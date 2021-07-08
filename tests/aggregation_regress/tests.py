@@ -2,13 +2,14 @@ import datetime
 import pickle
 from decimal import Decimal
 from operator import attrgetter
+from unittest import mock
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
 from django.db import connection
 from django.db.models import (
-    Avg, Case, Count, DecimalField, F, IntegerField, Max, Q, StdDev, Sum,
-    Value, Variance, When,
+    Aggregate, Avg, Case, Count, DecimalField, F, IntegerField, Max, Q, StdDev,
+    Sum, Value, Variance, When,
 )
 from django.test import TestCase, skipUnlessAnyDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate
@@ -369,11 +370,11 @@ class AggregationTests(TestCase):
             {'c__max': 3}
         )
 
-    def test_conditional_aggreate(self):
+    def test_conditional_aggregate(self):
         # Conditional aggregation of a grouped queryset.
         self.assertEqual(
             Book.objects.annotate(c=Count('authors')).values('pk').aggregate(test=Sum(
-                Case(When(c__gt=1, then=1), output_field=IntegerField())
+                Case(When(c__gt=1, then=1))
             ))['test'],
             3
         )
@@ -381,19 +382,19 @@ class AggregationTests(TestCase):
     def test_sliced_conditional_aggregate(self):
         self.assertEqual(
             Author.objects.all()[:5].aggregate(test=Sum(Case(
-                When(age__lte=35, then=1), output_field=IntegerField()
+                When(age__lte=35, then=1)
             )))['test'],
             3
         )
 
     def test_annotated_conditional_aggregate(self):
-        annotated_qs = Book.objects.annotate(discount_price=F('price') * 0.75)
+        annotated_qs = Book.objects.annotate(discount_price=F('price') * Decimal('0.75'))
         self.assertAlmostEqual(
             annotated_qs.aggregate(test=Avg(Case(
                 When(pages__lt=400, then='discount_price'),
                 output_field=DecimalField()
             )))['test'],
-            22.27, places=2
+            Decimal('22.27'), places=2
         )
 
     def test_distinct_conditional_aggregate(self):
@@ -430,13 +431,23 @@ class AggregationTests(TestCase):
 
     def test_field_error(self):
         # Bad field requests in aggregates are caught and reported
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'foo' into field. Choices are: authors, "
+            "contact, contact_id, hardbackbook, id, isbn, name, pages, price, "
+            "pubdate, publisher, publisher_id, rating, store, tags"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Book.objects.all().aggregate(num_authors=Count('foo'))
 
-        with self.assertRaises(FieldError):
+        with self.assertRaisesMessage(FieldError, msg):
             Book.objects.all().annotate(num_authors=Count('foo'))
 
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'foo' into field. Choices are: authors, "
+            "contact, contact_id, hardbackbook, id, isbn, name, num_authors, "
+            "pages, price, pubdate, publisher, publisher_id, rating, store, tags"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Book.objects.all().annotate(num_authors=Count('authors__id')).aggregate(Max('foo'))
 
     def test_more(self):
@@ -668,7 +679,7 @@ class AggregationTests(TestCase):
         )
 
         # Regression for #10127 - Empty select_related() works with annotate
-        qs = Book.objects.filter(rating__lt=4.5).select_related().annotate(Avg('authors__age'))
+        qs = Book.objects.filter(rating__lt=4.5).select_related().annotate(Avg('authors__age')).order_by('name')
         self.assertQuerysetEqual(
             qs,
             [
@@ -690,10 +701,10 @@ class AggregationTests(TestCase):
         qs = Book.objects.extra(select={'pub': 'publisher_id'}).values('pub').annotate(Count('id')).order_by('pub')
         self.assertSequenceEqual(
             qs, [
-                {'pub': self.b1.id, 'id__count': 2},
-                {'pub': self.b2.id, 'id__count': 1},
-                {'pub': self.b3.id, 'id__count': 2},
-                {'pub': self.b4.id, 'id__count': 1}
+                {'pub': self.p1.id, 'id__count': 2},
+                {'pub': self.p2.id, 'id__count': 1},
+                {'pub': self.p3.id, 'id__count': 2},
+                {'pub': self.p4.id, 'id__count': 1},
             ],
         )
 
@@ -737,20 +748,31 @@ class AggregationTests(TestCase):
 
     def test_duplicate_alias(self):
         # Regression for #11256 - duplicating a default alias raises ValueError.
-        with self.assertRaises(ValueError):
+        msg = (
+            "The named annotation 'authors__age__avg' conflicts with "
+            "the default name for another annotation."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             Book.objects.all().annotate(Avg('authors__age'), authors__age__avg=Avg('authors__age'))
 
     def test_field_name_conflict(self):
         # Regression for #11256 - providing an aggregate name
         # that conflicts with a field name on the model raises ValueError
-        with self.assertRaises(ValueError):
+        msg = "The annotation 'age' conflicts with a field on the model."
+        with self.assertRaisesMessage(ValueError, msg):
             Author.objects.annotate(age=Avg('friends__age'))
 
     def test_m2m_name_conflict(self):
         # Regression for #11256 - providing an aggregate name
         # that conflicts with an m2m name on the model raises ValueError
-        with self.assertRaises(ValueError):
+        msg = "The annotation 'friends' conflicts with a field on the model."
+        with self.assertRaisesMessage(ValueError, msg):
             Author.objects.annotate(friends=Count('friends'))
+
+    def test_fk_attname_conflict(self):
+        msg = "The annotation 'contact_id' conflicts with a field on the model."
+        with self.assertRaisesMessage(ValueError, msg):
+            Book.objects.annotate(contact_id=F('publisher_id'))
 
     def test_values_queryset_non_conflict(self):
         # Regression for #14707 -- If you're using a values query set, some potential conflicts are avoided.
@@ -777,7 +799,8 @@ class AggregationTests(TestCase):
     def test_reverse_relation_name_conflict(self):
         # Regression for #11256 - providing an aggregate name
         # that conflicts with a reverse-related name on the model raises ValueError
-        with self.assertRaises(ValueError):
+        msg = "The annotation 'book_contact_set' conflicts with a field on the model."
+        with self.assertRaisesMessage(ValueError, msg):
             Author.objects.annotate(book_contact_set=Avg('friends__age'))
 
     def test_pickle(self):
@@ -853,7 +876,7 @@ class AggregationTests(TestCase):
         )
 
         # Note: intentionally no order_by(), that case needs tests, too.
-        publishers = Publisher.objects.filter(id__in=[1, 2])
+        publishers = Publisher.objects.filter(id__in=[self.p1.id, self.p2.id])
         self.assertEqual(
             sorted(p.name for p in publishers),
             [
@@ -910,7 +933,9 @@ class AggregationTests(TestCase):
             {'n_pages': 2078},
         )
 
-        qs = HardbackBook.objects.annotate(n_authors=Count('book_ptr__authors')).values('name', 'n_authors')
+        qs = HardbackBook.objects.annotate(
+            n_authors=Count('book_ptr__authors'),
+        ).values('name', 'n_authors').order_by('name')
         self.assertSequenceEqual(
             qs,
             [
@@ -922,7 +947,7 @@ class AggregationTests(TestCase):
             ],
         )
 
-        qs = HardbackBook.objects.annotate(n_authors=Count('authors')).values('name', 'n_authors')
+        qs = HardbackBook.objects.annotate(n_authors=Count('authors')).values('name', 'n_authors').order_by('name')
         self.assertSequenceEqual(
             qs,
             [
@@ -936,7 +961,8 @@ class AggregationTests(TestCase):
 
         # Regression for #10766 - Shouldn't be able to reference an aggregate
         # fields in an aggregate() call.
-        with self.assertRaises(FieldError):
+        msg = "Cannot compute Avg('mean_age'): 'mean_age' is an aggregate"
+        with self.assertRaisesMessage(FieldError, msg):
             Book.objects.annotate(mean_age=Avg('authors__age')).annotate(Avg('mean_age'))
 
     def test_empty_filter_count(self):
@@ -948,7 +974,7 @@ class AggregationTests(TestCase):
     def test_empty_filter_aggregate(self):
         self.assertEqual(
             Author.objects.filter(id__in=[]).annotate(Count("friends")).aggregate(Count("pk")),
-            {"pk__count": None}
+            {"pk__count": 0}
         )
 
     def test_none_call_before_aggregate(self):
@@ -981,7 +1007,7 @@ class AggregationTests(TestCase):
     def test_values_annotate_values(self):
         qs = Book.objects.values("name").annotate(
             n_authors=Count("authors")
-        ).values_list("pk", flat=True)
+        ).values_list("pk", flat=True).order_by('name')
         self.assertEqual(list(qs), list(Book.objects.values_list("pk", flat=True)))
 
     def test_having_group_by(self):
@@ -991,7 +1017,7 @@ class AggregationTests(TestCase):
             n_authors=Count("authors")
         ).filter(
             pages__gt=F("n_authors")
-        ).values_list("name", flat=True)
+        ).values_list("name", flat=True).order_by('name')
         # Results should be the same, all Books have more pages than authors
         self.assertEqual(
             list(qs), list(Book.objects.values_list("name", flat=True))
@@ -1006,12 +1032,12 @@ class AggregationTests(TestCase):
         books = Book.objects.values_list("publisher__name").annotate(
             Count("id"), Avg("price"), Avg("authors__age"), avg_pgs=Avg("pages")
         ).order_by("-publisher__name")
-        self.assertEqual(books[0], ('Sams', 1, 23.09, 45.0, 528.0))
+        self.assertEqual(books[0], ('Sams', 1, Decimal('23.09'), 45.0, 528.0))
 
     def test_annotation_disjunction(self):
         qs = Book.objects.annotate(n_authors=Count("authors")).filter(
             Q(n_authors=2) | Q(name="Python Web Development with Django")
-        )
+        ).order_by('name')
         self.assertQuerysetEqual(
             qs, [
                 "Artificial Intelligence: A Modern Approach",
@@ -1028,7 +1054,7 @@ class AggregationTests(TestCase):
                 Q(name="The Definitive Guide to Django: Web Development Done Right") |
                 (Q(name="Artificial Intelligence: A Modern Approach") & Q(n_authors=3))
             )
-        )
+        ).order_by('name')
         self.assertQuerysetEqual(
             qs,
             [
@@ -1082,7 +1108,6 @@ class AggregationTests(TestCase):
             lambda b: (b.name, b.authorCount)
         )
 
-    @skipUnlessDBFeature('supports_stddev')
     def test_stddev(self):
         self.assertEqual(
             Book.objects.aggregate(StdDev('pages')),
@@ -1096,7 +1121,7 @@ class AggregationTests(TestCase):
 
         self.assertEqual(
             Book.objects.aggregate(StdDev('price')),
-            {'price__stddev': Approximate(24.16, 2)}
+            {'price__stddev': Approximate(Decimal('24.16'), 2)}
         )
 
         self.assertEqual(
@@ -1111,7 +1136,7 @@ class AggregationTests(TestCase):
 
         self.assertEqual(
             Book.objects.aggregate(StdDev('price', sample=True)),
-            {'price__stddev': Approximate(26.46, 1)}
+            {'price__stddev': Approximate(Decimal('26.46'), 1)}
         )
 
         self.assertEqual(
@@ -1126,7 +1151,7 @@ class AggregationTests(TestCase):
 
         self.assertEqual(
             Book.objects.aggregate(Variance('price')),
-            {'price__variance': Approximate(583.77, 1)}
+            {'price__variance': Approximate(Decimal('583.77'), 1)}
         )
 
         self.assertEqual(
@@ -1141,7 +1166,7 @@ class AggregationTests(TestCase):
 
         self.assertEqual(
             Book.objects.aggregate(Variance('price', sample=True)),
-            {'price__variance': Approximate(700.53, 2)}
+            {'price__variance': Approximate(Decimal('700.53'), 2)}
         )
 
     def test_filtering_by_annotation_name(self):
@@ -1262,6 +1287,69 @@ class AggregationTests(TestCase):
             ]
         )
 
+    @skipUnlessDBFeature('allows_group_by_selected_pks')
+    def test_aggregate_unmanaged_model_columns(self):
+        """
+        Unmanaged models are sometimes used to represent database views which
+        may not allow grouping by selected primary key.
+        """
+        def assertQuerysetResults(queryset):
+            self.assertEqual(
+                [(b.name, b.num_authors) for b in queryset.order_by('name')],
+                [
+                    ('Artificial Intelligence: A Modern Approach', 2),
+                    ('Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp', 1),
+                    ('Practical Django Projects', 1),
+                    ('Python Web Development with Django', 3),
+                    ('Sams Teach Yourself Django in 24 Hours', 1),
+                    ('The Definitive Guide to Django: Web Development Done Right', 2),
+                ]
+            )
+        queryset = Book.objects.select_related('contact').annotate(num_authors=Count('authors'))
+        # Unmanaged origin model.
+        with mock.patch.object(Book._meta, 'managed', False):
+            _, _, grouping = queryset.query.get_compiler(using='default').pre_sql_setup()
+            self.assertEqual(len(grouping), len(Book._meta.fields) + 1)
+            for index, field in enumerate(Book._meta.fields):
+                self.assertIn(field.name, grouping[index][0])
+            self.assertIn(Author._meta.pk.name, grouping[-1][0])
+            assertQuerysetResults(queryset)
+        # Unmanaged related model.
+        with mock.patch.object(Author._meta, 'managed', False):
+            _, _, grouping = queryset.query.get_compiler(using='default').pre_sql_setup()
+            self.assertEqual(len(grouping), len(Author._meta.fields) + 1)
+            self.assertIn(Book._meta.pk.name, grouping[0][0])
+            for index, field in enumerate(Author._meta.fields):
+                self.assertIn(field.name, grouping[index + 1][0])
+            assertQuerysetResults(queryset)
+
+    @skipUnlessDBFeature('allows_group_by_selected_pks')
+    def test_aggregate_unmanaged_model_as_tables(self):
+        qs = Book.objects.select_related('contact').annotate(num_authors=Count('authors'))
+        # Force treating unmanaged models as tables.
+        with mock.patch(
+            'django.db.connection.features.allows_group_by_selected_pks_on_model',
+            return_value=True,
+        ):
+            with mock.patch.object(Book._meta, 'managed', False), \
+                    mock.patch.object(Author._meta, 'managed', False):
+                _, _, grouping = qs.query.get_compiler(using='default').pre_sql_setup()
+                self.assertEqual(len(grouping), 2)
+                self.assertIn('id', grouping[0][0])
+                self.assertIn('id', grouping[1][0])
+                self.assertQuerysetEqual(
+                    qs.order_by('name'),
+                    [
+                        ('Artificial Intelligence: A Modern Approach', 2),
+                        ('Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp', 1),
+                        ('Practical Django Projects', 1),
+                        ('Python Web Development with Django', 3),
+                        ('Sams Teach Yourself Django in 24 Hours', 1),
+                        ('The Definitive Guide to Django: Web Development Done Right', 2),
+                    ],
+                    attrgetter('name', 'num_authors'),
+                )
+
     def test_reverse_join_trimming(self):
         qs = Author.objects.annotate(Count('book_contact_set__contact'))
         self.assertIn(' JOIN ', str(qs.query))
@@ -1362,8 +1450,10 @@ class AggregationTests(TestCase):
         query = Book.objects.annotate(Count('authors')).filter(
             q1 | q2).order_by('pk')
         self.assertQuerysetEqual(
-            query, [1, 4, 5, 6],
-            lambda b: b.pk)
+            query,
+            [self.b1.pk, self.b4.pk, self.b5.pk, self.b6.pk],
+            attrgetter('pk'),
+        )
 
     def test_ticket_11293_q_immutable(self):
         """
@@ -1419,6 +1509,29 @@ class AggregationTests(TestCase):
         vals1 = Book.objects.values('rating', 'price').distinct().aggregate(result=Sum('rating'))
         vals2 = Book.objects.aggregate(result=Sum('rating') - Value(4.0))
         self.assertEqual(vals1, vals2)
+
+    def test_annotate_values_list_flat(self):
+        """Find ages that are shared by at least two authors."""
+        qs = Author.objects.values_list('age', flat=True).annotate(age_count=Count('age')).filter(age_count__gt=1)
+        self.assertSequenceEqual(qs, [29])
+
+    def test_allow_distinct(self):
+        class MyAggregate(Aggregate):
+            pass
+        with self.assertRaisesMessage(TypeError, 'MyAggregate does not allow distinct'):
+            MyAggregate('foo', distinct=True)
+
+        class DistinctAggregate(Aggregate):
+            allow_distinct = True
+        DistinctAggregate('foo', distinct=True)
+
+    @skipUnlessDBFeature('supports_subqueries_in_group_by')
+    def test_having_subquery_select(self):
+        authors = Author.objects.filter(pk=self.a1.pk)
+        books = Book.objects.annotate(Count('authors')).filter(
+            Q(authors__in=authors) | Q(authors__count__gt=2)
+        )
+        self.assertEqual(set(books), {self.b1, self.b4})
 
 
 class JoinPromotionTests(TestCase):

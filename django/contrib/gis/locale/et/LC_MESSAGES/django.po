@@ -6,13 +6,14 @@
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
 # madisvain <madisvain@gmail.com>, 2011
 # Martin Pajuste <martinpajuste@gmail.com>, 2015
+# Ragnar Rebase <rrebase@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-16 20:39+0000\n"
-"Last-Translator: Janno Liivak <jannolii@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-12-28 02:37+0000\n"
+"Last-Translator: Ragnar Rebase <rrebase@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -28,7 +29,7 @@ msgid "The base GIS field."
 msgstr "Baas GIS väli."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "Baas Geomeetria väli -- ühildub OpenGIS Spetsifikatsiooni Geomeetria tüübiga."
 
@@ -79,9 +80,6 @@ msgstr "Kustuta kõik Vahendid"
 msgid "WKT debugging window:"
 msgstr "WKT silumisaken:"
 
-msgid "Google Maps via GeoDjango"
-msgstr "Google Maps läbi GeoDjango"
-
 msgid "Debugging window (serialized value)"
 msgstr "Siluri aken (järjestikväärtus)"
 
@@ -89,5 +87,5 @@ msgid "No feeds are registered."
 msgstr "Ühtegi voogu pole registreeritud."
 
 #, python-format
-msgid "Slug %r isn't registered."
-msgstr "Nälk %r ei ole registreeritud."
+msgid "Slug %r isn’t registered."
+msgstr "Nälk %r ei ole registeeritud."

@@ -1,6 +1,5 @@
 import string
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.template import Origin, TemplateDoesNotExist
 from django.utils.html import conditional_escape
@@ -28,19 +27,16 @@ class TemplateStrings(BaseEngine):
         tried = []
         for template_file in self.iter_template_filenames(template_name):
             try:
-                with open(template_file, encoding=settings.FILE_CHARSET) as fp:
+                with open(template_file, encoding='utf-8') as fp:
                     template_code = fp.read()
             except FileNotFoundError:
                 tried.append((
                     Origin(template_file, template_name, self),
                     'Source does not exist',
                 ))
-                continue
-
-            return Template(template_code)
-
-        else:
-            raise TemplateDoesNotExist(template_name, tried=tried, backend=self)
+            else:
+                return Template(template_code)
+        raise TemplateDoesNotExist(template_name, tried=tried, backend=self)
 
 
 class Template(string.Template):

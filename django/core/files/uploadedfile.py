@@ -8,6 +8,7 @@ from io import BytesIO
 from django.conf import settings
 from django.core.files import temp as tempfile
 from django.core.files.base import File
+from django.core.files.utils import validate_file_name
 
 __all__ = ('UploadedFile', 'TemporaryUploadedFile', 'InMemoryUploadedFile',
            'SimpleUploadedFile')
@@ -15,13 +16,12 @@ __all__ = ('UploadedFile', 'TemporaryUploadedFile', 'InMemoryUploadedFile',
 
 class UploadedFile(File):
     """
-    A abstract uploaded file (``TemporaryUploadedFile`` and
+    An abstract uploaded file (``TemporaryUploadedFile`` and
     ``InMemoryUploadedFile`` are the built-in concrete subclasses).
 
     An ``UploadedFile`` object behaves somewhat like a file object and
     represents some file data that the user submitted with a form.
     """
-    DEFAULT_CHUNK_SIZE = 64 * 2 ** 10
 
     def __init__(self, file=None, name=None, content_type=None, size=None, charset=None, content_type_extra=None):
         super().__init__(file, name)
@@ -48,6 +48,8 @@ class UploadedFile(File):
                 ext = ext[:255]
                 name = name[:255 - len(ext)] + ext
 
+            name = validate_file_name(name)
+
         self._name = name
 
     name = property(_get_name, _set_name)
@@ -58,7 +60,8 @@ class TemporaryUploadedFile(UploadedFile):
     A file uploaded to a temporary location (i.e. stream-to-disk).
     """
     def __init__(self, name, content_type, size, charset, content_type_extra=None):
-        file = tempfile.NamedTemporaryFile(suffix='.upload', dir=settings.FILE_UPLOAD_TEMP_DIR)
+        _, ext = os.path.splitext(name)
+        file = tempfile.NamedTemporaryFile(suffix='.upload' + ext, dir=settings.FILE_UPLOAD_TEMP_DIR)
         super().__init__(file, name, content_type, size, charset, content_type_extra)
 
     def temporary_file_path(self):
@@ -85,6 +88,7 @@ class InMemoryUploadedFile(UploadedFile):
 
     def open(self, mode=None):
         self.file.seek(0)
+        return self
 
     def chunks(self, chunk_size=None):
         self.file.seek(0)

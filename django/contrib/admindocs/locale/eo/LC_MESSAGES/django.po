@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2016
+# Batist D 🐍 <baptiste+transifex@darthenay.fr>, 2013-2016
+# Matthieu Desplantes <matmututu@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-09-28 11:26+0000\n"
-"Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-04-13 08:19+0000\n"
+"Last-Translator: Matthieu Desplantes <matmututu@gmail.com>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
 "MIME-Version: 1.0\n"
@@ -98,11 +99,9 @@ msgstr "Bonvolu instali docutils-n"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
+"The admin documentation system requires Python’s <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
-"La admin dokumentaran sistemon bezonas la pitonan <a href=\"%(link)s"
-"\">docutils</a> bibliotekon."
 
 #, python-format
 msgid ""
@@ -153,13 +152,13 @@ msgid "Template: %(name)s"
 msgstr "Ŝablono: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Ŝablono: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr "Ŝablono: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "Serĉi vojon por ŝablono “%(name)s”:"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr ""
 
 msgid "(does not exist)"
 msgstr "(ne ekzistas)"
@@ -238,13 +237,6 @@ msgid ""
 msgstr ""
 "\n"
 "Vida funkcio: <code>%(full_name)s</code>. Nomo: <code>%(url_name)s</code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Bulea (Vera aŭ Malvera)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Tipo de kampo: %(field_type)s"
 
 msgid "tag:"
 msgstr "etikedo:"

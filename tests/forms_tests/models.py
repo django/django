@@ -50,8 +50,7 @@ class ChoiceModel(models.Model):
     choice = models.CharField(max_length=2, blank=True, choices=CHOICES)
     choice_string_w_none = models.CharField(
         max_length=2, blank=True, null=True, choices=STRING_CHOICES_WITH_NONE)
-    choice_integer = models.IntegerField(choices=INTEGER_CHOICES, blank=True,
-                                         null=True)
+    choice_integer = models.IntegerField(choices=INTEGER_CHOICES, blank=True, null=True)
 
 
 class ChoiceOptionModel(models.Model):
@@ -128,13 +127,6 @@ class OptionalMultiChoiceModel(models.Model):
 
 class FileModel(models.Model):
     file = models.FileField(storage=temp_storage, upload_to='tests')
-
-
-class Group(models.Model):
-    name = models.CharField(max_length=10)
-
-    def __str__(self):
-        return '%s' % self.name
 
 
 class Article(models.Model):

@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 
-from .models import Child, Event, Parent, Swallow
+from .models import Band, Child, Event, Parent, Swallow
 
 site = admin.AdminSite(name="admin")
 
@@ -16,8 +16,10 @@ class CustomPaginator(Paginator):
 
 
 class EventAdmin(admin.ModelAdmin):
+    date_hierarchy = 'date'
     list_display = ['event_date_func']
 
+    @admin.display
     def event_date_func(self, event):
         return event.date
 
@@ -31,6 +33,7 @@ site.register(Event, EventAdmin)
 class ParentAdmin(admin.ModelAdmin):
     list_filter = ['child__name']
     search_fields = ['child__name']
+    list_select_related = ['child']
 
 
 class ChildAdmin(admin.ModelAdmin):
@@ -56,6 +59,31 @@ class FilteredChildAdmin(admin.ModelAdmin):
 
 class BandAdmin(admin.ModelAdmin):
     list_filter = ['genres']
+
+
+class NrOfMembersFilter(admin.SimpleListFilter):
+    title = 'number of members'
+    parameter_name = 'nr_of_members_partition'
+
+    def lookups(self, request, model_admin):
+        return [
+            ('5', '0 - 5'),
+            ('more', 'more than 5'),
+        ]
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == '5':
+            return queryset.filter(nr_of_members__lte=5)
+        if value == 'more':
+            return queryset.filter(nr_of_members__gt=5)
+
+
+class BandCallableFilterAdmin(admin.ModelAdmin):
+    list_filter = [NrOfMembersFilter]
+
+
+site.register(Band, BandCallableFilterAdmin)
 
 
 class GroupAdmin(admin.ModelAdmin):
@@ -104,6 +132,8 @@ site.register(Child, DynamicListDisplayChildAdmin)
 
 class NoListDisplayLinksParentAdmin(admin.ModelAdmin):
     list_display_links = None
+    list_display = ['name']
+    list_editable = ['name']
 
 
 site.register(Parent, NoListDisplayLinksParentAdmin)
@@ -143,6 +173,6 @@ class EmptyValueChildAdmin(admin.ModelAdmin):
     empty_value_display = '-empty-'
     list_display = ('name', 'age_display', 'age')
 
+    @admin.display(empty_value='&dagger;')
     def age_display(self, obj):
         return obj.age
-    age_display.empty_value_display = '&dagger;'

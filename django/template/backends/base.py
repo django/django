@@ -20,7 +20,7 @@ class BaseEngine:
         params = params.copy()
         self.name = params.pop('NAME')
         self.dirs = list(params.pop('DIRS'))
-        self.app_dirs = bool(params.pop('APP_DIRS'))
+        self.app_dirs = params.pop('APP_DIRS')
         if params:
             raise ImproperlyConfigured(
                 "Unknown parameters: {}".format(", ".join(params)))

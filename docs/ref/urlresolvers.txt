@@ -17,7 +17,7 @@ callable view object. For example, given the following ``url``::
 
     from news import views
 
-    url(r'^archive/$', views.archive, name='news-archive')
+    path('archive/', views.archive, name='news-archive')
 
 you can use any of the following to reverse the URL::
 
@@ -130,6 +130,20 @@ If the URL does not resolve, the function raises a
 
         The name of the URL pattern that matches the URL.
 
+    .. attribute:: ResolverMatch.route
+
+        The route of the matching URL pattern.
+
+        For example, if ``path('users/<id>/', ...)`` is the matching pattern,
+        ``route`` will contain ``'users/<id>/'``.
+
+    .. attribute:: ResolverMatch.tried
+
+        .. versionadded:: 3.2
+
+        The list of URL patterns tried before the URL either matched one or
+        exhausted available patterns.
+
     .. attribute:: ResolverMatch.app_name
 
         The application namespace for the URL pattern that matches the
@@ -176,7 +190,7 @@ view would raise a ``Http404`` error before redirecting to it::
 
     from urllib.parse import urlparse
     from django.urls import resolve
-    from django.http import HttpResponseRedirect, Http404
+    from django.http import Http404, HttpResponseRedirect
 
     def myview(request):
         next = request.META.get('HTTP_REFERER', None) or '/'

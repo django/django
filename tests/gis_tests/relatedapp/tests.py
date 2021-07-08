@@ -1,18 +1,15 @@
 from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
-from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.geos import GEOSGeometry, MultiPoint, Point
-from django.db import connection
+from django.db import NotSupportedError, connection
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import override_settings
 from django.utils import timezone
 
-from ..utils import no_oracle
 from .models import (
     Article, Author, Book, City, DirectoryEntry, Event, Location, Parcel,
 )
 
 
-@skipUnlessDBFeature("gis_enabled")
 class RelatedGeoModelTest(TestCase):
     fixtures = ['initial']
 
@@ -34,7 +31,8 @@ class RelatedGeoModelTest(TestCase):
                 nm, st, lon, lat = ref
                 self.assertEqual(nm, c.name)
                 self.assertEqual(st, c.state)
-                self.assertEqual(Point(lon, lat, srid=c.location.point.srid), c.location.point)
+                self.assertAlmostEqual(lon, c.location.point.x, 6)
+                self.assertAlmostEqual(lat, c.location.point.y, 6)
 
     @skipUnlessDBFeature("supports_extent_aggr")
     def test_related_extent_aggregate(self):
@@ -133,7 +131,8 @@ class RelatedGeoModelTest(TestCase):
         # actually correspond to the centroid of the border.
         c1 = b1.centroid
         c2 = c1.transform(2276, clone=True)
-        Parcel.objects.create(name='P2', city=pcity, center1=c1, center2=c2, border1=b1, border2=b1)
+        b2 = b1 if connection.features.supports_transform else b1.transform(2276, clone=True)
+        Parcel.objects.create(name='P2', city=pcity, center1=c1, center2=c2, border1=b1, border2=b2)
 
         # Should return the second Parcel, which has the center within the
         # border.
@@ -141,12 +140,15 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(1, len(qs))
         self.assertEqual('P2', qs[0].name)
 
+        # This time center2 is in a different coordinate system and needs to be
+        # wrapped in transformation SQL.
+        qs = Parcel.objects.filter(center2__within=F('border1'))
         if connection.features.supports_transform:
-            # This time center2 is in a different coordinate system and needs
-            # to be wrapped in transformation SQL.
-            qs = Parcel.objects.filter(center2__within=F('border1'))
-            self.assertEqual(1, len(qs))
-            self.assertEqual('P2', qs[0].name)
+            self.assertEqual('P2', qs.get().name)
+        else:
+            msg = "This backend doesn't support the Transform function."
+            with self.assertRaisesMessage(NotSupportedError, msg):
+                list(qs)
 
         # Should return the first Parcel, which has the center point equal
         # to the point in the City ForeignKey.
@@ -154,11 +156,14 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(1, len(qs))
         self.assertEqual('P1', qs[0].name)
 
+        # This time the city column should be wrapped in transformation SQL.
+        qs = Parcel.objects.filter(border2__contains=F('city__location__point'))
         if connection.features.supports_transform:
-            # This time the city column should be wrapped in transformation SQL.
-            qs = Parcel.objects.filter(border2__contains=F('city__location__point'))
-            self.assertEqual(1, len(qs))
-            self.assertEqual('P1', qs[0].name)
+            self.assertEqual('P1', qs.get().name)
+        else:
+            msg = "This backend doesn't support the Transform function."
+            with self.assertRaisesMessage(NotSupportedError, msg):
+                list(qs)
 
     def test07_values(self):
         "Testing values() and values_list()."
@@ -171,8 +176,8 @@ class RelatedGeoModelTest(TestCase):
         for m, d, t in zip(gqs, gvqs, gvlqs):
             # The values should be Geometry objects and not raw strings returned
             # by the spatial database.
-            self.assertIsInstance(d['point'], Geometry)
-            self.assertIsInstance(t[1], Geometry)
+            self.assertIsInstance(d['point'], GEOSGeometry)
+            self.assertIsInstance(t[1], GEOSGeometry)
             self.assertEqual(m.point, d['point'])
             self.assertEqual(m.point, t[1])
 
@@ -202,8 +207,6 @@ class RelatedGeoModelTest(TestCase):
             self.assertEqual(val_dict['id'], c_id)
             self.assertEqual(val_dict['location__id'], l_id)
 
-    # TODO: fix on Oracle -- qs2 returns an empty result for an unknown reason
-    @no_oracle
     def test10_combine(self):
         "Testing the combination of two QuerySets (#10807)."
         buf1 = City.objects.get(name='Aurora').location.point.buffer(0.1)
@@ -216,10 +219,7 @@ class RelatedGeoModelTest(TestCase):
         self.assertIn('Aurora', names)
         self.assertIn('Kecksburg', names)
 
-    # TODO: fix on Oracle -- get the following error because the SQL is ordered
-    # by a geometry object, which Oracle apparently doesn't like:
-    #  ORA-22901: cannot compare nested table or VARRAY or LOB attributes of an object type
-    @no_oracle
+    @skipUnlessDBFeature('allows_group_by_lob')
     def test12a_count(self):
         "Testing `Count` aggregate on geo-fields."
         # The City, 'Fort Worth' uses the same location as Dallas.
@@ -241,10 +241,7 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(1, len(vqs))
         self.assertEqual(3, vqs[0]['num_books'])
 
-    # TODO: fix on Oracle -- get the following error because the SQL is ordered
-    # by a geometry object, which Oracle apparently doesn't like:
-    #  ORA-22901: cannot compare nested table or VARRAY or LOB attributes of an object type
-    @no_oracle
+    @skipUnlessDBFeature('allows_group_by_lob')
     def test13c_count(self):
         "Testing `Count` aggregate with `.values()`.  See #15305."
         qs = Location.objects.filter(id=5).annotate(num_cities=Count('city')).values('id', 'point', 'num_cities')
@@ -252,8 +249,6 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(2, qs[0]['num_cities'])
         self.assertIsInstance(qs[0]['point'], GEOSGeometry)
 
-    # TODO: The phantom model does appear on Oracle.
-    @no_oracle
     def test13_select_related_null_fk(self):
         "Testing `select_related` on a nullable ForeignKey."
         Book.objects.create(title='Without Author')

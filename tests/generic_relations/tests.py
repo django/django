@@ -1,11 +1,8 @@
-from django import forms
-from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
-from django.db import IntegrityError, models
+from django.db import IntegrityError
 from django.db.models import Q
 from django.test import SimpleTestCase, TestCase
-from django.test.utils import isolate_apps
 
 from .models import (
     AllowsNullGFK, Animal, Carrot, Comparison, ConcreteRelatedModel,
@@ -16,25 +13,26 @@ from .models import (
 
 
 class GenericRelationsTests(TestCase):
-    def setUp(self):
-        self.lion = Animal.objects.create(
-            common_name="Lion", latin_name="Panthera leo")
-        self.platypus = Animal.objects.create(
-            common_name="Platypus", latin_name="Ornithorhynchus anatinus")
+    @classmethod
+    def setUpTestData(cls):
+        cls.lion = Animal.objects.create(common_name='Lion', latin_name='Panthera leo')
+        cls.platypus = Animal.objects.create(
+            common_name='Platypus',
+            latin_name='Ornithorhynchus anatinus',
+        )
         Vegetable.objects.create(name="Eggplant", is_yucky=True)
-        self.bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
-        self.quartz = Mineral.objects.create(name="Quartz", hardness=7)
+        cls.bacon = Vegetable.objects.create(name='Bacon', is_yucky=False)
+        cls.quartz = Mineral.objects.create(name='Quartz', hardness=7)
 
         # Tagging stuff.
-        self.bacon.tags.create(tag="fatty")
-        self.bacon.tags.create(tag="salty")
-        self.lion.tags.create(tag="yellow")
-        self.lion.tags.create(tag="hairy")
+        cls.fatty = cls.bacon.tags.create(tag='fatty')
+        cls.salty = cls.bacon.tags.create(tag='salty')
+        cls.yellow = cls.lion.tags.create(tag='yellow')
+        cls.hairy = cls.lion.tags.create(tag='hairy')
 
+    def comp_func(self, obj):
         # Original list of tags:
-        self.comp_func = lambda obj: (
-            obj.tag, obj.content_type.model_class(), obj.object_id
-        )
+        return obj.tag, obj.content_type.model_class(), obj.object_id
 
     def test_generic_update_or_create_when_created(self):
         """
@@ -88,14 +86,8 @@ class GenericRelationsTests(TestCase):
         Objects with declared GenericRelations can be tagged directly -- the
         API mimics the many-to-many API.
         """
-        self.assertQuerysetEqual(self.lion.tags.all(), [
-            "<TaggedItem: hairy>",
-            "<TaggedItem: yellow>"
-        ])
-        self.assertQuerysetEqual(self.bacon.tags.all(), [
-            "<TaggedItem: fatty>",
-            "<TaggedItem: salty>"
-        ])
+        self.assertSequenceEqual(self.lion.tags.all(), [self.hairy, self.yellow])
+        self.assertSequenceEqual(self.bacon.tags.all(), [self.fatty, self.salty])
 
     def test_access_content_object(self):
         """
@@ -107,9 +99,7 @@ class GenericRelationsTests(TestCase):
     def test_query_content_object(self):
         qs = TaggedItem.objects.filter(
             animal__isnull=False).order_by('animal__common_name', 'tag')
-        self.assertQuerysetEqual(
-            qs, ["<TaggedItem: hairy>", "<TaggedItem: yellow>"]
-        )
+        self.assertSequenceEqual(qs, [self.hairy, self.yellow])
 
         mpk = ManualPK.objects.create(id=1)
         mpk.tags.create(tag='mpk')
@@ -126,17 +116,14 @@ class GenericRelationsTests(TestCase):
         # defined. That's OK, because you can create TaggedItems explicitly.
         # However, excluding GenericRelations means your lookups have to be a
         # bit more explicit.
-        TaggedItem.objects.create(content_object=self.quartz, tag="shiny")
-        TaggedItem.objects.create(content_object=self.quartz, tag="clearish")
+        shiny = TaggedItem.objects.create(content_object=self.quartz, tag="shiny")
+        clearish = TaggedItem.objects.create(content_object=self.quartz, tag="clearish")
 
         ctype = ContentType.objects.get_for_model(self.quartz)
         q = TaggedItem.objects.filter(
             content_type__pk=ctype.id, object_id=self.quartz.id
         )
-        self.assertQuerysetEqual(q, [
-            "<TaggedItem: clearish>",
-            "<TaggedItem: shiny>"
-        ])
+        self.assertSequenceEqual(q, [clearish, shiny])
 
     def test_access_via_content_type(self):
         """
@@ -147,9 +134,10 @@ class GenericRelationsTests(TestCase):
 
         ctype = ContentType.objects.get_for_model(self.platypus)
 
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Animal.objects.filter(tags__content_type=ctype),
-            ["<Animal: Platypus>"])
+            [self.platypus],
+        )
 
     def test_set_foreign_key(self):
         """
@@ -159,9 +147,7 @@ class GenericRelationsTests(TestCase):
         tag1.content_object = self.platypus
         tag1.save()
 
-        self.assertQuerysetEqual(
-            self.platypus.tags.all(),
-            ["<TaggedItem: shiny>"])
+        self.assertSequenceEqual(self.platypus.tags.all(), [tag1])
 
     def test_queries_across_generic_relations(self):
         """
@@ -169,10 +155,10 @@ class GenericRelationsTests(TestCase):
         there are two TaggedItems with a tag of "fatty", this query only pulls
         out the one with the content type related to Animals.
         """
-        self.assertQuerysetEqual(Animal.objects.order_by('common_name'), [
-            "<Animal: Lion>",
-            "<Animal: Platypus>"
-        ])
+        self.assertSequenceEqual(
+            Animal.objects.order_by('common_name'),
+            [self.lion, self.platypus],
+        )
 
     def test_queries_content_type_restriction(self):
         """
@@ -183,10 +169,14 @@ class GenericRelationsTests(TestCase):
         mpk.tags.create(tag="fatty")
         self.platypus.tags.create(tag="fatty")
 
-        self.assertQuerysetEqual(
-            Animal.objects.filter(tags__tag='fatty'), ["<Animal: Platypus>"])
-        self.assertQuerysetEqual(
-            Animal.objects.exclude(tags__tag='fatty'), ["<Animal: Lion>"])
+        self.assertSequenceEqual(
+            Animal.objects.filter(tags__tag='fatty'),
+            [self.platypus],
+        )
+        self.assertSequenceEqual(
+            Animal.objects.exclude(tags__tag='fatty'),
+            [self.lion],
+        )
 
     def test_object_deletion_with_generic_relation(self):
         """
@@ -238,7 +228,7 @@ class GenericRelationsTests(TestCase):
             content_type__pk=ctype.id, object_id=self.lion.id, tag="hairy")
         tag.delete()
 
-        self.assertQuerysetEqual(self.lion.tags.all(), ["<TaggedItem: yellow>"])
+        self.assertSequenceEqual(self.lion.tags.all(), [self.yellow])
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
             ('fatty', Vegetable, self.bacon.pk),
             ('salty', Vegetable, self.bacon.pk),
@@ -284,32 +274,22 @@ class GenericRelationsTests(TestCase):
         salty = bacon.tags.create(tag="salty")
 
         bacon.tags.set([fatty, salty])
-        self.assertQuerysetEqual(bacon.tags.all(), [
-            "<TaggedItem: fatty>",
-            "<TaggedItem: salty>",
-        ])
+        self.assertSequenceEqual(bacon.tags.all(), [fatty, salty])
 
         bacon.tags.set([fatty])
-        self.assertQuerysetEqual(bacon.tags.all(), [
-            "<TaggedItem: fatty>",
-        ])
+        self.assertSequenceEqual(bacon.tags.all(), [fatty])
 
         bacon.tags.set([])
-        self.assertQuerysetEqual(bacon.tags.all(), [])
+        self.assertSequenceEqual(bacon.tags.all(), [])
 
         bacon.tags.set([fatty, salty], bulk=False, clear=True)
-        self.assertQuerysetEqual(bacon.tags.all(), [
-            "<TaggedItem: fatty>",
-            "<TaggedItem: salty>",
-        ])
+        self.assertSequenceEqual(bacon.tags.all(), [fatty, salty])
 
         bacon.tags.set([fatty], bulk=False, clear=True)
-        self.assertQuerysetEqual(bacon.tags.all(), [
-            "<TaggedItem: fatty>",
-        ])
+        self.assertSequenceEqual(bacon.tags.all(), [fatty])
 
         bacon.tags.set([], clear=True)
-        self.assertQuerysetEqual(bacon.tags.all(), [])
+        self.assertSequenceEqual(bacon.tags.all(), [])
 
     def test_assign(self):
         bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
@@ -317,18 +297,13 @@ class GenericRelationsTests(TestCase):
         salty = bacon.tags.create(tag="salty")
 
         bacon.tags.set([fatty, salty])
-        self.assertQuerysetEqual(bacon.tags.all(), [
-            "<TaggedItem: fatty>",
-            "<TaggedItem: salty>",
-        ])
+        self.assertSequenceEqual(bacon.tags.all(), [fatty, salty])
 
         bacon.tags.set([fatty])
-        self.assertQuerysetEqual(bacon.tags.all(), [
-            "<TaggedItem: fatty>",
-        ])
+        self.assertSequenceEqual(bacon.tags.all(), [fatty])
 
         bacon.tags.set([])
-        self.assertQuerysetEqual(bacon.tags.all(), [])
+        self.assertSequenceEqual(bacon.tags.all(), [])
 
     def test_assign_with_queryset(self):
         # Querysets used in reverse GFK assignments are pre-evaluated so their
@@ -345,9 +320,38 @@ class GenericRelationsTests(TestCase):
         self.assertEqual(1, bacon.tags.count())
         self.assertEqual(1, qs.count())
 
+    def test_clear(self):
+        self.assertSequenceEqual(
+            TaggedItem.objects.order_by('tag'),
+            [self.fatty, self.hairy, self.salty, self.yellow],
+        )
+        self.bacon.tags.clear()
+        self.assertSequenceEqual(self.bacon.tags.all(), [])
+        self.assertSequenceEqual(
+            TaggedItem.objects.order_by('tag'),
+            [self.hairy, self.yellow],
+        )
+
+    def test_remove(self):
+        self.assertSequenceEqual(
+            TaggedItem.objects.order_by('tag'),
+            [self.fatty, self.hairy, self.salty, self.yellow],
+        )
+        self.bacon.tags.remove(self.fatty)
+        self.assertSequenceEqual(self.bacon.tags.all(), [self.salty])
+        self.assertSequenceEqual(
+            TaggedItem.objects.order_by('tag'),
+            [self.hairy, self.salty, self.yellow],
+        )
+
     def test_generic_relation_related_name_default(self):
         # GenericRelation isn't usable from the reverse side by default.
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'vegetable' into field. Choices are: "
+            "animal, content_object, content_type, content_type_id, id, "
+            "manualpk, object_id, tag, valuabletaggeditem"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             TaggedItem.objects.filter(vegetable__isnull=True)
 
     def test_multiple_gfk(self):
@@ -358,42 +362,35 @@ class GenericRelationsTests(TestCase):
         bear = Animal.objects.create(common_name="bear")
 
         # Create directly
-        Comparison.objects.create(
+        c1 = Comparison.objects.create(
             first_obj=cheetah, other_obj=tiger, comparative="faster"
         )
-        Comparison.objects.create(
+        c2 = Comparison.objects.create(
             first_obj=tiger, other_obj=cheetah, comparative="cooler"
         )
 
         # Create using GenericRelation
-        tiger.comparisons.create(other_obj=bear, comparative="cooler")
-        tiger.comparisons.create(other_obj=cheetah, comparative="stronger")
-        self.assertQuerysetEqual(cheetah.comparisons.all(), [
-            "<Comparison: cheetah is faster than tiger>"
-        ])
+        c3 = tiger.comparisons.create(other_obj=bear, comparative="cooler")
+        c4 = tiger.comparisons.create(other_obj=cheetah, comparative="stronger")
+        self.assertSequenceEqual(cheetah.comparisons.all(), [c1])
 
         # Filtering works
-        self.assertQuerysetEqual(tiger.comparisons.filter(comparative="cooler"), [
-            "<Comparison: tiger is cooler than cheetah>",
-            "<Comparison: tiger is cooler than bear>",
-        ], ordered=False)
+        self.assertCountEqual(
+            tiger.comparisons.filter(comparative='cooler'),
+            [c2, c3],
+        )
 
         # Filtering and deleting works
         subjective = ["cooler"]
         tiger.comparisons.filter(comparative__in=subjective).delete()
-        self.assertQuerysetEqual(Comparison.objects.all(), [
-            "<Comparison: cheetah is faster than tiger>",
-            "<Comparison: tiger is stronger than cheetah>"
-        ], ordered=False)
+        self.assertCountEqual(Comparison.objects.all(), [c1, c4])
 
         # If we delete cheetah, Comparisons with cheetah as 'first_obj' will be
         # deleted since Animal has an explicit GenericRelation to Comparison
         # through first_obj. Comparisons with cheetah as 'other_obj' will not
         # be deleted.
         cheetah.delete()
-        self.assertQuerysetEqual(Comparison.objects.all(), [
-            "<Comparison: tiger is stronger than None>"
-        ])
+        self.assertSequenceEqual(Comparison.objects.all(), [c4])
 
     def test_gfk_subclasses(self):
         # GenericForeignKey should work with subclasses (see #8309)
@@ -416,73 +413,6 @@ class GenericRelationsTests(TestCase):
         self.assertEqual(ValuableRock.objects.filter(tags__tag="countertop").count(), 1)
         granite.delete()  # deleting the rock should delete the related tag.
         self.assertEqual(ValuableTaggedItem.objects.count(), 0)
-
-    def test_generic_inline_formsets(self):
-        GenericFormSet = generic_inlineformset_factory(TaggedItem, extra=1)
-        formset = GenericFormSet()
-        self.assertHTMLEqual(
-            ''.join(form.as_p() for form in formset.forms),
-            """<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-tag">
-Tag:</label> <input id="id_generic_relations-taggeditem-content_type-object_id-0-tag" type="text"
-name="generic_relations-taggeditem-content_type-object_id-0-tag" maxlength="50" /></p>
-<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-DELETE">Delete:</label>
-<input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-0-DELETE"
-id="id_generic_relations-taggeditem-content_type-object_id-0-DELETE" />
-<input type="hidden" name="generic_relations-taggeditem-content_type-object_id-0-id"
-id="id_generic_relations-taggeditem-content_type-object_id-0-id" /></p>"""
-        )
-
-        formset = GenericFormSet(instance=Animal())
-        self.assertHTMLEqual(
-            ''.join(form.as_p() for form in formset.forms),
-            """<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-tag">
-Tag:</label> <input id="id_generic_relations-taggeditem-content_type-object_id-0-tag"
-type="text" name="generic_relations-taggeditem-content_type-object_id-0-tag" maxlength="50" /></p>
-<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-DELETE">Delete:</label>
-<input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-0-DELETE"
-id="id_generic_relations-taggeditem-content_type-object_id-0-DELETE" /><input type="hidden"
-name="generic_relations-taggeditem-content_type-object_id-0-id"
-id="id_generic_relations-taggeditem-content_type-object_id-0-id" /></p>"""
-        )
-
-        platypus = Animal.objects.create(
-            common_name="Platypus", latin_name="Ornithorhynchus anatinus"
-        )
-        platypus.tags.create(tag="shiny")
-        GenericFormSet = generic_inlineformset_factory(TaggedItem, extra=1)
-        formset = GenericFormSet(instance=platypus)
-        tagged_item_id = TaggedItem.objects.get(
-            tag='shiny', object_id=platypus.id
-        ).id
-        self.assertHTMLEqual(
-            ''.join(form.as_p() for form in formset.forms),
-            """<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-tag">Tag:</label>
-<input id="id_generic_relations-taggeditem-content_type-object_id-0-tag" type="text"
-name="generic_relations-taggeditem-content_type-object_id-0-tag" value="shiny" maxlength="50" /></p>
-<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-DELETE">Delete:</label>
-<input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-0-DELETE"
-id="id_generic_relations-taggeditem-content_type-object_id-0-DELETE" />
-<input type="hidden" name="generic_relations-taggeditem-content_type-object_id-0-id"
-value="%s" id="id_generic_relations-taggeditem-content_type-object_id-0-id" /></p>
-<p><label for="id_generic_relations-taggeditem-content_type-object_id-1-tag">Tag:</label>
-<input id="id_generic_relations-taggeditem-content_type-object_id-1-tag" type="text"
-name="generic_relations-taggeditem-content_type-object_id-1-tag" maxlength="50" /></p>
-<p><label for="id_generic_relations-taggeditem-content_type-object_id-1-DELETE">Delete:</label>
-<input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-1-DELETE"
-id="id_generic_relations-taggeditem-content_type-object_id-1-DELETE" />
-<input type="hidden" name="generic_relations-taggeditem-content_type-object_id-1-id"
-id="id_generic_relations-taggeditem-content_type-object_id-1-id" /></p>""" % tagged_item_id
-        )
-
-        lion = Animal.objects.create(common_name="Lion", latin_name="Panthera leo")
-        formset = GenericFormSet(instance=lion, prefix='x')
-        self.assertHTMLEqual(
-            ''.join(form.as_p() for form in formset.forms),
-            """<p><label for="id_x-0-tag">Tag:</label>
-<input id="id_x-0-tag" type="text" name="x-0-tag" maxlength="50" /></p>
-<p><label for="id_x-0-DELETE">Delete:</label> <input type="checkbox" name="x-0-DELETE" id="id_x-0-DELETE" />
-<input type="hidden" name="x-0-id" id="id_x-0-id" /></p>"""
-        )
 
     def test_gfk_manager(self):
         # GenericForeignKey should not use the default manager (which may filter objects) #16048
@@ -507,22 +437,6 @@ id="id_generic_relations-taggeditem-content_type-object_id-1-id" /></p>""" % tag
         bear = Carrot.objects.create(name='carrot')
         TaggedItem.objects.create(content_object=bear, tag='orange')
         self.assertEqual(Carrot.objects.get(tags__tag='orange'), bear)
-
-    def test_generic_inline_formsets_initial(self):
-        """
-        Test for #17927 Initial values support for BaseGenericInlineFormSet.
-        """
-        quartz = Mineral.objects.create(name="Quartz", hardness=7)
-
-        GenericFormSet = generic_inlineformset_factory(TaggedItem, extra=1)
-        ctype = ContentType.objects.get_for_model(quartz)
-        initial_data = [{
-            'tag': 'lizard',
-            'content_type': ctype.pk,
-            'object_id': quartz.pk,
-        }]
-        formset = GenericFormSet(initial=initial_data)
-        self.assertEqual(formset.forms[0].initial, initial_data[0])
 
     def test_get_or_create(self):
         # get_or_create should work with virtual fields (content_object)
@@ -580,97 +494,83 @@ id="id_generic_relations-taggeditem-content_type-object_id-1-id" /></p>""" % tag
         tag = TaggedItem(content_object=spinach)
         self.assertEqual(tag.content_object, spinach)
 
+    def test_create_after_prefetch(self):
+        platypus = Animal.objects.prefetch_related('tags').get(pk=self.platypus.pk)
+        self.assertSequenceEqual(platypus.tags.all(), [])
+        weird_tag = platypus.tags.create(tag='weird')
+        self.assertSequenceEqual(platypus.tags.all(), [weird_tag])
 
-class CustomWidget(forms.TextInput):
-    pass
+    def test_add_after_prefetch(self):
+        platypus = Animal.objects.prefetch_related('tags').get(pk=self.platypus.pk)
+        self.assertSequenceEqual(platypus.tags.all(), [])
+        weird_tag = TaggedItem.objects.create(tag='weird', content_object=platypus)
+        platypus.tags.add(weird_tag)
+        self.assertSequenceEqual(platypus.tags.all(), [weird_tag])
 
+    def test_remove_after_prefetch(self):
+        weird_tag = self.platypus.tags.create(tag='weird')
+        platypus = Animal.objects.prefetch_related('tags').get(pk=self.platypus.pk)
+        self.assertSequenceEqual(platypus.tags.all(), [weird_tag])
+        platypus.tags.remove(weird_tag)
+        self.assertSequenceEqual(platypus.tags.all(), [])
 
-class TaggedItemForm(forms.ModelForm):
-    class Meta:
-        model = TaggedItem
-        fields = '__all__'
-        widgets = {'tag': CustomWidget}
+    def test_clear_after_prefetch(self):
+        weird_tag = self.platypus.tags.create(tag='weird')
+        platypus = Animal.objects.prefetch_related('tags').get(pk=self.platypus.pk)
+        self.assertSequenceEqual(platypus.tags.all(), [weird_tag])
+        platypus.tags.clear()
+        self.assertSequenceEqual(platypus.tags.all(), [])
 
+    def test_set_after_prefetch(self):
+        platypus = Animal.objects.prefetch_related('tags').get(pk=self.platypus.pk)
+        self.assertSequenceEqual(platypus.tags.all(), [])
+        furry_tag = TaggedItem.objects.create(tag='furry', content_object=platypus)
+        platypus.tags.set([furry_tag])
+        self.assertSequenceEqual(platypus.tags.all(), [furry_tag])
+        weird_tag = TaggedItem.objects.create(tag='weird', content_object=platypus)
+        platypus.tags.set([weird_tag])
+        self.assertSequenceEqual(platypus.tags.all(), [weird_tag])
 
-class GenericInlineFormsetTest(TestCase):
-    def test_generic_inlineformset_factory(self):
-        """
-        Regression for #14572: Using base forms with widgets
-        defined in Meta should not raise errors.
-        """
-        Formset = generic_inlineformset_factory(TaggedItem, TaggedItemForm)
-        form = Formset().forms[0]
-        self.assertIsInstance(form['tag'].field.widget, CustomWidget)
+    def test_add_then_remove_after_prefetch(self):
+        furry_tag = self.platypus.tags.create(tag='furry')
+        platypus = Animal.objects.prefetch_related('tags').get(pk=self.platypus.pk)
+        self.assertSequenceEqual(platypus.tags.all(), [furry_tag])
+        weird_tag = self.platypus.tags.create(tag='weird')
+        platypus.tags.add(weird_tag)
+        self.assertSequenceEqual(platypus.tags.all(), [furry_tag, weird_tag])
+        platypus.tags.remove(weird_tag)
+        self.assertSequenceEqual(platypus.tags.all(), [furry_tag])
 
-    @isolate_apps('generic_relations')
-    def test_incorrect_content_type(self):
-        class BadModel(models.Model):
-            content_type = models.PositiveIntegerField()
+    def test_prefetch_related_different_content_types(self):
+        TaggedItem.objects.create(content_object=self.platypus, tag='prefetch_tag_1')
+        TaggedItem.objects.create(
+            content_object=Vegetable.objects.create(name='Broccoli'),
+            tag='prefetch_tag_2',
+        )
+        TaggedItem.objects.create(
+            content_object=Animal.objects.create(common_name='Bear'),
+            tag='prefetch_tag_3',
+        )
+        qs = TaggedItem.objects.filter(
+            tag__startswith='prefetch_tag_',
+        ).prefetch_related('content_object', 'content_object__tags')
+        with self.assertNumQueries(4):
+            tags = list(qs)
+        for tag in tags:
+            self.assertSequenceEqual(tag.content_object.tags.all(), [tag])
 
-        msg = "fk_name 'generic_relations.BadModel.content_type' is not a ForeignKey to ContentType"
-        with self.assertRaisesMessage(Exception, msg):
-            generic_inlineformset_factory(BadModel, TaggedItemForm)
-
-    def test_save_new_uses_form_save(self):
-        """
-        Regression for #16260: save_new should call form.save()
-        """
-        class SaveTestForm(forms.ModelForm):
-            def save(self, *args, **kwargs):
-                self.instance.saved_by = "custom method"
-                return super().save(*args, **kwargs)
-
-        Formset = generic_inlineformset_factory(ForProxyModelModel, fields='__all__', form=SaveTestForm)
-
-        instance = ProxyRelatedModel.objects.create()
-
-        data = {
-            'form-TOTAL_FORMS': '1',
-            'form-INITIAL_FORMS': '0',
-            'form-MAX_NUM_FORMS': '',
-            'form-0-title': 'foo',
-        }
-
-        formset = Formset(data, instance=instance, prefix='form')
-        self.assertTrue(formset.is_valid())
-        new_obj = formset.save()[0]
-        self.assertEqual(new_obj.saved_by, "custom method")
-
-    def test_save_new_for_proxy(self):
-        Formset = generic_inlineformset_factory(ForProxyModelModel, fields='__all__', for_concrete_model=False)
-
-        instance = ProxyRelatedModel.objects.create()
-
-        data = {
-            'form-TOTAL_FORMS': '1',
-            'form-INITIAL_FORMS': '0',
-            'form-MAX_NUM_FORMS': '',
-            'form-0-title': 'foo',
-        }
-
-        formset = Formset(data, instance=instance, prefix='form')
-        self.assertTrue(formset.is_valid())
-
-        new_obj, = formset.save()
-        self.assertEqual(new_obj.obj, instance)
-
-    def test_save_new_for_concrete(self):
-        Formset = generic_inlineformset_factory(ForProxyModelModel, fields='__all__', for_concrete_model=True)
-
-        instance = ProxyRelatedModel.objects.create()
-
-        data = {
-            'form-TOTAL_FORMS': '1',
-            'form-INITIAL_FORMS': '0',
-            'form-MAX_NUM_FORMS': '',
-            'form-0-title': 'foo',
-        }
-
-        formset = Formset(data, instance=instance, prefix='form')
-        self.assertTrue(formset.is_valid())
-
-        new_obj, = formset.save()
-        self.assertNotIsInstance(new_obj.obj, ProxyRelatedModel)
+    def test_prefetch_related_custom_object_id(self):
+        tiger = Animal.objects.create(common_name='tiger')
+        cheetah = Animal.objects.create(common_name='cheetah')
+        Comparison.objects.create(
+            first_obj=cheetah, other_obj=tiger, comparative='faster',
+        )
+        Comparison.objects.create(
+            first_obj=tiger, other_obj=cheetah, comparative='cooler',
+        )
+        qs = Comparison.objects.prefetch_related('first_obj__comparisons')
+        for comparison in qs:
+            self.assertSequenceEqual(comparison.first_obj.comparisons.all(), [comparison])
 
 
 class ProxyRelatedModelTest(TestCase):

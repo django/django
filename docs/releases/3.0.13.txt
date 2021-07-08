@@ -1,0 +1,16 @@
+===========================
+Django 3.0.13 release notes
+===========================
+
+*February 19, 2021*
+
+Django 3.0.13 fixes a security issue in 3.0.12.
+
+CVE-2021-23336: Web cache poisoning via ``django.utils.http.limited_parse_qsl()``
+=================================================================================
+
+Django contains a copy of :func:`urllib.parse.parse_qsl` which was added to
+backport some security fixes. A further security fix has been issued recently
+such that ``parse_qsl()`` no longer allows using ``;`` as a query parameter
+separator by default. Django now includes this fix. See :bpo:`42967` for
+further details.

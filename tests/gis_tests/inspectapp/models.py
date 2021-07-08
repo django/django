@@ -13,9 +13,6 @@ class AllOGRFields(models.Model):
     geom = models.PolygonField()
     point = models.PointField()
 
-    class Meta:
-        required_db_features = ['gis_enabled']
-
 
 class Fields3D(models.Model):
     point = models.PointField(dim=3)
@@ -24,4 +21,4 @@ class Fields3D(models.Model):
     poly = models.PolygonField(dim=3)
 
     class Meta:
-        required_db_features = ['gis_enabled']
+        required_db_features = {'supports_3d_storage'}

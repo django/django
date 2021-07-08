@@ -1,7 +1,11 @@
+from django.apps import apps
 from django.contrib.auth import authenticate, signals
 from django.contrib.auth.models import User
+from django.core.exceptions import FieldDoesNotExist
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
+
+from .models import MinimalUser, UserWithDisabledLastLoginField
 
 
 @override_settings(ROOT_URLCONF='auth_tests.urls')
@@ -75,10 +79,36 @@ class SignalTestCase(TestCase):
         user.username = "This username shouldn't get saved"
         request = RequestFactory().get('/login')
         signals.user_logged_in.send(sender=user.__class__, request=request, user=user)
-        user.refresh_from_db()
+        user = User.objects.get(pk=user.pk)
         self.assertEqual(user.username, 'staff')
         self.assertNotEqual(user.last_login, old_last_login)
 
     def test_failed_login_without_request(self):
         authenticate(username='testclient', password='bad')
         self.assertIsNone(self.login_failed[0]['request'])
+
+    def test_login_with_custom_user_without_last_login_field(self):
+        """
+        The user_logged_in signal is only registered if the user model has a
+        last_login field.
+        """
+        last_login_receivers = signals.user_logged_in.receivers
+        try:
+            signals.user_logged_in.receivers = []
+            with self.assertRaises(FieldDoesNotExist):
+                MinimalUser._meta.get_field('last_login')
+            with self.settings(AUTH_USER_MODEL='auth_tests.MinimalUser'):
+                apps.get_app_config('auth').ready()
+            self.assertEqual(signals.user_logged_in.receivers, [])
+
+            # last_login is a property whose value is None.
+            self.assertIsNone(UserWithDisabledLastLoginField().last_login)
+            with self.settings(AUTH_USER_MODEL='auth_tests.UserWithDisabledLastLoginField'):
+                apps.get_app_config('auth').ready()
+            self.assertEqual(signals.user_logged_in.receivers, [])
+
+            with self.settings(AUTH_USER_MODEL='auth.User'):
+                apps.get_app_config('auth').ready()
+            self.assertEqual(len(signals.user_logged_in.receivers), 1)
+        finally:
+            signals.user_logged_in.receivers = last_login_receivers

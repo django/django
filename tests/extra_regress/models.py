@@ -10,9 +10,6 @@ class RevisionableModel(models.Model):
     title = models.CharField(blank=True, max_length=255)
     when = models.DateTimeField(default=datetime.datetime.now)
 
-    def __str__(self):
-        return "%s (%s, %s)" % (self.title, self.id, self.base.id)
-
     def save(self, *args, force_insert=None, force_update=None, **kwargs):
         super().save(*args, force_insert=force_insert, force_update=force_update, **kwargs)
         if not self.base:

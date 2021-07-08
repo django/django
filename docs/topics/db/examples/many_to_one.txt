@@ -23,7 +23,7 @@ To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`:
             return self.headline
 
         class Meta:
-            ordering = ('headline',)
+            ordering = ['headline']
 
 What follows are examples of operations that can be performed using the Python
 API facilities.
@@ -74,10 +74,9 @@ Create an Article via the Reporter object::
     >>> new_article.reporter.id
     1
 
-Create a new article, and add it to the article set::
+Create a new article::
 
-    >>> new_article2 = Article(headline="Paul's story", pub_date=date(2006, 1, 17))
-    >>> r.article_set.add(new_article2)
+    >>> new_article2 = Article.objects.create(headline="Paul's story", pub_date=date(2006, 1, 17), reporter=r)
     >>> new_article2.reporter
     <Reporter: John Smith>
     >>> new_article2.reporter.id
@@ -98,7 +97,7 @@ Adding an object of the wrong type raises TypeError::
     >>> r.article_set.add(r2)
     Traceback (most recent call last):
     ...
-    TypeError: 'Article' instance expected
+    TypeError: 'Article' instance expected, got <Reporter: Paul Jones>
 
     >>> r.article_set.all()
     <QuerySet [<Article: John's second story>, <Article: This is a test>]>
@@ -186,7 +185,7 @@ Queries can go round in circles::
     >>> Reporter.objects.filter(article__reporter=r).distinct()
     <QuerySet [<Reporter: John Smith>]>
 
-If you delete a reporter, his articles will be deleted (assuming that the
+If you delete a reporter, their articles will be deleted (assuming that the
 ForeignKey was defined with :attr:`django.db.models.ForeignKey.on_delete` set to
 ``CASCADE``, which is the default)::
 

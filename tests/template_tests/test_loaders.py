@@ -93,6 +93,10 @@ class CachedLoaderTests(SimpleTestCase):
         """
         self.assertEqual(self.engine.template_loaders[0].cache_key(lazystr('template.html'), []), 'template.html')
 
+    def test_get_dirs(self):
+        inner_dirs = self.engine.template_loaders[0].loaders[0].get_dirs()
+        self.assertSequenceEqual(list(self.engine.template_loaders[0].get_dirs()), list(inner_dirs))
+
 
 class FileSystemLoaderTests(SimpleTestCase):
 
@@ -156,24 +160,17 @@ class FileSystemLoaderTests(SimpleTestCase):
 
     def test_unicode_template_name(self):
         with self.source_checker(['/dir1', '/dir2']) as check_sources:
-            # UTF-8 bytestrings are permitted.
-            check_sources(b'\xc3\x85ngstr\xc3\xb6m', ['/dir1/Ångström', '/dir2/Ångström'])
-            # Strings are permitted.
             check_sources('Ångström', ['/dir1/Ångström', '/dir2/Ångström'])
 
-    def test_utf8_bytestring(self):
-        """
-        Invalid UTF-8 encoding in bytestrings should raise a useful error
-        """
-        engine = self.engine
-        loader = engine.template_loaders[0]
-        with self.assertRaises(UnicodeDecodeError):
-            list(loader.get_template_sources(b'\xc3\xc3'))
+    def test_bytestring(self):
+        loader = self.engine.template_loaders[0]
+        msg = "Can't mix strings and bytes in path components"
+        with self.assertRaisesMessage(TypeError, msg):
+            list(loader.get_template_sources(b'\xc3\x85ngstr\xc3\xb6m'))
 
     def test_unicode_dir_name(self):
-        with self.source_checker([b'/Stra\xc3\x9fe']) as check_sources:
+        with self.source_checker(['/Straße']) as check_sources:
             check_sources('Ångström', ['/Straße/Ångström'])
-            check_sources(b'\xc3\x85ngstr\xc3\xb6m', ['/Straße/Ångström'])
 
     @unittest.skipUnless(
         os.path.normcase('/TEST') == os.path.normpath('/test'),
@@ -198,11 +195,12 @@ class FileSystemLoaderTests(SimpleTestCase):
             tmppath = os.path.join(tmpdir, tmpfile.name)
             os.chmod(tmppath, 0o0222)
             with self.set_dirs([tmpdir]):
-                with self.assertRaisesMessage(IOError, 'Permission denied'):
+                with self.assertRaisesMessage(PermissionError, 'Permission denied'):
                     self.engine.get_template(tmpfile.name)
 
     def test_notafile_error(self):
-        with self.assertRaises(IOError):
+        # Windows raises PermissionError when trying to open a directory.
+        with self.assertRaises(PermissionError if sys.platform == 'win32' else IsADirectoryError):
             self.engine.get_template('first')
 
 

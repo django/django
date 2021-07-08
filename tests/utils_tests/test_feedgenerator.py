@@ -1,12 +1,11 @@
 import datetime
-import unittest
 
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils import feedgenerator
 from django.utils.timezone import get_fixed_timezone, utc
 
 
-class FeedgeneratorTest(unittest.TestCase):
+class FeedgeneratorTests(SimpleTestCase):
     """
     Tests for the low-level syndication feed framework.
     """
@@ -126,10 +125,11 @@ class FeedgeneratorTest(unittest.TestCase):
         feed.add_item('item_title', 'item_link', 'item_description')
         feed.writeString('utf-8')
 
+    def test_deterministic_attribute_order(self):
+        feed = feedgenerator.Atom1Feed('title', '/link/', 'desc')
+        feed_content = feed.writeString('utf-8')
+        self.assertIn('href="/link/" rel="alternate"', feed_content)
 
-class FeedgeneratorDBTest(TestCase):
-
-    # setting the timezone requires a database query on PostgreSQL.
     def test_latest_post_date_returns_utc_time(self):
         for use_tz in (True, False):
             with self.settings(USE_TZ=use_tz):

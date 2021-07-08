@@ -6,14 +6,15 @@
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # rodin <romihardiyanto@gmail.com>, 2011-2012
 # rodin <romihardiyanto@gmail.com>, 2015-2016
+# sage <laymonage@gmail.com>, 2019
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-08-25 02:20+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-28 05:59+0000\n"
+"Last-Translator: sage <laymonage@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -29,9 +30,9 @@ msgid "The base GIS field."
 msgstr "Bidang GIS dasar."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
-"Bidang Geometri dasar -- memetakan ke jenis OpenGIS Specification Geometry."
+"Bidang Geometri dasar — memetakan ke jenis OpenGIS Specification Geometry."
 
 msgid "Point"
 msgstr "Point"
@@ -81,9 +82,6 @@ msgstr "Hapus semua Fitur"
 msgid "WKT debugging window:"
 msgstr "Jendela mencari dan memperbaiki kesalahan WKT:"
 
-msgid "Google Maps via GeoDjango"
-msgstr "Google Maps melalui GeoDjango"
-
 msgid "Debugging window (serialized value)"
 msgstr "Jendela mencari dan memperbaiki kesalahan (nilai bersambung)"
 
@@ -91,5 +89,5 @@ msgid "No feeds are registered."
 msgstr "Tidak ada umpan terdaftar."
 
 #, python-format
-msgid "Slug %r isn't registered."
+msgid "Slug %r isn’t registered."
 msgstr "Slug %r tidak terdaftar."

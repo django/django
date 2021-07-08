@@ -1,23 +1,22 @@
-import os
-import tempfile
+import datetime
 from io import StringIO
 from wsgiref.util import FileWrapper
 
 from django import forms
-from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin import BooleanFieldListFilter
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
-from django.core.files.storage import FileSystemStorage
 from django.core.mail import EmailMessage
 from django.db import models
 from django.forms.models import BaseModelFormSet
-from django.http import HttpResponse, StreamingHttpResponse
+from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
+from django.urls import path
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+from django.views.decorators.common import no_append_slash
 
 from .forms import MediaActionForm
 from .models import (
@@ -35,25 +34,24 @@ from .models import (
     OtherStory, Paper, Parent, ParentWithDependentChildren, ParentWithUUIDPK,
     Person, Persona, Picture, Pizza, Plot, PlotDetails, PlotProxy,
     PluggableSearchPerson, Podcast, Post, PrePopulatedPost,
-    PrePopulatedPostLargeSlug, PrePopulatedSubPost, Promo, Question, Recipe,
-    Recommendation, Recommender, ReferencedByGenRel, ReferencedByInline,
-    ReferencedByParent, RelatedPrepopulated, RelatedWithUUIDPKModel, Report,
-    Reservation, Restaurant, RowLevelChangePermissionModel, Section,
-    ShortMessage, Simple, Sketch, State, Story, StumpJoke, Subscriber,
-    SuperVillain, Telegram, Thing, Topping, UnchangeableObject,
-    UndeletableObject, UnorderedObject, UserMessenger, Villain, Vodcast,
-    Whatsit, Widget, Worker, WorkHour,
+    PrePopulatedPostLargeSlug, PrePopulatedSubPost, Promo, Question,
+    ReadablePizza, ReadOnlyPizza, ReadOnlyRelatedField, Recipe, Recommendation,
+    Recommender, ReferencedByGenRel, ReferencedByInline, ReferencedByParent,
+    RelatedPrepopulated, RelatedWithUUIDPKModel, Report, Reservation,
+    Restaurant, RowLevelChangePermissionModel, Section, ShortMessage, Simple,
+    Sketch, Song, State, Story, StumpJoke, Subscriber, SuperVillain, Telegram,
+    Thing, Topping, UnchangeableObject, UndeletableObject, UnorderedObject,
+    UserMessenger, UserProxy, Villain, Vodcast, Whatsit, Widget, Worker,
+    WorkHour,
 )
 
 
+@admin.display(ordering='date')
 def callable_year(dt_value):
     try:
         return dt_value.year
     except AttributeError:
         return None
-
-
-callable_year.admin_order_field = 'date'
 
 
 class ArticleInline(admin.TabularInline):
@@ -79,26 +77,53 @@ class ChapterInline(admin.TabularInline):
 
 
 class ChapterXtra1Admin(admin.ModelAdmin):
-    list_filter = ('chap',
-                   'chap__title',
-                   'chap__book',
-                   'chap__book__name',
-                   'chap__book__promo',
-                   'chap__book__promo__name',)
+    list_filter = (
+        'chap',
+        'chap__title',
+        'chap__book',
+        'chap__book__name',
+        'chap__book__promo',
+        'chap__book__promo__name',
+        'guest_author__promo__book',
+    )
 
 
-class ArticleAdmin(admin.ModelAdmin):
+class ArticleForm(forms.ModelForm):
+    extra_form_field = forms.BooleanField(required=False)
+
+    class Meta:
+        fields = '__all__'
+        model = Article
+
+
+class ArticleAdminWithExtraUrl(admin.ModelAdmin):
+    def get_urls(self):
+        urlpatterns = super().get_urls()
+        urlpatterns.append(
+            path('extra.json', self.admin_site.admin_view(self.extra_json), name='article_extra_json')
+        )
+        return urlpatterns
+
+    def extra_json(self, request):
+        return JsonResponse({})
+
+
+class ArticleAdmin(ArticleAdminWithExtraUrl):
     list_display = (
         'content', 'date', callable_year, 'model_year', 'modeladmin_year',
         'model_year_reversed', 'section', lambda obj: obj.title,
+        'order_by_expression', 'model_property_year', 'model_month',
+        'order_by_f_expression', 'order_by_orderby_expression',
     )
     list_editable = ('section',)
     list_filter = ('date', 'section')
+    autocomplete_fields = ('section',)
     view_on_site = False
+    form = ArticleForm
     fieldsets = (
         ('Some fields', {
             'classes': ('collapse',),
-            'fields': ('title', 'content')
+            'fields': ('title', 'content', 'extra_form_field'),
         }),
         ('Some other fields', {
             'classes': ('wide',),
@@ -106,13 +131,26 @@ class ArticleAdmin(admin.ModelAdmin):
         })
     )
 
+    # These orderings aren't particularly useful but show that expressions can
+    # be used for admin_order_field.
+    @admin.display(ordering=models.F('date') + datetime.timedelta(days=3))
+    def order_by_expression(self, obj):
+        return obj.model_year
+
+    @admin.display(ordering=models.F('date'))
+    def order_by_f_expression(self, obj):
+        return obj.model_year
+
+    @admin.display(ordering=models.F('date').asc(nulls_last=True))
+    def order_by_orderby_expression(self, obj):
+        return obj.model_year
+
     def changelist_view(self, request):
         return super().changelist_view(request, extra_context={'extra_var': 'Hello!'})
 
+    @admin.display(ordering='date', description=None)
     def modeladmin_year(self, obj):
         return obj.date.year
-    modeladmin_year.admin_order_field = 'date'
-    modeladmin_year.short_description = None
 
     def delete_model(self, request, obj):
         EmailMessage(
@@ -144,6 +182,10 @@ class RowLevelChangePermissionModelAdmin(admin.ModelAdmin):
         """ Only allow changing objects with even id number """
         return request.user.is_staff and (obj is not None) and (obj.id % 2 == 0)
 
+    def has_view_permission(self, request, obj=None):
+        """Only allow viewing objects if id is a multiple of 3."""
+        return request.user.is_staff and obj is not None and obj.id % 3 == 0
+
 
 class CustomArticleAdmin(admin.ModelAdmin):
     """
@@ -162,12 +204,13 @@ class CustomArticleAdmin(admin.ModelAdmin):
 
 
 class ThingAdmin(admin.ModelAdmin):
-    list_filter = ('color__warm', 'color__value', 'pub_date',)
+    list_filter = ('color', 'color__warm', 'color__value', 'pub_date')
 
 
 class InquisitionAdmin(admin.ModelAdmin):
     list_display = ('leader', 'country', 'expected', 'sketch')
 
+    @admin.display
     def sketch(self, obj):
         # A method with the same name as a reverse accessor.
         return 'list-display-sketch'
@@ -188,7 +231,7 @@ class BasePersonModelFormSet(BaseModelFormSet):
             person = person_dict.get('id')
             alive = person_dict.get('alive')
             if person and alive and person.name == "Grace Hopper":
-                raise forms.ValidationError("Grace is not a Zombie")
+                raise ValidationError("Grace is not a Zombie")
 
 
 class PersonAdmin(admin.ModelAdmin):
@@ -228,6 +271,11 @@ class SubscriberAdmin(admin.ModelAdmin):
     actions = ['mail_admin']
     action_form = MediaActionForm
 
+    def delete_queryset(self, request, queryset):
+        SubscriberAdmin.overridden = True
+        super().delete_queryset(request, queryset)
+
+    @admin.action
     def mail_admin(self, request, selected):
         EmailMessage(
             'Greetings from a ModelAdmin action',
@@ -237,6 +285,7 @@ class SubscriberAdmin(admin.ModelAdmin):
         ).send()
 
 
+@admin.action(description='External mail (Another awesome action)')
 def external_mail(modeladmin, request, selected):
     EmailMessage(
         'Greetings from a function action',
@@ -246,31 +295,21 @@ def external_mail(modeladmin, request, selected):
     ).send()
 
 
-external_mail.short_description = 'External mail (Another awesome action)'
-
-
+@admin.action(description='Redirect to (Awesome action)')
 def redirect_to(modeladmin, request, selected):
     from django.http import HttpResponseRedirect
     return HttpResponseRedirect('/some-where-else/')
 
 
-redirect_to.short_description = 'Redirect to (Awesome action)'
-
-
+@admin.action(description='Download subscription')
 def download(modeladmin, request, selected):
     buf = StringIO('This is the content of the file')
     return StreamingHttpResponse(FileWrapper(buf))
 
 
-download.short_description = 'Download subscription'
-
-
+@admin.action(description='No permission to run')
 def no_perm(modeladmin, request, selected):
-    return HttpResponse(content='No permission to perform this action',
-                        status=403)
-
-
-no_perm.short_description = 'No permission to run'
+    return HttpResponse(content='No permission to perform this action', status=403)
 
 
 class ExternalSubscriberAdmin(admin.ModelAdmin):
@@ -319,10 +358,6 @@ class EmptyModelAdmin(admin.ModelAdmin):
 
 class OldSubscriberAdmin(admin.ModelAdmin):
     actions = None
-
-
-temp_storage = FileSystemStorage(tempfile.mkdtemp())
-UPLOAD_TO = os.path.join(temp_storage.location, 'test_upload')
 
 
 class PictureInline(admin.TabularInline):
@@ -390,6 +425,7 @@ class LinkInline(admin.TabularInline):
 
     readonly_fields = ("posted", "multiline", "readonly_link_content")
 
+    @admin.display
     def multiline(self, instance):
         return "InlineMultiline\ntest\nstring"
 
@@ -431,6 +467,13 @@ class PrePopulatedPostAdmin(admin.ModelAdmin):
         return self.prepopulated_fields
 
 
+class PrePopulatedPostReadOnlyAdmin(admin.ModelAdmin):
+    prepopulated_fields = {'slug': ('title',)}
+
+    def has_change_permission(self, *args, **kwargs):
+        return False
+
+
 class PostAdmin(admin.ModelAdmin):
     list_display = ['title', 'public']
     readonly_fields = (
@@ -443,19 +486,22 @@ class PostAdmin(admin.ModelAdmin):
         LinkInline
     ]
 
+    @admin.display
     def coolness(self, instance):
         if instance.pk:
             return "%d amount of cool." % instance.pk
         else:
             return "Unknown coolness."
 
+    @admin.display(description='Value in $US')
     def value(self, instance):
         return 1000
-    value.short_description = 'Value in $US'
 
+    @admin.display
     def multiline(self, instance):
         return "Multiline\ntest\nstring"
 
+    @admin.display
     def multiline_html(self, instance):
         return mark_safe("Multiline<br>\nhtml<br>\ncontent")
 
@@ -492,6 +538,27 @@ class ToppingAdmin(admin.ModelAdmin):
 
 class PizzaAdmin(admin.ModelAdmin):
     readonly_fields = ('toppings',)
+
+
+class ReadOnlyRelatedFieldAdmin(admin.ModelAdmin):
+    readonly_fields = ('chapter', 'language', 'user')
+
+
+class StudentAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
+
+
+class ReadOnlyPizzaAdmin(admin.ModelAdmin):
+    readonly_fields = ('name', 'toppings')
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return True
+
+    def has_delete_permission(self, request, obj=None):
+        return True
 
 
 class WorkHourAdmin(admin.ModelAdmin):
@@ -560,7 +627,7 @@ class StoryForm(forms.ModelForm):
 class StoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'content')
     list_display_links = ('title',)  # 'id' not in list_display_links
-    list_editable = ('content', )
+    list_editable = ('content',)
     form = StoryForm
     ordering = ['-id']
 
@@ -568,7 +635,7 @@ class StoryAdmin(admin.ModelAdmin):
 class OtherStoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'content')
     list_display_links = ('title', 'id')  # 'id' in list_display_links
-    list_editable = ('content', )
+    list_editable = ('content',)
     ordering = ['-id']
 
 
@@ -576,9 +643,9 @@ class ComplexSortedPersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'age', 'is_employee', 'colored_name')
     ordering = ('name',)
 
+    @admin.display(ordering='name')
     def colored_name(self, obj):
         return format_html('<span style="color: #ff00ff;">{}</span>', obj.name)
-    colored_name.admin_order_field = 'name'
 
 
 class PluggableSearchPersonAdmin(admin.ModelAdmin):
@@ -586,18 +653,30 @@ class PluggableSearchPersonAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
     def get_search_results(self, request, queryset, search_term):
-        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
+        queryset, may_have_duplicates = super().get_search_results(
+            request, queryset, search_term,
+        )
         try:
             search_term_as_int = int(search_term)
         except ValueError:
             pass
         else:
             queryset |= self.model.objects.filter(age=search_term_as_int)
-        return queryset, use_distinct
+        return queryset, may_have_duplicates
 
 
 class AlbumAdmin(admin.ModelAdmin):
     list_filter = ['title']
+
+
+class QuestionAdmin(admin.ModelAdmin):
+    ordering = ['-posted']
+    search_fields = ['question']
+    autocomplete_fields = ['related_questions']
+
+
+class AnswerAdmin(admin.ModelAdmin):
+    autocomplete_fields = ['question']
 
 
 class PrePopulatedPostLargeSlugAdmin(admin.ModelAdmin):
@@ -617,18 +696,16 @@ class AdminOrderedModelMethodAdmin(admin.ModelAdmin):
 
 
 class AdminOrderedAdminMethodAdmin(admin.ModelAdmin):
+    @admin.display(ordering='order')
     def some_admin_order(self, obj):
         return obj.order
-    some_admin_order.admin_order_field = 'order'
     ordering = ('order',)
     list_display = ('stuff', 'some_admin_order')
 
 
+@admin.display(ordering='order')
 def admin_ordered_callable(obj):
     return obj.order
-
-
-admin_ordered_callable.admin_order_field = 'order'
 
 
 class AdminOrderedCallableAdmin(admin.ModelAdmin):
@@ -642,11 +719,7 @@ class ReportAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         # Corner case: Don't call parent implementation
-        return [
-            url(r'^extra/$',
-                self.extra,
-                name='cable_extra'),
-        ]
+        return [path('extra/', self.extra, name='cable_extra')]
 
 
 class CustomTemplateBooleanFieldListFilter(BooleanFieldListFilter):
@@ -661,25 +734,41 @@ class CustomTemplateFilterColorAdmin(admin.ModelAdmin):
 class RelatedPrepopulatedInline1(admin.StackedInline):
     fieldsets = (
         (None, {
-            'fields': (('pubdate', 'status'), ('name', 'slug1', 'slug2',),)
+            'fields': (
+                ('fk', 'm2m'),
+                ('pubdate', 'status'),
+                ('name', 'slug1', 'slug2',),
+            ),
         }),
     )
     formfield_overrides = {models.CharField: {'strip': False}}
     model = RelatedPrepopulated
     extra = 1
-    prepopulated_fields = {'slug1': ['name', 'pubdate'],
-                           'slug2': ['status', 'name']}
+    autocomplete_fields = ['fk', 'm2m']
+    prepopulated_fields = {
+        'slug1': ['name', 'pubdate'],
+        'slug2': ['status', 'name'],
+    }
 
 
 class RelatedPrepopulatedInline2(admin.TabularInline):
     model = RelatedPrepopulated
     extra = 1
-    prepopulated_fields = {'slug1': ['name', 'pubdate'],
-                           'slug2': ['status', 'name']}
+    autocomplete_fields = ['fk', 'm2m']
+    prepopulated_fields = {
+        'slug1': ['name', 'pubdate'],
+        'slug2': ['status', 'name'],
+    }
+
+
+class RelatedPrepopulatedInline3(admin.TabularInline):
+    model = RelatedPrepopulated
+    extra = 0
+    autocomplete_fields = ['fk', 'm2m']
 
 
 class MainPrepopulatedAdmin(admin.ModelAdmin):
-    inlines = [RelatedPrepopulatedInline1, RelatedPrepopulatedInline2]
+    inlines = [RelatedPrepopulatedInline1, RelatedPrepopulatedInline2, RelatedPrepopulatedInline3]
     fieldsets = (
         (None, {
             'fields': (('pubdate', 'status'), ('name', 'slug1', 'slug2', 'slug3'))
@@ -713,12 +802,13 @@ class UnchangeableObjectAdmin(admin.ModelAdmin):
         return [p for p in urlpatterns if p.name and not p.name.endswith("_change")]
 
 
+@admin.display
 def callable_on_unknown(obj):
     return obj.unknown
 
 
 class AttributeErrorRaisingAdmin(admin.ModelAdmin):
-    list_display = [callable_on_unknown, ]
+    list_display = [callable_on_unknown]
 
 
 class CustomManagerAdmin(admin.ModelAdmin):
@@ -730,21 +820,27 @@ class MessageTestingAdmin(admin.ModelAdmin):
     actions = ["message_debug", "message_info", "message_success",
                "message_warning", "message_error", "message_extra_tags"]
 
+    @admin.action
     def message_debug(self, request, selected):
         self.message_user(request, "Test debug", level="debug")
 
+    @admin.action
     def message_info(self, request, selected):
         self.message_user(request, "Test info", level="info")
 
+    @admin.action
     def message_success(self, request, selected):
         self.message_user(request, "Test success", level="success")
 
+    @admin.action
     def message_warning(self, request, selected):
         self.message_user(request, "Test warning", level="warning")
 
+    @admin.action
     def message_error(self, request, selected):
         self.message_user(request, "Test error", level="error")
 
+    @admin.action
     def message_extra_tags(self, request, selected):
         self.message_user(request, "Test tags", extra_tags="extra_tag")
 
@@ -818,8 +914,27 @@ class CityInlineAdmin(admin.TabularInline):
     view_on_site = False
 
 
+class StateAdminForm(forms.ModelForm):
+    nolabel_form_field = forms.BooleanField(required=False)
+
+    class Meta:
+        model = State
+        fields = '__all__'
+        labels = {'name': 'State name (from form’s Meta.labels)'}
+
+    @property
+    def changed_data(self):
+        data = super().changed_data
+        if data:
+            # Add arbitrary name to changed_data to test
+            # change message construction.
+            return data + ['not_a_form_field']
+        return data
+
+
 class StateAdmin(admin.ModelAdmin):
     inlines = [CityInlineAdmin]
+    form = StateAdminForm
 
 
 class RestaurantInlineAdmin(admin.TabularInline):
@@ -830,6 +945,12 @@ class RestaurantInlineAdmin(admin.TabularInline):
 class CityAdmin(admin.ModelAdmin):
     inlines = [RestaurantInlineAdmin]
     view_on_site = True
+
+    def get_formset_kwargs(self, request, obj, inline, prefix):
+        return {
+            **super().get_formset_kwargs(request, obj, inline, prefix),
+            'form_kwargs': {'initial': {'name': 'overridden_name'}},
+        }
 
 
 class WorkerAdmin(admin.ModelAdmin):
@@ -891,7 +1012,10 @@ site = admin.AdminSite(name="admin")
 site.site_url = '/my-site-url/'
 site.register(Article, ArticleAdmin)
 site.register(CustomArticle, CustomArticleAdmin)
-site.register(Section, save_as=True, inlines=[ArticleInline], readonly_fields=['name_property'])
+site.register(
+    Section, save_as=True, inlines=[ArticleInline],
+    readonly_fields=['name_property'], search_fields=['name'],
+)
 site.register(ModelWithStringPrimaryKey)
 site.register(Color)
 site.register(Thing, ThingAdmin)
@@ -953,7 +1077,9 @@ site.register(InlineReferer, InlineRefererAdmin)
 site.register(ReferencedByGenRel)
 site.register(GenRelReference)
 site.register(ParentWithUUIDPK)
+site.register(RelatedPrepopulated, search_fields=['name'])
 site.register(RelatedWithUUIDPKModel)
+site.register(ReadOnlyRelatedField, ReadOnlyRelatedFieldAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
@@ -967,10 +1093,13 @@ site.register(Book, inlines=[ChapterInline])
 site.register(Promo)
 site.register(ChapterXtra1, ChapterXtra1Admin)
 site.register(Pizza, PizzaAdmin)
+site.register(ReadOnlyPizza, ReadOnlyPizzaAdmin)
+site.register(ReadablePizza)
 site.register(Topping, ToppingAdmin)
 site.register(Album, AlbumAdmin)
-site.register(Question)
-site.register(Answer, date_hierarchy='question__posted')
+site.register(Song)
+site.register(Question, QuestionAdmin)
+site.register(Answer, AnswerAdmin, date_hierarchy='question__posted')
 site.register(Answer2, date_hierarchy='question__expires')
 site.register(PrePopulatedPost, PrePopulatedPostAdmin)
 site.register(ComplexSortedPerson, ComplexSortedPersonAdmin)
@@ -995,6 +1124,7 @@ site.register(Ingredient)
 site.register(NotReferenced)
 site.register(ExplicitlyProvidedPK, GetFormsetsArgumentCheckingAdmin)
 site.register(ImplicitlyGeneratedPK, GetFormsetsArgumentCheckingAdmin)
+site.register(UserProxy)
 
 # Register core models we need in our tests
 site.register(User, UserAdmin)
@@ -1016,3 +1146,68 @@ site2.register(Person, save_as_continue=False)
 site7 = admin.AdminSite(name="admin7")
 site7.register(Article, ArticleAdmin2)
 site7.register(Section)
+site7.register(PrePopulatedPost, PrePopulatedPostReadOnlyAdmin)
+
+
+# Used to test ModelAdmin.sortable_by and get_sortable_by().
+class ArticleAdmin6(admin.ModelAdmin):
+    list_display = (
+        'content', 'date', callable_year, 'model_year', 'modeladmin_year',
+        'model_year_reversed', 'section',
+    )
+    sortable_by = ('date', callable_year)
+
+    @admin.display(ordering='date')
+    def modeladmin_year(self, obj):
+        return obj.date.year
+
+
+class ActorAdmin6(admin.ModelAdmin):
+    list_display = ('name', 'age')
+    sortable_by = ('name',)
+
+    def get_sortable_by(self, request):
+        return ('age',)
+
+
+class ChapterAdmin6(admin.ModelAdmin):
+    list_display = ('title', 'book')
+    sortable_by = ()
+
+
+class ColorAdmin6(admin.ModelAdmin):
+    list_display = ('value',)
+
+    def get_sortable_by(self, request):
+        return ()
+
+
+site6 = admin.AdminSite(name='admin6')
+site6.register(Article, ArticleAdmin6)
+site6.register(Actor, ActorAdmin6)
+site6.register(Chapter, ChapterAdmin6)
+site6.register(Color, ColorAdmin6)
+
+
+class ArticleAdmin9(admin.ModelAdmin):
+    def has_change_permission(self, request, obj=None):
+        # Simulate that the user can't change a specific object.
+        return obj is None
+
+
+class ActorAdmin9(admin.ModelAdmin):
+    def get_urls(self):
+        # Opt-out of append slash for single model.
+        urls = super().get_urls()
+        for pattern in urls:
+            pattern.callback = no_append_slash(pattern.callback)
+        return urls
+
+
+site9 = admin.AdminSite(name='admin9')
+site9.register(Article, ArticleAdmin9)
+site9.register(Actor, ActorAdmin9)
+
+site10 = admin.AdminSite(name='admin10')
+site10.final_catch_all_view = False
+site10.register(Article, ArticleAdminWithExtraUrl)

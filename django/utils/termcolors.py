@@ -144,7 +144,7 @@ def parse_color_setting(config_string):
     where:
         palette is a named palette; one of 'light', 'dark', or 'nocolor'.
         role is a named style used by Django
-        fg is a background color.
+        fg is a foreground color.
         bg is a background color.
         option is a display options.
 
@@ -199,7 +199,7 @@ def parse_color_setting(config_string):
                 definition['bg'] = colors[-1]
 
             # All remaining instructions are options
-            opts = tuple(s for s in styles if s in opt_dict.keys())
+            opts = tuple(s for s in styles if s in opt_dict)
             if opts:
                 definition['opts'] = opts
 

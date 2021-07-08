@@ -4,48 +4,48 @@
 {% block extrahead %}
     {{ block.super }}
     {{ media }}
-    <script type="text/javascript" src="{% static 'admin/js/cancel.js' %}"></script>
+    <script src="{% static 'admin/js/cancel.js' %}" async></script>
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation{% endblock %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
 &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
-&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst|escape }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
 &rsaquo; <a href="{% url opts|admin_urlname:'change' object.pk|admin_urlquote %}">{{ object|truncatewords:"18" }}</a>
-&rsaquo; {% trans 'Delete' %}
+&rsaquo; {% translate 'Delete' %}
 </div>
 {% endblock %}
 
 {% block content %}
 {% if perms_lacking %}
-    <p>{% blocktrans with escaped_object=object %}Deleting the {{ object_name }} '{{ escaped_object }}' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:{% endblocktrans %}</p>
+    <p>{% blocktranslate with escaped_object=object %}Deleting the {{ object_name }} '{{ escaped_object }}' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:{% endblocktranslate %}</p>
     <ul>
     {% for obj in perms_lacking %}
         <li>{{ obj }}</li>
     {% endfor %}
     </ul>
 {% elif protected %}
-    <p>{% blocktrans with escaped_object=object %}Deleting the {{ object_name }} '{{ escaped_object }}' would require deleting the following protected related objects:{% endblocktrans %}</p>
+    <p>{% blocktranslate with escaped_object=object %}Deleting the {{ object_name }} '{{ escaped_object }}' would require deleting the following protected related objects:{% endblocktranslate %}</p>
     <ul>
     {% for obj in protected %}
         <li>{{ obj }}</li>
     {% endfor %}
     </ul>
 {% else %}
-    <p>{% blocktrans with escaped_object=object %}Are you sure you want to delete the {{ object_name }} "{{ escaped_object }}"? All of the following related items will be deleted:{% endblocktrans %}</p>
+    <p>{% blocktranslate with escaped_object=object %}Are you sure you want to delete the {{ object_name }} "{{ escaped_object }}"? All of the following related items will be deleted:{% endblocktranslate %}</p>
     {% include "admin/includes/object_delete_summary.html" %}
-    <h2>{% trans "Objects" %}</h2>
+    <h2>{% translate "Objects" %}</h2>
     <ul>{{ deleted_objects|unordered_list }}</ul>
     <form method="post">{% csrf_token %}
     <div>
-    <input type="hidden" name="post" value="yes" />
-    {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1" />{% endif %}
-    {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}" />{% endif %}
-    <input type="submit" value="{% trans "Yes, I'm sure" %}" />
-    <a href="#" class="button cancel-link">{% trans "No, take me back" %}</a>
+    <input type="hidden" name="post" value="yes">
+    {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
+    {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
+    <input type="submit" value="{% translate 'Yes, I’m sure' %}">
+    <a href="#" class="button cancel-link">{% translate "No, take me back" %}</a>
     </div>
     </form>
 {% endif %}

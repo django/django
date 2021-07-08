@@ -4,14 +4,27 @@ Performing raw SQL queries
 
 .. currentmodule:: django.db.models
 
-When the :doc:`model query APIs </topics/db/queries>` don't go far enough, you
-can fall back to writing raw SQL. Django gives you two ways of performing raw
-SQL queries: you can use :meth:`Manager.raw()` to `perform raw queries and
-return model instances`__, or you can avoid the model layer entirely and
-`execute custom SQL directly`__.
+Django gives you two ways of performing raw SQL queries: you can use
+:meth:`Manager.raw()` to `perform raw queries and return model instances`__, or
+you can avoid the model layer entirely and `execute custom SQL directly`__.
 
 __ `performing raw queries`_
 __ `executing custom SQL directly`_
+
+.. admonition:: Explore the ORM before using raw SQL!
+
+    The Django ORM provides many tools to express queries without writing raw
+    SQL. For example:
+
+    * The :doc:`QuerySet API </ref/models/querysets>` is extensive.
+    * You can :meth:`annotate <.QuerySet.annotate>` and :doc:`aggregate
+      </topics/db/aggregation>` using many built-in :doc:`database functions
+      </ref/models/database-functions>`. Beyond those, you can create
+      :doc:`custom query expressions </ref/models/expressions/>`.
+
+    Before using raw SQL, explore :doc:`the ORM </topics/db/index>`. Ask on
+    one of :doc:`the support channels </faq/help>` to see if the ORM supports
+    your use case.
 
 .. warning::
 
@@ -29,12 +42,12 @@ Performing raw queries
 The ``raw()`` manager method can be used to perform raw SQL queries that
 return model instances:
 
-.. method:: Manager.raw(raw_query, params=None, translations=None)
+.. method:: Manager.raw(raw_query, params=(), translations=None)
 
 This method takes a raw SQL query, executes it, and returns a
 ``django.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance
-can be iterated over just like a normal
-:class:`~django.db.models.query.QuerySet` to provide object instances.
+can be iterated over like a normal :class:`~django.db.models.query.QuerySet` to
+provide object instances.
 
 This is best illustrated with an example. Suppose you have the following model::
 
@@ -50,9 +63,9 @@ You could then execute custom SQL like so::
     John Smith
     Jane Jones
 
-Of course, this example isn't very exciting -- it's exactly the same as
-running ``Person.objects.all()``. However, ``raw()`` has a bunch of other
-options that make it very powerful.
+This example isn't very exciting -- it's exactly the same as running
+``Person.objects.all()``. However, ``raw()`` has a bunch of other options that
+make it very powerful.
 
 .. admonition:: Model table names
 
@@ -85,16 +98,10 @@ options that make it very powerful.
     both rows will match. To prevent this, perform the correct typecasting
     before using the value in a query.
 
-.. warning::
+.. versionchanged:: 3.2
 
-    While a ``RawQuerySet`` instance can be iterated over like a normal
-    :class:`~django.db.models.query.QuerySet`, ``RawQuerySet`` doesn't
-    implement all methods you can use with ``QuerySet``. For example,
-    ``__bool__()`` and ``__len__()`` are not defined in ``RawQuerySet``, and
-    thus all ``RawQuerySet`` instances are considered ``True``. The reason
-    these methods are not implemented in ``RawQuerySet`` is that implementing
-    them without internal caching would be a performance drawback and adding
-    such caching would be backward incompatible.
+    The default value of the ``params`` argument was changed from ``None`` to
+    an empty tuple.
 
 Mapping query fields to model fields
 ------------------------------------
@@ -168,8 +175,9 @@ last names were both retrieved on demand when they were printed.
 
 There is only one field that you can't leave out - the primary key
 field. Django uses the primary key to identify model instances, so it
-must always be included in a raw query. An ``InvalidQuery`` exception
-will be raised if you forget to include the primary key.
+must always be included in a raw query. A
+:class:`~django.core.exceptions.FieldDoesNotExist` exception will be raised if
+you forget to include the primary key.
 
 Adding annotations
 ------------------
@@ -185,7 +193,10 @@ of people with their ages calculated by the database::
     Jane is 42.
     ...
 
-__ https://www.postgresql.org/docs/current/static/functions-datetime.html
+You can often avoid using raw SQL to compute annotations by instead using a
+:ref:`Func() expression <func-expressions>`.
+
+__ https://www.postgresql.org/docs/current/functions-datetime.html
 
 Passing parameters into ``raw()``
 ---------------------------------
@@ -199,9 +210,8 @@ argument to ``raw()``::
 ``params`` is a list or dictionary of parameters. You'll use ``%s``
 placeholders in the query string for a list, or ``%(key)s``
 placeholders for a dictionary (where ``key`` is replaced by a
-dictionary key, of course), regardless of your database engine.  Such
-placeholders will be replaced with parameters from the ``params``
-argument.
+dictionary key), regardless of your database engine. Such placeholders will be
+replaced with parameters from the ``params`` argument.
 
 .. note::
 
@@ -210,20 +220,26 @@ argument.
 
 .. warning::
 
-    **Do not use string formatting on raw queries!**
+    **Do not use string formatting on raw queries or quote placeholders in your
+    SQL strings!**
 
     It's tempting to write the above query as::
 
         >>> query = 'SELECT * FROM myapp_person WHERE last_name = %s' % lname
         >>> Person.objects.raw(query)
 
-    **Don't.**
+    You might also think you should write your query like this (with quotes
+    around ``%s``)::
 
-    Using the ``params`` argument completely protects you from `SQL injection
-    attacks`__, a common exploit where attackers inject arbitrary SQL into
-    your database. If you use string interpolation, sooner or later you'll
-    fall victim to SQL injection. As long as you remember to always use the
-    ``params`` argument you'll be protected.
+        >>> query = "SELECT * FROM myapp_person WHERE last_name = '%s'"
+
+    **Don't make either of these mistakes.**
+
+    As discussed in :ref:`sql-injection-protection`, using the ``params``
+    argument and leaving the placeholders unquoted protects you from `SQL
+    injection attacks`__, a common exploit where attackers inject arbitrary
+    SQL into your database. If you use string interpolation or quote the
+    placeholder, you're at risk for SQL injection.
 
 __ https://en.wikipedia.org/wiki/SQL_injection
 
@@ -257,6 +273,9 @@ For example::
 
         return row
 
+To protect against SQL injection, you must not include quotes around the ``%s``
+placeholders in the SQL string.
+
 Note that if you want to include literal percent signs in the query, you have to
 double them in the case you are passing parameters::
 
@@ -270,8 +289,8 @@ object that allows you to retrieve a specific connection using its
 alias::
 
     from django.db import connections
-    cursor = connections['my_db_alias'].cursor()
-    # Your code here...
+    with connections['my_db_alias'].cursor() as cursor:
+        # Your code here...
 
 By default, the Python DB API will return results without their field names,
 which means you end up with a ``list`` of values, rather than a ``dict``. At a
@@ -346,3 +365,31 @@ is equivalent to::
         c.execute(...)
     finally:
         c.close()
+
+Calling stored procedures
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. method:: CursorWrapper.callproc(procname, params=None, kparams=None)
+
+    Calls a database stored procedure with the given name. A sequence
+    (``params``) or dictionary (``kparams``) of input parameters may be
+    provided. Most databases don't support ``kparams``. Of Django's built-in
+    backends, only Oracle supports it.
+
+    For example, given this stored procedure in an Oracle database:
+
+    .. code-block:: sql
+
+        CREATE PROCEDURE "TEST_PROCEDURE"(v_i INTEGER, v_text NVARCHAR2(10)) AS
+            p_i INTEGER;
+            p_text NVARCHAR2(10);
+        BEGIN
+            p_i := v_i;
+            p_text := v_text;
+            ...
+        END;
+
+    This will call it::
+
+        with connection.cursor() as cursor:
+            cursor.callproc('test_procedure', [1, 'test'])

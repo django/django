@@ -2,16 +2,19 @@
 Form Widget classes specific to the Django admin site.
 """
 import copy
+import json
 
 from django import forms
-from django.db.models.deletion import CASCADE
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
+from django.db.models import CASCADE
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
-from django.utils.encoding import force_text
 from django.utils.html import smart_urlquote
-from django.utils.safestring import mark_safe
+from django.utils.http import urlencode
 from django.utils.text import Truncator
-from django.utils.translation import gettext as _
+from django.utils.translation import get_language, gettext as _
 
 
 class FilteredSelectMultiple(forms.SelectMultiple):
@@ -21,17 +24,19 @@ class FilteredSelectMultiple(forms.SelectMultiple):
     Note that the resulting JavaScript assumes that the jsi18n
     catalog has been loaded in the page
     """
-    @property
-    def media(self):
-        js = ["core.js", "SelectBox.js", "SelectFilter2.js"]
-        return forms.Media(js=["admin/js/%s" % path for path in js])
+    class Media:
+        js = [
+            'admin/js/core.js',
+            'admin/js/SelectBox.js',
+            'admin/js/SelectFilter2.js',
+        ]
 
     def __init__(self, verbose_name, is_stacked, attrs=None, choices=()):
         self.verbose_name = verbose_name
         self.is_stacked = is_stacked
         super().__init__(attrs, choices)
 
-    def get_context(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         context['widget']['attrs']['class'] = 'selectfilter'
         if self.is_stacked:
@@ -42,29 +47,27 @@ class FilteredSelectMultiple(forms.SelectMultiple):
 
 
 class AdminDateWidget(forms.DateInput):
-    @property
-    def media(self):
-        js = ["calendar.js", "admin/DateTimeShortcuts.js"]
-        return forms.Media(js=["admin/js/%s" % path for path in js])
+    class Media:
+        js = [
+            'admin/js/calendar.js',
+            'admin/js/admin/DateTimeShortcuts.js',
+        ]
 
     def __init__(self, attrs=None, format=None):
-        final_attrs = {'class': 'vDateField', 'size': '10'}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs, format=format)
+        attrs = {'class': 'vDateField', 'size': '10', **(attrs or {})}
+        super().__init__(attrs=attrs, format=format)
 
 
 class AdminTimeWidget(forms.TimeInput):
-    @property
-    def media(self):
-        js = ["calendar.js", "admin/DateTimeShortcuts.js"]
-        return forms.Media(js=["admin/js/%s" % path for path in js])
+    class Media:
+        js = [
+            'admin/js/calendar.js',
+            'admin/js/admin/DateTimeShortcuts.js',
+        ]
 
     def __init__(self, attrs=None, format=None):
-        final_attrs = {'class': 'vTimeField', 'size': '8'}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs, format=format)
+        attrs = {'class': 'vTimeField', 'size': '8', **(attrs or {})}
+        super().__init__(attrs=attrs, format=format)
 
 
 class AdminSplitDateTime(forms.SplitDateTimeWidget):
@@ -101,7 +104,6 @@ def url_params_from_lookup_dict(lookups):
     """
     params = {}
     if lookups and hasattr(lookups, 'items'):
-        items = []
         for k, v in lookups.items():
             if callable(v):
                 v = v()
@@ -111,8 +113,7 @@ def url_params_from_lookup_dict(lookups):
                 v = ('0', '1')[v]
             else:
                 v = str(v)
-            items.append((k, v))
-        params.update(dict(items))
+            params[k] = v
     return params
 
 
@@ -129,7 +130,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         self.db = using
         super().__init__(attrs)
 
-    def get_context(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         rel_to = self.rel.model
         if rel_to in self.admin_site._registry:
@@ -144,15 +145,17 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 
             params = self.url_parameters()
             if params:
-                related_url += '?' + '&amp;'.join(
-                    '%s=%s' % (k, v) for k, v in params.items(),
-                )
-            context['related_url'] = mark_safe(related_url)
+                related_url += '?' + urlencode(params)
+            context['related_url'] = related_url
             context['link_title'] = _('Lookup')
             # The JavaScript code looks for this class.
             context['widget']['attrs'].setdefault('class', 'vForeignKeyRawIdAdminField')
+        else:
+            context['related_url'] = None
         if context['widget']['value']:
             context['link_label'], context['link_url'] = self.label_and_url_for_value(value)
+        else:
+            context['link_label'] = None
         return context
 
     def base_url_parameters(self):
@@ -171,7 +174,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         key = self.rel.get_related_field().name
         try:
             obj = self.rel.model._default_manager.using(self.db).get(**{key: value})
-        except (ValueError, self.rel.model.DoesNotExist):
+        except (ValueError, self.rel.model.DoesNotExist, ValidationError):
             return '', ''
 
         try:
@@ -186,7 +189,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         except NoReverseMatch:
             url = ''  # Admin not registered for target model.
 
-        return Truncator(obj).words(14, truncate='...'), url
+        return Truncator(obj).words(14), url
 
 
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
@@ -196,7 +199,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     """
     template_name = 'admin/widgets/many_to_many_raw_id.html'
 
-    def get_context(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         if self.rel.model in self.admin_site._registry:
             # The related object is registered with the same AdminSite
@@ -215,7 +218,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
             return value.split(',')
 
     def format_value(self, value):
-        return ','.join(force_text(v) for v in value) if value else ''
+        return ','.join(str(v) for v in value) if value else ''
 
 
 class RelatedFieldWidgetWrapper(forms.Widget):
@@ -226,7 +229,8 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     template_name = 'admin/widgets/related_widget_wrapper.html'
 
     def __init__(self, widget, rel, admin_site, can_add_related=None,
-                 can_change_related=False, can_delete_related=False):
+                 can_change_related=False, can_delete_related=False,
+                 can_view_related=False):
         self.needs_multipart_form = widget.needs_multipart_form
         self.attrs = widget.attrs
         self.choices = widget.choices
@@ -243,6 +247,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         # XXX: The deletion UX can be confusing when dealing with cascading deletion.
         cascade = getattr(rel, 'on_delete', None) is CASCADE
         self.can_delete_related = not multiple and not cascade and can_delete_related
+        self.can_view_related = not multiple and can_view_related
         # so we can check if the related object is registered with this AdminSite
         self.admin_site = admin_site
 
@@ -265,7 +270,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         return reverse("admin:%s_%s_%s" % (info + (action,)),
                        current_app=self.admin_site.name, args=args)
 
-    def get_context(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
         from django.contrib.admin.views.main import IS_POPUP_VAR, TO_FIELD_VAR
         rel_opts = self.rel.model._meta
         info = (rel_opts.app_label, rel_opts.model_name)
@@ -276,28 +281,21 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         ])
         context = {
             'rendered_widget': self.widget.render(name, value, attrs),
+            'is_hidden': self.is_hidden,
             'name': name,
             'url_params': url_params,
             'model': rel_opts.verbose_name,
+            'can_add_related': self.can_add_related,
+            'can_change_related': self.can_change_related,
+            'can_delete_related': self.can_delete_related,
+            'can_view_related': self.can_view_related,
         }
-        if self.can_change_related:
-            change_related_template_url = self.get_related_url(info, 'change', '__fk__')
-            context.update(
-                can_change_related=True,
-                change_related_template_url=change_related_template_url,
-            )
         if self.can_add_related:
-            add_related_url = self.get_related_url(info, 'add')
-            context.update(
-                can_add_related=True,
-                add_related_url=add_related_url,
-            )
+            context['add_related_url'] = self.get_related_url(info, 'add')
         if self.can_delete_related:
-            delete_related_template_url = self.get_related_url(info, 'delete', '__fk__')
-            context.update(
-                can_delete_related=True,
-                delete_related_template_url=delete_related_template_url,
-            )
+            context['delete_related_template_url'] = self.get_related_url(info, 'delete', '__fk__')
+        if self.can_view_related or self.can_change_related:
+            context['change_related_template_url'] = self.get_related_url(info, 'change', '__fk__')
         return context
 
     def value_from_datadict(self, data, files, name):
@@ -312,42 +310,37 @@ class RelatedFieldWidgetWrapper(forms.Widget):
 
 class AdminTextareaWidget(forms.Textarea):
     def __init__(self, attrs=None):
-        final_attrs = {'class': 'vLargeTextField'}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs)
+        super().__init__(attrs={'class': 'vLargeTextField', **(attrs or {})})
 
 
 class AdminTextInputWidget(forms.TextInput):
     def __init__(self, attrs=None):
-        final_attrs = {'class': 'vTextField'}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs)
+        super().__init__(attrs={'class': 'vTextField', **(attrs or {})})
 
 
 class AdminEmailInputWidget(forms.EmailInput):
     def __init__(self, attrs=None):
-        final_attrs = {'class': 'vTextField'}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs)
+        super().__init__(attrs={'class': 'vTextField', **(attrs or {})})
 
 
 class AdminURLFieldWidget(forms.URLInput):
     template_name = 'admin/widgets/url.html'
 
-    def __init__(self, attrs=None):
-        final_attrs = {'class': 'vURLField'}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs)
+    def __init__(self, attrs=None, validator_class=URLValidator):
+        super().__init__(attrs={'class': 'vURLField', **(attrs or {})})
+        self.validator = validator_class()
 
     def get_context(self, name, value, attrs):
+        try:
+            self.validator(value if value else '')
+            url_valid = True
+        except ValidationError:
+            url_valid = False
         context = super().get_context(name, value, attrs)
         context['current_label'] = _('Currently:')
         context['change_label'] = _('Change:')
         context['widget']['href'] = smart_urlquote(context['widget']['value']) if value else ''
+        context['url_valid'] = url_valid
         return context
 
 
@@ -355,11 +348,129 @@ class AdminIntegerFieldWidget(forms.NumberInput):
     class_name = 'vIntegerField'
 
     def __init__(self, attrs=None):
-        final_attrs = {'class': self.class_name}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs)
+        super().__init__(attrs={'class': self.class_name, **(attrs or {})})
 
 
 class AdminBigIntegerFieldWidget(AdminIntegerFieldWidget):
     class_name = 'vBigIntegerField'
+
+
+class AdminUUIDInputWidget(forms.TextInput):
+    def __init__(self, attrs=None):
+        super().__init__(attrs={'class': 'vUUIDField', **(attrs or {})})
+
+
+# Mapping of lowercase language codes [returned by Django's get_language()] to
+# language codes supported by select2.
+# See django/contrib/admin/static/admin/js/vendor/select2/i18n/*
+SELECT2_TRANSLATIONS = {x.lower(): x for x in [
+    'ar', 'az', 'bg', 'ca', 'cs', 'da', 'de', 'el', 'en', 'es', 'et',
+    'eu', 'fa', 'fi', 'fr', 'gl', 'he', 'hi', 'hr', 'hu', 'id', 'is',
+    'it', 'ja', 'km', 'ko', 'lt', 'lv', 'mk', 'ms', 'nb', 'nl', 'pl',
+    'pt-BR', 'pt', 'ro', 'ru', 'sk', 'sr-Cyrl', 'sr', 'sv', 'th',
+    'tr', 'uk', 'vi',
+]}
+SELECT2_TRANSLATIONS.update({'zh-hans': 'zh-CN', 'zh-hant': 'zh-TW'})
+
+
+class AutocompleteMixin:
+    """
+    Select widget mixin that loads options from AutocompleteJsonView via AJAX.
+
+    Renders the necessary data attributes for select2 and adds the static form
+    media.
+    """
+    url_name = '%s:autocomplete'
+
+    def __init__(self, field, admin_site, attrs=None, choices=(), using=None):
+        self.field = field
+        self.admin_site = admin_site
+        self.db = using
+        self.choices = choices
+        self.attrs = {} if attrs is None else attrs.copy()
+
+    def get_url(self):
+        return reverse(self.url_name % self.admin_site.name)
+
+    def build_attrs(self, base_attrs, extra_attrs=None):
+        """
+        Set select2's AJAX attributes.
+
+        Attributes can be set using the html5 data attribute.
+        Nested attributes require a double dash as per
+        https://select2.org/configuration/data-attributes#nested-subkey-options
+        """
+        attrs = super().build_attrs(base_attrs, extra_attrs=extra_attrs)
+        attrs.setdefault('class', '')
+        attrs.update({
+            'data-ajax--cache': 'true',
+            'data-ajax--delay': 250,
+            'data-ajax--type': 'GET',
+            'data-ajax--url': self.get_url(),
+            'data-app-label': self.field.model._meta.app_label,
+            'data-model-name': self.field.model._meta.model_name,
+            'data-field-name': self.field.name,
+            'data-theme': 'admin-autocomplete',
+            'data-allow-clear': json.dumps(not self.is_required),
+            'data-placeholder': '',  # Allows clearing of the input.
+            'class': attrs['class'] + (' ' if attrs['class'] else '') + 'admin-autocomplete',
+        })
+        return attrs
+
+    def optgroups(self, name, value, attr=None):
+        """Return selected options based on the ModelChoiceIterator."""
+        default = (None, [], 0)
+        groups = [default]
+        has_selected = False
+        selected_choices = {
+            str(v) for v in value
+            if str(v) not in self.choices.field.empty_values
+        }
+        if not self.is_required and not self.allow_multiple_selected:
+            default[1].append(self.create_option(name, '', '', False, 0))
+        remote_model_opts = self.field.remote_field.model._meta
+        to_field_name = getattr(self.field.remote_field, 'field_name', remote_model_opts.pk.attname)
+        to_field_name = remote_model_opts.get_field(to_field_name).attname
+        choices = (
+            (getattr(obj, to_field_name), self.choices.field.label_from_instance(obj))
+            for obj in self.choices.queryset.using(self.db).filter(**{'%s__in' % to_field_name: selected_choices})
+        )
+        for option_value, option_label in choices:
+            selected = (
+                str(option_value) in value and
+                (has_selected is False or self.allow_multiple_selected)
+            )
+            has_selected |= selected
+            index = len(default[1])
+            subgroup = default[1]
+            subgroup.append(self.create_option(name, option_value, option_label, selected_choices, index))
+        return groups
+
+    @property
+    def media(self):
+        extra = '' if settings.DEBUG else '.min'
+        i18n_name = SELECT2_TRANSLATIONS.get(get_language())
+        i18n_file = ('admin/js/vendor/select2/i18n/%s.js' % i18n_name,) if i18n_name else ()
+        return forms.Media(
+            js=(
+                'admin/js/vendor/jquery/jquery%s.js' % extra,
+                'admin/js/vendor/select2/select2.full%s.js' % extra,
+            ) + i18n_file + (
+                'admin/js/jquery.init.js',
+                'admin/js/autocomplete.js',
+            ),
+            css={
+                'screen': (
+                    'admin/css/vendor/select2/select2%s.css' % extra,
+                    'admin/css/autocomplete.css',
+                ),
+            },
+        )
+
+
+class AutocompleteSelect(AutocompleteMixin, forms.Select):
+    pass
+
+
+class AutocompleteSelectMultiple(AutocompleteMixin, forms.SelectMultiple):
+    pass

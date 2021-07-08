@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand, CommandError
 class Command(BaseCommand):
     help = "Dance around like a madman."
     args = ''
-    requires_system_checks = True
+    requires_system_checks = '__all__'
 
     def add_arguments(self, parser):
         parser.add_argument("integer", nargs='?', type=int, default=0)
@@ -15,9 +15,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         example = options["example"]
         if example == "raise":
-            raise CommandError()
+            raise CommandError(returncode=3)
         if options['verbosity'] > 0:
             self.stdout.write("I don't feel like dancing %s." % options["style"])
-            self.stdout.write(','.join(options.keys()))
+            self.stdout.write(','.join(options))
         if options['integer'] > 0:
             self.stdout.write("You passed %d as a positional argument." % options['integer'])

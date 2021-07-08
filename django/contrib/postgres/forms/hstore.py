@@ -28,7 +28,7 @@ class HStoreField(forms.CharField):
         if not isinstance(value, dict):
             try:
                 value = json.loads(value)
-            except ValueError:
+            except json.JSONDecodeError:
                 raise ValidationError(
                     self.error_messages['invalid_json'],
                     code='invalid_json',

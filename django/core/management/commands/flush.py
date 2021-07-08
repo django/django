@@ -4,7 +4,7 @@ from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
 from django.core.management.sql import emit_post_migrate_signal, sql_flush
-from django.db import DEFAULT_DB_ALIAS, connections, transaction
+from django.db import DEFAULT_DB_ALIAS, connections
 
 
 class Command(BaseCommand):
@@ -12,15 +12,15 @@ class Command(BaseCommand):
         'Removes ALL DATA from the database, including data added during '
         'migrations. Does not achieve a "fresh install" state.'
     )
+    stealth_options = ('reset_sequences', 'allow_cascade', 'inhibit_post_migrate')
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--noinput', '--no-input',
-            action='store_false', dest='interactive', default=True,
+            '--noinput', '--no-input', action='store_false', dest='interactive',
             help='Tells Django to NOT prompt the user for input of any kind.',
         )
         parser.add_argument(
-            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            '--database', default=DEFAULT_DB_ALIAS,
             help='Nominates a database to flush. Defaults to the "default" database.',
         )
 
@@ -44,13 +44,13 @@ class Command(BaseCommand):
             except ImportError:
                 pass
 
-        sql_list = sql_flush(self.style, connection, only_django=True,
+        sql_list = sql_flush(self.style, connection,
                              reset_sequences=reset_sequences,
                              allow_cascade=allow_cascade)
 
         if interactive:
             confirm = input("""You have requested a flush of the database.
-This will IRREVERSIBLY DESTROY all data currently in the %r database,
+This will IRREVERSIBLY DESTROY all data currently in the "%s" database,
 and return each table to an empty state.
 Are you sure you want to do this?
 
@@ -60,11 +60,7 @@ Are you sure you want to do this?
 
         if confirm == 'yes':
             try:
-                with transaction.atomic(using=database,
-                                        savepoint=connection.features.can_rollback_ddl):
-                    with connection.cursor() as cursor:
-                        for sql in sql_list:
-                            cursor.execute(sql)
+                connection.ops.execute_sql_flush(sql_list)
             except Exception as exc:
                 raise CommandError(
                     "Database %s couldn't be flushed. Possible reasons:\n"
@@ -72,7 +68,7 @@ Are you sure you want to do this?
                     "  * At least one of the expected database tables doesn't exist.\n"
                     "  * The SQL was invalid.\n"
                     "Hint: Look at the output of 'django-admin sqlflush'. "
-                    "That's the SQL this command wasn't able to run.\n" % (
+                    "That's the SQL this command wasn't able to run." % (
                         connection.settings_dict['NAME'],
                     )
                 ) from exc
@@ -83,4 +79,4 @@ Are you sure you want to do this?
                 # respond as if the database had been migrated from scratch.
                 emit_post_migrate_signal(verbosity, interactive, database)
         else:
-            self.stdout.write("Flush cancelled.\n")
+            self.stdout.write('Flush cancelled.')

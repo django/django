@@ -1,7 +1,7 @@
 """
 Base file upload handler classes, and the built-in concrete subclasses
 """
-
+import os
 from io import BytesIO
 
 from django.conf import settings
@@ -52,7 +52,7 @@ class SkipFile(UploadFileException):
 
 class StopFutureHandlers(UploadFileException):
     """
-    Upload handers that have handled a file and do not want future handlers to
+    Upload handlers that have handled a file and do not want future handlers to
     run should raise this exception instead of returning None.
     """
     pass
@@ -127,14 +127,18 @@ class FileUploadHandler:
         """
         pass
 
+    def upload_interrupted(self):
+        """
+        Signal that the upload was interrupted. Subclasses should perform
+        cleanup that is necessary for this handler.
+        """
+        pass
+
 
 class TemporaryFileUploadHandler(FileUploadHandler):
     """
     Upload handler that streams data into a temporary file.
     """
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def new_file(self, *args, **kwargs):
         """
         Create the file object to append to as data is coming in.
@@ -150,6 +154,15 @@ class TemporaryFileUploadHandler(FileUploadHandler):
         self.file.size = file_size
         return self.file
 
+    def upload_interrupted(self):
+        if hasattr(self, 'file'):
+            temp_location = self.file.temporary_file_path()
+            try:
+                self.file.close()
+                os.remove(temp_location)
+            except FileNotFoundError:
+                pass
+
 
 class MemoryFileUploadHandler(FileUploadHandler):
     """
@@ -163,10 +176,7 @@ class MemoryFileUploadHandler(FileUploadHandler):
         """
         # Check the content-length header to see if we should
         # If the post is too large, we cannot use the Memory handler.
-        if content_length > settings.FILE_UPLOAD_MAX_MEMORY_SIZE:
-            self.activated = False
-        else:
-            self.activated = True
+        self.activated = content_length <= settings.FILE_UPLOAD_MAX_MEMORY_SIZE
 
     def new_file(self, *args, **kwargs):
         super().new_file(*args, **kwargs)

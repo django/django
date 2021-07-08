@@ -74,8 +74,17 @@ class CustomMessagesModel(models.Model):
     )
 
 
+class AuthorManager(models.Manager):
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(archived=False)
+
+
 class Author(models.Model):
     name = models.CharField(max_length=100)
+    archived = models.BooleanField(default=False)
+
+    objects = AuthorManager()
 
 
 class Article(models.Model):
@@ -93,9 +102,6 @@ class Post(models.Model):
     slug = models.CharField(max_length=50, unique_for_year='posted', blank=True)
     subtitle = models.CharField(max_length=50, unique_for_month='posted', blank=True)
     posted = models.DateField()
-
-    def __str__(self):
-        return self.name
 
 
 class FlexibleDatePost(models.Model):
@@ -130,4 +136,7 @@ try:
         auto2 = models.AutoField(primary_key=True)
 except AssertionError as exc:
     assertion_error = exc
-assert str(assertion_error) == "A model can't have more than one AutoField."
+assert str(assertion_error) == (
+    "Model validation.MultipleAutoFields can't have more than one "
+    "auto-generated field."
+)

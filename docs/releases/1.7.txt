@@ -127,7 +127,8 @@ composite keys in future releases of Django, the
 
 This method takes no arguments, and returns a tuple of four items:
 
-* ``name``: The field's attribute name on its parent model, or None if it is not part of a model
+* ``name``: The field's attribute name on its parent model, or ``None`` if it
+  is not part of a model
 * ``path``: A dotted, Python path to the class of this field, including the class name.
 * ``args``: Positional arguments, as a list
 * ``kwargs``: Keyword arguments, as a dict
@@ -421,7 +422,7 @@ Minor features
   <django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed>` method
   to more easily customize the login policy.
 
-* :func:`django.contrib.auth.views.password_reset` takes an optional
+* ``django.contrib.auth.views.password_reset()`` takes an optional
   ``html_email_template_name`` parameter used to send a multipart HTML email
   for password resets.
 
@@ -479,7 +480,7 @@ Minor features
 
 * The ``"django.contrib.sessions.backends.cached_db"`` session backend now
   respects :setting:`SESSION_CACHE_ALIAS`. In previous versions, it always used
-  the `default` cache.
+  the ``default`` cache.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -506,8 +507,7 @@ Minor features
   and :attr:`~django.core.files.storage.FileSystemStorage.directory_permissions_mode`
   parameters. See :djadmin:`collectstatic` for example usage.
 
-* The :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
-  backend gets a sibling class called
+* The ``CachedStaticFilesStorage`` backend gets a sibling class called
   :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
   that doesn't use the cache system at all but instead a JSON file called
   ``staticfiles.json`` for storing the mapping between the original file name
@@ -558,7 +558,9 @@ Email
 ~~~~~
 
 * :func:`~django.core.mail.send_mail` now accepts an ``html_message``
-  parameter for sending a multipart ``text/plain`` and ``text/html`` email.
+  parameter for sending a multipart :mimetype:`text/plain` and
+  :mimetype:`text/html` email.
+
 * The SMTP :class:`~django.core.mail.backends.smtp.EmailBackend` now accepts a
   ``timeout`` parameter.
 
@@ -661,12 +663,11 @@ Internationalization
 
 * The :class:`~django.middleware.locale.LocaleMiddleware` now stores the user's
   selected language with the session key ``_language``. This should only be
-  accessed using the :data:`~django.utils.translation.LANGUAGE_SESSION_KEY`
-  constant. Previously it was stored with the key ``django_language`` and the
-  ``LANGUAGE_SESSION_KEY`` constant did not exist, but keys reserved for Django
-  should start with an underscore. For backwards compatibility ``django_language``
-  is still read from in 1.7. Sessions will be migrated to the new key
-  as they are written.
+  accessed using the ``LANGUAGE_SESSION_KEY`` constant. Previously it was
+  stored with the key ``django_language`` and the ``LANGUAGE_SESSION_KEY``
+  constant did not exist, but keys reserved for Django should start with an
+  underscore. For backwards compatibility ``django_language`` is still read
+  from in 1.7. Sessions will be migrated to the new key as they are written.
 
 * The :ttag:`blocktrans` tag now supports a ``trimmed`` option. This
   option will remove newline characters from the beginning and the end of the
@@ -715,7 +716,7 @@ Management Commands
     filesystem for changes every second. That caused a small delay before
     reloads and reduced battery life on laptops.
 
-    .. _pyinotify: https://pypi.python.org/pypi/pyinotify
+    .. _pyinotify: https://pypi.org/project/pyinotify/
 
   * In addition, the development server automatically reloads when a
     translation file is updated, i.e. after running
@@ -737,7 +738,7 @@ Management Commands
   :class:`~django.db.migrations.operations.RunSQL` operation of migrations,
   which benefits from the improved behavior.
 
-.. _sqlparse: https://pypi.python.org/pypi/sqlparse
+.. _sqlparse: https://pypi.org/project/sqlparse/
 
 Models
 ~~~~~~
@@ -1122,9 +1123,9 @@ as ``error_list``; ``error_dict``; or the return value of
 would have previously found strings.
 
 Also if you directly assigned the return value of ``update_error_dict()``
-to ``Form._errors`` you may inadvertently add `list` instances where
+to ``Form._errors`` you may inadvertently add ``list`` instances where
 ``ErrorList`` instances are expected. This is a problem because unlike a
-simple `list`, an ``ErrorList`` knows how to handle instances of
+simple ``list``, an ``ErrorList`` knows how to handle instances of
 ``ValidationError``.
 
 Most use-cases that warranted using these private APIs are now covered by
@@ -1202,7 +1203,7 @@ a :exc:`ValueError` when encountering them, you will have to install pytz_. You
 may be affected by this problem if you use Django's time zone-related date
 formats or :mod:`django.contrib.syndication`.
 
-.. _pytz: https://pypi.python.org/pypi/pytz/
+.. _pytz: https://pypi.org/project/pytz/
 
 ``remove()`` and ``clear()`` methods of related managers
 --------------------------------------------------------
@@ -1742,7 +1743,7 @@ will be removed in Django 1.9. You can simply remove the
 --------------------------------------
 
 ``javascript_quote()`` was an undocumented function present in ``django.utils.text``.
-It was used internally in the :ref:`javascript_catalog view <javascript_catalog-view>`
+It was used internally in the ``javascript_catalog()`` view
 whose implementation was changed to make use of ``json.dumps()`` instead.
 If you were relying on this function to provide safe output from untrusted
 strings, you should use ``django.utils.html.escapejs`` or the
@@ -1846,7 +1847,7 @@ remove usage of these features.
 * The ``check_for_test_cookie`` method in
   :class:`~django.contrib.auth.forms.AuthenticationForm` is removed.
 
-* The version of :func:`django.contrib.auth.views.password_reset_confirm` that
+* The version of ``django.contrib.auth.views.password_reset_confirm()`` that
   supports base36 encoded user IDs
   (``django.contrib.auth.views.password_reset_confirm_uidb36``) is removed.
 

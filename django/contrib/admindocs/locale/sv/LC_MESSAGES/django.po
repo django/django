@@ -4,14 +4,15 @@
 # Andreas Pelme <andreas@pelme.se>, 2012,2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2014
-# Thomas Lundqvist <thomas@biljettshop.se>, 2013
+# Petter Strandmark <petter.strandmark@gmail.com>, 2019
+# Thomas Lundqvist, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:51+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2019-01-28 13:49+0000\n"
+"Last-Translator: Petter Strandmark <petter.strandmark@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -40,6 +41,9 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"För att installera bookmarklets, dra länken till din verkygsrad för "
+"bokmärken, eller högerklicka på länken och lägg till den till dina "
+"bokmärken. Nu kan du välja din bookmarklet från vilken sida som helst."
 
 msgid "Documentation for this page"
 msgstr "Dokumentation för denna sida"
@@ -118,7 +122,7 @@ msgid "Model: %(name)s"
 msgstr "Modell: %(name)s"
 
 msgid "Fields"
-msgstr ""
+msgstr "Fält"
 
 msgid "Field"
 msgstr "Fält"
@@ -130,16 +134,16 @@ msgid "Description"
 msgstr "Beskrivning"
 
 msgid "Methods with arguments"
-msgstr ""
+msgstr "Metod med argument"
 
 msgid "Method"
-msgstr ""
+msgstr "Metod"
 
 msgid "Arguments"
-msgstr ""
+msgstr "Argument"
 
 msgid "Back to Model documentation"
-msgstr ""
+msgstr "Tillbaka till modell-dokumentation"
 
 msgid "Model documentation"
 msgstr "Modelldokumentation"
@@ -214,7 +218,7 @@ msgid "Templates:"
 msgstr "Mallar:"
 
 msgid "Back to View documentation"
-msgstr ""
+msgstr "Tillbaka till vy-dokumentation"
 
 msgid "View documentation"
 msgstr "Titta på dokumentationen"
@@ -240,13 +244,6 @@ msgid ""
 msgstr ""
 "\n"
 "Vyfunktion: <code>%(full_name)s</code>. Namn: <code>%(url_name)s</code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Boolesk (antingen True eller False)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Fält av typ: %(field_type)s"
 
 msgid "tag:"
 msgstr "tagg:"

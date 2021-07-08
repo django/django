@@ -14,8 +14,6 @@ def _simple_domain_name_validator(value):
     Validate that the given value contains no whitespaces to prevent common
     typos.
     """
-    if not value:
-        return
     checks = ((s in value) for s in string.whitespace)
     if any(checks):
         raise ValidationError(
@@ -86,13 +84,14 @@ class Site(models.Model):
         unique=True,
     )
     name = models.CharField(_('display name'), max_length=50)
+
     objects = SiteManager()
 
     class Meta:
         db_table = 'django_site'
         verbose_name = _('site')
         verbose_name_plural = _('sites')
-        ordering = ('domain',)
+        ordering = ['domain']
 
     def __str__(self):
         return self.domain

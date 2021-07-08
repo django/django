@@ -4,13 +4,15 @@
 # Fandekasp <lemaire.adrien@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Shinya Okano <tokibito@gmail.com>, 2013-2016
+# Takuya N <takninnovationresearch@gmail.com>, 2020
+# Tsuboi Yuto <y_tsuboi@ga-tech.co.jp>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-26 16:21+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-05-09 04:02+0000\n"
+"Last-Translator: Tsuboi Yuto <y_tsuboi@ga-tech.co.jp>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -99,11 +101,11 @@ msgstr "docutilsをインストールして下さい"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
+"The admin documentation system requires Python’s <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
-"管理ドキュメントシステムには、Pythonの <a href=\"%(link)s\">docutils</a> ライ"
-"ブラリが必要です。"
+"管理用ドキュメントシステムにはPythonの<a href=\"%(link)s\">docutils</a>ライブ"
+"ラリが必要です。"
 
 #, python-format
 msgid ""
@@ -154,13 +156,13 @@ msgid "Template: %(name)s"
 msgstr "テンプレート: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "テンプレート: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr "テンプレート: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "テンプレートの検索パス \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "テンプレートの検索パス <q>%(name)s</q>:"
 
 msgid "(does not exist)"
 msgstr "(存在しません)"
@@ -239,13 +241,6 @@ msgid ""
 msgstr ""
 "\n"
 "ビュー関数: <code>%(full_name)s</code>. 名前: <code>%(url_name)s</code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "ブール値 (真: True または偽: False)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "フィールドの型: %(field_type)s"
 
 msgid "tag:"
 msgstr "タグ"

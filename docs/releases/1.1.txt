@@ -207,7 +207,7 @@ detail in :doc:`the ORM aggregation documentation </topics/db/aggregation>`.
 Query expressions
 ~~~~~~~~~~~~~~~~~
 
-Queries can now refer to a another field on the query and can traverse
+Queries can now refer to another field on the query and can traverse
 relationships to refer to fields on related models. This is implemented in the
 new :class:`~django.db.models.F` object; for full details, including examples,
 consult the :class:`F expressions documentation <django.db.models.F>`.
@@ -267,7 +267,7 @@ A few notable improvements have been made to the :doc:`testing framework
 </topics/testing/index>`.
 
 Test performance improvements
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. currentmodule:: django.test
 
@@ -347,8 +347,8 @@ For full details, see :ref:`the documentation on defining URL namespaces
 GeoDjango
 ---------
 
-In Django 1.1, GeoDjango_ (i.e. ``django.contrib.gis``) has several new
-features:
+In Django 1.1, :doc:`GeoDjango </ref/contrib/gis/index>` (i.e.
+``django.contrib.gis``) has several new features:
 
 * Support for SpatiaLite_ -- a spatial database for SQLite -- as a spatial
   backend.
@@ -363,7 +363,6 @@ features:
 
 For more details, see the GeoDjango documentation.
 
-.. _geodjango: http://geodjango.org/
 .. _spatialite: https://www.gaia-gis.it/gaia-sins/
 
 Other improvements
@@ -441,7 +440,7 @@ What's next?
 We'll take a short break, and then work on Django 1.2 will begin -- no rest for
 the weary! If you'd like to help, discussion of Django development, including
 progress toward the 1.2 release, takes place daily on the |django-developers|
-mailing list and in the ``#django-dev`` IRC channel on ``irc.freenode.net``.
+mailing list and in the ``#django-dev`` IRC channel on ``irc.libera.chat``.
 Feel free to join the discussions!
 
 Django's online documentation also includes pointers on how to contribute to

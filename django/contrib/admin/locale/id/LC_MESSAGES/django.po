@@ -2,20 +2,21 @@
 #
 # Translators:
 # Claude Paroz <claude@2xlibre.net>, 2014
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2016
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
-# oon arfiandwi <oon.arfiandwi@gmail.com>, 2016
+# oon arfiandwi <oon.arfiandwi@gmail.com>, 2016,2020
 # rodin <romihardiyanto@gmail.com>, 2011-2013
-# rodin <romihardiyanto@gmail.com>, 2013-2015
+# rodin <romihardiyanto@gmail.com>, 2013-2017
+# sage <laymonage@gmail.com>, 2019
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-08-24 04:56+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2020-12-24 09:53+0000\n"
+"Last-Translator: oon arfiandwi <oon.arfiandwi@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -25,8 +26,12 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Hapus %(verbose_name_plural)s yang dipilih"
+
+#, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr "Sukes menghapus %(count)d %(items)s."
+msgstr "Sukses menghapus %(count)d %(items)s."
 
 #, python-format
 msgid "Cannot delete %(name)s"
@@ -34,10 +39,6 @@ msgstr "Tidak dapat menghapus %(name)s"
 
 msgid "Are you sure?"
 msgstr "Yakin?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Hapus %(verbose_name_plural)s yang dipilih"
 
 msgid "Administration"
 msgstr "Administrasi"
@@ -75,6 +76,12 @@ msgstr "Tidak ada tanggal"
 msgid "Has date"
 msgstr "Ada tanggal"
 
+msgid "Empty"
+msgstr "Kosong"
+
+msgid "Not empty"
+msgstr "Tidak kosong"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -93,6 +100,15 @@ msgstr "Tambahkan %(verbose_name)s lagi"
 msgid "Remove"
 msgstr "Hapus"
 
+msgid "Addition"
+msgstr "Tambahan"
+
+msgid "Change"
+msgstr "Ubah"
+
+msgid "Deletion"
+msgstr "Penghapusan"
+
 msgid "action time"
 msgstr "waktu aksi"
 
@@ -106,7 +122,7 @@ msgid "object id"
 msgstr "id objek"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "representasi objek"
 
@@ -123,23 +139,23 @@ msgid "log entries"
 msgstr "entri pencatatan"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "\"%(object)s\" ditambahkan."
+msgid "Added “%(object)s”."
+msgstr "“%(object)s” ditambahkan."
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "\"%(object)s\" diubah - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "“%(object)s” diubah — %(changes)s"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "\"%(object)s\" dihapus."
+msgid "Deleted “%(object)s.”"
+msgstr "“%(object)s” dihapus."
 
 msgid "LogEntry Object"
 msgstr "Objek LogEntry"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr "{name} ditambahkan \"{object}\"."
+msgid "Added {name} “{object}”."
+msgstr "{name} “{object}” ditambahkan."
 
 msgid "Added."
 msgstr "Ditambahkan."
@@ -148,16 +164,16 @@ msgid "and"
 msgstr "dan"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "{fields} berubah untuk {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "{fields} diubah untuk {name} “{object}”."
 
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr "{fields} berubah."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr " {name} dihapus \"{object}\"."
+msgid "Deleted {name} “{object}”."
+msgstr "{name} “{object}” dihapus."
 
 msgid "No fields changed."
 msgstr "Tidak ada bidang yang berubah."
@@ -165,48 +181,45 @@ msgstr "Tidak ada bidang yang berubah."
 msgid "None"
 msgstr "None"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
-"Tekan \"Control\", atau \"Command\" pada Mac, untuk memilih lebih dari satu."
+"Tekan “Control”, atau “Command” pada Mac, untuk memilih lebih dari satu."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr "{name} “{obj}” berhasil ditambahkan."
+
+msgid "You may edit it again below."
+msgstr "Anda dapat menyunting itu kembali di bawah."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+"The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
-"{name} \"{obj}\" telah berhasil ditambahkan. Anda dapat menyuntingnya "
-"kembali dibawah."
+"{name} “{obj}” berhasil ditambahkan. Anda dapat menambahkan {name} lain di "
+"bawah."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+"{name} “{obj}” berhasil diubah. Anda dapat mengeditnya kembali di bawah."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr ""
+"{name} “{obj}” berhasil ditambahkan. Anda dapat mengeditnya kembali di bawah."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
-"{name} \"{obj}\" telah berhasil ditambahkan. Anda dapat menambahkan {name} "
-"lain dibawah."
+"{name} “{obj}” berhasil diubah. Anda dapat menambahkan {name} lain di bawah."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" telah berhasil ditambahkan."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
-" {name} \"{obj}\" telah berhasil dirubah. Anda dapat menyuntingnya kembali "
-"dibawah."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-"{name} \"{obj}\" telah berhasil dirubah. Anda dapat menambahkan {name} lain "
-"dibawah."
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
-msgstr "{name} \"{obj}\" telah berhasil dirubah."
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "{name} “{obj}” berhasil diubah."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -218,12 +231,12 @@ msgid "No action selected."
 msgstr "Tidak ada aksi yang dipilih."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" berhasil dihapus."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "%(name)s “%(obj)s” berhasil dihapus."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Objek %(name)s dengan kunci utama %(key)r tidak ada."
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr "%(name)s dengan ID “%(key)s” tidak ada. Mungkin telah dihapus?"
 
 #, python-format
 msgid "Add %s"
@@ -232,6 +245,10 @@ msgstr "Tambahkan %s"
 #, python-format
 msgid "Change %s"
 msgstr "Ubah %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Lihat %s"
 
 msgid "Database error"
 msgstr "Galat basis data"
@@ -287,7 +304,7 @@ msgstr "Administrasi %(app)s"
 msgid "Page not found"
 msgstr "Laman tidak ditemukan"
 
-msgid "We're sorry, but the requested page could not be found."
+msgid "We’re sorry, but the requested page could not be found."
 msgstr "Maaf, laman yang Anda minta tidak ditemukan."
 
 msgid "Home"
@@ -303,11 +320,11 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Galat Server <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Galat terjadi dan telah dilaporkan ke administrator situs lewat email untuk "
-"diperbaiki. Terima kasih atas pengertiannya."
+"Terjadi sebuah galat dan telah dilaporkan ke administrator situs melalui "
+"surel untuk diperbaiki. Terima kasih atas pengertian Anda."
 
 msgid "Run the selected action"
 msgstr "Jalankan aksi terpilih"
@@ -325,12 +342,25 @@ msgstr "Pilih seluruh %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Bersihkan pilihan"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Model pada aplikasi %(name)s"
+
+msgid "Add"
+msgstr "Tambah"
+
+msgid "View"
+msgstr "Lihat"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Anda tidak memiliki izin untuk melihat atau mengedit apa pun."
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
 "Pertama-tama, masukkan nama pengguna dan sandi. Anda akan dapat mengubah "
-"opsi pengguna lain setelah itu."
+"opsi pengguna lebih lengkap setelah itu."
 
 msgid "Enter a username and password."
 msgstr "Masukkan nama pengguna dan sandi."
@@ -339,7 +369,7 @@ msgid "Change password"
 msgstr "Ganti sandi"
 
 msgid "Please correct the error below."
-msgstr "Perbaiki galat di bawah ini."
+msgstr "Mohon perbaiki kesalahan di bawah ini."
 
 msgid "Please correct the errors below."
 msgstr "Perbaiki galat di bawah ini."
@@ -372,6 +402,9 @@ msgstr "Lihat di situs"
 
 msgid "Filter"
 msgstr "Filter"
+
+msgid "Clear all filters"
+msgstr "Hapus semua penyaringan"
 
 msgid "Remove from sorting"
 msgstr "Dihapus dari pengurutan"
@@ -415,8 +448,8 @@ msgstr ""
 msgid "Objects"
 msgstr "Objek"
 
-msgid "Yes, I'm sure"
-msgstr "Ya, tentu saja"
+msgid "Yes, I’m sure"
+msgstr "Ya, saya yakin"
 
 msgid "No, take me back"
 msgstr "Tidak, bawa saya kembali"
@@ -450,9 +483,6 @@ msgstr ""
 "Yakin akan menghapus %(objects_name)s terpilih? Semua objek berikut beserta "
 "objek terkait juga akan dihapus:"
 
-msgid "Change"
-msgstr "Ubah"
-
 msgid "Delete?"
 msgstr "Hapus?"
 
@@ -463,18 +493,8 @@ msgstr " Berdasarkan %(filter_title)s "
 msgid "Summary"
 msgstr "Ringkasan"
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Model pada aplikasi %(name)s"
-
-msgid "Add"
-msgstr "Tambah"
-
-msgid "You don't have permission to edit anything."
-msgstr "Anda tidak memiliki izin untuk mengubah apapun."
-
 msgid "Recent actions"
-msgstr "Tindakah terbaru"
+msgstr "Tindakan terbaru"
 
 msgid "My actions"
 msgstr "Tindakan saya"
@@ -486,23 +506,26 @@ msgid "Unknown content"
 msgstr "Konten tidak diketahui"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
 "Ada masalah dengan instalasi basis data Anda. Pastikan tabel yang sesuai "
-"pada basis data telah dibuat dan dapat dibaca oleh pengguna yang benar."
+"pada basis data telah dibuat dan dapat dibaca oleh pengguna yang sesuai."
 
 #, python-format
 msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
-"Anda dikenali sebagai %(username)s, tapi tidak diperbolehkan untuk mengakses "
-"halaman ini. Anda ingin mencoba mengakses menggunakan akun yang lain?"
+"Anda diautentikasi sebagai %(username)s, tapi tidak diperbolehkan untuk "
+"mengakses halaman ini. Ingin mencoba mengakses menggunakan akun yang lain?"
 
 msgid "Forgotten your password or username?"
 msgstr "Lupa nama pengguna atau sandi?"
+
+msgid "Toggle navigation"
+msgstr "Alihkan navigasi"
 
 msgid "Date/time"
 msgstr "Tanggal/waktu"
@@ -514,10 +537,10 @@ msgid "Action"
 msgstr "Aksi"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
-"Objek ini tidak memiliki riwayat perubahan. Kemungkinan objek ini tidak "
+"Objek ini tidak memiliki riwayat perubahan. Mungkin objek ini tidak "
 "ditambahkan melalui situs administrasi ini."
 
 msgid "Show all"
@@ -526,20 +549,8 @@ msgstr "Tampilkan semua"
 msgid "Save"
 msgstr "Simpan"
 
-msgid "Popup closing..."
-msgstr "Menutup popup..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Ubah %(model)s yang dipilih"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Tambahkan %(model)s yang lain"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Hapus %(model)s yang dipilih"
+msgid "Popup closing…"
+msgstr "Menutup jendela sembulan..."
 
 msgid "Search"
 msgstr "Cari"
@@ -562,6 +573,24 @@ msgstr "Simpan dan tambahkan lagi"
 msgid "Save and continue editing"
 msgstr "Simpan dan terus mengedit"
 
+msgid "Save and view"
+msgstr "Simpan dan tampilkan"
+
+msgid "Close"
+msgstr "Tutup"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Ubah %(model)s yang dipilih"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Tambahkan %(model)s yang lain"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Hapus %(model)s yang dipilih"
+
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Terima kasih telah menggunakan situs ini hari ini."
 
@@ -575,11 +604,11 @@ msgid "Your password was changed."
 msgstr "Sandi Anda telah diubah."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Dengan alasan keamanan, masukkan sandi lama Anda dua kali untuk memastikan "
-"Anda tidak salah mengetikkannya."
+"Masukkan sandi lama Anda, demi alasan keamanan, dan masukkan sandi baru Anda "
+"dua kali untuk memastikan Anda tidak salah mengetikkannya."
 
 msgid "Change my password"
 msgstr "Ubah sandi saya"
@@ -615,17 +644,18 @@ msgstr ""
 "lagi."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Kami mengirimi anda instruksi untuk pengubahan kata sandi, jika ada akun "
-"dengan alamat email yang sesuai. Anda seharusnya menerimanya sesaat lagi."
+"Kami telah mengirimi Anda surel berisi petunjuk untuk mengatur sandi Anda, "
+"jika ada akun dengan alamat surel yang sesuai. Anda seharusnya menerima "
+"surel tersebut sesaat lagi."
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"Jika Anda tidak menerima email, pastikan Anda telah memasukkan alamat yang "
+"Jika Anda tidak menerima surel, pastikan Anda telah memasukkan alamat yang "
 "digunakan saat pendaftaran serta periksa folder spam Anda."
 
 #, python-format
@@ -639,7 +669,7 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Kunjungi laman di bawah ini dan ketikkan sandi baru:"
 
-msgid "Your username, in case you've forgotten:"
+msgid "Your username, in case you’ve forgotten:"
 msgstr "Nama pengguna Anda, jika lupa:"
 
 msgid "Thanks for using our site!"
@@ -650,11 +680,11 @@ msgid "The %(site_name)s team"
 msgstr "Tim %(site_name)s"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"Lupa sandinya? Masukkan alamat email Anda di bawah ini agar kami dapat "
-"mengirimkan petunjuk untuk menyetel ulang sandinya."
+"Lupa sandi Anda? Masukkan alamat surel Anda di bawah ini dan kami akan "
+"mengirimkan petunjuk untuk mengatur sandi baru Anda."
 
 msgid "Email address:"
 msgstr "Alamat email:"
@@ -672,6 +702,10 @@ msgstr "Pilih %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Pilih %s untuk diubah"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Pilih %s untuk melihat"
 
 msgid "Date:"
 msgstr "Tanggal:"

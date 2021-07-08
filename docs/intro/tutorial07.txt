@@ -7,6 +7,11 @@ continuing the Web-poll application and will focus on customizing Django's
 automatically-generated admin site that we first explored in :doc:`Tutorial 2
 </intro/tutorial02>`.
 
+.. admonition:: Where to get help:
+
+    If you're having trouble going through this tutorial, please head over to
+    the :doc:`Getting Help</faq/help>` section of the FAQ.
+
 Customize the admin form
 ========================
 
@@ -18,8 +23,8 @@ Django the options you want when you register the object.
 Let's see how this works by reordering the fields on the edit form. Replace
 the ``admin.site.register(Question)`` line with:
 
-.. snippet::
-    :filename: polls/admin.py
+.. code-block:: python
+    :caption: polls/admin.py
 
     from django.contrib import admin
 
@@ -47,8 +52,8 @@ of fields, choosing an intuitive order is an important usability detail.
 And speaking of forms with dozens of fields, you might want to split the form
 up into fieldsets:
 
-.. snippet::
-    :filename: polls/admin.py
+.. code-block:: python
+    :caption: polls/admin.py
 
     from django.contrib import admin
 
@@ -79,10 +84,10 @@ OK, we have our Question admin page, but a ``Question`` has multiple
 Yet.
 
 There are two ways to solve this problem. The first is to register ``Choice``
-with the admin just as we did with ``Question``. That's easy:
+with the admin just as we did with ``Question``:
 
-.. snippet::
-    :filename: polls/admin.py
+.. code-block:: python
+    :caption: polls/admin.py
 
     from django.contrib import admin
 
@@ -115,8 +120,8 @@ It'd be better if you could add a bunch of Choices directly when you create the
 Remove the ``register()`` call for the ``Choice`` model. Then, edit the ``Question``
 registration code to read:
 
-.. snippet::
-    :filename: polls/admin.py
+.. code-block:: python
+    :caption: polls/admin.py
 
     from django.contrib import admin
 
@@ -151,19 +156,19 @@ already-created object, you get another three extra slots.
 
 At the end of the three current slots you will find an "Add another Choice"
 link.  If you click on it, a new slot will be added. If you want to remove the
-added slot, you can click on the X to the top right of the added slot. Note
-that you can't remove the original three slots. This image shows an added slot:
+added slot, you can click on the X to the top right of the added slot. This
+image shows an added slot:
 
 .. image:: _images/admin14t.png
    :alt: Additional slot added dynamically
 
 One small problem, though. It takes a lot of screen space to display all the
 fields for entering related ``Choice`` objects. For that reason, Django offers a
-tabular way of displaying inline related objects; you just need to change
-the ``ChoiceInline`` declaration to read:
+tabular way of displaying inline related objects. To use it, change the
+``ChoiceInline`` declaration to read:
 
-.. snippet::
-    :filename: polls/admin.py
+.. code-block:: python
+    :caption: polls/admin.py
 
     class ChoiceInline(admin.TabularInline):
         #...
@@ -194,18 +199,18 @@ more helpful if we could display individual fields. To do that, use the
 tuple of field names to display, as columns, on the change list page for the
 object:
 
-.. snippet::
-    :filename: polls/admin.py
+.. code-block:: python
+    :caption: polls/admin.py
 
     class QuestionAdmin(admin.ModelAdmin):
         # ...
         list_display = ('question_text', 'pub_date')
 
-Just for good measure, let's also include the ``was_published_recently()``
-method from :doc:`Tutorial 2 </intro/tutorial02>`:
+For good measure, let's also include the ``was_published_recently()`` method
+from :doc:`Tutorial 2 </intro/tutorial02>`:
 
-.. snippet::
-    :filename: polls/admin.py
+.. code-block:: python
+    :caption: polls/admin.py
 
     class QuestionAdmin(admin.ModelAdmin):
         # ...
@@ -223,22 +228,26 @@ of an arbitrary method is not supported. Also note that the column header for
 underscores replaced with spaces), and that each line contains the string
 representation of the output.
 
-You can improve that by giving that method (in :file:`polls/models.py`) a few
-attributes, as follows:
+You can improve that by using the :func:`~django.contrib.admin.display`
+decorator on that method (in :file:`polls/models.py`), as follows:
 
-.. snippet::
-    :filename: polls/models.py
+.. code-block:: python
+    :caption: polls/models.py
+
+    from django.contrib import admin
 
     class Question(models.Model):
         # ...
+        @admin.display(
+            boolean=True,
+            ordering='pub_date',
+            description='Published recently?',
+        )
         def was_published_recently(self):
             now = timezone.now()
             return now - datetime.timedelta(days=1) <= self.pub_date <= now
-        was_published_recently.admin_order_field = 'pub_date'
-        was_published_recently.boolean = True
-        was_published_recently.short_description = 'Published recently?'
 
-For more information on these method properties, see
+For more information on the properties configurable via the decorator, see
 :attr:`~django.contrib.admin.ModelAdmin.list_display`.
 
 Edit your :file:`polls/admin.py` file again and add an improvement to the
@@ -284,9 +293,8 @@ Customize the admin look and feel
 Clearly, having "Django administration" at the top of each admin page is
 ridiculous. It's just placeholder text.
 
-That's easy to change, though, using Django's template system. The Django admin
-is powered by Django itself, and its interfaces use Django's own template
-system.
+You can change it, though, using Django's template system. The Django admin is
+powered by Django itself, and its interfaces use Django's own template system.
 
 .. _ref-customizing-your-projects-templates:
 
@@ -301,13 +309,13 @@ keeping your templates within the project is a good convention to follow.
 Open your settings file (:file:`mysite/settings.py`, remember) and add a
 :setting:`DIRS <TEMPLATES-DIRS>` option in the :setting:`TEMPLATES` setting:
 
-.. snippet::
-    :filename: mysite/settings.py
+.. code-block:: python
+    :caption: mysite/settings.py
 
     TEMPLATES = [
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [os.path.join(BASE_DIR, 'templates')],
+            'DIRS': [BASE_DIR / 'templates'],
             'APP_DIRS': True,
             'OPTIONS': {
                 'context_processors': [
@@ -328,8 +336,8 @@ when loading Django templates; it's a search path.
     Just like the static files, we *could* have all our templates together, in
     one big templates directory, and it would work perfectly well. However,
     templates that belong to a particular application should be placed in that
-    application’s template directory (e.g. ``polls/templates``) rather than the
-    project’s (``templates``). We'll discuss in more detail in the
+    application's template directory (e.g. ``polls/templates``) rather than the
+    project's (``templates``). We'll discuss in more detail in the
     :doc:`reusable apps tutorial </intro/reusable-apps>` *why* we do this.
 
 Now create a directory called ``admin`` inside ``templates``, and copy the
@@ -342,11 +350,11 @@ template directory in the source code of Django itself
     If you have difficulty finding where the Django source files are located
     on your system, run the following command:
 
-    .. code-block:: console
+    .. console::
 
         $ python -c "import django; print(django.__path__)"
 
-Then, just edit the file and replace
+Then, edit the file and replace
 ``{{ site_header|default:_('Django administration') }}`` (including the curly
 braces) with your own site's name as you see fit. You should end up with
 a section of code like:
@@ -369,9 +377,8 @@ template language will be evaluated to produce the final HTML page, just like
 we saw in :doc:`Tutorial 3 </intro/tutorial03>`.
 
 Note that any of Django's default admin templates can be overridden. To
-override a template, just do the same thing you did with ``base_site.html`` --
-copy it from the default directory into your custom directory, and make
-changes.
+override a template, do the same thing you did with ``base_site.html`` -- copy
+it from the default directory into your custom directory, and make changes.
 
 Customizing your *application's* templates
 ------------------------------------------

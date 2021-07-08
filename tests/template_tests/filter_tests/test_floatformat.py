@@ -2,6 +2,8 @@ from decimal import Decimal, localcontext
 
 from django.template.defaultfilters import floatformat
 from django.test import SimpleTestCase
+from django.test.utils import override_settings
+from django.utils import translation
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
@@ -26,7 +28,9 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(floatformat(7.7), '7.7')
         self.assertEqual(floatformat(7.0), '7')
         self.assertEqual(floatformat(0.7), '0.7')
+        self.assertEqual(floatformat(-0.7), '-0.7')
         self.assertEqual(floatformat(0.07), '0.1')
+        self.assertEqual(floatformat(-0.07), '-0.1')
         self.assertEqual(floatformat(0.007), '0.0')
         self.assertEqual(floatformat(0.0), '0')
         self.assertEqual(floatformat(7.7, 0), '8')
@@ -56,11 +60,34 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(floatformat(1.5e-15, -20), '0.00000000000000150000')
         self.assertEqual(floatformat(1.00000000000000015, 16), '1.0000000000000002')
 
+    @override_settings(USE_L10N=True)
+    def test_force_grouping(self):
+        with translation.override('en'):
+            self.assertEqual(floatformat(10000, 'g'), '10,000')
+            self.assertEqual(floatformat(66666.666, '1g'), '66,666.7')
+            # Invalid suffix.
+            self.assertEqual(floatformat(10000, 'g2'), '10000')
+        with translation.override('de', deactivate=True):
+            self.assertEqual(floatformat(10000, 'g'), '10.000')
+            self.assertEqual(floatformat(66666.666, '1g'), '66.666,7')
+            # Invalid suffix.
+            self.assertEqual(floatformat(10000, 'g2'), '10000')
+
     def test_zero_values(self):
         self.assertEqual(floatformat(0, 6), '0.000000')
         self.assertEqual(floatformat(0, 7), '0.0000000')
         self.assertEqual(floatformat(0, 10), '0.0000000000')
         self.assertEqual(floatformat(0.000000000000000000015, 20), '0.00000000000000000002')
+
+    def test_negative_zero_values(self):
+        tests = [
+            (-0.01, -1, '0.0'),
+            (-0.001, 2, '0.00'),
+            (-0.499, 0, '0'),
+        ]
+        for num, decimal_places, expected in tests:
+            with self.subTest(num=num, decimal_places=decimal_places):
+                self.assertEqual(floatformat(num, decimal_places), expected)
 
     def test_infinity(self):
         pos_inf = float(1e30000)

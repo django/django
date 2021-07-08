@@ -1,15 +1,13 @@
 from django.contrib.gis import admin
 from django.contrib.gis.geos import Point
-from django.test import TestCase, override_settings, skipUnlessDBFeature
-from django.test.utils import patch_logger
+from django.test import SimpleTestCase, override_settings
 
 from .admin import UnmodifiableAdmin
 from .models import City, site
 
 
-@skipUnlessDBFeature("gis_enabled")
 @override_settings(ROOT_URLCONF='django.contrib.gis.tests.geoadmin.urls')
-class GeoAdminTest(TestCase):
+class GeoAdminTest(SimpleTestCase):
 
     def test_ensure_geographic_media(self):
         geoadmin = site._registry[City]
@@ -74,28 +72,27 @@ class GeoAdminTest(TestCase):
     def test_olwidget_empty_string(self):
         geoadmin = site._registry[City]
         form = geoadmin.get_changelist_form(None)({'point': ''})
-        with patch_logger('django.contrib.gis', 'error') as logger_calls:
+        with self.assertNoLogs('django.contrib.gis', 'ERROR'):
             output = str(form['point'])
         self.assertInHTML(
             '<textarea id="id_point" class="vWKTField required" cols="150"'
             ' rows="10" name="point"></textarea>',
             output
         )
-        self.assertEqual(logger_calls, [])
 
     def test_olwidget_invalid_string(self):
         geoadmin = site._registry[City]
         form = geoadmin.get_changelist_form(None)({'point': 'INVALID()'})
-        with patch_logger('django.contrib.gis', 'error') as logger_calls:
+        with self.assertLogs('django.contrib.gis', 'ERROR') as cm:
             output = str(form['point'])
         self.assertInHTML(
             '<textarea id="id_point" class="vWKTField required" cols="150"'
             ' rows="10" name="point"></textarea>',
             output
         )
-        self.assertEqual(len(logger_calls), 1)
+        self.assertEqual(len(cm.records), 1)
         self.assertEqual(
-            logger_calls[0],
+            cm.records[0].getMessage(),
             "Error creating geometry from value 'INVALID()' (String input "
             "unrecognized as WKT EWKT, and HEXEWKB.)"
         )

@@ -10,7 +10,7 @@ for basic file handling in Django.
 The ``File`` class
 ==================
 
-.. class:: File(file_object)
+.. class:: File(file_object, name=None)
 
     The :class:`File` class is a thin wrapper around a Python
     :py:term:`file object` with some Django-specific additions.
@@ -56,10 +56,7 @@ The ``File`` class
         was originally opened with; ``None`` means to reopen with the original
         mode.
 
-    .. method:: read(num_bytes=None)
-
-        Read content from the file. The optional ``size`` is the number of
-        bytes to read; if not specified, the file will be read to the end.
+        It can be used as a context manager, e.g. ``with file.open() as f:``.
 
     .. method:: __iter__()
 
@@ -78,33 +75,23 @@ The ``File`` class
         Returns ``True`` if the file is large enough to require multiple chunks
         to access all of its content give some ``chunk_size``.
 
-    .. method:: write(content)
-
-        Writes the specified content string to the file. Depending on the
-        storage system behind the scenes, this content might not be fully
-        committed until :func:`close()` is called on the file.
-
     .. method:: close()
 
         Close the file.
 
     In addition to the listed methods, :class:`~django.core.files.File` exposes
     the following attributes and methods of its ``file`` object:
-    ``encoding``, ``fileno``, ``flush``, ``isatty``, ``newlines``,
-    ``read``, ``readinto``, ``readlines``, ``seek``, ``softspace``, ``tell``,
-    ``truncate``, ``writelines``, ``xreadlines``, ``readable()``,
-    ``writable()``, and ``seekable()``.
-
-    .. versionchanged:: 1.11
-
-        The ``readable()`` and ``writable()`` methods were added.
+    ``encoding``, ``fileno``, ``flush``, ``isatty``, ``newlines``, ``read``,
+    ``readinto``, ``readline``, ``readlines``, ``seek``, ``tell``,
+    ``truncate``, ``write``, ``writelines``, ``readable()``, ``writable()``,
+    and ``seekable()``.
 
 .. currentmodule:: django.core.files.base
 
 The ``ContentFile`` class
 =========================
 
-.. class:: ContentFile(File)
+.. class:: ContentFile(content, name=None)
 
     The ``ContentFile`` class inherits from :class:`~django.core.files.File`,
     but unlike :class:`~django.core.files.File` it operates on string content
@@ -112,7 +99,7 @@ The ``ContentFile`` class
 
         from django.core.files.base import ContentFile
 
-        f1 = ContentFile("esta sentencia está en español")
+        f1 = ContentFile("esta frase está en español")
         f2 = ContentFile(b"these are bytes")
 
 .. currentmodule:: django.core.files.images
@@ -120,7 +107,7 @@ The ``ContentFile`` class
 The ``ImageFile`` class
 =======================
 
-.. class:: ImageFile(file_object)
+.. class:: ImageFile(file_object, name=None)
 
     Django provides a built-in class specifically for images.
     :class:`django.core.files.images.ImageFile` inherits all the attributes

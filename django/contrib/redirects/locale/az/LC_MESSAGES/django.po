@@ -2,13 +2,14 @@
 #
 # Translators:
 # Ali Ismayilov <ali@ismailov.info>, 2011
+# Emin Mastizada <emin@linux.com>, 2020
 # Emin Mastizada <emin@linux.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-08-05 00:29+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-12 06:46+0000\n"
 "Last-Translator: Emin Mastizada <emin@linux.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
@@ -28,21 +29,19 @@ msgid "redirect from"
 msgstr "buradan yönəlt"
 
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Domen ünvanını çıxmaqla bu, mütləq ünvan kimi göstərilməlidir. Məsələn, \"/"
-"events/search/\"."
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
+msgstr "Bu, domen adı xaric, mütləq yol olmalıdır. Məsələn: “/events/search/”."
 
 msgid "redirect to"
 msgstr "bura yönəlt"
 
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
+"“http://”."
 msgstr ""
-"Bu həm mütləq ünvan (yuxarıdakı kimi) ola bilər, həm də \"http://\" ilə "
-"başlayan tam URL ola bilər."
+"Bu həm mütləq yol (yuxarıdakı kimi), həm də “http://” ilə başlayan tam URL "
+"ola bilər."
 
 msgid "redirect"
 msgstr "yönəlt"

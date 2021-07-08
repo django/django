@@ -11,36 +11,81 @@ class NullBooleanSelectTest(WidgetTest):
     def test_render_true(self):
         self.check_html(self.widget, 'is_cool', True, html=(
             """<select name="is_cool">
-            <option value="1">Unknown</option>
-            <option value="2" selected>Yes</option>
-            <option value="3">No</option>
+            <option value="unknown">Unknown</option>
+            <option value="true" selected>Yes</option>
+            <option value="false">No</option>
             </select>"""
         ))
 
     def test_render_false(self):
         self.check_html(self.widget, 'is_cool', False, html=(
             """<select name="is_cool">
-            <option value="1">Unknown</option>
-            <option value="2">Yes</option>
-            <option value="3" selected>No</option>
+            <option value="unknown">Unknown</option>
+            <option value="true">Yes</option>
+            <option value="false" selected>No</option>
             </select>"""
         ))
 
     def test_render_none(self):
         self.check_html(self.widget, 'is_cool', None, html=(
             """<select name="is_cool">
-            <option value="1" selected>Unknown</option>
-            <option value="2">Yes</option>
-            <option value="3">No</option>
+            <option value="unknown" selected>Unknown</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
             </select>"""
         ))
 
-    def test_render_value(self):
+    def test_render_value_unknown(self):
+        self.check_html(self.widget, 'is_cool', 'unknown', html=(
+            """<select name="is_cool">
+            <option value="unknown" selected>Unknown</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+            </select>"""
+        ))
+
+    def test_render_value_true(self):
+        self.check_html(self.widget, 'is_cool', 'true', html=(
+            """<select name="is_cool">
+            <option value="unknown">Unknown</option>
+            <option value="true" selected>Yes</option>
+            <option value="false">No</option>
+            </select>"""
+        ))
+
+    def test_render_value_false(self):
+        self.check_html(self.widget, 'is_cool', 'false', html=(
+            """<select name="is_cool">
+            <option value="unknown">Unknown</option>
+            <option value="true">Yes</option>
+            <option value="false" selected>No</option>
+            </select>"""
+        ))
+
+    def test_render_value_1(self):
+        self.check_html(self.widget, 'is_cool', '1', html=(
+            """<select name="is_cool">
+            <option value="unknown" selected>Unknown</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+            </select>"""
+        ))
+
+    def test_render_value_2(self):
         self.check_html(self.widget, 'is_cool', '2', html=(
             """<select name="is_cool">
-            <option value="1">Unknown</option>
-            <option value="2" selected>Yes</option>
-            <option value="3">No</option>
+            <option value="unknown">Unknown</option>
+            <option value="true" selected>Yes</option>
+            <option value="false">No</option>
+            </select>"""
+        ))
+
+    def test_render_value_3(self):
+        self.check_html(self.widget, 'is_cool', '3', html=(
+            """<select name="is_cool">
+            <option value="unknown">Unknown</option>
+            <option value="true">Yes</option>
+            <option value="false" selected>No</option>
             </select>"""
         ))
 
@@ -55,9 +100,9 @@ class NullBooleanSelectTest(WidgetTest):
             self.check_html(widget, 'id_bool', True, html=(
                 """
                 <select name="id_bool">
-                    <option value="1">Unbekannt</option>
-                    <option value="2" selected>Ja</option>
-                    <option value="3">Nein</option>
+                    <option value="unknown">Unbekannt</option>
+                    <option value="true" selected>Ja</option>
+                    <option value="false">Nein</option>
                 </select>
                 """
             ))

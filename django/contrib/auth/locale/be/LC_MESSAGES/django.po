@@ -2,13 +2,13 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016
+# znotdead <zhirafchik@gmail.com>, 2016-2017,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-09-15 10:02+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-10-16 18:29+0000\n"
 "Last-Translator: znotdead <zhirafchik@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
@@ -55,7 +55,7 @@ msgstr "Пароль не зададзены."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Няправільны фармат паролю або невядомы алгарытм хэшавання."
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "Не супадаюць паролі ў двух палях."
 
 msgid "Password"
@@ -68,13 +68,12 @@ msgid "Enter the same password as before, for verification."
 msgstr "Дзеля пэўнасьці набярыце такі самы пароль яшчэ раз."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Паролі не захоўваюцца ў такім выглядзе, як іх набралі, таму ўбачыць пароль "
-"карыстальніка нельга, але яго можна зьмяніць выкарыстоўваючы <a href=\"../"
-"password/\">гэту форму</a>."
+"Паролі не захоўваюцца ў такім выглядзе, як іх набралі, таму ўбачыць пароль "
+"карыстальніка нельга, але яго можна зьмяніць выкарыстоўваючы<a href="
+"\"{}\">гэту форму </a>."
 
 #, python-format
 msgid ""
@@ -252,20 +251,20 @@ msgstr[3] "Ваш пароль павінен мець не менш %(min_lengt
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Пароль занадта падобны да %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
 "Ваш пароль ня можа быць занадта падобным да вашай іншай асабістай інфармацыі."
 
 msgid "This password is too common."
 msgstr "Гэты пароль занадта распаўсюджаны."
 
-msgid "Your password can't be a commonly used password."
+msgid "Your password can’t be a commonly used password."
 msgstr "Ваш пароль ня можа быць адным з шырока распаўсюджаных пароляў."
 
 msgid "This password is entirely numeric."
 msgstr "Гэты пароль цалкам лікавы."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Ваш пароль ня можа быць цалкам лікавым."
 
 #, python-format

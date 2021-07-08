@@ -1,6 +1,6 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.core.paginator import InvalidPage, Paginator
-from django.db.models.query import QuerySet
+from django.db.models import QuerySet
 from django.http import Http404
 from django.utils.translation import gettext as _
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
@@ -64,7 +64,7 @@ class MultipleObjectMixin(ContextMixin):
             if page == 'last':
                 page_number = paginator.num_pages
             else:
-                raise Http404(_("Page is not 'last', nor can it be converted to an int."))
+                raise Http404(_('Page is not “last”, nor can it be converted to an int.'))
         try:
             page = paginator.page(page_number)
             return (paginator, page, page.object_list, page.has_other_pages())
@@ -149,9 +149,9 @@ class BaseListView(MultipleObjectMixin, View):
             if self.get_paginate_by(self.object_list) is not None and hasattr(self.object_list, 'exists'):
                 is_empty = not self.object_list.exists()
             else:
-                is_empty = len(self.object_list) == 0
+                is_empty = not self.object_list
             if is_empty:
-                raise Http404(_("Empty list and '%(class_name)s.allow_empty' is False.") % {
+                raise Http404(_('Empty list and “%(class_name)s.allow_empty” is False.') % {
                     'class_name': self.__class__.__name__,
                 })
         context = self.get_context_data()
@@ -181,7 +181,13 @@ class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
         if hasattr(self.object_list, 'model'):
             opts = self.object_list.model._meta
             names.append("%s/%s%s.html" % (opts.app_label, opts.model_name, self.template_name_suffix))
-
+        elif not names:
+            raise ImproperlyConfigured(
+                "%(cls)s requires either a 'template_name' attribute "
+                "or a get_queryset() method that returns a QuerySet." % {
+                    'cls': self.__class__.__name__,
+                }
+            )
         return names
 
 

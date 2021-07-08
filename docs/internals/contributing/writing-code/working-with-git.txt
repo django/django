@@ -18,7 +18,7 @@ Installing Git
 ==============
 
 Django uses `Git`_ for its source control. You can `download
-<http://git-scm.com/download>`_ Git, but it's often easier to install with
+<https://git-scm.com/download>`_ Git, but it's often easier to install with
 your operating system's package manager.
 
 Django's `Git repository`_ is hosted on `GitHub`_, and it is recommended
@@ -34,7 +34,7 @@ Note that ``user.name`` should be your real name, not your GitHub nick. GitHub
 should know the email you use in the ``user.email`` field, as this will be
 used to associate your commits with your GitHub account.
 
-.. _Git: http://git-scm.com/
+.. _Git: https://git-scm.com/
 .. _Git repository: https://github.com/django/django/
 .. _GitHub: https://github.com/
 
@@ -45,7 +45,7 @@ When you have created your GitHub account, with the nick "GitHub_nick", and
 `forked Django's repository <https://github.com/django/django/fork>`__,
 create a local copy of your fork::
 
-    git clone git@github.com:GitHub_nick/django.git
+    git clone https://github.com/GitHub_nick/django.git
 
 This will create a new directory "django", containing a clone of your GitHub
 repository. The rest of the git commands on this page need to be run within the
@@ -69,9 +69,9 @@ Working on a ticket
 ===================
 
 When working on a ticket, create a new branch for the work, and base that work
-on upstream/master::
+on ``upstream/main``::
 
-    git checkout -b ticket_xxxxx upstream/master
+    git checkout -b ticket_xxxxx upstream/main
 
 The -b flag creates a new branch for you locally. Don't hesitate to create new
 branches even for the smallest things - that's what they are there for.
@@ -98,7 +98,7 @@ necessary::
 Publishing work
 ---------------
 
-You can publish your work on GitHub just by doing::
+You can publish your work on GitHub by running::
 
   git push origin ticket_xxxxx
 
@@ -115,7 +115,7 @@ their clone would become corrupt when you edit commits.
 
 There are also "public branches". These are branches other people are supposed
 to fork, so the history of these branches should never change. Good examples
-of public branches are the ``master`` and ``stable/A.B.x`` branches in the
+of public branches are the ``main`` and ``stable/A.B.x`` branches in the
 ``django/django`` repository.
 
 When you think your work is ready to be pulled into Django, you should create
@@ -142,7 +142,7 @@ Pull requests at GitHub have only two states: open and closed. The committer
 who will deal with your pull request has only two options: merge it or close
 it. For this reason, it isn't useful to make a pull request until the code is
 ready for merging -- or sufficiently close that a committer will finish it
-himself.
+themselves.
 
 Rebasing branches
 -----------------
@@ -186,9 +186,9 @@ the changes::
     git push -f origin ticket_xxxxx
 
 Note that this will rewrite history of ticket_xxxxx - if you check the commit
-hashes before and after the operation at GitHub you will notice that the
-commit hashes do not match anymore. This is acceptable, as the branch is merely
-a topic branch, and nobody should be basing their work on it.
+hashes before and after the operation at GitHub you will notice that the commit
+hashes do not match anymore. This is acceptable, as the branch is a topic
+branch, and nobody should be basing their work on it.
 
 After upstream has changed
 --------------------------
@@ -200,7 +200,7 @@ do this, use::
   git rebase
 
 The work is automatically rebased using the branch you forked on, in the
-example case using ``upstream/master``.
+example case using ``upstream/main``.
 
 The rebase command removes all your local commits temporarily, applies the
 upstream commits, and then applies your local commits again on the work.
@@ -255,7 +255,7 @@ One of the ways that developers can contribute to Django is by reviewing
 patches. Those patches will typically exist as pull requests on GitHub and
 can be easily integrated into your local repository::
 
-    git checkout -b pull_xxxxx upstream/master
+    git checkout -b pull_xxxxx upstream/main
     curl https://github.com/django/django/pull/xxxxx.patch | git am
 
 This will create a new branch and then apply the changes from the pull request

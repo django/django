@@ -7,7 +7,9 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, override_settings
 from django.test.utils import requires_tz_support
 from django.utils import timezone
-from django.utils.feedgenerator import rfc2822_date, rfc3339_date
+from django.utils.feedgenerator import (
+    Atom1Feed, Rss201rev2Feed, rfc2822_date, rfc3339_date,
+)
 
 from .models import Article, Entry
 
@@ -38,10 +40,15 @@ class FeedTestCase(TestCase):
             title='My last entry', updated=datetime.datetime(2013, 1, 20, 0, 0),
             published=datetime.datetime(2013, 3, 25, 20, 0)
         )
-        cls.a1 = Article.objects.create(title='My first article', entry=cls.e1)
+        cls.a1 = Article.objects.create(
+            title='My first article',
+            entry=cls.e1,
+            updated=datetime.datetime(1986, 11, 21, 9, 12, 18),
+            published=datetime.datetime(1986, 10, 21, 9, 12, 18),
+        )
 
     def assertChildNodes(self, elem, expected):
-        actual = set(n.nodeName for n in elem.childNodes)
+        actual = {n.nodeName for n in elem.childNodes}
         expected = set(expected)
         self.assertEqual(actual, expected)
 
@@ -52,7 +59,7 @@ class FeedTestCase(TestCase):
 
     def assertCategories(self, elem, expected):
         self.assertEqual(
-            set(i.firstChild.wholeText for i in elem.childNodes if i.nodeName == 'category'),
+            {i.firstChild.wholeText for i in elem.childNodes if i.nodeName == 'category'},
             set(expected)
         )
 
@@ -82,6 +89,7 @@ class SyndicationFeedTest(FeedTestCase):
         self.assertEqual(len(feed_elem), 1)
         feed = feed_elem[0]
         self.assertEqual(feed.getAttribute('version'), '2.0')
+        self.assertEqual(feed.getElementsByTagName('language')[0].firstChild.nodeValue, 'en')
 
         # Making sure there's only one `channel` element w/in the
         # `rss` element.
@@ -123,7 +131,7 @@ class SyndicationFeedTest(FeedTestCase):
         )
 
         # Find the pubdate of the first feed item
-        d = Entry.objects.get(pk=1).published
+        d = Entry.objects.get(pk=self.e1.pk).published
         pub_date = rfc2822_date(timezone.make_aware(d, TZ))
 
         items = chan.getElementsByTagName('item')
@@ -131,14 +139,24 @@ class SyndicationFeedTest(FeedTestCase):
         self.assertChildNodeContent(items[0], {
             'title': 'My first entry',
             'description': 'Overridden description: My first entry',
-            'link': 'http://example.com/blog/1/',
-            'guid': 'http://example.com/blog/1/',
+            'link': 'http://example.com/blog/%s/' % self.e1.pk,
+            'guid': 'http://example.com/blog/%s/' % self.e1.pk,
             'pubDate': pub_date,
             'author': 'test@example.com (Sally Smith)',
+            'comments': '/blog/%s/comments' % self.e1.pk,
         })
         self.assertCategories(items[0], ['python', 'testing'])
         for item in items:
-            self.assertChildNodes(item, ['title', 'link', 'description', 'guid', 'category', 'pubDate', 'author'])
+            self.assertChildNodes(item, [
+                'title',
+                'link',
+                'description',
+                'guid',
+                'category',
+                'pubDate',
+                'author',
+                'comments',
+            ])
             # Assert that <guid> does not have any 'isPermaLink' attribute
             self.assertIsNone(item.getElementsByTagName(
                 'guid')[0].attributes.get('isPermaLink'))
@@ -236,7 +254,7 @@ class SyndicationFeedTest(FeedTestCase):
         self.assertChildNodeContent(items[0], {
             'title': 'My first entry',
             'description': 'Overridden description: My first entry',
-            'link': 'http://example.com/blog/1/',
+            'link': 'http://example.com/blog/%s/' % self.e1.pk,
         })
         for item in items:
             self.assertChildNodes(item, ['title', 'link', 'description'])
@@ -328,7 +346,7 @@ class SyndicationFeedTest(FeedTestCase):
         feed = minidom.parseString(response.content).firstChild
         updated = feed.getElementsByTagName('updated')[0].firstChild.wholeText
 
-        d = Entry.objects.exclude(pk=5).latest('updated').updated
+        d = Entry.objects.exclude(title='My last entry').latest('updated').updated
         latest_updated = rfc3339_date(timezone.make_aware(d, TZ))
 
         self.assertEqual(updated, latest_updated)
@@ -362,6 +380,11 @@ class SyndicationFeedTest(FeedTestCase):
             ])
             summary = entry.getElementsByTagName('summary')[0]
             self.assertEqual(summary.getAttribute('type'), 'html')
+
+    def test_feed_generator_language_attribute(self):
+        response = self.client.get('/syndication/language/')
+        feed = minidom.parseString(response.content).firstChild
+        self.assertEqual(feed.firstChild.getElementsByTagName('language')[0].firstChild.nodeValue, 'de')
 
     def test_title_escaping(self):
         """
@@ -399,20 +422,36 @@ class SyndicationFeedTest(FeedTestCase):
         published = doc.getElementsByTagName('published')[0].firstChild.wholeText
         self.assertEqual(published[-6:], '+00:42')
 
+    def test_feed_no_content_self_closing_tag(self):
+        tests = [
+            (Atom1Feed, 'link'),
+            (Rss201rev2Feed, 'atom:link'),
+        ]
+        for feedgenerator, tag in tests:
+            with self.subTest(feedgenerator=feedgenerator.__name__):
+                feed = feedgenerator(
+                    title='title',
+                    link='https://example.com',
+                    description='self closing tags test',
+                    feed_url='https://feed.url.com',
+                )
+                doc = feed.writeString('utf-8')
+                self.assertIn(f'<{tag} href="https://feed.url.com" rel="self"/>', doc)
+
     @requires_tz_support
     def test_feed_last_modified_time_naive_date(self):
         """
         Tests the Last-Modified header with naive publication dates.
         """
         response = self.client.get('/syndication/naive-dates/')
-        self.assertEqual(response['Last-Modified'], 'Tue, 26 Mar 2013 01:00:00 GMT')
+        self.assertEqual(response.headers['Last-Modified'], 'Tue, 26 Mar 2013 01:00:00 GMT')
 
     def test_feed_last_modified_time(self):
         """
         Tests the Last-Modified header with aware publication dates.
         """
         response = self.client.get('/syndication/aware-dates/')
-        self.assertEqual(response['Last-Modified'], 'Mon, 25 Mar 2013 19:18:00 GMT')
+        self.assertEqual(response.headers['Last-Modified'], 'Mon, 25 Mar 2013 19:18:00 GMT')
 
         # No last-modified when feed has no item_pubdate
         response = self.client.get('/syndication/no_pubdate/')
@@ -452,7 +491,11 @@ class SyndicationFeedTest(FeedTestCase):
         An ImproperlyConfigured is raised if no link could be found for the
         item(s).
         """
-        with self.assertRaises(ImproperlyConfigured):
+        msg = (
+            'Give your Article class a get_absolute_url() method, or define '
+            'an item_link() method in your Feed class.'
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.client.get('/syndication/articles/')
 
     def test_template_feed(self):
@@ -468,7 +511,7 @@ class SyndicationFeedTest(FeedTestCase):
         self.assertChildNodeContent(items[0], {
             'title': 'Title in your templates: My first entry\n',
             'description': 'Description in your templates: My first entry\n',
-            'link': 'http://example.com/blog/1/',
+            'link': 'http://example.com/blog/%s/' % self.e1.pk,
         })
 
     def test_template_context_feed(self):
@@ -491,27 +534,33 @@ class SyndicationFeedTest(FeedTestCase):
         """
         add_domain() prefixes domains onto the correct URLs.
         """
-        self.assertEqual(
-            views.add_domain('example.com', '/foo/?arg=value'),
-            'http://example.com/foo/?arg=value'
+        prefix_domain_mapping = (
+            (('example.com', '/foo/?arg=value'), 'http://example.com/foo/?arg=value'),
+            (('example.com', '/foo/?arg=value', True), 'https://example.com/foo/?arg=value'),
+            (('example.com', 'http://djangoproject.com/doc/'), 'http://djangoproject.com/doc/'),
+            (('example.com', 'https://djangoproject.com/doc/'), 'https://djangoproject.com/doc/'),
+            (('example.com', 'mailto:uhoh@djangoproject.com'), 'mailto:uhoh@djangoproject.com'),
+            (('example.com', '//example.com/foo/?arg=value'), 'http://example.com/foo/?arg=value'),
         )
-        self.assertEqual(
-            views.add_domain('example.com', '/foo/?arg=value', True),
-            'https://example.com/foo/?arg=value'
-        )
-        self.assertEqual(
-            views.add_domain('example.com', 'http://djangoproject.com/doc/'),
-            'http://djangoproject.com/doc/'
-        )
-        self.assertEqual(
-            views.add_domain('example.com', 'https://djangoproject.com/doc/'),
-            'https://djangoproject.com/doc/'
-        )
-        self.assertEqual(
-            views.add_domain('example.com', 'mailto:uhoh@djangoproject.com'),
-            'mailto:uhoh@djangoproject.com'
-        )
-        self.assertEqual(
-            views.add_domain('example.com', '//example.com/foo/?arg=value'),
-            'http://example.com/foo/?arg=value'
-        )
+        for prefix in prefix_domain_mapping:
+            with self.subTest(prefix=prefix):
+                self.assertEqual(views.add_domain(*prefix[0]), prefix[1])
+
+    def test_get_object(self):
+        response = self.client.get('/syndication/rss2/articles/%s/' % self.e1.pk)
+        doc = minidom.parseString(response.content)
+        feed = doc.getElementsByTagName('rss')[0]
+        chan = feed.getElementsByTagName('channel')[0]
+        items = chan.getElementsByTagName('item')
+
+        self.assertChildNodeContent(items[0], {
+            'comments': '/blog/%s/article/%s/comments' % (self.e1.pk, self.a1.pk),
+            'description': 'Article description: My first article',
+            'link': 'http://example.com/blog/%s/article/%s/' % (self.e1.pk, self.a1.pk),
+            'title': 'Title: My first article',
+            'pubDate': rfc2822_date(timezone.make_aware(self.a1.published, TZ)),
+        })
+
+    def test_get_non_existent_object(self):
+        response = self.client.get('/syndication/rss2/articles/0/')
+        self.assertEqual(response.status_code, 404)

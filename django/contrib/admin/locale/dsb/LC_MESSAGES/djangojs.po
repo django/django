@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016
+# Michael Wolf <milupo@sorbzilla.de>, 2016,2020-2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-12 13:24+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-02-01 22:10+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
 "language/dsb/)\n"
@@ -86,8 +86,8 @@ msgstr ""
 "wuwjeźośo, se waše njeskładowane změny zgubiju."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
 "Sćo akciju wubrał, ale njejsćo hyšći swóje změny za jadnotliwe póla "
@@ -95,12 +95,27 @@ msgstr ""
 "wuwjasć."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
 "Sćo akciju wubrał, ale njejsćo jadnotliwe póla změnił. Nejskerjej pytaśo "
 "skerjej za tłocaškom Start ako za tłocaškom Składowaś."
+
+msgid "Now"
+msgstr "Něnto"
+
+msgid "Midnight"
+msgstr "Połnoc"
+
+msgid "6 a.m."
+msgstr "6:00 góź. dopołdnja"
+
+msgid "Noon"
+msgstr "Połdnjo"
+
+msgid "6 p.m."
+msgstr "6:00 wótpołdnja"
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
@@ -118,26 +133,11 @@ msgstr[1] "Glědajśo: Waš cas jo wó %s góźinje za serwerowym casom."
 msgstr[2] "Glědajśo: Waš cas jo wó %s góźiny za serwerowym casom."
 msgstr[3] "Glědajśo: Waš cas jo wó %s góźin za serwerowym casom."
 
-msgid "Now"
-msgstr "Něnto"
-
 msgid "Choose a Time"
 msgstr "Wubjeŕśo cas"
 
 msgid "Choose a time"
 msgstr "Wubjeŕśo cas"
-
-msgid "Midnight"
-msgstr "Połnoc"
-
-msgid "6 a.m."
-msgstr "6:00 góź. dopołdnja"
-
-msgid "Noon"
-msgstr "Połdnjo"
-
-msgid "6 p.m."
-msgstr "6:00 wótpołdnja"
 
 msgid "Cancel"
 msgstr "Pśetergnuś"
@@ -189,6 +189,54 @@ msgstr "Nowember"
 
 msgid "December"
 msgstr "December"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Jan."
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Feb."
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Měr."
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Apr."
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Maj"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Jun."
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Jul."
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Awg."
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Sep."
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Okt."
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Now."
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Dec."
 
 msgctxt "one letter Sunday"
 msgid "S"

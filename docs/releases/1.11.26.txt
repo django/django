@@ -1,0 +1,15 @@
+============================
+Django 1.11.26 release notes
+============================
+
+*November 4, 2019*
+
+Django 1.11.26 fixes a regression in 1.11.25.
+
+Bugfixes
+========
+
+* Fixed a crash when using a ``contains``, ``contained_by``, ``has_key``,
+  ``has_keys``, or ``has_any_keys`` lookup on
+  ``django.contrib.postgres.fields.JSONField``, if the right or left hand
+  side of an expression is a key transform (:ticket:`30826`).

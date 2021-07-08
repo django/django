@@ -1,9 +1,6 @@
-import logging
 import posixpath
-import warnings
 from collections import defaultdict
 
-from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.safestring import mark_safe
 
 from .base import (
@@ -15,13 +12,14 @@ register = Library()
 
 BLOCK_CONTEXT_KEY = 'block_context'
 
-logger = logging.getLogger('django.template')
-
 
 class BlockContext:
     def __init__(self):
         # Dictionary of FIFO queues.
         self.blocks = defaultdict(list)
+
+    def __repr__(self):
+        return f'<{self.__class__.__qualname__}: blocks={self.blocks!r}>'
 
     def add_blocks(self, blocks):
         for name, block in blocks.items():
@@ -103,7 +101,7 @@ class ExtendsNode(Node):
         without extending the same template twice.
         """
         history = context.render_context.setdefault(
-            self.context_key, [context.template.origin],
+            self.context_key, [self.origin],
         )
         template, origin = context.template.engine.find_template(
             template_name, skip=history,
@@ -151,7 +149,8 @@ class ExtendsNode(Node):
 
         # Call Template._render explicitly so the parser context stays
         # the same.
-        return compiled_parent._render(context)
+        with context.render_context.push_state(compiled_parent, isolated_context=False):
+            return compiled_parent._render(context)
 
 
 class IncludeNode(Node):
@@ -163,52 +162,43 @@ class IncludeNode(Node):
         self.isolated_context = isolated_context
         super().__init__(*args, **kwargs)
 
+    def __repr__(self):
+        return f'<{self.__class__.__qualname__}: template={self.template!r}>'
+
     def render(self, context):
         """
         Render the specified template and context. Cache the template object
         in render_context to avoid reparsing and loading when used in a for
         loop.
         """
-        try:
-            template = self.template.resolve(context)
-            # Does this quack like a Template?
-            if not callable(getattr(template, 'render', None)):
-                # If not, we'll try our cache, and get_template()
-                template_name = template
-                cache = context.render_context.setdefault(self.context_key, {})
-                template = cache.get(template_name)
-                if template is None:
-                    template = context.template.engine.get_template(template_name)
-                    cache[template_name] = template
-            # Use the base.Template of a backends.django.Template.
-            elif hasattr(template, 'template'):
-                template = template.template
-            values = {
-                name: var.resolve(context)
-                for name, var in self.extra_context.items()
-            }
-            if self.isolated_context:
-                return template.render(context.new(values))
-            with context.push(**values):
-                return template.render(context)
-        except Exception as e:
-            if context.template.engine.debug:
-                raise
-            template_name = getattr(context, 'template_name', None) or 'unknown'
-            warnings.warn(
-                "Rendering {%% include '%s' %%} raised %s. In Django 2.1, "
-                "this exception will be raised rather than silenced and "
-                "rendered as an empty string." %
-                (template_name, e.__class__.__name__),
-                RemovedInDjango21Warning,
-            )
-            logger.warning(
-                "Exception raised while rendering {%% include %%} for "
-                "template '%s'. Empty string rendered instead.",
-                template_name,
-                exc_info=True,
-            )
-            return ''
+        template = self.template.resolve(context)
+        # Does this quack like a Template?
+        if not callable(getattr(template, 'render', None)):
+            # If not, try the cache and select_template().
+            template_name = template or ()
+            if isinstance(template_name, str):
+                template_name = (construct_relative_path(
+                    self.origin.template_name,
+                    template_name,
+                ),)
+            else:
+                template_name = tuple(template_name)
+            cache = context.render_context.dicts[0].setdefault(self, {})
+            template = cache.get(template_name)
+            if template is None:
+                template = context.template.engine.select_template(template_name)
+                cache[template_name] = template
+        # Use the base.Template of a backends.django.Template.
+        elif hasattr(template, 'template'):
+            template = template.template
+        values = {
+            name: var.resolve(context)
+            for name, var in self.extra_context.items()
+        }
+        if self.isolated_context:
+            return template.render(context.new(values))
+        with context.push(**values):
+            return template.render(context)
 
 
 @register.tag('block')
@@ -245,7 +235,12 @@ def construct_relative_path(current_template_name, relative_name):
     Convert a relative path (starting with './' or '../') to the full template
     name based on the current_template_name.
     """
-    if not any(relative_name.startswith(x) for x in ["'./", "'../", '"./', '"../']):
+    has_quotes = (
+        (relative_name.startswith('"') and relative_name.endswith('"')) or
+        (relative_name.startswith("'") and relative_name.endswith("'"))
+    )
+    new_name = relative_name.strip('\'"')
+    if not new_name.startswith(('./', '../')):
         # relative_name is a variable or a literal that doesn't contain a
         # relative path.
         return relative_name
@@ -253,7 +248,7 @@ def construct_relative_path(current_template_name, relative_name):
     new_name = posixpath.normpath(
         posixpath.join(
             posixpath.dirname(current_template_name.lstrip('/')),
-            relative_name.strip('\'"')
+            new_name,
         )
     )
     if new_name.startswith('../'):
@@ -267,7 +262,7 @@ def construct_relative_path(current_template_name, relative_name):
             "same template in which the tag appears."
             % (relative_name, current_template_name)
         )
-    return '"%s"' % new_name
+    return f'"{new_name}"' if has_quotes else new_name
 
 
 @register.tag('extends')

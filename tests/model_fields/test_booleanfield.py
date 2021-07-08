@@ -24,13 +24,13 @@ class BooleanFieldTests(TestCase):
         self._test_get_prep_value(models.BooleanField())
 
     def test_nullbooleanfield_get_prep_value(self):
-        self._test_get_prep_value(models.NullBooleanField())
+        self._test_get_prep_value(models.BooleanField(null=True))
 
     def test_booleanfield_to_python(self):
         self._test_to_python(models.BooleanField())
 
     def test_nullbooleanfield_to_python(self):
-        self._test_to_python(models.NullBooleanField())
+        self._test_to_python(models.BooleanField(null=True))
 
     def test_booleanfield_choices_blank(self):
         """
@@ -41,8 +41,17 @@ class BooleanFieldTests(TestCase):
         f = models.BooleanField(choices=choices, default=1, null=False)
         self.assertEqual(f.formfield().choices, choices)
 
+    def test_booleanfield_choices_blank_desired(self):
+        """
+        BooleanField with choices and no default should generated a formfield
+        with the blank option.
+        """
+        choices = [(1, 'Si'), (2, 'No')]
+        f = models.BooleanField(choices=choices)
+        self.assertEqual(f.formfield().choices, [('', '---------')] + choices)
+
     def test_nullbooleanfield_formfield(self):
-        f = models.NullBooleanField()
+        f = models.BooleanField(null=True)
         self.assertIsInstance(f.formfield(), forms.NullBooleanField)
 
     def test_return_type(self):

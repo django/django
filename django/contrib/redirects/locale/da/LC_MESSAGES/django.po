@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Erik Wognsen <r4mses@gmail.com>, 2014-2015
+# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2021
+# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2014-2015,2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-12-01 20:11+0000\n"
-"Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-15 18:30+0000\n"
+"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,20 +28,20 @@ msgid "redirect from"
 msgstr "omdiriger fra"
 
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
 msgstr ""
-"Dette skal være en absolut sti uden domænenavnet. Eksempel: '/nyheder/soeg/'"
+"Dette skal være en absolut sti uden domænenavnet. Eksempel: “/nyheder/soeg/”"
 
 msgid "redirect to"
 msgstr "omdiriger til"
 
 msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
+"This can be either an absolute path (as above) or a full URL starting with a "
+"scheme such as “https://”."
 msgstr ""
-"Dette kan enten være en absolut sti (som ovenfor), eller en komplet URL "
-"startende med 'http://'"
+"Dette kan være enten en absolut sti (som ovenfor) eller en hel URL der "
+"starter med en protokol, fx “https://”."
 
 msgid "redirect"
 msgstr "omdiriger"

@@ -1,17 +1,21 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Antoni Aloy <aaloy@apsl.net>, 2015
+# Antoni Aloy <aaloy@apsl.net>, 2015,2017
 # Carles Barrobés <carles@barrobes.com>, 2011-2012,2014-2015
+# Gil Obradors Via <gil.obradors@gmail.com>, 2019
+# Gil Obradors Via <gil.obradors@gmail.com>, 2019-2020
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Marc Compte <marc@compte.cat>, 2021
 # Roger Pons <rogerpons@gmail.com>, 2015
+# Xavier RG <xavirodgal@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 08:38+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2021-04-08 22:44+0000\n"
+"Last-Translator: Marc Compte <marc@compte.cat>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -55,7 +59,7 @@ msgstr "No s'ha establert la clau."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Format de contrasenya incorrecte o algorisme de hash desconegut."
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "Els dos camps de contrasenya no coincideixen."
 
 msgid "Password"
@@ -68,13 +72,12 @@ msgid "Enter the same password as before, for verification."
 msgstr "Introduïu la mateixa contrasenya d'abans, com a verificació."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Les contrasenyes no són desades en text pla. Per tant, no es pot veure "
-"aquesta contrasenya d'usuari, però podeu modificar-la mitjantçant <a href="
-"\"../password/\">aquest formulari</a>."
+"Les contrasenyes no es guarden en text clar, així que no hi ha forma de "
+"conèixer-les, però pots canviar la contrasenya utilitzant <a href=\"{}\"> "
+"aquest formulari</a>."
 
 #, python-format
 msgid ""
@@ -119,19 +122,19 @@ msgid "hash"
 msgstr "hash"
 
 msgid "variety"
-msgstr ""
+msgstr "varietat"
 
 msgid "version"
-msgstr ""
+msgstr "versió"
 
 msgid "memory cost"
-msgstr ""
+msgstr "cost de memòria"
 
 msgid "time cost"
-msgstr ""
+msgstr "cost de temps"
 
 msgid "parallelism"
-msgstr ""
+msgstr "paralelisme"
 
 msgid "work factor"
 msgstr "factor de treball"
@@ -187,7 +190,7 @@ msgid "username"
 msgstr "nom d'usuari"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
+msgstr "Obligatori. 150 o menys caràcters. Només lletres, dígits i @/./+/-/_."
 
 msgid "A user with that username already exists."
 msgstr "Ja existeix un usuari amb aquest nom."
@@ -243,28 +246,28 @@ msgstr[1] ""
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] "La contrasenya és ha de tenir al menys %(min_length)d caràcter."
-msgstr[1] "La contrasenya és ha de tenir un mínim de %(min_length)d caràcters."
+msgstr[1] "La contrasenya ha de tenir un mínim de %(min_length)d caràcters."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "La contrasenya és massa semblant a %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
-"La contrasenya no pot ser massa similar a la vostra altra informació "
-"personal."
+"La teva contrasenya no pot ser tan similar a alguna de la teva informació "
+"personal"
 
 msgid "This password is too common."
 msgstr "Aquesta contrasenya és massa comuna."
 
-msgid "Your password can't be a commonly used password."
-msgstr "La contrasenya no pot ser una de les habitualment utilitzades."
+msgid "Your password can’t be a commonly used password."
+msgstr "La teva contrasenya no pot ser la típica contrasenya comuna."
 
 msgid "This password is entirely numeric."
 msgstr "La contrasenya està formada només per números."
 
-msgid "Your password can't be entirely numeric."
-msgstr "La contrasenya no pot estar formada només per números."
+msgid "Your password can’t be entirely numeric."
+msgstr "La teva contrasenya no potser únicament numèrica."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
@@ -274,11 +277,15 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"Introdueixi un nom d'usuari vàlid. Aquest valor pot contenir sols lletres, "
+"números i els caràcters @/./+/-/_ "
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
+"Introdueixi un nom d'usuari vàlid. Aquest valor pot contenir sols lletres, "
+"números i els caràcters @/./+/-/_ "
 
 msgid "Logged out"
 msgstr "Sessió finalitzada"

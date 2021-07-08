@@ -1,15 +1,12 @@
-import re
 import warnings
 from io import StringIO
 
-from django.template.base import (
-    TOKEN_BLOCK, TOKEN_COMMENT, TOKEN_TEXT, TOKEN_VAR, TRANSLATOR_COMMENT_MARK,
-    Lexer,
-)
+from django.template.base import TRANSLATOR_COMMENT_MARK, Lexer, TokenType
+from django.utils.regex_helper import _lazy_re_compile
 
 from . import TranslatorCommentWarning, trim_whitespace
 
-dot_re = re.compile(r'\S')
+dot_re = _lazy_re_compile(r'\S')
 
 
 def blankout(src, char):
@@ -20,19 +17,19 @@ def blankout(src, char):
     return dot_re.sub(char, src)
 
 
-context_re = re.compile(r"""^\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?'))\s*""")
-inline_re = re.compile(
-    # Match the trans 'some text' part
-    r"""^\s*trans\s+((?:"[^"]*?")|(?:'[^']*?'))"""
+context_re = _lazy_re_compile(r"""^\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?'))\s*""")
+inline_re = _lazy_re_compile(
+    # Match the trans/translate 'some text' part.
+    r"""^\s*trans(?:late)?\s+((?:"[^"]*?")|(?:'[^']*?'))"""
     # Match and ignore optional filters
     r"""(?:\s*\|\s*[^\s:]+(?::(?:[^\s'":]+|(?:"[^"]*?")|(?:'[^']*?')))?)*"""
     # Match the optional context part
     r"""(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?\s*"""
 )
-block_re = re.compile(r"""^\s*blocktrans(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?(?:\s+|$)""")
-endblock_re = re.compile(r"""^\s*endblocktrans$""")
-plural_re = re.compile(r"""^\s*plural$""")
-constant_re = re.compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
+block_re = _lazy_re_compile(r"""^\s*blocktrans(?:late)?(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?(?:\s+|$)""")
+endblock_re = _lazy_re_compile(r"""^\s*endblocktrans(?:late)?$""")
+plural_re = _lazy_re_compile(r"""^\s*plural$""")
+constant_re = _lazy_re_compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
 
 
 def templatize(src, origin=None):
@@ -63,7 +60,7 @@ def templatize(src, origin=None):
 
     for t in Lexer(src).tokenize():
         if incomment:
-            if t.token_type == TOKEN_BLOCK and t.contents == 'endcomment':
+            if t.token_type == TokenType.BLOCK and t.contents == 'endcomment':
                 content = ''.join(comment)
                 translators_comment_start = None
                 for lineno, line in enumerate(content.splitlines(True)):
@@ -79,7 +76,7 @@ def templatize(src, origin=None):
             else:
                 comment.append(t.contents)
         elif intrans:
-            if t.token_type == TOKEN_BLOCK:
+            if t.token_type == TokenType.BLOCK:
                 endbmatch = endblock_re.match(t.contents)
                 pluralmatch = plural_re.match(t.contents)
                 if endbmatch:
@@ -130,12 +127,12 @@ def templatize(src, origin=None):
                         "Translation blocks must not include other block tags: "
                         "%s (%sline %d)" % (t.contents, filemsg, t.lineno)
                     )
-            elif t.token_type == TOKEN_VAR:
+            elif t.token_type == TokenType.VAR:
                 if inplural:
                     plural.append('%%(%s)s' % t.contents)
                 else:
                     singular.append('%%(%s)s' % t.contents)
-            elif t.token_type == TOKEN_TEXT:
+            elif t.token_type == TokenType.TEXT:
                 contents = t.contents.replace('%', '%%')
                 if inplural:
                     plural.append(contents)
@@ -147,7 +144,7 @@ def templatize(src, origin=None):
             if comment_lineno_cache is not None:
                 cur_lineno = t.lineno + t.contents.count('\n')
                 if comment_lineno_cache == cur_lineno:
-                    if t.token_type != TOKEN_COMMENT:
+                    if t.token_type != TokenType.COMMENT:
                         for c in lineno_comment_map[comment_lineno_cache]:
                             filemsg = ''
                             if origin:
@@ -163,21 +160,21 @@ def templatize(src, origin=None):
                     out.write('# %s' % ' | '.join(lineno_comment_map[comment_lineno_cache]))
                 comment_lineno_cache = None
 
-            if t.token_type == TOKEN_BLOCK:
+            if t.token_type == TokenType.BLOCK:
                 imatch = inline_re.match(t.contents)
                 bmatch = block_re.match(t.contents)
                 cmatches = constant_re.findall(t.contents)
                 if imatch:
-                    g = imatch.group(1)
+                    g = imatch[1]
                     if g[0] == '"':
                         g = g.strip('"')
                     elif g[0] == "'":
                         g = g.strip("'")
                     g = g.replace('%', '%%')
-                    if imatch.group(2):
+                    if imatch[2]:
                         # A context is provided
-                        context_match = context_re.match(imatch.group(2))
-                        message_context = context_match.group(1)
+                        context_match = context_re.match(imatch[2])
+                        message_context = context_match[1]
                         if message_context[0] == '"':
                             message_context = message_context.strip('"')
                         elif message_context[0] == "'":
@@ -191,10 +188,10 @@ def templatize(src, origin=None):
                 elif bmatch:
                     for fmatch in constant_re.findall(t.contents):
                         out.write(' _(%s) ' % fmatch)
-                    if bmatch.group(1):
+                    if bmatch[1]:
                         # A context is provided
-                        context_match = context_re.match(bmatch.group(1))
-                        message_context = context_match.group(1)
+                        context_match = context_re.match(bmatch[1])
+                        message_context = context_match[1]
                         if message_context[0] == '"':
                             message_context = message_context.strip('"')
                         elif message_context[0] == "'":
@@ -211,17 +208,17 @@ def templatize(src, origin=None):
                     incomment = True
                 else:
                     out.write(blankout(t.contents, 'B'))
-            elif t.token_type == TOKEN_VAR:
+            elif t.token_type == TokenType.VAR:
                 parts = t.contents.split('|')
                 cmatch = constant_re.match(parts[0])
                 if cmatch:
-                    out.write(' _(%s) ' % cmatch.group(1))
+                    out.write(' _(%s) ' % cmatch[1])
                 for p in parts[1:]:
                     if p.find(':_(') >= 0:
                         out.write(' %s ' % p.split(':', 1)[1])
                     else:
                         out.write(blankout(p, 'F'))
-            elif t.token_type == TOKEN_COMMENT:
+            elif t.token_type == TokenType.COMMENT:
                 if t.contents.lstrip().startswith(TRANSLATOR_COMMENT_MARK):
                     lineno_comment_map.setdefault(t.lineno, []).append(t.contents)
                     comment_lineno_cache = t.lineno

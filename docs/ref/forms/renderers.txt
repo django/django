@@ -5,11 +5,6 @@ The form rendering API
 .. module:: django.forms.renderers
    :synopsis: Built-in form renderers.
 
-.. versionadded:: 1.11
-
-    In older versions, widgets are rendered using Python. All APIs described
-    in this document are new.
-
 Django's form widgets are rendered using Django's :doc:`template engines
 system </topics/templates>`.
 
@@ -90,12 +85,14 @@ templates based on what's configured in the :setting:`TEMPLATES` setting.
 
 Using this renderer along with the built-in widget templates requires either:
 
-#. ``'django.forms'`` in :setting:`INSTALLED_APPS` and at least one engine
-   with :setting:`APP_DIRS=True <TEMPLATES-APP_DIRS>`.
+* ``'django.forms'`` in :setting:`INSTALLED_APPS` and at least one engine
+  with :setting:`APP_DIRS=True <TEMPLATES-APP_DIRS>`.
 
-#. Adding the built-in widgets templates directory (``django/forms/templates``
-   or ``django/forms/jinja2``) in :setting:`DIRS <TEMPLATES-DIRS>` of one of
-   your template engines.
+* Adding the built-in widgets templates directory in :setting:`DIRS
+  <TEMPLATES-DIRS>` of one of your template engines. To generate that path::
+
+    import django
+    django.__path__[0] + '/forms/templates'  # or '/forms/jinja2'
 
 Using this renderer requires you to make sure the form templates your project
 needs can be located.
@@ -117,6 +114,8 @@ Some widgets add further information to the context. For instance, all widgets
 that subclass ``Input`` defines ``widget['type']`` and :class:`.MultiWidget`
 defines ``widget['subwidgets']`` for looping purposes.
 
+.. _overriding-built-in-widget-templates:
+
 Overriding built-in widget templates
 ====================================
 
@@ -126,6 +125,6 @@ Each widget has a ``template_name`` attribute with a value such as
 ``input.html`` by defining ``django/forms/widgets/input.html``, for example.
 See :ref:`built-in widgets` for the name of each widget's template.
 
-If you use the :class:`TemplatesSetting` renderer, overriding widget templates
-works the same as overriding any other template in your project. You can't
-override built-in widget templates using the other built-in renderers.
+To override widget templates, you must use the :class:`TemplatesSetting`
+renderer. Then overriding widget templates works :doc:`the same as
+</howto/overriding-templates>` overriding any other template in your project.

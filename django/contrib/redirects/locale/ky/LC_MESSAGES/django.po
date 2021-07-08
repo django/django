@@ -1,0 +1,50 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>, 2020-2021
+# Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>, 2020
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-04-02 11:57+0000\n"
+"Last-Translator: Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>\n"
+"Language-Team: Kyrgyz (http://www.transifex.com/django/django/language/ky/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ky\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Redirects"
+msgstr "Буруулар"
+
+msgid "site"
+msgstr "сайт"
+
+msgid "redirect from"
+msgstr "бурулуп келатат"
+
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
+msgstr ""
+"Бул доменди камтыбаган абсолюттук жол болуусу керек. Мисалы: “/events/"
+"search/”."
+
+msgid "redirect to"
+msgstr "Бул жакка бар"
+
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with a "
+"scheme such as “https://”."
+msgstr ""
+"Бул абсолюттук жол (жогорудай) же толук  \"https://\" сыяктуу схема менен "
+"башталган URL боло алат. "
+
+msgid "redirect"
+msgstr "буруу"
+
+msgid "redirects"
+msgstr "буруулар"

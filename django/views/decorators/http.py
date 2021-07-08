@@ -2,19 +2,17 @@
 Decorators for views based on HTTP headers.
 """
 
-import logging
-from calendar import timegm
 from functools import wraps
 
 from django.http import HttpResponseNotAllowed
 from django.middleware.http import ConditionalGetMiddleware
+from django.utils import timezone
 from django.utils.cache import get_conditional_response
 from django.utils.decorators import decorator_from_middleware
 from django.utils.http import http_date, quote_etag
+from django.utils.log import log_response
 
 conditional_page = decorator_from_middleware(ConditionalGetMiddleware)
-
-logger = logging.getLogger('django.request')
 
 
 def require_http_methods(request_method_list):
@@ -32,11 +30,13 @@ def require_http_methods(request_method_list):
         @wraps(func)
         def inner(request, *args, **kwargs):
             if request.method not in request_method_list:
-                logger.warning(
+                response = HttpResponseNotAllowed(request_method_list)
+                log_response(
                     'Method Not Allowed (%s): %s', request.method, request.path,
-                    extra={'status_code': 405, 'request': request}
+                    response=response,
+                    request=request,
                 )
-                return HttpResponseNotAllowed(request_method_list)
+                return response
             return func(request, *args, **kwargs)
         return inner
     return decorator
@@ -70,9 +70,9 @@ def condition(etag_func=None, last_modified_func=None):
 
     This decorator will either pass control to the wrapped view function or
     return an HTTP 304 response (unmodified) or 412 response (precondition
-    failed), depending upon the request method. In either case, it will add the
-    generated ETag and Last-Modified headers to the response if it doesn't
-    already have them.
+    failed), depending upon the request method. In either case, the decorator
+    will add the generated ETag and Last-Modified headers to the response if
+    the headers aren't already set and if the request's method is safe.
     """
     def decorator(func):
         @wraps(func)
@@ -82,7 +82,9 @@ def condition(etag_func=None, last_modified_func=None):
                 if last_modified_func:
                     dt = last_modified_func(request, *args, **kwargs)
                     if dt:
-                        return timegm(dt.utctimetuple())
+                        if not timezone.is_aware(dt):
+                            dt = timezone.make_aware(dt, timezone.utc)
+                        return int(dt.timestamp())
 
             # The value from etag_func() could be quoted or unquoted.
             res_etag = etag_func(request, *args, **kwargs) if etag_func else None
@@ -98,11 +100,13 @@ def condition(etag_func=None, last_modified_func=None):
             if response is None:
                 response = func(request, *args, **kwargs)
 
-            # Set relevant headers on the response if they don't already exist.
-            if res_last_modified and not response.has_header('Last-Modified'):
-                response['Last-Modified'] = http_date(res_last_modified)
-            if res_etag and not response.has_header('ETag'):
-                response['ETag'] = res_etag
+            # Set relevant headers on the response if they don't already exist
+            # and if the request method is safe.
+            if request.method in ('GET', 'HEAD'):
+                if res_last_modified and not response.has_header('Last-Modified'):
+                    response.headers['Last-Modified'] = http_date(res_last_modified)
+                if res_etag:
+                    response.headers.setdefault('ETag', res_etag)
 
             return response
 

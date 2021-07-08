@@ -8,6 +8,7 @@ from django.contrib.gis.db.models.functions import (
 from django.contrib.gis.geos import GEOSGeometry, LineString, Point, Polygon
 from django.test import TestCase, skipUnlessDBFeature
 
+from ..utils import FuncTestMixin
 from .models import (
     City3D, Interstate2D, Interstate3D, InterstateProj2D, InterstateProj3D,
     MultiPoint3D, Point2D, Point3D, Polygon2D, Polygon3D,
@@ -70,7 +71,7 @@ class Geo3DLoadingHelper:
         # Interstate (2D / 3D and Geographic/Projected variants)
         for name, line, exp_z in interstate_data:
             line_3d = GEOSGeometry(line, srid=4269)
-            line_2d = LineString([l[:2] for l in line_3d.coords], srid=4269)
+            line_2d = LineString([coord[:2] for coord in line_3d.coords], srid=4269)
 
             # Creating a geographic and projected version of the
             # interstate in both 2D and 3D.
@@ -93,7 +94,7 @@ class Geo3DLoadingHelper:
         Polygon3D.objects.create(name='3D BBox', poly=bbox_3d)
 
 
-@skipUnlessDBFeature("gis_enabled", "supports_3d_storage")
+@skipUnlessDBFeature("supports_3d_storage")
 class Geo3DTest(Geo3DLoadingHelper, TestCase):
     """
     Only a subset of the PostGIS routines are 3D-enabled, and this TestCase
@@ -141,7 +142,7 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
         Testing LayerMapping on 3D models.
         """
         # Import here as GDAL is required for those imports
-        from django.contrib.gis.utils import LayerMapping, LayerMapError
+        from django.contrib.gis.utils import LayerMapError, LayerMapping
 
         point_mapping = {'point': 'POINT'}
         mpoint_mapping = {'mpoint': 'MULTIPOINT'}
@@ -204,8 +205,8 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
         self.assertIsNone(City3D.objects.none().aggregate(Extent3D('point'))['point__extent3d'])
 
 
-@skipUnlessDBFeature("gis_enabled", "supports_3d_functions")
-class Geo3DFunctionsTests(Geo3DLoadingHelper, TestCase):
+@skipUnlessDBFeature("supports_3d_functions")
+class Geo3DFunctionsTests(FuncTestMixin, Geo3DLoadingHelper, TestCase):
     def test_kml(self):
         """
         Test KML() function with Z values.

@@ -38,3 +38,6 @@ class SessionStore(DBStore):
         obj.account_id = account_id
 
         return obj
+
+    def get_session_cookie_age(self):
+        return 60 * 60 * 24  # One day.

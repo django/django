@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2017,2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-12 18:25+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-02-25 16:01+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
 "language/dsb/)\n"
@@ -53,8 +53,8 @@ msgstr "Žedno gronidło nastajone."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Njepłaśiwy gronidłowy format abo njeznaty kontrolny algoritmus."
 
-msgid "The two password fields didn't match."
-msgstr "Gronidle njejstej jadnak."
+msgid "The two password fields didn’t match."
+msgstr "Dwě gronidlowej póli njejstej jadnakej."
 
 msgid "Password"
 msgstr "Gronidło"
@@ -66,12 +66,11 @@ msgid "Enter the same password as before, for verification."
 msgstr "Zapódajśo to samske gronidło, za pśespytanje."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Gropne gronidła se njeskładuju, togodla njamóžośo gronidło wužywarja wiźeś, "
-"ale móžośo gronidło z pomocu <a href=\"../password/\">toś togo formulara</a> "
+"Grube gronidła se njeskładuju, togodla njejo móžno, gronidło wužywarja "
+"wiźeś, ale móžośo gronidło z pomocu <a href=\"{}\">toś togo formulara</a> "
 "změniś."
 
 #, python-format
@@ -258,19 +257,19 @@ msgstr[3] ""
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Gronidło jo na %(verbose_name)s pśepódobne."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr "Wašo gronidło njesmějo na waše druge wósobinske daty pśepódobne byś."
 
 msgid "This password is too common."
 msgstr "Toś to gronidło jo pśepowšykne."
 
-msgid "Your password can't be a commonly used password."
+msgid "Your password can’t be a commonly used password."
 msgstr "Wašo gronidło njesmějo cesto wužywane gronidło byś."
 
 msgid "This password is entirely numeric."
 msgstr "Toś to gronidło jo cele numeriske."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Wašo gronidło njesmějo cele numeriske byś."
 
 #, python-format

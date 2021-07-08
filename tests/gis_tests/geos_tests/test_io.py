@@ -1,14 +1,11 @@
 import binascii
-from unittest import skipUnless
 
 from django.contrib.gis.geos import (
-    HAS_GEOS, GEOSGeometry, Point, Polygon, WKBReader, WKBWriter, WKTReader,
-    WKTWriter,
+    GEOSGeometry, Point, Polygon, WKBReader, WKBWriter, WKTReader, WKTWriter,
 )
 from django.test import SimpleTestCase
 
 
-@skipUnless(HAS_GEOS, "Geos is required.")
 class GEOSIOTest(SimpleTestCase):
 
     def test01_wktreader(self):

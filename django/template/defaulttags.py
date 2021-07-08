@@ -15,10 +15,11 @@ from django.utils.safestring import mark_safe
 from .base import (
     BLOCK_TAG_END, BLOCK_TAG_START, COMMENT_TAG_END, COMMENT_TAG_START,
     FILTER_SEPARATOR, SINGLE_BRACE_END, SINGLE_BRACE_START,
-    VARIABLE_ATTRIBUTE_SEPARATOR, VARIABLE_TAG_END, VARIABLE_TAG_START,
-    Context, Node, NodeList, TemplateSyntaxError, VariableDoesNotExist,
-    kwarg_re, render_value_in_context, token_kwargs,
+    VARIABLE_ATTRIBUTE_SEPARATOR, VARIABLE_TAG_END, VARIABLE_TAG_START, Node,
+    NodeList, TemplateSyntaxError, VariableDoesNotExist, kwarg_re,
+    render_value_in_context, token_kwargs,
 )
+from .context import Context
 from .defaultfilters import date
 from .library import Library
 from .smartif import IfParser, Literal
@@ -54,7 +55,7 @@ class CsrfTokenNode(Node):
             if csrf_token == 'NOTPROVIDED':
                 return format_html("")
             else:
-                return format_html("<input type='hidden' name='csrfmiddlewaretoken' value='{}' />", csrf_token)
+                return format_html('<input type="hidden" name="csrfmiddlewaretoken" value="{}">', csrf_token)
         else:
             # It's very probable that the token is missing because of
             # misconfiguration, so we raise a warning
@@ -118,15 +119,16 @@ class FirstOfNode(Node):
         self.asvar = asvar
 
     def render(self, context):
+        first = ''
         for var in self.vars:
-            value = var.resolve(context, True)
+            value = var.resolve(context, ignore_failures=True)
             if value:
                 first = render_value_in_context(value, context)
-                if self.asvar:
-                    context[self.asvar] = first
-                    return ''
-                return first
-        return ''
+                break
+        if self.asvar:
+            context[self.asvar] = first
+            return ''
+        return first
 
 
 class ForNode(Node):
@@ -143,13 +145,13 @@ class ForNode(Node):
 
     def __repr__(self):
         reversed_text = ' reversed' if self.is_reversed else ''
-        return "<For Node: for %s in %s, tail_len: %d%s>" % \
-            (', '.join(self.loopvars), self.sequence, len(self.nodelist_loop),
-             reversed_text)
-
-    def __iter__(self):
-        yield from self.nodelist_loop
-        yield from self.nodelist_empty
+        return '<%s: for %s in %s, tail_len: %d%s>' % (
+            self.__class__.__name__,
+            ', '.join(self.loopvars),
+            self.sequence,
+            len(self.nodelist_loop),
+            reversed_text,
+        )
 
     def render(self, context):
         if 'forloop' in context:
@@ -157,10 +159,7 @@ class ForNode(Node):
         else:
             parentloop = {}
         with context.push():
-            try:
-                values = self.sequence.resolve(context, True)
-            except VariableDoesNotExist:
-                values = []
+            values = self.sequence.resolve(context, ignore_failures=True)
             if values is None:
                 values = []
             if not hasattr(values, '__len__'):
@@ -211,11 +210,9 @@ class ForNode(Node):
                     nodelist.append(node.render_annotated(context))
 
                 if pop_context:
-                    # The loop variables were pushed on to the context so pop them
-                    # off again. This is necessary because the tag lets the length
-                    # of loopvars differ to the length of each set of items and we
-                    # don't want to leave any vars from the previous loop on the
-                    # context.
+                    # Pop the loop variables pushed on to the context to avoid
+                    # the context ending up in an inconsistent state when other
+                    # tags (e.g., include and with) push data to context.
                     context.pop()
         return mark_safe(''.join(nodelist))
 
@@ -230,20 +227,17 @@ class IfChangedNode(Node):
     def render(self, context):
         # Init state storage
         state_frame = self._get_context_stack_frame(context)
-        if self not in state_frame:
-            state_frame[self] = None
+        state_frame.setdefault(self)
 
         nodelist_true_output = None
-        try:
-            if self._varlist:
-                # Consider multiple parameters.  This automatically behaves
-                # like an OR evaluation of the multiple variables.
-                compare_to = [var.resolve(context, True) for var in self._varlist]
-            else:
-                # The "{% ifchanged %}" syntax (without any variables) compares the rendered output.
-                compare_to = nodelist_true_output = self.nodelist_true.render(context)
-        except VariableDoesNotExist:
-            compare_to = None
+        if self._varlist:
+            # Consider multiple parameters. This behaves like an OR evaluation
+            # of the multiple variables.
+            compare_to = [var.resolve(context, ignore_failures=True) for var in self._varlist]
+        else:
+            # The "{% ifchanged %}" syntax (without any variables) compares
+            # the rendered output.
+            compare_to = nodelist_true_output = self.nodelist_true.render(context)
 
         if compare_to != state_frame[self]:
             state_frame[self] = compare_to
@@ -266,25 +260,6 @@ class IfChangedNode(Node):
             return context.render_context
 
 
-class IfEqualNode(Node):
-    child_nodelists = ('nodelist_true', 'nodelist_false')
-
-    def __init__(self, var1, var2, nodelist_true, nodelist_false, negate):
-        self.var1, self.var2 = var1, var2
-        self.nodelist_true, self.nodelist_false = nodelist_true, nodelist_false
-        self.negate = negate
-
-    def __repr__(self):
-        return '<%s>' % self.__class__.__name__
-
-    def render(self, context):
-        val1 = self.var1.resolve(context, True)
-        val2 = self.var2.resolve(context, True)
-        if (self.negate and val1 != val2) or (not self.negate and val1 == val2):
-            return self.nodelist_true.render(context)
-        return self.nodelist_false.render(context)
-
-
 class IfNode(Node):
 
     def __init__(self, conditions_nodelists):
@@ -299,7 +274,7 @@ class IfNode(Node):
 
     @property
     def nodelist(self):
-        return NodeList(node for _, nodelist in self.conditions_nodelists for node in nodelist)
+        return NodeList(self)
 
     def render(self, context):
         for condition, nodelist in self.conditions_nodelists:
@@ -348,10 +323,10 @@ class RegroupNode(Node):
         # This method is called for each object in self.target. See regroup()
         # for the reason why we temporarily put the object in the context.
         context[self.var_name] = obj
-        return self.expression.resolve(context, True)
+        return self.expression.resolve(context, ignore_failures=True)
 
     def render(self, context):
-        obj_list = self.target.resolve(context, True)
+        obj_list = self.target.resolve(context, ignore_failures=True)
         if obj_list is None:
             # target variable wasn't found in context; fail silently.
             context[self.var_name] = []
@@ -406,15 +381,16 @@ class SpacelessNode(Node):
 
 
 class TemplateTagNode(Node):
-    mapping = {'openblock': BLOCK_TAG_START,
-               'closeblock': BLOCK_TAG_END,
-               'openvariable': VARIABLE_TAG_START,
-               'closevariable': VARIABLE_TAG_END,
-               'openbrace': SINGLE_BRACE_START,
-               'closebrace': SINGLE_BRACE_END,
-               'opencomment': COMMENT_TAG_START,
-               'closecomment': COMMENT_TAG_END,
-               }
+    mapping = {
+        'openblock': BLOCK_TAG_START,
+        'closeblock': BLOCK_TAG_END,
+        'openvariable': VARIABLE_TAG_START,
+        'closevariable': VARIABLE_TAG_END,
+        'openbrace': SINGLE_BRACE_START,
+        'closebrace': SINGLE_BRACE_END,
+        'opencomment': COMMENT_TAG_START,
+        'closecomment': COMMENT_TAG_END,
+    }
 
     def __init__(self, tagtype):
         self.tagtype = tagtype
@@ -430,8 +406,17 @@ class URLNode(Node):
         self.kwargs = kwargs
         self.asvar = asvar
 
+    def __repr__(self):
+        return "<%s view_name='%s' args=%s kwargs=%s as=%s>" % (
+            self.__class__.__qualname__,
+            self.view_name,
+            repr(self.args),
+            repr(self.kwargs),
+            repr(self.asvar),
+        )
+
     def render(self, context):
-        from django.urls import reverse, NoReverseMatch
+        from django.urls import NoReverseMatch, reverse
         args = [arg.resolve(context) for arg in self.args]
         kwargs = {k: v.resolve(context) for k, v in self.kwargs.items()}
         view_name = self.view_name.resolve(context)
@@ -488,11 +473,11 @@ class WidthRatioNode(Node):
             value = float(value)
             max_value = float(max_value)
             ratio = (value / max_value) * max_width
-            result = str(int(round(ratio)))
+            result = str(round(ratio))
         except ZeroDivisionError:
-            return '0'
+            result = '0'
         except (ValueError, TypeError, OverflowError):
-            return ''
+            result = ''
 
         if self.asvar:
             context[self.asvar] = result
@@ -704,7 +689,7 @@ def firstof(parser, token):
             {{ var3 }}
         {% endif %}
 
-    but obviously much cleaner!
+    but much cleaner!
 
     You can also use a literal string as a fallback value in case all
     passed variables are False::
@@ -723,7 +708,7 @@ def firstof(parser, token):
     """
     bits = token.split_contents()[1:]
     asvar = None
-    if len(bits) < 1:
+    if not bits:
         raise TemplateSyntaxError("'firstof' statement requires at least one argument")
 
     if len(bits) >= 2 and bits[-2] == 'as':
@@ -822,52 +807,6 @@ def do_for(parser, token):
     else:
         nodelist_empty = None
     return ForNode(loopvars, sequence, is_reversed, nodelist_loop, nodelist_empty)
-
-
-def do_ifequal(parser, token, negate):
-    bits = list(token.split_contents())
-    if len(bits) != 3:
-        raise TemplateSyntaxError("%r takes two arguments" % bits[0])
-    end_tag = 'end' + bits[0]
-    nodelist_true = parser.parse(('else', end_tag))
-    token = parser.next_token()
-    if token.contents == 'else':
-        nodelist_false = parser.parse((end_tag,))
-        parser.delete_first_token()
-    else:
-        nodelist_false = NodeList()
-    val1 = parser.compile_filter(bits[1])
-    val2 = parser.compile_filter(bits[2])
-    return IfEqualNode(val1, val2, nodelist_true, nodelist_false, negate)
-
-
-@register.tag
-def ifequal(parser, token):
-    """
-    Output the contents of the block if the two arguments equal each other.
-
-    Examples::
-
-        {% ifequal user.id comment.user_id %}
-            ...
-        {% endifequal %}
-
-        {% ifnotequal user.id comment.user_id %}
-            ...
-        {% else %}
-            ...
-        {% endifnotequal %}
-    """
-    return do_ifequal(parser, token, False)
-
-
-@register.tag
-def ifnotequal(parser, token):
-    """
-    Output the contents of the block if the two arguments are not equal.
-    See ifequal.
-    """
-    return do_ifequal(parser, token, True)
 
 
 class TemplateLiteral(Literal):
@@ -975,7 +914,7 @@ def do_if(parser, token):
 
     # {% endif %}
     if token.contents != 'endif':
-        raise TemplateSyntaxError('Malformed template tag at line {0}: "{1}"'.format(token.lineno, token.contents))
+        raise TemplateSyntaxError('Malformed template tag at line {}: "{}"'.format(token.lineno, token.contents))
 
     return IfNode(conditions_nodelists)
 
@@ -1028,7 +967,7 @@ def find_library(parser, name):
     except KeyError:
         raise TemplateSyntaxError(
             "'%s' is not a registered tag library. Must be one of:\n%s" % (
-                name, "\n".join(sorted(parser.libraries.keys())),
+                name, "\n".join(sorted(parser.libraries)),
             ),
         )
 
@@ -1138,7 +1077,7 @@ def now(parser, token):
     """
     Display the date, formatted according to the given string.
 
-    Use the same format as PHP's ``date()`` function; see http://php.net/date
+    Use the same format as PHP's ``date()`` function; see https://php.net/date
     for all the possible values.
 
     Sample usage::
@@ -1331,7 +1270,7 @@ def url(parser, token):
 
         {% url "url_name" name1=value1 name2=value2 %}
 
-    The first argument is a django.conf.urls.url() name. Other arguments are
+    The first argument is a URL pattern name. Other arguments are
     space-separated values that will be filled in place of positional and
     keyword arguments in the URL. Don't mix positional and keyword arguments.
     All arguments for the URL must be present.
@@ -1339,12 +1278,12 @@ def url(parser, token):
     For example, if you have a view ``app_name.views.client_details`` taking
     the client's id and the corresponding line in a URLconf looks like this::
 
-        url('^client/(\d+)/$', views.client_details, name='client-detail-view')
+        path('client/<int:id>/', views.client_details, name='client-detail-view')
 
     and this app's URLconf is included into the project's URLconf under some
     path::
 
-        url('^clients/', include('app_name.urls'))
+        path('clients/', include('app_name.urls'))
 
     then in a template you can create a link for a certain client like this::
 
@@ -1361,7 +1300,7 @@ def url(parser, token):
     """
     bits = token.split_contents()
     if len(bits) < 2:
-        raise TemplateSyntaxError("'%s' takes at least one argument, the name of a url()." % bits[0])
+        raise TemplateSyntaxError("'%s' takes at least one argument, a URL pattern name." % bits[0])
     viewname = parser.compile_filter(bits[1])
     args = []
     kwargs = {}
@@ -1371,16 +1310,15 @@ def url(parser, token):
         asvar = bits[-1]
         bits = bits[:-2]
 
-    if len(bits):
-        for bit in bits:
-            match = kwarg_re.match(bit)
-            if not match:
-                raise TemplateSyntaxError("Malformed arguments to url tag")
-            name, value = match.groups()
-            if name:
-                kwargs[name] = parser.compile_filter(value)
-            else:
-                args.append(parser.compile_filter(value))
+    for bit in bits:
+        match = kwarg_re.match(bit)
+        if not match:
+            raise TemplateSyntaxError("Malformed arguments to url tag")
+        name, value = match.groups()
+        if name:
+            kwargs[name] = parser.compile_filter(value)
+        else:
+            args.append(parser.compile_filter(value))
 
     return URLNode(viewname, args, kwargs, asvar)
 
@@ -1417,17 +1355,17 @@ def widthratio(parser, token):
     For example::
 
         <img src="bar.png" alt="Bar"
-             height="10" width="{% widthratio this_value max_value max_width %}" />
+             height="10" width="{% widthratio this_value max_value max_width %}">
 
     If ``this_value`` is 175, ``max_value`` is 200, and ``max_width`` is 100,
     the image in the above example will be 88 pixels wide
     (because 175/200 = .875; .875 * 100 = 87.5 which is rounded up to 88).
 
     In some cases you might want to capture the result of widthratio in a
-    variable. It can be useful for instance in a blocktrans like this::
+    variable. It can be useful for instance in a blocktranslate like this::
 
         {% widthratio this_value max_value max_width as width %}
-        {% blocktrans %}The width is: {{ width }}{% endblocktrans %}
+        {% blocktranslate %}The width is: {{ width }}{% endblocktranslate %}
     """
     bits = token.split_contents()
     if len(bits) == 4:

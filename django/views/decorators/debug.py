@@ -26,6 +26,12 @@ def sensitive_variables(*variables):
         def my_function()
             ...
     """
+    if len(variables) == 1 and callable(variables[0]):
+        raise TypeError(
+            'sensitive_variables() must be called to use it as a decorator, '
+            'e.g., use @sensitive_variables(), not @sensitive_variables.'
+        )
+
     def decorator(func):
         @functools.wraps(func)
         def sensitive_variables_wrapper(*func_args, **func_kwargs):
@@ -61,14 +67,22 @@ def sensitive_post_parameters(*parameters):
         def my_view(request)
             ...
     """
+    if len(parameters) == 1 and callable(parameters[0]):
+        raise TypeError(
+            'sensitive_post_parameters() must be called to use it as a '
+            'decorator, e.g., use @sensitive_post_parameters(), not '
+            '@sensitive_post_parameters.'
+        )
+
     def decorator(view):
         @functools.wraps(view)
         def sensitive_post_parameters_wrapper(request, *args, **kwargs):
-            assert isinstance(request, HttpRequest), (
-                "sensitive_post_parameters didn't receive an HttpRequest. "
-                "If you are decorating a classmethod, be sure to use "
-                "@method_decorator."
-            )
+            if not isinstance(request, HttpRequest):
+                raise TypeError(
+                    "sensitive_post_parameters didn't receive an HttpRequest "
+                    "object. If you are decorating a classmethod, make sure "
+                    "to use @method_decorator."
+                )
             if parameters:
                 request.sensitive_post_parameters = parameters
             else:

@@ -9,15 +9,14 @@ from .settings import AUTH_MIDDLEWARE, AUTH_TEMPLATES
 
 
 class MockUser:
-    def has_module_perms(self, perm):
-        if perm == 'mockapp':
-            return True
-        return False
+    def __repr__(self):
+        return 'MockUser()'
 
-    def has_perm(self, perm):
-        if perm == 'mockapp.someperm':
-            return True
-        return False
+    def has_module_perms(self, perm):
+        return perm == 'mockapp'
+
+    def has_perm(self, perm, obj=None):
+        return perm == 'mockapp.someperm'
 
 
 class PermWrapperTests(SimpleTestCase):
@@ -37,6 +36,10 @@ class PermWrapperTests(SimpleTestCase):
             self.eq_calls += 1
             return False
 
+    def test_repr(self):
+        perms = PermWrapper(MockUser())
+        self.assertEqual(repr(perms), 'PermWrapper(MockUser())')
+
     def test_permwrapper_in(self):
         """
         'something' in PermWrapper works as expected.
@@ -55,6 +58,10 @@ class PermWrapperTests(SimpleTestCase):
         pldict = PermLookupDict(MockUser(), 'mockapp')
         with self.assertRaises(TypeError):
             self.EQLimiterObject() in pldict
+
+    def test_iter(self):
+        with self.assertRaisesMessage(TypeError, 'PermWrapper is not iterable.'):
+            iter(PermWrapper(MockUser()))
 
 
 @override_settings(ROOT_URLCONF='auth_tests.urls', TEMPLATES=AUTH_TEMPLATES)

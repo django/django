@@ -8,6 +8,7 @@
 """
 import sys
 from decimal import Decimal, InvalidOperation as DecimalInvalidOperation
+from pathlib import Path
 
 from django.contrib.gis.db.models import GeometryField
 from django.contrib.gis.gdal import (
@@ -20,7 +21,7 @@ from django.contrib.gis.gdal.field import (
 )
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import connections, models, router, transaction
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 
 # LayerMapping exceptions.
@@ -48,19 +49,21 @@ class LayerMapping:
     "A class that maps OGR Layers to GeoDjango Models."
 
     # Acceptable 'base' types for a multi-geometry type.
-    MULTI_TYPES = {1: OGRGeomType('MultiPoint'),
-                   2: OGRGeomType('MultiLineString'),
-                   3: OGRGeomType('MultiPolygon'),
-                   OGRGeomType('Point25D').num: OGRGeomType('MultiPoint25D'),
-                   OGRGeomType('LineString25D').num: OGRGeomType('MultiLineString25D'),
-                   OGRGeomType('Polygon25D').num: OGRGeomType('MultiPolygon25D'),
-                   }
-
+    MULTI_TYPES = {
+        1: OGRGeomType('MultiPoint'),
+        2: OGRGeomType('MultiLineString'),
+        3: OGRGeomType('MultiPolygon'),
+        OGRGeomType('Point25D').num: OGRGeomType('MultiPoint25D'),
+        OGRGeomType('LineString25D').num: OGRGeomType('MultiLineString25D'),
+        OGRGeomType('Polygon25D').num: OGRGeomType('MultiPolygon25D'),
+    }
     # Acceptable Django field types and corresponding acceptable OGR
     # counterparts.
     FIELD_TYPES = {
         models.AutoField: OFTInteger,
         models.BigAutoField: OFTInteger64,
+        models.SmallAutoField: OFTInteger,
+        models.BooleanField: (OFTInteger, OFTReal, OFTString),
         models.IntegerField: (OFTInteger, OFTReal, OFTString),
         models.FloatField: (OFTInteger, OFTReal),
         models.DateField: OFTDate,
@@ -72,8 +75,11 @@ class LayerMapping:
         models.SlugField: OFTString,
         models.TextField: OFTString,
         models.URLField: OFTString,
+        models.UUIDField: OFTString,
         models.BigIntegerField: (OFTInteger, OFTReal, OFTString),
         models.SmallIntegerField: (OFTInteger, OFTReal, OFTString),
+        models.PositiveBigIntegerField: (OFTInteger, OFTReal, OFTString),
+        models.PositiveIntegerField: (OFTInteger, OFTReal, OFTString),
         models.PositiveSmallIntegerField: (OFTInteger, OFTReal, OFTString),
     }
 
@@ -88,7 +94,7 @@ class LayerMapping:
         argument usage.
         """
         # Getting the DataSource and the associated Layer.
-        if isinstance(data, str):
+        if isinstance(data, (str, Path)):
             self.ds = DataSource(data, encoding=encoding)
         else:
             self.ds = data
@@ -343,13 +349,13 @@ class LayerMapping:
         """
         if (isinstance(ogr_field, OFTString) and
                 isinstance(model_field, (models.CharField, models.TextField))):
-            if self.encoding:
+            if self.encoding and ogr_field.value is not None:
                 # The encoding for OGR data sources may be specified here
                 # (e.g., 'cp437' for Census Bureau boundary files).
-                val = force_text(ogr_field.value, self.encoding)
+                val = force_str(ogr_field.value, self.encoding)
             else:
                 val = ogr_field.value
-            if model_field.max_length and len(val) > model_field.max_length:
+            if model_field.max_length and val is not None and len(val) > model_field.max_length:
                 raise InvalidString('%s model field maximum string length is %s, given %s characters.' %
                                     (model_field.name, model_field.max_length, len(val)))
         elif isinstance(ogr_field, OFTReal) and isinstance(model_field, models.DecimalField):
@@ -558,10 +564,14 @@ class LayerMapping:
                             # one from the kwargs WKT, adding in additional
                             # geometries, and update the attribute with the
                             # just-updated geometry WKT.
-                            geom = getattr(m, self.geom_field).ogr
-                            new = OGRGeometry(kwargs[self.geom_field])
-                            for g in new:
-                                geom.add(g)
+                            geom_value = getattr(m, self.geom_field)
+                            if geom_value is None:
+                                geom = OGRGeometry(kwargs[self.geom_field])
+                            else:
+                                geom = geom_value.ogr
+                                new = OGRGeometry(kwargs[self.geom_field])
+                                for g in new:
+                                    geom.add(g)
                             setattr(m, self.geom_field, geom.wkt)
                         except ObjectDoesNotExist:
                             # No unique model exists yet, create.

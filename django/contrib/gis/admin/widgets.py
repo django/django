@@ -15,7 +15,7 @@ class OpenLayersWidget(Textarea):
     """
     Render an OpenLayers map using the WKT of the geometry.
     """
-    def get_context(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
         # Update the template parameters with any attributes passed in.
         if attrs:
             self.params.update(attrs)

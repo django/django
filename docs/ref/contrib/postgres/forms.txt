@@ -15,8 +15,7 @@ Fields
 
 .. class:: SimpleArrayField(base_field, delimiter=',', max_length=None, min_length=None)
 
-    A simple field which maps to an array. It is represented by an HTML
-    ``<input>``.
+    A field which maps to an array. It is represented by an HTML ``<input>``.
 
     .. attribute:: base_field
 
@@ -26,8 +25,8 @@ Fields
         to render any HTML, but it is used to process the submitted data and
         validate it. For example::
 
-            >>> from django.contrib.postgres.forms import SimpleArrayField
             >>> from django import forms
+            >>> from django.contrib.postgres.forms import SimpleArrayField
 
             >>> class NumberListForm(forms.Form):
             ...     numbers = SimpleArrayField(forms.IntegerField())
@@ -48,8 +47,8 @@ Fields
         value is used to split the submitted data. It allows you to chain
         ``SimpleArrayField`` for multidimensional data::
 
-            >>> from django.contrib.postgres.forms import SimpleArrayField
             >>> from django import forms
+            >>> from django.contrib.postgres.forms import SimpleArrayField
 
             >>> class GridForm(forms.Form):
             ...     places = SimpleArrayField(SimpleArrayField(IntegerField()), delimiter='|')
@@ -159,25 +158,6 @@ Fields
         valid for a given field. This can be done using the
         :class:`~django.contrib.postgres.validators.KeysValidator`.
 
-    .. versionchanged:: 1.11
-
-        Added the ability to store nulls.
-
-``JSONField``
--------------
-
-.. class:: JSONField
-
-    A field which accepts JSON encoded data for a
-    :class:`~django.contrib.postgres.fields.JSONField`. It is represented by an
-    HTML ``<textarea>``.
-
-    .. admonition:: User friendly forms
-
-        ``JSONField`` is not particularly user friendly in most cases, however
-        it is a useful way to format data from a client-side widget for
-        submission to the server.
-
 Range Fields
 ------------
 
@@ -197,14 +177,14 @@ not greater than the upper bound. All of these fields use
     :class:`~django.contrib.postgres.fields.IntegerRangeField` and
     :class:`~django.contrib.postgres.fields.BigIntegerRangeField`.
 
-``FloatRangeField``
-~~~~~~~~~~~~~~~~~~~
+``DecimalRangeField``
+~~~~~~~~~~~~~~~~~~~~~
 
-.. class:: FloatRangeField
+.. class:: DecimalRangeField
 
-    Based on :class:`~django.forms.FloatField` and translates its input into
+    Based on :class:`~django.forms.DecimalField` and translates its input into
     :class:`~psycopg2:psycopg2.extras.NumericRange`. Default for
-    :class:`~django.contrib.postgres.fields.FloatRangeField`.
+    :class:`~django.contrib.postgres.fields.DecimalRangeField`.
 
 ``DateTimeRangeField``
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -245,4 +225,4 @@ Widgets
 
         Takes a single "compressed" value of a field, for example a
         :class:`~django.contrib.postgres.fields.DateRangeField`,
-        and returns a tuple representing and lower and upper bound.
+        and returns a tuple representing a lower and upper bound.

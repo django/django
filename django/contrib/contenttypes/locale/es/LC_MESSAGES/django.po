@@ -4,13 +4,14 @@
 # Antoni Aloy <aaloy@apsl.net>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
+# Uriel Medina <urimeba511@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-10-10 15:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-09-25 17:13+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -37,9 +38,9 @@ msgstr ""
 "El objeto de tipo de contenido %(ct_id)s  no tiene ningún modelo asociado."
 
 #, python-format
-msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
-msgstr "El objeto de tipo de contenido %(ct_id)s objeto %(obj_id)s  no existe"
+msgid "Content type %(ct_id)s object %(obj_id)s doesn’t exist"
+msgstr "El tipo de contenido %(ct_id)s del objeto %(obj_id)s no existe"
 
 #, python-format
-msgid "%(ct_name)s objects don't have a get_absolute_url() method"
-msgstr "El objeto %(ct_name)s no tiene un método get_absolute_url () "
+msgid "%(ct_name)s objects don’t have a get_absolute_url() method"
+msgstr "%(ct_name)s objetos no tienen un método get_absolute_url()"

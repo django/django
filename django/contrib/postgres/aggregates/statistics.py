@@ -1,5 +1,4 @@
-from django.db.models import FloatField, IntegerField
-from django.db.models.aggregates import Aggregate
+from django.db.models import Aggregate, FloatField, IntegerField
 
 __all__ = [
     'CovarPop', 'Corr', 'RegrAvgX', 'RegrAvgY', 'RegrCount', 'RegrIntercept',
@@ -8,22 +7,12 @@ __all__ = [
 
 
 class StatAggregate(Aggregate):
-    def __init__(self, y, x, output_field=FloatField()):
+    output_field = FloatField()
+
+    def __init__(self, y, x, output_field=None, filter=None):
         if not x or not y:
             raise ValueError('Both y and x must be provided.')
-        super().__init__(y=y, x=x, output_field=output_field)
-        self.x = x
-        self.y = y
-        self.source_expressions = self._parse_expressions(self.y, self.x)
-
-    def get_source_expressions(self):
-        return self.y, self.x
-
-    def set_source_expressions(self, exprs):
-        self.y, self.x = exprs
-
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        return super().resolve_expression(query, allow_joins, reuse, summarize)
+        super().__init__(y, x, output_field=output_field, filter=filter)
 
 
 class Corr(StatAggregate):
@@ -31,9 +20,9 @@ class Corr(StatAggregate):
 
 
 class CovarPop(StatAggregate):
-    def __init__(self, y, x, sample=False):
+    def __init__(self, y, x, sample=False, filter=None):
         self.function = 'COVAR_SAMP' if sample else 'COVAR_POP'
-        super().__init__(y, x)
+        super().__init__(y, x, filter=filter)
 
 
 class RegrAvgX(StatAggregate):
@@ -46,14 +35,8 @@ class RegrAvgY(StatAggregate):
 
 class RegrCount(StatAggregate):
     function = 'REGR_COUNT'
-
-    def __init__(self, y, x):
-        super().__init__(y=y, x=x, output_field=IntegerField())
-
-    def convert_value(self, value, expression, connection, context):
-        if value is None:
-            return 0
-        return int(value)
+    output_field = IntegerField()
+    empty_aggregate_value = 0
 
 
 class RegrIntercept(StatAggregate):

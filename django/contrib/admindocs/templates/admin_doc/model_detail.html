@@ -11,14 +11,14 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% trans 'Documentation' %}</a>
-&rsaquo; <a href="{% url 'django-admindocs-models-index' %}">{% trans 'Models' %}</a>
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% translate 'Documentation' %}</a>
+&rsaquo; <a href="{% url 'django-admindocs-models-index' %}">{% translate 'Models' %}</a>
 &rsaquo; {{ name }}
 </div>
 {% endblock %}
 
-{% block title %}{% blocktrans %}Model: {{ name }}{% endblocktrans %}{% endblock %}
+{% block title %}{% blocktranslate %}Model: {{ name }}{% endblocktranslate %}{% endblock %}
 
 {% block content %}
 <div id="content-main">
@@ -27,14 +27,14 @@
 
 {{ description }}
 
-<h3>{% trans 'Fields' %}</h3>
+<h3>{% translate 'Fields' %}</h3>
 <div class="module">
 <table class="model">
 <thead>
 <tr>
-    <th>{% trans 'Field' %}</th>
-    <th>{% trans 'Type' %}</th>
-    <th>{% trans 'Description' %}</th>
+    <th>{% translate 'Field' %}</th>
+    <th>{% translate 'Type' %}</th>
+    <th>{% translate 'Description' %}</th>
 </tr>
 </thead>
 <tbody>
@@ -50,14 +50,14 @@
 </div>
 
 {% if methods %}
-<h3>{% trans 'Methods with arguments' %}</h3>
+<h3>{% translate 'Methods with arguments' %}</h3>
 <div class="module">
 <table class="model">
 <thead>
 <tr>
-    <th>{% trans 'Method' %}</th>
-    <th>{% trans 'Arguments' %}</th>
-    <th>{% trans 'Description' %}</th>
+    <th>{% translate 'Method' %}</th>
+    <th>{% translate 'Arguments' %}</th>
+    <th>{% translate 'Description' %}</th>
 </tr>
 </thead>
 <tbody>
@@ -73,6 +73,6 @@
 </div>
 {% endif %}
 
-<p class="small"><a href="{% url 'django-admindocs-models-index' %}">&lsaquo; {% trans 'Back to Model documentation' %}</a></p>
+<p class="small"><a href="{% url 'django-admindocs-models-index' %}">&lsaquo; {% translate 'Back to Model documentation' %}</a></p>
 </div>
 {% endblock %}

@@ -2,13 +2,13 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Ramiro Morales, 2013-2016
+# Ramiro Morales, 2013-2017,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-30 23:54+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-10-01 10:21+0000\n"
 "Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -53,7 +53,7 @@ msgstr "No se ha establecido una contraseña."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Formato de contraseña inválido o algoritmo de hashing desconocido."
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "Los dos campos de contraseñas no coinciden entre si."
 
 msgid "Password"
@@ -67,13 +67,12 @@ msgstr ""
 "Introduzca la misma contraseña nuevamente, para poder verificar la misma."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "El sistema no almacena las contraseñas originales por lo cual no es posible "
 "visualizar la contraseña de este usuario, pero puede modificarla usando <a "
-"href=\"../password/\">este formulario</a>."
+"href=\"{}\">este formulario</a>."
 
 #, python-format
 msgid ""
@@ -252,7 +251,7 @@ msgstr[1] "Su contraseña debe contener por lo menos %(min_length)d caracteres."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "La contraseña es muy similar a %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
 "Su contraseña no puede ser similar a otros componentes de su información "
 "personal."
@@ -260,13 +259,13 @@ msgstr ""
 msgid "This password is too common."
 msgstr "La contraseña tiene un valor demasiado común."
 
-msgid "Your password can't be a commonly used password."
-msgstr "Su contraseña no puede ser una contraseña muy comunmente usada."
+msgid "Your password can’t be a commonly used password."
+msgstr "Su contraseña no puede ser una contraseña usada muy comúnmente."
 
 msgid "This password is entirely numeric."
 msgstr "La contraseña está formada completamente por dígitos."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Su contraseña no puede estar formada exclusivamente por números."
 
 #, python-format

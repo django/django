@@ -29,6 +29,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='contenttype',
-            unique_together=set([('app_label', 'model')]),
+            unique_together={('app_label', 'model')},
         ),
     ]

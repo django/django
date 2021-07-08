@@ -11,7 +11,6 @@ from django.contrib.sessions.backends.base import (
 from django.contrib.sessions.exceptions import InvalidSessionKey
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.utils import timezone
-from django.utils.encoding import force_text
 
 
 class SessionStore(SessionBase):
@@ -19,7 +18,7 @@ class SessionStore(SessionBase):
     Implement a file based session store.
     """
     def __init__(self, session_key=None):
-        self.storage_path = type(self)._get_storage_path()
+        self.storage_path = self._get_storage_path()
         self.file_prefix = settings.SESSION_COOKIE_NAME
         super().__init__(session_key)
 
@@ -28,10 +27,7 @@ class SessionStore(SessionBase):
         try:
             return cls._storage_path
         except AttributeError:
-            storage_path = getattr(settings, "SESSION_FILE_PATH", None)
-            if not storage_path:
-                storage_path = tempfile.gettempdir()
-
+            storage_path = getattr(settings, 'SESSION_FILE_PATH', None) or tempfile.gettempdir()
             # Make sure the storage path is valid.
             if not os.path.isdir(storage_path):
                 raise ImproperlyConfigured(
@@ -52,7 +48,7 @@ class SessionStore(SessionBase):
         # Make sure we're not vulnerable to directory traversal. Session keys
         # should always be md5s, so they should never contain directory
         # components.
-        if not set(session_key).issubset(set(VALID_KEY_CHARS)):
+        if not set(session_key).issubset(VALID_KEY_CHARS):
             raise InvalidSessionKey(
                 "Invalid characters in session key")
 
@@ -63,26 +59,21 @@ class SessionStore(SessionBase):
         Return the modification time of the file storing the session's content.
         """
         modification = os.stat(self._key_to_file()).st_mtime
-        if settings.USE_TZ:
-            modification = datetime.datetime.utcfromtimestamp(modification)
-            modification = modification.replace(tzinfo=timezone.utc)
-        else:
-            modification = datetime.datetime.fromtimestamp(modification)
-        return modification
+        tz = timezone.utc if settings.USE_TZ else None
+        return datetime.datetime.fromtimestamp(modification, tz=tz)
 
     def _expiry_date(self, session_data):
         """
         Return the expiry time of the file storing the session's content.
         """
-        expiry = session_data.get('_session_expiry')
-        if not expiry:
-            expiry = self._last_modification() + datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE)
-        return expiry
+        return session_data.get('_session_expiry') or (
+            self._last_modification() + datetime.timedelta(seconds=self.get_session_cookie_age())
+        )
 
     def load(self):
         session_data = {}
         try:
-            with open(self._key_to_file(), "rb") as session_file:
+            with open(self._key_to_file(), encoding='ascii') as session_file:
                 file_data = session_file.read()
             # Don't fail if there is no data in the session file.
             # We may have opened the empty placeholder file.
@@ -92,7 +83,7 @@ class SessionStore(SessionBase):
                 except (EOFError, SuspiciousOperation) as e:
                     if isinstance(e, SuspiciousOperation):
                         logger = logging.getLogger('django.security.%s' % e.__class__.__name__)
-                        logger.warning(force_text(e))
+                        logger.warning(str(e))
                     self.create()
 
                 # Remove expired sessions.
@@ -101,7 +92,7 @@ class SessionStore(SessionBase):
                     session_data = {}
                     self.delete()
                     self.create()
-        except (IOError, SuspiciousOperation):
+        except (OSError, SuspiciousOperation):
             self._session_key = None
         return session_data
 
@@ -173,8 +164,7 @@ class SessionStore(SessionBase):
             finally:
                 if not renamed:
                     os.unlink(output_file_name)
-
-        except (OSError, IOError, EOFError):
+        except (EOFError, OSError):
             pass
 
     def exists(self, session_key):

@@ -4,10 +4,10 @@ Timezone-related classes and functions.
 
 import functools
 from contextlib import ContextDecorator
-from datetime import datetime, timedelta, tzinfo
-from threading import local
+from datetime import datetime, timedelta, timezone, tzinfo
 
 import pytz
+from asgiref.local import Local
 
 from django.conf import settings
 
@@ -21,48 +21,23 @@ __all__ = [
 ]
 
 
-# UTC and local time zones
-
-ZERO = timedelta(0)
-
-
-class FixedOffset(tzinfo):
-    """
-    Fixed offset in minutes east from UTC. Taken from Python's docs.
-
-    Kept as close as possible to the reference version. __init__ was changed
-    to make its arguments optional, according to Python's requirement that
-    tzinfo subclasses can be instantiated without arguments.
-    """
-
-    def __init__(self, offset=None, name=None):
-        if offset is not None:
-            self.__offset = timedelta(minutes=offset)
-        if name is not None:
-            self.__name = name
-
-    def utcoffset(self, dt):
-        return self.__offset
-
-    def tzname(self, dt):
-        return self.__name
-
-    def dst(self, dt):
-        return ZERO
-
-
 # UTC time zone as a tzinfo instance.
 utc = pytz.utc
+
+_PYTZ_BASE_CLASSES = (pytz.tzinfo.BaseTzInfo, pytz._FixedOffset)
+# In releases prior to 2018.4, pytz.UTC was not a subclass of BaseTzInfo
+if not isinstance(pytz.UTC, pytz._FixedOffset):
+    _PYTZ_BASE_CLASSES = _PYTZ_BASE_CLASSES + (type(pytz.UTC),)
 
 
 def get_fixed_timezone(offset):
     """Return a tzinfo instance with a fixed offset from UTC."""
     if isinstance(offset, timedelta):
-        offset = offset.seconds // 60
+        offset = offset.total_seconds() // 60
     sign = '-' if offset < 0 else '+'
     hhmm = '%02d%02d' % divmod(abs(offset), 60)
     name = sign + hhmm
-    return FixedOffset(offset, name)
+    return timezone(timedelta(minutes=offset), name)
 
 
 # In order to avoid accessing settings at compile time,
@@ -83,7 +58,7 @@ def get_default_timezone_name():
     return _get_timezone_name(get_default_timezone())
 
 
-_active = local()
+_active = Local()
 
 
 def get_current_timezone():
@@ -98,12 +73,7 @@ def get_current_timezone_name():
 
 def _get_timezone_name(timezone):
     """Return the name of ``timezone``."""
-    try:
-        # for pytz timezones
-        return timezone.zone
-    except AttributeError:
-        # for regular tzinfo objects
-        return timezone.tzname(None)
+    return str(timezone)
 
 # Timezone selection functions.
 
@@ -204,11 +174,7 @@ def localtime(value=None, timezone=None):
     # Emulate the behavior of astimezone() on Python < 3.6.
     if is_naive(value):
         raise ValueError("localtime() cannot be applied to a naive datetime")
-    value = value.astimezone(timezone)
-    if hasattr(timezone, 'normalize'):
-        # This method is available for pytz time zones.
-        value = timezone.normalize(value)
-    return value
+    return value.astimezone(timezone)
 
 
 def localdate(value=None, timezone=None):
@@ -228,11 +194,7 @@ def now():
     """
     Return an aware or naive datetime.datetime, depending on settings.USE_TZ.
     """
-    if settings.USE_TZ:
-        # timeit shows that datetime.now(tz=utc) is 24% slower
-        return datetime.utcnow().replace(tzinfo=utc)
-    else:
-        return datetime.now()
+    return datetime.now(tz=utc if settings.USE_TZ else None)
 
 
 # By design, these four functions don't perform any checks on their arguments.
@@ -243,7 +205,7 @@ def is_aware(value):
     Determine if a given datetime.datetime is aware.
 
     The concept is defined in Python's docs:
-    http://docs.python.org/library/datetime.html#datetime.tzinfo
+    https://docs.python.org/library/datetime.html#datetime.tzinfo
 
     Assuming value.tzinfo is either None or a proper datetime.tzinfo,
     value.utcoffset() implements the appropriate logic.
@@ -256,7 +218,7 @@ def is_naive(value):
     Determine if a given datetime.datetime is naive.
 
     The concept is defined in Python's docs:
-    http://docs.python.org/library/datetime.html#datetime.tzinfo
+    https://docs.python.org/library/datetime.html#datetime.tzinfo
 
     Assuming value.tzinfo is either None or a proper datetime.tzinfo,
     value.utcoffset() implements the appropriate logic.
@@ -268,7 +230,7 @@ def make_aware(value, timezone=None, is_dst=None):
     """Make a naive datetime.datetime in a given time zone aware."""
     if timezone is None:
         timezone = get_current_timezone()
-    if hasattr(timezone, 'localize'):
+    if _is_pytz_zone(timezone):
         # This method is available for pytz time zones.
         return timezone.localize(value, is_dst=is_dst)
     else:
@@ -287,8 +249,21 @@ def make_naive(value, timezone=None):
     # Emulate the behavior of astimezone() on Python < 3.6.
     if is_naive(value):
         raise ValueError("make_naive() cannot be applied to a naive datetime")
-    value = value.astimezone(timezone)
-    if hasattr(timezone, 'normalize'):
-        # This method is available for pytz time zones.
-        value = timezone.normalize(value)
-    return value.replace(tzinfo=None)
+    return value.astimezone(timezone).replace(tzinfo=None)
+
+
+def _is_pytz_zone(tz):
+    """Checks if a zone is a pytz zone."""
+    return isinstance(tz, _PYTZ_BASE_CLASSES)
+
+
+def _datetime_ambiguous_or_imaginary(dt, tz):
+    if _is_pytz_zone(tz):
+        try:
+            tz.utcoffset(dt)
+        except (pytz.AmbiguousTimeError, pytz.NonExistentTimeError):
+            return True
+        else:
+            return False
+
+    return tz.utcoffset(dt.replace(fold=not dt.fold)) != tz.utcoffset(dt)

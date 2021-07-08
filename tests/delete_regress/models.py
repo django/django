@@ -24,6 +24,7 @@ class Person(models.Model):
 
 class Book(models.Model):
     pagecount = models.IntegerField()
+    owner = models.ForeignKey('Child', models.CASCADE, null=True)
 
 
 class Toy(models.Model):
@@ -56,6 +57,8 @@ class Email(Contact):
 
 class Researcher(models.Model):
     contacts = models.ManyToManyField(Contact, related_name="research_contacts")
+    primary_contact = models.ForeignKey(Contact, models.SET_NULL, null=True, related_name='primary_contacts')
+    secondary_contact = models.ForeignKey(Contact, models.SET_NULL, null=True, related_name='secondary_contacts')
 
 
 class Food(models.Model):

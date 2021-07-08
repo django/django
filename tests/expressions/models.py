@@ -1,17 +1,27 @@
 """
 Tests for F() query expression syntax.
 """
+import uuid
 
 from django.db import models
+
+
+class Manager(models.Model):
+    name = models.CharField(max_length=50)
 
 
 class Employee(models.Model):
     firstname = models.CharField(max_length=50)
     lastname = models.CharField(max_length=50)
     salary = models.IntegerField(blank=True, null=True)
+    manager = models.ForeignKey(Manager, models.CASCADE, null=True)
 
     def __str__(self):
         return '%s %s' % (self.firstname, self.lastname)
+
+
+class RemoteEmployee(Employee):
+    adjusted_salary = models.IntegerField()
 
 
 class Company(models.Model):
@@ -21,12 +31,15 @@ class Company(models.Model):
     ceo = models.ForeignKey(
         Employee,
         models.CASCADE,
-        related_name='company_ceo_set')
+        related_name='company_ceo_set',
+    )
     point_of_contact = models.ForeignKey(
         Employee,
         models.SET_NULL,
         related_name='company_point_of_contact_set',
-        null=True)
+        null=True,
+    )
+    based_in_eu = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -35,9 +48,10 @@ class Company(models.Model):
 class Number(models.Model):
     integer = models.BigIntegerField(db_column='the_integer')
     float = models.FloatField(null=True, db_column='the_float')
+    decimal_value = models.DecimalField(max_digits=20, decimal_places=17, null=True)
 
     def __str__(self):
-        return '%i, %.3f' % (self.integer, self.float)
+        return '%i, %.3f, %.17f' % (self.integer, self.float, self.decimal_value)
 
 
 class Experiment(models.Model):
@@ -47,8 +61,10 @@ class Experiment(models.Model):
     estimated_time = models.DurationField()
     start = models.DateTimeField()
     end = models.DateTimeField()
+    scalar = models.IntegerField(null=True)
 
     class Meta:
+        db_table = 'expressions_ExPeRiMeNt'
         ordering = ('name',)
 
     def duration(self):
@@ -67,7 +83,7 @@ class Time(models.Model):
     time = models.TimeField(null=True)
 
     def __str__(self):
-        return "%s" % self.time
+        return str(self.time)
 
 
 class SimulationRun(models.Model):
@@ -79,8 +95,10 @@ class SimulationRun(models.Model):
         return "%s (%s to %s)" % (self.midpoint, self.start, self.end)
 
 
+class UUIDPK(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+
+
 class UUID(models.Model):
     uuid = models.UUIDField(null=True)
-
-    def __str__(self):
-        return "%s" % self.uuid
+    uuid_fk = models.ForeignKey(UUIDPK, models.CASCADE, null=True)

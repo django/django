@@ -8,17 +8,18 @@ from django.contrib.gis.geos import (
     MultiPoint, MultiPolygon, Point, Polygon, fromstr,
 )
 from django.core.management import call_command
-from django.db import connection
+from django.db import DatabaseError, NotSupportedError, connection
+from django.db.models import F, OuterRef, Subquery
 from django.test import TestCase, skipUnlessDBFeature
+from django.test.utils import CaptureQueriesContext
 
-from ..utils import no_oracle, oracle, postgis, skipUnlessGISLookup, spatialite
+from ..utils import skipUnlessGISLookup
 from .models import (
-    City, Country, Feature, MinusOneSRID, NonConcreteModel, PennsylvaniaCity,
-    State, Track,
+    City, Country, Feature, MinusOneSRID, MultiFields, NonConcreteModel,
+    PennsylvaniaCity, State, Track,
 )
 
 
-@skipUnlessDBFeature("gis_enabled")
 class GeoModelTest(TestCase):
     fixtures = ['initial']
 
@@ -65,7 +66,7 @@ class GeoModelTest(TestCase):
         nullcity.delete()
 
         # Testing on a Polygon
-        shell = LinearRing((0, 0), (0, 100), (100, 100), (100, 0), (0, 0))
+        shell = LinearRing((0, 0), (0, 90), (100, 90), (100, 0), (0, 0))
         inner = LinearRing((40, 40), (40, 60), (60, 60), (60, 40), (40, 40))
 
         # Creating a State object using a built Polygon
@@ -75,14 +76,13 @@ class GeoModelTest(TestCase):
         nullstate.save()
 
         ns = State.objects.get(name='NullState')
-        self.assertEqual(ply, ns.poly)
+        self.assertEqual(connection.ops.Adapter._fix_polygon(ply), ns.poly)
 
         # Testing the `ogr` and `srs` lazy-geometry properties.
-        if gdal.HAS_GDAL:
-            self.assertIsInstance(ns.poly.ogr, gdal.OGRGeometry)
-            self.assertEqual(ns.poly.wkb, ns.poly.ogr.wkb)
-            self.assertIsInstance(ns.poly.srs, gdal.SpatialReference)
-            self.assertEqual('WGS 84', ns.poly.srs.name)
+        self.assertIsInstance(ns.poly.ogr, gdal.OGRGeometry)
+        self.assertEqual(ns.poly.wkb, ns.poly.ogr.wkb)
+        self.assertIsInstance(ns.poly.srs, gdal.SpatialReference)
+        self.assertEqual('WGS 84', ns.poly.srs.name)
 
         # Changing the interior ring on the poly attribute.
         new_inner = LinearRing((30, 30), (30, 70), (70, 70), (70, 30), (30, 30))
@@ -90,7 +90,10 @@ class GeoModelTest(TestCase):
         ply[1] = new_inner
         self.assertEqual(4326, ns.poly.srid)
         ns.save()
-        self.assertEqual(ply, State.objects.get(name='NullState').poly)
+        self.assertEqual(
+            connection.ops.Adapter._fix_polygon(ply),
+            State.objects.get(name='NullState').poly
+        )
         ns.delete()
 
     @skipUnlessDBFeature("supports_transform")
@@ -104,7 +107,7 @@ class GeoModelTest(TestCase):
         # Constructing & querying with a point from a different SRID. Oracle
         # `SDO_OVERLAPBDYINTERSECT` operates differently from
         # `ST_Intersects`, so contains is used instead.
-        if oracle:
+        if connection.ops.oracle:
             tx = Country.objects.get(mpoly__contains=other_srid_pnt)
         else:
             tx = Country.objects.get(mpoly__intersects=other_srid_pnt)
@@ -151,9 +154,6 @@ class GeoModelTest(TestCase):
         self.assertIsInstance(f_4.geom, GeometryCollection)
         self.assertEqual(f_3.geom, f_4.geom[2])
 
-    # TODO: fix on Oracle: ORA-22901: cannot compare nested table or VARRAY or
-    # LOB attributes of an object type.
-    @no_oracle
     @skipUnlessDBFeature("supports_transform")
     def test_inherited_geofields(self):
         "Database functions on inherited Geometry fields."
@@ -171,14 +171,13 @@ class GeoModelTest(TestCase):
     def test_raw_sql_query(self):
         "Testing raw SQL query."
         cities1 = City.objects.all()
-        # Only PostGIS would support a 'select *' query because of its recognized
-        # HEXEWKB format for geometry fields
-        as_text = 'ST_AsText(%s)' if postgis else connection.ops.select
-        cities2 = City.objects.raw(
-            'select id, name, %s from geoapp_city' % as_text % 'point'
-        )
-        self.assertEqual(len(cities1), len(list(cities2)))
-        self.assertIsInstance(cities2[0].point, Point)
+        point_select = connection.ops.select % 'point'
+        cities2 = list(City.objects.raw(
+            'select id, name, %s as point from geoapp_city' % point_select
+        ))
+        self.assertEqual(len(cities1), len(cities2))
+        with self.assertNumQueries(0):  # Ensure point isn't deferred.
+            self.assertIsInstance(cities2[0].point, Point)
 
     def test_dumpdata_loaddata_cycle(self):
         """
@@ -222,7 +221,6 @@ class GeoModelTest(TestCase):
             self.assertEqual(feature.geom.srid, g.srid)
 
 
-@skipUnlessDBFeature("gis_enabled")
 class GeoLookupTest(TestCase):
     fixtures = ['initial']
 
@@ -231,11 +229,9 @@ class GeoLookupTest(TestCase):
         ptown = City.objects.get(name='Pueblo')
         qs1 = City.objects.filter(point__disjoint=ptown.point)
         self.assertEqual(7, qs1.count())
-
-        if connection.features.supports_real_shape_operations:
-            qs2 = State.objects.filter(poly__disjoint=ptown.point)
-            self.assertEqual(1, qs2.count())
-            self.assertEqual('Kansas', qs2[0].name)
+        qs2 = State.objects.filter(poly__disjoint=ptown.point)
+        self.assertEqual(1, qs2.count())
+        self.assertEqual('Kansas', qs2[0].name)
 
     def test_contains_contained_lookups(self):
         "Testing the 'contained', 'contains', and 'bbcontains' lookup types."
@@ -273,8 +269,7 @@ class GeoLookupTest(TestCase):
         # Pueblo and Oklahoma City (even though OK City is within the bounding box of Texas)
         # are not contained in Texas or New Zealand.
         self.assertEqual(len(Country.objects.filter(mpoly__contains=pueblo.point)), 0)  # Query w/GEOSGeometry object
-        self.assertEqual(len(Country.objects.filter(mpoly__contains=okcity.point.wkt)),
-                         0 if connection.features.supports_real_shape_operations else 1)  # Query w/WKT
+        self.assertEqual(len(Country.objects.filter(mpoly__contains=okcity.point.wkt)), 0)  # Query w/WKT
 
         # OK City is contained w/in bounding box of Texas.
         if connection.features.supports_bbcontains_lookup:
@@ -302,15 +297,16 @@ class GeoLookupTest(TestCase):
         invalid_geom = fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 1 1, 1 0, 0 0))')
         State.objects.create(name='invalid', poly=invalid_geom)
         qs = State.objects.all()
-        if oracle:
+        if connection.ops.oracle or (connection.ops.mysql and connection.mysql_version < (8, 0, 0)):
             # Kansas has adjacent vertices with distance 6.99244813842e-12
             # which is smaller than the default Oracle tolerance.
+            # It's invalid on MySQL < 8 also.
             qs = qs.exclude(name='Kansas')
             self.assertEqual(State.objects.filter(name='Kansas', poly__isvalid=False).count(), 1)
         self.assertEqual(qs.filter(poly__isvalid=False).count(), 1)
         self.assertEqual(qs.filter(poly__isvalid=True).count(), qs.count() - 1)
 
-    @skipUnlessDBFeature("supports_left_right_lookups")
+    @skipUnlessGISLookup('left', 'right')
     def test_left_right_lookups(self):
         "Testing the 'left' and 'right' lookup types."
         # Left: A << B => true if xmax(A) < xmin(B)
@@ -386,6 +382,9 @@ class GeoLookupTest(TestCase):
         # Puerto Rico should be NULL (it's a commonwealth unincorporated territory)
         self.assertEqual(1, len(nullqs))
         self.assertEqual('Puerto Rico', nullqs[0].name)
+        # GeometryField=None is an alias for __isnull=True.
+        self.assertCountEqual(State.objects.filter(poly=None), nullqs)
+        self.assertCountEqual(State.objects.exclude(poly=None), validqs)
 
         # The valid states should be Colorado & Kansas
         self.assertEqual(2, len(validqs))
@@ -402,6 +401,34 @@ class GeoLookupTest(TestCase):
         nmi.save()
         State.objects.filter(name='Northern Mariana Islands').update(poly=None)
         self.assertIsNone(State.objects.get(name='Northern Mariana Islands').poly)
+
+    @skipUnlessDBFeature('supports_null_geometries', 'supports_crosses_lookup', 'supports_relate_lookup')
+    def test_null_geometries_excluded_in_lookups(self):
+        """NULL features are excluded in spatial lookup functions."""
+        null = State.objects.create(name='NULL', poly=None)
+        queries = [
+            ('equals', Point(1, 1)),
+            ('disjoint', Point(1, 1)),
+            ('touches', Point(1, 1)),
+            ('crosses', LineString((0, 0), (1, 1), (5, 5))),
+            ('within', Point(1, 1)),
+            ('overlaps', LineString((0, 0), (1, 1), (5, 5))),
+            ('contains', LineString((0, 0), (1, 1), (5, 5))),
+            ('intersects', LineString((0, 0), (1, 1), (5, 5))),
+            ('relate', (Point(1, 1), 'T*T***FF*')),
+            ('same_as', Point(1, 1)),
+            ('exact', Point(1, 1)),
+            ('coveredby', Point(1, 1)),
+            ('covers', Point(1, 1)),
+        ]
+        for lookup, geom in queries:
+            with self.subTest(lookup=lookup):
+                self.assertNotIn(null, State.objects.filter(**{'poly__%s' % lookup: geom}))
+
+    def test_wkt_string_in_lookup(self):
+        # Valid WKT strings don't emit error logs.
+        with self.assertNoLogs('django.contrib.gis', 'ERROR'):
+            State.objects.filter(poly__intersects='LINESTRING(0 0, 1 1, 5 5)')
 
     @skipUnlessDBFeature("supports_relate_lookup")
     def test_relate_lookup(self):
@@ -423,19 +450,22 @@ class GeoLookupTest(TestCase):
             with self.assertRaises(e):
                 qs.count()
 
-        # Relate works differently for the different backends.
-        if postgis or spatialite:
-            contains_mask = 'T*T***FF*'
-            within_mask = 'T*F**F***'
-            intersects_mask = 'T********'
-        elif oracle:
+        contains_mask = 'T*T***FF*'
+        within_mask = 'T*F**F***'
+        intersects_mask = 'T********'
+        # Relate works differently on Oracle.
+        if connection.ops.oracle:
             contains_mask = 'contains'
             within_mask = 'inside'
             # TODO: This is not quite the same as the PostGIS mask above
             intersects_mask = 'overlapbdyintersect'
 
         # Testing contains relation mask.
-        self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt1, contains_mask)).name)
+        if connection.features.supports_transform:
+            self.assertEqual(
+                Country.objects.get(mpoly__relate=(pnt1, contains_mask)).name,
+                'Texas',
+            )
         self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt2, contains_mask)).name)
 
         # Testing within relation mask.
@@ -443,13 +473,43 @@ class GeoLookupTest(TestCase):
         self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, within_mask)).name)
 
         # Testing intersection relation mask.
-        if not oracle:
-            self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt1, intersects_mask)).name)
+        if not connection.ops.oracle:
+            if connection.features.supports_transform:
+                self.assertEqual(
+                    Country.objects.get(mpoly__relate=(pnt1, intersects_mask)).name,
+                    'Texas',
+                )
             self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt2, intersects_mask)).name)
             self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, intersects_mask)).name)
 
+        # With a complex geometry expression
+        mask = 'anyinteract' if connection.ops.oracle else within_mask
+        self.assertFalse(City.objects.exclude(point__relate=(functions.Union('point', 'point'), mask)))
 
-@skipUnlessDBFeature("gis_enabled")
+    def test_gis_lookups_with_complex_expressions(self):
+        multiple_arg_lookups = {'dwithin', 'relate'}  # These lookups are tested elsewhere.
+        lookups = connection.ops.gis_operators.keys() - multiple_arg_lookups
+        self.assertTrue(lookups, 'No lookups found')
+        for lookup in lookups:
+            with self.subTest(lookup):
+                City.objects.filter(**{'point__' + lookup: functions.Union('point', 'point')}).exists()
+
+    def test_subquery_annotation(self):
+        multifields = MultiFields.objects.create(
+            city=City.objects.create(point=Point(1, 1)),
+            point=Point(2, 2),
+            poly=Polygon.from_bbox((0, 0, 2, 2)),
+        )
+        qs = MultiFields.objects.annotate(
+            city_point=Subquery(City.objects.filter(
+                id=OuterRef('city'),
+            ).values('point')),
+        ).filter(
+            city_point__within=F('poly'),
+        )
+        self.assertEqual(qs.get(), multifields)
+
+
 class GeoQuerySetTest(TestCase):
     # TODO: GeoQuerySet is removed, organize these test better.
     fixtures = ['initial']
@@ -484,7 +544,7 @@ class GeoQuerySetTest(TestCase):
         Testing the `MakeLine` aggregate.
         """
         if not connection.features.supports_make_line_aggr:
-            with self.assertRaises(NotImplementedError):
+            with self.assertRaises(NotSupportedError):
                 City.objects.all().aggregate(MakeLine('point'))
             return
 
@@ -527,6 +587,50 @@ class GeoQuerySetTest(TestCase):
         qs = City.objects.filter(name='NotACity')
         self.assertIsNone(qs.aggregate(Union('point'))['point__union'])
 
+    @skipUnlessDBFeature('supports_union_aggr')
+    def test_geoagg_subquery(self):
+        tx = Country.objects.get(name='Texas')
+        union = GEOSGeometry('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)')
+        # Use distinct() to force the usage of a subquery for aggregation.
+        with CaptureQueriesContext(connection) as ctx:
+            self.assertIs(union.equals(
+                City.objects.filter(point__within=tx.mpoly).distinct().aggregate(
+                    Union('point'),
+                )['point__union'],
+            ), True)
+        self.assertIn('subquery', ctx.captured_queries[0]['sql'])
+
+    @skipUnlessDBFeature('supports_tolerance_parameter')
+    def test_unionagg_tolerance(self):
+        City.objects.create(
+            point=fromstr('POINT(-96.467222 32.751389)', srid=4326),
+            name='Forney',
+        )
+        tx = Country.objects.get(name='Texas').mpoly
+        # Tolerance is greater than distance between Forney and Dallas, that's
+        # why Dallas is ignored.
+        forney_houston = GEOSGeometry(
+            'MULTIPOINT(-95.363151 29.763374, -96.467222 32.751389)',
+            srid=4326,
+        )
+        self.assertIs(
+            forney_houston.equals_exact(
+                City.objects.filter(point__within=tx).aggregate(
+                    Union('point', tolerance=32000),
+                )['point__union'],
+                tolerance=10e-6,
+            ),
+            True,
+        )
+
+    @skipUnlessDBFeature('supports_tolerance_parameter')
+    def test_unionagg_tolerance_escaping(self):
+        tx = Country.objects.get(name='Texas').mpoly
+        with self.assertRaises(DatabaseError):
+            City.objects.filter(point__within=tx).aggregate(
+                Union('point', tolerance='0.05))), (((1'),
+            )
+
     def test_within_subquery(self):
         """
         Using a queryset inside a geo lookup is working (using a subquery)
@@ -534,13 +638,7 @@ class GeoQuerySetTest(TestCase):
         """
         tex_cities = City.objects.filter(
             point__within=Country.objects.filter(name='Texas').values('mpoly')).order_by('name')
-        expected = ['Dallas', 'Houston']
-        if not connection.features.supports_real_shape_operations:
-            expected.append('Oklahoma City')
-        self.assertEqual(
-            list(tex_cities.values_list('name', flat=True)),
-            expected
-        )
+        self.assertEqual(list(tex_cities.values_list('name', flat=True)), ['Dallas', 'Houston'])
 
     def test_non_concrete_field(self):
         NonConcreteModel.objects.create(point=Point(0, 0), name='name')

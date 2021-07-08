@@ -4,6 +4,7 @@
 # yakky <i.spalletti@nephila.it>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Marco Bonetti, 2014
+# Mirco Grillo <mirco.grillomg@gmail.com>, 2020
 # Nicola Larosa <transifex@teknico.net>, 2012
 # palmux <palmux@gmail.com>, 2015
 # Mattia Procopio <promat85@gmail.com>, 2015
@@ -11,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-22 13:33+0000\n"
-"Last-Translator: palmux <palmux@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-07-23 08:59+0000\n"
+"Last-Translator: Mirco Grillo <mirco.grillomg@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -29,9 +30,9 @@ msgid "The base GIS field."
 msgstr "Il campo GIS base."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
-"Il campo base GIS -- corrisponde al tipo Geometry delle specifiche OpenGIS."
+"Il campo Geometry -- corrisponde al tipo Geometry delle specifiche OpenGIS."
 
 msgid "Point"
 msgstr "Punto"
@@ -82,9 +83,6 @@ msgstr "Cancella tutti gli oggetti"
 msgid "WKT debugging window:"
 msgstr "Finestra di debug WKT:"
 
-msgid "Google Maps via GeoDjango"
-msgstr "Google Maps da GeoDjango"
-
 msgid "Debugging window (serialized value)"
 msgstr "Finestra di debug (valore serializzato)"
 
@@ -92,5 +90,5 @@ msgid "No feeds are registered."
 msgstr "Non ci sono feed registrati."
 
 #, python-format
-msgid "Slug %r isn't registered."
+msgid "Slug %r isn’t registered."
 msgstr "Lo slug %r non è registrato."

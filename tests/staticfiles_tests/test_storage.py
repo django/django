@@ -4,12 +4,14 @@ import sys
 import tempfile
 import unittest
 from io import StringIO
+from pathlib import Path
+from unittest import mock
 
 from django.conf import settings
 from django.contrib.staticfiles import finders, storage
-from django.contrib.staticfiles.management.commands.collectstatic import \
-    Command as CollectstaticCommand
-from django.core.cache.backends.base import BaseCache
+from django.contrib.staticfiles.management.commands.collectstatic import (
+    Command as CollectstaticCommand,
+)
 from django.core.management import call_command
 from django.test import override_settings
 
@@ -25,14 +27,9 @@ def hashed_file_path(test, path):
 class TestHashedFiles:
     hashed_file_path = hashed_file_path
 
-    def setUp(self):
-        self._max_post_process_passes = storage.staticfiles_storage.max_post_process_passes
-        super().setUp()
-
     def tearDown(self):
         # Clear hashed files to avoid side effects among tests.
         storage.staticfiles_storage.hashed_files.clear()
-        storage.staticfiles_storage.max_post_process_passes = self._max_post_process_passes
 
     def assertPostCondition(self):
         """
@@ -42,9 +39,6 @@ class TestHashedFiles:
         pass
 
     def test_template_tag_return(self):
-        """
-        Test the CachedStaticFilesStorage backend.
-        """
         self.assertStaticRaises(ValueError, "does/not/exist.png", "/static/does/not/exist.png")
         self.assertStaticRenders("test/file.txt", "/static/test/file.dad0999e4f8f.txt")
         self.assertStaticRenders("test/file.txt", "/static/test/file.dad0999e4f8f.txt", asvar=True)
@@ -95,10 +89,10 @@ class TestHashedFiles:
 
     def test_path_with_querystring_and_fragment(self):
         relpath = self.hashed_file_path("cached/css/fragments.css")
-        self.assertEqual(relpath, "cached/css/fragments.c4e6753b52d3.css")
+        self.assertEqual(relpath, "cached/css/fragments.a60c0e74834f.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
-            self.assertIn(b'fonts/font.a4b0478549d0.eot?#iefix', content)
+            self.assertIn(b'fonts/font.b9b105392eb8.eot?#iefix', content)
             self.assertIn(b'fonts/font.b8d603e42714.svg#webfontIyfZbseF', content)
             self.assertIn(b'fonts/font.b8d603e42714.svg#path/to/../../fonts/font.svg', content)
             self.assertIn(b'data:font/woff;charset=utf-8;base64,d09GRgABAAAAADJoAA0AAAAAR2QAAQAAAAAAAAAAAAA', content)
@@ -165,6 +159,52 @@ class TestHashedFiles:
             self.assertIn(b"https://", relfile.read())
         self.assertPostCondition()
 
+    def test_module_import(self):
+        relpath = self.hashed_file_path('cached/module.js')
+        self.assertEqual(relpath, 'cached/module.91b9cf9935da.js')
+        tests = [
+            # Relative imports.
+            b'import testConst from "./module_test.d489af3cf882.js";',
+            b'import relativeModule from "../nested/js/nested.866475c46bb4.js";',
+            b'import { firstConst, secondConst } from "./module_test.d489af3cf882.js";',
+            # Absolute import.
+            b'import rootConst from "/static/absolute_root.5586327fe78c.js";',
+            # Dynamic import.
+            b'const dynamicModule = import("./module_test.d489af3cf882.js");',
+            # Creating a module object.
+            b'import * as NewModule from "./module_test.d489af3cf882.js";',
+            # Aliases.
+            b'import { testConst as alias } from "./module_test.d489af3cf882.js";',
+            b'import {\n'
+            b'    firstVar as firstVarAlias,\n'
+            b'    secondVar as secondVarAlias\n'
+            b'} from "./module_test.d489af3cf882.js";',
+        ]
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            for module_import in tests:
+                with self.subTest(module_import=module_import):
+                    self.assertIn(module_import, content)
+        self.assertPostCondition()
+
+    def test_aggregating_modules(self):
+        relpath = self.hashed_file_path('cached/module.js')
+        self.assertEqual(relpath, 'cached/module.91b9cf9935da.js')
+        tests = [
+            b'export * from "./module_test.d489af3cf882.js";',
+            b'export { testConst } from "./module_test.d489af3cf882.js";',
+            b'export {\n'
+            b'    firstVar as firstVarAlias,\n'
+            b'    secondVar as secondVarAlias\n'
+            b'} from "./module_test.d489af3cf882.js";',
+        ]
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            for module_import in tests:
+                with self.subTest(module_import=module_import):
+                    self.assertIn(module_import, content)
+        self.assertPostCondition()
+
     @override_settings(
         STATICFILES_DIRS=[os.path.join(TEST_ROOT, 'project', 'loop')],
         STATICFILES_FINDERS=['django.contrib.staticfiles.finders.FileSystemFinder'],
@@ -204,6 +244,8 @@ class TestHashedFiles:
         self.assertIn(os.path.join('cached', 'css', 'window.css'), stats['post_processed'])
         self.assertIn(os.path.join('cached', 'css', 'img', 'window.png'), stats['unmodified'])
         self.assertIn(os.path.join('test', 'nonascii.css'), stats['post_processed'])
+        # No file should be yielded twice.
+        self.assertCountEqual(stats['post_processed'], set(stats['post_processed']))
         self.assertPostCondition()
 
     def test_css_import_case_insensitive(self):
@@ -213,6 +255,30 @@ class TestHashedFiles:
             content = relfile.read()
             self.assertNotIn(b"cached/other.css", content)
             self.assertIn(b"other.d41d8cd98f00.css", content)
+        self.assertPostCondition()
+
+    def test_js_source_map(self):
+        relpath = self.hashed_file_path('cached/source_map.js')
+        self.assertEqual(relpath, 'cached/source_map.9371cbb02a26.js')
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            self.assertNotIn(b'//# sourceMappingURL=source_map.js.map', content)
+            self.assertIn(
+                b'//# sourceMappingURL=source_map.js.99914b932bd3.map',
+                content,
+            )
+        self.assertPostCondition()
+
+    def test_js_source_map_sensitive(self):
+        relpath = self.hashed_file_path('cached/source_map_sensitive.js')
+        self.assertEqual(relpath, 'cached/source_map_sensitive.5da96fdd3cb3.js')
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            self.assertIn(b'//# sOuRcEMaPpInGURL=source_map.js.map', content)
+            self.assertNotIn(
+                b'//# sourceMappingURL=source_map.js.99914b932bd3.map',
+                content,
+            )
         self.assertPostCondition()
 
     @override_settings(
@@ -231,77 +297,8 @@ class TestHashedFiles:
         self.assertPostCondition()
 
 
-@override_settings(
-    STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage',
-)
-class TestCollectionCachedStorage(TestHashedFiles, CollectionTestCase):
-    """
-    Tests for the Cache busting storage
-    """
-    def test_cache_invalidation(self):
-        name = "cached/styles.css"
-        hashed_name = "cached/styles.5e0040571e1a.css"
-        # check if the cache is filled correctly as expected
-        cache_key = storage.staticfiles_storage.hash_key(name)
-        cached_name = storage.staticfiles_storage.hashed_files.get(cache_key)
-        self.assertEqual(self.hashed_file_path(name), cached_name)
-        # clearing the cache to make sure we re-set it correctly in the url method
-        storage.staticfiles_storage.hashed_files.clear()
-        cached_name = storage.staticfiles_storage.hashed_files.get(cache_key)
-        self.assertIsNone(cached_name)
-        self.assertEqual(self.hashed_file_path(name), hashed_name)
-        cached_name = storage.staticfiles_storage.hashed_files.get(cache_key)
-        self.assertEqual(cached_name, hashed_name)
-
-        # Check files that had to be hashed multiple times since their content
-        # includes other files that were hashed.
-        name = 'cached/relative.css'
-        hashed_name = 'cached/relative.c3e9e1ea6f2e.css'
-        cache_key = storage.staticfiles_storage.hash_key(name)
-        cached_name = storage.staticfiles_storage.hashed_files.get(cache_key)
-        self.assertIsNone(cached_name)
-        self.assertEqual(self.hashed_file_path(name), hashed_name)
-        cached_name = storage.staticfiles_storage.hashed_files.get(cache_key)
-        self.assertEqual(cached_name, hashed_name)
-
-    def test_cache_key_memcache_validation(self):
-        """
-        Handle cache key creation correctly, see #17861.
-        """
-        name = (
-            "/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff"
-            "/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff"
-            "/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff"
-            "/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff"
-            "/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff"
-            "/some crazy/\x16\xb4"
-        )
-        cache_key = storage.staticfiles_storage.hash_key(name)
-        cache_validator = BaseCache({})
-        cache_validator.validate_key(cache_key)
-        self.assertEqual(cache_key, 'staticfiles:821ea71ef36f95b3922a77f7364670e7')
-
-    def test_corrupt_intermediate_files(self):
-        configured_storage = storage.staticfiles_storage
-        # Clear cache to force rehashing of the files
-        configured_storage.hashed_files.clear()
-        # Simulate a corrupt chain of intermediate files by ensuring they don't
-        # resolve before the max post-process count, which would normally be
-        # high enough.
-        configured_storage.max_post_process_passes = 1
-        # File without intermediates that can be rehashed without a problem.
-        self.hashed_file_path('cached/css/img/window.png')
-        # File with too many intermediates to rehash with the low max
-        # post-process passes.
-        err_msg = "The name 'cached/styles.css' could not be hashed with %r." % (configured_storage._wrapped,)
-        with self.assertRaisesMessage(ValueError, err_msg):
-            self.hashed_file_path('cached/styles.css')
-
-
-@override_settings(
-    STATICFILES_STORAGE='staticfiles_tests.storage.ExtraPatternsCachedStaticFilesStorage',
-)
-class TestExtraPatternsCachedStorage(CollectionTestCase):
+@override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.ExtraPatternsStorage')
+class TestExtraPatternsStorage(CollectionTestCase):
 
     def setUp(self):
         storage.staticfiles_storage.hashed_files.clear()  # avoid cache interference
@@ -347,7 +344,8 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
             f.write('to be deleted in one test')
 
         self.patched_settings = self.settings(
-            STATICFILES_DIRS=settings.STATICFILES_DIRS + [temp_dir])
+            STATICFILES_DIRS=settings.STATICFILES_DIRS + [temp_dir],
+        )
         self.patched_settings.enable()
         self.addCleanup(shutil.rmtree, temp_dir)
         self._manifest_strict = storage.staticfiles_storage.manifest_strict
@@ -373,6 +371,15 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         filename = storage.staticfiles_storage.manifest_name
         path = storage.staticfiles_storage.path(filename)
         self.assertTrue(os.path.exists(path))
+
+    def test_manifest_does_not_exist(self):
+        storage.staticfiles_storage.manifest_name = 'does.not.exist.json'
+        self.assertIsNone(storage.staticfiles_storage.read_manifest())
+
+    def test_manifest_does_not_ignore_permission_error(self):
+        with mock.patch('builtins.open', side_effect=PermissionError):
+            with self.assertRaises(PermissionError):
+                storage.staticfiles_storage.read_manifest()
 
     def test_loaded_cache(self):
         self.assertNotEqual(storage.staticfiles_storage.hashed_files, {})
@@ -434,14 +441,42 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         # File exists on disk
         self.hashed_file_path(missing_file_name)
 
+    def test_intermediate_files(self):
+        cached_files = os.listdir(os.path.join(settings.STATIC_ROOT, 'cached'))
+        # Intermediate files shouldn't be created for reference.
+        self.assertEqual(
+            len([
+                cached_file
+                for cached_file in cached_files
+                if cached_file.startswith('relative.')
+            ]),
+            2,
+        )
+
+
+@override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.NoneHashStorage')
+class TestCollectionNoneHashStorage(CollectionTestCase):
+    hashed_file_path = hashed_file_path
+
+    def test_hashed_name(self):
+        relpath = self.hashed_file_path('cached/styles.css')
+        self.assertEqual(relpath, 'cached/styles.css')
+
 
 @override_settings(
-    STATICFILES_STORAGE='staticfiles_tests.storage.SimpleCachedStaticFilesStorage',
+    STATICFILES_STORAGE='staticfiles_tests.storage.NoPostProcessReplacedPathStorage'
 )
-class TestCollectionSimpleCachedStorage(CollectionTestCase):
-    """
-    Tests for the Cache busting storage
-    """
+class TestCollectionNoPostProcessReplacedPaths(CollectionTestCase):
+    run_collectstatic_in_setUp = False
+
+    def test_collectstatistic_no_post_process_replaced_paths(self):
+        stdout = StringIO()
+        self.run_collectstatic(verbosity=1, stdout=stdout)
+        self.assertIn('post-processed', stdout.getvalue())
+
+
+@override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.SimpleStorage')
+class TestCollectionSimpleStorage(CollectionTestCase):
     hashed_file_path = hashed_file_path
 
     def setUp(self):
@@ -449,9 +484,6 @@ class TestCollectionSimpleCachedStorage(CollectionTestCase):
         super().setUp()
 
     def test_template_tag_return(self):
-        """
-        Test the CachedStaticFilesStorage backend.
-        """
         self.assertStaticRaises(ValueError, "does/not/exist.png", "/static/does/not/exist.png")
         self.assertStaticRenders("test/file.txt", "/static/test/file.deploy12345.txt")
         self.assertStaticRenders("cached/styles.css", "/static/cached/styles.deploy12345.css")
@@ -477,7 +509,7 @@ class CustomStaticFilesStorage(storage.StaticFilesStorage):
         super().__init__(*args, **kwargs)
 
 
-@unittest.skipIf(sys.platform.startswith('win'), "Windows only partially supports chmod.")
+@unittest.skipIf(sys.platform == 'win32', "Windows only partially supports chmod.")
 class TestStaticFilePermissions(CollectionTestCase):
 
     command_params = {
@@ -505,12 +537,19 @@ class TestStaticFilePermissions(CollectionTestCase):
     )
     def test_collect_static_files_permissions(self):
         call_command('collectstatic', **self.command_params)
-        test_file = os.path.join(settings.STATIC_ROOT, "test.txt")
-        test_dir = os.path.join(settings.STATIC_ROOT, "subdir")
-        file_mode = os.stat(test_file)[0] & 0o777
-        dir_mode = os.stat(test_dir)[0] & 0o777
+        static_root = Path(settings.STATIC_ROOT)
+        test_file = static_root / 'test.txt'
+        file_mode = test_file.stat().st_mode & 0o777
         self.assertEqual(file_mode, 0o655)
-        self.assertEqual(dir_mode, 0o765)
+        tests = [
+            static_root / 'subdir',
+            static_root / 'nested',
+            static_root / 'nested' / 'css',
+        ]
+        for directory in tests:
+            with self.subTest(directory=directory):
+                dir_mode = directory.stat().st_mode & 0o777
+                self.assertEqual(dir_mode, 0o765)
 
     @override_settings(
         FILE_UPLOAD_PERMISSIONS=None,
@@ -518,12 +557,19 @@ class TestStaticFilePermissions(CollectionTestCase):
     )
     def test_collect_static_files_default_permissions(self):
         call_command('collectstatic', **self.command_params)
-        test_file = os.path.join(settings.STATIC_ROOT, "test.txt")
-        test_dir = os.path.join(settings.STATIC_ROOT, "subdir")
-        file_mode = os.stat(test_file)[0] & 0o777
-        dir_mode = os.stat(test_dir)[0] & 0o777
+        static_root = Path(settings.STATIC_ROOT)
+        test_file = static_root / 'test.txt'
+        file_mode = test_file.stat().st_mode & 0o777
         self.assertEqual(file_mode, 0o666 & ~self.umask)
-        self.assertEqual(dir_mode, 0o777 & ~self.umask)
+        tests = [
+            static_root / 'subdir',
+            static_root / 'nested',
+            static_root / 'nested' / 'css',
+        ]
+        for directory in tests:
+            with self.subTest(directory=directory):
+                dir_mode = directory.stat().st_mode & 0o777
+                self.assertEqual(dir_mode, 0o777 & ~self.umask)
 
     @override_settings(
         FILE_UPLOAD_PERMISSIONS=0o655,
@@ -532,16 +578,23 @@ class TestStaticFilePermissions(CollectionTestCase):
     )
     def test_collect_static_files_subclass_of_static_storage(self):
         call_command('collectstatic', **self.command_params)
-        test_file = os.path.join(settings.STATIC_ROOT, "test.txt")
-        test_dir = os.path.join(settings.STATIC_ROOT, "subdir")
-        file_mode = os.stat(test_file)[0] & 0o777
-        dir_mode = os.stat(test_dir)[0] & 0o777
+        static_root = Path(settings.STATIC_ROOT)
+        test_file = static_root / 'test.txt'
+        file_mode = test_file.stat().st_mode & 0o777
         self.assertEqual(file_mode, 0o640)
-        self.assertEqual(dir_mode, 0o740)
+        tests = [
+            static_root / 'subdir',
+            static_root / 'nested',
+            static_root / 'nested' / 'css',
+        ]
+        for directory in tests:
+            with self.subTest(directory=directory):
+                dir_mode = directory.stat().st_mode & 0o777
+                self.assertEqual(dir_mode, 0o740)
 
 
 @override_settings(
-    STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage',
+    STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage',
 )
 class TestCollectionHashedFilesCache(CollectionTestCase):
     """

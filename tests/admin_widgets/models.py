@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -16,7 +18,12 @@ class Member(models.Model):
         return self.name
 
 
-class Band(models.Model):
+class Artist(models.Model):
+    pass
+
+
+class Band(Artist):
+    uuid = models.UUIDField(unique=True, default=uuid.uuid4)
     name = models.CharField(max_length=100)
     style = models.CharField(max_length=20)
     members = models.ManyToManyField(Member)
@@ -25,14 +32,42 @@ class Band(models.Model):
         return self.name
 
 
+class UnsafeLimitChoicesTo(models.Model):
+    band = models.ForeignKey(
+        Band,
+        models.CASCADE,
+        limit_choices_to={'name': '"&><escapeme'},
+    )
+
+
 class Album(models.Model):
-    band = models.ForeignKey(Band, models.CASCADE)
+    band = models.ForeignKey(Band, models.CASCADE, to_field='uuid')
+    featuring = models.ManyToManyField(Band, related_name='featured')
     name = models.CharField(max_length=100)
     cover_art = models.FileField(upload_to='albums')
     backside_art = MyFileField(upload_to='albums_back', null=True)
 
     def __str__(self):
         return self.name
+
+
+class ReleaseEvent(models.Model):
+    """
+    Used to check that autocomplete widget correctly resolves attname for FK as
+    PK example.
+    """
+    album = models.ForeignKey(Album, models.CASCADE, primary_key=True)
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class VideoStream(models.Model):
+    release_event = models.ForeignKey(ReleaseEvent, models.CASCADE)
 
 
 class HiddenInventoryManager(models.Manager):
@@ -91,6 +126,7 @@ class CarTire(models.Model):
 
 
 class Honeycomb(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     location = models.CharField(max_length=20)
 
 
@@ -131,11 +167,11 @@ class Advisor(models.Model):
 class Student(models.Model):
     name = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ('name',)
+
+    def __str__(self):
+        return self.name
 
 
 class School(models.Model):

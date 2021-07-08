@@ -1,5 +1,3 @@
-from django.utils.encoding import force_text
-
 # Levels
 DEBUG = 10
 INFO = 20
@@ -11,7 +9,8 @@ CRITICAL = 50
 class CheckMessage:
 
     def __init__(self, level, msg, hint=None, obj=None, id=None):
-        assert isinstance(level, int), "The first argument should be level."
+        if not isinstance(level, int):
+            raise TypeError('The first argument should be level.')
         self.level = level
         self.msg = msg
         self.hint = hint
@@ -35,7 +34,7 @@ class CheckMessage:
             # method doesn't return "applabel.modellabel" and cannot be changed.
             obj = self.obj._meta.label
         else:
-            obj = force_text(self.obj)
+            obj = str(self.obj)
         id = "(%s) " % self.id if self.id else ""
         hint = "\n\tHINT: %s" % self.hint if self.hint else ''
         return "%s: %s%s%s" % (obj, id, self.msg, hint)

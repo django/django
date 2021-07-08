@@ -6,7 +6,8 @@ from .models import Choice, Poll, User
 
 class ReverseLookupTests(TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         john = User.objects.create(name="John Doe")
         jim = User.objects.create(name="Jim Bo")
         first_poll = Poll.objects.create(
@@ -38,13 +39,16 @@ class ReverseLookupTests(TestCase):
         p1 = Poll.objects.get(poll_choice__name__exact="This is the answer.")
         self.assertEqual(p1.question, "What's the first question?")
 
-        p2 = Poll.objects.get(
-            related_choice__name__exact="This is the answer.")
+        p2 = Poll.objects.get(related_choice__name__exact='This is the answer.')
         self.assertEqual(p2.question, "What's the second question?")
 
     def test_reverse_field_name_disallowed(self):
         """
         If a related_name is given you can't use the field name instead
         """
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'choice' into field. Choices are: "
+            "creator, creator_id, id, poll_choice, question, related_choice"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Poll.objects.get(choice__name__exact="This is the answer")

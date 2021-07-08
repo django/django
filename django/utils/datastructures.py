@@ -1,15 +1,14 @@
 import copy
-from collections import OrderedDict
+from collections.abc import Mapping
 
 
 class OrderedSet:
     """
     A set which keeps the ordering of the inserted items.
-    Currently backs onto OrderedDict.
     """
 
     def __init__(self, iterable=None):
-        self.dict = OrderedDict(((x, None) for x in iterable) if iterable else [])
+        self.dict = dict.fromkeys(iterable or ())
 
     def add(self, item):
         self.dict[item] = None
@@ -24,7 +23,10 @@ class OrderedSet:
             pass
 
     def __iter__(self):
-        return iter(self.dict.keys())
+        return iter(self.dict)
+
+    def __reversed__(self):
+        return reversed(self.dict)
 
     def __contains__(self, item):
         return item in self.dict
@@ -34,6 +36,10 @@ class OrderedSet:
 
     def __len__(self):
         return len(self.dict)
+
+    def __repr__(self):
+        data = repr(list(self.dict)) if self.dict else ''
+        return f'{self.__class__.__qualname__}({data})'
 
 
 class MultiValueDictKeyError(KeyError):
@@ -76,7 +82,7 @@ class MultiValueDict(dict):
         try:
             list_ = super().__getitem__(key)
         except KeyError:
-            raise MultiValueDictKeyError(repr(key))
+            raise MultiValueDictKeyError(key)
         try:
             return list_[-1]
         except IndexError:
@@ -91,9 +97,7 @@ class MultiValueDict(dict):
             for k, v in self.lists()
         ])
 
-    def __deepcopy__(self, memo=None):
-        if memo is None:
-            memo = {}
+    def __deepcopy__(self, memo):
         result = self.__class__()
         memo[id(self)] = result
         for key, value in dict.items(self):
@@ -102,9 +106,7 @@ class MultiValueDict(dict):
         return result
 
     def __getstate__(self):
-        obj_dict = self.__dict__.copy()
-        obj_dict['_data'] = {k: self._getlist(k) for k in self}
-        return obj_dict
+        return {**self.__dict__, '_data': {k: self._getlist(k) for k in self}}
 
     def __setstate__(self, obj_dict):
         data = obj_dict.pop('_data', {})
@@ -197,18 +199,17 @@ class MultiValueDict(dict):
     def update(self, *args, **kwargs):
         """Extend rather than replace existing key lists."""
         if len(args) > 1:
-            raise TypeError("update expected at most 1 arguments, got %d" % len(args))
+            raise TypeError("update expected at most 1 argument, got %d" % len(args))
         if args:
-            other_dict = args[0]
-            if isinstance(other_dict, MultiValueDict):
-                for key, value_list in other_dict.lists():
+            arg = args[0]
+            if isinstance(arg, MultiValueDict):
+                for key, value_list in arg.lists():
                     self.setlistdefault(key).extend(value_list)
             else:
-                try:
-                    for key, value in other_dict.items():
-                        self.setlistdefault(key).append(value)
-                except TypeError:
-                    raise ValueError("MultiValueDict.update() takes either a MultiValueDict or dictionary")
+                if isinstance(arg, Mapping):
+                    arg = arg.items()
+                for key, value in arg:
+                    self.setlistdefault(key).append(value)
         for key, value in kwargs.items():
             self.setlistdefault(key).append(value)
 
@@ -235,11 +236,8 @@ class ImmutableList(tuple):
         self.warning = warning
         return self
 
-    def complain(self, *wargs, **kwargs):
-        if isinstance(self.warning, Exception):
-            raise self.warning
-        else:
-            raise AttributeError(self.warning)
+    def complain(self, *args, **kwargs):
+        raise AttributeError(self.warning)
 
     # All list mutation functions complain.
     __delitem__ = complain
@@ -277,12 +275,68 @@ class DictWrapper(dict):
         present). If the prefix is present, pass the value through self.func
         before returning, otherwise return the raw value.
         """
-        if key.startswith(self.prefix):
-            use_func = True
+        use_func = key.startswith(self.prefix)
+        if use_func:
             key = key[len(self.prefix):]
-        else:
-            use_func = False
         value = super().__getitem__(key)
         if use_func:
             return self.func(value)
         return value
+
+
+def _destruct_iterable_mapping_values(data):
+    for i, elem in enumerate(data):
+        if len(elem) != 2:
+            raise ValueError(
+                'dictionary update sequence element #{} has '
+                'length {}; 2 is required.'.format(i, len(elem))
+            )
+        if not isinstance(elem[0], str):
+            raise ValueError('Element key %r invalid, only strings are allowed' % elem[0])
+        yield tuple(elem)
+
+
+class CaseInsensitiveMapping(Mapping):
+    """
+    Mapping allowing case-insensitive key lookups. Original case of keys is
+    preserved for iteration and string representation.
+
+    Example::
+
+        >>> ci_map = CaseInsensitiveMapping({'name': 'Jane'})
+        >>> ci_map['Name']
+        Jane
+        >>> ci_map['NAME']
+        Jane
+        >>> ci_map['name']
+        Jane
+        >>> ci_map  # original case preserved
+        {'name': 'Jane'}
+    """
+
+    def __init__(self, data):
+        if not isinstance(data, Mapping):
+            data = {k: v for k, v in _destruct_iterable_mapping_values(data)}
+        self._store = {k.lower(): (k, v) for k, v in data.items()}
+
+    def __getitem__(self, key):
+        return self._store[key.lower()][1]
+
+    def __len__(self):
+        return len(self._store)
+
+    def __eq__(self, other):
+        return isinstance(other, Mapping) and {
+            k.lower(): v for k, v in self.items()
+        } == {
+            k.lower(): v for k, v in other.items()
+        }
+
+    def __iter__(self):
+        return (original_key for original_key, value in self._store.values())
+
+    def __repr__(self):
+        return repr({key: value for key, value in self._store.values()})
+
+    def copy(self):
+        return self

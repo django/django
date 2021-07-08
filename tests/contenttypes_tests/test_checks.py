@@ -1,5 +1,6 @@
 from unittest import mock
 
+from django.contrib.contenttypes.checks import check_model_name_lengths
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
@@ -216,3 +217,20 @@ class GenericRelationTests(SimpleTestCase):
                 id='fields.E001',
             )
         ])
+
+
+@isolate_apps('contenttypes_tests', attr_name='apps')
+class ModelCheckTests(SimpleTestCase):
+    def test_model_name_too_long(self):
+        model = type('A' * 101, (models.Model,), {'__module__': self.__module__})
+        self.assertEqual(check_model_name_lengths(self.apps.get_app_configs()), [
+            checks.Error(
+                'Model names must be at most 100 characters (got 101).',
+                obj=model,
+                id='contenttypes.E005',
+            )
+        ])
+
+    def test_model_name_max_length(self):
+        type('A' * 100, (models.Model,), {'__module__': self.__module__})
+        self.assertEqual(check_model_name_lengths(self.apps.get_app_configs()), [])

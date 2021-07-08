@@ -4,16 +4,16 @@
 # Bayarkhuu Bataa, 2014
 # Claude Paroz <claude@2xlibre.net>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Zorig <zorig_ezd@yahoo.com>, 2013-2014,2016
+# Zorig <zorig_ezd@yahoo.com>, 2013-2014,2016-2017
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2014-2015
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:51+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"Last-Translator: Zorig <zorig_ezd@yahoo.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
@@ -141,7 +141,7 @@ msgid "Arguments"
 msgstr "Аргументүүд"
 
 msgid "Back to Model documentation"
-msgstr ""
+msgstr "Моделийн баримтруу буцах"
 
 msgid "Model documentation"
 msgstr "Моделийн баримт"
@@ -216,7 +216,7 @@ msgid "Templates:"
 msgstr "Загварууд:"
 
 msgid "Back to View documentation"
-msgstr ""
+msgstr "Харагдац баримтруу буцах"
 
 msgid "View documentation"
 msgstr "Харагдац баримт"
@@ -242,13 +242,6 @@ msgid ""
 msgstr ""
 "\n"
 "Функц харах: <code>%(full_name)s</code>. Нэр: <code>%(url_name)s</code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Boolean (Үнэн худлын аль нэг нь)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Талбарийн төрөл нь : %(field_type)s"
 
 msgid "tag:"
 msgstr "шошго:"

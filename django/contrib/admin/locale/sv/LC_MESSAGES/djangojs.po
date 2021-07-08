@@ -4,16 +4,17 @@
 # Andreas Pelme <andreas@pelme.se>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2014
-# Mattias Jansson <mattias@colourandcode.se>, 2011
+# Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
+# Mattias Benjaminsson <mattias@colourandcode.se>, 2011
 # Samuel Linde <samuel@linde.im>, 2011
-# Thomas Lundqvist <thomas@biljettshop.se>, 2016
+# Thomas Lundqvist, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 10:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"Last-Translator: Mattias Hansson <mattias.gothenburg@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -103,26 +104,8 @@ msgstr ""
 "Du har markerat en operation och du har inte gjort några ändringar i "
 "enskilda fält. Du letar antagligen efter Utför-knappen snarare än Spara."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Notera: Du är %s timme före serverns tid."
-msgstr[1] "Notera: Du är %s timmar före serverns tid."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Notera: Du är %s timme efter serverns tid."
-msgstr[1] "Notera: Du är %s timmar efter serverns tid."
-
 msgid "Now"
 msgstr "Nu"
-
-msgid "Choose a Time"
-msgstr "Välj en tidpunkt"
-
-msgid "Choose a time"
-msgstr "Välj en tidpunkt"
 
 msgid "Midnight"
 msgstr "Midnatt"
@@ -135,6 +118,24 @@ msgstr "Middag"
 
 msgid "6 p.m."
 msgstr "6 p.m."
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Notera: Du är %s timme före serverns tid."
+msgstr[1] "Notera: Du är %s timmar före serverns tid."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Notera: Du är %s timme efter serverns tid."
+msgstr[1] "Notera: Du är %s timmar efter serverns tid."
+
+msgid "Choose a Time"
+msgstr "Välj en tidpunkt"
+
+msgid "Choose a time"
+msgstr "Välj en tidpunkt"
 
 msgid "Cancel"
 msgstr "Avbryt"
@@ -152,68 +153,68 @@ msgid "Tomorrow"
 msgstr "I morgon"
 
 msgid "January"
-msgstr ""
+msgstr "januari"
 
 msgid "February"
-msgstr ""
+msgstr "februari"
 
 msgid "March"
-msgstr ""
+msgstr "mars"
 
 msgid "April"
-msgstr ""
+msgstr "april"
 
 msgid "May"
-msgstr ""
+msgstr "maj"
 
 msgid "June"
-msgstr ""
+msgstr "juni"
 
 msgid "July"
-msgstr ""
+msgstr "juli"
 
 msgid "August"
-msgstr ""
+msgstr "augusti"
 
 msgid "September"
-msgstr ""
+msgstr "september"
 
 msgid "October"
-msgstr ""
+msgstr "oktober"
 
 msgid "November"
-msgstr ""
+msgstr "november"
 
 msgid "December"
-msgstr ""
+msgstr "december"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "S"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "M"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "T"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "O"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "T"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "F"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "L"
 
 msgid "Show"
 msgstr "Visa"

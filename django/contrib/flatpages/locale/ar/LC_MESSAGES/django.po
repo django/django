@@ -5,14 +5,15 @@
 # Bashar Al-Abdulhadi, 2014
 # Eyad Toma <d.eyad.t@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Muaaz Alsaied, 2020
 # Ossama Khayat <okhayat@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 21:27+0000\n"
-"Last-Translator: Bashar Al-Abdulhadi\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-04-02 11:30+0000\n"
+"Last-Translator: Muaaz Alsaied\n"
 "Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -31,14 +32,17 @@ msgid "URL"
 msgstr "رابط"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "مثال: '/about/contact/'. تأكد من وضع شرطات في البداية والنهاية."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
+msgstr "مثال: “/about/contact/”. تأكد من وضع فواصل مائلة في البداية والنهاية."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr ""
 "يجب أن تحتوي هذه القيمة الأحرف والأرقام والنقاط وعلامات _ و - و / أو ~ فقط."
+
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr "مثال: “/about/contact/”. تأكد من وضع فواصل مائلة في البداية."
 
 msgid "URL is missing a leading slash."
 msgstr "العنوان URL يفقد رمز / في بدايته."
@@ -63,10 +67,10 @@ msgid "template name"
 msgstr "اسم القالب"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
-"مثال: 'flatpages/contact_page.html'. إن لم تكن الصفحة موجودة، فسوف يستخدم "
+"مثال: “flatpages/contact_page.html”. إن لم يكن هذا موجوداً، فسوف يستخدم "
 "النظام 'flatpages/default.html'."
 
 msgid "registration required"

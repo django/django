@@ -1,6 +1,8 @@
 import copy
+import datetime
 
 from django.forms import Select
+from django.test import override_settings
 from django.utils.safestring import mark_safe
 
 from .base import WidgetTest
@@ -120,7 +122,7 @@ class SelectTest(WidgetTest):
             ),
         )
 
-    def test_choices_constuctor(self):
+    def test_choices_constructor(self):
         widget = Select(choices=[(1, 1), (2, 2), (3, 3)])
         self.check_html(widget, 'num', 2, html=(
             """<select name="num">
@@ -218,6 +220,34 @@ class SelectTest(WidgetTest):
             </select>"""
         ))
 
+    @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
+    def test_doesnt_localize_option_value(self):
+        choices = [
+            (1, 'One'),
+            (1000, 'One thousand'),
+            (1000000, 'One million'),
+        ]
+        html = """
+        <select name="number">
+        <option value="1">One</option>
+        <option value="1000">One thousand</option>
+        <option value="1000000">One million</option>
+        </select>
+        """
+        self.check_html(self.widget(choices=choices), 'number', None, html=html)
+
+        choices = [
+            (datetime.time(0, 0), 'midnight'),
+            (datetime.time(12, 0), 'noon'),
+        ]
+        html = """
+        <select name="time">
+        <option value="00:00:00">midnight</option>
+        <option value="12:00:00">noon</option>
+        </select>
+        """
+        self.check_html(self.widget(choices=choices), 'time', None, html=html)
+
     def test_options(self):
         options = list(self.widget(choices=self.beatles).options(
             'name', ['J'], attrs={'class': 'super'},
@@ -227,13 +257,13 @@ class SelectTest(WidgetTest):
         self.assertEqual(options[0]['value'], 'J')
         self.assertEqual(options[0]['label'], 'John')
         self.assertEqual(options[0]['index'], '0')
-        self.assertEqual(options[0]['selected'], True)
+        self.assertIs(options[0]['selected'], True)
         # Template-related attributes
         self.assertEqual(options[1]['name'], 'name')
         self.assertEqual(options[1]['value'], 'P')
         self.assertEqual(options[1]['label'], 'Paul')
         self.assertEqual(options[1]['index'], '1')
-        self.assertEqual(options[1]['selected'], False)
+        self.assertIs(options[1]['selected'], False)
 
     def test_optgroups(self):
         choices = [
@@ -250,35 +280,84 @@ class SelectTest(WidgetTest):
         groups = list(self.widget(choices=choices).optgroups(
             'name', ['vhs'], attrs={'class': 'super'},
         ))
-        self.assertEqual(len(groups), 3)
-        self.assertEqual(groups[0][0], None)
-        self.assertEqual(groups[0][2], 0)
-        self.assertEqual(len(groups[0][1]), 1)
-        options = groups[0][1]
-        self.assertEqual(options[0]['name'], 'name')
-        self.assertEqual(options[0]['value'], 'unknown')
-        self.assertEqual(options[0]['label'], 'Unknown')
-        self.assertEqual(options[0]['index'], '0')
-        self.assertEqual(options[0]['selected'], False)
-        self.assertEqual(groups[1][0], 'Audio')
-        self.assertEqual(groups[1][2], 1)
-        self.assertEqual(len(groups[1][1]), 2)
-        options = groups[1][1]
-        self.assertEqual(options[0]['name'], 'name')
-        self.assertEqual(options[0]['value'], 'vinyl')
-        self.assertEqual(options[0]['label'], 'Vinyl')
-        self.assertEqual(options[0]['index'], '1_0')
-        self.assertEqual(options[1]['index'], '1_1')
-        self.assertEqual(groups[2][0], 'Video')
-        self.assertEqual(groups[2][2], 2)
-        self.assertEqual(len(groups[2][1]), 2)
-        options = groups[2][1]
-        self.assertEqual(options[0]['name'], 'name')
-        self.assertEqual(options[0]['value'], 'vhs')
-        self.assertEqual(options[0]['label'], 'VHS Tape')
-        self.assertEqual(options[0]['index'], '2_0')
-        self.assertEqual(options[0]['selected'], True)
-        self.assertEqual(options[1]['index'], '2_1')
+        audio, video, unknown = groups
+        label, options, index = audio
+        self.assertEqual(label, 'Audio')
+        self.assertEqual(
+            options,
+            [{
+                'value': 'vinyl',
+                'type': 'select',
+                'attrs': {},
+                'index': '0_0',
+                'label': 'Vinyl',
+                'template_name': 'django/forms/widgets/select_option.html',
+                'name': 'name',
+                'selected': False,
+                'wrap_label': True,
+            }, {
+                'value': 'cd',
+                'type': 'select',
+                'attrs': {},
+                'index': '0_1',
+                'label': 'CD',
+                'template_name': 'django/forms/widgets/select_option.html',
+                'name': 'name',
+                'selected': False,
+                'wrap_label': True,
+            }]
+        )
+        self.assertEqual(index, 0)
+        label, options, index = video
+        self.assertEqual(label, 'Video')
+        self.assertEqual(
+            options,
+            [{
+                'value': 'vhs',
+                'template_name': 'django/forms/widgets/select_option.html',
+                'label': 'VHS Tape',
+                'attrs': {'selected': True},
+                'index': '1_0',
+                'name': 'name',
+                'selected': True,
+                'type': 'select',
+                'wrap_label': True,
+            }, {
+                'value': 'dvd',
+                'template_name': 'django/forms/widgets/select_option.html',
+                'label': 'DVD',
+                'attrs': {},
+                'index': '1_1',
+                'name': 'name',
+                'selected': False,
+                'type': 'select',
+                'wrap_label': True,
+            }]
+        )
+        self.assertEqual(index, 1)
+        label, options, index = unknown
+        self.assertIsNone(label)
+        self.assertEqual(
+            options,
+            [{
+                'value': 'unknown',
+                'selected': False,
+                'template_name': 'django/forms/widgets/select_option.html',
+                'label': 'Unknown',
+                'attrs': {},
+                'index': '2',
+                'name': 'name',
+                'type': 'select',
+                'wrap_label': True,
+            }]
+        )
+        self.assertEqual(index, 2)
+
+    def test_optgroups_integer_choices(self):
+        """The option 'value' is the same type as what's in `choices`."""
+        groups = list(self.widget(choices=[[0, 'choice text']]).optgroups('name', ['vhs']))
+        label, options, index = groups[0]
+        self.assertEqual(options[0]['value'], 0)
 
     def test_deepcopy(self):
         """

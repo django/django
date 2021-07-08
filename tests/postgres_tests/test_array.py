@@ -1,31 +1,91 @@
 import decimal
+import enum
 import json
 import unittest
 import uuid
 
 from django import forms
-from django.core import exceptions, serializers, validators
+from django.core import checks, exceptions, serializers, validators
 from django.core.exceptions import FieldError
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
-from django.test import TransactionTestCase, override_settings
+from django.db.models.expressions import Exists, OuterRef, RawSQL, Value
+from django.db.models.functions import Cast, JSONObject, Upper
+from django.test import TransactionTestCase, modify_settings, override_settings
 from django.test.utils import isolate_apps
 from django.utils import timezone
 
-from . import PostgreSQLTestCase
+from . import (
+    PostgreSQLSimpleTestCase, PostgreSQLTestCase, PostgreSQLWidgetTestCase,
+)
 from .models import (
-    ArrayFieldSubclass, CharArrayModel, DateTimeArrayModel, IntegerArrayModel,
-    NestedIntegerArrayModel, NullableIntegerArrayModel, OtherTypesArrayModel,
-    PostgreSQLModel, Tag,
+    ArrayEnumModel, ArrayFieldSubclass, CharArrayModel, DateTimeArrayModel,
+    IntegerArrayModel, NestedIntegerArrayModel, NullableIntegerArrayModel,
+    OtherTypesArrayModel, PostgreSQLModel, Tag,
 )
 
 try:
+    from psycopg2.extras import NumericRange
+
+    from django.contrib.postgres.aggregates import ArrayAgg
+    from django.contrib.postgres.expressions import ArraySubquery
     from django.contrib.postgres.fields import ArrayField
+    from django.contrib.postgres.fields.array import (
+        IndexTransform, SliceTransform,
+    )
     from django.contrib.postgres.forms import (
         SimpleArrayField, SplitArrayField, SplitArrayWidget,
     )
+    from django.db.backends.postgresql.base import PSYCOPG2_VERSION
 except ImportError:
     pass
+
+
+@isolate_apps('postgres_tests')
+class BasicTests(PostgreSQLSimpleTestCase):
+    def test_get_field_display(self):
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(
+                models.CharField(max_length=16),
+                choices=[
+                    ['Media', [(['vinyl', 'cd'], 'Audio')]],
+                    (('mp3', 'mp4'), 'Digital'),
+                ],
+            )
+
+        tests = (
+            (['vinyl', 'cd'], 'Audio'),
+            (('mp3', 'mp4'), 'Digital'),
+            (('a', 'b'), "('a', 'b')"),
+            (['c', 'd'], "['c', 'd']"),
+        )
+        for value, display in tests:
+            with self.subTest(value=value, display=display):
+                instance = MyModel(field=value)
+                self.assertEqual(instance.get_field_display(), display)
+
+    def test_get_field_display_nested_array(self):
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(
+                ArrayField(models.CharField(max_length=16)),
+                choices=[
+                    [
+                        'Media',
+                        [([['vinyl', 'cd'], ('x',)], 'Audio')],
+                    ],
+                    ((['mp3'], ('mp4',)), 'Digital'),
+                ],
+            )
+        tests = (
+            ([['vinyl', 'cd'], ('x',)], 'Audio'),
+            ((['mp3'], ('mp4',)), 'Digital'),
+            ((('a', 'b'), ('c',)), "(('a', 'b'), ('c',))"),
+            ([['a', 'b'], ['c']], "[['a', 'b'], ['c']]"),
+        )
+        for value, display in tests:
+            with self.subTest(value=value, display=display):
+                instance = MyModel(field=value)
+                self.assertEqual(instance.get_field_display(), display)
 
 
 class TestSaveLoad(PostgreSQLTestCase):
@@ -96,6 +156,12 @@ class TestSaveLoad(PostgreSQLTestCase):
             uuids=[uuid.uuid4()],
             decimals=[decimal.Decimal(1.25), 1.75],
             tags=[Tag(1), Tag(2), Tag(3)],
+            json=[{'a': 1}, {'b': 2}],
+            int_ranges=[NumericRange(10, 20), NumericRange(30, 40)],
+            bigint_ranges=[
+                NumericRange(7000000000, 10000000000),
+                NumericRange(50000000000, 70000000000),
+            ]
         )
         instance.save()
         loaded = OtherTypesArrayModel.objects.get()
@@ -103,6 +169,9 @@ class TestSaveLoad(PostgreSQLTestCase):
         self.assertEqual(instance.uuids, loaded.uuids)
         self.assertEqual(instance.decimals, loaded.decimals)
         self.assertEqual(instance.tags, loaded.tags)
+        self.assertEqual(instance.json, loaded.json)
+        self.assertEqual(instance.int_ranges, loaded.int_ranges)
+        self.assertEqual(instance.bigint_ranges, loaded.bigint_ranges)
 
     def test_null_from_db_value_handling(self):
         instance = OtherTypesArrayModel.objects.create(
@@ -113,6 +182,9 @@ class TestSaveLoad(PostgreSQLTestCase):
         )
         instance.refresh_from_db()
         self.assertIsNone(instance.tags)
+        self.assertEqual(instance.json, [])
+        self.assertIsNone(instance.int_ranges)
+        self.assertIsNone(instance.bigint_ranges)
 
     def test_model_set_on_base_field(self):
         instance = IntegerArrayModel()
@@ -120,22 +192,45 @@ class TestSaveLoad(PostgreSQLTestCase):
         self.assertEqual(field.model, IntegerArrayModel)
         self.assertEqual(field.base_field.model, IntegerArrayModel)
 
+    def test_nested_nullable_base_field(self):
+        if PSYCOPG2_VERSION < (2, 7, 5):
+            self.skipTest('See https://github.com/psycopg/psycopg2/issues/325')
+        instance = NullableIntegerArrayModel.objects.create(
+            field_nested=[[None, None], [None, None]],
+        )
+        self.assertEqual(instance.field_nested, [[None, None], [None, None]])
+
 
 class TestQuerying(PostgreSQLTestCase):
 
-    def setUp(self):
-        self.objs = [
-            NullableIntegerArrayModel.objects.create(field=[1]),
-            NullableIntegerArrayModel.objects.create(field=[2]),
-            NullableIntegerArrayModel.objects.create(field=[2, 3]),
-            NullableIntegerArrayModel.objects.create(field=[20, 30, 40]),
-            NullableIntegerArrayModel.objects.create(field=None),
-        ]
+    @classmethod
+    def setUpTestData(cls):
+        cls.objs = NullableIntegerArrayModel.objects.bulk_create([
+            NullableIntegerArrayModel(order=1, field=[1]),
+            NullableIntegerArrayModel(order=2, field=[2]),
+            NullableIntegerArrayModel(order=3, field=[2, 3]),
+            NullableIntegerArrayModel(order=4, field=[20, 30, 40]),
+            NullableIntegerArrayModel(order=5, field=None),
+        ])
+
+    def test_empty_list(self):
+        NullableIntegerArrayModel.objects.create(field=[])
+        obj = NullableIntegerArrayModel.objects.annotate(
+            empty_array=models.Value([], output_field=ArrayField(models.IntegerField())),
+        ).filter(field=models.F('empty_array')).get()
+        self.assertEqual(obj.field, [])
+        self.assertEqual(obj.empty_array, [])
 
     def test_exact(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__exact=[1]),
             self.objs[:1]
+        )
+
+    def test_exact_with_expression(self):
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__exact=[Value(1)]),
+            self.objs[:1],
         )
 
     def test_exact_charfield(self):
@@ -176,6 +271,15 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[:2]
         )
 
+    def test_in_subquery(self):
+        IntegerArrayModel.objects.create(field=[2, 3])
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(
+                field__in=IntegerArrayModel.objects.all().values_list('field', flat=True)
+            ),
+            self.objs[2:3]
+        )
+
     @unittest.expectedFailure
     def test_in_including_F_object(self):
         # This test asserts that Array objects passed to filters can be
@@ -199,21 +303,45 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[:2]
         )
 
-    @unittest.expectedFailure
     def test_contained_by_including_F_object(self):
-        # This test asserts that Array objects passed to filters can be
-        # constructed to contain F objects. This currently doesn't work as the
-        # psycopg2 mogrify method that generates the ARRAY() syntax is
-        # expecting literals, not column references (#27095).
         self.assertSequenceEqual(
-            NullableIntegerArrayModel.objects.filter(field__contained_by=[models.F('id'), 2]),
-            self.objs[:2]
+            NullableIntegerArrayModel.objects.filter(field__contained_by=[models.F('order'), 2]),
+            self.objs[:3],
         )
 
     def test_contains(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__contains=[2]),
             self.objs[1:3]
+        )
+
+    def test_contains_subquery(self):
+        IntegerArrayModel.objects.create(field=[2, 3])
+        inner_qs = IntegerArrayModel.objects.values_list('field', flat=True)
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__contains=inner_qs[:1]),
+            self.objs[2:3],
+        )
+        inner_qs = IntegerArrayModel.objects.filter(field__contains=OuterRef('field'))
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(Exists(inner_qs)),
+            self.objs[1:3],
+        )
+
+    def test_contains_including_expression(self):
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(
+                field__contains=[2, Value(6) / Value(2)],
+            ),
+            self.objs[2:3],
+        )
+
+    def test_icontains(self):
+        # Using the __icontains lookup with ArrayField is inefficient.
+        instance = CharArrayModel.objects.create(field=['FoO'])
+        self.assertSequenceEqual(
+            CharArrayModel.objects.filter(field__icontains='foo'),
+            [instance]
         )
 
     def test_contains_charfield(self):
@@ -234,6 +362,39 @@ class TestQuerying(PostgreSQLTestCase):
             CharArrayModel.objects.filter(field__overlap=['text']),
             []
         )
+
+    def test_overlap_charfield_including_expression(self):
+        obj_1 = CharArrayModel.objects.create(field=['TEXT', 'lower text'])
+        obj_2 = CharArrayModel.objects.create(field=['lower text', 'TEXT'])
+        CharArrayModel.objects.create(field=['lower text', 'text'])
+        self.assertSequenceEqual(
+            CharArrayModel.objects.filter(field__overlap=[
+                Upper(Value('text')),
+                'other',
+            ]),
+            [obj_1, obj_2],
+        )
+
+    def test_lookups_autofield_array(self):
+        qs = NullableIntegerArrayModel.objects.filter(
+            field__0__isnull=False,
+        ).values('field__0').annotate(
+            arrayagg=ArrayAgg('id'),
+        ).order_by('field__0')
+        tests = (
+            ('contained_by', [self.objs[1].pk, self.objs[2].pk, 0], [2]),
+            ('contains', [self.objs[2].pk], [2]),
+            ('exact', [self.objs[3].pk], [20]),
+            ('overlap', [self.objs[1].pk, self.objs[3].pk], [2, 20]),
+        )
+        for lookup, value, expected in tests:
+            with self.subTest(lookup=lookup):
+                self.assertSequenceEqual(
+                    qs.filter(
+                        **{'arrayagg__' + lookup: value},
+                    ).values_list('field__0', flat=True),
+                    expected,
+                )
 
     def test_index(self):
         self.assertSequenceEqual(
@@ -260,6 +421,25 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             NestedIntegerArrayModel.objects.filter(field__0=[1, 2]),
             [instance]
+        )
+
+    def test_index_transform_expression(self):
+        expr = RawSQL("string_to_array(%s, ';')", ['1;2'])
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(
+                field__0=Cast(
+                    IndexTransform(1, models.IntegerField, expr),
+                    output_field=models.IntegerField(),
+                ),
+            ),
+            self.objs[:1],
+        )
+
+    def test_index_annotation(self):
+        qs = NullableIntegerArrayModel.objects.annotate(second=models.F('field__1'))
+        self.assertCountEqual(
+            qs.values_list('second', flat=True),
+            [None, None, None, 3, 30],
         )
 
     def test_overlap(self):
@@ -292,6 +472,22 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[2:3]
         )
 
+    def test_order_by_slice(self):
+        more_objs = (
+            NullableIntegerArrayModel.objects.create(field=[1, 637]),
+            NullableIntegerArrayModel.objects.create(field=[2, 1]),
+            NullableIntegerArrayModel.objects.create(field=[3, -98123]),
+            NullableIntegerArrayModel.objects.create(field=[4, 2]),
+        )
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.order_by('field__1'),
+            [
+                more_objs[2], more_objs[1], more_objs[3], self.objs[2],
+                self.objs[3], more_objs[0], self.objs[4], self.objs[1],
+                self.objs[0],
+            ]
+        )
+
     @unittest.expectedFailure
     def test_slice_nested(self):
         instance = NestedIntegerArrayModel.objects.create(field=[[1, 2], [3, 4]])
@@ -300,12 +496,38 @@ class TestQuerying(PostgreSQLTestCase):
             [instance]
         )
 
+    def test_slice_transform_expression(self):
+        expr = RawSQL("string_to_array(%s, ';')", ['9;2;3'])
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__0_2=SliceTransform(2, 3, expr)),
+            self.objs[2:3],
+        )
+
+    def test_slice_annotation(self):
+        qs = NullableIntegerArrayModel.objects.annotate(
+            first_two=models.F('field__0_2'),
+        )
+        self.assertCountEqual(
+            qs.values_list('first_two', flat=True),
+            [None, [1], [2], [2, 3], [20, 30]],
+        )
+
     def test_usage_in_subquery(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(
                 id__in=NullableIntegerArrayModel.objects.filter(field__len=3)
             ),
             [self.objs[3]]
+        )
+
+    def test_enum_lookup(self):
+        class TestEnum(enum.Enum):
+            VALUE_1 = 'value_1'
+
+        instance = ArrayEnumModel.objects.create(array_of_enums=[TestEnum.VALUE_1])
+        self.assertSequenceEqual(
+            ArrayEnumModel.objects.filter(array_of_enums__contains=[TestEnum.VALUE_1]),
+            [instance]
         )
 
     def test_unsupported_lookup(self):
@@ -317,20 +539,90 @@ class TestQuerying(PostgreSQLTestCase):
         with self.assertRaisesMessage(FieldError, msg):
             list(NullableIntegerArrayModel.objects.filter(field__0bar=[2]))
 
+    def test_grouping_by_annotations_with_array_field_param(self):
+        value = models.Value([1], output_field=ArrayField(models.IntegerField()))
+        self.assertEqual(
+            NullableIntegerArrayModel.objects.annotate(
+                array_length=models.Func(
+                    value, 1, function='ARRAY_LENGTH', output_field=models.IntegerField(),
+                ),
+            ).values('array_length').annotate(
+                count=models.Count('pk'),
+            ).get()['array_length'],
+            1,
+        )
+
+    def test_filter_by_array_subquery(self):
+        inner_qs = NullableIntegerArrayModel.objects.filter(
+            field__len=models.OuterRef('field__len'),
+        ).values('field')
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.alias(
+                same_sized_fields=ArraySubquery(inner_qs),
+            ).filter(same_sized_fields__len__gt=1),
+            self.objs[0:2],
+        )
+
+    def test_annotated_array_subquery(self):
+        inner_qs = NullableIntegerArrayModel.objects.exclude(
+            pk=models.OuterRef('pk')
+        ).values('order')
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.annotate(
+                sibling_ids=ArraySubquery(inner_qs),
+            ).get(order=1).sibling_ids,
+            [2, 3, 4, 5],
+        )
+
+    def test_group_by_with_annotated_array_subquery(self):
+        inner_qs = NullableIntegerArrayModel.objects.exclude(
+            pk=models.OuterRef('pk')
+        ).values('order')
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.annotate(
+                sibling_ids=ArraySubquery(inner_qs),
+                sibling_count=models.Max('sibling_ids__len'),
+            ).values_list('sibling_count', flat=True),
+            [len(self.objs) - 1] * len(self.objs),
+        )
+
+    def test_annotated_ordered_array_subquery(self):
+        inner_qs = NullableIntegerArrayModel.objects.order_by('-order').values('order')
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.annotate(
+                ids=ArraySubquery(inner_qs),
+            ).first().ids,
+            [5, 4, 3, 2, 1],
+        )
+
+    def test_annotated_array_subquery_with_json_objects(self):
+        inner_qs = NullableIntegerArrayModel.objects.exclude(
+            pk=models.OuterRef('pk')
+        ).values(json=JSONObject(order='order', field='field'))
+        siblings_json = NullableIntegerArrayModel.objects.annotate(
+            siblings_json=ArraySubquery(inner_qs),
+        ).values_list('siblings_json', flat=True).get(order=1)
+        self.assertSequenceEqual(
+            siblings_json,
+            [
+                {'field': [2], 'order': 2},
+                {'field': [2, 3], 'order': 3},
+                {'field': [20, 30, 40], 'order': 4},
+                {'field': None, 'order': 5},
+            ],
+        )
+
 
 class TestDateTimeExactQuerying(PostgreSQLTestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         now = timezone.now()
-        self.datetimes = [now]
-        self.dates = [now.date()]
-        self.times = [now.time()]
-        self.objs = [
-            DateTimeArrayModel.objects.create(
-                datetimes=self.datetimes,
-                dates=self.dates,
-                times=self.times,
-            )
+        cls.datetimes = [now]
+        cls.dates = [now.date()]
+        cls.times = [now.time()]
+        cls.objs = [
+            DateTimeArrayModel.objects.create(datetimes=cls.datetimes, dates=cls.dates, times=cls.times),
         ]
 
     def test_exact_datetimes(self):
@@ -354,17 +646,18 @@ class TestDateTimeExactQuerying(PostgreSQLTestCase):
 
 class TestOtherTypesExactQuerying(PostgreSQLTestCase):
 
-    def setUp(self):
-        self.ips = ['192.168.0.1', '::1']
-        self.uuids = [uuid.uuid4()]
-        self.decimals = [decimal.Decimal(1.25), 1.75]
-        self.tags = [Tag(1), Tag(2), Tag(3)]
-        self.objs = [
+    @classmethod
+    def setUpTestData(cls):
+        cls.ips = ['192.168.0.1', '::1']
+        cls.uuids = [uuid.uuid4()]
+        cls.decimals = [decimal.Decimal(1.25), 1.75]
+        cls.tags = [Tag(1), Tag(2), Tag(3)]
+        cls.objs = [
             OtherTypesArrayModel.objects.create(
-                ips=self.ips,
-                uuids=self.uuids,
-                decimals=self.decimals,
-                tags=self.tags,
+                ips=cls.ips,
+                uuids=cls.uuids,
+                decimals=cls.decimals,
+                tags=cls.tags,
             )
         ]
 
@@ -394,7 +687,7 @@ class TestOtherTypesExactQuerying(PostgreSQLTestCase):
 
 
 @isolate_apps('postgres_tests')
-class TestChecks(PostgreSQLTestCase):
+class TestChecks(PostgreSQLSimpleTestCase):
 
     def test_field_checks(self):
         class MyModel(PostgreSQLModel):
@@ -416,6 +709,38 @@ class TestChecks(PostgreSQLTestCase):
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0].id, 'postgres.E002')
 
+    def test_invalid_default(self):
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(models.IntegerField(), default=[])
+
+        model = MyModel()
+        self.assertEqual(model.check(), [
+            checks.Warning(
+                msg=(
+                    "ArrayField default should be a callable instead of an "
+                    "instance so that it's not shared between all field "
+                    "instances."
+                ),
+                hint='Use a callable instead, e.g., use `list` instead of `[]`.',
+                obj=MyModel._meta.get_field('field'),
+                id='fields.E010',
+            )
+        ])
+
+    def test_valid_default(self):
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(models.IntegerField(), default=list)
+
+        model = MyModel()
+        self.assertEqual(model.check(), [])
+
+    def test_valid_default_none(self):
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(models.IntegerField(), default=None)
+
+        model = MyModel()
+        self.assertEqual(model.check(), [])
+
     def test_nested_field_checks(self):
         """
         Nested ArrayFields are permitted.
@@ -429,6 +754,20 @@ class TestChecks(PostgreSQLTestCase):
         # The inner CharField is missing a max_length.
         self.assertEqual(errors[0].id, 'postgres.E001')
         self.assertIn('max_length', errors[0].msg)
+
+    def test_choices_tuple_list(self):
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(
+                models.CharField(max_length=16),
+                choices=[
+                    [
+                        'Media',
+                        [(['vinyl', 'cd'], 'Audio'), (('vhs', 'dvd'), 'Video')],
+                    ],
+                    (['mp3', 'mp4'], 'Digital'),
+                ],
+            )
+        self.assertEqual(MyModel._meta.get_field('field').check(), [])
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific tests")
@@ -511,7 +850,7 @@ class TestMigrations(TransactionTestCase):
             self.assertNotIn(table_name, connection.introspection.table_names(cursor))
 
 
-class TestSerialization(PostgreSQLTestCase):
+class TestSerialization(PostgreSQLSimpleTestCase):
     test_data = (
         '[{"fields": {"field": "[\\"1\\", \\"2\\", null]"}, "model": "postgres_tests.integerarraymodel", "pk": null}]'
     )
@@ -526,7 +865,7 @@ class TestSerialization(PostgreSQLTestCase):
         self.assertEqual(instance.field, [1, 2, None])
 
 
-class TestValidation(PostgreSQLTestCase):
+class TestValidation(PostgreSQLSimpleTestCase):
 
     def test_unbounded(self):
         field = ArrayField(models.IntegerField())
@@ -535,7 +874,7 @@ class TestValidation(PostgreSQLTestCase):
         self.assertEqual(cm.exception.code, 'item_invalid')
         self.assertEqual(
             cm.exception.message % cm.exception.params,
-            'Item 1 in the array did not validate: This field cannot be null.'
+            'Item 2 in the array did not validate: This field cannot be null.'
         )
 
     def test_blank_true(self):
@@ -566,10 +905,10 @@ class TestValidation(PostgreSQLTestCase):
         exception = cm.exception.error_list[0]
         self.assertEqual(
             exception.message,
-            'Item 0 in the array did not validate: Ensure this value has at most 2 characters (it has 3).'
+            'Item 1 in the array did not validate: Ensure this value has at most 2 characters (it has 3).'
         )
         self.assertEqual(exception.code, 'item_invalid')
-        self.assertEqual(exception.params, {'nth': 0, 'value': 'abc', 'limit_value': 2, 'show_value': 3})
+        self.assertEqual(exception.params, {'nth': 1, 'value': 'abc', 'limit_value': 2, 'show_value': 3})
 
     def test_with_validators(self):
         field = ArrayField(models.IntegerField(validators=[validators.MinValueValidator(1)]))
@@ -580,13 +919,13 @@ class TestValidation(PostgreSQLTestCase):
         exception = cm.exception.error_list[0]
         self.assertEqual(
             exception.message,
-            'Item 0 in the array did not validate: Ensure this value is greater than or equal to 1.'
+            'Item 1 in the array did not validate: Ensure this value is greater than or equal to 1.'
         )
         self.assertEqual(exception.code, 'item_invalid')
-        self.assertEqual(exception.params, {'nth': 0, 'value': 0, 'limit_value': 1, 'show_value': 0})
+        self.assertEqual(exception.params, {'nth': 1, 'value': 0, 'limit_value': 1, 'show_value': 0})
 
 
-class TestSimpleFormField(PostgreSQLTestCase):
+class TestSimpleFormField(PostgreSQLSimpleTestCase):
 
     def test_valid(self):
         field = SimpleArrayField(forms.CharField())
@@ -597,13 +936,13 @@ class TestSimpleFormField(PostgreSQLTestCase):
         field = SimpleArrayField(forms.IntegerField())
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean('a,b,9')
-        self.assertEqual(cm.exception.messages[0], 'Item 0 in the array did not validate: Enter a whole number.')
+        self.assertEqual(cm.exception.messages[0], 'Item 1 in the array did not validate: Enter a whole number.')
 
     def test_validate_fail(self):
         field = SimpleArrayField(forms.CharField(required=True))
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean('a,b,')
-        self.assertEqual(cm.exception.messages[0], 'Item 2 in the array did not validate: This field is required.')
+        self.assertEqual(cm.exception.messages[0], 'Item 3 in the array did not validate: This field is required.')
 
     def test_validate_fail_base_field_error_params(self):
         field = SimpleArrayField(forms.CharField(max_length=2))
@@ -614,23 +953,23 @@ class TestSimpleFormField(PostgreSQLTestCase):
         first_error = errors[0]
         self.assertEqual(
             first_error.message,
-            'Item 0 in the array did not validate: Ensure this value has at most 2 characters (it has 3).'
+            'Item 1 in the array did not validate: Ensure this value has at most 2 characters (it has 3).'
         )
         self.assertEqual(first_error.code, 'item_invalid')
-        self.assertEqual(first_error.params, {'nth': 0, 'value': 'abc', 'limit_value': 2, 'show_value': 3})
+        self.assertEqual(first_error.params, {'nth': 1, 'value': 'abc', 'limit_value': 2, 'show_value': 3})
         second_error = errors[1]
         self.assertEqual(
             second_error.message,
-            'Item 2 in the array did not validate: Ensure this value has at most 2 characters (it has 4).'
+            'Item 3 in the array did not validate: Ensure this value has at most 2 characters (it has 4).'
         )
         self.assertEqual(second_error.code, 'item_invalid')
-        self.assertEqual(second_error.params, {'nth': 2, 'value': 'defg', 'limit_value': 2, 'show_value': 4})
+        self.assertEqual(second_error.params, {'nth': 3, 'value': 'defg', 'limit_value': 2, 'show_value': 4})
 
     def test_validators_fail(self):
         field = SimpleArrayField(forms.RegexField('[a-e]{2}'))
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean('a,bc,de')
-        self.assertEqual(cm.exception.messages[0], 'Item 0 in the array did not validate: Enter a valid value.')
+        self.assertEqual(cm.exception.messages[0], 'Item 1 in the array did not validate: Enter a valid value.')
 
     def test_delimiter(self):
         field = SimpleArrayField(forms.CharField(), delimiter='|')
@@ -678,13 +1017,33 @@ class TestSimpleFormField(PostgreSQLTestCase):
         self.assertIsInstance(form_field, SimpleArrayField)
         self.assertEqual(form_field.max_length, 4)
 
+    def test_model_field_choices(self):
+        model_field = ArrayField(models.IntegerField(choices=((1, 'A'), (2, 'B'))))
+        form_field = model_field.formfield()
+        self.assertEqual(form_field.clean('1,2'), [1, 2])
+
     def test_already_converted_value(self):
         field = SimpleArrayField(forms.CharField())
         vals = ['a', 'b', 'c']
         self.assertEqual(field.clean(vals), vals)
 
+    def test_has_changed(self):
+        field = SimpleArrayField(forms.IntegerField())
+        self.assertIs(field.has_changed([1, 2], [1, 2]), False)
+        self.assertIs(field.has_changed([1, 2], '1,2'), False)
+        self.assertIs(field.has_changed([1, 2], '1,2,3'), True)
+        self.assertIs(field.has_changed([1, 2], 'a,b'), True)
 
-class TestSplitFormField(PostgreSQLTestCase):
+    def test_has_changed_empty(self):
+        field = SimpleArrayField(forms.CharField())
+        self.assertIs(field.has_changed(None, None), False)
+        self.assertIs(field.has_changed(None, ''), False)
+        self.assertIs(field.has_changed(None, []), False)
+        self.assertIs(field.has_changed([], None), False)
+        self.assertIs(field.has_changed([], ''), False)
+
+
+class TestSplitFormField(PostgreSQLSimpleTestCase):
 
     def test_valid(self):
         class SplitForm(forms.Form):
@@ -734,13 +1093,15 @@ class TestSplitFormField(PostgreSQLTestCase):
         data = {'array_0': 'a', 'array_1': 'b', 'array_2': ''}
         form = SplitForm(data)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors, {'array': ['Item 2 in the array did not validate: This field is required.']})
+        self.assertEqual(form.errors, {'array': ['Item 3 in the array did not validate: This field is required.']})
 
     def test_invalid_integer(self):
-        msg = 'Item 1 in the array did not validate: Ensure this value is less than or equal to 100.'
+        msg = 'Item 2 in the array did not validate: Ensure this value is less than or equal to 100.'
         with self.assertRaisesMessage(exceptions.ValidationError, msg):
             SplitArrayField(forms.IntegerField(max_value=100), size=2).clean([0, 101])
 
+    # To locate the widget's template.
+    @modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
     def test_rendering(self):
         class SplitForm(forms.Form):
             array = SplitArrayField(forms.CharField(), size=3)
@@ -749,9 +1110,9 @@ class TestSplitFormField(PostgreSQLTestCase):
             <tr>
                 <th><label for="id_array_0">Array:</label></th>
                 <td>
-                    <input id="id_array_0" name="array_0" type="text" required />
-                    <input id="id_array_1" name="array_1" type="text" required />
-                    <input id="id_array_2" name="array_2" type="text" required />
+                    <input id="id_array_0" name="array_0" type="text" required>
+                    <input id="id_array_1" name="array_1" type="text" required>
+                    <input id="id_array_2" name="array_2" type="text" required>
                 </td>
             </tr>
         ''')
@@ -761,8 +1122,8 @@ class TestSplitFormField(PostgreSQLTestCase):
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean(['abc', 'c', 'defg'])
         self.assertEqual(cm.exception.messages, [
-            'Item 0 in the array did not validate: Ensure this value has at most 2 characters (it has 3).',
-            'Item 2 in the array did not validate: Ensure this value has at most 2 characters (it has 4).',
+            'Item 1 in the array did not validate: Ensure this value has at most 2 characters (it has 3).',
+            'Item 3 in the array did not validate: Ensure this value has at most 2 characters (it has 4).',
         ])
 
     def test_splitarraywidget_value_omitted_from_data(self):
@@ -778,8 +1139,117 @@ class TestSplitFormField(PostgreSQLTestCase):
         obj = form.save(commit=False)
         self.assertEqual(obj.field, [1, 2])
 
+    def test_splitarrayfield_has_changed(self):
+        class Form(forms.ModelForm):
+            field = SplitArrayField(forms.IntegerField(), required=False, size=2)
 
-class TestSplitFormWidget(PostgreSQLTestCase):
+            class Meta:
+                model = IntegerArrayModel
+                fields = ('field',)
+
+        tests = [
+            ({}, {'field_0': '', 'field_1': ''}, True),
+            ({'field': None}, {'field_0': '', 'field_1': ''}, True),
+            ({'field': [1]}, {'field_0': '', 'field_1': ''}, True),
+            ({'field': [1]}, {'field_0': '1', 'field_1': '0'}, True),
+            ({'field': [1, 2]}, {'field_0': '1', 'field_1': '2'}, False),
+            ({'field': [1, 2]}, {'field_0': 'a', 'field_1': 'b'}, True),
+        ]
+        for initial, data, expected_result in tests:
+            with self.subTest(initial=initial, data=data):
+                obj = IntegerArrayModel(**initial)
+                form = Form(data, instance=obj)
+                self.assertIs(form.has_changed(), expected_result)
+
+    def test_splitarrayfield_remove_trailing_nulls_has_changed(self):
+        class Form(forms.ModelForm):
+            field = SplitArrayField(forms.IntegerField(), required=False, size=2, remove_trailing_nulls=True)
+
+            class Meta:
+                model = IntegerArrayModel
+                fields = ('field',)
+
+        tests = [
+            ({}, {'field_0': '', 'field_1': ''}, False),
+            ({'field': None}, {'field_0': '', 'field_1': ''}, False),
+            ({'field': []}, {'field_0': '', 'field_1': ''}, False),
+            ({'field': [1]}, {'field_0': '1', 'field_1': ''}, False),
+        ]
+        for initial, data, expected_result in tests:
+            with self.subTest(initial=initial, data=data):
+                obj = IntegerArrayModel(**initial)
+                form = Form(data, instance=obj)
+                self.assertIs(form.has_changed(), expected_result)
+
+
+class TestSplitFormWidget(PostgreSQLWidgetTestCase):
+
+    def test_get_context(self):
+        self.assertEqual(
+            SplitArrayWidget(forms.TextInput(), size=2).get_context('name', ['val1', 'val2']),
+            {
+                'widget': {
+                    'name': 'name',
+                    'is_hidden': False,
+                    'required': False,
+                    'value': "['val1', 'val2']",
+                    'attrs': {},
+                    'template_name': 'postgres/widgets/split_array.html',
+                    'subwidgets': [
+                        {
+                            'name': 'name_0',
+                            'is_hidden': False,
+                            'required': False,
+                            'value': 'val1',
+                            'attrs': {},
+                            'template_name': 'django/forms/widgets/text.html',
+                            'type': 'text',
+                        },
+                        {
+                            'name': 'name_1',
+                            'is_hidden': False,
+                            'required': False,
+                            'value': 'val2',
+                            'attrs': {},
+                            'template_name': 'django/forms/widgets/text.html',
+                            'type': 'text',
+                        },
+                    ]
+                }
+            }
+        )
+
+    def test_checkbox_get_context_attrs(self):
+        context = SplitArrayWidget(
+            forms.CheckboxInput(),
+            size=2,
+        ).get_context('name', [True, False])
+        self.assertEqual(context['widget']['value'], '[True, False]')
+        self.assertEqual(
+            [subwidget['attrs'] for subwidget in context['widget']['subwidgets']],
+            [{'checked': True}, {}]
+        )
+
+    def test_render(self):
+        self.check_html(
+            SplitArrayWidget(forms.TextInput(), size=2), 'array', None,
+            """
+            <input name="array_0" type="text">
+            <input name="array_1" type="text">
+            """
+        )
+
+    def test_render_attrs(self):
+        self.check_html(
+            SplitArrayWidget(forms.TextInput(), size=2),
+            'array', ['val1', 'val2'], attrs={'id': 'foo'},
+            html=(
+                """
+                <input id="foo_0" name="array_0" type="text" value="val1">
+                <input id="foo_1" name="array_1" type="text" value="val2">
+                """
+            )
+        )
 
     def test_value_omitted_from_data(self):
         widget = SplitArrayWidget(forms.TextInput(), size=2)

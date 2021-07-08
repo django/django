@@ -1,17 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Eugene MechanisM <eugene@mechanism.pro>, 2012
+# Eugene <eugene.mechanism@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Panasoft, 2021
+# SeryiMysh <vital@dorokhin.kz>, 2020
 # Алексей Борискин <sun.void@gmail.com>, 2012-2015
 # Андрей Щуров <shurov9009@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-23 16:38+0000\n"
-"Last-Translator: Андрей Щуров <shurov9009@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-03-16 22:51+0000\n"
+"Last-Translator: Panasoft\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -107,11 +109,11 @@ msgstr "Пожалуйста, установите docutils"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
+"The admin documentation system requires Python’s <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
-"Встроенной в административное приложение системе документации необходима для "
-"работы Python-библиотека <a href=\"%(link)s\">docutils</a>."
+"Для системы административной документации требуется библиотека Python <a "
+"href=\"%(link)s\">docutils</a>."
 
 #, python-format
 msgid ""
@@ -162,13 +164,13 @@ msgid "Template: %(name)s"
 msgstr "Шаблон: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Шаблон: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr "Шаблон: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "Пути, по которым будет произведён поиск шаблона \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "Путь к местонахождению шаблона <q>%(name)s</q>:"
 
 msgid "(does not exist)"
 msgstr "(не существует)"
@@ -248,13 +250,6 @@ msgstr ""
 "\n"
 "View-функция: <code>%(full_name)s</code>. Имя url-шаблона: <code>"
 "%(url_name)s</code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Логическое (True или False)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Поле типа %(field_type)s"
 
 msgid "tag:"
 msgstr "тег:"

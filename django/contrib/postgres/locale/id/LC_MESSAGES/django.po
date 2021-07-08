@@ -1,17 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2016
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2018
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # oon arfiandwi <oon.arfiandwi@gmail.com>, 2016
+# rodin <romihardiyanto@gmail.com>, 2016
+# sage <laymonage@gmail.com>, 2019
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-08-23 04:54+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -24,24 +26,18 @@ msgid "PostgreSQL extensions"
 msgstr "Ekstensi PostgreSQL"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "butir %(nth)s di dalam susunan tidak disahkan:"
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Butir %(nth)s dalam larik tidak tervalidasi:"
 
 msgid "Nested arrays must have the same length."
-msgstr "Array bersarang harus mempunyai panjang sama."
+msgstr "Array bersaran harus mempunyai panjang yang sama."
 
-msgid "Map of strings to strings"
-msgstr "Pemetaan dari strings ke strings"
+msgid "Map of strings to strings/nulls"
+msgstr "Pemetaan dari string ke string/null"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Sebuah nilai dari \"%(key)s\" bukan sebuah untaian."
-
-msgid "A JSON object"
-msgstr "Sebuah obyek JSON"
-
-msgid "Value must be valid JSON."
-msgstr "Nilai harus JSON sah."
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "Nilai dari “%(key)s” bukan sebuah string atau null."
 
 msgid "Could not load JSON data."
 msgstr "Tidak dapat memuat data JSON."
@@ -49,15 +45,11 @@ msgstr "Tidak dapat memuat data JSON."
 msgid "Input must be a JSON dictionary."
 msgstr "Masukan harus kamus JSON."
 
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "Nilai '%(value)s' harus JSON sah."
-
 msgid "Enter two valid values."
-msgstr "Masukkan dua nilai yang benar"
+msgstr "Masukkan dua nilai yang valid."
 
 msgid "The start of the range must not exceed the end of the range."
-msgstr "Awal jangkauan harus tidak melebihi akhir dari jangkauan."
+msgstr "Awal jangkauan harus tidak melebihi akhir jangkauan."
 
 msgid "Enter two whole numbers."
 msgstr "Masukkan dua buah bilangan bulat."
@@ -66,10 +58,10 @@ msgid "Enter two numbers."
 msgstr "Masukkan dua buah bilangan."
 
 msgid "Enter two valid date/times."
-msgstr "Masukan dua buah tanggal/waktu"
+msgstr "Masukan dua buah tanggal/waktu."
 
 msgid "Enter two valid dates."
-msgstr "Masukan dua buah tanggal yang benar"
+msgstr "Masukan dua buah tanggal yang benar."
 
 #, python-format
 msgid ""
@@ -79,7 +71,7 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no more than "
 "%(limit_value)d."
 msgstr[0] ""
-"Daftar mengandung barang %(show_value)d, dia harus mengandung tidak lebih "
+"Daftar mengandung %(show_value)d butir, seharusnya mengandung tidak lebih "
 "dari %(limit_value)d."
 
 #, python-format
@@ -90,16 +82,16 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no fewer than "
 "%(limit_value)d."
 msgstr[0] ""
-"Daftar kandungan item %(show_value)d, setidaknya harus mengandung kurang "
+"Daftar mengandung%(show_value)d butir, seharusnya mengandung tidak kurang "
 "dari %(limit_value)d."
 
 #, python-format
 msgid "Some keys were missing: %(keys)s"
-msgstr "Ada yang salah di suatu kunci: %(keys)s"
+msgstr "Beberapa kunci hilang: %(keys)s"
 
 #, python-format
 msgid "Some unknown keys were provided: %(keys)s"
-msgstr "Suatu kunci yang tidak di ketahui sumbernya: %(keys)s"
+msgstr "Beberapa kunci yang tidak dikenali diberikan: %(keys)s"
 
 #, python-format
 msgid ""
@@ -113,5 +105,5 @@ msgid ""
 "Ensure that this range is completely greater than or equal to "
 "%(limit_value)s."
 msgstr ""
-"Pastikan bahwa jangkauan ini sepenuhnya lebih besar dari atau sama dengan "
+"Pastikan bahwa jangkauan ini sepenuhnya lebih dari atau sama dengan "
 "%(limit_value)s."

@@ -1,5 +1,5 @@
 from django.apps import apps
-from django.contrib.gis.db.models.fields import GeometryField
+from django.contrib.gis.db.models import GeometryField
 from django.contrib.gis.db.models.functions import AsKML, Transform
 from django.contrib.gis.shortcuts import render_to_kml, render_to_kmz
 from django.core.exceptions import FieldDoesNotExist

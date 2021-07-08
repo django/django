@@ -1,0 +1,32 @@
+===========================
+Django 3.1.12 release notes
+===========================
+
+*June 2, 2021*
+
+Django 3.1.12 fixes two security issues in 3.1.11.
+
+CVE-2021-33203: Potential directory traversal via ``admindocs``
+===============================================================
+
+Staff members could use the :mod:`~django.contrib.admindocs`
+``TemplateDetailView`` view to check the existence of arbitrary files.
+Additionally, if (and only if) the default admindocs templates have been
+customized by the developers to also expose the file contents, then not only
+the existence but also the file contents would have been exposed.
+
+As a mitigation, path sanitation is now applied and only files within the
+template root directories can be loaded.
+
+CVE-2021-33571: Possible indeterminate SSRF, RFI, and LFI attacks since validators accepted leading zeros in IPv4 addresses
+===========================================================================================================================
+
+:class:`~django.core.validators.URLValidator`,
+:func:`~django.core.validators.validate_ipv4_address`, and
+:func:`~django.core.validators.validate_ipv46_address` didn't prohibit leading
+zeros in octal literals. If you used such values you could suffer from
+indeterminate SSRF, RFI, and LFI attacks.
+
+:func:`~django.core.validators.validate_ipv4_address` and
+:func:`~django.core.validators.validate_ipv46_address` validators were not
+affected on Python 3.9.5+.

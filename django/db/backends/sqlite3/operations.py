@@ -1,18 +1,30 @@
 import datetime
+import decimal
 import uuid
+from functools import lru_cache
+from itertools import chain
 
 from django.conf import settings
 from django.core.exceptions import FieldError
-from django.db import utils
-from django.db.backends import utils as backend_utils
+from django.db import DatabaseError, NotSupportedError, models
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.models import aggregates, fields
+from django.db.models.expressions import Col
 from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
-from django.utils.duration import duration_string
+from django.utils.functional import cached_property
 
 
 class DatabaseOperations(BaseDatabaseOperations):
+    cast_char_field_without_max_length = 'text'
+    cast_data_types = {
+        'DateField': 'TEXT',
+        'DateTimeField': 'TEXT',
+    }
+    explain_prefix = 'EXPLAIN QUERY PLAN'
+    # List of datatypes to that cannot be extracted with JSON_EXTRACT() on
+    # SQLite. Use JSON_TYPE() instead.
+    jsonfield_datatype_values = frozenset(['null', 'false', 'true'])
+
     def bulk_batch_size(self, fields, objs):
         """
         SQLite has a compile-time default (SQLITE_LIMIT_VARIABLE_NUMBER) of
@@ -21,26 +33,40 @@ class DatabaseOperations(BaseDatabaseOperations):
         If there's only a single field to insert, the limit is 500
         (SQLITE_MAX_COMPOUND_SELECT).
         """
-        limit = 999 if len(fields) > 1 else 500
-        return (limit // len(fields)) if len(fields) > 0 else len(objs)
+        if len(fields) == 1:
+            return 500
+        elif len(fields) > 1:
+            return self.connection.features.max_query_params // len(fields)
+        else:
+            return len(objs)
 
     def check_expression_support(self, expression):
-        bad_fields = (fields.DateField, fields.DateTimeField, fields.TimeField)
-        bad_aggregates = (aggregates.Sum, aggregates.Avg, aggregates.Variance, aggregates.StdDev)
+        bad_fields = (models.DateField, models.DateTimeField, models.TimeField)
+        bad_aggregates = (models.Sum, models.Avg, models.Variance, models.StdDev)
         if isinstance(expression, bad_aggregates):
             for expr in expression.get_source_expressions():
                 try:
                     output_field = expr.output_field
+                except (AttributeError, FieldError):
+                    # Not every subexpression has an output_field which is fine
+                    # to ignore.
+                    pass
+                else:
                     if isinstance(output_field, bad_fields):
-                        raise NotImplementedError(
+                        raise NotSupportedError(
                             'You cannot use Sum, Avg, StdDev, and Variance '
                             'aggregations on date/time fields in sqlite3 '
                             'since date/time is saved as text.'
                         )
-                except FieldError:
-                    # Not every subexpression has an output_field which is fine
-                    # to ignore.
-                    pass
+        if (
+            isinstance(expression, models.Aggregate) and
+            expression.distinct and
+            len(expression.source_expressions) > 1
+        ):
+            raise NotSupportedError(
+                "SQLite doesn't support DISTINCT on aggregate functions "
+                "accepting multiple arguments."
+            )
 
     def date_extract_sql(self, lookup_type, field_name):
         """
@@ -50,40 +76,54 @@ class DatabaseOperations(BaseDatabaseOperations):
         """
         return "django_date_extract('%s', %s)" % (lookup_type.lower(), field_name)
 
-    def date_interval_sql(self, timedelta):
-        return "'%s'" % duration_string(timedelta), []
+    def fetch_returned_insert_rows(self, cursor):
+        """
+        Given a cursor object that has just performed an INSERT...RETURNING
+        statement into a table, return the list of returned data.
+        """
+        return cursor.fetchall()
 
     def format_for_duration_arithmetic(self, sql):
         """Do nothing since formatting is handled in the custom function."""
         return sql
 
-    def date_trunc_sql(self, lookup_type, field_name):
-        return "django_date_trunc('%s', %s)" % (lookup_type.lower(), field_name)
+    def date_trunc_sql(self, lookup_type, field_name, tzname=None):
+        return "django_date_trunc('%s', %s, %s, %s)" % (
+            lookup_type.lower(),
+            field_name,
+            *self._convert_tznames_to_sql(tzname),
+        )
 
-    def time_trunc_sql(self, lookup_type, field_name):
-        return "django_time_trunc('%s', %s)" % (lookup_type.lower(), field_name)
+    def time_trunc_sql(self, lookup_type, field_name, tzname=None):
+        return "django_time_trunc('%s', %s, %s, %s)" % (
+            lookup_type.lower(),
+            field_name,
+            *self._convert_tznames_to_sql(tzname),
+        )
 
-    def _convert_tzname_to_sql(self, tzname):
-        return "'%s'" % tzname if settings.USE_TZ else 'NULL'
+    def _convert_tznames_to_sql(self, tzname):
+        if tzname and settings.USE_TZ:
+            return "'%s'" % tzname, "'%s'" % self.connection.timezone_name
+        return 'NULL', 'NULL'
 
     def datetime_cast_date_sql(self, field_name, tzname):
-        return "django_datetime_cast_date(%s, %s)" % (
-            field_name, self._convert_tzname_to_sql(tzname),
+        return 'django_datetime_cast_date(%s, %s, %s)' % (
+            field_name, *self._convert_tznames_to_sql(tzname),
         )
 
     def datetime_cast_time_sql(self, field_name, tzname):
-        return "django_datetime_cast_time(%s, %s)" % (
-            field_name, self._convert_tzname_to_sql(tzname),
+        return 'django_datetime_cast_time(%s, %s, %s)' % (
+            field_name, *self._convert_tznames_to_sql(tzname),
         )
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
-        return "django_datetime_extract('%s', %s, %s)" % (
-            lookup_type.lower(), field_name, self._convert_tzname_to_sql(tzname),
+        return "django_datetime_extract('%s', %s, %s, %s)" % (
+            lookup_type.lower(), field_name, *self._convert_tznames_to_sql(tzname),
         )
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
-        return "django_datetime_trunc('%s', %s, %s)" % (
-            lookup_type.lower(), field_name, self._convert_tzname_to_sql(tzname),
+        return "django_datetime_trunc('%s', %s, %s, %s)" % (
+            lookup_type.lower(), field_name, *self._convert_tznames_to_sql(tzname),
         )
 
     def time_extract_sql(self, lookup_type, field_name):
@@ -128,10 +168,9 @@ class DatabaseOperations(BaseDatabaseOperations):
             if isinstance(params, (list, tuple)):
                 params = self._quote_params_for_last_executed_query(params)
             else:
-                keys = params.keys()
                 values = tuple(params.values())
                 values = self._quote_params_for_last_executed_query(values)
-                params = dict(zip(keys, values))
+                params = dict(zip(params, values))
             return sql % params
         # For consistency with SQLiteCursorWrapper.execute(), just return sql
         # when there are no parameters. See #13648 and #17158.
@@ -146,18 +185,63 @@ class DatabaseOperations(BaseDatabaseOperations):
     def no_limit_value(self):
         return -1
 
-    def sql_flush(self, style, tables, sequences, allow_cascade=False):
-        # NB: The generated SQL below is specific to SQLite
-        # Note: The DELETE FROM... SQL generated below works for SQLite databases
-        # because constraints don't exist
+    def __references_graph(self, table_name):
+        query = """
+        WITH tables AS (
+            SELECT %s name
+            UNION
+            SELECT sqlite_master.name
+            FROM sqlite_master
+            JOIN tables ON (sql REGEXP %s || tables.name || %s)
+        ) SELECT name FROM tables;
+        """
+        params = (
+            table_name,
+            r'(?i)\s+references\s+("|\')?',
+            r'("|\')?\s*\(',
+        )
+        with self.connection.cursor() as cursor:
+            results = cursor.execute(query, params)
+            return [row[0] for row in results.fetchall()]
+
+    @cached_property
+    def _references_graph(self):
+        # 512 is large enough to fit the ~330 tables (as of this writing) in
+        # Django's test suite.
+        return lru_cache(maxsize=512)(self.__references_graph)
+
+    def sql_flush(self, style, tables, *, reset_sequences=False, allow_cascade=False):
+        if tables and allow_cascade:
+            # Simulate TRUNCATE CASCADE by recursively collecting the tables
+            # referencing the tables to be flushed.
+            tables = set(chain.from_iterable(self._references_graph(table) for table in tables))
         sql = ['%s %s %s;' % (
             style.SQL_KEYWORD('DELETE'),
             style.SQL_KEYWORD('FROM'),
             style.SQL_FIELD(self.quote_name(table))
         ) for table in tables]
-        # Note: No requirement for reset of auto-incremented indices (cf. other
-        # sql_flush() implementations). Just return SQL at this point
+        if reset_sequences:
+            sequences = [{'table': table} for table in tables]
+            sql.extend(self.sequence_reset_by_name_sql(style, sequences))
         return sql
+
+    def sequence_reset_by_name_sql(self, style, sequences):
+        if not sequences:
+            return []
+        return [
+            '%s %s %s %s = 0 %s %s %s (%s);' % (
+                style.SQL_KEYWORD('UPDATE'),
+                style.SQL_TABLE(self.quote_name('sqlite_sequence')),
+                style.SQL_KEYWORD('SET'),
+                style.SQL_FIELD(self.quote_name('seq')),
+                style.SQL_KEYWORD('WHERE'),
+                style.SQL_FIELD(self.quote_name('name')),
+                style.SQL_KEYWORD('IN'),
+                ', '.join([
+                    "'%s'" % sequence_info['table'] for sequence_info in sequences
+                ]),
+            ),
+        ]
 
     def adapt_datetimefield_value(self, value):
         if value is None:
@@ -200,14 +284,14 @@ class DatabaseOperations(BaseDatabaseOperations):
         elif internal_type == 'TimeField':
             converters.append(self.convert_timefield_value)
         elif internal_type == 'DecimalField':
-            converters.append(self.convert_decimalfield_value)
+            converters.append(self.get_decimalfield_converter(expression))
         elif internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
-        elif internal_type in ('NullBooleanField', 'BooleanField'):
+        elif internal_type == 'BooleanField':
             converters.append(self.convert_booleanfield_value)
         return converters
 
-    def convert_datetimefield_value(self, value, expression, connection, context):
+    def convert_datetimefield_value(self, value, expression, connection):
         if value is not None:
             if not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
@@ -215,30 +299,40 @@ class DatabaseOperations(BaseDatabaseOperations):
                 value = timezone.make_aware(value, self.connection.timezone)
         return value
 
-    def convert_datefield_value(self, value, expression, connection, context):
+    def convert_datefield_value(self, value, expression, connection):
         if value is not None:
             if not isinstance(value, datetime.date):
                 value = parse_date(value)
         return value
 
-    def convert_timefield_value(self, value, expression, connection, context):
+    def convert_timefield_value(self, value, expression, connection):
         if value is not None:
             if not isinstance(value, datetime.time):
                 value = parse_time(value)
         return value
 
-    def convert_decimalfield_value(self, value, expression, connection, context):
-        if value is not None:
-            value = expression.output_field.format_number(value)
-            value = backend_utils.typecast_decimal(value)
-        return value
+    def get_decimalfield_converter(self, expression):
+        # SQLite stores only 15 significant digits. Digits coming from
+        # float inaccuracy must be removed.
+        create_decimal = decimal.Context(prec=15).create_decimal_from_float
+        if isinstance(expression, Col):
+            quantize_value = decimal.Decimal(1).scaleb(-expression.output_field.decimal_places)
 
-    def convert_uuidfield_value(self, value, expression, connection, context):
+            def converter(value, expression, connection):
+                if value is not None:
+                    return create_decimal(value).quantize(quantize_value, context=expression.output_field.context)
+        else:
+            def converter(value, expression, connection):
+                if value is not None:
+                    return create_decimal(value)
+        return converter
+
+    def convert_uuidfield_value(self, value, expression, connection):
         if value is not None:
             value = uuid.UUID(value)
         return value
 
-    def convert_booleanfield_value(self, value, expression, connection, context):
+    def convert_booleanfield_value(self, value, expression, connection):
         return bool(value) if value in (1, 0) else value
 
     def bulk_insert_sql(self, fields, placeholder_rows):
@@ -248,15 +342,17 @@ class DatabaseOperations(BaseDatabaseOperations):
         )
 
     def combine_expression(self, connector, sub_expressions):
-        # SQLite doesn't have a power function, so we fake it with a
-        # user-defined function django_power that's registered in connect().
+        # SQLite doesn't have a ^ operator, so use the user-defined POWER
+        # function that's registered in connect().
         if connector == '^':
-            return 'django_power(%s)' % ','.join(sub_expressions)
+            return 'POWER(%s)' % ','.join(sub_expressions)
+        elif connector == '#':
+            return 'BITXOR(%s)' % ','.join(sub_expressions)
         return super().combine_expression(connector, sub_expressions)
 
     def combine_duration_expression(self, connector, sub_expressions):
-        if connector not in ['+', '-']:
-            raise utils.DatabaseError('Invalid connector for timedelta: %s.' % connector)
+        if connector not in ['+', '-', '*', '/']:
+            raise DatabaseError('Invalid connector for timedelta: %s.' % connector)
         fn_params = ["'%s'" % connector] + sub_expressions
         if len(fn_params) > 3:
             raise ValueError('Too many params for timedelta operations.')
@@ -269,6 +365,22 @@ class DatabaseOperations(BaseDatabaseOperations):
     def subtract_temporals(self, internal_type, lhs, rhs):
         lhs_sql, lhs_params = lhs
         rhs_sql, rhs_params = rhs
+        params = (*lhs_params, *rhs_params)
         if internal_type == 'TimeField':
-            return "django_time_diff(%s, %s)" % (lhs_sql, rhs_sql), lhs_params + rhs_params
-        return "django_timestamp_diff(%s, %s)" % (lhs_sql, rhs_sql), lhs_params + rhs_params
+            return 'django_time_diff(%s, %s)' % (lhs_sql, rhs_sql), params
+        return 'django_timestamp_diff(%s, %s)' % (lhs_sql, rhs_sql), params
+
+    def insert_statement(self, ignore_conflicts=False):
+        return 'INSERT OR IGNORE INTO' if ignore_conflicts else super().insert_statement(ignore_conflicts)
+
+    def return_insert_columns(self, fields):
+        # SQLite < 3.35 doesn't support an INSERT...RETURNING statement.
+        if not fields:
+            return '', ()
+        columns = [
+            '%s.%s' % (
+                self.quote_name(field.model._meta.db_table),
+                self.quote_name(field.column),
+            ) for field in fields
+        ]
+        return 'RETURNING %s' % ', '.join(columns), ()

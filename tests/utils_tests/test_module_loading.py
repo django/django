@@ -4,7 +4,7 @@ import unittest
 from importlib import import_module
 from zipimport import zipimporter
 
-from django.test import SimpleTestCase, TestCase, modify_settings
+from django.test import SimpleTestCase, modify_settings
 from django.test.utils import extend_sys_path
 from django.utils.module_loading import (
     autodiscover_modules, import_string, module_has_submodule,
@@ -47,6 +47,18 @@ class DefaultLoader(unittest.TestCase):
         self.assertFalse(module_has_submodule(test_no_submodule, 'anything'))
         with self.assertRaises(ImportError):
             import_module('utils_tests.test_no_submodule.anything')
+
+    def test_has_sumbodule_with_dotted_path(self):
+        """Nested module existence can be tested."""
+        test_module = import_module('utils_tests.test_module')
+        # A grandchild that exists.
+        self.assertIs(module_has_submodule(test_module, 'child_module.grandchild_module'), True)
+        # A grandchild that doesn't exist.
+        self.assertIs(module_has_submodule(test_module, 'child_module.no_such_module'), False)
+        # A grandchild whose parent doesn't exist.
+        self.assertIs(module_has_submodule(test_module, 'no_such_module.grandchild_module'), False)
+        # A grandchild whose parent is not a package.
+        self.assertIs(module_has_submodule(test_module, 'good_module.no_such_module'), False)
 
 
 class EggLoader(unittest.TestCase):
@@ -107,7 +119,7 @@ class EggLoader(unittest.TestCase):
                 import_module('egg_module.sub1.sub2.no_such_module')
 
 
-class ModuleImportTestCase(TestCase):
+class ModuleImportTests(SimpleTestCase):
     def test_import_string(self):
         cls = import_string('django.utils.module_loading.import_string')
         self.assertEqual(cls, import_string)

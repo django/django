@@ -19,14 +19,13 @@ class Migration(migrations.Migration):
                 ('content_type', models.ForeignKey(
                     to='contenttypes.ContentType',
                     on_delete=models.CASCADE,
-                    to_field='id',
                     verbose_name='content type',
                 )),
                 ('codename', models.CharField(max_length=100, verbose_name='codename')),
             ],
             options={
-                'ordering': ('content_type__app_label', 'content_type__model', 'codename'),
-                'unique_together': set([('content_type', 'codename')]),
+                'ordering': ['content_type__app_label', 'content_type__model', 'codename'],
+                'unique_together': {('content_type', 'codename')},
                 'verbose_name': 'permission',
                 'verbose_name_plural': 'permissions',
             },

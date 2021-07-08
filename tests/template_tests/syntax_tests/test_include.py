@@ -1,10 +1,8 @@
-import warnings
-
 from django.template import (
     Context, Engine, TemplateDoesNotExist, TemplateSyntaxError, loader,
 )
-from django.test import SimpleTestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.template.loader_tags import IncludeNode
+from django.test import SimpleTestCase
 
 from ..utils import setup
 from .test_basic import basic_templates
@@ -39,24 +37,8 @@ class IncludeTagTests(SimpleTestCase):
     @setup({'include04': 'a{% include "nonexistent" %}b'})
     def test_include04(self):
         template = self.engine.get_template('include04')
-
-        if self.engine.debug:
-            with self.assertRaises(TemplateDoesNotExist):
-                template.render(Context({}))
-        else:
-            with warnings.catch_warnings(record=True) as warns:
-                warnings.simplefilter('always')
-                output = template.render(Context({}))
-
-            self.assertEqual(output, "ab")
-
-            self.assertEqual(len(warns), 1)
-            self.assertEqual(
-                str(warns[0].message),
-                "Rendering {% include 'include04' %} raised "
-                "TemplateDoesNotExist. In Django 2.1, this exception will be "
-                "raised rather than silenced and rendered as an empty string.",
-            )
+        with self.assertRaises(TemplateDoesNotExist):
+            template.render(Context({}))
 
     @setup({
         'include 05': 'template with a space',
@@ -178,48 +160,37 @@ class IncludeTagTests(SimpleTestCase):
     @setup({'include-error07': '{% include "include-fail1" %}'}, include_fail_templates)
     def test_include_error07(self):
         template = self.engine.get_template('include-error07')
-
-        if self.engine.debug:
-            with self.assertRaises(RuntimeError):
-                template.render(Context())
-        else:
-            with ignore_warnings(category=RemovedInDjango21Warning):
-                self.assertEqual(template.render(Context()), '')
+        with self.assertRaises(RuntimeError):
+            template.render(Context())
 
     @setup({'include-error08': '{% include "include-fail2" %}'}, include_fail_templates)
     def test_include_error08(self):
         template = self.engine.get_template('include-error08')
-
-        if self.engine.debug:
-            with self.assertRaises(TemplateSyntaxError):
-                template.render(Context())
-        else:
-            with ignore_warnings(category=RemovedInDjango21Warning):
-                self.assertEqual(template.render(Context()), '')
+        with self.assertRaises(TemplateSyntaxError):
+            template.render(Context())
 
     @setup({'include-error09': '{% include failed_include %}'}, include_fail_templates)
     def test_include_error09(self):
         context = Context({'failed_include': 'include-fail1'})
         template = self.engine.get_template('include-error09')
-
-        if self.engine.debug:
-            with self.assertRaises(RuntimeError):
-                template.render(context)
-        else:
-            with ignore_warnings(category=RemovedInDjango21Warning):
-                self.assertEqual(template.render(context), '')
+        with self.assertRaises(RuntimeError):
+            template.render(context)
 
     @setup({'include-error10': '{% include failed_include %}'}, include_fail_templates)
     def test_include_error10(self):
         context = Context({'failed_include': 'include-fail2'})
         template = self.engine.get_template('include-error10')
+        with self.assertRaises(TemplateSyntaxError):
+            template.render(context)
 
-        if self.engine.debug:
-            with self.assertRaises(TemplateSyntaxError):
-                template.render(context)
-        else:
-            with ignore_warnings(category=RemovedInDjango21Warning):
-                self.assertEqual(template.render(context), '')
+    @setup({'include_empty': '{% include %}'})
+    def test_include_empty(self):
+        msg = (
+            "'include' tag takes at least one argument: the name of the "
+            "template to be included."
+        )
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.get_template('include_empty')
 
 
 class IncludeTests(SimpleTestCase):
@@ -231,9 +202,8 @@ class IncludeTests(SimpleTestCase):
         """
         engine = Engine(app_dirs=True, debug=True)
         template = engine.get_template('test_include_error.html')
-        with self.assertRaises(TemplateDoesNotExist) as e:
+        with self.assertRaisesMessage(TemplateDoesNotExist, 'missing.html'):
             template.render(Context())
-        self.assertEqual(e.exception.args[0], 'missing.html')
 
     def test_extends_include_missing_baseloader(self):
         """
@@ -243,9 +213,8 @@ class IncludeTests(SimpleTestCase):
         """
         engine = Engine(app_dirs=True, debug=True)
         template = engine.get_template('test_extends_error.html')
-        with self.assertRaises(TemplateDoesNotExist) as e:
+        with self.assertRaisesMessage(TemplateDoesNotExist, 'missing.html'):
             template.render(Context())
-        self.assertEqual(e.exception.args[0], 'missing.html')
 
     def test_extends_include_missing_cachedloader(self):
         engine = Engine(debug=True, loaders=[
@@ -255,15 +224,13 @@ class IncludeTests(SimpleTestCase):
         ])
 
         template = engine.get_template('test_extends_error.html')
-        with self.assertRaises(TemplateDoesNotExist) as e:
+        with self.assertRaisesMessage(TemplateDoesNotExist, 'missing.html'):
             template.render(Context())
-        self.assertEqual(e.exception.args[0], 'missing.html')
 
         # Repeat to ensure it still works when loading from the cache
         template = engine.get_template('test_extends_error.html')
-        with self.assertRaises(TemplateDoesNotExist) as e:
+        with self.assertRaisesMessage(TemplateDoesNotExist, 'missing.html'):
             template.render(Context())
-        self.assertEqual(e.exception.args[0], 'missing.html')
 
     def test_include_template_argument(self):
         """
@@ -276,6 +243,26 @@ class IncludeTests(SimpleTestCase):
         outer_tmpl = engine.from_string('{% include tmpl %}')
         output = outer_tmpl.render(ctx)
         self.assertEqual(output, 'This worked!')
+
+    def test_include_template_iterable(self):
+        engine = Engine.get_default()
+        outer_temp = engine.from_string('{% include var %}')
+        tests = [
+            ('admin/fail.html', 'index.html'),
+            ['admin/fail.html', 'index.html'],
+        ]
+        for template_names in tests:
+            with self.subTest(template_names):
+                output = outer_temp.render(Context({'var': template_names}))
+                self.assertEqual(output, 'index\n')
+
+    def test_include_template_none(self):
+        engine = Engine.get_default()
+        outer_temp = engine.from_string('{% include var %}')
+        ctx = Context({'var': None})
+        msg = 'No template names provided'
+        with self.assertRaisesMessage(TemplateDoesNotExist, msg):
+            outer_temp.render(ctx)
 
     def test_include_from_loader_get_template(self):
         tmpl = loader.get_template('include_tpl.html')  # {% include tmpl %}
@@ -307,4 +294,33 @@ class IncludeTests(SimpleTestCase):
         self.assertEqual(
             "Recursion!  A1  Recursion!  B1   B2   B3  Recursion!  C1",
             t.render(Context({'comments': comments})).replace(' ', '').replace('\n', ' ').strip(),
+        )
+
+    def test_include_cache(self):
+        """
+        {% include %} keeps resolved templates constant (#27974). The
+        CounterNode object in the {% counter %} template tag is created once
+        if caching works properly. Each iteration increases the counter instead
+        of restarting it.
+
+        This works as a regression test only if the cached loader
+        isn't used, so the @setup decorator isn't used.
+        """
+        engine = Engine(loaders=[
+            ('django.template.loaders.locmem.Loader', {
+                'template': '{% for x in vars %}{% include "include" %}{% endfor %}',
+                'include': '{% include "next" %}',
+                'next': '{% load custom %}{% counter %}'
+            }),
+        ], libraries={'custom': 'template_tests.templatetags.custom'})
+        output = engine.render_to_string('template', {'vars': range(9)})
+        self.assertEqual(output, '012345678')
+
+
+class IncludeNodeTests(SimpleTestCase):
+    def test_repr(self):
+        include_node = IncludeNode('app/template.html')
+        self.assertEqual(
+            repr(include_node),
+            "<IncludeNode: template='app/template.html'>",
         )

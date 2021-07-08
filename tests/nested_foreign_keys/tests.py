@@ -25,9 +25,10 @@ from .models import (
 # relation such as introduced by one-to-one relations (through multi-table
 # inheritance).
 class NestedForeignKeysTests(TestCase):
-    def setUp(self):
-        self.director = Person.objects.create(name='Terry Gilliam / Terry Jones')
-        self.movie = Movie.objects.create(title='Monty Python and the Holy Grail', director=self.director)
+    @classmethod
+    def setUpTestData(cls):
+        cls.director = Person.objects.create(name='Terry Gilliam / Terry Jones')
+        cls.movie = Movie.objects.create(title='Monty Python and the Holy Grail', director=cls.director)
 
     # This test failed in #16715 because in some cases INNER JOIN was selected
     # for the second foreign key relation instead of LEFT OUTER JOIN.
@@ -124,9 +125,10 @@ class NestedForeignKeysTests(TestCase):
 # nesting as we now use 4 models instead of 3 (and thus 3 relations). This
 # checks if promotion of join types works for deeper nesting too.
 class DeeplyNestedForeignKeysTests(TestCase):
-    def setUp(self):
-        self.director = Person.objects.create(name='Terry Gilliam / Terry Jones')
-        self.movie = Movie.objects.create(title='Monty Python and the Holy Grail', director=self.director)
+    @classmethod
+    def setUpTestData(cls):
+        cls.director = Person.objects.create(name='Terry Gilliam / Terry Jones')
+        cls.movie = Movie.objects.create(title='Monty Python and the Holy Grail', director=cls.director)
 
     def test_inheritance(self):
         Event.objects.create()

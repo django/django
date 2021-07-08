@@ -1,10 +1,10 @@
 import json
 
-from django.conf import settings
 from django.contrib.messages.storage.base import BaseStorage
 from django.contrib.messages.storage.cookie import (
     MessageDecoder, MessageEncoder,
 )
+from django.core.exceptions import ImproperlyConfigured
 
 
 class SessionStorage(BaseStorage):
@@ -14,10 +14,12 @@ class SessionStorage(BaseStorage):
     session_key = '_messages'
 
     def __init__(self, request, *args, **kwargs):
-        assert hasattr(request, 'session'), "The session-based temporary "\
-            "message storage requires session middleware to be installed, "\
-            "and come before the message middleware in the "\
-            "MIDDLEWARE%s list." % ("_CLASSES" if settings.MIDDLEWARE is None else "")
+        if not hasattr(request, 'session'):
+            raise ImproperlyConfigured(
+                'The session-based temporary message storage requires session '
+                'middleware to be installed, and come before the message '
+                'middleware in the MIDDLEWARE list.'
+            )
         super().__init__(request, *args, **kwargs)
 
     def _get(self, *args, **kwargs):
@@ -39,7 +41,7 @@ class SessionStorage(BaseStorage):
         return []
 
     def serialize_messages(self, messages):
-        encoder = MessageEncoder(separators=(',', ':'))
+        encoder = MessageEncoder()
         return encoder.encode(messages)
 
     def deserialize_messages(self, data):

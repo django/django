@@ -10,9 +10,9 @@ class ArticleTranslationDescriptor(ForwardManyToOneDescriptor):
     def __set__(self, instance, value):
         if instance is None:
             raise AttributeError("%s must be accessed via instance" % self.field.name)
-        setattr(instance, self.cache_name, value)
+        self.field.set_cached_value(instance, value)
         if value is not None and not self.field.remote_field.multiple:
-            setattr(value, self.field.related.get_cache_name(), instance)
+            self.field.remote_field.set_cached_value(value, instance)
 
 
 class ColConstraint:
@@ -83,11 +83,10 @@ class ArticleTranslation(models.Model):
     lang = models.CharField(max_length=2)
     title = models.CharField(max_length=100)
     body = models.TextField()
-    abstract = models.CharField(max_length=400, null=True)
+    abstract = models.TextField(null=True)
 
     class Meta:
         unique_together = ('article', 'lang')
-        ordering = ('active_translation__title',)
 
 
 class ArticleTag(models.Model):

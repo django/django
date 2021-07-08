@@ -3,15 +3,11 @@ from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
 from django.db import models
-from django.db.models.fields.related import (
-    ForeignKey, ForeignObject, ForeignObjectRel, ManyToManyField, ManyToOneRel,
-    OneToOneField,
-)
 
 from .models import AllFieldsModel
 
 NON_CONCRETE_FIELDS = (
-    ForeignObject,
+    models.ForeignObject,
     GenericForeignKey,
     GenericRelation,
 )
@@ -23,32 +19,32 @@ NON_EDITABLE_FIELDS = (
 )
 
 RELATION_FIELDS = (
-    ForeignKey,
-    ForeignObject,
-    ManyToManyField,
-    OneToOneField,
+    models.ForeignKey,
+    models.ForeignObject,
+    models.ManyToManyField,
+    models.OneToOneField,
     GenericForeignKey,
     GenericRelation,
 )
 
 MANY_TO_MANY_CLASSES = {
-    ManyToManyField,
+    models.ManyToManyField,
 }
 
 MANY_TO_ONE_CLASSES = {
-    ForeignObject,
-    ForeignKey,
+    models.ForeignObject,
+    models.ForeignKey,
     GenericForeignKey,
 }
 
 ONE_TO_MANY_CLASSES = {
-    ForeignObjectRel,
-    ManyToOneRel,
+    models.ForeignObjectRel,
+    models.ManyToOneRel,
     GenericRelation,
 }
 
 ONE_TO_ONE_CLASSES = {
-    OneToOneField,
+    models.OneToOneField,
 }
 
 FLAG_PROPERTIES = (
@@ -76,21 +72,21 @@ class FieldFlagsTests(test.SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.fields = (
-            list(AllFieldsModel._meta.fields) +
-            list(AllFieldsModel._meta.private_fields)
-        )
+        cls.fields = [
+            *AllFieldsModel._meta.fields,
+            *AllFieldsModel._meta.private_fields,
+        ]
 
-        cls.all_fields = (
-            cls.fields +
-            list(AllFieldsModel._meta.many_to_many) +
-            list(AllFieldsModel._meta.private_fields)
-        )
+        cls.all_fields = [
+            *cls.fields,
+            *AllFieldsModel._meta.many_to_many,
+            *AllFieldsModel._meta.private_fields,
+        ]
 
-        cls.fields_and_reverse_objects = (
-            cls.all_fields +
-            list(AllFieldsModel._meta.related_objects)
-        )
+        cls.fields_and_reverse_objects = [
+            *cls.all_fields,
+            *AllFieldsModel._meta.related_objects,
+        ]
 
     def test_each_field_should_have_a_concrete_attribute(self):
         self.assertTrue(all(f.concrete.__class__ == bool for f in self.fields))

@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015
+# Aarni Koskela, 2015,2020
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-11 11:43+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-12-09 06:30+0000\n"
 "Last-Translator: Aarni Koskela\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
@@ -26,7 +26,7 @@ msgid "The base GIS field."
 msgstr "GIS-peruskenttä."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr "Geometriaperuskenttä – vastaa OpenGIS-määrittelyn geometriatyyppiä."
 
 msgid "Point"
@@ -76,9 +76,6 @@ msgstr "Poista kaikki ominaisuudet"
 msgid "WKT debugging window:"
 msgstr "WKT-debuggausikkuna:"
 
-msgid "Google Maps via GeoDjango"
-msgstr "Google Maps GeoDjangon kautta"
-
 msgid "Debugging window (serialized value)"
 msgstr "Debuggausikkuna (sarjoitettu arvo)"
 
@@ -86,5 +83,5 @@ msgid "No feeds are registered."
 msgstr "Syötteitä ei ole rekisteröity."
 
 #, python-format
-msgid "Slug %r isn't registered."
+msgid "Slug %r isn’t registered."
 msgstr "Lyhytnimeä %r ei ole rekisteröity."

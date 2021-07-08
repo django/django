@@ -6,7 +6,6 @@ class NamedModel(models.Model):
 
     class Meta:
         abstract = True
-        required_db_features = ['gis_enabled']
 
     def __str__(self):
         return self.name
@@ -17,7 +16,6 @@ class City(NamedModel):
 
     class Meta:
         app_label = 'geogapp'
-        required_db_features = ['gis_enabled']
 
 
 class Zipcode(NamedModel):
@@ -31,7 +29,6 @@ class County(NamedModel):
 
     class Meta:
         app_label = 'geogapp'
-        required_db_features = ['gis_enabled']
 
     def __str__(self):
         return ' County, '.join([self.name, self.state])

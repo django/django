@@ -4,6 +4,7 @@ from io import StringIO
 from django.apps import apps
 from django.core import checks
 from django.core.checks import Error, Warning
+from django.core.checks.messages import CheckMessage
 from django.core.checks.registry import CheckRegistry
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -30,10 +31,10 @@ class SystemCheckFrameworkTests(SimpleTestCase):
             return [1, 2, 3]
 
         def f2(**kwargs):
-            return [4, ]
+            return [4]
 
         def f3(**kwargs):
-            return [5, ]
+            return [5]
 
         calls = [0]
 
@@ -65,6 +66,28 @@ class SystemCheckFrameworkTests(SimpleTestCase):
         errors2 = registry2.run_checks(tags=["tag1", "tag2"], include_deployment_checks=True)
         self.assertEqual(errors, errors2)
         self.assertEqual(sorted(errors), [4, 5])
+
+    def test_register_no_kwargs_error(self):
+        registry = CheckRegistry()
+        msg = 'Check functions must accept keyword arguments (**kwargs).'
+        with self.assertRaisesMessage(TypeError, msg):
+            @registry.register
+            def no_kwargs(app_configs, databases):
+                pass
+
+    def test_register_run_checks_non_iterable(self):
+        registry = CheckRegistry()
+
+        @registry.register
+        def return_non_iterable(**kwargs):
+            return Error('Message')
+
+        msg = (
+            'The function %r did not return a list. All functions registered '
+            'with the checks registry must return a list.' % return_non_iterable
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            registry.run_checks()
 
 
 class MessageTests(SimpleTestCase):
@@ -124,6 +147,11 @@ class MessageTests(SimpleTestCase):
         e = Error("Error", obj=DummyObj())
         self.assertNotEqual(e, 'a string')
 
+    def test_invalid_level(self):
+        msg = 'The first argument should be level.'
+        with self.assertRaisesMessage(TypeError, msg):
+            CheckMessage('ERROR', 'Message')
+
 
 def simple_system_check(**kwargs):
     simple_system_check.kwargs = kwargs
@@ -160,26 +188,27 @@ class CheckCommandTests(SimpleTestCase):
     @override_system_checks([simple_system_check, tagged_system_check])
     def test_simple_call(self):
         call_command('check')
-        self.assertEqual(simple_system_check.kwargs, {'app_configs': None})
-        self.assertEqual(tagged_system_check.kwargs, {'app_configs': None})
+        self.assertEqual(simple_system_check.kwargs, {'app_configs': None, 'databases': None})
+        self.assertEqual(tagged_system_check.kwargs, {'app_configs': None, 'databases': None})
 
     @override_system_checks([simple_system_check, tagged_system_check])
     def test_given_app(self):
         call_command('check', 'auth', 'admin')
         auth_config = apps.get_app_config('auth')
         admin_config = apps.get_app_config('admin')
-        self.assertEqual(simple_system_check.kwargs, {'app_configs': [auth_config, admin_config]})
-        self.assertEqual(tagged_system_check.kwargs, {'app_configs': [auth_config, admin_config]})
+        self.assertEqual(simple_system_check.kwargs, {'app_configs': [auth_config, admin_config], 'databases': None})
+        self.assertEqual(tagged_system_check.kwargs, {'app_configs': [auth_config, admin_config], 'databases': None})
 
     @override_system_checks([simple_system_check, tagged_system_check])
     def test_given_tag(self):
         call_command('check', tags=['simpletag'])
         self.assertIsNone(simple_system_check.kwargs)
-        self.assertEqual(tagged_system_check.kwargs, {'app_configs': None})
+        self.assertEqual(tagged_system_check.kwargs, {'app_configs': None, 'databases': None})
 
     @override_system_checks([simple_system_check, tagged_system_check])
     def test_invalid_tag(self):
-        with self.assertRaises(CommandError):
+        msg = 'There is no system check with the "missingtag" tag.'
+        with self.assertRaisesMessage(CommandError, msg):
             call_command('check', tags=['missingtag'])
 
     @override_system_checks([simple_system_check])
@@ -283,6 +312,12 @@ class CheckFrameworkReservedNamesTests(SimpleTestCase):
                 "The 'ModelWithAttributeCalledCheck.check()' class method is "
                 "currently overridden by 42.",
                 obj=ModelWithAttributeCalledCheck,
+                id='models.E020'
+            ),
+            Error(
+                "The 'ModelWithFieldCalledCheck.check()' class method is "
+                "currently overridden by %r." % ModelWithFieldCalledCheck.check,
+                obj=ModelWithFieldCalledCheck,
                 id='models.E020'
             ),
             Error(

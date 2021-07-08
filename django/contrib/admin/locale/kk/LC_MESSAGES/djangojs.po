@@ -6,15 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 10:10+0000\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2017-09-19 16:41+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Kazakh (http://www.transifex.com/django/django/language/kk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: kk\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -66,6 +66,7 @@ msgstr ""
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(cnt)s-ң %(sel)s-ы(і) таңдалды"
+msgstr[1] "%(cnt)s-ң %(sel)s-ы(і) таңдалды"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
@@ -90,24 +91,8 @@ msgstr ""
 "Сіз Сақтау батырмасына қарағанда, Go(Алға) батырмасын іздеп отырған "
 "боларсыз, себебі ешқандай өзгеріс жасамай, әрекет жасадыңыз."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] ""
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] ""
-
 msgid "Now"
 msgstr "Қазір"
-
-msgid "Choose a Time"
-msgstr ""
-
-msgid "Choose a time"
-msgstr "Уақытты таңда"
 
 msgid "Midnight"
 msgstr "Түн жарым"
@@ -120,6 +105,24 @@ msgstr "Талтүс"
 
 msgid "6 p.m."
 msgstr ""
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] ""
+msgstr[1] ""
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Choose a Time"
+msgstr ""
+
+msgid "Choose a time"
+msgstr "Уақытты таңда"
 
 msgid "Cancel"
 msgstr "Болдырмау"

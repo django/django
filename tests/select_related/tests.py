@@ -60,10 +60,6 @@ class SelectRelatedTests(TestCase):
             self.assertEqual(domain.name, 'Eukaryota')
 
     def test_list_without_select_related(self):
-        """
-        select_related() also of course applies to entire lists, not just
-        items. This test verifies the expected behavior without select_related.
-        """
         with self.assertNumQueries(9):
             world = Species.objects.all()
             families = [o.genus.family.name for o in world]
@@ -75,10 +71,7 @@ class SelectRelatedTests(TestCase):
             ])
 
     def test_list_with_select_related(self):
-        """
-        select_related() also of course applies to entire lists, not just
-        items. This test verifies the expected behavior with select_related.
-        """
+        """select_related() applies to entire lists, not just items."""
         with self.assertNumQueries(1):
             world = Species.objects.all().select_related()
             families = [o.genus.family.name for o in world]
@@ -137,10 +130,6 @@ class SelectRelatedTests(TestCase):
                  .order_by('id')[0:1].get().genus.family.order.name)
             self.assertEqual(s, 'Diptera')
 
-    def test_depth_fields_fails(self):
-        with self.assertRaises(TypeError):
-            Species.objects.select_related('genus__family__order', depth=4)
-
     def test_none_clears_list(self):
         queryset = Species.objects.select_related('genus').select_related(None)
         self.assertIs(queryset.query.select_related, False)
@@ -153,6 +142,15 @@ class SelectRelatedTests(TestCase):
             obj = queryset[0]
             self.assertEqual(obj.parent_1, parent_1)
             self.assertEqual(obj.parent_2, parent_2)
+
+    def test_reverse_relation_caching(self):
+        species = Species.objects.select_related('genus').filter(name='melanogaster').first()
+        with self.assertNumQueries(0):
+            self.assertEqual(species.genus.name, 'Drosophila')
+        # The species_set reverse relation isn't cached.
+        self.assertEqual(species.genus._state.fields_cache, {})
+        with self.assertNumQueries(1):
+            self.assertEqual(species.genus.species_set.first().name, 'melanogaster')
 
     def test_select_related_after_values(self):
         """

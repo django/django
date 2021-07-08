@@ -64,8 +64,13 @@ class ExtendsBehaviorTests(SimpleTestCase):
         """
         engine = Engine(dirs=[os.path.join(RECURSIVE, 'fs')])
         template = engine.get_template('self.html')
-        with self.assertRaises(TemplateDoesNotExist):
+        with self.assertRaises(TemplateDoesNotExist) as e:
             template.render(Context({}))
+        tried = e.exception.tried
+        self.assertEqual(len(tried), 1)
+        origin, message = tried[0]
+        self.assertEqual(origin.template_name, 'self.html')
+        self.assertEqual(message, 'Skipped to avoid recursion')
 
     def test_extend_cached(self):
         engine = Engine(
@@ -117,3 +122,24 @@ class ExtendsBehaviorTests(SimpleTestCase):
         template = engine.get_template('base.html')
         output = template.render(Context({}))
         self.assertEqual(output.strip(), 'loader2 loader1')
+
+    def test_block_override_in_extended_included_template(self):
+        """
+        ExtendsNode.find_template() initializes history with self.origin
+        (#28071).
+        """
+        engine = Engine(
+            loaders=[
+                ['django.template.loaders.locmem.Loader', {
+                    'base.html': "{% extends 'base.html' %}{% block base %}{{ block.super }}2{% endblock %}",
+                    'included.html':
+                        "{% extends 'included.html' %}{% block included %}{{ block.super }}B{% endblock %}",
+                }],
+                ['django.template.loaders.locmem.Loader', {
+                    'base.html': "{% block base %}1{% endblock %}{% include 'included.html' %}",
+                    'included.html': "{% block included %}A{% endblock %}",
+                }],
+            ],
+        )
+        template = engine.get_template('base.html')
+        self.assertEqual(template.render(Context({})), '12AB')

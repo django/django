@@ -19,10 +19,10 @@ for the best practice in raising ``ValidationError``. If no ``ValidationError``
 is raised, the method should return the cleaned (normalized) data as a Python
 object.
 
-Most validation can be done using `validators`_ - simple helpers that can be
-reused easily. Validators are simple functions (or callables) that take a single
-argument and raise ``ValidationError`` on invalid input. Validators are run
-after the field's ``to_python`` and ``validate`` methods have been called.
+Most validation can be done using `validators`_ - helpers that can be reused.
+Validators are functions (or callables) that take a single argument and raise
+``ValidationError`` on invalid input. Validators are run after the field's
+``to_python`` and ``validate`` methods have been called.
 
 Validation of a form is split into several steps, which can be customized or
 overridden:
@@ -65,9 +65,9 @@ overridden:
   For example, if you wanted to validate that the contents of a
   ``CharField`` called ``serialnumber`` was unique,
   ``clean_serialnumber()`` would be the right place to do this. You don't
-  need a specific field (it's just a ``CharField``), but you want a
-  formfield-specific piece of validation and, possibly,
-  cleaning/normalizing the data.
+  need a specific field (it's a ``CharField``), but you want a
+  formfield-specific piece of validation and, possibly, cleaning/normalizing
+  the data.
 
   The return value of this method replaces the existing value in
   ``cleaned_data``, so it must be the field's value from ``cleaned_data`` (even
@@ -218,26 +218,26 @@ previous features.
 Using validators
 ----------------
 
-Django's form (and model) fields support use of simple utility functions and
-classes known as validators. A validator is merely a callable object or
-function that takes a value and simply returns nothing if the value is valid or
-raises a :exc:`~django.core.exceptions.ValidationError` if not. These can be
-passed to a field's constructor, via the field's ``validators`` argument, or
-defined on the :class:`~django.forms.Field` class itself with the
-``default_validators`` attribute.
+Django's form (and model) fields support use of utility functions and classes
+known as validators. A validator is a callable object or function that takes a
+value and returns nothing if the value is valid or raises a
+:exc:`~django.core.exceptions.ValidationError` if not. These can be passed to a
+field's constructor, via the field's ``validators`` argument, or defined on the
+:class:`~django.forms.Field` class itself with the ``default_validators``
+attribute.
 
-Simple validators can be used to validate values inside the field, let's have
-a look at Django's ``SlugField``::
+Validators can be used to validate values inside the field, let's have a look
+at Django's ``SlugField``::
 
-    from django.forms import CharField
     from django.core import validators
+    from django.forms import CharField
 
     class SlugField(CharField):
         default_validators = [validators.validate_slug]
 
-As you can see, ``SlugField`` is just a ``CharField`` with a customized
-validator that validates that submitted text obeys to some character rules.
-This can also be done on field definition so::
+As you can see, ``SlugField`` is a ``CharField`` with a customized validator
+that validates that submitted text obeys to some character rules. This can also
+be done on field definition so::
 
     slug = forms.SlugField()
 
@@ -281,8 +281,7 @@ Every form that uses this field will have these methods run before anything
 else can be done with the field's data. This is cleaning that is specific to
 this type of field, regardless of how it is subsequently used.
 
-Let's create a simple ``ContactForm`` to demonstrate how you'd use this
-field::
+Let's create a ``ContactForm`` to demonstrate how you'd use this field::
 
     class ContactForm(forms.Form):
         subject = forms.CharField(max_length=100)
@@ -291,10 +290,10 @@ field::
         recipients = MultiEmailField()
         cc_myself = forms.BooleanField(required=False)
 
-Simply use ``MultiEmailField`` like any other form field. When the
-``is_valid()`` method is called on the form, the ``MultiEmailField.clean()``
-method will be run as part of the cleaning process and it will, in turn, call
-the custom ``to_python()`` and ``validate()`` methods.
+Use ``MultiEmailField`` like any other form field. When the ``is_valid()``
+method is called on the form, the ``MultiEmailField.clean()`` method will be
+run as part of the cleaning process and it will, in turn, call the custom
+``to_python()`` and ``validate()`` methods.
 
 Cleaning a specific field attribute
 -----------------------------------
@@ -306,6 +305,7 @@ don't want to put it into the general ``MultiEmailField`` class. Instead, we
 write a cleaning method that operates on the ``recipients`` field, like so::
 
     from django import forms
+    from django.core.exceptions import ValidationError
 
     class ContactForm(forms.Form):
         # Everything as before.
@@ -314,7 +314,7 @@ write a cleaning method that operates on the ``recipients`` field, like so::
         def clean_recipients(self):
             data = self.cleaned_data['recipients']
             if "fred@example.com" not in data:
-                raise forms.ValidationError("You have forgotten about Fred!")
+                raise ValidationError("You have forgotten about Fred!")
 
             # Always return a value to use as the new cleaned data, even if
             # this method didn't change it.
@@ -347,6 +347,7 @@ an error, you can raise a ``ValidationError`` from the ``clean()`` method. For
 example::
 
     from django import forms
+    from django.core.exceptions import ValidationError
 
     class ContactForm(forms.Form):
         # Everything as before.
@@ -360,13 +361,15 @@ example::
             if cc_myself and subject:
                 # Only do something if both fields are valid so far.
                 if "help" not in subject:
-                    raise forms.ValidationError(
+                    raise ValidationError(
                         "Did not send for 'help' in the subject despite "
                         "CC'ing yourself."
                     )
 
 In this code, if the validation error is raised, the form will display an
-error message at the top of the form (normally) describing the problem.
+error message at the top of the form (normally) describing the problem. Such
+errors are non-field errors, which are displayed in the template with
+``{{ form.non_field_errors }}``.
 
 The call to ``super().clean()`` in the example code ensures that any validation
 logic in parent classes is maintained. If your form inherits another that
@@ -403,7 +406,7 @@ work out what works effectively in your particular situation. Our new code
                 self.add_error('cc_myself', msg)
                 self.add_error('subject', msg)
 
-The second argument of ``add_error()`` can be a simple string, or preferably
-an instance of ``ValidationError``. See :ref:`raising-validation-error` for
-more details. Note that ``add_error()`` automatically removes the field
-from ``cleaned_data``.
+The second argument of ``add_error()`` can be a string, or preferably an
+instance of ``ValidationError``. See :ref:`raising-validation-error` for more
+details. Note that ``add_error()`` automatically removes the field from
+``cleaned_data``.

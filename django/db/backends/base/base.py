@@ -1,21 +1,23 @@
+import _thread
 import copy
+import threading
 import time
 import warnings
 from collections import deque
 from contextlib import contextmanager
 
-import _thread
 import pytz
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.db import DEFAULT_DB_ALIAS
+from django.db import DEFAULT_DB_ALIAS, DatabaseError
 from django.db.backends import utils
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.signals import connection_created
 from django.db.transaction import TransactionManagementError
-from django.db.utils import DatabaseError, DatabaseErrorWrapper
+from django.db.utils import DatabaseErrorWrapper
 from django.utils import timezone
+from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 
 NO_DB_ALIAS = '__no_db__'
@@ -31,6 +33,7 @@ class BaseDatabaseWrapper:
     data_type_check_constraints = {}
     ops = None
     vendor = 'unknown'
+    display_name = 'unknown'
     SchemaEditorClass = None
     # Classes instantiated in __init__().
     client_class = None
@@ -42,8 +45,7 @@ class BaseDatabaseWrapper:
 
     queries_limit = 9000
 
-    def __init__(self, settings_dict, alias=DEFAULT_DB_ALIAS,
-                 allow_thread_sharing=False):
+    def __init__(self, settings_dict, alias=DEFAULT_DB_ALIAS):
         # Connection related attributes.
         # The underlying database connection.
         self.connection = None
@@ -79,7 +81,8 @@ class BaseDatabaseWrapper:
         self.errors_occurred = False
 
         # Thread-safety related attributes.
-        self.allow_thread_sharing = allow_thread_sharing
+        self._thread_sharing_lock = threading.Lock()
+        self._thread_sharing_count = 0
         self._thread_ident = _thread.get_ident()
 
         # A list of no-argument functions to run when the transaction commits.
@@ -90,6 +93,12 @@ class BaseDatabaseWrapper:
         # Should we run the on-commit hooks the next time set_autocommit(True)
         # is called?
         self.run_commit_hooks_on_set_autocommit_on = False
+
+        # A stack of wrappers to be invoked around execute()/executemany()
+        # calls. Each entry is a function taking five arguments: execute, sql,
+        # params, many, and context. It's the function's responsibility to
+        # call execute(sql, params, many, context).
+        self.execute_wrappers = []
 
         self.client = self.client_class(self)
         self.creation = self.creation_class(self)
@@ -108,17 +117,20 @@ class BaseDatabaseWrapper:
     @cached_property
     def timezone(self):
         """
-        Time zone for datetimes stored as naive values in the database.
+        Return a tzinfo of the database connection time zone.
 
-        Return a tzinfo object or None.
+        This is only used when time zone support is enabled. When a datetime is
+        read from the database, it is always returned in this time zone.
 
-        This is only needed when time zone support is enabled and the database
-        doesn't support time zones. (When the database supports time zones,
-        the adapter handles aware datetimes so Django doesn't need to.)
+        When the database backend supports time zones, it doesn't matter which
+        time zone Django uses, as long as aware datetimes are used everywhere.
+        Other users connecting to the database can choose their own time zone.
+
+        When the database backend doesn't support time zones, the time zone
+        Django uses may be constrained by the requirements of other users of
+        the database.
         """
         if not settings.USE_TZ:
-            return None
-        elif self.features.supports_timezones:
             return None
         elif self.settings_dict['TIME_ZONE'] is None:
             return timezone.utc
@@ -169,6 +181,7 @@ class BaseDatabaseWrapper:
 
     # ##### Backend-specific methods for creating connections #####
 
+    @async_unsafe
     def connect(self):
         """Connect to the database. Assume that the connection is closed."""
         # Check for invalid configurations.
@@ -179,7 +192,7 @@ class BaseDatabaseWrapper:
         self.needs_rollback = False
         # Reset parameters defining when to close the connection
         max_age = self.settings_dict['CONN_MAX_AGE']
-        self.close_at = None if max_age is None else time.time() + max_age
+        self.close_at = None if max_age is None else time.monotonic() + max_age
         self.closed_in_transaction = False
         self.errors_occurred = False
         # Establish the connection
@@ -192,16 +205,13 @@ class BaseDatabaseWrapper:
         self.run_on_commit = []
 
     def check_settings(self):
-        if self.settings_dict['TIME_ZONE'] is not None:
-            if not settings.USE_TZ:
-                raise ImproperlyConfigured(
-                    "Connection '%s' cannot set TIME_ZONE because USE_TZ is "
-                    "False." % self.alias)
-            elif self.features.supports_timezones:
-                raise ImproperlyConfigured(
-                    "Connection '%s' cannot set TIME_ZONE because its engine "
-                    "handles time zones conversions natively." % self.alias)
+        if self.settings_dict['TIME_ZONE'] is not None and not settings.USE_TZ:
+            raise ImproperlyConfigured(
+                "Connection '%s' cannot set TIME_ZONE because USE_TZ is False."
+                % self.alias
+            )
 
+    @async_unsafe
     def ensure_connection(self):
         """Guarantee that a connection to the database is established."""
         if self.connection is None:
@@ -243,10 +253,12 @@ class BaseDatabaseWrapper:
 
     # ##### Generic wrappers for PEP-249 connection methods #####
 
+    @async_unsafe
     def cursor(self):
         """Create a cursor, opening a connection if necessary."""
         return self._cursor()
 
+    @async_unsafe
     def commit(self):
         """Commit a transaction and reset the dirty flag."""
         self.validate_thread_sharing()
@@ -256,6 +268,7 @@ class BaseDatabaseWrapper:
         self.errors_occurred = False
         self.run_commit_hooks_on_set_autocommit_on = True
 
+    @async_unsafe
     def rollback(self):
         """Roll back a transaction and reset the dirty flag."""
         self.validate_thread_sharing()
@@ -266,6 +279,7 @@ class BaseDatabaseWrapper:
         self.needs_rollback = False
         self.run_on_commit = []
 
+    @async_unsafe
     def close(self):
         """Close the connection to the database."""
         self.validate_thread_sharing()
@@ -305,6 +319,7 @@ class BaseDatabaseWrapper:
 
     # ##### Generic savepoint management methods #####
 
+    @async_unsafe
     def savepoint(self):
         """
         Create a savepoint inside the current transaction. Return an
@@ -325,6 +340,7 @@ class BaseDatabaseWrapper:
 
         return sid
 
+    @async_unsafe
     def savepoint_rollback(self, sid):
         """
         Roll back to a savepoint. Do nothing if savepoints are not supported.
@@ -340,6 +356,7 @@ class BaseDatabaseWrapper:
             (sids, func) for (sids, func) in self.run_on_commit if sid not in sids
         ]
 
+    @async_unsafe
     def savepoint_commit(self, sid):
         """
         Release a savepoint. Do nothing if savepoints are not supported.
@@ -350,6 +367,7 @@ class BaseDatabaseWrapper:
         self.validate_thread_sharing()
         self._savepoint_commit(sid)
 
+    @async_unsafe
     def clean_savepoints(self):
         """
         Reset the counter used to generate unique savepoint ids in this thread.
@@ -378,7 +396,7 @@ class BaseDatabaseWrapper:
         The usual way to start a transaction is to turn autocommit off.
         SQLite does not properly start a transaction when disabling
         autocommit. To avoid this buggy behavior and to actually enter a new
-        transaction, an explcit BEGIN is required. Using
+        transaction, an explicit BEGIN is required. Using
         force_begin_transaction_with_broken_autocommit=True will issue an
         explicit BEGIN with SQLite. This option will be ignored for other
         backends.
@@ -388,7 +406,7 @@ class BaseDatabaseWrapper:
 
         start_transaction_under_autocommit = (
             force_begin_transaction_with_broken_autocommit and not autocommit and
-            self.features.autocommits_when_autocommit_is_off
+            hasattr(self, '_start_transaction_under_autocommit')
         )
 
         if start_transaction_under_autocommit:
@@ -502,18 +520,33 @@ class BaseDatabaseWrapper:
                     self.close()
                     return
 
-            if self.close_at is not None and time.time() >= self.close_at:
+            if self.close_at is not None and time.monotonic() >= self.close_at:
                 self.close()
                 return
 
     # ##### Thread safety handling #####
 
+    @property
+    def allow_thread_sharing(self):
+        with self._thread_sharing_lock:
+            return self._thread_sharing_count > 0
+
+    def inc_thread_sharing(self):
+        with self._thread_sharing_lock:
+            self._thread_sharing_count += 1
+
+    def dec_thread_sharing(self):
+        with self._thread_sharing_lock:
+            if self._thread_sharing_count <= 0:
+                raise RuntimeError('Cannot decrement the thread sharing count below zero.')
+            self._thread_sharing_count -= 1
+
     def validate_thread_sharing(self):
         """
         Validate that the connection isn't accessed by another thread than the
         one which originally created it, unless the connection was explicitly
-        authorized to be shared between threads (via the `allow_thread_sharing`
-        property). Raise an exception if the validation fails.
+        authorized to be shared between threads (via the `inc_thread_sharing()`
+        method). Raise an exception if the validation fails.
         """
         if not (self.allow_thread_sharing or self._thread_ident == _thread.get_ident()):
             raise DatabaseError(
@@ -566,39 +599,28 @@ class BaseDatabaseWrapper:
         Provide a cursor: with self.temporary_connection() as cursor: ...
         """
         must_close = self.connection is None
-        cursor = self.cursor()
         try:
-            yield cursor
+            with self.cursor() as cursor:
+                yield cursor
         finally:
-            cursor.close()
             if must_close:
                 self.close()
 
-    @property
-    def _nodb_connection(self):
+    @contextmanager
+    def _nodb_cursor(self):
         """
-        Return an alternative connection to be used when there is no need to
-        access the main database, specifically for test db creation/deletion.
-        This also prevents the production database from being exposed to
-        potential child threads while (or after) the test database is destroyed.
-        Refs #10868, #17786, #16969.
+        Return a cursor from an alternative connection to be used when there is
+        no need to access the main database, specifically for test db
+        creation/deletion. This also prevents the production database from
+        being exposed to potential child threads while (or after) the test
+        database is destroyed. Refs #10868, #17786, #16969.
         """
-        settings_dict = self.settings_dict.copy()
-        settings_dict['NAME'] = None
-        nodb_connection = self.__class__(
-            settings_dict,
-            alias=NO_DB_ALIAS,
-            allow_thread_sharing=False)
-        return nodb_connection
-
-    def _start_transaction_under_autocommit(self):
-        """
-        Only required when autocommits_when_autocommit_is_off = True.
-        """
-        raise NotImplementedError(
-            'subclasses of BaseDatabaseWrapper may require a '
-            '_start_transaction_under_autocommit() method'
-        )
+        conn = self.__class__({**self.settings_dict, 'NAME': None}, alias=NO_DB_ALIAS)
+        try:
+            with conn.cursor() as cursor:
+                yield cursor
+        finally:
+            conn.close()
 
     def schema_editor(self, *args, **kwargs):
         """
@@ -610,6 +632,8 @@ class BaseDatabaseWrapper:
         return self.SchemaEditorClass(self, *args, **kwargs)
 
     def on_commit(self, func):
+        if not callable(func):
+            raise TypeError("on_commit()'s callback must be a callable.")
         if self.in_atomic_block:
             # Transaction in progress; save for execution on commit.
             self.run_on_commit.append((set(self.savepoint_ids), func))
@@ -628,7 +652,19 @@ class BaseDatabaseWrapper:
             sids, func = current_run_on_commit.pop(0)
             func()
 
-    def copy(self, alias=None, allow_thread_sharing=None):
+    @contextmanager
+    def execute_wrapper(self, wrapper):
+        """
+        Return a context manager under which the wrapper is applied to suitable
+        database query executions.
+        """
+        self.execute_wrappers.append(wrapper)
+        try:
+            yield
+        finally:
+            self.execute_wrappers.pop()
+
+    def copy(self, alias=None):
         """
         Return a copy of this connection.
 
@@ -637,6 +673,4 @@ class BaseDatabaseWrapper:
         settings_dict = copy.deepcopy(self.settings_dict)
         if alias is None:
             alias = self.alias
-        if allow_thread_sharing is None:
-            allow_thread_sharing = self.allow_thread_sharing
-        return type(self)(settings_dict, alias, allow_thread_sharing)
+        return type(self)(settings_dict, alias)

@@ -60,7 +60,7 @@ def ogrinspect(*args, **kwargs):
 
     ...will print model definition to stout
 
-    or put this in a python script and use to redirect the output to a new
+    or put this in a Python script and use to redirect the output to a new
     model like:
 
     $ python generate_model.py > myapp/models.py
@@ -116,7 +116,7 @@ def ogrinspect(*args, **kwargs):
 
     Note: Call the _ogrinspect() helper to do the heavy lifting.
     """
-    return '\n'.join(s for s in _ogrinspect(*args, **kwargs))
+    return '\n'.join(_ogrinspect(*args, **kwargs))
 
 
 def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=None,
@@ -168,6 +168,7 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
     if imports:
         yield '# This is an auto-generated Django model module created by ogrinspect.'
         yield 'from django.contrib.gis.db import models'
+        yield ''
         yield ''
 
     yield 'class %s(models.Model):' % model_name

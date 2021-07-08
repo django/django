@@ -1,4 +1,5 @@
-from django.forms import EmailField, ValidationError
+from django.core.exceptions import ValidationError
+from django.forms import EmailField
 from django.test import SimpleTestCase
 
 from . import FormFieldAssertionsMixin
@@ -8,7 +9,7 @@ class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
     def test_emailfield_1(self):
         f = EmailField()
-        self.assertWidgetRendersTo(f, '<input type="email" name="f" id="id_f" required />')
+        self.assertWidgetRendersTo(f, '<input type="email" name="f" id="id_f" required>')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean('')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
@@ -41,7 +42,7 @@ class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         f = EmailField(min_length=10, max_length=15)
         self.assertWidgetRendersTo(
             f,
-            '<input id="id_f" type="email" name="f" maxlength="15" minlength="10" required />',
+            '<input id="id_f" type="email" name="f" maxlength="15" minlength="10" required>',
         )
         with self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 10 characters (it has 9).'"):
             f.clean('a@foo.com')
@@ -51,6 +52,7 @@ class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
     def test_emailfield_strip_on_none_value(self):
         f = EmailField(required=False, empty_value=None)
+        self.assertIsNone(f.clean(''))
         self.assertIsNone(f.clean(None))
 
     def test_emailfield_unable_to_set_strip_kwarg(self):

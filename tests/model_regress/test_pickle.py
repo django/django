@@ -1,11 +1,11 @@
 import pickle
 
+import django
 from django.db import DJANGO_VERSION_PICKLE_KEY, models
-from django.test import TestCase
-from django.utils.version import get_version
+from django.test import SimpleTestCase
 
 
-class ModelPickleTestCase(TestCase):
+class ModelPickleTests(SimpleTestCase):
     def test_missing_django_version_unpickling(self):
         """
         #21430 -- Verifies a warning is raised for models that are
@@ -40,6 +40,26 @@ class ModelPickleTestCase(TestCase):
                 return reduce_list
 
         p = DifferentDjangoVersion(title="FooBar")
-        msg = "Pickled model instance's Django version 1.0 does not match the current version %s." % get_version()
+        msg = (
+            "Pickled model instance's Django version 1.0 does not match the "
+            "current version %s." % django.__version__
+        )
         with self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(p))
+
+    def test_with_getstate(self):
+        """
+        A model may override __getstate__() to choose the attributes to pickle.
+        """
+        class PickledModel(models.Model):
+            def __getstate__(self):
+                state = super().__getstate__().copy()
+                del state['dont_pickle']
+                return state
+
+        m = PickledModel()
+        m.dont_pickle = 1
+        dumped = pickle.dumps(m)
+        self.assertEqual(m.dont_pickle, 1)
+        reloaded = pickle.loads(dumped)
+        self.assertFalse(hasattr(reloaded, 'dont_pickle'))

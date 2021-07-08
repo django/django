@@ -5,7 +5,6 @@ is generated for the table on various manage.py operations.
 
 from django.db import models
 
-
 #  All of these models are created in the database by Django.
 
 
@@ -15,9 +14,6 @@ class A01(models.Model):
 
     class Meta:
         db_table = 'a01'
-
-    def __str__(self):
-        return self.f_a
 
 
 class B01(models.Model):
@@ -30,9 +26,6 @@ class B01(models.Model):
         # 'managed' is True by default. This tests we can set it explicitly.
         managed = True
 
-    def __str__(self):
-        return self.f_a
-
 
 class C01(models.Model):
     mm_a = models.ManyToManyField(A01, db_table='d01')
@@ -42,8 +35,6 @@ class C01(models.Model):
     class Meta:
         db_table = 'c01'
 
-    def __str__(self):
-        return self.f_a
 
 # All of these models use the same tables as the previous set (they are shadows
 # of possibly a subset of the columns). There should be no creation errors,
@@ -57,9 +48,6 @@ class A02(models.Model):
         db_table = 'a01'
         managed = False
 
-    def __str__(self):
-        return self.f_a
-
 
 class B02(models.Model):
     class Meta:
@@ -69,9 +57,6 @@ class B02(models.Model):
     fk_a = models.ForeignKey(A02, models.CASCADE)
     f_a = models.CharField(max_length=10, db_index=True)
     f_b = models.IntegerField()
-
-    def __str__(self):
-        return self.f_a
 
 
 # To re-use the many-to-many intermediate table, we need to manually set up
@@ -84,9 +69,6 @@ class C02(models.Model):
     class Meta:
         db_table = 'c01'
         managed = False
-
-    def __str__(self):
-        return self.f_a
 
 
 class Intermediate(models.Model):

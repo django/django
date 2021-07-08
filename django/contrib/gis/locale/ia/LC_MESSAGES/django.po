@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Martijn Dekker <mcdutchie@hotmail.com>, 2012
+# Martijn Dekker <mcdutchie@hotmail.com>, 2012,2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 09:11+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Interlingua (http://www.transifex.com/django/django/language/"
 "ia/)\n"
@@ -21,11 +21,13 @@ msgid "GIS"
 msgstr ""
 
 msgid "The base GIS field."
-msgstr ""
+msgstr "Le campo GIS de base."
 
 msgid ""
 "The base Geometry field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
+"Le campo Geometry de base. Corresponde al typo geometric del specification "
+"OpenGIS."
 
 msgid "Point"
 msgstr "Puncto"
@@ -71,16 +73,13 @@ msgstr ""
 "del formulario geometric."
 
 msgid "Delete all Features"
-msgstr ""
+msgstr "Deler tote le elementos"
 
 msgid "WKT debugging window:"
-msgstr ""
-
-msgid "Google Maps via GeoDjango"
-msgstr ""
+msgstr "Fenestra pro debugging WKT:"
 
 msgid "Debugging window (serialized value)"
-msgstr ""
+msgstr "Fenestra pro debugging (valor serialisate)"
 
 msgid "No feeds are registered."
 msgstr "Nulle syndication es registrate."

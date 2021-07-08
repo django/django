@@ -15,8 +15,9 @@ class DummyStorage:
 
 
 class ApiTests(SimpleTestCase):
+    rf = RequestFactory()
+
     def setUp(self):
-        self.rf = RequestFactory()
         self.request = self.rf.request()
         self.storage = DummyStorage()
 

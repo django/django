@@ -1,0 +1,20 @@
+==========================
+Django 3.2.3 release notes
+==========================
+
+*May 13, 2021*
+
+Django 3.2.3 fixes several bugs in 3.2.2.
+
+Bugfixes
+========
+
+* Prepared for ``mysqlclient`` > 2.0.3 support (:ticket:`32732`).
+
+* Fixed a regression in Django 3.2 that caused the incorrect filtering of
+  querysets combined with the ``|`` operator (:ticket:`32717`).
+
+* Fixed a regression in Django 3.2.1 where saving ``FileField`` would raise a
+  ``SuspiciousFileOperation`` even when a custom
+  :attr:`~django.db.models.FileField.upload_to` returns a valid file path
+  (:ticket:`32718`).

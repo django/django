@@ -6,6 +6,11 @@ This tutorial begins where :doc:`Tutorial 2 </intro/tutorial02>` left off. We're
 continuing the Web-poll application and will focus on creating the public
 interface -- "views."
 
+.. admonition:: Where to get help:
+
+    If you're having trouble going through this tutorial, please head over to
+    the :doc:`Getting Help</faq/help>` section of the FAQ.
+
 Overview
 ========
 
@@ -40,23 +45,23 @@ In our poll application, we'll have the following four views:
   question.
 
 In Django, web pages and other content are delivered by views. Each view is
-represented by a simple Python function (or method, in the case of class-based
-views). Django will choose a view by examining the URL that's requested (to be
-precise, the part of the URL after the domain name).
+represented by a Python function (or method, in the case of class-based views).
+Django will choose a view by examining the URL that's requested (to be precise,
+the part of the URL after the domain name).
 
 Now in your time on the web you may have come across such beauties as
-"ME2/Sites/dirmod.asp?sid=&type=gen&mod=Core+Pages&gid=A6CD4967199A42D9B65B1B".
+``ME2/Sites/dirmod.htm?sid=&type=gen&mod=Core+Pages&gid=A6CD4967199A42D9B65B1B``.
 You will be pleased to know that Django allows us much more elegant
 *URL patterns* than that.
 
-A URL pattern is simply the general form of a URL - for example:
+A URL pattern is the general form of a URL - for example:
 ``/newsarchive/<year>/<month>/``.
 
 To get from a URL to a view, Django uses what are known as 'URLconfs'. A
-URLconf maps URL patterns (described as regular expressions) to views.
+URLconf maps URL patterns to views.
 
 This tutorial provides basic instruction in the use of URLconfs, and you can
-refer to :mod:`django.urls` for more information.
+refer to :doc:`/topics/http/urls` for more information.
 
 Writing more views
 ==================
@@ -64,8 +69,8 @@ Writing more views
 Now let's add a few more views to ``polls/views.py``. These views are
 slightly different, because they take an argument:
 
-.. snippet::
-    :filename: polls/views.py
+.. code-block:: python
+    :caption: polls/views.py
 
     def detail(request, question_id):
         return HttpResponse("You're looking at question %s." % question_id)
@@ -78,24 +83,24 @@ slightly different, because they take an argument:
         return HttpResponse("You're voting on question %s." % question_id)
 
 Wire these new views into the ``polls.urls`` module by adding the following
-:func:`~django.conf.urls.url` calls:
+:func:`~django.urls.path` calls:
 
-.. snippet::
-    :filename: polls/urls.py
+.. code-block:: python
+    :caption: polls/urls.py
 
-    from django.conf.urls import url
+    from django.urls import path
 
     from . import views
 
     urlpatterns = [
         # ex: /polls/
-        url(r'^$', views.index, name='index'),
+        path('', views.index, name='index'),
         # ex: /polls/5/
-        url(r'^(?P<question_id>[0-9]+)/$', views.detail, name='detail'),
+        path('<int:question_id>/', views.detail, name='detail'),
         # ex: /polls/5/results/
-        url(r'^(?P<question_id>[0-9]+)/results/$', views.results, name='results'),
+        path('<int:question_id>/results/', views.results, name='results'),
         # ex: /polls/5/vote/
-        url(r'^(?P<question_id>[0-9]+)/vote/$', views.vote, name='vote'),
+        path('<int:question_id>/vote/', views.vote, name='vote'),
     ]
 
 Take a look in your browser, at "/polls/34/". It'll run the ``detail()``
@@ -106,28 +111,19 @@ placeholder results and voting pages.
 When somebody requests a page from your website -- say, "/polls/34/", Django
 will load the ``mysite.urls`` Python module because it's pointed to by the
 :setting:`ROOT_URLCONF` setting. It finds the variable named ``urlpatterns``
-and traverses the regular expressions in order. After finding the match at
-``'^polls/'``, it strips off the matching text (``"polls/"``) and sends the
-remaining text -- ``"34/"`` -- to the 'polls.urls' URLconf for further
-processing. There it matches ``r'^(?P<question_id>[0-9]+)/$'``, resulting in a
-call to the ``detail()`` view like so::
+and traverses the patterns in order. After finding the match at ``'polls/'``,
+it strips off the matching text (``"polls/"``) and sends the remaining text --
+``"34/"`` -- to the 'polls.urls' URLconf for further processing. There it
+matches ``'<int:question_id>/'``, resulting in a call to the ``detail()`` view
+like so::
 
-    detail(request=<HttpRequest object>, question_id='34')
+    detail(request=<HttpRequest object>, question_id=34)
 
-The ``question_id='34'`` part comes from ``(?P<question_id>[0-9]+)``. Using parentheses
-around a pattern "captures" the text matched by that pattern and sends it as an
-argument to the view function; ``?P<question_id>`` defines the name that will
-be used to identify the matched pattern; and ``[0-9]+`` is a regular expression to
-match a sequence of digits (i.e., a number).
-
-Because the URL patterns are regular expressions, there really is no limit on
-what you can do with them. And there's no need to add URL cruft such as
-``.html`` -- unless you want to, in which case you can do something like
-this::
-
-    url(r'^polls/latest\.html$', views.index),
-
-But, don't do that. It's silly.
+The ``question_id=34`` part comes from ``<int:question_id>``. Using angle
+brackets "captures" part of the URL and sends it as a keyword argument to the
+view function. The ``:question_id>`` part of the string defines the name that
+will be used to identify the matched pattern, and the ``<int:`` part is a
+converter that determines what patterns should match this part of the URL path.
 
 Write views that actually do something
 ======================================
@@ -149,8 +145,8 @@ in :doc:`Tutorial 2 </intro/tutorial02>`. Here's one stab at a new ``index()``
 view, which displays the latest 5 poll questions in the system, separated by
 commas, according to publication date:
 
-.. snippet::
-    :filename: polls/views.py
+.. code-block:: python
+    :caption: polls/views.py
 
     from django.http import HttpResponse
 
@@ -183,7 +179,7 @@ directory called ``polls``, and within that create a file called
 ``index.html``. In other words, your template should be at
 ``polls/templates/polls/index.html``. Because of how the ``app_directories``
 template loader works as described above, you can refer to this template within
-Django simply as ``polls/index.html``.
+Django as ``polls/index.html``.
 
 .. admonition:: Template namespacing
 
@@ -192,14 +188,14 @@ Django simply as ``polls/index.html``.
     but it would actually be a bad idea. Django will choose the first template
     it finds whose name matches, and if you had a template with the same name
     in a *different* application, Django would be unable to distinguish between
-    them. We need to be able to point Django at the right one, and the easiest
+    them. We need to be able to point Django at the right one, and the best
     way to ensure this is by *namespacing* them. That is, by putting those
     templates inside *another* directory named for the application itself.
 
 Put the following code in that template:
 
-.. snippet:: html+django
-    :filename: polls/templates/polls/index.html
+.. code-block:: html+django
+    :caption: polls/templates/polls/index.html
 
     {% if latest_question_list %}
         <ul>
@@ -211,10 +207,17 @@ Put the following code in that template:
         <p>No polls are available.</p>
     {% endif %}
 
+.. note::
+
+    To make the tutorial shorter, all template examples use incomplete HTML. In
+    your own projects you should use `complete HTML documents`__.
+
+__ https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/Getting_started#anatomy_of_an_html_document
+
 Now let's update our ``index`` view in ``polls/views.py`` to use the template:
 
-.. snippet::
-    :filename: polls/views.py
+.. code-block:: python
+    :caption: polls/views.py
 
     from django.http import HttpResponse
     from django.template import loader
@@ -246,8 +249,8 @@ It's a very common idiom to load a template, fill a context and return an
 template. Django provides a shortcut. Here's the full ``index()`` view,
 rewritten:
 
-.. snippet::
-    :filename: polls/views.py
+.. code-block:: python
+    :caption: polls/views.py
 
     from django.shortcuts import render
 
@@ -275,8 +278,8 @@ Raising a 404 error
 Now, let's tackle the question detail view -- the page that displays the question text
 for a given poll. Here's the view:
 
-.. snippet::
-    :filename: polls/views.py
+.. code-block:: python
+    :caption: polls/views.py
 
     from django.http import Http404
     from django.shortcuts import render
@@ -297,8 +300,8 @@ We'll discuss what you could put in that ``polls/detail.html`` template a bit
 later, but if you'd like to quickly get the above example working, a file
 containing just:
 
-.. snippet:: html+django
-    :filename: polls/templates/polls/detail.html
+.. code-block:: html+django
+    :caption: polls/templates/polls/detail.html
 
     {{ question }}
 
@@ -311,8 +314,8 @@ It's a very common idiom to use :meth:`~django.db.models.query.QuerySet.get`
 and raise :exc:`~django.http.Http404` if the object doesn't exist. Django
 provides a shortcut. Here's the ``detail()`` view, rewritten:
 
-.. snippet::
-    :filename: polls/views.py
+.. code-block:: python
+    :caption: polls/views.py
 
     from django.shortcuts import get_object_or_404, render
 
@@ -353,8 +356,8 @@ Back to the ``detail()`` view for our poll application. Given the context
 variable ``question``, here's what the ``polls/detail.html`` template might look
 like:
 
-.. snippet:: html+django
-    :filename: polls/templates/polls/detail.html
+.. code-block:: html+django
+    :caption: polls/templates/polls/detail.html
 
     <h1>{{ question.question_text }}</h1>
     <ul>
@@ -388,7 +391,7 @@ template, the link was partially hardcoded like this:
 
 The problem with this hardcoded, tightly-coupled approach is that it becomes
 challenging to change URLs on projects with a lot of templates. However, since
-you defined the name argument in the :func:`~django.conf.urls.url` functions in
+you defined the name argument in the :func:`~django.urls.path` functions in
 the ``polls.urls`` module, you can remove a reliance on specific URL paths
 defined in your url configurations by using the ``{% url %}`` template tag:
 
@@ -402,7 +405,7 @@ defined below::
 
     ...
     # the 'name' value as called by the {% url %} template tag
-    url(r'^(?P<question_id>[0-9]+)/$', views.detail, name='detail'),
+    path('<int:question_id>/', views.detail, name='detail'),
     ...
 
 If you want to change the URL of the polls detail view to something else,
@@ -411,11 +414,11 @@ template (or templates) you would change it in ``polls/urls.py``::
 
     ...
     # added the word 'specifics'
-    url(r'^specifics/(?P<question_id>[0-9]+)/$', views.detail, name='detail'),
+    path('specifics/<int:question_id>/', views.detail, name='detail'),
     ...
 
 Namespacing URL names
-======================
+=====================
 
 The tutorial project has just one app, ``polls``. In real Django projects,
 there might be five, ten, twenty apps or more. How does Django differentiate
@@ -427,34 +430,35 @@ make it so that Django knows which app view to create for a url when using the
 The answer is to add namespaces to your  URLconf. In the ``polls/urls.py``
 file, go ahead and add an ``app_name`` to set the application namespace:
 
-.. snippet::
-    :filename: polls/urls.py
+.. code-block:: python
+    :caption: polls/urls.py
 
-    from django.conf.urls import url
+    from django.urls import path
 
     from . import views
 
     app_name = 'polls'
     urlpatterns = [
-        url(r'^$', views.index, name='index'),
-        url(r'^(?P<question_id>[0-9]+)/$', views.detail, name='detail'),
-        url(r'^(?P<question_id>[0-9]+)/results/$', views.results, name='results'),
-        url(r'^(?P<question_id>[0-9]+)/vote/$', views.vote, name='vote'),
+        path('', views.index, name='index'),
+        path('<int:question_id>/', views.detail, name='detail'),
+        path('<int:question_id>/results/', views.results, name='results'),
+        path('<int:question_id>/vote/', views.vote, name='vote'),
     ]
 
 Now change your ``polls/index.html`` template from:
 
-.. snippet:: html+django
-    :filename: polls/templates/polls/index.html
+.. code-block:: html+django
+    :caption: polls/templates/polls/index.html
 
     <li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
 
 to point at the namespaced detail view:
 
-.. snippet:: html+django
-    :filename: polls/templates/polls/index.html
+.. code-block:: html+django
+    :caption: polls/templates/polls/index.html
 
     <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
 
 When you're comfortable with writing views, read :doc:`part 4 of this tutorial
-</intro/tutorial04>` to learn about simple form processing and generic views.
+</intro/tutorial04>` to learn the basics about form processing and generic
+views.

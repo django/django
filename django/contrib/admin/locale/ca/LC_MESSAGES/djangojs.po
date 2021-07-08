@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Antoni Aloy <aaloy@apsl.net>, 2017
 # Carles Barrobés <carles@barrobes.com>, 2011-2012,2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Roger Pons <rogerpons@gmail.com>, 2015
@@ -8,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 10:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"Last-Translator: Antoni Aloy <aaloy@apsl.net>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -101,26 +102,8 @@ msgstr ""
 "Heu seleccionat una acció i no heu fet cap canvi a camps individuals. "
 "Probablement esteu cercant el botó 'Anar' enlloc de 'Desar'."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Nota: Aneu %s hora avançats respecte la hora del servidor."
-msgstr[1] "Nota: Aneu %s hores avançats respecte la hora del servidor."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Nota: Aneu %s hora endarrerits respecte la hora del servidor."
-msgstr[1] "Nota: Aneu %s hores endarrerits respecte la hora del servidor."
-
 msgid "Now"
 msgstr "Ara"
-
-msgid "Choose a Time"
-msgstr "Escolliu una hora"
-
-msgid "Choose a time"
-msgstr "Escolliu una hora"
 
 msgid "Midnight"
 msgstr "Mitjanit"
@@ -133,6 +116,24 @@ msgstr "Migdia"
 
 msgid "6 p.m."
 msgstr "6 p.m."
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Nota: Aneu %s hora avançats respecte la hora del servidor."
+msgstr[1] "Nota: Aneu %s hores avançats respecte la hora del servidor."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Nota: Aneu %s hora endarrerits respecte la hora del servidor."
+msgstr[1] "Nota: Aneu %s hores endarrerits respecte la hora del servidor."
+
+msgid "Choose a Time"
+msgstr "Escolliu una hora"
+
+msgid "Choose a time"
+msgstr "Escolliu una hora"
 
 msgid "Cancel"
 msgstr "Cancel·lar"
@@ -150,68 +151,68 @@ msgid "Tomorrow"
 msgstr "Demà"
 
 msgid "January"
-msgstr ""
+msgstr "Gener"
 
 msgid "February"
-msgstr ""
+msgstr "Febrer"
 
 msgid "March"
-msgstr ""
+msgstr "Març"
 
 msgid "April"
-msgstr ""
+msgstr "Abril"
 
 msgid "May"
-msgstr ""
+msgstr "Maig"
 
 msgid "June"
-msgstr ""
+msgstr "Juny"
 
 msgid "July"
-msgstr ""
+msgstr "Juliol"
 
 msgid "August"
-msgstr ""
+msgstr "Agost"
 
 msgid "September"
-msgstr ""
+msgstr "Setembre"
 
 msgid "October"
-msgstr ""
+msgstr "Octubre"
 
 msgid "November"
-msgstr ""
+msgstr "Novembre"
 
 msgid "December"
-msgstr ""
+msgstr "Desembre"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "D"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "L"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "M"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "X"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "J"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "V"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "S"
 
 msgid "Show"
 msgstr "Mostrar"

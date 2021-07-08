@@ -1,20 +1,22 @@
 import itertools
 import math
 from copy import copy
-from decimal import Decimal
 
 from django.core.exceptions import EmptyResultSet
-from django.db.models.expressions import Func, Value
+from django.db.models.expressions import Case, Func, Value, When
 from django.db.models.fields import (
-    DateTimeField, DecimalField, Field, IntegerField,
+    CharField, DateTimeField, Field, IntegerField, UUIDField,
 )
 from django.db.models.query_utils import RegisterLookupMixin
+from django.utils.datastructures import OrderedSet
 from django.utils.functional import cached_property
+from django.utils.hashable import make_hashable
 
 
 class Lookup:
     lookup_name = None
     prepare_rhs = True
+    can_use_none_as_rhs = False
 
     def __init__(self, lhs, rhs):
         self.lhs, self.rhs = lhs, rhs
@@ -26,15 +28,20 @@ class Lookup:
         if bilateral_transforms:
             # Warn the user as soon as possible if they are trying to apply
             # a bilateral transformation on a nested QuerySet: that won't work.
-            from django.db.models.sql.query import Query  # avoid circular import
+            from django.db.models.sql.query import (  # avoid circular import
+                Query,
+            )
             if isinstance(rhs, Query):
-                raise NotImplementedError("Bilateral transformations on nested querysets are not supported.")
+                raise NotImplementedError("Bilateral transformations on nested querysets are not implemented.")
         self.bilateral_transforms = bilateral_transforms
 
     def apply_bilateral_transforms(self, value):
         for transform in self.bilateral_transforms:
             value = transform(value)
         return value
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.lhs!r}, {self.rhs!r})'
 
     def batch_process_rhs(self, compiler, connection, rhs=None):
         if rhs is None:
@@ -65,8 +72,8 @@ class Lookup:
             self.lhs, self.rhs = new_exprs
 
     def get_prep_lookup(self):
-        if hasattr(self.rhs, '_prepare'):
-            return self.rhs._prepare(self.lhs.output_field)
+        if hasattr(self.rhs, 'resolve_expression'):
+            return self.rhs
         if self.prepare_rhs and hasattr(self.lhs.output_field, 'get_prep_value'):
             return self.lhs.output_field.get_prep_value(self.rhs)
         return self.rhs
@@ -76,6 +83,8 @@ class Lookup:
 
     def process_lhs(self, compiler, connection, lhs=None):
         lhs = lhs or self.lhs
+        if hasattr(lhs, 'resolve_expression'):
+            lhs = lhs.resolve_expression(compiler.query)
         return compiler.compile(lhs)
 
     def process_rhs(self, compiler, connection):
@@ -87,22 +96,19 @@ class Lookup:
                 value = Value(value, output_field=self.lhs.output_field)
             value = self.apply_bilateral_transforms(value)
             value = value.resolve_expression(compiler.query)
-        # Due to historical reasons there are a couple of different
-        # ways to produce sql here. get_compiler is likely a Query
-        # instance and as_sql just something with as_sql. Finally the value
-        # can of course be just plain Python value.
-        if hasattr(value, 'get_compiler'):
-            value = value.get_compiler(connection=connection)
         if hasattr(value, 'as_sql'):
             sql, params = compiler.compile(value)
-            return '(' + sql + ')', params
+            # Ensure expression is wrapped in parentheses to respect operator
+            # precedence but avoid double wrapping as it can be misinterpreted
+            # on some backends (e.g. subqueries on SQLite).
+            if sql and sql[0] != '(':
+                sql = '(%s)' % sql
+            return sql, params
         else:
             return self.get_db_prep_lookup(value, connection)
 
     def rhs_is_direct_value(self):
-        return not(
-            hasattr(self.rhs, 'as_sql') or
-            hasattr(self.rhs, 'get_compiler'))
+        return not hasattr(self.rhs, 'as_sql')
 
     def relabeled_clone(self, relabels):
         new = copy(self)
@@ -111,7 +117,7 @@ class Lookup:
             new.rhs = new.rhs.relabeled_clone(relabels)
         return new
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         cols = self.lhs.get_group_by_cols()
         if hasattr(self.rhs, 'get_group_by_cols'):
             cols.extend(self.rhs.get_group_by_cols())
@@ -120,13 +126,42 @@ class Lookup:
     def as_sql(self, compiler, connection):
         raise NotImplementedError
 
+    def as_oracle(self, compiler, connection):
+        # Oracle doesn't allow EXISTS() and filters to be compared to another
+        # expression unless they're wrapped in a CASE WHEN.
+        wrapped = False
+        exprs = []
+        for expr in (self.lhs, self.rhs):
+            if connection.ops.conditional_expression_supported_in_where_clause(expr):
+                expr = Case(When(expr, then=True), default=False)
+                wrapped = True
+            exprs.append(expr)
+        lookup = type(self)(*exprs) if wrapped else self
+        return lookup.as_sql(compiler, connection)
+
     @cached_property
     def contains_aggregate(self):
         return self.lhs.contains_aggregate or getattr(self.rhs, 'contains_aggregate', False)
 
+    @cached_property
+    def contains_over_clause(self):
+        return self.lhs.contains_over_clause or getattr(self.rhs, 'contains_over_clause', False)
+
     @property
     def is_summary(self):
         return self.lhs.is_summary or getattr(self.rhs, 'is_summary', False)
+
+    @property
+    def identity(self):
+        return self.__class__, self.lhs, self.rhs
+
+    def __eq__(self, other):
+        if not isinstance(other, Lookup):
+            return NotImplemented
+        return self.identity == other.identity
+
+    def __hash__(self):
+        return hash(make_hashable(self.identity))
 
 
 class Transform(RegisterLookupMixin, Func):
@@ -180,11 +215,10 @@ class FieldGetDbPrepValueMixin:
     get_db_prep_lookup_value_is_iterable = False
 
     def get_db_prep_lookup(self, value, connection):
-        # For relational fields, use the output_field of the 'field' attribute.
-        field = getattr(self.lhs.output_field, 'field', None)
-        get_db_prep_value = getattr(field, 'get_db_prep_value', None)
-        if not get_db_prep_value:
-            get_db_prep_value = self.lhs.output_field.get_db_prep_value
+        # For relational fields, use the 'target_field' attribute of the
+        # output_field.
+        field = getattr(self.lhs.output_field, 'target_field', None)
+        get_db_prep_value = getattr(field, 'get_db_prep_value', None) or self.lhs.output_field.get_db_prep_value
         return (
             '%s',
             [get_db_prep_value(v, connection, prepared=True) for v in value]
@@ -201,11 +235,9 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
     get_db_prep_lookup_value_is_iterable = True
 
     def get_prep_lookup(self):
+        if hasattr(self.rhs, 'resolve_expression'):
+            return self.rhs
         prepared_values = []
-        if hasattr(self.rhs, '_prepare'):
-            # A subquery is like an iterable but its items shouldn't be
-            # prepared independently.
-            return self.rhs._prepare(self.lhs.output_field)
         for rhs_value in self.rhs:
             if hasattr(rhs_value, 'resolve_expression'):
                 # An expression will be handled by the database but can coexist
@@ -229,7 +261,7 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
         if hasattr(param, 'resolve_expression'):
             param = param.resolve_expression(compiler.query)
         if hasattr(param, 'as_sql'):
-            sql, params = param.as_sql(compiler, connection)
+            sql, params = compiler.compile(param)
         return sql, params
 
     def batch_process_rhs(self, compiler, connection, rhs=None):
@@ -246,9 +278,48 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
         return sql, tuple(params)
 
 
+class PostgresOperatorLookup(FieldGetDbPrepValueMixin, Lookup):
+    """Lookup defined by operators on PostgreSQL."""
+    postgres_operator = None
+
+    def as_postgresql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
+        params = tuple(lhs_params) + tuple(rhs_params)
+        return '%s %s %s' % (lhs, self.postgres_operator, rhs), params
+
+
 @Field.register_lookup
 class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name = 'exact'
+
+    def process_rhs(self, compiler, connection):
+        from django.db.models.sql.query import Query
+        if isinstance(self.rhs, Query):
+            if self.rhs.has_limit_one():
+                if not self.rhs.has_select_fields:
+                    self.rhs.clear_select_clause()
+                    self.rhs.add_fields(['pk'])
+            else:
+                raise ValueError(
+                    'The QuerySet value for an exact lookup must be limited to '
+                    'one result using slicing.'
+                )
+        return super().process_rhs(compiler, connection)
+
+    def as_sql(self, compiler, connection):
+        # Avoid comparison against direct rhs if lhs is a boolean value. That
+        # turns "boolfield__exact=True" into "WHERE boolean_field" instead of
+        # "WHERE boolean_field = True" when allowed.
+        if (
+            isinstance(self.rhs, bool) and
+            getattr(self.lhs, 'conditional', False) and
+            connection.ops.conditional_expression_supported_in_where_clause(self.lhs)
+        ):
+            lhs_sql, params = self.process_lhs(compiler, connection)
+            template = '%s' if self.rhs else 'NOT %s'
+            return template % lhs_sql, params
+        return super().as_sql(compiler, connection)
 
 
 @Field.register_lookup
@@ -304,40 +375,6 @@ class IntegerLessThan(IntegerFieldFloatRounding, LessThan):
     pass
 
 
-class DecimalComparisonLookup:
-    def as_sqlite(self, compiler, connection):
-        lhs_sql, params = self.process_lhs(compiler, connection)
-        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
-        params.extend(rhs_params)
-        # For comparisons whose lhs is a DecimalField, cast rhs AS NUMERIC
-        # because the rhs will have been converted to a string by the
-        # rev_typecast_decimal() adapter.
-        if isinstance(self.rhs, Decimal):
-            rhs_sql = 'CAST(%s AS NUMERIC)' % rhs_sql
-        rhs_sql = self.get_rhs_op(connection, rhs_sql)
-        return '%s %s' % (lhs_sql, rhs_sql), params
-
-
-@DecimalField.register_lookup
-class DecimalGreaterThan(DecimalComparisonLookup, GreaterThan):
-    pass
-
-
-@DecimalField.register_lookup
-class DecimalGreaterThanOrEqual(DecimalComparisonLookup, GreaterThanOrEqual):
-    pass
-
-
-@DecimalField.register_lookup
-class DecimalLessThan(DecimalComparisonLookup, LessThan):
-    pass
-
-
-@DecimalField.register_lookup
-class DecimalLessThanOrEqual(DecimalComparisonLookup, LessThanOrEqual):
-    pass
-
-
 @Field.register_lookup
 class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     lookup_name = 'in'
@@ -351,10 +388,12 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             )
 
         if self.rhs_is_direct_value():
+            # Remove None from the list as NULL is never equal to anything.
             try:
-                rhs = set(self.rhs)
+                rhs = OrderedSet(self.rhs)
+                rhs.discard(None)
             except TypeError:  # Unhashable items in self.rhs
-                rhs = self.rhs
+                rhs = [r for r in self.rhs if r is not None]
 
             if not rhs:
                 raise EmptyResultSet
@@ -365,7 +404,26 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             placeholder = '(' + ', '.join(sqls) + ')'
             return (placeholder, sqls_params)
         else:
+            from django.db.models.sql.query import (  # avoid circular import
+                Query,
+            )
+            if isinstance(self.rhs, Query):
+                query = self.rhs
+                query.clear_ordering(clear_default=True)
+                if not query.has_select_fields:
+                    query.clear_select_clause()
+                    query.add_fields(['pk'])
+
             return super().process_rhs(compiler, connection)
+
+    def get_group_by_cols(self, alias=None):
+        cols = self.lhs.get_group_by_cols()
+        if hasattr(self.rhs, 'get_group_by_cols'):
+            if not getattr(self.rhs, 'has_select_fields', True):
+                self.rhs.clear_select_clause()
+                self.rhs.add_fields(['pk'])
+            cols.extend(self.rhs.get_group_by_cols())
+        return cols
 
     def get_rhs_op(self, connection, rhs):
         return 'IN %s' % rhs
@@ -400,6 +458,8 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
 
 
 class PatternLookup(BuiltinLookup):
+    param_pattern = '%%%s%%'
+    prepare_rhs = False
 
     def get_rhs_op(self, connection, rhs):
         # Assume we are in startswith. We need to produce SQL like:
@@ -411,77 +471,49 @@ class PatternLookup(BuiltinLookup):
         # So, for Python values we don't need any special pattern, but for
         # SQL reference values or SQL transformations we need the correct
         # pattern added.
-        if hasattr(self.rhs, 'get_compiler') or hasattr(self.rhs, 'as_sql') or self.bilateral_transforms:
+        if hasattr(self.rhs, 'as_sql') or self.bilateral_transforms:
             pattern = connection.pattern_ops[self.lookup_name].format(connection.pattern_esc)
             return pattern.format(rhs)
         else:
             return super().get_rhs_op(connection, rhs)
 
+    def process_rhs(self, qn, connection):
+        rhs, params = super().process_rhs(qn, connection)
+        if self.rhs_is_direct_value() and params and not self.bilateral_transforms:
+            params[0] = self.param_pattern % connection.ops.prep_for_like_query(params[0])
+        return rhs, params
+
 
 @Field.register_lookup
 class Contains(PatternLookup):
     lookup_name = 'contains'
-    prepare_rhs = False
-
-    def process_rhs(self, qn, connection):
-        rhs, params = super().process_rhs(qn, connection)
-        if params and not self.bilateral_transforms:
-            params[0] = "%%%s%%" % connection.ops.prep_for_like_query(params[0])
-        return rhs, params
 
 
 @Field.register_lookup
 class IContains(Contains):
     lookup_name = 'icontains'
-    prepare_rhs = False
 
 
 @Field.register_lookup
 class StartsWith(PatternLookup):
     lookup_name = 'startswith'
-    prepare_rhs = False
-
-    def process_rhs(self, qn, connection):
-        rhs, params = super().process_rhs(qn, connection)
-        if params and not self.bilateral_transforms:
-            params[0] = "%s%%" % connection.ops.prep_for_like_query(params[0])
-        return rhs, params
+    param_pattern = '%s%%'
 
 
 @Field.register_lookup
-class IStartsWith(PatternLookup):
+class IStartsWith(StartsWith):
     lookup_name = 'istartswith'
-    prepare_rhs = False
-
-    def process_rhs(self, qn, connection):
-        rhs, params = super().process_rhs(qn, connection)
-        if params and not self.bilateral_transforms:
-            params[0] = "%s%%" % connection.ops.prep_for_like_query(params[0])
-        return rhs, params
 
 
 @Field.register_lookup
 class EndsWith(PatternLookup):
     lookup_name = 'endswith'
-    prepare_rhs = False
-
-    def process_rhs(self, qn, connection):
-        rhs, params = super().process_rhs(qn, connection)
-        if params and not self.bilateral_transforms:
-            params[0] = "%%%s" % connection.ops.prep_for_like_query(params[0])
-        return rhs, params
+    param_pattern = '%%%s'
 
 
 @Field.register_lookup
-class IEndsWith(PatternLookup):
+class IEndsWith(EndsWith):
     lookup_name = 'iendswith'
-    prepare_rhs = False
-
-    def process_rhs(self, qn, connection):
-        rhs, params = super().process_rhs(qn, connection)
-        if params and not self.bilateral_transforms:
-            params[0] = "%%%s" % connection.ops.prep_for_like_query(params[0])
-        return rhs, params
 
 
 @Field.register_lookup
@@ -498,6 +530,11 @@ class IsNull(BuiltinLookup):
     prepare_rhs = False
 
     def as_sql(self, compiler, connection):
+        if not isinstance(self.rhs, bool):
+            raise ValueError(
+                'The QuerySet value for an isnull lookup must be True or '
+                'False.'
+            )
         sql, params = compiler.compile(self.lhs)
         if self.rhs:
             return "%s IS NULL" % sql, params
@@ -527,78 +564,115 @@ class IRegex(Regex):
 
 class YearLookup(Lookup):
     def year_lookup_bounds(self, connection, year):
+        from django.db.models.functions import ExtractIsoYear
+        iso_year = isinstance(self.lhs, ExtractIsoYear)
         output_field = self.lhs.lhs.output_field
         if isinstance(output_field, DateTimeField):
-            bounds = connection.ops.year_lookup_bounds_for_datetime_field(year)
+            bounds = connection.ops.year_lookup_bounds_for_datetime_field(
+                year, iso_year=iso_year,
+            )
         else:
-            bounds = connection.ops.year_lookup_bounds_for_date_field(year)
+            bounds = connection.ops.year_lookup_bounds_for_date_field(
+                year, iso_year=iso_year,
+            )
         return bounds
 
-
-class YearComparisonLookup(YearLookup):
     def as_sql(self, compiler, connection):
-        # We will need to skip the extract part and instead go
-        # directly with the originating field, that is self.lhs.lhs.
-        lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
-        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
-        rhs_sql = self.get_rhs_op(connection, rhs_sql)
-        start, finish = self.year_lookup_bounds(connection, rhs_params[0])
-        params.append(self.get_bound(start, finish))
-        return '%s %s' % (lhs_sql, rhs_sql), params
+        # Avoid the extract operation if the rhs is a direct value to allow
+        # indexes to be used.
+        if self.rhs_is_direct_value():
+            # Skip the extract part by directly using the originating field,
+            # that is self.lhs.lhs.
+            lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
+            rhs_sql, _ = self.process_rhs(compiler, connection)
+            rhs_sql = self.get_direct_rhs_sql(connection, rhs_sql)
+            start, finish = self.year_lookup_bounds(connection, self.rhs)
+            params.extend(self.get_bound_params(start, finish))
+            return '%s %s' % (lhs_sql, rhs_sql), params
+        return super().as_sql(compiler, connection)
 
-    def get_rhs_op(self, connection, rhs):
+    def get_direct_rhs_sql(self, connection, rhs):
         return connection.operators[self.lookup_name] % rhs
 
-    def get_bound(self):
+    def get_bound_params(self, start, finish):
         raise NotImplementedError(
-            'subclasses of YearComparisonLookup must provide a get_bound() method'
+            'subclasses of YearLookup must provide a get_bound_params() method'
         )
 
 
 class YearExact(YearLookup, Exact):
-    lookup_name = 'exact'
+    def get_direct_rhs_sql(self, connection, rhs):
+        return 'BETWEEN %s AND %s'
 
-    def as_sql(self, compiler, connection):
-        # We will need to skip the extract part and instead go
-        # directly with the originating field, that is self.lhs.lhs.
-        lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
-        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
-        try:
-            # Check that rhs_params[0] exists (IndexError),
-            # it isn't None (TypeError), and is a number (ValueError)
-            int(rhs_params[0])
-        except (IndexError, TypeError, ValueError):
-            # Can't determine the bounds before executing the query, so skip
-            # optimizations by falling back to a standard exact comparison.
-            return super().as_sql(compiler, connection)
-        bounds = self.year_lookup_bounds(connection, rhs_params[0])
-        params.extend(bounds)
-        return '%s BETWEEN %%s AND %%s' % lhs_sql, params
+    def get_bound_params(self, start, finish):
+        return (start, finish)
 
 
-class YearGt(YearComparisonLookup):
-    lookup_name = 'gt'
-
-    def get_bound(self, start, finish):
-        return finish
+class YearGt(YearLookup, GreaterThan):
+    def get_bound_params(self, start, finish):
+        return (finish,)
 
 
-class YearGte(YearComparisonLookup):
-    lookup_name = 'gte'
-
-    def get_bound(self, start, finish):
-        return start
+class YearGte(YearLookup, GreaterThanOrEqual):
+    def get_bound_params(self, start, finish):
+        return (start,)
 
 
-class YearLt(YearComparisonLookup):
-    lookup_name = 'lt'
-
-    def get_bound(self, start, finish):
-        return start
+class YearLt(YearLookup, LessThan):
+    def get_bound_params(self, start, finish):
+        return (start,)
 
 
-class YearLte(YearComparisonLookup):
-    lookup_name = 'lte'
+class YearLte(YearLookup, LessThanOrEqual):
+    def get_bound_params(self, start, finish):
+        return (finish,)
 
-    def get_bound(self, start, finish):
-        return finish
+
+class UUIDTextMixin:
+    """
+    Strip hyphens from a value when filtering a UUIDField on backends without
+    a native datatype for UUID.
+    """
+    def process_rhs(self, qn, connection):
+        if not connection.features.has_native_uuid_field:
+            from django.db.models.functions import Replace
+            if self.rhs_is_direct_value():
+                self.rhs = Value(self.rhs)
+            self.rhs = Replace(self.rhs, Value('-'), Value(''), output_field=CharField())
+        rhs, params = super().process_rhs(qn, connection)
+        return rhs, params
+
+
+@UUIDField.register_lookup
+class UUIDIExact(UUIDTextMixin, IExact):
+    pass
+
+
+@UUIDField.register_lookup
+class UUIDContains(UUIDTextMixin, Contains):
+    pass
+
+
+@UUIDField.register_lookup
+class UUIDIContains(UUIDTextMixin, IContains):
+    pass
+
+
+@UUIDField.register_lookup
+class UUIDStartsWith(UUIDTextMixin, StartsWith):
+    pass
+
+
+@UUIDField.register_lookup
+class UUIDIStartsWith(UUIDTextMixin, IStartsWith):
+    pass
+
+
+@UUIDField.register_lookup
+class UUIDEndsWith(UUIDTextMixin, EndsWith):
+    pass
+
+
+@UUIDField.register_lookup
+class UUIDIEndsWith(UUIDTextMixin, IEndsWith):
+    pass

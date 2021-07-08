@@ -2,13 +2,13 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Ramiro Morales, 2012,2014-2015
+# Ramiro Morales, 2012,2014-2015,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-30 00:21+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-10-01 10:26+0000\n"
 "Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -25,9 +25,9 @@ msgid "The base GIS field."
 msgstr "El campo GIS base"
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
-"El campo Geometry base -- corresponde al tipo Geometry de la especificación "
+"El campo Geometry base — corresponde al tipo Geometry de la especificación "
 "OpenGIS."
 
 msgid "Point"
@@ -79,9 +79,6 @@ msgstr "Eliminar todas las Features"
 msgid "WKT debugging window:"
 msgstr "Ventana de depuración WTK:"
 
-msgid "Google Maps via GeoDjango"
-msgstr "Google Maps vía GeoDjango"
-
 msgid "Debugging window (serialized value)"
 msgstr "Ventana de depuración (valor serializado)"
 
@@ -89,5 +86,5 @@ msgid "No feeds are registered."
 msgstr "No se han registrado feeds."
 
 #, python-format
-msgid "Slug %r isn't registered."
+msgid "Slug %r isn’t registered."
 msgstr "El slug %r no está registrado."

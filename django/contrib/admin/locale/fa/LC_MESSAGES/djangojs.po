@@ -6,22 +6,23 @@
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Pouya Abbassi, 2016
+# rahim agh <rahim.aghareb@gmail.com>, 2020-2021
 # Reza Mohammadi <reza@teeleh.ir>, 2014
 # Sina Cheraghi <sinacher@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-08-16 13:54+0000\n"
-"Last-Translator: Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-04-03 13:56+0000\n"
+"Last-Translator: rahim agh <rahim.aghareb@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fa\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -77,6 +78,7 @@ msgstr "برای حذف یکجای همهٔ %sی انتخاب شده کلیک ک
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] " %(sel)s از %(cnt)s انتخاب شده‌اند"
+msgstr[1] " %(sel)s از %(cnt)s انتخاب شده‌اند"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
@@ -86,40 +88,24 @@ msgstr ""
 "دهید،  تغییرات از دست خواهند رفت"
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"شما کاری را انتخاب کرده اید، ولی هنوز تغییرات بعضی فیلد ها را ذخیره نکرده "
-"اید. لطفا OK را فشار دهید تا ذخیره شود.\n"
-"شما باید عملیات را دوباره انجام دهید."
+"شما یک اقدام را انتخاب کرده‌اید، ولی تغییراتی که در فیلدهای شخصی وارد کرده‌اید "
+"هنوز ذخیره نشده‌اند. لطفاً کلید OK را برای ذخیره کردن تغییرات بزنید. لازم است "
+"که اقدام را دوباره اجرا کنید."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"شما عملی را انجام داده اید، ولی تغییری انجام نداده اید. احتمالا دنبال کلید "
-"Go به جای Save میگردید."
-
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "توجه: شما %s ساعت از زمان سرور جلو هستید."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "توجه: شما %s ساعت از زمان سرور عقب هستید."
+"شما یک اقدام را انتخاب کرده‌اید، ولی تغییراتی در فیلدهای شخصی وارد نکرده‌اید. "
+"احتمالاً به جای کلید Save به دنبال کلید Go می‌گردید."
 
 msgid "Now"
 msgstr "اکنون"
-
-msgid "Choose a Time"
-msgstr "یک زمان انتخاب کنید"
-
-msgid "Choose a time"
-msgstr "یک زمان انتخاب کنید"
 
 msgid "Midnight"
 msgstr "نیمه‌شب"
@@ -132,6 +118,24 @@ msgstr "ظهر"
 
 msgid "6 p.m."
 msgstr "۶ بعدازظهر"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "توجه: شما %s ساعت از زمان سرور جلو هستید."
+msgstr[1] "توجه: شما %s ساعت از زمان سرور جلو هستید."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "توجه: شما %s ساعت از زمان سرور عقب هستید."
+msgstr[1] "توجه: شما %s ساعت از زمان سرور عقب هستید."
+
+msgid "Choose a Time"
+msgstr "یک زمان انتخاب کنید"
+
+msgid "Choose a time"
+msgstr "یک زمان انتخاب کنید"
 
 msgid "Cancel"
 msgstr "انصراف"
@@ -182,6 +186,54 @@ msgid "November"
 msgstr "نوامبر"
 
 msgid "December"
+msgstr "دسامبر"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "ژانویه"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "فوریه"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "مارس"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "آوریل"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "می"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "ژوئن"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "ژوئیه"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "اوت"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "سپتامبر"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "اکتبر"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "نوامبر"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
 msgstr "دسامبر"
 
 msgctxt "one letter Sunday"

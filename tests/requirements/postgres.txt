@@ -1,1 +1,1 @@
-psycopg2>=2.5
+psycopg2>=2.5.4

@@ -34,5 +34,5 @@ class CPointerBase:
         if self.destructor and self._ptr:
             try:
                 self.destructor(self.ptr)
-            except (AttributeError, TypeError):
+            except (AttributeError, ImportError, TypeError):
                 pass  # Some part might already have been garbage collected

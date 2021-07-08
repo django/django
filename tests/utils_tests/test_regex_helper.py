@@ -1,6 +1,7 @@
+import re
 import unittest
-import warnings
 
+from django.test import SimpleTestCase
 from django.utils import regex_helper
 
 
@@ -23,16 +24,6 @@ class NormalizeTests(unittest.TestCase):
         result = regex_helper.normalize(pattern)
         self.assertEqual(result, expected)
 
-    def test_group_ignored(self):
-        pattern = r"(?i)(?L)(?m)(?s)(?u)(?#)"
-        expected = [('', [])]
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-            result = regex_helper.normalize(pattern)
-        self.assertEqual(result, expected)
-        for i, char in enumerate('iLmsu#'):
-            self.assertEqual(str(warns[i].message), 'Using (?%s) in url() patterns is deprecated.' % char)
-
     def test_group_noncapturing(self):
         pattern = r"(?:non-capturing)"
         expected = [('non-capturing', [])]
@@ -52,3 +43,12 @@ class NormalizeTests(unittest.TestCase):
                     ['first_group_name'])]
         result = regex_helper.normalize(pattern)
         self.assertEqual(result, expected)
+
+
+class LazyReCompileTests(SimpleTestCase):
+    def test_flags_with_pre_compiled_regex(self):
+        test_pattern = re.compile('test')
+        lazy_test_pattern = regex_helper._lazy_re_compile(test_pattern, re.I)
+        msg = 'flags must be empty if regex is passed pre-compiled'
+        with self.assertRaisesMessage(AssertionError, msg):
+            lazy_test_pattern.match('TEST')

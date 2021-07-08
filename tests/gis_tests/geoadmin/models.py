@@ -9,7 +9,6 @@ class City(models.Model):
 
     class Meta:
         app_label = 'geoadmin'
-        required_db_features = ['gis_enabled']
 
     def __str__(self):
         return self.name

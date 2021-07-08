@@ -1,7 +1,7 @@
-from django.conf.urls import url
+from django.urls import path
 
 from .admin import site
 
 urlpatterns = [
-    url(r'^test_admin/admin/', site.urls),
+    path('test_admin/admin/', site.urls),
 ]

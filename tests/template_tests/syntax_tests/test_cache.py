@@ -108,7 +108,7 @@ class CacheTagTests(SimpleTestCase):
                     'As plurdled gabbleblotchits/On a lurgid bee/'
                     'That mordiously hath bitled out/Its earted jurtles/'
                     'Into a rancid festering/Or else I shall rend thee in the gobberwarts'
-                    'with my blurglecruncheon/See if I dont.'
+                    'with my blurglecruncheon/See if I don\'t.'
                 ),
             }
         )

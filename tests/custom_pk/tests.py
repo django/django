@@ -1,7 +1,8 @@
 from django.db import IntegrityError, transaction
-from django.test import TestCase, skipIfDBFeature
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from .models import Bar, Business, Employee, Foo
+from .fields import MyWrapper
+from .models import Bar, Business, CustomAutoFieldModel, Employee, Foo
 
 
 class BasicCustomPKTests(TestCase):
@@ -145,7 +146,7 @@ class BasicCustomPKTests(TestCase):
         # Or we can use the real attribute name for the primary key:
         self.assertEqual(e.employee_code, 123)
 
-        with self.assertRaises(AttributeError):
+        with self.assertRaisesMessage(AttributeError, "'Employee' object has no attribute 'id'"):
             e.id
 
     def test_in_bulk(self):
@@ -187,12 +188,12 @@ class CustomPKTests(TestCase):
         Business.objects.create(pk="Tears")
 
     def test_unicode_pk(self):
-        # Primary key may be unicode string
+        # Primary key may be Unicode string.
         Business.objects.create(name='jaźń')
 
     def test_unique_pk(self):
-        # The primary key must also obviously be unique, so trying to create a
-        # new object with the same primary key will fail.
+        # The primary key must also be unique, so trying to create a new object
+        # with the same primary key will fail.
         Employee.objects.create(
             employee_code=123, first_name="Frank", last_name="Jones"
         )
@@ -230,3 +231,13 @@ class CustomPKTests(TestCase):
         with self.assertRaises(IntegrityError):
             with transaction.atomic():
                 Employee.objects.create(first_name="Tom", last_name="Smith")
+
+    def test_auto_field_subclass_create(self):
+        obj = CustomAutoFieldModel.objects.create()
+        self.assertIsInstance(obj.id, MyWrapper)
+
+    @skipUnlessDBFeature('can_return_rows_from_bulk_insert')
+    def test_auto_field_subclass_bulk_create(self):
+        obj = CustomAutoFieldModel()
+        CustomAutoFieldModel.objects.bulk_create([obj])
+        self.assertIsInstance(obj.id, MyWrapper)

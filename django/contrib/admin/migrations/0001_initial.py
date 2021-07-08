@@ -21,7 +21,6 @@ class Migration(migrations.Migration):
                 ('action_flag', models.PositiveSmallIntegerField(verbose_name='action flag')),
                 ('change_message', models.TextField(verbose_name='change message', blank=True)),
                 ('content_type', models.ForeignKey(
-                    to_field='id',
                     on_delete=models.SET_NULL,
                     blank=True, null=True,
                     to='contenttypes.ContentType',
@@ -34,7 +33,7 @@ class Migration(migrations.Migration):
                 )),
             ],
             options={
-                'ordering': ('-action_time',),
+                'ordering': ['-action_time'],
                 'db_table': 'django_admin_log',
                 'verbose_name': 'log entry',
                 'verbose_name_plural': 'log entries',

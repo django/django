@@ -1,15 +1,17 @@
 from ctypes import byref, c_double, c_int, c_void_p
 
-from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.prototypes import raster as capi
+from django.contrib.gis.gdal.raster.base import GDALRasterBase
 from django.contrib.gis.shortcuts import numpy
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
-from .const import GDAL_INTEGER_TYPES, GDAL_PIXEL_TYPES, GDAL_TO_CTYPES
+from .const import (
+    GDAL_COLOR_TYPES, GDAL_INTEGER_TYPES, GDAL_PIXEL_TYPES, GDAL_TO_CTYPES,
+)
 
 
-class GDALBand(GDALBase):
+class GDALBand(GDALRasterBase):
     """
     Wrap a GDAL raster band, needs to be obtained from a GDALRaster object.
     """
@@ -30,7 +32,7 @@ class GDALBand(GDALBase):
         """
         Return the description string of the band.
         """
-        return force_text(capi.get_band_description(self._ptr))
+        return force_str(capi.get_band_description(self._ptr))
 
     @property
     def width(self):
@@ -150,8 +152,6 @@ class GDALBand(GDALBase):
         Set the nodata value for this band.
         """
         if value is None:
-            if not capi.delete_band_nodata_value:
-                raise ValueError('GDAL >= 2.1 required to delete nodata values.')
             capi.delete_band_nodata_value(self._ptr)
         elif not isinstance(value, (int, float)):
             raise ValueError('Nodata value must be numeric or None.')
@@ -168,6 +168,13 @@ class GDALBand(GDALBase):
             dtype = GDAL_PIXEL_TYPES[dtype]
         return dtype
 
+    def color_interp(self, as_string=False):
+        """Return the GDAL color interpretation for this band."""
+        color = capi.get_band_color_interp(self._ptr)
+        if as_string:
+            color = GDAL_COLOR_TYPES[color]
+        return color
+
     def data(self, data=None, offset=None, size=None, shape=None, as_memoryview=False):
         """
         Read or writes pixel values for this band. Blocks of data can
@@ -177,15 +184,9 @@ class GDALBand(GDALBase):
 
         Allowed input data types are bytes, memoryview, list, tuple, and array.
         """
-        if not offset:
-            offset = (0, 0)
-
-        if not size:
-            size = (self.width - offset[0], self.height - offset[1])
-
-        if not shape:
-            shape = size
-
+        offset = offset or (0, 0)
+        size = size or (self.width - offset[0], self.height - offset[1])
+        shape = shape or size
         if any(x <= 0 for x in size):
             raise ValueError('Offset too big for this raster.')
 
@@ -233,7 +234,7 @@ class GDALBand(GDALBase):
 class BandList(list):
     def __init__(self, source):
         self.source = source
-        list.__init__(self)
+        super().__init__()
 
     def __iter__(self):
         for idx in range(1, len(self) + 1):

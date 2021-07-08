@@ -17,12 +17,11 @@ community as a whole to self-manage, keep the problems to a minimum, and
 educate those coming into the community so that they can become valuable
 contributing members.
 
-Similarly, while we aim for Trac to be a perfect representation of the state
-of Django's progress, we acknowledge that this simply will not happen. By
-distributing the load of Trac maintenance to the community, we accept that
-there will be mistakes. Trac is "mostly accurate", and we give allowances for
-the fact that sometimes it will be wrong. That's okay. We're perfectionists
-with deadlines.
+Similarly, while we aim for Trac to be a perfect representation of the state of
+Django's progress, we acknowledge that this will not happen. By distributing
+the load of Trac maintenance to the community, we accept that there will be
+mistakes. Trac is "mostly accurate", and we give allowances for the fact that
+sometimes it will be wrong. That's okay. We're perfectionists with deadlines.
 
 We rely on the community to keep participating, keep tickets as accurate as
 possible, and raise issues for discussion on our mailing lists when there is
@@ -144,9 +143,11 @@ Ready For Checkin
 The ticket was reviewed by any member of the community other than the person
 who supplied the patch and found to meet all the requirements for a
 commit-ready patch. A committer now needs to give the patch a final
-review prior to being committed. See the
-:ref:`New contributors' FAQ<new-contributors-faq>` for "My ticket has been in
-RFC forever! What should I do?"
+review prior to being committed.
+
+There are a lot of pull requests. It can take a while for your patch to get
+reviewed. See the :ref:`contributing code FAQ<new-contributors-faq>` for some
+ideas here.
 
 Someday/Maybe
 -------------
@@ -269,8 +270,8 @@ When a ticket has completed its useful lifecycle, it's time for it to be
 closed. Closing a ticket is a big responsibility, though. You have to be sure
 that the issue is really resolved, and you need to keep in mind that the
 reporter of the ticket may not be happy to have their ticket closed (unless
-it's fixed, of course). If you're not certain about closing a ticket, just
-leave a comment with your thoughts instead.
+it's fixed!). If you're not certain about closing a ticket, leave a comment
+with your thoughts instead.
 
 If you do close a ticket, you should always make sure of the following:
 
@@ -404,8 +405,6 @@ the ticket database:
   but your input is still valuable.
 
 .. _Trac: https://code.djangoproject.com/
-.. _i18n branch: https://code.djangoproject.com/browser/django/branches/i18n
-.. _`tags/releases`: https://code.djangoproject.com/browser/django/tags/releases
 .. _`easy pickings`: https://code.djangoproject.com/query?status=!closed&easy=1
 .. _`creating an account on Trac`: https://www.djangoproject.com/accounts/register/
 .. _password reset page: https://www.djangoproject.com/accounts/password/reset/
@@ -423,9 +422,9 @@ inadvertent side-effect. Here's how you can determine this.
 
 Begin by writing a regression test for Django's test suite for the issue. For
 example, we'll pretend we're debugging a regression in migrations. After you've
-written the test and confirmed that it fails on the latest master, put it in a
-separate file that you can run standalone. For our example, we'll pretend we
-created ``tests/migrations/test_regression.py``, which can be run with::
+written the test and confirmed that it fails on the latest main branch, put it
+in a separate file that you can run standalone. For our example, we'll pretend
+we created ``tests/migrations/test_regression.py``, which can be run with::
 
     $ ./runtests.py migrations.test_regression
 

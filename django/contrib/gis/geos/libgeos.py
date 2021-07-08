@@ -8,13 +8,12 @@
 """
 import logging
 import os
-import re
 from ctypes import CDLL, CFUNCTYPE, POINTER, Structure, c_char_p
 from ctypes.util import find_library
 
-from django.contrib.gis.geos.error import GEOSException
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.functional import SimpleLazyObject
+from django.utils.functional import SimpleLazyObject, cached_property
+from django.utils.version import get_version_tuple
 
 logger = logging.getLogger('django.contrib.gis')
 
@@ -24,8 +23,7 @@ def load_geos():
     try:
         from django.conf import settings
         lib_path = settings.GEOS_LIBRARY_PATH
-    except (AttributeError, EnvironmentError,
-            ImportError, ImproperlyConfigured):
+    except (AttributeError, ImportError, ImproperlyConfigured, OSError):
         lib_path = None
 
     # Setting the appropriate names for the GEOS-C library.
@@ -59,7 +57,7 @@ def load_geos():
     # Getting the GEOS C library.  The C interface (CDLL) is used for
     # both *NIX and Windows.
     # See the GEOS C API source code for more details on the library function calls:
-    #  http://geos.refractions.net/ro/doxygen_docs/html/geos__c_8h-source.html
+    # https://geos.osgeo.org/doxygen/geos__c_8h_source.html
     _lgeos = CDLL(lib_path)
     # Here we set up the prototypes for the initGEOS_r and finishGEOS_r
     # routines.  These functions aren't actually called until they are
@@ -67,6 +65,8 @@ def load_geos():
     # geos/prototypes/threadsafe.py.
     _lgeos.initGEOS_r.restype = CONTEXT_PTR
     _lgeos.finishGEOS_r.argtypes = [CONTEXT_PTR]
+    # Set restype for compatibility across 32 and 64-bit platforms.
+    _lgeos.GEOSversion.restype = c_char_p
     return _lgeos
 
 
@@ -128,14 +128,6 @@ CS_PTR = POINTER(GEOSCoordSeq_t)
 CONTEXT_PTR = POINTER(GEOSContextHandle_t)
 
 
-# Used specifically by the GEOSGeom_createPolygon and GEOSGeom_createCollection
-#  GEOS routines
-def get_pointer_arr(n):
-    "Get a ctypes pointer array (of length `n`) for GEOSGeom_t opaque pointer."
-    GeomArr = GEOM_PTR * n
-    return GeomArr()
-
-
 lgeos = SimpleLazyObject(load_geos)
 
 
@@ -147,7 +139,7 @@ class GEOSFuncFactory:
     restype = None
     errcheck = None
 
-    def __init__(self, func_name, *args, restype=None, errcheck=None, argtypes=None, **kwargs):
+    def __init__(self, func_name, *, restype=None, errcheck=None, argtypes=None):
         self.func_name = func_name
         if restype is not None:
             self.restype = restype
@@ -155,16 +147,12 @@ class GEOSFuncFactory:
             self.errcheck = errcheck
         if argtypes is not None:
             self.argtypes = argtypes
-        self.args = args
-        self.kwargs = kwargs
-        self.func = None
 
-    def __call__(self, *args, **kwargs):
-        if self.func is None:
-            self.func = self.get_func(*self.args, **self.kwargs)
-        return self.func(*args, **kwargs)
+    def __call__(self, *args):
+        return self.func(*args)
 
-    def get_func(self, *args, **kwargs):
+    @cached_property
+    def func(self):
         from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
         func = GEOSFunc(self.func_name)
         func.argtypes = self.argtypes or []
@@ -174,28 +162,11 @@ class GEOSFuncFactory:
         return func
 
 
-# Return the string version of the GEOS library. Have to set the restype
-# explicitly to c_char_p to ensure compatibility across 32 and 64-bit platforms.
-geos_version = GEOSFuncFactory('GEOSversion', restype=c_char_p)
-
-# Regular expression should be able to parse version strings such as
-# '3.0.0rc4-CAPI-1.3.3', '3.0.0-CAPI-1.4.1', '3.4.0dev-CAPI-1.8.0' or '3.4.0dev-CAPI-1.8.0 r0'
-version_regex = re.compile(
-    r'^(?P<version>(?P<major>\d+)\.(?P<minor>\d+)\.(?P<subminor>\d+))'
-    r'((rc(?P<release_candidate>\d+))|dev)?-CAPI-(?P<capi_version>\d+\.\d+\.\d+)( r\d+)?$'
-)
+def geos_version():
+    """Return the string version of the GEOS library."""
+    return lgeos.GEOSversion()
 
 
-def geos_version_info():
-    """
-    Return a dictionary containing the various version metadata parsed from
-    the GEOS version string, including the version number, whether the version
-    is a release candidate (and what number release candidate), and the C API
-    version.
-    """
-    ver = geos_version().decode()
-    m = version_regex.match(ver)
-    if not m:
-        raise GEOSException('Could not parse version info string "%s"' % ver)
-    return {key: m.group(key) for key in (
-        'version', 'release_candidate', 'capi_version', 'major', 'minor', 'subminor')}
+def geos_version_tuple():
+    """Return the GEOS version as a tuple (major, minor, subminor)."""
+    return get_version_tuple(geos_version().decode())

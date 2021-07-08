@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-27 22:40+0200\n"
+"PO-Revision-Date: 2019-11-05 00:38+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Asturian (http://www.transifex.com/django/django/language/"
 "ast/)\n"
 "MIME-Version: 1.0\n"
@@ -137,6 +137,9 @@ msgstr ""
 msgid "Hungarian"
 msgstr "Húngaru"
 
+msgid "Armenian"
+msgstr ""
+
 msgid "Interlingua"
 msgstr "Interlingua"
 
@@ -157,6 +160,9 @@ msgstr "Xaponés"
 
 msgid "Georgian"
 msgstr "Xeorxanu"
+
+msgid "Kabyle"
+msgstr ""
 
 msgid "Kazakh"
 msgstr "Kazakh"
@@ -272,6 +278,9 @@ msgstr "Ucranianu"
 msgid "Urdu"
 msgstr "Urdu"
 
+msgid "Uzbek"
+msgstr ""
+
 msgid "Vietnamese"
 msgstr "Vietnamita"
 
@@ -293,6 +302,15 @@ msgstr ""
 msgid "Syndication"
 msgstr ""
 
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
 msgid "Enter a valid value."
 msgstr "Introduz un valor válidu."
 
@@ -305,14 +323,13 @@ msgstr ""
 msgid "Enter a valid email address."
 msgstr "Introduz una direición de corréu válida."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Introduz un 'slug' válidu que consista en lletres, númberu, guiones baxos o "
-"medios. "
 
 msgid ""
-"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
 
@@ -368,6 +385,9 @@ msgstr[1] ""
 "Asegúrate qu'esti valor tien como muncho %(limit_value)d caráuteres (tien "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Introduz un númberu."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -389,6 +409,15 @@ msgstr[0] ""
 "Asegúrate que nun hai más de %(max)s díxitu enantes del puntu decimal."
 msgstr[1] ""
 "Asegúrate que nun hai más de %(max)s díxitos enantes del puntu decimal."
+
+#, python-format
+msgid ""
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
+msgstr ""
+
+msgid "Null characters are not allowed."
+msgstr ""
 
 msgid "and"
 msgstr "y"
@@ -422,18 +451,12 @@ msgstr ""
 msgid "Field of type: %(field_type)s"
 msgstr "Campu de la triba: %(field_type)s"
 
-msgid "Integer"
-msgstr "Enteru"
-
 #, python-format
-msgid "'%(value)s' value must be an integer."
+msgid "“%(value)s” value must be either True or False."
 msgstr ""
 
-msgid "Big (8 byte) integer"
-msgstr "Enteru big (8 byte)"
-
 #, python-format
-msgid "'%(value)s' value must be either True or False."
+msgid "“%(value)s” value must be either True, False, or None."
 msgstr ""
 
 msgid "Boolean (Either True or False)"
@@ -448,13 +471,13 @@ msgstr "Enteros separtaos per coma"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
 
@@ -463,13 +486,13 @@ msgstr "Data (ensin hora)"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
 
@@ -477,7 +500,7 @@ msgid "Date (with time)"
 msgstr "Data (con hora)"
 
 #, python-format
-msgid "'%(value)s' value must be a decimal number."
+msgid "“%(value)s” value must be a decimal number."
 msgstr ""
 
 msgid "Decimal number"
@@ -485,7 +508,7 @@ msgstr "Númberu decimal"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
 
@@ -499,11 +522,21 @@ msgid "File path"
 msgstr "Camín del ficheru"
 
 #, python-format
-msgid "'%(value)s' value must be a float."
+msgid "“%(value)s” value must be a float."
 msgstr ""
 
 msgid "Floating point number"
 msgstr "Númberu de puntu flotante"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr ""
+
+msgid "Integer"
+msgstr "Enteru"
+
+msgid "Big (8 byte) integer"
+msgstr "Enteru big (8 byte)"
 
 msgid "IPv4 address"
 msgstr "Direición IPv4"
@@ -512,7 +545,7 @@ msgid "IP address"
 msgstr "Direición IP"
 
 #, python-format
-msgid "'%(value)s' value must be either None, True or False."
+msgid "“%(value)s” value must be either None, True or False."
 msgstr ""
 
 msgid "Boolean (Either True, False or None)"
@@ -536,13 +569,13 @@ msgstr "Testu"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
 
@@ -556,7 +589,10 @@ msgid "Raw binary data"
 msgstr "Datos binarios crudos"
 
 #, python-format
-msgid "'%(value)s' is not a valid UUID."
+msgid "“%(value)s” is not a valid UUID."
+msgstr ""
+
+msgid "Universally unique identifier"
 msgstr ""
 
 msgid "File"
@@ -598,9 +634,6 @@ msgstr "Requierse esti campu."
 msgid "Enter a whole number."
 msgstr "Introduz un númberu completu"
 
-msgid "Enter a number."
-msgstr "Introduz un númberu."
-
 msgid "Enter a valid date."
 msgstr "Introduz una data válida."
 
@@ -611,6 +644,10 @@ msgid "Enter a valid date/time."
 msgstr "Introduz una data/hora válida."
 
 msgid "Enter a valid duration."
+msgstr ""
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
 msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."
@@ -707,9 +744,8 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Por favor, igua los valores duplicaos embaxo"
 
-msgid "The inline foreign key did not match the parent instance primary key."
+msgid "The inline value did not match the parent instance."
 msgstr ""
-"La calve foriata en llinia nun concasa cola clave primaria d'instancia pá."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -717,25 +753,23 @@ msgstr ""
 "disponibles."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" nun ye un valor válidu pa la clave primaria."
+msgid "“%(pk)s” is not a valid value."
+msgstr ""
 
 #, python-format
 msgid ""
-"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
-"Nun pudo interpretase %(datetime)s nel fusu horariu %(current_timezone)s; "
-"pue ser ambiguu o pue nun esistir."
+
+msgid "Clear"
+msgstr "Llimpiar"
 
 msgid "Currently"
 msgstr "Anguaño"
 
 msgid "Change"
 msgstr "Camudar"
-
-msgid "Clear"
-msgstr "Llimpiar"
 
 msgid "Unknown"
 msgstr "Desconocíu"
@@ -745,6 +779,15 @@ msgstr "Sí"
 
 msgid "No"
 msgstr "Non"
+
+msgid "Year"
+msgstr ""
+
+msgid "Month"
+msgstr ""
+
+msgid "Day"
+msgstr ""
 
 msgid "yes,no,maybe"
 msgstr "sí,non,quiciabes"
@@ -1008,8 +1051,8 @@ msgstr ""
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr ""
 
 msgid "or"
 msgstr "o"
@@ -1064,16 +1107,24 @@ msgid "CSRF verification failed. Request aborted."
 msgstr ""
 
 msgid ""
-"You are seeing this message because this HTTPS site requires a 'Referer "
-"header' to be sent by your Web browser, but none was sent. This header is "
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
 
 msgid ""
-"If you have configured your browser to disable 'Referer' headers, please re-"
-"enable them, at least for this site, or for HTTPS connections, or for 'same-"
-"origin' requests."
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
+msgstr ""
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
 msgstr ""
 
 msgid ""
@@ -1084,33 +1135,17 @@ msgstr ""
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
-"them, at least for this site, or for 'same-origin' requests."
+"them, at least for this site, or for “same-origin” requests."
 msgstr ""
 
 msgid "More information is available with DEBUG=True."
 msgstr ""
 
-msgid "Welcome to Django"
-msgstr ""
-
-msgid "It worked!"
-msgstr ""
-
-msgid "Congratulations on your first Django-powered page."
-msgstr ""
-
-msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
-msgstr ""
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-
 msgid "No year specified"
 msgstr "Nun s'especificó l'añu"
+
+msgid "Date out of range"
+msgstr ""
 
 msgid "No month specified"
 msgstr "Nun s'especificó'l mes"
@@ -1134,31 +1169,69 @@ msgstr ""
 "allow_future ye False."
 
 #, python-format
-msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
-msgstr "Cadena de data inválida '%(datestr)s' col formatu dau '%(format)s'"
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr ""
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "Nun s'alcontró %(verbose_name)s que concase cola gueta"
 
-msgid "Page is not 'last', nor can it be converted to an int."
-msgstr "La páxina nun ye 'last', tampoco pue convertise a un int."
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr ""
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "Páxina inválida (%(page_number)s): %(message)s"
 
 #, python-format
-msgid "Empty list and '%(class_name)s.allow_empty' is False."
-msgstr "La llista ta balera y '%(class_name)s.allow_empty' ye False."
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr ""
 
 msgid "Directory indexes are not allowed here."
 msgstr "Nun tán almitíos equí los indexaos de direutoriu."
 
 #, python-format
-msgid "\"%(path)s\" does not exist"
-msgstr "\"%(path)s\" nun esiste"
+msgid "“%(path)s” does not exist"
+msgstr ""
 
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Índiz de %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+msgid "The install worked successfully! Congratulations!"
+msgstr ""
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr ""
+
+msgid "Topics, references, &amp; how-to’s"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+msgid "Get started with Django"
+msgstr ""
+
+msgid "Django Community"
+msgstr ""
+
+msgid "Connect, get help, or contribute"
+msgstr ""

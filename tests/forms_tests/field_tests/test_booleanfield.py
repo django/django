@@ -1,6 +1,7 @@
 import pickle
 
-from django.forms import BooleanField, ValidationError
+from django.core.exceptions import ValidationError
+from django.forms import BooleanField
 from django.test import SimpleTestCase
 
 
@@ -57,3 +58,7 @@ class BooleanFieldTest(SimpleTestCase):
         self.assertFalse(f.has_changed(True, 'True'))
         self.assertTrue(f.has_changed(False, 'True'))
         self.assertTrue(f.has_changed(True, 'False'))
+
+    def test_disabled_has_changed(self):
+        f = BooleanField(disabled=True)
+        self.assertIs(f.has_changed('True', 'False'), False)

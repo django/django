@@ -3,13 +3,14 @@
 # Translators:
 # Hotellook, 2014
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2016
+# Yoel Acevedo, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:51+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 19:11+0000\n"
+"Last-Translator: Yoel Acevedo\n"
 "Language-Team: Spanish (Venezuela) (http://www.transifex.com/django/django/"
 "language/es_VE/)\n"
 "MIME-Version: 1.0\n"
@@ -141,7 +142,7 @@ msgid "Arguments"
 msgstr "Argumentos"
 
 msgid "Back to Model documentation"
-msgstr ""
+msgstr "Volver a la documentación de Modelos"
 
 msgid "Model documentation"
 msgstr "Documentación del Modelo"
@@ -216,7 +217,7 @@ msgid "Templates:"
 msgstr "Plantillas:"
 
 msgid "Back to View documentation"
-msgstr ""
+msgstr "Volver a la documentación de Vistas"
 
 msgid "View documentation"
 msgstr "Documentación de la vista"
@@ -243,13 +244,6 @@ msgstr ""
 "\n"
 "    Ver función: <code>%(full_name)s</code>. Nombre: <code>%(url_name)s</"
 "code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Booleano (Verdadero o Falso)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Tipo de campo: %(field_type)s"
 
 msgid "tag:"
 msgstr "etiqueta:"

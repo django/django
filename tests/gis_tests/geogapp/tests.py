@@ -2,20 +2,18 @@
 Tests for geography support in PostGIS
 """
 import os
-from unittest import skipIf, skipUnless
 
 from django.contrib.gis.db import models
 from django.contrib.gis.db.models.functions import Area, Distance
 from django.contrib.gis.measure import D
-from django.db import connection
+from django.db import NotSupportedError, connection
 from django.db.models.functions import Cast
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from ..utils import oracle, postgis, spatialite
+from ..utils import FuncTestMixin
 from .models import City, County, Zipcode
 
 
-@skipUnlessDBFeature("gis_enabled")
 class GeographyTest(TestCase):
     fixtures = ['initial']
 
@@ -23,7 +21,6 @@ class GeographyTest(TestCase):
         "Ensure geography features loaded properly."
         self.assertEqual(8, City.objects.count())
 
-    @skipIf(spatialite, "SpatiaLite doesn't support distance lookups with Distance objects.")
     @skipUnlessDBFeature("supports_distances_lookups", "supports_distance_geodetic")
     def test02_distance_lookup(self):
         "Testing distance lookup support on non-point geography fields."
@@ -39,9 +36,10 @@ class GeographyTest(TestCase):
         for cities in [cities1, cities2]:
             self.assertEqual(['Dallas', 'Houston', 'Oklahoma City'], cities)
 
-    @skipUnless(postgis, "This is a PostGIS-specific test")
     def test04_invalid_operators_functions(self):
         "Ensuring exceptions are raised for operators & functions invalid on geography fields."
+        if not connection.ops.postgis:
+            self.skipTest('This is a PostGIS-specific test.')
         # Only a subset of the geometry functions & operator are available
         # to PostGIS geography types.  For more information, visit:
         # http://postgis.refractions.net/documentation/manual-1.5/ch08.html#PostGIS_GeographyFunctions
@@ -67,11 +65,11 @@ class GeographyTest(TestCase):
         # Getting the shapefile and mapping dictionary.
         shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'data'))
         co_shp = os.path.join(shp_path, 'counties', 'counties.shp')
-        co_mapping = {'name': 'Name',
-                      'state': 'State',
-                      'mpoly': 'MULTIPOLYGON',
-                      }
-
+        co_mapping = {
+            'name': 'Name',
+            'state': 'State',
+            'mpoly': 'MULTIPOLYGON',
+        }
         # Reference county names, number of polygons, and state names.
         names = ['Bexar', 'Galveston', 'Harris', 'Honolulu', 'Pueblo']
         num_polys = [1, 2, 1, 19, 1]  # Number of polygons for each.
@@ -87,8 +85,7 @@ class GeographyTest(TestCase):
             self.assertEqual(state, c.state)
 
 
-@skipUnlessDBFeature("gis_enabled")
-class GeographyFunctionTests(TestCase):
+class GeographyFunctionTests(FuncTestMixin, TestCase):
     fixtures = ['initial']
 
     @skipUnlessDBFeature("supports_extent_aggr")
@@ -97,7 +94,7 @@ class GeographyFunctionTests(TestCase):
         Cast a geography to a geometry field for an aggregate function that
         expects a geometry input.
         """
-        if not connection.ops.geography:
+        if not connection.features.supports_geography:
             self.skipTest("This test needs geography support")
         expected = (-96.8016128540039, 29.7633724212646, -95.3631439208984, 32.782058715820)
         res = City.objects.filter(
@@ -111,19 +108,32 @@ class GeographyFunctionTests(TestCase):
         """
         Testing Distance() support on non-point geography fields.
         """
-        if oracle:
+        if connection.ops.oracle:
             ref_dists = [0, 4899.68, 8081.30, 9115.15]
-        elif spatialite:
-            # SpatiaLite returns non-zero distance for polygons and points
-            # covered by that polygon.
-            ref_dists = [326.61, 4899.68, 8081.30, 9115.15]
+        elif connection.ops.spatialite:
+            if connection.ops.spatial_version < (5,):
+                # SpatiaLite < 5 returns non-zero distance for polygons and points
+                # covered by that polygon.
+                ref_dists = [326.61, 4899.68, 8081.30, 9115.15]
+            else:
+                ref_dists = [0, 4899.68, 8081.30, 9115.15]
         else:
             ref_dists = [0, 4891.20, 8071.64, 9123.95]
         htown = City.objects.get(name='Houston')
-        qs = Zipcode.objects.annotate(distance=Distance('poly', htown.point))
+        qs = Zipcode.objects.annotate(
+            distance=Distance('poly', htown.point),
+            distance2=Distance(htown.point, 'poly'),
+        )
         for z, ref in zip(qs, ref_dists):
             self.assertAlmostEqual(z.distance.m, ref, 2)
-        if not spatialite:
+
+        if connection.ops.postgis:
+            # PostGIS casts geography to geometry when distance2 is calculated.
+            ref_dists = [0, 4899.68, 8081.30, 9115.15]
+        for z, ref in zip(qs, ref_dists):
+            self.assertAlmostEqual(z.distance2.m, ref, 2)
+
+        if not connection.ops.spatialite:
             # Distance function combined with a lookup.
             hzip = Zipcode.objects.get(code='77002')
             self.assertEqual(qs.get(distance__lte=0), hzip)
@@ -144,5 +154,5 @@ class GeographyFunctionTests(TestCase):
     @skipUnlessDBFeature("has_Area_function")
     @skipIfDBFeature("supports_area_geodetic")
     def test_geodetic_area_raises_if_not_supported(self):
-        with self.assertRaisesMessage(NotImplementedError, 'Area on geodetic coordinate systems not supported.'):
+        with self.assertRaisesMessage(NotSupportedError, 'Area on geodetic coordinate systems not supported.'):
             Zipcode.objects.annotate(area=Area('poly')).get(code='77002')

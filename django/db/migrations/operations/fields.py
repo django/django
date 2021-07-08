@@ -1,13 +1,15 @@
-from django.db.models.fields import NOT_PROVIDED
+from django.db.migrations.utils import field_references
+from django.db.models import NOT_PROVIDED
 from django.utils.functional import cached_property
 
 from .base import Operation
 
 
 class FieldOperation(Operation):
-    def __init__(self, model_name, name):
+    def __init__(self, model_name, name, field=None):
         self.model_name = model_name
         self.name = name
+        self.field = field
 
     @cached_property
     def model_name_lower(self):
@@ -23,15 +25,37 @@ class FieldOperation(Operation):
     def is_same_field_operation(self, operation):
         return self.is_same_model_operation(operation) and self.name_lower == operation.name_lower
 
-    def references_model(self, name, app_label=None):
-        return name.lower() == self.model_name_lower
+    def references_model(self, name, app_label):
+        name_lower = name.lower()
+        if name_lower == self.model_name_lower:
+            return True
+        if self.field:
+            return bool(field_references(
+                (app_label, self.model_name_lower), self.field, (app_label, name_lower)
+            ))
+        return False
 
-    def references_field(self, model_name, name, app_label=None):
-        return self.references_model(model_name) and name.lower() == self.name_lower
+    def references_field(self, model_name, name, app_label):
+        model_name_lower = model_name.lower()
+        # Check if this operation locally references the field.
+        if model_name_lower == self.model_name_lower:
+            if name == self.name:
+                return True
+            elif self.field and hasattr(self.field, 'from_fields') and name in self.field.from_fields:
+                return True
+        # Check if this operation remotely references the field.
+        if self.field is None:
+            return False
+        return bool(field_references(
+            (app_label, self.model_name_lower),
+            self.field,
+            (app_label, model_name_lower),
+            name,
+        ))
 
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, app_label):
         return (
-            super().reduce(operation, in_between, app_label=app_label) or
+            super().reduce(operation, app_label) or
             not operation.references_field(self.model_name, self.name, app_label)
         )
 
@@ -40,9 +64,8 @@ class AddField(FieldOperation):
     """Add a field to a model."""
 
     def __init__(self, model_name, name, field, preserve_default=True):
-        self.field = field
         self.preserve_default = preserve_default
-        super().__init__(model_name, name)
+        super().__init__(model_name, name, field)
 
     def deconstruct(self):
         kwargs = {
@@ -59,16 +82,13 @@ class AddField(FieldOperation):
         )
 
     def state_forwards(self, app_label, state):
-        # If preserve default is off, don't use the default for future state
-        if not self.preserve_default:
-            field = self.field.clone()
-            field.default = NOT_PROVIDED
-        else:
-            field = self.field
-        state.models[app_label, self.model_name_lower].fields.append((self.name, field))
-        # Delay rendering of relationships if it's not a relational field
-        delay = not field.is_relation
-        state.reload_model(app_label, self.model_name_lower, delay=delay)
+        state.add_field(
+            app_label,
+            self.model_name_lower,
+            self.name,
+            self.field,
+            self.preserve_default,
+        )
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)
@@ -92,7 +112,11 @@ class AddField(FieldOperation):
     def describe(self):
         return "Add field %s to %s" % (self.name, self.model_name)
 
-    def reduce(self, operation, in_between, app_label=None):
+    @property
+    def migration_name_fragment(self):
+        return '%s_%s' % (self.model_name_lower, self.name_lower)
+
+    def reduce(self, operation, app_label):
         if isinstance(operation, FieldOperation) and self.is_same_field_operation(operation):
             if isinstance(operation, AlterField):
                 return [
@@ -112,7 +136,7 @@ class AddField(FieldOperation):
                         field=self.field,
                     ),
                 ]
-        return super().reduce(operation, in_between, app_label=app_label)
+        return super().reduce(operation, app_label)
 
 
 class RemoveField(FieldOperation):
@@ -130,17 +154,7 @@ class RemoveField(FieldOperation):
         )
 
     def state_forwards(self, app_label, state):
-        new_fields = []
-        old_field = None
-        for name, instance in state.models[app_label, self.model_name_lower].fields:
-            if name != self.name:
-                new_fields.append((name, instance))
-            else:
-                old_field = instance
-        state.models[app_label, self.model_name_lower].fields = new_fields
-        # Delay rendering of relationships if it's not a relational field
-        delay = not old_field.is_relation
-        state.reload_model(app_label, self.model_name_lower, delay=delay)
+        state.remove_field(app_label, self.model_name_lower, self.name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.apps.get_model(app_label, self.model_name)
@@ -156,6 +170,16 @@ class RemoveField(FieldOperation):
     def describe(self):
         return "Remove field %s from %s" % (self.name, self.model_name)
 
+    @property
+    def migration_name_fragment(self):
+        return 'remove_%s_%s' % (self.model_name_lower, self.name_lower)
+
+    def reduce(self, operation, app_label):
+        from .models import DeleteModel
+        if isinstance(operation, DeleteModel) and operation.name_lower == self.model_name_lower:
+            return [operation]
+        return super().reduce(operation, app_label)
+
 
 class AlterField(FieldOperation):
     """
@@ -164,9 +188,8 @@ class AlterField(FieldOperation):
     """
 
     def __init__(self, model_name, name, field, preserve_default=True):
-        self.field = field
         self.preserve_default = preserve_default
-        super().__init__(model_name, name)
+        super().__init__(model_name, name, field)
 
     def deconstruct(self):
         kwargs = {
@@ -183,21 +206,13 @@ class AlterField(FieldOperation):
         )
 
     def state_forwards(self, app_label, state):
-        if not self.preserve_default:
-            field = self.field.clone()
-            field.default = NOT_PROVIDED
-        else:
-            field = self.field
-        state.models[app_label, self.model_name_lower].fields = [
-            (n, field if n == self.name else f)
-            for n, f in
-            state.models[app_label, self.model_name_lower].fields
-        ]
-        # TODO: investigate if old relational fields must be reloaded or if it's
-        # sufficient if the new field is (#27737).
-        # Delay rendering of relationships if it's not a relational field
-        delay = not field.is_relation
-        state.reload_model(app_label, self.model_name_lower, delay=delay)
+        state.alter_field(
+            app_label,
+            self.model_name_lower,
+            self.name,
+            self.field,
+            self.preserve_default,
+        )
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)
@@ -217,7 +232,11 @@ class AlterField(FieldOperation):
     def describe(self):
         return "Alter field %s on %s" % (self.name, self.model_name)
 
-    def reduce(self, operation, in_between, app_label=None):
+    @property
+    def migration_name_fragment(self):
+        return 'alter_%s_%s' % (self.model_name_lower, self.name_lower)
+
+    def reduce(self, operation, app_label):
         if isinstance(operation, RemoveField) and self.is_same_field_operation(operation):
             return [operation]
         elif isinstance(operation, RenameField) and self.is_same_field_operation(operation):
@@ -229,7 +248,7 @@ class AlterField(FieldOperation):
                     field=self.field,
                 ),
             ]
-        return super().reduce(operation, in_between, app_label=app_label)
+        return super().reduce(operation, app_label)
 
 
 class RenameField(FieldOperation):
@@ -261,26 +280,7 @@ class RenameField(FieldOperation):
         )
 
     def state_forwards(self, app_label, state):
-        # Rename the field
-        state.models[app_label, self.model_name_lower].fields = [
-            (self.new_name if n == self.old_name else n, f)
-            for n, f in state.models[app_label, self.model_name_lower].fields
-        ]
-        # Fix index/unique_together to refer to the new field
-        options = state.models[app_label, self.model_name_lower].options
-        for option in ('index_together', 'unique_together'):
-            if option in options:
-                options[option] = [
-                    [self.new_name if n == self.old_name else n for n in together]
-                    for together in options[option]
-                ]
-        for n, f in state.models[app_label, self.model_name_lower].fields:
-            if n == self.new_name:
-                field = f
-                break
-        # Delay rendering of relationships if it's not a relational field
-        delay = not field.is_relation
-        state.reload_model(app_label, self.model_name_lower, delay=delay)
+        state.rename_field(app_label, self.model_name_lower, self.old_name, self.new_name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)
@@ -305,13 +305,21 @@ class RenameField(FieldOperation):
     def describe(self):
         return "Rename field %s on %s to %s" % (self.old_name, self.model_name, self.new_name)
 
-    def references_field(self, model_name, name, app_label=None):
-        return self.references_model(model_name) and (
+    @property
+    def migration_name_fragment(self):
+        return 'rename_%s_%s_%s' % (
+            self.old_name_lower,
+            self.model_name_lower,
+            self.new_name_lower,
+        )
+
+    def references_field(self, model_name, name, app_label):
+        return self.references_model(model_name, app_label) and (
             name.lower() == self.old_name_lower or
             name.lower() == self.new_name_lower
         )
 
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, app_label):
         if (isinstance(operation, RenameField) and
                 self.is_same_model_operation(operation) and
                 self.new_name_lower == operation.old_name_lower):
@@ -323,8 +331,11 @@ class RenameField(FieldOperation):
                 ),
             ]
         # Skip `FieldOperation.reduce` as we want to run `references_field`
-        # against self.new_name.
+        # against self.old_name and self.new_name.
         return (
-            super(FieldOperation, self).reduce(operation, in_between, app_label=app_label) or
-            not operation.references_field(self.model_name, self.new_name, app_label)
+            super(FieldOperation, self).reduce(operation, app_label) or
+            not (
+                operation.references_field(self.model_name, self.old_name, app_label) or
+                operation.references_field(self.model_name, self.new_name, app_label)
+            )
         )

@@ -2,20 +2,22 @@ import os
 import re
 import types
 from datetime import datetime, timedelta
-from unittest import TestCase, skipUnless
+from decimal import Decimal
+from unittest import TestCase, mock
 
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.validators import (
     BaseValidator, DecimalValidator, EmailValidator, FileExtensionValidator,
     MaxLengthValidator, MaxValueValidator, MinLengthValidator,
-    MinValueValidator, RegexValidator, URLValidator, int_list_validator,
-    validate_comma_separated_integer_list, validate_email,
-    validate_image_file_extension, validate_integer, validate_ipv4_address,
-    validate_ipv6_address, validate_ipv46_address, validate_slug,
-    validate_unicode_slug,
+    MinValueValidator, ProhibitNullCharactersValidator, RegexValidator,
+    URLValidator, int_list_validator, validate_comma_separated_integer_list,
+    validate_email, validate_image_file_extension, validate_integer,
+    validate_ipv4_address, validate_ipv6_address, validate_ipv46_address,
+    validate_slug, validate_unicode_slug,
 )
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango41Warning
 
 try:
     from PIL import Image  # noqa
@@ -49,7 +51,7 @@ TEST_DATA = [
     (validate_email, 'example@valid-with-hyphens.com', None),
     (validate_email, 'test@domain.with.idn.tld.उदाहरण.परीक्षा', None),
     (validate_email, 'email@localhost', None),
-    (EmailValidator(whitelist=['localdomain']), 'email@localdomain', None),
+    (EmailValidator(allowlist=['localdomain']), 'email@localdomain', None),
     (validate_email, '"test@test"@example.com', None),
     (validate_email, 'example@atm.%s' % ('a' * 63), None),
     (validate_email, 'example@%s.atm' % ('a' * 63), None),
@@ -134,6 +136,16 @@ TEST_DATA = [
     (validate_ipv4_address, '1.1.1.1\n', ValidationError),
     (validate_ipv4_address, '٧.2٥.3٣.243', ValidationError),
 
+    # Leading zeros are forbidden to avoid ambiguity with the octal notation.
+    (validate_ipv4_address, '000.000.000.000', ValidationError),
+    (validate_ipv4_address, '016.016.016.016', ValidationError),
+    (validate_ipv4_address, '192.168.000.001', ValidationError),
+    (validate_ipv4_address, '01.2.3.4', ValidationError),
+    (validate_ipv4_address, '01.2.3.4', ValidationError),
+    (validate_ipv4_address, '1.02.3.4', ValidationError),
+    (validate_ipv4_address, '1.2.03.4', ValidationError),
+    (validate_ipv4_address, '1.2.3.04', ValidationError),
+
     # validate_ipv6_address uses django.utils.ipv6, which
     # is tested in much greater detail in its own testcase
     (validate_ipv6_address, 'fe80::1', None),
@@ -158,6 +170,16 @@ TEST_DATA = [
     (validate_ipv46_address, '1:2', ValidationError),
     (validate_ipv46_address, '::zzz', ValidationError),
     (validate_ipv46_address, '12345::', ValidationError),
+
+    # Leading zeros are forbidden to avoid ambiguity with the octal notation.
+    (validate_ipv46_address, '000.000.000.000', ValidationError),
+    (validate_ipv46_address, '016.016.016.016', ValidationError),
+    (validate_ipv46_address, '192.168.000.001', ValidationError),
+    (validate_ipv46_address, '01.2.3.4', ValidationError),
+    (validate_ipv46_address, '01.2.3.4', ValidationError),
+    (validate_ipv46_address, '1.02.3.4', ValidationError),
+    (validate_ipv46_address, '1.2.03.4', ValidationError),
+    (validate_ipv46_address, '1.2.3.04', ValidationError),
 
     (validate_comma_separated_integer_list, '1', None),
     (validate_comma_separated_integer_list, '12', None),
@@ -202,6 +224,10 @@ TEST_DATA = [
     (MinValueValidator(0), -1, ValidationError),
     (MinValueValidator(NOW), NOW - timedelta(days=1), ValidationError),
 
+    # limit_value may be a callable.
+    (MinValueValidator(lambda: 1), 0, ValidationError),
+    (MinValueValidator(lambda: 1), 1, None),
+
     (MaxLengthValidator(10), '', None),
     (MaxLengthValidator(10), 10 * 'x', None),
 
@@ -217,9 +243,18 @@ TEST_DATA = [
     (URLValidator(EXTENDED_SCHEMES), 'git+ssh://git@github.com/example/hg-git.git', None),
 
     (URLValidator(EXTENDED_SCHEMES), 'git://-invalid.com', ValidationError),
-    # Trailing newlines not accepted
+    (URLValidator(), None, ValidationError),
+    (URLValidator(), 56, ValidationError),
+    (URLValidator(), 'no_scheme', ValidationError),
+    # Newlines and tabs are not accepted.
     (URLValidator(), 'http://www.djangoproject.com/\n', ValidationError),
     (URLValidator(), 'http://[::ffff:192.9.5.5]\n', ValidationError),
+    (URLValidator(), 'http://www.djangoproject.com/\r', ValidationError),
+    (URLValidator(), 'http://[::ffff:192.9.5.5]\r', ValidationError),
+    (URLValidator(), 'http://www.django\rproject.com/', ValidationError),
+    (URLValidator(), 'http://[::\rffff:192.9.5.5]', ValidationError),
+    (URLValidator(), 'http://\twww.djangoproject.com/', ValidationError),
+    (URLValidator(), 'http://\t[::ffff:192.9.5.5]', ValidationError),
     # Trailing junk does not take forever to reject
     (URLValidator(), 'http://www.asdasdasdasdsadfm.com.br ', ValidationError),
     (URLValidator(), 'http://www.asdasdasdasdsadfm.com.br z', ValidationError),
@@ -248,15 +283,46 @@ TEST_DATA = [
     (RegexValidator('a', flags=re.IGNORECASE), 'A', None),
 
     (FileExtensionValidator(['txt']), ContentFile('contents', name='fileWithUnsupportedExt.jpg'), ValidationError),
-    (FileExtensionValidator(['txt']), ContentFile('contents', name='fileWithNoExtenstion'), ValidationError),
+    (FileExtensionValidator(['txt']), ContentFile('contents', name='fileWithUnsupportedExt.JPG'), ValidationError),
+    (FileExtensionValidator(['txt']), ContentFile('contents', name='fileWithNoExtension'), ValidationError),
+    (FileExtensionValidator(['']), ContentFile('contents', name='fileWithAnExtension.txt'), ValidationError),
     (FileExtensionValidator([]), ContentFile('contents', name='file.txt'), ValidationError),
+
+    (FileExtensionValidator(['']), ContentFile('contents', name='fileWithNoExtension'), None),
     (FileExtensionValidator(['txt']), ContentFile('contents', name='file.txt'), None),
+    (FileExtensionValidator(['txt']), ContentFile('contents', name='file.TXT'), None),
+    (FileExtensionValidator(['TXT']), ContentFile('contents', name='file.txt'), None),
     (FileExtensionValidator(), ContentFile('contents', name='file.jpg'), None),
+
+    (DecimalValidator(max_digits=2, decimal_places=2), Decimal('0.99'), None),
+    (DecimalValidator(max_digits=2, decimal_places=1), Decimal('0.99'), ValidationError),
+    (DecimalValidator(max_digits=3, decimal_places=1), Decimal('999'), ValidationError),
+    (DecimalValidator(max_digits=4, decimal_places=1), Decimal('999'), None),
+    (DecimalValidator(max_digits=20, decimal_places=2), Decimal('742403889818000000'), None),
+    (DecimalValidator(20, 2), Decimal('7.42403889818E+17'), None),
+    (DecimalValidator(max_digits=20, decimal_places=2), Decimal('7424742403889818000000'), ValidationError),
+    (DecimalValidator(max_digits=5, decimal_places=2), Decimal('7304E-1'), None),
+    (DecimalValidator(max_digits=5, decimal_places=2), Decimal('7304E-3'), ValidationError),
+    (DecimalValidator(max_digits=5, decimal_places=5), Decimal('70E-5'), None),
+    (DecimalValidator(max_digits=5, decimal_places=5), Decimal('70E-6'), ValidationError),
+    # 'Enter a number.' errors
+    *[
+        (DecimalValidator(decimal_places=2, max_digits=10), Decimal(value), ValidationError)
+        for value in (
+            'NaN', '-NaN', '+NaN', 'sNaN', '-sNaN', '+sNaN',
+            'Inf', '-Inf', '+Inf', 'Infinity', '-Infinity', '+Infinity',
+        )
+    ],
 
     (validate_image_file_extension, ContentFile('contents', name='file.jpg'), None),
     (validate_image_file_extension, ContentFile('contents', name='file.png'), None),
+    (validate_image_file_extension, ContentFile('contents', name='file.PNG'), None),
     (validate_image_file_extension, ContentFile('contents', name='file.txt'), ValidationError),
     (validate_image_file_extension, ContentFile('contents', name='file'), ValidationError),
+
+    (ProhibitNullCharactersValidator(), '\x00something', ValidationError),
+    (ProhibitNullCharactersValidator(), 'something', None),
+    (ProhibitNullCharactersValidator(), None, None),
 ]
 
 
@@ -274,43 +340,21 @@ with open(create_path('invalid_urls.txt'), encoding='utf8') as f:
         TEST_DATA.append((URLValidator(), url.strip(), ValidationError))
 
 
-def create_simple_test_method(validator, expected, value, num):
-    if expected is not None and issubclass(expected, Exception):
-        test_mask = 'test_%s_raises_error_%d'
+class TestValidators(SimpleTestCase):
 
-        def test_func(self):
-            # assertRaises not used, so as to be able to produce an error message
-            # containing the tested value
-            try:
-                validator(value)
-            except expected:
-                pass
-            else:
-                self.fail("%s not raised when validating '%s'" % (
-                    expected.__name__, value))
-    else:
-        test_mask = 'test_%s_%d'
+    def test_validators(self):
+        for validator, value, expected in TEST_DATA:
+            name = validator.__name__ if isinstance(validator, types.FunctionType) else validator.__class__.__name__
+            exception_expected = expected is not None and issubclass(expected, Exception)
+            with self.subTest(name, value=value):
+                if validator is validate_image_file_extension and not PILLOW_IS_INSTALLED:
+                    self.skipTest('Pillow is required to test validate_image_file_extension.')
+                if exception_expected:
+                    with self.assertRaises(expected):
+                        validator(value)
+                else:
+                    self.assertEqual(expected, validator(value))
 
-        def test_func(self):
-            try:
-                self.assertEqual(expected, validator(value))
-            except ValidationError as e:
-                self.fail("Validation of '%s' failed. Error message was: %s" % (
-                    value, str(e)))
-    if isinstance(validator, types.FunctionType):
-        val_name = validator.__name__
-    else:
-        val_name = validator.__class__.__name__
-    test_name = test_mask % (val_name, num)
-    if validator is validate_image_file_extension:
-        SKIP_MSG = "Pillow is required to test validate_image_file_extension"
-        test_func = skipUnless(PILLOW_IS_INSTALLED, SKIP_MSG)(test_func)
-    return test_name, test_func
-
-# Dynamically assemble a test class with the contents of TEST_DATA
-
-
-class TestSimpleValidators(SimpleTestCase):
     def test_single_message(self):
         v = ValidationError('Not Valid')
         self.assertEqual(str(v), "['Not Valid']")
@@ -327,20 +371,14 @@ class TestSimpleValidators(SimpleTestCase):
         self.assertEqual(repr(v), "ValidationError({'first': ['First Problem']})")
 
     def test_regex_validator_flags(self):
-        with self.assertRaises(TypeError):
+        msg = 'If the flags are set, regex must be a regular expression string.'
+        with self.assertRaisesMessage(TypeError, msg):
             RegexValidator(re.compile('a'), flags=re.IGNORECASE)
 
     def test_max_length_validator_message(self):
         v = MaxLengthValidator(16, message='"%(value)s" has more than %(limit_value)d characters.')
         with self.assertRaisesMessage(ValidationError, '"djangoproject.com" has more than 16 characters.'):
             v('djangoproject.com')
-
-
-test_counter = 0
-for validator, value, expected in TEST_DATA:
-    name, method = create_simple_test_method(validator, expected, value, test_counter)
-    setattr(TestSimpleValidators, name, method)
-    test_counter += 1
 
 
 class TestValidatorEquality(TestCase):
@@ -416,6 +454,7 @@ class TestValidatorEquality(TestCase):
             MaxValueValidator(44),
             MaxValueValidator(44),
         )
+        self.assertEqual(MaxValueValidator(44), mock.ANY)
         self.assertNotEqual(
             MaxValueValidator(44),
             MinValueValidator(44),
@@ -453,6 +492,14 @@ class TestValidatorEquality(TestCase):
             FileExtensionValidator(['txt'])
         )
         self.assertEqual(
+            FileExtensionValidator(['TXT']),
+            FileExtensionValidator(['txt'])
+        )
+        self.assertEqual(
+            FileExtensionValidator(['TXT', 'png']),
+            FileExtensionValidator(['txt', 'png'])
+        )
+        self.assertEqual(
             FileExtensionValidator(['txt']),
             FileExtensionValidator(['txt'], code='invalid_extension')
         )
@@ -472,3 +519,60 @@ class TestValidatorEquality(TestCase):
             FileExtensionValidator(['txt']),
             FileExtensionValidator(['txt'], message='custom error message')
         )
+
+    def test_prohibit_null_characters_validator_equality(self):
+        self.assertEqual(
+            ProhibitNullCharactersValidator(message='message', code='code'),
+            ProhibitNullCharactersValidator(message='message', code='code')
+        )
+        self.assertEqual(
+            ProhibitNullCharactersValidator(),
+            ProhibitNullCharactersValidator()
+        )
+        self.assertNotEqual(
+            ProhibitNullCharactersValidator(message='message1', code='code'),
+            ProhibitNullCharactersValidator(message='message2', code='code')
+        )
+        self.assertNotEqual(
+            ProhibitNullCharactersValidator(message='message', code='code1'),
+            ProhibitNullCharactersValidator(message='message', code='code2')
+        )
+
+
+class DeprecationTests(SimpleTestCase):
+    @ignore_warnings(category=RemovedInDjango41Warning)
+    def test_whitelist(self):
+        validator = EmailValidator(whitelist=['localdomain'])
+        self.assertEqual(validator.domain_allowlist, ['localdomain'])
+        self.assertIsNone(validator('email@localdomain'))
+        self.assertEqual(validator.domain_allowlist, validator.domain_whitelist)
+
+    def test_whitelist_warning(self):
+        msg = "The whitelist argument is deprecated in favor of allowlist."
+        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
+            EmailValidator(whitelist='localdomain')
+
+    @ignore_warnings(category=RemovedInDjango41Warning)
+    def test_domain_whitelist(self):
+        validator = EmailValidator()
+        validator.domain_whitelist = ['mydomain']
+        self.assertEqual(validator.domain_allowlist, ['mydomain'])
+        self.assertEqual(validator.domain_allowlist, validator.domain_whitelist)
+
+    def test_domain_whitelist_access_warning(self):
+        validator = EmailValidator()
+        msg = (
+            'The domain_whitelist attribute is deprecated in favor of '
+            'domain_allowlist.'
+        )
+        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
+            validator.domain_whitelist
+
+    def test_domain_whitelist_set_warning(self):
+        validator = EmailValidator()
+        msg = (
+            'The domain_whitelist attribute is deprecated in favor of '
+            'domain_allowlist.'
+        )
+        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
+            validator.domain_whitelist = ['mydomain']

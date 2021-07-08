@@ -23,8 +23,7 @@ class ConditionalGetMiddleware(MiddlewareMixin):
 
         etag = response.get('ETag')
         last_modified = response.get('Last-Modified')
-        if last_modified:
-            last_modified = parse_http_date_safe(last_modified)
+        last_modified = last_modified and parse_http_date_safe(last_modified)
 
         if etag or last_modified:
             return get_conditional_response(

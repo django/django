@@ -1,0 +1,28 @@
+==========================
+Django 2.1.4 release notes
+==========================
+
+*December 3, 2018*
+
+Django 2.1.4 fixes several bugs in 2.1.3.
+
+Bugfixes
+========
+
+* Corrected the default password list that ``CommonPasswordValidator`` uses by
+  lowercasing all passwords to match the format expected by the validator
+  (:ticket:`29952`).
+
+* Prevented repetitive calls to ``geos_version_tuple()`` in the ``WKBWriter``
+  class in an attempt to fix a random crash involving ``LooseVersion``
+  (:ticket:`29959`).
+
+* Fixed keep-alive support in ``runserver`` after it was disabled to fix
+  another issue in Django 2.0 (:ticket:`29849`).
+
+* Fixed admin view-only change form crash when using
+  ``ModelAdmin.prepopulated_fields`` (:ticket:`29929`).
+
+* Fixed "Please correct the errors below" error message when editing an object
+  in the admin if the user only has the "view" permission on inlines
+  (:ticket:`29930`).

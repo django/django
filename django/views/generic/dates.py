@@ -55,7 +55,10 @@ class YearMixin:
 
         The interval is defined by start date <= item date < next start date.
         """
-        return date.replace(year=date.year + 1, month=1, day=1)
+        try:
+            return date.replace(year=date.year + 1, month=1, day=1)
+        except ValueError:
+            raise Http404(_("Date out of range"))
 
     def _get_current_year(self, date):
         """Return the start date of the current interval."""
@@ -102,7 +105,10 @@ class MonthMixin:
         The interval is defined by start date <= item date < next start date.
         """
         if date.month == 12:
-            return date.replace(year=date.year + 1, month=1, day=1)
+            try:
+                return date.replace(year=date.year + 1, month=1, day=1)
+            except ValueError:
+                raise Http404(_("Date out of range"))
         else:
             return date.replace(month=date.month + 1, day=1)
 
@@ -196,7 +202,10 @@ class WeekMixin:
 
         The interval is defined by start date <= item date < next start date.
         """
-        return date + datetime.timedelta(days=7 - self._get_weekday(date))
+        try:
+            return date + datetime.timedelta(days=7 - self._get_weekday(date))
+        except OverflowError:
+            raise Http404(_("Date out of range"))
 
     def _get_current_week(self, date):
         """Return the start date of the current interval."""
@@ -209,7 +218,7 @@ class WeekMixin:
         The first day according to the week format is 0 and the last day is 6.
         """
         week_format = self.get_week_format()
-        if week_format == '%W':                 # week starts on Monday
+        if week_format in {'%W', '%V'}:         # week starts on Monday
             return date.weekday()
         elif week_format == '%U':               # week starts on Sunday
             return (date.weekday() + 1) % 7
@@ -258,7 +267,7 @@ class DateMixin:
         if self.uses_datetime_field:
             value = datetime.datetime.combine(value, datetime.time.min)
             if settings.USE_TZ:
-                value = timezone.make_aware(value, timezone.get_current_timezone())
+                value = timezone.make_aware(value)
         return value
 
     def _make_single_date_lookup(self, date):
@@ -288,9 +297,11 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
 
     def get(self, request, *args, **kwargs):
         self.date_list, self.object_list, extra_context = self.get_dated_items()
-        context = self.get_context_data(object_list=self.object_list,
-                                        date_list=self.date_list)
-        context.update(extra_context)
+        context = self.get_context_data(
+            object_list=self.object_list,
+            date_list=self.date_list,
+            **extra_context
+        )
         return self.render_to_response(context)
 
     def get_dated_items(self):
@@ -322,7 +333,7 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
         if not allow_empty:
             # When pagination is enabled, it's better to do a cheap query
             # than to load the unpaginated queryset in memory.
-            is_empty = len(qs) == 0 if paginate_by is None else not qs.exists()
+            is_empty = not qs if paginate_by is None else not qs.exists()
             if is_empty:
                 raise Http404(_("No %(verbose_name_plural)s available") % {
                     'verbose_name_plural': qs.model._meta.verbose_name_plural,
@@ -474,14 +485,23 @@ class BaseWeekArchiveView(YearMixin, WeekMixin, BaseDateListView):
 
         date_field = self.get_date_field()
         week_format = self.get_week_format()
-        week_start = {
-            '%W': '1',
-            '%U': '0',
-        }[week_format]
-        date = _date_from_string(year, self.get_year_format(),
-                                 week_start, '%w',
-                                 week, week_format)
-
+        week_choices = {'%W': '1', '%U': '0', '%V': '1'}
+        try:
+            week_start = week_choices[week_format]
+        except KeyError:
+            raise ValueError('Unknown week format %r. Choices are: %s' % (
+                week_format,
+                ', '.join(sorted(week_choices)),
+            ))
+        year_format = self.get_year_format()
+        if week_format == '%V' and year_format != '%G':
+            raise ValueError(
+                "ISO week directive '%s' is incompatible with the year "
+                "directive '%s'. Use the ISO year '%%G' instead." % (
+                    week_format, year_format,
+                )
+            )
+        date = _date_from_string(year, year_format, week_start, '%w', week, week_format)
         since = self._make_date_lookup_arg(date)
         until = self._make_date_lookup_arg(self._get_next_week(date))
         lookup_kwargs = {
@@ -600,12 +620,12 @@ def _date_from_string(year, year_format, month='', month_format='', day='', day_
     Get a datetime.date object given a format string and a year, month, and day
     (only year is mandatory). Raise a 404 for an invalid date.
     """
-    format = delim.join((year_format, month_format, day_format))
-    datestr = delim.join((year, month, day))
+    format = year_format + delim + month_format + delim + day_format
+    datestr = str(year) + delim + str(month) + delim + str(day)
     try:
         return datetime.datetime.strptime(datestr, format).date()
     except ValueError:
-        raise Http404(_("Invalid date string '%(datestr)s' given format '%(format)s'") % {
+        raise Http404(_('Invalid date string “%(datestr)s” given format “%(format)s”') % {
             'datestr': datestr,
             'format': format,
         })

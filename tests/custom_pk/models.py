@@ -7,7 +7,7 @@ this behavior by explicitly adding ``primary_key=True`` to a field.
 
 from django.db import models
 
-from .fields import MyAutoField
+from .fields import MyAutoField, MyWrapperField
 
 
 class Employee(models.Model):
@@ -29,16 +29,14 @@ class Business(models.Model):
     class Meta:
         verbose_name_plural = 'businesses'
 
-    def __str__(self):
-        return self.name
-
 
 class Bar(models.Model):
-    id = MyAutoField(primary_key=True, db_index=True)
-
-    def __str__(self):
-        return repr(self.pk)
+    id = MyWrapperField(primary_key=True, db_index=True)
 
 
 class Foo(models.Model):
     bar = models.ForeignKey(Bar, models.CASCADE)
+
+
+class CustomAutoFieldModel(models.Model):
+    id = MyAutoField(primary_key=True)

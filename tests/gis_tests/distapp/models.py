@@ -8,7 +8,6 @@ class NamedModel(models.Model):
 
     class Meta:
         abstract = True
-        required_db_features = ['gis_enabled']
 
     def __str__(self):
         return self.name
@@ -29,6 +28,8 @@ class AustraliaCity(NamedModel):
     "City model for Australia, using WGS84."
     point = models.PointField()
     radius = models.IntegerField(default=10000)
+    allowed_distance = models.FloatField(default=0.5)
+    ref_point = models.PointField(null=True)
 
 
 class CensusZipcode(NamedModel):

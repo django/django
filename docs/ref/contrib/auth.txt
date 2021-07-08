@@ -12,10 +12,13 @@ topic guide </topics/auth/index>`.
 ``User`` model
 ==============
 
+.. class:: models.User
+
 Fields
 ------
 
 .. class:: models.User
+    :noindex:
 
     :class:`~django.contrib.auth.models.User` objects have the following
     fields:
@@ -32,30 +35,20 @@ Fields
         ``max_length=191`` because MySQL can only create unique indexes with
         191 characters in that case by default.
 
-        .. admonition:: Usernames and Unicode
-
-            Django originally accepted only ASCII letters in usernames.
-            Although it wasn't a deliberate choice, Unicode characters have
-            always been accepted when using Python 3. Django 1.10 officially
-            added Unicode support in usernames, keeping the ASCII-only behavior
-            on Python 2, with the option to customize the behavior using
-            :attr:`.User.username_validator`.
-
     .. attribute:: first_name
 
-        Optional. 30 characters or fewer.
+        Optional (:attr:`blank=True <django.db.models.Field.blank>`). 150
+        characters or fewer.
 
     .. attribute:: last_name
 
-        Optional. 150 characters or fewer.
-
-        .. versionchanged:: 2.0
-
-            The ``max_length`` increased from 30 to 150 characters.
+        Optional (:attr:`blank=True <django.db.models.Field.blank>`). 150
+        characters or fewer.
 
     .. attribute:: email
 
-        Optional. Email address.
+        Optional (:attr:`blank=True <django.db.models.Field.blank>`). Email
+        address.
 
     .. attribute:: password
 
@@ -70,7 +63,7 @@ Fields
 
     .. attribute:: user_permissions
 
-         Many-to-many relationship to :class:`~django.contrib.auth.models.Permission`
+        Many-to-many relationship to :class:`~django.contrib.auth.models.Permission`
 
     .. attribute:: is_staff
 
@@ -117,6 +110,7 @@ Attributes
 ----------
 
 .. class:: models.User
+    :noindex:
 
     .. attribute:: is_authenticated
 
@@ -138,28 +132,11 @@ Attributes
         :attr:`~django.contrib.auth.models.User.is_authenticated` to this
         attribute.
 
-    .. attribute:: username_validator
-
-        Points to a validator instance used to validate usernames. Defaults to
-        :class:`validators.UnicodeUsernameValidator`.
-
-        To change the default username validator, you can subclass the ``User``
-        model and set this attribute to a different validator instance. For
-        example, to use ASCII usernames::
-
-            from django.contrib.auth.models import User
-            from django.contrib.auth.validators import ASCIIUsernameValidator
-
-            class CustomUser(User):
-                username_validator = ASCIIUsernameValidator()
-
-                class Meta:
-                    proxy = True  # If no new field is added.
-
 Methods
 -------
 
 .. class:: models.User
+    :noindex:
 
     .. method:: get_username()
 
@@ -211,6 +188,13 @@ Methods
         :meth:`~django.contrib.auth.models.User.set_unusable_password()` has
         been called for this user.
 
+    .. method:: get_user_permissions(obj=None)
+
+        Returns a set of permission strings that the user has directly.
+
+        If ``obj`` is passed in, only returns the user permissions for this
+        specific object.
+
     .. method:: get_group_permissions(obj=None)
 
         Returns a set of permission strings that the user has, through their
@@ -232,7 +216,8 @@ Methods
         Returns ``True`` if the user has the specified permission, where perm
         is in the format ``"<app label>.<permission codename>"``. (see
         documentation on :ref:`permissions <topic-authorization>`). If the user is
-        inactive, this method will always return ``False``.
+        inactive, this method will always return ``False``. For an active
+        superuser, this method will always return ``True``.
 
         If ``obj`` is passed in, this method won't check for a permission for
         the model, but for this specific object.
@@ -242,7 +227,8 @@ Methods
         Returns ``True`` if the user has each of the specified permissions,
         where each perm is in the format
         ``"<app label>.<permission codename>"``. If the user is inactive,
-        this method will always return ``False``.
+        this method will always return ``False``. For an active superuser, this
+        method will always return ``True``.
 
         If ``obj`` is passed in, this method won't check for permissions for
         the model, but for the specific object.
@@ -251,7 +237,8 @@ Methods
 
         Returns ``True`` if the user has any permissions in the given package
         (the Django app label). If the user is inactive, this method will
-        always return ``False``.
+        always return ``False``. For an active superuser, this method will
+        always return ``True``.
 
     .. method:: email_user(subject, message, from_email=None, **kwargs)
 
@@ -290,10 +277,30 @@ Manager methods
 
         See :ref:`Creating users <topics-auth-creating-users>` for example usage.
 
-    .. method:: create_superuser(username, email, password, **extra_fields)
+    .. method:: create_superuser(username, email=None, password=None, **extra_fields)
 
         Same as :meth:`create_user`, but sets :attr:`~models.User.is_staff` and
         :attr:`~models.User.is_superuser` to ``True``.
+
+    .. method:: with_perm(perm, is_active=True, include_superusers=True, backend=None, obj=None)
+
+        Returns users that have the given permission ``perm`` either in the
+        ``"<app label>.<permission codename>"`` format or as a
+        :class:`~django.contrib.auth.models.Permission` instance. Returns an
+        empty queryset if no users who have the ``perm`` found.
+
+        If ``is_active`` is ``True`` (default), returns only active users, or
+        if ``False``, returns only inactive users. Use ``None`` to return all
+        users irrespective of active state.
+
+        If ``include_superusers`` is ``True`` (default), the result will
+        include superusers.
+
+        If ``backend`` is passed in and it's defined in
+        :setting:`AUTHENTICATION_BACKENDS`, then this method will use it.
+        Otherwise, it will use the ``backend`` in
+        :setting:`AUTHENTICATION_BACKENDS`, if there is only one, or raise an
+        exception.
 
 ``AnonymousUser`` object
 ========================
@@ -341,6 +348,7 @@ Fields
 fields:
 
 .. class:: models.Permission
+    :noindex:
 
     .. attribute:: name
 
@@ -372,11 +380,12 @@ Fields
 :class:`~django.contrib.auth.models.Group` objects have the following fields:
 
 .. class:: models.Group
+    :noindex:
 
     .. attribute:: name
 
-        Required. 80 characters or fewer. Any characters are permitted. Example:
-        ``'Awesome Users'``.
+        Required. 150 characters or fewer. Any characters are permitted.
+        Example: ``'Awesome Users'``.
 
     .. attribute:: permissions
 
@@ -392,12 +401,12 @@ Validators
 
 .. class:: validators.ASCIIUsernameValidator
 
-    A field validator allowing only ASCII letters, in addition to ``@``, ``.``,
-    ``+``, ``-``, and ``_``.
+    A field validator allowing only ASCII letters and numbers, in addition to
+    ``@``, ``.``, ``+``, ``-``, and ``_``.
 
 .. class:: validators.UnicodeUsernameValidator
 
-    A field validator allowing Unicode letters, in addition to ``@``, ``.``,
+    A field validator allowing Unicode characters, in addition to ``@``, ``.``,
     ``+``, ``-``, and ``_``. The default validator for ``User.username``.
 
 .. _topics-auth-signals:
@@ -457,10 +466,6 @@ can be used for notification when a user logs in or out.
         The :class:`~django.http.HttpRequest` object, if one was provided to
         :func:`~django.contrib.auth.authenticate`.
 
-    .. versionchanged:: 1.11
-
-        The ``request`` argument was added.
-
 .. _authentication-backends-reference:
 
 Authentication backends
@@ -475,11 +480,33 @@ backends, see the :ref:`Other authentication sources section
 <authentication-backends>` of the :doc:`User authentication guide
 </topics/auth/index>`.
 
-
 Available authentication backends
 ---------------------------------
 
 The following backends are available in :mod:`django.contrib.auth.backends`:
+
+.. class:: BaseBackend
+
+    A base class that provides default implementations for all required
+    methods. By default, it will reject any user and provide no permissions.
+
+    .. method:: get_user_permissions(user_obj, obj=None)
+
+        Returns an empty set.
+
+    .. method:: get_group_permissions(user_obj, obj=None)
+
+        Returns an empty set.
+
+    .. method:: get_all_permissions(user_obj, obj=None)
+
+        Uses :meth:`get_user_permissions` and :meth:`get_group_permissions` to
+        get the set of permission strings the ``user_obj`` has.
+
+    .. method:: has_perm(user_obj, perm, obj=None)
+
+        Uses :meth:`get_all_permissions` to check if ``user_obj`` has the
+        permission string ``perm``.
 
 .. class:: ModelBackend
 
@@ -500,6 +527,9 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     implement them other than returning an empty set of permissions if
     ``obj is not None``.
 
+    :meth:`with_perm` also allows an object to be passed as a parameter, but
+    unlike others methods it returns an empty queryset if ``obj is not None``.
+
     .. method:: authenticate(request, username=None, password=None, **kwargs)
 
         Tries to authenticate ``username`` with ``password`` by calling
@@ -513,10 +543,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         ``request`` is an :class:`~django.http.HttpRequest` and may be ``None``
         if it wasn't provided to :func:`~django.contrib.auth.authenticate`
         (which passes it on to the backend).
-
-        .. versionchanged:: 1.11
-
-            The ``request`` argument was added.
 
     .. method:: get_user_permissions(user_obj, obj=None)
 
@@ -550,7 +576,7 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         Returns whether the ``user_obj`` has any permissions on the app
         ``app_label``.
 
-    .. method:: ModelBackend.user_can_authenticate()
+    .. method:: user_can_authenticate()
 
         Returns whether the user is allowed to authenticate. To match the
         behavior of :class:`~django.contrib.auth.forms.AuthenticationForm`
@@ -561,16 +587,30 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         don't have an :attr:`~django.contrib.auth.models.CustomUser.is_active`
         field are allowed.
 
+    .. method:: with_perm(perm, is_active=True, include_superusers=True, obj=None)
+
+        Returns all active users who have the permission ``perm`` either in
+        the form of ``"<app label>.<permission codename>"`` or a
+        :class:`~django.contrib.auth.models.Permission` instance. Returns an
+        empty queryset if no users who have the ``perm`` found.
+
+        If ``is_active`` is ``True`` (default), returns only active users, or
+        if ``False``, returns only inactive users. Use ``None`` to return all
+        users irrespective of active state.
+
+        If ``include_superusers`` is ``True`` (default), the result will
+        include superusers.
+
 .. class:: AllowAllUsersModelBackend
 
-   Same as :class:`ModelBackend` except that it doesn't reject inactive users
-   because :meth:`~ModelBackend.user_can_authenticate` always returns ``True``.
+    Same as :class:`ModelBackend` except that it doesn't reject inactive users
+    because :meth:`~ModelBackend.user_can_authenticate` always returns ``True``.
 
-   When using this backend, you'll likely want to customize the
-   :class:`~django.contrib.auth.forms.AuthenticationForm` used by the
-   :class:`~django.contrib.auth.views.LoginView` by overriding the
-   :meth:`~django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed`
-   method as it rejects inactive users.
+    When using this backend, you'll likely want to customize the
+    :class:`~django.contrib.auth.forms.AuthenticationForm` used by the
+    :class:`~django.contrib.auth.views.LoginView` by overriding the
+    :meth:`~django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed`
+    method as it rejects inactive users.
 
 .. class:: RemoteUserBackend
 
@@ -583,51 +623,56 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     If you need more control, you can create your own authentication backend
     that inherits from this class and override these attributes or methods:
 
-.. attribute:: RemoteUserBackend.create_unknown_user
+    .. attribute:: create_unknown_user
 
-    ``True`` or ``False``. Determines whether or not a user object is created
-    if not already in the database  Defaults to ``True``.
+        ``True`` or ``False``. Determines whether or not a user object is
+        created if not already in the database  Defaults to ``True``.
 
-.. method:: RemoteUserBackend.authenticate(request, remote_user)
+    .. method:: authenticate(request, remote_user)
 
-    The username passed as ``remote_user`` is considered trusted. This method
-    simply returns the user object with the given username, creating a new
-    user object if :attr:`~RemoteUserBackend.create_unknown_user` is ``True``.
+        The username passed as ``remote_user`` is considered trusted. This
+        method returns the user object with the given username, creating a new
+        user object if :attr:`~RemoteUserBackend.create_unknown_user` is
+        ``True``.
 
-    Returns ``None`` if :attr:`~RemoteUserBackend.create_unknown_user` is
-    ``False`` and a ``User`` object with the given username is not found in the
-    database.
+        Returns ``None`` if :attr:`~RemoteUserBackend.create_unknown_user` is
+        ``False`` and a ``User`` object with the given username is not found in
+        the database.
 
-    ``request`` is an :class:`~django.http.HttpRequest` and may be ``None`` if
-    it wasn't provided to :func:`~django.contrib.auth.authenticate` (which
-    passes it on to the backend).
+        ``request`` is an :class:`~django.http.HttpRequest` and may be ``None``
+        if it wasn't provided to :func:`~django.contrib.auth.authenticate`
+        (which passes it on to the backend).
 
-.. method:: RemoteUserBackend.clean_username(username)
+    .. method:: clean_username(username)
 
-   Performs any cleaning on the ``username`` (e.g. stripping LDAP DN
-   information) prior to using it to get or create a user object. Returns the
-   cleaned username.
+        Performs any cleaning on the ``username`` (e.g. stripping LDAP DN
+        information) prior to using it to get or create a user object. Returns
+        the cleaned username.
 
-.. method:: RemoteUserBackend.configure_user(user)
+    .. method:: configure_user(request, user)
 
-   Configures a newly created user.  This method is called immediately after a
-   new user is created, and can be used to perform custom setup actions, such
-   as setting the user's groups based on attributes in an LDAP directory.
-   Returns the user object.
+        Configures a newly created user.  This method is called immediately
+        after a new user is created, and can be used to perform custom setup
+        actions, such as setting the user's groups based on attributes in an
+        LDAP directory. Returns the user object.
 
-.. method:: RemoteUserBackend.user_can_authenticate()
+        ``request`` is an :class:`~django.http.HttpRequest` and may be ``None``
+        if it wasn't provided to :func:`~django.contrib.auth.authenticate`
+        (which passes it on to the backend).
 
-    Returns whether the user is allowed to authenticate. This method returns
-    ``False`` for users with :attr:`is_active=False
-    <django.contrib.auth.models.User.is_active>`. Custom user models that don't
-    have an :attr:`~django.contrib.auth.models.CustomUser.is_active` field are
-    allowed.
+    .. method:: user_can_authenticate()
+
+        Returns whether the user is allowed to authenticate. This method
+        returns ``False`` for users with :attr:`is_active=False
+        <django.contrib.auth.models.User.is_active>`. Custom user models that
+        don't have an :attr:`~django.contrib.auth.models.CustomUser.is_active`
+        field are allowed.
 
 .. class:: AllowAllUsersRemoteUserBackend
 
-   Same as :class:`RemoteUserBackend` except that it doesn't reject inactive
-   users because :attr:`~RemoteUserBackend.user_can_authenticate` always
-   returns ``True``.
+    Same as :class:`RemoteUserBackend` except that it doesn't reject inactive
+    users because :attr:`~RemoteUserBackend.user_can_authenticate` always
+    returns ``True``.
 
 Utility functions
 =================

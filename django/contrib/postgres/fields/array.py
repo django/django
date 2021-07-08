@@ -4,7 +4,8 @@ from django.contrib.postgres import lookups
 from django.contrib.postgres.forms import SimpleArrayField
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
 from django.core import checks, exceptions
-from django.db.models import Field, IntegerField, Transform
+from django.db.models import Field, Func, IntegerField, Transform, Value
+from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.lookups import Exact, In
 from django.utils.translation import gettext_lazy as _
 
@@ -14,19 +15,19 @@ from .utils import AttributeSetter
 __all__ = ['ArrayField']
 
 
-class ArrayField(Field):
+class ArrayField(CheckFieldDefaultMixin, Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'item_invalid': _('Item %(nth)s in the array did not validate: '),
+        'item_invalid': _('Item %(nth)s in the array did not validate:'),
         'nested_array_mismatch': _('Nested arrays must have the same length.'),
     }
+    _default_hint = ('list', '[]')
 
     def __init__(self, base_field, size=None, **kwargs):
         self.base_field = base_field
         self.size = size
         if self.size:
-            self.default_validators = self.default_validators[:]
-            self.default_validators.append(ArrayMaxLengthValidator(self.size))
+            self.default_validators = [*self.default_validators, ArrayMaxLengthValidator(self.size)]
         # For performance, only add a from_db_value() method if the base field
         # implements it.
         if hasattr(self.base_field, 'from_db_value'):
@@ -44,6 +45,10 @@ class ArrayField(Field):
     def model(self, model):
         self.__dict__['model'] = model
         self.base_field.model = model
+
+    @classmethod
+    def _choices_is_value(cls, value):
+        return isinstance(value, (list, tuple)) or super()._choices_is_value(value)
 
     def check(self, **kwargs):
         errors = super().check(**kwargs)
@@ -81,8 +86,15 @@ class ArrayField(Field):
         size = self.size or ''
         return '%s[%s]' % (self.base_field.db_type(connection), size)
 
+    def cast_db_type(self, connection):
+        size = self.size or ''
+        return '%s[%s]' % (self.base_field.cast_db_type(connection), size)
+
+    def get_placeholder(self, value, compiler, connection):
+        return '%s::{}'.format(self.db_type(connection))
+
     def get_db_prep_value(self, value, connection, prepared=False):
-        if isinstance(value, list) or isinstance(value, tuple):
+        if isinstance(value, (list, tuple)):
             return [self.base_field.get_db_prep_value(i, connection, prepared=False) for i in value]
         return value
 
@@ -103,11 +115,11 @@ class ArrayField(Field):
             value = [self.base_field.to_python(val) for val in vals]
         return value
 
-    def _from_db_value(self, value, expression, connection, context):
+    def _from_db_value(self, value, expression, connection):
         if value is None:
             return value
         return [
-            self.base_field.from_db_value(item, expression, connection, context)
+            self.base_field.from_db_value(item, expression, connection)
             for item in value
         ]
 
@@ -155,7 +167,7 @@ class ArrayField(Field):
                     error,
                     prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': index},
+                    params={'nth': index + 1},
                 )
         if isinstance(self.base_field, ArrayField):
             if len({len(i) for i in value}) > 1:
@@ -174,49 +186,58 @@ class ArrayField(Field):
                     error,
                     prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': index},
+                    params={'nth': index + 1},
                 )
 
     def formfield(self, **kwargs):
-        defaults = {
+        return super().formfield(**{
             'form_class': SimpleArrayField,
             'base_field': self.base_field.formfield(),
             'max_length': self.size,
-        }
-        defaults.update(kwargs)
-        return super().formfield(**defaults)
+            **kwargs,
+        })
+
+
+class ArrayRHSMixin:
+    def __init__(self, lhs, rhs):
+        if isinstance(rhs, (tuple, list)):
+            expressions = []
+            for value in rhs:
+                if not hasattr(value, 'resolve_expression'):
+                    field = lhs.output_field
+                    value = Value(field.base_field.get_prep_value(value))
+                expressions.append(value)
+            rhs = Func(
+                *expressions,
+                function='ARRAY',
+                template='%(function)s[%(expressions)s]',
+            )
+        super().__init__(lhs, rhs)
+
+    def process_rhs(self, compiler, connection):
+        rhs, rhs_params = super().process_rhs(compiler, connection)
+        cast_type = self.lhs.output_field.cast_db_type(connection)
+        return '%s::%s' % (rhs, cast_type), rhs_params
 
 
 @ArrayField.register_lookup
-class ArrayContains(lookups.DataContains):
-    def as_sql(self, qn, connection):
-        sql, params = super().as_sql(qn, connection)
-        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
-        return sql, params
+class ArrayContains(ArrayRHSMixin, lookups.DataContains):
+    pass
 
 
 @ArrayField.register_lookup
-class ArrayContainedBy(lookups.ContainedBy):
-    def as_sql(self, qn, connection):
-        sql, params = super().as_sql(qn, connection)
-        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
-        return sql, params
+class ArrayContainedBy(ArrayRHSMixin, lookups.ContainedBy):
+    pass
 
 
 @ArrayField.register_lookup
-class ArrayExact(Exact):
-    def as_sql(self, qn, connection):
-        sql, params = super().as_sql(qn, connection)
-        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
-        return sql, params
+class ArrayExact(ArrayRHSMixin, Exact):
+    pass
 
 
 @ArrayField.register_lookup
-class ArrayOverlap(lookups.Overlap):
-    def as_sql(self, qn, connection):
-        sql, params = super().as_sql(qn, connection)
-        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
-        return sql, params
+class ArrayOverlap(ArrayRHSMixin, lookups.Overlap):
+    pass
 
 
 @ArrayField.register_lookup
@@ -237,6 +258,8 @@ class ArrayLenTransform(Transform):
 class ArrayInLookup(In):
     def get_prep_lookup(self):
         values = super().get_prep_lookup()
+        if hasattr(values, 'resolve_expression'):
+            return values
         # In.process_rhs() expects values to be hashable, so convert lists
         # to tuples.
         prepared_values = []
@@ -257,7 +280,7 @@ class IndexTransform(Transform):
 
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
-        return '%s[%s]' % (lhs, self.index), params
+        return '%s[%%s]' % lhs, params + [self.index]
 
     @property
     def output_field(self):
@@ -283,7 +306,7 @@ class SliceTransform(Transform):
 
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
-        return '%s[%s:%s]' % (lhs, self.start, self.end), params
+        return '%s[%%s:%%s]' % lhs, params + [self.start, self.end]
 
 
 class SliceTransformFactory:

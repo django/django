@@ -14,7 +14,9 @@ import sys
 from wsgiref import simple_server
 
 from django.core.exceptions import ImproperlyConfigured
+from django.core.handlers.wsgi import LimitedStream
 from django.core.wsgi import get_wsgi_application
+from django.db import connections
 from django.utils.module_loading import import_string
 
 __all__ = ('WSGIServer', 'WSGIRequestHandler')
@@ -50,8 +52,12 @@ def get_internal_wsgi_application():
 
 
 def is_broken_pipe_error():
-    exc_type, exc_value = sys.exc_info()[:2]
-    return issubclass(exc_type, socket.error) and exc_value.args[0] == 32
+    exc_type, _, _ = sys.exc_info()
+    return issubclass(exc_type, (
+        BrokenPipeError,
+        ConnectionAbortedError,
+        ConnectionResetError,
+    ))
 
 
 class WSGIServer(simple_server.WSGIServer):
@@ -74,16 +80,65 @@ class WSGIServer(simple_server.WSGIServer):
 
 class ThreadedWSGIServer(socketserver.ThreadingMixIn, WSGIServer):
     """A threaded version of the WSGIServer"""
-    pass
+    daemon_threads = True
+
+    def __init__(self, *args, connections_override=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.connections_override = connections_override
+
+    # socketserver.ThreadingMixIn.process_request() passes this method as
+    # the target to a new Thread object.
+    def process_request_thread(self, request, client_address):
+        if self.connections_override:
+            # Override this thread's database connections with the ones
+            # provided by the parent thread.
+            for alias, conn in self.connections_override.items():
+                connections[alias] = conn
+        super().process_request_thread(request, client_address)
+
+    def _close_connections(self):
+        # Used for mocking in tests.
+        connections.close_all()
+
+    def close_request(self, request):
+        self._close_connections()
+        super().close_request(request)
 
 
 class ServerHandler(simple_server.ServerHandler):
     http_version = '1.1'
 
-    def handle_error(self):
-        # Ignore broken pipe errors, otherwise pass on
-        if not is_broken_pipe_error():
-            super().handle_error()
+    def __init__(self, stdin, stdout, stderr, environ, **kwargs):
+        """
+        Use a LimitedStream so that unread request data will be ignored at
+        the end of the request. WSGIRequest uses a LimitedStream but it
+        shouldn't discard the data since the upstream servers usually do this.
+        This fix applies only for testserver/runserver.
+        """
+        try:
+            content_length = int(environ.get('CONTENT_LENGTH'))
+        except (ValueError, TypeError):
+            content_length = 0
+        super().__init__(LimitedStream(stdin, content_length), stdout, stderr, environ, **kwargs)
+
+    def cleanup_headers(self):
+        super().cleanup_headers()
+        # HTTP/1.1 requires support for persistent connections. Send 'close' if
+        # the content length is unknown to prevent clients from reusing the
+        # connection.
+        if 'Content-Length' not in self.headers:
+            self.headers['Connection'] = 'close'
+        # Persistent connections require threading server.
+        elif not isinstance(self.request_handler.server, socketserver.ThreadingMixIn):
+            self.headers['Connection'] = 'close'
+        # Mark the connection for closing if it's set as such above or if the
+        # application sent the header.
+        if self.headers.get('Connection') == 'close':
+            self.request_handler.close_connection = True
+
+    def close(self):
+        self.get_stdin()._read_limited()
+        super().close()
 
 
 class WSGIRequestHandler(simple_server.WSGIRequestHandler):
@@ -128,18 +183,21 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
         # the WSGI environ. This prevents header-spoofing based on ambiguity
         # between underscores and dashes both normalized to underscores in WSGI
         # env vars. Nginx and Apache 2.4+ both do this as well.
-        for k, v in self.headers.items():
+        for k in self.headers:
             if '_' in k:
                 del self.headers[k]
 
         return super().get_environ()
 
     def handle(self):
-        """Handle multiple requests if necessary."""
-        self.close_connection = 1
+        self.close_connection = True
         self.handle_one_request()
         while not self.close_connection:
             self.handle_one_request()
+        try:
+            self.connection.shutdown(socket.SHUT_WR)
+        except (AttributeError, OSError):
+            pass
 
     def handle_one_request(self):
         """Copy of WSGIRequestHandler.handle() but with different ServerHandler"""
@@ -157,7 +215,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
         handler = ServerHandler(
             self.rfile, self.wfile, self.get_stderr(), self.get_environ()
         )
-        handler.request_handler = self      # backpointer for logging
+        handler.request_handler = self      # backpointer for logging & connection closing
         handler.run(self.server.get_app())
 
 

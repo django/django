@@ -3,12 +3,12 @@
  by GEOSGeometry to house the actual coordinates of the Point,
  LineString, and LinearRing geometries.
 """
-from ctypes import byref, c_double, c_uint
+from ctypes import byref, c_byte, c_double, c_uint
 
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.error import GEOSException
-from django.contrib.gis.geos.libgeos import CS_PTR
+from django.contrib.gis.geos.libgeos import CS_PTR, geos_version_tuple
 from django.contrib.gis.shortcuts import numpy
 
 
@@ -31,7 +31,7 @@ class GEOSCoordSeq(GEOSBase):
 
     def __len__(self):
         "Return the number of points in the coordinate sequence."
-        return int(self.size)
+        return self.size
 
     def __str__(self):
         "Return the string representation of the coordinate sequence."
@@ -39,10 +39,8 @@ class GEOSCoordSeq(GEOSBase):
 
     def __getitem__(self, index):
         "Return the coordinate sequence value at the given index."
-        coords = [self.getX(index), self.getY(index)]
-        if self.dims == 3 and self._z:
-            coords.append(self.getZ(index))
-        return tuple(coords)
+        self._checkindex(index)
+        return self._point_getter(index)
 
     def __setitem__(self, index, value):
         "Set the coordinate sequence value at the given index."
@@ -56,29 +54,64 @@ class GEOSCoordSeq(GEOSBase):
         # Checking the dims of the input
         if self.dims == 3 and self._z:
             n_args = 3
-            set_3d = True
+            point_setter = self._set_point_3d
         else:
             n_args = 2
-            set_3d = False
+            point_setter = self._set_point_2d
         if len(value) != n_args:
             raise TypeError('Dimension of value does not match.')
-        # Setting the X, Y, Z
-        self.setX(index, value[0])
-        self.setY(index, value[1])
-        if set_3d:
-            self.setZ(index, value[2])
+        self._checkindex(index)
+        point_setter(index, value)
 
     # #### Internal Routines ####
     def _checkindex(self, index):
         "Check the given index."
-        sz = self.size
-        if (sz < 1) or (index < 0) or (index >= sz):
+        if not (0 <= index < self.size):
             raise IndexError('invalid GEOS Geometry index: %s' % index)
 
     def _checkdim(self, dim):
         "Check the given dimension."
         if dim < 0 or dim > 2:
             raise GEOSException('invalid ordinate dimension "%d"' % dim)
+
+    def _get_x(self, index):
+        return capi.cs_getx(self.ptr, index, byref(c_double()))
+
+    def _get_y(self, index):
+        return capi.cs_gety(self.ptr, index, byref(c_double()))
+
+    def _get_z(self, index):
+        return capi.cs_getz(self.ptr, index, byref(c_double()))
+
+    def _set_x(self, index, value):
+        capi.cs_setx(self.ptr, index, value)
+
+    def _set_y(self, index, value):
+        capi.cs_sety(self.ptr, index, value)
+
+    def _set_z(self, index, value):
+        capi.cs_setz(self.ptr, index, value)
+
+    @property
+    def _point_getter(self):
+        return self._get_point_3d if self.dims == 3 and self._z else self._get_point_2d
+
+    def _get_point_2d(self, index):
+        return (self._get_x(index), self._get_y(index))
+
+    def _get_point_3d(self, index):
+        return (self._get_x(index), self._get_y(index), self._get_z(index))
+
+    def _set_point_2d(self, index, value):
+        x, y = value
+        self._set_x(index, x)
+        self._set_y(index, y)
+
+    def _set_point_3d(self, index, value):
+        x, y, z = value
+        self._set_x(index, x)
+        self._set_y(index, y)
+        self._set_z(index, z)
 
     # #### Ordinate getting and setting routines ####
     def getOrdinate(self, dimension, index):
@@ -157,7 +190,27 @@ class GEOSCoordSeq(GEOSBase):
     def tuple(self):
         "Return a tuple version of this coordinate sequence."
         n = self.size
+        get_point = self._point_getter
         if n == 1:
-            return self[0]
-        else:
-            return tuple(self[i] for i in range(n))
+            return get_point(0)
+        return tuple(get_point(i) for i in range(n))
+
+    @property
+    def is_counterclockwise(self):
+        """Return whether this coordinate sequence is counterclockwise."""
+        if geos_version_tuple() < (3, 7):
+            # A modified shoelace algorithm to determine polygon orientation.
+            # See https://en.wikipedia.org/wiki/Shoelace_formula.
+            area = 0.0
+            n = len(self)
+            for i in range(n):
+                j = (i + 1) % n
+                area += self[i][0] * self[j][1]
+                area -= self[j][0] * self[i][1]
+            return area > 0.0
+        ret = c_byte()
+        if not capi.cs_is_ccw(self.ptr, byref(ret)):
+            raise GEOSException(
+                'Error encountered in GEOS C function "%s".' % capi.cs_is_ccw.func_name
+            )
+        return ret.value == 1

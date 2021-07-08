@@ -6,13 +6,16 @@ import sys
 import tempfile as sys_tempfile
 import unittest
 from io import BytesIO, StringIO
+from unittest import mock
 from urllib.parse import quote
 
+from django.core.exceptions import SuspiciousFileOperation
 from django.core.files import temp as tempfile
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.http.multipartparser import MultiPartParser, parse_header
+from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
+from django.http.multipartparser import (
+    FILE, MultiPartParser, MultiPartParserError, Parser, parse_header,
+)
 from django.test import SimpleTestCase, TestCase, client, override_settings
-from django.utils.encoding import force_bytes
 
 from . import uploadhandler
 from .models import FileModel
@@ -21,6 +24,32 @@ UNICODE_FILENAME = 'test-0123456789_中文_Orléans.jpg'
 MEDIA_ROOT = sys_tempfile.mkdtemp()
 UPLOAD_TO = os.path.join(MEDIA_ROOT, 'test_upload')
 
+CANDIDATE_TRAVERSAL_FILE_NAMES = [
+    '/tmp/hax0rd.txt',          # Absolute path, *nix-style.
+    'C:\\Windows\\hax0rd.txt',  # Absolute path, win-style.
+    'C:/Windows/hax0rd.txt',    # Absolute path, broken-style.
+    '\\tmp\\hax0rd.txt',        # Absolute path, broken in a different way.
+    '/tmp\\hax0rd.txt',         # Absolute path, broken by mixing.
+    'subdir/hax0rd.txt',        # Descendant path, *nix-style.
+    'subdir\\hax0rd.txt',       # Descendant path, win-style.
+    'sub/dir\\hax0rd.txt',      # Descendant path, mixed.
+    '../../hax0rd.txt',         # Relative path, *nix-style.
+    '..\\..\\hax0rd.txt',       # Relative path, win-style.
+    '../..\\hax0rd.txt',        # Relative path, mixed.
+    '..&#x2F;hax0rd.txt',       # HTML entities.
+    '..&sol;hax0rd.txt',        # HTML entities.
+]
+
+CANDIDATE_INVALID_FILE_NAMES = [
+    '/tmp/',        # Directory, *nix-style.
+    'c:\\tmp\\',    # Directory, win-style.
+    '/tmp/.',       # Directory dot, *nix-style.
+    'c:\\tmp\\.',   # Directory dot, *nix-style.
+    '/tmp/..',      # Parent directory, *nix-style.
+    'c:\\tmp\\..',  # Parent directory, win-style.
+    '',             # Empty filename.
+]
+
 
 @override_settings(MEDIA_ROOT=MEDIA_ROOT, ROOT_URLCONF='file_uploads.urls', MIDDLEWARE=[])
 class FileUploadTests(TestCase):
@@ -28,13 +57,24 @@ class FileUploadTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        if not os.path.isdir(MEDIA_ROOT):
-            os.makedirs(MEDIA_ROOT)
+        os.makedirs(MEDIA_ROOT, exist_ok=True)
+        cls.addClassCleanup(shutil.rmtree, MEDIA_ROOT)
 
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(MEDIA_ROOT)
-        super().tearDownClass()
+    def test_upload_name_is_validated(self):
+        candidates = [
+            '/tmp/',
+            '/tmp/..',
+            '/tmp/.',
+        ]
+        if sys.platform == 'win32':
+            candidates.extend([
+                'c:\\tmp\\',
+                'c:\\tmp\\..',
+                'c:\\tmp\\.',
+            ])
+        for file_name in candidates:
+            with self.subTest(file_name=file_name):
+                self.assertRaises(SuspiciousFileOperation, UploadedFile, name=file_name)
 
     def test_simple_upload(self):
         with open(__file__, 'rb') as fp:
@@ -65,7 +105,7 @@ class FileUploadTests(TestCase):
                     post_data[key + '_hash'] = hashlib.sha1(post_data[key].read()).hexdigest()
                     post_data[key].seek(0)
                 except AttributeError:
-                    post_data[key + '_hash'] = hashlib.sha1(force_bytes(post_data[key])).hexdigest()
+                    post_data[key + '_hash'] = hashlib.sha1(post_data[key].encode()).hexdigest()
 
             response = self.client.post('/verify/', post_data)
 
@@ -78,7 +118,7 @@ class FileUploadTests(TestCase):
             'Content-Type: application/octet-stream',
             'Content-Transfer-Encoding: base64',
             '']))
-        payload.write(b"\r\n" + encode(force_bytes(content)) + b"\r\n")
+        payload.write(b'\r\n' + encode(content.encode()) + b'\r\n')
         payload.write('--' + client.BOUNDARY + '--\r\n')
         r = {
             'CONTENT_LENGTH': len(payload),
@@ -162,15 +202,61 @@ class FileUploadTests(TestCase):
         response = self.client.request(**r)
         self.assertEqual(response.status_code, 200)
 
+    def test_unicode_file_name_rfc2231_with_double_quotes(self):
+        payload = client.FakePayload()
+        payload.write('\r\n'.join([
+            '--' + client.BOUNDARY,
+            'Content-Disposition: form-data; name="file_unicode"; '
+            'filename*="UTF-8\'\'%s"' % quote(UNICODE_FILENAME),
+            'Content-Type: application/octet-stream',
+            '',
+            'You got pwnd.\r\n',
+            '\r\n--' + client.BOUNDARY + '--\r\n',
+        ]))
+        r = {
+            'CONTENT_LENGTH': len(payload),
+            'CONTENT_TYPE': client.MULTIPART_CONTENT,
+            'PATH_INFO': '/unicode_name/',
+            'REQUEST_METHOD': 'POST',
+            'wsgi.input': payload,
+        }
+        response = self.client.request(**r)
+        self.assertEqual(response.status_code, 200)
+
+    def test_unicode_name_rfc2231_with_double_quotes(self):
+        payload = client.FakePayload()
+        payload.write('\r\n'.join([
+            '--' + client.BOUNDARY,
+            'Content-Disposition: form-data; name*="UTF-8\'\'file_unicode"; '
+            'filename*="UTF-8\'\'%s"' % quote(UNICODE_FILENAME),
+            'Content-Type: application/octet-stream',
+            '',
+            'You got pwnd.\r\n',
+            '\r\n--' + client.BOUNDARY + '--\r\n'
+        ]))
+        r = {
+            'CONTENT_LENGTH': len(payload),
+            'CONTENT_TYPE': client.MULTIPART_CONTENT,
+            'PATH_INFO': '/unicode_name/',
+            'REQUEST_METHOD': 'POST',
+            'wsgi.input': payload,
+        }
+        response = self.client.request(**r)
+        self.assertEqual(response.status_code, 200)
+
     def test_blank_filenames(self):
         """
         Receiving file upload when filename is blank (before and after
         sanitization) should be okay.
         """
-        # The second value is normalized to an empty name by
-        # MultiPartParser.IE_sanitize()
-        filenames = ['', 'C:\\Windows\\']
-
+        filenames = [
+            '',
+            # Normalized by MultiPartParser.IE_sanitize().
+            'C:\\Windows\\',
+            # Normalized by os.path.basename().
+            '/',
+            'ends-with-slash/',
+        ]
         payload = client.FakePayload()
         for i, name in enumerate(filenames):
             payload.write('\r\n'.join([
@@ -204,22 +290,8 @@ class FileUploadTests(TestCase):
         # a malicious payload with an invalid file name (containing os.sep or
         # os.pardir). This similar to what an attacker would need to do when
         # trying such an attack.
-        scary_file_names = [
-            "/tmp/hax0rd.txt",          # Absolute path, *nix-style.
-            "C:\\Windows\\hax0rd.txt",  # Absolute path, win-style.
-            "C:/Windows/hax0rd.txt",    # Absolute path, broken-style.
-            "\\tmp\\hax0rd.txt",        # Absolute path, broken in a different way.
-            "/tmp\\hax0rd.txt",         # Absolute path, broken by mixing.
-            "subdir/hax0rd.txt",        # Descendant path, *nix-style.
-            "subdir\\hax0rd.txt",       # Descendant path, win-style.
-            "sub/dir\\hax0rd.txt",      # Descendant path, mixed.
-            "../../hax0rd.txt",         # Relative path, *nix-style.
-            "..\\..\\hax0rd.txt",       # Relative path, win-style.
-            "../..\\hax0rd.txt"         # Relative path, mixed.
-        ]
-
         payload = client.FakePayload()
-        for i, name in enumerate(scary_file_names):
+        for i, name in enumerate(CANDIDATE_TRAVERSAL_FILE_NAMES):
             payload.write('\r\n'.join([
                 '--' + client.BOUNDARY,
                 'Content-Disposition: form-data; name="file%s"; filename="%s"' % (i, name),
@@ -239,7 +311,7 @@ class FileUploadTests(TestCase):
         response = self.client.request(**r)
         # The filenames should have been sanitized by the time it got to the view.
         received = response.json()
-        for i, name in enumerate(scary_file_names):
+        for i, name in enumerate(CANDIDATE_TRAVERSAL_FILE_NAMES):
             got = received["file%s" % i]
             self.assertEqual(got, "hax0rd.txt")
 
@@ -385,9 +457,41 @@ class FileUploadTests(TestCase):
             file.write(b'a' * (2 ** 21))
             file.seek(0)
 
-            # AttributeError: You cannot alter upload handlers after the upload has been processed.
-            with self.assertRaises(AttributeError):
+            msg = 'You cannot alter upload handlers after the upload has been processed.'
+            with self.assertRaisesMessage(AttributeError, msg):
                 self.client.post('/quota/broken/', {'f': file})
+
+    def test_stop_upload_temporary_file_handler(self):
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file.write(b'a')
+            temp_file.seek(0)
+            response = self.client.post('/temp_file/stop_upload/', {'file': temp_file})
+            temp_path = response.json()['temp_path']
+            self.assertIs(os.path.exists(temp_path), False)
+
+    def test_upload_interrupted_temporary_file_handler(self):
+        # Simulate an interrupted upload by omitting the closing boundary.
+        class MockedParser(Parser):
+            def __iter__(self):
+                for item in super().__iter__():
+                    item_type, meta_data, field_stream = item
+                    yield item_type, meta_data, field_stream
+                    if item_type == FILE:
+                        return
+
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file.write(b'a')
+            temp_file.seek(0)
+            with mock.patch(
+                'django.http.multipartparser.Parser',
+                MockedParser,
+            ):
+                response = self.client.post(
+                    '/temp_file/upload_interrupted/',
+                    {'file': temp_file},
+                )
+            temp_path = response.json()['temp_path']
+            self.assertIs(os.path.exists(temp_path), False)
 
     def test_fileupload_getlist(self):
         file = tempfile.NamedTemporaryFile
@@ -479,8 +583,9 @@ class FileUploadTests(TestCase):
             try:
                 self.client.post('/upload_errors/', post_data)
             except reference_error.__class__ as err:
-                self.assertFalse(
-                    str(err) == str(reference_error),
+                self.assertNotEqual(
+                    str(err),
+                    str(reference_error),
                     "Caught a repeated exception that'll cause an infinite loop in file uploads."
                 )
             except Exception as err:
@@ -517,6 +622,46 @@ class FileUploadTests(TestCase):
         # shouldn't differ.
         self.assertEqual(os.path.basename(obj.testfile.path), 'MiXeD_cAsE.txt')
 
+    def test_filename_traversal_upload(self):
+        os.makedirs(UPLOAD_TO, exist_ok=True)
+        tests = [
+            '..&#x2F;test.txt',
+            '..&sol;test.txt',
+        ]
+        for file_name in tests:
+            with self.subTest(file_name=file_name):
+                payload = client.FakePayload()
+                payload.write(
+                    '\r\n'.join([
+                        '--' + client.BOUNDARY,
+                        'Content-Disposition: form-data; name="my_file"; '
+                        'filename="%s";' % file_name,
+                        'Content-Type: text/plain',
+                        '',
+                        'file contents.\r\n',
+                        '\r\n--' + client.BOUNDARY + '--\r\n',
+                    ]),
+                )
+                r = {
+                    'CONTENT_LENGTH': len(payload),
+                    'CONTENT_TYPE': client.MULTIPART_CONTENT,
+                    'PATH_INFO': '/upload_traversal/',
+                    'REQUEST_METHOD': 'POST',
+                    'wsgi.input': payload,
+                }
+                response = self.client.request(**r)
+                result = response.json()
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(result['file_name'], 'test.txt')
+                self.assertIs(
+                    os.path.exists(os.path.join(MEDIA_ROOT, 'test.txt')),
+                    False,
+                )
+                self.assertIs(
+                    os.path.exists(os.path.join(UPLOAD_TO, 'test.txt')),
+                    True,
+                )
+
 
 @override_settings(MEDIA_ROOT=MEDIA_ROOT)
 class DirectoryCreationTests(SimpleTestCase):
@@ -527,13 +672,8 @@ class DirectoryCreationTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        if not os.path.isdir(MEDIA_ROOT):
-            os.makedirs(MEDIA_ROOT)
-
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(MEDIA_ROOT)
-        super().tearDownClass()
+        os.makedirs(MEDIA_ROOT, exist_ok=True)
+        cls.addClassCleanup(shutil.rmtree, MEDIA_ROOT)
 
     def setUp(self):
         self.obj = FileModel()
@@ -547,19 +687,16 @@ class DirectoryCreationTests(SimpleTestCase):
             self.obj.testfile.save('foo.txt', SimpleUploadedFile('foo.txt', b'x'), save=False)
 
     def test_not_a_directory(self):
-        """The correct IOError is raised when the upload directory name exists but isn't a directory"""
         # Create a file with the upload directory name
         open(UPLOAD_TO, 'wb').close()
         self.addCleanup(os.remove, UPLOAD_TO)
-        with self.assertRaises(IOError) as exc_info:
+        msg = '%s exists and is not a directory.' % UPLOAD_TO
+        with self.assertRaisesMessage(FileExistsError, msg):
             with SimpleUploadedFile('foo.txt', b'x') as file:
                 self.obj.testfile.save('foo.txt', file, save=False)
-        # The test needs to be done on a specific string as IOError
-        # is raised even without the patch (just not early enough)
-        self.assertEqual(exc_info.exception.args[0], "%s exists and is not a directory." % UPLOAD_TO)
 
 
-class MultiParserTests(unittest.TestCase):
+class MultiParserTests(SimpleTestCase):
 
     def test_empty_upload_handlers(self):
         # We're not actually parsing here; just checking if the parser properly
@@ -568,6 +705,45 @@ class MultiParserTests(unittest.TestCase):
             'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
             'CONTENT_LENGTH': '1'
         }, StringIO('x'), [], 'utf-8')
+
+    def test_invalid_content_type(self):
+        with self.assertRaisesMessage(MultiPartParserError, 'Invalid Content-Type: text/plain'):
+            MultiPartParser({
+                'CONTENT_TYPE': 'text/plain',
+                'CONTENT_LENGTH': '1',
+            }, StringIO('x'), [], 'utf-8')
+
+    def test_negative_content_length(self):
+        with self.assertRaisesMessage(MultiPartParserError, 'Invalid content length: -1'):
+            MultiPartParser({
+                'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
+                'CONTENT_LENGTH': -1,
+            }, StringIO('x'), [], 'utf-8')
+
+    def test_bad_type_content_length(self):
+        multipart_parser = MultiPartParser({
+            'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
+            'CONTENT_LENGTH': 'a',
+        }, StringIO('x'), [], 'utf-8')
+        self.assertEqual(multipart_parser._content_length, 0)
+
+    def test_sanitize_file_name(self):
+        parser = MultiPartParser({
+            'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
+            'CONTENT_LENGTH': '1'
+        }, StringIO('x'), [], 'utf-8')
+        for file_name in CANDIDATE_TRAVERSAL_FILE_NAMES:
+            with self.subTest(file_name=file_name):
+                self.assertEqual(parser.sanitize_file_name(file_name), 'hax0rd.txt')
+
+    def test_sanitize_invalid_file_name(self):
+        parser = MultiPartParser({
+            'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
+            'CONTENT_LENGTH': '1',
+        }, StringIO('x'), [], 'utf-8')
+        for file_name in CANDIDATE_INVALID_FILE_NAMES:
+            with self.subTest(file_name=file_name):
+                self.assertIsNone(parser.sanitize_file_name(file_name))
 
     def test_rfc2231_parsing(self):
         test_data = (

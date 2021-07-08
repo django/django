@@ -3,15 +3,15 @@
 # Translators:
 # dekomote <dr.mote@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Vasil Vangelovski <vvangelovski@gmail.com>, 2016
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2016-2017,2019,2021
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2013-2015
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2011-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-15 11:14+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-06-11 17:28+0000\n"
 "Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
 "Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
 "mk/)\n"
@@ -20,6 +20,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: mk\n"
 "Plural-Forms: nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Избриши ги избраните %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -31,10 +35,6 @@ msgstr "Не може да се избрише %(name)s"
 
 msgid "Are you sure?"
 msgstr "Сигурни сте?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Избриши ги избраните %(verbose_name_plural)s"
 
 msgid "Administration"
 msgstr "Администрација"
@@ -67,10 +67,16 @@ msgid "This year"
 msgstr "Оваа година"
 
 msgid "No date"
-msgstr "Без датум"
+msgstr "Нема датум"
 
 msgid "Has date"
 msgstr "Има датум"
+
+msgid "Empty"
+msgstr ""
+
+msgid "Not empty"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -85,10 +91,19 @@ msgstr "Акција:"
 
 #, python-format
 msgid "Add another %(verbose_name)s"
-msgstr "Додадете уште %(verbose_name)s"
+msgstr "Додади уште %(verbose_name)s"
 
 msgid "Remove"
 msgstr "Отстрани"
+
+msgid "Addition"
+msgstr "Додавање"
+
+msgid "Change"
+msgstr "Измени"
+
+msgid "Deletion"
+msgstr "Бришење"
 
 msgid "action time"
 msgstr "време на акција"
@@ -97,13 +112,13 @@ msgid "user"
 msgstr "корисник"
 
 msgid "content type"
-msgstr "тип содржина"
+msgstr "тип на содржина"
 
 msgid "object id"
 msgstr "идентификационен број на објект"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "репрезентација на објект"
 
@@ -120,23 +135,23 @@ msgid "log entries"
 msgstr "ставки во записникот"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "Додадено \"%(object)s\"."
+msgid "Added “%(object)s”."
+msgstr ""
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "Променето \"%(object)s\" - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr ""
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "Избришано \"%(object)s.\""
+msgid "Deleted “%(object)s.”"
+msgstr ""
 
 msgid "LogEntry Object"
 msgstr "Запис во дневник"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr "Додадено  {name} \"{object}\"."
+msgid "Added {name} “{object}”."
+msgstr ""
 
 msgid "Added."
 msgstr "Додадено."
@@ -145,16 +160,16 @@ msgid "and"
 msgstr "и"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "Изменето {fields} за {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
+msgstr ""
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr "Изменето {fields}."
+msgstr "Изменети {fields}."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr "Избришано   {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
+msgstr "Избришан {name} “{object}”."
 
 msgid "No fields changed."
 msgstr "Не е изменето ниедно поле."
@@ -162,40 +177,38 @@ msgstr "Не е изменето ниедно поле."
 msgid "None"
 msgstr "Ништо"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr ""
-"Држете го копчето \"Control\", или \"Command\" на Mac, за да изберете повеќе "
-"од едно."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr "Држете “Control” или “Command” на Mac за да изберете повеќе."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr "Успешно беше додадено {name} “{obj}”."
+
+msgid "You may edit it again below."
+msgstr "Можете повторно да го промените подолу."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+"The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
+msgid "The {name} “{obj}” was changed successfully."
 msgstr ""
 
 msgid ""
@@ -209,12 +222,12 @@ msgid "No action selected."
 msgstr "Ниедна акција не е одбрана."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "Ставаката %(name)s \"%(obj)s\" беше успешно избришана."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr ""
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Објект %(name)s со примарен клуч %(key)r не постои."
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr ""
 
 #, python-format
 msgid "Add %s"
@@ -223,6 +236,10 @@ msgstr "Додади %s"
 #, python-format
 msgid "Change %s"
 msgstr "Измени %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Погледни %s"
 
 msgid "Database error"
 msgstr "Грешка во базата на податоци"
@@ -280,8 +297,8 @@ msgstr "Администрација на %(app)s"
 msgid "Page not found"
 msgstr "Страницата не е најдена"
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Се извинуваме, но неможе да ја најдеме страницата која ја баравте."
+msgid "We’re sorry, but the requested page could not be found."
+msgstr ""
 
 msgid "Home"
 msgstr "Дома"
@@ -296,11 +313,9 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Грешка со серверот <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Се случи грешка. Администраторите на сајтот се известени и треба да биде "
-"брзо поправена. Ви благодариме за вашето трпение."
 
 msgid "Run the selected action"
 msgstr "Изврши ја избраната акција"
@@ -318,12 +333,23 @@ msgstr "Избери ги сите %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Откажи го изборот"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Модели во %(name)s апликација"
+
+msgid "Add"
+msgstr "Додади"
+
+msgid "View"
+msgstr "Погледни"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr ""
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
-"Прво, внесете корисничко име и лозинка. Потоа ќе можете да уредувате повеќе "
-"кориснички опции."
 
 msgid "Enter a username and password."
 msgstr "Внесете корисничко име и лозинка."
@@ -332,7 +358,7 @@ msgid "Change password"
 msgstr "Промени лозинка"
 
 msgid "Please correct the error below."
-msgstr "Ве молам поправете ги грешките подолу."
+msgstr "Ве молиме поправете ја грешката подолу."
 
 msgid "Please correct the errors below."
 msgstr "Ве молам поправете ги грешките подолу."
@@ -365,6 +391,9 @@ msgstr "Погледни на сајтот"
 
 msgid "Filter"
 msgstr "Филтер"
+
+msgid "Clear all filters"
+msgstr ""
 
 msgid "Remove from sorting"
 msgstr "Отстрани од сортирање"
@@ -408,8 +437,8 @@ msgstr ""
 msgid "Objects"
 msgstr "Предмети"
 
-msgid "Yes, I'm sure"
-msgstr "Да, сигурен сум"
+msgid "Yes, I’m sure"
+msgstr ""
 
 msgid "No, take me back"
 msgstr "Не, врати ме назад"
@@ -442,9 +471,6 @@ msgstr ""
 "Дали сте сигурни дека сакате да го избришете избраниот %(objects_name)s? "
 "Сите овие објекти и оние поврзани со нив ќе бидат избришани:"
 
-msgid "Change"
-msgstr "Измени"
-
 msgid "Delete?"
 msgstr "Избриши?"
 
@@ -454,16 +480,6 @@ msgstr " Според %(filter_title)s "
 
 msgid "Summary"
 msgstr "Резиме"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Модели во %(name)s апликација"
-
-msgid "Add"
-msgstr "Додади"
-
-msgid "You don't have permission to edit anything."
-msgstr "Немате дозвола ништо да уредува."
 
 msgid "Recent actions"
 msgstr "Последни акции"
@@ -478,13 +494,10 @@ msgid "Unknown content"
 msgstr "Непозната содржина"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Нешто не е во ред со инсталацијата на базата на податоци. Потврдете дека "
-"соодветни табели во базата се направени и потврдете дека базата може да биде "
-"прочитана од соодветниот корисник."
 
 #, python-format
 msgid ""
@@ -497,6 +510,9 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "Ја заборавивте вашата лозинка или корисничко име?"
 
+msgid "Toggle navigation"
+msgstr ""
+
 msgid "Date/time"
 msgstr "Датум/час"
 
@@ -507,11 +523,9 @@ msgid "Action"
 msgstr "Акција"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
-"Овој објект нема историја на измени. Најверојатно не бил додаден со админ "
-"сајтот."
 
 msgid "Show all"
 msgstr "Прикажи ги сите"
@@ -519,20 +533,8 @@ msgstr "Прикажи ги сите"
 msgid "Save"
 msgstr "Сними"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Попапот се затвара..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Промени ги избраните %(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Додади уште %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Избриши ги избраните %(model)s"
 
 msgid "Search"
 msgstr "Барај"
@@ -556,6 +558,24 @@ msgstr "Сними и додади уште"
 msgid "Save and continue editing"
 msgstr "Сними и продолжи со уредување"
 
+msgid "Save and view"
+msgstr "Сними и прегледај"
+
+msgid "Close"
+msgstr "Затвори"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Промени ги избраните %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Додади уште %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Избриши ги избраните %(model)s"
+
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr ""
 "Ви благодариме што денеска поминавте квалитетно време со интернет страницава."
@@ -570,11 +590,9 @@ msgid "Your password was changed."
 msgstr "Вашата лозинка беше сменета."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Заради сигурност ве молам внесете ја вашата стара лозинка и потоа внесете ја "
-"новата двапати за да може да се потврди дека правилно сте ја искуцале."
 
 msgid "Change my password"
 msgstr "Промени ја мојата лозинка"
@@ -609,33 +627,28 @@ msgstr ""
 "била искористена. Ве молам повторно побарајте ресетирање на вашата лозинката."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Ви испративме упатства за поставување на вашата лозинката, ако постои "
-"корисник со е-пошта што ја внесовте. Треба наскоро да ги добиете "
-"инструкциите."
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"Ако не примивте email, ве молиме осигурајте се дека сте ја внесле правата "
-"адреса кога се регистриравте и проверете го spam фолдерот."
 
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
-"Го примате овој email бидејќи побаравте ресетирање на лозинка за вашето "
-"корисничко име на %(site_name)s."
+"Го примате овој email бидејќи побаравте ресетирање на лозинка како корисник "
+"на %(site_name)s."
 
 msgid "Please go to the following page and choose a new password:"
 msgstr "Ве молам одете на следната страница и внесете нова лозинка:"
 
-msgid "Your username, in case you've forgotten:"
-msgstr "Вашето корисничко име, во случај да сте го заборавиле:"
+msgid "Your username, in case you’ve forgotten:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "Ви благодариме што го користите овој сајт!"
@@ -645,11 +658,9 @@ msgid "The %(site_name)s team"
 msgstr "Тимот на %(site_name)s"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"Ја заборавивте вашата лозинка? Внесете ја вашата email адреса подолу, ќе "
-"добиете порака со инструкции за промена на лозинката."
 
 msgid "Email address:"
 msgstr "Email адреса:"
@@ -667,6 +678,10 @@ msgstr "Изберете %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Изберете %s за измена"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Изберете %s за прегледување"
 
 msgid "Date:"
 msgstr "Датум:"

@@ -79,10 +79,18 @@ class Operation:
         """
         return "%s: %s" % (self.__class__.__name__, self._constructor_args)
 
-    def references_model(self, name, app_label=None):
+    @property
+    def migration_name_fragment(self):
+        """
+        A filename part suitable for automatically naming a migration
+        containing this operation, or None if not applicable.
+        """
+        return None
+
+    def references_model(self, name, app_label):
         """
         Return True if there is a chance this operation references the given
-        model name (as a string), with an optional app label for accuracy.
+        model name (as a string), with an app label for accuracy.
 
         Used for optimization. If in doubt, return True;
         returning a false positive will merely make the optimizer a little
@@ -91,10 +99,10 @@ class Operation:
         """
         return True
 
-    def references_field(self, model_name, name, app_label=None):
+    def references_field(self, model_name, name, app_label):
         """
         Return True if there is a chance this operation references the given
-        field name, with an optional app label for accuracy.
+        field name, with an app label for accuracy.
 
         Used for optimization. If in doubt, return True.
         """
@@ -102,7 +110,7 @@ class Operation:
 
     def allow_migrate_model(self, connection_alias, model):
         """
-        Return wether or not a model may be migrated.
+        Return whether or not a model may be migrated.
 
         This is a thin wrapper around router.allow_migrate_model() that
         preemptively rejects any proxy, swapped out, or unmanaged model.
@@ -112,7 +120,7 @@ class Operation:
 
         return router.allow_migrate_model(connection_alias, model)
 
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, app_label):
         """
         Return either a list of operations the actual operation should be
         replaced with or a boolean that indicates whether or not the specified

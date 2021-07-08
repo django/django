@@ -6,7 +6,6 @@ from django.contrib.postgres.validators import (
     ArrayMaxLengthValidator, ArrayMinLengthValidator,
 )
 from django.core.exceptions import ValidationError
-from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from ..utils import prefix_validation_error
@@ -14,19 +13,23 @@ from ..utils import prefix_validation_error
 
 class SimpleArrayField(forms.CharField):
     default_error_messages = {
-        'item_invalid': _('Item %(nth)s in the array did not validate: '),
+        'item_invalid': _('Item %(nth)s in the array did not validate:'),
     }
 
-    def __init__(self, base_field, delimiter=',', max_length=None, min_length=None, *args, **kwargs):
+    def __init__(self, base_field, *, delimiter=',', max_length=None, min_length=None, **kwargs):
         self.base_field = base_field
         self.delimiter = delimiter
-        super().__init__(*args, **kwargs)
+        super().__init__(**kwargs)
         if min_length is not None:
             self.min_length = min_length
             self.validators.append(ArrayMinLengthValidator(int(min_length)))
         if max_length is not None:
             self.max_length = max_length
             self.validators.append(ArrayMaxLengthValidator(int(max_length)))
+
+    def clean(self, value):
+        value = super().clean(value)
+        return [self.base_field.clean(val) for val in value]
 
     def prepare_value(self, value):
         if isinstance(value, list):
@@ -50,7 +53,7 @@ class SimpleArrayField(forms.CharField):
                     error,
                     prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': index},
+                    params={'nth': index + 1},
                 ))
         if errors:
             raise ValidationError(errors)
@@ -67,7 +70,7 @@ class SimpleArrayField(forms.CharField):
                     error,
                     prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': index},
+                    params={'nth': index + 1},
                 ))
         if errors:
             raise ValidationError(errors)
@@ -83,13 +86,24 @@ class SimpleArrayField(forms.CharField):
                     error,
                     prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': index},
+                    params={'nth': index + 1},
                 ))
         if errors:
             raise ValidationError(errors)
 
+    def has_changed(self, initial, data):
+        try:
+            value = self.to_python(data)
+        except ValidationError:
+            pass
+        else:
+            if initial in self.empty_values and value in self.empty_values:
+                return False
+        return super().has_changed(initial, data)
+
 
 class SplitArrayWidget(forms.Widget):
+    template_name = 'postgres/widgets/split_array.html'
 
     def __init__(self, widget, size, **kwargs):
         self.widget = widget() if isinstance(widget, type) else widget
@@ -116,11 +130,13 @@ class SplitArrayWidget(forms.Widget):
             id_ += '_0'
         return id_
 
-    def render(self, name, value, attrs=None, renderer=None):
+    def get_context(self, name, value, attrs=None):
+        attrs = {} if attrs is None else attrs
+        context = super().get_context(name, value, attrs)
         if self.is_localized:
             self.widget.is_localized = self.is_localized
         value = value or []
-        output = []
+        context['widget']['subwidgets'] = []
         final_attrs = self.build_attrs(attrs)
         id_ = final_attrs.get('id')
         for i in range(max(len(value), self.size)):
@@ -129,12 +145,11 @@ class SplitArrayWidget(forms.Widget):
             except IndexError:
                 widget_value = None
             if id_:
-                final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
-            output.append(self.widget.render(name + '_%s' % i, widget_value, final_attrs, renderer))
-        return mark_safe(self.format_output(output))
-
-    def format_output(self, rendered_widgets):
-        return ''.join(rendered_widgets)
+                final_attrs = {**final_attrs, 'id': '%s_%s' % (id_, i)}
+            context['widget']['subwidgets'].append(
+                self.widget.get_context(name + '_%s' % i, widget_value, final_attrs)['widget']
+            )
+        return context
 
     @property
     def media(self):
@@ -152,16 +167,32 @@ class SplitArrayWidget(forms.Widget):
 
 class SplitArrayField(forms.Field):
     default_error_messages = {
-        'item_invalid': _('Item %(nth)s in the array did not validate: '),
+        'item_invalid': _('Item %(nth)s in the array did not validate:'),
     }
 
-    def __init__(self, base_field, size, remove_trailing_nulls=False, **kwargs):
+    def __init__(self, base_field, size, *, remove_trailing_nulls=False, **kwargs):
         self.base_field = base_field
         self.size = size
         self.remove_trailing_nulls = remove_trailing_nulls
         widget = SplitArrayWidget(widget=base_field.widget, size=size)
         kwargs.setdefault('widget', widget)
         super().__init__(**kwargs)
+
+    def _remove_trailing_nulls(self, values):
+        index = None
+        if self.remove_trailing_nulls:
+            for i, value in reversed(list(enumerate(values))):
+                if value in self.base_field.empty_values:
+                    index = i
+                else:
+                    break
+            if index is not None:
+                values = values[:index]
+        return values, index
+
+    def to_python(self, value):
+        value = super().to_python(value)
+        return [self.base_field.to_python(item) for item in value]
 
     def clean(self, value):
         cleaned_data = []
@@ -178,22 +209,26 @@ class SplitArrayField(forms.Field):
                     error,
                     self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': index},
+                    params={'nth': index + 1},
                 ))
                 cleaned_data.append(None)
             else:
                 errors.append(None)
-        if self.remove_trailing_nulls:
-            null_index = None
-            for i, value in reversed(list(enumerate(cleaned_data))):
-                if value in self.base_field.empty_values:
-                    null_index = i
-                else:
-                    break
-            if null_index is not None:
-                cleaned_data = cleaned_data[:null_index]
-                errors = errors[:null_index]
+        cleaned_data, null_index = self._remove_trailing_nulls(cleaned_data)
+        if null_index is not None:
+            errors = errors[:null_index]
         errors = list(filter(None, errors))
         if errors:
             raise ValidationError(list(chain.from_iterable(errors)))
         return cleaned_data
+
+    def has_changed(self, initial, data):
+        try:
+            data = self.to_python(data)
+        except ValidationError:
+            pass
+        else:
+            data, _ = self._remove_trailing_nulls(data)
+            if initial in self.empty_values and data in self.empty_values:
+                return False
+        return super().has_changed(initial, data)

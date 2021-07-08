@@ -7,6 +7,172 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
+.. _deprecation-removed-in-5.0:
+
+5.0
+---
+
+See the :ref:`Django 4.0 release notes <deprecated-features-4.0>` for more
+details on these changes.
+
+* The ``SERIALIZE`` test setting will be removed.
+
+* The undocumented ``django.utils.baseconv`` module will be removed.
+
+* The undocumented ``django.utils.datetime_safe`` module will be removed.
+
+* The default value of the ``USE_TZ`` setting will change from ``False`` to
+  ``True``.
+
+* The default sitemap protocol for sitemaps built outside the context of a
+  request will change from ``'http'`` to ``'https'``.
+
+.. _deprecation-removed-in-4.1:
+
+4.1
+---
+
+See the :ref:`Django 3.2 release notes <deprecated-features-3.2>` for more
+details on these changes.
+
+* Support for assigning objects which don't support creating deep copies with
+  ``copy.deepcopy()`` to class attributes in ``TestCase.setUpTestData()`` will
+  be removed.
+
+* ``BaseCommand.requires_system_checks`` won't support boolean values.
+
+* The ``whitelist`` argument and ``domain_whitelist`` attribute of
+  ``django.core.validators.EmailValidator`` will be removed.
+
+* The ``default_app_config`` module variable will be removed.
+
+* ``TransactionTestCase.assertQuerysetEqual()` will no longer automatically
+  call ``repr()`` on a queryset when compared to string values.
+
+* ``django.core.cache.backends.memcached.MemcachedCache`` will be removed.
+
+* Support for the pre-Django 3.2 format of messages used by
+  ``django.contrib.messages.storage.cookie.CookieStorage`` will be removed.
+
+.. _deprecation-removed-in-4.0:
+
+4.0
+---
+
+See the :ref:`Django 3.0 release notes <deprecated-features-3.0>` for more
+details on these changes.
+
+* ``django.utils.http.urlquote()``, ``urlquote_plus()``, ``urlunquote()``, and
+  ``urlunquote_plus()`` will be removed.
+
+* ``django.utils.encoding.force_text()`` and ``smart_text()`` will be removed.
+
+* ``django.utils.translation.ugettext()``, ``ugettext_lazy()``,
+  ``ugettext_noop()``, ``ungettext()``, and ``ungettext_lazy()`` will be
+  removed.
+
+* ``django.views.i18n.set_language()`` will no longer set the user language in
+  ``request.session`` (key ``django.utils.translation.LANGUAGE_SESSION_KEY``).
+
+* ``alias=None`` will be required in the signature of
+  ``django.db.models.Expression.get_group_by_cols()`` subclasses.
+
+* ``django.utils.text.unescape_entities()`` will be removed.
+
+* ``django.utils.http.is_safe_url()`` will be removed.
+
+See the :ref:`Django 3.1 release notes <deprecated-features-3.1>` for more
+details on these changes.
+
+* The ``PASSWORD_RESET_TIMEOUT_DAYS`` setting will be removed.
+
+* The undocumented usage of the :lookup:`isnull` lookup with non-boolean values
+  as the right-hand side will no longer be allowed.
+
+* The ``django.db.models.query_utils.InvalidQuery`` exception class will be
+  removed.
+
+* The ``django-admin.py`` entry point will be removed.
+
+* The ``HttpRequest.is_ajax()`` method will be removed.
+
+* Support for the pre-Django 3.1 encoding format of cookies values used by
+  ``django.contrib.messages.storage.cookie.CookieStorage`` will be removed.
+
+* Support for the pre-Django 3.1 password reset tokens in the admin site (that
+  use the SHA-1 hashing algorithm) will be removed.
+
+* Support for the pre-Django 3.1 encoding format of sessions will be removed.
+
+* Support for the pre-Django 3.1 ``django.core.signing.Signer`` signatures
+  (encoded with the SHA-1 algorithm) will be removed.
+
+* Support for the pre-Django 3.1 ``django.core.signing.dumps()`` signatures
+  (encoded with the SHA-1 algorithm) in ``django.core.signing.loads()`` will be
+  removed.
+
+* Support for the pre-Django 3.1 user sessions (that use the SHA-1 algorithm)
+  will be removed.
+
+* The ``get_response`` argument for
+  ``django.utils.deprecation.MiddlewareMixin.__init__()`` will be required and
+  won't accept ``None``.
+
+* The ``providing_args`` argument for ``django.dispatch.Signal`` will be
+  removed.
+
+* The ``length`` argument for ``django.utils.crypto.get_random_string()`` will
+  be required.
+
+* The ``list`` message for ``ModelMultipleChoiceField`` will be removed.
+
+* Support for passing raw column aliases to ``QuerySet.order_by()`` will be
+  removed.
+
+* The model ``NullBooleanField`` will be removed. A stub field will remain for
+  compatibility with historical migrations.
+
+* ``django.conf.urls.url()`` will be removed.
+
+* The model ``django.contrib.postgres.fields.JSONField`` will be removed. A
+  stub field will remain for compatibility with historical migrations.
+
+* ``django.contrib.postgres.forms.JSONField``,
+  ``django.contrib.postgres.fields.jsonb.KeyTransform``, and
+  ``django.contrib.postgres.fields.jsonb.KeyTextTransform`` will be removed.
+
+* The ``{% ifequal %}`` and ``{% ifnotequal %}`` template tags will be removed.
+
+* The ``DEFAULT_HASHING_ALGORITHM`` transitional setting will be removed.
+
+.. _deprecation-removed-in-3.1:
+
+3.1
+---
+
+See the :ref:`Django 2.2 release notes <deprecated-features-2.2>` for more
+details on these changes.
+
+* ``django.utils.timezone.FixedOffset`` will be removed.
+
+* ``django.core.paginator.QuerySetPaginator`` will be removed.
+
+* A model's ``Meta.ordering`` will no longer affect ``GROUP BY`` queries.
+
+* ``django.contrib.postgres.fields.FloatRangeField`` and
+  ``django.contrib.postgres.forms.FloatRangeField`` will be removed.
+
+* The ``FILE_CHARSET`` setting will be removed.
+
+* ``django.contrib.staticfiles.storage.CachedStaticFilesStorage`` will be
+  removed.
+
+* ``RemoteUserBackend.configure_user()`` will require ``request`` as the first
+  positional argument.
+
+* Support for ``SimpleTestCase.allow_database_queries`` and
+  ``TransactionTestCase.multi_db`` will be removed.
+
 .. _deprecation-removed-in-3.0:
 
 3.0
@@ -20,6 +186,29 @@ details on these changes.
 * ``django.shortcuts.render_to_response()`` will be removed.
 
 * The ``DEFAULT_CONTENT_TYPE`` setting will be removed.
+
+* ``HttpRequest.xreadlines()`` will be removed.
+
+* Support for the ``context`` argument of ``Field.from_db_value()`` and
+  ``Expression.convert_value()`` will be removed.
+
+* The ``field_name`` keyword argument of ``QuerySet.earliest()`` and
+  ``latest()`` will be removed.
+
+See the :ref:`Django 2.1 release notes <deprecated-features-2.1>` for more
+details on these changes.
+
+* ``django.contrib.gis.db.models.functions.ForceRHR`` will be removed.
+
+* ``django.utils.http.cookie_date()`` will be removed.
+
+* The ``staticfiles`` and ``admin_static`` template tag libraries will be
+  removed.
+
+* ``django.contrib.staticfiles.templatetags.static()`` will be removed.
+
+* The shim to allow ``InlineModelAdmin.has_add_permission()`` to be defined
+  without an ``obj`` argument will be removed.
 
 .. _deprecation-removed-in-2.1:
 
@@ -62,8 +251,8 @@ details on these changes.
 
 * The ``Model._meta.has_auto_field`` attribute will be removed.
 
-* Support for regular expression groups with ``iLmsu#`` in ``url()`` will be
-  removed.
+* ``url()``'s support for inline flags in regular expression groups (``(?i)``,
+  ``(?L)``, ``(?m)``, ``(?s)``, and ``(?u)``) will be removed.
 
 * Support for ``Widget.render()`` methods without the ``renderer`` argument
   will be removed.
@@ -139,7 +328,7 @@ details on these changes.
   ``django.utils.feedgenerator.RssFeed`` will be removed in favor of
   ``content_type``.
 
-* The ``app_name`` argument to :func:`~django.conf.urls.include()` will be
+* The ``app_name`` argument to ``django.conf.urls.include()`` will be
   removed.
 
 * Support for passing a 3-tuple as the first argument to ``include()`` will
@@ -543,7 +732,7 @@ details on these changes.
 * Database test settings as independent entries in the database settings,
   prefixed by ``TEST_``, will no longer be supported.
 
-* The `cache_choices` option to :class:`~django.forms.ModelChoiceField` and
+* The ``cache_choices`` option to :class:`~django.forms.ModelChoiceField` and
   :class:`~django.forms.ModelMultipleChoiceField` will be removed.
 
 * The default value of the
@@ -609,9 +798,6 @@ details on these changes.
 
 * Support for the Python Imaging Library (PIL) module will be removed, as it
   no longer appears to be actively maintained & does not work on Python 3.
-  You are advised to install `Pillow`_, which should be used instead.
-
-  .. _`Pillow`: https://pypi.python.org/pypi/Pillow
 
 * The following private APIs will be removed:
 
@@ -706,17 +892,15 @@ details on these changes.
   remove calls to this method, and instead ensure that their auth related views
   are CSRF protected, which ensures that cookies are enabled.
 
-* The version of :func:`django.contrib.auth.views.password_reset_confirm` that
+* The version of ``django.contrib.auth.views.password_reset_confirm()`` that
   supports base36 encoded user IDs
   (``django.contrib.auth.views.password_reset_confirm_uidb36``) will be
   removed. If your site has been running Django 1.6 for more than
-  :setting:`PASSWORD_RESET_TIMEOUT_DAYS`, this change will have no effect. If
-  not, then any password reset links generated before you upgrade to Django 1.7
+  ``PASSWORD_RESET_TIMEOUT_DAYS``, this change will have no effect. If not,
+  then any password reset links generated before you upgrade to Django 1.7
   won't work after the upgrade.
 
 * The ``django.utils.encoding.StrAndUnicode`` mix-in will be removed.
-  Define a ``__str__`` method and apply the
-  :func:`~django.utils.encoding.python_2_unicode_compatible` decorator instead.
 
 .. _deprecation-removed-in-1.6:
 
@@ -778,10 +962,9 @@ details on these changes.
   ``django.contrib.gis.utils`` will be removed.
 
 * ``django.conf.urls.defaults`` will be removed. The functions
-  :func:`~django.conf.urls.include`, ``patterns()`` and
-  :func:`~django.conf.urls.url` plus :data:`~django.conf.urls.handler404`,
-  :data:`~django.conf.urls.handler500`, are now available through
-  :mod:`django.conf.urls` .
+  ``include()``, ``patterns()``, and ``url()``, plus
+  :data:`~django.conf.urls.handler404` and :data:`~django.conf.urls.handler500`
+  are now available through ``django.conf.urls``.
 
 * The functions ``setup_environ()`` and ``execute_manager()`` will be removed
   from :mod:`django.core.management`. This also means that the old (pre-1.4)
@@ -821,10 +1004,9 @@ details on these changes.
   used instead.
 
 * The ``django.test.simple.DjangoTestRunner`` will be removed.
-  Instead use a unittest-native class.  The features of the
+  Instead use a ``unittest``-native class. The features of the
   ``django.test.simple.DjangoTestRunner`` (including fail-fast and
-  Ctrl-C test termination) can currently be provided by the unittest-native
-  :class:`~unittest.TextTestRunner`.
+  Ctrl-C test termination) can be provided by :class:`unittest.TextTestRunner`.
 
 * The undocumented function
   ``django.contrib.formtools.utils.security_hash`` will be removed,

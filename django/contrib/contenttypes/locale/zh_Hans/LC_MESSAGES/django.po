@@ -2,16 +2,17 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Ronald White <ouyanghongyu@gmail.com>, 2014
+# Ronald White <tkliuxing@me.com>, 2014
 # slene <vslene@gmail.com>, 2011
+# wolf ice <warwolf7677@163.com>, 2020
 # Kevin Sze <leiarix@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2016-03-02 23:06+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-03-04 02:33+0000\n"
+"Last-Translator: wolf ice <warwolf7677@163.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -37,9 +38,9 @@ msgid "Content type %(ct_id)s object has no associated model"
 msgstr "内容类型 %(ct_id)s 对象没有关联的模型"
 
 #, python-format
-msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
-msgstr "内容类型 %(ct_id)s 对象 %(obj_id)s 不存在"
+msgid "Content type %(ct_id)s object %(obj_id)s doesn’t exist"
+msgstr "内容类型%(ct_id)s对象%(obj_id)s不存在"
 
 #, python-format
-msgid "%(ct_name)s objects don't have a get_absolute_url() method"
-msgstr "%(ct_name)s 对象没有 a get_absolute_url() 方法"
+msgid "%(ct_name)s objects don’t have a get_absolute_url() method"
+msgstr "%(ct_name)s对象不包含get_absolute_url()方法"

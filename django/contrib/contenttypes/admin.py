@@ -25,12 +25,10 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
             f for f in obj.model._meta.private_fields
             if isinstance(f, GenericForeignKey)
         ]
-        if len(gfks) == 0:
+        if not gfks:
             return [
                 checks.Error(
-                    "'%s.%s' has no GenericForeignKey." % (
-                        obj.model._meta.app_label, obj.model._meta.object_name
-                    ),
+                    "'%s' has no GenericForeignKey." % obj.model._meta.label,
                     obj=obj.__class__,
                     id='admin.E301'
                 )
@@ -42,8 +40,8 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
             except FieldDoesNotExist:
                 return [
                     checks.Error(
-                        "'ct_field' references '%s', which is not a field on '%s.%s'." % (
-                            obj.ct_field, obj.model._meta.app_label, obj.model._meta.object_name
+                        "'ct_field' references '%s', which is not a field on '%s'." % (
+                            obj.ct_field, obj.model._meta.label,
                         ),
                         obj=obj.__class__,
                         id='admin.E302'
@@ -55,8 +53,8 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
             except FieldDoesNotExist:
                 return [
                     checks.Error(
-                        "'ct_fk_field' references '%s', which is not a field on '%s.%s'." % (
-                            obj.ct_fk_field, obj.model._meta.app_label, obj.model._meta.object_name
+                        "'ct_fk_field' references '%s', which is not a field on '%s'." % (
+                            obj.ct_fk_field, obj.model._meta.label,
                         ),
                         obj=obj.__class__,
                         id='admin.E303'
@@ -71,8 +69,8 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
 
             return [
                 checks.Error(
-                    "'%s.%s' has no GenericForeignKey using content type field '%s' and object ID field '%s'." % (
-                        obj.model._meta.app_label, obj.model._meta.object_name, obj.ct_field, obj.ct_fk_field
+                    "'%s' has no GenericForeignKey using content type field '%s' and object ID field '%s'." % (
+                        obj.model._meta.label, obj.ct_field, obj.ct_fk_field,
                     ),
                     obj=obj.__class__,
                     id='admin.E304'
@@ -92,11 +90,7 @@ class GenericInlineModelAdmin(InlineModelAdmin):
             fields = kwargs.pop('fields')
         else:
             fields = flatten_fieldsets(self.get_fieldsets(request, obj))
-        if self.exclude is None:
-            exclude = []
-        else:
-            exclude = list(self.exclude)
-        exclude.extend(self.get_readonly_fields(request, obj))
+        exclude = [*(self.exclude or []), *self.get_readonly_fields(request, obj)]
         if self.exclude is None and hasattr(self.form, '_meta') and self.form._meta.exclude:
             # Take the custom ModelForm's Meta.exclude into account only if the
             # GenericInlineModelAdmin doesn't define its own.
@@ -104,20 +98,20 @@ class GenericInlineModelAdmin(InlineModelAdmin):
         exclude = exclude or None
         can_delete = self.can_delete and self.has_delete_permission(request, obj)
         defaults = {
-            "ct_field": self.ct_field,
-            "fk_field": self.ct_fk_field,
-            "form": self.form,
-            "formfield_callback": partial(self.formfield_for_dbfield, request=request),
-            "formset": self.formset,
-            "extra": self.get_extra(request, obj),
-            "can_delete": can_delete,
-            "can_order": False,
-            "fields": fields,
-            "min_num": self.get_min_num(request, obj),
-            "max_num": self.get_max_num(request, obj),
-            "exclude": exclude
+            'ct_field': self.ct_field,
+            'fk_field': self.ct_fk_field,
+            'form': self.form,
+            'formfield_callback': partial(self.formfield_for_dbfield, request=request),
+            'formset': self.formset,
+            'extra': self.get_extra(request, obj),
+            'can_delete': can_delete,
+            'can_order': False,
+            'fields': fields,
+            'min_num': self.get_min_num(request, obj),
+            'max_num': self.get_max_num(request, obj),
+            'exclude': exclude,
+            **kwargs,
         }
-        defaults.update(kwargs)
 
         if defaults['fields'] is None and not modelform_defines_fields(defaults['form']):
             defaults['fields'] = ALL_FIELDS

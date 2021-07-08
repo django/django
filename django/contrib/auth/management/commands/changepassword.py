@@ -12,7 +12,7 @@ UserModel = get_user_model()
 class Command(BaseCommand):
     help = "Change a user's password for django.contrib.auth."
     requires_migrations_checks = True
-    requires_system_checks = False
+    requires_system_checks = []
 
     def _get_pass(self, prompt="Password: "):
         p = getpass.getpass(prompt=prompt)
@@ -26,7 +26,7 @@ class Command(BaseCommand):
             help='Username to change password for; by default, it\'s the current username.',
         )
         parser.add_argument(
-            '--database', action='store', dest='database',
+            '--database',
             default=DEFAULT_DB_ALIAS,
             help='Specifies the database to use. Default is "default".',
         )
@@ -44,7 +44,7 @@ class Command(BaseCommand):
         except UserModel.DoesNotExist:
             raise CommandError("user '%s' does not exist" % username)
 
-        self.stdout.write("Changing password for user '%s'\n" % u)
+        self.stdout.write("Changing password for user '%s'" % u)
 
         MAX_TRIES = 3
         count = 0
@@ -54,7 +54,7 @@ class Command(BaseCommand):
             p1 = self._get_pass()
             p2 = self._get_pass("Password (again): ")
             if p1 != p2:
-                self.stdout.write("Passwords do not match. Please try again.\n")
+                self.stdout.write('Passwords do not match. Please try again.')
                 count += 1
                 # Don't validate passwords that don't match.
                 continue

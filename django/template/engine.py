@@ -4,8 +4,8 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
-from .base import Context, Template
-from .context import _builtin_context_processors
+from .base import Template
+from .context import Context, _builtin_context_processors
 from .exceptions import TemplateDoesNotExist
 from .library import import_library
 
@@ -52,13 +52,32 @@ class Engine:
         self.builtins = self.default_builtins + builtins
         self.template_builtins = self.get_template_builtins(self.builtins)
 
+    def __repr__(self):
+        return (
+            '<%s:%s app_dirs=%s%s debug=%s loaders=%s string_if_invalid=%s '
+            'file_charset=%s%s%s autoescape=%s>'
+        ) % (
+            self.__class__.__qualname__,
+            '' if not self.dirs else ' dirs=%s' % repr(self.dirs),
+            self.app_dirs,
+            ''
+            if not self.context_processors
+            else ' context_processors=%s' % repr(self.context_processors),
+            self.debug,
+            repr(self.loaders),
+            repr(self.string_if_invalid),
+            repr(self.file_charset),
+            '' if not self.libraries else ' libraries=%s' % repr(self.libraries),
+            '' if not self.builtins else ' builtins=%s' % repr(self.builtins),
+            repr(self.autoescape),
+        )
+
     @staticmethod
     @functools.lru_cache()
     def get_default():
         """
-        When only one DjangoTemplates backend is configured, return it.
-
-        Raise ImproperlyConfigured otherwise.
+        Return the first DjangoTemplates backend that's configured, or raise
+        ImproperlyConfigured if none are configured.
 
         This is required for preserving historical APIs that rely on a
         globally available, implicitly configured engine such as:
@@ -74,18 +93,10 @@ class Engine:
         # local imports are required to avoid import loops.
         from django.template import engines
         from django.template.backends.django import DjangoTemplates
-        django_engines = [engine for engine in engines.all()
-                          if isinstance(engine, DjangoTemplates)]
-        if len(django_engines) == 1:
-            # Unwrap the Engine instance inside DjangoTemplates
-            return django_engines[0].engine
-        elif len(django_engines) == 0:
-            raise ImproperlyConfigured(
-                "No DjangoTemplates backend is configured.")
-        else:
-            raise ImproperlyConfigured(
-                "Several DjangoTemplates backends are configured. "
-                "You must select one explicitly.")
+        for engine in engines.all():
+            if isinstance(engine, DjangoTemplates):
+                return engine.engine
+        raise ImproperlyConfigured('No DjangoTemplates backend is configured.')
 
     @cached_property
     def template_context_processors(self):
@@ -116,8 +127,7 @@ class Engine:
 
     def find_template_loader(self, loader):
         if isinstance(loader, (tuple, list)):
-            args = list(loader[1:])
-            loader = loader[0]
+            loader, *args = loader
         else:
             args = []
 
@@ -170,7 +180,7 @@ class Engine:
         if isinstance(context, Context):
             return t.render(context)
         else:
-            return t.render(Context(context))
+            return t.render(Context(context, autoescape=self.autoescape))
 
     def select_template(self, template_name_list):
         """

@@ -5,13 +5,15 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2015
 # Jonathan Lindén, 2014
+# Petter Strandmark <petter.strandmark@gmail.com>, 2019
+# Thomas Lundqvist, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 09:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2019-01-28 14:06+0000\n"
+"Last-Translator: Petter Strandmark <petter.strandmark@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -24,11 +26,13 @@ msgid "GIS"
 msgstr "GIS"
 
 msgid "The base GIS field."
-msgstr ""
+msgstr "Basklassen för GIS-fält."
 
 msgid ""
 "The base Geometry field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
+"Basklassen för geometri-fält -- motsvarar ”Geometry”-typen i OpenGIS-"
+"specifikationen."
 
 msgid "Point"
 msgstr "Punkt"
@@ -55,7 +59,7 @@ msgid "Extent Aggregate Field"
 msgstr "Fält för sammanlagd yta"
 
 msgid "Raster Field"
-msgstr ""
+msgstr "Rasterfält"
 
 msgid "No geometry value provided."
 msgstr "Inget geometriskt värde angivet."
@@ -76,9 +80,6 @@ msgstr "Ta bort alla attribut"
 
 msgid "WKT debugging window:"
 msgstr "WKT felsökningsfönster:"
-
-msgid "Google Maps via GeoDjango"
-msgstr "Google Maps genom GeoDjango"
 
 msgid "Debugging window (serialized value)"
 msgstr "Felsökningsfönster (serialiserat värde)"

@@ -2,21 +2,22 @@
 #
 # Translators:
 # Baurzhan Muftakhidinov <baurthefirst@gmail.com>, 2015
+# Leo Trubach <leotrubach@gmail.com>, 2017
 # Nurlan Rakhimzhanov <nurlan.rakhimzhanov@gmail.com>, 2011
 # yun_man_ger <germanilyin@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 00:36+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Kazakh (http://www.transifex.com/django/django/language/kk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: kk\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -64,10 +65,10 @@ msgid "This year"
 msgstr "Осы жыл"
 
 msgid "No date"
-msgstr ""
+msgstr "Күні жоқ"
 
 msgid "Has date"
-msgstr ""
+msgstr "Күні бар"
 
 #, python-format
 msgid ""
@@ -85,6 +86,15 @@ msgstr "Тағы басқа %(verbose_name)s кос"
 msgid "Remove"
 msgstr "Өшіру"
 
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "Өзгетру"
+
+msgid "Deletion"
+msgstr ""
+
 msgid "action time"
 msgstr "әрекет уақыты"
 
@@ -98,7 +108,7 @@ msgid "object id"
 msgstr "объекттің id-i"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "объекттің repr-i"
 
@@ -162,8 +172,10 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -173,12 +185,13 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -205,8 +218,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" сәтті өшірілді."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Бірінші кілті %(key)r бар %(name)s объекті жоқ."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
 
 #, python-format
 msgid "Add %s"
@@ -215,6 +228,10 @@ msgstr "%s қосу"
 #, python-format
 msgid "Change %s"
 msgstr "%s өзгету"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "Мәліметтер базасының қатесі"
@@ -226,11 +243,19 @@ msgstr[0] ""
 "one: %(count)s %(name)s өзгертілді.\n"
 "\n"
 "other: %(count)s %(name)s таңдалғандарының барі өзгертілді."
+msgstr[1] ""
+"one: %(count)s %(name)s өзгертілді.\n"
+"\n"
+"other: %(count)s %(name)s таңдалғандарының барі өзгертілді."
 
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
+"one: %(total_count)s таңдалды\n"
+"\n"
+"other: Барлығы %(total_count)s таңдалды"
+msgstr[1] ""
 "one: %(total_count)s таңдалды\n"
 "\n"
 "other: Барлығы %(total_count)s таңдалды"
@@ -325,8 +350,6 @@ msgstr "Құпия сөзді өзгерту"
 
 msgid "Please correct the error below."
 msgstr ""
-"one: Астындағы қатені дұрыстаңыз.\n"
-"other: Астындағы қателерді дұрыстаңыз."
 
 msgid "Please correct the errors below."
 msgstr ""
@@ -436,8 +459,8 @@ msgstr ""
 "Таңдаған %(objects_name)s объектіңізді өшіруге сенімдісіз бе? Себебі, "
 "таңдағын объектіліріңіз және онымен байланыстағы барлық элементтер жойылады:"
 
-msgid "Change"
-msgstr "Өзгетру"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "Өшіру?"
@@ -456,8 +479,8 @@ msgstr ""
 msgid "Add"
 msgstr "Қосу"
 
-msgid "You don't have permission to edit anything."
-msgstr "Бірденке түзетуге рұқсатыңыз жоқ."
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr ""
@@ -509,19 +532,7 @@ msgstr "Барлығын көрсету"
 msgid "Save"
 msgstr "Сақтау"
 
-msgid "Popup closing..."
-msgstr ""
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Delete selected %(model)s"
+msgid "Popup closing…"
 msgstr ""
 
 msgid "Search"
@@ -531,6 +542,7 @@ msgstr "Іздеу"
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s нәтиже"
+msgstr[1] "%(counter)s нәтиже"
 
 #, python-format
 msgid "%(full_result_count)s total"
@@ -544,6 +556,24 @@ msgstr "Сақта және жаңасын қос"
 
 msgid "Save and continue editing"
 msgstr "Сақта және өзгертуді жалғастыр"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Бүгін Веб-торапқа уақыт бөлгеніңіз үшін рахмет."
@@ -644,6 +674,10 @@ msgstr "%s таңда"
 #, python-format
 msgid "Select %s to change"
 msgstr "%s өзгерту үщін таңда"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "Күнтізбелік күн:"

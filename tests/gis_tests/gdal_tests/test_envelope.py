@@ -1,10 +1,6 @@
 import unittest
-from unittest import skipUnless
 
-from django.contrib.gis.gdal import HAS_GDAL
-
-if HAS_GDAL:
-    from django.contrib.gis.gdal import Envelope, GDALException
+from django.contrib.gis.gdal import Envelope, GDALException
 
 
 class TestPoint:
@@ -13,7 +9,6 @@ class TestPoint:
         self.y = y
 
 
-@skipUnless(HAS_GDAL, "GDAL is required")
 class EnvelopeTest(unittest.TestCase):
 
     def setUp(self):

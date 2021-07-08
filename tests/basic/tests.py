@@ -1,17 +1,20 @@
 import threading
 from datetime import datetime, timedelta
+from unittest import mock
 
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections
+from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections, models
 from django.db.models.manager import BaseManager
-from django.db.models.query import EmptyQuerySet, QuerySet
+from django.db.models.query import MAX_GET_RESULTS, EmptyQuerySet
 from django.test import (
-    SimpleTestCase, TestCase, TransactionTestCase, skipIfDBFeature,
-    skipUnlessDBFeature,
+    SimpleTestCase, TestCase, TransactionTestCase, skipUnlessDBFeature,
 )
 from django.utils.translation import gettext_lazy
 
-from .models import Article, ArticleSelectOnSave, SelfRef
+from .models import (
+    Article, ArticleSelectOnSave, ChildPrimaryKeyWithDefault, FeaturedArticle,
+    PrimaryKeyWithDefault, SelfRef,
+)
 
 
 class ModelInstanceCreationTests(TestCase):
@@ -65,8 +68,17 @@ class ModelInstanceCreationTests(TestCase):
         a.save()
         self.assertEqual(a.headline, 'Fourth article')
 
+    def test_positional_and_keyword_args_for_the_same_field(self):
+        msg = "Article() got both positional and keyword arguments for field '%s'."
+        with self.assertRaisesMessage(TypeError, msg % 'headline'):
+            Article(None, 'Fifth article', headline='Other headline.')
+        with self.assertRaisesMessage(TypeError, msg % 'headline'):
+            Article(None, 'Sixth article', headline='')
+        with self.assertRaisesMessage(TypeError, msg % 'pub_date'):
+            Article(None, 'Seventh article', datetime(2021, 3, 1), pub_date=None)
+
     def test_cannot_create_instance_with_invalid_kwargs(self):
-        with self.assertRaisesMessage(TypeError, "'foo' is an invalid keyword argument for this function"):
+        with self.assertRaisesMessage(TypeError, "Article() got an unexpected keyword argument 'foo'"):
             Article(
                 id=None,
                 headline='Some headline',
@@ -131,6 +143,17 @@ class ModelInstanceCreationTests(TestCase):
         # ... but there will often be more efficient ways if that is all you need:
         self.assertTrue(Article.objects.filter(id=a.id).exists())
 
+    def test_save_primary_with_default(self):
+        # An UPDATE attempt is skipped when a primary key has default.
+        with self.assertNumQueries(1):
+            PrimaryKeyWithDefault().save()
+
+    def test_save_parent_primary_with_default(self):
+        # An UPDATE attempt is skipped when an inherited primary key has
+        # default.
+        with self.assertNumQueries(2):
+            ChildPrimaryKeyWithDefault().save()
+
 
 class ModelTest(TestCase):
     def test_objects_attribute_is_only_available_on_the_class_itself(self):
@@ -147,13 +170,11 @@ class ModelTest(TestCase):
             Article(headline=headline, pub_date=some_pub_date).save()
         self.assertQuerysetEqual(
             Article.objects.all().order_by('headline'),
-            ["<Article: Amazing article>",
-             "<Article: An article>",
-             "<Article: Article One>",
-             "<Article: Boring article>"]
+            sorted(headlines),
+            transform=lambda a: a.headline,
         )
         Article.objects.filter(headline__startswith='A').delete()
-        self.assertQuerysetEqual(Article.objects.all().order_by('headline'), ["<Article: Boring article>"])
+        self.assertEqual(Article.objects.get().headline, 'Boring article')
 
     def test_not_equal_and_equal_operators_behave_as_expected_on_instances(self):
         some_pub_date = datetime(2014, 5, 16, 12, 1)
@@ -164,42 +185,13 @@ class ModelTest(TestCase):
 
         self.assertNotEqual(Article.objects.get(id__exact=a1.id), Article.objects.get(id__exact=a2.id))
 
-    @skipUnlessDBFeature('supports_microsecond_precision')
     def test_microsecond_precision(self):
-        # In PostgreSQL, microsecond-level precision is available.
         a9 = Article(
             headline='Article 9',
             pub_date=datetime(2005, 7, 31, 12, 30, 45, 180),
         )
         a9.save()
         self.assertEqual(Article.objects.get(pk=a9.pk).pub_date, datetime(2005, 7, 31, 12, 30, 45, 180))
-
-    @skipIfDBFeature('supports_microsecond_precision')
-    def test_microsecond_precision_not_supported(self):
-        # In MySQL, microsecond-level precision isn't always available. You'll
-        # lose microsecond-level precision once the data is saved.
-        a9 = Article(
-            headline='Article 9',
-            pub_date=datetime(2005, 7, 31, 12, 30, 45, 180),
-        )
-        a9.save()
-        self.assertEqual(
-            Article.objects.get(id__exact=a9.id).pub_date,
-            datetime(2005, 7, 31, 12, 30, 45),
-        )
-
-    @skipIfDBFeature('supports_microsecond_precision')
-    def test_microsecond_precision_not_supported_edge_case(self):
-        # In MySQL, microsecond-level precision isn't always available. You'll
-        # lose microsecond-level precision once the data is saved.
-        a = Article.objects.create(
-            headline='Article',
-            pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999),
-        )
-        self.assertEqual(
-            Article.objects.get(pk=a.pk).pub_date,
-            datetime(2008, 12, 31, 23, 59, 59),
-        )
 
     def test_manually_specify_primary_key(self):
         # You can manually specify the primary key when creating a new object.
@@ -223,17 +215,17 @@ class ModelTest(TestCase):
     def test_year_lookup_edge_case(self):
         # Edge-case test: A year lookup should retrieve all objects in
         # the given year, including Jan. 1 and Dec. 31.
-        Article.objects.create(
+        a11 = Article.objects.create(
             headline='Article 11',
             pub_date=datetime(2008, 1, 1),
         )
-        Article.objects.create(
+        a12 = Article.objects.create(
             headline='Article 12',
             pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999),
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(pub_date__year=2008),
-            ["<Article: Article 11>", "<Article: Article 12>"]
+            [a11, a12],
         )
 
     def test_unicode_data(self):
@@ -268,19 +260,11 @@ class ModelTest(TestCase):
     def test_extra_method_select_argument_with_dashes_and_values(self):
         # The 'select' argument to extra() supports names with dashes in
         # them, as long as you use values().
-        Article.objects.create(
-            headline="Article 10",
-            pub_date=datetime(2005, 7, 31, 12, 30, 45),
-        )
-        Article.objects.create(
-            headline='Article 11',
-            pub_date=datetime(2008, 1, 1),
-        )
-        Article.objects.create(
-            headline='Article 12',
-            pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999),
-        )
-
+        Article.objects.bulk_create([
+            Article(headline='Article 10', pub_date=datetime(2005, 7, 31, 12, 30, 45)),
+            Article(headline='Article 11', pub_date=datetime(2008, 1, 1)),
+            Article(headline='Article 12', pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999)),
+        ])
         dicts = Article.objects.filter(
             pub_date__year=2008).extra(
             select={'dashed-value': '1'}).values('headline', 'dashed-value')
@@ -293,19 +277,11 @@ class ModelTest(TestCase):
         # If you use 'select' with extra() and names containing dashes on a
         # query that's *not* a values() query, those extra 'select' values
         # will silently be ignored.
-        Article.objects.create(
-            headline="Article 10",
-            pub_date=datetime(2005, 7, 31, 12, 30, 45),
-        )
-        Article.objects.create(
-            headline='Article 11',
-            pub_date=datetime(2008, 1, 1),
-        )
-        Article.objects.create(
-            headline='Article 12',
-            pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999),
-        )
-
+        Article.objects.bulk_create([
+            Article(headline='Article 10', pub_date=datetime(2005, 7, 31, 12, 30, 45)),
+            Article(headline='Article 11', pub_date=datetime(2008, 1, 1)),
+            Article(headline='Article 12', pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999)),
+        ])
         articles = Article.objects.filter(
             pub_date__year=2008).extra(select={'dashed-value': '1', 'undashedvalue': '2'})
         self.assertEqual(articles[0].undashedvalue, 2)
@@ -335,8 +311,8 @@ class ModelTest(TestCase):
         self.assertEqual(article.headline, notlazy)
 
     def test_emptyqs(self):
-        # Can't be instantiated
-        with self.assertRaises(TypeError):
+        msg = "EmptyQuerySet can't be instantiated"
+        with self.assertRaisesMessage(TypeError, msg):
             EmptyQuerySet()
         self.assertIsInstance(Article.objects.none(), EmptyQuerySet)
         self.assertNotIsInstance('', EmptyQuerySet)
@@ -353,7 +329,7 @@ class ModelTest(TestCase):
         # A hacky test for custom QuerySet subclass - refs #17271
         Article.objects.create(headline='foo', pub_date=datetime.now())
 
-        class CustomQuerySet(QuerySet):
+        class CustomQuerySet(models.QuerySet):
             def do_something(self):
                 return 'did something'
 
@@ -392,15 +368,34 @@ class ModelTest(TestCase):
         self.assertNotEqual(object(), Article(id=1))
         a = Article()
         self.assertEqual(a, a)
+        self.assertEqual(a, mock.ANY)
         self.assertNotEqual(Article(), a)
 
     def test_hash(self):
         # Value based on PK
         self.assertEqual(hash(Article(id=1)), hash(1))
-        with self.assertRaises(TypeError):
+        msg = 'Model instances without primary key value are unhashable'
+        with self.assertRaisesMessage(TypeError, msg):
             # No PK value -> unhashable (because save() would then change
             # hash)
             hash(Article())
+
+    def test_missing_hash_not_inherited(self):
+        class NoHash(models.Model):
+            def __eq__(self, other):
+                return super.__eq__(other)
+
+        with self.assertRaisesMessage(TypeError, "unhashable type: 'NoHash'"):
+            hash(NoHash(id=1))
+
+    def test_specified_parent_hash_inherited(self):
+        class ParentHash(models.Model):
+            def __eq__(self, other):
+                return super.__eq__(other)
+
+            __hash__ = models.Model.__hash__
+
+        self.assertEqual(hash(ParentHash(id=1)), 1)
 
     def test_delete_and_access_field(self):
         # Accessing a field after it's deleted from a model reloads its value.
@@ -415,17 +410,38 @@ class ModelTest(TestCase):
         # Fields that weren't deleted aren't reloaded.
         self.assertEqual(article.pub_date, new_pub_date)
 
+    def test_multiple_objects_max_num_fetched(self):
+        max_results = MAX_GET_RESULTS - 1
+        Article.objects.bulk_create(
+            Article(headline='Area %s' % i, pub_date=datetime(2005, 7, 28))
+            for i in range(max_results)
+        )
+        self.assertRaisesMessage(
+            MultipleObjectsReturned,
+            'get() returned more than one Article -- it returned %d!' % max_results,
+            Article.objects.get,
+            headline__startswith='Area',
+        )
+        Article.objects.create(headline='Area %s' % max_results, pub_date=datetime(2005, 7, 28))
+        self.assertRaisesMessage(
+            MultipleObjectsReturned,
+            'get() returned more than one Article -- it returned more than %d!' % max_results,
+            Article.objects.get,
+            headline__startswith='Area',
+        )
+
 
 class ModelLookupTest(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         # Create an Article.
-        self.a = Article(
+        cls.a = Article(
             id=None,
             headline='Swallow programs in Python',
             pub_date=datetime(2005, 7, 28),
         )
         # Save it into the database. You have to call save() explicitly.
-        self.a.save()
+        cls.a.save()
 
     def test_all_lookup(self):
         # Change values by changing the attributes, then calling save().
@@ -433,7 +449,7 @@ class ModelLookupTest(TestCase):
         self.a.save()
 
         # Article.objects.all() returns all the articles in the database.
-        self.assertQuerysetEqual(Article.objects.all(), ['<Article: Parrot programs in Python>'])
+        self.assertSequenceEqual(Article.objects.all(), [self.a])
 
     def test_rich_lookup(self):
         # Django provides a rich database lookup API.
@@ -449,24 +465,24 @@ class ModelLookupTest(TestCase):
         self.assertEqual(Article.objects.get(id=self.a.id), self.a)
         self.assertEqual(Article.objects.get(headline='Swallow programs in Python'), self.a)
 
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(pub_date__year=2005),
-            ['<Article: Swallow programs in Python>'],
+            [self.a],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(pub_date__year=2004),
             [],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(pub_date__year=2005, pub_date__month=7),
-            ['<Article: Swallow programs in Python>'],
+            [self.a],
         )
 
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(pub_date__week_day=5),
-            ['<Article: Swallow programs in Python>'],
+            [self.a],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(pub_date__week_day=6),
             [],
         )
@@ -490,7 +506,7 @@ class ModelLookupTest(TestCase):
         self.assertEqual(Article.objects.get(pk=self.a.id), self.a)
 
         # pk can be used as a shortcut for the primary key name in any query.
-        self.assertQuerysetEqual(Article.objects.filter(pk__in=[self.a.id]), ["<Article: Swallow programs in Python>"])
+        self.assertSequenceEqual(Article.objects.filter(pk__in=[self.a.id]), [self.a])
 
         # Model instances of the same type and same ID are considered equal.
         a = Article.objects.get(pk=self.a.id)
@@ -561,9 +577,11 @@ class ManagerTest(SimpleTestCase):
         'update_or_create',
         'create',
         'bulk_create',
+        'bulk_update',
         'filter',
         'aggregate',
         'annotate',
+        'alias',
         'complex_filter',
         'exclude',
         'in_bulk',
@@ -584,6 +602,8 @@ class ManagerTest(SimpleTestCase):
         'only',
         'using',
         'exists',
+        'contains',
+        'explain',
         '_insert',
         '_update',
         'raw',
@@ -602,7 +622,7 @@ class ManagerTest(SimpleTestCase):
         `Manager` will need to be added to `ManagerTest.QUERYSET_PROXY_METHODS`.
         """
         self.assertEqual(
-            sorted(BaseManager._get_queryset_methods(QuerySet).keys()),
+            sorted(BaseManager._get_queryset_methods(models.QuerySet)),
             sorted(self.QUERYSET_PROXY_METHODS),
         )
 
@@ -618,7 +638,7 @@ class SelectOnSaveTests(TestCase):
         with self.assertNumQueries(1):
             asos.save(force_update=True)
         Article.objects.all().delete()
-        with self.assertRaises(DatabaseError):
+        with self.assertRaisesMessage(DatabaseError, 'Forced update did not affect any rows.'):
             with self.assertNumQueries(1):
                 asos.save(force_update=True)
 
@@ -635,7 +655,7 @@ class SelectOnSaveTests(TestCase):
 
         orig_class = Article._base_manager._queryset_class
 
-        class FakeQuerySet(QuerySet):
+        class FakeQuerySet(models.QuerySet):
             # Make sure the _update method below is in fact called.
             called = False
 
@@ -653,23 +673,23 @@ class SelectOnSaveTests(TestCase):
             # This is not wanted behavior, but this is how Django has always
             # behaved for databases that do not return correct information
             # about matched rows for UPDATE.
-            with self.assertRaises(DatabaseError):
+            with self.assertRaisesMessage(DatabaseError, 'Forced update did not affect any rows.'):
                 asos.save(force_update=True)
-            with self.assertRaises(DatabaseError):
+            msg = (
+                "An error occurred in the current transaction. You can't "
+                "execute queries until the end of the 'atomic' block."
+            )
+            with self.assertRaisesMessage(DatabaseError, msg):
                 asos.save(update_fields=['pub_date'])
         finally:
             Article._base_manager._queryset_class = orig_class
 
 
 class ModelRefreshTests(TestCase):
-    def _truncate_ms(self, val):
-        # MySQL < 5.6.4 removes microseconds from the datetimes which can cause
-        # problems when comparing the original value to that loaded from DB
-        return val - timedelta(microseconds=val.microsecond)
 
     def test_refresh(self):
-        a = Article.objects.create(pub_date=self._truncate_ms(datetime.now()))
-        Article.objects.create(pub_date=self._truncate_ms(datetime.now()))
+        a = Article.objects.create(pub_date=datetime.now())
+        Article.objects.create(pub_date=datetime.now())
         Article.objects.filter(pk=a.pk).update(headline='new headline')
         with self.assertNumQueries(1):
             a.refresh_from_db()
@@ -688,8 +708,15 @@ class ModelRefreshTests(TestCase):
 
     def test_unknown_kwarg(self):
         s = SelfRef.objects.create()
-        with self.assertRaises(TypeError):
+        msg = "refresh_from_db() got an unexpected keyword argument 'unknown_kwarg'"
+        with self.assertRaisesMessage(TypeError, msg):
             s.refresh_from_db(unknown_kwarg=10)
+
+    def test_lookup_in_fields(self):
+        s = SelfRef.objects.create()
+        msg = 'Found "__" in fields argument. Relations and transforms are not allowed in fields.'
+        with self.assertRaisesMessage(ValueError, msg):
+            s.refresh_from_db(fields=['foo__bar'])
 
     def test_refresh_fk(self):
         s1 = SelfRef.objects.create()
@@ -716,7 +743,7 @@ class ModelRefreshTests(TestCase):
         self.assertEqual(s2.selfref, s1)
 
     def test_refresh_unsaved(self):
-        pub_date = self._truncate_ms(datetime.now())
+        pub_date = datetime.now()
         a = Article.objects.create(pub_date=pub_date)
         a2 = Article(id=a.pk)
         with self.assertNumQueries(1):
@@ -736,6 +763,53 @@ class ModelRefreshTests(TestCase):
         self.assertIsNone(s1.article)
 
     def test_refresh_no_fields(self):
-        a = Article.objects.create(pub_date=self._truncate_ms(datetime.now()))
+        a = Article.objects.create(pub_date=datetime.now())
         with self.assertNumQueries(0):
             a.refresh_from_db(fields=[])
+
+    def test_refresh_clears_reverse_related(self):
+        """refresh_from_db() clear cached reverse relations."""
+        article = Article.objects.create(
+            headline='Parrot programs in Python',
+            pub_date=datetime(2005, 7, 28),
+        )
+        self.assertFalse(hasattr(article, 'featured'))
+        FeaturedArticle.objects.create(article_id=article.pk)
+        article.refresh_from_db()
+        self.assertTrue(hasattr(article, 'featured'))
+
+    def test_refresh_clears_one_to_one_field(self):
+        article = Article.objects.create(
+            headline='Parrot programs in Python',
+            pub_date=datetime(2005, 7, 28),
+        )
+        featured = FeaturedArticle.objects.create(article_id=article.pk)
+        self.assertEqual(featured.article.headline, 'Parrot programs in Python')
+        article.headline = 'Parrot programs in Python 2.0'
+        article.save()
+        featured.refresh_from_db()
+        self.assertEqual(featured.article.headline, 'Parrot programs in Python 2.0')
+
+    def test_prefetched_cache_cleared(self):
+        a = Article.objects.create(pub_date=datetime(2005, 7, 28))
+        s = SelfRef.objects.create(article=a)
+        # refresh_from_db() without fields=[...]
+        a1_prefetched = Article.objects.prefetch_related('selfref_set').first()
+        self.assertCountEqual(a1_prefetched.selfref_set.all(), [s])
+        s.article = None
+        s.save()
+        # Relation is cleared and prefetch cache is stale.
+        self.assertCountEqual(a1_prefetched.selfref_set.all(), [s])
+        a1_prefetched.refresh_from_db()
+        # Cache was cleared and new results are available.
+        self.assertCountEqual(a1_prefetched.selfref_set.all(), [])
+        # refresh_from_db() with fields=[...]
+        a2_prefetched = Article.objects.prefetch_related('selfref_set').first()
+        self.assertCountEqual(a2_prefetched.selfref_set.all(), [])
+        s.article = a
+        s.save()
+        # Relation is added and prefetch cache is stale.
+        self.assertCountEqual(a2_prefetched.selfref_set.all(), [])
+        a2_prefetched.refresh_from_db(fields=['selfref_set'])
+        # Cache was cleared and new results are available.
+        self.assertCountEqual(a2_prefetched.selfref_set.all(), [s])

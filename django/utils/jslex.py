@@ -1,4 +1,4 @@
-"""JsLex: a lexer for Javascript"""
+"""JsLex: a lexer for JavaScript"""
 # Originally from https://bitbucket.org/ned/jslex
 import re
 
@@ -62,7 +62,7 @@ class Lexer:
             for match in regexes[state].finditer(text, start):
                 name = match.lastgroup
                 tok = toks[name]
-                toktext = match.group(name)
+                toktext = match[name]
                 start += len(toktext)
                 yield (tok.name, toktext)
 
@@ -75,23 +75,23 @@ class Lexer:
 
 class JsLexer(Lexer):
     """
-    A Javascript lexer
+    A JavaScript lexer
 
     >>> lexer = JsLexer()
     >>> list(lexer.lex("a = 1"))
     [('id', 'a'), ('ws', ' '), ('punct', '='), ('ws', ' '), ('dnum', '1')]
 
-    This doesn't properly handle non-ASCII characters in the Javascript source.
+    This doesn't properly handle non-ASCII characters in the JavaScript source.
     """
 
     # Because these tokens are matched as alternatives in a regex, longer
     # possibilities must appear in the list before shorter ones, for example,
     # '>>' before '>'.
     #
-    # Note that we don't have to detect malformed Javascript, only properly
-    # lex correct Javascript, so much of this is simplified.
+    # Note that we don't have to detect malformed JavaScript, only properly
+    # lex correct JavaScript, so much of this is simplified.
 
-    # Details of Javascript lexical structure are taken from
+    # Details of JavaScript lexical structure are taken from
     # http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-262.pdf
 
     # A useful explanation of automatic semicolon insertion is at
@@ -184,7 +184,7 @@ class JsLexer(Lexer):
 
 def prepare_js_for_gettext(js):
     """
-    Convert the Javascript source `js` into something resembling C for
+    Convert the JavaScript source `js` into something resembling C for
     xgettext.
 
     What actually happens is that all the regex literals are replaced with
@@ -192,7 +192,7 @@ def prepare_js_for_gettext(js):
     """
     def escape_quotes(m):
         """Used in a regex to properly escape double quotes."""
-        s = m.group(0)
+        s = m[0]
         if s == '"':
             return r'\"'
         else:

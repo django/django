@@ -60,7 +60,7 @@ class BaseTests:
                 },
             }],
             ROOT_URLCONF='messages_tests.urls',
-            MESSAGE_TAGS='',
+            MESSAGE_TAGS={},
             MESSAGE_STORAGE='%s.%s' % (self.storage_class.__module__, self.storage_class.__name__),
             SESSION_SERIALIZER='django.contrib.sessions.serializers.JSONSerializer',
         )
@@ -87,6 +87,14 @@ class BaseTests:
         storage = self.storage_class(self.get_request())
         storage._loaded_data = data or []
         return storage
+
+    def test_repr(self):
+        request = self.get_request()
+        storage = self.storage_class(request)
+        self.assertEqual(
+            repr(storage),
+            f'<{self.storage_class.__qualname__}: request=<HttpRequest>>',
+        )
 
     def test_add(self):
         storage = self.get_storage()
@@ -172,7 +180,7 @@ class BaseTests:
             'messages': ['Test message %d' % x for x in range(5)],
         }
         show_url = reverse('show_template_response')
-        for level in self.levels.keys():
+        for level in self.levels:
             add_url = reverse('add_template_response', args=(level,))
             response = self.client.post(add_url, data, follow=True)
             self.assertRedirects(response, show_url)
@@ -252,7 +260,7 @@ class BaseTests:
     def test_middleware_disabled_fail_silently(self):
         """
         When the middleware is disabled, an exception is not raised
-        if 'fail_silently' = True
+        if 'fail_silently' is True.
         """
         data = {
             'messages': ['Test message %d' % x for x in range(5)],
@@ -349,8 +357,9 @@ class BaseTests:
         storage = self.get_storage()
         storage.level = 0
         add_level_messages(storage)
+        storage.add(constants.INFO, 'A generic info message', extra_tags=None)
         tags = [msg.tags for msg in storage]
-        self.assertEqual(tags, ['info', '', 'extra-tag debug', 'warning', 'error', 'success'])
+        self.assertEqual(tags, ['info', '', 'extra-tag debug', 'warning', 'error', 'success', 'info'])
 
     def test_level_tag(self):
         storage = self.get_storage()

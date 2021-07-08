@@ -108,7 +108,7 @@ class Team:
         raise NotImplementedError("Not so simple")
 
     def to_string(self):
-        return "%s" % self.title
+        return str(self.title)
 
 
 class TeamField(models.CharField):
@@ -124,7 +124,7 @@ class TeamField(models.CharField):
             return value
         return Team(value)
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, expression, connection):
         return Team(value)
 
     def value_to_string(self, obj):

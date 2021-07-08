@@ -7,7 +7,7 @@ How to use Django with uWSGI
 uWSGI_ is a fast, self-healing and developer/sysadmin-friendly application
 container server coded in pure C.
 
-.. _uWSGI: https://projects.unbit.it/uwsgi/
+.. _uWSGI: https://uwsgi-docs.readthedocs.io/
 
 .. seealso::
 
@@ -27,39 +27,26 @@ command. For example:
 .. code-block:: console
 
     # Install current stable version.
-    $ pip install uwsgi
+    $ python -m pip install uwsgi
 
     # Or install LTS (long term support).
-    $ pip install https://projects.unbit.it/downloads/uwsgi-lts.tar.gz
+    $ python -m pip install https://projects.unbit.it/downloads/uwsgi-lts.tar.gz
 
 .. _installation procedures: https://uwsgi-docs.readthedocs.io/en/latest/Install.html
-
-.. warning::
-
-    Some distributions, including Debian and Ubuntu, ship an outdated version
-    of uWSGI that does not conform to the WSGI specification. Versions prior to
-    1.2.6 do not call ``close`` on the response object after handling a
-    request. In those cases the :data:`~django.core.signals.request_finished`
-    signal isn't sent. This can result in idle connections to database and
-    memcache servers.
 
 uWSGI model
 -----------
 
 uWSGI operates on a client-server model. Your Web server (e.g., nginx, Apache)
-communicates with a `django-uwsgi` "worker" process to serve dynamic content.
-See uWSGI's `background documentation`_ for more detail.
-
-.. _background documentation: https://projects.unbit.it/uwsgi/wiki/Background
+communicates with a ``django-uwsgi`` "worker" process to serve dynamic content.
 
 Configuring and starting the uWSGI server for Django
 ----------------------------------------------------
 
 uWSGI supports multiple ways to configure the process. See uWSGI's
-`configuration documentation`_ and `examples`_.
+`configuration documentation`_.
 
 .. _configuration documentation: https://uwsgi.readthedocs.io/en/latest/Configuration.html
-.. _examples: https://projects.unbit.it/uwsgi/wiki/Example
 
 Here's an example command to start a uWSGI server::
 
@@ -73,7 +60,7 @@ Here's an example command to start a uWSGI server::
         --harakiri=20 \                 # respawn processes taking more than 20 seconds
         --max-requests=5000 \           # respawn processes after serving 5000 requests
         --vacuum \                      # clear environment on exit
-        --home=/path/to/virtual/env \   # optional path to a virtualenv
+        --home=/path/to/virtual/env \   # optional path to a virtual environment
         --daemonize=/var/log/uwsgi/yourproject.log      # background the process
 
 This assumes you have a top-level project package named ``mysite``, and
@@ -90,8 +77,8 @@ The Django-specific options here are:
   path -- i.e., the directory containing the ``mysite`` package.
 * ``module``: The WSGI module to use -- probably the ``mysite.wsgi`` module
   that :djadmin:`startproject` creates.
-* ``env``: Should probably contain at least ``DJANGO_SETTINGS_MODULE``.
-* ``home``: Optional path to your project virtualenv.
+* ``env``: Should probably contain at least :envvar:`DJANGO_SETTINGS_MODULE`.
+* ``home``: Optional path to your project virtual environment.
 
 Example ini configuration file::
 

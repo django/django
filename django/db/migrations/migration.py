@@ -1,3 +1,4 @@
+from django.db.migrations.utils import get_migration_name_timestamp
 from django.db.transaction import atomic
 
 from .exceptions import IrreversibleError
@@ -58,9 +59,11 @@ class Migration:
         self.replaces = list(self.__class__.replaces)
 
     def __eq__(self, other):
-        if not isinstance(other, Migration):
-            return False
-        return (self.name == other.name) and (self.app_label == other.app_label)
+        return (
+            isinstance(other, Migration) and
+            self.name == other.name and
+            self.app_label == other.app_label
+        )
 
     def __repr__(self):
         return "<Migration %s.%s>" % (self.app_label, self.name)
@@ -162,14 +165,40 @@ class Migration:
                 schema_editor.collected_sql.append("--")
                 if not operation.reduces_to_sql:
                     continue
-            if not schema_editor.connection.features.can_rollback_ddl and operation.atomic:
-                # We're forcing a transaction on a non-transactional-DDL backend
+            atomic_operation = operation.atomic or (self.atomic and operation.atomic is not False)
+            if not schema_editor.atomic_migration and atomic_operation:
+                # Force a transaction on a non-transactional-DDL backend or an
+                # atomic operation inside a non-atomic migration.
                 with atomic(schema_editor.connection.alias):
                     operation.database_backwards(self.app_label, schema_editor, from_state, to_state)
             else:
                 # Normal behaviour
                 operation.database_backwards(self.app_label, schema_editor, from_state, to_state)
         return project_state
+
+    def suggest_name(self):
+        """
+        Suggest a name for the operations this migration might represent. Names
+        are not guaranteed to be unique, but put some effort into the fallback
+        name to avoid VCS conflicts if possible.
+        """
+        if self.initial:
+            return 'initial'
+
+        raw_fragments = [op.migration_name_fragment for op in self.operations]
+        fragments = [name for name in raw_fragments if name]
+
+        if not fragments or len(fragments) != len(self.operations):
+            return 'auto_%s' % get_migration_name_timestamp()
+
+        name = fragments[0]
+        for fragment in fragments[1:]:
+            new_name = f'{name}_{fragment}'
+            if len(new_name) > 52:
+                name = f'{name}_and_more'
+                break
+            name = new_name
+        return name
 
 
 class SwappableTuple(tuple):

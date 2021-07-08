@@ -1,33 +1,25 @@
+import functools
 import inspect
 
 
-def getargspec(func):
-    sig = inspect.signature(func)
-    args = [
-        p.name for p in sig.parameters.values()
-        if p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-    ]
-    varargs = [
-        p.name for p in sig.parameters.values()
-        if p.kind == inspect.Parameter.VAR_POSITIONAL
-    ]
-    varargs = varargs[0] if varargs else None
-    varkw = [
-        p.name for p in sig.parameters.values()
-        if p.kind == inspect.Parameter.VAR_KEYWORD
-    ]
-    varkw = varkw[0] if varkw else None
-    defaults = [
-        p.default for p in sig.parameters.values()
-        if p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD and p.default is not p.empty
-    ] or None
-    return args, varargs, varkw, defaults
+@functools.lru_cache(maxsize=512)
+def _get_func_parameters(func, remove_first):
+    parameters = tuple(inspect.signature(func).parameters.values())
+    if remove_first:
+        parameters = parameters[1:]
+    return parameters
+
+
+def _get_callable_parameters(meth_or_func):
+    is_method = inspect.ismethod(meth_or_func)
+    func = meth_or_func.__func__ if is_method else meth_or_func
+    return _get_func_parameters(func, remove_first=is_method)
 
 
 def get_func_args(func):
-    sig = inspect.signature(func)
+    params = _get_callable_parameters(func)
     return [
-        arg_name for arg_name, param in sig.parameters.items()
+        param.name for param in params
         if param.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
     ]
 
@@ -38,10 +30,10 @@ def get_func_full_args(func):
     does not have a default value, omit it in the tuple. Arguments such as
     *args and **kwargs are also included.
     """
-    sig = inspect.signature(func)
+    params = _get_callable_parameters(func)
     args = []
-    for arg_name, param in sig.parameters.items():
-        name = arg_name
+    for param in params:
+        name = param.name
         # Ignore 'self'
         if name == 'self':
             continue
@@ -57,8 +49,9 @@ def get_func_full_args(func):
 
 
 def func_accepts_kwargs(func):
+    """Return True if function 'func' accepts keyword arguments **kwargs."""
     return any(
-        p for p in inspect.signature(func).parameters.values()
+        p for p in _get_callable_parameters(func)
         if p.kind == p.VAR_KEYWORD
     )
 
@@ -68,18 +61,19 @@ def func_accepts_var_args(func):
     Return True if function 'func' accepts positional arguments *args.
     """
     return any(
-        p for p in inspect.signature(func).parameters.values()
+        p for p in _get_callable_parameters(func)
         if p.kind == p.VAR_POSITIONAL
     )
 
 
-def func_has_no_args(func):
-    args = [
-        p for p in inspect.signature(func).parameters.values()
+def method_has_no_args(meth):
+    """Return True if a method only accepts 'self'."""
+    count = len([
+        p for p in _get_callable_parameters(meth)
         if p.kind == p.POSITIONAL_OR_KEYWORD
-    ]
-    return len(args) == 1
+    ])
+    return count == 0 if inspect.ismethod(meth) else count == 1
 
 
-def func_supports_parameter(func, parameter):
-    return parameter in inspect.signature(func).parameters
+def func_supports_parameter(func, name):
+    return any(param.name == name for param in _get_callable_parameters(func))

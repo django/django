@@ -2,7 +2,6 @@ from collections import defaultdict
 
 from django.apps import apps
 from django.db import models
-from django.utils.encoding import force_text
 from django.utils.translation import gettext_lazy as _
 
 
@@ -87,7 +86,6 @@ class ContentTypeManager(models.Manager):
                 model__in=needed_models
             )
             for ct in cts:
-                model = ct.model_class()
                 opts_models = needed_opts.pop(ct.model_class()._meta, [])
                 for model in opts_models:
                     results[model] = ct
@@ -106,7 +104,7 @@ class ContentTypeManager(models.Manager):
     def get_for_id(self, id):
         """
         Lookup a ContentType by ID. Use the same shared cache as get_for_model
-        (though ContentTypes are obviously not created on-the-fly by get_by_id).
+        (though ContentTypes are not created on-the-fly by get_by_id).
         """
         try:
             ct = self._cache[self.db][id]
@@ -141,17 +139,24 @@ class ContentType(models.Model):
         verbose_name = _('content type')
         verbose_name_plural = _('content types')
         db_table = 'django_content_type'
-        unique_together = (('app_label', 'model'),)
+        unique_together = [['app_label', 'model']]
 
     def __str__(self):
-        return self.name
+        return self.app_labeled_name
 
     @property
     def name(self):
         model = self.model_class()
         if not model:
             return self.model
-        return force_text(model._meta.verbose_name)
+        return str(model._meta.verbose_name)
+
+    @property
+    def app_labeled_name(self):
+        model = self.model_class()
+        if not model:
+            return self.model
+        return '%s | %s' % (model._meta.app_label, model._meta.verbose_name)
 
     def model_class(self):
         """Return the model class for this type of content."""

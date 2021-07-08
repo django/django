@@ -5,15 +5,16 @@
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2012
-# Sander Steffann <sander@steffann.nl>, 2015
+# Sander Steffann <inactive+steffann@transifex.com>, 2015
 # Tino de Bruijn <tinodb@gmail.com>, 2011
+# Tonnes <tonnes.mb@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-16 22:21+0000\n"
-"Last-Translator: Ilja Maas <iljamaas@dreamsolution.nl>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-17 08:52+0000\n"
+"Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -31,25 +32,28 @@ msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "Voorbeeld: '/about/contact/'. Zorg voor slashes aan het begin en eind."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
+msgstr "Voorbeeld: ‘/about/contact/’. Zorg voor slashes aan het begin en eind."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr ""
-"Deze waarde mag alleen letters, cijfers, punten, lage streepjes, streepjes, "
-"schuine strepen of tildes bevatten."
+"Deze waarde mag alleen letters, cijfers, punten, liggende streepjes, "
+"streepjes, slashes of tildes bevatten."
+
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr "Voorbeeld: ‘/about/contact’. Zorg voor een slash aan het begin."
 
 msgid "URL is missing a leading slash."
-msgstr "In de URL ontbreekt een begin slash."
+msgstr "In de URL ontbreekt een beginslash."
 
 msgid "URL is missing a trailing slash."
-msgstr "In de URL ontbreekt een eind slash."
+msgstr "In de URL ontbreekt een eindslash."
 
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
-msgstr "Platte pagina met url %(url)s bestaat al voor site %(site)s"
+msgstr "Platte pagina met URL %(url)s bestaat al voor website %(site)s"
 
 msgid "title"
 msgstr "titel"
@@ -64,22 +68,22 @@ msgid "template name"
 msgstr "sjabloonnaam"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
-"Voorbeeld: 'flatpages/contact_page.html'. Als deze niet is opgegeven, dan "
-"wordt 'flatpages/default.html' gebruikt."
+"Voorbeeld: ‘flatpages/contact_page.html’. Als dit niet is opgegeven, wordt "
+"‘flatpages/default.html’ gebruikt."
 
 msgid "registration required"
-msgstr "registratie verplicht"
+msgstr "registratie vereist"
 
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
-"Indien dit is aangevinkt kunnen alleen ingelogde gebruikers deze pagina "
+"Als dit is aangevinkt, kunnen alleen aangemelde gebruikers de pagina "
 "bekijken."
 
 msgid "sites"
-msgstr "sites"
+msgstr "websites"
 
 msgid "flat page"
 msgstr "platte pagina"

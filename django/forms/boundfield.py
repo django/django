@@ -1,13 +1,10 @@
 import datetime
-import warnings
+import re
 
 from django.forms.utils import flatatt, pretty_name
 from django.forms.widgets import Textarea, TextInput
-from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html, html_safe
-from django.utils.inspect import func_supports_parameter
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
@@ -48,10 +45,14 @@ class BoundField:
         id_ = self.field.widget.attrs.get('id') or self.auto_id
         attrs = {'id': id_} if id_ else {}
         attrs = self.build_widget_attrs(attrs)
-        return list(
+        return [
             BoundWidget(self.field.widget, widget, self.form.renderer)
             for widget in self.field.widget.subwidgets(self.html_name, self.value(), attrs=attrs)
-        )
+        ]
+
+    def __bool__(self):
+        # BoundField evaluates to True even if it doesn't have subwidgets.
+        return True
 
     def __iter__(self):
         return iter(self.subwidgets)
@@ -63,7 +64,10 @@ class BoundField:
         # Prevent unnecessary reevaluation when accessing BoundField's attrs
         # from templates.
         if not isinstance(idx, (int, slice)):
-            raise TypeError
+            raise TypeError(
+                'BoundField indices must be integers or slices, not %s.'
+                % type(idx).__name__
+            )
         return self.subwidgets[idx]
 
     @property
@@ -79,40 +83,18 @@ class BoundField:
         attributes passed as attrs. If a widget isn't specified, use the
         field's default widget.
         """
-        if not widget:
-            widget = self.field.widget
-
+        widget = widget or self.field.widget
         if self.field.localize:
             widget.is_localized = True
-
         attrs = attrs or {}
         attrs = self.build_widget_attrs(attrs, widget)
-        auto_id = self.auto_id
-        if auto_id and 'id' not in attrs and 'id' not in widget.attrs:
-            if not only_initial:
-                attrs['id'] = auto_id
-            else:
-                attrs['id'] = self.html_initial_id
-
-        if not only_initial:
-            name = self.html_name
-        else:
-            name = self.html_initial_name
-
-        kwargs = {}
-        if func_supports_parameter(widget.render, 'renderer'):
-            kwargs['renderer'] = self.form.renderer
-        else:
-            warnings.warn(
-                'Add the `renderer` argument to the render() method of %s. '
-                'It will be mandatory in Django 2.1.' % widget.__class__,
-                RemovedInDjango21Warning, stacklevel=2,
-            )
+        if self.auto_id and 'id' not in widget.attrs:
+            attrs.setdefault('id', self.html_initial_id if only_initial else self.auto_id)
         return widget.render(
-            name=name,
+            name=self.html_initial_name if only_initial else self.html_name,
             value=self.value(),
             attrs=attrs,
-            **kwargs
+            renderer=self.form.renderer,
         )
 
     def as_text(self, attrs=None, **kwargs):
@@ -172,7 +154,7 @@ class BoundField:
         if id_:
             id_for_label = widget.id_for_label(id_)
             if id_for_label:
-                attrs = dict(attrs or {}, **{'for': id_for_label})
+                attrs = {**(attrs or {}), 'for': id_for_label}
             if self.field.required and hasattr(self.form, 'required_css_class'):
                 attrs = attrs or {}
                 if 'class' in attrs:
@@ -209,9 +191,9 @@ class BoundField:
         Calculate and return the ID attribute for this BoundField, if the
         associated Form has specified auto_id. Return an empty string otherwise.
         """
-        auto_id = self.form.auto_id
-        if auto_id and '%s' in force_text(auto_id):
-            return force_text(auto_id) % self.html_name
+        auto_id = self.form.auto_id  # Boolean or string
+        if auto_id and '%s' in str(auto_id):
+            return auto_id % self.html_name
         elif auto_id:
             return self.html_name
         return ''
@@ -238,14 +220,17 @@ class BoundField:
         return data
 
     def build_widget_attrs(self, attrs, widget=None):
-        if not widget:
-            widget = self.field.widget
+        widget = widget or self.field.widget
         attrs = dict(attrs)  # Copy attrs to avoid modifying the argument.
         if widget.use_required_attribute(self.initial) and self.field.required and self.form.use_required_attribute:
             attrs['required'] = True
         if self.field.disabled:
             attrs['disabled'] = True
         return attrs
+
+    @property
+    def widget_type(self):
+        return re.sub(r'widget$|input$', '', self.field.widget.__class__.__name__.lower())
 
 
 @html_safe
@@ -271,7 +256,7 @@ class BoundWidget:
         return self.tag(wrap_label=True)
 
     def tag(self, wrap_label=False):
-        context = {'widget': self.data, 'wrap_label': wrap_label}
+        context = {'widget': {**self.data, 'wrap_label': wrap_label}}
         return self.parent_widget._render(self.template_name, context, self.renderer)
 
     @property

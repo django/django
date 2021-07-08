@@ -2,15 +2,15 @@
 #
 # Translators:
 # Georgi Kostadinov <grgkostadinov@gmail.com>, 2012
-# Todor Lubenov <tgl.sysdev@gmail.com>, 2016
-# Todor Lubenov <tgl.sysdev@gmail.com>, 2011,2015
+# Todor Lubenov <tlubenov@gmail.com>, 2016,2020
+# Todor Lubenov <tlubenov@gmail.com>, 2011,2015,2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-07-21 15:01+0000\n"
-"Last-Translator: Todor Lubenov <tgl.sysdev@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2021-02-28 07:20+0000\n"
+"Last-Translator: Todor Lubenov <tlubenov@gmail.com>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
 "bg/)\n"
 "MIME-Version: 1.0\n"
@@ -26,9 +26,9 @@ msgid "The base GIS field."
 msgstr "Базово ГИС поле."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
-"Основното ГИС поле - карти за спецификация от OpenGIS  геометричен тип."
+"Базово Геометричнно поле — карти от OpenGIS Specification Geometry тип."
 
 msgid "Point"
 msgstr "Точка"
@@ -79,9 +79,6 @@ msgstr "Изтрий всички обекти"
 msgid "WKT debugging window:"
 msgstr "WKT прозорец за проверка:"
 
-msgid "Google Maps via GeoDjango"
-msgstr "Google Maps през GeoDjango"
-
 msgid "Debugging window (serialized value)"
 msgstr "Debugging прозорец (сериализирана стойност)"
 
@@ -89,5 +86,5 @@ msgid "No feeds are registered."
 msgstr "Няма регистрирани фийда."
 
 #, python-format
-msgid "Slug %r isn't registered."
-msgstr "Слъгът %r не е регистриран."
+msgid "Slug %r isn’t registered."
+msgstr "Slug %r не е регистриран."

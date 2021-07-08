@@ -14,25 +14,25 @@ class TruncatewordsTests(SimpleTestCase):
         output = self.engine.render_to_string(
             'truncatewords01', {'a': 'alpha & bravo', 'b': mark_safe('alpha &amp; bravo')}
         )
-        self.assertEqual(output, 'alpha & ... alpha &amp; ...')
+        self.assertEqual(output, 'alpha & … alpha &amp; …')
 
     @setup({'truncatewords02': '{{ a|truncatewords:"2" }} {{ b|truncatewords:"2"}}'})
     def test_truncatewords02(self):
         output = self.engine.render_to_string(
             'truncatewords02', {'a': 'alpha & bravo', 'b': mark_safe('alpha &amp; bravo')}
         )
-        self.assertEqual(output, 'alpha &amp; ... alpha &amp; ...')
+        self.assertEqual(output, 'alpha &amp; … alpha &amp; …')
 
 
 class FunctionTests(SimpleTestCase):
 
     def test_truncate(self):
-        self.assertEqual(truncatewords('A sentence with a few words in it', 1), 'A ...')
+        self.assertEqual(truncatewords('A sentence with a few words in it', 1), 'A …')
 
     def test_truncate2(self):
         self.assertEqual(
             truncatewords('A sentence with a few words in it', 5),
-            'A sentence with a few ...',
+            'A sentence with a few …',
         )
 
     def test_overtruncate(self):

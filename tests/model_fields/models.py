@@ -1,3 +1,4 @@
+import json
 import os
 import tempfile
 import uuid
@@ -7,11 +8,10 @@ from django.contrib.contenttypes.fields import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.storage import FileSystemStorage
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.db.models.fields.files import ImageField, ImageFieldFile
-from django.db.models.fields.related import (
-    ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
-)
+from django.db.models.fields.files import ImageFieldFile
+from django.utils.translation import gettext_lazy as _
 
 try:
     from PIL import Image
@@ -46,35 +46,37 @@ class Whiz(models.Model):
         )
         ),
         (0, 'Other'),
+        (5, _('translated')),
     )
     c = models.IntegerField(choices=CHOICES, null=True)
 
 
-class Counter:
-    def __init__(self):
-        self.n = 1
+class WhizDelayed(models.Model):
+    c = models.IntegerField(choices=(), null=True)
 
-    def __iter__(self):
-        return self
 
-    def __next__(self):
-        if self.n > 5:
-            raise StopIteration
-        else:
-            self.n += 1
-            return (self.n, 'val-' + str(self.n))
+# Contrived way of adding choices later.
+WhizDelayed._meta.get_field('c').choices = Whiz.CHOICES
 
 
 class WhizIter(models.Model):
-    c = models.IntegerField(choices=Counter(), null=True)
+    c = models.IntegerField(choices=iter(Whiz.CHOICES), null=True)
 
 
 class WhizIterEmpty(models.Model):
-    c = models.CharField(choices=(x for x in []), blank=True, max_length=1)
+    c = models.CharField(choices=iter(()), blank=True, max_length=1)
+
+
+class Choiceful(models.Model):
+    no_choices = models.IntegerField(null=True)
+    empty_choices = models.IntegerField(choices=(), null=True)
+    with_choices = models.IntegerField(choices=[(1, 'A')], null=True)
+    empty_choices_bool = models.BooleanField(choices=())
+    empty_choices_text = models.TextField(choices=())
 
 
 class BigD(models.Model):
-    d = models.DecimalField(max_digits=38, decimal_places=30)
+    d = models.DecimalField(max_digits=32, decimal_places=30)
 
 
 class FloatModel(models.Model):
@@ -89,6 +91,18 @@ class UnicodeSlugField(models.Model):
     s = models.SlugField(max_length=255, allow_unicode=True)
 
 
+class AutoModel(models.Model):
+    value = models.AutoField(primary_key=True)
+
+
+class BigAutoModel(models.Model):
+    value = models.BigAutoField(primary_key=True)
+
+
+class SmallAutoModel(models.Model):
+    value = models.SmallAutoField(primary_key=True)
+
+
 class SmallIntegerModel(models.Model):
     value = models.SmallIntegerField()
 
@@ -100,6 +114,10 @@ class IntegerModel(models.Model):
 class BigIntegerModel(models.Model):
     value = models.BigIntegerField()
     null_value = models.BigIntegerField(null=True, blank=True)
+
+
+class PositiveBigIntegerModel(models.Model):
+    value = models.PositiveBigIntegerField()
 
 
 class PositiveSmallIntegerModel(models.Model):
@@ -116,7 +134,7 @@ class Post(models.Model):
 
 
 class NullBooleanModel(models.Model):
-    nbfield = models.NullBooleanField()
+    nbfield = models.BooleanField(null=True, blank=True)
 
 
 class BooleanModel(models.Model):
@@ -173,16 +191,15 @@ class VerboseNameField(models.Model):
     # field_image = models.ImageField("verbose field")
     field11 = models.IntegerField("verbose field11")
     field12 = models.GenericIPAddressField("verbose field12", protocol="ipv4")
-    field13 = models.NullBooleanField("verbose field13")
-    field14 = models.PositiveIntegerField("verbose field14")
-    field15 = models.PositiveSmallIntegerField("verbose field15")
-    field16 = models.SlugField("verbose field16")
-    field17 = models.SmallIntegerField("verbose field17")
-    field18 = models.TextField("verbose field18")
-    field19 = models.TimeField("verbose field19")
-    field20 = models.URLField("verbose field20")
-    field21 = models.UUIDField("verbose field21")
-    field22 = models.DurationField("verbose field22")
+    field13 = models.PositiveIntegerField("verbose field13")
+    field14 = models.PositiveSmallIntegerField("verbose field14")
+    field15 = models.SlugField("verbose field15")
+    field16 = models.SmallIntegerField("verbose field16")
+    field17 = models.TextField("verbose field17")
+    field18 = models.TimeField("verbose field18")
+    field19 = models.URLField("verbose field19")
+    field20 = models.UUIDField("verbose field20")
+    field21 = models.DurationField("verbose field21")
 
 
 class GenericIPAddress(models.Model):
@@ -235,7 +252,7 @@ if Image:
             self.was_opened = True
             super().open()
 
-    class TestImageField(ImageField):
+    class TestImageField(models.ImageField):
         attr_class = TestImageFieldFile
 
     # Set up a temp directory for file storage.
@@ -315,6 +332,43 @@ if Image:
                                   width_field='headshot_width')
 
 
+class CustomJSONDecoder(json.JSONDecoder):
+    def __init__(self, object_hook=None, *args, **kwargs):
+        return super().__init__(object_hook=self.as_uuid, *args, **kwargs)
+
+    def as_uuid(self, dct):
+        if 'uuid' in dct:
+            dct['uuid'] = uuid.UUID(dct['uuid'])
+        return dct
+
+
+class JSONModel(models.Model):
+    value = models.JSONField()
+
+    class Meta:
+        required_db_features = {'supports_json_field'}
+
+
+class NullableJSONModel(models.Model):
+    value = models.JSONField(blank=True, null=True)
+    value_custom = models.JSONField(
+        encoder=DjangoJSONEncoder,
+        decoder=CustomJSONDecoder,
+        null=True,
+    )
+
+    class Meta:
+        required_db_features = {'supports_json_field'}
+
+
+class RelatedJSONModel(models.Model):
+    value = models.JSONField()
+    json_model = models.ForeignKey(NullableJSONModel, models.CASCADE)
+
+    class Meta:
+        required_db_features = {'supports_json_field'}
+
+
 class AllFieldsModel(models.Model):
     big_integer = models.BigIntegerField()
     binary = models.BinaryField()
@@ -329,7 +383,6 @@ class AllFieldsModel(models.Model):
     floatf = models.FloatField()
     integer = models.IntegerField()
     generic_ip = models.GenericIPAddressField()
-    null_boolean = models.NullBooleanField()
     positive_integer = models.PositiveIntegerField()
     positive_small_integer = models.PositiveSmallIntegerField()
     slug = models.SlugField()
@@ -339,25 +392,29 @@ class AllFieldsModel(models.Model):
     url = models.URLField()
     uuid = models.UUIDField()
 
-    fo = ForeignObject(
+    fo = models.ForeignObject(
         'self',
         on_delete=models.CASCADE,
-        from_fields=['abstract_non_concrete_id'],
+        from_fields=['positive_integer'],
         to_fields=['id'],
         related_name='reverse'
     )
-    fk = ForeignKey(
+    fk = models.ForeignKey(
         'self',
         models.CASCADE,
         related_name='reverse2'
     )
-    m2m = ManyToManyField('self')
-    oto = OneToOneField('self', models.CASCADE)
+    m2m = models.ManyToManyField('self')
+    oto = models.OneToOneField('self', models.CASCADE)
 
     object_id = models.PositiveIntegerField()
     content_type = models.ForeignKey(ContentType, models.CASCADE)
     gfk = GenericForeignKey()
     gr = GenericRelation(DataModel)
+
+
+class ManyToMany(models.Model):
+    m2m = models.ManyToManyField('self')
 
 
 ###############################################################################

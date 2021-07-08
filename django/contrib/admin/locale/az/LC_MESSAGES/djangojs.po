@@ -2,14 +2,14 @@
 #
 # Translators:
 # Ali Ismayilov <ali@ismailov.info>, 2011-2012
-# Emin Mastizada <emin@linux.com>, 2016
+# Emin Mastizada <emin@linux.com>, 2016,2020
 # Emin Mastizada <emin@linux.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-09-16 10:02+0000\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-14 20:39+0000\n"
 "Last-Translator: Emin Mastizada <emin@linux.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
@@ -83,21 +83,36 @@ msgstr ""
 "əməliyyatı işə salsanız, dəyişikliklər əldən gedəcək."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Əməliyyatı seçmisiniz, amma bəzi sahələrdəki dəyişiklikləri hələ yadda "
-"saxlamamışıq. Bunun üçün OK seçməlisiniz. Ondan sonra əməliyyatı yenidən işə "
-"salmağa cəhd edin."
+"Əməliyyat seçmisiniz, amma fərdi sahələrdəki dəyişiklikləriniz hələ də yadda "
+"saxlanılmayıb. Saxlamaq üçün lütfən Tamam düyməsinə klikləyin. Əməliyyatı "
+"təkrar işlətməli olacaqsınız."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Siz əməliyyatı seçmisiniz və heç bir sahəyə dəyişiklik etməmisiniz. Siz "
-"yəqin ki, Yadda saxla düyməsini deyil, Getdik düyməsini axtarırsınız."
+"Əməliyyat seçmisiniz və fərdi sahələrdə dəyişiklər etməmisiniz. Böyük "
+"ehtimal Saxla düyməsi yerinə Get düyməsinə ehtiyyacınız var."
+
+msgid "Now"
+msgstr "İndi"
+
+msgid "Midnight"
+msgstr "Gecə yarısı"
+
+msgid "6 a.m."
+msgstr "6 a.m."
+
+msgid "Noon"
+msgstr "Günorta"
+
+msgid "6 p.m."
+msgstr "6 p.m."
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
@@ -111,26 +126,11 @@ msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "Diqqət: Server vaxtından %s saat geridəsiniz."
 msgstr[1] "Diqqət: Server vaxtından %s saat geridəsiniz."
 
-msgid "Now"
-msgstr "İndi"
-
 msgid "Choose a Time"
 msgstr "Vaxt Seçin"
 
 msgid "Choose a time"
 msgstr "Vaxtı seçin"
-
-msgid "Midnight"
-msgstr "Gecə yarısı"
-
-msgid "6 a.m."
-msgstr "6 a.m."
-
-msgid "Noon"
-msgstr "Günorta"
-
-msgid "6 p.m."
-msgstr "6 p.m."
 
 msgid "Cancel"
 msgstr "Ləğv et"

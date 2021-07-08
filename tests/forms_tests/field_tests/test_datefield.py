@@ -1,8 +1,7 @@
 from datetime import date, datetime
 
-from django.forms import (
-    DateField, Form, HiddenInput, SelectDateWidget, ValidationError,
-)
+from django.core.exceptions import ValidationError
+from django.forms import DateField, Form, HiddenInput, SelectDateWidget
 from django.test import SimpleTestCase, override_settings
 from django.utils import translation
 
@@ -22,7 +21,7 @@ class DateFieldTest(SimpleTestCase):
         # accept the input from the "as_hidden" rendering as well.
         self.assertHTMLEqual(
             a['mydate'].as_hidden(),
-            '<input type="hidden" name="mydate" value="2008-4-1" id="id_mydate" />',
+            '<input type="hidden" name="mydate" value="2008-04-01" id="id_mydate">',
         )
 
         b = GetDate({'mydate': '2008-4-1'})
@@ -103,7 +102,7 @@ class DateFieldTest(SimpleTestCase):
         a = GetDate({'mydate_month': '2', 'mydate_day': '31', 'mydate_year': '2010'})
         self.assertFalse(a.is_valid())
         # 'Geef een geldige datum op.' = 'Enter a valid date.'
-        self.assertEqual(a.errors, {'mydate': ['Geef een geldige datum op.']})
+        self.assertEqual(a.errors, {'mydate': ['Voer een geldige datum in.']})
 
     @override_settings(USE_L10N=True)
     @translation.override('nl')

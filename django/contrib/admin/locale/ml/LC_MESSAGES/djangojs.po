@@ -3,14 +3,15 @@
 # Translators:
 # Aby Thomas <abyzthomas@gmail.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
+# MUHAMMED RAMEEZ <muhammedrameez2000@gmail.com>, 2019
 # Rajeesh Nair <rajeeshrnair@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 10:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-13 00:53+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Malayalam (http://www.transifex.com/django/django/language/"
 "ml/)\n"
 "MIME-Version: 1.0\n"
@@ -83,20 +84,31 @@ msgstr ""
 "നഷ്ടപ്പെടും."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"നിങ്ങള്‍ ഒരു ആക്ഷന്‍ തെരഞ്ഞെടുത്തിട്ടുണ്ട്. പക്ഷേ, കളങ്ങളിലെ മാറ്റങ്ങള്‍ ഇനിയും സേവ് ചെയ്യാനുണ്ട്. "
-"ആദ്യം സേവ്ചെയ്യാനായി OK ക്ലിക് ചെയ്യുക. അതിനു ശേഷം ആക്ഷന്‍ ഒന്നു കൂടി പ്രയോഗിക്കേണ്ടി വരും."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"നിങ്ങള്‍ ഒരു ആക്ഷന്‍ തെരഞ്ഞെടുത്തിട്ടുണ്ട്. കളങ്ങളില്‍ സേവ് ചെയ്യാത്ത മാറ്റങ്ങള്‍ ഇല്ല. നിങ്ങള്‍സേവ് ബട്ടണ്‍ "
-"തന്നെയാണോ അതോ ഗോ ബട്ടണാണോ ഉദ്ദേശിച്ചത്."
+
+msgid "Now"
+msgstr "ഇപ്പോള്‍"
+
+msgid "Midnight"
+msgstr "അര്‍ധരാത്രി"
+
+msgid "6 a.m."
+msgstr "6 a.m."
+
+msgid "Noon"
+msgstr "ഉച്ച"
+
+msgid "6 p.m."
+msgstr "6 p.m"
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
@@ -110,26 +122,11 @@ msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "ഒർക്കുക: സെർവർ സമയത്തിനെക്കാളും നിങ്ങൾ %s സമയം പിന്നിലാണ്."
 msgstr[1] "ഒർക്കുക: സെർവർ സമയത്തിനെക്കാളും നിങ്ങൾ %s സമയം പിന്നിലാണ്."
 
-msgid "Now"
-msgstr "ഇപ്പോള്‍"
-
 msgid "Choose a Time"
-msgstr ""
+msgstr "സമയം തിരഞ്ഞെടുക്കുക"
 
 msgid "Choose a time"
 msgstr "സമയം തെരഞ്ഞെടുക്കൂ"
-
-msgid "Midnight"
-msgstr "അര്‍ധരാത്രി"
-
-msgid "6 a.m."
-msgstr "6 a.m."
-
-msgid "Noon"
-msgstr "ഉച്ച"
-
-msgid "6 p.m."
-msgstr ""
 
 msgid "Cancel"
 msgstr "റദ്ദാക്കൂ"
@@ -138,7 +135,7 @@ msgid "Today"
 msgstr "ഇന്ന്"
 
 msgid "Choose a Date"
-msgstr ""
+msgstr "ഒരു തീയതി തിരഞ്ഞെടുക്കുക"
 
 msgid "Yesterday"
 msgstr "ഇന്നലെ"
@@ -147,68 +144,68 @@ msgid "Tomorrow"
 msgstr "നാളെ"
 
 msgid "January"
-msgstr ""
+msgstr "ജനുവരി"
 
 msgid "February"
-msgstr ""
+msgstr "ഫെബ്രുവരി"
 
 msgid "March"
-msgstr ""
+msgstr "മാർച്ച്"
 
 msgid "April"
-msgstr ""
+msgstr "ഏപ്രിൽ"
 
 msgid "May"
-msgstr ""
+msgstr "മെയ്"
 
 msgid "June"
-msgstr ""
+msgstr "ജൂൺ"
 
 msgid "July"
-msgstr ""
+msgstr "ജൂലൈ"
 
 msgid "August"
-msgstr ""
+msgstr "ആഗസ്റ്റ്"
 
 msgid "September"
-msgstr ""
+msgstr "സെപ്റ്റംബർ"
 
 msgid "October"
-msgstr ""
+msgstr "ഒക്ടോബർ"
 
 msgid "November"
-msgstr ""
+msgstr "നവംബർ"
 
 msgid "December"
-msgstr ""
+msgstr "ഡിസംബര്"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "ഞ്ഞ‍"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "തി"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "ചൊ"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "ബു"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "വ്യാ"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "വെ"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "ശ"
 
 msgid "Show"
 msgstr "കാണട്ടെ"

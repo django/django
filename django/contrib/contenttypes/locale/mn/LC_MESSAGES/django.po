@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Bayarkhuu Bataa, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Zorig <zorig_ezd@yahoo.com>, 2014
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011-2012
@@ -9,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-10-10 11:23+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2017-10-19 14:01+0000\n"
+"Last-Translator: Bayarkhuu Bataa\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
@@ -20,10 +21,10 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Content Types"
-msgstr "Агуулга Төрлүүд"
+msgstr "Агуулгын төрөл"
 
 msgid "python model class name"
-msgstr "пайтоны модел класын нэр"
+msgstr "пайтоны моделын классын нэр"
 
 msgid "content type"
 msgstr "агуулгын төрөл"
@@ -37,9 +38,9 @@ msgstr "%(ct_id)s төрлийн холбоотой модель олдсонг�
 
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
-msgstr "%(ct_id)s төрлийн %(obj_id)s id тай обект олдсонгүй"
+msgstr "%(ct_id)s төрлийн %(obj_id)s объект олдсонгүй"
 
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
 msgstr ""
-"%(ct_name)s обектууд дээр get_absolute_url() функцийг тодохройлоогүй байна."
+"%(ct_name)s объектууд дээр get_absolute_url() функцийг тодорхойлоогүй байна."

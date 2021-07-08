@@ -5,6 +5,11 @@ from .models import Account, Employee, Person, Profile, ProxyEmployee
 
 
 class UpdateOnlyFieldsTests(TestCase):
+    msg = (
+        'The following fields do not exist in this model, are m2m fields, or '
+        'are non-concrete fields: %s'
+    )
+
     def test_update_fields_basic(self):
         s = Person.objects.create(name='Sara', gender='F')
         self.assertEqual(s.gender, 'F')
@@ -120,7 +125,7 @@ class UpdateOnlyFieldsTests(TestCase):
         a2 = Account.objects.create(num=2)
         e1.accounts.set([a1, a2])
 
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, self.msg % 'accounts'):
             e1.save(update_fields=['accounts'])
 
     def test_update_fields_inheritance(self):
@@ -201,10 +206,12 @@ class UpdateOnlyFieldsTests(TestCase):
     def test_update_fields_incorrect_params(self):
         s = Person.objects.create(name='Sara', gender='F')
 
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, self.msg % 'first_name'):
             s.save(update_fields=['first_name'])
 
-        with self.assertRaises(ValueError):
+        # "name" is treated as an iterable so the output is something like
+        # "n, a, m, e" but the order isn't deterministic.
+        with self.assertRaisesMessage(ValueError, self.msg % ''):
             s.save(update_fields="name")
 
     def test_empty_update_fields(self):
@@ -250,3 +257,8 @@ class UpdateOnlyFieldsTests(TestCase):
         self.assertEqual(Person.objects.count(), 1)
         with self.assertNumQueries(2):
             s.save(update_fields=['name', 'employee_num'])
+
+    def test_update_non_concrete_field(self):
+        profile_boss = Profile.objects.create(name='Boss', salary=3000)
+        with self.assertRaisesMessage(ValueError, self.msg % 'non_concrete'):
+            profile_boss.save(update_fields=['non_concrete'])

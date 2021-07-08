@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -17,71 +17,71 @@ msgstr ""
 msgid "GIS"
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:78
+#: contrib/gis/db/models/fields.py:64
 msgid "The base GIS field."
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:165
+#: contrib/gis/db/models/fields.py:201
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:352
+#: contrib/gis/db/models/fields.py:285
 msgid "Point"
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:358
+#: contrib/gis/db/models/fields.py:292
 msgid "Line string"
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:364
+#: contrib/gis/db/models/fields.py:299
 msgid "Polygon"
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:370
+#: contrib/gis/db/models/fields.py:306
 msgid "Multi-point"
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:376
+#: contrib/gis/db/models/fields.py:313
 msgid "Multi-line string"
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:382
+#: contrib/gis/db/models/fields.py:320
 msgid "Multi polygon"
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:388
+#: contrib/gis/db/models/fields.py:327
 msgid "Geometry collection"
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:394
+#: contrib/gis/db/models/fields.py:333
 msgid "Extent Aggregate Field"
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:405
+#: contrib/gis/db/models/fields.py:348
 msgid "Raster Field"
 msgstr ""
 
-#: contrib/gis/forms/fields.py:20
+#: contrib/gis/forms/fields.py:19
 msgid "No geometry value provided."
 msgstr ""
 
-#: contrib/gis/forms/fields.py:21
+#: contrib/gis/forms/fields.py:20
 msgid "Invalid geometry value."
 msgstr ""
 
-#: contrib/gis/forms/fields.py:22
+#: contrib/gis/forms/fields.py:21
 msgid "Invalid geometry type."
 msgstr ""
 
-#: contrib/gis/forms/fields.py:23
+#: contrib/gis/forms/fields.py:22
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr ""
 
 #: contrib/gis/templates/gis/admin/openlayers.html:35
-#: contrib/gis/templates/gis/openlayers.html:18
+#: contrib/gis/templates/gis/openlayers.html:12
 msgid "Delete all Features"
 msgstr ""
 
@@ -93,11 +93,11 @@ msgstr ""
 msgid "Debugging window (serialized value)"
 msgstr ""
 
-#: contrib/gis/views.py:10
+#: contrib/gis/views.py:8
 msgid "No feeds are registered."
 msgstr ""
 
-#: contrib/gis/views.py:16
+#: contrib/gis/views.py:14
 #, python-format
-msgid "Slug %r isn't registered."
+msgid "Slug %r isn’t registered."
 msgstr ""

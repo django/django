@@ -1,20 +1,23 @@
+from unittest import mock
+
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
-from django.db.models import Prefetch, QuerySet
+from django.db.models import Prefetch, QuerySet, prefetch_related_objects
 from django.db.models.query import get_prefetcher
+from django.db.models.sql import Query
 from django.test import TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 
 from .models import (
-    Author, Author2, AuthorAddress, AuthorWithAge, Bio, Book, Bookmark,
-    BookReview, BookWithYear, Comment, Department, Employee, FavoriteAuthors,
-    House, LessonEntry, Person, Qualification, Reader, Room, TaggedItem,
-    Teacher, WordEntry,
+    Article, Author, Author2, AuthorAddress, AuthorWithAge, Bio, Book,
+    Bookmark, BookReview, BookWithYear, Comment, Department, Employee,
+    FavoriteAuthors, House, LessonEntry, ModelIterableSubclass, Person,
+    Qualification, Reader, Room, TaggedItem, Teacher, WordEntry,
 )
 
 
-class PrefetchRelatedTests(TestCase):
+class TestDataMixin:
     @classmethod
     def setUpTestData(cls):
         cls.book1 = Book.objects.create(title='Poems')
@@ -38,6 +41,8 @@ class PrefetchRelatedTests(TestCase):
         cls.reader1.books_read.add(cls.book1, cls.book4)
         cls.reader2.books_read.add(cls.book2, cls.book4)
 
+
+class PrefetchRelatedTests(TestDataMixin, TestCase):
     def assertWhereContains(self, sql, needle):
         where_idx = sql.index('WHERE')
         self.assertEqual(
@@ -71,7 +76,7 @@ class PrefetchRelatedTests(TestCase):
             [list(b.first_time_authors.all())
              for b in Book.objects.prefetch_related('first_time_authors')]
 
-        self.assertQuerysetEqual(self.book2.authors.all(), ["<Author: Charlotte>"])
+        self.assertSequenceEqual(self.book2.authors.all(), [self.author1])
 
     def test_onetoone_reverse_no_match(self):
         # Regression for #17439
@@ -80,6 +85,23 @@ class PrefetchRelatedTests(TestCase):
         with self.assertNumQueries(0):
             with self.assertRaises(BookWithYear.DoesNotExist):
                 book.bookwithyear
+
+    def test_onetoone_reverse_with_to_field_pk(self):
+        """
+        A model (Bio) with a OneToOneField primary key (author) that references
+        a non-pk field (name) on the related model (Author) is prefetchable.
+        """
+        Bio.objects.bulk_create([
+            Bio(author=self.author1),
+            Bio(author=self.author2),
+            Bio(author=self.author3),
+        ])
+        authors = Author.objects.filter(
+            name__in=[self.author1, self.author2, self.author3],
+        ).prefetch_related('bio')
+        with self.assertNumQueries(2):
+            for author in authors:
+                self.assertEqual(author.name, author.bio.author.name)
 
     def test_survives_clone(self):
         with self.assertNumQueries(2):
@@ -185,7 +207,7 @@ class PrefetchRelatedTests(TestCase):
 
     def test_reverse_one_to_one_then_m2m(self):
         """
-        A m2m relation can be followed afterr going through the select_related
+        A m2m relation can be followed after going through the select_related
         reverse of an o2o.
         """
         qs = Author.objects.prefetch_related('bio__books').select_related('bio')
@@ -199,18 +221,33 @@ class PrefetchRelatedTests(TestCase):
 
     def test_attribute_error(self):
         qs = Reader.objects.all().prefetch_related('books_read__xyz')
-        with self.assertRaises(AttributeError) as cm:
+        msg = (
+            "Cannot find 'xyz' on Book object, 'books_read__xyz' "
+            "is an invalid parameter to prefetch_related()"
+        )
+        with self.assertRaisesMessage(AttributeError, msg) as cm:
             list(qs)
 
         self.assertIn('prefetch_related', str(cm.exception))
 
     def test_invalid_final_lookup(self):
         qs = Book.objects.prefetch_related('authors__name')
-        with self.assertRaises(ValueError) as cm:
+        msg = (
+            "'authors__name' does not resolve to an item that supports "
+            "prefetching - this is an invalid parameter to prefetch_related()."
+        )
+        with self.assertRaisesMessage(ValueError, msg) as cm:
             list(qs)
 
         self.assertIn('prefetch_related', str(cm.exception))
         self.assertIn("name", str(cm.exception))
+
+    def test_prefetch_eq(self):
+        prefetch_1 = Prefetch('authors', queryset=Author.objects.all())
+        prefetch_2 = Prefetch('books', queryset=Book.objects.all())
+        self.assertEqual(prefetch_1, prefetch_1)
+        self.assertEqual(prefetch_1, mock.ANY)
+        self.assertNotEqual(prefetch_1, prefetch_2)
 
     def test_forward_m2m_to_attr_conflict(self):
         msg = 'to_attr=authors conflicts with a field on the Book model.'
@@ -254,6 +291,62 @@ class PrefetchRelatedTests(TestCase):
 
         sql = queries[-1]['sql']
         self.assertWhereContains(sql, self.author1.id)
+
+    def test_filter_deferred(self):
+        """
+        Related filtering of prefetched querysets is deferred on m2m and
+        reverse m2o relations until necessary.
+        """
+        add_q = Query.add_q
+        for relation in ['authors', 'first_time_authors']:
+            with self.subTest(relation=relation):
+                with mock.patch.object(
+                    Query,
+                    'add_q',
+                    autospec=True,
+                    side_effect=lambda self, q: add_q(self, q),
+                ) as add_q_mock:
+                    list(Book.objects.prefetch_related(relation))
+                    self.assertEqual(add_q_mock.call_count, 1)
+
+    def test_named_values_list(self):
+        qs = Author.objects.prefetch_related('books')
+        self.assertCountEqual(
+            [value.name for value in qs.values_list('name', named=True)],
+            ['Anne', 'Charlotte', 'Emily', 'Jane'],
+        )
+
+
+class RawQuerySetTests(TestDataMixin, TestCase):
+    def test_basic(self):
+        with self.assertNumQueries(2):
+            books = Book.objects.raw(
+                "SELECT * FROM prefetch_related_book WHERE id = %s",
+                (self.book1.id,)
+            ).prefetch_related('authors')
+            book1 = list(books)[0]
+
+        with self.assertNumQueries(0):
+            self.assertCountEqual(book1.authors.all(), [self.author1, self.author2, self.author3])
+
+    def test_prefetch_before_raw(self):
+        with self.assertNumQueries(2):
+            books = Book.objects.prefetch_related('authors').raw(
+                "SELECT * FROM prefetch_related_book WHERE id = %s",
+                (self.book1.id,)
+            )
+            book1 = list(books)[0]
+
+        with self.assertNumQueries(0):
+            self.assertCountEqual(book1.authors.all(), [self.author1, self.author2, self.author3])
+
+    def test_clear(self):
+        with self.assertNumQueries(5):
+            with_prefetch = Author.objects.raw(
+                "SELECT * FROM prefetch_related_author"
+            ).prefetch_related('books')
+            without_prefetch = with_prefetch.prefetch_related(None)
+            [list(a.books.all()) for a in without_prefetch]
 
 
 class CustomPrefetchTests(TestCase):
@@ -337,14 +430,27 @@ class CustomPrefetchTests(TestCase):
 
     def test_ambiguous(self):
         # Ambiguous: Lookup was already seen with a different queryset.
-        with self.assertRaises(ValueError):
-            self.traverse_qs(
-                Person.objects.prefetch_related('houses__rooms', Prefetch('houses', queryset=House.objects.all())),
-                [['houses', 'rooms']]
-            )
+        msg = (
+            "'houses' lookup was already seen with a different queryset. You "
+            "may need to adjust the ordering of your lookups."
+        )
+        # lookup.queryset shouldn't be evaluated.
+        with self.assertNumQueries(3):
+            with self.assertRaisesMessage(ValueError, msg):
+                self.traverse_qs(
+                    Person.objects.prefetch_related(
+                        'houses__rooms',
+                        Prefetch('houses', queryset=House.objects.all()),
+                    ),
+                    [['houses', 'rooms']],
+                )
 
         # Ambiguous: Lookup houses_lst doesn't yet exist when performing houses_lst__rooms.
-        with self.assertRaises(AttributeError):
+        msg = (
+            "Cannot find 'houses_lst' on Person object, 'houses_lst__rooms' is "
+            "an invalid parameter to prefetch_related()"
+        )
+        with self.assertRaisesMessage(AttributeError, msg):
             self.traverse_qs(
                 Person.objects.prefetch_related(
                     'houses_lst__rooms',
@@ -705,9 +811,33 @@ class CustomPrefetchTests(TestCase):
             self.room2_1
         )
 
+    def test_nested_prefetch_related_with_duplicate_prefetcher(self):
+        """
+        Nested prefetches whose name clashes with descriptor names
+        (Person.houses here) are allowed.
+        """
+        occupants = Person.objects.prefetch_related(
+            Prefetch('houses', to_attr='some_attr_name'),
+            Prefetch('houses', queryset=House.objects.prefetch_related('main_room')),
+        )
+        houses = House.objects.prefetch_related(Prefetch('occupants', queryset=occupants))
+        with self.assertNumQueries(5):
+            self.traverse_qs(list(houses), [['occupants', 'houses', 'main_room']])
+
     def test_values_queryset(self):
-        with self.assertRaisesMessage(ValueError, 'Prefetch querysets cannot use values().'):
+        msg = 'Prefetch querysets cannot use raw(), values(), and values_list().'
+        with self.assertRaisesMessage(ValueError, msg):
             Prefetch('houses', House.objects.values('pk'))
+        with self.assertRaisesMessage(ValueError, msg):
+            Prefetch('houses', House.objects.values_list('pk'))
+        # That error doesn't affect managers with custom ModelIterable subclasses
+        self.assertIs(Teacher.objects_custom.all()._iterable_class, ModelIterableSubclass)
+        Prefetch('teachers', Teacher.objects_custom.all())
+
+    def test_raw_queryset(self):
+        msg = 'Prefetch querysets cannot use raw(), values(), and values_list().'
+        with self.assertRaisesMessage(ValueError, msg):
+            Prefetch('houses', House.objects.raw('select pk from house'))
 
     def test_to_attr_doesnt_cache_through_attr_as_list(self):
         house = House.objects.prefetch_related(
@@ -726,28 +856,43 @@ class CustomPrefetchTests(TestCase):
             with self.assertNumQueries(0):
                 self.assertEqual(person.cached_all_houses, all_houses)
 
+    def test_filter_deferred(self):
+        """
+        Related filtering of prefetched querysets is deferred until necessary.
+        """
+        add_q = Query.add_q
+        with mock.patch.object(
+            Query,
+            'add_q',
+            autospec=True,
+            side_effect=lambda self, q: add_q(self, q),
+        ) as add_q_mock:
+            list(House.objects.prefetch_related(
+                Prefetch('occupants', queryset=Person.objects.all())
+            ))
+            self.assertEqual(add_q_mock.call_count, 1)
+
 
 class DefaultManagerTests(TestCase):
 
-    def setUp(self):
-        self.qual1 = Qualification.objects.create(name="BA")
-        self.qual2 = Qualification.objects.create(name="BSci")
-        self.qual3 = Qualification.objects.create(name="MA")
-        self.qual4 = Qualification.objects.create(name="PhD")
+    @classmethod
+    def setUpTestData(cls):
+        cls.qual1 = Qualification.objects.create(name='BA')
+        cls.qual2 = Qualification.objects.create(name='BSci')
+        cls.qual3 = Qualification.objects.create(name='MA')
+        cls.qual4 = Qualification.objects.create(name='PhD')
 
-        self.teacher1 = Teacher.objects.create(name="Mr Cleese")
-        self.teacher2 = Teacher.objects.create(name="Mr Idle")
-        self.teacher3 = Teacher.objects.create(name="Mr Chapman")
+        cls.teacher1 = Teacher.objects.create(name='Mr Cleese')
+        cls.teacher2 = Teacher.objects.create(name='Mr Idle')
+        cls.teacher3 = Teacher.objects.create(name='Mr Chapman')
+        cls.teacher1.qualifications.add(cls.qual1, cls.qual2, cls.qual3, cls.qual4)
+        cls.teacher2.qualifications.add(cls.qual1)
+        cls.teacher3.qualifications.add(cls.qual2)
 
-        self.teacher1.qualifications.add(self.qual1, self.qual2, self.qual3, self.qual4)
-        self.teacher2.qualifications.add(self.qual1)
-        self.teacher3.qualifications.add(self.qual2)
-
-        self.dept1 = Department.objects.create(name="English")
-        self.dept2 = Department.objects.create(name="Physics")
-
-        self.dept1.teachers.add(self.teacher1, self.teacher2)
-        self.dept2.teachers.add(self.teacher1, self.teacher3)
+        cls.dept1 = Department.objects.create(name='English')
+        cls.dept2 = Department.objects.create(name='Physics')
+        cls.dept1.teachers.add(cls.teacher1, cls.teacher2)
+        cls.dept2.teachers.add(cls.teacher1, cls.teacher3)
 
     def test_m2m_then_m2m(self):
         with self.assertNumQueries(3):
@@ -802,6 +947,19 @@ class GenericRelationTests(TestCase):
             qs = Comment.objects.prefetch_related('content_object')
             [c.content_object for c in qs]
 
+    def test_prefetch_GFK_uuid_pk(self):
+        article = Article.objects.create(name='Django')
+        Comment.objects.create(comment='awesome', content_object_uuid=article)
+        qs = Comment.objects.prefetch_related('content_object_uuid')
+        self.assertEqual([c.content_object_uuid for c in qs], [article])
+
+    def test_prefetch_GFK_fk_pk(self):
+        book = Book.objects.create(title='Poems')
+        book_with_year = BookWithYear.objects.create(book=book, published_year=2019)
+        Comment.objects.create(comment='awesome', content_object=book_with_year)
+        qs = Comment.objects.prefetch_related('content_object')
+        self.assertEqual([c.content_object for c in qs], [book_with_year])
+
     def test_traverse_GFK(self):
         """
         A 'content_object' can be traversed with prefetch_related() and
@@ -855,7 +1013,7 @@ class GenericRelationTests(TestCase):
 
         with self.assertNumQueries(3):
             bookmark = Bookmark.objects.filter(pk=b.pk).prefetch_related('tags', 'favorite_tags')[0]
-            self.assertEqual(sorted([i.tag for i in bookmark.tags.all()]), ["django", "python"])
+            self.assertEqual(sorted(i.tag for i in bookmark.tags.all()), ["django", "python"])
             self.assertEqual([i.tag for i in bookmark.favorite_tags.all()], ["python"])
 
     def test_custom_queryset(self):
@@ -978,42 +1136,42 @@ class LookupOrderingTest(TestCase):
     ensure it is preserved.
     """
 
-    def setUp(self):
-        self.person1 = Person.objects.create(name="Joe")
-        self.person2 = Person.objects.create(name="Mary")
+    @classmethod
+    def setUpTestData(cls):
+        person1 = Person.objects.create(name='Joe')
+        person2 = Person.objects.create(name='Mary')
 
         # Set main_room for each house before creating the next one for
         # databases where supports_nullable_unique_constraints is False.
+        house1 = House.objects.create(address='123 Main St')
+        room1_1 = Room.objects.create(name='Dining room', house=house1)
+        Room.objects.create(name='Lounge', house=house1)
+        Room.objects.create(name='Kitchen', house=house1)
+        house1.main_room = room1_1
+        house1.save()
+        person1.houses.add(house1)
 
-        self.house1 = House.objects.create(address="123 Main St")
-        self.room1_1 = Room.objects.create(name="Dining room", house=self.house1)
-        self.room1_2 = Room.objects.create(name="Lounge", house=self.house1)
-        self.room1_3 = Room.objects.create(name="Kitchen", house=self.house1)
-        self.house1.main_room = self.room1_1
-        self.house1.save()
-        self.person1.houses.add(self.house1)
+        house2 = House.objects.create(address='45 Side St')
+        room2_1 = Room.objects.create(name='Dining room', house=house2)
+        Room.objects.create(name='Lounge', house=house2)
+        house2.main_room = room2_1
+        house2.save()
+        person1.houses.add(house2)
 
-        self.house2 = House.objects.create(address="45 Side St")
-        self.room2_1 = Room.objects.create(name="Dining room", house=self.house2)
-        self.room2_2 = Room.objects.create(name="Lounge", house=self.house2)
-        self.house2.main_room = self.room2_1
-        self.house2.save()
-        self.person1.houses.add(self.house2)
+        house3 = House.objects.create(address='6 Downing St')
+        room3_1 = Room.objects.create(name='Dining room', house=house3)
+        Room.objects.create(name='Lounge', house=house3)
+        Room.objects.create(name='Kitchen', house=house3)
+        house3.main_room = room3_1
+        house3.save()
+        person2.houses.add(house3)
 
-        self.house3 = House.objects.create(address="6 Downing St")
-        self.room3_1 = Room.objects.create(name="Dining room", house=self.house3)
-        self.room3_2 = Room.objects.create(name="Lounge", house=self.house3)
-        self.room3_3 = Room.objects.create(name="Kitchen", house=self.house3)
-        self.house3.main_room = self.room3_1
-        self.house3.save()
-        self.person2.houses.add(self.house3)
-
-        self.house4 = House.objects.create(address="7 Regents St")
-        self.room4_1 = Room.objects.create(name="Dining room", house=self.house4)
-        self.room4_2 = Room.objects.create(name="Lounge", house=self.house4)
-        self.house4.main_room = self.room4_1
-        self.house4.save()
-        self.person2.houses.add(self.house4)
+        house4 = House.objects.create(address='7 Regents St')
+        room4_1 = Room.objects.create(name='Dining room', house=house4)
+        Room.objects.create(name='Lounge', house=house4)
+        house4.main_room = room4_1
+        house4.save()
+        person2.houses.add(house4)
 
     def test_order(self):
         with self.assertNumQueries(4):
@@ -1072,7 +1230,7 @@ class NullableTest(TestCase):
 
 
 class MultiDbTests(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     def test_using_is_honored_m2m(self):
         B = Book.objects.using('other')
@@ -1200,44 +1358,46 @@ class MultiDbTests(TestCase):
 
 
 class Ticket19607Tests(TestCase):
-
-    def setUp(self):
-
-        for id, name1, name2 in [
-            (1, 'einfach', 'simple'),
-            (2, 'schwierig', 'difficult'),
-        ]:
-            LessonEntry.objects.create(id=id, name1=name1, name2=name2)
-
-        for id, lesson_entry_id, name in [
-            (1, 1, 'einfach'),
-            (2, 1, 'simple'),
-            (3, 2, 'schwierig'),
-            (4, 2, 'difficult'),
-        ]:
-            WordEntry.objects.create(id=id, lesson_entry_id=lesson_entry_id, name=name)
+    @classmethod
+    def setUpTestData(cls):
+        LessonEntry.objects.bulk_create(
+            LessonEntry(id=id_, name1=name1, name2=name2)
+            for id_, name1, name2 in [
+                (1, 'einfach', 'simple'),
+                (2, 'schwierig', 'difficult'),
+            ]
+        )
+        WordEntry.objects.bulk_create(
+            WordEntry(id=id_, lesson_entry_id=lesson_entry_id, name=name)
+            for id_, lesson_entry_id, name in [
+                (1, 1, 'einfach'),
+                (2, 1, 'simple'),
+                (3, 2, 'schwierig'),
+                (4, 2, 'difficult'),
+            ]
+        )
 
     def test_bug(self):
         list(WordEntry.objects.prefetch_related('lesson_entry', 'lesson_entry__wordentry_set'))
 
 
 class Ticket21410Tests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        book1 = Book.objects.create(title='Poems')
+        book2 = Book.objects.create(title='Jane Eyre')
+        book3 = Book.objects.create(title='Wuthering Heights')
+        book4 = Book.objects.create(title='Sense and Sensibility')
 
-    def setUp(self):
-        self.book1 = Book.objects.create(title="Poems")
-        self.book2 = Book.objects.create(title="Jane Eyre")
-        self.book3 = Book.objects.create(title="Wuthering Heights")
-        self.book4 = Book.objects.create(title="Sense and Sensibility")
+        author1 = Author2.objects.create(name='Charlotte', first_book=book1)
+        author2 = Author2.objects.create(name='Anne', first_book=book1)
+        author3 = Author2.objects.create(name='Emily', first_book=book1)
+        author4 = Author2.objects.create(name='Jane', first_book=book4)
 
-        self.author1 = Author2.objects.create(name="Charlotte", first_book=self.book1)
-        self.author2 = Author2.objects.create(name="Anne", first_book=self.book1)
-        self.author3 = Author2.objects.create(name="Emily", first_book=self.book1)
-        self.author4 = Author2.objects.create(name="Jane", first_book=self.book4)
-
-        self.author1.favorite_books.add(self.book1, self.book2, self.book3)
-        self.author2.favorite_books.add(self.book1)
-        self.author3.favorite_books.add(self.book2)
-        self.author4.favorite_books.add(self.book3)
+        author1.favorite_books.add(book1, book2, book3)
+        author2.favorite_books.add(book1)
+        author3.favorite_books.add(book2)
+        author4.favorite_books.add(book3)
 
     def test_bug(self):
         list(Author2.objects.prefetch_related('first_book', 'favorite_books'))
@@ -1245,15 +1405,16 @@ class Ticket21410Tests(TestCase):
 
 class Ticket21760Tests(TestCase):
 
-    def setUp(self):
-        self.rooms = []
+    @classmethod
+    def setUpTestData(cls):
+        cls.rooms = []
         for _ in range(3):
             house = House.objects.create()
             for _ in range(3):
-                self.rooms.append(Room.objects.create(house=house))
+                cls.rooms.append(Room.objects.create(house=house))
             # Set main_room for each house before creating the next one for
             # databases where supports_nullable_unique_constraints is False.
-            house.main_room = self.rooms[-3]
+            house.main_room = cls.rooms[-3]
             house.save()
 
     def test_bug(self):
@@ -1262,13 +1423,19 @@ class Ticket21760Tests(TestCase):
         self.assertNotIn(' JOIN ', str(queryset.query))
 
 
-class Ticket25546Tests(TestCase):
+class DirectPrefetchedObjectCacheReuseTests(TestCase):
     """
-    Nested prefetch_related() shouldn't trigger duplicate queries for the same
-    lookup.
+    prefetch_related() reuses objects fetched in _prefetched_objects_cache.
 
-    Before, prefetch queries were for 'addresses', 'first_time_authors', and
-    'first_time_authors__addresses'. The last query is the duplicate.
+    When objects are prefetched and not stored as an instance attribute (often
+    intermediary relationships), they are saved to the
+    _prefetched_objects_cache attribute. prefetch_related() takes
+    _prefetched_objects_cache into account when determining whether an object
+    has been fetched[1] and retrieves results from it when it is populated [2].
+
+    [1]: #25546 (duplicate queries on nested Prefetch)
+    [2]: #27554 (queryset evaluation fails with a mix of nested and flattened
+        prefetches)
     """
 
     @classmethod
@@ -1287,8 +1454,14 @@ class Ticket25546Tests(TestCase):
             AuthorAddress.objects.create(author=cls.author12, address='Haunted house'),
             AuthorAddress.objects.create(author=cls.author21, address='Happy place'),
         ]
+        cls.bookwithyear1 = BookWithYear.objects.create(title='Poems', published_year=2010)
+        cls.bookreview1 = BookReview.objects.create(book=cls.bookwithyear1)
 
-    def test_prefetch(self):
+    def test_detect_is_fetched(self):
+        """
+        Nested prefetch_related() shouldn't trigger duplicate queries for the same
+        lookup.
+        """
         with self.assertNumQueries(3):
             books = Book.objects.filter(
                 title__in=['book1', 'book2'],
@@ -1332,7 +1505,7 @@ class Ticket25546Tests(TestCase):
             list(book2.first_time_authors.all()[0].addresses.all().all())
         )
 
-    def test_prefetch_with_to_attr(self):
+    def test_detect_is_fetched_with_to_attr(self):
         with self.assertNumQueries(3):
             books = Book.objects.filter(
                 title__in=['book1', 'book2'],
@@ -1358,3 +1531,60 @@ class Ticket25546Tests(TestCase):
             self.assertEqual(book1.first_authors[0].happy_place, [self.author1_address1])
             self.assertEqual(book1.first_authors[1].happy_place, [])
             self.assertEqual(book2.first_authors[0].happy_place, [self.author2_address1])
+
+    def test_prefetch_reverse_foreign_key(self):
+        with self.assertNumQueries(2):
+            bookwithyear1, = BookWithYear.objects.prefetch_related('bookreview_set')
+        with self.assertNumQueries(0):
+            self.assertCountEqual(bookwithyear1.bookreview_set.all(), [self.bookreview1])
+        with self.assertNumQueries(0):
+            prefetch_related_objects([bookwithyear1], 'bookreview_set')
+
+    def test_add_clears_prefetched_objects(self):
+        bookwithyear = BookWithYear.objects.get(pk=self.bookwithyear1.pk)
+        prefetch_related_objects([bookwithyear], 'bookreview_set')
+        self.assertCountEqual(bookwithyear.bookreview_set.all(), [self.bookreview1])
+        new_review = BookReview.objects.create()
+        bookwithyear.bookreview_set.add(new_review)
+        self.assertCountEqual(bookwithyear.bookreview_set.all(), [self.bookreview1, new_review])
+
+    def test_remove_clears_prefetched_objects(self):
+        bookwithyear = BookWithYear.objects.get(pk=self.bookwithyear1.pk)
+        prefetch_related_objects([bookwithyear], 'bookreview_set')
+        self.assertCountEqual(bookwithyear.bookreview_set.all(), [self.bookreview1])
+        bookwithyear.bookreview_set.remove(self.bookreview1)
+        self.assertCountEqual(bookwithyear.bookreview_set.all(), [])
+
+
+class ReadPrefetchedObjectsCacheTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.book1 = Book.objects.create(title='Les confessions Volume I')
+        cls.book2 = Book.objects.create(title='Candide')
+        cls.author1 = AuthorWithAge.objects.create(name='Rousseau', first_book=cls.book1, age=70)
+        cls.author2 = AuthorWithAge.objects.create(name='Voltaire', first_book=cls.book2, age=65)
+        cls.book1.authors.add(cls.author1)
+        cls.book2.authors.add(cls.author2)
+        FavoriteAuthors.objects.create(author=cls.author1, likes_author=cls.author2)
+
+    def test_retrieves_results_from_prefetched_objects_cache(self):
+        """
+        When intermediary results are prefetched without a destination
+        attribute, they are saved in the RelatedManager's cache
+        (_prefetched_objects_cache). prefetch_related() uses this cache
+        (#27554).
+        """
+        authors = AuthorWithAge.objects.prefetch_related(
+            Prefetch(
+                'author',
+                queryset=Author.objects.prefetch_related(
+                    # Results are saved in the RelatedManager's cache
+                    # (_prefetched_objects_cache) and do not replace the
+                    # RelatedManager on Author instances (favorite_authors)
+                    Prefetch('favorite_authors__first_book'),
+                ),
+            ),
+        )
+        with self.assertNumQueries(4):
+            # AuthorWithAge -> Author -> FavoriteAuthors, Book
+            self.assertSequenceEqual(authors, [self.author1, self.author2])

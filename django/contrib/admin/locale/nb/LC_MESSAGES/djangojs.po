@@ -3,16 +3,17 @@
 # Translators:
 # Eirik Krogstad <eirikkr@gmail.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Jon <jon@funkbit.no>, 2015-2016
-# Jon <jon@funkbit.no>, 2014
-# Jon <jon@funkbit.no>, 2011-2012
+# Jon, 2015-2016
+# Jon, 2014
+# Jon, 2020-2021
+# Jon, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-27 09:11+0000\n"
-"Last-Translator: Jon <jon@funkbit.no>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-03-18 14:20+0000\n"
+"Last-Translator: Jon\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -85,21 +86,36 @@ msgstr ""
 "handling, vil dine ulagrede endringer gå tapt."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Du har valgt en handling, men du har ikke lagret dine endringer i "
+"Du har valgt en handling, men du har ikke lagret endringene dine i "
 "individuelle felter enda. Vennligst trykk OK for å lagre. Du må utføre "
 "handlingen på nytt."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
 "Du har valgt en handling, og har ikke gjort noen endringer i individuelle "
 "felter. Du ser mest sannsynlig etter Gå-knappen, ikke Lagre-knappen."
+
+msgid "Now"
+msgstr "Nå"
+
+msgid "Midnight"
+msgstr "Midnatt"
+
+msgid "6 a.m."
+msgstr "06:00"
+
+msgid "Noon"
+msgstr "12:00"
+
+msgid "6 p.m."
+msgstr "18:00"
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
@@ -113,26 +129,11 @@ msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "Merk: Du er %s time bak server-tid."
 msgstr[1] "Merk: Du er %s timer bak server-tid."
 
-msgid "Now"
-msgstr "Nå"
-
 msgid "Choose a Time"
 msgstr "Velg et klokkeslett"
 
 msgid "Choose a time"
 msgstr "Velg et klokkeslett"
-
-msgid "Midnight"
-msgstr "Midnatt"
-
-msgid "6 a.m."
-msgstr "06:00"
-
-msgid "Noon"
-msgstr "12:00"
-
-msgid "6 p.m."
-msgstr "18:00"
 
 msgid "Cancel"
 msgstr "Avbryt"
@@ -184,6 +185,54 @@ msgstr "November"
 
 msgid "December"
 msgstr "Desember"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Jan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Feb"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mar"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Mai"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Jun"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Jul"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Aug"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Sep"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Des"
 
 msgctxt "one letter Sunday"
 msgid "S"

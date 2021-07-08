@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016
+# Michael Wolf <milupo@sorbzilla.de>, 2016,2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2016-08-05 08:21+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2018-05-26 11:14+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
 "language/hsb/)\n"
@@ -21,17 +21,60 @@ msgstr ""
 msgid "Humanize"
 msgstr "Humanize"
 
-msgid "th"
-msgstr "."
+#. Translators: Ordinal format for 11 (11th), 12 (12th), and 13 (13th).
+msgctxt "ordinal 11, 12, 13"
+msgid "{}th"
+msgstr "{}."
 
-msgid "st"
-msgstr "."
+#. Translators: Ordinal format when value ends with 0, e.g. 80th.
+msgctxt "ordinal 0"
+msgid "{}th"
+msgstr "{}."
 
-msgid "nd"
-msgstr "."
+#. Translators: Ordinal format when value ends with 1, e.g. 81st, except 11.
+msgctxt "ordinal 1"
+msgid "{}st"
+msgstr "{}."
 
-msgid "rd"
-msgstr "."
+#. Translators: Ordinal format when value ends with 2, e.g. 82nd, except 12.
+msgctxt "ordinal 2"
+msgid "{}nd"
+msgstr "{}."
+
+#. Translators: Ordinal format when value ends with 3, e.g. 83th, except 13.
+msgctxt "ordinal 3"
+msgid "{}rd"
+msgstr "{}."
+
+#. Translators: Ordinal format when value ends with 4, e.g. 84th.
+msgctxt "ordinal 4"
+msgid "{}th"
+msgstr "{}."
+
+#. Translators: Ordinal format when value ends with 5, e.g. 85th.
+msgctxt "ordinal 5"
+msgid "{}th"
+msgstr "{}."
+
+#. Translators: Ordinal format when value ends with 6, e.g. 86th.
+msgctxt "ordinal 6"
+msgid "{}th"
+msgstr "{}."
+
+#. Translators: Ordinal format when value ends with 7, e.g. 87th.
+msgctxt "ordinal 7"
+msgid "{}th"
+msgstr "{}."
+
+#. Translators: Ordinal format when value ends with 8, e.g. 88th.
+msgctxt "ordinal 8"
+msgid "{}th"
+msgstr "{}."
+
+#. Translators: Ordinal format when value ends with 9, e.g. 89th.
+msgctxt "ordinal 9"
+msgid "{}th"
+msgstr "{}."
 
 #, python-format
 msgid "%(value).1f million"
@@ -245,36 +288,14 @@ msgstr "jutře"
 msgid "yesterday"
 msgstr "wčera"
 
+#. Translators: delta will contain a string like '2 months' or '1 month, 2
+#. weeks'
 #, python-format
-msgctxt "naturaltime"
 msgid "%(delta)s ago"
-msgstr "před %(delta)s"
+msgstr "Před %(delta)s"
 
-msgid "now"
-msgstr "nětko"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a second ago"
-msgid_plural "%(count)s seconds ago"
-msgstr[0] "před %(count)s sekundu"
-msgstr[1] "před %(count)s sekundomaj"
-msgstr[2] "před %(count)s sekundami"
-msgstr[3] "před %(count)s sekundami"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a minute ago"
-msgid_plural "%(count)s minutes ago"
-msgstr[0] "před %(count)s mjeńšinu"
-msgstr[1] "před %(count)s mjeńšinomaj"
-msgstr[2] "před %(count)s mjeńšinami"
-msgstr[3] "před %(count)s mjeńšinami"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
@@ -283,13 +304,31 @@ msgstr[1] "před %(count)s hodźinomaj"
 msgstr[2] "před %(count)s hodźinami"
 msgstr[3] "před %(count)s hodźinami"
 
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
 #, python-format
-msgctxt "naturaltime"
-msgid "%(delta)s from now"
-msgstr "za %(delta)s"
+msgid "a minute ago"
+msgid_plural "%(count)s minutes ago"
+msgstr[0] "před %(count)s mjeńšinu"
+msgstr[1] "před %(count)s mjeńšinomaj"
+msgstr[2] "před %(count)s mjeńšinami"
+msgstr[3] "před %(count)s mjeńšinami"
 
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a second ago"
+msgid_plural "%(count)s seconds ago"
+msgstr[0] "před %(count)s sekundu"
+msgstr[1] "před %(count)s sekundomaj"
+msgstr[2] "před %(count)s sekundami"
+msgstr[3] "před %(count)s sekundami"
+
+msgid "now"
+msgstr "nětko"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
@@ -298,8 +337,8 @@ msgstr[1] "za %(count)s sekundźe"
 msgstr[2] "za %(count)s sekundy"
 msgstr[3] "za %(count)s sekundow"
 
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
 #, python-format
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
@@ -308,8 +347,8 @@ msgstr[1] "za %(count)s mjeńšinje"
 msgstr[2] "za %(count)s mjeńšiny"
 msgstr[3] "za %(count)s mjeńšin"
 
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
 #, python-format
 msgid "an hour from now"
 msgid_plural "%(count)s hours from now"
@@ -317,3 +356,120 @@ msgstr[0] "za %(count)s hodźinu"
 msgstr[1] "za %(count)s hodźinje"
 msgstr[2] "za %(count)s hodźiny"
 msgstr[3] "za %(count)s hodźin"
+
+#. Translators: delta will contain a string like '2 months' or '1 month, 2
+#. weeks'
+#, python-format
+msgid "%(delta)s from now"
+msgstr "%(delta)s wotnětka"
+
+#. Translators: 'naturaltime-past' strings will be included in '%(delta)s ago'
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "%d lětom"
+msgstr[1] "%d lětomaj"
+msgstr[2] "%d lětami"
+msgstr[3] "%d lětami"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] "%d měsacom"
+msgstr[1] "%d měsacomaj"
+msgstr[2] "%d měsacami"
+msgstr[3] "%d měsacami"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] "%d tydźenjom"
+msgstr[1] "%d tydźenjomaj"
+msgstr[2] "%d tydźenjemi"
+msgstr[3] "%d tydźenjemi"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d dnjom"
+msgstr[1] "%d dnjomaj"
+msgstr[2] "%d dnjemi"
+msgstr[3] "%d dnjemi"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d hodźinu"
+msgstr[1] "%d hodźinomaj"
+msgstr[2] "%d hodźinami"
+msgstr[3] "%d hodźinami"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d mjeńšinu"
+msgstr[1] "%d mjeńšinomaj"
+msgstr[2] "%d mjeńšinami"
+msgstr[3] "%d mjeńšinami"
+
+#. Translators: 'naturaltime-future' strings will be included in '%(delta)s
+#. from now'
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "%d lěto"
+msgstr[1] "%d lěće"
+msgstr[2] "%d lěta"
+msgstr[3] "%d lět"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] "%d měsac"
+msgstr[1] "%d měsacaj"
+msgstr[2] "%d měsacy"
+msgstr[3] "%d měsacow"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] "%d tydźeń"
+msgstr[1] "%d njedźeli"
+msgstr[2] "%d njedźele"
+msgstr[3] "%d njedźel"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d źeń"
+msgstr[1] "%d dnjej"
+msgstr[2] "%d dny"
+msgstr[3] "%d dnjow"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d hodźina"
+msgstr[1] "%d hodźinje"
+msgstr[2] "%d hodźiny"
+msgstr[3] "%d hodźin"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d mjeńšina"
+msgstr[1] "%d mjeńšinje"
+msgstr[2] "%d mjeńšiny"
+msgstr[3] "%d mjeńšin"

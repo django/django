@@ -4,14 +4,15 @@
 # Andreas Pelme <andreas@pelme.se>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2014
-# Thomas Lundqvist <thomas@biljettshop.se>, 2016
+# Petter Strandmark <petter.strandmark@gmail.com>, 2019
+# Thomas Lundqvist, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-03-23 11:23+0000\n"
-"Last-Translator: Thomas Lundqvist <thomas@biljettshop.se>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-28 13:46+0000\n"
+"Last-Translator: Petter Strandmark <petter.strandmark@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -40,6 +41,9 @@ msgid ""
 msgstr ""
 "Detta värde får endast innehålla bokstäver, siffror, punkter, understreck, "
 "bindestreck, snedstreck och tilde."
+
+msgid "Example: '/about/contact'. Make sure to have a leading slash."
+msgstr "Exempel: '/about/contact'. Se till att den börjar med ett snedstreck."
 
 msgid "URL is missing a leading slash."
 msgstr "URL:en saknar ett inledande snedstreck."

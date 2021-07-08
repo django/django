@@ -1,15 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Branko Kokanovic <branko@kokanovic.org>, 2018
+# Igor Jerosimić, 2021
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 10:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-15 16:56+0000\n"
+"Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -83,39 +85,24 @@ msgstr ""
 "Имате несачиване измене. Ако покренете акцију, измене ће бити изгубљене."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
-msgstr "Изабрали сте акцију али нисте сачували промене поља."
+msgstr ""
+"Изабрали сте акцију, али нисте сачували ваше промене у појединачна поља. "
+"Кликните на OK да сачувате промене. Биће неопходно да поново покренете "
+"акцију."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
-msgstr "Изабрали сте акцију али нисте изменили ни једно поље."
-
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr ""
+"Изабрали сте акцију и нисте направили ниједну промену на појединачним "
+"пољима. Вероватно тражите Крени дугме уместо Сачувај."
 
 msgid "Now"
 msgstr "Тренутно време"
-
-msgid "Choose a Time"
-msgstr ""
-
-msgid "Choose a time"
-msgstr "Одабир времена"
 
 msgid "Midnight"
 msgstr "Поноћ"
@@ -127,7 +114,27 @@ msgid "Noon"
 msgstr "Подне"
 
 msgid "6 p.m."
-msgstr ""
+msgstr "18ч"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Обавештење: %s сат сте испред серверског времена."
+msgstr[1] "Обавештење: %s сата сте испред серверског времена."
+msgstr[2] "Обавештење: %s сати сте испред серверског времена."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Обавештење: %s сат сте иза серверског времена."
+msgstr[1] "Обавештење: %s сата сте иза серверског времена."
+msgstr[2] "Обавештење: %s сати сте иза серверског времена."
+
+msgid "Choose a Time"
+msgstr "Одаберите време"
+
+msgid "Choose a time"
+msgstr "Одабир времена"
 
 msgid "Cancel"
 msgstr "Поништи"
@@ -136,7 +143,7 @@ msgid "Today"
 msgstr "Данас"
 
 msgid "Choose a Date"
-msgstr ""
+msgstr "Одаберите датум"
 
 msgid "Yesterday"
 msgstr "Јуче"
@@ -145,68 +152,116 @@ msgid "Tomorrow"
 msgstr "Сутра"
 
 msgid "January"
-msgstr ""
+msgstr "Јануар"
 
 msgid "February"
-msgstr ""
+msgstr "Фебруар"
 
 msgid "March"
-msgstr ""
+msgstr "Март"
 
 msgid "April"
-msgstr ""
+msgstr "Април"
 
 msgid "May"
-msgstr ""
+msgstr "Мај"
 
 msgid "June"
-msgstr ""
+msgstr "Јун"
 
 msgid "July"
-msgstr ""
+msgstr "Јул"
 
 msgid "August"
-msgstr ""
+msgstr "Август"
 
 msgid "September"
-msgstr ""
+msgstr "Септембар"
 
 msgid "October"
-msgstr ""
+msgstr "Октобар"
 
 msgid "November"
-msgstr ""
+msgstr "Новембар"
 
 msgid "December"
-msgstr ""
+msgstr "Децембар"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "јан"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "феб"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "март"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "апр"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "мај"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "јун"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "јул"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "авг"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "сеп"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "окт"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "нов"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "дец"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "Н"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "П"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "У"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "С"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "Ч"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "П"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "С"
 
 msgid "Show"
 msgstr "Покажи"

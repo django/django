@@ -27,11 +27,18 @@
   NAD83 / Texas South Central
 """
 from ctypes import byref, c_char_p, c_int
+from enum import IntEnum
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import SRSException
+from django.contrib.gis.gdal.libgdal import GDAL_VERSION
 from django.contrib.gis.gdal.prototypes import srs as capi
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes, force_str
+
+
+class AxisOrder(IntEnum):
+    TRADITIONAL = 0
+    AUTHORITY = 1
 
 
 class SpatialReference(GDALBase):
@@ -42,17 +49,25 @@ class SpatialReference(GDALBase):
     """
     destructor = capi.release_srs
 
-    def __init__(self, srs_input='', srs_type='user'):
+    def __init__(self, srs_input='', srs_type='user', axis_order=None):
         """
         Create a GDAL OSR Spatial Reference object from the given input.
         The input may be string of OGC Well Known Text (WKT), an integer
-        EPSG code, a PROJ.4 string, and/or a projection "well known" shorthand
+        EPSG code, a PROJ string, and/or a projection "well known" shorthand
         string (one of 'WGS84', 'WGS72', 'NAD27', 'NAD83').
         """
-
+        if not isinstance(axis_order, (type(None), AxisOrder)):
+            raise ValueError(
+                'SpatialReference.axis_order must be an AxisOrder instance.'
+            )
+        self.axis_order = axis_order or AxisOrder.TRADITIONAL
         if srs_type == 'wkt':
             self.ptr = capi.new_srs(c_char_p(b''))
             self.import_wkt(srs_input)
+            if self.axis_order == AxisOrder.TRADITIONAL and GDAL_VERSION >= (3, 0):
+                capi.set_axis_strategy(self.ptr, self.axis_order)
+            elif self.axis_order != AxisOrder.TRADITIONAL and GDAL_VERSION < (3, 0):
+                raise ValueError('%s is not supported in GDAL < 3.0.' % self.axis_order)
             return
         elif isinstance(srs_input, str):
             try:
@@ -85,6 +100,10 @@ class SpatialReference(GDALBase):
         else:
             self.ptr = srs
 
+        if self.axis_order == AxisOrder.TRADITIONAL and GDAL_VERSION >= (3, 0):
+            capi.set_axis_strategy(self.ptr, self.axis_order)
+        elif self.axis_order != AxisOrder.TRADITIONAL and GDAL_VERSION < (3, 0):
+            raise ValueError('%s is not supported in GDAL < 3.0.' % self.axis_order)
         # Importing from either the user input string or an integer SRID.
         if srs_type == 'user':
             self.import_user_input(srs_input)
@@ -143,7 +162,7 @@ class SpatialReference(GDALBase):
 
     def clone(self):
         "Return a clone of this SpatialReference object."
-        return SpatialReference(capi.clone_srs(self.ptr))
+        return SpatialReference(capi.clone_srs(self.ptr), axis_order=self.axis_order)
 
     def from_esri(self):
         "Morph this SpatialReference from ESRI's format to EPSG."
@@ -222,7 +241,7 @@ class SpatialReference(GDALBase):
         elif self.geographic:
             units, name = capi.angular_units(self.ptr, byref(c_char_p()))
         if name is not None:
-            name = force_text(name)
+            name = force_str(name)
         return (units, name)
 
     # #### Spheroid/Ellipsoid Properties ####
@@ -277,7 +296,7 @@ class SpatialReference(GDALBase):
         capi.from_epsg(self.ptr, epsg)
 
     def import_proj(self, proj):
-        "Import the Spatial Reference from a PROJ.4 string."
+        """Import the Spatial Reference from a PROJ string."""
         capi.from_proj(self.ptr, proj)
 
     def import_user_input(self, user_input):
@@ -305,7 +324,7 @@ class SpatialReference(GDALBase):
 
     @property
     def proj(self):
-        "Return the PROJ.4 representation for this Spatial Reference."
+        """Return the PROJ representation for this Spatial Reference."""
         return capi.to_proj(self.ptr, byref(c_char_p()))
 
     @property

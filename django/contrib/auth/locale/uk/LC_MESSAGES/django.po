@@ -3,29 +3,32 @@
 # Translators:
 # captain_m4l <qotsaman@gmail.com>, 2012
 # Igor Melnyk, 2014-2015
+# Illia Volochii <illia.volochii@gmail.com>, 2021
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2015
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
 # captain_m4l <qotsaman@gmail.com>, 2012
 # Mykola Zamkovoi <nickzam@gmail.com>, 2014
-# Oleksandr Bolotov <oleksandr.bolotov@gmail.com>, 2013
+# Alex Bolotov <oleksandr.bolotov@gmail.com>, 2013
 # Vitaliy Kozlovskyi <ubombi@gmail.com>, 2015
-# Zoriana Zaiats, 2016
+# Zoriana Zaiats, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-25 11:46+0000\n"
-"Last-Translator: Zoriana Zaiats\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2021-01-19 23:40+0000\n"
+"Last-Translator: Illia Volochii <illia.volochii@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: uk\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != "
+"11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % "
+"100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
+"(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
 msgid "Personal info"
 msgstr "Персональна інформація"
@@ -62,8 +65,8 @@ msgstr "Пароль не встановлено."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Невірний формат пароля або невідомий алгоритм хешування."
 
-msgid "The two password fields didn't match."
-msgstr "Паролі у двох полях не співпадають."
+msgid "The two password fields didn’t match."
+msgstr "Паролі не збігаються"
 
 msgid "Password"
 msgstr "Пароль"
@@ -75,13 +78,12 @@ msgid "Enter the same password as before, for verification."
 msgstr "Введіть той же пароль, що і раніше, для підтвердження."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Відкритими паролі не зберігаються, тому немає можливості їх переглянути, але "
-"ви можете змінити пароль використовуючи <a href=\"../password/\">цю форму</"
-"a>."
+"Паролі не зберігаються у відкритому вигляді, тому немає можливості "
+"переглянути пароль цього користувача, але ви можете змінити пароль за "
+"допомогою <a href=\"{}\">цієї форми</a>."
 
 #, python-format
 msgid ""
@@ -245,6 +247,8 @@ msgstr[1] ""
 "Пароль надто короткий. Він повинен містити як мінімум %(min_length)d символи"
 msgstr[2] ""
 "Пароль надто короткий. Він повинен містити як мінімум %(min_length)d символів"
+msgstr[3] ""
+"Пароль надто короткий. Він повинен містити як мінімум %(min_length)d символів"
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -252,25 +256,26 @@ msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] "Ваш пароль повинен містити як мінімум %(min_length)d символ"
 msgstr[1] "Ваш пароль повинен містити як мінімум %(min_length)d символи"
 msgstr[2] "Ваш пароль повинен містити як мінімум %(min_length)d символів"
+msgstr[3] "Ваш пароль повинен містити як мінімум %(min_length)d символів"
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Пароль надто схожий на %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
-msgstr "Пароль не повинен бути надто схожим на іншу персональну інформацію."
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "Пароль не може бути надто схожим на іншу особисту інформацію."
 
 msgid "This password is too common."
 msgstr "Пароль надто відомий."
 
-msgid "Your password can't be a commonly used password."
-msgstr "Ваш пароль не повинен бути загальновідомим."
+msgid "Your password can’t be a commonly used password."
+msgstr "Пароль не може бути одним із дуже поширених."
 
 msgid "This password is entirely numeric."
 msgstr "Цей пароль повністю складається із цифр."
 
-msgid "Your password can't be entirely numeric."
-msgstr "Ваш пароль не може складається лише із цифр."
+msgid "Your password can’t be entirely numeric."
+msgstr "Пароль не може складається лише із цифр."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

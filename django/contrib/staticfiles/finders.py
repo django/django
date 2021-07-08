@@ -1,11 +1,10 @@
 import functools
 import os
-from collections import OrderedDict
 
 from django.apps import apps
 from django.conf import settings
 from django.contrib.staticfiles import utils
-from django.core.checks import Error
+from django.core.checks import Error, Warning
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import (
     FileSystemStorage, Storage, default_storage,
@@ -54,7 +53,7 @@ class FileSystemFinder(BaseFinder):
         # List of locations with static files
         self.locations = []
         # Maps dir paths to an appropriate storage instance
-        self.storages = OrderedDict()
+        self.storages = {}
         for root in settings.STATICFILES_DIRS:
             if isinstance(root, (list, tuple)):
                 prefix, root = root
@@ -76,14 +75,27 @@ class FileSystemFinder(BaseFinder):
                 hint='Perhaps you forgot a trailing comma?',
                 id='staticfiles.E001',
             ))
+            return errors
         for root in settings.STATICFILES_DIRS:
             if isinstance(root, (list, tuple)):
-                _, root = root
+                prefix, root = root
+                if prefix.endswith('/'):
+                    errors.append(Error(
+                        'The prefix %r in the STATICFILES_DIRS setting must '
+                        'not end with a slash.' % prefix,
+                        id='staticfiles.E003',
+                    ))
             if settings.STATIC_ROOT and os.path.abspath(settings.STATIC_ROOT) == os.path.abspath(root):
                 errors.append(Error(
                     'The STATICFILES_DIRS setting should not contain the '
                     'STATIC_ROOT setting.',
                     id='staticfiles.E002',
+                ))
+            if not os.path.isdir(root):
+                errors.append(Warning(
+                    f"The directory '{root}' in the STATICFILES_DIRS setting "
+                    f"does not exist.",
+                    id='staticfiles.W004',
                 ))
         return errors
 
@@ -121,9 +133,11 @@ class FileSystemFinder(BaseFinder):
         List all files in all locations.
         """
         for prefix, root in self.locations:
-            storage = self.storages[root]
-            for path in utils.get_files(storage, ignore_patterns):
-                yield path, storage
+            # Skip nonexistent directories.
+            if os.path.isdir(root):
+                storage = self.storages[root]
+                for path in utils.get_files(storage, ignore_patterns):
+                    yield path, storage
 
 
 class AppDirectoriesFinder(BaseFinder):
@@ -138,7 +152,7 @@ class AppDirectoriesFinder(BaseFinder):
         # The list of apps that are handled
         self.apps = []
         # Mapping of app names to storage instances
-        self.storages = OrderedDict()
+        self.storages = {}
         app_configs = apps.get_app_configs()
         if app_names:
             app_names = set(app_names)
@@ -182,12 +196,11 @@ class AppDirectoriesFinder(BaseFinder):
         Find a requested static file in an app's static locations.
         """
         storage = self.storages.get(app)
-        if storage:
-            # only try to find a file if the source dir actually exists
-            if storage.exists(path):
-                matched_path = storage.path(path)
-                if matched_path:
-                    return matched_path
+        # Only try to find a file if the source dir actually exists.
+        if storage and storage.exists(path):
+            matched_path = storage.path(path)
+            if matched_path:
+                return matched_path
 
 
 class BaseStorageFinder(BaseFinder):
@@ -204,7 +217,7 @@ class BaseStorageFinder(BaseFinder):
             raise ImproperlyConfigured("The staticfiles storage finder %r "
                                        "doesn't have a storage class "
                                        "assigned." % self.__class__)
-        # Make sure we have an storage instance here.
+        # Make sure we have a storage instance here.
         if not isinstance(self.storage, (Storage, LazyObject)):
             self.storage = self.storage()
         super().__init__(*args, **kwargs)

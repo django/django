@@ -2,13 +2,14 @@
 #
 # Translators:
 # Paras Nath Chaudhary <opnchaudhary@gmail.com>, 2012
+# Sandesh Rana <vimmrana0@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:51+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-20 19:57+0000\n"
+"Last-Translator: Sandesh Rana <vimmrana0@gmail.com>\n"
 "Language-Team: Nepali (http://www.transifex.com/django/django/language/ne/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "प्रशासनिक दस्तावेज"
 
 msgid "Home"
 msgstr "गृह "
@@ -26,16 +27,19 @@ msgid "Documentation"
 msgstr "प्रलेखन"
 
 msgid "Bookmarklets"
-msgstr ""
+msgstr "बुकमार्कलेटहरू"
 
 msgid "Documentation bookmarklets"
-msgstr ""
+msgstr "कागजातका बुकमार्कलेटहरू"
 
 msgid ""
 "To install bookmarklets, drag the link to your bookmarks toolbar, or right-"
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"बुकमार्कलेटहरू स्थापना गर्न, लिंकलाई तपाईंको बुकमार्क टूलबारमा ड्र्याग गर्नुहोस्, वा लिंकमा "
+"दायाँ क्लिक गर्नुहोस् र तपाईंको बुकमार्कमा थप्नुहोस्। अब तपाईं साइटमा कुनै पृष्ठबाट बुकमार्क "
+"चयन गर्न सक्नुहुन्छ।"
 
 msgid "Documentation for this page"
 msgstr "यो पृस्ठको लागी प्रलेखन"
@@ -108,7 +112,7 @@ msgid "Type"
 msgstr ""
 
 msgid "Description"
-msgstr ""
+msgstr "वर्णन"
 
 msgid "Methods with arguments"
 msgstr ""
@@ -136,12 +140,12 @@ msgid "Template: %(name)s"
 msgstr ""
 
 #, python-format
-msgid "Template: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
 msgstr ""
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
 msgstr ""
 
 msgid "(does not exist)"
@@ -215,13 +219,6 @@ msgid ""
 "    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
 "code>.\n"
 msgstr ""
-
-msgid "Boolean (Either True or False)"
-msgstr "बुलियन (True अथवा False)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "फाँटको प्रकार: %(field_type)s"
 
 msgid "tag:"
 msgstr "ट्याग:"

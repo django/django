@@ -2,15 +2,17 @@
 Indirection layer for PostgreSQL-specific fields, so the tests don't fail when
 run with a backend other than PostgreSQL.
 """
+import enum
+
 from django.db import models
 
 try:
     from django.contrib.postgres.fields import (
         ArrayField, BigIntegerRangeField, CICharField, CIEmailField,
-        CITextField, DateRangeField, DateTimeRangeField, FloatRangeField,
-        HStoreField, IntegerRangeField, JSONField,
+        CITextField, DateRangeField, DateTimeRangeField, DecimalRangeField,
+        HStoreField, IntegerRangeField,
     )
-    from django.contrib.postgres.search import SearchVectorField
+    from django.contrib.postgres.search import SearchVector, SearchVectorField
 except ImportError:
     class DummyArrayField(models.Field):
         def __init__(self, base_field, size=None, **kwargs):
@@ -24,10 +26,6 @@ except ImportError:
             })
             return name, path, args, kwargs
 
-    class DummyJSONField(models.Field):
-        def __init__(self, encoder=None, **kwargs):
-            super().__init__(**kwargs)
-
     ArrayField = DummyArrayField
     BigIntegerRangeField = models.Field
     CICharField = models.Field
@@ -35,8 +33,13 @@ except ImportError:
     CITextField = models.Field
     DateRangeField = models.Field
     DateTimeRangeField = models.Field
-    FloatRangeField = models.Field
+    DecimalRangeField = models.Field
     HStoreField = models.Field
     IntegerRangeField = models.Field
-    JSONField = DummyJSONField
+    SearchVector = models.Expression
     SearchVectorField = models.Field
+
+
+class EnumField(models.CharField):
+    def get_prep_value(self, value):
+        return value.value if isinstance(value, enum.Enum) else value

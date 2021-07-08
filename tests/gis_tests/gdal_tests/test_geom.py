@@ -1,22 +1,17 @@
 import json
 import pickle
-import unittest
-from binascii import b2a_hex
-from unittest import skipUnless
 
-from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.gdal import (
+    CoordTransform, GDALException, OGRGeometry, OGRGeomType, SpatialReference,
+)
+from django.template import Context
+from django.template.engine import Engine
+from django.test import SimpleTestCase
 
 from ..test_data import TestDataMixin
 
-if HAS_GDAL:
-    from django.contrib.gis.gdal import (
-        CoordTransform, GDALException, OGRGeometry, OGRGeomType, OGRIndexError,
-        SpatialReference,
-    )
 
-
-@skipUnless(HAS_GDAL, "GDAL is required")
-class OGRGeomTest(unittest.TestCase, TestDataMixin):
+class OGRGeomTest(SimpleTestCase, TestDataMixin):
     "This tests the OGR Geometry."
 
     def test_geomtype(self):
@@ -104,7 +99,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         for g in self.geometries.hex_wkt:
             geom1 = OGRGeometry(g.wkt)
             wkb = geom1.wkb
-            self.assertEqual(b2a_hex(wkb).upper(), g.hex.encode())
+            self.assertEqual(wkb.hex().upper(), g.hex)
             # Constructing w/WKB.
             geom2 = OGRGeometry(wkb)
             self.assertEqual(geom1, geom2)
@@ -162,7 +157,8 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(ls.coords, linestr.tuple)
             self.assertEqual(linestr, OGRGeometry(ls.wkt))
             self.assertNotEqual(linestr, prev)
-            with self.assertRaises(OGRIndexError):
+            msg = 'Index out of range when accessing points of a line string: %s.'
+            with self.assertRaisesMessage(IndexError, msg % len(linestr)):
                 linestr.__getitem__(len(linestr))
             prev = linestr
 
@@ -187,7 +183,8 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             for ls in mlinestr:
                 self.assertEqual(2, ls.geom_type)
                 self.assertEqual('LINESTRING', ls.geom_name)
-            with self.assertRaises(OGRIndexError):
+            msg = 'Index out of range when accessing geometry in a collection: %s.'
+            with self.assertRaisesMessage(IndexError, msg % len(mlinestr)):
                 mlinestr.__getitem__(len(mlinestr))
 
     def test_linearring(self):
@@ -217,6 +214,9 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             self.assertEqual('POLYGON', poly.geom_name)
             self.assertEqual(p.n_p, poly.point_count)
             self.assertEqual(p.n_i + 1, len(poly))
+            msg = 'Index out of range when accessing rings of a polygon: %s.'
+            with self.assertRaisesMessage(IndexError, msg % len(poly)):
+                poly.__getitem__(len(poly))
 
             # Testing area & centroid.
             self.assertAlmostEqual(p.area, poly.area, 9)
@@ -236,6 +236,14 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
             for r in poly:
                 self.assertEqual('LINEARRING', r.geom_name)
+
+    def test_polygons_templates(self):
+        # Accessing Polygon attributes in templates should work.
+        engine = Engine()
+        template = engine.from_string('{{ polygons.0.wkt }}')
+        polygons = [OGRGeometry(p.wkt) for p in self.geometries.multipolygons[:2]]
+        content = template.render(Context({'polygons': polygons}))
+        self.assertIn('MULTIPOLYGON (((100', content)
 
     def test_closepolygons(self):
         "Testing closing Polygon objects."
@@ -259,7 +267,8 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             if mp.valid:
                 self.assertEqual(mp.n_p, mpoly.point_count)
                 self.assertEqual(mp.num_geom, len(mpoly))
-                with self.assertRaises(OGRIndexError):
+                msg = 'Index out of range when accessing geometry in a collection: %s.'
+                with self.assertRaisesMessage(IndexError, msg % len(mpoly)):
                     mpoly.__getitem__(len(mpoly))
                 for p in mpoly:
                     self.assertEqual('POLYGON', p.geom_name)
@@ -341,7 +350,9 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         self.assertEqual(k1, orig)
         self.assertNotEqual(k1, k2)
 
-        prec = 3
+        # Different PROJ versions use different transformations, all are
+        # correct as having a 1 meter accuracy.
+        prec = -1
         for p in (t1, t2, t3, k2):
             self.assertAlmostEqual(trans.x, p.x, prec)
             self.assertAlmostEqual(trans.y, p.y, prec)
@@ -351,7 +362,9 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         ls_orig = OGRGeometry('LINESTRING(-104.609 38.255)', 4326)
         ls_trans = OGRGeometry('LINESTRING(992385.4472045 481455.4944650)', 2774)
 
-        prec = 3
+        # Different PROJ versions use different transformations, all are
+        # correct as having a 1 meter accuracy.
+        prec = -1
         ls_orig.transform(ls_trans.srs)
         # Making sure the coordinate dimension is still 2D.
         self.assertEqual(2, ls_orig.coord_dim)
@@ -365,10 +378,10 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
             d1 = OGRGeometry(self.geometries.diff_geoms[i].wkt)
             d2 = a.difference(b)
-            self.assertEqual(d1, d2)
-            self.assertEqual(d1, a - b)  # __sub__ is difference operator
+            self.assertTrue(d1.geos.equals(d2.geos))
+            self.assertTrue(d1.geos.equals((a - b).geos))  # __sub__ is difference operator
             a -= b  # testing __isub__
-            self.assertEqual(d1, a)
+            self.assertTrue(d1.geos.equals(a.geos))
 
     def test_intersection(self):
         "Testing intersects() and intersection()."
@@ -378,10 +391,10 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             i1 = OGRGeometry(self.geometries.intersect_geoms[i].wkt)
             self.assertTrue(a.intersects(b))
             i2 = a.intersection(b)
-            self.assertEqual(i1, i2)
-            self.assertEqual(i1, a & b)  # __and__ is intersection operator
+            self.assertTrue(i1.geos.equals(i2.geos))
+            self.assertTrue(i1.geos.equals((a & b).geos))  # __and__ is intersection operator
             a &= b  # testing __iand__
-            self.assertEqual(i1, a)
+            self.assertTrue(i1.geos.equals(a.geos))
 
     def test_symdifference(self):
         "Testing sym_difference()."
@@ -390,10 +403,10 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
             d1 = OGRGeometry(self.geometries.sdiff_geoms[i].wkt)
             d2 = a.sym_difference(b)
-            self.assertEqual(d1, d2)
-            self.assertEqual(d1, a ^ b)  # __xor__ is symmetric difference operator
+            self.assertTrue(d1.geos.equals(d2.geos))
+            self.assertTrue(d1.geos.equals((a ^ b).geos))  # __xor__ is symmetric difference operator
             a ^= b  # testing __ixor__
-            self.assertEqual(d1, a)
+            self.assertTrue(d1.geos.equals(a.geos))
 
     def test_union(self):
         "Testing union()."
@@ -402,10 +415,10 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
             u1 = OGRGeometry(self.geometries.union_geoms[i].wkt)
             u2 = a.union(b)
-            self.assertEqual(u1, u2)
-            self.assertEqual(u1, a | b)  # __or__ is union operator
+            self.assertTrue(u1.geos.equals(u2.geos))
+            self.assertTrue(u1.geos.equals((a | b).geos))  # __or__ is union operator
             a |= b  # testing __ior__
-            self.assertEqual(u1, a)
+            self.assertTrue(u1.geos.equals(a.geos))
 
     def test_add(self):
         "Testing GeometryCollection.add()."

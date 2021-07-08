@@ -4,6 +4,7 @@ import enum
 import functools
 import math
 import os
+import pathlib
 import re
 import sys
 import uuid
@@ -13,22 +14,23 @@ import custom_migration_operations.more_operations
 import custom_migration_operations.operations
 
 from django import get_version
-from django.conf import settings
+from django.conf import SettingsReference, settings
 from django.core.validators import EmailValidator, RegexValidator
 from django.db import migrations, models
-from django.db.migrations.writer import (
-    MigrationWriter, OperationWriter, SettingsReference,
-)
+from django.db.migrations.serializer import BaseSerializer
+from django.db.migrations.writer import MigrationWriter, OperationWriter
 from django.test import SimpleTestCase
-from django.utils import datetime_safe
 from django.utils.deconstruct import deconstructible
 from django.utils.functional import SimpleLazyObject
-from django.utils.timezone import FixedOffset, get_default_timezone, utc
+from django.utils.timezone import get_default_timezone, get_fixed_timezone, utc
 from django.utils.translation import gettext_lazy as _
 
 from .models import FoodManager, FoodQuerySet
 
-PY36 = sys.version_info >= (3, 6)
+
+class DeconstructibleInstances:
+    def deconstruct(self):
+        return ('DeconstructibleInstances', [], {})
 
 
 class Money(decimal.Decimal):
@@ -40,10 +42,30 @@ class Money(decimal.Decimal):
         )
 
 
-class TestModel1(object):
+class TestModel1:
     def upload_to(self):
         return '/somewhere/dynamic/'
     thing = models.FileField(upload_to=upload_to)
+
+
+class TextEnum(enum.Enum):
+    A = 'a-value'
+    B = 'value-b'
+
+
+class TextTranslatedEnum(enum.Enum):
+    A = _('a-value')
+    B = _('value-b')
+
+
+class BinaryEnum(enum.Enum):
+    A = b'a-value'
+    B = b'value-b'
+
+
+class IntEnum(enum.IntEnum):
+    A = 1
+    B = 2
 
 
 class OperationWriterTests(SimpleTestCase):
@@ -169,6 +191,13 @@ class WriterTests(SimpleTestCase):
     """
     Tests the migration writer (makes migration files from Migration instances)
     """
+    class NestedEnum(enum.IntEnum):
+        A = 1
+        B = 2
+
+    class NestedChoices(models.TextChoices):
+        X = 'X', 'X value'
+        Y = 'Y', 'Y value'
 
     def safe_exec(self, string, value=None):
         d = {}
@@ -258,58 +287,124 @@ class WriterTests(SimpleTestCase):
         self.assertEqual(self.serialize_round_trip(lazy_pattern), pattern)
 
     def test_serialize_enums(self):
-        class TextEnum(enum.Enum):
-            A = 'a-value'
-            B = 'value-b'
-
-        class BinaryEnum(enum.Enum):
-            A = b'a-value'
-            B = b'value-b'
-
-        class IntEnum(enum.IntEnum):
-            A = 1
-            B = 2
-
         self.assertSerializedResultEqual(
             TextEnum.A,
-            ("migrations.test_writer.TextEnum('a-value')", {'import migrations.test_writer'})
+            ("migrations.test_writer.TextEnum['A']", {'import migrations.test_writer'})
+        )
+        self.assertSerializedResultEqual(
+            TextTranslatedEnum.A,
+            ("migrations.test_writer.TextTranslatedEnum['A']", {'import migrations.test_writer'})
         )
         self.assertSerializedResultEqual(
             BinaryEnum.A,
-            ("migrations.test_writer.BinaryEnum(b'a-value')", {'import migrations.test_writer'})
+            ("migrations.test_writer.BinaryEnum['A']", {'import migrations.test_writer'})
         )
         self.assertSerializedResultEqual(
             IntEnum.B,
-            ("migrations.test_writer.IntEnum(2)", {'import migrations.test_writer'})
+            ("migrations.test_writer.IntEnum['B']", {'import migrations.test_writer'})
         )
+        self.assertSerializedResultEqual(
+            self.NestedEnum.A,
+            (
+                "migrations.test_writer.WriterTests.NestedEnum['A']",
+                {'import migrations.test_writer'},
+            ),
+        )
+        self.assertSerializedEqual(self.NestedEnum.A)
 
         field = models.CharField(default=TextEnum.B, choices=[(m.value, m) for m in TextEnum])
         string = MigrationWriter.serialize(field)[0]
         self.assertEqual(
             string,
             "models.CharField(choices=["
-            "('a-value', migrations.test_writer.TextEnum('a-value')), "
-            "('value-b', migrations.test_writer.TextEnum('value-b'))], "
-            "default=migrations.test_writer.TextEnum('value-b'))"
+            "('a-value', migrations.test_writer.TextEnum['A']), "
+            "('value-b', migrations.test_writer.TextEnum['B'])], "
+            "default=migrations.test_writer.TextEnum['B'])"
+        )
+        field = models.CharField(
+            default=TextTranslatedEnum.A,
+            choices=[(m.value, m) for m in TextTranslatedEnum],
+        )
+        string = MigrationWriter.serialize(field)[0]
+        self.assertEqual(
+            string,
+            "models.CharField(choices=["
+            "('a-value', migrations.test_writer.TextTranslatedEnum['A']), "
+            "('value-b', migrations.test_writer.TextTranslatedEnum['B'])], "
+            "default=migrations.test_writer.TextTranslatedEnum['A'])"
         )
         field = models.CharField(default=BinaryEnum.B, choices=[(m.value, m) for m in BinaryEnum])
         string = MigrationWriter.serialize(field)[0]
         self.assertEqual(
             string,
             "models.CharField(choices=["
-            "(b'a-value', migrations.test_writer.BinaryEnum(b'a-value')), "
-            "(b'value-b', migrations.test_writer.BinaryEnum(b'value-b'))], "
-            "default=migrations.test_writer.BinaryEnum(b'value-b'))"
+            "(b'a-value', migrations.test_writer.BinaryEnum['A']), "
+            "(b'value-b', migrations.test_writer.BinaryEnum['B'])], "
+            "default=migrations.test_writer.BinaryEnum['B'])"
         )
         field = models.IntegerField(default=IntEnum.A, choices=[(m.value, m) for m in IntEnum])
         string = MigrationWriter.serialize(field)[0]
         self.assertEqual(
             string,
             "models.IntegerField(choices=["
-            "(1, migrations.test_writer.IntEnum(1)), "
-            "(2, migrations.test_writer.IntEnum(2))], "
-            "default=migrations.test_writer.IntEnum(1))"
+            "(1, migrations.test_writer.IntEnum['A']), "
+            "(2, migrations.test_writer.IntEnum['B'])], "
+            "default=migrations.test_writer.IntEnum['A'])"
         )
+
+    def test_serialize_choices(self):
+        class TextChoices(models.TextChoices):
+            A = 'A', 'A value'
+            B = 'B', 'B value'
+
+        class IntegerChoices(models.IntegerChoices):
+            A = 1, 'One'
+            B = 2, 'Two'
+
+        class DateChoices(datetime.date, models.Choices):
+            DATE_1 = 1969, 7, 20, 'First date'
+            DATE_2 = 1969, 11, 19, 'Second date'
+
+        self.assertSerializedResultEqual(TextChoices.A, ("'A'", set()))
+        self.assertSerializedResultEqual(IntegerChoices.A, ('1', set()))
+        self.assertSerializedResultEqual(
+            DateChoices.DATE_1,
+            ('datetime.date(1969, 7, 20)', {'import datetime'}),
+        )
+        field = models.CharField(default=TextChoices.B, choices=TextChoices.choices)
+        string = MigrationWriter.serialize(field)[0]
+        self.assertEqual(
+            string,
+            "models.CharField(choices=[('A', 'A value'), ('B', 'B value')], "
+            "default='B')",
+        )
+        field = models.IntegerField(default=IntegerChoices.B, choices=IntegerChoices.choices)
+        string = MigrationWriter.serialize(field)[0]
+        self.assertEqual(
+            string,
+            "models.IntegerField(choices=[(1, 'One'), (2, 'Two')], default=2)",
+        )
+        field = models.DateField(default=DateChoices.DATE_2, choices=DateChoices.choices)
+        string = MigrationWriter.serialize(field)[0]
+        self.assertEqual(
+            string,
+            "models.DateField(choices=["
+            "(datetime.date(1969, 7, 20), 'First date'), "
+            "(datetime.date(1969, 11, 19), 'Second date')], "
+            "default=datetime.date(1969, 11, 19))"
+        )
+
+    def test_serialize_nested_class(self):
+        for nested_cls in [self.NestedEnum, self.NestedChoices]:
+            cls_name = nested_cls.__name__
+            with self.subTest(cls_name):
+                self.assertSerializedResultEqual(
+                    nested_cls,
+                    (
+                        "migrations.test_writer.WriterTests.%s" % cls_name,
+                        {'import migrations.test_writer'},
+                    ),
+                )
 
     def test_serialize_uuid(self):
         self.assertSerializedEqual(uuid.uuid1())
@@ -336,6 +431,46 @@ class WriterTests(SimpleTestCase):
             "default=uuid.UUID('5c859437-d061-4847-b3f7-e6b78852f8c8'))"
         )
 
+    def test_serialize_pathlib(self):
+        # Pure path objects work in all platforms.
+        self.assertSerializedEqual(pathlib.PurePosixPath())
+        self.assertSerializedEqual(pathlib.PureWindowsPath())
+        path = pathlib.PurePosixPath('/path/file.txt')
+        expected = ("pathlib.PurePosixPath('/path/file.txt')", {'import pathlib'})
+        self.assertSerializedResultEqual(path, expected)
+        path = pathlib.PureWindowsPath('A:\\File.txt')
+        expected = ("pathlib.PureWindowsPath('A:/File.txt')", {'import pathlib'})
+        self.assertSerializedResultEqual(path, expected)
+        # Concrete path objects work on supported platforms.
+        if sys.platform == 'win32':
+            self.assertSerializedEqual(pathlib.WindowsPath.cwd())
+            path = pathlib.WindowsPath('A:\\File.txt')
+            expected = ("pathlib.PureWindowsPath('A:/File.txt')", {'import pathlib'})
+            self.assertSerializedResultEqual(path, expected)
+        else:
+            self.assertSerializedEqual(pathlib.PosixPath.cwd())
+            path = pathlib.PosixPath('/path/file.txt')
+            expected = ("pathlib.PurePosixPath('/path/file.txt')", {'import pathlib'})
+            self.assertSerializedResultEqual(path, expected)
+
+        field = models.FilePathField(path=pathlib.PurePosixPath('/home/user'))
+        string, imports = MigrationWriter.serialize(field)
+        self.assertEqual(
+            string,
+            "models.FilePathField(path=pathlib.PurePosixPath('/home/user'))",
+        )
+        self.assertIn('import pathlib', imports)
+
+    def test_serialize_path_like(self):
+        with os.scandir(os.path.dirname(__file__)) as entries:
+            path_like = list(entries)[0]
+        expected = (repr(path_like.path), {})
+        self.assertSerializedResultEqual(path_like, expected)
+
+        field = models.FilePathField(path=path_like)
+        string = MigrationWriter.serialize(field)[0]
+        self.assertEqual(string, 'models.FilePathField(path=%r)' % path_like.path)
+
     def test_serialize_functions(self):
         with self.assertRaisesMessage(ValueError, 'Cannot serialize function: lambda'):
             self.assertSerializedEqual(lambda x: 42)
@@ -345,40 +480,28 @@ class WriterTests(SimpleTestCase):
         self.serialize_round_trip(models.SET(42))
 
     def test_serialize_datetime(self):
-        self.assertSerializedEqual(datetime.datetime.utcnow())
-        self.assertSerializedEqual(datetime.datetime.utcnow)
+        self.assertSerializedEqual(datetime.datetime.now())
+        self.assertSerializedEqual(datetime.datetime.now)
         self.assertSerializedEqual(datetime.datetime.today())
         self.assertSerializedEqual(datetime.datetime.today)
         self.assertSerializedEqual(datetime.date.today())
         self.assertSerializedEqual(datetime.date.today)
         self.assertSerializedEqual(datetime.datetime.now().time())
         self.assertSerializedEqual(datetime.datetime(2014, 1, 1, 1, 1, tzinfo=get_default_timezone()))
-        self.assertSerializedEqual(datetime.datetime(2013, 12, 31, 22, 1, tzinfo=FixedOffset(180)))
+        self.assertSerializedEqual(datetime.datetime(2013, 12, 31, 22, 1, tzinfo=get_fixed_timezone(180)))
         self.assertSerializedResultEqual(
             datetime.datetime(2014, 1, 1, 1, 1),
             ("datetime.datetime(2014, 1, 1, 1, 1)", {'import datetime'})
         )
-        self.assertSerializedResultEqual(
-            datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc),
-            (
-                "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc)",
-                {'import datetime', 'from django.utils.timezone import utc'},
-            )
-        )
-
-    def test_serialize_datetime_safe(self):
-        self.assertSerializedResultEqual(
-            datetime_safe.date(2014, 3, 31),
-            ("datetime.date(2014, 3, 31)", {'import datetime'})
-        )
-        self.assertSerializedResultEqual(
-            datetime_safe.time(10, 25),
-            ("datetime.time(10, 25)", {'import datetime'})
-        )
-        self.assertSerializedResultEqual(
-            datetime_safe.datetime(2014, 3, 31, 16, 4, 31),
-            ("datetime.datetime(2014, 3, 31, 16, 4, 31)", {'import datetime'})
-        )
+        for tzinfo in (utc, datetime.timezone.utc):
+            with self.subTest(tzinfo=tzinfo):
+                self.assertSerializedResultEqual(
+                    datetime.datetime(2012, 1, 1, 1, 1, tzinfo=tzinfo),
+                    (
+                        "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc)",
+                        {'import datetime', 'from django.utils.timezone import utc'},
+                    )
+                )
 
     def test_serialize_fields(self):
         self.assertSerializedFieldEqual(models.CharField(max_length=255))
@@ -431,10 +554,7 @@ class WriterTests(SimpleTestCase):
         # Test a string regex with flag
         validator = RegexValidator(r'^[0-9]+$', flags=re.S)
         string = MigrationWriter.serialize(validator)[0]
-        if PY36:
-            self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=re.RegexFlag(16))")
-        else:
-            self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=16)")
+        self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=re.RegexFlag['DOTALL'])")
         self.serialize_round_trip(validator)
 
         # Test message and code
@@ -473,6 +593,11 @@ class WriterTests(SimpleTestCase):
         self.assertSerializedEqual(one_item_tuple)
         self.assertSerializedEqual(many_items_tuple)
 
+    def test_serialize_range(self):
+        string, imports = MigrationWriter.serialize(range(1, 5))
+        self.assertEqual(string, 'range(1, 5)')
+        self.assertEqual(imports, set())
+
     def test_serialize_builtins(self):
         string, imports = MigrationWriter.serialize(range)
         self.assertEqual(string, 'range')
@@ -505,6 +630,12 @@ class WriterTests(SimpleTestCase):
         self.assertSerializedEqual(frozenset())
         self.assertSerializedEqual(frozenset("let it go"))
 
+    def test_serialize_set(self):
+        self.assertSerializedEqual(set())
+        self.assertSerializedResultEqual(set(), ('set()', set()))
+        self.assertSerializedEqual({'a'})
+        self.assertSerializedResultEqual({'a'}, ("{'a'}", set()))
+
     def test_serialize_timedelta(self):
         self.assertSerializedEqual(datetime.timedelta())
         self.assertSerializedEqual(datetime.timedelta(minutes=42))
@@ -516,13 +647,31 @@ class WriterTests(SimpleTestCase):
         self.assertEqual(result.args, value.args)
         self.assertEqual(result.keywords, value.keywords)
 
+    def test_serialize_functools_partialmethod(self):
+        value = functools.partialmethod(datetime.timedelta, 1, seconds=2)
+        result = self.serialize_round_trip(value)
+        self.assertIsInstance(result, functools.partialmethod)
+        self.assertEqual(result.func, value.func)
+        self.assertEqual(result.args, value.args)
+        self.assertEqual(result.keywords, value.keywords)
+
+    def test_serialize_type_none(self):
+        self.assertSerializedEqual(type(None))
+
+    def test_serialize_type_model(self):
+        self.assertSerializedEqual(models.Model)
+        self.assertSerializedResultEqual(
+            MigrationWriter.serialize(models.Model),
+            ("('models.Model', {'from django.db import models'})", set()),
+        )
+
     def test_simple_migration(self):
         """
         Tests serializing a simple migration.
         """
         fields = {
-            'charfield': models.DateTimeField(default=datetime.datetime.utcnow),
-            'datetimefield': models.DateTimeField(default=datetime.datetime.utcnow),
+            'charfield': models.DateTimeField(default=datetime.datetime.now),
+            'datetimefield': models.DateTimeField(default=datetime.datetime.now),
         }
 
         options = {
@@ -613,16 +762,21 @@ class WriterTests(SimpleTestCase):
         })
         dt = datetime.datetime(2015, 7, 31, 4, 40, 0, 0, tzinfo=utc)
         with mock.patch('django.db.migrations.writer.now', lambda: dt):
-            writer = MigrationWriter(migration)
-            output = writer.as_string()
+            for include_header in (True, False):
+                with self.subTest(include_header=include_header):
+                    writer = MigrationWriter(migration, include_header)
+                    output = writer.as_string()
 
-        self.assertTrue(
-            output.startswith(
-                "# Generated by Django %(version)s on 2015-07-31 04:40\n" % {
-                    'version': get_version(),
-                }
-            )
-        )
+                    self.assertEqual(
+                        include_header,
+                        output.startswith(
+                            "# Generated by Django %s on 2015-07-31 04:40\n\n" % get_version()
+                        )
+                    )
+                    if not include_header:
+                        # Make sure the output starts with something that's not
+                        # a comment or indentation or blank line
+                        self.assertRegex(output.splitlines(keepends=True)[0], r"^[^#\s]+")
 
     def test_models_import_omitted(self):
         """
@@ -644,9 +798,20 @@ class WriterTests(SimpleTestCase):
         # Yes, it doesn't make sense to use a class as a default for a
         # CharField. It does make sense for custom fields though, for example
         # an enumfield that takes the enum class as an argument.
-        class DeconstructibleInstances:
-            def deconstruct(self):
-                return ('DeconstructibleInstances', [], {})
-
         string = MigrationWriter.serialize(models.CharField(default=DeconstructibleInstances))[0]
         self.assertEqual(string, "models.CharField(default=migrations.test_writer.DeconstructibleInstances)")
+
+    def test_register_serializer(self):
+        class ComplexSerializer(BaseSerializer):
+            def serialize(self):
+                return 'complex(%r)' % self.value, {}
+
+        MigrationWriter.register_serializer(complex, ComplexSerializer)
+        self.assertSerializedEqual(complex(1, 2))
+        MigrationWriter.unregister_serializer(complex)
+        with self.assertRaisesMessage(ValueError, 'Cannot serialize: (1+2j)'):
+            self.assertSerializedEqual(complex(1, 2))
+
+    def test_register_non_serializer(self):
+        with self.assertRaisesMessage(ValueError, "'TestModel1' must inherit from 'BaseSerializer'."):
+            MigrationWriter.register_serializer(complex, TestModel1)

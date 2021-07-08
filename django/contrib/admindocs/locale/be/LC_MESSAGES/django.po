@@ -2,13 +2,13 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2014-2015
-# znotdead <zhirafchik@gmail.com>, 2016
+# znotdead <zhirafchik@gmail.com>, 2016,2019,2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-09-15 10:26+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-15 17:29+0000\n"
 "Last-Translator: znotdead <zhirafchik@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
@@ -101,7 +101,7 @@ msgstr "Калі ласка, усталюйце Docutils"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
+"The admin documentation system requires Python’s <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
 "Дакументацыя кіраўнічай сістэмы патрабуе бібліятэку Python <a href=\"%(link)s"
@@ -156,13 +156,13 @@ msgid "Template: %(name)s"
 msgstr "Шаблон: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Шаблон: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr "Шаблон: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "Шлях пошуку для шаблону \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "Шлях пошуку для шаблону <q>%(name)s</q>:"
 
 msgid "(does not exist)"
 msgstr "(не існуе)"
@@ -242,13 +242,6 @@ msgstr ""
 "\n"
 "Функцыя прагляду: <code>%(full_name)s</code>. Імя: <code>%(url_name)s</"
 "code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Ляґічнае («сапраўдна» або «не сапраўдна»)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Палі віду: %(field_type)s"
 
 msgid "tag:"
 msgstr "цэтлік:"

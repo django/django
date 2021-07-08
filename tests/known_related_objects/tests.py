@@ -42,7 +42,7 @@ class ExistingRelatedInstancesTests(TestCase):
         tournament_2 = self.t2
         with self.assertNumQueries(1):
             pools = tournament_1.pool_set.all() | tournament_2.pool_set.all()
-            related_objects = set(pool.tournament for pool in pools)
+            related_objects = {pool.tournament for pool in pools}
             self.assertEqual(related_objects, {tournament_1, tournament_2})
 
     def test_queryset_or_different_cached_items(self):
@@ -60,12 +60,12 @@ class ExistingRelatedInstancesTests(TestCase):
         # 2 queries here as pool 3 has tournament 2, which is not cached
         with self.assertNumQueries(2):
             pools = tournament_1.pool_set.all() | Pool.objects.filter(pk=self.p3.pk)
-            related_objects = set(pool.tournament for pool in pools)
+            related_objects = {pool.tournament for pool in pools}
             self.assertEqual(related_objects, {tournament_1, tournament_2})
         # and the other direction
         with self.assertNumQueries(2):
             pools = Pool.objects.filter(pk=self.p3.pk) | tournament_1.pool_set.all()
-            related_objects = set(pool.tournament for pool in pools)
+            related_objects = {pool.tournament for pool in pools}
             self.assertEqual(related_objects, {tournament_1, tournament_2})
 
     def test_queryset_and(self):

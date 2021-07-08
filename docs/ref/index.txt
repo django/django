@@ -16,9 +16,11 @@ API Reference
    exceptions
    files/index
    forms/index
+   logging
    middleware
    migration-operations
    models/index
+   paginator
    request-response
    schema-editor
    settings

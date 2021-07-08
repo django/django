@@ -3,24 +3,24 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% trans 'Documentation' %}</a>
-&rsaquo; {% trans 'Bookmarklets' %}
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% translate 'Documentation' %}</a>
+&rsaquo; {% translate 'Bookmarklets' %}
 </div>
 {% endblock %}
-{% block title %}{% trans "Documentation bookmarklets" %}{% endblock %}
+{% block title %}{% translate "Documentation bookmarklets" %}{% endblock %}
 
 {% block content %}
 
-<p class="help">{% blocktrans trimmed %}
+<p class="help">{% blocktranslate trimmed %}
 To install bookmarklets, drag the link to your bookmarks toolbar, or right-click
 the link and add it to your bookmarks. Now you can select the bookmarklet
 from any page in the site.
-{% endblocktrans %}</p>
+{% endblocktranslate %}</p>
 
 <div id="content-main">
-    <h3><a href="javascript:(function(){if(typeof ActiveXObject!='undefined'){x=new ActiveXObject('Microsoft.XMLHTTP')}else if(typeof XMLHttpRequest!='undefined'){x=new XMLHttpRequest()}else{return;}x.open('HEAD',location.href,false);x.send(null);try{view=x.getResponseHeader('x-view');}catch(e){alert('No view found for this page');return;}if(view=='undefined'){alert('No view found for this page');}document.location='{% url 'django-admindocs-views-index' %}'+view+'/';})()">{% trans "Documentation for this page" %}</a></h3>
-    <p>{% trans "Jumps you from any page to the documentation for the view that generates that page." %}</p>
+    <h3><a href="javascript:(function(){if(typeof XMLHttpRequest!='undefined'){x=new XMLHttpRequest()}else{return;}x.open('HEAD',location.href,false);x.send(null);try{view=x.getResponseHeader('x-view');}catch(e){alert('No view found for this page');return;}if(view=='undefined'){alert('No view found for this page');}document.location='{% url 'django-admindocs-views-index' %}'+view+'/';})()">{% translate "Documentation for this page" %}</a></h3>
+    <p>{% translate "Jumps you from any page to the documentation for the view that generates that page." %}</p>
 </div>
 
 {% endblock %}

@@ -9,7 +9,7 @@ class MigrationOptimizer:
     nothing.
     """
 
-    def optimize(self, operations, app_label=None):
+    def optimize(self, operations, app_label):
         """
         Main optimization entry point. Pass in a list of Operation instances,
         get out a new list of Operation instances.
@@ -25,11 +25,10 @@ class MigrationOptimizer:
         The inner loop is run until the starting list is the same as the result
         list, and then the result is returned. This means that operation
         optimization must be stable and always return an equal or shorter list.
-
-        The app_label argument is optional, but if you pass it you'll get more
-        efficient optimization.
         """
         # Internal tracking variable for test assertions about # of loops
+        if app_label is None:
+            raise TypeError('app_label must be a str.')
         self._iterations = 0
         while True:
             result = self.optimize_inner(operations, app_label)
@@ -38,24 +37,33 @@ class MigrationOptimizer:
                 return result
             operations = result
 
-    def optimize_inner(self, operations, app_label=None):
+    def optimize_inner(self, operations, app_label):
         """Inner optimization loop."""
         new_operations = []
         for i, operation in enumerate(operations):
+            right = True  # Should we reduce on the right or on the left.
             # Compare it to each operation after it
             for j, other in enumerate(operations[i + 1:]):
-                in_between = operations[i + 1:i + j + 1]
-                result = operation.reduce(other, in_between, app_label)
+                result = operation.reduce(other, app_label)
                 if isinstance(result, list):
-                    # Optimize! Add result, then remaining others, then return
-                    new_operations.extend(result)
-                    new_operations.extend(in_between)
+                    in_between = operations[i + 1:i + j + 1]
+                    if right:
+                        new_operations.extend(in_between)
+                        new_operations.extend(result)
+                    elif all(op.reduce(other, app_label) is True for op in in_between):
+                        # Perform a left reduction if all of the in-between
+                        # operations can optimize through other.
+                        new_operations.extend(result)
+                        new_operations.extend(in_between)
+                    else:
+                        # Otherwise keep trying.
+                        new_operations.append(operation)
+                        break
                     new_operations.extend(operations[i + j + 2:])
                     return new_operations
-                if not result:
-                    # We can't optimize across `other`.
-                    new_operations.append(operation)
-                    break
+                elif not result:
+                    # Can't perform a right reduction.
+                    right = False
             else:
                 new_operations.append(operation)
         return new_operations

@@ -17,29 +17,26 @@ objects, and a ``Publication`` has multiple ``Article`` objects:
     class Publication(models.Model):
         title = models.CharField(max_length=30)
 
+        class Meta:
+            ordering = ['title']
+
         def __str__(self):
             return self.title
-
-        class Meta:
-            ordering = ('title',)
 
     class Article(models.Model):
         headline = models.CharField(max_length=100)
         publications = models.ManyToManyField(Publication)
 
+        class Meta:
+            ordering = ['headline']
+
         def __str__(self):
             return self.headline
 
-        class Meta:
-            ordering = ('headline',)
-
 What follows are examples of operations that can be performed using the Python
-API facilities. Note that if you are using :ref:`an intermediate model
-<intermediary-manytomany>` for a many-to-many relationship, some of the related
-manager's methods are disabled, so some of these examples won't work with such
-models.
+API facilities.
 
-Create a couple of ``Publications``::
+Create a few ``Publications``::
 
     >>> p1 = Publication(title='The Python Journal')
     >>> p1.save()
@@ -57,7 +54,7 @@ You can't associate it with a ``Publication`` until it's been saved::
     >>> a1.publications.add(p1)
     Traceback (most recent call last):
     ...
-    ValueError: 'Article' instance needs to have a primary key value before a many-to-many relationship can be used.
+    ValueError: "<Article: Django lets you build Web apps easily>" needs to have a value for field "id" before this many-to-many relationship can be used.
 
 Save it!
 ::
@@ -68,14 +65,14 @@ Associate the ``Article`` with a ``Publication``::
 
     >>> a1.publications.add(p1)
 
-Create another ``Article``, and set it to appear in both ``Publications``::
+Create another ``Article``, and set it to appear in the ``Publications``::
 
     >>> a2 = Article(headline='NASA uses Python')
     >>> a2.save()
     >>> a2.publications.add(p1, p2)
     >>> a2.publications.add(p3)
 
-Adding a second time is OK::
+Adding a second time is OK, it will not duplicate the relation::
 
     >>> a2.publications.add(p3)
 

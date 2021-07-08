@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-15 09:52+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
 "bg/)\n"
 "MIME-Version: 1.0\n"
@@ -22,34 +22,24 @@ msgid "PostgreSQL extensions"
 msgstr "PostgreSQL разширения"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "Стойност %(nth)s в масива не валидират:"
+msgid "Item %(nth)s in the array did not validate:"
+msgstr ""
 
 msgid "Nested arrays must have the same length."
 msgstr "Вложените масиви, трябва да имат същата дължина."
 
-msgid "Map of strings to strings"
-msgstr "Карта на низ към низ"
+msgid "Map of strings to strings/nulls"
+msgstr ""
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Стойността за \"%(key)s\" не е низ"
-
-msgid "A JSON object"
-msgstr "JSON обект"
-
-msgid "Value must be valid JSON."
-msgstr "Стойността трябва да е валиден JSON"
+msgid "The value of “%(key)s” is not a string or null."
+msgstr ""
 
 msgid "Could not load JSON data."
 msgstr "Не можа да зареди JSON данни ."
 
 msgid "Input must be a JSON dictionary."
 msgstr ""
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "'%(value)s' стойност трябва да е JSON."
 
 msgid "Enter two valid values."
 msgstr "Въведете две валидни стойности."

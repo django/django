@@ -25,6 +25,13 @@ class PublishedBookManager(models.Manager):
         return super().get_queryset().filter(is_published=True)
 
 
+class AnnotatedBookManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().annotate(
+            favorite_avg=models.Avg('favorite_books__favorite_thing_id')
+        )
+
+
 class CustomQuerySet(models.QuerySet):
     def filter(self, *args, **kwargs):
         queryset = super().filter(fun=True)
@@ -123,15 +130,11 @@ class FunPerson(models.Model):
 
     objects = FunPeopleManager()
 
-    def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
-
 
 class Book(models.Model):
     title = models.CharField(max_length=50)
     author = models.CharField(max_length=30)
     is_published = models.BooleanField(default=False)
-    published_objects = PublishedBookManager()
     authors = models.ManyToManyField(Person, related_name='books')
     fun_authors = models.ManyToManyField(FunPerson, related_name='books')
     favorite_things = GenericRelation(
@@ -145,8 +148,11 @@ class Book(models.Model):
         object_id_field='favorite_thing_id',
     )
 
-    def __str__(self):
-        return self.title
+    published_objects = PublishedBookManager()
+    annotated_objects = AnnotatedBookManager()
+
+    class Meta:
+        base_manager_name = 'annotated_objects'
 
 
 class FastCarManager(models.Manager):
@@ -160,9 +166,6 @@ class Car(models.Model):
     top_speed = models.IntegerField(help_text="In miles per hour.")
     cars = models.Manager()
     fast_cars = FastCarManager()
-
-    def __str__(self):
-        return self.name
 
 
 class FastCarAsBase(Car):
@@ -185,9 +188,6 @@ class RestrictedManager(models.Manager):
 class RelatedModel(models.Model):
     name = models.CharField(max_length=50)
 
-    def __str__(self):
-        return self.name
-
 
 class RestrictedModel(models.Model):
     name = models.CharField(max_length=50)
@@ -197,9 +197,6 @@ class RestrictedModel(models.Model):
     objects = RestrictedManager()
     plain_manager = models.Manager()
 
-    def __str__(self):
-        return self.name
-
 
 class OneToOneRestrictedModel(models.Model):
     name = models.CharField(max_length=50)
@@ -208,9 +205,6 @@ class OneToOneRestrictedModel(models.Model):
 
     objects = RestrictedManager()
     plain_manager = models.Manager()
-
-    def __str__(self):
-        return self.name
 
 
 class AbstractPerson(models.Model):

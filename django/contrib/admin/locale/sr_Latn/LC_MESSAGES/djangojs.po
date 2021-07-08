@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Igor Jerosimić, 2019,2021
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 10:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-15 17:00+0000\n"
+"Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
 "language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
@@ -83,39 +84,24 @@ msgstr ""
 "Imate nesačivane izmene. Ako pokrenete akciju, izmene će biti izgubljene."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
-msgstr "Izabrali ste akciju ali niste sačuvali promene polja."
+msgstr ""
+"Izabrali ste akciju, ali niste sačuvali vaše promene u pojedinačna polja. "
+"Kliknite na OK da sačuvate promene. Biće neophodno da ponovo pokrenete "
+"akciju."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
-msgstr "Izabrali ste akciju ali niste izmenili ni jedno polje."
-
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr ""
+"Izabrali ste akciju i niste napravili nijednu promenu na pojedinačnim "
+"poljima. Verovatno tražite Kreni dugme umesto Sačuvaj."
 
 msgid "Now"
 msgstr "Trenutno vreme"
-
-msgid "Choose a Time"
-msgstr ""
-
-msgid "Choose a time"
-msgstr "Odabir vremena"
 
 msgid "Midnight"
 msgstr "Ponoć"
@@ -127,7 +113,27 @@ msgid "Noon"
 msgstr "Podne"
 
 msgid "6 p.m."
-msgstr ""
+msgstr "18č"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Obaveštenje: Vi ste %s sat ispred serverskog vremena."
+msgstr[1] "Obaveštenje: Vi ste %s sata ispred serverskog vremena."
+msgstr[2] "Obaveštenje: Vi ste %s sati ispred serverskog vremena."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Obaveštenje: Vi ste %s sat iza serverskog vremena."
+msgstr[1] "Obaveštenje: Vi ste %s sata iza serverskog vremena."
+msgstr[2] "Obaveštenje: Vi ste %s sati iza serverskog vremena."
+
+msgid "Choose a Time"
+msgstr "Odaberite vreme"
+
+msgid "Choose a time"
+msgstr "Odabir vremena"
 
 msgid "Cancel"
 msgstr "Poništi"
@@ -136,7 +142,7 @@ msgid "Today"
 msgstr "Danas"
 
 msgid "Choose a Date"
-msgstr ""
+msgstr "Odaberite datum"
 
 msgid "Yesterday"
 msgstr "Juče"
@@ -145,68 +151,116 @@ msgid "Tomorrow"
 msgstr "Sutra"
 
 msgid "January"
-msgstr ""
+msgstr "Januar"
 
 msgid "February"
-msgstr ""
+msgstr "Februar"
 
 msgid "March"
-msgstr ""
+msgstr "Mart"
 
 msgid "April"
-msgstr ""
+msgstr "April"
 
 msgid "May"
-msgstr ""
+msgstr "Maj"
 
 msgid "June"
-msgstr ""
+msgstr "Jun"
 
 msgid "July"
-msgstr ""
+msgstr "Jul"
 
 msgid "August"
-msgstr ""
+msgstr "Avgust"
 
 msgid "September"
-msgstr ""
+msgstr "Septembar"
 
 msgid "October"
-msgstr ""
+msgstr "Oktobar"
 
 msgid "November"
-msgstr ""
+msgstr "Novembar"
 
 msgid "December"
-msgstr ""
+msgstr "Decembar"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "jan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "feb"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "mart"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "maj"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "jun"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "jul"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "avg"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "sep"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "dec"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "N"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "P"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "U"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "S"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "Č"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "P"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "S"
 
 msgid "Show"
 msgstr "Pokaži"

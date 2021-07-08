@@ -54,8 +54,8 @@ class DateFormatTests(SimpleTestCase):
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), ltz), dt)
         # astimezone() is safe here because the target timezone doesn't have DST
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U'))), dt.astimezone(ltz).replace(tzinfo=None))
-        self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), tz).utctimetuple(), dt.utctimetuple())
-        self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), ltz).utctimetuple(), dt.utctimetuple())
+        self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), tz).timetuple(), dt.astimezone(tz).timetuple())
+        self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), ltz).timetuple(), dt.astimezone(ltz).timetuple())
 
     def test_epoch(self):
         udt = datetime(1970, 1, 1, tzinfo=utc)
@@ -116,6 +116,9 @@ class DateFormatTests(SimpleTestCase):
         the_future = datetime(2100, 10, 25, 0, 00)
         self.assertEqual(dateformat.format(the_future, r'Y'), '2100')
 
+    def test_day_of_year_leap(self):
+        self.assertEqual(dateformat.format(datetime(2000, 12, 31), 'z'), '366')
+
     def test_timezones(self):
         my_birthday = datetime(1979, 7, 8, 22, 00)
         summertime = datetime(2005, 10, 30, 1, 00)
@@ -128,7 +131,7 @@ class DateFormatTests(SimpleTestCase):
 
         if TZ_SUPPORT:
             self.assertEqual(dateformat.format(my_birthday, 'O'), '+0100')
-            self.assertEqual(dateformat.format(my_birthday, 'r'), 'Sun, 8 Jul 1979 22:00:00 +0100')
+            self.assertEqual(dateformat.format(my_birthday, 'r'), 'Sun, 08 Jul 1979 22:00:00 +0100')
             self.assertEqual(dateformat.format(my_birthday, 'T'), 'CET')
             self.assertEqual(dateformat.format(my_birthday, 'e'), '')
             self.assertEqual(dateformat.format(aware_dt, 'e'), '-0330')
@@ -146,10 +149,52 @@ class DateFormatTests(SimpleTestCase):
     def test_invalid_time_format_specifiers(self):
         my_birthday = date(1984, 8, 7)
 
-        for specifier in ['a', 'A', 'f', 'g', 'G', 'h', 'H', 'i', 'P', 's', 'u']:
+        for specifier in ['a', 'A', 'f', 'g', 'G', 'h', 'H', 'i', 'P', 'r', 's', 'u']:
             msg = (
                 "The format for date objects may not contain time-related "
                 "format specifiers (found '%s')." % specifier
             )
             with self.assertRaisesMessage(TypeError, msg):
                 dateformat.format(my_birthday, specifier)
+
+    def test_r_format_with_non_en_locale(self):
+        # Changing the locale doesn't change the "r" format.
+        dt = datetime(1979, 7, 8, 22, 00)
+        with translation.override('fr'):
+            self.assertEqual(
+                dateformat.format(dt, 'r'),
+                'Sun, 08 Jul 1979 22:00:00 +0100',
+            )
+
+    def test_y_format_year_before_1000(self):
+        tests = [
+            (476, '76'),
+            (42, '42'),
+            (4, '04'),
+        ]
+        for year, expected_date in tests:
+            with self.subTest(year=year):
+                self.assertEqual(
+                    dateformat.format(datetime(year, 9, 8, 5, 0), 'y'),
+                    expected_date,
+                )
+
+    def test_Y_format_year_before_1000(self):
+        self.assertEqual(dateformat.format(datetime(1, 1, 1), 'Y'), '0001')
+        self.assertEqual(dateformat.format(datetime(999, 1, 1), 'Y'), '0999')
+
+    def test_twelve_hour_format(self):
+        tests = [
+            (0, '12'),
+            (1, '1'),
+            (11, '11'),
+            (12, '12'),
+            (13, '1'),
+            (23, '11'),
+        ]
+        for hour, expected in tests:
+            with self.subTest(hour=hour):
+                self.assertEqual(
+                    dateformat.format(datetime(2000, 1, 1, hour), 'g'),
+                    expected,
+                )
