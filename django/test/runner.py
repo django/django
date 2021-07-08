@@ -504,10 +504,6 @@ class Shuffler:
     def seed_display(self):
         return f'{self.seed!r} ({self.seed_source})'
 
-    def _hash_item(self, item, key):
-        text = '{}{}'.format(self.seed, key(item))
-        return self._hash_text(text)
-
     def shuffle(self, items, key):
         """
         Return a new list of the items in a shuffled order.
@@ -517,16 +513,13 @@ class Shuffler:
         order of the return value is deterministic. It depends on the seed
         and key function but not on the original order.
         """
-        hashes = {}
-        for item in items:
-            hashed = self._hash_item(item, key)
-            if hashed in hashes:
-                msg = 'item {!r} has same hash {!r} as item {!r}'.format(
-                    item, hashed, hashes[hashed],
-                )
-                raise RuntimeError(msg)
-            hashes[hashed] = item
-        return [hashes[hashed] for hashed in sorted(hashes)]
+        def sort_key(item):
+            key_value = key(item)
+            text = '{}{}'.format(self.seed, key_value)
+            hash_value = self._hash_text(text)
+            return hash_value, key_value
+
+        return list(sorted(items, key=sort_key))
 
 
 class DiscoverRunner:
