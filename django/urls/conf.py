@@ -1,8 +1,10 @@
 """Functions for use in URLsconfs."""
 from functools import partial
 from importlib import import_module
+from django.core.checks import messages
 
 from django.core.exceptions import ImproperlyConfigured
+from django.http import HttpRequest ,HttpResponseNotAllowed
 
 from .resolvers import (
     LocalePrefixPattern, RegexPattern, RoutePattern, URLPattern, URLResolver,
@@ -54,9 +56,12 @@ def include(arg, namespace=None):
     return (urlconf_module, app_name, namespace)
 
 
-def _path(route, view, kwargs=None, name=None, Pattern=None):
+def _path(route, view, kwargs=None, name=None, Pattern=None , methods=None):
     from django.views import View
-
+    
+    if not isinstance(methods,None) and HttpRequest.method not in methods:
+        raise HttpResponseNotAllowed(permitted_methods=methods,content="Method is not Allowed")
+    
     if isinstance(view, (list, tuple)):
         # For include(...) processing.
         pattern = Pattern(route, is_endpoint=False)
