@@ -1791,7 +1791,8 @@ Default options
 .. program:: None
 
 Although some commands may allow their own custom options, every command
-allows for the following options:
+allows for the following options (except for the :djadmin:`runserver` command,
+because this command do not use :option:`--verbosity` and :option:`--traceback`):
 
 .. django-admin-option:: --pythonpath PYTHONPATH
 
@@ -1827,6 +1828,7 @@ Example usage::
 Displays a full stack trace when a :exc:`~django.core.management.CommandError`
 is raised. By default, ``django-admin`` will show an error message when a
 ``CommandError`` occurs and a full stack trace for any other exception.
+This option is not used with :djadmin:`runserver` command.
 
 Example usage::
 
@@ -1835,7 +1837,7 @@ Example usage::
 .. django-admin-option:: --verbosity {0,1,2,3}, -v {0,1,2,3}
 
 Specifies the amount of notification and debug information that a command
-should print to the console.
+should print to the console. This option is not used with :djadmin:`runserver` command.
 
 * ``0`` means no output.
 * ``1`` means normal output (default).

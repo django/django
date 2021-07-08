@@ -1411,12 +1411,10 @@ class ManageTestserver(SimpleTestCase):
                 "has not been deleted. You can explore it on your own."
             ),
             skip_checks=True,
-            traceback=False,
             use_ipv6=False,
             use_reloader=False,
             use_static_handler=True,
             use_threading=connection.features.test_db_allows_multiple_connections,
-            verbosity=1,
         )
 
 
@@ -1495,6 +1493,17 @@ class CommandTypes(AdminScriptTestCase):
         self.assertNotEqual(version_location, -1)
         self.assertLess(tag_location, version_location)
         self.assertOutput(out, "Checks the entire Django project for potential problems.")
+
+    def test_help_ignored_options_by_runserver(self):
+        "runserver does not use --traceback and --verbosity options"
+        args = ['runserver', '--help']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, 'optional')
+        self.assertOutput(out, '--version')
+        self.assertNotInOutput(out, '--verbosity')
+        self.assertNotInOutput(out, '--traceback')
+        self.assertOutput(out, '--no-color')
 
     def test_color_style(self):
         style = color.no_style()

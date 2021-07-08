@@ -287,11 +287,6 @@ class BaseCommand:
         )
         parser.add_argument('--version', action='version', version=self.get_version())
         parser.add_argument(
-            '-v', '--verbosity', default=1,
-            type=int, choices=[0, 1, 2, 3],
-            help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output',
-        )
-        parser.add_argument(
             '--settings',
             help=(
                 'The Python path to a settings module, e.g. '
@@ -303,7 +298,6 @@ class BaseCommand:
             '--pythonpath',
             help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".',
         )
-        parser.add_argument('--traceback', action='store_true', help='Raise on CommandError exceptions')
         parser.add_argument(
             '--no-color', action='store_true',
             help="Don't colorize the command output.",
@@ -312,6 +306,13 @@ class BaseCommand:
             '--force-color', action='store_true',
             help='Force colorization of the command output.',
         )
+        if subcommand != 'runserver':
+            parser.add_argument('--traceback', action='store_true', help='Raise on CommandError exceptions')
+            parser.add_argument(
+                '-v', '--verbosity', default=1,
+                type=int, choices=[0, 1, 2, 3],
+                help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output',
+            )
         if self.requires_system_checks:
             parser.add_argument(
                 '--skip-checks', action='store_true',
