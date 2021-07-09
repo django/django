@@ -1,0 +1,7 @@
+Hi,
+
+you can use 'pyism' Template-Engine ( https://github.com/amir4v/pyism )
+for having this syntax that is really handy:
+  @python
+      [...]
+  @end
