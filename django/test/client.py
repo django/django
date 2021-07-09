@@ -834,7 +834,7 @@ class Client(ClientMixin, RequestFactory):
                 extra['SERVER_PORT'] = str(url.port)
 
             # Prepend the request path to handle relative path redirects
-            path = url.path
+            path = url.path or '/'
             if not path.startswith('/'):
                 path = urljoin(response.request['PATH_INFO'], path)
 

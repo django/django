@@ -36,9 +36,7 @@ class RegrAvgY(StatAggregate):
 class RegrCount(StatAggregate):
     function = 'REGR_COUNT'
     output_field = IntegerField()
-
-    def convert_value(self, value, expression, connection):
-        return 0 if value is None else value
+    empty_aggregate_value = 0
 
 
 class RegrIntercept(StatAggregate):

@@ -1457,6 +1457,13 @@ different database tables).
 Django will raise a :exc:`~django.core.exceptions.FieldError` if you override
 any model field in any ancestor model.
 
+Note that because of the way fields are resolved during class definition, model
+fields inherited from multiple abstract parent models are resolved in a strict
+depth-first order. This contrasts with standard Python MRO, which is resolved
+breadth-first in cases of diamond shaped inheritance. This difference only
+affects complex model hierarchies, which (as per the advice above) you should
+try to avoid.
+
 Organizing models in a package
 ==============================
 

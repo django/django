@@ -25,6 +25,7 @@ Some examples
 
     from django.db.models import Count, F, Value
     from django.db.models.functions import Length, Upper
+    from django.db.models.lookups import GreaterThan
 
     # Find companies that have more employees than chairs.
     Company.objects.filter(num_employees__gt=F('num_chairs'))
@@ -74,6 +75,13 @@ Some examples
     from django.db.models import Exists
     Company.objects.filter(
         Exists(Employee.objects.filter(company=OuterRef('pk'), salary__gt=10))
+    )
+
+    # Lookup expressions can also be used directly in filters
+    Company.objects.filter(GreaterThan(F('num_employees'), F('num_chairs')))
+    # or annotations.
+    Company.objects.annotate(
+        need_chairs=GreaterThan(F('num_employees'), F('num_chairs')),
     )
 
 Built-in Expressions
@@ -409,6 +417,14 @@ The ``Aggregate`` API is as follows:
         A class attribute determining whether or not this aggregate function
         allows passing a ``distinct`` keyword argument. If set to ``False``
         (default), ``TypeError`` is raised if ``distinct=True`` is passed.
+
+    .. attribute:: empty_aggregate_value
+
+        .. versionadded:: 4.0
+
+        Override :attr:`~django.db.models.Expression.empty_aggregate_value` to
+        ``None`` since most aggregate functions result in ``NULL`` when applied
+        to an empty result set.
 
 The ``expressions`` positional arguments can include expressions, transforms of
 the model field, or the names of model fields. They will be converted to a
@@ -949,6 +965,15 @@ calling the appropriate methods on the wrapped expression.
         Tells Django that this expression can be used as the source expression
         in :class:`~django.db.models.expressions.Window`. Defaults to
         ``False``.
+
+    .. attribute:: empty_aggregate_value
+
+        .. versionadded:: 4.0
+
+        Tells Django which value should be returned when the expression is used
+        to :meth:`aggregate <django.db.models.query.QuerySet.aggregate>` over
+        an empty result set. Defaults to :py:data:`NotImplemented` which forces
+        the expression to be computed on the database.
 
     .. method:: resolve_expression(query=None, allow_joins=True, reuse=None, summarize=False, for_save=False)
 

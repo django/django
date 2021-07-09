@@ -25,3 +25,7 @@ class Timestamp(models.Model):
 
 class AllDayEvent(models.Model):
     day = models.DateField()
+
+
+class DailyEvent(models.Model):
+    time = models.TimeField()

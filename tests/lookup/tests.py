@@ -6,9 +6,13 @@ from operator import attrgetter
 from django.core.exceptions import FieldError
 from django.db import connection, models
 from django.db.models import (
-    BooleanField, Exists, ExpressionWrapper, F, Max, OuterRef, Q,
+    BooleanField, Case, Exists, ExpressionWrapper, F, Max, OuterRef, Q,
+    Subquery, Value, When,
 )
-from django.db.models.functions import Substr
+from django.db.models.functions import Cast, Substr
+from django.db.models.lookups import (
+    Exact, GreaterThan, GreaterThanOrEqual, LessThan, LessThanOrEqual,
+)
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 
@@ -1020,3 +1024,156 @@ class LookupTests(TestCase):
             )),
             [stock_1, stock_2],
         )
+
+
+class LookupQueryingTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.s1 = Season.objects.create(year=1942, gt=1942)
+        cls.s2 = Season.objects.create(year=1842, gt=1942)
+        cls.s3 = Season.objects.create(year=2042, gt=1942)
+
+    def test_annotate(self):
+        qs = Season.objects.annotate(equal=Exact(F('year'), 1942))
+        self.assertCountEqual(
+            qs.values_list('year', 'equal'),
+            ((1942, True), (1842, False), (2042, False)),
+        )
+
+    def test_alias(self):
+        qs = Season.objects.alias(greater=GreaterThan(F('year'), 1910))
+        self.assertCountEqual(qs.filter(greater=True), [self.s1, self.s3])
+
+    def test_annotate_value_greater_than_value(self):
+        qs = Season.objects.annotate(greater=GreaterThan(Value(40), Value(30)))
+        self.assertCountEqual(
+            qs.values_list('year', 'greater'),
+            ((1942, True), (1842, True), (2042, True)),
+        )
+
+    def test_annotate_field_greater_than_field(self):
+        qs = Season.objects.annotate(greater=GreaterThan(F('year'), F('gt')))
+        self.assertCountEqual(
+            qs.values_list('year', 'greater'),
+            ((1942, False), (1842, False), (2042, True)),
+        )
+
+    def test_annotate_field_greater_than_value(self):
+        qs = Season.objects.annotate(greater=GreaterThan(F('year'), Value(1930)))
+        self.assertCountEqual(
+            qs.values_list('year', 'greater'),
+            ((1942, True), (1842, False), (2042, True)),
+        )
+
+    def test_annotate_field_greater_than_literal(self):
+        qs = Season.objects.annotate(greater=GreaterThan(F('year'), 1930))
+        self.assertCountEqual(
+            qs.values_list('year', 'greater'),
+            ((1942, True), (1842, False), (2042, True)),
+        )
+
+    def test_annotate_literal_greater_than_field(self):
+        qs = Season.objects.annotate(greater=GreaterThan(1930, F('year')))
+        self.assertCountEqual(
+            qs.values_list('year', 'greater'),
+            ((1942, False), (1842, True), (2042, False)),
+        )
+
+    def test_annotate_less_than_float(self):
+        qs = Season.objects.annotate(lesser=LessThan(F('year'), 1942.1))
+        self.assertCountEqual(
+            qs.values_list('year', 'lesser'),
+            ((1942, True), (1842, True), (2042, False)),
+        )
+
+    def test_annotate_greater_than_or_equal(self):
+        qs = Season.objects.annotate(greater=GreaterThanOrEqual(F('year'), 1942))
+        self.assertCountEqual(
+            qs.values_list('year', 'greater'),
+            ((1942, True), (1842, False), (2042, True)),
+        )
+
+    def test_annotate_greater_than_or_equal_float(self):
+        qs = Season.objects.annotate(greater=GreaterThanOrEqual(F('year'), 1942.1))
+        self.assertCountEqual(
+            qs.values_list('year', 'greater'),
+            ((1942, False), (1842, False), (2042, True)),
+        )
+
+    def test_combined_lookups(self):
+        expression = Exact(F('year'), 1942) | GreaterThan(F('year'), 1942)
+        qs = Season.objects.annotate(gte=expression)
+        self.assertCountEqual(
+            qs.values_list('year', 'gte'),
+            ((1942, True), (1842, False), (2042, True)),
+        )
+
+    def test_lookup_in_filter(self):
+        qs = Season.objects.filter(GreaterThan(F('year'), 1910))
+        self.assertCountEqual(qs, [self.s1, self.s3])
+
+    def test_filter_lookup_lhs(self):
+        qs = Season.objects.annotate(before_20=LessThan(F('year'), 2000)).filter(
+            before_20=LessThan(F('year'), 1900),
+        )
+        self.assertCountEqual(qs, [self.s2, self.s3])
+
+    def test_filter_wrapped_lookup_lhs(self):
+        qs = Season.objects.annotate(before_20=ExpressionWrapper(
+            Q(year__lt=2000),
+            output_field=BooleanField(),
+        )).filter(before_20=LessThan(F('year'), 1900)).values_list('year', flat=True)
+        self.assertCountEqual(qs, [1842, 2042])
+
+    def test_filter_exists_lhs(self):
+        qs = Season.objects.annotate(before_20=Exists(
+            Season.objects.filter(pk=OuterRef('pk'), year__lt=2000),
+        )).filter(before_20=LessThan(F('year'), 1900))
+        self.assertCountEqual(qs, [self.s2, self.s3])
+
+    def test_filter_subquery_lhs(self):
+        qs = Season.objects.annotate(before_20=Subquery(
+            Season.objects.filter(pk=OuterRef('pk')).values(
+                lesser=LessThan(F('year'), 2000),
+            ),
+        )).filter(before_20=LessThan(F('year'), 1900))
+        self.assertCountEqual(qs, [self.s2, self.s3])
+
+    def test_combined_lookups_in_filter(self):
+        expression = Exact(F('year'), 1942) | GreaterThan(F('year'), 1942)
+        qs = Season.objects.filter(expression)
+        self.assertCountEqual(qs, [self.s1, self.s3])
+
+    def test_combined_annotated_lookups_in_filter(self):
+        expression = Exact(F('year'), 1942) | GreaterThan(F('year'), 1942)
+        qs = Season.objects.annotate(gte=expression).filter(gte=True)
+        self.assertCountEqual(qs, [self.s1, self.s3])
+
+    def test_combined_annotated_lookups_in_filter_false(self):
+        expression = Exact(F('year'), 1942) | GreaterThan(F('year'), 1942)
+        qs = Season.objects.annotate(gte=expression).filter(gte=False)
+        self.assertSequenceEqual(qs, [self.s2])
+
+    def test_lookup_in_order_by(self):
+        qs = Season.objects.order_by(LessThan(F('year'), 1910), F('year'))
+        self.assertSequenceEqual(qs, [self.s1, self.s3, self.s2])
+
+    @skipUnlessDBFeature('supports_boolean_expr_in_select_clause')
+    def test_aggregate_combined_lookup(self):
+        expression = Cast(GreaterThan(F('year'), 1900), models.IntegerField())
+        qs = Season.objects.aggregate(modern=models.Sum(expression))
+        self.assertEqual(qs['modern'], 2)
+
+    def test_conditional_expression(self):
+        qs = Season.objects.annotate(century=Case(
+            When(
+                GreaterThan(F('year'), 1900) & LessThanOrEqual(F('year'), 2000),
+                then=Value('20th'),
+            ),
+            default=Value('other'),
+        )).values('year', 'century')
+        self.assertCountEqual(qs, [
+            {'year': 1942, 'century': '20th'},
+            {'year': 1842, 'century': 'other'},
+            {'year': 2042, 'century': 'other'},
+        ])

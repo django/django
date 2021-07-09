@@ -1,6 +1,7 @@
 """
 Tests for django test runner
 """
+import collections.abc
 import unittest
 from unittest import mock
 
@@ -14,7 +15,9 @@ from django.core.management.base import SystemCheckError
 from django.test import (
     SimpleTestCase, TransactionTestCase, skipUnlessDBFeature,
 )
-from django.test.runner import DiscoverRunner, reorder_tests
+from django.test.runner import (
+    DiscoverRunner, Shuffler, reorder_test_bin, reorder_tests, shuffle_tests,
+)
 from django.test.testcases import connections_support_transactions
 from django.test.utils import (
     captured_stderr, dependency_ordered, get_unique_databases_and_mirrors,
@@ -36,7 +39,7 @@ class MySuite:
         yield from self.tests
 
 
-class TestSuiteTests(unittest.TestCase):
+class TestSuiteTests(SimpleTestCase):
     def build_test_suite(self, test_classes, suite=None, suite_class=None):
         if suite_class is None:
             suite_class = unittest.TestSuite
@@ -89,6 +92,14 @@ class TestSuiteTests(unittest.TestCase):
             'Tests1.test1', 'Tests1.test2', 'Tests2.test1', 'Tests2.test2',
         ])
 
+    def test_iter_test_cases_string_input(self):
+        msg = (
+            "Test 'a' must be a test case or test suite not string (was found "
+            "in 'abc')."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            list(iter_test_cases('abc'))
+
     def test_iter_test_cases_iterable_of_tests(self):
         class Tests(unittest.TestCase):
             def test1(self):
@@ -117,6 +128,68 @@ class TestSuiteTests(unittest.TestCase):
         tests = list(iter_test_cases(suite))
         self.assertEqual(len(tests), 4)
         self.assertNotIsInstance(tests[0], unittest.TestSuite)
+
+    def make_tests(self):
+        """Return an iterable of tests."""
+        suite = self.make_test_suite()
+        tests = list(iter_test_cases(suite))
+        return tests
+
+    def test_shuffle_tests(self):
+        tests = self.make_tests()
+        # Choose a seed that shuffles both the classes and methods.
+        shuffler = Shuffler(seed=9)
+        shuffled_tests = shuffle_tests(tests, shuffler)
+        self.assertIsInstance(shuffled_tests, collections.abc.Iterator)
+        self.assertTestNames(shuffled_tests, expected=[
+            'Tests2.test1', 'Tests2.test2', 'Tests1.test2', 'Tests1.test1',
+        ])
+
+    def test_reorder_test_bin_no_arguments(self):
+        tests = self.make_tests()
+        reordered_tests = reorder_test_bin(tests)
+        self.assertIsInstance(reordered_tests, collections.abc.Iterator)
+        self.assertTestNames(reordered_tests, expected=[
+            'Tests1.test1', 'Tests1.test2', 'Tests2.test1', 'Tests2.test2',
+        ])
+
+    def test_reorder_test_bin_reverse(self):
+        tests = self.make_tests()
+        reordered_tests = reorder_test_bin(tests, reverse=True)
+        self.assertIsInstance(reordered_tests, collections.abc.Iterator)
+        self.assertTestNames(reordered_tests, expected=[
+            'Tests2.test2', 'Tests2.test1', 'Tests1.test2', 'Tests1.test1',
+        ])
+
+    def test_reorder_test_bin_random(self):
+        tests = self.make_tests()
+        # Choose a seed that shuffles both the classes and methods.
+        shuffler = Shuffler(seed=9)
+        reordered_tests = reorder_test_bin(tests, shuffler=shuffler)
+        self.assertIsInstance(reordered_tests, collections.abc.Iterator)
+        self.assertTestNames(reordered_tests, expected=[
+            'Tests2.test1', 'Tests2.test2', 'Tests1.test2', 'Tests1.test1',
+        ])
+
+    def test_reorder_test_bin_random_and_reverse(self):
+        tests = self.make_tests()
+        # Choose a seed that shuffles both the classes and methods.
+        shuffler = Shuffler(seed=9)
+        reordered_tests = reorder_test_bin(tests, shuffler=shuffler, reverse=True)
+        self.assertIsInstance(reordered_tests, collections.abc.Iterator)
+        self.assertTestNames(reordered_tests, expected=[
+            'Tests1.test1', 'Tests1.test2', 'Tests2.test2', 'Tests2.test1',
+        ])
+
+    def test_reorder_tests_random(self):
+        tests = self.make_tests()
+        # Choose a seed that shuffles both the classes and methods.
+        shuffler = Shuffler(seed=9)
+        reordered_tests = reorder_tests(tests, classes=[], shuffler=shuffler)
+        self.assertIsInstance(reordered_tests, collections.abc.Iterator)
+        self.assertTestNames(reordered_tests, expected=[
+            'Tests2.test1', 'Tests2.test2', 'Tests1.test2', 'Tests1.test1',
+        ])
 
     def test_reorder_tests_reverse_with_duplicates(self):
         class Tests1(unittest.TestCase):

@@ -131,6 +131,11 @@ Minor features
   :class:`~django.contrib.postgres.operations.AddConstraintNotValid` on
   PostgreSQL.
 
+* The new
+  :class:`ArraySubquery() <django.contrib.postgres.expressions.ArraySubquery>`
+  expression allows using subqueries to construct lists of values on
+  PostgreSQL.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -226,7 +231,8 @@ Internationalization
 Logging
 ~~~~~~~
 
-* ...
+* The alias of the database used in an SQL call is now passed as extra context
+  along with each message to the :ref:`django-db-logger` logger.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -235,6 +241,11 @@ Management Commands
   :option:`--skip-checks` option.
 
 * On PostgreSQL, :djadmin:`dbshell` now supports specifying a password file.
+
+* The :djadmin:`shell` command now respects :py:data:`sys.__interactivehook__`
+  at startup. This allows loading shell history between interactive sessions.
+  As a consequence, ``readline`` is no longer loaded if running in *isolated*
+  mode.
 
 Migrations
 ~~~~~~~~~~
@@ -257,6 +268,17 @@ Models
 
 * :class:`~django.db.models.DurationField` now supports multiplying and
   dividing by scalar values on SQLite.
+
+* :meth:`.QuerySet.bulk_update` now returns the number of objects updated.
+
+* The new :attr:`.Aggregate.empty_aggregate_value` attribute allows specifying
+  a value to return when the aggregation is used over an empty result set.
+
+* The ``skip_locked`` argument of :meth:`.QuerySet.select_for_update()` is now
+  allowed on MariaDB 10.6+.
+
+* :class:`~django.db.models.Lookup` expressions may now be used in ``QuerySet``
+  annotations, aggregations, and directly in filters.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -305,6 +327,9 @@ Tests
 
 * The new :meth:`.DiscoverRunner.log` method allows customizing the way
   messages are logged.
+
+* Django test runner now supports a :option:`--shuffle <test --shuffle>` option
+  to execute tests in a random order.
 
 URLs
 ~~~~

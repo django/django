@@ -315,6 +315,12 @@ class CheckFrameworkReservedNamesTests(SimpleTestCase):
                 id='models.E020'
             ),
             Error(
+                "The 'ModelWithFieldCalledCheck.check()' class method is "
+                "currently overridden by %r." % ModelWithFieldCalledCheck.check,
+                obj=ModelWithFieldCalledCheck,
+                id='models.E020'
+            ),
+            Error(
                 "The 'ModelWithRelatedManagerCalledCheck.check()' class method is "
                 "currently overridden by %r." % ModelWithRelatedManagerCalledCheck.check,
                 obj=ModelWithRelatedManagerCalledCheck,

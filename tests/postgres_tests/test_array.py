@@ -10,7 +10,7 @@ from django.core.exceptions import FieldError
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
 from django.db.models.expressions import Exists, OuterRef, RawSQL, Value
-from django.db.models.functions import Cast, Upper
+from django.db.models.functions import Cast, JSONObject, Upper
 from django.test import TransactionTestCase, modify_settings, override_settings
 from django.test.utils import isolate_apps
 from django.utils import timezone
@@ -28,6 +28,7 @@ try:
     from psycopg2.extras import NumericRange
 
     from django.contrib.postgres.aggregates import ArrayAgg
+    from django.contrib.postgres.expressions import ArraySubquery
     from django.contrib.postgres.fields import ArrayField
     from django.contrib.postgres.fields.array import (
         IndexTransform, SliceTransform,
@@ -549,6 +550,66 @@ class TestQuerying(PostgreSQLTestCase):
                 count=models.Count('pk'),
             ).get()['array_length'],
             1,
+        )
+
+    def test_filter_by_array_subquery(self):
+        inner_qs = NullableIntegerArrayModel.objects.filter(
+            field__len=models.OuterRef('field__len'),
+        ).values('field')
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.alias(
+                same_sized_fields=ArraySubquery(inner_qs),
+            ).filter(same_sized_fields__len__gt=1),
+            self.objs[0:2],
+        )
+
+    def test_annotated_array_subquery(self):
+        inner_qs = NullableIntegerArrayModel.objects.exclude(
+            pk=models.OuterRef('pk')
+        ).values('order')
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.annotate(
+                sibling_ids=ArraySubquery(inner_qs),
+            ).get(order=1).sibling_ids,
+            [2, 3, 4, 5],
+        )
+
+    def test_group_by_with_annotated_array_subquery(self):
+        inner_qs = NullableIntegerArrayModel.objects.exclude(
+            pk=models.OuterRef('pk')
+        ).values('order')
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.annotate(
+                sibling_ids=ArraySubquery(inner_qs),
+                sibling_count=models.Max('sibling_ids__len'),
+            ).values_list('sibling_count', flat=True),
+            [len(self.objs) - 1] * len(self.objs),
+        )
+
+    def test_annotated_ordered_array_subquery(self):
+        inner_qs = NullableIntegerArrayModel.objects.order_by('-order').values('order')
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.annotate(
+                ids=ArraySubquery(inner_qs),
+            ).first().ids,
+            [5, 4, 3, 2, 1],
+        )
+
+    def test_annotated_array_subquery_with_json_objects(self):
+        inner_qs = NullableIntegerArrayModel.objects.exclude(
+            pk=models.OuterRef('pk')
+        ).values(json=JSONObject(order='order', field='field'))
+        siblings_json = NullableIntegerArrayModel.objects.annotate(
+            siblings_json=ArraySubquery(inner_qs),
+        ).values_list('siblings_json', flat=True).get(order=1)
+        self.assertSequenceEqual(
+            siblings_json,
+            [
+                {'field': [2], 'order': 2},
+                {'field': [2, 3], 'order': 3},
+                {'field': [20, 30, 40], 'order': 4},
+                {'field': None, 'order': 5},
+            ],
         )
 
 

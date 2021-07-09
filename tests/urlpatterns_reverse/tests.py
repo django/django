@@ -271,8 +271,9 @@ class NoURLPatternsTests(SimpleTestCase):
         with self.assertRaisesMessage(
             ImproperlyConfigured,
             "The included URLconf 'urlpatterns_reverse.no_urls' does not "
-            "appear to have any patterns in it. If you see valid patterns in "
-            "the file then the issue is probably caused by a circular import."
+            "appear to have any patterns in it. If you see the 'urlpatterns' "
+            "variable with valid patterns in the file then the issue is "
+            "probably caused by a circular import."
         ):
             getattr(resolver, 'url_patterns')
 
@@ -1095,8 +1096,9 @@ class NoRootUrlConfTests(SimpleTestCase):
     def test_no_handler_exception(self):
         msg = (
             "The included URLconf 'None' does not appear to have any patterns "
-            "in it. If you see valid patterns in the file then the issue is "
-            "probably caused by a circular import."
+            "in it. If you see the 'urlpatterns' variable with valid patterns "
+            "in the file then the issue is probably caused by a circular "
+            "import."
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.client.get('/test/me/')

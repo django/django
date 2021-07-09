@@ -12,7 +12,7 @@ from unittest import mock
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import DatabaseError, connection
-from django.http import Http404
+from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.template import TemplateDoesNotExist
 from django.test import RequestFactory, SimpleTestCase, override_settings
@@ -1635,3 +1635,17 @@ class DecoratorsTests(SimpleTestCase):
             @sensitive_post_parameters
             def test_func(request):
                 return index_page(request)
+
+    def test_sensitive_post_parameters_http_request(self):
+        class MyClass:
+            @sensitive_post_parameters()
+            def a_view(self, request):
+                return HttpResponse()
+
+        msg = (
+            "sensitive_post_parameters didn't receive an HttpRequest object. "
+            "If you are decorating a classmethod, make sure to use "
+            "@method_decorator."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            MyClass().a_view(HttpRequest())

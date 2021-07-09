@@ -77,11 +77,12 @@ def sensitive_post_parameters(*parameters):
     def decorator(view):
         @functools.wraps(view)
         def sensitive_post_parameters_wrapper(request, *args, **kwargs):
-            assert isinstance(request, HttpRequest), (
-                "sensitive_post_parameters didn't receive an HttpRequest. "
-                "If you are decorating a classmethod, be sure to use "
-                "@method_decorator."
-            )
+            if not isinstance(request, HttpRequest):
+                raise TypeError(
+                    "sensitive_post_parameters didn't receive an HttpRequest "
+                    "object. If you are decorating a classmethod, make sure "
+                    "to use @method_decorator."
+                )
             if parameters:
                 request.sensitive_post_parameters = parameters
             else:

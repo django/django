@@ -3,6 +3,7 @@ from contextlib import contextmanager
 from io import StringIO
 from unittest import mock
 
+from django.core.exceptions import ImproperlyConfigured
 from django.db import DatabaseError, connection
 from django.db.backends.base.creation import BaseDatabaseCreation
 from django.test import SimpleTestCase
@@ -60,6 +61,15 @@ class DatabaseCreationTests(SimpleTestCase):
     def test_sql_table_creation_suffix_with_encoding_and_template(self):
         settings = {'CHARSET': 'UTF8', 'TEMPLATE': 'template0'}
         self.check_sql_table_creation_suffix(settings, '''WITH ENCODING 'UTF8' TEMPLATE "template0"''')
+
+    def test_sql_table_creation_raises_with_collation(self):
+        settings = {'COLLATION': 'test'}
+        msg = (
+            'PostgreSQL does not support collation setting at database '
+            'creation time.'
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            self.check_sql_table_creation_suffix(settings, None)
 
     def _execute_raise_database_already_exists(self, cursor, parameters, keepdb=False):
         error = DatabaseError('database %s already exists' % parameters['dbname'])

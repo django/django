@@ -273,12 +273,12 @@ class Query(BaseExpression):
         memo[id(self)] = result
         return result
 
-    def get_compiler(self, using=None, connection=None):
+    def get_compiler(self, using=None, connection=None, elide_empty=True):
         if using is None and connection is None:
             raise ValueError("Need either using or connection")
         if using:
             connection = connections[using]
-        return connection.ops.compiler(self.compiler)(self, connection, using)
+        return connection.ops.compiler(self.compiler)(self, connection, using, elide_empty)
 
     def get_meta(self):
         """
@@ -447,11 +447,10 @@ class Query(BaseExpression):
             inner_query.select_for_update = False
             inner_query.select_related = False
             inner_query.set_annotation_mask(self.annotation_select)
-            if not self.is_sliced and not self.distinct_fields:
-                # Queries with distinct_fields need ordering and when a limit
-                # is applied we must take the slice from the ordered query.
-                # Otherwise no need for ordering.
-                inner_query.clear_ordering(True)
+            # Queries with distinct_fields need ordering and when a limit is
+            # applied we must take the slice from the ordered query. Otherwise
+            # no need for ordering.
+            inner_query.clear_ordering(force=False)
             if not inner_query.distinct:
                 # If the inner query uses default select and it has some
                 # aggregate annotations, then we must make sure the inner
@@ -491,14 +490,19 @@ class Query(BaseExpression):
             self.default_cols = False
             self.extra = {}
 
-        outer_query.clear_ordering(True)
+        empty_aggregate_result = [
+            expression.empty_aggregate_value
+            for expression in outer_query.annotation_select.values()
+        ]
+        elide_empty = not any(result is NotImplemented for result in empty_aggregate_result)
+        outer_query.clear_ordering(force=True)
         outer_query.clear_limits()
         outer_query.select_for_update = False
         outer_query.select_related = False
-        compiler = outer_query.get_compiler(using)
+        compiler = outer_query.get_compiler(using, elide_empty=elide_empty)
         result = compiler.execute_sql(SINGLE)
         if result is None:
-            result = [None] * len(outer_query.annotation_select)
+            result = empty_aggregate_result
 
         converters = compiler.get_converters(outer_query.annotation_select.values())
         result = next(compiler.apply_converters((result,), converters))
@@ -534,7 +538,7 @@ class Query(BaseExpression):
                 combined_query.exists(using, limit=limit_combined)
                 for combined_query in q.combined_queries
             )
-        q.clear_ordering(True)
+        q.clear_ordering(force=True)
         if limit:
             q.set_limits(high=1)
         q.add_extra({'a': 1}, None, None, None, None, None)
@@ -1035,12 +1039,6 @@ class Query(BaseExpression):
         # Subqueries need to use a different set of aliases than the outer query.
         clone.bump_prefix(query)
         clone.subquery = True
-        # It's safe to drop ordering if the queryset isn't using slicing,
-        # distinct(*fields) or select_for_update().
-        if (self.low_mark == 0 and self.high_mark is None and
-                not self.distinct_fields and
-                not self.select_for_update):
-            clone.clear_ordering(True)
         clone.where.resolve_expression(query, *args, **kwargs)
         for key, value in clone.annotations.items():
             resolved = value.resolve_expression(query, *args, **kwargs)
@@ -1063,6 +1061,13 @@ class Query(BaseExpression):
         ]
 
     def as_sql(self, compiler, connection):
+        # Some backends (e.g. Oracle) raise an error when a subquery contains
+        # unnecessary ORDER BY clause.
+        if (
+            self.subquery and
+            not connection.features.ignores_unnecessary_order_by_in_subqueries
+        ):
+            self.clear_ordering(force=False)
         sql, params = self.get_compiler(connection=connection).as_sql()
         if self.subquery:
             sql = '(%s)' % sql
@@ -1257,9 +1262,9 @@ class Query(BaseExpression):
         if hasattr(filter_expr, 'resolve_expression'):
             if not getattr(filter_expr, 'conditional', False):
                 raise TypeError('Cannot filter against a non-conditional expression.')
-            condition = self.build_lookup(
-                ['exact'], filter_expr.resolve_expression(self, allow_joins=allow_joins), True
-            )
+            condition = filter_expr.resolve_expression(self, allow_joins=allow_joins)
+            if not isinstance(condition, Lookup):
+                condition = self.build_lookup(['exact'], condition, True)
             clause = self.where_class()
             clause.add(condition, AND)
             return clause, []
@@ -1769,7 +1774,7 @@ class Query(BaseExpression):
         query = Query(self.model)
         query._filtered_relations = self._filtered_relations
         query.add_filter(filter_expr)
-        query.clear_ordering(True)
+        query.clear_ordering(force=True)
         # Try to have as simple as possible subquery -> trim leading joins from
         # the subquery.
         trimmed_prefix, contains_louter = query.trim_start(names_with_path)
@@ -1970,14 +1975,18 @@ class Query(BaseExpression):
         else:
             self.default_ordering = False
 
-    def clear_ordering(self, force_empty):
+    def clear_ordering(self, force=False, clear_default=True):
         """
-        Remove any ordering settings. If 'force_empty' is True, there will be
-        no ordering in the resulting query (not even the model's default).
+        Remove any ordering settings if the current query allows it without
+        side effects, set 'force' to True to clear the ordering regardless.
+        If 'clear_default' is True, there will be no ordering in the resulting
+        query (not even the model's default).
         """
+        if not force and (self.is_sliced or self.distinct_fields or self.select_for_update):
+            return
         self.order_by = ()
         self.extra_order_by = ()
-        if force_empty:
+        if clear_default:
             self.default_ordering = False
 
     def set_group_by(self, allow_aliases=True):

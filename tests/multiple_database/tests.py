@@ -1344,14 +1344,14 @@ class RouterTestCase(TestCase):
         # If you create an object through a M2M relation, it will be
         # written to the write database, even if the original object
         # was on the read database
-        alice = dive.authors.create(name='Alice')
+        alice = dive.authors.create(name='Alice', pk=3)
         self.assertEqual(alice._state.db, 'default')
 
         # Same goes for get_or_create, regardless of whether getting or creating
         alice, created = dive.authors.get_or_create(name='Alice')
         self.assertEqual(alice._state.db, 'default')
 
-        bob, created = dive.authors.get_or_create(name='Bob')
+        bob, created = dive.authors.get_or_create(name='Bob', defaults={'pk': 4})
         self.assertEqual(bob._state.db, 'default')
 
     def test_o2o_cross_database_protection(self):

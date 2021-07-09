@@ -1310,6 +1310,7 @@ class Model(metaclass=ModelBase):
                 cls._meta.pk.remote_field.parent_link
             ) and
             not settings.is_overridden('DEFAULT_AUTO_FIELD') and
+            cls._meta.app_config and
             not cls._meta.app_config._is_default_auto_field_overridden
         ):
             return [

@@ -1253,7 +1253,8 @@ class TestCase(TransactionTestCase):
             self.setUpTestData()
             return super()._fixture_setup()
 
-        assert not self.reset_sequences, 'reset_sequences cannot be used on TestCase instances'
+        if self.reset_sequences:
+            raise TypeError('reset_sequences cannot be used on TestCase instances')
         self.atomics = self._enter_atomics()
 
     def _fixture_teardown(self):

@@ -1,11 +1,14 @@
 import sys
 
 from django.contrib.auth.models import Group
-from django.template import Context, Engine, TemplateSyntaxError
+from django.template import (
+    Context, Engine, TemplateDoesNotExist, TemplateSyntaxError,
+)
 from django.template.base import UNKNOWN_SOURCE
 from django.test import SimpleTestCase, override_settings
 from django.urls import NoReverseMatch
 from django.utils import translation
+from django.utils.html import escape
 
 
 class TemplateTests(SimpleTestCase):
@@ -133,6 +136,18 @@ class TemplateTests(SimpleTestCase):
         with self.assertRaises(TemplateSyntaxError) as e:
             t.render(Context())
         self.assertEqual(e.exception.template_debug['during'], '{% badtag %}')
+
+    def test_render_tag_error_in_extended_block(self):
+        """Errors in extended block are displayed correctly."""
+        e = Engine(app_dirs=True, debug=True)
+        template = e.get_template('test_extends_block_error.html')
+        context = Context()
+        with self.assertRaises(TemplateDoesNotExist) as cm:
+            template.render(context)
+        self.assertEqual(
+            cm.exception.template_debug['during'],
+            escape('{% include "missing.html" %}'),
+        )
 
     def test_super_errors(self):
         """

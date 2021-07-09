@@ -3,6 +3,7 @@ from django.test import TestCase
 
 from .models import (
     BigChild, Child, ChildProxy, Primary, RefreshPrimaryProxy, Secondary,
+    ShadowChild,
 )
 
 
@@ -164,6 +165,11 @@ class DeferTests(AssertionMixin, TestCase):
         self.assert_delayed(obj, 3)
         self.assertEqual(obj.name, "c1")
         self.assertEqual(obj.value, "foo")
+
+    def test_defer_of_overridden_scalar(self):
+        ShadowChild.objects.create()
+        obj = ShadowChild.objects.defer('name').get()
+        self.assertEqual(obj.name, 'adonis')
 
 
 class BigChildDeferTests(AssertionMixin, TestCase):

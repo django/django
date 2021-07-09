@@ -43,6 +43,16 @@ class TestTestCase(TestCase):
         with self.assertRaisesMessage(AssertionError, message):
             Car.objects.using('other').get()
 
+    def test_reset_sequences(self):
+        old_reset_sequences = self.reset_sequences
+        self.reset_sequences = True
+        msg = 'reset_sequences cannot be used on TestCase instances'
+        try:
+            with self.assertRaisesMessage(TypeError, msg):
+                self._fixture_setup()
+        finally:
+            self.reset_sequences = old_reset_sequences
+
 
 class NonDeepCopyAble:
     def __deepcopy__(self, memo):

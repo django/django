@@ -2,6 +2,7 @@ from django.db import NotSupportedError
 from django.db.backends.ddl_references import Statement, Table
 from django.db.models import Deferrable, F, Q
 from django.db.models.constraints import BaseConstraint
+from django.db.models.expressions import Col
 from django.db.models.sql import Query
 
 __all__ = ['ExclusionConstraint']
@@ -73,6 +74,8 @@ class ExclusionConstraint(BaseConstraint):
                 expression = F(expression)
             expression = expression.resolve_expression(query=query)
             sql, params = compiler.compile(expression)
+            if not isinstance(expression, Col):
+                sql = f'({sql})'
             try:
                 opclass = self.opclasses[idx]
                 if opclass:

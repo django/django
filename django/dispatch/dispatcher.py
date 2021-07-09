@@ -80,8 +80,8 @@ class Signal:
 
         # If DEBUG is on, check that we got a good receiver
         if settings.configured and settings.DEBUG:
-            assert callable(receiver), "Signal receivers must be callable."
-
+            if not callable(receiver):
+                raise TypeError('Signal receivers must be callable.')
             # Check for **kwargs
             if not func_accepts_kwargs(receiver):
                 raise ValueError("Signal receivers must accept keyword arguments (**kwargs).")

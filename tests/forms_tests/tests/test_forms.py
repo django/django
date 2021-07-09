@@ -613,13 +613,14 @@ Java</label></li>
 </ul>"""
         )
 
-        # When RadioSelect is used with auto_id, and the whole form is printed using
-        # either as_table() or as_ul(), the label for the RadioSelect will point to the
-        # ID of the *first* radio button.
+        # When RadioSelect is used with auto_id, and the whole form is printed
+        # using either as_table() or as_ul(), the label for the RadioSelect
+        # will **not** point to the ID of the *first* radio button to improve
+        # accessibility for screen reader users.
         self.assertHTMLEqual(
             f.as_table(),
             """<tr><th><label for="id_name">Name:</label></th><td><input type="text" name="name" id="id_name" required></td></tr>
-<tr><th><label for="id_language_0">Language:</label></th><td><ul id="id_language">
+<tr><th><label>Language:</label></th><td><ul id="id_language">
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" required>
 Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" required>
@@ -629,7 +630,7 @@ Java</label></li>
         self.assertHTMLEqual(
             f.as_ul(),
             """<li><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" required></li>
-<li><label for="id_language_0">Language:</label> <ul id="id_language">
+<li><label>Language:</label> <ul id="id_language">
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" required>
 Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" required>
@@ -639,7 +640,7 @@ Java</label></li>
         self.assertHTMLEqual(
             f.as_p(),
             """<p><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" required></p>
-<p><label for="id_language_0">Language:</label> <ul id="id_language">
+<p><label>Language:</label> <ul id="id_language">
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" required>
 Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" required>

@@ -89,3 +89,10 @@ class FileResponseTests(SimpleTestCase):
             response.headers['Content-Disposition'],
             "attachment; filename*=utf-8''%E7%A5%9D%E6%82%A8%E5%B9%B3%E5%AE%89.odt"
         )
+
+    def test_repr(self):
+        response = FileResponse(io.BytesIO(b'binary content'))
+        self.assertEqual(
+            repr(response),
+            '<FileResponse status_code=200, "application/octet-stream">',
+        )

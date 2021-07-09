@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db import DatabaseError, NotSupportedError
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import strip_quotes, truncate_name
-from django.db.models import AutoField, Exists, ExpressionWrapper
+from django.db.models import AutoField, Exists, ExpressionWrapper, Lookup
 from django.db.models.expressions import RawSQL
 from django.db.models.sql.where import WhereNode
 from django.utils import timezone
@@ -202,7 +202,7 @@ END;
         # Oracle stores empty strings as null. If the field accepts the empty
         # string, undo this to adhere to the Django convention of using
         # the empty string instead of null.
-        if expression.field.empty_strings_allowed:
+        if expression.output_field.empty_strings_allowed:
             converters.append(
                 self.convert_empty_bytes
                 if internal_type == 'BinaryField' else
@@ -639,7 +639,7 @@ END;
         Oracle supports only EXISTS(...) or filters in the WHERE clause, others
         must be compared with True.
         """
-        if isinstance(expression, (Exists, WhereNode)):
+        if isinstance(expression, (Exists, Lookup, WhereNode)):
             return True
         if isinstance(expression, ExpressionWrapper) and expression.conditional:
             return self.conditional_expression_supported_in_where_clause(expression.expression)

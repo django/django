@@ -150,6 +150,10 @@ class BaseForm:
     def __getitem__(self, name):
         """Return a BoundField with the given name."""
         try:
+            return self._bound_fields_cache[name]
+        except KeyError:
+            pass
+        try:
             field = self.fields[name]
         except KeyError:
             raise KeyError(
@@ -159,9 +163,9 @@ class BaseForm:
                     ', '.join(sorted(self.fields)),
                 )
             )
-        if name not in self._bound_fields_cache:
-            self._bound_fields_cache[name] = field.get_bound_field(self, name)
-        return self._bound_fields_cache[name]
+        bound_field = field.get_bound_field(self, name)
+        self._bound_fields_cache[name] = bound_field
+        return bound_field
 
     @property
     def errors(self):
