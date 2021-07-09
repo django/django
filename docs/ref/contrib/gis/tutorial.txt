@@ -736,7 +736,7 @@ may be edited by clicking on a polygon and dragging the vertices to the desired
 position.
 
 .. _OpenLayers: https://openlayers.org/
-.. _Open Street Map: https://www.openstreetmap.org/
+.. _OpenStreetMap: https://www.openstreetmap.org/
 .. _Vector Map Level 0: http://web.archive.org/web/20201024202709/https://earth-info.nga.mil/publications/vmap0.html
 .. _OSGeo: https://www.osgeo.org/
 
@@ -746,7 +746,7 @@ position.
 ~~~~~~~~~~~~~~~
 
 With the :class:`~django.contrib.gis.admin.OSMGeoAdmin`, GeoDjango uses
-a `Open Street Map`_ layer in the admin.
+an `OpenStreetMap`_ layer in the admin.
 This provides more context (including street and thoroughfare details) than
 available with the :class:`~django.contrib.gis.admin.GeoModelAdmin`
 (which uses the `Vector Map Level 0`_ WMS dataset hosted at `OSGeo`_).
