@@ -7,8 +7,8 @@ from django.http import HttpRequest, HttpResponse, UnreadablePostError
 from django.middleware.csrf import (
     CSRF_ALLOWED_CHARS, CSRF_SESSION_KEY, CSRF_TOKEN_LENGTH, REASON_BAD_ORIGIN,
     REASON_CSRF_TOKEN_MISSING, REASON_NO_CSRF_COOKIE, CsrfViewMiddleware,
-    RejectRequest, _does_token_match, _mask_cipher_secret, _unmask_cipher_token,
-    get_token,
+    InvalidTokenFormat, RejectRequest, _does_token_match, _mask_cipher_secret,
+    _sanitize_token, _unmask_cipher_token, get_token, rotate_token,
 )
 from django.test import SimpleTestCase, override_settings
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
@@ -68,6 +68,76 @@ class CsrfFunctionTests(SimpleTestCase):
             with self.subTest(secret=secret):
                 masked = _mask_cipher_secret(secret)
                 self.assertMaskedSecretCorrect(masked, secret)
+
+    def test_get_token_csrf_cookie_set(self):
+        request = HttpRequest()
+        request.META['CSRF_COOKIE'] = MASKED_TEST_SECRET1
+        self.assertNotIn('CSRF_COOKIE_NEEDS_UPDATE', request.META)
+        token = get_token(request)
+        self.assertNotEqual(token, MASKED_TEST_SECRET1)
+        self.assertMaskedSecretCorrect(token, TEST_SECRET)
+        # The existing cookie is preserved.
+        self.assertEqual(request.META['CSRF_COOKIE'], MASKED_TEST_SECRET1)
+        self.assertIs(request.META['CSRF_COOKIE_NEEDS_UPDATE'], True)
+
+    def test_get_token_csrf_cookie_not_set(self):
+        request = HttpRequest()
+        self.assertNotIn('CSRF_COOKIE', request.META)
+        self.assertNotIn('CSRF_COOKIE_NEEDS_UPDATE', request.META)
+        token = get_token(request)
+        cookie = request.META['CSRF_COOKIE']
+        self.assertEqual(len(cookie), CSRF_TOKEN_LENGTH)
+        unmasked_cookie = _unmask_cipher_token(cookie)
+        self.assertMaskedSecretCorrect(token, unmasked_cookie)
+        self.assertIs(request.META['CSRF_COOKIE_NEEDS_UPDATE'], True)
+
+    def test_rotate_token(self):
+        request = HttpRequest()
+        request.META['CSRF_COOKIE'] = MASKED_TEST_SECRET1
+        self.assertNotIn('CSRF_COOKIE_NEEDS_UPDATE', request.META)
+        rotate_token(request)
+        # The underlying secret was changed.
+        cookie = request.META['CSRF_COOKIE']
+        self.assertEqual(len(cookie), CSRF_TOKEN_LENGTH)
+        unmasked_cookie = _unmask_cipher_token(cookie)
+        self.assertNotEqual(unmasked_cookie, TEST_SECRET)
+        self.assertIs(request.META['CSRF_COOKIE_NEEDS_UPDATE'], True)
+
+    def test_sanitize_token_masked(self):
+        # Tokens of length CSRF_TOKEN_LENGTH are preserved.
+        cases = [
+            (MASKED_TEST_SECRET1, MASKED_TEST_SECRET1),
+            (64 * 'a', 64 * 'a'),
+        ]
+        for token, expected in cases:
+            with self.subTest(token=token):
+                actual = _sanitize_token(token)
+                self.assertEqual(actual, expected)
+
+    def test_sanitize_token_unmasked(self):
+        # A token of length CSRF_SECRET_LENGTH is masked.
+        actual = _sanitize_token(TEST_SECRET)
+        self.assertMaskedSecretCorrect(actual, TEST_SECRET)
+
+    def test_sanitize_token_invalid(self):
+        cases = [
+            (64 * '*', 'has invalid characters'),
+            (16 * 'a', 'has incorrect length'),
+        ]
+        for token, expected_message in cases:
+            with self.subTest(token=token):
+                with self.assertRaisesMessage(InvalidTokenFormat, expected_message):
+                    _sanitize_token(token)
+
+    def test_does_token_match(self):
+        cases = [
+            ((MASKED_TEST_SECRET1, MASKED_TEST_SECRET2), True),
+            ((MASKED_TEST_SECRET1, 64 * 'a'), False),
+        ]
+        for (token1, token2), expected in cases:
+            with self.subTest(token1=token1, token2=token2):
+                actual = _does_token_match(token1, token2)
+                self.assertIs(actual, expected)
 
 
 class TestingSessionStore(SessionStore):
