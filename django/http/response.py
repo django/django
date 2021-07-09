@@ -588,8 +588,9 @@ class JsonResponse(HttpResponse):
     An HTTP response class that consumes data to be serialized to JSON.
 
     :param data: Data to be dumped into json. By default only ``dict`` objects
-      are allowed to be passed due to a security flaw before ECMAScript 5. See
-      the ``safe`` parameter for more information.
+      are allowed to be passed due to a security flaw before ECMAScript 5. Set 
+      the ``safe`` parameter to False to allow non-dict objects to be serialized.
+      See the ``safe`` parameter for more information.
     :param encoder: Should be a json encoder class. Defaults to
       ``django.core.serializers.json.DjangoJSONEncoder``.
     :param safe: Controls if only ``dict`` objects may be serialized. Defaults
