@@ -339,7 +339,7 @@ msgid "Run the selected action"
 msgstr "اجرای حرکت انتخاب شده"
 
 msgid "Go"
-msgstr "برو"
+msgstr "اجرا"
 
 msgid "Click here to select the objects across all pages"
 msgstr "برای انتخاب موجودیت‌ها در تمام صفحات اینجا را کلیک کنید"
