@@ -1,6 +1,6 @@
-===================================
-Upgrading Django to a newer version
-===================================
+========================================
+How to upgrade Django to a newer version
+========================================
 
 While it can be a complex process at times, upgrading to the latest Django
 version has several benefits:

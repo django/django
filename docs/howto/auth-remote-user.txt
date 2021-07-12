@@ -1,6 +1,6 @@
-====================================
-Authentication using ``REMOTE_USER``
-====================================
+=========================================
+How to authenticate using ``REMOTE_USER``
+=========================================
 
 This document describes how to make use of external authentication sources
 (where the Web server sets the ``REMOTE_USER`` environment variable) in your

@@ -1,6 +1,6 @@
-===========================
-Outputting PDFs with Django
-===========================
+=======================
+How to create PDF files
+=======================
 
 This document explains how to output PDF files dynamically using Django views.
 This is made possible by the excellent, open-source ReportLab_ Python PDF

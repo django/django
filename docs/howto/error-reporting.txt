@@ -1,6 +1,6 @@
-===============
-Error reporting
-===============
+=============================
+How to manage error reporting
+=============================
 
 When you're running a public site you should always turn off the
 :setting:`DEBUG` setting. That will make your server run much faster, and will
