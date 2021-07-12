@@ -2,7 +2,6 @@ import enum
 from types import DynamicClassAttribute
 
 from django.utils.functional import Promise
-from django.utils.version import PY310
 
 __all__ = ['Choices', 'IntegerChoices', 'TextChoices']
 
@@ -75,10 +74,9 @@ class Choices(enum.Enum, metaclass=ChoicesMeta):
         """
         return str(self.value)
 
-    # A similar format is used in Python 3.10+.
-    if not PY310:
-        def __repr__(self):
-            return '%s.%s' % (self.__class__.__qualname__, self._name_)
+    # A similar format was proposed for Python 3.10.
+    def __repr__(self):
+        return f'{self.__class__.__qualname__}.{self._name_}'
 
 
 class IntegerChoices(int, Choices):

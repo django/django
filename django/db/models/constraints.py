@@ -4,7 +4,6 @@ from django.db.models.expressions import ExpressionList, F
 from django.db.models.indexes import IndexExpression
 from django.db.models.query_utils import Q
 from django.db.models.sql.query import Query
-from django.utils.version import PY310
 
 __all__ = ['CheckConstraint', 'Deferrable', 'UniqueConstraint']
 
@@ -86,10 +85,9 @@ class Deferrable(Enum):
     DEFERRED = 'deferred'
     IMMEDIATE = 'immediate'
 
-    # A similar format is used in Python 3.10+.
-    if not PY310:
-        def __repr__(self):
-            return '%s.%s' % (self.__class__.__qualname__, self._name_)
+    # A similar format was proposed for Python 3.10.
+    def __repr__(self):
+        return f'{self.__class__.__qualname__}.{self._name_}'
 
 
 class UniqueConstraint(BaseConstraint):
