@@ -118,7 +118,7 @@ class BoundField:
         """
         Return the data for this BoundField, or None if it wasn't given.
         """
-        return self.field.widget.value_from_datadict(self.form.data, self.form.files, self.html_name)
+        return self.form._field_data_value(self.field, self.html_name)
 
     def value(self):
         """
