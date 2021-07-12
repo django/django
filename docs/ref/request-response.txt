@@ -1092,6 +1092,10 @@ parameter to ``False``::
 
 Without passing ``safe=False``, a :exc:`TypeError` will be raised.
 
+Note that an API based on ``dict`` objects is more extensible, flexible, and
+makes it easier to maintain forwards compatibility. Therefore, you should avoid
+using non-dict objects in JSON-encoded response.
+
 .. warning::
 
     Before the `5th edition of ECMAScript
