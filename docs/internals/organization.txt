@@ -112,9 +112,7 @@ no veto by the technical board.
 
 Core team members are always looking for promising contributors, teaching them
 how the project is managed, and submitting their names to the core team's vote
-when they're ready. If you would like to join the core team, you can contact a
-core team member privately or ask for guidance on the :ref:`Django Core
-Mentorship mailing-list <django-core-mentorship-mailing-list>`.
+when they're ready.
 
 There's no time limit on core team membership. However, in order to provide
 the general public with a reasonable idea of how many people maintain Django,
