@@ -221,7 +221,11 @@ Forms
 Generic Views
 ~~~~~~~~~~~~~
 
-* ...
+* :class:`~django.views.generic.edit.DeleteView` now uses
+  :class:`~django.views.generic.edit.FormMixin`, allowing you to provide a
+  :class:`~django.forms.Form` subclass, with a checkbox for example, to confirm
+  deletion. In addition, this allows ``DeleteView`` to function with
+  :class:`django.contrib.messages.views.SuccessMessageMixin`.
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
