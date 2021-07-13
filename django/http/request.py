@@ -309,11 +309,7 @@ class HttpRequest:
     def preferred_language(self):
         """Returns the client's language in order of priority from the "Accept-Language" header"""
         languages = [_.strip() for _ in self.headers.get('Accept-Language', '*').split(',')]
-        for language in languages:
-            if language.split(';')[0] == language:
-                return language
-            return language.split(';')[0]
-        return '*'
+        return languages[0].split(';')[0]
 
     def _mark_post_parse_error(self):
         self._post = QueryDict()
