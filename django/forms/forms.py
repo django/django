@@ -191,6 +191,15 @@ class BaseForm:
         """Add an 'initial' prefix for checking dynamic initial values."""
         return 'initial-%s' % self.add_prefix(field_name)
 
+    def _widget_data_value(self, widget, html_name):
+        # value_from_datadict() gets the data from the data dictionaries.
+        # Each widget type knows how to retrieve its own data, because some
+        # widgets split data over several HTML fields.
+        return widget.value_from_datadict(self.data, self.files, html_name)
+
+    def _field_data_value(self, field, html_name):
+        return self._widget_data_value(field.widget, html_name)
+
     def _html_output(self, normal_row, error_row, row_ender, help_text_html, errors_on_separate_row):
         "Output HTML. Used by as_table(), as_ul(), as_p()."
         # Errors that should be displayed above all fields.
@@ -379,13 +388,10 @@ class BaseForm:
 
     def _clean_fields(self):
         for name, field in self.fields.items():
-            # value_from_datadict() gets the data from the data dictionaries.
-            # Each widget type knows how to retrieve its own data, because some
-            # widgets split data over several HTML fields.
             if field.disabled:
                 value = self.get_initial_for_field(field, name)
             else:
-                value = field.widget.value_from_datadict(self.data, self.files, self.add_prefix(name))
+                value = self._field_data_value(field, self.add_prefix(name))
             try:
                 if isinstance(field, FileField):
                     initial = self.get_initial_for_field(field, name)
@@ -432,8 +438,7 @@ class BaseForm:
     def changed_data(self):
         data = []
         for name, field in self.fields.items():
-            prefixed_name = self.add_prefix(name)
-            data_value = field.widget.value_from_datadict(self.data, self.files, prefixed_name)
+            data_value = self._field_data_value(field, self.add_prefix(name))
             if not field.show_hidden_initial:
                 # Use the BoundField's initial as this is the value passed to
                 # the widget.
@@ -442,8 +447,9 @@ class BaseForm:
                 initial_prefixed_name = self.add_initial_prefix(name)
                 hidden_widget = field.hidden_widget()
                 try:
-                    initial_value = field.to_python(hidden_widget.value_from_datadict(
-                        self.data, self.files, initial_prefixed_name))
+                    initial_value = field.to_python(
+                        self._widget_data_value(hidden_widget, initial_prefixed_name)
+                    )
                 except ValidationError:
                     # Always assume data has changed if validation fails.
                     data.append(name)
