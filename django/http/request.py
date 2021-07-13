@@ -305,6 +305,16 @@ class HttpRequest:
             self._stream = BytesIO(self._body)
         return self._body
 
+    @property
+    def preferred_language(self):
+        """Returns the client's language in order of priority from the "Accept-Language" header"""
+        languages = [_.strip() for _ in self.headers.get('Accept-Language', '*').split(',')]
+        for language in languages:
+            if language.split(';')[0] == language:
+                return language
+            return language.split(';')[0]
+        return '*'
+
     def _mark_post_parse_error(self):
         self._post = QueryDict()
         self._files = MultiValueDict()
