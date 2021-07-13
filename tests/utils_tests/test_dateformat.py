@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, time, tzinfo
 
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import TZ_SUPPORT, requires_tz_support
@@ -67,10 +67,12 @@ class DateFormatTests(SimpleTestCase):
         self.assertEqual(dateformat.format(my_birthday, ''), '')
 
     def test_am_pm(self):
-        my_birthday = datetime(1979, 7, 8, 22, 00)
-
-        self.assertEqual(dateformat.format(my_birthday, 'a'), 'p.m.')
-        self.assertEqual(dateformat.format(my_birthday, 'A'), 'PM')
+        morning = time(7, 00)
+        evening = time(19, 00)
+        self.assertEqual(dateformat.format(morning, 'a'), 'a.m.')
+        self.assertEqual(dateformat.format(evening, 'a'), 'p.m.')
+        self.assertEqual(dateformat.format(morning, 'A'), 'AM')
+        self.assertEqual(dateformat.format(evening, 'A'), 'PM')
 
     def test_microsecond(self):
         # Regression test for #18951
@@ -78,10 +80,14 @@ class DateFormatTests(SimpleTestCase):
         self.assertEqual(dateformat.format(dt, 'u'), '000123')
 
     def test_date_formats(self):
+        # Specifiers 'I', 'r', and 'U' are covered in test_timezones().
         my_birthday = datetime(1979, 7, 8, 22, 00)
         for specifier, expected in [
             ('b', 'jul'),
             ('d', '08'),
+            ('D', 'Sun'),
+            ('E', 'July'),
+            ('F', 'July'),
             ('j', '8'),
             ('l', 'Sunday'),
             ('L', 'False'),
@@ -89,6 +95,7 @@ class DateFormatTests(SimpleTestCase):
             ('M', 'Jul'),
             ('n', '7'),
             ('N', 'July'),
+            ('o', '1979'),
             ('S', 'th'),
             ('t', '31'),
             ('w', '0'),
@@ -105,10 +112,17 @@ class DateFormatTests(SimpleTestCase):
         self.assertEqual(dateformat.format(timestamp, 'c'), '2008-05-19T11:45:23.123456')
 
     def test_time_formats(self):
+        # Specifiers 'I', 'r', and 'U' are covered in test_timezones().
         my_birthday = datetime(1979, 7, 8, 22, 00)
         for specifier, expected in [
             ('a', 'p.m.'),
             ('A', 'PM'),
+            ('f', '10'),
+            ('g', '10'),
+            ('G', '22'),
+            ('h', '10'),
+            ('H', '22'),
+            ('i', '00'),
             ('P', '10 p.m.'),
             ('s', '00'),
             ('u', '000000'),
@@ -134,6 +148,7 @@ class DateFormatTests(SimpleTestCase):
         my_birthday = datetime(1979, 7, 8, 22, 00)
         summertime = datetime(2005, 10, 30, 1, 00)
         wintertime = datetime(2005, 10, 30, 4, 00)
+        noon = time(12, 0, 0)
 
         # 3h30m to the west of UTC
         tz = get_fixed_timezone(-210)
@@ -152,10 +167,20 @@ class DateFormatTests(SimpleTestCase):
                     self.assertEqual(dateformat.format(my_birthday, specifier), expected)
 
             self.assertEqual(dateformat.format(aware_dt, 'e'), '-0330')
+            self.assertEqual(
+                dateformat.format(aware_dt, 'r'),
+                'Sat, 16 May 2009 05:30:30 -0330',
+            )
+
             self.assertEqual(dateformat.format(summertime, 'I'), '1')
             self.assertEqual(dateformat.format(summertime, 'O'), '+0200')
+
             self.assertEqual(dateformat.format(wintertime, 'I'), '0')
             self.assertEqual(dateformat.format(wintertime, 'O'), '+0100')
+
+            for specifier in ['e', 'O', 'T', 'Z']:
+                with self.subTest(specifier=specifier):
+                    self.assertEqual(dateformat.time_format(noon, specifier), '')
 
         # Ticket #16924 -- We don't need timezone support to test this
         self.assertEqual(dateformat.format(aware_dt, 'O'), '-0330')
@@ -172,6 +197,33 @@ class DateFormatTests(SimpleTestCase):
                 with self.assertRaisesMessage(TypeError, msg):
                     dateformat.format(my_birthday, specifier)
 
+    @requires_tz_support
+    def test_e_format_with_named_time_zone(self):
+        dt = datetime(1970, 1, 1, tzinfo=utc)
+        self.assertEqual(dateformat.format(dt, 'e'), 'UTC')
+
+    @requires_tz_support
+    def test_e_format_with_time_zone_with_unimplemented_tzname(self):
+        class NoNameTZ(tzinfo):
+            """Time zone without .tzname() defined."""
+            def utcoffset(self, dt):
+                return None
+
+        dt = datetime(1970, 1, 1, tzinfo=NoNameTZ())
+        self.assertEqual(dateformat.format(dt, 'e'), '')
+
+    def test_P_format(self):
+        for expected, t in [
+            ('midnight', time(0)),
+            ('noon', time(12)),
+            ('4 a.m.', time(4)),
+            ('8:30 a.m.', time(8, 30)),
+            ('4 p.m.', time(16)),
+            ('8:30 p.m.', time(20, 30)),
+        ]:
+            with self.subTest(time=t):
+                self.assertEqual(dateformat.time_format(t, 'P'), expected)
+
     def test_r_format_with_non_en_locale(self):
         # Changing the locale doesn't change the "r" format.
         dt = datetime(1979, 7, 8, 22, 00)
@@ -180,6 +232,18 @@ class DateFormatTests(SimpleTestCase):
                 dateformat.format(dt, 'r'),
                 'Sun, 08 Jul 1979 22:00:00 +0100',
             )
+
+    def test_S_format(self):
+        for expected, days in [
+            ('st', [1, 21, 31]),
+            ('nd', [2, 22]),
+            ('rd', [3, 23]),
+            ('th', (n for n in range(4, 31) if n not in [21, 22, 23])),
+        ]:
+            for day in days:
+                dt = date(1970, 1, day)
+                with self.subTest(day=day):
+                    self.assertEqual(dateformat.format(dt, 'S'), expected)
 
     def test_y_format_year_before_1000(self):
         tests = [
@@ -200,16 +264,15 @@ class DateFormatTests(SimpleTestCase):
 
     def test_twelve_hour_format(self):
         tests = [
-            (0, '12'),
-            (1, '1'),
-            (11, '11'),
-            (12, '12'),
-            (13, '1'),
-            (23, '11'),
+            (0, '12', '12'),
+            (1, '1', '01'),
+            (11, '11', '11'),
+            (12, '12', '12'),
+            (13, '1', '01'),
+            (23, '11', '11'),
         ]
-        for hour, expected in tests:
+        for hour, g_expected, h_expected in tests:
+            dt = datetime(2000, 1, 1, hour)
             with self.subTest(hour=hour):
-                self.assertEqual(
-                    dateformat.format(datetime(2000, 1, 1, hour), 'g'),
-                    expected,
-                )
+                self.assertEqual(dateformat.format(dt, 'g'), g_expected)
+                self.assertEqual(dateformat.format(dt, 'h'), h_expected)
