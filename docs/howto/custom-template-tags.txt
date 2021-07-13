@@ -1,6 +1,6 @@
-================================
-Custom template tags and filters
-================================
+==============================================
+How to create custom template tags and filters
+==============================================
 
 Django's template language comes with a wide variety of :doc:`built-in
 tags and filters </ref/templates/builtins>` designed to address the

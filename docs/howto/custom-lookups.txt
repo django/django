@@ -1,6 +1,6 @@
-==============
-Custom Lookups
-==============
+===========================
+How to write custom lookups
+===========================
 
 .. currentmodule:: django.db.models
 

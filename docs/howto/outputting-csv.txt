@@ -1,6 +1,6 @@
-==========================
-Outputting CSV with Django
-==========================
+========================
+How to create CSV output
+========================
 
 This document explains how to output CSV (Comma Separated Values) dynamically
 using Django views. To do this, you can either use the Python CSV library or the

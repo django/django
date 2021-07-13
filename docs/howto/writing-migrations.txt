@@ -1,6 +1,6 @@
-===========================
-Writing database migrations
-===========================
+=================================
+How to create database migrations
+=================================
 
 This document explains how to structure and write database migrations for
 different scenarios you might encounter. For introductory material on
