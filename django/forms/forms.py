@@ -203,9 +203,6 @@ class BaseForm:
         # widgets split data over several HTML fields.
         return widget.value_from_datadict(self.data, self.files, html_name)
 
-    def _field_data_value(self, field, html_name):
-        return self._widget_data_value(field.widget, html_name)
-
     def _html_output(self, normal_row, error_row, row_ender, help_text_html, errors_on_separate_row):
         "Output HTML. Used by as_table(), as_ul(), as_p()."
         # Errors that should be displayed above all fields.
@@ -439,26 +436,7 @@ class BaseForm:
 
     @cached_property
     def changed_data(self):
-        data = []
-        for name, bf in self._bound_items():
-            field = bf.field
-            if not field.show_hidden_initial:
-                # Use the BoundField's initial as this is the value passed to
-                # the widget.
-                initial_value = bf.initial
-            else:
-                hidden_widget = field.hidden_widget()
-                try:
-                    initial_value = field.to_python(
-                        self._widget_data_value(hidden_widget, bf.html_initial_name)
-                    )
-                except ValidationError:
-                    # Always assume data has changed if validation fails.
-                    data.append(name)
-                    continue
-            if field.has_changed(initial_value, bf.data):
-                data.append(name)
-        return data
+        return [name for name, bf in self._bound_items() if bf._has_changed()]
 
     @property
     def media(self):
