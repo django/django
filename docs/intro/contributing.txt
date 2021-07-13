@@ -130,6 +130,8 @@ that they don't interfere with each other.
 It's a good idea to keep all your virtual environments in one place, for
 example in ``.virtualenvs/`` in your home directory.
 
+.. _create-a-new-virtrual-env:
+
 Create a new virtual environment by running:
 
 .. console::
@@ -166,27 +168,27 @@ command line to help you keep track of which one you are using. Anything you
 install through ``pip`` while this name is displayed will be installed in that
 virtual environment, isolated from other environments and system-wide packages.
 
+Creating projects with a local copy of Django
+---------------------------------------------
+
+It may be helpful to test your local changes with a Django project. First you
+have to :ref:`create a new virtual environment <create-a-new-virtrual-env>` ,
+:ref:`install the previously cloned local copy of Django
+<intro-contributing-install-local-copy>`, and create a new project outside of
+your local copy of Django.
+
 .. _intro-contributing-install-local-copy:
 
-Go ahead and install the previously cloned copy of Django:
+Install the previously cloned copy of Django in editable mode:
 
 .. console::
 
     $ python -m pip install -e /path/to/your/local/clone/django/
 
-The installed version of Django is now pointing at your local copy by installing
-in editable mode. You will immediately see any changes you make to it, which is
-of great help when writing your first patch.
-
-Creating projects with a local copy of Django
----------------------------------------------
-
-It may be helpful to test your local changes with a Django project. First you
-have to create a new virtual environment, :ref:`install the previously cloned
-local copy of Django in editable mode <intro-contributing-install-local-copy>`,
-and create a new Django project outside of your local copy of Django. You will
-immediately see any changes you make to Django in your new project, which is
-of great help when writing your first patch.
+The installed version of Django is now pointing at your local copy.  By
+installing in editable mode, you will immediately see any changes you make to
+Django in your new project. This can be of great help when writing your first
+patch.
 
 Running Django's test suite for the first time
 ==============================================
