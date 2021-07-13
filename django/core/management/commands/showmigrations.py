@@ -17,7 +17,10 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             '--database', default=DEFAULT_DB_ALIAS,
-            help='Nominates a database to synchronize. Defaults to the "default" database.',
+            help=(
+                'Nominates a database to show migrations for. Defaults to the '
+                '"default" database.'
+            ),
         )
 
         formats = parser.add_mutually_exclusive_group()
