@@ -35,23 +35,6 @@ installation, usage, or debugging of Django.
 .. _django-users subscription email address: mailto:django-users+subscribe@googlegroups.com
 .. _django-users posting email: mailto:django-users@googlegroups.com
 
-.. _django-core-mentorship-mailing-list:
-
-``django-core-mentorship``
-==========================
-
-The Django Core Mentorship list is intended to provide a welcoming
-introductory environment for community members interested in contributing to
-the Django Project.
-
-* `django-core-mentorship mailing archive`_
-* `django-core-mentorship subscription email address`_
-* `django-core-mentorship posting email`_
-
-.. _django-core-mentorship mailing archive: https://groups.google.com/d/forum/django-core-mentorship
-.. _django-core-mentorship subscription email address: mailto:django-core-mentorship+subscribe@googlegroups.com
-.. _django-core-mentorship posting email: mailto:django-core-mentorship@googlegroups.com
-
 .. _django-developers-mailing-list:
 
 ``django-developers``
