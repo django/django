@@ -166,7 +166,7 @@ Django's Git repository:
     Note that the Trac integration doesn't know anything about pull requests.
     So if you try to close a pull request with the phrase "closes #400" in your
     commit message, GitHub will close the pull request, but the Trac plugin
-    will also close the same numbered ticket in Trac.
+    will not close the same numbered ticket in Trac.
 
 .. _Trac plugin: https://github.com/trac-hacks/trac-github
 
