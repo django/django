@@ -1,4 +1,3 @@
-import datetime
 import re
 
 from django.core.exceptions import ValidationError
@@ -228,13 +227,7 @@ class BoundField:
 
     @cached_property
     def initial(self):
-        data = self.form.get_initial_for_field(self.field, self.name)
-        # If this is an auto-generated default date, nix the microseconds for
-        # standardized handling. See #22502.
-        if (isinstance(data, (datetime.datetime, datetime.time)) and
-                not self.field.widget.supports_microseconds):
-            data = data.replace(microsecond=0)
-        return data
+        return self.form.get_initial_for_field(self.field, self.name)
 
     def build_widget_attrs(self, attrs, widget=None):
         widget = widget or self.field.widget

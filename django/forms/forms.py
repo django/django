@@ -3,6 +3,7 @@ Form classes
 """
 
 import copy
+import datetime
 
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.forms.fields import Field, FileField
@@ -475,6 +476,11 @@ class BaseForm:
         value = self.initial.get(field_name, field.initial)
         if callable(value):
             value = value()
+        # If this is an auto-generated default date, nix the microseconds
+        # for standardized handling. See #22502.
+        if (isinstance(value, (datetime.datetime, datetime.time)) and
+                not field.widget.supports_microseconds):
+            value = value.replace(microsecond=0)
         return value
 
 

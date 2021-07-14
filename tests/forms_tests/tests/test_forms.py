@@ -1983,11 +1983,15 @@ Password: <input type="password" name="password" required></li>
         )
 
     def test_get_initial_for_field(self):
+        now = datetime.datetime(2006, 10, 25, 14, 30, 45, 123456)
+
         class PersonForm(Form):
             first_name = CharField(initial='John')
             last_name = CharField(initial='Doe')
             age = IntegerField()
             occupation = CharField(initial=lambda: 'Unknown')
+            dt_fixed = DateTimeField(initial=now)
+            dt_callable = DateTimeField(initial=lambda: now)
 
         form = PersonForm(initial={'first_name': 'Jane'})
         cases = [
@@ -1997,6 +2001,9 @@ Password: <input type="password" name="password" required></li>
             ('first_name', 'Jane'),
             # Callables are evaluated.
             ('occupation', 'Unknown'),
+            # Microseconds are removed from datetimes.
+            ('dt_fixed', datetime.datetime(2006, 10, 25, 14, 30, 45)),
+            ('dt_callable', datetime.datetime(2006, 10, 25, 14, 30, 45)),
         ]
         for field_name, expected in cases:
             with self.subTest(field_name=field_name):
@@ -2104,6 +2111,8 @@ Password: <input type="password" name="password" required></li>
             supports_microseconds = False
 
         class DateTimeForm(Form):
+            # Test a non-callable.
+            fixed = DateTimeField(initial=now)
             auto_timestamp = DateTimeField(initial=delayed_now)
             auto_time_only = TimeField(initial=delayed_now_time)
             supports_microseconds = DateTimeField(initial=delayed_now, widget=TextInput)
@@ -2113,6 +2122,7 @@ Password: <input type="password" name="password" required></li>
 
         unbound = DateTimeForm()
         cases = [
+            ('fixed', now_no_ms),
             ('auto_timestamp', now_no_ms),
             ('auto_time_only', now_no_ms.time()),
             ('supports_microseconds', now),
@@ -2123,6 +2133,10 @@ Password: <input type="password" name="password" required></li>
         for field_name, expected in cases:
             with self.subTest(field_name=field_name):
                 actual = unbound[field_name].value()
+                self.assertEqual(actual, expected)
+                # Also check get_initial_for_field().
+                field = unbound.fields[field_name]
+                actual = unbound.get_initial_for_field(field, field_name)
                 self.assertEqual(actual, expected)
 
     def get_datetime_form_with_callable_initial(self, disabled, microseconds=0):
