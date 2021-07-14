@@ -232,7 +232,8 @@ consult your backend module's own documentation.
 Default: ``300``
 
 The number of seconds before a cache entry is considered stale. If the value of
-this settings is ``None``, cache entries will not expire.
+this setting is ``None``, cache entries will not expire. A value of ``0``
+causes keys to immediately expire (effectively "don't cache").
 
 .. setting:: CACHES-VERSION
 
