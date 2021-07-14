@@ -2112,12 +2112,18 @@ Password: <input type="password" name="password" required></li>
             ti_without_microsec = DateTimeField(initial=delayed_now, widget=TextInputWithoutMicrosec)
 
         unbound = DateTimeForm()
-        self.assertEqual(unbound['auto_timestamp'].value(), now_no_ms)
-        self.assertEqual(unbound['auto_time_only'].value(), now_no_ms.time())
-        self.assertEqual(unbound['supports_microseconds'].value(), now)
-        self.assertEqual(unbound['hi_default_microsec'].value(), now)
-        self.assertEqual(unbound['hi_without_microsec'].value(), now_no_ms)
-        self.assertEqual(unbound['ti_without_microsec'].value(), now_no_ms)
+        cases = [
+            ('auto_timestamp', now_no_ms),
+            ('auto_time_only', now_no_ms.time()),
+            ('supports_microseconds', now),
+            ('hi_default_microsec', now),
+            ('hi_without_microsec', now_no_ms),
+            ('ti_without_microsec', now_no_ms),
+        ]
+        for field_name, expected in cases:
+            with self.subTest(field_name=field_name):
+                actual = unbound[field_name].value()
+                self.assertEqual(actual, expected)
 
     def get_datetime_form_with_callable_initial(self, disabled, microseconds=0):
         class FakeTime:
