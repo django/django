@@ -27,6 +27,9 @@ details on these changes.
 * The default sitemap protocol for sitemaps built outside the context of a
   request will change from ``'http'`` to ``'https'``.
 
+* The ``extra_tests`` argument for ``DiscoverRunner.build_suite()`` and
+  ``DiscoverRunner.run_tests()`` will be removed.
+
 .. _deprecation-removed-in-4.1:
 
 4.1

@@ -533,6 +533,9 @@ Miscellaneous
 * The default sitemap protocol for sitemaps built outside the context of a
   request will change from ``'http'`` to ``'https'`` in Django 5.0.
 
+* The ``extra_tests`` argument for :meth:`.DiscoverRunner.build_suite` and
+  :meth:`.DiscoverRunner.run_tests` is deprecated.
+
 Features removed in 4.0
 =======================
 

@@ -11,6 +11,7 @@ import random
 import sys
 import textwrap
 import unittest
+import warnings
 from collections import defaultdict
 from contextlib import contextmanager
 from importlib import import_module
@@ -25,6 +26,7 @@ from django.test.utils import (
     teardown_databases as _teardown_databases, teardown_test_environment,
 )
 from django.utils.datastructures import OrderedSet
+from django.utils.deprecation import RemovedInDjango50Warning
 
 try:
     import ipdb as pdb
@@ -727,6 +729,12 @@ class DiscoverRunner:
         return tests
 
     def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
+        if extra_tests is not None:
+            warnings.warn(
+                'The extra_tests argument is deprecated.',
+                RemovedInDjango50Warning,
+                stacklevel=2,
+            )
         test_labels = test_labels or ['.']
         extra_tests = extra_tests or []
 
@@ -866,11 +874,14 @@ class DiscoverRunner:
         Test labels should be dotted Python paths to test modules, test
         classes, or test methods.
 
-        A list of 'extra' tests may also be provided; these tests
-        will be added to the test suite.
-
         Return the number of tests that failed.
         """
+        if extra_tests is not None:
+            warnings.warn(
+                'The extra_tests argument is deprecated.',
+                RemovedInDjango50Warning,
+                stacklevel=2,
+            )
         self.setup_test_environment()
         suite = self.build_suite(test_labels, extra_tests)
         databases = self.get_databases(suite)
