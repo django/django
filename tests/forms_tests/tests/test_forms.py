@@ -1990,12 +1990,19 @@ Password: <input type="password" name="password" required></li>
             occupation = CharField(initial=lambda: 'Unknown')
 
         form = PersonForm(initial={'first_name': 'Jane'})
-        self.assertIsNone(form.get_initial_for_field(form.fields['age'], 'age'))
-        self.assertEqual(form.get_initial_for_field(form.fields['last_name'], 'last_name'), 'Doe')
-        # Form.initial overrides Field.initial.
-        self.assertEqual(form.get_initial_for_field(form.fields['first_name'], 'first_name'), 'Jane')
-        # Callables are evaluated.
-        self.assertEqual(form.get_initial_for_field(form.fields['occupation'], 'occupation'), 'Unknown')
+        cases = [
+            ('age', None),
+            ('last_name', 'Doe'),
+            # Form.initial overrides Field.initial.
+            ('first_name', 'Jane'),
+            # Callables are evaluated.
+            ('occupation', 'Unknown'),
+        ]
+        for field_name, expected in cases:
+            with self.subTest(field_name=field_name):
+                field = form.fields[field_name]
+                actual = form.get_initial_for_field(field, field_name)
+                self.assertEqual(actual, expected)
 
     def test_changed_data(self):
         class Person(Form):
