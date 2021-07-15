@@ -149,7 +149,10 @@ class MigrationLoader:
                 "There is more than one migration for '%s' with the prefix '%s'" % (app_label, name_prefix)
             )
         elif not results:
-            raise KeyError("There no migrations for '%s' with the prefix '%s'" % (app_label, name_prefix))
+            raise KeyError(
+                f"There is no migration for '{app_label}' with the prefix "
+                f"'{name_prefix}'"
+            )
         else:
             return self.disk_migrations[results[0]]
 

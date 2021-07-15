@@ -182,7 +182,7 @@ class LoaderTests(TestCase):
         msg = "There is more than one migration for 'migrations' with the prefix '0'"
         with self.assertRaisesMessage(AmbiguityError, msg):
             migration_loader.get_migration_by_prefix("migrations", "0")
-        msg = "There no migrations for 'migrations' with the prefix 'blarg'"
+        msg = "There is no migration for 'migrations' with the prefix 'blarg'"
         with self.assertRaisesMessage(KeyError, msg):
             migration_loader.get_migration_by_prefix("migrations", "blarg")
 
@@ -299,7 +299,7 @@ class LoaderTests(TestCase):
         loader.build_graph()
         self.assertEqual(num_nodes(), 3)
 
-        # Starting at 5 to 7 we are passed the squashed migrations
+        # Starting at 5 to 7 we are past the squashed migrations.
         self.record_applied(recorder, 'migrations', '5_auto')
         loader.build_graph()
         self.assertEqual(num_nodes(), 2)
