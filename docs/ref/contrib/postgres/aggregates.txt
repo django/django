@@ -125,7 +125,8 @@ General-purpose aggregation functions
 .. class:: JSONBAgg(expressions, distinct=False, filter=None, default=None, ordering=(), **extra)
 
     Returns the input values as a ``JSON`` array, or ``default`` if there are
-    no values.
+    no values. You can query the result using :lookup:`key and index lookups
+    <jsonfield.key>`.
 
     .. attribute:: distinct
 
@@ -144,6 +145,29 @@ General-purpose aggregation functions
         elements in the result list.
 
         Examples are the same as for :attr:`ArrayAgg.ordering`.
+
+    Usage example::
+
+        class Room(models.Model):
+            number = models.IntegerField(unique=True)
+
+        class HotelReservation(model.Model):
+            room = models.ForeignKey('Room', on_delete=models.CASCADE)
+            start = models.DateTimeField()
+            end = models.DateTimeField()
+            requirements = models.JSONField(blank=True, null=True)
+
+        >>> from django.contrib.postgres.aggregates import JSONBAgg
+        >>> Room.objects.annotate(
+        ...     requirements=JSONBAgg(
+        ...         'hotelreservation__requirements',
+        ...         ordering='-hotelreservation__start',
+        ...     )
+        ... ).filter(requirements__0__sea_view=True).values('number', 'requirements')
+        <QuerySet [{'number': 102, 'requirements': [
+            {'parking': False, 'sea_view': True, 'double_bed': False},
+            {'parking': True, 'double_bed': True}
+        ]}]>
 
     .. deprecated:: 4.0
 
