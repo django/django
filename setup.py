@@ -1,4 +1,4 @@
-import os
+
 import sys
 from distutils.sysconfig import get_python_lib
 
