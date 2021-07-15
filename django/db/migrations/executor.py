@@ -1,5 +1,6 @@
 from django.apps.registry import apps as global_apps
 from django.db import migrations, router
+from django.db.migrations.exceptions import NodeNotFoundError
 
 from .exceptions import InvalidMigrationPlan
 from .loader import MigrationLoader
@@ -55,7 +56,13 @@ class MigrationExecutor:
                             plan.append((self.loader.graph.nodes[migration], True))
                             applied.pop(migration)
             else:
-                for migration in self.loader.graph.forwards_plan(target):
+                try:
+                    forward_plan = self.loader.graph.forwards_plan(target)
+                except NodeNotFoundError as nnfe:
+                    if nnfe.node in self.loader.replacements:
+                        nnfe.message = f'Migration {nnfe.node[0]}.{nnfe.node[1]} is incompletely applied.'
+                    raise
+                for migration in forward_plan:
                     if migration not in applied:
                         plan.append((self.loader.graph.nodes[migration], False))
                         applied[migration] = self.loader.graph.nodes[migration]

@@ -2,7 +2,9 @@ from unittest import mock
 
 from django.apps.registry import apps as global_apps
 from django.db import DatabaseError, connection, migrations, models
-from django.db.migrations.exceptions import InvalidMigrationPlan
+from django.db.migrations.exceptions import (
+    InvalidMigrationPlan, NodeNotFoundError,
+)
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
@@ -669,6 +671,15 @@ class ExecutorTests(MigrationTestBase):
                 ('migrations', '0001_squashed_0002'),
                 executor.recorder.applied_migrations(),
             )
+
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_squashed'})
+    def test_partially_applied_replacement_raises_informative_error(self):
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied('migrations', '0001_initial')
+        executor = MigrationExecutor(connection)
+        msg = 'Migration migrations.0001_squashed_0002 is incompletely applied.'
+        with self.assertRaisesMessage(NodeNotFoundError, expected_message=msg):
+            executor.migrate([('migrations', '0001_squashed_0002')])
 
     # When the feature is False, the operation and the record won't be
     # performed in a transaction and the test will systematically pass.
