@@ -1010,6 +1010,10 @@ class AsyncClientTest(TestCase):
                 with self.assertRaisesMessage(NotImplementedError, msg):
                     await method('/redirect_view/', follow=True)
 
+    async def test_get_data(self):
+        response = await self.async_client.get('/get_view/', {'var': 'val'})
+        self.assertContains(response, 'This is a test. val is the value.')
+
 
 @override_settings(ROOT_URLCONF='test_client.urls')
 class AsyncRequestFactoryTest(SimpleTestCase):
@@ -1063,3 +1067,8 @@ class AsyncRequestFactoryTest(SimpleTestCase):
         self.assertIn('HTTP_AUTHORIZATION', request.META)
         self.assertEqual(request.headers['x-another-header'], 'some other value')
         self.assertIn('HTTP_X_ANOTHER_HEADER', request.META)
+
+    def test_request_factory_query_string(self):
+        request = self.request_factory.get('/somewhere/', {'example': 'data'})
+        self.assertNotIn('Query-String', request.headers)
+        self.assertEqual(request.GET['example'], 'data')

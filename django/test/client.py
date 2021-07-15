@@ -547,6 +547,8 @@ class AsyncRequestFactory(RequestFactory):
         follow = extra.pop('follow', None)
         if follow is not None:
             s['follow'] = follow
+        if query_string := extra.pop('QUERY_STRING', None):
+            s['query_string'] = query_string
         s['headers'] += [
             (key.lower().encode('ascii'), value.encode('latin1'))
             for key, value in extra.items()
