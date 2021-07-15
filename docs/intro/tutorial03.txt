@@ -306,6 +306,11 @@ containing just:
     {{ question }}
 
 will get you started for now.
+To see the effect of the :exc:`~django.http.Http404` exception :doc:` start the
+development server</intro/tutorial01/#the-development-server>` and visit
+http://127.0.0.1:8000/polls/2 with your Web browser. You should see an error page
+with the heading ``Page not found (404)`` and the exception value
+``Question does not exist.`` which has been ``Raised by: polls.views.detail``.
 
 A shortcut: :func:`~django.shortcuts.get_object_or_404`
 -------------------------------------------------------
