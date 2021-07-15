@@ -49,7 +49,7 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertIsNone(f.min_value)
 
     def test_enter_a_number_error(self):
-        f = DecimalField(max_digits=4, decimal_places=2)
+        f = DecimalField(max_value=1, max_digits=4, decimal_places=2)
         values = (
             '-NaN', 'NaN', '+NaN',
             '-sNaN', 'sNaN', '+sNaN',

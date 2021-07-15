@@ -9,4 +9,6 @@ Django 3.2.6 fixes several bugs in 3.2.5.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 3.2 that caused a crash validating ``"NaN"``
+  input with a ``forms.DecimalField`` that had a specified ``max_value``
+  (:ticket:`32949`).
