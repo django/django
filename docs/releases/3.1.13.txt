@@ -4,7 +4,7 @@ Django 3.1.13 release notes
 
 *July 1, 2021*
 
-Django 3.1.13 fixes a security issues with severity "high" in 3.1.12.
+Django 3.1.13 fixes a security issue with severity "high" in 3.1.12.
 
 CVE-2021-35042: Potential SQL injection via unsanitized ``QuerySet.order_by()`` input
 =====================================================================================
