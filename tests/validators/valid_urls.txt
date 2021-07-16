@@ -2,6 +2,8 @@ http://www.djangoproject.com/
 HTTP://WWW.DJANGOPROJECT.COM/
 http://localhost/
 http://example.com/
+http://example.com:0
+http://example.com:0/
 http://example.com:65535
 http://example.com:65535/
 http://example.com./
@@ -37,6 +39,8 @@ http://userid:@example.com:8080
 http://userid:@example.com:8080/
 http://userid:password@example.com
 http://userid:password@example.com/
+http://userid:password@example.com:8
+http://userid:password@example.com:8/
 http://userid:password@example.com:8080
 http://userid:password@example.com:8080/
 http://userid:password@example.com:65535

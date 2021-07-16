@@ -60,6 +60,7 @@ http://1.2.03.4
 http://1.2.3.04
 http://.www.foo.bar/
 http://.www.foo.bar./
+http://[::1:2::3]:8/
 http://[::1:2::3]:8080/
 http://[]
 http://[]:8080
