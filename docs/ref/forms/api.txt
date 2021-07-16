@@ -222,8 +222,10 @@ what happens with unbound forms::
     >>> f.errors
     {}
 
-Dynamic initial values
-======================
+.. _ref-forms-initial-form-values:
+
+Initial form values
+===================
 
 .. attribute:: Form.initial
 
@@ -260,9 +262,30 @@ precedence::
 
 .. method:: Form.get_initial_for_field(field, field_name)
 
-Use :meth:`~Form.get_initial_for_field()` to retrieve initial data for a form
-field. It retrieves data from :attr:`Form.initial` and :attr:`Field.initial`,
-in that order, and evaluates any callable initial values.
+Returns the initial data for a form field. It retrieves the data from
+:attr:`Form.initial` if present, otherwise trying :attr:`Field.initial`.
+Callable values are evaluated.
+
+It is recommended to use :attr:`BoundField.initial` over
+:meth:`~Form.get_initial_for_field()` because ``BoundField.initial`` has a
+simpler interface. Also, unlike :meth:`~Form.get_initial_for_field()`,
+:attr:`BoundField.initial` caches its values. This is useful especially when
+dealing with callables whose return values can change (e.g. ``datetime.now`` or
+``uuid.uuid4``)::
+
+    >>> import uuid
+    >>> class UUIDCommentForm(CommentForm):
+    ...     identifier = forms.UUIDField(initial=uuid.uuid4)
+    >>> f = UUIDCommentForm()
+    >>> f.get_initial_for_field(f.fields['identifier'], 'identifier')
+    UUID('972ca9e4-7bfe-4f5b-af7d-07b3aa306334')
+    >>> f.get_initial_for_field(f.fields['identifier'], 'identifier')
+    UUID('1b411fab-844e-4dec-bd4f-e9b0495f04d0')
+    >>> # Using BoundField.initial, for comparison
+    >>> f['identifier'].initial
+    UUID('28a09c59-5f00-4ed9-9179-a3b074fa9c30')
+    >>> f['identifier'].initial
+    UUID('28a09c59-5f00-4ed9-9179-a3b074fa9c30')
 
 Checking which form data has changed
 ====================================
@@ -951,6 +974,29 @@ Attributes of ``BoundField``
     .. code-block:: html
 
         <label for="myFIELD">...</label><input id="myFIELD" type="text" name="my_field" required>
+
+.. attribute:: BoundField.initial
+
+    Use :attr:`BoundField.initial` to retrieve initial data for a form field.
+    It retrieves the data from :attr:`Form.initial` if present, otherwise
+    trying :attr:`Field.initial`. Callable values are evaluated. See
+    :ref:`ref-forms-initial-form-values` for more examples.
+
+    :attr:`BoundField.initial` caches its return value, which is useful
+    especially when dealing with callables whose return values can change (e.g.
+    ``datetime.now`` or ``uuid.uuid4``)::
+
+        >>> from datetime import datetime
+        >>> class DatedCommentForm(CommentForm):
+        ...     created = forms.DateTimeField(initial=datetime.now)
+        >>> f = DatedCommentForm()
+        >>> f['created'].initial
+        datetime.datetime(2021, 7, 27, 9, 5, 54)
+        >>> f['created'].initial
+        datetime.datetime(2021, 7, 27, 9, 5, 54)
+
+    Using :attr:`BoundField.initial` is recommended over
+    :meth:`~Form.get_initial_for_field()`.
 
 .. attribute:: BoundField.is_hidden
 
