@@ -46,7 +46,7 @@ details on these changes.
 
 * The ``default_app_config`` module variable will be removed.
 
-* ``TransactionTestCase.assertQuerysetEqual()` will no longer automatically
+* ``TransactionTestCase.assertQuerysetEqual()`` will no longer automatically
   call ``repr()`` on a queryset when compared to string values.
 
 * ``django.core.cache.backends.memcached.MemcachedCache`` will be removed.
