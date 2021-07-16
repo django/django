@@ -3,7 +3,7 @@ import sys
 import tempfile
 import traceback
 
-from asgiref.sync import ThreadSensitiveContext, sync_to_async
+from asgiref.sync import ThreadSensitiveContext, async_to_sync, sync_to_async
 
 from django.conf import settings
 from django.core import signals
@@ -245,17 +245,7 @@ class ASGIHandler(base.BaseHandler):
         })
         # Streaming responses need to be pinned to their iterator.
         if response.streaming:
-            # Access `__iter__` and not `streaming_content` directly in case
-            # it has been overridden in a subclass.
-            for part in response:
-                for chunk, _ in self.chunk_bytes(part):
-                    await send({
-                        'type': 'http.response.body',
-                        'body': chunk,
-                        # Ignore "more" as there may be more parts; instead,
-                        # use an empty final closing message with False.
-                        'more_body': True,
-                    })
+            await sync_to_async(self.process_streaming_response)(response, send)
             # Final closing message.
             await send({'type': 'http.response.body'})
         # Other responses just need chunking.
@@ -268,6 +258,20 @@ class ASGIHandler(base.BaseHandler):
                     'more_body': not last,
                 })
         await sync_to_async(response.close, thread_sensitive=True)()
+
+    def process_streaming_response(self, response, send):
+        sync_send = async_to_sync(send)
+        # Access `__iter__` and not `streaming_content` directly in
+        # case it has been overridden in a subclass.
+        for part in response:
+            for chunk, _ in self.chunk_bytes(part):
+                sync_send({
+                    'type': 'http.response.body',
+                    'body': chunk,
+                    # Ignore "more" as there may be more parts; instead,
+                    # use an empty final closing message with False.
+                    'more_body': True,
+                })
 
     @classmethod
     def chunk_bytes(cls, data):
