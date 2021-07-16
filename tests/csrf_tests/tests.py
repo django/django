@@ -14,8 +14,9 @@ from django.test import SimpleTestCase, override_settings
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
 
 from .views import (
-    ensure_csrf_cookie_view, non_token_view_using_request_processor,
-    post_form_view, sandwiched_rotate_token_view, token_view,
+    ensure_csrf_cookie_view, ensured_and_protected_view,
+    non_token_view_using_request_processor, post_form_view, protected_view,
+    sandwiched_rotate_token_view, token_view,
 )
 
 # This is a test (unmasked) CSRF cookie / secret.
@@ -1064,6 +1065,32 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
                 mw.process_request(req)
                 resp = mw.process_view(req, token_view, (), {})
                 self.assertIsNone(resp)
+
+    def test_cookie_reset_only_once(self):
+        """
+        A CSRF cookie that needs to be reset is reset only once when the view
+        is decorated with both ensure_csrf_cookie and csrf_protect.
+        """
+        # Pass an unmasked cookie to trigger a cookie reset.
+        req = self._get_POST_request_with_token(cookie=TEST_SECRET)
+        resp = ensured_and_protected_view(req)
+        self.assertContains(resp, 'OK')
+        csrf_cookie = self._read_csrf_cookie(req, resp)
+        actual_secret = _unmask_cipher_token(csrf_cookie)
+        self.assertEqual(actual_secret, TEST_SECRET)
+        # set_cookie() was called only once and with the expected secret.
+        self.assertCookiesSet(req, resp, [TEST_SECRET])
+
+    def test_invalid_cookie_replaced_on_GET(self):
+        """
+        A CSRF cookie with the wrong format is replaced during a GET request.
+        """
+        req = self._get_request(cookie='badvalue')
+        resp = protected_view(req)
+        self.assertContains(resp, 'OK')
+        csrf_cookie = self._read_csrf_cookie(req, resp)
+        self.assertTrue(csrf_cookie, msg='No CSRF cookie was sent.')
+        self.assertEqual(len(csrf_cookie), CSRF_TOKEN_LENGTH)
 
     def test_bare_secret_accepted_and_replaced(self):
         """

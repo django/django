@@ -437,15 +437,25 @@ class CsrfViewMiddleware(MiddlewareMixin):
         return self._accept(request)
 
     def process_response(self, request, response):
-        if not getattr(request, 'csrf_cookie_needs_reset', False):
-            if getattr(response, 'csrf_cookie_set', False):
-                return response
+        # Send the CSRF cookie whenever the cookie is being used (even if the
+        # client already has it) in order to renew the expiry timer, but only
+        # if it hasn't already been sent during this request-response cycle.
+        # Also, send the cookie no matter what if a reset was requested.
+        if (
+            getattr(request, 'csrf_cookie_needs_reset', False) or (
+                request.META.get('CSRF_COOKIE_USED') and
+                not getattr(response, 'csrf_cookie_set', False)
+            )
+        ):
+            self._set_token(request, response)
+            # Update state to prevent _set_token() from being unnecessarily
+            # called again in process_response() by other instances of
+            # CsrfViewMiddleware. This can happen e.g. when both a decorator
+            # and middleware are used. However, the csrf_cookie_needs_reset
+            # attribute is still respected in subsequent calls e.g. in case
+            # rotate_token() is called in process_response() later by custom
+            # middleware but before those subsequent calls.
+            response.csrf_cookie_set = True
+            request.csrf_cookie_needs_reset = False
 
-        if not request.META.get("CSRF_COOKIE_USED", False):
-            return response
-
-        # Set the CSRF cookie even if it's already set, so we renew
-        # the expiry timer.
-        self._set_token(request, response)
-        response.csrf_cookie_set = True
         return response

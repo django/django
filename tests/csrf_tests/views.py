@@ -34,6 +34,17 @@ csrf_rotating_token = decorator_from_middleware(_CsrfCookieRotator)
 
 
 @csrf_protect
+def protected_view(request):
+    return HttpResponse('OK')
+
+
+@csrf_protect
+@ensure_csrf_cookie
+def ensured_and_protected_view(request):
+    return TestingHttpResponse('OK')
+
+
+@csrf_protect
 @csrf_rotating_token
 @ensure_csrf_cookie
 def sandwiched_rotate_token_view(request):
