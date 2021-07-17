@@ -427,6 +427,12 @@ class BaseModelForm(BaseForm):
         except ValidationError as e:
             self._update_errors(e)
 
+    def get_cleaned_data(self,*args):
+        output = {}
+        for data in filter(lambda key : key[0] in args,self.cleaned_data.items()):
+            output[data[0]] = data[1]
+        return output
+    
     def _save_m2m(self):
         """
         Save the many-to-many fields and generic relations for this form.
