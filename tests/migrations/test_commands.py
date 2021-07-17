@@ -1360,13 +1360,13 @@ class MakeMigrationsTests(MigrationTestBase):
                 app_label = 'migrations'
 
         input_msg = (
-            "You are trying to add a non-nullable field 'silly_field' to "
-            "author without a default; we can't do that (the database needs "
-            "something to populate existing rows).\n"
+            "It is impossible to add a non-nullable field 'silly_field' to "
+            "author without specifying a default. This is because the "
+            "database needs something to populate existing rows.\n"
             "Please select a fix:\n"
             " 1) Provide a one-off default now (will be set on all existing "
             "rows with a null value for this column)\n"
-            " 2) Quit, and let me add a default in models.py"
+            " 2) Quit and manually define a default value in models.py."
         )
         with self.temporary_migration_module(module='migrations.test_migrations'):
             # 2 - quit.
@@ -1380,10 +1380,11 @@ class MakeMigrationsTests(MigrationTestBase):
                     call_command('makemigrations', 'migrations', interactive=True)
             output = out.getvalue()
             self.assertIn(input_msg, output)
-            self.assertIn('Please enter the default value now, as valid Python', output)
+            self.assertIn('Please enter the default value as valid Python.', output)
             self.assertIn(
                 'The datetime and django.utils.timezone modules are '
-                'available, so you can do e.g. timezone.now',
+                'available, so it is possible to provide e.g. timezone.now as '
+                'a value',
                 output,
             )
             self.assertIn("Type 'exit' to exit this prompt", output)
@@ -1418,16 +1419,16 @@ class MakeMigrationsTests(MigrationTestBase):
                 app_label = 'migrations'
 
         input_msg = (
-            "You are trying to change the nullable field 'slug' on author to "
-            "non-nullable without a default; we can't do that (the database "
-            "needs something to populate existing rows).\n"
+            "It is impossible to change a nullable field 'slug' on author to "
+            "non-nullable without providing a default. This is because the "
+            "database needs something to populate existing rows.\n"
             "Please select a fix:\n"
             " 1) Provide a one-off default now (will be set on all existing "
             "rows with a null value for this column)\n"
-            " 2) Ignore for now, and let me handle existing rows with NULL "
-            "myself (e.g. because you added a RunPython or RunSQL operation "
-            "to handle NULL values in a previous data migration)\n"
-            " 3) Quit, and let me add a default in models.py"
+            " 2) Ignore for now. Existing rows that contain NULL values will "
+            "have to be handled manually, for example with a RunPython or "
+            "RunSQL operation.\n"
+            " 3) Quit and manually define a default value in models.py."
         )
         with self.temporary_migration_module(module='migrations.test_migrations'):
             # 3 - quit.
@@ -1441,10 +1442,11 @@ class MakeMigrationsTests(MigrationTestBase):
                     call_command('makemigrations', 'migrations', interactive=True)
             output = out.getvalue()
             self.assertIn(input_msg, output)
-            self.assertIn('Please enter the default value now, as valid Python', output)
+            self.assertIn('Please enter the default value as valid Python.', output)
             self.assertIn(
                 'The datetime and django.utils.timezone modules are '
-                'available, so you can do e.g. timezone.now',
+                'available, so it is possible to provide e.g. timezone.now as '
+                'a value',
                 output,
             )
             self.assertIn("Type 'exit' to exit this prompt", output)
@@ -1814,12 +1816,13 @@ class MakeMigrationsTests(MigrationTestBase):
                 app_label = 'migrations'
 
         input_msg = (
-            "You are trying to add the field 'creation_date' with "
-            "'auto_now_add=True' to entry without a default; the database "
-            "needs something to populate existing rows.\n\n"
-            " 1) Provide a one-off default now (will be set on all existing "
-            "rows)\n"
-            " 2) Quit, and let me add a default in models.py"
+            "It is impossible to add the field 'creation_date' with "
+            "'auto_now_add=True' to entry without providing a default. This "
+            "is because the database needs something to populate existing "
+            "rows.\n\n"
+            " 1) Provide a one-off default now which will be set on all "
+            "existing rows\n"
+            " 2) Quit and manually define a default value in models.py."
         )
         # Monkeypatch interactive questioner to auto accept
         with mock.patch('django.db.migrations.questioner.sys.stdout', new_callable=io.StringIO) as prompt_stdout:
@@ -1830,10 +1833,14 @@ class MakeMigrationsTests(MigrationTestBase):
             prompt_output = prompt_stdout.getvalue()
             self.assertIn(input_msg, prompt_output)
             self.assertIn(
-                'Please enter the default value now, as valid Python',
+                'Please enter the default value as valid Python.',
                 prompt_output,
             )
-            self.assertIn("You can accept the default 'timezone.now' by pressing 'Enter'", prompt_output)
+            self.assertIn(
+                "Accept the default 'timezone.now' by pressing 'Enter' or "
+                "provide another value.",
+                prompt_output,
+            )
             self.assertIn("Type 'exit' to exit this prompt", prompt_output)
             self.assertIn("Add field creation_date to entry", output)
 
