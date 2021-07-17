@@ -71,7 +71,7 @@ class MigrationQuestioner:
         return self.defaults.get("ask_rename_model", False)
 
     def ask_merge(self, app_label):
-        """Do you really want to merge these migrations?"""
+        """Should these migrations really be merged?"""
         return self.defaults.get("ask_merge", False)
 
     def ask_auto_now_add_addition(self, field_name, model_name):
@@ -113,13 +113,16 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         string) which will be shown to the user and used as the return value
         if the user doesn't provide any other input.
         """
-        print("Please enter the default value now, as valid Python")
+        print('Please enter the default value as valid Python.')
         if default:
             print(
-                "You can accept the default '{}' by pressing 'Enter' or you "
-                "can provide another value.".format(default)
+                f"Accept the default '{default}' by pressing 'Enter' or "
+                f"provide another value."
             )
-        print("The datetime and django.utils.timezone modules are available, so you can do e.g. timezone.now")
+        print(
+            'The datetime and django.utils.timezone modules are available, so '
+            'it is possible to provide e.g. timezone.now as a value.'
+        )
         print("Type 'exit' to exit this prompt")
         while True:
             if default:
@@ -130,7 +133,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
             if not code and default:
                 code = default
             if not code:
-                print("Please enter some code, or 'exit' (with no quotes) to exit.")
+                print("Please enter some code, or 'exit' (without quotes) to exit.")
             elif code == "exit":
                 sys.exit(1)
             else:
@@ -143,13 +146,15 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         """Adding a NOT NULL field to a model."""
         if not self.dry_run:
             choice = self._choice_input(
-                "You are trying to add a non-nullable field '%s' to %s without a default; "
-                "we can't do that (the database needs something to populate existing rows).\n"
-                "Please select a fix:" % (field_name, model_name),
+                f"It is impossible to add a non-nullable field '{field_name}' "
+                f"to {model_name} without specifying a default. This is "
+                f"because the database needs something to populate existing "
+                f"rows.\n"
+                f"Please select a fix:",
                 [
                     ("Provide a one-off default now (will be set on all existing "
                      "rows with a null value for this column)"),
-                    "Quit, and let me add a default in models.py",
+                    'Quit and manually define a default value in models.py.',
                 ]
             )
             if choice == 2:
@@ -162,17 +167,18 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         """Changing a NULL field to NOT NULL."""
         if not self.dry_run:
             choice = self._choice_input(
-                "You are trying to change the nullable field '%s' on %s to non-nullable "
-                "without a default; we can't do that (the database needs something to "
-                "populate existing rows).\n"
-                "Please select a fix:" % (field_name, model_name),
+                f"It is impossible to change a nullable field '{field_name}' "
+                f"on {model_name} to non-nullable without providing a "
+                f"default. This is because the database needs something to "
+                f"populate existing rows.\n"
+                f"Please select a fix:",
                 [
                     ("Provide a one-off default now (will be set on all existing "
                      "rows with a null value for this column)"),
-                    ("Ignore for now, and let me handle existing rows with NULL myself "
-                     "(e.g. because you added a RunPython or RunSQL operation to handle "
-                     "NULL values in a previous data migration)"),
-                    "Quit, and let me add a default in models.py",
+                    'Ignore for now. Existing rows that contain NULL values '
+                    'will have to be handled manually, for example with a '
+                    'RunPython or RunSQL operation.',
+                    'Quit and manually define a default value in models.py.',
                 ]
             )
             if choice == 2:
@@ -185,13 +191,13 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
 
     def ask_rename(self, model_name, old_name, new_name, field_instance):
         """Was this field really renamed?"""
-        msg = "Did you rename %s.%s to %s.%s (a %s)? [y/N]"
+        msg = 'Was %s.%s renamed to %s.%s (a %s)? [y/N]'
         return self._boolean_input(msg % (model_name, old_name, model_name, new_name,
                                           field_instance.__class__.__name__), False)
 
     def ask_rename_model(self, old_model_state, new_model_state):
         """Was this model really renamed?"""
-        msg = "Did you rename the %s.%s model to %s? [y/N]"
+        msg = 'Was the model %s.%s renamed to %s? [y/N]'
         return self._boolean_input(msg % (old_model_state.app_label, old_model_state.name,
                                           new_model_state.name), False)
 
@@ -199,7 +205,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         return self._boolean_input(
             "\nMerging will only work if the operations printed above do not conflict\n" +
             "with each other (working on different fields or models)\n" +
-            "Do you want to merge these migration branches? [y/N]",
+            'Should these migration branches be merged?',
             False,
         )
 
@@ -207,13 +213,14 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         """Adding an auto_now_add field to a model."""
         if not self.dry_run:
             choice = self._choice_input(
-                "You are trying to add the field '{}' with 'auto_now_add=True' "
-                "to {} without a default; the database needs something to "
-                "populate existing rows.\n".format(field_name, model_name),
+                f"It is impossible to add the field '{field_name}' with "
+                f"'auto_now_add=True' to {model_name} without providing a "
+                f"default. This is because the database needs something to "
+                f"populate existing rows.\n",
                 [
-                    "Provide a one-off default now (will be set on all "
-                    "existing rows)",
-                    "Quit, and let me add a default in models.py",
+                    'Provide a one-off default now which will be set on all '
+                    'existing rows',
+                    'Quit and manually define a default value in models.py.',
                 ]
             )
             if choice == 2:
