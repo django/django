@@ -490,6 +490,7 @@ class DateTimeBaseInput(TextInput):
 
 
 class DateInput(DateTimeBaseInput):
+    input_type = 'date'
     format_key = 'DATE_INPUT_FORMATS'
     template_name = 'django/forms/widgets/date.html'
 
