@@ -1357,8 +1357,8 @@ class Query(BaseExpression):
                     clause.add(lookup_class(value, False), AND)
         return clause, used_joins if not require_outer else ()
 
-    def add_filter(self, filter_clause):
-        self.add_q(Q(**{filter_clause[0]: filter_clause[1]}))
+    def add_filter(self, filter_lhs, filter_rhs):
+        self.add_q(Q((filter_lhs, filter_rhs)))
 
     def add_q(self, q_object):
         """
@@ -1762,15 +1762,15 @@ class Query(BaseExpression):
                 LIMIT 1
             )
         """
-        filter_lhs, filter_rhs = filter_expr
-        if isinstance(filter_rhs, OuterRef):
-            filter_expr = (filter_lhs, OuterRef(filter_rhs))
-        elif isinstance(filter_rhs, F):
-            filter_expr = (filter_lhs, OuterRef(filter_rhs.name))
         # Generate the inner query.
         query = Query(self.model)
         query._filtered_relations = self._filtered_relations
-        query.add_filter(filter_expr)
+        filter_lhs, filter_rhs = filter_expr
+        if isinstance(filter_rhs, OuterRef):
+            filter_rhs = OuterRef(filter_rhs)
+        elif isinstance(filter_rhs, F):
+            filter_rhs = OuterRef(filter_rhs.name)
+        query.add_filter(filter_lhs, filter_rhs)
         query.clear_ordering(force=True)
         # Try to have as simple as possible subquery -> trim leading joins from
         # the subquery.

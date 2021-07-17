@@ -516,6 +516,10 @@ Miscellaneous
   ``ForeignObject`` and ``ForeignObjectRel`` are removed. If needed, initialize
   ``django.db.models.sql.where.WhereNode`` instead.
 
+* The ``filter_clause`` argument of the undocumented ``Query.add_filter()``
+  method is replaced by two positional arguments ``filter_lhs`` and
+  ``filter_rhs``.
+
 .. _deprecated-features-4.0:
 
 Features deprecated in 4.0

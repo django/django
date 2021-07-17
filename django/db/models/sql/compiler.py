@@ -9,7 +9,7 @@ from django.db import DatabaseError, NotSupportedError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import F, OrderBy, RawSQL, Ref, Value
 from django.db.models.functions import Cast, Random
-from django.db.models.query_utils import Q, select_related_descend
+from django.db.models.query_utils import select_related_descend
 from django.db.models.sql.constants import (
     CURSOR, GET_ITERATOR_CHUNK_SIZE, MULTI, NO_RESULTS, ORDER_DIR, SINGLE,
 )
@@ -1509,7 +1509,7 @@ class SQLDeleteCompiler(SQLCompiler):
             # to the target table on MySQL.
             sql, params = innerq.get_compiler(connection=self.connection).as_sql()
             innerq = RawSQL('SELECT * FROM (%s) subquery' % sql, params)
-        outerq.add_q(Q(pk__in=innerq))
+        outerq.add_filter('pk__in', innerq)
         return self._as_sql(outerq)
 
 
@@ -1633,11 +1633,11 @@ class SQLUpdateCompiler(SQLCompiler):
             idents = []
             for rows in query.get_compiler(self.using).execute_sql(MULTI):
                 idents.extend(r[0] for r in rows)
-            self.query.add_filter(('pk__in', idents))
+            self.query.add_filter('pk__in', idents)
             self.query.related_ids = idents
         else:
             # The fast path. Filters and updates in one query.
-            self.query.add_filter(('pk__in', query))
+            self.query.add_filter('pk__in', query)
         self.query.reset_refcounts(refcounts_before)
 
 
