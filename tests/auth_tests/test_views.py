@@ -45,7 +45,7 @@ from .settings import AUTH_TEMPLATES
 )
 class AuthViewsTestCase(TestCase):
     """
-    Helper base class for all the follow test cases.
+    Helper base class for the test classes that follow.
     """
 
     @classmethod
