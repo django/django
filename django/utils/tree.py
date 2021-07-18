@@ -76,7 +76,7 @@ class Node:
     def __hash__(self):
         return hash((self.__class__, self.connector, self.negated, *make_hashable(self.children)))
 
-    def add(self, data, conn_type, squash=True):
+    def add(self, data, conn_type):
         """
         Combine this tree and the data represented by data using the
         connector conn_type. The combine is done by squashing the node other
@@ -87,14 +87,8 @@ class Node:
 
         Return a node which can be used in place of data regardless if the
         node other got squashed or not.
-
-        If `squash` is False the data is prepared and added as a child to
-        this tree without further logic.
         """
         if self.connector == conn_type and data in self.children:
-            return data
-        if not squash:
-            self.children.append(data)
             return data
         if self.connector == conn_type:
             # We can reuse self.children to append or squash the node other.
