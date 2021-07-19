@@ -73,6 +73,8 @@ class Q(tree.Node):
         obj.__dict__ = self.__dict__.copy()
         return obj
 
+    copy = __copy__
+
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         # We must promote any new joins to left outer joins so that when Q is
         # used as an expression, rows aren't filtered due to joins.
