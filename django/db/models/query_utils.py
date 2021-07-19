@@ -49,8 +49,7 @@ class Q(tree.Node):
         elif isinstance(other, Q) and not other:
             return self.copy()
 
-        obj = type(self)()
-        obj.connector = conn
+        obj = self._new_instance(connector=conn)
         obj.add(self, conn)
         obj.add(other, conn)
         return obj
