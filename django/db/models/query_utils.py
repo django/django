@@ -68,6 +68,11 @@ class Q(tree.Node):
         obj.negate()
         return obj
 
+    def __copy__(self):
+        obj = self._new_instance()
+        obj.__dict__ = self.__dict__.copy()
+        return obj
+
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         # We must promote any new joins to left outer joins so that when Q is
         # used as an expression, rows aren't filtered due to joins.
