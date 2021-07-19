@@ -47,8 +47,7 @@ class Q(tree.Node):
         if not self:
             return other.copy() if hasattr(other, 'copy') else copy.copy(other)
         elif isinstance(other, Q) and not other:
-            _, args, kwargs = self.deconstruct()
-            return type(self)(*args, **kwargs)
+            return self.copy()
 
         obj = type(self)()
         obj.connector = conn
