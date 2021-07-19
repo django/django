@@ -61,8 +61,7 @@ class Q(tree.Node):
         return self._combine(other, self.AND)
 
     def __invert__(self):
-        obj = type(self)()
-        obj.add(self, self.AND)
+        obj = self.copy()
         obj.negate()
         return obj
 
