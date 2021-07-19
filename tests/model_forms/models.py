@@ -480,3 +480,7 @@ class NullableUniqueCharFieldModel(models.Model):
     email = models.EmailField(blank=True, null=True)
     slug = models.SlugField(blank=True, null=True)
     url = models.URLField(blank=True, null=True)
+
+
+class NullablePositiveIntegerField(models.Model):
+    maybe_number = models.PositiveIntegerField(blank=True, null=True)

@@ -24,10 +24,10 @@ from .models import (
     CustomFieldForExclusionModel, DateTimePost, DerivedBook, DerivedPost,
     Document, ExplicitPK, FilePathModel, FlexibleDatePost, Homepage,
     ImprovedArticle, ImprovedArticleWithParentLink, Inventory,
-    NullableUniqueCharFieldModel, Person, Photo, Post, Price, Product,
-    Publication, PublicationDefaults, StrictAssignmentAll,
-    StrictAssignmentFieldSpecific, Student, StumpJoke, TextFile, Triple,
-    Writer, WriterProfile, test_images,
+    NullablePositiveIntegerField, NullableUniqueCharFieldModel, Person, Photo,
+    Post, Price, Product, Publication, PublicationDefaults,
+    StrictAssignmentAll, StrictAssignmentFieldSpecific, Student, StumpJoke,
+    TextFile, Triple, Writer, WriterProfile, test_images,
 )
 
 if test_images:
@@ -326,6 +326,11 @@ class ModelFormBaseTest(TestCase):
         self.assertEqual(form.instance.email, empty_value)
         self.assertEqual(form.instance.slug, empty_value)
         self.assertEqual(form.instance.url, empty_value)
+
+    def test_empty_string_positive_integer_field(self):
+        instance = NullablePositiveIntegerField(maybe_number='')
+        with self.assertRaises(ValidationError):
+            instance.full_clean()
 
     def test_missing_fields_attribute(self):
         message = (
