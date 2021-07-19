@@ -2086,7 +2086,12 @@ class Query(BaseExpression):
             self.deferred_loading = existing.union(field_names), True
         else:
             # Remove names from the set of any existing "immediate load" names.
-            self.deferred_loading = existing.difference(field_names), False
+            if new_existing := existing.difference(field_names):
+                self.deferred_loading = new_existing, False
+            else:
+                self.clear_deferred_loading()
+                if new_only := set(field_names).difference(existing):
+                    self.deferred_loading = new_only, True
 
     def add_immediate_loading(self, field_names):
         """
