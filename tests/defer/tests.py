@@ -49,8 +49,14 @@ class DeferTests(AssertionMixin, TestCase):
         qs = Primary.objects.all()
         self.assert_delayed(qs.only("name", "value").defer("name")[0], 2)
         self.assert_delayed(qs.defer("name").only("value", "name")[0], 2)
+        self.assert_delayed(qs.defer('name').only('name').only('value')[0], 2)
         self.assert_delayed(qs.defer("name").only("value")[0], 2)
         self.assert_delayed(qs.only("name").defer("value")[0], 2)
+
+    def test_defer_only_clear(self):
+        qs = Primary.objects.all()
+        self.assert_delayed(qs.only('name').defer('name')[0], 0)
+        self.assert_delayed(qs.defer('name').only('name')[0], 0)
 
     def test_defer_on_an_already_deferred_field(self):
         qs = Primary.objects.all()
