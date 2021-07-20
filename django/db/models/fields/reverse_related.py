@@ -310,7 +310,7 @@ class ManyToManyRel(ForeignObjectRel):
     def identity(self):
         return super().identity + (
             self.through,
-            self.through_fields,
+            make_hashable(self.through_fields),
             self.db_constraint,
         )
 
