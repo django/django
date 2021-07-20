@@ -37,7 +37,7 @@ class DeleteQuery(Query):
         num_deleted = 0
         field = self.get_meta().pk
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
-            self.where = self.where_class()
+            self.clear_where()
             self.add_q(Q(
                 **{field.attname + '__in': pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]}))
             num_deleted += self.do_query(self.get_meta().db_table, self.where, using=using)
@@ -70,7 +70,7 @@ class UpdateQuery(Query):
     def update_batch(self, pk_list, values, using):
         self.add_update_values(values)
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
-            self.where = self.where_class()
+            self.clear_where()
             self.add_q(Q(pk__in=pk_list[offset: offset + GET_ITERATOR_CHUNK_SIZE]))
             self.get_compiler(using).execute_sql(NO_RESULTS)
 

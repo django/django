@@ -504,6 +504,11 @@ Miscellaneous
   individual nodes to a string. ``Node.render()`` should always return a string
   as documented.
 
+* The ``where_class`` property of ``django.db.models.sql.query.Query`` and the
+  ``where_class`` argument to the private ``get_extra_restriction()`` method of
+  ``ForeignObject`` and ``ForeignObjectRel`` are removed. If needed, initialize
+  ``django.db.models.sql.where.WhereNode`` instead.
+
 .. _deprecated-features-4.0:
 
 Features deprecated in 4.0

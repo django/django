@@ -1504,7 +1504,6 @@ class SQLDeleteCompiler(SQLCompiler):
             pk.get_col(self.query.get_initial_alias())
         ]
         outerq = Query(self.query.model)
-        outerq.where = self.query.where_class()
         if not self.connection.features.update_can_self_select:
             # Force the materialization of the inner query to allow reference
             # to the target table on MySQL.
@@ -1626,7 +1625,7 @@ class SQLUpdateCompiler(SQLCompiler):
 
         # Now we adjust the current query: reset the where clause and get rid
         # of all the tables we don't need (since they're in the sub-select).
-        self.query.where = self.query.where_class()
+        self.query.clear_where()
         if self.query.related_updates or must_pre_select:
             # Either we're using the idents in multiple update queries (so
             # don't want them to change), or the db backend doesn't support

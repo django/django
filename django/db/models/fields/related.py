@@ -711,7 +711,7 @@ class ForeignObject(RelatedField):
         """
         return {}
 
-    def get_extra_restriction(self, where_class, alias, related_alias):
+    def get_extra_restriction(self, alias, related_alias):
         """
         Return a pair condition used for joining and subquery pushdown. The
         condition is something that responds to as_sql(compiler, connection)
