@@ -14,6 +14,7 @@ from django.db.models.fields.related import (
     ReverseManyToOneDescriptor, lazy_related_operation,
 )
 from django.db.models.query_utils import PathInfo
+from django.db.models.sql import AND
 from django.utils.functional import cached_property
 
 
@@ -468,10 +469,8 @@ class GenericRelation(ForeignObject):
     def get_extra_restriction(self, where_class, alias, remote_alias):
         field = self.remote_field.model._meta.get_field(self.content_type_field_name)
         contenttype_pk = self.get_content_type().pk
-        cond = where_class()
         lookup = field.get_lookup('exact')(field.get_col(remote_alias), contenttype_pk)
-        cond.add(lookup, 'AND')
-        return cond
+        return where_class([lookup], connector=AND)
 
     def bulk_related_objects(self, objs, using=DEFAULT_DB_ALIAS):
         """
