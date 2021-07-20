@@ -21,6 +21,143 @@ and its community.
 .. _Django Code of Conduct: https://www.djangoproject.com/conduct/
 .. _Django Software Foundation: https://www.djangoproject.com/foundation/
 
+.. _mergers-team:
+
+Mergers
+=======
+
+Role
+----
+
+Mergers_ are a small set of people who merge pull requests to the `Django Git
+repository <https://github.com/django/django>`_.
+
+Prerogatives
+------------
+
+Mergers hold the following prerogatives:
+
+- Merging any pull request which constitutes a `minor change`_ (small enough
+  not to require the use of the `DEP process`_). A Merger must not merge a
+  change primarily authored by that Merger, unless the pull request has been
+  approved by:
+
+  - another Merger,
+  - a technical board member,
+  - a member of the `triage & review team`_, or
+  - a member of the `security team`_.
+
+- Initiating discussion of a minor change in the appropriate venue, and request
+  that other Mergers refrain from merging it while discussion proceeds.
+- Requesting a vote of the technical board regarding any minor change if, in
+  the Merger's opinion, discussion has failed to reach a consensus.
+- Requesting a vote of the technical board when a `major change`_ (significant
+  enough to require the use of the `DEP process`_) reaches one of its
+  implementation milestones and is intended to merge.
+
+.. _`minor change`: https://github.com/django/deps/blob/main/accepted/0010-new-governance.rst#terminology
+.. _`major change`: https://github.com/django/deps/blob/main/accepted/0010-new-governance.rst#terminology
+
+Membership
+----------
+
+`The technical board`_ selects Mergers_ as necessary to maintain their number
+at a minimum of three, in order to spread the workload and avoid over-burdening
+or burning out any individual Merger. There is no upper limit to the number of
+Mergers.
+
+It's not a requirement that a Merger is also a Django Fellow, but the Django
+Software Foundation has the power to use funding of Fellow positions as a way
+to make the role of Merger sustainable.
+
+The following restrictions apply to the role of Merger:
+
+- A person must not simultaneously serve as a member of the technical board. If
+  a Merger is elected to the technical board, they shall cease to be a Merger
+  immediately upon taking up membership in the technical board.
+- A person may serve in the roles of Releaser and Merger simultaneously.
+
+The selection process, when a vacancy occurs or when the technical board deems
+it necessary to select additional persons for such a role, occur as follows:
+
+- Any member in good standing of an appropriate discussion venue, or the Django
+  Software Foundation board acting with the input of the DSF's Fellowship
+  committee, may suggest a person for consideration.
+- The technical board considers the suggestions put forth, and then any member
+  of the technical board formally nominates a candidate for the role.
+- The technical board votes on nominees.
+
+Mergers may resign their role at any time, but should endeavor to provide some
+advance notice in order to allow the selection of a replacement. Termination of
+the contract of a Django Fellow by the Django Software Foundation temporarily
+suspends that person's Merger role until such time as the technical board can
+vote on their nomination.
+
+Otherwise, a Merger may be removed by:
+
+- Becoming disqualified due to election to the technical board.
+- Becoming disqualified due to actions taken by the Code of Conduct committee
+  of the Django Software Foundation.
+- A vote of the technical board.
+
+.. _releasers-team:
+
+Releasers
+=========
+
+Role
+----
+
+Releasers_ are a small set of people who have the authority to upload packaged
+releases of Django to the `Python Package Index`_, and to the
+`djangoproject.com`_ website.
+
+Prerogatives
+------------
+
+Releasers_ :doc:`build Django releases </internals/howto-release-django>` and
+upload them to the `Python Package Index`_, and to the `djangoproject.com`_
+website.
+
+Membership
+----------
+
+`The technical board`_ selects Releasers_ as necessary to maintain their number
+at a minimum of three, in order to spread the workload and avoid over-burdening
+or burning out any individual Releaser. There is no upper limit to the number
+of Releasers.
+
+It's not a requirement that a Releaser is also a Django Fellow, but the Django
+Software Foundation has the power to use funding of Fellow positions as a way
+to make the role of Releaser sustainable.
+
+A person may serve in the roles of Releaser and Merger simultaneously.
+
+The selection process, when a vacancy occurs or when the technical board deems
+it necessary to select additional persons for such a role, occur as follows:
+
+- Any member in good standing of an appropriate discussion venue, or the Django
+  Software Foundation board acting with the input of the DSF's Fellowship
+  committee, may suggest a person for consideration.
+- The technical board considers the suggestions put forth, and then any member
+  of the technical board formally nominates a candidate for the role.
+- The technical board votes on nominees.
+
+Releasers may resign their role at any time, but should endeavor to provide
+some advance notice in order to allow the selection of a replacement.
+Termination of the contract of a Django Fellow by the Django Software
+Foundation temporarily suspends that person's Releaser role until such time as
+the technical board can vote on their nomination.
+
+Otherwise, a Releaser may be removed by:
+
+- Becoming disqualified due to actions taken by the Code of Conduct committee
+  of the Django Software Foundation.
+- A vote of the technical board.
+
+.. _`Python Package Index`: https://pypi.org/project/Django/
+.. _djangoproject.com: https://www.djangoproject.com/download/
+
 .. _technical-board:
 
 Technical board
@@ -78,7 +215,11 @@ board. The election process works as follows:
 Both the application and the voting period last between one and two weeks, at
 the outgoing board's discretion.
 
-.. _the technical board: https://www.djangoproject.com/foundation/teams/#technical-board-team
+.. _mergers: https://www.djangoproject.com/foundation/teams/#mergers-team
+.. _releasers: https://www.djangoproject.com/foundation/teams/#releasers-team
+.. _`security team`: https://www.djangoproject.com/foundation/teams/#security-team
+.. _`the technical board`: https://www.djangoproject.com/foundation/teams/#technical-board-team
+.. _`triage & review team`: https://www.djangoproject.com/foundation/teams/#triage-review-team
 
 Changing the organization
 =========================
