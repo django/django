@@ -5,6 +5,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import operator
 import warnings
+from contextlib import contextmanager
 from itertools import chain
 
 import django
@@ -190,6 +191,7 @@ class QuerySet:
         self._fields = None
         self._defer_next_filter = False
         self._deferred_filter = None
+        self._allow_cloning = True
 
     @property
     def query(self):
@@ -1328,12 +1330,31 @@ class QuerySet:
                 self._insert(item, fields=fields, using=self.db, ignore_conflicts=ignore_conflicts)
         return inserted_rows
 
+    def _disable_cloning(self):
+        self._allow_cloning = False
+        return self
+
+    def _enable_cloning(self):
+        self._allow_cloning = True
+        return self
+
+    @contextmanager
+    def _avoid_cloning(self):
+        self._disable_cloning()
+        try:
+            yield self
+        finally:
+            self._enable_cloning()
+
     def _chain(self):
         """
         Return a copy of the current QuerySet that's ready for another
         operation.
         """
-        obj = self._clone()
+        if not self._allow_cloning:
+            obj = self
+        else:
+            obj = self._clone()
         if obj._sticky_filter:
             obj.query.filter_is_sticky = True
             obj._sticky_filter = False
