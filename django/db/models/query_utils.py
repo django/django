@@ -5,7 +5,6 @@ Factored out from django.db.models.query to avoid making the main module very
 large and/or so that they can be used by other modules without getting into
 circular import difficulties.
 """
-import copy
 import functools
 import inspect
 import logging
@@ -54,17 +53,14 @@ class Q(tree.Node):
         )
 
     def _combine(self, other, conn):
-        if not (isinstance(other, Q) or getattr(other, "conditional", False) is True):
+        if getattr(other, "conditional", False) is False:
             raise TypeError(other)
-
         if not self:
-            return other.copy() if hasattr(other, "copy") else copy.copy(other)
-        elif isinstance(other, Q) and not other:
-            _, args, kwargs = self.deconstruct()
-            return type(self)(*args, **kwargs)
+            return other.copy()
+        if not other and isinstance(other, Q):
+            return self.copy()
 
-        obj = type(self)()
-        obj.connector = conn
+        obj = self.create(connector=conn)
         obj.add(self, conn)
         obj.add(other, conn)
         return obj
@@ -79,8 +75,7 @@ class Q(tree.Node):
         return self._combine(other, self.XOR)
 
     def __invert__(self):
-        obj = type(self)()
-        obj.add(self, self.AND)
+        obj = self.copy()
         obj.negate()
         return obj
 
