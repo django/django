@@ -44,6 +44,13 @@ class Node:
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self)
 
+    def __copy__(self):
+        obj = self.create(connector=self.connector, negated=self.negated)
+        obj.children = self.children  # Don't [:] as .__init__() via .create() does.
+        return obj
+
+    copy = __copy__
+
     def __deepcopy__(self, memodict):
         obj = self.create(connector=self.connector, negated=self.negated)
         obj.children = copy.deepcopy(self.children, memodict)

@@ -183,9 +183,6 @@ class WhereNode(tree.Node):
         clone.relabel_aliases(change_map)
         return clone
 
-    def copy(self):
-        return self.clone()
-
     @classmethod
     def _contains_aggregate(cls, obj):
         if isinstance(obj, tree.Node):
