@@ -56,6 +56,11 @@ def is_django_path(path):
     return Path(django.__file__).parent in Path(path).parents
 
 
+def is_in_autoreloaded_thread():
+    """Return True if current thread will be killed and recreated on source code change"""
+    return os.environ.get(DJANGO_AUTORELOAD_ENV) == 'true'
+
+
 def check_errors(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
@@ -633,7 +638,7 @@ def start_django(reloader, main_func, *args, **kwargs):
 def run_with_reloader(main_func, *args, **kwargs):
     signal.signal(signal.SIGTERM, lambda *args: sys.exit(0))
     try:
-        if os.environ.get(DJANGO_AUTORELOAD_ENV) == 'true':
+        if is_in_autoreloaded_thread():
             reloader = get_reloader()
             logger.info('Watching for file changes with %s', reloader.__class__.__name__)
             start_django(reloader, main_func, *args, **kwargs)

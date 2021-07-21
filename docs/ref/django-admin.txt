@@ -1590,9 +1590,11 @@ This is useful in a number of ways:
   in any way, knowing that whatever data changes you're making are only
   being made to a test database.
 
-Note that this server does *not* automatically detect changes to your Python
-source code (as :djadmin:`runserver` does). It does, however, detect changes to
-templates.
+.. note::
+
+    This server by default does *not* automatically detect changes to your Python
+    source code (as :djadmin:`runserver` does). It does, however, detect changes to
+    templates. If you want to detect changes to your source code, use  ``--autoreload`` flag.
 
 .. django-admin-option:: --addrport ADDRPORT
 
@@ -1619,6 +1621,10 @@ To run on 1.2.3.4:7000 with a ``test`` fixture::
 
 Suppresses all user prompts. A typical prompt is a warning about deleting an
 existing test database.
+
+.. django-admin-option:: --autoreload
+
+Automatically detect changes to your Python source code.
 
 Commands provided by applications
 =================================

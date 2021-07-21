@@ -1391,7 +1391,7 @@ class ManageTestserver(SimpleTestCase):
             'blah.json',
             stdout=out, settings=None, pythonpath=None, verbosity=1,
             traceback=False, addrport='', no_color=False, use_ipv6=False,
-            skip_checks=True, interactive=True, force_color=False,
+            skip_checks=True, interactive=True, force_color=False, autoreload=False,
         )
 
     @mock.patch('django.db.connection.creation.create_test_db', return_value='test_db')

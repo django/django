@@ -255,6 +255,9 @@ Management Commands
   As a consequence, ``readline`` is no longer loaded if running in *isolated*
   mode.
 
+* The :djadmin:`testserver` management command now supports the
+  :option:`--autoreload` option.
+
 Migrations
 ~~~~~~~~~~
 

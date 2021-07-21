@@ -1,6 +1,7 @@
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import connection
+from django.utils.autoreload import is_in_autoreloaded_thread
 
 
 class Command(BaseCommand):
@@ -25,20 +26,30 @@ class Command(BaseCommand):
             '--ipv6', '-6', action='store_true', dest='use_ipv6',
             help='Tells Django to use an IPv6 address.',
         )
+        parser.add_argument(
+            '--autoreload', action='store_true', dest='autoreload',
+            help='Tells Django to use the auto-reloader.',
+        )
 
     def handle(self, *fixture_labels, **options):
         verbosity = options['verbosity']
         interactive = options['interactive']
+        autoreload = options['autoreload']
+        keepdb = is_in_autoreloaded_thread()
 
         # Create a test database.
-        db_name = connection.creation.create_test_db(verbosity=verbosity, autoclobber=not interactive, serialize=False)
+        db_name = connection.creation.create_test_db(
+            verbosity=verbosity,
+            autoclobber=not interactive,
+            serialize=False,
+            keepdb=keepdb,
+        )
 
-        # Import the fixture data into the test database.
-        call_command('loaddata', *fixture_labels, **{'verbosity': verbosity})
+        if not keepdb:
+            # Import the fixture data into the test database.
+            call_command('loaddata', *fixture_labels, verbosity=verbosity)
 
-        # Run the development server. Turn off auto-reloading because it causes
-        # a strange error -- it causes this handle() method to be called
-        # multiple times.
+
         shutdown_message = (
             '\nServer stopped.\nNote that the test database, %r, has not been '
             'deleted. You can explore it on your own.' % db_name
@@ -48,7 +59,7 @@ class Command(BaseCommand):
             'runserver',
             addrport=options['addrport'],
             shutdown_message=shutdown_message,
-            use_reloader=False,
+            use_reloader=autoreload,
             use_ipv6=options['use_ipv6'],
             use_threading=use_threading
         )
