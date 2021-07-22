@@ -2,6 +2,10 @@ foo
 http://
 http://example
 http://example.
+http://example.com:-1
+http://example.com:-1/
+http://example.com:000000080
+http://example.com:000000080/
 http://.com
 http://invalid-.com
 http://-invalid.com
