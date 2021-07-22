@@ -86,7 +86,7 @@ Other topics
     application. Let's take a look at an example of the ``ModelAdmin``::
 
         from django.contrib import admin
-        from myproject.myapp.models import Author
+        from myapp.models import Author
 
         class AuthorAdmin(admin.ModelAdmin):
             pass
@@ -102,7 +102,7 @@ Other topics
         preceding example could be simplified to::
 
             from django.contrib import admin
-            from myproject.myapp.models import Author
+            from myapp.models import Author
 
             admin.site.register(Author)
 
@@ -2723,7 +2723,7 @@ any other inline. In your ``admin.py`` for this example app::
     from django.contrib import admin
     from django.contrib.contenttypes.admin import GenericTabularInline
 
-    from myproject.myapp.models import Image, Product
+    from myapp.models import Image, Product
 
     class ImageInline(GenericTabularInline):
         model = Image
