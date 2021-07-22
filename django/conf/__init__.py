@@ -8,6 +8,7 @@ for a list of all possible variables.
 
 import importlib
 import os
+import sys
 import time
 import traceback
 import warnings
@@ -181,7 +182,13 @@ class Settings:
         # store the settings module in case someone later cares
         self.SETTINGS_MODULE = settings_module
 
-        mod = importlib.import_module(self.SETTINGS_MODULE)
+        try:
+            mod = importlib.import_module(self.SETTINGS_MODULE)
+        except ImportError as exc:
+            # If the settings module cannot be imported, treat it as a configuration error.
+            if not self.was_settings_module_found():
+                raise ImproperlyConfigured(f"Settings module {self.SETTINGS_MODULE} could not be imported") from exc
+            raise
 
         tuple_settings = (
             'ALLOWED_HOSTS',
@@ -231,6 +238,20 @@ class Settings:
 
     def is_overridden(self, setting):
         return setting in self._explicit_settings
+
+    def was_settings_module_found(self):
+        _, _, traceback = sys.exc_info()
+        # The first file in the traceback is this very file, so ignore it.
+        traceback = traceback.tb_next
+        while traceback:
+            # Continue stepping through frames as long as we're in the importlib module.
+            file = traceback.tb_frame.f_code.co_filename
+            if "importlib" not in file:
+                # The settings module was found before something went wrong.
+                return True
+            traceback = traceback.tb_next
+        # The setting module itself could not be imported.
+        return False
 
     def __repr__(self):
         return '<%(cls)s "%(settings_module)s">' % {

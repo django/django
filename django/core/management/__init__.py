@@ -368,8 +368,7 @@ class ManagementUtility:
         try:
             settings.INSTALLED_APPS
         except ImproperlyConfigured as exc:
-            self.settings_exception = exc
-        except ImportError as exc:
+            print(exc)
             self.settings_exception = exc
 
         if settings.configured:
