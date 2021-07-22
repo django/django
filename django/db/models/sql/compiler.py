@@ -754,9 +754,6 @@ class SQLCompiler:
                 order_by = None
             else:
                 distinct_fields, distinct_params = self.get_distinct()
-                # This must come after 'select', 'ordering', and 'distinct'
-                # (see docstring of get_from_clause() for details).
-                from_, f_params = self.get_from_clause()
                 try:
                     where, w_params = (
                         self.compile(self.where) if self.where is not None else ("", [])
@@ -776,6 +773,10 @@ class SQLCompiler:
                     )
                 except FullResultSet:
                     having, h_params = "", []
+
+                # This must come after any clauses that should be able to add tables.
+                # (see docstring of get_from_clause() for details).
+                from_, f_params = self.get_from_clause()
                 result = ["SELECT"]
                 params = []
 
@@ -1110,7 +1111,7 @@ class SQLCompiler:
 
         This should only be called after any SQL construction methods that
         might change the tables that are needed. This means the select columns,
-        ordering, and distinct must be done first.
+        ordering, filtering, and distinct must be done first.
         """
         result = []
         params = []
