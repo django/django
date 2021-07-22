@@ -209,6 +209,12 @@ class BasePasswordHasher:
         """Check if the given password is correct."""
         raise NotImplementedError('subclasses of BasePasswordHasher must provide a verify() method')
 
+    def _check_encode_args(self, password, salt):
+        if password is None:
+            raise TypeError('password must be provided.')
+        if not salt or '$' in salt:
+            raise ValueError('salt must be provided and cannot contain $.')
+
     def encode(self, password, salt):
         """
         Create an encoded database value.
@@ -269,8 +275,7 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     digest = hashlib.sha256
 
     def encode(self, password, salt, iterations=None):
-        assert password is not None
-        assert salt and '$' not in salt
+        self._check_encode_args(password, salt)
         iterations = iterations or self.iterations
         hash = pbkdf2(password, salt, iterations, digest=self.digest)
         hash = base64.b64encode(hash).decode('ascii').strip()
@@ -519,8 +524,7 @@ class SHA1PasswordHasher(BasePasswordHasher):
     algorithm = "sha1"
 
     def encode(self, password, salt):
-        assert password is not None
-        assert salt and '$' not in salt
+        self._check_encode_args(password, salt)
         hash = hashlib.sha1((salt + password).encode()).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
@@ -561,8 +565,7 @@ class MD5PasswordHasher(BasePasswordHasher):
     algorithm = "md5"
 
     def encode(self, password, salt):
-        assert password is not None
-        assert salt and '$' not in salt
+        self._check_encode_args(password, salt)
         hash = hashlib.md5((salt + password).encode()).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 

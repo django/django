@@ -4,8 +4,9 @@ from django.conf.global_settings import PASSWORD_HASHERS
 from django.contrib.auth.hashers import (
     UNUSABLE_PASSWORD_PREFIX, UNUSABLE_PASSWORD_SUFFIX_LENGTH,
     BasePasswordHasher, BCryptPasswordHasher, BCryptSHA256PasswordHasher,
-    PBKDF2PasswordHasher, PBKDF2SHA1PasswordHasher, check_password, get_hasher,
-    identify_hasher, is_password_usable, make_password,
+    MD5PasswordHasher, PBKDF2PasswordHasher, PBKDF2SHA1PasswordHasher,
+    SHA1PasswordHasher, check_password, get_hasher, identify_hasher,
+    is_password_usable, make_password,
 )
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
@@ -473,6 +474,35 @@ class TestUtilsHashPass(SimpleTestCase):
             # Wrong password supplied, hardening needed
             check_password('wrong_password', encoded)
             self.assertEqual(hasher.harden_runtime.call_count, 1)
+
+    def test_encode_invalid_salt(self):
+        hasher_classes = [
+            MD5PasswordHasher,
+            PBKDF2PasswordHasher,
+            PBKDF2SHA1PasswordHasher,
+            SHA1PasswordHasher,
+        ]
+        msg = 'salt must be provided and cannot contain $.'
+        for hasher_class in hasher_classes:
+            hasher = hasher_class()
+            for salt in [None, '', 'sea$salt']:
+                with self.subTest(hasher_class.__name__, salt=salt):
+                    with self.assertRaisesMessage(ValueError, msg):
+                        hasher.encode('password', salt)
+
+    def test_encode_password_required(self):
+        hasher_classes = [
+            MD5PasswordHasher,
+            PBKDF2PasswordHasher,
+            PBKDF2SHA1PasswordHasher,
+            SHA1PasswordHasher,
+        ]
+        msg = 'password must be provided.'
+        for hasher_class in hasher_classes:
+            hasher = hasher_class()
+            with self.subTest(hasher_class.__name__):
+                with self.assertRaisesMessage(TypeError, msg):
+                    hasher.encode(None, 'seasalt')
 
 
 class BasePasswordHasherTests(SimpleTestCase):
