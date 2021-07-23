@@ -520,6 +520,12 @@ Miscellaneous
   method is replaced by two positional arguments ``filter_lhs`` and
   ``filter_rhs``.
 
+* :class:`~django.middleware.csrf.CsrfViewMiddleware` now uses
+  ``request.META['CSRF_COOKIE_NEEDS_UPDATE']`` in place of
+  ``request.META['CSRF_COOKIE_USED']``, ``request.csrf_cookie_needs_reset``,
+  and ``response.csrf_cookie_set`` to track whether the CSRF cookie should be
+  sent. This is an undocumented, private API.
+
 .. _deprecated-features-4.0:
 
 Features deprecated in 4.0
