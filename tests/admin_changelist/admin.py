@@ -59,6 +59,7 @@ class FilteredChildAdmin(admin.ModelAdmin):
 
 class BandAdmin(admin.ModelAdmin):
     list_filter = ['genres']
+    list_grouper_column = 'genres'
 
 
 class NrOfMembersFilter(admin.SimpleListFilter):
