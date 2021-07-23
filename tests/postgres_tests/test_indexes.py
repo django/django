@@ -430,7 +430,7 @@ class SchemaTests(PostgreSQLTestCase):
     def test_gist_include_not_supported(self):
         index_name = 'gist_include_exception'
         index = GistIndex(fields=['scene'], name=index_name, include=['setting'])
-        msg = 'Covering GiST indexes requires PostgreSQL 12+.'
+        msg = 'Covering GiST indexes require PostgreSQL 12+.'
         with self.assertRaisesMessage(NotSupportedError, msg):
             with mock.patch(
                 'django.db.backends.postgresql.features.DatabaseFeatures.supports_covering_gist_indexes',

@@ -762,7 +762,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             expressions=[('ints', RangeOperators.ADJACENT_TO)],
             include=['id'],
         )
-        msg = 'Covering exclusion constraints requires PostgreSQL 12+.'
+        msg = 'Covering exclusion constraints require PostgreSQL 12+.'
         with connection.schema_editor() as editor:
             with mock.patch(
                 'django.db.backends.postgresql.features.DatabaseFeatures.supports_covering_gist_indexes',

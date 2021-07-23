@@ -178,7 +178,7 @@ class GistIndex(PostgresIndex):
 
     def check_supported(self, schema_editor):
         if self.include and not schema_editor.connection.features.supports_covering_gist_indexes:
-            raise NotSupportedError('Covering GiST indexes requires PostgreSQL 12+.')
+            raise NotSupportedError('Covering GiST indexes require PostgreSQL 12+.')
 
 
 class HashIndex(PostgresIndex):
