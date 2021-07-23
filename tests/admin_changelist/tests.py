@@ -1351,6 +1351,13 @@ class ChangeListTests(TestCase):
         self.assertEqual(response.context_data['cl'].search_help_text, 'Search help text')
         self.assertContains(response, '<div class="help">Search help text</div>')
 
+    def test_list_grouper_column(self):
+        superuser = self._create_superuser('superuser')
+        m = BandAdmin(Band, custom_site)
+        request = self._mocked_authenticated_request('/band/', superuser)
+        response = m.changelist_view(request)
+        self.assertEqual(response.context_data['cl'].list_grouper_column, 'genres')
+
 
 class GetAdminLogTests(TestCase):
 
