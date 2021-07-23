@@ -260,7 +260,7 @@ class AppConfig:
         Raise LookupError if no model exists with this name.
         """
         if require_ready:
-            self.apps.check_models_ready()
+            self.apps.check_models_ready(model_name)
         else:
             self.apps.check_apps_ready()
         try:

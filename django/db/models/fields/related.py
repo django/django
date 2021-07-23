@@ -103,8 +103,14 @@ class RelatedField(FieldCacheMixin, Field):
 
     @cached_property
     def related_model(self):
-        # Can't cache this property until all the models are loaded.
-        apps.check_models_ready()
+        from django.db.models.base import Model
+        # Can't cache this property until related model is loaded.
+        if isinstance(self.remote_field.model, str):
+            apps.check_models_ready(self.remote_field.model)
+        elif isinstance(self.remote_field.model, type(Model)):
+            apps.check_models_ready(self.remote_field.model._meta.model_name)
+        else:
+            apps.check_models_ready()
         return self.remote_field.model
 
     def check(self, **kwargs):

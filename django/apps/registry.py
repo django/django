@@ -33,6 +33,8 @@ class Apps:
         # all_models is never overridden or reset.
         self.all_models = defaultdict(dict)
 
+        self.all_models_set = set()
+
         # Mapping of labels to AppConfig instances for installed apps.
         self.app_configs = {}
 
@@ -117,6 +119,9 @@ class Apps:
 
             self.models_ready = True
 
+            # No point to waste memory when all models are imported
+            self.all_models_set = set()
+
             # Phase 3: run ready() methods of app configs.
             for app_config in self.get_app_configs():
                 app_config.ready()
@@ -135,10 +140,14 @@ class Apps:
             settings.INSTALLED_APPS
             raise AppRegistryNotReady("Apps aren't loaded yet.")
 
-    def check_models_ready(self):
-        """Raise an exception if all models haven't been imported yet."""
-        if not self.models_ready:
-            raise AppRegistryNotReady("Models aren't loaded yet.")
+    def check_models_ready(self, model_name=None):
+        """Raise an exception if model hasn't been imported yet."""
+        if self.models_ready:
+            return
+        elif model_name and model_name.lower() in self.all_models_set:
+            return
+
+        raise AppRegistryNotReady("Models aren't loaded yet.")
 
     def get_app_configs(self):
         """Import applications and return an iterable of app configs."""
@@ -195,13 +204,13 @@ class Apps:
         model exists with this name in the application. Raise ValueError if
         called with a single argument that doesn't contain exactly one dot.
         """
-        if require_ready:
-            self.check_models_ready()
-        else:
-            self.check_apps_ready()
-
         if model_name is None:
             app_label, model_name = app_label.split('.')
+
+        if require_ready:
+            self.check_models_ready(model_name)
+        else:
+            self.check_apps_ready()
 
         app_config = self.get_app_config(app_label)
 
@@ -229,6 +238,9 @@ class Apps:
                     "Conflicting '%s' models in application '%s': %s and %s." %
                     (model_name, app_label, app_models[model_name], model))
         app_models[model_name] = model
+        if not self.models_ready:
+            self.all_models_set.update([model_name])
+
         self.do_pending_operations(model)
         self.clear_cache()
 
