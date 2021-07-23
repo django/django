@@ -1047,6 +1047,13 @@ subclass::
     See the default template provided by Django (``admin/filter.html``) for
     a concrete example.
 
+.. attribute:: ModelAdmin.list_grouper_column
+
+    .. versionadded:: 4.0
+
+    Set ``list_grouper_column`` to specify a column name by which
+    to group objects.
+    
 .. attribute:: ModelAdmin.list_max_show_all
 
     Set ``list_max_show_all`` to control how many items can appear on a "Show
