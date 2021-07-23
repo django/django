@@ -27,6 +27,17 @@
 </thead>
 <tbody>
 {% for result in results %}
+{% if cl.list_grouper_column and list_grouper_index %}
+{% ifchanged result|at:list_grouper_index %}
+<tr class="group_head">
+    <td style="padding-top: 5px; padding-bottom: 5px;" colspan="100%">
+        <div class="dropdown-toggle" style="font-weight: bold;">
+            {{ result|at:list_grouper_index|striptags }}
+        </div>
+    </td>
+</tr>
+{% endifchanged %}
+{% endif %}
 {% if result.form and result.form.non_field_errors %}
     <tr><td colspan="{{ result|length }}">{{ result.form.non_field_errors }}</td></tr>
 {% endif %}
