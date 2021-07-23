@@ -64,7 +64,9 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :class:`BitXor() <django.contrib.postgres.aggregates.BitXor>`
+  aggregate function returns an ``int`` of the bitwise ``XOR`` of all non-null
+  input values.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

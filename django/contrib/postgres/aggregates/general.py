@@ -9,7 +9,8 @@ from django.utils.deprecation import RemovedInDjango50Warning
 from .mixins import OrderableAggMixin
 
 __all__ = [
-    'ArrayAgg', 'BitAnd', 'BitOr', 'BoolAnd', 'BoolOr', 'JSONBAgg', 'StringAgg',
+    'ArrayAgg', 'BitAnd', 'BitOr', 'BitXor', 'BoolAnd', 'BoolOr', 'JSONBAgg',
+    'StringAgg',
 ]
 
 
@@ -58,6 +59,10 @@ class BitAnd(Aggregate):
 
 class BitOr(Aggregate):
     function = 'BIT_OR'
+
+
+class BitXor(Aggregate):
+    function = 'BIT_XOR'
 
 
 class BoolAnd(Aggregate):
