@@ -677,7 +677,9 @@ class ExecutorTests(MigrationTestBase):
         recorder = MigrationRecorder(connection)
         recorder.record_applied('migrations', '0001_initial')
         executor = MigrationExecutor(connection)
-        msg = 'Migration migrations.0001_squashed_0002 is incompletely applied.'
+        msg = 'Migration migrations.0001_squashed_0002 is incompletely applied.\n'
+        msg += 'Still unapplied:\n'
+        msg += '  - migrations.0002_second'
         with self.assertRaisesMessage(NodeNotFoundError, expected_message=msg):
             executor.migrate([('migrations', '0001_squashed_0002')])
 

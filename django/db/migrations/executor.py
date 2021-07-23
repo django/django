@@ -61,6 +61,11 @@ class MigrationExecutor:
                 except NodeNotFoundError as nnfe:
                     if nnfe.node in self.loader.replacements:
                         nnfe.message = f'Migration {nnfe.node[0]}.{nnfe.node[1]} is incompletely applied.'
+                        nnfe.message += '\nStill unapplied:'
+                        incomplete_migration = self.loader.replacements[nnfe.node]
+                        for replacement in incomplete_migration.replaces:
+                            if replacement not in applied:
+                                nnfe.message += f'\n  - {replacement[0]}.{replacement[1]}'
                     raise
                 for migration in forward_plan:
                     if migration not in applied:
