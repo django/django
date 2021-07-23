@@ -111,7 +111,7 @@ Customizing widget instances
 When Django renders a widget as HTML, it only renders very minimal markup -
 Django doesn't add class names, or any other widget-specific attributes. This
 means, for example, that all :class:`TextInput` widgets will appear the same
-on your Web pages.
+on your web pages.
 
 There are two ways to customize widgets: :ref:`per widget instance
 <styling-widget-instances>` and :ref:`per widget class <styling-widget-classes>`.
@@ -145,7 +145,7 @@ provided for each widget will be rendered exactly the same::
     <tr><th>Url:</th><td><input type="url" name="url" required></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" required></td></tr>
 
-On a real Web page, you probably don't want every widget to look the same. You
+On a real web page, you probably don't want every widget to look the same. You
 might want a larger input element for the comment, and you might want the
 'name' widget to have some special CSS class. It is also possible to specify
 the 'type' attribute to take advantage of the new HTML5 input types.  To do

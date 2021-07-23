@@ -85,7 +85,7 @@ you use a wildcard, you must perform your own validation of the ``Host`` HTTP
 header, or otherwise ensure that you aren't vulnerable to this category of
 attacks.
 
-You should also configure the Web server that sits in front of Django to
+You should also configure the web server that sits in front of Django to
 validate the host. It should respond with a static error page or ignore
 requests for incorrect hosts instead of forwarding the request to Django. This
 way you'll avoid spurious errors in your Django logs (or emails if you have
@@ -249,5 +249,5 @@ Django includes default views and templates for several HTTP error codes. You
 may want to override the default templates by creating the following templates
 in your root template directory: ``404.html``, ``500.html``, ``403.html``, and
 ``400.html``. The :ref:`default error views <error-views>` that use these
-templates should suffice for 99% of Web applications, but you can
+templates should suffice for 99% of web applications, but you can
 :ref:`customize them <customizing-error-views>` as well.

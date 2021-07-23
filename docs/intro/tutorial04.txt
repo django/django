@@ -3,7 +3,7 @@ Writing your first Django app, part 4
 =====================================
 
 This tutorial begins where :doc:`Tutorial 3 </intro/tutorial03>` left off. We're
-continuing the Web-poll application and will focus on form processing and
+continuing the web-poll application and will focus on form processing and
 cutting down our code.
 
 .. admonition:: Where to get help:
@@ -47,7 +47,7 @@ A quick rundown:
   ``method="get"``) is very important, because the act of submitting this
   form will alter data server-side. Whenever you create a form that alters
   data server-side, use ``method="post"``. This tip isn't specific to
-  Django; it's good Web development practice in general.
+  Django; it's good web development practice in general.
 
 * ``forloop.counter`` indicates how many times the :ttag:`for` tag has gone
   through its loop
@@ -126,7 +126,7 @@ This code includes a few things we haven't covered yet in this tutorial:
 
   As the Python comment above points out, you should always return an
   :class:`~django.http.HttpResponseRedirect` after successfully dealing with
-  POST data. This tip isn't specific to Django; it's good Web development
+  POST data. This tip isn't specific to Django; it's good web development
   practice in general.
 
 * We are using the :func:`~django.urls.reverse` function in the
@@ -204,7 +204,7 @@ The ``detail()`` (from :doc:`Tutorial 3 </intro/tutorial03>`) and ``results()``
 views are very short -- and, as mentioned above, redundant. The ``index()``
 view, which displays a list of polls, is similar.
 
-These views represent a common case of basic Web development: getting data from
+These views represent a common case of basic web development: getting data from
 the database according to a parameter passed in the URL, loading a template and
 returning the rendered template. Because this is so common, Django provides a
 shortcut, called the "generic views" system.

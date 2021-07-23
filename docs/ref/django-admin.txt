@@ -918,7 +918,7 @@ detected.
 
 .. django-admin:: runserver [addrport]
 
-Starts a lightweight development Web server on the local machine. By default,
+Starts a lightweight development web server on the local machine. By default,
 the server runs on port 8000 on the IP address ``127.0.0.1``. You can pass in an
 IP address and port number explicitly.
 
@@ -931,7 +931,7 @@ This server uses the WSGI application object specified by the
 
 DO NOT USE THIS SERVER IN A PRODUCTION SETTING. It has not gone through
 security audits or performance tests. (And that's how it's gonna stay. We're in
-the business of making Web frameworks, not Web servers, so improving this
+the business of making web frameworks, not web servers, so improving this
 server to be able to handle a production environment is outside the scope of
 Django.)
 
@@ -1580,12 +1580,12 @@ This is useful in a number of ways:
 
 * When you're writing :doc:`unit tests </topics/testing/overview>` of how your views
   act with certain fixture data, you can use ``testserver`` to interact with
-  the views in a Web browser, manually.
+  the views in a web browser, manually.
 
 * Let's say you're developing your Django application and have a "pristine"
   copy of a database that you'd like to interact with. You can dump your
   database to a fixture (using the :djadmin:`dumpdata` command, explained
-  above), then use ``testserver`` to run your Web application with that data.
+  above), then use ``testserver`` to run your web application with that data.
   With this arrangement, you have the flexibility of messing up your data
   in any way, knowing that whatever data changes you're making are only
   being made to a test database.

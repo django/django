@@ -275,7 +275,7 @@ Python logging module <python:logging.handlers>`.
 
     The ``include_html`` argument of ``AdminEmailHandler`` is used to
     control whether the traceback email includes an HTML attachment
-    containing the full content of the debug Web page that would have been
+    containing the full content of the debug web page that would have been
     produced if :setting:`DEBUG` were ``True``. To set this value in your
     configuration, include it in the handler definition for
     ``django.utils.log.AdminEmailHandler``, like this::

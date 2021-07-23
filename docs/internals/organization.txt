@@ -7,7 +7,7 @@ Principles
 
 The Django Project is managed by a team of volunteers pursuing three goals:
 
-- Driving the development of the Django Web Framework,
+- Driving the development of the Django web framework,
 - Fostering the ecosystem of Django-related software,
 - Leading the Django community in accordance with the values described in the
   `Django Code of Conduct`_.
@@ -132,7 +132,7 @@ Role
 
 The technical board is a group of experienced and active committers who steer
 technical choices. Their main concern is to maintain the quality and stability
-of the Django Web Framework.
+of the Django web framework.
 
 Prerogatives
 ------------

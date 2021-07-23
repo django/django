@@ -98,7 +98,7 @@ def closing_iterator_wrapper(iterable, close):
 
 def conditional_content_removal(request, response):
     """
-    Simulate the behavior of most Web servers by removing the content of
+    Simulate the behavior of most web servers by removing the content of
     responses for HEAD requests, 1xx, 204, and 304 responses. Ensure
     compliance with RFC 7230, section 3.3.3.
     """
@@ -144,7 +144,7 @@ class ClientHandler(BaseHandler):
         # Request goes through middleware.
         response = self.get_response(request)
 
-        # Simulate behaviors of most Web servers.
+        # Simulate behaviors of most web servers.
         conditional_content_removal(request, response)
 
         # Attach the originating request to the response so that it could be
@@ -190,7 +190,7 @@ class AsyncClientHandler(BaseHandler):
         request._dont_enforce_csrf_checks = not self.enforce_csrf_checks
         # Request goes through middleware.
         response = await self.get_response_async(request)
-        # Simulate behaviors of most Web servers.
+        # Simulate behaviors of most web servers.
         conditional_content_removal(request, response)
         # Attach the originating ASGI request to the response so that it could
         # be later retrieved.

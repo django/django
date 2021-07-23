@@ -300,7 +300,7 @@ Sample usage::
     >>> feed = feedgenerator.Rss201rev2Feed(
     ...     title="Poynter E-Media Tidbits",
     ...     link="http://www.poynter.org/column.asp?id=31",
-    ...     description="A group Weblog by the sharpest minds in online media/journalism/publishing.",
+    ...     description="A group blog by the sharpest minds in online media/journalism/publishing.",
     ...     language="en",
     ... )
     >>> feed.add_item(

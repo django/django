@@ -22,7 +22,7 @@ class Session(AbstractBaseSession):
 
     For complete documentation on using Sessions in your code, consult
     the sessions documentation that is shipped with Django (also available
-    on the Django Web site).
+    on the Django web site).
     """
     objects = SessionManager()
 

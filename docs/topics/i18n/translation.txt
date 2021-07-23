@@ -20,7 +20,7 @@ the equivalent of the translation strings in the target language. Once the
 translators have filled in the message file, it must be compiled. This process
 relies on the GNU gettext toolset.
 
-Once this is done, Django takes care of translating Web apps on the fly in each
+Once this is done, Django takes care of translating web apps on the fly in each
 available language, according to users' language preferences.
 
 Django's internationalization hooks are on by default, and that means there's a

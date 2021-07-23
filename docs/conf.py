@@ -317,7 +317,7 @@ latex_documents = [
 man_pages = [(
     'ref/django-admin',
     'django-admin',
-    'Utility script for the Django Web framework',
+    'Utility script for the Django web framework',
     ['Django Software Foundation'],
     1
 )]

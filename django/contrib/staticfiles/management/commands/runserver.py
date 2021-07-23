@@ -6,7 +6,7 @@ from django.core.management.commands.runserver import (
 
 
 class Command(RunserverCommand):
-    help = "Starts a lightweight Web server for development and also serves static files."
+    help = "Starts a lightweight web server for development and also serves static files."
 
     def add_arguments(self, parser):
         super().add_arguments(parser)

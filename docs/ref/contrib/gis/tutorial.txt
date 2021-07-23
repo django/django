@@ -6,8 +6,8 @@ Introduction
 ============
 
 GeoDjango is an included contrib module for Django that turns it into a
-world-class geographic Web framework.  GeoDjango strives to make it as simple
-as possible to create geographic Web applications, like location-based services.
+world-class geographic web framework. GeoDjango strives to make it as simple
+as possible to create geographic web applications, like location-based services.
 Its features include:
 
 * Django model fields for `OGC`_ geometries and raster data.

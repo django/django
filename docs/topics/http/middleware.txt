@@ -88,7 +88,7 @@ caveats:
   so you can't define ``__init__()`` as requiring any other arguments.
 
 * Unlike the ``__call__()`` method which is called once per request,
-  ``__init__()`` is called only *once*, when the Web server starts.
+  ``__init__()`` is called only *once*, when the web server starts.
 
 Marking middleware as unused
 ----------------------------

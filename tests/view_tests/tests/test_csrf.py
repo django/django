@@ -44,7 +44,7 @@ class CsrfViewTests(SimpleTestCase):
         self.assertContains(
             response,
             'You are seeing this message because this HTTPS site requires a '
-            '“Referer header” to be sent by your Web browser, but '
+            '“Referer header” to be sent by your web browser, but '
             'none was sent.',
             status_code=403,
         )

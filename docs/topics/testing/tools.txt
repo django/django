@@ -11,7 +11,7 @@ Django provides a small set of tools that come in handy when writing tests.
 The test client
 ===============
 
-The test client is a Python class that acts as a dummy Web browser, allowing
+The test client is a Python class that acts as a dummy web browser, allowing
 you to test your views and interact with your Django-powered application
 programmatically.
 
@@ -35,7 +35,7 @@ short:
   rendered and that the template is passed the correct context data.
 
 * Use in-browser frameworks like Selenium_ to test *rendered* HTML and the
-  *behavior* of Web pages, namely JavaScript functionality. Django also
+  *behavior* of web pages, namely JavaScript functionality. Django also
   provides special support for those frameworks; see the section on
   :class:`~django.test.LiveServerTestCase` for more details.
 
@@ -45,7 +45,7 @@ Overview and a quick example
 ----------------------------
 
 To use the test client, instantiate ``django.test.Client`` and retrieve
-Web pages::
+web pages::
 
     >>> from django.test import Client
     >>> c = Client()
@@ -61,8 +61,8 @@ of the Python interactive interpreter.
 
 Note a few important things about how the test client works:
 
-* The test client does *not* require the Web server to be running. In fact,
-  it will run just fine with no Web server running at all! That's because
+* The test client does *not* require the web server to be running. In fact,
+  it will run just fine with no web server running at all! That's because
   it avoids the overhead of HTTP and deals directly with the Django
   framework. This helps make the unit tests run quickly.
 
@@ -75,8 +75,8 @@ Note a few important things about how the test client works:
 
       >>> c.get('https://www.example.com/login/')
 
-  The test client is not capable of retrieving Web pages that are not
-  powered by your Django project. If you need to retrieve other Web pages,
+  The test client is not capable of retrieving web pages that are not
+  powered by your Django project. If you need to retrieve other web pages,
   use a Python standard library module such as :mod:`urllib`.
 
 * To resolve URLs, the test client uses whatever URLconf is pointed-to by
@@ -1018,7 +1018,7 @@ out the `full reference`_ for more details.
                 lambda driver: driver.find_element_by_tag_name('body'))
 
     The tricky thing here is that there's really no such thing as a "page load,"
-    especially in modern Web apps that generate HTML dynamically after the
+    especially in modern web apps that generate HTML dynamically after the
     server generates the initial document. So, checking for the presence of
     ``<body>`` in the response might not necessarily be appropriate for all use
     cases. Please refer to the `Selenium FAQ`_ and `Selenium documentation`_
@@ -1422,7 +1422,7 @@ Assertions
 As Python's normal :class:`unittest.TestCase` class implements assertion methods
 such as :meth:`~unittest.TestCase.assertTrue` and
 :meth:`~unittest.TestCase.assertEqual`, Django's custom :class:`TestCase` class
-provides a number of custom assertion methods that are useful for testing Web
+provides a number of custom assertion methods that are useful for testing web
 applications:
 
 The failure messages given by most of these assertion methods can be customized

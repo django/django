@@ -613,7 +613,7 @@ If the server is not running start it like so:
 
     $ python manage.py runserver
 
-Now, open a Web browser and go to "/admin/" on your local domain -- e.g.,
+Now, open a web browser and go to "/admin/" on your local domain -- e.g.,
 http://127.0.0.1:8000/admin/. You should see the admin's login screen:
 
 .. image:: _images/admin01.png

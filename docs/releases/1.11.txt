@@ -741,7 +741,7 @@ Miscellaneous
   to allow including lists inside help text.
 
 * :class:`~django.middleware.http.ConditionalGetMiddleware` no longer sets the
-  ``Date`` header as Web servers set that header. It also no longer sets the
+  ``Date`` header as web servers set that header. It also no longer sets the
   ``Content-Length`` header as this is now done by
   :class:`~django.middleware.common.CommonMiddleware`.
 

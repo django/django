@@ -65,7 +65,7 @@ class ModelInheritanceTests(TestCase):
         post = Post.objects.create(title="Lorem Ipsum")
         post.attached_comment_set.create(content="Save $ on V1agr@", is_spam=True)
         post.attached_link_set.create(
-            content="The Web framework for perfections with deadlines.",
+            content="The web framework for perfections with deadlines.",
             url="http://www.djangoproject.com/"
         )
 

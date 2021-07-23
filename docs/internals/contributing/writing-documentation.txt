@@ -160,8 +160,7 @@ documentation:
 * **subclass** -- it's a single word without a hyphen, both as a verb
   ("subclass that model") and as a noun ("create a subclass").
 
-* **Web**, **World Wide Web**, **the Web** -- note Web is always
-  capitalized when referring to the World Wide Web.
+* **the web**, **web framework** -- it's not capitalized.
 
 * **website** -- use one word, without capitalization.
 

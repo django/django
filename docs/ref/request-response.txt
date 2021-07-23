@@ -57,10 +57,10 @@ All attributes should be considered read-only, unless stated otherwise.
 
 .. attribute:: HttpRequest.path_info
 
-    Under some Web server configurations, the portion of the URL after the
+    Under some web server configurations, the portion of the URL after the
     host name is split up into a script prefix portion and a path info
     portion. The ``path_info`` attribute always contains the path info portion
-    of the path, no matter what Web server is being used. Using this instead
+    of the path, no matter what web server is being used. Using this instead
     of :attr:`~HttpRequest.path` can make your code easier to move between
     test and deployment servers.
 
@@ -151,7 +151,7 @@ All attributes should be considered read-only, unless stated otherwise.
     * ``QUERY_STRING`` -- The query string, as a single (unparsed) string.
     * ``REMOTE_ADDR`` -- The IP address of the client.
     * ``REMOTE_HOST`` -- The hostname of the client.
-    * ``REMOTE_USER`` -- The user authenticated by the Web server, if any.
+    * ``REMOTE_USER`` -- The user authenticated by the web server, if any.
     * ``REQUEST_METHOD`` -- A string such as ``"GET"`` or ``"POST"``.
     * ``SERVER_NAME`` -- The hostname of the server.
     * ``SERVER_PORT`` -- The port of the server (as a string).
@@ -167,7 +167,7 @@ All attributes should be considered read-only, unless stated otherwise.
     name, so you won't see them in ``META``. This prevents header-spoofing
     based on ambiguity between underscores and dashes both being normalizing to
     underscores in WSGI environment variables. It matches the behavior of
-    Web servers like Nginx and Apache 2.4+.
+    web servers like Nginx and Apache 2.4+.
 
     :attr:`HttpRequest.headers` is a simpler way to access all HTTP-prefixed
     headers, plus ``CONTENT_LENGTH`` and ``CONTENT_TYPE``.
@@ -365,7 +365,7 @@ Methods
         Mixing HTTP and HTTPS on the same site is discouraged, therefore
         :meth:`~HttpRequest.build_absolute_uri()` will always generate an
         absolute URI with the same scheme the current request has. If you need
-        to redirect users to HTTPS, it's best to let your Web server redirect
+        to redirect users to HTTPS, it's best to let your web server redirect
         all HTTP traffic to HTTPS.
 
 .. method:: HttpRequest.get_signed_cookie(key, default=RAISE_ERROR, salt='', max_age=None)
@@ -662,7 +662,7 @@ Typical usage is to pass the contents of the page, as a string, bytestring,
 or :class:`memoryview`, to the :class:`HttpResponse` constructor::
 
     >>> from django.http import HttpResponse
-    >>> response = HttpResponse("Here's the text of the Web page.")
+    >>> response = HttpResponse("Here's the text of the web page.")
     >>> response = HttpResponse("Text only, please.", content_type="text/plain")
     >>> response = HttpResponse(b'Bytestrings are also accepted.')
     >>> response = HttpResponse(memoryview(b'Memoryview as well.'))
@@ -671,7 +671,7 @@ But if you want to add content incrementally, you can use ``response`` as a
 file-like object::
 
     >>> response = HttpResponse()
-    >>> response.write("<p>Here's the text of the Web page.</p>")
+    >>> response.write("<p>Here's the text of the web page.</p>")
     >>> response.write("<p>Here's another paragraph.</p>")
 
 Passing iterators

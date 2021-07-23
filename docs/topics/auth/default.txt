@@ -347,7 +347,7 @@ inherit the permissions of the concrete model they subclass::
 
 .. _auth-web-requests:
 
-Authentication in Web requests
+Authentication in web requests
 ==============================
 
 Django uses :doc:`sessions </topics/http/sessions>` and middleware to hook the
@@ -451,7 +451,7 @@ How to log a user out
 
     When you call :func:`~django.contrib.auth.logout()`, the session data for
     the current request is completely cleaned out. All existing data is
-    removed. This is to prevent another person from using the same Web browser
+    removed. This is to prevent another person from using the same web browser
     to log in and have access to the previous user's session data. If you want
     to put anything into the session that will be available to the user
     immediately after logging out, do that *after* calling

@@ -216,7 +216,7 @@ Normally, you should always use :func:`~django.urls.reverse` to define URLs
 within your application. However, if your application constructs part of the
 URL hierarchy itself, you may occasionally need to generate URLs. In that
 case, you need to be able to find the base URL of the Django project within
-its Web server (normally, :func:`~django.urls.reverse` takes care of this for
+its web server (normally, :func:`~django.urls.reverse` takes care of this for
 you). In that case, you can call ``get_script_prefix()``, which will return
 the script prefix portion of the URL for your Django project. If your Django
 project is at the root of its web server, this is always ``"/"``.

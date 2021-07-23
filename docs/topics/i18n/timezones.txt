@@ -503,7 +503,7 @@ Setup
    datetimes, and vice-versa.
 
    If your application connects to other systems -- for instance, if it queries
-   a Web service -- make sure datetimes are properly specified. To transmit
+   a web service -- make sure datetimes are properly specified. To transmit
    datetimes safely, their representation should include the UTC offset, or
    their values should be in UTC (or both!).
 

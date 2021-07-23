@@ -36,7 +36,7 @@ Next, clone your fork, install some requirements, and run the tests:
 
 Installing the requirements will likely require some operating system packages
 that your computer doesn't have installed. You can usually figure out which
-package to install by doing a Web search for the last line or so of the error
+package to install by doing a web search for the last line or so of the error
 message. Try adding your operating system to the search query if needed.
 
 If you have trouble installing the requirements, you can skip that step. See
@@ -246,7 +246,7 @@ labels.
 Running the Selenium tests
 --------------------------
 
-Some tests require Selenium and a Web browser. To run these tests, you must
+Some tests require Selenium and a web browser. To run these tests, you must
 install the selenium_ package and run the tests with the
 ``--selenium=<BROWSERS>`` option. For example, if you have Firefox and Google
 Chrome installed:
@@ -302,7 +302,7 @@ like so:
 
 If you encounter an error during the installation, your system might be missing
 a dependency for one or more of the Python packages. Consult the failing
-package's documentation or search the Web with the error message that you
+package's documentation or search the web with the error message that you
 encounter.
 
 You can also install the database adapter(s) of your choice using

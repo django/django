@@ -11,7 +11,7 @@ API. Refer to the :doc:`data model reference </ref/models/index>` for full
 details of all the various model lookup options.
 
 Throughout this guide (and in the reference), we'll refer to the following
-models, which comprise a Weblog application:
+models, which comprise a blog application:
 
 .. _queryset-model-example:
 
@@ -1181,7 +1181,7 @@ object and returns the number of objects deleted and a dictionary with
 the number of deletions per object type. Example::
 
     >>> e.delete()
-    (1, {'weblog.Entry': 1})
+    (1, {'blog.Entry': 1})
 
 You can also delete objects in bulk. Every
 :class:`~django.db.models.query.QuerySet` has a
