@@ -98,7 +98,10 @@ def get_token(request):
         request.META["CSRF_COOKIE"] = _mask_cipher_secret(csrf_secret)
     else:
         csrf_secret = _unmask_cipher_token(request.META["CSRF_COOKIE"])
-    request.META["CSRF_COOKIE_USED"] = True
+    # Since the cookie is being used, flag to send the cookie in
+    # process_response() (even if the client already has it) in order to renew
+    # the expiry timer.
+    request.csrf_cookie_needs_reset = True
     return _mask_cipher_secret(csrf_secret)
 
 
@@ -107,10 +110,7 @@ def rotate_token(request):
     Change the CSRF token in use for a request - should be done on login
     for security purposes.
     """
-    request.META.update({
-        "CSRF_COOKIE_USED": True,
-        "CSRF_COOKIE": _get_new_csrf_token(),
-    })
+    request.META["CSRF_COOKIE"] = _get_new_csrf_token()
     request.csrf_cookie_needs_reset = True
 
 
@@ -438,25 +438,15 @@ class CsrfViewMiddleware(MiddlewareMixin):
         return self._accept(request)
 
     def process_response(self, request, response):
-        # Send the CSRF cookie whenever the cookie is being used (even if the
-        # client already has it) in order to renew the expiry timer, but only
-        # if it hasn't already been sent during this request-response cycle.
-        # Also, send the cookie no matter what if a reset was requested.
-        if (
-            getattr(request, 'csrf_cookie_needs_reset', False) or (
-                request.META.get('CSRF_COOKIE_USED') and
-                not getattr(response, 'csrf_cookie_set', False)
-            )
-        ):
+        if getattr(request, 'csrf_cookie_needs_reset', False):
             self._set_token(request, response)
-            # Update state to prevent _set_token() from being unnecessarily
+            # Unset the flag to prevent _set_token() from being unnecessarily
             # called again in process_response() by other instances of
             # CsrfViewMiddleware. This can happen e.g. when both a decorator
             # and middleware are used. However, the csrf_cookie_needs_reset
             # attribute is still respected in subsequent calls e.g. in case
             # rotate_token() is called in process_response() later by custom
             # middleware but before those subsequent calls.
-            response.csrf_cookie_set = True
             request.csrf_cookie_needs_reset = False
 
         return response
