@@ -19,7 +19,6 @@ from .base import (
     NodeList, TemplateSyntaxError, VariableDoesNotExist, kwarg_re,
     render_value_in_context, token_kwargs,
 )
-from .context import Context
 from .defaultfilters import date
 from .library import Library
 from .smartif import IfParser, Literal
@@ -1349,9 +1348,12 @@ def verbatim(parser, token):
             ...
         {% endverbatim myblock %}
     """
-    nodelist = parser.parse(('endverbatim',))
+    # set the end tag to the entire token contents to allow specific closing
+    # tags to be matched
+    end_tag = f'end{token.contents}'
+    verbatim_text = parser.parse_verbatim((end_tag,))
     parser.delete_first_token()
-    return VerbatimNode(nodelist.render(Context()))
+    return VerbatimNode(verbatim_text)
 
 
 @register.tag

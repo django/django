@@ -100,6 +100,14 @@ class TokenType(Enum):
     COMMENT = 3
 
 
+# A mapping between tag start strings and the corresponding token type
+TAG_START_TOKEN_TYPE_MAP = {
+    VARIABLE_TAG_START: TokenType.VAR,
+    BLOCK_TAG_START: TokenType.BLOCK,
+    COMMENT_TAG_START: TokenType.COMMENT,
+}
+
+
 class VariableDoesNotExist(Exception):
 
     def __init__(self, msg, params=()):
@@ -291,7 +299,7 @@ def linebreak_iter(template_source):
 
 
 class Token:
-    def __init__(self, token_type, contents, position=None, lineno=None):
+    def __init__(self, token_type, contents, position=None, lineno=None, full_token_string=None):
         """
         A token representing a string from the template.
 
@@ -309,8 +317,14 @@ class Token:
         lineno
             The line number the token appears on in the template source.
             This is used for traceback information and gettext files.
+
+        full_token_string
+            The verbatim token string - includes '{%', '%}', '{{', '}}' and
+            other characters which are stripped out of the contents arg.
+            This is only required for non text tokens - the contents of text
+            tokens are never stripped.
         """
-        self.token_type, self.contents = token_type, contents
+        self.token_type, self.contents, self.token_string = token_type, contents, full_token_string
         self.lineno = lineno
         self.position = position
 
@@ -338,13 +352,11 @@ class Token:
 class Lexer:
     def __init__(self, template_string):
         self.template_string = template_string
-        self.verbatim = False
 
     def __repr__(self):
-        return '<%s template_string="%s...", verbatim=%s>' % (
+        return '<%s template_string="%s...">' % (
             self.__class__.__qualname__,
             self.template_string[:20].replace('\n', ''),
-            self.verbatim,
         )
 
     def tokenize(self):
@@ -367,25 +379,15 @@ class Lexer:
         If in_tag is True, we are processing something that matched a tag,
         otherwise it should be treated as a literal string.
         """
-        token_start = token_string[0:2]
-        if in_tag and token_start == BLOCK_TAG_START:
+        if in_tag:
             # The [2:-2] ranges below strip off *_TAG_START and *_TAG_END.
             # We could do len(BLOCK_TAG_START) to be more "correct", but we've
             # hard-coded the 2s here for performance. And it's not like
             # the TAG_START values are going to change anytime, anyway.
             block_content = token_string[2:-2].strip()
-            if self.verbatim and block_content == self.verbatim:
-                self.verbatim = False
-        if in_tag and not self.verbatim:
-            if token_start == VARIABLE_TAG_START:
-                return Token(TokenType.VAR, token_string[2:-2].strip(), position, lineno)
-            elif token_start == BLOCK_TAG_START:
-                if block_content[:9] in ('verbatim', 'verbatim '):
-                    self.verbatim = 'end%s' % block_content
-                return Token(TokenType.BLOCK, block_content, position, lineno)
-            elif token_start == COMMENT_TAG_START:
-                content = token_string[2:-2].strip()
-                return Token(TokenType.COMMENT, content, position, lineno)
+            token_start = token_string[0:2]
+            token_type = TAG_START_TOKEN_TYPE_MAP[token_start]
+            return Token(token_type, block_content, position, lineno, token_string)
         else:
             return Token(TokenType.TEXT, token_string, position, lineno)
 
@@ -506,6 +508,31 @@ class Parser:
         if parse_until:
             self.unclosed_block_tag(parse_until)
         return nodelist
+
+    def parse_verbatim(self, parse_until):
+        """
+        Iterate through the parser tokens and returns a string that is a
+        verbatim copy of the original template fragment.
+        Fragment starts from the current token position and ends when one of
+        the tags in parse_until is reached.
+        """
+        text_list = []
+        while self.tokens:
+            token = self.next_token()
+            # check for end tag if TokenType.BLOCK
+            # match entire token contents, not just the 'command'
+            if token.token_type.value == 2 and token.contents in parse_until:
+                # A matching token has been reached. Return control to
+                # the caller. Put the token back on the token list so the
+                # caller knows where it terminated.
+                self.prepend_token(token)
+                return ''.join(text_list)
+
+            # Use the full token_string if not TokenType.TEXT
+            verbatim_content = token.contents if token.token_type.value == 0 else token.token_string
+            text_list.append(verbatim_content)
+
+        return ''.join(text_list)
 
     def skip_past(self, endtag):
         while self.tokens:
