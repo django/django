@@ -3,7 +3,7 @@ import re
 from django.conf import settings
 from django.contrib.sessions.backends.cache import SessionStore
 from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, UnreadablePostError
 from django.middleware.csrf import (
     CSRF_ALLOWED_CHARS, CSRF_SESSION_KEY, CSRF_TOKEN_LENGTH, REASON_BAD_ORIGIN,
     REASON_CSRF_TOKEN_MISSING, REASON_NO_CSRF_COOKIE, CsrfViewMiddleware,
@@ -728,10 +728,10 @@ class CsrfViewMiddlewareTestMixin:
             req = self._get_request()
             ensure_csrf_cookie_view(req)
 
-    def test_post_data_read_failure(self):
+    def test_reading_post_data_raises_unreadable_post_error(self):
         """
-        OSErrors during POST data reading are caught and treated as if the
-        POST data wasn't there.
+        An UnreadablePostError raised while reading the POST data should be
+        handled by the middleware.
         """
         req = self._get_POST_request_with_token()
         mw = CsrfViewMiddleware(post_form_view)
@@ -740,7 +740,7 @@ class CsrfViewMiddlewareTestMixin:
         self.assertIsNone(resp)
 
         req = self._get_POST_request_with_token(request_class=PostErrorRequest)
-        req.post_error = OSError('error reading input data')
+        req.post_error = UnreadablePostError('Error reading input data.')
         mw.process_request(req)
         with self.assertLogs('django.security.csrf', 'WARNING') as cm:
             resp = mw.process_view(req, post_form_view, (), {})
@@ -749,6 +749,18 @@ class CsrfViewMiddlewareTestMixin:
             cm.records[0].getMessage(),
             'Forbidden (%s): ' % REASON_CSRF_TOKEN_MISSING,
         )
+
+    def test_reading_post_data_raises_os_error(self):
+        """
+        An OSError raised while reading the POST data should not be handled by
+        the middleware.
+        """
+        mw = CsrfViewMiddleware(post_form_view)
+        req = self._get_POST_request_with_token(request_class=PostErrorRequest)
+        req.post_error = OSError('Deleted directories/Missing permissions.')
+        mw.process_request(req)
+        with self.assertRaises(OSError):
+            mw.process_view(req, post_form_view, (), {})
 
     @override_settings(ALLOWED_HOSTS=['www.example.com'])
     def test_bad_origin_bad_domain(self):

@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 
 from django.conf import settings
 from django.core.exceptions import DisallowedHost, ImproperlyConfigured
+from django.http import UnreadablePostError
 from django.http.request import HttpHeaders
 from django.urls import get_callable
 from django.utils.cache import patch_vary_headers
@@ -342,7 +343,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
         if request.method == 'POST':
             try:
                 request_csrf_token = request.POST.get('csrfmiddlewaretoken', '')
-            except OSError:
+            except UnreadablePostError:
                 # Handle a broken connection before we've completed reading the
                 # POST data. process_view shouldn't raise any exceptions, so
                 # we'll ignore and serve the user a 403 (assuming they're still
