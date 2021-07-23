@@ -75,6 +75,16 @@ General-purpose aggregation functions
     Returns an ``int`` of the bitwise ``OR`` of all non-null input values, or
     ``default`` if all values are null.
 
+``BitXor``
+----------
+
+.. versionadded:: 4.1
+
+.. class:: BitXor(expression, filter=None, default=None, **extra)
+
+    Returns an ``int`` of the bitwise ``XOR`` of all non-null input values, or
+    ``default`` if all values are null. It requires PostgreSQL 14+.
+
 ``BoolAnd``
 -----------
 

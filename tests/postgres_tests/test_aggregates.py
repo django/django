@@ -1,8 +1,10 @@
+from django.db import connection
 from django.db.models import (
     CharField, F, Func, IntegerField, OuterRef, Q, Subquery, Value,
 )
 from django.db.models.fields.json import KeyTextTransform, KeyTransform
 from django.db.models.functions import Cast, Concat, Substr
+from django.test import skipUnlessDBFeature
 from django.test.utils import Approximate, ignore_warnings
 from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango50Warning
@@ -12,9 +14,9 @@ from .models import AggregateTestModel, HotelReservation, Room, StatTestModel
 
 try:
     from django.contrib.postgres.aggregates import (
-        ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr, Corr, CovarPop, JSONBAgg,
-        RegrAvgX, RegrAvgY, RegrCount, RegrIntercept, RegrR2, RegrSlope,
-        RegrSXX, RegrSXY, RegrSYY, StatAggregate, StringAgg,
+        ArrayAgg, BitAnd, BitOr, BitXor, BoolAnd, BoolOr, Corr, CovarPop,
+        JSONBAgg, RegrAvgX, RegrAvgY, RegrCount, RegrIntercept, RegrR2,
+        RegrSlope, RegrSXX, RegrSXY, RegrSYY, StatAggregate, StringAgg,
     )
     from django.contrib.postgres.fields import ArrayField
 except ImportError:
@@ -68,6 +70,8 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             (JSONBAgg('integer_field'), []),
             (StringAgg('char_field', delimiter=';'), ''),
         ]
+        if connection.features.has_bit_xor:
+            tests.append((BitXor('integer_field'), None))
         for aggregation, expected_result in tests:
             with self.subTest(aggregation=aggregation):
                 # Empty result with non-execution optimization.
@@ -96,6 +100,8 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             (JSONBAgg('integer_field', default=Value('["<empty>"]')), ['<empty>']),
             (StringAgg('char_field', delimiter=';', default=Value('<empty>')), '<empty>'),
         ]
+        if connection.features.has_bit_xor:
+            tests.append((BitXor('integer_field', default=0), 0))
         for aggregation, expected_result in tests:
             with self.subTest(aggregation=aggregation):
                 # Empty result with non-execution optimization.
@@ -274,6 +280,28 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         values = AggregateTestModel.objects.filter(
             integer_field=0).aggregate(bitor=BitOr('integer_field'))
         self.assertEqual(values, {'bitor': 0})
+
+    @skipUnlessDBFeature('has_bit_xor')
+    def test_bit_xor_general(self):
+        AggregateTestModel.objects.create(integer_field=3)
+        values = AggregateTestModel.objects.filter(
+            integer_field__in=[1, 3],
+        ).aggregate(bitxor=BitXor('integer_field'))
+        self.assertEqual(values, {'bitxor': 2})
+
+    @skipUnlessDBFeature('has_bit_xor')
+    def test_bit_xor_on_only_true_values(self):
+        values = AggregateTestModel.objects.filter(
+            integer_field=1,
+        ).aggregate(bitxor=BitXor('integer_field'))
+        self.assertEqual(values, {'bitxor': 1})
+
+    @skipUnlessDBFeature('has_bit_xor')
+    def test_bit_xor_on_only_false_values(self):
+        values = AggregateTestModel.objects.filter(
+            integer_field=0,
+        ).aggregate(bitxor=BitXor('integer_field'))
+        self.assertEqual(values, {'bitxor': 0})
 
     def test_bool_and_general(self):
         values = AggregateTestModel.objects.aggregate(booland=BoolAnd('boolean_field'))
