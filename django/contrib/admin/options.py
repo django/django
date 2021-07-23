@@ -558,6 +558,7 @@ class ModelAdmin(BaseModelAdmin):
     list_per_page = 100
     list_max_show_all = 200
     list_editable = ()
+    list_grouper_column = None
     search_fields = ()
     search_help_text = None
     date_hierarchy = None
@@ -755,6 +756,7 @@ class ModelAdmin(BaseModelAdmin):
             self,
             sortable_by,
             self.search_help_text,
+            self.list_grouper_column,
         )
 
     def get_object(self, request, object_id, from_field=None):
