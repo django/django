@@ -684,7 +684,7 @@ class WatchmanReloaderTests(ReloaderTests, IntegrationTests):
     def setUp(self):
         super().setUp()
         # Shorten the timeout to speed up tests.
-        self.reloader.client_timeout = 0.1
+        self.reloader.client_timeout = int(os.environ.get('DJANGO_WATCHMAN_TIMEOUT', 2))
 
     def test_watch_glob_ignores_non_existing_directories_two_levels(self):
         with mock.patch.object(self.reloader, '_subscribe') as mocked_subscribe:
