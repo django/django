@@ -355,6 +355,10 @@ To save an object back to the database, call ``save()``:
 
 .. method:: Model.save(force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None)
 
+For details on using the ``force_insert`` and ``force_update`` arguments, see
+:ref:`ref-models-force-insert`. Details about the ``update_fields`` argument
+can be found in the :ref:`ref-models-update-fields` section.
+
 If you want customized saving behavior, you can override this ``save()``
 method. See :ref:`overriding-model-methods` for more details.
 
@@ -548,6 +552,8 @@ as::
 For more details, see the documentation on :class:`F expressions
 <django.db.models.F>` and their :ref:`use in update queries
 <topics-db-queries-update>`.
+
+.. _ref-models-update-fields:
 
 Specifying which fields to save
 -------------------------------
