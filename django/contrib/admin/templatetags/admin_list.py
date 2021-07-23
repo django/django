@@ -297,15 +297,20 @@ def result_list(cl):
     """
     headers = list(result_headers(cl))
     num_sorted_fields = 0
-    for h in headers:
+    list_grouper_column = cl.list_grouper_column and cl.list_grouper_column.lower()
+    list_grouper_index = None
+    for i, h in enumerate(headers):
         if h['sortable'] and h['sorted']:
             num_sorted_fields += 1
+        if h['text'].lower() == list_grouper_column:
+            list_grouper_index = i
     return {
         'cl': cl,
         'result_hidden_fields': list(result_hidden_fields(cl)),
         'result_headers': headers,
         'num_sorted_fields': num_sorted_fields,
         'results': list(results(cl)),
+        'list_grouper_index': list_grouper_index,
     }
 
 
