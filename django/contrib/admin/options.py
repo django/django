@@ -17,7 +17,7 @@ from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     NestedObjects, construct_change_message, flatten_fieldsets,
     get_deleted_objects, lookup_spawns_duplicates, model_format_dict,
-    model_ngettext, quote, unquote,
+    quote, unquote,
 )
 from django.contrib.admin.widgets import (
     AutocompleteSelect, AutocompleteSelectMultiple,
@@ -1788,12 +1788,13 @@ class ModelAdmin(BaseModelAdmin):
 
                 if changecount:
                     msg = ngettext(
-                        "%(count)s %(name)s was changed successfully.",
-                        "%(count)s %(name)s were changed successfully.",
+                        "%(count)s %(item)s was changed successfully.",
+                        "%(count)s %(items)s were changed successfully.",
                         changecount
                     ) % {
                         'count': changecount,
-                        'name': model_ngettext(opts, changecount),
+                        'item': opts.verbose_name,
+                        'items': opts.verbose_name_plural,
                     }
                     self.message_user(request, msg, messages.SUCCESS)
 
