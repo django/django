@@ -259,10 +259,8 @@ class AppConfig:
 
         Raise LookupError if no model exists with this name.
         """
-        if require_ready:
-            self.apps.check_models_ready()
-        else:
-            self.apps.check_apps_ready()
+        self.apps.check_models_ready(model_name) if require_ready else self.apps.check_apps_ready()
+        
         try:
             return self.models[model_name.lower()]
         except KeyError:
