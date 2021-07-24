@@ -5,10 +5,9 @@ Built-in, globally-available admin actions.
 from django.contrib import messages
 from django.contrib.admin import helpers
 from django.contrib.admin.decorators import action
-from django.contrib.admin.utils import model_ngettext
 from django.core.exceptions import PermissionDenied
 from django.template.response import TemplateResponse
-from django.utils.translation import gettext as _, gettext_lazy
+from django.utils.translation import gettext as _, gettext_lazy, ngettext
 
 
 @action(
@@ -43,16 +42,30 @@ def delete_selected(modeladmin, request, queryset):
                 obj_display = str(obj)
                 modeladmin.log_deletion(request, obj, obj_display)
             modeladmin.delete_queryset(request, queryset)
-            modeladmin.message_user(request, _("Successfully deleted %(count)d %(items)s.") % {
-                "count": n, "items": model_ngettext(modeladmin.opts, n)
-            }, messages.SUCCESS)
+            modeladmin.message_user(
+                request,
+                ngettext(
+                    "Successfully deleted %(count)d %(item)s.",
+                    "Successfully deleted %(count)d %(items)s.",
+                    n,
+                )
+                % {
+                    "count": n,
+                    "item": modeladmin.opts.verbose_name,
+                    "items": modeladmin.opts.verbose_name_plural,
+                },
+                messages.SUCCESS,
+            )
         # Return None to display the change list page again.
         return None
 
-    objects_name = model_ngettext(queryset)
+    object_name = queryset.model._meta.verbose_name
+    objects_name = queryset.model._meta.verbose_name_plural
 
     if perms_needed or protected:
-        title = _("Cannot delete %(name)s") % {"name": objects_name}
+        title = ngettext(
+            "Cannot delete %(item)s", "Cannot delete %(items)s", queryset.count()
+        ) % {"item": object_name, "items": objects_name}
     else:
         title = _("Are you sure?")
 
@@ -60,6 +73,7 @@ def delete_selected(modeladmin, request, queryset):
         **modeladmin.admin_site.each_context(request),
         'title': title,
         'subtitle': None,
+        'object_name': str(object_name),
         'objects_name': str(objects_name),
         'deletable_objects': [deletable_objects],
         'model_count': dict(model_count).items(),
