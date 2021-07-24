@@ -1,4 +1,5 @@
 import json
+from unittest.mock import patch
 
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.views.main import IS_POPUP_VAR
@@ -8,6 +9,7 @@ from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils.translation import activate, deactivate
 
 from .admin import SubscriberAdmin
 from .forms import MediaActionForm
@@ -400,6 +402,53 @@ action)</option>
         self.assertIn(
             r'&quot;obj\\&quot;', output
         )
+
+    def test_model_admin_default_delete_action_polish_localized_content(self):
+        def _fake_ngettext(message, message_plural, n):
+            if n == 1:
+                return 'Czy chcesz skasować zaznaczone(go)(-ną)(-ny) subscriber?'
+            if n > 1:
+                return 'Czy chcesz skasować zaznaczone(-nych) subscribers?'
+
+        def _get_confirmation_text(confirmation_response_content):
+            content_div_index = confirmation_response_content.find('<div id="content"')
+            p_index = confirmation_response_content.find('<p>', content_div_index)
+            p_closing_index = confirmation_response_content.find('</p>', p_index)
+            return confirmation_response_content[p_index + len('<p>') : p_closing_index]
+
+        activate('pl')
+
+        action_data_two = {
+            ACTION_CHECKBOX_NAME: [self.s1.pk, self.s2.pk],
+            'action': 'delete_selected',
+            'index': 0,
+        }
+        with patch('django.utils.translation.ngettext', _fake_ngettext):
+            confirmation = self.client.post(
+                reverse('admin:admin_views_subscriber_changelist'), action_data_two
+            )
+        self.assertIsInstance(confirmation, TemplateResponse)
+        self.assertIn(
+            'Czy chcesz skasować zaznaczone(-nych) subscribers?',
+            _get_confirmation_text(confirmation.content.decode()),
+        )
+
+        action_data_one = {
+            ACTION_CHECKBOX_NAME: [self.s1.pk],
+            'action': 'delete_selected',
+            'index': 0,
+        }
+        with patch('django.utils.translation.ngettext', _fake_ngettext):
+            confirmation = self.client.post(
+                reverse('admin:admin_views_subscriber_changelist'), action_data_one
+            )
+        self.assertIsInstance(confirmation, TemplateResponse)
+        self.assertIn(
+            'Czy chcesz skasować zaznaczone(go)(-ną)(-ny) subscriber?',
+            _get_confirmation_text(confirmation.content.decode()),
+        )
+
+        deactivate()
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
