@@ -1304,6 +1304,14 @@ Specifies which files in the app template (in addition to those matching
 ``--extension``) should be rendered with the template engine. Defaults to an
 empty list.
 
+.. django-admin-option:: --exclude DIRECTORIES, -x DIRECTORIES
+
+.. versionadded:: 4.0
+
+Specifies which directories in the app template should be excluded, in addition
+to ``.git`` and ``__pycache__``. If this option is not provided, directories
+named ``__pycache__`` or starting with ``.`` will be excluded.
+
 The :class:`template context <django.template.Context>` used for all matching
 files is:
 
@@ -1372,6 +1380,14 @@ the template engine. Defaults to ``py``.
 Specifies which files in the project template (in addition to those matching
 ``--extension``) should be rendered with the template engine. Defaults to an
 empty list.
+
+.. django-admin-option:: --exclude DIRECTORIES, -x DIRECTORIES
+
+.. versionadded:: 4.0
+
+Specifies which directories in the project template should be excluded, in
+addition to ``.git`` and ``__pycache__``. If this option is not provided,
+directories named ``__pycache__`` or starting with ``.`` will be excluded.
 
 The :class:`template context <django.template.Context>` used is:
 

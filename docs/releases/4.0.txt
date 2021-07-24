@@ -278,6 +278,9 @@ Management Commands
   <django.core.management.BaseCommand.suppressed_base_arguments>` attribute
   allows suppressing unsupported default command options in the help output.
 
+* The new :option:`startapp --exclude` and :option:`startproject --exclude`
+  options allow excluding directories from the template.
+
 Migrations
 ~~~~~~~~~~
 
