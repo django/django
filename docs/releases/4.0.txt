@@ -274,6 +274,10 @@ Management Commands
   As a consequence, ``readline`` is no longer loaded if running in *isolated*
   mode.
 
+* The new :attr:`BaseCommand.suppressed_base_arguments
+  <django.core.management.BaseCommand.suppressed_base_arguments>` attribute
+  allows suppressing unsupported default command options in the help output.
+
 Migrations
 ~~~~~~~~~~
 

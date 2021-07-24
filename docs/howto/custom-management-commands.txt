@@ -242,6 +242,14 @@ All attributes can be set in your derived class and can be used in
     If you pass the :option:`--no-color` option when running your command, all
     ``self.style()`` calls will return the original string uncolored.
 
+.. attribute:: BaseCommand.suppressed_base_arguments
+
+    .. versionadded:: 4.0
+
+    The default command options to suppress in the help output. This should be
+    a set of option names (e.g. ``'--verbosity'``). The default values for the
+    suppressed options are still passed.
+
 Methods
 -------
 

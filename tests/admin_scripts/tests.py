@@ -1381,6 +1381,15 @@ class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
         self.assertOutput(err, 'CommandError: You must set settings.ALLOWED_HOSTS if DEBUG is False.')
 
 
+class ManageRunserverHelpOutput(AdminScriptTestCase):
+    def test_suppressed_options(self):
+        """runserver doesn't support --verbosity and --trackback options."""
+        out, err = self.run_manage(['runserver', '--help'])
+        self.assertNotInOutput(out, '--verbosity')
+        self.assertNotInOutput(out, '--trackback')
+        self.assertOutput(out, '--settings')
+
+
 class ManageTestserver(SimpleTestCase):
 
     @mock.patch.object(TestserverCommand, 'handle', return_value='')
@@ -1845,6 +1854,34 @@ class CommandTypes(AdminScriptTestCase):
             "EXECUTE:LabelCommand label=anotherlabel, options=[('force_color', "
             "False), ('no_color', False), ('pythonpath', None), "
             "('settings', None), ('traceback', False), ('verbosity', 1)]"
+        )
+
+    def test_suppress_base_options_command_help(self):
+        args = ['suppress_base_options_command', '--help']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, 'Test suppress base options command.')
+        self.assertNotInOutput(out, 'input file')
+        self.assertOutput(out, '-h, --help')
+        self.assertNotInOutput(out, '--version')
+        self.assertNotInOutput(out, '--verbosity')
+        self.assertNotInOutput(out, '-v {0,1,2,3}')
+        self.assertNotInOutput(out, '--settings')
+        self.assertNotInOutput(out, '--pythonpath')
+        self.assertNotInOutput(out, '--traceback')
+        self.assertNotInOutput(out, '--no-color')
+        self.assertNotInOutput(out, '--force-color')
+
+    def test_suppress_base_options_command_defaults(self):
+        args = ['suppress_base_options_command']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(
+            out,
+            "EXECUTE:SuppressBaseOptionsCommand options=[('file', None), "
+            "('force_color', False), ('no_color', False), "
+            "('pythonpath', None), ('settings', None), "
+            "('traceback', False), ('verbosity', 1)]"
         )
 
 
