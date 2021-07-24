@@ -51,18 +51,12 @@ class HttpRequest:
         # Any variable assignment made here should also happen in
         # `WSGIRequest.__init__()`.
 
-        self.GET = QueryDict(mutable=True)
-        self.POST = QueryDict(mutable=True)
-        self.COOKIES = {}
-        self.META = {}
+        self.GET = self.POST = QueryDict(mutable=True)
+        self.COOKIES = self.META = {}
         self.FILES = MultiValueDict()
 
-        self.path = ''
-        self.path_info = ''
-        self.method = None
-        self.resolver_match = None
-        self.content_type = None
-        self.content_params = None
+        self.path = self.path_info = ''
+        self.method = self.resolver_match = self.content_type = self.content_params = None
 
     def __repr__(self):
         if self.method is None or not self.get_full_path():
@@ -136,11 +130,10 @@ class HttpRequest:
 
     def get_port(self):
         """Return the port number for the request as a string."""
-        if settings.USE_X_FORWARDED_PORT and 'HTTP_X_FORWARDED_PORT' in self.META:
-            port = self.META['HTTP_X_FORWARDED_PORT']
-        else:
-            port = self.META['SERVER_PORT']
-        return str(port)
+        return str(
+            self.META['HTTP_X_FORWARDED_PORT'] if settings.USE_X_FORWARDED_PORT and 'HTTP_X_FORWARDED_PORT' in self.META else
+            self.META['SERVER_PORT']
+        )
 
     def get_full_path(self, force_append_slash=False):
         return self._get_full_path(self.path, force_append_slash)
@@ -189,13 +182,10 @@ class HttpRequest:
         is scheme-relative (i.e., ``//example.com/``), urljoin() it to a base
         URL constructed from the request variables.
         """
-        if location is None:
-            # Make it an absolute url (but schemeless and domainless) for the
-            # edge case that the path starts with '//'.
-            location = '//%s' % self.get_full_path()
-        else:
-            # Coerce lazy locations.
-            location = str(location)
+        # Make it an absolute url (but schemeless and domainless) for the
+        # edge case that the path starts with '//'.
+        # Else coerce lazy locations.
+        location = '//%s' % self.get_full_path() if location is None else str(location)
         bits = urlsplit(location)
         if not (bits.scheme and bits.netloc):
             # Handle the simple, most common case. If the location is absolute
@@ -319,11 +309,8 @@ class HttpRequest:
             return
 
         if self.content_type == 'multipart/form-data':
-            if hasattr(self, '_body'):
-                # Use already read data
-                data = BytesIO(self._body)
-            else:
-                data = self
+            # Use already read data if self has '_body' attribute
+            data = BytesIO(self._body) if hasattr(self, '_body') else self
             try:
                 self._post, self._files = self.parse_file_upload(self.META, data)
             except MultiPartParserError:
