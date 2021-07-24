@@ -238,24 +238,25 @@ class MultiPartParser:
                                 break
 
                         for chunk in field_stream:
-                            if transfer_encoding == 'base64':
-                                # We only special-case base64 transfer encoding
-                                # We should always decode base64 chunks by multiple of 4,
-                                # ignoring whitespace.
+                            if transfer_encoding != 'base64':
+                                continue
+                            # We only special-case base64 transfer encoding
+                            # We should always decode base64 chunks by multiple of 4,
+                            # ignoring whitespace.
 
-                                stripped_chunk = b"".join(chunk.split())
+                            stripped_chunk = b"".join(chunk.split())
 
+                            remaining = len(stripped_chunk) % 4
+                            while remaining != 0:
+                                over_chunk = field_stream.read(4 - remaining)
+                                stripped_chunk += b"".join(over_chunk.split())
                                 remaining = len(stripped_chunk) % 4
-                                while remaining != 0:
-                                    over_chunk = field_stream.read(4 - remaining)
-                                    stripped_chunk += b"".join(over_chunk.split())
-                                    remaining = len(stripped_chunk) % 4
 
-                                try:
-                                    chunk = base64.b64decode(stripped_chunk)
-                                except Exception as exc:
-                                    # Since this is only a chunk, any error is an unfixable error.
-                                    raise MultiPartParserError("Could not decode base64 data.") from exc
+                            try:
+                                chunk = base64.b64decode(stripped_chunk)
+                            except Exception as exc:
+                                # Since this is only a chunk, any error is an unfixable error.
+                                raise MultiPartParserError("Could not decode base64 data.") from exc
 
                             for i, handler in enumerate(handlers):
                                 chunk_length = len(chunk)
@@ -680,23 +681,24 @@ def parse_header(line):
     pdict = {}
     for p in plist:
         i = p.find(b'=')
-        if i >= 0:
-            has_encoding = False
-            name = p[:i].strip().lower().decode('ascii')
-            if name.endswith('*'):
-                # Lang/encoding embedded in the value (like "filename*=UTF-8''file.ext")
-                # http://tools.ietf.org/html/rfc2231#section-4
-                name = name[:-1]
-                if p.count(b"'") == 2:
-                    has_encoding = True
-            value = p[i + 1:].strip()
-            if len(value) >= 2 and value[:1] == value[-1:] == b'"':
-                value = value[1:-1]
-                value = value.replace(b'\\\\', b'\\').replace(b'\\"', b'"')
-            if has_encoding:
-                encoding, lang, value = value.split(b"'")
-                value = unquote(value.decode(), encoding=encoding.decode())
-            pdict[name] = value
+        if not i >= 0:
+            continue
+        has_encoding = False
+        name = p[:i].strip().lower().decode('ascii')
+        if name.endswith('*'):
+            # Lang/encoding embedded in the value (like "filename*=UTF-8''file.ext")
+            # http://tools.ietf.org/html/rfc2231#section-4
+            name = name[:-1]
+            if p.count(b"'") == 2:
+                has_encoding = True
+        value = p[i + 1:].strip()
+        if len(value) >= 2 and value[:1] == value[-1:] == b'"':
+            value = value[1:-1]
+            value = value.replace(b'\\\\', b'\\').replace(b'\\"', b'"')
+        if has_encoding:
+            encoding, lang, value = value.split(b"'")
+            value = unquote(value.decode(), encoding=encoding.decode())
+        pdict[name] = value
     return key, pdict
 
 
