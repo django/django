@@ -182,7 +182,7 @@ the SQL operator ``&&``. For example::
 ``len``
 ~~~~~~~
 
-Returns the length of the array. The lookups available afterwards are those
+Returns the length of the array. The lookups available afterward are those
 available for :class:`~django.db.models.IntegerField`. For example::
 
     >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])

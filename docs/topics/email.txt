@@ -420,7 +420,7 @@ The email backend class has the following methods:
 * ``send_messages(email_messages)`` sends a list of
   :class:`~django.core.mail.EmailMessage` objects. If the connection is
   not open, this call will implicitly open the connection, and close the
-  connection afterwards. If the connection is already open, it will be
+  connection afterward. If the connection is already open, it will be
   left open after mail has been sent.
 
 It can also be used as a context manager, which will automatically call

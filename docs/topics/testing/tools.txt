@@ -1260,7 +1260,7 @@ Django provides a standard Python context manager (see :pep:`343`) called
                 self.assertRedirects(response, '/other/login/?next=/sekrit/')
 
 This example will override the :setting:`LOGIN_URL` setting for the code
-in the ``with`` block and reset its value to the previous state afterwards.
+in the ``with`` block and reset its value to the previous state afterward.
 
 .. method:: SimpleTestCase.modify_settings()
 

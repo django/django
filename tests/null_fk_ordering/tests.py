@@ -34,7 +34,7 @@ class NullFkOrderingTests(TestCase):
         Comment.objects.create(post=p2, comment_text='Another second comment')
 
         # We have to test this carefully. Some databases sort NULL values before
-        # everything else, some sort them afterwards. So we extract the ordered list
+        # everything else, some sort them afterward. So we extract the ordered list
         # and check the length. Before the fix, this list was too short (some values
         # were omitted).
         self.assertEqual(len(list(Comment.objects.all())), 4)

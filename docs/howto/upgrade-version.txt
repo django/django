@@ -21,7 +21,7 @@ Required Reading
 If it's your first time doing an upgrade, it is useful to read the :doc:`guide
 on the different release processes </internals/release-process>`.
 
-Afterwards, you should familiarize yourself with the changes that were made in
+Afterward, you should familiarize yourself with the changes that were made in
 the new Django version(s):
 
 * Read the :doc:`release notes </releases/index>` for each 'final' release from

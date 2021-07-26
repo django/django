@@ -156,7 +156,7 @@ class BaseDatabaseSchemaEditor:
     def table_sql(self, model):
         """Take a model and return its table definition."""
         # Add any unique_togethers (always deferred, as some fields might be
-        # created afterwards, like geometry fields with some backends).
+        # created afterward, like geometry fields with some backends).
         for field_names in model._meta.unique_together:
             fields = [model._meta.get_field(field) for field in field_names]
             self.deferred_sql.append(self._create_unique_sql(model, fields))

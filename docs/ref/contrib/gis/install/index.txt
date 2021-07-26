@@ -292,7 +292,7 @@ Download the framework packages for:
 Install the packages in the order they are listed above, as the GDAL and SQLite
 packages require the packages listed before them.
 
-Afterwards, you can also install the KyngChaos binary packages for `PostgreSQL
+Afterward, you can also install the KyngChaos binary packages for `PostgreSQL
 and PostGIS`__.
 
 After installing the binary packages, you'll want to add the following to

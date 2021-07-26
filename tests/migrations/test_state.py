@@ -310,7 +310,7 @@ class StateTests(SimpleTestCase):
     def test_apps_bulk_update(self):
         """
         StateApps.bulk_update() should update apps.ready to False and reset
-        the value afterwards.
+        the value afterward.
         """
         project_state = ProjectState()
         apps = project_state.apps
