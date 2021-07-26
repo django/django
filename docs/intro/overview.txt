@@ -71,7 +71,7 @@ necessary::
     # Import the models we created from our "news" app
     >>> from news.models import Article, Reporter
 
-    # No reporters are in the system yet.
+    # No reporters are in the database yet.
     >>> Reporter.objects.all()
     <QuerySet []>
 
@@ -81,11 +81,11 @@ necessary::
     # Save the object into the database. You have to call save() explicitly.
     >>> r.save()
 
-    # Now it has an ID.
+    # This reporter object has an attribute ID.
     >>> r.id
     1
 
-    # Now the new reporter is in the database.
+    # Now the new reporter is added to the database.
     >>> Reporter.objects.all()
     <QuerySet [<Reporter: John Smith>]>
 
@@ -111,7 +111,7 @@ necessary::
     ...     content='Yeah.', reporter=r)
     >>> a.save()
 
-    # Now the article is in the database.
+    # Now the article is added to the database.
     >>> Article.objects.all()
     <QuerySet [<Article: Django is cool>]>
 
@@ -130,11 +130,11 @@ necessary::
     >>> Article.objects.filter(reporter__full_name__startswith='John')
     <QuerySet [<Article: Django is cool>]>
 
-    # Change an object by altering its attributes and calling save().
+    # Update an object by altering its attributes followed by calling save().
     >>> r.full_name = 'Billy Goat'
     >>> r.save()
 
-    # Delete an object with delete().
+    # Delete an object using delete().
     >>> r.delete()
 
 A dynamic admin interface: it's not just scaffolding -- it's the whole house
