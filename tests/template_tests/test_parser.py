@@ -133,3 +133,20 @@ class ParserTests(SimpleTestCase):
                 '1|two_one_opt_arg:"1"',
         ):
             FilterExpression(expr, parser)
+
+    def test_verbatim_parsing(self):
+        str1 = 'Some text1\n{% for u in users %}\n\t{{ user.first_name }}\n{% endfor %}'
+        str2 = '{% endsometag %}'
+        lexer = Lexer(str1 + str2)
+        tokens = lexer.tokenize()
+
+        p = Parser(tokens)
+        verbatim_text = p.parse_verbatim('endsometag')
+
+        self.assertEqual(verbatim_text, str1)
+
+        p = Parser(tokens)
+        verbatim_text_all = p.parse_verbatim('nonexistent')
+        # parsing should continue to end of input as the provided until tag
+        # won't be found
+        self.assertEqual(verbatim_text_all, str1 + str2)
