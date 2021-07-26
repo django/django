@@ -146,12 +146,9 @@ class WhereNode(tree.Node):
         value) tuples, or objects supporting .clone().
         """
         clone = self.__class__._new_instance(
-            children=[], connector=self.connector, negated=self.negated)
-        for child in self.children:
-            if hasattr(child, 'clone'):
-                clone.children.append(child.clone())
-            else:
-                clone.children.append(child)
+            children=None, connector=self.connector, negated=self.negated,
+        )
+        clone.children = self.children[:]
         return clone
 
     def relabeled_clone(self, change_map):
