@@ -849,8 +849,8 @@ class BaseDatabaseSchemaEditor:
             self.execute(self._create_fk_sql(model, new_field, "_fk_%(to_table)s_%(to_column)s"))
         # Rebuild FKs that pointed to us if we previously had to drop them
         if drop_foreign_keys:
-            for rel in new_field.model._meta.related_objects:
-                if _is_relevant_relation(rel, new_field) and rel.field.db_constraint:
+            for _, rel in rels_to_update:
+                if rel.field.db_constraint:
                     self.execute(self._create_fk_sql(rel.related_model, rel.field, "_fk"))
         # Does it have check constraints we need to add?
         if old_db_params['check'] != new_db_params['check'] and new_db_params['check']:

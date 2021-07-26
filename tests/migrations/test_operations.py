@@ -1551,10 +1551,32 @@ class OperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_forwards(app_label, editor, project_state, new_state)
         assertIdTypeEqualsMTIFkType()
+        if connection.features.supports_foreign_keys:
+            self.assertFKExists(
+                f'{app_label}_shetlandpony',
+                ['pony_ptr_id'],
+                (f'{app_label}_pony', 'id'),
+            )
+            self.assertFKExists(
+                f'{app_label}_shetlandrider',
+                ['pony_id'],
+                (f'{app_label}_shetlandpony', 'pony_ptr_id'),
+            )
         # Reversal.
         with connection.schema_editor() as editor:
             operation.database_backwards(app_label, editor, new_state, project_state)
         assertIdTypeEqualsMTIFkType()
+        if connection.features.supports_foreign_keys:
+            self.assertFKExists(
+                f'{app_label}_shetlandpony',
+                ['pony_ptr_id'],
+                (f'{app_label}_pony', 'id'),
+            )
+            self.assertFKExists(
+                f'{app_label}_shetlandrider',
+                ['pony_id'],
+                (f'{app_label}_shetlandpony', 'pony_ptr_id'),
+            )
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_alter_field_reloads_state_on_fk_with_to_field_target_type_change(self):
