@@ -212,25 +212,14 @@ class BaseDatabaseSchemaEditor:
 
     # Field <-> database mapping functions
 
-    def column_sql(self, model, field, include_default=False):
-        """
-        Take a field and return its column definition.
-        The field must already have had set_attributes_from_name() called.
-        """
-        # Get the column's type and use that as the basis of the SQL
-        db_params = field.db_parameters(connection=self.connection)
-        sql = db_params['type']
-        params = []
-        # Check for fields that aren't actually columns (e.g. M2M)
-        if sql is None:
-            return None, None
-        # Collation.
+    def _iter_column_sql(self, column_db_type, params, model, field, include_default):
+        yield column_db_type
         collation = getattr(field, 'db_collation', None)
         if collation:
-            sql += self._collate_sql(collation)
-        # Work out nullability
+            yield self._collate_sql(collation)
+        # Work out nullability.
         null = field.null
-        # If we were told to include a default value, do so
+        # Include a default value, if requested.
         include_default = (
             include_default and
             not self.skip_default(field) and
@@ -241,36 +230,50 @@ class BaseDatabaseSchemaEditor:
         )
         if include_default:
             default_value = self.effective_default(field)
-            column_default = ' DEFAULT ' + self._column_default_sql(field)
             if default_value is not None:
+                column_default = 'DEFAULT ' + self._column_default_sql(field)
                 if self.connection.features.requires_literal_defaults:
-                    # Some databases can't take defaults as a parameter (oracle)
+                    # Some databases can't take defaults as a parameter (Oracle).
                     # If this is the case, the individual schema backend should
-                    # implement prepare_default
-                    sql += column_default % self.prepare_default(default_value)
+                    # implement prepare_default().
+                    yield column_default % self.prepare_default(default_value)
                 else:
-                    sql += column_default
-                    params += [default_value]
+                    yield column_default
+                    params.append(default_value)
         # Oracle treats the empty string ('') as null, so coerce the null
         # option whenever '' is a possible value.
         if (field.empty_strings_allowed and not field.primary_key and
                 self.connection.features.interprets_empty_strings_as_nulls):
             null = True
         if null and not self.connection.features.implied_column_null:
-            sql += " NULL"
+            yield 'NULL'
         elif not null:
-            sql += " NOT NULL"
-        # Primary key/unique outputs
+            yield 'NOT NULL'
         if field.primary_key:
-            sql += " PRIMARY KEY"
+            yield 'PRIMARY KEY'
         elif field.unique:
-            sql += " UNIQUE"
-        # Optionally add the tablespace if it's an implicitly indexed column
+            yield 'UNIQUE'
+        # Optionally add the tablespace if it's an implicitly indexed column.
         tablespace = field.db_tablespace or model._meta.db_tablespace
         if tablespace and self.connection.features.supports_tablespaces and field.unique:
-            sql += " %s" % self.connection.ops.tablespace_sql(tablespace, inline=True)
-        # Return the sql
-        return sql, params
+            yield self.connection.ops.tablespace_sql(tablespace, inline=True)
+
+    def column_sql(self, model, field, include_default=False):
+        """
+        Return the column definition for a field. The field must already have
+        had set_attributes_from_name() called.
+        """
+        # Get the column's type and use that as the basis of the SQL.
+        db_params = field.db_parameters(connection=self.connection)
+        column_db_type = db_params['type']
+        # Check for fields that aren't actually columns (e.g. M2M).
+        if column_db_type is None:
+            return None, None
+        params = []
+        return ' '.join(
+            # This appends to the params being returned.
+            self._iter_column_sql(column_db_type, params, model, field, include_default)
+        ), params
 
     def skip_default(self, field):
         """
@@ -954,7 +957,7 @@ class BaseDatabaseSchemaEditor:
             self.sql_alter_column_collate % {
                 'column': self.quote_name(new_field.column),
                 'type': new_type,
-                'collation': self._collate_sql(new_collation) if new_collation else '',
+                'collation': ' ' + self._collate_sql(new_collation) if new_collation else '',
             },
             [],
         )
@@ -1377,7 +1380,7 @@ class BaseDatabaseSchemaEditor:
         return self._delete_constraint_sql(self.sql_delete_pk, model, name)
 
     def _collate_sql(self, collation):
-        return ' COLLATE ' + self.quote_name(collation)
+        return 'COLLATE ' + self.quote_name(collation)
 
     def remove_procedure(self, procedure_name, param_types=()):
         sql = self.sql_delete_procedure % {
