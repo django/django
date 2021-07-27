@@ -316,14 +316,15 @@ class BaseDatabaseSchemaEditor:
             else:
                 default = ''
         elif getattr(field, 'auto_now', False) or getattr(field, 'auto_now_add', False):
-            default = datetime.now()
             internal_type = field.get_internal_type()
-            if internal_type == 'DateField':
-                default = default.date()
-            elif internal_type == 'TimeField':
-                default = default.time()
-            elif internal_type == 'DateTimeField':
+            if internal_type == 'DateTimeField':
                 default = timezone.now()
+            else:
+                default = datetime.now()
+                if internal_type == 'DateField':
+                    default = default.date()
+                elif internal_type == 'TimeField':
+                    default = default.time()
         else:
             default = None
         return default
