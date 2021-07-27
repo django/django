@@ -245,10 +245,10 @@ class BaseDatabaseSchemaEditor:
         if (field.empty_strings_allowed and not field.primary_key and
                 self.connection.features.interprets_empty_strings_as_nulls):
             null = True
-        if null and not self.connection.features.implied_column_null:
-            yield 'NULL'
-        elif not null:
+        if not null:
             yield 'NOT NULL'
+        elif not self.connection.features.implied_column_null:
+            yield 'NULL'
         if field.primary_key:
             yield 'PRIMARY KEY'
         elif field.unique:
