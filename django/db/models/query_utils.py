@@ -9,6 +9,7 @@ import copy
 import functools
 import inspect
 from collections import namedtuple
+import math
 
 from django.core.exceptions import FieldError
 from django.db.models.constants import LOOKUP_SEP
@@ -68,6 +69,27 @@ class Q(tree.Node):
         obj.negate()
         return obj
 
+    def __eq__(self, other):
+        """Equality taking into account nan."""
+        # First check that they are the same type and have the same connector and negated.
+        if (self.__class__, self.connector, self.negated) != (other.__class__, other.connector, other.negated):
+            return False
+
+        if len(self.children) != len(other.children):
+            return False
+
+        for self_item, other_item in zip(self.children, other.children):
+            # Children is a List[Union[Tuple, Q]]
+            if isinstance(self_item, tuple) and isinstance(other_item, tuple):
+                if not self.nan_tuple_eq(self_item, other_item):
+                    return False
+            elif self_item != other_item:
+                return False
+        return True
+
+    def __hash__(self):
+        return hash((self.connector, self.negated, *self.children))
+
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         # We must promote any new joins to left outer joins so that when Q is
         # used as an expression, rows aren't filtered due to joins.
@@ -90,12 +112,29 @@ class Q(tree.Node):
             kwargs['_negated'] = True
         return path, args, kwargs
 
+    @staticmethod
+    def nan_eq(a: any, b: any) -> bool:
+        """Check if a == b or if they are both `nan`."""
+        return (
+            a == b or
+            isinstance(a, float) and
+            isinstance(b, float) and
+            math.isnan(a) and
+            math.isnan(b)
+        )
+
+    @classmethod
+    def nan_tuple_eq(cls, a: tuple, b: type) -> bool:
+        """Check if a and b are the same, were `nan == nan`"""
+        return all(cls.nan_eq(x, y) for x, y in zip(a, b)) and len(a) == len(b)
+
 
 class DeferredAttribute:
     """
     A wrapper for a deferred-loading field. When the value is read from this
     object the first time, the query is executed.
     """
+
     def __init__(self, field):
         self.field = field
 

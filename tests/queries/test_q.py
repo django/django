@@ -27,6 +27,13 @@ class QTests(SimpleTestCase):
         self.assertEqual(q | Q(), q)
         self.assertEqual(Q() | q, q)
 
+    def test_equality(self):
+        self.assertEqual(Q(my_field=float("nan")), Q(my_field=float("nan")))
+        self.assertEqual(~Q(my_other_field=float("nan")), ~Q(my_other_field=float("nan")))
+        self.assertNotEqual(~Q(my_field=float("nan")), Q(my_field=float("nan")))
+        self.assertNotEqual(Q(my_field=float("nan")), Q(different_field=float("nan")))
+        self.assertNotEqual(Q(my_field=float("nan")), Q(my_field=float("nan"), x=1))
+
     def test_combine_empty_copy(self):
         base_q = Q(x=1)
         tests = [
