@@ -2143,7 +2143,7 @@ The above example can be rewritten using ``update_or_create()`` like so::
         defaults={'first_name': 'Bob'},
     )
 
-For detailed description how names passed in ``kwargs`` are resolved see
+For a detailed description of how names passed in ``kwargs`` are resolved, see
 :meth:`get_or_create`.
 
 As described above in :meth:`get_or_create`, this method is prone to a
