@@ -471,7 +471,7 @@ A few notes about what's going on:
 * The ``transform`` keyword is set to ``False`` because the data in the
   shapefile does not need to be converted -- it's already in WGS84 (SRID=4326).
 
-Afterwards, invoke the Django shell from the ``geodjango`` project directory:
+Afterward, invoke the Django shell from the ``geodjango`` project directory:
 
 .. console::
 

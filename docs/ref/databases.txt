@@ -295,7 +295,7 @@ cause a conflict. For example::
     IntegrityError: duplicate key value violates unique constraint
     "auth_user_pkey" DETAIL:  Key (id)=(1) already exists.
 
-If you need to specify such values, reset the sequence afterwards to avoid
+If you need to specify such values, reset the sequence afterward to avoid
 reusing a value that's already in the table. The :djadmin:`sqlsequencereset`
 management command generates the SQL statements to do that.
 

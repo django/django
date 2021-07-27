@@ -80,7 +80,7 @@ The documentation is organized into several categories:
   understands what we're trying to achieve. Don't feel that you need to begin
   with explanations of how things work - what matters is what the reader does,
   not what you explain. It can be helpful to refer back to what you've done and
-  explain afterwards.
+  explain afterward.
 
 * :doc:`Topic guides </topics/index>` aim to explain a concept or subject at a
   fairly high level.
