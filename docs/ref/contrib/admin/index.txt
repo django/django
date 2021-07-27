@@ -3459,7 +3459,7 @@ The ``staff_member_required`` decorator
 .. function:: staff_member_required(redirect_field_name='next', login_url='admin:login')
 
     This decorator is used on the admin views that require authorization. A
-    view decorated with this function will having the following behavior:
+    view decorated with this function will have the following behavior:
 
     * If the user is logged in, is a staff member (``User.is_staff=True``), and
       is active (``User.is_active=True``), execute the view normally.
