@@ -1171,20 +1171,20 @@ class DateField(DateTimeCheckMixin, Field):
         if not self.has_default():
             return []
 
-        now = _get_naive_now()
         value = self.default
         if isinstance(value, datetime.datetime):
-            value = _to_naive(value)
-            value = value.date()
+            value = _to_naive(value).date()
         elif isinstance(value, datetime.date):
             # Nothing to do, as dates don't have tz information
             pass
         else:
             # No explicit date / datetime value -- no checks necessary
             return []
+        # At this point, value is a date object.
+        today = _get_naive_now().date()
         offset = datetime.timedelta(days=1)
-        lower = (now - offset).date()
-        upper = (now + offset).date()
+        lower = today - offset
+        upper = today + offset
         if lower <= value <= upper:
             return [
                 checks.Warning(
@@ -1308,20 +1308,20 @@ class DateTimeField(DateField):
         if not self.has_default():
             return []
 
-        now = _get_naive_now()
         value = self.default
         if isinstance(value, datetime.datetime):
-            second_offset = datetime.timedelta(seconds=10)
-            lower = now - second_offset
-            upper = now + second_offset
             value = _to_naive(value)
+            now = _get_naive_now()
+            offset = datetime.timedelta(seconds=10)
+            lower = now - offset
+            upper = now + offset
         elif isinstance(value, datetime.date):
-            second_offset = datetime.timedelta(seconds=10)
-            lower = now - second_offset
-            lower = datetime.datetime(lower.year, lower.month, lower.day)
-            upper = now + second_offset
-            upper = datetime.datetime(upper.year, upper.month, upper.day)
-            value = datetime.datetime(value.year, value.month, value.day)
+            now = _get_naive_now()
+            offset = datetime.timedelta(seconds=10)
+            lower = now - offset
+            upper = now + offset
+            lower = lower.date()
+            upper = upper.date()
         else:
             # No explicit date / datetime value -- no checks necessary
             return []
@@ -2201,22 +2201,22 @@ class TimeField(DateTimeCheckMixin, Field):
         if not self.has_default():
             return []
 
-        now = _get_naive_now()
         value = self.default
         if isinstance(value, datetime.datetime):
-            second_offset = datetime.timedelta(seconds=10)
-            lower = now - second_offset
-            upper = now + second_offset
-            value = _to_naive(value)
+            now = _get_naive_now()
         elif isinstance(value, datetime.time):
-            second_offset = datetime.timedelta(seconds=10)
-            lower = now - second_offset
-            upper = now + second_offset
+            now = _get_naive_now()
+            # This will not use the right date in the race condition where now
+            # is just before the date change and value is just past 0:00.
             value = datetime.datetime.combine(now.date(), value)
-            value = _to_naive(value)
         else:
             # No explicit time / datetime value -- no checks necessary
             return []
+        # At this point, value is a datetime object.
+        offset = datetime.timedelta(seconds=10)
+        lower = now - offset
+        upper = now + offset
+        value = _to_naive(value)
         if lower <= value <= upper:
             return [
                 checks.Warning(
