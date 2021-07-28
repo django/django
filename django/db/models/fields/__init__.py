@@ -1103,6 +1103,16 @@ class CommaSeparatedIntegerField(CharField):
     }
 
 
+def _to_naive(value):
+    if timezone.is_aware(value):
+        value = timezone.make_naive(value, timezone.utc)
+    return value
+
+
+def _get_naive_now():
+    return _to_naive(timezone.now())
+
+
 class DateTimeCheckMixin:
 
     def check(self, **kwargs):
@@ -1161,13 +1171,10 @@ class DateField(DateTimeCheckMixin, Field):
         if not self.has_default():
             return []
 
-        now = timezone.now()
-        if not timezone.is_naive(now):
-            now = timezone.make_naive(now, timezone.utc)
+        now = _get_naive_now()
         value = self.default
         if isinstance(value, datetime.datetime):
-            if not timezone.is_naive(value):
-                value = timezone.make_naive(value, timezone.utc)
+            value = _to_naive(value)
             value = value.date()
         elif isinstance(value, datetime.date):
             # Nothing to do, as dates don't have tz information
@@ -1301,16 +1308,13 @@ class DateTimeField(DateField):
         if not self.has_default():
             return []
 
-        now = timezone.now()
-        if not timezone.is_naive(now):
-            now = timezone.make_naive(now, timezone.utc)
+        now = _get_naive_now()
         value = self.default
         if isinstance(value, datetime.datetime):
             second_offset = datetime.timedelta(seconds=10)
             lower = now - second_offset
             upper = now + second_offset
-            if timezone.is_aware(value):
-                value = timezone.make_naive(value, timezone.utc)
+            value = _to_naive(value)
         elif isinstance(value, datetime.date):
             second_offset = datetime.timedelta(seconds=10)
             lower = now - second_offset
@@ -2197,23 +2201,19 @@ class TimeField(DateTimeCheckMixin, Field):
         if not self.has_default():
             return []
 
-        now = timezone.now()
-        if not timezone.is_naive(now):
-            now = timezone.make_naive(now, timezone.utc)
+        now = _get_naive_now()
         value = self.default
         if isinstance(value, datetime.datetime):
             second_offset = datetime.timedelta(seconds=10)
             lower = now - second_offset
             upper = now + second_offset
-            if timezone.is_aware(value):
-                value = timezone.make_naive(value, timezone.utc)
+            value = _to_naive(value)
         elif isinstance(value, datetime.time):
             second_offset = datetime.timedelta(seconds=10)
             lower = now - second_offset
             upper = now + second_offset
             value = datetime.datetime.combine(now.date(), value)
-            if timezone.is_aware(value):
-                value = timezone.make_naive(value, timezone.utc)
+            value = _to_naive(value)
         else:
             # No explicit time / datetime value -- no checks necessary
             return []
