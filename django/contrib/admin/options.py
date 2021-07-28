@@ -1,8 +1,7 @@
 import copy
 import json
-import operator
 import re
-from functools import partial, reduce, update_wrapper
+from functools import partial, update_wrapper
 from urllib.parse import quote as urlquote
 
 from django import forms
@@ -1035,9 +1034,11 @@ class ModelAdmin(BaseModelAdmin):
             for bit in smart_split(search_term):
                 if bit.startswith(('"', "'")) and bit[0] == bit[-1]:
                     bit = unescape_string_literal(bit)
-                or_queries = [models.Q(**{orm_lookup: bit})
-                              for orm_lookup in orm_lookups]
-                queryset = queryset.filter(reduce(operator.or_, or_queries))
+                or_queries = models.Q(
+                    *((orm_lookup, bit) for orm_lookup in orm_lookups),
+                    _connector=models.Q.OR,
+                )
+                queryset = queryset.filter(or_queries)
             may_have_duplicates |= any(
                 lookup_spawns_duplicates(self.opts, search_spec)
                 for search_spec in orm_lookups

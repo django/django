@@ -1,6 +1,5 @@
 import functools
 import itertools
-import operator
 from collections import defaultdict
 
 from django.contrib.contenttypes.models import ContentType
@@ -571,16 +570,16 @@ def create_generic_related_manager(superclass, rel):
             queryset = queryset.using(queryset._db or self._db)
             # Group instances by content types.
             content_type_queries = (
-                models.Q(**{
-                    '%s__pk' % self.content_type_field_name: content_type_id,
-                    '%s__in' % self.object_id_field_name: {obj.pk for obj in objs}
-                })
+                models.Q(
+                    (f'{self.content_type_field_name}__pk', content_type_id),
+                    (f'{self.object_id_field_name}__in', {obj.pk for obj in objs}),
+                )
                 for content_type_id, objs in itertools.groupby(
                     sorted(instances, key=lambda obj: self.get_content_type(obj).pk),
                     lambda obj: self.get_content_type(obj).pk,
                 )
             )
-            query = functools.reduce(operator.or_, content_type_queries)
+            query = models.Q(*content_type_queries, _connector=models.Q.OR)
             # We (possibly) need to convert object IDs to the type of the
             # instances' PK in order to match up instances:
             object_id_converter = instances[0]._meta.pk.to_python
