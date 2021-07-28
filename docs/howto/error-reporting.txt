@@ -123,7 +123,7 @@ Filtering error reports
     Filtering sensitive data is a hard problem, and it's nearly impossible to
     guarantee that sensitive data won't leak into an error report. Therefore,
     error reports should only be available to trusted team members and you
-    should avoid transmitting error reports unencrypted over the Internet
+    should avoid transmitting error reports unencrypted over the internet
     (such as through email).
 
 Filtering sensitive information

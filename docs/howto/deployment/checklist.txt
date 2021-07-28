@@ -2,7 +2,7 @@
 Deployment checklist
 ====================
 
-The Internet is a hostile environment. Before deploying your Django project,
+The internet is a hostile environment. Before deploying your Django project,
 you should take some time to review your settings, with security, performance,
 and operations in mind.
 
