@@ -2213,7 +2213,7 @@ class TimeField(DateTimeCheckMixin, Field):
             upper = now + second_offset
             value = datetime.datetime.combine(now.date(), value)
             if timezone.is_aware(value):
-                value = timezone.make_naive(value, timezone.utc).time()
+                value = timezone.make_naive(value, timezone.utc)
         else:
             # No explicit time / datetime value -- no checks necessary
             return []
