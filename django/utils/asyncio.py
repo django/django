@@ -21,7 +21,7 @@ def async_unsafe(message):
                     pass
                 else:
                     raise SynchronousOnlyOperation(message)
-            # Pass onwards.
+            # Pass onward.
             return func(*args, **kwargs)
         return inner
     # If the message is actually a function, then be a no-arguments decorator.

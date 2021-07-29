@@ -74,7 +74,7 @@ behavior is from broken web bots too.
     before other middleware that intercepts 404 errors, such as
     :class:`~django.middleware.locale.LocaleMiddleware` or
     :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`.
-    Put it towards the top of your :setting:`MIDDLEWARE` setting.
+    Put it toward the top of your :setting:`MIDDLEWARE` setting.
 
 You can tell Django to stop reporting particular 404s by tweaking the
 :setting:`IGNORABLE_404_URLS` setting. It should be a list of compiled

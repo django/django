@@ -528,7 +528,7 @@ Several other `MySQLdb connection options`_ may be useful, such as ``ssl``,
 Setting ``sql_mode``
 ~~~~~~~~~~~~~~~~~~~~
 
-From MySQL 5.7 onwards, the default value of the ``sql_mode`` option contains
+From MySQL 5.7 onward, the default value of the ``sql_mode`` option contains
 ``STRICT_TRANS_TABLES``. That option escalates warnings into errors when data
 are truncated upon insertion, so Django highly recommends activating a
 `strict mode`_ for MySQL to prevent data loss (either ``STRICT_TRANS_TABLES``

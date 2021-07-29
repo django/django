@@ -103,7 +103,7 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         f = DecimalField(max_digits=3)
         # Leading whole zeros "collapse" to one digit.
         self.assertEqual(f.clean('0000000.10'), decimal.Decimal("0.1"))
-        # But a leading 0 before the . doesn't count towards max_digits
+        # But a leading 0 before the . doesn't count toward max_digits
         self.assertEqual(f.clean('0000000.100'), decimal.Decimal("0.100"))
         # Only leading whole zeros "collapse" to one digit.
         self.assertEqual(f.clean('000000.02'), decimal.Decimal('0.02'))
