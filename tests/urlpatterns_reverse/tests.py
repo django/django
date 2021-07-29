@@ -1,6 +1,7 @@
 """
 Unit tests for reverse URL lookups.
 """
+import pickle
 import sys
 import threading
 
@@ -1166,6 +1167,12 @@ class ResolverMatchTests(SimpleTestCase):
                     f"url_name='{name}', app_names=[], namespaces=[], "
                     f"route='{name}/')",
                 )
+
+    @override_settings(ROOT_URLCONF='urlpatterns.path_urls')
+    def test_pickling(self):
+        msg = 'Cannot pickle ResolverMatch.'
+        with self.assertRaisesMessage(pickle.PicklingError, msg):
+            pickle.dumps(resolve('/users/'))
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.erroneous_urls')
