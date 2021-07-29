@@ -709,7 +709,7 @@ class NullBooleanSelect(Select):
     """
     def __init__(self, attrs=None):
         choices = (
-            ('unknown', _('Unknown')),
+            ('unknown', _('---------')),
             ('true', _('Yes')),
             ('false', _('No')),
         )
