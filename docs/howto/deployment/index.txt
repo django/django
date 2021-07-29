@@ -1,6 +1,6 @@
-================
-Deploying Django
-================
+====================
+How to deploy Django
+====================
 
 Django is full of shortcuts to make web developers' lives easier, but all
 those tools are of no use if you can't easily deploy your sites. Since Django's
