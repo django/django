@@ -276,6 +276,7 @@ views and use Django's generic views instead. To do so, open the
 
 
     class IndexView(generic.ListView):
+        model = Question
         template_name = 'polls/index.html'
         context_object_name = 'latest_question_list'
 
