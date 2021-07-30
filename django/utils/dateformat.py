@@ -220,7 +220,7 @@ class DateFormat(TimeFormat):
         return MONTHS[self.data.month]
 
     def I(self):  # NOQA: E743, E741
-        "'1' if Daylight Savings Time, '0' otherwise."
+        "'1' if daylight saving time, '0' otherwise."
         if self._no_timezone_or_datetime_is_ambiguous_or_imaginary:
             return ''
         return '1' if self.timezone.dst(self.data) else '0'

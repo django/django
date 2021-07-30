@@ -48,7 +48,7 @@ except ImportError:
     HAS_YAML = False
 
 # These tests use the EAT (Eastern Africa Time) and ICT (Indochina Time)
-# who don't have Daylight Saving Time, so we can represent them easily
+# who don't have daylight saving time, so we can represent them easily
 # with fixed offset timezones and use them directly as tzinfo in the
 # constructors.
 

@@ -15,8 +15,8 @@ This is handy if your users live in more than one time zone and you want to
 display datetime information according to each user's wall clock.
 
 Even if your website is available in only one time zone, it's still good
-practice to store data in UTC in your database. The main reason is Daylight
-Saving Time (DST). Many countries have a system of DST, where clocks are moved
+practice to store data in UTC in your database. The main reason is daylight
+saving time (DST). Many countries have a system of DST, where clocks are moved
 forward in spring and backward in autumn. If you're working in local time,
 you're likely to encounter errors twice a year, when the transitions happen.
 (The pytz_ documentation discusses `these issues`_ in greater detail.) This
@@ -481,7 +481,7 @@ Setup
 
    Yes. When time zone support is enabled, Django uses a more accurate model
    of local time. This shields you from subtle and unreproducible bugs around
-   Daylight Saving Time (DST) transitions.
+   daylight saving time (DST) transitions.
 
    When you enable time zone support, you'll encounter some errors because
    you're using naive datetimes where Django expects aware datetimes. Such
