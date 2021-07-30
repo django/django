@@ -752,7 +752,7 @@ Maximum size of a request body and the number of GET/POST parameters is limited
 Two new settings help mitigate denial-of-service attacks via large requests:
 
 * :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE` limits the size that a request body
-  may be. File uploads don't count towards this limit.
+  may be. File uploads don't count toward this limit.
 * :setting:`DATA_UPLOAD_MAX_NUMBER_FIELDS` limits the number of GET/POST
   parameters that are parsed.
 

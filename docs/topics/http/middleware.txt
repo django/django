@@ -287,7 +287,7 @@ that exception; instead it will get an :class:`~django.http.HttpResponse`
 object with a :attr:`~django.http.HttpResponse.status_code` of 404.
 
 You can set :setting:`DEBUG_PROPAGATE_EXCEPTIONS` to ``True`` to skip this
-conversion and propagate exceptions upwards.
+conversion and propagate exceptions upward.
 
 .. _async-middleware:
 

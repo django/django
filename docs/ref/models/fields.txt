@@ -1755,7 +1755,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     a reference to the setting, not to the model directly.
 
     You only want to override this to be ``False`` if you are sure your
-    model should always point towards the swapped-in model - for example,
+    model should always point toward the swapped-in model - for example,
     if it is a profile model designed specifically for your custom user model.
 
     Setting it to ``False`` does not mean you can reference a swappable model
@@ -1969,7 +1969,7 @@ that control how the relationship functions.
     a reference to the setting, not to the model directly.
 
     You only want to override this to be ``False`` if you are sure your
-    model should always point towards the swapped-in model - for example,
+    model should always point toward the swapped-in model - for example,
     if it is a profile model designed specifically for your custom user model.
 
     If in doubt, leave it to its default of ``True``.
