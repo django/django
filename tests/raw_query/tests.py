@@ -228,9 +228,7 @@ class RawQueryTests(TestCase):
         self.assertSuccessfulRawQuery(Reviewer, query, reviewers)
 
     def test_extra_conversions(self):
-        """
-        Test to insure that extra translations are ignored.
-        """
+        """Extra translations are ignored."""
         query = "SELECT * FROM raw_query_author"
         translations = {'something': 'else'}
         authors = Author.objects.all()
