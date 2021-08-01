@@ -255,7 +255,10 @@ Upstream support for MariaDB 10.2 ends in May 2022. Django 4.1 supports MariaDB
 Miscellaneous
 -------------
 
-* ...
+* Related managers for :class:`~django.db.models.ForeignKey`,
+  :class:`~django.db.models.ManyToManyField`, and
+  :class:`~django.contrib.contenttypes.fields.GenericRelation` are now cached
+  on the :class:`~django.db.models.Model` instance to which they belong.
 
 .. _deprecated-features-4.1:
 
