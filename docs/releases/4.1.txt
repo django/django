@@ -189,6 +189,9 @@ Forms
   labels in ``<legend>`` tags via the new ``tag`` argument of
   :meth:`~django.forms.BoundField.label_tag`.
 
+* The new ``edit_only`` argument for :func:`.modelformset_factory` and
+  :func:`.inlineformset_factory` allows preventing new objects creation.
+
 Generic Views
 ~~~~~~~~~~~~~
 

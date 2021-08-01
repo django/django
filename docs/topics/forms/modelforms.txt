@@ -953,8 +953,8 @@ extra forms displayed.
 
 Also, ``extra=0`` doesn't prevent creation of new model instances as you can
 :ref:`add additional forms with JavaScript <understanding-the-managementform>`
-or send additional POST data. Formsets :ticket:`don't yet provide functionality
-<26142>` for an "edit only" view that prevents creation of new instances.
+or send additional POST data. See :ref:`model-formsets-edit-only` on how to do
+this.
 
 If the value of ``max_num`` is greater than the number of existing related
 objects, up to ``extra`` additional blank forms will be added to the formset,
@@ -971,6 +971,25 @@ so long as the total number of forms does not exceed ``max_num``::
 
 A ``max_num`` value of ``None`` (the default) puts a high limit on the number
 of forms displayed (1000). In practice this is equivalent to no limit.
+
+.. _model-formsets-edit-only:
+
+Preventing new objects creation
+-------------------------------
+
+.. versionadded:: 4.1
+
+Using the ``edit_only`` parameter, you can prevent creation of any new
+objects::
+
+    >>> AuthorFormSet = modelformset_factory(
+    ...     Author,
+    ...     fields=('name', 'title'),
+    ...     edit_only=True,
+    ... )
+
+Here, the formset will only edit existing ``Author`` instances. No other
+objects will be created or edited.
 
 Using a model formset in a view
 -------------------------------
