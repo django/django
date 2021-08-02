@@ -1177,9 +1177,23 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         self.assertTrue(csrf_cookie, msg='No CSRF cookie was sent.')
         self.assertEqual(len(csrf_cookie), CSRF_TOKEN_LENGTH)
 
+    def test_masked_secret_accepted_and_not_replaced(self):
+        """
+        The csrf cookie is left unchanged if originally masked.
+        """
+        req = self._get_POST_request_with_token(cookie=MASKED_TEST_SECRET1)
+        mw = CsrfViewMiddleware(token_view)
+        mw.process_request(req)
+        resp = mw.process_view(req, token_view, (), {})
+        self.assertIsNone(resp)
+        resp = mw(req)
+        csrf_cookie = self._read_csrf_cookie(req, resp)
+        self.assertEqual(csrf_cookie, MASKED_TEST_SECRET1)
+        self._check_token_present(resp, csrf_cookie)
+
     def test_bare_secret_accepted_and_replaced(self):
         """
-        The csrf token is reset from a bare secret.
+        The csrf cookie is reset (masked) if originally not masked.
         """
         req = self._get_POST_request_with_token(cookie=TEST_SECRET)
         mw = CsrfViewMiddleware(token_view)
@@ -1188,7 +1202,8 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         self.assertIsNone(resp)
         resp = mw(req)
         csrf_cookie = self._read_csrf_cookie(req, resp)
-        self.assertEqual(len(csrf_cookie), CSRF_TOKEN_LENGTH)
+        # This also checks that csrf_cookie now has length CSRF_TOKEN_LENGTH.
+        self.assertMaskedSecretCorrect(csrf_cookie, TEST_SECRET)
         self._check_token_present(resp, csrf_cookie)
 
     @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_COOKIE_DOMAIN='.example.com', USE_X_FORWARDED_PORT=True)
