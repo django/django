@@ -140,7 +140,16 @@ class Command(BaseCommand):
                 except KeyError:
                     raise CommandError("Cannot find a migration matching '%s' from app '%s'." % (
                         migration_name, app_label))
-                targets = [(app_label, migration.name)]
+                target = (app_label, migration.name)
+                # Partially applied squashed migrations are not included in the
+                # graph, use the last replacement instead.
+                if (
+                    target not in executor.loader.graph.nodes and
+                    target in executor.loader.replacements
+                ):
+                    incomplete_migration = executor.loader.replacements[target]
+                    target = incomplete_migration.replaces[-1]
+                targets = [target]
             target_app_labels_only = False
         elif options['app_label']:
             targets = [key for key in executor.loader.graph.leaf_nodes() if key[0] == app_label]
