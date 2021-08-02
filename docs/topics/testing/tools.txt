@@ -1971,9 +1971,10 @@ test if the database doesn't support a specific named feature.
 
 The decorators use a string identifier to describe database features.
 This string corresponds to attributes of the database connection
-features class. See ``django.db.backends.BaseDatabaseFeatures``
-class for a full list of database features that can be used as a basis
-for skipping tests.
+features class. See
+:source:`django.db.backends.base.features.BaseDatabaseFeatures class
+<django/db/backends/base/features.py>` for a full list of database features
+that can be used as a basis for skipping tests.
 
 .. function:: skipIfDBFeature(*feature_name_strings)
 
