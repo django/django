@@ -21,6 +21,7 @@ rather than the HTML rendered to the end-user.
 """
 import itertools
 import tempfile
+import pickle
 from unittest import mock
 
 from django.contrib.auth.models import User
@@ -72,6 +73,13 @@ class ClientTest(TestCase):
         self.assertContains(response, 'This is a test')
         self.assertEqual(response.context['var'], '\xf2')
         self.assertEqual(response.templates[0].name, 'GET Template')
+
+    def test_pickle_resp(self):
+        # neglect non-pickleable attributes in response
+        resp = self.client.get('/get_view/')
+        tmp = pickle.dumps(resp)
+        resp_from_pickle = pickle.loads(tmp)
+        self.assertEqual(repr(resp), repr(resp_from_pickle))
 
     def test_query_string_encoding(self):
         # WSGI requires latin-1 encoded strings.

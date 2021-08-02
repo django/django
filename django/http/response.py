@@ -5,6 +5,7 @@ import os
 import re
 import sys
 import time
+import pickle
 from collections.abc import Mapping
 from email.header import Header
 from http.client import responses
@@ -332,6 +333,17 @@ class HttpResponse(HttpResponseBase):
             'status_code': self.status_code,
             'content_type': self._content_type_for_repr,
         }
+
+    def __getstate__(self):
+        # neglect non-pickleable attributes in response
+        state = {}
+        for k, v in self.__dict__.items():
+            try:
+                pickle.dumps(v)
+                state[k] = v
+            except Exception:
+                pass
+        return state
 
     def serialize(self):
         """Full HTTP message, including headers, as a bytestring."""
