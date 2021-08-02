@@ -155,6 +155,66 @@ class Query(BaseExpression):
     base_table_class = BaseTable
     join_class = Join
 
+    default_cols = True
+    default_ordering = True
+    standard_ordering = True
+
+    filter_is_sticky = False
+    subquery = False
+
+    # SQL-related attributes.
+    # Select and related select clauses are expressions to use in the SELECT
+    # clause of the query. The select is used for cases where we want to set up
+    # the select clause to contain other than default fields (values(),
+    # subqueries...). Note that annotations go to annotations dictionary.
+    select = ()
+    # The group_by attribute can have one of the following forms:
+    #  - None: no group by at all in the query
+    #  - A tuple of expressions: group by (at least) those expressions.
+    #    String refs are also allowed for now.
+    #  - True: group by all select fields of the model
+    # See compiler.get_group_by() for details.
+    group_by = None
+    order_by = ()
+    low_mark = 0  # Used for offset/limit.
+    high_mark = None  # Used for offset/limit.
+    distinct = False
+    distinct_fields = ()
+    select_for_update = False
+    select_for_update_nowait = False
+    select_for_update_skip_locked = False
+    select_for_update_of = ()
+    select_for_no_key_update = False
+    select_related = False
+    # Arbitrary limit for select_related to prevents infinite recursion.
+    max_depth = 5
+    # Holds the selects defined by a call to values() or values_list()
+    # excluding annotation_select and extra_select.
+    values_select = ()
+
+    # SQL annotation-related attributes.
+    annotation_select_mask = None
+    _annotation_select_cache = None
+
+    # Set combination attributes.
+    combinator = None
+    combinator_all = False
+    combined_queries = ()
+
+    # These are for extensions. The contents are more or less appended verbatim
+    # to the appropriate clause.
+    extra_select_mask = None
+    _extra_select_cache = None
+
+    extra_tables = ()
+    extra_order_by = ()
+
+    # A tuple that is a set of model field names and either True, if these are
+    # the fields to defer, or False if these are the only fields to load.
+    deferred_loading = (frozenset(), True)
+
+    explain_info = None
+
     def __init__(self, model, alias_cols=True):
         self.model = model
         self.alias_refcount = {}
@@ -172,73 +232,16 @@ class Query(BaseExpression):
         # Map external tables to whether they are aliased.
         self.external_aliases = {}
         self.table_map = {}  # Maps table names to list of aliases.
-        self.default_cols = True
-        self.default_ordering = True
-        self.standard_ordering = True
         self.used_aliases = set()
-        self.filter_is_sticky = False
-        self.subquery = False
 
-        # SQL-related attributes
-        # Select and related select clauses are expressions to use in the
-        # SELECT clause of the query.
-        # The select is used for cases where we want to set up the select
-        # clause to contain other than default fields (values(), subqueries...)
-        # Note that annotations go to annotations dictionary.
-        self.select = ()
         self.where = WhereNode()
-        # The group_by attribute can have one of the following forms:
-        #  - None: no group by at all in the query
-        #  - A tuple of expressions: group by (at least) those expressions.
-        #    String refs are also allowed for now.
-        #  - True: group by all select fields of the model
-        # See compiler.get_group_by() for details.
-        self.group_by = None
-        self.order_by = ()
-        self.low_mark, self.high_mark = 0, None  # Used for offset/limit
-        self.distinct = False
-        self.distinct_fields = ()
-        self.select_for_update = False
-        self.select_for_update_nowait = False
-        self.select_for_update_skip_locked = False
-        self.select_for_update_of = ()
-        self.select_for_no_key_update = False
-
-        self.select_related = False
-        # Arbitrary limit for select_related to prevents infinite recursion.
-        self.max_depth = 5
-
-        # Holds the selects defined by a call to values() or values_list()
-        # excluding annotation_select and extra_select.
-        self.values_select = ()
-
-        # SQL annotation-related attributes
-        self.annotations = {}  # Maps alias -> Annotation Expression
-        self.annotation_select_mask = None
-        self._annotation_select_cache = None
-
-        # Set combination attributes
-        self.combinator = None
-        self.combinator_all = False
-        self.combined_queries = ()
-
+        # Maps alias -> Annotation Expression.
+        self.annotations = {}
         # These are for extensions. The contents are more or less appended
         # verbatim to the appropriate clause.
         self.extra = {}  # Maps col_alias -> (col_sql, params).
-        self.extra_select_mask = None
-        self._extra_select_cache = None
-
-        self.extra_tables = ()
-        self.extra_order_by = ()
-
-        # A tuple that is a set of model field names and either True, if these
-        # are the fields to defer, or False if these are the only fields to
-        # load.
-        self.deferred_loading = (frozenset(), True)
 
         self._filtered_relations = {}
-
-        self.explain_info = None
 
     @property
     def output_field(self):
