@@ -2,7 +2,7 @@
 Django 3.2.6 release notes
 ==========================
 
-*Expected August 2, 2021*
+*August 2, 2021*
 
 Django 3.2.6 fixes several bugs in 3.2.5.
 
