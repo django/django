@@ -367,27 +367,33 @@ class Lexer:
         If in_tag is True, we are processing something that matched a tag,
         otherwise it should be treated as a literal string.
         """
-        token_start = token_string[0:2]
-        if in_tag and token_start == BLOCK_TAG_START:
-            # The [2:-2] ranges below strip off *_TAG_START and *_TAG_END.
-            # We could do len(BLOCK_TAG_START) to be more "correct", but we've
-            # hard-coded the 2s here for performance. And it's not like
-            # the TAG_START values are going to change anytime, anyway.
-            block_content = token_string[2:-2].strip()
-            if self.verbatim and block_content == self.verbatim:
-                self.verbatim = False
-        if in_tag and not self.verbatim:
-            if token_start == VARIABLE_TAG_START:
-                return Token(TokenType.VAR, token_string[2:-2].strip(), position, lineno)
-            elif token_start == BLOCK_TAG_START:
-                if block_content[:9] in ('verbatim', 'verbatim '):
-                    self.verbatim = 'end%s' % block_content
-                return Token(TokenType.BLOCK, block_content, position, lineno)
-            assert token_start == COMMENT_TAG_START
-            content = token_string[2:-2].strip()
-            return Token(TokenType.COMMENT, content, position, lineno)
-        else:
-            return Token(TokenType.TEXT, token_string, position, lineno)
+        if in_tag:
+            # The [0:2] and [2:-2] ranges below strip off *_TAG_START and
+            # *_TAG_END. The 2's are hard-coded for performance. Using
+            # len(BLOCK_TAG_START) would permit BLOCK_TAG_START to be
+            # different, but it's not likely that the TAG_START values will
+            # change anytime soon.
+            token_start = token_string[0:2]
+            if token_start == BLOCK_TAG_START:
+                content = token_string[2:-2].strip()
+                if self.verbatim:
+                    # Then a verbatim block is being processed.
+                    if content != self.verbatim:
+                        return Token(TokenType.TEXT, token_string, position, lineno)
+                    # Otherwise, the current verbatim block is ending.
+                    self.verbatim = False
+                elif content[:9] in ('verbatim', 'verbatim '):
+                    # Then a verbatim block is starting.
+                    self.verbatim = 'end%s' % content
+                return Token(TokenType.BLOCK, content, position, lineno)
+            if not self.verbatim:
+                content = token_string[2:-2].strip()
+                if token_start == VARIABLE_TAG_START:
+                    return Token(TokenType.VAR, content, position, lineno)
+                # BLOCK_TAG_START was handled above.
+                assert token_start == COMMENT_TAG_START
+                return Token(TokenType.COMMENT, content, position, lineno)
+        return Token(TokenType.TEXT, token_string, position, lineno)
 
 
 class DebugLexer(Lexer):
