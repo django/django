@@ -782,14 +782,15 @@ The ``expression`` argument is either a :ref:`window function
 <window-functions>`, an :ref:`aggregate function <aggregation-functions>`, or
 an expression that's compatible in a window clause.
 
-The ``partition_by`` argument is a list of expressions (column names should be
-wrapped in an ``F``-object) that control the partitioning of the rows.
-Partitioning narrows which rows are used to compute the result set.
+The ``partition_by`` argument accepts an expression or a sequence of
+expressions (column names should be wrapped in an ``F``-object) that control
+the partitioning of the rows.  Partitioning narrows which rows are used to
+compute the result set.
 
 The ``output_field`` is specified either as an argument or by the expression.
 
-The ``order_by`` argument accepts a sequence of expressions on which you can
-call :meth:`~django.db.models.Expression.asc` and
+The ``order_by`` argument accepts an expression or a sequence of expressions on
+which you can call :meth:`~django.db.models.Expression.asc` and
 :meth:`~django.db.models.Expression.desc`. The ordering controls the order in
 which the expression is applied. For example, if you sum over the rows in a
 partition, the first result is the value of the first row, the second is the
