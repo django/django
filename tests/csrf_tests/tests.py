@@ -494,8 +494,7 @@ class CsrfViewMiddlewareTestMixin:
         """
         A new token is sent if the csrf_cookie is the empty string.
         """
-        req = self._get_request()
-        self._set_csrf_cookie(req, '')
+        req = self._get_request(cookie='')
         mw = CsrfViewMiddleware(token_view)
         mw.process_view(req, token_view, (), {})
         resp = token_view(req)
@@ -1094,8 +1093,7 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         If the token is longer than expected, it is ignored and a new token is
         created.
         """
-        req = self._get_request()
-        self._set_csrf_cookie(req, 'x' * 100000)
+        req = self._get_request(cookie='x' * 100000)
         mw = CsrfViewMiddleware(token_view)
         mw.process_view(req, token_view, (), {})
         resp = mw(req)
@@ -1108,8 +1106,7 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         new token is created.
         """
         token = ('!@#' + self._csrf_id_token)[:CSRF_TOKEN_LENGTH]
-        req = self._get_request()
-        self._set_csrf_cookie(req, token)
+        req = self._get_request(cookie=token)
         mw = CsrfViewMiddleware(token_view)
         mw.process_view(req, token_view, (), {})
         resp = mw(req)
