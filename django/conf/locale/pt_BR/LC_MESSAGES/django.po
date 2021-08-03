@@ -532,8 +532,7 @@ msgid ""
 "format."
 msgstr ""
 "O valor \"%(value)s\" tem um formato de data inválido. Deve ser no formato  "
-"YYY-MM-DD."
-
+"YYYY-MM-DD."
 #, python-format
 msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
