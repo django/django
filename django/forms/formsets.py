@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.forms import Form
 from django.forms.fields import BooleanField, IntegerField
 from django.forms.utils import ErrorList
-from django.forms.widgets import HiddenInput, NumberInput
+from django.forms.widgets import CheckboxInput, HiddenInput, NumberInput
 from django.utils.functional import cached_property
 from django.utils.html import html_safe
 from django.utils.safestring import mark_safe
@@ -55,6 +55,7 @@ class BaseFormSet:
     """
     A collection of instances of the same Form class.
     """
+    deletion_widget = CheckboxInput
     ordering_widget = NumberInput
     default_error_messages = {
         'missing_management_form': _(
@@ -284,6 +285,10 @@ class BaseFormSet:
         return 'form'
 
     @classmethod
+    def get_deletion_widget(cls):
+        return cls.deletion_widget
+
+    @classmethod
     def get_ordering_widget(cls):
         return cls.ordering_widget
 
@@ -417,7 +422,11 @@ class BaseFormSet:
                     widget=self.get_ordering_widget(),
                 )
         if self.can_delete and (self.can_delete_extra or index < initial_form_count):
-            form.fields[DELETION_FIELD_NAME] = BooleanField(label=_('Delete'), required=False)
+            form.fields[DELETION_FIELD_NAME] = BooleanField(
+                label=_('Delete'),
+                required=False,
+                widget=self.get_deletion_widget(),
+            )
 
     def add_prefix(self, index):
         return '%s-%s' % (self.prefix, index)

@@ -636,6 +636,49 @@ On the other hand, if you are using a plain ``FormSet``, it's up to you to
 handle ``formset.deleted_forms``, perhaps in your formset's ``save()`` method,
 as there's no general notion of what it means to delete a form.
 
+:class:`~django.forms.formsets.BaseFormSet` also provides a
+:attr:`~django.forms.formsets.BaseFormSet.deletion_widget` attribute and
+:meth:`~django.forms.formsets.BaseFormSet.get_deletion_widget` method that
+control the widget used with
+:attr:`~django.forms.formsets.BaseFormSet.can_delete`.
+
+``deletion_widget``
+^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 4.0
+
+.. attribute:: BaseFormSet.deletion_widget
+
+Default: :class:`~django.forms.CheckboxInput`
+
+Set ``deletion_widget`` to specify the widget class to be used with
+``can_delete``::
+
+    >>> from django.forms import BaseFormSet, formset_factory
+    >>> from myapp.forms import ArticleForm
+    >>> class BaseArticleFormSet(BaseFormSet):
+    ...     deletion_widget = HiddenInput
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet, can_delete=True)
+
+``get_deletion_widget``
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 4.0
+
+.. method:: BaseFormSet.get_deletion_widget()
+
+Override ``get_deletion_widget()`` if you need to provide a widget instance for
+use with ``can_delete``::
+
+    >>> from django.forms import BaseFormSet, formset_factory
+    >>> from myapp.forms import ArticleForm
+    >>> class BaseArticleFormSet(BaseFormSet):
+    ...     def get_deletion_widget(self):
+    ...         return HiddenInput(attrs={'class': 'deletion'})
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet, can_delete=True)
+
 ``can_delete_extra``
 --------------------
 
