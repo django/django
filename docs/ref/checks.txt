@@ -541,6 +541,8 @@ configured:
 * **templates.E002**: ``string_if_invalid`` in :setting:`TEMPLATES`
   :setting:`OPTIONS <TEMPLATES-OPTIONS>` must be a string but got: ``{value}``
   (``{type}``).
+* **templates.E003**:``<name>`` is used for multiple template tag modules:
+  ``<module list>``.
 
 Translation
 -----------
