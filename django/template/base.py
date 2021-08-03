@@ -383,9 +383,9 @@ class Lexer:
                 if block_content[:9] in ('verbatim', 'verbatim '):
                     self.verbatim = 'end%s' % block_content
                 return Token(TokenType.BLOCK, block_content, position, lineno)
-            elif token_start == COMMENT_TAG_START:
-                content = token_string[2:-2].strip()
-                return Token(TokenType.COMMENT, content, position, lineno)
+            assert token_start == COMMENT_TAG_START
+            content = token_string[2:-2].strip()
+            return Token(TokenType.COMMENT, content, position, lineno)
         else:
             return Token(TokenType.TEXT, token_string, position, lineno)
 
