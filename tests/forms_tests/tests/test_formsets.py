@@ -602,8 +602,8 @@ class FormsFormsetTestCase(SimpleTestCase):
             ],
         )
 
-    def test_formsets_with_order_custom_widget(self):
-        class OrderingAttributFormSet(BaseFormSet):
+    def test_formsets_with_ordering_custom_widget(self):
+        class OrderingAttributeFormSet(BaseFormSet):
             ordering_widget = HiddenInput
 
         class OrderingMethodFormSet(BaseFormSet):
@@ -611,7 +611,7 @@ class FormsFormsetTestCase(SimpleTestCase):
                 return HiddenInput(attrs={'class': 'ordering'})
 
         tests = (
-            (OrderingAttributFormSet, '<input type="hidden" name="form-0-ORDER">'),
+            (OrderingAttributeFormSet, '<input type="hidden" name="form-0-ORDER">'),
             (OrderingMethodFormSet, '<input class="ordering" type="hidden" name="form-0-ORDER">'),
         )
         for formset_class, order_html in tests:
