@@ -1221,7 +1221,7 @@ msgstr ""
 "riattivalo almeno per questo sito, o per connessioni \"same-origin\""
 
 msgid "More information is available with DEBUG=True."
-msgstr "Maggiorni informazioni sono disponibili con DEBUG=True"
+msgstr "Maggiori informazioni sono disponibili con DEBUG=True"
 
 msgid "No year specified"
 msgstr "Anno non specificato"
