@@ -17,6 +17,7 @@ from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, extend_sys_path, ignore_warnings
 from django.utils import translation
 from django.utils.deprecation import RemovedInDjango41Warning
+from django.utils.version import PY310
 
 from .management.commands import dance
 
@@ -333,7 +334,9 @@ class CommandTests(SimpleTestCase):
         self.assertIn('bar', out.getvalue())
 
     def test_subparser_invalid_option(self):
-        msg = "Error: invalid choice: 'test' (choose from 'foo')"
+        msg = "Error:%s invalid choice: 'test' (choose from 'foo')" % (
+            ' argument {foo}:' if PY310 else ''
+        )
         with self.assertRaisesMessage(CommandError, msg):
             management.call_command('subparser', 'test', 12)
         msg = 'Error: the following arguments are required: subcommand'
