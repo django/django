@@ -20,6 +20,7 @@ import importlib
 
 from django.apps import apps
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.core.serializers.base import SerializerDoesNotExist
 
 # Built-in serializers
@@ -69,7 +70,7 @@ def register_serializer(format, serializer_module, serializers=None):
 
     try:
         module = importlib.import_module(serializer_module)
-    except ImportError as exc:
+    except (ImportError, ImproperlyConfigured) as exc:
         bad_serializer = BadSerializer(exc)
 
         module = type('BadSerializerModule', (), {

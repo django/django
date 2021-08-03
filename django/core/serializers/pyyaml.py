@@ -8,7 +8,14 @@ import collections
 import decimal
 from io import StringIO
 
-import yaml
+try:
+    import yaml
+except ImportError as e:
+    from django.core.exceptions import ImproperlyConfigured
+
+    raise ImproperlyConfigured(
+        'Error loading yaml module. Did you install PyYAML?'
+    ) from e
 
 from django.core.serializers.base import DeserializationError
 from django.core.serializers.python import (

@@ -3,6 +3,7 @@ import unittest
 from io import StringIO
 
 from django.core import management, serializers
+from django.core.exceptions import ImproperlyConfigured
 from django.core.serializers.base import DeserializationError
 from django.test import SimpleTestCase, TestCase, TransactionTestCase
 
@@ -16,6 +17,8 @@ except ImportError:
     HAS_YAML = False
 
 YAML_IMPORT_ERROR_MESSAGE = r'No module named yaml'
+YAML_IMPORT_ERROR_ADDON_MESSAGE = \
+    'Error loading yaml module. Did you install PyYAML?'
 
 
 class YamlImportModuleMock:
@@ -34,7 +37,8 @@ class YamlImportModuleMock:
 
     def import_module(self, module_path):
         if module_path == serializers.BUILTIN_SERIALIZERS['yaml']:
-            raise ImportError(YAML_IMPORT_ERROR_MESSAGE)
+            e = ImportError(YAML_IMPORT_ERROR_MESSAGE)
+            raise ImproperlyConfigured(YAML_IMPORT_ERROR_ADDON_MESSAGE) from e
 
         return self._import_module(module_path)
 
@@ -68,17 +72,27 @@ class NoYamlSerializerTestCase(SimpleTestCase):
     def test_serializer_pyyaml_error_message(self):
         """Using yaml serializer without pyyaml raises ImportError"""
         jane = Author(name="Jane")
-        with self.assertRaises(ImportError):
+        with self.assertRaises(ImproperlyConfigured) as cm:
             serializers.serialize("yaml", [jane])
+        # Also test the underlying ImportError
+        self.assertIn(YAML_IMPORT_ERROR_MESSAGE, cm.exception.__cause__.args)
 
     def test_deserializer_pyyaml_error_message(self):
         """Using yaml deserializer without pyyaml raises ImportError"""
-        with self.assertRaises(ImportError):
+        with self.assertRaises(ImproperlyConfigured) as cm:
             serializers.deserialize("yaml", "")
+        # Also test the underlying ImportError
+        self.assertIn(YAML_IMPORT_ERROR_MESSAGE, cm.exception.__cause__.args)
 
     def test_dumpdata_pyyaml_error_message(self):
         """Calling dumpdata produces an error when yaml package missing"""
-        with self.assertRaisesMessage(management.CommandError, YAML_IMPORT_ERROR_MESSAGE):
+        # Note that we don't test for YAML_IMPORT_ERROR_MESSAGE since it isn't
+        # a part of the CommandError string directly, even if it's the
+        # __cause__ of the underlying exception.
+        with self.assertRaisesMessage(
+            management.CommandError,
+            YAML_IMPORT_ERROR_ADDON_MESSAGE,
+        ):
             management.call_command('dumpdata', format='yaml')
 
 
