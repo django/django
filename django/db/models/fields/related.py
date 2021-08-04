@@ -1258,6 +1258,16 @@ class ManyToManyField(RelatedField):
                 )
             )
 
+        if self.remote_field.symmetrical and self._related_name:
+            warnings.append(
+                checks.Warning(
+                    'related_name has no effect on ManyToManyField '
+                    'with a symmetrical relationship, e.g. to "self".',
+                    obj=self,
+                    id='fields.W345',
+                )
+            )
+
         return warnings
 
     def _check_relationship_model(self, from_model=None, **kwargs):

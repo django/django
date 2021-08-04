@@ -313,6 +313,8 @@ Related fields
   with a ``through`` model.
 * **fields.W344**: The field's intermediary table ``<table name>`` clashes with
   the table name of ``<model>``/``<model>.<field name>``.
+* **fields.W345**: ``related_name`` has no effect on ``ManyToManyField`` with a
+  symmetrical relationship, e.g. to "self".
 
 Models
 ------
