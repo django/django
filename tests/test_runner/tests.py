@@ -434,6 +434,12 @@ class ManageCommandParallelTests(SimpleTestCase):
             )
         self.assertEqual(stderr.getvalue(), '')
 
+    @mock.patch.dict(os.environ, {'DJANGO_TEST_PROCESSES': '7'})
+    def test_no_parallel_django_test_processes_env(self, *mocked_objects):
+        with captured_stderr() as stderr:
+            call_command('test', testrunner='test_runner.tests.MockTestRunner')
+        self.assertEqual(stderr.getvalue(), '')
+
     @mock.patch.dict(os.environ, {'DJANGO_TEST_PROCESSES': 'invalid'})
     def test_django_test_processes_env_non_int(self, *mocked_objects):
         with self.assertRaises(ValueError):
@@ -442,6 +448,18 @@ class ManageCommandParallelTests(SimpleTestCase):
                 '--parallel',
                 testrunner='test_runner.tests.MockTestRunner',
             )
+
+    @mock.patch.dict(os.environ, {'DJANGO_TEST_PROCESSES': '7'})
+    def test_django_test_processes_parallel_default(self, *mocked_objects):
+        for parallel in ['--parallel', '--parallel=auto']:
+            with self.subTest(parallel=parallel):
+                with captured_stderr() as stderr:
+                    call_command(
+                        'test',
+                        parallel,
+                        testrunner='test_runner.tests.MockTestRunner',
+                    )
+                self.assertIn('parallel=7', stderr.getvalue())
 
 
 class CustomTestRunnerOptionsSettingsTests(AdminScriptTestCase):
