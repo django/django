@@ -336,14 +336,24 @@ class RemoteTestRunner:
         return result
 
 
-def parallel_type(value):
-    """Parse value passed to the --parallel option."""
+def get_max_test_processes():
+    """
+    The maximum number of test processes when using the --parallel option.
+    """
     # The current implementation of the parallel test runner requires
     # multiprocessing to start subprocesses with fork().
     if multiprocessing.get_start_method() != 'fork':
         return 1
-    if value == 'auto':
+    try:
+        return int(os.environ['DJANGO_TEST_PROCESSES'])
+    except KeyError:
         return multiprocessing.cpu_count()
+
+
+def parallel_type(value):
+    """Parse value passed to the --parallel option."""
+    if value == 'auto':
+        return value
     try:
         return int(value)
     except ValueError:
@@ -616,12 +626,8 @@ class DiscoverRunner:
             '-d', '--debug-sql', action='store_true',
             help='Prints logged SQL queries on failure.',
         )
-        try:
-            default_parallel = int(os.environ['DJANGO_TEST_PROCESSES'])
-        except KeyError:
-            default_parallel = 0
         parser.add_argument(
-            '--parallel', nargs='?', const='auto', default=default_parallel,
+            '--parallel', nargs='?', const='auto', default=0,
             type=parallel_type, metavar='N',
             help=(
                 'Run tests using up to N parallel processes. Use the value '
