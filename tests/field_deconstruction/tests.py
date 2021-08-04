@@ -438,7 +438,6 @@ class FieldDeconstructionTests(SimpleTestCase):
             m2m = models.ManyToManyField('self')
             m2m_related_name = models.ManyToManyField(
                 'self',
-                related_name='custom_name',
                 related_query_name='custom_query_name',
                 limit_choices_to={'flag': True},
             )
@@ -455,7 +454,6 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {
             'to': 'field_deconstruction.MyModel',
-            'related_name': 'custom_name',
             'related_query_name': 'custom_query_name',
             'limit_choices_to': {'flag': True},
         })
