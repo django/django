@@ -795,6 +795,9 @@ class DiscoverRunner:
             # Since tests are distributed across processes on a per-TestCase
             # basis, there's no need for more processes than TestCases.
             processes = min(self.parallel, len(subsuites))
+            # Update also "parallel" because it's used to determine the number
+            # of test databases.
+            self.parallel = processes
             if processes > 1:
                 suite = self.parallel_test_suite(
                     subsuites,

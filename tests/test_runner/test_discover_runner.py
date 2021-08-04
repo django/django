@@ -457,6 +457,26 @@ class DiscoverRunnerTests(SimpleTestCase):
         suite = runner.build_suite(['test_runner_apps.tagged'])
         self.assertEqual(suite.processes, len(suite.subsuites))
 
+    def test_number_of_databases_parallel_test_suite(self):
+        """
+        Number of databases doesn't exceed the number of TestCases with
+        parallel tests.
+        """
+        runner = DiscoverRunner(parallel=8, verbosity=0)
+        suite = runner.build_suite(['test_runner_apps.tagged'])
+        self.assertEqual(suite.processes, len(suite.subsuites))
+        self.assertEqual(runner.parallel, suite.processes)
+
+    def test_number_of_databases_no_parallel_test_suite(self):
+        """
+        Number of databases doesn't exceed the number of TestCases with
+        non-parallel tests.
+        """
+        runner = DiscoverRunner(parallel=8, verbosity=0)
+        suite = runner.build_suite(['test_runner_apps.simple.tests.DjangoCase1'])
+        self.assertEqual(runner.parallel, 1)
+        self.assertIsInstance(suite, TestSuite)
+
     def test_buffer_mode_test_pass(self):
         runner = DiscoverRunner(buffer=True, verbosity=0)
         with captured_stdout() as stdout, captured_stderr() as stderr:
