@@ -23,7 +23,7 @@ else:
     from django.conf import settings
     from django.db import connection, connections
     from django.test import TestCase, TransactionTestCase
-    from django.test.runner import parallel_type
+    from django.test.runner import get_max_test_processes, parallel_type
     from django.test.selenium import SeleniumTestCaseBase
     from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
     from django.utils.deprecation import (
@@ -325,17 +325,6 @@ def teardown_run_tests(state):
     del os.environ['RUNNING_DJANGOS_TEST_SUITE']
 
 
-def actual_test_processes(parallel):
-    if parallel == 0:
-        # This doesn't work before django.setup() on some databases.
-        if all(conn.features.can_clone_databases for conn in connections.all()):
-            return parallel_type('auto')
-        else:
-            return 1
-    else:
-        return parallel
-
-
 class ActionSelenium(argparse.Action):
     """
     Validate the comma-separated list of requested browsers.
@@ -354,18 +343,29 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
                  test_labels, debug_sql, parallel, tags, exclude_tags,
                  test_name_patterns, start_at, start_after, pdb, buffer,
                  timing, shuffle):
-    actual_parallel = actual_test_processes(parallel)
+    if parallel in {0, 'auto'}:
+        max_parallel = get_max_test_processes()
+    else:
+        max_parallel = parallel
 
     if verbosity >= 1:
         msg = "Testing against Django installed in '%s'" % os.path.dirname(django.__file__)
-        if actual_parallel > 1:
-            msg += " with up to %d processes" % actual_parallel
+        if max_parallel > 1:
+            msg += " with up to %d processes" % max_parallel
         print(msg)
 
     test_labels, state = setup_run_tests(verbosity, start_at, start_after, test_labels)
     # Run the test suite, including the extra validation tests.
     if not hasattr(settings, 'TEST_RUNNER'):
         settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+
+    if parallel in {0, 'auto'}:
+        # This doesn't work before django.setup() on some databases.
+        if all(conn.features.can_clone_databases for conn in connections.all()):
+            parallel = max_parallel
+        else:
+            parallel = 1
+
     TestRunner = get_runner(settings)
     test_runner = TestRunner(
         verbosity=verbosity,
@@ -374,7 +374,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
         keepdb=keepdb,
         reverse=reverse,
         debug_sql=debug_sql,
-        parallel=actual_parallel,
+        parallel=parallel,
         tags=tags,
         exclude_tags=exclude_tags,
         test_name_patterns=test_name_patterns,
@@ -563,13 +563,11 @@ if __name__ == "__main__":
         '--debug-sql', action='store_true',
         help='Turn on the SQL query logger within tests.',
     )
-    try:
-        default_parallel = int(os.environ['DJANGO_TEST_PROCESSES'])
-    except KeyError:
-        # actual_test_processes() converts this to "auto" later on.
-        default_parallel = 0
+    # 0 is converted to "auto" or 1 later on, depending on a method used by
+    # multiprocessing to start subprocesses and on the backend support for
+    # cloning databases.
     parser.add_argument(
-        '--parallel', nargs='?', const='auto', default=default_parallel,
+        '--parallel', nargs='?', const='auto', default=0,
         type=parallel_type, metavar='N',
         help=(
             'Run tests using up to N parallel processes. Use the value "auto" '
