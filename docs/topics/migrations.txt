@@ -51,7 +51,7 @@ same circumstances, exactly what will happen in production.
 
     The updates to your application that necessitated migrations should be
     deployed immediately after deploying the migrations. Otherwise, the
-    changes to your database should be flexible enough to account for the
+    changes to your models should be flexible enough to account for the
     possibility of there being outdated app code running in production.
 
 Django will make migrations for any change to your models or fields - even
