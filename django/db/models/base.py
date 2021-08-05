@@ -1828,7 +1828,7 @@ class Model(metaclass=ModelBase):
                     else:
                         fld = _cls._meta.get_field(part)
                     if fld.is_relation:
-                        _cls = fld.get_path_info()[-1].to_opts.model
+                        _cls = fld.path_infos[-1].to_opts.model
                     else:
                         _cls = None
                 except (FieldDoesNotExist, AttributeError):

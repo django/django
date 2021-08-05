@@ -395,7 +395,7 @@ class GenericRelation(ForeignObject):
             opts = field.remote_field.model._meta
         parent_field_chain.reverse()
         for field in parent_field_chain:
-            path.extend(field.remote_field.get_path_info())
+            path.extend(field.remote_field.path_infos)
         return path
 
     def get_path_info(self, filtered_relation=None):

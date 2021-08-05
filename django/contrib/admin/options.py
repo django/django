@@ -400,14 +400,14 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             # model anyways. For example, if you filter on employee__department__id,
             # then the id value would be found already from employee__department_id.
             if not prev_field or (prev_field.is_relation and
-                                  field not in prev_field.get_path_info()[-1].target_fields):
+                                  field not in prev_field.path_infos[-1].target_fields):
                 relation_parts.append(part)
-            if not getattr(field, 'get_path_info', None):
+            if not getattr(field, 'path_infos', None):
                 # This is not a relational field, so further parts
                 # must be transforms.
                 break
             prev_field = field
-            model = field.get_path_info()[-1].to_opts.model
+            model = field.path_infos[-1].to_opts.model
 
         if len(relation_parts) <= 1:
             # Either a local field filter, or no fields at all.
@@ -1020,9 +1020,9 @@ class ModelAdmin(BaseModelAdmin):
                         return field_name
                 else:
                     prev_field = field
-                    if hasattr(field, 'get_path_info'):
+                    if hasattr(field, 'path_infos'):
                         # Update opts to follow the relation.
-                        opts = field.get_path_info()[-1].to_opts
+                        opts = field.path_infos[-1].to_opts
             # Otherwise, use the field with icontains.
             return "%s__icontains" % field_name
 

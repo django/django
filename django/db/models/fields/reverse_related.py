@@ -71,7 +71,7 @@ class ForeignObjectRel(FieldCacheMixin):
         When filtering against this relation, return the field on the remote
         model against which the filtering should happen.
         """
-        target_fields = self.get_path_info()[-1].target_fields
+        target_fields = self.path_infos[-1].target_fields
         if len(target_fields) > 1:
             raise exceptions.FieldError("Can't use target_field for multicolumn relations.")
         return target_fields[0]
@@ -138,6 +138,18 @@ class ForeignObjectRel(FieldCacheMixin):
     def __hash__(self):
         return hash(self.identity)
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        # Delete the path_infos cached property because it can be recalculated
+        # at first invocation after deserialization. The attribute must be
+        # removed because subclasses like ManyToOneRel may have a PathInfo
+        # which contains an intermediate M2M table that's been dynamically
+        # created and doesn't exist in the .models module.
+        # This is a reverse relation, so there is no reverse_path_infos to
+        # delete.
+        state.pop('path_infos', None)
+        return state
+
     def get_choices(
         self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
         limit_choices_to=None, ordering=(),
@@ -195,7 +207,14 @@ class ForeignObjectRel(FieldCacheMixin):
         return opts.model_name + ('_set' if self.multiple else '')
 
     def get_path_info(self, filtered_relation=None):
-        return self.field.get_reverse_path_info(filtered_relation)
+        if filtered_relation:
+            return self.field.get_reverse_path_info(filtered_relation)
+        else:
+            return self.field.reverse_path_infos
+
+    @cached_property
+    def path_infos(self):
+        return self.get_path_info()
 
     def get_cache_name(self):
         """
@@ -234,7 +253,7 @@ class ManyToOneRel(ForeignObjectRel):
         self.field_name = field_name
 
     def __getstate__(self):
-        state = self.__dict__.copy()
+        state = super().__getstate__()
         state.pop('related_model', None)
         return state
 

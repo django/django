@@ -1528,8 +1528,11 @@ class Query(BaseExpression):
                     path.extend(path_to_parent)
                     cur_names_with_path[1].extend(path_to_parent)
                     opts = path_to_parent[-1].to_opts
-            if hasattr(field, 'get_path_info'):
-                pathinfos = field.get_path_info(filtered_relation)
+            if hasattr(field, 'path_infos'):
+                if filtered_relation:
+                    pathinfos = field.get_path_info(filtered_relation)
+                else:
+                    pathinfos = field.path_infos
                 if not allow_many:
                     for inner_pos, p in enumerate(pathinfos):
                         if p.m2m:

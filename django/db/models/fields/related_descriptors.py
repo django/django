@@ -599,7 +599,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
                     # for related object id.
                     rel_obj_id = tuple([
                         getattr(self.instance, target_field.attname)
-                        for target_field in self.field.get_path_info()[-1].target_fields
+                        for target_field in self.field.path_infos[-1].target_fields
                     ])
                 else:
                     rel_obj_id = getattr(self.instance, target_field.attname)
