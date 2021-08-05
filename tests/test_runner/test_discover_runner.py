@@ -1,4 +1,5 @@
 import logging
+import multiprocessing
 import os
 import unittest.loader
 from argparse import ArgumentParser
@@ -34,6 +35,55 @@ def change_loader_patterns(patterns):
         yield
     finally:
         DiscoverRunner.test_loader.testNamePatterns = original_patterns
+
+
+# Isolate from the real environment.
+@mock.patch.dict(os.environ, {}, clear=True)
+@mock.patch.object(multiprocessing, 'cpu_count', return_value=12)
+# Python 3.8 on macOS defaults to 'spawn' mode.
+@mock.patch.object(multiprocessing, 'get_start_method', return_value='fork')
+class DiscoverRunnerParallelArgumentTests(SimpleTestCase):
+    def get_parser(self):
+        parser = ArgumentParser()
+        DiscoverRunner.add_arguments(parser)
+        return parser
+
+    def test_parallel_default(self, *mocked_objects):
+        result = self.get_parser().parse_args([])
+        self.assertEqual(result.parallel, 0)
+
+    def test_parallel_flag(self, *mocked_objects):
+        result = self.get_parser().parse_args(['--parallel'])
+        self.assertEqual(result.parallel, 12)
+
+    def test_parallel_auto(self, *mocked_objects):
+        result = self.get_parser().parse_args(['--parallel', 'auto'])
+        self.assertEqual(result.parallel, 12)
+
+    def test_parallel_count(self, *mocked_objects):
+        result = self.get_parser().parse_args(['--parallel', '17'])
+        self.assertEqual(result.parallel, 17)
+
+    def test_parallel_invalid(self, *mocked_objects):
+        with self.assertRaises(SystemExit), captured_stderr() as stderr:
+            self.get_parser().parse_args(['--parallel', 'unaccepted'])
+        msg = "argument --parallel: 'unaccepted' is not an integer or the string 'auto'"
+        self.assertIn(msg, stderr.getvalue())
+
+    @mock.patch.dict(os.environ, {'DJANGO_TEST_PROCESSES': '7'})
+    def test_parallel_env_var(self, *mocked_objects):
+        result = self.get_parser().parse_args([])
+        self.assertEqual(result.parallel, 7)
+
+    @mock.patch.dict(os.environ, {'DJANGO_TEST_PROCESSES': 'typo'})
+    def test_parallel_env_var_non_int(self, *mocked_objects):
+        with self.assertRaises(ValueError):
+            self.get_parser().parse_args([])
+
+    def test_parallel_spawn(self, mocked_get_start_method, mocked_cpu_count):
+        mocked_get_start_method.return_value = 'spawn'
+        result = self.get_parser().parse_args(['--parallel'])
+        self.assertEqual(result.parallel, 1)
 
 
 class DiscoverRunnerTests(SimpleTestCase):
@@ -406,6 +456,26 @@ class DiscoverRunnerTests(SimpleTestCase):
         runner = DiscoverRunner(parallel=5, verbosity=0)
         suite = runner.build_suite(['test_runner_apps.tagged'])
         self.assertEqual(suite.processes, len(suite.subsuites))
+
+    def test_number_of_databases_parallel_test_suite(self):
+        """
+        Number of databases doesn't exceed the number of TestCases with
+        parallel tests.
+        """
+        runner = DiscoverRunner(parallel=8, verbosity=0)
+        suite = runner.build_suite(['test_runner_apps.tagged'])
+        self.assertEqual(suite.processes, len(suite.subsuites))
+        self.assertEqual(runner.parallel, suite.processes)
+
+    def test_number_of_databases_no_parallel_test_suite(self):
+        """
+        Number of databases doesn't exceed the number of TestCases with
+        non-parallel tests.
+        """
+        runner = DiscoverRunner(parallel=8, verbosity=0)
+        suite = runner.build_suite(['test_runner_apps.simple.tests.DjangoCase1'])
+        self.assertEqual(runner.parallel, 1)
+        self.assertIsInstance(suite, TestSuite)
 
     def test_buffer_mode_test_pass(self):
         runner = DiscoverRunner(buffer=True, verbosity=0)

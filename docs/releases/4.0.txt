@@ -229,6 +229,13 @@ Forms
   an additional class of ``nonform`` to help distinguish them from
   form-specific errors.
 
+* :class:`~django.forms.formsets.BaseFormSet` now allows customizing the widget
+  used when deleting forms via
+  :attr:`~django.forms.formsets.BaseFormSet.can_delete` by setting the
+  :attr:`~django.forms.formsets.BaseFormSet.deletion_widget` attribute or
+  overriding :meth:`~django.forms.formsets.BaseFormSet.get_deletion_widget`
+  method.
+
 Generic Views
 ~~~~~~~~~~~~~
 
@@ -349,6 +356,9 @@ Tests
 
 * Django test runner now supports a :option:`--shuffle <test --shuffle>` option
   to execute tests in a random order.
+
+* The :option:`test --parallel` option now supports the value ``auto`` to run
+  one test process for each processor core.
 
 URLs
 ~~~~
@@ -525,6 +535,9 @@ Miscellaneous
   ``request.META['CSRF_COOKIE_USED']``, ``request.csrf_cookie_needs_reset``,
   and ``response.csrf_cookie_set`` to track whether the CSRF cookie should be
   sent. This is an undocumented, private API.
+
+* The undocumented ``TRANSLATOR_COMMENT_MARK`` constant is moved from
+  ``django.template.base`` to ``django.utils.translation.template``.
 
 .. _deprecated-features-4.0:
 

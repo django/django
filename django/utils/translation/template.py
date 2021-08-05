@@ -1,10 +1,12 @@
 import warnings
 from io import StringIO
 
-from django.template.base import TRANSLATOR_COMMENT_MARK, Lexer, TokenType
+from django.template.base import Lexer, TokenType
 from django.utils.regex_helper import _lazy_re_compile
 
 from . import TranslatorCommentWarning, trim_whitespace
+
+TRANSLATOR_COMMENT_MARK = 'Translators'
 
 dot_re = _lazy_re_compile(r'\S')
 

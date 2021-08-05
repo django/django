@@ -78,7 +78,6 @@ VARIABLE_TAG_START = '{{'
 VARIABLE_TAG_END = '}}'
 COMMENT_TAG_START = '{#'
 COMMENT_TAG_END = '#}'
-TRANSLATOR_COMMENT_MARK = 'Translators'
 SINGLE_BRACE_START = '{'
 SINGLE_BRACE_END = '}'
 
@@ -387,9 +386,7 @@ class Lexer:
                     self.verbatim = 'end%s' % block_content
                 return Token(TokenType.BLOCK, block_content, position, lineno)
             elif token_start == COMMENT_TAG_START:
-                content = ''
-                if token_string.find(TRANSLATOR_COMMENT_MARK):
-                    content = token_string[2:-2].strip()
+                content = token_string[2:-2].strip()
                 return Token(TokenType.COMMENT, content, position, lineno)
         else:
             return Token(TokenType.TEXT, token_string, position, lineno)

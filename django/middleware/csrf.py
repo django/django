@@ -138,7 +138,7 @@ def _sanitize_token(token):
     return token
 
 
-def _compare_masked_tokens(request_csrf_token, csrf_token):
+def _does_token_match(request_csrf_token, csrf_token):
     # Assume both arguments are sanitized -- that is, strings of
     # length CSRF_TOKEN_LENGTH, all CSRF_ALLOWED_CHARS.
     return constant_time_compare(
@@ -369,7 +369,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
             reason = self._bad_token_message(exc.reason, token_source)
             raise RejectRequest(reason)
 
-        if not _compare_masked_tokens(request_csrf_token, csrf_token):
+        if not _does_token_match(request_csrf_token, csrf_token):
             reason = self._bad_token_message('incorrect', token_source)
             raise RejectRequest(reason)
 
