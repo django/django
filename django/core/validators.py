@@ -170,7 +170,7 @@ class EmailValidator:
         re.IGNORECASE)
     literal_regex = _lazy_re_compile(
         # literal form, ipv4 or ipv6 address (SMTP 4.1.3)
-        r'\[([A-f0-9:.]+)\]\Z',
+        r'\[([A-F0-9:.]+)\]\Z',
         re.IGNORECASE)
     domain_allowlist = ['localhost']
 
