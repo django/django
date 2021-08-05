@@ -5,7 +5,6 @@ import os
 import re
 import sys
 import time
-import pickle
 from collections.abc import Mapping
 from email.header import Header
 from http.client import responses
@@ -321,6 +320,7 @@ class HttpResponse(HttpResponseBase):
     """
 
     streaming = False
+    non_pickable_attrs = ['client', 'templates', 'context', 'json', 'resolver_match', 'wsgi_request']
 
     def __init__(self, content=b'', *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -335,15 +335,7 @@ class HttpResponse(HttpResponseBase):
         }
 
     def __getstate__(self):
-        # neglect non-pickleable attributes in response
-        state = {}
-        for k, v in self.__dict__.items():
-            try:
-                pickle.dumps(v)
-                state[k] = v
-            except Exception:
-                pass
-        return state
+        return {k: v for k, v in self.__dict__.items() if k not in self.non_pickable_attrs}
 
     def serialize(self):
         """Full HTTP message, including headers, as a bytestring."""
