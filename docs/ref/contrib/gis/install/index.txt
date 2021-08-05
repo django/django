@@ -112,12 +112,12 @@ community!  You can:
 * Join the ``#django-geo`` IRC channel on Libera.Chat. Please be patient and
   polite -- while you may not get an immediate response, someone will attempt
   to answer your question as soon as they see it.
-* Ask your question on the `GeoDjango`__ mailing list.
+* Ask your question on the `GeoDjango`__ forum.
 * File a ticket on the `Django trac`__ if you think there's a bug.  Make
   sure to provide a complete description of the problem, versions used,
   and specify the component as "GIS".
 
-__ https://groups.google.com/g/geodjango
+__ https://forum.djangoproject.com/c/internals/geodjango/13
 __ https://code.djangoproject.com/newticket
 
 .. _libsettings:
