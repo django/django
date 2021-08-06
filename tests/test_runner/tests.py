@@ -2,6 +2,9 @@
 Tests for django test runner
 """
 import collections.abc
+import multiprocessing
+import os
+import sys
 import unittest
 from unittest import mock
 
@@ -358,7 +361,8 @@ class DependencyOrderingTests(unittest.TestCase):
 
 class MockTestRunner:
     def __init__(self, *args, **kwargs):
-        pass
+        if parallel := kwargs.get('parallel'):
+            sys.stderr.write(f'parallel={parallel}')
 
 
 MockTestRunner.run_tests = mock.Mock(return_value=[])
@@ -379,6 +383,65 @@ class ManageCommandTests(unittest.TestCase):
         with captured_stderr() as stderr:
             call_command('test', '--timing', 'sites', testrunner='test_runner.tests.MockTestRunner')
         self.assertIn('Total run took', stderr.getvalue())
+
+
+# Isolate from the real environment.
+@mock.patch.dict(os.environ, {}, clear=True)
+@mock.patch.object(multiprocessing, 'cpu_count', return_value=12)
+# Python 3.8 on macOS defaults to 'spawn' mode.
+@mock.patch.object(multiprocessing, 'get_start_method', return_value='fork')
+class ManageCommandParallelTests(SimpleTestCase):
+    def test_parallel_default(self, *mocked_objects):
+        with captured_stderr() as stderr:
+            call_command(
+                'test',
+                '--parallel',
+                testrunner='test_runner.tests.MockTestRunner',
+            )
+        self.assertIn('parallel=12', stderr.getvalue())
+
+    def test_parallel_auto(self, *mocked_objects):
+        with captured_stderr() as stderr:
+            call_command(
+                'test',
+                '--parallel=auto',
+                testrunner='test_runner.tests.MockTestRunner',
+            )
+        self.assertIn('parallel=12', stderr.getvalue())
+
+    def test_no_parallel(self, *mocked_objects):
+        with captured_stderr() as stderr:
+            call_command('test', testrunner='test_runner.tests.MockTestRunner')
+        # Parallel is disabled by default.
+        self.assertEqual(stderr.getvalue(), '')
+
+    def test_parallel_spawn(self, mocked_get_start_method, mocked_cpu_count):
+        mocked_get_start_method.return_value = 'spawn'
+        with captured_stderr() as stderr:
+            call_command(
+                'test',
+                '--parallel=auto',
+                testrunner='test_runner.tests.MockTestRunner',
+            )
+        self.assertIn('parallel=1', stderr.getvalue())
+
+    def test_no_parallel_spawn(self, mocked_get_start_method, mocked_cpu_count):
+        mocked_get_start_method.return_value = 'spawn'
+        with captured_stderr() as stderr:
+            call_command(
+                'test',
+                testrunner='test_runner.tests.MockTestRunner',
+            )
+        self.assertEqual(stderr.getvalue(), '')
+
+    @mock.patch.dict(os.environ, {'DJANGO_TEST_PROCESSES': 'invalid'})
+    def test_django_test_processes_env_non_int(self, *mocked_objects):
+        with self.assertRaises(ValueError):
+            call_command(
+                'test',
+                '--parallel',
+                testrunner='test_runner.tests.MockTestRunner',
+            )
 
 
 class CustomTestRunnerOptionsSettingsTests(AdminScriptTestCase):
