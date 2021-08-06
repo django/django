@@ -85,12 +85,10 @@ SINGLE_BRACE_END = '}'
 # (e.g. strings)
 UNKNOWN_SOURCE = '<unknown source>'
 
-# match a variable or block tag and capture the entire tag, including start/end
-# delimiters
-tag_re = (_lazy_re_compile('(%s.*?%s|%s.*?%s|%s.*?%s)' %
-          (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END),
-           re.escape(VARIABLE_TAG_START), re.escape(VARIABLE_TAG_END),
-           re.escape(COMMENT_TAG_START), re.escape(COMMENT_TAG_END))))
+# Match BLOCK_TAG_*, VARIABLE_TAG_*, and COMMENT_TAG_* tags and capture the
+# entire tag, including start/end delimiters. Using re.compile() is faster
+# than instantiating SimpleLazyObject with _lazy_re_compile().
+tag_re = re.compile(r'({%.*?%}|{{.*?}}|{#.*?#})')
 
 logger = logging.getLogger('django.template')
 
