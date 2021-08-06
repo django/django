@@ -825,6 +825,13 @@ Generate migration files without Django version and timestamp header.
 Makes ``makemigrations`` exit with a non-zero status when model changes without
 migrations are detected.
 
+.. django-admin-option:: --scriptable
+
+.. versionadded:: 4.1
+
+Diverts log output and input prompts to ``stderr``, writing only paths of
+generated migration files to ``stdout``.
+
 ``migrate``
 -----------
 

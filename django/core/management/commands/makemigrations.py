@@ -57,9 +57,20 @@ class Command(BaseCommand):
             '--check', action='store_true', dest='check_changes',
             help='Exit with a non-zero status if model changes are missing migrations.',
         )
+        parser.add_argument(
+            '--scriptable', action='store_true', dest='scriptable',
+            help=(
+                'Divert log output and input prompts to stderr, writing only '
+                'paths of generated migration files to stdout.'
+            ),
+        )
+
+    @property
+    def log_output(self):
+        return self.stderr if self.scriptable else self.stdout
 
     def log(self, msg):
-        self.stdout.write(msg)
+        self.log_output.write(msg)
 
     @no_translations
     def handle(self, *app_labels, **options):
@@ -73,6 +84,10 @@ class Command(BaseCommand):
             raise CommandError('The migration name must be a valid Python identifier.')
         self.include_header = options['include_header']
         check_changes = options['check_changes']
+        self.scriptable = options['scriptable']
+        # If logs and prompts are diverted to stderr, remove the ERROR style.
+        if self.scriptable:
+            self.stderr.style_func = None
 
         # Make sure the app they asked for exists
         app_labels = set(app_labels)
@@ -147,7 +162,7 @@ class Command(BaseCommand):
             questioner = InteractiveMigrationQuestioner(
                 specified_apps=app_labels,
                 dry_run=self.dry_run,
-                prompt_output=self.stdout,
+                prompt_output=self.log_output,
             )
         else:
             questioner = NonInteractiveMigrationQuestioner(
@@ -226,6 +241,8 @@ class Command(BaseCommand):
                     self.log('  %s\n' % self.style.MIGRATE_LABEL(migration_string))
                     for operation in migration.operations:
                         self.log('    - %s' % operation.describe())
+                    if self.scriptable:
+                        self.stdout.write(migration_string)
                 if not self.dry_run:
                     # Write the migrations file to the disk.
                     migrations_directory = os.path.dirname(writer.path)
@@ -254,7 +271,7 @@ class Command(BaseCommand):
         if it's safe; otherwise, advises on how to fix it.
         """
         if self.interactive:
-            questioner = InteractiveMigrationQuestioner(prompt_output=self.stdout)
+            questioner = InteractiveMigrationQuestioner(prompt_output=self.log_output)
         else:
             questioner = MigrationQuestioner(defaults={'ask_merge': True})
 
@@ -327,6 +344,8 @@ class Command(BaseCommand):
                         fh.write(writer.as_string())
                     if self.verbosity > 0:
                         self.log('\nCreated new merge migration %s' % writer.path)
+                        if self.scriptable:
+                            self.stdout.write(writer.path)
                 elif self.verbosity == 3:
                     # Alternatively, makemigrations --merge --dry-run --verbosity 3
                     # will log the merge migrations rather than saving the file
