@@ -163,7 +163,8 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :option:`makemigrations --no-input` now logs default answers and reasons why
+  migrations cannot be created.
 
 Migrations
 ~~~~~~~~~~
