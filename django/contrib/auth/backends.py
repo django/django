@@ -134,7 +134,6 @@ class ModelBackend(BaseBackend):
                 'The `perm` argument must be a string or a permission instance.'
             )
 
-        UserModel = get_user_model()
         if obj is not None:
             return UserModel._default_manager.none()
 
