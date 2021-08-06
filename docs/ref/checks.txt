@@ -542,6 +542,9 @@ configured:
 * **templates.E002**: ``string_if_invalid`` in :setting:`TEMPLATES`
   :setting:`OPTIONS <TEMPLATES-OPTIONS>` must be a string but got: ``{value}``
   (``{type}``).
+* **templates.E003**: Multiple installed apps have ``templatetags`` modules with the
+  same file name, so ``{% load <name> %}`` will not be able to determine which
+  one to load.  You should rename one of them.
 
 Translation
 -----------
