@@ -84,6 +84,28 @@ def reraise(exc, backend):
     raise new from exc
 
 
+def get_template_tag_module_names():
+    """
+    Generator yielding (name, full.module.name) for all installed application
+    templatetag libraries. Example:
+    ("i18n", "django.templatetags.i18n")
+
+    """
+    candidates = ['django.templatetags']
+    candidates.extend(f'{app.name}.templatetags' for app in apps.get_app_configs())
+
+    for candidate in candidates:
+        try:
+            pkg = import_module(candidate)
+        except ModuleNotFoundError:
+            # No templatetags package defined. This is safe to ignore.
+            continue
+
+        if hasattr(pkg, '__path__'):
+            for name in get_package_libraries(pkg):
+                yield name[len(candidate) + 1:], name
+
+
 def get_installed_libraries():
     """
     Return the built-in template tag libraries and those from installed
@@ -91,24 +113,10 @@ def get_installed_libraries():
     individual module names, not the full module paths. Example:
     django.templatetags.i18n is stored as i18n.
     """
-    libraries = {}
-    candidates = ['django.templatetags']
-    candidates.extend(
-        '%s.templatetags' % app_config.name
-        for app_config in apps.get_app_configs())
-
-    for candidate in candidates:
-        try:
-            pkg = import_module(candidate)
-        except ImportError:
-            # No templatetags package defined. This is safe to ignore.
-            continue
-
-        if hasattr(pkg, '__path__'):
-            for name in get_package_libraries(pkg):
-                libraries[name[len(candidate) + 1:]] = name
-
-    return libraries
+    return {
+        module_name: full_name
+        for module_name, full_name in get_template_tag_module_names()
+    }
 
 
 def get_package_libraries(pkg):
