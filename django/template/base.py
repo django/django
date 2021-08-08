@@ -391,28 +391,36 @@ class Lexer:
 
 
 class DebugLexer(Lexer):
+    def _tag_re_split_positions(self):
+        last = 0
+        for match in tag_re.finditer(self.template_string):
+            start, end = match.span()
+            yield last, start
+            yield start, end
+            last = end
+        yield last, len(self.template_string)
+
+    # This parallels the use of tag_re.split() in Lexer.tokenize().
+    def _tag_re_split(self):
+        for position in self._tag_re_split_positions():
+            yield self.template_string[slice(*position)], position
+
     def tokenize(self):
         """
         Split a template string into tokens and annotates each token with its
         start and end position in the source. This is slower than the default
         lexer so only use it when debug is True.
         """
+        # For maintainability, it is helpful if the implementation below can
+        # continue to closely parallel Lexer.tokenize()'s implementation.
+        in_tag = False
         lineno = 1
         result = []
-        upto = 0
-        for match in tag_re.finditer(self.template_string):
-            start, end = match.span()
-            if start > upto:
-                token_string = self.template_string[upto:start]
-                result.append(self.create_token(token_string, (upto, start), lineno, in_tag=False))
+        for token_string, position in self._tag_re_split():
+            if token_string:
+                result.append(self.create_token(token_string, position, lineno, in_tag))
                 lineno += token_string.count('\n')
-            token_string = self.template_string[start:end]
-            result.append(self.create_token(token_string, (start, end), lineno, in_tag=True))
-            lineno += token_string.count('\n')
-            upto = end
-        last_bit = self.template_string[upto:]
-        if last_bit:
-            result.append(self.create_token(last_bit, (upto, upto + len(last_bit)), lineno, in_tag=False))
+            in_tag = not in_tag
         return result
 
 
