@@ -357,8 +357,8 @@ class Lexer:
         for bit in tag_re.split(self.template_string):
             if bit:
                 result.append(self.create_token(bit, None, lineno, in_tag))
+                lineno += bit.count('\n')
             in_tag = not in_tag
-            lineno += bit.count('\n')
         return result
 
     def create_token(self, token_string, position, lineno, in_tag):
