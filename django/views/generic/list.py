@@ -1,6 +1,6 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.core.paginator import InvalidPage, Paginator
-from django.db.models import QuerySet
+from django.db.models import Case, QuerySet
 from django.http import Http404
 from django.utils.translation import gettext as _
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
@@ -41,7 +41,7 @@ class MultipleObjectMixin(ContextMixin):
             )
         ordering = self.get_ordering()
         if ordering:
-            if isinstance(ordering, str):
+            if isinstance(ordering, (str, Case)):
                 ordering = (ordering,)
             queryset = queryset.order_by(*ordering)
 
