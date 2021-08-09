@@ -9,6 +9,7 @@ class LexerTestMixin:
         'text\n'
         '{% if test %}{{ varvalue }}{% endif %}'
         '{#comment {{not a var}} %{not a block}% #}'
+        'end text'
     )
     expected_token_tuples = [
         # (token_type, contents, lineno, position)
@@ -17,6 +18,7 @@ class LexerTestMixin:
         (TokenType.VAR, 'varvalue', 2, (18, 32)),
         (TokenType.BLOCK, 'endif', 2, (32, 43)),
         (TokenType.COMMENT, 'comment {{not a var}} %{not a block}%', 2, (43, 85)),
+        (TokenType.TEXT, 'end text', 2, (85, 93)),
     ]
 
     def test_tokenize(self):
