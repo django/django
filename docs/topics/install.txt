@@ -150,7 +150,7 @@ This is the recommended way to install Django.
         $ python -m pip install Django
 
 .. _pip: https://pip.pypa.io/
-.. _standalone pip installer: https://pip.pypa.io/en/latest/installing/#installing-with-get-pip-py
+.. _standalone pip installer: https://pip.pypa.io/en/latest/installation/
 
 .. _installing-distribution-package:
 
