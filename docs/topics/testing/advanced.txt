@@ -510,7 +510,7 @@ behavior. This class defines the ``run_tests()`` entry point, plus a
 selection of other methods that are used by ``run_tests()`` to set up, execute
 and tear down the test suite.
 
-.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, parallel=0, tags=None, exclude_tags=None, test_name_patterns=None, pdb=False, buffer=False, enable_faulthandler=True, timing=True, shuffle=False, **kwargs)
+.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, parallel=0, tags=None, exclude_tags=None, test_name_patterns=None, pdb=False, buffer=False, enable_faulthandler=True, timing=True, shuffle=False, logger=None, **kwargs)
 
     ``DiscoverRunner`` will search for tests in any file matching ``pattern``.
 
@@ -580,10 +580,15 @@ and tear down the test suite.
     If ``shuffle`` is an integer, test cases will be shuffled in a random order
     prior to execution, using the integer as a random seed. If ``shuffle`` is
     ``None``, the seed will be generated randomly. In both cases, the seed will
-    be logged to the console and set to ``self.shuffle_seed`` prior to running
-    tests. This option can be used to help detect tests that aren't properly
-    isolated. :ref:`Grouping by test class <order-of-tests>` is preserved when
-    using this option.
+    be logged and set to ``self.shuffle_seed`` prior to running tests. This
+    option can be used to help detect tests that aren't properly isolated.
+    :ref:`Grouping by test class <order-of-tests>` is preserved when using this
+    option.
+
+    ``logger`` can be used to pass a Python :py:ref:`Logger object <logger>`.
+    If provided, the logger will be used to log messages instead of printing to
+    the console. The logger object will respect its logging level rather than
+    the ``verbosity``.
 
     Django may, from time to time, extend the capabilities of the test runner
     by adding new arguments. The ``**kwargs`` declaration allows for this
@@ -601,7 +606,7 @@ and tear down the test suite.
 
     .. versionadded:: 4.0
 
-        The ``shuffle`` argument was added.
+        The ``logger`` and ``shuffle`` arguments were added.
 
 Attributes
 ~~~~~~~~~~
@@ -726,11 +731,13 @@ Methods
 
     .. versionadded:: 4.0
 
-    Prints to the console a message with the given integer `logging level`_
-    (e.g. ``logging.DEBUG``, ``logging.INFO``, or ``logging.WARNING``),
-    respecting the current ``verbosity``. For example, an ``INFO`` message will
-    be logged if the ``verbosity`` is at least 1, and ``DEBUG`` will be logged
-    if it is at least 2.
+    If a ``logger`` is set, logs the message at the given integer
+    `logging level`_ (e.g. ``logging.DEBUG``, ``logging.INFO``, or
+    ``logging.WARNING``). Otherwise, the message is printed to the console,
+    respecting the current ``verbosity``. For example, no message will be
+    printed if the ``verbosity`` is 0, ``INFO`` and above will be printed if
+    the ``verbosity`` is at least 1, and ``DEBUG`` will be printed if it is at
+    least 2. The ``level`` defaults to ``logging.INFO``.
 
 .. _`logging level`: https://docs.python.org/3/library/logging.html#levels
 
