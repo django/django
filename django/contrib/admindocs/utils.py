@@ -137,9 +137,57 @@ if docutils_is_available:
     for name, urlbase in ROLES.items():
         create_reference_role(name, urlbase)
 
-# Match the beginning of a named or unnamed group.
+# Match the beginning of a named, unnamed, non-capturing group.
 named_group_matcher = _lazy_re_compile(r'\(\?P(<\w+>)')
 unnamed_group_matcher = _lazy_re_compile(r'\(')
+non_capturing_group_matcher = _lazy_re_compile(r'\(\?\:')
+
+
+def replace_non_capturing_groups(pattern):
+    r"""
+    Find non-capturing groups in `pattern` and remove them. E.g.,
+    1. ^a(?:\w+)b ==> ^ab
+    2. ^a(?:(x|y)) ==> ^a
+    3. ^(?P<a>\w+)/b/(?:\d+) ==> ^(?P<a>\w+)/b/
+    """
+    non_capturing_group_indices = [
+        m.start(0) for m in non_capturing_group_matcher.finditer(pattern)
+    ]
+    # Indicied of the start of non-capturing groups
+    group_indices = []
+    for start in non_capturing_group_indices:
+        unmatched_open_brackets, prev_char = 1, None
+        for idx, val in enumerate(pattern[start + 3:]):
+            # Check for unescaped `(` and `)`. They mark the start and end of
+            # a nested group.
+            if val == '(' and prev_char != '\\':
+                unmatched_open_brackets += 1
+            elif val == ')' and prev_char != '\\':
+                unmatched_open_brackets -= 1
+            prev_char = val
+            # If brackets are balanced, the end of the string for the current
+            # named capture group pattern has been reached.
+            if unmatched_open_brackets == 0:
+                group_indices.append((start, start + 4 + idx))
+                break
+    # Remove unnamed group matches inside other unnamed capture groups.
+    group_start_end_indices = []
+    prev_end = None
+    for start, end in group_indices:
+        if prev_end and start > prev_end or not prev_end:
+            group_start_end_indices.append((start, end))
+        prev_end = end
+
+    # Handle the fact that replacing the string between indices will change string length and thus indices
+    # will point to the wrong substring if not corrected.
+    final_pattern, prev_end = '', None
+    for start, end in group_start_end_indices:
+        if prev_end:
+            final_pattern += pattern[prev_end:start]
+        else:
+            final_pattern += pattern[:start]
+        prev_end = end
+    return final_pattern + pattern[prev_end:]
 
 
 def replace_named_groups(pattern):
