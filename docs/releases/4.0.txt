@@ -356,8 +356,11 @@ Tests
 * Django test runner now supports a :option:`--buffer <test --buffer>` option
   with parallel tests.
 
-* The new :meth:`.DiscoverRunner.log` method allows customizing the way
-  messages are logged.
+* The new ``logger`` argument to :class:`~django.test.runner.DiscoverRunner`
+  allows a Python :py:ref:`logger <logger>` to be used for logging.
+
+* The new :meth:`.DiscoverRunner.log` method provides a way to log messages
+  that uses the ``DiscoverRunner.logger``, or prints to the console if not set.
 
 * Django test runner now supports a :option:`--shuffle <test --shuffle>` option
   to execute tests in a random order.
