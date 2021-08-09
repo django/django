@@ -397,7 +397,12 @@ class AdminDocViewFunctionsTests(SimpleTestCase):
             (r'^(?P<a>(x|y))/b/(?P<c>\w+)', '/<a>/b/<c>'),
             (r'^(?P<a>(x|y))/b/(?P<c>\w+)ab', '/<a>/b/<c>ab'),
             (r'^(?P<a>(x|y)(\(|\)))/b/(?P<c>\w+)ab', '/<a>/b/<c>ab'),
-            (r'^a/?$', '/a/'),
+            # Non-capturing groups
+            (r'^a(?:\w+)b', '/ab'),
+            (r'^a(?:(x|y))', '/a'),
+            (r'^(?:\w+(?:\w+))a', '/a'),
+            (r'^a(?:\w+)/b(?:\w+)', '/a/b'),
+            (r'(?P<a>\w+)/b/(?:\w+)c(?:\w+)', '/<a>/b/c'),
         )
         for pattern, output in tests:
             with self.subTest(pattern=pattern):
