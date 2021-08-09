@@ -1,6 +1,46 @@
 from django.template import Context, Template, Variable, VariableDoesNotExist
+from django.template.base import DebugLexer, Lexer, TokenType
 from django.test import SimpleTestCase
 from django.utils.translation import gettext_lazy
+
+
+class LexerTestMixin:
+    template_string = (
+        'text\n'
+        '{% if test %}{{ varvalue }}{% endif %}'
+        '{#comment {{not a var}} %{not a block}% #}'
+    )
+    expected_token_tuples = [
+        # (token_type, contents, lineno, position)
+        (TokenType.TEXT, 'text\n', 1, (0, 5)),
+        (TokenType.BLOCK, 'if test', 2, (5, 18)),
+        (TokenType.VAR, 'varvalue', 2, (18, 32)),
+        (TokenType.BLOCK, 'endif', 2, (32, 43)),
+        (TokenType.COMMENT, 'comment {{not a var}} %{not a block}%', 2, (43, 85)),
+    ]
+
+    def test_tokenize(self):
+        tokens = self.lexer_class(self.template_string).tokenize()
+        token_tuples = [(t.token_type, t.contents, t.lineno, t.position) for t in tokens]
+        self.assertEqual(token_tuples, self.make_expected())
+
+    def make_expected(self):
+        raise NotImplementedError('This method must be implemented by a subclass.')
+
+
+class LexerTests(LexerTestMixin, SimpleTestCase):
+    lexer_class = Lexer
+
+    def make_expected(self):
+        # The non-debug lexer does not record position.
+        return [t[:-1] + (None,) for t in self.expected_token_tuples]
+
+
+class DebugLexerTests(LexerTestMixin, SimpleTestCase):
+    lexer_class = DebugLexer
+
+    def make_expected(self):
+        return self.expected_token_tuples
 
 
 class TemplateTests(SimpleTestCase):
