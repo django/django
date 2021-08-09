@@ -1322,7 +1322,7 @@ class QuerySet:
                 self._insert(item, fields=fields, using=self.db, ignore_conflicts=ignore_conflicts)
         return inserted_rows
 
-    def _chain(self, **kwargs):
+    def _chain(self):
         """
         Return a copy of the current QuerySet that's ready for another
         operation.
@@ -1331,7 +1331,6 @@ class QuerySet:
         if obj._sticky_filter:
             obj.query.filter_is_sticky = True
             obj._sticky_filter = False
-        obj.__dict__.update(kwargs)
         return obj
 
     def _clone(self):
@@ -1622,11 +1621,11 @@ class Prefetch:
     def __getstate__(self):
         obj_dict = self.__dict__.copy()
         if self.queryset is not None:
+            queryset = self.queryset._chain()
             # Prevent the QuerySet from being evaluated
-            obj_dict['queryset'] = self.queryset._chain(
-                _result_cache=[],
-                _prefetch_done=True,
-            )
+            queryset._result_cache = []
+            queryset._prefetch_done = True
+            obj_dict['queryset'] = queryset
         return obj_dict
 
     def add_prefix(self, prefix):
