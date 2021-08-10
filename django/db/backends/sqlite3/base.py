@@ -22,6 +22,7 @@ from django.db.backends.base.base import (
 )
 from django.utils import timezone
 from django.utils.asyncio import async_unsafe
+from django.utils.crypto import md5
 from django.utils.dateparse import parse_datetime, parse_time
 from django.utils.duration import duration_microseconds
 from django.utils.regex_helper import _lazy_re_compile
@@ -233,7 +234,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         create_deterministic_function('LN', 1, none_guard(math.log))
         create_deterministic_function('LOG', 2, none_guard(lambda x, y: math.log(y, x)))
         create_deterministic_function('LPAD', 3, _sqlite_lpad)
-        create_deterministic_function('MD5', 1, none_guard(lambda x: hashlib.md5(x.encode()).hexdigest()))
+        create_deterministic_function('MD5', 1, none_guard(lambda x: md5(x.encode()).hexdigest()))
         create_deterministic_function('MOD', 2, none_guard(math.fmod))
         create_deterministic_function('PI', 0, lambda: math.pi)
         create_deterministic_function('POWER', 2, none_guard(operator.pow))
