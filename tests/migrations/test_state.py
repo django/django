@@ -916,7 +916,7 @@ class StateTests(SimpleTestCase):
             project_state.apps
 
         # If we include the real app it should succeed
-        project_state = ProjectState(real_apps=["contenttypes"])
+        project_state = ProjectState(real_apps={'contenttypes'})
         project_state.add_model(ModelState.from_model(TestModel))
         rendered_state = project_state.apps
         self.assertEqual(

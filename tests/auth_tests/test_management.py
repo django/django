@@ -1131,7 +1131,7 @@ class CreatePermissionsTests(TestCase):
         with self.assertNumQueries(0):
             create_permissions(self.app_config, verbosity=0, apps=state.apps)
         # Unavailable auth.Permission
-        state = migrations.state.ProjectState(real_apps=['contenttypes'])
+        state = migrations.state.ProjectState(real_apps={'contenttypes'})
         with self.assertNumQueries(0):
             create_permissions(self.app_config, verbosity=0, apps=state.apps)
 
