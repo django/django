@@ -91,7 +91,10 @@ class ProjectState:
     def __init__(self, models=None, real_apps=None):
         self.models = models or {}
         # Apps to include from main registry, usually unmigrated ones
-        self.real_apps = real_apps or []
+        if real_apps:
+            self.real_apps = real_apps if isinstance(real_apps, set) else set(real_apps)
+        else:
+            self.real_apps = set()
         self.is_delayed = False
         # {remote_model_key: {model_key: [(field_name, field)]}}
         self.relations = None
@@ -352,7 +355,6 @@ class ProjectState:
         self.relations = defaultdict(partial(defaultdict, list))
         concretes, proxies = self._get_concrete_models_mapping_and_proxy_models()
 
-        real_apps = set(self.real_apps)
         for model_key in concretes:
             model_state = self.models[model_key]
             for field_name, field in model_state.fields.items():
@@ -360,7 +362,7 @@ class ProjectState:
                 if not remote_field:
                     continue
                 remote_model_key = resolve_relation(remote_field.model, *model_key)
-                if remote_model_key[0] not in real_apps and remote_model_key in concretes:
+                if remote_model_key[0] not in self.real_apps and remote_model_key in concretes:
                     remote_model_key = concretes[remote_model_key]
                 self.relations[remote_model_key][model_key].append((field_name, field))
 
@@ -368,7 +370,7 @@ class ProjectState:
                 if not through:
                     continue
                 through_model_key = resolve_relation(through, *model_key)
-                if through_model_key[0] not in real_apps and through_model_key in concretes:
+                if through_model_key[0] not in self.real_apps and through_model_key in concretes:
                     through_model_key = concretes[through_model_key]
                 self.relations[through_model_key][model_key].append((field_name, field))
         for model_key in proxies:
@@ -432,7 +434,7 @@ class ProjectState:
         return cls(app_models)
 
     def __eq__(self, other):
-        return self.models == other.models and set(self.real_apps) == set(other.real_apps)
+        return self.models == other.models and self.real_apps == other.real_apps
 
 
 class AppConfigStub(AppConfig):
