@@ -3,16 +3,26 @@ Timezone-related classes and functions.
 """
 
 import functools
+import warnings
+
+try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo
+
 from contextlib import ContextDecorator
 from datetime import datetime, timedelta, timezone, tzinfo
 
+# TODO: make this import conditional.
 import pytz
 from asgiref.local import Local
 
 from django.conf import settings
+from django.utils.deprecation import RemovedInDjango50Warning
 
+# RemovedInDjango50Warning: add 'utc' to __all__.
 __all__ = [
-    'utc', 'get_fixed_timezone',
+    'get_fixed_timezone',
     'get_default_timezone', 'get_default_timezone_name',
     'get_current_timezone', 'get_current_timezone_name',
     'activate', 'deactivate', 'override',
@@ -21,8 +31,22 @@ __all__ = [
 ]
 
 
-# UTC time zone as a tzinfo instance.
-utc = pytz.utc
+# RemovedInDjango50Warning
+# This code has two purposes.
+# * Adjust the `utc` constant based on the `USE_DEPRECATED_PYTZ` setting.
+# * Defer that until used, since this module can be imported early in the
+#   bootstrap process before the settings are configured.
+#
+# For Django 5.0 Replace with:
+# utc = zoneinfo.ZoneInfo('UTC')
+def __getattr__(name):
+    if name != 'utc':
+        raise AttributeError(f'module {__name__!r} has no attribute {name!r}')
+
+    if settings.configured:
+        return pytz.utc if settings.USE_DEPRECATED_PYTZ else zoneinfo.ZoneInfo('UTC')
+    return zoneinfo.ZoneInfo('UTC')
+
 
 _PYTZ_BASE_CLASSES = (pytz.tzinfo.BaseTzInfo, pytz._FixedOffset)
 # In releases prior to 2018.4, pytz.UTC was not a subclass of BaseTzInfo
@@ -49,7 +73,16 @@ def get_default_timezone():
 
     This is the time zone defined by settings.TIME_ZONE.
     """
-    return pytz.timezone(settings.TIME_ZONE)
+    if settings.USE_DEPRECATED_PYTZ:
+        msg = (
+            "The USE_DEPRECATED_PYTZ setting, and support for pytz "
+            "timezones is deprecated in favor of the stdlib zoneinfo module."
+            " Please update your code to use zoneinfo and remove the "
+            "USE_DEPRECATED_PYTZ setting."
+        )
+        warnings.warn(msg, RemovedInDjango50Warning, stacklevel=3)
+        return pytz.timezone(settings.TIME_ZONE)
+    return zoneinfo.ZoneInfo(settings.TIME_ZONE)
 
 
 # This function exists for consistency with get_current_timezone_name
@@ -194,7 +227,8 @@ def now():
     """
     Return an aware or naive datetime.datetime, depending on settings.USE_TZ.
     """
-    return datetime.now(tz=utc if settings.USE_TZ else None)
+    # RemovedInDjango50Warning: s/__getattr__('utc')/utc/
+    return datetime.now(tz=__getattr__('utc') if settings.USE_TZ else None)
 
 
 # By design, these four functions don't perform any checks on their arguments.

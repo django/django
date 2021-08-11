@@ -67,7 +67,14 @@ class DatetimeDatetimeSerializer(BaseSerializer):
         imports = ["import datetime"]
         if self.value.tzinfo is not None:
             imports.append("from django.utils.timezone import utc")
-        return repr(self.value).replace('<UTC>', 'utc'), set(imports)
+        # Serialize, replacing tzinfo implementation details:
+        serialized = (
+            repr(self.value)
+            .replace('backports.', '')  # zoneinfo for PY38
+            .replace("zoneinfo.ZoneInfo(key='UTC')", 'utc')
+            .replace('<UTC>', 'utc')  # pytz
+        )
+        return serialized, set(imports)
 
 
 class DecimalSerializer(BaseSerializer):

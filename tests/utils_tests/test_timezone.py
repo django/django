@@ -12,14 +12,17 @@ except ImportError:
     except ImportError:
         zoneinfo = None
 
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase, ignore_warnings, override_settings
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango50Warning
 
 CET = pytz.timezone("Europe/Paris")
 EAT = timezone.get_fixed_timezone(180)      # Africa/Nairobi
 ICT = timezone.get_fixed_timezone(420)      # Asia/Bangkok
 UTC = datetime.timezone.utc
 
+# TODO: Remove the zoneinfo = None fallback and these helpers.
+#   ???: for 4.0 or 5.0?
 HAS_ZONEINFO = zoneinfo is not None
 
 if not HAS_ZONEINFO:
@@ -36,6 +39,34 @@ else:
 
 
 class TimezoneTests(SimpleTestCase):
+
+    def setUp(self):
+        # RemovedInDjango50Warning
+        timezone.get_default_timezone.cache_clear()
+
+    def tearDown(self):
+        # RemovedInDjango50Warning
+        timezone.get_default_timezone.cache_clear()
+
+    # TODO: Add similar tests for BaseDatabaseWrapper.timezone()
+    def test_default_timezone_is_zoneinfo(self):
+        self.assertIsInstance(timezone.get_default_timezone(), zoneinfo.ZoneInfo)
+
+    @ignore_warnings(category=RemovedInDjango50Warning)
+    @override_settings(USE_DEPRECATED_PYTZ=True)
+    def test_setting_allows_fallback_to_pytz(self):
+        self.assertIsInstance(timezone.get_default_timezone(), pytz.BaseTzInfo)
+
+    @override_settings(USE_DEPRECATED_PYTZ=True)
+    def test_setting_allows_fallback_to_pytz_warning(self):
+        msg = (
+            "The USE_DEPRECATED_PYTZ setting, and support for pytz "
+            "timezones is deprecated in favor of the stdlib zoneinfo module."
+            " Please update your code to use zoneinfo and remove the "
+            "USE_DEPRECATED_PYTZ setting."
+        )
+        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
+            timezone.get_default_timezone()
 
     def test_now(self):
         with override_settings(USE_TZ=True):
@@ -264,6 +295,12 @@ class TimezoneTests(SimpleTestCase):
         self.assertEqual(timezone.get_default_timezone_name(), 'America/Chicago')
 
     def test_get_default_timezone_utc(self):
+        with override_settings(USE_TZ=True, TIME_ZONE='UTC'):
+            self.assertIs(timezone.get_default_timezone(), timezone.utc)
+
+    @ignore_warnings(category=RemovedInDjango50Warning)
+    @override_settings(USE_DEPRECATED_PYTZ=True)
+    def test_get_default_timezone_utc_pytz(self):
         with override_settings(USE_TZ=True, TIME_ZONE='UTC'):
             self.assertIs(timezone.get_default_timezone(), timezone.utc)
 
