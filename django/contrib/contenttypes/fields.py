@@ -213,7 +213,7 @@ class GenericForeignKey(FieldCacheMixin):
             gfk_key,
             True,
             self.name,
-            True,
+            False,
         )
 
     def __get__(self, instance, cls=None):
@@ -229,6 +229,8 @@ class GenericForeignKey(FieldCacheMixin):
         pk_val = getattr(instance, self.fk_field)
 
         rel_obj = self.get_cached_value(instance, default=None)
+        if rel_obj is None and self.is_cached(instance):
+            return rel_obj
         if rel_obj is not None:
             ct_match = ct_id == self.get_content_type(obj=rel_obj, using=instance._state.db).id
             pk_match = rel_obj._meta.pk.to_python(pk_val) == rel_obj.pk
