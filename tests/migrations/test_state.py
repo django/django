@@ -924,6 +924,10 @@ class StateTests(SimpleTestCase):
             1,
         )
 
+    def test_real_apps_non_set(self):
+        with self.assertRaises(AssertionError):
+            ProjectState(real_apps=['contenttypes'])
+
     def test_ignore_order_wrt(self):
         """
         Makes sure ProjectState doesn't include OrderWrt fields when

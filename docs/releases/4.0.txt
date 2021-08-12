@@ -544,6 +544,10 @@ Miscellaneous
 * The undocumented ``TRANSLATOR_COMMENT_MARK`` constant is moved from
   ``django.template.base`` to ``django.utils.translation.template``.
 
+* The ``real_apps`` argument of the undocumented
+  ``django.db.migrations.state.ProjectState.__init__()`` method must now be a
+  set if provided.
+
 .. _deprecated-features-4.0:
 
 Features deprecated in 4.0
