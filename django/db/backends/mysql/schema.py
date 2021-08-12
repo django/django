@@ -108,6 +108,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def _field_should_be_indexed(self, model, field):
         create_index = super()._field_should_be_indexed(model, field)
+        if not create_index:
+            return False
+
         storage = self.connection.introspection.get_storage_engine(
             self.connection.cursor(), model._meta.db_table
         )
@@ -115,11 +118,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # db_constraint=False because the index from that constraint won't be
         # created.
         if (storage == "InnoDB" and
-                create_index and
                 field.get_internal_type() == 'ForeignKey' and
                 field.db_constraint):
             return False
-        return not self._is_limited_data_type(field) and create_index
+        return not self._is_limited_data_type(field)
 
     def _delete_composed_index(self, model, fields, *args):
         """
