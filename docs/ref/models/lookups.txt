@@ -177,16 +177,21 @@ following methods:
     comparison between ``lhs`` and ``rhs`` such as ``lhs in rhs`` or
     ``lhs > rhs``.
 
-    The notation to use a lookup in an expression is
-    ``<lhs>__<lookup_name>=<rhs>``.
+    The primary notation to use a lookup in an expression is
+    ``<lhs>__<lookup_name>=<rhs>``. Lookups can also be used directly in
+    ``QuerySet`` filters::
 
-    This class acts as a query expression, but, since it has ``=<rhs>`` on its
-    construction, lookups must always be the end of a lookup expression.
+         Book.objects.filter(LessThan(F('word_count'), 7500))
+
+    …or annotations::
+
+         Book.objects.annotate(is_short_story=LessThan(F('word_count'), 7500))
 
     .. attribute:: lhs
 
-        The left-hand side - what is being looked up. The object must follow
-        the :ref:`Query Expression API <query-expression>`.
+        The left-hand side - what is being looked up. The object typically
+        follows the :ref:`Query Expression API <query-expression>`. It may also
+        be a plain value.
 
     .. attribute:: rhs
 
@@ -213,3 +218,8 @@ following methods:
     .. method:: process_rhs(compiler, connection)
 
         Behaves the same way as :meth:`process_lhs`, for the right-hand side.
+
+    .. versionchanged:: 4.0
+
+        Support for using lookups in ``QuerySet`` annotations, aggregations,
+        and directly in filters was added.

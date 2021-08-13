@@ -22,6 +22,7 @@ you quickly accomplish common tasks.
    error-reporting
    initial-data
    legacy-databases
+   logging
    outputting-csv
    outputting-pdf
    overriding-templates

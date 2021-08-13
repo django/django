@@ -1,7 +1,7 @@
 import html.entities
 import re
 import unicodedata
-from gzip import GzipFile
+from gzip import GzipFile, compress as gzip_compress
 from io import BytesIO
 
 from django.core.exceptions import SuspiciousFileOperation
@@ -280,13 +280,8 @@ def phone2numeric(phone):
     return ''.join(char2number.get(c, c) for c in phone.lower())
 
 
-# From http://www.xhaus.com/alan/python/httpcomp.html#gzip
-# Used with permission.
 def compress_string(s):
-    zbuf = BytesIO()
-    with GzipFile(mode='wb', compresslevel=6, fileobj=zbuf, mtime=0) as zfile:
-        zfile.write(s)
-    return zbuf.getvalue()
+    return gzip_compress(s, compresslevel=6, mtime=0)
 
 
 class StreamingBuffer(BytesIO):

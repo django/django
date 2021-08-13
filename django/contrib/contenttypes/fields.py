@@ -1,6 +1,5 @@
 import functools
 import itertools
-import operator
 from collections import defaultdict
 
 from django.contrib.contenttypes.models import ContentType
@@ -14,6 +13,8 @@ from django.db.models.fields.related import (
     ReverseManyToOneDescriptor, lazy_related_operation,
 )
 from django.db.models.query_utils import PathInfo
+from django.db.models.sql import AND
+from django.db.models.sql.where import WhereNode
 from django.utils.functional import cached_property
 
 
@@ -465,13 +466,11 @@ class GenericRelation(ForeignObject):
         return ContentType.objects.get_for_model(self.model,
                                                  for_concrete_model=self.for_concrete_model)
 
-    def get_extra_restriction(self, where_class, alias, remote_alias):
+    def get_extra_restriction(self, alias, remote_alias):
         field = self.remote_field.model._meta.get_field(self.content_type_field_name)
         contenttype_pk = self.get_content_type().pk
-        cond = where_class()
         lookup = field.get_lookup('exact')(field.get_col(remote_alias), contenttype_pk)
-        cond.add(lookup, 'AND')
-        return cond
+        return WhereNode([lookup], connector=AND)
 
     def bulk_related_objects(self, objs, using=DEFAULT_DB_ALIAS):
         """
@@ -571,16 +570,16 @@ def create_generic_related_manager(superclass, rel):
             queryset = queryset.using(queryset._db or self._db)
             # Group instances by content types.
             content_type_queries = (
-                models.Q(**{
-                    '%s__pk' % self.content_type_field_name: content_type_id,
-                    '%s__in' % self.object_id_field_name: {obj.pk for obj in objs}
-                })
+                models.Q(
+                    (f'{self.content_type_field_name}__pk', content_type_id),
+                    (f'{self.object_id_field_name}__in', {obj.pk for obj in objs}),
+                )
                 for content_type_id, objs in itertools.groupby(
                     sorted(instances, key=lambda obj: self.get_content_type(obj).pk),
                     lambda obj: self.get_content_type(obj).pk,
                 )
             )
-            query = functools.reduce(operator.or_, content_type_queries)
+            query = models.Q(*content_type_queries, _connector=models.Q.OR)
             # We (possibly) need to convert object IDs to the type of the
             # instances' PK in order to match up instances:
             object_id_converter = instances[0]._meta.pk.to_python

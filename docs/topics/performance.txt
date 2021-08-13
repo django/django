@@ -166,7 +166,7 @@ produce, or even an entire site.
 
 Implementing caching should not be regarded as an alternative to improving code
 that's performing poorly because it has been written badly. It's one of the
-final steps towards producing well-performing code, not a shortcut.
+final steps toward producing well-performing code, not a shortcut.
 
 :class:`~django.utils.functional.cached_property`
 -------------------------------------------------
@@ -411,7 +411,7 @@ performance gains for your application to outweigh the potential risks.
 With these caveats in mind, you should be aware of:
 
 `PyPy <https://www.pypy.org/>`_
-~~~~~~~~~~~~~~~~~~~~~~~~~~~----
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `PyPy <https://www.pypy.org/>`_ is an implementation of Python in Python itself
 (the 'standard' Python implementation is in C). PyPy can offer substantial

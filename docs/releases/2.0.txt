@@ -306,7 +306,7 @@ Pagination
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* The :djadmin:`runserver` Web server supports HTTP 1.1.
+* The :djadmin:`runserver` web server supports HTTP 1.1.
 
 Templates
 ~~~~~~~~~

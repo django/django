@@ -23,9 +23,9 @@ from django.test import (
 )
 from django.utils import translation
 from django.utils.formats import (
-    date_format, get_format, get_format_modules, iter_format_modules, localize,
-    localize_input, reset_format_cache, sanitize_separators,
-    sanitize_strftime_format, time_format,
+    date_format, get_format, iter_format_modules, localize, localize_input,
+    reset_format_cache, sanitize_separators, sanitize_strftime_format,
+    time_format,
 )
 from django.utils.numberformat import format as nformat
 from django.utils.safestring import SafeString, mark_safe
@@ -1195,13 +1195,6 @@ class FormattingTests(SimpleTestCase):
     def test_get_format_modules_lang(self):
         with translation.override('de', deactivate=True):
             self.assertEqual('.', get_format('DECIMAL_SEPARATOR', lang='en'))
-
-    def test_get_format_modules_stability(self):
-        with self.settings(FORMAT_MODULE_PATH='i18n.other.locale'):
-            with translation.override('de', deactivate=True):
-                old = "%r" % get_format_modules(reverse=True)
-                new = "%r" % get_format_modules(reverse=True)  # second try
-                self.assertEqual(new, old, 'Value returned by get_formats_modules() must be preserved between calls.')
 
     def test_localize_templatetag_and_filter(self):
         """

@@ -337,6 +337,10 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset.non_form_errors(), ['Please submit at most 1 form.'])
+        self.assertEqual(
+            str(formset.non_form_errors()),
+            '<ul class="errorlist nonform"><li>Please submit at most 1 form.</li></ul>',
+        )
 
     def test_formset_validate_min_flag(self):
         """
@@ -359,6 +363,11 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset.non_form_errors(), ['Please submit at least 3 forms.'])
+        self.assertEqual(
+            str(formset.non_form_errors()),
+            '<ul class="errorlist nonform"><li>'
+            'Please submit at least 3 forms.</li></ul>',
+        )
 
     def test_formset_validate_min_unchanged_forms(self):
         """
@@ -542,6 +551,38 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertEqual(formset._errors, [])
         self.assertEqual(len(formset.deleted_forms), 1)
 
+    def test_formset_with_deletion_custom_widget(self):
+        class DeletionAttributeFormSet(BaseFormSet):
+            deletion_widget = HiddenInput
+
+        class DeletionMethodFormSet(BaseFormSet):
+            def get_deletion_widget(self):
+                return HiddenInput(attrs={'class': 'deletion'})
+
+        tests = [
+            (DeletionAttributeFormSet, '<input type="hidden" name="form-0-DELETE">'),
+            (
+                DeletionMethodFormSet,
+                '<input class="deletion" type="hidden" name="form-0-DELETE">',
+            ),
+        ]
+        for formset_class, delete_html in tests:
+            with self.subTest(formset_class=formset_class.__name__):
+                ArticleFormSet = formset_factory(
+                    ArticleForm,
+                    formset=formset_class,
+                    can_delete=True,
+                )
+                formset = ArticleFormSet(auto_id=False)
+                self.assertHTMLEqual(
+                    '\n'.join([form.as_ul() for form in formset.forms]),
+                    (
+                        f'<li>Title: <input type="text" name="form-0-title"></li>'
+                        f'<li>Pub date: <input type="text" name="form-0-pub_date">'
+                        f'{delete_html}</li>'
+                    ),
+                )
+
     def test_formsets_with_ordering(self):
         """
         formset_factory's can_order argument adds an integer field to each
@@ -593,8 +634,8 @@ class FormsFormsetTestCase(SimpleTestCase):
             ],
         )
 
-    def test_formsets_with_order_custom_widget(self):
-        class OrderingAttributFormSet(BaseFormSet):
+    def test_formsets_with_ordering_custom_widget(self):
+        class OrderingAttributeFormSet(BaseFormSet):
             ordering_widget = HiddenInput
 
         class OrderingMethodFormSet(BaseFormSet):
@@ -602,7 +643,7 @@ class FormsFormsetTestCase(SimpleTestCase):
                 return HiddenInput(attrs={'class': 'ordering'})
 
         tests = (
-            (OrderingAttributFormSet, '<input type="hidden" name="form-0-ORDER">'),
+            (OrderingAttributeFormSet, '<input type="hidden" name="form-0-ORDER">'),
             (OrderingMethodFormSet, '<input class="ordering" type="hidden" name="form-0-ORDER">'),
         )
         for formset_class, order_html in tests:
@@ -983,6 +1024,11 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = FavoriteDrinksFormSet(data, prefix='drinks')
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset.non_form_errors(), ['You may only specify a drink once.'])
+        self.assertEqual(
+            str(formset.non_form_errors()),
+            '<ul class="errorlist nonform"><li>'
+            'You may only specify a drink once.</li></ul>',
+        )
 
     def test_formset_iteration(self):
         """Formset instances are iterable."""

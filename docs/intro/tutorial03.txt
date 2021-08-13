@@ -3,7 +3,7 @@ Writing your first Django app, part 3
 =====================================
 
 This tutorial begins where :doc:`Tutorial 2 </intro/tutorial02>` left off. We're
-continuing the Web-poll application and will focus on creating the public
+continuing the web-poll application and will focus on creating the public
 interface -- "views."
 
 .. admonition:: Where to get help:
@@ -14,7 +14,7 @@ interface -- "views."
 Overview
 ========
 
-A view is a "type" of Web page in your Django application that generally serves
+A view is a "type" of web page in your Django application that generally serves
 a specific function and has a specific template. For example, in a blog
 application, you might have the following views:
 
@@ -121,9 +121,10 @@ like so::
 
 The ``question_id=34`` part comes from ``<int:question_id>``. Using angle
 brackets "captures" part of the URL and sends it as a keyword argument to the
-view function. The ``:question_id>`` part of the string defines the name that
-will be used to identify the matched pattern, and the ``<int:`` part is a
+view function. The ``question_id`` part of the string defines the name that
+will be used to identify the matched pattern, and the ``int`` part is a
 converter that determines what patterns should match this part of the URL path.
+The colon (``:``) separates the converter and pattern name.
 
 Write views that actually do something
 ======================================

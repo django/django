@@ -18,6 +18,9 @@ class BlockContext:
         # Dictionary of FIFO queues.
         self.blocks = defaultdict(list)
 
+    def __repr__(self):
+        return f'<{self.__class__.__qualname__}: blocks={self.blocks!r}>'
+
     def add_blocks(self, blocks):
         for name, block in blocks.items():
             self.blocks[name].insert(0, block)
@@ -158,6 +161,9 @@ class IncludeNode(Node):
         self.extra_context = extra_context or {}
         self.isolated_context = isolated_context
         super().__init__(*args, **kwargs)
+
+    def __repr__(self):
+        return f'<{self.__class__.__qualname__}: template={self.template!r}>'
 
     def render(self, context):
         """

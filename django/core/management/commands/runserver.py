@@ -22,7 +22,7 @@ naiveip_re = _lazy_re_compile(r"""^(?:
 
 
 class Command(BaseCommand):
-    help = "Starts a lightweight Web server for development."
+    help = "Starts a lightweight web server for development."
 
     # Validation is called explicitly each time the server is reloaded.
     requires_system_checks = []

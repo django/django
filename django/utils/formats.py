@@ -86,16 +86,13 @@ def iter_format_modules(lang, format_module_path=None):
                 pass
 
 
-def get_format_modules(lang=None, reverse=False):
+def get_format_modules(lang=None):
     """Return a list of the format modules found."""
     if lang is None:
         lang = get_language()
     if lang not in _format_modules_cache:
         _format_modules_cache[lang] = list(iter_format_modules(lang, settings.FORMAT_MODULE_PATH))
-    modules = _format_modules_cache[lang]
-    if reverse:
-        return list(reversed(modules))
-    return modules
+    return _format_modules_cache[lang]
 
 
 def get_format(format_type, lang=None, use_l10n=None):
@@ -171,10 +168,8 @@ def number_format(value, decimal_pos=None, use_l10n=None, force_grouping=False):
     If use_l10n is provided and is not None, it forces the value to
     be localized (or not), overriding the value of settings.USE_L10N.
     """
-    if use_l10n or (use_l10n is None and settings.USE_L10N):
-        lang = get_language()
-    else:
-        lang = None
+    use_l10n = use_l10n or (use_l10n is None and settings.USE_L10N)
+    lang = get_language() if use_l10n else None
     return numberformat.format(
         value,
         get_format('DECIMAL_SEPARATOR', lang, use_l10n=use_l10n),

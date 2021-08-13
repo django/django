@@ -3,7 +3,7 @@ Advanced tutorial: How to write reusable apps
 =============================================
 
 This advanced tutorial begins where :doc:`Tutorial 7 </intro/tutorial07>`
-left off. We'll be turning our Web-poll into a standalone Python package
+left off. We'll be turning our web-poll into a standalone Python package
 you can reuse in new projects and share with other people.
 
 If you haven't recently completed Tutorials 1–7, we encourage you to review
@@ -150,7 +150,7 @@ this. For a small app like polls, this process isn't too difficult.
        Polls
        =====
 
-       Polls is a Django app to conduct Web-based polls. For each question,
+       Polls is a Django app to conduct web-based polls. For each question,
        visitors can choose between a fixed number of answers.
 
        Detailed documentation is in the "docs" directory.
@@ -204,7 +204,7 @@ this. For a small app like polls, this process isn't too difficult.
         [metadata]
         name = django-polls
         version = 0.1
-        description = A Django app to conduct Web-based polls.
+        description = A Django app to conduct web-based polls.
         long_description = file: README.rst
         url = https://www.example.com/
         author = Your Name

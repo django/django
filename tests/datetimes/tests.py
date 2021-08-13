@@ -199,3 +199,16 @@ class DateTimesTests(TestCase):
         Article.objects.create(pub_date=dt, published_on=dt.date(), title="Don't put dates into datetime functions!")
         with self.assertRaisesMessage(ValueError, "Cannot truncate DateField 'published_on' to DateTimeField"):
             list(Article.objects.datetimes('published_on', 'second'))
+
+    def test_datetimes_fails_when_given_invalid_kind_argument(self):
+        msg = (
+            "'kind' must be one of 'year', 'month', 'week', 'day', 'hour', "
+            "'minute', or 'second'."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Article.objects.datetimes('pub_date', 'bad_kind')
+
+    def test_datetimes_fails_when_given_invalid_order_argument(self):
+        msg = "'order' must be either 'ASC' or 'DESC'."
+        with self.assertRaisesMessage(ValueError, msg):
+            Article.objects.datetimes('pub_date', 'year', order='bad order')

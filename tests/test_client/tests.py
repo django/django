@@ -762,6 +762,13 @@ class ClientTest(TestCase):
         response = self.client.get('/django_project_redirect/')
         self.assertRedirects(response, 'https://www.djangoproject.com/', fetch_redirect_response=False)
 
+    def test_external_redirect_without_trailing_slash(self):
+        """
+        Client._handle_redirects() with an empty path.
+        """
+        response = self.client.get('/no_trailing_slash_external_redirect/', follow=True)
+        self.assertRedirects(response, 'https://testserver')
+
     def test_external_redirect_with_fetch_error_msg(self):
         """
         assertRedirects without fetch_redirect_response=False raises
@@ -887,8 +894,11 @@ class ClientTest(TestCase):
         self.assertEqual(response.content, b'temp_file')
 
     def test_uploading_named_temp_file(self):
-        test_file = tempfile.NamedTemporaryFile()
-        response = self.client.post('/upload_view/', data={'named_temp_file': test_file})
+        with tempfile.NamedTemporaryFile() as test_file:
+            response = self.client.post(
+                '/upload_view/',
+                data={'named_temp_file': test_file},
+            )
         self.assertEqual(response.content, b'named_temp_file')
 
 
@@ -1000,6 +1010,10 @@ class AsyncClientTest(TestCase):
                 with self.assertRaisesMessage(NotImplementedError, msg):
                     await method('/redirect_view/', follow=True)
 
+    async def test_get_data(self):
+        response = await self.async_client.get('/get_view/', {'var': 'val'})
+        self.assertContains(response, 'This is a test. val is the value.')
+
 
 @override_settings(ROOT_URLCONF='test_client.urls')
 class AsyncRequestFactoryTest(SimpleTestCase):
@@ -1053,3 +1067,8 @@ class AsyncRequestFactoryTest(SimpleTestCase):
         self.assertIn('HTTP_AUTHORIZATION', request.META)
         self.assertEqual(request.headers['x-another-header'], 'some other value')
         self.assertIn('HTTP_X_ANOTHER_HEADER', request.META)
+
+    def test_request_factory_query_string(self):
+        request = self.request_factory.get('/somewhere/', {'example': 'data'})
+        self.assertNotIn('Query-String', request.headers)
+        self.assertEqual(request.GET['example'], 'data')

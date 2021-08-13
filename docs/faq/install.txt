@@ -23,7 +23,7 @@ required for some use cases, but you'll receive an error about them as they're
 needed.
 
 For a development environment -- if you just want to experiment with Django --
-you don't need to have a separate Web server installed or database server.
+you don't need to have a separate web server installed or database server.
 
 Django comes with its own :djadmin:`lightweight development server<runserver>`.
 For a production environment, Django follows the WSGI spec, :pep:`3333`, which

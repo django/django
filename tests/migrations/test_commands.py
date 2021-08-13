@@ -929,6 +929,15 @@ class MigrateTests(MigrationTestBase):
         recorder.record_applied("migrations", "0001_initial")
         recorder.record_applied("migrations", "0002_second")
         out = io.StringIO()
+        call_command('showmigrations', 'migrations', stdout=out, no_color=True)
+        self.assertEqual(
+            "migrations\n"
+            " [-] 0001_squashed_0002 (2 squashed migrations) "
+            "run 'manage.py migrate' to finish recording.\n",
+            out.getvalue().lower(),
+        )
+
+        out = io.StringIO()
         call_command("migrate", "migrations", verbosity=0)
         call_command("showmigrations", "migrations", stdout=out, no_color=True)
         self.assertEqual(
@@ -941,6 +950,34 @@ class MigrateTests(MigrationTestBase):
             recorder.applied_migrations()
         )
         # No changes were actually applied so there is nothing to rollback
+
+    def test_migrate_partially_applied_squashed_migration(self):
+        """
+        Migrating to a squashed migration specified by name should succeed
+        even if it is partially applied.
+        """
+        with self.temporary_migration_module(module='migrations.test_migrations'):
+            recorder = MigrationRecorder(connection)
+            try:
+                call_command('migrate', 'migrations', '0001_initial', verbosity=0)
+                call_command(
+                    'squashmigrations',
+                    'migrations',
+                    '0002',
+                    interactive=False,
+                    verbosity=0,
+                )
+                call_command(
+                    'migrate',
+                    'migrations',
+                    '0001_squashed_0002_second',
+                    verbosity=0,
+                )
+                applied_migrations = recorder.applied_migrations()
+                self.assertIn(('migrations', '0002_second'), applied_migrations)
+            finally:
+                # Unmigrate everything.
+                call_command('migrate', 'migrations', 'zero', verbosity=0)
 
     @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations'})
     def test_migrate_inconsistent_history(self):

@@ -81,7 +81,7 @@ Understand cached attributes
 
 As well as caching of the whole ``QuerySet``, there is caching of the result of
 attributes on ORM objects. In general, attributes that are not callable will be
-cached. For example, assuming the :ref:`example Weblog models
+cached. For example, assuming the :ref:`example blog models
 <queryset-model-example>`::
 
   >>> entry = Entry.objects.get(id=1)
@@ -164,7 +164,7 @@ First, the query will be quicker because of the underlying database index.
 Also, the query could run much slower if multiple objects match the lookup;
 having a unique constraint on the column guarantees this will never happen.
 
-So using the :ref:`example Weblog models <queryset-model-example>`::
+So using the :ref:`example blog models <queryset-model-example>`::
 
   >>> entry = Entry.objects.get(id=10)
 

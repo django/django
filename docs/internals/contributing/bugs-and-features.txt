@@ -143,7 +143,7 @@ seriously. After a suitable voting period, if an obvious consensus arises we'll
 follow the votes.
 
 However, consensus is not always possible. If consensus cannot be reached, or
-if the discussion towards a consensus fizzles out without a concrete decision,
+if the discussion toward a consensus fizzles out without a concrete decision,
 the decision may be deferred to the :ref:`technical board <technical-board>`.
 
 Internally, the technical board will use the same voting mechanism. A
@@ -164,4 +164,4 @@ Votes on technical matters should be announced and held in public on the
 
 .. _searching: https://code.djangoproject.com/search
 .. _custom queries: https://code.djangoproject.com/query
-.. _#django: irc://irc.libera.chat/django
+.. _#django: https://web.libera.chat/#django

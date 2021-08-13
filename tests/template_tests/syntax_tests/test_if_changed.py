@@ -125,11 +125,11 @@ class IfChangedTagTests(SimpleTestCase):
         self.assertEqual(output, '1-first,1-other,2-first,2-other,2-other,3-first,')
 
     @setup({'ifchanged-else02': '{% for id in ids %}{{ id }}-'
-                                '{% ifchanged id %}{% cycle "red" "blue" %}{% else %}grey{% endifchanged %}'
+                                '{% ifchanged id %}{% cycle "red" "blue" %}{% else %}gray{% endifchanged %}'
                                 ',{% endfor %}'})
     def test_ifchanged_else02(self):
         output = self.engine.render_to_string('ifchanged-else02', {'ids': [1, 1, 2, 2, 2, 3]})
-        self.assertEqual(output, '1-red,1-grey,2-blue,2-grey,2-grey,3-red,')
+        self.assertEqual(output, '1-red,1-gray,2-blue,2-gray,2-gray,3-red,')
 
     @setup({'ifchanged-else03': '{% for id in ids %}{{ id }}'
                                 '{% ifchanged id %}-{% cycle "red" "blue" %}{% else %}{% endifchanged %}'

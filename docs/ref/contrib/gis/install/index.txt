@@ -292,7 +292,7 @@ Download the framework packages for:
 Install the packages in the order they are listed above, as the GDAL and SQLite
 packages require the packages listed before them.
 
-Afterwards, you can also install the KyngChaos binary packages for `PostgreSQL
+Afterward, you can also install the KyngChaos binary packages for `PostgreSQL
 and PostGIS`__.
 
 After installing the binary packages, you'll want to add the following to
@@ -484,7 +484,7 @@ Install Django and set up database
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :ref:`install Django <installing-official-release>` on your system. It is
-recommended that you create a :doc:`virtural environment
+recommended that you create a :doc:`virtual environment
 <python:tutorial/venv>` for each project you create.
 
 psycopg2

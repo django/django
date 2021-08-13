@@ -1,8 +1,8 @@
-import datetime
 import re
 
+from django.core.exceptions import ValidationError
 from django.forms.utils import flatatt, pretty_name
-from django.forms.widgets import Textarea, TextInput
+from django.forms.widgets import MultiWidget, Textarea, TextInput
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html, html_safe
 from django.utils.safestring import mark_safe
@@ -118,7 +118,7 @@ class BoundField:
         """
         Return the data for this BoundField, or None if it wasn't given.
         """
-        return self.field.widget.value_from_datadict(self.form.data, self.form.files, self.html_name)
+        return self.form._widget_data_value(self.field.widget, self.html_name)
 
     def value(self):
         """
@@ -129,6 +129,22 @@ class BoundField:
         if self.form.is_bound:
             data = self.field.bound_data(self.data, data)
         return self.field.prepare_value(data)
+
+    def _has_changed(self):
+        field = self.field
+        if field.show_hidden_initial:
+            hidden_widget = field.hidden_widget()
+            initial_value = self.form._widget_data_value(
+                hidden_widget, self.html_initial_name,
+            )
+            try:
+                initial_value = field.to_python(initial_value)
+            except ValidationError:
+                # Always assume data has changed if validation fails.
+                return True
+        else:
+            initial_value = self.initial
+        return field.has_changed(initial_value, self.data)
 
     def label_tag(self, contents=None, attrs=None, label_suffix=None):
         """
@@ -211,19 +227,23 @@ class BoundField:
 
     @cached_property
     def initial(self):
-        data = self.form.get_initial_for_field(self.field, self.name)
-        # If this is an auto-generated default date, nix the microseconds for
-        # standardized handling. See #22502.
-        if (isinstance(data, (datetime.datetime, datetime.time)) and
-                not self.field.widget.supports_microseconds):
-            data = data.replace(microsecond=0)
-        return data
+        return self.form.get_initial_for_field(self.field, self.name)
 
     def build_widget_attrs(self, attrs, widget=None):
         widget = widget or self.field.widget
         attrs = dict(attrs)  # Copy attrs to avoid modifying the argument.
         if widget.use_required_attribute(self.initial) and self.field.required and self.form.use_required_attribute:
-            attrs['required'] = True
+            # MultiValueField has require_all_fields: if False, fall back
+            # on subfields.
+            if (
+                hasattr(self.field, 'require_all_fields') and
+                not self.field.require_all_fields and
+                isinstance(self.field.widget, MultiWidget)
+            ):
+                for subfield, subwidget in zip(self.field.fields, widget.widgets):
+                    subwidget.attrs['required'] = subwidget.use_required_attribute(self.initial) and subfield.required
+            else:
+                attrs['required'] = True
         if self.field.disabled:
             attrs['disabled'] = True
         return attrs
@@ -267,7 +287,7 @@ class BoundWidget:
 
     @property
     def id_for_label(self):
-        return 'id_%s_%s' % (self.data['name'], self.data['index'])
+        return self.data['attrs'].get('id')
 
     @property
     def choice_label(self):

@@ -477,12 +477,18 @@ class NonAutocommitTests(TransactionTestCase):
 
     available_apps = []
 
+    def setUp(self):
+        transaction.set_autocommit(False)
+
+    def tearDown(self):
+        transaction.rollback()
+        transaction.set_autocommit(True)
+
     def test_orm_query_after_error_and_rollback(self):
         """
         ORM queries are allowed after an error and a rollback in non-autocommit
         mode (#27504).
         """
-        transaction.set_autocommit(False)
         r1 = Reporter.objects.create(first_name='Archibald', last_name='Haddock')
         r2 = Reporter(first_name='Cuthbert', last_name='Calculus', id=r1.id)
         with self.assertRaises(IntegrityError):
@@ -492,12 +498,7 @@ class NonAutocommitTests(TransactionTestCase):
 
     def test_orm_query_without_autocommit(self):
         """#24921 -- ORM queries must be possible after set_autocommit(False)."""
-        transaction.set_autocommit(False)
-        try:
-            Reporter.objects.create(first_name="Tintin")
-        finally:
-            transaction.rollback()
-            transaction.set_autocommit(True)
+        Reporter.objects.create(first_name="Tintin")
 
 
 class DurableTests(TransactionTestCase):

@@ -123,7 +123,7 @@ corresponds to the projection system that will be used to interpret the data
 in the spatial database. [#fnsrid]_  Projection systems give the context to the
 coordinates that specify a location.  Although the details of `geodesy`__ are
 beyond the scope of this documentation, the general problem is that the earth
-is spherical and representations of the earth (e.g., paper maps, Web maps)
+is spherical and representations of the earth (e.g., paper maps, web maps)
 are not.
 
 Most people are familiar with using latitude and longitude to reference a

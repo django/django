@@ -32,7 +32,7 @@ class ActiveTranslationField(models.ForeignObject):
     """
     requires_unique_target = False
 
-    def get_extra_restriction(self, where_class, alias, related_alias):
+    def get_extra_restriction(self, alias, related_alias):
         return ColConstraint(alias, 'lang', get_language())
 
     def get_extra_descriptor_filter(self, instance):

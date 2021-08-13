@@ -86,7 +86,7 @@ Other topics
     application. Let's take a look at an example of the ``ModelAdmin``::
 
         from django.contrib import admin
-        from myproject.myapp.models import Author
+        from myapp.models import Author
 
         class AuthorAdmin(admin.ModelAdmin):
             pass
@@ -102,7 +102,7 @@ Other topics
         preceding example could be simplified to::
 
             from django.contrib import admin
-            from myproject.myapp.models import Author
+            from myapp.models import Author
 
             admin.site.register(Author)
 
@@ -1381,6 +1381,13 @@ subclass::
 
         Support for searching against quoted phrases with spaces was added.
 
+.. attribute:: ModelAdmin.search_help_text
+
+    .. versionadded:: 4.0
+
+    Set ``search_help_text`` to specify a descriptive text for the search box
+    which will be displayed below it.
+
 .. attribute:: ModelAdmin.show_full_result_count
 
     Set ``show_full_result_count`` to control whether the full count of objects
@@ -2265,7 +2272,7 @@ Adding custom validation to the admin
 
 You can also add custom validation of data in the admin. The automatic admin
 interface reuses :mod:`django.forms`, and the ``ModelAdmin`` class gives you
-the ability define your own form::
+the ability to define your own form::
 
     class ArticleAdmin(admin.ModelAdmin):
         form = MyArticleAdminForm
@@ -2716,7 +2723,7 @@ any other inline. In your ``admin.py`` for this example app::
     from django.contrib import admin
     from django.contrib.contenttypes.admin import GenericTabularInline
 
-    from myproject.myapp.models import Image, Product
+    from myapp.models import Image, Product
 
     class ImageInline(GenericTabularInline):
         model = Image
@@ -3452,7 +3459,7 @@ The ``staff_member_required`` decorator
 .. function:: staff_member_required(redirect_field_name='next', login_url='admin:login')
 
     This decorator is used on the admin views that require authorization. A
-    view decorated with this function will having the following behavior:
+    view decorated with this function will have the following behavior:
 
     * If the user is logged in, is a staff member (``User.is_staff=True``), and
       is active (``User.is_active=True``), execute the view normally.

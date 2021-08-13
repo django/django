@@ -3,7 +3,7 @@ import re
 from django.forms import CharField, Form, Media
 from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import (
-    CsrfViewMiddleware, _compare_masked_tokens as equivalent_tokens, get_token,
+    CsrfViewMiddleware, _does_token_match as equivalent_tokens, get_token,
 )
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.template.backends.dummy import TemplateStrings

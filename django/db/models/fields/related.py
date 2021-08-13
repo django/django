@@ -89,6 +89,18 @@ class RelatedField(FieldCacheMixin, Field):
     many_to_many = False
     many_to_one = False
 
+    def __init__(
+        self,
+        related_name=None,
+        related_query_name=None,
+        limit_choices_to=None,
+        **kwargs,
+    ):
+        self._related_name = related_name
+        self._related_query_name = related_query_name
+        self._limit_choices_to = limit_choices_to
+        super().__init__(**kwargs)
+
     @cached_property
     def related_model(self):
         # Can't cache this property until all the models are loaded.
@@ -319,12 +331,12 @@ class RelatedField(FieldCacheMixin, Field):
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
-        if self.remote_field.limit_choices_to:
-            kwargs['limit_choices_to'] = self.remote_field.limit_choices_to
-        if self.remote_field.related_name is not None:
-            kwargs['related_name'] = self.remote_field.related_name
-        if self.remote_field.related_query_name is not None:
-            kwargs['related_query_name'] = self.remote_field.related_query_name
+        if self._limit_choices_to:
+            kwargs['limit_choices_to'] = self._limit_choices_to
+        if self._related_name is not None:
+            kwargs['related_name'] = self._related_name
+        if self._related_query_name is not None:
+            kwargs['related_query_name'] = self._related_query_name
         return name, path, args, kwargs
 
     def get_forward_related_filter(self, obj):
@@ -347,12 +359,12 @@ class RelatedField(FieldCacheMixin, Field):
         select all instances of self.related_field.model related through
         this field to obj. obj is an instance of self.model.
         """
-        base_filter = {
-            rh_field.attname: getattr(obj, lh_field.attname)
+        base_filter = (
+            (rh_field.attname, getattr(obj, lh_field.attname))
             for lh_field, rh_field in self.related_fields
-        }
+        )
         descriptor_filter = self.get_extra_descriptor_filter(obj)
-        base_q = Q(**base_filter)
+        base_q = Q(*base_filter)
         if isinstance(descriptor_filter, dict):
             return base_q & Q(**descriptor_filter)
         elif descriptor_filter:
@@ -471,7 +483,13 @@ class ForeignObject(RelatedField):
                 on_delete=on_delete,
             )
 
-        super().__init__(rel=rel, **kwargs)
+        super().__init__(
+            rel=rel,
+            related_name=related_name,
+            related_query_name=related_query_name,
+            limit_choices_to=limit_choices_to,
+            **kwargs,
+        )
 
         self.from_fields = from_fields
         self.to_fields = to_fields
@@ -693,7 +711,7 @@ class ForeignObject(RelatedField):
         """
         return {}
 
-    def get_extra_restriction(self, where_class, alias, related_alias):
+    def get_extra_restriction(self, alias, related_alias):
         """
         Return a pair condition used for joining and subquery pushdown. The
         condition is something that responds to as_sql(compiler, connection)
@@ -797,13 +815,13 @@ class ForeignKey(ForeignObject):
         try:
             to._meta.model_name
         except AttributeError:
-            assert isinstance(to, str), (
-                "%s(%r) is invalid. First parameter to ForeignKey must be "
-                "either a model, a model name, or the string %r" % (
-                    self.__class__.__name__, to,
-                    RECURSIVE_RELATIONSHIP_CONSTANT,
+            if not isinstance(to, str):
+                raise TypeError(
+                    '%s(%r) is invalid. First parameter to ForeignKey must be '
+                    'either a model, a model name, or the string %r' % (
+                        self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT,
+                    )
                 )
-            )
         else:
             # For backwards compatibility purposes, we need to *try* and set
             # the to_field during FK construction. It won't be guaranteed to
@@ -825,6 +843,9 @@ class ForeignKey(ForeignObject):
         super().__init__(
             to,
             on_delete,
+            related_name=related_name,
+            related_query_name=related_query_name,
+            limit_choices_to=limit_choices_to,
             from_fields=[RECURSIVE_RELATIONSHIP_CONSTANT],
             to_fields=[to_field],
             **kwargs,
@@ -1148,18 +1169,20 @@ class ManyToManyField(RelatedField):
         try:
             to._meta
         except AttributeError:
-            assert isinstance(to, str), (
-                "%s(%r) is invalid. First parameter to ManyToManyField must be "
-                "either a model, a model name, or the string %r" %
-                (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
-            )
+            if not isinstance(to, str):
+                raise TypeError(
+                    '%s(%r) is invalid. First parameter to ManyToManyField '
+                    'must be either a model, a model name, or the string %r' % (
+                        self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT,
+                    )
+                )
 
         if symmetrical is None:
             symmetrical = (to == RECURSIVE_RELATIONSHIP_CONSTANT)
 
-        if through is not None:
-            assert db_table is None, (
-                "Cannot specify a db_table if an intermediary model is used."
+        if through is not None and db_table is not None:
+            raise ValueError(
+                'Cannot specify a db_table if an intermediary model is used.'
             )
 
         kwargs['rel'] = self.rel_class(
@@ -1174,7 +1197,12 @@ class ManyToManyField(RelatedField):
         )
         self.has_null_arg = 'null' in kwargs
 
-        super().__init__(**kwargs)
+        super().__init__(
+            related_name=related_name,
+            related_query_name=related_query_name,
+            limit_choices_to=limit_choices_to,
+            **kwargs,
+        )
 
         self.db_table = db_table
         self.swappable = swappable
@@ -1227,6 +1255,16 @@ class ManyToManyField(RelatedField):
                     'with a through model.',
                     obj=self,
                     id='fields.W343',
+                )
+            )
+
+        if self.remote_field.symmetrical and self._related_name:
+            warnings.append(
+                checks.Warning(
+                    'related_name has no effect on ManyToManyField '
+                    'with a symmetrical relationship, e.g. to "self".',
+                    obj=self,
+                    id='fields.W345',
                 )
             )
 

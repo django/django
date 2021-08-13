@@ -1,6 +1,7 @@
 """
 Unit tests for reverse URL lookups.
 """
+import pickle
 import sys
 import threading
 
@@ -271,8 +272,9 @@ class NoURLPatternsTests(SimpleTestCase):
         with self.assertRaisesMessage(
             ImproperlyConfigured,
             "The included URLconf 'urlpatterns_reverse.no_urls' does not "
-            "appear to have any patterns in it. If you see valid patterns in "
-            "the file then the issue is probably caused by a circular import."
+            "appear to have any patterns in it. If you see the 'urlpatterns' "
+            "variable with valid patterns in the file then the issue is "
+            "probably caused by a circular import."
         ):
             getattr(resolver, 'url_patterns')
 
@@ -1095,8 +1097,9 @@ class NoRootUrlConfTests(SimpleTestCase):
     def test_no_handler_exception(self):
         msg = (
             "The included URLconf 'None' does not appear to have any patterns "
-            "in it. If you see valid patterns in the file then the issue is "
-            "probably caused by a circular import."
+            "in it. If you see the 'urlpatterns' variable with valid patterns "
+            "in the file then the issue is probably caused by a circular "
+            "import."
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.client.get('/test/me/')
@@ -1164,6 +1167,12 @@ class ResolverMatchTests(SimpleTestCase):
                     f"url_name='{name}', app_names=[], namespaces=[], "
                     f"route='{name}/')",
                 )
+
+    @override_settings(ROOT_URLCONF='urlpatterns.path_urls')
+    def test_pickling(self):
+        msg = 'Cannot pickle ResolverMatch.'
+        with self.assertRaisesMessage(pickle.PicklingError, msg):
+            pickle.dumps(resolve('/users/'))
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.erroneous_urls')

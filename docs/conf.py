@@ -65,6 +65,7 @@ linkcheck_ignore = [
     r'^https://www\.google\.com/webmasters/tools/ping',
     r'^https://search\.google\.com/search-console/welcome',
     # Fragments used to dynamically switch content or populate fields.
+    r'^https://web\.libera\.chat/#',
     r'^https://github\.com/[^#]+#L\d+-L\d+$',
     r'^https://help\.apple\.com/itc/podcasts_connect/#/itc',
     # Anchors on certain pages with missing a[name] attributes.
@@ -264,7 +265,6 @@ modindex_common_prefix = ["django."]
 # Appended to every page
 rst_epilog = """
 .. |django-users| replace:: :ref:`django-users <django-users-mailing-list>`
-.. |django-core-mentorship| replace:: :ref:`django-core-mentorship <django-core-mentorship-mailing-list>`
 .. |django-developers| replace:: :ref:`django-developers <django-developers-mailing-list>`
 .. |django-announce| replace:: :ref:`django-announce <django-announce-mailing-list>`
 .. |django-updates| replace:: :ref:`django-updates <django-updates-mailing-list>`
@@ -317,7 +317,7 @@ latex_documents = [
 man_pages = [(
     'ref/django-admin',
     'django-admin',
-    'Utility script for the Django Web framework',
+    'Utility script for the Django web framework',
     ['Django Software Foundation'],
     1
 )]

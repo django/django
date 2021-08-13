@@ -161,10 +161,11 @@ class Index:
             column_names[0][:7],
             '%s_%s' % (names_digest(*hash_data, length=6), self.suffix),
         )
-        assert len(self.name) <= self.max_name_length, (
-            'Index too long for multiple database support. Is self.suffix '
-            'longer than 3 characters?'
-        )
+        if len(self.name) > self.max_name_length:
+            raise ValueError(
+                'Index too long for multiple database support. Is self.suffix '
+                'longer than 3 characters?'
+            )
         if self.name[0] == '_' or self.name[0].isdigit():
             self.name = 'D%s' % self.name[1:]
 

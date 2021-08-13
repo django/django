@@ -2,7 +2,7 @@
 URL dispatcher
 ==============
 
-A clean, elegant URL scheme is an important detail in a high-quality Web
+A clean, elegant URL scheme is an important detail in a high-quality web
 application. Django lets you design URLs however you want, with no framework
 limitations.
 

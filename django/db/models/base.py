@@ -947,12 +947,12 @@ class Model(metaclass=ModelBase):
                     field.delete_cached_value(self)
 
     def delete(self, using=None, keep_parents=False):
+        if self.pk is None:
+            raise ValueError(
+                "%s object can't be deleted because its %s attribute is set "
+                "to None." % (self._meta.object_name, self._meta.pk.attname)
+            )
         using = using or router.db_for_write(self.__class__, instance=self)
-        assert self.pk is not None, (
-            "%s object can't be deleted because its %s attribute is set to None." %
-            (self._meta.object_name, self._meta.pk.attname)
-        )
-
         collector = Collector(using=using)
         collector.collect([self], keep_parents=keep_parents)
         return collector.delete()
@@ -971,8 +971,8 @@ class Model(metaclass=ModelBase):
         op = 'gt' if is_next else 'lt'
         order = '' if is_next else '-'
         param = getattr(self, field.attname)
-        q = Q(**{'%s__%s' % (field.name, op): param})
-        q = q | Q(**{field.name: param, 'pk__%s' % op: self.pk})
+        q = Q((field.name, param), (f'pk__{op}', self.pk), _connector=Q.AND)
+        q = Q(q, (f'{field.name}__{op}', param), _connector=Q.OR)
         qs = self.__class__._default_manager.using(self._state.db).filter(**kwargs).filter(q).order_by(
             '%s%s' % (order, field.name), '%spk' % order
         )
@@ -1310,6 +1310,7 @@ class Model(metaclass=ModelBase):
                 cls._meta.pk.remote_field.parent_link
             ) and
             not settings.is_overridden('DEFAULT_AUTO_FIELD') and
+            cls._meta.app_config and
             not cls._meta.app_config._is_default_auto_field_overridden
         ):
             return [

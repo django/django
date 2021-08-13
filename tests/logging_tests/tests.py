@@ -53,13 +53,8 @@ class SetupDefaultLoggingMixin:
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls._logging = settings.LOGGING
         logging.config.dictConfig(DEFAULT_LOGGING)
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        logging.config.dictConfig(cls._logging)
+        cls.addClassCleanup(logging.config.dictConfig, settings.LOGGING)
 
 
 class DefaultLoggingTests(SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleTestCase):

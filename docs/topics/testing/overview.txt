@@ -235,9 +235,9 @@ the Django test runner reorders tests in the following way:
     for quicker feedback. This includes things like test modules that couldn't
     be found or that couldn't be loaded due to syntax errors.
 
-You may reverse the execution order inside groups using the :option:`test
---reverse` option. This can help with ensuring your tests are independent from
-each other.
+You may randomize and/or reverse the execution order inside groups using the
+:option:`test --shuffle` and :option:`--reverse <test --reverse>` options. This
+can help with ensuring your tests are independent from each other.
 
 .. versionchanged:: 4.0
 

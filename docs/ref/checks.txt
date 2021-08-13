@@ -313,6 +313,8 @@ Related fields
   with a ``through`` model.
 * **fields.W344**: The field's intermediary table ``<table name>`` clashes with
   the table name of ``<model>``/``<model>.<field name>``.
+* **fields.W345**: ``related_name`` has no effect on ``ManyToManyField`` with a
+  symmetrical relationship, e.g. to "self".
 
 Models
 ------
@@ -584,6 +586,8 @@ The following checks are performed on your URL configuration:
   take the correct number of arguments (…).
 * **urls.E008**: The custom ``handlerXXX`` view ``'path.to.view'`` could not be
   imported.
+* **urls.E009**: Your URL pattern ``<pattern>`` has an invalid view, pass
+  ``<view>.as_view()`` instead of ``<view>``.
 
 ``contrib`` app checks
 ======================

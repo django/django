@@ -40,6 +40,7 @@ from django.test import (
     ignore_warnings, override_settings,
 )
 from django.test.signals import setting_changed
+from django.test.utils import CaptureQueriesContext
 from django.utils import timezone, translation
 from django.utils.cache import (
     get_cache_key, learn_cache_key, patch_cache_control, patch_vary_headers,
@@ -1116,6 +1117,18 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         cache.set_many({'a': 1, 'b': 2, 'c': 3})
         with self.assertNumQueries(1):
             cache.delete_many(['a', 'b', 'c'])
+
+    def test_cull_count_queries(self):
+        old_max_entries = cache._max_entries
+        # Force _cull to delete on first cached record.
+        cache._max_entries = -1
+        with CaptureQueriesContext(connection) as captured_queries:
+            try:
+                cache.set('force_cull', 'value', 1000)
+            finally:
+                cache._max_entries = old_max_entries
+        num_count_queries = sum('COUNT' in query['sql'] for query in captured_queries)
+        self.assertEqual(num_count_queries, 1)
 
     def test_delete_cursor_rowcount(self):
         """

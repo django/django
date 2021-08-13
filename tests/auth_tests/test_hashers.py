@@ -4,7 +4,8 @@ from django.conf.global_settings import PASSWORD_HASHERS
 from django.contrib.auth.hashers import (
     UNUSABLE_PASSWORD_PREFIX, UNUSABLE_PASSWORD_SUFFIX_LENGTH,
     BasePasswordHasher, BCryptPasswordHasher, BCryptSHA256PasswordHasher,
-    PBKDF2PasswordHasher, PBKDF2SHA1PasswordHasher, check_password, get_hasher,
+    MD5PasswordHasher, PBKDF2PasswordHasher, PBKDF2SHA1PasswordHasher,
+    ScryptPasswordHasher, SHA1PasswordHasher, check_password, get_hasher,
     identify_hasher, is_password_usable, make_password,
 )
 from django.test import SimpleTestCase
@@ -474,6 +475,37 @@ class TestUtilsHashPass(SimpleTestCase):
             check_password('wrong_password', encoded)
             self.assertEqual(hasher.harden_runtime.call_count, 1)
 
+    def test_encode_invalid_salt(self):
+        hasher_classes = [
+            MD5PasswordHasher,
+            PBKDF2PasswordHasher,
+            PBKDF2SHA1PasswordHasher,
+            ScryptPasswordHasher,
+            SHA1PasswordHasher,
+        ]
+        msg = 'salt must be provided and cannot contain $.'
+        for hasher_class in hasher_classes:
+            hasher = hasher_class()
+            for salt in [None, '', 'sea$salt']:
+                with self.subTest(hasher_class.__name__, salt=salt):
+                    with self.assertRaisesMessage(ValueError, msg):
+                        hasher.encode('password', salt)
+
+    def test_encode_password_required(self):
+        hasher_classes = [
+            MD5PasswordHasher,
+            PBKDF2PasswordHasher,
+            PBKDF2SHA1PasswordHasher,
+            ScryptPasswordHasher,
+            SHA1PasswordHasher,
+        ]
+        msg = 'password must be provided.'
+        for hasher_class in hasher_classes:
+            hasher = hasher_class()
+            with self.subTest(hasher_class.__name__):
+                with self.assertRaisesMessage(TypeError, msg):
+                    hasher.encode(None, 'seasalt')
+
 
 class BasePasswordHasherTests(SimpleTestCase):
     not_implemented_msg = 'subclasses of BasePasswordHasher must provide %s() method'
@@ -632,3 +664,78 @@ class TestUtilsHashPassArgon2(SimpleTestCase):
             self.assertTrue(state['upgraded'])
         finally:
             setattr(hasher, attr, old_value)
+
+
+@override_settings(PASSWORD_HASHERS=PASSWORD_HASHERS)
+class TestUtilsHashPassScrypt(SimpleTestCase):
+
+    def test_scrypt(self):
+        encoded = make_password('lètmein', 'seasalt', 'scrypt')
+        self.assertEqual(
+            encoded,
+            'scrypt$16384$seasalt$8$1$Qj3+9PPyRjSJIebHnG81TMjsqtaIGxNQG/aEB/NY'
+            'afTJ7tibgfYz71m0ldQESkXFRkdVCBhhY8mx7rQwite/Pw=='
+        )
+        self.assertIs(is_password_usable(encoded), True)
+        self.assertIs(check_password('lètmein', encoded), True)
+        self.assertIs(check_password('lètmeinz', encoded), False)
+        self.assertEqual(identify_hasher(encoded).algorithm, "scrypt")
+        # Blank passwords.
+        blank_encoded = make_password('', 'seasalt', 'scrypt')
+        self.assertIs(blank_encoded.startswith('scrypt$'), True)
+        self.assertIs(is_password_usable(blank_encoded), True)
+        self.assertIs(check_password('', blank_encoded), True)
+        self.assertIs(check_password(' ', blank_encoded), False)
+
+    def test_scrypt_decode(self):
+        encoded = make_password('lètmein', 'seasalt', 'scrypt')
+        hasher = get_hasher('scrypt')
+        decoded = hasher.decode(encoded)
+        tests = [
+            ('block_size', hasher.block_size),
+            ('parallelism', hasher.parallelism),
+            ('salt', 'seasalt'),
+            ('work_factor', hasher.work_factor),
+        ]
+        for key, excepted in tests:
+            with self.subTest(key=key):
+                self.assertEqual(decoded[key], excepted)
+
+    def _test_scrypt_upgrade(self, attr, summary_key, new_value):
+        hasher = get_hasher('scrypt')
+        self.assertEqual(hasher.algorithm, 'scrypt')
+        self.assertNotEqual(getattr(hasher, attr), new_value)
+
+        old_value = getattr(hasher, attr)
+        try:
+            # Generate hash with attr set to the new value.
+            setattr(hasher, attr, new_value)
+            encoded = make_password('lètmein', 'seasalt', 'scrypt')
+            attr_value = hasher.safe_summary(encoded)[summary_key]
+            self.assertEqual(attr_value, new_value)
+
+            state = {'upgraded': False}
+
+            def setter(password):
+                state['upgraded'] = True
+
+            # No update is triggered.
+            self.assertIs(check_password('lètmein', encoded, setter, 'scrypt'), True)
+            self.assertIs(state['upgraded'], False)
+            # Revert to the old value.
+            setattr(hasher, attr, old_value)
+            # Password is updated.
+            self.assertIs(check_password('lètmein', encoded, setter, 'scrypt'), True)
+            self.assertIs(state['upgraded'], True)
+        finally:
+            setattr(hasher, attr, old_value)
+
+    def test_scrypt_upgrade(self):
+        tests = [
+            ('work_factor', 'work factor', 2 ** 11),
+            ('block_size', 'block size', 10),
+            ('parallelism', 'parallelism', 2),
+        ]
+        for attr, summary_key, new_value in tests:
+            with self.subTest(attr=attr):
+                self._test_scrypt_upgrade(attr, summary_key, new_value)

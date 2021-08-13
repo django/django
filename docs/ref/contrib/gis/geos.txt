@@ -87,7 +87,7 @@ Finally, there is the :func:`fromfile` factory method which returns a
 .. admonition:: My logs are filled with GEOS-related errors
 
     You find many ``TypeError`` or ``AttributeError`` exceptions filling your
-    Web server's log files. This generally means that you are creating GEOS
+    web server's log files. This generally means that you are creating GEOS
     objects at the top level of some of your Python modules. Then, due to a race
     condition in the garbage collector, your module is garbage collected before
     the GEOS object. To prevent this, create :class:`GEOSGeometry` objects

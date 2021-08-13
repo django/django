@@ -23,7 +23,7 @@ from django.test.utils import extend_sys_path
 from django.utils import autoreload
 from django.utils.autoreload import WatchmanUnavailable
 
-from .test_module import __main__ as test_main
+from .test_module import __main__ as test_main, main_module as test_main_module
 from .utils import on_macos_with_hfs
 
 
@@ -182,6 +182,15 @@ class TestChildArguments(SimpleTestCase):
             [sys.executable, '-m', 'utils_tests.test_module', 'runserver'],
         )
 
+    @mock.patch.dict(sys.modules, {'__main__': test_main_module})
+    @mock.patch('sys.argv', [test_main.__file__, 'runserver'])
+    @mock.patch('sys.warnoptions', [])
+    def test_run_as_non_django_module_non_package(self):
+        self.assertEqual(
+            autoreload.get_child_arguments(),
+            [sys.executable, '-m', 'utils_tests.test_module.main_module', 'runserver'],
+        )
+
     @mock.patch('sys.argv', [__file__, 'runserver'])
     @mock.patch('sys.warnoptions', ['error'])
     def test_warnoptions(self):
@@ -218,6 +227,17 @@ class TestChildArguments(SimpleTestCase):
         msg = 'Script does-not-exist does not exist.'
         with self.assertRaisesMessage(RuntimeError, msg):
             autoreload.get_child_arguments()
+
+    @mock.patch('sys.argv', [__file__, 'runserver'])
+    @mock.patch('sys.warnoptions', [])
+    def test_module_no_spec(self):
+        module = types.ModuleType('test_module')
+        del module.__spec__
+        with mock.patch.dict(sys.modules, {'__main__': module}):
+            self.assertEqual(
+                autoreload.get_child_arguments(),
+                [sys.executable, __file__, 'runserver']
+            )
 
 
 class TestUtilities(SimpleTestCase):
@@ -664,7 +684,7 @@ class WatchmanReloaderTests(ReloaderTests, IntegrationTests):
     def setUp(self):
         super().setUp()
         # Shorten the timeout to speed up tests.
-        self.reloader.client_timeout = 0.1
+        self.reloader.client_timeout = int(os.environ.get('DJANGO_WATCHMAN_TIMEOUT', 2))
 
     def test_watch_glob_ignores_non_existing_directories_two_levels(self):
         with mock.patch.object(self.reloader, '_subscribe') as mocked_subscribe:

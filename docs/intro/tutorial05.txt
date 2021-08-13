@@ -3,7 +3,7 @@ Writing your first Django app, part 5
 =====================================
 
 This tutorial begins where :doc:`Tutorial 4 </intro/tutorial04>` left off.
-We've built a Web-poll application, and we'll now create some automated tests
+We've built a web-poll application, and we'll now create some automated tests
 for it.
 
 .. admonition:: Where to get help:

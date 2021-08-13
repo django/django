@@ -134,6 +134,16 @@ class CheckUrlConfigTests(SimpleTestCase):
         result = check_url_namespaces_unique(None)
         self.assertEqual(result, [])
 
+    @override_settings(ROOT_URLCONF='check_framework.urls.cbv_as_view')
+    def test_check_view_not_class(self):
+        self.assertEqual(check_url_config(None), [
+            Error(
+                "Your URL pattern 'missing_as_view' has an invalid view, pass "
+                "EmptyCBV.as_view() instead of EmptyCBV.",
+                id='urls.E009',
+            ),
+        ])
+
 
 class UpdatedToPathTests(SimpleTestCase):
 

@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015,2020
+# Aarni Koskela, 2015,2020-2021
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2014
 msgid ""
@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-15 11:34+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2021-04-14 12:18+0000\n"
+"Last-Translator: Aarni Koskela\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -42,6 +42,8 @@ msgid ""
 "This can be either an absolute path (as above) or a full URL starting with a "
 "scheme such as “https://”."
 msgstr ""
+"Tässä on käytettävä joko absoluuttista polkua (kuten yllä) tai täydellistä "
+"URL-osoitetta joka alkaa skeemalla (esim. \"https://\")."
 
 msgid "redirect"
 msgstr "edelleenohjaus"

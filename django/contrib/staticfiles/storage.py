@@ -42,15 +42,30 @@ class StaticFilesStorage(FileSystemStorage):
 
 
 class HashedFilesMixin:
-    default_template = """url("%s")"""
+    default_template = """url("%(url)s")"""
     max_post_process_passes = 5
     patterns = (
         ("*.css", (
-            r"""(url\(['"]{0,1}\s*(.*?)["']{0,1}\))""",
-            (r"""(@import\s*["']\s*(.*?)["'])""", """@import url("%s")"""),
+            r"""(?P<matched>url\(['"]{0,1}\s*(?P<url>.*?)["']{0,1}\))""",
+            (
+                r"""(?P<matched>@import\s*["']\s*(?P<url>.*?)["'])""",
+                """@import url("%(url)s")""",
+            ),
         )),
         ('*.js', (
-            (r'(?m)^(//# (?-i:sourceMappingURL)=(.*))$', '//# sourceMappingURL=%s'),
+            (
+                r'(?P<matched>)^(//# (?-i:sourceMappingURL)=(?P<url>.*))$',
+                '//# sourceMappingURL=%(url)s',
+            ),
+            (
+                r"""(?P<matched>import\s+(?s:(?P<imports>.*?))\s*from\s*["'](?P<url>.*?)["'])""",
+                'import %(imports)s from "%(url)s"',
+            ),
+            (
+                r"""(?P<matched>export\s+(?s:(?P<exports>.*?))\s*from\s*["'](?P<url>.*?)["'])""",
+                'export %(exports)s from "%(url)s"',
+            ),
+            (r"""(?P<matched>import\(["'](?P<url>.*?)["']\))""", 'import("%(url)s")'),
         )),
     )
     keep_intermediate_files = True
@@ -163,7 +178,9 @@ class HashedFilesMixin:
             This requires figuring out which files the matched URL resolves
             to and calling the url() method of the storage.
             """
-            matched, url = matchobj.groups()
+            matches = matchobj.groupdict()
+            matched = matches['matched']
+            url = matches['url']
 
             # Ignore absolute/protocol-relative and data-uri URLs.
             if re.match(r'^[a-z]+:', url):
@@ -199,7 +216,8 @@ class HashedFilesMixin:
                 transformed_url += ('?#' if '?#' in url else '#') + fragment
 
             # Return the hashed version to the file
-            return template % unquote(transformed_url)
+            matches['url'] = unquote(transformed_url)
+            return template % matches
 
         return converter
 
@@ -242,6 +260,7 @@ class HashedFilesMixin:
                 processed_adjustable_paths[name] = (name, hashed_name, processed)
 
         paths = {path: paths[path] for path in adjustable_paths}
+        substitutions = False
 
         for i in range(self.max_post_process_passes):
             substitutions = False
@@ -382,13 +401,16 @@ class ManifestFilesMixin(HashedFilesMixin):
     manifest_strict = True
     keep_intermediate_files = False
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, manifest_storage=None, **kwargs):
         super().__init__(*args, **kwargs)
+        if manifest_storage is None:
+            manifest_storage = self
+        self.manifest_storage = manifest_storage
         self.hashed_files = self.load_manifest()
 
     def read_manifest(self):
         try:
-            with self.open(self.manifest_name) as manifest:
+            with self.manifest_storage.open(self.manifest_name) as manifest:
                 return manifest.read().decode()
         except FileNotFoundError:
             return None
@@ -416,10 +438,10 @@ class ManifestFilesMixin(HashedFilesMixin):
 
     def save_manifest(self):
         payload = {'paths': self.hashed_files, 'version': self.manifest_version}
-        if self.exists(self.manifest_name):
-            self.delete(self.manifest_name)
+        if self.manifest_storage.exists(self.manifest_name):
+            self.manifest_storage.delete(self.manifest_name)
         contents = json.dumps(payload).encode()
-        self._save(self.manifest_name, ContentFile(contents))
+        self.manifest_storage._save(self.manifest_name, ContentFile(contents))
 
     def stored_name(self, name):
         parsed_name = urlsplit(unquote(name))

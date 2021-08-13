@@ -805,7 +805,7 @@ directories::
     ]
 
 Your templates can go anywhere you want, as long as the directories and
-templates are readable by the Web server. They can have any extension you want,
+templates are readable by the web server. They can have any extension you want,
 such as ``.html`` or ``.txt``, or they can have no extension at all.
 
 Note that these paths should use Unix-style forward slashes, even on Windows.

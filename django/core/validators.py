@@ -66,7 +66,7 @@ class URLValidator(RegexValidator):
     ul = '\u00a1-\uffff'  # Unicode letters range (must not be a raw string).
 
     # IP patterns
-    ipv4_re = r'(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)(?:\.(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}'
+    ipv4_re = r'(?:0|25[0-5]|2[0-4]\d|1\d?\d?|[1-9]\d?)(?:\.(?:0|25[0-5]|2[0-4]\d|1\d?\d?|[1-9]\d?)){3}'
     ipv6_re = r'\[[0-9a-f:.]+\]'  # (simple regex, validated later)
 
     # Host patterns
@@ -87,7 +87,7 @@ class URLValidator(RegexValidator):
         r'^(?:[a-z0-9.+-]*)://'  # scheme is validated separately
         r'(?:[^\s:@/]+(?::[^\s:@/]*)?@)?'  # user:pass authentication
         r'(?:' + ipv4_re + '|' + ipv6_re + '|' + host_re + ')'
-        r'(?::\d{2,5})?'  # port
+        r'(?::\d{1,5})?'  # port
         r'(?:[/?#][^\s]*)?'  # resource path
         r'\Z', re.IGNORECASE)
     message = _('Enter a valid URL.')
@@ -129,7 +129,7 @@ class URLValidator(RegexValidator):
                 raise
         else:
             # Now verify IPv6 in the netloc part
-            host_match = re.search(r'^\[(.+)\](?::\d{2,5})?$', urlsplit(value).netloc)
+            host_match = re.search(r'^\[(.+)\](?::\d{1,5})?$', urlsplit(value).netloc)
             if host_match:
                 potential_ip = host_match[1]
                 try:
@@ -170,7 +170,7 @@ class EmailValidator:
         re.IGNORECASE)
     literal_regex = _lazy_re_compile(
         # literal form, ipv4 or ipv6 address (SMTP 4.1.3)
-        r'\[([A-f0-9:.]+)\]\Z',
+        r'\[([A-F0-9:.]+)\]\Z',
         re.IGNORECASE)
     domain_allowlist = ['localhost']
 
@@ -276,6 +276,19 @@ def validate_ipv4_address(value):
         ipaddress.IPv4Address(value)
     except ValueError:
         raise ValidationError(_('Enter a valid IPv4 address.'), code='invalid', params={'value': value})
+    else:
+        # Leading zeros are forbidden to avoid ambiguity with the octal
+        # notation. This restriction is included in Python 3.9.5+.
+        # TODO: Remove when dropping support for PY39.
+        if any(
+            octet != '0' and octet[0] == '0'
+            for octet in value.split('.')
+        ):
+            raise ValidationError(
+                _('Enter a valid IPv4 address.'),
+                code='invalid',
+                params={'value': value},
+            )
 
 
 def validate_ipv6_address(value):

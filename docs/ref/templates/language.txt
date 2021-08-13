@@ -471,10 +471,10 @@ That would result in a rendered template like this::
 
     Hello, <b>username
 
-...which, in turn, would result in the remainder of the Web page being bolded!
+...which, in turn, would result in the remainder of the web page being bolded!
 
 Clearly, user-submitted data shouldn't be trusted blindly and inserted directly
-into your Web pages, because a malicious user could use this kind of hole to
+into your web pages, because a malicious user could use this kind of hole to
 do potentially bad things. This type of security exploit is called a
 `Cross Site Scripting`_ (XSS) attack.
 

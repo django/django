@@ -185,7 +185,7 @@ Security middleware
 
 .. warning::
     If your deployment situation allows, it's usually a good idea to have your
-    front-end Web server perform the functionality provided by the
+    front-end web server perform the functionality provided by the
     ``SecurityMiddleware``. That way, if there are requests that aren't served
     by Django (such as static media or user-uploaded files), they will have
     the same protections as requests to your Django application.
@@ -222,7 +222,7 @@ you set the :setting:`SECURE_HSTS_SECONDS` setting to a non-zero integer value.
 
 When enabling HSTS, it's a good idea to first use a small value for testing,
 for example, :setting:`SECURE_HSTS_SECONDS = 3600<SECURE_HSTS_SECONDS>` for one
-hour. Each time a Web browser sees the HSTS header from your site, it will
+hour. Each time a web browser sees the HSTS header from your site, it will
 refuse to communicate non-securely (using HTTP) with your domain for the given
 period of time. Once you confirm that all assets are served securely on your
 site (i.e. HSTS didn't break anything), it's a good idea to increase this value
@@ -413,10 +413,10 @@ is ``True``.
 
 Note that in most deployment situations where Django isn't involved in serving
 user-uploaded files, this setting won't help you. For example, if your
-:setting:`MEDIA_URL` is served directly by your front-end Web server (nginx,
+:setting:`MEDIA_URL` is served directly by your front-end web server (nginx,
 Apache, etc.) then you'd want to set this header there. On the other hand, if
 you are using Django to do something like require authorization in order to
-download files and you cannot set the header using your Web server, this
+download files and you cannot set the header using your web server, this
 setting will be useful.
 
 __ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
@@ -486,17 +486,17 @@ Authentication middleware
 .. class:: AuthenticationMiddleware
 
 Adds the ``user`` attribute, representing the currently-logged-in user, to
-every incoming ``HttpRequest`` object. See :ref:`Authentication in Web requests
+every incoming ``HttpRequest`` object. See :ref:`Authentication in web requests
 <auth-web-requests>`.
 
 .. class:: RemoteUserMiddleware
 
-Middleware for utilizing Web server provided authentication. See
+Middleware for utilizing web server provided authentication. See
 :doc:`/howto/auth-remote-user` for usage details.
 
 .. class:: PersistentRemoteUserMiddleware
 
-Middleware for utilizing Web server provided authentication when enabled only
+Middleware for utilizing web server provided authentication when enabled only
 on the login page. See :ref:`persistent-remote-user-middleware-howto` for usage
 details.
 

@@ -1,6 +1,9 @@
+from pathlib import Path
+
 from django.dispatch import receiver
 from django.template import engines
 from django.template.backends.django import DjangoTemplates
+from django.utils._os import to_path
 from django.utils.autoreload import (
     autoreload_started, file_changed, is_django_path,
 )
@@ -15,13 +18,13 @@ def get_template_directories():
         if not isinstance(backend, DjangoTemplates):
             continue
 
-        items.update(backend.engine.dirs)
+        items.update(Path.cwd() / to_path(dir) for dir in backend.engine.dirs)
 
         for loader in backend.engine.template_loaders:
             if not hasattr(loader, 'get_dirs'):
                 continue
             items.update(
-                directory
+                Path.cwd() / to_path(directory)
                 for directory in loader.get_dirs()
                 if not is_django_path(directory)
             )

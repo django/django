@@ -154,7 +154,7 @@ class Storage:
     def url(self, name):
         """
         Return an absolute URL where the file's contents can be accessed
-        directly by a Web browser.
+        directly by a web browser.
         """
         raise NotImplementedError('subclasses of Storage must provide a url() method')
 
@@ -316,16 +316,17 @@ class FileSystemStorage(Storage):
             pass
 
     def exists(self, name):
-        return os.path.exists(self.path(name))
+        return os.path.lexists(self.path(name))
 
     def listdir(self, path):
         path = self.path(path)
         directories, files = [], []
-        for entry in os.scandir(path):
-            if entry.is_dir():
-                directories.append(entry.name)
-            else:
-                files.append(entry.name)
+        with os.scandir(path) as entries:
+            for entry in entries:
+                if entry.is_dir():
+                    directories.append(entry.name)
+                else:
+                    files.append(entry.name)
         return directories, files
 
     def path(self, name):

@@ -67,6 +67,13 @@ class ChangeListTests(TestCase):
         request.user = user
         return request
 
+    def test_repr(self):
+        m = ChildAdmin(Child, custom_site)
+        request = self.factory.get('/child/')
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        self.assertEqual(repr(cl), '<ChangeList: model=Child model_admin=ChildAdmin>')
+
     def test_specified_ordering_by_f_expression(self):
         class OrderedByFBandAdmin(admin.ModelAdmin):
             list_display = ['name', 'genres', 'nr_of_members']
@@ -1327,6 +1334,22 @@ class ChangeListTests(TestCase):
         self.assertIn('<ul class="object-tools">', response.rendered_content)
         # The "Add" button inside the object-tools shouldn't appear.
         self.assertNotIn('Add ', response.rendered_content)
+
+    def test_search_help_text(self):
+        superuser = self._create_superuser('superuser')
+        m = BandAdmin(Band, custom_site)
+        # search_fields without search_help_text.
+        m.search_fields = ['name']
+        request = self._mocked_authenticated_request('/band/', superuser)
+        response = m.changelist_view(request)
+        self.assertIsNone(response.context_data['cl'].search_help_text)
+        self.assertNotContains(response, '<div class="help">')
+        # search_fields with search_help_text.
+        m.search_help_text = 'Search help text'
+        request = self._mocked_authenticated_request('/band/', superuser)
+        response = m.changelist_view(request)
+        self.assertEqual(response.context_data['cl'].search_help_text, 'Search help text')
+        self.assertContains(response, '<div class="help">Search help text</div>')
 
 
 class GetAdminLogTests(TestCase):

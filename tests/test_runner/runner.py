@@ -16,5 +16,5 @@ class CustomOptionsTestRunner(DiscoverRunner):
         parser.add_argument('--option_b', '-b', default='2'),
         parser.add_argument('--option_c', '-c', default='3'),
 
-    def run_tests(self, test_labels, extra_tests=None, **kwargs):
+    def run_tests(self, test_labels, **kwargs):
         print("%s:%s:%s" % (self.option_a, self.option_b, self.option_c))

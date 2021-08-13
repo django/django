@@ -69,6 +69,9 @@ class BaseStorage:
     def __contains__(self, item):
         return item in self._loaded_messages or item in self._queued_messages
 
+    def __repr__(self):
+        return f'<{self.__class__.__qualname__}: request={self.request!r}>'
+
     @property
     def _loaded_messages(self):
         """

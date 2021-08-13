@@ -462,7 +462,8 @@ class WriterTests(SimpleTestCase):
         self.assertIn('import pathlib', imports)
 
     def test_serialize_path_like(self):
-        path_like = list(os.scandir(os.path.dirname(__file__)))[0]
+        with os.scandir(os.path.dirname(__file__)) as entries:
+            path_like = list(entries)[0]
         expected = (repr(path_like.path), {})
         self.assertSerializedResultEqual(path_like, expected)
 
@@ -656,6 +657,13 @@ class WriterTests(SimpleTestCase):
 
     def test_serialize_type_none(self):
         self.assertSerializedEqual(type(None))
+
+    def test_serialize_type_model(self):
+        self.assertSerializedEqual(models.Model)
+        self.assertSerializedResultEqual(
+            MigrationWriter.serialize(models.Model),
+            ("('models.Model', {'from django.db import models'})", set()),
+        )
 
     def test_simple_migration(self):
         """

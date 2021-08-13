@@ -89,5 +89,5 @@ class ShellCommandTestCase(SimpleTestCase):
     # in parallel mode. The tests are run in a subprocess and the subprocess's
     # stdin is closed and replaced by /dev/null. Reading from /dev/null always
     # returns EOF and so select always shows that sys.stdin is ready to read.
-    # This causes problems because of the call to select.select() towards the
+    # This causes problems because of the call to select.select() toward the
     # end of shell's handle() method.
