@@ -1192,8 +1192,11 @@ class Query(BaseExpression):
         # stage because join promotion can't be done in the compiler. Using
         # DEFAULT_DB_ALIAS isn't nice but it's the best that can be done here.
         # A similar thing is done in is_nullable(), too.
-        if (connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls and
-                lookup_name == 'exact' and lookup.rhs == ''):
+        if (
+            lookup_name == 'exact' and
+            lookup.rhs == '' and
+            connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls
+        ):
             return lhs.get_lookup('isnull')(lhs, True)
 
         return lookup
