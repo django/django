@@ -144,6 +144,7 @@ class Query(BaseExpression):
 
     alias_prefix = 'T'
     subq_aliases = frozenset([alias_prefix])
+    empty_aggregate_value = 'NULL'
 
     compiler = 'SQLCompiler'
 

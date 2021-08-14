@@ -70,3 +70,8 @@ class CoalesceTests(TestCase):
             authors, ['John Smith', 'Rhonda'],
             lambda a: a.name
         )
+
+    def test_empty_query(self):
+        Author.objects.create(name='John Smith')
+        for author in Author.objects.annotate(annotation=Coalesce(Author.objects.none(), 42)):
+            self.assertEqual(author.annotation, 42)

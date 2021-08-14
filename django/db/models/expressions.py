@@ -702,7 +702,12 @@ class Func(SQLiteNumericMixin, Expression):
         sql_parts = []
         params = []
         for arg in self.source_expressions:
-            arg_sql, arg_params = compiler.compile(arg)
+            try:
+                arg_sql, arg_params = compiler.compile(arg)
+            except EmptyResultSet:
+                arg_sql, arg_params = getattr(arg, 'empty_aggregate_value', NotImplemented), ()
+                if arg_sql is NotImplemented:
+                    raise
             sql_parts.append(arg_sql)
             params.extend(arg_params)
         data = {**self.extra, **extra_context}
