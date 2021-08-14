@@ -1100,8 +1100,8 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             # user-defined intermediary models as they could have other fields
             # causing conflicts which must be surfaced.
             can_ignore_conflicts = (
-                connections[db].features.supports_ignore_conflicts and
-                self.through._meta.auto_created is not False
+                self.through._meta.auto_created is not False and
+                connections[db].features.supports_ignore_conflicts
             )
             # Don't send the signal when inserting duplicate data row
             # for symmetrical reverse entries.

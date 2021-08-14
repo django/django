@@ -2332,10 +2332,10 @@ class Query(BaseExpression):
         # used. The proper fix would be to defer all decisions where
         # is_nullable() is needed to the compiler stage, but that is not easy
         # to do currently.
-        return (
-            connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls and
-            field.empty_strings_allowed
-        ) or field.null
+        return field.null or (
+            field.empty_strings_allowed and
+            connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls
+        )
 
 
 def get_order_dir(field, default='ASC'):
