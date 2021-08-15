@@ -768,7 +768,7 @@ utility methods in the ``django.test.utils`` module.
     :func:`teardown_databases` function at the conclusion of testing.
 
     The ``aliases`` argument determines which :setting:`DATABASES` aliases test
-    databases should be setup for. If it's not provided, it defaults to all of
+    databases should be set up for. If it's not provided, it defaults to all of
     :setting:`DATABASES` aliases.
 
     The ``serialized_aliases`` argument determines what subset of ``aliases``
