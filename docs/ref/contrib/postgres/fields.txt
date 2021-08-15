@@ -261,7 +261,7 @@ transform do not change. For example::
     Read about `the performance considerations`_ prior to using it.
 
     To use ``citext``, use the :class:`.CITextExtension` operation to
-    :ref:`setup the citext extension <create-postgresql-extensions>` in
+    :ref:`set up the citext extension <create-postgresql-extensions>` in
     PostgreSQL before the first ``CreateModel`` migration operation.
 
     If you're using an :class:`~django.contrib.postgres.fields.ArrayField`
@@ -307,7 +307,7 @@ transform do not change. For example::
     To use this field, you'll need to:
 
     #. Add ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`.
-    #. :ref:`Setup the hstore extension <create-postgresql-extensions>` in
+    #. :ref:`Set up the hstore extension <create-postgresql-extensions>` in
        PostgreSQL.
 
     You'll see an error like ``can't adapt type 'dict'`` if you skip the first

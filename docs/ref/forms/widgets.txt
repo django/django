@@ -454,7 +454,7 @@ foundation for custom widgets.
                 return '{}-{}-{}'.format(year, month, day)
 
     The constructor creates several :class:`Select` widgets in a list. The
-    ``super()`` method uses this list to setup the widget.
+    ``super()`` method uses this list to set up the widget.
 
     The required method :meth:`~MultiWidget.decompress` breaks up a
     ``datetime.date`` value into the day, month, and year values corresponding

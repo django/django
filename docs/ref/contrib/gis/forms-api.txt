@@ -33,7 +33,7 @@ GeoDjango form fields take the following optional arguments.
 .. attribute:: Field.geom_type
 
     You generally shouldn't have to set or change that attribute which should
-    be setup depending on the field class. It matches the OpenGIS standard
+    be set up depending on the field class. It matches the OpenGIS standard
     geometry name.
 
 Form field classes

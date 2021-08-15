@@ -65,7 +65,7 @@ following::
     ...\> py -m venv project-name
 
 This will create a folder called 'project-name' if it does not already exist
-and setup the virtual environment. To activate the environment, run::
+and set up the virtual environment. To activate the environment, run::
 
     ...\> project-name\Scripts\activate.bat
 
