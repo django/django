@@ -89,7 +89,7 @@ You should also configure the web server that sits in front of Django to
 validate the host. It should respond with a static error page or ignore
 requests for incorrect hosts instead of forwarding the request to Django. This
 way you'll avoid spurious errors in your Django logs (or emails if you have
-error reporting configured that way). For example, on nginx you might setup a
+error reporting configured that way). For example, on nginx you might set up a
 default server to return "444 No Response" on an unrecognized host:
 
 .. code-block:: nginx
