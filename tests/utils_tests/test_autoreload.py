@@ -191,6 +191,7 @@ class TestChildArguments(SimpleTestCase):
             [sys.executable, '-m', 'utils_tests.test_module.main_module', 'runserver'],
         )
 
+    @mock.patch('__main__.__spec__', None)
     @mock.patch('sys.argv', [__file__, 'runserver'])
     @mock.patch('sys.warnoptions', ['error'])
     def test_warnoptions(self):
@@ -199,6 +200,7 @@ class TestChildArguments(SimpleTestCase):
             [sys.executable, '-Werror', __file__, 'runserver']
         )
 
+    @mock.patch('__main__.__spec__', None)
     @mock.patch('sys.warnoptions', [])
     def test_exe_fallback(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -210,6 +212,7 @@ class TestChildArguments(SimpleTestCase):
                     [exe_path, 'runserver']
                 )
 
+    @mock.patch('__main__.__spec__', None)
     @mock.patch('sys.warnoptions', [])
     def test_entrypoint_fallback(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -221,6 +224,7 @@ class TestChildArguments(SimpleTestCase):
                     [sys.executable, script_path, 'runserver']
                 )
 
+    @mock.patch('__main__.__spec__', None)
     @mock.patch('sys.argv', ['does-not-exist', 'runserver'])
     @mock.patch('sys.warnoptions', [])
     def test_raises_runtimeerror(self):
@@ -475,7 +479,8 @@ class RestartWithReloaderTests(SimpleTestCase):
             script.touch()
             argv = [str(script), 'runserver']
             mock_call = self.patch_autoreload(argv)
-            autoreload.restart_with_reloader()
+            with mock.patch('__main__.__spec__', None):
+                autoreload.restart_with_reloader()
             self.assertEqual(mock_call.call_count, 1)
             self.assertEqual(
                 mock_call.call_args[0][0],
