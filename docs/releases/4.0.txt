@@ -68,6 +68,11 @@ recommended over PBKDF2. However, it's not the default as it requires OpenSSL
 Minor features
 --------------
 
+:mod:`django.shortcuts`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :func:`django.shortcuts.make_toast` function returns ``'toast'``.
+
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
