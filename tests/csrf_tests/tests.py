@@ -1177,6 +1177,23 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         self.assertTrue(csrf_cookie, msg='No CSRF cookie was sent.')
         self.assertEqual(len(csrf_cookie), CSRF_TOKEN_LENGTH)
 
+    def test_unmasked_secret_replaced_on_GET(self):
+        """An unmasked CSRF cookie is replaced during a GET request."""
+        req = self._get_request(cookie=TEST_SECRET)
+        resp = protected_view(req)
+        self.assertContains(resp, 'OK')
+        csrf_cookie = self._read_csrf_cookie(req, resp)
+        self.assertTrue(csrf_cookie, msg='No CSRF cookie was sent.')
+        self.assertMaskedSecretCorrect(csrf_cookie, TEST_SECRET)
+
+    def test_masked_secret_not_replaced_on_GET(self):
+        """A masked CSRF cookie is not replaced during a GET request."""
+        req = self._get_request(cookie=MASKED_TEST_SECRET1)
+        resp = protected_view(req)
+        self.assertContains(resp, 'OK')
+        csrf_cookie = self._read_csrf_cookie(req, resp)
+        self.assertFalse(csrf_cookie, msg='A CSRF cookie was sent.')
+
     def test_masked_secret_accepted_and_not_replaced(self):
         """
         The csrf cookie is left unchanged if originally masked.
