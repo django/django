@@ -110,11 +110,12 @@ The above code could be simplified by using the `JavaScript Cookie library
 
 .. note::
 
-    The CSRF token is also present in the DOM, but only if explicitly included
-    using :ttag:`csrf_token` in a template. The cookie contains the canonical
-    token; the ``CsrfViewMiddleware`` will prefer the cookie to the token in
-    the DOM. Regardless, you're guaranteed to have the cookie if the token is
-    present in the DOM, so you should use the cookie!
+    The CSRF token is also present in the DOM in a masked form, but only if
+    explicitly included using :ttag:`csrf_token` in a template. The cookie
+    contains the canonical, unmasked token. The
+    :class:`~django.middleware.csrf.CsrfViewMiddleware` will accept either.
+    However, in order to protect against `BREACH`_ attacks, it's recommended to
+    use a masked token.
 
 .. warning::
 
@@ -231,25 +232,21 @@ How it works
 
 The CSRF protection is based on the following things:
 
-#. A CSRF cookie that is based on a random secret value, which other sites
-   will not have access to.
+#. A CSRF cookie that is a random secret value, which other sites will not have
+   access to.
 
-   This cookie is set by ``CsrfViewMiddleware``. It is sent with every
-   response that has called ``django.middleware.csrf.get_token()`` (the
-   function used internally to retrieve the CSRF token), if it wasn't already
-   set on the request.
+   ``CsrfViewMiddleware`` sends this cookie with the response whenever
+   ``django.middleware.csrf.get_token()`` is called. It can also send it in
+   other cases. For security reasons, the value of the secret is changed each
+   time a user logs in.
 
-   In order to protect against `BREACH`_ attacks, the token is not simply the
-   secret; a random mask is prepended to the secret and used to scramble it.
+#. A hidden form field with the name 'csrfmiddlewaretoken', present in all
+   outgoing POST forms.
 
-   For security reasons, the value of the secret is changed each time a
-   user logs in.
-
-#. A hidden form field with the name 'csrfmiddlewaretoken' present in all
-   outgoing POST forms. The value of this field is, again, the value of the
-   secret, with a mask which is both added to it and used to scramble it. The
-   mask is regenerated on every call to ``get_token()`` so that the form field
-   value is changed in every such response.
+   In order to protect against `BREACH`_ attacks, the value of this field is
+   not simply the secret. It is scrambled differently with each response using
+   a mask. The mask is generated randomly on every call to ``get_token()``, so
+   the form field value is different each time.
 
    This part is done by the template tag.
 
@@ -293,6 +290,10 @@ The CSRF protection is based on the following things:
 .. versionadded:: 4.0
 
     ``Origin`` checking was added, as described above.
+
+.. versionchanged:: 4.1
+
+    In older versions, the CSRF cookie value was masked.
 
 This ensures that only forms that have originated from trusted domains can be
 used to POST data back.

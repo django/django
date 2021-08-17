@@ -67,6 +67,8 @@ details on these changes.
 
 * The ``SitemapIndexItem.__str__()`` method will be removed.
 
+* The ``CSRF_COOKIE_MASKED`` transitional setting will be removed.
+
 .. _deprecation-removed-in-4.1:
 
 4.1

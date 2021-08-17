@@ -26,6 +26,25 @@ officially support the latest release of each series.
 What's new in Django 4.1
 ========================
 
+.. _csrf-cookie-masked-usage:
+
+``CSRF_COOKIE_MASKED`` setting
+------------------------------
+
+The new :setting:`CSRF_COOKIE_MASKED` transitional setting allows specifying
+whether to mask the CSRF cookie.
+
+:class:`~django.middleware.csrf.CsrfViewMiddleware` no longer masks the CSRF
+cookie like it does the CSRF token in the DOM. If you are upgrading multiple
+instances of the same project to Django 4.1, you should set
+:setting:`CSRF_COOKIE_MASKED` to ``True`` during the transition, in
+order to allow compatibility with the older versions of Django. Once the
+transition to 4.1 is complete you can stop overriding
+:setting:`CSRF_COOKIE_MASKED`.
+
+This setting is deprecated as of this release and will be removed in Django
+5.0.
+
 Minor features
 --------------
 
@@ -270,6 +289,13 @@ Miscellaneous
 * The Django test runner now returns a non-zero error code for unexpected
   successes from tests marked with :py:func:`unittest.expectedFailure`.
 
+* :class:`~django.middleware.csrf.CsrfViewMiddleware` no longer masks the CSRF
+  cookie like it does the CSRF token in the DOM.
+
+* :class:`~django.middleware.csrf.CsrfViewMiddleware` now uses
+  ``request.META['CSRF_COOKIE']`` for storing the unmasked CSRF secret rather
+  than a masked version. This is an undocumented, private API.
+
 .. _deprecated-features-4.1:
 
 Features deprecated in 4.1
@@ -282,6 +308,8 @@ Miscellaneous
   Custom sitemap index templates should be updated for the adjusted
   :ref:`context variables <sitemap-index-context-variables>`, expecting a list
   of objects with ``location`` and optional ``lastmod`` attributes.
+
+* ``CSRF_COOKIE_MASKED`` transitional setting is deprecated.
 
 Features removed in 4.1
 =======================

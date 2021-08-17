@@ -12,6 +12,8 @@ from django.middleware.csrf import (
     _unmask_cipher_token, get_token, rotate_token,
 )
 from django.test import SimpleTestCase, override_settings
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
 
 from .views import (
@@ -76,13 +78,12 @@ class CsrfFunctionTests(CsrfFunctionTestMixin, SimpleTestCase):
 
     def test_get_token_csrf_cookie_set(self):
         request = HttpRequest()
-        request.META['CSRF_COOKIE'] = MASKED_TEST_SECRET1
+        request.META['CSRF_COOKIE'] = TEST_SECRET
         self.assertNotIn('CSRF_COOKIE_NEEDS_UPDATE', request.META)
         token = get_token(request)
-        self.assertNotEqual(token, MASKED_TEST_SECRET1)
         self.assertMaskedSecretCorrect(token, TEST_SECRET)
         # The existing cookie is preserved.
-        self.assertEqual(request.META['CSRF_COOKIE'], MASKED_TEST_SECRET1)
+        self.assertEqual(request.META['CSRF_COOKIE'], TEST_SECRET)
         self.assertIs(request.META['CSRF_COOKIE_NEEDS_UPDATE'], True)
 
     def test_get_token_csrf_cookie_not_set(self):
@@ -91,38 +92,32 @@ class CsrfFunctionTests(CsrfFunctionTestMixin, SimpleTestCase):
         self.assertNotIn('CSRF_COOKIE_NEEDS_UPDATE', request.META)
         token = get_token(request)
         cookie = request.META['CSRF_COOKIE']
-        self.assertEqual(len(cookie), CSRF_TOKEN_LENGTH)
-        unmasked_cookie = _unmask_cipher_token(cookie)
-        self.assertMaskedSecretCorrect(token, unmasked_cookie)
+        self.assertMaskedSecretCorrect(token, cookie)
         self.assertIs(request.META['CSRF_COOKIE_NEEDS_UPDATE'], True)
 
     def test_rotate_token(self):
         request = HttpRequest()
-        request.META['CSRF_COOKIE'] = MASKED_TEST_SECRET1
+        request.META['CSRF_COOKIE'] = TEST_SECRET
         self.assertNotIn('CSRF_COOKIE_NEEDS_UPDATE', request.META)
         rotate_token(request)
         # The underlying secret was changed.
         cookie = request.META['CSRF_COOKIE']
-        self.assertEqual(len(cookie), CSRF_TOKEN_LENGTH)
-        unmasked_cookie = _unmask_cipher_token(cookie)
-        self.assertNotEqual(unmasked_cookie, TEST_SECRET)
+        self.assertEqual(len(cookie), CSRF_SECRET_LENGTH)
+        self.assertNotEqual(cookie, TEST_SECRET)
         self.assertIs(request.META['CSRF_COOKIE_NEEDS_UPDATE'], True)
 
-    def test_sanitize_token_masked(self):
-        # Tokens of length CSRF_TOKEN_LENGTH are preserved.
+    def test_sanitize_token_valid(self):
         cases = [
-            (MASKED_TEST_SECRET1, MASKED_TEST_SECRET1),
-            (64 * 'a', 64 * 'a'),
+            # A token of length CSRF_SECRET_LENGTH.
+            TEST_SECRET,
+            # A token of length CSRF_TOKEN_LENGTH.
+            MASKED_TEST_SECRET1,
+            64 * 'a',
         ]
-        for token, expected in cases:
+        for token in cases:
             with self.subTest(token=token):
                 actual = _sanitize_token(token)
-                self.assertEqual(actual, expected)
-
-    def test_sanitize_token_unmasked(self):
-        # A token of length CSRF_SECRET_LENGTH is masked.
-        actual = _sanitize_token(TEST_SECRET)
-        self.assertMaskedSecretCorrect(actual, TEST_SECRET)
+                self.assertIsNone(actual)
 
     def test_sanitize_token_invalid(self):
         cases = [
@@ -136,13 +131,25 @@ class CsrfFunctionTests(CsrfFunctionTestMixin, SimpleTestCase):
 
     def test_does_token_match(self):
         cases = [
-            ((MASKED_TEST_SECRET1, MASKED_TEST_SECRET2), True),
-            ((MASKED_TEST_SECRET1, 64 * 'a'), False),
+            # Masked tokens match.
+            ((MASKED_TEST_SECRET1, TEST_SECRET), True),
+            ((MASKED_TEST_SECRET2, TEST_SECRET), True),
+            ((64 * 'a', _unmask_cipher_token(64 * 'a')), True),
+            # Unmasked tokens match.
+            ((TEST_SECRET, TEST_SECRET), True),
+            ((32 * 'a', 32 * 'a'), True),
+            # Incorrect tokens don't match.
+            ((32 * 'a', TEST_SECRET), False),
+            ((64 * 'a', TEST_SECRET), False),
         ]
-        for (token1, token2), expected in cases:
-            with self.subTest(token1=token1, token2=token2):
-                actual = _does_token_match(token1, token2)
+        for (token, secret), expected in cases:
+            with self.subTest(token=token, secret=secret):
+                actual = _does_token_match(token, secret)
                 self.assertIs(actual, expected)
+
+    def test_does_token_match_wrong_token_length(self):
+        with self.assertRaises(AssertionError):
+            _does_token_match(16 * 'a', TEST_SECRET)
 
 
 class TestingSessionStore(SessionStore):
@@ -215,14 +222,6 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         """
         raise NotImplementedError('This method must be implemented by a subclass.')
 
-    def assertCookiesSet(self, req, resp, expected_secrets):
-        """
-        Assert that set_cookie() was called with the given sequence of secrets.
-        """
-        cookies_set = self._get_cookies_set(req, resp)
-        secrets_set = [_unmask_cipher_token(cookie) for cookie in cookies_set]
-        self.assertEqual(secrets_set, expected_secrets)
-
     def _get_request(self, method=None, cookie=None, request_class=None):
         if method is None:
             method = 'GET'
@@ -280,11 +279,9 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         )
 
     # This method depends on _unmask_cipher_token() being correct.
-    def _check_token_present(self, response, csrf_token=None):
-        if csrf_token is None:
+    def _check_token_present(self, response, csrf_secret=None):
+        if csrf_secret is None:
             csrf_secret = TEST_SECRET
-        else:
-            csrf_secret = _unmask_cipher_token(csrf_token)
         text = str(response.content, response.charset)
         match = re.search('name="csrfmiddlewaretoken" value="(.*?)"', text)
         self.assertTrue(
@@ -482,10 +479,12 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         req = self._get_POST_request_with_token()
         resp = sandwiched_rotate_token_view(req)
         self.assertContains(resp, 'OK')
-        csrf_cookie = self._read_csrf_cookie(req, resp)
-        actual_secret = _unmask_cipher_token(csrf_cookie)
+        actual_secret = self._read_csrf_cookie(req, resp)
         # set_cookie() was called a second time with a different secret.
-        self.assertCookiesSet(req, resp, [TEST_SECRET, actual_secret])
+        cookies_set = self._get_cookies_set(req, resp)
+        # Only compare the last two to exclude a spurious entry that's present
+        # when CsrfViewMiddlewareUseSessionsTests is running.
+        self.assertEqual(cookies_set[-2:], [TEST_SECRET, actual_secret])
         self.assertNotEqual(actual_secret, TEST_SECRET)
 
     # Tests for the template tag method
@@ -498,7 +497,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
 
         token = get_token(req)
         self.assertIsNotNone(token)
-        self._check_token_present(resp, token)
+        csrf_secret = _unmask_cipher_token(token)
+        self._check_token_present(resp, csrf_secret)
 
     def test_token_node_empty_csrf_cookie(self):
         """
@@ -511,7 +511,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
 
         token = get_token(req)
         self.assertIsNotNone(token)
-        self._check_token_present(resp, token)
+        csrf_secret = _unmask_cipher_token(token)
+        self._check_token_present(resp, csrf_secret)
 
     def test_token_node_with_csrf_cookie(self):
         """
@@ -568,7 +569,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         resp = mw(req)
         csrf_cookie = self._read_csrf_cookie(req, resp)
         self.assertEqual(
-            csrf_cookie, self._csrf_id_cookie,
+            csrf_cookie, TEST_SECRET,
             'CSRF cookie was changed on an accepted request',
         )
 
@@ -1108,7 +1109,7 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         mw.process_view(req, token_view, (), {})
         resp = mw(req)
         csrf_cookie = self._read_csrf_cookie(req, resp)
-        self.assertEqual(len(csrf_cookie), CSRF_TOKEN_LENGTH)
+        self.assertEqual(len(csrf_cookie), CSRF_SECRET_LENGTH)
 
     def test_process_view_token_invalid_chars(self):
         """
@@ -1121,7 +1122,7 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         mw.process_view(req, token_view, (), {})
         resp = mw(req)
         csrf_cookie = self._read_csrf_cookie(req, resp)
-        self.assertEqual(len(csrf_cookie), CSRF_TOKEN_LENGTH)
+        self.assertEqual(len(csrf_cookie), CSRF_SECRET_LENGTH)
         self.assertNotEqual(csrf_cookie, token)
 
     def test_masked_unmasked_combinations(self):
@@ -1151,20 +1152,19 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
                 resp = mw.process_view(req, token_view, (), {})
                 self.assertIsNone(resp)
 
-    def test_cookie_reset_only_once(self):
+    def test_set_cookie_called_only_once(self):
         """
-        A CSRF cookie that needs to be reset is reset only once when the view
-        is decorated with both ensure_csrf_cookie and csrf_protect.
+        set_cookie() is called only once when the view is decorated with both
+        ensure_csrf_cookie and csrf_protect.
         """
-        # Pass an unmasked cookie to trigger a cookie reset.
-        req = self._get_POST_request_with_token(cookie=TEST_SECRET)
+        req = self._get_POST_request_with_token()
         resp = ensured_and_protected_view(req)
         self.assertContains(resp, 'OK')
         csrf_cookie = self._read_csrf_cookie(req, resp)
-        actual_secret = _unmask_cipher_token(csrf_cookie)
-        self.assertEqual(actual_secret, TEST_SECRET)
+        self.assertEqual(csrf_cookie, TEST_SECRET)
         # set_cookie() was called only once and with the expected secret.
-        self.assertCookiesSet(req, resp, [TEST_SECRET])
+        cookies_set = self._get_cookies_set(req, resp)
+        self.assertEqual(cookies_set, [TEST_SECRET])
 
     def test_invalid_cookie_replaced_on_GET(self):
         """
@@ -1175,28 +1175,28 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         self.assertContains(resp, 'OK')
         csrf_cookie = self._read_csrf_cookie(req, resp)
         self.assertTrue(csrf_cookie, msg='No CSRF cookie was sent.')
-        self.assertEqual(len(csrf_cookie), CSRF_TOKEN_LENGTH)
+        self.assertEqual(len(csrf_cookie), CSRF_SECRET_LENGTH)
 
-    def test_unmasked_secret_replaced_on_GET(self):
-        """An unmasked CSRF cookie is replaced during a GET request."""
-        req = self._get_request(cookie=TEST_SECRET)
-        resp = protected_view(req)
-        self.assertContains(resp, 'OK')
-        csrf_cookie = self._read_csrf_cookie(req, resp)
-        self.assertTrue(csrf_cookie, msg='No CSRF cookie was sent.')
-        self.assertMaskedSecretCorrect(csrf_cookie, TEST_SECRET)
-
-    def test_masked_secret_not_replaced_on_GET(self):
-        """A masked CSRF cookie is not replaced during a GET request."""
-        req = self._get_request(cookie=MASKED_TEST_SECRET1)
-        resp = protected_view(req)
-        self.assertContains(resp, 'OK')
-        csrf_cookie = self._read_csrf_cookie(req, resp)
-        self.assertFalse(csrf_cookie, msg='A CSRF cookie was sent.')
-
-    def test_masked_secret_accepted_and_not_replaced(self):
+    def test_valid_secret_not_replaced_on_GET(self):
         """
-        The csrf cookie is left unchanged if originally masked.
+        Masked and unmasked CSRF cookies are not replaced during a GET request.
+        """
+        cases = [
+            TEST_SECRET,
+            MASKED_TEST_SECRET1,
+        ]
+        for cookie in cases:
+            with self.subTest(cookie=cookie):
+                req = self._get_request(cookie=cookie)
+                resp = protected_view(req)
+                self.assertContains(resp, 'OK')
+                csrf_cookie = self._read_csrf_cookie(req, resp)
+                self.assertFalse(csrf_cookie, msg='A CSRF cookie was sent.')
+
+    def test_masked_secret_accepted_and_replaced(self):
+        """
+        For a view that uses the csrf_token, the csrf cookie is replaced with
+        the unmasked version if originally masked.
         """
         req = self._get_POST_request_with_token(cookie=MASKED_TEST_SECRET1)
         mw = CsrfViewMiddleware(token_view)
@@ -1205,12 +1205,12 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         self.assertIsNone(resp)
         resp = mw(req)
         csrf_cookie = self._read_csrf_cookie(req, resp)
-        self.assertEqual(csrf_cookie, MASKED_TEST_SECRET1)
+        self.assertEqual(csrf_cookie, TEST_SECRET)
         self._check_token_present(resp, csrf_cookie)
 
-    def test_bare_secret_accepted_and_replaced(self):
+    def test_bare_secret_accepted_and_not_replaced(self):
         """
-        The csrf cookie is reset (masked) if originally not masked.
+        The csrf cookie is left unchanged if originally not masked.
         """
         req = self._get_POST_request_with_token(cookie=TEST_SECRET)
         mw = CsrfViewMiddleware(token_view)
@@ -1219,8 +1219,7 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         self.assertIsNone(resp)
         resp = mw(req)
         csrf_cookie = self._read_csrf_cookie(req, resp)
-        # This also checks that csrf_cookie now has length CSRF_TOKEN_LENGTH.
-        self.assertMaskedSecretCorrect(csrf_cookie, TEST_SECRET)
+        self.assertEqual(csrf_cookie, TEST_SECRET)
         self._check_token_present(resp, csrf_cookie)
 
     @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_COOKIE_DOMAIN='.example.com', USE_X_FORWARDED_PORT=True)
@@ -1407,3 +1406,31 @@ class CsrfInErrorHandlingViewsTests(CsrfFunctionTestMixin, SimpleTestCase):
         token2 = response.content.decode('ascii')
         secret2 = _unmask_cipher_token(token2)
         self.assertMaskedSecretCorrect(token1, secret2)
+
+
+@ignore_warnings(category=RemovedInDjango50Warning)
+class CsrfCookieMaskedTests(CsrfFunctionTestMixin, SimpleTestCase):
+    @override_settings(CSRF_COOKIE_MASKED=True)
+    def test_get_token_csrf_cookie_not_set(self):
+        request = HttpRequest()
+        self.assertNotIn('CSRF_COOKIE', request.META)
+        self.assertNotIn('CSRF_COOKIE_NEEDS_UPDATE', request.META)
+        token = get_token(request)
+        cookie = request.META['CSRF_COOKIE']
+        self.assertEqual(len(cookie), CSRF_TOKEN_LENGTH)
+        unmasked_cookie = _unmask_cipher_token(cookie)
+        self.assertMaskedSecretCorrect(token, unmasked_cookie)
+        self.assertIs(request.META['CSRF_COOKIE_NEEDS_UPDATE'], True)
+
+    @override_settings(CSRF_COOKIE_MASKED=True)
+    def test_rotate_token(self):
+        request = HttpRequest()
+        request.META['CSRF_COOKIE'] = MASKED_TEST_SECRET1
+        self.assertNotIn('CSRF_COOKIE_NEEDS_UPDATE', request.META)
+        rotate_token(request)
+        # The underlying secret was changed.
+        cookie = request.META['CSRF_COOKIE']
+        self.assertEqual(len(cookie), CSRF_TOKEN_LENGTH)
+        unmasked_cookie = _unmask_cipher_token(cookie)
+        self.assertNotEqual(unmasked_cookie, TEST_SECRET)
+        self.assertIs(request.META['CSRF_COOKIE_NEEDS_UPDATE'], True)

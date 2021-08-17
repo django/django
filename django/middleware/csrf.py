@@ -83,7 +83,12 @@ def _add_new_csrf_cookie(request):
     """Generate a new random CSRF_COOKIE value, and add it to request.META."""
     csrf_secret = _get_new_csrf_string()
     request.META.update({
-        'CSRF_COOKIE': _mask_cipher_secret(csrf_secret),
+        # RemovedInDjango50Warning: when the deprecation ends, replace
+        # with: 'CSRF_COOKIE': csrf_secret
+        'CSRF_COOKIE': (
+            _mask_cipher_secret(csrf_secret)
+            if settings.CSRF_COOKIE_MASKED else csrf_secret
+        ),
         'CSRF_COOKIE_NEEDS_UPDATE': True,
     })
     return csrf_secret
@@ -100,7 +105,7 @@ def get_token(request):
     function lazily, as is done by the csrf context processor.
     """
     if 'CSRF_COOKIE' in request.META:
-        csrf_secret = _unmask_cipher_token(request.META["CSRF_COOKIE"])
+        csrf_secret = request.META['CSRF_COOKIE']
         # Since the cookie is being used, flag to send the cookie in
         # process_response() (even if the client already has it) in order to
         # renew the expiry timer.
@@ -124,29 +129,33 @@ class InvalidTokenFormat(Exception):
 
 
 def _sanitize_token(token):
+    """
+    Raise an InvalidTokenFormat error if the token has an invalid length or
+    characters that aren't allowed. The token argument can be a CSRF cookie
+    secret or non-cookie CSRF token, and either masked or unmasked.
+    """
     if len(token) not in (CSRF_TOKEN_LENGTH, CSRF_SECRET_LENGTH):
         raise InvalidTokenFormat(REASON_INCORRECT_LENGTH)
     # Make sure all characters are in CSRF_ALLOWED_CHARS.
     if invalid_token_chars_re.search(token):
         raise InvalidTokenFormat(REASON_INVALID_CHARACTERS)
-    if len(token) == CSRF_SECRET_LENGTH:
-        # Older Django versions set cookies to values of CSRF_SECRET_LENGTH
-        # alphanumeric characters. For backwards compatibility, accept
-        # such values as unmasked secrets.
-        # It's easier to mask here and be consistent later, rather than add
-        # different code paths in the checks, although that might be a tad more
-        # efficient.
-        return _mask_cipher_secret(token)
-    return token
 
 
-def _does_token_match(request_csrf_token, csrf_token):
-    # Assume both arguments are sanitized -- that is, strings of
-    # length CSRF_TOKEN_LENGTH, all CSRF_ALLOWED_CHARS.
-    return constant_time_compare(
-        _unmask_cipher_token(request_csrf_token),
-        _unmask_cipher_token(csrf_token),
-    )
+def _does_token_match(request_csrf_token, csrf_secret):
+    """
+    Return whether the given CSRF token matches the given CSRF secret, after
+    unmasking the token if necessary.
+
+    This function assumes that the request_csrf_token argument has been
+    validated to have the correct length (CSRF_SECRET_LENGTH or
+    CSRF_TOKEN_LENGTH characters) and allowed characters, and that if it has
+    length CSRF_TOKEN_LENGTH, it is a masked secret.
+    """
+    # Only unmask tokens that are exactly CSRF_TOKEN_LENGTH characters long.
+    if len(request_csrf_token) == CSRF_TOKEN_LENGTH:
+        request_csrf_token = _unmask_cipher_token(request_csrf_token)
+    assert len(request_csrf_token) == CSRF_SECRET_LENGTH
+    return constant_time_compare(request_csrf_token, csrf_secret)
 
 
 class RejectRequest(Exception):
@@ -206,10 +215,17 @@ class CsrfViewMiddleware(MiddlewareMixin):
         )
         return response
 
-    def _get_token(self, request):
+    def _get_secret(self, request):
+        """
+        Return the CSRF secret originally associated with the request, or None
+        if it didn't have one.
+
+        If the CSRF_USE_SESSIONS setting is false, raises InvalidTokenFormat if
+        the request's secret has invalid characters or an invalid length.
+        """
         if settings.CSRF_USE_SESSIONS:
             try:
-                return request.session.get(CSRF_SESSION_KEY)
+                csrf_secret = request.session.get(CSRF_SESSION_KEY)
             except AttributeError:
                 raise ImproperlyConfigured(
                     'CSRF_USE_SESSIONS is enabled, but request.session is not '
@@ -218,18 +234,18 @@ class CsrfViewMiddleware(MiddlewareMixin):
                 )
         else:
             try:
-                cookie_token = request.COOKIES[settings.CSRF_COOKIE_NAME]
+                csrf_secret = request.COOKIES[settings.CSRF_COOKIE_NAME]
             except KeyError:
-                return None
-
-            # This can raise InvalidTokenFormat.
-            csrf_token = _sanitize_token(cookie_token)
-
-            if csrf_token != cookie_token:
-                # Then the cookie token had length CSRF_SECRET_LENGTH, so flag
-                # to replace it with the masked version.
-                request.META['CSRF_COOKIE_NEEDS_UPDATE'] = True
-            return csrf_token
+                csrf_secret = None
+            else:
+                # This can raise InvalidTokenFormat.
+                _sanitize_token(csrf_secret)
+        if csrf_secret is None:
+            return None
+        # Django versions before 4.0 masked the secret before storing.
+        if len(csrf_secret) == CSRF_TOKEN_LENGTH:
+            csrf_secret = _unmask_cipher_token(csrf_secret)
+        return csrf_secret
 
     def _set_csrf_cookie(self, request, response):
         if settings.CSRF_USE_SESSIONS:
@@ -328,15 +344,15 @@ class CsrfViewMiddleware(MiddlewareMixin):
         return f'CSRF token from {token_source} {reason}.'
 
     def _check_token(self, request):
-        # Access csrf_token via self._get_token() as rotate_token() may have
+        # Access csrf_secret via self._get_secret() as rotate_token() may have
         # been called by an authentication middleware during the
         # process_request() phase.
         try:
-            csrf_token = self._get_token(request)
+            csrf_secret = self._get_secret(request)
         except InvalidTokenFormat as exc:
             raise RejectRequest(f'CSRF cookie {exc.reason}.')
 
-        if csrf_token is None:
+        if csrf_secret is None:
             # No CSRF cookie. For POST requests, we insist on a CSRF cookie,
             # and in this way we can avoid all CSRF attacks, including login
             # CSRF.
@@ -358,6 +374,10 @@ class CsrfViewMiddleware(MiddlewareMixin):
             # Fall back to X-CSRFToken, to make things easier for AJAX, and
             # possible for PUT/DELETE.
             try:
+                # This can have length CSRF_SECRET_LENGTH or CSRF_TOKEN_LENGTH,
+                # depending on whether the client obtained the token from
+                # the DOM or the cookie (and if the cookie, whether the cookie
+                # was masked or unmasked).
                 request_csrf_token = request.META[settings.CSRF_HEADER_NAME]
             except KeyError:
                 raise RejectRequest(REASON_CSRF_TOKEN_MISSING)
@@ -366,24 +386,27 @@ class CsrfViewMiddleware(MiddlewareMixin):
             token_source = 'POST'
 
         try:
-            request_csrf_token = _sanitize_token(request_csrf_token)
+            _sanitize_token(request_csrf_token)
         except InvalidTokenFormat as exc:
             reason = self._bad_token_message(exc.reason, token_source)
             raise RejectRequest(reason)
 
-        if not _does_token_match(request_csrf_token, csrf_token):
+        if not _does_token_match(request_csrf_token, csrf_secret):
             reason = self._bad_token_message('incorrect', token_source)
             raise RejectRequest(reason)
 
     def process_request(self, request):
         try:
-            csrf_token = self._get_token(request)
+            csrf_secret = self._get_secret(request)
         except InvalidTokenFormat:
             _add_new_csrf_cookie(request)
         else:
-            if csrf_token is not None:
-                # Use same token next time.
-                request.META['CSRF_COOKIE'] = csrf_token
+            if csrf_secret is not None:
+                # Use the same secret next time. If the secret was originally
+                # masked, this also causes it to be replaced with the unmasked
+                # form, but only in cases where the secret is already getting
+                # saved anyways.
+                request.META['CSRF_COOKIE'] = csrf_secret
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
         if getattr(request, 'csrf_processing_done', False):
