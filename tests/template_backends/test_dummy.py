@@ -3,7 +3,7 @@ import re
 from django.forms import CharField, Form, Media
 from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import (
-    CsrfViewMiddleware, _does_token_match as equivalent_tokens, get_token,
+    CSRF_TOKEN_LENGTH, CsrfViewMiddleware, _unmask_cipher_token, get_token,
 )
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.template.backends.dummy import TemplateStrings
@@ -74,6 +74,12 @@ class TemplateStringsTests(SimpleTestCase):
 
         self.assertHTMLEqual(content, expected)
 
+    def check_tokens_equivalent(self, token1, token2):
+        self.assertEqual(len(token1), CSRF_TOKEN_LENGTH)
+        self.assertEqual(len(token2), CSRF_TOKEN_LENGTH)
+        token1, token2 = map(_unmask_cipher_token, (token1, token2))
+        self.assertEqual(token1, token2)
+
     def test_csrf_token(self):
         request = HttpRequest()
         CsrfViewMiddleware(lambda req: HttpResponse()).process_view(request, lambda r: None, (), {})
@@ -84,7 +90,7 @@ class TemplateStringsTests(SimpleTestCase):
         expected = '<input type="hidden" name="csrfmiddlewaretoken" value="([^"]+)">'
         match = re.match(expected, content) or re.match(expected.replace('"', "'"), content)
         self.assertTrue(match, "hidden csrftoken field not found in output")
-        self.assertTrue(equivalent_tokens(match[1], get_token(request)))
+        self.check_tokens_equivalent(match[1], get_token(request))
 
     def test_no_directory_traversal(self):
         with self.assertRaises(TemplateDoesNotExist):

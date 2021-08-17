@@ -1396,13 +1396,14 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
 
 
 @override_settings(ROOT_URLCONF='csrf_tests.csrf_token_error_handler_urls', DEBUG=False)
-class CsrfInErrorHandlingViewsTests(SimpleTestCase):
+class CsrfInErrorHandlingViewsTests(CsrfFunctionTestMixin, SimpleTestCase):
     def test_csrf_token_on_404_stays_constant(self):
         response = self.client.get('/does not exist/')
         # The error handler returns status code 599.
         self.assertEqual(response.status_code, 599)
-        token1 = response.content
+        token1 = response.content.decode('ascii')
         response = self.client.get('/does not exist/')
         self.assertEqual(response.status_code, 599)
-        token2 = response.content
-        self.assertTrue(_does_token_match(token1.decode('ascii'), token2.decode('ascii')))
+        token2 = response.content.decode('ascii')
+        secret2 = _unmask_cipher_token(token2)
+        self.assertMaskedSecretCorrect(token1, secret2)
