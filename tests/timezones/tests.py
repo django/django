@@ -362,6 +362,21 @@ class NewDatabaseTests(TestCase):
                 self.assertEqual(Event.objects.filter(dt__in=(prev, dt, next)).count(), 1)
                 self.assertEqual(Event.objects.filter(dt__range=(prev, next)).count(), 1)
 
+    def test_connection_timezone(self):
+        tests = [
+            (False, None, zoneinfo.ZoneInfo),
+            (False, 'Africa/Nairobi', zoneinfo.ZoneInfo),
+            (True, None, pytz.BaseTzInfo),
+            (True, 'Africa/Nairobi', pytz.BaseTzInfo),
+        ]
+        for use_pytz, connection_tz, expected_type in tests:
+            with self.subTest(use_pytz=use_pytz, connection_tz=connection_tz):
+                connection.timezone.clear_cache()
+                with override_settings(USE_DEPRECATED_PYTZ=use_pytz), \
+                     override_database_connection_timezone(connection_tz):
+                    self.assertIsInstance(connection.timezone, expected_type)
+                connection.timezone.clear_cache()
+
     def test_query_convert_timezones(self):
         # Connection timezone is equal to the current timezone, datetime
         # shouldn't be converted.
