@@ -166,7 +166,7 @@ will be returned::
     * A URL, which will be returned as-is.
 
 Note: this is the underlying function used by :func:`~django.shortcuts.redirect`
-thus it accepts the same arguments but returning an URL instead of a
+thus it accepts the same arguments but returning a URL instead of a
 :class:`~django.http.HttpResponseRedirect`.
 
 ``get_object_or_404()``
