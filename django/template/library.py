@@ -243,7 +243,7 @@ def parse_bits(parser, bits, params, varargs, varkw, defaults,
     keyword arguments.
     """
     if takes_context:
-        if params[0] == 'context':
+        if params and params[0] == 'context':
             params = params[1:]
         else:
             raise TemplateSyntaxError(
