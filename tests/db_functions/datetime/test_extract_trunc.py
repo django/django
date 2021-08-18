@@ -1,14 +1,15 @@
+import unittest
 from datetime import datetime, timedelta, timezone as datetime_timezone
-
-import pytz
 
 try:
     import zoneinfo
 except ImportError:
-    try:
-        from backports import zoneinfo
-    except ImportError:
-        zoneinfo = None
+    from backports import zoneinfo
+
+try:
+    import pytz
+except ImportError:
+    pytz = None
 
 from django.conf import settings
 from django.db.models import (
@@ -29,9 +30,16 @@ from django.utils import timezone
 
 from ..models import Author, DTModel, Fan
 
-ZONE_CONSTRUCTORS = (pytz.timezone,)
-if zoneinfo is not None:
-    ZONE_CONSTRUCTORS += (zoneinfo.ZoneInfo,)
+HAS_PYTZ = pytz is not None
+if not HAS_PYTZ:
+    needs_pytx = unittest.skip("Test requires pytz")
+else:
+    def needs_pytx(f):
+        return f
+
+ZONE_CONSTRUCTORS = (zoneinfo.ZoneInfo,)
+if HAS_PYTZ:
+    ZONE_CONSTRUCTORS += (pytz.timezone,)
 
 
 def truncate_to(value, kind, tzinfo=None):
@@ -1263,6 +1271,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
                 self.assertEqual(model.melb_time, melb_start_datetime.time())
                 self.assertEqual(model.pacific_time, pacific_start_datetime.time())
 
+    @needs_pytx
     def test_trunc_ambiguous_and_invalid_times(self):
         sao = pytz.timezone('America/Sao_Paulo')
         utc = timezone.utc

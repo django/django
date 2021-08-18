@@ -1,11 +1,33 @@
 from datetime import datetime, tzinfo
 
-import pytz
+try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo
 
+from django.conf import settings
 from django.template import Library, Node, TemplateSyntaxError
 from django.utils import timezone
 
 register = Library()
+
+
+class UnknownTimezoneException(BaseException):
+    pass
+
+
+# RemovedInDjango50Warning
+def timezone_constructor(tzname):
+    if settings.USE_DEPRECATED_PYTZ:
+        import pytz
+        try:
+            return pytz.timezone(tzname)
+        except pytz.UnknownTimeZoneError:
+            raise UnknownTimezoneException()
+    try:
+        return zoneinfo.ZoneInfo(tzname)
+    except zoneinfo.ZoneInfoNotFoundError:
+        raise UnknownTimezoneException()
 
 
 # HACK: datetime instances cannot be assigned new attributes. Define a subclass
@@ -61,8 +83,8 @@ def do_timezone(value, arg):
         tz = arg
     elif isinstance(arg, str):
         try:
-            tz = pytz.timezone(arg)
-        except pytz.UnknownTimeZoneError:
+            tz = timezone_constructor(arg)
+        except UnknownTimezoneException:
             return ''
     else:
         return ''

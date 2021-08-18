@@ -13,8 +13,6 @@ except ImportError:
 from contextlib import ContextDecorator
 from datetime import datetime, timedelta, timezone, tzinfo
 
-# TODO: make this import conditional.
-import pytz
 from asgiref.local import Local
 
 from django.conf import settings
@@ -43,15 +41,10 @@ def __getattr__(name):
     if name != 'utc':
         raise AttributeError(f'module {__name__!r} has no attribute {name!r}')
 
-    if settings.configured:
-        return pytz.utc if settings.USE_DEPRECATED_PYTZ else zoneinfo.ZoneInfo('UTC')
+    if settings.configured and settings.USE_DEPRECATED_PYTZ:
+        import pytz
+        return pytz.utc
     return zoneinfo.ZoneInfo('UTC')
-
-
-_PYTZ_BASE_CLASSES = (pytz.tzinfo.BaseTzInfo, pytz._FixedOffset)
-# In releases prior to 2018.4, pytz.UTC was not a subclass of BaseTzInfo
-if not isinstance(pytz.UTC, pytz._FixedOffset):
-    _PYTZ_BASE_CLASSES = _PYTZ_BASE_CLASSES + (type(pytz.UTC),)
 
 
 def get_fixed_timezone(offset):
@@ -74,6 +67,7 @@ def get_default_timezone():
     This is the time zone defined by settings.TIME_ZONE.
     """
     if settings.USE_DEPRECATED_PYTZ:
+        import pytz
         msg = (
             "The USE_DEPRECATED_PYTZ setting, and support for pytz "
             "timezones is deprecated in favor of the stdlib zoneinfo module."
@@ -124,7 +118,11 @@ def activate(timezone):
     if isinstance(timezone, tzinfo):
         _active.value = timezone
     elif isinstance(timezone, str):
-        _active.value = pytz.timezone(timezone)
+        if settings.USE_DEPRECATED_PYTZ:
+            import pytz
+            _active.value = pytz.timezone(timezone)
+        else:
+            _active.value = zoneinfo.ZoneInfo(timezone)
     else:
         raise ValueError("Invalid timezone: %r" % timezone)
 
@@ -288,11 +286,21 @@ def make_naive(value, timezone=None):
 
 def _is_pytz_zone(tz):
     """Checks if a zone is a pytz zone."""
+    if not settings.USE_DEPRECATED_PYTZ:
+        return False
+
+    import pytz
+    _PYTZ_BASE_CLASSES = (pytz.tzinfo.BaseTzInfo, pytz._FixedOffset)
+    # In releases prior to 2018.4, pytz.UTC was not a subclass of BaseTzInfo
+    if not isinstance(pytz.UTC, pytz._FixedOffset):
+        _PYTZ_BASE_CLASSES = _PYTZ_BASE_CLASSES + (type(pytz.UTC),)
+
     return isinstance(tz, _PYTZ_BASE_CLASSES)
 
 
 def _datetime_ambiguous_or_imaginary(dt, tz):
     if _is_pytz_zone(tz):
+        import pytz
         try:
             tz.utcoffset(dt)
         except (pytz.AmbiguousTimeError, pytz.NonExistentTimeError):
