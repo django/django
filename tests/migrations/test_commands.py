@@ -951,6 +951,7 @@ class MigrateTests(MigrationTestBase):
         )
         # No changes were actually applied so there is nothing to rollback
 
+    @override_settings(AUTH_USER_MODEL='migrations.Author')
     def test_migrate_partially_applied_squashed_migration(self):
         """
         Migrating to a squashed migration specified by name should succeed
