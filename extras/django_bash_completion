@@ -36,7 +36,7 @@ _django_completion()
                    COMP_CWORD=$COMP_CWORD \
                    DJANGO_AUTO_COMPLETE=1 $1 ) )
 }
-complete -F _django_completion -o default manage.py django-admin
+complete -F _django_completion -o default ./manage.py manage.py django-admin
 
 _python_django_completion()
 {
