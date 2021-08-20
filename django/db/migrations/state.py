@@ -346,6 +346,40 @@ class ProjectState:
         # Render all models
         self.apps.render_multiple(states_to_be_rendered)
 
+    def update_model_field_relation(
+        self, model, model_key, field_name, field, concretes,
+    ):
+        remote_model_key = resolve_relation(model, *model_key)
+        if remote_model_key[0] not in self.real_apps and remote_model_key in concretes:
+            remote_model_key = concretes[remote_model_key]
+        self.relations[remote_model_key][model_key].append((field_name, field))
+
+    def resolve_model_field_relations(
+        self, model_key, field_name, field, concretes=None,
+    ):
+        remote_field = field.remote_field
+        if not remote_field:
+            return
+        if concretes is None:
+            concretes, _ = self._get_concrete_models_mapping_and_proxy_models()
+
+        self.update_model_field_relation(
+            remote_field.model, model_key, field_name, field, concretes,
+        )
+
+        through = getattr(remote_field, 'through', None)
+        if not through:
+            return
+        self.update_model_field_relation(through, model_key, field_name, field, concretes)
+
+    def resolve_model_relations(self, model_key, concretes=None):
+        if concretes is None:
+            concretes, _ = self._get_concrete_models_mapping_and_proxy_models()
+
+        model_state = self.models[model_key]
+        for field_name, field in model_state.fields.items():
+            self.resolve_model_field_relations(model_key, field_name, field, concretes)
+
     def resolve_fields_and_relations(self):
         # Resolve fields.
         for model_state in self.models.values():
@@ -357,23 +391,8 @@ class ProjectState:
         concretes, proxies = self._get_concrete_models_mapping_and_proxy_models()
 
         for model_key in concretes:
-            model_state = self.models[model_key]
-            for field_name, field in model_state.fields.items():
-                remote_field = field.remote_field
-                if not remote_field:
-                    continue
-                remote_model_key = resolve_relation(remote_field.model, *model_key)
-                if remote_model_key[0] not in self.real_apps and remote_model_key in concretes:
-                    remote_model_key = concretes[remote_model_key]
-                self.relations[remote_model_key][model_key].append((field_name, field))
+            self.resolve_model_relations(model_key, concretes)
 
-                through = getattr(remote_field, 'through', None)
-                if not through:
-                    continue
-                through_model_key = resolve_relation(through, *model_key)
-                if through_model_key[0] not in self.real_apps and through_model_key in concretes:
-                    through_model_key = concretes[through_model_key]
-                self.relations[through_model_key][model_key].append((field_name, field))
         for model_key in proxies:
             self.relations[model_key] = self.relations[concretes[model_key]]
 
