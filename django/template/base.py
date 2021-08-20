@@ -384,8 +384,8 @@ class Lexer:
             # We could do len(BLOCK_TAG_START) to be more "correct", but we've
             # hard-coded the 2s here for performance. And it's not like
             # the TAG_START values are going to change anytime, anyway.
-            block_content = token_string[2:-2].strip()
             token_start = token_string[0:2]
+            block_content = token_string[2:-2].strip()
             token_type = TAG_START_TOKEN_TYPE_MAP[token_start]
             return Token(token_type, block_content, position, lineno, token_string)
         else:
