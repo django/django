@@ -2,6 +2,7 @@ import collections.abc
 import copy
 import datetime
 import decimal
+import math
 import operator
 import uuid
 import warnings
@@ -1539,6 +1540,12 @@ class DecimalField(Field):
         if value is None:
             return value
         if isinstance(value, float):
+            if math.isnan(value):
+                raise exceptions.ValidationError(
+                    self.error_messages['invalid'],
+                    code='invalid',
+                    params={'value': value},
+                )
             return self.context.create_decimal_from_float(value)
         try:
             return decimal.Decimal(value)
