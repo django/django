@@ -58,6 +58,13 @@ For example::
 Functional unique constraints are added to models using the
 :attr:`Meta.constraints <django.db.models.Options.constraints>` option.
 
+``scrypt`` password hasher
+--------------------------
+
+The new :ref:`scrypt password hasher <scrypt-usage>` is more secure and
+recommended over PBKDF2. However, it's not the default as it requires OpenSSL
+1.1+ and more memory.
+
 Minor features
 --------------
 
@@ -131,6 +138,11 @@ Minor features
   :class:`~django.contrib.postgres.operations.AddConstraintNotValid` on
   PostgreSQL.
 
+* The new
+  :class:`ArraySubquery() <django.contrib.postgres.expressions.ArraySubquery>`
+  expression allows using subqueries to construct lists of values on
+  PostgreSQL.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -161,6 +173,11 @@ Minor features
 * :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` now
   replaces paths to JavaScript modules in ``import`` and ``export`` statements
   with their hashed counterparts.
+
+* The new ``manifest_storage`` argument of
+  :class:`~django.contrib.staticfiles.storage.ManifestFilesMixin` and
+  :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
+  allows customizing the manifest file storage.
 
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -213,10 +230,25 @@ Forms
   error message. This allows custom error messages to use the ``%(value)s``
   placeholder.
 
+* :class:`~django.forms.formsets.BaseFormSet` now renders non-form errors with
+  an additional class of ``nonform`` to help distinguish them from
+  form-specific errors.
+
+* :class:`~django.forms.formsets.BaseFormSet` now allows customizing the widget
+  used when deleting forms via
+  :attr:`~django.forms.formsets.BaseFormSet.can_delete` by setting the
+  :attr:`~django.forms.formsets.BaseFormSet.deletion_widget` attribute or
+  overriding :meth:`~django.forms.formsets.BaseFormSet.get_deletion_widget`
+  method.
+
 Generic Views
 ~~~~~~~~~~~~~
 
-* ...
+* :class:`~django.views.generic.edit.DeleteView` now uses
+  :class:`~django.views.generic.edit.FormMixin`, allowing you to provide a
+  :class:`~django.forms.Form` subclass, with a checkbox for example, to confirm
+  deletion. In addition, this allows ``DeleteView`` to function with
+  :class:`django.contrib.messages.views.SuccessMessageMixin`.
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
@@ -226,7 +258,8 @@ Internationalization
 Logging
 ~~~~~~~
 
-* ...
+* The alias of the database used in an SQL call is now passed as extra context
+  along with each message to the :ref:`django-db-logger` logger.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -235,6 +268,11 @@ Management Commands
   :option:`--skip-checks` option.
 
 * On PostgreSQL, :djadmin:`dbshell` now supports specifying a password file.
+
+* The :djadmin:`shell` command now respects :py:data:`sys.__interactivehook__`
+  at startup. This allows loading shell history between interactive sessions.
+  As a consequence, ``readline`` is no longer loaded if running in *isolated*
+  mode.
 
 Migrations
 ~~~~~~~~~~
@@ -257,6 +295,26 @@ Models
 
 * :class:`~django.db.models.DurationField` now supports multiplying and
   dividing by scalar values on SQLite.
+
+* :meth:`.QuerySet.bulk_update` now returns the number of objects updated.
+
+* The new :attr:`.Aggregate.empty_aggregate_value` attribute allows specifying
+  a value to return when the aggregation is used over an empty result set.
+
+* The ``skip_locked`` argument of :meth:`.QuerySet.select_for_update()` is now
+  allowed on MariaDB 10.6+.
+
+* :class:`~django.db.models.Lookup` expressions may now be used in ``QuerySet``
+  annotations, aggregations, and directly in filters.
+
+* The new :ref:`default <aggregate-default>` argument for built-in aggregates
+  allows specifying a value to be returned when the queryset (or grouping)
+  contains no entries, rather than ``None``.
+
+* The ``on_delete`` argument for ``ForeignKey`` and ``OneToOneField`` now accepts
+  ``DB_CASCADE``, ``DB_SET_NULL``, and ``DB_RESTRICT``. These
+  will behave like ``DO_NOTHING`` in Django, but leverage the ``ON DELETE`` SQL
+  constraint equivalents.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -305,6 +363,12 @@ Tests
 
 * The new :meth:`.DiscoverRunner.log` method allows customizing the way
   messages are logged.
+
+* Django test runner now supports a :option:`--shuffle <test --shuffle>` option
+  to execute tests in a random order.
+
+* The :option:`test --parallel` option now supports the value ``auto`` to run
+  one test process for each processor core.
 
 URLs
 ~~~~
@@ -467,6 +531,28 @@ Miscellaneous
   individual nodes to a string. ``Node.render()`` should always return a string
   as documented.
 
+* The ``where_class`` property of ``django.db.models.sql.query.Query`` and the
+  ``where_class`` argument to the private ``get_extra_restriction()`` method of
+  ``ForeignObject`` and ``ForeignObjectRel`` are removed. If needed, initialize
+  ``django.db.models.sql.where.WhereNode`` instead.
+
+* The ``filter_clause`` argument of the undocumented ``Query.add_filter()``
+  method is replaced by two positional arguments ``filter_lhs`` and
+  ``filter_rhs``.
+
+* :class:`~django.middleware.csrf.CsrfViewMiddleware` now uses
+  ``request.META['CSRF_COOKIE_NEEDS_UPDATE']`` in place of
+  ``request.META['CSRF_COOKIE_USED']``, ``request.csrf_cookie_needs_reset``,
+  and ``response.csrf_cookie_set`` to track whether the CSRF cookie should be
+  sent. This is an undocumented, private API.
+
+* The undocumented ``TRANSLATOR_COMMENT_MARK`` constant is moved from
+  ``django.template.base`` to ``django.utils.translation.template``.
+
+* The ``real_apps`` argument of the undocumented
+  ``django.db.migrations.state.ProjectState.__init__()`` method must now be a
+  set if provided.
+
 .. _deprecated-features-4.0:
 
 Features deprecated in 4.0
@@ -499,6 +585,16 @@ Miscellaneous
 
 * The default sitemap protocol for sitemaps built outside the context of a
   request will change from ``'http'`` to ``'https'`` in Django 5.0.
+
+* The ``extra_tests`` argument for :meth:`.DiscoverRunner.build_suite` and
+  :meth:`.DiscoverRunner.run_tests` is deprecated.
+
+* The :class:`~django.contrib.postgres.aggregates.ArrayAgg`,
+  :class:`~django.contrib.postgres.aggregates.JSONBAgg`, and
+  :class:`~django.contrib.postgres.aggregates.StringAgg` aggregates will return
+  ``None`` when there are no rows instead of ``[]``, ``[]``, and ``''``
+  respectively in Django 5.0. If you need the previous behavior, explicitly set
+  ``default`` to ``Value([])``, ``Value('[]')``, or ``Value('')``.
 
 Features removed in 4.0
 =======================

@@ -291,10 +291,14 @@ class QuerySet:
                 'QuerySet indices must be integers or slices, not %s.'
                 % type(k).__name__
             )
-        assert ((not isinstance(k, slice) and (k >= 0)) or
-                (isinstance(k, slice) and (k.start is None or k.start >= 0) and
-                 (k.stop is None or k.stop >= 0))), \
-            "Negative indexing is not supported."
+        if (
+            (isinstance(k, int) and k < 0) or
+            (isinstance(k, slice) and (
+                (k.start is not None and k.start < 0) or
+                (k.stop is not None and k.stop < 0)
+            ))
+        ):
+            raise ValueError('Negative indexing is not supported.')
 
         if self._result_cache is not None:
             return self._result_cache[k]
@@ -480,7 +484,8 @@ class QuerySet:
         # PostgreSQL via the RETURNING ID clause. It should be possible for
         # Oracle as well, but the semantics for extracting the primary keys is
         # trickier so it's not done yet.
-        assert batch_size is None or batch_size > 0
+        if batch_size is not None and batch_size <= 0:
+            raise ValueError('Batch size must be a positive integer.')
         # Check that the parents share the same concrete model with the our
         # model to detect the inheritance pattern ConcreteGrandParent ->
         # MultiTableParent -> ProxyChild. Simply checking self.model._meta.proxy
@@ -541,7 +546,7 @@ class QuerySet:
         if any(f.primary_key for f in fields):
             raise ValueError('bulk_update() cannot be used with primary key fields.')
         if not objs:
-            return
+            return 0
         # PK is used twice in the resulting update query, once in the filter
         # and once in the WHEN. Each field will also have one CAST.
         max_batch_size = connections[self.db].ops.bulk_batch_size(['pk', 'pk'] + fields, objs)
@@ -563,9 +568,11 @@ class QuerySet:
                     case_statement = Cast(case_statement, output_field=field)
                 update_kwargs[field.attname] = case_statement
             updates.append(([obj.pk for obj in batch_objs], update_kwargs))
+        rows_updated = 0
         with transaction.atomic(using=self.db, savepoint=False):
             for pks, update_kwargs in updates:
-                self.filter(pk__in=pks).update(**update_kwargs)
+                rows_updated += self.filter(pk__in=pks).update(**update_kwargs)
+        return rows_updated
     bulk_update.alters_data = True
 
     def get_or_create(self, defaults=None, **kwargs):
@@ -656,7 +663,7 @@ class QuerySet:
             )
         obj = self._chain()
         obj.query.set_limits(high=1)
-        obj.query.clear_ordering(force_empty=True)
+        obj.query.clear_ordering(force=True)
         obj.query.add_ordering(*order_by)
         return obj.get()
 
@@ -739,7 +746,7 @@ class QuerySet:
         # Disable non-supported fields.
         del_query.query.select_for_update = False
         del_query.query.select_related = False
-        del_query.query.clear_ordering(force_empty=True)
+        del_query.query.clear_ordering(force=True)
 
         collector = Collector(using=del_query.db)
         collector.collect(del_query)
@@ -898,10 +905,10 @@ class QuerySet:
         Return a list of date objects representing all available dates for
         the given field_name, scoped to 'kind'.
         """
-        assert kind in ('year', 'month', 'week', 'day'), \
-            "'kind' must be one of 'year', 'month', 'week', or 'day'."
-        assert order in ('ASC', 'DESC'), \
-            "'order' must be either 'ASC' or 'DESC'."
+        if kind not in ('year', 'month', 'week', 'day'):
+            raise ValueError("'kind' must be one of 'year', 'month', 'week', or 'day'.")
+        if order not in ('ASC', 'DESC'):
+            raise ValueError("'order' must be either 'ASC' or 'DESC'.")
         return self.annotate(
             datefield=Trunc(field_name, kind, output_field=DateField()),
             plain_field=F(field_name)
@@ -914,10 +921,13 @@ class QuerySet:
         Return a list of datetime objects representing all available
         datetimes for the given field_name, scoped to 'kind'.
         """
-        assert kind in ('year', 'month', 'week', 'day', 'hour', 'minute', 'second'), \
-            "'kind' must be one of 'year', 'month', 'week', 'day', 'hour', 'minute', or 'second'."
-        assert order in ('ASC', 'DESC'), \
-            "'order' must be either 'ASC' or 'DESC'."
+        if kind not in ('year', 'month', 'week', 'day', 'hour', 'minute', 'second'):
+            raise ValueError(
+                "'kind' must be one of 'year', 'month', 'week', 'day', "
+                "'hour', 'minute', or 'second'."
+            )
+        if order not in ('ASC', 'DESC'):
+            raise ValueError("'order' must be either 'ASC' or 'DESC'.")
         if settings.USE_TZ:
             if tzinfo is None:
                 tzinfo = timezone.get_current_timezone()
@@ -1007,7 +1017,7 @@ class QuerySet:
         # Clone the query to inherit the select list and everything
         clone = self._chain()
         # Clear limits and ordering so they can be reapplied
-        clone.query.clear_ordering(True)
+        clone.query.clear_ordering(force=True)
         clone.query.clear_limits()
         clone.query.combined_queries = (self.query,) + tuple(qs.query for qs in other_qs)
         clone.query.combinator = combinator
@@ -1164,7 +1174,7 @@ class QuerySet:
         if self.query.is_sliced:
             raise TypeError('Cannot reorder a query once a slice has been taken.')
         obj = self._chain()
-        obj.query.clear_ordering(force_empty=False)
+        obj.query.clear_ordering(force=True, clear_default=False)
         obj.query.add_ordering(*field_names)
         return obj
 
@@ -1312,7 +1322,7 @@ class QuerySet:
                 self._insert(item, fields=fields, using=self.db, ignore_conflicts=ignore_conflicts)
         return inserted_rows
 
-    def _chain(self, **kwargs):
+    def _chain(self):
         """
         Return a copy of the current QuerySet that's ready for another
         operation.
@@ -1321,7 +1331,6 @@ class QuerySet:
         if obj._sticky_filter:
             obj.query.filter_is_sticky = True
             obj._sticky_filter = False
-        obj.__dict__.update(kwargs)
         return obj
 
     def _clone(self):
@@ -1612,11 +1621,11 @@ class Prefetch:
     def __getstate__(self):
         obj_dict = self.__dict__.copy()
         if self.queryset is not None:
+            queryset = self.queryset._chain()
             # Prevent the QuerySet from being evaluated
-            obj_dict['queryset'] = self.queryset._chain(
-                _result_cache=[],
-                _prefetch_done=True,
-            )
+            queryset._result_cache = []
+            queryset._prefetch_done = True
+            obj_dict['queryset'] = queryset
         return obj_dict
 
     def add_prefix(self, prefix):

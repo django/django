@@ -77,7 +77,7 @@ should be used only for requests that do not affect the state of the system.
 ``GET`` would also be unsuitable for a password form, because the password
 would appear in the URL, and thus, also in browser history and server logs,
 all in plain text. Neither would it be suitable for large quantities of data,
-or for binary data, such as an image. A Web application that uses ``GET``
+or for binary data, such as an image. A web application that uses ``GET``
 requests for admin forms is a security risk: it can be easy for an attacker to
 mimic a form's request to gain access to sensitive parts of the system.
 ``POST``, coupled with other protections like Django's :doc:`CSRF protection
@@ -115,7 +115,7 @@ Forms in Django
 We've described HTML forms briefly, but an HTML ``<form>`` is just one part of
 the machinery required.
 
-In the context of a Web application, 'form' might refer to that HTML
+In the context of a web application, 'form' might refer to that HTML
 ``<form>``, or to the Django :class:`Form` that produces it, or to the
 structured data returned when it is submitted, or to the end-to-end working
 collection of these parts.

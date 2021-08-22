@@ -444,4 +444,4 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             self._remake_table(model)
 
     def _collate_sql(self, collation):
-        return ' COLLATE ' + collation
+        return 'COLLATE ' + collation

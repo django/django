@@ -26,7 +26,7 @@ Then, please post it in one of the following channels:
   chat-based discussions. If you're new to IRC, see the `Libera.Chat
   documentation`_ for different ways to connect.
 
-.. _`"Using Django"`: https://forum.djangoproject.com/c/users
+.. _`"Using Django"`: https://forum.djangoproject.com/c/users/6
 .. _#django IRC channel: https://web.libera.chat/#django
 .. _Libera.Chat documentation: https://libera.chat/guides/connect
 

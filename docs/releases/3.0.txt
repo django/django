@@ -559,7 +559,7 @@ Miscellaneous
 
 * Assigning a value to a model's :class:`~django.db.models.ForeignKey` or
   :class:`~django.db.models.OneToOneField` ``'_id'`` attribute now unsets the
-  corresponding field. Accessing the field afterwards will result in a query.
+  corresponding field. Accessing the field afterward will result in a query.
 
 * :func:`~django.utils.cache.patch_vary_headers` now handles an asterisk
   ``'*'`` according to :rfc:`7231#section-7.1.4`, i.e. if a list of header

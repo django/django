@@ -1401,8 +1401,8 @@ Format character  Description                               Example output
 ``e``             Timezone name. Could be in any format,
                   or might return an empty string,          ``''``, ``'GMT'``, ``'-500'``, ``'US/Eastern'``, etc.
                   depending on the datetime.
-``I``             Daylight Savings Time, whether it's       ``'1'`` or ``'0'``
-                  in effect or not.
+``I``             Daylight saving time, whether it's in     ``'1'`` or ``'0'``
+                  effect or not.
 ``O``             Difference to Greenwich time in hours.    ``'+0200'``
 ``T``             Time zone of this machine.                ``'EST'``, ``'MDT'``
 ``Z``             Time zone offset in seconds. The          ``-43200`` to ``43200``

@@ -310,7 +310,7 @@ class StateTests(SimpleTestCase):
     def test_apps_bulk_update(self):
         """
         StateApps.bulk_update() should update apps.ready to False and reset
-        the value afterwards.
+        the value afterward.
         """
         project_state = ProjectState()
         apps = project_state.apps
@@ -916,13 +916,17 @@ class StateTests(SimpleTestCase):
             project_state.apps
 
         # If we include the real app it should succeed
-        project_state = ProjectState(real_apps=["contenttypes"])
+        project_state = ProjectState(real_apps={'contenttypes'})
         project_state.add_model(ModelState.from_model(TestModel))
         rendered_state = project_state.apps
         self.assertEqual(
             len([x for x in rendered_state.get_models() if x._meta.app_label == "migrations"]),
             1,
         )
+
+    def test_real_apps_non_set(self):
+        with self.assertRaises(AssertionError):
+            ProjectState(real_apps=['contenttypes'])
 
     def test_ignore_order_wrt(self):
         """

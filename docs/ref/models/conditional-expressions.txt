@@ -48,6 +48,10 @@ objects that have an ``output_field`` that is a
 :class:`~django.db.models.BooleanField`. The result is provided using the
 ``then`` keyword.
 
+.. versionchanged:: 4.0
+
+    Support for lookup expressions was added.
+
 Some examples::
 
     >>> from django.db.models import F, Q, When
@@ -68,6 +72,13 @@ Some examples::
     ...     account_type=OuterRef('account_type'),
     ... ).exclude(pk=OuterRef('pk')).values('pk')
     >>> When(Exists(non_unique_account_type), then=Value('non unique'))
+    >>> # Condition can be created using lookup expressions.
+    >>> from django.db.models.lookups import GreaterThan, LessThan
+    >>> When(
+    ...     GreaterThan(F('registered_on'), date(2014, 1, 1)) &
+    ...     LessThan(F('registered_on'), date(2015, 1, 1)),
+    ...     then='account_type',
+    ... )
 
 Keep in mind that each of these values can be an expression.
 

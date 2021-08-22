@@ -66,7 +66,7 @@ class MigrationExecutor:
         Create a project state including all the applications without
         migrations and applied migrations if with_applied_migrations=True.
         """
-        state = ProjectState(real_apps=list(self.loader.unmigrated_apps))
+        state = ProjectState(real_apps=self.loader.unmigrated_apps)
         if with_applied_migrations:
             # Create the forwards plan Django would follow on an empty database
             full_plan = self.migration_plan(self.loader.graph.leaf_nodes(), clean_start=True)

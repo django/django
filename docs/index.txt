@@ -52,7 +52,7 @@ Django has a lot of documentation. A high-level overview of how it's organized
 will help you know where to look for certain things:
 
 * :doc:`Tutorials </intro/index>` take you by the hand through a series of
-  steps to create a Web application. Start here if you're new to Django or Web
+  steps to create a web application. Start here if you're new to Django or web
   application development. Also look at the ":ref:`index-first-steps`".
 
 * :doc:`Topic guides </topics/index>` discuss key topics and concepts at a
@@ -70,7 +70,7 @@ The model layer
 ===============
 
 Django provides an abstraction layer (the "models") for structuring and
-manipulating the data of your Web application. Learn more about it below:
+manipulating the data of your web application. Learn more about it below:
 
 * **Models:**
   :doc:`Introduction to models <topics/db/models>` |
@@ -241,7 +241,7 @@ most popular features:
 Security
 ========
 
-Security is a topic of paramount importance in the development of Web
+Security is a topic of paramount importance in the development of web
 applications and Django provides multiple protection tools and mechanisms:
 
 * :doc:`Security overview <topics/security>`
@@ -261,7 +261,7 @@ regions:
 * :doc:`Overview <topics/i18n/index>` |
   :doc:`Internationalization <topics/i18n/translation>` |
   :ref:`Localization <how-to-create-language-files>` |
-  :doc:`Localized Web UI formatting and form input <topics/i18n/formatting>`
+  :doc:`Localized web UI formatting and form input <topics/i18n/formatting>`
 * :doc:`Time zones </topics/i18n/timezones>`
 
 Performance and optimization
@@ -276,13 +276,13 @@ Geographic framework
 ====================
 
 :doc:`GeoDjango <ref/contrib/gis/index>` intends to be a world-class geographic
-Web framework. Its goal is to make it as easy as possible to build GIS Web
+web framework. Its goal is to make it as easy as possible to build GIS web
 applications and harness the power of spatially enabled data.
 
-Common Web application tools
+Common web application tools
 ============================
 
-Django offers multiple tools commonly needed in the development of Web
+Django offers multiple tools commonly needed in the development of web
 applications:
 
 * **Authentication:**

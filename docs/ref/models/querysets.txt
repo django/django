@@ -9,7 +9,7 @@ material presented in the :doc:`model </topics/db/models>` and :doc:`database
 query </topics/db/queries>` guides, so you'll probably want to read and
 understand those documents before reading this one.
 
-Throughout this reference we'll use the :ref:`example Weblog models
+Throughout this reference we'll use the :ref:`example blog models
 <queryset-model-example>` presented in the :doc:`database query guide
 </topics/db/queries>`.
 
@@ -1792,11 +1792,11 @@ them::
     >>> Person.objects.select_related('hometown').select_for_update().exclude(hometown=None)
     <QuerySet [<Person: ...)>, ...]>
 
-Currently, the ``postgresql``, ``oracle``, and ``mysql`` database
-backends support ``select_for_update()``. However, MariaDB 10.3+ supports only
-the ``nowait`` argument and MySQL 8.0.1+ supports the ``nowait``,
-``skip_locked``, and ``of`` arguments. The ``no_key`` argument is supported
-only on PostgreSQL.
+The ``postgresql``, ``oracle``, and ``mysql`` database backends support
+``select_for_update()``. However, MariaDB 10.3+ only supports the ``nowait``
+argument, MariaDB 10.6+ also supports the ``skip_locked`` argument, and MySQL
+8.0.1+ supports the ``nowait``, ``skip_locked``, and ``of`` arguments. The
+``no_key`` argument is only supported on PostgreSQL.
 
 Passing ``nowait=True``, ``skip_locked=True``, ``no_key=True``, or ``of`` to
 ``select_for_update()`` using database backends that do not support these
@@ -1835,6 +1835,10 @@ raised if ``select_for_update()`` is used in autocommit mode.
     The ``no_key`` argument was added.
 
     The ``of`` argument was allowed on MySQL 8.0.1+.
+
+.. versionchanged:: 4.0
+
+    The ``skip_locked`` argument was allowed on MariaDB 10.6+.
 
 ``raw()``
 ~~~~~~~~~
@@ -2139,7 +2143,7 @@ The above example can be rewritten using ``update_or_create()`` like so::
         defaults={'first_name': 'Bob'},
     )
 
-For detailed description how names passed in ``kwargs`` are resolved see
+For a detailed description of how names passed in ``kwargs`` are resolved, see
 :meth:`get_or_create`.
 
 As described above in :meth:`get_or_create`, this method is prone to a
@@ -2221,7 +2225,8 @@ normally supports it).
 .. method:: bulk_update(objs, fields, batch_size=None)
 
 This method efficiently updates the given fields on the provided model
-instances, generally with one query::
+instances, generally with one query, and returns the number of objects
+updated::
 
     >>> objs = [
     ...    Entry.objects.create(headline='Entry 1'),
@@ -2230,6 +2235,11 @@ instances, generally with one query::
     >>> objs[0].headline = 'This is entry 1'
     >>> objs[1].headline = 'This is entry 2'
     >>> Entry.objects.bulk_update(objs, ['headline'])
+    2
+
+.. versionchanged:: 4.0
+
+    The return value of the number of objects updated was added.
 
 :meth:`.QuerySet.update` is used to save the changes, so this is more efficient
 than iterating through the list of models and calling ``save()`` on each of
@@ -2246,6 +2256,10 @@ them, but it has a few caveats:
   extra query per ancestor.
 * When an individual batch contains duplicates, only the first instance in that
   batch will result in an update.
+* The number of objects updated returned by the function may be fewer than the
+  number of objects passed in. This can be due to duplicate objects passed in
+  which are updated in the same batch or race conditions such that objects are
+  no longer present in the database.
 
 The ``batch_size`` parameter controls how many objects are saved in a single
 query. The default is to update all objects in one batch, except for SQLite
@@ -2284,7 +2298,10 @@ database query like ``count()`` would.
 
 Takes a list of field values (``id_list``) and the ``field_name`` for those
 values, and returns a dictionary mapping each value to an instance of the
-object with the given field value. If ``id_list`` isn't provided, all objects
+object with the given field value. No
+:exc:`django.core.exceptions.ObjectDoesNotExist` exceptions will ever be raised
+by ``in_bulk``; that is, any ``id_list`` value not matching any instance will
+simply be ignored. If ``id_list`` isn't provided, all objects
 in the queryset are returned. ``field_name`` must be a unique field or a
 distinct field (if there's only one field specified in :meth:`distinct`).
 ``field_name`` defaults to the primary key.
@@ -2668,7 +2685,7 @@ For example, to delete all the entries in a particular blog::
 
     # Delete all the entries belonging to this Blog.
     >>> Entry.objects.filter(blog=b).delete()
-    (4, {'weblog.Entry': 2, 'weblog.Entry_authors': 2})
+    (4, {'blog.Entry': 2, 'blog.Entry_authors': 2})
 
 By default, Django's :class:`~django.db.models.ForeignKey` emulates the SQL
 constraint ``ON DELETE CASCADE`` — in other words, any objects with foreign
@@ -2679,7 +2696,7 @@ For example::
 
     # This will delete all Blogs and all of their Entry objects.
     >>> blogs.delete()
-    (5, {'weblog.Blog': 1, 'weblog.Entry': 2, 'weblog.Entry_authors': 2})
+    (5, {'blog.Blog': 1, 'blog.Entry': 2, 'blog.Entry_authors': 2})
 
 This cascade behavior is customizable via the
 :attr:`~django.db.models.ForeignKey.on_delete` argument to the
@@ -3523,8 +3540,10 @@ documentation to learn how to create your aggregates.
 
     Aggregation functions return ``None`` when used with an empty
     ``QuerySet``. For example, the ``Sum`` aggregation function returns ``None``
-    instead of ``0`` if the ``QuerySet`` contains no entries. An exception is
-    ``Count``, which does return ``0`` if the ``QuerySet`` is empty.
+    instead of ``0`` if the ``QuerySet`` contains no entries. To return another
+    value instead, pass a value to the ``default`` argument. An exception is
+    ``Count``, which does return ``0`` if the ``QuerySet`` is empty. ``Count``
+    does not support the ``default`` argument.
 
 All aggregates have the following parameters in common:
 
@@ -3561,6 +3580,16 @@ rows that are aggregated.
 See :ref:`conditional-aggregation` and :ref:`filtering-on-annotations` for
 example usage.
 
+.. _aggregate-default:
+
+``default``
+~~~~~~~~~~~
+
+.. versionadded:: 4.0
+
+An optional argument that allows specifying a value to use as a default value
+when the queryset (or grouping) contains no entries.
+
 ``**extra``
 ~~~~~~~~~~~
 
@@ -3570,7 +3599,7 @@ by the aggregate.
 ``Avg``
 ~~~~~~~
 
-.. class:: Avg(expression, output_field=None, distinct=False, filter=None, **extra)
+.. class:: Avg(expression, output_field=None, distinct=False, filter=None, default=None, **extra)
 
     Returns the mean value of the given expression, which must be numeric
     unless you specify a different ``output_field``.
@@ -3606,10 +3635,14 @@ by the aggregate.
         This is the SQL equivalent of ``COUNT(DISTINCT <field>)``. The default
         value is ``False``.
 
+    .. note::
+
+        The ``default`` argument is not supported.
+
 ``Max``
 ~~~~~~~
 
-.. class:: Max(expression, output_field=None, filter=None, **extra)
+.. class:: Max(expression, output_field=None, filter=None, default=None, **extra)
 
     Returns the maximum value of the given expression.
 
@@ -3619,7 +3652,7 @@ by the aggregate.
 ``Min``
 ~~~~~~~
 
-.. class:: Min(expression, output_field=None, filter=None, **extra)
+.. class:: Min(expression, output_field=None, filter=None, default=None, **extra)
 
     Returns the minimum value of the given expression.
 
@@ -3629,7 +3662,7 @@ by the aggregate.
 ``StdDev``
 ~~~~~~~~~~
 
-.. class:: StdDev(expression, output_field=None, sample=False, filter=None, **extra)
+.. class:: StdDev(expression, output_field=None, sample=False, filter=None, default=None, **extra)
 
     Returns the standard deviation of the data in the provided expression.
 
@@ -3647,7 +3680,7 @@ by the aggregate.
 ``Sum``
 ~~~~~~~
 
-.. class:: Sum(expression, output_field=None, distinct=False, filter=None, **extra)
+.. class:: Sum(expression, output_field=None, distinct=False, filter=None, default=None, **extra)
 
     Computes the sum of all values of the given expression.
 
@@ -3665,7 +3698,7 @@ by the aggregate.
 ``Variance``
 ~~~~~~~~~~~~
 
-.. class:: Variance(expression, output_field=None, sample=False, filter=None, **extra)
+.. class:: Variance(expression, output_field=None, sample=False, filter=None, default=None, **extra)
 
     Returns the variance of the data in the provided expression.
 

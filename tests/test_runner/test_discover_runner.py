@@ -1,4 +1,5 @@
 import logging
+import multiprocessing
 import os
 import unittest.loader
 from argparse import ArgumentParser
@@ -8,7 +9,7 @@ from unittest import TestSuite, TextTestRunner, defaultTestLoader, mock
 
 from django.db import connections
 from django.test import SimpleTestCase
-from django.test.runner import DiscoverRunner
+from django.test.runner import DiscoverRunner, get_max_test_processes
 from django.test.utils import (
     NullTimeKeeper, TimeKeeper, captured_stderr, captured_stdout,
 )
@@ -36,6 +37,55 @@ def change_loader_patterns(patterns):
         DiscoverRunner.test_loader.testNamePatterns = original_patterns
 
 
+# Isolate from the real environment.
+@mock.patch.dict(os.environ, {}, clear=True)
+@mock.patch.object(multiprocessing, 'cpu_count', return_value=12)
+# Python 3.8 on macOS defaults to 'spawn' mode.
+@mock.patch.object(multiprocessing, 'get_start_method', return_value='fork')
+class DiscoverRunnerParallelArgumentTests(SimpleTestCase):
+    def get_parser(self):
+        parser = ArgumentParser()
+        DiscoverRunner.add_arguments(parser)
+        return parser
+
+    def test_parallel_default(self, *mocked_objects):
+        result = self.get_parser().parse_args([])
+        self.assertEqual(result.parallel, 0)
+
+    def test_parallel_flag(self, *mocked_objects):
+        result = self.get_parser().parse_args(['--parallel'])
+        self.assertEqual(result.parallel, 'auto')
+
+    def test_parallel_auto(self, *mocked_objects):
+        result = self.get_parser().parse_args(['--parallel', 'auto'])
+        self.assertEqual(result.parallel, 'auto')
+
+    def test_parallel_count(self, *mocked_objects):
+        result = self.get_parser().parse_args(['--parallel', '17'])
+        self.assertEqual(result.parallel, 17)
+
+    def test_parallel_invalid(self, *mocked_objects):
+        with self.assertRaises(SystemExit), captured_stderr() as stderr:
+            self.get_parser().parse_args(['--parallel', 'unaccepted'])
+        msg = "argument --parallel: 'unaccepted' is not an integer or the string 'auto'"
+        self.assertIn(msg, stderr.getvalue())
+
+    def test_get_max_test_processes(self, *mocked_objects):
+        self.assertEqual(get_max_test_processes(), 12)
+
+    @mock.patch.dict(os.environ, {'DJANGO_TEST_PROCESSES': '7'})
+    def test_get_max_test_processes_env_var(self, *mocked_objects):
+        self.assertEqual(get_max_test_processes(), 7)
+
+    def test_get_max_test_processes_spawn(
+        self, mocked_get_start_method, mocked_cpu_count,
+    ):
+        mocked_get_start_method.return_value = 'spawn'
+        self.assertEqual(get_max_test_processes(), 1)
+        with mock.patch.dict(os.environ, {'DJANGO_TEST_PROCESSES': '7'}):
+            self.assertEqual(get_max_test_processes(), 1)
+
+
 class DiscoverRunnerTests(SimpleTestCase):
 
     @staticmethod
@@ -49,6 +99,16 @@ class DiscoverRunnerTests(SimpleTestCase):
         runner = DiscoverRunner()
         self.assertFalse(runner.debug_mode)
 
+    def test_add_arguments_shuffle(self):
+        parser = ArgumentParser()
+        DiscoverRunner.add_arguments(parser)
+        ns = parser.parse_args([])
+        self.assertIs(ns.shuffle, False)
+        ns = parser.parse_args(['--shuffle'])
+        self.assertIsNone(ns.shuffle)
+        ns = parser.parse_args(['--shuffle', '5'])
+        self.assertEqual(ns.shuffle, 5)
+
     def test_add_arguments_debug_mode(self):
         parser = ArgumentParser()
         DiscoverRunner.add_arguments(parser)
@@ -57,6 +117,30 @@ class DiscoverRunnerTests(SimpleTestCase):
         self.assertFalse(ns.debug_mode)
         ns = parser.parse_args(["--debug-mode"])
         self.assertTrue(ns.debug_mode)
+
+    def test_setup_shuffler_no_shuffle_argument(self):
+        runner = DiscoverRunner()
+        self.assertIs(runner.shuffle, False)
+        runner.setup_shuffler()
+        self.assertIsNone(runner.shuffle_seed)
+
+    def test_setup_shuffler_shuffle_none(self):
+        runner = DiscoverRunner(shuffle=None)
+        self.assertIsNone(runner.shuffle)
+        with mock.patch('random.randint', return_value=1):
+            with captured_stdout() as stdout:
+                runner.setup_shuffler()
+        self.assertEqual(stdout.getvalue(), 'Using shuffle seed: 1 (generated)\n')
+        self.assertEqual(runner.shuffle_seed, 1)
+
+    def test_setup_shuffler_shuffle_int(self):
+        runner = DiscoverRunner(shuffle=2)
+        self.assertEqual(runner.shuffle, 2)
+        with captured_stdout() as stdout:
+            runner.setup_shuffler()
+        expected_out = 'Using shuffle seed: 2 (given)\n'
+        self.assertEqual(stdout.getvalue(), expected_out)
+        self.assertEqual(runner.shuffle_seed, 2)
 
     def test_load_tests_for_label_file_path(self):
         with change_cwd('.'):
@@ -266,6 +350,25 @@ class DiscoverRunnerTests(SimpleTestCase):
         self.assertIsInstance(tests[0], unittest.loader._FailedTest)
         self.assertNotIsInstance(tests[-1], unittest.loader._FailedTest)
 
+    def test_build_suite_shuffling(self):
+        # These will result in unittest.loader._FailedTest instances rather
+        # than TestCase objects, but they are sufficient for testing.
+        labels = ['label1', 'label2', 'label3', 'label4']
+        cases = [
+            ({}, ['label1', 'label2', 'label3', 'label4']),
+            ({'reverse': True}, ['label4', 'label3', 'label2', 'label1']),
+            ({'shuffle': 8}, ['label4', 'label1', 'label3', 'label2']),
+            ({'shuffle': 8, 'reverse': True}, ['label2', 'label3', 'label1', 'label4']),
+        ]
+        for kwargs, expected in cases:
+            with self.subTest(kwargs=kwargs):
+                # Prevent writing the seed to stdout.
+                runner = DiscoverRunner(**kwargs, verbosity=0)
+                tests = runner.build_suite(test_labels=labels)
+                # The ids have the form "unittest.loader._FailedTest.label1".
+                names = [test.id().split('.')[-1] for test in tests]
+                self.assertEqual(names, expected)
+
     def test_overridable_get_test_runner_kwargs(self):
         self.assertIsInstance(DiscoverRunner().get_test_runner_kwargs(), dict)
 
@@ -354,6 +457,26 @@ class DiscoverRunnerTests(SimpleTestCase):
         suite = runner.build_suite(['test_runner_apps.tagged'])
         self.assertEqual(suite.processes, len(suite.subsuites))
 
+    def test_number_of_databases_parallel_test_suite(self):
+        """
+        Number of databases doesn't exceed the number of TestCases with
+        parallel tests.
+        """
+        runner = DiscoverRunner(parallel=8, verbosity=0)
+        suite = runner.build_suite(['test_runner_apps.tagged'])
+        self.assertEqual(suite.processes, len(suite.subsuites))
+        self.assertEqual(runner.parallel, suite.processes)
+
+    def test_number_of_databases_no_parallel_test_suite(self):
+        """
+        Number of databases doesn't exceed the number of TestCases with
+        non-parallel tests.
+        """
+        runner = DiscoverRunner(parallel=8, verbosity=0)
+        suite = runner.build_suite(['test_runner_apps.simple.tests.DjangoCase1'])
+        self.assertEqual(runner.parallel, 1)
+        self.assertIsInstance(suite, TestSuite)
+
     def test_buffer_mode_test_pass(self):
         runner = DiscoverRunner(buffer=True, verbosity=0)
         with captured_stdout() as stdout, captured_stderr() as stderr:
@@ -373,6 +496,52 @@ class DiscoverRunnerTests(SimpleTestCase):
             runner.run_suite(suite)
         self.assertIn('Write to stderr.', stderr.getvalue())
         self.assertIn('Write to stdout.', stdout.getvalue())
+
+    def run_suite_with_runner(self, runner_class, **kwargs):
+        class MyRunner(DiscoverRunner):
+            def test_runner(self, *args, **kwargs):
+                return runner_class()
+
+        runner = MyRunner(**kwargs)
+        # Suppress logging "Using shuffle seed" to the console.
+        with captured_stdout():
+            runner.setup_shuffler()
+        with captured_stdout() as stdout:
+            try:
+                result = runner.run_suite(None)
+            except RuntimeError as exc:
+                result = str(exc)
+        output = stdout.getvalue()
+        return result, output
+
+    def test_run_suite_logs_seed(self):
+        class TestRunner:
+            def run(self, suite):
+                return '<fake-result>'
+
+        expected_prefix = 'Used shuffle seed'
+        # Test with and without shuffling enabled.
+        result, output = self.run_suite_with_runner(TestRunner)
+        self.assertEqual(result, '<fake-result>')
+        self.assertNotIn(expected_prefix, output)
+
+        result, output = self.run_suite_with_runner(TestRunner, shuffle=2)
+        self.assertEqual(result, '<fake-result>')
+        expected_output = f'{expected_prefix}: 2 (given)\n'
+        self.assertEqual(output, expected_output)
+
+    def test_run_suite_logs_seed_exception(self):
+        """
+        run_suite() logs the seed when TestRunner.run() raises an exception.
+        """
+        class TestRunner:
+            def run(self, suite):
+                raise RuntimeError('my exception')
+
+        result, output = self.run_suite_with_runner(TestRunner, shuffle=2)
+        self.assertEqual(result, 'my exception')
+        expected_output = 'Used shuffle seed: 2 (given)\n'
+        self.assertEqual(output, expected_output)
 
     @mock.patch('faulthandler.enable')
     def test_faulthandler_enabled(self, mocked_enable):
@@ -405,7 +574,7 @@ class DiscoverRunnerTests(SimpleTestCase):
             with runner.time_keeper.timed('test'):
                 pass
             runner.time_keeper.print_results()
-        self.assertTrue(isinstance(runner.time_keeper, NullTimeKeeper))
+        self.assertIsInstance(runner.time_keeper, NullTimeKeeper)
         self.assertNotIn('test', stderr.getvalue())
 
     def test_timings_captured(self):
@@ -414,7 +583,7 @@ class DiscoverRunnerTests(SimpleTestCase):
             with runner.time_keeper.timed('test'):
                 pass
             runner.time_keeper.print_results()
-        self.assertTrue(isinstance(runner.time_keeper, TimeKeeper))
+        self.assertIsInstance(runner.time_keeper, TimeKeeper)
         self.assertIn('test', stderr.getvalue())
 
     def test_log(self):

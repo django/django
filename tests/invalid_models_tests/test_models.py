@@ -821,6 +821,33 @@ class ShadowingFieldsTests(SimpleTestCase):
             )
         ])
 
+    def test_field_name_clash_with_m2m_through(self):
+        class Parent(models.Model):
+            clash_id = models.IntegerField()
+
+        class Child(Parent):
+            clash = models.ForeignKey('Child', models.CASCADE)
+
+        class Model(models.Model):
+            parents = models.ManyToManyField(
+                to=Parent,
+                through='Through',
+                through_fields=['parent', 'model'],
+            )
+
+        class Through(models.Model):
+            parent = models.ForeignKey(Parent, models.CASCADE)
+            model = models.ForeignKey(Model, models.CASCADE)
+
+        self.assertEqual(Child.check(), [
+            Error(
+                "The field 'clash' clashes with the field 'clash_id' from "
+                "model 'invalid_models_tests.parent'.",
+                obj=Child._meta.get_field('clash'),
+                id='models.E006',
+            )
+        ])
+
     def test_multiinheritance_clash(self):
         class Mother(models.Model):
             clash = models.IntegerField()
@@ -1212,9 +1239,8 @@ class OtherModelTests(SimpleTestCase):
         class Model(models.Model):
             fk = models.ForeignKey('self', models.CASCADE)
 
-            @property
-            def fk_id(self):
-                pass
+        # Override related field accessor.
+        Model.fk_id = property(lambda self: 'ERROR')
 
         self.assertEqual(Model.check(), [
             Error(
@@ -1590,6 +1616,18 @@ class OtherModelTests(SimpleTestCase):
                 id='signals.E001',
             ),
         ])
+
+
+class MultipleAutoFieldsTests(TestCase):
+    def test_multiple_autofields(self):
+        msg = (
+            "Model invalid_models_tests.MultipleAutoFields can't have more "
+            "than one auto-generated field."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            class MultipleAutoFields(models.Model):
+                auto1 = models.AutoField(primary_key=True)
+                auto2 = models.AutoField(primary_key=True)
 
 
 @isolate_apps('invalid_models_tests')

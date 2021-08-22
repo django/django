@@ -23,7 +23,7 @@ else:
     from django.conf import settings
     from django.db import connection, connections
     from django.test import TestCase, TransactionTestCase
-    from django.test.runner import default_test_processes
+    from django.test.runner import get_max_test_processes, parallel_type
     from django.test.selenium import SeleniumTestCaseBase
     from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
     from django.utils.deprecation import (
@@ -325,17 +325,6 @@ def teardown_run_tests(state):
     del os.environ['RUNNING_DJANGOS_TEST_SUITE']
 
 
-def actual_test_processes(parallel):
-    if parallel == 0:
-        # This doesn't work before django.setup() on some databases.
-        if all(conn.features.can_clone_databases for conn in connections.all()):
-            return default_test_processes()
-        else:
-            return 1
-    else:
-        return parallel
-
-
 class ActionSelenium(argparse.Action):
     """
     Validate the comma-separated list of requested browsers.
@@ -353,10 +342,14 @@ class ActionSelenium(argparse.Action):
 def django_tests(verbosity, interactive, failfast, keepdb, reverse,
                  test_labels, debug_sql, parallel, tags, exclude_tags,
                  test_name_patterns, start_at, start_after, pdb, buffer,
-                 timing):
+                 timing, shuffle):
+    if parallel in {0, 'auto'}:
+        max_parallel = get_max_test_processes()
+    else:
+        max_parallel = parallel
+
     if verbosity >= 1:
         msg = "Testing against Django installed in '%s'" % os.path.dirname(django.__file__)
-        max_parallel = default_test_processes() if parallel == 0 else parallel
         if max_parallel > 1:
             msg += " with up to %d processes" % max_parallel
         print(msg)
@@ -365,6 +358,14 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
     # Run the test suite, including the extra validation tests.
     if not hasattr(settings, 'TEST_RUNNER'):
         settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+
+    if parallel in {0, 'auto'}:
+        # This doesn't work before django.setup() on some databases.
+        if all(conn.features.can_clone_databases for conn in connections.all()):
+            parallel = max_parallel
+        else:
+            parallel = 1
+
     TestRunner = get_runner(settings)
     test_runner = TestRunner(
         verbosity=verbosity,
@@ -373,13 +374,14 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
         keepdb=keepdb,
         reverse=reverse,
         debug_sql=debug_sql,
-        parallel=actual_test_processes(parallel),
+        parallel=parallel,
         tags=tags,
         exclude_tags=exclude_tags,
         test_name_patterns=test_name_patterns,
         pdb=pdb,
         buffer=buffer,
         timing=timing,
+        shuffle=shuffle,
     )
     failures = test_runner.run_tests(test_labels)
     teardown_run_tests(state)
@@ -406,6 +408,11 @@ def get_subprocess_args(options):
         subprocess_args.append('--tag=%s' % options.tags)
     if options.exclude_tags:
         subprocess_args.append('--exclude_tag=%s' % options.exclude_tags)
+    if options.shuffle is not False:
+        if options.shuffle is None:
+            subprocess_args.append('--shuffle')
+        else:
+            subprocess_args.append('--shuffle=%s' % options.shuffle)
     return subprocess_args
 
 
@@ -524,6 +531,13 @@ if __name__ == "__main__":
         help='Run the test suite in pairs with the named test to find problem pairs.',
     )
     parser.add_argument(
+        '--shuffle', nargs='?', default=False, type=int, metavar='SEED',
+        help=(
+            'Shuffle the order of test cases to help check that tests are '
+            'properly isolated.'
+        ),
+    )
+    parser.add_argument(
         '--reverse', action='store_true',
         help='Sort test suites and test cases in opposite order to debug '
              'test side effects not apparent with normal execution lineup.',
@@ -549,10 +563,16 @@ if __name__ == "__main__":
         '--debug-sql', action='store_true',
         help='Turn on the SQL query logger within tests.',
     )
+    # 0 is converted to "auto" or 1 later on, depending on a method used by
+    # multiprocessing to start subprocesses and on the backend support for
+    # cloning databases.
     parser.add_argument(
-        '--parallel', nargs='?', default=0, type=int,
-        const=default_test_processes(), metavar='N',
-        help='Run tests using up to N parallel processes.',
+        '--parallel', nargs='?', const='auto', default=0,
+        type=parallel_type, metavar='N',
+        help=(
+            'Run tests using up to N parallel processes. Use the value "auto" '
+            'to run one test process for each processor core.'
+        ),
     )
     parser.add_argument(
         '--tag', dest='tags', action='append',
@@ -650,7 +670,7 @@ if __name__ == "__main__":
                 options.exclude_tags,
                 getattr(options, 'test_name_patterns', None),
                 options.start_at, options.start_after, options.pdb, options.buffer,
-                options.timing,
+                options.timing, options.shuffle,
             )
         time_keeper.print_results()
         if failures:

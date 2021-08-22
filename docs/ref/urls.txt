@@ -21,7 +21,7 @@ Returns an element for inclusion in ``urlpatterns``. For example::
         path('bio/<username>/', views.bio, name='bio'),
         path('articles/<slug:title>/', views.article, name='article-detail'),
         path('articles/<slug:title>/<int:section>/', views.section, name='article-section'),
-        path('weblog/', include('blog.urls')),
+        path('blog/', include('blog.urls')),
         ...
     ]
 
@@ -58,7 +58,7 @@ Returns an element for inclusion in ``urlpatterns``. For example::
     urlpatterns = [
         re_path(r'^index/$', views.index, name='index'),
         re_path(r'^bio/(?P<username>\w+)/$', views.bio, name='bio'),
-        re_path(r'^weblog/', include('blog.urls')),
+        re_path(r'^blog/', include('blog.urls')),
         ...
     ]
 

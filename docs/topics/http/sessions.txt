@@ -103,7 +103,7 @@ To use file-based sessions, set the :setting:`SESSION_ENGINE` setting to
 
 You might also want to set the :setting:`SESSION_FILE_PATH` setting (which
 defaults to output from ``tempfile.gettempdir()``, most likely ``/tmp``) to
-control where Django stores session files. Be sure to check that your Web
+control where Django stores session files. Be sure to check that your web
 server has permissions to read and write to this location.
 
 .. _cookie-session-backend:
@@ -264,7 +264,7 @@ You can edit it multiple times.
         :class:`~django.contrib.sessions.serializers.PickleSerializer`.
 
       * If ``value`` is ``0``, the user's session cookie will expire
-        when the user's Web browser is closed.
+        when the user's web browser is closed.
 
       * If ``value`` is ``None``, the session reverts to using the global
         session expiry policy.
@@ -299,7 +299,7 @@ You can edit it multiple times.
     .. method:: get_expire_at_browser_close()
 
       Returns either ``True`` or ``False``, depending on whether the user's
-      session cookie will expire when the user's Web browser is closed.
+      session cookie will expire when the user's web browser is closed.
 
     .. method:: clear_expired()
 

@@ -36,10 +36,16 @@ def _all_related_fields(model):
 def _related_non_m2m_objects(old_field, new_field):
     # Filter out m2m objects from reverse relations.
     # Return (old_relation, new_relation) tuples.
-    return zip(
+    related_fields = zip(
         (obj for obj in _all_related_fields(old_field.model) if _is_relevant_relation(obj, old_field)),
         (obj for obj in _all_related_fields(new_field.model) if _is_relevant_relation(obj, new_field)),
     )
+    for old_rel, new_rel in related_fields:
+        yield old_rel, new_rel
+        yield from _related_non_m2m_objects(
+            old_rel.remote_field,
+            new_rel.remote_field,
+        )
 
 
 class BaseDatabaseSchemaEditor:
@@ -150,7 +156,7 @@ class BaseDatabaseSchemaEditor:
     def table_sql(self, model):
         """Take a model and return its table definition."""
         # Add any unique_togethers (always deferred, as some fields might be
-        # created afterwards, like geometry fields with some backends).
+        # created afterward, like geometry fields with some backends).
         for field_names in model._meta.unique_together:
             fields = [model._meta.get_field(field) for field in field_names]
             self.deferred_sql.append(self._create_unique_sql(model, fields))
@@ -207,25 +213,14 @@ class BaseDatabaseSchemaEditor:
 
     # Field <-> database mapping functions
 
-    def column_sql(self, model, field, include_default=False):
-        """
-        Take a field and return its column definition.
-        The field must already have had set_attributes_from_name() called.
-        """
-        # Get the column's type and use that as the basis of the SQL
-        db_params = field.db_parameters(connection=self.connection)
-        sql = db_params['type']
-        params = []
-        # Check for fields that aren't actually columns (e.g. M2M)
-        if sql is None:
-            return None, None
-        # Collation.
+    def _iter_column_sql(self, column_db_type, params, model, field, include_default):
+        yield column_db_type
         collation = getattr(field, 'db_collation', None)
         if collation:
-            sql += self._collate_sql(collation)
-        # Work out nullability
+            yield self._collate_sql(collation)
+        # Work out nullability.
         null = field.null
-        # If we were told to include a default value, do so
+        # Include a default value, if requested.
         include_default = (
             include_default and
             not self.skip_default(field) and
@@ -236,36 +231,50 @@ class BaseDatabaseSchemaEditor:
         )
         if include_default:
             default_value = self.effective_default(field)
-            column_default = ' DEFAULT ' + self._column_default_sql(field)
             if default_value is not None:
+                column_default = 'DEFAULT ' + self._column_default_sql(field)
                 if self.connection.features.requires_literal_defaults:
-                    # Some databases can't take defaults as a parameter (oracle)
+                    # Some databases can't take defaults as a parameter (Oracle).
                     # If this is the case, the individual schema backend should
-                    # implement prepare_default
-                    sql += column_default % self.prepare_default(default_value)
+                    # implement prepare_default().
+                    yield column_default % self.prepare_default(default_value)
                 else:
-                    sql += column_default
-                    params += [default_value]
+                    yield column_default
+                    params.append(default_value)
         # Oracle treats the empty string ('') as null, so coerce the null
         # option whenever '' is a possible value.
         if (field.empty_strings_allowed and not field.primary_key and
                 self.connection.features.interprets_empty_strings_as_nulls):
             null = True
-        if null and not self.connection.features.implied_column_null:
-            sql += " NULL"
-        elif not null:
-            sql += " NOT NULL"
-        # Primary key/unique outputs
+        if not null:
+            yield 'NOT NULL'
+        elif not self.connection.features.implied_column_null:
+            yield 'NULL'
         if field.primary_key:
-            sql += " PRIMARY KEY"
+            yield 'PRIMARY KEY'
         elif field.unique:
-            sql += " UNIQUE"
-        # Optionally add the tablespace if it's an implicitly indexed column
+            yield 'UNIQUE'
+        # Optionally add the tablespace if it's an implicitly indexed column.
         tablespace = field.db_tablespace or model._meta.db_tablespace
         if tablespace and self.connection.features.supports_tablespaces and field.unique:
-            sql += " %s" % self.connection.ops.tablespace_sql(tablespace, inline=True)
-        # Return the sql
-        return sql, params
+            yield self.connection.ops.tablespace_sql(tablespace, inline=True)
+
+    def column_sql(self, model, field, include_default=False):
+        """
+        Return the column definition for a field. The field must already have
+        had set_attributes_from_name() called.
+        """
+        # Get the column's type and use that as the basis of the SQL.
+        db_params = field.db_parameters(connection=self.connection)
+        column_db_type = db_params['type']
+        # Check for fields that aren't actually columns (e.g. M2M).
+        if column_db_type is None:
+            return None, None
+        params = []
+        return ' '.join(
+            # This appends to the params being returned.
+            self._iter_column_sql(column_db_type, params, model, field, include_default)
+        ), params
 
     def skip_default(self, field):
         """
@@ -308,14 +317,15 @@ class BaseDatabaseSchemaEditor:
             else:
                 default = ''
         elif getattr(field, 'auto_now', False) or getattr(field, 'auto_now_add', False):
-            default = datetime.now()
             internal_type = field.get_internal_type()
-            if internal_type == 'DateField':
-                default = default.date()
-            elif internal_type == 'TimeField':
-                default = default.time()
-            elif internal_type == 'DateTimeField':
+            if internal_type == 'DateTimeField':
                 default = timezone.now()
+            else:
+                default = datetime.now()
+                if internal_type == 'DateField':
+                    default = default.date()
+                elif internal_type == 'TimeField':
+                    default = default.time()
         else:
             default = None
         return default
@@ -844,8 +854,8 @@ class BaseDatabaseSchemaEditor:
             self.execute(self._create_fk_sql(model, new_field, "_fk_%(to_table)s_%(to_column)s"))
         # Rebuild FKs that pointed to us if we previously had to drop them
         if drop_foreign_keys:
-            for rel in new_field.model._meta.related_objects:
-                if _is_relevant_relation(rel, new_field) and rel.field.db_constraint:
+            for _, rel in rels_to_update:
+                if rel.field.db_constraint:
                     self.execute(self._create_fk_sql(rel.related_model, rel.field, "_fk"))
         # Does it have check constraints we need to add?
         if old_db_params['check'] != new_db_params['check'] and new_db_params['check']:
@@ -949,7 +959,7 @@ class BaseDatabaseSchemaEditor:
             self.sql_alter_column_collate % {
                 'column': self.quote_name(new_field.column),
                 'type': new_type,
-                'collation': self._collate_sql(new_collation) if new_collation else '',
+                'collation': ' ' + self._collate_sql(new_collation) if new_collation else '',
             },
             [],
         )
@@ -1379,7 +1389,7 @@ class BaseDatabaseSchemaEditor:
         return self._delete_constraint_sql(self.sql_delete_pk, model, name)
 
     def _collate_sql(self, collation):
-        return ' COLLATE ' + self.quote_name(collation)
+        return 'COLLATE ' + self.quote_name(collation)
 
     def remove_procedure(self, procedure_name, param_types=()):
         sql = self.sql_delete_procedure % {

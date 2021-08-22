@@ -331,7 +331,7 @@ Tools for cryptographic signing
 
 Django 1.4 adds both a low-level API for signing values and a high-level API
 for setting and reading signed cookies, one of the most common uses of
-signing in Web applications.
+signing in web applications.
 
 See the :doc:`cryptographic signing </topics/signing>` docs for more
 information.
@@ -688,14 +688,14 @@ files included in apps.
 Starting in Django 1.4, the admin's static files also follow this
 convention, to make the files easier to deploy. In previous versions of Django,
 it was also common to define an ``ADMIN_MEDIA_PREFIX`` setting to point to the
-URL where the admin's static files live on a Web server. This setting has now
+URL where the admin's static files live on a web server. This setting has now
 been deprecated and replaced by the more general setting :setting:`STATIC_URL`.
 Django will now expect to find the admin static files under the URL
 ``<STATIC_URL>/admin/``.
 
 If you've previously used a URL path for ``ADMIN_MEDIA_PREFIX`` (e.g.
 ``/media/``) simply make sure :setting:`STATIC_URL` and :setting:`STATIC_ROOT`
-are configured and your Web server serves those files correctly. The
+are configured and your web server serves those files correctly. The
 development server continues to serve the admin files just like before. Read
 the :doc:`static files howto </howto/static-files/index>` for more details.
 
@@ -719,7 +719,7 @@ admin app. Our new policy formalizes existing practices: `YUI's A-grade`_
 browsers should provide a fully-functional admin experience, with the notable
 exception of Internet Explorer 6, which is no longer supported.
 
-Released over 10 years ago, IE6 imposes many limitations on modern Web
+Released over 10 years ago, IE6 imposes many limitations on modern web
 development. The practical implications of this policy are that contributors
 are free to improve the admin without consideration for these limitations.
 

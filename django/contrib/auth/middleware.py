@@ -27,7 +27,7 @@ class AuthenticationMiddleware(MiddlewareMixin):
 
 class RemoteUserMiddleware(MiddlewareMixin):
     """
-    Middleware for utilizing Web-server-provided authentication.
+    Middleware for utilizing web-server-provided authentication.
 
     If request.user is not authenticated, then this middleware attempts to
     authenticate the username passed in the ``REMOTE_USER`` request header.
@@ -113,7 +113,7 @@ class RemoteUserMiddleware(MiddlewareMixin):
 
 class PersistentRemoteUserMiddleware(RemoteUserMiddleware):
     """
-    Middleware for Web-server provided authentication on logon pages.
+    Middleware for web-server provided authentication on logon pages.
 
     Like RemoteUserMiddleware but keeps the user authenticated even if
     the header (``REMOTE_USER``) is not found in the request. Useful

@@ -857,7 +857,7 @@ takes a few steps:
    full path to a directory where you'd like Django to store uploaded files.
    (For performance, these files are not stored in the database.) Define
    :setting:`MEDIA_URL` as the base public URL of that directory. Make sure
-   that this directory is writable by the Web server's user account.
+   that this directory is writable by the web server's user account.
 
 #. Add the :class:`FileField` or :class:`ImageField` to your model, defining
    the :attr:`~FileField.upload_to` option to specify a subdirectory of
@@ -900,7 +900,7 @@ Note that whenever you deal with uploaded files, you should pay close attention
 to where you're uploading them and what type of files they are, to avoid
 security holes. *Validate all uploaded files* so that you're sure the files are
 what you think they are. For example, if you blindly let somebody upload files,
-without validation, to a directory that's within your Web server's document
+without validation, to a directory that's within your web server's document
 root, then somebody could upload a CGI or PHP script and execute that script by
 visiting its URL on your site. Don't allow that.
 
@@ -1640,7 +1640,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
 * .. attribute:: DB_CASCADE
 
-    .. versionadded:: 3.1
+    .. versionadded:: 4.0
 
     Django takes no direct action, behaves exactly like ``DO_NOTHING``,
     but also sets ``ON DELETE CASCADE`` as a SQL constraint. The cascade
@@ -1648,7 +1648,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
 * .. attribute:: DB_SET_NULL
 
-    .. versionadded:: 3.1
+    .. versionadded:: 4.0
 
     Django takes no direct action, behaves exactly like ``DO_NOTHING``, but
     also adds ``ON DELETE SET NULL`` as a SQL constraint. The setting of
@@ -1656,7 +1656,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
 * .. attribute:: DB_RESTRICT
 
-    .. versionadded:: 3.1
+    .. versionadded:: 4.0
 
     Django takes no direct action, behaves exactly like ``DO_NOTHING``, but
     also adds ``ON DELETE RESTRICT`` as a SQL constraint. The immediate
@@ -1780,7 +1780,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     a reference to the setting, not to the model directly.
 
     You only want to override this to be ``False`` if you are sure your
-    model should always point towards the swapped-in model - for example,
+    model should always point toward the swapped-in model - for example,
     if it is a profile model designed specifically for your custom user model.
 
     Setting it to ``False`` does not mean you can reference a swappable model
@@ -1994,7 +1994,7 @@ that control how the relationship functions.
     a reference to the setting, not to the model directly.
 
     You only want to override this to be ``False`` if you are sure your
-    model should always point towards the swapped-in model - for example,
+    model should always point toward the swapped-in model - for example,
     if it is a profile model designed specifically for your custom user model.
 
     If in doubt, leave it to its default of ``True``.

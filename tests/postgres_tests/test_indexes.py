@@ -305,7 +305,7 @@ class SchemaTests(PostgreSQLTestCase):
         self.assertIn(index_name, constraints)
         self.assertIn(constraints[index_name]['type'], GinIndex.suffix)
         self.assertIs(sql.references_column(table, 'field'), True)
-        self.assertIn(' AS tsvector', str(sql))
+        self.assertIn('::tsvector', str(sql))
         with connection.schema_editor() as editor:
             editor.remove_index(TextFieldModel, index)
         self.assertNotIn(index_name, self.get_constraints(table))

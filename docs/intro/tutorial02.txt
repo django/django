@@ -3,8 +3,8 @@ Writing your first Django app, part 2
 =====================================
 
 This tutorial begins where :doc:`Tutorial 1 </intro/tutorial01>` left off.
-We'll setup the database, create your first model, and get a quick introduction
-to Django's automatically-generated admin site.
+We'll set up the database, create your first model, and get a quick
+introduction to Django's automatically-generated admin site.
 
 .. admonition:: Where to get help:
 
@@ -613,7 +613,7 @@ If the server is not running start it like so:
 
     $ python manage.py runserver
 
-Now, open a Web browser and go to "/admin/" on your local domain -- e.g.,
+Now, open a web browser and go to "/admin/" on your local domain -- e.g.,
 http://127.0.0.1:8000/admin/. You should see the admin's login screen:
 
 .. image:: _images/admin01.png

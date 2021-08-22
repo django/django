@@ -762,8 +762,18 @@ class RadioSelect(ChoiceWidget):
     template_name = 'django/forms/widgets/radio.html'
     option_template_name = 'django/forms/widgets/radio_option.html'
 
+    def id_for_label(self, id_, index=None):
+        """
+        Don't include for="field_0" in <label> to improve accessibility when
+        using a screen reader, in addition clicking such a label would toggle
+        the first input.
+        """
+        if index is None:
+            return ''
+        return super().id_for_label(id_, index)
 
-class CheckboxSelectMultiple(ChoiceWidget):
+
+class CheckboxSelectMultiple(RadioSelect):
     allow_multiple_selected = True
     input_type = 'checkbox'
     template_name = 'django/forms/widgets/checkbox_select.html'
@@ -778,15 +788,6 @@ class CheckboxSelectMultiple(ChoiceWidget):
         # HTML checkboxes don't appear in POST data if not checked, so it's
         # never known if the value is actually omitted.
         return False
-
-    def id_for_label(self, id_, index=None):
-        """
-        Don't include for="field_0" in <label> because clicking such a label
-        would toggle the first checkbox.
-        """
-        if index is None:
-            return ''
-        return super().id_for_label(id_, index)
 
 
 class MultiWidget(Widget):

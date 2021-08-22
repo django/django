@@ -80,7 +80,7 @@ The documentation is organized into several categories:
   understands what we're trying to achieve. Don't feel that you need to begin
   with explanations of how things work - what matters is what the reader does,
   not what you explain. It can be helpful to refer back to what you've done and
-  explain afterwards.
+  explain afterward.
 
 * :doc:`Topic guides </topics/index>` aim to explain a concept or subject at a
   fairly high level.
@@ -160,8 +160,7 @@ documentation:
 * **subclass** -- it's a single word without a hyphen, both as a verb
   ("subclass that model") and as a noun ("create a subclass").
 
-* **Web**, **World Wide Web**, **the Web** -- note Web is always
-  capitalized when referring to the World Wide Web.
+* **the web**, **web framework** -- it's not capitalized.
 
 * **website** -- use one word, without capitalization.
 

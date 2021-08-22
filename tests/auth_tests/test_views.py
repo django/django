@@ -23,6 +23,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sites.requests import RequestSite
 from django.core import mail
+from django.core.exceptions import ImproperlyConfigured
 from django.db import connection
 from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import CsrfViewMiddleware, get_token
@@ -44,7 +45,7 @@ from .settings import AUTH_TEMPLATES
 )
 class AuthViewsTestCase(TestCase):
     """
-    Helper base class for all the follow test cases.
+    Helper base class for the test classes that follow.
     """
 
     @classmethod
@@ -385,6 +386,11 @@ class PasswordResetTest(AuthViewsTestCase):
         _, uuidb64, _ = path.strip('/').split('/')
         response = Client().get('/reset/%s/set-password/' % uuidb64)
         self.assertContains(response, 'The password reset link was invalid')
+
+    def test_missing_kwargs(self):
+        msg = "The URL path must contain 'uidb64' and 'token' parameters."
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            self.client.get('/reset/missing_parameters/')
 
 
 @override_settings(AUTH_USER_MODEL='auth_tests.CustomUser')

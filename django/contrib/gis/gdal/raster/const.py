@@ -47,7 +47,7 @@ GDAL_RESAMPLE_ALGORITHMS = {
 # See https://www.gdal.org/gdal_8h.html#ace76452d94514561fffa8ea1d2a5968c
 GDAL_COLOR_TYPES = {
     0: 'GCI_Undefined',  # Undefined, default value, i.e. not known
-    1: 'GCI_GrayIndex',  # Greyscale
+    1: 'GCI_GrayIndex',  # Grayscale
     2: 'GCI_PaletteIndex',  # Paletted
     3: 'GCI_RedBand',  # Red band of RGBA image
     4: 'GCI_GreenBand',  # Green band of RGBA image

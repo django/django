@@ -1,14 +1,19 @@
+import argparse
 import ctypes
 import faulthandler
+import hashlib
 import io
 import itertools
 import logging
 import multiprocessing
 import os
 import pickle
+import random
 import sys
 import textwrap
 import unittest
+import warnings
+from collections import defaultdict
 from contextlib import contextmanager
 from importlib import import_module
 from io import StringIO
@@ -22,6 +27,7 @@ from django.test.utils import (
     teardown_databases as _teardown_databases, teardown_test_environment,
 )
 from django.utils.datastructures import OrderedSet
+from django.utils.deprecation import RemovedInDjango50Warning
 
 try:
     import ipdb as pdb
@@ -330,8 +336,10 @@ class RemoteTestRunner:
         return result
 
 
-def default_test_processes():
-    """Default number of test processes when using the --parallel option."""
+def get_max_test_processes():
+    """
+    The maximum number of test processes when using the --parallel option.
+    """
     # The current implementation of the parallel test runner requires
     # multiprocessing to start subprocesses with fork().
     if multiprocessing.get_start_method() != 'fork':
@@ -340,6 +348,18 @@ def default_test_processes():
         return int(os.environ['DJANGO_TEST_PROCESSES'])
     except KeyError:
         return multiprocessing.cpu_count()
+
+
+def parallel_type(value):
+    """Parse value passed to the --parallel option."""
+    if value == 'auto':
+        return value
+    try:
+        return int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            f"{value!r} is not an integer or the string 'auto'"
+        )
 
 
 _worker_id = 0
@@ -469,6 +489,64 @@ class ParallelTestSuite(unittest.TestSuite):
         return iter(self.subsuites)
 
 
+class Shuffler:
+    """
+    This class implements shuffling with a special consistency property.
+    Consistency means that, for a given seed and key function, if two sets of
+    items are shuffled, the resulting order will agree on the intersection of
+    the two sets. For example, if items are removed from an original set, the
+    shuffled order for the new set will be the shuffled order of the original
+    set restricted to the smaller set.
+    """
+
+    # This doesn't need to be cryptographically strong, so use what's fastest.
+    hash_algorithm = 'md5'
+
+    @classmethod
+    def _hash_text(cls, text):
+        h = hashlib.new(cls.hash_algorithm)
+        h.update(text.encode('utf-8'))
+        return h.hexdigest()
+
+    def __init__(self, seed=None):
+        if seed is None:
+            # Limit seeds to 10 digits for simpler output.
+            seed = random.randint(0, 10**10 - 1)
+            seed_source = 'generated'
+        else:
+            seed_source = 'given'
+        self.seed = seed
+        self.seed_source = seed_source
+
+    @property
+    def seed_display(self):
+        return f'{self.seed!r} ({self.seed_source})'
+
+    def _hash_item(self, item, key):
+        text = '{}{}'.format(self.seed, key(item))
+        return self._hash_text(text)
+
+    def shuffle(self, items, key):
+        """
+        Return a new list of the items in a shuffled order.
+
+        The `key` is a function that accepts an item in `items` and returns
+        a string unique for that item that can be viewed as a string id. The
+        order of the return value is deterministic. It depends on the seed
+        and key function but not on the original order.
+        """
+        hashes = {}
+        for item in items:
+            hashed = self._hash_item(item, key)
+            if hashed in hashes:
+                msg = 'item {!r} has same hash {!r} as item {!r}'.format(
+                    item, hashed, hashes[hashed],
+                )
+                raise RuntimeError(msg)
+            hashes[hashed] = item
+        return [hashes[hashed] for hashed in sorted(hashes)]
+
+
 class DiscoverRunner:
     """A Django test runner that uses unittest2 test discovery."""
 
@@ -483,7 +561,7 @@ class DiscoverRunner:
                  reverse=False, debug_mode=False, debug_sql=False, parallel=0,
                  tags=None, exclude_tags=None, test_name_patterns=None,
                  pdb=False, buffer=False, enable_faulthandler=True,
-                 timing=False, **kwargs):
+                 timing=False, shuffle=False, **kwargs):
 
         self.pattern = pattern
         self.top_level = top_level
@@ -515,6 +593,8 @@ class DiscoverRunner:
                 pattern if '*' in pattern else '*%s*' % pattern
                 for pattern in test_name_patterns
             }
+        self.shuffle = shuffle
+        self._shuffler = None
 
     @classmethod
     def add_arguments(cls, parser):
@@ -531,6 +611,10 @@ class DiscoverRunner:
             help='Preserves the test DB between runs.'
         )
         parser.add_argument(
+            '--shuffle', nargs='?', default=False, type=int, metavar='SEED',
+            help='Shuffles test case order.',
+        )
+        parser.add_argument(
             '-r', '--reverse', action='store_true',
             help='Reverses test case order.',
         )
@@ -543,9 +627,12 @@ class DiscoverRunner:
             help='Prints logged SQL queries on failure.',
         )
         parser.add_argument(
-            '--parallel', nargs='?', default=1, type=int,
-            const=default_test_processes(), metavar='N',
-            help='Run tests using up to N parallel processes.',
+            '--parallel', nargs='?', const='auto', default=0,
+            type=parallel_type, metavar='N',
+            help=(
+                'Run tests using up to N parallel processes. Use the value '
+                '"auto" to run one test process for each processor core.'
+            ),
         )
         parser.add_argument(
             '--tag', action='append', dest='tags',
@@ -582,6 +669,12 @@ class DiscoverRunner:
             ),
         )
 
+    @property
+    def shuffle_seed(self):
+        if self._shuffler is None:
+            return None
+        return self._shuffler.seed
+
     def log(self, msg, level=None):
         """
         Log the given message at the given logging level.
@@ -598,6 +691,13 @@ class DiscoverRunner:
     def setup_test_environment(self, **kwargs):
         setup_test_environment(debug=self.debug_mode)
         unittest.installHandler()
+
+    def setup_shuffler(self):
+        if self.shuffle is False:
+            return
+        shuffler = Shuffler(seed=self.shuffle)
+        self.log(f'Using shuffle seed: {shuffler.seed_display}')
+        self._shuffler = shuffler
 
     @contextmanager
     def load_with_patterns(self):
@@ -647,6 +747,12 @@ class DiscoverRunner:
         return tests
 
     def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
+        if extra_tests is not None:
+            warnings.warn(
+                'The extra_tests argument is deprecated.',
+                RemovedInDjango50Warning,
+                stacklevel=2,
+            )
         test_labels = test_labels or ['.']
         extra_tests = extra_tests or []
 
@@ -655,6 +761,7 @@ class DiscoverRunner:
             discover_kwargs['pattern'] = self.pattern
         if self.top_level is not None:
             discover_kwargs['top_level_dir'] = self.top_level
+        self.setup_shuffler()
 
         all_tests = []
         for label in test_labels:
@@ -680,7 +787,12 @@ class DiscoverRunner:
         # _FailedTest objects include things like test modules that couldn't be
         # found or that couldn't be loaded due to syntax errors.
         test_types = (unittest.loader._FailedTest, *self.reorder_by)
-        all_tests = list(reorder_tests(all_tests, test_types, self.reverse))
+        all_tests = list(reorder_tests(
+            all_tests,
+            test_types,
+            shuffler=self._shuffler,
+            reverse=self.reverse,
+        ))
         self.log('Found %d test(s).' % len(all_tests))
         suite = self.test_suite(all_tests)
 
@@ -689,6 +801,9 @@ class DiscoverRunner:
             # Since tests are distributed across processes on a per-TestCase
             # basis, there's no need for more processes than TestCases.
             processes = min(self.parallel, len(subsuites))
+            # Update also "parallel" because it's used to determine the number
+            # of test databases.
+            self.parallel = processes
             if processes > 1:
                 suite = self.parallel_test_suite(
                     subsuites,
@@ -726,7 +841,12 @@ class DiscoverRunner:
     def run_suite(self, suite, **kwargs):
         kwargs = self.get_test_runner_kwargs()
         runner = self.test_runner(**kwargs)
-        return runner.run(suite)
+        try:
+            return runner.run(suite)
+        finally:
+            if self._shuffler is not None:
+                seed_display = self._shuffler.seed_display
+                self.log(f'Used shuffle seed: {seed_display}')
 
     def teardown_databases(self, old_config, **kwargs):
         """Destroy all the non-mirror databases."""
@@ -775,11 +895,14 @@ class DiscoverRunner:
         Test labels should be dotted Python paths to test modules, test
         classes, or test methods.
 
-        A list of 'extra' tests may also be provided; these tests
-        will be added to the test suite.
-
         Return the number of tests that failed.
         """
+        if extra_tests is not None:
+            warnings.warn(
+                'The extra_tests argument is deprecated.',
+                RemovedInDjango50Warning,
+                stacklevel=2,
+            )
         self.setup_test_environment()
         suite = self.build_suite(test_labels, extra_tests)
         databases = self.get_databases(suite)
@@ -851,19 +974,72 @@ def find_top_level(top_level):
     return top_level
 
 
-def reorder_tests(tests, classes, reverse=False):
+def _class_shuffle_key(cls):
+    return f'{cls.__module__}.{cls.__qualname__}'
+
+
+def shuffle_tests(tests, shuffler):
     """
-    Reorder an iterable of tests by test type, removing any duplicates.
+    Return an iterator over the given tests in a shuffled order, keeping tests
+    next to other tests of their class.
 
-    `classes` is a sequence of types. The result is returned as an iterator.
-
-    All tests of type classes[0] are placed first, then tests of type
-    classes[1], etc. Tests with no match in classes are placed last.
-
-    If `reverse` is True, sort tests within classes in opposite order but
-    don't reverse test classes.
+    `tests` should be an iterable of tests.
     """
-    bins = [OrderedSet() for i in range(len(classes) + 1)]
+    tests_by_type = {}
+    for _, class_tests in itertools.groupby(tests, type):
+        class_tests = list(class_tests)
+        test_type = type(class_tests[0])
+        class_tests = shuffler.shuffle(class_tests, key=lambda test: test.id())
+        tests_by_type[test_type] = class_tests
+
+    classes = shuffler.shuffle(tests_by_type, key=_class_shuffle_key)
+
+    return itertools.chain(*(tests_by_type[cls] for cls in classes))
+
+
+def reorder_test_bin(tests, shuffler=None, reverse=False):
+    """
+    Return an iterator that reorders the given tests, keeping tests next to
+    other tests of their class.
+
+    `tests` should be an iterable of tests that supports reversed().
+    """
+    if shuffler is None:
+        if reverse:
+            return reversed(tests)
+        # The function must return an iterator.
+        return iter(tests)
+
+    tests = shuffle_tests(tests, shuffler)
+    if not reverse:
+        return tests
+    # Arguments to reversed() must be reversible.
+    return reversed(list(tests))
+
+
+def reorder_tests(tests, classes, reverse=False, shuffler=None):
+    """
+    Reorder an iterable of tests, grouping by the given TestCase classes.
+
+    This function also removes any duplicates and reorders so that tests of the
+    same type are consecutive.
+
+    The result is returned as an iterator. `classes` is a sequence of types.
+    Tests that are instances of `classes[0]` are grouped first, followed by
+    instances of `classes[1]`, etc. Tests that are not instances of any of the
+    classes are grouped last.
+
+    If `reverse` is True, the tests within each `classes` group are reversed,
+    but without reversing the order of `classes` itself.
+
+    The `shuffler` argument is an optional instance of this module's `Shuffler`
+    class. If provided, tests will be shuffled within each `classes` group, but
+    keeping tests with other tests of their TestCase class. Reversing is
+    applied after shuffling to allow reversing the same random order.
+    """
+    # Each bin maps TestCase class to OrderedSet of tests. This permits tests
+    # to be grouped by TestCase class even if provided non-consecutively.
+    bins = [defaultdict(OrderedSet) for i in range(len(classes) + 1)]
     *class_bins, last_bin = bins
 
     for test in tests:
@@ -872,11 +1048,12 @@ def reorder_tests(tests, classes, reverse=False):
                 break
         else:
             test_bin = last_bin
-        test_bin.add(test)
+        test_bin[type(test)].add(test)
 
-    if reverse:
-        bins = (reversed(tests) for tests in bins)
-    return itertools.chain(*bins)
+    for test_bin in bins:
+        # Call list() since reorder_test_bin()'s input must support reversed().
+        tests = list(itertools.chain.from_iterable(test_bin.values()))
+        yield from reorder_test_bin(tests, shuffler=shuffler, reverse=reverse)
 
 
 def partition_suite_by_case(suite):

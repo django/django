@@ -295,7 +295,7 @@ cause a conflict. For example::
     IntegrityError: duplicate key value violates unique constraint
     "auth_user_pkey" DETAIL:  Key (id)=(1) already exists.
 
-If you need to specify such values, reset the sequence afterwards to avoid
+If you need to specify such values, reset the sequence afterward to avoid
 reusing a value that's already in the table. The :djadmin:`sqlsequencereset`
 management command generates the SQL statements to do that.
 
@@ -528,7 +528,7 @@ Several other `MySQLdb connection options`_ may be useful, such as ``ssl``,
 Setting ``sql_mode``
 ~~~~~~~~~~~~~~~~~~~~
 
-From MySQL 5.7 onwards, the default value of the ``sql_mode`` option contains
+From MySQL 5.7 onward, the default value of the ``sql_mode`` option contains
 ``STRICT_TRANS_TABLES``. That option escalates warnings into errors when data
 are truncated upon insertion, so Django highly recommends activating a
 `strict mode`_ for MySQL to prevent data loss (either ``STRICT_TRANS_TABLES``
@@ -686,16 +686,16 @@ a :exc:`~django.db.NotSupportedError` is raised.
 =============== ========= ==========
 Option          MariaDB   MySQL
 =============== ========= ==========
-``SKIP LOCKED``           X (≥8.0.1)
+``SKIP LOCKED`` X (≥10.6) X (≥8.0.1)
 ``NOWAIT``      X (≥10.3) X (≥8.0.1)
 ``OF``                    X (≥8.0.1)
 ``NO KEY``
 =============== ========= ==========
 
 When using ``select_for_update()`` on MySQL, make sure you filter a queryset
-against at least set of fields contained in unique constraints or only against
-fields covered by indexes. Otherwise, an exclusive write lock will be acquired
-over the full table for the duration of the transaction.
+against at least a set of fields contained in unique constraints or only
+against fields covered by indexes. Otherwise, an exclusive write lock will be
+acquired over the full table for the duration of the transaction.
 
 Automatic typecasting can cause unexpected results
 --------------------------------------------------

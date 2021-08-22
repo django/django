@@ -339,7 +339,7 @@ class FileStorageTests(SimpleTestCase):
 
     def test_file_url(self):
         """
-        File storage returns a url to access a given file from the Web.
+        File storage returns a url to access a given file from the web.
         """
         self.assertEqual(self.storage.url('test.file'), self.storage.base_url + 'test.file')
 

@@ -148,7 +148,7 @@ Security
 
 Because a settings file contains sensitive information, such as the database
 password, you should make every attempt to limit access to it. For example,
-change its file permissions so that only you and your Web server's user can
+change its file permissions so that only you and your web server's user can
 read it. This is especially important in a shared-hosting environment.
 
 Available settings
@@ -287,7 +287,7 @@ settings and populate Django's application registry. For example::
     from myapp import models
 
 Note that calling ``django.setup()`` is only necessary if your code is truly
-standalone. When invoked by your Web server, or through :doc:`django-admin
+standalone. When invoked by your web server, or through :doc:`django-admin
 </ref/django-admin>`, Django will handle this for you.
 
 .. admonition:: ``django.setup()`` may only be called once.

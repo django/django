@@ -35,7 +35,7 @@ If you think working *with* Django is fun, wait until you start working *on*
 it. Really, **ANYONE** can do something to help make Django better and greater!
 
 This contributing guide contains everything you need to know to help build the
-Django Web framework. Browse the following sections to find out how:
+Django web framework. Browse the following sections to find out how:
 
 .. toctree::
    :maxdepth: 2

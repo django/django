@@ -2412,7 +2412,7 @@ class AutodetectorTests(TestCase):
         loader = MigrationLoader(connection)
         before = self.make_project_state([])
         after = self.make_project_state([self.book_migrations_fk])
-        after.real_apps = ["migrations"]
+        after.real_apps = {'migrations'}
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes(graph=loader.graph)
         # Right number/type of migrations?
@@ -2431,7 +2431,7 @@ class AutodetectorTests(TestCase):
         loader = MigrationLoader(connection)
         before = self.make_project_state([])
         after = self.make_project_state([self.book_migrations_fk])
-        after.real_apps = ["migrations"]
+        after.real_apps = {'migrations'}
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes(graph=loader.graph)
         # Right number/type of migrations?

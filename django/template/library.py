@@ -182,6 +182,7 @@ class TagHelperNode(Node):
 
 
 class SimpleNode(TagHelperNode):
+    child_nodelists = ()
 
     def __init__(self, func, takes_context, args, kwargs, target_var):
         super().__init__(func, takes_context, args, kwargs)
@@ -242,7 +243,7 @@ def parse_bits(parser, bits, params, varargs, varkw, defaults,
     keyword arguments.
     """
     if takes_context:
-        if params[0] == 'context':
+        if params and params[0] == 'context':
             params = params[1:]
         else:
             raise TemplateSyntaxError(

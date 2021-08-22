@@ -313,7 +313,9 @@ Related fields
   with a ``through`` model.
 * **fields.W344**: The field's intermediary table ``<table name>`` clashes with
   the table name of ``<model>``/``<model>.<field name>``.
-* **fields.E345**: Field specifies unsupported ``on_delete=<action>`` model 
+* **fields.W345**: ``related_name`` has no effect on ``ManyToManyField`` with a
+  symmetrical relationship, e.g. to "self".
+* **fields.E346**: Field specifies unsupported ``on_delete=<action>`` model 
   relation. This would interfere with other expected model behaviors. 
 
 Models

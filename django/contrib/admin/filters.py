@@ -451,11 +451,12 @@ class EmptyFieldListFilter(FieldListFilter):
         if self.lookup_val not in ('0', '1'):
             raise IncorrectLookupParameters
 
-        lookup_condition = models.Q()
+        lookup_conditions = []
         if self.field.empty_strings_allowed:
-            lookup_condition |= models.Q(**{self.field_path: ''})
+            lookup_conditions.append((self.field_path, ''))
         if self.field.null:
-            lookup_condition |= models.Q(**{'%s__isnull' % self.field_path: True})
+            lookup_conditions.append((f'{self.field_path}__isnull', True))
+        lookup_condition = models.Q(*lookup_conditions, _connector=models.Q.OR)
         if self.lookup_val == '1':
             return queryset.filter(lookup_condition)
         return queryset.exclude(lookup_condition)

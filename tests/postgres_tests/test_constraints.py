@@ -14,7 +14,9 @@ from django.test import modify_settings, skipUnlessDBFeature
 from django.utils import timezone
 
 from . import PostgreSQLTestCase
-from .models import HotelReservation, RangesModel, Room, Scene
+from .models import (
+    HotelReservation, IntegerArrayModel, RangesModel, Room, Scene,
+)
 
 try:
     from psycopg2.extras import DateRange, NumericRange
@@ -668,6 +670,19 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         self.assertIn(
             constraint_name,
             self.get_constraints(HotelReservation._meta.db_table),
+        )
+
+    def test_index_transform(self):
+        constraint_name = 'first_index_equal'
+        constraint = ExclusionConstraint(
+            name=constraint_name,
+            expressions=[('field__0', RangeOperators.EQUAL)],
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(IntegerArrayModel, constraint)
+        self.assertIn(
+            constraint_name,
+            self.get_constraints(IntegerArrayModel._meta.db_table),
         )
 
     def test_range_adjacent_initially_deferred(self):

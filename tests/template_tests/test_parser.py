@@ -79,11 +79,12 @@ class ParserTests(SimpleTestCase):
             Variable(r"'Some \'Better\' News'").resolve(c), "Some 'Better' News"
         )
 
-        # Variables should reject access of attributes beginning with
-        # underscores.
-        msg = "Variables and attributes may not begin with underscores: 'article._hidden'"
-        with self.assertRaisesMessage(TemplateSyntaxError, msg):
-            Variable("article._hidden")
+        # Variables should reject access of attributes and variables beginning
+        # with underscores.
+        for name in ['article._hidden', '_article']:
+            msg = f"Variables and attributes may not begin with underscores: '{name}'"
+            with self.assertRaisesMessage(TemplateSyntaxError, msg):
+                Variable(name)
 
         # Variables should raise on non string type
         with self.assertRaisesMessage(TypeError, "Variable must be a string or number, got <class 'dict'>"):

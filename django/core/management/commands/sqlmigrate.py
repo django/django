@@ -32,7 +32,7 @@ class Command(BaseCommand):
         # Get the database we're operating from
         connection = connections[options['database']]
 
-        # Load up an loader to get all the migration data, but don't replace
+        # Load up a loader to get all the migration data, but don't replace
         # migrations.
         loader = MigrationLoader(connection, replace_migrations=False)
 

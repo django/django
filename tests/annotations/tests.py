@@ -241,7 +241,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             ),
             rating_count=Count('rating'),
         ).first()
-        self.assertEqual(book.isnull_pubdate, False)
+        self.assertIs(book.isnull_pubdate, False)
         self.assertEqual(book.rating_count, 1)
 
     @skipUnlessDBFeature('supports_boolean_expr_in_select_clause')

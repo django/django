@@ -65,7 +65,7 @@ class MultiValueDict(dict):
     >>> d.setlist('lastname', ['Holovaty', 'Willison'])
 
     This class exists to solve the irritating problem raised by cgi.parse_qs,
-    which returns a list for every key, even though most Web forms submit
+    which returns a list for every key, even though most web forms submit
     single name-value pairs.
     """
     def __init__(self, key_to_list_mapping=()):

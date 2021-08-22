@@ -214,9 +214,10 @@ class TruncBase(TimezoneMixin, Transform):
         copy = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
         field = copy.lhs.output_field
         # DateTimeField is a subclass of DateField so this works for both.
-        assert isinstance(field, (DateField, TimeField)), (
-            "%r isn't a DateField, TimeField, or DateTimeField." % field.name
-        )
+        if not isinstance(field, (DateField, TimeField)):
+            raise TypeError(
+                "%r isn't a DateField, TimeField, or DateTimeField." % field.name
+            )
         # If self.output_field was None, then accessing the field will trigger
         # the resolver to assign it to self.lhs.output_field.
         if not isinstance(copy.output_field, (DateField, DateTimeField, TimeField)):

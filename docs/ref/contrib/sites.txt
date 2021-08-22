@@ -174,7 +174,7 @@ Getting the current domain for display
 
 LJWorld.com and Lawrence.com both have email alert functionality, which lets
 readers sign up to get notifications when news happens. It's pretty basic: A
-reader signs up on a Web form and immediately gets an email saying,
+reader signs up on a web form and immediately gets an email saying,
 "Thanks for your subscription."
 
 It'd be inefficient and redundant to implement this sign up processing code

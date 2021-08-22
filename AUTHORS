@@ -1,4 +1,4 @@
-Django was originally created in late 2003 at World Online, the Web division
+Django was originally created in late 2003 at World Online, the web division
 of the Lawrence Journal-World newspaper in Lawrence, Kansas.
 
 Here is an inevitably incomplete list of MUCH-APPRECIATED CONTRIBUTORS --
@@ -74,6 +74,7 @@ answer newbie questions, and generally made Django that much better:
     Andrew Godwin <andrew@aeracode.org>
     Andrew Pinkham <http://AndrewsForge.com>
     Andrews Medina <andrewsmedina@gmail.com>
+    Andrew Northall <andrew@northall.me.uk>
     Andriy Sokolovskiy <me@asokolovskiy.com>
     Andy Chosak <andy@chosak.org>
     Andy Dustman <farcepest@gmail.com>
@@ -82,6 +83,7 @@ answer newbie questions, and generally made Django that much better:
     Anssi Kääriäinen <akaariai@gmail.com>
     ant9000@netwise.it
     Anthony Briggs <anthony.briggs@gmail.com>
+    Anthony Wright <ryow.college@gmail.com>
     Anton Samarchyan <desecho@gmail.com>
     Antoni Aloy
     Antonio Cavedoni <http://cavedoni.com/>
@@ -251,6 +253,7 @@ answer newbie questions, and generally made Django that much better:
     David Sanders <dsanders11@ucsbalum.com>
     David Schein
     David Tulig <david.tulig@gmail.com>
+    David Winterbottom <david.winterbottom@gmail.com>
     David Wobrock <david.wobrock@gmail.com>
     Davide Ceretti <dav.ceretti@gmail.com>
     Deep L. Sukhwani <deepsukhwani@gmail.com>
@@ -354,6 +357,7 @@ answer newbie questions, and generally made Django that much better:
     Graham Carlyle <graham.carlyle@maplecroft.net>
     Grant Jenks <contact@grantjenks.com>
     Greg Chapple <gregchapple1@gmail.com>
+    Greg Twohig
     Gregor Allensworth <greg.allensworth@gmail.com>
     Gregor Müllegger <gregor@muellegger.de>
     Grigory Fateyev <greg@dial.com.ru>
@@ -421,6 +425,7 @@ answer newbie questions, and generally made Django that much better:
     Jan Rademaker
     Jarek Głowacki <jarekwg@gmail.com>
     Jarek Zgoda <jarek.zgoda@gmail.com>
+    Jarosław Wygoda <jaroslaw@wygoda.me>
     Jason Davies (Esaj) <https://www.jasondavies.com/>
     Jason Huggins <http://www.jrandolph.com/blog/>
     Jason McBrayer <http://www.carcosa.net/jason/>
@@ -476,11 +481,14 @@ answer newbie questions, and generally made Django that much better:
     Jökull Sólberg Auðunsson <jokullsolberg@gmail.com>
     Jon Dufresne <jon.dufresne@gmail.com>
     Jonas Haag <jonas@lophus.org>
+    Jonathan Davis <jonathandavis47780@gmail.com>
     Jonatas C. D. <jonatas.cd@gmail.com>
     Jonathan Buchanan <jonathan.buchanan@gmail.com>
     Jonathan Daugherty (cygnus) <http://www.cprogrammer.org/>
     Jonathan Feignberg <jdf@pobox.com>
     Jonathan Slenders
+    Jonny Park <jonnythebard9@gmail.com>
+    Jordan Bae <qoentlr37@gmail.com>
     Jordan Dimov <s3x3y1@gmail.com>
     Jordi J. Tablada <jordi.joan@gmail.com>
     Jorge Bastida <me@jorgebastida.com>
@@ -561,6 +569,7 @@ answer newbie questions, and generally made Django that much better:
     Luan Pablo <luanpab@gmail.com>
     Lucas Connors <https://www.revolutiontech.ca/>
     Luciano Ramalho
+    Lucidiot <lucidiot@brainshit.fr>
     Ludvig Ericson <ludvig.ericson@gmail.com>
     Luis C. Berrocal <luis.berrocal.1942@gmail.com>
     Łukasz Langa <lukasz@langa.pl>
@@ -603,7 +612,7 @@ answer newbie questions, and generally made Django that much better:
     Martin Mahner <https://www.mahner.org/>
     Martin Maney <http://www.chipy.org/Martin_Maney>
     Martin von Gagern <gagern@google.com>
-    Mart Sõmermaa <http://mrts.pri.ee/>
+    Mart Sõmermaa <https://github.com/mrts>
     Marty Alchin <gulopine@gamemusic.org>
     Masashi Shibata <m.shibata1020@gmail.com>
     masonsimon+django@gmail.com
@@ -896,6 +905,7 @@ answer newbie questions, and generally made Django that much better:
     thebjorn <bp@datakortet.no>
     Thejaswi Puthraya <thejaswi.puthraya@gmail.com>
     Thijs van Dien <thijs@vandien.net>
+    Thibault Vallois <thibault.vallois@protonmail.com>
     Thom Wiggers
     Thomas Chaumeny <t.chaumeny@gmail.com>
     Thomas Güttler <hv@tbz-pariv.de>
@@ -905,6 +915,7 @@ answer newbie questions, and generally made Django that much better:
     Thomas Stromberg <tstromberg@google.com>
     Thomas Tanner <tanner@gmx.net>
     tibimicu@gmx.net
+    Ties Jan Hefting <hello@tiesjan.com>
     Tim Allen <tim@pyphilly.org>
     Tim Givois <tim.givois.mendez@gmail.com>
     Tim Graham <timograham@gmail.com>
@@ -920,6 +931,7 @@ answer newbie questions, and generally made Django that much better:
     Tom Forbes <tom@tomforb.es>
     Tom Insam
     Tom Tobin
+    Tom Wojcik <me@tomwojcik.com>
     Tomáš Ehrlich <tomas.ehrlich@gmail.com>
     Tomáš Kopeček <permonik@m6.cz>
     Tome Cvitan <tome@cvitan.com>
@@ -973,6 +985,7 @@ answer newbie questions, and generally made Django that much better:
     Wilson Miner <wminer@gmail.com>
     Wim Glenn <hey@wimglenn.com>
     wojtek
+    Wu Haotian <whtsky@gmail.com>
     Xavier Francisco <xavier.n.francisco@gmail.com>
     Xia Kai <https://blog.xiaket.org/>
     Yann Fouillat <gagaro42@gmail.com>

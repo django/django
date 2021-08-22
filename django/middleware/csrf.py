@@ -11,6 +11,8 @@ from urllib.parse import urlparse
 
 from django.conf import settings
 from django.core.exceptions import DisallowedHost, ImproperlyConfigured
+from django.http import UnreadablePostError
+from django.http.request import HttpHeaders
 from django.urls import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.crypto import constant_time_compare, get_random_string
@@ -28,7 +30,6 @@ REASON_BAD_ORIGIN = "Origin checking failed - %s does not match any trusted orig
 REASON_NO_REFERER = "Referer checking failed - no Referer."
 REASON_BAD_REFERER = "Referer checking failed - %s does not match any trusted origins."
 REASON_NO_CSRF_COOKIE = "CSRF cookie not set."
-REASON_CSRF_TOKEN_INCORRECT = 'CSRF token incorrect.'
 REASON_CSRF_TOKEN_MISSING = 'CSRF token missing.'
 REASON_MALFORMED_REFERER = "Referer checking failed - Referer is malformed."
 REASON_INSECURE_REFERER = "Referer checking failed - Referer is insecure while host is secure."
@@ -78,8 +79,14 @@ def _unmask_cipher_token(token):
     return ''.join(chars[x - y] for x, y in pairs)  # Note negative values are ok
 
 
-def _get_new_csrf_token():
-    return _mask_cipher_secret(_get_new_csrf_string())
+def _add_new_csrf_cookie(request):
+    """Generate a new random CSRF_COOKIE value, and add it to request.META."""
+    csrf_secret = _get_new_csrf_string()
+    request.META.update({
+        'CSRF_COOKIE': _mask_cipher_secret(csrf_secret),
+        'CSRF_COOKIE_NEEDS_UPDATE': True,
+    })
+    return csrf_secret
 
 
 def get_token(request):
@@ -92,12 +99,14 @@ def get_token(request):
     header to the outgoing response.  For this reason, you may need to use this
     function lazily, as is done by the csrf context processor.
     """
-    if "CSRF_COOKIE" not in request.META:
-        csrf_secret = _get_new_csrf_string()
-        request.META["CSRF_COOKIE"] = _mask_cipher_secret(csrf_secret)
-    else:
+    if 'CSRF_COOKIE' in request.META:
         csrf_secret = _unmask_cipher_token(request.META["CSRF_COOKIE"])
-    request.META["CSRF_COOKIE_USED"] = True
+        # Since the cookie is being used, flag to send the cookie in
+        # process_response() (even if the client already has it) in order to
+        # renew the expiry timer.
+        request.META['CSRF_COOKIE_NEEDS_UPDATE'] = True
+    else:
+        csrf_secret = _add_new_csrf_cookie(request)
     return _mask_cipher_secret(csrf_secret)
 
 
@@ -106,11 +115,7 @@ def rotate_token(request):
     Change the CSRF token in use for a request - should be done on login
     for security purposes.
     """
-    request.META.update({
-        "CSRF_COOKIE_USED": True,
-        "CSRF_COOKIE": _get_new_csrf_token(),
-    })
-    request.csrf_cookie_needs_reset = True
+    _add_new_csrf_cookie(request)
 
 
 class InvalidTokenFormat(Exception):
@@ -135,7 +140,7 @@ def _sanitize_token(token):
     return token
 
 
-def _compare_masked_tokens(request_csrf_token, csrf_token):
+def _does_token_match(request_csrf_token, csrf_token):
     # Assume both arguments are sanitized -- that is, strings of
     # length CSRF_TOKEN_LENGTH, all CSRF_ALLOWED_CHARS.
     return constant_time_compare(
@@ -223,10 +228,10 @@ class CsrfViewMiddleware(MiddlewareMixin):
             if csrf_token != cookie_token:
                 # Then the cookie token had length CSRF_SECRET_LENGTH, so flag
                 # to replace it with the masked version.
-                request.csrf_cookie_needs_reset = True
+                request.META['CSRF_COOKIE_NEEDS_UPDATE'] = True
             return csrf_token
 
-    def _set_token(self, request, response):
+    def _set_csrf_cookie(self, request, response):
         if settings.CSRF_USE_SESSIONS:
             if request.session.get(CSRF_SESSION_KEY) != request.META['CSRF_COOKIE']:
                 request.session[CSRF_SESSION_KEY] = request.META['CSRF_COOKIE']
@@ -315,16 +320,70 @@ class CsrfViewMiddleware(MiddlewareMixin):
         if not is_same_domain(referer.netloc, good_referer):
             raise RejectRequest(REASON_BAD_REFERER % referer.geturl())
 
+    def _bad_token_message(self, reason, token_source):
+        if token_source != 'POST':
+            # Assume it is a settings.CSRF_HEADER_NAME value.
+            header_name = HttpHeaders.parse_header_name(token_source)
+            token_source = f'the {header_name!r} HTTP header'
+        return f'CSRF token from {token_source} {reason}.'
+
+    def _check_token(self, request):
+        # Access csrf_token via self._get_token() as rotate_token() may have
+        # been called by an authentication middleware during the
+        # process_request() phase.
+        try:
+            csrf_token = self._get_token(request)
+        except InvalidTokenFormat as exc:
+            raise RejectRequest(f'CSRF cookie {exc.reason}.')
+
+        if csrf_token is None:
+            # No CSRF cookie. For POST requests, we insist on a CSRF cookie,
+            # and in this way we can avoid all CSRF attacks, including login
+            # CSRF.
+            raise RejectRequest(REASON_NO_CSRF_COOKIE)
+
+        # Check non-cookie token for match.
+        request_csrf_token = ''
+        if request.method == 'POST':
+            try:
+                request_csrf_token = request.POST.get('csrfmiddlewaretoken', '')
+            except UnreadablePostError:
+                # Handle a broken connection before we've completed reading the
+                # POST data. process_view shouldn't raise any exceptions, so
+                # we'll ignore and serve the user a 403 (assuming they're still
+                # listening, which they probably aren't because of the error).
+                pass
+
+        if request_csrf_token == '':
+            # Fall back to X-CSRFToken, to make things easier for AJAX, and
+            # possible for PUT/DELETE.
+            try:
+                request_csrf_token = request.META[settings.CSRF_HEADER_NAME]
+            except KeyError:
+                raise RejectRequest(REASON_CSRF_TOKEN_MISSING)
+            token_source = settings.CSRF_HEADER_NAME
+        else:
+            token_source = 'POST'
+
+        try:
+            request_csrf_token = _sanitize_token(request_csrf_token)
+        except InvalidTokenFormat as exc:
+            reason = self._bad_token_message(exc.reason, token_source)
+            raise RejectRequest(reason)
+
+        if not _does_token_match(request_csrf_token, csrf_token):
+            reason = self._bad_token_message('incorrect', token_source)
+            raise RejectRequest(reason)
+
     def process_request(self, request):
         try:
             csrf_token = self._get_token(request)
         except InvalidTokenFormat:
-            csrf_token = _get_new_csrf_token()
-            request.csrf_cookie_needs_reset = True
-
-        if csrf_token is not None:
-            # Use same token next time.
-            request.META['CSRF_COOKIE'] = csrf_token
+            _add_new_csrf_cookie(request)
+        else:
+            if csrf_token is not None:
+                # Use same token next time.
+                request.META['CSRF_COOKIE'] = csrf_token
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
         if getattr(request, 'csrf_processing_done', False):
@@ -374,60 +433,23 @@ class CsrfViewMiddleware(MiddlewareMixin):
             except RejectRequest as exc:
                 return self._reject(request, exc.reason)
 
-        # Access csrf_token via self._get_token() as rotate_token() may have
-        # been called by an authentication middleware during the
-        # process_request() phase.
         try:
-            csrf_token = self._get_token(request)
-        except InvalidTokenFormat as exc:
-            return self._reject(request, f'CSRF cookie {exc.reason}.')
-
-        if csrf_token is None:
-            # No CSRF cookie. For POST requests, we insist on a CSRF cookie,
-            # and in this way we can avoid all CSRF attacks, including login
-            # CSRF.
-            return self._reject(request, REASON_NO_CSRF_COOKIE)
-
-        # Check non-cookie token for match.
-        request_csrf_token = ''
-        if request.method == 'POST':
-            try:
-                request_csrf_token = request.POST.get('csrfmiddlewaretoken', '')
-            except OSError:
-                # Handle a broken connection before we've completed reading the
-                # POST data. process_view shouldn't raise any exceptions, so
-                # we'll ignore and serve the user a 403 (assuming they're still
-                # listening, which they probably aren't because of the error).
-                pass
-
-        if request_csrf_token == '':
-            # Fall back to X-CSRFToken, to make things easier for AJAX, and
-            # possible for PUT/DELETE.
-            try:
-                request_csrf_token = request.META[settings.CSRF_HEADER_NAME]
-            except KeyError:
-                return self._reject(request, REASON_CSRF_TOKEN_MISSING)
-
-        try:
-            request_csrf_token = _sanitize_token(request_csrf_token)
-        except InvalidTokenFormat as exc:
-            return self._reject(request, f'CSRF token {exc.reason}.')
-
-        if not _compare_masked_tokens(request_csrf_token, csrf_token):
-            return self._reject(request, REASON_CSRF_TOKEN_INCORRECT)
+            self._check_token(request)
+        except RejectRequest as exc:
+            return self._reject(request, exc.reason)
 
         return self._accept(request)
 
     def process_response(self, request, response):
-        if not getattr(request, 'csrf_cookie_needs_reset', False):
-            if getattr(response, 'csrf_cookie_set', False):
-                return response
+        if request.META.get('CSRF_COOKIE_NEEDS_UPDATE'):
+            self._set_csrf_cookie(request, response)
+            # Unset the flag to prevent _set_csrf_cookie() from being
+            # unnecessarily called again in process_response() by other
+            # instances of CsrfViewMiddleware. This can happen e.g. when both a
+            # decorator and middleware are used. However,
+            # CSRF_COOKIE_NEEDS_UPDATE is still respected in subsequent calls
+            # e.g. in case rotate_token() is called in process_response() later
+            # by custom middleware but before those subsequent calls.
+            request.META['CSRF_COOKIE_NEEDS_UPDATE'] = False
 
-        if not request.META.get("CSRF_COOKIE_USED", False):
-            return response
-
-        # Set the CSRF cookie even if it's already set, so we renew
-        # the expiry timer.
-        self._set_token(request, response)
-        response.csrf_cookie_set = True
         return response

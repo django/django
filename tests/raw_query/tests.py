@@ -33,7 +33,7 @@ class RawQueryTests(TestCase):
         )
         cls.b3 = Book.objects.create(
             title='Another awesome book', author=cls.a1, paperback=False,
-            opening_line='A squat grey building of only thirty-four stories.',
+            opening_line='A squat gray building of only thirty-four stories.',
         )
         cls.b4 = Book.objects.create(
             title='Some other book', author=cls.a3, paperback=True,
@@ -228,9 +228,7 @@ class RawQueryTests(TestCase):
         self.assertSuccessfulRawQuery(Reviewer, query, reviewers)
 
     def test_extra_conversions(self):
-        """
-        Test to insure that extra translations are ignored.
-        """
+        """Extra translations are ignored."""
         query = "SELECT * FROM raw_query_author"
         translations = {'something': 'else'}
         authors = Author.objects.all()

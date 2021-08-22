@@ -101,6 +101,7 @@ urlpatterns = [
     ),
     path('edit/author/<int:pk>/delete/', views.AuthorDelete.as_view()),
     path('edit/author/<int:pk>/delete/special/', views.SpecializedAuthorDelete.as_view()),
+    path('edit/author/<int:pk>/delete/form/', views.AuthorDeleteFormView.as_view()),
 
     # ArchiveIndexView
     path('dates/books/', views.BookArchive.as_view()),

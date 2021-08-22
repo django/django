@@ -133,6 +133,7 @@ urlpatterns = auth_urlpatterns + [
             post_reset_login_backend='django.contrib.auth.backends.AllowAllUsersModelBackend',
         ),
     ),
+    path('reset/missing_parameters/', views.PasswordResetConfirmView.as_view()),
     path('password_change/custom/',
          views.PasswordChangeView.as_view(success_url='/custom/')),
     path('password_change/custom/named/',

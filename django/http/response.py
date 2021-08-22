@@ -153,14 +153,10 @@ class HttpResponseBase:
 
     def serialize_headers(self):
         """HTTP headers as a bytestring."""
-        def to_bytes(val, encoding):
-            return val if isinstance(val, bytes) else val.encode(encoding)
-
-        headers = [
-            (to_bytes(key, 'ascii') + b': ' + to_bytes(value, 'latin-1'))
+        return b'\r\n'.join([
+            key.encode('ascii') + b': ' + value.encode('latin-1')
             for key, value in self.headers.items()
-        ]
-        return b'\r\n'.join(headers)
+        ])
 
     __bytes__ = serialize_headers
 
@@ -401,6 +397,13 @@ class StreamingHttpResponse(HttpResponseBase):
         # `streaming_content` should be an iterable of bytestrings.
         # See the `streaming_content` property methods.
         self.streaming_content = streaming_content
+
+    def __repr__(self):
+        return '<%(cls)s status_code=%(status_code)d%(content_type)s>' % {
+            'cls': self.__class__.__qualname__,
+            'status_code': self.status_code,
+            'content_type': self._content_type_for_repr,
+        }
 
     @property
     def content(self):

@@ -43,7 +43,7 @@ class AxisOrder(IntEnum):
 
 class SpatialReference(GDALBase):
     """
-    A wrapper for the OGRSpatialReference object.  According to the GDAL Web site,
+    A wrapper for the OGRSpatialReference object. According to the GDAL web site,
     the SpatialReference object "provide[s] services to represent coordinate
     systems (projections and datums) and to transform between them."
     """

@@ -10,9 +10,10 @@ from django.forms import (
     BooleanField, CharField, CheckboxSelectMultiple, ChoiceField, DateField,
     DateTimeField, EmailField, FileField, FileInput, FloatField, Form,
     HiddenInput, ImageField, IntegerField, MultipleChoiceField,
-    MultipleHiddenInput, MultiValueField, NullBooleanField, PasswordInput,
-    RadioSelect, Select, SplitDateTimeField, SplitHiddenDateTimeWidget,
-    Textarea, TextInput, TimeField, ValidationError, forms,
+    MultipleHiddenInput, MultiValueField, MultiWidget, NullBooleanField,
+    PasswordInput, RadioSelect, Select, SplitDateTimeField,
+    SplitHiddenDateTimeWidget, Textarea, TextInput, TimeField, ValidationError,
+    forms,
 )
 from django.forms.renderers import DjangoTemplates, get_default_renderer
 from django.forms.utils import ErrorList
@@ -613,13 +614,14 @@ Java</label></li>
 </ul>"""
         )
 
-        # When RadioSelect is used with auto_id, and the whole form is printed using
-        # either as_table() or as_ul(), the label for the RadioSelect will point to the
-        # ID of the *first* radio button.
+        # When RadioSelect is used with auto_id, and the whole form is printed
+        # using either as_table() or as_ul(), the label for the RadioSelect
+        # will **not** point to the ID of the *first* radio button to improve
+        # accessibility for screen reader users.
         self.assertHTMLEqual(
             f.as_table(),
             """<tr><th><label for="id_name">Name:</label></th><td><input type="text" name="name" id="id_name" required></td></tr>
-<tr><th><label for="id_language_0">Language:</label></th><td><ul id="id_language">
+<tr><th><label>Language:</label></th><td><ul id="id_language">
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" required>
 Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" required>
@@ -629,7 +631,7 @@ Java</label></li>
         self.assertHTMLEqual(
             f.as_ul(),
             """<li><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" required></li>
-<li><label for="id_language_0">Language:</label> <ul id="id_language">
+<li><label>Language:</label> <ul id="id_language">
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" required>
 Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" required>
@@ -639,7 +641,7 @@ Java</label></li>
         self.assertHTMLEqual(
             f.as_p(),
             """<p><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" required></p>
-<p><label for="id_language_0">Language:</label> <ul id="id_language">
+<p><label>Language:</label> <ul id="id_language">
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" required>
 Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" required>
@@ -719,7 +721,7 @@ Java</label></li>
         fields = list(BeatleForm(auto_id=False)['name'])
         self.assertEqual(len(fields), 4)
 
-        self.assertEqual(fields[0].id_for_label, 'id_name_0')
+        self.assertEqual(fields[0].id_for_label, None)
         self.assertEqual(fields[0].choice_label, 'John')
         self.assertHTMLEqual(fields[0].tag(), '<option value="john">John</option>')
         self.assertHTMLEqual(str(fields[0]), '<option value="john">John</option>')
@@ -1982,19 +1984,33 @@ Password: <input type="password" name="password" required></li>
         )
 
     def test_get_initial_for_field(self):
+        now = datetime.datetime(2006, 10, 25, 14, 30, 45, 123456)
+
         class PersonForm(Form):
             first_name = CharField(initial='John')
             last_name = CharField(initial='Doe')
             age = IntegerField()
             occupation = CharField(initial=lambda: 'Unknown')
+            dt_fixed = DateTimeField(initial=now)
+            dt_callable = DateTimeField(initial=lambda: now)
 
         form = PersonForm(initial={'first_name': 'Jane'})
-        self.assertIsNone(form.get_initial_for_field(form.fields['age'], 'age'))
-        self.assertEqual(form.get_initial_for_field(form.fields['last_name'], 'last_name'), 'Doe')
-        # Form.initial overrides Field.initial.
-        self.assertEqual(form.get_initial_for_field(form.fields['first_name'], 'first_name'), 'Jane')
-        # Callables are evaluated.
-        self.assertEqual(form.get_initial_for_field(form.fields['occupation'], 'occupation'), 'Unknown')
+        cases = [
+            ('age', None),
+            ('last_name', 'Doe'),
+            # Form.initial overrides Field.initial.
+            ('first_name', 'Jane'),
+            # Callables are evaluated.
+            ('occupation', 'Unknown'),
+            # Microseconds are removed from datetimes.
+            ('dt_fixed', datetime.datetime(2006, 10, 25, 14, 30, 45)),
+            ('dt_callable', datetime.datetime(2006, 10, 25, 14, 30, 45)),
+        ]
+        for field_name, expected in cases:
+            with self.subTest(field_name=field_name):
+                field = form.fields[field_name]
+                actual = form.get_initial_for_field(field, field_name)
+                self.assertEqual(actual, expected)
 
     def test_changed_data(self):
         class Person(Form):
@@ -2096,6 +2112,8 @@ Password: <input type="password" name="password" required></li>
             supports_microseconds = False
 
         class DateTimeForm(Form):
+            # Test a non-callable.
+            fixed = DateTimeField(initial=now)
             auto_timestamp = DateTimeField(initial=delayed_now)
             auto_time_only = TimeField(initial=delayed_now_time)
             supports_microseconds = DateTimeField(initial=delayed_now, widget=TextInput)
@@ -2104,22 +2122,65 @@ Password: <input type="password" name="password" required></li>
             ti_without_microsec = DateTimeField(initial=delayed_now, widget=TextInputWithoutMicrosec)
 
         unbound = DateTimeForm()
-        self.assertEqual(unbound['auto_timestamp'].value(), now_no_ms)
-        self.assertEqual(unbound['auto_time_only'].value(), now_no_ms.time())
-        self.assertEqual(unbound['supports_microseconds'].value(), now)
-        self.assertEqual(unbound['hi_default_microsec'].value(), now)
-        self.assertEqual(unbound['hi_without_microsec'].value(), now_no_ms)
-        self.assertEqual(unbound['ti_without_microsec'].value(), now_no_ms)
+        cases = [
+            ('fixed', now_no_ms),
+            ('auto_timestamp', now_no_ms),
+            ('auto_time_only', now_no_ms.time()),
+            ('supports_microseconds', now),
+            ('hi_default_microsec', now),
+            ('hi_without_microsec', now_no_ms),
+            ('ti_without_microsec', now_no_ms),
+        ]
+        for field_name, expected in cases:
+            with self.subTest(field_name=field_name):
+                actual = unbound[field_name].value()
+                self.assertEqual(actual, expected)
+                # Also check get_initial_for_field().
+                field = unbound.fields[field_name]
+                actual = unbound.get_initial_for_field(field, field_name)
+                self.assertEqual(actual, expected)
 
-    def test_datetime_clean_initial_callable_disabled(self):
-        now = datetime.datetime(2006, 10, 25, 14, 30, 45, 123456)
+    def get_datetime_form_with_callable_initial(self, disabled, microseconds=0):
+        class FakeTime:
+            def __init__(self):
+                self.elapsed_seconds = 0
+
+            def now(self):
+                self.elapsed_seconds += 1
+                return datetime.datetime(
+                    2006, 10, 25, 14, 30, 45 + self.elapsed_seconds,
+                    microseconds,
+                )
 
         class DateTimeForm(forms.Form):
-            dt = DateTimeField(initial=lambda: now, disabled=True)
+            dt = DateTimeField(initial=FakeTime().now, disabled=disabled)
 
-        form = DateTimeForm({})
+        return DateTimeForm({})
+
+    def test_datetime_clean_disabled_callable_initial_microseconds(self):
+        """
+        Cleaning a form with a disabled DateTimeField and callable initial
+        removes microseconds.
+        """
+        form = self.get_datetime_form_with_callable_initial(
+            disabled=True, microseconds=123456,
+        )
         self.assertEqual(form.errors, {})
-        self.assertEqual(form.cleaned_data, {'dt': now})
+        self.assertEqual(form.cleaned_data, {
+            'dt': datetime.datetime(2006, 10, 25, 14, 30, 46),
+        })
+
+    def test_datetime_clean_disabled_callable_initial_bound_field(self):
+        """
+        The cleaned value for a form with a disabled DateTimeField and callable
+        initial matches the bound field's cached initial value.
+        """
+        form = self.get_datetime_form_with_callable_initial(disabled=True)
+        self.assertEqual(form.errors, {})
+        cleaned = form.cleaned_data['dt']
+        self.assertEqual(cleaned, datetime.datetime(2006, 10, 25, 14, 30, 46))
+        bf = form['dt']
+        self.assertEqual(cleaned, bf.initial)
 
     def test_datetime_changed_data_callable_with_microseconds(self):
         class DateTimeForm(forms.Form):
@@ -3042,6 +3103,39 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
         with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
             f.clean(['61', '287654321', '123', 'Home'])
 
+    def test_multivalue_optional_subfields_rendering(self):
+        class PhoneWidget(MultiWidget):
+            def __init__(self, attrs=None):
+                widgets = [TextInput(), TextInput()]
+                super().__init__(widgets, attrs)
+
+            def decompress(self, value):
+                return [None, None]
+
+        class PhoneField(MultiValueField):
+            def __init__(self, *args, **kwargs):
+                fields = [CharField(), CharField(required=False)]
+                super().__init__(fields, *args, **kwargs)
+
+        class PhoneForm(Form):
+            phone1 = PhoneField(widget=PhoneWidget)
+            phone2 = PhoneField(widget=PhoneWidget, required=False)
+            phone3 = PhoneField(widget=PhoneWidget, require_all_fields=False)
+            phone4 = PhoneField(
+                widget=PhoneWidget, required=False, require_all_fields=False,
+            )
+
+        form = PhoneForm(auto_id=False)
+        self.assertHTMLEqual(
+            form.as_p(),
+            """
+            <p>Phone1:<input type="text" name="phone1_0" required><input type="text" name="phone1_1" required></p>
+            <p>Phone2:<input type="text" name="phone2_0"><input type="text" name="phone2_1"></p>
+            <p>Phone3:<input type="text" name="phone3_0" required><input type="text" name="phone3_1"></p>
+            <p>Phone4:<input type="text" name="phone4_0"><input type="text" name="phone4_1"></p>
+            """,
+        )
+
     def test_custom_empty_values(self):
         """
         Form fields can customize what is considered as an empty value
@@ -3141,6 +3235,22 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
         form = SomeForm()
         self.assertEqual(form['field'].id_for_label, 'myCustomID')
         self.assertEqual(form['field_none'].id_for_label, 'id_field_none')
+
+    def test_boundfield_subwidget_id_for_label(self):
+        """
+        If auto_id is provided when initializing the form, the generated ID in
+        subwidgets must reflect that prefix.
+        """
+        class SomeForm(Form):
+            field = MultipleChoiceField(
+                choices=[('a', 'A'), ('b', 'B')],
+                widget=CheckboxSelectMultiple,
+            )
+
+        form = SomeForm(auto_id='prefix_%s')
+        subwidgets = form['field'].subwidgets
+        self.assertEqual(subwidgets[0].id_for_label, 'prefix_field_0')
+        self.assertEqual(subwidgets[1].id_for_label, 'prefix_field_1')
 
     def test_boundfield_widget_type(self):
         class SomeForm(Form):

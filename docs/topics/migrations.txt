@@ -201,7 +201,7 @@ migration will contain a dependency on a migration in ``authors``.
 
 This means that when you run the migrations, the ``authors`` migration runs
 first and creates the table the ``ForeignKey`` references, and then the migration
-that makes the ``ForeignKey`` column runs afterwards and creates the constraint.
+that makes the ``ForeignKey`` column runs afterward and creates the constraint.
 If this didn't happen, the migration would try to create the ``ForeignKey``
 column without the table it's referencing existing and your database would
 throw an error.
