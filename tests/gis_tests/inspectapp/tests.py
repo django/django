@@ -191,7 +191,7 @@ def get_ogr_db_string():
     db = connections.databases['default']
 
     # Map from the django backend into the OGR driver name and database identifier
-    # https://www.gdal.org/ogr/ogr_formats.html
+    # https://gdal.org/drivers/vector/
     #
     # TODO: Support Oracle (OCI).
     drivers = {
