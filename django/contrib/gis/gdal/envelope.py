@@ -17,7 +17,7 @@ from django.contrib.gis.gdal.error import GDALException
 
 # The OGR definition of an Envelope is a C structure containing four doubles.
 #  See the 'ogr_core.h' source file for more information:
-#   https://www.gdal.org/ogr__core_8h_source.html
+#   https://gdal.org/doxygen/ogr__core_8h_source.html
 class OGREnvelope(Structure):
     "Represent the OGREnvelope C Structure."
     _fields_ = [("MinX", c_double),
