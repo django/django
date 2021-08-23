@@ -509,27 +509,36 @@ class Parser:
             self.unclosed_block_tag(parse_until)
         return nodelist
 
-    def parse_verbatim(self, parse_until):
+    def parse_verbatim(self, parse_until_tag):
         """
         Iterate through the parser tokens and returns a string that is a
         verbatim copy of the original template fragment.
-        Fragment starts from the current token position and ends when one of
-        the tags in parse_until is reached.
+        Fragment starts from the current token position and ends when
+        parse_until_tag is reached.
         """
         text_list = []
+
+        # See #23424: matching the end tag via a regex rather than a simple test
+        # allows verbatim content to contain tag delimiters eg. '{{' and '{%'
+        end_tag_re = re.compile(f'.*({{%\\s*{parse_until_tag}\\s*?%}}).*')
+
         while self.tokens:
             token = self.next_token()
-            # check for end tag if TokenType.BLOCK
-            # match entire token contents, not just the 'command'
-            if token.token_type.value == 2 and token.contents in parse_until:
+            # Use the full token_string if not TokenType.TEXT
+            verbatim_content = token.contents if token.token_type.value == 0 else token.token_string
+
+            if end_tag_re.match(verbatim_content):
+                # FIXME in #23424: if the verbatim content has additional chars
+                #  that have not been matched (this can happen if verbatim content
+                #  contains tag delimiters), the token needs to be be split
+                #  into smaller tokens.
+
                 # A matching token has been reached. Return control to
                 # the caller. Put the token back on the token list so the
                 # caller knows where it terminated.
                 self.prepend_token(token)
                 return ''.join(text_list)
 
-            # Use the full token_string if not TokenType.TEXT
-            verbatim_content = token.contents if token.token_type.value == 0 else token.token_string
             text_list.append(verbatim_content)
 
         return ''.join(text_list)

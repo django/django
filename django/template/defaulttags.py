@@ -1351,7 +1351,7 @@ def verbatim(parser, token):
     # set the end tag to the entire token contents to allow specific closing
     # tags to be matched
     end_tag = f'end{token.contents}'
-    verbatim_text = parser.parse_verbatim((end_tag,))
+    verbatim_text = parser.parse_verbatim(end_tag)
     parser.delete_first_token()
     return VerbatimNode(verbatim_text)
 
