@@ -527,16 +527,29 @@ class Parser:
             # Use the full token_string if not TokenType.TEXT
             verbatim_content = token.contents if token.token_type.value == 0 else token.token_string
 
-            if end_tag_re.match(verbatim_content):
-                # FIXME in #23424: if the verbatim content has additional chars
-                #  that have not been matched (this can happen if verbatim content
-                #  contains tag delimiters), the token needs to be be split
-                #  into smaller tokens.
+            if match := end_tag_re.match(verbatim_content):
+                # 23424: if the verbatim content has additional chars
+                # that have not been matched (this can happen if verbatim content
+                # contains tag delimiters), the token needs to be be split
+                # into smaller tokens.
+                matched_end_tag = match.groups()[0]
+                inner_text, outer_text = verbatim_content.split(matched_end_tag)
+                if inner_text:
+                    text_list.append(inner_text)
+
+                if outer_text:
+                    lexer = Lexer(outer_text)
+                    split_tokens = lexer.tokenize()
+                    for new_token in reversed(split_tokens):
+                        self.prepend_token(new_token)
 
                 # A matching token has been reached. Return control to
                 # the caller. Put the token back on the token list so the
                 # caller knows where it terminated.
-                self.prepend_token(token)
+                # Need to construct a new token as the token passed in might
+                # have been split above.
+                end_token = Token(TokenType.BLOCK, parse_until_tag)
+                self.prepend_token(end_token)
                 return ''.join(text_list)
 
             text_list.append(verbatim_content)

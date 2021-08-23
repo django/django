@@ -1,5 +1,3 @@
-from unittest import expectedFailure
-
 from django.template import TemplateSyntaxError
 from django.test import SimpleTestCase
 
@@ -39,21 +37,18 @@ class VerbatimTagTests(SimpleTestCase):
         output = self.engine.render_to_string('verbatim-tag06')
         self.assertEqual(output, 'Don\'t {% endverbatim %} just yet')
 
-    @expectedFailure  # See #23424
     @setup({'verbatim-tag07': '{% verbatim %}{{% endverbatim %}text'
                               '{% verbatim %}}{% endverbatim %}'})
     def test_verbatim_tag07(self):
         output = self.engine.render_to_string('verbatim-tag07')
         self.assertEqual(output, '{text}')
 
-    @expectedFailure  # See #23424
     @setup({'verbatim-tag08': '{% verbatim %}{{{% endverbatim %}text'
                               '{% verbatim %}}}{% endverbatim %}'})
     def test_verbatim_tag08(self):
         output = self.engine.render_to_string('verbatim-tag08', {'field': 'value'})
         self.assertEqual(output, '{{text}}')
 
-    @expectedFailure    # See #23424
     @setup({'verbatim-tag09': '{%verbatim%} {{ {%endverbatim%} computer.{{field}} '
                               '{%verbatim%} }} {%endverbatim%}'})
     def test_verbatim_tag09(self):
