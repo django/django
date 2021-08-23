@@ -43,17 +43,14 @@ class ModelIterable(BaseIterable):
     """Iterable that yields a model instance for each row."""
 
     def __iter__(self):
-        queryset = self.queryset
-        db = queryset.db
-        compiler = queryset.query.get_compiler(using=db)
-
+        from django.db import connection
         g = self._gen()
         sql, params = g.send(None)
-        with compiler.connection.cursor() as cursor:
+        with connection.cursor() as cursor:
             from django.db.models.sql.compiler import cursor_iter
             cursor.execute(sql, params)
             for rows in cursor_iter(
-                cursor, compiler.connection.features.empty_fetchmany_value, None,
+                cursor, connection.features.empty_fetchmany_value, None,
                 itersize=100,
             ):
                 objects = g.send(rows)
@@ -329,7 +326,18 @@ class QuerySet:
         return len(self._result_cache)
 
     def _gen(self):
-        1
+        queries = self._new_fetch_all()
+        objects = None
+        while True:
+            g = queries.send(objects)
+            t = (sql, params) = g.send(None)
+            rows = yield t
+            objects = []
+            while rows:
+                objs = g.send(rows)
+                objects.extend(objs)
+                rows = yield ()
+        yield from self._result_cache
 
     def __iter__(self):
         """
@@ -346,8 +354,25 @@ class QuerySet:
             3. self.iterator()
                - Responsible for turning the rows into model objects.
         """
-        self._fetch_all()
-        return iter(self._result_cache)
+
+        from django.db import connection
+        g = self._gen()
+        try:
+            while 1:
+                sql, params = g.send(None)
+                with connection.cursor() as cursor:
+                    from django.db.models.sql.compiler import cursor_iter
+                    cursor.execute(sql, params)
+                    for rows in cursor_iter(
+                        cursor, connection.features.empty_fetchmany_value, None,
+                        itersize=100,
+                    ):
+                        objects = g.send(rows)
+                        if objects is not ():
+                            yield from objects
+        except RuntimeError as re:
+            print(str(re))
+            yield from self._result_cache
 
     def __bool__(self):
         self._fetch_all()
@@ -907,7 +932,13 @@ class QuerySet:
 
     def _prefetch_related_objects(self):
         # This method can only be called once the result cache has been filled.
-        yield from prefetch_related_objects(self._result_cache, *self._prefetch_related_lookups)
+        g = prefetch_related_objects(self._result_cache, *self._prefetch_related_lookups)
+        val = None
+        try:
+            while 1:
+                val = yield g.send(val)
+        except StopIteration as rv:
+            assert rv.value == None
         self._prefetch_done = True
 
     def explain(self, *, format=None, **options):
@@ -1416,7 +1447,19 @@ class QuerySet:
         c._fields = self._fields
         return c
 
-    # gen
+    def _new_fetch_all(self):
+        if self._result_cache is None:
+            objects = (yield self._iterable_class(self)._gen())
+            self._result_cache = list(objects)
+        if self._prefetch_related_lookups and not self._prefetch_done:
+            g = self._prefetch_related_objects()
+            val = None
+            try:
+                while 1:
+                    val = yield g.send(val)
+            except StopIteration as rv:
+                assert rv.value == None
+
     def _fetch_all(self):
         if self._result_cache is None:
             self._result_cache = list(self._iterable_class(self))
@@ -1825,12 +1868,18 @@ def prefetch_related_objects(model_instances, *related_lookups):
                 obj_to_fetch = [obj for obj in obj_list if not is_fetched(obj)]
 
             if obj_to_fetch:
-                obj_list, additional_lookups = prefetch_one_level(
+                g = prefetch_one_level(
                     obj_to_fetch,
                     prefetcher,
                     lookup,
                     level,
                 )
+                val = None
+                try:
+                    while 1:
+                        val = yield g.send(val)
+                except StopIteration as rv:
+                    obj_list, additional_lookups = rv.value
                 # We need to ensure we don't keep adding lookups from the
                 # same relationships to stop infinite recursion. So, if we
                 # are already on an automatically added lookup, don't add
@@ -1967,12 +2016,8 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
         # for performance reasons.
         rel_qs._prefetch_related_lookups = ()
 
-    all_related_objects = []
-    g = rel_qs._model_iterable(rel_qs)._gen()
-    while 1:
-        objects = g.send(rows)
-        all_related_objects.extend(objects)
-    # all_related_objects = list(rel_qs)
+
+    all_related_objects = (yield rel_qs._iterable_class(rel_qs)._gen())
 
     rel_obj_cache = {}
     for rel_obj in all_related_objects:
