@@ -32,6 +32,15 @@ MAX_GET_RESULTS = 21
 REPR_OUTPUT_SIZE = 20
 
 
+def proxy(g):
+    val = None
+    try:
+        while 1:
+            val = yield g.send(val)
+    except StopIteration as rv:
+        return rv.value
+
+
 class BaseIterable:
     def __init__(self, queryset, chunked_fetch=False, chunk_size=GET_ITERATOR_CHUNK_SIZE):
         self.queryset = queryset
@@ -101,7 +110,7 @@ class ModelIterable(BaseIterable):
                         setattr(obj, field.name, rel_obj)
 
                 objects.append(obj)
-            yield objects
+            rows = yield objects
 
 
     #
@@ -371,8 +380,10 @@ class QuerySet:
                         if objects is not ():
                             yield from objects
         except RuntimeError as re:
-            print(str(re))
-            yield from self._result_cache
+            # to be further investigated
+            if str(re) != "generator raised StopIteration":
+                raise
+        yield from self._result_cache
 
     def __bool__(self):
         self._fetch_all()
@@ -932,13 +943,7 @@ class QuerySet:
 
     def _prefetch_related_objects(self):
         # This method can only be called once the result cache has been filled.
-        g = prefetch_related_objects(self._result_cache, *self._prefetch_related_lookups)
-        val = None
-        try:
-            while 1:
-                val = yield g.send(val)
-        except StopIteration as rv:
-            assert rv.value == None
+        yield from proxy(prefetch_related_objects(self._result_cache, *self._prefetch_related_lookups))
         self._prefetch_done = True
 
     def explain(self, *, format=None, **options):
@@ -1452,13 +1457,7 @@ class QuerySet:
             objects = (yield self._iterable_class(self)._gen())
             self._result_cache = list(objects)
         if self._prefetch_related_lookups and not self._prefetch_done:
-            g = self._prefetch_related_objects()
-            val = None
-            try:
-                while 1:
-                    val = yield g.send(val)
-            except StopIteration as rv:
-                assert rv.value == None
+            yield from proxy(self._prefetch_related_objects())
 
     def _fetch_all(self):
         if self._result_cache is None:
@@ -1868,18 +1867,12 @@ def prefetch_related_objects(model_instances, *related_lookups):
                 obj_to_fetch = [obj for obj in obj_list if not is_fetched(obj)]
 
             if obj_to_fetch:
-                g = prefetch_one_level(
+                obj_list, additional_lookups = yield from proxy(prefetch_one_level(
                     obj_to_fetch,
                     prefetcher,
                     lookup,
                     level,
-                )
-                val = None
-                try:
-                    while 1:
-                        val = yield g.send(val)
-                except StopIteration as rv:
-                    obj_list, additional_lookups = rv.value
+                ))
                 # We need to ensure we don't keep adding lookups from the
                 # same relationships to stop infinite recursion. So, if we
                 # are already on an automatically added lookup, don't add
