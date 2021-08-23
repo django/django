@@ -8,7 +8,7 @@ from django.middleware.csrf import (
     CSRF_ALLOWED_CHARS, CSRF_SECRET_LENGTH, CSRF_SESSION_KEY,
     CSRF_TOKEN_LENGTH, REASON_BAD_ORIGIN, REASON_CSRF_TOKEN_MISSING,
     REASON_NO_CSRF_COOKIE, CsrfViewMiddleware, InvalidTokenFormat,
-    RejectRequest, _does_token_match, _mask_cipher_secret, _sanitize_token,
+    RejectRequest, _check_token_format, _does_token_match, _mask_cipher_secret,
     _unmask_cipher_token, get_token, rotate_token,
 )
 from django.test import SimpleTestCase, override_settings
@@ -106,7 +106,7 @@ class CsrfFunctionTests(CsrfFunctionTestMixin, SimpleTestCase):
         self.assertNotEqual(cookie, TEST_SECRET)
         self.assertIs(request.META['CSRF_COOKIE_NEEDS_UPDATE'], True)
 
-    def test_sanitize_token_valid(self):
+    def test_check_token_format_valid(self):
         cases = [
             # A token of length CSRF_SECRET_LENGTH.
             TEST_SECRET,
@@ -116,10 +116,10 @@ class CsrfFunctionTests(CsrfFunctionTestMixin, SimpleTestCase):
         ]
         for token in cases:
             with self.subTest(token=token):
-                actual = _sanitize_token(token)
+                actual = _check_token_format(token)
                 self.assertIsNone(actual)
 
-    def test_sanitize_token_invalid(self):
+    def test_check_token_format_invalid(self):
         cases = [
             (64 * '*', 'has invalid characters'),
             (16 * 'a', 'has incorrect length'),
@@ -127,7 +127,7 @@ class CsrfFunctionTests(CsrfFunctionTestMixin, SimpleTestCase):
         for token, expected_message in cases:
             with self.subTest(token=token):
                 with self.assertRaisesMessage(InvalidTokenFormat, expected_message):
-                    _sanitize_token(token)
+                    _check_token_format(token)
 
     def test_does_token_match(self):
         cases = [

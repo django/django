@@ -128,7 +128,7 @@ class InvalidTokenFormat(Exception):
         self.reason = reason
 
 
-def _sanitize_token(token):
+def _check_token_format(token):
     """
     Raise an InvalidTokenFormat error if the token has an invalid length or
     characters that aren't allowed. The token argument can be a CSRF cookie
@@ -239,7 +239,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
                 csrf_secret = None
             else:
                 # This can raise InvalidTokenFormat.
-                _sanitize_token(csrf_secret)
+                _check_token_format(csrf_secret)
         if csrf_secret is None:
             return None
         # Django versions before 4.0 masked the secret before storing.
@@ -386,7 +386,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
             token_source = 'POST'
 
         try:
-            _sanitize_token(request_csrf_token)
+            _check_token_format(request_csrf_token)
         except InvalidTokenFormat as exc:
             reason = self._bad_token_message(exc.reason, token_source)
             raise RejectRequest(reason)
