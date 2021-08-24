@@ -912,6 +912,11 @@ It also provides an additional method:
                 self.assertEqual(mail.outbox[0].subject, 'Contact Form')
                 self.assertEqual(mail.outbox[0].body, 'I like your site')
 
+    .. versionchanged:: 4.0
+
+        In older versions, new callbacks added while executing
+        :func:`.transaction.on_commit` callbacks were not captured.
+
 .. _live-test-server:
 
 ``LiveServerTestCase``

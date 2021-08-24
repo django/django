@@ -368,6 +368,9 @@ Tests
 * The :option:`test --parallel` option now supports the value ``auto`` to run
   one test process for each processor core.
 
+* :meth:`.TestCase.captureOnCommitCallbacks` now captures new callbacks added
+  while executing :func:`.transaction.on_commit` callbacks.
+
 URLs
 ~~~~
 
