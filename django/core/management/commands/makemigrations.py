@@ -58,6 +58,9 @@ class Command(BaseCommand):
             help='Exit with a non-zero status if model changes are missing migrations.',
         )
 
+    def log(self, msg):
+        self.stdout.write(msg)
+
     @no_translations
     def handle(self, *app_labels, **options):
         self.verbosity = options['verbosity']
@@ -132,7 +135,7 @@ class Command(BaseCommand):
 
         # If they want to merge and there's nothing to merge, then politely exit
         if self.merge and not conflicts:
-            self.stdout.write("No conflicts detected to merge.")
+            self.log('No conflicts detected to merge.')
             return
 
         # If they want to merge and there is something to merge, then
@@ -181,11 +184,11 @@ class Command(BaseCommand):
             if self.verbosity >= 1:
                 if app_labels:
                     if len(app_labels) == 1:
-                        self.stdout.write("No changes detected in app '%s'" % app_labels.pop())
+                        self.log("No changes detected in app '%s'" % app_labels.pop())
                     else:
-                        self.stdout.write("No changes detected in apps '%s'" % ("', '".join(app_labels)))
+                        self.log("No changes detected in apps '%s'" % ("', '".join(app_labels)))
                 else:
-                    self.stdout.write("No changes detected")
+                    self.log('No changes detected')
         else:
             self.write_migration_files(changes)
             if check_changes:
@@ -198,7 +201,7 @@ class Command(BaseCommand):
         directory_created = {}
         for app_label, app_migrations in changes.items():
             if self.verbosity >= 1:
-                self.stdout.write(self.style.MIGRATE_HEADING("Migrations for '%s':" % app_label))
+                self.log(self.style.MIGRATE_HEADING("Migrations for '%s':" % app_label))
             for migration in app_migrations:
                 # Describe the migration
                 writer = MigrationWriter(migration, self.include_header)
@@ -211,9 +214,9 @@ class Command(BaseCommand):
                         migration_string = writer.path
                     if migration_string.startswith('..'):
                         migration_string = writer.path
-                    self.stdout.write('  %s\n' % self.style.MIGRATE_LABEL(migration_string))
+                    self.log('  %s\n' % self.style.MIGRATE_LABEL(migration_string))
                     for operation in migration.operations:
-                        self.stdout.write('    - %s' % operation.describe())
+                        self.log('    - %s' % operation.describe())
                 if not self.dry_run:
                     # Write the migrations file to the disk.
                     migrations_directory = os.path.dirname(writer.path)
@@ -229,12 +232,12 @@ class Command(BaseCommand):
                         fh.write(migration_string)
                 elif self.verbosity == 3:
                     # Alternatively, makemigrations --dry-run --verbosity 3
-                    # will output the migrations to stdout rather than saving
-                    # the file to the disk.
-                    self.stdout.write(self.style.MIGRATE_HEADING(
+                    # will log the migrations rather than saving the file to
+                    # the disk.
+                    self.log(self.style.MIGRATE_HEADING(
                         "Full migrations file '%s':" % writer.filename
                     ))
-                    self.stdout.write(writer.as_string())
+                    self.log(writer.as_string())
 
     def handle_merge(self, loader, conflicts):
         """
@@ -276,11 +279,11 @@ class Command(BaseCommand):
             # (can_optimize_through) to automatically see if they're
             # mergeable. For now, we always just prompt the user.
             if self.verbosity > 0:
-                self.stdout.write(self.style.MIGRATE_HEADING("Merging %s" % app_label))
+                self.log(self.style.MIGRATE_HEADING('Merging %s' % app_label))
                 for migration in merge_migrations:
-                    self.stdout.write(self.style.MIGRATE_LABEL("  Branch %s" % migration.name))
+                    self.log(self.style.MIGRATE_LABEL('  Branch %s' % migration.name))
                     for operation in migration.merged_operations:
-                        self.stdout.write('    - %s' % operation.describe())
+                        self.log('    - %s' % operation.describe())
             if questioner.ask_merge(app_label):
                 # If they still want to merge it, then write out an empty
                 # file depending on the migrations needing merging.
@@ -314,12 +317,12 @@ class Command(BaseCommand):
                     with open(writer.path, "w", encoding='utf-8') as fh:
                         fh.write(writer.as_string())
                     if self.verbosity > 0:
-                        self.stdout.write("\nCreated new merge migration %s" % writer.path)
+                        self.log('\nCreated new merge migration %s' % writer.path)
                 elif self.verbosity == 3:
                     # Alternatively, makemigrations --merge --dry-run --verbosity 3
-                    # will output the merge migrations to stdout rather than saving
-                    # the file to the disk.
-                    self.stdout.write(self.style.MIGRATE_HEADING(
+                    # will log the merge migrations rather than saving the file
+                    # to the disk.
+                    self.log(self.style.MIGRATE_HEADING(
                         "Full merge migrations file '%s':" % writer.filename
                     ))
-                    self.stdout.write(writer.as_string())
+                    self.log(writer.as_string())
