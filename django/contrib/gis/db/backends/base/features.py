@@ -60,15 +60,15 @@ class BaseSpatialFeatures:
 
     @property
     def supports_bbcontains_lookup(self):
-        return 'bbcontains' in self.connection.ops.gis_operators
+        return "bbcontains" in self.connection.ops.gis_operators
 
     @property
     def supports_contained_lookup(self):
-        return 'contained' in self.connection.ops.gis_operators
+        return "contained" in self.connection.ops.gis_operators
 
     @property
     def supports_crosses_lookup(self):
-        return 'crosses' in self.connection.ops.gis_operators
+        return "crosses" in self.connection.ops.gis_operators
 
     @property
     def supports_distances_lookups(self):
@@ -76,11 +76,11 @@ class BaseSpatialFeatures:
 
     @property
     def supports_dwithin_lookup(self):
-        return 'dwithin' in self.connection.ops.gis_operators
+        return "dwithin" in self.connection.ops.gis_operators
 
     @property
     def supports_relate_lookup(self):
-        return 'relate' in self.connection.ops.gis_operators
+        return "relate" in self.connection.ops.gis_operators
 
     @property
     def supports_isvalid_lookup(self):
@@ -104,7 +104,7 @@ class BaseSpatialFeatures:
         return models.Union not in self.connection.ops.disallowed_aggregates
 
     def __getattr__(self, name):
-        m = re.match(r'has_(\w*)_function$', name)
+        m = re.match(r"has_(\w*)_function$", name)
         if m:
             func_name = m[1]
             return func_name not in self.connection.ops.unsupported_functions

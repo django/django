@@ -60,9 +60,9 @@ class Migration:
 
     def __eq__(self, other):
         return (
-            isinstance(other, Migration) and
-            self.name == other.name and
-            self.app_label == other.app_label
+            isinstance(other, Migration)
+            and self.name == other.name
+            and self.app_label == other.app_label
         )
 
     def __repr__(self):
@@ -114,15 +114,21 @@ class Migration:
             old_state = project_state.clone()
             operation.state_forwards(self.app_label, project_state)
             # Run the operation
-            atomic_operation = operation.atomic or (self.atomic and operation.atomic is not False)
+            atomic_operation = operation.atomic or (
+                self.atomic and operation.atomic is not False
+            )
             if not schema_editor.atomic_migration and atomic_operation:
                 # Force a transaction on a non-transactional-DDL backend or an
                 # atomic operation inside a non-atomic migration.
                 with atomic(schema_editor.connection.alias):
-                    operation.database_forwards(self.app_label, schema_editor, old_state, project_state)
+                    operation.database_forwards(
+                        self.app_label, schema_editor, old_state, project_state
+                    )
             else:
                 # Normal behaviour
-                operation.database_forwards(self.app_label, schema_editor, old_state, project_state)
+                operation.database_forwards(
+                    self.app_label, schema_editor, old_state, project_state
+                )
         return project_state
 
     def unapply(self, project_state, schema_editor, collect_sql=False):
@@ -145,7 +151,9 @@ class Migration:
         for operation in self.operations:
             # If it's irreversible, error out
             if not operation.reversible:
-                raise IrreversibleError("Operation %s in %s is not reversible" % (operation, self))
+                raise IrreversibleError(
+                    "Operation %s in %s is not reversible" % (operation, self)
+                )
             # Preserve new state from previous run to not tamper the same state
             # over all operations
             new_state = new_state.clone()
@@ -165,15 +173,21 @@ class Migration:
                 schema_editor.collected_sql.append("--")
                 if not operation.reduces_to_sql:
                     continue
-            atomic_operation = operation.atomic or (self.atomic and operation.atomic is not False)
+            atomic_operation = operation.atomic or (
+                self.atomic and operation.atomic is not False
+            )
             if not schema_editor.atomic_migration and atomic_operation:
                 # Force a transaction on a non-transactional-DDL backend or an
                 # atomic operation inside a non-atomic migration.
                 with atomic(schema_editor.connection.alias):
-                    operation.database_backwards(self.app_label, schema_editor, from_state, to_state)
+                    operation.database_backwards(
+                        self.app_label, schema_editor, from_state, to_state
+                    )
             else:
                 # Normal behaviour
-                operation.database_backwards(self.app_label, schema_editor, from_state, to_state)
+                operation.database_backwards(
+                    self.app_label, schema_editor, from_state, to_state
+                )
         return project_state
 
     def suggest_name(self):
@@ -183,19 +197,19 @@ class Migration:
         name to avoid VCS conflicts if possible.
         """
         if self.initial:
-            return 'initial'
+            return "initial"
 
         raw_fragments = [op.migration_name_fragment for op in self.operations]
         fragments = [name for name in raw_fragments if name]
 
         if not fragments or len(fragments) != len(self.operations):
-            return 'auto_%s' % get_migration_name_timestamp()
+            return "auto_%s" % get_migration_name_timestamp()
 
         name = fragments[0]
         for fragment in fragments[1:]:
-            new_name = f'{name}_{fragment}'
+            new_name = f"{name}_{fragment}"
             if len(new_name) > 52:
-                name = f'{name}_and_more'
+                name = f"{name}_and_more"
                 break
             name = new_name
         return name

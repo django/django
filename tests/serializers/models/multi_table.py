@@ -8,7 +8,7 @@ class ParentManager(models.Manager):
 
 class Parent(models.Model):
     parent_data = models.CharField(max_length=30, unique=True)
-    parent_m2m = models.ManyToManyField('self')
+    parent_m2m = models.ManyToManyField("self")
 
     objects = ParentManager()
 

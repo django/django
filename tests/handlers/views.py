@@ -38,7 +38,7 @@ def bad_request(request):
 
 
 def suspicious(request):
-    raise SuspiciousOperation('dubious')
+    raise SuspiciousOperation("dubious")
 
 
 @csrf_exempt
@@ -52,7 +52,7 @@ def httpstatus_enum(request):
 
 
 async def async_regular(request):
-    return HttpResponse(b'regular content')
+    return HttpResponse(b"regular content")
 
 
 class CoroutineClearingView:

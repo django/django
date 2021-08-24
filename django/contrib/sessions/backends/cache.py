@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.contrib.sessions.backends.base import (
-    CreateError, SessionBase, UpdateError,
+    CreateError,
+    SessionBase,
+    UpdateError,
 )
 from django.core.cache import caches
 
@@ -11,6 +13,7 @@ class SessionStore(SessionBase):
     """
     A cache-based session store.
     """
+
     cache_key_prefix = KEY_PREFIX
 
     def __init__(self, session_key=None):
@@ -49,7 +52,8 @@ class SessionStore(SessionBase):
             return
         raise RuntimeError(
             "Unable to create a new session key. "
-            "It is likely that the cache is unavailable.")
+            "It is likely that the cache is unavailable."
+        )
 
     def save(self, must_create=False):
         if self.session_key is None:
@@ -60,14 +64,18 @@ class SessionStore(SessionBase):
             func = self._cache.set
         else:
             raise UpdateError
-        result = func(self.cache_key,
-                      self._get_session(no_load=must_create),
-                      self.get_expiry_age())
+        result = func(
+            self.cache_key,
+            self._get_session(no_load=must_create),
+            self.get_expiry_age(),
+        )
         if must_create and not result:
             raise CreateError
 
     def exists(self, session_key):
-        return bool(session_key) and (self.cache_key_prefix + session_key) in self._cache
+        return (
+            bool(session_key) and (self.cache_key_prefix + session_key) in self._cache
+        )
 
     def delete(self, session_key=None):
         if session_key is None:

@@ -19,7 +19,7 @@ class _EnsureCsrfToken(CsrfViewMiddleware):
 
 
 requires_csrf_token = decorator_from_middleware(_EnsureCsrfToken)
-requires_csrf_token.__name__ = 'requires_csrf_token'
+requires_csrf_token.__name__ = "requires_csrf_token"
 requires_csrf_token.__doc__ = """
 Use this decorator on views that need a correct csrf_token available to
 RequestContext, but without the CSRF protection that csrf_protect
@@ -39,7 +39,7 @@ class _EnsureCsrfCookie(CsrfViewMiddleware):
 
 
 ensure_csrf_cookie = decorator_from_middleware(_EnsureCsrfCookie)
-ensure_csrf_cookie.__name__ = 'ensure_csrf_cookie'
+ensure_csrf_cookie.__name__ = "ensure_csrf_cookie"
 ensure_csrf_cookie.__doc__ = """
 Use this decorator to ensure that a view sets a CSRF cookie, whether or not it
 uses the csrf_token template tag, or the CsrfViewMiddleware is used.
@@ -52,5 +52,6 @@ def csrf_exempt(view_func):
     # if they don't have side effects, so return a new function.
     def wrapped_view(*args, **kwargs):
         return view_func(*args, **kwargs)
+
     wrapped_view.csrf_exempt = True
     return wraps(view_func)(wrapped_view)

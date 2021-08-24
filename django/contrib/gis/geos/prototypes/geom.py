@@ -2,7 +2,9 @@ from ctypes import POINTER, c_char_p, c_int, c_ubyte
 
 from django.contrib.gis.geos.libgeos import CS_PTR, GEOM_PTR, GEOSFuncFactory
 from django.contrib.gis.geos.prototypes.errcheck import (
-    check_geom, check_minus_one, check_string,
+    check_geom,
+    check_minus_one,
+    check_string,
 )
 
 # This is the return type used by binary output (WKB, HEX) routines.
@@ -44,38 +46,38 @@ class StringFromGeom(GEOSFuncFactory):
 # ### ctypes prototypes ###
 
 # The GEOS geometry type, typeid, num_coordinates and number of geometries
-geos_normalize = IntFromGeom('GEOSNormalize')
-geos_type = StringFromGeom('GEOSGeomType')
-geos_typeid = IntFromGeom('GEOSGeomTypeId')
-get_dims = GEOSFuncFactory('GEOSGeom_getDimensions', argtypes=[GEOM_PTR], restype=c_int)
-get_num_coords = IntFromGeom('GEOSGetNumCoordinates')
-get_num_geoms = IntFromGeom('GEOSGetNumGeometries')
+geos_normalize = IntFromGeom("GEOSNormalize")
+geos_type = StringFromGeom("GEOSGeomType")
+geos_typeid = IntFromGeom("GEOSGeomTypeId")
+get_dims = GEOSFuncFactory("GEOSGeom_getDimensions", argtypes=[GEOM_PTR], restype=c_int)
+get_num_coords = IntFromGeom("GEOSGetNumCoordinates")
+get_num_geoms = IntFromGeom("GEOSGetNumGeometries")
 
 # Geometry creation factories
-create_point = GeomOutput('GEOSGeom_createPoint', argtypes=[CS_PTR])
-create_linestring = GeomOutput('GEOSGeom_createLineString', argtypes=[CS_PTR])
-create_linearring = GeomOutput('GEOSGeom_createLinearRing', argtypes=[CS_PTR])
+create_point = GeomOutput("GEOSGeom_createPoint", argtypes=[CS_PTR])
+create_linestring = GeomOutput("GEOSGeom_createLineString", argtypes=[CS_PTR])
+create_linearring = GeomOutput("GEOSGeom_createLinearRing", argtypes=[CS_PTR])
 
 # Polygon and collection creation routines are special and will not
 # have their argument types defined.
-create_polygon = GeomOutput('GEOSGeom_createPolygon')
-create_empty_polygon = GeomOutput('GEOSGeom_createEmptyPolygon')
-create_collection = GeomOutput('GEOSGeom_createCollection')
+create_polygon = GeomOutput("GEOSGeom_createPolygon")
+create_empty_polygon = GeomOutput("GEOSGeom_createEmptyPolygon")
+create_collection = GeomOutput("GEOSGeom_createCollection")
 
 # Ring routines
-get_extring = GeomOutput('GEOSGetExteriorRing', argtypes=[GEOM_PTR])
-get_intring = GeomOutput('GEOSGetInteriorRingN', argtypes=[GEOM_PTR, c_int])
-get_nrings = IntFromGeom('GEOSGetNumInteriorRings')
+get_extring = GeomOutput("GEOSGetExteriorRing", argtypes=[GEOM_PTR])
+get_intring = GeomOutput("GEOSGetInteriorRingN", argtypes=[GEOM_PTR, c_int])
+get_nrings = IntFromGeom("GEOSGetNumInteriorRings")
 
 # Collection Routines
-get_geomn = GeomOutput('GEOSGetGeometryN', argtypes=[GEOM_PTR, c_int])
+get_geomn = GeomOutput("GEOSGetGeometryN", argtypes=[GEOM_PTR, c_int])
 
 # Cloning
-geom_clone = GEOSFuncFactory('GEOSGeom_clone', argtypes=[GEOM_PTR], restype=GEOM_PTR)
+geom_clone = GEOSFuncFactory("GEOSGeom_clone", argtypes=[GEOM_PTR], restype=GEOM_PTR)
 
 # Destruction routine.
-destroy_geom = GEOSFuncFactory('GEOSGeom_destroy', argtypes=[GEOM_PTR])
+destroy_geom = GEOSFuncFactory("GEOSGeom_destroy", argtypes=[GEOM_PTR])
 
 # SRID routines
-geos_get_srid = GEOSFuncFactory('GEOSGetSRID', argtypes=[GEOM_PTR], restype=c_int)
-geos_set_srid = GEOSFuncFactory('GEOSSetSRID', argtypes=[GEOM_PTR, c_int])
+geos_get_srid = GEOSFuncFactory("GEOSGetSRID", argtypes=[GEOM_PTR], restype=c_int)
+geos_set_srid = GEOSFuncFactory("GEOSSetSRID", argtypes=[GEOM_PTR, c_int])

@@ -2,12 +2,12 @@
 #
 # The *_FORMAT strings use the Django date format syntax,
 # see https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
-DATE_FORMAT = 'd F Y'
-TIME_FORMAT = 'g.i.A'
+DATE_FORMAT = "d F Y"
+TIME_FORMAT = "g.i.A"
 # DATETIME_FORMAT =
-YEAR_MONTH_FORMAT = 'F Y'
-MONTH_DAY_FORMAT = 'j F'
-SHORT_DATE_FORMAT = 'Y-m-d'
+YEAR_MONTH_FORMAT = "F Y"
+MONTH_DAY_FORMAT = "j F"
+SHORT_DATE_FORMAT = "Y-m-d"
 # SHORT_DATETIME_FORMAT =
 # FIRST_DAY_OF_WEEK =
 
@@ -16,6 +16,6 @@ SHORT_DATE_FORMAT = 'Y-m-d'
 # DATE_INPUT_FORMATS =
 # TIME_INPUT_FORMATS =
 # DATETIME_INPUT_FORMATS =
-DECIMAL_SEPARATOR = ','
-THOUSAND_SEPARATOR = '.'
+DECIMAL_SEPARATOR = ","
+THOUSAND_SEPARATOR = "."
 # NUMBER_GROUPING =

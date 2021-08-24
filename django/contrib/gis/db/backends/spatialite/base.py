@@ -27,12 +27,16 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
         # (`libspatialite`). If it's not in the system library path (e.g., it
         # cannot be found by `ctypes.util.find_library`), then it may be set
         # manually in the settings via the `SPATIALITE_LIBRARY_PATH` setting.
-        self.lib_spatialite_paths = [name for name in [
-            getattr(settings, 'SPATIALITE_LIBRARY_PATH', None),
-            'mod_spatialite.so',
-            'mod_spatialite',
-            find_library('spatialite'),
-        ] if name is not None]
+        self.lib_spatialite_paths = [
+            name
+            for name in [
+                getattr(settings, "SPATIALITE_LIBRARY_PATH", None),
+                "mod_spatialite.so",
+                "mod_spatialite",
+                find_library("spatialite"),
+            ]
+            if name is not None
+        ]
         super().__init__(*args, **kwargs)
 
     def get_new_connection(self, conn_params):
@@ -42,26 +46,26 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
             conn.enable_load_extension(True)
         except AttributeError:
             raise ImproperlyConfigured(
-                'SpatiaLite requires SQLite to be configured to allow '
-                'extension loading.'
+                "SpatiaLite requires SQLite to be configured to allow "
+                "extension loading."
             )
         # Load the SpatiaLite library extension on the connection.
         for path in self.lib_spatialite_paths:
             try:
                 conn.load_extension(path)
             except Exception:
-                if getattr(settings, 'SPATIALITE_LIBRARY_PATH', None):
+                if getattr(settings, "SPATIALITE_LIBRARY_PATH", None):
                     raise ImproperlyConfigured(
-                        'Unable to load the SpatiaLite library extension '
-                        'as specified in your SPATIALITE_LIBRARY_PATH setting.'
+                        "Unable to load the SpatiaLite library extension "
+                        "as specified in your SPATIALITE_LIBRARY_PATH setting."
                     )
                 continue
             else:
                 break
         else:
             raise ImproperlyConfigured(
-                'Unable to load the SpatiaLite library extension. '
-                'Library names tried: %s' % ', '.join(self.lib_spatialite_paths)
+                "Unable to load the SpatiaLite library extension. "
+                "Library names tried: %s" % ", ".join(self.lib_spatialite_paths)
             )
         return conn
 
@@ -72,6 +76,6 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
             cursor.execute("PRAGMA table_info(geometry_columns);")
             if cursor.fetchall() == []:
                 if self.ops.spatial_version < (5,):
-                    cursor.execute('SELECT InitSpatialMetaData(1)')
+                    cursor.execute("SELECT InitSpatialMetaData(1)")
                 else:
-                    cursor.execute('SELECT InitSpatialMetaDataFull(1)')
+                    cursor.execute("SELECT InitSpatialMetaDataFull(1)")

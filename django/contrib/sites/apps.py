@@ -8,8 +8,8 @@ from .management import create_default_site
 
 
 class SitesConfig(AppConfig):
-    default_auto_field = 'django.db.models.AutoField'
-    name = 'django.contrib.sites'
+    default_auto_field = "django.db.models.AutoField"
+    name = "django.contrib.sites"
     verbose_name = _("Sites")
 
     def ready(self):

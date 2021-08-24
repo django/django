@@ -46,7 +46,7 @@ def create_namedtuple_class(*names):
         return unpickle_named_row, (names, tuple(self))
 
     return type(
-        'Row',
-        (namedtuple('Row', names),),
-        {'__reduce__': __reduce__, '__slots__': ()},
+        "Row",
+        (namedtuple("Row", names),),
+        {"__reduce__": __reduce__, "__slots__": ()},
     )

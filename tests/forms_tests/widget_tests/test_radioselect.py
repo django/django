@@ -10,22 +10,27 @@ class RadioSelectTest(WidgetTest):
     widget = RadioSelect
 
     def test_render(self):
-        choices = (('', '------'),) + self.beatles
-        self.check_html(self.widget(choices=choices), 'beatle', 'J', html=(
-            """<ul>
+        choices = (("", "------"),) + self.beatles
+        self.check_html(
+            self.widget(choices=choices),
+            "beatle",
+            "J",
+            html=(
+                """<ul>
             <li><label><input type="radio" name="beatle" value=""> ------</label></li>
             <li><label><input checked type="radio" name="beatle" value="J"> John</label></li>
             <li><label><input type="radio" name="beatle" value="P"> Paul</label></li>
             <li><label><input type="radio" name="beatle" value="G"> George</label></li>
             <li><label><input type="radio" name="beatle" value="R"> Ringo</label></li>
             </ul>"""
-        ))
+            ),
+        )
 
     def test_nested_choices(self):
         nested_choices = (
-            ('unknown', 'Unknown'),
-            ('Audio', (('vinyl', 'Vinyl'), ('cd', 'CD'))),
-            ('Video', (('vhs', 'VHS'), ('dvd', 'DVD'))),
+            ("unknown", "Unknown"),
+            ("Audio", (("vinyl", "Vinyl"), ("cd", "CD"))),
+            ("Video", (("vhs", "VHS"), ("dvd", "DVD"))),
         )
         html = """
         <ul id="media">
@@ -49,8 +54,11 @@ class RadioSelectTest(WidgetTest):
         </ul>
         """
         self.check_html(
-            self.widget(choices=nested_choices), 'nestchoice', 'dvd',
-            attrs={'id': 'media'}, html=html,
+            self.widget(choices=nested_choices),
+            "nestchoice",
+            "dvd",
+            attrs={"id": "media"},
+            html=html,
         )
 
     def test_constructor_attrs(self):
@@ -58,7 +66,7 @@ class RadioSelectTest(WidgetTest):
         Attributes provided at instantiation are passed to the constituent
         inputs.
         """
-        widget = RadioSelect(attrs={'id': 'foo'}, choices=self.beatles)
+        widget = RadioSelect(attrs={"id": "foo"}, choices=self.beatles)
         html = """
         <ul id="foo">
         <li>
@@ -69,7 +77,7 @@ class RadioSelectTest(WidgetTest):
         <li><label for="foo_3"><input type="radio" id="foo_3" value="R" name="beatle"> Ringo</label></li>
         </ul>
         """
-        self.check_html(widget, 'beatle', 'J', html=html)
+        self.check_html(widget, "beatle", "J", html=html)
 
     def test_render_attrs(self):
         """
@@ -86,7 +94,13 @@ class RadioSelectTest(WidgetTest):
         <li><label for="bar_3"><input type="radio" id="bar_3" value="R" name="beatle"> Ringo</label></li>
         </ul>
         """
-        self.check_html(self.widget(choices=self.beatles), 'beatle', 'J', attrs={'id': 'bar'}, html=html)
+        self.check_html(
+            self.widget(choices=self.beatles),
+            "beatle",
+            "J",
+            attrs={"id": "bar"},
+            html=html,
+        )
 
     def test_class_attrs(self):
         """
@@ -101,14 +115,20 @@ class RadioSelectTest(WidgetTest):
         <li><label><input type="radio" class="bar" value="R" name="beatle"> Ringo</label></li>
         </ul>
         """
-        self.check_html(self.widget(choices=self.beatles), 'beatle', 'J', attrs={'class': 'bar'}, html=html)
+        self.check_html(
+            self.widget(choices=self.beatles),
+            "beatle",
+            "J",
+            attrs={"class": "bar"},
+            html=html,
+        )
 
     @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
     def test_doesnt_localize_input_value(self):
         choices = [
-            (1, 'One'),
-            (1000, 'One thousand'),
-            (1000000, 'One million'),
+            (1, "One"),
+            (1000, "One thousand"),
+            (1000000, "One million"),
         ]
         html = """
         <ul>
@@ -117,11 +137,11 @@ class RadioSelectTest(WidgetTest):
         <li><label><input type="radio" name="number" value="1000000"> One million</label></li>
         </ul>
         """
-        self.check_html(self.widget(choices=choices), 'number', None, html=html)
+        self.check_html(self.widget(choices=choices), "number", None, html=html)
 
         choices = [
-            (datetime.time(0, 0), 'midnight'),
-            (datetime.time(12, 0), 'noon'),
+            (datetime.time(0, 0), "midnight"),
+            (datetime.time(12, 0), "noon"),
         ]
         html = """
         <ul>
@@ -129,17 +149,22 @@ class RadioSelectTest(WidgetTest):
         <li><label><input type="radio" name="time" value="12:00:00"> noon</label></li>
         </ul>
         """
-        self.check_html(self.widget(choices=choices), 'time', None, html=html)
+        self.check_html(self.widget(choices=choices), "time", None, html=html)
 
     def test_render_as_subwidget(self):
         """A RadioSelect as a subwidget of MultiWidget."""
-        choices = (('', '------'),) + self.beatles
-        self.check_html(MultiWidget([self.widget(choices=choices)]), 'beatle', ['J'], html=(
-            """<ul>
+        choices = (("", "------"),) + self.beatles
+        self.check_html(
+            MultiWidget([self.widget(choices=choices)]),
+            "beatle",
+            ["J"],
+            html=(
+                """<ul>
             <li><label><input type="radio" name="beatle_0" value=""> ------</label></li>
             <li><label><input checked type="radio" name="beatle_0" value="J"> John</label></li>
             <li><label><input type="radio" name="beatle_0" value="P"> Paul</label></li>
             <li><label><input type="radio" name="beatle_0" value="G"> George</label></li>
             <li><label><input type="radio" name="beatle_0" value="R"> Ringo</label></li>
             </ul>"""
-        ))
+            ),
+        )

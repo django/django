@@ -12,12 +12,22 @@ from django.utils import formats
 from django.utils.dateformat import format, time_format
 from django.utils.encoding import iri_to_uri
 from django.utils.html import (
-    avoid_wrapping, conditional_escape, escape, escapejs,
-    json_script as _json_script, linebreaks, strip_tags, urlize as _urlize,
+    avoid_wrapping,
+    conditional_escape,
+    escape,
+    escapejs,
+    json_script as _json_script,
+    linebreaks,
+    strip_tags,
+    urlize as _urlize,
 )
 from django.utils.safestring import SafeData, mark_safe
 from django.utils.text import (
-    Truncator, normalize_newlines, phone2numeric, slugify as _slugify, wrap,
+    Truncator,
+    normalize_newlines,
+    phone2numeric,
+    slugify as _slugify,
+    wrap,
 )
 from django.utils.timesince import timesince, timeuntil
 from django.utils.translation import gettext, ngettext
@@ -32,23 +42,26 @@ register = Library()
 # STRING DECORATOR    #
 #######################
 
+
 def stringfilter(func):
     """
     Decorator for filters which should only receive strings. The object
     passed as the first positional argument will be converted to a string.
     """
+
     def _dec(*args, **kwargs):
         args = list(args)
         args[0] = str(args[0])
-        if (isinstance(args[0], SafeData) and
-                getattr(_dec._decorated_function, 'is_safe', False)):
+        if isinstance(args[0], SafeData) and getattr(
+            _dec._decorated_function, "is_safe", False
+        ):
             return mark_safe(func(*args, **kwargs))
         return func(*args, **kwargs)
 
     # Include a reference to the real function (used to check original
     # arguments by the template parser, and to bear the 'is_safe' attribute
     # when multiple decorators are applied).
-    _dec._decorated_function = getattr(func, '_decorated_function', func)
+    _dec._decorated_function = getattr(func, "_decorated_function", func)
 
     return wraps(func)(_dec)
 
@@ -56,6 +69,7 @@ def stringfilter(func):
 ###################
 # STRINGS         #
 ###################
+
 
 @register.filter(is_safe=True)
 @stringfilter
@@ -65,7 +79,7 @@ def addslashes(value):
     example. Less useful for escaping JavaScript; use the ``escapejs``
     filter instead.
     """
-    return value.replace('\\', '\\\\').replace('"', '\\"').replace("'", "\\'")
+    return value.replace("\\", "\\\\").replace('"', '\\"').replace("'", "\\'")
 
 
 @register.filter(is_safe=True)
@@ -130,7 +144,7 @@ def floatformat(text, arg=-1):
     of that value.
     """
     force_grouping = False
-    if isinstance(arg, str) and arg.endswith('g'):
+    if isinstance(arg, str) and arg.endswith("g"):
         force_grouping = True
         arg = arg[:-1] or -1
     try:
@@ -140,7 +154,7 @@ def floatformat(text, arg=-1):
         try:
             d = Decimal(str(float(text)))
         except (ValueError, InvalidOperation, TypeError):
-            return ''
+            return ""
     try:
         p = int(arg)
     except ValueError:
@@ -153,7 +167,7 @@ def floatformat(text, arg=-1):
 
     if not m and p < 0:
         return mark_safe(
-            formats.number_format('%d' % (int(d)), 0, force_grouping=force_grouping),
+            formats.number_format("%d" % (int(d)), 0, force_grouping=force_grouping),
         )
 
     exp = Decimal(1).scaleb(-abs(p))
@@ -169,11 +183,11 @@ def floatformat(text, arg=-1):
     sign, digits, exponent = rounded_d.as_tuple()
     digits = [str(digit) for digit in reversed(digits)]
     while len(digits) <= abs(exponent):
-        digits.append('0')
-    digits.insert(-exponent, '.')
+        digits.append("0")
+    digits.insert(-exponent, ".")
     if sign and rounded_d:
-        digits.append('-')
-    number = ''.join(reversed(digits))
+        digits.append("-")
+    number = "".join(reversed(digits))
     return mark_safe(
         formats.number_format(number, abs(p), force_grouping=force_grouping),
     )
@@ -190,7 +204,7 @@ def iriencode(value):
 @stringfilter
 def linenumbers(value, autoescape=True):
     """Display text with line numbers."""
-    lines = value.split('\n')
+    lines = value.split("\n")
     # Find the maximum width of the line count, for use with zero padding
     # string format command
     width = str(len(str(len(lines))))
@@ -200,7 +214,7 @@ def linenumbers(value, autoescape=True):
     else:
         for i, line in enumerate(lines):
             lines[i] = ("%0" + width + "d. %s") % (i + 1, escape(line))
-    return mark_safe('\n'.join(lines))
+    return mark_safe("\n".join(lines))
 
 
 @register.filter(is_safe=True)
@@ -257,7 +271,7 @@ def stringformat(value, arg):
 def title(value):
     """Convert a string into titlecase."""
     t = re.sub("([a-z])'([A-Z])", lambda m: m[0].lower(), value.title())
-    return re.sub(r'\d([A-Z])', lambda m: m[0].lower(), t)
+    return re.sub(r"\d([A-Z])", lambda m: m[0].lower(), t)
 
 
 @register.filter(is_safe=True)
@@ -296,7 +310,7 @@ def truncatewords(value, arg):
         length = int(arg)
     except ValueError:  # Invalid literal for int().
         return value  # Fail silently.
-    return Truncator(value).words(length, truncate=' …')
+    return Truncator(value).words(length, truncate=" …")
 
 
 @register.filter(is_safe=True)
@@ -310,7 +324,7 @@ def truncatewords_html(value, arg):
         length = int(arg)
     except ValueError:  # invalid literal for int()
         return value  # Fail silently.
-    return Truncator(value).words(length, html=True, truncate=' …')
+    return Truncator(value).words(length, html=True, truncate=" …")
 
 
 @register.filter(is_safe=False)
@@ -333,7 +347,7 @@ def urlencode(value, safe=None):
     """
     kwargs = {}
     if safe is not None:
-        kwargs['safe'] = safe
+        kwargs["safe"] = safe
     return quote(value, **kwargs)
 
 
@@ -353,7 +367,9 @@ def urlizetrunc(value, limit, autoescape=True):
 
     Argument: Length to truncate URLs to.
     """
-    return mark_safe(_urlize(value, trim_url_limit=int(limit), nofollow=True, autoescape=autoescape))
+    return mark_safe(
+        _urlize(value, trim_url_limit=int(limit), nofollow=True, autoescape=autoescape)
+    )
 
 
 @register.filter(is_safe=False)
@@ -396,8 +412,8 @@ def center(value, arg):
 def cut(value, arg):
     """Remove all values of arg from the given string."""
     safe = isinstance(value, SafeData)
-    value = value.replace(arg, '')
-    if safe and arg != ';':
+    value = value.replace(arg, "")
+    if safe and arg != ";":
         return mark_safe(value)
     return value
 
@@ -405,6 +421,7 @@ def cut(value, arg):
 ###################
 # HTML STRINGS    #
 ###################
+
 
 @register.filter("escape", is_safe=True)
 @stringfilter
@@ -447,7 +464,7 @@ def linebreaksbr(value, autoescape=True):
     value = normalize_newlines(value)
     if autoescape:
         value = escape(value)
-    return mark_safe(value.replace('\n', '<br>'))
+    return mark_safe(value.replace("\n", "<br>"))
 
 
 @register.filter(is_safe=True)
@@ -477,6 +494,7 @@ def striptags(value):
 ###################
 # LISTS           #
 ###################
+
 
 def _property_resolver(arg):
     """
@@ -513,7 +531,7 @@ def dictsort(value, arg):
     try:
         return sorted(value, key=_property_resolver(arg))
     except (TypeError, VariableDoesNotExist):
-        return ''
+        return ""
 
 
 @register.filter(is_safe=False)
@@ -525,7 +543,7 @@ def dictsortreversed(value, arg):
     try:
         return sorted(value, key=_property_resolver(arg), reverse=True)
     except (TypeError, VariableDoesNotExist):
-        return ''
+        return ""
 
 
 @register.filter(is_safe=False)
@@ -534,7 +552,7 @@ def first(value):
     try:
         return value[0]
     except IndexError:
-        return ''
+        return ""
 
 
 @register.filter(is_safe=True, needs_autoescape=True)
@@ -555,7 +573,7 @@ def last(value):
     try:
         return value[-1]
     except IndexError:
-        return ''
+        return ""
 
 
 @register.filter(is_safe=False)
@@ -573,7 +591,7 @@ def length_is(value, arg):
     try:
         return len(value) == int(arg)
     except (ValueError, TypeError):
-        return ''
+        return ""
 
 
 @register.filter(is_safe=True)
@@ -589,7 +607,7 @@ def slice_filter(value, arg):
     """
     try:
         bits = []
-        for x in str(arg).split(':'):
+        for x in str(arg).split(":"):
             if not x:
                 bits.append(None)
             else:
@@ -625,6 +643,7 @@ def unordered_list(value, autoescape=True):
     if autoescape:
         escaper = conditional_escape
     else:
+
         def escaper(x):
             return x
 
@@ -653,16 +672,19 @@ def unordered_list(value, autoescape=True):
             pass
 
     def list_formatter(item_list, tabs=1):
-        indent = '\t' * tabs
+        indent = "\t" * tabs
         output = []
         for item, children in walk_items(item_list):
-            sublist = ''
+            sublist = ""
             if children:
-                sublist = '\n%s<ul>\n%s\n%s</ul>\n%s' % (
-                    indent, list_formatter(children, tabs + 1), indent, indent)
-            output.append('%s<li>%s%s</li>' % (
-                indent, escaper(item), sublist))
-        return '\n'.join(output)
+                sublist = "\n%s<ul>\n%s\n%s</ul>\n%s" % (
+                    indent,
+                    list_formatter(children, tabs + 1),
+                    indent,
+                    indent,
+                )
+            output.append("%s<li>%s%s</li>" % (indent, escaper(item), sublist))
+        return "\n".join(output)
 
     return mark_safe(list_formatter(value))
 
@@ -670,6 +692,7 @@ def unordered_list(value, autoescape=True):
 ###################
 # INTEGERS        #
 ###################
+
 
 @register.filter(is_safe=False)
 def add(value, arg):
@@ -680,7 +703,7 @@ def add(value, arg):
         try:
             return value + arg
         except Exception:
-            return ''
+            return ""
 
 
 @register.filter(is_safe=False)
@@ -708,61 +731,63 @@ def get_digit(value, arg):
 # DATES           #
 ###################
 
+
 @register.filter(expects_localtime=True, is_safe=False)
 def date(value, arg=None):
     """Format a date according to the given format."""
-    if value in (None, ''):
-        return ''
+    if value in (None, ""):
+        return ""
     try:
         return formats.date_format(value, arg)
     except AttributeError:
         try:
             return format(value, arg)
         except AttributeError:
-            return ''
+            return ""
 
 
 @register.filter(expects_localtime=True, is_safe=False)
 def time(value, arg=None):
     """Format a time according to the given format."""
-    if value in (None, ''):
-        return ''
+    if value in (None, ""):
+        return ""
     try:
         return formats.time_format(value, arg)
     except (AttributeError, TypeError):
         try:
             return time_format(value, arg)
         except (AttributeError, TypeError):
-            return ''
+            return ""
 
 
 @register.filter("timesince", is_safe=False)
 def timesince_filter(value, arg=None):
     """Format a date as the time since that date (i.e. "4 days, 6 hours")."""
     if not value:
-        return ''
+        return ""
     try:
         if arg:
             return timesince(value, arg)
         return timesince(value)
     except (ValueError, TypeError):
-        return ''
+        return ""
 
 
 @register.filter("timeuntil", is_safe=False)
 def timeuntil_filter(value, arg=None):
     """Format a date as the time until that date (i.e. "4 days, 6 hours")."""
     if not value:
-        return ''
+        return ""
     try:
         return timeuntil(value, arg)
     except (ValueError, TypeError):
-        return ''
+        return ""
 
 
 ###################
 # LOGIC           #
 ###################
+
 
 @register.filter(is_safe=False)
 def default(value, arg):
@@ -802,8 +827,8 @@ def yesno(value, arg=None):
     """
     if arg is None:
         # Translators: Please do not add spaces around commas.
-        arg = gettext('yes,no,maybe')
-    bits = arg.split(',')
+        arg = gettext("yes,no,maybe")
+    bits = arg.split(",")
     if len(bits) < 2:
         return value  # Invalid arg.
     try:
@@ -822,6 +847,7 @@ def yesno(value, arg=None):
 # MISC            #
 ###################
 
+
 @register.filter(is_safe=True)
 def filesizeformat(bytes_):
     """
@@ -831,7 +857,7 @@ def filesizeformat(bytes_):
     try:
         bytes_ = int(bytes_)
     except (TypeError, ValueError, UnicodeDecodeError):
-        value = ngettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
+        value = ngettext("%(size)d byte", "%(size)d bytes", 0) % {"size": 0}
         return avoid_wrapping(value)
 
     def filesize_number_format(value):
@@ -848,7 +874,7 @@ def filesizeformat(bytes_):
         bytes_ = -bytes_  # Allow formatting of negative numbers.
 
     if bytes_ < KB:
-        value = ngettext("%(size)d byte", "%(size)d bytes", bytes_) % {'size': bytes_}
+        value = ngettext("%(size)d byte", "%(size)d bytes", bytes_) % {"size": bytes_}
     elif bytes_ < MB:
         value = gettext("%s KB") % filesize_number_format(bytes_ / KB)
     elif bytes_ < GB:
@@ -866,7 +892,7 @@ def filesizeformat(bytes_):
 
 
 @register.filter(is_safe=False)
-def pluralize(value, arg='s'):
+def pluralize(value, arg="s"):
     """
     Return a plural suffix if the value is not 1, '1', or an object of
     length 1. By default, use 's' as the suffix:
@@ -888,11 +914,11 @@ def pluralize(value, arg='s'):
     * If value is 1, cand{{ value|pluralize:"y,ies" }} display "candy".
     * If value is 2, cand{{ value|pluralize:"y,ies" }} display "candies".
     """
-    if ',' not in arg:
-        arg = ',' + arg
-    bits = arg.split(',')
+    if "," not in arg:
+        arg = "," + arg
+    bits = arg.split(",")
     if len(bits) > 2:
-        return ''
+        return ""
     singular_suffix, plural_suffix = bits[:2]
 
     try:
@@ -904,7 +930,7 @@ def pluralize(value, arg='s'):
             return singular_suffix if len(value) == 1 else plural_suffix
         except TypeError:  # len() of unsized object.
             pass
-    return ''
+    return ""
 
 
 @register.filter("phone2numeric", is_safe=True)

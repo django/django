@@ -11,8 +11,8 @@ from django.utils.translation import gettext_lazy as _
 def pretty_name(name):
     """Convert 'first_name' to 'First name'."""
     if not name:
-        return ''
-    return name.replace('_', ' ').capitalize()
+        return ""
+    return name.replace("_", " ").capitalize()
 
 
 def flatatt(attrs):
@@ -35,9 +35,8 @@ def flatatt(attrs):
         elif value is not None:
             key_value_attrs.append((attr, value))
 
-    return (
-        format_html_join('', ' {}="{}"', sorted(key_value_attrs)) +
-        format_html_join('', ' {}', sorted(boolean_attrs))
+    return format_html_join("", ' {}="{}"', sorted(key_value_attrs)) + format_html_join(
+        "", " {}", sorted(boolean_attrs)
     )
 
 
@@ -48,6 +47,7 @@ class ErrorDict(dict):
 
     The dictionary keys are the field names, and the values are the errors.
     """
+
     def as_data(self):
         return {f: e.as_data() for f, e in self.items()}
 
@@ -59,18 +59,18 @@ class ErrorDict(dict):
 
     def as_ul(self):
         if not self:
-            return ''
+            return ""
         return format_html(
             '<ul class="errorlist">{}</ul>',
-            format_html_join('', '<li>{}{}</li>', self.items())
+            format_html_join("", "<li>{}{}</li>", self.items()),
         )
 
     def as_text(self):
         output = []
         for field, errors in self.items():
-            output.append('* %s' % field)
-            output.append('\n'.join('  * %s' % e for e in errors))
-        return '\n'.join(output)
+            output.append("* %s" % field)
+            output.append("\n".join("  * %s" % e for e in errors))
+        return "\n".join(output)
 
     def __str__(self):
         return self.as_ul()
@@ -81,13 +81,14 @@ class ErrorList(UserList, list):
     """
     A collection of errors that knows how to display itself in various formats.
     """
+
     def __init__(self, initlist=None, error_class=None):
         super().__init__(initlist)
 
         if error_class is None:
-            self.error_class = 'errorlist'
+            self.error_class = "errorlist"
         else:
-            self.error_class = 'errorlist {}'.format(error_class)
+            self.error_class = "errorlist {}".format(error_class)
 
     def as_data(self):
         return ValidationError(self.data).error_list
@@ -101,10 +102,12 @@ class ErrorList(UserList, list):
         errors = []
         for error in self.as_data():
             message = next(iter(error))
-            errors.append({
-                'message': escape(message) if escape_html else message,
-                'code': error.code or '',
-            })
+            errors.append(
+                {
+                    "message": escape(message) if escape_html else message,
+                    "code": error.code or "",
+                }
+            )
         return errors
 
     def as_json(self, escape_html=False):
@@ -112,16 +115,16 @@ class ErrorList(UserList, list):
 
     def as_ul(self):
         if not self.data:
-            return ''
+            return ""
 
         return format_html(
             '<ul class="{}">{}</ul>',
             self.error_class,
-            format_html_join('', '<li>{}</li>', ((e,) for e in self))
+            format_html_join("", "<li>{}</li>", ((e,) for e in self)),
         )
 
     def as_text(self):
-        return '\n'.join('* %s' % e for e in self)
+        return "\n".join("* %s" % e for e in self)
 
     def __str__(self):
         return self.as_ul()
@@ -153,6 +156,7 @@ class ErrorList(UserList, list):
 
 # Utilities for time zone support in DateTimeField et al.
 
+
 def from_current_timezone(value):
     """
     When time zone support is enabled, convert naive datetimes
@@ -161,19 +165,20 @@ def from_current_timezone(value):
     if settings.USE_TZ and value is not None and timezone.is_naive(value):
         current_timezone = timezone.get_current_timezone()
         try:
-            if (
-                not timezone._is_pytz_zone(current_timezone) and
-                timezone._datetime_ambiguous_or_imaginary(value, current_timezone)
-            ):
-                raise ValueError('Ambiguous or non-existent time.')
+            if not timezone._is_pytz_zone(
+                current_timezone
+            ) and timezone._datetime_ambiguous_or_imaginary(value, current_timezone):
+                raise ValueError("Ambiguous or non-existent time.")
             return timezone.make_aware(value, current_timezone)
         except Exception as exc:
             raise ValidationError(
-                _('%(datetime)s couldn’t be interpreted '
-                  'in time zone %(current_timezone)s; it '
-                  'may be ambiguous or it may not exist.'),
-                code='ambiguous_timezone',
-                params={'datetime': value, 'current_timezone': current_timezone}
+                _(
+                    "%(datetime)s couldn’t be interpreted "
+                    "in time zone %(current_timezone)s; it "
+                    "may be ambiguous or it may not exist."
+                ),
+                code="ambiguous_timezone",
+                params={"datetime": value, "current_timezone": current_timezone},
             ) from exc
     return value
 

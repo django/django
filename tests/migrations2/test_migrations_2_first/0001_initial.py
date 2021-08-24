@@ -8,7 +8,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-
         migrations.CreateModel(
             "OtherAuthor",
             [
@@ -19,5 +18,4 @@ class Migration(migrations.Migration):
                 ("silly_field", models.BooleanField(default=False)),
             ],
         ),
-
     ]

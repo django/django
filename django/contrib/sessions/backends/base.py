@@ -18,6 +18,7 @@ class CreateError(Exception):
     Used internally as a consistent exception type to catch from save (see the
     docstring for SessionBase.save() for details).
     """
+
     pass
 
 
@@ -25,6 +26,7 @@ class UpdateError(Exception):
     """
     Occurs if Django tries to update a session that was deleted.
     """
+
     pass
 
 
@@ -32,8 +34,9 @@ class SessionBase:
     """
     Base class for all Session classes.
     """
-    TEST_COOKIE_NAME = 'testcookie'
-    TEST_COOKIE_VALUE = 'worked'
+
+    TEST_COOKIE_NAME = "testcookie"
+    TEST_COOKIE_VALUE = "worked"
 
     __not_given = object()
 
@@ -59,7 +62,7 @@ class SessionBase:
 
     @property
     def key_salt(self):
-        return 'django.contrib.sessions.' + self.__class__.__qualname__
+        return "django.contrib.sessions." + self.__class__.__qualname__
 
     def get(self, key, default=None):
         return self._session.get(key, default)
@@ -89,16 +92,20 @@ class SessionBase:
     def encode(self, session_dict):
         "Return the given session dictionary serialized and encoded as a string."
         return signing.dumps(
-            session_dict, salt=self.key_salt, serializer=self.serializer,
+            session_dict,
+            salt=self.key_salt,
+            serializer=self.serializer,
             compress=True,
         )
 
     def decode(self, session_data):
         try:
-            return signing.loads(session_data, salt=self.key_salt, serializer=self.serializer)
+            return signing.loads(
+                session_data, salt=self.key_salt, serializer=self.serializer
+            )
         except signing.BadSignature:
-            logger = logging.getLogger('django.security.SuspiciousSession')
-            logger.warning('Session data corrupted')
+            logger = logging.getLogger("django.security.SuspiciousSession")
+            logger.warning("Session data corrupted")
         except Exception:
             # ValueError, unpickling exceptions. If any of these happen, just
             # return an empty dictionary (an empty session).
@@ -197,18 +204,18 @@ class SessionBase:
         arguments specifying the modification and expiry of the session.
         """
         try:
-            modification = kwargs['modification']
+            modification = kwargs["modification"]
         except KeyError:
             modification = timezone.now()
         # Make the difference between "expiry=None passed in kwargs" and
         # "expiry not passed in kwargs", in order to guarantee not to trigger
         # self.load() when expiry is provided.
         try:
-            expiry = kwargs['expiry']
+            expiry = kwargs["expiry"]
         except KeyError:
-            expiry = self.get('_session_expiry')
+            expiry = self.get("_session_expiry")
 
-        if not expiry:   # Checks both None and 0 cases
+        if not expiry:  # Checks both None and 0 cases
             return self.get_session_cookie_age()
         if not isinstance(expiry, datetime):
             return expiry
@@ -222,14 +229,14 @@ class SessionBase:
         arguments specifying the modification and expiry of the session.
         """
         try:
-            modification = kwargs['modification']
+            modification = kwargs["modification"]
         except KeyError:
             modification = timezone.now()
         # Same comment as in get_expiry_age
         try:
-            expiry = kwargs['expiry']
+            expiry = kwargs["expiry"]
         except KeyError:
-            expiry = self.get('_session_expiry')
+            expiry = self.get("_session_expiry")
 
         if isinstance(expiry, datetime):
             return expiry
@@ -254,13 +261,13 @@ class SessionBase:
         if value is None:
             # Remove any custom expiration for this session.
             try:
-                del self['_session_expiry']
+                del self["_session_expiry"]
             except KeyError:
                 pass
             return
         if isinstance(value, timedelta):
             value = timezone.now() + value
-        self['_session_expiry'] = value
+        self["_session_expiry"] = value
 
     def get_expire_at_browser_close(self):
         """
@@ -269,9 +276,9 @@ class SessionBase:
         ``get_expiry_date()`` or ``get_expiry_age()`` to find the actual expiry
         date/age, if there is one.
         """
-        if self.get('_session_expiry') is None:
+        if self.get("_session_expiry") is None:
             return settings.SESSION_EXPIRE_AT_BROWSER_CLOSE
-        return self.get('_session_expiry') == 0
+        return self.get("_session_expiry") == 0
 
     def flush(self):
         """
@@ -299,7 +306,9 @@ class SessionBase:
         """
         Return True if the given session_key already exists.
         """
-        raise NotImplementedError('subclasses of SessionBase must provide an exists() method')
+        raise NotImplementedError(
+            "subclasses of SessionBase must provide an exists() method"
+        )
 
     def create(self):
         """
@@ -307,7 +316,9 @@ class SessionBase:
         a unique key and will have saved the result once (with empty data)
         before the method returns.
         """
-        raise NotImplementedError('subclasses of SessionBase must provide a create() method')
+        raise NotImplementedError(
+            "subclasses of SessionBase must provide a create() method"
+        )
 
     def save(self, must_create=False):
         """
@@ -315,20 +326,26 @@ class SessionBase:
         object (or raise CreateError). Otherwise, only update an existing
         object and don't create one (raise UpdateError if needed).
         """
-        raise NotImplementedError('subclasses of SessionBase must provide a save() method')
+        raise NotImplementedError(
+            "subclasses of SessionBase must provide a save() method"
+        )
 
     def delete(self, session_key=None):
         """
         Delete the session data under this key. If the key is None, use the
         current session key value.
         """
-        raise NotImplementedError('subclasses of SessionBase must provide a delete() method')
+        raise NotImplementedError(
+            "subclasses of SessionBase must provide a delete() method"
+        )
 
     def load(self):
         """
         Load the session data and return a dictionary.
         """
-        raise NotImplementedError('subclasses of SessionBase must provide a load() method')
+        raise NotImplementedError(
+            "subclasses of SessionBase must provide a load() method"
+        )
 
     @classmethod
     def clear_expired(cls):
@@ -339,4 +356,4 @@ class SessionBase:
         NotImplementedError. If it isn't necessary, because the backend has
         a built-in expiration mechanism, it should be a no-op.
         """
-        raise NotImplementedError('This backend does not support clear_expired().')
+        raise NotImplementedError("This backend does not support clear_expired().")

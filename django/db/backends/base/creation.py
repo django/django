@@ -12,7 +12,7 @@ from django.utils.module_loading import import_string
 
 # The prefix to put on the default database name when creating
 # the test database.
-TEST_DATABASE_PREFIX = 'test_'
+TEST_DATABASE_PREFIX = "test_"
 
 
 class BaseDatabaseCreation:
@@ -20,6 +20,7 @@ class BaseDatabaseCreation:
     Encapsulate backend-specific differences pertaining to creation and
     destruction of the test database.
     """
+
     def __init__(self, connection):
         self.connection = connection
 
@@ -29,7 +30,9 @@ class BaseDatabaseCreation:
     def log(self, msg):
         sys.stderr.write(msg + os.linesep)
 
-    def create_test_db(self, verbosity=1, autoclobber=False, serialize=True, keepdb=False):
+    def create_test_db(
+        self, verbosity=1, autoclobber=False, serialize=True, keepdb=False
+    ):
         """
         Create a test database, prompting the user for confirmation if the
         database already exists. Return the name of the test database created.
@@ -40,14 +43,17 @@ class BaseDatabaseCreation:
         test_database_name = self._get_test_db_name()
 
         if verbosity >= 1:
-            action = 'Creating'
+            action = "Creating"
             if keepdb:
                 action = "Using existing"
 
-            self.log('%s test database for alias %s...' % (
-                action,
-                self._get_database_display_str(verbosity, test_database_name),
-            ))
+            self.log(
+                "%s test database for alias %s..."
+                % (
+                    action,
+                    self._get_database_display_str(verbosity, test_database_name),
+                )
+            )
 
         # We could skip this call if keepdb is True, but we instead
         # give it the keepdb param. This is to handle the case
@@ -61,25 +67,24 @@ class BaseDatabaseCreation:
         self.connection.settings_dict["NAME"] = test_database_name
 
         try:
-            if self.connection.settings_dict['TEST']['MIGRATE'] is False:
+            if self.connection.settings_dict["TEST"]["MIGRATE"] is False:
                 # Disable migrations for all apps.
                 old_migration_modules = settings.MIGRATION_MODULES
                 settings.MIGRATION_MODULES = {
-                    app.label: None
-                    for app in apps.get_app_configs()
+                    app.label: None for app in apps.get_app_configs()
                 }
             # We report migrate messages at one level lower than that
             # requested. This ensures we don't get flooded with messages during
             # testing (unless you really ask to be flooded).
             call_command(
-                'migrate',
+                "migrate",
                 verbosity=max(verbosity - 1, 0),
                 interactive=False,
                 database=self.connection.alias,
                 run_syncdb=True,
             )
         finally:
-            if self.connection.settings_dict['TEST']['MIGRATE'] is False:
+            if self.connection.settings_dict["TEST"]["MIGRATE"] is False:
                 settings.MIGRATION_MODULES = old_migration_modules
 
         # We then serialize the current state of the database into a string
@@ -89,12 +94,12 @@ class BaseDatabaseCreation:
         if serialize:
             self.connection._test_serialized_contents = self.serialize_db_to_string()
 
-        call_command('createcachetable', database=self.connection.alias)
+        call_command("createcachetable", database=self.connection.alias)
 
         # Ensure a connection for the side effect of initializing the test database.
         self.connection.ensure_connection()
 
-        if os.environ.get('RUNNING_DJANGOS_TEST_SUITE') == 'true':
+        if os.environ.get("RUNNING_DJANGOS_TEST_SUITE") == "true":
             self.mark_expected_failures_and_skips()
 
         return test_database_name
@@ -104,7 +109,7 @@ class BaseDatabaseCreation:
         Set this database up to be used in testing as a mirror of a primary
         database whose settings are given.
         """
-        self.connection.settings_dict['NAME'] = primary_settings_dict['NAME']
+        self.connection.settings_dict["NAME"] = primary_settings_dict["NAME"]
 
     def serialize_db_to_string(self):
         """
@@ -115,22 +120,23 @@ class BaseDatabaseCreation:
         # Iteratively return every object for all models to serialize.
         def get_objects():
             from django.db.migrations.loader import MigrationLoader
+
             loader = MigrationLoader(self.connection)
             for app_config in apps.get_app_configs():
                 if (
-                    app_config.models_module is not None and
-                    app_config.label in loader.migrated_apps and
-                    app_config.name not in settings.TEST_NON_SERIALIZED_APPS
+                    app_config.models_module is not None
+                    and app_config.label in loader.migrated_apps
+                    and app_config.name not in settings.TEST_NON_SERIALIZED_APPS
                 ):
                     for model in app_config.get_models():
-                        if (
-                            model._meta.can_migrate(self.connection) and
-                            router.allow_migrate_model(self.connection.alias, model)
-                        ):
+                        if model._meta.can_migrate(
+                            self.connection
+                        ) and router.allow_migrate_model(self.connection.alias, model):
                             queryset = model._base_manager.using(
                                 self.connection.alias,
                             ).order_by(model._meta.pk.name)
                             yield from queryset.iterator()
+
         # Serialize to a string
         out = StringIO()
         serializers.serialize("json", get_objects(), indent=None, stream=out)
@@ -148,7 +154,9 @@ class BaseDatabaseCreation:
             # Disable constraint checks, because some databases (MySQL) doesn't
             # support deferred checks.
             with self.connection.constraint_checks_disabled():
-                for obj in serializers.deserialize('json', data, using=self.connection.alias):
+                for obj in serializers.deserialize(
+                    "json", data, using=self.connection.alias
+                ):
                     obj.save()
                     table_names.add(obj.object.__class__._meta.db_table)
             # Manually check for any invalid keys that might have been added,
@@ -161,7 +169,7 @@ class BaseDatabaseCreation:
         """
         return "'%s'%s" % (
             self.connection.alias,
-            (" ('%s')" % database_name) if verbosity >= 2 else '',
+            (" ('%s')" % database_name) if verbosity >= 2 else "",
         )
 
     def _get_test_db_name(self):
@@ -171,12 +179,12 @@ class BaseDatabaseCreation:
         _create_test_db() and when no external munging is done with the 'NAME'
         settings.
         """
-        if self.connection.settings_dict['TEST']['NAME']:
-            return self.connection.settings_dict['TEST']['NAME']
-        return TEST_DATABASE_PREFIX + self.connection.settings_dict['NAME']
+        if self.connection.settings_dict["TEST"]["NAME"]:
+            return self.connection.settings_dict["TEST"]["NAME"]
+        return TEST_DATABASE_PREFIX + self.connection.settings_dict["NAME"]
 
     def _execute_create_test_db(self, cursor, parameters, keepdb=False):
-        cursor.execute('CREATE DATABASE %(dbname)s %(suffix)s' % parameters)
+        cursor.execute("CREATE DATABASE %(dbname)s %(suffix)s" % parameters)
 
     def _create_test_db(self, verbosity, autoclobber, keepdb=False):
         """
@@ -184,8 +192,8 @@ class BaseDatabaseCreation:
         """
         test_database_name = self._get_test_db_name()
         test_db_params = {
-            'dbname': self.connection.ops.quote_name(test_database_name),
-            'suffix': self.sql_table_creation_suffix(),
+            "dbname": self.connection.ops.quote_name(test_database_name),
+            "suffix": self.sql_table_creation_suffix(),
         }
         # Create the test database and connect to it.
         with self._nodb_cursor() as cursor:
@@ -197,24 +205,30 @@ class BaseDatabaseCreation:
                 if keepdb:
                     return test_database_name
 
-                self.log('Got an error creating the test database: %s' % e)
+                self.log("Got an error creating the test database: %s" % e)
                 if not autoclobber:
                     confirm = input(
                         "Type 'yes' if you would like to try deleting the test "
-                        "database '%s', or 'no' to cancel: " % test_database_name)
-                if autoclobber or confirm == 'yes':
+                        "database '%s', or 'no' to cancel: " % test_database_name
+                    )
+                if autoclobber or confirm == "yes":
                     try:
                         if verbosity >= 1:
-                            self.log('Destroying old test database for alias %s...' % (
-                                self._get_database_display_str(verbosity, test_database_name),
-                            ))
-                        cursor.execute('DROP DATABASE %(dbname)s' % test_db_params)
+                            self.log(
+                                "Destroying old test database for alias %s..."
+                                % (
+                                    self._get_database_display_str(
+                                        verbosity, test_database_name
+                                    ),
+                                )
+                            )
+                        cursor.execute("DROP DATABASE %(dbname)s" % test_db_params)
                         self._execute_create_test_db(cursor, test_db_params, keepdb)
                     except Exception as e:
-                        self.log('Got an error recreating the test database: %s' % e)
+                        self.log("Got an error recreating the test database: %s" % e)
                         sys.exit(2)
                 else:
-                    self.log('Tests cancelled.')
+                    self.log("Tests cancelled.")
                     sys.exit(1)
 
         return test_database_name
@@ -223,16 +237,19 @@ class BaseDatabaseCreation:
         """
         Clone a test database.
         """
-        source_database_name = self.connection.settings_dict['NAME']
+        source_database_name = self.connection.settings_dict["NAME"]
 
         if verbosity >= 1:
-            action = 'Cloning test database'
+            action = "Cloning test database"
             if keepdb:
-                action = 'Using existing clone'
-            self.log('%s for alias %s...' % (
-                action,
-                self._get_database_display_str(verbosity, source_database_name),
-            ))
+                action = "Using existing clone"
+            self.log(
+                "%s for alias %s..."
+                % (
+                    action,
+                    self._get_database_display_str(verbosity, source_database_name),
+                )
+            )
 
         # We could skip this call if keepdb is True, but we instead
         # give it the keepdb param. See create_test_db for details.
@@ -246,7 +263,10 @@ class BaseDatabaseCreation:
         # already and its name has been copied to settings_dict['NAME'] so
         # we don't need to call _get_test_db_name.
         orig_settings_dict = self.connection.settings_dict
-        return {**orig_settings_dict, 'NAME': '{}_{}'.format(orig_settings_dict['NAME'], suffix)}
+        return {
+            **orig_settings_dict,
+            "NAME": "{}_{}".format(orig_settings_dict["NAME"], suffix),
+        }
 
     def _clone_test_db(self, suffix, verbosity, keepdb=False):
         """
@@ -254,27 +274,33 @@ class BaseDatabaseCreation:
         """
         raise NotImplementedError(
             "The database backend doesn't support cloning databases. "
-            "Disable the option to run tests in parallel processes.")
+            "Disable the option to run tests in parallel processes."
+        )
 
-    def destroy_test_db(self, old_database_name=None, verbosity=1, keepdb=False, suffix=None):
+    def destroy_test_db(
+        self, old_database_name=None, verbosity=1, keepdb=False, suffix=None
+    ):
         """
         Destroy a test database, prompting the user for confirmation if the
         database already exists.
         """
         self.connection.close()
         if suffix is None:
-            test_database_name = self.connection.settings_dict['NAME']
+            test_database_name = self.connection.settings_dict["NAME"]
         else:
-            test_database_name = self.get_test_db_clone_settings(suffix)['NAME']
+            test_database_name = self.get_test_db_clone_settings(suffix)["NAME"]
 
         if verbosity >= 1:
-            action = 'Destroying'
+            action = "Destroying"
             if keepdb:
-                action = 'Preserving'
-            self.log('%s test database for alias %s...' % (
-                action,
-                self._get_database_display_str(verbosity, test_database_name),
-            ))
+                action = "Preserving"
+            self.log(
+                "%s test database for alias %s..."
+                % (
+                    action,
+                    self._get_database_display_str(verbosity, test_database_name),
+                )
+            )
 
         # if we want to preserve the database
         # skip the actual destroying piece.
@@ -295,8 +321,9 @@ class BaseDatabaseCreation:
         # to do so, because it's not allowed to delete a database while being
         # connected to it.
         with self._nodb_cursor() as cursor:
-            cursor.execute("DROP DATABASE %s"
-                           % self.connection.ops.quote_name(test_database_name))
+            cursor.execute(
+                "DROP DATABASE %s" % self.connection.ops.quote_name(test_database_name)
+            )
 
     def mark_expected_failures_and_skips(self):
         """
@@ -304,8 +331,8 @@ class BaseDatabaseCreation:
         database and test which should be skipped on this database.
         """
         for test_name in self.connection.features.django_test_expected_failures:
-            test_case_name, _, test_method_name = test_name.rpartition('.')
-            test_app = test_name.split('.')[0]
+            test_case_name, _, test_method_name = test_name.rpartition(".")
+            test_app = test_name.split(".")[0]
             # Importing a test app that isn't installed raises RuntimeError.
             if test_app in settings.INSTALLED_APPS:
                 test_case = import_string(test_case_name)
@@ -313,8 +340,8 @@ class BaseDatabaseCreation:
                 setattr(test_case, test_method_name, expectedFailure(test_method))
         for reason, tests in self.connection.features.django_test_skips.items():
             for test_name in tests:
-                test_case_name, _, test_method_name = test_name.rpartition('.')
-                test_app = test_name.split('.')[0]
+                test_case_name, _, test_method_name = test_name.rpartition(".")
+                test_app = test_name.split(".")[0]
                 # Importing a test app that isn't installed raises RuntimeError.
                 if test_app in settings.INSTALLED_APPS:
                     test_case = import_string(test_case_name)
@@ -325,7 +352,7 @@ class BaseDatabaseCreation:
         """
         SQL to append to the end of the test table creation statements.
         """
-        return ''
+        return ""
 
     def test_db_signature(self):
         """
@@ -335,8 +362,8 @@ class BaseDatabaseCreation:
         """
         settings_dict = self.connection.settings_dict
         return (
-            settings_dict['HOST'],
-            settings_dict['PORT'],
-            settings_dict['ENGINE'],
+            settings_dict["HOST"],
+            settings_dict["PORT"],
+            settings_dict["ENGINE"],
             self._get_test_db_name(),
         )

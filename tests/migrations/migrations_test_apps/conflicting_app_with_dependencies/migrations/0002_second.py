@@ -17,5 +17,5 @@ class Migration(migrations.Migration):
             [
                 ("id", models.AutoField(primary_key=True)),
             ],
-        )
+        ),
     ]

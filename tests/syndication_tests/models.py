@@ -7,7 +7,7 @@ class Entry(models.Model):
     published = models.DateTimeField()
 
     class Meta:
-        ordering = ('updated',)
+        ordering = ("updated",)
 
     def __str__(self):
         return self.title
@@ -23,4 +23,4 @@ class Article(models.Model):
     published = models.DateTimeField()
 
     class Meta:
-        ordering = ['updated']
+        ordering = ["updated"]

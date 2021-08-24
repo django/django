@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.AlterUniqueTogether(
-            name='author',
-            unique_together={('name', 'slug')},
+            name="author",
+            unique_together={("name", "slug")},
         ),
     ]

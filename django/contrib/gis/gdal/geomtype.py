@@ -8,24 +8,24 @@ class OGRGeomType:
 
     # Dictionary of acceptable OGRwkbGeometryType s and their string names.
     _types = {
-        0: 'Unknown',
-        1: 'Point',
-        2: 'LineString',
-        3: 'Polygon',
-        4: 'MultiPoint',
-        5: 'MultiLineString',
-        6: 'MultiPolygon',
-        7: 'GeometryCollection',
-        100: 'None',
-        101: 'LinearRing',
-        102: 'PointZ',
-        1 + wkb25bit: 'Point25D',
-        2 + wkb25bit: 'LineString25D',
-        3 + wkb25bit: 'Polygon25D',
-        4 + wkb25bit: 'MultiPoint25D',
-        5 + wkb25bit: 'MultiLineString25D',
-        6 + wkb25bit: 'MultiPolygon25D',
-        7 + wkb25bit: 'GeometryCollection25D',
+        0: "Unknown",
+        1: "Point",
+        2: "LineString",
+        3: "Polygon",
+        4: "MultiPoint",
+        5: "MultiLineString",
+        6: "MultiPolygon",
+        7: "GeometryCollection",
+        100: "None",
+        101: "LinearRing",
+        102: "PointZ",
+        1 + wkb25bit: "Point25D",
+        2 + wkb25bit: "LineString25D",
+        3 + wkb25bit: "Polygon25D",
+        4 + wkb25bit: "MultiPoint25D",
+        5 + wkb25bit: "MultiLineString25D",
+        6 + wkb25bit: "MultiPolygon25D",
+        7 + wkb25bit: "GeometryCollection25D",
     }
     # Reverse type dictionary, keyed by lowercase of the name.
     _str_types = {v.lower(): k for k, v in _types.items()}
@@ -36,17 +36,17 @@ class OGRGeomType:
             num = type_input.num
         elif isinstance(type_input, str):
             type_input = type_input.lower()
-            if type_input == 'geometry':
-                type_input = 'unknown'
+            if type_input == "geometry":
+                type_input = "unknown"
             num = self._str_types.get(type_input)
             if num is None:
                 raise GDALException('Invalid OGR String Type "%s"' % type_input)
         elif isinstance(type_input, int):
             if type_input not in self._types:
-                raise GDALException('Invalid OGR Integer Type: %d' % type_input)
+                raise GDALException("Invalid OGR Integer Type: %d" % type_input)
             num = type_input
         else:
-            raise TypeError('Invalid OGR input type given.')
+            raise TypeError("Invalid OGR input type given.")
 
         # Setting the OGR geometry type number.
         self.num = num
@@ -77,19 +77,19 @@ class OGRGeomType:
     @property
     def django(self):
         "Return the Django GeometryField for this OGR Type."
-        s = self.name.replace('25D', '')
-        if s in ('LinearRing', 'None'):
+        s = self.name.replace("25D", "")
+        if s in ("LinearRing", "None"):
             return None
-        elif s == 'Unknown':
-            s = 'Geometry'
-        elif s == 'PointZ':
-            s = 'Point'
-        return s + 'Field'
+        elif s == "Unknown":
+            s = "Geometry"
+        elif s == "PointZ":
+            s = "Point"
+        return s + "Field"
 
     def to_multi(self):
         """
         Transform Point, LineString, Polygon, and their 25D equivalents
         to their Multi... counterpart.
         """
-        if self.name.startswith(('Point', 'LineString', 'Polygon')):
+        if self.name.startswith(("Point", "LineString", "Polygon")):
             self.num += 3

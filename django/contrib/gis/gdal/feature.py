@@ -15,6 +15,7 @@ class Feature(GDALBase):
     This class that wraps an OGR Feature, needs to be instantiated
     from a Layer object.
     """
+
     destructor = capi.destroy_feature
 
     def __init__(self, feat, layer):
@@ -22,7 +23,7 @@ class Feature(GDALBase):
         Initialize Feature from a pointer and its Layer object.
         """
         if not feat:
-            raise GDALException('Cannot create OGR Feature, invalid pointer given.')
+            raise GDALException("Cannot create OGR Feature, invalid pointer given.")
         self.ptr = feat
         self._layer = layer
 
@@ -38,7 +39,9 @@ class Feature(GDALBase):
         elif 0 <= index < self.num_fields:
             i = index
         else:
-            raise IndexError('Index out of range when accessing field in a feature: %s.' % index)
+            raise IndexError(
+                "Index out of range when accessing field in a feature: %s." % index
+            )
         return Field(self, i)
 
     def __len__(self):
@@ -47,7 +50,7 @@ class Feature(GDALBase):
 
     def __str__(self):
         "The string name of the feature."
-        return 'Feature FID %d in Layer<%s>' % (self.fid, self.layer_name)
+        return "Feature FID %d in Layer<%s>" % (self.fid, self.layer_name)
 
     def __eq__(self, other):
         "Do equivalence testing on the features."
@@ -81,8 +84,9 @@ class Feature(GDALBase):
             force_str(
                 capi.get_field_name(capi.get_field_defn(self._layer._ldefn, i)),
                 self.encoding,
-                strings_only=True
-            ) for i in range(self.num_fields)
+                strings_only=True,
+            )
+            for i in range(self.num_fields)
         ]
 
     @property
@@ -104,12 +108,12 @@ class Feature(GDALBase):
         object.  May take a string of the field name or a Field object as
         parameters.
         """
-        field_name = getattr(field, 'name', field)
+        field_name = getattr(field, "name", field)
         return self[field_name].value
 
     def index(self, field_name):
         "Return the index of the given field name."
         i = capi.get_field_index(self.ptr, force_bytes(field_name))
         if i < 0:
-            raise IndexError('Invalid OFT field name given: %s.' % field_name)
+            raise IndexError("Invalid OFT field name given: %s." % field_name)
         return i

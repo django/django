@@ -8,22 +8,23 @@ from django.core.exceptions import ValidationError
 
 from . import admin as base_admin, models
 
-PERMISSION_NAME = 'admin_views.%s' % get_permission_codename('change', models.Article._meta)
+PERMISSION_NAME = "admin_views.%s" % get_permission_codename(
+    "change", models.Article._meta
+)
 
 
 class PermissionAdminAuthenticationForm(AuthenticationForm):
     def confirm_login_allowed(self, user):
         if not user.is_active or not (user.is_staff or user.has_perm(PERMISSION_NAME)):
-            raise ValidationError('permission denied')
+            raise ValidationError("permission denied")
 
 
 class HasPermissionAdmin(admin.AdminSite):
     login_form = PermissionAdminAuthenticationForm
 
     def has_permission(self, request):
-        return (
-            request.user.is_active and
-            (request.user.is_staff or request.user.has_perm(PERMISSION_NAME))
+        return request.user.is_active and (
+            request.user.is_staff or request.user.has_perm(PERMISSION_NAME)
         )
 
 

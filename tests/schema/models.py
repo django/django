@@ -68,7 +68,7 @@ class AuthorWithIndexedNameAndBirthday(models.Model):
 
     class Meta:
         apps = new_apps
-        index_together = [['name', 'birthday']]
+        index_together = [["name", "birthday"]]
 
 
 class AuthorWithUniqueNameAndBirthday(models.Model):
@@ -77,7 +77,7 @@ class AuthorWithUniqueNameAndBirthday(models.Model):
 
     class Meta:
         apps = new_apps
-        unique_together = [['name', 'birthday']]
+        unique_together = [["name", "birthday"]]
 
 
 class Book(models.Model):
@@ -212,7 +212,7 @@ class Thing(models.Model):
 
     class Meta:
         apps = new_apps
-        db_table = 'drop'
+        db_table = "drop"
 
     def __str__(self):
         return self.when
@@ -229,7 +229,7 @@ class UniqueTest(models.Model):
 
 class Node(models.Model):
     node_id = models.AutoField(primary_key=True)
-    parent = models.ForeignKey('self', models.CASCADE, null=True, blank=True)
+    parent = models.ForeignKey("self", models.CASCADE, null=True, blank=True)
 
     class Meta:
         apps = new_apps

@@ -1,5 +1,6 @@
 from django.contrib.sessions.base_session import (
-    AbstractBaseSession, BaseSessionManager,
+    AbstractBaseSession,
+    BaseSessionManager,
 )
 
 
@@ -24,12 +25,14 @@ class Session(AbstractBaseSession):
     the sessions documentation that is shipped with Django (also available
     on the Django web site).
     """
+
     objects = SessionManager()
 
     @classmethod
     def get_session_store_class(cls):
         from django.contrib.sessions.backends.db import SessionStore
+
         return SessionStore
 
     class Meta(AbstractBaseSession.Meta):
-        db_table = 'django_session'
+        db_table = "django_session"

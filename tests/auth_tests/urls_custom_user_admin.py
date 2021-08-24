@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.urls import path
 
-site = admin.AdminSite(name='custom_user_admin')
+site = admin.AdminSite(name="custom_user_admin")
 
 
 class CustomUserAdmin(UserAdmin):
@@ -19,5 +19,5 @@ class CustomUserAdmin(UserAdmin):
 site.register(get_user_model(), CustomUserAdmin)
 
 urlpatterns = [
-    path('admin/', site.urls),
+    path("admin/", site.urls),
 ]

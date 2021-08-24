@@ -3,10 +3,14 @@ from ctypes import POINTER, Structure, byref, c_byte, c_char_p, c_int, c_size_t
 
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.libgeos import (
-    GEOM_PTR, GEOSFuncFactory, geos_version_tuple,
+    GEOM_PTR,
+    GEOSFuncFactory,
+    geos_version_tuple,
 )
 from django.contrib.gis.geos.prototypes.errcheck import (
-    check_geom, check_sized_string, check_string,
+    check_geom,
+    check_sized_string,
+    check_string,
 )
 from django.contrib.gis.geos.prototypes.geom import c_uchar_p, geos_char_p
 from django.utils.encoding import force_bytes
@@ -35,33 +39,43 @@ WKB_READ_PTR = POINTER(WKBReader_st)
 WKB_WRITE_PTR = POINTER(WKBReader_st)
 
 # WKTReader routines
-wkt_reader_create = GEOSFuncFactory('GEOSWKTReader_create', restype=WKT_READ_PTR)
-wkt_reader_destroy = GEOSFuncFactory('GEOSWKTReader_destroy', argtypes=[WKT_READ_PTR])
+wkt_reader_create = GEOSFuncFactory("GEOSWKTReader_create", restype=WKT_READ_PTR)
+wkt_reader_destroy = GEOSFuncFactory("GEOSWKTReader_destroy", argtypes=[WKT_READ_PTR])
 
 wkt_reader_read = GEOSFuncFactory(
-    'GEOSWKTReader_read', argtypes=[WKT_READ_PTR, c_char_p], restype=GEOM_PTR, errcheck=check_geom
+    "GEOSWKTReader_read",
+    argtypes=[WKT_READ_PTR, c_char_p],
+    restype=GEOM_PTR,
+    errcheck=check_geom,
 )
 # WKTWriter routines
-wkt_writer_create = GEOSFuncFactory('GEOSWKTWriter_create', restype=WKT_WRITE_PTR)
-wkt_writer_destroy = GEOSFuncFactory('GEOSWKTWriter_destroy', argtypes=[WKT_WRITE_PTR])
+wkt_writer_create = GEOSFuncFactory("GEOSWKTWriter_create", restype=WKT_WRITE_PTR)
+wkt_writer_destroy = GEOSFuncFactory("GEOSWKTWriter_destroy", argtypes=[WKT_WRITE_PTR])
 
 wkt_writer_write = GEOSFuncFactory(
-    'GEOSWKTWriter_write', argtypes=[WKT_WRITE_PTR, GEOM_PTR], restype=geos_char_p, errcheck=check_string
+    "GEOSWKTWriter_write",
+    argtypes=[WKT_WRITE_PTR, GEOM_PTR],
+    restype=geos_char_p,
+    errcheck=check_string,
 )
 
 wkt_writer_get_outdim = GEOSFuncFactory(
-    'GEOSWKTWriter_getOutputDimension', argtypes=[WKT_WRITE_PTR], restype=c_int
+    "GEOSWKTWriter_getOutputDimension", argtypes=[WKT_WRITE_PTR], restype=c_int
 )
 wkt_writer_set_outdim = GEOSFuncFactory(
-    'GEOSWKTWriter_setOutputDimension', argtypes=[WKT_WRITE_PTR, c_int]
+    "GEOSWKTWriter_setOutputDimension", argtypes=[WKT_WRITE_PTR, c_int]
 )
 
-wkt_writer_set_trim = GEOSFuncFactory('GEOSWKTWriter_setTrim', argtypes=[WKT_WRITE_PTR, c_byte])
-wkt_writer_set_precision = GEOSFuncFactory('GEOSWKTWriter_setRoundingPrecision', argtypes=[WKT_WRITE_PTR, c_int])
+wkt_writer_set_trim = GEOSFuncFactory(
+    "GEOSWKTWriter_setTrim", argtypes=[WKT_WRITE_PTR, c_byte]
+)
+wkt_writer_set_precision = GEOSFuncFactory(
+    "GEOSWKTWriter_setRoundingPrecision", argtypes=[WKT_WRITE_PTR, c_int]
+)
 
 # WKBReader routines
-wkb_reader_create = GEOSFuncFactory('GEOSWKBReader_create', restype=WKB_READ_PTR)
-wkb_reader_destroy = GEOSFuncFactory('GEOSWKBReader_destroy', argtypes=[WKB_READ_PTR])
+wkb_reader_create = GEOSFuncFactory("GEOSWKBReader_create", restype=WKB_READ_PTR)
+wkb_reader_destroy = GEOSFuncFactory("GEOSWKBReader_destroy", argtypes=[WKB_READ_PTR])
 
 
 class WKBReadFunc(GEOSFuncFactory):
@@ -75,12 +89,12 @@ class WKBReadFunc(GEOSFuncFactory):
     errcheck = staticmethod(check_geom)
 
 
-wkb_reader_read = WKBReadFunc('GEOSWKBReader_read')
-wkb_reader_read_hex = WKBReadFunc('GEOSWKBReader_readHEX')
+wkb_reader_read = WKBReadFunc("GEOSWKBReader_read")
+wkb_reader_read_hex = WKBReadFunc("GEOSWKBReader_readHEX")
 
 # WKBWriter routines
-wkb_writer_create = GEOSFuncFactory('GEOSWKBWriter_create', restype=WKB_WRITE_PTR)
-wkb_writer_destroy = GEOSFuncFactory('GEOSWKBWriter_destroy', argtypes=[WKB_WRITE_PTR])
+wkb_writer_create = GEOSFuncFactory("GEOSWKBWriter_create", restype=WKB_WRITE_PTR)
+wkb_writer_destroy = GEOSFuncFactory("GEOSWKBWriter_destroy", argtypes=[WKB_WRITE_PTR])
 
 
 # WKB Writing prototypes.
@@ -90,8 +104,8 @@ class WKBWriteFunc(GEOSFuncFactory):
     errcheck = staticmethod(check_sized_string)
 
 
-wkb_writer_write = WKBWriteFunc('GEOSWKBWriter_write')
-wkb_writer_write_hex = WKBWriteFunc('GEOSWKBWriter_writeHEX')
+wkb_writer_write = WKBWriteFunc("GEOSWKBWriter_write")
+wkb_writer_write_hex = WKBWriteFunc("GEOSWKBWriter_writeHEX")
 
 
 # WKBWriter property getter/setter prototypes.
@@ -104,23 +118,29 @@ class WKBWriterSet(GEOSFuncFactory):
     argtypes = [WKB_WRITE_PTR, c_int]
 
 
-wkb_writer_get_byteorder = WKBWriterGet('GEOSWKBWriter_getByteOrder')
-wkb_writer_set_byteorder = WKBWriterSet('GEOSWKBWriter_setByteOrder')
-wkb_writer_get_outdim = WKBWriterGet('GEOSWKBWriter_getOutputDimension')
-wkb_writer_set_outdim = WKBWriterSet('GEOSWKBWriter_setOutputDimension')
-wkb_writer_get_include_srid = WKBWriterGet('GEOSWKBWriter_getIncludeSRID', restype=c_byte)
-wkb_writer_set_include_srid = WKBWriterSet('GEOSWKBWriter_setIncludeSRID', argtypes=[WKB_WRITE_PTR, c_byte])
+wkb_writer_get_byteorder = WKBWriterGet("GEOSWKBWriter_getByteOrder")
+wkb_writer_set_byteorder = WKBWriterSet("GEOSWKBWriter_setByteOrder")
+wkb_writer_get_outdim = WKBWriterGet("GEOSWKBWriter_getOutputDimension")
+wkb_writer_set_outdim = WKBWriterSet("GEOSWKBWriter_setOutputDimension")
+wkb_writer_get_include_srid = WKBWriterGet(
+    "GEOSWKBWriter_getIncludeSRID", restype=c_byte
+)
+wkb_writer_set_include_srid = WKBWriterSet(
+    "GEOSWKBWriter_setIncludeSRID", argtypes=[WKB_WRITE_PTR, c_byte]
+)
 
 
 # ### Base I/O Class ###
 class IOBase(GEOSBase):
     "Base class for GEOS I/O objects."
+
     def __init__(self):
         # Getting the pointer with the constructor.
         self.ptr = self._constructor()
         # Loading the real destructor function at this point as doing it in
         # __del__ is too late (import error).
         self.destructor.func
+
 
 # ### Base WKB/WKT Reading and Writing objects ###
 
@@ -183,7 +203,7 @@ class WKTWriter(IOBase):
     @outdim.setter
     def outdim(self, new_dim):
         if new_dim not in (2, 3):
-            raise ValueError('WKT output dimension must be 2 or 3')
+            raise ValueError("WKT output dimension must be 2 or 3")
         wkt_writer_set_outdim(self.ptr, new_dim)
 
     @property
@@ -203,7 +223,9 @@ class WKTWriter(IOBase):
     @precision.setter
     def precision(self, precision):
         if (not isinstance(precision, int) or precision < 0) and precision is not None:
-            raise AttributeError('WKT output rounding precision must be non-negative integer or None.')
+            raise AttributeError(
+                "WKT output rounding precision must be non-negative integer or None."
+            )
         if precision != self._precision:
             self._precision = precision
             wkt_writer_set_precision(self.ptr, -1 if precision is None else precision)
@@ -221,34 +243,37 @@ class WKBWriter(IOBase):
 
     def _handle_empty_point(self, geom):
         from django.contrib.gis.geos import Point
+
         if isinstance(geom, Point) and geom.empty:
             if self.srid:
                 # PostGIS uses POINT(NaN NaN) for WKB representation of empty
                 # points. Use it for EWKB as it's a PostGIS specific format.
                 # https://trac.osgeo.org/postgis/ticket/3181
-                geom = Point(float('NaN'), float('NaN'), srid=geom.srid)
+                geom = Point(float("NaN"), float("NaN"), srid=geom.srid)
             else:
-                raise ValueError('Empty point is not representable in WKB.')
+                raise ValueError("Empty point is not representable in WKB.")
         return geom
 
     def write(self, geom):
         "Return the WKB representation of the given geometry."
         from django.contrib.gis.geos import Polygon
+
         geom = self._handle_empty_point(geom)
         wkb = wkb_writer_write(self.ptr, geom.ptr, byref(c_size_t()))
         if self.geos_version < (3, 6, 1) and isinstance(geom, Polygon) and geom.empty:
             # Fix GEOS output for empty polygon.
             # See https://trac.osgeo.org/geos/ticket/680.
-            wkb = wkb[:-8] + b'\0' * 4
+            wkb = wkb[:-8] + b"\0" * 4
         return memoryview(wkb)
 
     def write_hex(self, geom):
         "Return the HEXEWKB representation of the given geometry."
         from django.contrib.gis.geos.polygon import Polygon
+
         geom = self._handle_empty_point(geom)
         wkb = wkb_writer_write_hex(self.ptr, geom.ptr, byref(c_size_t()))
         if self.geos_version < (3, 6, 1) and isinstance(geom, Polygon) and geom.empty:
-            wkb = wkb[:-16] + b'0' * 8
+            wkb = wkb[:-16] + b"0" * 8
         return wkb
 
     # ### WKBWriter Properties ###
@@ -259,7 +284,9 @@ class WKBWriter(IOBase):
 
     def _set_byteorder(self, order):
         if order not in (0, 1):
-            raise ValueError('Byte order parameter must be 0 (Big Endian) or 1 (Little Endian).')
+            raise ValueError(
+                "Byte order parameter must be 0 (Big Endian) or 1 (Little Endian)."
+            )
         wkb_writer_set_byteorder(self.ptr, order)
 
     byteorder = property(_get_byteorder, _set_byteorder)
@@ -272,7 +299,7 @@ class WKBWriter(IOBase):
     @outdim.setter
     def outdim(self, new_dim):
         if new_dim not in (2, 3):
-            raise ValueError('WKB output dimension must be 2 or 3')
+            raise ValueError("WKB output dimension must be 2 or 3")
         wkb_writer_set_outdim(self.ptr, new_dim)
 
     # Property for getting/setting the include srid flag.

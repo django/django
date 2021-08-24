@@ -11,4 +11,4 @@ class DatabaseFeatures(BaseSpatialFeatures, OracleDatabaseFeatures):
     supports_perimeter_geodetic = True
     supports_dwithin_distance_expr = False
     supports_tolerance_parameter = True
-    unsupported_geojson_options = {'bbox', 'crs', 'precision'}
+    unsupported_geojson_options = {"bbox", "crs", "precision"}

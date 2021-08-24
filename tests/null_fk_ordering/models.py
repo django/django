@@ -18,7 +18,7 @@ class Article(models.Model):
     author = models.ForeignKey(Author, models.SET_NULL, null=True)
 
     class Meta:
-        ordering = ['author__name']
+        ordering = ["author__name"]
 
 
 # These following 4 models represent a far more complex ordering case.
@@ -41,4 +41,4 @@ class Comment(models.Model):
     comment_text = models.CharField(max_length=250)
 
     class Meta:
-        ordering = ['post__forum__system_info__system_name', 'comment_text']
+        ordering = ["post__forum__system_info__system_name", "comment_text"]

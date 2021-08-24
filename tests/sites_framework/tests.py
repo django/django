@@ -12,11 +12,17 @@ from .models import CustomArticle, ExclusiveArticle, SyndicatedArticle
 class SitesFrameworkTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        Site.objects.get_or_create(id=settings.SITE_ID, domain="example.com", name="example.com")
-        Site.objects.create(id=settings.SITE_ID + 1, domain="example2.com", name="example2.com")
+        Site.objects.get_or_create(
+            id=settings.SITE_ID, domain="example.com", name="example.com"
+        )
+        Site.objects.create(
+            id=settings.SITE_ID + 1, domain="example2.com", name="example2.com"
+        )
 
     def test_site_fk(self):
-        article = ExclusiveArticle.objects.create(title="Breaking News!", site_id=settings.SITE_ID)
+        article = ExclusiveArticle.objects.create(
+            title="Breaking News!", site_id=settings.SITE_ID
+        )
         self.assertEqual(ExclusiveArticle.on_site.all().get(), article)
 
     def test_sites_m2m(self):
@@ -35,9 +41,8 @@ class SitesFrameworkTestCase(TestCase):
         self.assertEqual(CustomArticle.on_site.all().get(), article)
 
 
-@isolate_apps('sites_framework')
+@isolate_apps("sites_framework")
 class CurrentSiteManagerChecksTests(SimpleTestCase):
-
     def test_invalid_name(self):
         class InvalidArticle(models.Model):
             on_site = CurrentSiteManager("places_this_article_should_appear")
@@ -48,13 +53,12 @@ class CurrentSiteManagerChecksTests(SimpleTestCase):
                 "CurrentSiteManager could not find a field named "
                 "'places_this_article_should_appear'.",
                 obj=InvalidArticle.on_site,
-                id='sites.E001',
+                id="sites.E001",
             )
         ]
         self.assertEqual(errors, expected)
 
     def test_invalid_field_type(self):
-
         class ConfusedArticle(models.Model):
             site = models.IntegerField()
             on_site = CurrentSiteManager()
@@ -65,7 +69,7 @@ class CurrentSiteManagerChecksTests(SimpleTestCase):
                 "CurrentSiteManager cannot use 'ConfusedArticle.site' as it is "
                 "not a foreign key or a many-to-many field.",
                 obj=ConfusedArticle.on_site,
-                id='sites.E002',
+                id="sites.E002",
             )
         ]
         self.assertEqual(errors, expected)
