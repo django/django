@@ -26,14 +26,10 @@ class NowUTC(Now):
     template = 'CURRENT_TIMESTAMP'
     output_field = DateTimeField()
 
-    def as_mysql(self, compiler, connection, **extra_context):
-        return self.as_sql(compiler, connection, template='UTC_TIMESTAMP', **extra_context)
-
-    def as_oracle(self, compiler, connection, **extra_context):
-        return self.as_sql(compiler, connection, template="CURRENT_TIMESTAMP AT TIME ZONE 'UTC'", **extra_context)
-
-    def as_postgresql(self, compiler, connection, **extra_context):
-        return self.as_sql(compiler, connection, template="STATEMENT_TIMESTAMP() AT TIME ZONE 'UTC'", **extra_context)
+    def as_sql(self, compiler, connection, **extra_context):
+        if connection.features.test_now_utc_template:
+            extra_context['template'] = connection.features.test_now_utc_template
+        return super().as_sql(compiler, connection, **extra_context)
 
 
 class AggregateTestCase(TestCase):

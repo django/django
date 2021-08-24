@@ -60,6 +60,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             'swedish_ci': f'{charset}_swedish_ci',
         }
 
+    test_now_utc_template = 'UTC_TIMESTAMP'
+
     @cached_property
     def django_test_skips(self):
         skips = {
