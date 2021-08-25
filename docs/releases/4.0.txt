@@ -138,6 +138,8 @@ Minor features
 * The :attr:`.InlineModelAdmin.verbose_name_plural` attribute now fallbacks to
   the :attr:`.InlineModelAdmin.verbose_name` + ``'s'``.
 
+* jQuery is upgraded from version 3.5.1 to 3.6.0.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
