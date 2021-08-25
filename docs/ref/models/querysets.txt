@@ -2291,6 +2291,9 @@ retrieving model instances from it (for example, by iterating over it), it's
 probably more efficient to use ``len(queryset)`` which won't cause an extra
 database query like ``count()`` would.
 
+If the queryset has already been fully retrieved, ``count()`` will use that
+length rather than perform an extra database query.
+
 ``in_bulk()``
 ~~~~~~~~~~~~~
 
