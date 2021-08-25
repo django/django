@@ -1216,7 +1216,7 @@ class StateRelationsTests(SimpleTestCase):
         )
         self.assertEqual(
             project_state.relations['tests', 'post']['tests', 'post'],
-            [('next_post', new_field)],
+            {'next_post': new_field},
         )
         # Add a foreign key.
         new_field = models.ForeignKey('tests.post', models.CASCADE)
@@ -1229,7 +1229,7 @@ class StateRelationsTests(SimpleTestCase):
         )
         self.assertEqual(
             project_state.relations['tests', 'post']['tests', 'comment'],
-            [('post', new_field)],
+            {'post': new_field},
         )
 
     def test_add_field_m2m_with_through(self):
@@ -1271,7 +1271,7 @@ class StateRelationsTests(SimpleTestCase):
         )
         self.assertEqual(
             project_state.relations['tests', 'tag']['tests', 'post'],
-            [('tags', new_field)],
+            {'tags': new_field},
         )
 
     def test_remove_field(self):
@@ -1308,14 +1308,14 @@ class StateRelationsTests(SimpleTestCase):
         field = project_state.models['tests', 'comment'].fields['user']
         self.assertEqual(
             project_state.relations['tests', 'user']['tests', 'comment'],
-            [('user', field)],
+            {'user': field},
         )
 
         project_state.rename_field('tests', 'comment', 'user', 'author')
         renamed_field = project_state.models['tests', 'comment'].fields['author']
         self.assertEqual(
             project_state.relations['tests', 'user']['tests', 'comment'],
-            [('author', renamed_field)],
+            {'author': renamed_field},
         )
         self.assertEqual(field, renamed_field)
 
@@ -1357,7 +1357,7 @@ class StateRelationsTests(SimpleTestCase):
         )
         self.assertEqual(
             project_state.relations['tests', 'user']['tests', 'comment'],
-            [('user', m2m_field)],
+            {'user': m2m_field},
         )
 
     def test_alter_field_m2m_to_fk(self):
@@ -1387,7 +1387,7 @@ class StateRelationsTests(SimpleTestCase):
         )
         self.assertEqual(
             project_state.relations['tests_other', 'user_other']['tests', 'post'],
-            [('authors', foreign_key)],
+            {'authors': foreign_key},
         )
 
     def test_many_relations_to_same_model(self):
@@ -1403,14 +1403,14 @@ class StateRelationsTests(SimpleTestCase):
         comment_rels = project_state.relations['tests', 'user']['tests', 'comment']
         # Two foreign keys to the same model.
         self.assertEqual(len(comment_rels), 2)
-        self.assertEqual(comment_rels[1], ('reviewer', new_field))
+        self.assertEqual(comment_rels['reviewer'], new_field)
         # Rename the second foreign key.
         project_state.rename_field('tests', 'comment', 'reviewer', 'supervisor')
         self.assertEqual(len(comment_rels), 2)
-        self.assertEqual(comment_rels[1], ('supervisor', new_field))
+        self.assertEqual(comment_rels['supervisor'], new_field)
         # Remove the first foreign key.
         project_state.remove_field('tests', 'comment', 'user')
-        self.assertEqual(comment_rels, [('supervisor', new_field)])
+        self.assertEqual(comment_rels, {'supervisor': new_field})
 
 
 class ModelStateTests(SimpleTestCase):

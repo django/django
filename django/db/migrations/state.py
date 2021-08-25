@@ -97,7 +97,7 @@ class ProjectState:
             assert isinstance(real_apps, set)
         self.real_apps = real_apps
         self.is_delayed = False
-        # {remote_model_key: {model_key: [(field_name, field)]}}
+        # {remote_model_key: {model_key: {field_name: field}}}
         self._relations = None
 
     @property
@@ -302,14 +302,10 @@ class ProjectState:
             old_name_lower = old_name.lower()
             new_name_lower = new_name.lower()
             for to_model in self._relations.values():
-                # It's safe to modify the same collection that is iterated
-                # because `break` is called right after.
-                for field_name, field in to_model[model_key]:
-                    if field_name == old_name_lower:
-                        field.name = new_name_lower
-                        to_model[model_key].remove((old_name_lower, field))
-                        to_model[model_key].append((new_name_lower, field))
-                        break
+                if old_name_lower in to_model[model_key]:
+                    field = to_model[model_key].pop(old_name_lower)
+                    field.name = new_name_lower
+                    to_model[model_key][new_name_lower] = field
         self.reload_model(*model_key, delay=delay)
 
     def _find_reload_model(self, app_label, model_name, delay=False):
@@ -406,9 +402,13 @@ class ProjectState:
             remote_model_key = concretes[remote_model_key]
         relations_to_remote_model = self._relations[remote_model_key]
         if field_name in self.models[model_key].fields:
-            relations_to_remote_model[model_key].append((field_name, field))
+            # The assert holds because it's a new relation, or an altered
+            # relation, in which case references have been removed by
+            # alter_field().
+            assert field_name not in relations_to_remote_model[model_key]
+            relations_to_remote_model[model_key][field_name] = field
         else:
-            relations_to_remote_model[model_key].remove((field_name, field))
+            del relations_to_remote_model[model_key][field_name]
             if not relations_to_remote_model[model_key]:
                 del relations_to_remote_model[model_key]
 
@@ -444,8 +444,8 @@ class ProjectState:
             for field_name, field in model_state.fields.items():
                 field.name = field_name
         # Resolve relations.
-        # {remote_model_key: {model_key: [(field_name, field)]}}
-        self._relations = defaultdict(partial(defaultdict, list))
+        # {remote_model_key: {model_key: {field_name: field}}}
+        self._relations = defaultdict(partial(defaultdict, dict))
         concretes, proxies = self._get_concrete_models_mapping_and_proxy_models()
 
         for model_key in concretes:
