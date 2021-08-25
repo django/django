@@ -16,6 +16,7 @@ from django.db.backends.utils import truncate_name
 from django.db.migrations.exceptions import InconsistentMigrationHistory
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import TestCase, override_settings, skipUnlessDBFeature
+from django.test.utils import captured_stdout
 
 from .models import UnicodeModel, UnserializableModel
 from .routers import TestRouter
@@ -1347,6 +1348,46 @@ class MakeMigrationsTests(MigrationTestBase):
             with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
                 call_command("makemigrations", "migrations", interactive=False)
 
+    def test_makemigrations_interactive_not_null_addition(self):
+        """
+        makemigrations messages when adding a NOT NULL field in interactive
+        mode.
+        """
+        class Author(models.Model):
+            silly_field = models.BooleanField(null=False)
+
+            class Meta:
+                app_label = 'migrations'
+
+        input_msg = (
+            "You are trying to add a non-nullable field 'silly_field' to "
+            "author without a default; we can't do that (the database needs "
+            "something to populate existing rows).\n"
+            "Please select a fix:\n"
+            " 1) Provide a one-off default now (will be set on all existing "
+            "rows with a null value for this column)\n"
+            " 2) Quit, and let me add a default in models.py"
+        )
+        with self.temporary_migration_module(module='migrations.test_migrations'):
+            # 2 - quit.
+            with mock.patch('builtins.input', return_value='2'):
+                with captured_stdout() as out, self.assertRaises(SystemExit):
+                    call_command('makemigrations', 'migrations', interactive=True)
+            self.assertIn(input_msg, out.getvalue())
+            # 1 - provide a default.
+            with mock.patch('builtins.input', return_value='1'):
+                with captured_stdout() as out:
+                    call_command('makemigrations', 'migrations', interactive=True)
+            output = out.getvalue()
+            self.assertIn(input_msg, output)
+            self.assertIn('Please enter the default value now, as valid Python', output)
+            self.assertIn(
+                'The datetime and django.utils.timezone modules are '
+                'available, so you can do e.g. timezone.now',
+                output,
+            )
+            self.assertIn("Type 'exit' to exit this prompt", output)
+
     def test_makemigrations_non_interactive_not_null_alteration(self):
         """
         Non-interactive makemigrations fails when a default is missing on a
@@ -1364,6 +1405,49 @@ class MakeMigrationsTests(MigrationTestBase):
         with self.temporary_migration_module(module="migrations.test_migrations"):
             call_command("makemigrations", "migrations", interactive=False, stdout=out)
         self.assertIn("Alter field slug on author", out.getvalue())
+
+    def test_makemigrations_interactive_not_null_alteration(self):
+        """
+        makemigrations messages when changing a NULL field to NOT NULL in
+        interactive mode.
+        """
+        class Author(models.Model):
+            slug = models.SlugField(null=False)
+
+            class Meta:
+                app_label = 'migrations'
+
+        input_msg = (
+            "You are trying to change the nullable field 'slug' on author to "
+            "non-nullable without a default; we can't do that (the database "
+            "needs something to populate existing rows).\n"
+            "Please select a fix:\n"
+            " 1) Provide a one-off default now (will be set on all existing "
+            "rows with a null value for this column)\n"
+            " 2) Ignore for now, and let me handle existing rows with NULL "
+            "myself (e.g. because you added a RunPython or RunSQL operation "
+            "to handle NULL values in a previous data migration)\n"
+            " 3) Quit, and let me add a default in models.py"
+        )
+        with self.temporary_migration_module(module='migrations.test_migrations'):
+            # 3 - quit.
+            with mock.patch('builtins.input', return_value='3'):
+                with captured_stdout() as out, self.assertRaises(SystemExit):
+                    call_command('makemigrations', 'migrations', interactive=True)
+            self.assertIn(input_msg, out.getvalue())
+            # 1 - provide a default.
+            with mock.patch('builtins.input', return_value='1'):
+                with captured_stdout() as out:
+                    call_command('makemigrations', 'migrations', interactive=True)
+            output = out.getvalue()
+            self.assertIn(input_msg, output)
+            self.assertIn('Please enter the default value now, as valid Python', output)
+            self.assertIn(
+                'The datetime and django.utils.timezone modules are '
+                'available, so you can do e.g. timezone.now',
+                output,
+            )
+            self.assertIn("Type 'exit' to exit this prompt", output)
 
     def test_makemigrations_non_interactive_no_model_rename(self):
         """
@@ -1729,6 +1813,14 @@ class MakeMigrationsTests(MigrationTestBase):
             class Meta:
                 app_label = 'migrations'
 
+        input_msg = (
+            "You are trying to add the field 'creation_date' with "
+            "'auto_now_add=True' to entry without a default; the database "
+            "needs something to populate existing rows.\n\n"
+            " 1) Provide a one-off default now (will be set on all existing "
+            "rows)\n"
+            " 2) Quit, and let me add a default in models.py"
+        )
         # Monkeypatch interactive questioner to auto accept
         with mock.patch('django.db.migrations.questioner.sys.stdout', new_callable=io.StringIO) as prompt_stdout:
             out = io.StringIO()
@@ -1736,8 +1828,27 @@ class MakeMigrationsTests(MigrationTestBase):
                 call_command('makemigrations', 'migrations', interactive=True, stdout=out)
             output = out.getvalue()
             prompt_output = prompt_stdout.getvalue()
+            self.assertIn(input_msg, prompt_output)
+            self.assertIn(
+                'Please enter the default value now, as valid Python',
+                prompt_output,
+            )
             self.assertIn("You can accept the default 'timezone.now' by pressing 'Enter'", prompt_output)
+            self.assertIn("Type 'exit' to exit this prompt", prompt_output)
             self.assertIn("Add field creation_date to entry", output)
+
+    @mock.patch('builtins.input', return_value='2')
+    def test_makemigrations_auto_now_add_interactive_quit(self, mock_input):
+        class Author(models.Model):
+            publishing_date = models.DateField(auto_now_add=True)
+
+            class Meta:
+                app_label = 'migrations'
+
+        with self.temporary_migration_module(module='migrations.test_migrations'):
+            with captured_stdout():
+                with self.assertRaises(SystemExit):
+                    call_command('makemigrations', 'migrations', interactive=True)
 
 
 class SquashMigrationsTests(MigrationTestBase):
