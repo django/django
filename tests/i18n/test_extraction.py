@@ -804,3 +804,29 @@ class NoSettingsExtractionTests(AdminScriptTestCase):
         out, err = self.run_django_admin(['makemessages', '-l', 'en', '-v', '0'])
         self.assertNoOutput(err)
         self.assertNoOutput(out)
+
+
+class UnchangedPoExtractionTests(ExtractorTests):
+
+    work_subdir = 'unchanged'
+
+    def setUp(self):
+        super().setUp()
+        with open(self.PO_FILE) as fp:
+            self.original_po_contents = fp.read()
+
+    def test_po_remains_unchanged(self):
+        """
+        PO files are unchanged unless there are new changes.
+        """
+        _, po_contents = self._run_makemessages()
+        self.assertEqual(po_contents, self.original_po_contents)
+
+    def test_po_changes_with_new_strings(self):
+        """
+        PO file is properly updated when new changes are detected.
+        """
+        os.rename('new_file.py.tmp', 'new_file.py')
+        _, po_contents = self._run_makemessages()
+        self.assertNotEqual(po_contents, self.original_po_contents)
+        self.assertMsgId('This is a hitherto undiscovered translatable string.', po_contents)
