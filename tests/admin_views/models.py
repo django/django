@@ -1046,3 +1046,7 @@ class ReadOnlyRelatedField(models.Model):
     chapter = models.ForeignKey(Chapter, models.CASCADE)
     language = models.ForeignKey(Language, models.CASCADE)
     user = models.ForeignKey(User, models.CASCADE)
+
+
+class Héllo(models.Model):
+    pass
