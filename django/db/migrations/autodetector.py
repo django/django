@@ -483,7 +483,7 @@ class MigrationAutodetector:
                             fields = list(model_state.fields.values()) + [
                                 field.remote_field
                                 for relations in self.to_state.relations[app_label, model_name].values()
-                                for _, field in relations
+                                for field in relations.values()
                             ]
                             for field in fields:
                                 if field.is_relation:
@@ -672,7 +672,7 @@ class MigrationAutodetector:
             if (app_label, model_name) in self.old_proxy_keys:
                 for related_model_key, related_fields in relations[app_label, model_name].items():
                     related_model_state = self.to_state.models[related_model_key]
-                    for related_field_name, related_field in related_fields:
+                    for related_field_name, related_field in related_fields.items():
                         self.add_operation(
                             related_model_state.app_label,
                             operations.AlterField(
@@ -777,7 +777,7 @@ class MigrationAutodetector:
             for (related_object_app_label, object_name), relation_related_fields in (
                 relations[app_label, model_name].items()
             ):
-                for field_name, field in relation_related_fields:
+                for field_name, field in relation_related_fields.items():
                     dependencies.append(
                         (related_object_app_label, object_name, field_name, False),
                     )
@@ -1082,7 +1082,10 @@ class MigrationAutodetector:
         else:
             relations = project_state.relations[app_label, model_name]
             for (remote_app_label, remote_model_name), fields in relations.items():
-                if any(field == related_field.remote_field for _, related_field in fields):
+                if any(
+                    field == related_field.remote_field
+                    for related_field in fields.values()
+                ):
                     remote_field_model = f'{remote_app_label}.{remote_model_name}'
                     break
         # Account for FKs to swappable models
