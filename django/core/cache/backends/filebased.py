@@ -127,8 +127,7 @@ class FileBasedCache(BaseCache):
         Convert a key into a cache file path. Basically this is the
         root cache path joined with the md5sum of the key and a suffix.
         """
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         return os.path.join(self._dir, ''.join(
             [hashlib.md5(key.encode()).hexdigest(), self.cache_suffix]))
 

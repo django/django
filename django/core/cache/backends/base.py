@@ -105,6 +105,21 @@ class BaseCache:
 
         return self.key_func(key, self.key_prefix, version)
 
+    def validate_key(self, key):
+        """
+        Warn about keys that would not be portable to the memcached
+        backend. This encourages (but does not force) writing backend-portable
+        cache code.
+        """
+        for warning in memcache_key_warnings(key):
+            warnings.warn(warning, CacheKeyWarning)
+
+    def make_and_validate_key(self, key, version=None):
+        """Helper to make and validate keys."""
+        key = self.make_key(key, version=version)
+        self.validate_key(key)
+        return key
+
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         """
         Set a value in the cache if the key does not already exist. If
@@ -239,15 +254,6 @@ class BaseCache:
     def clear(self):
         """Remove *all* values from the cache at once."""
         raise NotImplementedError('subclasses of BaseCache must provide a clear() method')
-
-    def validate_key(self, key):
-        """
-        Warn about keys that would not be portable to the memcached
-        backend. This encourages (but does not force) writing backend-portable
-        cache code.
-        """
-        for warning in memcache_key_warnings(key):
-            warnings.warn(warning, CacheKeyWarning)
 
     def incr_version(self, key, delta=1, version=None):
         """

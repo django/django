@@ -67,36 +67,29 @@ class BaseMemcachedCache(BaseCache):
         return int(timeout)
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         return self._cache.add(key, value, self.get_backend_timeout(timeout))
 
     def get(self, key, default=None, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         return self._cache.get(key, default)
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         if not self._cache.set(key, value, self.get_backend_timeout(timeout)):
             # make sure the key doesn't keep its old value in case of failure to set (memcached's 1MB limit)
             self._cache.delete(key)
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         return bool(self._cache.touch(key, self.get_backend_timeout(timeout)))
 
     def delete(self, key, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         return bool(self._cache.delete(key))
 
     def get_many(self, keys, version=None):
-        key_map = {self.make_key(key, version=version): key for key in keys}
-        for key in key_map:
-            self.validate_key(key)
+        key_map = {self.make_and_validate_key(key, version=version): key for key in keys}
         ret = self._cache.get_multi(key_map.keys())
         return {key_map[k]: v for k, v in ret.items()}
 
@@ -105,8 +98,7 @@ class BaseMemcachedCache(BaseCache):
         self._cache.disconnect_all()
 
     def incr(self, key, delta=1, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         try:
             # Memcached doesn't support negative delta.
             if delta < 0:
@@ -126,17 +118,14 @@ class BaseMemcachedCache(BaseCache):
         safe_data = {}
         original_keys = {}
         for key, value in data.items():
-            safe_key = self.make_key(key, version=version)
-            self.validate_key(safe_key)
+            safe_key = self.make_and_validate_key(key, version=version)
             safe_data[safe_key] = value
             original_keys[safe_key] = key
         failed_keys = self._cache.set_multi(safe_data, self.get_backend_timeout(timeout))
         return [original_keys[k] for k in failed_keys]
 
     def delete_many(self, keys, version=None):
-        keys = [self.make_key(key, version=version) for key in keys]
-        for key in keys:
-            self.validate_key(key)
+        keys = [self.make_and_validate_key(key, version=version) for key in keys]
         self._cache.delete_multi(keys)
 
     def clear(self):
@@ -167,8 +156,7 @@ class MemcachedCache(BaseMemcachedCache):
         self._options = {'pickleProtocol': pickle.HIGHEST_PROTOCOL, **self._options}
 
     def get(self, key, default=None, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         val = self._cache.get(key)
         # python-memcached doesn't support default values in get().
         # https://github.com/linsomniac/python-memcached/issues/159
@@ -181,8 +169,7 @@ class MemcachedCache(BaseMemcachedCache):
         # python-memcached's delete() returns True when key doesn't exist.
         # https://github.com/linsomniac/python-memcached/issues/170
         # Call _deletetouch() without the NOT_FOUND in expected results.
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         return bool(self._cache._deletetouch([b'DELETED'], 'delete', key))
 
 
@@ -200,8 +187,7 @@ class PyLibMCCache(BaseMemcachedCache):
         return output
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         if timeout == 0:
             return self._cache.delete(key)
         return self._cache.touch(key, self.get_backend_timeout(timeout))

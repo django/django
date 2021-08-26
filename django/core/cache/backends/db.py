@@ -54,11 +54,7 @@ class DatabaseCache(BaseDatabaseCache):
         if not keys:
             return {}
 
-        key_map = {}
-        for key in keys:
-            new_key = self.make_key(key, version)
-            self.validate_key(new_key)
-            key_map[new_key] = key
+        key_map = {self.make_and_validate_key(key, version=version): key for key in keys}
 
         db = router.db_for_read(self.cache_model_class)
         connection = connections[db]
@@ -96,18 +92,15 @@ class DatabaseCache(BaseDatabaseCache):
         return result
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         self._base_set('set', key, value, timeout)
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         return self._base_set('add', key, value, timeout)
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         return self._base_set('touch', key, None, timeout)
 
     def _base_set(self, mode, key, value, timeout=DEFAULT_TIMEOUT):
@@ -197,17 +190,12 @@ class DatabaseCache(BaseDatabaseCache):
                 return True
 
     def delete(self, key, version=None):
-        key = self.make_key(key, version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         return self._base_delete_many([key])
 
     def delete_many(self, keys, version=None):
-        key_list = []
-        for key in keys:
-            key = self.make_key(key, version)
-            self.validate_key(key)
-            key_list.append(key)
-        self._base_delete_many(key_list)
+        keys = [self.make_and_validate_key(key, version=version) for key in keys]
+        self._base_delete_many(keys)
 
     def _base_delete_many(self, keys):
         if not keys:
@@ -230,8 +218,7 @@ class DatabaseCache(BaseDatabaseCache):
             return bool(cursor.rowcount)
 
     def has_key(self, key, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
 
         db = router.db_for_read(self.cache_model_class)
         connection = connections[db]
