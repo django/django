@@ -213,7 +213,7 @@ class DummyCacheTests(SimpleTestCase):
     def test_delete_many_invalid_key(self):
         msg = KEY_ERRORS_WITH_MEMCACHED_MSG % ':1:key with spaces'
         with self.assertWarnsMessage(CacheKeyWarning, msg):
-            cache.delete_many({'key with spaces': 'foo'})
+            cache.delete_many(['key with spaces'])
 
     def test_clear(self):
         "clear does nothing for the dummy cache backend"
@@ -700,7 +700,7 @@ class BaseCacheTests:
             ('delete', [key]),
             ('get_many', [[key, 'b']]),
             ('set_many', [{key: 1, 'b': 2}]),
-            ('delete_many', [{key: 1, 'b': 2}]),
+            ('delete_many', [[key, 'b']]),
         ]
         try:
             for operation, args in tests:
@@ -1409,7 +1409,7 @@ class BaseMemcachedTests(BaseCacheTests):
             ('delete', [key]),
             ('get_many', [[key, 'b']]),
             ('set_many', [{key: 1, 'b': 2}]),
-            ('delete_many', [{key: 1, 'b': 2}]),
+            ('delete_many', [[key, 'b']]),
         ]
         for operation, args in tests:
             with self.subTest(operation=operation):
