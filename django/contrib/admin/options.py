@@ -54,7 +54,6 @@ from django.views.generic import RedirectView
 
 IS_POPUP_VAR = '_popup'
 TO_FIELD_VAR = '_to_field'
-POPUP_INDEX_VAR = '_popup_index'
 
 
 HORIZONTAL, VERTICAL = 1, 2
@@ -1148,7 +1147,6 @@ class ModelAdmin(BaseModelAdmin):
             'save_on_top': self.save_on_top,
             'to_field_var': TO_FIELD_VAR,
             'is_popup_var': IS_POPUP_VAR,
-            'popup_index_var':POPUP_INDEX_VAR,
             'app_label': app_label,
         })
         if add and self.add_form_template is not None:
@@ -1532,7 +1530,6 @@ class ModelAdmin(BaseModelAdmin):
 
     def _changeform_view(self, request, object_id, form_url, extra_context):
         to_field = request.POST.get(TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR))
-        popup_index = request.GET.get(POPUP_INDEX_VAR,1)
         if to_field and not self.to_field_allowed(request, to_field):
             raise DisallowedModelAdminToField("The field %s cannot be referenced." % to_field)
 
@@ -1623,7 +1620,6 @@ class ModelAdmin(BaseModelAdmin):
             'original': obj,
             'is_popup': IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET,
             'to_field': to_field,
-            'popup_index':popup_index,
             'media': media,
             'inline_admin_formsets': inline_formsets,
             'errors': helpers.AdminErrorList(form, formsets),

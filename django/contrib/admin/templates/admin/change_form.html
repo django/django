@@ -3,7 +3,6 @@
 
 {% block extrahead %}{{ block.super }}
 <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
-<script type="text/javascript"> var popup_index = {% if popup_index %}{{ popup_index }}{% else %} 1 {% endif %};</script>
 
 {{ media }}
 {% endblock %}

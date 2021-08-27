@@ -10,15 +10,24 @@
     // to allowed characters in a reversible way so that we can locate the correct
     // element when the popup window is dismissed.
 
+    function setPopupIndex(){
+        if(document.getElementsByName("_popup").length > 0) {
+            var index = window.name.lastIndexOf("__") + 2;
+            popupIndex = parseInt(window.name.substring(index));   
+        }
+        else
+            popupIndex = 0;
+    }
+
     function id_to_windowname(text) {
         text = text.replace(/\-/g, '__dash__');
         text = text.replace(/\-/g, '__dash__');
-        text = text + "__" + popup_index
+        text = text + "__" + (popupIndex + 1)
         return text;
     }
 
     function windowname_to_id(text) {
-        text = text.replace(new RegExp("__" + (popup_index) + "$"), '');
+        text = text.replace(new RegExp("__" + (popupIndex + 1) + "$"), '');
         text = text.replace(/__dot__/g, '.');
         text = text.replace(/__dash__/g, '-');
         return text;
@@ -35,7 +44,6 @@
                 href += '&_popup=1';
             }
         }
-        href += '&_popup_index=' + (popup_index + 1);
         var win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes');
         win.focus();
         return false;
@@ -137,6 +145,8 @@
     window.id_to_windowname = id_to_windowname;
     window.windowname_to_id = windowname_to_id;
 
+    var popupIndex = 0;
+
     window.showRelatedObjectLookupPopup = showRelatedObjectLookupPopup;
     window.dismissRelatedLookupPopup = dismissRelatedLookupPopup;
     window.showRelatedObjectPopup = showRelatedObjectPopup;
@@ -150,6 +160,7 @@
     window.dismissAddAnotherPopup = dismissAddRelatedObjectPopup;
 
     $(document).ready(function() {
+        setPopupIndex();
         $("a[data-popup-opener]").on('click', function(event) {
             event.preventDefault();
             opener.dismissRelatedLookupPopup(window, $(this).data("popup-opener"));
