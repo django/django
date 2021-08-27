@@ -1872,6 +1872,21 @@ class MakeMigrationsTests(MigrationTestBase):
                 with self.assertRaises(SystemExit):
                     call_command('makemigrations', 'migrations', interactive=True)
 
+    def test_makemigrations_non_interactive_auto_now_add_addition(self):
+        """
+        Non-interactive makemigrations fails when a default is missing on a
+        new field when auto_now_add=True.
+        """
+        class Entry(models.Model):
+            creation_date = models.DateTimeField(auto_now_add=True)
+
+            class Meta:
+                app_label = 'migrations'
+
+        with self.temporary_migration_module(module='migrations.test_auto_now_add'):
+            with self.assertRaises(SystemExit):
+                call_command('makemigrations', 'migrations', interactive=False)
+
     def test_makemigrations_interactive_unique_callable_default_addition(self):
         """
         makemigrations prompts the user when adding a unique field with
