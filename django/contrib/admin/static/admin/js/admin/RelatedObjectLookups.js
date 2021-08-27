@@ -9,13 +9,16 @@
     // we use to generate popup window names may contain them, therefore we map them
     // to allowed characters in a reversible way so that we can locate the correct
     // element when the popup window is dismissed.
+
     function id_to_windowname(text) {
-        text = text.replace(/\./g, '__dot__');
         text = text.replace(/\-/g, '__dash__');
+        text = text.replace(/\-/g, '__dash__');
+        text = text + "__" + popup_index
         return text;
     }
 
     function windowname_to_id(text) {
+        text = text.replace(new RegExp("__" + (popup_index) + "$"), '');
         text = text.replace(/__dot__/g, '.');
         text = text.replace(/__dash__/g, '-');
         return text;
@@ -32,6 +35,7 @@
                 href += '&_popup=1';
             }
         }
+        href += '&_popup_index=' + (popup_index + 1);
         var win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes');
         win.focus();
         return false;
