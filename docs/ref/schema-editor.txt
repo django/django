@@ -43,7 +43,7 @@ Methods
 ``execute()``
 -------------
 
-.. method:: BaseDatabaseSchemaEditor.execute(sql, params=[])
+.. method:: BaseDatabaseSchemaEditor.execute(sql, params=())
 
 Executes the SQL statement passed in, with parameters if supplied. This
 is a wrapper around the normal database cursors that allows capture of the SQL

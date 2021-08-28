@@ -356,8 +356,11 @@ Tests
 * Django test runner now supports a :option:`--buffer <test --buffer>` option
   with parallel tests.
 
-* The new :meth:`.DiscoverRunner.log` method allows customizing the way
-  messages are logged.
+* The new ``logger`` argument to :class:`~django.test.runner.DiscoverRunner`
+  allows a Python :py:ref:`logger <logger>` to be used for logging.
+
+* The new :meth:`.DiscoverRunner.log` method provides a way to log messages
+  that uses the ``DiscoverRunner.logger``, or prints to the console if not set.
 
 * Django test runner now supports a :option:`--shuffle <test --shuffle>` option
   to execute tests in a random order.
@@ -547,6 +550,13 @@ Miscellaneous
 * The ``real_apps`` argument of the undocumented
   ``django.db.migrations.state.ProjectState.__init__()`` method must now be a
   set if provided.
+
+* :class:`~django.forms.RadioSelect` and
+  :class:`~django.forms.CheckboxSelectMultiple` widgets are now rendered in
+  ``<div>`` tags so they are announced more concisely by screen readers. If you
+  need the previous behavior, :ref:`override the widget template
+  <overriding-built-in-widget-templates>` with the appropriate template from
+  Django 3.2.
 
 .. _deprecated-features-4.0:
 

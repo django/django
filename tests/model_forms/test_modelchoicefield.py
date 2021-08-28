@@ -294,14 +294,14 @@ class ModelChoiceFieldTests(TestCase):
         field = CustomModelMultipleChoiceField(Category.objects.all())
         self.assertHTMLEqual(
             field.widget.render('name', []), (
-                '<ul>'
-                '<li><label><input type="checkbox" name="name" value="%d" '
-                'data-slug="entertainment">Entertainment</label></li>'
-                '<li><label><input type="checkbox" name="name" value="%d" '
-                'data-slug="test">A test</label></li>'
-                '<li><label><input type="checkbox" name="name" value="%d" '
-                'data-slug="third-test">Third</label></li>'
-                '</ul>'
+                '<div>'
+                '<div><label><input type="checkbox" name="name" value="%d" '
+                'data-slug="entertainment">Entertainment</label></div>'
+                '<div><label><input type="checkbox" name="name" value="%d" '
+                'data-slug="test">A test</label></div>'
+                '<div><label><input type="checkbox" name="name" value="%d" '
+                'data-slug="third-test">Third</label></div>'
+                '</div>'
             ) % (self.c1.pk, self.c2.pk, self.c3.pk),
         )
 
@@ -334,11 +334,11 @@ class ModelChoiceFieldTests(TestCase):
         field = CustomModelMultipleChoiceField(Category.objects.all())
         self.assertHTMLEqual(
             field.widget.render('name', []),
-            '''<ul>
-<li><label><input type="checkbox" name="name" value="%d" data-slug="entertainment">Entertainment</label></li>
-<li><label><input type="checkbox" name="name" value="%d" data-slug="test">A test</label></li>
-<li><label><input type="checkbox" name="name" value="%d" data-slug="third-test">Third</label></li>
-</ul>''' % (self.c1.pk, self.c2.pk, self.c3.pk),
+            """<div>
+<div><label><input type="checkbox" name="name" value="%d" data-slug="entertainment">Entertainment</label></div>
+<div><label><input type="checkbox" name="name" value="%d" data-slug="test">A test</label></div>
+<div><label><input type="checkbox" name="name" value="%d" data-slug="third-test">Third</label></div>
+</div>""" % (self.c1.pk, self.c2.pk, self.c3.pk),
         )
 
     def test_choices_not_fetched_when_not_rendering(self):

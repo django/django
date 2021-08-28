@@ -72,6 +72,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         'non_default': 'SWEDISH_CI',
         'swedish_ci': 'SWEDISH_CI',
     }
+    test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
 
     django_test_skips = {
         "Oracle doesn't support SHA224.": {

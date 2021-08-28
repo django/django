@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
 from django.urls import path, reverse
 
+from .models import Héllo
+
 
 class AdminSiteWithSidebar(admin.AdminSite):
     pass
@@ -17,6 +19,7 @@ site_with_sidebar = AdminSiteWithSidebar(name='test_with_sidebar')
 site_without_sidebar = AdminSiteWithoutSidebar(name='test_without_sidebar')
 
 site_with_sidebar.register(User)
+site_with_sidebar.register(Héllo)
 
 urlpatterns = [
     path('test_sidebar/admin/', site_with_sidebar.urls),
@@ -85,9 +88,23 @@ class AdminSidebarTests(TestCase):
         with self.assertNoLogs('django.template', 'DEBUG'):
             self.client.get(url)
 
+    def test_sidebar_model_name_non_ascii(self):
+        url = reverse('test_with_sidebar:admin_views_héllo_changelist')
+        response = self.client.get(url)
+        self.assertContains(response, '<div class="app-admin_views module current-app">')
+        self.assertContains(response, '<tr class="model-héllo current-model">')
+        self.assertContains(
+            response,
+            '<th scope="row">'
+            '<a href="/test_sidebar/admin/admin_views/h%C3%A9llo/" aria-current="page">'
+            'Héllos</a></th>'
+        )
+
 
 @override_settings(ROOT_URLCONF='admin_views.test_nav_sidebar')
 class SeleniumTests(AdminSeleniumTestCase):
+    available_apps = ['admin_views'] + AdminSeleniumTestCase.available_apps
+
     def setUp(self):
         self.superuser = User.objects.create_superuser(
             username='super',

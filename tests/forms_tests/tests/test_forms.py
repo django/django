@@ -585,20 +585,20 @@ class FormsTestCase(SimpleTestCase):
             language = ChoiceField(choices=[('P', 'Python'), ('J', 'Java')], widget=RadioSelect)
 
         f = FrameworkForm(auto_id=False)
-        self.assertHTMLEqual(str(f['language']), """<ul>
-<li><label><input type="radio" name="language" value="P" required> Python</label></li>
-<li><label><input type="radio" name="language" value="J" required> Java</label></li>
-</ul>""")
+        self.assertHTMLEqual(str(f['language']), """<div>
+<div><label><input type="radio" name="language" value="P" required> Python</label></div>
+<div><label><input type="radio" name="language" value="J" required> Java</label></div>
+</div>""")
         self.assertHTMLEqual(f.as_table(), """<tr><th>Name:</th><td><input type="text" name="name" required></td></tr>
-<tr><th>Language:</th><td><ul>
-<li><label><input type="radio" name="language" value="P" required> Python</label></li>
-<li><label><input type="radio" name="language" value="J" required> Java</label></li>
-</ul></td></tr>""")
+<tr><th>Language:</th><td><div>
+<div><label><input type="radio" name="language" value="P" required> Python</label></div>
+<div><label><input type="radio" name="language" value="J" required> Java</label></div>
+</div></td></tr>""")
         self.assertHTMLEqual(f.as_ul(), """<li>Name: <input type="text" name="name" required></li>
-<li>Language: <ul>
-<li><label><input type="radio" name="language" value="P" required> Python</label></li>
-<li><label><input type="radio" name="language" value="J" required> Java</label></li>
-</ul></li>""")
+<li>Language: <div>
+<div><label><input type="radio" name="language" value="P" required> Python</label></div>
+<div><label><input type="radio" name="language" value="J" required> Java</label></div>
+</div></li>""")
 
         # Regarding auto_id and <label>, RadioSelect is a special case. Each radio button
         # gets a distinct ID, formed by appending an underscore plus the button's
@@ -606,12 +606,12 @@ class FormsTestCase(SimpleTestCase):
         f = FrameworkForm(auto_id='id_%s')
         self.assertHTMLEqual(
             str(f['language']),
-            """<ul id="id_language">
-<li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" required>
-Python</label></li>
-<li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" required>
-Java</label></li>
-</ul>"""
+            """<div id="id_language">
+<div><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" required>
+Python</label></div>
+<div><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" required>
+Java</label></div>
+</div>"""
         )
 
         # When RadioSelect is used with auto_id, and the whole form is printed
@@ -621,32 +621,32 @@ Java</label></li>
         self.assertHTMLEqual(
             f.as_table(),
             """<tr><th><label for="id_name">Name:</label></th><td><input type="text" name="name" id="id_name" required></td></tr>
-<tr><th><label>Language:</label></th><td><ul id="id_language">
-<li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" required>
-Python</label></li>
-<li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" required>
-Java</label></li>
-</ul></td></tr>"""
+<tr><th><label>Language:</label></th><td><div id="id_language">
+<div><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" required>
+Python</label></div>
+<div><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" required>
+Java</label></div>
+</div></td></tr>"""
         )
         self.assertHTMLEqual(
             f.as_ul(),
             """<li><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" required></li>
-<li><label>Language:</label> <ul id="id_language">
-<li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" required>
-Python</label></li>
-<li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" required>
-Java</label></li>
-</ul></li>"""
+<li><label>Language:</label> <div id="id_language">
+<div><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" required>
+Python</label></div>
+<div><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" required>
+Java</label></div>
+</div></li>"""
         )
         self.assertHTMLEqual(
             f.as_p(),
             """<p><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" required></p>
-<p><label>Language:</label> <ul id="id_language">
-<li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" required>
-Python</label></li>
-<li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" required>
-Java</label></li>
-</ul></p>"""
+<p><label>Language:</label> <div id="id_language">
+<div><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" required>
+Python</label></div>
+<div><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" required>
+Java</label></div>
+</div></p>"""
         )
 
         # Test iterating on individual radios in a template
@@ -870,20 +870,20 @@ Java</label></li>
             )
 
         f = SongForm(auto_id=False)
-        self.assertHTMLEqual(str(f['composers']), """<ul>
-<li><label><input type="checkbox" name="composers" value="J"> John Lennon</label></li>
-<li><label><input type="checkbox" name="composers" value="P"> Paul McCartney</label></li>
-</ul>""")
+        self.assertHTMLEqual(str(f['composers']), """<div>
+<div><label><input type="checkbox" name="composers" value="J"> John Lennon</label></div>
+<div><label><input type="checkbox" name="composers" value="P"> Paul McCartney</label></div>
+</div>""")
         f = SongForm({'composers': ['J']}, auto_id=False)
-        self.assertHTMLEqual(str(f['composers']), """<ul>
-<li><label><input checked type="checkbox" name="composers" value="J"> John Lennon</label></li>
-<li><label><input type="checkbox" name="composers" value="P"> Paul McCartney</label></li>
-</ul>""")
+        self.assertHTMLEqual(str(f['composers']), """<div>
+<div><label><input checked type="checkbox" name="composers" value="J"> John Lennon</label></div>
+<div><label><input type="checkbox" name="composers" value="P"> Paul McCartney</label></div>
+</div>""")
         f = SongForm({'composers': ['J', 'P']}, auto_id=False)
-        self.assertHTMLEqual(str(f['composers']), """<ul>
-<li><label><input checked type="checkbox" name="composers" value="J"> John Lennon</label></li>
-<li><label><input checked type="checkbox" name="composers" value="P"> Paul McCartney</label></li>
-</ul>""")
+        self.assertHTMLEqual(str(f['composers']), """<div>
+<div><label><input checked type="checkbox" name="composers" value="J"> John Lennon</label></div>
+<div><label><input checked type="checkbox" name="composers" value="P"> Paul McCartney</label></div>
+</div>""")
         # Test iterating on individual checkboxes in a template
         t = Template('{% for checkbox in form.composers %}<div class="mycheckbox">{{ checkbox }}</div>{% endfor %}')
         self.assertHTMLEqual(t.render(Context({'form': f})), """<div class="mycheckbox"><label>
@@ -905,12 +905,12 @@ Java</label></li>
         f = SongForm(auto_id='%s_id')
         self.assertHTMLEqual(
             str(f['composers']),
-            """<ul id="composers_id">
-<li><label for="composers_id_0">
-<input type="checkbox" name="composers" value="J" id="composers_id_0"> John Lennon</label></li>
-<li><label for="composers_id_1">
-<input type="checkbox" name="composers" value="P" id="composers_id_1"> Paul McCartney</label></li>
-</ul>"""
+            """<div id="composers_id">
+<div><label for="composers_id_0">
+<input type="checkbox" name="composers" value="J" id="composers_id_0"> John Lennon</label></div>
+<div><label for="composers_id_1">
+<input type="checkbox" name="composers" value="P" id="composers_id_1"> Paul McCartney</label></div>
+</div>"""
         )
 
     def test_multiple_choice_list_data(self):
