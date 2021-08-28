@@ -20,7 +20,11 @@
 {% block content %}
 {% if form.errors and not form.non_field_errors %}
 <p class="errornote">
-{% if form.errors.items|length == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate "Please correct the errors below." %}{% endif %}
+{% if form.errors.items|length == 1 %}
+  {% translate "Please correct the error below." %}
+{% else %}
+  {% translate "Please correct the errors below." %}
+{% endif %}
 </p>
 {% endif %}
 
