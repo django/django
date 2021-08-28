@@ -1,6 +1,5 @@
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
-from django.db import IntegrityError
 from django.db.models import Q
 from django.test import SimpleTestCase, TestCase
 
@@ -252,7 +251,7 @@ class GenericRelationsTests(TestCase):
         t1 = TaggedItem.objects.create(content_object=self.quartz, tag="shiny")
         t2 = TaggedItem.objects.create(content_object=self.quartz, tag="clearish")
         # One save() for each object.
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(4):
             bacon.tags.add(t1, t2, bulk=False)
         self.assertEqual(t1.content_object, bacon)
         self.assertEqual(t2.content_object, bacon)
@@ -469,7 +468,8 @@ class GenericRelationsTests(TestCase):
         exception on model.save().
         """
         quartz = Mineral(name="Quartz", hardness=7)
-        with self.assertRaises(IntegrityError):
+        msg = "save() prohibited to prevent data loss due to unsaved related object 'content_object'."
+        with self.assertRaisesMessage(ValueError, msg):
             TaggedItem.objects.create(tag="shiny", content_object=quartz)
 
     def test_cache_invalidation_for_content_type_id(self):

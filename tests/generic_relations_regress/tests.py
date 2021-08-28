@@ -1,4 +1,3 @@
-from django.db import IntegrityError
 from django.db.models import ProtectedError, Q, Sum
 from django.forms.models import modelform_factory
 from django.test import TestCase, skipIfDBFeature
@@ -118,7 +117,8 @@ class GenericRelationTests(TestCase):
         # Fails with another, ORM-level error
         dev1 = Developer(name='Joe')
         note = Note(note='Deserves promotion', content_object=dev1)
-        with self.assertRaises(IntegrityError):
+        msg = "save() prohibited to prevent data loss due to unsaved related object 'content_object'."
+        with self.assertRaisesMessage(ValueError, msg):
             note.save()
 
     def test_target_model_len_zero(self):

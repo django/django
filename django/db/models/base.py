@@ -684,6 +684,7 @@ class Model(metaclass=ModelBase):
         non-SQL backends), respectively. Normally, they should not be set.
         """
         self._prepare_related_fields_for_save(operation_name='save')
+        self._prepare_private_fields_for_save(operation_name='save')
 
         using = using or router.db_for_write(self.__class__, instance=self)
         if force_insert and (force_update or update_fields):
@@ -945,6 +946,18 @@ class Model(metaclass=ModelBase):
                 # cached relationship.
                 if getattr(obj, field.target_field.attname) != getattr(self, field.attname):
                     field.delete_cached_value(self)
+
+    def _prepare_private_fields_for_save(self, operation_name):
+        for field in self._meta.private_fields:
+            if field.is_relation and field.is_cached(self):
+                obj = getattr(self, field.name, None)
+                if not obj:
+                    continue
+                if obj.pk is None:
+                    raise ValueError(
+                        "%s() prohibited to prevent data loss due to unsaved "
+                        "related object '%s'." % (operation_name, field.name)
+                    )
 
     def delete(self, using=None, keep_parents=False):
         if self.pk is None:
