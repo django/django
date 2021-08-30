@@ -105,11 +105,11 @@ class BaseMemcachedCache(BaseCache):
         self._cache.disconnect_all()
 
     def incr(self, key, delta=1, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
         # memcached doesn't support a negative delta
         if delta < 0:
-            return self._cache.decr(key, -delta)
+            return self.decr(key, -delta, version=version)
+        key = self.make_key(key, version=version)
+        self.validate_key(key)
         try:
             val = self._cache.incr(key, delta)
 
@@ -122,11 +122,11 @@ class BaseMemcachedCache(BaseCache):
         return val
 
     def decr(self, key, delta=1, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
         # memcached doesn't support a negative delta
         if delta < 0:
-            return self._cache.incr(key, -delta)
+            return self.incr(key, -delta, version=version)
+        key = self.make_key(key, version=version)
+        self.validate_key(key)
         try:
             val = self._cache.decr(key, delta)
 

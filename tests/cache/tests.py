@@ -382,6 +382,8 @@ class BaseCacheTests:
         self.assertEqual(cache.incr('answer', -10), 42)
         with self.assertRaises(ValueError):
             cache.incr('does_not_exist')
+        with self.assertRaises(ValueError):
+            cache.incr('does_not_exist', -1)
         cache.set('null', None)
         with self.assertRaises(self.incr_decr_type_error):
             cache.incr('null')
@@ -396,6 +398,8 @@ class BaseCacheTests:
         self.assertEqual(cache.decr('answer', -10), 42)
         with self.assertRaises(ValueError):
             cache.decr('does_not_exist')
+        with self.assertRaises(ValueError):
+            cache.incr('does_not_exist', -1)
         cache.set('null', None)
         with self.assertRaises(self.incr_decr_type_error):
             cache.decr('null')
