@@ -4,7 +4,7 @@ from django.contrib.admin import BooleanFieldListFilter, SimpleListFilter
 from django.contrib.admin.options import VERTICAL, ModelAdmin, TabularInline
 from django.contrib.admin.sites import AdminSite
 from django.core.checks import Error
-from django.db.models import F, Field, Model
+from django.db.models import CASCADE, F, Field, ForeignKey, Model
 from django.db.models.functions import Upper
 from django.forms.models import BaseModelFormSet
 from django.test import SimpleTestCase
@@ -1120,6 +1120,33 @@ class FkNameCheckTests(CheckTestCase):
             inlines = [ValidationTestInline]
 
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
+    def test_proxy_model_parent(self):
+        class Parent(Model):
+            pass
+
+        class ProxyChild(Parent):
+            class Meta:
+                proxy = True
+
+        class ProxyProxyChild(ProxyChild):
+            class Meta:
+                proxy = True
+
+        class Related(Model):
+            proxy_child = ForeignKey(ProxyChild, on_delete=CASCADE)
+
+        class InlineFkName(admin.TabularInline):
+            model = Related
+            fk_name = 'proxy_child'
+
+        class InlineNoFkName(admin.TabularInline):
+            model = Related
+
+        class ProxyProxyChildAdminFkName(admin.ModelAdmin):
+            inlines = [InlineFkName, InlineNoFkName]
+
+        self.assertIsValid(ProxyProxyChildAdminFkName, ProxyProxyChild)
 
 
 class ExtraCheckTests(CheckTestCase):
