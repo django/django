@@ -449,7 +449,7 @@ class AutocompleteMixin:
     @property
     def media(self):
         extra = '' if settings.DEBUG else '.min'
-        i18n_name = SELECT2_TRANSLATIONS.get(get_language())
+        i18n_name = SELECT2_TRANSLATIONS.get(get_language().lower())
         i18n_file = ('admin/js/vendor/select2/i18n/%s.js' % i18n_name,) if i18n_name else ()
         return forms.Media(
             js=(
