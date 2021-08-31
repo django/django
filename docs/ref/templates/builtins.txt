@@ -1054,8 +1054,9 @@ this example, the space around ``Hello`` won't be stripped::
 
 Outputs one of the syntax characters used to compose template tags.
 
-Since the template system has no concept of "escaping", to display one of the
-bits used in template tags, you must use the ``{% templatetag %}`` tag.
+The template system has no concept of "escaping" individual characters.
+However, you can use the ``{% templatetag %}`` tag to display one of the
+template tag character combinations.
 
 The argument tells which template bit to output:
 
@@ -1074,7 +1075,10 @@ Argument            Outputs
 
 Sample usage::
 
-    {% templatetag openblock %} url 'entry_list' {% templatetag closeblock %}
+    The {% templatetag openblock %} characters open a block.
+
+See also the :ttag:`verbatim` tag for another way of including these
+characters.
 
 .. templatetag:: url
 
