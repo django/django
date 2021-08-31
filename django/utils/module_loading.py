@@ -3,6 +3,7 @@ import os
 from importlib import import_module
 from importlib.util import find_spec as importlib_find
 
+module_cache = {}
 
 def import_string(dotted_path):
     """
@@ -13,8 +14,11 @@ def import_string(dotted_path):
         module_path, class_name = dotted_path.rsplit('.', 1)
     except ValueError as err:
         raise ImportError("%s doesn't look like a module path" % dotted_path) from err
-
-    module = import_module(module_path)
+    if module_path in module_cache:
+        module = module_cache[module_path]
+    else:
+        module = import_module(module_path)
+        module_cache[module_path] = module
 
     try:
         return getattr(module, class_name)
