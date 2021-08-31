@@ -105,33 +105,17 @@ class BaseMemcachedCache(BaseCache):
         self._cache.disconnect_all()
 
     def incr(self, key, delta=1, version=None):
-        # memcached doesn't support a negative delta
-        if delta < 0:
-            return self.decr(key, -delta, version=version)
         key = self.make_key(key, version=version)
         self.validate_key(key)
         try:
-            val = self._cache.incr(key, delta)
-
+            # Memcached doesn't support negative delta.
+            if delta < 0:
+                val = self._cache.decr(key, -delta)
+            else:
+                val = self._cache.incr(key, delta)
         # Normalize an exception raised by the underlying client library to
-        # ValueError in the event of a nonexistent key when calling incr().
-        except self.LibraryValueNotFoundException:
-            val = None
-        if val is None:
-            raise ValueError("Key '%s' not found" % key)
-        return val
-
-    def decr(self, key, delta=1, version=None):
-        # memcached doesn't support a negative delta
-        if delta < 0:
-            return self.incr(key, -delta, version=version)
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
-        try:
-            val = self._cache.decr(key, delta)
-
-        # Normalize an exception raised by the underlying client library to
-        # ValueError in the event of a nonexistent key when calling decr().
+        # ValueError in the event of a nonexistent key when calling
+        # incr()/decr().
         except self.LibraryValueNotFoundException:
             val = None
         if val is None:
