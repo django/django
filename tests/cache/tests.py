@@ -139,6 +139,8 @@ class DummyCacheTests(SimpleTestCase):
             cache.incr('answer')
         with self.assertRaises(ValueError):
             cache.incr('does_not_exist')
+        with self.assertRaises(ValueError):
+            cache.incr('does_not_exist', -1)
 
     def test_decr(self):
         "Dummy cache values can't be decremented"
@@ -147,6 +149,8 @@ class DummyCacheTests(SimpleTestCase):
             cache.decr('answer')
         with self.assertRaises(ValueError):
             cache.decr('does_not_exist')
+        with self.assertRaises(ValueError):
+            cache.decr('does_not_exist', -1)
 
     def test_touch(self):
         """Dummy cache can't do touch()."""
