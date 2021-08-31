@@ -1692,7 +1692,7 @@ class Query(BaseExpression):
                 yield expr
             elif include_external and callable(getattr(expr, 'get_external_cols', None)):
                 yield from expr.get_external_cols()
-            else:
+            elif hasattr(expr, 'get_source_expressions'):
                 yield from cls._gen_cols(
                     expr.get_source_expressions(),
                     include_external=include_external,
