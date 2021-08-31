@@ -76,8 +76,8 @@ Displaying debug output
 
 .. program:: None
 
-Use :option:`--verbosity` to specify the amount of notification and debug
-information that ``django-admin`` prints to the console.
+Use :option:`--verbosity`, where it is supported, to specify the amount of
+notification and debug information that ``django-admin`` prints to the console.
 
 Available commands
 ==================
@@ -1796,7 +1796,7 @@ Default options
 .. program:: None
 
 Although some commands may allow their own custom options, every command
-allows for the following options:
+allows for the following options by default:
 
 .. django-admin-option:: --pythonpath PYTHONPATH
 
@@ -1833,6 +1833,8 @@ Displays a full stack trace when a :exc:`~django.core.management.CommandError`
 is raised. By default, ``django-admin`` will show an error message when a
 ``CommandError`` occurs and a full stack trace for any other exception.
 
+This option is ignored by :djadmin:`runserver`.
+
 Example usage::
 
     django-admin migrate --traceback
@@ -1846,6 +1848,8 @@ should print to the console.
 * ``1`` means normal output (default).
 * ``2`` means verbose output.
 * ``3`` means *very* verbose output.
+
+This option is ignored by :djadmin:`runserver`.
 
 Example usage::
 
