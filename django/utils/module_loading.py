@@ -1,7 +1,15 @@
 import copy
 import os
+import sys
 from importlib import import_module
 from importlib.util import find_spec as importlib_find
+
+
+def cached_import(module_path, class_name):
+    modules = sys.modules
+    if module_path not in modules:
+        import_module(module_path)
+    return getattr(modules[module_path], class_name)
 
 
 def import_string(dotted_path):
@@ -14,10 +22,8 @@ def import_string(dotted_path):
     except ValueError as err:
         raise ImportError("%s doesn't look like a module path" % dotted_path) from err
 
-    module = import_module(module_path)
-
     try:
-        return getattr(module, class_name)
+        return cached_import(module_path, class_name)
     except AttributeError as err:
         raise ImportError('Module "%s" does not define a "%s" attribute/class' % (
             module_path, class_name)
