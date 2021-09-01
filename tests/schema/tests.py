@@ -910,7 +910,7 @@ class SchemaTests(TransactionTestCase):
     def test_alter_charfield_to_null(self):
         """
         #24307 - Should skip an alter statement on databases with
-        interprets_empty_strings_as_null when changing a CharField to null.
+        interprets_empty_strings_as_nulls when changing a CharField to null.
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -1008,7 +1008,7 @@ class SchemaTests(TransactionTestCase):
     def test_alter_textfield_to_null(self):
         """
         #24307 - Should skip an alter statement on databases with
-        interprets_empty_strings_as_null when changing a TextField to null.
+        interprets_empty_strings_as_nulls when changing a TextField to null.
         """
         # Create the table
         with connection.schema_editor() as editor:
