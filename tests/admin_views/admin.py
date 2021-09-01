@@ -22,8 +22,8 @@ from .forms import MediaActionForm
 from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
     AdminOrderedModelMethod, Album, Answer, Answer2, Article, BarAccount, Book,
-    Bookmark, Category, Chapter, ChapterXtra1, Child, ChildOfReferer, Choice,
-    City, Collector, Color, Color2, ComplexSortedPerson, CoverLetter,
+    Bookmark, Box, Category, Chapter, ChapterXtra1, Child, ChildOfReferer,
+    Choice, City, Collector, Color, Color2, ComplexSortedPerson, CoverLetter,
     CustomArticle, CyclicOne, CyclicTwo, DependentChild, DooHickey, EmptyModel,
     EmptyModelHidden, EmptyModelMixin, EmptyModelVisible, ExplicitlyProvidedPK,
     ExternalSubscriber, Fabric, FancyDoodad, FieldOverridePost,
@@ -1125,6 +1125,7 @@ site.register(NotReferenced)
 site.register(ExplicitlyProvidedPK, GetFormsetsArgumentCheckingAdmin)
 site.register(ImplicitlyGeneratedPK, GetFormsetsArgumentCheckingAdmin)
 site.register(UserProxy)
+site.register(Box)
 
 # Register core models we need in our tests
 site.register(User, UserAdmin)

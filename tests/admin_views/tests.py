@@ -48,8 +48,8 @@ from .admin import CityAdmin, site, site2
 from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
     AdminOrderedModelMethod, Album, Answer, Answer2, Article, BarAccount, Book,
-    Bookmark, Category, Chapter, ChapterXtra1, ChapterXtra2, Character, Child,
-    Choice, City, Collector, Color, ComplexSortedPerson, CoverLetter,
+    Bookmark, Box, Category, Chapter, ChapterXtra1, ChapterXtra2, Character,
+    Child, Choice, City, Collector, Color, ComplexSortedPerson, CoverLetter,
     CustomArticle, CyclicOne, CyclicTwo, DooHickey, Employee, EmptyModel,
     Fabric, FancyDoodad, FieldOverridePost, FilteredManager, FooAccount,
     FoodDelivery, FunkyTag, Gallery, Grommet, Inquisition, Language, Link,
@@ -4982,6 +4982,76 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.selenium.find_element_by_id('searchbar').rect['width'],
             50,
         )
+
+    def test_related_popup_index(self):
+        """
+        Create a chain of 'self' related objects via popups.
+        """
+        from selenium.webdriver.support.ui import Select
+        self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
+        add_url = reverse('admin:admin_views_box_add', current_app=site.name)
+        self.selenium.get(self.live_server_url + add_url)
+
+        self.selenium.find_element_by_id('add_id_next_box').click()
+        self.wait_for_and_switch_to_popup()
+
+        self.selenium.find_element_by_id('id_title').send_keys('test')
+        self.selenium.find_element_by_id('add_id_next_box').click()
+        self.wait_for_and_switch_to_popup(num_windows=3)
+
+        self.selenium.find_element_by_id('id_title').send_keys('test2')
+        self.selenium.find_element_by_id('add_id_next_box').click()
+        self.wait_for_and_switch_to_popup(num_windows=4)
+
+        self.selenium.find_element_by_id('id_title').send_keys('test3')
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.switch_to.window(self.selenium.window_handles[-1])
+        select = Select(self.selenium.find_element_by_id('id_next_box'))
+        next_box_id = str(Box.objects.get(title="test3").id)
+        self.assertEqual(select.first_selected_option.get_attribute('value'), next_box_id)
+
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.switch_to.window(self.selenium.window_handles[-1])
+        select = Select(self.selenium.find_element_by_id('id_next_box'))
+        next_box_id = str(Box.objects.get(title="test2").id)
+        self.assertEqual(select.first_selected_option.get_attribute('value'), next_box_id)
+
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.switch_to.window(self.selenium.window_handles[-1])
+        select = Select(self.selenium.find_element_by_id('id_next_box'))
+        next_box_id = str(Box.objects.get(title="test").id)
+        self.assertEqual(select.first_selected_option.get_attribute('value'), next_box_id)
+
+    def test_related_popup_incorrect_close(self):
+        """
+        Cleanup child popups when closing a parent popup.
+        """
+        self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
+        add_url = reverse('admin:admin_views_box_add', current_app=site.name)
+        self.selenium.get(self.live_server_url + add_url)
+
+        self.selenium.find_element_by_id('add_id_next_box').click()
+        self.wait_for_and_switch_to_popup()
+
+        test_window = self.selenium.current_window_handle
+        self.selenium.find_element_by_id('id_title').send_keys('test')
+        self.selenium.find_element_by_id('add_id_next_box').click()
+        self.wait_for_and_switch_to_popup(num_windows=3)
+
+        test2_window = self.selenium.current_window_handle
+        self.selenium.find_element_by_id('id_title').send_keys('test2')
+        self.selenium.find_element_by_id('add_id_next_box').click()
+        self.wait_for_and_switch_to_popup(num_windows=4)
+        self.assertEqual(len(self.selenium.window_handles), 4)
+
+        self.selenium.switch_to.window(test2_window)
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.assertEqual(len(self.selenium.window_handles), 2)
+
+        # Close final popup to clean up test.
+        self.selenium.switch_to.window(test_window)
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.switch_to.window(self.selenium.window_handles[-1])
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
