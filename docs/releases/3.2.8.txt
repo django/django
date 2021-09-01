@@ -1,0 +1,12 @@
+==========================
+Django 3.2.8 release notes
+==========================
+
+*Expected October 5, 2021*
+
+Django 3.2.8 fixes several bugs in 3.2.7.
+
+Bugfixes
+========
+
+* ...
