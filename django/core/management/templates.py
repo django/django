@@ -1,3 +1,4 @@
+import argparse
 import cgi
 import mimetypes
 import os
@@ -54,6 +55,14 @@ class TemplateCommand(BaseCommand):
             help='The file name(s) to render. Separate multiple file names '
                  'with commas, or use -n multiple times.'
         )
+        parser.add_argument(
+            '--exclude', '-x',
+            action='append', default=argparse.SUPPRESS, nargs='?', const='',
+            help=(
+                'The directory name(s) to exclude, in addition to .git and '
+                '__pycache__. Can be used multiple times.'
+            ),
+        )
 
     def handle(self, app_or_project, name, target=None, **options):
         self.app_or_project = app_or_project
@@ -82,8 +91,12 @@ class TemplateCommand(BaseCommand):
 
         extensions = tuple(handle_extensions(options['extensions']))
         extra_files = []
+        excluded_directories = ['.git', '__pycache__']
         for file in options['files']:
             extra_files.extend(map(lambda x: x.strip(), file.split(',')))
+        if exclude := options.get('exclude'):
+            for directory in exclude:
+                excluded_directories.append(directory.strip())
         if self.verbosity >= 2:
             self.stdout.write(
                 'Rendering %s template files with extensions: %s'
@@ -126,7 +139,10 @@ class TemplateCommand(BaseCommand):
                 os.makedirs(target_dir, exist_ok=True)
 
             for dirname in dirs[:]:
-                if dirname.startswith('.') or dirname == '__pycache__':
+                if 'exclude' not in options:
+                    if dirname.startswith('.') or dirname == '__pycache__':
+                        dirs.remove(dirname)
+                elif dirname in excluded_directories:
                     dirs.remove(dirname)
 
             for filename in files:

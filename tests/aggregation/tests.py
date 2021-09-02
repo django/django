@@ -1603,3 +1603,17 @@ class AggregateTestCase(TestCase):
             value=Sum('price', filter=Q(rating__lt=3.0), default=Avg('pages') / 10.0),
         )
         self.assertAlmostEqual(result['value'], Decimal('61.72'), places=2)
+
+    def test_exists_none_with_aggregate(self):
+        qs = Book.objects.all().annotate(
+            count=Count('id'),
+            exists=Exists(Author.objects.none()),
+        )
+        self.assertEqual(len(qs), 6)
+
+    def test_exists_extra_where_with_aggregate(self):
+        qs = Book.objects.all().annotate(
+            count=Count('id'),
+            exists=Exists(Author.objects.extra(where=['1=0'])),
+        )
+        self.assertEqual(len(qs), 6)
