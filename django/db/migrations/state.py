@@ -7,7 +7,8 @@ from django.apps import AppConfig
 from django.apps.registry import Apps, apps as global_apps
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
-from django.db import models
+from django.db import connection, connections, models
+from django.db.backends.utils import truncate_name
 from django.db.migrations.utils import field_is_referenced, get_references
 from django.db.models import NOT_PROVIDED
 from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
@@ -111,7 +112,7 @@ class ProjectState:
         self.models[model_key] = model_state
         if self._relations is not None:
             self.resolve_model_relations(model_key)
-        if 'apps' in self.__dict__:  # hasattr would cache the property
+        if 'apps' in self.__dict__ and not model_state.auto_created:  # hasattr would cache the property
             self.reload_model(*model_key)
 
     def remove_model(self, app_label, model_name):
@@ -235,8 +236,11 @@ class ProjectState:
             field.default = NOT_PROVIDED
         else:
             field = field
+
         model_key = app_label, model_name
         fields = self.models[model_key].fields
+        field.name = name
+        field.column = field.db_column or name
         if self._relations is not None:
             old_field = fields.pop(name)
             if old_field.is_relation:
@@ -592,7 +596,8 @@ class StateApps(Apps):
                 new_unrendered_models = []
                 for model in unrendered_models:
                     try:
-                        model.render(self)
+                        if not model.auto_created:
+                            model.render(self)
                     except InvalidBasesError:
                         new_unrendered_models.append(model)
                 if len(new_unrendered_models) == len(unrendered_models):
@@ -644,7 +649,7 @@ class ModelState:
     assign new ones, as these are not detached during a clone.
     """
 
-    def __init__(self, app_label, name, fields, options=None, bases=None, managers=None):
+    def __init__(self, app_label, name, fields, options=None, bases=None, managers=None, auto_created=False):
         self.app_label = app_label
         self.name = name
         self.fields = dict(fields)
@@ -653,7 +658,11 @@ class ModelState:
         self.options.setdefault('constraints', [])
         self.bases = bases or (models.Model,)
         self.managers = managers or []
+        self.auto_created = auto_created
+
         for name, field in self.fields.items():
+            field.column = field.db_column or name.lower()
+            field.name = name.lower()
             # Sanity-check that fields are NOT already bound to a model.
             if hasattr(field, 'model'):
                 raise ValueError(
@@ -677,6 +686,21 @@ class ModelState:
                     "Indexes passed to ModelState require a name attribute. "
                     "%r doesn't have one." % index
                 )
+
+    @cached_property
+    def _meta(self):
+        return ModelStateOptions(self)
+
+    def get_field_by_name(self, name):
+        return self.get_field(name)
+
+    def get_local_fields(self):
+        fields = [field for field in self.fields.values() if not field.many_to_many]
+        return fields
+
+    def get_local_many_to_many(self):
+        fields = [field for field in self.fields.values() if field.many_to_many]
+        return fields
 
     @cached_property
     def name_lower(self):
@@ -900,3 +924,137 @@ class ModelState:
             (self.bases == other.bases) and
             (self.managers == other.managers)
         )
+
+
+class ModelStateOptions(object):
+
+    def __init__(self, model):
+        self.model = model
+        self.concrete_model = model
+
+    @cached_property
+    def proxy(self):
+        return self.model.options.get('proxy', False)
+
+    @property
+    def app_label(self):
+        return self.model.app_label
+
+    @cached_property
+    def pk(self):
+        for name in self.model.fields:
+            if self.model.fields[name].primary_key:
+                return self.model.fields[name]
+
+    @cached_property
+    def swappable(self):
+        return self.model.options.get('swappable', None)
+
+    @cached_property
+    def auto_created(self):
+        return self.model.auto_created
+
+    @cached_property
+    def managed(self):
+        return self.model.options.get('managed', True)
+
+    def get_path_to_parent(self, model):
+        """
+        TODO add the implementation to get path of parent returning None for now
+        """
+        return None
+
+    @cached_property
+    def label_lower(self):
+        return '%s.%s' % (self.model.app_label, self.model.name_lower)
+
+    @property
+    def model_name(self):
+        return self.model.name_lower
+
+    @cached_property
+    def unique_together(self):
+        return self.model.options.get('unique_together', [])
+
+    @cached_property
+    def db_tablespace(self):
+        return self.model.options.get('db_tablespace', None)
+
+    @cached_property
+    def db_table(self):
+        db_table = self.model.options.get('db_table')
+        if db_table is None:
+            db_table = "%s_%s" % (self.model.app_label, self.model.name_lower)
+        return truncate_name(db_table, connection.ops.max_name_length())
+
+    def get_field(self, name):
+        return self.model.get_field_by_name(name)
+
+    @cached_property
+    def swapped(self):
+        """
+        Has this model been swapped out for another? If so, return the model
+        name of the replacement; otherwise, return None.
+
+        For historical reasons, model name lookups using get_model() are
+        case insensitive, so we make sure we are case insensitive here.
+        """
+        if self.swappable:
+            swapped_for = getattr(settings, self.swappable, None)
+            if swapped_for:
+                try:
+                    swapped_label, swapped_object = swapped_for.split('.')
+                except ValueError:
+                    # setting not in the format app_label.model_name
+                    # raising ImproperlyConfigured here causes problems with
+                    # test cleanup code - instead it is raised in get_user_model
+                    # or as part of validation.
+                    return swapped_for
+
+                if '%s.%s' % (swapped_label, swapped_object.lower()) not in (None, self.label_lower):
+                    return swapped_for
+        return None
+
+    @cached_property
+    def required_db_features(self):
+        return self.model.options.get('required_db_features', [])
+
+    @cached_property
+    def required_db_vendor(self):
+        return self.model.options.get('required_db_vendor', None)
+
+    def can_migrate(self, conn):
+        """
+        Return True if the model can/should be migrated on the `connection`.
+        `connection` can be either a real connection or a connection alias.
+        """
+        if self.proxy or self.swapped or not self.managed:
+            return False
+        if isinstance(conn, str):
+            conn = connections[conn]
+        if self.required_db_vendor:
+            return self.required_db_vendor == conn.vendor
+        if self.required_db_features:
+            return all(getattr(conn.features, feat, False)
+                       for feat in self.required_db_features)
+        return True
+
+    @cached_property
+    def constraints(self):
+        return self.model.options["constraints"]
+
+    @cached_property
+    def index_together(self):
+        return self.model.options.get('index_together', [])
+
+    @cached_property
+    def indexes(self):
+        return self.model.options.get('indexes', [])
+
+    @property
+    def local_fields(self):
+        return self.model.get_local_fields()
+
+    @property
+    def local_many_to_many(self):
+        return self.model.get_local_many_to_many()

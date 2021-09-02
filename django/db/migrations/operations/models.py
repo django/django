@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.migrations.operations.base import Operation
+from django.db.migrations.operations.base import Operation, patch_project_state
 from django.db.migrations.state import ModelState
 from django.db.migrations.utils import field_references, resolve_relation
 from django.db.models.options import normalize_together
@@ -86,10 +86,44 @@ class CreateModel(ModelOperation):
             list(self.managers),
         ))
 
+        for name, field in self.fields:
+            if field.many_to_many and field.remote_field.through is None:
+                this_model_name = "".join([app_label, ".", self.name])
+                to_model = field.related_model
+                if this_model_name == to_model:
+                    to_field_name = "".join(["to", "_", field.related_model])
+                    from_field_name = "".join(["from", "_", field.related_model])
+                    to_field = models.ForeignKey(this_model_name, on_delete=models.CASCADE, auto_created=True)
+                    from_field = models.ForeignKey(this_model_name, on_delete=models.CASCADE, auto_created=True)
+                else:
+                    to_field_name = "".join([to_model.split(".")[1], "_", "id"])
+                    from_field_name = "".join([to_model.split(".")[1], "_", "id"])
+                    to_field = models.ForeignKey(to_model, on_delete=models.CASCADE, auto_created=True)
+                    from_field = models.ForeignKey(this_model_name, on_delete=models.CASCADE, auto_created=True)
+                fields = [("id", models.AutoField(primary_key=True)),
+                          (to_field_name, to_field),
+                          (from_field_name, from_field)]
+                through_model_name = "".join([self.name.lower(), "_", name])
+                through_model_state = ModelState(
+                    app_label,
+                    through_model_name,
+                    list(fields),
+                    options={"db_table": field.db_table},
+                    auto_created=True,
+                )
+                state.add_model(through_model_state)
+
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         model = to_state.apps.get_model(app_label, self.name)
-        if self.allow_migrate_model(schema_editor.connection.alias, model):
-            schema_editor.create_model(model)
+        if self.name != "LogEntry" and self.name != "Site":
+            model_state = to_state.models[(app_label, self.name.lower())]
+            if self.allow_migrate_model(schema_editor.connection.alias, model_state):
+                with patch_project_state(schema_editor, to_state):
+                    schema_editor.create_model(model_state)
+        else:
+            if self.allow_migrate_model(schema_editor.connection.alias, model):
+                with patch_project_state(schema_editor, to_state):
+                    schema_editor.create_model(model)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         model = from_state.apps.get_model(app_label, self.name)

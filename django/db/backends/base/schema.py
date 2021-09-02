@@ -1,10 +1,12 @@
 import logging
 from datetime import datetime
 
+from django.db import connection
 from django.db.backends.ddl_references import (
     Columns, Expressions, ForeignKeyName, IndexName, Statement, Table,
 )
 from django.db.backends.utils import names_digest, split_identifier
+from django.db.migrations.state import ModelState
 from django.db.models import Deferrable, Index
 from django.db.models.sql import Query
 from django.db.transaction import TransactionManagementError, atomic
@@ -169,7 +171,10 @@ class BaseDatabaseSchemaEditor:
             if definition is None:
                 continue
             # Check constraints can go on the column SQL here.
-            db_params = field.db_parameters(connection=self.connection)
+            if isinstance(model, ModelState) and field.is_relation:
+                db_params = self.get_db_params(field, model)
+            else:
+                db_params = field.db_parameters(connection=self.connection)
             if db_params['check']:
                 definition += ' ' + self.sql_check_constraint % db_params
             # Autoincrement SQL (for backends with inline variant).
@@ -179,8 +184,24 @@ class BaseDatabaseSchemaEditor:
             params.extend(extra_params)
             # FK.
             if field.remote_field and field.db_constraint:
-                to_table = field.remote_field.model._meta.db_table
-                to_column = field.remote_field.model._meta.get_field(field.remote_field.field_name).column
+                if isinstance(model, ModelState):
+                    related_model = field.related_model
+                    if related_model == 'self':
+                        related_model = model.name_lower
+                    if "." in related_model:
+                        to_model_key = tuple(related_model.lower().split('.'))
+                    else:
+                        to_model_key = tuple([model.app_label, related_model.lower()])
+                    to_model = self.project_state.models[to_model_key]
+                    to_table = to_model._meta.db_table
+                    try:
+                        to_column = to_model.get_field(field.remote_field.field_name).column
+                    except KeyError:
+                        to_column = to_model._meta.pk.column
+                else:
+                    to_table = field.remote_field.model._meta.db_table
+                    to_field = field.remote_field.model._meta.get_field(field.remote_field.field_name)
+                    to_column = to_field.column
                 if self.sql_create_inline_fk:
                     definition += ' ' + self.sql_create_inline_fk % {
                         'to_table': self.quote_name(to_table),
@@ -258,13 +279,31 @@ class BaseDatabaseSchemaEditor:
         if tablespace and self.connection.features.supports_tablespaces and field.unique:
             yield self.connection.ops.tablespace_sql(tablespace, inline=True)
 
+    def get_db_params(self, field, model):
+        related_model = field.related_model
+        if related_model == 'self':
+            related_model = model.name_lower
+        if "." in related_model:
+            to_model_key = tuple(related_model.lower().split('.'))
+        else:
+            to_model_key = tuple([model.app_label, related_model.lower()])
+        to_model_state = self.project_state.models[to_model_key]
+        try:
+            to_field = to_model_state.get_field(field.to_fields[0])
+        except KeyError:
+            to_field = to_model_state._meta.pk
+        return {"type": to_field.rel_db_type(connection=connection), "check": []}
+
     def column_sql(self, model, field, include_default=False):
         """
         Return the column definition for a field. The field must already have
         had set_attributes_from_name() called.
         """
         # Get the column's type and use that as the basis of the SQL.
-        db_params = field.db_parameters(connection=self.connection)
+        if isinstance(model, ModelState) and field.is_relation:
+            db_params = self.get_db_params(field, model)
+        else:
+            db_params = field.db_parameters(connection=self.connection)
         column_db_type = db_params['type']
         # Check for fields that aren't actually columns (e.g. M2M).
         if column_db_type is None:
@@ -357,10 +396,20 @@ class BaseDatabaseSchemaEditor:
         # Add any field index and index_together's (deferred as SQLite _remake_table needs it)
         self.deferred_sql.extend(self._model_indexes_sql(model))
 
-        # Make M2M tables
-        for field in model._meta.local_many_to_many:
-            if field.remote_field.through._meta.auto_created:
-                self.create_model(field.remote_field.through)
+        if isinstance(model, ModelState):
+            for field in model._meta.local_many_to_many:
+                if field.remote_field.through is None:
+                    model_state = self.project_state.models[(
+                        model.app_label, "".join([model.name_lower, "_", field.name.lower()]))]
+                else:
+                    model_state = self.project_state.models[tuple(field.remote_field.through.split("."))]
+                if model_state.auto_created:
+                    self.create_model(model_state)
+        else:
+            # Make M2M tables
+            for field in model._meta.local_many_to_many:
+                if field.remote_field.through._meta.auto_created:
+                    self.create_model(field.remote_field.through)
 
     def delete_model(self, model):
         """Delete a model from the database."""
