@@ -1,10 +1,11 @@
 import copy
 import os
+import functools
 from importlib import import_module
 from importlib.util import find_spec as importlib_find
 
-module_cache = {}
 
+@functools.lru_cache(128)
 def import_string(dotted_path):
     """
     Import a dotted module path and return the attribute/class designated by the
@@ -14,11 +15,8 @@ def import_string(dotted_path):
         module_path, class_name = dotted_path.rsplit('.', 1)
     except ValueError as err:
         raise ImportError("%s doesn't look like a module path" % dotted_path) from err
-    if module_path in module_cache:
-        module = module_cache[module_path]
-    else:
-        module = import_module(module_path)
-        module_cache[module_path] = module
+
+    module = import_module(module_path)
 
     try:
         return getattr(module, class_name)
