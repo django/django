@@ -2,9 +2,9 @@
 Django 3.2.7 release notes
 ==========================
 
-*Expected September 1, 2021*
+*September 1, 2021*
 
-Django 3.2.7 fixes several bugs in 3.2.6.
+Django 3.2.7 fixes a bug in 3.2.6.
 
 Bugfixes
 ========

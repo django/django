@@ -1,11 +1,10 @@
 import copy
 import os
-import functools
+import sys
 from importlib import import_module
 from importlib.util import find_spec as importlib_find
 
 
-@functools.lru_cache(128)
 def import_string(dotted_path):
     """
     Import a dotted module path and return the attribute/class designated by the
@@ -16,7 +15,10 @@ def import_string(dotted_path):
     except ValueError as err:
         raise ImportError("%s doesn't look like a module path" % dotted_path) from err
 
-    module = import_module(module_path)
+    if module_path in sys.modules:
+        module = sys.modules[module_path]
+    else:
+        module = import_module(module_path)
 
     try:
         return getattr(module, class_name)

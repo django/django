@@ -3,7 +3,9 @@ import datetime
 import re
 
 from django.db import DatabaseError
-from django.db.backends.base.schema import BaseDatabaseSchemaEditor
+from django.db.backends.base.schema import (
+    BaseDatabaseSchemaEditor, _related_non_m2m_objects,
+)
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -124,6 +126,17 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self.remove_field(model, old_field)
         # Rename and possibly make the new field NOT NULL
         super().alter_field(model, new_temp_field, new_field)
+        # Recreate foreign key (if necessary) because the old field is not
+        # passed to the alter_field() and data types of new_temp_field and
+        # new_field always match.
+        new_type = new_field.db_type(self.connection)
+        if (
+            (old_field.primary_key and new_field.primary_key) or
+            (old_field.unique and new_field.unique)
+        ) and old_type != new_type:
+            for _, rel in _related_non_m2m_objects(new_temp_field, new_field):
+                if rel.field.db_constraint:
+                    self.execute(self._create_fk_sql(rel.related_model, rel.field, '_fk'))
 
     def _alter_column_type_sql(self, model, old_field, new_field, new_type):
         auto_field_types = {'AutoField', 'BigAutoField', 'SmallAutoField'}

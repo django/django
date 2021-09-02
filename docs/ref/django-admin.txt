@@ -76,8 +76,8 @@ Displaying debug output
 
 .. program:: None
 
-Use :option:`--verbosity` to specify the amount of notification and debug
-information that ``django-admin`` prints to the console.
+Use :option:`--verbosity`, where it is supported, to specify the amount of
+notification and debug information that ``django-admin`` prints to the console.
 
 Available commands
 ==================
@@ -1304,6 +1304,14 @@ Specifies which files in the app template (in addition to those matching
 ``--extension``) should be rendered with the template engine. Defaults to an
 empty list.
 
+.. django-admin-option:: --exclude DIRECTORIES, -x DIRECTORIES
+
+.. versionadded:: 4.0
+
+Specifies which directories in the app template should be excluded, in addition
+to ``.git`` and ``__pycache__``. If this option is not provided, directories
+named ``__pycache__`` or starting with ``.`` will be excluded.
+
 The :class:`template context <django.template.Context>` used for all matching
 files is:
 
@@ -1372,6 +1380,14 @@ the template engine. Defaults to ``py``.
 Specifies which files in the project template (in addition to those matching
 ``--extension``) should be rendered with the template engine. Defaults to an
 empty list.
+
+.. django-admin-option:: --exclude DIRECTORIES, -x DIRECTORIES
+
+.. versionadded:: 4.0
+
+Specifies which directories in the project template should be excluded, in
+addition to ``.git`` and ``__pycache__``. If this option is not provided,
+directories named ``__pycache__`` or starting with ``.`` will be excluded.
 
 The :class:`template context <django.template.Context>` used is:
 
@@ -1796,7 +1812,7 @@ Default options
 .. program:: None
 
 Although some commands may allow their own custom options, every command
-allows for the following options:
+allows for the following options by default:
 
 .. django-admin-option:: --pythonpath PYTHONPATH
 
@@ -1833,6 +1849,8 @@ Displays a full stack trace when a :exc:`~django.core.management.CommandError`
 is raised. By default, ``django-admin`` will show an error message when a
 ``CommandError`` occurs and a full stack trace for any other exception.
 
+This option is ignored by :djadmin:`runserver`.
+
 Example usage::
 
     django-admin migrate --traceback
@@ -1846,6 +1864,8 @@ should print to the console.
 * ``1`` means normal output (default).
 * ``2`` means verbose output.
 * ``3`` means *very* verbose output.
+
+This option is ignored by :djadmin:`runserver`.
 
 Example usage::
 
