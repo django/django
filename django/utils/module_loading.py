@@ -1,5 +1,6 @@
 import copy
 import os
+import sys
 from importlib import import_module
 from importlib.util import find_spec as importlib_find
 
@@ -14,8 +15,10 @@ def import_string(dotted_path):
     except ValueError as err:
         raise ImportError("%s doesn't look like a module path" % dotted_path) from err
 
-    module = import_module(module_path)
-
+    if module_path in sys.modules:
+        module = sys.modules[module_path]
+    else:
+        module = import_module(module_path)
     try:
         return getattr(module, class_name)
     except AttributeError as err:
