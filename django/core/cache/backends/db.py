@@ -56,8 +56,9 @@ class DatabaseCache(BaseDatabaseCache):
 
         key_map = {}
         for key in keys:
-            self.validate_key(key)
-            key_map[self.make_key(key, version)] = key
+            new_key = self.make_key(key, version)
+            self.validate_key(new_key)
+            key_map[new_key] = key
 
         db = router.db_for_read(self.cache_model_class)
         connection = connections[db]
@@ -196,14 +197,16 @@ class DatabaseCache(BaseDatabaseCache):
                 return True
 
     def delete(self, key, version=None):
+        key = self.make_key(key, version)
         self.validate_key(key)
-        return self._base_delete_many([self.make_key(key, version)])
+        return self._base_delete_many([key])
 
     def delete_many(self, keys, version=None):
         key_list = []
         for key in keys:
+            key = self.make_key(key, version)
             self.validate_key(key)
-            key_list.append(self.make_key(key, version))
+            key_list.append(key)
         self._base_delete_many(key_list)
 
     def _base_delete_many(self, keys):

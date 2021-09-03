@@ -675,7 +675,7 @@ class BaseCacheTests:
         finally:
             cull_cache._max_entries = old_max_entries
 
-    def _perform_invalid_key_test(self, key, expected_warning):
+    def _perform_invalid_key_test(self, key, expected_warning, key_func=None):
         """
         All the builtin backends should warn (except memcached that should
         error) on keys that would be refused by memcached. This encourages
@@ -688,7 +688,7 @@ class BaseCacheTests:
             return key
 
         old_func = cache.key_func
-        cache.key_func = func
+        cache.key_func = key_func or func
 
         tests = [
             ('add', [key, 1]),
@@ -724,6 +724,19 @@ class BaseCacheTests:
             '%r (longer than %s)' % (key, 250)
         )
         self._perform_invalid_key_test(key, expected_warning)
+
+    def test_invalid_with_version_key_length(self):
+        # Custom make_key() that adds a version to the key and exceeds the
+        # limit.
+        def key_func(key, *args):
+            return key + ':1'
+
+        key = 'a' * 249
+        expected_warning = (
+            'Cache key will cause errors if used with memcached: '
+            '%r (longer than %s)' % (key_func(key), 250)
+        )
+        self._perform_invalid_key_test(key, expected_warning, key_func=key_func)
 
     def test_cache_versioning_get_set(self):
         # set, using default version = 1
