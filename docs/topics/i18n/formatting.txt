@@ -151,7 +151,7 @@ Creating custom format files
 ============================
 
 Django provides format definitions for many locales, but sometimes you might
-want to create your own, because a format files doesn't exist for your locale,
+want to create your own, because a format file doesn't exist for your locale,
 or because you want to overwrite some of the values.
 
 To use custom formats, specify the path where you'll place format files
