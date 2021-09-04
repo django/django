@@ -317,6 +317,7 @@ class MultiPartParser:
         So while this function does sanitize filenames to some extent, the
         resulting filename should still be considered as untrusted user input.
         """
+        file_name = file_name.replace('\x00', '')
         file_name = html.unescape(file_name)
         file_name = file_name.rsplit('/')[-1]
         file_name = file_name.rsplit('\\')[-1]

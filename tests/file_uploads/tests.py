@@ -38,6 +38,7 @@ CANDIDATE_TRAVERSAL_FILE_NAMES = [
     '../..\\hax0rd.txt',        # Relative path, mixed.
     '..&#x2F;hax0rd.txt',       # HTML entities.
     '..&sol;hax0rd.txt',        # HTML entities.
+    '\x00hax0rd\x00.txt\x00',   # Null bytes.
 ]
 
 CANDIDATE_INVALID_FILE_NAMES = [
