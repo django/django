@@ -689,7 +689,8 @@ class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
         return ''
 
     def encode(self, password, salt):
-        assert salt == ''
+        if salt != '':
+            raise ValueError('salt must be empty.')
         hash = hashlib.sha1(password.encode()).hexdigest()
         return 'sha1$$%s' % hash
 
@@ -733,7 +734,8 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
         return ''
 
     def encode(self, password, salt):
-        assert salt == ''
+        if salt != '':
+            raise ValueError('salt must be empty.')
         return hashlib.md5(password.encode()).hexdigest()
 
     def decode(self, encoded):
@@ -774,9 +776,11 @@ class CryptPasswordHasher(BasePasswordHasher):
 
     def encode(self, password, salt):
         crypt = self._load_library()
-        assert len(salt) == 2
+        if len(salt) != 2:
+            raise ValueError('salt must be of length 2.')
         hash = crypt.crypt(password, salt)
-        assert hash is not None  # A platform like OpenBSD with a dummy crypt module.
+        if hash is None:  # A platform like OpenBSD with a dummy crypt module.
+            raise TypeError('hash must be provided.')
         # we don't need to store the salt, but Django used to do this
         return '%s$%s$%s' % (self.algorithm, '', hash)
 

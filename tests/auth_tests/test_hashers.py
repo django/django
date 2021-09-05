@@ -143,6 +143,13 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
 
+    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.UnsaltedMD5PasswordHasher'])
+    def test_unsalted_md5_encode_invalid_salt(self):
+        hasher = get_hasher('unsalted_md5')
+        msg = 'salt must be empty.'
+        with self.assertRaisesMessage(ValueError, msg):
+            hasher.encode('password', salt='salt')
+
     @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher'])
     def test_unsalted_sha1(self):
         encoded = make_password('lètmein', '', 'unsalted_sha1')
@@ -161,6 +168,13 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
 
+    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher'])
+    def test_unsalted_sha1_encode_invalid_salt(self):
+        hasher = get_hasher('unsalted_sha1')
+        msg = 'salt must be empty.'
+        with self.assertRaisesMessage(ValueError, msg):
+            hasher.encode('password', salt='salt')
+
     @skipUnless(crypt, "no crypt module to generate password.")
     @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.CryptPasswordHasher'])
     def test_crypt(self):
@@ -176,6 +190,23 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
+
+    @skipUnless(crypt, 'no crypt module to generate password.')
+    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.CryptPasswordHasher'])
+    def test_crypt_encode_invalid_salt(self):
+        hasher = get_hasher('crypt')
+        msg = 'salt must be of length 2.'
+        with self.assertRaisesMessage(ValueError, msg):
+            hasher.encode('password', salt='a')
+
+    @skipUnless(crypt, 'no crypt module to generate password.')
+    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.CryptPasswordHasher'])
+    def test_crypt_encode_invalid_hash(self):
+        hasher = get_hasher('crypt')
+        msg = 'hash must be provided.'
+        with mock.patch('crypt.crypt', return_value=None):
+            with self.assertRaisesMessage(TypeError, msg):
+                hasher.encode('password', salt='ab')
 
     @skipUnless(bcrypt, "bcrypt not installed")
     def test_bcrypt_sha256(self):
