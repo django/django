@@ -960,6 +960,11 @@ appropriate entities.
     The ``is_dst`` parameter has no effect when using non-``pytz`` timezone
     implementations.
 
+    .. versionchanged:: 4.0
+
+        The ``is_dst`` parameter is deprecated and will be removed in Django
+        5.0.
+
 .. function:: make_naive(value, timezone=None)
 
     Returns a naive :class:`~datetime.datetime` that represents in
