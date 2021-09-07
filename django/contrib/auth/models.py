@@ -250,16 +250,16 @@ class PermissionsMixin(models.Model):
             'The groups this user belongs to. A user will get all permissions '
             'granted to each of their groups.'
         ),
-        related_name="user_set",
-        related_query_name="user",
+        related_name='user_set',
+        related_query_name='user',
     )
     user_permissions = models.ManyToManyField(
         Permission,
         verbose_name=_('user permissions'),
         blank=True,
         help_text=_('Specific permissions for this user.'),
-        related_name="user_set",
-        related_query_name="user",
+        related_name='user_set',
+        related_query_name='user',
     )
 
     class Meta:
@@ -334,7 +334,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         help_text=_('Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
         validators=[username_validator],
         error_messages={
-            'unique': _("A user with that username already exists."),
+            'unique': _('A user with that username already exists.'),
         },
     )
     first_name = models.CharField(_('first name'), max_length=150, blank=True)
