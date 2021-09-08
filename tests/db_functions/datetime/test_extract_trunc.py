@@ -32,7 +32,7 @@ from ..models import Author, DTModel, Fan
 
 HAS_PYTZ = pytz is not None
 if not HAS_PYTZ:
-    needs_pytx = unittest.skip("Test requires pytz")
+    needs_pytx = unittest.skip('Test requires pytz')
 else:
     def needs_pytx(f):
         return f

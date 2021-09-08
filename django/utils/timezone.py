@@ -3,7 +3,6 @@ Timezone-related classes and functions.
 """
 
 import functools
-import warnings
 
 try:
     import zoneinfo
@@ -16,11 +15,9 @@ from datetime import datetime, timedelta, timezone, tzinfo
 from asgiref.local import Local
 
 from django.conf import settings
-from django.utils.deprecation import RemovedInDjango50Warning
 
-# RemovedInDjango50Warning: add 'utc' to __all__.
-__all__ = [
-    'get_fixed_timezone',
+__all__ = [  # noqa: F822 RemovedInDjango50Warning
+    'utc', 'get_fixed_timezone',
     'get_default_timezone', 'get_default_timezone_name',
     'get_current_timezone', 'get_current_timezone_name',
     'activate', 'deactivate', 'override',
@@ -68,13 +65,6 @@ def get_default_timezone():
     """
     if settings.USE_DEPRECATED_PYTZ:
         import pytz
-        msg = (
-            "The USE_DEPRECATED_PYTZ setting, and support for pytz "
-            "timezones is deprecated in favor of the stdlib zoneinfo module."
-            " Please update your code to use zoneinfo and remove the "
-            "USE_DEPRECATED_PYTZ setting."
-        )
-        warnings.warn(msg, RemovedInDjango50Warning, stacklevel=3)
         return pytz.timezone(settings.TIME_ZONE)
     return zoneinfo.ZoneInfo(settings.TIME_ZONE)
 
@@ -286,10 +276,14 @@ def make_naive(value, timezone=None):
 
 def _is_pytz_zone(tz):
     """Checks if a zone is a pytz zone."""
-    if not settings.USE_DEPRECATED_PYTZ:
+    # Try import rather than checking settings.USE_DEPRECATED_PYTZ to *allow*
+    # manually passing a pytz timezone, which some of the test cases (at least)
+    # rely on.
+    try:
+        import pytz
+    except ImportError:
         return False
 
-    import pytz
     _PYTZ_BASE_CLASSES = (pytz.tzinfo.BaseTzInfo, pytz._FixedOffset)
     # In releases prior to 2018.4, pytz.UTC was not a subclass of BaseTzInfo
     if not isinstance(pytz.UTC, pytz._FixedOffset):

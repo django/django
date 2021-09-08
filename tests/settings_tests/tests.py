@@ -4,7 +4,10 @@ import unittest
 from types import ModuleType, SimpleNamespace
 from unittest import mock
 
-from django.conf import ENVIRONMENT_VARIABLE, LazySettings, Settings, settings
+from django.conf import (
+    ENVIRONMENT_VARIABLE, USE_DEPRECATED_PYTZ_DEPRECATED_MSG, LazySettings,
+    Settings, settings,
+)
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
 from django.test import (
@@ -347,6 +350,21 @@ class SettingsTests(SimpleTestCase):
                 Settings('fake_settings_module')
         finally:
             del sys.modules['fake_settings_module']
+
+    def test_use_deprecated_pytz_deprecation(self):
+        settings_module = ModuleType('fake_settings_module')
+        settings_module.USE_DEPRECATED_PYTZ = True
+        settings_module.USE_TZ = True
+        sys.modules['fake_settings_module'] = settings_module
+        try:
+            with self.assertRaisesMessage(RemovedInDjango50Warning, USE_DEPRECATED_PYTZ_DEPRECATED_MSG):
+                Settings('fake_settings_module')
+        finally:
+            del sys.modules['fake_settings_module']
+
+        holder = LazySettings()
+        with self.assertRaisesMessage(RemovedInDjango50Warning, USE_DEPRECATED_PYTZ_DEPRECATED_MSG):
+            holder.configure(USE_DEPRECATED_PYTZ=True)
 
 
 class TestComplexSettingOverride(SimpleTestCase):

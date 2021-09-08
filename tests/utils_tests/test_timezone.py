@@ -26,9 +26,9 @@ if not HAS_PYTZ:
     CET = None
     PARIS_IMPLS = (PARIS_ZI,)
 
-    needs_pytx = unittest.skip("Test requires pytz")
+    needs_pytx = unittest.skip('Test requires pytz')
 else:
-    CET = pytz.timezone("Europe/Paris")
+    CET = pytz.timezone('Europe/Paris')
     PARIS_IMPLS = (PARIS_ZI, CET)
 
     def needs_pytx(f):
@@ -54,18 +54,6 @@ class TimezoneTests(SimpleTestCase):
     @override_settings(USE_DEPRECATED_PYTZ=True)
     def test_setting_allows_fallback_to_pytz(self):
         self.assertIsInstance(timezone.get_default_timezone(), pytz.BaseTzInfo)
-
-    @needs_pytx
-    @override_settings(USE_DEPRECATED_PYTZ=True)
-    def test_setting_allows_fallback_to_pytz_warning(self):
-        msg = (
-            "The USE_DEPRECATED_PYTZ setting, and support for pytz "
-            "timezones is deprecated in favor of the stdlib zoneinfo module."
-            " Please update your code to use zoneinfo and remove the "
-            "USE_DEPRECATED_PYTZ setting."
-        )
-        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
-            timezone.get_default_timezone()
 
     def test_now(self):
         with override_settings(USE_TZ=True):

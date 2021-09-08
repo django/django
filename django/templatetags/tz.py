@@ -12,6 +12,7 @@ from django.utils import timezone
 register = Library()
 
 
+# RemovedInDjango50Warning
 class UnknownTimezoneException(BaseException):
     pass
 
@@ -23,11 +24,11 @@ def timezone_constructor(tzname):
         try:
             return pytz.timezone(tzname)
         except pytz.UnknownTimeZoneError:
-            raise UnknownTimezoneException()
+            raise UnknownTimezoneException
     try:
         return zoneinfo.ZoneInfo(tzname)
     except zoneinfo.ZoneInfoNotFoundError:
-        raise UnknownTimezoneException()
+        raise UnknownTimezoneException
 
 
 # HACK: datetime instances cannot be assigned new attributes. Define a subclass
