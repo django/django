@@ -355,7 +355,8 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* :tfilter:`floatformat` template filter now allows using the ``u`` suffix to
+  force disabling localization.
 
 Tests
 ~~~~~
@@ -573,6 +574,10 @@ Miscellaneous
   need the previous behavior, :ref:`override the widget template
   <overriding-built-in-widget-templates>` with the appropriate template from
   Django 3.2.
+
+* The :tfilter:`floatformat` template filter no longer depends on the
+  :setting:`USE_L10N` setting and always returns localized output. Use the
+  ``u`` suffix to disable localization.
 
 .. _deprecated-features-4.0:
 

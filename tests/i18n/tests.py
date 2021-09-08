@@ -523,15 +523,15 @@ class FormattingTests(SimpleTestCase):
             self.assertEqual('99999.999', Template('{{ f }}').render(self.ctxt))
             self.assertEqual('Des. 31, 2009', Template('{{ d }}').render(self.ctxt))
             self.assertEqual('Des. 31, 2009, 8:50 p.m.', Template('{{ dt }}').render(self.ctxt))
-            self.assertEqual('66666.67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
-            self.assertEqual('100000.0', Template('{{ f|floatformat }}').render(self.ctxt))
+            self.assertEqual('66666.67', Template('{{ n|floatformat:"2u" }}').render(self.ctxt))
+            self.assertEqual('100000.0', Template('{{ f|floatformat:"u" }}').render(self.ctxt))
             self.assertEqual(
                 '66666.67',
-                Template('{{ n|floatformat:"2g" }}').render(self.ctxt),
+                Template('{{ n|floatformat:"2gu" }}').render(self.ctxt),
             )
             self.assertEqual(
                 '100000.0',
-                Template('{{ f|floatformat:"g" }}').render(self.ctxt),
+                Template('{{ f|floatformat:"ug" }}').render(self.ctxt),
             )
             self.assertEqual('10:15 a.m.', Template('{{ t|time:"TIME_FORMAT" }}').render(self.ctxt))
             self.assertEqual('12/31/2009', Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(self.ctxt))
@@ -628,12 +628,12 @@ class FormattingTests(SimpleTestCase):
             )
 
             # We shouldn't change the behavior of the floatformat filter re:
-            # thousand separator and grouping when USE_L10N is False even
-            # if the USE_THOUSAND_SEPARATOR, NUMBER_GROUPING and
-            # THOUSAND_SEPARATOR settings are specified
+            # thousand separator and grouping when localization is disabled
+            # even if the USE_THOUSAND_SEPARATOR, NUMBER_GROUPING and
+            # THOUSAND_SEPARATOR settings are specified.
             with self.settings(USE_THOUSAND_SEPARATOR=True, NUMBER_GROUPING=1, THOUSAND_SEPARATOR='!'):
-                self.assertEqual('66666.67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
-                self.assertEqual('100000.0', Template('{{ f|floatformat }}').render(self.ctxt))
+                self.assertEqual('66666.67', Template('{{ n|floatformat:"2u" }}').render(self.ctxt))
+                self.assertEqual('100000.0', Template('{{ f|floatformat:"u" }}').render(self.ctxt))
 
     def test_false_like_locale_formats(self):
         """

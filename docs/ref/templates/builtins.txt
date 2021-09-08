@@ -1736,12 +1736,31 @@ example, when the active locale is ``en`` (English):
 ``34232.00`` ``{{ value|floatformat:"-3g" }}`` ``34,232``
 ============ ================================= =============
 
+Output is always localized (independently of the :ttag:`{% localize off %}
+<localize>` tag) unless the argument passed to ``floatformat`` has the ``u``
+suffix, which will force disabling localization. For example, when the active
+locale is ``pl`` (Polish):
+
+============ ================================= =============
+``value``    Template                          Output
+============ ================================= =============
+``34.23234`` ``{{ value|floatformat:"3" }}``   ``34,232``
+``34.23234`` ``{{ value|floatformat:"3u" }}``  ``34.232``
+============ ================================= =============
+
 Using ``floatformat`` with no argument is equivalent to using ``floatformat``
 with an argument of ``-1``.
 
 .. versionchanged:: 3.2
 
     The ``g`` suffix to force grouping by thousand separators was added.
+
+.. versionchanged:: 4.0
+
+    ``floatformat`` template filter no longer depends on the
+    :setting:`USE_L10N` setting and always returns localized output.
+
+    The ``u`` suffix to force disabling localization was added.
 
 .. templatefilter:: force_escape
 

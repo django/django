@@ -126,13 +126,29 @@ def floatformat(text, arg=-1):
     * {{ 6666.6666|floatformat:"2g" }} displays "6,666.67"
     * {{ 10000|floatformat:"g" }} displays "10,000"
 
+    If arg has the 'u' suffix, force the result to be unlocalized. When the
+    active locale is pl (Polish):
+
+    * {{ 66666.6666|floatformat:"2" }} displays "66666,67"
+    * {{ 66666.6666|floatformat:"2u" }} displays "66666.67"
+
     If the input float is infinity or NaN, display the string representation
     of that value.
     """
     force_grouping = False
-    if isinstance(arg, str) and arg.endswith('g'):
-        force_grouping = True
-        arg = arg[:-1] or -1
+    use_l10n = True
+    if isinstance(arg, str):
+        last_char = arg[-1]
+        if arg[-2:] in {'gu', 'ug'}:
+            force_grouping = True
+            use_l10n = False
+            arg = arg[:-2] or -1
+        elif last_char == 'g':
+            force_grouping = True
+            arg = arg[:-1] or -1
+        elif last_char == 'u':
+            use_l10n = False
+            arg = arg[:-1] or -1
     try:
         input_val = repr(text)
         d = Decimal(input_val)
@@ -152,9 +168,12 @@ def floatformat(text, arg=-1):
         return input_val
 
     if not m and p < 0:
-        return mark_safe(
-            formats.number_format('%d' % (int(d)), 0, force_grouping=force_grouping),
-        )
+        return mark_safe(formats.number_format(
+            '%d' % (int(d)),
+            0,
+            use_l10n=use_l10n,
+            force_grouping=force_grouping,
+        ))
 
     exp = Decimal(1).scaleb(-abs(p))
     # Set the precision high enough to avoid an exception (#15789).
@@ -174,9 +193,12 @@ def floatformat(text, arg=-1):
     if sign and rounded_d:
         digits.append('-')
     number = ''.join(reversed(digits))
-    return mark_safe(
-        formats.number_format(number, abs(p), force_grouping=force_grouping),
-    )
+    return mark_safe(formats.number_format(
+        number,
+        abs(p),
+        use_l10n=use_l10n,
+        force_grouping=force_grouping,
+    ))
 
 
 @register.filter(is_safe=True)
