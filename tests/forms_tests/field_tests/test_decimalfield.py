@@ -164,8 +164,11 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertEqual(f.clean('1001,10'), decimal.Decimal("1001.10"))
         self.assertEqual(f.clean('1001.10'), decimal.Decimal("1001.10"))
 
-    @override_settings(DECIMAL_SEPARATOR=',', USE_THOUSAND_SEPARATOR=True,
-                       THOUSAND_SEPARATOR='.')
+    @override_settings(
+        DECIMAL_SEPARATOR=',',
+        USE_THOUSAND_SEPARATOR=True,
+        THOUSAND_SEPARATOR='.',
+    )
     def test_decimalfield_support_thousands_separator(self):
         f = DecimalField(localize=True)
         self.assertEqual(f.clean('1.001,10'), decimal.Decimal("1001.10"))

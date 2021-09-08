@@ -49,7 +49,7 @@ class DateTimeInputTest(WidgetTest):
     def test_locale_aware(self):
         d = datetime(2007, 9, 17, 12, 51, 34, 482548)
         with self.settings(DATETIME_INPUT_FORMATS=[
-            '%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M:%S.%f', '%Y-%m-%d %H:%M'
+            '%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M:%S.%f', '%Y-%m-%d %H:%M',
         ]):
             self.check_html(
                 self.widget, 'date', d,

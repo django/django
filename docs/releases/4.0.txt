@@ -590,8 +590,8 @@ Miscellaneous
   Django 3.2.
 
 * The :tfilter:`floatformat` template filter no longer depends on the
-  :setting:`USE_L10N` setting and always returns localized output. Use the
-  ``u`` suffix to disable localization.
+  ``USE_L10N`` setting and always returns localized output. Use the ``u``
+  suffix to disable localization.
 
 .. _deprecated-features-4.0:
 

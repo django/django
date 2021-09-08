@@ -507,7 +507,7 @@ class FormattingTests(SimpleTestCase):
         """
         self.maxDiff = 3000
         with translation.override('ca', deactivate=True):
-            # Formats
+            # Formats.
             self.assertEqual('N j, Y', get_format('DATE_FORMAT'))
             self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
             self.assertEqual('.', get_format('DECIMAL_SEPARATOR'))
@@ -515,14 +515,14 @@ class FormattingTests(SimpleTestCase):
             self.assertEqual('Des. 31, 2009', date_format(self.d))
             self.assertEqual('desembre 2009', date_format(self.d, 'YEAR_MONTH_FORMAT'))
             self.assertEqual('12/31/2009 8:50 p.m.', date_format(self.dt, 'SHORT_DATETIME_FORMAT'))
-            # Test localize()
+            # localize().
             self.assertEqual('No localizable', localize('No localizable'))
             self.assertEqual('66666.666', localize(self.n))
             self.assertEqual('99999.999', localize(self.f))
             self.assertEqual('10000', localize(self.long))
             self.assertEqual('Des. 31, 2009', localize(self.d))
             self.assertEqual('Des. 31, 2009, 8:50 p.m.', localize(self.dt))
-            # Template rendering
+            # Template rendering.
             self.assertEqual('66666.666', Template('{{ n }}').render(self.ctxt))
             self.assertEqual('99999.999', Template('{{ f }}').render(self.ctxt))
             self.assertEqual('Des. 31, 2009', Template('{{ d }}').render(self.ctxt))
@@ -542,8 +542,7 @@ class FormattingTests(SimpleTestCase):
             self.assertEqual(
                 '12/31/2009 8:50 p.m.', Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(self.ctxt)
             )
-
-            # Forms behavior
+            # Forms behavior.
             form = I18nForm({
                 'decimal_field': '66666,666',
                 'float_field': '99999,999',
@@ -631,6 +630,14 @@ class FormattingTests(SimpleTestCase):
                 '</select>',
                 forms.SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
             )
+
+            # We shouldn't change the behavior of the floatformat filter re:
+            # thousand separator and grouping when localization is disabled
+            # even if the USE_THOUSAND_SEPARATOR, NUMBER_GROUPING and
+            # THOUSAND_SEPARATOR settings are specified.
+            with self.settings(USE_THOUSAND_SEPARATOR=True, NUMBER_GROUPING=1, THOUSAND_SEPARATOR='!'):
+                self.assertEqual('66666.67', Template('{{ n|floatformat:"2u" }}').render(self.ctxt))
+                self.assertEqual('100000.0', Template('{{ f|floatformat:"u" }}').render(self.ctxt))
 
     def test_l10n_enabled(self):
         self.maxDiff = 3000
@@ -1129,7 +1136,7 @@ class FormattingTests(SimpleTestCase):
             self.assertEqual(sanitize_separators('1001.10'), '1001.10')
 
         with self.settings(
-            DECIMAL_SEPARATOR=',', USE_THOUSAND_SEPARATOR=True, THOUSAND_SEPARATOR='.'
+            DECIMAL_SEPARATOR=',', USE_THOUSAND_SEPARATOR=True, THOUSAND_SEPARATOR='.',
         ):
             self.assertEqual(sanitize_separators('1.001,10'), '1001.10')
             self.assertEqual(sanitize_separators('1001,10'), '1001.10')

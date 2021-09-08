@@ -802,10 +802,10 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse('admin-extra-context:jsi18n'))
         self.assertEqual(response.status_code, 200)
 
-    def test_L10N_deactivated(self):
+    def test_jsi18n_format_fallback(self):
         """
-        Check if L10N is deactivated, the JavaScript i18n view doesn't
-        return localized date/time formats. Refs #14824.
+        The JavaScript i18n view doesn't return localized date/time formats
+        when the selected language cannot be found.
         """
         with self.settings(LANGUAGE_CODE='ru'), translation.override('none'):
             response = self.client.get(reverse('admin:jsi18n'))

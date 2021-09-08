@@ -1756,8 +1756,8 @@ with an argument of ``-1``.
 
 .. versionchanged:: 4.0
 
-    ``floatformat`` template filter no longer depends on the
-    :setting:`USE_L10N` setting and always returns localized output.
+    ``floatformat`` template filter no longer depends on the ``USE_L10N``
+    setting and always returns localized output.
 
     The ``u`` suffix to force disabling localization was added.
 
