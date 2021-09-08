@@ -310,7 +310,7 @@ Related fields
 * **fields.W342**: Setting ``unique=True`` on a ``ForeignKey`` has the same
   effect as using a ``OneToOneField``.
 * **fields.W343**: ``limit_choices_to`` has no effect on ``ManyToManyField``
-  with a ``through`` model.
+  with a ``through`` model. *This check appeared before Django 4.0.*
 * **fields.W344**: The field's intermediary table ``<table name>`` clashes with
   the table name of ``<model>``/``<model>.<field name>``.
 * **fields.W345**: ``related_name`` has no effect on ``ManyToManyField`` with a
