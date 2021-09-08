@@ -337,3 +337,19 @@ class Profile(models.Model):
     collection = models.ForeignKey(ProfileCollection, models.SET_NULL, blank=True, null=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+
+
+class VerboseNameProfile(Profile):
+    class Meta:
+        verbose_name = 'Model with verbose name only'
+
+
+class VerboseNamePluralProfile(Profile):
+    class Meta:
+        verbose_name_plural = 'Model with verbose name plural only'
+
+
+class BothVerboseNameProfile(Profile):
+    class Meta:
+        verbose_name = 'Model with both - name'
+        verbose_name_plural = 'Model with both - plural name'
