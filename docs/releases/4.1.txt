@@ -43,6 +43,28 @@ View subclasses may now define async HTTP method handlers::
 
 See :ref:`async-class-based-views` for more details.
 
+Asynchronous ORM interface
+--------------------------
+
+``QuerySet`` now provides an asynchronous interface for all data access
+operations. These are named as-per the existing synchronous operations but with
+an ``a`` prefix, for example ``acreate()``, ``aget()``, and so on.
+
+The new interface allows you to write asynchronous code without needing to wrap
+ORM operations in ``sync_to_async()``::
+
+    async for author in Author.objects.filter(name__startswith="A"):
+        book = await author.books.afirst()
+
+Note that, at this stage, the underlying database operations remain
+synchronous, with contributions ongoing to push asynchronous support down into
+the SQL compiler, and integrate asynchronous database drivers. The new
+asynchronous queryset interface currently encapsulates the necessary
+``sync_to_async()`` operations for you, and will allow your code to take
+advantage of developments in the ORM's asynchronous support as it evolves.
+
+See :ref:`async-queries` for details and limitations.
+
 .. _csrf-cookie-masked-usage:
 
 ``CSRF_COOKIE_MASKED`` setting

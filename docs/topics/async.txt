@@ -61,27 +61,39 @@ In both ASGI and WSGI mode, you can still safely use asynchronous support to
 run code concurrently rather than serially. This is especially handy when
 dealing with external APIs or data stores.
 
-If you want to call a part of Django that is still synchronous, like the ORM,
-you will need to wrap it in a :func:`sync_to_async` call. For example::
+If you want to call a part of Django that is still synchronous, you will need
+to wrap it in a :func:`sync_to_async` call. For example::
 
     from asgiref.sync import sync_to_async
 
-    results = await sync_to_async(Blog.objects.get, thread_sensitive=True)(pk=123)
+    results = await sync_to_async(sync_function, thread_sensitive=True)(pk=123)
 
-You may find it easier to move any ORM code into its own function and call that
-entire function using :func:`sync_to_async`. For example::
-
-    from asgiref.sync import sync_to_async
-
-    def _get_blog(pk):
-        return Blog.objects.select_related('author').get(pk=pk)
-
-    get_blog = sync_to_async(_get_blog, thread_sensitive=True)
-
-If you accidentally try to call a part of Django that is still synchronous-only
+If you accidentally try to call a part of Django that is synchronous-only
 from an async view, you will trigger Django's
 :ref:`asynchronous safety protection <async-safety>` to protect your data from
 corruption.
+
+Queries & the ORM
+-----------------
+
+.. versionadded:: 4.1
+
+With some exceptions, Django can run ORM queries asynchronously as well::
+
+    async for author in Author.objects.filter(name__startswith="A"):
+        book = await author.books.afirst()
+
+Detailed notes can be found in :ref:`async-queries`, but in short:
+
+* All ``QuerySet`` methods that cause a SQL query to occur have an
+  ``a``-prefixed asynchronous variant.
+
+* ``async for`` is supported on all QuerySets (including the output of
+  ``values()`` and ``values_list()``.)
+
+Transactions do not yet work in async mode. If you have a piece of code that
+needs transactions behavior, we recommend you write that piece as a single
+synchronous function and call it using :func:`sync_to_async`.
 
 Performance
 -----------
