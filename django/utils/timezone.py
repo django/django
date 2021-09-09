@@ -3,6 +3,7 @@ Timezone-related classes and functions.
 """
 
 import functools
+import warnings
 
 try:
     import zoneinfo
@@ -15,6 +16,7 @@ from datetime import datetime, timedelta, timezone, tzinfo
 from asgiref.local import Local
 
 from django.conf import settings
+from django.utils.deprecation import RemovedInDjango50Warning
 
 __all__ = [  # noqa: F822 RemovedInDjango50Warning
     'utc', 'get_fixed_timezone',
@@ -24,6 +26,9 @@ __all__ = [  # noqa: F822 RemovedInDjango50Warning
     'localtime', 'now',
     'is_aware', 'is_naive', 'make_aware', 'make_naive',
 ]
+
+# RemovedInDjango50Warning
+IS_DST_PASSED = object()
 
 
 # RemovedInDjango50Warning
@@ -248,8 +253,16 @@ def is_naive(value):
     return value.utcoffset() is None
 
 
-def make_aware(value, timezone=None, is_dst=None):
+def make_aware(value, timezone=None, is_dst=IS_DST_PASSED):
     """Make a naive datetime.datetime in a given time zone aware."""
+    if is_dst is IS_DST_PASSED:
+        is_dst = None
+    else:
+        warnings.warn(
+            'The is_dst argument to make_aware() is deprecated as it has no '
+            'effect with zoneinfo time zones.',
+            RemovedInDjango50Warning
+        )
     if timezone is None:
         timezone = get_current_timezone()
     if _is_pytz_zone(timezone):

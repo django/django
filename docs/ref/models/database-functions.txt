@@ -524,6 +524,10 @@ The ``is_dst`` parameter indicates whether or not ``pytz`` should interpret
 nonexistent and ambiguous datetimes in daylight saving time. By default (when
 ``is_dst=None``), ``pytz`` raises an exception for such datetimes.
 
+.. versionchanged:: 4.0
+
+    The ``is_dst`` parameter is deprecated and will be removed in Django 5.0.
+
 Given the datetime ``2015-06-15 14:30:50.000321+00:00``, the built-in ``kind``\s
 return:
 
@@ -606,6 +610,10 @@ Usage example::
 .. class:: TruncQuarter(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'quarter'
+
+.. versionchanged:: 4.0
+
+    The ``is_dst`` parameter is deprecated and will be removed in Django 5.0.
 
 These are logically equivalent to ``Trunc('date_field', kind)``. They truncate
 all parts of the date up to ``kind`` which allows grouping or filtering dates
@@ -691,6 +699,10 @@ truncate function. It's also registered as a transform on ``DateTimeField`` as
 
     .. attribute:: kind = 'second'
 
+.. versionchanged:: 4.0
+
+    The ``is_dst`` parameter is deprecated and will be removed in Django 5.0.
+
 These are logically equivalent to ``Trunc('datetime_field', kind)``. They
 truncate all parts of the date up to ``kind`` and allow grouping or filtering
 datetimes with less precision. ``expression`` must have an ``output_field`` of
@@ -739,6 +751,10 @@ Usage example::
     :noindex:
 
     .. attribute:: kind = 'second'
+
+.. versionchanged:: 4.0
+
+    The ``is_dst`` parameter is deprecated and will be removed in Django 5.0.
 
 These are logically equivalent to ``Trunc('time_field', kind)``. They truncate
 all parts of the time up to ``kind`` which allows grouping or filtering times

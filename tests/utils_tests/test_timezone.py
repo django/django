@@ -222,6 +222,7 @@ class TimezoneTests(SimpleTestCase):
         )
 
     @needs_pytx
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_make_aware_pytz_ambiguous(self):
         # 2:30 happens twice, once before DST ends and once after
         ambiguous = datetime.datetime(2015, 10, 25, 2, 30)
@@ -250,6 +251,7 @@ class TimezoneTests(SimpleTestCase):
         self.assertEqual(dst.utcoffset(), datetime.timedelta(hours=2))
 
     @needs_pytx
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_make_aware_pytz_non_existent(self):
         # 2:30 never happened due to DST
         non_existent = datetime.datetime(2015, 3, 29, 2, 30)

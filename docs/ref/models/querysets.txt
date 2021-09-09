@@ -834,6 +834,11 @@ object. If it's ``None``, Django uses the :ref:`current time zone
 ambiguous datetimes in daylight saving time. By default (when ``is_dst=None``),
 ``pytz`` raises an exception for such datetimes.
 
+.. versionchanged:: 4.0
+
+    The ``is_dst`` parameter is deprecated and will be removed in Django
+    5.0.
+
 .. _database-time-zone-definitions:
 
 .. note::
