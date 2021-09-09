@@ -916,7 +916,9 @@ class QuerySet:
             'datefield', flat=True
         ).distinct().filter(plain_field__isnull=False).order_by(('-' if order == 'DESC' else '') + 'datefield')
 
-    def datetimes(self, field_name, kind, order='ASC', tzinfo=None, is_dst=None):
+    # RemovedInDjango50Warning: when the deprecation ends, remove is_dst
+    # argument.
+    def datetimes(self, field_name, kind, order='ASC', tzinfo=None, is_dst=timezone.NOT_PASSED):
         """
         Return a list of datetime objects representing all available
         datetimes for the given field_name, scoped to 'kind'.

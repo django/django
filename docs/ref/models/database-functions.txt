@@ -242,7 +242,8 @@ Takes an ``expression`` representing a ``DateField``, ``DateTimeField``,
 of the date referenced by ``lookup_name`` as an ``IntegerField``.
 Django usually uses the databases' extract function, so you may use any
 ``lookup_name`` that your database supports. A ``tzinfo`` subclass, usually
-provided by ``pytz``, can be passed to extract a value in a specific timezone.
+provided by :mod:`zoneinfo`, can be passed to extract a value in a specific
+timezone.
 
 Given the datetime ``2015-06-15 23:30:01.000321+00:00``, the built-in
 ``lookup_name``\s return:
@@ -450,8 +451,8 @@ to that timezone before the value is extracted. The example below converts to
 the Melbourne timezone (UTC +10:00), which changes the day, weekday, and hour
 values that are returned::
 
-    >>> import pytz
-    >>> melb = pytz.timezone('Australia/Melbourne')  # UTC+10:00
+    >>> import zoneinfo
+    >>> melb = zoneinfo.ZoneInfo('Australia/Melbourne')  # UTC+10:00
     >>> with timezone.override(melb):
     ...    Experiment.objects.annotate(
     ...        day=ExtractDay('start_datetime'),
@@ -466,8 +467,8 @@ values that are returned::
 Explicitly passing the timezone to the ``Extract`` function behaves in the same
 way, and takes priority over an active timezone::
 
-    >>> import pytz
-    >>> melb = pytz.timezone('Australia/Melbourne')
+    >>> import zoneinfo
+    >>> melb = zoneinfo.ZoneInfo('Australia/Melbourne')
     >>> Experiment.objects.annotate(
     ...     day=ExtractDay('start_datetime', tzinfo=melb),
     ...     weekday=ExtractWeekDay('start_datetime', tzinfo=melb),
@@ -517,12 +518,16 @@ part, and an ``output_field`` that's either ``DateTimeField()``,
 ``TimeField()``, or ``DateField()``. It returns a datetime, date, or time
 depending on ``output_field``, with fields up to ``kind`` set to their minimum
 value. If ``output_field`` is omitted, it will default to the ``output_field``
-of ``expression``. A ``tzinfo`` subclass, usually provided by ``pytz``, can be
-passed to truncate a value in a specific timezone.
+of ``expression``. A ``tzinfo`` subclass, usually provided by :mod:`zoneinfo`,
+can be passed to truncate a value in a specific timezone.
 
-The ``is_dst`` parameter indicates whether or not ``pytz`` should interpret
-nonexistent and ambiguous datetimes in daylight saving time. By default (when
-``is_dst=None``), ``pytz`` raises an exception for such datetimes.
+.. deprecated:: 4.0
+
+    The ``is_dst`` parameter indicates whether or not ``pytz`` should interpret
+    nonexistent and ambiguous datetimes in daylight saving time. By default
+    (when ``is_dst=None``), ``pytz`` raises an exception for such datetimes.
+
+    The ``is_dst`` parameter is deprecated and will be removed in Django 5.0.
 
 Given the datetime ``2015-06-15 14:30:50.000321+00:00``, the built-in ``kind``\s
 return:
@@ -607,6 +612,10 @@ Usage example::
 
     .. attribute:: kind = 'quarter'
 
+.. deprecated:: 4.0
+
+    The ``is_dst`` parameter is deprecated and will be removed in Django 5.0.
+
 These are logically equivalent to ``Trunc('date_field', kind)``. They truncate
 all parts of the date up to ``kind`` which allows grouping or filtering dates
 with less precision. ``expression`` can have an ``output_field`` of either
@@ -634,8 +643,8 @@ that deal with date-parts can be used with ``DateField``::
     2014-01-01 1
     2015-01-01 2
 
-    >>> import pytz
-    >>> melb = pytz.timezone('Australia/Melbourne')
+    >>> import zoneinfo
+    >>> melb = zoneinfo.ZoneInfo('Australia/Melbourne')
     >>> experiments_per_month = Experiment.objects.annotate(
     ...    month=TruncMonth('start_datetime', tzinfo=melb)).values('month').annotate(
     ...    experiments=Count('id'))
@@ -691,6 +700,10 @@ truncate function. It's also registered as a transform on ``DateTimeField`` as
 
     .. attribute:: kind = 'second'
 
+.. deprecated:: 4.0
+
+    The ``is_dst`` parameter is deprecated and will be removed in Django 5.0.
+
 These are logically equivalent to ``Trunc('datetime_field', kind)``. They
 truncate all parts of the date up to ``kind`` and allow grouping or filtering
 datetimes with less precision. ``expression`` must have an ``output_field`` of
@@ -704,10 +717,10 @@ Usage example::
     ...     TruncDate, TruncDay, TruncHour, TruncMinute, TruncSecond,
     ... )
     >>> from django.utils import timezone
-    >>> import pytz
+    >>> import zoneinfo
     >>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=timezone.utc)
     >>> Experiment.objects.create(start_datetime=start1, start_date=start1.date())
-    >>> melb = pytz.timezone('Australia/Melbourne')
+    >>> melb = zoneinfo.ZoneInfo('Australia/Melbourne')
     >>> Experiment.objects.annotate(
     ...     date=TruncDate('start_datetime'),
     ...     day=TruncDay('start_datetime', tzinfo=melb),
@@ -716,10 +729,10 @@ Usage example::
     ...     second=TruncSecond('start_datetime'),
     ... ).values('date', 'day', 'hour', 'minute', 'second').get()
     {'date': datetime.date(2014, 6, 15),
-     'day': datetime.datetime(2014, 6, 16, 0, 0, tzinfo=<DstTzInfo 'Australia/Melbourne' AEST+10:00:00 STD>),
-     'hour': datetime.datetime(2014, 6, 16, 0, 0, tzinfo=<DstTzInfo 'Australia/Melbourne' AEST+10:00:00 STD>),
-     'minute': 'minute': datetime.datetime(2014, 6, 15, 14, 30, tzinfo=<UTC>),
-     'second': datetime.datetime(2014, 6, 15, 14, 30, 50, tzinfo=<UTC>)
+     'day': datetime.datetime(2014, 6, 16, 0, 0, tzinfo=zoneinfo.ZoneInfo('Australia/Melbourne')),
+     'hour': datetime.datetime(2014, 6, 16, 0, 0, tzinfo=zoneinfo.ZoneInfo('Australia/Melbourne')),
+     'minute': 'minute': datetime.datetime(2014, 6, 15, 14, 30, tzinfo=zoneinfo.ZoneInfo('UTC')),
+     'second': datetime.datetime(2014, 6, 15, 14, 30, 50, tzinfo=zoneinfo.ZoneInfo('UTC'))
     }
 
 ``TimeField`` truncation
@@ -739,6 +752,10 @@ Usage example::
     :noindex:
 
     .. attribute:: kind = 'second'
+
+.. deprecated:: 4.0
+
+    The ``is_dst`` parameter is deprecated and will be removed in Django 5.0.
 
 These are logically equivalent to ``Trunc('time_field', kind)``. They truncate
 all parts of the time up to ``kind`` which allows grouping or filtering times
@@ -767,8 +784,8 @@ that deal with time-parts can be used with ``TimeField``::
     14:00:00 2
     17:00:00 1
 
-    >>> import pytz
-    >>> melb = pytz.timezone('Australia/Melbourne')
+    >>> import zoneinfo
+    >>> melb = zoneinfo.ZoneInfo('Australia/Melbourne')
     >>> experiments_per_hour = Experiment.objects.annotate(
     ...    hour=TruncHour('start_datetime', tzinfo=melb),
     ... ).values('hour').annotate(experiments=Count('id'))

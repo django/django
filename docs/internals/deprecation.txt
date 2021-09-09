@@ -36,6 +36,24 @@ details on these changes.
 
 * The ``USE_L10N`` setting will be removed.
 
+* The ``USE_DEPRECATED_PYTZ`` transitional setting will be removed.
+
+* Support for ``pytz`` timezones will be removed.
+
+* The ``is_dst`` argument will be removed from:
+
+  * ``QuerySet.datetimes()``
+  * ``django.utils.timezone.make_aware()``
+  * ``django.db.models.functions.Trunc()``
+  * ``django.db.models.functions.TruncSecond()``
+  * ``django.db.models.functions.TruncMinute()``
+  * ``django.db.models.functions.TruncHour()``
+  * ``django.db.models.functions.TruncDay()``
+  * ``django.db.models.functions.TruncWeek()``
+  * ``django.db.models.functions.TruncMonth()``
+  * ``django.db.models.functions.TruncQuarter()``
+  * ``django.db.models.functions.TruncYear()``
+
 .. _deprecation-removed-in-4.1:
 
 4.1

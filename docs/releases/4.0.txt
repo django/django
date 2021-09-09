@@ -28,6 +28,46 @@ The Django 3.2.x series is the last to support Python 3.6 and 3.7.
 What's new in Django 4.0
 ========================
 
+``zoneinfo`` default timezone implementation
+--------------------------------------------
+
+The Python standard library's :mod:`zoneinfo` is now the default timezone
+implementation in Django.
+
+This is the next step in the migration from using ``pytz`` to using
+:mod:`zoneinfo`. Django 3.2 allowed the use of non-``pytz`` time zones. Django
+4.0 makes ``zoneinfo`` the default implementation. Support for ``pytz`` is now
+deprecated and will be removed in Django 5.0.
+
+:mod:`zoneinfo` is part of the Python standard library from Python 3.9. The
+``backports.zoneinfo`` package is automatically installed alongside Django if
+you are using Python 3.8.
+
+The move to ``zoneinfo`` should be largely transparent. Selection of the
+current timezone, conversion of datetime instances to the current timezone in
+forms and templates, as well as operations on aware datetimes in UTC are
+unaffected.
+
+However, if you are you are working with non-UTC time zones, and using the
+``pytz`` ``normalize()`` and ``localize()`` APIs, possibly with the
+:setting:`DATABASE-TIME_ZONE` setting, you will need to audit your code, since
+``pytz`` and ``zoneinfo`` are not entirely equivalent.
+
+To give time for such an audit, the transitional :setting:`USE_DEPRECATED_PYTZ`
+setting allows continued use of ``pytz`` during the 4.x release cycle. This
+setting will be removed in Django 5.0.
+
+In addition, a `pytz_deprecation_shim`_ package, created by the ``zoneinfo``
+author, can be used to assist with the migration from ``pytz``. This package
+provides shims to help you safely remove ``pytz``, and has a detailed
+`migration guide`_ showing how to move to the new ``zoneinfo`` APIs.
+
+Using `pytz_deprecation_shim`_ and the :setting:`USE_DEPRECATED_PYTZ`
+transitional setting is recommended if you need a gradual update path.
+
+.. _pytz_deprecation_shim: https://pytz-deprecation-shim.readthedocs.io/en/latest/index.html
+.. _migration guide: https://pytz-deprecation-shim.readthedocs.io/en/latest/migration.html
+
 Functional unique constraints
 -----------------------------
 
@@ -595,10 +635,36 @@ Miscellaneous
 * The default value of the ``USE_L10N`` setting is changed to ``True``. See the
   :ref:`Localization section <use_l10n_deprecation>` above for more details.
 
+* As part of the :ref:`move to zoneinfo <whats-new-4.0>`,
+  :attr:`django.utils.timezone.utc` is changed to alias
+  :attr:`datetime.timezone.utc`.
+
 .. _deprecated-features-4.0:
 
 Features deprecated in 4.0
 ==========================
+
+Use of ``pytz`` time zones
+--------------------------
+
+As part of the :ref:`move to zoneinfo <whats-new-4.0>`, use of ``pytz`` time
+zones is deprecated.
+
+Accordingly, the ``is_dst`` arguments to the following are also deprecated:
+
+* :meth:`django.db.models.query.QuerySet.datetimes()`
+* :func:`django.db.models.functions.Trunc()`
+* :func:`django.db.models.functions.TruncSecond()`
+* :func:`django.db.models.functions.TruncMinute()`
+* :func:`django.db.models.functions.TruncHour()`
+* :func:`django.db.models.functions.TruncDay()`
+* :func:`django.db.models.functions.TruncWeek()`
+* :func:`django.db.models.functions.TruncMonth()`
+* :func:`django.db.models.functions.TruncQuarter()`
+* :func:`django.db.models.functions.TruncYear()`
+* :func:`django.utils.timezone.make_aware()`
+
+Support for use of ``pytz`` will be removed in Django 5.0.
 
 Time zone support
 -----------------

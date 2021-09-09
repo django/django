@@ -5,15 +5,15 @@ import unittest
 from unittest import mock
 from urllib.parse import parse_qsl, urljoin, urlparse
 
-import pytz
-
 try:
     import zoneinfo
 except ImportError:
-    try:
-        from backports import zoneinfo
-    except ImportError:
-        zoneinfo = None
+    from backports import zoneinfo
+
+try:
+    import pytz
+except ImportError:
+    pytz = None
 
 from django.contrib import admin
 from django.contrib.admin import AdminSite, ModelAdmin
@@ -73,10 +73,10 @@ MULTIPART_ENCTYPE = 'enctype="multipart/form-data"'
 
 def make_aware_datetimes(dt, iana_key):
     """Makes one aware datetime for each supported time zone provider."""
-    yield pytz.timezone(iana_key).localize(dt, is_dst=None)
+    yield dt.replace(tzinfo=zoneinfo.ZoneInfo(iana_key))
 
-    if zoneinfo is not None:
-        yield dt.replace(tzinfo=zoneinfo.ZoneInfo(iana_key))
+    if pytz is not None:
+        yield pytz.timezone(iana_key).localize(dt, is_dst=None)
 
 
 class AdminFieldExtractionMixin:

@@ -21,6 +21,13 @@ from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 
+# RemovedInDjango50Warning
+USE_DEPRECATED_PYTZ_DEPRECATED_MSG = (
+    'The USE_DEPRECATED_PYTZ setting, and support for pytz timezones is '
+    'deprecated in favor of the stdlib zoneinfo module. Please update your '
+    'code to use zoneinfo and remove the USE_DEPRECATED_PYTZ setting.'
+)
+
 USE_L10N_DEPRECATED_MSG = (
     'The USE_L10N setting is deprecated. Starting with Django 5.0, localized '
     'formatting of data will always be enabled. For example Django will '
@@ -196,6 +203,9 @@ class Settings:
                 category=RemovedInDjango50Warning,
             )
 
+        if self.is_overridden('USE_DEPRECATED_PYTZ'):
+            warnings.warn(USE_DEPRECATED_PYTZ_DEPRECATED_MSG, RemovedInDjango50Warning)
+
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
             # this file, no check happens and it's harmless.
@@ -245,6 +255,8 @@ class UserSettingsHolder:
         if name == 'USE_L10N':
             warnings.warn(USE_L10N_DEPRECATED_MSG, RemovedInDjango50Warning)
         super().__setattr__(name, value)
+        if name == 'USE_DEPRECATED_PYTZ':
+            warnings.warn(USE_DEPRECATED_PYTZ_DEPRECATED_MSG, RemovedInDjango50Warning)
 
     def __delattr__(self, name):
         self._deleted.add(name)

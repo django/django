@@ -6,7 +6,10 @@ import warnings
 from collections import deque
 from contextlib import contextmanager
 
-import pytz
+try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -21,6 +24,14 @@ from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 
 NO_DB_ALIAS = '__no_db__'
+
+
+# RemovedInDjango50Warning
+def timezone_constructor(tzname):
+    if settings.USE_DEPRECATED_PYTZ:
+        import pytz
+        return pytz.timezone(tzname)
+    return zoneinfo.ZoneInfo(tzname)
 
 
 class BaseDatabaseWrapper:
@@ -135,7 +146,7 @@ class BaseDatabaseWrapper:
         elif self.settings_dict['TIME_ZONE'] is None:
             return timezone.utc
         else:
-            return pytz.timezone(self.settings_dict['TIME_ZONE'])
+            return timezone_constructor(self.settings_dict['TIME_ZONE'])
 
     @cached_property
     def timezone_name(self):

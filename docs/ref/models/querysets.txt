@@ -834,6 +834,10 @@ object. If it's ``None``, Django uses the :ref:`current time zone
 ambiguous datetimes in daylight saving time. By default (when ``is_dst=None``),
 ``pytz`` raises an exception for such datetimes.
 
+.. deprecated:: 4.0
+
+    The ``is_dst`` parameter is deprecated and will be removed in Django 5.0.
+
 .. _database-time-zone-definitions:
 
 .. note::
@@ -842,13 +846,11 @@ ambiguous datetimes in daylight saving time. By default (when ``is_dst=None``),
     As a consequence, your database must be able to interpret the value of
     ``tzinfo.tzname(None)``. This translates into the following requirements:
 
-    - SQLite: no requirements. Conversions are performed in Python with pytz_
-      (installed when you install Django).
+    - SQLite: no requirements. Conversions are performed in Python.
     - PostgreSQL: no requirements (see `Time Zones`_).
     - Oracle: no requirements (see `Choosing a Time Zone File`_).
     - MySQL: load the time zone tables with `mysql_tzinfo_to_sql`_.
 
-    .. _pytz: http://pytz.sourceforge.net/
     .. _Time Zones: https://www.postgresql.org/docs/current/datatype-datetime.html#DATATYPE-TIMEZONES
     .. _Choosing a Time Zone File: https://docs.oracle.com/en/database/oracle/
        oracle-database/18/nlspg/datetime-data-types-and-time-zone-support.html

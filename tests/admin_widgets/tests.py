@@ -4,7 +4,10 @@ import re
 from datetime import datetime, timedelta
 from importlib import import_module
 
-import pytz
+try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo
 
 from django import forms
 from django.conf import settings
@@ -967,8 +970,8 @@ class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
         error_margin = timedelta(seconds=10)
 
         # If we are neighbouring a DST, we add an hour of error margin.
-        tz = pytz.timezone('America/Chicago')
-        utc_now = datetime.now(pytz.utc)
+        tz = zoneinfo.ZoneInfo('America/Chicago')
+        utc_now = datetime.now(zoneinfo.ZoneInfo('UTC'))
         tz_yesterday = (utc_now - timedelta(days=1)).astimezone(tz).tzname()
         tz_tomorrow = (utc_now + timedelta(days=1)).astimezone(tz).tzname()
         if tz_yesterday != tz_tomorrow:

@@ -1,5 +1,6 @@
 import datetime
 
+from django.conf import settings
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     display_for_field, display_for_value, get_fields_from_path,
@@ -328,7 +329,7 @@ def date_hierarchy(cl):
         field = get_fields_from_path(cl.model, field_name)[-1]
         if isinstance(field, models.DateTimeField):
             dates_or_datetimes = 'datetimes'
-            qs_kwargs = {'is_dst': True}
+            qs_kwargs = {'is_dst': True} if settings.USE_DEPRECATED_PYTZ else {}
         else:
             dates_or_datetimes = 'dates'
             qs_kwargs = {}

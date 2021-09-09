@@ -10,6 +10,16 @@ import sys
 import uuid
 from unittest import mock
 
+try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo
+
+try:
+    import pytz
+except ImportError:
+    pytz = None
+
 import custom_migration_operations.more_operations
 import custom_migration_operations.operations
 
@@ -502,6 +512,22 @@ class WriterTests(SimpleTestCase):
                         {'import datetime', 'from django.utils.timezone import utc'},
                     )
                 )
+
+        self.assertSerializedResultEqual(
+            datetime.datetime(2012, 1, 1, 2, 1, tzinfo=zoneinfo.ZoneInfo('Europe/Paris')),
+            (
+                "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc)",
+                {'import datetime', 'from django.utils.timezone import utc'},
+            )
+        )
+        if pytz:
+            self.assertSerializedResultEqual(
+                pytz.timezone('Europe/Paris').localize(datetime.datetime(2012, 1, 1, 2, 1)),
+                (
+                    "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc)",
+                    {'import datetime', 'from django.utils.timezone import utc'},
+                )
+            )
 
     def test_serialize_fields(self):
         self.assertSerializedFieldEqual(models.CharField(max_length=255))

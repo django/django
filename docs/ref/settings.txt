@@ -677,8 +677,8 @@ When :setting:`USE_TZ` is ``False``, it is an error to set this option.
     otherwise, you should leave this option unset. It's best to store datetimes
     in UTC because it avoids ambiguous or nonexistent datetimes during daylight
     saving time changes. Also, receiving datetimes in UTC keeps datetime
-    arithmetic simple — there's no need for the ``normalize()`` method provided
-    by pytz.
+    arithmetic simple — there's no need to consider potential offset changes
+    over a DST transition.
 
   * If you're connecting to a third-party database that stores datetimes in a
     local time rather than UTC, then you must set this option to the
@@ -695,8 +695,8 @@ When :setting:`USE_TZ` is ``False``, it is an error to set this option.
   as ``date_trunc``, because their results depend on the time zone.
 
   However, this has a downside: receiving all datetimes in local time makes
-  datetime arithmetic more tricky — you must call the ``normalize()`` method
-  provided by pytz after each operation.
+  datetime arithmetic more tricky — you must account for possible offset
+  changes over DST transitions.
 
   Consider converting to local time explicitly with ``AT TIME ZONE`` in raw SQL
   queries instead of setting the ``TIME_ZONE`` option.
@@ -2757,6 +2757,23 @@ the correct environment.
     match the system time zone.
 
 .. _list of time zones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+
+.. setting:: USE_DEPRECATED_PYTZ
+
+``USE_DEPRECATED_PYTZ``
+-----------------------
+
+.. versionadded:: 4.0
+
+Default: ``False``
+
+A boolean that specifies whether to use ``pytz``, rather than :mod:`zoneinfo`,
+as the default time zone implementation.
+
+.. deprecated:: 4.0
+
+    This transitional setting is deprecated. Support for using ``pytz`` will be
+    removed in Django 5.0.
 
 .. setting:: USE_I18N
 

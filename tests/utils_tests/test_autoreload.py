@@ -14,7 +14,10 @@ from pathlib import Path
 from subprocess import CompletedProcess
 from unittest import mock, skip, skipIf
 
-import pytz
+try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo
 
 import django.__main__
 from django.apps.registry import Apps
@@ -247,7 +250,7 @@ class TestChildArguments(SimpleTestCase):
 class TestUtilities(SimpleTestCase):
     def test_is_django_module(self):
         for module, expected in (
-            (pytz, False),
+            (zoneinfo, False),
             (sys, False),
             (autoreload, True)
         ):
@@ -256,7 +259,7 @@ class TestUtilities(SimpleTestCase):
 
     def test_is_django_path(self):
         for module, expected in (
-            (pytz.__file__, False),
+            (zoneinfo.__file__, False),
             (contextlib.__file__, False),
             (autoreload.__file__, True)
         ):

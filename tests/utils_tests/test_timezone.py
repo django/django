@@ -2,40 +2,57 @@ import datetime
 import unittest
 from unittest import mock
 
-import pytz
+try:
+    import pytz
+except ImportError:
+    pytz = None
 
 try:
     import zoneinfo
 except ImportError:
-    try:
-        from backports import zoneinfo
-    except ImportError:
-        zoneinfo = None
+    from backports import zoneinfo
 
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase, ignore_warnings, override_settings
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango50Warning
 
-CET = pytz.timezone("Europe/Paris")
+PARIS_ZI = zoneinfo.ZoneInfo('Europe/Paris')
 EAT = timezone.get_fixed_timezone(180)      # Africa/Nairobi
 ICT = timezone.get_fixed_timezone(420)      # Asia/Bangkok
 UTC = datetime.timezone.utc
 
-HAS_ZONEINFO = zoneinfo is not None
+HAS_PYTZ = pytz is not None
+if not HAS_PYTZ:
+    CET = None
+    PARIS_IMPLS = (PARIS_ZI,)
 
-if not HAS_ZONEINFO:
-    PARIS_ZI = None
-    PARIS_IMPLS = (CET,)
-
-    needs_zoneinfo = unittest.skip("Test requires zoneinfo")
+    needs_pytz = unittest.skip('Test requires pytz')
 else:
-    PARIS_ZI = zoneinfo.ZoneInfo('Europe/Paris')
-    PARIS_IMPLS = (CET, PARIS_ZI)
+    CET = pytz.timezone('Europe/Paris')
+    PARIS_IMPLS = (PARIS_ZI, CET)
 
-    def needs_zoneinfo(f):
+    def needs_pytz(f):
         return f
 
 
 class TimezoneTests(SimpleTestCase):
+
+    def setUp(self):
+        # RemovedInDjango50Warning
+        timezone.get_default_timezone.cache_clear()
+
+    def tearDown(self):
+        # RemovedInDjango50Warning
+        timezone.get_default_timezone.cache_clear()
+
+    def test_default_timezone_is_zoneinfo(self):
+        self.assertIsInstance(timezone.get_default_timezone(), zoneinfo.ZoneInfo)
+
+    @needs_pytz
+    @ignore_warnings(category=RemovedInDjango50Warning)
+    @override_settings(USE_DEPRECATED_PYTZ=True)
+    def test_setting_allows_fallback_to_pytz(self):
+        self.assertIsInstance(timezone.get_default_timezone(), pytz.BaseTzInfo)
 
     def test_now(self):
         with override_settings(USE_TZ=True):
@@ -173,13 +190,14 @@ class TimezoneTests(SimpleTestCase):
                     timezone.make_aware(datetime.datetime(2011, 9, 1, 12, 20, 30), tz),
                     datetime.datetime(2011, 9, 1, 12, 20, 30, tzinfo=CEST))
 
-        with self.assertRaises(ValueError):
-            timezone.make_aware(CET.localize(datetime.datetime(2011, 9, 1, 12, 20, 30)), CET)
-
-        if HAS_ZONEINFO:
+        if HAS_PYTZ:
             with self.assertRaises(ValueError):
-                timezone.make_aware(datetime.datetime(2011, 9, 1, 12, 20, 30, tzinfo=PARIS_ZI), PARIS_ZI)
+                timezone.make_aware(CET.localize(datetime.datetime(2011, 9, 1, 12, 20, 30)), CET)
 
+        with self.assertRaises(ValueError):
+            timezone.make_aware(datetime.datetime(2011, 9, 1, 12, 20, 30, tzinfo=PARIS_ZI), PARIS_ZI)
+
+    @needs_pytz
     def test_make_naive_pytz(self):
         self.assertEqual(
             timezone.make_naive(CET.localize(datetime.datetime(2011, 9, 1, 12, 20, 30)), CET),
@@ -192,7 +210,6 @@ class TimezoneTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, 'make_naive() cannot be applied to a naive datetime'):
             timezone.make_naive(datetime.datetime(2011, 9, 1, 12, 20, 30), CET)
 
-    @needs_zoneinfo
     def test_make_naive_zoneinfo(self):
         self.assertEqual(
             timezone.make_naive(datetime.datetime(2011, 9, 1, 12, 20, 30, tzinfo=PARIS_ZI), PARIS_ZI),
@@ -204,6 +221,8 @@ class TimezoneTests(SimpleTestCase):
             datetime.datetime(2011, 9, 1, 12, 20, 30, fold=1)
         )
 
+    @needs_pytz
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_make_aware_pytz_ambiguous(self):
         # 2:30 happens twice, once before DST ends and once after
         ambiguous = datetime.datetime(2015, 10, 25, 2, 30)
@@ -217,7 +236,6 @@ class TimezoneTests(SimpleTestCase):
         self.assertEqual(std.tzinfo.utcoffset(std), datetime.timedelta(hours=1))
         self.assertEqual(dst.tzinfo.utcoffset(dst), datetime.timedelta(hours=2))
 
-    @needs_zoneinfo
     def test_make_aware_zoneinfo_ambiguous(self):
         # 2:30 happens twice, once before DST ends and once after
         ambiguous = datetime.datetime(2015, 10, 25, 2, 30)
@@ -232,6 +250,8 @@ class TimezoneTests(SimpleTestCase):
         self.assertEqual(std.utcoffset(), datetime.timedelta(hours=1))
         self.assertEqual(dst.utcoffset(), datetime.timedelta(hours=2))
 
+    @needs_pytz
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_make_aware_pytz_non_existent(self):
         # 2:30 never happened due to DST
         non_existent = datetime.datetime(2015, 3, 29, 2, 30)
@@ -245,7 +265,6 @@ class TimezoneTests(SimpleTestCase):
         self.assertEqual(std.tzinfo.utcoffset(std), datetime.timedelta(hours=1))
         self.assertEqual(dst.tzinfo.utcoffset(dst), datetime.timedelta(hours=2))
 
-    @needs_zoneinfo
     def test_make_aware_zoneinfo_non_existent(self):
         # 2:30 never happened due to DST
         non_existent = datetime.datetime(2015, 3, 29, 2, 30)
@@ -260,6 +279,15 @@ class TimezoneTests(SimpleTestCase):
         self.assertEqual(std.utcoffset(), datetime.timedelta(hours=1))
         self.assertEqual(dst.utcoffset(), datetime.timedelta(hours=2))
 
+    def test_make_aware_is_dst_deprecation_warning(self):
+        msg = (
+            'The is_dst argument to make_aware(), used by the Trunc() '
+            'database functions and QuerySet.datetimes(), is deprecated as it '
+            'has no effect with zoneinfo time zones.'
+        )
+        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
+            timezone.make_aware(datetime.datetime(2011, 9, 1, 13, 20, 30), EAT, is_dst=True)
+
     def test_get_timezone_name(self):
         """
         The _get_timezone_name() helper must return the offset for fixed offset
@@ -271,15 +299,15 @@ class TimezoneTests(SimpleTestCase):
             # datetime.timezone, fixed offset with and without `name`.
             (datetime.timezone(datetime.timedelta(hours=10)), 'UTC+10:00'),
             (datetime.timezone(datetime.timedelta(hours=10), name='Etc/GMT-10'), 'Etc/GMT-10'),
-            # pytz, named and fixed offset.
-            (pytz.timezone('Europe/Madrid'), 'Europe/Madrid'),
-            (pytz.timezone('Etc/GMT-10'), '+10'),
+            # zoneinfo, named and fixed offset.
+            (zoneinfo.ZoneInfo('Europe/Madrid'), 'Europe/Madrid'),
+            (zoneinfo.ZoneInfo('Etc/GMT-10'), '+10'),
         ]
-        if HAS_ZONEINFO:
+        if HAS_PYTZ:
             tests += [
-                # zoneinfo, named and fixed offset.
-                (zoneinfo.ZoneInfo('Europe/Madrid'), 'Europe/Madrid'),
-                (zoneinfo.ZoneInfo('Etc/GMT-10'), '+10'),
+                # pytz, named and fixed offset.
+                (pytz.timezone('Europe/Madrid'), 'Europe/Madrid'),
+                (pytz.timezone('Etc/GMT-10'), '+10'),
             ]
         for tz, expected in tests:
             with self.subTest(tz=tz, expected=expected):
@@ -287,10 +315,6 @@ class TimezoneTests(SimpleTestCase):
 
     def test_get_default_timezone(self):
         self.assertEqual(timezone.get_default_timezone_name(), 'America/Chicago')
-
-    def test_get_default_timezone_utc(self):
-        with override_settings(USE_TZ=True, TIME_ZONE='UTC'):
-            self.assertIs(timezone.get_default_timezone(), timezone.utc)
 
     def test_fixedoffset_timedelta(self):
         delta = datetime.timedelta(hours=1)

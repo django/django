@@ -14,12 +14,12 @@ import warnings
 from itertools import chain
 from sqlite3 import dbapi2 as Database
 
-import pytz
-
 from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
 from django.db.backends import utils as backend_utils
-from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.backends.base.base import (
+    BaseDatabaseWrapper, timezone_constructor,
+)
 from django.utils import timezone
 from django.utils.asyncio import async_unsafe
 from django.utils.dateparse import parse_datetime, parse_time
@@ -431,7 +431,7 @@ def _sqlite_datetime_parse(dt, tzname=None, conn_tzname=None):
     except (TypeError, ValueError):
         return None
     if conn_tzname:
-        dt = dt.replace(tzinfo=pytz.timezone(conn_tzname))
+        dt = dt.replace(tzinfo=timezone_constructor(conn_tzname))
     if tzname is not None and tzname != conn_tzname:
         sign_index = tzname.find('+') + tzname.find('-') + 1
         if sign_index > -1:
@@ -441,7 +441,7 @@ def _sqlite_datetime_parse(dt, tzname=None, conn_tzname=None):
                 hours, minutes = offset.split(':')
                 offset_delta = datetime.timedelta(hours=int(hours), minutes=int(minutes))
                 dt += offset_delta if sign == '+' else -offset_delta
-        dt = timezone.localtime(dt, pytz.timezone(tzname))
+        dt = timezone.localtime(dt, timezone_constructor(tzname))
     return dt
 
 
