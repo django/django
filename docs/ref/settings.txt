@@ -2774,7 +2774,7 @@ See also :setting:`LANGUAGE_CODE`, :setting:`USE_L10N` and :setting:`USE_TZ`.
 ``USE_L10N``
 ------------
 
-Default: ``False``
+Default: ``True``
 
 A boolean that specifies if localized formatting of data will be enabled by
 default or not. If this is set to ``True``, e.g. Django will display numbers and
@@ -2782,10 +2782,15 @@ dates using the format of the current locale.
 
 See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
 
-.. note::
+.. versionchanged:: 4.0
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin
-    startproject <startproject>` includes ``USE_L10N = True`` for convenience.
+    In older versions, the default value is ``False``.
+
+.. deprecated:: 4.0
+
+    This setting is deprecated. Starting with Django 5.0, localized formatting
+    of data will always be enabled. For example Django will display numbers and
+    dates using the format of the current locale.
 
 .. setting:: USE_THOUSAND_SEPARATOR
 

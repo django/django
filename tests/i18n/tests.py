@@ -19,9 +19,11 @@ from django.conf.locale import LANG_INFO
 from django.conf.urls.i18n import i18n_patterns
 from django.template import Context, Template
 from django.test import (
-    RequestFactory, SimpleTestCase, TestCase, override_settings,
+    RequestFactory, SimpleTestCase, TestCase, ignore_warnings,
+    override_settings,
 )
 from django.utils import translation
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.formats import (
     date_format, get_format, iter_format_modules, localize, localize_input,
     reset_format_cache, sanitize_separators, sanitize_strftime_format,
@@ -422,7 +424,6 @@ class TranslationThreadSafetyTests(SimpleTestCase):
         self.assertLess(translation_count, len(trans_real._translations))
 
 
-@override_settings(USE_L10N=True)
 class FormattingTests(SimpleTestCase):
 
     def setUp(self):
@@ -498,6 +499,7 @@ class FormattingTests(SimpleTestCase):
             self.assertEqual('31.12.2009 в 20:50', Template('{{ dt|date:"d.m.Y в H:i" }}').render(self.ctxt))
             self.assertEqual('⌚ 10:15', Template('{{ t|time:"⌚ H:i" }}').render(self.ctxt))
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     @override_settings(USE_L10N=False)
     def test_l10n_disabled(self):
         """
@@ -1135,8 +1137,9 @@ class FormattingTests(SimpleTestCase):
                 self.assertEqual(sanitize_separators('77\xa0777,777'), '77777.777')
                 self.assertEqual(sanitize_separators('12 345'), '12345')
                 self.assertEqual(sanitize_separators('77 777,777'), '77777.777')
-            with self.settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=False):
-                self.assertEqual(sanitize_separators('12\xa0345'), '12\xa0345')
+            with translation.override(None):  # RemovedInDjango50Warning
+                with self.settings(USE_THOUSAND_SEPARATOR=True, THOUSAND_SEPARATOR='.'):
+                    self.assertEqual(sanitize_separators('12\xa0345'), '12\xa0345')
 
         with self.settings(USE_THOUSAND_SEPARATOR=True):
             with patch_formats(get_language(), THOUSAND_SEPARATOR='.', DECIMAL_SEPARATOR=','):
@@ -1144,18 +1147,25 @@ class FormattingTests(SimpleTestCase):
                 # Suspicion that user entered dot as decimal separator (#22171)
                 self.assertEqual(sanitize_separators('10.10'), '10.10')
 
-        with self.settings(USE_L10N=False, DECIMAL_SEPARATOR=','):
-            self.assertEqual(sanitize_separators('1001,10'), '1001.10')
-            self.assertEqual(sanitize_separators('1001.10'), '1001.10')
-
-        with self.settings(
-            USE_L10N=False, DECIMAL_SEPARATOR=',', USE_THOUSAND_SEPARATOR=True,
-            THOUSAND_SEPARATOR='.'
-        ):
-            self.assertEqual(sanitize_separators('1.001,10'), '1001.10')
-            self.assertEqual(sanitize_separators('1001,10'), '1001.10')
-            self.assertEqual(sanitize_separators('1001.10'), '1001.10')
-            self.assertEqual(sanitize_separators('1,001.10'), '1.001.10')  # Invalid output
+        # RemovedInDjango50Warning: When the deprecation ends, remove
+        # @ignore_warnings and USE_L10N=False. The assertions should remain
+        # because format-related settings will take precedence over
+        # locale-dictated formats.
+        with ignore_warnings(category=RemovedInDjango50Warning):
+            with self.settings(USE_L10N=False):
+                with self.settings(DECIMAL_SEPARATOR=','):
+                    self.assertEqual(sanitize_separators('1001,10'), '1001.10')
+                    self.assertEqual(sanitize_separators('1001.10'), '1001.10')
+                with self.settings(
+                    DECIMAL_SEPARATOR=',',
+                    THOUSAND_SEPARATOR='.',
+                    USE_THOUSAND_SEPARATOR=True,
+                ):
+                    self.assertEqual(sanitize_separators('1.001,10'), '1001.10')
+                    self.assertEqual(sanitize_separators('1001,10'), '1001.10')
+                    self.assertEqual(sanitize_separators('1001.10'), '1001.10')
+                    # Invalid output.
+                    self.assertEqual(sanitize_separators('1,001.10'), '1.001.10')
 
     def test_iter_format_modules(self):
         """
@@ -1225,10 +1235,21 @@ class FormattingTests(SimpleTestCase):
         output3 = '; '.join([expected_localized, expected_unlocalized])
         output4 = '; '.join([expected_unlocalized, expected_localized])
         with translation.override('de', deactivate=True):
-            with self.settings(USE_L10N=False, USE_THOUSAND_SEPARATOR=True):
-                self.assertEqual(template1.render(context), output1)
-                self.assertEqual(template4.render(context), output4)
-            with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True):
+            # RemovedInDjango50Warning: When the deprecation ends, remove
+            # @ignore_warnings and USE_L10N=False. The assertions should remain
+            # because format-related settings will take precedence over
+            # locale-dictated formats.
+            with ignore_warnings(category=RemovedInDjango50Warning):
+                with self.settings(
+                    USE_L10N=False,
+                    DATE_FORMAT='N j, Y',
+                    DECIMAL_SEPARATOR='.',
+                    NUMBER_GROUPING=0,
+                    USE_THOUSAND_SEPARATOR=True,
+                ):
+                    self.assertEqual(template1.render(context), output1)
+                    self.assertEqual(template4.render(context), output4)
+            with self.settings(USE_THOUSAND_SEPARATOR=True):
                 self.assertEqual(template1.render(context), output1)
                 self.assertEqual(template2.render(context), output2)
                 self.assertEqual(template3.render(context), output3)
@@ -1242,9 +1263,17 @@ class FormattingTests(SimpleTestCase):
         context = Context(
             {'int': 1455, 'float': 3.14, 'decimal': decimal.Decimal('24.1567')}
         )
-        for use_l10n in [True, False]:
-            with self.subTest(use_l10n=use_l10n), self.settings(
-                USE_L10N=use_l10n,
+        with self.settings(
+            DECIMAL_SEPARATOR=',',
+            USE_THOUSAND_SEPARATOR=True,
+            THOUSAND_SEPARATOR='°',
+            NUMBER_GROUPING=2,
+        ):
+            self.assertEqual(template.render(context), '1455/3.14/24.1567')
+        # RemovedInDjango50Warning.
+        with ignore_warnings(category=RemovedInDjango50Warning):
+            with self.settings(
+                USE_L10N=False,
                 DECIMAL_SEPARATOR=',',
                 USE_THOUSAND_SEPARATOR=True,
                 THOUSAND_SEPARATOR='°',

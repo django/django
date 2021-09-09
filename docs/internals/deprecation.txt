@@ -34,6 +34,8 @@ details on these changes.
   ``StringAgg`` aggregates will return ``None`` when there are no rows instead
   of ``[]``, ``[]``, and ``''`` respectively.
 
+* The ``USE_L10N`` setting will be removed.
+
 .. _deprecation-removed-in-4.1:
 
 4.1

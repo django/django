@@ -176,7 +176,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         response = self.client.get('/lastmod-sitemaps/descending.xml')
         self.assertEqual(response.headers['Last-Modified'], 'Sat, 20 Apr 2013 05:00:00 GMT')
 
-    @override_settings(USE_I18N=True, USE_L10N=True)
+    @override_settings(USE_I18N=True)
     def test_localized_priority(self):
         """The priority value should not be localized."""
         with translation.override('fr'):

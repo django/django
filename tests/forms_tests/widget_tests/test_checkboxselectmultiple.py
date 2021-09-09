@@ -133,7 +133,7 @@ class CheckboxSelectMultipleTest(WidgetTest):
         """
         self.check_html(widget, 'letters', ['a', 'c'], html=html)
 
-    @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
+    @override_settings(USE_THOUSAND_SEPARATOR=True)
     def test_doesnt_localize_input_value(self):
         choices = [
             (1, 'One'),

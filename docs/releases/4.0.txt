@@ -579,8 +579,11 @@ Miscellaneous
   Django 3.2.
 
 * The :tfilter:`floatformat` template filter no longer depends on the
-  :setting:`USE_L10N` setting and always returns localized output. Use the
-  ``u`` suffix to disable localization.
+  ``USE_L10N`` setting and always returns localized output. Use the ``u``
+  suffix to disable localization.
+
+* The default value of the ``USE_L10N`` setting is changed to ``True``. See the
+  :ref:`Localization section <use_l10n_deprecation>` above for more details.
 
 .. _deprecated-features-4.0:
 
@@ -600,6 +603,20 @@ Note that the default :file:`settings.py` file created by
 
 You can set ``USE_TZ`` to ``False`` in your project settings before then to
 opt-out.
+
+.. _use_l10n_deprecation:
+
+Localization
+------------
+
+In order to follow good practice, the default value of the ``USE_L10N`` setting
+is changed from ``False`` to ``True``.
+
+Moreover ``USE_L10N`` is deprecated as of this release. Starting with Django
+5.0, by default, any date or number displayed by Django will be localized.
+
+The :ttag:`{% localize %} <localize>` tag and the :tfilter:`localize`/
+:tfilter:`unlocalize` filters will still be honored by Django.
 
 Miscellaneous
 -------------

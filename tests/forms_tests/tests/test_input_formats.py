@@ -3,10 +3,10 @@ from datetime import date, datetime, time
 from django import forms
 from django.core.exceptions import ValidationError
 from django.test import SimpleTestCase, override_settings
+from django.utils import translation
 from django.utils.translation import activate, deactivate
 
 
-@override_settings(TIME_INPUT_FORMATS=["%I:%M:%S %p", "%I:%M %p"], USE_L10N=True)
 class LocalizedTimeTests(SimpleTestCase):
     def setUp(self):
         # nl/formats.py has customized TIME_INPUT_FORMATS:
@@ -117,6 +117,7 @@ class LocalizedTimeTests(SimpleTestCase):
         self.assertEqual(text, "13:30:00")
 
 
+@translation.override(None)  # RemovedInDjango50Warning.
 @override_settings(TIME_INPUT_FORMATS=["%I:%M:%S %p", "%I:%M %p"])
 class CustomTimeInputFormatsTests(SimpleTestCase):
     def test_timeField(self):
@@ -310,7 +311,6 @@ class SimpleTimeFormatTests(SimpleTestCase):
         self.assertEqual(text, "13:30:00")
 
 
-@override_settings(DATE_INPUT_FORMATS=["%d/%m/%Y", "%d-%m-%Y"], USE_L10N=True)
 class LocalizedDateTests(SimpleTestCase):
     def setUp(self):
         activate('de')
@@ -422,6 +422,7 @@ class LocalizedDateTests(SimpleTestCase):
         self.assertEqual(text, "21.12.2010")
 
 
+@translation.override(None)  # RemovedInDjango50Warning.
 @override_settings(DATE_INPUT_FORMATS=["%d.%m.%Y", "%d-%m-%Y"])
 class CustomDateInputFormatsTests(SimpleTestCase):
     def test_dateField(self):
@@ -615,7 +616,6 @@ class SimpleDateFormatTests(SimpleTestCase):
         self.assertEqual(text, "2010-12-21")
 
 
-@override_settings(DATETIME_INPUT_FORMATS=["%I:%M:%S %p %d/%m/%Y", "%I:%M %p %d-%m-%Y"], USE_L10N=True)
 class LocalizedDateTimeTests(SimpleTestCase):
     def setUp(self):
         activate('de')
@@ -731,6 +731,7 @@ class LocalizedDateTimeTests(SimpleTestCase):
         self.assertEqual(text, "21.12.2010 13:30:00")
 
 
+@translation.override(None)  # RemovedInDjango50Warning.
 @override_settings(DATETIME_INPUT_FORMATS=["%I:%M:%S %p %d/%m/%Y", "%I:%M %p %d-%m-%Y"])
 class CustomDateTimeInputFormatsTests(SimpleTestCase):
     def test_dateTimeField(self):

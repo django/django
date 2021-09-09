@@ -338,7 +338,7 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
     def test_localization(self):
         w = widgets.AdminSplitDateTime()
 
-        with self.settings(USE_L10N=True), translation.override('de-at'):
+        with translation.override('de-at'):
             w.is_localized = True
             self.assertHTMLEqual(
                 w.render('test', datetime(2007, 12, 1, 9, 30)),
@@ -939,7 +939,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
             expected_caption = '{:s} {:d}'.format(may_translation.upper(), 1984)
 
             # Test with every locale
-            with override_settings(LANGUAGE_CODE=language_code, USE_L10N=True):
+            with override_settings(LANGUAGE_CODE=language_code):
 
                 # Open a page that has a date picker widget
                 url = reverse('admin:admin_widgets_member_change', args=(member.pk,))

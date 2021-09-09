@@ -9,15 +9,23 @@ for a list of all possible variables.
 import importlib
 import os
 import time
+import traceback
 import warnings
 from pathlib import Path
 
+import django
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
+
+USE_L10N_DEPRECATED_MSG = (
+    'The USE_L10N setting is deprecated. Starting with Django 5.0, localized '
+    'formatting of data will always be enabled. For example Django will '
+    'display numbers and dates using the format of the current locale.'
+)
 
 
 class SettingsReference(str):
@@ -129,6 +137,27 @@ class LazySettings(LazyObject):
         """Return True if the settings have already been configured."""
         return self._wrapped is not empty
 
+    @property
+    def USE_L10N(self):
+        stack = traceback.extract_stack()
+        # Show a warning if the setting is used outside of Django.
+        # Stack index: -1 this line, -2 the caller.
+        filename, _, _, _ = stack[-2]
+        if not filename.startswith(os.path.dirname(django.__file__)):
+            warnings.warn(
+                USE_L10N_DEPRECATED_MSG,
+                RemovedInDjango50Warning,
+                stacklevel=2,
+            )
+        return self.__getattr__('USE_L10N')
+
+    # RemovedInDjango50Warning.
+    @property
+    def _USE_L10N_INTERNAL(self):
+        # Special hook to avoid checking a traceback in internal use on hot
+        # paths.
+        return self.__getattr__('USE_L10N')
+
 
 class Settings:
     def __init__(self, settings_module):
@@ -179,6 +208,9 @@ class Settings:
             os.environ['TZ'] = self.TIME_ZONE
             time.tzset()
 
+        if self.is_overridden('USE_L10N'):
+            warnings.warn(USE_L10N_DEPRECATED_MSG, RemovedInDjango50Warning)
+
     def is_overridden(self, setting):
         return setting in self._explicit_settings
 
@@ -210,6 +242,8 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
+        if name == 'USE_L10N':
+            warnings.warn(USE_L10N_DEPRECATED_MSG, RemovedInDjango50Warning)
         super().__setattr__(name, value)
 
     def __delattr__(self, name):

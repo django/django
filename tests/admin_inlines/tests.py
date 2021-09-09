@@ -382,7 +382,7 @@ class TestInline(TestDataMixin, TestCase):
             html=True
         )
 
-    @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
+    @override_settings(USE_THOUSAND_SEPARATOR=True)
     def test_localize_pk_shortcut(self):
         """
         The "View on Site" link is correct for locales that use thousand

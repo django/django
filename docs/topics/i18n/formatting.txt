@@ -18,18 +18,16 @@ necessary to set :setting:`USE_L10N = True <USE_L10N>` in your settings file.
 
 .. note::
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin
-    startproject <startproject>` includes :setting:`USE_L10N = True <USE_L10N>`
-    for convenience.  Note, however, that to enable number formatting with
-    thousand separators it is necessary to set :setting:`USE_THOUSAND_SEPARATOR
-    = True <USE_THOUSAND_SEPARATOR>` in your settings file. Alternatively, you
-    could use :tfilter:`intcomma` to format numbers in your template.
+    To enable number formatting with thousand separators, it is necessary to
+    set :setting:`USE_THOUSAND_SEPARATOR = True <USE_THOUSAND_SEPARATOR>` in
+    your settings file. Alternatively, you could use :tfilter:`intcomma` to
+    format numbers in your template.
 
 .. note::
 
-    There is also an independent but related :setting:`USE_I18N` setting that
-    controls if Django should activate translation. See
-    :doc:`/topics/i18n/translation` for more details.
+    There is a related :setting:`USE_I18N` setting that controls if Django
+    should activate translation. See :doc:`/topics/i18n/translation` for more
+    details.
 
 Locale aware input in forms
 ===========================

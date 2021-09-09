@@ -47,7 +47,7 @@ class FunctionTests(SimpleTestCase):
             ('', '0\xa0Bytes'),
             ('\N{GREEK SMALL LETTER ALPHA}', '0\xa0Bytes'),
         ]
-        with self.settings(USE_L10N=True), translation.override('de'):
+        with translation.override('de'):
             for value, expected in tests:
                 with self.subTest(value=value):
                     self.assertEqual(filesizeformat(value), expected)

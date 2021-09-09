@@ -1,9 +1,10 @@
 from datetime import date
 
 from django.forms import DateField, Form, SelectDateWidget
-from django.test import override_settings
+from django.test import ignore_warnings, override_settings
 from django.utils import translation
 from django.utils.dates import MONTHS_AP
+from django.utils.deprecation import RemovedInDjango50Warning
 
 from .base import WidgetTest
 
@@ -387,7 +388,6 @@ class SelectDateWidgetTest(WidgetTest):
         with self.assertRaisesMessage(ValueError, 'empty_label list/tuple must have 3 elements.'):
             SelectDateWidget(years=('2014',), empty_label=('not enough', 'values'))
 
-    @override_settings(USE_L10N=True)
     @translation.override('nl')
     def test_l10n(self):
         w = SelectDateWidget(
@@ -485,6 +485,11 @@ class SelectDateWidgetTest(WidgetTest):
             '13-08-0001',
         )
 
+    # RemovedInDjango50Warning: When the deprecation ends, remove
+    # @ignore_warnings and USE_L10N=False. The test should remain because
+    # format-related settings will take precedence over locale-dictated
+    # formats.
+    @ignore_warnings(category=RemovedInDjango50Warning)
     @override_settings(USE_L10N=False, DATE_INPUT_FORMATS=['%d.%m.%Y'])
     def test_custom_input_format(self):
         w = SelectDateWidget(years=('0001', '1899', '2009', '2010'))
@@ -551,7 +556,7 @@ class SelectDateWidgetTest(WidgetTest):
         data = {'field_day': '1', 'field_month': '12', 'field_year': '2000'}
         self.assertIs(self.widget.value_omitted_from_data(data, {}, 'field'), False)
 
-    @override_settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True)
+    @override_settings(USE_THOUSAND_SEPARATOR=True)
     def test_years_rendered_without_separator(self):
         widget = SelectDateWidget(years=(2007,))
         self.check_html(widget, 'mydate', '', html=(
