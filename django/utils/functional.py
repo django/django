@@ -1,4 +1,5 @@
 import copy
+import inspect
 import itertools
 import operator
 import warnings
@@ -231,12 +232,48 @@ def keep_lazy(*resultclasses):
     def decorator(func):
         lazy_func = lazy(func, *resultclasses)
 
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            if any(isinstance(arg, Promise) for arg in itertools.chain(args, kwargs.values())):
-                return lazy_func(*args, **kwargs)
-            return func(*args, **kwargs)
-        return wrapper
+        first_parameter = None
+        has_multiple_parameters = False
+        for parameter in inspect.signature(func).parameters.values():
+            # Skip parameters which are *args, or **kwargs, which are intrinsically
+            # multiple arguments and must go through the slow path.
+            if first_parameter or parameter.kind in (parameter.VAR_POSITIONAL, parameter.VAR_KEYWORD):
+                has_multiple_parameters = True
+                break
+            else:
+                first_parameter = parameter
+
+        if has_multiple_parameters:
+            @wraps(func)
+            def keep_lazy_multiple_argument_wrapper(*args, **kwargs):
+                # Merge the positional and keyword argument values into one
+                # contiguous list and test if any of the values need to
+                # divert to the lazy function, passing down the original
+                # arguments as given so that the normal exception messages
+                # can be raised.
+                for arg in [*args, *kwargs.values()]:
+                    if isinstance(arg, Promise):
+                        return lazy_func(*args, **kwargs)
+                return func(*args, **kwargs)
+            return keep_lazy_multiple_argument_wrapper
+        else:
+            @wraps(func)
+            def keep_lazy_single_argument_wrapper(*args, **kwargs):
+                # The expectation is that either the arg is positional, or
+                # there's only one keyword, meaning there should only ever be
+                # 1 value. We can't make use of first_parameter.name because
+                # passing in the wrong kwarg name would raise the incorrect
+                # exception (KeyError)
+                # If no arguments are given, the combined argument list will
+                # be empty and so cannot be lazy but should still defer down
+                # to the function so that it can raise the appropriate
+                # error message.
+                gathered_args = [*args, *kwargs.values()]
+                if gathered_args and isinstance(gathered_args[0], Promise):
+                        return lazy_func(*args, **kwargs)
+                return func(*args, **kwargs)
+            return keep_lazy_single_argument_wrapper
+
     return decorator
 
 

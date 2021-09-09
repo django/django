@@ -434,7 +434,7 @@ class KeepLazyMultipleDispatchTests(KeepLazyExamples, SimpleTestCase):
         self.assertEqual(self.keep_lazy_single_argument(lazystr("s")), "single")
         self.assertEqual(
             self.keep_lazy_single_argument.__code__.co_name,
-            "wrapper",
+            "keep_lazy_single_argument_wrapper",
         )
 
     def test_keep_lazy_single_positional_argument(self):
@@ -443,7 +443,7 @@ class KeepLazyMultipleDispatchTests(KeepLazyExamples, SimpleTestCase):
         self.assertEqual(self.keep_lazy_single_argument(s), "single")
         self.assertEqual(
             self.keep_lazy_single_argument.__code__.co_name,
-            "wrapper",
+            "keep_lazy_single_argument_wrapper",
         )
 
     def test_keep_lazy_single_keyword_argument(self):
@@ -452,7 +452,7 @@ class KeepLazyMultipleDispatchTests(KeepLazyExamples, SimpleTestCase):
         self.assertEqual(self.keep_lazy_single_argument(value=s), "single")
         self.assertEqual(
             self.keep_lazy_single_argument.__code__.co_name,
-            "wrapper",
+            "keep_lazy_single_argument_wrapper",
         )
 
     def test_keep_lazy_multiple_positional_arguments(self):
@@ -461,7 +461,7 @@ class KeepLazyMultipleDispatchTests(KeepLazyExamples, SimpleTestCase):
         self.assertEqual(self.keep_lazy_multiple_arguments(1, 2, s), "multiple")
         self.assertEqual(
             self.keep_lazy_multiple_arguments.__code__.co_name,
-            "wrapper",
+            "keep_lazy_multiple_argument_wrapper",
         )
 
     def test_keep_lazy_multiple_keyword_arguments(self):
@@ -474,7 +474,7 @@ class KeepLazyMultipleDispatchTests(KeepLazyExamples, SimpleTestCase):
         )
         self.assertEqual(
             self.keep_lazy_multiple_arguments.__code__.co_name,
-            "wrapper",
+            "keep_lazy_multiple_argument_wrapper",
         )
 
     def test_posargs(self):
@@ -490,7 +490,7 @@ class KeepLazyMultipleDispatchTests(KeepLazyExamples, SimpleTestCase):
         )
         self.assertEqual(
             self.keep_lazy_posargs.__code__.co_name,
-            "wrapper",
+            "keep_lazy_multiple_argument_wrapper",
         )
 
     def test_kwargs(self):
@@ -506,7 +506,7 @@ class KeepLazyMultipleDispatchTests(KeepLazyExamples, SimpleTestCase):
         )
         self.assertEqual(
             self.keep_lazy_kwargs.__code__.co_name,
-            "wrapper",
+            "keep_lazy_multiple_argument_wrapper",
         )
 
     def test_kwonly(self):
@@ -520,7 +520,7 @@ class KeepLazyMultipleDispatchTests(KeepLazyExamples, SimpleTestCase):
         )
         self.assertEqual(
             self.keep_lazy_multiple_arguments_with_kwonly.__code__.co_name,
-            "wrapper",
+            "keep_lazy_multiple_argument_wrapper",
         )
 
     def test_single_complex(self):
@@ -539,5 +539,5 @@ class KeepLazyMultipleDispatchTests(KeepLazyExamples, SimpleTestCase):
         )
         self.assertEqual(
             self.keep_lazy_multiple_arguments_with_poskwargs.__code__.co_name,
-            "wrapper",
+            "keep_lazy_multiple_argument_wrapper",
         )
