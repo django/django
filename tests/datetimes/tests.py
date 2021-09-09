@@ -6,8 +6,9 @@ try:
 except ImportError:
     pytz = None
 
-from django.test import TestCase, override_settings
+from django.test import TestCase, ignore_warnings, override_settings
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango50Warning
 
 from .models import Article, Category, Comment
 
@@ -96,6 +97,7 @@ class DateTimesTests(TestCase):
         self.assertEqual(qs[0], now)
 
     @unittest.skipUnless(pytz is not None, "Test needs pytz")
+    @ignore_warnings(category=RemovedInDjango50Warning)
     @override_settings(USE_TZ=True, TIME_ZONE='UTC', USE_DEPRECATED_PYTZ=True)
     def test_datetimes_ambiguous_and_invalid_times(self):
         sao = pytz.timezone('America/Sao_Paulo')

@@ -24,12 +24,13 @@ from django.template import (
     Context, RequestContext, Template, TemplateSyntaxError, context_processors,
 )
 from django.test import (
-    SimpleTestCase, TestCase, TransactionTestCase, override_settings,
-    skipIfDBFeature, skipUnlessDBFeature,
+    SimpleTestCase, TestCase, TransactionTestCase, ignore_warnings,
+    override_settings, skipIfDBFeature, skipUnlessDBFeature,
 )
 from django.test.utils import requires_tz_support
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.timezone import timedelta
 
 from .forms import (
@@ -362,6 +363,7 @@ class NewDatabaseTests(TestCase):
                 self.assertEqual(Event.objects.filter(dt__in=(prev, dt, next)).count(), 1)
                 self.assertEqual(Event.objects.filter(dt__range=(prev, next)).count(), 1)
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_connection_timezone(self):
         tests = [
             (False, None, zoneinfo.ZoneInfo),
@@ -1004,6 +1006,7 @@ class TemplateTests(SimpleTestCase):
         })
         self.assertEqual(tpl.render(ctx), "2011-09-01T12:20:30+02:00")
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_timezone_templatetag_invalid_argument(self):
         with self.assertRaises(TemplateSyntaxError):
             Template("{% load tz %}{% timezone %}{% endtimezone %}").render()
