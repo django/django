@@ -34,6 +34,14 @@ details on these changes.
   ``StringAgg`` aggregates will return ``None`` when there are no rows instead
   of ``[]``, ``[]``, and ``''`` respectively.
 
+* The transitional ``USE_DEPRECATED_PYTZ`` setting, and support for ``pytz``
+  timezones is deprecated in favor of the standard library ``zoneinfo``
+  module.
+
+* As part of the migration to use ``zoneinfo`` time zone, the ``is_dst``
+  argument to ``django.utils.timezone.make_aware``, and various functions that
+  proxy to it, is deprecated.
+
 .. _deprecation-removed-in-4.1:
 
 4.1
