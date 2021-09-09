@@ -1281,10 +1281,20 @@ implementation details see :ref:`using-the-views`.
     that can be used to reset the password, and sending that link to the
     user's registered email address.
 
-    If the email address provided does not exist in the system, this view
-    won't send an email, but the user won't receive any error message either.
-    This prevents information leaking to potential attackers. If you want to
-    provide an error message in this case, you can subclass
+    This view will send an email if the following conditions are met:
+
+    * The email address provided exists in the system.
+    * The requested user is active (``User.is_active`` is ``True``).
+    * The requested user has a usable password. Users flagged with an unusable
+      password (see
+      :meth:`~django.contrib.auth.models.User.set_unusable_password`) aren't
+      allowed to request a password reset to prevent misuse when using an
+      external authentication source like LDAP.
+
+    If any of these conditions are *not* met, no email will be sent, but the
+    user won't receive any error message either. This prevents information
+    leaking to potential attackers. If you want to provide an error message in
+    this case, you can subclass
     :class:`~django.contrib.auth.forms.PasswordResetForm` and use the
     ``form_class`` attribute.
 
@@ -1297,13 +1307,6 @@ implementation details see :ref:`using-the-views`.
         email address. To reduce the overhead, you can use a 3rd party package
         that allows to send emails asynchronously, e.g. `django-mailer
         <https://pypi.org/project/django-mailer/>`_.
-
-    Users flagged with an unusable password (see
-    :meth:`~django.contrib.auth.models.User.set_unusable_password()` aren't
-    allowed to request a password reset to prevent misuse when using an
-    external authentication source like LDAP. Note that they won't receive any
-    error message since this would expose their account's existence but no
-    mail will be sent either.
 
     **Attributes:**
 
