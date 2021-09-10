@@ -343,7 +343,7 @@ msgid "Enter a valid integer."
 msgstr "Nhập một số nguyên hợp lệ."
 
 msgid "Enter a valid email address."
-msgstr "Nhập địa chỉ email."
+msgstr "Nhập một địa chỉ email hợp lệ."
 
 #. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
