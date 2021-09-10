@@ -24,6 +24,11 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.safestring import mark_safe
 
 
+class FrameworkForm(Form):
+    name = CharField()
+    language = ChoiceField(choices=[('P', 'Python'), ('J', 'Java')], widget=RadioSelect)
+
+
 class Person(Form):
     first_name = CharField()
     last_name = CharField()
@@ -34,6 +39,14 @@ class PersonNew(Form):
     first_name = CharField(widget=TextInput(attrs={'id': 'first_name_id'}))
     last_name = CharField()
     birthday = DateField()
+
+
+class SongForm(Form):
+    name = CharField()
+    composers = MultipleChoiceField(
+        choices=[('J', 'John Lennon'), ('P', 'Paul McCartney')],
+        widget=CheckboxSelectMultiple,
+    )
 
 
 class MultiValueDictLike(dict):
@@ -580,10 +593,6 @@ class FormsTestCase(SimpleTestCase):
 
     def test_forms_with_radio(self):
         # Add widget=RadioSelect to use that widget with a ChoiceField.
-        class FrameworkForm(Form):
-            name = CharField()
-            language = ChoiceField(choices=[('P', 'Python'), ('J', 'Java')], widget=RadioSelect)
-
         f = FrameworkForm(auto_id=False)
         self.assertHTMLEqual(str(f['language']), """<div>
 <div><label><input type="radio" name="language" value="P" required> Python</label></div>
@@ -647,16 +656,6 @@ Python</label></div>
 <div><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" required>
 Java</label></div>
 </div></p>"""
-        )
-
-        # Test iterating on individual radios in a template
-        t = Template('{% for radio in form.language %}<div class="myradio">{{ radio }}</div>{% endfor %}')
-        self.assertHTMLEqual(
-            t.render(Context({'form': f})),
-            """<div class="myradio"><label for="id_language_0">
-<input id="id_language_0" name="language" type="radio" value="P" required> Python</label></div>
-<div class="myradio"><label for="id_language_1">
-<input id="id_language_1" name="language" type="radio" value="J" required> Java</label></div>"""
         )
 
     def test_form_with_iterable_boundfield(self):
@@ -862,13 +861,6 @@ Java</label></div>
 
     def test_multiple_choice_checkbox(self):
         # MultipleChoiceField can also be used with the CheckboxSelectMultiple widget.
-        class SongForm(Form):
-            name = CharField()
-            composers = MultipleChoiceField(
-                choices=[('J', 'John Lennon'), ('P', 'Paul McCartney')],
-                widget=CheckboxSelectMultiple,
-            )
-
         f = SongForm(auto_id=False)
         self.assertHTMLEqual(str(f['composers']), """<div>
 <div><label><input type="checkbox" name="composers" value="J"> John Lennon</label></div>
@@ -884,12 +876,6 @@ Java</label></div>
 <div><label><input checked type="checkbox" name="composers" value="J"> John Lennon</label></div>
 <div><label><input checked type="checkbox" name="composers" value="P"> Paul McCartney</label></div>
 </div>""")
-        # Test iterating on individual checkboxes in a template
-        t = Template('{% for checkbox in form.composers %}<div class="mycheckbox">{{ checkbox }}</div>{% endfor %}')
-        self.assertHTMLEqual(t.render(Context({'form': f})), """<div class="mycheckbox"><label>
-<input checked name="composers" type="checkbox" value="J"> John Lennon</label></div>
-<div class="mycheckbox"><label>
-<input checked name="composers" type="checkbox" value="P"> Paul McCartney</label></div>""")
 
     def test_checkbox_auto_id(self):
         # Regarding auto_id, CheckboxSelectMultiple is a special case. Each checkbox
@@ -2582,213 +2568,6 @@ Password: <input type="password" name="password" required>
             '<tr><th>File1:</th><td><input type="file" name="file1"></td></tr>',
         )
 
-    def test_basic_processing_in_view(self):
-        class UserRegistration(Form):
-            username = CharField(max_length=10)
-            password1 = CharField(widget=PasswordInput)
-            password2 = CharField(widget=PasswordInput)
-
-            def clean(self):
-                if (self.cleaned_data.get('password1') and self.cleaned_data.get('password2') and
-                        self.cleaned_data['password1'] != self.cleaned_data['password2']):
-                    raise ValidationError('Please make sure your passwords match.')
-
-                return self.cleaned_data
-
-        def my_function(method, post_data):
-            if method == 'POST':
-                form = UserRegistration(post_data, auto_id=False)
-            else:
-                form = UserRegistration(auto_id=False)
-
-            if form.is_valid():
-                return 'VALID: %r' % sorted(form.cleaned_data.items())
-
-            t = Template(
-                '<form method="post">\n'
-                '<table>\n{{ form }}\n</table>\n<input type="submit" required>\n</form>'
-            )
-            return t.render(Context({'form': form}))
-
-        # Case 1: GET (an empty form, with no errors).)
-        self.assertHTMLEqual(my_function('GET', {}), """<form method="post">
-<table>
-<tr><th>Username:</th><td><input type="text" name="username" maxlength="10" required></td></tr>
-<tr><th>Password1:</th><td><input type="password" name="password1" required></td></tr>
-<tr><th>Password2:</th><td><input type="password" name="password2" required></td></tr>
-</table>
-<input type="submit" required>
-</form>""")
-        # Case 2: POST with erroneous data (a redisplayed form, with errors).)
-        self.assertHTMLEqual(
-            my_function('POST', {'username': 'this-is-a-long-username', 'password1': 'foo', 'password2': 'bar'}),
-            """<form method="post">
-<table>
-<tr><td colspan="2"><ul class="errorlist nonfield"><li>Please make sure your passwords match.</li></ul></td></tr>
-<tr><th>Username:</th><td><ul class="errorlist">
-<li>Ensure this value has at most 10 characters (it has 23).</li></ul>
-<input type="text" name="username" value="this-is-a-long-username" maxlength="10" required></td></tr>
-<tr><th>Password1:</th><td><input type="password" name="password1" required></td></tr>
-<tr><th>Password2:</th><td><input type="password" name="password2" required></td></tr>
-</table>
-<input type="submit" required>
-</form>"""
-        )
-        # Case 3: POST with valid data (the success message).)
-        self.assertEqual(
-            my_function('POST', {'username': 'adrian', 'password1': 'secret', 'password2': 'secret'}),
-            "VALID: [('password1', 'secret'), ('password2', 'secret'), ('username', 'adrian')]"
-        )
-
-    def test_templates_with_forms(self):
-        class UserRegistration(Form):
-            username = CharField(max_length=10, help_text="Good luck picking a username that doesn't already exist.")
-            password1 = CharField(widget=PasswordInput)
-            password2 = CharField(widget=PasswordInput)
-
-            def clean(self):
-                if (self.cleaned_data.get('password1') and self.cleaned_data.get('password2') and
-                        self.cleaned_data['password1'] != self.cleaned_data['password2']):
-                    raise ValidationError('Please make sure your passwords match.')
-
-                return self.cleaned_data
-
-        # You have full flexibility in displaying form fields in a template. Just pass a
-        # Form instance to the template, and use "dot" access to refer to individual
-        # fields. Note, however, that this flexibility comes with the responsibility of
-        # displaying all the errors, including any that might not be associated with a
-        # particular field.
-        t = Template('''<form>
-{{ form.username.errors.as_ul }}<p><label>Your username: {{ form.username }}</label></p>
-{{ form.password1.errors.as_ul }}<p><label>Password: {{ form.password1 }}</label></p>
-{{ form.password2.errors.as_ul }}<p><label>Password (again): {{ form.password2 }}</label></p>
-<input type="submit" required>
-</form>''')
-        self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form>
-<p><label>Your username: <input type="text" name="username" maxlength="10" required></label></p>
-<p><label>Password: <input type="password" name="password1" required></label></p>
-<p><label>Password (again): <input type="password" name="password2" required></label></p>
-<input type="submit" required>
-</form>""")
-        self.assertHTMLEqual(
-            t.render(Context({'form': UserRegistration({'username': 'django'}, auto_id=False)})),
-            """<form>
-<p><label>Your username: <input type="text" name="username" value="django" maxlength="10" required></label></p>
-<ul class="errorlist"><li>This field is required.</li></ul><p>
-<label>Password: <input type="password" name="password1" required></label></p>
-<ul class="errorlist"><li>This field is required.</li></ul>
-<p><label>Password (again): <input type="password" name="password2" required></label></p>
-<input type="submit" required>
-</form>"""
-        )
-
-        # Use form.[field].label to output a field's label. You can specify the label for
-        # a field by using the 'label' argument to a Field class. If you don't specify
-        # 'label', Django will use the field name with underscores converted to spaces,
-        # and the initial letter capitalized.
-        t = Template('''<form>
-<p><label>{{ form.username.label }}: {{ form.username }}</label></p>
-<p><label>{{ form.password1.label }}: {{ form.password1 }}</label></p>
-<p><label>{{ form.password2.label }}: {{ form.password2 }}</label></p>
-<input type="submit" required>
-</form>''')
-        self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form>
-<p><label>Username: <input type="text" name="username" maxlength="10" required></label></p>
-<p><label>Password1: <input type="password" name="password1" required></label></p>
-<p><label>Password2: <input type="password" name="password2" required></label></p>
-<input type="submit" required>
-</form>""")
-
-        # User form.[field].label_tag to output a field's label with a <label> tag
-        # wrapped around it, but *only* if the given field has an "id" attribute.
-        # Recall from above that passing the "auto_id" argument to a Form gives each
-        # field an "id" attribute.
-        t = Template('''<form>
-<p>{{ form.username.label_tag }} {{ form.username }}</p>
-<p>{{ form.password1.label_tag }} {{ form.password1 }}</p>
-<p>{{ form.password2.label_tag }} {{ form.password2 }}</p>
-<input type="submit" required>
-</form>''')
-        self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form>
-<p>Username: <input type="text" name="username" maxlength="10" required></p>
-<p>Password1: <input type="password" name="password1" required></p>
-<p>Password2: <input type="password" name="password2" required></p>
-<input type="submit" required>
-</form>""")
-        self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id='id_%s')})), """<form>
-<p><label for="id_username">Username:</label>
-<input id="id_username" type="text" name="username" maxlength="10" required></p>
-<p><label for="id_password1">Password1:</label>
-<input type="password" name="password1" id="id_password1" required></p>
-<p><label for="id_password2">Password2:</label>
-<input type="password" name="password2" id="id_password2" required></p>
-<input type="submit" required>
-</form>""")
-
-        # User form.[field].help_text to output a field's help text. If the given field
-        # does not have help text, nothing will be output.
-        t = Template('''<form>
-<p>{{ form.username.label_tag }} {{ form.username }}<br>{{ form.username.help_text }}</p>
-<p>{{ form.password1.label_tag }} {{ form.password1 }}</p>
-<p>{{ form.password2.label_tag }} {{ form.password2 }}</p>
-<input type="submit" required>
-</form>''')
-        self.assertHTMLEqual(
-            t.render(Context({'form': UserRegistration(auto_id=False)})),
-            """<form>
-<p>Username: <input type="text" name="username" maxlength="10" required><br>
-Good luck picking a username that doesn&#x27;t already exist.</p>
-<p>Password1: <input type="password" name="password1" required></p>
-<p>Password2: <input type="password" name="password2" required></p>
-<input type="submit" required>
-</form>"""
-        )
-        self.assertEqual(
-            Template('{{ form.password1.help_text }}').render(Context({'form': UserRegistration(auto_id=False)})),
-            ''
-        )
-
-        # To display the errors that aren't associated with a particular field -- e.g.,
-        # the errors caused by Form.clean() -- use {{ form.non_field_errors }} in the
-        # template. If used on its own, it is displayed as a <ul> (or an empty string, if
-        # the list of errors is empty). You can also use it in {% if %} statements.
-        t = Template('''<form>
-{{ form.username.errors.as_ul }}<p><label>Your username: {{ form.username }}</label></p>
-{{ form.password1.errors.as_ul }}<p><label>Password: {{ form.password1 }}</label></p>
-{{ form.password2.errors.as_ul }}<p><label>Password (again): {{ form.password2 }}</label></p>
-<input type="submit" required>
-</form>''')
-        self.assertHTMLEqual(
-            t.render(Context({
-                'form': UserRegistration({'username': 'django', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)
-            })),
-            """<form>
-<p><label>Your username: <input type="text" name="username" value="django" maxlength="10" required></label></p>
-<p><label>Password: <input type="password" name="password1" required></label></p>
-<p><label>Password (again): <input type="password" name="password2" required></label></p>
-<input type="submit" required>
-</form>"""
-        )
-        t = Template('''<form>
-{{ form.non_field_errors }}
-{{ form.username.errors.as_ul }}<p><label>Your username: {{ form.username }}</label></p>
-{{ form.password1.errors.as_ul }}<p><label>Password: {{ form.password1 }}</label></p>
-{{ form.password2.errors.as_ul }}<p><label>Password (again): {{ form.password2 }}</label></p>
-<input type="submit" required>
-</form>''')
-        self.assertHTMLEqual(
-            t.render(Context({
-                'form': UserRegistration({'username': 'django', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)
-            })),
-            """<form>
-<ul class="errorlist nonfield"><li>Please make sure your passwords match.</li></ul>
-<p><label>Your username: <input type="text" name="username" value="django" maxlength="10" required></label></p>
-<p><label>Password: <input type="password" name="password1" required></label></p>
-<p><label>Password (again): <input type="password" name="password2" required></label></p>
-<input type="submit" required>
-</form>"""
-        )
-
     def test_empty_permitted(self):
         # Sometimes (pretty much in formsets) we want to allow a form to pass validation
         # if it is completely empty. We can accomplish this by using the empty_permitted
@@ -3900,3 +3679,333 @@ class RendererTests(SimpleTestCase):
         custom = CustomRenderer()
         form = CustomForm(renderer=custom)
         self.assertEqual(form.renderer, custom)
+
+
+class TemplateTests(SimpleTestCase):
+    def test_iterate_radios(self):
+        f = FrameworkForm(auto_id='id_%s')
+        t = Template(
+            '{% for radio in form.language %}'
+            '<div class="myradio">{{ radio }}</div>'
+            '{% endfor %}'
+        )
+        self.assertHTMLEqual(
+            t.render(Context({'form': f})),
+            '<div class="myradio"><label for="id_language_0">'
+            '<input id="id_language_0" name="language" type="radio" value="P" '
+            'required> Python</label></div>'
+            '<div class="myradio"><label for="id_language_1">'
+            '<input id="id_language_1" name="language" type="radio" value="J" '
+            'required> Java</label></div>',
+        )
+
+    def test_iterate_checkboxes(self):
+        f = SongForm({'composers': ['J', 'P']}, auto_id=False)
+        t = Template(
+            '{% for checkbox in form.composers %}'
+            '<div class="mycheckbox">{{ checkbox }}</div>'
+            '{% endfor %}'
+        )
+        self.assertHTMLEqual(
+            t.render(Context({'form': f})),
+            '<div class="mycheckbox"><label>'
+            '<input checked name="composers" type="checkbox" value="J"> '
+            'John Lennon</label></div>'
+            '<div class="mycheckbox"><label>'
+            '<input checked name="composers" type="checkbox" value="P"> '
+            'Paul McCartney</label></div>',
+        )
+
+    def test_templates_with_forms(self):
+        class UserRegistration(Form):
+            username = CharField(max_length=10, help_text=(
+                "Good luck picking a username that doesn't already exist."
+            ))
+            password1 = CharField(widget=PasswordInput)
+            password2 = CharField(widget=PasswordInput)
+
+            def clean(self):
+                if (
+                    self.cleaned_data.get('password1') and
+                    self.cleaned_data.get('password2') and
+                    self.cleaned_data['password1'] != self.cleaned_data['password2']
+                ):
+                    raise ValidationError('Please make sure your passwords match.')
+                return self.cleaned_data
+
+        # There is full flexibility in displaying form fields in a template.
+        # Just pass a Form instance to the template, and use "dot" access to
+        # refer to individual fields. However, this flexibility comes with the
+        # responsibility of displaying all the errors, including any that might
+        # not be associated with a particular field.
+        t = Template(
+            '<form>'
+            '{{ form.username.errors.as_ul }}'
+            '<p><label>Your username: {{ form.username }}</label></p>'
+            '{{ form.password1.errors.as_ul }}'
+            '<p><label>Password: {{ form.password1 }}</label></p>'
+            '{{ form.password2.errors.as_ul }}'
+            '<p><label>Password (again): {{ form.password2 }}</label></p>'
+            '<input type="submit" required>'
+            '</form>'
+        )
+        f = UserRegistration(auto_id=False)
+        self.assertHTMLEqual(
+            t.render(Context({'form': f})),
+            '<form>'
+            '<p><label>Your username: '
+            '<input type="text" name="username" maxlength="10" required></label></p>'
+            '<p><label>Password: '
+            '<input type="password" name="password1" required></label></p>'
+            '<p><label>Password (again): '
+            '<input type="password" name="password2" required></label></p>'
+            '<input type="submit" required>'
+            '</form>',
+        )
+        f = UserRegistration({'username': 'django'}, auto_id=False)
+        self.assertHTMLEqual(
+            t.render(Context({'form': f})),
+            '<form>'
+            '<p><label>Your username: '
+            '<input type="text" name="username" value="django" maxlength="10" required>'
+            '</label></p>'
+            '<ul class="errorlist"><li>This field is required.</li></ul><p>'
+            '<label>Password: '
+            '<input type="password" name="password1" required></label></p>'
+            '<ul class="errorlist"><li>This field is required.</li></ul>'
+            '<p><label>Password (again): '
+            '<input type="password" name="password2" required></label></p>'
+            '<input type="submit" required>'
+            '</form>',
+        )
+        # Use form.[field].label to output a field's label. 'label' for a field
+        # can by specified by using the 'label' argument to a Field class. If
+        # 'label' is not specified, Django will use the field name with
+        # underscores converted to spaces, and the initial letter capitalized.
+        t = Template(
+            '<form>'
+            '<p><label>{{ form.username.label }}: {{ form.username }}</label></p>'
+            '<p><label>{{ form.password1.label }}: {{ form.password1 }}</label></p>'
+            '<p><label>{{ form.password2.label }}: {{ form.password2 }}</label></p>'
+            '<input type="submit" required>'
+            '</form>'
+        )
+        f = UserRegistration(auto_id=False)
+        self.assertHTMLEqual(
+            t.render(Context({'form': f})),
+            '<form>'
+            '<p><label>Username: '
+            '<input type="text" name="username" maxlength="10" required></label></p>'
+            '<p><label>Password1: '
+            '<input type="password" name="password1" required></label></p>'
+            '<p><label>Password2: '
+            '<input type="password" name="password2" required></label></p>'
+            '<input type="submit" required>'
+            '</form>',
+        )
+        # Use form.[field].label_tag to output a field's label with a <label>
+        # tag wrapped around it, but *only* if the given field has an "id"
+        # attribute. Recall from above that passing the "auto_id" argument to a
+        # Form gives each field an "id" attribute.
+        t = Template(
+            '<form>'
+            '<p>{{ form.username.label_tag }} {{ form.username }}</p>'
+            '<p>{{ form.password1.label_tag }} {{ form.password1 }}</p>'
+            '<p>{{ form.password2.label_tag }} {{ form.password2 }}</p>'
+            '<input type="submit" required>'
+            '</form>'
+        )
+        self.assertHTMLEqual(
+            t.render(Context({'form': f})),
+            '<form>'
+            '<p>Username: '
+            '<input type="text" name="username" maxlength="10" required></p>'
+            '<p>Password1: <input type="password" name="password1" required></p>'
+            '<p>Password2: <input type="password" name="password2" required></p>'
+            '<input type="submit" required>'
+            '</form>',
+        )
+        f = UserRegistration(auto_id='id_%s')
+        self.assertHTMLEqual(
+            t.render(Context({'form': f})),
+            '<form>'
+            '<p><label for="id_username">Username:</label>'
+            '<input id="id_username" type="text" name="username" maxlength="10" '
+            'required></p>'
+            '<p><label for="id_password1">Password1:</label>'
+            '<input type="password" name="password1" id="id_password1" required></p>'
+            '<p><label for="id_password2">Password2:</label>'
+            '<input type="password" name="password2" id="id_password2" required></p>'
+            '<input type="submit" required>'
+            '</form>',
+        )
+        # Use form.[field].help_text to output a field's help text. If the
+        # given field does not have help text, nothing will be output.
+        t = Template(
+            '<form>'
+            '<p>{{ form.username.label_tag }} {{ form.username }}<br>'
+            '{{ form.username.help_text }}</p>'
+            '<p>{{ form.password1.label_tag }} {{ form.password1 }}</p>'
+            '<p>{{ form.password2.label_tag }} {{ form.password2 }}</p>'
+            '<input type="submit" required>'
+            '</form>'
+        )
+        f = UserRegistration(auto_id=False)
+        self.assertHTMLEqual(
+            t.render(Context({'form': f})),
+            '<form>'
+            '<p>Username: '
+            '<input type="text" name="username" maxlength="10" required><br>'
+            'Good luck picking a username that doesn&#x27;t already exist.</p>'
+            '<p>Password1: <input type="password" name="password1" required></p>'
+            '<p>Password2: <input type="password" name="password2" required></p>'
+            '<input type="submit" required>'
+            '</form>',
+        )
+        self.assertEqual(
+            Template('{{ form.password1.help_text }}').render(Context({'form': f})),
+            '',
+        )
+        # To display the errors that aren't associated with a particular field
+        # e.g. the errors caused by Form.clean() -- use
+        # {{ form.non_field_errors }} in the template. If used on its own, it
+        # is displayed as a <ul> (or an empty string, if the list of errors is
+        # empty).
+        t = Template(
+            '<form>'
+            '{{ form.username.errors.as_ul }}'
+            '<p><label>Your username: {{ form.username }}</label></p>'
+            '{{ form.password1.errors.as_ul }}'
+            '<p><label>Password: {{ form.password1 }}</label></p>'
+            '{{ form.password2.errors.as_ul }}'
+            '<p><label>Password (again): {{ form.password2 }}</label></p>'
+            '<input type="submit" required>'
+            '</form>'
+        )
+        f = UserRegistration(
+            {'username': 'django', 'password1': 'foo', 'password2': 'bar'},
+            auto_id=False,
+        )
+        self.assertHTMLEqual(
+            t.render(Context({'form': f})),
+            '<form>'
+            '<p><label>Your username: '
+            '<input type="text" name="username" value="django" maxlength="10" required>'
+            '</label></p>'
+            '<p><label>Password: '
+            '<input type="password" name="password1" required></label></p>'
+            '<p><label>Password (again): '
+            '<input type="password" name="password2" required></label></p>'
+            '<input type="submit" required>'
+            '</form>',
+        )
+        t = Template(
+            '<form>'
+            '{{ form.non_field_errors }}'
+            '{{ form.username.errors.as_ul }}'
+            '<p><label>Your username: {{ form.username }}</label></p>'
+            '{{ form.password1.errors.as_ul }}'
+            '<p><label>Password: {{ form.password1 }}</label></p>'
+            '{{ form.password2.errors.as_ul }}'
+            '<p><label>Password (again): {{ form.password2 }}</label></p>'
+            '<input type="submit" required>'
+            '</form>'
+        )
+        self.assertHTMLEqual(
+            t.render(Context({'form': f})),
+            '<form>'
+            '<ul class="errorlist nonfield">'
+            '<li>Please make sure your passwords match.</li></ul>'
+            '<p><label>Your username: '
+            '<input type="text" name="username" value="django" maxlength="10" required>'
+            '</label></p>'
+            '<p><label>Password: '
+            '<input type="password" name="password1" required></label></p>'
+            '<p><label>Password (again): '
+            '<input type="password" name="password2" required></label></p>'
+            '<input type="submit" required>'
+            '</form>',
+        )
+
+    def test_basic_processing_in_view(self):
+        class UserRegistration(Form):
+            username = CharField(max_length=10)
+            password1 = CharField(widget=PasswordInput)
+            password2 = CharField(widget=PasswordInput)
+
+            def clean(self):
+                if (
+                    self.cleaned_data.get('password1') and
+                    self.cleaned_data.get('password2') and
+                    self.cleaned_data['password1'] != self.cleaned_data['password2']
+                ):
+                    raise ValidationError('Please make sure your passwords match.')
+                return self.cleaned_data
+
+        def my_function(method, post_data):
+            if method == 'POST':
+                form = UserRegistration(post_data, auto_id=False)
+            else:
+                form = UserRegistration(auto_id=False)
+
+            if form.is_valid():
+                return 'VALID: %r' % sorted(form.cleaned_data.items())
+
+            t = Template(
+                '<form method="post">'
+                '<table>'
+                '{{ form }}'
+                '</table>'
+                '<input type="submit" required>'
+                '</form>'
+            )
+            return t.render(Context({'form': form}))
+
+        # GET with an empty form and no errors.
+        self.assertHTMLEqual(
+            my_function('GET', {}),
+            '<form method="post">'
+            '<table>'
+            '<tr><th>Username:</th><td>'
+            '<input type="text" name="username" maxlength="10" required></td></tr>'
+            '<tr><th>Password1:</th><td>'
+            '<input type="password" name="password1" required></td></tr>'
+            '<tr><th>Password2:</th><td>'
+            '<input type="password" name="password2" required></td></tr>'
+            '</table>'
+            '<input type="submit" required>'
+            '</form>',
+        )
+        # POST with erroneous data, a redisplayed form, with errors.
+        self.assertHTMLEqual(
+            my_function('POST', {
+                'username': 'this-is-a-long-username',
+                'password1': 'foo',
+                'password2': 'bar',
+            }),
+            '<form method="post">'
+            '<table>'
+            '<tr><td colspan="2"><ul class="errorlist nonfield">'
+            '<li>Please make sure your passwords match.</li></ul></td></tr>'
+            '<tr><th>Username:</th><td><ul class="errorlist">'
+            '<li>Ensure this value has at most 10 characters (it has 23).</li></ul>'
+            '<input type="text" name="username" '
+            'value="this-is-a-long-username" maxlength="10" required></td></tr>'
+            '<tr><th>Password1:</th><td>'
+            '<input type="password" name="password1" required></td></tr>'
+            '<tr><th>Password2:</th><td>'
+            '<input type="password" name="password2" required></td></tr>'
+            '</table>'
+            '<input type="submit" required>'
+            '</form>',
+        )
+        # POST with valid data (the success message).
+        self.assertEqual(
+            my_function('POST', {
+                'username': 'adrian',
+                'password1': 'secret',
+                'password2': 'secret',
+            }),
+            "VALID: [('password1', 'secret'), ('password2', 'secret'), "
+            "('username', 'adrian')]",
+        )
