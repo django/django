@@ -20,6 +20,7 @@ from django.forms.utils import ErrorList
 from django.http import QueryDict
 from django.template import Context, Template
 from django.test import SimpleTestCase
+from django.test.utils import override_settings
 from django.utils.datastructures import MultiValueDict
 from django.utils.safestring import mark_safe
 
@@ -1248,6 +1249,24 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#x27;xss&#x27;)&lt
         self.assertEqual(f.errors, error_dict)
         f.as_table()
         self.assertEqual(f.errors, error_dict)
+        self.assertHTMLEqual(
+            f.as_table(),
+            '<tr><td colspan="2"><ul class="errorlist nonfield"><li>Form error</li>'
+            '<li>(Hidden field hidden_input) This field is required.</li></ul>'
+            '<input type="hidden" name="hidden_input" id="id_hidden_input"></td></tr>',
+        )
+        self.assertHTMLEqual(
+            f.as_ul(),
+            '<li><ul class="errorlist nonfield"><li>Form error</li>'
+            '<li>(Hidden field hidden_input) This field is required.</li></ul>'
+            '<input type="hidden" name="hidden_input" id="id_hidden_input"></li>',
+        )
+        self.assertHTMLEqual(
+            f.as_p(),
+            '<ul class="errorlist nonfield"><li>Form error</li>'
+            '<li>(Hidden field hidden_input) This field is required.</li></ul>'
+            '<p><input type="hidden" name="hidden_input" id="id_hidden_input"></p>',
+        )
 
     def test_dynamic_construction(self):
         # It's possible to construct a Form dynamically by adding to the self.fields
@@ -3636,6 +3655,23 @@ Password: <input type="password" name="password" required>
         field_copy = copy.deepcopy(field)
         self.assertIsInstance(field_copy, CustomCharField)
         self.assertIsNot(field_copy.error_messages, field.error_messages)
+
+    def test_label_does_not_include_new_line(self):
+        form = Person()
+        field = form['first_name']
+        self.assertEqual(
+            field.label_tag(),
+            '<label for="id_first_name">First name:</label>',
+        )
+
+    @override_settings(USE_THOUSAND_SEPARATOR=True)
+    def test_label_attrs_not_localized(self):
+        form = Person()
+        field = form['first_name']
+        self.assertHTMLEqual(
+            field.label_tag(attrs={'number': 9999}),
+            '<label number="9999" for="id_first_name">First name:</label>',
+        )
 
 
 class CustomRenderer(DjangoTemplates):
