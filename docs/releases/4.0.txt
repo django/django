@@ -115,6 +115,17 @@ in Django <redis>`.
 
 .. _`redis-py`: https://pypi.org/project/redis/
 
+Template based form rendering
+-----------------------------
+
+To enhance customization of :class:`Forms <django.forms.Form>`,
+:doc:`Formsets </topics/forms/formsets>`, and
+:class:`~django.forms.ErrorList` they are now rendered using the template
+engine. See the new :meth:`~django.forms.Form.render`,
+:meth:`~django.forms.Form.get_context`, and
+:attr:`~django.forms.Form.template_name` for ``Form`` and
+:ref:`formset rendering <formset-rendering>` for ``Formset``.
+
 Minor features
 --------------
 
@@ -734,6 +745,12 @@ Miscellaneous
 * The ``django.contrib.gis.admin.GeoModelAdmin`` and ``OSMGeoAdmin`` classes
   are deprecated. Use :class:`~django.contrib.admin.ModelAdmin` and
   :class:`~django.contrib.gis.admin.GISModelAdmin` instead.
+
+* Since form rendering now uses the template engine, the undocumented
+  ``BaseForm._html_output()`` helper method is deprecated.
+
+* The ability to return a ``str`` from ``ErrorList`` and ``ErrorDict`` is
+  deprecated. It is expected these methods return a ``SafeString``.
 
 Features removed in 4.0
 =======================

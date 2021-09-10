@@ -4,8 +4,10 @@ from django.forms import (
 from django.test import SimpleTestCase
 from django.utils import translation
 from django.utils.translation import gettext_lazy
+from tests.forms_tests.tests import test_all_form_renderers
 
 
+@test_all_form_renderers()
 class FormsI18nTests(SimpleTestCase):
     def test_lazy_labels(self):
         class SomeForm(Form):

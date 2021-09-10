@@ -11,6 +11,7 @@ from django.forms.formsets import BaseFormSet, all_valid, formset_factory
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.test import SimpleTestCase
+from tests.forms_tests.tests import test_all_form_renderers
 
 
 class Choice(Form):
@@ -47,6 +48,7 @@ class CustomKwargForm(Form):
         super().__init__(*args, **kwargs)
 
 
+@test_all_form_renderers()
 class FormsFormsetTestCase(SimpleTestCase):
 
     def make_choiceformset(
@@ -1288,7 +1290,32 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertIs(formset._should_delete_form(formset.forms[1]), False)
         self.assertIs(formset._should_delete_form(formset.forms[2]), False)
 
+    def test_custom_renderer(self):
+        """
+        A custom renderer passed to a formset_factory() is passed to all forms
+        and ErrorList.
+        """
+        from django.forms.renderers import Jinja2
+        renderer = Jinja2()
+        data = {
+            'choices-TOTAL_FORMS': '2',
+            'choices-INITIAL_FORMS': '0',
+            'choices-MIN_NUM_FORMS': '0',
+            'choices-0-choice': 'Zero',
+            'choices-0-votes': '',
+            'choices-1-choice': 'One',
+            'choices-1-votes': '',
+        }
+        ChoiceFormSet = formset_factory(Choice, renderer=renderer)
+        formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
+        self.assertEqual(formset.renderer, renderer)
+        self.assertEqual(formset.forms[0].renderer, renderer)
+        self.assertEqual(formset.management_form.renderer, renderer)
+        self.assertEqual(formset.non_form_errors().renderer, renderer)
+        self.assertEqual(formset.empty_form.renderer, renderer)
 
+
+@test_all_form_renderers()
 class FormsetAsTagTests(SimpleTestCase):
     def setUp(self):
         data = {
@@ -1345,6 +1372,7 @@ class ArticleForm(Form):
 ArticleFormSet = formset_factory(ArticleForm)
 
 
+@test_all_form_renderers()
 class TestIsBoundBehavior(SimpleTestCase):
     def test_no_data_error(self):
         formset = ArticleFormSet({})
@@ -1359,7 +1387,7 @@ class TestIsBoundBehavior(SimpleTestCase):
         )
         self.assertEqual(formset.errors, [])
         # Can still render the formset.
-        self.assertEqual(
+        self.assertHTMLEqual(
             str(formset),
             '<tr><td colspan="2">'
             '<ul class="errorlist nonfield">'
@@ -1390,7 +1418,7 @@ class TestIsBoundBehavior(SimpleTestCase):
         )
         self.assertEqual(formset.errors, [])
         # Can still render the formset.
-        self.assertEqual(
+        self.assertHTMLEqual(
             str(formset),
             '<tr><td colspan="2">'
             '<ul class="errorlist nonfield">'

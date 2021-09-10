@@ -775,8 +775,91 @@ But with ``ArticleFormset(prefix='article')`` that becomes:
 This is useful if you want to :ref:`use more than one formset in a view
 <multiple-formsets-in-view>`.
 
+.. _formset-rendering:
+
 Using a formset in views and templates
 ======================================
+
+Formsets have five attributes and five methods associated with rendering.
+
+.. attribute:: BaseFormSet.renderer
+
+    .. versionadded:: 4.0
+
+    Specifies the :doc:`renderer </ref/forms/renderers>` to use for the
+    formset. Defaults to the renderer specified by the :setting:`FORM_RENDERER`
+    setting.
+
+.. attribute:: BaseFormSet.template_name
+
+    .. versionadded:: 4.0
+
+    The name of the template used when calling ``__str__`` or :meth:`.render`.
+    This template renders the formsets management forms and then each form in
+    the formset as per the template defined by the
+    forms :attr:`~django.forms.Form.template_name`. This is a proxy of
+    ``as_table`` by default.
+
+.. attribute:: BaseFormSet.template_name_p
+
+    .. versionadded:: 4.0
+
+    The name of the template used when calling :meth:`.as_p`. By default this
+    is ``'django/forms/formsets/p.html'``. This template renders the formsets
+    management forms and then each form in the formset as per the forms
+    :meth:`~django.forms.Form.as_p` method.
+
+.. attribute:: BaseFormSet.template_name_table
+
+    .. versionadded:: 4.0
+
+    The name of the template used when calling :meth:`.as_table`. By default
+    this is ``'django/forms/formsets/table.html'``. This template renders the
+    formsets management forms and then each form in the formset as per the
+    forms :meth:`~django.forms.Form.as_table` method.
+
+.. attribute:: BaseFormSet.template_name_ul
+
+    .. versionadded:: 4.0
+
+    The name of the template used when calling :meth:`.as_ul`. By default this
+    is ``'django/forms/formsets/ul.html'``. This template renders the formsets
+    management forms and then each form in the formset as per the forms
+    :meth:`~django.forms.Form.as_ul` method.
+
+.. method:: BaseFormSet.get_context()
+
+    .. versionadded:: 4.0
+
+    Returns the context for rendering a formset in a template.
+
+    The available context is:
+
+    * ``formset`` : The instance of the formset.
+
+.. method:: BaseFormSet.render(template_name=None, context=None, renderer=None)
+
+    .. versionadded:: 4.0
+
+    The render method is called by ``__str__`` as well as the :meth:`.as_p`,
+    :meth:`.as_ul`, and :meth:`.as_table` methods. All arguments are optional
+    and will default to:
+
+    * ``template_name``: :attr:`.template_name`
+    * ``context``: Value returned by :meth:`.get_context`
+    * ``renderer``: Value returned by :attr:`.renderer`
+
+.. method:: BaseFormSet.as_p()
+
+    Renders the formset with the :attr:`.template_name_p` template.
+
+.. method:: BaseFormSet.as_table()
+
+    Renders the formset with the :attr:`.template_name_table` template.
+
+.. method:: BaseFormSet.as_ul()
+
+    Renders the formset with the :attr:`.template_name_ul` template.
 
 Using a formset inside a view is not very different from using a regular
 ``Form`` class. The only thing you will want to be aware of is making sure to
@@ -821,7 +904,17 @@ deal with the management form:
         </table>
     </form>
 
-The above ends up calling the ``as_table`` method on the formset class.
+The above ends up calling the :meth:`BaseFormSet.render` method on the formset
+class. This renders the formset using the template specified by the
+:attr:`~BaseFormSet.template_name` attribute. Similar to forms, by default the
+formset will be rendered ``as_table``, with other helper methods of ``as_p``
+and ``as_ul`` being available. The rendering of the formset can be customized
+by specifying the ``template_name`` attribute, or more generally by
+:ref:`overriding the default template <overriding-built-in-formset-templates>`.
+
+.. versionchanged:: 4.0
+
+    Rendering of formsets was moved to the template engine.
 
 .. _manually-rendered-can-delete-and-can-order:
 

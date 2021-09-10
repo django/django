@@ -1,0 +1,24 @@
+{% if errors %}
+  <li>
+    {{ errors }}
+  {% if not fields %}
+    {% for field in hidden_fields %}{{ field }}{% endfor %}
+  {% endif %}
+  </li>
+{% endif %}
+{% for field, errors in fields %}
+  <li{% with classes=field.css_classes %}{% if classes %} class="{{ classes }}"{% endif %}{% endwith %}>
+    {{ errors }}
+    {% if field.label %}{{ field.label_tag }}{% endif %}
+    {{ field }}
+    {% if field.help_text %}
+      <span class="helptext">{{ field.help_text }}</span>
+    {% endif %}
+    {% if forloop.last %}
+      {% for field in hidden_fields %}{{ field }}{% endfor %}
+    {% endif %}
+  </li>
+{% endfor %}
+{% if not fields and not errors %}
+  {% for field in hidden_fields %}{{ field }}{% endfor %}
+{% endif %}

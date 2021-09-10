@@ -733,12 +733,17 @@ Reusable form templates
 
 If your site uses the same rendering logic for forms in multiple places, you
 can reduce duplication by saving the form's loop in a standalone template and
-using the :ttag:`include` tag to reuse it in other templates:
+overriding the forms :attr:`~django.forms.Form.template_name` attribute to
+render the form using the custom template. The below example will result in
+``{{ form }}`` being rendered as the output of the ``form_snippet.html``
+template.
+
+In your templates:
 
 .. code-block:: html+django
 
-    # In your form template:
-    {% include "form_snippet.html" %}
+    # In your template:
+    {{ form }}
 
     # In form_snippet.html:
     {% for field in form %}
@@ -748,16 +753,15 @@ using the :ttag:`include` tag to reuse it in other templates:
         </div>
     {% endfor %}
 
-If the form object passed to a template has a different name within the
-context, you can alias it using the ``with`` argument of the :ttag:`include`
-tag:
+In your form::
 
-.. code-block:: html+django
+    class MyForm(forms.Form):
+        template_name = 'form_snippet.html'
+        ...
 
-    {% include "form_snippet.html" with form=comment_form %}
+.. versionchanged:: 4.0
 
-If you find yourself doing this often, you might consider creating a custom
-:ref:`inclusion tag<howto-custom-template-tags-inclusion-tags>`.
+    Template rendering of forms was added.
 
 Further topics
 ==============

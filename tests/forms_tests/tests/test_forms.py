@@ -23,6 +23,7 @@ from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils.datastructures import MultiValueDict
 from django.utils.safestring import mark_safe
+from tests.forms_tests.tests import test_all_form_renderers
 
 
 class FrameworkForm(Form):
@@ -55,6 +56,7 @@ class MultiValueDictLike(dict):
         return [self[key]]
 
 
+@test_all_form_renderers()
 class FormsTestCase(SimpleTestCase):
     # A Form is a collection of Fields. It knows how to validate a set of data and it
     # knows how to render itself in a couple of default ways (e.g., an HTML table).
@@ -3077,117 +3079,6 @@ Password: <input type="password" name="password" required>
 
         self.assertHTMLEqual(boundfield.label_tag(label_suffix='$'), '<label for="id_field">Field$</label>')
 
-    def test_field_name(self):
-        """#5749 - `field_name` may be used as a key in _html_output()."""
-        class SomeForm(Form):
-            some_field = CharField()
-
-            def as_p(self):
-                return self._html_output(
-                    normal_row='<p id="p_%(field_name)s"></p>',
-                    error_row='%s',
-                    row_ender='</p>',
-                    help_text_html=' %s',
-                    errors_on_separate_row=True,
-                )
-
-        form = SomeForm()
-        self.assertHTMLEqual(form.as_p(), '<p id="p_some_field"></p>')
-
-    def test_field_without_css_classes(self):
-        """
-        `css_classes` may be used as a key in _html_output() (empty classes).
-        """
-        class SomeForm(Form):
-            some_field = CharField()
-
-            def as_p(self):
-                return self._html_output(
-                    normal_row='<p class="%(css_classes)s"></p>',
-                    error_row='%s',
-                    row_ender='</p>',
-                    help_text_html=' %s',
-                    errors_on_separate_row=True,
-                )
-
-        form = SomeForm()
-        self.assertHTMLEqual(form.as_p(), '<p class=""></p>')
-
-    def test_field_with_css_class(self):
-        """
-        `css_classes` may be used as a key in _html_output() (class comes
-        from required_css_class in this case).
-        """
-        class SomeForm(Form):
-            some_field = CharField()
-            required_css_class = 'foo'
-
-            def as_p(self):
-                return self._html_output(
-                    normal_row='<p class="%(css_classes)s"></p>',
-                    error_row='%s',
-                    row_ender='</p>',
-                    help_text_html=' %s',
-                    errors_on_separate_row=True,
-                )
-
-        form = SomeForm()
-        self.assertHTMLEqual(form.as_p(), '<p class="foo"></p>')
-
-    def test_field_name_with_hidden_input(self):
-        """
-        BaseForm._html_output() should merge all the hidden input fields and
-        put them in the last row.
-        """
-        class SomeForm(Form):
-            hidden1 = CharField(widget=HiddenInput)
-            custom = CharField()
-            hidden2 = CharField(widget=HiddenInput)
-
-            def as_p(self):
-                return self._html_output(
-                    normal_row='<p%(html_class_attr)s>%(field)s %(field_name)s</p>',
-                    error_row='%s',
-                    row_ender='</p>',
-                    help_text_html=' %s',
-                    errors_on_separate_row=True,
-                )
-
-        form = SomeForm()
-        self.assertHTMLEqual(
-            form.as_p(),
-            '<p><input id="id_custom" name="custom" type="text" required> custom'
-            '<input id="id_hidden1" name="hidden1" type="hidden">'
-            '<input id="id_hidden2" name="hidden2" type="hidden"></p>'
-        )
-
-    def test_field_name_with_hidden_input_and_non_matching_row_ender(self):
-        """
-        BaseForm._html_output() should merge all the hidden input fields and
-        put them in the last row ended with the specific row ender.
-        """
-        class SomeForm(Form):
-            hidden1 = CharField(widget=HiddenInput)
-            custom = CharField()
-            hidden2 = CharField(widget=HiddenInput)
-
-            def as_p(self):
-                return self._html_output(
-                    normal_row='<p%(html_class_attr)s>%(field)s %(field_name)s</p>',
-                    error_row='%s',
-                    row_ender='<hr><hr>',
-                    help_text_html=' %s',
-                    errors_on_separate_row=True
-                )
-
-        form = SomeForm()
-        self.assertHTMLEqual(
-            form.as_p(),
-            '<p><input id="id_custom" name="custom" type="text" required> custom</p>\n'
-            '<input id="id_hidden1" name="hidden1" type="hidden">'
-            '<input id="id_hidden2" name="hidden2" type="hidden"><hr><hr>'
-        )
-
     def test_error_dict(self):
         class MyForm(Form):
             foo = CharField()
@@ -3376,30 +3267,6 @@ Password: <input type="password" name="password" required>
 <tr><th><label for="id_last_name">Last name:</label></th><td>
 <input id="id_last_name" name="last_name" type="text" value="Lennon" required></td></tr>"""
         )
-
-    def test_errorlist_override(self):
-        class DivErrorList(ErrorList):
-            def __str__(self):
-                return self.as_divs()
-
-            def as_divs(self):
-                if not self:
-                    return ''
-                return '<div class="errorlist">%s</div>' % ''.join(
-                    '<div class="error">%s</div>' % e for e in self)
-
-        class CommentForm(Form):
-            name = CharField(max_length=50, required=False)
-            email = EmailField()
-            comment = CharField()
-
-        data = {'email': 'invalid'}
-        f = CommentForm(data, auto_id=False, error_class=DivErrorList)
-        self.assertHTMLEqual(f.as_p(), """<p>Name: <input type="text" name="name" maxlength="50"></p>
-<div class="errorlist"><div class="error">Enter a valid email address.</div></div>
-<p>Email: <input type="email" name="email" value="invalid" required></p>
-<div class="errorlist"><div class="error">This field is required.</div></div>
-<p>Comment: <input type="text" name="comment" required></p>""")
 
     def test_error_escaping(self):
         class TestForm(Form):
@@ -4044,4 +3911,41 @@ class TemplateTests(SimpleTestCase):
             }),
             "VALID: [('password1', 'secret'), ('password2', 'secret'), "
             "('username', 'adrian')]",
+        )
+
+
+class OverrideTests(SimpleTestCase):
+    def test_use_custom_template(self):
+        class Person(Form):
+            first_name = CharField()
+            template_name = 'forms_tests/form_snippet.html'
+
+        t = Template('{{ form }}')
+        html = t.render(Context({'form': Person()}))
+        expected = """
+        <div class="fieldWrapper"><label for="id_first_name">First name:</label>
+        <input type="text" name="first_name" required id="id_first_name"></div>
+        """
+        self.assertHTMLEqual(html, expected)
+
+    def test_errorlist_override(self):
+        class CustomErrorList(ErrorList):
+            template_name = 'forms_tests/error.html'
+
+        class CommentForm(Form):
+            name = CharField(max_length=50, required=False)
+            email = EmailField()
+            comment = CharField()
+
+        data = {'email': 'invalid'}
+        f = CommentForm(data, auto_id=False, error_class=CustomErrorList)
+        self.assertHTMLEqual(
+            f.as_p(),
+            '<p>Name: <input type="text" name="name" maxlength="50"></p>'
+            '<div class="errorlist">'
+            '<div class="error">Enter a valid email address.</div></div>'
+            '<p>Email: <input type="email" name="email" value="invalid" required></p>'
+            '<div class="errorlist">'
+            '<div class="error">This field is required.</div></div>'
+            '<p>Comment: <input type="text" name="comment" required></p>',
         )

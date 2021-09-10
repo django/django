@@ -57,6 +57,11 @@ details on these changes.
 * The ``django.contrib.gis.admin.GeoModelAdmin`` and ``OSMGeoAdmin`` classes
   will be removed.
 
+* The undocumented ``BaseForm._html_output()`` method will be removed.
+
+* The ability to return a ``str``, rather than a ``SafeString``, when rendering
+  an ``ErrorDict`` and ``ErrorList`` will be removed.
+
 .. _deprecation-removed-in-4.1:
 
 4.1

@@ -1,0 +1,29 @@
+{% if errors %}
+  <tr>
+    <td colspan="2">
+      {{ errors }}
+      {% if not fields %}
+        {% for field in hidden_fields %}{{ field }}{% endfor %}
+      {% endif %}
+    </td>
+  </tr>
+{% endif %}
+{% for field, errors in fields %}
+  <tr{% with classes=field.css_classes %}{% if classes %} class="{{ classes }}"{% endif %}{% endwith %}>
+    <th>{% if field.label %}{{ field.label_tag }}{% endif %}</th>
+    <td>
+      {{ errors }}
+      {{ field }}
+      {% if field.help_text %}
+        <br>
+        <span class="helptext">{{ field.help_text }}</span>
+      {% endif %}
+      {% if forloop.last %}
+        {% for field in hidden_fields %}{{ field }}{% endfor %}
+      {% endif %}
+    </td>
+  </tr>
+{% endfor %}
+{% if not fields and not errors %}
+  {% for field in hidden_fields %}{{ field }}{% endfor %}
+{% endif %}
