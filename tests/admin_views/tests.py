@@ -17,12 +17,12 @@ except ImportError:
 
 from django.contrib import admin
 from django.contrib.admin import AdminSite, ModelAdmin
-from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
+from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME, AdminReadonlyField
 from django.contrib.admin.models import ADDITION, DELETION, LogEntry
 from django.contrib.admin.options import TO_FIELD_VAR
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.tests import AdminSeleniumTestCase
-from django.contrib.admin.utils import quote
+from django.contrib.admin.utils import quote, lookup_field
 from django.contrib.admin.views.main import IS_POPUP_VAR
 from django.contrib.auth import REDIRECT_FIELD_NAME, get_permission_codename
 from django.contrib.auth.models import Group, Permission, User
@@ -30,10 +30,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.checks import Error
 from django.core.files import temp as tempfile
+from django.forms import ModelForm
 from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
 from django.test import (
     TestCase, modify_settings, override_settings, skipUnlessDBFeature,
+    RequestFactory,
 )
 from django.test.utils import override_script_prefix
 from django.urls import NoReverseMatch, resolve, reverse
@@ -44,7 +46,7 @@ from django.utils.html import escape
 from django.utils.http import urlencode
 
 from . import customadmin
-from .admin import CityAdmin, site, site2
+from .admin import CityAdmin, site, site2, ReadOnlyRelatedFieldAdmin
 from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
     AdminOrderedModelMethod, Album, Answer, Answer2, Article, BarAccount, Book,
@@ -5131,6 +5133,38 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         )
         # Related ForeignKey object not registered in admin.
         self.assertContains(response, '<div class="readonly">Chapter 1</div>', html=True)
+
+    #TODO New test being added.
+    def test_readonly_foreignkey_links_custom_adminsite(self):
+        """
+        ForeignKey readonly fields render as links if the target model is
+        registered in admin.
+        """
+        chapter = Chapter.objects.create(
+            title='Chapter 1',
+            content='content',
+            book=Book.objects.create(name='Book 1'),
+        )
+        language = Language.objects.create(iso='_40', name='Test')
+        obj = ReadOnlyRelatedField.objects.create(
+            chapter=chapter,
+            language=language,
+            user=self.superuser,
+        )
+
+        request = RequestFactory().get(
+            reverse('namespaced_admin:admin_views_readonlyrelatedfield_change', args=(obj.pk,)),
+        )
+
+        related_admin = site2._registry[ReadOnlyRelatedField]
+        admin_form = related_admin.get_form(request, obj=obj)()
+        readonly_field = AdminReadonlyField(admin_form, 'chapter', True, model_admin=related_admin)
+
+        field_url = readonly_field.get_admin_url(Language.iso.field, language)
+        self.assertIn('/admin5/', field_url)
+
+        field_url = readonly_field.get_admin_url(User.id.field, self.superuser)
+        self.assertIn('/admin5/auth/user/', field_url)
 
     def test_readonly_manytomany_backwards_ref(self):
         """
