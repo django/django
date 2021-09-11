@@ -17,12 +17,14 @@ except ImportError:
 
 from django.contrib import admin
 from django.contrib.admin import AdminSite, ModelAdmin
-from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME, AdminReadonlyField
+from django.contrib.admin.helpers import (
+    ACTION_CHECKBOX_NAME, AdminReadonlyField,
+)
 from django.contrib.admin.models import ADDITION, DELETION, LogEntry
 from django.contrib.admin.options import TO_FIELD_VAR
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.tests import AdminSeleniumTestCase
-from django.contrib.admin.utils import quote, lookup_field
+from django.contrib.admin.utils import quote
 from django.contrib.admin.views.main import IS_POPUP_VAR
 from django.contrib.auth import REDIRECT_FIELD_NAME, get_permission_codename
 from django.contrib.auth.models import Group, Permission, User
@@ -30,7 +32,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.checks import Error
 from django.core.files import temp as tempfile
-from django.forms import ModelForm
 from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
 from django.test import (
@@ -46,7 +47,7 @@ from django.utils.html import escape
 from django.utils.http import urlencode
 
 from . import customadmin
-from .admin import CityAdmin, site, site2, ReadOnlyRelatedFieldAdmin
+from .admin import CityAdmin, site, site2
 from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
     AdminOrderedModelMethod, Album, Answer, Answer2, Article, BarAccount, Book,
