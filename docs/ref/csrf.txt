@@ -153,7 +153,7 @@ Finally, you'll need to set the header on your AJAX request. Using the
         {
             headers: {'X-CSRFToken': csrftoken},
             method: 'POST',
-            mode: 'same-origin', // Do not send CSRF token to another domain.
+            mode: 'same-origin' // Do not send CSRF token to another domain.
         }
     );
     fetch(request).then(function(response) {
