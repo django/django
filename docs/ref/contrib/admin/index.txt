@@ -2453,13 +2453,19 @@ The ``InlineModelAdmin`` class adds or customizes:
 
 .. attribute:: InlineModelAdmin.verbose_name
 
-    An override to the ``verbose_name`` found in the model's inner ``Meta``
-    class.
+    An override to the :attr:`~django.db.models.Options.verbose_name` from the
+    model's inner ``Meta`` class.
 
 .. attribute:: InlineModelAdmin.verbose_name_plural
 
-    An override to the ``verbose_name_plural`` found in the model's inner
-    ``Meta`` class.
+    An override to the :attr:`~django.db.models.Options.verbose_name_plural`
+    from the model's inner ``Meta`` class. If this isn't given and the
+    :attr:`.InlineModelAdmin.verbose_name` is defined, Django will use
+    :attr:`.InlineModelAdmin.verbose_name` + ``'s'``.
+
+    .. versionchanged:: 4.0
+
+        The fallback to :attr:`.InlineModelAdmin.verbose_name` was added.
 
 .. attribute:: InlineModelAdmin.can_delete
 

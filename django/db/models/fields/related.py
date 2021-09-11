@@ -1247,17 +1247,6 @@ class ManyToManyField(RelatedField):
                     id='fields.W341',
                 )
             )
-        if (self.remote_field.limit_choices_to and self.remote_field.through and
-                not self.remote_field.through._meta.auto_created):
-            warnings.append(
-                checks.Warning(
-                    'limit_choices_to has no effect on ManyToManyField '
-                    'with a through model.',
-                    obj=self,
-                    id='fields.W343',
-                )
-            )
-
         if self.remote_field.symmetrical and self._related_name:
             warnings.append(
                 checks.Warning(

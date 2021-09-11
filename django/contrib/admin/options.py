@@ -2037,10 +2037,13 @@ class InlineModelAdmin(BaseModelAdmin):
         self.opts = self.model._meta
         self.has_registered_model = admin_site.is_registered(self.model)
         super().__init__()
+        if self.verbose_name_plural is None:
+            if self.verbose_name is None:
+                self.verbose_name_plural = self.model._meta.verbose_name_plural
+            else:
+                self.verbose_name_plural = format_lazy('{}s', self.verbose_name)
         if self.verbose_name is None:
             self.verbose_name = self.model._meta.verbose_name
-        if self.verbose_name_plural is None:
-            self.verbose_name_plural = self.model._meta.verbose_name_plural
 
     @property
     def media(self):

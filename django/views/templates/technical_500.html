@@ -276,8 +276,8 @@
       {% endfor %}
     </ul>
   </div>
-  <form action="https://dpaste.com/" name="pasteform" id="pasteform" method="post">
 {% if not is_email %}
+  <form action="https://dpaste.com/" name="pasteform" id="pasteform" method="post">
   <div id="pastebinTraceback" class="pastebin">
     <input type="hidden" name="language" value="PythonConsole">
     <input type="hidden" name="title"
@@ -327,8 +327,8 @@ Exception Value: {{ exception_value|force_escape }}
   <input type="submit" value="Share this traceback on a public website">
   </div>
 </form>
-</div>
 {% endif %}
+</div>
 {% endif %}
 
 <div id="requestinfo">

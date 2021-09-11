@@ -21,10 +21,10 @@ from django.test.utils import isolate_apps
 from .models import (
     Article, ArticleStatus, Author, Author1, Award, BetterWriter, BigInt, Book,
     Category, Character, Colour, ColourfulItem, CustomErrorMessage, CustomFF,
-    CustomFieldForExclusionModel, DateTimePost, DerivedBook, DerivedPost,
+    CustomFieldForExclusionModel, DateTimePost, DerivedBook, DerivedPost, Dice,
     Document, ExplicitPK, FilePathModel, FlexibleDatePost, Homepage,
     ImprovedArticle, ImprovedArticleWithParentLink, Inventory,
-    NullableUniqueCharFieldModel, Person, Photo, Post, Price, Product,
+    NullableUniqueCharFieldModel, Number, Person, Photo, Post, Price, Product,
     Publication, PublicationDefaults, StrictAssignmentAll,
     StrictAssignmentFieldSpecific, Student, StumpJoke, TextFile, Triple,
     Writer, WriterProfile, test_images,
@@ -2895,6 +2895,19 @@ class LimitChoicesToTests(TestCase):
             form.fields['character3'].queryset,
             [self.marley, self.threepwood],
         )
+
+    def test_limit_choices_to_m2m_through(self):
+        class DiceForm(forms.ModelForm):
+            class Meta:
+                model = Dice
+                fields = ['numbers']
+
+        Number.objects.create(value=0)
+        n1 = Number.objects.create(value=1)
+        n2 = Number.objects.create(value=2)
+
+        form = DiceForm()
+        self.assertCountEqual(form.fields['numbers'].queryset, [n1, n2])
 
 
 class FormFieldCallbackTests(SimpleTestCase):

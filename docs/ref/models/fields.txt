@@ -1810,10 +1810,6 @@ that control how the relationship functions.
 
     Same as :attr:`ForeignKey.limit_choices_to`.
 
-    ``limit_choices_to`` has no effect when used on a ``ManyToManyField`` with a
-    custom intermediate table specified using the
-    :attr:`~ManyToManyField.through` parameter.
-
 .. attribute:: ManyToManyField.symmetrical
 
     Only used in the definition of ManyToManyFields on self. Consider the
