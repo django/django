@@ -5137,8 +5137,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
 
     def test_readonly_foreignkey_links_custom_adminsite(self):
         """
-        Verifies that the correct links are rendered if an
-        alternate admin site is used.
+        Alternate admin site generates proper links for readonly fields
         """
         chapter = Chapter.objects.create(
             title='Chapter 1',
