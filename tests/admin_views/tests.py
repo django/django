@@ -5135,11 +5135,10 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         # Related ForeignKey object not registered in admin.
         self.assertContains(response, '<div class="readonly">Chapter 1</div>', html=True)
 
-    #TODO New test being added.
     def test_readonly_foreignkey_links_custom_adminsite(self):
         """
-        ForeignKey readonly fields render as links if the target model is
-        registered in admin.
+        Verifies that the correct links are rendered if an
+        alternate admin site is used.
         """
         chapter = Chapter.objects.create(
             title='Chapter 1',
@@ -5154,16 +5153,24 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         )
 
         request = RequestFactory().get(
-            reverse('namespaced_admin:admin_views_readonlyrelatedfield_change', args=(obj.pk,)),
+            reverse(
+                'namespaced_admin:admin_views_readonlyrelatedfield_change',
+                args=(obj.pk,)
+            )
         )
 
+        # Get an AdminReadonlyField for the alternate admin site
         related_admin = site2._registry[ReadOnlyRelatedField]
         admin_form = related_admin.get_form(request, obj=obj)()
-        readonly_field = AdminReadonlyField(admin_form, 'chapter', True, model_admin=related_admin)
+        readonly_field = AdminReadonlyField(
+            admin_form, 'chapter', True, model_admin=related_admin
+        )
 
+        # Verify that a foreign key to the same app renders correctly
         field_url = readonly_field.get_admin_url(Language.iso.field, language)
         self.assertIn('/admin5/', field_url)
 
+        # Verify that a foriegn key to a different app renders correctly
         field_url = readonly_field.get_admin_url(User.id.field, self.superuser)
         self.assertIn('/admin5/auth/user/', field_url)
 
