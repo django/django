@@ -10,7 +10,7 @@ from django.http.response import (
     HttpResponseServerError, JsonResponse, StreamingHttpResponse,
 )
 
-__all__ = [
+ all = [
     'SimpleCookie', 'parse_cookie', 'HttpRequest', 'QueryDict',
     'RawPostDataException', 'UnreadablePostError',
     'HttpResponse', 'StreamingHttpResponse', 'HttpResponseRedirect',
