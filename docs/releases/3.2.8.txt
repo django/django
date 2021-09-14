@@ -9,4 +9,5 @@ Django 3.2.8 fixes several bugs in 3.2.7.
 Bugfixes
 ========
 
-* ...
+* Fixed a bug in Django 3.2 that caused incorrect links on read-only fields in
+  admin (:ticket:`33077`).

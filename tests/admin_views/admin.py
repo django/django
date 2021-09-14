@@ -1142,6 +1142,8 @@ site2.register(
     raw_id_fields=['parent'],
 )
 site2.register(Person, save_as_continue=False)
+site2.register(ReadOnlyRelatedField, ReadOnlyRelatedFieldAdmin)
+site2.register(Language)
 
 site7 = admin.AdminSite(name="admin7")
 site7.register(Article, ArticleAdmin2)
