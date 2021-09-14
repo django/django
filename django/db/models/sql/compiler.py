@@ -631,10 +631,10 @@ class SQLCompiler:
                     result.append('HAVING %s' % having)
                     params.extend(h_params)
 
-            if self.query.explain_query:
+            if self.query.explain_info:
                 result.insert(0, self.connection.ops.explain_query_prefix(
-                    self.query.explain_format,
-                    **self.query.explain_options
+                    self.query.explain_info.format,
+                    **self.query.explain_info.options
                 ))
 
             if order_by:
@@ -1247,7 +1247,7 @@ class SQLCompiler:
         result = list(self.execute_sql())
         # Some backends return 1 item tuples with strings, and others return
         # tuples with integers and strings. Flatten them out into strings.
-        output_formatter = json.dumps if self.query.explain_format == 'json' else str
+        output_formatter = json.dumps if self.query.explain_info.format == 'json' else str
         for row in result[0]:
             if not isinstance(row, str):
                 yield ' '.join(output_formatter(c) for c in row)

@@ -136,6 +136,9 @@ class RawQuery:
         self.cursor.execute(self.sql, params)
 
 
+ExplainInfo = namedtuple('ExplainInfo', ('format', 'options'))
+
+
 class Query(BaseExpression):
     """A single SQL query."""
 
@@ -227,9 +230,7 @@ class Query(BaseExpression):
 
         self._filtered_relations = {}
 
-        self.explain_query = False
-        self.explain_format = None
-        self.explain_options = {}
+        self.explain_info = None
 
     @property
     def output_field(self):
@@ -545,9 +546,7 @@ class Query(BaseExpression):
 
     def explain(self, using, format=None, **options):
         q = self.clone()
-        q.explain_query = True
-        q.explain_format = format
-        q.explain_options = options
+        q.explain_info = ExplainInfo(format, options)
         compiler = q.get_compiler(using=using)
         return '\n'.join(compiler.explain_query())
 
