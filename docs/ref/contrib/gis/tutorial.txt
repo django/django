@@ -78,9 +78,9 @@ file. Edit the database connection settings to match your setup::
 
     DATABASES = {
         'default': {
-             'ENGINE': 'django.contrib.gis.db.backends.postgis',
-             'NAME': 'geodjango',
-             'USER': 'geo',
+            'ENGINE': 'django.contrib.gis.db.backends.postgis',
+            'NAME': 'geodjango',
+            'USER': 'geo',
         },
     }
 
@@ -258,7 +258,7 @@ This command should produce the following output:
     -- Create model WorldBorder
     --
     CREATE TABLE "world_worldborder" (
-        "id" serial NOT NULL PRIMARY KEY,
+        "id" bigserial NOT NULL PRIMARY KEY,
         "name" varchar(50) NOT NULL,
         "area" integer NOT NULL,
         "pop2005" integer NOT NULL,
@@ -273,7 +273,7 @@ This command should produce the following output:
         "mpoly" geometry(MULTIPOLYGON,4326) NOT NULL
     )
     ;
-    CREATE INDEX "world_worldborder_mpoly_id" ON "world_worldborder" USING GIST ( "mpoly" );
+    CREATE INDEX "world_worldborder_mpoly_id" ON "world_worldborder" USING GIST ("mpoly");
     COMMIT;
 
 If this looks correct, run :djadmin:`migrate` to create this table in the
@@ -367,13 +367,20 @@ system associated with it.  If it does, the ``srs`` attribute will return a
 
     >>> srs = lyr.srs
     >>> print(srs)
-    GEOGCS["GCS_WGS_1984",
-        DATUM["WGS_1984",
-            SPHEROID["WGS_1984",6378137.0,298.257223563]],
-        PRIMEM["Greenwich",0.0],
-        UNIT["Degree",0.0174532925199433]]
+    GEOGCS["WGS 84",
+    DATUM["WGS_1984",
+        SPHEROID["WGS 84",6378137,298.257223563,
+            AUTHORITY["EPSG","7030"]],
+        AUTHORITY["EPSG","6326"]],
+    PRIMEM["Greenwich",0,
+        AUTHORITY["EPSG","8901"]],
+    UNIT["degree",0.0174532925199433,
+        AUTHORITY["EPSG","9122"]],
+    AXIS["Latitude",NORTH],
+    AXIS["Longitude",EAST],
+    AUTHORITY["EPSG","4326"]]
     >>> srs.proj # PROJ representation
-    '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
+    '+proj=longlat +datum=WGS84 +no_defs'
 
 This shapefile is in the popular WGS84 spatial reference
 system -- in other words, the data uses longitude, latitude pairs in
@@ -389,7 +396,7 @@ The following code will let you examine the OGR types (e.g. integer or
 string) associated with each of the fields:
 
     >>> [fld.__name__ for fld in lyr.field_types]
-    ['OFTString', 'OFTString', 'OFTString', 'OFTInteger', 'OFTString', 'OFTInteger', 'OFTInteger', 'OFTInteger', 'OFTInteger', 'OFTReal', 'OFTReal']
+    ['OFTString', 'OFTString', 'OFTString', 'OFTInteger', 'OFTString', 'OFTInteger', 'OFTInteger64', 'OFTInteger', 'OFTInteger', 'OFTReal', 'OFTReal']
 
 You can iterate over each feature in the layer and extract information from both
 the feature's geometry (accessed via the ``geom`` attribute) as well as the
@@ -423,11 +430,10 @@ Boundary geometries may be exported as WKT and GeoJSON::
     >>> print(geom.json)
     { "type": "Polygon", "coordinates": [ [ [ 12.415798, 43.957954 ], [ 12.450554, 43.979721 ], ...
 
-
 ``LayerMapping``
 ----------------
 
-To import the data, use a LayerMapping in a Python script.
+To import the data, use a ``LayerMapping`` in a Python script.
 Create a file called ``load.py`` inside the ``world`` application,
 with the following code::
 
@@ -684,7 +690,6 @@ Geographic annotations
 GeoDjango also offers a set of geographic annotations to compute distances and
 several other operations (intersection, difference, etc.). See the
 :doc:`functions` documentation.
-
 
 Putting your data on the map
 ============================
