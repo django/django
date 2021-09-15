@@ -5,7 +5,8 @@ from .models import CharFieldModel, TextFieldModel
 
 try:
     from django.contrib.postgres.search import (
-        TrigramDistance, TrigramSimilarity,
+        TrigramDistance, TrigramSimilarity, TrigramWordDistance,
+        TrigramWordSimilarity,
     )
 except ImportError:
     pass
@@ -30,6 +31,15 @@ class TrigramTest(PostgreSQLTestCase):
             transform=lambda instance: instance.field,
         )
 
+    def test_trigram_word_search(self):
+        obj = self.Model.objects.create(
+            field='Gumby rides on the path of Middlesbrough',
+        )
+        self.assertSequenceEqual(
+            self.Model.objects.filter(field__trigram_word_similar='Middlesborough'),
+            [obj],
+        )
+
     def test_trigram_similarity(self):
         search = 'Bat sat on cat.'
         # Round result of similarity because PostgreSQL 12+ uses greater
@@ -43,6 +53,20 @@ class TrigramTest(PostgreSQLTestCase):
             ordered=True,
         )
 
+    def test_trigram_word_similarity(self):
+        search = 'mat'
+        self.assertSequenceEqual(
+            self.Model.objects.filter(
+                field__trigram_word_similar=search,
+            ).annotate(
+                word_similarity=TrigramWordSimilarity(search, 'field'),
+            ).values('field', 'word_similarity').order_by('-word_similarity'),
+            [
+                {'field': 'Cat sat on mat.', 'word_similarity': 1.0},
+                {'field': 'Matthew', 'word_similarity': 0.75},
+            ],
+        )
+
     def test_trigram_similarity_alternate(self):
         # Round result of distance because PostgreSQL 12+ uses greater
         # precision.
@@ -53,6 +77,19 @@ class TrigramTest(PostgreSQLTestCase):
             [('Cat sat on mat.', 0.375), ('Dog sat on rug.', 0.666667)],
             transform=lambda instance: (instance.field, round(instance.distance, 6)),
             ordered=True,
+        )
+
+    def test_trigram_word_similarity_alternate(self):
+        self.assertSequenceEqual(
+            self.Model.objects.annotate(
+                word_distance=TrigramWordDistance('mat', 'field'),
+            ).filter(
+                word_distance__lte=0.7,
+            ).values('field', 'word_distance').order_by('word_distance'),
+            [
+                {'field': 'Cat sat on mat.', 'word_distance': 0},
+                {'field': 'Matthew', 'word_distance': 0.25},
+            ],
         )
 
 

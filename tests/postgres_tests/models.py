@@ -83,7 +83,7 @@ class ArrayEnumModel(PostgreSQLModel):
 
 
 class CharFieldModel(models.Model):
-    field = models.CharField(max_length=16)
+    field = models.CharField(max_length=64)
 
 
 class TextFieldModel(models.Model):

@@ -110,7 +110,7 @@ class Migration(migrations.Migration):
             name='CharFieldModel',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('field', models.CharField(max_length=16)),
+                ('field', models.CharField(max_length=64)),
             ],
             options=None,
             bases=None,

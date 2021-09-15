@@ -200,6 +200,13 @@ Minor features
   expression allows using subqueries to construct lists of values on
   PostgreSQL.
 
+* The new :lookup:`trigram_word_similar` lookup, and the
+  :class:`TrigramWordDistance()
+  <django.contrib.postgres.search.TrigramWordDistance>` and
+  :class:`TrigramWordSimilarity()
+  <django.contrib.postgres.search.TrigramWordSimilarity>` expressions allow
+  using trigram word similarity.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
