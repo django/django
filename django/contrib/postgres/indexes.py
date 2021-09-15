@@ -4,7 +4,7 @@ from django.utils.functional import cached_property
 
 __all__ = [
     'BloomIndex', 'BrinIndex', 'BTreeIndex', 'GinIndex', 'GistIndex',
-    'HashIndex', 'SpGistIndex',
+    'HashIndex', 'SpGistIndex', 'OpClass',
 ]
 
 
