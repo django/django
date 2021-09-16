@@ -252,3 +252,6 @@ to remove usage of these features.
 
 * Support for using a boolean value in
   :attr:`.BaseCommand.requires_system_checks` is removed.
+
+* The ``whitelist`` argument and ``domain_whitelist`` attribute of
+  ``django.core.validators.EmailValidator`` are removed.

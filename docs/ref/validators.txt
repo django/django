@@ -151,13 +151,6 @@ to, or in lieu of custom ``field.clean()`` methods.
         validation, so you'd need to add them to the ``allowlist`` as
         necessary.
 
-    .. deprecated:: 3.2
-
-        The ``whitelist`` parameter is deprecated. Use :attr:`allowlist`
-        instead.
-        The undocumented ``domain_whitelist`` attribute is deprecated. Use
-        ``domain_allowlist`` instead.
-
 ``URLValidator``
 ----------------
 

@@ -15,8 +15,7 @@ from django.core.validators import (
     validate_ipv4_address, validate_ipv6_address, validate_ipv46_address,
     validate_slug, validate_unicode_slug,
 )
-from django.test import SimpleTestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango41Warning
+from django.test import SimpleTestCase
 
 try:
     from PIL import Image  # noqa
@@ -738,42 +737,3 @@ class TestValidatorEquality(TestCase):
             ProhibitNullCharactersValidator(message='message', code='code1'),
             ProhibitNullCharactersValidator(message='message', code='code2')
         )
-
-
-class DeprecationTests(SimpleTestCase):
-    @ignore_warnings(category=RemovedInDjango41Warning)
-    def test_whitelist(self):
-        validator = EmailValidator(whitelist=['localdomain'])
-        self.assertEqual(validator.domain_allowlist, ['localdomain'])
-        self.assertIsNone(validator('email@localdomain'))
-        self.assertEqual(validator.domain_allowlist, validator.domain_whitelist)
-
-    def test_whitelist_warning(self):
-        msg = "The whitelist argument is deprecated in favor of allowlist."
-        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
-            EmailValidator(whitelist='localdomain')
-
-    @ignore_warnings(category=RemovedInDjango41Warning)
-    def test_domain_whitelist(self):
-        validator = EmailValidator()
-        validator.domain_whitelist = ['mydomain']
-        self.assertEqual(validator.domain_allowlist, ['mydomain'])
-        self.assertEqual(validator.domain_allowlist, validator.domain_whitelist)
-
-    def test_domain_whitelist_access_warning(self):
-        validator = EmailValidator()
-        msg = (
-            'The domain_whitelist attribute is deprecated in favor of '
-            'domain_allowlist.'
-        )
-        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
-            validator.domain_whitelist
-
-    def test_domain_whitelist_set_warning(self):
-        validator = EmailValidator()
-        msg = (
-            'The domain_whitelist attribute is deprecated in favor of '
-            'domain_allowlist.'
-        )
-        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
-            validator.domain_whitelist = ['mydomain']
