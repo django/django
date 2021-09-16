@@ -48,12 +48,6 @@ warnings.simplefilter("error", ResourceWarning)
 warnings.simplefilter("error", RuntimeWarning)
 # Ignore known warnings in test dependencies.
 warnings.filterwarnings("ignore", "'U' mode is deprecated", DeprecationWarning, module='docutils.io')
-# RemovedInDjango41Warning: Ignore MemcachedCache deprecation warning.
-warnings.filterwarnings(
-    'ignore',
-    'MemcachedCache is deprecated',
-    category=RemovedInDjango41Warning,
-)
 
 # Reduce garbage collection frequency to improve performance. Since CPython
 # uses refcounting, garbage collection only collects objects with cyclic

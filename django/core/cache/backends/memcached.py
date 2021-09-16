@@ -1,14 +1,11 @@
 "Memcached cache backend"
 
-import pickle
 import re
 import time
-import warnings
 
 from django.core.cache.backends.base import (
     DEFAULT_TIMEOUT, BaseCache, InvalidCacheKey, memcache_key_warnings,
 )
-from django.utils.deprecation import RemovedInDjango41Warning
 from django.utils.functional import cached_property
 
 
@@ -134,43 +131,6 @@ class BaseMemcachedCache(BaseCache):
     def validate_key(self, key):
         for warning in memcache_key_warnings(key):
             raise InvalidCacheKey(warning)
-
-
-class MemcachedCache(BaseMemcachedCache):
-    "An implementation of a cache binding using python-memcached"
-
-    # python-memcached doesn't support default values in get().
-    # https://github.com/linsomniac/python-memcached/issues/159
-    _missing_key = None
-
-    def __init__(self, server, params):
-        warnings.warn(
-            'MemcachedCache is deprecated in favor of PyMemcacheCache and '
-            'PyLibMCCache.',
-            RemovedInDjango41Warning, stacklevel=2,
-        )
-        # python-memcached ≥ 1.45 returns None for a nonexistent key in
-        # incr/decr(), python-memcached < 1.45 raises ValueError.
-        import memcache
-        super().__init__(server, params, library=memcache, value_not_found_exception=ValueError)
-        self._options = {'pickleProtocol': pickle.HIGHEST_PROTOCOL, **self._options}
-
-    def get(self, key, default=None, version=None):
-        key = self.make_and_validate_key(key, version=version)
-        val = self._cache.get(key)
-        # python-memcached doesn't support default values in get().
-        # https://github.com/linsomniac/python-memcached/issues/159
-        # Remove this method if that issue is fixed.
-        if val is None:
-            return default
-        return val
-
-    def delete(self, key, version=None):
-        # python-memcached's delete() returns True when key doesn't exist.
-        # https://github.com/linsomniac/python-memcached/issues/170
-        # Call _deletetouch() without the NOT_FOUND in expected results.
-        key = self.make_and_validate_key(key, version=version)
-        return bool(self._cache._deletetouch([b'DELETED'], 'delete', key))
 
 
 class PyLibMCCache(BaseMemcachedCache):

@@ -158,12 +158,6 @@ permanent storage -- they're all intended to be solutions for caching, not
 storage -- but we point this out here because memory-based caching is
 particularly temporary.
 
-.. deprecated:: 3.2
-
-    The ``MemcachedCache`` backend is deprecated as ``python-memcached`` has
-    some problems and seems to be unmaintained. Use ``PyMemcacheCache`` or
-    ``PyLibMCCache`` instead.
-
 .. _redis:
 
 Redis
@@ -930,12 +924,6 @@ stored a literal value ``None``, use a sentinel object as the default::
     >>> # Wait 30 seconds for 'my_key' to expire...
     >>> cache.get('my_key', sentinel) is sentinel
     True
-
-.. admonition:: ``MemcachedCache``
-
-    Due to a ``python-memcached`` limitation, it's not possible to distinguish
-    between stored ``None`` value and a cache miss signified by a return value
-    of ``None`` on the deprecated ``MemcachedCache`` backend.
 
 ``cache.get()`` can take a ``default`` argument. This specifies which value to
 return if the object doesn't exist in the cache::
