@@ -255,3 +255,5 @@ to remove usage of these features.
 
 * The ``whitelist`` argument and ``domain_whitelist`` attribute of
   ``django.core.validators.EmailValidator`` are removed.
+
+* The ``default_app_config`` application configuration variable is removed.
