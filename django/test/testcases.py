@@ -6,7 +6,6 @@ import posixpath
 import sys
 import threading
 import unittest
-import warnings
 from collections import Counter
 from contextlib import contextmanager
 from copy import copy, deepcopy
@@ -42,7 +41,6 @@ from django.test.utils import (
     CaptureQueriesContext, ContextList, compare_xml, modify_settings,
     override_settings,
 )
-from django.utils.deprecation import RemovedInDjango41Warning
 from django.utils.functional import classproperty
 from django.utils.version import PY310
 from django.views.static import serve
@@ -1059,23 +1057,6 @@ class TransactionTestCase(SimpleTestCase):
 
     def assertQuerysetEqual(self, qs, values, transform=None, ordered=True, msg=None):
         values = list(values)
-        # RemovedInDjango41Warning.
-        if transform is None:
-            if (
-                values and isinstance(values[0], str) and
-                qs and not isinstance(qs[0], str)
-            ):
-                # Transform qs using repr() if the first element of values is a
-                # string and the first element of qs is not (which would be the
-                # case if qs is a flattened values_list).
-                warnings.warn(
-                    "In Django 4.1, repr() will not be called automatically "
-                    "on a queryset when compared to string values. Set an "
-                    "explicit 'transform' to silence this warning.",
-                    category=RemovedInDjango41Warning,
-                    stacklevel=2,
-                )
-                transform = repr
         items = qs
         if transform is not None:
             items = map(transform, items)

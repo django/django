@@ -1700,13 +1700,6 @@ your test suite.
 
     Output in case of error can be customized with the ``msg`` argument.
 
-    .. deprecated:: 3.2
-
-        If ``transform`` is not provided and ``values`` is a list of strings,
-        it's compared to a list produced by applying ``repr()`` to each member
-        of ``qs``. This behavior is deprecated and will be removed in Django
-        4.1. If you need it, explicitly set ``transform`` to ``repr``.
-
 .. method:: TransactionTestCase.assertNumQueries(num, func, *args, **kwargs)
 
     Asserts that when ``func`` is called with ``*args`` and ``**kwargs`` that
