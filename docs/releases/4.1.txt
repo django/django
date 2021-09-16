@@ -260,3 +260,6 @@ to remove usage of these features.
 
 * ``TransactionTestCase.assertQuerysetEqual()`` no longer calls ``repr()`` on a
   queryset when compared to string values.
+
+* The ``django.core.cache.backends.memcached.MemcachedCache`` backend is
+  removed.
