@@ -161,21 +161,8 @@ class CookieStorage(BaseStorage):
             return None
         try:
             return self.signer.unsign_object(data, serializer=MessageSerializer)
-        # RemovedInDjango41Warning: when the deprecation ends, replace with:
-        #
-        # except (signing.BadSignature, json.JSONDecodeError):
-        #     pass
-        except signing.BadSignature:
-            decoded = None
-        except (binascii.Error, json.JSONDecodeError):
-            decoded = self.signer.unsign(data)
-
-        if decoded:
-            # RemovedInDjango41Warning.
-            try:
-                return json.loads(decoded, cls=MessageDecoder)
-            except json.JSONDecodeError:
-                pass
+        except (signing.BadSignature, binascii.Error, json.JSONDecodeError):
+            pass
         # Mark the data as used (so it gets removed) since something was wrong
         # with the data.
         self.used = True

@@ -263,3 +263,6 @@ to remove usage of these features.
 
 * The ``django.core.cache.backends.memcached.MemcachedCache`` backend is
   removed.
+
+* Support for the pre-Django 3.2 format of messages used by
+  ``django.contrib.messages.storage.cookie.CookieStorage`` is removed.
