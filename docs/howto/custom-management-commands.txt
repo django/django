@@ -223,11 +223,6 @@ All attributes can be set in your derived class and can be used in
     ``'__all__'`` can be used to specify that all system checks should be
     performed. Default value is ``'__all__'``.
 
-    .. versionchanged:: 3.2
-
-        In older versions, the ``requires_system_checks`` attribute expects a
-        boolean value instead of a list or tuple of tags.
-
 .. attribute:: BaseCommand.style
 
     An instance attribute that helps create colored output when writing to

@@ -163,10 +163,6 @@ the field value of each one, and saving each one back to the database::
 * getting the database, rather than Python, to do work
 * reducing the number of queries some operations require
 
-.. versionchanged:: 3.2
-
-    Support for transforms of the field was added.
-
 .. _avoiding-race-conditions-using-f:
 
 Avoiding race conditions using ``F()``
@@ -460,10 +456,6 @@ grouping) contains no entries.
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
 into the ``template`` attribute.
 
-.. versionchanged:: 3.2
-
-    Support for transforms of the field was added.
-
 .. versionchanged:: 4.0
 
     The ``default`` argument was added.
@@ -521,11 +513,6 @@ output value. If no ``output_field`` is specified it will be tentatively
 inferred from the :py:class:`type` of the provided ``value``, if possible. For
 example, passing an instance of :py:class:`datetime.datetime` as ``value``
 would default ``output_field`` to :class:`~django.db.models.DateTimeField`.
-
-.. versionchanged:: 3.2
-
-  Support for inferring a default ``output_field`` from the type of ``value``
-  was added.
 
 ``ExpressionWrapper()`` expressions
 -----------------------------------
@@ -594,10 +581,6 @@ parent. For example, this queryset would need to be within a nested pair of
 ``Subquery`` instances to resolve correctly::
 
     >>> Book.objects.filter(author=OuterRef(OuterRef('pk')))
-
-.. versionchanged:: 3.2
-
-    Support for transforms of the field was added.
 
 Limiting a subquery to a single column
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -130,14 +130,10 @@ General-purpose aggregation functions
 
     .. attribute:: distinct
 
-        .. versionadded:: 3.2
-
         An optional boolean argument that determines if array values will be
         distinct. Defaults to ``False``.
 
     .. attribute:: ordering
-
-        .. versionadded:: 3.2
 
         An optional string of a field name (with an optional ``"-"`` prefix
         which indicates descending order) or an expression (or a tuple or list

@@ -363,8 +363,6 @@ progress bar is shown in the terminal.
 Fixtures compression
 ~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 3.2
-
 The output file can be compressed with one of the ``bz2``, ``gz``, ``lzma``, or
 ``xz`` formats by ending the filename with the corresponding extension.
 For example, to output the data as a compressed JSON file::
@@ -627,10 +625,6 @@ installation will be aborted, and any data installed in the call to
     constraints, so if you use MyISAM, you won't get validation of fixture
     data, or a rollback if multiple transaction files are found.
 
-.. versionchanged:: 3.2
-
-    Support for XZ archives (``.xz``) and LZMA archives (``.lzma``) was added.
-
 Database-specific fixtures
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -830,12 +824,6 @@ Generate migration files without Django version and timestamp header.
 
 Makes ``makemigrations`` exit with a non-zero status when model changes without
 migrations are detected.
-
-.. versionchanged:: 3.2
-
-    Support for calling ``makemigrations`` without an active database
-    connection was added. In that case, check for a consistent migration
-    history is skipped.
 
 ``migrate``
 -----------
@@ -1565,15 +1553,11 @@ as :option:`unittest's --buffer option<unittest.-b>`.
 
 .. django-admin-option:: --no-faulthandler
 
-.. versionadded:: 3.2
-
 Django automatically calls :func:`faulthandler.enable()` when starting the
 tests, which allows it to print a traceback if the interpreter crashes. Pass
 ``--no-faulthandler`` to disable this behavior.
 
 .. django-admin-option:: --timing
-
-.. versionadded:: 3.2
 
 Outputs timings, including database setup and total run time.
 
@@ -1939,10 +1923,6 @@ Other modern terminal environments on Windows, that support terminal colors,
 but which are not automatically detected as supported by Django, may "fake" the
 installation of ``ANSICON`` by setting the appropriate environmental variable,
 ``ANSICON="on"``.
-
-.. versionchanged:: 3.2
-
-    Updated support for syntax coloring on Windows.
 
 .. _`Windows Terminal`: https://www.microsoft.com/en-us/p/windows-terminal-preview/9n0dx20hk701
 .. _`VS Code`: https://code.visualstudio.com

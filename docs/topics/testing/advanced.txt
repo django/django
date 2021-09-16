@@ -600,10 +600,6 @@ and tear down the test suite.
     custom arguments by calling ``parser.add_argument()`` inside the method, so
     that the :djadmin:`test` command will be able to use those arguments.
 
-    .. versionadded:: 3.2
-
-        The ``enable_faulthandler`` and ``timing`` arguments were added.
-
     .. versionadded:: 4.0
 
         The ``logger`` and ``shuffle`` arguments were added.
@@ -782,11 +778,6 @@ utility methods in the ``django.test.utils`` module.
     test databases should have their state serialized to allow usage of the
     :ref:`serialized_rollback <test-case-serialized-rollback>` feature. If
     it's not provided, it defaults to ``aliases``.
-
-    .. versionchanged:: 3.2
-
-        The ``time_keeper`` kwarg was added, and all kwargs were made
-        keyword-only.
 
     .. versionchanged:: 4.0
 

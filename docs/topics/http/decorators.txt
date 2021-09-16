@@ -127,8 +127,6 @@ client-side caching.
 Common
 ======
 
-.. versionadded:: 3.2
-
 The decorators in :mod:`django.views.decorators.common` allow per-view
 customization of :class:`~django.middleware.common.CommonMiddleware` behavior.
 

@@ -254,14 +254,6 @@ subclass::
             def view_birth_date(self, obj):
                 return obj.birth_date
 
-    .. versionchanged:: 3.2
-
-        The ``empty_value`` argument to the
-        :func:`~django.contrib.admin.display` decorator is equivalent to
-        setting the ``empty_value_display`` attribute on the display function
-        directly in previous versions. Setting the attribute directly is still
-        supported for backward compatibility.
-
 .. attribute:: ModelAdmin.exclude
 
     This attribute, if given, should be a list of field names to exclude from
@@ -645,14 +637,6 @@ subclass::
       :func:`~django.contrib.admin.display` decorator and passing the
       ``description`` argument.
 
-      .. versionchanged:: 3.2
-
-          The ``description`` argument to the
-          :func:`~django.contrib.admin.display` decorator is equivalent to
-          setting the ``short_description`` attribute on the display function
-          directly in previous versions. Setting the attribute directly is
-          still supported for backward compatibility.
-
     * If the value of a field is ``None``, an empty string, or an iterable
       without elements, Django will display ``-`` (a dash). You can override
       this with :attr:`AdminSite.empty_value_display`::
@@ -675,14 +659,6 @@ subclass::
               def birth_date_view(self, obj):
                    return obj.birth_date
 
-      .. versionchanged:: 3.2
-
-          The ``empty_value`` argument to the
-          :func:`~django.contrib.admin.display` decorator is equivalent to
-          setting the ``empty_value_display`` attribute on the display function
-          directly in previous versions. Setting the attribute directly is
-          still supported for backward compatibility.
-
     * If the string given is a method of the model, ``ModelAdmin`` or a
       callable that returns ``True``, ``False``, or ``None``, Django will
       display a pretty "yes", "no", or "unknown" icon if you wrap the method
@@ -702,14 +678,6 @@ subclass::
 
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('name', 'born_in_fifties')
-
-      .. versionchanged:: 3.2
-
-          The ``boolean`` argument to the
-          :func:`~django.contrib.admin.display` decorator is equivalent to
-          setting the ``boolean`` attribute on the display function directly in
-          previous versions. Setting the attribute directly is still supported
-          for backward compatibility.
 
     * The ``__str__()`` method is just as valid in ``list_display`` as any
       other model method, so it's perfectly OK to do this::
@@ -781,14 +749,6 @@ subclass::
               @admin.display(ordering=Concat('first_name', Value(' '), 'last_name'))
               def full_name(self):
                   return self.first_name + ' ' + self.last_name
-
-      .. versionchanged:: 3.2
-
-          The ``ordering`` argument to the
-          :func:`~django.contrib.admin.display` decorator is equivalent to
-          setting the ``admin_order_field`` attribute on the display function
-          directly in previous versions. Setting the attribute directly is
-          still supported for backward compatibility.
 
     * Elements of ``list_display`` can also be properties::
 
@@ -1145,11 +1105,6 @@ subclass::
     ``prepopulated_fields`` doesn't accept ``DateTimeField``, ``ForeignKey``,
     ``OneToOneField``, and ``ManyToManyField`` fields.
 
-    .. versionchanged:: 3.2
-
-        In older versions, various English stop words are removed from
-        generated values.
-
 .. attribute:: ModelAdmin.preserve_filters
 
     By default, applied filters are preserved on the list view after creating,
@@ -1376,10 +1331,6 @@ subclass::
     If you need to customize search you can use
     :meth:`ModelAdmin.get_search_results` to provide additional or alternate
     search behavior.
-
-    .. versionchanged:: 3.2
-
-        Support for searching against quoted phrases with spaces was added.
 
 .. attribute:: ModelAdmin.search_help_text
 
@@ -2877,8 +2828,6 @@ creating your own ``AdminSite`` instance (see below), and changing the
 Theming support
 ===============
 
-.. versionadded:: 3.2
-
 The admin uses CSS variables to define colors. This allows changing colors
 without having to override many individual CSS rules. For example, if you
 preferred purple instead of blue you could add a ``admin/base.html`` template
@@ -2981,8 +2930,6 @@ Templates can override or extend base admin templates as described in
     on larger screens. By default, it is set to ``True``.
 
 .. attribute:: AdminSite.final_catch_all_view
-
-    .. versionadded:: 3.2
 
     A boolean value that determines whether to add a final catch-all view to
     the admin that redirects unauthenticated users to the login page. By
@@ -3421,8 +3368,6 @@ The ``display`` decorator
 =========================
 
 .. function:: display(*, boolean=None, ordering=None, description=None, empty_value=None)
-
-    .. versionadded:: 3.2
 
     This decorator can be used for setting specific attributes on custom
     display functions that can be used with

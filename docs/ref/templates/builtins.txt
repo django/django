@@ -1751,10 +1751,6 @@ locale is ``pl`` (Polish):
 Using ``floatformat`` with no argument is equivalent to using ``floatformat``
 with an argument of ``-1``.
 
-.. versionchanged:: 3.2
-
-    The ``g`` suffix to force grouping by thousand separators was added.
-
 .. versionchanged:: 4.0
 
     ``floatformat`` template filter no longer depends on the

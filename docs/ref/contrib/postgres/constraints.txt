@@ -109,8 +109,6 @@ enforced immediately after every command.
 
 .. attribute:: ExclusionConstraint.include
 
-.. versionadded:: 3.2
-
 A list or tuple of the names of the fields to be included in the covering
 exclusion constraint as non-key columns. This allows index-only scans to be
 used for queries that select only included fields
@@ -123,8 +121,6 @@ used for queries that select only included fields
 -------------
 
 .. attribute:: ExclusionConstraint.opclasses
-
-.. versionadded:: 3.2
 
 The names of the `PostgreSQL operator classes
 <https://www.postgresql.org/docs/current/indexes-opclass.html>`_ to use for

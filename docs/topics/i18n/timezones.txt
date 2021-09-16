@@ -35,10 +35,6 @@ Time zone support uses :mod:`zoneinfo`, which is part of the Python standard
 library from Python 3.9.  The ``backports.zoneinfo`` package is automatically
 installed alongside Django if you are using Python 3.8.
 
-.. versionchanged:: 3.2
-
-    Support for non-``pytz`` timezone implementations was added.
-
 .. versionchanged:: 4.0
 
     :mod:`zoneinfo` was made the default timezone implementation. You may

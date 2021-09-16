@@ -670,8 +670,6 @@ The ``F()`` objects support bitwise operations by ``.bitand()``, ``.bitor()``,
 Expressions can reference transforms
 ------------------------------------
 
-.. versionadded:: 3.2
-
 Django supports using transforms in expressions.
 
 For example, to find all ``Entry`` objects published in the same year as they

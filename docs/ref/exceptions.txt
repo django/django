@@ -167,8 +167,6 @@ list of errors.
 
 .. exception:: BadRequest
 
-    .. versionadded:: 3.2
-
     The :exc:`BadRequest` exception is raised when the request cannot be
     processed due to a client error. If a ``BadRequest`` exception reaches the
     ASGI/WSGI handler level it results in a
@@ -294,8 +292,6 @@ Sessions exceptions are defined in ``django.contrib.sessions.exceptions``.
 ----------------------
 
 .. exception:: SessionInterrupted
-
-    .. versionadded:: 3.2
 
     :exc:`SessionInterrupted` is raised when a session is destroyed in a
     concurrent request. It's a subclass of

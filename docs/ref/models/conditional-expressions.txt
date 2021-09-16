@@ -92,10 +92,6 @@ Keep in mind that each of these values can be an expression.
         >>> When(then__exact=0, then=1)
         >>> When(Q(then=0), then=1)
 
-.. versionchanged:: 3.2
-
-    Support for using the ``condition`` argument with ``lookups`` was added.
-
 ``Case``
 --------
 

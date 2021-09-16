@@ -30,8 +30,6 @@ options`_.
 
 .. attribute:: Index.expressions
 
-.. versionadded:: 3.2
-
 Positional argument ``*expressions`` allows creating functional indexes on
 expressions and database functions.
 
@@ -187,8 +185,6 @@ indexes records with more than 400 pages.
 -----------
 
 .. attribute:: Index.include
-
-.. versionadded:: 3.2
 
 A list or tuple of the names of the fields to be included in the covering index
 as non-key columns. This allows index-only scans to be used for queries that

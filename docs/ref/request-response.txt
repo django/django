@@ -723,12 +723,6 @@ middleware, are not removed.
 HTTP header fields cannot contain newlines. An attempt to set a header field
 containing a newline character (CR or LF) will raise ``BadHeaderError``
 
-.. versionchanged:: 3.2
-
-    The :attr:`HttpResponse.headers` interface was added.
-
-    The ability to set headers on instantiation was added.
-
 Telling the browser to treat the response as a file attachment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -752,8 +746,6 @@ Attributes
     A bytestring representing the content, encoded from a string if necessary.
 
 .. attribute:: HttpResponse.headers
-
-    .. versionadded:: 3.2
 
     A case insensitive, dict-like object that provides an interface to all
     HTTP headers on the response. See :ref:`setting-header-fields`.
@@ -823,10 +815,6 @@ Methods
     is unsuccessful, the :setting:`DEFAULT_CHARSET` setting will be used.
 
     ``headers`` is a :class:`dict` of HTTP headers for the response.
-
-    .. versionchanged:: 3.2
-
-        The ``headers`` parameter was added.
 
 .. method:: HttpResponse.__setitem__(header, value)
 

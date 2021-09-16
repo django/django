@@ -1172,10 +1172,3 @@ Finally, specify the custom model as the default user model for your project
 using the :setting:`AUTH_USER_MODEL` setting in your ``settings.py``::
 
     AUTH_USER_MODEL = 'customauth.MyUser'
-
-.. versionchanged:: 3.2
-
-    In older versions, ``ReadOnlyPasswordHashField`` is not
-    :attr:`~django.forms.Field.disabled` by default and
-    ``UserChangeForm.clean_password()`` is required to return the initial
-    value, whatever the user provides.
