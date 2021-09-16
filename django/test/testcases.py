@@ -1139,23 +1139,7 @@ class TestData:
         if instance is None:
             return self.data
         memo = self.get_memo(instance)
-        try:
-            data = deepcopy(self.data, memo)
-        except TypeError:
-            # RemovedInDjango41Warning.
-            msg = (
-                "Assigning objects which don't support copy.deepcopy() during "
-                "setUpTestData() is deprecated. Either assign the %s "
-                "attribute during setUpClass() or setUp(), or add support for "
-                "deepcopy() to %s.%s.%s."
-            ) % (
-                self.name,
-                owner.__module__,
-                owner.__qualname__,
-                self.name,
-            )
-            warnings.warn(msg, category=RemovedInDjango41Warning, stacklevel=2)
-            data = self.data
+        data = deepcopy(self.data, memo)
         setattr(instance, self.name, data)
         return data
 

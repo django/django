@@ -246,4 +246,6 @@ in Django 4.1.
 See :ref:`deprecated-features-3.2` for details on these changes, including how
 to remove usage of these features.
 
-* ...
+* Support for assigning objects which don't support creating deep copies with
+  ``copy.deepcopy()`` to class attributes in ``TestCase.setUpTestData()`` is
+  removed.
