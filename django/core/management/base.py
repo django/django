@@ -5,7 +5,6 @@ be executed through ``django-admin`` or ``manage.py``).
 import argparse
 import os
 import sys
-import warnings
 from argparse import ArgumentParser, HelpFormatter
 from io import TextIOBase
 
@@ -14,7 +13,6 @@ from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
 from django.db import DEFAULT_DB_ALIAS, connections
-from django.utils.deprecation import RemovedInDjango41Warning
 
 ALL_CHECKS = '__all__'
 
@@ -252,14 +250,6 @@ class BaseCommand:
         else:
             self.style = color_style(force_color)
             self.stderr.style_func = self.style.ERROR
-        if self.requires_system_checks in [False, True]:
-            warnings.warn(
-                "Using a boolean value for requires_system_checks is "
-                "deprecated. Use '__all__' instead of True, and [] (an empty "
-                "list) instead of False.",
-                RemovedInDjango41Warning,
-            )
-            self.requires_system_checks = ALL_CHECKS if self.requires_system_checks else []
         if (
             not isinstance(self.requires_system_checks, (list, tuple)) and
             self.requires_system_checks != ALL_CHECKS

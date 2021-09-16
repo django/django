@@ -249,3 +249,6 @@ to remove usage of these features.
 * Support for assigning objects which don't support creating deep copies with
   ``copy.deepcopy()`` to class attributes in ``TestCase.setUpTestData()`` is
   removed.
+
+* Support for using a boolean value in
+  :attr:`.BaseCommand.requires_system_checks` is removed.

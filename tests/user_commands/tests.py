@@ -14,9 +14,8 @@ from django.core.management.utils import (
 )
 from django.db import connection
 from django.test import SimpleTestCase, override_settings
-from django.test.utils import captured_stderr, extend_sys_path, ignore_warnings
+from django.test.utils import captured_stderr, extend_sys_path
 from django.utils import translation
-from django.utils.deprecation import RemovedInDjango41Warning
 
 from .management.commands import dance
 
@@ -422,45 +421,3 @@ class UtilsTests(SimpleTestCase):
     def test_normalize_path_patterns_truncates_wildcard_base(self):
         expected = [os.path.normcase(p) for p in ['foo/bar', 'bar/*/']]
         self.assertEqual(normalize_path_patterns(['foo/bar/*', 'bar/*/']), expected)
-
-
-class DeprecationTests(SimpleTestCase):
-    def test_requires_system_checks_warning(self):
-        class Command(BaseCommand):
-            pass
-
-        msg = (
-            "Using a boolean value for requires_system_checks is deprecated. "
-            "Use '__all__' instead of True, and [] (an empty list) instead of "
-            "False."
-        )
-        for value in [False, True]:
-            Command.requires_system_checks = value
-            with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
-                Command()
-
-    @ignore_warnings(category=RemovedInDjango41Warning)
-    def test_requires_system_checks_true(self):
-        class Command(BaseCommand):
-            requires_system_checks = True
-
-            def handle(self, *args, **options):
-                pass
-
-        command = Command()
-        with mock.patch('django.core.management.base.BaseCommand.check') as mocked_check:
-            management.call_command(command, skip_checks=False)
-        mocked_check.assert_called_once_with()
-
-    @ignore_warnings(category=RemovedInDjango41Warning)
-    def test_requires_system_checks_false(self):
-        class Command(BaseCommand):
-            requires_system_checks = False
-
-            def handle(self, *args, **options):
-                pass
-
-        command = Command()
-        with mock.patch('django.core.management.base.BaseCommand.check') as mocked_check:
-            management.call_command(command)
-        self.assertIs(mocked_check.called, False)
