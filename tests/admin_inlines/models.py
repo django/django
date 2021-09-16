@@ -327,6 +327,12 @@ class CourseProxy2(Course):
 
 
 # Other models
+class ShowInlineParent(models.Model):
+    show_inlines = models.BooleanField(default=False)
+
+
+class ShowInlineChild(models.Model):
+    parent = models.ForeignKey(ShowInlineParent, on_delete=models.CASCADE)
 
 
 class ProfileCollection(models.Model):

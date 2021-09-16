@@ -1585,12 +1585,16 @@ class ModelAdmin(BaseModelAdmin):
         )
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES, instance=obj)
+            formsets, inline_instances = self._create_formsets(
+                request,
+                form.instance if add else obj,
+                change=not add,
+            )
             form_validated = form.is_valid()
             if form_validated:
                 new_object = self.save_form(request, form, change=not add)
             else:
                 new_object = form.instance
-            formsets, inline_instances = self._create_formsets(request, new_object, change=not add)
             if all_valid(formsets) and form_validated:
                 self.save_model(request, new_object, form, not add)
                 self.save_related(request, form, formsets, not add)
