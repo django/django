@@ -257,3 +257,6 @@ to remove usage of these features.
   ``django.core.validators.EmailValidator`` are removed.
 
 * The ``default_app_config`` application configuration variable is removed.
+
+* ``TransactionTestCase.assertQuerysetEqual()`` no longer calls ``repr()`` on a
+  queryset when compared to string values.

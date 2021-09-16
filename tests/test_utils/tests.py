@@ -17,8 +17,8 @@ from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import (
-    SimpleTestCase, TestCase, TransactionTestCase, ignore_warnings,
-    skipIfDBFeature, skipUnlessDBFeature,
+    SimpleTestCase, TestCase, TransactionTestCase, skipIfDBFeature,
+    skipUnlessDBFeature,
 )
 from django.test.html import HTMLParseError, parse_html
 from django.test.utils import (
@@ -26,7 +26,6 @@ from django.test.utils import (
     override_settings, setup_test_environment,
 )
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
-from django.utils.deprecation import RemovedInDjango41Warning
 from django.utils.log import DEFAULT_LOGGING
 
 from .models import Car, Person, PossessedCar
@@ -360,32 +359,6 @@ class AssertQuerysetEqualTests(TestCase):
         self.assertNotIn('Set self.maxDiff to None to see it.', exception_msg)
         for name in names:
             self.assertIn(name, exception_msg)
-
-
-class AssertQuerysetEqualDeprecationTests(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.p1 = Person.objects.create(name='p1')
-        cls.p2 = Person.objects.create(name='p2')
-
-    @ignore_warnings(category=RemovedInDjango41Warning)
-    def test_str_values(self):
-        self.assertQuerysetEqual(
-            Person.objects.all().order_by('name'),
-            [repr(self.p1), repr(self.p2)],
-        )
-
-    def test_str_values_warning(self):
-        msg = (
-            "In Django 4.1, repr() will not be called automatically on a "
-            "queryset when compared to string values. Set an explicit "
-            "'transform' to silence this warning."
-        )
-        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
-            self.assertQuerysetEqual(
-                Person.objects.all().order_by('name'),
-                [repr(self.p1), repr(self.p2)],
-            )
 
 
 @override_settings(ROOT_URLCONF='test_utils.urls')
