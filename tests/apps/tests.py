@@ -5,18 +5,9 @@ from django.apps.registry import Apps
 from django.contrib.admin.models import LogEntry
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.db import models
-from django.test import SimpleTestCase, ignore_warnings, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.test.utils import extend_sys_path, isolate_apps
-from django.utils.deprecation import RemovedInDjango41Warning
 
-from .explicit_default_config_app.apps import ExplicitDefaultConfig
-from .explicit_default_config_empty_apps import ExplicitDefaultConfigEmptyApps
-from .explicit_default_config_mismatch_app.not_apps import (
-    ExplicitDefaultConfigMismatch,
-)
-from .explicit_default_config_without_apps import (
-    ExplicitDefaultConfigWithoutApps,
-)
 from .models import SoAlternative, TotallyNormal, new_apps
 from .one_config_app.apps import OneConfig
 from .two_configs_one_default_app.apps import TwoConfig
@@ -511,106 +502,3 @@ class NamespacePackageAppTests(SimpleTestCase):
             with self.settings(INSTALLED_APPS=['nsapp.apps.NSAppConfig']):
                 app_config = apps.get_app_config('nsapp')
                 self.assertEqual(app_config.path, self.app_path)
-
-
-class DeprecationTests(SimpleTestCase):
-    @ignore_warnings(category=RemovedInDjango41Warning)
-    def test_explicit_default_app_config(self):
-        with self.settings(INSTALLED_APPS=['apps.explicit_default_config_app']):
-            config = apps.get_app_config('explicit_default_config_app')
-        self.assertIsInstance(config, ExplicitDefaultConfig)
-
-    def test_explicit_default_app_config_warning(self):
-        """
-        Load an app that specifies a default AppConfig class matching the
-        autodetected one.
-        """
-        msg = (
-            "'apps.explicit_default_config_app' defines default_app_config = "
-            "'apps.explicit_default_config_app.apps.ExplicitDefaultConfig'. "
-            "Django now detects this configuration automatically. You can "
-            "remove default_app_config."
-        )
-        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
-            with self.settings(INSTALLED_APPS=['apps.explicit_default_config_app']):
-                pass
-        with ignore_warnings(category=RemovedInDjango41Warning):
-            with self.settings(INSTALLED_APPS=['apps.explicit_default_config_app']):
-                self.assertIsInstance(
-                    apps.get_app_config('explicit_default_config_app'),
-                    ExplicitDefaultConfig,
-                )
-
-    def test_explicit_default_app_config_mismatch(self):
-        """
-        Load an app that specifies a default AppConfig class not matching the
-        autodetected one.
-        """
-        msg = (
-            "'apps.explicit_default_config_mismatch_app' defines "
-            "default_app_config = 'apps.explicit_default_config_mismatch_app."
-            "not_apps.ExplicitDefaultConfigMismatch'. However, Django's "
-            "automatic detection picked another configuration, 'apps."
-            "explicit_default_config_mismatch_app.apps."
-            "ImplicitDefaultConfigMismatch'. You should move the default "
-            "config class to the apps submodule of your application and, if "
-            "this module defines several config classes, mark the default one "
-            "with default = True."
-        )
-        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
-            with self.settings(INSTALLED_APPS=['apps.explicit_default_config_mismatch_app']):
-                pass
-        with ignore_warnings(category=RemovedInDjango41Warning):
-            with self.settings(INSTALLED_APPS=['apps.explicit_default_config_mismatch_app']):
-                self.assertIsInstance(
-                    apps.get_app_config('explicit_default_config_mismatch_app'),
-                    ExplicitDefaultConfigMismatch,
-                )
-
-    def test_explicit_default_app_config_empty_apps(self):
-        """
-        Load an app that specifies a default AppConfig class in __init__ and
-        have an empty apps module.
-        """
-        msg = (
-            "'apps.explicit_default_config_empty_apps' defines "
-            "default_app_config = 'apps.explicit_default_config_empty_apps."
-            "ExplicitDefaultConfigEmptyApps'. However, Django's automatic "
-            "detection did not find this configuration. You should move the "
-            "default config class to the apps submodule of your application "
-            "and, if this module defines several config classes, mark the "
-            "default one with default = True."
-        )
-        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
-            with self.settings(INSTALLED_APPS=['apps.explicit_default_config_empty_apps']):
-                pass
-        with ignore_warnings(category=RemovedInDjango41Warning):
-            with self.settings(INSTALLED_APPS=['apps.explicit_default_config_empty_apps']):
-                self.assertIsInstance(
-                    apps.get_app_config('explicit_default_config_empty_apps'),
-                    ExplicitDefaultConfigEmptyApps,
-                )
-
-    def test_explicit_default_app_config_without_apps(self):
-        """
-        Load an app that specifies a default AppConfig class in __init__ and do
-        not have an apps module.
-        """
-        msg = (
-            "'apps.explicit_default_config_without_apps' defines "
-            "default_app_config = 'apps.explicit_default_config_without_apps."
-            "ExplicitDefaultConfigWithoutApps'. However, Django's automatic "
-            "detection did not find this configuration. You should move the "
-            "default config class to the apps submodule of your application "
-            "and, if this module defines several config classes, mark the "
-            "default one with default = True."
-        )
-        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
-            with self.settings(INSTALLED_APPS=['apps.explicit_default_config_without_apps']):
-                pass
-        with ignore_warnings(category=RemovedInDjango41Warning):
-            with self.settings(INSTALLED_APPS=['apps.explicit_default_config_without_apps']):
-                self.assertIsInstance(
-                    apps.get_app_config('explicit_default_config_without_apps'),
-                    ExplicitDefaultConfigWithoutApps,
-                )
