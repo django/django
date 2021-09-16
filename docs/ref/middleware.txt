@@ -72,11 +72,6 @@ Adds a few conveniences for perfectionists:
         """View to be excluded from APPEND_SLASH."""
         return HttpResponse()
 
-  .. versionchanged:: 3.2
-
-    Support for the :func:`~django.views.decorators.common.no_append_slash`
-    decorator was added.
-
 * Sets the ``Content-Length`` header for non-streaming responses.
 
 .. attribute:: CommonMiddleware.response_redirect_class

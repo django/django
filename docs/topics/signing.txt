@@ -101,10 +101,6 @@ generate signatures. You can use a different secret by passing it to the
     and underscores. ``algorithm`` must be an algorithm supported by
     :py:mod:`hashlib`, it defaults to ``'sha256'``.
 
-.. versionchanged:: 3.2
-
-    The ``sign_object()`` and ``unsign_object()`` methods were added.
-
 Using the ``salt`` argument
 ---------------------------
 
@@ -138,10 +134,6 @@ different salt.
 
 Unlike your :setting:`SECRET_KEY`, your salt argument does not need to stay
 secret.
-
-.. versionchanged:: 3.2
-
-    The ``sign_object()`` and ``unsign_object()`` methods were added.
 
 Verifying timestamped values
 ----------------------------
@@ -180,14 +172,10 @@ created within a specified period of time::
 
     .. method:: sign_object(obj, serializer=JSONSerializer, compress=False)
 
-        .. versionadded:: 3.2
-
         Encode, optionally compress, append current timestamp, and sign complex
         data structure (e.g. list, tuple, or dictionary).
 
     .. method:: unsign_object(signed_obj, serializer=JSONSerializer, max_age=None)
-
-        .. versionadded:: 3.2
 
         Checks if ``signed_obj`` was signed less than ``max_age`` seconds ago,
         otherwise raises ``SignatureExpired``. The ``max_age`` parameter can
@@ -237,7 +225,3 @@ and tuples) if you pass in a tuple, you will get a list from
 
     Reverse of ``dumps()``, raises ``BadSignature`` if signature fails.
     Checks ``max_age`` (in seconds) if given.
-
-.. versionchanged:: 3.2
-
-    The ``sign_object()`` and ``unsign_object()`` methods were added.

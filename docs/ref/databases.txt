@@ -477,10 +477,6 @@ because it is more accurate.
     differ only by case will pass validation, but upon calling ``save()``, an
     ``IntegrityError`` will be raised.
 
-.. versionchanged:: 3.2
-
-    Support for setting a database collation for the field was added.
-
 Connecting to the database
 --------------------------
 

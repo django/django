@@ -98,11 +98,6 @@ make it very powerful.
     both rows will match. To prevent this, perform the correct typecasting
     before using the value in a query.
 
-.. versionchanged:: 3.2
-
-    The default value of the ``params`` argument was changed from ``None`` to
-    an empty tuple.
-
 Mapping query fields to model fields
 ------------------------------------
 

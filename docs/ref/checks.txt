@@ -94,10 +94,6 @@ Django's system checks are organized using the following tags:
 
 Some checks may be registered with multiple tags.
 
-.. versionchanged:: 3.2
-
-    The ``sites`` tag was added.
-
 .. versionchanged:: 4.0
 
     The ``files`` tag was added.

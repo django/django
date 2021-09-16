@@ -868,17 +868,11 @@ It also provides an additional method:
     (for instance, MySQL with the MyISAM engine), ``setUpTestData()`` will be
     called before each test, negating the speed benefits.
 
-    .. versionchanged:: 3.2
-
-        Objects assigned to class attributes in ``setUpTestData()`` must
-        support creating deep copies with :py:func:`copy.deepcopy` in order to
-        isolate them from alterations performed by each test methods. In
-        previous versions of Django these objects were reused and changes made
-        to them were persisted between test methods.
+    Objects assigned to class attributes in ``setUpTestData()`` must support
+    creating deep copies with :py:func:`copy.deepcopy` in order to isolate them
+    from alterations performed by each test methods.
 
 .. classmethod:: TestCase.captureOnCommitCallbacks(using=DEFAULT_DB_ALIAS, execute=False)
-
-    .. versionadded:: 3.2
 
     Returns a context manager that captures :func:`transaction.on_commit()
     <django.db.transaction.on_commit>` callbacks for the given database
@@ -1705,14 +1699,6 @@ your test suite.
     raised.
 
     Output in case of error can be customized with the ``msg`` argument.
-
-    .. versionchanged:: 3.2
-
-        The default value of ``transform`` argument was changed to ``None``.
-
-    .. versionadded:: 3.2
-
-        Support for direct comparison between querysets was added.
 
     .. deprecated:: 3.2
 

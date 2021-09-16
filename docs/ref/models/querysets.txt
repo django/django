@@ -286,8 +286,6 @@ Aggregation </topics/db/aggregation>`.
 
 .. method:: alias(*args, **kwargs)
 
-.. versionadded:: 3.2
-
 Same as :meth:`annotate`, but instead of annotating objects in the
 ``QuerySet``, saves the expression for later reuse with other ``QuerySet``
 methods. This is useful when the result of the expression itself is not needed
@@ -1832,12 +1830,6 @@ raised if ``select_for_update()`` is used in autocommit mode.
     PostgreSQL doesn't support ``select_for_update()`` with
     :class:`~django.db.models.expressions.Window` expressions.
 
-.. versionchanged:: 3.2
-
-    The ``no_key`` argument was added.
-
-    The ``of`` argument was allowed on MySQL 8.0.1+.
-
 .. versionchanged:: 4.0
 
     The ``skip_locked`` argument was allowed on MariaDB 10.6+.
@@ -1859,11 +1851,6 @@ See the :doc:`/topics/db/sql` for more information.
   ``raw()`` always triggers a new query and doesn't account for previous
   filtering. As such, it should generally be called from the ``Manager`` or
   from a fresh ``QuerySet`` instance.
-
-.. versionchanged:: 3.2
-
-    The default value of the ``params`` argument was changed from ``None`` to
-    an empty tuple.
 
 Operators that return new ``QuerySet``\s
 ----------------------------------------
@@ -2328,10 +2315,6 @@ Example::
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 
-.. versionchanged:: 3.2
-
-    Using a distinct field was allowed.
-
 ``iterator()``
 ~~~~~~~~~~~~~~
 
@@ -2657,8 +2640,6 @@ update a bunch of records for a model that has a custom
 
 Ordered queryset
 ^^^^^^^^^^^^^^^^
-
-.. versionadded:: 3.2
 
 Chaining ``order_by()`` with ``update()`` is supported only on MariaDB and
 MySQL, and is ignored for different databases. This is useful for updating a
@@ -3558,10 +3539,6 @@ All aggregates have the following parameters in common:
 Strings that reference fields on the model, transforms of the field, or
 :doc:`query expressions </ref/models/expressions>`.
 
-.. versionchanged:: 3.2
-
-    Support for transforms of the field was added.
-
 ``output_field``
 ~~~~~~~~~~~~~~~~
 
@@ -3847,7 +3824,3 @@ operate on vegetarian pizzas.
 * :meth:`.QuerySet.only` and :meth:`~.QuerySet.prefetch_related`.
 * A :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
   inherited from a parent model.
-
-.. versionchanged:: 3.2
-
-    Support for nested relations was added.

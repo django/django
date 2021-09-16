@@ -17,10 +17,6 @@ Formset API reference. For introductory material about formsets, see the
 
     See :doc:`formsets </topics/forms/formsets>` for example usage.
 
-    .. versionchanged:: 3.2
-
-        The ``absolute_max`` and ``can_delete_extra`` arguments were added.
-
     .. versionchanged:: 4.0
 
         The ``renderer`` argument was added.

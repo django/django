@@ -131,8 +131,6 @@ validation.  See :ref:`validate_max`.
 Limiting the maximum number of instantiated forms
 =================================================
 
-.. versionadded:: 3.2
-
 The ``absolute_max`` parameter to :func:`.formset_factory` allows limiting the
 number of forms that can be instantiated when supplying ``POST`` data. This
 protects against memory exhaustion attacks using forged ``POST`` requests::
@@ -268,11 +266,6 @@ the management data by rendering ``{{ my_formset.management_form }}``
     client-side code. These fields are not required and so are not shown in
     the example ``POST`` data.
 
-.. versionchanged:: 3.2
-
-    ``formset.is_valid()`` now returns ``False`` rather than raising an
-    exception when the management form is missing or has been tampered with.
-
 ``total_form_count`` and ``initial_form_count``
 -----------------------------------------------
 
@@ -296,8 +289,6 @@ forms with JavaScript.
 
 ``error_messages``
 ------------------
-
-.. versionadded:: 3.2
 
 The ``error_messages`` argument lets you override the default messages that the
 formset will raise. Pass in a dictionary with keys matching the error messages
@@ -681,8 +672,6 @@ use with ``can_delete``::
 
 ``can_delete_extra``
 --------------------
-
-.. versionadded:: 3.2
 
 .. attribute:: BaseFormSet.can_delete_extra
 

@@ -436,11 +436,6 @@ The primary key field is read-only. If you change the value of the primary
 key on an existing object and then save it, a new object will be created
 alongside the old one.
 
-.. versionchanged:: 3.2
-
-    In older versions, auto-created primary key fields were always
-    :class:`AutoField`\s.
-
 ``unique``
 ----------
 
@@ -622,8 +617,6 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
         notes </ref/databases>` for details.
 
 .. attribute:: CharField.db_collation
-
-    .. versionadded:: 3.2
 
     Optional. The database collation name of the field.
 
@@ -1346,8 +1339,6 @@ However it is not enforced at the model or database level. Use a
 :class:`CharField` for that.
 
 .. attribute:: TextField.db_collation
-
-    .. versionadded:: 3.2
 
     The database collation name of the field.
 

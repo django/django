@@ -159,10 +159,6 @@ You can use a cache backend that doesn't ship with Django by setting
 :setting:`BACKEND <CACHES-BACKEND>` to a fully-qualified path of a cache
 backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
 
-.. versionchanged:: 3.2
-
-    The ``PyMemcacheCache`` backend was added.
-
 .. versionchanged:: 4.0
 
     The ``RedisCache`` backend was added.
@@ -1258,8 +1254,6 @@ See also :setting:`NUMBER_GROUPING`, :setting:`THOUSAND_SEPARATOR` and
 
 ``DEFAULT_AUTO_FIELD``
 ----------------------
-
-.. versionadded:: 3.2
 
 Default: ``'``:class:`django.db.models.AutoField`\ ``'``
 

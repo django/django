@@ -92,10 +92,6 @@ each feature in that layer.
 
     Returns the name of the data source.
 
-    .. versionchanged:: 3.2
-
-        Support for :class:`pathlib.Path` ``ds_input`` was added.
-
 __ https://gdal.org/drivers/vector/
 
 ``Layer``
@@ -1408,10 +1404,6 @@ blue.
             >>> target = rst.transform(target_srs)
             >>> target.origin
             [-82.98492744885776, 27.601924753080144]
-
-        .. versionchanged:: 3.2
-
-            Support for :class:`SpatialReference` ``srs`` was added
 
     .. attribute:: info
 

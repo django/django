@@ -158,10 +158,6 @@ permanent storage -- they're all intended to be solutions for caching, not
 storage -- but we point this out here because memory-based caching is
 particularly temporary.
 
-.. versionchanged:: 3.2
-
-    The ``PyMemcacheCache`` backend was added.
-
 .. deprecated:: 3.2
 
     The ``MemcachedCache`` backend is deprecated as ``python-memcached`` has

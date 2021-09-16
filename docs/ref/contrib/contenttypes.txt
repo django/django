@@ -511,10 +511,6 @@ The :mod:`django.contrib.contenttypes.forms` module provides:
     :class:`~django.contrib.contenttypes.fields.GenericForeignKey.for_concrete_model`
     argument on ``GenericForeignKey``.
 
-    .. versionchanged:: 3.2
-
-        The ``absolute_max`` and ``can_delete_extra`` arguments were added.
-
 .. module:: django.contrib.contenttypes.admin
 
 Generic relations in admin
