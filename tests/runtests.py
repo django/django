@@ -26,9 +26,7 @@ else:
     from django.test.runner import get_max_test_processes, parallel_type
     from django.test.selenium import SeleniumTestCaseBase
     from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
-    from django.utils.deprecation import (
-        RemovedInDjango41Warning, RemovedInDjango50Warning,
-    )
+    from django.utils.deprecation import RemovedInDjango50Warning
     from django.utils.log import DEFAULT_LOGGING
 
 try:
@@ -41,7 +39,6 @@ else:
 
 # Make deprecation warnings errors to ensure no usage of deprecated features.
 warnings.simplefilter('error', RemovedInDjango50Warning)
-warnings.simplefilter('error', RemovedInDjango41Warning)
 # Make resource and runtime warning errors to ensure no usage of error prone
 # patterns.
 warnings.simplefilter("error", ResourceWarning)

@@ -62,6 +62,9 @@ details on these changes.
 * The ability to return a ``str``, rather than a ``SafeString``, when rendering
   an ``ErrorDict`` and ``ErrorList`` will be removed.
 
+See the :ref:`Django 4.1 release notes <deprecated-features-4.1>` for more
+details on these changes.
+
 .. _deprecation-removed-in-4.1:
 
 4.1
