@@ -12,8 +12,8 @@ from .models import (
     ChildModel1, ChildModel2, Fashionista, FootNote, Holder, Holder2, Holder3,
     Holder4, Inner, Inner2, Inner3, Inner4Stacked, Inner4Tabular, Novel,
     OutfitItem, Parent, ParentModelWithCustomPk, Person, Poll, Profile,
-    ProfileCollection, Question, Sighting, SomeChildModel, SomeParentModel,
-    Teacher, VerboseNamePluralProfile, VerboseNameProfile,
+    ProfileCollection, Question, ShowInlineParent, Sighting, SomeChildModel,
+    SomeParentModel, Teacher, VerboseNamePluralProfile, VerboseNameProfile,
 )
 
 INLINE_CHANGELINK_HTML = 'class="inlinechangelink">Change</a>'
@@ -617,6 +617,21 @@ class TestInline(TestDataMixin, TestCase):
         response = self.client.get(reverse('admin:admin_inlines_person_add'))
         self.assertContains(response, '<h2>Author</h2>', html=True)  # Tabular.
         self.assertContains(response, '<h2>Fashionista</h2>', html=True)  # Stacked.
+
+    def test_inlines_based_on_model_state(self):
+        parent = ShowInlineParent.objects.create(show_inlines=False)
+        data = {
+            'show_inlines': 'on',
+            '_save': 'Save',
+        }
+        change_url = reverse(
+            'admin:admin_inlines_showinlineparent_change',
+            args=(parent.id,),
+        )
+        response = self.client.post(change_url, data)
+        self.assertEqual(response.status_code, 302)
+        parent.refresh_from_db()
+        self.assertIs(parent.show_inlines, True)
 
 
 @override_settings(ROOT_URLCONF='admin_inlines.urls')

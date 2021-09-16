@@ -11,8 +11,9 @@ from .models import (
     Inner4Tabular, Inner5Stacked, Inner5Tabular, NonAutoPKBook,
     NonAutoPKBookChild, Novel, NovelReadonlyChapter, OutfitItem,
     ParentModelWithCustomPk, Person, Poll, Profile, ProfileCollection,
-    Question, ReadOnlyInline, ShoppingWeakness, Sighting, SomeChildModel,
-    SomeParentModel, SottoCapo, Teacher, Title, TitleCollection,
+    Question, ReadOnlyInline, ShoppingWeakness, ShowInlineChild,
+    ShowInlineParent, Sighting, SomeChildModel, SomeParentModel, SottoCapo,
+    Teacher, Title, TitleCollection,
 )
 
 site = admin.AdminSite(name="admin")
@@ -371,6 +372,17 @@ class ChildHiddenFieldOnSingleLineStackedInline(admin.StackedInline):
     fields = ('name', 'position')
 
 
+class ShowInlineChildInline(admin.StackedInline):
+    model = ShowInlineChild
+
+
+class ShowInlineParentAdmin(admin.ModelAdmin):
+    def get_inlines(self, request, obj):
+        if obj is not None and obj.show_inlines:
+            return [ShowInlineChildInline]
+        return []
+
+
 site.register(TitleCollection, inlines=[TitleInline])
 # Test bug #12561 and #12778
 # only ModelAdmin media
@@ -402,6 +414,7 @@ site.register(Course, ClassAdminStackedHorizontal)
 site.register(CourseProxy, ClassAdminStackedVertical)
 site.register(CourseProxy1, ClassAdminTabularVertical)
 site.register(CourseProxy2, ClassAdminTabularHorizontal)
+site.register(ShowInlineParent, ShowInlineParentAdmin)
 # Used to test hidden fields in tabular and stacked inlines.
 site2 = admin.AdminSite(name='tabular_inline_hidden_field_admin')
 site2.register(SomeParentModel, inlines=[ChildHiddenFieldTabularInline])
