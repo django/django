@@ -306,7 +306,10 @@ class Query(BaseExpression):
         obj.annotations = self.annotations.copy()
         if self.annotation_select_mask is not None:
             obj.annotation_select_mask = self.annotation_select_mask.copy()
-        obj.combined_queries = tuple(query.clone() for query in self.combined_queries)
+        if self.combined_queries:
+            obj.combined_queries = tuple([
+                query.clone() for query in self.combined_queries
+            ])
         # _annotation_select_cache cannot be copied, as doing so breaks the
         # (necessary) state in which both annotations and
         # _annotation_select_cache point to the same underlying objects.
