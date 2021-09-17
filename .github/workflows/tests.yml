@@ -25,4 +25,4 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
       - run: npm install
-      - run: npm test
+      - run: /usr/bin/time -v npm test
