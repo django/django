@@ -1479,7 +1479,7 @@ class ManyToManyField(RelatedField):
         if isinstance(self.remote_field.model, str):
             kwargs['to'] = self.remote_field.model
         else:
-            kwargs['to'] = self.remote_field.model._meta.label
+            kwargs['to'] = self.remote_field.model._meta.label_lower
         if getattr(self.remote_field, 'through', None) is not None:
             if isinstance(self.remote_field.through, str):
                 kwargs['through'] = self.remote_field.through

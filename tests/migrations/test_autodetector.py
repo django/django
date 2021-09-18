@@ -1068,6 +1068,39 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, 'testapp', 0)
         self.assertNumberMigrations(changes, 'otherapp', 0)
 
+    def test_m2m_with_renamed_model_case(self):
+        """
+        Model name is case-insensitive. Changing case doesn't lead to any
+        autodetected operations on m2m fields
+        """
+        datacenter_capital_c = ModelState("thirdapp", "DataCenter", [
+            ("id", models.AutoField(primary_key=True)),
+            ("title", models.CharField(max_length=100)),
+        ])
+        datacenter_lowercased_c = ModelState("thirdapp", "Datacenter", [
+            ("id", models.AutoField(primary_key=True)),
+            ("title", models.CharField(max_length=100)),
+        ])
+        package = ModelState("thirdapp", "Package", [
+            ("id", models.AutoField(primary_key=True)),
+            ("name", models.CharField(max_length=100)),
+            ("datacenters", models.ManyToManyField("DataCenter")),
+        ])
+        package_with_renamed_datacenter = ModelState("thirdapp", "Package", [
+            ("id", models.AutoField(primary_key=True)),
+            ("name", models.CharField(max_length=100)),
+            ("datacenters", models.ManyToManyField("Datacenter")),
+        ])
+
+        changes = self.get_changes(
+            [datacenter_capital_c, package],
+            [datacenter_lowercased_c, package_with_renamed_datacenter],
+            questioner=MigrationQuestioner({'ask_rename_model': True})
+        )
+
+        self.assertNumberMigrations(changes, 'testapp', 0)
+        self.assertNumberMigrations(changes, 'otherapp', 0)
+
     def test_rename_m2m_through_model(self):
         """
         Tests autodetection of renamed models that are used in M2M relations as
