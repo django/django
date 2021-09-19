@@ -1073,20 +1073,20 @@ class AutodetectorTests(TestCase):
         Model name is case-insensitive. Changing case doesn't lead to any
         autodetected operations on m2m fields
         """
-        datacenter_capital_c = ModelState("thirdapp", "DataCenter", [
+        datacenter_capital_c = ModelState("testapp", "DataCenter", [
             ("id", models.AutoField(primary_key=True)),
             ("title", models.CharField(max_length=100)),
         ])
-        datacenter_lowercased_c = ModelState("thirdapp", "Datacenter", [
+        datacenter_lowercased_c = ModelState("testapp", "Datacenter", [
             ("id", models.AutoField(primary_key=True)),
             ("title", models.CharField(max_length=100)),
         ])
-        package = ModelState("thirdapp", "Package", [
+        package = ModelState("testapp", "Package", [
             ("id", models.AutoField(primary_key=True)),
             ("name", models.CharField(max_length=100)),
             ("datacenters", models.ManyToManyField("DataCenter")),
         ])
-        package_with_renamed_datacenter = ModelState("thirdapp", "Package", [
+        package_with_renamed_datacenter = ModelState("testapp", "Package", [
             ("id", models.AutoField(primary_key=True)),
             ("name", models.CharField(max_length=100)),
             ("datacenters", models.ManyToManyField("Datacenter")),
