@@ -171,11 +171,6 @@ Minor features
   :meth:`~django.contrib.auth.views.LoginView.get_default_redirect_url` method
   allow customizing the redirect after login.
 
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -187,11 +182,6 @@ Minor features
 * The new :class:`~django.contrib.gis.admin.GISModelAdmin` class allows
   customizing the widget used for ``GeometryField``. This is encouraged instead
   of deprecated ``GeoModelAdmin`` and ``OSMGeoAdmin``.
-
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -220,26 +210,6 @@ Minor features
   <django.contrib.postgres.search.TrigramWordSimilarity>` expressions allow
   using trigram word similarity.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sessions`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sitemaps`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -255,11 +225,6 @@ Minor features
   :class:`~django.contrib.staticfiles.storage.ManifestFilesMixin` and
   :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
   allows customizing the manifest file storage.
-
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 Cache
 ~~~~~
@@ -278,31 +243,6 @@ CSRF
 * CSRF protection now consults the ``Origin`` header, if present. To facilitate
   this, :ref:`some changes <csrf-trusted-origins-changes-4.0>` to the
   :setting:`CSRF_TRUSTED_ORIGINS` setting are required.
-
-Decorators
-~~~~~~~~~~
-
-* ...
-
-Email
-~~~~~
-
-* ...
-
-Error Reporting
-~~~~~~~~~~~~~~~
-
-* ...
-
-File Storage
-~~~~~~~~~~~~
-
-* ...
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
 
 Forms
 ~~~~~
@@ -333,11 +273,6 @@ Generic Views
   deletion. In addition, this allows ``DeleteView`` to function with
   :class:`django.contrib.messages.views.SuccessMessageMixin`.
 
-Internationalization
-~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 Logging
 ~~~~~~~
 
@@ -363,11 +298,6 @@ Management Commands
 
 * The new :option:`startapp --exclude` and :option:`startproject --exclude`
   options allow excluding directories from the template.
-
-Migrations
-~~~~~~~~~~
-
-* ...
 
 Models
 ~~~~~~
@@ -410,16 +340,6 @@ Requests and Responses
   same browsing context. You can prevent this header from being added by
   setting the :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY` setting to ``None``.
 
-Security
-~~~~~~~~
-
-* ...
-
-Serialization
-~~~~~~~~~~~~~
-
-* ...
-
 Signals
 ~~~~~~~
 
@@ -461,21 +381,6 @@ Tests
 
 * :meth:`.TestCase.captureOnCommitCallbacks` now captures new callbacks added
   while executing :func:`.transaction.on_commit` callbacks.
-
-URLs
-~~~~
-
-* ...
-
-Utilities
-~~~~~~~~~
-
-* ...
-
-Validators
-~~~~~~~~~~
-
-* ...
 
 .. _backwards-incompatible-4.0:
 
