@@ -50,8 +50,8 @@ unaffected.
 
 However, if you are you are working with non-UTC time zones, and using the
 ``pytz`` ``normalize()`` and ``localize()`` APIs, possibly with the
-:setting:`DATABASE-TIME_ZONE` setting, you will need to audit your code, since
-``pytz`` and ``zoneinfo`` are not entirely equivalent.
+:setting:`TIME_ZONE <DATABASE-TIME_ZONE>` setting, you will need to audit your
+code, since ``pytz`` and ``zoneinfo`` are not entirely equivalent.
 
 To give time for such an audit, the transitional :setting:`USE_DEPRECATED_PYTZ`
 setting allows continued use of ``pytz`` during the 4.x release cycle. This
@@ -399,7 +399,7 @@ backends.
   years.
 
 * The second argument of ``DatabaseSchemaEditor._unique_sql()`` and
-  ``_create_unique_sql()`` methods is now fields instead of columns.
+  ``_create_unique_sql()`` methods is now ``fields`` instead of ``columns``.
 
 :mod:`django.contrib.gis`
 -------------------------
@@ -521,8 +521,8 @@ Miscellaneous
   ``log_change()``, and ``log_deletion()`` methods is renamed to ``obj``.
 
 * :class:`~django.utils.feedgenerator.RssFeed`,
-  :class:`~django.utils.feedgenerator.Atom1Feed`, and their subclasses now
-  emit elements with no content as self-closing tags.
+  :class:`~django.utils.feedgenerator.Atom1Feed`, and their subclasses now emit
+  elements with no content as self-closing tags.
 
 * ``NodeList.render()`` no longer casts the output of ``render()`` method for
   individual nodes to a string. ``Node.render()`` should always return a string
@@ -581,17 +581,17 @@ zones is deprecated.
 
 Accordingly, the ``is_dst`` arguments to the following are also deprecated:
 
-* :meth:`django.db.models.query.QuerySet.datetimes()`
-* :func:`django.db.models.functions.Trunc()`
-* :func:`django.db.models.functions.TruncSecond()`
-* :func:`django.db.models.functions.TruncMinute()`
-* :func:`django.db.models.functions.TruncHour()`
-* :func:`django.db.models.functions.TruncDay()`
-* :func:`django.db.models.functions.TruncWeek()`
-* :func:`django.db.models.functions.TruncMonth()`
-* :func:`django.db.models.functions.TruncQuarter()`
-* :func:`django.db.models.functions.TruncYear()`
-* :func:`django.utils.timezone.make_aware()`
+* :meth:`django.db.models.query.QuerySet.datetimes`
+* :func:`django.db.models.functions.Trunc`
+* :func:`django.db.models.functions.TruncSecond`
+* :func:`django.db.models.functions.TruncMinute`
+* :func:`django.db.models.functions.TruncHour`
+* :func:`django.db.models.functions.TruncDay`
+* :func:`django.db.models.functions.TruncWeek`
+* :func:`django.db.models.functions.TruncMonth`
+* :func:`django.db.models.functions.TruncQuarter`
+* :func:`django.db.models.functions.TruncYear`
+* :func:`django.utils.timezone.make_aware`
 
 Support for use of ``pytz`` will be removed in Django 5.0.
 
