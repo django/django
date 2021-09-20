@@ -527,7 +527,7 @@ class EmptyFieldListFilter(FieldListFilter):
             lookup_conditions.append((self.field_path, ""))
         if self.field.null:
             lookup_conditions.append((f"{self.field_path}__isnull", True))
-        lookup_condition = models.Q(*lookup_conditions, _connector=models.Q.OR)
+        lookup_condition = models.Q.create(lookup_conditions, connector=models.Q.OR)
         if self.lookup_val == "1":
             return queryset.filter(lookup_condition)
         return queryset.exclude(lookup_condition)
