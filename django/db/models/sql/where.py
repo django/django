@@ -67,12 +67,12 @@ class WhereNode(tree.Node):
             else:
                 where_parts.append(c)
         having_node = (
-            self.__class__(having_parts, self.connector, self.negated)
+            self.create(having_parts, self.connector, self.negated)
             if having_parts
             else None
         )
         where_node = (
-            self.__class__(where_parts, self.connector, self.negated)
+            self.create(where_parts, self.connector, self.negated)
             if where_parts
             else None
         )
@@ -171,16 +171,11 @@ class WhereNode(tree.Node):
                 self.children[pos] = child.relabeled_clone(change_map)
 
     def clone(self):
-        clone = self.__class__.create(
-            children=None,
-            connector=self.connector,
-            negated=self.negated,
-        )
+        clone = self.create(connector=self.connector, negated=self.negated)
         for child in self.children:
             if hasattr(child, "clone"):
-                clone.children.append(child.clone())
-            else:
-                clone.children.append(child)
+                child = child.clone()
+            clone.children.append(child)
         return clone
 
     def relabeled_clone(self, change_map):

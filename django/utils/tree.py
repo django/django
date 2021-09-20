@@ -45,8 +45,7 @@ class Node:
         return "<%s: %s>" % (self.__class__.__name__, self)
 
     def __deepcopy__(self, memodict):
-        obj = Node(connector=self.connector, negated=self.negated)
-        obj.__class__ = self.__class__
+        obj = self.create(connector=self.connector, negated=self.negated)
         obj.children = copy.deepcopy(self.children, memodict)
         return obj
 
@@ -93,7 +92,7 @@ class Node:
         node other got squashed or not.
         """
         if self.connector != conn_type:
-            obj = self.create(self.children, self.connector, self.negated)
+            obj = self.copy()
             self.connector = conn_type
             self.children = [obj, data]
             return data
