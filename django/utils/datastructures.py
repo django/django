@@ -284,18 +284,6 @@ class DictWrapper(dict):
         return value
 
 
-def _destruct_iterable_mapping_values(data):
-    for i, elem in enumerate(data):
-        if len(elem) != 2:
-            raise ValueError(
-                'dictionary update sequence element #{} has '
-                'length {}; 2 is required.'.format(i, len(elem))
-            )
-        if not isinstance(elem[0], str):
-            raise ValueError('Element key %r invalid, only strings are allowed' % elem[0])
-        yield tuple(elem)
-
-
 class CaseInsensitiveMapping(Mapping):
     """
     Mapping allowing case-insensitive key lookups. Original case of keys is
@@ -315,9 +303,7 @@ class CaseInsensitiveMapping(Mapping):
     """
 
     def __init__(self, data):
-        if not isinstance(data, Mapping):
-            data = {k: v for k, v in _destruct_iterable_mapping_values(data)}
-        self._store = {k.lower(): (k, v) for k, v in data.items()}
+        self._store = {k.lower(): (k, v) for k, v in self._unpack_items(data)}
 
     def __getitem__(self, key):
         return self._store[key.lower()][1]
@@ -340,3 +326,20 @@ class CaseInsensitiveMapping(Mapping):
 
     def copy(self):
         return self
+
+    @staticmethod
+    def _unpack_items(data):
+        if isinstance(data, Mapping):
+            yield from data.items()
+            return
+        for i, elem in enumerate(data):
+            if len(elem) != 2:
+                raise ValueError(
+                    'dictionary update sequence element #{} has length {}; '
+                    '2 is required.'.format(i, len(elem))
+                )
+            if not isinstance(elem[0], str):
+                raise ValueError(
+                    'Element key %r invalid, only strings are allowed' % elem[0]
+                )
+            yield elem
