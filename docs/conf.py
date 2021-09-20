@@ -123,7 +123,7 @@ else:
     release = django_release()
 
 # The "development version" of Django
-django_next_version = '4.0'
+django_next_version = '4.1'
 
 extlinks = {
     'bpo': ('https://bugs.python.org/issue%s', 'bpo-'),
