@@ -87,8 +87,17 @@ come with Django:
 These applications are included by default as a convenience for the common case.
 
 Some of these applications make use of at least one database table, though,
-so we need to create the tables in the database before we can use them. To do
-that, run the following command:
+so we need to create the tables in the database before we can use them.
+
+.. note::
+    Before creating the tables in the database, there is one thing to note if
+    you already know your application will have users and you have specific
+    requirements for them. You may be interested in setting up a placeholder
+    for your user requirements. You can do this by editing your
+    :file:`mysite/settings.py` and :file:`mysite/models.py` files (we will go
+    through the latter next) with the changes ref:`here <auth-custom-user>`.
+
+To create the tables, run the following command:
 
 .. console::
 
