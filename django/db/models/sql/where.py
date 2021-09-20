@@ -171,7 +171,7 @@ class WhereNode(tree.Node):
                 self.children[pos] = child.relabeled_clone(change_map)
 
     def clone(self):
-        clone = self.__class__._new_instance(
+        clone = self.__class__.create(
             children=None,
             connector=self.connector,
             negated=self.negated,
