@@ -5,7 +5,7 @@ from django.db import models
 from django.forms import CharField, FileField, Form, ModelForm
 from django.forms.models import ModelFormMetaclass
 from django.test import SimpleTestCase, TestCase
-from tests.forms_tests.tests import test_all_form_renderers
+from tests.forms_tests.tests import jinja2_tests
 
 from ..models import (
     BoundaryModel, ChoiceFieldModel, ChoiceModel, ChoiceOptionModel, Defaults,
@@ -284,7 +284,6 @@ class ManyToManyExclusionTestCase(TestCase):
         self.assertEqual([obj.pk for obj in form.instance.multi_choice_int.all()], data['multi_choice_int'])
 
 
-@test_all_form_renderers()
 class EmptyLabelTestCase(TestCase):
     def test_empty_field_char(self):
         f = EmptyCharLabelChoiceForm()
@@ -374,3 +373,8 @@ class EmptyLabelTestCase(TestCase):
 <option value="2">Bar</option>
 </select></p>"""
         )
+
+
+@jinja2_tests
+class Jinja2EmptyLabelTestCase(EmptyLabelTestCase):
+    pass

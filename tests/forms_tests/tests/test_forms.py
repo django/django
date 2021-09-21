@@ -23,7 +23,7 @@ from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils.datastructures import MultiValueDict
 from django.utils.safestring import mark_safe
-from tests.forms_tests.tests import test_all_form_renderers
+from tests.forms_tests.tests import jinja2_tests
 
 
 class FrameworkForm(Form):
@@ -56,7 +56,6 @@ class MultiValueDictLike(dict):
         return [self[key]]
 
 
-@test_all_form_renderers()
 class FormsTestCase(SimpleTestCase):
     # A Form is a collection of Fields. It knows how to validate a set of data and it
     # knows how to render itself in a couple of default ways (e.g., an HTML table).
@@ -3539,6 +3538,11 @@ Password: <input type="password" name="password" required>
             field.label_tag(attrs={'number': 9999}),
             '<label number="9999" for="id_first_name">First name:</label>',
         )
+
+
+@jinja2_tests
+class Jinja2FormsTestCase(FormsTestCase):
+    pass
 
 
 class CustomRenderer(DjangoTemplates):
