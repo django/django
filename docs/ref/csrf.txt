@@ -160,7 +160,7 @@ Finally, you'll need to set the header on your AJAX request. Using the
         // ...
     });
 
-.. _fetch(): https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch
+.. _fetch(): https://developer.mozilla.org/en-US/docs/Web/API/fetch
 
 Using CSRF in Jinja2 templates
 ------------------------------
