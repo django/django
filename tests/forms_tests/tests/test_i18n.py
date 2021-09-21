@@ -4,10 +4,9 @@ from django.forms import (
 from django.test import SimpleTestCase
 from django.utils import translation
 from django.utils.translation import gettext_lazy
-from tests.forms_tests.tests import test_all_form_renderers
+from tests.forms_tests.tests import jinja2_tests
 
 
-@test_all_form_renderers()
 class FormsI18nTests(SimpleTestCase):
     def test_lazy_labels(self):
         class SomeForm(Form):
@@ -95,3 +94,8 @@ class FormsI18nTests(SimpleTestCase):
             degree = IntegerField(widget=Select(choices=((1, gettext_lazy('test')),)))
 
         CopyForm()
+
+
+@jinja2_tests
+class Jinja2FormsI18nTests(FormsI18nTests):
+    pass

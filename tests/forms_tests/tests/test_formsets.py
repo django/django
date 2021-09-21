@@ -11,7 +11,7 @@ from django.forms.formsets import BaseFormSet, all_valid, formset_factory
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.test import SimpleTestCase
-from tests.forms_tests.tests import test_all_form_renderers
+from tests.forms_tests.tests import jinja2_tests
 
 
 class Choice(Form):
@@ -48,7 +48,6 @@ class CustomKwargForm(Form):
         super().__init__(*args, **kwargs)
 
 
-@test_all_form_renderers()
 class FormsFormsetTestCase(SimpleTestCase):
 
     def make_choiceformset(
@@ -1315,7 +1314,11 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertEqual(formset.empty_form.renderer, renderer)
 
 
-@test_all_form_renderers()
+@jinja2_tests
+class Jinja2FormsFormsetTestCase(FormsFormsetTestCase):
+    pass
+
+
 class FormsetAsTagTests(SimpleTestCase):
     def setUp(self):
         data = {
@@ -1364,6 +1367,11 @@ class FormsetAsTagTests(SimpleTestCase):
         )
 
 
+@jinja2_tests
+class Jinja2FormsetAsTagTests(FormsetAsTagTests):
+    pass
+
+
 class ArticleForm(Form):
     title = CharField()
     pub_date = DateField()
@@ -1372,7 +1380,6 @@ class ArticleForm(Form):
 ArticleFormSet = formset_factory(ArticleForm)
 
 
-@test_all_form_renderers()
 class TestIsBoundBehavior(SimpleTestCase):
     def test_no_data_error(self):
         formset = ArticleFormSet({})
@@ -1483,6 +1490,11 @@ class TestIsBoundBehavior(SimpleTestCase):
         self.assertFalse(empty_forms[1].is_bound)
         # The empty forms should be equal.
         self.assertHTMLEqual(empty_forms[0].as_p(), empty_forms[1].as_p())
+
+
+@jinja2_tests
+class TestIsBoundBehavior(TestIsBoundBehavior):
+    pass
 
 
 class TestEmptyFormSet(SimpleTestCase):

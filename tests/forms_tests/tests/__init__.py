@@ -1,30 +1,16 @@
-import inspect
+from unittest import skipIf
 
 from django.test.utils import override_settings
 
-TEST_SETTINGS = [
-    {
-        'FORM_RENDERER': 'django.forms.renderers.DjangoTemplates',
-        'TEMPLATES': {'BACKEND': 'django.template.backends.django.DjangoTemplates'},
-    },
-    {
-        'FORM_RENDERER': 'django.forms.renderers.Jinja2',
-        'TEMPLATES': {'BACKEND': 'django.template.backends.jinja2.Jinja2'},
-    },
-]
+try:
+    import jinja2
+except ImportError:
+    jinja2 = None
 
 
-def test_all_form_renderers():
-    def wrapper(func):
-        def inner(*args, **kwargs):
-            for settings in TEST_SETTINGS:
-                with override_settings(**settings):
-                    func(*args, **kwargs)
-        return inner
-
-    def decorator(cls):
-        for name, func in inspect.getmembers(cls, inspect.isfunction):
-            if name.startswith('test_'):
-                setattr(cls, name, wrapper(func))
-        return cls
-    return decorator
+def jinja2_tests(test_func):
+    test_func = skipIf(jinja2 is None, 'this test requires jinja2')(test_func)
+    return override_settings(
+        FORM_RENDERER='django.forms.renderers.Jinja2',
+        TEMPLATES={'BACKEND': 'django.template.backends.jinja2.Jinja2'},
+    )(test_func)
