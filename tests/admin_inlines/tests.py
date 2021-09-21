@@ -1644,13 +1644,15 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.selenium.execute_script('window.scrollTo(0, %s);' % hide_link.location['y'])
             hide_link.click()
             self.wait_until_invisible(field_name)
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-        self.assertEqual(
-            len(self.selenium.find_elements_by_css_selector(stacked_inline_formset_selector + '.collapsed')), 0
-        )
-        self.assertEqual(
-            len(self.selenium.find_elements_by_css_selector(tabular_inline_formset_selector + '.collapsed')), 0
-        )
+        with self.wait_page_loaded():
+            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        with self.disable_implicit_wait():
+            self.assertEqual(
+                len(self.selenium.find_elements_by_css_selector(stacked_inline_formset_selector + '.collapsed')), 0
+            )
+            self.assertEqual(
+                len(self.selenium.find_elements_by_css_selector(tabular_inline_formset_selector + '.collapsed')), 0
+            )
         self.assertEqual(
             len(self.selenium.find_elements_by_css_selector(stacked_inline_formset_selector)), 1
         )
