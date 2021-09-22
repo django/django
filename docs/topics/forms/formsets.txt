@@ -784,18 +784,18 @@ Formsets have five attributes and five methods associated with rendering.
     .. versionadded:: 4.0
 
     The name of the template used when calling ``__str__`` or :meth:`.render`.
-    This template renders the formsets management forms and then each form in
-    the formset as per the template defined by the
-    forms :attr:`~django.forms.Form.template_name`. This is a proxy of
-    ``as_table`` by default.
+    This template renders the formset's management form and then each form in
+    the formset as per the template defined by the form's
+    :attr:`~django.forms.Form.template_name`. This is a proxy of ``as_table``
+    by default.
 
 .. attribute:: BaseFormSet.template_name_p
 
     .. versionadded:: 4.0
 
     The name of the template used when calling :meth:`.as_p`. By default this
-    is ``'django/forms/formsets/p.html'``. This template renders the formsets
-    management forms and then each form in the formset as per the forms
+    is ``'django/forms/formsets/p.html'``. This template renders the formset's
+    management form and then each form in the formset as per the form's
     :meth:`~django.forms.Form.as_p` method.
 
 .. attribute:: BaseFormSet.template_name_table
@@ -804,16 +804,16 @@ Formsets have five attributes and five methods associated with rendering.
 
     The name of the template used when calling :meth:`.as_table`. By default
     this is ``'django/forms/formsets/table.html'``. This template renders the
-    formsets management forms and then each form in the formset as per the
-    forms :meth:`~django.forms.Form.as_table` method.
+    formset's management form and then each form in the formset as per the
+    form's :meth:`~django.forms.Form.as_table` method.
 
 .. attribute:: BaseFormSet.template_name_ul
 
     .. versionadded:: 4.0
 
     The name of the template used when calling :meth:`.as_ul`. By default this
-    is ``'django/forms/formsets/ul.html'``. This template renders the formsets
-    management forms and then each form in the formset as per the forms
+    is ``'django/forms/formsets/ul.html'``. This template renders the formset's
+    management form and then each form in the formset as per the form's
     :meth:`~django.forms.Form.as_ul` method.
 
 .. method:: BaseFormSet.get_context()
