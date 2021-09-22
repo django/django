@@ -1,5 +1,5 @@
 import json
-from collections import UserDict, UserList
+from collections import UserList
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -84,7 +84,7 @@ class RenderableErrorMixin(RenderableMixin):
         return self.render(self.template_name_ul)
 
 
-class ErrorDict(UserDict, RenderableErrorMixin):
+class ErrorDict(dict, RenderableErrorMixin):
     """
     A collection of errors that knows how to display itself in various formats.
 
@@ -94,8 +94,8 @@ class ErrorDict(UserDict, RenderableErrorMixin):
     template_name_text = 'django/forms/errors/dict/text.txt'
     template_name_ul = 'django/forms/errors/dict/ul.html'
 
-    def __init__(self, data=None, renderer=None):
-        super().__init__(data)
+    def __init__(self, *args, renderer=None, **kwargs):
+        super().__init__(*args, **kwargs)
         self.renderer = renderer or get_default_renderer()
 
     def as_data(self):
