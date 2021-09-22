@@ -348,7 +348,7 @@ functions are available on each spatial backend.
 Function                              PostGIS  Oracle         MariaDB      MySQL       SpatiaLite
 ====================================  =======  ============== ============ =========== =================
 :class:`Area`                         X        X              X            X           X
-:class:`AsGeoJSON`                    X        X              X (≥ 10.2.4) X (≥ 5.7.5) X
+:class:`AsGeoJSON`                    X        X              X            X (≥ 5.7.5) X
 :class:`AsGML`                        X        X                                       X
 :class:`AsKML`                        X                                                X
 :class:`AsSVG`                        X                                                X

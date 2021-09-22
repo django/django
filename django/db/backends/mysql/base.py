@@ -132,8 +132,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     }
 
     # For these data types:
-    # - MySQL < 8.0.13 and MariaDB < 10.2.1 don't accept default values and
-    #   implicitly treat them as nullable
+    # - MySQL < 8.0.13 doesn't accept default values and implicitly treats them
+    #   as nullable
     # - all versions of MySQL and MariaDB don't support full width database
     #   indexes
     _limited_data_types = (
