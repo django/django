@@ -1793,7 +1793,7 @@ them::
     <QuerySet [<Person: ...)>, ...]>
 
 The ``postgresql``, ``oracle``, and ``mysql`` database backends support
-``select_for_update()``. However, MariaDB 10.3+ only supports the ``nowait``
+``select_for_update()``. However, MariaDB only supports the ``nowait``
 argument, MariaDB 10.6+ also supports the ``skip_locked`` argument, and MySQL
 8.0.1+ supports the ``nowait``, ``skip_locked``, and ``of`` arguments. The
 ``no_key`` argument is only supported on PostgreSQL.

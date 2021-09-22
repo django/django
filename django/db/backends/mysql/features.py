@@ -184,7 +184,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def supports_column_check_constraints(self):
         if self.connection.mysql_is_mariadb:
-            return self.connection.mysql_version >= (10, 2, 1)
+            return True
         return self.connection.mysql_version >= (8, 0, 16)
 
     supports_table_check_constraints = property(operator.attrgetter('supports_column_check_constraints'))
@@ -193,7 +193,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def can_introspect_check_constraints(self):
         if self.connection.mysql_is_mariadb:
             version = self.connection.mysql_version
-            return (version >= (10, 2, 22) and version < (10, 3)) or version >= (10, 3, 10)
+            return version >= (10, 3, 10)
         return self.connection.mysql_version >= (8, 0, 16)
 
     @cached_property
@@ -205,7 +205,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def has_select_for_update_nowait(self):
         if self.connection.mysql_is_mariadb:
-            return self.connection.mysql_version >= (10, 3, 0)
+            return True
         return self.connection.mysql_version >= (8, 0, 1)
 
     @cached_property
@@ -244,7 +244,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def supports_json_field(self):
         if self.connection.mysql_is_mariadb:
-            return self.connection.mysql_version >= (10, 2, 7)
+            return True
         return self.connection.mysql_version >= (5, 7, 8)
 
     @cached_property

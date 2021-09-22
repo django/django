@@ -328,7 +328,7 @@ non-durable <https://www.postgresql.org/docs/current/non-durability.html>`_.
 MariaDB notes
 =============
 
-Django supports MariaDB 10.2 and higher.
+Django supports MariaDB 10.3 and higher.
 
 To use MariaDB, use the MySQL backend, which is shared between the two. See the
 :ref:`MySQL notes <mysql-notes>` for more details.
@@ -683,7 +683,7 @@ a :exc:`~django.db.NotSupportedError` is raised.
 Option          MariaDB   MySQL
 =============== ========= ==========
 ``SKIP LOCKED`` X (≥10.6) X (≥8.0.1)
-``NOWAIT``      X (≥10.3) X (≥8.0.1)
+``NOWAIT``      X         X (≥8.0.1)
 ``OF``                    X (≥8.0.1)
 ``NO KEY``
 =============== ========= ==========

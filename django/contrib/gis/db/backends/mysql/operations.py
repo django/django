@@ -70,8 +70,6 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         if self.connection.mysql_is_mariadb:
             unsupported.remove('PointOnSurface')
             unsupported.update({'GeoHash', 'IsValid'})
-            if self.connection.mysql_version < (10, 2, 4):
-                unsupported.add('AsGeoJSON')
         elif self.connection.mysql_version < (5, 7, 5):
             unsupported.update({'AsGeoJSON', 'GeoHash', 'IsValid'})
         return unsupported
