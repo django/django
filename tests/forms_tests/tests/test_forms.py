@@ -67,6 +67,7 @@ class FormsTestCase(SimpleTestCase):
 
         self.assertTrue(p.is_bound)
         self.assertEqual(p.errors, {})
+        self.assertIsInstance(p.errors, dict)
         self.assertTrue(p.is_valid())
         self.assertHTMLEqual(p.errors.as_ul(), '')
         self.assertEqual(p.errors.as_text(), '')
