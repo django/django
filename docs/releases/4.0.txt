@@ -48,10 +48,10 @@ current timezone, conversion of datetime instances to the current timezone in
 forms and templates, as well as operations on aware datetimes in UTC are
 unaffected.
 
-However, if you are you are working with non-UTC time zones, and using the
-``pytz`` ``normalize()`` and ``localize()`` APIs, possibly with the
-:setting:`TIME_ZONE <DATABASE-TIME_ZONE>` setting, you will need to audit your
-code, since ``pytz`` and ``zoneinfo`` are not entirely equivalent.
+However, if you are working with non-UTC time zones, and using the ``pytz``
+``normalize()`` and ``localize()`` APIs, possibly with the :setting:`TIME_ZONE
+<DATABASE-TIME_ZONE>` setting, you will need to audit your code, since ``pytz``
+and ``zoneinfo`` are not entirely equivalent.
 
 To give time for such an audit, the transitional :setting:`USE_DEPRECATED_PYTZ`
 setting allows continued use of ``pytz`` during the 4.x release cycle. This
