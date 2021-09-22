@@ -247,12 +247,14 @@ Related fields
   either not installed, or is abstract.
 * **fields.E301**: Field defines a relation with the model
   ``<app_label>.<model>`` which has been swapped out.
-* **fields.E302**: Reverse accessor for ``<app_label>.<model>.<field name>``
-  clashes with field name ``<app_label>.<model>.<field name>``.
+* **fields.E302**: Reverse accessor ``<related model>.<accessor name>`` for
+  ``<app_label>.<model>.<field name>`` clashes with field name
+  ``<app_label>.<model>.<field name>``.
 * **fields.E303**: Reverse query name for ``<app_label>.<model>.<field name>``
   clashes with field name ``<app_label>.<model>.<field name>``.
-* **fields.E304**: Reverse accessor for ``<app_label>.<model>.<field name>``
-  clashes with reverse accessor for ``<app_label>.<model>.<field name>``.
+* **fields.E304**: Reverse accessor ``<related model>.<accessor name>`` for
+  ``<app_label>.<model>.<field name>`` clashes with reverse accessor for
+  ``<app_label>.<model>.<field name>``.
 * **fields.E305**: Reverse query name for ``<app_label>.<model>.<field name>``
   clashes with reverse query name for ``<app_label>.<model>.<field name>``.
 * **fields.E306**: The name ``<name>`` is invalid ``related_name`` for field
