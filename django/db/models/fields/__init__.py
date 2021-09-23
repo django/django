@@ -1999,9 +1999,6 @@ class NullBooleanField(BooleanField):
         del kwargs['blank']
         return name, path, args, kwargs
 
-    def get_internal_type(self):
-        return "NullBooleanField"
-
 
 class PositiveIntegerRelDbTypeMixin:
     def __init_subclass__(cls, **kwargs):
