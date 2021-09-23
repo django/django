@@ -195,7 +195,7 @@ class CommonPasswordValidator:
 
 class NumericPasswordValidator:
     """
-    Validate whether the password is alphanumeric.
+    Validate whether the password is entirely numeric.
     """
     def validate(self, password, user=None):
         if password.isdigit():
