@@ -1773,6 +1773,12 @@ to refer to the queryset's model.
 
         Restaurant.objects.select_for_update(of=('self', 'place_ptr'))
 
+.. admonition:: Using ``select_for_update(of=(...))`` with specified fields
+
+    If you want to lock models and specify selected fields, e.g. using
+    :meth:`values`, you must select at least one field from each model in the
+    ``of`` argument. Models without selected fields will not be locked.
+
 On PostgreSQL only, you can pass ``no_key=True`` in order to acquire a weaker
 lock, that still allows creating rows that merely reference locked rows
 (through a foreign key, for example) while the lock is in place. The
