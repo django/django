@@ -325,6 +325,7 @@ class QuerySet:
         return cls
 
     def __and__(self, other):
+        self._check_operator_queryset(other, '&')
         self._merge_sanity_check(other)
         if isinstance(other, EmptyQuerySet):
             return other
@@ -336,6 +337,7 @@ class QuerySet:
         return combined
 
     def __or__(self, other):
+        self._check_operator_queryset(other, '|')
         self._merge_sanity_check(other)
         if isinstance(self, EmptyQuerySet):
             return other
@@ -1429,6 +1431,10 @@ class QuerySet:
                 'Calling QuerySet.%s() after %s() is not supported.'
                 % (operation_name, self.query.combinator)
             )
+
+    def _check_operator_queryset(self, other, operator_):
+        if self.query.combinator or other.query.combinator:
+            raise TypeError(f'Cannot use {operator_} operator with combined queryset.')
 
 
 class InstanceCheckMeta(type):
