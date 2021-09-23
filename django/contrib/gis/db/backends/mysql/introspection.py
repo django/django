@@ -33,6 +33,6 @@ class MySQLIntrospection(DatabaseIntrospection):
         storage_engine = self.get_storage_engine(cursor, table_name)
         if storage_engine == 'InnoDB':
             if self.connection.mysql_is_mariadb:
-                True
+                return True
             return self.connection.mysql_version >= (5, 7, 5)
         return storage_engine in ('MyISAM', 'Aria')
