@@ -841,6 +841,21 @@ class BuildAbsoluteURITests(SimpleTestCase):
             with self.subTest(location=location):
                 self.assertEqual(request.build_absolute_uri(location=location), expected_url)
 
+    @override_settings(
+        USE_X_FORWARDED_PORT=True,
+        USE_X_FORWARDED_HOST=True,
+        ALLOWED_HOSTS=['*'])
+    def test_get_host_with_use_x_forwarded_port_and_http_host(self):
+        request = HttpRequest()
+        request.META = {
+            'HTTP_HOST': 'original.com',
+            'SERVER_PORT': '8000',
+            'HTTP_X_FORWARDED_HOST': 'example.com',
+            'HTTP_X_FORWARDED_PORT': '8080',
+        }
+        self.assertEqual(request.get_host(), 'example.com:8080')
+        self.assertEqual(request.get_port(), '8080')
+
 
 class RequestHeadersTests(SimpleTestCase):
     ENVIRON = {
