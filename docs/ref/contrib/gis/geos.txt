@@ -655,6 +655,16 @@ Other Properties & Methods
         doesn't impose any constraints on the geometry's SRID if called with a
         :class:`~django.contrib.gis.gdal.CoordTransform` object.
 
+.. method:: GEOSGeometry.make_valid()
+
+    .. versionadded:: 4.1
+
+    Returns a valid :class:`GEOSGeometry` equivalent, trying not to lose any of
+    the input vertices. If the geometry is already valid, it is returned
+    untouched. This is similar to the
+    :class:`~django.contrib.gis.db.models.functions.MakeValid` database
+    function. Requires GEOS 3.8.
+
 .. method:: GEOSGeometry.normalize()
 
     Converts this geometry to canonical form::
