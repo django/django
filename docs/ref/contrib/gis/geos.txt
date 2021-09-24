@@ -801,7 +801,7 @@ Geometry Collections
 
     .. attribute:: closed
 
-        Returns ``True`` if and only if all elements are closed. Requires GEOS 3.5.
+        Returns ``True`` if and only if all elements are closed.
 
 ``MultiPolygon``
 ----------------
