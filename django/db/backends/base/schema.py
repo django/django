@@ -622,7 +622,7 @@ class BaseDatabaseSchemaEditor:
                      old_db_params, new_db_params, strict=False):
         """Perform a "physical" (non-ManyToMany) field update."""
         # Drop any FK constraints, we'll remake them later
-        fks_dropped = set()
+        dropped_fks = set()
         if (
             self.connection.features.supports_foreign_keys and
             old_field.remote_field and
@@ -636,7 +636,7 @@ class BaseDatabaseSchemaEditor:
                     old_field.column,
                 ))
             for fk_name in fk_names:
-                fks_dropped.add((old_field.column,))
+                dropped_fks.add((old_field.column,))
                 self.execute(self._delete_fk_sql(model, fk_name))
         # Has unique been removed?
         if old_field.unique and (not new_field.unique or self._field_became_primary_key(old_field, new_field)):
@@ -848,7 +848,7 @@ class BaseDatabaseSchemaEditor:
                 self.execute(sql, params)
         # Does it have a foreign key?
         if (self.connection.features.supports_foreign_keys and new_field.remote_field and
-                (fks_dropped or not old_field.remote_field or not old_field.db_constraint) and
+                (dropped_fks or not old_field.remote_field or not old_field.db_constraint) and
                 new_field.db_constraint):
             self.execute(self._create_fk_sql(model, new_field, "_fk_%(to_table)s_%(to_column)s"))
         # Rebuild FKs that pointed to us if we previously had to drop them
