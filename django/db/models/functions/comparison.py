@@ -66,9 +66,9 @@ class Coalesce(Func):
         super().__init__(*expressions, **extra)
 
     @property
-    def empty_aggregate_value(self):
+    def empty_result_set_value(self):
         for expression in self.get_source_expressions():
-            result = expression.empty_aggregate_value
+            result = expression.empty_result_set_value
             if result is NotImplemented or result is not None:
                 return result
         return None

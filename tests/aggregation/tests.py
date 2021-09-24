@@ -1367,7 +1367,7 @@ class AggregateTestCase(TestCase):
                     'books_count': 0,
                 }
             )
-        # Expression without empty_aggregate_value forces queries to be
+        # Expression without empty_result_set_value forces queries to be
         # executed even if they would return an empty result set.
         raw_books_count = Func('book', function='COUNT')
         raw_books_count.contains_aggregate = True
