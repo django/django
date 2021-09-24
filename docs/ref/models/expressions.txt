@@ -414,11 +414,11 @@ The ``Aggregate`` API is as follows:
         allows passing a ``distinct`` keyword argument. If set to ``False``
         (default), ``TypeError`` is raised if ``distinct=True`` is passed.
 
-    .. attribute:: empty_aggregate_value
+    .. attribute:: empty_result_set_value
 
         .. versionadded:: 4.0
 
-        Override :attr:`~django.db.models.Expression.empty_aggregate_value` to
+        Override :attr:`~django.db.models.Expression.empty_result_set_value` to
         ``None`` since most aggregate functions result in ``NULL`` when applied
         to an empty result set.
 
@@ -959,14 +959,14 @@ calling the appropriate methods on the wrapped expression.
         in :class:`~django.db.models.expressions.Window`. Defaults to
         ``False``.
 
-    .. attribute:: empty_aggregate_value
+    .. attribute:: empty_result_set_value
 
         .. versionadded:: 4.0
 
         Tells Django which value should be returned when the expression is used
-        to :meth:`aggregate <django.db.models.query.QuerySet.aggregate>` over
-        an empty result set. Defaults to :py:data:`NotImplemented` which forces
-        the expression to be computed on the database.
+        to apply a function over an empty result set. Defaults to
+        :py:data:`NotImplemented` which forces the expression to be computed on
+        the database.
 
     .. method:: resolve_expression(query=None, allow_joins=True, reuse=None, summarize=False, for_save=False)
 
