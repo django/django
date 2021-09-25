@@ -202,6 +202,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('boolean_field', models.BooleanField(null=True)),
                 ('char_field', models.CharField(max_length=30, blank=True)),
+                ('text_field', models.TextField(blank=True)),
                 ('integer_field', models.IntegerField(null=True)),
                 ('json_field', models.JSONField(null=True)),
             ],

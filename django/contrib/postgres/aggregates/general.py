@@ -1,7 +1,9 @@
 import warnings
 
 from django.contrib.postgres.fields import ArrayField
-from django.db.models import Aggregate, BooleanField, JSONField, Value
+from django.db.models import (
+    Aggregate, BooleanField, JSONField, TextField, Value,
+)
 from django.utils.deprecation import RemovedInDjango50Warning
 
 from .mixins import OrderableAggMixin
@@ -88,6 +90,7 @@ class StringAgg(DeprecatedConvertValueMixin, OrderableAggMixin, Aggregate):
     function = 'STRING_AGG'
     template = '%(function)s(%(distinct)s%(expressions)s %(ordering)s)'
     allow_distinct = True
+    output_field = TextField()
 
     # RemovedInDjango50Warning
     deprecation_value = ''
