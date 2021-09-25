@@ -1,7 +1,7 @@
 import fnmatch
 import os
 from pathlib import Path
-from subprocess import PIPE, run
+from subprocess import run
 
 from django.apps import apps as installed_apps
 from django.utils.crypto import get_random_string
@@ -17,7 +17,7 @@ def popen_wrapper(args, stdout_encoding='utf-8'):
     Return stdout output, stderr output, and OS status code.
     """
     try:
-        p = run(args, stdout=PIPE, stderr=PIPE, close_fds=os.name != 'nt')
+        p = run(args, capture_output=True, close_fds=os.name != 'nt')
     except OSError as err:
         raise CommandError('Error executing %s' % args[0]) from err
     return (
