@@ -741,6 +741,13 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.remove_field(Author, Author._meta.get_field('id'))
             editor.alter_field(Author, old_field, new_field, strict=True)
+        # Redundant unique constraint is not added.
+        count = self.get_constraints_count(
+            Author._meta.db_table,
+            Author._meta.get_field('uuid').column,
+            None,
+        )
+        self.assertLessEqual(count['uniques'], 1)
 
     @isolate_apps('schema')
     def test_alter_primary_key_quoted_db_table(self):
