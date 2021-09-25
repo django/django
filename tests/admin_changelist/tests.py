@@ -743,7 +743,7 @@ class ChangeListTests(TestCase):
         response = m.changelist_view(request)
         for i in range(1, 10):
             link = reverse('admin:admin_changelist_child_change', args=(i,))
-            self.assertContains(response, '<a href="%s">%s</a>' % (link, i))
+            self.assertContains(response, f'<a href="{link}">{i}</a>')
 
         list_display = m.get_list_display(request)
         list_display_links = m.get_list_display_links(request, list_display)

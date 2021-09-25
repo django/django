@@ -29,7 +29,7 @@ def import_string(dotted_path):
     try:
         return cached_import(module_path, class_name)
     except AttributeError as err:
-        raise ImportError('Module "%s" does not define a "%s" attribute/class' % (
+        raise ImportError('Module "{}" does not define a "{}" attribute/class'.format(
             module_path, class_name)
         ) from err
 
@@ -54,7 +54,7 @@ def autodiscover_modules(*args, **kwargs):
                 if register_to:
                     before_import_registry = copy.copy(register_to._registry)
 
-                import_module('%s.%s' % (app_config.name, module_to_search))
+                import_module(f'{app_config.name}.{module_to_search}')
             except Exception:
                 # Reset the registry to the state before the last import
                 # as this import will have to reoccur on the next request and

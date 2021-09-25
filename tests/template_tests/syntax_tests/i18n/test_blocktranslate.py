@@ -258,7 +258,7 @@ class I18nBlockTransTagTests(SimpleTestCase):
 
     @setup({'template': '{% load i18n %}{% blocktranslate asvar %}Yes{% endblocktranslate %}'})
     def test_blocktrans_syntax_error_missing_assignment(self, tag_name):
-        msg = "No argument provided to the '{}' tag for the asvar option.".format(tag_name)
+        msg = f"No argument provided to the '{tag_name}' tag for the asvar option."
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template')
 
@@ -269,7 +269,7 @@ class I18nBlockTransTagTests(SimpleTestCase):
 
     @setup({'template': '{% load i18n %}{% blocktranslate %}{% block b %} {% endblock %}{% endblocktranslate %}'})
     def test_with_block(self, tag_name):
-        msg = "'{}' doesn't allow other block tags (seen 'block b') inside it".format(tag_name)
+        msg = f"'{tag_name}' doesn't allow other block tags (seen 'block b') inside it"
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template')
 
@@ -279,7 +279,7 @@ class I18nBlockTransTagTests(SimpleTestCase):
         '{% endblocktranslate %}'
     )})
     def test_with_for(self, tag_name):
-        msg = "'{}' doesn't allow other block tags (seen 'for b in [1, 2, 3]') inside it".format(tag_name)
+        msg = f"'{tag_name}' doesn't allow other block tags (seen 'for b in [1, 2, 3]') inside it"
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template')
 
@@ -290,13 +290,13 @@ class I18nBlockTransTagTests(SimpleTestCase):
 
     @setup({'template': '{% load i18n %}{% blocktranslate with %}{% endblocktranslate %}'})
     def test_no_args_with(self, tag_name):
-        msg = '"with" in \'{}\' tag needs at least one keyword argument.'.format(tag_name)
+        msg = f'"with" in \'{tag_name}\' tag needs at least one keyword argument.'
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template')
 
     @setup({'template': '{% load i18n %}{% blocktranslate count a %}{% endblocktranslate %}'})
     def test_count(self, tag_name):
-        msg = '"count" in \'{}\' tag expected exactly one keyword argument.'.format(tag_name)
+        msg = f'"count" in \'{tag_name}\' tag expected exactly one keyword argument.'
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template', {'a': [1, 2, 3]})
 
@@ -305,7 +305,7 @@ class I18nBlockTransTagTests(SimpleTestCase):
         '{% plural %}{{ counter }}{% endblocktranslate %}'
     )})
     def test_count_not_number(self, tag_name):
-        msg = "'counter' argument to '{}' tag must be a number.".format(tag_name)
+        msg = f"'counter' argument to '{tag_name}' tag must be a number."
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template', {'num': '1'})
 
@@ -315,7 +315,7 @@ class I18nBlockTransTagTests(SimpleTestCase):
         '{% endblocktranslate %}'
     )})
     def test_plural_bad_syntax(self, tag_name):
-        msg = "'{}' doesn't allow other block tags inside it".format(tag_name)
+        msg = f"'{tag_name}' doesn't allow other block tags inside it"
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template', {'var': [1, 2, 3]})
 
@@ -327,10 +327,10 @@ class TranslationBlockTranslateTagTests(SimpleTestCase):
         return Template(
             template_string.replace(
                 '{{% blocktranslate ',
-                '{{% {}'.format(self.tag_name)
+                f'{{% {self.tag_name}'
             ).replace(
                 '{{% endblocktranslate %}}',
-                '{{% end{} %}}'.format(self.tag_name)
+                f'{{% end{self.tag_name} %}}'
             )
         )
 
@@ -493,10 +493,10 @@ class MultipleLocaleActivationBlockTranslateTests(MultipleLocaleActivationTestCa
         return Template(
             template_string.replace(
                 '{{% blocktranslate ',
-                '{{% {}'.format(self.tag_name)
+                f'{{% {self.tag_name}'
             ).replace(
                 '{{% endblocktranslate %}}',
-                '{{% end{} %}}'.format(self.tag_name)
+                f'{{% end{self.tag_name} %}}'
             )
         )
 
@@ -541,10 +541,10 @@ class MiscTests(SimpleTestCase):
         return Template(
             template_string.replace(
                 '{{% blocktranslate ',
-                '{{% {}'.format(self.tag_name)
+                f'{{% {self.tag_name}'
             ).replace(
                 '{{% endblocktranslate %}}',
-                '{{% end{} %}}'.format(self.tag_name)
+                f'{{% end{self.tag_name} %}}'
             )
         )
 

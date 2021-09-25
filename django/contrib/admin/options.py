@@ -479,7 +479,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         opts = self.opts
         codename = get_permission_codename('add', opts)
-        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
+        return request.user.has_perm(f"{opts.app_label}.{codename}")
 
     def has_change_permission(self, request, obj=None):
         """
@@ -494,7 +494,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         opts = self.opts
         codename = get_permission_codename('change', opts)
-        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
+        return request.user.has_perm(f"{opts.app_label}.{codename}")
 
     def has_delete_permission(self, request, obj=None):
         """
@@ -509,7 +509,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         opts = self.opts
         codename = get_permission_codename('delete', opts)
-        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
+        return request.user.has_perm(f"{opts.app_label}.{codename}")
 
     def has_view_permission(self, request, obj=None):
         """
@@ -526,8 +526,8 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         codename_view = get_permission_codename('view', opts)
         codename_change = get_permission_codename('change', opts)
         return (
-            request.user.has_perm('%s.%s' % (opts.app_label, codename_view)) or
-            request.user.has_perm('%s.%s' % (opts.app_label, codename_change))
+            request.user.has_perm(f'{opts.app_label}.{codename_view}') or
+            request.user.has_perm(f'{opts.app_label}.{codename_change}')
         )
 
     def has_view_or_change_permission(self, request, obj=None):
@@ -591,7 +591,7 @@ class ModelAdmin(BaseModelAdmin):
         super().__init__()
 
     def __str__(self):
-        return "%s.%s" % (self.model._meta.app_label, self.__class__.__name__)
+        return f"{self.model._meta.app_label}.{self.__class__.__name__}"
 
     def __repr__(self):
         return (
@@ -1052,8 +1052,8 @@ class ModelAdmin(BaseModelAdmin):
         match = request.resolver_match
         if self.preserve_filters and match:
             opts = self.model._meta
-            current_url = '%s:%s' % (match.app_name, match.url_name)
-            changelist_url = 'admin:%s_%s_changelist' % (opts.app_label, opts.model_name)
+            current_url = f'{match.app_name}:{match.url_name}'
+            changelist_url = f'admin:{opts.app_label}_{opts.model_name}_changelist'
             if current_url == changelist_url:
                 preserved_filters = request.GET.urlencode()
             else:
@@ -1177,7 +1177,7 @@ class ModelAdmin(BaseModelAdmin):
         request.current_app = self.admin_site.name
 
         return TemplateResponse(request, form_template or [
-            "admin/%s/%s/change_form.html" % (app_label, opts.model_name),
+            f"admin/{app_label}/{opts.model_name}/change_form.html",
             "admin/%s/change_form.html" % app_label,
             "admin/change_form.html"
         ], context)
@@ -1189,7 +1189,7 @@ class ModelAdmin(BaseModelAdmin):
         opts = obj._meta
         preserved_filters = self.get_preserved_filters(request)
         obj_url = reverse(
-            'admin:%s_%s_change' % (opts.app_label, opts.model_name),
+            f'admin:{opts.app_label}_{opts.model_name}_change',
             args=(quote(obj.pk),),
             current_app=self.admin_site.name,
         )
@@ -1217,7 +1217,7 @@ class ModelAdmin(BaseModelAdmin):
                 'obj': str(obj),
             })
             return TemplateResponse(request, self.popup_response_template or [
-                'admin/%s/%s/popup_response.html' % (opts.app_label, opts.model_name),
+                f'admin/{opts.app_label}/{opts.model_name}/popup_response.html',
                 'admin/%s/popup_response.html' % opts.app_label,
                 'admin/popup_response.html',
             ], {
@@ -1277,7 +1277,7 @@ class ModelAdmin(BaseModelAdmin):
                 'new_value': str(new_value),
             })
             return TemplateResponse(request, self.popup_response_template or [
-                'admin/%s/%s/popup_response.html' % (opts.app_label, opts.model_name),
+                f'admin/{opts.app_label}/{opts.model_name}/popup_response.html',
                 'admin/%s/popup_response.html' % opts.app_label,
                 'admin/popup_response.html',
             ], {
@@ -1440,7 +1440,7 @@ class ModelAdmin(BaseModelAdmin):
                 'value': str(obj_id),
             })
             return TemplateResponse(request, self.popup_response_template or [
-                'admin/%s/%s/popup_response.html' % (opts.app_label, opts.model_name),
+                f'admin/{opts.app_label}/{opts.model_name}/popup_response.html',
                 'admin/%s/popup_response.html' % opts.app_label,
                 'admin/popup_response.html',
             ], {
@@ -1458,7 +1458,7 @@ class ModelAdmin(BaseModelAdmin):
 
         if self.has_change_permission(request, None):
             post_url = reverse(
-                'admin:%s_%s_changelist' % (opts.app_label, opts.model_name),
+                f'admin:{opts.app_label}_{opts.model_name}_changelist',
                 current_app=self.admin_site.name,
             )
             preserved_filters = self.get_preserved_filters(request)
@@ -1483,8 +1483,8 @@ class ModelAdmin(BaseModelAdmin):
         return TemplateResponse(
             request,
             self.delete_confirmation_template or [
-                "admin/{}/{}/delete_confirmation.html".format(app_label, opts.model_name),
-                "admin/{}/delete_confirmation.html".format(app_label),
+                f"admin/{app_label}/{opts.model_name}/delete_confirmation.html",
+                f"admin/{app_label}/delete_confirmation.html",
                 "admin/delete_confirmation.html",
             ],
             context,
@@ -1675,7 +1675,7 @@ class ModelAdmin(BaseModelAdmin):
     def _get_edited_object_pks(self, request, prefix):
         """Return POST data values of list_editable primary keys."""
         pk_pattern = re.compile(
-            r'{}-\d+-{}$'.format(re.escape(prefix), self.model._meta.pk.name)
+            fr'{re.escape(prefix)}-\d+-{self.model._meta.pk.name}$'
         )
         return [value for key, value in request.POST.items() if pk_pattern.match(key)]
 
@@ -1846,7 +1846,7 @@ class ModelAdmin(BaseModelAdmin):
         request.current_app = self.admin_site.name
 
         return TemplateResponse(request, self.change_list_template or [
-            'admin/%s/%s/change_list.html' % (app_label, opts.model_name),
+            f'admin/{app_label}/{opts.model_name}/change_list.html',
             'admin/%s/change_list.html' % app_label,
             'admin/change_list.html'
         ], context)
@@ -1958,7 +1958,7 @@ class ModelAdmin(BaseModelAdmin):
         request.current_app = self.admin_site.name
 
         return TemplateResponse(request, self.object_history_template or [
-            "admin/%s/%s/object_history.html" % (app_label, opts.model_name),
+            f"admin/{app_label}/{opts.model_name}/object_history.html",
             "admin/%s/object_history.html" % app_label,
             "admin/object_history.html"
         ], context)
@@ -1989,7 +1989,7 @@ class ModelAdmin(BaseModelAdmin):
             prefix = FormSet.get_default_prefix()
             prefixes[prefix] = prefixes.get(prefix, 0) + 1
             if prefixes[prefix] != 1 or not prefix:
-                prefix = "%s-%s" % (prefix, prefixes[prefix])
+                prefix = f"{prefix}-{prefixes[prefix]}"
             formset_params = self.get_formset_kwargs(request, obj, inline, prefix)
             formset = FormSet(**formset_params)
 
@@ -1997,7 +1997,7 @@ class ModelAdmin(BaseModelAdmin):
                 """Return whether or not the user deleted the form."""
                 return (
                     inline.has_delete_permission(request, obj) and
-                    '{}-{}-DELETE'.format(formset.prefix, index) in request.POST
+                    f'{formset.prefix}-{index}-DELETE' in request.POST
                 )
 
             # Bypass validation of each view-only inline form (since the form's
@@ -2183,7 +2183,7 @@ class InlineModelAdmin(BaseModelAdmin):
                 opts = field.remote_field.model._meta
                 break
         return any(
-            request.user.has_perm('%s.%s' % (opts.app_label, get_permission_codename(perm, opts)))
+            request.user.has_perm(f'{opts.app_label}.{get_permission_codename(perm, opts)}')
             for perm in perms
         )
 

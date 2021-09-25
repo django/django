@@ -42,7 +42,7 @@ class TranslatableFile:
         self.locale_dir = locale_dir
 
     def __repr__(self):
-        return "<%s: %s>" % (
+        return "<{}: {}>".format(
             self.__class__.__name__,
             os.sep.join([self.dirpath, self.file]),
         )
@@ -92,7 +92,7 @@ class BuildFile:
             'djangojs': 'c',
             'django': 'py',
         }.get(self.domain)
-        filename = '%s.%s' % (self.translatable.file, extension)
+        filename = f'{self.translatable.file}.{extension}'
         return os.path.join(self.translatable.dirpath, filename)
 
     def preprocess(self):
@@ -385,7 +385,7 @@ class Command(BaseCommand):
             for locale in locales:
                 if '-' in locale:
                     self.stdout.write(
-                        'invalid locale %s, did you mean %s?' % (
+                        'invalid locale {}, did you mean {}?'.format(
                             locale,
                             locale.replace('-', '_'),
                         ),
@@ -479,7 +479,7 @@ class Command(BaseCommand):
                 file_ext = os.path.splitext(filename)[1]
                 if file_ext not in self.extensions or is_ignored_path(file_path, self.ignore_patterns):
                     if self.verbosity > 1:
-                        self.stdout.write('ignoring file %s in %s' % (filename, dirpath))
+                        self.stdout.write(f'ignoring file {filename} in {dirpath}')
                 else:
                     locale_dir = None
                     for path in self.locale_paths:
@@ -512,7 +512,7 @@ class Command(BaseCommand):
         build_files = []
         for translatable in files:
             if self.verbosity > 1:
-                self.stdout.write('processing file %s in %s' % (
+                self.stdout.write('processing file {} in {}'.format(
                     translatable.file, translatable.dirpath
                 ))
             if self.domain not in ('djangojs', 'django'):
@@ -522,7 +522,7 @@ class Command(BaseCommand):
                 build_file.preprocess()
             except UnicodeDecodeError as e:
                 self.stdout.write(
-                    'UnicodeDecodeError: skipped file %s in %s (reason: %s)' % (
+                    'UnicodeDecodeError: skipped file {} in {} (reason: {})'.format(
                         translatable.file, translatable.dirpath, e,
                     )
                 )
@@ -539,7 +539,7 @@ class Command(BaseCommand):
             args = [
                 'xgettext',
                 '-d', self.domain,
-                '--language=%s' % ('C' if is_templatized else 'JavaScript',),
+                '--language={}'.format('C' if is_templatized else 'JavaScript'),
                 '--keyword=gettext_noop',
                 '--keyword=gettext_lazy',
                 '--keyword=ngettext_lazy:1,2',

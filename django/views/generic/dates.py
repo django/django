@@ -489,7 +489,7 @@ class BaseWeekArchiveView(YearMixin, WeekMixin, BaseDateListView):
         try:
             week_start = week_choices[week_format]
         except KeyError:
-            raise ValueError('Unknown week format %r. Choices are: %s' % (
+            raise ValueError('Unknown week format {!r}. Choices are: {}'.format(
                 week_format,
                 ', '.join(sorted(week_choices)),
             ))

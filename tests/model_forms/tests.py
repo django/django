@@ -1259,21 +1259,21 @@ class ModelFormBasicTests(TestCase):
 <li>Pub date: <input type="text" name="pub_date" required></li>
 <li>Writer: <select name="writer" required>
 <option value="" selected>---------</option>
-<option value="%s">Bob Woodward</option>
-<option value="%s">Mike Royko</option>
+<option value="{}">Bob Woodward</option>
+<option value="{}">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article" required></textarea></li>
 <li>Categories: <select multiple name="categories">
-<option value="%s" selected>Entertainment</option>
-<option value="%s" selected>It&#x27;s a test</option>
-<option value="%s">Third test</option>
+<option value="{}" selected>Entertainment</option>
+<option value="{}" selected>It&#x27;s a test</option>
+<option value="{}">Third test</option>
 </select></li>
 <li>Status: <select name="status">
 <option value="" selected>---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
-</select></li>''' % (self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk))
+</select></li>'''.format(self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk))
 
         # When the ModelForm is passed an instance, that instance's current values are
         # inserted as 'initial' data in each Field.
@@ -1301,21 +1301,21 @@ class ModelFormBasicTests(TestCase):
 <li>Pub date: <input type="text" name="pub_date" value="1988-01-04" required></li>
 <li>Writer: <select name="writer" required>
 <option value="">---------</option>
-<option value="%s">Bob Woodward</option>
-<option value="%s" selected>Mike Royko</option>
+<option value="{}">Bob Woodward</option>
+<option value="{}" selected>Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article" required>Hello.</textarea></li>
 <li>Categories: <select multiple name="categories">
-<option value="%s">Entertainment</option>
-<option value="%s">It&#x27;s a test</option>
-<option value="%s">Third test</option>
+<option value="{}">Entertainment</option>
+<option value="{}">It&#x27;s a test</option>
+<option value="{}">Third test</option>
 </select></li>
 <li>Status: <select name="status">
 <option value="" selected>---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
-</select></li>''' % (self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk))
+</select></li>'''.format(self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk))
 
         f = ArticleForm({
             'headline': 'Test headline',
@@ -1423,21 +1423,21 @@ class ModelFormBasicTests(TestCase):
 <tr><th>Pub date:</th><td><input type="text" name="pub_date" required></td></tr>
 <tr><th>Writer:</th><td><select name="writer" required>
 <option value="" selected>---------</option>
-<option value="%s">Bob Woodward</option>
-<option value="%s">Mike Royko</option>
+<option value="{}">Bob Woodward</option>
+<option value="{}">Mike Royko</option>
 </select></td></tr>
 <tr><th>Article:</th><td><textarea rows="10" cols="40" name="article" required></textarea></td></tr>
 <tr><th>Categories:</th><td><select multiple name="categories">
-<option value="%s">Entertainment</option>
-<option value="%s">It&#x27;s a test</option>
-<option value="%s">Third test</option>
+<option value="{}">Entertainment</option>
+<option value="{}">It&#x27;s a test</option>
+<option value="{}">Third test</option>
 </select></td></tr>
 <tr><th>Status:</th><td><select name="status">
 <option value="" selected>---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
-</select></td></tr>''' % (self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk))
+</select></td></tr>'''.format(self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk))
 
         # Add some categories and test the many-to-many form output.
         new_art = Article.objects.create(
@@ -1453,21 +1453,21 @@ class ModelFormBasicTests(TestCase):
 <li>Pub date: <input type="text" name="pub_date" value="1988-01-04" required></li>
 <li>Writer: <select name="writer" required>
 <option value="">---------</option>
-<option value="%s">Bob Woodward</option>
-<option value="%s" selected>Mike Royko</option>
+<option value="{}">Bob Woodward</option>
+<option value="{}" selected>Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article" required>Hello.</textarea></li>
 <li>Categories: <select multiple name="categories">
-<option value="%s" selected>Entertainment</option>
-<option value="%s">It&#x27;s a test</option>
-<option value="%s">Third test</option>
+<option value="{}" selected>Entertainment</option>
+<option value="{}">It&#x27;s a test</option>
+<option value="{}">Third test</option>
 </select></li>
 <li>Status: <select name="status">
 <option value="" selected>---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
-</select></li>''' % (self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk))
+</select></li>'''.format(self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk))
 
     def test_subset_fields(self):
         # You can restrict a form to a subset of the complete list of fields
@@ -1597,21 +1597,21 @@ class ModelFormBasicTests(TestCase):
 <li>Pub date: <input type="text" name="pub_date" required></li>
 <li>Writer: <select name="writer" required>
 <option value="" selected>---------</option>
-<option value="%s">Bob Woodward</option>
-<option value="%s">Mike Royko</option>
+<option value="{}">Bob Woodward</option>
+<option value="{}">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article" required></textarea></li>
 <li>Categories: <select multiple name="categories">
-<option value="%s">Entertainment</option>
-<option value="%s">It&#x27;s a test</option>
-<option value="%s">Third test</option>
+<option value="{}">Entertainment</option>
+<option value="{}">It&#x27;s a test</option>
+<option value="{}">Third test</option>
 </select> </li>
 <li>Status: <select name="status">
 <option value="" selected>---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
-</select></li>''' % (self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk))
+</select></li>'''.format(self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk))
 
         c4 = Category.objects.create(name='Fourth', url='4th')
         w_bernstein = Writer.objects.create(name='Carl Bernstein')
@@ -1622,23 +1622,31 @@ class ModelFormBasicTests(TestCase):
 <li>Pub date: <input type="text" name="pub_date" required></li>
 <li>Writer: <select name="writer" required>
 <option value="" selected>---------</option>
-<option value="%s">Bob Woodward</option>
-<option value="%s">Carl Bernstein</option>
-<option value="%s">Mike Royko</option>
+<option value="{}">Bob Woodward</option>
+<option value="{}">Carl Bernstein</option>
+<option value="{}">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article" required></textarea></li>
 <li>Categories: <select multiple name="categories">
-<option value="%s">Entertainment</option>
-<option value="%s">It&#x27;s a test</option>
-<option value="%s">Third test</option>
-<option value="%s">Fourth</option>
+<option value="{}">Entertainment</option>
+<option value="{}">It&#x27;s a test</option>
+<option value="{}">Third test</option>
+<option value="{}">Fourth</option>
 </select></li>
 <li>Status: <select name="status">
 <option value="" selected>---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
-</select></li>''' % (self.w_woodward.pk, w_bernstein.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk, c4.pk))
+</select></li>'''.format(
+                self.w_woodward.pk,
+                w_bernstein.pk,
+                self.w_royko.pk,
+                self.c1.pk,
+                self.c2.pk,
+                self.c3.pk,
+                c4.pk)
+        )
 
     def test_recleaning_model_form_instance(self):
         """
@@ -1953,10 +1961,10 @@ class ModelOneToOneFieldTests(TestCase):
             form.as_p(),
             '''<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer" required>
 <option value="" selected>---------</option>
-<option value="%s">Bob Woodward</option>
-<option value="%s">Mike Royko</option>
+<option value="{}">Bob Woodward</option>
+<option value="{}">Mike Royko</option>
 </select></p>
-<p><label for="id_age">Age:</label> <input type="number" name="age" id="id_age" min="0" required></p>''' % (
+<p><label for="id_age">Age:</label> <input type="number" name="age" id="id_age" min="0" required></p>'''.format(
                 self.w_woodward.pk, self.w_royko.pk,
             )
         )
@@ -1974,11 +1982,11 @@ class ModelOneToOneFieldTests(TestCase):
             form.as_p(),
             '''<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer" required>
 <option value="">---------</option>
-<option value="%s" selected>Bob Woodward</option>
-<option value="%s">Mike Royko</option>
+<option value="{}" selected>Bob Woodward</option>
+<option value="{}">Mike Royko</option>
 </select></p>
 <p><label for="id_age">Age:</label>
-<input type="number" name="age" value="65" id="id_age" min="0" required></p>''' % (
+<input type="number" name="age" value="65" id="id_age" min="0" required></p>'''.format(
                 self.w_woodward.pk, self.w_royko.pk,
             )
         )

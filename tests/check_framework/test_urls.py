@@ -184,7 +184,7 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
         result = check_url_config(None)
         self.assertEqual(len(result), 4)
         for code, num_params, error in zip([400, 403, 404, 500], [2, 2, 2, 1], result):
-            with self.subTest('handler{}'.format(code)):
+            with self.subTest(f'handler{code}'):
                 self.assertEqual(error, Error(
                     "The custom handler{} view 'check_framework.urls."
                     "bad_function_based_error_handlers.bad_handler' "
@@ -228,9 +228,9 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
             "Could not import '{}'. The path must be fully qualified.",
         ]
         for code, path, hint, error in zip([400, 403, 404, 500], paths, hints, result):
-            with self.subTest('handler{}'.format(code)):
+            with self.subTest(f'handler{code}'):
                 self.assertEqual(error, Error(
-                    "The custom handler{} view '{}' could not be imported.".format(code, path),
+                    f"The custom handler{code} view '{path}' could not be imported.",
                     hint=hint.format(path),
                     id='urls.E008',
                 ))

@@ -261,7 +261,7 @@ class FileUploadTests(TestCase):
         for i, name in enumerate(filenames):
             payload.write('\r\n'.join([
                 '--' + client.BOUNDARY,
-                'Content-Disposition: form-data; name="file%s"; filename="%s"' % (i, name),
+                f'Content-Disposition: form-data; name="file{i}"; filename="{name}"',
                 'Content-Type: application/octet-stream',
                 '',
                 'You got pwnd.\r\n'
@@ -294,7 +294,7 @@ class FileUploadTests(TestCase):
         for i, name in enumerate(CANDIDATE_TRAVERSAL_FILE_NAMES):
             payload.write('\r\n'.join([
                 '--' + client.BOUNDARY,
-                'Content-Disposition: form-data; name="file%s"; filename="%s"' % (i, name),
+                f'Content-Disposition: form-data; name="file{i}"; filename="{name}"',
                 'Content-Type: application/octet-stream',
                 '',
                 'You got pwnd.\r\n'
@@ -324,7 +324,7 @@ class FileUploadTests(TestCase):
             ('long_extension', 'foo.%s' % long_str, '.%s' % long_str[:254]),
             ('no_extension', long_str, long_str[:255]),
             ('no_filename', '.%s' % long_str, '.%s' % long_str[:254]),
-            ('long_everything', '%s.%s' % (long_str, long_str), '.%s' % long_str[:254]),
+            ('long_everything', f'{long_str}.{long_str}', '.%s' % long_str[:254]),
         ]
         payload = client.FakePayload()
         for name, filename, _ in cases:
@@ -348,7 +348,7 @@ class FileUploadTests(TestCase):
         result = response.json()
         for name, _, expected in cases:
             got = result[name]
-            self.assertEqual(expected, got, 'Mismatch for {}'.format(name))
+            self.assertEqual(expected, got, f'Mismatch for {name}')
             self.assertLess(len(got), 256,
                             "Got a long file name (%s characters)." % len(got))
 

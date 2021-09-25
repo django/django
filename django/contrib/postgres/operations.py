@@ -124,7 +124,7 @@ class AddIndexConcurrently(NotInTransactionMixin, AddIndex):
     atomic = False
 
     def describe(self):
-        return 'Concurrently create index %s on field(s) %s of model %s' % (
+        return 'Concurrently create index {} on field(s) {} of model {}'.format(
             self.index.name,
             ', '.join(self.index.fields),
             self.model_name,
@@ -148,7 +148,7 @@ class RemoveIndexConcurrently(NotInTransactionMixin, RemoveIndex):
     atomic = False
 
     def describe(self):
-        return 'Concurrently remove index %s from %s' % (self.name, self.model_name)
+        return f'Concurrently remove index {self.name} from {self.model_name}'
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         self._ensure_not_in_transaction(schema_editor)
@@ -202,10 +202,10 @@ class CollationOperation(Operation):
             args['provider'] = schema_editor.quote_name(self.provider)
         if self.deterministic is False:
             args['deterministic'] = 'false'
-        schema_editor.execute('CREATE COLLATION %(name)s (%(args)s)' % {
-            'name': schema_editor.quote_name(self.name),
-            'args': ', '.join(f'{option}={value}' for option, value in args.items()),
-        })
+        schema_editor.execute('CREATE COLLATION {name} ({args})'.format(
+            name=schema_editor.quote_name(self.name),
+            args=', '.join(f'{option}={value}' for option, value in args.items()),
+        ))
 
     def remove_collation(self, schema_editor):
         schema_editor.execute(
@@ -273,7 +273,7 @@ class AddConstraintNotValid(AddConstraint):
         super().__init__(model_name, constraint)
 
     def describe(self):
-        return 'Create not valid constraint %s on model %s' % (
+        return 'Create not valid constraint {} on model {}'.format(
             self.constraint.name,
             self.model_name,
         )
@@ -301,12 +301,12 @@ class ValidateConstraint(Operation):
         self.name = name
 
     def describe(self):
-        return 'Validate constraint %s on model %s' % (self.name, self.model_name)
+        return f'Validate constraint {self.name} on model {self.model_name}'
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         model = from_state.apps.get_model(app_label, self.model_name)
         if self.allow_migrate_model(schema_editor.connection.alias, model):
-            schema_editor.execute('ALTER TABLE %s VALIDATE CONSTRAINT %s' % (
+            schema_editor.execute('ALTER TABLE {} VALIDATE CONSTRAINT {}'.format(
                 schema_editor.quote_name(model._meta.db_table),
                 schema_editor.quote_name(self.name),
             ))
@@ -320,7 +320,7 @@ class ValidateConstraint(Operation):
 
     @property
     def migration_name_fragment(self):
-        return '%s_validate_%s' % (self.model_name.lower(), self.name.lower())
+        return f'{self.model_name.lower()}_validate_{self.name.lower()}'
 
     def deconstruct(self):
         return self.__class__.__name__, [], {

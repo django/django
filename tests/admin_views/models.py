@@ -169,7 +169,7 @@ class Inquisition(models.Model):
     country = models.CharField(max_length=20)
 
     def __str__(self):
-        return "by %s from %s" % (self.leader, self.country)
+        return f"by {self.leader} from {self.country}"
 
 
 class Sketch(models.Model):
@@ -276,7 +276,7 @@ class Account(models.Model):
     servicename = 'generic service'
 
     def __str__(self):
-        return "%s: %s" % (self.servicename, self.username)
+        return f"{self.servicename}: {self.username}"
 
 
 class FooAccount(Account):
@@ -294,7 +294,7 @@ class Subscriber(models.Model):
     email = models.EmailField(blank=False, max_length=175)
 
     def __str__(self):
-        return "%s (%s)" % (self.name, self.email)
+        return f"{self.name} ({self.email})"
 
 
 class ExternalSubscriber(Subscriber):
@@ -449,7 +449,7 @@ class Category(models.Model):
         ordering = ('order',)
 
     def __str__(self):
-        return '%s:o%s' % (self.id, self.order)
+        return f'{self.id}:o{self.order}'
 
 
 def link_posted_default():

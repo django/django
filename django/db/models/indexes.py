@@ -119,7 +119,7 @@ class Index:
         return schema_editor._delete_index_sql(model, self.name, **kwargs)
 
     def deconstruct(self):
-        path = '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
+        path = f'{self.__class__.__module__}.{self.__class__.__name__}'
         path = path.replace('django.db.models.indexes', 'django.db.models')
         kwargs = {'name': self.name}
         if self.fields:
@@ -156,10 +156,10 @@ class Index:
         # The length of the parts of the name is based on the default max
         # length of 30 characters.
         hash_data = [table_name] + column_names_with_order + [self.suffix]
-        self.name = '%s_%s_%s' % (
+        self.name = '{}_{}_{}'.format(
             table_name[:11],
             column_names[0][:7],
-            '%s_%s' % (names_digest(*hash_data, length=6), self.suffix),
+            f'{names_digest(*hash_data, length=6)}_{self.suffix}',
         )
         if len(self.name) > self.max_name_length:
             raise ValueError(
@@ -170,7 +170,7 @@ class Index:
             self.name = 'D%s' % self.name[1:]
 
     def __repr__(self):
-        return '<%s:%s%s%s%s%s%s%s>' % (
+        return '<{}:{}{}{}{}{}{}{}>'.format(
             self.__class__.__qualname__,
             '' if not self.fields else ' fields=%s' % repr(self.fields),
             '' if not self.expressions else ' expressions=%s' % repr(self.expressions),
@@ -197,11 +197,11 @@ class IndexExpression(Func):
     def set_wrapper_classes(self, connection=None):
         # Some databases (e.g. MySQL) treats COLLATE as an indexed expression.
         if connection and connection.features.collate_as_index_expression:
-            self.wrapper_classes = tuple([
+            self.wrapper_classes = tuple(
                 wrapper_cls
                 for wrapper_cls in self.wrapper_classes
                 if wrapper_cls is not Collate
-            ])
+            )
 
     @classmethod
     def register_wrappers(cls, *wrapper_classes):

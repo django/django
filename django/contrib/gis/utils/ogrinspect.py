@@ -192,21 +192,21 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
                     mfield, width, precision, kwargs_str
                 )
             else:
-                yield '    %s = models.FloatField(%s)' % (mfield, kwargs_str[2:])
+                yield f'    {mfield} = models.FloatField({kwargs_str[2:]})'
         elif field_type is OFTInteger:
-            yield '    %s = models.IntegerField(%s)' % (mfield, kwargs_str[2:])
+            yield f'    {mfield} = models.IntegerField({kwargs_str[2:]})'
         elif field_type is OFTInteger64:
-            yield '    %s = models.BigIntegerField(%s)' % (mfield, kwargs_str[2:])
+            yield f'    {mfield} = models.BigIntegerField({kwargs_str[2:]})'
         elif field_type is OFTString:
-            yield '    %s = models.CharField(max_length=%s%s)' % (mfield, width, kwargs_str)
+            yield f'    {mfield} = models.CharField(max_length={width}{kwargs_str})'
         elif field_type is OFTDate:
-            yield '    %s = models.DateField(%s)' % (mfield, kwargs_str[2:])
+            yield f'    {mfield} = models.DateField({kwargs_str[2:]})'
         elif field_type is OFTDateTime:
-            yield '    %s = models.DateTimeField(%s)' % (mfield, kwargs_str[2:])
+            yield f'    {mfield} = models.DateTimeField({kwargs_str[2:]})'
         elif field_type is OFTTime:
-            yield '    %s = models.TimeField(%s)' % (mfield, kwargs_str[2:])
+            yield f'    {mfield} = models.TimeField({kwargs_str[2:]})'
         else:
-            raise TypeError('Unknown field type %s in %s' % (field_type, mfield))
+            raise TypeError(f'Unknown field type {field_type} in {mfield}')
 
     # TODO: Autodetection of multigeometry types (see #7218).
     gtype = layer.geom_type
@@ -230,7 +230,7 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
     else:
         srid_str = 'srid=%s' % srid
 
-    yield '    %s = models.%s(%s)' % (geom_name, geom_field, srid_str)
+    yield f'    {geom_name} = models.{geom_field}({srid_str})'
 
     if name_field:
         yield ''

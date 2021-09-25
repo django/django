@@ -374,7 +374,7 @@ class FileStorageTests(SimpleTestCase):
         storage = self.storage_class(location=self.temp_dir, base_url='/no_ending_slash')
         self.assertEqual(
             storage.url('test.file'),
-            '%s%s' % (storage.base_url, 'test.file')
+            '{}{}'.format(storage.base_url, 'test.file')
         )
 
     def test_listdir(self):

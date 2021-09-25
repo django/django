@@ -852,7 +852,7 @@ class AggregateTestCase(TestCase):
         thedate = timezone.now()
         for i in range(10):
             Book.objects.create(
-                isbn="abcde{}".format(i), name="none", pages=10, rating=4.0,
+                isbn=f"abcde{i}", name="none", pages=10, rating=4.0,
                 price=9999.98, contact=a1, publisher=p1, pubdate=thedate)
 
         book = Book.objects.aggregate(price_sum=Sum('price'))

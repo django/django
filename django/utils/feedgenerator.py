@@ -53,7 +53,7 @@ def get_tag_uri(url, date):
     d = ''
     if date is not None:
         d = ',%s' % date.strftime('%Y-%m-%d')
-    return 'tag:%s%s:%s/%s' % (bits.hostname, d, bits.path, bits.fragment)
+    return f'tag:{bits.hostname}{d}:{bits.path}/{bits.fragment}'
 
 
 class SyndicationFeed:
@@ -250,7 +250,7 @@ class Rss201rev2Feed(RssFeed):
 
         # Author information.
         if item["author_name"] and item["author_email"]:
-            handler.addQuickElement("author", "%s (%s)" % (item['author_email'], item['author_name']))
+            handler.addQuickElement("author", "{} ({})".format(item['author_email'], item['author_name']))
         elif item["author_email"]:
             handler.addQuickElement("author", item["author_email"])
         elif item["author_name"]:

@@ -63,12 +63,12 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         f = URLField()
         # hangs "forever" if catastrophic backtracking in ticket:#11198 not fixed
         with self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'"):
-            f.clean('http://%s' % ("X" * 200,))
+            f.clean('http://{}'.format("X" * 200))
 
         # a second test, to make sure the problem is really addressed, even on
         # domains that don't fail the domain label length check in the regex
         with self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'"):
-            f.clean('http://%s' % ("X" * 60,))
+            f.clean('http://{}'.format("X" * 60))
 
     def test_urlfield_2(self):
         f = URLField(required=False)

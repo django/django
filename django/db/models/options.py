@@ -130,11 +130,11 @@ class Options:
 
     @property
     def label(self):
-        return '%s.%s' % (self.app_label, self.object_name)
+        return f'{self.app_label}.{self.object_name}'
 
     @property
     def label_lower(self):
-        return '%s.%s' % (self.app_label, self.model_name)
+        return f'{self.app_label}.{self.model_name}'
 
     @property
     def app_config(self):
@@ -203,7 +203,7 @@ class Options:
 
         # If the db_table wasn't provided, use the app_label + model_name.
         if not self.db_table:
-            self.db_table = "%s_%s" % (self.app_label, self.model_name)
+            self.db_table = f"{self.app_label}_{self.model_name}"
             self.db_table = truncate_name(self.db_table, connection.ops.max_name_length())
 
     def _format_names_with_class(self, cls, objs):
@@ -260,7 +260,7 @@ class Options:
                     if f.name == query or f.attname == query
                 )
             except StopIteration:
-                raise FieldDoesNotExist("%s has no field named '%s'" % (self.object_name, query))
+                raise FieldDoesNotExist(f"{self.object_name} has no field named '{query}'")
 
             self.ordering = ('_order',)
             if not any(isinstance(field, OrderWrt) for field in model._meta.local_fields):
@@ -383,7 +383,7 @@ class Options:
                     # or as part of validation.
                     return swapped_for
 
-                if '%s.%s' % (swapped_label, swapped_object.lower()) != self.label_lower:
+                if f'{swapped_label}.{swapped_object.lower()}' != self.label_lower:
                     return swapped_for
         return None
 
@@ -427,7 +427,7 @@ class Options:
                 return self.managers_map[base_manager_name]
             except KeyError:
                 raise ValueError(
-                    "%s has no manager named %r" % (
+                    "{} has no manager named {!r}".format(
                         self.object_name,
                         base_manager_name,
                     )
@@ -454,7 +454,7 @@ class Options:
                 return self.managers_map[default_manager_name]
             except KeyError:
                 raise ValueError(
-                    "%s has no manager named %r" % (
+                    "{} has no manager named {!r}".format(
                         self.object_name,
                         default_manager_name,
                     )
@@ -607,7 +607,7 @@ class Options:
             # field map.
             return self.fields_map[field_name]
         except KeyError:
-            raise FieldDoesNotExist("%s has no field named '%s'" % (self.object_name, field_name))
+            raise FieldDoesNotExist(f"{self.object_name} has no field named '{field_name}'")
 
     def get_base_chain(self, model):
         """
@@ -791,7 +791,7 @@ class Options:
           parent chain to the model's concrete model.
         """
         if include_parents not in (True, False, PROXY_PARENTS):
-            raise TypeError("Invalid argument for include_parents: %s" % (include_parents,))
+            raise TypeError(f"Invalid argument for include_parents: {include_parents}")
         # This helper function is used to allow recursion in ``get_fields()``
         # implementation and to provide a fast way for Django's internals to
         # access specific subsets of fields.

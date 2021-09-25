@@ -141,12 +141,12 @@ class BaseForm(RenderableFormMixin):
             is_valid = "Unknown"
         else:
             is_valid = self.is_bound and not self._errors
-        return '<%(cls)s bound=%(bound)s, valid=%(valid)s, fields=(%(fields)s)>' % {
-            'cls': self.__class__.__name__,
-            'bound': self.is_bound,
-            'valid': is_valid,
-            'fields': ';'.join(self.fields),
-        }
+        return '<{cls} bound={bound}, valid={valid}, fields=({fields})>'.format(
+            cls=self.__class__.__name__,
+            bound=self.is_bound,
+            valid=is_valid,
+            fields=';'.join(self.fields),
+        )
 
     def _bound_items(self):
         """Yield (name, bf) pairs, where bf is a BoundField object."""
@@ -168,7 +168,7 @@ class BaseForm(RenderableFormMixin):
             field = self.fields[name]
         except KeyError:
             raise KeyError(
-                "Key '%s' not found in '%s'. Choices are: %s." % (
+                "Key '{}' not found in '{}'. Choices are: {}.".format(
                     name,
                     self.__class__.__name__,
                     ', '.join(sorted(self.fields)),
@@ -196,7 +196,7 @@ class BaseForm(RenderableFormMixin):
 
         Subclasses may wish to override.
         """
-        return '%s-%s' % (self.prefix, field_name) if self.prefix else field_name
+        return f'{self.prefix}-{field_name}' if self.prefix else field_name
 
     def add_initial_prefix(self, field_name):
         """Add an 'initial' prefix for checking dynamic initial values."""
@@ -373,7 +373,7 @@ class BaseForm(RenderableFormMixin):
             if field not in self.errors:
                 if field != NON_FIELD_ERRORS and field not in self.fields:
                     raise ValueError(
-                        "'%s' has no field named '%s'." % (self.__class__.__name__, field))
+                        f"'{self.__class__.__name__}' has no field named '{field}'.")
                 if field == NON_FIELD_ERRORS:
                     self._errors[field] = self.error_class(error_class='nonfield', renderer=self.renderer)
                 else:

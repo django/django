@@ -57,7 +57,7 @@ def forbid_multi_line_headers(name, val, encoding):
     encoding = encoding or settings.DEFAULT_CHARSET
     val = str(val)  # val may be lazy
     if '\n' in val or '\r' in val:
-        raise BadHeaderError("Header values can't contain newlines (got %r for header %r)" % (val, name))
+        raise BadHeaderError(f"Header values can't contain newlines (got {val!r} for header {name!r})")
     try:
         val.encode('ascii')
     except UnicodeEncodeError:

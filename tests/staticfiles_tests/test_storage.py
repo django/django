@@ -432,7 +432,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
 
         configured_storage.manifest_strict = False
         # File doesn't exist on disk
-        err_msg = "The file '%s' could not be found with %r." % (missing_file_name, configured_storage._wrapped)
+        err_msg = f"The file '{missing_file_name}' could not be found with {configured_storage._wrapped!r}."
         with self.assertRaisesMessage(ValueError, err_msg):
             self.hashed_file_path(missing_file_name)
 

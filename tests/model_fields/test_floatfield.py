@@ -45,6 +45,6 @@ class TestFloatField(TestCase):
         ]
         for exception, value in tests:
             with self.subTest(value):
-                msg = "Field 'size' expected a number but got %r." % (value,)
+                msg = f"Field 'size' expected a number but got {value!r}."
                 with self.assertRaisesMessage(exception, msg):
                     FloatModel.objects.create(size=value)

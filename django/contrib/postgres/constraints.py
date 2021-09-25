@@ -79,11 +79,11 @@ class ExclusionConstraint(BaseConstraint):
             try:
                 opclass = self.opclasses[idx]
                 if opclass:
-                    sql = '%s %s' % (sql, opclass)
+                    sql = f'{sql} {opclass}'
             except IndexError:
                 pass
             sql = sql % tuple(schema_editor.quote_value(p) for p in params)
-            expressions.append('%s WITH %s' % (sql, operator))
+            expressions.append(f'{sql} WITH {operator}')
         return expressions
 
     def _get_condition_sql(self, compiler, schema_editor, query):
@@ -158,7 +158,7 @@ class ExclusionConstraint(BaseConstraint):
         return super().__eq__(other)
 
     def __repr__(self):
-        return '<%s: index_type=%s expressions=%s name=%s%s%s%s%s>' % (
+        return '<{}: index_type={} expressions={} name={}{}{}{}{}>'.format(
             self.__class__.__qualname__,
             repr(self.index_type),
             repr(self.expressions),

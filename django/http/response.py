@@ -483,10 +483,10 @@ class FileResponse(StreamingHttpResponse):
             disposition = 'attachment' if self.as_attachment else 'inline'
             try:
                 filename.encode('ascii')
-                file_expr = 'filename="{}"'.format(filename)
+                file_expr = f'filename="{filename}"'
             except UnicodeEncodeError:
-                file_expr = "filename*=utf-8''{}".format(quote(filename))
-            self.headers['Content-Disposition'] = '{}; {}'.format(disposition, file_expr)
+                file_expr = f"filename*=utf-8''{quote(filename)}"
+            self.headers['Content-Disposition'] = f'{disposition}; {file_expr}'
         elif self.as_attachment:
             self.headers['Content-Disposition'] = 'attachment'
 

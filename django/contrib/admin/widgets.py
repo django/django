@@ -136,7 +136,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         if rel_to in self.admin_site._registry:
             # The related object is registered with the same AdminSite
             related_url = reverse(
-                'admin:%s_%s_changelist' % (
+                'admin:{}_{}_changelist'.format(
                     rel_to._meta.app_label,
                     rel_to._meta.model_name,
                 ),
@@ -179,7 +179,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 
         try:
             url = reverse(
-                '%s:%s_%s_change' % (
+                '{}:{}_{}_change'.format(
                     self.admin_site.name,
                     obj._meta.app_label,
                     obj._meta.object_name.lower(),

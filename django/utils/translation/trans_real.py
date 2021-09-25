@@ -368,7 +368,7 @@ def gettext(message):
 
 
 def pgettext(context, message):
-    msg_with_ctxt = "%s%s%s" % (context, CONTEXT_SEPARATOR, message)
+    msg_with_ctxt = f"{context}{CONTEXT_SEPARATOR}{message}"
     result = gettext(msg_with_ctxt)
     if CONTEXT_SEPARATOR in result:
         # Translation not found
@@ -408,8 +408,8 @@ def ngettext(singular, plural, number):
 
 
 def npgettext(context, singular, plural, number):
-    msgs_with_ctxt = ("%s%s%s" % (context, CONTEXT_SEPARATOR, singular),
-                      "%s%s%s" % (context, CONTEXT_SEPARATOR, plural),
+    msgs_with_ctxt = (f"{context}{CONTEXT_SEPARATOR}{singular}",
+                      f"{context}{CONTEXT_SEPARATOR}{plural}",
                       number)
     result = ngettext(*msgs_with_ctxt)
     if CONTEXT_SEPARATOR in result:

@@ -153,14 +153,14 @@ class GeoIPTest(SimpleTestCase):
         path = settings.GEOIP_PATH
         g = GeoIP2(path=path)
         meta = g._reader.metadata()
-        version = '%s.%s' % (meta.binary_format_major_version, meta.binary_format_minor_version)
+        version = f'{meta.binary_format_major_version}.{meta.binary_format_minor_version}'
         country_path = g._country_file
         city_path = g._city_file
-        expected = '<GeoIP2 [v%(version)s] _country_file="%(country)s", _city_file="%(city)s">' % {
-            'version': version,
-            'country': country_path,
-            'city': city_path,
-        }
+        expected = '<GeoIP2 [v{version}] _country_file="{country}", _city_file="{city}">'.format(
+            version=version,
+            country=country_path,
+            city=city_path,
+        )
         self.assertEqual(repr(g), expected)
 
     @mock.patch('socket.gethostbyname', return_value='expected')

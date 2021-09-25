@@ -1386,7 +1386,7 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
             mailfrom = '@'.join([lp, domain])
 
         if mailfrom != maddr:
-            return "553 '%s' != '%s'" % (mailfrom, maddr)
+            return f"553 '{mailfrom}' != '{maddr}'"
         with self.sink_lock:
             self._sink.append(m)
 

@@ -390,7 +390,7 @@ class SimpleLazyObject(LazyObject):
             repr_attr = self._setupfunc
         else:
             repr_attr = self._wrapped
-        return '<%s: %r>' % (type(self).__name__, repr_attr)
+        return f'<{type(self).__name__}: {repr_attr!r}>'
 
     def __copy__(self):
         if self._wrapped is empty:

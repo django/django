@@ -85,18 +85,18 @@ class BaseSpatialOperations:
 
         if hasattr(value, 'as_sql'):
             return (
-                '%s(%%s, %s)' % (self.spatial_function_name('Transform'), f.srid)
+                '{}(%s, {})'.format(self.spatial_function_name('Transform'), f.srid)
                 if transform_value(value.output_field, f)
                 else '%s'
             )
         if transform_value(value, f):
             # Add Transform() to the SQL placeholder.
-            return '%s(%s(%%s,%s), %s)' % (
+            return '{}({}(%s,{}), {})'.format(
                 self.spatial_function_name('Transform'),
                 self.from_text, value.srid, f.srid,
             )
         elif self.connection.features.has_spatialrefsys_table:
-            return '%s(%%s,%s)' % (self.from_text, f.srid)
+            return f'{self.from_text}(%s,{f.srid})'
         else:
             # For backwards compatibility on MySQL (#27464).
             return '%s(%%s)' % self.from_text

@@ -76,7 +76,7 @@ class RenameMethodsBase(type):
 class DeprecationInstanceCheck(type):
     def __instancecheck__(self, instance):
         warnings.warn(
-            "`%s` is deprecated, use `%s` instead." % (self.__name__, self.alternative),
+            f"`{self.__name__}` is deprecated, use `{self.alternative}` instead.",
             self.deprecation_warning, 2
         )
         return super().__instancecheck__(instance)
@@ -94,7 +94,7 @@ class MiddlewareMixin:
         super().__init__()
 
     def __repr__(self):
-        return '<%s get_response=%s>' % (
+        return '<{} get_response={}>'.format(
             self.__class__.__qualname__,
             getattr(
                 self.get_response,

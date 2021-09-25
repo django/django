@@ -125,7 +125,7 @@ def get_deleted_objects(objs, request, admin_site):
         has_admin = model in admin_site._registry
         opts = obj._meta
 
-        no_edit_link = '%s: %s' % (capfirst(opts.verbose_name), obj)
+        no_edit_link = f'{capfirst(opts.verbose_name)}: {obj}'
 
         if has_admin:
             if not admin_site._registry[model].has_delete_permission(request, obj):
@@ -337,7 +337,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False, form=None)
             elif form and name in form.fields:
                 attr = form.fields[name]
             else:
-                message = "Unable to lookup '%s' on %s" % (name, model._meta.object_name)
+                message = f"Unable to lookup '{name}' on {model._meta.object_name}"
                 if model_admin:
                     message += " or %s" % model_admin.__class__.__name__
                 if form:

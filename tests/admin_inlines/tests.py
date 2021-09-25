@@ -391,7 +391,7 @@ class TestInline(TestDataMixin, TestCase):
         holder = Holder.objects.create(pk=123456789, dummy=42)
         inner = Inner.objects.create(pk=987654321, holder=holder, dummy=42, readonly='')
         response = self.client.get(reverse('admin:admin_inlines_holder_change', args=(holder.id,)))
-        inner_shortcut = 'r/%s/%s/' % (ContentType.objects.get_for_model(inner).pk, inner.pk)
+        inner_shortcut = f'r/{ContentType.objects.get_for_model(inner).pk}/{inner.pk}/'
         self.assertContains(response, inner_shortcut)
 
     def test_custom_pk_shortcut(self):
@@ -403,8 +403,8 @@ class TestInline(TestDataMixin, TestCase):
         child1 = ChildModel1.objects.create(my_own_pk="bar", name="Bar", parent=parent)
         child2 = ChildModel2.objects.create(my_own_pk="baz", name="Baz", parent=parent)
         response = self.client.get(reverse('admin:admin_inlines_parentmodelwithcustompk_change', args=('foo',)))
-        child1_shortcut = 'r/%s/%s/' % (ContentType.objects.get_for_model(child1).pk, child1.pk)
-        child2_shortcut = 'r/%s/%s/' % (ContentType.objects.get_for_model(child2).pk, child2.pk)
+        child1_shortcut = f'r/{ContentType.objects.get_for_model(child1).pk}/{child1.pk}/'
+        child2_shortcut = f'r/{ContentType.objects.get_for_model(child2).pk}/{child2.pk}/'
         self.assertContains(response, child1_shortcut)
         self.assertContains(response, child2_shortcut)
 
@@ -579,7 +579,7 @@ class TestInline(TestDataMixin, TestCase):
         self.assertTrue(response.context['inline_admin_formset'].opts.has_registered_model)
         for model, pk in items:
             url = reverse('admin:admin_inlines_%s_change' % model, args=(pk,))
-            self.assertContains(response, '<a href="%s" %s' % (url, INLINE_CHANGELINK_HTML))
+            self.assertContains(response, f'<a href="{url}" {INLINE_CHANGELINK_HTML}')
 
     def test_inlines_show_change_link_unregistered(self):
         "Inlines `show_change_link` disabled for unregistered models."
@@ -1593,7 +1593,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         # Before save all inputs have default border
         for inline in ('stacked', 'tabular'):
             for field_name in ('name', 'select', 'text'):
-                element_id = 'id_inner5%s_set-0-%s' % (inline, field_name)
+                element_id = f'id_inner5{inline}_set-0-{field_name}'
                 self.assertBorder(
                     self.selenium.find_element_by_id(element_id),
                     '1px solid #cccccc',

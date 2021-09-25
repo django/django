@@ -906,7 +906,7 @@ class TemplateTests(SimpleTestCase):
                 ctx = Context({'dt': dt, 'ICT': ICT})
                 actual = tpl.render(ctx)
                 expected = results[k1][k2]
-                self.assertEqual(actual, expected, '%s / %s: %r != %r' % (k1, k2, actual, expected))
+                self.assertEqual(actual, expected, f'{k1} / {k2}: {actual!r} != {expected!r}')
 
         # Changes for USE_TZ = False
 
@@ -919,7 +919,7 @@ class TemplateTests(SimpleTestCase):
                     ctx = Context({'dt': dt, 'ICT': ICT})
                     actual = tpl.render(ctx)
                     expected = results[k1][k2]
-                    self.assertEqual(actual, expected, '%s / %s: %r != %r' % (k1, k2, actual, expected))
+                    self.assertEqual(actual, expected, f'{k1} / {k2}: {actual!r} != {expected!r}')
 
     def test_localtime_filters_with_iana(self):
         """

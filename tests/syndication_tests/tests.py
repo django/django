@@ -554,9 +554,9 @@ class SyndicationFeedTest(FeedTestCase):
         items = chan.getElementsByTagName('item')
 
         self.assertChildNodeContent(items[0], {
-            'comments': '/blog/%s/article/%s/comments' % (self.e1.pk, self.a1.pk),
+            'comments': f'/blog/{self.e1.pk}/article/{self.a1.pk}/comments',
             'description': 'Article description: My first article',
-            'link': 'http://example.com/blog/%s/article/%s/' % (self.e1.pk, self.a1.pk),
+            'link': f'http://example.com/blog/{self.e1.pk}/article/{self.a1.pk}/',
             'title': 'Title: My first article',
             'pubDate': rfc2822_date(timezone.make_aware(self.a1.published, TZ)),
         })

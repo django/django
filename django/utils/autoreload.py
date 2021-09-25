@@ -173,7 +173,7 @@ def common_roots(paths):
     # Inspired from Werkzeug:
     # https://github.com/pallets/werkzeug/blob/7477be2853df70a022d9613e765581b9411c3c39/werkzeug/_reloader.py
     # Create a sorted list of the path components, longest first.
-    path_parts = sorted([x.parts for x in paths], key=len, reverse=True)
+    path_parts = sorted((x.parts for x in paths), key=len, reverse=True)
     tree = {}
     for chunks in path_parts:
         node = tree
@@ -471,13 +471,13 @@ class WatchmanReloader(BaseReloader):
                 logger.warning('Unable to watch directory %s as neither it or its parent exist.', directory)
                 return
             prefix = 'files-parent-%s' % directory.name
-            filenames = ['%s/%s' % (directory.name, filename) for filename in filenames]
+            filenames = [f'{directory.name}/{filename}' for filename in filenames]
             directory = directory.parent
             expression = ['name', filenames, 'wholename']
         else:
             prefix = 'files'
             expression = ['name', filenames]
-        self._subscribe(directory, '%s:%s' % (prefix, directory), expression)
+        self._subscribe(directory, f'{prefix}:{directory}', expression)
 
     def _watch_glob(self, directory, patterns):
         """
@@ -494,13 +494,13 @@ class WatchmanReloader(BaseReloader):
                 logger.warning('Unable to watch directory %s as neither it or its parent exist.', directory)
                 return
             prefix = 'glob-parent-%s' % directory.name
-            patterns = ['%s/%s' % (directory.name, pattern) for pattern in patterns]
+            patterns = [f'{directory.name}/{pattern}' for pattern in patterns]
             directory = directory.parent
 
         expression = ['anyof']
         for pattern in patterns:
             expression.append(['match', pattern, 'wholename'])
-        self._subscribe(directory, '%s:%s' % (prefix, directory), expression)
+        self._subscribe(directory, f'{prefix}:{directory}', expression)
 
     def watched_roots(self, watched_files):
         extra_directories = self.directory_globs.keys()

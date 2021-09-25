@@ -11,3 +11,8 @@ repos:
     rev: v7.30.0
     hooks:
       - id: eslint
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v2.27.0
+    hooks:
+      - id: pyupgrade
+        args: [--py38-plus]

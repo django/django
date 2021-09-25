@@ -57,7 +57,7 @@ def patch_cache_control(response, **kwargs):
         if t[1] is True:
             return t[0]
         else:
-            return '%s=%s' % (t[0], t[1])
+            return f'{t[0]}={t[1]}'
 
     cc = defaultdict(set)
     if response.get('Cache-Control'):
@@ -331,7 +331,7 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
         if value is not None:
             ctx.update(value.encode())
     url = hashlib.md5(request.build_absolute_uri().encode('ascii'))
-    cache_key = 'views.decorators.cache.cache_page.%s.%s.%s.%s' % (
+    cache_key = 'views.decorators.cache.cache_page.{}.{}.{}.{}'.format(
         key_prefix, method, url.hexdigest(), ctx.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
 
@@ -339,7 +339,7 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
 def _generate_cache_header_key(key_prefix, request):
     """Return a cache key for the header cache."""
     url = hashlib.md5(request.build_absolute_uri().encode('ascii'))
-    cache_key = 'views.decorators.cache.cache_header.%s.%s' % (
+    cache_key = 'views.decorators.cache.cache_header.{}.{}'.format(
         key_prefix, url.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
 

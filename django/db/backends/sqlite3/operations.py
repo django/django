@@ -74,7 +74,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         that's registered in connect(). Use single quotes because this is a
         string and could otherwise cause a collision with a field name.
         """
-        return "django_date_extract('%s', %s)" % (lookup_type.lower(), field_name)
+        return f"django_date_extract('{lookup_type.lower()}', {field_name})"
 
     def fetch_returned_insert_rows(self, cursor):
         """
@@ -88,14 +88,14 @@ class DatabaseOperations(BaseDatabaseOperations):
         return sql
 
     def date_trunc_sql(self, lookup_type, field_name, tzname=None):
-        return "django_date_trunc('%s', %s, %s, %s)" % (
+        return "django_date_trunc('{}', {}, {}, {})".format(
             lookup_type.lower(),
             field_name,
             *self._convert_tznames_to_sql(tzname),
         )
 
     def time_trunc_sql(self, lookup_type, field_name, tzname=None):
-        return "django_time_trunc('%s', %s, %s, %s)" % (
+        return "django_time_trunc('{}', {}, {}, {})".format(
             lookup_type.lower(),
             field_name,
             *self._convert_tznames_to_sql(tzname),
@@ -107,27 +107,27 @@ class DatabaseOperations(BaseDatabaseOperations):
         return 'NULL', 'NULL'
 
     def datetime_cast_date_sql(self, field_name, tzname):
-        return 'django_datetime_cast_date(%s, %s, %s)' % (
+        return 'django_datetime_cast_date({}, {}, {})'.format(
             field_name, *self._convert_tznames_to_sql(tzname),
         )
 
     def datetime_cast_time_sql(self, field_name, tzname):
-        return 'django_datetime_cast_time(%s, %s, %s)' % (
+        return 'django_datetime_cast_time({}, {}, {})'.format(
             field_name, *self._convert_tznames_to_sql(tzname),
         )
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
-        return "django_datetime_extract('%s', %s, %s, %s)" % (
+        return "django_datetime_extract('{}', {}, {}, {})".format(
             lookup_type.lower(), field_name, *self._convert_tznames_to_sql(tzname),
         )
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
-        return "django_datetime_trunc('%s', %s, %s, %s)" % (
+        return "django_datetime_trunc('{}', {}, {}, {})".format(
             lookup_type.lower(), field_name, *self._convert_tznames_to_sql(tzname),
         )
 
     def time_extract_sql(self, lookup_type, field_name):
-        return "django_time_extract('%s', %s)" % (lookup_type.lower(), field_name)
+        return f"django_time_extract('{lookup_type.lower()}', {field_name})"
 
     def pk_default_value(self):
         return "NULL"
@@ -215,7 +215,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             # Simulate TRUNCATE CASCADE by recursively collecting the tables
             # referencing the tables to be flushed.
             tables = set(chain.from_iterable(self._references_graph(table) for table in tables))
-        sql = ['%s %s %s;' % (
+        sql = ['{} {} {};'.format(
             style.SQL_KEYWORD('DELETE'),
             style.SQL_KEYWORD('FROM'),
             style.SQL_FIELD(self.quote_name(table))
@@ -229,7 +229,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if not sequences:
             return []
         return [
-            '%s %s %s %s = 0 %s %s %s (%s);' % (
+            '{} {} {} {} = 0 {} {} {} ({});'.format(
                 style.SQL_KEYWORD('UPDATE'),
                 style.SQL_TABLE(self.quote_name('sqlite_sequence')),
                 style.SQL_KEYWORD('SET'),
@@ -367,8 +367,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         rhs_sql, rhs_params = rhs
         params = (*lhs_params, *rhs_params)
         if internal_type == 'TimeField':
-            return 'django_time_diff(%s, %s)' % (lhs_sql, rhs_sql), params
-        return 'django_timestamp_diff(%s, %s)' % (lhs_sql, rhs_sql), params
+            return f'django_time_diff({lhs_sql}, {rhs_sql})', params
+        return f'django_timestamp_diff({lhs_sql}, {rhs_sql})', params
 
     def insert_statement(self, ignore_conflicts=False):
         return 'INSERT OR IGNORE INTO' if ignore_conflicts else super().insert_statement(ignore_conflicts)
@@ -378,7 +378,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if not fields:
             return '', ()
         columns = [
-            '%s.%s' % (
+            '{}.{}'.format(
                 self.quote_name(field.model._meta.db_table),
                 self.quote_name(field.column),
             ) for field in fields

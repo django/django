@@ -59,7 +59,7 @@ class Aggregate(Func):
                 if expr.contains_aggregate:
                     before_resolved = self.get_source_expressions()[index]
                     name = before_resolved.name if hasattr(before_resolved, 'name') else repr(before_resolved)
-                    raise FieldError("Cannot compute %s('%s'): '%s' is an aggregate" % (c.name, name, name))
+                    raise FieldError(f"Cannot compute {c.name}('{name}'): '{name}' is an aggregate")
         if (default := c.default) is None:
             return c
         if hasattr(default, 'resolve_expression'):
@@ -71,7 +71,7 @@ class Aggregate(Func):
     def default_alias(self):
         expressions = self.get_source_expressions()
         if len(expressions) == 1 and hasattr(expressions[0], 'name'):
-            return '%s__%s' % (expressions[0].name, self.name.lower())
+            return f'{expressions[0].name}__{self.name.lower()}'
         raise TypeError("Complex expressions require an alias")
 
     def get_group_by_cols(self, alias=None):

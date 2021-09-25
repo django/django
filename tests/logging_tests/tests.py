@@ -96,7 +96,7 @@ class LoggingAssertionMixin:
                 pass
             self.assertEqual(
                 len(cm.records), 1,
-                "Wrong number of calls for logger %r in %r level." % (logger, level)
+                f"Wrong number of calls for logger {logger!r} in {level!r} level."
             )
             record = cm.records[0]
             self.assertEqual(record.getMessage(), msg)
@@ -596,7 +596,7 @@ class LogFormattersTests(SimpleTestCase):
 
         with patch_django_server_logger() as logger_output:
             logger.info(log_msg, extra={'server_time': server_time})
-            self.assertEqual('[%s] %s\n' % (server_time, log_msg), logger_output.getvalue())
+            self.assertEqual(f'[{server_time}] {log_msg}\n', logger_output.getvalue())
 
         with patch_django_server_logger() as logger_output:
             logger.info(log_msg)

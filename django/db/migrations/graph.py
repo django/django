@@ -32,7 +32,7 @@ class Node:
         return str(self.key)
 
     def __repr__(self):
-        return '<%s: (%r, %r)>' % (self.__class__.__name__, self.key[0], self.key[1])
+        return f'<{self.__class__.__name__}: ({self.key[0]!r}, {self.key[1]!r})>'
 
     def add_child(self, child):
         self.children.add(child)
@@ -201,7 +201,7 @@ class MigrationGraph:
         follow if applying the migrations to a database.
         """
         if target not in self.nodes:
-            raise NodeNotFoundError("Node %r not a valid node" % (target,), target)
+            raise NodeNotFoundError(f"Node {target!r} not a valid node", target)
         return self.iterative_dfs(self.node_map[target])
 
     def backwards_plan(self, target):
@@ -211,7 +211,7 @@ class MigrationGraph:
         would follow if removing the migrations from a database.
         """
         if target not in self.nodes:
-            raise NodeNotFoundError("Node %r not a valid node" % (target,), target)
+            raise NodeNotFoundError(f"Node {target!r} not a valid node", target)
         return self.iterative_dfs(self.node_map[target], forwards=False)
 
     def iterative_dfs(self, start, forwards=True):
@@ -284,7 +284,7 @@ class MigrationGraph:
 
     def __repr__(self):
         nodes, edges = self._nodes_and_edges()
-        return '<%s: nodes=%s, edges=%s>' % (self.__class__.__name__, nodes, edges)
+        return f'<{self.__class__.__name__}: nodes={nodes}, edges={edges}>'
 
     def _nodes_and_edges(self):
         return len(self.nodes), sum(len(node.parents) for node in self.node_map.values())

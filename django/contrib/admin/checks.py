@@ -539,7 +539,7 @@ class BaseModelAdminChecks:
             return must_be('a list or tuple', option=label, obj=obj, id='admin.E029')
         else:
             return list(chain.from_iterable(
-                self._check_prepopulated_fields_value_item(obj, subfield_name, "%s[%r]" % (label, index))
+                self._check_prepopulated_fields_value_item(obj, subfield_name, f"{label}[{index!r}]")
                 for index, subfield_name in enumerate(val)
             ))
 
@@ -795,7 +795,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         if field_name not in obj.list_display:
             return [
                 checks.Error(
-                    "The value of '%s' refers to '%s', which is not defined in 'list_display'." % (
+                    "The value of '{}' refers to '{}', which is not defined in 'list_display'.".format(
                         label, field_name
                     ),
                     obj=obj.__class__,
@@ -857,7 +857,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             except (NotRelationField, FieldDoesNotExist):
                 return [
                     checks.Error(
-                        "The value of '%s' refers to '%s', which does not refer to a Field." % (label, field),
+                        f"The value of '{label}' refers to '{field}', which does not refer to a Field.",
                         obj=obj.__class__,
                         id='admin.E116',
                     )
@@ -941,7 +941,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             elif not field.editable:
                 return [
                     checks.Error(
-                        "The value of '%s' refers to '%s', which is not editable through the admin." % (
+                        "The value of '{}' refers to '{}', which is not editable through the admin.".format(
                             label, field_name
                         ),
                         obj=obj.__class__,
@@ -997,7 +997,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                 if not hasattr(obj, method_name):
                     errors.append(
                         checks.Error(
-                            '%s must define a %s() method for the %s action.' % (
+                            '{} must define a {}() method for the {} action.'.format(
                                 obj.__class__.__name__,
                                 method_name,
                                 func.__name__,
@@ -1117,7 +1117,7 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
 def must_be(type, option, obj, id):
     return [
         checks.Error(
-            "The value of '%s' must be %s." % (option, type),
+            f"The value of '{option}' must be {type}.",
             obj=obj.__class__,
             id=id,
         ),
@@ -1127,7 +1127,7 @@ def must_be(type, option, obj, id):
 def must_inherit_from(parent, option, obj, id):
     return [
         checks.Error(
-            "The value of '%s' must inherit from '%s'." % (option, parent),
+            f"The value of '{option}' must inherit from '{parent}'.",
             obj=obj.__class__,
             id=id,
         ),

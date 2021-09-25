@@ -327,7 +327,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
                     domain = punycode(domain)
                 except UnicodeError:
                     continue
-                url = 'mailto:%s@%s' % (local, domain)
+                url = f'mailto:{local}@{domain}'
                 nofollow_attr = ''
 
             # Make link.
@@ -336,8 +336,8 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
                 if autoescape and not safe_input:
                     lead, trail = escape(lead), escape(trail)
                     trimmed = escape(trimmed)
-                middle = '<a href="%s"%s>%s</a>' % (escape(url), nofollow_attr, trimmed)
-                words[i] = mark_safe('%s%s%s' % (lead, middle, trail))
+                middle = f'<a href="{escape(url)}"{nofollow_attr}>{trimmed}</a>'
+                words[i] = mark_safe(f'{lead}{middle}{trail}')
             else:
                 if safe_input:
                     words[i] = mark_safe(word)

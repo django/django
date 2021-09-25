@@ -132,4 +132,4 @@ def create_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
     ContentType.objects.using(using).bulk_create(cts)
     if verbosity >= 2:
         for ct in cts:
-            print("Adding content type '%s | %s'" % (ct.app_label, ct.model))
+            print(f"Adding content type '{ct.app_label} | {ct.model}'")

@@ -48,10 +48,10 @@ class Command(BaseCommand):
         try:
             migration = loader.get_migration_by_prefix(app_label, migration_name)
         except AmbiguityError:
-            raise CommandError("More than one migration matches '%s' in app '%s'. Please be more specific." % (
+            raise CommandError("More than one migration matches '{}' in app '{}'. Please be more specific.".format(
                 migration_name, app_label))
         except KeyError:
-            raise CommandError("Cannot find a migration matching '%s' from app '%s'. Is it in INSTALLED_APPS?" % (
+            raise CommandError("Cannot find a migration matching '{}' from app '{}'. Is it in INSTALLED_APPS?".format(
                 migration_name, app_label))
         target = (app_label, migration.name)
 

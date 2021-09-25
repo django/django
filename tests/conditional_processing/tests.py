@@ -79,7 +79,7 @@ class ConditionalGet(SimpleTestCase):
         self.assertFullResponse(response)
 
         # Several etags in If-None-Match is a bit exotic but why not?
-        self.client.defaults['HTTP_IF_NONE_MATCH'] = '%s, %s' % (ETAG, EXPIRED_ETAG)
+        self.client.defaults['HTTP_IF_NONE_MATCH'] = f'{ETAG}, {EXPIRED_ETAG}'
         response = self.client.get('/condition/')
         self.assertNotModified(response)
 

@@ -256,7 +256,7 @@ class QuerySet:
         data = list(self[:REPR_OUTPUT_SIZE + 1])
         if len(data) > REPR_OUTPUT_SIZE:
             data[-1] = "...(remaining elements truncated)..."
-        return '<%s %r>' % (self.__class__.__name__, data)
+        return f'<{self.__class__.__name__} {data!r}>'
 
     def __len__(self):
         self._fetch_all()
@@ -443,7 +443,7 @@ class QuerySet:
                 self.model._meta.object_name
             )
         raise self.model.MultipleObjectsReturned(
-            'get() returned more than one %s -- it returned %s!' % (
+            'get() returned more than one {} -- it returned {}!'.format(
                 self.model._meta.object_name,
                 num if not limit or num < limit else 'more than %s' % (limit - 1),
             )
@@ -642,7 +642,7 @@ class QuerySet:
                     invalid_params.append(param)
         if invalid_params:
             raise exceptions.FieldError(
-                "Invalid field name(s) for model %s: '%s'." % (
+                "Invalid field name(s) for model {}: '{}'.".format(
                     self.model._meta.object_name,
                     "', '".join(sorted(invalid_params)),
                 ))
@@ -713,7 +713,7 @@ class QuerySet:
         if id_list is not None:
             if not id_list:
                 return {}
-            filter_key = '{}__in'.format(field_name)
+            filter_key = f'{field_name}__in'
             batch_size = connections[self.db].features.max_query_params
             id_list = tuple(id_list)
             # If the database has a limit on the number of query parameters
@@ -1421,7 +1421,7 @@ class QuerySet:
         invalid_args = sorted(str(arg) for arg in values if not hasattr(arg, 'resolve_expression'))
         if invalid_args:
             raise TypeError(
-                'QuerySet.%s() received non-expression(s): %s.' % (
+                'QuerySet.{}() received non-expression(s): {}.'.format(
                     method_name,
                     ', '.join(invalid_args),
                 )
@@ -1556,7 +1556,7 @@ class RawQuerySet:
                 self.query.cursor.close()
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, self.query)
+        return f"<{self.__class__.__name__}: {self.query}>"
 
     def __getitem__(self, k):
         return list(self)[k]

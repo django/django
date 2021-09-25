@@ -26,7 +26,7 @@ class EmailBackend(ConsoleEmailBackend):
             )
         except OSError as err:
             raise ImproperlyConfigured(
-                'Could not create directory for saving email messages: %s (%s)' % (self.file_path, err)
+                f'Could not create directory for saving email messages: {self.file_path} ({err})'
             )
         # Make sure that self.file_path is writable.
         if not os.access(self.file_path, os.W_OK):
@@ -46,7 +46,7 @@ class EmailBackend(ConsoleEmailBackend):
         """Return a unique file name."""
         if self._fname is None:
             timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-            fname = "%s-%s.log" % (timestamp, abs(id(self)))
+            fname = f"{timestamp}-{abs(id(self))}.log"
             self._fname = os.path.join(self.file_path, fname)
         return self._fname
 

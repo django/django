@@ -52,12 +52,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 i INTEGER;
             BEGIN
                 SELECT COUNT(1) INTO i FROM USER_SEQUENCES
-                    WHERE SEQUENCE_NAME = '%(sq_name)s';
+                    WHERE SEQUENCE_NAME = '{sq_name}';
                 IF i = 1 THEN
-                    EXECUTE IMMEDIATE 'DROP SEQUENCE "%(sq_name)s"';
+                    EXECUTE IMMEDIATE 'DROP SEQUENCE "{sq_name}"';
                 END IF;
             END;
-        /""" % {'sq_name': self.connection.ops._get_no_autofield_sequence_name(model._meta.db_table)})
+        /""".format(sq_name=self.connection.ops._get_no_autofield_sequence_name(model._meta.db_table)))
 
     def alter_field(self, model, old_field, new_field, strict=False):
         try:
@@ -117,7 +117,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 # TimeField are stored as TIMESTAMP with a 1900-01-01 date part.
                 new_value = "TO_TIMESTAMP(CONCAT('1900-01-01 ', %s), 'YYYY-MM-DD HH24:MI:SS.FF')" % new_value
         # Transfer values across
-        self.execute("UPDATE %s set %s=%s" % (
+        self.execute("UPDATE {} set {}={}".format(
             self.quote_name(model._meta.db_table),
             self.quote_name(new_temp_field.column),
             new_value,
@@ -193,10 +193,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             return row[0] if row else False
 
     def _drop_identity(self, table_name, column_name):
-        self.execute('ALTER TABLE %(table)s MODIFY %(column)s DROP IDENTITY' % {
-            'table': self.quote_name(table_name),
-            'column': self.quote_name(column_name),
-        })
+        self.execute('ALTER TABLE {table} MODIFY {column} DROP IDENTITY'.format(
+            table=self.quote_name(table_name),
+            column=self.quote_name(column_name),
+        ))
 
     def _get_default_collation(self, table_name):
         with self.connection.cursor() as cursor:

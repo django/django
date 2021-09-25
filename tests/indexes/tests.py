@@ -500,7 +500,7 @@ class CoveringIndexTests(TransactionTestCase):
         )
         with connection.schema_editor() as editor:
             self.assertIn(
-                '(%s) INCLUDE (%s, %s)' % (
+                '({}) INCLUDE ({}, {})'.format(
                     editor.quote_name('headline'),
                     editor.quote_name('pub_date'),
                     editor.quote_name('published'),
@@ -532,7 +532,7 @@ class CoveringIndexTests(TransactionTestCase):
         )
         with connection.schema_editor() as editor:
             self.assertIn(
-                '(%s) INCLUDE (%s) WHERE %s ' % (
+                '({}) INCLUDE ({}) WHERE {} '.format(
                     editor.quote_name('headline'),
                     editor.quote_name('pub_date'),
                     editor.quote_name('pub_date'),

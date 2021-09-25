@@ -65,7 +65,7 @@ def file_upload_unicode_name(request):
     # through file save.
     uni_named_file = request.FILES['file_unicode']
     FileModel.objects.create(testfile=uni_named_file)
-    full_name = '%s/%s' % (UPLOAD_TO, uni_named_file.name)
+    full_name = f'{UPLOAD_TO}/{uni_named_file.name}'
     return HttpResponse() if os.path.exists(full_name) else HttpResponseServerError()
 
 

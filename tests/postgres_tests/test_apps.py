@@ -50,7 +50,7 @@ class PostgresConfigTests(PostgreSQLTestCase):
                         'import psycopg2.extras',
                     })
                     self.assertIn(
-                        '%s.%s(default=psycopg2.extras.%r)' % (
+                        '{}.{}(default=psycopg2.extras.{!r})'.format(
                             field.__module__,
                             field.__class__.__name__,
                             default,

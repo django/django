@@ -12,4 +12,4 @@ class Command(BaseCommand):
         parser.add_argument('--option_c', '-c', default='3')
 
     def handle(self, *labels, **options):
-        print('EXECUTE:BaseCommand labels=%s, options=%s' % (labels, sorted(options.items())))
+        print(f'EXECUTE:BaseCommand labels={labels}, options={sorted(options.items())}')

@@ -35,7 +35,7 @@ class LocaleMiddleware(MiddlewareMixin):
                 i18n_patterns_used and prefixed_default_language):
             # Maybe the language code is missing in the URL? Try adding the
             # language prefix and redirecting to that URL.
-            language_path = '/%s%s' % (language, request.path_info)
+            language_path = f'/{language}{request.path_info}'
             path_valid = is_valid_path(language_path, urlconf)
             path_needs_slash = (
                 not path_valid and (
@@ -50,7 +50,7 @@ class LocaleMiddleware(MiddlewareMixin):
                 # rest of the URL
                 language_url = request.get_full_path(force_append_slash=path_needs_slash).replace(
                     script_prefix,
-                    '%s%s/' % (script_prefix, language),
+                    f'{script_prefix}{language}/',
                     1
                 )
                 # Redirect to the language-specific URL as detected by

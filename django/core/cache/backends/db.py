@@ -63,7 +63,7 @@ class DatabaseCache(BaseDatabaseCache):
 
         with connection.cursor() as cursor:
             cursor.execute(
-                'SELECT %s, %s, %s FROM %s WHERE %s IN (%s)' % (
+                'SELECT {}, {}, {} FROM {} WHERE {} IN ({})'.format(
                     quote_name('cache_key'),
                     quote_name('value'),
                     quote_name('expires'),
@@ -134,7 +134,7 @@ class DatabaseCache(BaseDatabaseCache):
                 # regressions.
                 with transaction.atomic(using=db):
                     cursor.execute(
-                        'SELECT %s, %s FROM %s WHERE %s = %%s' % (
+                        'SELECT {}, {} FROM {} WHERE {} = %s'.format(
                             quote_name('cache_key'),
                             quote_name('expires'),
                             table,
@@ -154,7 +154,7 @@ class DatabaseCache(BaseDatabaseCache):
                     exp = connection.ops.adapt_datetimefield_value(exp)
                     if result and mode == 'touch':
                         cursor.execute(
-                            'UPDATE %s SET %s = %%s WHERE %s = %%s' % (
+                            'UPDATE {} SET {} = %s WHERE {} = %s'.format(
                                 table,
                                 quote_name('expires'),
                                 quote_name('cache_key')
@@ -163,7 +163,7 @@ class DatabaseCache(BaseDatabaseCache):
                         )
                     elif result and (mode == 'set' or (mode == 'add' and current_expires < now)):
                         cursor.execute(
-                            'UPDATE %s SET %s = %%s, %s = %%s WHERE %s = %%s' % (
+                            'UPDATE {} SET {} = %s, {} = %s WHERE {} = %s'.format(
                                 table,
                                 quote_name('value'),
                                 quote_name('expires'),
@@ -173,7 +173,7 @@ class DatabaseCache(BaseDatabaseCache):
                         )
                     elif mode != 'touch':
                         cursor.execute(
-                            'INSERT INTO %s (%s, %s, %s) VALUES (%%s, %%s, %%s)' % (
+                            'INSERT INTO {} ({}, {}, {}) VALUES (%s, %s, %s)'.format(
                                 table,
                                 quote_name('cache_key'),
                                 quote_name('value'),
@@ -208,7 +208,7 @@ class DatabaseCache(BaseDatabaseCache):
 
         with connection.cursor() as cursor:
             cursor.execute(
-                'DELETE FROM %s WHERE %s IN (%s)' % (
+                'DELETE FROM {} WHERE {} IN ({})'.format(
                     table,
                     quote_name('cache_key'),
                     ', '.join(['%s'] * len(keys)),
@@ -228,7 +228,7 @@ class DatabaseCache(BaseDatabaseCache):
 
         with connection.cursor() as cursor:
             cursor.execute(
-                'SELECT %s FROM %s WHERE %s = %%s and expires > %%s' % (
+                'SELECT {} FROM {} WHERE {} = %s and expires > %s'.format(
                     quote_name('cache_key'),
                     quote_name(self._table),
                     quote_name('cache_key'),

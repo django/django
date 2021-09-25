@@ -83,7 +83,7 @@ class Serializer(base.Serializer):
             try:
                 self.xml.characters(value)
             except UnserializableContentError:
-                raise ValueError("%s.%s (pk:%s) contains unserializable characters" % (
+                raise ValueError("{}.{} (pk:{}) contains unserializable characters".format(
                     obj.__class__.__name__, field.name, obj.pk))
         else:
             self.xml.addQuickElement("None")

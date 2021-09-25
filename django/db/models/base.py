@@ -60,7 +60,7 @@ def subclass_exception(name, bases, module, attached_to):
     """
     return type(name, bases, {
         '__module__': module,
-        '__qualname__': '%s.%s' % (attached_to.__qualname__, name),
+        '__qualname__': f'{attached_to.__qualname__}.{name}',
     })
 
 
@@ -153,7 +153,7 @@ class ModelBase(type):
         # If the model is a proxy, ensure that the base class
         # hasn't been swapped out.
         if is_proxy and base_meta and base_meta.swapped:
-            raise TypeError("%s cannot proxy the swapped model '%s'." % (name, base_meta.swapped))
+            raise TypeError(f"{name} cannot proxy the swapped model '{base_meta.swapped}'.")
 
         # Add remaining attributes (those with a contribute_to_class() method)
         # to the class.
@@ -348,7 +348,7 @@ class ModelBase(type):
 
         # Give the class a docstring -- its definition.
         if cls.__doc__ is None:
-            cls.__doc__ = "%s(%s)" % (cls.__name__, ", ".join(f.name for f in opts.fields))
+            cls.__doc__ = "{}({})".format(cls.__name__, ", ".join(f.name for f in opts.fields))
 
         get_absolute_url_override = settings.ABSOLUTE_URL_OVERRIDES.get(opts.label_lower)
         if get_absolute_url_override:
@@ -504,7 +504,7 @@ class Model(metaclass=ModelBase):
                 except (AttributeError, FieldDoesNotExist):
                     pass
             for kwarg in kwargs:
-                raise TypeError("%s() got an unexpected keyword argument '%s'" % (cls.__name__, kwarg))
+                raise TypeError(f"{cls.__name__}() got an unexpected keyword argument '{kwarg}'")
         super().__init__()
         post_init.send(sender=cls, instance=self)
 
@@ -522,10 +522,10 @@ class Model(metaclass=ModelBase):
         return new
 
     def __repr__(self):
-        return '<%s: %s>' % (self.__class__.__name__, self)
+        return f'<{self.__class__.__name__}: {self}>'
 
     def __str__(self):
-        return '%s object (%s)' % (self.__class__.__name__, self.pk)
+        return f'{self.__class__.__name__} object ({self.pk})'
 
     def __eq__(self, other):
         if not isinstance(other, Model):
@@ -974,7 +974,7 @@ class Model(metaclass=ModelBase):
         q = Q((field.name, param), (f'pk__{op}', self.pk), _connector=Q.AND)
         q = Q(q, (f'{field.name}__{op}', param), _connector=Q.OR)
         qs = self.__class__._default_manager.using(self._state.db).filter(**kwargs).filter(q).order_by(
-            '%s%s' % (order, field.name), '%spk' % order
+            f'{order}{field.name}', '%spk' % order
         )
         try:
             return qs[0]
@@ -1143,7 +1143,7 @@ class Model(metaclass=ModelBase):
                 lookup_kwargs['%s__month' % unique_for] = date.month
                 lookup_kwargs['%s__year' % unique_for] = date.year
             else:
-                lookup_kwargs['%s__%s' % (unique_for, lookup_type)] = getattr(date, lookup_type)
+                lookup_kwargs[f'{unique_for}__{lookup_type}'] = getattr(date, lookup_type)
             lookup_kwargs[field] = getattr(self, field)
 
             qs = model_class._default_manager.filter(**lookup_kwargs)
@@ -1739,7 +1739,7 @@ class Model(metaclass=ModelBase):
             except KeyError:
                 errors.append(
                     checks.Error(
-                        "'%s' refers to the nonexistent field '%s'." % (
+                        "'{}' refers to the nonexistent field '{}'.".format(
                             option, field_name,
                         ),
                         obj=cls,

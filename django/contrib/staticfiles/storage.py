@@ -103,7 +103,7 @@ class HashedFilesMixin:
         opened = content is None
         if opened:
             if not self.exists(filename):
-                raise ValueError("The file '%s' could not be found with %r." % (filename, self))
+                raise ValueError(f"The file '{filename}' could not be found with {self!r}.")
             try:
                 content = self.open(filename)
             except OSError:
@@ -392,7 +392,7 @@ class HashedFilesMixin:
                 intermediate_name = cache_name
         # If the cache name can't be determined after the max number of passes,
         # the intermediate files on disk may be corrupt; avoid an infinite loop.
-        raise ValueError("The name '%s' could not be hashed with %r." % (name, self))
+        raise ValueError(f"The name '{name}' could not be hashed with {self!r}.")
 
 
 class ManifestFilesMixin(HashedFilesMixin):

@@ -563,7 +563,7 @@ class GeoQuerySetTest(TestCase):
         line = City.objects.aggregate(MakeLine('point'))['point__makeline']
         self.assertTrue(
             ref_line.equals_exact(line, tolerance=10e-5),
-            "%s != %s" % (ref_line, line)
+            f"{ref_line} != {line}"
         )
 
     @skipUnlessDBFeature('supports_union_aggr')

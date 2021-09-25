@@ -61,7 +61,7 @@ class GeoFuncMixin:
             field = source_fields[pos]
             if not isinstance(field, GeometryField):
                 raise TypeError(
-                    "%s function requires a GeometryField in position %s, got %s." % (
+                    "{} function requires a GeometryField in position {}, got {}.".format(
                         self.name, pos + 1, type(field).__name__,
                     )
                 )
@@ -79,7 +79,7 @@ class GeoFuncMixin:
         if not hasattr(value, 'resolve_expression'):
             if check_types and not isinstance(value, check_types):
                 raise TypeError(
-                    "The %s parameter has the wrong type: should be %s." % (
+                    "The {} parameter has the wrong type: should be {}.".format(
                         param_name, check_types)
                 )
         return value

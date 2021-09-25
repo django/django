@@ -42,7 +42,7 @@ class ASGIRequest(HttpRequest):
         # The Django path is different from ASGI scope path args, it should
         # combine with script name.
         if self.script_name:
-            self.path = '%s/%s' % (
+            self.path = '{}/{}'.format(
                 self.script_name.rstrip('/'),
                 self.path_info.replace('/', '', 1),
             )

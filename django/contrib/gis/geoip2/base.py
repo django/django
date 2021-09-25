@@ -131,13 +131,13 @@ class GeoIP2:
 
     def __repr__(self):
         meta = self._reader.metadata()
-        version = '[v%s.%s]' % (meta.binary_format_major_version, meta.binary_format_minor_version)
-        return '<%(cls)s %(version)s _country_file="%(country)s", _city_file="%(city)s">' % {
-            'cls': self.__class__.__name__,
-            'version': version,
-            'country': self._country_file,
-            'city': self._city_file,
-        }
+        version = f'[v{meta.binary_format_major_version}.{meta.binary_format_minor_version}]'
+        return '<{cls} {version} _country_file="{country}", _city_file="{city}">'.format(
+            cls=self.__class__.__name__,
+            version=version,
+            country=self._country_file,
+            city=self._city_file,
+        )
 
     def _check_query(self, query, country=False, city=False, city_or_country=False):
         "Check the query and database availability."
@@ -220,7 +220,7 @@ class GeoIP2:
     def info(self):
         "Return information about the GeoIP library and databases in use."
         meta = self._reader.metadata()
-        return 'GeoIP Library:\n\t%s.%s\n' % (meta.binary_format_major_version, meta.binary_format_minor_version)
+        return f'GeoIP Library:\n\t{meta.binary_format_major_version}.{meta.binary_format_minor_version}\n'
 
     @classmethod
     def open(cls, full_path, cache):

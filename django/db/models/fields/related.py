@@ -54,7 +54,7 @@ def resolve_relation(scope_model, relation):
     # Look for an "app.Model" relation
     if isinstance(relation, str):
         if "." not in relation:
-            relation = "%s.%s" % (scope_model._meta.app_label, relation)
+            relation = f"{scope_model._meta.app_label}.{relation}"
 
     return relation
 
@@ -227,7 +227,7 @@ class RelatedField(FieldCacheMixin, Field):
         rel_name = self.remote_field.get_accessor_name()  # i. e. "model_set"
         rel_query_name = self.related_query_name()  # i. e. "model"
         # i.e. "app_label.Model.field".
-        field_name = '%s.%s' % (opts.label, self.name)
+        field_name = f'{opts.label}.{self.name}'
 
         # Check clashes between accessor or reverse query name of `field`
         # and any other field name -- i.e. accessor for Model.foreign is
@@ -235,11 +235,11 @@ class RelatedField(FieldCacheMixin, Field):
         potential_clashes = rel_opts.fields + rel_opts.many_to_many
         for clash_field in potential_clashes:
             # i.e. "app_label.Target.model_set".
-            clash_name = '%s.%s' % (rel_opts.label, clash_field.name)
+            clash_name = f'{rel_opts.label}.{clash_field.name}'
             if not rel_is_hidden and clash_field.name == rel_name:
                 errors.append(
                     checks.Error(
-                        "Reverse accessor for '%s' clashes with field name '%s'." % (field_name, clash_name),
+                        f"Reverse accessor for '{field_name}' clashes with field name '{clash_name}'.",
                         hint=("Rename field '%s', or add/change a related_name "
                               "argument to the definition for field '%s'.") % (clash_name, field_name),
                         obj=self,
@@ -250,7 +250,7 @@ class RelatedField(FieldCacheMixin, Field):
             if clash_field.name == rel_query_name:
                 errors.append(
                     checks.Error(
-                        "Reverse query name for '%s' clashes with field name '%s'." % (field_name, clash_name),
+                        f"Reverse query name for '{field_name}' clashes with field name '{clash_name}'.",
                         hint=("Rename field '%s', or add/change a related_name "
                               "argument to the definition for field '%s'.") % (clash_name, field_name),
                         obj=self,
@@ -264,14 +264,14 @@ class RelatedField(FieldCacheMixin, Field):
         potential_clashes = (r for r in rel_opts.related_objects if r.field is not self)
         for clash_field in potential_clashes:
             # i.e. "app_label.Model.m2m".
-            clash_name = '%s.%s' % (
+            clash_name = '{}.{}'.format(
                 clash_field.related_model._meta.label,
                 clash_field.field.name,
             )
             if not rel_is_hidden and clash_field.get_accessor_name() == rel_name:
                 errors.append(
                     checks.Error(
-                        "Reverse accessor for '%s' clashes with reverse accessor for '%s'." % (field_name, clash_name),
+                        f"Reverse accessor for '{field_name}' clashes with reverse accessor for '{clash_name}'.",
                         hint=("Add or change a related_name argument "
                               "to the definition for '%s' or '%s'.") % (field_name, clash_name),
                         obj=self,
@@ -348,7 +348,7 @@ class RelatedField(FieldCacheMixin, Field):
         self.related_field.model.
         """
         return {
-            '%s__%s' % (self.name, rh_field.name): getattr(obj, rh_field.attname)
+            f'{self.name}__{rh_field.name}': getattr(obj, rh_field.attname)
             for _, rh_field in self.related_fields
         }
 
@@ -602,7 +602,7 @@ class ForeignObject(RelatedField):
         if isinstance(self.remote_field.model, str):
             if '.' in self.remote_field.model:
                 app_label, model_name = self.remote_field.model.split('.')
-                kwargs['to'] = '%s.%s' % (app_label, model_name.lower())
+                kwargs['to'] = f'{app_label}.{model_name.lower()}'
             else:
                 kwargs['to'] = self.remote_field.model.lower()
         else:
@@ -1102,7 +1102,7 @@ def create_many_to_many_intermediary_model(field, klass):
         through._meta.managed = model._meta.managed or related._meta.managed
 
     to_model = resolve_relation(klass, field.remote_field.model)
-    name = '%s_%s' % (klass._meta.object_name, field.name)
+    name = f'{klass._meta.object_name}_{field.name}'
     lazy_related_operation(set_managed, klass, to_model, name)
 
     to = make_model_tuple(to_model)[1]
@@ -1261,7 +1261,7 @@ class ManyToManyField(RelatedField):
 
     def _check_relationship_model(self, from_model=None, **kwargs):
         if hasattr(self.remote_field.through, '_meta'):
-            qualified_model_name = "%s.%s" % (
+            qualified_model_name = "{}.{}".format(
                 self.remote_field.through._meta.app_label, self.remote_field.through.__name__)
         else:
             qualified_model_name = self.remote_field.through
@@ -1416,7 +1416,7 @@ class ManyToManyField(RelatedField):
                         if hasattr(f, 'remote_field') and getattr(f.remote_field, 'model', None) == related_model:
                             possible_field_names.append(f.name)
                     if possible_field_names:
-                        hint = "Did you mean one of the following foreign keys to '%s': %s?" % (
+                        hint = "Did you mean one of the following foreign keys to '{}': {}?".format(
                             related_model._meta.object_name,
                             ', '.join(possible_field_names),
                         )
@@ -1440,7 +1440,7 @@ class ManyToManyField(RelatedField):
                                 getattr(field.remote_field, 'model', None) == related_model):
                             errors.append(
                                 checks.Error(
-                                    "'%s.%s' is not a foreign key to '%s'." % (
+                                    "'{}.{}' is not a foreign key to '{}'.".format(
                                         through._meta.object_name, field_name,
                                         related_model._meta.object_name,
                                     ),
@@ -1471,7 +1471,7 @@ class ManyToManyField(RelatedField):
                         if field.remote_field.through is model:
                             return field.name
                 opts = model._meta.auto_created._meta
-                clashing_obj = '%s.%s' % (opts.label, _get_field_name(model))
+                clashing_obj = f'{opts.label}.{_get_field_name(model)}'
             else:
                 clashing_obj = model._meta.label
             if settings.DATABASE_ROUTERS:
@@ -1573,7 +1573,7 @@ class ManyToManyField(RelatedField):
         elif self.db_table:
             return self.db_table
         else:
-            m2m_table_name = '%s_%s' % (utils.strip_quotes(opts.db_table), self.name)
+            m2m_table_name = f'{utils.strip_quotes(opts.db_table)}_{self.name}'
             return utils.truncate_name(m2m_table_name, connection.ops.max_name_length())
 
     def _get_m2m_attr(self, related, attr):
@@ -1641,7 +1641,7 @@ class ManyToManyField(RelatedField):
             # related_name with one generated from the m2m field name. Django
             # still uses backwards relations internally and we need to avoid
             # clashes between multiple m2m fields with related_name == '+'.
-            self.remote_field.related_name = '_%s_%s_%s_+' % (
+            self.remote_field.related_name = '_{}_{}_{}_+'.format(
                 cls._meta.app_label,
                 cls.__name__.lower(),
                 name,

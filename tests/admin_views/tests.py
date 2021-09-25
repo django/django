@@ -684,7 +684,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                 # ensure filter link exists
                 self.assertContains(response, '<a href="?%s"' % query_string)
                 # ensure link works
-                filtered_response = self.client.get('%s?%s' % (changelist_url, query_string))
+                filtered_response = self.client.get(f'{changelist_url}?{query_string}')
                 self.assertEqual(filtered_response.status_code, 200)
                 # ensure changelist contains only valid objects
                 for obj in filtered_response.context['cl'].queryset.all():
@@ -915,7 +915,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         Regression test for ticket 20664 - ensure the pk is properly quoted.
         """
         actor = Actor.objects.create(name="Palin", age=27)
-        response = self.client.get("%s?%s" % (reverse('admin:admin_views_actor_changelist'), IS_POPUP_VAR))
+        response = self.client.get("{}?{}".format(reverse('admin:admin_views_actor_changelist'), IS_POPUP_VAR))
         self.assertContains(response, 'data-popup-opener="%s"' % actor.pk)
 
     def test_hide_change_password(self):
@@ -1634,7 +1634,7 @@ class AdminViewPermissionsTest(TestCase):
         Unsuccessful attempts will continue to render the login page with
         a 200 status code.
         """
-        login_url = '%s?next=%s' % (reverse('admin:login'), reverse('admin:index'))
+        login_url = '{}?next={}'.format(reverse('admin:login'), reverse('admin:index'))
         # Super User
         response = self.client.get(self.index_url)
         self.assertRedirects(response, login_url)
@@ -1742,18 +1742,18 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get(self.index_url)
         self.assertEqual(response.status_code, 302)
         query_string = 'the-answer=42'
-        redirect_url = '%s?%s' % (self.index_url, query_string)
+        redirect_url = f'{self.index_url}?{query_string}'
         new_next = {REDIRECT_FIELD_NAME: redirect_url}
         post_data = self.super_login.copy()
         post_data.pop(REDIRECT_FIELD_NAME)
         login = self.client.post(
-            '%s?%s' % (reverse('admin:login'), urlencode(new_next)),
+            '{}?{}'.format(reverse('admin:login'), urlencode(new_next)),
             post_data)
         self.assertRedirects(login, redirect_url)
 
     def test_double_login_is_not_allowed(self):
         """Regression test for #19327"""
-        login_url = '%s?next=%s' % (reverse('admin:login'), reverse('admin:index'))
+        login_url = '{}?next={}'.format(reverse('admin:login'), reverse('admin:index'))
 
         response = self.client.get(self.index_url)
         self.assertEqual(response.status_code, 302)
@@ -2681,10 +2681,10 @@ class AdminViewDeletedObjectsTest(TestCase):
         Cyclic relationships should still cause each object to only be
         listed once.
         """
-        one = '<li>Cyclic one: <a href="%s">I am recursive</a>' % (
+        one = '<li>Cyclic one: <a href="{}">I am recursive</a>'.format(
             reverse('admin:admin_views_cyclicone_change', args=(self.cy1.pk,)),
         )
-        two = '<li>Cyclic two: <a href="%s">I am recursive too</a>' % (
+        two = '<li>Cyclic two: <a href="{}">I am recursive too</a>'.format(
             reverse('admin:admin_views_cyclictwo_change', args=(self.cy2.pk,)),
         )
         response = self.client.get(reverse('admin:admin_views_cyclicone_delete', args=(self.cy1.pk,)))
@@ -2912,14 +2912,14 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         change_url = reverse(
             'admin:admin_views_modelwithstringprimarykey_change', args=('__fk__',)
         ).replace('__fk__', pk_final_url)
-        should_contain = '<th class="field-__str__"><a href="%s">%s</a></th>' % (change_url, escape(self.pk))
+        should_contain = f'<th class="field-__str__"><a href="{change_url}">{escape(self.pk)}</a></th>'
         self.assertContains(response, should_contain)
 
     def test_recentactions_link(self):
         "The link from the recent actions list referring to the changeform of the object should be quoted"
         response = self.client.get(reverse('admin:index'))
         link = reverse('admin:admin_views_modelwithstringprimarykey_change', args=(quote(self.pk),))
-        should_contain = """<a href="%s">%s</a>""" % (escape(link), escape(self.pk))
+        should_contain = f"""<a href="{escape(link)}">{escape(self.pk)}</a>"""
         self.assertContains(response, should_contain)
 
     def test_deleteconfirmation_link(self):
@@ -2930,7 +2930,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         change_url = reverse(
             'admin:admin_views_modelwithstringprimarykey_change', args=('__fk__',)
         ).replace('__fk__', escape(iri_to_uri(quote(self.pk))))
-        should_contain = '<a href="%s">%s</a>' % (change_url, escape(self.pk))
+        should_contain = f'<a href="{change_url}">{escape(self.pk)}</a>'
         self.assertContains(response, should_contain)
 
     def test_url_conflicts_with_add(self):
@@ -3020,7 +3020,7 @@ class SecureViewTests(TestCase):
     def test_secure_view_shows_login_if_not_logged_in(self):
         secure_url = reverse('secure_view')
         response = self.client.get(secure_url)
-        self.assertRedirects(response, '%s?next=%s' % (reverse('admin:login'), secure_url))
+        self.assertRedirects(response, '{}?next={}'.format(reverse('admin:login'), secure_url))
         response = self.client.get(secure_url, follow=True)
         self.assertTemplateUsed(response, 'admin/login.html')
         self.assertEqual(response.context[REDIRECT_FIELD_NAME], secure_url)
@@ -3032,7 +3032,7 @@ class SecureViewTests(TestCase):
         """
         secure_url = '/test_admin/admin/secure-view2/'
         response = self.client.get(secure_url)
-        self.assertRedirects(response, '%s?myfield=%s' % (reverse('admin:login'), secure_url))
+        self.assertRedirects(response, '{}?myfield={}'.format(reverse('admin:login'), secure_url))
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
@@ -5976,7 +5976,7 @@ class AdminUserMessageTest(TestCase):
         response = self.client.post(reverse('admin:admin_views_usermessenger_changelist'),
                                     action_data, follow=True)
         self.assertContains(response,
-                            '<li class="%s">Test %s</li>' % (level, level),
+                            f'<li class="{level}">Test {level}</li>',
                             html=True)
 
     @override_settings(MESSAGE_LEVEL=10)  # Set to DEBUG for this request
@@ -6071,7 +6071,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
             'http://testserver{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0'.format(
                 change_user_url
             ),
-            '{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0'.format(change_user_url)
+            f'{change_user_url}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0'
         )
 
         # Ignore ordering of querystring.
@@ -6082,8 +6082,8 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         # Ignore ordering of _changelist_filters.
         self.assertURLEqual(
-            '{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0'.format(change_user_url),
-            '{}?_changelist_filters=is_superuser__exact%3D0%26is_staff__exact%3D0'.format(change_user_url)
+            f'{change_user_url}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0',
+            f'{change_user_url}?_changelist_filters=is_superuser__exact%3D0%26is_staff__exact%3D0'
         )
 
     def get_changelist_filters(self):
@@ -6104,7 +6104,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         return self.joepublicuser.pk
 
     def get_changelist_url(self):
-        return '%s?%s' % (
+        return '{}?{}'.format(
             reverse('admin:auth_user_changelist',
                     current_app=self.admin_site.name),
             self.get_changelist_filters_querystring(),
@@ -6113,7 +6113,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
     def get_add_url(self, add_preserved_filters=True):
         url = reverse('admin:auth_user_add', current_app=self.admin_site.name)
         if add_preserved_filters:
-            url = '%s?%s' % (url, self.get_preserved_filters_querystring())
+            url = f'{url}?{self.get_preserved_filters_querystring()}'
         return url
 
     def get_change_url(self, user_id=None, add_preserved_filters=True):
@@ -6121,13 +6121,13 @@ class AdminKeepChangeListFiltersTests(TestCase):
             user_id = self.get_sample_user_id()
         url = reverse('admin:auth_user_change', args=(user_id,), current_app=self.admin_site.name)
         if add_preserved_filters:
-            url = '%s?%s' % (url, self.get_preserved_filters_querystring())
+            url = f'{url}?{self.get_preserved_filters_querystring()}'
         return url
 
     def get_history_url(self, user_id=None):
         if user_id is None:
             user_id = self.get_sample_user_id()
-        return "%s?%s" % (
+        return "{}?{}".format(
             reverse('admin:auth_user_history', args=(user_id,),
                     current_app=self.admin_site.name),
             self.get_preserved_filters_querystring(),
@@ -6136,7 +6136,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
     def get_delete_url(self, user_id=None):
         if user_id is None:
             user_id = self.get_sample_user_id()
-        return "%s?%s" % (
+        return "{}?{}".format(
             reverse('admin:auth_user_delete', args=(user_id,),
                     current_app=self.admin_site.name),
             self.get_preserved_filters_querystring(),
@@ -6148,7 +6148,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         # Check the `change_view` link has the correct querystring.
         detail_link = re.search(
-            '<a href="(.*?)">{}</a>'.format(self.joepublicuser.username),
+            f'<a href="(.*?)">{self.joepublicuser.username}</a>',
             response.content.decode()
         )
         self.assertURLEqual(detail_link[1], self.get_change_url())
@@ -6443,7 +6443,7 @@ class AdminViewOnSiteTests(TestCase):
     def test_callable(self):
         "The right link is displayed if view_on_site is a callable"
         response = self.client.get(reverse('admin:admin_views_worker_change', args=(self.w1.pk,)))
-        self.assertContains(response, '"/worker/%s/%s/"' % (self.w1.surname, self.w1.name))
+        self.assertContains(response, f'"/worker/{self.w1.surname}/{self.w1.name}/"')
 
     def test_missing_get_absolute_url(self):
         "None is returned if model doesn't have get_absolute_url"
@@ -6492,7 +6492,7 @@ class InlineAdminViewOnSiteTest(TestCase):
     def test_callable(self):
         "The right link is displayed if view_on_site is a callable"
         response = self.client.get(reverse('admin:admin_views_restaurant_change', args=(self.r1.pk,)))
-        self.assertContains(response, '"/worker_inline/%s/%s/"' % (self.w1.surname, self.w1.name))
+        self.assertContains(response, f'"/worker_inline/{self.w1.surname}/{self.w1.name}/"')
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
@@ -6545,7 +6545,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
     def test_unknown_url_redirects_login_if_not_authenticated(self):
         unknown_url = '/test_admin/admin/unknown/'
         response = self.client.get(unknown_url)
-        self.assertRedirects(response, '%s?next=%s' % (reverse('admin:login'), unknown_url))
+        self.assertRedirects(response, '{}?next={}'.format(reverse('admin:login'), unknown_url))
 
     def test_unknown_url_404_if_authenticated(self):
         superuser = User.objects.create_superuser(
@@ -6561,29 +6561,29 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
     def test_known_url_redirects_login_if_not_authenticated(self):
         known_url = reverse('admin:admin_views_article_changelist')
         response = self.client.get(known_url)
-        self.assertRedirects(response, '%s?next=%s' % (reverse('admin:login'), known_url))
+        self.assertRedirects(response, '{}?next={}'.format(reverse('admin:login'), known_url))
 
     def test_known_url_missing_slash_redirects_login_if_not_authenticated(self):
         known_url = reverse('admin:admin_views_article_changelist')[:-1]
         response = self.client.get(known_url)
         # Redirects with the next URL also missing the slash.
-        self.assertRedirects(response, '%s?next=%s' % (reverse('admin:login'), known_url))
+        self.assertRedirects(response, '{}?next={}'.format(reverse('admin:login'), known_url))
 
     def test_non_admin_url_shares_url_prefix(self):
         url = reverse('non_admin')[:-1]
         response = self.client.get(url)
         # Redirects with the next URL also missing the slash.
-        self.assertRedirects(response, '%s?next=%s' % (reverse('admin:login'), url))
+        self.assertRedirects(response, '{}?next={}'.format(reverse('admin:login'), url))
 
     def test_url_without_trailing_slash_if_not_authenticated(self):
         url = reverse('admin:article_extra_json')
         response = self.client.get(url)
-        self.assertRedirects(response, '%s?next=%s' % (reverse('admin:login'), url))
+        self.assertRedirects(response, '{}?next={}'.format(reverse('admin:login'), url))
 
     def test_unkown_url_without_trailing_slash_if_not_authenticated(self):
         url = reverse('admin:article_extra_json')[:-1]
         response = self.client.get(url)
-        self.assertRedirects(response, '%s?next=%s' % (reverse('admin:login'), url))
+        self.assertRedirects(response, '{}?next={}'.format(reverse('admin:login'), url))
 
     @override_settings(APPEND_SLASH=True)
     def test_missing_slash_append_slash_true_unknown_url(self):
@@ -6707,7 +6707,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
     def test_known_url_redirects_login_if_not_authenticated_without_final_catch_all_view(self):
         known_url = reverse('admin10:admin_views_article_changelist')
         response = self.client.get(known_url)
-        self.assertRedirects(response, '%s?next=%s' % (reverse('admin10:login'), known_url))
+        self.assertRedirects(response, '{}?next={}'.format(reverse('admin10:login'), known_url))
 
     def test_known_url_missing_slash_redirects_with_slash_if_not_authenticated_without_final_catch_all_view(self):
         known_url = reverse('admin10:admin_views_article_changelist')
@@ -6722,7 +6722,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
     def test_url_without_trailing_slash_if_not_authenticated_without_final_catch_all_view(self):
         url = reverse('admin10:article_extra_json')
         response = self.client.get(url)
-        self.assertRedirects(response, '%s?next=%s' % (reverse('admin10:login'), url))
+        self.assertRedirects(response, '{}?next={}'.format(reverse('admin10:login'), url))
 
     def test_unkown_url_without_trailing_slash_if_not_authenticated_without_final_catch_all_view(self):
         url = reverse('admin10:article_extra_json')[:-1]

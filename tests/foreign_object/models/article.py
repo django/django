@@ -22,7 +22,7 @@ class ColConstraint:
 
     def as_sql(self, compiler, connection):
         qn = compiler.quote_name_unless_alias
-        return '%s.%s = %%s' % (qn(self.alias), qn(self.col)), [self.value]
+        return f'{qn(self.alias)}.{qn(self.col)} = %s', [self.value]
 
 
 class ActiveTranslationField(models.ForeignObject):

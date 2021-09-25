@@ -51,8 +51,8 @@ def colorize(text='', opts=(), **kwargs):
         if o in opt_dict:
             code_list.append(opt_dict[o])
     if 'noreset' not in opts:
-        text = '%s\x1b[%sm' % (text or '', RESET)
-    return '%s%s' % (('\x1b[%sm' % ';'.join(code_list)), text or '')
+        text = '{}\x1b[{}m'.format(text or '', RESET)
+    return '{}{}'.format(('\x1b[%sm' % ';'.join(code_list)), text or '')
 
 
 def make_style(opts=(), **kwargs):

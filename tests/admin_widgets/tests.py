@@ -681,12 +681,12 @@ class ManyToManyRawIdWidgetTest(TestCase):
         w = widgets.ManyToManyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render('company_widget1', [c1.pk, c2.pk], attrs={}),
-            '<input type="text" name="company_widget1" value="%(c1pk)s,%(c2pk)s">' % {'c1pk': c1.pk, 'c2pk': c2.pk}
+            f'<input type="text" name="company_widget1" value="{c1.pk},{c2.pk}">'
         )
 
         self.assertHTMLEqual(
             w.render('company_widget2', [c1.pk]),
-            '<input type="text" name="company_widget2" value="%(c1pk)s">' % {'c1pk': c1.pk}
+            f'<input type="text" name="company_widget2" value="{c1.pk}">'
         )
 
 
@@ -939,7 +939,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
 
             # Get the expected caption
             may_translation = month_name
-            expected_caption = '{:s} {:d}'.format(may_translation.upper(), 1984)
+            expected_caption = f'{may_translation.upper():s} {1984:d}'
 
             # Test with every locale
             with override_settings(LANGUAGE_CODE=language_code):
@@ -1094,7 +1094,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
         # Choose some options ------------------------------------------------
         from_lisa_select_option = self.selenium.find_element_by_css_selector(
-            '{} > option[value="{}"]'.format(from_box, self.lisa.id)
+            f'{from_box} > option[value="{self.lisa.id}"]'
         )
 
         # Check the title attribute is there for tool tips: ticket #20821
@@ -1119,7 +1119,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
         # Check the tooltip is still there after moving: ticket #20821
         to_lisa_select_option = self.selenium.find_element_by_css_selector(
-            '{} > option[value="{}"]'.format(to_box, self.lisa.id)
+            f'{to_box} > option[value="{self.lisa.id}"]'
         )
         self.assertEqual(to_lisa_select_option.get_attribute('title'), to_lisa_select_option.get_attribute('text'))
 

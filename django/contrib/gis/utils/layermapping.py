@@ -547,7 +547,7 @@ class LayerMapping:
                     if strict:
                         raise
                     elif not silent:
-                        stream.write('Ignoring Feature ID %s because: %s\n' % (feat.fid, msg))
+                        stream.write(f'Ignoring Feature ID {feat.fid} because: {msg}\n')
                 else:
                     # Constructing the model using the keyword args
                     is_update = False
@@ -585,7 +585,7 @@ class LayerMapping:
                         m.save(using=self.using)
                         num_saved += 1
                         if verbose:
-                            stream.write('%s: %s\n' % ('Updated' if is_update else 'Saved', m))
+                            stream.write('{}: {}\n'.format('Updated' if is_update else 'Saved', m))
                     except Exception as msg:
                         if strict:
                             # Bailing out if the `strict` keyword is set.
@@ -597,7 +597,7 @@ class LayerMapping:
                                 stream.write('%s\n' % kwargs)
                             raise
                         elif not silent:
-                            stream.write('Failed to save %s:\n %s\nContinuing\n' % (kwargs, msg))
+                            stream.write(f'Failed to save {kwargs}:\n {msg}\nContinuing\n')
 
                 # Printing progress information, if requested.
                 if progress and num_feat % progress_interval == 0:
@@ -631,7 +631,7 @@ class LayerMapping:
                     num_feat, num_saved = _save(step_slice, num_feat, num_saved)
                     beg = end
                 except Exception:  # Deliberately catch everything
-                    stream.write('%s\nFailed to save slice: %s\n' % ('=-' * 20, step_slice))
+                    stream.write('{}\nFailed to save slice: {}\n'.format('=-' * 20, step_slice))
                     raise
         else:
             # Otherwise, just calling the previously defined _save() function.

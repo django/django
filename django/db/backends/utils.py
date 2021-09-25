@@ -117,7 +117,7 @@ class CursorDebugWrapper(CursorWrapper):
                 # params could be an iterator.
                 times = '?'
             self.db.queries_log.append({
-                'sql': '%s times: %s' % (times, sql) if many else sql,
+                'sql': f'{times} times: {sql}' if many else sql,
                 'time': '%.3f' % duration,
             })
             logger.debug(
@@ -208,7 +208,7 @@ def truncate_name(identifier, length=None, hash_len=4):
         return identifier
 
     digest = names_digest(name, length=hash_len)
-    return '%s%s%s' % ('%s"."' % namespace if namespace else '', name[:length - hash_len], digest)
+    return '{}{}{}'.format('%s"."' % namespace if namespace else '', name[:length - hash_len], digest)
 
 
 def names_digest(*args, length):
@@ -237,7 +237,7 @@ def format_number(value, max_digits, decimal_places):
     else:
         context.traps[decimal.Rounded] = 1
         value = context.create_decimal(value)
-    return "{:f}".format(value)
+    return f"{value:f}"
 
 
 def strip_quotes(table_name):

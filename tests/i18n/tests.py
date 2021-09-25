@@ -1340,7 +1340,7 @@ class FormattingTests(SimpleTestCase):
                     formatter = get_format(format_name, lang=language_code)[0]
                     self.assertEqual(
                         regex.findall(formatter), [],
-                        "%s locale's %s uses an unsupported format code." % (language_code, format_name)
+                        f"{language_code} locale's {format_name} uses an unsupported format code."
                     )
 
 

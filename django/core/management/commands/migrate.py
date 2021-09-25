@@ -99,7 +99,7 @@ class Command(BaseCommand):
         conflicts = executor.loader.detect_conflicts()
         if conflicts:
             name_str = "; ".join(
-                "%s in %s" % (", ".join(names), app)
+                "{} in {}".format(", ".join(names), app)
                 for app, names in conflicts.items()
             )
             raise CommandError(
@@ -138,7 +138,7 @@ class Command(BaseCommand):
                         (migration_name, app_label)
                     )
                 except KeyError:
-                    raise CommandError("Cannot find a migration matching '%s' from app '%s'." % (
+                    raise CommandError("Cannot find a migration matching '{}' from app '{}'.".format(
                         migration_name, app_label))
                 target = (app_label, migration.name)
                 # Partially applied squashed migrations are not included in the
@@ -351,7 +351,7 @@ class Command(BaseCommand):
                         continue
                     if self.verbosity >= 3:
                         self.stdout.write(
-                            '    Processing %s.%s model' % (app_name, model._meta.object_name)
+                            f'    Processing {app_name}.{model._meta.object_name} model'
                         )
                     if self.verbosity >= 1:
                         self.stdout.write('    Creating table %s' % model._meta.db_table)

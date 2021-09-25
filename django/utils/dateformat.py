@@ -150,7 +150,7 @@ class TimeFormat(Formatter):
             return _('midnight')
         if self.data.minute == 0 and self.data.hour == 12:
             return _('noon')
-        return '%s %s' % (self.f(), self.a())
+        return f'{self.f()} {self.a()}'
 
     def s(self):
         "Seconds; i.e. '00' to '59'"

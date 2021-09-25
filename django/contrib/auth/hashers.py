@@ -457,7 +457,7 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
             password = binascii.hexlify(self.digest(password).digest())
 
         data = bcrypt.hashpw(password, salt)
-        return "%s$%s" % (self.algorithm, data.decode('ascii'))
+        return "{}${}".format(self.algorithm, data.decode('ascii'))
 
     def decode(self, encoded):
         algorithm, empty, algostr, work_factor, data = encoded.split('$', 4)
@@ -601,7 +601,7 @@ class SHA1PasswordHasher(BasePasswordHasher):
     def encode(self, password, salt):
         self._check_encode_args(password, salt)
         hash = hashlib.sha1((salt + password).encode()).hexdigest()
-        return "%s$%s$%s" % (self.algorithm, salt, hash)
+        return f"{self.algorithm}${salt}${hash}"
 
     def decode(self, encoded):
         algorithm, salt, hash = encoded.split('$', 2)
@@ -642,7 +642,7 @@ class MD5PasswordHasher(BasePasswordHasher):
     def encode(self, password, salt):
         self._check_encode_args(password, salt)
         hash = hashlib.md5((salt + password).encode()).hexdigest()
-        return "%s$%s$%s" % (self.algorithm, salt, hash)
+        return f"{self.algorithm}${salt}${hash}"
 
     def decode(self, encoded):
         algorithm, salt, hash = encoded.split('$', 2)
@@ -782,7 +782,7 @@ class CryptPasswordHasher(BasePasswordHasher):
         if hash is None:  # A platform like OpenBSD with a dummy crypt module.
             raise TypeError('hash must be provided.')
         # we don't need to store the salt, but Django used to do this
-        return '%s$%s$%s' % (self.algorithm, '', hash)
+        return '{}${}${}'.format(self.algorithm, '', hash)
 
     def decode(self, encoded):
         algorithm, salt, hash = encoded.split('$', 2)

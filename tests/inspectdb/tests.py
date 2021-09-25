@@ -160,8 +160,8 @@ class InspectDBTestCase(TestCase):
         assertFieldType('big_int_field', 'models.%s()' % introspected_field_types['BigIntegerField'])
 
         bool_field_type = introspected_field_types['BooleanField']
-        assertFieldType('bool_field', "models.{}()".format(bool_field_type))
-        assertFieldType('null_bool_field', 'models.{}(blank=True, null=True)'.format(bool_field_type))
+        assertFieldType('bool_field', f"models.{bool_field_type}()")
+        assertFieldType('null_bool_field', f'models.{bool_field_type}(blank=True, null=True)')
 
         if connection.vendor != 'sqlite':
             assertFieldType('decimal_field', "models.DecimalField(max_digits=6, decimal_places=1)")
@@ -232,10 +232,10 @@ class InspectDBTestCase(TestCase):
         base_name = connection.introspection.identifier_converter('Field')
         integer_field_type = connection.features.introspected_field_types['IntegerField']
         self.assertIn("field = models.%s()" % integer_field_type, output)
-        self.assertIn("field_field = models.%s(db_column='%s_')" % (integer_field_type, base_name), output)
-        self.assertIn("field_field_0 = models.%s(db_column='%s__')" % (integer_field_type, base_name), output)
+        self.assertIn(f"field_field = models.{integer_field_type}(db_column='{base_name}_')", output)
+        self.assertIn(f"field_field_0 = models.{integer_field_type}(db_column='{base_name}__')", output)
         self.assertIn("field_field_1 = models.%s(db_column='__field')" % integer_field_type, output)
-        self.assertIn("prc_x = models.{}(db_column='prc(%) x')".format(integer_field_type), output)
+        self.assertIn(f"prc_x = models.{integer_field_type}(db_column='prc(%) x')", output)
         self.assertIn("tamaño = models.%s()" % integer_field_type, output)
 
     def test_table_name_introspection(self):

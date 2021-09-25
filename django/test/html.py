@@ -145,7 +145,7 @@ class Element:
         output = '<%s' % self.name
         for key, value in self.attributes:
             if value is not None:
-                output += ' %s="%s"' % (key, value)
+                output += f' {key}="{value}"'
             else:
                 output += ' %s' % key
         if self.children:
@@ -221,12 +221,12 @@ class Parser(HTMLParser):
 
     def handle_endtag(self, tag):
         if not self.open_tags:
-            self.error("Unexpected end tag `%s` (%s)" % (
+            self.error("Unexpected end tag `{}` ({})".format(
                 tag, self.format_position()))
         element = self.open_tags.pop()
         while element.name != tag:
             if not self.open_tags:
-                self.error("Unexpected end tag `%s` (%s)" % (
+                self.error("Unexpected end tag `{}` ({})".format(
                     tag, self.format_position()))
             element = self.open_tags.pop()
 

@@ -242,7 +242,7 @@ def do_get_language_info(parser, token):
     """
     args = token.split_contents()
     if len(args) != 5 or args[1] != 'for' or args[3] != 'as':
-        raise TemplateSyntaxError("'%s' requires 'for string as variable' (got %r)" % (args[0], args[1:]))
+        raise TemplateSyntaxError(f"'{args[0]}' requires 'for string as variable' (got {args[1:]!r})")
     return GetLanguageInfoNode(parser.compile_filter(args[2]), args[4])
 
 
@@ -267,7 +267,7 @@ def do_get_language_info_list(parser, token):
     """
     args = token.split_contents()
     if len(args) != 5 or args[1] != 'for' or args[3] != 'as':
-        raise TemplateSyntaxError("'%s' requires 'for sequence as variable' (got %r)" % (args[0], args[1:]))
+        raise TemplateSyntaxError(f"'{args[0]}' requires 'for sequence as variable' (got {args[1:]!r})")
     return GetLanguageInfoListNode(parser.compile_filter(args[2]), args[4])
 
 
@@ -402,7 +402,7 @@ def do_translate(parser, token):
                 )
             if value in invalid_context:
                 raise TemplateSyntaxError(
-                    "Invalid argument '%s' provided to the '%s' tag for the context option" % (value, bits[0]),
+                    f"Invalid argument '{value}' provided to the '{bits[0]}' tag for the context option",
                 )
             message_context = parser.compile_filter(value)
         elif option == 'as':
@@ -542,7 +542,7 @@ def do_block_translate(parser, token):
                 break
     end_tag_name = 'end%s' % bits[0]
     if token.contents.strip() != end_tag_name:
-        raise TemplateSyntaxError("%r doesn't allow other block tags (seen %r) inside it" % (bits[0], token.contents))
+        raise TemplateSyntaxError(f"{bits[0]!r} doesn't allow other block tags (seen {token.contents!r}) inside it")
 
     return BlockTranslateNode(extra_context, singular, plural, countervar,
                               counter, message_context, trimmed=trimmed,

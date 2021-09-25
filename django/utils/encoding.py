@@ -13,7 +13,7 @@ class DjangoUnicodeDecodeError(UnicodeDecodeError):
         super().__init__(*args)
 
     def __str__(self):
-        return '%s. You passed in %r (%s)' % (super().__str__(), self.obj, type(self.obj))
+        return f'{super().__str__()}. You passed in {self.obj!r} ({type(self.obj)})'
 
 
 def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):

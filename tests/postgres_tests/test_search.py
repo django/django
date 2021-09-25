@@ -519,7 +519,7 @@ class SearchVectorIndexTests(PostgreSQLTestCase):
         # Indexed function must be IMMUTABLE.
         with connection.cursor() as cursor:
             cursor.execute(
-                'CREATE INDEX search_vector_index ON %s USING GIN (%s)' % (Line._meta.db_table, sql),
+                f'CREATE INDEX search_vector_index ON {Line._meta.db_table} USING GIN ({sql})',
                 params,
             )
 

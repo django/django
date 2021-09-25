@@ -121,7 +121,7 @@ class Command(BaseCommand):
 
         if conflicts and not self.merge:
             name_str = "; ".join(
-                "%s in %s" % (", ".join(names), app)
+                "{} in {}".format(", ".join(names), app)
                 for app, names in conflicts.items()
             )
             raise CommandError(

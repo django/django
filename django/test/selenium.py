@@ -46,7 +46,7 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
             for browser in test_class.browsers[1:]:
                 browser_test_class = cls.__new__(
                     cls,
-                    "%s%s" % (capfirst(browser), name),
+                    f"{capfirst(browser)}{name}",
                     (test_class,),
                     {
                         'browser': browser,
@@ -101,7 +101,7 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
 
     @classproperty
     def live_server_url(cls):
-        return 'http://%s:%s' % (cls.external_host or cls.host, cls.server_thread.port)
+        return f'http://{cls.external_host or cls.host}:{cls.server_thread.port}'
 
     @classproperty
     def allowed_host(cls):

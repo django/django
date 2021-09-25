@@ -71,7 +71,7 @@ class GenericForeignKey(FieldCacheMixin):
 
     def __str__(self):
         model = self.model
-        return '%s.%s' % (model._meta.label, self.name)
+        return f'{model._meta.label}.{self.name}'
 
     def check(self, **kwargs):
         return [
@@ -129,7 +129,7 @@ class GenericForeignKey(FieldCacheMixin):
             if not isinstance(field, models.ForeignKey):
                 return [
                     checks.Error(
-                        "'%s.%s' is not a ForeignKey." % (
+                        "'{}.{}' is not a ForeignKey.".format(
                             self.model._meta.object_name, self.ct_field
                         ),
                         hint=(
@@ -143,7 +143,7 @@ class GenericForeignKey(FieldCacheMixin):
             elif field.remote_field.model != ContentType:
                 return [
                     checks.Error(
-                        "'%s.%s' is not a ForeignKey to 'contenttypes.ContentType'." % (
+                        "'{}.{}' is not a ForeignKey to 'contenttypes.ContentType'.".format(
                             self.model._meta.object_name, self.ct_field
                         ),
                         hint=(
@@ -602,7 +602,7 @@ def create_generic_related_manager(superclass, rel):
 
             def check_and_update_obj(obj):
                 if not isinstance(obj, self.model):
-                    raise TypeError("'%s' instance expected, got %r" % (
+                    raise TypeError("'{}' instance expected, got {!r}".format(
                         self.model._meta.object_name, obj
                     ))
                 setattr(obj, self.content_type_field_name, self.content_type)

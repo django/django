@@ -146,7 +146,7 @@ class DataContains(PostgresOperatorLookup):
         lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
         params = tuple(lhs_params) + tuple(rhs_params)
-        return 'JSON_CONTAINS(%s, %s)' % (lhs, rhs), params
+        return f'JSON_CONTAINS({lhs}, {rhs})', params
 
 
 class ContainedBy(PostgresOperatorLookup):
@@ -161,7 +161,7 @@ class ContainedBy(PostgresOperatorLookup):
         lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
         params = tuple(rhs_params) + tuple(lhs_params)
-        return 'JSON_CONTAINS(%s, %s)' % (rhs, lhs), params
+        return f'JSON_CONTAINS({rhs}, {lhs})', params
 
 
 class HasKeyLookup(PostgresOperatorLookup):
@@ -186,7 +186,7 @@ class HasKeyLookup(PostgresOperatorLookup):
                 *_, rhs_key_transforms = key.preprocess_lhs(compiler, connection)
             else:
                 rhs_key_transforms = [key]
-            rhs_params.append('%s%s' % (
+            rhs_params.append('{}{}'.format(
                 lhs_json_path,
                 compile_json_path(rhs_key_transforms, include_root=False),
             ))
@@ -320,13 +320,13 @@ class KeyTransform(Transform):
     def as_postgresql(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
         if len(key_transforms) > 1:
-            sql = '(%s %s %%s)' % (lhs, self.postgres_nested_operator)
+            sql = f'({lhs} {self.postgres_nested_operator} %s)'
             return sql, tuple(params) + (key_transforms,)
         try:
             lookup = int(self.key_name)
         except ValueError:
             lookup = self.key_name
-        return '(%s %s %%s)' % (lhs, self.postgres_operator), tuple(params) + (lookup,)
+        return f'({lhs} {self.postgres_operator} %s)', tuple(params) + (lookup,)
 
     def as_sqlite(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
@@ -376,7 +376,7 @@ class KeyTransformIsNull(lookups.IsNull):
             return sql, params
         # Column doesn't have a key or IS NULL.
         lhs, lhs_params, _ = self.lhs.preprocess_lhs(compiler, connection)
-        return '(NOT %s OR %s IS NULL)' % (sql, lhs), tuple(params) + tuple(lhs_params)
+        return f'(NOT {sql} OR {lhs} IS NULL)', tuple(params) + tuple(lhs_params)
 
     def as_sqlite(self, compiler, connection):
         template = 'JSON_TYPE(%s, %%s) IS NULL'
@@ -449,7 +449,7 @@ class KeyTransformExact(JSONExact):
             is_null_expr = self.lhs.get_lookup('isnull')(self.lhs, True)
             is_null_sql, is_null_params = is_null_expr.as_sql(compiler, connection)
             return (
-                '%s AND %s' % (has_key_sql, is_null_sql),
+                f'{has_key_sql} AND {is_null_sql}',
                 tuple(has_key_params) + tuple(is_null_params),
             )
         return super().as_sql(compiler, connection)

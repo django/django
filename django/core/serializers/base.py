@@ -44,7 +44,7 @@ class DeserializationError(Exception):
         Factory method for creating a deserialization error which has a more
         explanatory message.
         """
-        return cls("%s: (%s:pk=%s) field_value was '%s'" % (original_exc, model, fk, field_value))
+        return cls(f"{original_exc}: ({model}:pk={fk}) field_value was '{field_value}'")
 
 
 class M2MDeserializationError(Exception):
@@ -226,7 +226,7 @@ class DeserializedObject:
         self.deferred_fields = deferred_fields
 
     def __repr__(self):
-        return "<%s: %s(pk=%s)>" % (
+        return "<{}: {}(pk={})>".format(
             self.__class__.__name__,
             self.object._meta.label,
             self.object.pk,

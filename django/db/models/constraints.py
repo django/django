@@ -26,7 +26,7 @@ class BaseConstraint:
         raise NotImplementedError('This method must be implemented by a subclass.')
 
     def deconstruct(self):
-        path = '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
+        path = f'{self.__class__.__module__}.{self.__class__.__name__}'
         path = path.replace('django.db.models.constraints', 'django.db.models')
         return (path, (), {'name': self.name})
 
@@ -64,7 +64,7 @@ class CheckConstraint(BaseConstraint):
         return schema_editor._delete_check_sql(model, self.name)
 
     def __repr__(self):
-        return '<%s: check=%s name=%s>' % (
+        return '<{}: check={} name={}>'.format(
             self.__class__.__qualname__,
             self.check,
             repr(self.name),
@@ -216,7 +216,7 @@ class UniqueConstraint(BaseConstraint):
         )
 
     def __repr__(self):
-        return '<%s:%s%s%s%s%s%s%s>' % (
+        return '<{}:{}{}{}{}{}{}{}>'.format(
             self.__class__.__qualname__,
             '' if not self.fields else ' fields=%s' % repr(self.fields),
             '' if not self.expressions else ' expressions=%s' % repr(self.expressions),

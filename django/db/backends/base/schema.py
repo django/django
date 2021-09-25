@@ -189,7 +189,7 @@ class BaseDatabaseSchemaEditor:
                 elif self.connection.features.supports_foreign_keys:
                     self.deferred_sql.append(self._create_fk_sql(model, field, '_fk_%(to_table)s_%(to_column)s'))
             # Add the SQL to our big list.
-            column_sqls.append('%s %s' % (
+            column_sqls.append('{} {}'.format(
                 self.quote_name(field.column),
                 definition,
             ))
@@ -458,7 +458,7 @@ class BaseDatabaseSchemaEditor:
             **constraint_kwargs
         )
         if len(constraint_names) != 1:
-            raise ValueError("Found wrong number (%s) of constraints for %s(%s)" % (
+            raise ValueError("Found wrong number ({}) of constraints for {}({})".format(
                 len(constraint_names),
                 model._meta.db_table,
                 ", ".join(columns),
@@ -630,7 +630,7 @@ class BaseDatabaseSchemaEditor:
         ):
             fk_names = self._constraint_names(model, [old_field.column], foreign_key=True)
             if strict and len(fk_names) != 1:
-                raise ValueError("Found wrong number (%s) of foreign key constraints for %s.%s" % (
+                raise ValueError("Found wrong number ({}) of foreign key constraints for {}.{}".format(
                     len(fk_names),
                     model._meta.db_table,
                     old_field.column,
@@ -647,7 +647,7 @@ class BaseDatabaseSchemaEditor:
                 exclude=meta_constraint_names,
             )
             if strict and len(constraint_names) != 1:
-                raise ValueError("Found wrong number (%s) of unique constraints for %s.%s" % (
+                raise ValueError("Found wrong number ({}) of unique constraints for {}.{}".format(
                     len(constraint_names),
                     model._meta.db_table,
                     old_field.column,
@@ -703,7 +703,7 @@ class BaseDatabaseSchemaEditor:
                 exclude=meta_constraint_names,
             )
             if strict and len(constraint_names) != 1:
-                raise ValueError("Found wrong number (%s) of check constraints for %s.%s" % (
+                raise ValueError("Found wrong number ({}) of check constraints for {}.{}".format(
                     len(constraint_names),
                     model._meta.db_table,
                     old_field.column,
@@ -994,17 +994,17 @@ class BaseDatabaseSchemaEditor:
         and a unique digest and suffix.
         """
         _, table_name = split_identifier(table_name)
-        hash_suffix_part = '%s%s' % (names_digest(table_name, *column_names, length=8), suffix)
+        hash_suffix_part = f'{names_digest(table_name, *column_names, length=8)}{suffix}'
         max_length = self.connection.ops.max_name_length() or 200
         # If everything fits into max_length, use that name.
-        index_name = '%s_%s_%s' % (table_name, '_'.join(column_names), hash_suffix_part)
+        index_name = '{}_{}_{}'.format(table_name, '_'.join(column_names), hash_suffix_part)
         if len(index_name) <= max_length:
             return index_name
         # Shorten a long suffix.
         if len(hash_suffix_part) > max_length / 3:
             hash_suffix_part = hash_suffix_part[:max_length // 3]
         other_length = (max_length - len(hash_suffix_part)) // 2 - 1
-        index_name = '%s_%s_%s' % (
+        index_name = '{}_{}_{}'.format(
             table_name[:other_length],
             '_'.join(column_names)[:other_length],
             hash_suffix_part,
@@ -1362,7 +1362,7 @@ class BaseDatabaseSchemaEditor:
     def _delete_primary_key(self, model, strict=False):
         constraint_names = self._constraint_names(model, primary_key=True)
         if strict and len(constraint_names) != 1:
-            raise ValueError('Found wrong number (%s) of PK constraints for %s' % (
+            raise ValueError('Found wrong number ({}) of PK constraints for {}'.format(
                 len(constraint_names),
                 model._meta.db_table,
             ))

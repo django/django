@@ -272,10 +272,10 @@ class ProjectState:
             # Fix from_fields to refer to the new field.
             from_fields = getattr(field, 'from_fields', None)
             if from_fields:
-                field.from_fields = tuple([
+                field.from_fields = tuple(
                     new_name if from_field_name == old_name else from_field_name
                     for from_field_name in from_fields
-                ])
+                )
         # Fix index/unique_together to refer to the new field.
         options = model_state.options
         for option in ('index_together', 'unique_together'):
@@ -294,10 +294,10 @@ class ProjectState:
                 if getattr(remote_field, 'field_name', None) == old_name:
                     remote_field.field_name = new_name
                 if to_fields:
-                    field.to_fields = tuple([
+                    field.to_fields = tuple(
                         new_name if to_field_name == old_name else to_field_name
                         for to_field_name in to_fields
-                    ])
+                    )
         if self._relations is not None:
             old_name_lower = old_name.lower()
             new_name_lower = new_name.lower()
@@ -704,7 +704,7 @@ class ModelState:
             try:
                 fields.append((name, field.clone()))
             except TypeError as e:
-                raise TypeError("Couldn't reconstruct field %s on %s: %s" % (
+                raise TypeError("Couldn't reconstruct field {} on {}: {}".format(
                     name,
                     model._meta.label,
                     e,
@@ -715,7 +715,7 @@ class ModelState:
                 try:
                     fields.append((name, field.clone()))
                 except TypeError as e:
-                    raise TypeError("Couldn't reconstruct m2m field %s on %s: %s" % (
+                    raise TypeError("Couldn't reconstruct m2m field {} on {}: {}".format(
                         name,
                         model._meta.object_name,
                         e,
@@ -858,7 +858,7 @@ class ModelState:
                 for base in self.bases
             )
         except LookupError:
-            raise InvalidBasesError("Cannot resolve one or more bases from %r" % (self.bases,))
+            raise InvalidBasesError(f"Cannot resolve one or more bases from {self.bases!r}")
         # Clone fields for the body, add other bits.
         body = {name: field.clone() for name, field in self.fields.items()}
         body['Meta'] = meta
@@ -873,16 +873,16 @@ class ModelState:
         for index in self.options['indexes']:
             if index.name == name:
                 return index
-        raise ValueError("No index named %s on model %s" % (name, self.name))
+        raise ValueError(f"No index named {name} on model {self.name}")
 
     def get_constraint_by_name(self, name):
         for constraint in self.options['constraints']:
             if constraint.name == name:
                 return constraint
-        raise ValueError('No constraint named %s on model %s' % (name, self.name))
+        raise ValueError(f'No constraint named {name} on model {self.name}')
 
     def __repr__(self):
-        return "<%s: '%s.%s'>" % (self.__class__.__name__, self.app_label, self.name)
+        return f"<{self.__class__.__name__}: '{self.app_label}.{self.name}'>"
 
     def __eq__(self, other):
         return (

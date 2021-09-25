@@ -28,7 +28,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         if not self.is_in_memory_db(test_database_name):
             # Erase the old test database
             if verbosity >= 1:
-                self.log('Destroying old test database for alias %s...' % (
+                self.log('Destroying old test database for alias {}...'.format(
                     self._get_database_display_str(verbosity, test_database_name),
                 ))
             if os.access(test_database_name, os.F_OK):
@@ -55,7 +55,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             return orig_settings_dict
         else:
             root, ext = os.path.splitext(orig_settings_dict['NAME'])
-            return {**orig_settings_dict, 'NAME': '{}_{}{}'.format(root, suffix, ext)}
+            return {**orig_settings_dict, 'NAME': f'{root}_{suffix}{ext}'}
 
     def _clone_test_db(self, suffix, verbosity, keepdb=False):
         source_database_name = self.connection.settings_dict['NAME']
@@ -67,7 +67,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                 if keepdb:
                     return
                 if verbosity >= 1:
-                    self.log('Destroying old test database for alias %s...' % (
+                    self.log('Destroying old test database for alias {}...'.format(
                         self._get_database_display_str(verbosity, target_database_name),
                     ))
                 try:

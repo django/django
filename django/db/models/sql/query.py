@@ -103,7 +103,7 @@ class RawQuery:
         return iter(result)
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, self)
+        return f"<{self.__class__.__name__}: {self}>"
 
     @property
     def params_type(self):
@@ -307,9 +307,9 @@ class Query(BaseExpression):
         if self.annotation_select_mask is not None:
             obj.annotation_select_mask = self.annotation_select_mask.copy()
         if self.combined_queries:
-            obj.combined_queries = tuple([
+            obj.combined_queries = tuple(
                 query.clone() for query in self.combined_queries
-            ])
+            )
         # _annotation_select_cache cannot be copied, as doing so breaks the
         # (necessary) state in which both annotations and
         # _annotation_select_cache point to the same underlying objects.
@@ -851,8 +851,8 @@ class Query(BaseExpression):
         # "group by" and "where".
         self.where.relabel_aliases(change_map)
         if isinstance(self.group_by, tuple):
-            self.group_by = tuple([col.relabeled_clone(change_map) for col in self.group_by])
-        self.select = tuple([col.relabeled_clone(change_map) for col in self.select])
+            self.group_by = tuple(col.relabeled_clone(change_map) for col in self.group_by)
+        self.select = tuple(col.relabeled_clone(change_map) for col in self.select)
         self.annotations = self.annotations and {
             key: col.relabeled_clone(change_map) for key, col in self.annotations.items()
         }
@@ -1167,7 +1167,7 @@ class Query(BaseExpression):
         lookup_class = lhs.get_lookup(lookup_name)
         if not lookup_class:
             if lhs.field.is_relation:
-                raise FieldError('Related Field got invalid lookup: {}'.format(lookup_name))
+                raise FieldError(f'Related Field got invalid lookup: {lookup_name}')
             # A lookup wasn't found. Try to interpret the name as a transform
             # and do an Exact lookup against it.
             lhs = self.try_transform(lhs, lookup_name)
@@ -1317,7 +1317,7 @@ class Query(BaseExpression):
             # No support for transforms for relational fields
             num_lookups = len(lookups)
             if num_lookups > 1:
-                raise FieldError('Related Field got invalid lookup: {}'.format(lookups[0]))
+                raise FieldError(f'Related Field got invalid lookup: {lookups[0]}')
             if len(targets) == 1:
                 col = self._get_col(targets[0], join_info.final_field, alias)
             else:

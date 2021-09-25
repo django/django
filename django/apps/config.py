@@ -56,7 +56,7 @@ class AppConfig:
         self.models = None
 
     def __repr__(self):
-        return '<%s: %s>' % (self.__class__.__name__, self.label)
+        return f'<{self.__class__.__name__}: {self.label}>'
 
     @cached_property
     def default_auto_field(self):
@@ -116,7 +116,7 @@ class AppConfig:
             # If the apps module defines more than one AppConfig subclass,
             # the default one can declare default = True.
             if module_has_submodule(app_module, APPS_MODULE_NAME):
-                mod_path = '%s.%s' % (entry, APPS_MODULE_NAME)
+                mod_path = f'{entry}.{APPS_MODULE_NAME}'
                 mod = import_module(mod_path)
                 # Check if there's exactly one AppConfig candidate,
                 # excluding those that explicitly define default = False.
@@ -178,7 +178,7 @@ class AppConfig:
                     for name, candidate in inspect.getmembers(mod, inspect.isclass)
                     if issubclass(candidate, cls) and candidate is not cls
                 ]
-                msg = "Module '%s' does not contain a '%s' class." % (mod_path, cls_name)
+                msg = f"Module '{mod_path}' does not contain a '{cls_name}' class."
                 if candidates:
                     msg += ' Choices are: %s.' % ', '.join(candidates)
                 raise ImportError(msg)
@@ -207,7 +207,7 @@ class AppConfig:
             app_module = import_module(app_name)
         except ImportError:
             raise ImproperlyConfigured(
-                "Cannot import '%s'. Check that '%s.%s.name' is correct." % (
+                "Cannot import '{}'. Check that '{}.{}.name' is correct.".format(
                     app_name,
                     app_config_class.__module__,
                     app_config_class.__qualname__,
@@ -231,7 +231,7 @@ class AppConfig:
             return self.models[model_name.lower()]
         except KeyError:
             raise LookupError(
-                "App '%s' doesn't have a '%s' model." % (self.label, model_name))
+                f"App '{self.label}' doesn't have a '{model_name}' model.")
 
     def get_models(self, include_auto_created=False, include_swapped=False):
         """
@@ -260,7 +260,7 @@ class AppConfig:
         self.models = self.apps.all_models[self.label]
 
         if module_has_submodule(self.module, MODELS_MODULE_NAME):
-            models_module_name = '%s.%s' % (self.name, MODELS_MODULE_NAME)
+            models_module_name = f'{self.name}.{MODELS_MODULE_NAME}'
             self.models_module = import_module(models_module_name)
 
     def ready(self):

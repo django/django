@@ -340,7 +340,7 @@ class SQLCompiler:
                 table, col = col.split('.', 1)
                 yield (
                     OrderBy(
-                        RawSQL('%s.%s' % (self.quote_name_unless_alias(table), col), []),
+                        RawSQL(f'{self.quote_name_unless_alias(table)}.{col}', []),
                         descending=descending,
                     ),
                     False,
@@ -489,11 +489,11 @@ class SQLCompiler:
                     # Wrap in a subquery if wrapping in parentheses isn't
                     # supported.
                     if not features.supports_parentheses_in_compound:
-                        part_sql = 'SELECT * FROM ({})'.format(part_sql)
+                        part_sql = f'SELECT * FROM ({part_sql})'
                     # Add parentheses when combining with compound query if not
                     # already added for all compound queries.
                     elif not features.supports_slicing_ordering_in_compound:
-                        part_sql = '({})'.format(part_sql)
+                        part_sql = f'({part_sql})'
                 parts += ((part_sql, part_args),)
             except EmptyResultSet:
                 # Omit the empty queryset with UNION and with DIFFERENCE if the
@@ -508,7 +508,7 @@ class SQLCompiler:
             combinator_sql += ' ALL'
         braces = '({})' if features.supports_slicing_ordering_in_compound else '{}'
         sql_parts, args_parts = zip(*((braces.format(sql), args) for sql, args in parts))
-        result = [' {} '.format(combinator_sql).join(sql_parts)]
+        result = [f' {combinator_sql} '.join(sql_parts)]
         params = []
         for part in args_parts:
             params.extend(part)
@@ -531,8 +531,8 @@ class SQLCompiler:
             combinator = self.query.combinator
             features = self.connection.features
             if combinator:
-                if not getattr(features, 'supports_select_{}'.format(combinator)):
-                    raise NotSupportedError('{} is not supported on this database backend.'.format(combinator))
+                if not getattr(features, f'supports_select_{combinator}'):
+                    raise NotSupportedError(f'{combinator} is not supported on this database backend.')
                 result, params = self.get_combinator_sql(combinator, self.query.combinator_all)
             else:
                 distinct_fields, distinct_params = self.get_distinct()
@@ -562,9 +562,9 @@ class SQLCompiler:
                 col_idx = 1
                 for _, (s_sql, s_params), alias in self.select + extra_select:
                     if alias:
-                        s_sql = '%s AS %s' % (s_sql, self.connection.ops.quote_name(alias))
+                        s_sql = f'{s_sql} AS {self.connection.ops.quote_name(alias)}'
                     elif with_col_aliases:
-                        s_sql = '%s AS %s' % (
+                        s_sql = '{} AS {}'.format(
                             s_sql,
                             self.connection.ops.quote_name('col%d' % col_idx),
                         )
@@ -663,7 +663,7 @@ class SQLCompiler:
                     if not alias and with_col_aliases:
                         alias = 'col%d' % index
                     if alias:
-                        sub_selects.append("%s.%s" % (
+                        sub_selects.append("{}.{}".format(
                             self.connection.ops.quote_name('subquery'),
                             self.connection.ops.quote_name(alias),
                         ))
@@ -672,7 +672,7 @@ class SQLCompiler:
                         subselect, subparams = select_clone.as_sql(self, self.connection)
                         sub_selects.append(subselect)
                         sub_params.extend(subparams)
-                return 'SELECT %s FROM (%s) subquery' % (
+                return 'SELECT {} FROM ({}) subquery'.format(
                     ', '.join(sub_selects),
                     ' '.join(result),
                 ), tuple(sub_params + params)
@@ -1236,9 +1236,9 @@ class SQLCompiler:
 
         for index, select_col in enumerate(self.query.select):
             lhs_sql, lhs_params = self.compile(select_col)
-            rhs = '%s.%s' % (qn(alias), qn2(columns[index]))
+            rhs = f'{qn(alias)}.{qn2(columns[index])}'
             self.query.where.add(
-                RawSQL('%s = %s' % (lhs_sql, rhs), lhs_params), 'AND')
+                RawSQL(f'{lhs_sql} = {rhs}', lhs_params), 'AND')
 
         sql, params = self.as_sql()
         return 'EXISTS (%s)' % sql, params
@@ -1370,7 +1370,7 @@ class SQLInsertCompiler(SQLCompiler):
         qn = self.connection.ops.quote_name
         opts = self.query.get_meta()
         insert_statement = self.connection.ops.insert_statement(ignore_conflicts=self.query.ignore_conflicts)
-        result = ['%s %s' % (insert_statement, qn(opts.db_table))]
+        result = [f'{insert_statement} {qn(opts.db_table)}']
         fields = self.query.fields or [opts.pk]
         result.append('(%s)' % ', '.join(qn(f.column) for f in fields))
 
@@ -1560,10 +1560,10 @@ class SQLUpdateCompiler(SQLCompiler):
             name = field.column
             if hasattr(val, 'as_sql'):
                 sql, params = self.compile(val)
-                values.append('%s = %s' % (qn(name), placeholder % sql))
+                values.append(f'{qn(name)} = {placeholder % sql}')
                 update_params.extend(params)
             elif val is not None:
-                values.append('%s = %s' % (qn(name), placeholder))
+                values.append(f'{qn(name)} = {placeholder}')
                 update_params.append(val)
             else:
                 values.append('%s = NULL' % qn(name))
@@ -1660,7 +1660,7 @@ class SQLAggregateCompiler(SQLCompiler):
         inner_query_sql, inner_query_params = self.query.inner_query.get_compiler(
             self.using, elide_empty=self.elide_empty,
         ).as_sql(with_col_aliases=True)
-        sql = 'SELECT %s FROM (%s) subquery' % (sql, inner_query_sql)
+        sql = f'SELECT {sql} FROM ({inner_query_sql}) subquery'
         params = params + inner_query_params
         return sql, params
 

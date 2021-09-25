@@ -66,13 +66,13 @@ class Migration:
         )
 
     def __repr__(self):
-        return "<Migration %s.%s>" % (self.app_label, self.name)
+        return f"<Migration {self.app_label}.{self.name}>"
 
     def __str__(self):
-        return "%s.%s" % (self.app_label, self.name)
+        return f"{self.app_label}.{self.name}"
 
     def __hash__(self):
-        return hash("%s.%s" % (self.app_label, self.name))
+        return hash(f"{self.app_label}.{self.name}")
 
     def mutate_state(self, project_state, preserve=True):
         """
@@ -145,7 +145,7 @@ class Migration:
         for operation in self.operations:
             # If it's irreversible, error out
             if not operation.reversible:
-                raise IrreversibleError("Operation %s in %s is not reversible" % (operation, self))
+                raise IrreversibleError(f"Operation {operation} in {self} is not reversible")
             # Preserve new state from previous run to not tamper the same state
             # over all operations
             new_state = new_state.clone()

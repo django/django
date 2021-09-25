@@ -134,7 +134,7 @@ class Literal(TokenBase):
         return self.value
 
     def __repr__(self):
-        return "(%s %r)" % (self.id, self.value)
+        return f"({self.id} {self.value!r})"
 
 
 class EndToken(TokenBase):

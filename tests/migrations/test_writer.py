@@ -46,7 +46,7 @@ class DeconstructibleInstances:
 class Money(decimal.Decimal):
     def deconstruct(self):
         return (
-            '%s.%s' % (self.__class__.__module__, self.__class__.__name__),
+            f'{self.__class__.__module__}.{self.__class__.__name__}',
             [str(self)],
             {}
         )
@@ -215,14 +215,17 @@ class WriterTests(SimpleTestCase):
             exec(string, globals(), d)
         except Exception as e:
             if value:
-                self.fail("Could not exec %r (from value %r): %s" % (string.strip(), value, e))
+                self.fail(f"Could not exec {string.strip()!r} (from value {value!r}): {e}")
             else:
-                self.fail("Could not exec %r: %s" % (string.strip(), e))
+                self.fail(f"Could not exec {string.strip()!r}: {e}")
         return d
 
     def serialize_round_trip(self, value):
         string, imports = MigrationWriter.serialize(value)
-        return self.safe_exec("%s\ntest_value_result = %s" % ("\n".join(imports), string), value)['test_value_result']
+        return self.safe_exec(
+            "{}\ntest_value_result = {}".format("\n".join(imports), string),
+            value,
+        )['test_value_result']
 
     def assertSerializedEqual(self, value):
         self.assertEqual(self.serialize_round_trip(value), value)

@@ -62,7 +62,7 @@ def check_all_models(app_configs=None, **kwargs):
             model_labels = set(model_labels)
             errors.append(
                 Error(
-                    "index name '%s' is not unique %s %s." % (
+                    "index name '{}' is not unique {} {}.".format(
                         index_name,
                         'for model' if len(model_labels) == 1 else 'among models:',
                         ', '.join(sorted(model_labels)),
@@ -75,7 +75,7 @@ def check_all_models(app_configs=None, **kwargs):
             model_labels = set(model_labels)
             errors.append(
                 Error(
-                    "constraint name '%s' is not unique %s %s." % (
+                    "constraint name '{}' is not unique {} {}.".format(
                         constraint_name,
                         'for model' if len(model_labels) == 1 else 'among models:',
                         ', '.join(sorted(model_labels)),
@@ -163,7 +163,7 @@ def _check_lazy_references(apps, ignore=None):
         if isinstance(receiver, types.FunctionType):
             description = "The function '%s'" % receiver.__name__
         elif isinstance(receiver, types.MethodType):
-            description = "Bound method '%s.%s'" % (receiver.__self__.__class__.__name__, receiver.__name__)
+            description = f"Bound method '{receiver.__self__.__class__.__name__}.{receiver.__name__}'"
         else:
             description = "An instance of class '%s'" % receiver.__class__.__name__
         signal_name = model_signals.get(func.__self__, 'unknown')

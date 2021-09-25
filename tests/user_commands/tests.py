@@ -259,7 +259,7 @@ class CommandTests(SimpleTestCase):
         ]
         for arg, value in tests:
             out = StringIO()
-            expected_output = '%s=%s' % (arg, value)
+            expected_output = f'{arg}={value}'
             with self.subTest(arg=arg):
                 management.call_command(
                     'mutually_exclusive_required',
@@ -299,7 +299,7 @@ class CommandTests(SimpleTestCase):
             'flag_true': True,
         }
         expected_output = '\n'.join(
-            '%s=%s' % (arg, value) for arg, value in args.items()
+            f'{arg}={value}' for arg, value in args.items()
         )
         out = StringIO()
         management.call_command(

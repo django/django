@@ -267,7 +267,7 @@ def sanitize_strftime_format(fmt):
     mapping = {'C': 2, 'F': 10, 'G': 4, 'Y': 4}
     return re.sub(
         r'((?:^|[^%])(?:%%)*)%([CFGY])',
-        lambda m: r'%s%%0%s%s' % (m[1], mapping[m[2]], m[2]),
+        lambda m: fr'{m[1]}%0{mapping[m[2]]}{m[2]}',
         fmt,
     )
 

@@ -724,7 +724,7 @@ class DateDetailViewTests(TestDataMixin, TestCase):
         res = self.client.get('/dates/books/%s/new-new/' % urlbit)
         self.assertEqual(res.status_code, 404)
 
-        res = self.client.get('/dates/books/%s/%s/allow_future/' % (urlbit, b.id))
+        res = self.client.get(f'/dates/books/{urlbit}/{b.id}/allow_future/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['book'], b)
         self.assertTemplateUsed(res, 'generic_views/book_detail.html')

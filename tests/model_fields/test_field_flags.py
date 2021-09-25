@@ -130,7 +130,7 @@ class FieldFlagsTests(test.SimpleTestCase):
     def test_all_field_types_should_have_flags(self):
         for field in self.fields_and_reverse_objects:
             for flag in FLAG_PROPERTIES:
-                self.assertTrue(hasattr(field, flag), "Field %s does not have flag %s" % (field, flag))
+                self.assertTrue(hasattr(field, flag), f"Field {field} does not have flag {flag}")
             if field.is_relation:
                 true_cardinality_flags = sum(
                     getattr(field, flag) is True

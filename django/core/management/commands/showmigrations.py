@@ -150,8 +150,8 @@ class Command(BaseCommand):
             if self.verbosity >= 2:
                 deps = print_deps(node)
             if node.key in loader.applied_migrations:
-                self.stdout.write("[X]  %s.%s%s" % (node.key[0], node.key[1], deps))
+                self.stdout.write(f"[X]  {node.key[0]}.{node.key[1]}{deps}")
             else:
-                self.stdout.write("[ ]  %s.%s%s" % (node.key[0], node.key[1], deps))
+                self.stdout.write(f"[ ]  {node.key[0]}.{node.key[1]}{deps}")
         if not plan:
             self.stdout.write('(no migrations)', self.style.ERROR)

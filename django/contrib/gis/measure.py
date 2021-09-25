@@ -76,10 +76,10 @@ class MeasureBase:
             raise AttributeError('Unknown unit type: %s' % name)
 
     def __repr__(self):
-        return '%s(%s=%s)' % (pretty_name(self), self._default_unit, getattr(self, self._default_unit))
+        return f'{pretty_name(self)}({self._default_unit}={getattr(self, self._default_unit)})'
 
     def __str__(self):
-        return '%s %s' % (getattr(self, self._default_unit), self._default_unit)
+        return f'{getattr(self, self._default_unit)} {self._default_unit}'
 
     # **** Comparison methods ****
 
@@ -311,16 +311,16 @@ class Distance(MeasureBase):
                 **{self.STANDARD_UNIT: (self.standard * other)}
             )
         else:
-            raise TypeError('%(distance)s must be multiplied with number or %(distance)s' % {
-                "distance": pretty_name(self.__class__),
-            })
+            raise TypeError('{distance} must be multiplied with number or {distance}'.format(
+                distance=pretty_name(self.__class__),
+            ))
 
 
 class Area(MeasureBase):
     STANDARD_UNIT = AREA_PREFIX + Distance.STANDARD_UNIT
     # Getting the square units values and the alias dictionary.
-    UNITS = {'%s%s' % (AREA_PREFIX, k): v ** 2 for k, v in Distance.UNITS.items()}
-    ALIAS = {k: '%s%s' % (AREA_PREFIX, v) for k, v in Distance.ALIAS.items()}
+    UNITS = {f'{AREA_PREFIX}{k}': v ** 2 for k, v in Distance.UNITS.items()}
+    ALIAS = {k: f'{AREA_PREFIX}{v}' for k, v in Distance.ALIAS.items()}
     LALIAS = {k.lower(): v for k, v in ALIAS.items()}
 
     def __truediv__(self, other):

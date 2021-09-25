@@ -71,8 +71,8 @@ def _check_diff(cat_name, base_path):
     """
     Output the approximate number of changed/added strings in the en catalog.
     """
-    po_path = '%(path)s/en/LC_MESSAGES/django%(ext)s.po' % {
-        'path': base_path, 'ext': 'js' if cat_name.endswith('-js') else ''}
+    po_path = '{path}/en/LC_MESSAGES/django{ext}.po'.format(
+        path=base_path, ext='js' if cat_name.endswith('-js') else '')
     p = run("git diff -U0 %s | egrep '^[-+]msgid' | wc -l" % po_path,
             capture_output=True, shell=True)
     num_changes = int(p.stdout.strip())
@@ -129,7 +129,7 @@ def lang_stats(resources=None, languages=None):
             )
             if p.returncode == 0:
                 # msgfmt output stats on stderr
-                print('%s: %s' % (lang, p.stderr.strip()))
+                print(f'{lang}: {p.stderr.strip()}')
             else:
                 print(
                     'Errors happened when checking %s translation for %s:\n%s'
@@ -156,11 +156,11 @@ def fetch(resources=None, languages=None):
 
         # msgcat to wrap lines and msgfmt for compilation of .mo file
         for lang in target_langs:
-            po_path = '%(path)s/%(lang)s/LC_MESSAGES/django%(ext)s.po' % {
-                'path': dir_, 'lang': lang, 'ext': 'js' if name.endswith('-js') else ''}
+            po_path = '{path}/{lang}/LC_MESSAGES/django{ext}.po'.format(
+                path=dir_, lang=lang, ext='js' if name.endswith('-js') else '')
             if not os.path.exists(po_path):
-                print("No %(lang)s translation for resource %(name)s" % {
-                    'lang': lang, 'name': name})
+                print("No {lang} translation for resource {name}".format(
+                    lang=lang, name=name))
                 continue
             run(['msgcat', '--no-location', '-o', po_path, po_path])
             msgfmt = run(['msgfmt', '-c', '-o', '%s.mo' % po_path[:-3], po_path])
@@ -169,7 +169,7 @@ def fetch(resources=None, languages=None):
     if errors:
         print("\nWARNING: Errors have occurred in following cases:")
         for resource, lang in errors:
-            print("\tResource %s for language %s" % (resource, lang))
+            print(f"\tResource {resource} for language {lang}")
         exit(1)
 
 

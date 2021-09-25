@@ -19,7 +19,7 @@ class BaseStaticFilesMixin:
         self.assertIn(
             text,
             self._get_file(filepath),
-            "'%s' not in '%s'" % (text, filepath),
+            f"'{text}' not in '{filepath}'",
         )
 
     def assertFileNotFound(self, filepath):

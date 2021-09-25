@@ -24,9 +24,9 @@ class HTTPSSitemapTests(SitemapTestsBase):
         response = self.client.get('/secure/sitemap-simple.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-<url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
+<url><loc>{}/location/</loc><lastmod>{}</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
-""" % (self.base_url, date.today())
+""".format(self.base_url, date.today())
         self.assertXMLEqual(response.content.decode(), expected_content)
 
 
@@ -49,7 +49,7 @@ class HTTPSDetectionSitemapTests(SitemapTestsBase):
         response = self.client.get('/simple/sitemap-simple.xml', **self.extra)
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-<url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
+<url><loc>{}/location/</loc><lastmod>{}</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
-""" % (self.base_url.replace('http://', 'https://'), date.today())
+""".format(self.base_url.replace('http://', 'https://'), date.today())
         self.assertXMLEqual(response.content.decode(), expected_content)

@@ -981,7 +981,7 @@ class RequestFactoryTest(SimpleTestCase):
         request = self.request_factory.trace(url_path)
         response = trace_view(request)
         protocol = request.META["SERVER_PROTOCOL"]
-        echoed_request_line = "TRACE {} {}".format(url_path, protocol)
+        echoed_request_line = f"TRACE {url_path} {protocol}"
         self.assertContains(response, echoed_request_line)
 
 

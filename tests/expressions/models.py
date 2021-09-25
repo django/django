@@ -17,7 +17,7 @@ class Employee(models.Model):
     manager = models.ForeignKey(Manager, models.CASCADE, null=True)
 
     def __str__(self):
-        return '%s %s' % (self.firstname, self.lastname)
+        return f'{self.firstname} {self.lastname}'
 
 
 class RemoteEmployee(Employee):
@@ -92,7 +92,7 @@ class SimulationRun(models.Model):
     midpoint = models.TimeField()
 
     def __str__(self):
-        return "%s (%s to %s)" % (self.midpoint, self.start, self.end)
+        return f"{self.midpoint} ({self.start} to {self.end})"
 
 
 class UUIDPK(models.Model):

@@ -65,7 +65,7 @@ def assert_and_parse_html(self, html, user_msg, msg):
     try:
         dom = parse_html(html)
     except HTMLParseError as e:
-        standardMsg = '%s\n%s' % (msg, e)
+        standardMsg = f'{msg}\n{e}'
         self.fail(self._formatMessage(user_msg, standardMsg))
     return dom
 
@@ -191,7 +191,7 @@ class SimpleTestCase(unittest.TestCase):
             return frozenset(connections)
         for alias in cls.databases:
             if alias not in connections:
-                message = '%s.%s.databases refers to %r which is not defined in settings.DATABASES.' % (
+                message = '{}.{}.databases refers to {!r} which is not defined in settings.DATABASES.'.format(
                     cls.__module__,
                     cls.__qualname__,
                     alias,
@@ -211,7 +211,7 @@ class SimpleTestCase(unittest.TestCase):
             connection = connections[alias]
             for name, operation in cls._disallowed_connection_methods:
                 message = cls._disallowed_database_msg % {
-                    'test': '%s.%s' % (cls.__module__, cls.__qualname__),
+                    'test': f'{cls.__module__}.{cls.__qualname__}',
                     'alias': alias,
                     'operation': operation,
                 }
@@ -389,7 +389,7 @@ class SimpleTestCase(unittest.TestCase):
 
         self.assertURLEqual(
             url, expected_url,
-            msg_prefix + "Response redirected to '%s', expected '%s'" % (url, expected_url)
+            msg_prefix + f"Response redirected to '{url}', expected '{expected_url}'"
         )
 
     def assertURLEqual(self, url1, url2, msg_prefix=''):
@@ -409,7 +409,7 @@ class SimpleTestCase(unittest.TestCase):
 
         self.assertEqual(
             normalize(url1), normalize(url2),
-            msg_prefix + "Expected '%s' to equal '%s'." % (url1, url2)
+            msg_prefix + f"Expected '{url1}' to equal '{url2}'."
         )
 
     def _assert_contains(self, response, text, status_code, msg_prefix, html):
@@ -801,7 +801,7 @@ class SimpleTestCase(unittest.TestCase):
         dom2 = assert_and_parse_html(self, html2, msg, 'Second argument is not valid HTML:')
 
         if dom1 != dom2:
-            standardMsg = '%s != %s' % (
+            standardMsg = '{} != {}'.format(
                 safe_repr(dom1, True), safe_repr(dom2, True))
             diff = ('\n' + '\n'.join(difflib.ndiff(
                 str(dom1).splitlines(), str(dom2).splitlines(),
@@ -815,7 +815,7 @@ class SimpleTestCase(unittest.TestCase):
         dom2 = assert_and_parse_html(self, html2, msg, 'Second argument is not valid HTML:')
 
         if dom1 == dom2:
-            standardMsg = '%s == %s' % (
+            standardMsg = '{} == {}'.format(
                 safe_repr(dom1, True), safe_repr(dom2, True))
             self.fail(self._formatMessage(msg, standardMsg))
 
@@ -878,7 +878,7 @@ class SimpleTestCase(unittest.TestCase):
             self.fail(self._formatMessage(msg, standardMsg))
         else:
             if not result:
-                standardMsg = '%s != %s' % (safe_repr(xml1, True), safe_repr(xml2, True))
+                standardMsg = f'{safe_repr(xml1, True)} != {safe_repr(xml2, True)}'
                 diff = ('\n' + '\n'.join(
                     difflib.ndiff(xml1.splitlines(), xml2.splitlines())
                 ))
@@ -898,7 +898,7 @@ class SimpleTestCase(unittest.TestCase):
             self.fail(self._formatMessage(msg, standardMsg))
         else:
             if result:
-                standardMsg = '%s == %s' % (safe_repr(xml1, True), safe_repr(xml2, True))
+                standardMsg = f'{safe_repr(xml1, True)} == {safe_repr(xml2, True)}'
                 self.fail(self._formatMessage(msg, standardMsg))
 
 
@@ -1125,7 +1125,7 @@ class TestData:
         return data
 
     def __repr__(self):
-        return '<TestData: name=%r, data=%r>' % (self.name, self.data)
+        return f'<TestData: name={self.name!r}, data={self.data!r}>'
 
 
 class TestCase(TransactionTestCase):
@@ -1510,7 +1510,7 @@ class LiveServerTestCase(TransactionTestCase):
 
     @classproperty
     def live_server_url(cls):
-        return 'http://%s:%s' % (cls.host, cls.server_thread.port)
+        return f'http://{cls.host}:{cls.server_thread.port}'
 
     @classproperty
     def allowed_host(cls):

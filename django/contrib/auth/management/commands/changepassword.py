@@ -67,7 +67,7 @@ class Command(BaseCommand):
                 password_validated = True
 
         if count == MAX_TRIES:
-            raise CommandError("Aborting password change for user '%s' after %s attempts" % (u, count))
+            raise CommandError(f"Aborting password change for user '{u}' after {count} attempts")
 
         u.set_password(p1)
         u.save()

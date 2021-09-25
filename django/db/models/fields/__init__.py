@@ -183,14 +183,14 @@ class Field(RegisterLookupMixin):
         if not hasattr(self, 'model'):
             return super().__str__()
         model = self.model
-        return '%s.%s' % (model._meta.label, self.name)
+        return f'{model._meta.label}.{self.name}'
 
     def __repr__(self):
         """Display the module, class, and name of the field."""
-        path = '%s.%s' % (self.__class__.__module__, self.__class__.__qualname__)
+        path = f'{self.__class__.__module__}.{self.__class__.__qualname__}'
         name = getattr(self, 'name', None)
         if name is not None:
-            return '<%s: %s>' % (path, name)
+            return f'<{path}: {name}>'
         return '<%s>' % path
 
     def check(self, **kwargs):
@@ -490,7 +490,7 @@ class Field(RegisterLookupMixin):
                 if value is not default:
                     keywords[name] = value
         # Work out path - we shorten it for known Django core fields
-        path = "%s.%s" % (self.__class__.__module__, self.__class__.__qualname__)
+        path = f"{self.__class__.__module__}.{self.__class__.__qualname__}"
         if path.startswith("django.db.models.fields.related"):
             path = path.replace("django.db.models.fields.related", "django.db.models")
         elif path.startswith("django.db.models.fields.files"):
@@ -1402,7 +1402,7 @@ class DateTimeField(DateField):
             # time. This won't work during DST change, but we can't do much
             # about it, so we let the exceptions percolate up the call stack.
             try:
-                name = '%s.%s' % (self.model.__name__, self.name)
+                name = f'{self.model.__name__}.{self.name}'
             except AttributeError:
                 name = '(unbound)'
             warnings.warn("DateTimeField %s received a naive datetime (%s)"
@@ -1728,7 +1728,7 @@ class FloatField(Field):
             return float(value)
         except (TypeError, ValueError) as e:
             raise e.__class__(
-                "Field '%s' expected a number but got %r." % (self.name, value),
+                f"Field '{self.name}' expected a number but got {value!r}.",
             ) from e
 
     def get_internal_type(self):
@@ -1815,7 +1815,7 @@ class IntegerField(Field):
             return int(value)
         except (TypeError, ValueError) as e:
             raise e.__class__(
-                "Field '%s' expected a number but got %r." % (self.name, value),
+                f"Field '{self.name}' expected a number but got {value!r}.",
             ) from e
 
     def get_internal_type(self):

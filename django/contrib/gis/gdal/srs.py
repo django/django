@@ -351,4 +351,4 @@ class CoordTransform(GDALBase):
         self._srs2_name = target.name
 
     def __str__(self):
-        return 'Transform from "%s" to "%s"' % (self._srs1_name, self._srs2_name)
+        return f'Transform from "{self._srs1_name}" to "{self._srs2_name}"'

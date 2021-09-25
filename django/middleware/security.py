@@ -25,7 +25,7 @@ class SecurityMiddleware(MiddlewareMixin):
                         for pattern in self.redirect_exempt)):
             host = self.redirect_host or request.get_host()
             return HttpResponsePermanentRedirect(
-                "https://%s%s" % (host, request.get_full_path())
+                f"https://{host}{request.get_full_path()}"
             )
 
     def process_response(self, request, response):

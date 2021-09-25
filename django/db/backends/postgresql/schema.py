@@ -115,7 +115,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         serial_fields_map = {'bigserial': 'bigint', 'serial': 'integer', 'smallserial': 'smallint'}
         if new_type.lower() in serial_fields_map:
             column = strip_quotes(new_field.column)
-            sequence_name = "%s_%s_seq" % (table, column)
+            sequence_name = f"{table}_{column}_seq"
             return (
                 (
                     self.sql_alter_column_type % {
@@ -168,7 +168,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         elif old_field.db_parameters(connection=self.connection)['type'] in serial_fields_map:
             # Drop the sequence if migrating away from AutoField.
             column = strip_quotes(new_field.column)
-            sequence_name = '%s_%s_seq' % (table, column)
+            sequence_name = f'{table}_{column}_seq'
             fragment, _ = super()._alter_column_type_sql(model, old_field, new_field, new_type)
             return fragment, [
                 (

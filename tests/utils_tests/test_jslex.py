@@ -133,7 +133,7 @@ class JsTokensTest(SimpleTestCase):
 def make_function(input, toks):
     def test_func(self):
         lexer = JsLexer()
-        result = ["%s %s" % (name, tok) for name, tok in lexer.lex(input) if name != 'ws']
+        result = [f"{name} {tok}" for name, tok in lexer.lex(input) if name != 'ws']
         self.assertEqual(result, toks)
     return test_func
 

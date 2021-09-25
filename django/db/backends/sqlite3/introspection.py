@@ -143,7 +143,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             m = re.search(r'references (\S*) ?\(["|]?(.*)["|]?\)', field_desc, re.I)
             if not m:
                 continue
-            table, column = [s.strip('"') for s in m.groups()]
+            table, column = (s.strip('"') for s in m.groups())
 
             if field_desc.startswith("FOREIGN KEY"):
                 # Find name of the target FK field
@@ -367,7 +367,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # Find inline check constraints.
         try:
             table_schema = cursor.execute(
-                "SELECT sql FROM sqlite_master WHERE type='table' and name=%s" % (
+                "SELECT sql FROM sqlite_master WHERE type='table' and name={}".format(
                     self.connection.ops.quote_name(table_name),
                 )
             ).fetchone()[0]

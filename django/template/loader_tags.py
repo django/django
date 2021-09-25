@@ -46,7 +46,7 @@ class BlockNode(Node):
         self.name, self.nodelist, self.parent = name, nodelist, parent
 
     def __repr__(self):
-        return "<Block Node: %s. Contents: %r>" % (self.name, self.nodelist)
+        return f"<Block Node: {self.name}. Contents: {self.nodelist!r}>"
 
     def render(self, context):
         block_context = context.render_context.get(BLOCK_CONTEXT_KEY)
@@ -91,7 +91,7 @@ class ExtendsNode(Node):
         self.blocks = {n.name: n for n in nodelist.get_nodes_by_type(BlockNode)}
 
     def __repr__(self):
-        return '<%s: extends %s>' % (self.__class__.__name__, self.parent_name.token)
+        return f'<{self.__class__.__name__}: extends {self.parent_name.token}>'
 
     def find_template(self, template_name, context):
         """
@@ -215,7 +215,7 @@ def do_block(parser, token):
     # check for duplication.
     try:
         if block_name in parser.__loaded_blocks:
-            raise TemplateSyntaxError("'%s' tag with name '%s' appears more than once" % (bits[0], block_name))
+            raise TemplateSyntaxError(f"'{bits[0]}' tag with name '{block_name}' appears more than once")
         parser.__loaded_blocks.append(block_name)
     except AttributeError:  # parser.__loaded_blocks isn't a list yet
         parser.__loaded_blocks = [block_name]

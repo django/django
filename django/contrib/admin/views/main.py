@@ -109,7 +109,7 @@ class ChangeList:
         self.pk_attname = self.lookup_opts.pk.attname
 
     def __repr__(self):
-        return '<%s: model=%s model_admin=%s>' % (
+        return '<{}: model={} model_admin={}>'.format(
             self.__class__.__qualname__,
             self.model.__qualname__,
             self.model_admin.__class__.__qualname__,
@@ -533,7 +533,7 @@ class ChangeList:
 
     def url_for_result(self, result):
         pk = getattr(result, self.pk_attname)
-        return reverse('admin:%s_%s_change' % (self.opts.app_label,
-                                               self.opts.model_name),
+        return reverse('admin:{}_{}_change'.format(self.opts.app_label,
+                                                   self.opts.model_name),
                        args=(quote(pk),),
                        current_app=self.model_admin.admin_site.name)

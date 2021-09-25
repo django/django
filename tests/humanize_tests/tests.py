@@ -37,7 +37,7 @@ class HumanizeTests(SimpleTestCase):
                 self.assertEqual(
                     rendered,
                     normalize_result_func(result),
-                    msg="%s test failed, produced '%s', should've produced '%s'" % (method, rendered, result)
+                    msg=f"{method} test failed, produced '{rendered}', should've produced '{result}'"
                 )
 
     def test_ordinal(self):

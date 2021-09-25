@@ -87,8 +87,8 @@ class DeconstructableSerializer(BaseSerializer):
         for kw, arg in sorted(kwargs.items()):
             arg_string, arg_imports = serializer_factory(arg).serialize()
             imports.update(arg_imports)
-            strings.append("%s=%s" % (kw, arg_string))
-        return "%s(%s)" % (name, ", ".join(strings)), imports
+            strings.append(f"{kw}={arg_string}")
+        return "{}({})".format(name, ", ".join(strings)), imports
 
     @staticmethod
     def _serialize_path(path):
@@ -115,7 +115,7 @@ class DictionarySerializer(BaseSerializer):
             imports.update(k_imports)
             imports.update(v_imports)
             strings.append((k_string, v_string))
-        return "{%s}" % (", ".join("%s: %s" % (k, v) for k, v in strings)), imports
+        return "{%s}" % (", ".join(f"{k}: {v}" for k, v in strings)), imports
 
 
 class EnumSerializer(BaseSerializer):
@@ -123,7 +123,7 @@ class EnumSerializer(BaseSerializer):
         enum_class = self.value.__class__
         module = enum_class.__module__
         return (
-            '%s.%s[%r]' % (module, enum_class.__qualname__, self.value.name),
+            f'{module}.{enum_class.__qualname__}[{self.value.name!r}]',
             {'import %s' % module},
         )
 
@@ -131,7 +131,7 @@ class EnumSerializer(BaseSerializer):
 class FloatSerializer(BaseSimpleSerializer):
     def serialize(self):
         if math.isnan(self.value) or math.isinf(self.value):
-            return 'float("{}")'.format(self.value), set()
+            return f'float("{self.value}")', set()
         return super().serialize()
 
 
@@ -145,7 +145,7 @@ class FunctionTypeSerializer(BaseSerializer):
         if getattr(self.value, "__self__", None) and isinstance(self.value.__self__, type):
             klass = self.value.__self__
             module = klass.__module__
-            return "%s.%s.%s" % (module, klass.__name__, self.value.__name__), {"import %s" % module}
+            return f"{module}.{klass.__name__}.{self.value.__name__}", {"import %s" % module}
         # Further error checking
         if self.value.__name__ == '<lambda>':
             raise ValueError("Cannot serialize function: lambda")
@@ -155,10 +155,10 @@ class FunctionTypeSerializer(BaseSerializer):
         module_name = self.value.__module__
 
         if '<' not in self.value.__qualname__:  # Qualname can include <locals>
-            return '%s.%s' % (module_name, self.value.__qualname__), {'import %s' % self.value.__module__}
+            return f'{module_name}.{self.value.__qualname__}', {'import %s' % self.value.__module__}
 
         raise ValueError(
-            'Could not find function %s in %s.\n' % (self.value.__name__, module_name)
+            f'Could not find function {self.value.__name__} in {module_name}.\n'
         )
 
 
@@ -171,7 +171,7 @@ class FunctoolsPartialSerializer(BaseSerializer):
         # Add any imports needed by arguments
         imports = {'import functools', *func_imports, *args_imports, *keywords_imports}
         return (
-            'functools.%s(%s, *%s, **%s)' % (
+            'functools.{}({}, *{}, **{})'.format(
                 self.value.__class__.__name__,
                 func_string,
                 args_string,
@@ -229,7 +229,7 @@ class PathSerializer(BaseSerializer):
         # Convert concrete paths to pure paths to avoid issues with migrations
         # generated on one platform being used on a different platform.
         prefix = 'Pure' if isinstance(self.value, pathlib.Path) else ''
-        return 'pathlib.%s%r' % (prefix, self.value), {'import pathlib'}
+        return f'pathlib.{prefix}{self.value!r}', {'import pathlib'}
 
 
 class RegexSerializer(BaseSerializer):
@@ -284,7 +284,7 @@ class TypeSerializer(BaseSerializer):
             if module == builtins.__name__:
                 return self.value.__name__, set()
             else:
-                return "%s.%s" % (module, self.value.__qualname__), {"import %s" % module}
+                return f"{module}.{self.value.__qualname__}", {"import %s" % module}
 
 
 class UUIDSerializer(BaseSerializer):

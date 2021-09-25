@@ -125,9 +125,9 @@ class Command(BaseCommand):
                             else table2model(relations[column_name][1])
                         )
                         if rel_to in known_models:
-                            field_type = '%s(%s' % (rel_type, rel_to)
+                            field_type = f'{rel_type}({rel_to}'
                         else:
-                            field_type = "%s('%s'" % (rel_type, rel_to)
+                            field_type = f"{rel_type}('{rel_to}'"
                     else:
                         # Calling `get_field_type` to get the field type string and any
                         # additional parameters and notes.
@@ -151,7 +151,7 @@ class Command(BaseCommand):
                         extra_params['blank'] = True
                         extra_params['null'] = True
 
-                    field_desc = '%s = %s%s' % (
+                    field_desc = '{} = {}{}'.format(
                         att_name,
                         # Custom fields will have a dotted path
                         '' if '.' in field_type else 'models.',
@@ -163,7 +163,7 @@ class Command(BaseCommand):
                     if extra_params:
                         if not field_desc.endswith('('):
                             field_desc += ', '
-                        field_desc += ', '.join('%s=%r' % (k, v) for k, v in extra_params.items())
+                        field_desc += ', '.join(f'{k}={v!r}' for k, v in extra_params.items())
                     field_desc += ')'
                     if comment_notes:
                         field_desc += '  # ' + ' '.join(comment_notes)

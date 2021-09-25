@@ -172,10 +172,10 @@ class Command(BaseCommand):
             if squashed_name:
                 # Use the name from --squashed-name.
                 prefix, _ = start_migration.name.split('_', 1)
-                name = '%s_%s' % (prefix, squashed_name)
+                name = f'{prefix}_{squashed_name}'
             else:
                 # Generate a name.
-                name = '%s_squashed_%s' % (start_migration.name, migration.name)
+                name = f'{start_migration.name}_squashed_{migration.name}'
             new_migration = subclass(name, app_label)
         else:
             name = '0001_%s' % (squashed_name or 'squashed_%s' % migration.name)

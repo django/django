@@ -40,7 +40,7 @@ def deconstructible(*args, path=None):
                     "https://docs.djangoproject.com/en/%s/topics/migrations/#serializing-values"
                     % (name, module_name, get_docs_version()))
             return (
-                path or '%s.%s' % (obj.__class__.__module__, name),
+                path or f'{obj.__class__.__module__}.{name}',
                 obj._constructor_args[0],
                 obj._constructor_args[1],
             )

@@ -186,7 +186,7 @@ def templatize(src, origin=None):
                         ))
                         message_context = None
                     else:
-                        out.write(' gettext({p}{!r}) '.format(g, p=raw_prefix))
+                        out.write(f' gettext({raw_prefix}{g!r}) ')
                 elif bmatch:
                     for fmatch in constant_re.findall(t.contents):
                         out.write(' _(%s) ' % fmatch)

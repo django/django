@@ -71,7 +71,7 @@ class SpatialProxy(DeferredAttribute):
             # Set geometries with None, WKT, HEX, or WKB
             pass
         else:
-            raise TypeError('Cannot set %s SpatialProxy (%s) with value of type: %s' % (
+            raise TypeError('Cannot set {} SpatialProxy ({}) with value of type: {}'.format(
                 instance.__class__.__name__, gtype, type(value)))
 
         # Setting the objects dictionary with the value, and returning.

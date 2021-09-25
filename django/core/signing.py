@@ -153,14 +153,14 @@ class Signer:
                 'Unsafe Signer separator: %r (cannot be empty or consist of '
                 'only A-z0-9-_=)' % sep,
             )
-        self.salt = salt or '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
+        self.salt = salt or f'{self.__class__.__module__}.{self.__class__.__name__}'
         self.algorithm = algorithm or 'sha256'
 
     def signature(self, value):
         return base64_hmac(self.salt + 'signer', value, self.key, algorithm=self.algorithm)
 
     def sign(self, value):
-        return '%s%s%s' % (value, self.sep, self.signature(value))
+        return f'{value}{self.sep}{self.signature(value)}'
 
     def unsign(self, signed_value):
         if self.sep not in signed_value:
@@ -215,7 +215,7 @@ class TimestampSigner(Signer):
         return b62_encode(int(time.time()))
 
     def sign(self, value):
-        value = '%s%s%s' % (value, self.sep, self.timestamp())
+        value = f'{value}{self.sep}{self.timestamp()}'
         return super().sign(value)
 
     def unsign(self, value, max_age=None):
@@ -233,5 +233,5 @@ class TimestampSigner(Signer):
             age = time.time() - timestamp
             if age > max_age:
                 raise SignatureExpired(
-                    'Signature age %s > %s seconds' % (age, max_age))
+                    f'Signature age {age} > {max_age} seconds')
         return value

@@ -87,13 +87,13 @@ END;
             return "TO_CHAR(%s, 'IYYY')" % field_name
         else:
             # https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf/EXTRACT-datetime.html
-            return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
+            return f"EXTRACT({lookup_type.upper()} FROM {field_name})"
 
     def date_trunc_sql(self, lookup_type, field_name, tzname=None):
         field_name = self._convert_field_to_tz(field_name, tzname)
         # https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf/ROUND-and-TRUNC-Date-Functions.html
         if lookup_type in ('year', 'month'):
-            return "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
+            return f"TRUNC({field_name}, '{lookup_type.upper()}')"
         elif lookup_type == 'quarter':
             return "TRUNC(%s, 'Q')" % field_name
         elif lookup_type == 'week':
@@ -123,7 +123,7 @@ END;
         # TIMESTAMP WITH TIME ZONE and cast it back to TIMESTAMP to strip the
         # TIME ZONE details.
         if self.connection.timezone_name != tzname:
-            return "CAST((FROM_TZ(%s, '%s') AT TIME ZONE '%s') AS TIMESTAMP)" % (
+            return "CAST((FROM_TZ({}, '{}') AT TIME ZONE '{}') AS TIMESTAMP)".format(
                 field_name,
                 self.connection.timezone_name,
                 self._prepare_tzname_delta(tzname),
@@ -141,7 +141,7 @@ END;
             "TO_TIMESTAMP(CONCAT('1900-01-01 ', TO_CHAR(%s, 'HH24:MI:SS.FF')), "
             "'YYYY-MM-DD HH24:MI:SS.FF')"
         ) % self._convert_field_to_tz(field_name, tzname)
-        return "CASE WHEN %s IS NOT NULL THEN %s ELSE NULL END" % (
+        return "CASE WHEN {} IS NOT NULL THEN {} ELSE NULL END".format(
             field_name, convert_datetime_sql,
         )
 
@@ -153,7 +153,7 @@ END;
         field_name = self._convert_field_to_tz(field_name, tzname)
         # https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf/ROUND-and-TRUNC-Date-Functions.html
         if lookup_type in ('year', 'month'):
-            sql = "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
+            sql = f"TRUNC({field_name}, '{lookup_type.upper()}')"
         elif lookup_type == 'quarter':
             sql = "TRUNC(%s, 'Q')" % field_name
         elif lookup_type == 'week':
@@ -360,12 +360,12 @@ END;
         field_names = []
         params = []
         for field in fields:
-            field_names.append('%s.%s' % (
+            field_names.append('{}.{}'.format(
                 self.quote_name(field.model._meta.db_table),
                 self.quote_name(field.column),
             ))
             params.append(InsertVar(field))
-        return 'RETURNING %s INTO %s' % (
+        return 'RETURNING {} INTO {}'.format(
             ', '.join(field_names),
             ', '.join(['%s'] * len(params)),
         ), tuple(params)
@@ -425,7 +425,7 @@ END;
                     truncated_tables.add(foreign_table)
                 constraints.add((foreign_table, constraint))
         sql = [
-            '%s %s %s %s %s %s %s %s;' % (
+            '{} {} {} {} {} {} {} {};'.format(
                 style.SQL_KEYWORD('ALTER'),
                 style.SQL_KEYWORD('TABLE'),
                 style.SQL_FIELD(self.quote_name(table)),
@@ -436,13 +436,13 @@ END;
                 style.SQL_KEYWORD('INDEX'),
             ) for table, constraint in constraints
         ] + [
-            '%s %s %s;' % (
+            '{} {} {};'.format(
                 style.SQL_KEYWORD('TRUNCATE'),
                 style.SQL_KEYWORD('TABLE'),
                 style.SQL_FIELD(self.quote_name(table)),
             ) for table in truncated_tables
         ] + [
-            '%s %s %s %s %s %s;' % (
+            '{} {} {} {} {} {};'.format(
                 style.SQL_KEYWORD('ALTER'),
                 style.SQL_KEYWORD('TABLE'),
                 style.SQL_FIELD(self.quote_name(table)),
@@ -571,11 +571,11 @@ END;
         elif connector == '&':
             return 'BITAND(%s)' % ','.join(sub_expressions)
         elif connector == '|':
-            return 'BITAND(-%(lhs)s-1,%(rhs)s)+%(lhs)s' % {'lhs': lhs, 'rhs': rhs}
+            return 'BITAND(-{lhs}-1,{rhs})+{lhs}'.format(lhs=lhs, rhs=rhs)
         elif connector == '<<':
-            return '(%(lhs)s * POWER(2, %(rhs)s))' % {'lhs': lhs, 'rhs': rhs}
+            return f'({lhs} * POWER(2, {rhs}))'
         elif connector == '>>':
-            return 'FLOOR(%(lhs)s / POWER(2, %(rhs)s))' % {'lhs': lhs, 'rhs': rhs}
+            return f'FLOOR({lhs} / POWER(2, {rhs}))'
         elif connector == '^':
             return 'POWER(%s)' % ','.join(sub_expressions)
         elif connector == '#':
@@ -612,7 +612,7 @@ END;
                 # column ambiguously defined" when two or more columns in the
                 # first select have the same value.
                 if not query:
-                    placeholder = '%s col_%s' % (placeholder, i)
+                    placeholder = f'{placeholder} col_{i}'
                 select.append(placeholder)
             query.append('SELECT %s FROM DUAL' % ', '.join(select))
         # Bulk insert to tables with Oracle identity columns causes Oracle to
@@ -625,7 +625,7 @@ END;
             lhs_sql, lhs_params = lhs
             rhs_sql, rhs_params = rhs
             params = (*lhs_params, *rhs_params)
-            return "NUMTODSINTERVAL(TO_NUMBER(%s - %s), 'DAY')" % (lhs_sql, rhs_sql), params
+            return f"NUMTODSINTERVAL(TO_NUMBER({lhs_sql} - {rhs_sql}), 'DAY')", params
         return super().subtract_temporals(internal_type, lhs, rhs)
 
     def bulk_batch_size(self, fields, objs):

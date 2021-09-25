@@ -332,7 +332,7 @@ class InLookupTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         for i in range(1, 3):
-            group = Group.objects.create(name='Group {}'.format(i))
+            group = Group.objects.create(name=f'Group {i}')
         cls.e1 = Event.objects.create(title='Event 1', group=group)
 
     def test_in_lookup_queryset_evaluation(self):

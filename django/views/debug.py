@@ -110,7 +110,7 @@ class SafeExceptionReporterFilter:
         elif isinstance(value, list):
             cleansed = [self.cleanse_setting('', v) for v in value]
         elif isinstance(value, tuple):
-            cleansed = tuple([self.cleanse_setting('', v) for v in value])
+            cleansed = tuple(self.cleanse_setting('', v) for v in value)
         else:
             cleansed = value
 
@@ -193,7 +193,7 @@ class SafeExceptionReporterFilter:
             # MultiValueDicts will have a return value.
             is_multivalue_dict = isinstance(value, MultiValueDict)
         except Exception as e:
-            return '{!r} while evaluating {!r}'.format(e, value)
+            return f'{e!r} while evaluating {value!r}'
 
         if is_multivalue_dict:
             # Cleanse MultiValueDicts (request.POST is the one we usually care about)
@@ -553,7 +553,7 @@ def technical_404_response(request, exception):
 
         if hasattr(obj, '__module__'):
             module = obj.__module__
-            caller = '%s.%s' % (module, caller)
+            caller = f'{module}.{caller}'
 
     with builtin_template_path('technical_404.html').open(encoding='utf-8') as fh:
         t = DEBUG_ENGINE.from_string(fh.read())

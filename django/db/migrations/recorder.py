@@ -38,7 +38,7 @@ class MigrationRecorder:
                     db_table = 'django_migrations'
 
                 def __str__(self):
-                    return 'Migration %s for %s' % (self.name, self.app)
+                    return f'Migration {self.name} for {self.app}'
 
             cls._migration_class = Migration
         return cls._migration_class

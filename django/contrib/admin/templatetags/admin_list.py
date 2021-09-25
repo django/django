@@ -113,7 +113,7 @@ def result_headers(cl):
             continue
 
         # OK, it is sortable if we got this far
-        th_classes = ['sortable', 'column-{}'.format(field_name)]
+        th_classes = ['sortable', f'column-{field_name}']
         order_type = ''
         new_order_type = 'asc'
         sort_priority = 0

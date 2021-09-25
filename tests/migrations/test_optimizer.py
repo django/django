@@ -29,11 +29,11 @@ class OptimizerTests(SimpleTestCase):
         self.assertEqual(expected, result)
         if exact is not None and iterations != exact:
             raise self.failureException(
-                "Optimization did not take exactly %s iterations (it took %s)" % (exact, iterations)
+                f"Optimization did not take exactly {exact} iterations (it took {iterations})"
             )
         if less_than is not None and iterations >= less_than:
             raise self.failureException(
-                "Optimization did not take less than %s iterations (it took %s)" % (less_than, iterations)
+                f"Optimization did not take less than {less_than} iterations (it took {iterations})"
             )
 
     def assertDoesNotOptimize(self, operations, **kwargs):

@@ -40,7 +40,7 @@ class Waiter(models.Model):
     name = models.CharField(max_length=50)
 
     def __str__(self):
-        return "%s the waiter at %s" % (self.name, self.restaurant)
+        return f"{self.name} the waiter at {self.restaurant}"
 
 
 class Favorites(models.Model):

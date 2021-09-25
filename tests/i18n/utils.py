@@ -17,11 +17,11 @@ class POFileAssertionMixin:
         if use_quotes:
             expected_value = '"%s"' % expected_value
             q = "'"
-        needle = '%s %s' % (keyword, expected_value)
+        needle = f'{keyword} {expected_value}'
         expected_value = re.escape(expected_value)
         return self.assertTrue(
-            re.search('^%s %s' % (keyword, expected_value), haystack, re.MULTILINE),
-            'Could not find %(q)s%(n)s%(q)s in generated PO file' % {'n': needle, 'q': q}
+            re.search(f'^{keyword} {expected_value}', haystack, re.MULTILINE),
+            'Could not find {q}{n}{q} in generated PO file'.format(n=needle, q=q)
         )
 
     def assertMsgId(self, msgid, haystack, use_quotes=True):

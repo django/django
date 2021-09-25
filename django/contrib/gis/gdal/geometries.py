@@ -145,7 +145,7 @@ class OGRGeometry(GDALBase):
     def from_bbox(cls, bbox):
         "Construct a Polygon from a bounding box (4-tuple)."
         x0, y0, x1, y1 = bbox
-        return OGRGeometry('POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' % (
+        return OGRGeometry('POLYGON(({} {}, {} {}, {} {}, {} {}, {} {}))'.format(
             x0, y0, x0, y1, x1, y1, x1, y0, x0, y0))
 
     @staticmethod
@@ -361,7 +361,7 @@ class OGRGeometry(GDALBase):
         "Return the EWKT representation of the Geometry."
         srs = self.srs
         if srs and srs.srid:
-            return 'SRID=%s;%s' % (srs.srid, self.wkt)
+            return f'SRID={srs.srid};{self.wkt}'
         else:
             return self.wkt
 

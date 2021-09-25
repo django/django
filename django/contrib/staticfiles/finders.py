@@ -120,7 +120,7 @@ class FileSystemFinder(BaseFinder):
         absolute path (or ``None`` if no match).
         """
         if prefix:
-            prefix = '%s%s' % (prefix, os.sep)
+            prefix = f'{prefix}{os.sep}'
             if not path.startswith(prefix):
                 return None
             path = path[len(prefix):]

@@ -587,11 +587,11 @@ class LoginTest(AuthViewsTestCase):
         )
         for bad_url in bad_urls:
             with self.subTest(bad_url=bad_url):
-                nasty_url = '%(url)s?%(next)s=%(bad_url)s' % {
-                    'url': login_url,
-                    'next': REDIRECT_FIELD_NAME,
-                    'bad_url': quote(bad_url),
-                }
+                nasty_url = '{url}?{next}={bad_url}'.format(
+                    url=login_url,
+                    next=REDIRECT_FIELD_NAME,
+                    bad_url=quote(bad_url),
+                )
                 response = self.client.post(nasty_url, {
                     'username': 'testclient',
                     'password': 'password',
@@ -612,11 +612,11 @@ class LoginTest(AuthViewsTestCase):
         )
         for good_url in good_urls:
             with self.subTest(good_url=good_url):
-                safe_url = '%(url)s?%(next)s=%(good_url)s' % {
-                    'url': login_url,
-                    'next': REDIRECT_FIELD_NAME,
-                    'good_url': quote(good_url),
-                }
+                safe_url = '{url}?{next}={good_url}'.format(
+                    url=login_url,
+                    next=REDIRECT_FIELD_NAME,
+                    good_url=quote(good_url),
+                )
                 response = self.client.post(safe_url, {
                     'username': 'testclient',
                     'password': 'password',
@@ -627,11 +627,11 @@ class LoginTest(AuthViewsTestCase):
     def test_security_check_https(self):
         login_url = reverse('login')
         non_https_next_url = 'http://testserver/path'
-        not_secured_url = '%(url)s?%(next)s=%(next_url)s' % {
-            'url': login_url,
-            'next': REDIRECT_FIELD_NAME,
-            'next_url': quote(non_https_next_url),
-        }
+        not_secured_url = '{url}?{next}={next_url}'.format(
+            url=login_url,
+            next=REDIRECT_FIELD_NAME,
+            next_url=quote(non_https_next_url),
+        )
         post_data = {
             'username': 'testclient',
             'password': 'password',
@@ -1077,11 +1077,11 @@ class LogoutTest(AuthViewsTestCase):
         )
         for bad_url in bad_urls:
             with self.subTest(bad_url=bad_url):
-                nasty_url = '%(url)s?%(next)s=%(bad_url)s' % {
-                    'url': logout_url,
-                    'next': REDIRECT_FIELD_NAME,
-                    'bad_url': quote(bad_url),
-                }
+                nasty_url = '{url}?{next}={bad_url}'.format(
+                    url=logout_url,
+                    next=REDIRECT_FIELD_NAME,
+                    bad_url=quote(bad_url),
+                )
                 self.login()
                 response = self.client.get(nasty_url)
                 self.assertEqual(response.status_code, 302)
@@ -1101,11 +1101,11 @@ class LogoutTest(AuthViewsTestCase):
         )
         for good_url in good_urls:
             with self.subTest(good_url=good_url):
-                safe_url = '%(url)s?%(next)s=%(good_url)s' % {
-                    'url': logout_url,
-                    'next': REDIRECT_FIELD_NAME,
-                    'good_url': quote(good_url),
-                }
+                safe_url = '{url}?{next}={good_url}'.format(
+                    url=logout_url,
+                    next=REDIRECT_FIELD_NAME,
+                    good_url=quote(good_url),
+                )
                 self.login()
                 response = self.client.get(safe_url)
                 self.assertEqual(response.status_code, 302)
@@ -1115,11 +1115,11 @@ class LogoutTest(AuthViewsTestCase):
     def test_security_check_https(self):
         logout_url = reverse('logout')
         non_https_next_url = 'http://testserver/'
-        url = '%(url)s?%(next)s=%(next_url)s' % {
-            'url': logout_url,
-            'next': REDIRECT_FIELD_NAME,
-            'next_url': quote(non_https_next_url),
-        }
+        url = '{url}?{next}={next_url}'.format(
+            url=logout_url,
+            next=REDIRECT_FIELD_NAME,
+            next_url=quote(non_https_next_url),
+        )
         self.login()
         response = self.client.get(url, secure=True)
         self.assertRedirects(response, logout_url, fetch_redirect_response=False)

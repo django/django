@@ -62,7 +62,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # character.
             return "X'%s'" % value.hex()
         else:
-            raise ValueError("Cannot quote parameter value %r of type %s" % (value, type(value)))
+            raise ValueError(f"Cannot quote parameter value {value!r} of type {type(value)}")
 
     def _is_referenced_by_fk_constraint(self, table_name, column_name=None, ignore_self=False):
         """
@@ -197,10 +197,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             mapping.pop(old_field.column, None)
             body[new_field.name] = new_field
             if old_field.null and not new_field.null:
-                case_sql = "coalesce(%(col)s, %(default)s)" % {
-                    'col': self.quote_name(old_field.column),
-                    'default': self.quote_value(self.effective_default(new_field))
-                }
+                case_sql = "coalesce({col}, {default})".format(
+                    col=self.quote_name(old_field.column),
+                    default=self.quote_value(self.effective_default(new_field))
+                )
                 mapping[new_field.column] = case_sql
             else:
                 mapping[new_field.column] = self.quote_name(old_field.column)
@@ -282,7 +282,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self.create_model(new_model)
 
         # Copy data from the old table into the new table
-        self.execute("INSERT INTO %s (%s) SELECT %s FROM %s" % (
+        self.execute("INSERT INTO {} ({}) SELECT {} FROM {}".format(
             self.quote_name(new_model._meta.db_table),
             ', '.join(self.quote_name(x) for x in mapping),
             ', '.join(mapping.values()),
@@ -401,7 +401,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Make a new through table
         self.create_model(new_field.remote_field.through)
         # Copy the data across
-        self.execute("INSERT INTO %s (%s) SELECT %s FROM %s" % (
+        self.execute("INSERT INTO {} ({}) SELECT {} FROM {}".format(
             self.quote_name(new_field.remote_field.through._meta.db_table),
             ', '.join([
                 "id",

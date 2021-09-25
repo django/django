@@ -53,7 +53,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "TRUNCATE(YEARWEEK(%s, 3), -2) / 100" % field_name
         else:
             # EXTRACT returns 1-53 based on ISO-8601 for the week number.
-            return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
+            return f"EXTRACT({lookup_type.upper()} FROM {field_name})"
 
     def date_trunc_sql(self, lookup_type, field_name, tzname=None):
         field_name = self._convert_field_to_tz(field_name, tzname)
@@ -63,13 +63,13 @@ class DatabaseOperations(BaseDatabaseOperations):
         }  # Use double percents to escape.
         if lookup_type in fields:
             format_str = fields[lookup_type]
-            return "CAST(DATE_FORMAT(%s, '%s') AS DATE)" % (field_name, format_str)
+            return f"CAST(DATE_FORMAT({field_name}, '{format_str}') AS DATE)"
         elif lookup_type == 'quarter':
-            return "MAKEDATE(YEAR(%s), 1) + INTERVAL QUARTER(%s) QUARTER - INTERVAL 1 QUARTER" % (
+            return "MAKEDATE(YEAR({}), 1) + INTERVAL QUARTER({}) QUARTER - INTERVAL 1 QUARTER".format(
                 field_name, field_name
             )
         elif lookup_type == 'week':
-            return "DATE_SUB(%s, INTERVAL WEEKDAY(%s) DAY)" % (
+            return "DATE_SUB({}, INTERVAL WEEKDAY({}) DAY)".format(
                 field_name, field_name
             )
         else:
@@ -84,7 +84,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def _convert_field_to_tz(self, field_name, tzname):
         if tzname and settings.USE_TZ and self.connection.timezone_name != tzname:
-            field_name = "CONVERT_TZ(%s, '%s', '%s')" % (
+            field_name = "CONVERT_TZ({}, '{}', '{}')".format(
                 field_name,
                 self.connection.timezone_name,
                 self._prepare_tzname_delta(tzname),
@@ -126,7 +126,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             sql = field_name
         else:
             format_str = ''.join(format[:i] + format_def[i:])
-            sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
+            sql = f"CAST(DATE_FORMAT({field_name}, '{format_str}') AS DATETIME)"
         return sql
 
     def time_trunc_sql(self, lookup_type, field_name, tzname=None):
@@ -138,7 +138,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         }  # Use double percents to escape.
         if lookup_type in fields:
             format_str = fields[lookup_type]
-            return "CAST(DATE_FORMAT(%s, '%s') AS TIME)" % (field_name, format_str)
+            return f"CAST(DATE_FORMAT({field_name}, '{format_str}') AS TIME)"
         else:
             return "TIME(%s)" % (field_name)
 
@@ -185,7 +185,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if not fields:
             return '', ()
         columns = [
-            '%s.%s' % (
+            '{}.{}'.format(
                 self.quote_name(field.model._meta.db_table),
                 self.quote_name(field.column),
             ) for field in fields
@@ -201,7 +201,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             # It's faster to TRUNCATE tables that require a sequence reset
             # since ALTER TABLE AUTO_INCREMENT is slower than TRUNCATE.
             sql.extend(
-                '%s %s;' % (
+                '{} {};'.format(
                     style.SQL_KEYWORD('TRUNCATE'),
                     style.SQL_FIELD(self.quote_name(table_name)),
                 ) for table_name in tables
@@ -210,7 +210,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             # Otherwise issue a simple DELETE since it's faster than TRUNCATE
             # and preserves sequences.
             sql.extend(
-                '%s %s %s;' % (
+                '{} {} {};'.format(
                     style.SQL_KEYWORD('DELETE'),
                     style.SQL_KEYWORD('FROM'),
                     style.SQL_FIELD(self.quote_name(table_name)),
@@ -221,7 +221,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def sequence_reset_by_name_sql(self, style, sequences):
         return [
-            '%s %s %s %s = 1;' % (
+            '{} {} {} {} = 1;'.format(
                 style.SQL_KEYWORD('ALTER'),
                 style.SQL_KEYWORD('TABLE'),
                 style.SQL_FIELD(self.quote_name(sequence_info['table'])),
@@ -288,7 +288,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             return 'CONVERT(%s, SIGNED)' % connector.join(sub_expressions)
         elif connector == '>>':
             lhs, rhs = sub_expressions
-            return 'FLOOR(%(lhs)s / POW(2, %(rhs)s))' % {'lhs': lhs, 'rhs': rhs}
+            return f'FLOOR({lhs} / POW(2, {rhs}))'
         return super().combine_expression(connector, sub_expressions)
 
     def get_db_converters(self, expression):
@@ -328,15 +328,15 @@ class DatabaseOperations(BaseDatabaseOperations):
             if self.connection.mysql_is_mariadb:
                 # MariaDB includes the microsecond component in TIME_TO_SEC as
                 # a decimal. MySQL returns an integer without microseconds.
-                return 'CAST((TIME_TO_SEC(%(lhs)s) - TIME_TO_SEC(%(rhs)s)) * 1000000 AS SIGNED)' % {
-                    'lhs': lhs_sql, 'rhs': rhs_sql
-                }, (*lhs_params, *rhs_params)
+                return 'CAST((TIME_TO_SEC({lhs}) - TIME_TO_SEC({rhs})) * 1000000 AS SIGNED)'.format(
+                    lhs=lhs_sql, rhs=rhs_sql
+                ), (*lhs_params, *rhs_params)
             return (
                 "((TIME_TO_SEC(%(lhs)s) * 1000000 + MICROSECOND(%(lhs)s)) -"
                 " (TIME_TO_SEC(%(rhs)s) * 1000000 + MICROSECOND(%(rhs)s)))"
             ) % {'lhs': lhs_sql, 'rhs': rhs_sql}, tuple(lhs_params) * 2 + tuple(rhs_params) * 2
         params = (*rhs_params, *lhs_params)
-        return "TIMESTAMPDIFF(MICROSECOND, %s, %s)" % (rhs_sql, lhs_sql), params
+        return f"TIMESTAMPDIFF(MICROSECOND, {rhs_sql}, {lhs_sql})", params
 
     def explain_query_prefix(self, format=None, **options):
         # Alias MySQL's TRADITIONAL to TEXT for consistency with other backends.

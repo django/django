@@ -135,7 +135,7 @@ class Command(BaseCommand):
                 except FileNotFoundError:
                     pass
                 if self.verbosity > 0:
-                    self.stdout.write('processing file %s in %s' % (f, dirpath))
+                    self.stdout.write(f'processing file {f} in {dirpath}')
 
                 if has_bom(po_path):
                     self.stderr.write(
@@ -162,7 +162,7 @@ class Command(BaseCommand):
                 if status:
                     if self.verbosity > 0:
                         if errors:
-                            self.stderr.write("Execution of %s failed: %s" % (self.program, errors))
+                            self.stderr.write(f"Execution of {self.program} failed: {errors}")
                         else:
                             self.stderr.write("Execution of %s failed" % self.program)
                     self.has_errors = True

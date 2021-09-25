@@ -468,14 +468,14 @@ class ResolverTests(SimpleTestCase):
         self.assertEqual(
             len(e.args[0]['tried']),
             len(url_types_names),
-            'Wrong number of tried URLs returned.  Expected %s, got %s.' % (
+            'Wrong number of tried URLs returned.  Expected {}, got {}.'.format(
                 len(url_types_names), len(e.args[0]['tried'])
             )
         )
         for tried, expected in zip(e.args[0]['tried'], url_types_names):
             for t, e in zip(tried, expected):
                 with self.subTest(t):
-                    self.assertIsInstance(t, e['type']), '%s is not an instance of %s' % (t, e['type'])
+                    self.assertIsInstance(t, e['type']), '{} is not an instance of {}'.format(t, e['type'])
                     if 'name' in e:
                         if not e['name']:
                             self.assertIsNone(t.name, 'Expected no URL name but found %s.' % t.name)
@@ -483,7 +483,7 @@ class ResolverTests(SimpleTestCase):
                             self.assertEqual(
                                 t.name,
                                 e['name'],
-                                'Wrong URL name.  Expected "%s", got "%s".' % (e['name'], t.name)
+                                'Wrong URL name.  Expected "{}", got "{}".'.format(e['name'], t.name)
                             )
 
     def test_namespaced_view_detail(self):

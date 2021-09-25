@@ -141,13 +141,13 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
             # only use this if the object in question is a model.
             if isinstance(self.object, models.Model):
                 object_meta = self.object._meta
-                names.append("%s/%s%s.html" % (
+                names.append("{}/{}{}.html".format(
                     object_meta.app_label,
                     object_meta.model_name,
                     self.template_name_suffix
                 ))
             elif getattr(self, 'model', None) is not None and issubclass(self.model, models.Model):
-                names.append("%s/%s%s.html" % (
+                names.append("{}/{}{}.html".format(
                     self.model._meta.app_label,
                     self.model._meta.model_name,
                     self.template_name_suffix

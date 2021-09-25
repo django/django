@@ -984,7 +984,7 @@ class ModelFormsetTest(TestCase):
         class PoemForm2(forms.ModelForm):
             def save(self, commit=True):
                 poem = super().save(commit=False)
-                poem.name = "%s by %s" % (poem.name, poem.poet.name)
+                poem.name = f"{poem.name} by {poem.poet.name}"
                 if commit:
                     poem.save()
                 return poem

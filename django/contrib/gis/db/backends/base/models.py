@@ -31,7 +31,7 @@ class SpatialRefSysMixin:
             except Exception as e:
                 msg = e
 
-            raise Exception('Could not get OSR SpatialReference from WKT: %s\nError:\n%s' % (self.wkt, msg))
+            raise Exception(f'Could not get OSR SpatialReference from WKT: {self.wkt}\nError:\n{msg}')
 
     @property
     def ellipsoid(self):
@@ -127,7 +127,7 @@ class SpatialRefSysMixin:
                 radius, flattening = sphere_params[0], sphere_params[2]
             else:
                 radius, flattening = sphere_params
-            return 'SPHEROID["%s",%s,%s]' % (sphere_name, radius, flattening)
+            return f'SPHEROID["{sphere_name}",{radius},{flattening}]'
 
     def __str__(self):
         """

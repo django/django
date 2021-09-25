@@ -183,13 +183,13 @@ class IfChangedTests(SimpleTestCase):
             iter2 = iter([1, 2, 3])
             output2 = template.render(Context({'foo': range(3), 'get_value': lambda: next(iter2)}))
             self.assertEqual(
-                output2, '[0,1,2,3]', 'Expected [0,1,2,3] in second parallel template, got {}'.format(output2)
+                output2, '[0,1,2,3]', f'Expected [0,1,2,3] in second parallel template, got {output2}'
             )
             yield 3
 
         gen1 = gen()
         output1 = template.render(Context({'foo': range(3), 'get_value': lambda: next(gen1)}))
-        self.assertEqual(output1, '[0,1,2,3]', 'Expected [0,1,2,3] in first template, got {}'.format(output1))
+        self.assertEqual(output1, '[0,1,2,3]', f'Expected [0,1,2,3] in first template, got {output1}')
 
     def test_ifchanged_render_once(self):
         """

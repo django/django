@@ -334,7 +334,7 @@ class RequestFactory:
         # See https://www.python.org/dev/peps/pep-3333/#environ-variables
         return {
             'HTTP_COOKIE': '; '.join(sorted(
-                '%s=%s' % (morsel.key, morsel.coded_value)
+                f'{morsel.key}={morsel.coded_value}'
                 for morsel in self.cookies.values()
             )),
             'PATH_INFO': '/',
@@ -507,7 +507,7 @@ class AsyncRequestFactory(RequestFactory):
         scope['headers'].append((
             b'cookie',
             b'; '.join(sorted(
-                ('%s=%s' % (morsel.key, morsel.coded_value)).encode('ascii')
+                (f'{morsel.key}={morsel.coded_value}').encode('ascii')
                 for morsel in self.cookies.values()
             )),
         ))

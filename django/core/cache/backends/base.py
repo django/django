@@ -36,7 +36,7 @@ def default_key_func(key, key_prefix, version):
     the `key_prefix`. KEY_FUNCTION can be used to specify an alternate
     function with custom key making behavior.
     """
-    return '%s:%s:%s' % (key_prefix, version, key)
+    return f'{key_prefix}:{version}:{key}'
 
 
 def get_key_func(key_func):

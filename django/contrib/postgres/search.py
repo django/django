@@ -21,7 +21,7 @@ class SearchVectorExact(Lookup):
         lhs, lhs_params = self.process_lhs(qn, connection)
         rhs, rhs_params = self.process_rhs(qn, connection)
         params = lhs_params + rhs_params
-        return '%s @@ %s' % (lhs, rhs), params
+        return f'{lhs} @@ {rhs}', params
 
 
 class SearchVectorField(Field):
@@ -117,7 +117,7 @@ class SearchVector(SearchVectorCombinable, Func):
         extra_params = []
         if clone.weight:
             weight_sql, extra_params = compiler.compile(clone.weight)
-            sql = 'setweight({}, {})'.format(sql, weight_sql)
+            sql = f'setweight({sql}, {weight_sql})'
         return sql, config_params + params + extra_params
 
 
@@ -268,7 +268,7 @@ class SearchHeadline(Func):
         if self.options:
             # getquoted() returns a quoted bytestring of the adapted value.
             options_params.append(', '.join(
-                '%s=%s' % (
+                '{}={}'.format(
                     option,
                     psycopg2.extensions.adapt(value).getquoted().decode(),
                 ) for option, value in self.options.items()

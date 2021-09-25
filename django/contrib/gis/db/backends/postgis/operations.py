@@ -56,12 +56,12 @@ class PostGISOperator(SpatialOperator):
         if lookup.band_lhs is not None and lhs_is_raster:
             if not self.func:
                 raise ValueError('Band indices are not allowed for this operator, it works on bbox only.')
-            template_params['lhs'] = '%s, %s' % (template_params['lhs'], lookup.band_lhs)
+            template_params['lhs'] = '{}, {}'.format(template_params['lhs'], lookup.band_lhs)
 
         if lookup.band_rhs is not None and rhs_is_raster:
             if not self.func:
                 raise ValueError('Band indices are not allowed for this operator, it works on bbox only.')
-            template_params['rhs'] = '%s, %s' % (template_params['rhs'], lookup.band_rhs)
+            template_params['rhs'] = '{}, {}'.format(template_params['rhs'], lookup.band_rhs)
 
         # Convert rasters to polygons if necessary.
         if not self.raster or spheroid:
@@ -277,7 +277,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             if value.field.srid == f.srid:
                 placeholder = '%s'
             else:
-                placeholder = '%s(%%s, %s)' % (transform_func, f.srid)
+                placeholder = f'{transform_func}(%s, {f.srid})'
             return placeholder
 
         # Get the srid for this object
@@ -291,7 +291,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         if value_srid is None or value_srid == f.srid:
             placeholder = '%s'
         else:
-            placeholder = '%s(%%s, %s)' % (transform_func, f.srid)
+            placeholder = f'{transform_func}(%s, {f.srid})'
 
         return placeholder
 

@@ -74,7 +74,7 @@ def delete_selected(modeladmin, request, queryset):
 
     # Display the confirmation page
     return TemplateResponse(request, modeladmin.delete_selected_confirmation_template or [
-        "admin/%s/%s/delete_selected_confirmation.html" % (app_label, opts.model_name),
+        f"admin/{app_label}/{opts.model_name}/delete_selected_confirmation.html",
         "admin/%s/delete_selected_confirmation.html" % app_label,
         "admin/delete_selected_confirmation.html"
     ], context)

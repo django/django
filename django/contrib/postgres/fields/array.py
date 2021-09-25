@@ -64,7 +64,7 @@ class ArrayField(CheckFieldDefaultMixin, Field):
             # Remove the field name checks as they are not needed here.
             base_errors = self.base_field.check()
             if base_errors:
-                messages = '\n    '.join('%s (%s)' % (error.msg, error.id) for error in base_errors)
+                messages = '\n    '.join(f'{error.msg} ({error.id})' for error in base_errors)
                 errors.append(
                     checks.Error(
                         'Base field for array has errors:\n    %s' % messages,
@@ -84,14 +84,14 @@ class ArrayField(CheckFieldDefaultMixin, Field):
 
     def db_type(self, connection):
         size = self.size or ''
-        return '%s[%s]' % (self.base_field.db_type(connection), size)
+        return f'{self.base_field.db_type(connection)}[{size}]'
 
     def cast_db_type(self, connection):
         size = self.size or ''
-        return '%s[%s]' % (self.base_field.cast_db_type(connection), size)
+        return f'{self.base_field.cast_db_type(connection)}[{size}]'
 
     def get_placeholder(self, value, compiler, connection):
-        return '%s::{}'.format(self.db_type(connection))
+        return f'%s::{self.db_type(connection)}'
 
     def get_db_prep_value(self, value, connection, prepared=False):
         if isinstance(value, (list, tuple)):
@@ -217,7 +217,7 @@ class ArrayRHSMixin:
     def process_rhs(self, compiler, connection):
         rhs, rhs_params = super().process_rhs(compiler, connection)
         cast_type = self.lhs.output_field.cast_db_type(connection)
-        return '%s::%s' % (rhs, cast_type), rhs_params
+        return f'{rhs}::{cast_type}', rhs_params
 
 
 @ArrayField.register_lookup

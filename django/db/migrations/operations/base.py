@@ -77,7 +77,7 @@ class Operation:
         """
         Output a brief summary of what the action does.
         """
-        return "%s: %s" % (self.__class__.__name__, self._constructor_args)
+        return f"{self.__class__.__name__}: {self._constructor_args}"
 
     @property
     def migration_name_fragment(self):
@@ -133,7 +133,7 @@ class Operation:
         return False
 
     def __repr__(self):
-        return "<%s %s%s>" % (
+        return "<{} {}{}>".format(
             self.__class__.__name__,
             ", ".join(map(repr, self._constructor_args[0])),
             ",".join(" %s=%r" % x for x in self._constructor_args[1].items()),

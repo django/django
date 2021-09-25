@@ -14,7 +14,7 @@ class GeoFeedMixin:
         a single white space. Given a tuple of coordinates, return a string
         GeoRSS representation.
         """
-        return ' '.join('%f %f' % (coord[1], coord[0]) for coord in coords)
+        return ' '.join(f'{coord[1]:f} {coord[0]:f}' for coord in coords)
 
     def add_georss_point(self, handler, coords, w3c_geo=False):
         """

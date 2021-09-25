@@ -120,7 +120,7 @@ class Origin:
         return self.name
 
     def __repr__(self):
-        return '<%s name=%r>' % (self.__class__.__qualname__, self.name)
+        return f'<{self.__class__.__qualname__} name={self.name!r}>'
 
     def __eq__(self, other):
         return (
@@ -132,7 +132,7 @@ class Origin:
     @property
     def loader_name(self):
         if self.loader:
-            return '%s.%s' % (
+            return '{}.{}'.format(
                 self.loader.__module__, self.loader.__class__.__name__,
             )
 
@@ -159,7 +159,7 @@ class Template:
             yield from node
 
     def __repr__(self):
-        return '<%s template_string="%s...">' % (
+        return '<{} template_string="{}...">'.format(
             self.__class__.__qualname__,
             self.source[:20].replace('\n', ''),
         )
@@ -341,7 +341,7 @@ class Lexer:
         self.verbatim = False
 
     def __repr__(self):
-        return '<%s template_string="%s...", verbatim=%s>' % (
+        return '<{} template_string="{}...", verbatim={}>'.format(
             self.__class__.__qualname__,
             self.template_string[:20].replace('\n', ''),
             self.verbatim,
@@ -450,7 +450,7 @@ class Parser:
         self.origin = origin
 
     def __repr__(self):
-        return '<%s tokens=%r>' % (self.__class__.__qualname__, self.tokens)
+        return f'<{self.__class__.__qualname__} tokens={self.tokens!r}>'
 
     def parse(self, parse_until=None):
         """
@@ -603,36 +603,36 @@ class Parser:
 # translation). Numbers are treated as variables for implementation reasons
 # (so that they retain their type when passed to filters).
 constant_string = r"""
-(?:%(i18n_open)s%(strdq)s%(i18n_close)s|
-%(i18n_open)s%(strsq)s%(i18n_close)s|
-%(strdq)s|
-%(strsq)s)
-""" % {
-    'strdq': r'"[^"\\]*(?:\\.[^"\\]*)*"',  # double-quoted string
-    'strsq': r"'[^'\\]*(?:\\.[^'\\]*)*'",  # single-quoted string
-    'i18n_open': re.escape("_("),
-    'i18n_close': re.escape(")"),
-}
+(?:{i18n_open}{strdq}{i18n_close}|
+{i18n_open}{strsq}{i18n_close}|
+{strdq}|
+{strsq})
+""".format(
+    strdq=r'"[^"\\]*(?:\\.[^"\\]*)*"',  # double-quoted string
+    strsq=r"'[^'\\]*(?:\\.[^'\\]*)*'",  # single-quoted string
+    i18n_open=re.escape("_("),
+    i18n_close=re.escape(")"),
+)
 constant_string = constant_string.replace("\n", "")
 
 filter_raw_string = r"""
-^(?P<constant>%(constant)s)|
-^(?P<var>[%(var_chars)s]+|%(num)s)|
- (?:\s*%(filter_sep)s\s*
+^(?P<constant>{constant})|
+^(?P<var>[{var_chars}]+|{num})|
+ (?:\s*{filter_sep}\s*
      (?P<filter_name>\w+)
-         (?:%(arg_sep)s
+         (?:{arg_sep}
              (?:
-              (?P<constant_arg>%(constant)s)|
-              (?P<var_arg>[%(var_chars)s]+|%(num)s)
+              (?P<constant_arg>{constant})|
+              (?P<var_arg>[{var_chars}]+|{num})
              )
          )?
- )""" % {
-    'constant': constant_string,
-    'num': r'[-+\.]?\d[\d\.e]*',
-    'var_chars': r'\w\.',
-    'filter_sep': re.escape(FILTER_SEPARATOR),
-    'arg_sep': re.escape(FILTER_ARGUMENT_SEPARATOR),
-}
+ )""".format(
+    constant=constant_string,
+    num=r'[-+\.]?\d[\d\.e]*',
+    var_chars=r'\w\.',
+    filter_sep=re.escape(FILTER_SEPARATOR),
+    arg_sep=re.escape(FILTER_ARGUMENT_SEPARATOR),
+)
 
 filter_re = _lazy_re_compile(filter_raw_string, re.VERBOSE)
 
@@ -754,7 +754,7 @@ class FilterExpression:
         return self.token
 
     def __repr__(self):
-        return "<%s %r>" % (self.__class__.__qualname__, self.token)
+        return f"<{self.__class__.__qualname__} {self.token!r}>"
 
 
 class Variable:
@@ -841,7 +841,7 @@ class Variable:
         return value
 
     def __repr__(self):
-        return "<%s: %r>" % (self.__class__.__name__, self.var)
+        return f"<{self.__class__.__name__}: {self.var!r}>"
 
     def __str__(self):
         return self.var
@@ -993,7 +993,7 @@ class TextNode(Node):
         self.s = s
 
     def __repr__(self):
-        return "<%s: %r>" % (self.__class__.__name__, self.s[:25])
+        return f"<{self.__class__.__name__}: {self.s[:25]!r}>"
 
     def render(self, context):
         return self.s

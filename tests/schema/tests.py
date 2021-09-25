@@ -166,7 +166,7 @@ class SchemaTests(TransactionTestCase):
                                   cast_function=None):
         with connection.cursor() as cursor:
             schema_editor.add_field(model, field)
-            cursor.execute("SELECT {} FROM {};".format(field_name, model._meta.db_table))
+            cursor.execute(f"SELECT {field_name} FROM {model._meta.db_table};")
             database_default = cursor.fetchall()[0][0]
             if cast_function and type(database_default) != type(expected_default):
                 database_default = cast_function(database_default)
@@ -2361,7 +2361,7 @@ class SchemaTests(TransactionTestCase):
         self.assertIs(sql.references_column(table, 'height'), True)
         self.assertIn('UPPER(%s)' % editor.quote_name('name'), str(sql))
         self.assertIn(
-            'INCLUDE (%s, %s)' % (
+            'INCLUDE ({}, {})'.format(
                 editor.quote_name('weight'),
                 editor.quote_name('height'),
             ),
@@ -3804,7 +3804,7 @@ class SchemaTests(TransactionTestCase):
             max_name_length = connection.ops.max_name_length() or 200
             namespace = 'n' * max_name_length
             table_name = 't' * max_name_length
-            namespaced_table_name = '"%s"."%s"' % (namespace, table_name)
+            namespaced_table_name = f'"{namespace}"."{table_name}"'
             self.assertEqual(
                 editor._create_index_name(table_name, []),
                 editor._create_index_name(namespaced_table_name, []),

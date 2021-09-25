@@ -162,7 +162,7 @@ class FieldListFilter(ListFilter):
 class RelatedFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         other_model = get_model_from_relation(field)
-        self.lookup_kwarg = '%s__%s__exact' % (field_path, field.target_field.name)
+        self.lookup_kwarg = f'{field_path}__{field.target_field.name}__exact'
         self.lookup_kwarg_isnull = '%s__isnull' % field_path
         self.lookup_val = params.get(self.lookup_kwarg)
         self.lookup_val_isnull = params.get(self.lookup_kwarg_isnull)

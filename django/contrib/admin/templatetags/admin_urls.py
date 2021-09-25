@@ -10,7 +10,7 @@ register = template.Library()
 
 @register.filter
 def admin_urlname(value, arg):
-    return 'admin:%s_%s_%s' % (value.app_label, value.model_name, arg)
+    return f'admin:{value.app_label}_{value.model_name}_{arg}'
 
 
 @register.filter
@@ -36,8 +36,8 @@ def add_preserved_filters(context, url, popup=False, to_field=None):
         except Resolver404:
             pass
         else:
-            current_url = '%s:%s' % (match.app_name, match.url_name)
-            changelist_url = 'admin:%s_%s_changelist' % (opts.app_label, opts.model_name)
+            current_url = f'{match.app_name}:{match.url_name}'
+            changelist_url = f'admin:{opts.app_label}_{opts.model_name}_changelist'
             if changelist_url == current_url and '_changelist_filters' in preserved_filters:
                 preserved_filters = dict(parse_qsl(preserved_filters['_changelist_filters']))
 

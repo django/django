@@ -271,7 +271,7 @@ class Apps:
         model = self.all_models[app_label].get(model_name.lower())
         if model is None:
             raise LookupError(
-                "Model '%s.%s' not registered." % (app_label, model_name))
+                f"Model '{app_label}.{model_name}' not registered.")
         return model
 
     @functools.lru_cache(maxsize=None)

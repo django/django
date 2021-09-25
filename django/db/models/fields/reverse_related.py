@@ -110,7 +110,7 @@ class ForeignObjectRel(FieldCacheMixin):
         return self.field.db_type
 
     def __repr__(self):
-        return '<%s: %s.%s>' % (
+        return '<{}: {}.{}>'.format(
             type(self).__name__,
             self.related_model._meta.app_label,
             self.related_model._meta.model_name,

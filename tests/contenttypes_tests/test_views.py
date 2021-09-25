@@ -48,7 +48,7 @@ class ContentTypesViewsTests(TestCase):
         "Can view a shortcut for an Author object that has a get_absolute_url method"
         for obj in Author.objects.all():
             with self.subTest(obj=obj):
-                short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Author).id, obj.pk)
+                short_url = f'/shortcut/{ContentType.objects.get_for_model(Author).id}/{obj.pk}/'
                 response = self.client.get(short_url)
                 self.assertRedirects(response, 'http://testserver%s' % obj.get_absolute_url(), target_status_code=404)
 
@@ -59,7 +59,7 @@ class ContentTypesViewsTests(TestCase):
         """
         for obj in SchemeIncludedURL.objects.all():
             with self.subTest(obj=obj):
-                short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(SchemeIncludedURL).id, obj.pk)
+                short_url = f'/shortcut/{ContentType.objects.get_for_model(SchemeIncludedURL).id}/{obj.pk}/'
                 response = self.client.get(short_url)
                 self.assertRedirects(response, obj.get_absolute_url(), fetch_redirect_response=False)
 
@@ -70,29 +70,29 @@ class ContentTypesViewsTests(TestCase):
         """
         for obj in Article.objects.all():
             with self.subTest(obj=obj):
-                short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Article).id, obj.pk)
+                short_url = f'/shortcut/{ContentType.objects.get_for_model(Article).id}/{obj.pk}/'
                 response = self.client.get(short_url)
                 self.assertEqual(response.status_code, 404)
 
     def test_wrong_type_pk(self):
-        short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Author).id, 'nobody/expects')
+        short_url = '/shortcut/{}/{}/'.format(ContentType.objects.get_for_model(Author).id, 'nobody/expects')
         response = self.client.get(short_url)
         self.assertEqual(response.status_code, 404)
 
     def test_shortcut_bad_pk(self):
-        short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Author).id, '42424242')
+        short_url = '/shortcut/{}/{}/'.format(ContentType.objects.get_for_model(Author).id, '42424242')
         response = self.client.get(short_url)
         self.assertEqual(response.status_code, 404)
 
     def test_nonint_content_type(self):
         an_author = Author.objects.all()[0]
-        short_url = '/shortcut/%s/%s/' % ('spam', an_author.pk)
+        short_url = '/shortcut/{}/{}/'.format('spam', an_author.pk)
         response = self.client.get(short_url)
         self.assertEqual(response.status_code, 404)
 
     def test_bad_content_type(self):
         an_author = Author.objects.all()[0]
-        short_url = '/shortcut/%s/%s/' % (42424242, an_author.pk)
+        short_url = f'/shortcut/{42424242}/{an_author.pk}/'
         response = self.client.get(short_url)
         self.assertEqual(response.status_code, 404)
 
@@ -116,7 +116,7 @@ class ContentTypesViewsSiteRelTests(TestCase):
         get_model.side_effect = lambda *args, **kwargs: MockSite if args[0] == 'sites.Site' else ModelWithNullFKToSite
 
         obj = ModelWithNullFKToSite.objects.create(title='title')
-        url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(ModelWithNullFKToSite).id, obj.pk)
+        url = f'/shortcut/{ContentType.objects.get_for_model(ModelWithNullFKToSite).id}/{obj.pk}/'
         response = self.client.get(url)
         expected_url = 'http://example.com%s' % obj.get_absolute_url()
         self.assertRedirects(response, expected_url, fetch_redirect_response=False)
@@ -140,18 +140,18 @@ class ContentTypesViewsSiteRelTests(TestCase):
         ct = ContentType.objects.get_for_model(ModelWithM2MToSite)
         site_3_obj = ModelWithM2MToSite.objects.create(title='Not Linked to Current Site')
         site_3_obj.sites.add(MockSite.objects.get(pk=self.site_3.pk))
-        expected_url = 'http://%s%s' % (self.site_3.domain, site_3_obj.get_absolute_url())
+        expected_url = f'http://{self.site_3.domain}{site_3_obj.get_absolute_url()}'
 
         with self.settings(SITE_ID=self.site_2.pk):
             # Redirects to the domain of the first Site found in the m2m
             # relationship (ordering is arbitrary).
-            response = self.client.get('/shortcut/%s/%s/' % (ct.pk, site_3_obj.pk))
+            response = self.client.get(f'/shortcut/{ct.pk}/{site_3_obj.pk}/')
             self.assertRedirects(response, expected_url, fetch_redirect_response=False)
 
         obj_with_sites = ModelWithM2MToSite.objects.create(title='Linked to Current Site')
         obj_with_sites.sites.set(MockSite.objects.all())
-        shortcut_url = '/shortcut/%s/%s/' % (ct.pk, obj_with_sites.pk)
-        expected_url = 'http://%s%s' % (self.site_2.domain, obj_with_sites.get_absolute_url())
+        shortcut_url = f'/shortcut/{ct.pk}/{obj_with_sites.pk}/'
+        expected_url = f'http://{self.site_2.domain}{obj_with_sites.get_absolute_url()}'
 
         with self.settings(SITE_ID=self.site_2.pk):
             # Redirects to the domain of the Site matching the current site's

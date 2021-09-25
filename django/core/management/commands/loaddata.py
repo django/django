@@ -180,11 +180,11 @@ class Command(BaseCommand):
                 obj.save(using=self.using)
             # psycopg2 raises ValueError if data contains NUL chars.
             except (DatabaseError, IntegrityError, ValueError) as e:
-                e.args = ('Could not load %(object_label)s(pk=%(pk)s): %(error_msg)s' % {
-                    'object_label': obj.object._meta.label,
-                    'pk': obj.object.pk,
-                    'error_msg': e,
-                },)
+                e.args = ('Could not load {object_label}(pk={pk}): {error_msg}'.format(
+                    object_label=obj.object._meta.label,
+                    pk=obj.object.pk,
+                    error_msg=e,
+                ),)
                 raise
         if obj.deferred_fields:
             self.objs_with_deferred_fields.append(obj)
@@ -222,7 +222,7 @@ class Command(BaseCommand):
                             )
             except Exception as e:
                 if not isinstance(e, CommandError):
-                    e.args = ("Problem installing fixture '%s': %s" % (fixture_file, e),)
+                    e.args = (f"Problem installing fixture '{fixture_file}': {e}",)
                 raise
             finally:
                 fixture.close()
@@ -254,7 +254,7 @@ class Command(BaseCommand):
         cmp_fmts = self.compression_formats if cmp_fmt is None else [cmp_fmt]
         ser_fmts = self.serialization_formats if ser_fmt is None else [ser_fmt]
         return {
-            '%s.%s' % (
+            '{}.{}'.format(
                 fixture_name,
                 '.'.join([ext for ext in combo if ext]),
             ) for combo in product(databases, ser_fmts, cmp_fmts)

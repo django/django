@@ -40,7 +40,7 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
             except FieldDoesNotExist:
                 return [
                     checks.Error(
-                        "'ct_field' references '%s', which is not a field on '%s'." % (
+                        "'ct_field' references '{}', which is not a field on '{}'.".format(
                             obj.ct_field, obj.model._meta.label,
                         ),
                         obj=obj.__class__,
@@ -53,7 +53,7 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
             except FieldDoesNotExist:
                 return [
                     checks.Error(
-                        "'ct_fk_field' references '%s', which is not a field on '%s'." % (
+                        "'ct_fk_field' references '{}', which is not a field on '{}'.".format(
                             obj.ct_fk_field, obj.model._meta.label,
                         ),
                         obj=obj.__class__,
@@ -69,7 +69,7 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
 
             return [
                 checks.Error(
-                    "'%s' has no GenericForeignKey using content type field '%s' and object ID field '%s'." % (
+                    "'{}' has no GenericForeignKey using content type field '{}' and object ID field '{}'.".format(
                         obj.model._meta.label, obj.ct_field, obj.ct_fk_field,
                     ),
                     obj=obj.__class__,

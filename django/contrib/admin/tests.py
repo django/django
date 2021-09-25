@@ -127,7 +127,7 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         """
         Log in to the admin.
         """
-        self.selenium.get('%s%s' % (self.live_server_url, login_url))
+        self.selenium.get(f'{self.live_server_url}{login_url}')
         username_input = self.selenium.find_element_by_name('username')
         username_input.send_keys(username)
         password_input = self.selenium.find_element_by_name('password')

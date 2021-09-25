@@ -95,7 +95,7 @@ class LastExecutedQueryTest(TestCase):
     @skipUnlessDBFeature('supports_paramstyle_pyformat')
     def test_last_executed_query_dict(self):
         square_opts = Square._meta
-        sql = 'INSERT INTO %s (%s, %s) VALUES (%%(root)s, %%(square)s)' % (
+        sql = 'INSERT INTO {} ({}, {}) VALUES (%(root)s, %(square)s)'.format(
             connection.introspection.identifier_converter(square_opts.db_table),
             connection.ops.quote_name(square_opts.get_field('root').column),
             connection.ops.quote_name(square_opts.get_field('square').column),
@@ -114,7 +114,7 @@ class ParameterHandlingTest(TestCase):
     def test_bad_parameter_count(self):
         "An executemany call with too many/not enough parameters will raise an exception (Refs #12612)"
         with connection.cursor() as cursor:
-            query = ('INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (
+            query = ('INSERT INTO {} ({}, {}) VALUES (%s, %s)'.format(
                 connection.introspection.identifier_converter('backends_square'),
                 connection.ops.quote_name('root'),
                 connection.ops.quote_name('square')
@@ -250,9 +250,9 @@ class BackendTestCase(TransactionTestCase):
         f1 = connection.ops.quote_name(opts.get_field('root').column)
         f2 = connection.ops.quote_name(opts.get_field('square').column)
         if paramstyle == 'format':
-            query = 'INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (tbl, f1, f2)
+            query = f'INSERT INTO {tbl} ({f1}, {f2}) VALUES (%s, %s)'
         elif paramstyle == 'pyformat':
-            query = 'INSERT INTO %s (%s, %s) VALUES (%%(root)s, %%(square)s)' % (tbl, f1, f2)
+            query = f'INSERT INTO {tbl} ({f1}, {f2}) VALUES (%(root)s, %(square)s)'
         else:
             raise ValueError("unsupported paramstyle in test")
         with connection.cursor() as cursor:
@@ -329,7 +329,7 @@ class BackendTestCase(TransactionTestCase):
         f3, f4 = opts2.get_field('first_name'), opts2.get_field('last_name')
         with connection.cursor() as cursor:
             cursor.execute(
-                'SELECT %s, %s FROM %s ORDER BY %s' % (
+                'SELECT {}, {} FROM {} ORDER BY {}'.format(
                     qn(f3.column),
                     qn(f4.column),
                     connection.introspection.identifier_converter(opts2.db_table),
@@ -442,7 +442,7 @@ class BackendTestCase(TransactionTestCase):
         reset_queries()
         self.assertEqual(0, len(connection.queries))
 
-        sql = ('INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (
+        sql = ('INSERT INTO {} ({}, {}) VALUES (%s, %s)'.format(
             connection.introspection.identifier_converter('backends_square'),
             connection.ops.quote_name('root'),
             connection.ops.quote_name('square'),

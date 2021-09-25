@@ -18,7 +18,7 @@ class SafeJoinTests(unittest.TestCase):
         drive, path = os.path.splitdrive(safe_join("/", "path"))
         self.assertEqual(
             path,
-            "{}path".format(os.path.sep),
+            f"{os.path.sep}path",
         )
 
         drive, path = os.path.splitdrive(safe_join("/", ""))

@@ -29,7 +29,7 @@ def ogrinfo(data_source, num_features=10):
         print("  # features: %s" % len(layer))
         print("         srs: %s" % layer.srs)
         extent_tup = layer.extent.tuple
-        print("      extent: %s - %s" % (extent_tup[0:2], extent_tup[2:4]))
+        print(f"      extent: {extent_tup[0:2]} - {extent_tup[2:4]}")
         print("Displaying the first %s features ====" % num_features)
 
         width = max(*map(len, layer.fields))

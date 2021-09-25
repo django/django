@@ -24,7 +24,7 @@ class StaticTests(SimpleTestCase):
         "The static view can serve static media"
         media_files = ['file.txt', 'file.txt.gz', '%2F.txt']
         for filename in media_files:
-            response = self.client.get('/%s/%s' % (self.prefix, quote(filename)))
+            response = self.client.get(f'/{self.prefix}/{quote(filename)}')
             response_content = b''.join(response)
             file_path = path.join(media_dir, filename)
             with open(file_path, 'rb') as fp:
@@ -34,7 +34,7 @@ class StaticTests(SimpleTestCase):
 
     def test_chunked(self):
         "The static view should stream files in chunks to avoid large memory usage"
-        response = self.client.get('/%s/%s' % (self.prefix, 'long-line.txt'))
+        response = self.client.get('/{}/{}'.format(self.prefix, 'long-line.txt'))
         first_chunk = next(response.streaming_content)
         self.assertEqual(len(first_chunk), FileResponse.block_size)
         second_chunk = next(response.streaming_content)
@@ -49,7 +49,7 @@ class StaticTests(SimpleTestCase):
 
     def test_copes_with_empty_path_component(self):
         file_name = 'file.txt'
-        response = self.client.get('/%s//%s' % (self.prefix, file_name))
+        response = self.client.get(f'/{self.prefix}//{file_name}')
         response_content = b''.join(response)
         with open(path.join(media_dir, file_name), 'rb') as fp:
             self.assertEqual(fp.read(), response_content)
@@ -57,7 +57,7 @@ class StaticTests(SimpleTestCase):
     def test_is_modified_since(self):
         file_name = 'file.txt'
         response = self.client.get(
-            '/%s/%s' % (self.prefix, file_name),
+            f'/{self.prefix}/{file_name}',
             HTTP_IF_MODIFIED_SINCE='Thu, 1 Jan 1970 00:00:00 GMT'
         )
         response_content = b''.join(response)
@@ -67,7 +67,7 @@ class StaticTests(SimpleTestCase):
     def test_not_modified_since(self):
         file_name = 'file.txt'
         response = self.client.get(
-            '/%s/%s' % (self.prefix, file_name),
+            f'/{self.prefix}/{file_name}',
             HTTP_IF_MODIFIED_SINCE='Mon, 18 Jan 2038 05:14:07 GMT'
             # This is 24h before max Unix time. Remember to fix Django and
             # update this test well before 2038 :)
@@ -82,7 +82,7 @@ class StaticTests(SimpleTestCase):
         """
         file_name = 'file.txt'
         invalid_date = 'Mon, 28 May 999999999999 28:25:26 GMT'
-        response = self.client.get('/%s/%s' % (self.prefix, file_name),
+        response = self.client.get(f'/{self.prefix}/{file_name}',
                                    HTTP_IF_MODIFIED_SINCE=invalid_date)
         response_content = b''.join(response)
         with open(path.join(media_dir, file_name), 'rb') as fp:
@@ -97,7 +97,7 @@ class StaticTests(SimpleTestCase):
         """
         file_name = 'file.txt'
         invalid_date = ': 1291108438, Wed, 20 Oct 2010 14:05:00 GMT'
-        response = self.client.get('/%s/%s' % (self.prefix, file_name),
+        response = self.client.get(f'/{self.prefix}/{file_name}',
                                    HTTP_IF_MODIFIED_SINCE=invalid_date)
         response_content = b''.join(response)
         with open(path.join(media_dir, file_name), 'rb') as fp:

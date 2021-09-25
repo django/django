@@ -47,7 +47,7 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
         where_idx = sql.index('WHERE')
         self.assertEqual(
             sql.count(str(needle), where_idx), 1,
-            msg="WHERE clause doesn't contain %s, actual SQL: %s" % (needle, sql[where_idx:])
+            msg=f"WHERE clause doesn't contain {needle}, actual SQL: {sql[where_idx:]}"
         )
 
     def test_m2m_forward(self):

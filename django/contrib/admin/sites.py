@@ -280,7 +280,7 @@ class AdminSite:
         valid_app_labels = []
         for model, model_admin in self._registry.items():
             urlpatterns += [
-                path('%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls)),
+                path(f'{model._meta.app_label}/{model._meta.model_name}/', include(model_admin.urls)),
             ]
             if model._meta.app_label not in valid_app_labels:
                 valid_app_labels.append(model._meta.app_label)

@@ -10,7 +10,7 @@ class PermLookupDict:
         return str(self.user.get_all_permissions())
 
     def __getitem__(self, perm_name):
-        return self.user.has_perm("%s.%s" % (self.app_label, perm_name))
+        return self.user.has_perm(f"{self.app_label}.{perm_name}")
 
     def __iter__(self):
         # To fix 'item in perms.someapp' and __getitem__ interaction we need to

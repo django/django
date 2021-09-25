@@ -436,7 +436,7 @@ class BaseFormSet(RenderableFormMixin):
             )
 
     def add_prefix(self, index):
-        return '%s-%s' % (self.prefix, index)
+        return f'{self.prefix}-{index}'
 
     def is_multipart(self):
         """

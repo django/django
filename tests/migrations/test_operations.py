@@ -1309,8 +1309,8 @@ class OperationTests(OperationTestBase):
         operation.state_forwards(app_label, first_state)
         with connection.schema_editor() as editor:
             operation.database_forwards(app_label, editor, project_state, first_state)
-        original_m2m_table = "%s_%s" % (pony_db_table, "stables")
-        new_m2m_table = "%s_%s" % (app_label, "pony_stables")
+        original_m2m_table = "{}_{}".format(pony_db_table, "stables")
+        new_m2m_table = "{}_{}".format(app_label, "pony_stables")
         self.assertTableExists(original_m2m_table)
         self.assertTableNotExists(new_m2m_table)
         # Rename the Pony db_table which should also rename the m2m table.

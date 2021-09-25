@@ -151,7 +151,7 @@ class TestGetObjectFeed(TestRss2Feed):
         return Article.objects.filter(entry=obj)
 
     def item_link(self, item):
-        return '%sarticle/%s/' % (item.entry.get_absolute_url(), item.pk)
+        return f'{item.entry.get_absolute_url()}article/{item.pk}/'
 
     def item_comments(self, item):
         return '%scomments' % self.item_link(item)

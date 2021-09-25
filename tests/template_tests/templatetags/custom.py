@@ -73,7 +73,7 @@ no_params_with_context.anything = "Expected no_params_with_context __dict__"
 @register.simple_tag(takes_context=True)
 def params_and_context(context, arg):
     """Expected params_and_context __doc__"""
-    return "params_and_context - Expected result (context value: %s): %s" % (context['value'], arg)
+    return "params_and_context - Expected result (context value: {}): {}".format(context['value'], arg)
 
 
 params_and_context.anything = "Expected params_and_context __dict__"
@@ -82,7 +82,7 @@ params_and_context.anything = "Expected params_and_context __dict__"
 @register.simple_tag
 def simple_two_params(one, two):
     """Expected simple_two_params __doc__"""
-    return "simple_two_params - Expected result: %s, %s" % (one, two)
+    return f"simple_two_params - Expected result: {one}, {two}"
 
 
 simple_two_params.anything = "Expected simple_two_params __dict__"
@@ -101,7 +101,7 @@ def simple_keyword_only_default(*, kwarg=42):
 @register.simple_tag
 def simple_one_default(one, two='hi'):
     """Expected simple_one_default __doc__"""
-    return "simple_one_default - Expected result: %s, %s" % (one, two)
+    return f"simple_one_default - Expected result: {one}, {two}"
 
 
 simple_one_default.anything = "Expected simple_one_default __dict__"
@@ -132,9 +132,9 @@ def simple_unlimited_args_kwargs(one, two='hi', *args, **kwargs):
     """Expected simple_unlimited_args_kwargs __doc__"""
     # Sort the dictionary by key to guarantee the order for testing.
     sorted_kwarg = sorted(kwargs.items(), key=operator.itemgetter(0))
-    return "simple_unlimited_args_kwargs - Expected result: %s / %s" % (
+    return "simple_unlimited_args_kwargs - Expected result: {} / {}".format(
         ', '.join(str(arg) for arg in [one, two, *args]),
-        ', '.join('%s=%s' % (k, v) for (k, v) in sorted_kwarg)
+        ', '.join(f'{k}={v}' for (k, v) in sorted_kwarg)
     )
 
 

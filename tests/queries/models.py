@@ -372,7 +372,7 @@ class Eaten(models.Model):
     meal = models.CharField(max_length=20)
 
     def __str__(self):
-        return "%s at %s" % (self.food, self.meal)
+        return f"{self.food} at {self.meal}"
 
 
 class Node(models.Model):

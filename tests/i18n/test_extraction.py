@@ -63,7 +63,7 @@ class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
             po_contents = fp.read()
         if os.name == 'nt':
             # #: .\path\to\file.html:123
-            cwd_prefix = '%s%s' % (os.curdir, os.sep)
+            cwd_prefix = f'{os.curdir}{os.sep}'
         else:
             # #: path/to/file.html:123
             cwd_prefix = ''
@@ -88,7 +88,7 @@ class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
             for line, content in enumerate(f, 1):
                 if token in content:
                     return line
-        self.fail("The token '%s' could not be found in %s, please check the test config" % (token, path))
+        self.fail(f"The token '{token}' could not be found in {path}, please check the test config")
 
     def assertLocationCommentPresent(self, po_filename, line_number, *comment_parts):
         r"""
@@ -266,8 +266,8 @@ class BasicExtractorTests(ExtractorTests):
 
             # {% translate %} with a filter
             for minor_part in 'abcdefgh':  # Iterate from #7.1a to #7.1h template markers
-                self.assertIn('msgctxt "context #7.1{}"'.format(minor_part), po_contents)
-                self.assertMsgId('Translatable literal #7.1{}'.format(minor_part), po_contents)
+                self.assertIn(f'msgctxt "context #7.1{minor_part}"', po_contents)
+                self.assertMsgId(f'Translatable literal #7.1{minor_part}', po_contents)
 
             # {% blocktranslate %}
             self.assertIn('msgctxt "Special blocktranslate context #1"', po_contents)

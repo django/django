@@ -7,10 +7,10 @@ from .models import Article, Category
 
 class M2MMultipleTests(TestCase):
     def test_multiple(self):
-        c1, c2, c3, c4 = [
+        c1, c2, c3, c4 = (
             Category.objects.create(name=name)
             for name in ["Sports", "News", "Crime", "Life"]
-        ]
+        )
 
         a1 = Article.objects.create(
             headline="Parrot steals", pub_date=datetime(2005, 11, 27)

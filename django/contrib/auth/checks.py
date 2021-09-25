@@ -60,7 +60,7 @@ def check_user_model(app_configs=None, **kwargs):
                 ['django.contrib.auth.backends.ModelBackend']):
             errors.append(
                 checks.Error(
-                    "'%s.%s' must be unique because it is named as the 'USERNAME_FIELD'." % (
+                    "'{}.{}' must be unique because it is named as the 'USERNAME_FIELD'.".format(
                         cls._meta.object_name, cls.USERNAME_FIELD
                     ),
                     obj=cls,
@@ -70,7 +70,7 @@ def check_user_model(app_configs=None, **kwargs):
         else:
             errors.append(
                 checks.Warning(
-                    "'%s.%s' is named as the 'USERNAME_FIELD', but it is not unique." % (
+                    "'{}.{}' is named as the 'USERNAME_FIELD', but it is not unique.".format(
                         cls._meta.object_name, cls.USERNAME_FIELD
                     ),
                     hint='Ensure that your authentication backend(s) can handle non-unique usernames.',

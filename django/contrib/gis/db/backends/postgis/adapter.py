@@ -60,7 +60,7 @@ class PostGISAdapter:
         """
         if self.is_geometry:
             # Psycopg will figure out whether to use E'\\000' or '\000'.
-            return '%s(%s)' % (
+            return '{}({})'.format(
                 'ST_GeogFromWKB' if self.geography else 'ST_GeomFromEWKB',
                 self._adapter.getquoted().decode()
             )

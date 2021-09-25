@@ -69,7 +69,7 @@ class Join:
 
         # Add a join condition for each pair of joining columns.
         for lhs_col, rhs_col in self.join_cols:
-            join_conditions.append('%s.%s = %s.%s' % (
+            join_conditions.append('{}.{} = {}.{}'.format(
                 qn(self.parent_alias),
                 qn2(lhs_col),
                 qn(self.table_alias),
@@ -97,7 +97,7 @@ class Join:
             )
         on_clause_sql = ' AND '.join(join_conditions)
         alias_str = '' if self.table_alias == self.table_name else (' %s' % self.table_alias)
-        sql = '%s %s%s ON (%s)' % (self.join_type, qn(self.table_name), alias_str, on_clause_sql)
+        sql = f'{self.join_type} {qn(self.table_name)}{alias_str} ON ({on_clause_sql})'
         return sql, params
 
     def relabeled_clone(self, change_map):

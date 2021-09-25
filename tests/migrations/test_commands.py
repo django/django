@@ -1722,7 +1722,7 @@ class MakeMigrationsTests(MigrationTestBase):
 
             def cmd(migration_count, migration_name, *args):
                 call_command("makemigrations", "migrations", "--verbosity", "0", "--name", migration_name, *args)
-                migration_file = os.path.join(migration_dir, "%s_%s.py" % (migration_count, migration_name))
+                migration_file = os.path.join(migration_dir, f"{migration_count}_{migration_name}.py")
                 # Check for existing migration file in migration folder
                 self.assertTrue(os.path.exists(migration_file))
                 with open(migration_file, encoding='utf-8') as fp:

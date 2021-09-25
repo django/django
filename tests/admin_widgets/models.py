@@ -115,7 +115,7 @@ class Car(models.Model):
     model = models.CharField(max_length=30)
 
     def __str__(self):
-        return "%s %s" % (self.make, self.model)
+        return f"{self.make} {self.model}"
 
 
 class CarTire(models.Model):

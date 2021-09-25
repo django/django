@@ -63,7 +63,7 @@ class MigrationLoader:
             return settings.MIGRATION_MODULES[app_label], True
         else:
             app_package_name = apps.get_app_config(app_label).name
-            return '%s.%s' % (app_package_name, MIGRATIONS_MODULE_NAME), False
+            return f'{app_package_name}.{MIGRATIONS_MODULE_NAME}', False
 
     def load_disk(self):
         """Load the migrations from all INSTALLED_APPS from disk."""
@@ -111,7 +111,7 @@ class MigrationLoader:
             }
             # Load migrations
             for migration_name in migration_names:
-                migration_path = '%s.%s' % (module_name, migration_name)
+                migration_path = f'{module_name}.{migration_name}'
                 try:
                     migration_module = import_module(migration_path)
                 except ImportError as e:
@@ -124,7 +124,7 @@ class MigrationLoader:
                         raise
                 if not hasattr(migration_module, "Migration"):
                     raise BadMigrationError(
-                        "Migration %s in app %s has no Migration class" % (migration_name, app_config.label)
+                        f"Migration {migration_name} in app {app_config.label} has no Migration class"
                     )
                 self.disk_migrations[app_config.label, migration_name] = migration_module.Migration(
                     migration_name,
@@ -146,7 +146,7 @@ class MigrationLoader:
                 results.append((migration_app_label, migration_name))
         if len(results) > 1:
             raise AmbiguityError(
-                "There is more than one migration for '%s' with the prefix '%s'" % (app_label, name_prefix)
+                f"There is more than one migration for '{app_label}' with the prefix '{name_prefix}'"
             )
         elif not results:
             raise KeyError(

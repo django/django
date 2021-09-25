@@ -175,4 +175,4 @@ class Polygon(GEOSGeometry):
             "<innerBoundaryIs>%s</innerBoundaryIs>" % self[i + 1].kml
             for i in range(self.num_interior_rings)
         )
-        return "<Polygon><outerBoundaryIs>%s</outerBoundaryIs>%s</Polygon>" % (self[0].kml, inner_kml)
+        return f"<Polygon><outerBoundaryIs>{self[0].kml}</outerBoundaryIs>{inner_kml}</Polygon>"

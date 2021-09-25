@@ -354,7 +354,7 @@ class ListFiltersTests(TestCase):
         self.assertIs(choice['selected'], True)
         self.assertEqual(
             choice['query_string'],
-            '?date_registered__gte=%s&date_registered__lt=%s' % (
+            '?date_registered__gte={}&date_registered__lt={}'.format(
                 self.today,
                 self.tomorrow,
             )
@@ -382,7 +382,7 @@ class ListFiltersTests(TestCase):
         self.assertIs(choice['selected'], True)
         self.assertEqual(
             choice['query_string'],
-            '?date_registered__gte=%s&date_registered__lt=%s' % (
+            '?date_registered__gte={}&date_registered__lt={}'.format(
                 self.today.replace(day=1),
                 self.next_month,
             )
@@ -410,7 +410,7 @@ class ListFiltersTests(TestCase):
         self.assertIs(choice['selected'], True)
         self.assertEqual(
             choice['query_string'],
-            '?date_registered__gte=%s&date_registered__lt=%s' % (
+            '?date_registered__gte={}&date_registered__lt={}'.format(
                 self.today.replace(month=1, day=1),
                 self.next_year,
             )
@@ -434,7 +434,7 @@ class ListFiltersTests(TestCase):
         self.assertIs(choice['selected'], True)
         self.assertEqual(
             choice['query_string'],
-            '?date_registered__gte=%s&date_registered__lt=%s' % (
+            '?date_registered__gte={}&date_registered__lt={}'.format(
                 str(self.one_week_ago),
                 str(self.tomorrow),
             )

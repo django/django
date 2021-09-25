@@ -72,7 +72,7 @@ class Membership(models.Model):
 
     def __str__(self):
         group_name = self.group.name if self.group_id else 'NULL'
-        return "%s is a member of %s" % (self.person.name, group_name)
+        return f"{self.person.name} is a member of {group_name}"
 
 
 class Friendship(models.Model):

@@ -16,7 +16,7 @@ class Person(models.Model):
         self.data = []
 
     def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
+        return f"{self.first_name} {self.last_name}"
 
     def save(self, *args, **kwargs):
         self.data.append("Before save")

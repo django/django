@@ -330,7 +330,7 @@ class DistanceLookupFromFunction(DistanceLookupBase):
         sql, params = compiler.compile(distance_expr.resolve_expression(compiler.query))
         dist_sql, dist_params = self.process_distance(compiler, connection)
         return (
-            '%(func)s %(op)s %(dist)s' % {'func': sql, 'op': self.op, 'dist': dist_sql},
+            f'{sql} {self.op} {dist_sql}',
             params + dist_params,
         )
 

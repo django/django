@@ -93,7 +93,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
     def _choice_input(self, question, choices):
         print(question)
         for i, choice in enumerate(choices):
-            print(" %s) %s" % (i + 1, choice))
+            print(f" {i + 1}) {choice}")
         result = input("Select an option: ")
         while True:
             try:
@@ -126,7 +126,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         print("Type 'exit' to exit this prompt")
         while True:
             if default:
-                prompt = "[default: {}] >>> ".format(default)
+                prompt = f"[default: {default}] >>> "
             else:
                 prompt = ">>> "
             code = input(prompt)

@@ -116,7 +116,7 @@ class SimplifiedURLTests(SimpleTestCase):
     def test_converter_reverse(self):
         for expected, (url_name, app_name, kwargs) in converter_test_data:
             if app_name:
-                url_name = '%s:%s' % (app_name, url_name)
+                url_name = f'{app_name}:{url_name}'
             with self.subTest(url=url_name):
                 url = reverse(url_name, kwargs=kwargs)
                 self.assertEqual(url, expected)
@@ -186,7 +186,7 @@ class ConverterTests(SimpleTestCase):
         )
         for url_name, url_suffixes, converter in test_data:
             for url_suffix in url_suffixes:
-                url = '/%s/%s/' % (url_name, url_suffix)
+                url = f'/{url_name}/{url_suffix}/'
                 with self.subTest(url=url):
                     match = resolve(url)
                     self.assertEqual(match.url_name, url_name)
@@ -199,7 +199,7 @@ class ConverterTests(SimpleTestCase):
                         # The converted value might be different for int (a
                         # leading zero is lost in the conversion).
                         converted_value = match.kwargs[url_name]
-                        converted_url = '/%s/%s/' % (url_name, converted_value)
+                        converted_url = f'/{url_name}/{converted_value}/'
                         self.assertEqual(reverse(url_name, kwargs={url_name: converted_value}), converted_url)
 
     def test_nonmatching_urls(self):
@@ -219,7 +219,7 @@ class ConverterTests(SimpleTestCase):
         )
         for url_name, url_suffixes in test_data:
             for url_suffix in url_suffixes:
-                url = '/%s/%s/' % (url_name, url_suffix)
+                url = f'/{url_name}/{url_suffix}/'
                 with self.subTest(url=url), self.assertRaises(Resolver404):
                     resolve(url)
 
@@ -264,7 +264,7 @@ class SameNameTests(SimpleTestCase):
         ]
         for url_name, cases in tests:
             for args, kwargs, url_suffix in cases:
-                expected_url = '/%s/%s' % (url_name, url_suffix)
+                expected_url = f'/{url_name}/{url_suffix}'
                 with self.subTest(url=expected_url):
                     self.assertEqual(
                         reverse(url_name, args=args, kwargs=kwargs),

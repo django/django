@@ -44,7 +44,7 @@ class BaseDatabaseCreation:
             if keepdb:
                 action = "Using existing"
 
-            self.log('%s test database for alias %s...' % (
+            self.log('{} test database for alias {}...'.format(
                 action,
                 self._get_database_display_str(verbosity, test_database_name),
             ))
@@ -159,7 +159,7 @@ class BaseDatabaseCreation:
         """
         Return display string for a database for use in various actions.
         """
-        return "'%s'%s" % (
+        return "'{}'{}".format(
             self.connection.alias,
             (" ('%s')" % database_name) if verbosity >= 2 else '',
         )
@@ -205,7 +205,7 @@ class BaseDatabaseCreation:
                 if autoclobber or confirm == 'yes':
                     try:
                         if verbosity >= 1:
-                            self.log('Destroying old test database for alias %s...' % (
+                            self.log('Destroying old test database for alias {}...'.format(
                                 self._get_database_display_str(verbosity, test_database_name),
                             ))
                         cursor.execute('DROP DATABASE %(dbname)s' % test_db_params)
@@ -229,7 +229,7 @@ class BaseDatabaseCreation:
             action = 'Cloning test database'
             if keepdb:
                 action = 'Using existing clone'
-            self.log('%s for alias %s...' % (
+            self.log('{} for alias {}...'.format(
                 action,
                 self._get_database_display_str(verbosity, source_database_name),
             ))
@@ -271,7 +271,7 @@ class BaseDatabaseCreation:
             action = 'Destroying'
             if keepdb:
                 action = 'Preserving'
-            self.log('%s test database for alias %s...' % (
+            self.log('{} test database for alias {}...'.format(
                 action,
                 self._get_database_display_str(verbosity, test_database_name),
             ))

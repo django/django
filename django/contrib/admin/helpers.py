@@ -204,7 +204,7 @@ class AdminReadonlyField:
         return format_html('<label{}>{}{}</label>', flatatt(attrs), capfirst(label), self.form.label_suffix)
 
     def get_admin_url(self, remote_field, remote_obj):
-        url_name = 'admin:%s_%s_change' % (
+        url_name = 'admin:{}_{}_change'.format(
             remote_field.model._meta.app_label,
             remote_field.model._meta.model_name,
         )

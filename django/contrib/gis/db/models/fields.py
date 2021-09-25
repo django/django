@@ -46,7 +46,7 @@ def get_srid_info(srid, connection):
         _srid_cache[alias][srid] = SRIDCacheEntry(
             units=units,
             units_name=units_name,
-            spheroid='SPHEROID["%s",%s,%s]' % (srs['spheroid'], srs.semi_major, srs.inverse_flattening),
+            spheroid='SPHEROID["{}",{},{}]'.format(srs['spheroid'], srs.semi_major, srs.inverse_flattening),
             geodetic=srs.geographic,
         )
 

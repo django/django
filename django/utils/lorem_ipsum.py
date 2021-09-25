@@ -65,7 +65,7 @@ def sentence():
     sections = [' '.join(random.sample(WORDS, random.randint(3, 12))) for i in range(random.randint(1, 5))]
     s = ', '.join(sections)
     # Convert to sentence case and add end punctuation.
-    return '%s%s%s' % (s[0].upper(), s[1:], random.choice('?.'))
+    return '{}{}{}'.format(s[0].upper(), s[1:], random.choice('?.'))
 
 
 def paragraph():

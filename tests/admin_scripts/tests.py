@@ -71,7 +71,7 @@ class AdminScriptTestCase(SimpleTestCase):
                     o = getattr(settings, s)
                     if not isinstance(o, (dict, tuple, list)):
                         o = "'%s'" % o
-                    settings_file.write("%s = %s\n" % (s, o))
+                    settings_file.write(f"{s} = {o}\n")
 
             if apps is None:
                 apps = ['django.contrib.auth', 'django.contrib.contenttypes', 'admin_scripts']
@@ -80,7 +80,7 @@ class AdminScriptTestCase(SimpleTestCase):
 
             if sdict:
                 for k, v in sdict.items():
-                    settings_file.write("%s = %s\n" % (k, v))
+                    settings_file.write(f"{k} = {v}\n")
 
     def _ext_backend_paths(self):
         """
@@ -157,14 +157,14 @@ class AdminScriptTestCase(SimpleTestCase):
         if regex:
             self.assertIsNotNone(
                 re.search(msg, stream),
-                "'%s' does not match actual output text '%s'" % (msg, stream)
+                f"'{msg}' does not match actual output text '{stream}'"
             )
         else:
-            self.assertIn(msg, stream, "'%s' does not match actual output text '%s'" % (msg, stream))
+            self.assertIn(msg, stream, f"'{msg}' does not match actual output text '{stream}'")
 
     def assertNotInOutput(self, stream, msg):
         "Utility assertion: assert that the given message doesn't exist in the output"
-        self.assertNotIn(msg, stream, "'%s' matches actual output text '%s'" % (msg, stream))
+        self.assertNotIn(msg, stream, f"'{msg}' matches actual output text '{stream}'")
 
 ##########################################################################
 # DJANGO ADMIN TESTS

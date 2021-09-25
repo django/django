@@ -18,13 +18,13 @@ class Div3Lookup(models.Lookup):
         lhs, params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
         params.extend(rhs_params)
-        return '(%s) %%%% 3 = %s' % (lhs, rhs), params
+        return f'({lhs}) %% 3 = {rhs}', params
 
     def as_oracle(self, compiler, connection):
         lhs, params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
         params.extend(rhs_params)
-        return 'mod(%s, 3) = %s' % (lhs, rhs), params
+        return f'mod({lhs}, 3) = {rhs}', params
 
 
 class Div3Transform(models.Transform):
@@ -118,7 +118,7 @@ class YearLte(models.lookups.LessThanOrEqual):
         # and day, then convert that to date. (We try to have SQL like:
         #     WHERE somecol <= '2013-12-31')
         # but also make it work if the rhs_sql is field reference.
-        return "%s <= (%s || '-12-31')::date" % (lhs_sql, rhs_sql), params
+        return f"{lhs_sql} <= ({rhs_sql} || '-12-31')::date", params
 
 
 class Exactly(models.lookups.Exact):
@@ -212,7 +212,7 @@ class DateTimeTransform(models.Transform):
 
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
-        return 'from_unixtime({})'.format(lhs), params
+        return f'from_unixtime({lhs})', params
 
 
 class LookupTests(TestCase):

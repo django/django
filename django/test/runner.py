@@ -86,7 +86,7 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
     def printErrorList(self, flavour, errors):
         for test, err, sql_debug in errors:
             self.stream.writeln(self.separator1)
-            self.stream.writeln("%s: %s" % (flavour, self.getDescription(test)))
+            self.stream.writeln(f"{flavour}: {self.getDescription(test)}")
             self.stream.writeln(self.separator2)
             self.stream.writeln(err)
             self.stream.writeln(self.separator2)
@@ -523,7 +523,7 @@ class Shuffler:
         return f'{self.seed!r} ({self.seed_source})'
 
     def _hash_item(self, item, key):
-        text = '{}{}'.format(self.seed, key(item))
+        text = f'{self.seed}{key(item)}'
         return self._hash_text(text)
 
     def shuffle(self, items, key):
@@ -914,10 +914,10 @@ class DiscoverRunner:
         self.setup_test_environment()
         suite = self.build_suite(test_labels, extra_tests)
         databases = self.get_databases(suite)
-        serialized_aliases = set(
+        serialized_aliases = {
             alias
             for alias, serialize in databases.items() if serialize
-        )
+        }
         with self.time_keeper.timed('Total database setup'):
             old_config = self.setup_databases(
                 aliases=databases,

@@ -88,7 +88,9 @@ inclusion_no_params_with_context_from_template.anything = (
 def inclusion_params_and_context(context, arg):
     """Expected inclusion_params_and_context __doc__"""
     return {
-        "result": "inclusion_params_and_context - Expected result (context value: %s): %s" % (context['value'], arg)
+        "result": "inclusion_params_and_context - Expected result (context value: {}): {}".format(
+            context['value'], arg
+        )
     }
 
 
@@ -112,7 +114,7 @@ inclusion_params_and_context_from_template.anything = "Expected inclusion_params
 @register.inclusion_tag('inclusion.html')
 def inclusion_two_params(one, two):
     """Expected inclusion_two_params __doc__"""
-    return {"result": "inclusion_two_params - Expected result: %s, %s" % (one, two)}
+    return {"result": f"inclusion_two_params - Expected result: {one}, {two}"}
 
 
 inclusion_two_params.anything = "Expected inclusion_two_params __dict__"
@@ -121,7 +123,7 @@ inclusion_two_params.anything = "Expected inclusion_two_params __dict__"
 @register.inclusion_tag(engine.get_template('inclusion.html'))
 def inclusion_two_params_from_template(one, two):
     """Expected inclusion_two_params_from_template __doc__"""
-    return {"result": "inclusion_two_params_from_template - Expected result: %s, %s" % (one, two)}
+    return {"result": f"inclusion_two_params_from_template - Expected result: {one}, {two}"}
 
 
 inclusion_two_params_from_template.anything = "Expected inclusion_two_params_from_template __dict__"
@@ -130,7 +132,7 @@ inclusion_two_params_from_template.anything = "Expected inclusion_two_params_fro
 @register.inclusion_tag('inclusion.html')
 def inclusion_one_default(one, two='hi'):
     """Expected inclusion_one_default __doc__"""
-    return {"result": "inclusion_one_default - Expected result: %s, %s" % (one, two)}
+    return {"result": f"inclusion_one_default - Expected result: {one}, {two}"}
 
 
 inclusion_one_default.anything = "Expected inclusion_one_default __dict__"
@@ -148,7 +150,7 @@ def inclusion_keyword_only_default(*, kwarg=42):
 @register.inclusion_tag(engine.get_template('inclusion.html'))
 def inclusion_one_default_from_template(one, two='hi'):
     """Expected inclusion_one_default_from_template __doc__"""
-    return {"result": "inclusion_one_default_from_template - Expected result: %s, %s" % (one, two)}
+    return {"result": f"inclusion_one_default_from_template - Expected result: {one}, {two}"}
 
 
 inclusion_one_default_from_template.anything = "Expected inclusion_one_default_from_template __dict__"
@@ -224,9 +226,9 @@ def inclusion_unlimited_args_kwargs(one, two='hi', *args, **kwargs):
     """Expected inclusion_unlimited_args_kwargs __doc__"""
     # Sort the dictionary by key to guarantee the order for testing.
     sorted_kwarg = sorted(kwargs.items(), key=operator.itemgetter(0))
-    return {"result": "inclusion_unlimited_args_kwargs - Expected result: %s / %s" % (
+    return {"result": "inclusion_unlimited_args_kwargs - Expected result: {} / {}".format(
         ', '.join(str(arg) for arg in [one, two, *args]),
-        ', '.join('%s=%s' % (k, v) for (k, v) in sorted_kwarg)
+        ', '.join(f'{k}={v}' for (k, v) in sorted_kwarg)
     )}
 
 

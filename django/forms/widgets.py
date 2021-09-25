@@ -56,7 +56,7 @@ class Media:
         self._js_lists = [js]
 
     def __repr__(self):
-        return 'Media(css=%r, js=%r)' % (self._css, self._js)
+        return f'Media(css={self._css!r}, js={self._js!r})'
 
     def __str__(self):
         return self.render()
@@ -357,7 +357,7 @@ class MultipleHiddenInput(HiddenInput):
             if id_:
                 # An ID attribute was given. Add a numeric index as a suffix
                 # so that the inputs don't all have the same ID attribute.
-                widget_attrs['id'] = '%s_%s' % (id_, index)
+                widget_attrs['id'] = f'{id_}_{index}'
             widget = HiddenInput()
             widget.is_required = self.is_required
             subwidgets.append(widget.get_context(name, value_, widget_attrs)['widget'])
@@ -619,7 +619,7 @@ class ChoiceWidget(Widget):
         return groups
 
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
-        index = str(index) if subindex is None else "%s_%s" % (index, subindex)
+        index = str(index) if subindex is None else f"{index}_{subindex}"
         option_attrs = self.build_attrs(self.attrs, attrs) if self.option_inherits_attrs else {}
         if selected:
             option_attrs.update(self.checked_attribute)
@@ -648,7 +648,7 @@ class ChoiceWidget(Widget):
         references the zero index.
         """
         if id_ and self.add_id_index:
-            id_ = '%s_%s' % (id_, index)
+            id_ = f'{id_}_{index}'
         return id_
 
     def value_from_datadict(self, data, files, name):
@@ -841,7 +841,7 @@ class MultiWidget(Widget):
                 widget_value = None
             if id_:
                 widget_attrs = final_attrs.copy()
-                widget_attrs['id'] = '%s_%s' % (id_, i)
+                widget_attrs['id'] = f'{id_}_{i}'
             else:
                 widget_attrs = final_attrs
             subwidgets.append(widget.get_context(widget_name, widget_value, widget_attrs)['widget'])
@@ -1031,7 +1031,7 @@ class SelectDateWidget(Widget):
             if match:
                 # Convert any zeros in the date to empty strings to match the
                 # empty option value.
-                year, month, day = [int(val) or '' for val in match.groups()]
+                year, month, day = (int(val) or '' for val in match.groups())
             else:
                 input_format = get_format('DATE_INPUT_FORMATS')[0]
                 try:
@@ -1060,7 +1060,7 @@ class SelectDateWidget(Widget):
 
     def id_for_label(self, id_):
         for first_select in self._parse_date_fmt():
-            return '%s_%s' % (id_, first_select)
+            return f'{id_}_{first_select}'
         return '%s_month' % id_
 
     def value_from_datadict(self, data, files, name):
@@ -1077,12 +1077,12 @@ class SelectDateWidget(Widget):
             except ValueError:
                 # Return pseudo-ISO dates with zeros for any unselected values,
                 # e.g. '2017-0-23'.
-                return '%s-%s-%s' % (y or 0, m or 0, d or 0)
+                return f'{y or 0}-{m or 0}-{d or 0}'
             return date_value.strftime(input_format)
         return data.get(name)
 
     def value_omitted_from_data(self, data, files, name):
         return not any(
-            ('{}_{}'.format(name, interval) in data)
+            (f'{name}_{interval}' in data)
             for interval in ('year', 'month', 'day')
         )

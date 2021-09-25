@@ -47,7 +47,7 @@ class CommonMiddleware(MiddlewareMixin):
         # Check for a redirect based on settings.PREPEND_WWW
         host = request.get_host()
         must_prepend = settings.PREPEND_WWW and host and not host.startswith('www.')
-        redirect_url = ('%s://www.%s' % (request.scheme, host)) if must_prepend else ''
+        redirect_url = (f'{request.scheme}://www.{host}') if must_prepend else ''
 
         # Check if a slash should be appended
         if self.should_redirect_with_slash(request):
@@ -128,7 +128,7 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
                 ua = request.META.get('HTTP_USER_AGENT', '<none>')
                 ip = request.META.get('REMOTE_ADDR', '<none>')
                 mail_managers(
-                    "Broken %slink on %s" % (
+                    "Broken {}link on {}".format(
                         ('INTERNAL ' if self.is_internal_request(domain, referer) else ''),
                         domain
                     ),

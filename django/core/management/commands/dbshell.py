@@ -35,7 +35,7 @@ class Command(BaseCommand):
             )
         except subprocess.CalledProcessError as e:
             raise CommandError(
-                '"%s" returned non-zero exit status %s.' % (
+                '"{}" returned non-zero exit status {}.'.format(
                     ' '.join(e.cmd),
                     e.returncode,
                 ),

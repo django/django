@@ -29,9 +29,9 @@ __M = r'(?P<mon>\w{3})'
 __Y = r'(?P<year>\d{4})'
 __Y2 = r'(?P<year>\d{2})'
 __T = r'(?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})'
-RFC1123_DATE = _lazy_re_compile(r'^\w{3}, %s %s %s %s GMT$' % (__D, __M, __Y, __T))
-RFC850_DATE = _lazy_re_compile(r'^\w{6,9}, %s-%s-%s %s GMT$' % (__D, __M, __Y2, __T))
-ASCTIME_DATE = _lazy_re_compile(r'^\w{3} %s %s %s %s$' % (__M, __D2, __T, __Y))
+RFC1123_DATE = _lazy_re_compile(fr'^\w{{3}}, {__D} {__M} {__Y} {__T} GMT$')
+RFC850_DATE = _lazy_re_compile(fr'^\w{{6,9}}, {__D}-{__M}-{__Y2} {__T} GMT$')
+ASCTIME_DATE = _lazy_re_compile(fr'^\w{{3}} {__M} {__D2} {__T} {__Y}$')
 
 RFC3986_GENDELIMS = ":/?#[]@"
 RFC3986_SUBDELIMS = "!$&'()*+,;="
@@ -350,5 +350,5 @@ def escape_leading_slashes(url):
     redirecting to another host.
     """
     if url.startswith('//'):
-        url = '/%2F{}'.format(url[2:])
+        url = f'/%2F{url[2:]}'
     return url

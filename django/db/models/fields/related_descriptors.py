@@ -104,7 +104,7 @@ class ForwardManyToOneDescriptor:
             'RelatedObjectDoesNotExist',
             (self.field.remote_field.model.DoesNotExist, AttributeError), {
                 '__module__': self.field.model.__module__,
-                '__qualname__': '%s.%s.RelatedObjectDoesNotExist' % (
+                '__qualname__': '{}.{}.RelatedObjectDoesNotExist'.format(
                     self.field.model.__qualname__,
                     self.field.name,
                 ),
@@ -195,7 +195,7 @@ class ForwardManyToOneDescriptor:
 
         if rel_obj is None and not self.field.null:
             raise self.RelatedObjectDoesNotExist(
-                "%s has no %s." % (self.field.model.__name__, self.field.name)
+                f"{self.field.model.__name__} has no {self.field.name}."
             )
         else:
             return rel_obj
@@ -213,7 +213,7 @@ class ForwardManyToOneDescriptor:
         # An object must be an instance of the related class.
         if value is not None and not isinstance(value, self.field.remote_field.model._meta.concrete_model):
             raise ValueError(
-                'Cannot assign "%r": "%s.%s" must be a "%s" instance.' % (
+                'Cannot assign "{!r}": "{}.{}" must be a "{}" instance.'.format(
                     value,
                     instance._meta.object_name,
                     self.field.name,
@@ -349,7 +349,7 @@ class ReverseOneToOneDescriptor:
             'RelatedObjectDoesNotExist',
             (self.related.related_model.DoesNotExist, AttributeError), {
                 '__module__': self.related.model.__module__,
-                '__qualname__': '%s.%s.RelatedObjectDoesNotExist' % (
+                '__qualname__': '{}.{}.RelatedObjectDoesNotExist'.format(
                     self.related.model.__qualname__,
                     self.related.name,
                 )
@@ -419,7 +419,7 @@ class ReverseOneToOneDescriptor:
 
         if rel_obj is None:
             raise self.RelatedObjectDoesNotExist(
-                "%s has no %s." % (
+                "{} has no {}.".format(
                     instance.__class__.__name__,
                     self.related.get_accessor_name()
                 )
@@ -458,7 +458,7 @@ class ReverseOneToOneDescriptor:
         elif not isinstance(value, self.related.related_model):
             # An object must be an instance of the related class.
             raise ValueError(
-                'Cannot assign "%r": "%s.%s" must be a "%s" instance.' % (
+                'Cannot assign "{!r}": "{}.{}" must be a "{}" instance.'.format(
                     value,
                     instance._meta.object_name,
                     self.related.get_accessor_name(),
@@ -597,10 +597,10 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 except FieldError:
                     # The relationship has multiple target fields. Use a tuple
                     # for related object id.
-                    rel_obj_id = tuple([
+                    rel_obj_id = tuple(
                         getattr(self.instance, target_field.attname)
                         for target_field in self.field.get_path_info()[-1].target_fields
-                    ])
+                    )
                 else:
                     rel_obj_id = getattr(self.instance, target_field.attname)
                 queryset._known_related_objects = {self.field: {rel_obj_id: self.instance}}
@@ -646,7 +646,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
 
             def check_and_update_obj(obj):
                 if not isinstance(obj, self.model):
-                    raise TypeError("'%s' instance expected, got %r" % (
+                    raise TypeError("'{}' instance expected, got {!r}".format(
                         self.model._meta.object_name, obj,
                     ))
                 setattr(obj, self.field.name, self.instance)
@@ -698,7 +698,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 old_ids = set()
                 for obj in objs:
                     if not isinstance(obj, self.model):
-                        raise TypeError("'%s' instance expected, got %r" % (
+                        raise TypeError("'{}' instance expected, got {!r}".format(
                             self.model._meta.object_name, obj,
                         ))
                     # Is obj actually part of this descriptor set?
@@ -706,7 +706,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
                         old_ids.add(obj.pk)
                     else:
                         raise self.field.remote_field.model.DoesNotExist(
-                            "%r is not related to %r." % (obj, self.instance)
+                            f"{obj!r} is not related to {self.instance!r}."
                         )
                 self._clear(self.filter(pk__in=old_ids), bulk)
             remove.alters_data = True
@@ -842,7 +842,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             self.core_filters = {}
             self.pk_field_names = {}
             for lh_field, rh_field in self.source_field.related_fields:
-                core_filter_key = '%s__%s' % (self.query_field_name, rh_field.name)
+                core_filter_key = f'{self.query_field_name}__{rh_field.name}'
                 self.core_filters[core_filter_key] = getattr(instance, rh_field.attname)
                 self.pk_field_names[lh_field.name] = rh_field.name
 
@@ -926,7 +926,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             qn = connection.ops.quote_name
             queryset = queryset.extra(select={
                 '_prefetch_related_val_%s' % f.attname:
-                '%s.%s' % (qn(join_table), qn(f.column)) for f in fk.local_related_fields})
+                f'{qn(join_table)}.{qn(f.column)}' for f in fk.local_related_fields})
             return (
                 queryset,
                 lambda result: tuple(

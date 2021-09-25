@@ -45,7 +45,7 @@ class Node:
         return template % (self.connector, ', '.join(str(c) for c in self.children))
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, self)
+        return f"<{self.__class__.__name__}: {self}>"
 
     def __deepcopy__(self, memodict):
         obj = Node(connector=self.connector, negated=self.negated)

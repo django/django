@@ -531,7 +531,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         @mock_inputs({
             'password': 'nopasswd',
             'Username: ': 'joe',
-            'Orgs (Organization.id): ': '%s, %s' % (org_id_1, org_id_2),
+            'Orgs (Organization.id): ': f'{org_id_1}, {org_id_2}',
         })
         def test(self):
             call_command(

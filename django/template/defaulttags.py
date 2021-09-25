@@ -415,7 +415,7 @@ class URLNode(Node):
         self.asvar = asvar
 
     def __repr__(self):
-        return "<%s view_name='%s' args=%s kwargs=%s as=%s>" % (
+        return "<{} view_name='{}' args={} kwargs={} as={}>".format(
             self.__class__.__qualname__,
             self.view_name,
             repr(self.args),
@@ -922,7 +922,7 @@ def do_if(parser, token):
 
     # {% endif %}
     if token.contents != 'endif':
-        raise TemplateSyntaxError('Malformed template tag at line {}: "{}"'.format(token.lineno, token.contents))
+        raise TemplateSyntaxError(f'Malformed template tag at line {token.lineno}: "{token.contents}"')
 
     return IfNode(conditions_nodelists)
 
@@ -974,7 +974,7 @@ def find_library(parser, name):
         return parser.libraries[name]
     except KeyError:
         raise TemplateSyntaxError(
-            "'%s' is not a registered tag library. Must be one of:\n%s" % (
+            "'{}' is not a registered tag library. Must be one of:\n{}".format(
                 name, "\n".join(sorted(parser.libraries)),
             ),
         )
@@ -995,7 +995,7 @@ def load_from_library(library, label, names):
             subset.filters[name] = library.filters[name]
         if found is False:
             raise TemplateSyntaxError(
-                "'%s' is not a valid tag or filter in tag library '%s'" % (
+                "'{}' is not a valid tag or filter in tag library '{}'".format(
                     name, label,
                 ),
             )

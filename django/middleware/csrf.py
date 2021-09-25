@@ -256,7 +256,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
         except DisallowedHost:
             pass
         else:
-            good_origin = '%s://%s' % (
+            good_origin = '{}://{}'.format(
                 'https' if request.is_secure() else 'http',
                 good_host,
             )
@@ -315,7 +315,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
         else:
             server_port = request.get_port()
             if server_port not in ('443', '80'):
-                good_referer = '%s:%s' % (good_referer, server_port)
+                good_referer = f'{good_referer}:{server_port}'
 
         if not is_same_domain(referer.netloc, good_referer):
             raise RejectRequest(REASON_BAD_REFERER % referer.geturl())

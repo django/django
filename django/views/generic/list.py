@@ -180,7 +180,7 @@ class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
         # generated ones.
         if hasattr(self.object_list, 'model'):
             opts = self.object_list.model._meta
-            names.append("%s/%s%s.html" % (opts.app_label, opts.model_name, self.template_name_suffix))
+            names.append(f"{opts.app_label}/{opts.model_name}{self.template_name_suffix}.html")
         elif not names:
             raise ImproperlyConfigured(
                 "%(cls)s requires either a 'template_name' attribute "

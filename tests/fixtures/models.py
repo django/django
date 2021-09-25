@@ -55,8 +55,8 @@ class Tag(models.Model):
     tagged = GenericForeignKey(ct_field='tagged_type', fk_field='tagged_id')
 
     def __str__(self):
-        return '<%s: %s> tagged "%s"' % (self.tagged.__class__.__name__,
-                                         self.tagged, self.name)
+        return '<{}: {}> tagged "{}"'.format(self.tagged.__class__.__name__,
+                                             self.tagged, self.name)
 
 
 class PersonManager(models.Manager):
@@ -98,8 +98,10 @@ class Visa(models.Model):
     permissions = models.ManyToManyField(Permission, blank=True)
 
     def __str__(self):
-        return '%s %s' % (self.person.name,
-                          ', '.join(p.name for p in self.permissions.all()))
+        return '{} {}'.format(
+            self.person.name,
+            ', '.join(p.name for p in self.permissions.all())
+        )
 
 
 class Book(models.Model):
@@ -111,7 +113,7 @@ class Book(models.Model):
 
     def __str__(self):
         authors = ' and '.join(a.name for a in self.authors.all())
-        return '%s by %s' % (self.name, authors) if authors else self.name
+        return f'{self.name} by {authors}' if authors else self.name
 
 
 class PrimaryKeyUUIDModel(models.Model):

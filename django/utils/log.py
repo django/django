@@ -92,14 +92,14 @@ class AdminEmailHandler(logging.Handler):
     def emit(self, record):
         try:
             request = record.request
-            subject = '%s (%s IP): %s' % (
+            subject = '{} ({} IP): {}'.format(
                 record.levelname,
                 ('internal' if request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS
                  else 'EXTERNAL'),
                 record.getMessage()
             )
         except Exception:
-            subject = '%s: %s' % (
+            subject = '{}: {}'.format(
                 record.levelname,
                 record.getMessage()
             )
@@ -118,7 +118,7 @@ class AdminEmailHandler(logging.Handler):
             exc_info = (None, record.getMessage(), None)
 
         reporter = self.reporter_class(request, is_email=True, *exc_info)
-        message = "%s\n\n%s" % (self.format(no_exc_record), reporter.get_traceback_text())
+        message = f"{self.format(no_exc_record)}\n\n{reporter.get_traceback_text()}"
         html_message = reporter.get_traceback_html() if self.include_html else None
         self.send_mail(subject, message, fail_silently=True, html_message=html_message)
 

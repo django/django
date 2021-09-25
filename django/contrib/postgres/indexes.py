@@ -23,7 +23,7 @@ class PostgresIndex(Index):
         statement = super().create_sql(model, schema_editor, using=' USING %s' % self.suffix, **kwargs)
         with_params = self.get_with_params()
         if with_params:
-            statement.parts['extra'] = 'WITH (%s) %s' % (
+            statement.parts['extra'] = 'WITH ({}) {}'.format(
                 ', '.join(with_params),
                 statement.parts['extra'],
             )

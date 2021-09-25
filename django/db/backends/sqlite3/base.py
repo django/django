@@ -336,7 +336,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     column_name, referenced_column_name = foreign_key[3:5]
                     primary_key_column_name = self.introspection.get_primary_key_column(cursor, table_name)
                     primary_key_value, bad_value = cursor.execute(
-                        'SELECT %s, %s FROM %s WHERE rowid = %%s' % (
+                        'SELECT {}, {} FROM {} WHERE rowid = %s'.format(
                             self.ops.quote_name(primary_key_column_name),
                             self.ops.quote_name(column_name),
                             self.ops.quote_name(table_name),

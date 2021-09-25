@@ -74,9 +74,9 @@ class LazySettings(LazyObject):
         # Hardcode the class name as otherwise it yields 'Settings'.
         if self._wrapped is empty:
             return '<LazySettings [Unevaluated]>'
-        return '<LazySettings "%(settings_module)s">' % {
-            'settings_module': self._wrapped.SETTINGS_MODULE,
-        }
+        return '<LazySettings "{settings_module}">'.format(
+            settings_module=self._wrapped.SETTINGS_MODULE,
+        )
 
     def __getattr__(self, name):
         """Return the value of a setting and cache it in self.__dict__."""
@@ -137,7 +137,7 @@ class LazySettings(LazyObject):
         if value.startswith(('http://', 'https://', '/')):
             return value
         from django.urls import get_script_prefix
-        return '%s%s' % (get_script_prefix(), value)
+        return f'{get_script_prefix()}{value}'
 
     @property
     def configured(self):
@@ -225,10 +225,10 @@ class Settings:
         return setting in self._explicit_settings
 
     def __repr__(self):
-        return '<%(cls)s "%(settings_module)s">' % {
-            'cls': self.__class__.__name__,
-            'settings_module': self.SETTINGS_MODULE,
-        }
+        return '<{cls} "{settings_module}">'.format(
+            cls=self.__class__.__name__,
+            settings_module=self.SETTINGS_MODULE,
+        )
 
 
 class UserSettingsHolder:
@@ -276,9 +276,9 @@ class UserSettingsHolder:
         return deleted or set_locally or set_on_default
 
     def __repr__(self):
-        return '<%(cls)s>' % {
-            'cls': self.__class__.__name__,
-        }
+        return '<{cls}>'.format(
+            cls=self.__class__.__name__,
+        )
 
 
 settings = LazySettings()

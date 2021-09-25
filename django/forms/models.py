@@ -154,7 +154,7 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
             if (fields is not None and f.name in fields and
                     (exclude is None or f.name not in exclude)):
                 raise FieldError(
-                    "'%s' cannot be specified for %s model form as it is a non-editable field" % (
+                    "'{}' cannot be specified for {} model form as it is a non-editable field".format(
                         f.name, model.__name__)
                 )
             continue
@@ -456,7 +456,7 @@ class BaseModelForm(BaseForm):
         """
         if self.errors:
             raise ValueError(
-                "The %s could not be %s because the data didn't validate." % (
+                "The {} could not be {} because the data didn't validate.".format(
                     self.instance._meta.object_name,
                     'created' if self.instance._state.adding else 'changed',
                 )
@@ -602,7 +602,7 @@ class BaseModelFormSet(BaseFormSet):
         pk_required = i < self.initial_form_count()
         if pk_required:
             if self.is_bound:
-                pk_key = '%s-%s' % (self.add_prefix(i), self.model._meta.pk.name)
+                pk_key = f'{self.add_prefix(i)}-{self.model._meta.pk.name}'
                 try:
                     pk = self.data[pk_key]
                 except KeyError:
@@ -1028,11 +1028,11 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
                 fk.remote_field.model not in parent_list
             ):
                 raise ValueError(
-                    "fk_name '%s' is not a ForeignKey to '%s'." % (fk_name, parent_model._meta.label)
+                    f"fk_name '{fk_name}' is not a ForeignKey to '{parent_model._meta.label}'."
                 )
         elif not fks_to_parent:
             raise ValueError(
-                "'%s' has no field named '%s'." % (model._meta.label, fk_name)
+                f"'{model._meta.label}' has no field named '{fk_name}'."
             )
     else:
         # Try to discover what the ForeignKey from model to parent_model is
@@ -1053,7 +1053,7 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
             if can_fail:
                 return
             raise ValueError(
-                "'%s' has no ForeignKey to '%s'." % (
+                "'{}' has no ForeignKey to '{}'.".format(
                     model._meta.label,
                     parent_model._meta.label,
                 )

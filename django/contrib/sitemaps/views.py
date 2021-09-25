@@ -35,11 +35,11 @@ def index(request, sitemaps,
             site = site()
         protocol = req_protocol if site.protocol is None else site.protocol
         sitemap_url = reverse(sitemap_url_name, kwargs={'section': section})
-        absolute_url = '%s://%s%s' % (protocol, req_site.domain, sitemap_url)
+        absolute_url = f'{protocol}://{req_site.domain}{sitemap_url}'
         sites.append(absolute_url)
         # Add links to all pages of the sitemap.
         for page in range(2, site.paginator.num_pages + 1):
-            sites.append('%s?p=%s' % (absolute_url, page))
+            sites.append(f'{absolute_url}?p={page}')
 
     return TemplateResponse(request, template_name, {'sitemaps': sites},
                             content_type=content_type)

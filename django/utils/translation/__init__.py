@@ -251,7 +251,7 @@ def get_language_info(lang_code):
         try:
             info = LANG_INFO[generic_lang_code]
         except KeyError:
-            raise KeyError("Unknown language code %s and %s." % (lang_code, generic_lang_code))
+            raise KeyError(f"Unknown language code {lang_code} and {generic_lang_code}.")
 
     if info:
         info['name_translated'] = gettext_lazy(info['name'])
