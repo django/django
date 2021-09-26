@@ -3954,3 +3954,14 @@ class OverrideTests(SimpleTestCase):
             '<div class="error">This field is required.</div></div>'
             '<p>Comment: <input type="text" name="comment" required></p>',
         )
+
+    def test_cyclic_context_boundfield_render(self):
+        class FirstNameForm(Form):
+            first_name = CharField()
+            template_name_label = 'forms_tests/cyclic_context_boundfield_render.html'
+
+        f = FirstNameForm()
+        try:
+            self.assertInHTML('<th>1</th>', f.render())
+        except RecursionError:
+            self.fail('Cyclic reference in BoundField.render().')

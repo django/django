@@ -177,7 +177,6 @@ class BoundField:
                 else:
                     attrs['class'] = self.form.required_css_class
         context = {
-            'form': self.form,
             'field': self,
             'label': contents,
             'attrs': attrs,
