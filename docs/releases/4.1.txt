@@ -208,6 +208,11 @@ Models
   :class:`~django.db.models.expressions.Window` expression now accepts string
   references to fields and transforms.
 
+* The new :setting:`CONN_HEALTH_CHECKS` setting allows enabling health checks
+  for :ref:`persistent database connections <persistent-database-connections>`
+  in order to reduce the number of failed requests, e.g. after database server
+  restart.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

@@ -62,8 +62,19 @@ At the end of each request, Django closes the connection if it has reached its
 maximum age or if it is in an unrecoverable error state. If any database
 errors have occurred while processing the requests, Django checks whether the
 connection still works, and closes it if it doesn't. Thus, database errors
-affect at most one request; if the connection becomes unusable, the next
-request gets a fresh connection.
+affect at most one request per each application's worker thread; if the
+connection becomes unusable, the next request gets a fresh connection.
+
+Setting :setting:`CONN_HEALTH_CHECKS` to ``True`` can be used to improve the
+robustness of connection reuse and prevent errors when a connection has been
+closed by the database server which is now ready to accept and serve new
+connections, e.g. after database server restart. The health check is performed
+only once per request and only if the database is being accessed during the
+handling of the request.
+
+.. versionchanged:: 4.1
+
+    The :setting:`CONN_HEALTH_CHECKS` setting was added.
 
 Caveats
 ~~~~~~~
