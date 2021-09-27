@@ -577,6 +577,23 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
     format found in :setting:`DATE_INPUT_FORMATS` and respects
     :doc:`/topics/i18n/formatting`.
 
+.. admonition:: Date picker implementation
+
+    By default, the :class:`~django.forms.DateInput` is rendered as a simple
+    text box, i.e. ``<input type="text" ...>``. If you prefer a full-fledged
+    date picker instead, you can take advantage of the browser's interface for
+    the `HTML5 "date" input type`_. This can be achieved by overriding the
+    widget's ``input_type`` attribute, for example: ::
+
+        class MyDateInput(forms.DateInput):
+            input_type = 'date'
+
+    Alternatively, you could specify the widget as follows: ::
+
+        DateInput(attrs={'type': 'date'})
+
+.. _HTML5 "date" input type: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/date
+
 ``DateTimeInput``
 ~~~~~~~~~~~~~~~~~
 
