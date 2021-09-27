@@ -239,7 +239,7 @@ def localize_input(value, default=None):
     return value
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def sanitize_strftime_format(fmt):
     """
     Ensure that certain specifiers are correctly padded with leading zeros.

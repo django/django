@@ -83,7 +83,7 @@ def make_password(password, salt=None, hasher='default'):
     return hasher.encode(password, salt)
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def get_hashers():
     hashers = []
     for hasher_path in settings.PASSWORD_HASHERS:
@@ -96,7 +96,7 @@ def get_hashers():
     return hashers
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def get_hashers_by_algorithm():
     return {hasher.algorithm: hasher for hasher in get_hashers()}
 

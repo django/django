@@ -69,7 +69,7 @@ def technical_500_response(request, exc_type, exc_value, tb, status_code=500):
         return HttpResponse(text, status=status_code, content_type='text/plain; charset=utf-8')
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def get_default_exception_reporter_filter():
     # Instantiate the default filter for the first time and cache it.
     return import_string(settings.DEFAULT_EXCEPTION_REPORTER_FILTER)()

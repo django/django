@@ -441,7 +441,7 @@ class WatchmanReloader(BaseReloader):
         logger.debug('Watchman watch-project result: %s', result)
         return result['watch'], result.get('relative_path')
 
-    @functools.lru_cache()
+    @functools.lru_cache
     def _get_clock(self, root):
         return self.client.query('clock', root)['clock']
 

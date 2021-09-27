@@ -8,7 +8,7 @@ from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def get_default_renderer():
     renderer_class = import_string(settings.FORM_RENDERER)
     return renderer_class()

@@ -8,7 +8,7 @@ from django.db import connections
 from django.db.backends.base.base import NO_DB_ALIAS
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def get_hstore_oids(connection_alias):
     """Return hstore and hstore array OIDs."""
     with connections[connection_alias].cursor() as cursor:
@@ -26,7 +26,7 @@ def get_hstore_oids(connection_alias):
         return tuple(oids), tuple(array_oids)
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def get_citext_oids(connection_alias):
     """Return citext array OIDs."""
     with connections[connection_alias].cursor() as cursor:
