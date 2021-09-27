@@ -90,7 +90,7 @@ class EngineHandler:
         return [self[alias] for alias in self]
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def get_app_template_dirs(dirname):
     """
     Return an iterable of paths of directories to load app templates from.

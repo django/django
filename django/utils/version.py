@@ -70,7 +70,7 @@ def get_docs_version(version=None):
         return '%d.%d' % version[:2]
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def get_git_changeset():
     """Return a numeric identifier of the latest git changeset.
 
