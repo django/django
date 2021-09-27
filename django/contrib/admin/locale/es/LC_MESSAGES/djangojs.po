@@ -65,7 +65,7 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
-"Esta es la lista de los %s elegidos. Puede elmininar algunos "
+"Esta es la lista de los %s elegidos. Puede eliminar algunos "
 "seleccionándolos en la caja inferior y luego haciendo click en la flecha "
 "\"Eliminar\" que hay entre las dos cajas."
 
