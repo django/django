@@ -137,9 +137,11 @@ class Command(BaseCommand):
                         if not field.many_to_many:
                             fake_user_data[field_name] = input_value
 
-                        # Wrap any foreign keys in fake model instances
-                        if field.many_to_one:
-                            fake_user_data[field_name] = field.remote_field.model(input_value)
+                    # Wrap any foreign keys in fake model instances
+                    if field.many_to_one:
+                        user_data[field_name] = fake_user_data[field_name] = field.remote_field.model(
+                            user_data[field_name]
+                        )
 
                 # Prompt for a password if the model has one.
                 while PASSWORD_FIELD in user_data and user_data[PASSWORD_FIELD] is None:
@@ -185,6 +187,10 @@ class Command(BaseCommand):
                         raise CommandError('You must use --%s with --noinput.' % field_name)
                     field = self.UserModel._meta.get_field(field_name)
                     user_data[field_name] = field.clean(value, None)
+                    if field.many_to_many and isinstance(user_data[field_name], str):
+                        user_data[field_name] = [pk.strip() for pk in (user_data[field_name]).split(",")]
+                    if field.many_to_one:
+                        user_data[field_name] = field.remote_field.model(user_data[field_name])
 
             self.UserModel._default_manager.db_manager(database).create_superuser(**user_data)
             if options['verbosity'] >= 1:

@@ -8,7 +8,7 @@ class Email(models.Model):
 
 class CustomUserWithFKManager(BaseUserManager):
     def create_superuser(self, username, email, group, password):
-        user = self.model(username_id=username, email_id=email, group_id=group)
+        user = self.model(username_id=username, email_id=email.pk, group_id=group.id)
         user.set_password(password)
         user.save(using=self._db)
         return user
