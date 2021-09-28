@@ -702,7 +702,13 @@ class Func(SQLiteNumericMixin, Expression):
         sql_parts = []
         params = []
         for arg in self.source_expressions:
-            arg_sql, arg_params = compiler.compile(arg)
+            try:
+                arg_sql, arg_params = compiler.compile(arg)
+            except EmptyResultSet:
+                empty_result_set_value = getattr(arg, 'empty_result_set_value', NotImplemented)
+                if empty_result_set_value is NotImplemented:
+                    raise
+                arg_sql, arg_params = compiler.compile(Value(empty_result_set_value))
             sql_parts.append(arg_sql)
             params.extend(arg_params)
         data = {**self.extra, **extra_context}
@@ -1114,6 +1120,7 @@ class Subquery(BaseExpression, Combinable):
     """
     template = '(%(subquery)s)'
     contains_aggregate = False
+    empty_result_set_value = None
 
     def __init__(self, queryset, output_field=None, **extra):
         # Allow the usage of both QuerySet and sql.Query objects.
