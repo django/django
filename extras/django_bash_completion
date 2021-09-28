@@ -2,6 +2,8 @@
 # This bash script adds tab-completion feature to django-admin and manage.py.
 #
 # Testing it out without installing
+
+TODO: //ADD SERVER TEST         
 # =================================
 #
 # To test out the completion without "installing" this, just run this file
