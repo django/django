@@ -266,8 +266,12 @@ class SQLCompiler:
             try:
                 sql, params = self.compile(col)
             except EmptyResultSet:
-                # Select a predicate that's always False.
-                sql, params = '0', ()
+                empty_result_set_value = getattr(col, 'empty_result_set_value', NotImplemented)
+                if empty_result_set_value is NotImplemented:
+                    # Select a predicate that's always False.
+                    sql, params = '0', ()
+                else:
+                    sql, params = self.compile(Value(empty_result_set_value))
             else:
                 sql, params = col.select_format(self, sql, params)
             ret.append((col, (sql, params), alias))

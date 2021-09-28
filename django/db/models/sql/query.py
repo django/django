@@ -143,6 +143,7 @@ class Query(BaseExpression):
     """A single SQL query."""
 
     alias_prefix = 'T'
+    empty_result_set_value = None
     subq_aliases = frozenset([alias_prefix])
 
     compiler = 'SQLCompiler'
