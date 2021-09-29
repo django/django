@@ -478,6 +478,36 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             )
 
     @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithFK')
+    def test_fields_with_fk_by_env(self):
+        new_io = StringIO()
+        group = Group.objects.create(name='mygroup')
+        email = Email.objects.create(email='mymail@gmail.com')
+        os.environ["DJANGO_SUPERUSER_GROUP"] = str(group.pk)
+        call_command(
+            'createsuperuser',
+            interactive=False,
+            username=email.pk,
+            email=email.email,
+            stdout=new_io,
+        )
+        command_output = new_io.getvalue().strip()
+        self.assertEqual(command_output, 'Superuser created successfully.')
+        u = CustomUserWithFK._default_manager.get(email=email)
+        self.assertEqual(u.username, email)
+        self.assertEqual(u.group, group)
+
+        non_existent_email = 'mymail2@gmail.com'
+        msg = 'email instance with email %r does not exist.' % non_existent_email
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command(
+                'createsuperuser',
+                interactive=False,
+                username=email.pk,
+                email=non_existent_email,
+                stdout=new_io,
+            )
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithFK')
     def test_fields_with_fk_interactive(self):
         new_io = StringIO()
         group = Group.objects.create(name='mygroup')
@@ -515,6 +545,23 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             interactive=False,
             username='joe',
             orgs=[org_id_1, org_id_2],
+            stdout=new_io,
+        )
+        command_output = new_io.getvalue().strip()
+        self.assertEqual(command_output, 'Superuser created successfully.')
+        user = CustomUserWithM2M._default_manager.get(username='joe')
+        self.assertEqual(user.orgs.count(), 2)
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithM2m')
+    def test_fields_with_m2m_by_env(self):
+        new_io = StringIO()
+        org_id_1 = Organization.objects.create(name='Organization 1').pk
+        org_id_2 = Organization.objects.create(name='Organization 2').pk
+        os.environ["DJANGO_SUPERUSER_ORGS"] = "%s,%s" % (org_id_1, org_id_2)
+        call_command(
+            'createsuperuser',
+            interactive=False,
+            username='joe',
             stdout=new_io,
         )
         command_output = new_io.getvalue().strip()
