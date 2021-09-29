@@ -8,6 +8,7 @@
 # Martin Tóth <ezimir@gmail.com>, 2017
 # Peter Stríž <petulak8@gmail.com>, 2020
 # Zbynek Drlik <drlik.zbynek@gmail.com>, 2019
+# Richard Kellner <richard.kellner@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
@@ -570,7 +571,7 @@ msgid "Save and continue editing"
 msgstr "Uložiť a pokračovať v úpravách"
 
 msgid "Save and view"
-msgstr ""
+msgstr "Uložiť a zobraziť"
 
 msgid "Close"
 msgstr "Zatvoriť"
@@ -603,6 +604,7 @@ msgid ""
 "Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
+"Z bezpečnostných dôvodov zadajte svoje staré heslo a potom dvakrát zadajte nové heslo, aby sme mohli overiť, či ste ho zadali správne."
 
 msgid "Change my password"
 msgstr "Zmeniť moje heslo"
@@ -639,11 +641,16 @@ msgid ""
 "We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"Poslali sme vám email s pokynmi na nastavenie hesla, ak existuje účet s "
+"emailom, ktorý ste zadali. Čoskoro by ste ich mali dostať."
 
 msgid ""
 "If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
+"Ak do niekoľko minút nedostanete email, uistite sa, že ste zadali adresu, pomocou "
+"ktorej ste sa zaregistrovali, a tiež si skontrolujte priečinok so spamom."
+
 
 #, python-format
 msgid ""
