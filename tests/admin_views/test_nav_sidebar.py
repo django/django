@@ -167,7 +167,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             reverse('test_with_sidebar:auth_user_changelist')
         )
         filter_value_script = (
-            "return localStorage.getItem('django.admin.navSidebarFilterValue')"
+            "return sessionStorage.getItem('django.admin.navSidebarFilterValue')"
         )
         self.assertIsNone(self.selenium.execute_script(filter_value_script))
         filter_input = self.selenium.find_element_by_css_selector('#nav-filter')
