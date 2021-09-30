@@ -148,7 +148,11 @@ class WhereNode(tree.Node):
         clone = self.__class__._new_instance(
             children=None, connector=self.connector, negated=self.negated,
         )
-        clone.children = self.children[:]
+        for child in self.children:
+            if hasattr(child, 'clone'):
+                clone.children.append(child.clone())
+            else:
+                clone.children.append(child)
         return clone
 
     def relabeled_clone(self, change_map):
