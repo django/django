@@ -215,7 +215,8 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* A nested atomic block marked as durable in :class:`django.test.TestCase` now
+  raises a ``RuntimeError``, the same as outside of tests.
 
 URLs
 ~~~~

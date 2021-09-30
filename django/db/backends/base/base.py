@@ -79,6 +79,8 @@ class BaseDatabaseWrapper:
         self.savepoint_state = 0
         # List of savepoints created by 'atomic'.
         self.savepoint_ids = []
+        # Stack of active 'atomic' blocks.
+        self.atomic_blocks = []
         # Tracks if the outermost 'atomic' block should commit on exit,
         # ie. if autocommit was active on entry.
         self.commit_on_exit = True
@@ -200,6 +202,7 @@ class BaseDatabaseWrapper:
         # In case the previous connection was closed while in an atomic block
         self.in_atomic_block = False
         self.savepoint_ids = []
+        self.atomic_blocks = []
         self.needs_rollback = False
         # Reset parameters defining when to close the connection
         max_age = self.settings_dict['CONN_MAX_AGE']

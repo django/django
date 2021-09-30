@@ -165,19 +165,21 @@ class Atomic(ContextDecorator):
 
     This is a private API.
     """
-    # This private flag is provided only to disable the durability checks in
-    # TestCase.
-    _ensure_durability = True
 
     def __init__(self, using, savepoint, durable):
         self.using = using
         self.savepoint = savepoint
         self.durable = durable
+        self._from_testcase = False
 
     def __enter__(self):
         connection = get_connection(self.using)
 
-        if self.durable and self._ensure_durability and connection.in_atomic_block:
+        if (
+            self.durable and
+            connection.atomic_blocks and
+            not connection.atomic_blocks[-1]._from_testcase
+        ):
             raise RuntimeError(
                 'A durable atomic block cannot be nested within another '
                 'atomic block.'
@@ -207,8 +209,14 @@ class Atomic(ContextDecorator):
             connection.set_autocommit(False, force_begin_transaction_with_broken_autocommit=True)
             connection.in_atomic_block = True
 
+        if connection.in_atomic_block:
+            connection.atomic_blocks.append(self)
+
     def __exit__(self, exc_type, exc_value, traceback):
         connection = get_connection(self.using)
+
+        if connection.in_atomic_block:
+            connection.atomic_blocks.pop()
 
         if connection.savepoint_ids:
             sid = connection.savepoint_ids.pop()

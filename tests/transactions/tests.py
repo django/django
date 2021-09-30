@@ -501,7 +501,7 @@ class NonAutocommitTests(TransactionTestCase):
         Reporter.objects.create(first_name="Tintin")
 
 
-class DurableTests(TransactionTestCase):
+class DurableTestsBase:
     available_apps = ['transactions']
 
     def test_commit(self):
@@ -533,42 +533,18 @@ class DurableTests(TransactionTestCase):
                 with transaction.atomic(durable=True):
                     pass
 
-
-class DisableDurabiltityCheckTests(TestCase):
-    """
-    TestCase runs all tests in a transaction by default. Code using
-    durable=True would always fail when run from TestCase. This would mean
-    these tests would be forced to use the slower TransactionTestCase even when
-    not testing durability. For this reason, TestCase disables the durability
-    check.
-    """
-    available_apps = ['transactions']
-
-    def test_commit(self):
+    def test_sequence_of_durables(self):
         with transaction.atomic(durable=True):
-            reporter = Reporter.objects.create(first_name='Tintin')
-        self.assertEqual(Reporter.objects.get(), reporter)
-
-    def test_nested_outer_durable(self):
+            reporter = Reporter.objects.create(first_name='Tintin 1')
+        self.assertEqual(Reporter.objects.get(first_name='Tintin 1'), reporter)
         with transaction.atomic(durable=True):
-            reporter1 = Reporter.objects.create(first_name='Tintin')
-            with transaction.atomic():
-                reporter2 = Reporter.objects.create(
-                    first_name='Archibald',
-                    last_name='Haddock',
-                )
-        self.assertSequenceEqual(Reporter.objects.all(), [reporter2, reporter1])
+            reporter = Reporter.objects.create(first_name='Tintin 2')
+        self.assertEqual(Reporter.objects.get(first_name='Tintin 2'), reporter)
 
-    def test_nested_both_durable(self):
-        with transaction.atomic(durable=True):
-            # Error is not raised.
-            with transaction.atomic(durable=True):
-                reporter = Reporter.objects.create(first_name='Tintin')
-        self.assertEqual(Reporter.objects.get(), reporter)
 
-    def test_nested_inner_durable(self):
-        with transaction.atomic():
-            # Error is not raised.
-            with transaction.atomic(durable=True):
-                reporter = Reporter.objects.create(first_name='Tintin')
-        self.assertEqual(Reporter.objects.get(), reporter)
+class DurableTransactionTests(DurableTestsBase, TransactionTestCase):
+    pass
+
+
+class DurableTests(DurableTestsBase, TestCase):
+    pass
