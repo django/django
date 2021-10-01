@@ -304,10 +304,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @contextmanager
     def _nodb_cursor(self):
+        cursor = None
         try:
             with super()._nodb_cursor() as cursor:
                 yield cursor
         except (Database.DatabaseError, WrappedDatabaseError):
+            if cursor is not None:
+                raise
             warnings.warn(
                 "Normally Django will use a connection to the 'postgres' database "
                 "to avoid running initialization queries against the production "
