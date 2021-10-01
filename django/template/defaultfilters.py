@@ -944,5 +944,5 @@ def pprint(value):
         return "Error in formatting: %s: %s" % (e.__class__.__name__, e)
 
 @register.filter(name='range')
-def _range(dict: int):
-    return range(int)
+def _range(value: int):
+    return range(value)
