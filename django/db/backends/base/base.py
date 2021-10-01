@@ -85,6 +85,9 @@ class BaseDatabaseWrapper:
         # Tracks if the transaction should be rolled back to the next
         # available savepoint because of an exception in an inner block.
         self.needs_rollback = False
+        # This private flag is provided only to disable the durability checks in
+        # TestCase.
+        self._allow_nested_durable = False
 
         # Connection termination related attributes.
         self.close_at = None

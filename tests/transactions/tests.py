@@ -501,7 +501,7 @@ class NonAutocommitTests(TransactionTestCase):
         Reporter.objects.create(first_name="Tintin")
 
 
-class DurableTests(TransactionTestCase):
+class DurableTransactionTests(TransactionTestCase):
     available_apps = ['transactions']
 
     def test_commit(self):
@@ -534,14 +534,7 @@ class DurableTests(TransactionTestCase):
                     pass
 
 
-class DisableDurabiltityCheckTests(TestCase):
-    """
-    TestCase runs all tests in a transaction by default. Code using
-    durable=True would always fail when run from TestCase. This would mean
-    these tests would be forced to use the slower TransactionTestCase even when
-    not testing durability. For this reason, TestCase disables the durability
-    check.
-    """
+class DurableTests(TestCase):
     available_apps = ['transactions']
 
     def test_commit(self):
@@ -560,15 +553,15 @@ class DisableDurabiltityCheckTests(TestCase):
         self.assertSequenceEqual(Reporter.objects.all(), [reporter2, reporter1])
 
     def test_nested_both_durable(self):
+        msg = 'A durable atomic block cannot be nested within another atomic block.'
         with transaction.atomic(durable=True):
-            # Error is not raised.
-            with transaction.atomic(durable=True):
-                reporter = Reporter.objects.create(first_name='Tintin')
-        self.assertEqual(Reporter.objects.get(), reporter)
+            with self.assertRaisesMessage(RuntimeError, msg):
+                with transaction.atomic(durable=True):
+                    pass
 
     def test_nested_inner_durable(self):
+        msg = 'A durable atomic block cannot be nested within another atomic block.'
         with transaction.atomic():
-            # Error is not raised.
-            with transaction.atomic(durable=True):
-                reporter = Reporter.objects.create(first_name='Tintin')
-        self.assertEqual(Reporter.objects.get(), reporter)
+            with self.assertRaisesMessage(RuntimeError, msg):
+                with transaction.atomic(durable=True):
+                    pass

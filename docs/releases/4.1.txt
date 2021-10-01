@@ -194,7 +194,8 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* Nested :func:`~django.db.transaction.atomic` blocks using ``durable=True``
+  raise a ``RuntimeError`` during tests, the same behavior as outside of tests.
 
 URLs
 ~~~~

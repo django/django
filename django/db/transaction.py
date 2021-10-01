@@ -165,9 +165,6 @@ class Atomic(ContextDecorator):
 
     This is a private API.
     """
-    # This private flag is provided only to disable the durability checks in
-    # TestCase.
-    _ensure_durability = True
 
     def __init__(self, using, savepoint, durable):
         self.using = using
@@ -177,11 +174,12 @@ class Atomic(ContextDecorator):
     def __enter__(self):
         connection = get_connection(self.using)
 
-        if self.durable and self._ensure_durability and connection.in_atomic_block:
+        if self.durable and connection.in_atomic_block and not connection._allow_nested_durable:
             raise RuntimeError(
                 'A durable atomic block cannot be nested within another '
                 'atomic block.'
             )
+        connection._allow_nested_durable = False
         if not connection.in_atomic_block:
             # Reset state when entering an outermost atomic block.
             connection.commit_on_exit = True
