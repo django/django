@@ -73,6 +73,12 @@ purely database-related, whereas :attr:`~Field.blank` is validation-related. If
 a field has ``blank=True``, form validation will allow entry of an empty value.
 If a field has ``blank=False``, the field will be required.
 
+.. admonition:: Supplying missing values
+
+    ``blank=True`` can be used with fields having ``null=False``, but this will
+    require implementing :meth:`~django.db.models.Model.clean` on the model in
+    order to programmatically supply any missing values.
+
 .. _field-choices:
 
 ``choices``
