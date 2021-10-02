@@ -136,9 +136,21 @@ Now, our ``my_callback`` function will be called each time a request finishes.
     In practice, signal handlers are usually defined in a ``signals``
     submodule of the application they relate to. Signal receivers are
     connected in the :meth:`~django.apps.AppConfig.ready` method of your
-    application configuration class. If you're using the :func:`receiver`
-    decorator, import the ``signals`` submodule inside
-    :meth:`~django.apps.AppConfig.ready`.
+    application :ref:`configuration class <configuring-applications-ref>`. If
+    you're using the :func:`receiver` decorator, import the ``signals``
+    submodule inside :meth:`~django.apps.AppConfig.ready`, this will implicitly
+    connect signal handlers::
+
+        from django.apps import AppConfig
+
+        class MyAppConfig(AppConfig):
+            ...
+
+            def ready(self):
+                # Implicitly connect a signal handlers decorated with @receiver.
+                from . import signals
+                # Explicitly connect a signal handler.
+                signals.request_finished.connect(signals.my_callback)
 
 .. note::
 
