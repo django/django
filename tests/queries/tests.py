@@ -2846,6 +2846,14 @@ class ExcludeTests(TestCase):
             [self.j1, self.j2],
         )
 
+    def test_exclude_unsaved_o2o_object(self):
+        jack = Staff.objects.create(name='jack')
+        jack_staff = StaffUser.objects.create(staff=jack)
+        unsaved_object = Staff(name='jane')
+
+        self.assertIsNone(unsaved_object.pk)
+        self.assertSequenceEqual(StaffUser.objects.exclude(staff=unsaved_object), [jack_staff])
+
 
 class ExcludeTest17600(TestCase):
     """
