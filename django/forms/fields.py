@@ -794,9 +794,11 @@ class ChoiceField(Field):
         # Setting choices also sets the choices on the widget.
         # choices can be any iterable, but we call list() on it because
         # it will be consumed more than once.
+        if value is None:
+            return
         if callable(value):
             value = CallableChoiceIterator(value)
-        else:
+        elif not isinstance(value, (list, tuple)):
             value = list(value)
 
         self._choices = self.widget.choices = value
