@@ -32,7 +32,8 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The admin :ref:`dark mode CSS variables <admin-theming>` are now applied in a
+  separate stylesheet and template block.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

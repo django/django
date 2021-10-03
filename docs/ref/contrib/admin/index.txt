@@ -2848,13 +2848,19 @@ override to your project:
     </style>
     {% endblock %}
 
-A dark theme is defined, and applied respecting the `prefers-color-scheme`_
-media query.
+The list of CSS variables are defined at
+:file:`django/contrib/admin/static/admin/css/base.css`.
+
+Dark mode variables, respecting the `prefers-color-scheme`_ media query, are
+defined at :file:`django/contrib/admin/static/admin/css/dark_mode.css`. This is
+linked to the document in ``{% block dark-mode-vars %}``.
 
 .. _prefers-color-scheme: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme
 
-The list of CSS variables are defined at
-:file:`django/contrib/admin/static/admin/css/base.css`.
+.. versionchanged:: 4.1
+
+    The dark mode variables were moved to a separate stylesheet and template
+    block.
 
 ``AdminSite`` objects
 =====================
