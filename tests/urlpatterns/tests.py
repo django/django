@@ -182,7 +182,7 @@ class ConverterTests(SimpleTestCase):
             ('str', {'abcxyz'}, no_converter),
             ('path', {'allows.ANY*characters'}, no_converter),
             ('slug', {'abcxyz-ABCXYZ_01234567890'}, no_converter),
-            ('uuid', {'39da9369-838e-4750-91a5-f7805cd82839'}, uuid.UUID),
+            ('uuid', {'39da9369-838e-4750-91a5-f7805cd82839', '39DA9369-838E-4750-91A5-F7805CD82839'}, uuid.UUID),
         )
         for url_name, url_suffixes, converter in test_data:
             for url_suffix in url_suffixes:
