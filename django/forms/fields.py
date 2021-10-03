@@ -798,7 +798,7 @@ class ChoiceField(Field):
             return
         if callable(value):
             value = CallableChoiceIterator(value)
-        elif not isinstance(value, (list, tuple)):
+        elif not isinstance(value, list):
             value = list(value)
 
         self._choices = self.widget.choices = value
