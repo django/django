@@ -3,7 +3,26 @@ Django
 ======
 
 Django is a high-level Python web framework that encourages rapid development
-and clean, pragmatic design. Thanks for checking it out.
+and clean, pragmatic design. It is a Python-based 
+free and open-source web framework that follows the model–template–views 
+architectural pattern. It is maintained by the Django Software Foundation, 
+an American independent organization established as a 501 non-profit.
+
+Built by experienced developers, Django takes care of much of the hassle of web 
+development, so you can focus on writing your app without needing to reinvent 
+the wheel. It is free and open source, has a thriving and active community, 
+great documentation, and many options for free and paid-for support. 
+
+Django helps you write software that is:
+
+- Complete
+- Versatile
+- Secure
+- Scalable
+- Maintainable
+- Portable
+
+Thanks for checking it out.
 
 All documentation is in the "``docs``" directory and online at
 https://docs.djangoproject.com/en/stable/. If you're just getting started,
