@@ -358,6 +358,13 @@ You can chain other lookups after key lookups::
 If the key you wish to query by clashes with the name of another lookup, you
 need to use the :lookup:`hstorefield.contains` lookup instead.
 
+.. note::
+
+    Key transforms can also be chained with: :lookup:`contains`,
+    :lookup:`icontains`, :lookup:`endswith`, :lookup:`iendswith`,
+    :lookup:`iexact`, :lookup:`regex`, :lookup:`iregex`, :lookup:`startswith`,
+    and :lookup:`istartswith` lookups.
+
 .. warning::
 
     Since any string could be a key in a hstore value, any lookup other than
