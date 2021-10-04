@@ -180,6 +180,10 @@ Django quotes column and table names behind the scenes.
        the :attr:`ManyToManyField.through` attribute to make the relation
        use your custom model.
 
+    3. Generating migrations for the unmanaged tables with
+       :djadmin:`makemigrations`. The command will still create migration files.
+       However no operations will be performed
+
     For tests involving models with ``managed=False``, it's up to you to ensure
     the correct tables are created as part of the test setup.
 
