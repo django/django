@@ -6,14 +6,14 @@ from importlib.util import find_spec as importlib_find
 
 
 def cached_import(module_path, class_name):
-    modules = sys.modules
-    if module_path not in modules or (
-        # Module is not fully initialized.
-        getattr(modules[module_path], '__spec__', None) is not None and
-        getattr(modules[module_path].__spec__, '_initializing', False) is True
+    # Check whether module is loaded and fully initialized.
+    if not (
+        (module := sys.modules.get(module_path)) and
+        (spec := getattr(module, '__spec__', None)) and
+        getattr(spec, '_initializing', False) is False
     ):
-        import_module(module_path)
-    return getattr(modules[module_path], class_name)
+        module = import_module(module_path)
+    return getattr(module, class_name)
 
 
 def import_string(dotted_path):
