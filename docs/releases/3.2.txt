@@ -23,8 +23,9 @@ end in April 2022.
 Python compatibility
 ====================
 
-Django 3.2 supports Python 3.6, 3.7, 3.8, and 3.9. We **highly recommend** and
-only officially support the latest release of each series.
+Django 3.2 supports Python 3.6, 3.7, 3.8, 3.9, and 3.10 (as of 3.2.9). We
+**highly recommend** and only officially support the latest release of each
+series.
 
 .. _whats-new-3.2:
 
