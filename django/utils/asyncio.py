@@ -3,6 +3,13 @@ import functools
 import os
 
 from django.core.exceptions import SynchronousOnlyOperation
+from django.utils.version import PY37
+
+
+if PY37:
+    get_running_loop = asyncio.get_running_loop
+else:
+    get_running_loop = asyncio.get_event_loop
 
 
 def async_unsafe(message):
@@ -16,11 +23,11 @@ def async_unsafe(message):
             if not os.environ.get('DJANGO_ALLOW_ASYNC_UNSAFE'):
                 # Detect a running event loop in this thread.
                 try:
-                    event_loop = asyncio.get_event_loop()
+                    event_loop = get_running_loop()
                 except RuntimeError:
                     pass
                 else:
-                    if event_loop.is_running():
+                    if PY37 or event_loop.is_running():
                         raise SynchronousOnlyOperation(message)
             # Pass onwards.
             return func(*args, **kwargs)
