@@ -1,0 +1,12 @@
+==========================
+Django 3.2.9 release notes
+==========================
+
+*Expected November 1, 2021*
+
+Django 3.2.9 fixes several bugs in 3.2.8.
+
+Bugfixes
+========
+
+* ...
