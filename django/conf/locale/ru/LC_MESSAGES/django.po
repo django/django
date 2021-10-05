@@ -708,7 +708,7 @@ msgstr "Связь %(from)s-%(to)s"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr "Связьи %(from)s-%(to)s"
+msgstr "Связи %(from)s-%(to)s"
 
 msgid "Many-to-many relationship"
 msgstr "Связь \"многие ко многим\""
