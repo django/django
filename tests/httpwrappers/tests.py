@@ -44,6 +44,8 @@ class QueryDictTests(SimpleTestCase):
             q.popitem()
         with self.assertRaises(AttributeError):
             q.clear()
+        with self.assertRaises(AttributeError):
+            q.poplist("foo")
 
     def test_immutable_get_with_default(self):
         q = QueryDict()
@@ -159,11 +161,15 @@ class QueryDictTests(SimpleTestCase):
         self.assertCountEqual(q.values(), ['another', 'john'])
 
         q.update({'foo': 'hello'})
+        q.setlist("bars", ["hello", "world"])
         self.assertEqual(q['foo'], 'hello')
         self.assertEqual(q.get('foo', 'not available'), 'hello')
         self.assertEqual(q.getlist('foo'), ['bar', 'baz', 'another', 'hello'])
-        self.assertEqual(q.pop('foo'), ['bar', 'baz', 'another', 'hello'])
+        self.assertEqual(q.poplist('foo'), ['bar', 'baz', 'another', 'hello'])
+        breakpoint()
+        self.assertEqual(q.pop('bars'), 'world')
         self.assertEqual(q.pop('foo', 'not there'), 'not there')
+        self.assertEqual(q.pop('bars', 'not there'), 'not there')
         self.assertEqual(q.get('foo', 'not there'), 'not there')
         self.assertEqual(q.setdefault('foo', 'bar'), 'bar')
         self.assertEqual(q['foo'], 'bar')

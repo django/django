@@ -1,6 +1,8 @@
 import copy
 from collections.abc import Mapping
 
+NOT_PASSED = object()
+
 
 class OrderedSet:
     """
@@ -83,6 +85,9 @@ class MultiValueDict(dict):
             list_ = super().__getitem__(key)
         except KeyError:
             raise MultiValueDictKeyError(key)
+        return self._get_last(list_)
+
+    def _get_last(self, list_):
         try:
             return list_[-1]
         except IndexError:
@@ -113,6 +118,31 @@ class MultiValueDict(dict):
         for k, v in data.items():
             self.setlist(k, v)
         self.__dict__.update(obj_dict)
+
+    def pop(self, key, default=NOT_PASSED):
+        """
+        Remove and return the last data value for the passed key. If key doesn't exist
+        or value is an empty list, return `default`.
+        """
+        return self._pop(key, last=True, default=default)
+
+    def poplist(self, key, default=NOT_PASSED):
+        """
+        Remove and return the list of values for the key. If key doesn't exist, return a
+        default value.
+        """
+        return self._pop(key, last=False, default=default)
+
+    def _pop(self, key, last, default=NOT_PASSED):
+        try:
+            val = super(MultiValueDict, self).pop(key)
+            if last:
+                val = self._get_last(val)
+        except KeyError:
+            if default is NOT_PASSED:
+                raise MultiValueDictKeyError(key)
+            val = default
+        return val
 
     def get(self, key, default=None):
         """

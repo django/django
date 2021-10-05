@@ -514,9 +514,13 @@ class QueryDict(MultiValueDict):
         value = bytes_to_text(value, self.encoding)
         super().appendlist(key, value)
 
-    def pop(self, key, *args):
+    def pop(self, key, *args, **kwargs):
         self._assert_mutable()
-        return super().pop(key, *args)
+        return super().pop(key, *args, **kwargs)
+
+    def poplist(self, key, *args, **kwargs):
+        self._assert_mutable()
+        return super().poplist(key, *args, **kwargs)
 
     def popitem(self):
         self._assert_mutable()
