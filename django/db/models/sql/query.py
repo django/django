@@ -513,10 +513,7 @@ class Query(BaseExpression):
         """
         obj = self.clone()
         obj.add_annotation(Count('*'), alias='__count', is_summary=True)
-        number = obj.get_aggregation(using, ['__count'])['__count']
-        if number is None:
-            number = 0
-        return number
+        return obj.get_aggregation(using, ['__count'])['__count']
 
     def has_filters(self):
         return self.where
