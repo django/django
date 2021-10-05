@@ -166,7 +166,6 @@ class QueryDictTests(SimpleTestCase):
         self.assertEqual(q.get('foo', 'not available'), 'hello')
         self.assertEqual(q.getlist('foo'), ['bar', 'baz', 'another', 'hello'])
         self.assertEqual(q.poplist('foo'), ['bar', 'baz', 'another', 'hello'])
-        breakpoint()
         self.assertEqual(q.pop('bars'), 'world')
         self.assertEqual(q.pop('foo', 'not there'), 'not there')
         self.assertEqual(q.pop('bars', 'not there'), 'not there')
