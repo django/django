@@ -183,7 +183,7 @@ For further information related to using mod_wsgi-express see the main mod_wsgi 
 Serving files
 =============
 
-Django doesn't serve files itself; it leaves that job to whichever Web
+Django doesn't serve files itself; it leaves that job to whichever web
 server you choose.
 
 We recommend using a separate Web server -- i.e., one that's not also running
