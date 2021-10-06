@@ -2,7 +2,7 @@ from io import BytesIO
 from itertools import chain
 from urllib.parse import urlencode
 
-from django.core.exceptions import DisallowedHost
+from django.core.exceptions import DisallowedHost, ImproperlyConfigured
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
 from django.http import HttpRequest, RawPostDataException, UnreadablePostError
 from django.http.multipartparser import MultiPartParserError
@@ -657,6 +657,17 @@ class HostValidationTests(SimpleTestCase):
         # X_FORWARDED_HOST is obeyed.
         self.assertEqual(request.get_host(), 'forward.com')
 
+        # Check if X_FORWARDED_HOST is provided with a port.
+        request = HttpRequest()
+        request.META = {
+            'HTTP_X_FORWARDED_HOST': 'forward.com:8080',
+            'HTTP_HOST': 'example.com',
+            'SERVER_NAME': 'internal.com',
+            'SERVER_PORT': 80,
+        }
+        # X_FORWARDED_HOST is obeyed.
+        self.assertEqual(request.get_host(), 'forward.com:8080')
+
         # Check if X_FORWARDED_HOST isn't provided.
         request = HttpRequest()
         request.META = {
@@ -708,10 +719,27 @@ class HostValidationTests(SimpleTestCase):
                 }
                 request.get_host()
 
+    @override_settings(
+        USE_X_FORWARDED_PORT=True,
+        USE_X_FORWARDED_HOST=False,
+        ALLOWED_HOSTS=['*'])
+    def test_get_host_with_use_x_forwarded_port_and_http_host(self):
+        request = HttpRequest()
+        request.META = {
+            'HTTP_HOST': 'original.com',
+            'SERVER_PORT': '8000',
+            'HTTP_X_FORWARDED_HOST': 'example.com',
+            'HTTP_X_FORWARDED_PORT': '8080',
+        }
+        # Should NOT use the X-Forwarded-Port header
+        self.assertEqual(request.get_host(), 'original.com:8080')
+        self.assertEqual(request.get_port(), '8080')
+
     @override_settings(USE_X_FORWARDED_PORT=False)
     def test_get_port(self):
         request = HttpRequest()
         request.META = {
+            'SERVER_NAME': 'testserver',
             'SERVER_PORT': '8080',
             'HTTP_X_FORWARDED_PORT': '80',
         }
@@ -720,6 +748,7 @@ class HostValidationTests(SimpleTestCase):
 
         request = HttpRequest()
         request.META = {
+            'SERVER_NAME': 'testserver',
             'SERVER_PORT': '8080',
         }
         self.assertEqual(request.get_port(), '8080')
@@ -728,6 +757,7 @@ class HostValidationTests(SimpleTestCase):
     def test_get_port_with_x_forwarded_port(self):
         request = HttpRequest()
         request.META = {
+            'SERVER_NAME': 'testserver',
             'SERVER_PORT': '8080',
             'HTTP_X_FORWARDED_PORT': '80',
         }
@@ -736,9 +766,98 @@ class HostValidationTests(SimpleTestCase):
 
         request = HttpRequest()
         request.META = {
+            'SERVER_NAME': 'testserver',
             'SERVER_PORT': '8080',
         }
         self.assertEqual(request.get_port(), '8080')
+
+    @override_settings(USE_X_FORWARDED_HOST=True)
+    def test_get_port_with_x_forwarded_host(self):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_NAME': 'testserver',
+            'SERVER_PORT': '8080',
+            'HTTP_X_FORWARDED_HOST': 'example.com:8000',
+        }
+        # Should use the X-Forwarded-Host header
+        with override_settings(ALLOWED_HOSTS=['example.com']):
+            self.assertEqual(request.get_port(), '8000')
+
+        request = HttpRequest()
+        request.META = {
+            'SERVER_NAME': 'testserver',
+            'SERVER_PORT': '8080',
+        }
+        self.assertEqual(request.get_port(), '8080')
+
+    @override_settings(USE_X_FORWARDED_HOST=True)
+    def test_get_port_with_x_forwarded_host_ipv6(self):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_NAME': 'testserver',
+            'SERVER_PORT': '8080',
+            'HTTP_X_FORWARDED_HOST': '[2001:19f0:feee::dead:beef:cafe]:8000',
+        }
+        # Should use the X-Forwarded-Host header
+        with override_settings(ALLOWED_HOSTS=['[2001:19f0:feee::dead:beef:cafe]']):
+            self.assertEqual(request.get_port(), '8000')
+
+        request = HttpRequest()
+        request.META = {
+            'SERVER_NAME': 'testserver',
+            'SERVER_PORT': '8080',
+        }
+        self.assertEqual(request.get_port(), '8080')
+
+    @override_settings(USE_X_FORWARDED_HOST=True,
+                       USE_X_FORWARDED_PORT=True)
+    def test_get_port_with_x_forwarded_host_and_port(self):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_NAME': 'testserver',
+            'SERVER_PORT': '8080',
+            'HTTP_X_FORWARDED_HOST': 'example.com',
+            'HTTP_X_FORWARDED_PORT': '8010',
+        }
+        with override_settings(ALLOWED_HOSTS=['example.com']):
+            # Should use the X-Forwarded-Port header
+            self.assertEqual(request.get_port(), '8010')
+
+        request = HttpRequest()
+        request.META = {
+            'SERVER_NAME': 'testserver',
+            'SERVER_PORT': '8080',
+        }
+        self.assertEqual(request.get_port(), '8080')
+
+    @override_settings(
+        USE_X_FORWARDED_PORT=True,
+        USE_X_FORWARDED_HOST=True,
+        ALLOWED_HOSTS=['*'])
+    def test_get_host_with_x_forwarded_port(self):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_PORT': '80',
+            'HTTP_X_FORWARDED_HOST': 'example.com',
+            'HTTP_X_FORWARDED_PORT': '8080',
+        }
+        # Should use the X-Forwarded-Port header
+        self.assertEqual(request.get_host(), 'example.com:8080')
+
+    @override_settings(
+        USE_X_FORWARDED_PORT=True,
+        USE_X_FORWARDED_HOST=True,
+        ALLOWED_HOSTS=['*'])
+    def test_get_host_with_use_x_forwarded_port_and_port_in_host(self):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_PORT': '80',
+            'HTTP_X_FORWARDED_HOST': 'example.com:8081',
+            'HTTP_X_FORWARDED_PORT': '8080',
+        }
+        # Should use the X-Forwarded-Port header
+        with self.assertRaises(ImproperlyConfigured):
+            request.get_host()
 
     @override_settings(DEBUG=True, ALLOWED_HOSTS=[])
     def test_host_validation_in_debug_mode(self):

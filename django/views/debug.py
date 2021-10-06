@@ -281,7 +281,7 @@ class ExceptionReporter:
         """
         return '{scheme}://{host}{path}'.format(
             scheme=self.request.scheme,
-            host=self.request._get_raw_host(),
+            host=self.request._get_parsed_host_header().host,
             path=self.request.get_full_path(),
         )
 
