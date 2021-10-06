@@ -290,6 +290,26 @@ Dropped support for MariaDB 10.2
 Upstream support for MariaDB 10.2 ends in May 2022. Django 4.1 supports MariaDB
 10.3 and higher.
 
+Admin changelist searches spanning multi-valued relationships changes
+---------------------------------------------------------------------
+
+Admin changelist searches using multiple search terms are now applied in a
+single call to ``filter()``, rather than in sequential ``filter()`` calls.
+
+For multi-valued relationships, this means that rows from the related model
+must match all terms rather than any term. For example, if ``search_fields``
+is set to ``['child__name', 'child__age']``, and a user searches for
+``'Jamal 17'``, parent rows will be returned only if there is a relationship to
+some 17-year-old child named Jamal, rather than also returning parents who
+merely have a younger or older child named Jamal in addition to some other
+17-year-old.
+
+See the :ref:`spanning-multi-valued-relationships` topic for more discussion of
+this difference. In Django 4.0 and earlier,
+:meth:`~django.contrib.admin.ModelAdmin.get_search_results` followed the
+second example query, but this undocumented behavior led to queries with
+excessive joins.
+
 Miscellaneous
 -------------
 

@@ -1185,6 +1185,22 @@ subclass::
     :meth:`ModelAdmin.get_search_results` to provide additional or alternate
     search behavior.
 
+    .. versionchanged:: 4.1
+
+        Searches using multiple search terms are now applied in a single call
+        to ``filter()``, rather than in sequential ``filter()`` calls.
+
+        For multi-valued relationships, this means that rows from the related
+        model must match all terms rather than any term. For example, if
+        ``search_fields`` is set to ``['child__name', 'child__age']``, and a
+        user searches for ``'Jamal 17'``, parent rows will be returned only if
+        there is a relationship to some 17-year-old child named Jamal, rather
+        than also returning parents who merely have a younger or older child
+        named Jamal in addition to some other 17-year-old.
+
+        See the :ref:`spanning-multi-valued-relationships` topic for more
+        discussion of this difference.
+
 .. attribute:: ModelAdmin.search_help_text
 
     .. versionadded:: 4.0
@@ -1402,6 +1418,22 @@ templates used by the :class:`ModelAdmin` views:
     ('name', '=age')`` which results in a string comparison for the numeric
     field, for example ``... OR UPPER("polls_choice"."votes"::text) = UPPER('4')``
     on PostgreSQL.
+
+    .. versionchanged:: 4.1
+
+        Searches using multiple search terms are now applied in a single call
+        to ``filter()``, rather than in sequential ``filter()`` calls.
+
+        For multi-valued relationships, this means that rows from the related
+        model must match all terms rather than any term. For example, if
+        ``search_fields`` is set to ``['child__name', 'child__age']``, and a
+        user searches for ``'Jamal 17'``, parent rows will be returned only if
+        there is a relationship to some 17-year-old child named Jamal, rather
+        than also returning parents who merely have a younger or older child
+        named Jamal in addition to some other 17-year-old.
+
+        See the :ref:`spanning-multi-valued-relationships` topic for more
+        discussion of this difference.
 
 .. method:: ModelAdmin.save_related(request, form, formsets, change)
 
