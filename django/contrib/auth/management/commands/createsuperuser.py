@@ -185,6 +185,10 @@ class Command(BaseCommand):
                         raise CommandError('You must use --%s with --noinput.' % field_name)
                     field = self.UserModel._meta.get_field(field_name)
                     user_data[field_name] = field.clean(value, None)
+                    if field.many_to_many and isinstance(user_data[field_name], str):
+                        user_data[field_name] = [
+                            pk.strip() for pk in user_data[field_name].split(',')
+                        ]
 
             self.UserModel._default_manager.db_manager(database).create_superuser(**user_data)
             if options['verbosity'] >= 1:
