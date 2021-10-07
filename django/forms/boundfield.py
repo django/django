@@ -93,6 +93,7 @@ class BoundField:
             name=self.html_initial_name if only_initial else self.html_name,
             value=self.value(),
             attrs=attrs,
+            field=self,
             renderer=self.form.renderer,
         )
 

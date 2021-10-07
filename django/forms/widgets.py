@@ -215,8 +215,8 @@ class Widget(metaclass=MediaDefiningClass):
     def is_hidden(self):
         return self.input_type == 'hidden' if hasattr(self, 'input_type') else False
 
-    def subwidgets(self, name, value, attrs=None):
-        context = self.get_context(name, value, attrs)
+    def subwidgets(self, name, value, attrs=None, field=None):
+        context = self.get_context(name, value, attrs, field)
         yield context['widget']
 
     def format_value(self, value):
@@ -229,8 +229,9 @@ class Widget(metaclass=MediaDefiningClass):
             return formats.localize_input(value)
         return str(value)
 
-    def get_context(self, name, value, attrs):
+    def get_context(self, name, value, attrs, field):
         return {
+            'field': field,
             'widget': {
                 'name': name,
                 'is_hidden': self.is_hidden,
@@ -241,9 +242,9 @@ class Widget(metaclass=MediaDefiningClass):
             },
         }
 
-    def render(self, name, value, attrs=None, renderer=None):
+    def render(self, name, value, attrs=None, field=None, renderer=None):
         """Render the widget as an HTML string."""
-        context = self.get_context(name, value, attrs)
+        context = self.get_context(name, value, attrs, field)
         return self._render(self.template_name, context, renderer)
 
     def _render(self, template_name, context, renderer=None):
@@ -294,8 +295,8 @@ class Input(Widget):
             self.input_type = attrs.pop('type', self.input_type)
         super().__init__(attrs)
 
-    def get_context(self, name, value, attrs):
-        context = super().get_context(name, value, attrs)
+    def get_context(self, name, value, attrs, field):
+        context = super().get_context(name, value, attrs, field)
         context['widget']['type'] = self.input_type
         return context
 
@@ -328,10 +329,10 @@ class PasswordInput(Input):
         super().__init__(attrs)
         self.render_value = render_value
 
-    def get_context(self, name, value, attrs):
+    def get_context(self, name, value, attrs, field):
         if not self.render_value:
             value = None
-        return super().get_context(name, value, attrs)
+        return super().get_context(name, value, attrs, field)
 
 
 class HiddenInput(Input):
@@ -346,8 +347,8 @@ class MultipleHiddenInput(HiddenInput):
     """
     template_name = 'django/forms/widgets/multiple_hidden.html'
 
-    def get_context(self, name, value, attrs):
-        context = super().get_context(name, value, attrs)
+    def get_context(self, name, value, attrs, field):
+        context = super().get_context(name, value, attrs, field)
         final_attrs = context['widget']['attrs']
         id_ = context['widget']['attrs'].get('id')
 
@@ -360,7 +361,7 @@ class MultipleHiddenInput(HiddenInput):
                 widget_attrs['id'] = '%s_%s' % (id_, index)
             widget = HiddenInput()
             widget.is_required = self.is_required
-            subwidgets.append(widget.get_context(name, value_, widget_attrs)['widget'])
+            subwidgets.append(widget.get_context(name, value_, widget_attrs, field)['widget'])
 
         context['widget']['subwidgets'] = subwidgets
         return context
@@ -431,8 +432,8 @@ class ClearableFileInput(FileInput):
         if self.is_initial(value):
             return value
 
-    def get_context(self, name, value, attrs):
-        context = super().get_context(name, value, attrs)
+    def get_context(self, name, value, attrs, field):
+        context = super().get_context(name, value, attrs, field)
         checkbox_name = self.clear_checkbox_name(name)
         checkbox_id = self.clear_checkbox_id(checkbox_name)
         context['widget'].update({
@@ -525,10 +526,10 @@ class CheckboxInput(Input):
             return
         return str(value)
 
-    def get_context(self, name, value, attrs):
+    def get_context(self, name, value, attrs, field):
         if self.check_test(value):
             attrs = {**(attrs or {}), 'checked': True}
-        return super().get_context(name, value, attrs)
+        return super().get_context(name, value, attrs, field)
 
     def value_from_datadict(self, data, files, name):
         if name not in data:
@@ -637,8 +638,8 @@ class ChoiceWidget(Widget):
             'wrap_label': True,
         }
 
-    def get_context(self, name, value, attrs):
-        context = super().get_context(name, value, attrs)
+    def get_context(self, name, value, attrs, field):
+        context = super().get_context(name, value, attrs, field)
         context['widget']['optgroups'] = self.optgroups(name, context['widget']['value'], attrs)
         return context
 
@@ -677,8 +678,8 @@ class Select(ChoiceWidget):
     checked_attribute = {'selected': True}
     option_inherits_attrs = False
 
-    def get_context(self, name, value, attrs):
-        context = super().get_context(name, value, attrs)
+    def get_context(self, name, value, attrs, field):
+        context = super().get_context(name, value, attrs, field)
         if self.allow_multiple_selected:
             context['widget']['attrs']['multiple'] = True
         return context
@@ -817,8 +818,8 @@ class MultiWidget(Widget):
     def is_hidden(self):
         return all(w.is_hidden for w in self.widgets)
 
-    def get_context(self, name, value, attrs):
-        context = super().get_context(name, value, attrs)
+    def get_context(self, name, value, attrs, field):
+        context = super().get_context(name, value, attrs, field)
         if self.is_localized:
             for widget in self.widgets:
                 widget.is_localized = self.is_localized
@@ -844,7 +845,7 @@ class MultiWidget(Widget):
                 widget_attrs['id'] = '%s_%s' % (id_, i)
             else:
                 widget_attrs = final_attrs
-            subwidgets.append(widget.get_context(widget_name, widget_value, widget_attrs)['widget'])
+            subwidgets.append(widget.get_context(widget_name, widget_value, widget_attrs, field)['widget'])
         context['widget']['subwidgets'] = subwidgets
         return context
 
@@ -981,8 +982,8 @@ class SelectDateWidget(Widget):
             self.month_none_value = self.none_value
             self.day_none_value = self.none_value
 
-    def get_context(self, name, value, attrs):
-        context = super().get_context(name, value, attrs)
+    def get_context(self, name, value, attrs, field):
+        context = super().get_context(name, value, attrs, field)
         date_context = {}
         year_choices = [(i, str(i)) for i in self.years]
         if not self.is_required:
@@ -992,6 +993,7 @@ class SelectDateWidget(Widget):
             name=year_name,
             value=context['widget']['value']['year'],
             attrs={**context['widget']['attrs'], 'id': 'id_%s' % year_name},
+            field=field,
         )
         month_choices = list(self.months.items())
         if not self.is_required:
@@ -1001,6 +1003,7 @@ class SelectDateWidget(Widget):
             name=month_name,
             value=context['widget']['value']['month'],
             attrs={**context['widget']['attrs'], 'id': 'id_%s' % month_name},
+            field=field,
         )
         day_choices = [(i, i) for i in range(1, 32)]
         if not self.is_required:
@@ -1010,6 +1013,7 @@ class SelectDateWidget(Widget):
             name=day_name,
             value=context['widget']['value']['day'],
             attrs={**context['widget']['attrs'], 'id': 'id_%s' % day_name},
+            field=field,
         )
         subwidgets = []
         for field in self._parse_date_fmt():
