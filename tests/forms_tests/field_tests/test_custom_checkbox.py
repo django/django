@@ -1,5 +1,5 @@
-from django.forms.forms import Form
 from django.forms.fields import BooleanField
+from django.forms.forms import Form
 from django.forms.renderers import DjangoTemplates
 from django.template import Context, Template
 from django.test import SimpleTestCase
