@@ -154,8 +154,6 @@ to ``{% csrf_token %}`` in the Django template language. For example:
 Using the decorator method
 ==========================
 
-.. module:: django.views.decorators.csrf
-
 Rather than adding ``CsrfViewMiddleware`` as a blanket protection, you can use
 the ``csrf_protect`` decorator, which has exactly the same functionality, on
 particular views that need the protection. It must be used **both** on views
@@ -165,6 +163,8 @@ data. (These are often the same view function, but not always).
 Use of the decorator by itself is **not recommended**, since if you forget to
 use it, you will have a security hole. The 'belt and braces' strategy of using
 both is fine, and will incur minimal overhead.
+
+.. module:: django.views.decorators.csrf.csrf_protect
 
 .. function:: csrf_protect(view)
 
@@ -244,6 +244,8 @@ CSRF checks::
 
     >>> from django.test import Client
     >>> csrf_client = Client(enforce_csrf_checks=True)
+
+.. _csrf-edge-cases:
 
 Edge cases
 ==========
