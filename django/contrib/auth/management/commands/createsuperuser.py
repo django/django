@@ -124,6 +124,8 @@ class Command(BaseCommand):
                 for field_name in self.UserModel.REQUIRED_FIELDS:
                     field = self.UserModel._meta.get_field(field_name)
                     user_data[field_name] = options[field_name]
+                    if user_data[field_name] is not None:
+                        user_data[field_name] = field.clean(user_data[field_name], None)
                     while user_data[field_name] is None:
                         message = self._get_input_message(field)
                         input_value = self.get_input_data(field, message)
