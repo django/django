@@ -14,7 +14,7 @@ To take advantage of CSRF protection in your views, follow these steps:
    If you disabled it, which is not recommended, you can use
    :func:`~django.views.decorators.csrf.csrf_protect` on particular views
    you want to protect (see below). This is what you should do if you are
-   building a third-party app which relies on CSRF being inforced (for
+   building a third-party app which relies on CSRF being enforced (for
    example the admin app).
 
 #. In any template that uses a POST form, use the :ttag:`csrf_token` tag inside
