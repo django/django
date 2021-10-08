@@ -107,6 +107,11 @@ class PDBDebugResult(unittest.TextTestResult):
         super().addFailure(test, err)
         self.debug(err)
 
+    def addSubTest(self, test, subtest, err):
+        if err is not None:
+            self.debug(err)
+        super().addSubTest(test, subtest, err)
+
     def debug(self, error):
         self._restoreStdout()
         self.buffer = False
