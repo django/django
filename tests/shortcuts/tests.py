@@ -36,3 +36,8 @@ class RenderTests(SimpleTestCase):
         self.assertEqual(response.content, b'DTL\n')
         response = self.client.get('/render/using/?using=jinja2')
         self.assertEqual(response.content, b'Jinja2\n')
+
+    def test_render_missing_request(self):
+        msg = "First argument to render() must be an HttpRequest, not 'str'."
+        with self.assertRaisesMessage(ValueError, msg):
+            self.client.get('/render/missing_request/')

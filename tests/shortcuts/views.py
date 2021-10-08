@@ -35,3 +35,7 @@ def render_view_with_status(request):
 def render_view_with_using(request):
     using = request.GET.get('using')
     return render(request, 'shortcuts/using.html', using=using)
+
+
+def render_view_missing_request(request):
+    return render('shortcuts/render_test.html', {'foo': 'FOO'})

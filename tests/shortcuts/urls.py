@@ -8,4 +8,5 @@ urlpatterns = [
     path('render/content_type/', views.render_view_with_content_type),
     path('render/status/', views.render_view_with_status),
     path('render/using/', views.render_view_with_using),
+    path('render/missing_request/', views.render_view_missing_request),
 ]

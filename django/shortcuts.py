@@ -4,7 +4,8 @@ of MVC. In other words, these functions/classes introduce controlled coupling
 for convenience's sake.
 """
 from django.http import (
-    Http404, HttpResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
+    Http404, HttpRequest, HttpResponse, HttpResponsePermanentRedirect,
+    HttpResponseRedirect,
 )
 from django.template import loader
 from django.urls import NoReverseMatch, reverse
@@ -16,6 +17,12 @@ def render(request, template_name, context=None, content_type=None, status=None,
     Return a HttpResponse whose content is filled with the result of calling
     django.template.loader.render_to_string() with the passed arguments.
     """
+    if not isinstance(request, HttpRequest):
+        provided_type = request.__name__ if isinstance(request, type) else request.__class__.__name__
+        raise ValueError(
+            'First argument to render() must be an HttpRequest, '
+            "not '%s'." % provided_type
+        )
     content = loader.render_to_string(template_name, context, request, using=using)
     return HttpResponse(content, content_type, status)
 
