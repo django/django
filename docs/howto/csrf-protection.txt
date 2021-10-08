@@ -13,7 +13,9 @@ To take advantage of CSRF protection in your views, follow these steps:
 
    If you disabled it, which is not recommended, you can use
    :func:`~django.views.decorators.csrf.csrf_protect` on particular views
-   you want to protect (see below).
+   you want to protect (see below). This is what you should do if you are
+   building a third-party app which relies on CSRF being inforced (for
+   example the admin app).
 
 #. In any template that uses a POST form, use the :ttag:`csrf_token` tag inside
    the ``<form>`` element if the form is for an internal URL, e.g.:
@@ -33,12 +35,12 @@ To take advantage of CSRF protection in your views, follow these steps:
 
 .. _csrf-ajax:
 
-AJAX
-====
-While the above method can be used for AJAX POST requests, it has some
-inconveniences: you have to remember to pass the CSRF token in as POST data with
-every POST request. For this reason, there is an alternative method: on each
-XMLHttpRequest, set a custom ``X-CSRFToken`` header (as specified by the
+Using CSRF protection with AJAX
+===============================
+
+When making POST requests, you cannot add the CSRF token to the POST data.
+For this reason, there is an alternative method: on each XMLHttpRequest,
+set a custom ``X-CSRFToken`` header (as specified by the
 :setting:`CSRF_HEADER_NAME` setting) to the value of the CSRF token. This is
 often easier because many JavaScript frameworks provide hooks that allow
 headers to be set on every request.
