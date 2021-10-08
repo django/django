@@ -310,8 +310,35 @@ class BaseModelForm(BaseForm):
             label_suffix, empty_permitted, use_required_attribute=use_required_attribute,
             renderer=renderer,
         )
-        for formfield in self.fields.values():
+        for field_name, formfield in self.fields.items():
             apply_limit_choices_to_to_formfield(formfield)
+            # Check the initial value for a ModelChoiceField when set from instance.
+            if isinstance(formfield, ModelChoiceField) and (not initial or field_name not in initial):
+                self._check_model_choice_field_initial_value(field_name, formfield)
+
+    def _check_model_choice_field_initial_value(self, field_name, formfield):
+        """
+        Check that the initial value of a ModelChoiceField is the model instance
+        when `to_field_name` targets a field other than the ForeignKey's `to_field`.
+        """
+        from django.db.models import ForeignKey
+        if field_name not in self.initial:
+            return
+
+        model = formfield.queryset.model
+        value = self.initial[field_name]
+        # Ignore when falsy, when a model instance, or when targeting the primary key.
+        if not value or isinstance(value, model) or formfield.to_field_name in [None, 'pk', model._meta.pk.name]:
+            return
+
+        modelfield = self.instance._meta.get_field(field_name)
+        if not isinstance(modelfield, ForeignKey):
+            return
+
+        # Get the object using the ForeignKey `to_field` value.
+        lookup_field = modelfield.to_fields[0] or 'pk'
+        obj = model.objects.get(**{lookup_field: value})
+        self.initial.update({field_name: obj})
 
     def _get_validation_exclusions(self):
         """

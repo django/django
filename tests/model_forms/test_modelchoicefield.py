@@ -379,3 +379,47 @@ class ModelChoiceFieldTests(TestCase):
         )
         with self.assertNumQueries(2):
             template.render(Context({'form': CategoriesForm()}))
+
+    def test_model_choice_field_to_field_name_initial_value(self):
+        class ArticleForm(forms.ModelForm):
+            writer = forms.ModelChoiceField(queryset=Writer.objects.all(), to_field_name='name')
+
+            class Meta:
+                model = Article
+                fields = ['writer']
+
+        Writer.objects.create(name='Molière')
+        Writer.objects.create(name='Shakespeare')
+        writer = Writer.objects.create(name='Voltaire')
+        article = Article.objects.create(writer=writer, pub_date='1759-01-01')
+
+        form = ArticleForm(instance=article)
+        template = Template('{{ form }}')
+        html = template.render(Context({'form': form}))
+
+        self.assertIn('<option value="Voltaire" selected>Voltaire</option>', html)
+        self.assertEqual(form.initial['writer'], writer)
+
+    def test_model_choice_field_with_to_field_name_preserves_provided_initial_value(self):
+        """
+        When `initial` is explicitly set, don't attempt to convert the value to a
+        model instance.
+        """
+        class ArticleForm(forms.ModelForm):
+            writer = forms.ModelChoiceField(queryset=Writer.objects.all(), to_field_name='name')
+
+            class Meta:
+                model = Article
+                fields = ['writer']
+
+        Writer.objects.create(name='Molière')
+        Writer.objects.create(name='Shakespeare')
+        writer = Writer.objects.create(name='Voltaire')
+        article = Article.objects.create(writer=writer, pub_date='1759-01-01')
+
+        form = ArticleForm(instance=article, initial={'writer': 'Voltaire'})
+        template = Template('{{ form }}')
+        html = template.render(Context({'form': form}))
+
+        self.assertIn('<option value="Voltaire" selected>Voltaire</option>', html)
+        self.assertEqual(form.initial['writer'], 'Voltaire')
