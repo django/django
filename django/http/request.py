@@ -126,8 +126,9 @@ class HttpRequest:
 
             if settings.USE_X_FORWARDED_PORT and 'HTTP_X_FORWARDED_PORT' in self.META:
                 if port_in_x_fw_host:
-                    raise ImproperlyConfigured('HTTP_X_FORWARDED_HOST contains a port number '
-                                                'and USE_X_FORWARDED_PORT is set to True')
+                    raise ImproperlyConfigured(
+                        'HTTP_X_FORWARDED_HOST contains a port number and USE_X_FORWARDED_PORT is set to True'
+                    )
                 port = self.META['HTTP_X_FORWARDED_PORT']
 
             self._parsed_host_header = ParsedHostHeader(domain, port)
@@ -631,6 +632,7 @@ def bytes_to_text(s, encoding):
         return str(s, encoding, 'replace')
     else:
         return s
+
 
 def _parse_host_header(host):
     """
