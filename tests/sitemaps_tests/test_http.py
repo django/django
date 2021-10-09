@@ -352,3 +352,48 @@ class HTTPSitemapTests(SitemapTestsBase):
 
 </urlset>"""
         self.assertXMLEqual(response.content.decode(), expected_content)
+
+    def test_callable_sitemod_partial(self):
+        """
+        Not all items have `lastmod`. Therefore the `Last-Modified` header
+        is not set by the detail sitemap view.
+        """
+        index_response = self.client.get('/callable-lastmod-partial/index.xml')
+        sitemap_response = self.client.get('/callable-lastmod-partial/sitemap.xml')
+        self.assertNotIn('Last-Modified', index_response)
+        self.assertNotIn('Last-Modified', sitemap_response)
+        expected_content_index = """<?xml version="1.0" encoding="UTF-8"?>
+        <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+        <sitemap><loc>http://example.com/simple/sitemap-callable-lastmod.xml</loc></sitemap>
+        </sitemapindex>
+        """
+        expected_content_sitemap = """<?xml version="1.0" encoding="UTF-8"?>
+        <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+        <url><loc>http://example.com/location/</loc><lastmod>2013-03-13</lastmod></url><url><loc>http://example.com/location/</loc></url>
+        </urlset>
+        """
+        self.assertXMLEqual(index_response.content.decode(), expected_content_index)
+        self.assertXMLEqual(sitemap_response.content.decode(), expected_content_sitemap)
+
+    def test_callable_sitemod_full(self):
+        """
+        All items in the sitemap have `lastmod`. The `Last-Modified` header
+        is set for the detail sitemap view. The index view does not (currently)
+        set the `Last-Modified` header.
+        """
+        index_response = self.client.get('/callable-lastmod-full/index.xml')
+        sitemap_response = self.client.get('/callable-lastmod-full/sitemap.xml')
+        self.assertNotIn('Last-Modified', index_response)
+        self.assertEqual(sitemap_response.headers['Last-Modified'], 'Thu, 13 Mar 2014 10:00:00 GMT')
+        expected_content_index = """<?xml version="1.0" encoding="UTF-8"?>
+        <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+        <sitemap><loc>http://example.com/simple/sitemap-callable-lastmod.xml</loc></sitemap>
+        </sitemapindex>
+        """
+        expected_content_sitemap = """<?xml version="1.0" encoding="UTF-8"?>
+        <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+        <url><loc>http://example.com/location/</loc><lastmod>2013-03-13</lastmod></url><url><loc>http://example.com/location/</loc><lastmod>2014-03-13</lastmod></url>
+        </urlset>
+        """
+        self.assertXMLEqual(index_response.content.decode(), expected_content_index)
+        self.assertXMLEqual(sitemap_response.content.decode(), expected_content_sitemap)
