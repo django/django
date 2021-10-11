@@ -134,12 +134,12 @@ class Command(BaseCommand):
                                 self.stderr.write('Error: This field cannot be blank.')
                                 continue
                             user_data[field_name] = [pk.strip() for pk in input_value.split(',')]
-                        if not field.many_to_many:
-                            fake_user_data[field_name] = input_value
-
                         # Wrap any foreign keys in fake model instances
                         if field.many_to_one:
                             fake_user_data[field_name] = field.remote_field.model(input_value)
+
+                    if not field.many_to_many and field_name not in fake_user_data:
+                        fake_user_data[field_name] = user_data[field_name]
 
                 # Prompt for a password if the model has one.
                 while PASSWORD_FIELD in user_data and user_data[PASSWORD_FIELD] is None:
