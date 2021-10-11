@@ -21,7 +21,7 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - run: python -m pip install flake8==3.9.2
+      - run: python -m pip install flake8
       - name: flake8
         uses: liskin/gh-problem-matcher-wrap@v1
         with:
