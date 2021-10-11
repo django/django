@@ -29,8 +29,6 @@ if "install" in sys.argv:
 
 
 setup()
-
-
 if overlay_warning:
     sys.stderr.write("""
 
