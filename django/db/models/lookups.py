@@ -330,6 +330,12 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
             return template % lhs_sql, params
         return super().as_sql(compiler, connection)
 
+    def as_mysql(self, compiler, connection):
+        # MySQL needs explicit comparison for boolean fields
+        # like "WHERE foo = true", otherwise the query planner ignores indexes
+        # that include the field in question.
+        return super().as_sql(compiler, connection)
+
 
 @Field.register_lookup
 class IExact(BuiltinLookup):
