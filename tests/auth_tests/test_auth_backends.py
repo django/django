@@ -53,6 +53,13 @@ class BaseBackendTest(TestCase):
         self.assertIs(self.user.has_perm('group_perm'), True)
         self.assertIs(self.user.has_perm('other_perm', TestObj()), False)
 
+    def test_has_perms_perm_list_invalid(self):
+        msg = 'perm_list must be an iterable of permissions.'
+        with self.assertRaisesMessage(ValueError, msg):
+            self.user.has_perms('user_perm')
+        with self.assertRaisesMessage(ValueError, msg):
+            self.user.has_perms(object())
+
 
 class CountingMD5PasswordHasher(MD5PasswordHasher):
     """Hasher that counts how many times it computes a hash."""
@@ -475,6 +482,13 @@ class AnonymousUserBackendTest(SimpleTestCase):
     def test_has_perms(self):
         self.assertIs(self.user1.has_perms(['anon'], TestObj()), True)
         self.assertIs(self.user1.has_perms(['anon', 'perm'], TestObj()), False)
+
+    def test_has_perms_perm_list_invalid(self):
+        msg = 'perm_list must be an iterable of permissions.'
+        with self.assertRaisesMessage(ValueError, msg):
+            self.user1.has_perms('perm')
+        with self.assertRaisesMessage(ValueError, msg):
+            self.user1.has_perms(object())
 
     def test_has_module_perms(self):
         self.assertIs(self.user1.has_module_perms("app1"), True)
