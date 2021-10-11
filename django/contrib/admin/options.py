@@ -1536,7 +1536,7 @@ class ModelAdmin(BaseModelAdmin):
         and return a redirect to the admin index page.
         """
         msg = _('%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?') % {
-            'name': opts.verbose_name,
+            'name': capfirst(opts.verbose_name),
             'key': unquote(object_id),
         }
         self.message_user(request, msg, messages.WARNING)
