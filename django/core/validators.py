@@ -82,7 +82,7 @@ class URLValidator(RegexValidator):
     host_re = '(' + hostname_re + domain_re + tld_re + '|localhost)'
 
     regex = _lazy_re_compile(
-        r'^(?:[a-z0-9.+-]*)://'  # scheme is validated separately
+        r'^(?:[a-z0-9.+-]+:)?//'  # scheme is validated separately
         r'(?:[^\s:@/]+(?::[^\s:@/]*)?@)?'  # user:pass authentication
         r'(?:' + ipv4_re + '|' + ipv6_re + '|' + host_re + ')'
         r'(?::\d{1,5})?'  # port
@@ -102,9 +102,9 @@ class URLValidator(RegexValidator):
             raise ValidationError(self.message, code=self.code, params={'value': value})
         if self.unsafe_chars.intersection(value):
             raise ValidationError(self.message, code=self.code, params={'value': value})
-        # Check if the scheme is valid.
-        scheme = value.split('://')[0].lower()
-        if scheme not in self.schemes:
+        # Extract the scheme, if present, and validate.
+        scheme = value.split('//')[0][:-1].lower()
+        if scheme and scheme not in self.schemes:
             raise ValidationError(self.message, code=self.code, params={'value': value})
 
         # Then check full URL

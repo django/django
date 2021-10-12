@@ -143,6 +143,7 @@ VALID_URLS = [
     'http://multipledashintld.a-b-c',
     'http://evenmoredashintld.a---c',
     'http://dashinpunytld.xn---c',
+    '//www.example.com',
 ]
 
 INVALID_URLS = [
