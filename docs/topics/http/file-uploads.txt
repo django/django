@@ -271,3 +271,24 @@ list::
         @csrf_protect
         def _upload_file_view(request):
             ... # Process request
+
+    If you are using a class-based view, you will need to use
+    :func:`~django.views.decorators.csrf.csrf_exempt` on its
+    :meth:`~django.views.generic.base.View.dispatch` method and
+    :func:`~django.views.decorators.csrf.csrf_protect` on the method that
+    actually processes the request. Example code::
+
+        from django.utils.decorators import method_decorator
+        from django.views import View
+        from django.views.decorators.csrf import csrf_exempt, csrf_protect
+
+        @method_decorator(csrf_exempt, name='dispatch')
+        class UploadFileView(View):
+
+            def setup(self, request, *args, **kwargs):
+                request.upload_handlers.insert(0, ProgressBarUploadHandler(request))
+                super().setup(request, *args, **kwargs)
+
+            @method_decorator(csrf_protect)
+            def post(self, request, *args, **kwargs):
+                ... # Process request
