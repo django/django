@@ -531,6 +531,43 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
         test(self)
 
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithFK')
+    def test_validate_fk(self):
+        email = Email.objects.create(email='mymail@gmail.com')
+        Group.objects.all().delete()
+        nonexistent_group_id = 1
+        msg = f'group instance with id {nonexistent_group_id} does not exist.'
+
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command(
+                'createsuperuser',
+                interactive=False,
+                username=email.pk,
+                email=email.email,
+                group=nonexistent_group_id,
+                verbosity=0,
+            )
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithFK')
+    def test_validate_fk_environment_variable(self):
+        email = Email.objects.create(email='mymail@gmail.com')
+        Group.objects.all().delete()
+        nonexistent_group_id = 1
+        msg = f'group instance with id {nonexistent_group_id} does not exist.'
+
+        with mock.patch.dict(
+            os.environ,
+            {'DJANGO_SUPERUSER_GROUP': str(nonexistent_group_id)},
+        ):
+            with self.assertRaisesMessage(CommandError, msg):
+                call_command(
+                    'createsuperuser',
+                    interactive=False,
+                    username=email.pk,
+                    email=email.email,
+                    verbosity=0,
+                )
+
     @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithM2m')
     def test_fields_with_m2m(self):
         new_io = StringIO()
