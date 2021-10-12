@@ -1760,7 +1760,7 @@ class Query(BaseExpression):
             )
         """
         # Generate the inner query.
-        query = Query(self.model)
+        query = self.__class__(self.model)
         query._filtered_relations = self._filtered_relations
         filter_lhs, filter_rhs = filter_expr
         if isinstance(filter_rhs, OuterRef):
