@@ -753,17 +753,18 @@ a.deletelink:focus, a.deletelink:hover {
 /* OBJECT TOOLS */
 
 .object-tools {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
     font-size: 10px;
     font-weight: bold;
     padding-left: 0;
-    float: right;
     position: relative;
-    margin-top: -48px;
 }
 
 .object-tools li {
     display: block;
-    float: left;
+    margin-bottom: 15px;
     margin-left: 5px;
     height: 16px;
 }
@@ -960,6 +961,16 @@ table#change-history tbody th {
     text-decoration: none;
     border-bottom-color: var(--primary);
     color: var(--primary);
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.content-titles h1, .content-titles h2 {
+    white-space: nowrap;
+    margin-right: 10px;
 }
 
 /* SIDEBAR */
