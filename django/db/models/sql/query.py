@@ -148,6 +148,9 @@ class Query(BaseExpression):
 
     compiler = 'SQLCompiler'
 
+    base_table_class = BaseTable
+    join_class = Join
+
     def __init__(self, model, alias_cols=True):
         self.model = model
         self.alias_refcount = {}
@@ -934,7 +937,7 @@ class Query(BaseExpression):
             alias = self.base_table
             self.ref_alias(alias)
         else:
-            alias = self.join(BaseTable(self.get_meta().db_table, None))
+            alias = self.join(self.base_table_class(self.get_meta().db_table, None))
         return alias
 
     def count_active_tables(self):
@@ -948,8 +951,8 @@ class Query(BaseExpression):
     def join(self, join, reuse=None):
         """
         Return an alias for the 'join', either reusing an existing alias for
-        that join or creating a new one. 'join' is either a
-        sql.datastructures.BaseTable or Join.
+        that join or creating a new one. 'join' is either a base_table_class or
+        join_class.
 
         The 'reuse' parameter can be either None which means all joins are
         reusable, or it can be a set containing the aliases that can be reused.
@@ -1651,7 +1654,7 @@ class Query(BaseExpression):
                 nullable = self.is_nullable(join.join_field)
             else:
                 nullable = True
-            connection = Join(
+            connection = self.join_class(
                 opts.db_table, alias, table_alias, INNER, join.join_field,
                 nullable, filtered_relation=filtered_relation,
             )
@@ -2319,11 +2322,15 @@ class Query(BaseExpression):
             # values in select_fields. Lets punt this one for now.
             select_fields = [r[1] for r in join_field.related_fields]
             select_alias = lookup_tables[trimmed_paths]
-        # The found starting point is likely a Join instead of a BaseTable reference.
-        # But the first entry in the query's FROM clause must not be a JOIN.
+        # The found starting point is likely a join_class instead of a
+        # base_table_class reference. But the first entry in the query's FROM
+        # clause must not be a JOIN.
         for table in self.alias_map:
             if self.alias_refcount[table] > 0:
-                self.alias_map[table] = BaseTable(self.alias_map[table].table_name, table)
+                self.alias_map[table] = self.base_table_class(
+                    self.alias_map[table].table_name,
+                    table,
+                )
                 break
         self.set_select([f.get_col(select_alias) for f in select_fields])
         return trimmed_prefix, contains_louter
