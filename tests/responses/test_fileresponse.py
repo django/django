@@ -188,8 +188,9 @@ class FileResponseTests(SimpleTestCase):
                 pipe_for_write.write(b'binary content')
 
             response = FileResponse(os.fdopen(pipe_for_read, mode='rb'))
-            self.assertEqual(list(response), [b'binary content'])
+            response_content = list(response)
             response.close()
+            self.assertEqual(response_content, [b'binary content'])
             self.assertFalse(response.has_header('Content-Length'))
 
     def test_compressed_response(self):
