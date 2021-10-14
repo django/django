@@ -1,5 +1,4 @@
 import asyncore
-import base64
 import mimetypes
 import os
 import shutil
@@ -13,7 +12,7 @@ from email.mime.text import MIMEText
 from email.utils import parseaddr
 from io import StringIO
 from pathlib import Path
-from smtplib import SMTP, SMTPAuthenticationError, SMTPException
+from smtplib import SMTP, SMTPException
 from ssl import SSLError
 from unittest import mock
 
@@ -1347,15 +1346,6 @@ class FakeSMTPChannel(smtpd.SMTPChannel):
             # cares whether the connection attempt was made.
             pass
 
-    def smtp_AUTH(self, arg):
-        if arg == 'CRAM-MD5':
-            # This is only the first part of the login process. But it's enough
-            # for our tests.
-            challenge = base64.b64encode(b'somerandomstring13579')
-            self.push('334 %s' % challenge.decode())
-        else:
-            self.push('502 Error: login "%s" not implemented' % arg)
-
 
 class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
     """
@@ -1416,20 +1406,6 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
         if self.active:
             self.active = False
             self.join()
-
-
-class FakeAUTHSMTPConnection(SMTP):
-    """
-    A SMTP connection pretending support for the AUTH command. It does not, but
-    at least this can allow testing the first part of the AUTH process.
-    """
-
-    def ehlo(self, name=''):
-        response = SMTP.ehlo(self, name=name)
-        self.esmtp_features.update({
-            'auth': 'CRAM-MD5 PLAIN LOGIN',
-        })
-        return response
 
 
 class SMTPBackendTestsBase(SimpleTestCase):
@@ -1517,19 +1493,6 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         # Simulate an already open connection.
         backend.connection = mock.Mock(spec=object())
         self.assertIs(backend.open(), False)
-
-    def test_server_login(self):
-        """
-        Even if the Python SMTP server doesn't support authentication, the
-        login process starts and the appropriate exception is raised.
-        """
-        class CustomEmailBackend(smtp.EmailBackend):
-            connection_class = FakeAUTHSMTPConnection
-
-        backend = CustomEmailBackend(username='username', password='password')
-        with self.assertRaises(SMTPAuthenticationError):
-            with backend:
-                pass
 
     @override_settings(EMAIL_USE_TLS=True)
     def test_email_tls_use_settings(self):
