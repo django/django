@@ -2664,6 +2664,20 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, 'app', 0, 0, name='title', model_name='readable')
         self.assertOperationAttributes(changes, 'app', 0, 1, name='book')
 
+    def test_parse_number(self):
+        tests = [
+            ('no_number', None),
+            ('0001_initial', 1),
+            ('0002_model3', 2),
+            ('0002_auto_20380101_1112', 2),
+        ]
+        for migration_name, expected_number in tests:
+            with self.subTest(migration_name=migration_name):
+                self.assertEqual(
+                    MigrationAutodetector.parse_number(migration_name),
+                    expected_number,
+                )
+
 
 class MigrationSuggestNameTests(SimpleTestCase):
     def test_no_operations(self):
