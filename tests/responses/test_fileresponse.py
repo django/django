@@ -1,4 +1,5 @@
 import io
+import itertools
 import os
 import sys
 import tempfile
@@ -9,30 +10,103 @@ from django.http import FileResponse
 from django.test import SimpleTestCase
 
 
+class UnseekableBytesIO(io.BytesIO):
+    def seekable(self):
+        return False
+
+
 class FileResponseTests(SimpleTestCase):
-    def test_file_from_disk_response(self):
+    def test_content_length_file(self):
         response = FileResponse(open(__file__, 'rb'))
         self.assertEqual(response.headers['Content-Length'], str(os.path.getsize(__file__)))
-        self.assertIn(response.headers['Content-Type'], ['text/x-python', 'text/plain'])
-        self.assertEqual(
-            response.headers['Content-Disposition'],
-            'inline; filename="test_fileresponse.py"',
-        )
         response.close()
 
-    def test_file_from_buffer_response(self):
+    def test_content_length_buffer(self):
         response = FileResponse(io.BytesIO(b'binary content'))
         self.assertEqual(response.headers['Content-Length'], '14')
+
+    def test_content_type_file(self):
+        response = FileResponse(open(__file__, 'rb'))
+        self.assertIn(response.headers['Content-Type'], ['text/x-python', 'text/plain'])
+        response.close()
+
+    def test_content_type_buffer(self):
+        response = FileResponse(io.BytesIO(b'binary content'))
         self.assertEqual(response.headers['Content-Type'], 'application/octet-stream')
+
+    def test_content_type_buffer_explicit(self):
+        response = FileResponse(io.BytesIO(b'binary content'), content_type='video/webm')
+        self.assertEqual(response.headers['Content-Type'], 'video/webm')
+
+    def test_content_type_buffer_named(self):
+        test_tuples = (
+            ('test_fileresponse.py', ['text/x-python', 'text/plain']),
+            ('test_fileresponse.pynosuchfile', ['application/octet-stream']),
+        )
+        for filename, content_types in test_tuples:
+            with self.subTest(filename=filename):
+                buffer = io.BytesIO(b'binary content')
+                buffer.name = filename
+                response = FileResponse(buffer)
+                self.assertIn(response.headers['Content-Type'], content_types)
+
+    def test_content_disposition_file(self):
+        filenames = (
+            ('', 'test_fileresponse.py'),
+            ('custom_name.py', 'custom_name.py'),
+        )
+        dispositions = (
+            (False, 'inline'),
+            (True, 'attachment'),
+        )
+        for (filename, header_filename), (as_attachment, header_disposition)\
+                in itertools.product(filenames, dispositions):
+            with self.subTest(filename=filename, disposition=header_disposition):
+                response = FileResponse(open(__file__, 'rb'), filename=filename, as_attachment=as_attachment)
+                self.assertEqual(
+                    response.headers['Content-Disposition'],
+                    '%s; filename="%s"' % (header_disposition, header_filename),
+                )
+                response.close()
+
+    def test_content_disposition_buffer(self):
+        response = FileResponse(io.BytesIO(b'binary content'))
         self.assertFalse(response.has_header('Content-Disposition'))
+
+    def test_content_disposition_buffer_attachment(self):
+        response = FileResponse(io.BytesIO(b'binary content'), as_attachment=True)
+        self.assertEqual(response.headers['Content-Disposition'], 'attachment')
+
+    def test_content_disposition_buffer_explicit_filename(self):
+        dispositions = (
+            (False, 'inline'),
+            (True, 'attachment'),
+        )
+        for as_attachment, header_disposition in dispositions:
+            response = FileResponse(
+                io.BytesIO(b'binary content'),
+                as_attachment=as_attachment,
+                filename='custom_name.py',
+            )
+            self.assertEqual(
+                response.headers['Content-Disposition'], '%s; filename="custom_name.py"' % header_disposition
+            )
+
+    def test_response_buffer(self):
+        response = FileResponse(io.BytesIO(b'binary content'))
         self.assertEqual(list(response), [b'binary content'])
 
-    def test_file_from_buffer_unnamed_attachment(self):
-        response = FileResponse(io.BytesIO(b'binary content'), as_attachment=True)
-        self.assertEqual(response.headers['Content-Length'], '14')
-        self.assertEqual(response.headers['Content-Type'], 'application/octet-stream')
-        self.assertEqual(response.headers['Content-Disposition'], 'attachment')
-        self.assertEqual(list(response), [b'binary content'])
+    def test_response_nonzero_starting_position(self):
+        test_tuples = (
+            ('BytesIO', io.BytesIO),
+            ('UnseekableBytesIO', UnseekableBytesIO),
+        )
+        for buffer_class_name, BufferClass in test_tuples:
+            with self.subTest(buffer_class_name=buffer_class_name):
+                buffer = BufferClass(b'binary content')
+                buffer.seek(10)
+                response = FileResponse(buffer)
+                self.assertEqual(list(response), [b'tent'])
 
     @skipIf(sys.platform == 'win32', "Named pipes are Unix-only.")
     def test_file_from_named_pipe_response(self):
@@ -47,16 +121,6 @@ class FileResponseTests(SimpleTestCase):
             self.assertEqual(list(response), [b'binary content'])
             response.close()
             self.assertFalse(response.has_header('Content-Length'))
-
-    def test_file_from_disk_as_attachment(self):
-        response = FileResponse(open(__file__, 'rb'), as_attachment=True)
-        self.assertEqual(response.headers['Content-Length'], str(os.path.getsize(__file__)))
-        self.assertIn(response.headers['Content-Type'], ['text/x-python', 'text/plain'])
-        self.assertEqual(
-            response.headers['Content-Disposition'],
-            'attachment; filename="test_fileresponse.py"',
-        )
-        response.close()
 
     def test_compressed_response(self):
         """
@@ -87,7 +151,7 @@ class FileResponseTests(SimpleTestCase):
         )
         self.assertEqual(
             response.headers['Content-Disposition'],
-            "attachment; filename*=utf-8''%E7%A5%9D%E6%82%A8%E5%B9%B3%E5%AE%89.odt"
+            "attachment; filename*=utf-8''%E7%A5%9D%E6%82%A8%E5%B9%B3%E5%AE%89.odt",
         )
 
     def test_repr(self):
