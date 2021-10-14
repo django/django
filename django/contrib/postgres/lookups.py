@@ -58,3 +58,8 @@ class SearchLookup(SearchVectorExact):
 class TrigramSimilar(PostgresOperatorLookup):
     lookup_name = 'trigram_similar'
     postgres_operator = '%%'
+
+
+class TrigramWordSimilar(PostgresOperatorLookup):
+    lookup_name = 'trigram_word_similar'
+    postgres_operator = '%%>'

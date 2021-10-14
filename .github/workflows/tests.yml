@@ -2,9 +2,13 @@ name: Tests
 
 on:
   pull_request:
+    paths-ignore:
+      - 'docs/**'
   push:
     branches:
       - main
+    paths-ignore:
+      - 'docs/**'
 
 jobs:
   javascript-tests:

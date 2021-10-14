@@ -1663,6 +1663,12 @@ class Queries5Tests(TestCase):
             'bar %s'
         )
 
+    def test_queryset_reuse(self):
+        # Using querysets doesn't mutate aliases.
+        authors = Author.objects.filter(Q(name='a1') | Q(name='nonexistent'))
+        self.assertEqual(Ranking.objects.filter(author__in=authors).get(), self.rank3)
+        self.assertEqual(authors.count(), 1)
+
 
 class SelectRelatedTests(TestCase):
     def test_tickets_3045_3288(self):
@@ -2839,6 +2845,14 @@ class ExcludeTests(TestCase):
             ),
             [self.j1, self.j2],
         )
+
+    def test_exclude_unsaved_o2o_object(self):
+        jack = Staff.objects.create(name='jack')
+        jack_staff = StaffUser.objects.create(staff=jack)
+        unsaved_object = Staff(name='jane')
+
+        self.assertIsNone(unsaved_object.pk)
+        self.assertSequenceEqual(StaffUser.objects.exclude(staff=unsaved_object), [jack_staff])
 
 
 class ExcludeTest17600(TestCase):

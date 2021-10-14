@@ -868,17 +868,11 @@ It also provides an additional method:
     (for instance, MySQL with the MyISAM engine), ``setUpTestData()`` will be
     called before each test, negating the speed benefits.
 
-    .. versionchanged:: 3.2
-
-        Objects assigned to class attributes in ``setUpTestData()`` must
-        support creating deep copies with :py:func:`copy.deepcopy` in order to
-        isolate them from alterations performed by each test methods. In
-        previous versions of Django these objects were reused and changes made
-        to them were persisted between test methods.
+    Objects assigned to class attributes in ``setUpTestData()`` must support
+    creating deep copies with :py:func:`copy.deepcopy` in order to isolate them
+    from alterations performed by each test methods.
 
 .. classmethod:: TestCase.captureOnCommitCallbacks(using=DEFAULT_DB_ALIAS, execute=False)
-
-    .. versionadded:: 3.2
 
     Returns a context manager that captures :func:`transaction.on_commit()
     <django.db.transaction.on_commit>` callbacks for the given database
@@ -911,6 +905,11 @@ It also provides an additional method:
                 self.assertEqual(len(mail.outbox), 1)
                 self.assertEqual(mail.outbox[0].subject, 'Contact Form')
                 self.assertEqual(mail.outbox[0].body, 'I like your site')
+
+    .. versionchanged:: 4.0
+
+        In older versions, new callbacks added while executing
+        :func:`.transaction.on_commit` callbacks were not captured.
 
 .. _live-test-server:
 
@@ -1025,7 +1024,7 @@ out the `full reference`_ for more details.
     for more information.
 
     .. _Selenium FAQ: https://web.archive.org/web/20160129132110/http://code.google.com/p/selenium/wiki/FrequentlyAskedQuestions#Q:_WebDriver_fails_to_find_elements_/_Does_not_block_on_page_loa
-    .. _Selenium documentation: https://www.selenium.dev/documentation/en/webdriver/waits/#explicit-wait
+    .. _Selenium documentation: https://www.selenium.dev/documentation/webdriver/waits/#explicit-wait
 
 Test cases features
 ===================
@@ -1700,21 +1699,6 @@ your test suite.
     raised.
 
     Output in case of error can be customized with the ``msg`` argument.
-
-    .. versionchanged:: 3.2
-
-        The default value of ``transform`` argument was changed to ``None``.
-
-    .. versionadded:: 3.2
-
-        Support for direct comparison between querysets was added.
-
-    .. deprecated:: 3.2
-
-        If ``transform`` is not provided and ``values`` is a list of strings,
-        it's compared to a list produced by applying ``repr()`` to each member
-        of ``qs``. This behavior is deprecated and will be removed in Django
-        4.1. If you need it, explicitly set ``transform`` to ``repr``.
 
 .. method:: TransactionTestCase.assertNumQueries(num, func, *args, **kwargs)
 

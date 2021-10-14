@@ -120,9 +120,10 @@ class AdminScriptTestCase(SimpleTestCase):
 
         p = subprocess.run(
             [sys.executable, *args],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            capture_output=True,
             cwd=self.test_dir,
-            env=test_environ, universal_newlines=True,
+            env=test_environ,
+            text=True,
         )
         return p.stdout, p.stderr
 
@@ -1381,6 +1382,15 @@ class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
         self.assertOutput(err, 'CommandError: You must set settings.ALLOWED_HOSTS if DEBUG is False.')
 
 
+class ManageRunserverHelpOutput(AdminScriptTestCase):
+    def test_suppressed_options(self):
+        """runserver doesn't support --verbosity and --trackback options."""
+        out, err = self.run_manage(['runserver', '--help'])
+        self.assertNotInOutput(out, '--verbosity')
+        self.assertNotInOutput(out, '--trackback')
+        self.assertOutput(out, '--settings')
+
+
 class ManageTestserver(SimpleTestCase):
 
     @mock.patch.object(TestserverCommand, 'handle', return_value='')
@@ -1495,6 +1505,31 @@ class CommandTypes(AdminScriptTestCase):
         self.assertNotEqual(version_location, -1)
         self.assertLess(tag_location, version_location)
         self.assertOutput(out, "Checks the entire Django project for potential problems.")
+
+    def test_help_default_options_with_custom_arguments(self):
+        args = ['base_command', '--help']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        expected_options = [
+            '-h',
+            '--option_a OPTION_A',
+            '--option_b OPTION_B',
+            '--option_c OPTION_C',
+            '--version',
+            '-v {0,1,2,3}',
+            '--settings SETTINGS',
+            '--pythonpath PYTHONPATH',
+            '--traceback',
+            '--no-color',
+            '--force-color',
+            'args ...',
+        ]
+        for option in expected_options:
+            self.assertOutput(out, f'[{option}]')
+        self.assertOutput(out, '--option_a OPTION_A, -a OPTION_A')
+        self.assertOutput(out, '--option_b OPTION_B, -b OPTION_B')
+        self.assertOutput(out, '--option_c OPTION_C, -c OPTION_C')
+        self.assertOutput(out, '-v {0,1,2,3}, --verbosity {0,1,2,3}')
 
     def test_color_style(self):
         style = color.no_style()
@@ -1820,6 +1855,34 @@ class CommandTypes(AdminScriptTestCase):
             "EXECUTE:LabelCommand label=anotherlabel, options=[('force_color', "
             "False), ('no_color', False), ('pythonpath', None), "
             "('settings', None), ('traceback', False), ('verbosity', 1)]"
+        )
+
+    def test_suppress_base_options_command_help(self):
+        args = ['suppress_base_options_command', '--help']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, 'Test suppress base options command.')
+        self.assertNotInOutput(out, 'input file')
+        self.assertOutput(out, '-h, --help')
+        self.assertNotInOutput(out, '--version')
+        self.assertNotInOutput(out, '--verbosity')
+        self.assertNotInOutput(out, '-v {0,1,2,3}')
+        self.assertNotInOutput(out, '--settings')
+        self.assertNotInOutput(out, '--pythonpath')
+        self.assertNotInOutput(out, '--traceback')
+        self.assertNotInOutput(out, '--no-color')
+        self.assertNotInOutput(out, '--force-color')
+
+    def test_suppress_base_options_command_defaults(self):
+        args = ['suppress_base_options_command']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(
+            out,
+            "EXECUTE:SuppressBaseOptionsCommand options=[('file', None), "
+            "('force_color', False), ('no_color', False), "
+            "('pythonpath', None), ('settings', None), "
+            "('traceback', False), ('verbosity', 1)]"
         )
 
 
@@ -2151,6 +2214,88 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
             self.assertEqual(f.read().splitlines(False), [
                 'Some non-ASCII text for testing ticket #18091:',
                 'üäö €'])
+
+    def test_custom_project_template_hidden_directory_default_excluded(self):
+        """Hidden directories are excluded by default."""
+        template_path = os.path.join(custom_templates_dir, 'project_template')
+        args = [
+            'startproject',
+            '--template',
+            template_path,
+            'custom_project_template_hidden_directories',
+            'project_dir',
+        ]
+        testproject_dir = os.path.join(self.test_dir, 'project_dir')
+        os.mkdir(testproject_dir)
+
+        _, err = self.run_django_admin(args)
+        self.assertNoOutput(err)
+        hidden_dir = os.path.join(testproject_dir, '.hidden')
+        self.assertIs(os.path.exists(hidden_dir), False)
+
+    def test_custom_project_template_hidden_directory_included(self):
+        """
+        Template context variables in hidden directories are rendered, if not
+        excluded.
+        """
+        template_path = os.path.join(custom_templates_dir, 'project_template')
+        project_name = 'custom_project_template_hidden_directories_included'
+        args = [
+            'startproject',
+            '--template',
+            template_path,
+            project_name,
+            'project_dir',
+            '--exclude',
+        ]
+        testproject_dir = os.path.join(self.test_dir, 'project_dir')
+        os.mkdir(testproject_dir)
+
+        _, err = self.run_django_admin(args)
+        self.assertNoOutput(err)
+        render_py_path = os.path.join(testproject_dir, '.hidden', 'render.py')
+        with open(render_py_path) as fp:
+            self.assertIn(
+                f'# The {project_name} should be rendered.',
+                fp.read(),
+            )
+
+    def test_custom_project_template_exclude_directory(self):
+        """
+        Excluded directories (in addition to .git and __pycache__) are not
+        included in the project.
+        """
+        template_path = os.path.join(custom_templates_dir, 'project_template')
+        project_name = 'custom_project_with_excluded_directories'
+        args = [
+            'startproject',
+            '--template',
+            template_path,
+            project_name,
+            'project_dir',
+            '--exclude',
+            'additional_dir',
+            '-x',
+            '.hidden',
+        ]
+        testproject_dir = os.path.join(self.test_dir, 'project_dir')
+        os.mkdir(testproject_dir)
+
+        _, err = self.run_django_admin(args)
+        self.assertNoOutput(err)
+        excluded_directories = [
+            '.hidden',
+            'additional_dir',
+            '.git',
+            '__pycache__',
+        ]
+        for directory in excluded_directories:
+            self.assertIs(
+                os.path.exists(os.path.join(testproject_dir, directory)),
+                False,
+            )
+        not_excluded = os.path.join(testproject_dir, project_name)
+        self.assertIs(os.path.exists(not_excluded), True)
 
 
 class StartApp(AdminScriptTestCase):

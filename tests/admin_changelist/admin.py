@@ -134,6 +134,7 @@ class NoListDisplayLinksParentAdmin(admin.ModelAdmin):
     list_display_links = None
     list_display = ['name']
     list_editable = ['name']
+    actions_on_bottom = True
 
 
 site.register(Parent, NoListDisplayLinksParentAdmin)

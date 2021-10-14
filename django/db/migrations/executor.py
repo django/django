@@ -40,6 +40,15 @@ class MigrationExecutor:
             # If the migration is already applied, do backwards mode,
             # otherwise do forwards mode.
             elif target in applied:
+                # If the target is missing, it's likely a replaced migration.
+                # Reload the graph without replacements.
+                if (
+                    self.loader.replace_migrations and
+                    target not in self.loader.graph.node_map
+                ):
+                    self.loader.replace_migrations = False
+                    self.loader.build_graph()
+                    return self.migration_plan(targets, clean_start=clean_start)
                 # Don't migrate backwards all the way to the target node (that
                 # may roll back dependencies in other apps that don't need to
                 # be rolled back); instead roll back through target's immediate

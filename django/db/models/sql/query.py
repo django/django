@@ -136,10 +136,14 @@ class RawQuery:
         self.cursor.execute(self.sql, params)
 
 
+ExplainInfo = namedtuple('ExplainInfo', ('format', 'options'))
+
+
 class Query(BaseExpression):
     """A single SQL query."""
 
     alias_prefix = 'T'
+    empty_result_set_value = None
     subq_aliases = frozenset([alias_prefix])
 
     compiler = 'SQLCompiler'
@@ -227,9 +231,7 @@ class Query(BaseExpression):
 
         self._filtered_relations = {}
 
-        self.explain_query = False
-        self.explain_format = None
-        self.explain_options = {}
+        self.explain_info = None
 
     @property
     def output_field(self):
@@ -303,11 +305,12 @@ class Query(BaseExpression):
         obj.table_map = self.table_map.copy()
         obj.where = self.where.clone()
         obj.annotations = self.annotations.copy()
-        if self.annotation_select_mask is None:
-            obj.annotation_select_mask = None
-        else:
+        if self.annotation_select_mask is not None:
             obj.annotation_select_mask = self.annotation_select_mask.copy()
-        obj.combined_queries = tuple(query.clone() for query in self.combined_queries)
+        if self.combined_queries:
+            obj.combined_queries = tuple([
+                query.clone() for query in self.combined_queries
+            ])
         # _annotation_select_cache cannot be copied, as doing so breaks the
         # (necessary) state in which both annotations and
         # _annotation_select_cache point to the same underlying objects.
@@ -315,13 +318,9 @@ class Query(BaseExpression):
         # used.
         obj._annotation_select_cache = None
         obj.extra = self.extra.copy()
-        if self.extra_select_mask is None:
-            obj.extra_select_mask = None
-        else:
+        if self.extra_select_mask is not None:
             obj.extra_select_mask = self.extra_select_mask.copy()
-        if self._extra_select_cache is None:
-            obj._extra_select_cache = None
-        else:
+        if self._extra_select_cache is not None:
             obj._extra_select_cache = self._extra_select_cache.copy()
         if self.select_related is not False:
             # Use deepcopy because select_related stores fields in nested
@@ -489,11 +488,11 @@ class Query(BaseExpression):
             self.default_cols = False
             self.extra = {}
 
-        empty_aggregate_result = [
-            expression.empty_aggregate_value
+        empty_set_result = [
+            expression.empty_result_set_value
             for expression in outer_query.annotation_select.values()
         ]
-        elide_empty = not any(result is NotImplemented for result in empty_aggregate_result)
+        elide_empty = not any(result is NotImplemented for result in empty_set_result)
         outer_query.clear_ordering(force=True)
         outer_query.clear_limits()
         outer_query.select_for_update = False
@@ -501,7 +500,7 @@ class Query(BaseExpression):
         compiler = outer_query.get_compiler(using, elide_empty=elide_empty)
         result = compiler.execute_sql(SINGLE)
         if result is None:
-            result = empty_aggregate_result
+            result = empty_set_result
 
         converters = compiler.get_converters(outer_query.annotation_select.values())
         result = next(compiler.apply_converters((result,), converters))
@@ -514,10 +513,7 @@ class Query(BaseExpression):
         """
         obj = self.clone()
         obj.add_annotation(Count('*'), alias='__count', is_summary=True)
-        number = obj.get_aggregation(using, ['__count'])['__count']
-        if number is None:
-            number = 0
-        return number
+        return obj.get_aggregation(using, ['__count'])['__count']
 
     def has_filters(self):
         return self.where
@@ -551,9 +547,7 @@ class Query(BaseExpression):
 
     def explain(self, using, format=None, **options):
         q = self.clone()
-        q.explain_query = True
-        q.explain_format = format
-        q.explain_options = options
+        q.explain_info = ExplainInfo(format, options)
         compiler = q.get_compiler(using=using)
         return '\n'.join(compiler.explain_query())
 
@@ -1192,8 +1186,11 @@ class Query(BaseExpression):
         # stage because join promotion can't be done in the compiler. Using
         # DEFAULT_DB_ALIAS isn't nice but it's the best that can be done here.
         # A similar thing is done in is_nullable(), too.
-        if (connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls and
-                lookup_name == 'exact' and lookup.rhs == ''):
+        if (
+            lookup_name == 'exact' and
+            lookup.rhs == '' and
+            connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls
+        ):
             return lhs.get_lookup('isnull')(lhs, True)
 
         return lookup
@@ -1689,7 +1686,7 @@ class Query(BaseExpression):
                 yield expr
             elif include_external and callable(getattr(expr, 'get_external_cols', None)):
                 yield from expr.get_external_cols()
-            else:
+            elif hasattr(expr, 'get_source_expressions'):
                 yield from cls._gen_cols(
                     expr.get_source_expressions(),
                     include_external=include_external,
@@ -1763,7 +1760,7 @@ class Query(BaseExpression):
             )
         """
         # Generate the inner query.
-        query = Query(self.model)
+        query = self.__class__(self.model)
         query._filtered_relations = self._filtered_relations
         filter_lhs, filter_rhs = filter_expr
         if isinstance(filter_rhs, OuterRef):
@@ -2333,10 +2330,10 @@ class Query(BaseExpression):
         # used. The proper fix would be to defer all decisions where
         # is_nullable() is needed to the compiler stage, but that is not easy
         # to do currently.
-        return (
-            connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls and
-            field.empty_strings_allowed
-        ) or field.null
+        return field.null or (
+            field.empty_strings_allowed and
+            connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls
+        )
 
 
 def get_order_dir(field, default='ASC'):

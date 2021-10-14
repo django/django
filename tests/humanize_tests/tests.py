@@ -89,13 +89,13 @@ class HumanizeTests(SimpleTestCase):
             '100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.1234567',
             '1,234,567.1234567', None,
         )
-        with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=False):
+        with self.settings(USE_THOUSAND_SEPARATOR=False):
             with translation.override('en'):
                 self.humanize_tester(test_list, result_list, 'intcomma')
 
     def test_intcomma_without_number_grouping(self):
         # Regression for #17414
-        with translation.override('ja'), self.settings(USE_L10N=True):
+        with translation.override('ja'):
             self.humanize_tester([100], ['100'], 'intcomma')
 
     def test_intword(self):
@@ -126,7 +126,7 @@ class HumanizeTests(SimpleTestCase):
                      '100', '1000', '10123', '10311', '1000000', None)
         result_list = ('100', '1.000', '10.123', '10.311', '1.000.000', '1.234.567,25',
                        '100', '1.000', '10.123', '10.311', '1.000.000', None)
-        with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True):
+        with self.settings(USE_THOUSAND_SEPARATOR=True):
             with translation.override('de'):
                 self.humanize_tester(test_list, result_list, 'intcomma')
 
@@ -143,7 +143,7 @@ class HumanizeTests(SimpleTestCase):
         # Negative integers.
         test_list_negative = ('-' + test for test in test_list_positive)
         result_list_negative = ('-' + result for result in result_list_positive)
-        with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True):
+        with self.settings(USE_THOUSAND_SEPARATOR=True):
             with translation.override('de'):
                 self.humanize_tester(
                     (*test_list_positive, *test_list_negative),
@@ -355,7 +355,7 @@ class HumanizeTests(SimpleTestCase):
         orig_humanize_datetime, humanize.datetime = humanize.datetime, MockDateTime
         try:
             # Choose a language with different naturaltime-past/naturaltime-future translations
-            with translation.override('cs'), self.settings(USE_L10N=True):
+            with translation.override('cs'):
                 self.humanize_tester(test_list, result_list, 'naturaltime')
         finally:
             humanize.datetime = orig_humanize_datetime

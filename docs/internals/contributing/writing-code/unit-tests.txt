@@ -285,6 +285,7 @@ dependencies:
 *  PyYAML_
 *  pytz_ (required)
 *  pywatchman_
+*  redis_
 *  setuptools_
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
 *  gettext_ (:ref:`gettext_on_windows`)
@@ -308,8 +309,9 @@ encounter.
 You can also install the database adapter(s) of your choice using
 ``oracle.txt``, ``mysql.txt``, or ``postgres.txt``.
 
-If you want to test the memcached cache backend, you'll also need to define
-a :setting:`CACHES` setting that points at your memcached instance.
+If you want to test the memcached or Redis cache backends, you'll also need to
+define a :setting:`CACHES` setting that points at your memcached or Redis
+instance respectively.
 
 To run the GeoDjango tests, you will need to :doc:`set up a spatial database
 and install the Geospatial libraries</ref/contrib/gis/install/index>`.
@@ -332,6 +334,7 @@ service.
 .. _PyYAML: https://pyyaml.org/wiki/PyYAML
 .. _pytz: https://pypi.org/project/pytz/
 .. _pywatchman: https://pypi.org/project/pywatchman/
+.. _redis: https://pypi.org/project/redis/
 .. _setuptools: https://pypi.org/project/setuptools/
 .. _memcached: https://memcached.org/
 .. _gettext: https://www.gnu.org/software/gettext/manual/gettext.html

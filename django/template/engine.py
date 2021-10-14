@@ -73,7 +73,7 @@ class Engine:
         )
 
     @staticmethod
-    @functools.lru_cache()
+    @functools.lru_cache
     def get_default():
         """
         Return the first DjangoTemplates backend that's configured, or raise

@@ -490,10 +490,6 @@ structure of an ``Operation`` looks like this::
             # migration containing this operation, or None if not applicable.
             return "custom_operation_%s_%s" % (self.arg1, self.arg2)
 
-.. versionadded:: 3.2
-
-    The ``migration_name_fragment`` property was added.
-
 You can take this template and work from it, though we suggest looking at the
 built-in Django operations in ``django.db.migrations.operations`` - they cover
 a lot of the example usage of semi-internal aspects of the migration framework

@@ -1,12 +1,38 @@
+import warnings
+
 from django.contrib.admin import ModelAdmin
 from django.contrib.gis.admin.widgets import OpenLayersWidget
 from django.contrib.gis.db import models
+from django.contrib.gis.forms import OSMWidget
 from django.contrib.gis.gdal import OGRGeomType
 from django.forms import Media
+from django.utils.deprecation import RemovedInDjango50Warning
 
+
+class GeoModelAdminMixin:
+    gis_widget = OSMWidget
+    gis_widget_kwargs = {}
+
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        if (
+            isinstance(db_field, models.GeometryField) and
+            (db_field.dim < 3 or self.gis_widget.supports_3d)
+        ):
+            kwargs['widget'] = self.gis_widget(**self.gis_widget_kwargs)
+            return db_field.formfield(**kwargs)
+        else:
+            return super().formfield_for_dbfield(db_field, request, **kwargs)
+
+
+class GISModelAdmin(GeoModelAdminMixin, ModelAdmin):
+    pass
+
+
+# RemovedInDjango50Warning.
 spherical_mercator_srid = 3857
 
 
+# RemovedInDjango50Warning.
 class GeoModelAdmin(ModelAdmin):
     """
     The administration options class for Geographic models. Map settings
@@ -43,6 +69,15 @@ class GeoModelAdmin(ModelAdmin):
     wms_options = {'format': 'image/jpeg'}
     debug = False
     widget = OpenLayersWidget
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            'django.contrib.gis.admin.GeoModelAdmin and OSMGeoAdmin are '
+            'deprecated in favor of django.contrib.admin.ModelAdmin and '
+            'django.contrib.gis.admin.GISModelAdmin.',
+            RemovedInDjango50Warning, stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
     @property
     def media(self):
@@ -124,6 +159,7 @@ class GeoModelAdmin(ModelAdmin):
         return OLMap
 
 
+# RemovedInDjango50Warning.
 class OSMGeoAdmin(GeoModelAdmin):
     map_template = 'gis/admin/osm.html'
     num_zoom = 20

@@ -62,6 +62,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         'non_default': 'sv-x-icu',
         'swedish_ci': 'sv-x-icu',
     }
+    test_now_utc_template = "STATEMENT_TIMESTAMP() AT TIME ZONE 'UTC'"
 
     django_test_skips = {
         'opclasses are PostgreSQL only.': {
@@ -90,7 +91,13 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def is_postgresql_13(self):
         return self.connection.pg_version >= 130000
 
+    @cached_property
+    def is_postgresql_14(self):
+        return self.connection.pg_version >= 140000
+
+    has_bit_xor = property(operator.attrgetter('is_postgresql_14'))
     has_websearch_to_tsquery = property(operator.attrgetter('is_postgresql_11'))
     supports_covering_indexes = property(operator.attrgetter('is_postgresql_11'))
     supports_covering_gist_indexes = property(operator.attrgetter('is_postgresql_12'))
+    supports_covering_spgist_indexes = property(operator.attrgetter('is_postgresql_14'))
     supports_non_deterministic_collations = property(operator.attrgetter('is_postgresql_12'))

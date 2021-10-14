@@ -314,16 +314,12 @@ Now you're ready to actually put the release out there. To do this:
 
         $ scp Django-A.B.C.checksum.txt.asc djangoproject.com:/home/www/www/media/pgp/Django-A.B.C.checksum.txt
 
-#. Test that the release packages install correctly using ``easy_install``
-   and ``pip``. Here's one method::
+#. Test that the release packages install correctly using ``pip``. Here's one
+   method::
 
         $ RELEASE_VERSION='1.7.2'
         $ MAJOR_VERSION=`echo $RELEASE_VERSION| cut -c 1-3`
 
-        $ python -m venv django-easy-install
-        $ . django-easy-install/bin/activate
-        $ easy_install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz
-        $ deactivate
         $ python -m venv django-pip
         $ . django-pip/bin/activate
         $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz

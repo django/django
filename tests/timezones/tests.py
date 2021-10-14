@@ -5,15 +5,15 @@ from contextlib import contextmanager
 from unittest import SkipTest, skipIf
 from xml.dom.minidom import parseString
 
-import pytz
-
 try:
     import zoneinfo
 except ImportError:
-    try:
-        from backports import zoneinfo
-    except ImportError:
-        zoneinfo = None
+    from backports import zoneinfo
+
+try:
+    import pytz
+except ImportError:
+    pytz = None
 
 from django.contrib.auth.models import User
 from django.core import serializers
@@ -24,12 +24,13 @@ from django.template import (
     Context, RequestContext, Template, TemplateSyntaxError, context_processors,
 )
 from django.test import (
-    SimpleTestCase, TestCase, TransactionTestCase, override_settings,
-    skipIfDBFeature, skipUnlessDBFeature,
+    SimpleTestCase, TestCase, TransactionTestCase, ignore_warnings,
+    override_settings, skipIfDBFeature, skipUnlessDBFeature,
 )
 from django.test.utils import requires_tz_support
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.timezone import timedelta
 
 from .forms import (
@@ -60,9 +61,9 @@ UTC = timezone.utc
 EAT = timezone.get_fixed_timezone(180)      # Africa/Nairobi
 ICT = timezone.get_fixed_timezone(420)      # Asia/Bangkok
 
-ZONE_CONSTRUCTORS = (pytz.timezone,)
-if zoneinfo is not None:
-    ZONE_CONSTRUCTORS += (zoneinfo.ZoneInfo,)
+ZONE_CONSTRUCTORS = (zoneinfo.ZoneInfo,)
+if pytz is not None:
+    ZONE_CONSTRUCTORS += (pytz.timezone,)
 
 
 def get_timezones(key):
@@ -361,6 +362,23 @@ class NewDatabaseTests(TestCase):
                 self.assertEqual(Event.objects.filter(dt__in=(prev, next)).count(), 0)
                 self.assertEqual(Event.objects.filter(dt__in=(prev, dt, next)).count(), 1)
                 self.assertEqual(Event.objects.filter(dt__range=(prev, next)).count(), 1)
+
+    @ignore_warnings(category=RemovedInDjango50Warning)
+    def test_connection_timezone(self):
+        tests = [
+            (False, None, datetime.timezone),
+            (False, 'Africa/Nairobi', zoneinfo.ZoneInfo),
+        ]
+        if pytz is not None:
+            tests += [
+                (True, None, datetime.timezone),
+                (True, 'Africa/Nairobi', pytz.BaseTzInfo),
+            ]
+        for use_pytz, connection_tz, expected_type in tests:
+            with self.subTest(use_pytz=use_pytz, connection_tz=connection_tz):
+                with self.settings(USE_DEPRECATED_PYTZ=use_pytz):
+                    with override_database_connection_timezone(connection_tz):
+                        self.assertIsInstance(connection.timezone, expected_type)
 
     def test_query_convert_timezones(self):
         # Connection timezone is equal to the current timezone, datetime
@@ -812,8 +830,15 @@ class SerializationTests(SimpleTestCase):
                 self.assertEqual(obj.dt, dt)
 
 
+# RemovedInDjango50Warning: When the deprecation ends, remove setUpClass() and
+# USE_L10N=False. The tests should remain because format-related settings will
+# take precedence over locale-dictated formats.
 @override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_L10N=False, USE_TZ=True)
 class TemplateTests(SimpleTestCase):
+    @classmethod
+    def setUpClass(cls):
+        with ignore_warnings(category=RemovedInDjango50Warning):
+            super().setUpClass()
 
     @requires_tz_support
     def test_localtime_templatetag_and_filters(self):
@@ -913,7 +938,7 @@ class TemplateTests(SimpleTestCase):
                 tpl = Template("{% load tz %}{{ dt|timezone:tz }}")
                 ctx = Context({
                     'dt': datetime.datetime(2011, 9, 1, 13, 20, 30),
-                    'tz': pytz.timezone('Europe/Paris'),
+                    'tz': tz,
                 })
                 self.assertEqual(tpl.render(ctx), "2011-09-01T12:20:30+02:00")
 
@@ -986,11 +1011,15 @@ class TemplateTests(SimpleTestCase):
         })
         self.assertEqual(tpl.render(ctx), "2011-09-01T12:20:30+02:00")
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_timezone_templatetag_invalid_argument(self):
         with self.assertRaises(TemplateSyntaxError):
             Template("{% load tz %}{% timezone %}{% endtimezone %}").render()
-        with self.assertRaises(pytz.UnknownTimeZoneError):
+        with self.assertRaises(zoneinfo.ZoneInfoNotFoundError):
             Template("{% load tz %}{% timezone tz %}{% endtimezone %}").render(Context({'tz': 'foobar'}))
+        if pytz is not None:
+            with override_settings(USE_DEPRECATED_PYTZ=True), self.assertRaises(pytz.UnknownTimeZoneError):
+                Template("{% load tz %}{% timezone tz %}{% endtimezone %}").render(Context({'tz': 'foobar'}))
 
     @skipIf(sys.platform == 'win32', "Windows uses non-standard time zone names")
     def test_get_current_timezone_templatetag(self):
@@ -1072,8 +1101,15 @@ class TemplateTests(SimpleTestCase):
             self.assertEqual(tpl.render(Context({})), "+0700")
 
 
+# RemovedInDjango50Warning: When the deprecation ends, remove setUpClass() and
+# USE_L10N=False. The tests should remain because format-related settings will
+# take precedence over locale-dictated formats.
 @override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_L10N=False, USE_TZ=False)
 class LegacyFormsTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        with ignore_warnings(category=RemovedInDjango50Warning):
+            super().setUpClass()
 
     def test_form(self):
         form = EventForm({'dt': '2011-09-01 13:20:30'})
@@ -1109,8 +1145,15 @@ class LegacyFormsTests(TestCase):
         self.assertEqual(e.dt, datetime.datetime(2011, 9, 1, 13, 20, 30))
 
 
+# RemovedInDjango50Warning: When the deprecation ends, remove setUpClass() and
+# USE_L10N=False. The tests should remain because format-related settings will
+# take precedence over locale-dictated formats.
 @override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_L10N=False, USE_TZ=True)
 class NewFormsTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        with ignore_warnings(category=RemovedInDjango50Warning):
+            super().setUpClass()
 
     @requires_tz_support
     def test_form(self):
@@ -1183,6 +1226,10 @@ class NewFormsTests(TestCase):
     ROOT_URLCONF='timezones.urls',
 )
 class AdminTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        with ignore_warnings(category=RemovedInDjango50Warning):
+            super().setUpClass()
 
     @classmethod
     def setUpTestData(cls):

@@ -703,14 +703,19 @@ that specifies the template used to render each choice. For example, for the
     * ``option_template_name``: ``'django/forms/widgets/radio_option.html'``
 
     Similar to :class:`Select`, but rendered as a list of radio buttons within
-    ``<li>`` tags:
+    ``<div>`` tags:
 
     .. code-block:: html
 
-        <ul>
-          <li><input type="radio" name="..."></li>
+        <div>
+          <div><input type="radio" name="..."></div>
           ...
-        </ul>
+        </div>
+
+    .. versionchanged:: 4.0
+
+        So they are announced more concisely by screen readers, radio buttons
+        were changed to render in ``<div>`` tags.
 
     For more granular control over the generated markup, you can loop over the
     radio buttons in the template. Assuming a form ``myform`` with a field
@@ -788,10 +793,10 @@ that specifies the template used to render each choice. For example, for the
         </fieldset>
 
     If you decide not to loop over the radio buttons -- e.g., if your template
-    includes ``{{ myform.beatles }}`` -- they'll be output in a ``<ul>`` with
-    ``<li>`` tags, as above.
+    includes ``{{ myform.beatles }}`` -- they'll be output in a ``<div>`` with
+    ``<div>`` tags, as above.
 
-    The outer ``<ul>`` container receives the ``id`` attribute of the widget,
+    The outer ``<div>`` container receives the ``id`` attribute of the widget,
     if defined, or :attr:`BoundField.auto_id` otherwise.
 
     When looping over the radio buttons, the ``label`` and ``input`` tags include
@@ -810,13 +815,18 @@ that specifies the template used to render each choice. For example, for the
 
     .. code-block:: html
 
-        <ul>
-          <li><input type="checkbox" name="..." ></li>
+        <div>
+          <div><input type="checkbox" name="..." ></div>
           ...
-        </ul>
+        </div>
 
-    The outer ``<ul>`` container receives the ``id`` attribute of the widget,
+    The outer ``<div>`` container receives the ``id`` attribute of the widget,
     if defined, or :attr:`BoundField.auto_id` otherwise.
+
+    .. versionchanged:: 4.0
+
+        So they are announced more concisely by screen readers, checkboxes were
+        changed to render in ``<div>`` tags.
 
 Like :class:`RadioSelect`, you can loop over the individual checkboxes for the
 widget's choices. Unlike :class:`RadioSelect`, the checkboxes won't include the

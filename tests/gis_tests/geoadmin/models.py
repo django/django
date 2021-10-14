@@ -14,5 +14,8 @@ class City(models.Model):
         return self.name
 
 
-site = admin.AdminSite(name='admin_gis')
-site.register(City, admin.OSMGeoAdmin)
+site = admin.AdminSite(name='gis_admin_modeladmin')
+site.register(City, admin.ModelAdmin)
+
+site_gis = admin.AdminSite(name='gis_admin_gismodeladmin')
+site_gis.register(City, admin.GISModelAdmin)

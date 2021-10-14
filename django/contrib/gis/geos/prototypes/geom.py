@@ -44,6 +44,7 @@ class StringFromGeom(GEOSFuncFactory):
 # ### ctypes prototypes ###
 
 # The GEOS geometry type, typeid, num_coordinates and number of geometries
+geos_makevalid = GeomOutput('GEOSMakeValid', argtypes=[GEOM_PTR])
 geos_normalize = IntFromGeom('GEOSNormalize')
 geos_type = StringFromGeom('GEOSGeomType')
 geos_typeid = IntFromGeom('GEOSGeomTypeId')

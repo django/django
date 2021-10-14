@@ -139,8 +139,6 @@ If the URL does not resolve, the function raises a
 
     .. attribute:: ResolverMatch.tried
 
-        .. versionadded:: 3.2
-
         The list of URL patterns tried before the URL either matched one or
         exhausted available patterns.
 

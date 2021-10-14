@@ -1500,10 +1500,32 @@ class OperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_forwards("test_alflpkfk", editor, project_state, new_state)
         assertIdTypeEqualsFkType()
+        if connection.features.supports_foreign_keys:
+            self.assertFKExists(
+                'test_alflpkfk_pony_stables',
+                ['pony_id'],
+                ('test_alflpkfk_pony', 'id'),
+            )
+            self.assertFKExists(
+                'test_alflpkfk_stable_ponies',
+                ['pony_id'],
+                ('test_alflpkfk_pony', 'id'),
+            )
         # And test reversal
         with connection.schema_editor() as editor:
             operation.database_backwards("test_alflpkfk", editor, new_state, project_state)
         assertIdTypeEqualsFkType()
+        if connection.features.supports_foreign_keys:
+            self.assertFKExists(
+                'test_alflpkfk_pony_stables',
+                ['pony_id'],
+                ('test_alflpkfk_pony', 'id'),
+            )
+            self.assertFKExists(
+                'test_alflpkfk_stable_ponies',
+                ['pony_id'],
+                ('test_alflpkfk_pony', 'id'),
+            )
 
     def test_alter_field_pk_mti_fk(self):
         app_label = 'test_alflpkmtifk'

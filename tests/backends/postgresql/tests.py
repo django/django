@@ -103,6 +103,11 @@ class Tests(TestCase):
                     with connection._nodb_cursor():
                         pass
 
+    def test_nodb_cursor_reraise_exceptions(self):
+        with self.assertRaisesMessage(DatabaseError, 'exception'):
+            with connection._nodb_cursor():
+                raise DatabaseError('exception')
+
     def test_database_name_too_long(self):
         from django.db.backends.postgresql.base import DatabaseWrapper
         settings = connection.settings_dict.copy()

@@ -244,10 +244,6 @@ Django provides a single API to control database transactions.
     testing durable atomic blocks in a transaction for performance reasons. Use
     :class:`django.test.TransactionTestCase` for testing durability.
 
-.. versionchanged:: 3.2
-
-    The ``durable`` argument was added.
-
 Autocommit
 ==========
 

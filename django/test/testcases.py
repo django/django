@@ -6,7 +6,6 @@ import posixpath
 import sys
 import threading
 import unittest
-import warnings
 from collections import Counter
 from contextlib import contextmanager
 from copy import copy, deepcopy
@@ -42,7 +41,6 @@ from django.test.utils import (
     CaptureQueriesContext, ContextList, compare_xml, modify_settings,
     override_settings,
 )
-from django.utils.deprecation import RemovedInDjango41Warning
 from django.utils.functional import classproperty
 from django.utils.version import PY310
 from django.views.static import serve
@@ -1059,23 +1057,6 @@ class TransactionTestCase(SimpleTestCase):
 
     def assertQuerysetEqual(self, qs, values, transform=None, ordered=True, msg=None):
         values = list(values)
-        # RemovedInDjango41Warning.
-        if transform is None:
-            if (
-                values and isinstance(values[0], str) and
-                qs and not isinstance(qs[0], str)
-            ):
-                # Transform qs using repr() if the first element of values is a
-                # string and the first element of qs is not (which would be the
-                # case if qs is a flattened values_list).
-                warnings.warn(
-                    "In Django 4.1, repr() will not be called automatically "
-                    "on a queryset when compared to string values. Set an "
-                    "explicit 'transform' to silence this warning.",
-                    category=RemovedInDjango41Warning,
-                    stacklevel=2,
-                )
-                transform = repr
         items = qs
         if transform is not None:
             items = map(transform, items)
@@ -1139,23 +1120,7 @@ class TestData:
         if instance is None:
             return self.data
         memo = self.get_memo(instance)
-        try:
-            data = deepcopy(self.data, memo)
-        except TypeError:
-            # RemovedInDjango41Warning.
-            msg = (
-                "Assigning objects which don't support copy.deepcopy() during "
-                "setUpTestData() is deprecated. Either assign the %s "
-                "attribute during setUpClass() or setUp(), or add support for "
-                "deepcopy() to %s.%s.%s."
-            ) % (
-                self.name,
-                owner.__module__,
-                owner.__qualname__,
-                self.name,
-            )
-            warnings.warn(msg, category=RemovedInDjango41Warning, stacklevel=2)
-            data = self.data
+        data = deepcopy(self.data, memo)
         setattr(instance, self.name, data)
         return data
 
@@ -1282,11 +1247,18 @@ class TestCase(TransactionTestCase):
         try:
             yield callbacks
         finally:
-            run_on_commit = connections[using].run_on_commit[start_count:]
-            callbacks[:] = [func for sids, func in run_on_commit]
-            if execute:
-                for callback in callbacks:
-                    callback()
+            callback_count = len(connections[using].run_on_commit)
+            while True:
+                run_on_commit = connections[using].run_on_commit[start_count:]
+                callbacks[:] = [func for sids, func in run_on_commit]
+                if execute:
+                    for callback in callbacks:
+                        callback()
+
+                if callback_count == len(connections[using].run_on_commit):
+                    break
+                start_count = callback_count - 1
+                callback_count = len(connections[using].run_on_commit)
 
 
 class CheckCondition:

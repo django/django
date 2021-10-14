@@ -21,12 +21,12 @@ class Aggregate(Func):
     filter_template = '%s FILTER (WHERE %%(filter)s)'
     window_compatible = True
     allow_distinct = False
-    empty_aggregate_value = None
+    empty_result_set_value = None
 
     def __init__(self, *expressions, distinct=False, filter=None, default=None, **extra):
         if distinct and not self.allow_distinct:
             raise TypeError("%s does not allow distinct." % self.__class__.__name__)
-        if default is not None and self.empty_aggregate_value is not None:
+        if default is not None and self.empty_result_set_value is not None:
             raise TypeError(f'{self.__class__.__name__} does not allow default.')
         self.distinct = distinct
         self.filter = filter
@@ -117,7 +117,7 @@ class Count(Aggregate):
     name = 'Count'
     output_field = IntegerField()
     allow_distinct = True
-    empty_aggregate_value = 0
+    empty_result_set_value = 0
 
     def __init__(self, expression, filter=None, **extra):
         if expression == '*':

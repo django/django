@@ -66,12 +66,20 @@ class Command(BaseCommand):
         # write history to the .python_history file, but this can be overridden by
         # $PYTHONSTARTUP or ~/.pythonrc.py.
         try:
-            sys.__interactivehook__()
-        except Exception:
-            # Match the behavior of the cpython shell where an error in
-            # sys.__interactivehook__ prints a warning and the exception and continues.
-            print("Failed calling sys.__interactivehook__")
-            traceback.print_exc()
+            hook = sys.__interactivehook__
+        except AttributeError:
+            # Match the behavior of the cpython shell where a missing
+            # sys.__interactivehook__ is ignored.
+            pass
+        else:
+            try:
+                hook()
+            except Exception:
+                # Match the behavior of the cpython shell where an error in
+                # sys.__interactivehook__ prints a warning and the exception
+                # and continues.
+                print('Failed calling sys.__interactivehook__')
+                traceback.print_exc()
 
         # Set up tab completion for objects imported by $PYTHONSTARTUP or
         # ~/.pythonrc.py.

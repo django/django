@@ -505,6 +505,92 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
         test(self)
 
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithFK')
+    def test_fields_with_fk_via_option_interactive(self):
+        new_io = StringIO()
+        group = Group.objects.create(name='mygroup')
+        email = Email.objects.create(email='mymail@gmail.com')
+
+        @mock_inputs({'password': 'nopasswd'})
+        def test(self):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                username=email.pk,
+                email=email.email,
+                group=group.pk,
+                stdout=new_io,
+                stdin=MockTTY(),
+            )
+
+            command_output = new_io.getvalue().strip()
+            self.assertEqual(command_output, 'Superuser created successfully.')
+            u = CustomUserWithFK._default_manager.get(email=email)
+            self.assertEqual(u.username, email)
+            self.assertEqual(u.group, group)
+
+        test(self)
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithFK')
+    def test_validate_fk(self):
+        email = Email.objects.create(email='mymail@gmail.com')
+        Group.objects.all().delete()
+        nonexistent_group_id = 1
+        msg = f'group instance with id {nonexistent_group_id} does not exist.'
+
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command(
+                'createsuperuser',
+                interactive=False,
+                username=email.pk,
+                email=email.email,
+                group=nonexistent_group_id,
+                verbosity=0,
+            )
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithFK')
+    def test_validate_fk_environment_variable(self):
+        email = Email.objects.create(email='mymail@gmail.com')
+        Group.objects.all().delete()
+        nonexistent_group_id = 1
+        msg = f'group instance with id {nonexistent_group_id} does not exist.'
+
+        with mock.patch.dict(
+            os.environ,
+            {'DJANGO_SUPERUSER_GROUP': str(nonexistent_group_id)},
+        ):
+            with self.assertRaisesMessage(CommandError, msg):
+                call_command(
+                    'createsuperuser',
+                    interactive=False,
+                    username=email.pk,
+                    email=email.email,
+                    verbosity=0,
+                )
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithFK')
+    def test_validate_fk_via_option_interactive(self):
+        email = Email.objects.create(email='mymail@gmail.com')
+        Group.objects.all().delete()
+        nonexistent_group_id = 1
+        msg = f'group instance with id {nonexistent_group_id} does not exist.'
+
+        @mock_inputs({
+            'password': 'nopasswd',
+            'Username (Email.id): ': email.pk,
+            'Email (Email.email): ': email.email,
+        })
+        def test(self):
+            with self.assertRaisesMessage(CommandError, msg):
+                call_command(
+                    'createsuperuser',
+                    group=nonexistent_group_id,
+                    stdin=MockTTY(),
+                    verbosity=0,
+                )
+
+        test(self)
+
     @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithM2m')
     def test_fields_with_m2m(self):
         new_io = StringIO()
@@ -709,6 +795,46 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
                 new_io.getvalue().strip(),
                 "The password is too similar to the first name.\n"
                 "Superuser created successfully."
+            )
+
+        test(self)
+
+    @override_settings(
+        AUTH_USER_MODEL='auth_tests.CustomUser',
+        AUTH_PASSWORD_VALIDATORS=[
+            {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+        ]
+    )
+    def test_validate_password_against_required_fields_via_option(self):
+        new_io = StringIO()
+        first_name = 'josephine'
+        entered_passwords = [
+            first_name, first_name,
+            'superduperunguessablepassword', 'superduperunguessablepassword',
+        ]
+
+        def bad_then_good_password():
+            return entered_passwords.pop(0)
+
+        @mock_inputs({
+            'password': bad_then_good_password,
+            'bypass': 'n',
+        })
+        def test(self):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                first_name=first_name,
+                date_of_birth='1970-01-01',
+                email='joey@example.com',
+                stdin=MockTTY(),
+                stdout=new_io,
+                stderr=new_io,
+            )
+            self.assertEqual(
+                new_io.getvalue().strip(),
+                'The password is too similar to the first name.\n'
+                'Superuser created successfully.'
             )
 
         test(self)
@@ -993,6 +1119,25 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         self.assertTrue(user.check_password('test_password'))
         # Environment variables are ignored for non-required fields.
         self.assertEqual(user.first_name, '')
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithM2m')
+    def test_environment_variable_m2m_non_interactive(self):
+        new_io = StringIO()
+        org_id_1 = Organization.objects.create(name='Organization 1').pk
+        org_id_2 = Organization.objects.create(name='Organization 2').pk
+        with mock.patch.dict(os.environ, {
+            'DJANGO_SUPERUSER_ORGS': f'{org_id_1},{org_id_2}',
+        }):
+            call_command(
+                'createsuperuser',
+                interactive=False,
+                username='joe',
+                stdout=new_io,
+            )
+        command_output = new_io.getvalue().strip()
+        self.assertEqual(command_output, 'Superuser created successfully.')
+        user = CustomUserWithM2M._default_manager.get(username='joe')
+        self.assertEqual(user.orgs.count(), 2)
 
     @mock.patch.dict(os.environ, {
         'DJANGO_SUPERUSER_USERNAME': 'test_superuser',

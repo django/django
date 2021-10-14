@@ -34,14 +34,12 @@ processing functions.
 The ``condition`` decorator
 ===========================
 
-Sometimes (in fact, quite often) you can create functions to rapidly compute the ETag_
-value or the last-modified time for a resource, **without** needing to do all
-the computations needed to construct the full view. Django can then use these
-functions to provide an "early bailout" option for the view processing.
-Telling the client that the content has not been modified since the last
-request, perhaps.
-
-.. _ETag: https://tools.ietf.org/html/rfc7232#section-2.3
+Sometimes (in fact, quite often) you can create functions to rapidly compute
+the :rfc:`ETag <7232#section-2.3>` value or the last-modified time for a
+resource, **without** needing to do all the computations needed to construct
+the full view. Django can then use these functions to provide an
+"early bailout" option for the view processing. Telling the client that the
+content has not been modified since the last request, perhaps.
 
 These two functions are passed as parameters to the
 ``django.views.decorators.http.condition`` decorator. This decorator uses
@@ -60,7 +58,8 @@ order, as the view function they are helping to wrap. The function passed
 ``last_modified_func`` should return a standard datetime value specifying the
 last time the resource was modified, or ``None`` if the resource doesn't
 exist. The function passed to the ``etag`` decorator should return a string
-representing the `ETag`_ for the resource, or ``None`` if it doesn't exist.
+representing the :rfc:`ETag <7232#section-2.3>` for the resource, or ``None``
+if it doesn't exist.
 
 The decorator sets the ``ETag`` and ``Last-Modified`` headers on the response
 if they are not already set by the view and if the request's method is safe

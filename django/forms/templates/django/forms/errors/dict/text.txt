@@ -1,0 +1,3 @@
+{% for field, errors in errors %}* {{ field }}
+{% for error in errors %}  * {{ error }}
+{% endfor %}{% endfor %}

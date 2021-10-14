@@ -64,7 +64,7 @@ class TestUtilsHashPass(SimpleTestCase):
 
     def test_pbkdf2(self):
         encoded = make_password('lètmein', 'seasalt', 'pbkdf2_sha256')
-        self.assertEqual(encoded, 'pbkdf2_sha256$320000$seasalt$Toj2II2rBvFiGQcPmUml1Nlni2UtvyRWwz/jz4q6q/4=')
+        self.assertEqual(encoded, 'pbkdf2_sha256$390000$seasalt$8xBlGd3jVgvJ+92hWPxi5ww0uuAuAnKgC45eudxro7c=')
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
@@ -143,6 +143,13 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
 
+    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.UnsaltedMD5PasswordHasher'])
+    def test_unsalted_md5_encode_invalid_salt(self):
+        hasher = get_hasher('unsalted_md5')
+        msg = 'salt must be empty.'
+        with self.assertRaisesMessage(ValueError, msg):
+            hasher.encode('password', salt='salt')
+
     @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher'])
     def test_unsalted_sha1(self):
         encoded = make_password('lètmein', '', 'unsalted_sha1')
@@ -161,6 +168,13 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
 
+    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher'])
+    def test_unsalted_sha1_encode_invalid_salt(self):
+        hasher = get_hasher('unsalted_sha1')
+        msg = 'salt must be empty.'
+        with self.assertRaisesMessage(ValueError, msg):
+            hasher.encode('password', salt='salt')
+
     @skipUnless(crypt, "no crypt module to generate password.")
     @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.CryptPasswordHasher'])
     def test_crypt(self):
@@ -176,6 +190,23 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
+
+    @skipUnless(crypt, 'no crypt module to generate password.')
+    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.CryptPasswordHasher'])
+    def test_crypt_encode_invalid_salt(self):
+        hasher = get_hasher('crypt')
+        msg = 'salt must be of length 2.'
+        with self.assertRaisesMessage(ValueError, msg):
+            hasher.encode('password', salt='a')
+
+    @skipUnless(crypt, 'no crypt module to generate password.')
+    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.CryptPasswordHasher'])
+    def test_crypt_encode_invalid_hash(self):
+        hasher = get_hasher('crypt')
+        msg = 'hash must be provided.'
+        with mock.patch('crypt.crypt', return_value=None):
+            with self.assertRaisesMessage(TypeError, msg):
+                hasher.encode('password', salt='ab')
 
     @skipUnless(bcrypt, "bcrypt not installed")
     def test_bcrypt_sha256(self):
@@ -315,13 +346,13 @@ class TestUtilsHashPass(SimpleTestCase):
     def test_low_level_pbkdf2(self):
         hasher = PBKDF2PasswordHasher()
         encoded = hasher.encode('lètmein', 'seasalt2')
-        self.assertEqual(encoded, 'pbkdf2_sha256$320000$seasalt2$BRr4pYNIQDsLFP+u4dzjs7pFuWJEin4lFMMoO9wBYvo=')
+        self.assertEqual(encoded, 'pbkdf2_sha256$390000$seasalt2$geC/uZ92nRXDSjSxeoiBqYyRcrLzMm8xK3ro1QS1uo8=')
         self.assertTrue(hasher.verify('lètmein', encoded))
 
     def test_low_level_pbkdf2_sha1(self):
         hasher = PBKDF2SHA1PasswordHasher()
         encoded = hasher.encode('lètmein', 'seasalt2')
-        self.assertEqual(encoded, 'pbkdf2_sha1$320000$seasalt2$sDOkTvzV93jPWTRVxFGh50Jefo0=')
+        self.assertEqual(encoded, 'pbkdf2_sha1$390000$seasalt2$aDapRanzW8aHTz97v2TcfHzWD+I=')
         self.assertTrue(hasher.verify('lètmein', encoded))
 
     @skipUnless(bcrypt, 'bcrypt not installed')

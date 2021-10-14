@@ -146,7 +146,8 @@ class WhereNode(tree.Node):
         value) tuples, or objects supporting .clone().
         """
         clone = self.__class__._new_instance(
-            children=[], connector=self.connector, negated=self.negated)
+            children=None, connector=self.connector, negated=self.negated,
+        )
         for child in self.children:
             if hasattr(child, 'clone'):
                 clone.children.append(child.clone())

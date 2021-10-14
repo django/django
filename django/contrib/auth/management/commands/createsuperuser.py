@@ -124,6 +124,8 @@ class Command(BaseCommand):
                 for field_name in self.UserModel.REQUIRED_FIELDS:
                     field = self.UserModel._meta.get_field(field_name)
                     user_data[field_name] = options[field_name]
+                    if user_data[field_name] is not None:
+                        user_data[field_name] = field.clean(user_data[field_name], None)
                     while user_data[field_name] is None:
                         message = self._get_input_message(field)
                         input_value = self.get_input_data(field, message)
@@ -134,12 +136,12 @@ class Command(BaseCommand):
                                 self.stderr.write('Error: This field cannot be blank.')
                                 continue
                             user_data[field_name] = [pk.strip() for pk in input_value.split(',')]
-                        if not field.many_to_many:
-                            fake_user_data[field_name] = input_value
 
-                        # Wrap any foreign keys in fake model instances
-                        if field.many_to_one:
-                            fake_user_data[field_name] = field.remote_field.model(input_value)
+                    if not field.many_to_many:
+                        fake_user_data[field_name] = user_data[field_name]
+                    # Wrap any foreign keys in fake model instances.
+                    if field.many_to_one:
+                        fake_user_data[field_name] = field.remote_field.model(user_data[field_name])
 
                 # Prompt for a password if the model has one.
                 while PASSWORD_FIELD in user_data and user_data[PASSWORD_FIELD] is None:
@@ -185,6 +187,10 @@ class Command(BaseCommand):
                         raise CommandError('You must use --%s with --noinput.' % field_name)
                     field = self.UserModel._meta.get_field(field_name)
                     user_data[field_name] = field.clean(value, None)
+                    if field.many_to_many and isinstance(user_data[field_name], str):
+                        user_data[field_name] = [
+                            pk.strip() for pk in user_data[field_name].split(',')
+                        ]
 
             self.UserModel._default_manager.db_manager(database).create_superuser(**user_data)
             if options['verbosity'] >= 1:

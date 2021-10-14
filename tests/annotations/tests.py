@@ -210,6 +210,12 @@ class NonAggregateAnnotationTestCase(TestCase):
         self.assertEqual(len(books), Book.objects.count())
         self.assertTrue(all(not book.selected for book in books))
 
+    def test_empty_queryset_annotation(self):
+        qs = Author.objects.annotate(
+            empty=Subquery(Author.objects.values('id').none())
+        )
+        self.assertIsNone(qs.first().empty)
+
     def test_annotate_with_aggregation(self):
         books = Book.objects.annotate(is_book=Value(1), rating_count=Count('rating'))
         for book in books:

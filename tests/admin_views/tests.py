@@ -5,15 +5,15 @@ import unittest
 from unittest import mock
 from urllib.parse import parse_qsl, urljoin, urlparse
 
-import pytz
-
 try:
     import zoneinfo
 except ImportError:
-    try:
-        from backports import zoneinfo
-    except ImportError:
-        zoneinfo = None
+    from backports import zoneinfo
+
+try:
+    import pytz
+except ImportError:
+    pytz = None
 
 from django.contrib import admin
 from django.contrib.admin import AdminSite, ModelAdmin
@@ -48,8 +48,8 @@ from .admin import CityAdmin, site, site2
 from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
     AdminOrderedModelMethod, Album, Answer, Answer2, Article, BarAccount, Book,
-    Bookmark, Category, Chapter, ChapterXtra1, ChapterXtra2, Character, Child,
-    Choice, City, Collector, Color, ComplexSortedPerson, CoverLetter,
+    Bookmark, Box, Category, Chapter, ChapterXtra1, ChapterXtra2, Character,
+    Child, Choice, City, Collector, Color, ComplexSortedPerson, CoverLetter,
     CustomArticle, CyclicOne, CyclicTwo, DooHickey, Employee, EmptyModel,
     Fabric, FancyDoodad, FieldOverridePost, FilteredManager, FooAccount,
     FoodDelivery, FunkyTag, Gallery, Grommet, Inquisition, Language, Link,
@@ -73,10 +73,10 @@ MULTIPART_ENCTYPE = 'enctype="multipart/form-data"'
 
 def make_aware_datetimes(dt, iana_key):
     """Makes one aware datetime for each supported time zone provider."""
-    yield pytz.timezone(iana_key).localize(dt, is_dst=None)
+    yield dt.replace(tzinfo=zoneinfo.ZoneInfo(iana_key))
 
-    if zoneinfo is not None:
-        yield dt.replace(tzinfo=zoneinfo.ZoneInfo(iana_key))
+    if pytz is not None:
+        yield pytz.timezone(iana_key).localize(dt, is_dst=None)
 
 
 class AdminFieldExtractionMixin:
@@ -109,7 +109,7 @@ class AdminFieldExtractionMixin:
                 return field
 
 
-@override_settings(ROOT_URLCONF='admin_views.urls', USE_I18N=True, USE_L10N=False, LANGUAGE_CODE='en')
+@override_settings(ROOT_URLCONF='admin_views.urls', USE_I18N=True, LANGUAGE_CODE='en')
 class AdminViewBasicTestCase(TestCase):
 
     @classmethod
@@ -802,12 +802,12 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse('admin-extra-context:jsi18n'))
         self.assertEqual(response.status_code, 200)
 
-    def test_L10N_deactivated(self):
+    def test_jsi18n_format_fallback(self):
         """
-        Check if L10N is deactivated, the JavaScript i18n view doesn't
-        return localized date/time formats. Refs #14824.
+        The JavaScript i18n view doesn't return localized date/time formats
+        when the selected language cannot be found.
         """
-        with self.settings(LANGUAGE_CODE='ru', USE_L10N=False), translation.override('none'):
+        with self.settings(LANGUAGE_CODE='ru'), translation.override('none'):
             response = self.client.get(reverse('admin:jsi18n'))
             self.assertNotContains(response, '%d.%m.%Y %H:%M:%S')
             self.assertContains(response, '%Y-%m-%d %H:%M:%S')
@@ -4541,7 +4541,7 @@ class PrePopulatedTest(TestCase):
             "&quot;id&quot;: &quot;#id_prepopulatedsubpost_set-0-subslug&quot;"
         )
 
-    @override_settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True)
+    @override_settings(USE_THOUSAND_SEPARATOR=True)
     def test_prepopulated_maxlength_localized(self):
         """
         Regression test for #15938: if USE_THOUSAND_SEPARATOR is set, make sure
@@ -4649,6 +4649,8 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Tabular inlines ----------------------------------------------------
         # Initial inline
+        element = self.selenium.find_element_by_id('id_relatedprepopulated_set-2-0-status')
+        self.selenium.execute_script('window.scrollTo(0, %s);' % element.location['y'])
         self.selenium.find_element_by_id('id_relatedprepopulated_set-2-0-pubdate').send_keys('1234-12-07')
         self.select_option('#id_relatedprepopulated_set-2-0-status', 'option two')
         self.selenium.find_element_by_id('id_relatedprepopulated_set-2-0-name').send_keys(
@@ -4983,6 +4985,81 @@ class SeleniumTests(AdminSeleniumTestCase):
             50,
         )
 
+    def test_related_popup_index(self):
+        """
+        Create a chain of 'self' related objects via popups.
+        """
+        from selenium.webdriver.support.ui import Select
+        self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
+        add_url = reverse('admin:admin_views_box_add', current_app=site.name)
+        self.selenium.get(self.live_server_url + add_url)
+
+        base_window = self.selenium.current_window_handle
+        self.selenium.find_element_by_id('add_id_next_box').click()
+        self.wait_for_and_switch_to_popup()
+
+        popup_window_test = self.selenium.current_window_handle
+        self.selenium.find_element_by_id('id_title').send_keys('test')
+        self.selenium.find_element_by_id('add_id_next_box').click()
+        self.wait_for_and_switch_to_popup(num_windows=3)
+
+        popup_window_test2 = self.selenium.current_window_handle
+        self.selenium.find_element_by_id('id_title').send_keys('test2')
+        self.selenium.find_element_by_id('add_id_next_box').click()
+        self.wait_for_and_switch_to_popup(num_windows=4)
+
+        self.selenium.find_element_by_id('id_title').send_keys('test3')
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.switch_to.window(popup_window_test2)
+        select = Select(self.selenium.find_element_by_id('id_next_box'))
+        next_box_id = str(Box.objects.get(title="test3").id)
+        self.assertEqual(select.first_selected_option.get_attribute('value'), next_box_id)
+
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.switch_to.window(popup_window_test)
+        select = Select(self.selenium.find_element_by_id('id_next_box'))
+        next_box_id = str(Box.objects.get(title="test2").id)
+        self.assertEqual(select.first_selected_option.get_attribute('value'), next_box_id)
+
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.switch_to.window(base_window)
+        select = Select(self.selenium.find_element_by_id('id_next_box'))
+        next_box_id = str(Box.objects.get(title="test").id)
+        self.assertEqual(select.first_selected_option.get_attribute('value'), next_box_id)
+
+    def test_related_popup_incorrect_close(self):
+        """
+        Cleanup child popups when closing a parent popup.
+        """
+        self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
+        add_url = reverse('admin:admin_views_box_add', current_app=site.name)
+        self.selenium.get(self.live_server_url + add_url)
+
+        self.selenium.find_element_by_id('add_id_next_box').click()
+        self.wait_for_and_switch_to_popup()
+
+        test_window = self.selenium.current_window_handle
+        self.selenium.find_element_by_id('id_title').send_keys('test')
+        self.selenium.find_element_by_id('add_id_next_box').click()
+        self.wait_for_and_switch_to_popup(num_windows=3)
+
+        test2_window = self.selenium.current_window_handle
+        self.selenium.find_element_by_id('id_title').send_keys('test2')
+        self.selenium.find_element_by_id('add_id_next_box').click()
+        self.wait_for_and_switch_to_popup(num_windows=4)
+        self.assertEqual(len(self.selenium.window_handles), 4)
+
+        self.selenium.switch_to.window(test2_window)
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 2, 1)
+        self.assertEqual(len(self.selenium.window_handles), 2)
+
+        # Close final popup to clean up test.
+        self.selenium.switch_to.window(test_window)
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
+        self.selenium.switch_to.window(self.selenium.window_handles[-1])
+
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
 class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
@@ -5093,7 +5170,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         response = self.client.get(reverse('admin:admin_views_choice_change', args=(choice.pk,)))
         self.assertContains(response, '<div class="readonly">No opinion</div>', html=True)
 
-    def test_readonly_foreignkey_links(self):
+    def _test_readonly_foreignkey_links(self, admin_site):
         """
         ForeignKey readonly fields render as links if the target model is
         registered in admin.
@@ -5110,10 +5187,10 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
             user=self.superuser,
         )
         response = self.client.get(
-            reverse('admin:admin_views_readonlyrelatedfield_change', args=(obj.pk,)),
+            reverse(f'{admin_site}:admin_views_readonlyrelatedfield_change', args=(obj.pk,)),
         )
         # Related ForeignKey object registered in admin.
-        user_url = reverse('admin:auth_user_change', args=(self.superuser.pk,))
+        user_url = reverse(f'{admin_site}:auth_user_change', args=(self.superuser.pk,))
         self.assertContains(
             response,
             '<div class="readonly"><a href="%s">super</a></div>' % user_url,
@@ -5121,7 +5198,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         )
         # Related ForeignKey with the string primary key registered in admin.
         language_url = reverse(
-            'admin:admin_views_language_change',
+            f'{admin_site}:admin_views_language_change',
             args=(quote(language.pk),),
         )
         self.assertContains(
@@ -5131,6 +5208,12 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         )
         # Related ForeignKey object not registered in admin.
         self.assertContains(response, '<div class="readonly">Chapter 1</div>', html=True)
+
+    def test_readonly_foreignkey_links_default_admin_site(self):
+        self._test_readonly_foreignkey_links('admin')
+
+    def test_readonly_foreignkey_links_custom_admin_site(self):
+        self._test_readonly_foreignkey_links('namespaced_admin')
 
     def test_readonly_manytomany_backwards_ref(self):
         """
@@ -5704,7 +5787,7 @@ class ValidXHTMLTests(TestCase):
         self.assertNotContains(response, ' xml:lang=""')
 
 
-@override_settings(ROOT_URLCONF='admin_views.urls', USE_THOUSAND_SEPARATOR=True, USE_L10N=True)
+@override_settings(ROOT_URLCONF='admin_views.urls', USE_THOUSAND_SEPARATOR=True)
 class DateHierarchyTests(TestCase):
 
     @classmethod
@@ -6368,7 +6451,7 @@ class AdminViewOnSiteTests(TestCase):
             response, 'inline_admin_formset', 0, None,
             ['Children must share a family name with their parents in this contrived test case']
         )
-        msg = "The formset 'inline_admin_formset' in context 12 does not contain any non-form errors."
+        msg = "The formset 'inline_admin_formset' in context 22 does not contain any non-form errors."
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertFormsetError(response, 'inline_admin_formset', None, None, ['Error'])
 

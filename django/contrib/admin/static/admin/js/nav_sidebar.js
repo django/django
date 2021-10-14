@@ -74,7 +74,7 @@
             } else {
                 event.target.classList.add('no-results');
             }
-            localStorage.setItem('django.admin.navSidebarFilterValue', filterValue);
+            sessionStorage.setItem('django.admin.navSidebarFilterValue', filterValue);
         }
 
         const nav = document.getElementById('nav-filter');
@@ -82,7 +82,7 @@
         nav.addEventListener('input', checkValue, false);
         nav.addEventListener('keyup', checkValue, false);
 
-        const storedValue = localStorage.getItem('django.admin.navSidebarFilterValue');
+        const storedValue = sessionStorage.getItem('django.admin.navSidebarFilterValue');
         if (storedValue) {
             nav.value = storedValue;
             checkValue({target: nav, key: ''});

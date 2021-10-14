@@ -286,8 +286,6 @@ Aggregation </topics/db/aggregation>`.
 
 .. method:: alias(*args, **kwargs)
 
-.. versionadded:: 3.2
-
 Same as :meth:`annotate`, but instead of annotating objects in the
 ``QuerySet``, saves the expression for later reuse with other ``QuerySet``
 methods. This is useful when the result of the expression itself is not needed
@@ -834,6 +832,10 @@ object. If it's ``None``, Django uses the :ref:`current time zone
 ambiguous datetimes in daylight saving time. By default (when ``is_dst=None``),
 ``pytz`` raises an exception for such datetimes.
 
+.. deprecated:: 4.0
+
+    The ``is_dst`` parameter is deprecated and will be removed in Django 5.0.
+
 .. _database-time-zone-definitions:
 
 .. note::
@@ -842,13 +844,11 @@ ambiguous datetimes in daylight saving time. By default (when ``is_dst=None``),
     As a consequence, your database must be able to interpret the value of
     ``tzinfo.tzname(None)``. This translates into the following requirements:
 
-    - SQLite: no requirements. Conversions are performed in Python with pytz_
-      (installed when you install Django).
+    - SQLite: no requirements. Conversions are performed in Python.
     - PostgreSQL: no requirements (see `Time Zones`_).
     - Oracle: no requirements (see `Choosing a Time Zone File`_).
     - MySQL: load the time zone tables with `mysql_tzinfo_to_sql`_.
 
-    .. _pytz: http://pytz.sourceforge.net/
     .. _Time Zones: https://www.postgresql.org/docs/current/datatype-datetime.html#DATATYPE-TIMEZONES
     .. _Choosing a Time Zone File: https://docs.oracle.com/en/database/oracle/
        oracle-database/18/nlspg/datetime-data-types-and-time-zone-support.html
@@ -1773,6 +1773,12 @@ to refer to the queryset's model.
 
         Restaurant.objects.select_for_update(of=('self', 'place_ptr'))
 
+.. admonition:: Using ``select_for_update(of=(...))`` with specified fields
+
+    If you want to lock models and specify selected fields, e.g. using
+    :meth:`values`, you must select at least one field from each model in the
+    ``of`` argument. Models without selected fields will not be locked.
+
 On PostgreSQL only, you can pass ``no_key=True`` in order to acquire a weaker
 lock, that still allows creating rows that merely reference locked rows
 (through a foreign key, for example) while the lock is in place. The
@@ -1793,7 +1799,7 @@ them::
     <QuerySet [<Person: ...)>, ...]>
 
 The ``postgresql``, ``oracle``, and ``mysql`` database backends support
-``select_for_update()``. However, MariaDB 10.3+ only supports the ``nowait``
+``select_for_update()``. However, MariaDB only supports the ``nowait``
 argument, MariaDB 10.6+ also supports the ``skip_locked`` argument, and MySQL
 8.0.1+ supports the ``nowait``, ``skip_locked``, and ``of`` arguments. The
 ``no_key`` argument is only supported on PostgreSQL.
@@ -1830,12 +1836,6 @@ raised if ``select_for_update()`` is used in autocommit mode.
     PostgreSQL doesn't support ``select_for_update()`` with
     :class:`~django.db.models.expressions.Window` expressions.
 
-.. versionchanged:: 3.2
-
-    The ``no_key`` argument was added.
-
-    The ``of`` argument was allowed on MySQL 8.0.1+.
-
 .. versionchanged:: 4.0
 
     The ``skip_locked`` argument was allowed on MariaDB 10.6+.
@@ -1857,11 +1857,6 @@ See the :doc:`/topics/db/sql` for more information.
   ``raw()`` always triggers a new query and doesn't account for previous
   filtering. As such, it should generally be called from the ``Manager`` or
   from a fresh ``QuerySet`` instance.
-
-.. versionchanged:: 3.2
-
-    The default value of the ``params`` argument was changed from ``None`` to
-    an empty tuple.
 
 Operators that return new ``QuerySet``\s
 ----------------------------------------
@@ -2291,6 +2286,9 @@ retrieving model instances from it (for example, by iterating over it), it's
 probably more efficient to use ``len(queryset)`` which won't cause an extra
 database query like ``count()`` would.
 
+If the queryset has already been fully retrieved, ``count()`` will use that
+length rather than perform an extra database query.
+
 ``in_bulk()``
 ~~~~~~~~~~~~~
 
@@ -2322,10 +2320,6 @@ Example::
     {'Beatles Blog': <Blog: Beatles Blog>, 'Cheddar Talk': <Blog: Cheddar Talk>, 'Django Weblog': <Blog: Django Weblog>}
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
-
-.. versionchanged:: 3.2
-
-    Using a distinct field was allowed.
 
 ``iterator()``
 ~~~~~~~~~~~~~~
@@ -2652,8 +2646,6 @@ update a bunch of records for a model that has a custom
 
 Ordered queryset
 ^^^^^^^^^^^^^^^^
-
-.. versionadded:: 3.2
 
 Chaining ``order_by()`` with ``update()`` is supported only on MariaDB and
 MySQL, and is ignored for different databases. This is useful for updating a
@@ -3553,10 +3545,6 @@ All aggregates have the following parameters in common:
 Strings that reference fields on the model, transforms of the field, or
 :doc:`query expressions </ref/models/expressions>`.
 
-.. versionchanged:: 3.2
-
-    Support for transforms of the field was added.
-
 ``output_field``
 ~~~~~~~~~~~~~~~~
 
@@ -3842,7 +3830,3 @@ operate on vegetarian pizzas.
 * :meth:`.QuerySet.only` and :meth:`~.QuerySet.prefetch_related`.
 * A :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
   inherited from a parent model.
-
-.. versionchanged:: 3.2
-
-    Support for nested relations was added.

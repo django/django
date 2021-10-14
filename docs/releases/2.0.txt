@@ -558,7 +558,7 @@ Miscellaneous
 * :class:`~django.views.generic.base.RedirectView` no longer silences
   ``NoReverseMatch`` if the ``pattern_name`` doesn't exist.
 
-* When :setting:`USE_L10N` is off, :class:`~django.forms.FloatField` and
+* When ``USE_L10N`` is off, :class:`~django.forms.FloatField` and
   :class:`~django.forms.DecimalField` now respect :setting:`DECIMAL_SEPARATOR`
   and :setting:`THOUSAND_SEPARATOR` during validation. For example, with the
   settings::

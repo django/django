@@ -388,6 +388,7 @@ class AutocompleteMixin:
         self.db = using
         self.choices = choices
         self.attrs = {} if attrs is None else attrs.copy()
+        self.i18n_name = SELECT2_TRANSLATIONS.get(get_language())
 
     def get_url(self):
         return reverse(self.url_name % self.admin_site.name)
@@ -413,6 +414,7 @@ class AutocompleteMixin:
             'data-theme': 'admin-autocomplete',
             'data-allow-clear': json.dumps(not self.is_required),
             'data-placeholder': '',  # Allows clearing of the input.
+            'lang': self.i18n_name,
             'class': attrs['class'] + (' ' if attrs['class'] else '') + 'admin-autocomplete',
         })
         return attrs
@@ -449,8 +451,7 @@ class AutocompleteMixin:
     @property
     def media(self):
         extra = '' if settings.DEBUG else '.min'
-        i18n_name = SELECT2_TRANSLATIONS.get(get_language())
-        i18n_file = ('admin/js/vendor/select2/i18n/%s.js' % i18n_name,) if i18n_name else ()
+        i18n_file = ('admin/js/vendor/select2/i18n/%s.js' % self.i18n_name,) if self.i18n_name else ()
         return forms.Media(
             js=(
                 'admin/js/vendor/jquery/jquery%s.js' % extra,

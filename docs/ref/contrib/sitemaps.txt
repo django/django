@@ -268,8 +268,6 @@ Note:
 
     .. attribute:: Sitemap.languages
 
-        .. versionadded:: 3.2
-
         **Optional.**
 
         A :term:`sequence` of :term:`language codes<language code>` to use for
@@ -277,8 +275,6 @@ Note:
         Defaults to :setting:`LANGUAGES`.
 
     .. attribute:: Sitemap.alternates
-
-        .. versionadded:: 3.2
 
         **Optional.**
 
@@ -290,8 +286,6 @@ Note:
         .. _hreflang attribute: https://developers.google.com/search/docs/advanced/crawling/localized-versions
 
     .. attribute:: Sitemap.x_default
-
-        .. versionadded:: 3.2
 
         **Optional.**
 
@@ -497,10 +491,6 @@ The ``alternates`` attribute is available when :attr:`~Sitemap.i18n` and
 :attr:`~Sitemap.alternates` are enabled. It is a list of other language
 versions, including the optional :attr:`~Sitemap.x_default` fallback, for each
 URL. Each alternate is a dictionary with ``location`` and ``lang_code`` keys.
-
-.. versionchanged:: 3.2
-
-    The ``alternates`` attribute was added.
 
 The ``item`` attribute has been added for each URL to allow more flexible
 customization of the templates, such as `Google news sitemaps`_. Assuming

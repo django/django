@@ -74,7 +74,6 @@ class LogEntryTests(TestCase):
         logentry = LogEntry(change_message='non-JSON string')
         self.assertEqual(logentry.get_change_message(), logentry.change_message)
 
-    @override_settings(USE_L10N=True)
     def test_logentry_change_message_localized_datetime_input(self):
         """
         Localized date/time inputs shouldn't affect changed form data detection.

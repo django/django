@@ -81,6 +81,35 @@ class TimezoneSiteMap(SimpleSitemap):
     lastmod = datetime(2013, 3, 13, 10, 0, 0, tzinfo=timezone.get_fixed_timezone(-300))
 
 
+class CallableLastmodPartialSitemap(Sitemap):
+    """Not all items have `lastmod`."""
+    location = '/location/'
+
+    def items(self):
+        o1 = TestModel()
+        o1.lastmod = datetime(2013, 3, 13, 10, 0, 0)
+        o2 = TestModel()
+        return [o1, o2]
+
+    def lastmod(self, obj):
+        return obj.lastmod
+
+
+class CallableLastmodFullSitemap(Sitemap):
+    """All items have `lastmod`."""
+    location = '/location/'
+
+    def items(self):
+        o1 = TestModel()
+        o1.lastmod = datetime(2013, 3, 13, 10, 0, 0)
+        o2 = TestModel()
+        o2.lastmod = datetime(2014, 3, 13, 10, 0, 0)
+        return [o1, o2]
+
+    def lastmod(self, obj):
+        return obj.lastmod
+
+
 def testmodelview(request, id):
     return HttpResponse()
 
@@ -156,6 +185,14 @@ generic_sitemaps_lastmod = {
         'queryset': TestModel.objects.order_by('pk').all(),
         'date_field': 'lastmod',
     }),
+}
+
+callable_lastmod_partial_sitemap = {
+    'callable-lastmod': CallableLastmodPartialSitemap,
+}
+
+callable_lastmod_full_sitemap = {
+    'callable-lastmod': CallableLastmodFullSitemap,
 }
 
 urlpatterns = [
@@ -246,6 +283,10 @@ urlpatterns = [
     path(
         'sitemap-without-entries/sitemap.xml', views.sitemap,
         {'sitemaps': {}}, name='django.contrib.sitemaps.views.sitemap'),
+    path('callable-lastmod-partial/index.xml', views.index, {'sitemaps': callable_lastmod_partial_sitemap}),
+    path('callable-lastmod-partial/sitemap.xml', views.sitemap, {'sitemaps': callable_lastmod_partial_sitemap}),
+    path('callable-lastmod-full/index.xml', views.index, {'sitemaps': callable_lastmod_full_sitemap}),
+    path('callable-lastmod-full/sitemap.xml', views.sitemap, {'sitemaps': callable_lastmod_full_sitemap}),
 ]
 
 urlpatterns += i18n_patterns(

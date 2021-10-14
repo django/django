@@ -880,8 +880,10 @@ class BaseDatabaseSchemaEditor:
         Return a (sql, params) fragment to set a column to null or non-null
         as required by new_field, or None if no changes are required.
         """
-        if (self.connection.features.interprets_empty_strings_as_nulls and
-                new_field.get_internal_type() in ("CharField", "TextField")):
+        if (
+            self.connection.features.interprets_empty_strings_as_nulls and
+            new_field.empty_strings_allowed
+        ):
             # The field is nullable in the database anyway, leave it alone.
             return
         else:
@@ -1153,8 +1155,10 @@ class BaseDatabaseSchemaEditor:
         return not old_field.primary_key and new_field.primary_key
 
     def _unique_should_be_added(self, old_field, new_field):
-        return (not old_field.unique and new_field.unique) or (
-            old_field.primary_key and not new_field.primary_key and new_field.unique
+        return (
+            not new_field.primary_key and
+            new_field.unique and
+            (not old_field.unique or old_field.primary_key)
         )
 
     def _rename_field_sql(self, table, old_field, new_field, new_type):

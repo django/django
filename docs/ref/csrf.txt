@@ -150,16 +150,17 @@ Finally, you'll need to set the header on your AJAX request. Using the
 
     const request = new Request(
         /* URL */,
-        {headers: {'X-CSRFToken': csrftoken}}
+        {
+            method: 'POST',
+            headers: {'X-CSRFToken': csrftoken},
+            mode: 'same-origin' // Do not send CSRF token to another domain.
+        }
     );
-    fetch(request, {
-        method: 'POST',
-        mode: 'same-origin'  // Do not send CSRF token to another domain.
-    }).then(function(response) {
+    fetch(request).then(function(response) {
         // ...
     });
 
-.. _fetch(): https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch
+.. _fetch(): https://developer.mozilla.org/en-US/docs/Web/API/fetch
 
 Using CSRF in Jinja2 templates
 ------------------------------
