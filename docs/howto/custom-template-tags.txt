@@ -79,8 +79,8 @@ an application.
 .. admonition:: Behind the scenes
 
     For a ton of examples, read the source code for Django's default filters
-    and tags. They're in ``django/template/defaultfilters.py`` and
-    ``django/template/defaulttags.py``, respectively.
+    and tags. They're in :source:`django/template/defaultfilters.py` and
+    :source:`django/template/defaulttags.py`, respectively.
 
     For more information on the :ttag:`load` tag, read its documentation.
 
