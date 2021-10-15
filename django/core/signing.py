@@ -100,7 +100,7 @@ def base64_hmac(salt, value, key, algorithm='sha1'):
 def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
     Signer = import_string(settings.SIGNING_BACKEND)
     key = force_bytes(settings.SECRET_KEY)  # SECRET_KEY may be str or bytes.
-    return Signer(b'django.http.cookies' + key, salt=salt)
+    return Signer(key=b'django.http.cookies' + key, salt=salt)
 
 
 class JSONSerializer:
@@ -132,7 +132,7 @@ def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, 
 
     The serializer is expected to return a bytestring.
     """
-    return TimestampSigner(key, salt=salt).sign_object(obj, serializer=serializer, compress=compress)
+    return TimestampSigner(key=key, salt=salt).sign_object(obj, serializer=serializer, compress=compress)
 
 
 def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None):
@@ -141,11 +141,11 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
 
     The serializer is expected to accept a bytestring.
     """
-    return TimestampSigner(key, salt=salt).unsign_object(s, serializer=serializer, max_age=max_age)
+    return TimestampSigner(key=key, salt=salt).unsign_object(s, serializer=serializer, max_age=max_age)
 
 
 class Signer:
-    def __init__(self, key=None, sep=':', salt=None, algorithm=None):
+    def __init__(self, *, key=None, sep=':', salt=None, algorithm=None):
         self.key = key or settings.SECRET_KEY
         self.sep = sep
         if _SEP_UNSAFE.match(self.sep):
