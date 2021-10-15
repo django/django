@@ -212,11 +212,7 @@ class Expressions(TableColumns):
     def rename_table_references(self, old_table, new_table):
         if self.table != old_table:
             return
-        expressions = deepcopy(self.expressions)
-        self.columns = []
-        for col in self.compiler.query._gen_cols([expressions]):
-            col.alias = new_table
-        self.expressions = expressions
+        self.expressions = self.expressions.relabeled_clone({old_table: new_table})
         super().rename_table_references(old_table, new_table)
 
     def rename_column_references(self, table, old_column, new_column):
