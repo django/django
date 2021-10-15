@@ -1001,14 +1001,17 @@ class AutodetectorTests(TestCase):
         ]
         changes = self.get_changes(before, after, MigrationQuestioner({'ask_rename': True}))
         self.assertNumberMigrations(changes, 'app', 1)
-        self.assertOperationTypes(changes, 'app', 0, ['RenameField', 'AlterField'])
+        self.assertOperationTypes(changes, 'app', 0, ['AlterField', 'RenameField'])
         self.assertOperationAttributes(
-            changes, 'app', 0, 0, model_name='foo', old_name='field', new_name='renamed_field',
+            changes, 'app', 0, 0, model_name='foo', name='field',
         )
-        self.assertOperationAttributes(changes, 'app', 0, 1, model_name='foo', name='renamed_field')
-        self.assertEqual(changes['app'][0].operations[-1].field.deconstruct(), (
-            'renamed_field', 'django.db.models.IntegerField', [], {'db_column': 'field'},
+        self.assertEqual(changes['app'][0].operations[0].field.deconstruct(), (
+            'field', 'django.db.models.IntegerField', [], {'db_column': 'field'},
         ))
+        self.assertOperationAttributes(
+            changes, 'app', 0, 1, model_name='foo', old_name='field',
+            new_name='renamed_field',
+        )
 
     def test_rename_related_field_preserved_db_column(self):
         before = [
@@ -1031,17 +1034,20 @@ class AutodetectorTests(TestCase):
         ]
         changes = self.get_changes(before, after, MigrationQuestioner({'ask_rename': True}))
         self.assertNumberMigrations(changes, 'app', 1)
-        self.assertOperationTypes(changes, 'app', 0, ['RenameField', 'AlterField'])
+        self.assertOperationTypes(changes, 'app', 0, ['AlterField', 'RenameField'])
         self.assertOperationAttributes(
-            changes, 'app', 0, 0, model_name='bar', old_name='foo', new_name='renamed_foo',
+            changes, 'app', 0, 0, model_name='bar', name='foo',
         )
-        self.assertOperationAttributes(changes, 'app', 0, 1, model_name='bar', name='renamed_foo')
-        self.assertEqual(changes['app'][0].operations[-1].field.deconstruct(), (
-            'renamed_foo',
+        self.assertEqual(changes['app'][0].operations[0].field.deconstruct(), (
+            'foo',
             'django.db.models.ForeignKey',
             [],
             {'to': 'app.foo', 'on_delete': models.CASCADE, 'db_column': 'foo_id'},
         ))
+        self.assertOperationAttributes(
+            changes, 'app', 0, 1, model_name='bar', old_name='foo',
+            new_name='renamed_foo',
+        )
 
     def test_rename_model(self):
         """Tests autodetection of renamed models."""

@@ -840,6 +840,20 @@ class MigrationAutodetector:
                             old_field_dec[0:2] == field_dec[0:2] and
                             dict(old_field_dec[2], db_column=old_db_column) == field_dec[2])):
                         if self.questioner.ask_rename(model_name, rem_field_name, field_name, field):
+                            # A db_column mismatch requires a prior noop
+                            # AlterField for the subsequent RenameField to be a
+                            # noop on attempts at preserving the old name.
+                            if old_field.db_column != field.db_column:
+                                altered_field = field.clone()
+                                altered_field.name = rem_field_name
+                                self.add_operation(
+                                    app_label,
+                                    operations.AlterField(
+                                        model_name=model_name,
+                                        name=rem_field_name,
+                                        field=altered_field,
+                                    ),
+                                )
                             self.add_operation(
                                 app_label,
                                 operations.RenameField(
@@ -970,7 +984,10 @@ class MigrationAutodetector:
                     new_field.remote_field.through = old_field.remote_field.through
             old_field_dec = self.deep_deconstruct(old_field)
             new_field_dec = self.deep_deconstruct(new_field)
-            if old_field_dec != new_field_dec:
+            # If the field was confirmed to be renamed it means that only
+            # db_column was allowed to change which generate_renamed_fields()
+            # already accounts for by adding an AlterField operation.
+            if old_field_dec != new_field_dec and old_field_name == field_name:
                 both_m2m = old_field.many_to_many and new_field.many_to_many
                 neither_m2m = not old_field.many_to_many and not new_field.many_to_many
                 if both_m2m or neither_m2m:
