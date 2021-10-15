@@ -273,6 +273,7 @@ Running all the tests
 If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
+*  aiosmtpd_
 *  argon2-cffi_ 19.1.0+
 *  asgiref_ 3.3.2+ (required)
 *  bcrypt_
@@ -322,6 +323,7 @@ associated tests will be skipped.
 To run some of the autoreload tests, you'll need to install the Watchman_
 service.
 
+.. _aiosmtpd: https://pypi.org/project/aiosmtpd/
 .. _argon2-cffi: https://pypi.org/project/argon2-cffi/
 .. _asgiref: https://pypi.org/project/asgiref/
 .. _bcrypt: https://pypi.org/project/bcrypt/
