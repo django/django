@@ -88,18 +88,22 @@ By default, the ``Signer`` class uses the :setting:`SECRET_KEY` setting to
 generate signatures. You can use a different secret by passing it to the
 ``Signer`` constructor::
 
-    >>> signer = Signer('my-other-secret')
+    >>> signer = Signer(key='my-other-secret')
     >>> value = signer.sign('My string')
     >>> value
     'My string:EkfQJafvGyiofrdGnuthdxImIJw'
 
-.. class:: Signer(key=None, sep=':', salt=None, algorithm=None)
+.. class:: Signer(*, key=None, sep=':', salt=None, algorithm=None)
 
     Returns a signer which uses ``key`` to generate signatures and ``sep`` to
     separate values. ``sep`` cannot be in the :rfc:`URL safe base64 alphabet
     <4648#section-5>`. This alphabet contains alphanumeric characters, hyphens,
     and underscores. ``algorithm`` must be an algorithm supported by
     :py:mod:`hashlib`, it defaults to ``'sha256'``.
+
+    .. versionchanged:: 4.1
+
+        All kwargs were made keyword-only.
 
 Using the ``salt`` argument
 ---------------------------
@@ -158,7 +162,7 @@ created within a specified period of time::
     >>> signer.unsign(value, max_age=timedelta(seconds=20))
     'hello'
 
-.. class:: TimestampSigner(key=None, sep=':', salt=None, algorithm='sha256')
+.. class:: TimestampSigner(*, key=None, sep=':', salt=None, algorithm='sha256')
 
     .. method:: sign(value)
 
@@ -180,6 +184,10 @@ created within a specified period of time::
         Checks if ``signed_obj`` was signed less than ``max_age`` seconds ago,
         otherwise raises ``SignatureExpired``. The ``max_age`` parameter can
         accept an integer or a :py:class:`datetime.timedelta` object.
+
+    .. versionchanged:: 4.1
+
+        All kwargs were made keyword-only.
 
 .. _signing-complex-data:
 
