@@ -29,7 +29,7 @@ class TestSigner(SimpleTestCase):
             self.assertNotEqual(signer.signature(s), signer2.signature(s))
 
     def test_signature_with_salt(self):
-        "signature(kye=value, salt=...) should work"
+        """signature(value) works with a salted Signer."""
         signer = signing.Signer(key='predictable-secret', salt='extra-salt')
         self.assertEqual(
             signer.signature('hello'),
