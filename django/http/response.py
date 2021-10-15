@@ -438,7 +438,7 @@ class FileResponse(StreamingHttpResponse):
     def __init__(self, *args, as_attachment=False, filename='', **kwargs):
         self.as_attachment = as_attachment
         self.filename = filename
-        self._no_default_content_type_set = 'content_type' not in kwargs or kwargs['content_type'] is None
+        self._no_explicit_content_type = 'content_type' not in kwargs or kwargs['content_type'] is None
         super().__init__(*args, **kwargs)
 
     def _set_streaming_content(self, value):
@@ -476,7 +476,7 @@ class FileResponse(StreamingHttpResponse):
             filelike.seek(-int(self.headers['Content-Length']), io.SEEK_END)
 
         filename = os.path.basename(self.filename or filename)
-        if self._no_default_content_type_set:
+        if self._no_explicit_content_type:
             if filename:
                 content_type, encoding = mimetypes.guess_type(filename)
                 # Encoding isn't set to prevent browsers from automatically
