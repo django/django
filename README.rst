@@ -3,7 +3,15 @@ Django
 ======
 
 Django is a high-level Python web framework that encourages rapid development
-and clean, pragmatic design. Thanks for checking it out.
+and clean, pragmatic design.It’s free and open source.
+
+*Ridiculously fast.
+     Django was designed to help developers take applications from concept to completion as quickly as possible.
+ *Reassuringly secure.
+     Django takes security seriously and helps developers avoid many common security mistakes.
+ *Exceedingly scalable.
+     Some of the busiest sites on the web leverage Django’s ability to quickly and flexibly scale.
+ **Thanks for checking it out.**
 
 All documentation is in the "``docs``" directory and online at
 https://docs.djangoproject.com/en/stable/. If you're just getting started,
