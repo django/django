@@ -178,8 +178,12 @@ class MigrationAutodetector:
         # Generate index removal operations before field is removed
         self.generate_removed_constraints()
         self.generate_removed_indexes()
-        # Generate field operations
+        # Generate field renaming operations.
         self.generate_renamed_fields()
+        # Generate removal of foo together.
+        self.generate_removed_altered_unique_together()
+        self.generate_removed_altered_index_together()
+        # Generate field operations.
         self.generate_removed_fields()
         self.generate_added_fields()
         self.generate_altered_fields()
@@ -1128,8 +1132,7 @@ class MigrationAutodetector:
             dependencies.append((through_app_label, through_object_name, None, True))
         return dependencies
 
-    def _generate_altered_foo_together(self, operation):
-        option_name = operation.option_name
+    def _get_altered_foo_together_operations(self, option_name):
         for app_label, model_name in sorted(self.kept_model_keys):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
@@ -1157,13 +1160,49 @@ class MigrationAutodetector:
                             dependencies.extend(self._get_dependencies_for_foreign_key(
                                 app_label, model_name, field, self.to_state,
                             ))
+                yield (
+                    old_value,
+                    new_value,
+                    app_label,
+                    model_name,
+                    dependencies,
+                )
 
+    def _generate_removed_altered_foo_together(self, operation):
+        for (
+            old_value,
+            new_value,
+            app_label,
+            model_name,
+            dependencies,
+        ) in self._get_altered_foo_together_operations(operation.option_name):
+            removal_value = new_value.intersection(old_value)
+            if removal_value or old_value:
                 self.add_operation(
                     app_label,
-                    operation(
-                        name=model_name,
-                        **{option_name: new_value}
-                    ),
+                    operation(name=model_name, **{operation.option_name: removal_value}),
+                    dependencies=dependencies,
+                )
+
+    def generate_removed_altered_unique_together(self):
+        self._generate_removed_altered_foo_together(operations.AlterUniqueTogether)
+
+    def generate_removed_altered_index_together(self):
+        self._generate_removed_altered_foo_together(operations.AlterIndexTogether)
+
+    def _generate_altered_foo_together(self, operation):
+        for (
+            old_value,
+            new_value,
+            app_label,
+            model_name,
+            dependencies,
+        ) in self._get_altered_foo_together_operations(operation.option_name):
+            removal_value = new_value.intersection(old_value)
+            if new_value != removal_value:
+                self.add_operation(
+                    app_label,
+                    operation(name=model_name, **{operation.option_name: new_value}),
                     dependencies=dependencies,
                 )
 
