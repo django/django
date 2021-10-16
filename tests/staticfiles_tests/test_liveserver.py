@@ -29,22 +29,8 @@ class LiveServerBase(StaticLiveServerTestCase):
         # Override settings
         cls.settings_override = override_settings(**TEST_SETTINGS)
         cls.settings_override.enable()
-        try:
-            super().setUpClass()
-        except Exception:
-            # Clean up since tearDownClass() isn't called on errors.
-            cls._tearDownLiveServerBase()
-            raise
-
-    @classmethod
-    def _tearDownLiveServerBase(cls):
-        # Restore original settings
-        cls.settings_override.disable()
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        cls._tearDownLiveServerBase()
+        cls.addClassCleanup(cls.settings_override.disable)
+        super().setUpClass()
 
 
 class StaticLiveServerChecks(LiveServerBase):
@@ -74,8 +60,6 @@ class StaticLiveServerChecks(LiveServerBase):
             # app without having set the required STATIC_URL setting.")
             pass
         else:
-            # super().setUpClass() cleans up after itself on a failure.
-            super().tearDownClass()
             raise Exception('setUpClass() should have raised an exception.')
 
     def test_test_test(self):

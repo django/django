@@ -127,17 +127,11 @@ class LiveServerTestCaseSetupTest(LiveServerBase):
             super().setUpClass()
         except RuntimeError:
             # LiveServerTestCase's change to ALLOWED_HOSTS should be reverted.
+            cls.doClassCleanups()
             cls.check_allowed_hosts(['testserver'])
         else:
             raise RuntimeError('Server did not fail.')
         cls.set_up_called = True
-
-    @classmethod
-    def tearDownClass(cls):
-        # Make tearDownClass() a no-op because setUpClass() was already cleaned
-        # up, and because the error inside setUpClass() was handled, which will
-        # cause tearDownClass() to be called when it normally wouldn't.
-        pass
 
     def test_set_up_class(self):
         self.assertIs(self.set_up_called, True)
@@ -334,7 +328,7 @@ class LiveServerPort(LiveServerBase):
         """
         TestCase = type("TestCase", (LiveServerBase,), {})
         try:
-            TestCase.setUpClass()
+            TestCase._start_server_thread()
         except OSError as e:
             if e.errno == errno.EADDRINUSE:
                 # We're out of ports, LiveServerTestCase correctly fails with
@@ -342,15 +336,12 @@ class LiveServerPort(LiveServerBase):
                 return
             # Unexpected error.
             raise
-        try:
-            # We've acquired a port, ensure our server threads acquired
-            # different addresses.
-            self.assertNotEqual(
-                self.live_server_url, TestCase.live_server_url,
-                "Acquired duplicate server addresses for server threads: %s" % self.live_server_url
-            )
-        finally:
-            TestCase.tearDownClass()
+        self.assertNotEqual(
+            self.live_server_url,
+            TestCase.live_server_url,
+            f'Acquired duplicate server addresses for server threads: '
+            f'{self.live_server_url}',
+        )
 
     def test_specified_port_bind(self):
         """LiveServerTestCase.port customizes the server's port."""
@@ -360,14 +351,13 @@ class LiveServerPort(LiveServerBase):
         s.bind(('', 0))
         TestCase.port = s.getsockname()[1]
         s.close()
-        TestCase.setUpClass()
-        try:
-            self.assertEqual(
-                TestCase.port, TestCase.server_thread.port,
-                'Did not use specified port for LiveServerTestCase thread: %s' % TestCase.port
-            )
-        finally:
-            TestCase.tearDownClass()
+        TestCase._start_server_thread()
+        self.assertEqual(
+            TestCase.port,
+            TestCase.server_thread.port,
+            f'Did not use specified port for LiveServerTestCase thread: '
+            f'{TestCase.port}',
+        )
 
 
 class LiveServerThreadedTests(LiveServerBase):

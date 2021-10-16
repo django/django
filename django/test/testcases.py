@@ -1533,7 +1533,11 @@ class LiveServerTestCase(TransactionTestCase):
             ALLOWED_HOSTS={'append': cls.allowed_host},
         )
         cls._live_server_modified_settings.enable()
+        cls.addClassCleanup(cls._live_server_modified_settings.disable)
+        cls._start_server_thread()
 
+    @classmethod
+    def _start_server_thread(cls):
         connections_override = cls._make_connections_override()
         for conn in connections_override.values():
             # Explicitly enable thread-shareability for this connection.
@@ -1542,13 +1546,11 @@ class LiveServerTestCase(TransactionTestCase):
         cls.server_thread = cls._create_server_thread(connections_override)
         cls.server_thread.daemon = True
         cls.server_thread.start()
+        cls.addClassCleanup(cls._terminate_thread)
 
         # Wait for the live server to be ready
         cls.server_thread.is_ready.wait()
         if cls.server_thread.error:
-            # Clean up behind ourselves, since tearDownClass won't get called in
-            # case of errors.
-            cls._tearDownClassInternal()
             raise cls.server_thread.error
 
     @classmethod
@@ -1561,19 +1563,12 @@ class LiveServerTestCase(TransactionTestCase):
         )
 
     @classmethod
-    def _tearDownClassInternal(cls):
+    def _terminate_thread(cls):
         # Terminate the live server's thread.
         cls.server_thread.terminate()
         # Restore shared connections' non-shareability.
         for conn in cls.server_thread.connections_override.values():
             conn.dec_thread_sharing()
-
-        cls._live_server_modified_settings.disable()
-        super().tearDownClass()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls._tearDownClassInternal()
 
 
 class SerializeMixin:
