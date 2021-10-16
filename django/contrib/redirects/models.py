@@ -4,6 +4,13 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Redirect(models.Model):
+
+    class RedirectTypes(models.IntegerChoices):
+        MOVED_PERMANENTLY = 301, _('Moved Permanently')
+        FOUND = 302, _('Found')
+        GONE = 410, _('Gone')
+
+    redirect_type = models.IntegerField(_('redirect type'), choices=RedirectTypes.choices)
     site = models.ForeignKey(Site, models.CASCADE, verbose_name=_('site'))
     old_path = models.CharField(
         _('redirect from'),

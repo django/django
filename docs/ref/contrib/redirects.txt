@@ -6,8 +6,7 @@ The redirects app
    :synopsis: A framework for managing redirects.
 
 Django comes with an optional redirects application. It lets you store
-redirects in a database and handles the redirecting for you. It uses the HTTP
-response status code ``301 Moved Permanently`` by default.
+redirects in a database and specify the redirect type.
 
 Installation
 ============
@@ -31,18 +30,37 @@ The :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
 does all of the work. Each time any Django application raises a 404
 error, this middleware checks the redirects database for the requested
 URL as a last resort. Specifically, it checks for a redirect with the
-given ``old_path`` with a site ID that corresponds to the
+given ``old_path``, ``redirect_type`` and a site ID that corresponds to the
 :setting:`SITE_ID` setting.
 
-* If it finds a match, and ``new_path`` is not empty, it redirects to
-  ``new_path`` using a 301 ("Moved Permanently") redirect. You can subclass
-  :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
-  and set
-  :attr:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware.response_redirect_class`
-  to :class:`django.http.HttpResponseRedirect` to use a
-  ``302 Moved Temporarily`` redirect instead.
-* If it finds a match, and ``new_path`` is empty, it sends a 410 ("Gone")
-  HTTP header and empty (content-less) response.
+* If it finds a match, it redirects to ``new_path`` using the chosen ``redirect_type``.
+  To add a custom redirect type, you can subclass the
+  :class:`django.contrib.redirects.models.Redirect` and override the
+  :class:`RedirectTypes` integer choice like in the following example:
+
+      >>> RedirectTypes = IntegerChoices(
+      >>>       'RedirectTypes',
+      >>>       [
+      >>>           ('Permanent Redirect', 308),
+      >>>           *[(m.name, m.value) for m in Redirect.RedirectTypes]
+      >>>       ],
+      >>>   )
+
+  When adding a redirect type, remember also to extend the
+  :class:`RedirectFallbackMiddleware`.
+
+  First, set the ``redirect_model_class`` to the model class you just wrote.
+
+  Then, add the new response via the convenient ``response_redirect_types`` method:
+
+      >>> def get_response_redirect_types(self):
+      >>>   redirect_types = super().get_response_redirect_types()
+      >>>   redirect_types.update({308: HttpResponseRedirect})
+      >>>   return redirect_types
+
+  Finally, you are expected to link unregister the :class:`contrib.redirects.admin.RedirectAdmin`
+  and register it with the model class you wrote above.
+
 * If it doesn't find a match, the request continues to be processed as
   usual.
 
@@ -81,6 +99,7 @@ Via the Python API
         >>> # Add a new redirect.
         >>> redirect = Redirect.objects.create(
         ...     site_id=1,
+        ...     redirect_type=301,
         ...     old_path='/contact-us/',
         ...     new_path='/contact/',
         ... )
@@ -98,21 +117,25 @@ Middleware
 
 .. class:: middleware.RedirectFallbackMiddleware
 
-    You can change the :class:`~django.http.HttpResponse` classes used
-    by the middleware by creating a subclass of
-    :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
-    and overriding ``response_gone_class`` and/or ``response_redirect_class``.
+    You can override redirect types used by the middleware by creating a subclass of
+    :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware` and
+    overriding the ``response_redirect_types`` method.
 
-    .. attribute:: response_gone_class
+    .. attribute:: redirect_model_class
 
-        The :class:`~django.http.HttpResponse` class used when a
-        :class:`~django.contrib.redirects.models.Redirect` is not found for the
-        requested path or has a blank ``new_path`` value.
+        A :class:`django.db.models` class to be used for redirects.
 
-        Defaults to :class:`~django.http.HttpResponseGone`.
+        Defaults to :class:``Redirect``.
 
-    .. attribute:: response_redirect_class
+    .. attribute:: response_redirect_types
 
-        The :class:`~django.http.HttpResponse` class that handles the redirect.
+        A dictionary of ``status_code``integer and
+        :class:`~django.http.HttpResponse` class pairs.
 
-        Defaults to :class:`~django.http.HttpResponsePermanentRedirect`.
+        Defaults to:
+
+        >>> {
+        >>>     301: HttpResponsePermanentRedirect,
+        >>>     302: HttpResponseRedirect,
+        >>>     410: HttpResponseGone
+        >>> }
