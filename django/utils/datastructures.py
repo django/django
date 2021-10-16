@@ -1,14 +1,14 @@
 import copy
-from collections.abc import Mapping
+from collections.abc import Mapping, MutableSet
 
 
-class OrderedSet:
+class OrderedSet(MutableSet):
     """
     A set which keeps the ordering of the inserted items.
     """
 
-    def __init__(self, iterable=None):
-        self.dict = dict.fromkeys(iterable or ())
+    def __init__(self, iterable=()):
+        self.dict = dict.fromkeys(iterable)
 
     def add(self, item):
         self.dict[item] = None

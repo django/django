@@ -17,7 +17,8 @@ class OrderedSetTests(SimpleTestCase):
     def test_init_with_iterable(self):
         s = OrderedSet([1, 2, 3])
         self.assertEqual(list(s.dict.keys()), [1, 2, 3])
-
+        self.assertIsInstance(s, collections.abc.MutableSet)
+        
     def test_remove(self):
         s = OrderedSet()
         self.assertEqual(len(s), 0)
