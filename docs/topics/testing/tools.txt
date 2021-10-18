@@ -717,7 +717,7 @@ A subclass of :class:`unittest.TestCase` that adds this functionality:
   * Verifying that a template :meth:`has/hasn't been used to generate a given
     response content <SimpleTestCase.assertTemplateUsed>`.
   * Verifying that two :meth:`URLs <SimpleTestCase.assertURLEqual>` are equal.
-  * Verifying a HTTP :meth:`redirect <SimpleTestCase.assertRedirects>` is
+  * Verifying an HTTP :meth:`redirect <SimpleTestCase.assertRedirects>` is
     performed by the app.
   * Robustly testing two :meth:`HTML fragments <SimpleTestCase.assertHTMLEqual>`
     for equality/inequality or :meth:`containment <SimpleTestCase.assertInHTML>`.

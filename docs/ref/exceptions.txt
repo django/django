@@ -177,7 +177,7 @@ list of errors.
 
 .. exception:: RequestAborted
 
-    The :exc:`RequestAborted` exception is raised when a HTTP body being read
+    The :exc:`RequestAborted` exception is raised when an HTTP body being read
     in by the handler is cut off midstream and the client connection closes,
     or when the client does not send data and hits a timeout where the server
     closes the connection.

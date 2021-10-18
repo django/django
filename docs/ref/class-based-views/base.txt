@@ -86,7 +86,7 @@ MRO is an acronym for Method Resolution Order.
     .. method:: dispatch(request, *args, **kwargs)
 
         The ``view`` part of the view -- the method that accepts a ``request``
-        argument plus arguments, and returns a HTTP response.
+        argument plus arguments, and returns an HTTP response.
 
         The default implementation will inspect the HTTP method and attempt to
         delegate to a method that matches the HTTP method; a ``GET`` will be
@@ -99,7 +99,7 @@ MRO is an acronym for Method Resolution Order.
 
     .. method:: http_method_not_allowed(request, *args, **kwargs)
 
-        If the view was called with a HTTP method it doesn't support, this
+        If the view was called with an HTTP method it doesn't support, this
         method is called instead.
 
         The default implementation returns ``HttpResponseNotAllowed`` with a
