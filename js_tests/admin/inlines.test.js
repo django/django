@@ -178,3 +178,13 @@ QUnit.test('make removeButtons visible again', function(assert) {
     addButton.trigger($.Event( "click", { target: addButton } ));
     assert.equal(this.table.find('.inline-deletelink:visible').length, 2);
 });
+
+QUnit.test('check the dependent prepopulated fields', function(assert) {
+    const $ = django.jQuery;
+    const addButton = this.table.find('.add-row a');
+    addButton.trigger($.Event( "click", { target: addButton } ));
+    const title = this.table.find('#id_article_set-0-title');
+    const slug = this.table.find('#id_article_set-0-slug');
+    title.val('foo bar').change();
+    assert.equal(title.val(), slug.val());
+});

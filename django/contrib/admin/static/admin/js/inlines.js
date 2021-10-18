@@ -22,17 +22,20 @@
         const options = $.extend({}, $.fn.formset.defaults, opts);
         const $this = $(this);
         const $parent = $this.parent();
-        const updateElementIndex = function(el, prefix, ndx) {
+        const replacePlaceholders = function(prefix, ndx, text) {
             const id_regex = new RegExp("(" + prefix + "-(\\d+|__prefix__))");
             const replacement = prefix + "-" + ndx;
+            return text.replace(id_regex, replacement);
+        };
+        const updateElementIndex = function(el, prefix, ndx) {
             if ($(el).prop("for")) {
-                $(el).prop("for", $(el).prop("for").replace(id_regex, replacement));
+                $(el).prop("for", replacePlaceholders(prefix, ndx, $(el).prop("for")));
             }
             if (el.id) {
-                el.id = el.id.replace(id_regex, replacement);
+                el.id = replacePlaceholders(prefix, ndx, el.id);
             }
             if (el.name) {
-                el.name = el.name.replace(id_regex, replacement);
+                el.name = replacePlaceholders(prefix, ndx, el.name);
             }
         };
         const totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS").prop("autocomplete", "off");
@@ -64,16 +67,29 @@
         const addInlineClickHandler = function(e) {
             e.preventDefault();
             const template = $("#" + options.prefix + "-empty");
-            const row = template.clone(true);
+            const row = template.clone(true, true);
             row.removeClass(options.emptyCssClass)
                 .addClass(options.formCssClass)
                 .attr("id", options.prefix + "-" + nextIndex);
             addInlineDeleteButton(row);
+            row.insertBefore($(template));
             row.find("*").each(function() {
                 updateElementIndex(this, options.prefix, totalForms.val());
             });
-            // Insert the new form when it has been fully edited.
-            row.insertBefore($(template));
+            row.find("*").each(function() {
+                const field = $(this),
+                    inputs = field.find('input, select, textarea');
+                inputs.each(function() {
+                    const dependency_list = $(this).data('dependency_list') || [],
+                        dependencies = [];
+                    $.each(dependency_list, function(i, field_name) {
+                        dependencies.push('#' + replacePlaceholders(options.prefix, totalForms.val(), row.find('.field-' + field_name).find('input, select, textarea').attr('id')));
+                    });
+                    if (dependencies.length) {
+                        $(this).prepopulate(dependencies, $(this).attr('maxlength'));
+                    }
+                });
+            });
             // Update number of total forms.
             $(totalForms).val(parseInt(totalForms.val(), 10) + 1);
             nextIndex += 1;
