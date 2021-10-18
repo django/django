@@ -107,7 +107,7 @@ class HashedFilesMixin:
             try:
                 content = self.open(filename)
             except OSError:
-                # Handle directory paths and fragments
+                # Handle directory paths and fragments.
                 return name
         try:
             file_hash = self.file_hash(clean_name, content)
@@ -122,7 +122,7 @@ class HashedFilesMixin:
         unparsed_name = list(parsed_name)
         unparsed_name[2] = hashed_name
         # Special casing for a @font-face hack, like url(myfont.eot?#iefix")
-        # http://www.fontspring.com/blog/the-new-bulletproof-font-face-syntax
+        # http://www.fontspring.com/blog/the-new-bulletproof-font-face-syntax.
         if '?#' in name and not unparsed_name[3]:
             unparsed_name[2] += '?'
         return urlunsplit(unparsed_name)
@@ -146,7 +146,7 @@ class HashedFilesMixin:
         final_url = super().url(hashed_name)
 
         # Special casing for a @font-face hack, like url(myfont.eot?#iefix")
-        # http://www.fontspring.com/blog/the-new-bulletproof-font-face-syntax
+        # http://www.fontspring.com/blog/the-new-bulletproof-font-face-syntax.
         query_fragment = '?#' in name  # [sic!]
         if fragment or query_fragment:
             urlparts = list(urlsplit(final_url))
@@ -235,7 +235,7 @@ class HashedFilesMixin:
         If either of these are performed on a file, then that file is considered
         post-processed.
         """
-        # don't even dare to process the files if we're in dry run mode
+        # don't even dare to process the files if we're in dry run mode.
         if dry_run:
             return
 
@@ -275,21 +275,21 @@ class HashedFilesMixin:
         if substitutions:
             yield 'All', None, RuntimeError('Max post-process passes exceeded.')
 
-        # Store the processed paths
+        # Store the processed paths.
         self.hashed_files.update(hashed_files)
 
         # Yield adjustable files with final, hashed name.
         yield from processed_adjustable_paths.values()
 
     def _post_process(self, paths, adjustable_paths, hashed_files):
-        # Sort the files by directory level
+        # Sort the files by directory level.
         def path_level(name):
             return len(name.split(os.sep))
 
         for name in sorted(paths, key=path_level, reverse=True):
             substitutions = True
             # use the original, local file, not the copied-but-unprocessed
-            # file, which might be somewhere far away, like S3
+            # file, which might be somewhere far away, like S3.
             storage, path = paths[name]
             with storage.open(path) as original_file:
                 cleaned_name = self.clean_name(name)
@@ -348,7 +348,7 @@ class HashedFilesMixin:
                         saved_name = self._save(hashed_name, original_file)
                         hashed_name = self.clean_name(saved_name)
 
-                # and then set the cache accordingly
+                # and then set the cache accordingly.
                 hashed_files[hash_key] = hashed_name
 
                 yield name, hashed_name, processed, substitutions
