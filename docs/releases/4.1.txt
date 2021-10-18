@@ -253,7 +253,8 @@ Features deprecated in 4.1
 Miscellaneous
 -------------
 
-* ...
+* Keyword arguments to :class:`~django.core.signing.Signer` and
+  :class:`~django.core.signing.TimestampSigner` are now keyword-only.
 
 Features removed in 4.1
 =======================
