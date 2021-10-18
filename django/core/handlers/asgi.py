@@ -176,7 +176,7 @@ class ASGIHandler(base.BaseHandler):
         await self.send_response(response, send)
 
     async def read_body(self, receive):
-        """Reads a HTTP body from an ASGI connection."""
+        """Reads an HTTP body from an ASGI connection."""
         # Use the tempfile that auto rolls-over to a disk file as it fills up.
         body_file = tempfile.SpooledTemporaryFile(max_size=settings.FILE_UPLOAD_MAX_MEMORY_SIZE, mode='w+b')
         while True:
