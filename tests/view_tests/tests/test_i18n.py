@@ -58,7 +58,7 @@ class SetLanguageTests(TestCase):
     def test_setlang_http_next(self):
         """
         The set_language view only redirects to the 'next' argument if it is
-        "safe" and its scheme is https if the request was sent over https.
+        "safe" and its scheme is HTTPS if the request was sent over HTTPS.
         """
         lang_code = self._get_inactive_language_code()
         non_https_next_url = 'http://testserver/redirection/'

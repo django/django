@@ -1472,7 +1472,7 @@ class _MediaFilesHandler(FSFilesHandler):
 
 
 class LiveServerThread(threading.Thread):
-    """Thread for running a live http server while the tests are running."""
+    """Thread for running a live HTTP server while the tests are running."""
 
     server_class = ThreadedWSGIServer
 
