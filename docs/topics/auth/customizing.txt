@@ -382,9 +382,9 @@ the :setting:`AUTH_USER_MODEL` setting that references a custom model::
 
      AUTH_USER_MODEL = 'myapp.MyUser'
 
-This dotted pair describes the name of the Django app (which must be in your
-:setting:`INSTALLED_APPS`), and the name of the Django model that you wish to
-use as your user model.
+This dotted pair describes the :attr:`~django.apps.AppConfig.label` of the
+Django app (which must be in your :setting:`INSTALLED_APPS`), and the name of
+the Django model that you wish to use as your user model.
 
 Using a custom user model when starting a project
 -------------------------------------------------
