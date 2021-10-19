@@ -269,10 +269,10 @@ of :exc:`IntegrityError`.
 
 .. currentmodule:: django.http
 
-Http Exceptions
+HTTP Exceptions
 ===============
 
-Http exceptions may be imported from ``django.http``.
+HTTP exceptions may be imported from ``django.http``.
 
 ``UnreadablePostError``
 -----------------------

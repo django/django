@@ -289,9 +289,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertEqual(response.status_code, 302)  # redirect somewhere
 
     def test_popup_add_POST(self):
-        """
-        Ensure http response from a popup is properly escaped.
-        """
+        """HTTP response from a popup is properly escaped."""
         post_data = {
             IS_POPUP_VAR: '1',
             'title': 'title with a new\nline',
