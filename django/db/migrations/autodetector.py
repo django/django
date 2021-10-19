@@ -483,7 +483,7 @@ class MigrationAutodetector:
                             fields = list(model_state.fields.values()) + [
                                 field.remote_field
                                 for relations in self.to_state.relations[app_label, model_name].values()
-                                for _, field in relations
+                                for field in relations.values()
                             ]
                             for field in fields:
                                 if field.is_relation:
@@ -672,7 +672,7 @@ class MigrationAutodetector:
             if (app_label, model_name) in self.old_proxy_keys:
                 for related_model_key, related_fields in relations[app_label, model_name].items():
                     related_model_state = self.to_state.models[related_model_key]
-                    for related_field_name, related_field in related_fields:
+                    for related_field_name, related_field in related_fields.items():
                         self.add_operation(
                             related_model_state.app_label,
                             operations.AlterField(
@@ -777,7 +777,7 @@ class MigrationAutodetector:
             for (related_object_app_label, object_name), relation_related_fields in (
                 relations[app_label, model_name].items()
             ):
-                for field_name, field in relation_related_fields:
+                for field_name, field in relation_related_fields.items():
                     dependencies.append(
                         (related_object_app_label, object_name, field_name, False),
                     )
@@ -840,6 +840,20 @@ class MigrationAutodetector:
                             old_field_dec[0:2] == field_dec[0:2] and
                             dict(old_field_dec[2], db_column=old_db_column) == field_dec[2])):
                         if self.questioner.ask_rename(model_name, rem_field_name, field_name, field):
+                            # A db_column mismatch requires a prior noop
+                            # AlterField for the subsequent RenameField to be a
+                            # noop on attempts at preserving the old name.
+                            if old_field.db_column != field.db_column:
+                                altered_field = field.clone()
+                                altered_field.name = rem_field_name
+                                self.add_operation(
+                                    app_label,
+                                    operations.AlterField(
+                                        model_name=model_name,
+                                        name=rem_field_name,
+                                        field=altered_field,
+                                    ),
+                                )
                             self.add_operation(
                                 app_label,
                                 operations.RenameField(
@@ -880,6 +894,12 @@ class MigrationAutodetector:
                 field.default = self.questioner.ask_auto_now_add_addition(field_name, model_name)
             else:
                 field.default = self.questioner.ask_not_null_addition(field_name, model_name)
+        if (
+            field.unique and
+            field.default is not models.NOT_PROVIDED and
+            callable(field.default)
+        ):
+            self.questioner.ask_unique_callable_default_addition(field_name, model_name)
         self.add_operation(
             app_label,
             operations.AddField(
@@ -964,7 +984,10 @@ class MigrationAutodetector:
                     new_field.remote_field.through = old_field.remote_field.through
             old_field_dec = self.deep_deconstruct(old_field)
             new_field_dec = self.deep_deconstruct(new_field)
-            if old_field_dec != new_field_dec:
+            # If the field was confirmed to be renamed it means that only
+            # db_column was allowed to change which generate_renamed_fields()
+            # already accounts for by adding an AlterField operation.
+            if old_field_dec != new_field_dec and old_field_name == field_name:
                 both_m2m = old_field.many_to_many and new_field.many_to_many
                 neither_m2m = not old_field.many_to_many and not new_field.many_to_many
                 if both_m2m or neither_m2m:
@@ -1082,7 +1105,10 @@ class MigrationAutodetector:
         else:
             relations = project_state.relations[app_label, model_name]
             for (remote_app_label, remote_model_name), fields in relations.items():
-                if any(field == related_field.remote_field for _, related_field in fields):
+                if any(
+                    field == related_field.remote_field
+                    for related_field in fields.values()
+                ):
                     remote_field_model = f'{remote_app_label}.{remote_model_name}'
                     break
         # Account for FKs to swappable models
@@ -1320,8 +1346,11 @@ class MigrationAutodetector:
     def parse_number(cls, name):
         """
         Given a migration name, try to extract a number from the beginning of
-        it. If no number is found, return None.
+        it. For a squashed migration such as '0001_squashed_0004…', return the
+        second number. If no number is found, return None.
         """
+        if squashed_match := re.search(r'.*_squashed_(\d+)', name):
+            return int(squashed_match[1])
         match = re.match(r'^\d+', name)
         if match:
             return int(match[0])

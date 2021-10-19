@@ -73,6 +73,12 @@ purely database-related, whereas :attr:`~Field.blank` is validation-related. If
 a field has ``blank=True``, form validation will allow entry of an empty value.
 If a field has ``blank=False``, the field will be required.
 
+.. admonition:: Supplying missing values
+
+    ``blank=True`` can be used with fields having ``null=False``, but this will
+    require implementing :meth:`~django.db.models.Model.clean` on the model in
+    order to programmatically supply any missing values.
+
 .. _field-choices:
 
 ``choices``
@@ -436,11 +442,6 @@ The primary key field is read-only. If you change the value of the primary
 key on an existing object and then save it, a new object will be created
 alongside the old one.
 
-.. versionchanged:: 3.2
-
-    In older versions, auto-created primary key fields were always
-    :class:`AutoField`\s.
-
 ``unique``
 ----------
 
@@ -572,8 +573,8 @@ case it can't be included in a :class:`~django.forms.ModelForm`.
 
 .. attribute:: BinaryField.max_length
 
-    The maximum length (in characters) of the field. The maximum length is
-    enforced in Django's validation using
+    The maximum length (in bytes) of the field. The maximum length is enforced
+    in Django's validation using
     :class:`~django.core.validators.MaxLengthValidator`.
 
 .. admonition:: Abusing ``BinaryField``
@@ -622,8 +623,6 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
         notes </ref/databases>` for details.
 
 .. attribute:: CharField.db_collation
-
-    .. versionadded:: 3.2
 
     Optional. The database collation name of the field.
 
@@ -1203,9 +1202,8 @@ A field for storing JSON encoded data. In Python the data is represented in its
 Python native format: dictionaries, lists, strings, numbers, booleans and
 ``None``.
 
-``JSONField`` is supported on MariaDB 10.2.7+, MySQL 5.7.8+, Oracle,
-PostgreSQL, and SQLite (with the :ref:`JSON1 extension enabled
-<sqlite-json1>`).
+``JSONField`` is supported on MariaDB, MySQL 5.7.8+, Oracle, PostgreSQL, and
+SQLite (with the :ref:`JSON1 extension enabled <sqlite-json1>`).
 
 .. attribute:: JSONField.encoder
 
@@ -1346,8 +1344,6 @@ However it is not enforced at the model or database level. Use a
 :class:`CharField` for that.
 
 .. attribute:: TextField.db_collation
-
-    .. versionadded:: 3.2
 
     The database collation name of the field.
 
@@ -1809,10 +1805,6 @@ that control how the relationship functions.
 .. attribute:: ManyToManyField.limit_choices_to
 
     Same as :attr:`ForeignKey.limit_choices_to`.
-
-    ``limit_choices_to`` has no effect when used on a ``ManyToManyField`` with a
-    custom intermediate table specified using the
-    :attr:`~ManyToManyField.through` parameter.
 
 .. attribute:: ManyToManyField.symmetrical
 

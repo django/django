@@ -188,7 +188,9 @@ class TruncBase(TimezoneMixin, Transform):
     kind = None
     tzinfo = None
 
-    def __init__(self, expression, output_field=None, tzinfo=None, is_dst=None, **extra):
+    # RemovedInDjango50Warning: when the deprecation ends, remove is_dst
+    # argument.
+    def __init__(self, expression, output_field=None, tzinfo=None, is_dst=timezone.NOT_PASSED, **extra):
         self.tzinfo = tzinfo
         self.is_dst = is_dst
         super().__init__(expression, output_field=output_field, **extra)
@@ -264,7 +266,9 @@ class TruncBase(TimezoneMixin, Transform):
 
 class Trunc(TruncBase):
 
-    def __init__(self, expression, kind, output_field=None, tzinfo=None, is_dst=None, **extra):
+    # RemovedInDjango50Warning: when the deprecation ends, remove is_dst
+    # argument.
+    def __init__(self, expression, kind, output_field=None, tzinfo=None, is_dst=timezone.NOT_PASSED, **extra):
         self.kind = kind
         super().__init__(
             expression, output_field=output_field, tzinfo=tzinfo,

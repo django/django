@@ -1,3 +1,4 @@
+import pickle
 from datetime import datetime
 from functools import partialmethod
 from io import StringIO
@@ -5,7 +6,7 @@ from unittest import mock, skipIf
 
 from django.core import serializers
 from django.core.serializers import SerializerDoesNotExist
-from django.core.serializers.base import ProgressBar
+from django.core.serializers.base import PickleSerializer, ProgressBar
 from django.db import connection, transaction
 from django.http import HttpResponse
 from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
@@ -416,6 +417,21 @@ class SerializersTransactionTestBase:
         art_obj = Article.objects.all()[0]
         self.assertEqual(art_obj.categories.all().count(), 1)
         self.assertEqual(art_obj.author.name, "Agnes")
+
+
+class PickleSerializerTests(SimpleTestCase):
+    def test_serializer_protocol(self):
+        serializer = PickleSerializer(protocol=3)
+        self.assertEqual(serializer.protocol, 3)
+        # If protocol is not provided, it defaults to pickle.HIGHEST_PROTOCOL
+        serializer = PickleSerializer()
+        self.assertEqual(serializer.protocol, pickle.HIGHEST_PROTOCOL)
+
+    def test_serializer_loads_dumps(self):
+        serializer = PickleSerializer()
+        test_data = 'test data'
+        dump = serializer.dumps(test_data)
+        self.assertEqual(serializer.loads(dump), test_data)
 
 
 def register_tests(test_class, method_name, test_func, exclude=()):

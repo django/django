@@ -83,7 +83,7 @@ class ArrayEnumModel(PostgreSQLModel):
 
 
 class CharFieldModel(models.Model):
-    field = models.CharField(max_length=16)
+    field = models.CharField(max_length=64)
 
 
 class TextFieldModel(models.Model):
@@ -101,7 +101,7 @@ class BigAutoFieldModel(models.Model):
 # Scene/Character/Line models are used to test full text search. They're
 # populated with content from Monty Python and the Holy Grail.
 class Scene(models.Model):
-    scene = models.CharField(max_length=255)
+    scene = models.TextField()
     setting = models.CharField(max_length=255)
 
 
@@ -160,6 +160,7 @@ class AggregateTestModel(PostgreSQLModel):
     To test postgres-specific general aggregation functions
     """
     char_field = models.CharField(max_length=30, blank=True)
+    text_field = models.TextField(blank=True)
     integer_field = models.IntegerField(null=True)
     boolean_field = models.BooleanField(null=True)
     json_field = models.JSONField(null=True)

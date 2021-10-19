@@ -329,6 +329,8 @@ class BaseDatabaseFeatures:
         'non_default': None,  # Non-default.
         'swedish_ci': None  # Swedish case-insensitive.
     }
+    # SQL template override for tests.aggregation.tests.NowUTC
+    test_now_utc_template = None
 
     # A set of dotted paths to tests in Django's test suite that are expected
     # to fail on this database.

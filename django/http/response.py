@@ -1,11 +1,11 @@
 import datetime
+import io
 import json
 import mimetypes
 import os
 import re
 import sys
 import time
-from collections.abc import Mapping
 from email.header import Header
 from http.client import responses
 from urllib.parse import quote, urlparse
@@ -16,9 +16,7 @@ from django.core.exceptions import DisallowedRedirect
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import timezone
-from django.utils.datastructures import (
-    CaseInsensitiveMapping, _destruct_iterable_mapping_values,
-)
+from django.utils.datastructures import CaseInsensitiveMapping
 from django.utils.encoding import iri_to_uri
 from django.utils.http import http_date
 from django.utils.regex_helper import _lazy_re_compile
@@ -32,10 +30,8 @@ class ResponseHeaders(CaseInsensitiveMapping):
         Populate the initial data using __setitem__ to ensure values are
         correctly encoded.
         """
-        if not isinstance(data, Mapping):
-            data = {k: v for k, v in _destruct_iterable_mapping_values(data)}
         self._store = {}
-        for header, value in data.items():
+        for header, value in self._unpack_items(data):
             self[header] = value
 
     def _convert_to_charset(self, value, charset, mime_encode=False):
@@ -442,6 +438,7 @@ class FileResponse(StreamingHttpResponse):
     def __init__(self, *args, as_attachment=False, filename='', **kwargs):
         self.as_attachment = as_attachment
         self.filename = filename
+        self._no_explicit_content_type = 'content_type' not in kwargs or kwargs['content_type'] is None
         super().__init__(*args, **kwargs)
 
     def _set_streaming_content(self, value):
@@ -461,29 +458,38 @@ class FileResponse(StreamingHttpResponse):
         Set some common response headers (Content-Length, Content-Type, and
         Content-Disposition) based on the `filelike` response content.
         """
-        encoding_map = {
-            'bzip2': 'application/x-bzip',
-            'gzip': 'application/gzip',
-            'xz': 'application/x-xz',
-        }
-        filename = getattr(filelike, 'name', None)
-        filename = filename if (isinstance(filename, str) and filename) else self.filename
-        if os.path.isabs(filename):
-            self.headers['Content-Length'] = os.path.getsize(filelike.name)
-        elif hasattr(filelike, 'getbuffer'):
-            self.headers['Content-Length'] = filelike.getbuffer().nbytes
+        filename = getattr(filelike, 'name', '')
+        filename = filename if isinstance(filename, str) else ''
+        seekable = hasattr(filelike, 'seek') and (not hasattr(filelike, 'seekable') or filelike.seekable())
+        if hasattr(filelike, 'tell'):
+            if seekable:
+                initial_position = filelike.tell()
+                filelike.seek(0, io.SEEK_END)
+                self.headers['Content-Length'] = filelike.tell() - initial_position
+                filelike.seek(initial_position)
+            elif hasattr(filelike, 'getbuffer'):
+                self.headers['Content-Length'] = filelike.getbuffer().nbytes - filelike.tell()
+            elif os.path.exists(filename):
+                self.headers['Content-Length'] = os.path.getsize(filename) - filelike.tell()
+        elif seekable:
+            self.headers['Content-Length'] = sum(iter(lambda: len(filelike.read(self.block_size)), 0))
+            filelike.seek(-int(self.headers['Content-Length']), io.SEEK_END)
 
-        if self.headers.get('Content-Type', '').startswith('text/html'):
+        filename = os.path.basename(self.filename or filename)
+        if self._no_explicit_content_type:
             if filename:
                 content_type, encoding = mimetypes.guess_type(filename)
                 # Encoding isn't set to prevent browsers from automatically
                 # uncompressing files.
-                content_type = encoding_map.get(encoding, content_type)
+                content_type = {
+                    'bzip2': 'application/x-bzip',
+                    'gzip': 'application/gzip',
+                    'xz': 'application/x-xz',
+                }.get(encoding, content_type)
                 self.headers['Content-Type'] = content_type or 'application/octet-stream'
             else:
                 self.headers['Content-Type'] = 'application/octet-stream'
 
-        filename = self.filename or os.path.basename(filename)
         if filename:
             disposition = 'attachment' if self.as_attachment else 'inline'
             try:

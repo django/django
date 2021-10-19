@@ -44,8 +44,8 @@ from django.contrib.gis.gdal.prototypes import ds as capi
 from django.utils.encoding import force_bytes, force_str
 
 
-# For more information, see the OGR C API source code:
-#  https://www.gdal.org/ogr__api_8h.html
+# For more information, see the OGR C API documentation:
+#  https://gdal.org/api/vector_c_api.html
 #
 # The OGR_DS_* routines are relevant here.
 class DataSource(GDALBase):

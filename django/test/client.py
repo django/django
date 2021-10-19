@@ -117,7 +117,7 @@ def conditional_content_removal(request, response):
 
 class ClientHandler(BaseHandler):
     """
-    A HTTP Handler that can be used for testing purposes. Use the WSGI
+    An HTTP Handler that can be used for testing purposes. Use the WSGI
     interface to compose requests, but return the raw HttpResponse object with
     the originating WSGIRequest attached to its ``wsgi_request`` attribute.
     """
@@ -835,8 +835,11 @@ class Client(ClientMixin, RequestFactory):
             if url.port:
                 extra['SERVER_PORT'] = str(url.port)
 
+            path = url.path
+            # RFC 2616: bare domains without path are treated as the root.
+            if not path and url.netloc:
+                path = '/'
             # Prepend the request path to handle relative path redirects
-            path = url.path or '/'
             if not path.startswith('/'):
                 path = urljoin(response.request['PATH_INFO'], path)
 

@@ -369,6 +369,10 @@ class GetImageDimensionsTests(unittest.TestCase):
                 size = images.get_image_dimensions(fh)
                 self.assertEqual(size, (None, None))
 
+    def test_missing_file(self):
+        size = images.get_image_dimensions('missing.png')
+        self.assertEqual(size, (None, None))
+
     @unittest.skipUnless(HAS_WEBP, 'WEBP not installed')
     def test_webp(self):
         img_path = os.path.join(os.path.dirname(__file__), 'test.webp')

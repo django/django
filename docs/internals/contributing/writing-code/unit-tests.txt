@@ -273,6 +273,7 @@ Running all the tests
 If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
+*  aiosmtpd_
 *  argon2-cffi_ 19.1.0+
 *  asgiref_ 3.3.2+ (required)
 *  bcrypt_
@@ -285,6 +286,7 @@ dependencies:
 *  PyYAML_
 *  pytz_ (required)
 *  pywatchman_
+*  redis_
 *  setuptools_
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
 *  gettext_ (:ref:`gettext_on_windows`)
@@ -308,10 +310,11 @@ encounter.
 You can also install the database adapter(s) of your choice using
 ``oracle.txt``, ``mysql.txt``, or ``postgres.txt``.
 
-If you want to test the memcached cache backend, you'll also need to define
-a :setting:`CACHES` setting that points at your memcached instance.
+If you want to test the memcached or Redis cache backends, you'll also need to
+define a :setting:`CACHES` setting that points at your memcached or Redis
+instance respectively.
 
-To run the GeoDjango tests, you will need to :doc:`setup a spatial database
+To run the GeoDjango tests, you will need to :doc:`set up a spatial database
 and install the Geospatial libraries</ref/contrib/gis/install/index>`.
 
 Each of these dependencies is optional. If you're missing any of them, the
@@ -320,6 +323,7 @@ associated tests will be skipped.
 To run some of the autoreload tests, you'll need to install the Watchman_
 service.
 
+.. _aiosmtpd: https://pypi.org/project/aiosmtpd/
 .. _argon2-cffi: https://pypi.org/project/argon2-cffi/
 .. _asgiref: https://pypi.org/project/asgiref/
 .. _bcrypt: https://pypi.org/project/bcrypt/
@@ -332,6 +336,7 @@ service.
 .. _PyYAML: https://pyyaml.org/wiki/PyYAML
 .. _pytz: https://pypi.org/project/pytz/
 .. _pywatchman: https://pypi.org/project/pywatchman/
+.. _redis: https://pypi.org/project/redis/
 .. _setuptools: https://pypi.org/project/setuptools/
 .. _memcached: https://memcached.org/
 .. _gettext: https://www.gnu.org/software/gettext/manual/gettext.html

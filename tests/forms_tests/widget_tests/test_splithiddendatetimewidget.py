@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from django.forms import SplitHiddenDateTimeWidget
-from django.test import override_settings
 from django.utils import translation
 
 from .base import WidgetTest
@@ -30,7 +29,6 @@ class SplitHiddenDateTimeWidgetTest(WidgetTest):
             '<input type="hidden" name="date_1" value="12:51:00">'
         ))
 
-    @override_settings(USE_L10N=True)
     @translation.override('de-at')
     def test_l10n(self):
         d = datetime(2007, 9, 17, 12, 51)

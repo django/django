@@ -153,14 +153,15 @@ The cache backend to use. The built-in cache backends are:
 * ``'django.core.cache.backends.locmem.LocMemCache'``
 * ``'django.core.cache.backends.memcached.PyMemcacheCache'``
 * ``'django.core.cache.backends.memcached.PyLibMCCache'``
+* ``'django.core.cache.backends.redis.RedisCache'``
 
 You can use a cache backend that doesn't ship with Django by setting
 :setting:`BACKEND <CACHES-BACKEND>` to a fully-qualified path of a cache
 backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
 
-.. versionchanged:: 3.2
+.. versionchanged:: 4.0
 
-    The ``PyMemcacheCache`` backend was added.
+    The ``RedisCache`` backend was added.
 
 .. setting:: CACHES-KEY_FUNCTION
 
@@ -672,8 +673,8 @@ When :setting:`USE_TZ` is ``False``, it is an error to set this option.
     otherwise, you should leave this option unset. It's best to store datetimes
     in UTC because it avoids ambiguous or nonexistent datetimes during daylight
     saving time changes. Also, receiving datetimes in UTC keeps datetime
-    arithmetic simple — there's no need for the ``normalize()`` method provided
-    by pytz.
+    arithmetic simple — there's no need to consider potential offset changes
+    over a DST transition.
 
   * If you're connecting to a third-party database that stores datetimes in a
     local time rather than UTC, then you must set this option to the
@@ -690,8 +691,8 @@ When :setting:`USE_TZ` is ``False``, it is an error to set this option.
   as ``date_trunc``, because their results depend on the time zone.
 
   However, this has a downside: receiving all datetimes in local time makes
-  datetime arithmetic more tricky — you must call the ``normalize()`` method
-  provided by pytz after each operation.
+  datetime arithmetic more tricky — you must account for possible offset
+  changes over DST transitions.
 
   Consider converting to local time explicitly with ``AT TIME ZONE`` in raw SQL
   queries instead of setting the ``TIME_ZONE`` option.
@@ -1254,8 +1255,6 @@ See also :setting:`NUMBER_GROUPING`, :setting:`THOUSAND_SEPARATOR` and
 ``DEFAULT_AUTO_FIELD``
 ----------------------
 
-.. versionadded:: 3.2
-
 Default: ``'``:class:`django.db.models.AutoField`\ ``'``
 
 Default primary key field type to use for models that don't have a field with
@@ -1666,8 +1665,12 @@ generate correct URLs when ``SCRIPT_NAME`` is not ``/``.
 
 Default: ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``
 
-The class that renders form widgets. It must implement :ref:`the low-level
-render API <low-level-widget-render-api>`.
+The class that renders forms and form widgets. It must implement
+:ref:`the low-level render API <low-level-widget-render-api>`. Included form
+renderers are:
+
+* ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``
+* ``'``:class:`django.forms.renderers.Jinja2`\ ``'``
 
 .. setting:: FORMAT_MODULE_PATH
 
@@ -2340,7 +2343,7 @@ already have it.
 
 Default: ``None``
 
-A tuple representing a HTTP header/value combination that signifies a request
+A tuple representing an HTTP header/value combination that signifies a request
 is secure. This controls the behavior of the request object's ``is_secure()``
 method.
 
@@ -2750,6 +2753,23 @@ the correct environment.
 
 .. _list of time zones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
+.. setting:: USE_DEPRECATED_PYTZ
+
+``USE_DEPRECATED_PYTZ``
+-----------------------
+
+.. versionadded:: 4.0
+
+Default: ``False``
+
+A boolean that specifies whether to use ``pytz``, rather than :mod:`zoneinfo`,
+as the default time zone implementation.
+
+.. deprecated:: 4.0
+
+    This transitional setting is deprecated. Support for using ``pytz`` will be
+    removed in Django 5.0.
+
 .. setting:: USE_I18N
 
 ``USE_I18N``
@@ -2774,7 +2794,7 @@ See also :setting:`LANGUAGE_CODE`, :setting:`USE_L10N` and :setting:`USE_TZ`.
 ``USE_L10N``
 ------------
 
-Default: ``False``
+Default: ``True``
 
 A boolean that specifies if localized formatting of data will be enabled by
 default or not. If this is set to ``True``, e.g. Django will display numbers and
@@ -2782,10 +2802,15 @@ dates using the format of the current locale.
 
 See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
 
-.. note::
+.. versionchanged:: 4.0
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin
-    startproject <startproject>` includes ``USE_L10N = True`` for convenience.
+    In older versions, the default value is ``False``.
+
+.. deprecated:: 4.0
+
+    This setting is deprecated. Starting with Django 5.0, localized formatting
+    of data will always be enabled. For example Django will display numbers and
+    dates using the format of the current locale.
 
 .. setting:: USE_THOUSAND_SEPARATOR
 

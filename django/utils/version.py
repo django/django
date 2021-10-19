@@ -70,7 +70,7 @@ def get_docs_version(version=None):
         return '%d.%d' % version[:2]
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def get_git_changeset():
     """Return a numeric identifier of the latest git changeset.
 
@@ -85,8 +85,7 @@ def get_git_changeset():
     repo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     git_log = subprocess.run(
         'git log --pretty=format:%ct --quiet -1 HEAD',
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-        shell=True, cwd=repo_dir, universal_newlines=True,
+        capture_output=True, shell=True, cwd=repo_dir, text=True,
     )
     timestamp = git_log.stdout
     tz = datetime.timezone.utc

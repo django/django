@@ -169,6 +169,16 @@ class SimpleTagTests(TagTestCase):
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.from_string('{% load custom %}{% simple_tag_without_context_parameter 123 %}')
 
+    def test_simple_tag_missing_context_no_params(self):
+        msg = (
+            "'simple_tag_takes_context_without_params' is decorated with "
+            "takes_context=True so it must have a first argument of 'context'"
+        )
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.from_string(
+                '{% load custom %}{% simple_tag_takes_context_without_params %}'
+            )
+
 
 class InclusionTagTests(TagTestCase):
 
@@ -255,6 +265,16 @@ class InclusionTagTests(TagTestCase):
         )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.from_string('{% load inclusion %}{% inclusion_tag_without_context_parameter 123 %}')
+
+    def test_include_tag_missing_context_no_params(self):
+        msg = (
+            "'inclusion_tag_takes_context_without_params' is decorated with "
+            "takes_context=True so it must have a first argument of 'context'"
+        )
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.from_string(
+                '{% load inclusion %}{% inclusion_tag_takes_context_without_params %}'
+            )
 
     def test_inclusion_tags_from_template(self):
         c = Context({'value': 42})

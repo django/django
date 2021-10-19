@@ -1,12 +1,12 @@
 import datetime
 import decimal
 import functools
-import hashlib
 import logging
 import time
 from contextlib import contextmanager
 
 from django.db import NotSupportedError
+from django.utils.crypto import md5
 
 logger = logging.getLogger('django.db.backends')
 
@@ -216,7 +216,7 @@ def names_digest(*args, length):
     Generate a 32-bit digest of a set of arguments that can be used to shorten
     identifying names.
     """
-    h = hashlib.md5()
+    h = md5(usedforsecurity=False)
     for arg in args:
         h.update(arg.encode())
     return h.hexdigest()[:length]

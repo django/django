@@ -20,7 +20,7 @@
 
 import os
 from argparse import ArgumentParser
-from subprocess import PIPE, run
+from subprocess import run
 
 import django
 from django.conf import settings
@@ -74,7 +74,7 @@ def _check_diff(cat_name, base_path):
     po_path = '%(path)s/en/LC_MESSAGES/django%(ext)s.po' % {
         'path': base_path, 'ext': 'js' if cat_name.endswith('-js') else ''}
     p = run("git diff -U0 %s | egrep '^[-+]msgid' | wc -l" % po_path,
-            stdout=PIPE, stderr=PIPE, shell=True)
+            capture_output=True, shell=True)
     num_changes = int(p.stdout.strip())
     print("%d changed/added messages in '%s' catalog." % (num_changes, cat_name))
 
@@ -123,7 +123,7 @@ def lang_stats(resources=None, languages=None):
             )
             p = run(
                 ['msgfmt', '-vc', '-o', '/dev/null', po_path],
-                stdout=PIPE, stderr=PIPE,
+                capture_output=True,
                 env={'LANG': 'C'},
                 encoding='utf-8',
             )

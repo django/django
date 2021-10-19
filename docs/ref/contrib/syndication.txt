@@ -906,11 +906,6 @@ This example illustrates all possible attributes and methods for a
 
         item_comments = 'https://www.example.com/comments' # Hard-coded comments URL
 
-.. versionchanged:: 3.2
-
-    Support for a comments URL per feed item was added through the
-    ``item_comments`` hook.
-
 The low-level framework
 =======================
 

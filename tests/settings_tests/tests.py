@@ -4,7 +4,10 @@ import unittest
 from types import ModuleType, SimpleNamespace
 from unittest import mock
 
-from django.conf import ENVIRONMENT_VARIABLE, LazySettings, Settings, settings
+from django.conf import (
+    ENVIRONMENT_VARIABLE, USE_DEPRECATED_PYTZ_DEPRECATED_MSG, LazySettings,
+    Settings, settings,
+)
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
 from django.test import (
@@ -248,19 +251,19 @@ class SettingsTests(SimpleTestCase):
         Allow deletion of a setting in an overridden settings set (#18824)
         """
         previous_i18n = settings.USE_I18N
-        previous_l10n = settings.USE_L10N
+        previous_tz = settings.USE_TZ
         with self.settings(USE_I18N=False):
             del settings.USE_I18N
             with self.assertRaises(AttributeError):
                 getattr(settings, 'USE_I18N')
             # Should also work for a non-overridden setting
-            del settings.USE_L10N
+            del settings.USE_TZ
             with self.assertRaises(AttributeError):
-                getattr(settings, 'USE_L10N')
+                getattr(settings, 'USE_TZ')
             self.assertNotIn('USE_I18N', dir(settings))
-            self.assertNotIn('USE_L10N', dir(settings))
+            self.assertNotIn('USE_TZ', dir(settings))
         self.assertEqual(settings.USE_I18N, previous_i18n)
-        self.assertEqual(settings.USE_L10N, previous_l10n)
+        self.assertEqual(settings.USE_TZ, previous_tz)
 
     def test_override_settings_nested(self):
         """
@@ -347,6 +350,21 @@ class SettingsTests(SimpleTestCase):
                 Settings('fake_settings_module')
         finally:
             del sys.modules['fake_settings_module']
+
+    def test_use_deprecated_pytz_deprecation(self):
+        settings_module = ModuleType('fake_settings_module')
+        settings_module.USE_DEPRECATED_PYTZ = True
+        settings_module.USE_TZ = True
+        sys.modules['fake_settings_module'] = settings_module
+        try:
+            with self.assertRaisesMessage(RemovedInDjango50Warning, USE_DEPRECATED_PYTZ_DEPRECATED_MSG):
+                Settings('fake_settings_module')
+        finally:
+            del sys.modules['fake_settings_module']
+
+        holder = LazySettings()
+        with self.assertRaisesMessage(RemovedInDjango50Warning, USE_DEPRECATED_PYTZ_DEPRECATED_MSG):
+            holder.configure(USE_DEPRECATED_PYTZ=True)
 
 
 class TestComplexSettingOverride(SimpleTestCase):

@@ -718,7 +718,10 @@ class BaseModelFormSet(BaseFormSet):
                         # poke error messages into the right places and mark
                         # the form as invalid
                         errors.append(self.get_unique_error_message(unique_check))
-                        form._errors[NON_FIELD_ERRORS] = self.error_class([self.get_form_error()])
+                        form._errors[NON_FIELD_ERRORS] = self.error_class(
+                            [self.get_form_error()],
+                            renderer=self.renderer,
+                        )
                         # remove the data from the cleaned_data dict since it was invalid
                         for field in unique_check:
                             if field in form.cleaned_data:
@@ -747,7 +750,10 @@ class BaseModelFormSet(BaseFormSet):
                         # poke error messages into the right places and mark
                         # the form as invalid
                         errors.append(self.get_date_error_message(date_check))
-                        form._errors[NON_FIELD_ERRORS] = self.error_class([self.get_form_error()])
+                        form._errors[NON_FIELD_ERRORS] = self.error_class(
+                            [self.get_form_error()],
+                            renderer=self.renderer,
+                        )
                         # remove the data from the cleaned_data dict since it was invalid
                         del form.cleaned_data[field]
                     # mark the data as seen
@@ -869,7 +875,7 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=None,
                          widgets=None, validate_max=False, localized_fields=None,
                          labels=None, help_texts=None, error_messages=None,
                          min_num=None, validate_min=False, field_classes=None,
-                         absolute_max=None, can_delete_extra=True):
+                         absolute_max=None, can_delete_extra=True, renderer=None):
     """Return a FormSet class for the given Django model class."""
     meta = getattr(form, 'Meta', None)
     if (getattr(meta, 'fields', fields) is None and
@@ -887,7 +893,8 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=None,
     FormSet = formset_factory(form, formset, extra=extra, min_num=min_num, max_num=max_num,
                               can_order=can_order, can_delete=can_delete,
                               validate_min=validate_min, validate_max=validate_max,
-                              absolute_max=absolute_max, can_delete_extra=can_delete_extra)
+                              absolute_max=absolute_max, can_delete_extra=can_delete_extra,
+                              renderer=renderer)
     FormSet.model = model
     return FormSet
 
@@ -1009,9 +1016,17 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
         fks_to_parent = [f for f in opts.fields if f.name == fk_name]
         if len(fks_to_parent) == 1:
             fk = fks_to_parent[0]
-            if not isinstance(fk, ForeignKey) or \
-                    (fk.remote_field.model != parent_model and
-                     fk.remote_field.model not in parent_model._meta.get_parent_list()):
+            parent_list = parent_model._meta.get_parent_list()
+            if not isinstance(fk, ForeignKey) or (
+                # ForeignKey to proxy models.
+                fk.remote_field.model._meta.proxy and
+                fk.remote_field.model._meta.proxy_for_model not in parent_list
+            ) or (
+                # ForeignKey to concrete models.
+                not fk.remote_field.model._meta.proxy and
+                fk.remote_field.model != parent_model and
+                fk.remote_field.model not in parent_list
+            ):
                 raise ValueError(
                     "fk_name '%s' is not a ForeignKey to '%s'." % (fk_name, parent_model._meta.label)
                 )
@@ -1021,11 +1036,15 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
             )
     else:
         # Try to discover what the ForeignKey from model to parent_model is
+        parent_list = parent_model._meta.get_parent_list()
         fks_to_parent = [
             f for f in opts.fields
             if isinstance(f, ForeignKey) and (
                 f.remote_field.model == parent_model or
-                f.remote_field.model in parent_model._meta.get_parent_list()
+                f.remote_field.model in parent_list or (
+                    f.remote_field.model._meta.proxy and
+                    f.remote_field.model._meta.proxy_for_model in parent_list
+                )
             )
         ]
         if len(fks_to_parent) == 1:
@@ -1057,7 +1076,7 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
                           widgets=None, validate_max=False, localized_fields=None,
                           labels=None, help_texts=None, error_messages=None,
                           min_num=None, validate_min=False, field_classes=None,
-                          absolute_max=None, can_delete_extra=True):
+                          absolute_max=None, can_delete_extra=True, renderer=None):
     """
     Return an ``InlineFormSet`` for the given kwargs.
 
@@ -1089,6 +1108,7 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
         'field_classes': field_classes,
         'absolute_max': absolute_max,
         'can_delete_extra': can_delete_extra,
+        'renderer': renderer,
     }
     FormSet = modelformset_factory(model, **kwargs)
     FormSet.fk = fk
@@ -1145,6 +1165,9 @@ class ModelChoiceIteratorValue:
 
     def __str__(self):
         return str(self.value)
+
+    def __hash__(self):
+        return hash(self.value)
 
     def __eq__(self, other):
         if isinstance(other, ModelChoiceIteratorValue):

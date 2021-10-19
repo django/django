@@ -151,6 +151,17 @@ simple_tag_without_context_parameter.anything = "Expected simple_tag_without_con
 
 
 @register.simple_tag(takes_context=True)
+def simple_tag_takes_context_without_params():
+    """Expected simple_tag_takes_context_without_params __doc__"""
+    return 'Expected result'
+
+
+simple_tag_takes_context_without_params.anything = (
+    'Expected simple_tag_takes_context_without_params __dict__'
+)
+
+
+@register.simple_tag(takes_context=True)
 def escape_naive(context):
     """A tag that doesn't even think about escaping issues"""
     return "Hello {}!".format(context['name'])

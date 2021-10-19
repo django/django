@@ -190,6 +190,15 @@ def replace_non_capturing_groups(pattern):
     return final_pattern + pattern[prev_end:]
 
 
+def replace_metacharacters(pattern):
+    """Remove unescaped metacharacters from the pattern."""
+    return re.sub(
+        r'((?:^|(?<!\\))(?:\\\\)*)(\\?)([?*+^$]|\\[bBAZ])',
+        lambda m: m[1] + m[3] if m[2] else m[1],
+        pattern,
+    )
+
+
 def replace_named_groups(pattern):
     r"""
     Find named groups in `pattern` and replace them with the group name. E.g.,

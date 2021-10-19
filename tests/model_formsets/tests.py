@@ -1994,3 +1994,22 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         self.assertEqual(len(formset), 2)
         self.assertNotIn('DELETE', formset.forms[0].fields)
         self.assertNotIn('DELETE', formset.forms[1].fields)
+
+    def test_inlineformset_factory_passes_renderer(self):
+        from django.forms.renderers import Jinja2
+        renderer = Jinja2()
+        BookFormSet = inlineformset_factory(
+            Author,
+            Book,
+            fields='__all__',
+            renderer=renderer,
+        )
+        formset = BookFormSet()
+        self.assertEqual(formset.renderer, renderer)
+
+    def test_modelformset_factory_passes_renderer(self):
+        from django.forms.renderers import Jinja2
+        renderer = Jinja2()
+        BookFormSet = modelformset_factory(Author, fields='__all__', renderer=renderer)
+        formset = BookFormSet()
+        self.assertEqual(formset.renderer, renderer)

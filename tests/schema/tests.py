@@ -741,6 +741,13 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.remove_field(Author, Author._meta.get_field('id'))
             editor.alter_field(Author, old_field, new_field, strict=True)
+        # Redundant unique constraint is not added.
+        count = self.get_constraints_count(
+            Author._meta.db_table,
+            Author._meta.get_field('uuid').column,
+            None,
+        )
+        self.assertLessEqual(count['uniques'], 1)
 
     @isolate_apps('schema')
     def test_alter_primary_key_quoted_db_table(self):
@@ -863,6 +870,27 @@ class SchemaTests(TransactionTestCase):
         with self.assertRaises(IntegrityError):
             Note.objects.create(info=None)
 
+    @skipUnlessDBFeature('interprets_empty_strings_as_nulls')
+    def test_alter_textual_field_not_null_to_null(self):
+        """
+        Nullability for textual fields is preserved on databases that
+        interpret empty strings as NULLs.
+        """
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        columns = self.column_classes(Author)
+        # Field is nullable.
+        self.assertTrue(columns['uuid'][1][6])
+        # Change to NOT NULL.
+        old_field = Author._meta.get_field('uuid')
+        new_field = SlugField(null=False, blank=True)
+        new_field.set_attributes_from_name('uuid')
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+        columns = self.column_classes(Author)
+        # Nullability is preserved.
+        self.assertTrue(columns['uuid'][1][6])
+
     def test_alter_numeric_field_keep_null_status(self):
         """
         Changing a field type shouldn't affect the not null status.
@@ -910,7 +938,7 @@ class SchemaTests(TransactionTestCase):
     def test_alter_charfield_to_null(self):
         """
         #24307 - Should skip an alter statement on databases with
-        interprets_empty_strings_as_null when changing a CharField to null.
+        interprets_empty_strings_as_nulls when changing a CharField to null.
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -1008,7 +1036,7 @@ class SchemaTests(TransactionTestCase):
     def test_alter_textfield_to_null(self):
         """
         #24307 - Should skip an alter statement on databases with
-        interprets_empty_strings_as_null when changing a TextField to null.
+        interprets_empty_strings_as_nulls when changing a TextField to null.
         """
         # Create the table
         with connection.schema_editor() as editor:

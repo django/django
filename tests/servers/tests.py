@@ -173,7 +173,7 @@ class LiveServerViews(LiveServerBase):
 
     def test_closes_connection_without_content_length(self):
         """
-        A HTTP 1.1 server is supposed to support keep-alive. Since our
+        An HTTP 1.1 server is supposed to support keep-alive. Since our
         development server is rather simple we support it only in cases where
         we can detect a content length from the response. This should be doable
         for all simple views and streaming responses where an iterable with

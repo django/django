@@ -1,11 +1,10 @@
 from django.core.exceptions import ValidationError
 from django.forms import Form
 from django.forms.fields import BooleanField, IntegerField
-from django.forms.utils import ErrorList
+from django.forms.renderers import get_default_renderer
+from django.forms.utils import ErrorList, RenderableFormMixin
 from django.forms.widgets import CheckboxInput, HiddenInput, NumberInput
 from django.utils.functional import cached_property
-from django.utils.html import html_safe
-from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _, ngettext
 
 __all__ = ('BaseFormSet', 'formset_factory', 'all_valid')
@@ -50,8 +49,7 @@ class ManagementForm(Form):
         return cleaned_data
 
 
-@html_safe
-class BaseFormSet:
+class BaseFormSet(RenderableFormMixin):
     """
     A collection of instances of the same Form class.
     """
@@ -63,6 +61,10 @@ class BaseFormSet:
             '%(field_names)s. You may need to file a bug report if the issue persists.'
         ),
     }
+    template_name = 'django/forms/formsets/default.html'
+    template_name_p = 'django/forms/formsets/p.html'
+    template_name_table = 'django/forms/formsets/table.html'
+    template_name_ul = 'django/forms/formsets/ul.html'
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, form_kwargs=None,
@@ -84,9 +86,6 @@ class BaseFormSet:
         if error_messages is not None:
             messages.update(error_messages)
         self.error_messages = messages
-
-    def __str__(self):
-        return self.as_table()
 
     def __iter__(self):
         """Yield the forms in the order they should be rendered."""
@@ -110,15 +109,20 @@ class BaseFormSet:
     def management_form(self):
         """Return the ManagementForm instance for this FormSet."""
         if self.is_bound:
-            form = ManagementForm(self.data, auto_id=self.auto_id, prefix=self.prefix)
+            form = ManagementForm(self.data, auto_id=self.auto_id, prefix=self.prefix, renderer=self.renderer)
             form.full_clean()
         else:
-            form = ManagementForm(auto_id=self.auto_id, prefix=self.prefix, initial={
-                TOTAL_FORM_COUNT: self.total_form_count(),
-                INITIAL_FORM_COUNT: self.initial_form_count(),
-                MIN_NUM_FORM_COUNT: self.min_num,
-                MAX_NUM_FORM_COUNT: self.max_num
-            })
+            form = ManagementForm(
+                auto_id=self.auto_id,
+                prefix=self.prefix,
+                initial={
+                    TOTAL_FORM_COUNT: self.total_form_count(),
+                    INITIAL_FORM_COUNT: self.initial_form_count(),
+                    MIN_NUM_FORM_COUNT: self.min_num,
+                    MAX_NUM_FORM_COUNT: self.max_num,
+                },
+                renderer=self.renderer,
+            )
         return form
 
     def total_form_count(self):
@@ -177,6 +181,7 @@ class BaseFormSet:
             # incorrect validation for extra, optional, and deleted
             # forms in the formset.
             'use_required_attribute': False,
+            'renderer': self.renderer,
         }
         if self.is_bound:
             defaults['data'] = self.data
@@ -212,7 +217,8 @@ class BaseFormSet:
             prefix=self.add_prefix('__prefix__'),
             empty_permitted=True,
             use_required_attribute=False,
-            **self.get_form_kwargs(None)
+            **self.get_form_kwargs(None),
+            renderer=self.renderer,
         )
         self.add_fields(form, None)
         return form
@@ -338,7 +344,7 @@ class BaseFormSet:
         self._non_form_errors.
         """
         self._errors = []
-        self._non_form_errors = self.error_class(error_class='nonform')
+        self._non_form_errors = self.error_class(error_class='nonform', renderer=self.renderer)
         empty_forms_count = 0
 
         if not self.is_bound:  # Stop further processing.
@@ -387,7 +393,8 @@ class BaseFormSet:
         except ValidationError as e:
             self._non_form_errors = self.error_class(
                 e.error_list,
-                error_class='nonform'
+                error_class='nonform',
+                renderer=self.renderer,
             )
 
     def clean(self):
@@ -450,29 +457,14 @@ class BaseFormSet:
         else:
             return self.empty_form.media
 
-    def as_table(self):
-        "Return this formset rendered as HTML <tr>s -- excluding the <table></table>."
-        # XXX: there is no semantic division between forms here, there
-        # probably should be. It might make sense to render each form as a
-        # table row with each field as a td.
-        forms = ' '.join(form.as_table() for form in self)
-        return mark_safe(str(self.management_form) + '\n' + forms)
-
-    def as_p(self):
-        "Return this formset rendered as HTML <p>s."
-        forms = ' '.join(form.as_p() for form in self)
-        return mark_safe(str(self.management_form) + '\n' + forms)
-
-    def as_ul(self):
-        "Return this formset rendered as HTML <li>s."
-        forms = ' '.join(form.as_ul() for form in self)
-        return mark_safe(str(self.management_form) + '\n' + forms)
+    def get_context(self):
+        return {'formset': self}
 
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
                     can_delete=False, max_num=None, validate_max=False,
                     min_num=None, validate_min=False, absolute_max=None,
-                    can_delete_extra=True):
+                    can_delete_extra=True, renderer=None):
     """Return a FormSet for the given form class."""
     if min_num is None:
         min_num = DEFAULT_MIN_NUM
@@ -498,6 +490,7 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
         'absolute_max': absolute_max,
         'validate_min': validate_min,
         'validate_max': validate_max,
+        'renderer': renderer or get_default_renderer(),
     }
     return type(form.__name__ + 'FormSet', (formset,), attrs)
 

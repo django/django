@@ -178,6 +178,7 @@ flatpage
 flatpages
 Flatpages
 fooapp
+formatter
 formatters
 formfield
 formset
@@ -196,6 +197,7 @@ geospatial
 Gettext
 GiB
 gis
+GiST
 Googol
 Greenhill
 gunicorn
@@ -423,6 +425,7 @@ recomputation
 recursed
 redeclare
 redirections
+redis
 redisplay
 redisplayed
 redisplaying

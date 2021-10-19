@@ -89,7 +89,8 @@ class ViewTest(SimpleTestCase):
 
     def test_pathological_http_method(self):
         """
-        The edge case of a http request that spoofs an existing method name is caught.
+        The edge case of an http request that spoofs an existing method name is
+        caught.
         """
         self.assertEqual(SimpleView.as_view()(
             self.rf.get('/', REQUEST_METHOD='DISPATCH')
@@ -140,7 +141,7 @@ class ViewTest(SimpleTestCase):
     def test_invalid_keyword_argument(self):
         """
         View arguments must be predefined on the class and can't
-        be named like a HTTP method.
+        be named like an HTTP method.
         """
         msg = (
             'The method name %s is not accepted as a keyword argument to '

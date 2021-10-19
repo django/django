@@ -1,12 +1,10 @@
 import ipaddress
 import re
-import warnings
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
-from django.utils.deprecation import RemovedInDjango41Warning
 from django.utils.encoding import punycode
 from django.utils.ipv6 import is_valid_ipv6_address
 from django.utils.regex_helper import _lazy_re_compile
@@ -174,34 +172,7 @@ class EmailValidator:
         re.IGNORECASE)
     domain_allowlist = ['localhost']
 
-    @property
-    def domain_whitelist(self):
-        warnings.warn(
-            'The domain_whitelist attribute is deprecated in favor of '
-            'domain_allowlist.',
-            RemovedInDjango41Warning,
-            stacklevel=2,
-        )
-        return self.domain_allowlist
-
-    @domain_whitelist.setter
-    def domain_whitelist(self, allowlist):
-        warnings.warn(
-            'The domain_whitelist attribute is deprecated in favor of '
-            'domain_allowlist.',
-            RemovedInDjango41Warning,
-            stacklevel=2,
-        )
-        self.domain_allowlist = allowlist
-
-    def __init__(self, message=None, code=None, allowlist=None, *, whitelist=None):
-        if whitelist is not None:
-            allowlist = whitelist
-            warnings.warn(
-                'The whitelist argument is deprecated in favor of allowlist.',
-                RemovedInDjango41Warning,
-                stacklevel=2,
-            )
+    def __init__(self, message=None, code=None, allowlist=None):
         if message is not None:
             self.message = message
         if code is not None:

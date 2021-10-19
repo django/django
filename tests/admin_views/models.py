@@ -1046,3 +1046,13 @@ class ReadOnlyRelatedField(models.Model):
     chapter = models.ForeignKey(Chapter, models.CASCADE)
     language = models.ForeignKey(Language, models.CASCADE)
     user = models.ForeignKey(User, models.CASCADE)
+
+
+class Héllo(models.Model):
+    pass
+
+
+class Box(models.Model):
+    title = models.CharField(max_length=100)
+    next_box = models.ForeignKey("self", null=True, on_delete=models.SET_NULL, blank=True)
+    next_box = models.ForeignKey("self", null=True, on_delete=models.SET_NULL, blank=True)

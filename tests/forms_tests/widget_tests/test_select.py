@@ -220,7 +220,7 @@ class SelectTest(WidgetTest):
             </select>"""
         ))
 
-    @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
+    @override_settings(USE_THOUSAND_SEPARATOR=True)
     def test_doesnt_localize_option_value(self):
         choices = [
             (1, 'One'),

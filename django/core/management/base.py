@@ -2,9 +2,9 @@
 Base classes for writing management commands (named commands which can
 be executed through ``django-admin`` or ``manage.py``).
 """
+import argparse
 import os
 import sys
-import warnings
 from argparse import ArgumentParser, HelpFormatter
 from io import TextIOBase
 
@@ -13,7 +13,6 @@ from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
 from django.db import DEFAULT_DB_ALIAS, connections
-from django.utils.deprecation import RemovedInDjango41Warning
 
 ALL_CHECKS = '__all__'
 
@@ -239,6 +238,7 @@ class BaseCommand:
     base_stealth_options = ('stderr', 'stdout')
     # Command-specific options not defined by the argument parser.
     stealth_options = ()
+    suppressed_base_arguments = set()
 
     def __init__(self, stdout=None, stderr=None, no_color=False, force_color=False):
         self.stdout = OutputWrapper(stdout or sys.stdout)
@@ -250,14 +250,6 @@ class BaseCommand:
         else:
             self.style = color_style(force_color)
             self.stderr.style_func = self.style.ERROR
-        if self.requires_system_checks in [False, True]:
-            warnings.warn(
-                "Using a boolean value for requires_system_checks is "
-                "deprecated. Use '__all__' instead of True, and [] (an empty "
-                "list) instead of False.",
-                RemovedInDjango41Warning,
-            )
-            self.requires_system_checks = ALL_CHECKS if self.requires_system_checks else []
         if (
             not isinstance(self.requires_system_checks, (list, tuple)) and
             self.requires_system_checks != ALL_CHECKS
@@ -285,31 +277,37 @@ class BaseCommand:
             called_from_command_line=getattr(self, '_called_from_command_line', None),
             **kwargs
         )
-        parser.add_argument('--version', action='version', version=self.get_version())
-        parser.add_argument(
-            '-v', '--verbosity', default=1,
+        self.add_base_argument(
+            parser, '--version', action='version', version=self.get_version(),
+            help="Show program's version number and exit.",
+        )
+        self.add_base_argument(
+            parser, '-v', '--verbosity', default=1,
             type=int, choices=[0, 1, 2, 3],
             help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output',
         )
-        parser.add_argument(
-            '--settings',
+        self.add_base_argument(
+            parser, '--settings',
             help=(
                 'The Python path to a settings module, e.g. '
                 '"myproject.settings.main". If this isn\'t provided, the '
                 'DJANGO_SETTINGS_MODULE environment variable will be used.'
             ),
         )
-        parser.add_argument(
-            '--pythonpath',
+        self.add_base_argument(
+            parser, '--pythonpath',
             help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".',
         )
-        parser.add_argument('--traceback', action='store_true', help='Raise on CommandError exceptions')
-        parser.add_argument(
-            '--no-color', action='store_true',
+        self.add_base_argument(
+            parser, '--traceback', action='store_true',
+            help='Raise on CommandError exceptions.',
+        )
+        self.add_base_argument(
+            parser, '--no-color', action='store_true',
             help="Don't colorize the command output.",
         )
-        parser.add_argument(
-            '--force-color', action='store_true',
+        self.add_base_argument(
+            parser, '--force-color', action='store_true',
             help='Force colorization of the command output.',
         )
         if self.requires_system_checks:
@@ -325,6 +323,17 @@ class BaseCommand:
         Entry point for subclassed commands to add custom arguments.
         """
         pass
+
+    def add_base_argument(self, parser, *args, **kwargs):
+        """
+        Call the parser's add_argument() method, suppressing the help text
+        according to BaseCommand.suppressed_base_arguments.
+        """
+        for arg in args:
+            if arg in self.suppressed_base_arguments:
+                kwargs['help'] = argparse.SUPPRESS
+                break
+        parser.add_argument(*args, **kwargs)
 
     def print_help(self, prog_name, subcommand):
         """

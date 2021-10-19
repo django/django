@@ -146,6 +146,9 @@ documentation:
 
 * **email** -- no hyphen.
 
+* **HTTP** -- the expected pronunciation is "Aitch Tee Tee Pee" and therefore
+  should be preceded by "an" and not "a".
+
 * **MySQL**, **PostgreSQL**, **SQLite**
 
 * **SQL** -- when referring to SQL, the expected pronunciation should be

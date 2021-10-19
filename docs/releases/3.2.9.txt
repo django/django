@@ -1,0 +1,14 @@
+==========================
+Django 3.2.9 release notes
+==========================
+
+*Expected November 1, 2021*
+
+Django 3.2.9 fixes several bugs in 3.2.8 and adds compatibility with Python
+3.10.
+
+Bugfixes
+========
+
+* Fixed a bug in Django 3.2 that caused a migration crash on SQLite when
+  altering a field with a functional index (:ticket:`33194`).

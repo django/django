@@ -335,7 +335,7 @@ class MigrationLoader:
 
         See graph.make_state() for the meaning of "nodes" and "at_end".
         """
-        return self.graph.make_state(nodes=nodes, at_end=at_end, real_apps=list(self.unmigrated_apps))
+        return self.graph.make_state(nodes=nodes, at_end=at_end, real_apps=self.unmigrated_apps)
 
     def collect_sql(self, plan):
         """

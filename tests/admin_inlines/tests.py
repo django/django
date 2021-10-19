@@ -8,11 +8,12 @@ from django.urls import reverse
 
 from .admin import InnerInline, site as admin_site
 from .models import (
-    Author, BinaryTree, Book, Chapter, Child, ChildModel1, ChildModel2,
-    Fashionista, FootNote, Holder, Holder2, Holder3, Holder4, Inner, Inner2,
-    Inner3, Inner4Stacked, Inner4Tabular, Novel, OutfitItem, Parent,
-    ParentModelWithCustomPk, Person, Poll, Profile, ProfileCollection,
-    Question, Sighting, SomeChildModel, SomeParentModel, Teacher,
+    Author, BinaryTree, Book, BothVerboseNameProfile, Chapter, Child,
+    ChildModel1, ChildModel2, Fashionista, FootNote, Holder, Holder2, Holder3,
+    Holder4, Inner, Inner2, Inner3, Inner4Stacked, Inner4Tabular, Novel,
+    OutfitItem, Parent, ParentModelWithCustomPk, Person, Poll, Profile,
+    ProfileCollection, Question, ShowInlineParent, Sighting, SomeChildModel,
+    SomeParentModel, Teacher, VerboseNamePluralProfile, VerboseNameProfile,
 )
 
 INLINE_CHANGELINK_HTML = 'class="inlinechangelink">Change</a>'
@@ -34,6 +35,26 @@ class TestInline(TestDataMixin, TestCase):
         super().setUpTestData()
         cls.holder = Holder.objects.create(dummy=13)
         Inner.objects.create(dummy=42, holder=cls.holder)
+
+        cls.parent = SomeParentModel.objects.create(name='a')
+        SomeChildModel.objects.create(name='b', position='0', parent=cls.parent)
+        SomeChildModel.objects.create(name='c', position='1', parent=cls.parent)
+
+        cls.view_only_user = User.objects.create_user(
+            username='user', password='pwd', is_staff=True,
+        )
+        parent_ct = ContentType.objects.get_for_model(SomeParentModel)
+        child_ct = ContentType.objects.get_for_model(SomeChildModel)
+        permission = Permission.objects.get(
+            codename='view_someparentmodel',
+            content_type=parent_ct,
+        )
+        cls.view_only_user.user_permissions.add(permission)
+        permission = Permission.objects.get(
+            codename='view_somechildmodel',
+            content_type=child_ct,
+        )
+        cls.view_only_user.user_permissions.add(permission)
 
     def setUp(self):
         self.client.force_login(self.superuser)
@@ -226,6 +247,113 @@ class TestInline(TestDataMixin, TestCase):
             response.rendered_content,
         )
 
+    def test_tabular_inline_hidden_field_with_view_only_permissions(self):
+        """
+        Content of hidden field is not visible in tabular inline when user has
+        view-only permission.
+        """
+        self.client.force_login(self.view_only_user)
+        url = reverse(
+            'tabular_inline_hidden_field_admin:admin_inlines_someparentmodel_change',
+            args=(self.parent.pk,),
+        )
+        response = self.client.get(url)
+        self.assertInHTML('<th class="column-position hidden">Position</th>', response.rendered_content)
+        self.assertInHTML('<td class="field-position hidden"><p>0</p></td>', response.rendered_content)
+        self.assertInHTML('<td class="field-position hidden"><p>1</p></td>', response.rendered_content)
+
+    def test_stacked_inline_hidden_field_with_view_only_permissions(self):
+        """
+        Content of hidden field is not visible in stacked inline when user has
+        view-only permission.
+        """
+        self.client.force_login(self.view_only_user)
+        url = reverse(
+            'stacked_inline_hidden_field_in_group_admin:admin_inlines_someparentmodel_change',
+            args=(self.parent.pk,),
+        )
+        response = self.client.get(url)
+        # The whole line containing name + position fields is not hidden.
+        self.assertContains(response, '<div class="form-row field-name field-position">')
+        # The div containing the position field is hidden.
+        self.assertInHTML(
+            '<div class="fieldBox field-position hidden">'
+            '<label class="inline">Position:</label>'
+            '<div class="readonly">0</div></div>',
+            response.rendered_content,
+        )
+        self.assertInHTML(
+            '<div class="fieldBox field-position hidden">'
+            '<label class="inline">Position:</label>'
+            '<div class="readonly">1</div></div>',
+            response.rendered_content,
+        )
+
+    def test_stacked_inline_single_hidden_field_in_line_with_view_only_permissions(self):
+        """
+        Content of hidden field is not visible in stacked inline when user has
+        view-only permission and the field is grouped on a separate line.
+        """
+        self.client.force_login(self.view_only_user)
+        url = reverse(
+            'stacked_inline_hidden_field_on_single_line_admin:admin_inlines_someparentmodel_change',
+            args=(self.parent.pk,),
+        )
+        response = self.client.get(url)
+        # The whole line containing position field is hidden.
+        self.assertInHTML(
+            '<div class="form-row hidden field-position">'
+            '<div><label>Position:</label>'
+            '<div class="readonly">0</div></div></div>',
+            response.rendered_content,
+        )
+        self.assertInHTML(
+            '<div class="form-row hidden field-position">'
+            '<div><label>Position:</label>'
+            '<div class="readonly">1</div></div></div>',
+            response.rendered_content,
+        )
+
+    def test_tabular_inline_with_hidden_field_non_field_errors_has_correct_colspan(self):
+        """
+        In tabular inlines, when a form has non-field errors, those errors
+        are rendered in a table line with a single cell spanning the whole
+        table width. Colspan must be equal to the number of visible columns.
+        """
+        parent = SomeParentModel.objects.create(name='a')
+        child = SomeChildModel.objects.create(name='b', position='0', parent=parent)
+        url = reverse(
+            'tabular_inline_hidden_field_admin:admin_inlines_someparentmodel_change',
+            args=(parent.id,),
+        )
+        data = {
+            'name': parent.name,
+            'somechildmodel_set-TOTAL_FORMS': 1,
+            'somechildmodel_set-INITIAL_FORMS': 1,
+            'somechildmodel_set-MIN_NUM_FORMS': 0,
+            'somechildmodel_set-MAX_NUM_FORMS': 1000,
+            '_save': 'Save',
+            'somechildmodel_set-0-id': child.id,
+            'somechildmodel_set-0-parent': parent.id,
+            'somechildmodel_set-0-name': child.name,
+            'somechildmodel_set-0-position': 1,
+        }
+        response = self.client.post(url, data)
+        # Form has 3 visible columns and 1 hidden column.
+        self.assertInHTML(
+            '<thead><tr><th class="original"></th>'
+            '<th class="column-name required">Name</th>'
+            '<th class="column-position required hidden">Position</th>'
+            '<th>Delete?</th></tr></thead>',
+            response.rendered_content,
+        )
+        # The non-field error must be spanned on 3 (visible) columns.
+        self.assertInHTML(
+            '<tr class="row-form-errors"><td colspan="3">'
+            '<ul class="errorlist nonfield"><li>A non-field error</li></ul></td></tr>',
+            response.rendered_content,
+        )
+
     def test_non_related_name_inline(self):
         """
         Multiple inlines with related_name='+' have correct form prefixes.
@@ -254,7 +382,7 @@ class TestInline(TestDataMixin, TestCase):
             html=True
         )
 
-    @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
+    @override_settings(USE_THOUSAND_SEPARATOR=True)
     def test_localize_pk_shortcut(self):
         """
         The "View on Site" link is correct for locales that use thousand
@@ -489,6 +617,21 @@ class TestInline(TestDataMixin, TestCase):
         response = self.client.get(reverse('admin:admin_inlines_person_add'))
         self.assertContains(response, '<h2>Author</h2>', html=True)  # Tabular.
         self.assertContains(response, '<h2>Fashionista</h2>', html=True)  # Stacked.
+
+    def test_inlines_based_on_model_state(self):
+        parent = ShowInlineParent.objects.create(show_inlines=False)
+        data = {
+            'show_inlines': 'on',
+            '_save': 'Save',
+        }
+        change_url = reverse(
+            'admin:admin_inlines_showinlineparent_change',
+            args=(parent.id,),
+        )
+        response = self.client.post(change_url, data)
+        self.assertEqual(response.status_code, 302)
+        parent.refresh_from_db()
+        self.assertIs(parent.show_inlines, True)
 
 
 @override_settings(ROOT_URLCONF='admin_inlines.urls')
@@ -963,6 +1106,164 @@ class TestReadOnlyChangeViewInlinePermissions(TestCase):
 
 
 @override_settings(ROOT_URLCONF='admin_inlines.urls')
+class TestVerboseNameInlineForms(TestDataMixin, TestCase):
+    factory = RequestFactory()
+
+    def test_verbose_name_inline(self):
+        class NonVerboseProfileInline(TabularInline):
+            model = Profile
+            verbose_name = 'Non-verbose childs'
+
+        class VerboseNameProfileInline(TabularInline):
+            model = VerboseNameProfile
+            verbose_name = 'Childs with verbose name'
+
+        class VerboseNamePluralProfileInline(TabularInline):
+            model = VerboseNamePluralProfile
+            verbose_name = 'Childs with verbose name plural'
+
+        class BothVerboseNameProfileInline(TabularInline):
+            model = BothVerboseNameProfile
+            verbose_name = 'Childs with both verbose names'
+
+        modeladmin = ModelAdmin(ProfileCollection, admin_site)
+        modeladmin.inlines = [
+            NonVerboseProfileInline,
+            VerboseNameProfileInline,
+            VerboseNamePluralProfileInline,
+            BothVerboseNameProfileInline,
+        ]
+        obj = ProfileCollection.objects.create()
+        url = reverse('admin:admin_inlines_profilecollection_change', args=(obj.pk,))
+        request = self.factory.get(url)
+        request.user = self.superuser
+        response = modeladmin.changeform_view(request)
+        self.assertNotContains(response, 'Add another Profile')
+        # Non-verbose model.
+        self.assertContains(response, '<h2>Non-verbose childss</h2>')
+        self.assertContains(response, 'Add another Non-verbose child')
+        self.assertNotContains(response, '<h2>Profiles</h2>')
+        # Model with verbose name.
+        self.assertContains(response, '<h2>Childs with verbose names</h2>')
+        self.assertContains(response, 'Add another Childs with verbose name')
+        self.assertNotContains(response, '<h2>Model with verbose name onlys</h2>')
+        self.assertNotContains(response, 'Add another Model with verbose name only')
+        # Model with verbose name plural.
+        self.assertContains(response, '<h2>Childs with verbose name plurals</h2>')
+        self.assertContains(response, 'Add another Childs with verbose name plural')
+        self.assertNotContains(response, '<h2>Model with verbose name plural only</h2>')
+        # Model with both verbose names.
+        self.assertContains(response, '<h2>Childs with both verbose namess</h2>')
+        self.assertContains(response, 'Add another Childs with both verbose names')
+        self.assertNotContains(response, '<h2>Model with both - plural name</h2>')
+        self.assertNotContains(response, 'Add another Model with both - name')
+
+    def test_verbose_name_plural_inline(self):
+        class NonVerboseProfileInline(TabularInline):
+            model = Profile
+            verbose_name_plural = 'Non-verbose childs'
+
+        class VerboseNameProfileInline(TabularInline):
+            model = VerboseNameProfile
+            verbose_name_plural = 'Childs with verbose name'
+
+        class VerboseNamePluralProfileInline(TabularInline):
+            model = VerboseNamePluralProfile
+            verbose_name_plural = 'Childs with verbose name plural'
+
+        class BothVerboseNameProfileInline(TabularInline):
+            model = BothVerboseNameProfile
+            verbose_name_plural = 'Childs with both verbose names'
+
+        modeladmin = ModelAdmin(ProfileCollection, admin_site)
+        modeladmin.inlines = [
+            NonVerboseProfileInline,
+            VerboseNameProfileInline,
+            VerboseNamePluralProfileInline,
+            BothVerboseNameProfileInline,
+        ]
+        obj = ProfileCollection.objects.create()
+        url = reverse('admin:admin_inlines_profilecollection_change', args=(obj.pk,))
+        request = self.factory.get(url)
+        request.user = self.superuser
+        response = modeladmin.changeform_view(request)
+        # Non-verbose model.
+        self.assertContains(response, '<h2>Non-verbose childs</h2>')
+        self.assertContains(response, 'Add another Profile')
+        self.assertNotContains(response, '<h2>Profiles</h2>')
+        # Model with verbose name.
+        self.assertContains(response, '<h2>Childs with verbose name</h2>')
+        self.assertContains(response, 'Add another Model with verbose name only')
+        self.assertNotContains(response, '<h2>Model with verbose name onlys</h2>')
+        # Model with verbose name plural.
+        self.assertContains(response, '<h2>Childs with verbose name plural</h2>')
+        self.assertContains(response, 'Add another Profile')
+        self.assertNotContains(response, '<h2>Model with verbose name plural only</h2>')
+        # Model with both verbose names.
+        self.assertContains(response, '<h2>Childs with both verbose names</h2>')
+        self.assertContains(response, 'Add another Model with both - name')
+        self.assertNotContains(response, '<h2>Model with both - plural name</h2>')
+
+    def test_both_verbose_names_inline(self):
+        class NonVerboseProfileInline(TabularInline):
+            model = Profile
+            verbose_name = 'Non-verbose childs - name'
+            verbose_name_plural = 'Non-verbose childs - plural name'
+
+        class VerboseNameProfileInline(TabularInline):
+            model = VerboseNameProfile
+            verbose_name = 'Childs with verbose name - name'
+            verbose_name_plural = 'Childs with verbose name - plural name'
+
+        class VerboseNamePluralProfileInline(TabularInline):
+            model = VerboseNamePluralProfile
+            verbose_name = 'Childs with verbose name plural - name'
+            verbose_name_plural = 'Childs with verbose name plural - plural name'
+
+        class BothVerboseNameProfileInline(TabularInline):
+            model = BothVerboseNameProfile
+            verbose_name = 'Childs with both - name'
+            verbose_name_plural = 'Childs with both - plural name'
+
+        modeladmin = ModelAdmin(ProfileCollection, admin_site)
+        modeladmin.inlines = [
+            NonVerboseProfileInline,
+            VerboseNameProfileInline,
+            VerboseNamePluralProfileInline,
+            BothVerboseNameProfileInline,
+        ]
+        obj = ProfileCollection.objects.create()
+        url = reverse('admin:admin_inlines_profilecollection_change', args=(obj.pk,))
+        request = self.factory.get(url)
+        request.user = self.superuser
+        response = modeladmin.changeform_view(request)
+        self.assertNotContains(response, 'Add another Profile')
+        # Non-verbose model.
+        self.assertContains(response, '<h2>Non-verbose childs - plural name</h2>')
+        self.assertContains(response, 'Add another Non-verbose childs - name')
+        self.assertNotContains(response, '<h2>Profiles</h2>')
+        # Model with verbose name.
+        self.assertContains(response, '<h2>Childs with verbose name - plural name</h2>')
+        self.assertContains(response, 'Add another Childs with verbose name - name')
+        self.assertNotContains(response, '<h2>Model with verbose name onlys</h2>')
+        # Model with verbose name plural.
+        self.assertContains(
+            response,
+            '<h2>Childs with verbose name plural - plural name</h2>',
+        )
+        self.assertContains(
+            response,
+            'Add another Childs with verbose name plural - name',
+        )
+        self.assertNotContains(response, '<h2>Model with verbose name plural only</h2>')
+        # Model with both verbose names.
+        self.assertContains(response, '<h2>Childs with both - plural name</h2>')
+        self.assertContains(response, 'Add another Childs with both - name')
+        self.assertNotContains(response, '<h2>Model with both - plural name</h2>')
+        self.assertNotContains(response, 'Add another Model with both - name')
+
+
+@override_settings(ROOT_URLCONF='admin_inlines.urls')
 class SeleniumTests(AdminSeleniumTestCase):
 
     available_apps = ['admin_inlines'] + AdminSeleniumTestCase.available_apps
@@ -1343,13 +1644,15 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.selenium.execute_script('window.scrollTo(0, %s);' % hide_link.location['y'])
             hide_link.click()
             self.wait_until_invisible(field_name)
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-        self.assertEqual(
-            len(self.selenium.find_elements_by_css_selector(stacked_inline_formset_selector + '.collapsed')), 0
-        )
-        self.assertEqual(
-            len(self.selenium.find_elements_by_css_selector(tabular_inline_formset_selector + '.collapsed')), 0
-        )
+        with self.wait_page_loaded():
+            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        with self.disable_implicit_wait():
+            self.assertEqual(
+                len(self.selenium.find_elements_by_css_selector(stacked_inline_formset_selector + '.collapsed')), 0
+            )
+            self.assertEqual(
+                len(self.selenium.find_elements_by_css_selector(tabular_inline_formset_selector + '.collapsed')), 0
+            )
         self.assertEqual(
             len(self.selenium.find_elements_by_css_selector(stacked_inline_formset_selector)), 1
         )

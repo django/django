@@ -8,31 +8,26 @@ class DummyCache(BaseCache):
         super().__init__(*args, **kwargs)
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        self.make_and_validate_key(key, version=version)
         return True
 
     def get(self, key, default=None, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        self.make_and_validate_key(key, version=version)
         return default
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        self.make_and_validate_key(key, version=version)
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
-        self.validate_key(key)
+        self.make_and_validate_key(key, version=version)
         return False
 
     def delete(self, key, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        self.make_and_validate_key(key, version=version)
         return False
 
     def has_key(self, key, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        self.make_and_validate_key(key, version=version)
         return False
 
     def clear(self):

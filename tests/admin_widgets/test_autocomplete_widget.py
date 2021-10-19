@@ -72,7 +72,8 @@ class AutocompleteMixinTests(TestCase):
             'data-app-label': 'admin_widgets',
             'data-field-name': 'band',
             'data-model-name': 'album',
-            'data-placeholder': ''
+            'data-placeholder': '',
+            'lang': 'en',
         })
 
     def test_build_attrs_no_custom_class(self):

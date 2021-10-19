@@ -75,12 +75,10 @@ Methods
 
     Returns a :class:`Page` object with the given 1-based index. Raises
     :exc:`PageNotAnInteger` if the ``number`` cannot be converted to an integer
-    by calling ``int()``. Raises :exc:`InvalidPage` if the given page number
+    by calling ``int()``. Raises :exc:`EmptyPage` if the given page number
     doesn't exist.
 
 .. method:: Paginator.get_elided_page_range(number, *, on_each_side=3, on_ends=2)
-
-    .. versionadded:: 3.2
 
     Returns a 1-based list of page numbers similar to
     :attr:`Paginator.page_range`, but may add an ellipsis to either or both
@@ -105,8 +103,6 @@ Attributes
 ----------
 
 .. attribute:: Paginator.ELLIPSIS
-
-    .. versionadded:: 3.2
 
     A translatable string used as a substitute for elided page numbers in the
     page range returned by :meth:`~Paginator.get_elided_page_range`. Default is

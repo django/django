@@ -1429,6 +1429,25 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertIsNone(g.normalize())
         self.assertTrue(g.equals_exact(MultiPoint(Point(2, 2), Point(1, 1), Point(0, 0))))
 
+    @skipIf(geos_version_tuple() < (3, 8), 'GEOS >= 3.8.0 is required')
+    def test_make_valid(self):
+        poly = GEOSGeometry('POLYGON((0 0, 0 23, 23 0, 23 23, 0 0))')
+        self.assertIs(poly.valid, False)
+        valid_poly = poly.make_valid()
+        self.assertIs(valid_poly.valid, True)
+        self.assertNotEqual(valid_poly, poly)
+
+        valid_poly2 = valid_poly.make_valid()
+        self.assertIs(valid_poly2.valid, True)
+        self.assertEqual(valid_poly, valid_poly2)
+
+    @mock.patch('django.contrib.gis.geos.libgeos.geos_version', lambda: b'3.7.3')
+    def test_make_valid_geos_version(self):
+        msg = 'GEOSGeometry.make_valid() requires GEOS >= 3.8.0.'
+        poly = GEOSGeometry('POLYGON((0 0, 0 23, 23 0, 23 23, 0 0))')
+        with self.assertRaisesMessage(GEOSException, msg):
+            poly.make_valid()
+
     def test_empty_point(self):
         p = Point(srid=4326)
         self.assertEqual(p.ogr.ewkt, p.ewkt)

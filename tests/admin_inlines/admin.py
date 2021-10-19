@@ -11,8 +11,9 @@ from .models import (
     Inner4Tabular, Inner5Stacked, Inner5Tabular, NonAutoPKBook,
     NonAutoPKBookChild, Novel, NovelReadonlyChapter, OutfitItem,
     ParentModelWithCustomPk, Person, Poll, Profile, ProfileCollection,
-    Question, ReadOnlyInline, ShoppingWeakness, Sighting, SomeChildModel,
-    SomeParentModel, SottoCapo, Teacher, Title, TitleCollection,
+    Question, ReadOnlyInline, ShoppingWeakness, ShowInlineChild,
+    ShowInlineParent, Sighting, SomeChildModel, SomeParentModel, SottoCapo,
+    Teacher, Title, TitleCollection,
 )
 
 site = admin.AdminSite(name="admin")
@@ -342,6 +343,46 @@ class ClassAdminStackedVertical(admin.ModelAdmin):
     inlines = [ClassStackedVertical]
 
 
+class ChildHiddenFieldForm(forms.ModelForm):
+    class Meta:
+        model = SomeChildModel
+        fields = ['name', 'position', 'parent']
+        widgets = {'position': forms.HiddenInput}
+
+    def _post_clean(self):
+        super()._post_clean()
+        if self.instance is not None and self.instance.position == 1:
+            self.add_error(None, ValidationError('A non-field error'))
+
+
+class ChildHiddenFieldTabularInline(admin.TabularInline):
+    model = SomeChildModel
+    form = ChildHiddenFieldForm
+
+
+class ChildHiddenFieldInFieldsGroupStackedInline(admin.StackedInline):
+    model = SomeChildModel
+    form = ChildHiddenFieldForm
+    fields = [('name', 'position')]
+
+
+class ChildHiddenFieldOnSingleLineStackedInline(admin.StackedInline):
+    model = SomeChildModel
+    form = ChildHiddenFieldForm
+    fields = ('name', 'position')
+
+
+class ShowInlineChildInline(admin.StackedInline):
+    model = ShowInlineChild
+
+
+class ShowInlineParentAdmin(admin.ModelAdmin):
+    def get_inlines(self, request, obj):
+        if obj is not None and obj.show_inlines:
+            return [ShowInlineChildInline]
+        return []
+
+
 site.register(TitleCollection, inlines=[TitleInline])
 # Test bug #12561 and #12778
 # only ModelAdmin media
@@ -373,3 +414,11 @@ site.register(Course, ClassAdminStackedHorizontal)
 site.register(CourseProxy, ClassAdminStackedVertical)
 site.register(CourseProxy1, ClassAdminTabularVertical)
 site.register(CourseProxy2, ClassAdminTabularHorizontal)
+site.register(ShowInlineParent, ShowInlineParentAdmin)
+# Used to test hidden fields in tabular and stacked inlines.
+site2 = admin.AdminSite(name='tabular_inline_hidden_field_admin')
+site2.register(SomeParentModel, inlines=[ChildHiddenFieldTabularInline])
+site3 = admin.AdminSite(name='stacked_inline_hidden_field_in_group_admin')
+site3.register(SomeParentModel, inlines=[ChildHiddenFieldInFieldsGroupStackedInline])
+site4 = admin.AdminSite(name='stacked_inline_hidden_field_on_single_line_admin')
+site4.register(SomeParentModel, inlines=[ChildHiddenFieldOnSingleLineStackedInline])

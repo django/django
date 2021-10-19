@@ -4,7 +4,10 @@ import re
 from datetime import datetime, timedelta
 from importlib import import_module
 
-import pytz
+try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo
 
 from django import forms
 from django.conf import settings
@@ -338,7 +341,7 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
     def test_localization(self):
         w = widgets.AdminSplitDateTime()
 
-        with self.settings(USE_L10N=True), translation.override('de-at'):
+        with translation.override('de-at'):
             w.is_localized = True
             self.assertHTMLEqual(
                 w.render('test', datetime(2007, 12, 1, 9, 30)),
@@ -939,7 +942,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
             expected_caption = '{:s} {:d}'.format(may_translation.upper(), 1984)
 
             # Test with every locale
-            with override_settings(LANGUAGE_CODE=language_code, USE_L10N=True):
+            with override_settings(LANGUAGE_CODE=language_code):
 
                 # Open a page that has a date picker widget
                 url = reverse('admin:admin_widgets_member_change', args=(member.pk,))
@@ -967,8 +970,8 @@ class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
         error_margin = timedelta(seconds=10)
 
         # If we are neighbouring a DST, we add an hour of error margin.
-        tz = pytz.timezone('America/Chicago')
-        utc_now = datetime.now(pytz.utc)
+        tz = zoneinfo.ZoneInfo('America/Chicago')
+        utc_now = datetime.now(zoneinfo.ZoneInfo('UTC'))
         tz_yesterday = (utc_now - timedelta(days=1)).astimezone(tz).tzname()
         tz_tomorrow = (utc_now + timedelta(days=1)).astimezone(tz).tzname()
         if tz_yesterday != tz_tomorrow:

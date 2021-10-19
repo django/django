@@ -14,14 +14,15 @@ import warnings
 from itertools import chain
 from sqlite3 import dbapi2 as Database
 
-import pytz
-
 from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
 from django.db.backends import utils as backend_utils
-from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.backends.base.base import (
+    BaseDatabaseWrapper, timezone_constructor,
+)
 from django.utils import timezone
 from django.utils.asyncio import async_unsafe
+from django.utils.crypto import md5
 from django.utils.dateparse import parse_datetime, parse_time
 from django.utils.duration import duration_microseconds
 from django.utils.regex_helper import _lazy_re_compile
@@ -233,7 +234,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         create_deterministic_function('LN', 1, none_guard(math.log))
         create_deterministic_function('LOG', 2, none_guard(lambda x, y: math.log(y, x)))
         create_deterministic_function('LPAD', 3, _sqlite_lpad)
-        create_deterministic_function('MD5', 1, none_guard(lambda x: hashlib.md5(x.encode()).hexdigest()))
+        create_deterministic_function('MD5', 1, none_guard(lambda x: md5(x.encode()).hexdigest()))
         create_deterministic_function('MOD', 2, none_guard(math.fmod))
         create_deterministic_function('PI', 0, lambda: math.pi)
         create_deterministic_function('POWER', 2, none_guard(operator.pow))
@@ -431,7 +432,7 @@ def _sqlite_datetime_parse(dt, tzname=None, conn_tzname=None):
     except (TypeError, ValueError):
         return None
     if conn_tzname:
-        dt = dt.replace(tzinfo=pytz.timezone(conn_tzname))
+        dt = dt.replace(tzinfo=timezone_constructor(conn_tzname))
     if tzname is not None and tzname != conn_tzname:
         sign_index = tzname.find('+') + tzname.find('-') + 1
         if sign_index > -1:
@@ -441,7 +442,7 @@ def _sqlite_datetime_parse(dt, tzname=None, conn_tzname=None):
                 hours, minutes = offset.split(':')
                 offset_delta = datetime.timedelta(hours=int(hours), minutes=int(minutes))
                 dt += offset_delta if sign == '+' else -offset_delta
-        dt = timezone.localtime(dt, pytz.timezone(tzname))
+        dt = timezone.localtime(dt, timezone_constructor(tzname))
     return dt
 
 

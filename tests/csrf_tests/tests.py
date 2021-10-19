@@ -5,10 +5,11 @@ from django.contrib.sessions.backends.cache import SessionStore
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest, HttpResponse, UnreadablePostError
 from django.middleware.csrf import (
-    CSRF_ALLOWED_CHARS, CSRF_SESSION_KEY, CSRF_TOKEN_LENGTH, REASON_BAD_ORIGIN,
-    REASON_CSRF_TOKEN_MISSING, REASON_NO_CSRF_COOKIE, CsrfViewMiddleware,
-    InvalidTokenFormat, RejectRequest, _does_token_match, _mask_cipher_secret,
-    _sanitize_token, _unmask_cipher_token, get_token, rotate_token,
+    CSRF_ALLOWED_CHARS, CSRF_SECRET_LENGTH, CSRF_SESSION_KEY,
+    CSRF_TOKEN_LENGTH, REASON_BAD_ORIGIN, REASON_CSRF_TOKEN_MISSING,
+    REASON_NO_CSRF_COOKIE, CsrfViewMiddleware, InvalidTokenFormat,
+    RejectRequest, _does_token_match, _mask_cipher_secret, _sanitize_token,
+    _unmask_cipher_token, get_token, rotate_token,
 )
 from django.test import SimpleTestCase, override_settings
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
@@ -26,7 +27,22 @@ MASKED_TEST_SECRET1 = '1bcdefghij2bcdefghij3bcdefghij4bcdefghij5bcdefghij6bcdefg
 MASKED_TEST_SECRET2 = '2JgchWvM1tpxT2lfz9aydoXW9yT1DN3NdLiejYxOOlzzV4nhBbYqmqZYbAV3V5Bf'
 
 
-class CsrfFunctionTests(SimpleTestCase):
+class CsrfFunctionTestMixin:
+
+    # This method depends on _unmask_cipher_token() being correct.
+    def assertMaskedSecretCorrect(self, masked_secret, secret):
+        """Test that a string is a valid masked version of a secret."""
+        self.assertEqual(len(masked_secret), CSRF_TOKEN_LENGTH)
+        self.assertEqual(len(secret), CSRF_SECRET_LENGTH)
+        self.assertTrue(
+            set(masked_secret).issubset(set(CSRF_ALLOWED_CHARS)),
+            msg=f'invalid characters in {masked_secret!r}',
+        )
+        actual = _unmask_cipher_token(masked_secret)
+        self.assertEqual(actual, secret)
+
+
+class CsrfFunctionTests(CsrfFunctionTestMixin, SimpleTestCase):
 
     def test_unmask_cipher_token(self):
         cases = [
@@ -46,17 +62,6 @@ class CsrfFunctionTests(SimpleTestCase):
             with self.subTest(masked_secret=masked_secret):
                 actual = _unmask_cipher_token(masked_secret)
                 self.assertEqual(actual, secret)
-
-    # This method depends on _unmask_cipher_token() being correct.
-    def assertMaskedSecretCorrect(self, masked_secret, secret):
-        """Test that a string is a valid masked version of a secret."""
-        self.assertEqual(len(masked_secret), CSRF_TOKEN_LENGTH)
-        self.assertTrue(
-            set(masked_secret).issubset(set(CSRF_ALLOWED_CHARS)),
-            msg=f'invalid characters in {masked_secret!r}',
-        )
-        actual = _unmask_cipher_token(masked_secret)
-        self.assertEqual(actual, secret)
 
     def test_mask_cipher_secret(self):
         cases = [
@@ -186,7 +191,7 @@ class PostErrorRequest(TestingHttpRequest):
     POST = property(_get_post, _set_post)
 
 
-class CsrfViewMiddlewareTestMixin:
+class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
     """
     Shared methods and tests for session-based and cookie-based tokens.
     """
@@ -274,14 +279,19 @@ class CsrfViewMiddlewareTestMixin:
             request_class=request_class,
         )
 
-    def _check_token_present(self, response, csrf_id=None):
+    # This method depends on _unmask_cipher_token() being correct.
+    def _check_token_present(self, response, csrf_token=None):
+        if csrf_token is None:
+            csrf_secret = TEST_SECRET
+        else:
+            csrf_secret = _unmask_cipher_token(csrf_token)
         text = str(response.content, response.charset)
         match = re.search('name="csrfmiddlewaretoken" value="(.*?)"', text)
-        csrf_token = csrf_id or self._csrf_id_token
         self.assertTrue(
-            match and _does_token_match(csrf_token, match[1]),
-            "Could not find csrfmiddlewaretoken to match %s" % csrf_token
+            match, f'Could not find a csrfmiddlewaretoken value in: {text}',
         )
+        csrf_token = match[1]
+        self.assertMaskedSecretCorrect(csrf_token, csrf_secret)
 
     def test_process_response_get_token_not_used(self):
         """
@@ -494,8 +504,7 @@ class CsrfViewMiddlewareTestMixin:
         """
         A new token is sent if the csrf_cookie is the empty string.
         """
-        req = self._get_request()
-        self._set_csrf_cookie(req, '')
+        req = self._get_request(cookie='')
         mw = CsrfViewMiddleware(token_view)
         mw.process_view(req, token_view, (), {})
         resp = token_view(req)
@@ -544,7 +553,7 @@ class CsrfViewMiddlewareTestMixin:
         mw.process_view(req, token_view, (), {})
         resp = mw(req)
         csrf_cookie = self._read_csrf_cookie(req, resp)
-        self._check_token_present(resp, csrf_id=csrf_cookie)
+        self._check_token_present(resp, csrf_cookie)
 
     def test_cookie_not_reset_on_accepted_request(self):
         """
@@ -1094,8 +1103,7 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         If the token is longer than expected, it is ignored and a new token is
         created.
         """
-        req = self._get_request()
-        self._set_csrf_cookie(req, 'x' * 100000)
+        req = self._get_request(cookie='x' * 100000)
         mw = CsrfViewMiddleware(token_view)
         mw.process_view(req, token_view, (), {})
         resp = mw(req)
@@ -1108,8 +1116,7 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         new token is created.
         """
         token = ('!@#' + self._csrf_id_token)[:CSRF_TOKEN_LENGTH]
-        req = self._get_request()
-        self._set_csrf_cookie(req, token)
+        req = self._get_request(cookie=token)
         mw = CsrfViewMiddleware(token_view)
         mw.process_view(req, token_view, (), {})
         resp = mw(req)
@@ -1170,9 +1177,23 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         self.assertTrue(csrf_cookie, msg='No CSRF cookie was sent.')
         self.assertEqual(len(csrf_cookie), CSRF_TOKEN_LENGTH)
 
+    def test_masked_secret_accepted_and_not_replaced(self):
+        """
+        The csrf cookie is left unchanged if originally masked.
+        """
+        req = self._get_POST_request_with_token(cookie=MASKED_TEST_SECRET1)
+        mw = CsrfViewMiddleware(token_view)
+        mw.process_request(req)
+        resp = mw.process_view(req, token_view, (), {})
+        self.assertIsNone(resp)
+        resp = mw(req)
+        csrf_cookie = self._read_csrf_cookie(req, resp)
+        self.assertEqual(csrf_cookie, MASKED_TEST_SECRET1)
+        self._check_token_present(resp, csrf_cookie)
+
     def test_bare_secret_accepted_and_replaced(self):
         """
-        The csrf token is reset from a bare secret.
+        The csrf cookie is reset (masked) if originally not masked.
         """
         req = self._get_POST_request_with_token(cookie=TEST_SECRET)
         mw = CsrfViewMiddleware(token_view)
@@ -1181,8 +1202,9 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         self.assertIsNone(resp)
         resp = mw(req)
         csrf_cookie = self._read_csrf_cookie(req, resp)
-        self.assertEqual(len(csrf_cookie), CSRF_TOKEN_LENGTH)
-        self._check_token_present(resp, csrf_id=csrf_cookie)
+        # This also checks that csrf_cookie now has length CSRF_TOKEN_LENGTH.
+        self.assertMaskedSecretCorrect(csrf_cookie, TEST_SECRET)
+        self._check_token_present(resp, csrf_cookie)
 
     @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_COOKIE_DOMAIN='.example.com', USE_X_FORWARDED_PORT=True)
     def test_https_good_referer_behind_proxy(self):

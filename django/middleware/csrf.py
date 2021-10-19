@@ -79,8 +79,14 @@ def _unmask_cipher_token(token):
     return ''.join(chars[x - y] for x, y in pairs)  # Note negative values are ok
 
 
-def _get_new_csrf_token():
-    return _mask_cipher_secret(_get_new_csrf_string())
+def _add_new_csrf_cookie(request):
+    """Generate a new random CSRF_COOKIE value, and add it to request.META."""
+    csrf_secret = _get_new_csrf_string()
+    request.META.update({
+        'CSRF_COOKIE': _mask_cipher_secret(csrf_secret),
+        'CSRF_COOKIE_NEEDS_UPDATE': True,
+    })
+    return csrf_secret
 
 
 def get_token(request):
@@ -93,15 +99,14 @@ def get_token(request):
     header to the outgoing response.  For this reason, you may need to use this
     function lazily, as is done by the csrf context processor.
     """
-    if "CSRF_COOKIE" not in request.META:
-        csrf_secret = _get_new_csrf_string()
-        request.META["CSRF_COOKIE"] = _mask_cipher_secret(csrf_secret)
-    else:
+    if 'CSRF_COOKIE' in request.META:
         csrf_secret = _unmask_cipher_token(request.META["CSRF_COOKIE"])
-    # Since the cookie is being used, flag to send the cookie in
-    # process_response() (even if the client already has it) in order to renew
-    # the expiry timer.
-    request.META['CSRF_COOKIE_NEEDS_UPDATE'] = True
+        # Since the cookie is being used, flag to send the cookie in
+        # process_response() (even if the client already has it) in order to
+        # renew the expiry timer.
+        request.META['CSRF_COOKIE_NEEDS_UPDATE'] = True
+    else:
+        csrf_secret = _add_new_csrf_cookie(request)
     return _mask_cipher_secret(csrf_secret)
 
 
@@ -110,10 +115,7 @@ def rotate_token(request):
     Change the CSRF token in use for a request - should be done on login
     for security purposes.
     """
-    request.META.update({
-        'CSRF_COOKIE': _get_new_csrf_token(),
-        'CSRF_COOKIE_NEEDS_UPDATE': True,
-    })
+    _add_new_csrf_cookie(request)
 
 
 class InvalidTokenFormat(Exception):
@@ -229,7 +231,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
                 request.META['CSRF_COOKIE_NEEDS_UPDATE'] = True
             return csrf_token
 
-    def _set_token(self, request, response):
+    def _set_csrf_cookie(self, request, response):
         if settings.CSRF_USE_SESSIONS:
             if request.session.get(CSRF_SESSION_KEY) != request.META['CSRF_COOKIE']:
                 request.session[CSRF_SESSION_KEY] = request.META['CSRF_COOKIE']
@@ -377,12 +379,11 @@ class CsrfViewMiddleware(MiddlewareMixin):
         try:
             csrf_token = self._get_token(request)
         except InvalidTokenFormat:
-            csrf_token = _get_new_csrf_token()
-            request.META["CSRF_COOKIE_NEEDS_UPDATE"] = True
-
-        if csrf_token is not None:
-            # Use same token next time.
-            request.META['CSRF_COOKIE'] = csrf_token
+            _add_new_csrf_cookie(request)
+        else:
+            if csrf_token is not None:
+                # Use same token next time.
+                request.META['CSRF_COOKIE'] = csrf_token
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
         if getattr(request, 'csrf_processing_done', False):
@@ -441,14 +442,14 @@ class CsrfViewMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
         if request.META.get('CSRF_COOKIE_NEEDS_UPDATE'):
-            self._set_token(request, response)
-            # Unset the flag to prevent _set_token() from being unnecessarily
-            # called again in process_response() by other instances of
-            # CsrfViewMiddleware. This can happen e.g. when both a decorator and
-            # middleware are used. However, CSRF_COOKIE_NEEDS_UPDATE is still
-            # respected in subsequent calls e.g. in case rotate_token() is
-            # called in process_response() later by custom middleware but before
-            # those subsequent calls.
+            self._set_csrf_cookie(request, response)
+            # Unset the flag to prevent _set_csrf_cookie() from being
+            # unnecessarily called again in process_response() by other
+            # instances of CsrfViewMiddleware. This can happen e.g. when both a
+            # decorator and middleware are used. However,
+            # CSRF_COOKIE_NEEDS_UPDATE is still respected in subsequent calls
+            # e.g. in case rotate_token() is called in process_response() later
+            # by custom middleware but before those subsequent calls.
             request.META['CSRF_COOKIE_NEEDS_UPDATE'] = False
 
         return response

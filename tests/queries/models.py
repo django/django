@@ -636,7 +636,7 @@ class StaffUser(BaseUser):
     staff = models.OneToOneField(Staff, models.CASCADE, related_name='user')
 
     def __str__(self):
-        return self.staff
+        return str(self.staff)
 
 
 class Ticket21203Parent(models.Model):

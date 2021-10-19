@@ -3,8 +3,10 @@ from collections import UserList
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.forms.renderers import get_default_renderer
 from django.utils import timezone
-from django.utils.html import escape, format_html, format_html_join, html_safe
+from django.utils.html import escape, format_html_join
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 
@@ -41,53 +43,90 @@ def flatatt(attrs):
     )
 
 
-@html_safe
-class ErrorDict(dict):
+class RenderableMixin:
+    def get_context(self):
+        raise NotImplementedError(
+            'Subclasses of RenderableMixin must provide a get_context() method.'
+        )
+
+    def render(self, template_name=None, context=None, renderer=None):
+        return mark_safe((renderer or self.renderer).render(
+            template_name or self.template_name,
+            context or self.get_context(),
+        ))
+
+    __str__ = render
+    __html__ = render
+
+
+class RenderableFormMixin(RenderableMixin):
+    def as_p(self):
+        """Render as <p> elements."""
+        return self.render(self.template_name_p)
+
+    def as_table(self):
+        """Render as <tr> elements excluding the surrounding <table> tag."""
+        return self.render(self.template_name_table)
+
+    def as_ul(self):
+        """Render as <li> elements excluding the surrounding <ul> tag."""
+        return self.render(self.template_name_ul)
+
+
+class RenderableErrorMixin(RenderableMixin):
+    def as_json(self, escape_html=False):
+        return json.dumps(self.get_json_data(escape_html))
+
+    def as_text(self):
+        return self.render(self.template_name_text)
+
+    def as_ul(self):
+        return self.render(self.template_name_ul)
+
+
+class ErrorDict(dict, RenderableErrorMixin):
     """
     A collection of errors that knows how to display itself in various formats.
 
     The dictionary keys are the field names, and the values are the errors.
     """
+    template_name = 'django/forms/errors/dict/default.html'
+    template_name_text = 'django/forms/errors/dict/text.txt'
+    template_name_ul = 'django/forms/errors/dict/ul.html'
+
+    def __init__(self, *args, renderer=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.renderer = renderer or get_default_renderer()
+
     def as_data(self):
         return {f: e.as_data() for f, e in self.items()}
 
     def get_json_data(self, escape_html=False):
         return {f: e.get_json_data(escape_html) for f, e in self.items()}
 
-    def as_json(self, escape_html=False):
-        return json.dumps(self.get_json_data(escape_html))
-
-    def as_ul(self):
-        if not self:
-            return ''
-        return format_html(
-            '<ul class="errorlist">{}</ul>',
-            format_html_join('', '<li>{}{}</li>', self.items())
-        )
-
-    def as_text(self):
-        output = []
-        for field, errors in self.items():
-            output.append('* %s' % field)
-            output.append('\n'.join('  * %s' % e for e in errors))
-        return '\n'.join(output)
-
-    def __str__(self):
-        return self.as_ul()
+    def get_context(self):
+        return {
+            'errors': self.items(),
+            'error_class': 'errorlist',
+        }
 
 
-@html_safe
-class ErrorList(UserList, list):
+class ErrorList(UserList, list, RenderableErrorMixin):
     """
     A collection of errors that knows how to display itself in various formats.
     """
-    def __init__(self, initlist=None, error_class=None):
+    template_name = 'django/forms/errors/list/default.html'
+    template_name_text = 'django/forms/errors/list/text.txt'
+    template_name_ul = 'django/forms/errors/list/ul.html'
+
+    def __init__(self, initlist=None, error_class=None, renderer=None):
         super().__init__(initlist)
 
         if error_class is None:
             self.error_class = 'errorlist'
         else:
             self.error_class = 'errorlist {}'.format(error_class)
+        self.renderer = renderer or get_default_renderer()
 
     def as_data(self):
         return ValidationError(self.data).error_list
@@ -107,24 +146,11 @@ class ErrorList(UserList, list):
             })
         return errors
 
-    def as_json(self, escape_html=False):
-        return json.dumps(self.get_json_data(escape_html))
-
-    def as_ul(self):
-        if not self.data:
-            return ''
-
-        return format_html(
-            '<ul class="{}">{}</ul>',
-            self.error_class,
-            format_html_join('', '<li>{}</li>', ((e,) for e in self))
-        )
-
-    def as_text(self):
-        return '\n'.join('* %s' % e for e in self)
-
-    def __str__(self):
-        return self.as_ul()
+    def get_context(self):
+        return {
+            'errors': self,
+            'error_class': self.error_class,
+        }
 
     def __repr__(self):
         return repr(list(self))

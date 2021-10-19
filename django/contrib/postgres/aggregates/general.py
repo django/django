@@ -1,13 +1,16 @@
 import warnings
 
 from django.contrib.postgres.fields import ArrayField
-from django.db.models import Aggregate, BooleanField, JSONField, Value
+from django.db.models import (
+    Aggregate, BooleanField, JSONField, TextField, Value,
+)
 from django.utils.deprecation import RemovedInDjango50Warning
 
 from .mixins import OrderableAggMixin
 
 __all__ = [
-    'ArrayAgg', 'BitAnd', 'BitOr', 'BoolAnd', 'BoolOr', 'JSONBAgg', 'StringAgg',
+    'ArrayAgg', 'BitAnd', 'BitOr', 'BitXor', 'BoolAnd', 'BoolOr', 'JSONBAgg',
+    'StringAgg',
 ]
 
 
@@ -58,6 +61,10 @@ class BitOr(Aggregate):
     function = 'BIT_OR'
 
 
+class BitXor(Aggregate):
+    function = 'BIT_XOR'
+
+
 class BoolAnd(Aggregate):
     function = 'BOOL_AND'
     output_field = BooleanField()
@@ -88,6 +95,7 @@ class StringAgg(DeprecatedConvertValueMixin, OrderableAggMixin, Aggregate):
     function = 'STRING_AGG'
     template = '%(function)s(%(distinct)s%(expressions)s %(ordering)s)'
     allow_distinct = True
+    output_field = TextField()
 
     # RemovedInDjango50Warning
     deprecation_value = ''
