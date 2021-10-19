@@ -22,7 +22,7 @@ def check_default_cache_is_configured(app_configs, **kwargs):
 @register(Tags.caches, deploy=True)
 def check_cache_location_not_exposed(app_configs, **kwargs):
     errors = []
-    for name in ('MEDIA_ROOT', 'STATIC_ROOT', 'STATICFILES_DIRS'):
+    for name in {'MEDIA_ROOT', 'STATIC_ROOT', 'STATICFILES_DIRS'}:
         setting = getattr(settings, name, None)
         if not setting:
             continue
