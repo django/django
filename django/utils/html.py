@@ -17,16 +17,17 @@ from django.utils.text import normalize_newlines
 
 
 @keep_lazy(str, SafeString)
-def escape(text):
+def escape(text, quote=True):
     """
-    Return the given text with ampersands, quotes and angle brackets encoded
-    for use in HTML.
+    Return the given text with ampersands and angle brackets encoded
+    for use in HTML. If the optional flag quote is true (the default), 
+    the quotation mark characters are also encoded translated.
 
     Always escape input, even if it's already escaped and marked as such.
     This may result in double-escaping. If this is a concern, use
     conditional_escape() instead.
     """
-    return mark_safe(html.escape(str(text)))
+    return mark_safe(html.escape(str(text), quote))
 
 
 _js_escapes = {
@@ -75,7 +76,7 @@ def json_script(value, element_id):
     )
 
 
-def conditional_escape(text):
+def conditional_escape(text, quote=True):
     """
     Similar to escape(), except that it doesn't operate on pre-escaped strings.
 
@@ -87,7 +88,7 @@ def conditional_escape(text):
     if hasattr(text, '__html__'):
         return text.__html__()
     else:
-        return escape(text)
+        return escape(text, quote)
 
 
 def format_html(format_string, *args, **kwargs):
