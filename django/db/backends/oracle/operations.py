@@ -276,7 +276,7 @@ END;
 
     def field_cast_sql(self, db_type, internal_type):
         if db_type and db_type.endswith('LOB') and internal_type != 'JSONField':
-            return "DBMS_LOB.SUBSTR(%s)"
+            return "DBMS_LOB.SUBSTR(%s, 4000, 1 )" # 4000 is maximum length of VARCHAR2
         else:
             return "%s"
 
@@ -314,7 +314,7 @@ END;
         if lookup_type in ('iexact', 'icontains', 'istartswith', 'iendswith'):
             return "UPPER(%s)"
         if internal_type == 'JSONField' and lookup_type == 'exact':
-            return 'DBMS_LOB.SUBSTR(%s)'
+            return 'DBMS_LOB.SUBSTR(%s, 4000, 1 )' # 4000 is maximum length of VARCHAR2
         return "%s"
 
     def max_in_list_size(self):
