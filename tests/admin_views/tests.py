@@ -4578,8 +4578,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.p1 = PrePopulatedPost.objects.create(title='A Long Title', published=True, slug='a-long-title')
 
     def test_login_button_centered(self):
+        from selenium.webdriver.common.by import By
         self.selenium.get(self.live_server_url + reverse('admin:login'))
-        button = self.selenium.find_element_by_css_selector('.submit-row input')
+        button = self.selenium.find_element(By.CSS_SELECTOR, '.submit-row input')
         offset_left = button.get_property('offsetLeft')
         offset_right = (
             button.get_property('offsetParent').get_property('offsetWidth') -
@@ -4594,52 +4595,53 @@ class SeleniumTests(AdminSeleniumTestCase):
         and with stacked and tabular inlines.
         Refs #13068, #9264, #9983, #9784.
         """
+        from selenium.webdriver.common.by import By
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         self.selenium.get(self.live_server_url + reverse('admin:admin_views_mainprepopulated_add'))
         self.wait_for('.select2')
 
         # Main form ----------------------------------------------------------
-        self.selenium.find_element_by_id('id_pubdate').send_keys('2012-02-18')
+        self.selenium.find_element(By.ID, 'id_pubdate').send_keys('2012-02-18')
         self.select_option('#id_status', 'option two')
-        self.selenium.find_element_by_id('id_name').send_keys(' the mAin nÀMë and it\'s awεšomeıııİ')
-        slug1 = self.selenium.find_element_by_id('id_slug1').get_attribute('value')
-        slug2 = self.selenium.find_element_by_id('id_slug2').get_attribute('value')
-        slug3 = self.selenium.find_element_by_id('id_slug3').get_attribute('value')
+        self.selenium.find_element(By.ID, 'id_name').send_keys(' the mAin nÀMë and it\'s awεšomeıııİ')
+        slug1 = self.selenium.find_element(By.ID, 'id_slug1').get_attribute('value')
+        slug2 = self.selenium.find_element(By.ID, 'id_slug2').get_attribute('value')
+        slug3 = self.selenium.find_element(By.ID, 'id_slug3').get_attribute('value')
         self.assertEqual(slug1, 'the-main-name-and-its-awesomeiiii-2012-02-18')
         self.assertEqual(slug2, 'option-two-the-main-name-and-its-awesomeiiii')
         self.assertEqual(slug3, 'the-main-n\xe0m\xeb-and-its-aw\u03b5\u0161ome\u0131\u0131\u0131i')
 
         # Stacked inlines ----------------------------------------------------
         # Initial inline
-        self.selenium.find_element_by_id('id_relatedprepopulated_set-0-pubdate').send_keys('2011-12-17')
+        self.selenium.find_element(By.ID, 'id_relatedprepopulated_set-0-pubdate').send_keys('2011-12-17')
         self.select_option('#id_relatedprepopulated_set-0-status', 'option one')
-        self.selenium.find_element_by_id('id_relatedprepopulated_set-0-name').send_keys(
+        self.selenium.find_element(By.ID, 'id_relatedprepopulated_set-0-name').send_keys(
             ' here is a sŤāÇkeð   inline !  '
         )
-        slug1 = self.selenium.find_element_by_id('id_relatedprepopulated_set-0-slug1').get_attribute('value')
-        slug2 = self.selenium.find_element_by_id('id_relatedprepopulated_set-0-slug2').get_attribute('value')
+        slug1 = self.selenium.find_element(By.ID, 'id_relatedprepopulated_set-0-slug1').get_attribute('value')
+        slug2 = self.selenium.find_element(By.ID, 'id_relatedprepopulated_set-0-slug2').get_attribute('value')
         self.assertEqual(slug1, 'here-is-a-stacked-inline-2011-12-17')
         self.assertEqual(slug2, 'option-one-here-is-a-stacked-inline')
-        initial_select2_inputs = self.selenium.find_elements_by_class_name('select2-selection')
+        initial_select2_inputs = self.selenium.find_elements(By.CLASS_NAME, 'select2-selection')
         # Inline formsets have empty/invisible forms.
         # Only the 4 visible select2 inputs are initialized.
         num_initial_select2_inputs = len(initial_select2_inputs)
         self.assertEqual(num_initial_select2_inputs, 4)
 
         # Add an inline
-        self.selenium.find_elements_by_link_text('Add another Related prepopulated')[0].click()
+        self.selenium.find_elements(By.LINK_TEXT, 'Add another Related prepopulated')[0].click()
         self.assertEqual(
-            len(self.selenium.find_elements_by_class_name('select2-selection')),
+            len(self.selenium.find_elements(By.CLASS_NAME, 'select2-selection')),
             num_initial_select2_inputs + 2
         )
-        self.selenium.find_element_by_id('id_relatedprepopulated_set-1-pubdate').send_keys('1999-01-25')
+        self.selenium.find_element(By.ID, 'id_relatedprepopulated_set-1-pubdate').send_keys('1999-01-25')
         self.select_option('#id_relatedprepopulated_set-1-status', 'option two')
-        self.selenium.find_element_by_id('id_relatedprepopulated_set-1-name').send_keys(
+        self.selenium.find_element(By.ID, 'id_relatedprepopulated_set-1-name').send_keys(
             ' now you haVe anöther   sŤāÇkeð  inline with a very ... '
             'loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooog text... '
         )
-        slug1 = self.selenium.find_element_by_id('id_relatedprepopulated_set-1-slug1').get_attribute('value')
-        slug2 = self.selenium.find_element_by_id('id_relatedprepopulated_set-1-slug2').get_attribute('value')
+        slug1 = self.selenium.find_element(By.ID, 'id_relatedprepopulated_set-1-slug1').get_attribute('value')
+        slug2 = self.selenium.find_element(By.ID, 'id_relatedprepopulated_set-1-slug2').get_attribute('value')
         # 50 characters maximum for slug1 field
         self.assertEqual(slug1, 'now-you-have-another-stacked-inline-with-a-very-lo')
         # 60 characters maximum for slug2 field
@@ -4647,47 +4649,47 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Tabular inlines ----------------------------------------------------
         # Initial inline
-        element = self.selenium.find_element_by_id('id_relatedprepopulated_set-2-0-status')
+        element = self.selenium.find_element(By.ID, 'id_relatedprepopulated_set-2-0-status')
         self.selenium.execute_script('window.scrollTo(0, %s);' % element.location['y'])
-        self.selenium.find_element_by_id('id_relatedprepopulated_set-2-0-pubdate').send_keys('1234-12-07')
+        self.selenium.find_element(By.ID, 'id_relatedprepopulated_set-2-0-pubdate').send_keys('1234-12-07')
         self.select_option('#id_relatedprepopulated_set-2-0-status', 'option two')
-        self.selenium.find_element_by_id('id_relatedprepopulated_set-2-0-name').send_keys(
+        self.selenium.find_element(By.ID, 'id_relatedprepopulated_set-2-0-name').send_keys(
             'And now, with a tÃbűlaŘ inline !!!'
         )
-        slug1 = self.selenium.find_element_by_id('id_relatedprepopulated_set-2-0-slug1').get_attribute('value')
-        slug2 = self.selenium.find_element_by_id('id_relatedprepopulated_set-2-0-slug2').get_attribute('value')
+        slug1 = self.selenium.find_element(By.ID, 'id_relatedprepopulated_set-2-0-slug1').get_attribute('value')
+        slug2 = self.selenium.find_element(By.ID, 'id_relatedprepopulated_set-2-0-slug2').get_attribute('value')
         self.assertEqual(slug1, 'and-now-with-a-tabular-inline-1234-12-07')
         self.assertEqual(slug2, 'option-two-and-now-with-a-tabular-inline')
 
         # Add an inline
         # Button may be outside the browser frame.
-        element = self.selenium.find_elements_by_link_text('Add another Related prepopulated')[1]
+        element = self.selenium.find_elements(By.LINK_TEXT, 'Add another Related prepopulated')[1]
         self.selenium.execute_script('window.scrollTo(0, %s);' % element.location['y'])
         element.click()
         self.assertEqual(
-            len(self.selenium.find_elements_by_class_name('select2-selection')),
+            len(self.selenium.find_elements(By.CLASS_NAME, 'select2-selection')),
             num_initial_select2_inputs + 4
         )
-        self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-pubdate').send_keys('1981-08-22')
+        self.selenium.find_element(By.ID, 'id_relatedprepopulated_set-2-1-pubdate').send_keys('1981-08-22')
         self.select_option('#id_relatedprepopulated_set-2-1-status', 'option one')
-        self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-name').send_keys(
+        self.selenium.find_element(By.ID, 'id_relatedprepopulated_set-2-1-name').send_keys(
             r'tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters'
         )
-        slug1 = self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-slug1').get_attribute('value')
-        slug2 = self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-slug2').get_attribute('value')
+        slug1 = self.selenium.find_element(By.ID, 'id_relatedprepopulated_set-2-1-slug1').get_attribute('value')
+        slug2 = self.selenium.find_element(By.ID, 'id_relatedprepopulated_set-2-1-slug2').get_attribute('value')
         self.assertEqual(slug1, 'tabular-inline-with-ignored-characters-1981-08-22')
         self.assertEqual(slug2, 'option-one-tabular-inline-with-ignored-characters')
         # Add an inline without an initial inline.
         # The button is outside of the browser frame.
         self.selenium.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        self.selenium.find_elements_by_link_text('Add another Related prepopulated')[2].click()
+        self.selenium.find_elements(By.LINK_TEXT, 'Add another Related prepopulated')[2].click()
         self.assertEqual(
-            len(self.selenium.find_elements_by_class_name('select2-selection')),
+            len(self.selenium.find_elements(By.CLASS_NAME, 'select2-selection')),
             num_initial_select2_inputs + 6
         )
         # Save and check that everything is properly stored in the database
         with self.wait_page_loaded():
-            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+            self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
         self.assertEqual(MainPrepopulated.objects.all().count(), 1)
         MainPrepopulated.objects.get(
             name=' the mAin nÀMë and it\'s awεšomeıııİ',
@@ -4733,6 +4735,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         The prepopulation works for existing objects too, as long as
         the original field is empty (#19082).
         """
+        from selenium.webdriver.common.by import By
+
         # Slugs are empty to start with.
         item = MainPrepopulated.objects.create(
             name=' this is the mAin nÀMë',
@@ -4746,24 +4750,24 @@ class SeleniumTests(AdminSeleniumTestCase):
         object_url = self.live_server_url + reverse('admin:admin_views_mainprepopulated_change', args=(item.id,))
 
         self.selenium.get(object_url)
-        self.selenium.find_element_by_id('id_name').send_keys(' the best')
+        self.selenium.find_element(By.ID, 'id_name').send_keys(' the best')
 
         # The slugs got prepopulated since they were originally empty
-        slug1 = self.selenium.find_element_by_id('id_slug1').get_attribute('value')
-        slug2 = self.selenium.find_element_by_id('id_slug2').get_attribute('value')
+        slug1 = self.selenium.find_element(By.ID, 'id_slug1').get_attribute('value')
+        slug2 = self.selenium.find_element(By.ID, 'id_slug2').get_attribute('value')
         self.assertEqual(slug1, 'this-is-the-main-name-the-best-2012-02-18')
         self.assertEqual(slug2, 'option-two-this-is-the-main-name-the-best')
 
         # Save the object
         with self.wait_page_loaded():
-            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+            self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
 
         self.selenium.get(object_url)
-        self.selenium.find_element_by_id('id_name').send_keys(' hello')
+        self.selenium.find_element(By.ID, 'id_name').send_keys(' hello')
 
         # The slugs got prepopulated didn't change since they were originally not empty
-        slug1 = self.selenium.find_element_by_id('id_slug1').get_attribute('value')
-        slug2 = self.selenium.find_element_by_id('id_slug2').get_attribute('value')
+        slug1 = self.selenium.find_element(By.ID, 'id_slug1').get_attribute('value')
+        slug2 = self.selenium.find_element(By.ID, 'id_slug2').get_attribute('value')
         self.assertEqual(slug1, 'this-is-the-main-name-the-best-2012-02-18')
         self.assertEqual(slug2, 'option-two-this-is-the-main-name-the-best')
 
@@ -4772,22 +4776,25 @@ class SeleniumTests(AdminSeleniumTestCase):
         The 'collapse' class in fieldsets definition allows to
         show/hide the appropriate field section.
         """
+        from selenium.webdriver.common.by import By
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         self.selenium.get(self.live_server_url + reverse('admin:admin_views_article_add'))
-        self.assertFalse(self.selenium.find_element_by_id('id_title').is_displayed())
-        self.selenium.find_elements_by_link_text('Show')[0].click()
-        self.assertTrue(self.selenium.find_element_by_id('id_title').is_displayed())
-        self.assertEqual(self.selenium.find_element_by_id('fieldsetcollapser0').text, "Hide")
+        self.assertFalse(self.selenium.find_element(By.ID, 'id_title').is_displayed())
+        self.selenium.find_elements(By.LINK_TEXT, 'Show')[0].click()
+        self.assertTrue(self.selenium.find_element(By.ID, 'id_title').is_displayed())
+        self.assertEqual(self.selenium.find_element(By.ID, 'fieldsetcollapser0').text, "Hide")
 
     def test_first_field_focus(self):
         """JavaScript-assisted auto-focus on first usable form field."""
+        from selenium.webdriver.common.by import By
+
         # First form field has a single widget
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         with self.wait_page_loaded():
             self.selenium.get(self.live_server_url + reverse('admin:admin_views_picture_add'))
         self.assertEqual(
             self.selenium.switch_to.active_element,
-            self.selenium.find_element_by_id('id_name')
+            self.selenium.find_element(By.ID, 'id_name')
         )
 
         # First form field has a MultiWidget
@@ -4795,19 +4802,20 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.selenium.get(self.live_server_url + reverse('admin:admin_views_reservation_add'))
         self.assertEqual(
             self.selenium.switch_to.active_element,
-            self.selenium.find_element_by_id('id_start_date_0')
+            self.selenium.find_element(By.ID, 'id_start_date_0')
         )
 
     def test_cancel_delete_confirmation(self):
         "Cancelling the deletion of an object takes the user back one page."
+        from selenium.webdriver.common.by import By
         pizza = Pizza.objects.create(name="Double Cheese")
         url = reverse('admin:admin_views_pizza_change', args=(pizza.id,))
         full_url = self.live_server_url + url
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         self.selenium.get(full_url)
-        self.selenium.find_element_by_class_name('deletelink').click()
+        self.selenium.find_element(By.CLASS_NAME, 'deletelink').click()
         # Click 'cancel' on the delete page.
-        self.selenium.find_element_by_class_name('cancel-link').click()
+        self.selenium.find_element(By.CLASS_NAME, 'cancel-link').click()
         # Wait until we're back on the change page.
         self.wait_for_text('#content h1', 'Change pizza')
         self.assertEqual(self.selenium.current_url, full_url)
@@ -4818,6 +4826,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         Cancelling the deletion of an object with relations takes the user back
         one page.
         """
+        from selenium.webdriver.common.by import By
         pizza = Pizza.objects.create(name="Double Cheese")
         topping1 = Topping.objects.create(name="Cheddar")
         topping2 = Topping.objects.create(name="Mozzarella")
@@ -4826,9 +4835,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         full_url = self.live_server_url + url
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         self.selenium.get(full_url)
-        self.selenium.find_element_by_class_name('deletelink').click()
+        self.selenium.find_element(By.CLASS_NAME, 'deletelink').click()
         # Click 'cancel' on the delete page.
-        self.selenium.find_element_by_class_name('cancel-link').click()
+        self.selenium.find_element(By.CLASS_NAME, 'cancel-link').click()
         # Wait until we're back on the change page.
         self.wait_for_text('#content h1', 'Change pizza')
         self.assertEqual(self.selenium.current_url, full_url)
@@ -4839,6 +4848,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         """
         list_editable foreign keys have add/change popups.
         """
+        from selenium.webdriver.common.by import By
         from selenium.webdriver.support.ui import Select
         s1 = Section.objects.create(name='Test section')
         Article.objects.create(
@@ -4850,109 +4860,114 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         self.selenium.get(self.live_server_url + reverse('admin:admin_views_article_changelist'))
         # Change popup
-        self.selenium.find_element_by_id('change_id_form-0-section').click()
+        self.selenium.find_element(By.ID, 'change_id_form-0-section').click()
         self.wait_for_and_switch_to_popup()
         self.wait_for_text('#content h1', 'Change section')
-        name_input = self.selenium.find_element_by_id('id_name')
+        name_input = self.selenium.find_element(By.ID, 'id_name')
         name_input.clear()
         name_input.send_keys('<i>edited section</i>')
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         # Hide sidebar.
-        toggle_button = self.selenium.find_element_by_css_selector('#toggle-nav-sidebar')
+        toggle_button = self.selenium.find_element(By.CSS_SELECTOR, '#toggle-nav-sidebar')
         toggle_button.click()
-        select = Select(self.selenium.find_element_by_id('id_form-0-section'))
+        select = Select(self.selenium.find_element(By.ID, 'id_form-0-section'))
         self.assertEqual(select.first_selected_option.text, '<i>edited section</i>')
         # Rendered select2 input.
-        select2_display = self.selenium.find_element_by_class_name('select2-selection__rendered')
+        select2_display = self.selenium.find_element(By.CLASS_NAME, 'select2-selection__rendered')
         # Clear button (×\n) is included in text.
         self.assertEqual(select2_display.text, '×\n<i>edited section</i>')
 
         # Add popup
-        self.selenium.find_element_by_id('add_id_form-0-section').click()
+        self.selenium.find_element(By.ID, 'add_id_form-0-section').click()
         self.wait_for_and_switch_to_popup()
         self.wait_for_text('#content h1', 'Add section')
-        self.selenium.find_element_by_id('id_name').send_keys('new section')
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.find_element(By.ID, 'id_name').send_keys('new section')
+        self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
         self.selenium.switch_to.window(self.selenium.window_handles[0])
-        select = Select(self.selenium.find_element_by_id('id_form-0-section'))
+        select = Select(self.selenium.find_element(By.ID, 'id_form-0-section'))
         self.assertEqual(select.first_selected_option.text, 'new section')
-        select2_display = self.selenium.find_element_by_class_name('select2-selection__rendered')
+        select2_display = self.selenium.find_element(By.CLASS_NAME, 'select2-selection__rendered')
         # Clear button (×\n) is included in text.
         self.assertEqual(select2_display.text, '×\nnew section')
 
     def test_inline_uuid_pk_edit_with_popup(self):
+        from selenium.webdriver.common.by import By
         from selenium.webdriver.support.ui import Select
         parent = ParentWithUUIDPK.objects.create(title='test')
         related_with_parent = RelatedWithUUIDPKModel.objects.create(parent=parent)
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         change_url = reverse('admin:admin_views_relatedwithuuidpkmodel_change', args=(related_with_parent.id,))
         self.selenium.get(self.live_server_url + change_url)
-        self.selenium.find_element_by_id('change_id_parent').click()
+        self.selenium.find_element(By.ID, 'change_id_parent').click()
         self.wait_for_and_switch_to_popup()
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
         self.selenium.switch_to.window(self.selenium.window_handles[0])
-        select = Select(self.selenium.find_element_by_id('id_parent'))
+        select = Select(self.selenium.find_element(By.ID, 'id_parent'))
         self.assertEqual(select.first_selected_option.text, str(parent.id))
         self.assertEqual(select.first_selected_option.get_attribute('value'), str(parent.id))
 
     def test_inline_uuid_pk_add_with_popup(self):
+        from selenium.webdriver.common.by import By
         from selenium.webdriver.support.ui import Select
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         self.selenium.get(self.live_server_url + reverse('admin:admin_views_relatedwithuuidpkmodel_add'))
-        self.selenium.find_element_by_id('add_id_parent').click()
+        self.selenium.find_element(By.ID, 'add_id_parent').click()
         self.wait_for_and_switch_to_popup()
-        self.selenium.find_element_by_id('id_title').send_keys('test')
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.find_element(By.ID, 'id_title').send_keys('test')
+        self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
         self.selenium.switch_to.window(self.selenium.window_handles[0])
-        select = Select(self.selenium.find_element_by_id('id_parent'))
+        select = Select(self.selenium.find_element(By.ID, 'id_parent'))
         uuid_id = str(ParentWithUUIDPK.objects.first().id)
         self.assertEqual(select.first_selected_option.text, uuid_id)
         self.assertEqual(select.first_selected_option.get_attribute('value'), uuid_id)
 
     def test_inline_uuid_pk_delete_with_popup(self):
+        from selenium.webdriver.common.by import By
         from selenium.webdriver.support.ui import Select
         parent = ParentWithUUIDPK.objects.create(title='test')
         related_with_parent = RelatedWithUUIDPKModel.objects.create(parent=parent)
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         change_url = reverse('admin:admin_views_relatedwithuuidpkmodel_change', args=(related_with_parent.id,))
         self.selenium.get(self.live_server_url + change_url)
-        self.selenium.find_element_by_id('delete_id_parent').click()
+        self.selenium.find_element(By.ID, 'delete_id_parent').click()
         self.wait_for_and_switch_to_popup()
-        self.selenium.find_element_by_xpath('//input[@value="Yes, I’m sure"]').click()
+        self.selenium.find_element(By.XPATH, '//input[@value="Yes, I’m sure"]').click()
         self.selenium.switch_to.window(self.selenium.window_handles[0])
-        select = Select(self.selenium.find_element_by_id('id_parent'))
+        select = Select(self.selenium.find_element(By.ID, 'id_parent'))
         self.assertEqual(ParentWithUUIDPK.objects.count(), 0)
         self.assertEqual(select.first_selected_option.text, '---------')
         self.assertEqual(select.first_selected_option.get_attribute('value'), '')
 
     def test_inline_with_popup_cancel_delete(self):
         """Clicking ""No, take me back" on a delete popup closes the window."""
+        from selenium.webdriver.common.by import By
         parent = ParentWithUUIDPK.objects.create(title='test')
         related_with_parent = RelatedWithUUIDPKModel.objects.create(parent=parent)
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         change_url = reverse('admin:admin_views_relatedwithuuidpkmodel_change', args=(related_with_parent.id,))
         self.selenium.get(self.live_server_url + change_url)
-        self.selenium.find_element_by_id('delete_id_parent').click()
+        self.selenium.find_element(By.ID, 'delete_id_parent').click()
         self.wait_for_and_switch_to_popup()
-        self.selenium.find_element_by_xpath('//a[text()="No, take me back"]').click()
+        self.selenium.find_element(By.XPATH, '//a[text()="No, take me back"]').click()
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         self.assertEqual(len(self.selenium.window_handles), 1)
 
     def test_list_editable_raw_id_fields(self):
+        from selenium.webdriver.common.by import By
         parent = ParentWithUUIDPK.objects.create(title='test')
         parent2 = ParentWithUUIDPK.objects.create(title='test2')
         RelatedWithUUIDPKModel.objects.create(parent=parent)
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         change_url = reverse('admin:admin_views_relatedwithuuidpkmodel_changelist', current_app=site2.name)
         self.selenium.get(self.live_server_url + change_url)
-        self.selenium.find_element_by_id('lookup_id_form-0-parent').click()
+        self.selenium.find_element(By.ID, 'lookup_id_form-0-parent').click()
         self.wait_for_and_switch_to_popup()
         # Select "parent2" in the popup.
-        self.selenium.find_element_by_link_text(str(parent2.pk)).click()
+        self.selenium.find_element(By.LINK_TEXT, str(parent2.pk)).click()
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         # The newly selected pk should appear in the raw id input.
-        value = self.selenium.find_element_by_id('id_form-0-parent').get_attribute('value')
+        value = self.selenium.find_element(By.ID, 'id_form-0-parent').get_attribute('value')
         self.assertEqual(value, str(parent2.pk))
 
     def test_input_element_font(self):
@@ -4960,8 +4975,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         Browsers' default stylesheets override the font of inputs. The admin
         adds additional CSS to handle this.
         """
+        from selenium.webdriver.common.by import By
         self.selenium.get(self.live_server_url + reverse('admin:login'))
-        element = self.selenium.find_element_by_id('id_username')
+        element = self.selenium.find_element(By.ID, 'id_username')
         # Some browsers quotes the fonts, some don't.
         fonts = [
             font.strip().strip('"')
@@ -4973,13 +4989,14 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
     def test_search_input_filtered_page(self):
+        from selenium.webdriver.common.by import By
         Person.objects.create(name='Guido van Rossum', gender=1, alive=True)
         Person.objects.create(name='Grace Hopper', gender=1, alive=False)
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         person_url = reverse('admin:admin_views_person_changelist') + '?q=Gui'
         self.selenium.get(self.live_server_url + person_url)
         self.assertGreater(
-            self.selenium.find_element_by_id('searchbar').rect['width'],
+            self.selenium.find_element(By.ID, 'searchbar').rect['width'],
             50,
         )
 
@@ -4987,41 +5004,42 @@ class SeleniumTests(AdminSeleniumTestCase):
         """
         Create a chain of 'self' related objects via popups.
         """
+        from selenium.webdriver.common.by import By
         from selenium.webdriver.support.ui import Select
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         add_url = reverse('admin:admin_views_box_add', current_app=site.name)
         self.selenium.get(self.live_server_url + add_url)
 
         base_window = self.selenium.current_window_handle
-        self.selenium.find_element_by_id('add_id_next_box').click()
+        self.selenium.find_element(By.ID, 'add_id_next_box').click()
         self.wait_for_and_switch_to_popup()
 
         popup_window_test = self.selenium.current_window_handle
-        self.selenium.find_element_by_id('id_title').send_keys('test')
-        self.selenium.find_element_by_id('add_id_next_box').click()
+        self.selenium.find_element(By.ID, 'id_title').send_keys('test')
+        self.selenium.find_element(By.ID, 'add_id_next_box').click()
         self.wait_for_and_switch_to_popup(num_windows=3)
 
         popup_window_test2 = self.selenium.current_window_handle
-        self.selenium.find_element_by_id('id_title').send_keys('test2')
-        self.selenium.find_element_by_id('add_id_next_box').click()
+        self.selenium.find_element(By.ID, 'id_title').send_keys('test2')
+        self.selenium.find_element(By.ID, 'add_id_next_box').click()
         self.wait_for_and_switch_to_popup(num_windows=4)
 
-        self.selenium.find_element_by_id('id_title').send_keys('test3')
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.find_element(By.ID, 'id_title').send_keys('test3')
+        self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
         self.selenium.switch_to.window(popup_window_test2)
-        select = Select(self.selenium.find_element_by_id('id_next_box'))
+        select = Select(self.selenium.find_element(By.ID, 'id_next_box'))
         next_box_id = str(Box.objects.get(title="test3").id)
         self.assertEqual(select.first_selected_option.get_attribute('value'), next_box_id)
 
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
         self.selenium.switch_to.window(popup_window_test)
-        select = Select(self.selenium.find_element_by_id('id_next_box'))
+        select = Select(self.selenium.find_element(By.ID, 'id_next_box'))
         next_box_id = str(Box.objects.get(title="test2").id)
         self.assertEqual(select.first_selected_option.get_attribute('value'), next_box_id)
 
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
         self.selenium.switch_to.window(base_window)
-        select = Select(self.selenium.find_element_by_id('id_next_box'))
+        select = Select(self.selenium.find_element(By.ID, 'id_next_box'))
         next_box_id = str(Box.objects.get(title="test").id)
         self.assertEqual(select.first_selected_option.get_attribute('value'), next_box_id)
 
@@ -5029,32 +5047,33 @@ class SeleniumTests(AdminSeleniumTestCase):
         """
         Cleanup child popups when closing a parent popup.
         """
+        from selenium.webdriver.common.by import By
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         add_url = reverse('admin:admin_views_box_add', current_app=site.name)
         self.selenium.get(self.live_server_url + add_url)
 
-        self.selenium.find_element_by_id('add_id_next_box').click()
+        self.selenium.find_element(By.ID, 'add_id_next_box').click()
         self.wait_for_and_switch_to_popup()
 
         test_window = self.selenium.current_window_handle
-        self.selenium.find_element_by_id('id_title').send_keys('test')
-        self.selenium.find_element_by_id('add_id_next_box').click()
+        self.selenium.find_element(By.ID, 'id_title').send_keys('test')
+        self.selenium.find_element(By.ID, 'add_id_next_box').click()
         self.wait_for_and_switch_to_popup(num_windows=3)
 
         test2_window = self.selenium.current_window_handle
-        self.selenium.find_element_by_id('id_title').send_keys('test2')
-        self.selenium.find_element_by_id('add_id_next_box').click()
+        self.selenium.find_element(By.ID, 'id_title').send_keys('test2')
+        self.selenium.find_element(By.ID, 'add_id_next_box').click()
         self.wait_for_and_switch_to_popup(num_windows=4)
         self.assertEqual(len(self.selenium.window_handles), 4)
 
         self.selenium.switch_to.window(test2_window)
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
         self.wait_until(lambda d: len(d.window_handles) == 2, 1)
         self.assertEqual(len(self.selenium.window_handles), 2)
 
         # Close final popup to clean up test.
         self.selenium.switch_to.window(test_window)
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
         self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[-1])
 
