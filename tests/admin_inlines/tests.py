@@ -1279,37 +1279,33 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder4_add'))
 
         inline_id = '#inner4stacked_set-group'
+        rows_selector = '%s .dynamic-inner4stacked_set' % inline_id
 
-        def rows_length():
-            return len(self.selenium.find_elements_by_css_selector('%s .dynamic-inner4stacked_set' % inline_id))
-        self.assertEqual(rows_length(), 3)
-
+        self.assertCountSeleniumElements(rows_selector, 3)
         add_button = self.selenium.find_element_by_link_text(
             'Add another Inner4 stacked')
         add_button.click()
-
-        self.assertEqual(rows_length(), 4)
+        self.assertCountSeleniumElements(rows_selector, 4)
 
     def test_delete_stackeds(self):
         self.admin_login(username='super', password='secret')
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder4_add'))
 
         inline_id = '#inner4stacked_set-group'
+        rows_selector = '%s .dynamic-inner4stacked_set' % inline_id
 
-        def rows_length():
-            return len(self.selenium.find_elements_by_css_selector('%s .dynamic-inner4stacked_set' % inline_id))
-        self.assertEqual(rows_length(), 3)
+        self.assertCountSeleniumElements(rows_selector, 3)
 
         add_button = self.selenium.find_element_by_link_text(
             'Add another Inner4 stacked')
         add_button.click()
         add_button.click()
 
-        self.assertEqual(rows_length(), 5, msg="sanity check")
+        self.assertCountSeleniumElements(rows_selector, 5)
         for delete_link in self.selenium.find_elements_by_css_selector('%s .inline-deletelink' % inline_id):
             delete_link.click()
         with self.disable_implicit_wait():
-            self.assertEqual(rows_length(), 0)
+            self.assertCountSeleniumElements(rows_selector, 0)
 
     def test_delete_invalid_stacked_inlines(self):
         from selenium.common.exceptions import NoSuchElementException
@@ -1317,16 +1313,15 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder4_add'))
 
         inline_id = '#inner4stacked_set-group'
+        rows_selector = '%s .dynamic-inner4stacked_set' % inline_id
 
-        def rows_length():
-            return len(self.selenium.find_elements_by_css_selector('%s .dynamic-inner4stacked_set' % inline_id))
-        self.assertEqual(rows_length(), 3)
+        self.assertCountSeleniumElements(rows_selector, 3)
 
         add_button = self.selenium.find_element_by_link_text(
             'Add another Inner4 stacked')
         add_button.click()
         add_button.click()
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector('#id_inner4stacked_set-4-dummy')), 1)
+        self.assertCountSeleniumElements('#id_inner4stacked_set-4-dummy', 1)
 
         # Enter some data and click 'Save'.
         self.selenium.find_element_by_name('dummy').send_keys('1')
@@ -1338,14 +1333,15 @@ class SeleniumTests(AdminSeleniumTestCase):
         with self.wait_page_loaded():
             self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
 
-        self.assertEqual(rows_length(), 5, msg="sanity check")
+        # Sanity check.
+        self.assertCountSeleniumElements(rows_selector, 5)
         errorlist = self.selenium.find_element_by_css_selector(
             '%s .dynamic-inner4stacked_set .errorlist li' % inline_id
         )
         self.assertEqual('Please correct the duplicate values below.', errorlist.text)
         delete_link = self.selenium.find_element_by_css_selector('#inner4stacked_set-4 .inline-deletelink')
         delete_link.click()
-        self.assertEqual(rows_length(), 4)
+        self.assertCountSeleniumElements(rows_selector, 4)
         with self.disable_implicit_wait(), self.assertRaises(NoSuchElementException):
             self.selenium.find_element_by_css_selector('%s .dynamic-inner4stacked_set .errorlist li' % inline_id)
 
@@ -1361,16 +1357,15 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder4_add'))
 
         inline_id = '#inner4tabular_set-group'
+        rows_selector = '%s .dynamic-inner4tabular_set' % inline_id
 
-        def rows_length():
-            return len(self.selenium.find_elements_by_css_selector('%s .dynamic-inner4tabular_set' % inline_id))
-        self.assertEqual(rows_length(), 3)
+        self.assertCountSeleniumElements(rows_selector, 3)
 
         add_button = self.selenium.find_element_by_link_text(
             'Add another Inner4 tabular')
         add_button.click()
         add_button.click()
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector('#id_inner4tabular_set-4-dummy')), 1)
+        self.assertCountSeleniumElements('#id_inner4tabular_set-4-dummy', 1)
 
         # Enter some data and click 'Save'.
         self.selenium.find_element_by_name('dummy').send_keys('1')
@@ -1381,8 +1376,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.find_element_by_name('inner4tabular_set-4-dummy').send_keys('222')
         with self.wait_page_loaded():
             self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-
-        self.assertEqual(rows_length(), 5, msg="sanity check")
+        # Sanity Check.
+        self.assertCountSeleniumElements(rows_selector, 5)
 
         # Non-field errorlist is in its own <tr> just before
         # tr#inner4tabular_set-3:
@@ -1392,7 +1387,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual('Please correct the duplicate values below.', errorlist.text)
         delete_link = self.selenium.find_element_by_css_selector('#inner4tabular_set-4 .inline-deletelink')
         delete_link.click()
-        self.assertEqual(rows_length(), 4)
+
+        self.assertCountSeleniumElements(rows_selector, 4)
         with self.disable_implicit_wait(), self.assertRaises(NoSuchElementException):
             self.selenium.find_element_by_css_selector('%s .dynamic-inner4tabular_set .errorlist li' % inline_id)
 
@@ -1410,38 +1406,35 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_profilecollection_add'))
 
         # There's only one inline to start with and it has the correct ID.
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set')), 1)
-        self.assertEqual(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set')[0].get_attribute('id'),
-            'profile_set-0')
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set#profile_set-0 input[name=profile_set-0-first_name]')), 1)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set#profile_set-0 input[name=profile_set-0-last_name]')), 1)
+        self.assertCountSeleniumElements('.dynamic-profile_set', 1)
+        self.assertEqual(
+            self.selenium.find_elements_by_css_selector('.dynamic-profile_set')[0].get_attribute('id'),
+            'profile_set-0',
+        )
+        self.assertCountSeleniumElements('.dynamic-profile_set#profile_set-0 input[name=profile_set-0-first_name]', 1)
+        self.assertCountSeleniumElements('.dynamic-profile_set#profile_set-0 input[name=profile_set-0-last_name]', 1)
 
         # Add an inline
         self.selenium.find_element_by_link_text('Add another Profile').click()
 
         # The inline has been added, it has the right id, and it contains the
         # correct fields.
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector('.dynamic-profile_set')), 2)
-        self.assertEqual(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set')[1].get_attribute('id'), 'profile_set-1')
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set#profile_set-1 input[name=profile_set-1-first_name]')), 1)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set#profile_set-1 input[name=profile_set-1-last_name]')), 1)
-
+        self.assertCountSeleniumElements('.dynamic-profile_set', 2)
+        self.assertEqual(
+            self.selenium.find_elements_by_css_selector('.dynamic-profile_set')[1].get_attribute('id'),
+            'profile_set-1',
+        )
+        self.assertCountSeleniumElements('.dynamic-profile_set#profile_set-1 input[name=profile_set-1-first_name]', 1)
+        self.assertCountSeleniumElements('.dynamic-profile_set#profile_set-1 input[name=profile_set-1-last_name]', 1)
         # Let's add another one to be sure
         self.selenium.find_element_by_link_text('Add another Profile').click()
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector('.dynamic-profile_set')), 3)
-        self.assertEqual(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set')[2].get_attribute('id'), 'profile_set-2')
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set#profile_set-2 input[name=profile_set-2-first_name]')), 1)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set#profile_set-2 input[name=profile_set-2-last_name]')), 1)
+        self.assertCountSeleniumElements('.dynamic-profile_set', 3)
+        self.assertEqual(
+            self.selenium.find_elements_by_css_selector('.dynamic-profile_set')[2].get_attribute('id'),
+            'profile_set-2',
+        )
+        self.assertCountSeleniumElements('.dynamic-profile_set#profile_set-2 input[name=profile_set-2-first_name]', 1)
+        self.assertCountSeleniumElements('.dynamic-profile_set#profile_set-2 input[name=profile_set-2-last_name]', 1)
 
         # Enter some data and click 'Save'
         self.selenium.find_element_by_name('profile_set-0-first_name').send_keys('0 first name 1')
@@ -1486,33 +1479,22 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.find_element_by_link_text('Add another Profile').click()
         self.selenium.find_element_by_link_text('Add another Profile').click()
         self.selenium.find_element_by_link_text('Add another Profile').click()
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            '#profile_set-group table tr.dynamic-profile_set')), 5)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-0')), 1)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-1')), 1)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-2')), 1)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-3')), 1)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-4')), 1)
-
+        self.assertCountSeleniumElements('#profile_set-group table tr.dynamic-profile_set', 5)
+        self.assertCountSeleniumElements('form#profilecollection_form tr.dynamic-profile_set#profile_set-0', 1)
+        self.assertCountSeleniumElements('form#profilecollection_form tr.dynamic-profile_set#profile_set-1', 1)
+        self.assertCountSeleniumElements('form#profilecollection_form tr.dynamic-profile_set#profile_set-2', 1)
+        self.assertCountSeleniumElements('form#profilecollection_form tr.dynamic-profile_set#profile_set-3', 1)
+        self.assertCountSeleniumElements('form#profilecollection_form tr.dynamic-profile_set#profile_set-4', 1)
         # Click on a few delete buttons
         self.selenium.find_element_by_css_selector(
             'form#profilecollection_form tr.dynamic-profile_set#profile_set-1 td.delete a').click()
         self.selenium.find_element_by_css_selector(
             'form#profilecollection_form tr.dynamic-profile_set#profile_set-2 td.delete a').click()
         # The rows are gone and the IDs have been re-sequenced
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            '#profile_set-group table tr.dynamic-profile_set')), 3)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-0')), 1)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-1')), 1)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-2')), 1)
+        self.assertCountSeleniumElements('#profile_set-group table tr.dynamic-profile_set', 3)
+        self.assertCountSeleniumElements('form#profilecollection_form tr.dynamic-profile_set#profile_set-0', 1)
+        self.assertCountSeleniumElements('form#profilecollection_form tr.dynamic-profile_set#profile_set-1', 1)
+        self.assertCountSeleniumElements('form#profilecollection_form tr.dynamic-profile_set#profile_set-2', 1)
 
     def test_collapsed_inlines(self):
         # Collapsed inlines have SHOW/HIDE links.
@@ -1622,12 +1604,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         tabular_inline_formset_selector = 'div#inner5tabular_set-group fieldset.module.collapse'
         # Inlines without errors, both inlines collapsed
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-        self.assertEqual(
-            len(self.selenium.find_elements_by_css_selector(stacked_inline_formset_selector + '.collapsed')), 1
-        )
-        self.assertEqual(
-            len(self.selenium.find_elements_by_css_selector(tabular_inline_formset_selector + '.collapsed')), 1
-        )
+        self.assertCountSeleniumElements(stacked_inline_formset_selector + '.collapsed', 1)
+        self.assertCountSeleniumElements(tabular_inline_formset_selector + '.collapsed', 1)
         show_links = self.selenium.find_elements_by_link_text('SHOW')
         self.assertEqual(len(show_links), 2)
 
@@ -1647,18 +1625,10 @@ class SeleniumTests(AdminSeleniumTestCase):
         with self.wait_page_loaded():
             self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
         with self.disable_implicit_wait():
-            self.assertEqual(
-                len(self.selenium.find_elements_by_css_selector(stacked_inline_formset_selector + '.collapsed')), 0
-            )
-            self.assertEqual(
-                len(self.selenium.find_elements_by_css_selector(tabular_inline_formset_selector + '.collapsed')), 0
-            )
-        self.assertEqual(
-            len(self.selenium.find_elements_by_css_selector(stacked_inline_formset_selector)), 1
-        )
-        self.assertEqual(
-            len(self.selenium.find_elements_by_css_selector(tabular_inline_formset_selector)), 1
-        )
+            self.assertCountSeleniumElements(stacked_inline_formset_selector + '.collapsed', 0)
+            self.assertCountSeleniumElements(tabular_inline_formset_selector + '.collapsed', 0)
+        self.assertCountSeleniumElements(stacked_inline_formset_selector, 1)
+        self.assertCountSeleniumElements(tabular_inline_formset_selector, 1)
 
     def test_inlines_verbose_name(self):
         """

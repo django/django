@@ -154,6 +154,15 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         select = Select(self.selenium.find_element_by_css_selector(selector))
         select.deselect_by_value(value)
 
+    def assertCountSeleniumElements(self, selector, count, root_element=None):
+        """
+        Assert number of matches for a CSS selector.
+
+        `root_element` allow restriction to a pre-selected node.
+        """
+        root_element = root_element or self.selenium
+        self.assertEqual(len(root_element.find_elements_by_css_selector(selector)), count)
+
     def _assertOptionsValues(self, options_selector, values):
         if values:
             options = self.selenium.find_elements_by_css_selector(options_selector)

@@ -359,27 +359,31 @@ class SeleniumTests(AdminSeleniumTestCase):
         elem.click()  # Reopen the dropdown now that some objects exist.
         result_container = self.selenium.find_element_by_css_selector('.select2-results')
         self.assertTrue(result_container.is_displayed())
-        results = result_container.find_elements_by_css_selector('.select2-results__option')
         # PAGINATOR_SIZE results and "Loading more results".
-        self.assertEqual(len(results), PAGINATOR_SIZE + 1)
+        self.assertCountSeleniumElements('.select2-results__option', PAGINATOR_SIZE + 1, root_element=result_container)
         search = self.selenium.find_element_by_css_selector('.select2-search__field')
         # Load next page of results by scrolling to the bottom of the list.
         with self.select2_ajax_wait():
-            for _ in range(len(results)):
+            for _ in range(PAGINATOR_SIZE + 1):
                 search.send_keys(Keys.ARROW_DOWN)
-        results = result_container.find_elements_by_css_selector('.select2-results__option')
         # All objects are now loaded.
-        self.assertEqual(len(results), PAGINATOR_SIZE + 11)
+        self.assertCountSeleniumElements(
+            '.select2-results__option',
+            PAGINATOR_SIZE + 11,
+            root_element=result_container,
+        )
         # Limit the results with the search field.
         with self.select2_ajax_wait():
             search.send_keys('Who')
             # Ajax request is delayed.
             self.assertTrue(result_container.is_displayed())
-            results = result_container.find_elements_by_css_selector('.select2-results__option')
-            self.assertEqual(len(results), PAGINATOR_SIZE + 12)
+            self.assertCountSeleniumElements(
+                '.select2-results__option',
+                PAGINATOR_SIZE + 12,
+                root_element=result_container,
+            )
         self.assertTrue(result_container.is_displayed())
-        results = result_container.find_elements_by_css_selector('.select2-results__option')
-        self.assertEqual(len(results), 1)
+        self.assertCountSeleniumElements('.select2-results__option', 1, root_element=result_container)
         # Select the result.
         search.send_keys(Keys.RETURN)
         select = Select(self.selenium.find_element_by_id('id_question'))
@@ -401,25 +405,22 @@ class SeleniumTests(AdminSeleniumTestCase):
         elem.click()  # Reopen the dropdown now that some objects exist.
         result_container = self.selenium.find_element_by_css_selector('.select2-results')
         self.assertTrue(result_container.is_displayed())
-        results = result_container.find_elements_by_css_selector('.select2-results__option')
-        self.assertEqual(len(results), PAGINATOR_SIZE + 1)
+        self.assertCountSeleniumElements('.select2-results__option', PAGINATOR_SIZE + 1, root_element=result_container)
         search = self.selenium.find_element_by_css_selector('.select2-search__field')
         # Load next page of results by scrolling to the bottom of the list.
         with self.select2_ajax_wait():
-            for _ in range(len(results)):
+            for _ in range(PAGINATOR_SIZE + 1):
                 search.send_keys(Keys.ARROW_DOWN)
-        results = result_container.find_elements_by_css_selector('.select2-results__option')
-        self.assertEqual(len(results), 31)
+        self.assertCountSeleniumElements('.select2-results__option', 31, root_element=result_container)
         # Limit the results with the search field.
         with self.select2_ajax_wait():
             search.send_keys('Who')
             # Ajax request is delayed.
             self.assertTrue(result_container.is_displayed())
-            results = result_container.find_elements_by_css_selector('.select2-results__option')
-            self.assertEqual(len(results), 32)
+            self.assertCountSeleniumElements('.select2-results__option', 32, root_element=result_container)
         self.assertTrue(result_container.is_displayed())
-        results = result_container.find_elements_by_css_selector('.select2-results__option')
-        self.assertEqual(len(results), 1)
+
+        self.assertCountSeleniumElements('.select2-results__option', 1, root_element=result_container)
         # Select the result.
         search.send_keys(Keys.RETURN)
         # Reopen the dropdown and add the first result to the selection.

@@ -992,7 +992,7 @@ class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
         # Warning: This would effectively fail if the TIME_ZONE defined in the
         # settings has the same UTC offset as "Asia/Singapore" because the
         # mismatch warning would be rightfully missing from the page.
-        self.selenium.find_elements_by_css_selector('.field-birthdate .timezonewarning')
+        self.assertCountSeleniumElements('.field-birthdate .timezonewarning', 1)
 
         # Submit the form.
         with self.wait_page_loaded():
@@ -1322,8 +1322,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         change_url = reverse('admin:admin_widgets_school_change', args=(self.school.id,))
         self.selenium.get(self.live_server_url + change_url)
 
-        options_len = len(self.selenium.find_elements_by_css_selector('#id_students_to > option'))
-        self.assertEqual(options_len, 2)
+        self.assertCountSeleniumElements('#id_students_to > option', 2)
 
         # self.selenium.refresh() or send_keys(Keys.F5) does hard reload and
         # doesn't replicate what happens when a user clicks the browser's
@@ -1331,8 +1330,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         with self.wait_page_loaded():
             self.selenium.execute_script("location.reload()")
 
-        options_len = len(self.selenium.find_elements_by_css_selector('#id_students_to > option'))
-        self.assertEqual(options_len, 2)
+        self.assertCountSeleniumElements('#id_students_to > option', 2)
 
 
 class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
