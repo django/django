@@ -38,7 +38,7 @@ def unpickle_named_row(names, values):
     return create_namedtuple_class(*names)(*values)
 
 
-@functools.lru_cache
+@functools.lru_cache()
 def create_namedtuple_class(*names):
     # Cache type() with @lru_cache since it's too slow to be called for every
     # QuerySet evaluation.
