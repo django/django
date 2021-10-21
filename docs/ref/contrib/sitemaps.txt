@@ -421,7 +421,8 @@ Here's what the relevant URLconf lines would look like for the example above::
     from django.contrib.sitemaps import views
 
     urlpatterns = [
-        path('sitemap.xml', views.index, {'sitemaps': sitemaps}),
+        path('sitemap.xml', views.index, {'sitemaps': sitemaps},
+             name='django.contrib.sitemaps.views.index'),
         path('sitemap-<section>.xml', views.sitemap, {'sitemaps': sitemaps},
              name='django.contrib.sitemaps.views.sitemap'),
     ]
@@ -472,7 +473,7 @@ parameter to the ``sitemap`` and ``index`` views via the URLconf::
         path('custom-sitemap.xml', views.index, {
             'sitemaps': sitemaps,
             'template_name': 'custom_sitemap.html'
-        }),
+        }, name='django.contrib.sitemaps.views.index'),
         path('custom-sitemap-<section>.xml', views.sitemap, {
             'sitemaps': sitemaps,
             'template_name': 'custom_sitemap.html'
@@ -572,9 +573,13 @@ that: :func:`django.contrib.sitemaps.ping_google()`.
     ``ping_google`` takes these optional arguments:
 
     * ``sitemap_url`` - The absolute path to your site's sitemap (e.g.,
-      :file:`'/sitemap.xml'`). If this argument isn't provided, ``ping_google``
-      will attempt to figure out your sitemap by performing a reverse lookup in
-      your URLconf.
+      :file:`'/sitemap.xml'`).
+
+      If this argument isn't provided, ``ping_google`` will perform a reverse
+      lookup in your URLconf, for URLs named
+      ``'django.contrib.sitemaps.views.index'`` and then
+      ``'django.contrib.sitemaps.views.sitemap'`` (without further arguments) to
+      automatically determine the sitemap URL.
 
     * ``ping_url`` - Defaults to Google's Ping Tool:
       https://www.google.com/webmasters/tools/ping.
