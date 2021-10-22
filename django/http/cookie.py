@@ -17,6 +17,9 @@ def parse_cookie(cookie):
             # https://bugzilla.mozilla.org/show_bug.cgi?id=169091
             key, val = '', chunk
         key, val = key.strip(), val.strip()
+        # only use first cookie value if multiple with same name
+        if key in cookiedict:
+            continue
         if key or val:
             # unquote using Python's algorithm.
             cookiedict[key] = cookies._unquote(val)

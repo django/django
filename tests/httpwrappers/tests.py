@@ -773,9 +773,8 @@ class CookieTests(unittest.TestCase):
     def test_cookie_edgecases(self):
         # Cookies that RFC6265 allows.
         self.assertEqual(parse_cookie('a=b; Domain=example.com'), {'a': 'b', 'Domain': 'example.com'})
-        # parse_cookie() has historically kept only the last cookie with the
-        # same name.
-        self.assertEqual(parse_cookie('a=b; h=i; a=c'), {'a': 'c', 'h': 'i'})
+        # Use only the first value if multiple cookies have the same name. #33212
+        self.assertEqual(parse_cookie('a=b; h=i; a=c'), {'a': 'b', 'h': 'i'})
 
     def test_invalid_cookies(self):
         """
