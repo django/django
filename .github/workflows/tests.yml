@@ -30,3 +30,15 @@ jobs:
             ${{ runner.os }}-node-
       - run: npm install
       - run: npm test
+
+  selenium-tests:
+    on:
+      issue_comment:
+        types: [created]
+    runs-on: ubuntu-latest
+    name: Selenium tests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - run:
+        echo "${{github.event.comment}}"
