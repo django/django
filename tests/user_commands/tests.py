@@ -274,6 +274,41 @@ class CommandTests(SimpleTestCase):
                 )
                 self.assertIn(expected_output, out.getvalue())
 
+    def test_mutually_exclusive_group_required_with_same_dest_options(self):
+        tests = [
+            {'until': '2'},
+            {'for': '1', 'until': '2'},
+        ]
+        msg = (
+            "Cannot pass the dest 'until' that matches multiple arguments via "
+            "**options."
+        )
+        for options in tests:
+            with self.subTest(options=options):
+                with self.assertRaisesMessage(TypeError, msg):
+                    management.call_command(
+                        'mutually_exclusive_required_with_same_dest',
+                        **options,
+                    )
+
+    def test_mutually_exclusive_group_required_with_same_dest_args(self):
+        tests = [
+            ('--until=1',),
+            ('--until', 1),
+            ('--for=1',),
+            ('--for', 1),
+        ]
+        for args in tests:
+            out = StringIO()
+            with self.subTest(options=args):
+                management.call_command(
+                    'mutually_exclusive_required_with_same_dest',
+                    *args,
+                    stdout=out,
+                )
+                output = out.getvalue()
+                self.assertIn('until=1', output)
+
     def test_required_list_option(self):
         tests = [
             (('--foo-list', [1, 2]), {}),
