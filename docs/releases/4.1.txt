@@ -247,7 +247,9 @@ Upstream support for MariaDB 10.2 ends in May 2022. Django 4.1 supports MariaDB
 Miscellaneous
 -------------
 
-* ...
+* If multiple cookies are sent with the same name, Django now uses the first
+  value rather than the last value in ``request.COOKIES``. The ``Cookie``
+  header parsing code is slightly stricter.
 
 .. _deprecated-features-4.1:
 
