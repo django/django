@@ -522,7 +522,7 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {'auto_now_add': True})
 
-        # It should be reflected even if both `auto_now` and `auto_now_add` arguments are assigned
+        # It should be reflected even if both `auto_now` and `auto_now_add` arguments are assigned.
         field = models.TimeField(auto_now=True, auto_now_add=True)
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(args, [])
