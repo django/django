@@ -278,7 +278,7 @@ class LiveServerViews(LiveServerBase):
 
 
 @override_settings(ROOT_URLCONF='servers.urls')
-class SingleTreadLiveServerViews(SingleThreadLiveServerTestCase):
+class SingleThreadLiveServerViews(SingleThreadLiveServerTestCase):
     available_apps = ['servers']
 
     def test_closes_connection_with_content_length(self):
@@ -288,8 +288,8 @@ class SingleTreadLiveServerViews(SingleThreadLiveServerTestCase):
         Persistent connections require threading server.
         """
         conn = HTTPConnection(
-            SingleTreadLiveServerViews.server_thread.host,
-            SingleTreadLiveServerViews.server_thread.port,
+            SingleThreadLiveServerViews.server_thread.host,
+            SingleThreadLiveServerViews.server_thread.port,
             timeout=1,
         )
         try:
