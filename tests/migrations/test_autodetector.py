@@ -1732,9 +1732,7 @@ class AutodetectorTests(TestCase):
         )
 
     def test_rename_field_and_foo_together(self):
-        """
-        Removed fields will be removed after updating index/unique_together.
-        """
+        """Fields are renamed before updating index/unique_together."""
         changes = self.get_changes(
             [self.author_empty, self.book_foo_together_3],
             [self.author_empty, self.book_foo_together_4],
