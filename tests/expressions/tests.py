@@ -1473,7 +1473,6 @@ class FTimeDeltaTests(TestCase):
             test_set = [e.name for e in Experiment.objects.filter(completed__lte=F('assigned') + days)]
             self.assertEqual(test_set, self.expnames[:i + 1])
 
-    @skipUnlessDBFeature("supports_mixed_date_datetime_comparisons")
     def test_mixed_comparisons1(self):
         for i, delay in enumerate(self.delays):
             test_set = [e.name for e in Experiment.objects.filter(assigned__gt=F('start') - delay)]

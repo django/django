@@ -18,7 +18,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_unspecified_pk = True
     supports_timezones = False
     max_query_params = 999
-    supports_mixed_date_datetime_comparisons = False
     supports_transactions = True
     atomic_transactions = False
     can_rollback_ddl = True
@@ -49,6 +48,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         'ci': 'nocase',
         'cs': 'binary',
         'non_default': 'nocase',
+    }
+    django_test_expected_failures = {
+        # The django_format_dtdelta() function doesn't properly handle mixed
+        # Date/DateTime fields and timedeltas.
+        'expressions.tests.FTimeDeltaTests.test_mixed_comparisons1',
     }
 
     @cached_property

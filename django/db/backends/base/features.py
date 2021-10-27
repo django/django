@@ -112,9 +112,6 @@ class BaseDatabaseFeatures:
     # deferred
     can_defer_constraint_checks = False
 
-    # date_interval_sql can properly handle mixed Date/DateTime fields and timedeltas
-    supports_mixed_date_datetime_comparisons = True
-
     # Does the backend support tablespaces? Default to False because it isn't
     # in the SQL standard.
     supports_tablespaces = False
