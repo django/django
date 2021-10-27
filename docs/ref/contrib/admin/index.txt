@@ -2837,7 +2837,7 @@ override to your project:
 
     {% extends 'admin/base.html' %}
 
-    {% block extrahead %}{{ block.super }}
+    {% block extrastyle %}{{ block.super }}
     <style>
     :root {
       --primary: #9774d5;
