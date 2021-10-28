@@ -68,7 +68,10 @@ class Paginator:
         except PageNotAnInteger:
             number = 1
         except EmptyPage:
-            number = self.num_pages
+            if number < 1:
+                number = 1
+            elif number > self.num_pages:
+                number = self.num_pages
         return self.page(number)
 
     def page(self, number):
