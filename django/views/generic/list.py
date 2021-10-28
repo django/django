@@ -8,7 +8,7 @@ from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 
 class MultipleObjectMixin(ContextMixin):
     """A mixin for views manipulating multiple objects."""
-    allow_out_of_range = True
+    allow_out_of_range = False
     allow_empty = True
     queryset = None
     model = None
