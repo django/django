@@ -30,6 +30,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_cast_with_precision = False
     time_cast_precision = 3
     can_release_savepoints = True
+    has_case_insensitive_like = True
     # Is "ALTER TABLE ... RENAME COLUMN" supported?
     can_alter_table_rename_column = Database.sqlite_version_info >= (3, 25, 0)
     supports_parentheses_in_compound = False

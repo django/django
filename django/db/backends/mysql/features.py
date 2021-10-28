@@ -24,7 +24,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_select_difference = False
     supports_slicing_ordering_in_compound = True
     supports_index_on_text_field = False
-    has_case_insensitive_like = False
     create_test_procedure_without_params_sql = """
         CREATE PROCEDURE test_procedure ()
         BEGIN

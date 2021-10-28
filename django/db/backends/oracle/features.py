@@ -39,7 +39,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     # does by uppercasing all identifiers.
     ignores_table_name_case = True
     supports_index_on_text_field = False
-    has_case_insensitive_like = False
     create_test_procedure_without_params_sql = """
         CREATE PROCEDURE "TEST_PROCEDURE" AS
             V_I INTEGER;
