@@ -201,7 +201,7 @@ class BaseDatabaseFeatures:
     closed_cursor_error_class = ProgrammingError
 
     # Does 'a' LIKE 'A' match?
-    has_case_insensitive_like = True
+    has_case_insensitive_like = False
 
     # Suffix for backends that don't support "SELECT xxx;" queries.
     bare_select_suffix = ''

@@ -237,7 +237,8 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ...
+* ``BaseDatabaseFeatures.has_case_insensitive_like`` is changed from ``True``
+  to ``False`` to reflect the behavior of most databases.
 
 Dropped support for MariaDB 10.2
 --------------------------------
