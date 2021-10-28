@@ -868,6 +868,11 @@ class HTMLEqualTests(SimpleTestCase):
         dom2 = parse_html('<a><b/><b/></a><b/><b/>')
         self.assertEqual(dom2.count(dom1), 2)
 
+    def test_root_element_escaped_html(self):
+        html = '&lt;br&gt;'
+        parsed = parse_html(html)
+        self.assertEqual(str(parsed), html)
+
     def test_parsing_errors(self):
         with self.assertRaises(AssertionError):
             self.assertHTMLEqual('<p>', '')
@@ -881,6 +886,17 @@ class HTMLEqualTests(SimpleTestCase):
             self.assertHTMLEqual('< div></ div>', '<div></div>')
         with self.assertRaises(HTMLParseError):
             parse_html('</p>')
+
+    def test_escaped_html_errors(self):
+        msg = (
+            '<p>\n<foo>\n</p>'
+            ' != '
+            '<p>\n&lt;foo&gt;\n</p>\n'
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertHTMLEqual('<p><foo></p>', '<p>&lt;foo&gt;</p>')
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertHTMLEqual('<p><foo></p>', '<p>&#60;foo&#62;</p>')
 
     def test_contains_html(self):
         response = HttpResponse('''<body>
