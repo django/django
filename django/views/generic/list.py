@@ -8,6 +8,7 @@ from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 
 class MultipleObjectMixin(ContextMixin):
     """A mixin for views manipulating multiple objects."""
+    allow_out_of_range = True
     allow_empty = True
     queryset = None
     model = None
@@ -66,7 +67,10 @@ class MultipleObjectMixin(ContextMixin):
             else:
                 raise Http404(_('Page is not “last”, nor can it be converted to an int.'))
         try:
-            page = paginator.page(page_number)
+            if self.allow_out_of_range:
+                page = paginator.get_page(page_number)
+            else:
+                page = paginator.page(page_number)
             return (paginator, page, page.object_list, page.has_other_pages())
         except InvalidPage as e:
             raise Http404(_('Invalid page (%(page_number)s): %(message)s') % {
