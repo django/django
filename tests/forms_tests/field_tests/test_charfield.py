@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.forms import (
-    CharField, HiddenInput, PasswordInput, Textarea, TextInput,
+    CharField, Form, HiddenInput, PasswordInput, Textarea, TextInput,
 )
 from django.test import SimpleTestCase
 
@@ -152,3 +152,24 @@ class CharFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         msg = 'Null characters are not allowed.'
         with self.assertRaisesMessage(ValidationError, msg):
             f.clean('\x00something')
+
+    def test_aria_attribute_on_error(self):
+        """Add aria-invalid (set to true) HTML attribute if the field has validation errors."""
+
+        class InvalidForm(Form):
+            name = CharField()
+
+            def clean_name(self):
+                raise ValidationError("Some error.")
+
+        f = InvalidForm({
+            'name': "Random Name",
+        }, auto_id=False)
+
+        self.assertHTMLEqual(
+            f.as_table(),
+            """<tr><th>Name:</th><td>
+            <ul class="errorlist"><li>Some error.</li></ul>
+            <input aria-invalid="true" type="text" name="name" value="Random Name" required></td></tr>
+            """
+        )

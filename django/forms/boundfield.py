@@ -247,6 +247,8 @@ class BoundField:
                 attrs['required'] = True
         if self.field.disabled:
             attrs['disabled'] = True
+        if self.errors:
+            attrs['aria-invalid'] = "true"
         return attrs
 
     @property
