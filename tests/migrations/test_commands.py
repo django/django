@@ -2082,6 +2082,29 @@ class SquashMigrationsTests(MigrationTestBase):
             squashed_migration_file = os.path.join(migration_dir, '0001_%s.py' % squashed_name)
             self.assertTrue(os.path.exists(squashed_migration_file))
 
+    def test_squashed_name_collision(self):
+        """Using --squashed-name shouldn’t overwrite existing migrations"""
+        initial_migration_name = 'initial'
+        with self.temporary_migration_module(module='migrations.test_migrations') as migration_dir:
+            initial_migration_file = os.path.join(
+                migration_dir, '0001_%s.py' % initial_migration_name
+            )
+            with open(initial_migration_file, 'rt') as f:
+                initial_migration_contents = f.read()
+
+            with self.assertRaisesMessage(
+                CommandError, 'not safe to overwrite'
+            ):
+                call_command(
+                    'squashmigrations', 'migrations', '0001', '0002',
+                    squashed_name=initial_migration_name, interactive=False,
+                    verbosity=0,
+                )
+
+            with open(initial_migration_file, 'rt') as f:
+                updated_migration_contents = f.read()
+            self.assertEqual(initial_migration_contents, updated_migration_contents)
+
 
 class AppLabelErrorTests(TestCase):
     """

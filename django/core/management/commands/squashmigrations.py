@@ -1,3 +1,5 @@
+import os.path
+
 from django.apps import apps
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
@@ -184,6 +186,15 @@ class Command(BaseCommand):
 
         # Write out the new migration file
         writer = MigrationWriter(new_migration, include_header)
+
+        if os.path.isfile(writer.path):
+            raise CommandError(
+                'There already is a migration named %s. It is not safe to '
+                'overwrite that migration if it has been applied anywhere. '
+                'Try specifying a different name for the new squashed '
+                'migration.' % new_migration.name
+            )
+
         with open(writer.path, "w", encoding='utf-8') as fh:
             fh.write(writer.as_string())
 
