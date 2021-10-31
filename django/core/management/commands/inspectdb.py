@@ -83,6 +83,12 @@ class Command(BaseCommand):
                         c['columns'][0] for c in constraints.values()
                         if c['unique'] and len(c['columns']) == 1
                     ]
+
+                    constraints_for_delete = {}
+                    for cval in constraints.values():
+                        constraints_for_delete[cval['columns'][0]] = {'on_delete': cval.get('on_delete', None),
+                                                                      'on_update': cval.get('on_update', None), }
+
                     table_description = connection.introspection.get_table_description(cursor, table_name)
                 except Exception as e:
                     yield "# Unable to inspect table '%s'" % table_name
@@ -158,7 +164,18 @@ class Command(BaseCommand):
                         field_type,
                     )
                     if field_type.startswith(('ForeignKey(', 'OneToOneField(')):
-                        field_desc += ', models.DO_NOTHING'
+                        on_del_str = ', models.DO_NOTHING'
+
+                        if column_name in constraints_for_delete:
+                            del_key = constraints_for_delete[column_name]['on_delete']
+                            if del_key =='DO_NOTHING':
+                                on_del_str = ', models.DO_NOTHING'
+                            elif del_key =='CASCADE':
+                                on_del_str = ', models.CASCADE'
+                            elif del_key =='SET NULL':
+                                on_del_str = ', models.SET_NULL'
+
+                        field_desc += on_del_str
 
                     if extra_params:
                         if not field_desc.endswith('('):

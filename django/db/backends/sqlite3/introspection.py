@@ -214,7 +214,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         cursor.execute('PRAGMA foreign_key_list(%s)' % self.connection.ops.quote_name(table_name))
         for row in cursor.fetchall():
             # Remaining on_update/on_delete/match values are of no interest.
-            id_, _, table, from_, to = row[:5]
+            id_, _, table, from_, to, on_update, on_delete = row[:7]
             constraints['fk_%d' % id_] = {
                 'columns': [from_],
                 'primary_key': False,
@@ -222,6 +222,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 'foreign_key': (table, to),
                 'check': False,
                 'index': False,
+                'on_update':on_update,
+                'on_delete':on_delete
             }
         return constraints
 
