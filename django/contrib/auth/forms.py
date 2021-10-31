@@ -240,7 +240,7 @@ class AuthenticationForm(forms.Form):
 
 class PasswordResetForm(forms.Form):
     email = forms.EmailField(
-        label=_("Email"),
+        label=_('Email address'),
         max_length=254,
         widget=forms.EmailInput(attrs={'autocomplete': 'email'})
     )
