@@ -1776,6 +1776,21 @@ the :tfilter:`linebreaks` filter::
         {{ body|linebreaks|force_escape }}
     {% endautoescape %}
 
+
+.. templatefilter:: get_item
+
+``get_item``
+------------
+
+Django template to look up a dictionary value with a variable.
+
+For example::
+
+    mydict = {"key1":"value1", "key2":"value2"}
+    item = "key1"
+
+    {{ mydict|get_item:item }}
+
 .. templatefilter:: get_digit
 
 ``get_digit``

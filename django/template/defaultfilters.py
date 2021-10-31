@@ -725,6 +725,19 @@ def get_digit(value, arg):
     except IndexError:
         return 0
 
+@register.filter
+def get_item(dictionary, key):
+    """
+    Django template to look up a dictionary value with a variable
+
+    Problem:
+    https://stackoverflow.com/questions/8000022
+    mydict = {"key1":"value1", "key2":"value2"}
+    I want to look up mydict[item.NAME] where item has an attribute NAME
+    Solution:
+    {{ mydict|get_item:item.NAME }}
+    """
+    return dictionary.get(key)
 
 ###################
 # DATES           #
