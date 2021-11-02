@@ -189,10 +189,7 @@ class Command(BaseCommand):
 
         if os.path.isfile(writer.path):
             raise CommandError(
-                'There already is a migration named %s. It is not safe to '
-                'overwrite that migration if it has been applied anywhere. '
-                'Try specifying a different name for the new squashed '
-                'migration.' % new_migration.name
+                f'Migration {new_migration.name} already exists. Use a new name.'
             )
 
         with open(writer.path, "w", encoding='utf-8') as fh:
