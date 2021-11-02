@@ -2082,16 +2082,13 @@ class SquashMigrationsTests(MigrationTestBase):
             squashed_migration_file = os.path.join(migration_dir, '0001_%s.py' % squashed_name)
             self.assertTrue(os.path.exists(squashed_migration_file))
 
-    def test_squashed_name_collision(self):
-        """Using --squashed-name shouldn’t overwrite existing migrations"""
-        initial_migration_name = 'initial'
+    def test_squashed_name_exists(self):
+        msg = 'Migration 0001_initial already exists. Use a different name.'
         with self.temporary_migration_module(module='migrations.test_migrations'):
-            expected_regex = '0001_initial.*already exists'
-            with self.assertRaisesRegex(CommandError, expected_regex):
+            with self.assertRaisesMessage(CommandError, msg):
                 call_command(
                     'squashmigrations', 'migrations', '0001', '0002',
-                    squashed_name=initial_migration_name, interactive=False,
-                    verbosity=0,
+                    squashed_name='initial', interactive=False, verbosity=0,
                 )
 
 
