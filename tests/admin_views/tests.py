@@ -5787,7 +5787,6 @@ class AdminDocsTest(TestCase):
             ],
         },
     }],
-    USE_I18N=False,
 )
 class ValidXHTMLTests(TestCase):
 
@@ -5799,9 +5798,10 @@ class ValidXHTMLTests(TestCase):
         self.client.force_login(self.superuser)
 
     def test_lang_name_present(self):
-        response = self.client.get(reverse('admin:app_list', args=('admin_views',)))
-        self.assertNotContains(response, ' lang=""')
-        self.assertNotContains(response, ' xml:lang=""')
+        with translation.override(None):
+            response = self.client.get(reverse('admin:app_list', args=('admin_views',)))
+            self.assertNotContains(response, ' lang=""')
+            self.assertNotContains(response, ' xml:lang=""')
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls', USE_THOUSAND_SEPARATOR=True)
