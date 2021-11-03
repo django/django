@@ -314,7 +314,7 @@ Writing a test for ticket #99999
 --------------------------------
 
 In order to resolve this ticket, we'll add a ``make_toast()`` function to the
-top-level ``django`` module. First we are going to write a test that tries to
+``django.shortcuts`` module. First we are going to write a test that tries to
 use the function and check that its output looks correct.
 
 Navigate to Django's ``tests/shortcuts/`` folder and create a new file
