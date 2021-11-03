@@ -108,6 +108,10 @@ Minor features
   <django.contrib.postgres.fields.DecimalRangeField.default_bounds>` allows
   specifying bounds for list and tuple inputs.
 
+* :class:`~django.contrib.postgres.constraints.ExclusionConstraint` now allows
+  specifying operator classes with the
+  :class:`OpClass() <django.contrib.postgres.indexes.OpClass>` expression.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

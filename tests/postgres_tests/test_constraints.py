@@ -198,6 +198,7 @@ class SchemaTests(PostgreSQLTestCase):
         Scene.objects.create(scene='ScEnE 10', setting="Sir Bedemir's Castle")
 
 
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
 class ExclusionConstraintTests(PostgreSQLTestCase):
     def get_constraints(self, table):
         """Get the constraints on the table using a new cursor."""
@@ -604,6 +605,24 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         )
         self._test_range_overlaps(constraint)
 
+    def test_range_overlaps_custom_opclass_expression(self):
+        class TsTzRange(Func):
+            function = 'TSTZRANGE'
+            output_field = DateTimeRangeField()
+
+        constraint = ExclusionConstraint(
+            name='exclude_overlapping_reservations_custom_opclass',
+            expressions=[
+                (
+                    OpClass(TsTzRange('start', 'end', RangeBoundary()), 'range_ops'),
+                    RangeOperators.OVERLAPS,
+                ),
+                (OpClass('room', 'gist_int4_ops'), RangeOperators.EQUAL),
+            ],
+            condition=Q(cancelled=False),
+        )
+        self._test_range_overlaps(constraint)
+
     def test_range_overlaps(self):
         constraint = ExclusionConstraint(
             name='exclude_overlapping_reservations',
@@ -913,6 +932,34 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.add_constraint(RangesModel, constraint)
         self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
+
+    def test_opclass_expression(self):
+        constraint_name = 'ints_adjacent_opclass_expression'
+        self.assertNotIn(
+            constraint_name,
+            self.get_constraints(RangesModel._meta.db_table),
+        )
+        constraint = ExclusionConstraint(
+            name=constraint_name,
+            expressions=[(OpClass('ints', 'range_ops'), RangeOperators.ADJACENT_TO)],
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(RangesModel, constraint)
+        constraints = self.get_constraints(RangesModel._meta.db_table)
+        self.assertIn(constraint_name, constraints)
+        with editor.connection.cursor() as cursor:
+            cursor.execute(SchemaTests.get_opclass_query, [constraint_name])
+            self.assertEqual(
+                cursor.fetchall(),
+                [('range_ops', constraint_name)],
+            )
+        # Drop the constraint.
+        with connection.schema_editor() as editor:
+            editor.remove_constraint(RangesModel, constraint)
+        self.assertNotIn(
+            constraint_name,
+            self.get_constraints(RangesModel._meta.db_table),
+        )
 
     def test_range_equal_cast(self):
         constraint_name = 'exclusion_equal_room_cast'
