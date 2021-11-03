@@ -49,7 +49,7 @@ class RenderableMixin:
             'Subclasses of RenderableMixin must provide a get_context() method.'
         )
 
-    def render(self, template_name=None, context=None, field=None, renderer=None):
+    def render(self, template_name=None, context=None, renderer=None):
         return mark_safe((renderer or self.renderer).render(
             template_name or self.template_name,
             context or self.get_context(),
