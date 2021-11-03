@@ -994,9 +994,9 @@ class BaseCacheTests:
         self.assertEqual(caches['custom_key'].get('answer2'), 42)
         self.assertEqual(caches['custom_key2'].get('answer2'), 42)
 
+    @override_settings(CACHE_MIDDLEWARE_ALIAS=DEFAULT_CACHE_ALIAS)
     def test_cache_write_unpicklable_object(self):
         fetch_middleware = FetchFromCacheMiddleware(empty_response)
-        fetch_middleware.cache = cache
 
         request = self.factory.get('/cache/test')
         request._cache_update_cache = True
@@ -1011,7 +1011,6 @@ class BaseCacheTests:
             return response
 
         update_middleware = UpdateCacheMiddleware(get_response)
-        update_middleware.cache = cache
         response = update_middleware(request)
 
         get_cache_data = fetch_middleware.process_request(request)
