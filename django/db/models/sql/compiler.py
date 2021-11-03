@@ -1077,6 +1077,8 @@ class SQLCompiler:
                     (path, klass_info)
                     for klass_info in klass_info.get('related_klass_infos', [])
                 )
+        if not self.klass_info:
+            return []
         result = []
         invalid_names = []
         for name in self.query.select_for_update_of:
