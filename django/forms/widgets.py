@@ -1002,7 +1002,6 @@ class SelectDateWidget(Widget):
             name=month_name,
             value=context['widget']['value']['month'],
             attrs={**context['widget']['attrs'], 'id': 'id_%s' % month_name},
-            field=field,
         )
         day_choices = [(i, i) for i in range(1, 32)]
         if not self.is_required:
@@ -1012,7 +1011,6 @@ class SelectDateWidget(Widget):
             name=day_name,
             value=context['widget']['value']['day'],
             attrs={**context['widget']['attrs'], 'id': 'id_%s' % day_name},
-            field=field,
         )
         subwidgets = []
         for field in self._parse_date_fmt():
