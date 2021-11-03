@@ -172,7 +172,7 @@ By default, Django uses the :ref:`dictConfig format
 <logging-config-dictschema>`.
 
 In order to configure logging, you use :setting:`LOGGING` to define a
-dictionary of logging settings. These settings describes the loggers,
+dictionary of logging settings. These settings describe the loggers,
 handlers, filters and formatters that you want in your logging setup,
 and the log levels and other properties that you want those components
 to have.
