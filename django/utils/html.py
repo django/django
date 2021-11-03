@@ -264,7 +264,7 @@ class Urlizer:
         ])
 
     def handle_word(
-        self, word, safe_input, trim_url_limit=None, nofollow=False, autoescape=False,
+        self, word, *, safe_input, trim_url_limit=None, nofollow=False, autoescape=False,
     ):
         if '.' in word or '@' in word or ':' in word:
             # lead: Punctuation trimmed from the beginning of the word.
@@ -288,7 +288,7 @@ class Urlizer:
                 nofollow_attr = ''
             # Make link.
             if url:
-                trimmed = self.trim_url(middle, trim_url_limit=trim_url_limit)
+                trimmed = self.trim_url(middle, limit=trim_url_limit)
                 if autoescape and not safe_input:
                     lead, trail = escape(lead), escape(trail)
                     trimmed = escape(trimmed)
@@ -309,10 +309,10 @@ class Urlizer:
             return escape(word)
         return word
 
-    def trim_url(self, x, trim_url_limit):
-        if trim_url_limit is None or len(x) <= trim_url_limit:
+    def trim_url(self, x, *, limit):
+        if limit is None or len(x) <= limit:
             return x
-        return '%s…' % x[:max(0, trim_url_limit - 1)]
+        return '%s…' % x[:max(0, limit - 1)]
 
     def trim_punctuation(self, word):
         """
