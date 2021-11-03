@@ -3,6 +3,7 @@ import binascii
 from django.contrib.gis.geos import (
     GEOSGeometry, Point, Polygon, WKBReader, WKBWriter, WKTReader, WKTWriter,
 )
+from django.contrib.gis.geos.libgeos import geos_version_tuple
 from django.test import SimpleTestCase
 
 
@@ -40,7 +41,10 @@ class GEOSIOTest(SimpleTestCase):
     def test_wktwriter_constructor_arguments(self):
         wkt_w = WKTWriter(dim=3, trim=True, precision=3)
         ref = GEOSGeometry('POINT (5.34562 23 1.5)')
-        ref_wkt = 'POINT Z (5.35 23 1.5)'
+        if geos_version_tuple() > (3, 10):
+            ref_wkt = 'POINT Z (5.346 23 1.5)'
+        else:
+            ref_wkt = 'POINT Z (5.35 23 1.5)'
         self.assertEqual(ref_wkt, wkt_w.write(ref).decode())
 
     def test03_wkbreader(self):

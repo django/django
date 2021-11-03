@@ -18,7 +18,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_unspecified_pk = True
     supports_timezones = False
     max_query_params = 999
-    supports_mixed_date_datetime_comparisons = False
     supports_transactions = True
     atomic_transactions = False
     can_rollback_ddl = True
@@ -30,6 +29,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_cast_with_precision = False
     time_cast_precision = 3
     can_release_savepoints = True
+    has_case_insensitive_like = True
     # Is "ALTER TABLE ... RENAME COLUMN" supported?
     can_alter_table_rename_column = Database.sqlite_version_info >= (3, 25, 0)
     supports_parentheses_in_compound = False
@@ -48,6 +48,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         'ci': 'nocase',
         'cs': 'binary',
         'non_default': 'nocase',
+    }
+    django_test_expected_failures = {
+        # The django_format_dtdelta() function doesn't properly handle mixed
+        # Date/DateTime fields and timedeltas.
+        'expressions.tests.FTimeDeltaTests.test_mixed_comparisons1',
     }
 
     @cached_property

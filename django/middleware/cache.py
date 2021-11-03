@@ -67,7 +67,10 @@ class UpdateCacheMiddleware(MiddlewareMixin):
         self.page_timeout = None
         self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
         self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
-        self.cache = caches[self.cache_alias]
+
+    @property
+    def cache(self):
+        return caches[self.cache_alias]
 
     def _should_update_cache(self, request, response):
         return hasattr(request, '_cache_update_cache') and request._cache_update_cache
@@ -126,7 +129,10 @@ class FetchFromCacheMiddleware(MiddlewareMixin):
         super().__init__(get_response)
         self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
         self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
-        self.cache = caches[self.cache_alias]
+
+    @property
+    def cache(self):
+        return caches[self.cache_alias]
 
     def process_request(self, request):
         """
@@ -183,7 +189,6 @@ class CacheMiddleware(UpdateCacheMiddleware, FetchFromCacheMiddleware):
             if cache_alias is None:
                 cache_alias = DEFAULT_CACHE_ALIAS
             self.cache_alias = cache_alias
-            self.cache = caches[self.cache_alias]
         except KeyError:
             pass
 

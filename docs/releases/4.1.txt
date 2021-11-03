@@ -32,7 +32,8 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The admin :ref:`dark mode CSS variables <admin-theming>` are now applied in a
+  separate stylesheet and template block.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -88,7 +89,11 @@ Minor features
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The default sitemap index template ``<sitemapindex>`` now includes the
+  ``<lastmod>`` timestamp where available, through the new
+  :meth:`~django.contrib.sitemaps.Sitemap.get_latest_lastmod` method. Custom
+  sitemap index templates should be updated for the adjusted :ref:`context
+  variables <sitemap-index-context-variables>`.
 
 :mod:`django.contrib.sites`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -163,7 +168,8 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :option:`makemigrations --no-input` now logs default answers and reasons why
+  migrations cannot be created.
 
 Migrations
 ~~~~~~~~~~
@@ -231,7 +237,8 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ...
+* ``BaseDatabaseFeatures.has_case_insensitive_like`` is changed from ``True``
+  to ``False`` to reflect the behavior of most databases.
 
 Dropped support for MariaDB 10.2
 --------------------------------
@@ -252,7 +259,10 @@ Features deprecated in 4.1
 Miscellaneous
 -------------
 
-* ...
+* The context for sitemap index templates of a flat list of URLs is deprecated.
+  Custom sitemap index templates should be updated for the adjusted
+  :ref:`context variables <sitemap-index-context-variables>`, expecting a list
+  of objects with ``location`` and optional ``lastmod`` attributes.
 
 Features removed in 4.1
 =======================

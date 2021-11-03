@@ -149,6 +149,12 @@ def call_command(command_name, *args, **options):
             opt.dest in options and
             (opt.required or opt in mutually_exclusive_required_options)
         ):
+            opt_dest_count = sum(v == opt.dest for v in opt_mapping.values())
+            if opt_dest_count > 1:
+                raise TypeError(
+                    f'Cannot pass the dest {opt.dest!r} that matches multiple '
+                    f'arguments via **options.'
+                )
             parse_args.append(min(opt.option_strings))
             if isinstance(opt, (_AppendConstAction, _CountAction, _StoreConstAction)):
                 continue

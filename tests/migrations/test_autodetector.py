@@ -1001,14 +1001,17 @@ class AutodetectorTests(TestCase):
         ]
         changes = self.get_changes(before, after, MigrationQuestioner({'ask_rename': True}))
         self.assertNumberMigrations(changes, 'app', 1)
-        self.assertOperationTypes(changes, 'app', 0, ['RenameField', 'AlterField'])
+        self.assertOperationTypes(changes, 'app', 0, ['AlterField', 'RenameField'])
         self.assertOperationAttributes(
-            changes, 'app', 0, 0, model_name='foo', old_name='field', new_name='renamed_field',
+            changes, 'app', 0, 0, model_name='foo', name='field',
         )
-        self.assertOperationAttributes(changes, 'app', 0, 1, model_name='foo', name='renamed_field')
-        self.assertEqual(changes['app'][0].operations[-1].field.deconstruct(), (
-            'renamed_field', 'django.db.models.IntegerField', [], {'db_column': 'field'},
+        self.assertEqual(changes['app'][0].operations[0].field.deconstruct(), (
+            'field', 'django.db.models.IntegerField', [], {'db_column': 'field'},
         ))
+        self.assertOperationAttributes(
+            changes, 'app', 0, 1, model_name='foo', old_name='field',
+            new_name='renamed_field',
+        )
 
     def test_rename_related_field_preserved_db_column(self):
         before = [
@@ -1031,17 +1034,20 @@ class AutodetectorTests(TestCase):
         ]
         changes = self.get_changes(before, after, MigrationQuestioner({'ask_rename': True}))
         self.assertNumberMigrations(changes, 'app', 1)
-        self.assertOperationTypes(changes, 'app', 0, ['RenameField', 'AlterField'])
+        self.assertOperationTypes(changes, 'app', 0, ['AlterField', 'RenameField'])
         self.assertOperationAttributes(
-            changes, 'app', 0, 0, model_name='bar', old_name='foo', new_name='renamed_foo',
+            changes, 'app', 0, 0, model_name='bar', name='foo',
         )
-        self.assertOperationAttributes(changes, 'app', 0, 1, model_name='bar', name='renamed_foo')
-        self.assertEqual(changes['app'][0].operations[-1].field.deconstruct(), (
-            'renamed_foo',
+        self.assertEqual(changes['app'][0].operations[0].field.deconstruct(), (
+            'foo',
             'django.db.models.ForeignKey',
             [],
             {'to': 'app.foo', 'on_delete': models.CASCADE, 'db_column': 'foo_id'},
         ))
+        self.assertOperationAttributes(
+            changes, 'app', 0, 1, model_name='bar', old_name='foo',
+            new_name='renamed_foo',
+        )
 
     def test_rename_model(self):
         """Tests autodetection of renamed models."""
@@ -1564,9 +1570,26 @@ class AutodetectorTests(TestCase):
         )
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "otherapp", 1)
-        self.assertOperationTypes(changes, "otherapp", 0, ["AlterUniqueTogether", "AlterIndexTogether"])
-        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="book", unique_together={("title", "author")})
-        self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", index_together={("title", "author")})
+        self.assertOperationTypes(changes, 'otherapp', 0, [
+            'AlterUniqueTogether',
+            'AlterIndexTogether',
+            'AlterUniqueTogether',
+            'AlterIndexTogether',
+        ])
+        self.assertOperationAttributes(
+            changes, 'otherapp', 0, 0, name='book', unique_together=set(),
+        )
+        self.assertOperationAttributes(
+            changes, 'otherapp', 0, 1, name='book', index_together=set(),
+        )
+        self.assertOperationAttributes(
+            changes, 'otherapp', 0, 2, name='book',
+            unique_together={('title', 'author')},
+        )
+        self.assertOperationAttributes(
+            changes, 'otherapp', 0, 3, name='book',
+            index_together={('title', 'author')},
+        )
 
     def test_add_field_and_foo_together(self):
         """
@@ -1613,15 +1636,103 @@ class AutodetectorTests(TestCase):
         )
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "otherapp", 1)
-        self.assertOperationTypes(changes, "otherapp", 0, ["AlterUniqueTogether", "AlterIndexTogether", "RemoveField"])
-        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="book", unique_together={("author", "title")})
-        self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", index_together={("author", "title")})
-        self.assertOperationAttributes(changes, "otherapp", 0, 2, model_name="book", name="newfield")
+        self.assertOperationTypes(changes, 'otherapp', 0, [
+            'AlterUniqueTogether',
+            'AlterIndexTogether',
+            'AlterUniqueTogether',
+            'AlterIndexTogether',
+            'RemoveField',
+        ])
+        self.assertOperationAttributes(
+            changes, 'otherapp', 0, 0, name='book', unique_together=set(),
+        )
+        self.assertOperationAttributes(
+            changes, 'otherapp', 0, 1, name='book', index_together=set(),
+        )
+        self.assertOperationAttributes(
+            changes, 'otherapp', 0, 2, name='book',
+            unique_together={('author', 'title')},
+        )
+        self.assertOperationAttributes(
+            changes, 'otherapp', 0, 3, name='book',
+            index_together={('author', 'title')},
+        )
+        self.assertOperationAttributes(
+            changes, 'otherapp', 0, 4, model_name='book', name='newfield',
+        )
+
+    def test_alter_field_and_foo_together(self):
+        """Fields are altered after deleting some index/unique_together."""
+        initial_author = ModelState('testapp', 'Author', [
+            ('id', models.AutoField(primary_key=True)),
+            ('name', models.CharField(max_length=200)),
+            ('age', models.IntegerField(db_index=True)),
+        ], {
+            'unique_together': {('name',)},
+        })
+        author_reversed_constraints = ModelState('testapp', 'Author', [
+            ('id', models.AutoField(primary_key=True)),
+            ('name', models.CharField(max_length=200, unique=True)),
+            ('age', models.IntegerField()),
+        ], {
+            'index_together': {('age',)},
+        })
+        changes = self.get_changes([initial_author], [author_reversed_constraints])
+
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, [
+            'AlterUniqueTogether',
+            'AlterField',
+            'AlterField',
+            'AlterIndexTogether',
+        ])
+        self.assertOperationAttributes(
+            changes, 'testapp', 0, 0, name='author', unique_together=set(),
+        )
+        self.assertOperationAttributes(
+            changes, 'testapp', 0, 1, model_name='author', name='age',
+        )
+        self.assertOperationAttributes(
+            changes, 'testapp', 0, 2, model_name='author', name='name',
+        )
+        self.assertOperationAttributes(
+            changes, 'testapp', 0, 3, name='author', index_together={('age',)},
+        )
+
+    def test_partly_alter_foo_together(self):
+        initial_author = ModelState('testapp', 'Author', [
+            ('id', models.AutoField(primary_key=True)),
+            ('name', models.CharField(max_length=200)),
+            ('age', models.IntegerField()),
+        ], {
+            'unique_together': {('name',), ('age',)},
+            'index_together': {('name',)},
+        })
+        author_reversed_constraints = ModelState('testapp', 'Author', [
+            ('id', models.AutoField(primary_key=True)),
+            ('name', models.CharField(max_length=200)),
+            ('age', models.IntegerField()),
+        ], {
+            'unique_together': {('age',)},
+            'index_together': {('name',), ('age',)},
+        })
+        changes = self.get_changes([initial_author], [author_reversed_constraints])
+
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, [
+            'AlterUniqueTogether',
+            'AlterIndexTogether',
+        ])
+        self.assertOperationAttributes(
+            changes, 'testapp', 0, 0, name='author', unique_together={('age',)},
+        )
+        self.assertOperationAttributes(
+            changes, 'testapp', 0, 1, name='author',
+            index_together={('name',), ('age',)},
+        )
 
     def test_rename_field_and_foo_together(self):
-        """
-        Removed fields will be removed after updating index/unique_together.
-        """
+        """Fields are renamed before updating index/unique_together."""
         changes = self.get_changes(
             [self.author_empty, self.book_foo_together_3],
             [self.author_empty, self.book_foo_together_4],
@@ -1629,11 +1740,27 @@ class AutodetectorTests(TestCase):
         )
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "otherapp", 1)
-        self.assertOperationTypes(changes, "otherapp", 0, ["RenameField", "AlterUniqueTogether", "AlterIndexTogether"])
-        self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", unique_together={
-            ("title", "newfield2")
-        })
-        self.assertOperationAttributes(changes, "otherapp", 0, 2, name="book", index_together={("title", "newfield2")})
+        self.assertOperationTypes(changes, 'otherapp', 0, [
+            'RenameField',
+            'AlterUniqueTogether',
+            'AlterIndexTogether',
+            'AlterUniqueTogether',
+            'AlterIndexTogether',
+        ])
+        self.assertOperationAttributes(
+            changes, 'otherapp', 0, 1, name='book', unique_together=set(),
+        )
+        self.assertOperationAttributes(
+            changes, 'otherapp', 0, 2, name='book', index_together=set(),
+        )
+        self.assertOperationAttributes(
+            changes, 'otherapp', 0, 3, name='book',
+            unique_together={('title', 'newfield2')},
+        )
+        self.assertOperationAttributes(
+            changes, 'otherapp', 0, 4, name='book',
+            index_together={('title', 'newfield2')},
+        )
 
     def test_proxy(self):
         """The autodetector correctly deals with proxy models."""
@@ -1655,6 +1782,29 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, "testapp", 0, ["DeleteModel", "CreateModel"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="AuthorProxy")
         self.assertOperationAttributes(changes, "testapp", 0, 1, name="AuthorProxy", options={})
+
+    def test_proxy_non_model_parent(self):
+        class Mixin:
+            pass
+
+        author_proxy_non_model_parent = ModelState(
+            'testapp',
+            'AuthorProxy',
+            [],
+            {'proxy': True},
+            (Mixin, 'testapp.author'),
+        )
+        changes = self.get_changes(
+            [self.author_empty],
+            [self.author_empty, author_proxy_non_model_parent],
+        )
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['CreateModel'])
+        self.assertOperationAttributes(
+            changes, 'testapp', 0, 0, name='AuthorProxy',
+            options={'proxy': True, 'indexes': [], 'constraints': []},
+            bases=(Mixin, 'testapp.author'),
+        )
 
     def test_proxy_custom_pk(self):
         """
@@ -2663,6 +2813,26 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'app', 0, ['RemoveField', 'CreateModel'])
         self.assertOperationAttributes(changes, 'app', 0, 0, name='title', model_name='readable')
         self.assertOperationAttributes(changes, 'app', 0, 1, name='book')
+
+    def test_parse_number(self):
+        tests = [
+            ('no_number', None),
+            ('0001_initial', 1),
+            ('0002_model3', 2),
+            ('0002_auto_20380101_1112', 2),
+            ('0002_squashed_0003', 3),
+            ('0002_model2_squashed_0003_other4', 3),
+            ('0002_squashed_0003_squashed_0004', 4),
+            ('0002_model2_squashed_0003_other4_squashed_0005_other6', 5),
+            ('0002_custom_name_20380101_1112_squashed_0003_model', 3),
+            ('2_squashed_4', 4),
+        ]
+        for migration_name, expected_number in tests:
+            with self.subTest(migration_name=migration_name):
+                self.assertEqual(
+                    MigrationAutodetector.parse_number(migration_name),
+                    expected_number,
+                )
 
 
 class MigrationSuggestNameTests(SimpleTestCase):

@@ -141,10 +141,6 @@ class Options:
         # Don't go through get_app_config to avoid triggering imports.
         return self.apps.app_configs.get(self.app_label)
 
-    @property
-    def installed(self):
-        return self.app_config is not None
-
     def contribute_to_class(self, cls, name):
         from django.db import connection
         from django.db.backends.utils import truncate_name
@@ -706,7 +702,7 @@ class Options:
         for i, ancestor in enumerate(chain[:-1]):
             child = chain[i + 1]
             link = child._meta.get_ancestor_link(ancestor)
-            path.extend(link.get_reverse_path_info())
+            path.extend(link.reverse_path_infos)
         return path
 
     def _populate_directed_relation_graph(self):

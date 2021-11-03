@@ -1361,7 +1361,14 @@ class MakeMigrationsTests(MigrationTestBase):
 
         with self.assertRaises(SystemExit):
             with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
-                call_command("makemigrations", "migrations", interactive=False)
+                with captured_stdout() as out:
+                    call_command('makemigrations', 'migrations', interactive=False)
+        self.assertIn(
+            "Field 'silly_int' on model 'sillymodel' not migrated: it is "
+            "impossible to add a non-nullable field without specifying a "
+            "default.",
+            out.getvalue(),
+        )
 
     def test_makemigrations_interactive_not_null_addition(self):
         """
@@ -1417,10 +1424,15 @@ class MakeMigrationsTests(MigrationTestBase):
             class Meta:
                 app_label = "migrations"
 
-        out = io.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations"):
-            call_command("makemigrations", "migrations", interactive=False, stdout=out)
+            with captured_stdout() as out:
+                call_command('makemigrations', 'migrations', interactive=False)
         self.assertIn("Alter field slug on author", out.getvalue())
+        self.assertIn(
+            "Field 'slug' on model 'author' given a default of NOT PROVIDED "
+            "and must be corrected.",
+            out.getvalue(),
+        )
 
     def test_makemigrations_interactive_not_null_alteration(self):
         """
@@ -1872,6 +1884,27 @@ class MakeMigrationsTests(MigrationTestBase):
                 with self.assertRaises(SystemExit):
                     call_command('makemigrations', 'migrations', interactive=True)
 
+    def test_makemigrations_non_interactive_auto_now_add_addition(self):
+        """
+        Non-interactive makemigrations fails when a default is missing on a
+        new field when auto_now_add=True.
+        """
+        class Entry(models.Model):
+            creation_date = models.DateTimeField(auto_now_add=True)
+
+            class Meta:
+                app_label = 'migrations'
+
+        with self.temporary_migration_module(module='migrations.test_auto_now_add'):
+            with self.assertRaises(SystemExit), captured_stdout() as out:
+                call_command('makemigrations', 'migrations', interactive=False)
+        self.assertIn(
+            "Field 'creation_date' on model 'entry' not migrated: it is "
+            "impossible to add a field with 'auto_now_add=True' without "
+            "specifying a default.",
+            out.getvalue(),
+        )
+
     def test_makemigrations_interactive_unique_callable_default_addition(self):
         """
         makemigrations prompts the user when adding a unique field with
@@ -1922,6 +1955,21 @@ class MakeMigrationsTests(MigrationTestBase):
                 call_command('makemigrations', 'migrations', interactive=False)
             out_value = out.getvalue()
             self.assertIn('Add field created to book', out_value)
+
+    @override_settings(
+        MIGRATION_MODULES={'migrations': 'migrations.test_migrations_squashed'},
+    )
+    def test_makemigrations_continues_number_sequence_after_squash(self):
+        with self.temporary_migration_module(module='migrations.test_migrations_squashed'):
+            with captured_stdout() as out:
+                call_command(
+                    'makemigrations',
+                    'migrations',
+                    interactive=False,
+                    empty=True,
+                )
+            out_value = out.getvalue()
+            self.assertIn('0003_auto', out_value)
 
 
 class SquashMigrationsTests(MigrationTestBase):
@@ -2033,6 +2081,15 @@ class SquashMigrationsTests(MigrationTestBase):
             )
             squashed_migration_file = os.path.join(migration_dir, '0001_%s.py' % squashed_name)
             self.assertTrue(os.path.exists(squashed_migration_file))
+
+    def test_squashed_name_exists(self):
+        msg = 'Migration 0001_initial already exists. Use a different name.'
+        with self.temporary_migration_module(module='migrations.test_migrations'):
+            with self.assertRaisesMessage(CommandError, msg):
+                call_command(
+                    'squashmigrations', 'migrations', '0001', '0002',
+                    squashed_name='initial', interactive=False, verbosity=0,
+                )
 
 
 class AppLabelErrorTests(TestCase):

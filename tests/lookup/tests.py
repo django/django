@@ -2,6 +2,7 @@ import collections.abc
 from datetime import datetime
 from math import ceil
 from operator import attrgetter
+from unittest import skipUnless
 
 from django.core.exceptions import FieldError
 from django.db import connection, models
@@ -926,6 +927,44 @@ class LookupTests(TestCase):
             list(Article.objects.filter(author=Author.objects.all()[:2]))
         with self.assertRaisesMessage(ValueError, msg):
             list(Article.objects.filter(author=Author.objects.all()[1:]))
+
+    @skipUnless(connection.vendor == 'mysql', 'MySQL-specific workaround.')
+    def test_exact_booleanfield(self):
+        # MySQL ignores indexes with boolean fields unless they're compared
+        # directly to a boolean value.
+        product = Product.objects.create(name='Paper', qty_target=5000)
+        Stock.objects.create(product=product, short=False, qty_available=5100)
+        stock_1 = Stock.objects.create(product=product, short=True, qty_available=180)
+        qs = Stock.objects.filter(short=True)
+        self.assertSequenceEqual(qs, [stock_1])
+        self.assertIn(
+            '%s = True' % connection.ops.quote_name('short'),
+            str(qs.query),
+        )
+
+    @skipUnless(connection.vendor == 'mysql', 'MySQL-specific workaround.')
+    def test_exact_booleanfield_annotation(self):
+        # MySQL ignores indexes with boolean fields unless they're compared
+        # directly to a boolean value.
+        qs = Author.objects.annotate(case=Case(
+            When(alias='a1', then=True),
+            default=False,
+            output_field=BooleanField(),
+        )).filter(case=True)
+        self.assertSequenceEqual(qs, [self.au1])
+        self.assertIn(' = True', str(qs.query))
+
+        qs = Author.objects.annotate(
+            wrapped=ExpressionWrapper(Q(alias='a1'), output_field=BooleanField()),
+        ).filter(wrapped=True)
+        self.assertSequenceEqual(qs, [self.au1])
+        self.assertIn(' = True', str(qs.query))
+        # EXISTS(...) shouldn't be compared to a boolean value.
+        qs = Author.objects.annotate(
+            exists=Exists(Author.objects.filter(alias='a1', pk=OuterRef('pk'))),
+        ).filter(exists=True)
+        self.assertSequenceEqual(qs, [self.au1])
+        self.assertNotIn(' = True', str(qs.query))
 
     def test_custom_field_none_rhs(self):
         """

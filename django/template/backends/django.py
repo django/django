@@ -84,18 +84,16 @@ def reraise(exc, backend):
     raise new from exc
 
 
-def get_installed_libraries():
+def get_template_tag_modules():
     """
-    Return the built-in template tag libraries and those from installed
-    applications. Libraries are stored in a dictionary where keys are the
-    individual module names, not the full module paths. Example:
-    django.templatetags.i18n is stored as i18n.
+    Yield (module_name, module_path) pairs for all installed template tag
+    libraries.
     """
-    libraries = {}
     candidates = ['django.templatetags']
     candidates.extend(
-        '%s.templatetags' % app_config.name
-        for app_config in apps.get_app_configs())
+        f'{app_config.name}.templatetags'
+        for app_config in apps.get_app_configs()
+    )
 
     for candidate in candidates:
         try:
@@ -106,9 +104,20 @@ def get_installed_libraries():
 
         if hasattr(pkg, '__path__'):
             for name in get_package_libraries(pkg):
-                libraries[name[len(candidate) + 1:]] = name
+                yield name[len(candidate) + 1:], name
 
-    return libraries
+
+def get_installed_libraries():
+    """
+    Return the built-in template tag libraries and those from installed
+    applications. Libraries are stored in a dictionary where keys are the
+    individual module names, not the full module paths. Example:
+    django.templatetags.i18n is stored as i18n.
+    """
+    return {
+        module_name: full_name
+        for module_name, full_name in get_template_tag_modules()
+    }
 
 
 def get_package_libraries(pkg):

@@ -30,7 +30,7 @@ def get_normalized_value(value, lhs):
     from django.db.models import Model
     if isinstance(value, Model):
         value_list = []
-        sources = lhs.output_field.get_path_info()[-1].target_fields
+        sources = lhs.output_field.path_infos[-1].target_fields
         for source in sources:
             while not isinstance(value, source.model) and source.remote_field:
                 source = source.remote_field.model._meta.get_field(source.remote_field.field_name)
@@ -55,10 +55,10 @@ class RelatedIn(In):
             # ForeignKey to IntegerField given value 'abc'. The ForeignKey itself
             # doesn't have validation for non-integers, so we must run validation
             # using the target field.
-            if hasattr(self.lhs.output_field, 'get_path_info'):
+            if hasattr(self.lhs.output_field, 'path_infos'):
                 # Run the target field's get_prep_value. We can safely assume there is
                 # only one as we don't get to the direct value branch otherwise.
-                target_field = self.lhs.output_field.get_path_info()[-1].target_fields[-1]
+                target_field = self.lhs.output_field.path_infos[-1].target_fields[-1]
                 self.rhs = [target_field.get_prep_value(v) for v in self.rhs]
         return super().get_prep_lookup()
 
@@ -113,10 +113,10 @@ class RelatedLookupMixin:
             # ForeignKey to IntegerField given value 'abc'. The ForeignKey itself
             # doesn't have validation for non-integers, so we must run validation
             # using the target field.
-            if self.prepare_rhs and hasattr(self.lhs.output_field, 'get_path_info'):
+            if self.prepare_rhs and hasattr(self.lhs.output_field, 'path_infos'):
                 # Get the target field. We can safely assume there is only one
                 # as we don't get to the direct value branch otherwise.
-                target_field = self.lhs.output_field.get_path_info()[-1].target_fields[-1]
+                target_field = self.lhs.output_field.path_infos[-1].target_fields[-1]
                 self.rhs = target_field.get_prep_value(self.rhs)
 
         return super().get_prep_lookup()

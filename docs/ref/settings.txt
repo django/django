@@ -2343,7 +2343,7 @@ already have it.
 
 Default: ``None``
 
-A tuple representing a HTTP header/value combination that signifies a request
+A tuple representing an HTTP header/value combination that signifies a request
 is secure. This controls the behavior of the request object's ``is_secure()``
 method.
 

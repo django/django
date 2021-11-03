@@ -1,5 +1,5 @@
 """Compare two HTML documents."""
-
+import html
 from html.parser import HTMLParser
 
 from django.utils.regex_helper import _lazy_re_compile
@@ -150,7 +150,10 @@ class Element:
                 output += ' %s' % key
         if self.children:
             output += '>\n'
-            output += ''.join(str(c) for c in self.children)
+            output += ''.join([
+                html.escape(c) if isinstance(c, str) else str(c)
+                for c in self.children
+            ])
             output += '\n</%s>' % self.name
         else:
             output += '>'
@@ -165,7 +168,10 @@ class RootElement(Element):
         super().__init__(None, ())
 
     def __str__(self):
-        return ''.join(str(c) for c in self.children)
+        return ''.join([
+            html.escape(c) if isinstance(c, str) else str(c)
+            for c in self.children
+        ])
 
 
 class HTMLParseError(Exception):

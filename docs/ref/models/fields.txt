@@ -573,8 +573,8 @@ case it can't be included in a :class:`~django.forms.ModelForm`.
 
 .. attribute:: BinaryField.max_length
 
-    The maximum length (in characters) of the field. The maximum length is
-    enforced in Django's validation using
+    The maximum length (in bytes) of the field. The maximum length is enforced
+    in Django's validation using
     :class:`~django.core.validators.MaxLengthValidator`.
 
 .. admonition:: Abusing ``BinaryField``

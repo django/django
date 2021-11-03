@@ -1,7 +1,6 @@
 import argparse
 import ctypes
 import faulthandler
-import hashlib
 import io
 import itertools
 import logging
@@ -26,6 +25,7 @@ from django.test.utils import (
     setup_databases as _setup_databases, setup_test_environment,
     teardown_databases as _teardown_databases, teardown_test_environment,
 )
+from django.utils.crypto import new_hash
 from django.utils.datastructures import OrderedSet
 from django.utils.deprecation import RemovedInDjango50Warning
 
@@ -106,6 +106,11 @@ class PDBDebugResult(unittest.TextTestResult):
     def addFailure(self, test, err):
         super().addFailure(test, err)
         self.debug(err)
+
+    def addSubTest(self, test, subtest, err):
+        if err is not None:
+            self.debug(err)
+        super().addSubTest(test, subtest, err)
 
     def debug(self, error):
         self._restoreStdout()
@@ -504,7 +509,7 @@ class Shuffler:
 
     @classmethod
     def _hash_text(cls, text):
-        h = hashlib.new(cls.hash_algorithm)
+        h = new_hash(cls.hash_algorithm, usedforsecurity=False)
         h.update(text.encode('utf-8'))
         return h.hexdigest()
 

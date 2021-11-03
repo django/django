@@ -146,7 +146,12 @@ class Command(BaseCommand):
         if self.interactive:
             questioner = InteractiveMigrationQuestioner(specified_apps=app_labels, dry_run=self.dry_run)
         else:
-            questioner = NonInteractiveMigrationQuestioner(specified_apps=app_labels, dry_run=self.dry_run)
+            questioner = NonInteractiveMigrationQuestioner(
+                specified_apps=app_labels,
+                dry_run=self.dry_run,
+                verbosity=self.verbosity,
+                log=self.log,
+            )
         # Set up autodetector
         autodetector = MigrationAutodetector(
             loader.project_state(),

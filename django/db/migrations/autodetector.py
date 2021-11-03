@@ -178,8 +178,12 @@ class MigrationAutodetector:
         # Generate index removal operations before field is removed
         self.generate_removed_constraints()
         self.generate_removed_indexes()
-        # Generate field operations
+        # Generate field renaming operations.
         self.generate_renamed_fields()
+        # Generate removal of foo together.
+        self.generate_removed_altered_unique_together()
+        self.generate_removed_altered_index_together()
+        # Generate field operations.
         self.generate_removed_fields()
         self.generate_added_fields()
         self.generate_altered_fields()
@@ -840,6 +844,20 @@ class MigrationAutodetector:
                             old_field_dec[0:2] == field_dec[0:2] and
                             dict(old_field_dec[2], db_column=old_db_column) == field_dec[2])):
                         if self.questioner.ask_rename(model_name, rem_field_name, field_name, field):
+                            # A db_column mismatch requires a prior noop
+                            # AlterField for the subsequent RenameField to be a
+                            # noop on attempts at preserving the old name.
+                            if old_field.db_column != field.db_column:
+                                altered_field = field.clone()
+                                altered_field.name = rem_field_name
+                                self.add_operation(
+                                    app_label,
+                                    operations.AlterField(
+                                        model_name=model_name,
+                                        name=rem_field_name,
+                                        field=altered_field,
+                                    ),
+                                )
                             self.add_operation(
                                 app_label,
                                 operations.RenameField(
@@ -970,7 +988,10 @@ class MigrationAutodetector:
                     new_field.remote_field.through = old_field.remote_field.through
             old_field_dec = self.deep_deconstruct(old_field)
             new_field_dec = self.deep_deconstruct(new_field)
-            if old_field_dec != new_field_dec:
+            # If the field was confirmed to be renamed it means that only
+            # db_column was allowed to change which generate_renamed_fields()
+            # already accounts for by adding an AlterField operation.
+            if old_field_dec != new_field_dec and old_field_name == field_name:
                 both_m2m = old_field.many_to_many and new_field.many_to_many
                 neither_m2m = not old_field.many_to_many and not new_field.many_to_many
                 if both_m2m or neither_m2m:
@@ -1111,8 +1132,7 @@ class MigrationAutodetector:
             dependencies.append((through_app_label, through_object_name, None, True))
         return dependencies
 
-    def _generate_altered_foo_together(self, operation):
-        option_name = operation.option_name
+    def _get_altered_foo_together_operations(self, option_name):
         for app_label, model_name in sorted(self.kept_model_keys):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
@@ -1140,13 +1160,49 @@ class MigrationAutodetector:
                             dependencies.extend(self._get_dependencies_for_foreign_key(
                                 app_label, model_name, field, self.to_state,
                             ))
+                yield (
+                    old_value,
+                    new_value,
+                    app_label,
+                    model_name,
+                    dependencies,
+                )
 
+    def _generate_removed_altered_foo_together(self, operation):
+        for (
+            old_value,
+            new_value,
+            app_label,
+            model_name,
+            dependencies,
+        ) in self._get_altered_foo_together_operations(operation.option_name):
+            removal_value = new_value.intersection(old_value)
+            if removal_value or old_value:
                 self.add_operation(
                     app_label,
-                    operation(
-                        name=model_name,
-                        **{option_name: new_value}
-                    ),
+                    operation(name=model_name, **{operation.option_name: removal_value}),
+                    dependencies=dependencies,
+                )
+
+    def generate_removed_altered_unique_together(self):
+        self._generate_removed_altered_foo_together(operations.AlterUniqueTogether)
+
+    def generate_removed_altered_index_together(self):
+        self._generate_removed_altered_foo_together(operations.AlterIndexTogether)
+
+    def _generate_altered_foo_together(self, operation):
+        for (
+            old_value,
+            new_value,
+            app_label,
+            model_name,
+            dependencies,
+        ) in self._get_altered_foo_together_operations(operation.option_name):
+            removal_value = new_value.intersection(old_value)
+            if new_value != removal_value:
+                self.add_operation(
+                    app_label,
+                    operation(name=model_name, **{operation.option_name: new_value}),
                     dependencies=dependencies,
                 )
 
@@ -1329,8 +1385,11 @@ class MigrationAutodetector:
     def parse_number(cls, name):
         """
         Given a migration name, try to extract a number from the beginning of
-        it. If no number is found, return None.
+        it. For a squashed migration such as '0001_squashed_0004…', return the
+        second number. If no number is found, return None.
         """
+        if squashed_match := re.search(r'.*_squashed_(\d+)', name):
+            return int(squashed_match[1])
         match = re.match(r'^\d+', name)
         if match:
             return int(match[0])

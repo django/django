@@ -74,6 +74,12 @@ class BaseDatabaseOperations:
         """
         return len(objs)
 
+    def format_for_duration_arithmetic(self, sql):
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseOperations may require a '
+            'format_for_duration_arithmetic() method.'
+        )
+
     def cache_key_culling_sql(self):
         """
         Return an SQL query that retrieves the first cache key greater than the

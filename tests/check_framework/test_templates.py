@@ -1,8 +1,9 @@
 from copy import copy, deepcopy
 
+from django.core.checks import Error
 from django.core.checks.templates import (
-    E001, E002, check_setting_app_dirs_loaders,
-    check_string_if_invalid_is_string,
+    E001, E002, E003, check_for_template_tags_with_the_same_name,
+    check_setting_app_dirs_loaders, check_string_if_invalid_is_string,
 )
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
@@ -87,3 +88,85 @@ class CheckTemplateStringIfInvalidTest(SimpleTestCase):
         del TEMPLATES[1]['OPTIONS']['string_if_invalid']
         with self.settings(TEMPLATES=TEMPLATES):
             self.assertEqual(check_string_if_invalid_is_string(None), [self.error1])
+
+
+class CheckTemplateTagLibrariesWithSameName(SimpleTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.error_same_tags = Error(
+            E003.msg.format(
+                "'same_tags'",
+                "'check_framework.template_test_apps.same_tags_app_1."
+                "templatetags.same_tags', "
+                "'check_framework.template_test_apps.same_tags_app_2."
+                "templatetags.same_tags'",
+            ),
+            id=E003.id,
+        )
+
+    @staticmethod
+    def get_settings(module_name, module_path):
+        return {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'OPTIONS': {
+                'libraries': {
+                    module_name: f'check_framework.template_test_apps.{module_path}',
+                },
+            },
+        }
+
+    @override_settings(INSTALLED_APPS=[
+        'check_framework.template_test_apps.same_tags_app_1',
+        'check_framework.template_test_apps.same_tags_app_2',
+    ])
+    def test_template_tags_with_same_name(self):
+        self.assertEqual(
+            check_for_template_tags_with_the_same_name(None),
+            [self.error_same_tags],
+        )
+
+    def test_template_tags_with_same_library_name(self):
+        with self.settings(TEMPLATES=[
+            self.get_settings('same_tags', 'same_tags_app_1.templatetags.same_tags'),
+            self.get_settings('same_tags', 'same_tags_app_2.templatetags.same_tags'),
+        ]):
+            self.assertEqual(
+                check_for_template_tags_with_the_same_name(None),
+                [self.error_same_tags],
+            )
+
+    @override_settings(INSTALLED_APPS=[
+        'check_framework.template_test_apps.same_tags_app_1'
+    ])
+    def test_template_tags_with_same_library_name_and_module_name(self):
+        with self.settings(TEMPLATES=[
+            self.get_settings(
+                'same_tags',
+                'different_tags_app.templatetags.different_tags',
+            ),
+        ]):
+            self.assertEqual(check_for_template_tags_with_the_same_name(None), [Error(
+                E003.msg.format(
+                    "'same_tags'",
+                    "'check_framework.template_test_apps.different_tags_app."
+                    "templatetags.different_tags', "
+                    "'check_framework.template_test_apps.same_tags_app_1."
+                    "templatetags.same_tags'",
+                ),
+                id=E003.id,
+            )])
+
+    def test_template_tags_with_different_library_name(self):
+        with self.settings(TEMPLATES=[
+            self.get_settings('same_tags', 'same_tags_app_1.templatetags.same_tags'),
+            self.get_settings('not_same_tags', 'same_tags_app_2.templatetags.same_tags'),
+        ]):
+            self.assertEqual(check_for_template_tags_with_the_same_name(None), [])
+
+    @override_settings(INSTALLED_APPS=[
+        'check_framework.template_test_apps.same_tags_app_1',
+        'check_framework.template_test_apps.different_tags_app',
+    ])
+    def test_template_tags_with_different_name(self):
+        self.assertEqual(check_for_template_tags_with_the_same_name(None), [])

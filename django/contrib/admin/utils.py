@@ -40,9 +40,9 @@ def lookup_spawns_duplicates(opts, lookup_path):
             # Ignore query lookups.
             continue
         else:
-            if hasattr(field, 'get_path_info'):
+            if hasattr(field, 'path_infos'):
                 # This field is a relation; update opts to follow the relation.
-                path_info = field.get_path_info()
+                path_info = field.path_infos
                 opts = path_info[-1].to_opts
                 if any(path.m2m for path in path_info):
                     # This field is a m2m relation so duplicates must be
@@ -435,8 +435,8 @@ class NotRelationField(Exception):
 
 
 def get_model_from_relation(field):
-    if hasattr(field, 'get_path_info'):
-        return field.get_path_info()[-1].to_opts.model
+    if hasattr(field, 'path_infos'):
+        return field.path_infos[-1].to_opts.model
     else:
         raise NotRelationField
 
