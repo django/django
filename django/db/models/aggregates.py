@@ -87,7 +87,7 @@ class Aggregate(Func):
                     compiler, connection, template=template, filter=filter_sql,
                     **extra_context
                 )
-                return sql, params + filter_params
+                return sql, (*params, *filter_params)
             else:
                 copy = self.copy()
                 copy.filter = None

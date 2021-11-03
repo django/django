@@ -30,7 +30,7 @@ class OrderableAggMixin:
             sql, sql_params = super().as_sql(compiler, connection, ordering=(
                 'ORDER BY ' + ', '.join(ordering_expr_sql)
             ))
-            return sql, sql_params + ordering_params
+            return sql, (*sql_params, *ordering_params)
         return super().as_sql(compiler, connection, ordering='')
 
     def set_source_expressions(self, exprs):
