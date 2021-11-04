@@ -87,14 +87,12 @@ function or method::
 Notice that the function takes a ``sender`` argument, along with wildcard
 keyword arguments (``**kwargs``); all signal handlers must take these arguments.
 
-We'll look at senders `a bit later`_, but right now look at the ``**kwargs``
-argument. All signals send keyword arguments, and may change those keyword
-arguments at any time. In the case of
+We'll look at senders :ref:`a bit later <connecting-to-specific-signals>`, but
+right now look at the ``**kwargs`` argument. All signals send keyword
+arguments, and may change those keyword arguments at any time. In the case of
 :data:`~django.core.signals.request_finished`, it's documented as sending no
 arguments, which means we might be tempted to write our signal handling as
 ``my_callback(sender)``.
-
-.. _a bit later: `connecting to signals sent by specific senders`_
 
 This would be wrong -- in fact, Django will throw an error if you do so. That's
 because at any point arguments could get added to the signal and your receiver
