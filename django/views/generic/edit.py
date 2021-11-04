@@ -246,9 +246,7 @@ class BaseDeleteView(DeletionMixin, FormMixin, BaseDetailView):
             return self.form_invalid(form)
 
     def form_valid(self, form):
-        success_url = self.get_success_url()
-        self.object.delete()
-        return HttpResponseRedirect(success_url)
+        return self.delete(self.request, **self.kwargs)
 
 
 class DeleteView(SingleObjectTemplateResponseMixin, BaseDeleteView):
