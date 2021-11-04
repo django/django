@@ -875,7 +875,7 @@ class DiscoverRunner:
         teardown_test_environment()
 
     def suite_result(self, suite, result, **kwargs):
-        return len(result.failures) + len(result.errors)
+        return len(result.failures) + len(result.errors) + len(result.unexpectedSuccesses)
 
     def _get_databases(self, suite):
         databases = {}

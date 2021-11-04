@@ -331,9 +331,14 @@ but it's pretty intuitive. You can consult the documentation of Python's
 :mod:`unittest` library for details.
 
 Note that the return code for the test-runner script is 1 for any number of
-failed and erroneous tests. If all the tests pass, the return code is 0. This
+failed tests (whether the failure was caused by an error, a failed assertion,
+or an unexpected success). If all the tests pass, the return code is 0. This
 feature is useful if you're using the test-runner script in a shell script and
 need to test for success or failure at that level.
+
+.. versionchanged:: 4.1
+
+    In older versions, the return code was 0 for unexpected successes.
 
 .. _speeding-up-tests-auth-hashers:
 
