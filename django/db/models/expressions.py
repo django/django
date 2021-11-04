@@ -933,7 +933,7 @@ class ExpressionList(Func):
         return self.as_sql(compiler, connection, **extra_context)
 
 
-class ExpressionWrapper(Expression):
+class ExpressionWrapper(SQLiteNumericMixin, Expression):
     """
     An expression that can wrap another expression so that it can provide
     extra context to the inner expression, such as the output_field.
@@ -1032,7 +1032,7 @@ class When(Expression):
         return cols
 
 
-class Case(Expression):
+class Case(SQLiteNumericMixin, Expression):
     """
     An SQL searched CASE expression:
 
