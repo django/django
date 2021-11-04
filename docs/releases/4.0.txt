@@ -273,6 +273,10 @@ Generic Views
   deletion. In addition, this allows ``DeleteView`` to function with
   :class:`django.contrib.messages.views.SuccessMessageMixin`.
 
+  In accordance with ``FormMixin``, object deletion for POST requests is
+  handled in ``form_valid()``. Custom delete logic in ``delete()`` handlers
+  should be moved to ``form_valid()``, or a shared helper method, as needed.
+
 Logging
 ~~~~~~~
 
@@ -476,6 +480,14 @@ initialization.
 As a side-effect, running ``makemigrations`` might generate no-op
 ``AlterField`` operations for ``ManyToManyField`` and ``ForeignKey`` fields in
 some cases.
+
+``DeleteView`` changes
+----------------------
+
+:class:`~django.views.generic.edit.DeleteView` now uses
+:class:`~django.views.generic.edit.FormMixin` to handle POST requests. As a
+consequence, any custom deletion logic in ``delete()`` handlers should be
+moved to ``form_valid()``, or a shared helper method, if required.
 
 Miscellaneous
 -------------
