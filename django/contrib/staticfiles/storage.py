@@ -54,7 +54,7 @@ class HashedFilesMixin:
         )),
         ('*.js', (
             (
-                r'(?P<matched>)^(//# (?-i:sourceMappingURL)=(?P<url>.*))$',
+                r'(?m)(?P<matched>)^(//# (?-i:sourceMappingURL)=(?P<url>.*))$',
                 '//# sourceMappingURL=%(url)s',
             ),
             (
