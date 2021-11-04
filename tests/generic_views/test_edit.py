@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.messages import get_messages
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.client import RequestFactory
@@ -389,6 +390,8 @@ class DeleteViewTests(TestCase):
         self.assertEqual(res.status_code, 302)
         self.assertRedirects(res, '/list/authors/')
         self.assertQuerysetEqual(Author.objects.all(), [])
+        messages = [m.message for m in get_messages(res.wsgi_request)]
+        self.assertEqual(messages, ["Author deleted."])
 
     def test_delete_without_redirect(self):
         msg = 'No URL to redirect to. Provide a success_url.'

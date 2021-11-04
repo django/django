@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.core.paginator import Paginator
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
@@ -192,6 +193,10 @@ class SpecializedAuthorDelete(generic.DeleteView):
     template_name = 'generic_views/confirm_delete.html'
     context_object_name = 'thingy'
     success_url = reverse_lazy('authors_list')
+
+    def delete(self, request, pk):
+        messages.success(request, 'Author deleted.')
+        return super().delete(request)
 
 
 class BookConfig:
