@@ -796,232 +796,232 @@ msgid "%s PB"
 msgstr ""
 
 msgid "p.m."
-msgstr ""
+msgstr "p.m."
 
 msgid "a.m."
-msgstr ""
+msgstr "a.m."
 
 msgid "PM"
-msgstr ""
+msgstr "PM"
 
 msgid "AM"
-msgstr ""
+msgstr "AM"
 
 msgid "midnight"
-msgstr ""
+msgstr "मध्यरात्री"
 
 msgid "noon"
-msgstr ""
+msgstr "दुपार"
 
 msgid "Monday"
-msgstr ""
+msgstr "सोमवार"
 
 msgid "Tuesday"
-msgstr ""
+msgstr "मंगळवार"
 
 msgid "Wednesday"
-msgstr ""
+msgstr "बुधवार"
 
 msgid "Thursday"
-msgstr ""
+msgstr "गुरुवार"
 
 msgid "Friday"
-msgstr ""
+msgstr "शुक्रवार"
 
 msgid "Saturday"
-msgstr ""
+msgstr "शनिवार"
 
 msgid "Sunday"
-msgstr ""
+msgstr "रविवार"
 
 msgid "Mon"
-msgstr ""
+msgstr "सोम"
 
 msgid "Tue"
-msgstr ""
+msgstr "मंगळ"
 
 msgid "Wed"
-msgstr ""
+msgstr "बुध"
 
 msgid "Thu"
-msgstr ""
+msgstr "गुरु"
 
 msgid "Fri"
-msgstr ""
+msgstr "शुक्र"
 
 msgid "Sat"
-msgstr ""
+msgstr "शनि"
 
 msgid "Sun"
-msgstr ""
+msgstr "रवी"
 
 msgid "January"
-msgstr ""
+msgstr "जानेवारी"
 
 msgid "February"
-msgstr ""
+msgstr "फेब्रुवारी"
 
 msgid "March"
-msgstr ""
+msgstr "मार्च"
 
 msgid "April"
-msgstr ""
+msgstr "एप्रिल"
 
 msgid "May"
-msgstr ""
+msgstr "मे"
 
 msgid "June"
-msgstr ""
+msgstr "जून"
 
 msgid "July"
-msgstr ""
+msgstr "जुलै"
 
 msgid "August"
-msgstr ""
+msgstr "ऑगस्ट"
 
 msgid "September"
-msgstr ""
+msgstr "सप्टेंबर"
 
 msgid "October"
-msgstr ""
+msgstr "ऑक्टोबर"
 
 msgid "November"
-msgstr ""
+msgstr "नोव्हेंबर"
 
 msgid "December"
-msgstr ""
+msgstr "डिसेंबर"
 
 msgid "jan"
-msgstr ""
+msgstr "जान"
 
 msgid "feb"
-msgstr ""
+msgstr "फेब"
 
 msgid "mar"
-msgstr ""
+msgstr "मार्च"
 
 msgid "apr"
-msgstr ""
+msgstr "एप्रिल"
 
 msgid "may"
-msgstr ""
+msgstr "मे"
 
 msgid "jun"
-msgstr ""
+msgstr "जून"
 
 msgid "jul"
-msgstr ""
+msgstr "जुलै"
 
 msgid "aug"
-msgstr ""
+msgstr "ऑग"
 
 msgid "sep"
-msgstr ""
+msgstr "सप्टें"
 
 msgid "oct"
-msgstr ""
+msgstr "ऑक्ट"
 
 msgid "nov"
-msgstr ""
+msgstr "नोव्ह"
 
 msgid "dec"
-msgstr ""
+msgstr "डिसें"
 
 msgctxt "abbrev. month"
 msgid "Jan."
-msgstr ""
+msgstr "जान"
 
 msgctxt "abbrev. month"
 msgid "Feb."
-msgstr ""
+msgstr "फेब"
 
 msgctxt "abbrev. month"
 msgid "March"
-msgstr ""
+msgstr "मार्च"
 
 msgctxt "abbrev. month"
 msgid "April"
-msgstr ""
+msgstr "एप्रिल"
 
 msgctxt "abbrev. month"
 msgid "May"
-msgstr ""
+msgstr "मे"
 
 msgctxt "abbrev. month"
 msgid "June"
-msgstr ""
+msgstr "जून"
 
 msgctxt "abbrev. month"
 msgid "July"
-msgstr ""
+msgstr "जुलै"
 
 msgctxt "abbrev. month"
 msgid "Aug."
-msgstr ""
+msgstr "ऑग"
 
 msgctxt "abbrev. month"
 msgid "Sept."
-msgstr ""
+msgstr "सप्टें"
 
 msgctxt "abbrev. month"
 msgid "Oct."
-msgstr ""
+msgstr "ऑक्ट"
 
 msgctxt "abbrev. month"
 msgid "Nov."
-msgstr ""
+msgstr "नोव्ह"
 
 msgctxt "abbrev. month"
 msgid "Dec."
-msgstr ""
+msgstr "डिसें"
 
 msgctxt "alt. month"
 msgid "January"
-msgstr ""
+msgstr "जानेवारी"
 
 msgctxt "alt. month"
 msgid "February"
-msgstr ""
+msgstr "फेब्रुवारी"
 
 msgctxt "alt. month"
 msgid "March"
-msgstr ""
+msgstr "मार्च"
 
 msgctxt "alt. month"
 msgid "April"
-msgstr ""
+msgstr "एप्रिल"
 
 msgctxt "alt. month"
 msgid "May"
-msgstr ""
+msgstr "मे"
 
 msgctxt "alt. month"
 msgid "June"
-msgstr ""
+msgstr "जून"
 
 msgctxt "alt. month"
 msgid "July"
-msgstr ""
+msgstr "जुलै"
 
 msgctxt "alt. month"
 msgid "August"
-msgstr ""
+msgstr "ऑगस्ट"
 
 msgctxt "alt. month"
 msgid "September"
-msgstr ""
+msgstr "सप्टेंबर"
 
 msgctxt "alt. month"
 msgid "October"
-msgstr ""
+msgstr "ऑक्टोबर"
 
 msgctxt "alt. month"
 msgid "November"
-msgstr ""
+msgstr "नोव्हेंबर"
 
 msgctxt "alt. month"
 msgid "December"
-msgstr ""
+msgstr "डिसेंबर"
 
 msgid "This is not a valid IPv6 address."
 msgstr ""
