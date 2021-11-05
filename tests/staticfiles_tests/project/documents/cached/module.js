@@ -20,3 +20,5 @@ export {
     firstVar as firstVarAlias,
     secondVar as secondVarAlias
 } from "./module_test.js";
+
+/** @typedef { import('./myTypes').User } User */
