@@ -1,3 +1,5 @@
+import warnings
+
 from django.core.exceptions import ImproperlyConfigured
 from django.forms import Form, models as model_forms
 from django.http import HttpResponseRedirect
@@ -225,6 +227,11 @@ class DeletionMixin:
                 "No URL to redirect to. Provide a success_url.")
 
 
+# RemovedInDjango50Warning.
+class DeleteViewCustomDeleteWarning(Warning):
+    pass
+
+
 class BaseDeleteView(DeletionMixin, FormMixin, BaseDetailView):
     """
     Base view for deleting an object.
@@ -232,6 +239,19 @@ class BaseDeleteView(DeletionMixin, FormMixin, BaseDetailView):
     Using this base class requires subclassing to provide a response mixin.
     """
     form_class = Form
+
+    def __init__(self, *args, **kwargs):
+        # RemovedInDjango50Warning.
+        if self.__class__.delete is not DeletionMixin.delete:
+            warnings.warn(
+                f'DeleteView uses FormMixin to handle POST requests. As a '
+                f'consequence, any custom deletion logic in '
+                f'{self.__class__.__name__}.delete() handler should be moved '
+                f'to form_valid().',
+                DeleteViewCustomDeleteWarning,
+                stacklevel=2,
+            )
+        super().__init__(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         # Set self.object before the usual form processing flow.
