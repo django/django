@@ -1,7 +1,7 @@
 import datetime
 
 from django.core.exceptions import ValidationError
-from django.forms import SplitDateTimeField
+from django.forms import Form, SplitDateTimeField
 from django.forms.widgets import SplitDateTimeWidget
 from django.test import SimpleTestCase
 
@@ -60,3 +60,16 @@ class SplitDateTimeFieldTest(SimpleTestCase):
         self.assertTrue(f.has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['2008-05-06', '12:40:00']))
         self.assertFalse(f.has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['06/05/2008', '12:40']))
         self.assertTrue(f.has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['06/05/2008', '12:41']))
+
+    def test_form_as_table(self):
+        class TestForm(Form):
+            datetime = SplitDateTimeField()
+
+        f = TestForm()
+        self.assertHTMLEqual(
+            f.as_table(),
+            '<tr><th><label>Datetime:</label></th><td>'
+            '<input type="text" name="datetime_0" required id="id_datetime_0">'
+            '<input type="text" name="datetime_1" required id="id_datetime_1">'
+            '</td></tr>',
+        )

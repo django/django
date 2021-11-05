@@ -665,7 +665,7 @@ class TestFormField(PostgreSQLSimpleTestCase):
         self.assertHTMLEqual(str(form), '''
             <tr>
                 <th>
-                <label for="id_field_0">Field:</label>
+                <label>Field:</label>
                 </th>
                 <td>
                     <input id="id_field_0_0" name="field_0_0" type="text">
@@ -700,7 +700,7 @@ class TestFormField(PostgreSQLSimpleTestCase):
             form.as_table(),
             """
             <tr><th>
-            <label for="id_datetime_field_0">Datetime field:</label>
+            <label>Datetime field:</label>
             </th><td>
             <input type="text" name="datetime_field_0" id="id_datetime_field_0">
             <input type="text" name="datetime_field_1" id="id_datetime_field_1">
@@ -717,7 +717,7 @@ class TestFormField(PostgreSQLSimpleTestCase):
             form.as_table(),
             """
             <tr><th>
-            <label for="id_datetime_field_0">Datetime field:</label>
+            <label>Datetime field:</label>
             </th><td>
             <input type="text" name="datetime_field_0"
             value="2010-01-01 11:13:00" id="id_datetime_field_0">
@@ -754,7 +754,7 @@ class TestFormField(PostgreSQLSimpleTestCase):
 
         self.assertHTMLEqual(str(RangeForm()), '''
         <tr>
-            <th><label for="id_ints_0">Ints:</label></th>
+            <th><label>Ints:</label></th>
             <td>
                 <input id="id_ints_0" name="ints_0" type="number">
                 <input id="id_ints_1" name="ints_1" type="number">
