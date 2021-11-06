@@ -12,6 +12,10 @@ reference -- but we've got both! When you're ready to start a project, you can
 :doc:`start with the tutorial </intro/tutorial01>` or :doc:`dive right into more
 detailed documentation </topics/index>`.
 
+Before continuing programming, please install python from the official python site python.org
+
+You must be have at least Python 2.2.17 or higher to work with django.
+
 Design your model
 =================
 
