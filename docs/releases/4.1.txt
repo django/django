@@ -177,7 +177,9 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* The new :meth:`~django.forms.BoundField.legend_tag` allows rendering field
+  labels in ``<legend>`` tags via the new ``tag`` argument of
+  :meth:`~django.forms.BoundField.label_tag`.
 
 Generic Views
 ~~~~~~~~~~~~~

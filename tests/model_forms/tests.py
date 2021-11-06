@@ -830,6 +830,18 @@ class TestFieldOverridesByFormMeta(SimpleTestCase):
             str(form['slug'].label_tag()),
             '<label for="id_slug">Slug:</label>',
         )
+        self.assertHTMLEqual(
+            form['name'].legend_tag(),
+            '<legend for="id_name">Title:</legend>',
+        )
+        self.assertHTMLEqual(
+            form['url'].legend_tag(),
+            '<legend for="id_url">The URL:</legend>',
+        )
+        self.assertHTMLEqual(
+            form['slug'].legend_tag(),
+            '<legend for="id_slug">Slug:</legend>',
+        )
 
     def test_help_text_overrides(self):
         form = FieldOverridesByFormMetaForm()

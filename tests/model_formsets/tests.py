@@ -1801,6 +1801,10 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         })
         form = BookFormSet.form()
         self.assertHTMLEqual(form['title'].label_tag(), '<label for="id_title">Name:</label>')
+        self.assertHTMLEqual(
+            form['title'].legend_tag(),
+            '<legend for="id_title">Name:</legend>',
+        )
 
     def test_inlineformset_factory_labels_overrides(self):
         BookFormSet = inlineformset_factory(Author, Book, fields="__all__", labels={
@@ -1808,6 +1812,10 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         })
         form = BookFormSet.form()
         self.assertHTMLEqual(form['title'].label_tag(), '<label for="id_title">Name:</label>')
+        self.assertHTMLEqual(
+            form['title'].legend_tag(),
+            '<legend for="id_title">Name:</legend>',
+        )
 
     def test_modelformset_factory_help_text_overrides(self):
         BookFormSet = modelformset_factory(Book, fields="__all__", help_texts={
