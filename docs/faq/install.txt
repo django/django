@@ -87,3 +87,7 @@ releases contain the API that is covered by our backwards
 compatibility guarantees; if you write code against stable releases,
 you shouldn't have any problems upgrading when the next official
 version is released.
+
+Still unable to use django?or Install python (at least version 2.2.17) from python.org to continue.
+
+If you got "pip is not recognized as an internal or external command, operable program or batch file." so please run the command "python --version" to see if python is installed on your machine.
