@@ -1039,13 +1039,13 @@ class Model(metaclass=ModelBase):
         unique_checks = []
 
         unique_togethers = [(self.__class__, self._meta.unique_together)]
-        constraints = [(self.__class__, self._meta.total_unique_constraints)]
+        constraints = [(self.__class__, self._meta.list_unique_constraints)]
         for parent_class in self._meta.get_parent_list():
             if parent_class._meta.unique_together:
                 unique_togethers.append((parent_class, parent_class._meta.unique_together))
-            if parent_class._meta.total_unique_constraints:
+            if parent_class._meta.list_unique_constraints:
                 constraints.append(
-                    (parent_class, parent_class._meta.total_unique_constraints)
+                    (parent_class, parent_class._meta.list_unique_constraints)
                 )
 
         for model_class, unique_together in unique_togethers:

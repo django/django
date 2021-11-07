@@ -559,7 +559,7 @@ class ForeignObject(RelatedField):
         })
         unique_foreign_fields.update({
             frozenset(uc.fields)
-            for uc in self.remote_field.model._meta.total_unique_constraints
+            for uc in self.remote_field.model._meta.list_unique_constraints
         })
         foreign_fields = {f.name for f in self.foreign_related_fields}
         has_unique_constraint = any(u <= foreign_fields for u in unique_foreign_fields)

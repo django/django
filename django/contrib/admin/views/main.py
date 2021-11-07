@@ -391,7 +391,7 @@ class ChangeList:
                 *self.lookup_opts.unique_together,
                 *(
                     constraint.fields
-                    for constraint in self.lookup_opts.total_unique_constraints
+                    for constraint in self.lookup_opts.list_unique_constraints
                 ),
             )
             for field_names in constraint_field_names:
