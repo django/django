@@ -700,7 +700,7 @@ class QuerySet:
         opts = self.model._meta
         unique_fields = [
             constraint.fields[0]
-            for constraint in opts.total_unique_constraints
+            for constraint in opts.list_unique_constraints
             if len(constraint.fields) == 1
         ]
         if (

@@ -1,6 +1,7 @@
 import bisect
 import copy
 import inspect
+import warnings
 from collections import defaultdict
 
 from django.apps import apps
@@ -857,10 +858,15 @@ class Options:
         self._get_fields_cache[cache_key] = fields
         return fields
 
-    @cached_property
     def total_unique_constraints(self):
+        msg = "Deprecated, use 'list_unique_constraints' instead"
+        warnings.warn(msg, category=DeprecationWarning)
+        return self.list_unique_constraints
+
+    @cached_property
+    def list_unique_constraints(self):
         """
-        Return a list of total unique constraints. Useful for determining set
+        Return a list of all unique constraints. Useful for determining set
         of fields guaranteed to be unique for all rows.
         """
         return [
