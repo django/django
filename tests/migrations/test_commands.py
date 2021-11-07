@@ -1458,6 +1458,12 @@ class MakeMigrationsTests(MigrationTestBase):
             " 3) Quit and manually define a default value in models.py."
         )
         with self.temporary_migration_module(module='migrations.test_migrations'):
+            # No message appears if --dry-run.
+            with captured_stdout() as out:
+                call_command(
+                    'makemigrations', 'migrations', interactive=True, dry_run=True,
+                )
+            self.assertNotIn(input_msg, out.getvalue())
             # 3 - quit.
             with mock.patch('builtins.input', return_value='3'):
                 with captured_stdout() as out, self.assertRaises(SystemExit):
@@ -1511,6 +1517,39 @@ class MakeMigrationsTests(MigrationTestBase):
             call_command("makemigrations", "migrations", interactive=False, stdout=out)
         self.assertIn("Remove field silly_field from sillymodel", out.getvalue())
         self.assertIn("Add field silly_rename to sillymodel", out.getvalue())
+
+    @mock.patch('builtins.input', return_value='Y')
+    def test_makemigrations_model_rename_interactive(self, mock_input):
+        class RenamedModel(models.Model):
+            silly_field = models.BooleanField(default=False)
+
+            class Meta:
+                app_label = 'migrations'
+
+        with self.temporary_migration_module(
+            module='migrations.test_migrations_no_default',
+        ):
+            with captured_stdout() as out:
+                call_command('makemigrations', 'migrations', interactive=True)
+        self.assertIn('Rename model SillyModel to RenamedModel', out.getvalue())
+
+    @mock.patch('builtins.input', return_value='Y')
+    def test_makemigrations_field_rename_interactive(self, mock_input):
+        class SillyModel(models.Model):
+            silly_rename = models.BooleanField(default=False)
+
+            class Meta:
+                app_label = 'migrations'
+
+        with self.temporary_migration_module(
+            module='migrations.test_migrations_no_default',
+        ):
+            with captured_stdout() as out:
+                call_command('makemigrations', 'migrations', interactive=True)
+        self.assertIn(
+            'Rename field silly_field on sillymodel to silly_rename',
+            out.getvalue(),
+        )
 
     def test_makemigrations_handle_merge(self):
         """
@@ -1581,6 +1620,7 @@ class MakeMigrationsTests(MigrationTestBase):
         class SillyModel(models.Model):
             silly_field = models.BooleanField(default=False)
             silly_date = models.DateField()  # Added field without a default
+            silly_auto_now = models.DateTimeField(auto_now_add=True)
 
             class Meta:
                 app_label = "migrations"
