@@ -11,6 +11,7 @@ from django.db import connections
 from django.db.models import AutoField, Manager, OrderWrt, UniqueConstraint
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, OrderedSet
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.text import camel_case_to_spaces, format_lazy
@@ -860,7 +861,7 @@ class Options:
 
     def total_unique_constraints(self):
         msg = "Deprecated, use 'list_unique_constraints' instead"
-        warnings.warn(msg, category=DeprecationWarning)
+        warnings.warn(msg, category=RemovedInDjango50Warning)
         return self.list_unique_constraints
 
     @cached_property
