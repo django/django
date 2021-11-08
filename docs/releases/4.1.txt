@@ -270,6 +270,8 @@ Miscellaneous
   :ref:`context variables <sitemap-index-context-variables>`, expecting a list
   of objects with ``location`` and optional ``lastmod`` attributes.
 
+* `total_unique_constraints` renamed `list_unique_constraints` and deprecated.
+
 Features removed in 4.1
 =======================
 
