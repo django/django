@@ -1383,7 +1383,7 @@ The :class:`template context <django.template.Context>` used is:
   supported options)
 - ``project_name`` -- the project name as passed to the command
 - ``project_directory`` -- the full path of the newly created project
-- ``secret_key`` -- a random key for the :setting:`SECRET_KEY` setting
+- ``secret_key`` -- a random key for the :setting:`SECRET_KEYS` setting
 - ``docs_version`` -- the version of the documentation: ``'dev'`` or ``'1.x'``
 - ``django_version`` -- the version of Django, e.g. ``'2.0.3'``
 

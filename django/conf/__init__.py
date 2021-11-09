@@ -93,8 +93,15 @@ class LazySettings(LazyObject):
         # This is done here for performance reasons so the modified value is cached.
         if name in {'MEDIA_URL', 'STATIC_URL'} and val is not None:
             val = self._add_script_prefix(val)
-        elif name == 'SECRET_KEY' and not val:
-            raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
+
+        # Raise on an empty value for SECRET_KEYS(S).
+        if name == 'SECRET_KEY' and not val:
+            raise ImproperlyConfigured('The SECRET_KEY setting must not be empty.')
+        elif name == 'SECRET_KEYS':
+            if not val:
+                raise ImproperlyConfigured('The SECRET_KEYS setting must not be empty.')
+            if not all(val):
+                raise ImproperlyConfigured('The elements of SECRET_KEYS must not be empty.')
 
         self.__dict__[name] = val
         return val
@@ -182,12 +189,16 @@ class Settings:
         self.SETTINGS_MODULE = settings_module
 
         mod = importlib.import_module(self.SETTINGS_MODULE)
+        if hasattr(mod, 'SECRET_KEY') and hasattr(mod, 'SECRET_KEYS'):
+            if mod.SECRET_KEY and mod.SECRET_KEYS:
+                raise ImproperlyConfigured('Only one of SECRET_KEY and SECRET_KEYS can be specified, not both.')
 
         tuple_settings = (
             'ALLOWED_HOSTS',
             "INSTALLED_APPS",
             "TEMPLATE_DIRS",
             "LOCALE_PATHS",
+            "SECRET_KEYS",
         )
         self._explicit_settings = set()
         for setting in dir(mod):
@@ -198,6 +209,8 @@ class Settings:
                         not isinstance(setting_value, (list, tuple))):
                     raise ImproperlyConfigured("The %s setting must be a list or a tuple." % setting)
                 setattr(self, setting, setting_value)
+                if setting == 'SECRET_KEY':
+                    setting = 'SECRET_KEYS'
                 self._explicit_settings.add(setting)
 
         if self.USE_TZ is False and not self.is_overridden('USE_TZ'):
@@ -230,6 +243,8 @@ class Settings:
             warnings.warn(USE_L10N_DEPRECATED_MSG, RemovedInDjango50Warning)
 
     def is_overridden(self, setting):
+        if setting == 'SECRET_KEY':
+            setting = 'SECRET_KEYS'
         return setting in self._explicit_settings
 
     def __repr__(self):
@@ -237,6 +252,18 @@ class Settings:
             'cls': self.__class__.__name__,
             'settings_module': self.SETTINGS_MODULE,
         }
+
+    @property
+    def SECRET_KEY(self):
+        return self.SECRET_KEYS[0]
+
+    @SECRET_KEY.setter
+    def SECRET_KEY(self, value):
+        self.SECRET_KEYS = [value]
+
+    @SECRET_KEY.deleter
+    def SECRET_KEY(self):
+        del self.SECRET_KEYS
 
 
 class UserSettingsHolder:
@@ -280,6 +307,8 @@ class UserSettingsHolder:
         )
 
     def is_overridden(self, setting):
+        if setting == 'SECRET_KEY':
+            setting = 'SECRET_KEYS'
         deleted = (setting in self._deleted)
         set_locally = (setting in self.__dict__)
         set_on_default = getattr(self.default_settings, 'is_overridden', lambda s: False)(setting)
@@ -289,6 +318,21 @@ class UserSettingsHolder:
         return '<%(cls)s>' % {
             'cls': self.__class__.__name__,
         }
+
+    @property
+    def SECRET_KEY(self):
+        try:
+            return self.SECRET_KEYS[0]
+        except TypeError:
+            return ''
+
+    @SECRET_KEY.setter
+    def SECRET_KEY(self, value):
+        self.SECRET_KEYS = [value]
+
+    @SECRET_KEY.deleter
+    def SECRET_KEY(self):
+        del self.SECRET_KEYS
 
 
 settings = LazySettings()

@@ -39,25 +39,40 @@ described in the option's documentation.
 Critical settings
 =================
 
-:setting:`SECRET_KEY`
----------------------
+:setting:`SECRET_KEYS`
+----------------------
 
-**The secret key must be a large random value and it must be kept secret.**
+**Secret keys must be a large random values and they must be kept secret.**
 
-Make sure that the key used in production isn't used anywhere else and avoid
-committing it to source control. This reduces the number of vectors from which
-an attacker may acquire the key.
+Make sure that the keys used in production are not used anywhere else and avoid
+committing them to source control. This reduces the number of vectors from
+which an attacker may acquire a key.
 
-Instead of hardcoding the secret key in your settings module, consider loading
-it from an environment variable::
+Instead of hardcoding the secret keys in your settings module, consider loading
+them from environment variables::
 
     import os
-    SECRET_KEY = os.environ['SECRET_KEY']
+    SECRET_KEYS = [
+        os.environ['CURRENT_SECRET_KEY'],
+    ]
 
 or from a file::
 
-    with open('/etc/secret_key.txt') as f:
-        SECRET_KEY = f.read().strip()
+    with open('/etc/current_secret_key.txt') as f:
+        SECRET_KEYS = [
+            f.read().strip(),
+        ]
+
+If rotating keys, you may load multiple values::
+
+    import os
+    SECRET_KEYS = [
+        os.environ['CURRENT_SECRET_KEY'],
+        os.environ['OLD_SECRET_KEY'],
+    ]
+
+Ensure that old secret keys are removed from ``SECRET_KEYS`` in a timely
+manner.
 
 :setting:`DEBUG`
 ----------------
@@ -116,7 +131,7 @@ Database connection parameters are probably different in development and in
 production.
 
 Database passwords are very sensitive. You should protect them exactly like
-:setting:`SECRET_KEY`.
+:setting:`SECRET_KEYS`.
 
 For maximum security, make sure database servers only accept connections from
 your application servers.

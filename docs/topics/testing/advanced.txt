@@ -442,7 +442,9 @@ labels to run, etc.
 .. code-block:: python
     :caption: tests/test_settings.py
 
-    SECRET_KEY = 'fake-key'
+    SECRET_KEYS = [
+        'fake-key',
+    ]
     INSTALLED_APPS = [
         "tests",
     ]

@@ -4,8 +4,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 
 from .models import CustomEmailField
 
@@ -95,20 +94,20 @@ class TokenGeneratorTest(TestCase):
 
     def test_token_with_different_secret(self):
         """
-        A valid token can be created with a secret other than SECRET_KEY by
-        using the PasswordResetTokenGenerator.secret attribute.
+        A valid token can be created with a secret other than those in
+        SECRET_KEYS by using the PasswordResetTokenGenerator.secrets attribute.
         """
         user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
         new_secret = 'abcdefghijkl'
         # Create and check a token with a different secret.
         p0 = PasswordResetTokenGenerator()
-        p0.secret = new_secret
+        p0.secrets = [new_secret]
         tk0 = p0.make_token(user)
         self.assertIs(p0.check_token(user, tk0), True)
         # Create and check a token with the default secret.
         p1 = PasswordResetTokenGenerator()
-        self.assertEqual(p1.secret, settings.SECRET_KEY)
-        self.assertNotEqual(p1.secret, new_secret)
+        self.assertEqual(p1.secrets[0], settings.SECRET_KEYS[0])
+        self.assertNotEqual(p1.secrets[0], new_secret)
         tk1 = p1.make_token(user)
         # Tokens created with a different secret don't validate.
         self.assertIs(p0.check_token(user, tk1), False)
@@ -116,7 +115,7 @@ class TokenGeneratorTest(TestCase):
 
     def test_token_with_different_secret_subclass(self):
         class CustomPasswordResetTokenGenerator(PasswordResetTokenGenerator):
-            secret = 'test-secret'
+            secrets = ['test-secret']
 
         user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
         custom_password_generator = CustomPasswordResetTokenGenerator()
@@ -125,18 +124,45 @@ class TokenGeneratorTest(TestCase):
 
         default_password_generator = PasswordResetTokenGenerator()
         self.assertNotEqual(
-            custom_password_generator.secret,
-            default_password_generator.secret,
+            custom_password_generator.secrets,
+            default_password_generator.secrets,
         )
-        self.assertEqual(default_password_generator.secret, settings.SECRET_KEY)
+        self.assertEqual(default_password_generator.secrets, settings.SECRET_KEYS)
         # Tokens created with a different secret don't validate.
         tk_default = default_password_generator.make_token(user)
         self.assertIs(custom_password_generator.check_token(user, tk_default), False)
         self.assertIs(default_password_generator.check_token(user, tk_custom), False)
 
-    @override_settings(SECRET_KEY='')
+    @override_settings(SECRET_KEYS=[''])
     def test_secret_lazy_validation(self):
         default_token_generator = PasswordResetTokenGenerator()
-        msg = 'The SECRET_KEY setting must not be empty.'
+        msg = 'The elements of SECRET_KEYS must not be empty.'
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            default_token_generator.secret
+            default_token_generator.secrets
+
+    def test_verify_with_multiple_secrets(self):
+        user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
+
+        p1 = PasswordResetTokenGenerator()
+        p1.secrets = ['secret']
+
+        p2 = PasswordResetTokenGenerator()
+        p2.secrets = ['newsecret', 'secret']
+
+        tk1 = p1.make_token(user)
+        self.assertTrue(p1.check_token(user, tk1))
+        self.assertTrue(p2.check_token(user, tk1))
+
+    @override_settings(
+        SECRET_KEYS=['secret', 'old_secret'],
+    )
+    def test_default_keys_verification(self):
+        user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
+
+        p1 = PasswordResetTokenGenerator()
+        p1.secret = 'old_secret'
+
+        p2 = PasswordResetTokenGenerator()
+        tk = p1.make_token(user)
+
+        self.assertTrue(p2.check_token(user, tk))

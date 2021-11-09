@@ -114,7 +114,7 @@ Using cookie-based sessions
 To use cookies-based sessions, set the :setting:`SESSION_ENGINE` setting to
 ``"django.contrib.sessions.backends.signed_cookies"``. The session data will be
 stored using Django's tools for :doc:`cryptographic signing </topics/signing>`
-and the :setting:`SECRET_KEY` setting.
+and the :setting:`SECRET_KEYS` setting.
 
 .. note::
 
@@ -123,11 +123,11 @@ and the :setting:`SECRET_KEY` setting.
 
 .. warning::
 
-    **If the SECRET_KEY is not kept secret and you are using the**
+    **If the SECRET_KEYS values are not kept secret and you are using the**
     :class:`~django.contrib.sessions.serializers.PickleSerializer`, **this can
     lead to arbitrary remote code execution.**
 
-    An attacker in possession of the :setting:`SECRET_KEY` can not only
+    An attacker in possession of the :setting:`SECRET_KEYS` values can not only
     generate falsified session data, which your site will trust, but also
     remotely execute arbitrary code, as the data is serialized using pickle.
 
@@ -325,13 +325,14 @@ cookie backend*.
 
 For example, here's an attack scenario if you use :mod:`pickle` to serialize
 session data. If you're using the :ref:`signed cookie session backend
-<cookie-session-backend>` and :setting:`SECRET_KEY` is known by an attacker
-(there isn't an inherent vulnerability in Django that would cause it to leak),
-the attacker could insert a string into their session which, when unpickled,
-executes arbitrary code on the server. The technique for doing so is simple and
-easily available on the internet. Although the cookie session storage signs the
-cookie-stored data to prevent tampering, a :setting:`SECRET_KEY` leak
-immediately escalates to a remote code execution vulnerability.
+<cookie-session-backend>` and any value in :setting:`SECRET_KEYS` is known by
+an attacker (there isn't an inherent vulnerability in Django that would cause
+it to leak), the attacker could insert a string into their session which, when
+unpickled, executes arbitrary code on the server. The technique for doing so is
+simple and easily available on the internet. Although the cookie session
+storage signs the cookie-stored data to prevent tampering, a
+:setting:`SECRET_KEYS` leak immediately escalates to a remote code execution
+vulnerability.
 
 Bundled serializers
 ~~~~~~~~~~~~~~~~~~~
@@ -361,8 +362,8 @@ Bundled serializers
 .. class:: serializers.PickleSerializer
 
     Supports arbitrary Python objects, but, as described above, can lead to a
-    remote code execution vulnerability if :setting:`SECRET_KEY` becomes known
-    by an attacker.
+    remote code execution vulnerability if :setting:`SECRET_KEYS` values
+    becomes known by an attacker.
 
 .. _custom-serializers:
 

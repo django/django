@@ -25,12 +25,12 @@ You may also find signing useful for the following:
   protected resource, for example a downloadable file that a user has
   paid for.
 
-Protecting the ``SECRET_KEY``
-=============================
+Protecting ``SECRET_KEYS``
+==========================
 
 When you create a new Django project using :djadmin:`startproject`, the
-``settings.py`` file is generated automatically and gets a random
-:setting:`SECRET_KEY` value. This value is the key to securing signed
+``settings.py`` file is generated automatically and gets a random value for
+:setting:`SECRET_KEYS`. This value is the key to securing signed
 data -- it is vital you keep this secure, or attackers could use it to
 generate their own signed values.
 
@@ -84,7 +84,7 @@ If the signature or value have been altered in any way, a
     ... except signing.BadSignature:
     ...    print("Tampering detected!")
 
-By default, the ``Signer`` class uses the :setting:`SECRET_KEY` setting to
+By default, the ``Signer`` class uses the :setting:`SECRET_KEYS` setting to
 generate signatures. You can use a different secret by passing it to the
 ``Signer`` constructor::
 
@@ -107,7 +107,7 @@ Using the ``salt`` argument
 If you do not wish for every occurrence of a particular string to have the same
 signature hash, you can use the optional ``salt`` argument to the ``Signer``
 class. Using a salt will seed the signing hash function with both the salt and
-your :setting:`SECRET_KEY`::
+first of your :setting:`SECRET_KEYS`::
 
     >>> signer = Signer()
     >>> signer.sign('My string')
@@ -132,7 +132,7 @@ attacker from using a signed string generated in one place in the code as input
 to another piece of code that is generating (and verifying) signatures using a
 different salt.
 
-Unlike your :setting:`SECRET_KEY`, your salt argument does not need to stay
+Unlike your :setting:`SECRET_KEYS`, your salt argument does not need to stay
 secret.
 
 Verifying timestamped values
@@ -191,7 +191,7 @@ If you wish to protect a list, tuple or dictionary you can do so using the
 ``dumps()`` or ``loads()`` functions (which are shortcuts for
 ``TimestampSigner(salt='django.core.signing').sign_object()/unsign_object()``).
 These use JSON serialization under the hood. JSON ensures that even if your
-:setting:`SECRET_KEY` is stolen an attacker will not be able to execute
+:setting:`SECRET_KEYS` are stolen an attacker will not be able to execute
 arbitrary commands by exploiting the pickle format::
 
     >>> from django.core import signing

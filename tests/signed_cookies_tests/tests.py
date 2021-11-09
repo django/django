@@ -56,7 +56,7 @@ class SignedCookieTest(SimpleTestCase):
             with self.assertRaises(signing.SignatureExpired):
                 request.get_signed_cookie('c', max_age=10)
 
-    @override_settings(SECRET_KEY=b'\xe7')
+    @override_settings(SECRET_KEYS=[b'\xe7'])
     def test_signed_cookies_with_binary_key(self):
         response = HttpResponse()
         response.set_signed_cookie('c', 'hello')

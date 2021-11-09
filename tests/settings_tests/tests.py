@@ -293,11 +293,42 @@ class SettingsTests(SimpleTestCase):
         with self.assertRaises(AttributeError):
             getattr(settings, 'TEST2')
 
-    @override_settings(SECRET_KEY='')
-    def test_no_secret_key(self):
+    def test_empty_secret_key(self):
         msg = 'The SECRET_KEY setting must not be empty.'
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            settings.SECRET_KEY
+        tests = [
+            {'SECRET_KEY': ''},
+            {'SECRET_KEY': None},
+        ]
+        for kwargs in tests:
+            with self.subTest(kwargs=kwargs):
+                with override_settings(**kwargs):
+                    with self.assertRaisesMessage(ImproperlyConfigured, msg):
+                        settings.SECRET_KEY
+
+    def test_empty_secret_keys(self):
+        # The list itself must be there.
+        msg = 'The SECRET_KEYS setting must not be empty.'
+        tests = [
+            {'SECRET_KEYS': None},
+            {'SECRET_KEYS': []},
+        ]
+        for kwargs in tests:
+            with self.subTest(kwargs=kwargs):
+                with override_settings(**kwargs):
+                    with self.assertRaisesMessage(ImproperlyConfigured, msg):
+                        settings.SECRET_KEYS
+
+        # The first item must also be set.
+        msg = 'The elements of SECRET_KEYS must not be empty.'
+        tests = [
+            {'SECRET_KEYS': [None]},
+            {'SECRET_KEYS': ['']},
+        ]
+        for kwargs in tests:
+            with self.subTest(kwargs=kwargs):
+                with override_settings(**kwargs):
+                    with self.assertRaisesMessage(ImproperlyConfigured, msg):
+                        settings.SECRET_KEYS
 
     def test_no_settings_module(self):
         msg = (
@@ -338,7 +369,6 @@ class SettingsTests(SimpleTestCase):
 
     def test_use_tz_false_deprecation(self):
         settings_module = ModuleType('fake_settings_module')
-        settings_module.SECRET_KEY = 'foo'
         sys.modules['fake_settings_module'] = settings_module
         msg = (
             'The default value of USE_TZ will change from False to True in '
@@ -365,6 +395,51 @@ class SettingsTests(SimpleTestCase):
         holder = LazySettings()
         with self.assertRaisesMessage(RemovedInDjango50Warning, USE_DEPRECATED_PYTZ_DEPRECATED_MSG):
             holder.configure(USE_DEPRECATED_PYTZ=True)
+
+    @override_settings(SECRET_KEY='kex123')
+    def test_secret_key(self):
+        self.assertEqual(settings.SECRET_KEY, 'kex123')
+        self.assertEqual(settings.SECRET_KEYS, ['kex123'])
+
+    @override_settings(SECRET_KEYS=['aaa11', 'bbb22'])
+    def test_secret_keys(self):
+        self.assertEqual(settings.SECRET_KEY, 'aaa11')
+        self.assertEqual(settings.SECRET_KEYS, ['aaa11', 'bbb22'])
+
+
+class TestSecretKeysNormalization(unittest.TestCase):
+    """
+    Settings.__init__() handles setting either SECRET_KEY or SECRET_KEYS, but
+    not both.
+    """
+    def make_settings(self, **kwargs):
+        settings_module = ModuleType('fake_settings_module')
+        settings_module.USE_TZ = True
+        for k, v in kwargs.items():
+            setattr(settings_module, k, v)
+
+        try:
+            sys.modules['fake_settings_module'] = settings_module
+            result = Settings('fake_settings_module')
+        finally:
+            del sys.modules['fake_settings_module']
+
+        return result
+
+    def test_secret_key(self):
+        settings = self.make_settings(SECRET_KEY='foo')
+        self.assertEqual(settings.SECRET_KEY, 'foo')
+        self.assertEqual(settings.SECRET_KEYS, ['foo'])
+
+    def test_secret_keys(self):
+        settings = self.make_settings(SECRET_KEYS=['foo', 'bar'])
+        self.assertEqual(settings.SECRET_KEY, 'foo')
+        self.assertEqual(settings.SECRET_KEYS, ['foo', 'bar'])
+
+    def test_both_specified(self):
+        msg = 'Only one of SECRET_KEY and SECRET_KEYS can be specified, not both.'
+        with self.assertRaisesRegex(ImproperlyConfigured, msg):
+            self.make_settings(SECRET_KEY='a', SECRET_KEYS=['b'])
 
 
 class TestComplexSettingOverride(SimpleTestCase):
@@ -425,19 +500,19 @@ class SecureProxySslHeaderTest(SimpleTestCase):
 class IsOverriddenTest(SimpleTestCase):
     def test_configure(self):
         s = LazySettings()
-        s.configure(SECRET_KEY='foo')
+        s.configure(SECRET_KEYS=['foo'])
 
-        self.assertTrue(s.is_overridden('SECRET_KEY'))
+        self.assertTrue(s.is_overridden('SECRET_KEYS'))
 
     def test_module(self):
         settings_module = ModuleType('fake_settings_module')
-        settings_module.SECRET_KEY = 'foo'
+        settings_module.SECRET_KEYS = ['foo']
         settings_module.USE_TZ = False
         sys.modules['fake_settings_module'] = settings_module
         try:
             s = Settings('fake_settings_module')
 
-            self.assertTrue(s.is_overridden('SECRET_KEY'))
+            self.assertTrue(s.is_overridden('SECRET_KEYS'))
             self.assertFalse(s.is_overridden('ALLOWED_HOSTS'))
         finally:
             del sys.modules['fake_settings_module']
@@ -483,13 +558,14 @@ class TestListSettings(SimpleTestCase):
         "INSTALLED_APPS",
         "TEMPLATE_DIRS",
         "LOCALE_PATHS",
+        "SECRET_KEYS",
     )
 
     def test_tuple_settings(self):
         settings_module = ModuleType('fake_settings_module')
-        settings_module.SECRET_KEY = 'foo'
         msg = 'The %s setting must be a list or a tuple.'
         for setting in self.list_or_tuple_settings:
+            setattr(settings_module, 'USE_TZ', True)
             setattr(settings_module, setting, ('non_list_or_tuple_value'))
             sys.modules['fake_settings_module'] = settings_module
             try:

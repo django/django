@@ -1,4 +1,6 @@
-SECRET_KEY = 'abcdefg'
+SECRET_KEYS = [
+    'abcdefg',
+]
 
 INSTALLED_APPS = [
     'django.contrib.postgres',

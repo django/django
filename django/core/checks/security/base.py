@@ -197,17 +197,22 @@ def check_ssl_redirect(app_configs, **kwargs):
 
 
 @register(Tags.security, deploy=True)
-def check_secret_key(app_configs, **kwargs):
+def check_secret_keys(app_configs, **kwargs):
+    def check_key(key):
+        return (
+            key and
+            len(set(key)) >= SECRET_KEY_MIN_UNIQUE_CHARACTERS and
+            len(key) >= SECRET_KEY_MIN_LENGTH and
+            not key.startswith(SECRET_KEY_INSECURE_PREFIX)
+        )
+
     try:
-        secret_key = settings.SECRET_KEY
+        secret_keys = settings.SECRET_KEYS
     except (ImproperlyConfigured, AttributeError):
         passed_check = False
     else:
-        passed_check = (
-            len(set(secret_key)) >= SECRET_KEY_MIN_UNIQUE_CHARACTERS and
-            len(secret_key) >= SECRET_KEY_MIN_LENGTH and
-            not secret_key.startswith(SECRET_KEY_INSECURE_PREFIX)
-        )
+        passed_check = all(check_key(key) for key in secret_keys)
+
     return [] if passed_check else [W009]
 
 

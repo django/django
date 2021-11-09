@@ -97,10 +97,16 @@ def base64_hmac(salt, value, key, algorithm='sha1'):
     return b64_encode(salted_hmac(salt, value, key, algorithm=algorithm).digest()).decode()
 
 
+def _cookie_signer_key(key):
+    return b'django.http.cookies' + force_bytes(key)  # SECRET_KEYS items may be str or bytes.
+
+
 def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
     Signer = import_string(settings.SIGNING_BACKEND)
-    key = force_bytes(settings.SECRET_KEY)  # SECRET_KEY may be str or bytes.
-    return Signer(b'django.http.cookies' + key, salt=salt)
+    return Signer(
+        keys=[_cookie_signer_key(k) for k in settings.SECRET_KEYS],
+        salt=salt,
+    )
 
 
 class JSONSerializer:
@@ -117,9 +123,9 @@ class JSONSerializer:
 
 def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, compress=False):
     """
-    Return URL-safe, hmac signed base64 compressed JSON string. If key is
-    None, use settings.SECRET_KEY instead. The hmac algorithm is the default
-    Signer algorithm.
+    Return URL-safe, hmac signed base64 compressed JSON string. If key is None,
+    use the first key in settings.SECRET_KEYS instead. The hmac algorithm is
+    the default Signer algorithm.
 
     If compress is True (not the default), check if compressing using zlib can
     save some space. Prepend a '.' to signify compression. This is included
@@ -135,7 +141,7 @@ def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, 
     return TimestampSigner(key, salt=salt).sign_object(obj, serializer=serializer, compress=compress)
 
 
-def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None):
+def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None, keys=None):
     """
     Reverse of dumps(), raise BadSignature if signature fails.
 
@@ -145,8 +151,15 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
 
 
 class Signer:
-    def __init__(self, key=None, sep=':', salt=None, algorithm=None):
-        self.key = key or settings.SECRET_KEY
+    def __init__(self, key=None, sep=':', salt=None, algorithm=None, keys=None):
+        if key is not None:
+            if keys is not None:
+                raise TypeError('key and keys can not be specified together.')
+            self.keys = [key]
+        elif keys is not None:
+            self.keys = keys
+        else:
+            self.keys = settings.SECRET_KEYS
         self.sep = sep
         if _SEP_UNSAFE.match(self.sep):
             raise ValueError(
@@ -156,8 +169,9 @@ class Signer:
         self.salt = salt or '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
         self.algorithm = algorithm or 'sha256'
 
-    def signature(self, value):
-        return base64_hmac(self.salt + 'signer', value, self.key, algorithm=self.algorithm)
+    def signature(self, value, key=None):
+        key = key or self.keys[0]
+        return base64_hmac(self.salt + 'signer', value, key, algorithm=self.algorithm)
 
     def sign(self, value):
         return '%s%s%s' % (value, self.sep, self.signature(value))
@@ -166,8 +180,10 @@ class Signer:
         if self.sep not in signed_value:
             raise BadSignature('No "%s" found in value' % self.sep)
         value, sig = signed_value.rsplit(self.sep, 1)
-        if constant_time_compare(sig, self.signature(value)):
-            return value
+        for key in self.keys:
+            valid = constant_time_compare(sig, self.signature(value, key))
+            if valid:
+                return value
         raise BadSignature('Signature "%s" does not match' % sig)
 
     def sign_object(self, obj, serializer=JSONSerializer, compress=False):

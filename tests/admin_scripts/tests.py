@@ -69,7 +69,7 @@ class AdminScriptTestCase(SimpleTestCase):
                 'DATABASES',
                 'DEFAULT_AUTO_FIELD',
                 'ROOT_URLCONF',
-                'SECRET_KEY',
+                'SECRET_KEYS',
                 'USE_TZ',
             ]
             for s in exports:
@@ -2497,7 +2497,9 @@ class DiffSettings(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, "+ FOO = 'bar'")
         self.assertOutput(out, "- SECRET_KEY = ''")
+        self.assertOutput(out, "- SECRET_KEYS = None")
         self.assertOutput(out, "+ SECRET_KEY = 'django_tests_secret_key'")
+        self.assertOutput(out, "+ SECRET_KEYS = ['django_tests_secret_key']")
         self.assertNotInOutput(out, "  APPEND_SLASH = True")
 
     def test_unified_all(self):
@@ -2512,6 +2514,7 @@ class DiffSettings(AdminScriptTestCase):
         self.assertOutput(out, "  APPEND_SLASH = True")
         self.assertOutput(out, "+ FOO = 'bar'")
         self.assertOutput(out, "- SECRET_KEY = ''")
+        self.assertOutput(out, "- SECRET_KEYS = None")
 
 
 class Dumpdata(AdminScriptTestCase):

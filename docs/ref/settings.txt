@@ -1204,7 +1204,7 @@ environment, such as all the currently defined Django settings (from
 ``settings.py``).
 
 As a security measure, Django will *not* include settings that might be
-sensitive, such as :setting:`SECRET_KEY`. Specifically, it will exclude any
+sensitive, such as :setting:`SECRET_KEYS`. Specifically, it will exclude any
 setting whose name includes any of the following:
 
 * ``'API'``
@@ -2236,30 +2236,58 @@ object. See :ref:`how-django-processes-a-request` for details.
 ``SECRET_KEY``
 --------------
 
-Default: ``''`` (Empty string)
+``SECRET_KEY`` is a property alias to the first item of :setting:`SECRET_KEYS`.
 
-A secret key for a particular Django installation. This is used to provide
-:doc:`cryptographic signing </topics/signing>`, and should be set to a unique,
-unpredictable value.
+Accessing ``SECRET_KEY`` is equivalent to accessing ``SECRET_KEY[0]``. When
+setting ``SECRET_KEY = 'some-secret'`` is equivalent to ``SECRET_KEYS =
+['some-secret']``.
 
-:djadmin:`django-admin startproject <startproject>` automatically adds a
-randomly-generated ``SECRET_KEY`` to each new project.
+.. note::
 
-Uses of the key shouldn't assume that it's text or bytes. Every use should go
-through :func:`~django.utils.encoding.force_str` or
-:func:`~django.utils.encoding.force_bytes` to convert it to the desired type.
+    It is an error to provide both :setting:`SECRET_KEY` and
+    :setting:`SECRET_KEYS`. An ``ImproperlyConfigured`` exception will be
+    raised if you do.
 
-Django will refuse to start if :setting:`SECRET_KEY` is not set.
+.. note::
+
+    ``SECRET_KEY`` is maintained for backwards compatibility, given the
+    introduction of :setting:`SECRET_KEYS`. ``SECRET_KEY`` may be deprecated
+    in a future Django version. Users should migrate to use
+    :setting:`SECRET_KEYS`, and prefer :setting:`SECRET_KEYS` in new code.
+
+.. versionchanged:: 4.1
+
+    ``SECRET_KEY`` was made an alias to the first item of
+    :setting:`SECRET_KEYS`.
+
+.. setting:: SECRET_KEYS
+
+``SECRET_KEYS``
+---------------
+
+.. versionadded:: 4.1
+
+Default: ``None``
+
+A list of secret key values for a particular Django installation. These are
+used to provide :doc:`cryptographic signing </topics/signing>`, and should be
+set to a list of unique, unpredictable values.
+
+The default :file:`settings.py` file created by :djadmin:`django-admin
+startproject <startproject>` contains a ``SECRET_KEYS`` list with one
+unique value for convenience.
+
+Django will refuse to start if :setting:`SECRET_KEYS` is not set.
 
 .. warning::
 
-    **Keep this value secret.**
+    **Keep these values secret.**
 
-    Running Django with a known :setting:`SECRET_KEY` defeats many of Django's
+    Running Django with known :setting:`SECRET_KEYS` defeats many of Django's
     security protections, and can lead to privilege escalation and remote code
     execution vulnerabilities.
 
-The secret key is used for:
+The secret keys are used for:
 
 * All :doc:`sessions </topics/http/sessions>` if you are using
   any other session backend than ``django.contrib.sessions.backends.cache``,
@@ -2272,15 +2300,33 @@ The secret key is used for:
 * Any usage of :doc:`cryptographic signing </topics/signing>`, unless a
   different key is provided.
 
-If you rotate your secret key, all of the above will be invalidated.
-Secret keys are not used for passwords of users and key rotation will not
-affect them.
+The first secret key is used when signing new values. Other entries are
+checked for validation. For example, with the following dummy values::
+
+    SECRET_KEYS = [
+        'new-secret-key',
+        'old-secret-key',
+    ]
+
+… new values will be signed with ``'new-secret-key'``, whereas checks will be
+made against both ``'new-secret-key'`` and ``'old-secret-key'``.
+
+In order to rotate your secret keys, add a new value at the start of the list.
+Then remove the old values from the end of the list when you are ready to
+expire all sessions, password reset tokens, and so on, that make use of them.
 
 .. note::
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin
-    startproject <startproject>` creates a unique ``SECRET_KEY`` for
-    convenience.
+    Signing operations are computationally expensive. Having multiple old key
+    values in ``SECRET_KEYS`` adds additional overhead to all checks that
+    don't match an earlier key.
+
+    As such, tail values (``SECRET_KEYS[1:]``) should be removed after an
+    appropriate period, allowing for key rotation.
+
+Uses of the secret key values shouldn't assume that they are text or bytes.
+Every use should go through :func:`~django.utils.encoding.force_str` or
+:func:`~django.utils.encoding.force_bytes` to convert it to the desired type.
 
 .. setting:: SECURE_CONTENT_TYPE_NOSNIFF
 
@@ -3709,6 +3755,7 @@ Security
   * :setting:`CSRF_USE_SESSIONS`
 
 * :setting:`SECRET_KEY`
+* :setting:`SECRET_KEYS`
 * :setting:`X_FRAME_OPTIONS`
 
 Serialization

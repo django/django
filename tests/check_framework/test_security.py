@@ -377,41 +377,49 @@ class CheckSSLRedirectTest(SimpleTestCase):
 
 
 class CheckSecretKeyTest(SimpleTestCase):
-    @override_settings(SECRET_KEY=('abcdefghijklmnopqrstuvwx' * 2) + 'ab')
+    @override_settings(SECRET_KEYS=[('abcdefghijklmnopqrstuvwx' * 2) + 'ab'])
     def test_okay_secret_key(self):
-        self.assertEqual(len(settings.SECRET_KEY), base.SECRET_KEY_MIN_LENGTH)
-        self.assertGreater(len(set(settings.SECRET_KEY)), base.SECRET_KEY_MIN_UNIQUE_CHARACTERS)
-        self.assertEqual(base.check_secret_key(None), [])
+        self.assertEqual(len(settings.SECRET_KEYS[0]), base.SECRET_KEY_MIN_LENGTH)
+        self.assertGreater(len(set(settings.SECRET_KEYS[0])), base.SECRET_KEY_MIN_UNIQUE_CHARACTERS)
+        self.assertEqual(base.check_secret_keys(None), [])
 
-    @override_settings(SECRET_KEY='')
+    @override_settings(SECRET_KEYS=[''])
     def test_empty_secret_key(self):
-        self.assertEqual(base.check_secret_key(None), [base.W009])
+        self.assertEqual(base.check_secret_keys(None), [base.W009])
 
-    @override_settings(SECRET_KEY=None)
+    @override_settings(SECRET_KEYS=None)
     def test_missing_secret_key(self):
-        del settings.SECRET_KEY
-        self.assertEqual(base.check_secret_key(None), [base.W009])
+        del settings.SECRET_KEYS
+        self.assertEqual(base.check_secret_keys(None), [base.W009])
 
     @override_settings(SECRET_KEY=None)
     def test_none_secret_key(self):
-        self.assertEqual(base.check_secret_key(None), [base.W009])
+        self.assertEqual(base.check_secret_keys(None), [base.W009])
 
     @override_settings(
-        SECRET_KEY=base.SECRET_KEY_INSECURE_PREFIX + get_random_secret_key()
+        SECRET_KEYS=[base.SECRET_KEY_INSECURE_PREFIX + get_random_secret_key()]
     )
     def test_insecure_secret_key(self):
-        self.assertEqual(base.check_secret_key(None), [base.W009])
+        self.assertEqual(base.check_secret_keys(None), [base.W009])
 
-    @override_settings(SECRET_KEY=('abcdefghijklmnopqrstuvwx' * 2) + 'a')
+    @override_settings(SECRET_KEYS=[('abcdefghijklmnopqrstuvwx' * 2) + 'a'])
     def test_low_length_secret_key(self):
-        self.assertEqual(len(settings.SECRET_KEY), base.SECRET_KEY_MIN_LENGTH - 1)
-        self.assertEqual(base.check_secret_key(None), [base.W009])
+        self.assertEqual(len(settings.SECRET_KEYS[0]), base.SECRET_KEY_MIN_LENGTH - 1)
+        self.assertEqual(base.check_secret_keys(None), [base.W009])
 
-    @override_settings(SECRET_KEY='abcd' * 20)
+    @override_settings(SECRET_KEYS=['abcd' * 20])
     def test_low_entropy_secret_key(self):
-        self.assertGreater(len(settings.SECRET_KEY), base.SECRET_KEY_MIN_LENGTH)
-        self.assertLess(len(set(settings.SECRET_KEY)), base.SECRET_KEY_MIN_UNIQUE_CHARACTERS)
-        self.assertEqual(base.check_secret_key(None), [base.W009])
+        self.assertGreater(len(settings.SECRET_KEYS[0]), base.SECRET_KEY_MIN_LENGTH)
+        self.assertLess(len(set(settings.SECRET_KEYS[0])), base.SECRET_KEY_MIN_UNIQUE_CHARACTERS)
+        self.assertEqual(base.check_secret_keys(None), [base.W009])
+
+    @override_settings(SECRET_KEYS=[
+        ('abcdefghijklmnopqrstuvwx' * 2) + 'ab',
+        'badkey'
+    ])
+    def test_multiple_keys(self):
+        self.assertEqual(base.check_secret_keys(None), [base.W009])
+        self.assertEqual(base.check_secret_keys(None), [base.W009])
 
 
 class CheckDebugTest(SimpleTestCase):

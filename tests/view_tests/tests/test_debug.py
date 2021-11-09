@@ -1396,6 +1396,7 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
         """
         sensitive_settings = [
             'SECRET_KEY',
+            'SECRET_KEYS',
             'PASSWORD',
             'API_KEY',
             'AUTH_TOKEN',
@@ -1412,6 +1413,7 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
         """
         sensitive_settings = [
             'SECRET_KEY',
+            'SECRET_KEYS',
             'PASSWORD',
             'API_KEY',
             'AUTH_TOKEN',
@@ -1473,7 +1475,7 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
                 ),
                 'tokens': ['98b37c57-ec62-4e39', '8690ef7d-8004-4916'],
             },
-            {'SECRET_KEY': 'c4d77c62-6196-4f17-a06b-c462cffae87a'},
+            {'SECRET_KEYS': ['c4d77c62-6196-4f17-a06b-c462cffae87a']},
         ]
         cleansed = [
             {
@@ -1485,7 +1487,7 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
                 ),
                 'tokens': reporter_filter.cleansed_substitute,
             },
-            {'SECRET_KEY': reporter_filter.cleansed_substitute},
+            {'SECRET_KEYS': reporter_filter.cleansed_substitute},
         ]
         self.assertEqual(
             reporter_filter.cleanse_setting('SETTING_NAME', initial),

@@ -911,9 +911,10 @@ function.
 .. note::
 
     Since
-    :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`
-    is based on :setting:`SECRET_KEY`, updating your site to use a new secret
-    will invalidate all existing sessions.
+    :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash`
+    is based on the values in :setting:`SECRET_KEYS`, secret key values must be
+    rotated to avoid invalidating existing sessions when updating your site to
+    use a new secret. See :setting:`SECRET_KEYS` for details.
 
 .. _built-in-auth-views:
 

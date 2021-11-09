@@ -216,7 +216,8 @@ Requests and Responses
 Security
 ~~~~~~~~
 
-* ...
+* The new :setting:`SECRET_KEYS` setting allows providing a list of values for
+  secret key rotation.
 
 Serialization
 ~~~~~~~~~~~~~
@@ -295,6 +296,9 @@ Miscellaneous
 * :class:`~django.middleware.csrf.CsrfViewMiddleware` now uses
   ``request.META['CSRF_COOKIE']`` for storing the unmasked CSRF secret rather
   than a masked version. This is an undocumented, private API.
+* The undocumented ``secret`` (``str``) attribute of
+  ``PasswordResetTokenGenerator`` becomes ``secrets`` (``[str]``) in line with
+  the move to ``SECRET_KEYS``.
 
 .. _deprecated-features-4.1:
 
