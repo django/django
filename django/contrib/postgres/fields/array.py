@@ -304,7 +304,6 @@ class IndexTransformFactory:
 
 
 class SliceTransform(Transform):
-
     def __init__(self, start, end, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.start = start
@@ -312,11 +311,11 @@ class SliceTransform(Transform):
 
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
-        # self.start is set to 1 if slice start is not provided
+        # self.start is set to 1 if slice start is not provided.
         if self.end:
-            return '%s[%%s:%%s]' % lhs, params + [self.start, self.end]
+            return f'{lhs}[%s:%s]', params + [self.start, self.end]
         else:
-            return '%s[%%s:]' % lhs, params + [self.start]
+            return f'{lhs}[%s:]', params + [self.start]
 
 
 class SliceTransformFactory:

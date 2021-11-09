@@ -679,7 +679,10 @@ class SliceableF(F):
             if subscript.stop and subscript.start and subscript.stop < subscript.start:
                 raise ValueError('Slice stop must be greater than slice start.')
             self.start = 1 if subscript.start is None else subscript.start + 1
-            self.length = None if subscript.stop is None else subscript.stop - (subscript.start or 0)
+            if subscript.stop is None:
+                self.length = None
+            else:
+                self.length = subscript.stop - (subscript.start or 0)
         else:
             raise TypeError('Argument to slice must be either int or slice instance.')
 
@@ -692,7 +695,7 @@ class SliceableF(F):
         for_save=False,
     ):
         resolved = query.resolve_ref(self.name, allow_joins, reuse, summarize)
-        return resolved.target.slice_expression(resolved, self.start, self.length)
+        return resolved.output_field.slice_expression(resolved, self.start, self.length)
 
 
 class Func(SQLiteNumericMixin, Expression):
