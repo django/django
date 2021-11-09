@@ -4,6 +4,7 @@ import re
 import sys
 from functools import total_ordering
 from itertools import dropwhile
+from pathlib import Path
 
 import django
 from django.conf import settings
@@ -208,7 +209,7 @@ class Command(BaseCommand):
 
     requires_system_checks = []
 
-    msgmerge_options = ['-q', '--previous']
+    msgmerge_options = ['-q', '--backup=none', '--previous', '--update']
     msguniq_options = ['--to-code=utf-8']
     msgattrib_options = ['--no-obsolete']
     xgettext_options = ['--from-code=UTF-8', '--add-comments=Translators']
@@ -615,13 +616,14 @@ class Command(BaseCommand):
 
         if os.path.exists(pofile):
             args = ['msgmerge'] + self.msgmerge_options + [pofile, potfile]
-            msgs, errors, status = popen_wrapper(args)
+            _, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
                         "errors happened while running msgmerge\n%s" % errors)
                 elif self.verbosity > 0:
                     self.stdout.write(errors)
+            msgs = Path(pofile).read_text(encoding='utf-8')
         else:
             with open(potfile, encoding='utf-8') as fp:
                 msgs = fp.read()

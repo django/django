@@ -804,3 +804,37 @@ class NoSettingsExtractionTests(AdminScriptTestCase):
         out, err = self.run_django_admin(['makemessages', '-l', 'en', '-v', '0'])
         self.assertNoOutput(err)
         self.assertNoOutput(out)
+
+
+class UnchangedPoExtractionTests(ExtractorTests):
+    work_subdir = 'unchanged'
+
+    def setUp(self):
+        super().setUp()
+        po_file = Path(self.PO_FILE)
+        po_file_tmp = Path(self.PO_FILE + '.tmp')
+        if os.name == 'nt':
+            # msgmerge outputs Windows style paths on Windows.
+            po_contents = po_file_tmp.read_text().replace(
+                '#: __init__.py',
+                '#: .\\__init__.py',
+            )
+            po_file.write_text(po_contents)
+        else:
+            po_file_tmp.rename(po_file)
+        self.original_po_contents = po_file.read_text()
+
+    def test_po_remains_unchanged(self):
+        """PO files are unchanged unless there are new changes."""
+        _, po_contents = self._run_makemessages()
+        self.assertEqual(po_contents, self.original_po_contents)
+
+    def test_po_changed_with_new_strings(self):
+        """PO files are updated when new changes are detected."""
+        Path('models.py.tmp').rename('models.py')
+        _, po_contents = self._run_makemessages()
+        self.assertNotEqual(po_contents, self.original_po_contents)
+        self.assertMsgId(
+            'This is a hitherto undiscovered translatable string.',
+            po_contents,
+        )
