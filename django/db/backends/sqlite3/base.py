@@ -360,8 +360,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     primary_key_column_name = self.introspection.get_primary_key_column(cursor, table_name)
                     if not primary_key_column_name:
                         continue
-                    key_columns = self.introspection.get_key_columns(cursor, table_name)
-                    for column_name, referenced_table_name, referenced_column_name in key_columns:
+                    relations = self.introspection.get_relations(cursor, table_name)
+                    for column_name, (referenced_column_name, referenced_table_name) in relations:
                         cursor.execute(
                             """
                             SELECT REFERRING.`%s`, REFERRING.`%s` FROM `%s` as REFERRING

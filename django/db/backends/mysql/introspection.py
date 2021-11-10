@@ -153,27 +153,18 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Return a dictionary of {field_name: (field_name_other_table, other_table)}
         representing all foreign keys in the given table.
         """
-        constraints = self.get_key_columns(cursor, table_name)
-        relations = {}
-        for my_fieldname, other_table, other_field in constraints:
-            relations[my_fieldname] = (other_field, other_table)
-        return relations
-
-    def get_key_columns(self, cursor, table_name):
-        """
-        Return a list of (column_name, referenced_table_name, referenced_column_name)
-        for all key columns in the given table.
-        """
-        key_columns = []
         cursor.execute("""
-            SELECT column_name, referenced_table_name, referenced_column_name
+            SELECT column_name, referenced_column_name, referenced_table_name
             FROM information_schema.key_column_usage
             WHERE table_name = %s
                 AND table_schema = DATABASE()
                 AND referenced_table_name IS NOT NULL
-                AND referenced_column_name IS NOT NULL""", [table_name])
-        key_columns.extend(cursor.fetchall())
-        return key_columns
+                AND referenced_column_name IS NOT NULL
+        """, [table_name])
+        return {
+            field_name: (other_field, other_table)
+            for field_name, other_field, other_table in cursor.fetchall()
+        }
 
     def get_storage_engine(self, cursor, table_name):
         """

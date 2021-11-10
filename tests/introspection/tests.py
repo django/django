@@ -168,15 +168,6 @@ class IntrospectionTests(TransactionTestCase):
                 relations = connection.introspection.get_relations(cursor, 'mocked_table')
             self.assertEqual(relations, {'art_id': ('id', Article._meta.db_table)})
 
-    @skipUnlessDBFeature('can_introspect_foreign_keys')
-    def test_get_key_columns(self):
-        with connection.cursor() as cursor:
-            key_columns = connection.introspection.get_key_columns(cursor, Article._meta.db_table)
-        self.assertEqual(set(key_columns), {
-            ('reporter_id', Reporter._meta.db_table, 'id'),
-            ('response_to_id', Article._meta.db_table, 'id'),
-        })
-
     def test_get_primary_key_column(self):
         with connection.cursor() as cursor:
             primary_key_column = connection.introspection.get_primary_key_column(cursor, Article._meta.db_table)

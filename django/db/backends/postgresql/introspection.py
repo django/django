@@ -121,9 +121,6 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Return a dictionary of {field_name: (field_name_other_table, other_table)}
         representing all foreign keys in the given table.
         """
-        return {row[0]: (row[2], row[1]) for row in self.get_key_columns(cursor, table_name)}
-
-    def get_key_columns(self, cursor, table_name):
         cursor.execute("""
             SELECT a1.attname, c2.relname, a2.attname
             FROM pg_constraint con
@@ -137,7 +134,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 c1.relnamespace = c2.relnamespace AND
                 pg_catalog.pg_table_is_visible(c1.oid)
         """, [table_name])
-        return cursor.fetchall()
+        return {row[0]: (row[2], row[1]) for row in cursor.fetchall()}
 
     def get_constraints(self, cursor, table_name):
         """
