@@ -246,6 +246,9 @@ backends.
 * ``BaseDatabaseFeatures.has_case_insensitive_like`` is changed from ``True``
   to ``False`` to reflect the behavior of most databases.
 
+* ``DatabaseIntrospection.get_key_columns()`` is removed. Use
+  ``DatabaseIntrospection.get_relations()`` instead.
+
 Dropped support for MariaDB 10.2
 --------------------------------
 
