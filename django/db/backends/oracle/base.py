@@ -245,7 +245,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         cursor.execute(
             "ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'"
             " NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'" +
-            (" TIME_ZONE = 'UTC'" if settings.USE_TZ else '')
+            (" TIME_ZONE = '+00:00'" if settings.USE_TZ else '')
         )
         cursor.close()
         if 'operators' not in self.__dict__:
