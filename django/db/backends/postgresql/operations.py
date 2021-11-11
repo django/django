@@ -2,6 +2,7 @@ from psycopg2.extras import Inet
 
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
+from django.db.backends.utils import split_tzname_delta
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -44,10 +45,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
 
     def _prepare_tzname_delta(self, tzname):
-        if '+' in tzname:
-            return tzname.replace('+', '-')
-        elif '-' in tzname:
-            return tzname.replace('-', '+')
+        tzname, sign, offset = split_tzname_delta(tzname)
+        if offset:
+            sign = '-' if sign == '+' else '+'
+            return f'{tzname}{sign}{offset}'
         return tzname
 
     def _convert_field_to_tz(self, field_name, tzname):

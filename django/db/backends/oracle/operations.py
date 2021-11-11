@@ -5,7 +5,9 @@ from functools import lru_cache
 from django.conf import settings
 from django.db import DatabaseError, NotSupportedError
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.backends.utils import strip_quotes, truncate_name
+from django.db.backends.utils import (
+    split_tzname_delta, strip_quotes, truncate_name,
+)
 from django.db.models import AutoField, Exists, ExpressionWrapper, Lookup
 from django.db.models.expressions import RawSQL
 from django.db.models.sql.where import WhereNode
@@ -108,11 +110,8 @@ END;
     _tzname_re = _lazy_re_compile(r'^[\w/:+-]+$')
 
     def _prepare_tzname_delta(self, tzname):
-        if '+' in tzname:
-            return tzname[tzname.find('+'):]
-        elif '-' in tzname:
-            return tzname[tzname.find('-'):]
-        return tzname
+        tzname, sign, offset = split_tzname_delta(tzname)
+        return f'{sign}{offset}' if offset else tzname
 
     def _convert_field_to_tz(self, field_name, tzname):
         if not (settings.USE_TZ and tzname):
