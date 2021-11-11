@@ -434,14 +434,11 @@ def _sqlite_datetime_parse(dt, tzname=None, conn_tzname=None):
     if conn_tzname:
         dt = dt.replace(tzinfo=timezone_constructor(conn_tzname))
     if tzname is not None and tzname != conn_tzname:
-        sign_index = tzname.find('+') + tzname.find('-') + 1
-        if sign_index > -1:
-            sign = tzname[sign_index]
-            tzname, offset = tzname.split(sign)
-            if offset:
-                hours, minutes = offset.split(':')
-                offset_delta = datetime.timedelta(hours=int(hours), minutes=int(minutes))
-                dt += offset_delta if sign == '+' else -offset_delta
+        tzname, sign, offset = backend_utils.split_tzname_delta(tzname)
+        if offset:
+            hours, minutes = offset.split(':')
+            offset_delta = datetime.timedelta(hours=int(hours), minutes=int(minutes))
+            dt += offset_delta if sign == '+' else -offset_delta
         dt = timezone.localtime(dt, timezone_constructor(tzname))
     return dt
 

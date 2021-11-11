@@ -2,6 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
+from django.db.backends.utils import split_tzname_delta
 from django.db.models import Exists, ExpressionWrapper, Lookup
 from django.utils import timezone
 from django.utils.encoding import force_str
@@ -77,11 +78,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "DATE(%s)" % (field_name)
 
     def _prepare_tzname_delta(self, tzname):
-        if '+' in tzname:
-            return tzname[tzname.find('+'):]
-        elif '-' in tzname:
-            return tzname[tzname.find('-'):]
-        return tzname
+        tzname, sign, offset = split_tzname_delta(tzname)
+        return f'{sign}{offset}' if offset else tzname
 
     def _convert_field_to_tz(self, field_name, tzname):
         if tzname and settings.USE_TZ and self.connection.timezone_name != tzname:
