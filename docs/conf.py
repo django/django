@@ -272,34 +272,22 @@ rst_epilog = """
 
 # -- Options for LaTeX output --------------------------------------------------
 
-# Use lualatex for Unicode support.
-latex_engine = 'lualatex'
-# Set fonts and fallbacks for CJK and Emojis.
+# Use XeLaTeX for Unicode support.
+latex_engine = 'xelatex'
+latex_use_xindy = False
+# Set font for CJK and fallbacks for unicode characters.
 latex_elements = {
+    'fontpkg': r"""
+        \setmainfont{Symbola}
+    """,
     'preamble': r"""
-        \directlua{
-            luaotfload.add_fallback("seriffallbacks", {
-                "Noto Serif CJK SC:style=Regular;",
-                "Symbola:Style=Regular;"
-            })
-        }
-        \setmainfont{FreeSerif}[RawFeature={fallback=seriffallbacks}]
-
-        \directlua{
-            luaotfload.add_fallback("sansfallbacks", {
-                "Noto Sans CJK SC:style=Regular;",
-                "Symbola:Style=Regular;"
-            })
-        }
-        \setsansfont{FreeSans}[RawFeature={fallback=sansfallbacks}]
-
-        \directlua{
-            luaotfload.add_fallback("monofallbacks", {
-                "Noto Sans Mono CJK SC:style=Regular;",
-                "Symbola:Style=Regular;"
-            })
-        }
-        \setmonofont{FreeMono}[RawFeature={fallback=monofallbacks}]
+        \usepackage{newunicodechar}
+        \usepackage[UTF8]{ctex}
+        \newunicodechar{π}{\ensuremath{\pi}}
+        \newunicodechar{≤}{\ensuremath{\le}}
+        \newunicodechar{≥}{\ensuremath{\ge}}
+        \newunicodechar{♥}{\ensuremath{\heartsuit}}
+        \newunicodechar{…}{\ensuremath{\ldots}}
     """,
 }
 
