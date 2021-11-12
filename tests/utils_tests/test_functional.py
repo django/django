@@ -1,7 +1,7 @@
 from unittest import mock
 
 from django.test import SimpleTestCase
-from django.utils.functional import cached_property, classproperty, lazy
+from django.utils.functional import cached_property, classproperty, keep_lazy, lazy
 
 
 class FunctionalTests(SimpleTestCase):
@@ -265,3 +265,118 @@ class FunctionalTests(SimpleTestCase):
 
         self.assertEqual(Foo.foo, 456)
         self.assertEqual(Foo().foo, 456)
+
+
+@keep_lazy(str)
+
+
+def keep_lazy_single_argument(value):
+    return value
+
+@keep_lazy(str)
+
+
+def keep_lazy_multiple_arguments(val1, val2, val3):
+    return val1, val2, val3
+
+@keep_lazy(str)
+
+
+def keep_lazy_posargs(*args):
+    return args
+
+@keep_lazy(str)
+
+
+def keep_lazy_kwargs(**kwargs):
+    return kwargs
+
+@keep_lazy(str)
+
+
+def keep_lazy_single_argument_with_poskwargs(arg, /, *args, **kwargs):
+    return (arg, *args, *kwargs.values())
+
+
+class KeepLazyTests(SimpleTestCase):
+    def test_keep_lazy_single_positional_argument(self):
+        self.assertEqual(keep_lazy_single_argument("test"), "test")
+
+    def test_keep_lazy_single_keyword_argument(self):
+        self.assertEqual(keep_lazy_single_argument(value="test"), "test")
+
+    def test_keep_lazy_single_invalid_keyword_argument(self):
+        with self.assertRaisesMessage(TypeError, "got an unexpected keyword argument 'val'"):
+            keep_lazy_single_argument(val="test")
+
+    def test_keep_lazy_single_argument_given_multiple_positional_arguments(self):
+        with self.assertRaisesMessage(TypeError, "takes 1 positional argument but 2 were given"):
+            keep_lazy_single_argument("test", "testing")
+
+    def test_keep_lazy_single_argument_given_multiple_mixed_arguments(self):
+        with self.assertRaisesMessage(TypeError, "got an unexpected keyword argument 'val'"):
+            keep_lazy_single_argument("test", val="testing")
+
+    def test_keep_lazy_single_argument_given_multiple_keyword_arguments(self):
+        with self.assertRaisesMessage(TypeError, "got an unexpected keyword argument 'val'"):
+            keep_lazy_single_argument(value="test", val="testing")
+
+    def test_keep_lazy_multiple_positional_arguments(self):
+        self.assertEqual(
+            keep_lazy_multiple_arguments("test1", "test2", "test3"),
+            ("test1", "test2", "test3")
+        )
+
+    def test_keep_lazy_multiple_keyword_arguments(self):
+        self.assertEqual(
+            keep_lazy_multiple_arguments(val1="test1", val2="test2", val3="test3"),
+            ("test1", "test2", "test3")
+        )
+
+    def test_keep_lazy_multiple_invalid_keyword_argument(self):
+        with self.assertRaisesMessage(TypeError, "got an unexpected keyword argument 'val'"):
+            keep_lazy_multiple_arguments(val="test")
+
+    def test_keep_lazy_multiple_given_too_few_positional_arguments(self):
+        with self.assertRaisesMessage(TypeError, "missing 1 required positional argument: 'val3'"):
+            keep_lazy_multiple_arguments("test", "testing")
+
+    def test_keep_lazy_multiple_given_too_few_keyword_arguments(self):
+        with self.assertRaisesMessage(TypeError, "missing 1 required positional argument: 'val3'"):
+            keep_lazy_multiple_arguments(val1="test", val2="testing")
+
+    def test_keep_lazy_multiple_given_too_many_positional_arguments(self):
+        with self.assertRaisesMessage(TypeError, "takes 3 positional arguments but 4 were given"):
+            keep_lazy_multiple_arguments("test1", "test2", "test3", "test4")
+
+    def test_keep_lazy_multiple_given_too_many_keyword_arguments(self):
+        with self.assertRaisesMessage(TypeError, "got an unexpected keyword argument 'val4'"):
+            keep_lazy_multiple_arguments(val1="test1", val2="test2", val3="test3", val4="test4")
+
+    def test_posargs(self):
+        """
+        A function which accepts *args must be dispatched to the multiple argument wrapper
+        """
+        self.assertEqual(
+            keep_lazy_posargs("this", "may", "take", "many", "arguments"),
+            ("this", "may", "take", "many", "arguments")
+        )
+
+    def test_kwargs(self):
+        """
+        A function which accepts **kwargs must be dispatched to the multiple argument wrapper
+        """
+        self.assertEqual(
+            keep_lazy_kwargs(this="may", take="many", arguments="too"),
+            {"this": "may", "take": "many", "arguments": "too"}
+        )
+
+    def test_single_complex(self):
+        """
+        A function which accepts arguments plus *args or **kwargs must be
+        dispatched to the multiple argument wrapper
+        """
+        self.assertEqual(
+            keep_lazy_single_argument_with_poskwargs(1, 2, 3, val=4, val2=5),
+            (1, 2, 3, 4, 5)
+        )
