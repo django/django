@@ -2,7 +2,7 @@ from functools import wraps
 
 from django.db import IntegrityError, connections, transaction
 from django.test import TestCase, skipUnlessDBFeature
-from django.test.testcases import TestData
+from django.test.testcases import DatabaseOperationForbidden, TestData
 
 from .models import Car, Person, PossessedCar
 
@@ -28,9 +28,9 @@ class TestTestCase(TestCase):
             "Add 'other' to test_utils.test_testcase.TestTestCase.databases to "
             "ensure proper test isolation and silence this failure."
         )
-        with self.assertRaisesMessage(AssertionError, message):
+        with self.assertRaisesMessage(DatabaseOperationForbidden, message):
             connections['other'].connect()
-        with self.assertRaisesMessage(AssertionError, message):
+        with self.assertRaisesMessage(DatabaseOperationForbidden, message):
             connections['other'].temporary_connection()
 
     def test_disallowed_database_queries(self):
@@ -39,7 +39,7 @@ class TestTestCase(TestCase):
             "Add 'other' to test_utils.test_testcase.TestTestCase.databases to "
             "ensure proper test isolation and silence this failure."
         )
-        with self.assertRaisesMessage(AssertionError, message):
+        with self.assertRaisesMessage(DatabaseOperationForbidden, message):
             Car.objects.using('other').get()
 
     def test_reset_sequences(self):

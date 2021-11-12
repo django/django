@@ -139,13 +139,17 @@ class _AssertTemplateNotUsedContext(_AssertTemplateUsedContext):
         return '%s was rendered.' % self.template_name
 
 
+class DatabaseOperationForbidden(AssertionError):
+    pass
+
+
 class _DatabaseFailure:
     def __init__(self, wrapped, message):
         self.wrapped = wrapped
         self.message = message
 
     def __call__(self):
-        raise AssertionError(self.message)
+        raise DatabaseOperationForbidden(self.message)
 
 
 class SimpleTestCase(unittest.TestCase):

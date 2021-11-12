@@ -21,6 +21,7 @@ from django.test import (
     skipUnlessDBFeature,
 )
 from django.test.html import HTMLParseError, parse_html
+from django.test.testcases import DatabaseOperationForbidden
 from django.test.utils import (
     CaptureQueriesContext, TestContextDecorator, isolate_apps,
     override_settings, setup_test_environment,
@@ -1508,9 +1509,9 @@ class DisallowedDatabaseQueriesTests(SimpleTestCase):
             "test_utils.tests.DisallowedDatabaseQueriesTests.databases to "
             "silence this failure."
         )
-        with self.assertRaisesMessage(AssertionError, expected_message):
+        with self.assertRaisesMessage(DatabaseOperationForbidden, expected_message):
             connection.connect()
-        with self.assertRaisesMessage(AssertionError, expected_message):
+        with self.assertRaisesMessage(DatabaseOperationForbidden, expected_message):
             connection.temporary_connection()
 
     def test_disallowed_database_queries(self):
@@ -1521,7 +1522,7 @@ class DisallowedDatabaseQueriesTests(SimpleTestCase):
             "test_utils.tests.DisallowedDatabaseQueriesTests.databases to "
             "silence this failure."
         )
-        with self.assertRaisesMessage(AssertionError, expected_message):
+        with self.assertRaisesMessage(DatabaseOperationForbidden, expected_message):
             Car.objects.first()
 
     def test_disallowed_database_chunked_cursor_queries(self):
@@ -1532,7 +1533,7 @@ class DisallowedDatabaseQueriesTests(SimpleTestCase):
             "test_utils.tests.DisallowedDatabaseQueriesTests.databases to "
             "silence this failure."
         )
-        with self.assertRaisesMessage(AssertionError, expected_message):
+        with self.assertRaisesMessage(DatabaseOperationForbidden, expected_message):
             next(Car.objects.iterator())
 
 
