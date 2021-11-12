@@ -505,6 +505,10 @@ class BaseDatabaseOperations:
         """
         if value is None:
             return None
+        # Expression values are adapted by the database.
+        if hasattr(value, 'resolve_expression'):
+            return value
+
         return str(value)
 
     def adapt_timefield_value(self, value):
@@ -514,6 +518,10 @@ class BaseDatabaseOperations:
         """
         if value is None:
             return None
+        # Expression values are adapted by the database.
+        if hasattr(value, 'resolve_expression'):
+            return value
+
         if timezone.is_aware(value):
             raise ValueError("Django does not support timezone-aware times.")
         return str(value)
