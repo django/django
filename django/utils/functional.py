@@ -1,4 +1,5 @@
 import copy
+import inspect
 import itertools
 import operator
 from functools import total_ordering, wraps
@@ -54,6 +55,7 @@ class classproperty:
     Decorator that converts a method with a single cls argument into a property
     that can be accessed directly from the class.
     """
+
     def __init__(self, method=None):
         self.fget = method
 
@@ -136,6 +138,7 @@ def lazy(func, *resultclasses):
                 # applies the given magic method of the result type.
                 res = func(*self.__args, **self.__kw)
                 return getattr(res, method_name)(*args, **kw)
+
             return __wrapper__
 
         def __text_cast(self):
@@ -223,12 +226,41 @@ def keep_lazy(*resultclasses):
     def decorator(func):
         lazy_func = lazy(func, *resultclasses)
 
+        func_params = tuple(inspect.signature(func).parameters.items())
+        # Skip parameters which are *args, or **kwargs, which are intrinsically
+        # multiple arguments and must go through the slow path.
+        contains_var_parameters = bool({
+            k for k, v in func_params
+            if v.kind in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
+        })
+        non_var_parameters = [
+            k for k, v in func_params
+            if v.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
+        ]
+        func_first_param_name = None
+        if non_var_parameters:
+            func_first_param_name = non_var_parameters[0]
+
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def keep_lazy_single_argument_wrapper(*args, **kwargs):
+            if (args and isinstance(args[0], Promise)) or (
+                func_first_param_name in kwargs
+                and isinstance(kwargs[func_first_param_name], Promise)
+            ):
+                return lazy_func(*args, **kwargs)
+            return func(*args, **kwargs)
+
+        @wraps(func)
+        def keep_lazy_multiple_argument_wrapper(*args, **kwargs):
             if any(isinstance(arg, Promise) for arg in itertools.chain(args, kwargs.values())):
                 return lazy_func(*args, **kwargs)
             return func(*args, **kwargs)
-        return wrapper
+
+        if contains_var_parameters or len(non_var_parameters) > 1:
+            return keep_lazy_multiple_argument_wrapper
+        else:
+            return keep_lazy_single_argument_wrapper
+
     return decorator
 
 
@@ -247,6 +279,7 @@ def new_method_proxy(func):
         if self._wrapped is empty:
             self._setup()
         return func(self._wrapped, *args)
+
     return inner
 
 
@@ -254,6 +287,8 @@ class LazyObject:
     """
     A wrapper for another class that can be used to delay instantiation of the
     wrapped class.
+
+
 
     By subclassing, you have the opportunity to intercept and alter the
     instantiation. If you don't need to do that, use SimpleLazyObject.
@@ -368,6 +403,7 @@ class SimpleLazyObject(LazyObject):
     Designed for compound objects of unknown type. For builtins or objects of
     known type, use django.utils.functional.lazy.
     """
+
     def __init__(self, func):
         """
         Pass in a callable that returns the object to be wrapped.
@@ -423,3 +459,4 @@ def partition(predicate, values):
     for item in values:
         results[predicate(item)].append(item)
     return results
+
