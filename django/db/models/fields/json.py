@@ -81,7 +81,7 @@ class JSONField(CheckFieldDefaultMixin, Field):
             return value
         try:
             return json.loads(value, cls=self.decoder)
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, TypeError):
             return value
 
     def get_internal_type(self):
