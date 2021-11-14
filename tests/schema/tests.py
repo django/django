@@ -119,9 +119,6 @@ class SchemaTests(TransactionTestCase):
         for name, (type, desc) in columns.items():
             if isinstance(type, tuple):
                 columns[name] = (type[0], desc)
-        # SQLite also doesn't error properly
-        if not columns:
-            raise DatabaseError("Table does not exist (empty pragma)")
         return columns
 
     def get_primary_key(self, table):

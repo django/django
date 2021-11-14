@@ -3,6 +3,7 @@ from collections import namedtuple
 
 import sqlparse
 
+from django.db import DatabaseError
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo as BaseFieldInfo, TableInfo,
 )
@@ -84,6 +85,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """
         cursor.execute('PRAGMA table_info(%s)' % self.connection.ops.quote_name(table_name))
         table_info = cursor.fetchall()
+        if not table_info:
+            raise DatabaseError(f'Table {table_name} does not exist (empty pragma).')
         collations = self._get_column_collations(cursor, table_name)
         json_columns = set()
         if self.connection.features.can_introspect_json_field:
