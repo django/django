@@ -75,9 +75,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             for other_table in self.connection.introspection.get_table_list(cursor):
                 if ignore_self and other_table.name == table_name:
                     continue
-                constraints = self.connection.introspection._get_foreign_key_constraints(cursor, other_table.name)
-                for constraint in constraints.values():
-                    constraint_table, constraint_column = constraint['foreign_key']
+                relations = self.connection.introspection.get_relations(cursor, other_table.name)
+                for constraint_column, constraint_table in relations.values():
                     if (constraint_table == table_name and
                             (column_name is None or constraint_column == column_name)):
                         return True

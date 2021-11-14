@@ -137,22 +137,6 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 return name
         return None
 
-    def _get_foreign_key_constraints(self, cursor, table_name):
-        constraints = {}
-        cursor.execute('PRAGMA foreign_key_list(%s)' % self.connection.ops.quote_name(table_name))
-        for row in cursor.fetchall():
-            # Remaining on_update/on_delete/match values are of no interest.
-            id_, _, table, from_, to = row[:5]
-            constraints['fk_%d' % id_] = {
-                'columns': [from_],
-                'primary_key': False,
-                'unique': False,
-                'foreign_key': (table, to),
-                'check': False,
-                'index': False,
-            }
-        return constraints
-
     def _parse_column_or_constraint_definition(self, tokens, columns):
         token = None
         is_constraint_definition = None
@@ -349,7 +333,18 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 "check": False,
                 "index": False,
             }
-        constraints.update(self._get_foreign_key_constraints(cursor, table_name))
+        relations = enumerate(self.get_relations(cursor, table_name).items())
+        constraints.update({
+            f'fk_{index}': {
+                'columns': [column_name],
+                'primary_key': False,
+                'unique': False,
+                'foreign_key': (ref_table_name, ref_column_name),
+                'check': False,
+                'index': False,
+            }
+            for index, (column_name, (ref_column_name, ref_table_name)) in relations
+        })
         return constraints
 
     def _get_index_columns_orders(self, sql):
