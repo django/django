@@ -4611,7 +4611,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(slug2, 'option-two-the-main-name-and-its-awesomeiiii')
         self.assertEqual(slug3, 'the-main-n\xe0m\xeb-and-its-aw\u03b5\u0161ome\u0131\u0131\u0131i')
 
-        # Stacked inlines ----------------------------------------------------
+        # Stacked inlines with fieldsets -------------------------------------
         # Initial inline
         self.selenium.find_element(By.ID, 'id_relatedprepopulated_set-0-pubdate').send_keys('2011-12-17')
         self.select_option('#id_relatedprepopulated_set-0-status', 'option one')
@@ -4687,6 +4687,32 @@ class SeleniumTests(AdminSeleniumTestCase):
             len(self.selenium.find_elements(By.CLASS_NAME, 'select2-selection')),
             num_initial_select2_inputs + 6
         )
+        # Stacked Inlines without fieldsets ----------------------------------
+        # Initial inline.
+        row_id = 'id_relatedprepopulated_set-4-0-'
+        self.selenium.find_element(By.ID, f'{row_id}pubdate').send_keys('2011-12-12')
+        self.select_option(f'#{row_id}status', 'option one')
+        self.selenium.find_element(By.ID, f'{row_id}name').send_keys(' sŤāÇkeð  inline !  ')
+        slug1 = self.selenium.find_element(By.ID, f'{row_id}slug1').get_attribute('value')
+        slug2 = self.selenium.find_element(By.ID, f'{row_id}slug2').get_attribute('value')
+        self.assertEqual(slug1, 'stacked-inline-2011-12-12')
+        self.assertEqual(slug2, 'option-one')
+        # Add inline.
+        self.selenium.find_elements(
+            By.LINK_TEXT,
+            'Add another Related prepopulated',
+        )[3].click()
+        row_id = 'id_relatedprepopulated_set-4-1-'
+        self.selenium.find_element(By.ID, f'{row_id}pubdate').send_keys('1999-01-20')
+        self.select_option(f'#{row_id}status', 'option two')
+        self.selenium.find_element(By.ID, f'{row_id}name').send_keys(
+            ' now you haVe anöther   sŤāÇkeð  inline with a very loooong '
+        )
+        slug1 = self.selenium.find_element(By.ID, f'{row_id}slug1').get_attribute('value')
+        slug2 = self.selenium.find_element(By.ID, f'{row_id}slug2').get_attribute('value')
+        self.assertEqual(slug1, 'now-you-have-another-stacked-inline-with-a-very-lo')
+        self.assertEqual(slug2, 'option-two')
+
         # Save and check that everything is properly stored in the database
         with self.wait_page_loaded():
             self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
@@ -4699,7 +4725,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             slug2='option-two-the-main-name-and-its-awesomeiiii',
             slug3='the-main-nàmë-and-its-awεšomeıııi',
         )
-        self.assertEqual(RelatedPrepopulated.objects.all().count(), 4)
+        self.assertEqual(RelatedPrepopulated.objects.all().count(), 6)
         RelatedPrepopulated.objects.get(
             name=' here is a sŤāÇkeð   inline !  ',
             pubdate='2011-12-17',
