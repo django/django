@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.gis.gdal import CoordTransform, SpatialReference
 from django.core.serializers.base import SerializerDoesNotExist
 from django.core.serializers.json import Serializer as JSONSerializer
@@ -50,7 +52,7 @@ class Serializer(JSONSerializer):
                     srs = SpatialReference(self.srid)
                     self._cts[self._geometry.srid] = CoordTransform(self._geometry.srs, srs)
                 self._geometry.transform(self._cts[self._geometry.srid])
-            data["geometry"] = eval(self._geometry.geojson)
+            data["geometry"] = json.loads(self._geometry.geojson)
         else:
             data["geometry"] = None
         return data
