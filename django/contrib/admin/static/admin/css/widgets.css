@@ -3,18 +3,21 @@
 .selector {
     width: 800px;
     float: left;
+    display: flex;
 }
 
 .selector select {
     width: 380px;
     height: 17.2em;
+    flex: 1 0 auto;
 }
 
 .selector-available, .selector-chosen {
-    float: left;
     width: 380px;
     text-align: center;
     margin-bottom: 5px;
+    display: flex;
+    flex-direction: column;
 }
 
 .selector-chosen select {
@@ -63,12 +66,13 @@
 }
 
 .selector ul.selector-chooser {
-    float: left;
+    align-self: center;
     width: 22px;
     background-color: var(--selected-bg);
     border-radius: 10px;
-    margin: 10em 5px 0 5px;
+    margin: 0 5px;
     padding: 0;
+    transform: translateY(-17px);
 }
 
 .selector-chooser li {
@@ -168,6 +172,7 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 .stacked {
     float: left;
     width: 490px;
+    display: block;
 }
 
 .stacked select {
@@ -193,6 +198,7 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
     margin: 0 0 10px 40%;
     background-color: #eee;
     border-radius: 10px;
+    transform: none;
 }
 
 .stacked .selector-chooser li {

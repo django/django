@@ -1164,6 +1164,25 @@ site7 = admin.AdminSite(name="admin7")
 site7.register(Article, ArticleAdmin2)
 site7.register(Section)
 site7.register(PrePopulatedPost, PrePopulatedPostReadOnlyAdmin)
+site7.register(
+    Pizza,
+    filter_horizontal=['toppings'],
+    fieldsets=(
+        ('Collapsible', {
+            'classes': ['collapse'],
+            'fields': ['toppings'],
+        }),
+    ),
+)
+site7.register(
+    Question,
+    filter_horizontal=['related_questions'],
+    fieldsets=(
+        ('Not collapsible', {
+            'fields': ['related_questions'],
+        }),
+    ),
+)
 
 
 # Used to test ModelAdmin.sortable_by and get_sortable_by().
