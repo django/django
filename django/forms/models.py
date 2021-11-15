@@ -1187,8 +1187,13 @@ class ModelChoiceIterator:
         # Can't use iterator() when queryset uses prefetch_related()
         if not queryset._prefetch_related_lookups:
             queryset = queryset.iterator()
-        for obj in queryset:
-            yield self.choice(obj)
+        sort_key = self.field.sort_key
+        if sort_key is not None:
+            for obj in sorted(queryset, key=sort_key):
+                yield self.choice(obj)
+        else:
+            for obj in queryset:
+                yield self.choice(obj)
 
     def __len__(self):
         # count() adds a query but uses less memory since the QuerySet results
@@ -1219,7 +1224,7 @@ class ModelChoiceField(ChoiceField):
     def __init__(self, queryset, *, empty_label="---------",
                  required=True, widget=None, label=None, initial=None,
                  help_text='', to_field_name=None, limit_choices_to=None,
-                 blank=False, **kwargs):
+                 blank=False, sort_key=None, **kwargs):
         # Call Field instead of ChoiceField __init__() because we don't need
         # ChoiceField.__init__().
         Field.__init__(
@@ -1236,6 +1241,7 @@ class ModelChoiceField(ChoiceField):
         self.queryset = queryset
         self.limit_choices_to = limit_choices_to   # limit the queryset later.
         self.to_field_name = to_field_name
+        self.sort_key = sort_key
 
     def get_limit_choices_to(self):
         """
