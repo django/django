@@ -183,7 +183,8 @@ Generic Views
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :func:`~django.conf.urls.i18n.i18n_patterns` function now supports
+  languages with both scripts and regions.
 
 Logging
 ~~~~~~~
