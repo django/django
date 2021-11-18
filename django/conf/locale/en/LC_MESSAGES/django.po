@@ -267,6 +267,10 @@ msgid "Marathi"
 msgstr ""
 
 #: conf/global_settings.py:120
+msgid "Malay"
+msgstr ""
+
+#: conf/global_settings.py:120
 msgid "Burmese"
 msgstr ""
 

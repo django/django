@@ -260,6 +260,11 @@ Forms
   overriding :meth:`~django.forms.formsets.BaseFormSet.get_deletion_widget`
   method.
 
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* Added support and translations for the Malay language.
+
 Generic Views
 ~~~~~~~~~~~~~
 

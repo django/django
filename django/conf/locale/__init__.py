@@ -386,6 +386,12 @@ LANG_INFO = {
         'name': 'Marathi',
         'name_local': 'मराठी',
     },
+    'ms': {
+        'bidi': False,
+        'code': 'ms',
+        'name': 'Malay',
+        'name_local': 'Bahasa Melayu',
+    },
     'my': {
         'bidi': False,
         'code': 'my',
