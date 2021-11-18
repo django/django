@@ -117,6 +117,7 @@ LANGUAGES = [
     ('ml', gettext_noop('Malayalam')),
     ('mn', gettext_noop('Mongolian')),
     ('mr', gettext_noop('Marathi')),
+    ('ms', gettext_noop('Malay')),
     ('my', gettext_noop('Burmese')),
     ('nb', gettext_noop('Norwegian Bokmål')),
     ('ne', gettext_noop('Nepali')),
