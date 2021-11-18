@@ -35,6 +35,13 @@ class TextFieldTests(TestCase):
         p.refresh_from_db()
         self.assertEqual(p.body, 'Smile 😀.')
 
+    def test_contains(self):
+        post = Post.objects.create(title='Test', body='A±Ж' * 4000)
+        qs = Post.objects.filter(body__contains='A±Ж')
+        self.assertSequenceEqual(qs, [post])
+        qs = Post.objects.filter(body__contains=1)
+        self.assertSequenceEqual(qs, [])
+
 
 class TestMethods(SimpleTestCase):
     def test_deconstruct(self):
