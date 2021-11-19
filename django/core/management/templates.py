@@ -181,7 +181,7 @@ class TemplateCommand(BaseCommand):
                 if self.verbosity >= 2:
                     self.stdout.write('Creating %s' % new_path)
                 try:
-                    shutil.copymode(old_path, new_path)
+                    self.apply_umask(old_path, new_path)
                     self.make_writeable(new_path)
                 except OSError:
                     self.stderr.write(
@@ -344,6 +344,12 @@ class TemplateCommand(BaseCommand):
             return False
         scheme = template.split(':', 1)[0].lower()
         return scheme in self.url_schemes
+
+    def apply_umask(self, old_path, new_path):
+        current_umask = os.umask(0)
+        os.umask(current_umask)
+        current_mode = stat.S_IMODE(os.stat(old_path).st_mode)
+        os.chmod(new_path, current_mode & ~current_umask)
 
     def make_writeable(self, filename):
         """

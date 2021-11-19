@@ -7,6 +7,7 @@ import os
 import re
 import shutil
 import socket
+import stat
 import subprocess
 import sys
 import tempfile
@@ -32,6 +33,7 @@ from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
 )
 from django.test.utils import captured_stderr, captured_stdout
+from django.utils.version import PY39
 
 custom_templates_dir = os.path.join(os.path.dirname(__file__), 'custom_templates')
 
@@ -95,7 +97,7 @@ class AdminScriptTestCase(SimpleTestCase):
                 paths.append(os.path.dirname(backend_dir))
         return paths
 
-    def run_test(self, args, settings_file=None, apps=None):
+    def run_test(self, args, settings_file=None, apps=None, umask=None):
         base_dir = os.path.dirname(self.test_dir)
         # The base dir for Django's tests is one level up.
         tests_dir = os.path.dirname(os.path.dirname(__file__))
@@ -124,11 +126,13 @@ class AdminScriptTestCase(SimpleTestCase):
             cwd=self.test_dir,
             env=test_environ,
             text=True,
+            # subprocess.run()'s umask was added in Python 3.9.
+            **({'umask': umask} if umask and PY39 else {}),
         )
         return p.stdout, p.stderr
 
-    def run_django_admin(self, args, settings_file=None):
-        return self.run_test(['-m', 'django', *args], settings_file)
+    def run_django_admin(self, args, settings_file=None, umask=None):
+        return self.run_test(['-m', 'django', *args], settings_file, umask=umask)
 
     def run_manage(self, args, settings_file=None, manage_py=None):
         template_manage_py = (
@@ -2296,6 +2300,29 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
             )
         not_excluded = os.path.join(testproject_dir, project_name)
         self.assertIs(os.path.exists(not_excluded), True)
+
+    @unittest.skipIf(
+        sys.platform == 'win32',
+        'Windows only partially supports umasks and chmod.',
+    )
+    @unittest.skipUnless(PY39, "subprocess.run()'s umask was added in Python 3.9.")
+    def test_honor_umask(self):
+        _, err = self.run_django_admin(['startproject', 'testproject'], umask=0o077)
+        self.assertNoOutput(err)
+        testproject_dir = os.path.join(self.test_dir, 'testproject')
+        self.assertIs(os.path.isdir(testproject_dir), True)
+        tests = [
+            (['manage.py'], 0o700),
+            (['testproject'], 0o700),
+            (['testproject', 'settings.py'], 0o600),
+        ]
+        for paths, expected_mode in tests:
+            file_path = os.path.join(testproject_dir, *paths)
+            with self.subTest(paths[-1]):
+                self.assertEqual(
+                    stat.S_IMODE(os.stat(file_path).st_mode),
+                    expected_mode,
+                )
 
 
 class StartApp(AdminScriptTestCase):
