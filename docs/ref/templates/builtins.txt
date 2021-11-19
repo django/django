@@ -1832,7 +1832,7 @@ If ``value`` is the list ``['a', 'b', 'c']``, the output will be the string
 Safely outputs a Python object as JSON, wrapped in a ``<script>`` tag, ready
 for use with JavaScript.
 
-**Argument:** HTML "id" of the ``<script>`` tag.
+**Argument:** The optional HTML "id" of the ``<script>`` tag.
 
 For example::
 
@@ -1860,6 +1860,10 @@ example if ``value`` is ``{'hello': 'world</script>&amp;'}``, the output is:
 This is compatible with a strict Content Security Policy that prohibits in-page
 script execution. It also maintains a clean separation between passive data and
 executable code.
+
+.. versionchanged:: 4.1
+
+    In older versions, the HTML "id" was a required argument.
 
 .. templatefilter:: last
 

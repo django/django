@@ -83,10 +83,10 @@ def escapejs_filter(value):
 
 
 @register.filter(is_safe=True)
-def json_script(value, element_id):
+def json_script(value, element_id=None):
     """
     Output value JSON-encoded, wrapped in a <script type="application/json">
-    tag.
+    tag (with an optional id).
     """
     return _json_script(value, element_id)
 

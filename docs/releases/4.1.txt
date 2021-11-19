@@ -210,7 +210,8 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* :tfilter:`json_script` template filter now allows wrapping in a ``<script>``
+  tag without the HTML ``id`` attribute.
 
 Tests
 ~~~~~
