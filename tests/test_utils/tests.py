@@ -558,14 +558,10 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
 
     def test_assert_used_on_http_response(self):
         response = HttpResponse()
-        error_msg = (
-            'assertTemplateUsed() and assertTemplateNotUsed() are only '
-            'usable on responses fetched using the Django test Client.'
-        )
-        with self.assertRaisesMessage(ValueError, error_msg):
+        msg = '%s() is only usable on responses fetched using the Django test Client.'
+        with self.assertRaisesMessage(ValueError, msg % 'assertTemplateUsed'):
             self.assertTemplateUsed(response, 'template.html')
-
-        with self.assertRaisesMessage(ValueError, error_msg):
+        with self.assertRaisesMessage(ValueError, msg % 'assertTemplateNotUsed'):
             self.assertTemplateNotUsed(response, 'template.html')
 
 
@@ -1288,6 +1284,15 @@ class TestFormset(formset_factory(TestForm)):
 
 
 class AssertFormErrorTests(SimpleTestCase):
+    def test_non_client_response(self):
+        msg = (
+            'assertFormError() is only usable on responses fetched using the '
+            'Django test Client.'
+        )
+        response = HttpResponse()
+        with self.assertRaisesMessage(ValueError, msg):
+            self.assertFormError(response, 'formset', 0, 'field', 'invalid value')
+
     def test_response_with_no_context(self):
         msg = 'Response did not use any contexts to render the response'
         response = mock.Mock(context=[])
@@ -1383,6 +1388,15 @@ class AssertFormsetErrorTests(SimpleTestCase):
             'form-INITIAL_FORMS': '0',
             'form-0-field': field_value,
         }
+
+    def test_non_client_response(self):
+        msg = (
+            'assertFormsetError() is only usable on responses fetched using '
+            'the Django test Client.'
+        )
+        response = HttpResponse()
+        with self.assertRaisesMessage(ValueError, msg):
+            self.assertFormsetError(response, 'formset', 0, 'field', 'invalid value')
 
     def test_response_with_no_context(self):
         msg = 'Response did not use any contexts to render the response'
