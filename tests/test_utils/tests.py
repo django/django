@@ -13,7 +13,10 @@ from django.core.files.storage import default_storage
 from django.db import (
     IntegrityError, connection, connections, models, router, transaction,
 )
-from django.forms import EmailField, IntegerField
+from django.forms import (
+    CharField, EmailField, Form, IntegerField, ValidationError,
+    formset_factory,
+)
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import (
@@ -1229,6 +1232,271 @@ class AssertURLEqualTests(SimpleTestCase):
                 'http://example.com/?x=1&x=2', 'https://example.com/?x=2&x=1',
                 msg_prefix='Prefix: ',
             )
+
+
+class TestForm(Form):
+    field = CharField()
+
+    def clean_field(self):
+        value = self.cleaned_data.get('field', '')
+        if value == 'invalid':
+            raise ValidationError('invalid value')
+        return value
+
+    def clean(self):
+        if self.cleaned_data.get('field') == 'invalid_non_field':
+            raise ValidationError('non-field error')
+        return self.cleaned_data
+
+    @classmethod
+    def _get_cleaned_form(cls, field_value):
+        form = cls({'field': field_value})
+        form.full_clean()
+        return form
+
+    @classmethod
+    def valid(cls):
+        return cls._get_cleaned_form('valid')
+
+    @classmethod
+    def invalid(cls, nonfield=False):
+        return cls._get_cleaned_form('invalid_non_field' if nonfield else 'invalid')
+
+
+class TestFormset(formset_factory(TestForm)):
+    @classmethod
+    def _get_cleaned_formset(cls, field_value):
+        formset = cls({
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',
+            'form-0-field': field_value,
+        })
+        formset.full_clean()
+        return formset
+
+    @classmethod
+    def valid(cls):
+        return cls._get_cleaned_formset('valid')
+
+    @classmethod
+    def invalid(cls, nonfield=False, nonform=False):
+        if nonform:
+            formset = cls({}, error_messages={'missing_management_form': 'error'})
+            formset.full_clean()
+            return formset
+        return cls._get_cleaned_formset('invalid_non_field' if nonfield else 'invalid')
+
+
+class AssertFormErrorTests(SimpleTestCase):
+    def test_response_with_no_context(self):
+        msg = 'Response did not use any contexts to render the response'
+        response = mock.Mock(context=[])
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormError(response, 'form', 'field', 'invalid value')
+        msg_prefix = 'Custom prefix'
+        with self.assertRaisesMessage(AssertionError, f'{msg_prefix}: {msg}'):
+            self.assertFormError(
+                response,
+                'form',
+                'field',
+                'invalid value',
+                msg_prefix=msg_prefix,
+            )
+
+    def test_form_not_in_context(self):
+        msg = "The form 'form' was not used to render the response"
+        response = mock.Mock(context=[{}])
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormError(response, 'form', 'field', 'invalid value')
+
+    def test_field_not_in_form(self):
+        msg = "The form 'form' in context 0 does not contain the field 'other_field'"
+        response = mock.Mock(context=[{'form': TestForm.invalid()}])
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormError(response, 'form', 'other_field', 'invalid value')
+
+    def test_field_not_in_form_multicontext(self):
+        msg = "The form 'form' in context 1 does not contain the field 'other_field'"
+        response = mock.Mock(context=[{}, {'form': TestForm.invalid()}])
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormError(response, 'form', 'other_field', 'invalid value')
+
+    def test_field_with_no_errors(self):
+        msg = "The field 'field' on form 'form' in context 0 contains no errors"
+        response = mock.Mock(context=[{'form': TestForm.valid()}])
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormError(response, 'form', 'field', 'invalid value')
+
+    def test_field_with_no_errors_multicontext(self):
+        msg = "The field 'field' on form 'form' in context 1 contains no errors"
+        response = mock.Mock(context=[{}, {'form': TestForm.valid()}])
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormError(response, 'form', 'field', 'invalid value')
+
+    def test_field_with_different_error(self):
+        msg = (
+            "The field 'field' on form 'form' in context 0 does not contain "
+            "the error 'other error' (actual errors: ['invalid value'])"
+        )
+        response = mock.Mock(context=[{'form': TestForm.invalid()}])
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormError(response, 'form', 'field', 'other error')
+
+    def test_field_with_different_error_multicontext(self):
+        msg = (
+            "The field 'field' on form 'form' in context 1 does not contain "
+            "the error 'other error' (actual errors: ['invalid value'])"
+        )
+        response = mock.Mock(context=[{}, {'form': TestForm.invalid()}])
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormError(response, 'form', 'field', 'other error')
+
+    def test_basic_positive_assertion(self):
+        response = mock.Mock(context=[{'form': TestForm.invalid()}])
+        self.assertFormError(response, 'form', 'field', 'invalid value')
+
+    def test_basic_positive_assertion_multicontext(self):
+        response = mock.Mock(context=[{}, {'form': TestForm.invalid()}])
+        self.assertFormError(response, 'form', 'field', 'invalid value')
+
+    def test_empty_errors_unbound_form(self):
+        response = mock.Mock(context=[{'form': TestForm()}])
+        self.assertFormError(response, 'form', 'field', [])
+
+    def test_empty_errors_valid_form(self):
+        response = mock.Mock(context=[{'form': TestForm.valid()}])
+        self.assertFormError(response, 'form', 'field', [])
+
+    def test_empty_errors_invalid_form(self):
+        response = mock.Mock(context=[{'form': TestForm.invalid()}])
+        self.assertFormError(response, 'form', 'field', [])
+
+    def test_non_field_errors(self):
+        response = mock.Mock(context=[{'form': TestForm.invalid(nonfield=True)}])
+        self.assertFormError(response, 'form', None, 'non-field error')
+
+
+class AssertFormsetErrorTests(SimpleTestCase):
+    def _get_formset_data(self, field_value):
+        return {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',
+            'form-0-field': field_value,
+        }
+
+    def test_response_with_no_context(self):
+        msg = 'Response did not use any contexts to render the response'
+        response = mock.Mock(context=[])
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormsetError(response, 'formset', 0, 'field', 'invalid value')
+
+    def test_formset_not_in_context(self):
+        msg = "The formset 'formset' was not used to render the response"
+        response = mock.Mock(context=[{}])
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormsetError(response, 'formset', 0, 'field', 'invalid value')
+
+    def test_field_not_in_form(self):
+        msg = (
+            "The formset 'formset', form 0 in context 0 does not contain the "
+            "field 'other_field'"
+        )
+        response = mock.Mock(context=[{'formset': TestFormset.invalid()}])
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormsetError(
+                response,
+                'formset',
+                0,
+                'other_field',
+                'invalid value',
+            )
+
+    def test_field_not_in_form_multicontext(self):
+        msg = (
+            "The formset 'formset', form 0 in context 1 does not contain the "
+            "field 'other_field'"
+        )
+        response = mock.Mock(context=[{}, {'formset': TestFormset.invalid()}])
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormsetError(
+                response,
+                'formset',
+                0,
+                'other_field',
+                'invalid value',
+            )
+
+    def test_field_with_no_errors(self):
+        msg = (
+            "The field 'field' on formset 'formset', form 0 in context 0 "
+            "contains no errors"
+        )
+        response = mock.Mock(context=[{'formset': TestFormset.valid()}])
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormsetError(response, 'formset', 0, 'field', 'invalid value')
+
+    def test_field_with_no_errors_multicontext(self):
+        msg = (
+            "The field 'field' on formset 'formset', form 0 in context 1 "
+            "contains no errors"
+        )
+        response = mock.Mock(context=[{}, {'formset': TestFormset.valid()}])
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormsetError(response, 'formset', 0, 'field', 'invalid value')
+
+    def test_field_with_different_error(self):
+        msg = (
+            "The field 'field' on formset 'formset', form 0 in context 0 does"
+            " not contain the error 'other error' (actual errors: ['invalid "
+            "value'])"
+        )
+        response = mock.Mock(context=[{'formset': TestFormset.invalid()}])
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormsetError(response, 'formset', 0, 'field', 'other error')
+
+    def test_field_with_different_error_multicontext(self):
+        msg = (
+            "The field 'field' on formset 'formset', form 0 in context 1 does"
+            " not contain the error 'other error' (actual errors: ['invalid "
+            "value'])"
+        )
+        response = mock.Mock(context=[{}, {'formset': TestFormset.invalid()}])
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormsetError(response, 'formset', 0, 'field', 'other error')
+
+    def test_basic_positive_assertion(self):
+        response = mock.Mock(context=[{'formset': TestFormset.invalid()}])
+        self.assertFormsetError(response, 'formset', 0, 'field', 'invalid value')
+
+    def test_basic_positive_assertion_multicontext(self):
+        response = mock.Mock(context=[{}, {'formset': TestFormset.invalid()}])
+        self.assertFormsetError(response, 'formset', 0, 'field', 'invalid value')
+
+    def test_empty_errors_unbound_formset(self):
+        response = mock.Mock(context=[{'formset': TestFormset()}])
+        self.assertFormsetError(response, 'formset', 0, 'field', [])
+
+    def test_empty_errors_valid_formset(self):
+        response = mock.Mock(context=[{}, {'formset': TestFormset.valid()}])
+        self.assertFormsetError(response, 'formset', 0, 'field', [])
+
+    def test_empty_errors_invalid_formset(self):
+        response = mock.Mock(context=[{}, {'formset': TestFormset.invalid()}])
+        self.assertFormsetError(response, 'formset', 0, 'field', [])
+
+    def test_non_field_errors(self):
+        response = mock.Mock(context=[
+            {},
+            {'formset': TestFormset.invalid(nonfield=True)},
+        ])
+        self.assertFormsetError(response, 'formset', 0, None, 'non-field error')
+
+    def test_non_form_errors(self):
+        response = mock.Mock(context=[
+            {},
+            {'formset': TestFormset.invalid(nonform=True)},
+        ])
+        self.assertFormsetError(response, 'formset', None, None, 'error')
 
 
 class FirstUrls:
