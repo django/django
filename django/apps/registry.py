@@ -18,7 +18,7 @@ class Apps:
     """
 
     def __init__(self, installed_apps=()):
-        # installed_apps is set to None when creating the master registry
+        # installed_apps is set to None when creating the main registry
         # because it cannot be populated at that point. Other registries must
         # provide a list of installed apps and are populated immediately.
         if installed_apps is None and hasattr(sys.modules[__name__], "apps"):
@@ -54,7 +54,7 @@ class Apps:
         # `lazy_model_operation()` and `do_pending_operations()` methods.
         self._pending_operations = defaultdict(list)
 
-        # Populate apps and models, unless it's the master registry.
+        # Populate apps and models, unless it's the main registry.
         if installed_apps is not None:
             self.populate(installed_apps)
 

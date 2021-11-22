@@ -785,7 +785,7 @@ class Client(ClientMixin, RequestFactory):
 
     def request(self, **request):
         """
-        The master request method. Compose the environment dictionary and pass
+        Make a generic request. Compose the environment dictionary and pass
         to the handler, return the result of the handler. Assume defaults for
         the query environment, which can be overridden using the arguments to
         the request.
@@ -1041,7 +1041,7 @@ class AsyncClient(ClientMixin, AsyncRequestFactory):
 
     async def request(self, **request):
         """
-        The master request method. Compose the scope dictionary and pass to the
+        Make a generic request. Compose the scope dictionary and pass to the
         handler, return the result of the handler. Assume defaults for the
         query environment, which can be overridden using the arguments to the
         request.

@@ -233,18 +233,18 @@ Using routers
 
 Database routers are installed using the :setting:`DATABASE_ROUTERS`
 setting. This setting defines a list of class names, each specifying a
-router that should be used by the master router
+router that should be used by the base router
 (``django.db.router``).
 
-The master router is used by Django's database operations to allocate
+The base router is used by Django's database operations to allocate
 database usage. Whenever a query needs to know which database to use,
-it calls the master router, providing a model and a hint (if
-available). Django then tries each router in turn until a database
-suggestion can be found. If no suggestion can be found, it tries the
-current :attr:`instance._state.db <django.db.models.Model._state>` of the hint
-instance. If a hint instance wasn't provided, or :attr:`instance._state.db
-<django.db.models.Model._state>` is ``None``, the master router will allocate
-the ``default`` database.
+it calls the base router, providing a model and a hint (if
+available). The base router tries each router class in turn until one returns
+a database suggestion. If no routers return a suggestion, the base router tries
+the current :attr:`instance._state.db
+<django.db.models.Model._state>` of the hint instance. If no hint instance
+was provided, or :attr:`instance._state.db <django.db.models.Model._state>` is
+``None``, the base router will allocate the ``default`` database.
 
 An example
 ----------
