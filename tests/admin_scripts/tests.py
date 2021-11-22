@@ -33,7 +33,11 @@ from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
 )
 from django.test.utils import captured_stderr, captured_stdout
+from django.urls import path
 from django.utils.version import PY39
+from django.views.static import serve
+
+from . import urls
 
 custom_templates_dir = os.path.join(os.path.dirname(__file__), 'custom_templates')
 
@@ -2126,6 +2130,33 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'run.py')))
+
+    def test_custom_project_template_from_tarball_by_url_django_user_agent(self):
+        user_agent = None
+
+        def serve_template(request, *args, **kwargs):
+            nonlocal user_agent
+            user_agent = request.headers['User-Agent']
+            return serve(request, *args, **kwargs)
+
+        old_urlpatterns = urls.urlpatterns[:]
+        try:
+            urls.urlpatterns += [
+                path(
+                    'user_agent_check/<path:path>',
+                    serve_template,
+                    {'document_root': os.path.join(urls.here, 'custom_templates')},
+                ),
+            ]
+
+            template_url = f'{self.live_server_url}/user_agent_check/project_template.tgz'
+            args = ['startproject', '--template', template_url, 'urltestproject']
+            _, err = self.run_django_admin(args)
+
+            self.assertNoOutput(err)
+            self.assertIn('Django/%s' % get_version(), user_agent)
+        finally:
+            urls.urlpatterns = old_urlpatterns
 
     def test_project_template_tarball_url(self):
         "Startproject management command handles project template tar/zip balls from non-canonical urls"

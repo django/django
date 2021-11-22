@@ -7,7 +7,7 @@ import shutil
 import stat
 import tempfile
 from importlib import import_module
-from urllib.request import urlretrieve
+from urllib.request import build_opener
 
 import django
 from django.conf import settings
@@ -277,8 +277,14 @@ class TemplateCommand(BaseCommand):
 
         if self.verbosity >= 2:
             self.stdout.write('Downloading %s' % display_url)
+
+        the_path = os.path.join(tempdir, filename)
+        opener = build_opener()
+        opener.addheaders = [('User-Agent', f'Django/{django.__version__}')]
         try:
-            the_path, info = urlretrieve(url, os.path.join(tempdir, filename))
+            with opener.open(url) as source, open(the_path, 'wb') as target:
+                headers = source.info()
+                target.write(source.read())
         except OSError as e:
             raise CommandError("couldn't download URL %s to %s: %s" %
                                (url, filename, e))
@@ -286,7 +292,7 @@ class TemplateCommand(BaseCommand):
         used_name = the_path.split('/')[-1]
 
         # Trying to get better name from response headers
-        content_disposition = info.get('content-disposition')
+        content_disposition = headers['content-disposition']
         if content_disposition:
             _, params = cgi.parse_header(content_disposition)
             guessed_filename = params.get('filename') or used_name
@@ -295,7 +301,7 @@ class TemplateCommand(BaseCommand):
 
         # Falling back to content type guessing
         ext = self.splitext(guessed_filename)[1]
-        content_type = info.get('content-type')
+        content_type = headers['content-type']
         if not ext and content_type:
             ext = mimetypes.guess_extension(content_type)
             if ext:
