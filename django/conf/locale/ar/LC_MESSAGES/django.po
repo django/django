@@ -396,7 +396,7 @@ msgstr[1] ""
 "تأكد أن هذه القيمة تحتوي على حرف أو رمز %(limit_value)d على الأقل (هي تحتوي "
 "حالياً على %(show_value)d)."
 msgstr[2] ""
-"تأكد أن هذه القيمة تحتوي على %(limit_value)d حرف و رمز على الأقل (هي تحتوي "
+"تأكد أن هذه القيمة تحتوي على %(limit_value)d حرف ورمز على الأقل (هي تحتوي "
 "حالياً على %(show_value)d)."
 msgstr[3] ""
 "تأكد أن هذه القيمة تحتوي على %(limit_value)d حرف أو رمز على الأقل (هي تحتوي "
@@ -422,7 +422,7 @@ msgstr[1] ""
 "تأكد أن هذه القيمة تحتوي على حرف أو رمز %(limit_value)d على الأكثر (هي تحتوي "
 "حالياً على %(show_value)d)."
 msgstr[2] ""
-"تأكد أن هذه القيمة تحتوي على %(limit_value)d حرف و رمز على الأكثر (هي تحتوي "
+"تأكد أن هذه القيمة تحتوي على %(limit_value)d حرف ورمز على الأكثر (هي تحتوي "
 "حالياً على %(show_value)d)."
 msgstr[3] ""
 "تأكد أن هذه القيمة تحتوي على %(limit_value)d حرف أو رمز على الأكثر (هي تحتوي "
@@ -536,7 +536,7 @@ msgid ""
 "“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"قيمة '%(value)s' ليست من بُنية تاريخ صحيحة. القيمة يجب ان تكون من البُنية YYYY-"
+"قيمة '%(value)s' ليست من بُنية تاريخ صحيحة. القيمة يجب أن تكون من البُنية YYYY-"
 "MM-DD."
 
 #, python-format
@@ -553,7 +553,7 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"قيمة '%(value)s' ليست من بُنية صحيحة. القيمة يجب ان تكون من البُنية YYYY-MM-DD "
+"قيمة '%(value)s' ليست من بُنية صحيحة. القيمة يجب أن تكون من البُنية YYYY-MM-DD "
 "HH:MM[:ss[.uuuuuu]][TZ] ."
 
 #, python-format
@@ -562,14 +562,14 @@ msgid ""
 "[TZ]) but it is an invalid date/time."
 msgstr ""
 "قيمة '%(value)s' من بُنية صحيحة (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) لكنها "
-"تحوي وقت و تاريخ غير صحيحين."
+"تحوي وقت وتاريخ غير صحيحين."
 
 msgid "Date (with time)"
 msgstr "التاريخ (مع الوقت)"
 
 #, python-format
 msgid "“%(value)s” value must be a decimal number."
-msgstr "قيمة '%(value)s' يجب ان تكون عدد عشري."
+msgstr "قيمة '%(value)s' يجب أن تكون عدد عشري."
 
 msgid "Decimal number"
 msgstr "رقم عشري"
@@ -579,7 +579,7 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
-"قيمة '%(value)s' ليست بنسق صحيح. القيمة يجب ان تكون من التنسيق ([DD] "
+"قيمة '%(value)s' ليست بنسق صحيح. القيمة يجب أن تكون من التنسيق ([DD] "
 "[[HH:]MM:]ss[.uuuuuu])"
 
 msgid "Duration"
@@ -593,14 +593,14 @@ msgstr "مسار الملف"
 
 #, python-format
 msgid "“%(value)s” value must be a float."
-msgstr "قيمة '%(value)s' يجب ان تكون عدد تعويم."
+msgstr "قيمة '%(value)s' يجب أن تكون عدد تعويم."
 
 msgid "Floating point number"
 msgstr "رقم فاصلة عائمة"
 
 #, python-format
 msgid "“%(value)s” value must be an integer."
-msgstr "قيمة '%(value)s' يجب ان تكون عدد طبيعي."
+msgstr "قيمة '%(value)s' يجب أن تكون عدد طبيعي."
 
 msgid "Integer"
 msgstr "عدد صحيح"
@@ -616,7 +616,7 @@ msgstr "عنوان IP"
 
 #, python-format
 msgid "“%(value)s” value must be either None, True or False."
-msgstr "قيمة '%(value)s' يجب ان تكون None أو True أو False."
+msgstr "قيمة '%(value)s' يجب أن تكون None أو True أو False."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "ثنائي (إما True أو False أو None)"
@@ -645,7 +645,7 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"قيمة '%(value)s' ليست بنسق صحيح. القيمة يجب ان تكون من التنسيق\n"
+"قيمة '%(value)s' ليست بنسق صحيح. القيمة يجب أن تكون من التنسيق\n"
 "HH:MM[:ss[.uuuuuu]]"
 
 #, python-format
@@ -685,7 +685,7 @@ msgstr "يجب أن تكون قيمة JSON صالحة."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "النموذج %(model)s ذو الحقل و القيمة %(field)s %(value)r غير موجود."
+msgstr "النموذج %(model)s ذو الحقل والقيمة %(field)s %(value)r غير موجود."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "الحقل المرتبط (تم تحديد النوع وفقاً للحقل المرتبط)"
@@ -730,7 +730,7 @@ msgstr "أدخل مدّة صحيحة"
 
 #, python-brace-format
 msgid "The number of days must be between {min_days} and {max_days}."
-msgstr "يجب أن يكون عدد الأيام بين {min_days} و {max_days}."
+msgstr "يجب أن يكون عدد الأيام بين {min_days}و {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "لم يتم ارسال ملف، الرجاء التأكد من نوع ترميز الاستمارة."
@@ -804,22 +804,22 @@ msgstr "بيانات ManagementForm مفقودة أو تم العبث بها"
 #, python-format
 msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
-msgstr[0] "الرجاء إرسال %d إستمارة أو أقل."
-msgstr[1] "الرجاء إرسال إستمارة %d أو أقل"
+msgstr[0] "الرجاء إرسال %d استمارة أو أقل."
+msgstr[1] "الرجاء إرسال استمارة %d أو أقل"
 msgstr[2] "الرجاء إرسال %d إستمارتين أو أقل"
-msgstr[3] "الرجاء إرسال %d إستمارة أو أقل"
-msgstr[4] "الرجاء إرسال %d إستمارة أو أقل"
-msgstr[5] "الرجاء إرسال %d إستمارة أو أقل"
+msgstr[3] "الرجاء إرسال %d استمارة أو أقل"
+msgstr[4] "الرجاء إرسال %d استمارة أو أقل"
+msgstr[5] "الرجاء إرسال %d استمارة أو أقل"
 
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
-msgstr[0] "الرجاء إرسال %d إستمارة أو أكثر."
-msgstr[1] "الرجاء إرسال إستمارة %d أو أكثر."
+msgstr[0] "الرجاء إرسال %d استمارة أو أكثر."
+msgstr[1] "الرجاء إرسال استمارة %d أو أكثر."
 msgstr[2] "الرجاء إرسال %d إستمارتين أو أكثر."
-msgstr[3] "الرجاء إرسال %d إستمارة أو أكثر."
-msgstr[4] "الرجاء إرسال %d إستمارة أو أكثر."
-msgstr[5] "الرجاء إرسال %d إستمارة أو أكثر."
+msgstr[3] "الرجاء إرسال %d استمارة أو أكثر."
+msgstr[4] "الرجاء إرسال %d استمارة أو أكثر."
+msgstr[5] "الرجاء إرسال %d استمارة أو أكثر."
 
 msgid "Order"
 msgstr "الترتيب"
@@ -890,9 +890,9 @@ msgstr "نعم,لا,ربما"
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d بايت"
-msgstr[1] "بايت واحد"
-msgstr[2] "بايتان"
-msgstr[3] "%(size)d بايتان"
+msgstr[1] "بايت"
+msgstr[2] "بايت"
+msgstr[3] "%(size)d بايت"
 msgstr[4] "%(size)d بايت"
 msgstr[5] "%(size)d بايت"
 
@@ -1182,11 +1182,11 @@ msgstr[5] "%d شهر"
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
-msgstr[0] "%d اسبوع."
-msgstr[1] "%d اسبوع."
+msgstr[0] "%d أسبوع."
+msgstr[1] "%d أسبوع."
 msgstr[2] "%d أسبوعين"
 msgstr[3] "%d أسابيع"
-msgstr[4] "%d اسبوع."
+msgstr[4] "%d أسبوع."
 msgstr[5] "%d أسبوع"
 
 #, python-format
@@ -1307,7 +1307,7 @@ msgstr "نسق تاريخ غير صحيح \"%(datestr)s\" محدد بالشكل 
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
-msgstr "لم يعثر على أي %(verbose_name)s مطابقة لهذا الإستعلام"
+msgstr "لم يعثر على أي %(verbose_name)s مطابقة لهذا الاستعلام"
 
 msgid "Page is not “last”, nor can it be converted to an int."
 msgstr "الصفحة ليست \"الأخيرة\"، كما لا يمكن تحويل القيمة إلى رقم طبيعي."
@@ -1335,7 +1335,7 @@ msgid "Index of %(directory)s"
 msgstr "فهرس لـ %(directory)s"
 
 msgid "Django: the Web framework for perfectionists with deadlines."
-msgstr "جانغو: إطار الويب للمهتمين بالكمال و لديهم مواعيد تسليم نهائية."
+msgstr "جانغو: إطار الويب للمهتمين بالكمال ولديهم مواعيد تسليم نهائية."
 
 #, python-format
 msgid ""
@@ -1357,19 +1357,19 @@ msgid ""
 msgstr ""
 "تظهر لك هذه الصفحة لأن <a href=\"https://docs.djangoproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> في ملف settings خاصتك كما أنك لم تقم بإعداد الروابط URLs."
+"\">DEBUG=True</a> في ملف settings الخاص بك كما أنك لم تقم بإعداد الروابط URLs."
 
 msgid "Django Documentation"
 msgstr "وثائق تعليمات جانغو"
 
 msgid "Topics, references, &amp; how-to’s"
-msgstr "المواضيع و المراجع و التعليمات"
+msgstr "المواضيع والمراجع والتعليمات"
 
 msgid "Tutorial: A Polling App"
 msgstr "برنامج تعليمي: تطبيق تصويت"
 
 msgid "Get started with Django"
-msgstr "إبدأ مع جانغو"
+msgstr "ابدأ مع جانغو"
 
 msgid "Django Community"
 msgstr "مجتمع جانغو"
