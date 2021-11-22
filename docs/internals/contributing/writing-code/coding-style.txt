@@ -158,7 +158,7 @@ Imports
 
   .. console::
 
-      $ python -m pip install isort >= 5.1.0
+      $ python -m pip install "isort >= 5.1.0"
       $ isort -rc .
 
   This runs ``isort`` recursively from your current directory, modifying any
