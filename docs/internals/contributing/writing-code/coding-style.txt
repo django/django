@@ -159,7 +159,7 @@ Imports
   .. console::
 
       $ python -m pip install "isort >= 5.1.0"
-      $ isort -rc .
+      $ isort .
 
   This runs ``isort`` recursively from your current directory, modifying any
   files that don't conform to the guidelines. If you need to have imports out
