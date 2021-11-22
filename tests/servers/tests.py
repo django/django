@@ -173,7 +173,7 @@ class LiveServerViews(LiveServerBase):
         we can detect a content length from the response. This should be doable
         for all simple views and streaming responses where an iterable with
         length of one is passed. The latter follows as result of `set_content_length`
-        from https://github.com/python/cpython/blob/master/Lib/wsgiref/handlers.py.
+        from https://github.com/python/cpython/blob/main/Lib/wsgiref/handlers.py.
 
         If we cannot detect a content length we explicitly set the `Connection`
         header to `close` to notify the client that we do not actually support

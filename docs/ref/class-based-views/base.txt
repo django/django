@@ -18,9 +18,9 @@ MRO is an acronym for Method Resolution Order.
 
 .. class:: django.views.generic.base.View
 
-    The master class-based base view. All other class-based views inherit from
-    this base class. It isn't strictly a generic view and thus can also be
-    imported from ``django.views``.
+    The base view class. All other class-based views inherit from this base
+    class. It isn't strictly a generic view and thus can also be imported from
+    ``django.views``.
 
     **Method Flowchart**
 

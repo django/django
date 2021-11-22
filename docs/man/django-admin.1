@@ -870,9 +870,9 @@ If you\(aqre in a multi\-database setup, you might have fixture data that
 you want to load onto one database, but not onto another. In this
 situation, you can add a database identifier into the names of your fixtures.
 .sp
-For example, if your \fBDATABASES\fP setting has a \(aqmaster\(aq database
-defined, name the fixture \fBmydata.master.json\fP or
-\fBmydata.master.json.gz\fP and the fixture will only be loaded when you
+For example, if your \fBDATABASES\fP setting has a \(aqusers\(aq database
+defined, name the fixture \fBmydata.users.json\fP or
+\fBmydata.users.json.gz\fP and the fixture will only be loaded when you
 specify you want to load data into the \fBmaster\fP database.
 .SS Loading fixtures from \fBstdin\fP
 .sp
@@ -1815,7 +1815,7 @@ zip files, you can use a URL like:
 .sp
 .nf
 .ft C
-django\-admin startapp \-\-template=https://github.com/githubuser/django\-app\-template/archive/master.zip myapp
+django\-admin startapp \-\-template=https://github.com/githubuser/django\-app\-template/archive/main.zip myapp
 .ft P
 .fi
 .UNINDENT
