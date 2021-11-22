@@ -574,8 +574,13 @@ def create_generic_related_manager(superclass, rel):
                 return self._apply_rel_filters(queryset)
 
         def get_prefetch_queryset(self, instances, queryset=None):
+            # We only want to disable cloning if we own the creation of the
+            # QuerySet instance, otherwise we may subsequently re-enable
+            # cloning when we shouldn't.
+            cloning_disabled = queryset is None
+
             if queryset is None:
-                queryset = super().get_queryset()
+                queryset = super().get_queryset()._disable_cloning()
 
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
@@ -595,8 +600,15 @@ def create_generic_related_manager(superclass, rel):
             # instances' PK in order to match up instances:
             object_id_converter = instances[0]._meta.pk.to_python
             content_type_id_field_name = '%s_id' % self.content_type_field_name
+            queryset = queryset.filter(query)
+
+            # We owned the instantiation of the QuerySet, so we can restore
+            # subsequent cloning operations which were prevented within this method.
+            if cloning_disabled:
+                queryset._enable_cloning()
+
             return (
-                queryset.filter(query),
+                queryset,
                 lambda relobj: (
                     object_id_converter(getattr(relobj, self.object_id_field_name)),
                     getattr(relobj, content_type_id_field_name),

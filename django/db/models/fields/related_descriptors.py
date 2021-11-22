@@ -118,8 +118,13 @@ class ForwardManyToOneDescriptor:
         return self.field.remote_field.model._base_manager.db_manager(hints=hints).all()
 
     def get_prefetch_queryset(self, instances, queryset=None):
+        # We only want to disable cloning if we own the creation of the
+        # QuerySet instance, otherwise we may subsequently re-enable
+        # cloning when we shouldn't.
+        cloning_disabled = queryset is None
+
         if queryset is None:
-            queryset = self.get_queryset()
+            queryset = self.get_queryset()._disable_cloning()
         queryset._add_hints(instance=instances[0])
 
         rel_obj_attr = self.field.get_foreign_related_value
@@ -139,6 +144,11 @@ class ForwardManyToOneDescriptor:
         else:
             query = {'%s__in' % self.field.related_query_name(): instances}
         queryset = queryset.filter(**query)
+
+        # We owned the instantiation of the QuerySet, so we can restore
+        # subsequent cloning operations which were prevented within this method.
+        if cloning_disabled:
+            queryset._enable_cloning()
 
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
@@ -363,8 +373,13 @@ class ReverseOneToOneDescriptor:
         return self.related.related_model._base_manager.db_manager(hints=hints).all()
 
     def get_prefetch_queryset(self, instances, queryset=None):
+        # We only want to disable cloning if we own the creation of the
+        # QuerySet instance, otherwise we may subsequently re-enable
+        # cloning when we shouldn't.
+        cloning_disabled = queryset is None
+
         if queryset is None:
-            queryset = self.get_queryset()
+            queryset = self.get_queryset()._disable_cloning()
         queryset._add_hints(instance=instances[0])
 
         rel_obj_attr = self.related.field.get_local_related_value
@@ -372,6 +387,11 @@ class ReverseOneToOneDescriptor:
         instances_dict = {instance_attr(inst): inst for inst in instances}
         query = {'%s__in' % self.related.field.name: instances}
         queryset = queryset.filter(**query)
+
+        # We owned the instantiation of the QuerySet, so we can restore
+        # subsequent cloning operations which were prevented within this method.
+        if cloning_disabled:
+            queryset._enable_cloning()
 
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
@@ -632,8 +652,13 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 return self._apply_rel_filters(queryset)
 
         def get_prefetch_queryset(self, instances, queryset=None):
+            # We only want to disable cloning if we own the creation of the
+            # QuerySet instance, otherwise we may subsequently re-enable
+            # cloning when we shouldn't.
+            cloning_disabled = queryset is None
+
             if queryset is None:
-                queryset = super().get_queryset()
+                queryset = super().get_queryset()._disable_cloning()
 
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
@@ -643,6 +668,11 @@ def create_reverse_many_to_one_manager(superclass, rel):
             instances_dict = {instance_attr(inst): inst for inst in instances}
             query = {'%s__in' % self.field.name: instances}
             queryset = queryset.filter(**query)
+
+            # We owned the instantiation of the QuerySet, so we can restore
+            # subsequent cloning operations which were prevented within this method.
+            if cloning_disabled:
+                queryset._enable_cloning()
 
             # Since we just bypassed this class' get_queryset(), we must manage
             # the reverse relation manually.
@@ -928,8 +958,13 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 return self._apply_rel_filters(queryset)
 
         def get_prefetch_queryset(self, instances, queryset=None):
+            # We only want to disable cloning if we own the creation of the
+            # QuerySet instance, otherwise we may subsequently re-enable
+            # cloning when we shouldn't.
+            cloning_disabled = queryset is None
+
             if queryset is None:
-                queryset = super().get_queryset()
+                queryset = super().get_queryset()._disable_cloning()
 
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
@@ -951,6 +986,12 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             queryset = queryset.extra(select={
                 '_prefetch_related_val_%s' % f.attname:
                 '%s.%s' % (qn(join_table), qn(f.column)) for f in fk.local_related_fields})
+
+            # We owned the instantiation of the QuerySet, so we can restore
+            # subsequent cloning operations which were prevented within this method.
+            if cloning_disabled:
+                queryset._enable_cloning()
+
             return (
                 queryset,
                 lambda result: tuple(
