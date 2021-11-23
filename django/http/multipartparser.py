@@ -321,6 +321,23 @@ class MultiPartParser:
         file_name = file_name.rsplit('/')[-1]
         file_name = file_name.rsplit('\\')[-1]
 
+        forbidden_chars = { '>', '<', ':', '\"', '/', '\\', '|', '?', '*'} | set(chr(ch) for ch in range(32))
+        for char in forbidden_chars:
+            file_name = file_name.replace(char, '')
+
+        reserved_file_names =  {
+            'CON', 'PRN', 'AUX', 'NUL', 'COM1', 'COM2', 'COM3', 'COM4', 
+            'COM5', 'COM6', 'COM7', 'COM8', 'COM9', 'LPT1', 'LPT2', 
+            'LPT3', 'LPT4', 'LPT5', 'LPT6', 'LPT7', 'LPT8', 'LPT9' 
+        }
+
+        if file_name and file_name.split('.')[0].upper() in reserved_file_names:
+            file_name = file_name.replace(file_name.split('.')[0], '')
+        
+        extension = file_name.split('.')[-1]
+        for ext in ('..' + extension, ' .' + extension):
+            file_name = file_name.replace(ext, f'.{extension}')
+
         if file_name in {'', '.', '..'}:
             return None
         return file_name
