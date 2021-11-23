@@ -754,7 +754,7 @@ class SQLCompiler:
             targets, alias, _ = self.query.trim_joins(targets, joins, path)
             for target in targets:
                 if name in self.query.annotation_select:
-                    result.append(name)
+                    result.append(self.connection.ops.quote_name(name))
                 else:
                     r, p = self.compile(transform_function(target, alias))
                     result.append(r)
