@@ -179,7 +179,7 @@ executed.
 ``filter()``
 ~~~~~~~~~~~~
 
-.. method:: filter(**kwargs)
+.. method:: filter(*args, **kwargs)
 
 Returns a new ``QuerySet`` containing objects that match the given lookup
 parameters.
@@ -189,12 +189,12 @@ The lookup parameters (``**kwargs``) should be in the format described in
 underlying SQL statement.
 
 If you need to execute more complex queries (for example, queries with ``OR`` statements),
-you can use :class:`Q objects <django.db.models.Q>`.
+you can use :class:`Q objects <django.db.models.Q>` (``*args``).
 
 ``exclude()``
 ~~~~~~~~~~~~~
 
-.. method:: exclude(**kwargs)
+.. method:: exclude(*args, **kwargs)
 
 Returns a new ``QuerySet`` containing objects that do *not* match the given
 lookup parameters.
@@ -231,7 +231,7 @@ In SQL terms, that evaluates to:
 Note the second example is more restrictive.
 
 If you need to execute more complex queries (for example, queries with ``OR`` statements),
-you can use :class:`Q objects <django.db.models.Q>`.
+you can use :class:`Q objects <django.db.models.Q>` (``*args``).
 
 ``annotate()``
 ~~~~~~~~~~~~~~
@@ -1843,7 +1843,7 @@ raised if ``select_for_update()`` is used in autocommit mode.
 ``raw()``
 ~~~~~~~~~
 
-.. method:: raw(raw_query, params=(), translations=None)
+.. method:: raw(raw_query, params=(), translations=None, using=None)
 
 Takes a raw SQL query, executes it, and returns a
 ``django.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance
@@ -1910,7 +1910,7 @@ they query the database each time they're called.
 ``get()``
 ~~~~~~~~~
 
-.. method:: get(**kwargs)
+.. method:: get(*args, **kwargs)
 
 Returns the object matching the given lookup parameters, which should be in
 the format described in `Field lookups`_. You should use lookups that are
@@ -1918,7 +1918,7 @@ guaranteed unique, such as the primary key or fields in a unique constraint.
 For example::
 
     Entry.objects.get(id=1)
-    Entry.objects.get(blog=blog, entry_number=1)
+    Entry.objects.get(Q(blog=blog) & Q(entry_number=1))
 
 If you expect a queryset to already return one row, you can use ``get()``
 without any arguments to return the object for that row::
