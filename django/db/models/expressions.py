@@ -915,8 +915,8 @@ class Ref(Expression):
 class ExpressionList(Func):
     """
     An expression containing multiple expressions. Can be used to provide a
-    list of expressions as an argument to another expression, like an
-    ordering clause.
+    list of expressions as an argument to another expression, like a partition
+    clause.
     """
     template = '%(expressions)s'
 
@@ -931,6 +931,26 @@ class ExpressionList(Func):
     def as_sqlite(self, compiler, connection, **extra_context):
         # Casting to numeric is unnecessary.
         return self.as_sql(compiler, connection, **extra_context)
+
+
+class OrderByList(Func):
+    template = 'ORDER BY %(expressions)s'
+
+    def __init__(self, *expressions, **extra):
+        expressions = (
+            (
+                OrderBy(F(expr[1:]), descending=True)
+                if isinstance(expr, str) and expr[0] == '-'
+                else expr
+            )
+            for expr in expressions
+        )
+        super().__init__(*expressions, **extra)
+
+    def as_sql(self, *args, **kwargs):
+        if not self.source_expressions:
+            return '', ()
+        return super().as_sql(*args, **kwargs)
 
 
 class ExpressionWrapper(SQLiteNumericMixin, Expression):
