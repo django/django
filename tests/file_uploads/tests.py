@@ -24,8 +24,6 @@ UNICODE_FILENAME = 'test-0123456789_中文_Orléans.jpg'
 MEDIA_ROOT = sys_tempfile.mkdtemp()
 UPLOAD_TO = os.path.join(MEDIA_ROOT, 'test_upload')
 
-null_characters_word = ''.join(chr(ch) for ch in range(32))
-
 CANDIDATE_TRAVERSAL_FILE_NAMES = [
     '/tmp/hax0rd.txt',          # Absolute path, *nix-style.
     'C:\\Windows\\hax0rd.txt',  # Absolute path, win-style.
@@ -40,10 +38,7 @@ CANDIDATE_TRAVERSAL_FILE_NAMES = [
     '../..\\hax0rd.txt',        # Relative path, mixed.
     '..&#x2F;hax0rd.txt',       # HTML entities.
     '..&sol;hax0rd.txt',        # HTML entities.
-    'hax><:?|*0rd.txt',         # with reserved characters.
-    'hax><:?|*0rd..txt',        # file name ends with a period.
-    'hax><:?|*0rd .txt',        # file name ends with a space.
-    f'hax><:?|*0rd{null_characters_word}.txt', # file name containig all characters having ascii value from range 0-31
+    'hax0rd\x00.txt\x00',       # null bytes.
 ]
 
 CANDIDATE_INVALID_FILE_NAMES = [
@@ -54,10 +49,6 @@ CANDIDATE_INVALID_FILE_NAMES = [
     '/tmp/..',      # Parent directory, *nix-style.
     'c:\\tmp\\..',  # Parent directory, win-style.
     '',             # Empty filename.
-    'NUL',          # Forbidden filename.
-    'AUX',          # forbidden filename.
-    'Com7',         # forbidden filename, case-insensitive.
-    '><:\"/|?*'     # forbidden characters, as per windows naming convention.
 ]
 
 
