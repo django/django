@@ -51,6 +51,7 @@ class WindowFunctionTests(TestCase):
         tests = [
             ExtractYear(F('hire_date')).asc(),
             F('hire_date__year').asc(),
+            'hire_date__year',
         ]
         for order_by in tests:
             with self.subTest(order_by=order_by):
@@ -473,7 +474,7 @@ class WindowFunctionTests(TestCase):
         """
         qs = Employee.objects.annotate(ntile=Window(
             expression=Ntile(num_buckets=4),
-            order_by=F('salary').desc(),
+            order_by='-salary',
         )).order_by('ntile', '-salary', 'name')
         self.assertQuerysetEqual(qs, [
             ('Miller', 'Management', 100000, 1),
@@ -875,7 +876,7 @@ class NonQueryWindowTests(SimpleTestCase):
         )
         self.assertEqual(
             repr(Window(expression=Avg('salary'), order_by=F('department').asc())),
-            '<Window: Avg(F(salary)) OVER (ORDER BY OrderBy(F(department), descending=False))>'
+            '<Window: Avg(F(salary)) OVER (OrderByList(OrderBy(F(department), descending=False)))>'
         )
 
     def test_window_frame_repr(self):
@@ -942,9 +943,12 @@ class NonQueryWindowTests(SimpleTestCase):
             qs.filter(equal=True)
 
     def test_invalid_order_by(self):
-        msg = 'order_by must be either an Expression or a sequence of expressions'
+        msg = (
+            'Window.order_by must be either a string reference to a field, an '
+            'expression, or a list or tuple of them.'
+        )
         with self.assertRaisesMessage(ValueError, msg):
-            Window(expression=Sum('power'), order_by='-horse')
+            Window(expression=Sum('power'), order_by={'-horse'})
 
     def test_invalid_source_expression(self):
         msg = "Expression 'Upper' isn't compatible with OVER clauses."

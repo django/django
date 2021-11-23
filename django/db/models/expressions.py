@@ -915,8 +915,8 @@ class Ref(Expression):
 class ExpressionList(Func):
     """
     An expression containing multiple expressions. Can be used to provide a
-    list of expressions as an argument to another expression, like an
-    ordering clause.
+    list of expressions as an argument to another expression, like a partition
+    clause.
     """
     template = '%(expressions)s'
 
@@ -931,6 +931,26 @@ class ExpressionList(Func):
     def as_sqlite(self, compiler, connection, **extra_context):
         # Casting to numeric is unnecessary.
         return self.as_sql(compiler, connection, **extra_context)
+
+
+class OrderByList(Func):
+    template = 'ORDER BY %(expressions)s'
+
+    def __init__(self, *expressions, **extra):
+        expressions = (
+            (
+                OrderBy(F(expr[1:]), descending=True)
+                if isinstance(expr, str) and expr[0] == '-'
+                else expr
+            )
+            for expr in expressions
+        )
+        super().__init__(*expressions, **extra)
+
+    def as_sql(self, *args, **kwargs):
+        if not self.source_expressions:
+            return '', ()
+        return super().as_sql(*args, **kwargs)
 
 
 class ExpressionWrapper(SQLiteNumericMixin, Expression):
@@ -1313,11 +1333,13 @@ class Window(SQLiteNumericMixin, Expression):
 
         if self.order_by is not None:
             if isinstance(self.order_by, (list, tuple)):
-                self.order_by = ExpressionList(*self.order_by)
-            elif not isinstance(self.order_by, BaseExpression):
+                self.order_by = OrderByList(*self.order_by)
+            elif isinstance(self.order_by, (BaseExpression, str)):
+                self.order_by = OrderByList(self.order_by)
+            else:
                 raise ValueError(
-                    'order_by must be either an Expression or a sequence of '
-                    'expressions.'
+                    'Window.order_by must be either a string reference to a '
+                    'field, an expression, or a list or tuple of them.'
                 )
         super().__init__(output_field=output_field)
         self.source_expression = self._parse_expressions(expression)[0]
@@ -1343,18 +1365,17 @@ class Window(SQLiteNumericMixin, Expression):
                 compiler=compiler, connection=connection,
                 template='PARTITION BY %(expressions)s',
             )
-            window_sql.extend(sql_expr)
+            window_sql.append(sql_expr)
             window_params.extend(sql_params)
 
         if self.order_by is not None:
-            window_sql.append(' ORDER BY ')
             order_sql, order_params = compiler.compile(self.order_by)
-            window_sql.extend(order_sql)
+            window_sql.append(order_sql)
             window_params.extend(order_params)
 
         if self.frame:
             frame_sql, frame_params = compiler.compile(self.frame)
-            window_sql.append(' ' + frame_sql)
+            window_sql.append(frame_sql)
             window_params.extend(frame_params)
 
         params.extend(window_params)
@@ -1362,7 +1383,7 @@ class Window(SQLiteNumericMixin, Expression):
 
         return template % {
             'expression': expr_sql,
-            'window': ''.join(window_sql).strip()
+            'window': ' '.join(window_sql).strip()
         }, params
 
     def as_sqlite(self, compiler, connection):
@@ -1379,7 +1400,7 @@ class Window(SQLiteNumericMixin, Expression):
         return '{} OVER ({}{}{})'.format(
             str(self.source_expression),
             'PARTITION BY ' + str(self.partition_by) if self.partition_by else '',
-            'ORDER BY ' + str(self.order_by) if self.order_by else '',
+            str(self.order_by or ''),
             str(self.frame or ''),
         )
 
