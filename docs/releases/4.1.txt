@@ -185,7 +185,9 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* The ``order_by`` argument of the
+  :class:`~django.db.models.expressions.Window` expression now accepts string
+  references to fields and transforms.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
