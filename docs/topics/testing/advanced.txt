@@ -873,8 +873,14 @@ project. You can see a report of this data by typing following command::
 Note that some Django code was executed while running tests, but it is not
 listed here because of the ``source`` flag passed to the previous command.
 
-For more options like annotated HTML listings detailing missed lines, see the
+If you are running tests in parallel using the ``--parallel`` option,
+you need to run ``coverage.py`` with the ``--concurrency=multiprocessing``
+option. You can then combine the results from parallel execution using
+`coverage combine`_.
+For details and more options like annotated HTML listings detailing missed 
+lines, see the
 `coverage.py`_ docs.
 
 .. _coverage.py: https://coverage.readthedocs.io/
 .. _install coverage.py: https://pypi.org/project/coverage/
+.. _coverage combine: https://coverage.readthedocs.io/en/latest/cmd.html#cmd-combine
