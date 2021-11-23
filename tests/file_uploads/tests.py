@@ -38,6 +38,9 @@ CANDIDATE_TRAVERSAL_FILE_NAMES = [
     '../..\\hax0rd.txt',        # Relative path, mixed.
     '..&#x2F;hax0rd.txt',       # HTML entities.
     '..&sol;hax0rd.txt',        # HTML entities.
+    'hax><:?|*0rd.txt',         # with reserved characters.
+    'hax><:?|*0rd..txt',        # file name ends with a period.
+    'hax><:?|*0rd .txt',        # file name ends with a space.
 ]
 
 CANDIDATE_INVALID_FILE_NAMES = [
@@ -48,6 +51,10 @@ CANDIDATE_INVALID_FILE_NAMES = [
     '/tmp/..',      # Parent directory, *nix-style.
     'c:\\tmp\\..',  # Parent directory, win-style.
     '',             # Empty filename.
+    'NUL',          # Forbidden filename.
+    'AUX',          # forbidden filename.
+    'Com7',         # forbidden filename, case-insensitive.
+    '><:\"/|?*'     # forbidden characters, as per windows naming convention.
 ]
 
 
