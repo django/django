@@ -332,21 +332,21 @@ class CsrfViewMiddleware(MiddlewareMixin):
         # been called by an authentication middleware during the
         # process_request() phase.
         try:
-            csrf_token = self._get_token(request)
+            cookie_csrf_token = self._get_token(request)
         except InvalidTokenFormat as exc:
             raise RejectRequest(f'CSRF cookie {exc.reason}.')
 
-        if csrf_token is None:
+        if cookie_csrf_token is None:
             # No CSRF cookie. For POST requests, we insist on a CSRF cookie,
             # and in this way we can avoid all CSRF attacks, including login
             # CSRF.
             raise RejectRequest(REASON_NO_CSRF_COOKIE)
 
         # Check non-cookie token for match.
-        request_csrf_token = ''
+        non_cookie_csrf_token = ''
         if request.method == 'POST':
             try:
-                request_csrf_token = request.POST.get('csrfmiddlewaretoken', '')
+                non_cookie_csrf_token = request.POST.get('csrfmiddlewaretoken', '')
             except UnreadablePostError:
                 # Handle a broken connection before we've completed reading the
                 # POST data. process_view shouldn't raise any exceptions, so
@@ -354,11 +354,11 @@ class CsrfViewMiddleware(MiddlewareMixin):
                 # listening, which they probably aren't because of the error).
                 pass
 
-        if request_csrf_token == '':
+        if non_cookie_csrf_token == '':
             # Fall back to X-CSRFToken, to make things easier for AJAX, and
             # possible for PUT/DELETE.
             try:
-                request_csrf_token = request.META[settings.CSRF_HEADER_NAME]
+                non_cookie_csrf_token = request.META[settings.CSRF_HEADER_NAME]
             except KeyError:
                 raise RejectRequest(REASON_CSRF_TOKEN_MISSING)
             token_source = settings.CSRF_HEADER_NAME
@@ -366,12 +366,12 @@ class CsrfViewMiddleware(MiddlewareMixin):
             token_source = 'POST'
 
         try:
-            request_csrf_token = _sanitize_token(request_csrf_token)
+            non_cookie_csrf_token = _sanitize_token(non_cookie_csrf_token)
         except InvalidTokenFormat as exc:
             reason = self._bad_token_message(exc.reason, token_source)
             raise RejectRequest(reason)
 
-        if not _does_token_match(request_csrf_token, csrf_token):
+        if not _does_token_match(non_cookie_csrf_token, cookie_csrf_token):
             reason = self._bad_token_message('incorrect', token_source)
             raise RejectRequest(reason)
 

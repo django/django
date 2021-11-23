@@ -42,6 +42,7 @@ class RemoteUserMiddleware(MiddlewareMixin):
     # Name of request header to grab username from.  This will be the key as
     # used in the request.META dictionary, i.e. the normalization of headers to
     # all uppercase and the addition of "HTTP_" prefix apply.
+    # ref - https://docs.djangoproject.com/en/dev/ref/request-response/#django.http.HttpRequest.META
     header = "REMOTE_USER"
     force_logout_if_no_header = True
 
