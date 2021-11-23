@@ -296,12 +296,6 @@
     width: 100%;
 }
 
-#changelist .actions.selected { /* XXX Probably unused? */
-    background: var(--body-bg);
-    border-top: 1px solid var(--body-bg);
-    border-bottom: 1px solid #edecd6;
-}
-
 #changelist .actions span.all,
 #changelist .actions span.action-counter,
 #changelist .actions span.clear,
