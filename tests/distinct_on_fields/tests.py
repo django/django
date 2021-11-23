@@ -1,5 +1,5 @@
 from django.db import connection
-from django.db.models import CharField, Max
+from django.db.models import F, CharField, Max
 from django.db.models.functions import Lower
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import register_lookup
@@ -139,3 +139,12 @@ class DistinctOnTests(TestCase):
         """
         staff = Staff.objects.distinct('name').order_by('name', '-organisation').get(name='p1')
         self.assertEqual(staff.organisation, 'o2')
+
+    def test_uppercase_aliases(self):
+        """
+        Distinct on field should allow uppercase letters (regression test).
+        refs #33309
+        """
+
+        qs = Celebrity.objects.annotate(nameAlias=F('name')).distinct('nameAlias').get(pk=1)
+        self.assertEqual(qs, self.celeb1)
