@@ -344,11 +344,8 @@ class Query(BaseExpression):
             obj.subq_aliases = self.subq_aliases.copy()
         obj.used_aliases = self.used_aliases.copy()
         obj._filtered_relations = self._filtered_relations.copy()
-        # Clear the cached_property
-        try:
-            del obj.base_table
-        except AttributeError:
-            pass
+        # Clear the cached_property, if it exists.
+        obj.__dict__.pop("base_table", None)
         return obj
 
     def chain(self, klass=None):
