@@ -56,7 +56,7 @@ class Layer(GDALBase):
         "Iterate over each Feature in the Layer."
         # ResetReading() must be called before iteration is to begin.
         capi.reset_reading(self._ptr)
-        for i in range(self.num_feat):
+        while range(self.num_feat):
             yield Feature(capi.get_next_feature(self._ptr), self)
 
     def __len__(self):
