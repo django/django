@@ -27,7 +27,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_sequence_reset = False
     can_introspect_materialized_views = True
     atomic_transactions = False
-    supports_combined_alters = False
     nulls_order_largest = True
     requires_literal_defaults = True
     closed_cursor_error_class = InterfaceError
