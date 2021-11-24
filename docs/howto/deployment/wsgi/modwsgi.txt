@@ -124,7 +124,7 @@ instead install ``mod_wsgi`` using:
 
 .. code-block:: apache
 
-    pip install mod_wsgi-standalone
+    python -m pip install mod_wsgi-standalone
 
 When installing mod_wsgi-standalone, it will also install a version of Apache
 into your Python distribution. You can only use mod_wsgi-express when using
