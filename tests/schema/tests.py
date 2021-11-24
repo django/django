@@ -1045,7 +1045,6 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(Note, old_field, new_field, strict=True)
 
-    @skipUnlessDBFeature('supports_combined_alters')
     def test_alter_null_to_not_null_keeping_default(self):
         """
         #23738 - Can change a nullable field with default to non-nullable
