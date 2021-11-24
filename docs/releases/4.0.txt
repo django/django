@@ -87,7 +87,7 @@ For example::
         last_name = models.CharField(max_length=255)
 
         class Meta:
-            indexes = [
+            constraints = [
                 UniqueConstraint(
                     Lower('first_name'),
                     Lower('last_name').desc(),
