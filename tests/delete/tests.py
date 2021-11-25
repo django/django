@@ -713,9 +713,8 @@ class FastDeleteTests(TestCase):
 
     def test_fast_delete_empty_no_update_can_self_select(self):
         """
-        #25932 - Fast deleting on backends that don't have the
-        `no_update_can_self_select` feature should work even if the specified
-        filter doesn't match any row.
+        Fast deleting when DatabaseFeatures.update_can_self_select = False
+        works even if the specified filter doesn't match any row (#25932).
         """
         with self.assertNumQueries(1):
             self.assertEqual(

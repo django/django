@@ -1,5 +1,5 @@
 from django.db import connection
-from django.db.models import CharField, Max
+from django.db.models import CharField, F, Max
 from django.db.models.functions import Lower
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import register_lookup
@@ -149,3 +149,9 @@ class DistinctOnTests(TestCase):
         """
         staff = Staff.objects.distinct('name').order_by('name', '-organisation').get(name='p1')
         self.assertEqual(staff.organisation, 'o2')
+
+    def test_distinct_on_mixed_case_annotation(self):
+        qs = Staff.objects.annotate(
+            nAmEAlIaS=F('name'),
+        ).distinct('nAmEAlIaS').order_by('nAmEAlIaS')
+        self.assertSequenceEqual(qs, [self.p1_o1, self.p2_o1, self.p3_o1])
