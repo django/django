@@ -1,5 +1,5 @@
-from django.contrib.gis.db import models
 from django.db import migrations
+from django.contrib.gis.db import models
 from django.contrib.gis.geos.polygon import Polygon
 
 
@@ -19,6 +19,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='household',
-            constraint=models.CheckConstraint(check=models.Q(('location__within', Polygon(((1, 1), (1, 1), (1, 1), (1, 1), (1, 1))))), name='location_constraint'),
+            constraint=models.CheckConstraint(
+                check=models.Q(('location__within', Polygon(((1, 1), (1, 1), (1, 1), (1, 1), (1, 1))))),
+                name='location_constraint'),
         ),
     ]
