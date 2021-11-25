@@ -1,6 +1,6 @@
-from django.db import migrations
 from django.contrib.gis.db import models
 from django.contrib.gis.geos.polygon import Polygon
+from django.db import migrations
 
 
 class Migration(migrations.Migration):
