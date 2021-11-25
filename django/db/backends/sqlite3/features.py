@@ -10,10 +10,6 @@ from .base import Database
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    # SQLite can read from a cursor since SQLite 3.6.5, subject to the caveat
-    # that statements within a connection aren't isolated from each other. See
-    # https://sqlite.org/isolation.html.
-    can_use_chunked_reads = True
     test_db_allows_multiple_connections = False
     supports_unspecified_pk = True
     supports_timezones = False
