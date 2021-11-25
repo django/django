@@ -431,7 +431,10 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             if not getattr(self.rhs, 'has_select_fields', True):
                 self.rhs.clear_select_clause()
                 self.rhs.add_fields(['pk'])
-            cols.extend(self.rhs.get_group_by_cols())
+            from django.db.models.sql.query import \
+                Query  # avoid circular import
+            if not isinstance(self.rhs, Query):
+                cols.extend(self.rhs.get_group_by_cols())
         return cols
 
     def get_rhs_op(self, connection, rhs):
