@@ -113,7 +113,7 @@ the Python Package Index ``(PyPi)``, you can instead run:
 
 .. code-block:: apache
 
-    pip install mod_wsgi
+    python -m pip install mod_wsgi
 
 If you wish to use a version of ``Apache`` which is installed into a non
 standard location, you can set and export the APXS environment variable to the
