@@ -19,11 +19,9 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='household',
-            constraint=models.CheckConstraint(
-                check=models.Q(
-                    ('location__within', Polygon(
-                        ((0.0, 0.0), (0.0, 50.0), (50.0, 50.0), (50.0, 0.0), (0.0, 0.0))
-                    ))),
-                name='location_constraint'),
+            constraint=models.CheckConstraint(check=models.Q(('location__within', Polygon(
+                ((96.816941, -43.74051), (96.816941, -9.142176),
+                 (167.998035, -9.142176), (167.998035, -43.74051),
+                 (96.816941, -43.74051))))), name='location_constraint'),
         ),
     ]
