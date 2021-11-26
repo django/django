@@ -1406,6 +1406,7 @@ class MiscTests(SimpleTestCase):
             ('12-345', []),
             ('', []),
             ('en;q=1e0', []),
+            ('en-au;q=１.０', []),
         ]
         for value, expected in tests:
             with self.subTest(value=value):

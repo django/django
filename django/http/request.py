@@ -23,7 +23,7 @@ from django.utils.regex_helper import _lazy_re_compile
 from .multipartparser import parse_header
 
 RAISE_ERROR = object()
-host_validation_re = _lazy_re_compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$")
+host_validation_re = _lazy_re_compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:[0-9]+)?$")
 
 
 class UnreadablePostError(OSError):

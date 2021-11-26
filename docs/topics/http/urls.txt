@@ -246,8 +246,8 @@ following URL patterns which optionally take a page argument::
     from django.urls import re_path
 
     urlpatterns = [
-        re_path(r'^blog/(page-(\d+)/)?$', blog_articles),                  # bad
-        re_path(r'^comments/(?:page-(?P<page_number>\d+)/)?$', comments),  # good
+        re_path(r'^blog/(page-([0-9]+)/)?$', blog_articles),                  # bad
+        re_path(r'^comments/(?:page-(?P<page_number>[0-9]+)/)?$', comments),  # good
     ]
 
 Both patterns use nested arguments and will resolve: for example,

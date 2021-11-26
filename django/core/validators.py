@@ -64,7 +64,10 @@ class URLValidator(RegexValidator):
     ul = '\u00a1-\uffff'  # Unicode letters range (must not be a raw string).
 
     # IP patterns
-    ipv4_re = r'(?:0|25[0-5]|2[0-4]\d|1\d?\d?|[1-9]\d?)(?:\.(?:0|25[0-5]|2[0-4]\d|1\d?\d?|[1-9]\d?)){3}'
+    ipv4_re = (
+        r'(?:0|25[0-5]|2[0-4][0-9]|1[0-9]?[0-9]?|[1-9][0-9]?)'
+        r'(?:\.(?:0|25[0-5]|2[0-4][0-9]|1[0-9]?[0-9]?|[1-9][0-9]?)){3}'
+    )
     ipv6_re = r'\[[0-9a-f:.]+\]'  # (simple regex, validated later)
 
     # Host patterns
@@ -85,7 +88,7 @@ class URLValidator(RegexValidator):
         r'^(?:[a-z0-9.+-]*)://'  # scheme is validated separately
         r'(?:[^\s:@/]+(?::[^\s:@/]*)?@)?'  # user:pass authentication
         r'(?:' + ipv4_re + '|' + ipv6_re + '|' + host_re + ')'
-        r'(?::\d{1,5})?'  # port
+        r'(?::[0-9]{1,5})?'  # port
         r'(?:[/?#][^\s]*)?'  # resource path
         r'\Z', re.IGNORECASE)
     message = _('Enter a valid URL.')
@@ -128,7 +131,7 @@ class URLValidator(RegexValidator):
                 raise
         else:
             # Now verify IPv6 in the netloc part
-            host_match = re.search(r'^\[(.+)\](?::\d{1,5})?$', splitted_url.netloc)
+            host_match = re.search(r'^\[(.+)\](?::[0-9]{1,5})?$', splitted_url.netloc)
             if host_match:
                 potential_ip = host_match[1]
                 try:

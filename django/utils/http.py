@@ -23,12 +23,12 @@ ETAG_MATCH = _lazy_re_compile(r'''
 ''', re.X)
 
 MONTHS = 'jan feb mar apr may jun jul aug sep oct nov dec'.split()
-__D = r'(?P<day>\d{2})'
-__D2 = r'(?P<day>[ \d]\d)'
+__D = r'(?P<day>[0-9]{2})'
+__D2 = r'(?P<day>[ 0-9][0-9])'
 __M = r'(?P<mon>\w{3})'
-__Y = r'(?P<year>\d{4})'
-__Y2 = r'(?P<year>\d{2})'
-__T = r'(?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})'
+__Y = r'(?P<year>[0-9]{4})'
+__Y2 = r'(?P<year>[0-9]{2})'
+__T = r'(?P<hour>[0-9]{2}):(?P<min>[0-9]{2}):(?P<sec>[0-9]{2})'
 RFC1123_DATE = _lazy_re_compile(r'^\w{3}, %s %s %s %s GMT$' % (__D, __M, __Y, __T))
 RFC850_DATE = _lazy_re_compile(r'^\w{6,9}, %s-%s-%s %s GMT$' % (__D, __M, __Y2, __T))
 ASCTIME_DATE = _lazy_re_compile(r'^\w{3} %s %s %s %s$' % (__M, __D2, __T, __Y))

@@ -38,7 +38,7 @@ __all__ = (
 
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
-CONTENT_TYPE_RE = _lazy_re_compile(r'.*; charset=([\w\d-]+);?')
+CONTENT_TYPE_RE = _lazy_re_compile(r'.*; charset=([\w-]+);?')
 # Structured suffix spec: https://tools.ietf.org/html/rfc6838#section-4.2.8
 JSON_CONTENT_TYPE_RE = _lazy_re_compile(r'^application\/(.+\+)?json')
 
