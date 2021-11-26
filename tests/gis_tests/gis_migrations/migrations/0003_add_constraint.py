@@ -20,7 +20,10 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name='household',
             constraint=models.CheckConstraint(
-                check=models.Q(('location__within', Polygon(((1, 1), (1, 1), (1, 1), (1, 1), (1, 1))))),
+                check=models.Q(
+                    ('location__within', Polygon(
+                        ((0.0, 0.0), (0.0, 50.0), (50.0, 50.0), (50.0, 0.0), (0.0, 0.0))
+                    ))),
                 name='location_constraint'),
         ),
     ]
