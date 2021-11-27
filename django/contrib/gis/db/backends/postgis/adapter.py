@@ -60,10 +60,10 @@ class PostGISAdapter:
         """
         if self.is_geometry:
             # Psycopg will figure out whether to use E'\\000' or '\000'.
-            return '%s(%s)' % (
-                'ST_GeogFromWKB' if self.geography else 'ST_GeomFromEWKB',
-                self._adapter.getquoted().decode()
+            return b'%s(%s)' % (
+                b'ST_GeogFromWKB' if self.geography else b'ST_GeomFromEWKB',
+                self._adapter.getquoted()
             )
         else:
             # For rasters, add explicit type cast to WKB string.
-            return "'%s'::raster" % self.ewkb
+            return b"'%s'::raster" % self.ewkb.encode()
