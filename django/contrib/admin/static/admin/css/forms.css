@@ -350,10 +350,6 @@ body.popup .submit-row {
     width: 2.2em;
 }
 
-.vTextField, .vUUIDField {
-    width: 20em;
-}
-
 .vIntegerField {
     width: 5em;
 }
@@ -364,6 +360,10 @@ body.popup .submit-row {
 
 .vForeignKeyRawIdAdminField {
     width: 5em;
+}
+
+.vTextField, .vUUIDField {
+    width: 20em;
 }
 
 /* INLINES */
