@@ -2,9 +2,10 @@
 Django 3.2.10 release notes
 ===========================
 
-*Expected December 1, 2021*
+*December 7, 2021*
 
-Django 3.2.10 fixes several bugs in 3.2.9.
+Django 3.2.10 fixes a security issue with severity "low" and several bugs in
+3.2.9.
 
 Bugfixes
 ========

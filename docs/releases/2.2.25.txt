@@ -1,0 +1,9 @@
+===========================
+Django 2.2.25 release notes
+===========================
+
+*December 7, 2021*
+
+Django 2.2.25 fixes a security issue with severity "low" in 2.2.24.
+
+...

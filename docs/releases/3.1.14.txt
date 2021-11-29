@@ -1,0 +1,9 @@
+===========================
+Django 3.1.14 release notes
+===========================
+
+*December 7, 2021*
+
+Django 3.1.14 fixes a security issue with severity "low" in 3.1.13.
+
+...
