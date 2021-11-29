@@ -275,9 +275,9 @@ class SessionBase:
         ``get_expiry_date()`` or ``get_expiry_age()`` to find the actual expiry
         date/age, if there is one.
         """
-        if self.get('_session_expiry') is None:
+        if (expiry := self.get('_session_expiry')) is None:
             return settings.SESSION_EXPIRE_AT_BROWSER_CLOSE
-        return self.get('_session_expiry') == 0
+        return expiry == 0
 
     def flush(self):
         """
