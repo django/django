@@ -258,10 +258,8 @@ You can edit it multiple times.
         ``request.session.set_expiry(300)`` would make the session expire
         in 5 minutes.
 
-      * If ``value`` is a ``datetime`` or ``timedelta`` object, the
-        session will expire at that specific date/time. Note that ``datetime``
-        and ``timedelta`` values are only serializable if you are using the
-        :class:`~django.contrib.sessions.serializers.PickleSerializer`.
+      * If ``value`` is a ``datetime`` or ``timedelta`` object, the session
+        will expire at that specific date/time.
 
       * If ``value`` is ``0``, the user's session cookie will expire
         when the user's web browser is closed.

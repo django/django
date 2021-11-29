@@ -210,8 +210,10 @@ class SessionBase:
 
         if not expiry:   # Checks both None and 0 cases
             return self.get_session_cookie_age()
-        if not isinstance(expiry, datetime):
+        if not isinstance(expiry, (datetime, str)):
             return expiry
+        if isinstance(expiry, str):
+            expiry = datetime.fromisoformat(expiry)
         delta = expiry - modification
         return delta.days * 86400 + delta.seconds
 
@@ -233,6 +235,8 @@ class SessionBase:
 
         if isinstance(expiry, datetime):
             return expiry
+        elif isinstance(expiry, str):
+            return datetime.fromisoformat(expiry)
         expiry = expiry or self.get_session_cookie_age()
         return modification + timedelta(seconds=expiry)
 
@@ -260,6 +264,8 @@ class SessionBase:
             return
         if isinstance(value, timedelta):
             value = timezone.now() + value
+        if isinstance(value, datetime):
+            value = value.isoformat()
         self['_session_expiry'] = value
 
     def get_expire_at_browser_close(self):
