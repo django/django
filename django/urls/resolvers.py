@@ -154,7 +154,11 @@ class RegexPattern(CheckURLMixin):
         self.converters = {}
 
     def match(self, path):
-        match = self.regex.search(path)
+        match = (
+            self.regex.fullmatch(path)
+            if self._is_endpoint and self.regex.pattern.endswith('$')
+            else self.regex.search(path)
+        )
         if match:
             # If there are any named groups, use those as kwargs, ignoring
             # non-named groups. Otherwise, pass all non-named arguments as
@@ -244,7 +248,7 @@ def _route_to_regex(route, is_endpoint=False):
         converters[parameter] = converter
         parts.append('(?P<' + parameter + '>' + converter.regex + ')')
     if is_endpoint:
-        parts.append('$')
+        parts.append(r'\Z')
     return ''.join(parts), converters
 
 
