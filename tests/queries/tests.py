@@ -15,7 +15,7 @@ from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
 from .models import (
-    FK1, Annotation, Article, Author, BaseA, Book, CategoryItem,
+    FK1, Annotation, Article, Author, BaseA, BaseUser, Book, CategoryItem,
     CategoryRelationship, Celebrity, Channel, Chapter, Child, ChildObjectA,
     Classroom, CommonMixedCaseForeignKeys, Company, Cover, CustomPk,
     CustomPkTag, DateTimePK, Detail, DumbCategory, Eaten, Employment,
@@ -2094,6 +2094,15 @@ class QuerySetBitwiseOperationTests(TestCase):
         cls.room_2 = Classroom.objects.create(school=cls.school, has_blackboard=True, name='Room 2')
         cls.room_3 = Classroom.objects.create(school=cls.school, has_blackboard=True, name='Room 3')
         cls.room_4 = Classroom.objects.create(school=cls.school, has_blackboard=False, name='Room 4')
+        tag = Tag.objects.create()
+        cls.annotation_1 = Annotation.objects.create(tag=tag)
+        annotation_2 = Annotation.objects.create(tag=tag)
+        note = cls.annotation_1.notes.create(tag=tag)
+        cls.base_user_1 = BaseUser.objects.create(annotation=cls.annotation_1)
+        cls.base_user_2 = BaseUser.objects.create(annotation=annotation_2)
+        cls.task = Task.objects.create(
+            owner=cls.base_user_2, creator=cls.base_user_2, note=note,
+        )
 
     @skipUnlessDBFeature('allow_sliced_subqueries_with_in')
     def test_or_with_rhs_slice(self):
@@ -2129,6 +2138,17 @@ class QuerySetBitwiseOperationTests(TestCase):
         self.assertSequenceEqual(combined, [self.school])
         nested_combined = School.objects.filter(pk__in=combined.values('pk'))
         self.assertSequenceEqual(nested_combined, [self.school])
+
+    def test_conflicting_aliases_during_combine(self):
+        qs1 = self.annotation_1.baseuser_set.all()
+        qs2 = BaseUser.objects.filter(
+            Q(owner__note__in=self.annotation_1.notes.all()) |
+            Q(creator__note__in=self.annotation_1.notes.all())
+        )
+        self.assertSequenceEqual(qs1, [self.base_user_1])
+        self.assertSequenceEqual(qs2, [self.base_user_2])
+        self.assertCountEqual(qs2 | qs1, qs1 | qs2)
+        self.assertCountEqual(qs2 | qs1, [self.base_user_1, self.base_user_2])
 
 
 class CloneTests(TestCase):
