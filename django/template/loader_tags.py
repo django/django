@@ -235,10 +235,6 @@ def construct_relative_path(current_template_name, relative_name):
     Convert a relative path (starting with './' or '../') to the full template
     name based on the current_template_name.
     """
-    has_quotes = (
-        (relative_name.startswith('"') and relative_name.endswith('"')) or
-        (relative_name.startswith("'") and relative_name.endswith("'"))
-    )
     new_name = relative_name.strip('\'"')
     if not new_name.startswith(('./', '../')):
         # relative_name is a variable or a literal that doesn't contain a
@@ -262,6 +258,10 @@ def construct_relative_path(current_template_name, relative_name):
             "same template in which the tag appears."
             % (relative_name, current_template_name)
         )
+    has_quotes = (
+        relative_name.startswith(('"', "'")) and
+        relative_name[0] == relative_name[-1]
+    )
     return f'"{new_name}"' if has_quotes else new_name
 
 
