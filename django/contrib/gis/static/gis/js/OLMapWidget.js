@@ -107,6 +107,13 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
         if (initial_value && !this.options.is_collection) {
             this.disableDrawing();
         }
+        const clearNode = document.getElementById(this.map.getTarget()).nextElementSibling;
+        if (clearNode.classList.contains('clear_features')) {
+            clearNode.querySelector('a').addEventListener('click', (ev) => {
+                ev.preventDefault();
+                self.clearFeatures();
+            });
+        }
         this.ready = true;
     }
 
