@@ -1209,9 +1209,14 @@ class SQLCompiler:
             cursor = self.connection.cursor()
         try:
             cursor.execute(sql, params)
-        except Exception:
-            # Might fail for server-side cursors (e.g. connection closed)
-            cursor.close()
+        except Exception as exc:
+            errors_occurred = self.connection.errors_occurred
+            try:
+                # Might fail for server-side cursors (e.g. connection closed)
+                cursor.close()
+            except self.connection.Database.Error as close_exc:
+                if not errors_occurred:
+                    raise close_exc from exc
             raise
 
         if result_type == CURSOR:
