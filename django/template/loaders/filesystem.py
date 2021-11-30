@@ -20,8 +20,15 @@ class Loader(BaseLoader):
 
     def get_contents(self, origin):
         try:
-            with open(origin.name, encoding=self.engine.file_charset) as fp:
-                return fp.read()
+            # Read and decode file contents with fewer system calls than plain fp.read().
+            contents = bytearray()
+            with open(origin.name, 'rb', buffering=0) as fp:
+                while data := fp.read(65536):
+                    contents += data
+            contents = contents.decode(self.engine.file_charset)
+            if '\r' in contents:
+                contents = contents.replace('\r\n', '\n').replace('\r', '\n')
+            return contents
         except FileNotFoundError:
             raise TemplateDoesNotExist(origin)
 
