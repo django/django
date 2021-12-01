@@ -1280,10 +1280,17 @@ class AggregateTestCase(TestCase):
         ).values(
             'publisher'
         ).annotate(count=Count('pk')).values('count')
-        long_books_count_breakdown = Publisher.objects.values_list(
-            Subquery(long_books_count_qs, IntegerField()),
-        ).annotate(total=Count('*'))
-        self.assertEqual(dict(long_books_count_breakdown), {None: 1, 1: 4})
+        groups = [
+            Subquery(long_books_count_qs),
+            long_books_count_qs,
+            long_books_count_qs.query,
+        ]
+        for group in groups:
+            with self.subTest(group=group.__class__.__name__):
+                long_books_count_breakdown = Publisher.objects.values_list(
+                    group,
+                ).annotate(total=Count('*'))
+                self.assertEqual(dict(long_books_count_breakdown), {None: 1, 1: 4})
 
     @skipUnlessDBFeature('supports_subqueries_in_group_by')
     def test_group_by_exists_annotation(self):
@@ -1340,6 +1347,25 @@ class AggregateTestCase(TestCase):
             authors_count=Count('authors'),
         ).values_list('publisher_count', flat=True)
         self.assertSequenceEqual(books_breakdown, [1] * 6)
+
+    def test_filter_in_subquery_or_aggregation(self):
+        """
+        Filtering against an aggregate requires the usage of the HAVING clause.
+
+        If such a filter is unionized to a non-aggregate one the latter will
+        also need to be moved to the HAVING clause and have its grouping
+        columns used in the GROUP BY.
+
+        When this is done with a subquery the specialized logic in charge of
+        using outer reference columns to group should be used instead of the
+        subquery itself as the latter might return multiple rows.
+        """
+        authors = Author.objects.annotate(
+            Count('book'),
+        ).filter(
+            Q(book__count__gt=0) | Q(pk__in=Book.objects.values('authors'))
+        )
+        self.assertQuerysetEqual(authors, Author.objects.all(), ordered=False)
 
     def test_aggregation_random_ordering(self):
         """Random() is not included in the GROUP BY when used for ordering."""

@@ -1181,12 +1181,13 @@ class Subquery(BaseExpression, Combinable):
         return sql, sql_params
 
     def get_group_by_cols(self, alias=None):
+        # If this expression is referenced by an alias for an explicit GROUP BY
+        # through values() a reference to this expression and not the
+        # underlying .query must be returned to ensure external column
+        # references are not grouped against as well.
         if alias:
             return [Ref(alias, self)]
-        external_cols = self.get_external_cols()
-        if any(col.possibly_multivalued for col in external_cols):
-            return [self]
-        return external_cols
+        return self.query.get_group_by_cols()
 
 
 class Exists(Subquery):
