@@ -1,4 +1,5 @@
 from datetime import datetime
+from unittest import mock
 
 from django.core.exceptions import FieldError
 from django.db.models import BooleanField, CharField, F, Q
@@ -6,12 +7,29 @@ from django.db.models.expressions import Col, Func
 from django.db.models.fields.related_lookups import RelatedIsNull
 from django.db.models.functions import Lower
 from django.db.models.lookups import Exact, GreaterThan, IsNull, LessThan
+from django.db.models.query import QuerySet
 from django.db.models.sql.query import JoinPromoter, Query
 from django.db.models.sql.where import OR
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 from django.test.utils import register_lookup
 
 from .models import Author, Item, ObjectC, Ranking
+
+
+OTHER_DATABASE_ALIAS = 'other'
+
+
+class OtherRouter:
+    def db_for_read(self, model, **hints):
+        return OTHER_DATABASE_ALIAS
+
+
+class TestQuerySet(SimpleTestCase):
+    @override_settings(DATABASE_ROUTERS=[OtherRouter()])
+    def test_create_query_set(self):
+        query_set = QuerySet(Item)
+
+        self.assertEqual(query_set.query.using, OTHER_DATABASE_ALIAS)
 
 
 class TestQuery(SimpleTestCase):
@@ -150,6 +168,18 @@ class TestQuery(SimpleTestCase):
         msg = 'Cannot filter against a non-conditional expression.'
         with self.assertRaisesMessage(TypeError, msg):
             query.build_where(Func(output_field=CharField()))
+
+    @mock.patch('django.db.models.sql.query.connections')
+    def test_sql_with_params_using_non_default_db(self, connections):
+        query = Query(Item, using=OTHER_DATABASE_ALIAS)
+
+        query.sql_with_params()
+
+        # We cannot update DATABASES in settings.py for a single test to remove
+        # the default DB to test that the method call works. We can fall back to
+        # checking that the correct connection is looked up and assume that it's
+        # used.
+        connections.__getitem__.assert_called_once_with(OTHER_DATABASE_ALIAS)
 
 
 class JoinPromoterTest(SimpleTestCase):

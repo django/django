@@ -148,8 +148,9 @@ class Query(BaseExpression):
 
     compiler = 'SQLCompiler'
 
-    def __init__(self, model, alias_cols=True):
+    def __init__(self, model, alias_cols=True, using=None):
         self.model = model
+        self.using = using or DEFAULT_DB_ALIAS
         self.alias_refcount = {}
         # alias_map is the most important data structure regarding joins.
         # It's used for recording which joins exist in the query and what
@@ -266,7 +267,7 @@ class Query(BaseExpression):
         Return the query as an SQL string and the parameters that will be
         substituted into the query.
         """
-        return self.get_compiler(DEFAULT_DB_ALIAS).as_sql()
+        return self.get_compiler(self.using).as_sql()
 
     def __deepcopy__(self, memo):
         """Limit the amount of work when a Query is deepcopied."""
@@ -1183,13 +1184,11 @@ class Query(BaseExpression):
             return lhs.get_lookup('isnull')(lhs, True)
 
         # For Oracle '' is equivalent to null. The check must be done at this
-        # stage because join promotion can't be done in the compiler. Using
-        # DEFAULT_DB_ALIAS isn't nice but it's the best that can be done here.
-        # A similar thing is done in is_nullable(), too.
+        # stage because join promotion can't be done in the compiler.
         if (
             lookup_name == 'exact' and
             lookup.rhs == '' and
-            connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls
+            connections[self.using].features.interprets_empty_strings_as_nulls
         ):
             return lhs.get_lookup('isnull')(lhs, True)
 
@@ -2328,14 +2327,9 @@ class Query(BaseExpression):
         nullable for those backends. In such situations field.null can be
         False even if we should treat the field as nullable.
         """
-        # We need to use DEFAULT_DB_ALIAS here, as QuerySet does not have
-        # (nor should it have) knowledge of which connection is going to be
-        # used. The proper fix would be to defer all decisions where
-        # is_nullable() is needed to the compiler stage, but that is not easy
-        # to do currently.
         return field.null or (
             field.empty_strings_allowed and
-            connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls
+            connections[self.using].features.interprets_empty_strings_as_nulls
         )
 
 
