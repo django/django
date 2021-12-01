@@ -302,8 +302,8 @@ class PostgresOperatorLookup(FieldGetDbPrepValueMixin, Lookup):
 class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name = 'exact'
 
-    def process_rhs(self, compiler, connection):
-        from django.db.models.sql.query import Query
+    def get_prep_lookup(self):
+        from django.db.models.sql.query import Query  # avoid circular import
         if isinstance(self.rhs, Query):
             if self.rhs.has_limit_one():
                 if not self.rhs.has_select_fields:
@@ -314,7 +314,7 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
                     'The QuerySet value for an exact lookup must be limited to '
                     'one result using slicing.'
                 )
-        return super().process_rhs(compiler, connection)
+        return super().get_prep_lookup()
 
     def as_sql(self, compiler, connection):
         # Avoid comparison against direct rhs if lhs is a boolean value. That
@@ -388,6 +388,15 @@ class IntegerLessThan(IntegerFieldFloatRounding, LessThan):
 class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     lookup_name = 'in'
 
+    def get_prep_lookup(self):
+        from django.db.models.sql.query import Query  # avoid circular import
+        if isinstance(self.rhs, Query):
+            self.rhs.clear_ordering(clear_default=True)
+            if not self.rhs.has_select_fields:
+                self.rhs.clear_select_clause()
+                self.rhs.add_fields(['pk'])
+        return super().get_prep_lookup()
+
     def process_rhs(self, compiler, connection):
         db_rhs = getattr(self.rhs, '_db', None)
         if db_rhs is not None and db_rhs != connection.alias:
@@ -412,27 +421,7 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             sqls, sqls_params = self.batch_process_rhs(compiler, connection, rhs)
             placeholder = '(' + ', '.join(sqls) + ')'
             return (placeholder, sqls_params)
-        else:
-            from django.db.models.sql.query import (  # avoid circular import
-                Query,
-            )
-            if isinstance(self.rhs, Query):
-                query = self.rhs
-                query.clear_ordering(clear_default=True)
-                if not query.has_select_fields:
-                    query.clear_select_clause()
-                    query.add_fields(['pk'])
-
-            return super().process_rhs(compiler, connection)
-
-    def get_group_by_cols(self, alias=None):
-        cols = self.lhs.get_group_by_cols()
-        if hasattr(self.rhs, 'get_group_by_cols'):
-            if not getattr(self.rhs, 'has_select_fields', True):
-                self.rhs.clear_select_clause()
-                self.rhs.add_fields(['pk'])
-            cols.extend(self.rhs.get_group_by_cols())
-        return cols
+        return super().process_rhs(compiler, connection)
 
     def get_rhs_op(self, connection, rhs):
         return 'IN %s' % rhs
