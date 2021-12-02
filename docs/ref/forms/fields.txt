@@ -418,39 +418,6 @@ For each field, we describe the default widget used if you don't specify
         time the field's form is initialized, in addition to during rendering.
         Defaults to an empty list.
 
-``TypedChoiceField``
---------------------
-
-.. class:: TypedChoiceField(**kwargs)
-
-    Just like a :class:`ChoiceField`, except :class:`TypedChoiceField` takes two
-    extra arguments, :attr:`coerce` and :attr:`empty_value`.
-
-    * Default widget: :class:`Select`
-    * Empty value: Whatever you've given as :attr:`empty_value`.
-    * Normalizes to: A value of the type provided by the :attr:`coerce`
-      argument.
-    * Validates that the given value exists in the list of choices and can be
-      coerced.
-    * Error message keys: ``required``, ``invalid_choice``
-
-    Takes extra arguments:
-
-    .. attribute:: coerce
-
-        A function that takes one argument and returns a coerced value. Examples
-        include the built-in ``int``, ``float``, ``bool`` and other types. Defaults
-        to an identity function. Note that coercion happens after input
-        validation, so it is possible to coerce to a value not present in
-        ``choices``.
-
-    .. attribute:: empty_value
-
-        The value to use to represent "empty." Defaults to the empty string;
-        ``None`` is another common choice here. Note that this value will not be
-        coerced by the function given in the ``coerce`` argument, so choose it
-        accordingly.
-
 ``DateField``
 -------------
 
@@ -677,6 +644,40 @@ For each field, we describe the default widget used if you don't specify
     Takes two optional arguments for validation, ``max_value`` and ``min_value``.
     These control the range of values permitted in the field.
 
+``GenericIPAddressField``
+-------------------------
+
+.. class:: GenericIPAddressField(**kwargs)
+
+    A field containing either an IPv4 or an IPv6 address.
+
+    * Default widget: :class:`TextInput`
+    * Empty value: ``''`` (an empty string)
+    * Normalizes to: A string. IPv6 addresses are normalized as described below.
+    * Validates that the given value is a valid IP address.
+    * Error message keys: ``required``, ``invalid``
+
+    The IPv6 address normalization follows :rfc:`4291#section-2.2` section 2.2,
+    including using the IPv4 format suggested in paragraph 3 of that section, like
+    ``::ffff:192.0.2.0``. For example, ``2001:0::0:01`` would be normalized to
+    ``2001::1``, and ``::ffff:0a0a:0a0a`` to ``::ffff:10.10.10.10``. All characters
+    are converted to lowercase.
+
+    Takes two optional arguments:
+
+    .. attribute:: protocol
+
+        Limits valid inputs to the specified protocol.
+        Accepted values are ``both`` (default), ``IPv4``
+        or ``IPv6``. Matching is case insensitive.
+
+    .. attribute:: unpack_ipv4
+
+        Unpacks IPv4 mapped addresses like ``::ffff:192.0.2.1``.
+        If this option is enabled that address would be unpacked to
+        ``192.0.2.1``. Default is disabled. Can only be used
+        when ``protocol`` is set to ``'both'``.
+
 ``ImageField``
 --------------
 
@@ -821,40 +822,6 @@ For each field, we describe the default widget used if you don't specify
         it is a useful way to format data from a client-side widget for
         submission to the server.
 
-``GenericIPAddressField``
--------------------------
-
-.. class:: GenericIPAddressField(**kwargs)
-
-    A field containing either an IPv4 or an IPv6 address.
-
-    * Default widget: :class:`TextInput`
-    * Empty value: ``''`` (an empty string)
-    * Normalizes to: A string. IPv6 addresses are normalized as described below.
-    * Validates that the given value is a valid IP address.
-    * Error message keys: ``required``, ``invalid``
-
-    The IPv6 address normalization follows :rfc:`4291#section-2.2` section 2.2,
-    including using the IPv4 format suggested in paragraph 3 of that section, like
-    ``::ffff:192.0.2.0``. For example, ``2001:0::0:01`` would be normalized to
-    ``2001::1``, and ``::ffff:0a0a:0a0a`` to ``::ffff:10.10.10.10``. All characters
-    are converted to lowercase.
-
-    Takes two optional arguments:
-
-    .. attribute:: protocol
-
-        Limits valid inputs to the specified protocol.
-        Accepted values are ``both`` (default), ``IPv4``
-        or ``IPv6``. Matching is case insensitive.
-
-    .. attribute:: unpack_ipv4
-
-        Unpacks IPv4 mapped addresses like ``::ffff:192.0.2.1``.
-        If this option is enabled that address would be unpacked to
-        ``192.0.2.1``. Default is disabled. Can only be used
-        when ``protocol`` is set to ``'both'``.
-
 ``MultipleChoiceField``
 -----------------------
 
@@ -871,28 +838,6 @@ For each field, we describe the default widget used if you don't specify
     replaced with the selected choice.
 
     Takes one extra required argument, ``choices``, as for :class:`ChoiceField`.
-
-``TypedMultipleChoiceField``
-----------------------------
-
-.. class:: TypedMultipleChoiceField(**kwargs)
-
-    Just like a :class:`MultipleChoiceField`, except :class:`TypedMultipleChoiceField`
-    takes two extra arguments, ``coerce`` and ``empty_value``.
-
-    * Default widget: :class:`SelectMultiple`
-    * Empty value: Whatever you've given as ``empty_value``
-    * Normalizes to: A list of values of the type provided by the ``coerce``
-      argument.
-    * Validates that the given values exists in the list of choices and can be
-      coerced.
-    * Error message keys: ``required``, ``invalid_choice``
-
-    The ``invalid_choice`` error message may contain ``%(value)s``, which will be
-    replaced with the selected choice.
-
-    Takes two extra arguments, ``coerce`` and ``empty_value``, as for
-    :class:`TypedChoiceField`.
 
 ``NullBooleanField``
 --------------------
@@ -996,6 +941,61 @@ For each field, we describe the default widget used if you don't specify
     ``False``, or from the active locale format ``TIME_INPUT_FORMATS`` key if
     localization is enabled. See also :doc:`format localization
     </topics/i18n/formatting>`.
+
+``TypedChoiceField``
+--------------------
+
+.. class:: TypedChoiceField(**kwargs)
+
+    Just like a :class:`ChoiceField`, except :class:`TypedChoiceField` takes two
+    extra arguments, :attr:`coerce` and :attr:`empty_value`.
+
+    * Default widget: :class:`Select`
+    * Empty value: Whatever you've given as :attr:`empty_value`.
+    * Normalizes to: A value of the type provided by the :attr:`coerce`
+      argument.
+    * Validates that the given value exists in the list of choices and can be
+      coerced.
+    * Error message keys: ``required``, ``invalid_choice``
+
+    Takes extra arguments:
+
+    .. attribute:: coerce
+
+        A function that takes one argument and returns a coerced value. Examples
+        include the built-in ``int``, ``float``, ``bool`` and other types. Defaults
+        to an identity function. Note that coercion happens after input
+        validation, so it is possible to coerce to a value not present in
+        ``choices``.
+
+    .. attribute:: empty_value
+
+        The value to use to represent "empty." Defaults to the empty string;
+        ``None`` is another common choice here. Note that this value will not be
+        coerced by the function given in the ``coerce`` argument, so choose it
+        accordingly.
+
+``TypedMultipleChoiceField``
+----------------------------
+
+.. class:: TypedMultipleChoiceField(**kwargs)
+
+    Just like a :class:`MultipleChoiceField`, except :class:`TypedMultipleChoiceField`
+    takes two extra arguments, ``coerce`` and ``empty_value``.
+
+    * Default widget: :class:`SelectMultiple`
+    * Empty value: Whatever you've given as ``empty_value``
+    * Normalizes to: A list of values of the type provided by the ``coerce``
+      argument.
+    * Validates that the given values exists in the list of choices and can be
+      coerced.
+    * Error message keys: ``required``, ``invalid_choice``
+
+    The ``invalid_choice`` error message may contain ``%(value)s``, which will be
+    replaced with the selected choice.
+
+    Takes two extra arguments, ``coerce`` and ``empty_value``, as for
+    :class:`TypedChoiceField`.
 
 ``URLField``
 ------------
