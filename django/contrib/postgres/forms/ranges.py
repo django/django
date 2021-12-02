@@ -105,5 +105,7 @@ class RangeWidget(MultiWidget):
 
     def decompress(self, value):
         if value:
+            if isinstance(value, tuple):
+                return value
             return (value.lower, value.upper)
         return (None, None)
