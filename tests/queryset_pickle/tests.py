@@ -16,6 +16,10 @@ class PickleabilityTestCase(TestCase):
     def assert_pickles(self, qs):
         self.assertEqual(list(pickle.loads(pickle.dumps(qs))), list(qs))
 
+    def test_binaryfield(self):
+        Happening.objects.create(data=b'binary data')
+        self.assert_pickles(Happening.objects.all())
+
     def test_related_field(self):
         g = Group.objects.create(name="Ponies Who Own Maybachs")
         self.assert_pickles(Event.objects.filter(group=g.id))
