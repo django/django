@@ -8,6 +8,7 @@ class Car(models.Model):
 class Person(models.Model):
     name = models.CharField(max_length=100)
     cars = models.ManyToManyField(Car, through='PossessedCar')
+    data = models.BinaryField(null=True)
 
 
 class PossessedCar(models.Model):
