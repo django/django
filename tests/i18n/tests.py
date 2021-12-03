@@ -1594,21 +1594,32 @@ class MiscTests(SimpleTestCase):
         LANGUAGES=[
             ('en', 'English'),
             ('de', 'German'),
+            ('de-1996', 'German, orthography of 1996'),
             ('de-at', 'Austrian German'),
+            ('i-mingo', 'Mingo'),
+            ('kl-tunumiit', 'Tunumiisiut'),
             ('pl', 'Polish'),
         ],
     )
     def test_get_language_from_path_real(self):
         g = trans_real.get_language_from_path
-        self.assertEqual(g('/pl/'), 'pl')
-        self.assertEqual(g('/pl'), 'pl')
-        self.assertIsNone(g('/xyz/'))
-        self.assertEqual(g('/en/'), 'en')
-        self.assertEqual(g('/en-gb/'), 'en')
-        self.assertEqual(g('/de/'), 'de')
-        self.assertEqual(g('/de-at/'), 'de-at')
-        self.assertEqual(g('/de-ch/'), 'de')
-        self.assertIsNone(g('/de-simple-page/'))
+        tests = [
+            ('/pl/', 'pl'),
+            ('/pl', 'pl'),
+            ('/xyz/', None),
+            ('/en/', 'en'),
+            ('/en-gb/', 'en'),
+            ('/de/', 'de'),
+            ('/de-1996/', 'de-1996'),
+            ('/de-at/', 'de-at'),
+            ('/de-ch/', 'de'),
+            ('/de-simple-page/', None),
+            ('/i-mingo/', 'i-mingo'),
+            ('/kl-tunumiit/', 'kl-tunumiit'),
+        ]
+        for path, language in tests:
+            with self.subTest(path=path):
+                self.assertEqual(g(path), language)
 
     def test_get_language_from_path_null(self):
         g = trans_null.get_language_from_path
