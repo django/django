@@ -89,6 +89,39 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
         return context
 
 
+class AdminTZAwareDateTime(AdminSplitDateTime):
+    """
+    A Timezone aware SplitDateTime Widget.
+    """
+    template_name = 'admin/widgets/split_tz_datetime.html'
+
+    def __init__(self, attrs=None):
+        server_date_time_widgets = [
+            AdminDateWidget(attrs={'type': 'hidden'}),
+            AdminTimeWidget(attrs={'type': 'hidden'})
+        ]
+        local_date_time_widgets = [
+            AdminDateWidget(attrs={'timezone-aware': 'yes'}),
+            AdminTimeWidget(attrs={'timezone-aware': 'yes'})
+        ]
+        widgets = server_date_time_widgets + local_date_time_widgets
+        forms.MultiWidget.__init__(self, widgets, attrs)
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        server_date_id = context['widget']['subwidgets'][0]['attrs']['id']
+        server_time_id = context['widget']['subwidgets'][1]['attrs']['id']
+        # Local Date Widget
+        context['widget']['subwidgets'][2]['attrs']['server-date-id'] = server_date_id
+        # Local Time Widget
+        context['widget']['subwidgets'][3]['attrs']['server-time-id'] = server_time_id
+        return context
+
+    def value_from_datadict(self, data, files, name):
+        # Return just value from server date time widgets
+        return super().value_from_datadict(data, files, name)[:2]
+
+
 class AdminRadioSelect(forms.RadioSelect):
     template_name = 'admin/widgets/radio.html'
 

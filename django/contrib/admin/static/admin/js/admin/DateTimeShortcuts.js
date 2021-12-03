@@ -37,18 +37,38 @@
             for (const inp of document.getElementsByTagName('input')) {
                 if (inp.type === 'text' && inp.classList.contains('vTimeField')) {
                     DateTimeShortcuts.addClock(inp);
-                    DateTimeShortcuts.addTimezoneWarning(inp);
+                    // If widget is timezone aware then convert server time to local and set it,
+                    // else show timezone warning.
+                    if(inp.getAttribute('timezone-aware') === 'yes') {
+                        const server_time_inp = document.getElementById(inp.getAttribute('server-time-id'));
+                        inp.value = DateTimeShortcuts.convert_time(server_time_inp, true);
+                        inp.addEventListener('input', function() {
+                            document.getElementById(this.getAttribute('server-time-id')).value = DateTimeShortcuts.convert_time(this, false);
+                        });
+                    } else {
+                        DateTimeShortcuts.addTimezoneWarning(inp);
+                    }
                 }
                 else if (inp.type === 'text' && inp.classList.contains('vDateField')) {
                     DateTimeShortcuts.addCalendar(inp);
-                    DateTimeShortcuts.addTimezoneWarning(inp);
+                    // If widget is timezone aware then convert server date to local and set it,
+                    // else show timezone warning.
+                    if(inp.getAttribute('timezone-aware') === 'yes') {
+                        const server_date_inp = document.getElementById(inp.getAttribute('server-date-id'));
+                        inp.value = DateTimeShortcuts.convert_date(server_date_inp, true);
+                        inp.addEventListener('input', function() {
+                            document.getElementById(this.getAttribute('server-date-id')).value = DateTimeShortcuts.convert_date(this, false);
+                        });
+                    } else {
+                        DateTimeShortcuts.addTimezoneWarning(inp);
+                    }
                 }
             }
         },
-        // Return the current time while accounting for the server timezone.
-        now: function() {
+        // Return the current time, if widget is not timezone aware then account for server's timezone.
+        now: function(inp) {
             const serverOffset = document.body.dataset.adminUtcOffset;
-            if (serverOffset) {
+            if (inp.getAttribute('timezone-aware') !== 'yes' && serverOffset) {
                 const localNow = new Date();
                 const localOffset = localNow.getTimezoneOffset() * -60;
                 localNow.setTime(localNow.getTime() + 1000 * (serverOffset - localOffset));
@@ -56,6 +76,32 @@
             } else {
                 return new Date();
             }
+        },
+        // Converts time from server timezone to local timezone if server_to_local is True.
+        // Converts time from local timezone to server timezone if server_to_local is False.
+        convert_time: function(inp, server_to_local = true) {
+            if (!inp.value) {
+                return '';
+            }
+            const timezoneOffset = DateTimeShortcuts.timezoneOffset * (server_to_local ? 1 : -1);
+            const from_time = inp.value;
+            const to_time = new Date();
+            const [hours, minutes, seconds] = from_time.split(':');
+            to_time.setHours(hours, minutes, seconds);
+            to_time.setTime(to_time.getTime() + timezoneOffset * 1000);
+            return to_time.strftime(get_format('TIME_INPUT_FORMATS')[0]);
+        },
+        // Converts date from server timezone to local timezone if server_to_local is True.
+        // Converts date from local timezone to server timezone if server_to_local is False.
+        convert_date: function(inp, server_to_local = true) {
+            if(!inp.value) {
+                return '';
+            }
+            const timezoneOffset = DateTimeShortcuts.timezoneOffset * (server_to_local ? 1 : -1);
+            const from_date = inp.value;
+            const to_date = new Date(from_date);
+            to_date.setTime(to_date.getTime() + timezoneOffset * 1000);
+            return to_date.strftime(get_format('DATE_INPUT_FORMATS')[0]);
         },
         // Add a warning when the time zone in the browser and backend do not match.
         addTimezoneWarning: function(inp) {
@@ -213,14 +259,16 @@
         },
         handleClockQuicklink: function(num, val) {
             let d;
+            const inputEvent = new Event('input', { bubbles: true, cancelable: true});
             if (val === -1) {
-                d = DateTimeShortcuts.now();
+                d = DateTimeShortcuts.now(DateTimeShortcuts.clockInputs[num]);
             }
             else {
                 d = new Date(1970, 1, 1, val, 0, 0, 0);
             }
             DateTimeShortcuts.clockInputs[num].value = d.strftime(get_format('TIME_INPUT_FORMATS')[0]);
             DateTimeShortcuts.clockInputs[num].focus();
+            DateTimeShortcuts.clockInputs[num].dispatchEvent(inputEvent);
             DateTimeShortcuts.dismissClock(num);
         },
         // Add calendar widget to a given field.
@@ -396,16 +444,20 @@
                 .replace('\t', '\\t')
                 .replace("'", "\\'");
             return function(y, m, d) {
+                const inputEvent = new Event('input', { bubbles: true, cancelable: true });
                 DateTimeShortcuts.calendarInputs[num].value = new Date(y, m - 1, d).strftime(format);
                 DateTimeShortcuts.calendarInputs[num].focus();
+                DateTimeShortcuts.calendarInputs[num].dispatchEvent(inputEvent);
                 document.getElementById(DateTimeShortcuts.calendarDivName1 + num).style.display = 'none';
             };
         },
         handleCalendarQuickLink: function(num, offset) {
-            const d = DateTimeShortcuts.now();
+            const inputEvent = new Event('input', { bubbles: true, cancelable: true });
+            const d = DateTimeShortcuts.now(DateTimeShortcuts.calendarInputs[num]);
             d.setDate(d.getDate() + offset);
             DateTimeShortcuts.calendarInputs[num].value = d.strftime(get_format('DATE_INPUT_FORMATS')[0]);
             DateTimeShortcuts.calendarInputs[num].focus();
+            DateTimeShortcuts.calendarInputs[num].dispatchEvent(inputEvent);
             DateTimeShortcuts.dismissCalendar(num);
         }
     };
