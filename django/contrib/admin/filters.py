@@ -73,6 +73,8 @@ class SimpleListFilter(ListFilter):
         if self.parameter_name in params:
             value = params.pop(self.parameter_name)
             self.used_parameters[self.parameter_name] = value
+        # step 6: the call from get_filters() gets us to this line which again calls lookups()
+        # which explains the RecurssionError mentioned in the ticket.
         lookup_choices = self.lookups(request, model_admin)
         if lookup_choices is None:
             lookup_choices = ()
@@ -93,6 +95,7 @@ class SimpleListFilter(ListFilter):
         """
         Must be overridden to return a list of tuples (value, verbose value)
         """
+        # step 1: get_changelist_instance() gets called here
         raise NotImplementedError(
             'The SimpleListFilter.lookups() method must be overridden to '
             'return a list of tuples (value, verbose value).'

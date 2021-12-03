@@ -739,6 +739,7 @@ class ModelAdmin(BaseModelAdmin):
             list_display = ['action_checkbox', *list_display]
         sortable_by = self.get_sortable_by(request)
         ChangeList = self.get_changelist(request)
+        # step 2: The call to get_changelist_instance returns a ChangeList object
         return ChangeList(
             request,
             self.model,

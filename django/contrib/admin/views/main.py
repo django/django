@@ -97,6 +97,7 @@ class ChangeList:
             self.list_editable = ()
         else:
             self.list_editable = list_editable
+        # step 3: returning the ChangeList object calls this __init__() method which calls get_queryset()
         self.queryset = self.get_queryset(request)
         self.get_results(request)
         if self.is_popup:
@@ -129,6 +130,7 @@ class ChangeList:
         return lookup_params
 
     def get_filters(self, request):
+        # step 4: get_queryset() function calls get_filters() (L463)
         lookup_params = self.get_filters_params()
         may_have_duplicates = False
         has_active_filters = False
@@ -142,6 +144,7 @@ class ChangeList:
             lookup_params_count = len(lookup_params)
             if callable(list_filter):
                 # This is simply a custom list filter class.
+                # step 5: this initializes an instance of the filter which in this case is SimpleListFilter
                 spec = list_filter(request, lookup_params, self.model, self.model_admin)
             else:
                 field_path = None
