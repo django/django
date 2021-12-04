@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.functions import Lower
 
 
 def validate_answer_to_universe(value):
@@ -125,3 +126,13 @@ class GenericIPAddressTestModel(models.Model):
 
 class GenericIPAddrUnpackUniqueTest(models.Model):
     generic_v4unpack_ip = models.GenericIPAddressField(null=True, blank=True, unique=True, unpack_ipv4=True)
+
+
+class UniqueFuncConstraintModel(models.Model):
+    field = models.CharField(max_length=255)
+
+    class Meta:
+        required_db_features = {'supports_expression_indexes'}
+        constraints = [
+            models.UniqueConstraint(Lower('field'), name='func_lower_field_uq'),
+        ]
