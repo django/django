@@ -870,7 +870,11 @@ class Options:
         return [
             constraint
             for constraint in self.constraints
-            if isinstance(constraint, UniqueConstraint) and constraint.condition is None
+            if (
+                isinstance(constraint, UniqueConstraint) and
+                constraint.condition is None and
+                not constraint.contains_expressions
+            )
         ]
 
     @cached_property
