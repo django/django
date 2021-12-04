@@ -5,7 +5,9 @@ import django
 from django.db import models
 from django.test import TestCase
 
-from .models import Container, Event, Group, Happening, M2MModel, MyEvent
+from .models import (
+    BinaryFieldModel, Container, Event, Group, Happening, M2MModel, MyEvent,
+)
 
 
 class PickleabilityTestCase(TestCase):
@@ -17,8 +19,8 @@ class PickleabilityTestCase(TestCase):
         self.assertEqual(list(pickle.loads(pickle.dumps(qs))), list(qs))
 
     def test_binaryfield(self):
-        Happening.objects.create(data=b'binary data')
-        self.assert_pickles(Happening.objects.all())
+        BinaryFieldModel.objects.create(data=b'binary data')
+        self.assert_pickles(BinaryFieldModel.objects.all())
 
     def test_related_field(self):
         g = Group.objects.create(name="Ponies Who Own Maybachs")
