@@ -1205,8 +1205,6 @@ class TestCase(TransactionTestCase):
     def tearDownClass(cls):
         if cls._databases_support_transactions():
             cls._rollback_atomics(cls.cls_atomics)
-            for conn in connections.all():
-                conn.close()
         super().tearDownClass()
 
     @classmethod
