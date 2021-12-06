@@ -4,14 +4,14 @@
 # NullIsNot0 <nullisnot0@inbox.lv>, 2017
 # NullIsNot0 <nullisnot0@inbox.lv>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
-# NullIsNot0 <nullisnot0@inbox.lv>, 2019
+# NullIsNot0 <nullisnot0@inbox.lv>, 2019,2021
 # peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-11-07 07:27+0000\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-10-06 05:08+0000\n"
 "Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
@@ -138,6 +138,9 @@ msgstr "darba faktors"
 
 msgid "checksum"
 msgstr "kontrolsumma"
+
+msgid "block size"
+msgstr "bloka izmērs"
 
 msgid "name"
 msgstr "nosaukums"

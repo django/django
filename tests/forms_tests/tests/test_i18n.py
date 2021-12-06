@@ -29,7 +29,7 @@ class FormsI18nTests(SimpleTestCase):
         with translation.override('pl'):
             self.assertHTMLEqual(
                 f.as_p(),
-                '<p><label for="id_username">u\u017cytkownik:</label>'
+                '<p><label for="id_username">nazwa u\u017cytkownika:</label>'
                 '<input id="id_username" type="text" name="username" maxlength="10" required></p>'
             )
 

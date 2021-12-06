@@ -4,6 +4,7 @@
 # Aarni Koskela, 2015,2017-2018,2020-2021
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jiri Grönroos <jiri.gronroos@iki.fi>, 2021
 # Lasse Liehu <larso@gmx.com>, 2015
 # Mika Mäkelä <mika.m.makela@gmail.com>, 2018
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2011
@@ -11,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-04-13 07:20+0000\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-25 07:24+0000\n"
 "Last-Translator: Aarni Koskela\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
@@ -125,7 +126,7 @@ msgid "Irish"
 msgstr "irlanti"
 
 msgid "Scottish Gaelic"
-msgstr "Skottilainen gaeli"
+msgstr "skottilainen gaeli"
 
 msgid "Galician"
 msgstr "galicia"
@@ -210,6 +211,9 @@ msgstr "mongolia"
 
 msgid "Marathi"
 msgstr "marathi"
+
+msgid "Malay"
+msgstr "malaiji"
 
 msgid "Burmese"
 msgstr "burman kieli"
@@ -363,7 +367,7 @@ msgstr ""
 "ja tavuviivoista."
 
 msgid "Enter a valid IPv4 address."
-msgstr "DSyötä kelvollinen IPv4-osoite."
+msgstr "Syötä kelvollinen IPv4-osoite."
 
 msgid "Enter a valid IPv6 address."
 msgstr "Syötä kelvollinen IPv6-osoite."
@@ -596,7 +600,7 @@ msgid "Boolean (Either True, False or None)"
 msgstr "Totuusarvo: joko tosi (True), epätosi (False) tai ei mikään (None)"
 
 msgid "Positive big integer"
-msgstr "suuri positiivinen kokonaisluku"
+msgstr "Suuri positiivinen kokonaisluku"
 
 msgid "Positive integer"
 msgstr "Positiivinen kokonaisluku"
@@ -661,7 +665,7 @@ msgid "Foreign Key (type determined by related field)"
 msgstr "Vierasavain (tyyppi määräytyy liittyvän kentän mukaan)"
 
 msgid "One-to-one relationship"
-msgstr "Yksi-yhteen relaatio"
+msgstr "Yksi-yhteen -relaatio"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
@@ -672,7 +676,7 @@ msgid "%(from)s-%(to)s relationships"
 msgstr "%(from)s-%(to)s -suhteet"
 
 msgid "Many-to-many relationship"
-msgstr "Moni-moneen relaatio"
+msgstr "Moni-moneen -relaatio"
 
 #. Translators: If found as last label character, these punctuation
 #. characters will prevent the default label_suffix to be appended to the
@@ -799,7 +803,7 @@ msgstr ""
 "for the %(lookup)s in %(date_field)s."
 
 msgid "Please correct the duplicate values below."
-msgstr "Korjaa allaolevat kaksoisarvot."
+msgstr "Korjaa alla olevat kaksoisarvot."
 
 msgid "The inline value did not match the parent instance."
 msgstr "Liittyvä arvo ei vastannut vanhempaa instanssia."
@@ -1111,40 +1115,40 @@ msgid ", "
 msgstr ", "
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d vuosi"
-msgstr[1] "%d vuotta"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d vuosi"
+msgstr[1] "%(num)d vuotta"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d kuukausi"
-msgstr[1] "%d kuukautta"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d kuukausi"
+msgstr[1] "%(num)d kuukautta "
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d viikko"
-msgstr[1] "%d viikkoa"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d viikko"
+msgstr[1] "%(num)d viikkoa"
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d päivä"
-msgstr[1] "%d päivää"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d päivä"
+msgstr[1] "%(num)d päivää"
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d tunti"
-msgstr[1] "%d tuntia"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d tunti"
+msgstr[1] "%(num)d tuntia"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minuutti"
-msgstr[1] "%d minuuttia"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d minuutti"
+msgstr[1] "%(num)d minuuttia"
 
 msgid "Forbidden"
 msgstr "Kielletty"
@@ -1154,7 +1158,7 @@ msgstr "CSRF-vahvistus epäonnistui. Pyyntö hylätty."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
@@ -1270,8 +1274,9 @@ msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
-"Katso Django %(version)s <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/releases/\" target=\"_blank\" rel=\"noopener\">julkaisutiedot</a>"
+"Katso Djangon version %(version)s <a href=\"https://docs.djangoproject.com/"
+"en/%(version)s/releases/\" target=\"_blank\" rel=\"noopener"
+"\">julkaisutiedot</a>"
 
 #, python-format
 msgid ""

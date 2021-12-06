@@ -6,14 +6,14 @@
 # NullIsNot0 <nullisnot0@inbox.lv>, 2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Māris Nartišs <maris.gis@gmail.com>, 2016
-# NullIsNot0 <nullisnot0@inbox.lv>, 2019-2020
+# NullIsNot0 <nullisnot0@inbox.lv>, 2019-2021
 # peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-22 17:27+0000\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-10-06 05:10+0000\n"
 "Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
@@ -25,6 +25,10 @@ msgstr ""
 "2);\n"
 
 #, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Izdzēst izvēlēto %(verbose_name_plural)s"
+
+#, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Veiksmīgi izdzēsti %(count)d %(items)s."
 
@@ -34,10 +38,6 @@ msgstr "Nevar izdzēst %(name)s"
 
 msgid "Are you sure?"
 msgstr "Vai esat pārliecināts?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Izdzēst izvēlēto %(verbose_name_plural)s"
 
 msgid "Administration"
 msgstr "Administrācija"
@@ -523,6 +523,12 @@ msgstr "Aizmirsi paroli vai lietotājvārdu?"
 msgid "Toggle navigation"
 msgstr "Pārslēgt navigāciju"
 
+msgid "Start typing to filter…"
+msgstr "Sāciet rakstīt, lai atlasītu…"
+
+msgid "Filter navigation items"
+msgstr "Atlasīt navigācijas vienības"
+
 msgid "Date/time"
 msgstr "Datums/laiks"
 
@@ -589,8 +595,8 @@ msgstr "Pievienot citu %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Dzēst izvēlēto %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Paldies par pavadīto laiku mājas lapā."
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Paldies, ka šodien vietnei veltījāt kvalitatīvu laiku."
 
 msgid "Log in again"
 msgstr "Pieslēgties vēlreiz"

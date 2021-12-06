@@ -6,15 +6,16 @@
 # Marian Andre <marian@andre.sk>, 2013-2015,2017
 # Martin Kosír, 2011
 # Martin Tóth <ezimir@gmail.com>, 2017
+# Peter Kuma, 2021
 # Peter Stríž <petulak8@gmail.com>, 2020
 # Zbynek Drlik <drlik.zbynek@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2020-12-14 18:32+0000\n"
-"Last-Translator: Peter Stríž <petulak8@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-09-22 07:21+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Slovak (http://www.transifex.com/django/django/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -195,25 +196,33 @@ msgstr "Nižšie môžete začať znovu editovať "
 msgid ""
 "The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
+"Objekt {name} \"{obj}\" bol úspešne pridaný. Môžete pridať ďaľší {name} "
+"nižšie."
 
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
+"Objekt {name} \"{obj}\" bol úspešne zmenený. Ďalšie zmeny môžete urobiť "
+"nižšie."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully. You may edit it again below."
 msgstr ""
+"Objekt {name} \"{obj}\" bol úspešne pridaný. Ďalšie zmeny môžete urobiť "
+"nižšie."
 
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
+"Objekt {name} \"{obj}\" bol úspešne zmenený. Môžete pridať ďaľší {name} "
+"nižšie."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was changed successfully."
-msgstr ""
+msgstr "Objekt {name} \"{obj}\" bol úspešne zmenený."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -227,11 +236,11 @@ msgstr "Nebola vybraná žiadna akcia."
 
 #, python-format
 msgid "The %(name)s “%(obj)s” was deleted successfully."
-msgstr ""
+msgstr "Objekt %(name)s \"%(obj)s\" bol úspešne vymazaný."
 
 #, python-format
 msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
-msgstr ""
+msgstr "Objekt %(name)s s ID \"%(key)s\" neexistuje. Možno bol vymazaný?"
 
 #, python-format
 msgid "Add %s"
@@ -306,7 +315,7 @@ msgid "Page not found"
 msgstr "Stránka nenájdená"
 
 msgid "We’re sorry, but the requested page could not be found."
-msgstr ""
+msgstr "Ľutujeme, ale požadovaná stránka nebola nájdená."
 
 msgid "Home"
 msgstr "Domov"
@@ -324,6 +333,8 @@ msgid ""
 "There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
+"Došlo k chybe. Chyba bola nahlásená správcovi webu prostredníctvom e-mailu a "
+"zanedlho by mala byť odstránená. Ďakujeme za vašu trpezlivosť."
 
 msgid "Run the selected action"
 msgstr "Vykonať vybranú akciu"
@@ -358,6 +369,8 @@ msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
+"Najskôr zadajte používateľské meno a heslo. Potom budete môcť upraviť viac "
+"používateľských nastavení."
 
 msgid "Enter a username and password."
 msgstr "Zadajte používateľské meno a heslo."
@@ -366,7 +379,7 @@ msgid "Change password"
 msgstr "Zmeniť heslo"
 
 msgid "Please correct the error below."
-msgstr ""
+msgstr "Prosím, opravte chybu uvedenú nižšie."
 
 msgid "Please correct the errors below."
 msgstr "Prosím, opravte chyby uvedené nižšie."
@@ -507,6 +520,9 @@ msgid ""
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
+"Niečo nie je v poriadku s vašou inštaláciou databázy. Zabezpečte, aby boli "
+"vytvorené potrebné databázové tabuľky a taktiež zabezpečte, aby príslušný "
+"používateľ mohol čítať databázu."
 
 #, python-format
 msgid ""
@@ -520,6 +536,12 @@ msgid "Forgotten your password or username?"
 msgstr "Zabudli ste heslo alebo používateľské meno?"
 
 msgid "Toggle navigation"
+msgstr "Zameniť navigáciu"
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
 msgstr ""
 
 msgid "Date/time"
@@ -535,6 +557,8 @@ msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
+"Tento objekt nemá zoznam zmien. Pravdepodobne nebol pridaný prostredníctvom "
+"tejto správcovskej stránky."
 
 msgid "Show all"
 msgstr "Zobraziť všetky"
@@ -543,7 +567,7 @@ msgid "Save"
 msgstr "Uložiť"
 
 msgid "Popup closing…"
-msgstr ""
+msgstr "Vyskakovacie okno sa zatvára..."
 
 msgid "Search"
 msgstr "Vyhľadávanie"
@@ -570,7 +594,7 @@ msgid "Save and continue editing"
 msgstr "Uložiť a pokračovať v úpravách"
 
 msgid "Save and view"
-msgstr ""
+msgstr "Uložiť a zobraziť"
 
 msgid "Close"
 msgstr "Zatvoriť"
@@ -587,8 +611,8 @@ msgstr "Pridať ďalší %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Zmazať vybrané %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Ďakujeme za čas strávený na našich stránkach."
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
 
 msgid "Log in again"
 msgstr "Znova sa prihlásiť"
@@ -603,6 +627,8 @@ msgid ""
 "Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
+"Z bezpečnostných dôvodov zadajte staré heslo a potom nové heslo dvakrát, aby "
+"sme mohli overiť, že ste ho zadali správne."
 
 msgid "Change my password"
 msgstr "Zmeniť moje heslo"
@@ -639,11 +665,15 @@ msgid ""
 "We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"Poslali sme vám e-mailom inštrukcie pre nastavenie hesla, ak existuje konto "
+"so zadanou emailovou adresou. Čoskoro by ste ich mali dostať."
 
 msgid ""
 "If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
+"Ak vám nepríde e-mail, uistite sa, že ste zadali adresu, s ktorou ste sa "
+"registrovali a skontrolujte svoj spamový priečinok."
 
 #, python-format
 msgid ""
@@ -670,6 +700,8 @@ msgid ""
 "Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
+"Zabudli ste heslo? Zadajte vašu e-mailovú adresu nižšie a my vám pošleme "
+"inštrukcie pre nastavenie nového hesla."
 
 msgid "Email address:"
 msgstr "E-mailová adresa:"

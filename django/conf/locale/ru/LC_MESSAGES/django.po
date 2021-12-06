@@ -7,6 +7,7 @@
 # Dimmus <dmitri.chudinov@gmail.com>, 2011
 # eigrad <andrew@ei-grad.ru>, 2012
 # Eugene <eugene.mechanism@gmail.com>, 2013
+# Eugene Morozov <transifex@emorozov.net>, 2021
 # eXtractor <evg.kirov@gmail.com>, 2015
 # crazyzubr <hjcnbckfd@gmail.com>, 2020
 # Igor Melnyk, 2014
@@ -14,7 +15,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lilo.panic, 2016
 # Mikhail Zholobov <legal90@gmail.com>, 2013
-# Nikolay Korotkiy <sikmir@gmail.com>, 2018
+# Nikolay Korotkiy <sikmir@disroot.org>, 2018
 # Panasoft, 2021
 # Вася Аникин <anikin.vasya@gmail.com>, 2017
 # SeryiMysh <vital@dorokhin.kz>, 2020
@@ -24,9 +25,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-03-16 22:50+0000\n"
-"Last-Translator: Panasoft\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-18 21:19+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -225,6 +226,9 @@ msgstr "Монгольский"
 
 msgid "Marathi"
 msgstr "Маратхи"
+
+msgid "Malay"
+msgstr ""
 
 msgid "Burmese"
 msgstr "Бирманский"
@@ -708,7 +712,7 @@ msgstr "Связь %(from)s-%(to)s"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr "Связьи %(from)s-%(to)s"
+msgstr "Связи %(from)s-%(to)s"
 
 msgid "Many-to-many relationship"
 msgstr "Связь \"многие ко многим\""
@@ -1168,52 +1172,52 @@ msgid ", "
 msgstr ", "
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d год"
-msgstr[1] "%d года"
-msgstr[2] "%d лет"
-msgstr[3] "%d лет"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d месяц"
-msgstr[1] "%d месяца"
-msgstr[2] "%d месяцев"
-msgstr[3] "%d месяцев"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d неделя"
-msgstr[1] "%d недели"
-msgstr[2] "%d недель"
-msgstr[3] "%d недель"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d день"
-msgstr[1] "%d дня"
-msgstr[2] "%d дней"
-msgstr[3] "%d дней"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d час"
-msgstr[1] "%d часа"
-msgstr[2] "%d часов"
-msgstr[3] "%d часов"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d минута"
-msgstr[1] "%d минуты"
-msgstr[2] "%d минут"
-msgstr[3] "%d минут"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 msgid "Forbidden"
 msgstr "Ошибка доступа"
@@ -1223,15 +1227,10 @@ msgstr "Ошибка проверки CSRF. Запрос отклонён."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Вы видите это сообщение, потому что данный сайт использует защищённое "
-"соединение и требует, чтобы заголовок “Referer” был передан вашим браузером, "
-"но он не был им передан. Данный заголовок необходим по соображениям "
-"безопасности, чтобы убедиться, что ваш браузер не был взломан, а запрос к "
-"серверу не был перехвачен или подменён."
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"

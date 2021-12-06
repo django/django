@@ -21,6 +21,7 @@
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011,2013
 # Luigy, 2019
 # Marc Garcia <garcia.marc@gmail.com>, 2011
+# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
 # monobotsoft <monobot.soft@gmail.com>, 2012
 # ntrrgc <ntrrgc@gmail.com>, 2013
 # ntrrgc <ntrrgc@gmail.com>, 2013
@@ -32,9 +33,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-02-11 06:03+0000\n"
-"Last-Translator: Uriel Medina <urimeba511@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-24 16:30+0000\n"
+"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -231,6 +232,9 @@ msgstr "Mongol"
 
 msgid "Marathi"
 msgstr "Maratí"
+
+msgid "Malay"
+msgstr ""
 
 msgid "Burmese"
 msgstr "Birmano"
@@ -1133,7 +1137,7 @@ msgstr "No es una dirección IPv6 válida."
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s…"
-msgstr "%(truncated_text)s..."
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "o"
@@ -1143,40 +1147,40 @@ msgid ", "
 msgstr ", "
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d año"
-msgstr[1] "%d años"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d años"
+msgstr[1] "%(num)d años"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d mes"
-msgstr[1] "%d meses"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d mes"
+msgstr[1] "%(num)d meses"
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d semana"
-msgstr[1] "%d semanas"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d semana"
+msgstr[1] "%(num)d semanas"
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d día"
-msgstr[1] "%d días"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d día"
+msgstr[1] "%(num)d días"
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d hora"
-msgstr[1] "%d horas"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d hora"
+msgstr[1] "%(num)d horas"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minuto"
-msgstr[1] "%d minutos"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d minutos"
+msgstr[1] "%(num)d minutes"
 
 msgid "Forbidden"
 msgstr "Prohibido"
@@ -1186,11 +1190,11 @@ msgstr "La verificación CSRF ha fallado. Solicitud abortada."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Está viendo este mensaje porque este sitio HTTPS requiere que su navegador "
+"Estás viendo este mensaje porque este sitio HTTPS requiere que tu navegador "
 "web envíe un \"encabezado de referencia\", pero no se envió ninguno. Este "
 "encabezado es necesario por razones de seguridad, para garantizar que su "
 "navegador no sea secuestrado por terceros."

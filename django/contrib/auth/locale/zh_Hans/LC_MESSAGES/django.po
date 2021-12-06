@@ -2,6 +2,7 @@
 #
 # Translators:
 # Bo Li <bo.li@measureofquality.com>, 2020
+# lanbla <lanlinwen@buaa.edu.cn>, 2021
 # David <huangtao0202@gmail.com>, 2019
 # ausaki <www.ljm969087551@qq.com>, 2017
 # jamin M <lxxmbyx@163.com>, 2019
@@ -10,7 +11,7 @@
 # Lele Long <schemacs@gmail.com>, 2011,2015
 # Liping Wang <lynn.config@gmail.com>, 2016-2017
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
-# pylemon <leeway1985@gmail.com>, 2012-2013
+# Lemon Li <leeway1985@gmail.com>, 2012-2013
 # Wentao Han <wentao.han@gmail.com>, 2020
 # hizyn <zhangyanan5552@gmail.com>, 2016
 # ced773123cfad7b4e8b79ca80f736af9, 2011
@@ -19,9 +20,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-12-09 02:32+0000\n"
-"Last-Translator: Bo Li <bo.li@measureofquality.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-22 03:12+0000\n"
+"Last-Translator: lanbla <lanlinwen@buaa.edu.cn>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -143,6 +144,9 @@ msgstr "加密因子"
 
 msgid "checksum"
 msgstr "校验和"
+
+msgid "block size"
+msgstr "块大小"
 
 msgid "name"
 msgstr "名称"
