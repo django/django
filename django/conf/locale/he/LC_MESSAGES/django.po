@@ -6,7 +6,7 @@
 # Meir Kriheli <mkriheli@gmail.com>, 2011-2015,2017,2019-2020
 # Menachem G., 2021
 # Yaron Shahrabani <sh.yaron@gmail.com>, 2021
-# אורי רודברג <uri@speedy.net>, 2020
+# Uri Rodberg <uri@speedy.net>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
@@ -1126,50 +1126,50 @@ msgstr ", "
 #, python-format
 msgid "%(num)d year"
 msgid_plural "%(num)d years"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "שנה"
+msgstr[1] "שנתיים"
+msgstr[2] "%(num)d שנים"
+msgstr[3] "%(num)d שנים"
 
 #, python-format
 msgid "%(num)d month"
 msgid_plural "%(num)d months"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "חודש"
+msgstr[1] "חודשיים"
+msgstr[2] "%(num)d חודשים"
+msgstr[3] "%(num)d חודשים"
 
 #, python-format
 msgid "%(num)d week"
 msgid_plural "%(num)d weeks"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "שבוע"
+msgstr[1] "שבועיים"
+msgstr[2] "%(num)d שבועות"
+msgstr[3] "%(num)d שבועות"
 
 #, python-format
 msgid "%(num)d day"
 msgid_plural "%(num)d days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "יום"
+msgstr[1] "יומיים"
+msgstr[2] "%(num)d ימים"
+msgstr[3] "%(num)d ימים"
 
 #, python-format
 msgid "%(num)d hour"
 msgid_plural "%(num)d hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "שעה"
+msgstr[1] "שעתיים"
+msgstr[2] "%(num)d שעות"
+msgstr[3] "%(num)d שעות"
 
 #, python-format
 msgid "%(num)d minute"
 msgid_plural "%(num)d minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "דקה"
+msgstr[1] "%(num)d דקות"
+msgstr[2] "%(num)d דקות"
+msgstr[3] "%(num)d דקות"
 
 msgid "Forbidden"
 msgstr "אסור"
