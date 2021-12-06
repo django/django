@@ -108,6 +108,10 @@ do this by adding the following snippet to your urls.py::
     folder; it doesn't perform static files discovery like
     :mod:`django.contrib.staticfiles`.
 
+    Finally, static files are served via a wrapper at the WSGI application
+    layer. As a consequence, static files requests do not pass through the
+    normal :doc:`middleware chain </topics/http/middleware>`.
+
 .. _serving-uploaded-files-in-development:
 
 Serving files uploaded by a user during development
