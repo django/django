@@ -2,6 +2,7 @@
 #
 # Translators:
 # HuanCheng Bai白宦成 <xiqingongzi@gmail.com>, 2017-2018
+# lanbla <lanlinwen@buaa.edu.cn>, 2021
 # Daniel Duan <DaNmarner@gmail.com>, 2013
 # jamin M <lxxmbyx@163.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -13,7 +14,7 @@
 # matthew Yip <yymmatthew@gmail.com>, 2020
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # Ronald White <tkliuxing@me.com>, 2014
-# pylemon <leeway1985@gmail.com>, 2013
+# Lemon Li <leeway1985@gmail.com>, 2013
 # Ray Wang <pivstone@gmail.com>, 2017
 # slene <vslene@gmail.com>, 2011
 # Sun Liwen <sunliwen@gmail.com>, 2014
@@ -34,9 +35,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-02-07 04:20+0000\n"
-"Last-Translator: Veoco <one@nomox.cn>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-22 03:05+0000\n"
+"Last-Translator: lanbla <lanlinwen@buaa.edu.cn>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -233,6 +234,9 @@ msgstr "蒙古语"
 
 msgid "Marathi"
 msgstr "马拉地语"
+
+msgid "Malay"
+msgstr "马来语"
 
 msgid "Burmese"
 msgstr "缅甸语"
@@ -1101,34 +1105,34 @@ msgid ", "
 msgstr "，"
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d 年"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d 年"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d 月"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d 月"
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d 周"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d 周"
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d 日"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d 日"
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d 小时"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d 小时"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d 分钟"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d 分钟"
 
 msgid "Forbidden"
 msgstr "禁止访问"
@@ -1138,12 +1142,12 @@ msgstr "CSRF验证失败. 请求被中断."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"您看到此消息是因为此HTTPS站点要求Web浏览器发送的“Referer头”没被发送。出于安全"
-"原因，此HTTP头是必需的，以确保您的浏览器不会被第三方劫持。"
+"您看到此消息是由于HTTPS站点需要您的浏览器发送 'Referer header'，但是该信息并"
+"未被发送。出于安全原因，此HTTP头是必需的，以确保您的浏览器不会被第三方劫持。"
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"

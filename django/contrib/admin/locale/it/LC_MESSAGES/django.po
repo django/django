@@ -2,7 +2,8 @@
 #
 # Translators:
 # 0d21a39e384d88c2313b89b5042c04cb, 2017
-# Carlo Miron <C8E@miron.it>, 2018-2019
+# Carlo Miron <carlo@miron.it>, 2018-2019
+# Davide Targa <davide.targa@gmail.com>, 2021
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Flavio Curella <flavio.curella@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -17,9 +18,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-15 15:53+0000\n"
-"Last-Translator: palmux <palmux@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-12 11:54+0000\n"
+"Last-Translator: Davide Targa <davide.targa@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -540,6 +541,12 @@ msgstr "Hai dimenticato la password o lo username?"
 msgid "Toggle navigation"
 msgstr "Abilita/disabilita navigazione"
 
+msgid "Start typing to filter…"
+msgstr "Inizia a scrivere per filtrare..."
+
+msgid "Filter navigation items"
+msgstr "Filtra gli oggetti di navigazione"
+
 msgid "Date/time"
 msgstr "Data/ora"
 
@@ -605,8 +612,8 @@ msgstr "Aggiungi un altro %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Elimina la selezione %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Grazie per aver speso il tuo tempo prezioso su questo sito oggi."
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Grazie per avere trascorso del tempo di qualità sul sito oggi."
 
 msgid "Log in again"
 msgstr "Accedi di nuovo"

@@ -5,14 +5,14 @@
 # arupakan125 <koh@arupaka.net>, 2020
 # Masashi SHIBATA <contact@c-bata.link>, 2017
 # Nikita K <hiyori.amatsuki@gmail.com>, 2019
-# Shinya Okano <tokibito@gmail.com>, 2013-2016
+# Shinya Okano <tokibito@gmail.com>, 2013-2016,2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-01-20 06:25+0000\n"
-"Last-Translator: arupakan125 <koh@arupaka.net>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-10-13 11:35+0000\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -137,6 +137,9 @@ msgstr "ワークファクター"
 
 msgid "checksum"
 msgstr "チェックサム"
+
+msgid "block size"
+msgstr "ブロックサイズ"
 
 msgid "name"
 msgstr "名前"
