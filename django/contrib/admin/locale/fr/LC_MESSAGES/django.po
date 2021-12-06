@@ -2,16 +2,16 @@
 #
 # Translators:
 # Bruno Brouard <annoa.b@gmail.com>, 2021
-# Claude Paroz <claude@2xlibre.net>, 2013-2020
+# Claude Paroz <claude@2xlibre.net>, 2013-2021
 # Claude Paroz <claude@2xlibre.net>, 2011,2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-03-04 20:53+0000\n"
-"Last-Translator: Bruno Brouard <annoa.b@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-09 07:39+0000\n"
+"Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -93,7 +93,7 @@ msgid "Add another %(verbose_name)s"
 msgstr "Ajouter un objet %(verbose_name)s supplémentaire"
 
 msgid "Remove"
-msgstr "Supprimer"
+msgstr "Enlever"
 
 msgid "Addition"
 msgstr "Ajout"
@@ -537,6 +537,12 @@ msgstr "Mot de passe ou nom d’utilisateur oublié ?"
 msgid "Toggle navigation"
 msgstr "Basculer la navigation"
 
+msgid "Start typing to filter…"
+msgstr "Écrivez ici pour filtrer…"
+
+msgid "Filter navigation items"
+msgstr "Filtrer les éléments de navigation"
+
 msgid "Date/time"
 msgstr "Date/heure"
 
@@ -602,7 +608,7 @@ msgstr "Ajouter un autre objet %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Supprimer l’objet %(model)s sélectionné"
 
-msgid "Thanks for spending some quality time with the Web site today."
+msgid "Thanks for spending some quality time with the web site today."
 msgstr "Merci pour le temps que vous avez accordé à ce site aujourd’hui."
 
 msgid "Log in again"

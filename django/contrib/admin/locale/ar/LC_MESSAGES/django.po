@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bashar Al-Abdulhadi, 2015-2016,2018,2020
+# Bashar Al-Abdulhadi, 2015-2016,2018,2020-2021
 # Bashar Al-Abdulhadi, 2014
 # Eyad Toma <d.eyad.t@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-15 00:40+0000\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-10-15 21:11+0000\n"
 "Last-Translator: Bashar Al-Abdulhadi\n"
 "Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -22,6 +22,10 @@ msgstr ""
 "Language: ar\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "احذف %(verbose_name_plural)s المحدّدة"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -33,10 +37,6 @@ msgstr "تعذّر حذف %(name)s"
 
 msgid "Are you sure?"
 msgstr "هل أنت متأكد؟"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "احذف %(verbose_name_plural)s المحدّدة"
 
 msgid "Administration"
 msgstr "الإدارة"
@@ -527,6 +527,12 @@ msgstr "نسيت كلمة المرور أو اسم المستخدم الخاص �
 msgid "Toggle navigation"
 msgstr "تغيير التصفّح"
 
+msgid "Start typing to filter…"
+msgstr "ابدأ الكتابة للتصفية ..."
+
+msgid "Filter navigation items"
+msgstr "تصفية عناصر التصفح"
+
 msgid "Date/time"
 msgstr "التاريخ/الوقت"
 
@@ -596,8 +602,8 @@ msgstr "أضف %(model)s آخر"
 msgid "Delete selected %(model)s"
 msgstr "حذف %(model)s المختارة"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "شكراً لك على قضائك بعض الوقت مع الموقع اليوم."
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "شكرا لقضاء بعض الوقت الجيد في الموقع اليوم."
 
 msgid "Log in again"
 msgstr "ادخل مجدداً"

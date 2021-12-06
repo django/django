@@ -8,8 +8,8 @@
 # Arthur Silva <arxdsilva@gmail.com>, 2017
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
 # Camilo B. Moreira <camilo.moreira@fatec.sp.gov.br>, 2017
-# Carlos C. Leite <caduado@gmail.com>, 2020
-# Carlos C. Leite <caduado@gmail.com>, 2016,2019
+# Carlos Leite <caduado@gmail.com>, 2020
+# Carlos Leite <caduado@gmail.com>, 2016,2019
 # Filipe Cifali Stangler <cifali.filipe@gmail.com>, 2016
 # Claudio Rogerio Carvalho Filho <excriptbrasil@gmail.com>, 2020
 # dudanogueira <dudanogueira@gmail.com>, 2012
@@ -25,6 +25,7 @@
 # Lucas Infante <maccinza@gmail.com>, 2015
 # Luiz Boaretto <lboaretto@gmail.com>, 2017
 # Marcelo Moro Brondani <mbrondani@inf.ufsm.br>, 2018
+# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
 # Rafael Fontenelle <rffontenelle@gmail.com>, 2021
 # Samuel Nogueira Bacelar <samuelnbacelar@hotmail.com>, 2020
 # Sandro <sandrossv@hotmail.com>, 2011
@@ -36,9 +37,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-17 05:42+0000\n"
-"Last-Translator: Rafael Fontenelle <rffontenelle@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-24 16:29+0000\n"
+"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -235,6 +236,9 @@ msgstr "Mongol"
 
 msgid "Marathi"
 msgstr "Marathi"
+
+msgid "Malay"
+msgstr ""
 
 msgid "Burmese"
 msgstr "Birmanês"
@@ -532,7 +536,7 @@ msgid ""
 "format."
 msgstr ""
 "O valor \"%(value)s\" tem um formato de data inválido. Deve ser no formato  "
-"YYY-MM-DD."
+"YYYY-MM-DD."
 
 #, python-format
 msgid ""
@@ -1130,7 +1134,7 @@ msgstr "Este não é um endereço IPv6 válido."
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s…"
-msgstr " %(truncated_text)s..."
+msgstr " %(truncated_text)s…"
 
 msgid "or"
 msgstr "ou"
@@ -1140,40 +1144,40 @@ msgid ", "
 msgstr ", "
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d ano"
-msgstr[1] "%d anos"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d mês"
-msgstr[1] "%d meses"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d semana"
-msgstr[1] "%d semanas"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d dia"
-msgstr[1] "%d dias"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d hora"
-msgstr[1] "%d horas"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minuto"
-msgstr[1] "%d minutos"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Forbidden"
 msgstr "Proibido"
@@ -1183,14 +1187,10 @@ msgstr "Verificação CSRF falhou. Pedido cancelado."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Você está vendo esta mensagem porque este site HTTPS requer que um “Referer "
-"header” seja enviado pelo seu Web browser, mas nenhum foi enviado. Este "
-"cabeçalho é requierido por razões de segurança, para assegurar que seu "
-"browser não foi sequestrado por terceiros."
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"

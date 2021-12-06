@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-15 17:37+0000\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-18 23:38+0000\n"
 "Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
 "language/sr@latin/)\n"
@@ -209,6 +209,9 @@ msgstr "mongolski"
 
 msgid "Marathi"
 msgstr "marathi"
+
+msgid "Malay"
+msgstr "malajski"
 
 msgid "Burmese"
 msgstr "burmanski"
@@ -441,15 +444,17 @@ msgid ""
 "Ensure that there are no more than %(max)s digit before the decimal point."
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Ne može biti više od %(max)s cifre pre decimalnog zapisa."
+msgstr[1] "Ne može biti više od %(max)s cifre pre decimalnog zapisa."
+msgstr[2] "Ne može biti više od %(max)s cifara pre decimalnog zapisa."
 
 #, python-format
 msgid ""
 "File extension “%(extension)s” is not allowed. Allowed extensions are: "
 "%(allowed_extensions)s."
 msgstr ""
+"Ekstenzija datoteke \"%(extension)s\" nije dozvoljena. Dozvoljene su sledeće "
+"ekstenzije: %(allowed_extensions)s."
 
 msgid "Null characters are not allowed."
 msgstr "'Null' karakteri nisu dozvoljeni."
@@ -481,6 +486,8 @@ msgstr "%(model_name)s sa ovom vrednošću %(field_label)s već postoji."
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
+"%(field_label)s mora biti jedinstven(a) za %(date_field_label)s "
+"%(lookup_type)s."
 
 #, python-format
 msgid "Field of type: %(field_type)s"
@@ -488,11 +495,11 @@ msgstr "Polje tipa: %(field_type)s"
 
 #, python-format
 msgid "“%(value)s” value must be either True or False."
-msgstr ""
+msgstr "Vrednost \"%(value)s\"  mora biti True ili False."
 
 #, python-format
 msgid "“%(value)s” value must be either True, False, or None."
-msgstr ""
+msgstr "\"%(value)s\" vrednost mora biti True, False ili None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Bulova vrednost (True ili False)"
@@ -509,6 +516,8 @@ msgid ""
 "“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"Vrednost \"%(value)s\" nema ispravan format datuma. Mora biti u formatu GGGG-"
+"MM-DD."
 
 #, python-format
 msgid ""
@@ -1094,7 +1103,7 @@ msgstr "Ovo nije ispravna IPv6 adresa."
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s…"
-msgstr ""
+msgstr "%(truncated_text)s..."
 
 msgid "or"
 msgstr "ili"
@@ -1104,46 +1113,46 @@ msgid ", "
 msgstr ","
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d godina"
-msgstr[1] "%d godine"
-msgstr[2] "%d godina"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d godina"
+msgstr[1] "%(num)d godine"
+msgstr[2] "%(num)d godina"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d mesec"
-msgstr[1] "%d meseca"
-msgstr[2] "%d meseci"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d nedelja"
-msgstr[1] "%d nedelje"
-msgstr[2] "%d nedelja"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d dan"
-msgstr[1] "%d dana"
-msgstr[2] "%d dana"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d čas"
-msgstr[1] "%d časa"
-msgstr[2] "%d časova"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minut"
-msgstr[1] "%d minute"
-msgstr[2] "%d minuta"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 msgid "Forbidden"
 msgstr "Zabranjeno"
@@ -1153,14 +1162,10 @@ msgstr "CSRF verifikacija nije prošla. Zahtev odbijen."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Ova poruka je prikazana jer ovaj HTTPS sajt zahteva da \"Referer header\" "
-"bude poslat od strane vašeg internet pregledača, što trenutno nije slučaj. "
-"Pomenuto zaglavlje je potrebno iz bezbedonosnih razloga, da bi se osiguralo "
-"da vaš pregledač nije pod kontrolom trećih lica."
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"
@@ -1227,7 +1232,7 @@ msgstr ""
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
-msgstr ""
+msgstr "Neispravan datum \"%(datestr)s\" za format \"%(format)s\""
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
@@ -1238,7 +1243,7 @@ msgstr "Stranica nije poslednja, niti može biti konvertovana u tip \"int\"."
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr ""
+msgstr "Neispravna strana (%(page_number)s): %(message)s"
 
 #, python-format
 msgid "Empty list and “%(class_name)s.allow_empty” is False."

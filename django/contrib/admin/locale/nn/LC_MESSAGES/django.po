@@ -5,14 +5,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jensadne <jensadne@pvv.ntnu.no>, 2013
 # Sigurd Gartmann <sigurdga-transifex@sigurdga.no>, 2012
+# Sivert Olstad, 2021
 # velmont <odin.omdal@gmail.com>, 2012
+# Vibeke Uthaug, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-18 12:44+0000\n"
+"Last-Translator: Vibeke Uthaug\n"
 "Language-Team: Norwegian Nynorsk (http://www.transifex.com/django/django/"
 "language/nn/)\n"
 "MIME-Version: 1.0\n"
@@ -20,6 +22,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: nn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Slett valgte %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -32,12 +38,8 @@ msgstr "Kan ikkje slette %(name)s"
 msgid "Are you sure?"
 msgstr "Er du sikker?"
 
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Slett valgte %(verbose_name_plural)s"
-
 msgid "Administration"
-msgstr ""
+msgstr "Administrasjon"
 
 msgid "All"
 msgstr "Alle"
@@ -67,41 +69,58 @@ msgid "This year"
 msgstr "I år"
 
 msgid "No date"
-msgstr ""
+msgstr "Ingen dato"
 
 msgid "Has date"
-msgstr ""
+msgstr "Har dato"
+
+msgid "Empty"
+msgstr "Tom"
+
+msgid "Not empty"
+msgstr "Ikkje tom"
 
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
+"Oppgje korrekt %(username)s og passord for ein administrasjonsbrukarkonto. "
+"Merk at det er skilnad på små og store bokstavar."
 
 msgid "Action:"
 msgstr "Handling:"
 
 #, python-format
 msgid "Add another %(verbose_name)s"
-msgstr "Legg til ny %(verbose_name)s."
+msgstr "Opprett ny %(verbose_name)s."
 
 msgid "Remove"
 msgstr "Fjern"
+
+msgid "Addition"
+msgstr "Tillegg"
+
+msgid "Change"
+msgstr "Endre"
+
+msgid "Deletion"
+msgstr "Sletting"
 
 msgid "action time"
 msgstr "tid for handling"
 
 msgid "user"
-msgstr ""
+msgstr "brukar"
 
 msgid "content type"
-msgstr ""
+msgstr "innhaldstype"
 
 msgid "object id"
 msgstr "objekt-ID"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "objekt repr"
 
@@ -118,41 +137,41 @@ msgid "log entries"
 msgstr "logginnlegg"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "La til «%(object)s»."
+msgid "Added “%(object)s”."
+msgstr "Oppretta  “%(object)s”."
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "Endra «%(object)s» - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "Endra “%(object)s” — %(changes)s"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "Sletta «%(object)s»."
+msgid "Deleted “%(object)s.”"
+msgstr "Sletta “%(object)s”."
 
 msgid "LogEntry Object"
 msgstr "LogEntry-objekt"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr ""
+msgid "Added {name} “{object}”."
+msgstr "Oppretta {name} “{object}”."
 
 msgid "Added."
-msgstr ""
+msgstr "Oppretta."
 
 msgid "and"
 msgstr "og"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr ""
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "Endra {fields} for {name} “{object}”."
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "Endra {fields}."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr ""
+msgid "Deleted {name} “{object}”."
+msgstr "Sletta {name} “{object}”."
 
 msgid "No fields changed."
 msgstr "Ingen felt endra."
@@ -160,39 +179,41 @@ msgstr "Ingen felt endra."
 msgid "None"
 msgstr "Ingen"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
+"Hald nede “Control”, eller “Command” på ein Mac, for å velge meir enn éin."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr "{name} “{obj}” vart oppretta."
+
+msgid "You may edit it again below."
+msgstr "Du kan endre det att nedanfor."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+"The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
+"{name} “{obj}” vart oppretta. Du kan opprette enda ein {name} nedanfor."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr "{name} “{obj}” vart endra. Du kan redigere vidare nedanfor."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr "{name} “{obj}” vart oppretta. Du kan redigere vidare nedanfor."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
-msgstr ""
+msgstr "{name} “{obj}” vart endra. Du kan opprette enda ein {name} nedanfor."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
-msgstr ""
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "{name} “{obj}” vart endra."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -205,12 +226,13 @@ msgid "No action selected."
 msgstr "Inga valt handling."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" vart sletta."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "%(name)s “%(obj)s” vart sletta."
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
+"%(name)s med ID “%(key)s” eksisterer ikkje. Kanskje den har vorte sletta?"
 
 #, python-format
 msgid "Add %s"
@@ -219,6 +241,10 @@ msgstr "Opprett %s"
 #, python-format
 msgid "Change %s"
 msgstr "Rediger %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Sjå %s"
 
 msgid "Database error"
 msgstr "Databasefeil"
@@ -247,7 +273,7 @@ msgstr "Endringshistorikk: %s"
 #. suitable to be an item in a list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
-msgstr ""
+msgstr "%(class_name)s %(instance)s"
 
 #, python-format
 msgid ""
@@ -271,12 +297,12 @@ msgstr "Logg inn"
 
 #, python-format
 msgid "%(app)s administration"
-msgstr ""
+msgstr "%(app)s-administrasjon"
 
 msgid "Page not found"
 msgstr "Fann ikkje sida"
 
-msgid "We're sorry, but the requested page could not be found."
+msgid "We’re sorry, but the requested page could not be found."
 msgstr "Sida du spør etter finst ikkje."
 
 msgid "Home"
@@ -292,9 +318,11 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Tenarfeil <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
+"Det har oppstått ein feil. Det er rapportert til dei som administrerer "
+"nettsida med e-mail og burde bli fiksa snarast. Takk for tolmodigheita."
 
 msgid "Run the selected action"
 msgstr "Utfør den valde handlinga"
@@ -312,8 +340,21 @@ msgstr "Velg alle %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Nullstill utval"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modellar i %(name)s-applikasjonen"
+
+msgid "Add"
+msgstr "Opprett"
+
+msgid "View"
+msgstr "Sjå"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Du har ikkje løyve til å sjå eller redigere noko."
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
 "Skriv først inn brukernamn og passord. Deretter vil du få høve til å endre "
@@ -326,10 +367,10 @@ msgid "Change password"
 msgstr "Endre passord"
 
 msgid "Please correct the error below."
-msgstr "Korriger feila under."
+msgstr "Korriger feilen under."
 
 msgid "Please correct the errors below."
-msgstr ""
+msgstr "Korriger feila under."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
@@ -339,7 +380,7 @@ msgid "Welcome,"
 msgstr "Velkommen,"
 
 msgid "View site"
-msgstr ""
+msgstr "Vis nettstad"
 
 msgid "Documentation"
 msgstr "Dokumentasjon"
@@ -359,6 +400,9 @@ msgstr "Vis på nettstad"
 
 msgid "Filter"
 msgstr "Filtrering"
+
+msgid "Clear all filters"
+msgstr "Fjern alle filter"
 
 msgid "Remove from sorting"
 msgstr "Fjern frå sortering"
@@ -399,13 +443,13 @@ msgstr ""
 "Alle dei følgjande relaterte objekta vil bli sletta:"
 
 msgid "Objects"
-msgstr ""
+msgstr "Objekt"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Ja, eg er sikker"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "Nei, ta meg attende"
 
 msgid "Delete multiple objects"
 msgstr "Slett fleire objekt"
@@ -435,9 +479,6 @@ msgstr ""
 "Er du sikker på at du vil slette dei valgte objekta %(objects_name)s? "
 "Følgjande objekt og deira relaterte objekt vil bli sletta:"
 
-msgid "Change"
-msgstr "Endre"
-
 msgid "Delete?"
 msgstr "Slette?"
 
@@ -446,23 +487,13 @@ msgid " By %(filter_title)s "
 msgstr "Etter %(filter_title)s "
 
 msgid "Summary"
-msgstr ""
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr ""
-
-msgid "Add"
-msgstr "Opprett"
-
-msgid "You don't have permission to edit anything."
-msgstr "Du har ikkje løyve til å redigere noko."
+msgstr "Oppsummering"
 
 msgid "Recent actions"
-msgstr ""
+msgstr "Siste handlingar"
 
 msgid "My actions"
-msgstr ""
+msgstr "Mine handlingar"
 
 msgid "None available"
 msgstr "Ingen tilgjengelege"
@@ -471,10 +502,11 @@ msgid "Unknown content"
 msgstr "Ukjent innhald"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
+" match \n"
 "Noko er gale med databaseinstallasjonen din. Syt for at databasetabellane er "
 "oppretta og at brukaren har dei naudsynte løyve."
 
@@ -483,9 +515,20 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
+"Du er stadfesta som %(username)s, men er ikkje autentisert til å få tilgang "
+"til denne sida . Ynskjer du å logge inn med ein annan konto?"
 
 msgid "Forgotten your password or username?"
 msgstr "Gløymd brukarnamn eller passord?"
+
+msgid "Toggle navigation"
+msgstr "Veksl navigasjon"
+
+msgid "Start typing to filter…"
+msgstr "Begynn å skrive for å filtrere..."
+
+msgid "Filter navigation items"
+msgstr "Filtrer navigasjonselement"
 
 msgid "Date/time"
 msgstr "Dato/tid"
@@ -497,11 +540,11 @@ msgid "Action"
 msgstr "Handling"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
-"Dette objektet har ingen endringshistorikk. Det var sannsynlegvis ikkje "
-"oppretta med administrasjonssida."
+"Dette objektet har ingen endringshistorikk. Det blei sannsynlegvis ikkje "
+"oppretta av denne administratoren. "
 
 msgid "Show all"
 msgstr "Vis alle"
@@ -509,20 +552,8 @@ msgstr "Vis alle"
 msgid "Save"
 msgstr "Lagre"
 
-msgid "Popup closing..."
-msgstr ""
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr ""
+msgid "Popup closing…"
+msgstr "Lukkar popup…"
 
 msgid "Search"
 msgstr "Søk"
@@ -546,8 +577,26 @@ msgstr "Lagre og opprett ny"
 msgid "Save and continue editing"
 msgstr "Lagre og hald fram å redigere"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Takk for at du brukte kvalitetstid på nettstaden i dag."
+msgid "Save and view"
+msgstr "Lagre og sjå"
+
+msgid "Close"
+msgstr "Lukk"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Endre valt %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Opprett ny %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Slett valde %(model)s"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Takk for at du brukte litt kvalitetstid på nettsida i dag. "
 
 msgid "Log in again"
 msgstr "Logg inn att"
@@ -559,11 +608,11 @@ msgid "Your password was changed."
 msgstr "Passordet ditt vart endret."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
 "Av sikkerheitsgrunnar må du oppgje det gamle passordet ditt. Oppgje så det "
-"nye passordet ditt to gonger, slik at vi kan kontrollere at det er korrekt."
+"nye passordet ditt to gongar, sånn at vi kan kontrollere at det er korrekt."
 
 msgid "Change my password"
 msgstr "Endre passord"
@@ -598,25 +647,32 @@ msgstr ""
 "Nullstill passordet ditt på nytt."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"Dersom det eksisterer ein brukarkonto med e-postadressa du skreiv inn vil "
+"det bli sendt ein e-post med instruksjonar for å nullstille passordet til "
+"den e-postadressa. Du burde motta den snart. "
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
+"Om du ikkje mottar ein e-post, ver vennleg og sørg for at du skreiv inn e-"
+"postadressa du er registrert med og sjekk spam-filteret. "
 
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
+"Du får denne e-posten fordi du har bedt om å nullstille passordet for "
+"brukarkontoen din på %(site_name)s."
 
 msgid "Please go to the following page and choose a new password:"
 msgstr "Gå til følgjande side og velg eit nytt passord:"
 
-msgid "Your username, in case you've forgotten:"
+msgid "Your username, in case you’ve forgotten:"
 msgstr "Brukarnamnet ditt, i tilfelle du har gløymt det:"
 
 msgid "Thanks for using our site!"
@@ -627,12 +683,14 @@ msgid "The %(site_name)s team"
 msgstr "Helsing %(site_name)s"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
+"Gløymt passordet ditt? Oppgje e-postadressa di under, så sender me deg ein e-"
+"post med instruksjonar for nullstilling av passord."
 
 msgid "Email address:"
-msgstr ""
+msgstr "E-postadresse:"
 
 msgid "Reset my password"
 msgstr "Nullstill passordet"
@@ -648,6 +706,10 @@ msgstr "Velg %s"
 msgid "Select %s to change"
 msgstr "Velg %s du ønskar å redigere"
 
+#, python-format
+msgid "Select %s to view"
+msgstr "Velg %s du ønskar å sjå"
+
 msgid "Date:"
 msgstr "Dato:"
 
@@ -658,7 +720,7 @@ msgid "Lookup"
 msgstr "Oppslag"
 
 msgid "Currently:"
-msgstr ""
+msgstr "Noverande:"
 
 msgid "Change:"
-msgstr ""
+msgstr "Endre:"

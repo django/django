@@ -1,17 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2015
+# Fery Setiawan <gembelweb@gmail.com>, 2015,2021
 # rodin <romihardiyanto@gmail.com>, 2011
 # rodin <romihardiyanto@gmail.com>, 2015
-# sage <laymonage@gmail.com>, 2019
+# sag᠎e <laymonage@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-28 05:54+0000\n"
-"Last-Translator: sage <laymonage@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-09-14 00:29+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -39,11 +39,11 @@ msgid "redirect to"
 msgstr "pengalihan ke"
 
 msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"“http://”."
+"This can be either an absolute path (as above) or a full URL starting with a "
+"scheme such as “https://”."
 msgstr ""
-"Dapat berupa lokasi absolut (seperti di atas) atau URL lengkap yang dimulai "
-"dengan “http://”."
+"Ini dapat berupa jalur mutlak (seperti diatas) atau URL lengkap diawali "
+"dengan skema seperti “https://”."
 
 msgid "redirect"
 msgstr "pengalihan"

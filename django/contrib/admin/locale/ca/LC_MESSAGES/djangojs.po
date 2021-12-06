@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Antoni Aloy <aaloy@apsl.net>, 2017
+# Antoni Aloy <aaloy@apsl.net>, 2017,2021
 # Carles Barrobés <carles@barrobes.com>, 2011-2012,2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Roger Pons <rogerpons@gmail.com>, 2015
@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-10-27 08:48+0000\n"
 "Last-Translator: Antoni Aloy <aaloy@apsl.net>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
@@ -86,21 +86,21 @@ msgstr ""
 "acció, es perdran aquests canvis no desats."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Heu seleccionat una acció, però encara no heu desat els vostres canvis a "
-"camps individuals. Si us plau premeu OK per desar. Haureu de tornar a "
-"executar l'acció."
+"Has seleccionat una acció, però encara no l'has desat els canvis dels camps "
+"individuals. Si us plau clica OK per desar. Necessitaràs tornar a executar "
+"l'acció."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Heu seleccionat una acció i no heu fet cap canvi a camps individuals. "
-"Probablement esteu cercant el botó 'Anar' enlloc de 'Desar'."
+"Has seleccionat una acció i no has fet cap canvi als camps individuals. "
+"Probablement estàs cercant el botó Anar enlloc del botó de Desar."
 
 msgid "Now"
 msgstr "Ara"
@@ -185,6 +185,54 @@ msgstr "Novembre"
 
 msgid "December"
 msgstr "Desembre"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Gen"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Feb"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mar"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Abr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Mai"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Jun"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Jul"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Ago"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Sep"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Oct"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Des"
 
 msgctxt "one letter Sunday"
 msgid "S"

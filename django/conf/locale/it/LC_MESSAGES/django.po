@@ -2,9 +2,10 @@
 #
 # Translators:
 # 0d21a39e384d88c2313b89b5042c04cb, 2017
-# Carlo Miron <C8E@miron.it>, 2011
-# Carlo Miron <C8E@miron.it>, 2014
-# Carlo Miron <C8E@miron.it>, 2018-2019
+# Carlo Miron <carlo@miron.it>, 2011
+# Carlo Miron <carlo@miron.it>, 2014
+# Carlo Miron <carlo@miron.it>, 2018-2019
+# Davide Targa <davide.targa@gmail.com>, 2021
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Flavio Curella <flavio.curella@gmail.com>, 2013,2016
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -21,9 +22,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-15 16:42+0000\n"
-"Last-Translator: palmux <palmux@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-18 21:19+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -220,6 +221,9 @@ msgstr "Mongolo"
 
 msgid "Marathi"
 msgstr "Marathi"
+
+msgid "Malay"
+msgstr ""
 
 msgid "Burmese"
 msgstr "Birmano"
@@ -1130,40 +1134,40 @@ msgid ", "
 msgstr ", "
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d anno"
-msgstr[1] "%d anni"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d anno"
+msgstr[1] "%(num)d anni"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d mese"
-msgstr[1] "%d mesi"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d mese"
+msgstr[1] "%(num)d mesi"
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d settimana"
-msgstr[1] "%d settimane"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d settimana"
+msgstr[1] "%(num)d settimane"
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d giorno"
-msgstr[1] "%d giorni"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d giorno"
+msgstr[1] "%(num)d giorni"
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d ora"
-msgstr[1] "%d ore"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d ora"
+msgstr[1] "%(num)d ore"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minuto"
-msgstr[1] "%d minuti"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d minuto"
+msgstr[1] "%(num)d minuti"
 
 msgid "Forbidden"
 msgstr "Proibito"
@@ -1173,14 +1177,14 @@ msgstr "Verifica CSRF fallita. Richiesta interrotta."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Stai vedendo questo messaggio perché questo sito HTTPS richiede una "
-"\"Referer header\" che deve essere inviata dal tuo browser web, ma non è "
-"stato inviato nulla. Questo header è richiesto per ragioni di sicurezza, per "
-"assicurare che il tuo browser non sia stato dirottato da terze parti."
+"Vedi questo messaggio perchè questo sito HTTPS richiede l'invio da parte del "
+"tuo browser del “Referer header”, che non è invece stato inviato. Questo "
+"header è richiesto per motivi di sicurezza, per assicurare che il tuo "
+"browser non sia stato sabotato da terzi."
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"

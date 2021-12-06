@@ -4,13 +4,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Nick Mavrakis <mavrakis.n@gmail.com>, 2016
 # Pãnoș <panos.laganakos@gmail.com>, 2014
+# Serafeim Papastefanos <spapas@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Nick Mavrakis <mavrakis.n@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-06-03 18:27+0000\n"
+"Last-Translator: Serafeim Papastefanos <spapas@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -28,21 +29,21 @@ msgid "redirect from"
 msgstr "ανακατεύθυνση από"
 
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
 msgstr ""
-"Αυτό πρέπει να είναι ένα απόλυτο μονοπάτι, με εξαίρεση το όνομα χώρου. "
-"Παράδειγμα: '/events/search/'."
+"Πρέπει να είναι ένα απόλυτο μονοπάτι χωρίς το όνομα τομέα. Για παράδειγμα \"/"
+"events/search\"."
 
 msgid "redirect to"
 msgstr "ανακατεύθυνση προς"
 
 msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
+"This can be either an absolute path (as above) or a full URL starting with a "
+"scheme such as “https://”."
 msgstr ""
-"Αυτό πρέπει να είναι ένα απόλυτο μονοπάτι (όπως παραπάνω), ή ένα πλήρες URL "
-"που αρχίζει με 'http://'."
+"Μπορεί να είναι είτε ένα απόλυτο μονοπάτι (όπως πιο πάνω) είτε ένα πλήρες "
+"URL που ξεκινά με κατάλληλο σχημα πχ \"https://\"."
 
 msgid "redirect"
 msgstr "ανακατεύθυνση"

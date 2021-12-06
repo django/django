@@ -74,16 +74,22 @@ class TranslationTests(SimpleTestCase):
         """
         Test plurals with ngettext. French differs from English in that 0 is singular.
         """
-        self.assertEqual(ngettext("%d year", "%d years", 0) % 0, "0 année")
-        self.assertEqual(ngettext("%d year", "%d years", 2) % 2, "2 années")
+        self.assertEqual(
+            ngettext('%(num)d year', '%(num)d years', 0) % {'num': 0},
+            '0 année',
+        )
+        self.assertEqual(
+            ngettext('%(num)d year', '%(num)d years', 2) % {'num': 2},
+            '2 années',
+        )
         self.assertEqual(ngettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}, "0 octet")
         self.assertEqual(ngettext("%(size)d byte", "%(size)d bytes", 2) % {'size': 2}, "2 octets")
 
     def test_plural_null(self):
         g = trans_null.ngettext
-        self.assertEqual(g('%d year', '%d years', 0) % 0, '0 years')
-        self.assertEqual(g('%d year', '%d years', 1) % 1, '1 year')
-        self.assertEqual(g('%d year', '%d years', 2) % 2, '2 years')
+        self.assertEqual(g('%(num)d year', '%(num)d years', 0) % {'num': 0}, '0 years')
+        self.assertEqual(g('%(num)d year', '%(num)d years', 1) % {'num': 1}, '1 year')
+        self.assertEqual(g('%(num)d year', '%(num)d years', 2) % {'num': 2}, '2 years')
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     @translation.override('fr')
@@ -99,7 +105,7 @@ class TranslationTests(SimpleTestCase):
         french = trans_real.catalog()
         # Internal _catalog can query subcatalogs (from different po files).
         self.assertEqual(french._catalog[('%d singular', 0)], '%d singulier')
-        self.assertEqual(french._catalog[('%d hour', 0)], '%d heure')
+        self.assertEqual(french._catalog[('%(num)d hour', 0)], '%(num)d heure')
 
     def test_override(self):
         activate('de')

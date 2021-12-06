@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Martijn Dekker <mcdutchie@hotmail.com>, 2012
+# Martijn Dekker <mcdutchie@hotmail.com>, 2012,2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-09-24 14:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-09-22 09:22+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Interlingua (http://www.transifex.com/django/django/language/"
 "ia/)\n"
 "MIME-Version: 1.0\n"
@@ -28,7 +28,7 @@ msgstr "Datas importante"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "Le objecto %(name)s con le clave primari %(key)r non existe."
 
 msgid "Password changed successfully."
 msgstr "Le cambio del contrasigno ha succedite."
@@ -38,7 +38,7 @@ msgid "Change password: %s"
 msgstr "Cambia contrasigno: %s"
 
 msgid "Authentication and Authorization"
-msgstr ""
+msgstr "Authentication e autorisation"
 
 msgid "password"
 msgstr "contrasigno"
@@ -47,12 +47,13 @@ msgid "last login"
 msgstr "ultime session"
 
 msgid "No password set."
-msgstr ""
+msgstr "Nulle contrasigno definite."
 
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr ""
+"Le formato del contrasigno es invalide o le algorithmo de hash es incognite."
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "Le duo campos de contrasigno non es identic."
 
 msgid "Password"
@@ -62,24 +63,29 @@ msgid "Password confirmation"
 msgstr "Confirma contrasigno"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "Scribe le mesme contrasigno que antea, pro verification."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
+"Le contrasignos non es immagazinate in forma de texto simple, dunque il non "
+"es possibile vider le contrasigno de iste usator, ma tu pote cambiar le "
+"contrasigno con <a href=\"{}\">iste formulario</a>."
 
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
+"Per favor entra un %(username)s e contrasigno correcte. Nota que ambe campos "
+"pote distinguer inter majusculas e minusculas."
 
 msgid "This account is inactive."
 msgstr "Iste conto es inactive."
 
 msgid "Email"
-msgstr ""
+msgstr "E-mail"
 
 msgid "New password"
 msgstr "Nove contrasigno"
@@ -109,19 +115,19 @@ msgid "hash"
 msgstr "hash"
 
 msgid "variety"
-msgstr ""
+msgstr "varietate"
 
 msgid "version"
-msgstr ""
+msgstr "version"
 
 msgid "memory cost"
-msgstr ""
+msgstr "costo de memoria"
 
 msgid "time cost"
-msgstr ""
+msgstr "costo de tempore"
 
 msgid "parallelism"
-msgstr ""
+msgstr "parallelismo"
 
 msgid "work factor"
 msgstr "factor de labor"
@@ -129,11 +135,14 @@ msgstr "factor de labor"
 msgid "checksum"
 msgstr "summa de controlo"
 
+msgid "block size"
+msgstr ""
+
 msgid "name"
 msgstr "nomine"
 
 msgid "content type"
-msgstr ""
+msgstr "typo de contento"
 
 msgid "codename"
 msgstr "nomine de codice"
@@ -164,18 +173,21 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
+"Le gruppos al quales iste usator pertine. Un usator recipe tote le "
+"permissiones concedite a cata un de su gruppos."
 
 msgid "user permissions"
 msgstr "permissiones de usator"
 
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Permissiones specific pro iste usator."
 
 msgid "username"
 msgstr "nomine de usator"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
+"Obligatori. 150 characteres o minus. Litteras, cifras e @/./+/-/_ solmente."
 
 msgid "A user with that username already exists."
 msgstr "Un usator con iste nomine de usator jam existe."
@@ -187,7 +199,7 @@ msgid "last name"
 msgstr "nomine de familia"
 
 msgid "email address"
-msgstr ""
+msgstr "adresse de e-mail"
 
 msgid "staff status"
 msgstr "stato de personal"
@@ -222,32 +234,38 @@ msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
 msgstr[0] ""
+"Le contrasigno es troppo curte. Debe continer al minus %(min_length)d "
+"character."
 msgstr[1] ""
+"Le contrasigno es troppo curte. Debe continer al minus %(min_length)d "
+"characteres."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Le contrasigno debe continer al minus %(min_length)d character."
+msgstr[1] "Le contrasigno debe continer al minus %(min_length)d characteres."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "Le contrasigno es troppo simile al %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
+"Le contrasigno non pote esser troppo similar a tu altere informationes "
+"personal."
 
 msgid "This password is too common."
-msgstr ""
+msgstr "Iste contrasigno es troppo commun."
 
-msgid "Your password can't be a commonly used password."
-msgstr ""
+msgid "Your password can’t be a commonly used password."
+msgstr "Le contrasigno non pote esser un contrasigno communmente usate."
 
 msgid "This password is entirely numeric."
-msgstr ""
+msgstr "Iste contrasigno es toto numeric."
 
-msgid "Your password can't be entirely numeric."
-msgstr ""
+msgid "Your password can’t be entirely numeric."
+msgstr "Le contrasigno non pote esser toto numeric."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
@@ -257,32 +275,36 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"Entra un nomine de usator valide. Pote continer solmente litteras anglese, "
+"numeros e le characteres @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
+"Entra un nomine de usator valide. Pote continer solmente litteras, numeros e "
+"le characteres @/./+/-/_."
 
 msgid "Logged out"
 msgstr "Session claudite"
 
 msgid "Password reset"
-msgstr ""
+msgstr "Reinitialisation del contrasigno"
 
 msgid "Password reset sent"
-msgstr ""
+msgstr "Reinitialisation del contrasigno inviate"
 
 msgid "Enter new password"
-msgstr ""
+msgstr "Scribe nove contrasigno"
 
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Reinitialisation de contrasigno fallite"
 
 msgid "Password reset complete"
-msgstr ""
+msgstr "Contrasigno reinitialisate con successo"
 
 msgid "Password change"
-msgstr ""
+msgstr "Cambio de contrasigno"
 
 msgid "Password change successful"
-msgstr ""
+msgstr "Contrasigno cambiate con successo"

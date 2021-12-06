@@ -3,14 +3,14 @@
 # Translators:
 # Belek <abylov.belek@gmail.com>, 2016
 # Chyngyz Monokbaev <monokbaev@gmail.com>, 2016
-# Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>, 2020
+# Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>, 2020-2021
 # Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2020-11-23 00:50+0000\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-27 14:12+0000\n"
 "Last-Translator: Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>\n"
 "Language-Team: Kyrgyz (http://www.transifex.com/django/django/language/ky/)\n"
 "MIME-Version: 1.0\n"
@@ -478,7 +478,7 @@ msgstr "Өчүрөлүбү?"
 
 #, python-format
 msgid " By %(filter_title)s "
-msgstr "%(filter_title)s карап"
+msgstr "%(filter_title)s боюнча"
 
 msgid "Summary"
 msgstr "Жалпысынан"
@@ -516,6 +516,12 @@ msgstr "Колдонуучу атыңыз же сырсөздү унутуп к�
 
 msgid "Toggle navigation"
 msgstr "Навигацияны алмаштыруу"
+
+msgid "Start typing to filter…"
+msgstr "чыпкалоо үчүн жазып башта"
+
+msgid "Filter navigation items"
+msgstr "Навигация элементтерин чыпкалоо"
 
 msgid "Date/time"
 msgstr "Күн/убакыт"
@@ -579,8 +585,8 @@ msgstr "Башка %(model)s кошуу"
 msgid "Delete selected %(model)s"
 msgstr "Тандалган %(model)s обеттерин өчүрүү"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Бүгүнкү баалуу убактыңызды Сайт үчүн бөлгөнүңүзгө рахмат."
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Сайтта бираз убакыт өткөргөн үчүн ыраазычылык."
 
 msgid "Log in again"
 msgstr "Кайрадан кирүү"

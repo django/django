@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Antoni Aloy <aaloy@apsl.net>, 2014-2015,2017
+# Antoni Aloy <aaloy@apsl.net>, 2014-2015,2017,2021
 # Carles Barrobés <carles@barrobes.com>, 2011-2012,2014
 # duub qnnp, 2015
 # GerardoGa <ggarciamaristany@gmail.com>, 2018
@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-04-04 21:09+0000\n"
-"Last-Translator: Marc Compte <marc@compte.cat>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-10-27 08:45+0000\n"
+"Last-Translator: Antoni Aloy <aaloy@apsl.net>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -535,6 +535,12 @@ msgstr "Heu oblidat la vostra contrasenya o nom d'usuari?"
 msgid "Toggle navigation"
 msgstr "Canviar mode de navegació"
 
+msgid "Start typing to filter…"
+msgstr "Comença a teclejar per filtrar ..."
+
+msgid "Filter navigation items"
+msgstr "Filtrar els items de navegació"
+
 msgid "Date/time"
 msgstr "Data/hora"
 
@@ -600,8 +606,8 @@ msgstr "Afegeix un altre %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Esborra el %(model)s seleccionat"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Gràcies per passar una estona de qualitat al web durant el dia d'avui."
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Gràcies per dedicar temps de qualitat avui a aquesta web."
 
 msgid "Log in again"
 msgstr "Iniciar sessió de nou"
