@@ -72,7 +72,12 @@ END;
     }
 
     def cache_key_culling_sql(self):
-        return 'SELECT cache_key FROM %s ORDER BY cache_key OFFSET %%s ROWS FETCH FIRST 1 ROWS ONLY'
+        cache_key = self.quote_name('cache_key')
+        return (
+            f'SELECT {cache_key} '
+            f'FROM %s '
+            f'ORDER BY {cache_key} OFFSET %%s ROWS FETCH FIRST 1 ROWS ONLY'
+        )
 
     def date_extract_sql(self, lookup_type, field_name):
         if lookup_type == 'week_day':
