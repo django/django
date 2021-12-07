@@ -1,8 +1,8 @@
-============================================
-Django 4.0 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 4.0 release notes
+========================
 
-*Expected December 2021*
+*December 7, 2021*
 
 Welcome to Django 4.0!
 
