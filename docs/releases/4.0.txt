@@ -118,10 +118,9 @@ in Django <redis>`.
 Template based form rendering
 -----------------------------
 
-To enhance customization of :class:`Forms <django.forms.Form>`,
-:doc:`Formsets </topics/forms/formsets>`, and
-:class:`~django.forms.ErrorList` they are now rendered using the template
-engine. See the new :meth:`~django.forms.Form.render`,
+:class:`Forms <django.forms.Form>`, :doc:`Formsets </topics/forms/formsets>`,
+and :class:`~django.forms.ErrorList` are now rendered using the template engine
+to enhance customization. See the new :meth:`~django.forms.Form.render`,
 :meth:`~django.forms.Form.get_context`, and
 :attr:`~django.forms.Form.template_name` for ``Form`` and
 :ref:`formset rendering <formset-rendering>` for ``Formset``.
