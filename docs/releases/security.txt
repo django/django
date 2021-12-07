@@ -1243,3 +1243,17 @@ Versions affected
 
 * Django 3.2 :commit:`(patch) <a34a5f724c5d5adb2109374ba3989ebb7b11f81f>`
 * Django 3.1 :commit:`(patch) <0bd57a879a0d54920bb9038a732645fb917040e9>`
+
+December 7, 2021 - :cve:`2021-44420`
+------------------------------------
+
+Potential bypass of an upstream access control based on URL paths. `Full
+description
+<https://www.djangoproject.com/weblog/2021/dec/07/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.2 :commit:`(patch) <333c65603032c377e682cdbd7388657a5463a05a>`
+* Django 3.1 :commit:`(patch) <22bd17488159601bf0741b70ae7932bffea8eced>`
+* Django 2.2 :commit:`(patch) <7cf7d74e8a754446eeb85cacf2fef1247e0cb6d7>`
