@@ -582,6 +582,9 @@ Miscellaneous
   :attr:`django.utils.timezone.utc` is changed to alias
   :attr:`datetime.timezone.utc`.
 
+* The minimum supported version of ``asgiref`` is increased from 3.3.2 to
+  3.4.1.
+
 .. _deprecated-features-4.0:
 
 Features deprecated in 4.0
