@@ -1,5 +1,4 @@
 import operator
-import platform
 
 from django.db import transaction
 from django.db.backends.base.features import BaseDatabaseFeatures
@@ -91,10 +90,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def supports_atomic_references_rename(self):
-        # SQLite 3.28.0 bundled with MacOS 10.15 does not support renaming
-        # references atomically.
-        if platform.mac_ver()[0].startswith('10.15.') and Database.sqlite_version_info == (3, 28, 0):
-            return False
         return Database.sqlite_version_info >= (3, 26, 0)
 
     @cached_property

@@ -259,6 +259,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_aggregate('VAR_POP', 1, list_aggregate(statistics.pvariance))
         conn.create_aggregate('VAR_SAMP', 1, list_aggregate(statistics.variance))
         conn.execute('PRAGMA foreign_keys = ON')
+        # The macOS bundled SQLite defaults legacy_alter_table ON, which
+        # prevents atomic table renames (feature supports_atomic_references_rename)
+        conn.execute('PRAGMA legacy_alter_table = OFF')
         return conn
 
     def init_connection_state(self):
