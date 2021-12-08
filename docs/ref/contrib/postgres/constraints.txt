@@ -53,9 +53,21 @@ operators with strings. For example::
 
     Only commutative operators can be used in exclusion constraints.
 
+The :class:`OpClass() <django.contrib.postgres.indexes.OpClass>` expression can
+be used to specify a custom `operator class`_ for the constraint expressions.
+For example::
+
+    expressions=[
+        (OpClass('circle', name='circle_ops'), RangeOperators.OVERLAPS),
+    ]
+
+creates an exclusion constraint on ``circle`` using ``circle_ops``.
+
 .. versionchanged:: 4.1
 
     Support for the ``OpClass()`` expression was added.
+
+.. _operator class: https://www.postgresql.org/docs/current/indexes-opclass.html
 
 ``index_type``
 --------------
@@ -147,19 +159,11 @@ For example::
 
 creates an exclusion constraint on ``circle`` using ``circle_ops``.
 
-Alternatively, you can use
-:class:`OpClass() <django.contrib.postgres.indexes.OpClass>` in
-:attr:`~ExclusionConstraint.expressions`::
+.. deprecated:: 4.1
 
-    ExclusionConstraint(
-        name='exclude_overlapping_opclasses',
-        expressions=[(OpClass('circle', 'circle_ops'), RangeOperators.OVERLAPS)],
-    )
-
-.. versionchanged:: 4.1
-
-    Support for specifying operator classes with the ``OpClass()`` expression
-    was added.
+    The ``opclasses`` parameter is deprecated in favor of using
+    :class:`OpClass() <django.contrib.postgres.indexes.OpClass>` in
+    :attr:`~ExclusionConstraint.expressions`.
 
 Examples
 --------

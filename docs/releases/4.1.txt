@@ -353,6 +353,38 @@ Miscellaneous
 * The ``name`` argument of :func:`django.utils.functional.cached_property` is
   deprecated as it's unnecessary as of Python 3.6.
 
+* The ``opclasses`` argument of
+  ``django.contrib.postgres.constraints.ExclusionConstraint`` is deprecated in
+  favor of using :class:`OpClass() <django.contrib.postgres.indexes.OpClass>`
+  in :attr:`.ExclusionConstraint.expressions`. To use it, you need to add
+  ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`.
+
+  After making this change, :djadmin:`makemigrations` will generate a new
+  migration with two operations: ``RemoveConstraint`` and ``AddConstraint``.
+  Since this change has no effect on the database schema,
+  the :class:`~django.db.migrations.operations.SeparateDatabaseAndState`
+  operation can be used to only update the migration state without running any
+  SQL. Move the generated operations into the ``state_operations`` argument of
+  :class:`~django.db.migrations.operations.SeparateDatabaseAndState`. For
+  example::
+
+    class Migration(migrations.Migration):
+        ...
+
+        operations = [
+            migrations.SeparateDatabaseAndState(
+                database_operations=[],
+                state_operations=[
+                    migrations.RemoveConstraint(
+                        ...
+                    ),
+                    migrations.AddConstraint(
+                        ...
+                    ),
+                ],
+            ),
+        ]
+
 Features removed in 4.1
 =======================
 

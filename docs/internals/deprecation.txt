@@ -72,6 +72,9 @@ details on these changes.
 * The ``name`` argument of ``django.utils.functional.cached_property()`` will
   be removed.
 
+* The ``opclasses`` argument of
+  ``django.contrib.postgres.constraints.ExclusionConstraint`` will be removed.
+
 .. _deprecation-removed-in-4.1:
 
 4.1

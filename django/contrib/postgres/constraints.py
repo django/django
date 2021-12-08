@@ -1,3 +1,5 @@
+import warnings
+
 from django.contrib.postgres.indexes import OpClass
 from django.db import NotSupportedError
 from django.db.backends.ddl_references import Expressions, Statement, Table
@@ -6,6 +8,7 @@ from django.db.models.constraints import BaseConstraint
 from django.db.models.expressions import ExpressionList
 from django.db.models.indexes import IndexExpression
 from django.db.models.sql import Query
+from django.utils.deprecation import RemovedInDjango50Warning
 
 __all__ = ['ExclusionConstraint']
 
@@ -67,6 +70,14 @@ class ExclusionConstraint(BaseConstraint):
         self.deferrable = deferrable
         self.include = tuple(include) if include else ()
         self.opclasses = opclasses
+        if self.opclasses:
+            warnings.warn(
+                'The opclasses argument is deprecated in favor of using '
+                'django.contrib.postgres.indexes.OpClass in '
+                'ExclusionConstraint.expressions.',
+                category=RemovedInDjango50Warning,
+                stacklevel=2,
+            )
         super().__init__(name=name)
 
     def _get_expressions(self, schema_editor, query):
