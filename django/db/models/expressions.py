@@ -730,6 +730,7 @@ class Func(SQLiteNumericMixin, Expression):
         copy.extra = self.extra.copy()
         return copy
 
+
 @deconstructible(path='django.db.models.Value')
 class Value(SQLiteNumericMixin, Expression):
     """Represent a wrapped value as a node within an expression."""
