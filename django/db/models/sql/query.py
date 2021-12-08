@@ -846,6 +846,9 @@ class Query(BaseExpression):
         relabelling any references to them in select columns and the where
         clause.
         """
+        # If keys and values of change_map were to intersect, an alias might be
+        # updated twice (e.g. T4 -> T5, T5 -> T6, so also T4 -> T6) depending
+        # on their order in change_map.
         assert set(change_map).isdisjoint(change_map.values())
 
         # 1. Update references in "select" (normal columns plus aliases),
