@@ -13,7 +13,10 @@ from django.core.files.storage import default_storage
 from django.db import (
     IntegrityError, connection, connections, models, router, transaction,
 )
-from django.forms import EmailField, IntegerField
+from django.forms import (
+    CharField, EmailField, Form, IntegerField, ValidationError,
+    formset_factory,
+)
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import (
@@ -1239,6 +1242,44 @@ class AssertURLEqualTests(SimpleTestCase):
                 'http://example.com/?x=1&x=2', 'https://example.com/?x=2&x=1',
                 msg_prefix='Prefix: ',
             )
+
+
+class TestForm(Form):
+    field = CharField()
+
+    def clean_field(self):
+        value = self.cleaned_data.get('field', '')
+        if value == 'invalid':
+            raise ValidationError('invalid value')
+        return value
+
+
+class TestFormset(formset_factory(TestForm)):
+    @classmethod
+    def _get_cleaned_formset(cls, field_value):
+        formset = cls({
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',
+            'form-0-field': field_value,
+        })
+        formset.full_clean()
+        return formset
+
+    @classmethod
+    def invalid(cls):
+        return cls._get_cleaned_formset('invalid')
+
+
+class AssertFormsetErrorTests(SimpleTestCase):
+    def test_formset_named_form(self):
+        formset = TestFormset.invalid()
+        # The mocked context emulates the template-based rendering of the
+        # formset.
+        response = mock.Mock(context=[
+            {'form': formset},
+            {'form': formset.management_form},
+        ])
+        self.assertFormsetError(response, 'form', 0, 'field', 'invalid value')
 
 
 class FirstUrls:

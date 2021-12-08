@@ -9,4 +9,6 @@ Django 4.0.1 fixes several bugs in 4.0.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 4.0 that caused a crash of
+  :meth:`~django.test.SimpleTestCase.assertFormsetError` on a formset named
+  ``form`` (:ticket:`33346`).
