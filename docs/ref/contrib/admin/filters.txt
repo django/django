@@ -18,7 +18,7 @@ or tuple of elements, where each element is one of the following types:
 - A field name.
 - A subclass of ``django.contrib.admin.SimpleListFilter``.
 - A 2-tuple containing a field name and a subclass of
-   ``django.contrib.admin.FieldListFilter``.
+  ``django.contrib.admin.FieldListFilter``.
 
 See the examples below for discussion of each of these options for defining
 ``list_filter``.
