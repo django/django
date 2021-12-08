@@ -1898,6 +1898,9 @@ SQL equivalent:
 
     SELECT ... WHERE x=1 OR y=2
 
+``|`` is not a commutative operation, as different (though equivalent) queries
+may be generated.
+
 Methods that do not return ``QuerySet``\s
 -----------------------------------------
 
