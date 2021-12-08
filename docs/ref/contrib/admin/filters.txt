@@ -176,6 +176,25 @@ allows to store::
             ('title', admin.EmptyFieldListFilter),
         )
 
+By defining a filter using the ``__in`` lookup, it is possible to filter for
+any of a group of values. You need to override the ``expected_parameters``
+method, and the specify the ``lookup_kwargs`` attribute with the appropriate
+field name. By default, multiple values in the query string will be separated
+with commas, but this can be customized via the ``list_separator`` attribute.
+The following example shows such a filter using the vertical-pipe character as
+the separator::
+
+    class FilterWithCustomSeparator(admin.FieldListFilter):
+        # custom list separator that should be used to separate values.
+        list_separator = '|'
+
+        def __init__(self, field, request, params, model, model_admin, field_path):
+            self.lookup_kwarg = '%s__in' % field_path
+            super().__init__(field, request, params, model, model_admin, field_path)
+
+        def expected_parameters(self):
+            return [self.lookup_kwarg]
+
 .. note::
 
     The :class:`~django.contrib.contenttypes.fields.GenericForeignKey` field is

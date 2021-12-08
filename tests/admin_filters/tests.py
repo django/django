@@ -4,7 +4,8 @@ import unittest
 
 from django.contrib.admin import (
     AllValuesFieldListFilter, BooleanFieldListFilter, EmptyFieldListFilter,
-    ModelAdmin, RelatedOnlyFieldListFilter, SimpleListFilter, site,
+    FieldListFilter, ModelAdmin, RelatedOnlyFieldListFilter, SimpleListFilter,
+    site,
 )
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.auth.admin import UserAdmin
@@ -135,6 +136,17 @@ class DepartmentListFilterLookupWithDynamicValue(DecadeListFilterWithTitleAndPar
             return (('the 80s', "the 1980's"), ('the 90s', "the 1990's"),)
 
 
+class EmployeeNameCustomDividerFilter(FieldListFilter):
+    list_separator = '|'
+
+    def __init__(self, field, request, params, model, model_admin, field_path):
+        self.lookup_kwarg = '%s__in' % field_path
+        super().__init__(field, request, params, model, model_admin, field_path)
+
+    def expected_parameters(self):
+        return [self.lookup_kwarg]
+
+
 class CustomUserAdmin(UserAdmin):
     list_filter = ('books_authored', 'books_contributed')
 
@@ -229,6 +241,12 @@ class DecadeFilterBookAdminParameterEndsWith__Isnull(ModelAdmin):
 class EmployeeAdmin(ModelAdmin):
     list_display = ['name', 'department']
     list_filter = ['department']
+
+
+class EmployeeCustomDividerFilterAdmin(EmployeeAdmin):
+    list_filter = [
+        ('name', EmployeeNameCustomDividerFilter),
+    ]
 
 
 class DepartmentFilterEmployeeAdmin(EmployeeAdmin):
@@ -1547,3 +1565,29 @@ class ListFiltersTests(TestCase):
         request.user = self.alfred
         with self.assertRaises(IncorrectLookupParameters):
             modeladmin.get_changelist_instance(request)
+
+    def test_lookup_using_custom_divider(self):
+        """
+        Filter __in lookups with a custom divider.
+        """
+        jane = Employee.objects.create(name='Jane,Green', department=self.design)
+        modeladmin = EmployeeCustomDividerFilterAdmin(Employee, site)
+        employees = [jane, self.jack]
+
+        request = self.request_factory.get(
+            '/', {'name__in': "|".join(e.name for e in employees)}
+        )
+        # test for lookup with custom divider
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        # Make sure the correct queryset is returned
+        queryset = changelist.get_queryset(request)
+        self.assertEqual(list(queryset), employees)
+
+        # test for lookup with comma in the lookup string
+        request = self.request_factory.get('/', {'name': jane.name})
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        # Make sure the correct queryset is returned
+        queryset = changelist.get_queryset(request)
+        self.assertEqual(list(queryset), [jane])

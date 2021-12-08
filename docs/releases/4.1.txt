@@ -54,6 +54,10 @@ Minor features
 * The admin :ref:`dark mode CSS variables <admin-theming>` are now applied in a
   separate stylesheet and template block.
 
+* :ref:`modeladmin-list-filters` providing custom ``FieldListFilter``
+  subclasses can now control the query string value separator when filtering
+  for multiple values using the ``__in`` lookup.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
