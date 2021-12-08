@@ -572,7 +572,7 @@ class SimpleTestCase(unittest.TestCase):
         # Search all contexts for the error.
         found_formset = False
         for i, context in enumerate(contexts):
-            if formset not in context:
+            if formset not in context or not hasattr(context[formset], 'forms'):
                 continue
             found_formset = True
             for err in errors:

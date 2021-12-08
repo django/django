@@ -1512,6 +1512,16 @@ class AssertFormsetErrorTests(SimpleTestCase):
         ])
         self.assertFormsetError(response, 'formset', None, None, 'error')
 
+    def test_formset_named_form(self):
+        formset = TestFormset.invalid()
+        # The mocked context emulates the template-based rendering of the
+        # formset.
+        response = mock.Mock(context=[
+            {'form': formset},
+            {'form': formset.management_form},
+        ])
+        self.assertFormsetError(response, 'form', 0, 'field', 'invalid value')
+
 
 class FirstUrls:
     urlpatterns = [path('first/', empty_response, name='first')]
