@@ -390,7 +390,7 @@ class BaseExpression:
         return sql, params
 
 
-@deconstructible
+@deconstructible(path='django.db.models.Expression')
 class Expression(BaseExpression, Combinable):
     """An expression that can be combined with other expressions."""
 
