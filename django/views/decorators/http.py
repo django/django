@@ -8,7 +8,7 @@ from django.http import HttpResponseNotAllowed
 from django.middleware.http import ConditionalGetMiddleware
 from django.utils import timezone
 from django.utils.cache import get_conditional_response
-from django.utils.decorators import decorator_from_middleware
+from django.utils.decorators import decorator_from_middleware, require_method_decorator
 from django.utils.http import http_date, quote_etag
 from django.utils.log import log_response
 
@@ -26,9 +26,10 @@ def require_http_methods(request_method_list):
 
     Note that request methods should be in uppercase.
     """
-    def decorator(func):
-        @wraps(func)
-        def inner(request, *args, **kwargs):
+    def decorator(view_func):
+        @wraps(view_func)
+        def wrapped_view(request, *args, **kwargs):
+            require_method_decorator(request, 'require_http_methods')
             if request.method not in request_method_list:
                 response = HttpResponseNotAllowed(request_method_list)
                 log_response(
@@ -37,8 +38,8 @@ def require_http_methods(request_method_list):
                     request=request,
                 )
                 return response
-            return func(request, *args, **kwargs)
-        return inner
+            return view_func(request, *args, **kwargs)
+        return wrapped_view
     return decorator
 
 
@@ -74,9 +75,10 @@ def condition(etag_func=None, last_modified_func=None):
     will add the generated ETag and Last-Modified headers to the response if
     the headers aren't already set and if the request's method is safe.
     """
-    def decorator(func):
-        @wraps(func)
-        def inner(request, *args, **kwargs):
+    def decorator(view_func):
+        @wraps(view_func)
+        def wrapped_view(request, *args, **kwargs):
+            require_method_decorator(request, 'condition')
             # Compute values (if any) for the requested resource.
             def get_last_modified():
                 if last_modified_func:
@@ -98,7 +100,7 @@ def condition(etag_func=None, last_modified_func=None):
             )
 
             if response is None:
-                response = func(request, *args, **kwargs)
+                response = view_func(request, *args, **kwargs)
 
             # Set relevant headers on the response if they don't already exist
             # and if the request method is safe.
@@ -110,7 +112,7 @@ def condition(etag_func=None, last_modified_func=None):
 
             return response
 
-        return inner
+        return wrapped_view
     return decorator
 
 

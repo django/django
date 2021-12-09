@@ -152,6 +152,16 @@ def make_middleware_decorator(middleware_class):
     return _make_decorator
 
 
+def require_method_decorator(request, name):
+    # check properties instead of an `isinstance` check to allow for objects
+    # like Django REST framework's `Request`
+    if not hasattr(request, 'path') and not hasattr(request, 'method'):
+        raise TypeError(
+            name + " didn't receive a request as its first argument. If you "
+            "are decorating a classmethod, make sure to use @method_decorator."
+        )
+
+
 def sync_and_async_middleware(func):
     """
     Mark a middleware factory as returning a hybrid middleware supporting both

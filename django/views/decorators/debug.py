@@ -1,6 +1,6 @@
 import functools
 
-from django.http import HttpRequest
+from django.utils.decorators import require_method_decorator
 
 
 def sensitive_variables(*variables):
@@ -32,14 +32,19 @@ def sensitive_variables(*variables):
             'e.g., use @sensitive_variables(), not @sensitive_variables.'
         )
 
-    def decorator(func):
-        @functools.wraps(func)
+    def decorator(view_func):
+        # The function name `sensitive_variables_wrapper` and arguments
+        # `func_args` and `func_kwargs` are used by the debug view's
+        # `get_traceback_frame_variables` and must not be changed.
+        @functools.wraps(view_func)
         def sensitive_variables_wrapper(*func_args, **func_kwargs):
-            if variables:
-                sensitive_variables_wrapper.sensitive_variables = variables
-            else:
-                sensitive_variables_wrapper.sensitive_variables = '__ALL__'
-            return func(*func_args, **func_kwargs)
+            # ensure `sensitive_variables_wrapper` is accessible in the current
+            # frame's `f_locals`
+            nonlocal sensitive_variables_wrapper
+            return view_func(*func_args, **func_kwargs)
+        sensitive_variables_wrapper.sensitive_variables = (
+            variables or '__ALL__'
+        )
         return sensitive_variables_wrapper
     return decorator
 
@@ -74,19 +79,14 @@ def sensitive_post_parameters(*parameters):
             '@sensitive_post_parameters.'
         )
 
-    def decorator(view):
-        @functools.wraps(view)
-        def sensitive_post_parameters_wrapper(request, *args, **kwargs):
-            if not isinstance(request, HttpRequest):
-                raise TypeError(
-                    "sensitive_post_parameters didn't receive an HttpRequest "
-                    "object. If you are decorating a classmethod, make sure "
-                    "to use @method_decorator."
-                )
-            if parameters:
-                request.sensitive_post_parameters = parameters
-            else:
-                request.sensitive_post_parameters = '__ALL__'
-            return view(request, *args, **kwargs)
-        return sensitive_post_parameters_wrapper
+    if not parameters:
+        parameters = '__ALL__'
+
+    def decorator(view_func):
+        @functools.wraps(view_func)
+        def wrapped_view(request, *args, **kwargs):
+            require_method_decorator(request, 'sensitive_post_parameters')
+            request.sensitive_post_parameters = parameters
+            return view_func(request, *args, **kwargs)
+        return wrapped_view
     return decorator
