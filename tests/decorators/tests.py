@@ -1,5 +1,5 @@
 from functools import update_wrapper, wraps
-from unittest import TestCase
+from unittest import TestCase, mock
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import (
@@ -471,12 +471,29 @@ class XFrameOptionsDecoratorsTests(TestCase):
 
 
 class NeverCacheDecoratorTest(TestCase):
-    def test_never_cache_decorator(self):
+
+    @mock.patch('time.time')
+    def test_never_cache_decorator(self, mocked_time):
         @never_cache
         def a_view(request):
             return HttpResponse()
+        mocked_time.return_value = 1167616461.0
         r = a_view(HttpRequest())
         self.assertEqual(
             set(r.headers['Cache-Control'].split(', ')),
             {'max-age=0', 'no-cache', 'no-store', 'must-revalidate', 'private'},
+        )
+        self.assertEqual(
+            r.headers['Expires'], 'Mon, 01 Jan 2007 01:54:21 GMT'
+        )
+
+    def test_expires_header_does_not_get_modified_if_already_set(self):
+        @never_cache
+        def a_view(request):
+            return HttpResponse(headers={
+                'Expires': 'tomorrow'
+            })
+        r = a_view(HttpRequest())
+        self.assertEqual(
+            r.headers['Expires'], 'tomorrow'
         )

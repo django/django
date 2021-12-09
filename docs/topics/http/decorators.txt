@@ -118,9 +118,14 @@ client-side caching.
 
 .. function:: never_cache(view_func)
 
+    This decorator adds a ``Expires: Wdy, DD Mon YYYY HH:MM:SS GMT`` header
+    to a response to tell the client how long a component can be cached.
+
     This decorator adds a ``Cache-Control: max-age=0, no-cache, no-store,
     must-revalidate, private`` header to a response to indicate that a page
     should never be cached.
+
+    Each header is only added if it isn't already set.
 
 .. module:: django.views.decorators.common
 
