@@ -1131,20 +1131,20 @@ class SimpleExpressionTests(SimpleTestCase):
             hash(Expression(TestModel._meta.get_field('other_field'))),
         )
 
-        def test_deconstruct(self):
-            expression = Expression()
-            path, args, kwargs = expression.deconstruct()
-            self.assertEqual(path, 'django.db.models.Expression')
-            self.assertEqual(args, ())
-            self.assertEqual(kwargs, {})
+    def test_deconstruct(self):
+        expression = Expression()
+        path, args, kwargs = expression.deconstruct()
+        self.assertEqual(path, 'django.db.models.Expression')
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {})
 
-        def test_deconstruct_output_field(self):
-            expression = Expression(output_field=IntegerField())
-            path, args, kwargs = expression.deconstruct()
-            self.assertEqual(path, 'django.db.models.Expression')
-            self.assertEqual(args, ())
-            self.assertEqual(len(kwargs), 1)
-            self.assertEqual(kwargs['output_field'].deconstruct(), IntegerField().deconstruct())
+    def test_deconstruct_output_field(self):
+        expression = Expression(output_field=IntegerField())
+        path, args, kwargs = expression.deconstruct()
+        self.assertEqual(path, 'django.db.models.Expression')
+        self.assertEqual(args, ())
+        self.assertEqual(len(kwargs), 1)
+        self.assertEqual(kwargs['output_field'].deconstruct(), IntegerField().deconstruct())
 
 
 class ExpressionsNumericTests(TestCase):
