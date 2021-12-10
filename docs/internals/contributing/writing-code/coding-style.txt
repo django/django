@@ -42,12 +42,20 @@ Python style
 
 * Unless otherwise specified, follow :pep:`8`.
 
-  Use `flake8`_ to check for problems in this area. Note that our ``setup.cfg``
-  file contains some excluded files (deprecated modules we don't care about
-  cleaning up and some third-party code that Django vendors) as well as some
-  excluded errors that we don't consider as gross violations. Remember that
-  :pep:`8` is only a guide, so respect the style of the surrounding code as a
-  primary goal.
+  Use `flake8`_ to check for problems in this area. When you have
+  :ref:`pre-commit set up <coding-style-pre-commit>`, it runs flake8
+  automatically changed files when committing. You can also run flake8 on
+  particular files with:
+
+  .. code-block:: shell
+
+        $ pre-commit run flake8 --files <filenames>
+
+  Note that our ``setup.cfg`` file contains some excluded files (deprecated
+  modules we don't care about cleaning up and some third-party code that Django
+  vendors) as well as some excluded errors that we don't consider as gross
+  violations. Remember that :pep:`8` is only a guide, so respect the style of
+  the surrounding code as a primary goal.
 
   An exception to :pep:`8` is our rules on line lengths. Don't limit lines of
   code to 79 characters if it means the code looks significantly uglier or is
@@ -152,20 +160,13 @@ Imports
 =======
 
 * Use `isort <https://github.com/PyCQA/isort#readme>`_ to automate import
-  sorting using the guidelines below.
+  sorting using the guidelines below. When you have :ref:`pre-commit set up
+  <coding-style-pre-commit>`, it will run isort automatically on changed files
+  when committing. You can also run isort on particular files with:
 
-  Quick start:
+  .. code-block:: shell
 
-  .. console::
-
-      $ python -m pip install "isort >= 5.1.0"
-      $ isort .
-
-  This runs ``isort`` recursively from your current directory, modifying any
-  files that don't conform to the guidelines. If you need to have imports out
-  of order (to avoid a circular import, for example) use a comment like this::
-
-      import module  # isort:skip
+        $ pre-commit run isort --files <filenames>
 
 * Put imports in these groups: future, standard library, third-party libraries,
   other Django components, local Django component, try/excepts. Sort lines in
