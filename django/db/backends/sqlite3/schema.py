@@ -15,6 +15,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_table = "DROP TABLE %(table)s"
     sql_create_fk = None
     sql_create_inline_fk = "REFERENCES %(to_table)s (%(to_column)s) DEFERRABLE INITIALLY DEFERRED"
+    sql_create_column_inline_fk = sql_create_inline_fk
     sql_create_unique = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)"
     sql_delete_unique = "DROP INDEX %(name)s"
 
@@ -322,14 +323,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                     self.deferred_sql.remove(sql)
 
     def add_field(self, model, field):
-        """
-        Create a field on a model. Usually involves adding a column, but may
-        involve adding a table instead (for M2M fields).
-        """
-        # Special-case implicit M2M tables
-        if field.many_to_many and field.remote_field.through._meta.auto_created:
-            return self.create_model(field.remote_field.through)
-        self._remake_table(model, create_field=field)
+        """Create a field on a model."""
+        # Fields with default values cannot by handled by ALTER TABLE ADD
+        # COLUMN statement because DROP DEFAULT is not supported in
+        # ALTER TABLE.
+        if not field.null or self.effective_default(field) is not None:
+            self._remake_table(model, create_field=field)
+        else:
+            super().add_field(model, field)
 
     def remove_field(self, model, field):
         """

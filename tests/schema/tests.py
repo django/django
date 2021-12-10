@@ -517,6 +517,15 @@ class SchemaTests(TransactionTestCase):
             'column': editor.quote_name(new_field.name),
         }
         self.assertFalse(any(drop_default_sql in query['sql'] for query in ctx.captured_queries))
+        # Table is not rebuilt.
+        self.assertIs(any(
+            'CREATE TABLE' in query['sql']
+            for query in ctx.captured_queries
+        ), False)
+        self.assertIs(any(
+            'DROP TABLE' in query['sql']
+            for query in ctx.captured_queries
+        ), False)
         columns = self.column_classes(Author)
         self.assertEqual(columns['age'][0], connection.features.introspected_field_types['IntegerField'])
         self.assertTrue(columns['age'][1][6])
