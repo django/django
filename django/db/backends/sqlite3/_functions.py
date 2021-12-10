@@ -21,14 +21,6 @@ from django.utils.crypto import md5
 from django.utils.duration import duration_microseconds
 
 
-def list_aggregate(function):
-    """
-    Return an aggregate class that accumulates values in a list and applies
-    the provided function to the data.
-    """
-    return type('ListAggregate', (list,), {'finalize': function, 'step': list.append})
-
-
 def register(connection):
     create_deterministic_function = functools.partial(
         connection.create_function,
@@ -80,10 +72,10 @@ def register(connection):
     # Don't use the built-in RANDOM() function because it returns a value
     # in the range [-1 * 2^63, 2^63 - 1] instead of [0, 1).
     connection.create_function('RAND', 0, random.random)
-    connection.create_aggregate('STDDEV_POP', 1, list_aggregate(statistics.pstdev))
-    connection.create_aggregate('STDDEV_SAMP', 1, list_aggregate(statistics.stdev))
-    connection.create_aggregate('VAR_POP', 1, list_aggregate(statistics.pvariance))
-    connection.create_aggregate('VAR_SAMP', 1, list_aggregate(statistics.variance))
+    connection.create_aggregate('STDDEV_POP', 1, StdDevPop)
+    connection.create_aggregate('STDDEV_SAMP', 1, StdDevSamp)
+    connection.create_aggregate('VAR_POP', 1, VarPop)
+    connection.create_aggregate('VAR_SAMP', 1, VarSamp)
 
 
 def _sqlite_datetime_parse(dt, tzname=None, conn_tzname=None):
@@ -467,3 +459,23 @@ def _sqlite_tan(x):
     if x is None:
         return None
     return tan(x)
+
+
+class ListAggregate(list):
+    step = list.append
+
+
+class StdDevPop(ListAggregate):
+    finalize = statistics.pstdev
+
+
+class StdDevSamp(ListAggregate):
+    finalize = statistics.stdev
+
+
+class VarPop(ListAggregate):
+    finalize = statistics.pvariance
+
+
+class VarSamp(ListAggregate):
+    finalize = statistics.variance
