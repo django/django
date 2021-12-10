@@ -2128,7 +2128,9 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(response.status_code, 302)
         login = self.client.post(login_url, self.no_username_login)
         self.assertEqual(login.status_code, 200)
-        self.assertFormError(login, "form", "username", ["This field is required."])
+        self.assertFormError(
+            login.context["form"], "username", ["This field is required."]
+        )
 
     def test_login_redirect_for_direct_get(self):
         """
@@ -6711,10 +6713,9 @@ class UserAdminTest(TestCase):
             },
         )
         self.assertEqual(response.status_code, 200)
-        self.assertFormError(response, "adminform", "password1", [])
+        self.assertFormError(response.context["adminform"], "password1", [])
         self.assertFormError(
-            response,
-            "adminform",
+            response.context["adminform"],
             "password2",
             ["The two password fields didn’t match."],
         )
@@ -7836,12 +7837,13 @@ class AdminViewOnSiteTests(TestCase):
             reverse("admin:admin_views_parentwithdependentchildren_add"), post_data
         )
         self.assertFormError(
-            response, "adminform", "some_required_info", ["This field is required."]
+            response.context["adminform"],
+            "some_required_info",
+            ["This field is required."],
         )
-        self.assertFormError(response, "adminform", None, [])
+        self.assertFormError(response.context["adminform"], None, [])
         self.assertFormsetError(
-            response,
-            "inline_admin_formset",
+            response.context["inline_admin_formset"],
             0,
             None,
             [
@@ -7849,7 +7851,9 @@ class AdminViewOnSiteTests(TestCase):
                 "contrived test case"
             ],
         )
-        self.assertFormsetError(response, "inline_admin_formset", None, None, [])
+        self.assertFormsetError(
+            response.context["inline_admin_formset"], None, None, []
+        )
 
     def test_change_view_form_and_formsets_run_validation(self):
         """
@@ -7879,11 +7883,12 @@ class AdminViewOnSiteTests(TestCase):
             post_data,
         )
         self.assertFormError(
-            response, "adminform", "some_required_info", ["This field is required."]
+            response.context["adminform"],
+            "some_required_info",
+            ["This field is required."],
         )
         self.assertFormsetError(
-            response,
-            "inline_admin_formset",
+            response.context["inline_admin_formset"],
             0,
             None,
             [

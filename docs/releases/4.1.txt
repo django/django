@@ -327,6 +327,10 @@ Tests
 * A nested atomic block marked as durable in :class:`django.test.TestCase` now
   raises a ``RuntimeError``, the same as outside of tests.
 
+* :meth:`.SimpleTestCase.assertFormError` and
+  :meth:`~.SimpleTestCase.assertFormsetError` now support passing a
+  form/formset object directly.
+
 URLs
 ~~~~
 
@@ -449,6 +453,9 @@ Miscellaneous
 
 * The admin log out UI now uses ``POST`` requests.
 
+* The undocumented ``InlineAdminFormSet.non_form_errors`` property is replaced
+  by the ``non_form_errors()`` method. This is consistent with ``BaseFormSet``.
+
 .. _deprecated-features-4.1:
 
 Features deprecated in 4.1
@@ -551,6 +558,15 @@ Miscellaneous
 
 * The :data:`django.utils.timezone.utc` alias to :attr:`datetime.timezone.utc`
   is deprecated. Use :attr:`datetime.timezone.utc` directly.
+
+* Passing a response object and a form/formset name to
+  ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` is
+  deprecated. Use::
+
+    assertFormError(response.context['form_name'], …)
+    assertFormsetError(response.context['formset_name'], …)
+
+  or pass the form/formset object directly instead.
 
 Features removed in 4.1
 =======================
