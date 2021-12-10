@@ -1,3 +1,8 @@
+ci:
+  autofix_commit_msg: Applied fixes.
+  autoupdate_commit_msg: Updated pre-commit hooks.
+  autoupdate_schedule: monthly
+
 repos:
   - repo: https://github.com/PyCQA/isort
     rev: 5.9.3
