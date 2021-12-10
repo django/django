@@ -64,6 +64,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         else:
             raise ValueError("Cannot quote parameter value %r of type %s" % (value, type(value)))
 
+    def prepare_default(self, value):
+        return self.quote_value(value)
+
     def _is_referenced_by_fk_constraint(self, table_name, column_name=None, ignore_self=False):
         """
         Return whether or not the provided table name is referenced by another
@@ -186,8 +189,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             body[create_field.name] = create_field
             # Choose a default and insert it into the copy map
             if not create_field.many_to_many and create_field.concrete:
-                mapping[create_field.column] = self.quote_value(
-                    self.effective_default(create_field)
+                mapping[create_field.column] = self.prepare_default(
+                    self.effective_default(create_field),
                 )
         # Add in any altered fields
         if alter_field:
@@ -198,7 +201,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             if old_field.null and not new_field.null:
                 case_sql = "coalesce(%(col)s, %(default)s)" % {
                     'col': self.quote_name(old_field.column),
-                    'default': self.quote_value(self.effective_default(new_field))
+                    'default': self.prepare_default(self.effective_default(new_field)),
                 }
                 mapping[new_field.column] = case_sql
             else:
