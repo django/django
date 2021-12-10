@@ -57,6 +57,10 @@ def include(arg, namespace=None):
 def _path(route, view, kwargs=None, name=None, Pattern=None):
     from django.views import View
 
+    if kwargs is not None and not isinstance(kwargs, dict):
+        raise TypeError(
+            f'kwargs argument must be a dict, but got {kwargs.__class__.__name__}.'
+        )
     if isinstance(view, (list, tuple)):
         # For include(...) processing.
         pattern = Pattern(route, is_endpoint=False)

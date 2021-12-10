@@ -4,7 +4,9 @@ import uuid
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
-from django.urls import NoReverseMatch, Resolver404, path, resolve, reverse
+from django.urls import (
+    NoReverseMatch, Resolver404, path, re_path, resolve, reverse,
+)
 from django.views import View
 
 from .converters import DynamicConverter
@@ -136,6 +138,13 @@ class SimplifiedURLTests(SimpleTestCase):
     def test_path_inclusion_is_reversible(self):
         url = reverse('inner-extra', kwargs={'extra': 'something'})
         self.assertEqual(url, '/included_urls/extra/something/')
+
+    def test_invalid_kwargs(self):
+        msg = 'kwargs argument must be a dict, but got str.'
+        with self.assertRaisesMessage(TypeError, msg):
+            path('hello/', empty_view, 'name')
+        with self.assertRaisesMessage(TypeError, msg):
+            re_path('^hello/$', empty_view, 'name')
 
     def test_invalid_converter(self):
         msg = "URL route 'foo/<nonexistent:var>/' uses invalid converter 'nonexistent'."
