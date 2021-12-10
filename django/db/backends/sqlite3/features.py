@@ -18,6 +18,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_rollback_ddl = True
     can_create_inline_fk = False
     supports_paramstyle_pyformat = False
+    requires_literal_defaults = True
     can_clone_databases = True
     supports_temporal_subtraction = True
     ignores_table_name_case = True
