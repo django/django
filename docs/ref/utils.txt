@@ -62,9 +62,13 @@ need to distinguish caches by the ``Accept-language`` header.
 
 .. function:: add_never_cache_headers(response)
 
+    Adds an ``Expires`` header to the current date/time.
+
     Adds a ``Cache-Control: max-age=0, no-cache, no-store, must-revalidate,
     private`` header to a response to indicate that a page should never be
     cached.
+
+    Each header is only added if it isn't already set.
 
 .. function:: patch_vary_headers(response, newheaders)
 
