@@ -58,6 +58,12 @@ class HashedFilesMixin:
                 '//# sourceMappingURL=%(url)s',
             ),
         )),
+        ('*.mjs', (
+            (
+                r"""(^|;)\s*(?P<matched>(?P<prefix>import(\s*\*\s*as\s+\w+\s+|\s+\w+\s+|\s*{[\w,\s]*?}\s*)from\s*)['"](?P<url>.*?)['"])""",
+                "%(prefix)s '%(url)s'",
+            ),
+        )),
     )
     keep_intermediate_files = True
 
