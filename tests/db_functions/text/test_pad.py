@@ -25,6 +25,8 @@ class PadTests(TestCase):
             (RPad('name', 0), ''),
             (LPad('name', None), none_value),
             (RPad('name', None), none_value),
+            (LPad(Value(None), 1), none_value),
+            (RPad(Value(None), 1), none_value),
             (LPad('goes_by', 1), none_value),
             (RPad('goes_by', 1), none_value),
         )

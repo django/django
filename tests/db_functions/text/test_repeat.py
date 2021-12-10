@@ -16,6 +16,7 @@ class RepeatTests(TestCase):
             (Repeat('name', Length('alias')), 'JohnJohnJohn'),
             (Repeat(Value('x'), 3), 'xxx'),
             (Repeat('name', None), none_value),
+            (Repeat(Value(None), 4), none_value),
             (Repeat('goes_by', 1), none_value),
         )
         for function, repeated_text in tests:
