@@ -451,17 +451,17 @@ def _sqlite_date_trunc(lookup_type, dt, tzname, conn_tzname):
     if dt is None:
         return None
     if lookup_type == 'year':
-        return "%i-01-01" % dt.year
+        return '%04i-01-01' % dt.year
     elif lookup_type == 'quarter':
         month_in_quarter = dt.month - (dt.month - 1) % 3
-        return '%i-%02i-01' % (dt.year, month_in_quarter)
+        return '%04i-%02i-01' % (dt.year, month_in_quarter)
     elif lookup_type == 'month':
-        return "%i-%02i-01" % (dt.year, dt.month)
+        return '%04i-%02i-01' % (dt.year, dt.month)
     elif lookup_type == 'week':
         dt = dt - datetime.timedelta(days=dt.weekday())
-        return "%i-%02i-%02i" % (dt.year, dt.month, dt.day)
+        return '%04i-%02i-%02i' % (dt.year, dt.month, dt.day)
     elif lookup_type == 'day':
-        return "%i-%02i-%02i" % (dt.year, dt.month, dt.day)
+        return '%04i-%02i-%02i' % (dt.year, dt.month, dt.day)
 
 
 def _sqlite_time_trunc(lookup_type, dt, tzname, conn_tzname):
@@ -520,23 +520,23 @@ def _sqlite_datetime_trunc(lookup_type, dt, tzname, conn_tzname):
     if dt is None:
         return None
     if lookup_type == 'year':
-        return "%i-01-01 00:00:00" % dt.year
+        return '%04i-01-01 00:00:00' % dt.year
     elif lookup_type == 'quarter':
         month_in_quarter = dt.month - (dt.month - 1) % 3
-        return '%i-%02i-01 00:00:00' % (dt.year, month_in_quarter)
+        return '%04i-%02i-01 00:00:00' % (dt.year, month_in_quarter)
     elif lookup_type == 'month':
-        return "%i-%02i-01 00:00:00" % (dt.year, dt.month)
+        return '%04i-%02i-01 00:00:00' % (dt.year, dt.month)
     elif lookup_type == 'week':
         dt = dt - datetime.timedelta(days=dt.weekday())
-        return "%i-%02i-%02i 00:00:00" % (dt.year, dt.month, dt.day)
+        return '%04i-%02i-%02i 00:00:00' % (dt.year, dt.month, dt.day)
     elif lookup_type == 'day':
-        return "%i-%02i-%02i 00:00:00" % (dt.year, dt.month, dt.day)
+        return '%04i-%02i-%02i 00:00:00' % (dt.year, dt.month, dt.day)
     elif lookup_type == 'hour':
-        return "%i-%02i-%02i %02i:00:00" % (dt.year, dt.month, dt.day, dt.hour)
+        return '%04i-%02i-%02i %02i:00:00' % (dt.year, dt.month, dt.day, dt.hour)
     elif lookup_type == 'minute':
-        return "%i-%02i-%02i %02i:%02i:00" % (dt.year, dt.month, dt.day, dt.hour, dt.minute)
+        return '%04i-%02i-%02i %02i:%02i:00' % (dt.year, dt.month, dt.day, dt.hour, dt.minute)
     elif lookup_type == 'second':
-        return "%i-%02i-%02i %02i:%02i:%02i" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
+        return '%04i-%02i-%02i %02i:%02i:%02i' % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
 
 
 def _sqlite_time_extract(lookup_type, dt):

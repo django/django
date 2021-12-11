@@ -77,6 +77,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             'db_functions.text.test_sha224.SHA224Tests.test_basic',
             'db_functions.text.test_sha224.SHA224Tests.test_transform',
         },
+        "Oracle doesn't correctly calculate ISO 8601 week numbering before "
+        "1583 (the Gregorian calendar was introduced in 1582).": {
+            'db_functions.datetime.test_extract_trunc.DateFunctionTests.test_trunc_week_before_1000',
+            'db_functions.datetime.test_extract_trunc.DateFunctionWithTimeZoneTests.test_trunc_week_before_1000',
+        },
         "Oracle doesn't support bitwise XOR.": {
             'expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor',
             'expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor_null',

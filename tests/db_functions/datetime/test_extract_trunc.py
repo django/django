@@ -653,7 +653,7 @@ class DateFunctionTests(TestCase):
         self.assertEqual(DTModel.objects.filter(start_datetime__second=ExtractSecond('start_datetime')).count(), 2)
 
     def test_trunc_func(self):
-        start_datetime = datetime(2015, 6, 15, 14, 30, 50, 321)
+        start_datetime = datetime(999, 6, 15, 14, 30, 50, 321)
         end_datetime = datetime(2016, 6, 15, 14, 10, 50, 123)
         if settings.USE_TZ:
             start_datetime = timezone.make_aware(start_datetime)
@@ -730,9 +730,7 @@ class DateFunctionTests(TestCase):
         qs = DTModel.objects.filter(start_datetime__date=Trunc('start_datetime', 'day', output_field=DateField()))
         self.assertEqual(qs.count(), 2)
 
-    def test_trunc_week(self):
-        start_datetime = datetime(2015, 6, 15, 14, 30, 50, 321)
-        end_datetime = datetime(2016, 6, 15, 14, 10, 50, 123)
+    def _test_trunc_week(self, start_datetime, end_datetime):
         if settings.USE_TZ:
             start_datetime = timezone.make_aware(start_datetime)
             end_datetime = timezone.make_aware(end_datetime)
@@ -758,6 +756,18 @@ class DateFunctionTests(TestCase):
                 (end_datetime, truncate_to(end_datetime.date(), 'week')),
             ],
             lambda m: (m.start_datetime, m.truncated),
+        )
+
+    def test_trunc_week(self):
+        self._test_trunc_week(
+            start_datetime=datetime(2015, 6, 15, 14, 30, 50, 321),
+            end_datetime=datetime(2016, 6, 15, 14, 10, 50, 123),
+        )
+
+    def test_trunc_week_before_1000(self):
+        self._test_trunc_week(
+            start_datetime=datetime(999, 6, 15, 14, 30, 50, 321),
+            end_datetime=datetime(2016, 6, 15, 14, 10, 50, 123),
         )
 
     def test_trunc_invalid_arguments(self):
