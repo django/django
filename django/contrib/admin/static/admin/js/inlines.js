@@ -88,7 +88,7 @@
             if (options.added) {
                 options.added(row);
             }
-            $(document).trigger('formset:added', [row, options.prefix]);
+            document.querySelector(document).trigger('formset:added', [row, options.prefix]);
         };
 
         /**
