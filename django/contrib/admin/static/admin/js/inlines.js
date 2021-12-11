@@ -130,7 +130,7 @@
             if (options.removed) {
                 options.removed(row);
             }
-            $(document).trigger('formset:removed', [row, options.prefix]);
+            document.querySelector(document).trigger('formset:removed', [row, options.prefix]);
             // Update the TOTAL_FORMS form count.
             const forms = $("." + options.formCssClass);
             $("#id_" + options.prefix + "-TOTAL_FORMS").val(forms.length);
