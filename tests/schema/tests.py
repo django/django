@@ -12,10 +12,11 @@ from django.db import (
 from django.db.models import (
     CASCADE, PROTECT, AutoField, BigAutoField, BigIntegerField, BinaryField,
     BooleanField, CharField, CheckConstraint, DateField, DateTimeField,
-    DecimalField, F, FloatField, ForeignKey, ForeignObject, Index,
-    IntegerField, JSONField, ManyToManyField, Model, OneToOneField, OrderBy,
-    PositiveIntegerField, Q, SlugField, SmallAutoField, SmallIntegerField,
-    TextField, TimeField, UniqueConstraint, UUIDField, Value,
+    DecimalField, DurationField, F, FloatField, ForeignKey, ForeignObject,
+    Index, IntegerField, JSONField, ManyToManyField, Model, OneToOneField,
+    OrderBy, PositiveIntegerField, Q, SlugField, SmallAutoField,
+    SmallIntegerField, TextField, TimeField, UniqueConstraint, UUIDField,
+    Value,
 )
 from django.db.models.fields.json import KeyTextTransform
 from django.db.models.functions import Abs, Cast, Collate, Lower, Random, Upper
@@ -639,6 +640,19 @@ class SchemaTests(TransactionTestCase):
         # MySQL annoyingly uses the same backend, so it'll come back as one of
         # these two types.
         self.assertIn(columns['bits'][0], ("BinaryField", "TextField"))
+
+    def test_add_field_durationfield_with_default(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        new_field = DurationField(default=datetime.timedelta(minutes=10))
+        new_field.set_attributes_from_name('duration')
+        with connection.schema_editor() as editor:
+            editor.add_field(Author, new_field)
+        columns = self.column_classes(Author)
+        self.assertEqual(
+            columns['duration'][0],
+            connection.features.introspected_field_types['DurationField'],
+        )
 
     @unittest.skipUnless(connection.vendor == 'mysql', "MySQL specific")
     def test_add_binaryfield_mediumblob(self):
@@ -1884,6 +1898,32 @@ class SchemaTests(TransactionTestCase):
         constraints = self.get_constraints(Author._meta.db_table)
         if not any(details['columns'] == ['height'] and details['check'] for details in constraints.values()):
             self.fail("No check constraint for height found")
+
+    @skipUnlessDBFeature('supports_column_check_constraints', 'can_introspect_check_constraints')
+    @isolate_apps('schema')
+    def test_check_constraint_timedelta_param(self):
+        class DurationModel(Model):
+            duration = DurationField()
+
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(DurationModel)
+        self.isolated_local_models = [DurationModel]
+        constraint_name = 'duration_gte_5_minutes'
+        constraint = CheckConstraint(
+            check=Q(duration__gt=datetime.timedelta(minutes=5)),
+            name=constraint_name,
+        )
+        DurationModel._meta.constraints = [constraint]
+        with connection.schema_editor() as editor:
+            editor.add_constraint(DurationModel, constraint)
+        constraints = self.get_constraints(DurationModel._meta.db_table)
+        self.assertIn(constraint_name, constraints)
+        with self.assertRaises(IntegrityError), atomic():
+            DurationModel.objects.create(duration=datetime.timedelta(minutes=4))
+        DurationModel.objects.create(duration=datetime.timedelta(minutes=10))
 
     @skipUnlessDBFeature('supports_column_check_constraints', 'can_introspect_check_constraints')
     def test_remove_field_check_does_not_remove_meta_constraints(self):

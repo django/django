@@ -6,6 +6,7 @@ from django.db import DatabaseError
 from django.db.backends.base.schema import (
     BaseDatabaseSchemaEditor, _related_non_m2m_objects,
 )
+from django.utils.duration import duration_iso_string
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -27,6 +28,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def quote_value(self, value):
         if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
             return "'%s'" % value
+        elif isinstance(value, datetime.timedelta):
+            return "'%s'" % duration_iso_string(value)
         elif isinstance(value, str):
             return "'%s'" % value.replace("\'", "\'\'").replace('%', '%%')
         elif isinstance(value, (bytes, bytearray, memoryview)):
