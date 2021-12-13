@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2019-12-13 21:48+0000\n"
-"Last-Translator: Otabek Umurzakov <umurzakov.otabek.1999@gmail.com>\n"
+"PO-Revision-Date: 2021-12-13 18:21+0000\n"
+"Last-Translator: Nuriddin Islamov <nuriddinislamov@icloud.com>\n"
 "Language-Team: Uzbek (http://www.transifex.com/django/django/language/uz/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -18,7 +18,7 @@ msgstr ""
 
 #, javascript-format
 msgid "Available %s"
-msgstr "Mavjud %s"
+msgstr "%s mavjud"
 
 #, javascript-format
 msgid ""
@@ -69,7 +69,7 @@ msgstr "Barchasini o'chirish"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
-msgstr "Barcha tanlangan %s larni birdan o'chirib tashlash uchun bosing."
+msgstr "Barcha tanlangan %slarni bittada o'chirib tashlash uchun bosing."
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -185,34 +185,34 @@ msgstr "Dekabr"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr "S"
+msgstr "Ya"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr "M"
+msgstr "Du"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr "T"
+msgstr "Se"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr "W"
+msgstr "Ch"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr "T"
+msgstr "Pa"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr "F"
+msgstr "Ju"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr "S"
+msgstr "Sh"
 
 msgid "Show"
 msgstr "Ko'rsatish"
 
 msgid "Hide"
-msgstr "Yashirish"
+msgstr "Bekitish"
