@@ -93,10 +93,10 @@ class Command(BaseCommand):
         # Start the interactive interpreter.
         code.interact(local=imported_objects)
 
-    def handle(self, **options):
+    def handle(self, *, interface, command, **options):
         # Execute the command and exit.
-        if options['command']:
-            exec(options['command'], globals())
+        if command:
+            exec(command, globals())
             return
 
         # Execute stdin if it has anything to read and exit.
@@ -105,7 +105,7 @@ class Command(BaseCommand):
             exec(sys.stdin.read(), globals())
             return
 
-        available_shells = [options['interface']] if options['interface'] else self.shells
+        available_shells = [interface] if interface else self.shells
 
         for shell in available_shells:
             try:

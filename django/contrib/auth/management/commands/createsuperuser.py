@@ -78,9 +78,8 @@ class Command(BaseCommand):
         self.stdin = options.get('stdin', sys.stdin)  # Used for testing
         return super().execute(*args, **options)
 
-    def handle(self, *args, **options):
+    def handle(self, *args, database, interactive, verbosity, **options):
         username = options[self.UserModel.USERNAME_FIELD]
-        database = options['database']
         user_data = {}
         verbose_field_name = self.username_field.verbose_name
         try:
@@ -91,7 +90,7 @@ class Command(BaseCommand):
             # If not provided, create the user with an unusable password.
             user_data[PASSWORD_FIELD] = None
         try:
-            if options['interactive']:
+            if interactive:
                 # Same as user_data but without many to many fields and with
                 # foreign keys as fake model instances instead of raw IDs.
                 fake_user_data = {}
@@ -193,7 +192,7 @@ class Command(BaseCommand):
                         ]
 
             self.UserModel._default_manager.db_manager(database).create_superuser(**user_data)
-            if options['verbosity'] >= 1:
+            if verbosity >= 1:
                 self.stdout.write("Superuser created successfully.")
         except KeyboardInterrupt:
             self.stderr.write('\nOperation cancelled.')

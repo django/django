@@ -281,45 +281,45 @@ class Command(BaseCommand):
             help="Keep .pot file after making messages. Useful when debugging.",
         )
 
-    def handle(self, *args, **options):
-        locale = options['locale']
-        exclude = options['exclude']
-        self.domain = options['domain']
-        self.verbosity = options['verbosity']
-        process_all = options['all']
-        extensions = options['extensions']
-        self.symlinks = options['symlinks']
+    def handle(
+        self, *args, locale, exclude, domain, all, extensions, symlinks,
+        ignore_patterns, use_default_ignore_patterns, no_wrap, no_location,
+        add_location, no_obsolete, keep_pot, verbosity, **options
+    ):
+        self.domain = domain
+        self.verbosity = verbosity
+        process_all = all
+        self.symlinks = symlinks
 
-        ignore_patterns = options['ignore_patterns']
-        if options['use_default_ignore_patterns']:
+        if use_default_ignore_patterns:
             ignore_patterns += ['CVS', '.*', '*~', '*.pyc']
         self.ignore_patterns = list(set(ignore_patterns))
 
         # Avoid messing with mutable class variables
-        if options['no_wrap']:
+        if no_wrap:
             self.msgmerge_options = self.msgmerge_options[:] + ['--no-wrap']
             self.msguniq_options = self.msguniq_options[:] + ['--no-wrap']
             self.msgattrib_options = self.msgattrib_options[:] + ['--no-wrap']
             self.xgettext_options = self.xgettext_options[:] + ['--no-wrap']
-        if options['no_location']:
+        if no_location:
             self.msgmerge_options = self.msgmerge_options[:] + ['--no-location']
             self.msguniq_options = self.msguniq_options[:] + ['--no-location']
             self.msgattrib_options = self.msgattrib_options[:] + ['--no-location']
             self.xgettext_options = self.xgettext_options[:] + ['--no-location']
-        if options['add_location']:
+        if add_location:
             if self.gettext_version < (0, 19):
                 raise CommandError(
                     "The --add-location option requires gettext 0.19 or later. "
                     "You have %s." % '.'.join(str(x) for x in self.gettext_version)
                 )
-            arg_add_location = "--add-location=%s" % options['add_location']
+            arg_add_location = "--add-location=%s" % add_location
             self.msgmerge_options = self.msgmerge_options[:] + [arg_add_location]
             self.msguniq_options = self.msguniq_options[:] + [arg_add_location]
             self.msgattrib_options = self.msgattrib_options[:] + [arg_add_location]
             self.xgettext_options = self.xgettext_options[:] + [arg_add_location]
 
-        self.no_obsolete = options['no_obsolete']
-        self.keep_pot = options['keep_pot']
+        self.no_obsolete = no_obsolete
+        self.keep_pot = keep_pot
 
         if self.domain not in ('django', 'djangojs'):
             raise CommandError("currently makemessages only supports domains "

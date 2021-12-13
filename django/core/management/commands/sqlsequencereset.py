@@ -14,12 +14,12 @@ class Command(AppCommand):
             help='Nominates a database to print the SQL for. Defaults to the "default" database.',
         )
 
-    def handle_app_config(self, app_config, **options):
+    def handle_app_config(self, app_config, database, verbosity, **options):
         if app_config.models_module is None:
             return
-        connection = connections[options['database']]
+        connection = connections[database]
         models = app_config.get_models(include_auto_created=True)
         statements = connection.ops.sequence_reset_sql(self.style, models)
-        if not statements and options['verbosity'] >= 1:
+        if not statements and verbosity >= 1:
             self.stderr.write('No sequences found.')
         return '\n'.join(statements)

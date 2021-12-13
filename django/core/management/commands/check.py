@@ -37,9 +37,9 @@ class Command(BaseCommand):
             help='Run database related checks against these aliases.',
         )
 
-    def handle(self, *app_labels, **options):
-        include_deployment_checks = options['deploy']
-        if options['list_tags']:
+    def handle(self, *app_labels, deploy, list_tags, tags, fail_level, databases, **options):
+        include_deployment_checks = deploy
+        if list_tags:
             self.stdout.write('\n'.join(sorted(registry.tags_available(include_deployment_checks))))
             return
 
@@ -48,7 +48,6 @@ class Command(BaseCommand):
         else:
             app_configs = None
 
-        tags = options['tags']
         if tags:
             try:
                 invalid_tag = next(
@@ -65,6 +64,6 @@ class Command(BaseCommand):
             tags=tags,
             display_num_errors=True,
             include_deployment_checks=include_deployment_checks,
-            fail_level=getattr(checks, options['fail_level']),
-            databases=options['databases'],
+            fail_level=getattr(checks, fail_level),
+            databases=databases,
         )

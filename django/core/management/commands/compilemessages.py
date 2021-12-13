@@ -56,12 +56,10 @@ class Command(BaseCommand):
                  'Use multiple times to ignore more.',
         )
 
-    def handle(self, **options):
-        locale = options['locale']
-        exclude = options['exclude']
-        ignore_patterns = set(options['ignore_patterns'])
-        self.verbosity = options['verbosity']
-        if options['fuzzy']:
+    def handle(self, *, locale, exclude, fuzzy, ignore_patterns, verbosity, **options):
+        ignore_patterns = set(ignore_patterns)
+        self.verbosity = verbosity
+        if fuzzy:
             self.program_options = self.program_options + ['-f']
 
         if find_command(self.program) is None:

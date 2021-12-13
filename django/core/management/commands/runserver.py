@@ -69,22 +69,22 @@ class Command(BaseCommand):
         """Return the default WSGI handler for the runner."""
         return get_internal_wsgi_application()
 
-    def handle(self, *args, **options):
+    def handle(self, *args, addrport, use_ipv6, **options):
         if not settings.DEBUG and not settings.ALLOWED_HOSTS:
             raise CommandError('You must set settings.ALLOWED_HOSTS if DEBUG is False.')
 
-        self.use_ipv6 = options['use_ipv6']
+        self.use_ipv6 = use_ipv6
         if self.use_ipv6 and not socket.has_ipv6:
             raise CommandError('Your Python does not support IPv6.')
         self._raw_ipv6 = False
-        if not options['addrport']:
+        if not addrport:
             self.addr = ''
             self.port = self.default_port
         else:
-            m = re.match(naiveip_re, options['addrport'])
+            m = re.match(naiveip_re, addrport)
             if m is None:
                 raise CommandError('"%s" is not a valid port number '
-                                   'or address:port pair.' % options['addrport'])
+                                   'or address:port pair.' % addrport)
             self.addr, _ipv4, _ipv6, _fqdn, self.port = m.groups()
             if not self.port.isdigit():
                 raise CommandError("%r is not a valid port number." % self.port)
@@ -100,26 +100,21 @@ class Command(BaseCommand):
             self._raw_ipv6 = self.use_ipv6
         self.run(**options)
 
-    def run(self, **options):
+    def run(self, *, use_reloader, **options):
         """Run the server, using the autoreloader if needed."""
-        use_reloader = options['use_reloader']
-
         if use_reloader:
             autoreload.run_with_reloader(self.inner_run, **options)
         else:
             self.inner_run(None, **options)
 
-    def inner_run(self, *args, **options):
+    def inner_run(self, *args, use_threading, skip_checks, shutdown_message='', **options):
         # If an exception was silenced in ManagementUtility.execute in order
         # to be raised in the child process, raise it now.
         autoreload.raise_last_exception()
 
-        threading = options['use_threading']
-        # 'shutdown_message' is a stealth option.
-        shutdown_message = options.get('shutdown_message', '')
         quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
 
-        if not options['skip_checks']:
+        if not skip_checks:
             self.stdout.write('Performing system checks...\n\n')
             self.check(display_num_errors=True)
         # Need to check migrations here, so can't use the
@@ -143,7 +138,7 @@ class Command(BaseCommand):
         try:
             handler = self.get_handler(*args, **options)
             run(self.addr, int(self.port), handler,
-                ipv6=self.use_ipv6, threading=threading, server_cls=self.server_cls)
+                ipv6=self.use_ipv6, threading=use_threading, server_cls=self.server_cls)
         except OSError as e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {

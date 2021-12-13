@@ -8,10 +8,10 @@ class Command(BaseCommand):
         parser.add_argument('args', metavar='app_label', nargs='*', help='Specify the app label(s) to works on.')
         parser.add_argument('--empty', action='store_true', help="Do nothing.")
 
-    def handle(self, *app_labels, **options):
+    def handle(self, *app_labels, empty, **options):
         app_labels = set(app_labels)
 
-        if options['empty']:
+        if empty:
             self.stdout.write()
             self.stdout.write("Dave, I can't do that.")
             return

@@ -18,8 +18,8 @@ class Command(BaseCommand):
             help='Nominates a database to print the SQL for. Defaults to the "default" database.',
         )
 
-    def handle(self, **options):
-        sql_statements = sql_flush(self.style, connections[options['database']])
-        if not sql_statements and options['verbosity'] >= 1:
+    def handle(self, *, database, verbosity, **options):
+        sql_statements = sql_flush(self.style, connections[database])
+        if not sql_statements and verbosity >= 1:
             self.stderr.write('No tables found.')
         return '\n'.join(sql_statements)

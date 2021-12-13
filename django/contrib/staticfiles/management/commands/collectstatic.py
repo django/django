@@ -68,20 +68,22 @@ class Command(BaseCommand):
             help="Don't ignore the common private glob-style patterns (defaults to 'CVS', '.*' and '*~').",
         )
 
-    def set_options(self, **options):
+    def set_options(
+        self, *, interactive, post_process, ignore_patterns, dry_run, clear,
+        link, use_default_ignore_patterns, verbosity, **options
+    ):
         """
         Set instance variables based on an options dict
         """
-        self.interactive = options['interactive']
-        self.verbosity = options['verbosity']
-        self.symlink = options['link']
-        self.clear = options['clear']
-        self.dry_run = options['dry_run']
-        ignore_patterns = options['ignore_patterns']
-        if options['use_default_ignore_patterns']:
+        self.interactive = interactive
+        self.verbosity = verbosity
+        self.symlink = link
+        self.clear = clear
+        self.dry_run = dry_run
+        if use_default_ignore_patterns:
             ignore_patterns += apps.get_app_config('staticfiles').ignore_patterns
         self.ignore_patterns = list({os.path.normpath(p) for p in ignore_patterns})
-        self.post_process = options['post_process']
+        self.post_process = post_process
 
     def collect(self):
         """

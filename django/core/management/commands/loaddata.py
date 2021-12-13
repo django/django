@@ -66,13 +66,16 @@ class Command(BaseCommand):
             help='Format of serialized data when reading from stdin.',
         )
 
-    def handle(self, *fixture_labels, **options):
-        self.ignore = options['ignore']
-        self.using = options['database']
-        self.app_label = options['app_label']
-        self.verbosity = options['verbosity']
-        self.excluded_models, self.excluded_apps = parse_apps_and_model_labels(options['exclude'])
-        self.format = options['format']
+    def handle(
+        self, *fixture_labels, database, app_label, ignore, exclude, format,
+        verbosity, **options
+    ):
+        self.ignore = ignore
+        self.using = database
+        self.app_label = app_label
+        self.verbosity = verbosity
+        self.excluded_models, self.excluded_apps = parse_apps_and_model_labels(exclude)
+        self.format = format
 
         with transaction.atomic(using=self.using):
             self.loaddata(fixture_labels)

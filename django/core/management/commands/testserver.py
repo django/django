@@ -26,10 +26,10 @@ class Command(BaseCommand):
             help='Tells Django to use an IPv6 address.',
         )
 
-    def handle(self, *fixture_labels, **options):
-        verbosity = options['verbosity']
-        interactive = options['interactive']
-
+    def handle(
+        self, *fixture_labels, interactive, addrport, use_ipv6, verbosity,
+        **options
+    ):
         # Create a test database.
         db_name = connection.creation.create_test_db(verbosity=verbosity, autoclobber=not interactive, serialize=False)
 
@@ -46,9 +46,9 @@ class Command(BaseCommand):
         use_threading = connection.features.test_db_allows_multiple_connections
         call_command(
             'runserver',
-            addrport=options['addrport'],
+            addrport=addrport,
             shutdown_message=shutdown_message,
             use_reloader=False,
-            use_ipv6=options['use_ipv6'],
+            use_ipv6=use_ipv6,
             use_threading=use_threading
         )

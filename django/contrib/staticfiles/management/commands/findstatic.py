@@ -15,9 +15,8 @@ class Command(LabelCommand):
             help="Only return the first match for each static file.",
         )
 
-    def handle_label(self, path, **options):
-        verbosity = options['verbosity']
-        result = finders.find(path, all=options['all'])
+    def handle_label(self, path, *, all, verbosity, **options):
+        result = finders.find(path, all=all)
         if verbosity >= 2:
             searched_locations = (
                 "\nLooking in the following locations:\n  %s" %

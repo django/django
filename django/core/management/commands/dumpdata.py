@@ -78,24 +78,17 @@ class Command(BaseCommand):
             help='Specifies file to which the output is written.'
         )
 
-    def handle(self, *app_labels, **options):
-        format = options['format']
-        indent = options['indent']
-        using = options['database']
-        excludes = options['exclude']
-        output = options['output']
-        show_traceback = options['traceback']
-        use_natural_foreign_keys = options['use_natural_foreign_keys']
-        use_natural_primary_keys = options['use_natural_primary_keys']
-        use_base_manager = options['use_base_manager']
-        pks = options['primary_keys']
-
-        if pks:
-            primary_keys = [pk.strip() for pk in pks.split(',')]
+    def handle(
+        self, *app_labels, format, indent, database, exclude,
+        use_natural_foreign_keys, use_natural_primary_keys, use_base_manager,
+        primary_keys, output, verbosity, traceback, **options
+    ):
+        if primary_keys:
+            primary_keys = [pk.strip() for pk in primary_keys.split(',')]
         else:
             primary_keys = []
 
-        excluded_models, excluded_apps = parse_apps_and_model_labels(excludes)
+        excluded_models, excluded_apps = parse_apps_and_model_labels(exclude)
 
         if not app_labels:
             if primary_keys:
@@ -176,13 +169,13 @@ class Command(BaseCommand):
                         "%s is a proxy model and won't be serialized." % model._meta.label,
                         category=ProxyModelWarning,
                     )
-                if not model._meta.proxy and router.allow_migrate_model(using, model):
+                if not model._meta.proxy and router.allow_migrate_model(database, model):
                     if use_base_manager:
                         objects = model._base_manager
                     else:
                         objects = model._default_manager
 
-                    queryset = objects.using(using).order_by(model._meta.pk.name)
+                    queryset = objects.using(database).order_by(model._meta.pk.name)
                     if primary_keys:
                         queryset = queryset.filter(pk__in=primary_keys)
                     if count_only:
@@ -195,7 +188,7 @@ class Command(BaseCommand):
             progress_output = None
             object_count = 0
             # If dumpdata is outputting to stdout, there is no way to display progress
-            if output and self.stdout.isatty() and options['verbosity'] > 0:
+            if output and self.stdout.isatty() and verbosity > 0:
                 progress_output = self.stdout
                 object_count = sum(get_objects(count_only=True))
             if output:
@@ -240,6 +233,6 @@ class Command(BaseCommand):
                 if stream:
                     stream.close()
         except Exception as e:
-            if show_traceback:
+            if traceback:
                 raise
             raise CommandError("Unable to serialize database: %s" % e)

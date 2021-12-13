@@ -62,17 +62,19 @@ class Command(BaseCommand):
         self.stdout.write(msg)
 
     @no_translations
-    def handle(self, *app_labels, **options):
-        self.verbosity = options['verbosity']
-        self.interactive = options['interactive']
-        self.dry_run = options['dry_run']
-        self.merge = options['merge']
-        self.empty = options['empty']
-        self.migration_name = options['name']
+    def handle(
+        self, *app_labels, dry_run, merge, empty, interactive, name,
+        include_header, check_changes, verbosity, **options
+    ):
+        self.verbosity = verbosity
+        self.interactive = interactive
+        self.dry_run = dry_run
+        self.merge = merge
+        self.empty = empty
+        self.migration_name = name
         if self.migration_name and not self.migration_name.isidentifier():
             raise CommandError('The migration name must be a valid Python identifier.')
-        self.include_header = options['include_header']
-        check_changes = options['check_changes']
+        self.include_header = include_header
 
         # Make sure the app they asked for exists
         app_labels = set(app_labels)

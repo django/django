@@ -43,17 +43,16 @@ class Command(BaseCommand):
 
         parser.set_defaults(format='list')
 
-    def handle(self, *args, **options):
-        self.verbosity = options['verbosity']
+    def handle(self, *args, app_label, database, format, verbosity, **options):
+        self.verbosity = verbosity
 
         # Get the database we're operating from
-        db = options['database']
-        connection = connections[db]
+        connection = connections[database]
 
-        if options['format'] == "plan":
-            return self.show_plan(connection, options['app_label'])
+        if format == "plan":
+            return self.show_plan(connection, app_label)
         else:
-            return self.show_list(connection, options['app_label'])
+            return self.show_list(connection, app_label)
 
     def _validate_app_names(self, loader, app_names):
         has_bad_names = False

@@ -95,9 +95,7 @@ class Command(BaseCommand):
             help='Generate mapping dictionary for use with `LayerMapping`.',
         )
 
-    def handle(self, *args, **options):
-        data_source, model_name = options.pop('data_source'), options.pop('model_name')
-
+    def handle(self, *args, data_source, model_name, **options):
         # Getting the OGR DataSource from the string parameter.
         try:
             ds = gdal.DataSource(data_source)

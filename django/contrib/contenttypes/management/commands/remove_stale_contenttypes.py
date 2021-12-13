@@ -26,18 +26,13 @@ class Command(BaseCommand):
             ),
         )
 
-    def handle(self, **options):
-        db = options['database']
-        include_stale_apps = options['include_stale_apps']
-        interactive = options['interactive']
-        verbosity = options['verbosity']
-
-        if not router.allow_migrate_model(db, ContentType):
+    def handle(self, *, database, include_stale_apps, interactive, verbosity, **options):
+        if not router.allow_migrate_model(database, ContentType):
             return
         ContentType.objects.clear_cache()
 
         apps_content_types = itertools.groupby(
-            ContentType.objects.using(db).order_by('app_label', 'model'),
+            ContentType.objects.using(database).order_by('app_label', 'model'),
             lambda obj: obj.app_label,
         )
         for app_label, content_types in apps_content_types:

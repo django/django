@@ -12,6 +12,8 @@ class Command(BaseCommand):
         'Removes ALL DATA from the database, including data added during '
         'migrations. Does not achieve a "fresh install" state.'
     )
+
+    # Used by Django’s internals:
     stealth_options = ('reset_sequences', 'allow_cascade', 'inhibit_post_migrate')
 
     def add_arguments(self, parser):
@@ -24,15 +26,11 @@ class Command(BaseCommand):
             help='Nominates a database to flush. Defaults to the "default" database.',
         )
 
-    def handle(self, **options):
-        database = options['database']
+    def handle(
+        self, *, interactive, database, verbosity, reset_sequences=True,
+        allow_cascade=False, inhibit_post_migrate=False, **options
+    ):
         connection = connections[database]
-        verbosity = options['verbosity']
-        interactive = options['interactive']
-        # The following are stealth options used by Django's internals.
-        reset_sequences = options.get('reset_sequences', True)
-        allow_cascade = options.get('allow_cascade', False)
-        inhibit_post_migrate = options.get('inhibit_post_migrate', False)
 
         self.style = no_style()
 

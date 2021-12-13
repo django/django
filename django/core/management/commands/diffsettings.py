@@ -38,23 +38,24 @@ class Command(BaseCommand):
             ),
         )
 
-    def handle(self, **options):
+    def handle(self, *, default, output, **options):
         from django.conf import Settings, global_settings, settings
+
+        show_all = options['all']
 
         # Because settings are imported lazily, we need to explicitly load them.
         if not settings.configured:
             settings._setup()
 
         user_settings = module_to_dict(settings._wrapped)
-        default = options['default']
         default_settings = module_to_dict(Settings(default) if default else global_settings)
         output_func = {
             'hash': self.output_hash,
             'unified': self.output_unified,
-        }[options['output']]
-        return '\n'.join(output_func(user_settings, default_settings, **options))
+        }[output]
+        return '\n'.join(output_func(user_settings, default_settings, show_all))
 
-    def output_hash(self, user_settings, default_settings, **options):
+    def output_hash(self, user_settings, default_settings, show_all):
         # Inspired by Postfix's "postconf -n".
         output = []
         for key in sorted(user_settings):
@@ -62,11 +63,11 @@ class Command(BaseCommand):
                 output.append("%s = %s  ###" % (key, user_settings[key]))
             elif user_settings[key] != default_settings[key]:
                 output.append("%s = %s" % (key, user_settings[key]))
-            elif options['all']:
+            elif show_all:
                 output.append("### %s = %s" % (key, user_settings[key]))
         return output
 
-    def output_unified(self, user_settings, default_settings, **options):
+    def output_unified(self, user_settings, default_settings, show_all):
         output = []
         for key in sorted(user_settings):
             if key not in default_settings:
@@ -74,6 +75,6 @@ class Command(BaseCommand):
             elif user_settings[key] != default_settings[key]:
                 output.append(self.style.ERROR("- %s = %s" % (key, default_settings[key])))
                 output.append(self.style.SUCCESS("+ %s = %s" % (key, user_settings[key])))
-            elif options['all']:
+            elif show_all:
                 output.append("  %s = %s" % (key, user_settings[key]))
         return output

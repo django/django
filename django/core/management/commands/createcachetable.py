@@ -28,19 +28,17 @@ class Command(BaseCommand):
             help='Does not create the table, just prints the SQL that would be run.',
         )
 
-    def handle(self, *tablenames, **options):
-        db = options['database']
-        self.verbosity = options['verbosity']
-        dry_run = options['dry_run']
+    def handle(self, *tablenames, database, dry_run, verbosity, **options):
+        self.verbosity = verbosity
         if tablenames:
             # Legacy behavior, tablename specified as argument
             for tablename in tablenames:
-                self.create_table(db, tablename, dry_run)
+                self.create_table(database, tablename, dry_run)
         else:
             for cache_alias in settings.CACHES:
                 cache = caches[cache_alias]
                 if isinstance(cache, BaseDatabaseCache):
-                    self.create_table(db, cache._table, dry_run)
+                    self.create_table(database, cache._table, dry_run)
 
     def create_table(self, database, tablename, dry_run):
         cache = BaseDatabaseCache(tablename, {})

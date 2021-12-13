@@ -12,12 +12,11 @@ class Command(BaseCommand):
         parser.add_argument("-x", "--example")
         parser.add_argument("--opt-3", action='store_true', dest='option3')
 
-    def handle(self, *args, **options):
-        example = options["example"]
+    def handle(self, *args, integer, style, example, verbosity, **options):
         if example == "raise":
             raise CommandError(returncode=3)
-        if options['verbosity'] > 0:
-            self.stdout.write("I don't feel like dancing %s." % options["style"])
+        if verbosity > 0:
+            self.stdout.write("I don't feel like dancing %s." % style)
             self.stdout.write(','.join(options))
-        if options['integer'] > 0:
-            self.stdout.write("You passed %d as a positional argument." % options['integer'])
+        if integer > 0:
+            self.stdout.write("You passed %d as a positional argument." % integer)

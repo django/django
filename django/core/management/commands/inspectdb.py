@@ -30,15 +30,16 @@ class Command(BaseCommand):
 
     def handle(self, **options):
         try:
-            for line in self.handle_inspection(options):
+            for line in self.handle_inspection(**options):
                 self.stdout.write(line)
         except NotImplementedError:
             raise CommandError("Database inspection isn't supported for the currently selected database backend.")
 
-    def handle_inspection(self, options):
-        connection = connections[options['database']]
-        # 'table_name_filter' is a stealth option
-        table_name_filter = options.get('table_name_filter')
+    def handle_inspection(
+        self, *, table, database, include_partitions, include_views,
+        table_name_filter=False, **options
+    ):
+        connection = connections[database]
 
         def table2model(table_name):
             return re.sub(r'[^a-zA-Z0-9]', '', table_name.title())
@@ -60,12 +61,12 @@ class Command(BaseCommand):
 
             # Determine types of tables and/or views to be introspected.
             types = {'t'}
-            if options['include_partitions']:
+            if include_partitions:
                 types.add('p')
-            if options['include_views']:
+            if include_views:
                 types.add('v')
 
-            for table_name in (options['table'] or sorted(info.name for info in table_info if info.type in types)):
+            for table_name in (table or sorted(info.name for info in table_info if info.type in types)):
                 if table_name_filter is not None and callable(table_name_filter):
                     if not table_name_filter(table_name):
                         continue

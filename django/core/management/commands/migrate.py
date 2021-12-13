@@ -69,13 +69,16 @@ class Command(BaseCommand):
         )
 
     @no_translations
-    def handle(self, *args, **options):
-        database = options['database']
-        if not options['skip_checks']:
+    def handle(
+        self, *args, skip_checks, app_label, migration_name, interactive,
+        database, fake, fake_initial, plan, run_syncdb, check_unapplied,
+        verbosity, **options
+    ):
+        if not skip_checks:
             self.check(databases=[database])
 
-        self.verbosity = options['verbosity']
-        self.interactive = options['interactive']
+        self.verbosity = verbosity
+        self.interactive = interactive
 
         # Import the 'management' module within each installed app, to register
         # dispatcher events.
@@ -109,11 +112,9 @@ class Command(BaseCommand):
             )
 
         # If they supplied command line arguments, work out what they mean.
-        run_syncdb = options['run_syncdb']
         target_app_labels_only = True
-        if options['app_label']:
+        if app_label:
             # Validate app_label.
-            app_label = options['app_label']
             try:
                 apps.get_app_config(app_label)
             except LookupError as err:
@@ -124,8 +125,7 @@ class Command(BaseCommand):
             elif app_label not in executor.loader.migrated_apps:
                 raise CommandError("App '%s' does not have migrations." % app_label)
 
-        if options['app_label'] and options['migration_name']:
-            migration_name = options['migration_name']
+        if app_label and migration_name:
             if migration_name == "zero":
                 targets = [(app_label, None)]
             else:
@@ -151,19 +151,19 @@ class Command(BaseCommand):
                     target = incomplete_migration.replaces[-1]
                 targets = [target]
             target_app_labels_only = False
-        elif options['app_label']:
+        elif app_label:
             targets = [key for key in executor.loader.graph.leaf_nodes() if key[0] == app_label]
         else:
             targets = executor.loader.graph.leaf_nodes()
 
-        plan = executor.migration_plan(targets)
-        exit_dry = plan and options['check_unapplied']
+        migration_plan = executor.migration_plan(targets)
+        exit_dry = migration_plan and check_unapplied
 
-        if options['plan']:
+        if plan:
             self.stdout.write('Planned operations:', self.style.MIGRATE_LABEL)
-            if not plan:
+            if not migration_plan:
                 self.stdout.write('  No planned migration operations.')
-            for migration, backwards in plan:
+            for migration, backwards in migration_plan:
                 self.stdout.write(str(migration), self.style.MIGRATE_HEADING)
                 for operation in migration.operations:
                     message, is_error = self.describe_operation(operation, backwards)
@@ -176,12 +176,12 @@ class Command(BaseCommand):
             sys.exit(1)
 
         # At this point, ignore run_syncdb if there aren't any apps to sync.
-        run_syncdb = options['run_syncdb'] and executor.loader.unmigrated_apps
+        run_syncdb = run_syncdb and executor.loader.unmigrated_apps
         # Print some useful info
         if self.verbosity >= 1:
             self.stdout.write(self.style.MIGRATE_HEADING("Operations to perform:"))
             if run_syncdb:
-                if options['app_label']:
+                if app_label:
                     self.stdout.write(
                         self.style.MIGRATE_LABEL("  Synchronize unmigrated app: %s" % app_label)
                     )
@@ -210,14 +210,15 @@ class Command(BaseCommand):
         pre_migrate_state = executor._create_project_state(with_applied_migrations=True)
         pre_migrate_apps = pre_migrate_state.apps
         emit_pre_migrate_signal(
-            self.verbosity, self.interactive, connection.alias, stdout=self.stdout, apps=pre_migrate_apps, plan=plan,
+            self.verbosity, self.interactive, connection.alias,
+            stdout=self.stdout, apps=pre_migrate_apps, plan=migration_plan,
         )
 
         # Run the syncdb phase.
         if run_syncdb:
             if self.verbosity >= 1:
                 self.stdout.write(self.style.MIGRATE_HEADING("Synchronizing apps without migrations:"))
-            if options['app_label']:
+            if app_label:
                 self.sync_apps(connection, [app_label])
             else:
                 self.sync_apps(connection, executor.loader.unmigrated_apps)
@@ -225,7 +226,7 @@ class Command(BaseCommand):
         # Migrate!
         if self.verbosity >= 1:
             self.stdout.write(self.style.MIGRATE_HEADING("Running migrations:"))
-        if not plan:
+        if not migration_plan:
             if self.verbosity >= 1:
                 self.stdout.write("  No migrations to apply.")
                 # If there's changes that aren't in migrations yet, tell them how to fix it.
@@ -247,11 +248,8 @@ class Command(BaseCommand):
                     ))
             fake = False
             fake_initial = False
-        else:
-            fake = options['fake']
-            fake_initial = options['fake_initial']
         post_migrate_state = executor.migrate(
-            targets, plan=plan, state=pre_migrate_state.clone(), fake=fake,
+            targets, plan=migration_plan, state=pre_migrate_state.clone(), fake=fake,
             fake_initial=fake_initial,
         )
         # post_migrate signals have access to all models. Ensure that all models
@@ -275,7 +273,8 @@ class Command(BaseCommand):
         # Send the post_migrate signal, so individual apps can do whatever they need
         # to do at this point.
         emit_post_migrate_signal(
-            self.verbosity, self.interactive, connection.alias, stdout=self.stdout, apps=post_migrate_apps, plan=plan,
+            self.verbosity, self.interactive, connection.alias,
+            stdout=self.stdout, apps=post_migrate_apps, plan=migration_plan,
         )
 
     def migration_progress_callback(self, action, migration=None, fake=False):

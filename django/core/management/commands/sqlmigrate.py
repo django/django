@@ -28,16 +28,18 @@ class Command(BaseCommand):
         options['no_color'] = True
         return super().execute(*args, **options)
 
-    def handle(self, *args, **options):
+    def handle(
+        self, *args, app_label, migration_name, database, backwards, verbosity,
+        **options
+    ):
         # Get the database we're operating from
-        connection = connections[options['database']]
+        connection = connections[database]
 
         # Load up a loader to get all the migration data, but don't replace
         # migrations.
         loader = MigrationLoader(connection, replace_migrations=False)
 
         # Resolve command-line arguments into a migration
-        app_label, migration_name = options['app_label'], options['migration_name']
         # Validate app_label
         try:
             apps.get_app_config(app_label)
@@ -61,8 +63,8 @@ class Command(BaseCommand):
 
         # Make a plan that represents just the requested migrations and show SQL
         # for it
-        plan = [(loader.graph.nodes[target], options['backwards'])]
+        plan = [(loader.graph.nodes[target], backwards)]
         sql_statements = loader.collect_sql(plan)
-        if not sql_statements and options['verbosity'] >= 1:
+        if not sql_statements and verbosity >= 1:
             self.stderr.write('No operations found.')
         return '\n'.join(sql_statements)

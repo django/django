@@ -20,10 +20,10 @@ class Command(BaseCommand):
         parameters = parser.add_argument_group('parameters', prefix_chars='--')
         parameters.add_argument('parameters', nargs='*')
 
-    def handle(self, **options):
-        connection = connections[options['database']]
+    def handle(self, *, database, parameters, **options):
+        connection = connections[database]
         try:
-            connection.client.runshell(options['parameters'])
+            connection.client.runshell(parameters)
         except FileNotFoundError:
             # Note that we're assuming the FileNotFoundError relates to the
             # command missing. It could be raised for some other reason, in
