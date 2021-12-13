@@ -23,7 +23,7 @@ def deconstructible(*args, path=None):
             and keyword arguments.
             """
             # Fallback version
-            if path and obj.__class__.__name__ in path:
+            if path and type(obj) is klass:
                 module_name, _, name = path.rpartition('.')
             else:
                 module_name = obj.__module__
@@ -39,7 +39,7 @@ def deconstructible(*args, path=None):
                     "For more information, see "
                     "https://docs.djangoproject.com/en/%s/topics/migrations/#serializing-values"
                     % (name, module_name, get_docs_version()))
-            if obj.__class__.__name__ not in path:
+            if path and type(obj) is not klass:
                 return (
                     '%s.%s' % (obj.__class__.__module__, name),
                     obj._constructor_args[0],
