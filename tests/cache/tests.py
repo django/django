@@ -402,17 +402,20 @@ class BaseCacheTests:
 
     def test_data_types(self):
         # Many different data types can be cached
-        stuff = {
+        tests = {
             'string': 'this is a string',
             'int': 42,
+            'bool': True,
             'list': [1, 2, 3, 4],
             'tuple': (1, 2, 3, 4),
             'dict': {'A': 1, 'B': 2},
             'function': f,
             'class': C,
         }
-        cache.set("stuff", stuff)
-        self.assertEqual(cache.get("stuff"), stuff)
+        for key, value in tests.items():
+            with self.subTest(key=key):
+                cache.set(key, value)
+                self.assertEqual(cache.get(key), value)
 
     def test_cache_read_for_model_instance(self):
         # Don't want fields with callable as default to be called on cache read
@@ -1712,6 +1715,11 @@ class RedisCacheTests(BaseCacheTests, TestCase):
 
     def test_get_client(self):
         self.assertIsInstance(cache._cache.get_client(), self.lib.Redis)
+
+    def test_serializer_dumps(self):
+        self.assertEqual(cache._cache._serializer.dumps(123), 123)
+        self.assertIsInstance(cache._cache._serializer.dumps(True), bytes)
+        self.assertIsInstance(cache._cache._serializer.dumps('abc'), bytes)
 
 
 class FileBasedCachePathLibTests(FileBasedCacheTests):
