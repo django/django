@@ -78,12 +78,22 @@ class ModelInstanceCreationTests(TestCase):
             Article(None, 'Seventh article', datetime(2021, 3, 1), pub_date=None)
 
     def test_cannot_create_instance_with_invalid_kwargs(self):
-        with self.assertRaisesMessage(TypeError, "Article() got an unexpected keyword argument 'foo'"):
+        msg = "Article() got unexpected keyword arguments: 'foo'"
+        with self.assertRaisesMessage(TypeError, msg):
             Article(
                 id=None,
                 headline='Some headline',
                 pub_date=datetime(2005, 7, 31),
                 foo='bar',
+            )
+        msg = "Article() got unexpected keyword arguments: 'foo', 'bar'"
+        with self.assertRaisesMessage(TypeError, msg):
+            Article(
+                id=None,
+                headline='Some headline',
+                pub_date=datetime(2005, 7, 31),
+                foo='bar',
+                bar='baz',
             )
 
     def test_can_leave_off_value_for_autofield_and_it_gets_value_on_save(self):
