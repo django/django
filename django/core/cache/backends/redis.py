@@ -10,8 +10,14 @@ from django.utils.module_loading import import_string
 
 
 class RedisSerializer(PickleSerializer):
+    """
+    Similar to PickSerializer, except integers are serialized as native Redis
+    integers for better incr() and decr() atomicity.
+    """
     def dumps(self, obj):
-        if isinstance(obj, int):
+        # Only skip pickling for integers, a int subclasses as bool should be
+        # pickled.
+        if type(obj) is int:
             return obj
         return super().dumps(obj)
 
