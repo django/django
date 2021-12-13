@@ -724,7 +724,7 @@ Has two **required** arguments:
 
     The number of decimal places to store with the number.
 
-For example, to store numbers up to ``999`` with a resolution of 2 decimal
+For example, to store numbers up to ``999.99`` with a resolution of 2 decimal
 places, you'd use::
 
     models.DecimalField(..., max_digits=5, decimal_places=2)
