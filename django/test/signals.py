@@ -24,8 +24,8 @@ COMPLEX_OVERRIDE_SETTINGS = {'DATABASES'}
 
 
 @receiver(setting_changed)
-def clear_cache_handlers(**kwargs):
-    if kwargs['setting'] == 'CACHES':
+def clear_cache_handlers(*, setting, **kwargs):
+    if setting == 'CACHES':
         from django.core.cache import caches, close_caches
         close_caches()
         caches._settings = caches.settings = caches.configure_settings(None)
@@ -33,8 +33,8 @@ def clear_cache_handlers(**kwargs):
 
 
 @receiver(setting_changed)
-def update_installed_apps(**kwargs):
-    if kwargs['setting'] == 'INSTALLED_APPS':
+def update_installed_apps(*, setting, **kwargs):
+    if setting == 'INSTALLED_APPS':
         # Rebuild any AppDirectoriesFinder instance.
         from django.contrib.staticfiles.finders import get_finder
         get_finder.cache_clear()
@@ -50,8 +50,8 @@ def update_installed_apps(**kwargs):
 
 
 @receiver(setting_changed)
-def update_connections_time_zone(**kwargs):
-    if kwargs['setting'] == 'TIME_ZONE':
+def update_connections_time_zone(*, setting, **kwargs):
+    if setting == 'TIME_ZONE':
         # Reset process time zone
         if hasattr(time, 'tzset'):
             if kwargs['value']:
@@ -64,7 +64,7 @@ def update_connections_time_zone(**kwargs):
         timezone.get_default_timezone.cache_clear()
 
     # Reset the database connections' time zone
-    if kwargs['setting'] in {'TIME_ZONE', 'USE_TZ'}:
+    if setting in {'TIME_ZONE', 'USE_TZ'}:
         for conn in connections.all():
             try:
                 del conn.timezone
@@ -78,14 +78,14 @@ def update_connections_time_zone(**kwargs):
 
 
 @receiver(setting_changed)
-def clear_routers_cache(**kwargs):
-    if kwargs['setting'] == 'DATABASE_ROUTERS':
+def clear_routers_cache(*, setting, **kwargs):
+    if setting == 'DATABASE_ROUTERS':
         router.routers = ConnectionRouter().routers
 
 
 @receiver(setting_changed)
-def reset_template_engines(**kwargs):
-    if kwargs['setting'] in {
+def reset_template_engines(*, setting, **kwargs):
+    if setting in {
         'TEMPLATES',
         'DEBUG',
         'INSTALLED_APPS',
@@ -104,57 +104,59 @@ def reset_template_engines(**kwargs):
 
 
 @receiver(setting_changed)
-def clear_serializers_cache(**kwargs):
-    if kwargs['setting'] == 'SERIALIZATION_MODULES':
+def clear_serializers_cache(*, setting, **kwargs):
+    if setting == 'SERIALIZATION_MODULES':
         from django.core import serializers
         serializers._serializers = {}
 
 
 @receiver(setting_changed)
-def language_changed(**kwargs):
-    if kwargs['setting'] in {'LANGUAGES', 'LANGUAGE_CODE', 'LOCALE_PATHS'}:
+def language_changed(*, setting, **kwargs):
+    if setting in {'LANGUAGES', 'LANGUAGE_CODE', 'LOCALE_PATHS'}:
         from django.utils.translation import trans_real
         trans_real._default = None
         trans_real._active = Local()
-    if kwargs['setting'] in {'LANGUAGES', 'LOCALE_PATHS'}:
+    if setting in {'LANGUAGES', 'LOCALE_PATHS'}:
         from django.utils.translation import trans_real
         trans_real._translations = {}
         trans_real.check_for_language.cache_clear()
 
 
 @receiver(setting_changed)
-def localize_settings_changed(**kwargs):
-    if kwargs['setting'] in FORMAT_SETTINGS or kwargs['setting'] == 'USE_THOUSAND_SEPARATOR':
+def localize_settings_changed(*, setting, **kwargs):
+    if setting in FORMAT_SETTINGS or setting == 'USE_THOUSAND_SEPARATOR':
         reset_format_cache()
 
 
 @receiver(setting_changed)
-def file_storage_changed(**kwargs):
-    if kwargs['setting'] == 'DEFAULT_FILE_STORAGE':
+def file_storage_changed(*, setting, **kwargs):
+    if setting == 'DEFAULT_FILE_STORAGE':
         from django.core.files.storage import default_storage
         default_storage._wrapped = empty
 
 
 @receiver(setting_changed)
-def complex_setting_changed(**kwargs):
-    if kwargs['enter'] and kwargs['setting'] in COMPLEX_OVERRIDE_SETTINGS:
+def complex_setting_changed(*, enter, setting, **kwargs):
+    if enter and setting in COMPLEX_OVERRIDE_SETTINGS:
         # Considering the current implementation of the signals framework,
         # this stacklevel shows the line containing the override_settings call.
-        warnings.warn("Overriding setting %s can lead to unexpected behavior."
-                      % kwargs['setting'], stacklevel=6)
+        warnings.warn(
+            f'Overriding setting {setting} can lead to unexpected behavior.',
+            stacklevel=6,
+        )
 
 
 @receiver(setting_changed)
-def root_urlconf_changed(**kwargs):
-    if kwargs['setting'] == 'ROOT_URLCONF':
+def root_urlconf_changed(*, setting, **kwargs):
+    if setting == 'ROOT_URLCONF':
         from django.urls import clear_url_caches, set_urlconf
         clear_url_caches()
         set_urlconf(None)
 
 
 @receiver(setting_changed)
-def static_storage_changed(**kwargs):
-    if kwargs['setting'] in {
+def static_storage_changed(*, setting, **kwargs):
+    if setting in {
         'STATICFILES_STORAGE',
         'STATIC_ROOT',
         'STATIC_URL',
@@ -164,8 +166,8 @@ def static_storage_changed(**kwargs):
 
 
 @receiver(setting_changed)
-def static_finders_changed(**kwargs):
-    if kwargs['setting'] in {
+def static_finders_changed(*, setting, **kwargs):
+    if setting in {
         'STATICFILES_DIRS',
         'STATIC_ROOT',
     }:
@@ -174,8 +176,8 @@ def static_finders_changed(**kwargs):
 
 
 @receiver(setting_changed)
-def auth_password_validators_changed(**kwargs):
-    if kwargs['setting'] == 'AUTH_PASSWORD_VALIDATORS':
+def auth_password_validators_changed(*, setting, **kwargs):
+    if setting == 'AUTH_PASSWORD_VALIDATORS':
         from django.contrib.auth.password_validation import (
             get_default_password_validators,
         )
@@ -183,8 +185,8 @@ def auth_password_validators_changed(**kwargs):
 
 
 @receiver(setting_changed)
-def user_model_swapped(**kwargs):
-    if kwargs['setting'] == 'AUTH_USER_MODEL':
+def user_model_swapped(*, setting, **kwargs):
+    if setting == 'AUTH_USER_MODEL':
         apps.clear_cache()
         try:
             from django.contrib.auth import get_user_model

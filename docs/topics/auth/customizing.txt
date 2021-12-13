@@ -504,8 +504,8 @@ different user model.
         from django.dispatch import receiver
 
         @receiver(setting_changed)
-        def user_model_swapped(**kwargs):
-            if kwargs['setting'] == 'AUTH_USER_MODEL':
+        def user_model_swapped(*, setting, **kwargs):
+            if setting == 'AUTH_USER_MODEL':
                 apps.clear_cache()
                 from myapp import some_module
                 some_module.UserModel = get_user_model()
