@@ -1016,3 +1016,49 @@ table#change-history tbody th {
 .popup #header {
     padding: 10px 20px;
 }
+
+/* PAGINATOR */
+
+.paginator {
+    font-size: 13px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    line-height: 22px;
+    margin: 0;
+    border-top: 1px solid var(--hairline-color);
+    width: 100%;
+}
+
+.paginator a:link, .paginator a:visited {
+    padding: 2px 6px;
+    background: var(--button-bg);
+    text-decoration: none;
+    color: var(--button-fg);
+}
+
+.paginator a.showall {
+    border: none;
+    background: none;
+    color: var(--link-fg);
+}
+
+.paginator a.showall:focus, .paginator a.showall:hover {
+    background: none;
+    color: var(--link-hover-color);
+}
+
+.paginator .end {
+    margin-right: 6px;
+}
+
+.paginator .this-page {
+    padding: 2px 6px;
+    font-weight: bold;
+    font-size: 13px;
+    vertical-align: top;
+}
+
+.paginator a:focus, .paginator a:hover {
+    color: white;
+    background: var(--link-hover-color);
+}
