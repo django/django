@@ -18,7 +18,7 @@ here's how we recommend you read the docs:
   ``docs/howto/deployment/index.txt`` for instructions.
 
 * You'll probably want to read through the topical guides (in ``docs/topics``)
-  next; from there you can jump to the HOWTOs (in ``docs/howto``) for specific
+  next; from there you can jump to the HOW-TOS (in ``docs/howto``) for specific
   problems, and check out the reference (``docs/ref``) for gory details.
 
 * See ``docs/README`` for instructions on building an HTML version of the docs.
@@ -29,10 +29,10 @@ ticket here: https://code.djangoproject.com/newticket
 
 To get more help:
 
-* Join the ``#django`` channel on ``irc.libera.chat``. Lots of helpful people
+* Join the ``django`` channel on ``irc.libera.chat``. Lots of helpful people
   hang out there. See https://web.libera.chat if you're new to IRC.
 
-* Join the django-users mailing list, or read the archives, at
+* Join the Django-users mailing list, or read the archives, at
   https://groups.google.com/group/django-users.
 
 To contribute to Django:
