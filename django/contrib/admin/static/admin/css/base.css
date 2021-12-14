@@ -774,12 +774,19 @@ a.deletelink:focus, a.deletelink:hover {
 
 /* OBJECT HISTORY */
 
-table#change-history {
+#change-history table {
     width: 100%;
 }
 
-table#change-history tbody th {
+#change-history table tbody th {
     width: 16em;
+}
+
+#change-history .paginator {
+    color: var(--body-quiet-color);
+    border-bottom: 1px solid var(--hairline-color);
+    background: var(--body-bg);
+    overflow: hidden;
 }
 
 /* PAGE STRUCTURE */

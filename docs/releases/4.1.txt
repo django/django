@@ -58,6 +58,9 @@ Minor features
   subclasses can now control the query string value separator when filtering
   for multiple values using the ``__in`` lookup.
 
+* The admin :meth:`history view <django.contrib.admin.ModelAdmin.history_view>`
+  is now paginated.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

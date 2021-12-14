@@ -2016,6 +2016,10 @@ Other methods
     Django view for the page that shows the modification history for a given
     model instance.
 
+    .. versionchanged:: 4.1
+
+        Pagination was added.
+
 Unlike the hook-type ``ModelAdmin`` methods detailed in the previous section,
 these five methods are in reality designed to be invoked as Django views from
 the admin application URL dispatching handler to render the pages that deal
