@@ -16,6 +16,15 @@ SECRET_KEY_INSECURE_PREFIX = 'django-insecure-'
 SECRET_KEY_MIN_LENGTH = 50
 SECRET_KEY_MIN_UNIQUE_CHARACTERS = 5
 
+SECRET_KEY_WARNING_MSG = (
+    f"Your %s has less than {SECRET_KEY_MIN_LENGTH} characters, less than "
+    f"{SECRET_KEY_MIN_UNIQUE_CHARACTERS} unique characters, or it's prefixed "
+    f"with '{SECRET_KEY_INSECURE_PREFIX}' indicating that it was generated "
+    f"automatically by Django. Please generate a long and random value, "
+    f"otherwise many of Django's security-critical features will be "
+    f"vulnerable to attack."
+)
+
 W001 = Warning(
     "You do not have 'django.middleware.security.SecurityMiddleware' "
     "in your MIDDLEWARE so the SECURE_HSTS_SECONDS, "
@@ -72,15 +81,7 @@ W008 = Warning(
 )
 
 W009 = Warning(
-    "Your SECRET_KEY has less than %(min_length)s characters, less than "
-    "%(min_unique_chars)s unique characters, or it's prefixed with "
-    "'%(insecure_prefix)s' indicating that it was generated automatically by "
-    "Django. Please generate a long and random SECRET_KEY, otherwise many of "
-    "Django's security-critical features will be vulnerable to attack." % {
-        'min_length': SECRET_KEY_MIN_LENGTH,
-        'min_unique_chars': SECRET_KEY_MIN_UNIQUE_CHARACTERS,
-        'insecure_prefix': SECRET_KEY_INSECURE_PREFIX,
-    },
+    SECRET_KEY_WARNING_MSG % 'SECRET_KEY',
     id='security.W009',
 )
 
@@ -130,6 +131,8 @@ E024 = Error(
     ),
     id='security.E024',
 )
+
+W025 = Warning(SECRET_KEY_WARNING_MSG, id='security.W025')
 
 
 def _security_middleware():
@@ -196,6 +199,14 @@ def check_ssl_redirect(app_configs, **kwargs):
     return [] if passed_check else [W008]
 
 
+def _check_secret_key(secret_key):
+    return (
+        len(set(secret_key)) >= SECRET_KEY_MIN_UNIQUE_CHARACTERS and
+        len(secret_key) >= SECRET_KEY_MIN_LENGTH and
+        not secret_key.startswith(SECRET_KEY_INSECURE_PREFIX)
+    )
+
+
 @register(Tags.security, deploy=True)
 def check_secret_key(app_configs, **kwargs):
     try:
@@ -203,12 +214,26 @@ def check_secret_key(app_configs, **kwargs):
     except (ImproperlyConfigured, AttributeError):
         passed_check = False
     else:
-        passed_check = (
-            len(set(secret_key)) >= SECRET_KEY_MIN_UNIQUE_CHARACTERS and
-            len(secret_key) >= SECRET_KEY_MIN_LENGTH and
-            not secret_key.startswith(SECRET_KEY_INSECURE_PREFIX)
-        )
+        passed_check = _check_secret_key(secret_key)
     return [] if passed_check else [W009]
+
+
+@register(Tags.security, deploy=True)
+def check_secret_key_fallbacks(app_configs, **kwargs):
+    warnings = []
+    try:
+        fallbacks = settings.SECRET_KEY_FALLBACKS
+    except (ImproperlyConfigured, AttributeError):
+        warnings.append(
+            Warning(W025.msg % 'SECRET_KEY_FALLBACKS', id=W025.id)
+        )
+    else:
+        for index, key in enumerate(fallbacks):
+            if not _check_secret_key(key):
+                warnings.append(
+                    Warning(W025.msg % f'SECRET_KEY_FALLBACKS[{index}]', id=W025.id)
+                )
+    return warnings
 
 
 @register(Tags.security, deploy=True)

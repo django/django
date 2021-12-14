@@ -97,10 +97,18 @@ def base64_hmac(salt, value, key, algorithm='sha1'):
     return b64_encode(salted_hmac(salt, value, key, algorithm=algorithm).digest()).decode()
 
 
+def _cookie_signer_key(key):
+    # SECRET_KEYS items may be str or bytes.
+    return b'django.http.cookies' + force_bytes(key)
+
+
 def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
     Signer = import_string(settings.SIGNING_BACKEND)
-    key = force_bytes(settings.SECRET_KEY)  # SECRET_KEY may be str or bytes.
-    return Signer(b'django.http.cookies' + key, salt=salt)
+    return Signer(
+        key=_cookie_signer_key(settings.SECRET_KEY),
+        fallback_keys=map(_cookie_signer_key, settings.SECRET_KEY_FALLBACKS),
+        salt=salt,
+    )
 
 
 class JSONSerializer:
@@ -135,18 +143,41 @@ def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, 
     return TimestampSigner(key, salt=salt).sign_object(obj, serializer=serializer, compress=compress)
 
 
-def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None):
+def loads(
+    s,
+    key=None,
+    salt='django.core.signing',
+    serializer=JSONSerializer,
+    max_age=None,
+    fallback_keys=None,
+):
     """
     Reverse of dumps(), raise BadSignature if signature fails.
 
     The serializer is expected to accept a bytestring.
     """
-    return TimestampSigner(key, salt=salt).unsign_object(s, serializer=serializer, max_age=max_age)
+    return TimestampSigner(key, salt=salt, fallback_keys=fallback_keys).unsign_object(
+        s,
+        serializer=serializer,
+        max_age=max_age,
+    )
 
 
 class Signer:
-    def __init__(self, key=None, sep=':', salt=None, algorithm=None):
+    def __init__(
+        self,
+        key=None,
+        sep=':',
+        salt=None,
+        algorithm=None,
+        fallback_keys=None,
+    ):
         self.key = key or settings.SECRET_KEY
+        self.fallback_keys = (
+            fallback_keys
+            if fallback_keys is not None
+            else settings.SECRET_KEY_FALLBACKS
+        )
         self.sep = sep
         if _SEP_UNSAFE.match(self.sep):
             raise ValueError(
@@ -156,8 +187,9 @@ class Signer:
         self.salt = salt or '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
         self.algorithm = algorithm or 'sha256'
 
-    def signature(self, value):
-        return base64_hmac(self.salt + 'signer', value, self.key, algorithm=self.algorithm)
+    def signature(self, value, key=None):
+        key = key or self.key
+        return base64_hmac(self.salt + 'signer', value, key, algorithm=self.algorithm)
 
     def sign(self, value):
         return '%s%s%s' % (value, self.sep, self.signature(value))
@@ -166,8 +198,9 @@ class Signer:
         if self.sep not in signed_value:
             raise BadSignature('No "%s" found in value' % self.sep)
         value, sig = signed_value.rsplit(self.sep, 1)
-        if constant_time_compare(sig, self.signature(value)):
-            return value
+        for key in [self.key, *self.fallback_keys]:
+            if constant_time_compare(sig, self.signature(value, key)):
+                return value
         raise BadSignature('Signature "%s" does not match' % sig)
 
     def sign_object(self, obj, serializer=JSONSerializer, compress=False):

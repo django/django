@@ -25,14 +25,22 @@ You may also find signing useful for the following:
   protected resource, for example a downloadable file that a user has
   paid for.
 
-Protecting the ``SECRET_KEY``
-=============================
+Protecting ``SECRET_KEY`` and ``SECRET_KEY_FALLBACKS``
+======================================================
 
 When you create a new Django project using :djadmin:`startproject`, the
 ``settings.py`` file is generated automatically and gets a random
 :setting:`SECRET_KEY` value. This value is the key to securing signed
 data -- it is vital you keep this secure, or attackers could use it to
 generate their own signed values.
+
+:setting:`SECRET_KEY_FALLBACKS` can be used to rotate secret keys. The
+values will not be used to sign data, but if specified, they will be used to
+validate signed data and must be kept secure.
+
+.. versionchanged:: 4.1
+
+    The ``SECRET_KEY_FALLBACKS`` setting was added.
 
 Using the low-level API
 =======================
@@ -93,13 +101,19 @@ generate signatures. You can use a different secret by passing it to the
     >>> value
     'My string:EkfQJafvGyiofrdGnuthdxImIJw'
 
-.. class:: Signer(key=None, sep=':', salt=None, algorithm=None)
+.. class:: Signer(key=None, sep=':', salt=None, algorithm=None, fallback_keys=None)
 
     Returns a signer which uses ``key`` to generate signatures and ``sep`` to
     separate values. ``sep`` cannot be in the :rfc:`URL safe base64 alphabet
     <4648#section-5>`. This alphabet contains alphanumeric characters, hyphens,
     and underscores. ``algorithm`` must be an algorithm supported by
-    :py:mod:`hashlib`, it defaults to ``'sha256'``.
+    :py:mod:`hashlib`, it defaults to ``'sha256'``. ``fallback_keys`` is a list
+    of additional values used to validate signed data, defaults to
+    :setting:`SECRET_KEY_FALLBACKS`.
+
+    .. versionchanged:: 4.1
+
+        The ``fallback_keys`` argument was added.
 
 Using the ``salt`` argument
 ---------------------------
@@ -221,7 +235,11 @@ and tuples) if you pass in a tuple, you will get a list from
     Returns URL-safe, signed base64 compressed JSON string. Serialized object
     is signed using :class:`~TimestampSigner`.
 
-.. function:: loads(string, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None)
+.. function:: loads(string, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None, fallback_keys=None)
 
     Reverse of ``dumps()``, raises ``BadSignature`` if signature fails.
     Checks ``max_age`` (in seconds) if given.
+
+    .. versionchanged:: 4.1
+
+        The ``fallback_keys`` argument was added.

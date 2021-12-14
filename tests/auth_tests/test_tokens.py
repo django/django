@@ -140,3 +140,39 @@ class TokenGeneratorTest(TestCase):
         msg = 'The SECRET_KEY setting must not be empty.'
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             default_token_generator.secret
+
+    def test_check_token_secret_fallbacks(self):
+        user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
+        p1 = PasswordResetTokenGenerator()
+        p1.secret = 'secret'
+        tk = p1.make_token(user)
+        p2 = PasswordResetTokenGenerator()
+        p2.secret = 'newsecret'
+        p2.secret_fallbacks = ['secret']
+        self.assertIs(p1.check_token(user, tk), True)
+        self.assertIs(p2.check_token(user, tk), True)
+
+    @override_settings(
+        SECRET_KEY='secret',
+        SECRET_KEY_FALLBACKS=['oldsecret'],
+    )
+    def test_check_token_secret_key_fallbacks(self):
+        user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
+        p1 = PasswordResetTokenGenerator()
+        p1.secret = 'oldsecret'
+        tk = p1.make_token(user)
+        p2 = PasswordResetTokenGenerator()
+        self.assertIs(p2.check_token(user, tk), True)
+
+    @override_settings(
+        SECRET_KEY='secret',
+        SECRET_KEY_FALLBACKS=['oldsecret'],
+    )
+    def test_check_token_secret_key_fallbacks_override(self):
+        user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
+        p1 = PasswordResetTokenGenerator()
+        p1.secret = 'oldsecret'
+        tk = p1.make_token(user)
+        p2 = PasswordResetTokenGenerator()
+        p2.secret_fallbacks = []
+        self.assertIs(p2.check_token(user, tk), False)

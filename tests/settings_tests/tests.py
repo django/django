@@ -483,6 +483,7 @@ class TestListSettings(SimpleTestCase):
         "INSTALLED_APPS",
         "TEMPLATE_DIRS",
         "LOCALE_PATHS",
+        "SECRET_KEY_FALLBACKS",
     )
 
     def test_tuple_settings(self):

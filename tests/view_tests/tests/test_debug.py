@@ -1459,6 +1459,7 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
         """
         sensitive_settings = [
             'SECRET_KEY',
+            'SECRET_KEY_FALLBACKS',
             'PASSWORD',
             'API_KEY',
             'AUTH_TOKEN',
@@ -1475,6 +1476,7 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
         """
         sensitive_settings = [
             'SECRET_KEY',
+            'SECRET_KEY_FALLBACKS',
             'PASSWORD',
             'API_KEY',
             'AUTH_TOKEN',

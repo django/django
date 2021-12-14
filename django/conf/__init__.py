@@ -188,6 +188,7 @@ class Settings:
             "INSTALLED_APPS",
             "TEMPLATE_DIRS",
             "LOCALE_PATHS",
+            "SECRET_KEY_FALLBACKS",
         )
         self._explicit_settings = set()
         for setting in dir(mod):

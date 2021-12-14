@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.checks.messages import Error
+from django.core.checks.messages import Error, Warning
 from django.core.checks.security import base, csrf, sessions
 from django.core.management.utils import get_random_secret_key
 from django.test import SimpleTestCase
@@ -412,6 +412,79 @@ class CheckSecretKeyTest(SimpleTestCase):
         self.assertGreater(len(settings.SECRET_KEY), base.SECRET_KEY_MIN_LENGTH)
         self.assertLess(len(set(settings.SECRET_KEY)), base.SECRET_KEY_MIN_UNIQUE_CHARACTERS)
         self.assertEqual(base.check_secret_key(None), [base.W009])
+
+
+class CheckSecretKeyFallbacksTest(SimpleTestCase):
+    @override_settings(SECRET_KEY_FALLBACKS=[('abcdefghijklmnopqrstuvwx' * 2) + 'ab'])
+    def test_okay_secret_key_fallbacks(self):
+        self.assertEqual(
+            len(settings.SECRET_KEY_FALLBACKS[0]),
+            base.SECRET_KEY_MIN_LENGTH,
+        )
+        self.assertGreater(
+            len(set(settings.SECRET_KEY_FALLBACKS[0])),
+            base.SECRET_KEY_MIN_UNIQUE_CHARACTERS,
+        )
+        self.assertEqual(base.check_secret_key_fallbacks(None), [])
+
+    def test_no_secret_key_fallbacks(self):
+        with self.settings(SECRET_KEY_FALLBACKS=None):
+            del settings.SECRET_KEY_FALLBACKS
+            self.assertEqual(base.check_secret_key_fallbacks(None), [
+                Warning(base.W025.msg % 'SECRET_KEY_FALLBACKS', id=base.W025.id),
+            ])
+
+    @override_settings(SECRET_KEY_FALLBACKS=[
+        base.SECRET_KEY_INSECURE_PREFIX + get_random_secret_key()
+    ])
+    def test_insecure_secret_key_fallbacks(self):
+        self.assertEqual(base.check_secret_key_fallbacks(None), [
+            Warning(base.W025.msg % 'SECRET_KEY_FALLBACKS[0]', id=base.W025.id),
+        ])
+
+    @override_settings(SECRET_KEY_FALLBACKS=[('abcdefghijklmnopqrstuvwx' * 2) + 'a'])
+    def test_low_length_secret_key_fallbacks(self):
+        self.assertEqual(
+            len(settings.SECRET_KEY_FALLBACKS[0]),
+            base.SECRET_KEY_MIN_LENGTH - 1,
+        )
+        self.assertEqual(base.check_secret_key_fallbacks(None), [
+            Warning(base.W025.msg % 'SECRET_KEY_FALLBACKS[0]', id=base.W025.id),
+        ])
+
+    @override_settings(SECRET_KEY_FALLBACKS=['abcd' * 20])
+    def test_low_entropy_secret_key_fallbacks(self):
+        self.assertGreater(
+            len(settings.SECRET_KEY_FALLBACKS[0]),
+            base.SECRET_KEY_MIN_LENGTH,
+        )
+        self.assertLess(
+            len(set(settings.SECRET_KEY_FALLBACKS[0])),
+            base.SECRET_KEY_MIN_UNIQUE_CHARACTERS,
+        )
+        self.assertEqual(base.check_secret_key_fallbacks(None), [
+            Warning(base.W025.msg % 'SECRET_KEY_FALLBACKS[0]', id=base.W025.id),
+        ])
+
+    @override_settings(SECRET_KEY_FALLBACKS=[
+        ('abcdefghijklmnopqrstuvwx' * 2) + 'ab',
+        'badkey',
+    ])
+    def test_multiple_keys(self):
+        self.assertEqual(base.check_secret_key_fallbacks(None), [
+            Warning(base.W025.msg % 'SECRET_KEY_FALLBACKS[1]', id=base.W025.id),
+        ])
+
+    @override_settings(SECRET_KEY_FALLBACKS=[
+        ('abcdefghijklmnopqrstuvwx' * 2) + 'ab',
+        'badkey1',
+        'badkey2',
+    ])
+    def test_multiple_bad_keys(self):
+        self.assertEqual(base.check_secret_key_fallbacks(None), [
+            Warning(base.W025.msg % 'SECRET_KEY_FALLBACKS[1]', id=base.W025.id),
+            Warning(base.W025.msg % 'SECRET_KEY_FALLBACKS[2]', id=base.W025.id),
+        ])
 
 
 class CheckDebugTest(SimpleTestCase):

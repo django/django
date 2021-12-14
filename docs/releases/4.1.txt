@@ -254,7 +254,8 @@ Requests and Responses
 Security
 ~~~~~~~~
 
-* ...
+* The new :setting:`SECRET_KEY_FALLBACKS` setting allows providing a list of
+  values for secret key rotation.
 
 Serialization
 ~~~~~~~~~~~~~

@@ -1,7 +1,7 @@
 import datetime
 
 from django.core import signing
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 from django.test.utils import freeze_time
 from django.utils.crypto import InvalidAlgorithm
 
@@ -177,6 +177,39 @@ class TestSigner(SimpleTestCase):
         for sep in separators:
             with self.assertRaisesMessage(ValueError, msg % sep):
                 signing.Signer(sep=sep)
+
+    def test_verify_with_non_default_key(self):
+        old_signer = signing.Signer('secret')
+        new_signer = signing.Signer('newsecret', fallback_keys=['othersecret', 'secret'])
+        signed = old_signer.sign('abc')
+        self.assertEqual(new_signer.unsign(signed), 'abc')
+
+    def test_sign_unsign_multiple_keys(self):
+        """The default key is a valid verification key."""
+        signer = signing.Signer('secret', fallback_keys=['oldsecret'])
+        signed = signer.sign('abc')
+        self.assertEqual(signer.unsign(signed), 'abc')
+
+    @override_settings(
+        SECRET_KEY='secret',
+        SECRET_KEY_FALLBACKS=['oldsecret'],
+    )
+    def test_sign_unsign_ignore_secret_key_fallbacks(self):
+        old_signer = signing.Signer('oldsecret')
+        signed = old_signer.sign('abc')
+        signer = signing.Signer(fallback_keys=[])
+        with self.assertRaises(signing.BadSignature):
+            signer.unsign(signed)
+
+    @override_settings(
+        SECRET_KEY='secret',
+        SECRET_KEY_FALLBACKS=['oldsecret'],
+    )
+    def test_default_keys_verification(self):
+        old_signer = signing.Signer('oldsecret')
+        signed = old_signer.sign('abc')
+        signer = signing.Signer()
+        self.assertEqual(signer.unsign(signed), 'abc')
 
 
 class TestTimestampSigner(SimpleTestCase):

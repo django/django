@@ -272,6 +272,10 @@ IGNORABLE_404_URLS = []
 # loudly.
 SECRET_KEY = ''
 
+# List of secret keys used to verify the validity of signatures. This allows
+# secret key rotation.
+SECRET_KEY_FALLBACKS = []
+
 # Default file storage mechanism that holds media.
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
