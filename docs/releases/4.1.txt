@@ -346,6 +346,9 @@ Miscellaneous
 
 * ``CSRF_COOKIE_MASKED`` transitional setting is deprecated.
 
+* The ``name`` argument of :func:`django.utils.functional.cached_property` is
+  deprecated as it's unnecessary as of Python 3.6.
+
 Features removed in 4.1
 =======================
 
