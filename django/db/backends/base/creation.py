@@ -1,7 +1,6 @@
 import os
 import sys
 from io import StringIO
-from unittest import expectedFailure, skip
 
 from django.apps import apps
 from django.conf import settings
@@ -303,6 +302,8 @@ class BaseDatabaseCreation:
         Mark tests in Django's test suite which are expected failures on this
         database and test which should be skipped on this database.
         """
+        # Only load unittest if we're actually testing.
+        from unittest import expectedFailure, skip
         for test_name in self.connection.features.django_test_expected_failures:
             test_case_name, _, test_method_name = test_name.rpartition('.')
             test_app = test_name.split('.')[0]

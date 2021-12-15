@@ -3,13 +3,13 @@ from psycopg2.extras import (
 )
 
 from django.apps import AppConfig
+from django.core.signals import setting_changed
 from django.db import connections
 from django.db.backends.signals import connection_created
 from django.db.migrations.writer import MigrationWriter
 from django.db.models import CharField, OrderBy, TextField
 from django.db.models.functions import Collate
 from django.db.models.indexes import IndexExpression
-from django.test.signals import setting_changed
 from django.utils.translation import gettext_lazy as _
 
 from .indexes import OpClass

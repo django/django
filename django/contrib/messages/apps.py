@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 from django.contrib.messages.storage import base
 from django.contrib.messages.utils import get_level_tags
-from django.test.signals import setting_changed
+from django.core.signals import setting_changed
 from django.utils.translation import gettext_lazy as _
 
 
