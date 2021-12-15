@@ -100,6 +100,10 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             # even on domains that don't fail the domain label length check in
             # the regex.
             'http://%s' % ("X" * 200,),
+            # urlsplit() raises ValueError.
+            '////]@N.AN',
+            # Empty hostname.
+            '#@A.bO',
         ]
         msg = "'Enter a valid URL.'"
         for value in tests:

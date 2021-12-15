@@ -109,14 +109,15 @@ class URLValidator(RegexValidator):
 
         # Then check full URL
         try:
+            splitted_url = urlsplit(value)
+        except ValueError:
+            raise ValidationError(self.message, code=self.code, params={'value': value})
+        try:
             super().__call__(value)
         except ValidationError as e:
             # Trivial case failed. Try for possible IDN domain
             if value:
-                try:
-                    scheme, netloc, path, query, fragment = urlsplit(value)
-                except ValueError:  # for example, "Invalid IPv6 URL"
-                    raise ValidationError(self.message, code=self.code, params={'value': value})
+                scheme, netloc, path, query, fragment = splitted_url
                 try:
                     netloc = punycode(netloc)  # IDN -> ACE
                 except UnicodeError:  # invalid domain part
@@ -127,7 +128,7 @@ class URLValidator(RegexValidator):
                 raise
         else:
             # Now verify IPv6 in the netloc part
-            host_match = re.search(r'^\[(.+)\](?::\d{1,5})?$', urlsplit(value).netloc)
+            host_match = re.search(r'^\[(.+)\](?::\d{1,5})?$', splitted_url.netloc)
             if host_match:
                 potential_ip = host_match[1]
                 try:
@@ -139,7 +140,7 @@ class URLValidator(RegexValidator):
         # section 3.1. It's defined to be 255 bytes or less, but this includes
         # one byte for the length of the name and one byte for the trailing dot
         # that's used to indicate absolute names in DNS.
-        if len(urlsplit(value).hostname) > 253:
+        if splitted_url.hostname is None or len(splitted_url.hostname) > 253:
             raise ValidationError(self.message, code=self.code, params={'value': value})
 
 
