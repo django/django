@@ -7,7 +7,10 @@ from django.forms import (
     BaseForm, CharField, DateField, FileField, Form, IntegerField,
     SplitDateTimeField, formsets,
 )
-from django.forms.formsets import BaseFormSet, all_valid, formset_factory
+from django.forms.formsets import (
+    INITIAL_FORM_COUNT, MAX_NUM_FORM_COUNT, MIN_NUM_FORM_COUNT,
+    TOTAL_FORM_COUNT, BaseFormSet, ManagementForm, all_valid, formset_factory,
+)
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.test import SimpleTestCase
@@ -996,6 +999,18 @@ class FormsFormsetTestCase(SimpleTestCase):
 <td><input type="text" name="form-0-name" value="Gin Tonic" id="id_form-0-name"></td></tr>
 <tr><th><label for="id_form-1-name">Name:</label></th>
 <td><input type="text" name="form-1-name" id="id_form-1-name"></td></tr>"""
+        )
+
+    def test_management_form_field_names(self):
+        """The management form class has field names matching the constants."""
+        self.assertCountEqual(
+            ManagementForm.base_fields,
+            [
+                TOTAL_FORM_COUNT,
+                INITIAL_FORM_COUNT,
+                MIN_NUM_FORM_COUNT,
+                MAX_NUM_FORM_COUNT,
+            ],
         )
 
     def test_management_form_prefix(self):

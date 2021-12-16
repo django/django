@@ -1031,6 +1031,7 @@ class ModelAdmin(BaseModelAdmin):
         if search_fields and search_term:
             orm_lookups = [construct_search(str(search_field))
                            for search_field in search_fields]
+            term_queries = []
             for bit in smart_split(search_term):
                 if bit.startswith(('"', "'")) and bit[0] == bit[-1]:
                     bit = unescape_string_literal(bit)
@@ -1038,7 +1039,8 @@ class ModelAdmin(BaseModelAdmin):
                     *((orm_lookup, bit) for orm_lookup in orm_lookups),
                     _connector=models.Q.OR,
                 )
-                queryset = queryset.filter(or_queries)
+                term_queries.append(or_queries)
+            queryset = queryset.filter(models.Q(*term_queries))
             may_have_duplicates |= any(
                 lookup_spawns_duplicates(self.opts, search_spec)
                 for search_spec in orm_lookups
@@ -1925,6 +1927,7 @@ class ModelAdmin(BaseModelAdmin):
     def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."
         from django.contrib.admin.models import LogEntry
+        from django.contrib.admin.views.main import PAGE_VAR
 
         # First check if the user can see this history.
         model = self.model
@@ -1943,11 +1946,19 @@ class ModelAdmin(BaseModelAdmin):
             content_type=get_content_type_for_model(model)
         ).select_related().order_by('action_time')
 
+        paginator = self.get_paginator(request, action_list, 100)
+        page_number = request.GET.get(PAGE_VAR, 1)
+        page_obj = paginator.get_page(page_number)
+        page_range = paginator.get_elided_page_range(page_obj.number)
+
         context = {
             **self.admin_site.each_context(request),
             'title': _('Change history: %s') % obj,
             'subtitle': None,
-            'action_list': action_list,
+            'action_list': page_obj,
+            'page_range': page_range,
+            'page_var': PAGE_VAR,
+            'pagination_required': paginator.count > 100,
             'module_name': str(capfirst(opts.verbose_name_plural)),
             'object': obj,
             'opts': opts,

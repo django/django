@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django.test import TestCase
@@ -74,6 +75,23 @@ class GetObjectOr404Tests(TestCase):
         self.assertEqual(
             get_list_or_404(Article.objects.all(), title__icontains="Run"),
             [article]
+        )
+        # Q objects.
+        self.assertEqual(
+            get_object_or_404(
+                Article,
+                Q(title__startswith='Run') | Q(title__startswith='Walk'),
+                authors__name__contains='Brave',
+            ),
+            article,
+        )
+        self.assertEqual(
+            get_list_or_404(
+                Article,
+                Q(title__startswith='Run') | Q(title__startswith='Walk'),
+                authors__name='Patsy',
+            ),
+            [article],
         )
 
     def test_bad_class(self):

@@ -8,7 +8,8 @@ from django.test import TestCase
 
 from .models import (
     CustomPKModel, FlexibleDatePost, ModelToValidate, Post, UniqueErrorsModel,
-    UniqueFieldsModel, UniqueForDateModel, UniqueTogetherModel,
+    UniqueFieldsModel, UniqueForDateModel, UniqueFuncConstraintModel,
+    UniqueTogetherModel,
 )
 
 
@@ -86,6 +87,13 @@ class GetUniqueCheckTests(unittest.TestCase):
         ), m._get_unique_checks(exclude='start_date')
         )
 
+    def test_func_unique_constraint_ignored(self):
+        m = UniqueFuncConstraintModel()
+        self.assertEqual(
+            m._get_unique_checks(),
+            ([(UniqueFuncConstraintModel, ('id',))], []),
+        )
+
 
 class PerformUniqueChecksTest(TestCase):
     def test_primary_key_unique_check_not_performed_when_adding_and_pk_not_specified(self):
@@ -107,6 +115,10 @@ class PerformUniqueChecksTest(TestCase):
         with self.assertNumQueries(0):
             mtv = ModelToValidate(number=10, name='Some Name')
             mtv.full_clean()
+
+    def test_func_unique_check_not_performed(self):
+        with self.assertNumQueries(0):
+            UniqueFuncConstraintModel(field='some name').full_clean()
 
     def test_unique_for_date(self):
         Post.objects.create(

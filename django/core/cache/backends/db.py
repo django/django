@@ -228,10 +228,11 @@ class DatabaseCache(BaseDatabaseCache):
 
         with connection.cursor() as cursor:
             cursor.execute(
-                'SELECT %s FROM %s WHERE %s = %%s and expires > %%s' % (
+                'SELECT %s FROM %s WHERE %s = %%s and %s > %%s' % (
                     quote_name('cache_key'),
                     quote_name(self._table),
                     quote_name('cache_key'),
+                    quote_name('expires'),
                 ),
                 [key, connection.ops.adapt_datetimefield_value(now)]
             )
@@ -243,8 +244,10 @@ class DatabaseCache(BaseDatabaseCache):
         else:
             connection = connections[db]
             table = connection.ops.quote_name(self._table)
-            cursor.execute("DELETE FROM %s WHERE expires < %%s" % table,
-                           [connection.ops.adapt_datetimefield_value(now)])
+            cursor.execute('DELETE FROM %s WHERE %s < %%s' % (
+                table,
+                connection.ops.quote_name('expires'),
+            ), [connection.ops.adapt_datetimefield_value(now)])
             deleted_count = cursor.rowcount
             remaining_num = num - deleted_count
             if remaining_num > self._max_entries:
@@ -255,7 +258,10 @@ class DatabaseCache(BaseDatabaseCache):
                 last_cache_key = cursor.fetchone()
                 if last_cache_key:
                     cursor.execute(
-                        'DELETE FROM %s WHERE cache_key < %%s' % table,
+                        'DELETE FROM %s WHERE %s < %%s' % (
+                            table,
+                            connection.ops.quote_name('cache_key'),
+                        ),
                         [last_cache_key[0]],
                     )
 

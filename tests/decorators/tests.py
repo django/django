@@ -1,5 +1,5 @@
 from functools import update_wrapper, wraps
-from unittest import TestCase
+from unittest import TestCase, mock
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import (
@@ -494,15 +494,31 @@ class XFrameOptionsDecoratorsTests(TestCase):
 
 
 class NeverCacheDecoratorTest(SimpleTestCase):
-    def test_never_cache_decorator(self):
+
+    @mock.patch('time.time')
+    def test_never_cache_decorator_headers(self, mocked_time):
         @never_cache
         def a_view(request):
             return HttpResponse()
-        r = a_view(HttpRequest())
+
+        mocked_time.return_value = 1167616461.0
+        response = a_view(HttpRequest())
         self.assertEqual(
-            set(r.headers['Cache-Control'].split(', ')),
-            {'max-age=0', 'no-cache', 'no-store', 'must-revalidate', 'private'},
+            response.headers['Expires'],
+            'Mon, 01 Jan 2007 01:54:21 GMT',
         )
+        self.assertEqual(
+            response.headers['Cache-Control'],
+            'max-age=0, no-cache, no-store, must-revalidate, private',
+        )
+
+    def test_never_cache_decorator_expires_not_overridden(self):
+        @never_cache
+        def a_view(request):
+            return HttpResponse(headers={'Expires': 'tomorrow'})
+
+        response = a_view(HttpRequest())
+        self.assertEqual(response.headers['Expires'], 'tomorrow')
 
     def test_never_cache_decorator_http_request(self):
         class MyClass:

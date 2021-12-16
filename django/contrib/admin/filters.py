@@ -118,6 +118,7 @@ class SimpleListFilter(ListFilter):
 class FieldListFilter(ListFilter):
     _field_list_filters = []
     _take_priority_index = 0
+    list_separator = ','
 
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.field = field
@@ -127,7 +128,7 @@ class FieldListFilter(ListFilter):
         for p in self.expected_parameters():
             if p in params:
                 value = params.pop(p)
-                self.used_parameters[p] = prepare_lookup_value(p, value)
+                self.used_parameters[p] = prepare_lookup_value(p, value, self.list_separator)
 
     def has_output(self):
         return True

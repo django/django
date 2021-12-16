@@ -613,13 +613,14 @@ class OrderItem(models.Model):
 
 
 class BaseUser(models.Model):
-    pass
+    annotation = models.ForeignKey(Annotation, models.CASCADE, null=True, blank=True)
 
 
 class Task(models.Model):
     title = models.CharField(max_length=10)
     owner = models.ForeignKey(BaseUser, models.CASCADE, related_name='owner')
     creator = models.ForeignKey(BaseUser, models.CASCADE, related_name='creator')
+    note = models.ForeignKey(Note, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.title

@@ -6,13 +6,14 @@
 # Jonathan Lindén, 2014
 # Petter Strandmark <petter.strandmark@gmail.com>, 2019
 # Thomas Lundqvist, 2013
+# Tomas Lööw <tomas.loow@mailbox.org>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2019-01-28 13:49+0000\n"
-"Last-Translator: Petter Strandmark <petter.strandmark@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-10-27 05:33+0000\n"
+"Last-Translator: Tomas Lööw <tomas.loow@mailbox.org>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -105,7 +106,7 @@ msgstr "Vänligen installera docutils"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
+"The admin documentation system requires Python’s <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
 "Administrationsdokumentationen kräver Pythons <a href=\"%(link)s\">docutils</"
@@ -159,13 +160,13 @@ msgid "Template: %(name)s"
 msgstr "Mall: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Mall: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr ""
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "Sökväg för mall \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr ""
 
 msgid "(does not exist)"
 msgstr "(finns inte)"

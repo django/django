@@ -4,13 +4,14 @@
 # Aarni Koskela, 2015,2017,2020-2021
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jiri Grönroos <jiri.gronroos@iki.fi>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-04-14 12:20+0000\n"
-"Last-Translator: Aarni Koskela\n"
+"PO-Revision-Date: 2021-11-22 15:49+0000\n"
+"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -28,7 +29,7 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
-"Tämä on lista saatavillaolevista %s. Valitse allaolevasta laatikosta "
+"Tämä on lista saatavilla olevista %s. Valitse alla olevasta laatikosta "
 "haluamasi ja siirrä ne valittuihin klikkamalla \"Valitse\"-nuolta "
 "laatikoiden välillä."
 

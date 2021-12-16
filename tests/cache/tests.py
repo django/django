@@ -157,17 +157,20 @@ class DummyCacheTests(SimpleTestCase):
 
     def test_data_types(self):
         "All data types are ignored equally by the dummy cache"
-        stuff = {
+        tests = {
             'string': 'this is a string',
             'int': 42,
+            'bool': True,
             'list': [1, 2, 3, 4],
             'tuple': (1, 2, 3, 4),
             'dict': {'A': 1, 'B': 2},
             'function': f,
             'class': C,
         }
-        cache.set("stuff", stuff)
-        self.assertIsNone(cache.get("stuff"))
+        for key, value in tests.items():
+            with self.subTest(key=key):
+                cache.set(key, value)
+                self.assertIsNone(cache.get(key))
 
     def test_expiration(self):
         "Expiration has no effect on the dummy cache"
@@ -399,17 +402,20 @@ class BaseCacheTests:
 
     def test_data_types(self):
         # Many different data types can be cached
-        stuff = {
+        tests = {
             'string': 'this is a string',
             'int': 42,
+            'bool': True,
             'list': [1, 2, 3, 4],
             'tuple': (1, 2, 3, 4),
             'dict': {'A': 1, 'B': 2},
             'function': f,
             'class': C,
         }
-        cache.set("stuff", stuff)
-        self.assertEqual(cache.get("stuff"), stuff)
+        for key, value in tests.items():
+            with self.subTest(key=key):
+                cache.set(key, value)
+                self.assertEqual(cache.get(key), value)
 
     def test_cache_read_for_model_instance(self):
         # Don't want fields with callable as default to be called on cache read
@@ -1113,7 +1119,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         with self.assertNumQueries(1):
             cache.delete_many(['a', 'b', 'c'])
 
-    def test_cull_count_queries(self):
+    def test_cull_queries(self):
         old_max_entries = cache._max_entries
         # Force _cull to delete on first cached record.
         cache._max_entries = -1
@@ -1124,6 +1130,13 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
                 cache._max_entries = old_max_entries
         num_count_queries = sum('COUNT' in query['sql'] for query in captured_queries)
         self.assertEqual(num_count_queries, 1)
+        # Column names are quoted.
+        for query in captured_queries:
+            sql = query['sql']
+            if 'expires' in sql:
+                self.assertIn(connection.ops.quote_name('expires'), sql)
+            if 'cache_key' in sql:
+                self.assertIn(connection.ops.quote_name('cache_key'), sql)
 
     def test_delete_cursor_rowcount(self):
         """
@@ -1179,6 +1192,15 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
             stdout=out,
         )
         self.assertEqual(out.getvalue(), "Cache table 'test cache table' created.\n")
+
+    def test_has_key_query_columns_quoted(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            cache.has_key('key')
+        self.assertEqual(len(captured_queries), 1)
+        sql = captured_queries[0]['sql']
+        # Column names are quoted.
+        self.assertIn(connection.ops.quote_name('expires'), sql)
+        self.assertIn(connection.ops.quote_name('cache_key'), sql)
 
 
 @override_settings(USE_TZ=True)
@@ -1693,6 +1715,11 @@ class RedisCacheTests(BaseCacheTests, TestCase):
 
     def test_get_client(self):
         self.assertIsInstance(cache._cache.get_client(), self.lib.Redis)
+
+    def test_serializer_dumps(self):
+        self.assertEqual(cache._cache._serializer.dumps(123), 123)
+        self.assertIsInstance(cache._cache._serializer.dumps(True), bytes)
+        self.assertIsInstance(cache._cache._serializer.dumps('abc'), bytes)
 
 
 class FileBasedCachePathLibTests(FileBasedCacheTests):

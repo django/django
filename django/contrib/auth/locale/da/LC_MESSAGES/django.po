@@ -2,18 +2,19 @@
 #
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
-# Erik Wognsen <r4mses@gmail.com>, 2013-2017,2019
+# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2021
+# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2013-2017,2019
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Stevenn, 2013
+# 85794379431c3e0f5c85c0e72a78d45b_658ddd9, 2013
 # tiktuk <tiktuk@gmail.com>, 2018
 # valberg <valberg@orn.li>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-17 18:07+0000\n"
-"Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-09-23 20:27+0000\n"
+"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -138,6 +139,9 @@ msgstr "work factor"
 
 msgid "checksum"
 msgstr "tjeksum"
+
+msgid "block size"
+msgstr "blokstørrelse"
 
 msgid "name"
 msgstr "navn"

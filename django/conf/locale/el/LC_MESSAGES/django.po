@@ -3,6 +3,7 @@
 # Translators:
 # Apostolis Bessas <mpessas+txc@transifex.com>, 2013
 # Dimitris Glezos <glezos@transifex.com>, 2011,2013,2017
+# Fotis Athineos <fotis@transifex.com>, 2021
 # Giannis Meletakis <meletakis@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Nick Mavrakis <mavrakis.n@gmail.com>, 2017-2020
@@ -17,8 +18,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-15 12:25+0000\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-18 21:19+0000\n"
 "Last-Translator: Transifex Bot <>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -215,6 +216,9 @@ msgstr "Μογγολικά"
 
 msgid "Marathi"
 msgstr "Μαράθι"
+
+msgid "Malay"
+msgstr ""
 
 msgid "Burmese"
 msgstr "Βιρμανικά"
@@ -785,14 +789,14 @@ msgstr ""
 #, python-format
 msgid "Please submit at most %d form."
 msgid_plural "Please submit at most %d forms."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Παρακαλώ υποβάλλετε το πολύ %d φόρμα."
+msgstr[1] "Παρακαλώ υποβάλλετε το πολύ %d φόρμες."
 
 #, python-format
 msgid "Please submit at least %d form."
 msgid_plural "Please submit at least %d forms."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Παρακαλώ υποβάλλετε τουλάχιστον %d φόρμα."
+msgstr[1] "Παρακαλώ υποβάλλετε τουλάχιστον %d φόρμες."
 
 msgid "Order"
 msgstr "Ταξινόμηση"
@@ -1133,40 +1137,40 @@ msgid ", "
 msgstr ", "
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d χρόνος"
-msgstr[1] "%d χρόνια"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d μήνας"
-msgstr[1] "%d μήνες"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d βδομάδα"
-msgstr[1] "%d βδομάδες"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d μέρα"
-msgstr[1] "%d μέρες"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d ώρα"
-msgstr[1] "%d ώρες"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d λεπτό"
-msgstr[1] "%d λεπτά"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Forbidden"
 msgstr "Απαγορευμένο"
@@ -1176,14 +1180,10 @@ msgstr "Η πιστοποίηση CSRF απέτυχε. Το αίτημα ματ�
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Βλέπετε αυτό το μήνυμα επειδή αυτή η HTTPS σελίδα απαιτεί από τον Web "
-"browser σας να σταλεί ένας 'Referer header', όμως τίποτα δεν στάλθηκε. Αυτός "
-"ο header είναι απαραίτητος για λόγους ασφαλείας, για να εξασφαλιστεί ότι ο "
-"browser δεν έχει γίνει hijacked από τρίτους."
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"

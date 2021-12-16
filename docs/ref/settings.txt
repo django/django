@@ -347,6 +347,22 @@ form input <acquiring-csrf-token-from-html>` instead of :ref:`from the cookie
 
 See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
 
+.. setting:: CSRF_COOKIE_MASKED
+
+``CSRF_COOKIE_MASKED``
+----------------------
+
+.. versionadded:: 4.1
+
+Default: ``False``
+
+Whether to mask the CSRF cookie. See
+:ref:`release notes <csrf-cookie-masked-usage>` for usage details.
+
+.. deprecated:: 4.1
+
+    This transitional setting is deprecated and will be removed in Django 5.0.
+
 .. setting:: CSRF_COOKIE_NAME
 
 ``CSRF_COOKIE_NAME``
@@ -612,7 +628,25 @@ Default: ``0``
 
 The lifetime of a database connection, as an integer of seconds. Use ``0`` to
 close database connections at the end of each request — Django's historical
-behavior — and ``None`` for unlimited persistent connections.
+behavior — and ``None`` for unlimited :ref:`persistent database connections
+<persistent-database-connections>`.
+
+.. setting:: CONN_HEALTH_CHECKS
+
+``CONN_HEALTH_CHECKS``
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 4.1
+
+Default: ``False``
+
+If set to ``True``, existing :ref:`persistent database connections
+<persistent-database-connections>` will be health checked before they are
+reused in each request performing database access. If the health check fails,
+the connection will be re-established without failing the request when the
+connection is no longer usable but the database server is ready to accept and
+serve new connections (e.g. after database server restart closing existing
+connections).
 
 .. setting:: OPTIONS
 

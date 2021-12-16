@@ -542,9 +542,9 @@ default template, see also :ref:`overriding-built-in-form-templates`.
 .. attribute:: Form.template_name_label
 
 The template used to render a field's ``<label>``, used when calling
-:meth:`BoundField.label_tag`. Can be changed per form by overriding this
-attribute or more generally by overriding the default template, see also
-:ref:`overriding-built-in-form-templates`.
+:meth:`BoundField.label_tag`/:meth:`~BoundField.legend_tag`. Can be changed per
+form by overriding this attribute or more generally by overriding the default
+template, see also :ref:`overriding-built-in-form-templates`.
 
 ``as_p()``
 ----------
@@ -672,8 +672,12 @@ classes, as needed. The HTML will look something like::
     <tr><th><label for="id_cc_myself">Cc myself:<label> ...
     >>> f['subject'].label_tag()
     <label class="required" for="id_subject">Subject:</label>
+    >>> f['subject'].legend_tag()
+    <legend class="required" for="id_subject">Subject:</legend>
     >>> f['subject'].label_tag(attrs={'class': 'foo'})
     <label for="id_subject" class="foo required">Subject:</label>
+    >>> f['subject'].legend_tag(attrs={'class': 'foo'})
+    <legend for="id_subject" class="foo required">Subject:</legend>
 
 .. _ref-forms-api-configuring-label:
 
@@ -797,7 +801,8 @@ Fields can also define their own :attr:`~django.forms.Field.label_suffix`.
 This will take precedence over :attr:`Form.label_suffix
 <django.forms.Form.label_suffix>`. The suffix can also be overridden at runtime
 using the ``label_suffix`` parameter to
-:meth:`~django.forms.BoundField.label_tag`.
+:meth:`~django.forms.BoundField.label_tag`/
+:meth:`~django.forms.BoundField.legend_tag`.
 
 .. attribute:: Form.use_required_attribute
 
@@ -1092,7 +1097,8 @@ Attributes of ``BoundField``
 
     Use this property to render the ID of this field. For example, if you are
     manually constructing a ``<label>`` in your template (despite the fact that
-    :meth:`~BoundField.label_tag` will do this for you):
+    :meth:`~BoundField.label_tag`/:meth:`~BoundField.legend_tag` will do this
+    for you):
 
     .. code-block:: html+django
 
@@ -1142,7 +1148,7 @@ Attributes of ``BoundField``
 .. attribute:: BoundField.label
 
     The :attr:`~django.forms.Field.label` of the field. This is used in
-    :meth:`~BoundField.label_tag`.
+    :meth:`~BoundField.label_tag`/:meth:`~BoundField.legend_tag`.
 
 .. attribute:: BoundField.name
 
@@ -1208,7 +1214,7 @@ Methods of ``BoundField``
         >>> f['message'].css_classes('foo bar')
         'foo bar required'
 
-.. method:: BoundField.label_tag(contents=None, attrs=None, label_suffix=None)
+.. method:: BoundField.label_tag(contents=None, attrs=None, label_suffix=None, tag=None)
 
     Renders a label tag for the form field using the template specified by
     :attr:`.Form.template_name_label`.
@@ -1225,7 +1231,8 @@ Methods of ``BoundField``
       field's widget ``attrs`` or :attr:`BoundField.auto_id`. Additional
       attributes can be provided by the ``attrs`` argument.
     * ``use_tag``: A boolean which is ``True`` if the label has an ``id``.
-      If ``False`` the default template omits the ``<label>`` tag.
+      If ``False`` the default template omits the ``tag``.
+    * ``tag``: An optional string to customize the tag, defaults to ``label``.
 
     .. tip::
 
@@ -1248,6 +1255,19 @@ Methods of ``BoundField``
     .. versionchanged:: 4.0
 
         The label is now rendered using the template engine.
+
+    .. versionchanged:: 4.1
+
+        The ``tag`` argument was added.
+
+.. method:: BoundField.legend_tag(contents=None, attrs=None, label_suffix=None)
+
+    .. versionadded:: 4.1
+
+    Calls :meth:`.label_tag` with ``tag='legend'`` to render the label with
+    ``<legend>`` tags. This is useful when rendering radio and multiple
+    checkbox widgets where ``<legend>`` may be more appropriate than a
+    ``<label>``.
 
 .. method:: BoundField.value()
 

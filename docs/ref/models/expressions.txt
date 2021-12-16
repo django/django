@@ -772,26 +772,31 @@ compute the result set.
 
 The ``output_field`` is specified either as an argument or by the expression.
 
-The ``order_by`` argument accepts an expression or a sequence of expressions on
-which you can call :meth:`~django.db.models.Expression.asc` and
-:meth:`~django.db.models.Expression.desc`. The ordering controls the order in
-which the expression is applied. For example, if you sum over the rows in a
-partition, the first result is the value of the first row, the second is the
-sum of first and second row.
+The ``order_by`` argument accepts an expression on which you can call
+:meth:`~django.db.models.Expression.asc` and
+:meth:`~django.db.models.Expression.desc`, a string of a field name (with an
+optional ``"-"`` prefix which indicates descending order), or a tuple or list
+of strings and/or expressions. The ordering controls the order in which the
+expression is applied. For example, if you sum over the rows in a partition,
+the first result is the value of the first row, the second is the sum of first
+and second row.
 
 The ``frame`` parameter specifies which other rows that should be used in the
 computation. See :ref:`window-frames` for details.
+
+.. versionchanged:: 4.1
+
+    Support for ``order_by`` by field name references was added.
 
 For example, to annotate each movie with the average rating for the movies by
 the same studio in the same genre and release year::
 
     >>> from django.db.models import Avg, F, Window
-    >>> from django.db.models.functions import ExtractYear
     >>> Movie.objects.annotate(
     >>>     avg_rating=Window(
     >>>         expression=Avg('rating'),
     >>>         partition_by=[F('studio'), F('genre')],
-    >>>         order_by=ExtractYear('released').asc(),
+    >>>         order_by='released__year',
     >>>     ),
     >>> )
 
@@ -805,10 +810,9 @@ partition and ordering from the previous example is extracted into a dictionary
 to reduce repetition::
 
     >>> from django.db.models import Avg, F, Max, Min, Window
-    >>> from django.db.models.functions import ExtractYear
     >>> window = {
     >>>    'partition_by': [F('studio'), F('genre')],
-    >>>    'order_by': ExtractYear('released').asc(),
+    >>>    'order_by': 'released__year',
     >>> }
     >>> Movie.objects.annotate(
     >>>     avg_rating=Window(
@@ -887,12 +891,11 @@ same genre in the same year, this ``RowRange`` example annotates each movie
 with the average rating of a movie's two prior and two following peers::
 
     >>> from django.db.models import Avg, F, RowRange, Window
-    >>> from django.db.models.functions import ExtractYear
     >>> Movie.objects.annotate(
     >>>     avg_rating=Window(
     >>>         expression=Avg('rating'),
     >>>         partition_by=[F('studio'), F('genre')],
-    >>>         order_by=ExtractYear('released').asc(),
+    >>>         order_by='released__year',
     >>>         frame=RowRange(start=-2, end=2),
     >>>     ),
     >>> )
@@ -901,14 +904,14 @@ If the database supports it, you can specify the start and end points based on
 values of an expression in the partition. If the ``released`` field of the
 ``Movie`` model stores the release month of each movies, this ``ValueRange``
 example annotates each movie with the average rating of a movie's peers
-released between twelve months before and twelve months after the each movie.
+released between twelve months before and twelve months after the each movie::
 
     >>> from django.db.models import Avg, F, ValueRange, Window
     >>> Movie.objects.annotate(
     >>>     avg_rating=Window(
     >>>         expression=Avg('rating'),
     >>>         partition_by=[F('studio'), F('genre')],
-    >>>         order_by=F('released').asc(),
+    >>>         order_by='released__year',
     >>>         frame=ValueRange(start=-12, end=12),
     >>>     ),
     >>> )

@@ -2,10 +2,13 @@
 #
 # Translators:
 # Ahmad Hosseini <ahmadly.com@gmail.com>, 2020
+# alirezamastery <alireza.mastery@gmail.com>, 2021
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Arash Fazeli <a.fazeli@gmail.com>, 2012
 # Eric Hamiter <ehamiter@gmail.com>, 2019
+# Farshad Asadpour, 2021
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
 # Mazdak Badakhshan <geraneum@gmail.com>, 2014
 # Milad Hazrati <miladhazrati75@gmail.com>, 2019
 # MJafar Mashhadi <raindigital2007@gmail.com>, 2018
@@ -20,9 +23,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-04-03 06:19+0000\n"
-"Last-Translator: rahim agh <rahim.aghareb@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-24 16:28+0000\n"
+"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -219,6 +222,9 @@ msgstr "مغولی"
 
 msgid "Marathi"
 msgstr "مِراتی"
+
+msgid "Malay"
+msgstr "Malay"
 
 msgid "Burmese"
 msgstr "برمه‌ای"
@@ -768,6 +774,8 @@ msgid ""
 "ManagementForm data is missing or has been tampered with. Missing fields: "
 "%(field_names)s. You may need to file a bug report if the issue persists."
 msgstr ""
+"اطلاعات ManagementForm مفقود یا دستکاری شده است. ردیف های مفقود شده: "
+"%(field_names)s. اگر این مشکل ادامه داشت، آن را گزارش کنید."
 
 #, python-format
 msgid "Please submit at most %d form."
@@ -1106,7 +1114,7 @@ msgstr "این مقدار آدرس IPv6 معتبری نیست."
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s…"
-msgstr "%(truncated_text)s ..."
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "یا"
@@ -1116,40 +1124,40 @@ msgid ", "
 msgstr "،"
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d سال"
-msgstr[1] "%d سال"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d سال"
+msgstr[1] "%(num)d سال ها"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d ماه"
-msgstr[1] "%d ماه"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d ماه"
+msgstr[1] "%(num)d ماه ها"
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d هفته"
-msgstr[1] "%d هفته"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d هفته"
+msgstr[1] "%(num)d هفته ها"
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d روز"
-msgstr[1] "%d روز"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d روز"
+msgstr[1] "%(num)d روزها"
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d ساعت"
-msgstr[1] "%d ساعت"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d ساعت"
+msgstr[1] "%(num)d ساعت ها"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d دقیقه"
-msgstr[1] "%d دقیقه"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d دقیقه"
+msgstr[1] "%(num)d دقیقه ها"
 
 msgid "Forbidden"
 msgstr "ممنوع"
@@ -1159,14 +1167,14 @@ msgstr "‏CSRF تأیید نشد. درخواست لغو شد."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"شما این پیغام را می‌بینید چون این وب‌گاه HTTPS نیازمند یک \"Referer header\" "
-"یا سرتیتر ارجاع دهنده است که باید توسط مرورگر شما ارسال شود. این سرتیتر به "
-"دلایل امنیتی مورد نیاز است تا اطمینان حاصل شود که مرورگر شما توسط شخص سومی "
-"مورد سوءاستفاده قرار نگرفته باشد."
+"شما این پیغام را مشاهده میکنید برای اینکه این HTTPS site نیازمند یک "
+"\"Referer header\"  برای ارسال توسط مرورگر شما دارد،‌اما مقداری ارسال "
+"نمیشود . این هدر الزامی میباشد برای امنیت ، در واقع برای اینکه مرورگر شما "
+"مطمین شود hijack به عنوان نفر سوم (third parties) در میان نیست"
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"

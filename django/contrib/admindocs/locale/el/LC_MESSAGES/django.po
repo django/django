@@ -2,6 +2,7 @@
 #
 # Translators:
 # Dimitris Glezos <glezos@transifex.com>, 2011
+# Fotis Athineos <fotis@transifex.com>, 2021
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Nick Mavrakis <mavrakis.n@gmail.com>, 2016
 # Pãnoș <panos.laganakos@gmail.com>, 2014
@@ -10,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-08-04 06:47+0000\n"
+"Last-Translator: Fotis Athineos <fotis@transifex.com>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -105,7 +106,7 @@ msgstr "Παρακαλώ εγκαταστείστε τα docutils"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
+"The admin documentation system requires Python’s <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
 "Το σύστημα διαχειριστικής τεκμηρίωσης απαιτεί την βιβλιοθήκη της Python <a "
@@ -160,13 +161,13 @@ msgid "Template: %(name)s"
 msgstr "Περίγραμμα: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Περίγραμμα: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr "Περίγραμμα: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "Αναζήτηση μονοπατιού για περίγραμμα \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "Αναζήτηση μονοπατιού για περίγραμμα <q>%(name)s</q>:"
 
 msgid "(does not exist)"
 msgstr "(δεν υπάρχει)"

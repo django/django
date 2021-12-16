@@ -175,12 +175,24 @@ fieldset .fieldBox {
     top: 0;
     left: auto;
     right: 10px;
+    background: url(../img/calendar-icons.svg) 0 -30px no-repeat;
+}
+
+.calendarbox .calendarnav-previous:focus,
+.calendarbox .calendarnav-previous:hover {
+    background-position: 0 -45px;
 }
 
 .calendarnav-next {
     top: 0;
     right: auto;
     left: 10px;
+    background: url(../img/calendar-icons.svg) 0 0 no-repeat;
+}
+
+.calendarbox .calendarnav-next:focus,
+.calendarbox .calendarnav-next:hover {
+    background-position: 0 -15px;
 }
 
 .calendar caption, .calendarbox h2 {

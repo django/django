@@ -4810,6 +4810,49 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertTrue(self.selenium.find_element(By.ID, 'id_title').is_displayed())
         self.assertEqual(self.selenium.find_element(By.ID, 'fieldsetcollapser0').text, "Hide")
 
+    def test_selectbox_height_collapsible_fieldset(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(
+            username='super',
+            password='secret',
+            login_url=reverse('admin7:index'),
+        )
+        url = self.live_server_url + reverse('admin7:admin_views_pizza_add')
+        self.selenium.get(url)
+        self.selenium.find_elements(By.LINK_TEXT, 'Show')[0].click()
+        filter_box = self.selenium.find_element(By.ID, 'id_toppings_filter')
+        from_box = self.selenium.find_element(By.ID, 'id_toppings_from')
+        to_box = self.selenium.find_element(By.ID, 'id_toppings_to')
+        self.assertEqual(
+            to_box.get_property('offsetHeight'),
+            (
+                filter_box.get_property('offsetHeight') +
+                from_box.get_property('offsetHeight')
+            ),
+        )
+
+    def test_selectbox_height_not_collapsible_fieldset(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(
+            username='super',
+            password='secret',
+            login_url=reverse('admin7:index'),
+        )
+        url = self.live_server_url + reverse('admin7:admin_views_question_add')
+        self.selenium.get(url)
+        filter_box = self.selenium.find_element(By.ID, 'id_related_questions_filter')
+        from_box = self.selenium.find_element(By.ID, 'id_related_questions_from')
+        to_box = self.selenium.find_element(By.ID, 'id_related_questions_to')
+        self.assertEqual(
+            to_box.get_property('offsetHeight'),
+            (
+                filter_box.get_property('offsetHeight') +
+                from_box.get_property('offsetHeight')
+            ),
+        )
+
     def test_first_field_focus(self):
         """JavaScript-assisted auto-focus on first usable form field."""
         from selenium.webdriver.common.by import By

@@ -7,6 +7,7 @@ import os
 import re
 import shutil
 import socket
+import stat
 import subprocess
 import sys
 import tempfile
@@ -32,6 +33,11 @@ from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
 )
 from django.test.utils import captured_stderr, captured_stdout
+from django.urls import path
+from django.utils.version import PY39
+from django.views.static import serve
+
+from . import urls
 
 custom_templates_dir = os.path.join(os.path.dirname(__file__), 'custom_templates')
 
@@ -95,7 +101,7 @@ class AdminScriptTestCase(SimpleTestCase):
                 paths.append(os.path.dirname(backend_dir))
         return paths
 
-    def run_test(self, args, settings_file=None, apps=None):
+    def run_test(self, args, settings_file=None, apps=None, umask=None):
         base_dir = os.path.dirname(self.test_dir)
         # The base dir for Django's tests is one level up.
         tests_dir = os.path.dirname(os.path.dirname(__file__))
@@ -124,11 +130,13 @@ class AdminScriptTestCase(SimpleTestCase):
             cwd=self.test_dir,
             env=test_environ,
             text=True,
+            # subprocess.run()'s umask was added in Python 3.9.
+            **({'umask': umask} if umask and PY39 else {}),
         )
         return p.stdout, p.stderr
 
-    def run_django_admin(self, args, settings_file=None):
-        return self.run_test(['-m', 'django', *args], settings_file)
+    def run_django_admin(self, args, settings_file=None, umask=None):
+        return self.run_test(['-m', 'django', *args], settings_file, umask=umask)
 
     def run_manage(self, args, settings_file=None, manage_py=None):
         template_manage_py = (
@@ -2123,6 +2131,33 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'run.py')))
 
+    def test_custom_project_template_from_tarball_by_url_django_user_agent(self):
+        user_agent = None
+
+        def serve_template(request, *args, **kwargs):
+            nonlocal user_agent
+            user_agent = request.headers['User-Agent']
+            return serve(request, *args, **kwargs)
+
+        old_urlpatterns = urls.urlpatterns[:]
+        try:
+            urls.urlpatterns += [
+                path(
+                    'user_agent_check/<path:path>',
+                    serve_template,
+                    {'document_root': os.path.join(urls.here, 'custom_templates')},
+                ),
+            ]
+
+            template_url = f'{self.live_server_url}/user_agent_check/project_template.tgz'
+            args = ['startproject', '--template', template_url, 'urltestproject']
+            _, err = self.run_django_admin(args)
+
+            self.assertNoOutput(err)
+            self.assertIn('Django/%s' % get_version(), user_agent)
+        finally:
+            urls.urlpatterns = old_urlpatterns
+
     def test_project_template_tarball_url(self):
         "Startproject management command handles project template tar/zip balls from non-canonical urls"
         template_url = '%s/custom_templates/project_template.tgz/' % self.live_server_url
@@ -2296,6 +2331,29 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
             )
         not_excluded = os.path.join(testproject_dir, project_name)
         self.assertIs(os.path.exists(not_excluded), True)
+
+    @unittest.skipIf(
+        sys.platform == 'win32',
+        'Windows only partially supports umasks and chmod.',
+    )
+    @unittest.skipUnless(PY39, "subprocess.run()'s umask was added in Python 3.9.")
+    def test_honor_umask(self):
+        _, err = self.run_django_admin(['startproject', 'testproject'], umask=0o077)
+        self.assertNoOutput(err)
+        testproject_dir = os.path.join(self.test_dir, 'testproject')
+        self.assertIs(os.path.isdir(testproject_dir), True)
+        tests = [
+            (['manage.py'], 0o700),
+            (['testproject'], 0o700),
+            (['testproject', 'settings.py'], 0o600),
+        ]
+        for paths, expected_mode in tests:
+            file_path = os.path.join(testproject_dir, *paths)
+            with self.subTest(paths[-1]):
+                self.assertEqual(
+                    stat.S_IMODE(os.stat(file_path).st_mode),
+                    expected_mode,
+                )
 
 
 class StartApp(AdminScriptTestCase):

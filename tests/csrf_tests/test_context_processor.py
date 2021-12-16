@@ -9,7 +9,7 @@ class TestContextProcessor(CsrfFunctionTestMixin, SimpleTestCase):
 
     def test_force_token_to_string(self):
         request = HttpRequest()
-        test_token = '1bcdefghij2bcdefghij3bcdefghij4bcdefghij5bcdefghij6bcdefghijABCD'
-        request.META['CSRF_COOKIE'] = test_token
+        test_secret = 32 * 'a'
+        request.META['CSRF_COOKIE'] = test_secret
         token = csrf(request).get('csrf_token')
-        self.assertMaskedSecretCorrect(token, 'lcccccccX2kcccccccY2jcccccccssIC')
+        self.assertMaskedSecretCorrect(token, test_secret)

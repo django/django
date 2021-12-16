@@ -173,6 +173,12 @@ class TestUtilsHtml(SimpleTestCase):
             with self.subTest(arg=arg):
                 self.assertEqual(json_script(arg, 'test_id'), expected)
 
+    def test_json_script_without_id(self):
+        self.assertHTMLEqual(
+            json_script({'key': 'value'}),
+            '<script type="application/json">{"key": "value"}</script>',
+        )
+
     def test_smart_urlquote(self):
         items = (
             ('http://öäü.com/', 'http://xn--4ca9at.com/'),

@@ -142,6 +142,7 @@ Now, our ``my_callback`` function will be called each time a request finishes.
     connect signal handlers::
 
         from django.apps import AppConfig
+        from django.core.signals import request_finished
 
         class MyAppConfig(AppConfig):
             ...
@@ -150,7 +151,7 @@ Now, our ``my_callback`` function will be called each time a request finishes.
                 # Implicitly connect a signal handlers decorated with @receiver.
                 from . import signals
                 # Explicitly connect a signal handler.
-                signals.request_finished.connect(signals.my_callback)
+                request_finished.connect(signals.my_callback)
 
 .. note::
 

@@ -15,6 +15,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_table = "DROP TABLE %(table)s"
     sql_create_fk = None
     sql_create_inline_fk = "REFERENCES %(to_table)s (%(to_column)s) DEFERRABLE INITIALLY DEFERRED"
+    sql_create_column_inline_fk = sql_create_inline_fk
     sql_create_unique = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)"
     sql_delete_unique = "DROP INDEX %(name)s"
 
@@ -63,6 +64,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             return "X'%s'" % value.hex()
         else:
             raise ValueError("Cannot quote parameter value %r of type %s" % (value, type(value)))
+
+    def prepare_default(self, value):
+        return self.quote_value(value)
 
     def _is_referenced_by_fk_constraint(self, table_name, column_name=None, ignore_self=False):
         """
@@ -186,8 +190,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             body[create_field.name] = create_field
             # Choose a default and insert it into the copy map
             if not create_field.many_to_many and create_field.concrete:
-                mapping[create_field.column] = self.quote_value(
-                    self.effective_default(create_field)
+                mapping[create_field.column] = self.prepare_default(
+                    self.effective_default(create_field),
                 )
         # Add in any altered fields
         if alter_field:
@@ -198,7 +202,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             if old_field.null and not new_field.null:
                 case_sql = "coalesce(%(col)s, %(default)s)" % {
                     'col': self.quote_name(old_field.column),
-                    'default': self.quote_value(self.effective_default(new_field))
+                    'default': self.prepare_default(self.effective_default(new_field)),
                 }
                 mapping[new_field.column] = case_sql
             else:
@@ -319,14 +323,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                     self.deferred_sql.remove(sql)
 
     def add_field(self, model, field):
-        """
-        Create a field on a model. Usually involves adding a column, but may
-        involve adding a table instead (for M2M fields).
-        """
-        # Special-case implicit M2M tables
-        if field.many_to_many and field.remote_field.through._meta.auto_created:
-            return self.create_model(field.remote_field.through)
-        self._remake_table(model, create_field=field)
+        """Create a field on a model."""
+        # Fields with default values cannot by handled by ALTER TABLE ADD
+        # COLUMN statement because DROP DEFAULT is not supported in
+        # ALTER TABLE.
+        if not field.null or self.effective_default(field) is not None:
+            self._remake_table(model, create_field=field)
+        else:
+            super().add_field(model, field)
 
     def remove_field(self, model, field):
         """

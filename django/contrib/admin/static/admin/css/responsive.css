@@ -131,10 +131,6 @@ input[type="submit"], button {
         padding: 15px 0;
     }
 
-    #changelist .actions.selected {
-        border: none;
-    }
-
     #changelist .actions label {
         display: flex;
     }

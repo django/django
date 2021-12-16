@@ -74,10 +74,15 @@ class TestDataTests(TestCase):
             belongs_to=cls.jim_douglas,
         )
 
+        cls.person_binary = Person.objects.create(name='Person', data=b'binary data')
+        cls.person_binary_get = Person.objects.get(pk=cls.person_binary.pk)
+
     @assert_no_queries
     def test_class_attribute_equality(self):
         """Class level test data is equal to instance level test data."""
         self.assertEqual(self.jim_douglas, self.__class__.jim_douglas)
+        self.assertEqual(self.person_binary, self.__class__.person_binary)
+        self.assertEqual(self.person_binary_get, self.__class__.person_binary_get)
 
     @assert_no_queries
     def test_class_attribute_identity(self):
@@ -85,6 +90,21 @@ class TestDataTests(TestCase):
         Class level test data is not identical to instance level test data.
         """
         self.assertIsNot(self.jim_douglas, self.__class__.jim_douglas)
+        self.assertIsNot(self.person_binary, self.__class__.person_binary)
+        self.assertIsNot(self.person_binary_get, self.__class__.person_binary_get)
+
+    @assert_no_queries
+    def test_binaryfield_data_type(self):
+        self.assertEqual(bytes(self.person_binary.data), b'binary data')
+        self.assertEqual(bytes(self.person_binary_get.data), b'binary data')
+        self.assertEqual(
+            type(self.person_binary_get.data),
+            type(self.__class__.person_binary_get.data),
+        )
+        self.assertEqual(
+            type(self.person_binary.data),
+            type(self.__class__.person_binary.data),
+        )
 
     @assert_no_queries
     def test_identity_preservation(self):

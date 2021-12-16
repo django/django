@@ -1478,8 +1478,11 @@ your test suite.
     Asserts that a field on a form raises the provided list of errors when
     rendered on the form.
 
+    ``response`` must be a response instance returned by the
+    :class:`test client <django.test.Response>`.
+
     ``form`` is the name the ``Form`` instance was given in the template
-    context.
+    context of the response.
 
     ``field`` is the name of the field on the form to check. If ``field``
     has a value of ``None``, non-field errors (errors you can access via
@@ -1494,8 +1497,11 @@ your test suite.
     Asserts that the ``formset`` raises the provided list of errors when
     rendered.
 
+    ``response`` must be a response instance returned by the
+    :class:`test client <django.test.Response>`.
+
     ``formset`` is the name the ``Formset`` instance was given in the template
-    context.
+    context of the response.
 
     ``form_index`` is the number of the form within the ``Formset``.  If
     ``form_index`` has a value of ``None``, non-form errors (errors you can
@@ -1511,9 +1517,10 @@ your test suite.
 
 .. method:: SimpleTestCase.assertContains(response, text, count=None, status_code=200, msg_prefix='', html=False)
 
-    Asserts that a ``Response`` instance produced the given ``status_code`` and
-    that ``text`` appears in the content of the response. If ``count`` is
-    provided, ``text`` must occur exactly ``count`` times in the response.
+    Asserts that a :class:`response <django.http.HttpResponse>` produced the
+    given :attr:`~django.http.HttpResponse.status_code` and that ``text``
+    appears in its :attr:`~django.http.HttpResponse.content`. If ``count``
+    is provided, ``text`` must occur exactly ``count`` times in the response.
 
     Set ``html`` to ``True`` to handle ``text`` as HTML. The comparison with
     the response content will be based on HTML semantics instead of
@@ -1523,8 +1530,9 @@ your test suite.
 
 .. method:: SimpleTestCase.assertNotContains(response, text, status_code=200, msg_prefix='', html=False)
 
-    Asserts that a ``Response`` instance produced the given ``status_code`` and
-    that ``text`` does *not* appear in the content of the response.
+    Asserts that a :class:`response <django.http.HttpResponse>` produced the
+    given :attr:`~django.http.HttpResponse.status_code` and that ``text`` does
+    *not* appear in its :attr:`~django.http.HttpResponse.content`.
 
     Set ``html`` to ``True`` to handle ``text`` as HTML. The comparison with
     the response content will be based on HTML semantics instead of
@@ -1537,9 +1545,12 @@ your test suite.
     Asserts that the template with the given name was used in rendering the
     response.
 
-    The name is a string such as ``'admin/index.html'``.
+    ``response`` must be a response instance returned by the
+    :class:`test client <django.test.Response>`.
 
-    The count argument is an integer indicating the number of times the
+    ``template_name`` should be a string such as ``'admin/index.html'``.
+
+    The ``count`` argument is an integer indicating the number of times the
     template should be rendered. Default is ``None``, meaning that the template
     should be rendered one or more times.
 
@@ -1567,9 +1578,10 @@ your test suite.
 
 .. method:: SimpleTestCase.assertRedirects(response, expected_url, status_code=302, target_status_code=200, msg_prefix='', fetch_redirect_response=True)
 
-    Asserts that the response returned a ``status_code`` redirect status,
-    redirected to ``expected_url`` (including any ``GET`` data), and that the
-    final page was received with ``target_status_code``.
+    Asserts that the :class:`response <django.http.HttpResponse>` returned a
+    :attr:`~django.http.HttpResponse.status_code` redirect status, redirected
+    to ``expected_url`` (including any ``GET`` data), and that the final page
+    was received with ``target_status_code``.
 
     If your request used the ``follow`` argument, the ``expected_url`` and
     ``target_status_code`` will be the url and status code for the final

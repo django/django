@@ -525,6 +525,8 @@ those latter objects, you could write::
 
     Blog.objects.filter(entry__authors__isnull=False, entry__authors__name__isnull=True)
 
+.. _spanning-multi-valued-relationships:
+
 Spanning multi-valued relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

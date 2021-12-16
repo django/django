@@ -92,7 +92,7 @@ class JsLexer(Lexer):
     # lex correct JavaScript, so much of this is simplified.
 
     # Details of JavaScript lexical structure are taken from
-    # http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-262.pdf
+    # https://www.ecma-international.org/publications-and-standards/standards/ecma-262/
 
     # A useful explanation of automatic semicolon insertion is at
     # http://inimino.org/~inimino/blog/javascript_semicolons

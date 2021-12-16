@@ -34,6 +34,11 @@ USE_L10N_DEPRECATED_MSG = (
     'display numbers and dates using the format of the current locale.'
 )
 
+CSRF_COOKIE_MASKED_DEPRECATED_MSG = (
+    'The CSRF_COOKIE_MASKED transitional setting is deprecated. Support for '
+    'it will be removed in Django 5.0.'
+)
+
 
 class SettingsReference(str):
     """
@@ -206,6 +211,9 @@ class Settings:
         if self.is_overridden('USE_DEPRECATED_PYTZ'):
             warnings.warn(USE_DEPRECATED_PYTZ_DEPRECATED_MSG, RemovedInDjango50Warning)
 
+        if self.is_overridden('CSRF_COOKIE_MASKED'):
+            warnings.warn(CSRF_COOKIE_MASKED_DEPRECATED_MSG, RemovedInDjango50Warning)
+
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
             # this file, no check happens and it's harmless.
@@ -254,6 +262,8 @@ class UserSettingsHolder:
         self._deleted.discard(name)
         if name == 'USE_L10N':
             warnings.warn(USE_L10N_DEPRECATED_MSG, RemovedInDjango50Warning)
+        if name == 'CSRF_COOKIE_MASKED':
+            warnings.warn(CSRF_COOKIE_MASKED_DEPRECATED_MSG, RemovedInDjango50Warning)
         super().__setattr__(name, value)
         if name == 'USE_DEPRECATED_PYTZ':
             warnings.warn(USE_DEPRECATED_PYTZ_DEPRECATED_MSG, RemovedInDjango50Warning)

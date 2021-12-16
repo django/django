@@ -29,7 +29,7 @@ class FormsI18nTests(SimpleTestCase):
         with translation.override('pl'):
             self.assertHTMLEqual(
                 f.as_p(),
-                '<p><label for="id_username">u\u017cytkownik:</label>'
+                '<p><label for="id_username">nazwa u\u017cytkownika:</label>'
                 '<input id="id_username" type="text" name="username" maxlength="10" required></p>'
             )
 
@@ -44,7 +44,15 @@ class FormsI18nTests(SimpleTestCase):
 
         f = SomeForm()
         self.assertHTMLEqual(f['field_1'].label_tag(), '<label for="id_field_1">field_1:</label>')
+        self.assertHTMLEqual(
+            f['field_1'].legend_tag(),
+            '<legend for="id_field_1">field_1:</legend>',
+        )
         self.assertHTMLEqual(f['field_2'].label_tag(), '<label for="field_2_id">field_2:</label>')
+        self.assertHTMLEqual(
+            f['field_2'].legend_tag(),
+            '<legend for="field_2_id">field_2:</legend>',
+        )
 
     def test_non_ascii_choices(self):
         class SomeForm(Form):

@@ -31,6 +31,11 @@ class OracleGISSchemaEditor(DatabaseSchemaEditor):
     def geo_quote_name(self, name):
         return self.connection.ops.geo_quote_name(name)
 
+    def quote_value(self, value):
+        if isinstance(value, self.connection.ops.Adapter):
+            return super().quote_value(str(value))
+        return super().quote_value(value)
+
     def column_sql(self, model, field, include_default=False):
         column_sql = super().column_sql(model, field, include_default)
         if isinstance(field, GeometryField):

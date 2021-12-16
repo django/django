@@ -88,7 +88,8 @@ class BaseDatabaseOperations:
         This is used by the 'db' cache backend to determine where to start
         culling.
         """
-        return "SELECT cache_key FROM %s ORDER BY cache_key LIMIT 1 OFFSET %%s"
+        cache_key = self.quote_name('cache_key')
+        return f'SELECT {cache_key} FROM %s ORDER BY {cache_key} LIMIT 1 OFFSET %%s'
 
     def unification_cast_sql(self, output_field):
         """

@@ -1,8 +1,8 @@
-============================================
-Django 4.0 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 4.0 release notes
+========================
 
-*Expected December 2021*
+*December 7, 2021*
 
 Welcome to Django 4.0!
 
@@ -87,7 +87,7 @@ For example::
         last_name = models.CharField(max_length=255)
 
         class Meta:
-            indexes = [
+            constraints = [
                 UniqueConstraint(
                     Lower('first_name'),
                     Lower('last_name').desc(),
@@ -118,10 +118,9 @@ in Django <redis>`.
 Template based form rendering
 -----------------------------
 
-To enhance customization of :class:`Forms <django.forms.Form>`,
-:doc:`Formsets </topics/forms/formsets>`, and
-:class:`~django.forms.ErrorList` they are now rendered using the template
-engine. See the new :meth:`~django.forms.Form.render`,
+:class:`Forms <django.forms.Form>`, :doc:`Formsets </topics/forms/formsets>`,
+and :class:`~django.forms.ErrorList` are now rendered using the template engine
+to enhance customization. See the new :meth:`~django.forms.Form.render`,
 :meth:`~django.forms.Form.get_context`, and
 :attr:`~django.forms.Form.template_name` for ``Form`` and
 :ref:`formset rendering <formset-rendering>` for ``Formset``.
@@ -581,6 +580,9 @@ Miscellaneous
 * As part of the :ref:`move to zoneinfo <whats-new-4.0>`,
   :attr:`django.utils.timezone.utc` is changed to alias
   :attr:`datetime.timezone.utc`.
+
+* The minimum supported version of ``asgiref`` is increased from 3.3.2 to
+  3.4.1.
 
 .. _deprecated-features-4.0:
 

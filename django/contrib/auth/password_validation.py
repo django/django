@@ -34,7 +34,7 @@ def get_password_validators(validator_config):
 
 def validate_password(password, user=None, password_validators=None):
     """
-    Validate whether the password meets all validator requirements.
+    Validate that the password meets all validator requirements.
 
     If the password is valid, return ``None``.
     If the password is invalid, raise ValidationError with all error messages.
@@ -90,7 +90,7 @@ password_validators_help_text_html = lazy(_password_validators_help_text_html, s
 
 class MinimumLengthValidator:
     """
-    Validate whether the password is of a minimum length.
+    Validate that the password is of a minimum length.
     """
     def __init__(self, min_length=8):
         self.min_length = min_length
@@ -117,7 +117,7 @@ class MinimumLengthValidator:
 
 class UserAttributeSimilarityValidator:
     """
-    Validate whether the password is sufficiently different from the user's
+    Validate that the password is sufficiently different from the user's
     attributes.
 
     If no specific attributes are provided, look at a sensible list of
@@ -159,7 +159,7 @@ class UserAttributeSimilarityValidator:
 
 class CommonPasswordValidator:
     """
-    Validate whether the password is a common password.
+    Validate that the password is not a common password.
 
     The password is rejected if it occurs in a provided list of passwords,
     which may be gzipped. The list Django ships with contains 20000 common
@@ -195,7 +195,7 @@ class CommonPasswordValidator:
 
 class NumericPasswordValidator:
     """
-    Validate whether the password is alphanumeric.
+    Validate that the password is not entirely numeric.
     """
     def validate(self, password, user=None):
         if password.isdigit():

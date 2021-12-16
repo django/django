@@ -572,6 +572,16 @@ class Model(metaclass=ModelBase):
         """Hook to allow choosing the attributes to pickle."""
         state = self.__dict__.copy()
         state['_state'] = copy.copy(state['_state'])
+        # memoryview cannot be pickled, so cast it to bytes and store
+        # separately.
+        _memoryview_attrs = []
+        for attr, value in state.items():
+            if isinstance(value, memoryview):
+                _memoryview_attrs.append((attr, bytes(value)))
+        if _memoryview_attrs:
+            state['_memoryview_attrs'] = _memoryview_attrs
+            for attr, value in _memoryview_attrs:
+                state.pop(attr)
         return state
 
     def __setstate__(self, state):
@@ -591,6 +601,9 @@ class Model(metaclass=ModelBase):
                 RuntimeWarning,
                 stacklevel=2,
             )
+        if '_memoryview_attrs' in state:
+            for attr, value in state.pop('_memoryview_attrs'):
+                state[attr] = memoryview(value)
         self.__dict__.update(state)
 
     def _get_pk_val(self, meta=None):
@@ -931,11 +944,13 @@ class Model(metaclass=ModelBase):
             using=using, raw=raw,
         )
 
-    def _prepare_related_fields_for_save(self, operation_name):
+    def _prepare_related_fields_for_save(self, operation_name, fields=None):
         # Ensure that a model instance without a PK hasn't been assigned to
         # a ForeignKey or OneToOneField on this model. If the field is
         # nullable, allowing the save would result in silent data loss.
         for field in self._meta.concrete_fields:
+            if fields and field not in fields:
+                continue
             # If the related field isn't cached, then an instance hasn't been
             # assigned and there's no need to worry about this check.
             if field.is_relation and field.is_cached(self):

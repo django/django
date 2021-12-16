@@ -35,10 +35,12 @@ option.
     not raise ``ValidationError``\s. Rather you'll get a database integrity
     error on ``save()``. ``UniqueConstraint``\s without a
     :attr:`~UniqueConstraint.condition` (i.e. non-partial unique constraints)
-    are different in this regard, in that they leverage the existing
-    ``validate_unique()`` logic, and thus enable two-stage validation. In
-    addition to ``IntegrityError`` on ``save()``, ``ValidationError`` is also
-    raised during model validation when the ``UniqueConstraint`` is violated.
+    and :attr:`~UniqueConstraint.expressions` (i.e. non-functional unique
+    constraints) are different in this regard, in that they leverage the
+    existing ``validate_unique()`` logic, and thus enable two-stage validation.
+    In addition to ``IntegrityError`` on ``save()``, ``ValidationError`` is
+    also raised during model validation when the ``UniqueConstraint`` is
+    violated.
 
 ``CheckConstraint``
 ===================

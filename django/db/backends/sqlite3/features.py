@@ -1,5 +1,4 @@
 import operator
-import platform
 
 from django.db import transaction
 from django.db.backends.base.features import BaseDatabaseFeatures
@@ -10,10 +9,6 @@ from .base import Database
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    # SQLite can read from a cursor since SQLite 3.6.5, subject to the caveat
-    # that statements within a connection aren't isolated from each other. See
-    # https://sqlite.org/isolation.html.
-    can_use_chunked_reads = True
     test_db_allows_multiple_connections = False
     supports_unspecified_pk = True
     supports_timezones = False
@@ -23,6 +18,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_rollback_ddl = True
     can_create_inline_fk = False
     supports_paramstyle_pyformat = False
+    requires_literal_defaults = True
     can_clone_databases = True
     supports_temporal_subtraction = True
     ignores_table_name_case = True
@@ -95,10 +91,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def supports_atomic_references_rename(self):
-        # SQLite 3.28.0 bundled with MacOS 10.15 does not support renaming
-        # references atomically.
-        if platform.mac_ver()[0].startswith('10.15.') and Database.sqlite_version_info == (3, 28, 0):
-            return False
         return Database.sqlite_version_info >= (3, 26, 0)
 
     @cached_property

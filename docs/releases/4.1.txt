@@ -26,6 +26,25 @@ officially support the latest release of each series.
 What's new in Django 4.1
 ========================
 
+.. _csrf-cookie-masked-usage:
+
+``CSRF_COOKIE_MASKED`` setting
+------------------------------
+
+The new :setting:`CSRF_COOKIE_MASKED` transitional setting allows specifying
+whether to mask the CSRF cookie.
+
+:class:`~django.middleware.csrf.CsrfViewMiddleware` no longer masks the CSRF
+cookie like it does the CSRF token in the DOM. If you are upgrading multiple
+instances of the same project to Django 4.1, you should set
+:setting:`CSRF_COOKIE_MASKED` to ``True`` during the transition, in
+order to allow compatibility with the older versions of Django. Once the
+transition to 4.1 is complete you can stop overriding
+:setting:`CSRF_COOKIE_MASKED`.
+
+This setting is deprecated as of this release and will be removed in Django
+5.0.
+
 Minor features
 --------------
 
@@ -34,6 +53,13 @@ Minor features
 
 * The admin :ref:`dark mode CSS variables <admin-theming>` are now applied in a
   separate stylesheet and template block.
+
+* :ref:`modeladmin-list-filters` providing custom ``FieldListFilter``
+  subclasses can now control the query string value separator when filtering
+  for multiple values using the ``__in`` lookup.
+
+* The admin :meth:`history view <django.contrib.admin.ModelAdmin.history_view>`
+  is now paginated.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -154,7 +180,9 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* The new :meth:`~django.forms.BoundField.legend_tag` allows rendering field
+  labels in ``<legend>`` tags via the new ``tag`` argument of
+  :meth:`~django.forms.BoundField.label_tag`.
 
 Generic Views
 ~~~~~~~~~~~~~
@@ -164,7 +192,8 @@ Generic Views
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :func:`~django.conf.urls.i18n.i18n_patterns` function now supports
+  languages with both scripts and regions.
 
 Logging
 ~~~~~~~
@@ -185,7 +214,14 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* The ``order_by`` argument of the
+  :class:`~django.db.models.expressions.Window` expression now accepts string
+  references to fields and transforms.
+
+* The new :setting:`CONN_HEALTH_CHECKS` setting allows enabling health checks
+  for :ref:`persistent database connections <persistent-database-connections>`
+  in order to reduce the number of failed requests, e.g. after database server
+  restart.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -210,7 +246,8 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* :tfilter:`json_script` template filter now allows wrapping in a ``<script>``
+  tag without the HTML ``id`` attribute.
 
 Tests
 ~~~~~
@@ -256,6 +293,26 @@ Dropped support for MariaDB 10.2
 Upstream support for MariaDB 10.2 ends in May 2022. Django 4.1 supports MariaDB
 10.3 and higher.
 
+Admin changelist searches spanning multi-valued relationships changes
+---------------------------------------------------------------------
+
+Admin changelist searches using multiple search terms are now applied in a
+single call to ``filter()``, rather than in sequential ``filter()`` calls.
+
+For multi-valued relationships, this means that rows from the related model
+must match all terms rather than any term. For example, if ``search_fields``
+is set to ``['child__name', 'child__age']``, and a user searches for
+``'Jamal 17'``, parent rows will be returned only if there is a relationship to
+some 17-year-old child named Jamal, rather than also returning parents who
+merely have a younger or older child named Jamal in addition to some other
+17-year-old.
+
+See the :ref:`spanning-multi-valued-relationships` topic for more discussion of
+this difference. In Django 4.0 and earlier,
+:meth:`~django.contrib.admin.ModelAdmin.get_search_results` followed the
+second example query, but this undocumented behavior led to queries with
+excessive joins.
+
 Miscellaneous
 -------------
 
@@ -266,6 +323,13 @@ Miscellaneous
 
 * The Django test runner now returns a non-zero error code for unexpected
   successes from tests marked with :py:func:`unittest.expectedFailure`.
+
+* :class:`~django.middleware.csrf.CsrfViewMiddleware` no longer masks the CSRF
+  cookie like it does the CSRF token in the DOM.
+
+* :class:`~django.middleware.csrf.CsrfViewMiddleware` now uses
+  ``request.META['CSRF_COOKIE']`` for storing the unmasked CSRF secret rather
+  than a masked version. This is an undocumented, private API.
 
 .. _deprecated-features-4.1:
 
@@ -279,6 +343,8 @@ Miscellaneous
   Custom sitemap index templates should be updated for the adjusted
   :ref:`context variables <sitemap-index-context-variables>`, expecting a list
   of objects with ``location`` and optional ``lastmod`` attributes.
+
+* ``CSRF_COOKIE_MASKED`` transitional setting is deprecated.
 
 Features removed in 4.1
 =======================
