@@ -15,6 +15,7 @@ from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 
 
+@deconstructible(path='django.db.models.SQLiteNumericMixin')
 class SQLiteNumericMixin:
     """
     Some expressions with output_field=DecimalField() must be cast to
@@ -442,6 +443,7 @@ def _resolve_combined_type(connector, lhs_type, rhs_type):
             return combined_type
 
 
+@deconstructible(path='django.db.models.CombinedExpression')
 class CombinedExpression(SQLiteNumericMixin, Expression):
 
     def __init__(self, lhs, connector, rhs, output_field=None):
@@ -517,6 +519,7 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         return c
 
 
+@deconstructible(path='django.db.models.DurationExpression')
 class DurationExpression(CombinedExpression):
     def compile(self, side, compiler, connection):
         try:
@@ -565,6 +568,7 @@ class DurationExpression(CombinedExpression):
         return sql, params
 
 
+@deconstructible(path='django.db.models.TemporalSubtraction')
 class TemporalSubtraction(CombinedExpression):
     output_field = fields.DurationField()
 
@@ -609,6 +613,7 @@ class F(Combinable):
         return hash(self.name)
 
 
+@deconstructible(path='django.db.models.ResolvedOuterRef')
 class ResolvedOuterRef(F):
     """
     An object that contains a reference to an outer query.
@@ -639,6 +644,7 @@ class ResolvedOuterRef(F):
         return []
 
 
+@deconstructible(path='django.db.models.OuterRef')
 class OuterRef(F):
     contains_aggregate = False
 
@@ -651,6 +657,7 @@ class OuterRef(F):
         return self
 
 
+@deconstructible(path='django.db.models.Func')
 class Func(SQLiteNumericMixin, Expression):
     """An SQL function call."""
     function = None
@@ -808,6 +815,7 @@ class Value(SQLiteNumericMixin, Expression):
         return self.value
 
 
+@deconstructible(path='django.db.models.RawSQL')
 class RawSQL(Expression):
     def __init__(self, sql, params, output_field=None):
         if output_field is None:
@@ -835,6 +843,7 @@ class RawSQL(Expression):
         return super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
 
 
+@deconstructible(path='django.db.models.Star')
 class Star(Expression):
     def __repr__(self):
         return "'*'"
@@ -843,6 +852,7 @@ class Star(Expression):
         return '*', []
 
 
+@deconstructible(path='django.db.models.Col')
 class Col(Expression):
 
     contains_column_references = True
@@ -880,6 +890,7 @@ class Col(Expression):
                 self.target.get_db_converters(connection))
 
 
+@deconstructible(path='django.db.models.F')
 class Ref(Expression):
     """
     Reference to column alias of the query. For example, Ref('sum_cost') in
@@ -913,6 +924,7 @@ class Ref(Expression):
         return [self]
 
 
+@deconstructible(path='django.db.models.ExpressionList')
 class ExpressionList(Func):
     """
     An expression containing multiple expressions. Can be used to provide a
@@ -934,6 +946,7 @@ class ExpressionList(Func):
         return self.as_sql(compiler, connection, **extra_context)
 
 
+@deconstructible(path='django.db.models.ExpressionWrapper')
 class ExpressionWrapper(SQLiteNumericMixin, Expression):
     """
     An expression that can wrap another expression so that it can provide
@@ -966,6 +979,7 @@ class ExpressionWrapper(SQLiteNumericMixin, Expression):
         return "{}({})".format(self.__class__.__name__, self.expression)
 
 
+@deconstructible(path='django.db.models.When')
 class When(Expression):
     template = 'WHEN %(condition)s THEN %(result)s'
     # This isn't a complete conditional expression, must be used in Case().
@@ -1033,6 +1047,7 @@ class When(Expression):
         return cols
 
 
+@deconstructible(path='django.db.models.Case')
 class Case(SQLiteNumericMixin, Expression):
     """
     An SQL searched CASE expression:
@@ -1205,6 +1220,7 @@ class Exists(Subquery):
         return sql, params
 
 
+@deconstructible(path='django.db.models.OrderBy')
 class OrderBy(Expression):
     template = '%(expression)s %(ordering)s'
     conditional = False
@@ -1287,6 +1303,7 @@ class OrderBy(Expression):
         self.descending = True
 
 
+@deconstructible(path='django.db.models.Window')
 class Window(SQLiteNumericMixin, Expression):
     template = '%(expression)s OVER (%(window)s)'
     # Although the main expression may either be an aggregate or an
@@ -1391,6 +1408,7 @@ class Window(SQLiteNumericMixin, Expression):
         return []
 
 
+@deconstructible(path='django.db.models.WindowFrame')
 class WindowFrame(Expression):
     """
     Model the frame clause in window expressions. There are two types of frame
@@ -1450,6 +1468,7 @@ class WindowFrame(Expression):
         raise NotImplementedError('Subclasses must implement window_frame_start_end().')
 
 
+@deconstructible(path='django.db.models.RowRange')
 class RowRange(WindowFrame):
     frame_type = 'ROWS'
 
@@ -1457,6 +1476,7 @@ class RowRange(WindowFrame):
         return connection.ops.window_frame_rows_start_end(start, end)
 
 
+@deconstructible(path='django.db.models.ValueRange')
 class ValueRange(WindowFrame):
     frame_type = 'RANGE'
 
