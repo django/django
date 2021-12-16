@@ -211,6 +211,13 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"to": "auth.user", "on_delete": models.CASCADE})
         self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
+        # Swap detection for lowercase swappable model.
+        field = models.ForeignKey('auth.user', models.CASCADE)
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, 'django.db.models.ForeignKey')
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {'to': 'auth.user', 'on_delete': models.CASCADE})
+        self.assertEqual(kwargs['to'].setting_name, 'AUTH_USER_MODEL')
         # Test nonexistent (for now) model
         field = models.ForeignKey("something.Else", models.CASCADE)
         name, path, args, kwargs = field.deconstruct()
@@ -272,6 +279,19 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"to": "auth.permission", "on_delete": models.CASCADE})
         self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
+
+        # Model names are case-insensitive.
+        with isolate_lru_cache(apps.get_swappable_settings_name):
+            # It doesn't matter that we swapped out user for permission;
+            # there's no validation. We just want to check the setting stuff
+            # works.
+            field = models.ForeignKey('auth.permission', models.CASCADE)
+            name, path, args, kwargs = field.deconstruct()
+
+        self.assertEqual(path, 'django.db.models.ForeignKey')
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {'to': 'auth.permission', 'on_delete': models.CASCADE})
+        self.assertEqual(kwargs['to'].setting_name, 'AUTH_USER_MODEL')
 
     def test_one_to_one(self):
         # Test basic pointing
