@@ -19,3 +19,7 @@ Bugfixes
 * Relaxed the check added in Django 4.0 to reallow use of a duck-typed
   ``HttpRequest`` in ``django.views.decorators.cache.cache_control()`` and
   ``never_cache()`` decorators (:ticket:`33350`).
+
+* Fixed a regression in Django 4.0 that caused creating bogus migrations for
+  models that reference swappable models such as ``auth.User``
+  (:ticket:`33366`).
