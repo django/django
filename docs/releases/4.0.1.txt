@@ -15,3 +15,7 @@ Bugfixes
 
 * Fixed a bug in Django 4.0 that caused a crash on booleans with the
   ``RedisCache`` backend (:ticket:`33361`).
+
+* Relaxed the check added in Django 4.0 to reallow use of a duck-typed
+  ``HttpRequest`` in ``django.views.decorators.cache.cache_control()`` and
+  ``never_cache()`` decorators (:ticket:`33350`).
