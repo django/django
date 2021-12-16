@@ -110,9 +110,9 @@ class OSMWidget(OpenLayersWidget):
     default_lat = 47
     default_zoom = 12
 
-    def __init__(self, attrs=None):
+        def __init__(self, **kwargs):
         super().__init__()
         for key in ('default_lon', 'default_lat', 'default_zoom'):
             self.attrs[key] = getattr(self, key)
-        if attrs:
-            self.attrs.update(attrs)
+        if kwargs:
+            self.attrs.update(kwargs)
