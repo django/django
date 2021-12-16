@@ -493,6 +493,15 @@ class XFrameOptionsDecoratorsTests(TestCase):
         self.assertIsNone(r.get('X-Frame-Options', None))
 
 
+class HttpRequestProxy:
+    def __init__(self, request):
+        self._request = request
+
+    def __getattr__(self, attr):
+        """Proxy to the underlying HttpRequest object."""
+        return getattr(self._request, attr)
+
+
 class NeverCacheDecoratorTest(SimpleTestCase):
 
     @mock.patch('time.time')
@@ -525,12 +534,27 @@ class NeverCacheDecoratorTest(SimpleTestCase):
             @never_cache
             def a_view(self, request):
                 return HttpResponse()
+
+        request = HttpRequest()
         msg = (
             "never_cache didn't receive an HttpRequest. If you are decorating "
             "a classmethod, be sure to use @method_decorator."
         )
         with self.assertRaisesMessage(TypeError, msg):
-            MyClass().a_view(HttpRequest())
+            MyClass().a_view(request)
+        with self.assertRaisesMessage(TypeError, msg):
+            MyClass().a_view(HttpRequestProxy(request))
+
+    def test_never_cache_decorator_http_request_proxy(self):
+        class MyClass:
+            @method_decorator(never_cache)
+            def a_view(self, request):
+                return HttpResponse()
+
+        request = HttpRequest()
+        response = MyClass().a_view(HttpRequestProxy(request))
+        self.assertIn('Cache-Control', response.headers)
+        self.assertIn('Expires', response.headers)
 
 
 class CacheControlDecoratorTest(SimpleTestCase):
@@ -544,5 +568,18 @@ class CacheControlDecoratorTest(SimpleTestCase):
             "cache_control didn't receive an HttpRequest. If you are "
             "decorating a classmethod, be sure to use @method_decorator."
         )
+        request = HttpRequest()
         with self.assertRaisesMessage(TypeError, msg):
-            MyClass().a_view(HttpRequest())
+            MyClass().a_view(request)
+        with self.assertRaisesMessage(TypeError, msg):
+            MyClass().a_view(HttpRequestProxy(request))
+
+    def test_cache_control_decorator_http_request_proxy(self):
+        class MyClass:
+            @method_decorator(cache_control(a='b'))
+            def a_view(self, request):
+                return HttpResponse()
+
+        request = HttpRequest()
+        response = MyClass().a_view(HttpRequestProxy(request))
+        self.assertEqual(response.headers['Cache-Control'], 'a=b')
