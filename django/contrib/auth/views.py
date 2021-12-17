@@ -43,7 +43,6 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
     """
     form_class = AuthenticationForm
     authentication_form = None
-    next_page = None
     redirect_field_name = REDIRECT_FIELD_NAME
     template_name = 'registration/login.html'
     redirect_authenticated_user = False
@@ -64,7 +63,10 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return self.get_redirect_url() or self.get_default_redirect_url()
+        url = self.get_redirect_url()
+        return url or resolve_url(
+            f'{settings.AUTH_APPLICATION_NAMESPACE}:{settings.LOGIN_REDIRECT_URL}') or resolve_url(
+            settings.LOGIN_REDIRECT_URL)
 
     def get_redirect_url(self):
         """Return the user-originating redirect URL if it's safe."""
@@ -134,12 +136,15 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
         if self.next_page is not None:
             next_page = resolve_url(self.next_page)
         elif settings.LOGOUT_REDIRECT_URL:
-            next_page = resolve_url(settings.LOGOUT_REDIRECT_URL)
+            if settings.AUTH_APPLICATION_NAMESPACE:
+                next_page = resolve_url(f'{settings.AUTH_APPLICATION_NAMESPACE}:{settings.LOGOUT_REDIRECT_URL}')
+            else:
+                next_page = resolve_url(settings.LOGOUT_REDIRECT_URL)
         else:
             next_page = self.next_page
 
         if (self.redirect_field_name in self.request.POST or
-                self.redirect_field_name in self.request.GET):
+            self.redirect_field_name in self.request.GET):
             next_page = self.request.POST.get(
                 self.redirect_field_name,
                 self.request.GET.get(self.redirect_field_name)
@@ -171,7 +176,8 @@ def logout_then_login(request, login_url=None):
     """
     Log out the user if they are logged in. Then redirect to the login page.
     """
-    login_url = resolve_url(login_url or settings.LOGIN_URL)
+    login_url = resolve_url(
+        login_url or f'{settings.AUTH_APPLICATION_NAMESPACE}:{settings.LOGIN_URL}' or settings.LOGIN_URL)
     return LogoutView.as_view(next_page=login_url)(request)
 
 
@@ -179,7 +185,8 @@ def redirect_to_login(next, login_url=None, redirect_field_name=REDIRECT_FIELD_N
     """
     Redirect the user to the login page, passing the given 'next' page.
     """
-    resolved_url = resolve_url(login_url or settings.LOGIN_URL)
+    resolved_url = resolve_url(
+        login_url or f'{settings.AUTH_APPLICATION_NAMESPACE}:{settings.LOGIN_URL}' or settings.LOGIN_URL)
 
     login_url_parts = list(urlparse(resolved_url))
     if redirect_field_name:
@@ -210,13 +217,19 @@ class PasswordContextMixin:
 
 
 class PasswordResetView(PasswordContextMixin, FormView):
+    def get_success_url(self):
+        if settings.AUTH_APPLICATION_NAMESPACE:
+            return reverse_lazy(f'{settings.AUTH_APPLICATION_NAMESPACE}:password_reset_done')
+        else:
+            return reverse_lazy('password_reset_done')
+
     email_template_name = 'registration/password_reset_email.html'
     extra_email_context = None
     form_class = PasswordResetForm
     from_email = None
     html_email_template_name = None
     subject_template_name = 'registration/password_reset_subject.txt'
-    success_url = reverse_lazy('password_reset_done')
+    success_url = get_success_url
     template_name = 'registration/password_reset_form.html'
     title = _('Password reset')
     token_generator = default_token_generator
@@ -249,11 +262,17 @@ class PasswordResetDoneView(PasswordContextMixin, TemplateView):
 
 
 class PasswordResetConfirmView(PasswordContextMixin, FormView):
+    def get_success_url(self):
+        if settings.AUTH_APPLICATION_NAMESPACE:
+            return reverse_lazy(f'{settings.AUTH_APPLICATION_NAMESPACE}:password_reset_complete')
+        else:
+            return reverse_lazy('password_reset_complete')
+
     form_class = SetPasswordForm
     post_reset_login = False
     post_reset_login_backend = None
     reset_url_token = 'set-password'
-    success_url = reverse_lazy('password_reset_complete')
+    success_url = get_success_url
     template_name = 'registration/password_reset_confirm.html'
     title = _('Enter new password')
     token_generator = default_token_generator
@@ -335,8 +354,15 @@ class PasswordResetCompleteView(PasswordContextMixin, TemplateView):
 
 
 class PasswordChangeView(PasswordContextMixin, FormView):
+
+    def get_success_url(self):
+        if settings.AUTH_APPLICATION_NAMESPACE:
+            return reverse_lazy(f'{settings.AUTH_APPLICATION_NAMESPACE}:password_change_done')
+        else:
+            return reverse_lazy('password_change_done')
+
     form_class = PasswordChangeForm
-    success_url = reverse_lazy('password_change_done')
+    success_url = get_success_url
     template_name = 'registration/password_change_form.html'
     title = _('Password change')
 
