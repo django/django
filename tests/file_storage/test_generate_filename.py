@@ -53,13 +53,20 @@ class GenerateFilenameStorageTests(SimpleTestCase):
                     s.generate_filename(file_name)
 
     def test_storage_dangerous_paths_dir_name(self):
-        file_name = '/tmp/../path'
+        candidates = [
+            ('tmp/../path', 'tmp/..'),
+            ('tmp\\..\\path', 'tmp/..'),
+            ('/tmp/../path', '/tmp/..'),
+            ('\\tmp\\..\\path', '/tmp/..'),
+        ]
         s = FileSystemStorage()
-        msg = "Detected path traversal attempt in '/tmp/..'"
-        with self.assertRaisesMessage(SuspiciousFileOperation, msg):
-            s.get_available_name(file_name)
-        with self.assertRaisesMessage(SuspiciousFileOperation, msg):
-            s.generate_filename(file_name)
+        for file_name, path in candidates:
+            msg = "Detected path traversal attempt in '%s'" % path
+            with self.subTest(file_name=file_name):
+                with self.assertRaisesMessage(SuspiciousFileOperation, msg):
+                    s.get_available_name(file_name)
+                with self.assertRaisesMessage(SuspiciousFileOperation, msg):
+                    s.generate_filename(file_name)
 
     def test_filefield_dangerous_filename(self):
         candidates = [
