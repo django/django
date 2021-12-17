@@ -15,7 +15,6 @@ from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 
 
-@deconstructible(path='django.db.models.SQLiteNumericMixin')
 class SQLiteNumericMixin:
     """
     Some expressions with output_field=DecimalField() must be cast to
@@ -391,7 +390,6 @@ class BaseExpression:
         return sql, params
 
 
-@deconstructible(path='django.db.models.Expression')
 class Expression(BaseExpression, Combinable):
     """An expression that can be combined with other expressions."""
 
@@ -443,7 +441,6 @@ def _resolve_combined_type(connector, lhs_type, rhs_type):
             return combined_type
 
 
-@deconstructible(path='django.db.models.CombinedExpression')
 class CombinedExpression(SQLiteNumericMixin, Expression):
 
     def __init__(self, lhs, connector, rhs, output_field=None):
@@ -519,7 +516,6 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         return c
 
 
-@deconstructible(path='django.db.models.DurationExpression')
 class DurationExpression(CombinedExpression):
     def compile(self, side, compiler, connection):
         try:
@@ -568,7 +564,6 @@ class DurationExpression(CombinedExpression):
         return sql, params
 
 
-@deconstructible(path='django.db.models.TemporalSubtraction')
 class TemporalSubtraction(CombinedExpression):
     output_field = fields.DurationField()
 
@@ -613,7 +608,6 @@ class F(Combinable):
         return hash(self.name)
 
 
-@deconstructible(path='django.db.models.ResolvedOuterRef')
 class ResolvedOuterRef(F):
     """
     An object that contains a reference to an outer query.
@@ -815,7 +809,6 @@ class Value(SQLiteNumericMixin, Expression):
         return self.value
 
 
-@deconstructible(path='django.db.models.RawSQL')
 class RawSQL(Expression):
     def __init__(self, sql, params, output_field=None):
         if output_field is None:
@@ -843,7 +836,6 @@ class RawSQL(Expression):
         return super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
 
 
-@deconstructible(path='django.db.models.Star')
 class Star(Expression):
     def __repr__(self):
         return "'*'"
@@ -852,7 +844,6 @@ class Star(Expression):
         return '*', []
 
 
-@deconstructible(path='django.db.models.Col')
 class Col(Expression):
 
     contains_column_references = True
@@ -890,7 +881,6 @@ class Col(Expression):
                 self.target.get_db_converters(connection))
 
 
-@deconstructible(path='django.db.models.F')
 class Ref(Expression):
     """
     Reference to column alias of the query. For example, Ref('sum_cost') in
@@ -924,7 +914,6 @@ class Ref(Expression):
         return [self]
 
 
-@deconstructible(path='django.db.models.ExpressionList')
 class ExpressionList(Func):
     """
     An expression containing multiple expressions. Can be used to provide a
@@ -945,7 +934,7 @@ class ExpressionList(Func):
         # Casting to numeric is unnecessary.
         return self.as_sql(compiler, connection, **extra_context)
 
-      
+
 class OrderByList(Func):
     template = 'ORDER BY %(expressions)s'
 
@@ -964,8 +953,8 @@ class OrderByList(Func):
         if not self.source_expressions:
             return '', ()
         return super().as_sql(*args, **kwargs)
-      
-      
+
+
 @deconstructible(path='django.db.models.ExpressionWrapper')
 class ExpressionWrapper(SQLiteNumericMixin, Expression):
     """
