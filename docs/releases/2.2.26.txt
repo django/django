@@ -33,6 +33,11 @@ resolution logic, that will not call methods, nor allow indexing on
 dictionaries.
 
 As a reminder, all untrusted user input should be validated before use.
+CVE-2021-45452: Potential directory-traversal via ``Storage.save()``
+====================================================================
+
+``Storage.save()`` allowed directory-traversal if directly passed suitably
+crafted file names.
 
 This issue has severity "low" according to the :ref:`Django security policy
 <security-disclosure>`.
