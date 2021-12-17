@@ -21,9 +21,15 @@ class CityAdmin(admin.GISModelAdmin):
         'default_zoom': 12
     }
 
+class CityDefaultAdmin(admin.GISModelAdmin):
+    pass
+
 
 site = admin.AdminSite(name='gis_admin_modeladmin')
 site.register(City, admin.ModelAdmin)
 
 site_gis = admin.AdminSite(name='gis_admin_gismodeladmin')
 site_gis.register(City, CityAdmin)
+
+site_gis_default = admin.AdminSite(name='gis_admin_gismodeladmin')
+site_gis_default.register(City, CityDefaultAdmin)
