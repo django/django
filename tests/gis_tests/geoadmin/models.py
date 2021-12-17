@@ -14,8 +14,16 @@ class City(models.Model):
         return self.name
 
 
+class CityAdmin(admin.GISModelAdmin):
+    gis_widget_kwargs = {
+        'default_lat': 55,
+        'default_lon': 37,
+        'default_zoom': 12
+    }
+
+
 site = admin.AdminSite(name='gis_admin_modeladmin')
 site.register(City, admin.ModelAdmin)
 
 site_gis = admin.AdminSite(name='gis_admin_gismodeladmin')
-site_gis.register(City, admin.GISModelAdmin)
+site_gis.register(City, CityAdmin)

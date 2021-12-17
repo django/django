@@ -1,7 +1,7 @@
 from django.contrib.gis.geos import Point
 from django.test import SimpleTestCase, override_settings
 
-from .models import City, site, site_gis
+from .models import City, CityAdmin, site, site_gis
 
 
 @override_settings(ROOT_URLCONF='django.contrib.gis.tests.geoadmin.urls')
@@ -57,3 +57,11 @@ class GeoAdminTest(SimpleTestCase):
 
 class GISAdminTests(GeoAdminTest):
     admin_site = site_gis  # GISModelAdmin
+
+    def test_widget_initializes_with_attrs(self):
+        geoadmin = self.admin_site._registry[City]
+        form = geoadmin.get_changelist_form(None)()
+        widget = form['point'].field.widget
+        self.assertEqual(widget.attrs['default_lat'], 55)
+        self.assertEqual(widget.attrs['default_lon'], 37)
+        self.assertEqual(widget.attrs['default_zoom'], 12)
