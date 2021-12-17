@@ -291,6 +291,12 @@ class FileStorageTests(SimpleTestCase):
 
         self.storage.delete('path/to/test.file')
 
+    def test_file_save_abs_path(self):
+        test_name = 'path/to/test.file'
+        f = ContentFile('file saved with path')
+        f_name = self.storage.save(os.path.join(self.temp_dir, test_name), f)
+        self.assertEqual(f_name, test_name)
+
     def test_save_doesnt_close(self):
         with TemporaryUploadedFile('test', 'text/plain', 1, 'utf8') as file:
             file.write(b'1')
