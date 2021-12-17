@@ -51,7 +51,10 @@ class Storage:
             content = File(content, name)
 
         name = self.get_available_name(name, max_length=max_length)
-        return self._save(name, content)
+        name = self._save(name, content)
+        # Ensure that the name returned from the storage system is still valid.
+        validate_file_name(name, allow_relative_path=True)
+        return name
 
     # These methods are part of the public API, with default implementations.
 
@@ -75,6 +78,7 @@ class Storage:
         Return a filename that's free on the target storage system and
         available for new content to be written to.
         """
+        name = str(name).replace('\\', '/')
         dir_name, file_name = os.path.split(name)
         if '..' in pathlib.PurePath(dir_name).parts:
             raise SuspiciousFileOperation("Detected path traversal attempt in '%s'" % dir_name)
@@ -108,6 +112,7 @@ class Storage:
         Validate the filename by calling get_valid_name() and return a filename
         to be passed to the save() method.
         """
+        filename = str(filename).replace('\\', '/')
         # `filename` may include a path as returned by FileField.upload_to.
         dirname, filename = os.path.split(filename)
         if '..' in pathlib.PurePath(dirname).parts:
@@ -297,6 +302,8 @@ class FileSystemStorage(Storage):
         if self.file_permissions_mode is not None:
             os.chmod(full_path, self.file_permissions_mode)
 
+        # Ensure the saved path is always relative to the storage root.
+        name = os.path.relpath(full_path, self.location)
         # Store filenames with forward slashes, even on Windows.
         return str(name).replace('\\', '/')
 
