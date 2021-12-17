@@ -335,8 +335,13 @@ class PasswordResetCompleteView(PasswordContextMixin, TemplateView):
 
 
 class PasswordChangeView(PasswordContextMixin, FormView):
+    def get_success_url(self):
+        if settings.AUTH_APPLICATION_NAMESPACE:
+            return reverse_lazy(f'{settings.AUTH_APPLICATION_NAMESPACE}:password_change_done')
+        else:
+            return reverse_lazy('password_change_done')
     form_class = PasswordChangeForm
-    success_url = reverse_lazy('password_change_done')
+    success_url = get_success_url
     template_name = 'registration/password_change_form.html'
     title = _('Password change')
 
