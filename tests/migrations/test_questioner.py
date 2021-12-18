@@ -59,7 +59,7 @@ class QuestionerHelperMethodsTests(SimpleTestCase):
     def test_questioner_no_default_bad_user_entry_code(self, mock_input):
         with captured_stdout() as stdout, self.assertRaises(SystemExit):
             self.questioner._ask_default()
-        self.assertIn('Invalid input: unexpected EOF while parsing', stdout.getvalue())
+        self.assertIn('Invalid input: ', stdout.getvalue())
 
     @mock.patch('builtins.input', side_effect=['', 'n'])
     def test_questioner_no_default_no_user_entry_boolean(self, mock_input):
