@@ -2,8 +2,6 @@
  This module houses the Geometry Collection objects:
  GeometryCollection, MultiPoint, MultiLineString, and MultiPolygon
 """
-from ctypes import byref, c_int, c_uint
-
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.geometry import GEOSGeometry, LinearGeometryMixin
 from django.contrib.gis.geos.libgeos import GEOM_PTR
@@ -53,7 +51,7 @@ class GeometryCollection(GEOSGeometry):
             # allow GEOSGeometry types (python wrappers) or pointer types
             capi.geom_clone(getattr(g, 'ptr', g)) for g in items
         ])
-        return capi.create_collection(c_int(self._typeid), byref(geoms), c_uint(length))
+        return capi.create_collection(self._typeid, geoms, length)
 
     def _get_single_internal(self, index):
         return capi.get_geomn(self.ptr, index)

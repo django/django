@@ -1,4 +1,4 @@
-from ctypes import POINTER, c_char_p, c_int, c_ubyte
+from ctypes import POINTER, c_char_p, c_int, c_ubyte, c_uint
 
 from django.contrib.gis.geos.libgeos import CS_PTR, GEOM_PTR, GEOSFuncFactory
 from django.contrib.gis.geos.prototypes.errcheck import (
@@ -56,11 +56,16 @@ create_point = GeomOutput('GEOSGeom_createPoint', argtypes=[CS_PTR])
 create_linestring = GeomOutput('GEOSGeom_createLineString', argtypes=[CS_PTR])
 create_linearring = GeomOutput('GEOSGeom_createLinearRing', argtypes=[CS_PTR])
 
-# Polygon and collection creation routines are special and will not
-# have their argument types defined.
-create_polygon = GeomOutput('GEOSGeom_createPolygon')
-create_empty_polygon = GeomOutput('GEOSGeom_createEmptyPolygon')
-create_collection = GeomOutput('GEOSGeom_createCollection')
+# Polygon and collection creation routines need argument types defined
+# for compatibility with some platforms, e.g. macOS ARM64. With argtypes
+# defined, arrays are automatically cast and byref() calls are not needed.
+create_polygon = GeomOutput(
+    'GEOSGeom_createPolygon', argtypes=[GEOM_PTR, POINTER(GEOM_PTR), c_uint],
+)
+create_empty_polygon = GeomOutput('GEOSGeom_createEmptyPolygon', argtypes=[])
+create_collection = GeomOutput(
+    'GEOSGeom_createCollection', argtypes=[c_int, POINTER(GEOM_PTR), c_uint],
+)
 
 # Ring routines
 get_extring = GeomOutput('GEOSGetExteriorRing', argtypes=[GEOM_PTR])

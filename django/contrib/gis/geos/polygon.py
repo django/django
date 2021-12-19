@@ -1,5 +1,3 @@
-from ctypes import byref, c_uint
-
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.contrib.gis.geos.libgeos import GEOM_PTR
@@ -85,12 +83,11 @@ class Polygon(GEOSGeometry):
 
         n_holes = length - 1
         if n_holes:
-            holes = (GEOM_PTR * n_holes)(*[self._clone(r) for r in rings])
-            holes_param = byref(holes)
+            holes_param = (GEOM_PTR * n_holes)(*[self._clone(r) for r in rings])
         else:
             holes_param = None
 
-        return capi.create_polygon(shell, holes_param, c_uint(n_holes))
+        return capi.create_polygon(shell, holes_param, n_holes)
 
     def _clone(self, g):
         if isinstance(g, GEOM_PTR):
