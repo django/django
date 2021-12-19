@@ -298,6 +298,14 @@ class Collector(object):
                     query.update_batch([obj.pk for obj in instances],
                                        {field.name: value}, self.using)
 
+            # validate multi db for cascaded models
+            for model, instances in six.iteritems(self.data):
+                if model.objects.db and model.objects.db != self.using:
+                    raise Exception("Cannot delete Cascaded model %s because "
+                        "it has different db(%s) than self.using(%s)." % (
+                        model.__name__, model.objects.db, self.using)
+                    )
+
             # reverse instance collections
             for instances in six.itervalues(self.data):
                 instances.reverse()
