@@ -112,10 +112,12 @@ class MiddlewareMixin:
             # Mark the class as async-capable, but do the actual switch
             # inside __call__ to avoid swapping out dunder methods
             self._is_coroutine = asyncio.coroutines._is_coroutine
+        else:
+            self._is_coroutine = None
 
     def __call__(self, request):
         # Exit out to async mode, if needed
-        if asyncio.iscoroutinefunction(self.get_response):
+        if self._is_coroutine:
             return self.__acall__(request)
         response = None
         if hasattr(self, 'process_request'):
