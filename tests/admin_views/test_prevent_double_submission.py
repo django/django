@@ -27,12 +27,26 @@ class SeleniumTests(AdminSeleniumTestCase):
         input_.send_keys('Bookmark name')
         save_button = self.selenium.find_element(By.CSS_SELECTOR, 'input[name=_save]')
         self.selenium.execute_script("arguments[0].click(); window.stop();", save_button)
-        save_and_add_another = self.selenium.find_element(By.CSS_SELECTOR, 'input[name="_addanother"]')
-        save_and_continue_editing = self.selenium.find_element(By.CSS_SELECTOR, 'input[name="_continue"]')
-        self.assertFalse(save_button.is_enabled())
-        self.assertFalse(save_and_add_another.is_enabled())
-        self.assertFalse(save_and_continue_editing.is_enabled())
+        submit_buttons = self.selenium.find_elements(By.CSS_SELECTOR, 'input[type=submit]')
+        # All submits buttons are DISABLED
+        for button in submit_buttons:
+            self.assertFalse(button.is_enabled())
         self.assertEqual(Bookmark.objects.count(), 0)
+
+    def test_submit_and_go_back(self):
+        from selenium.webdriver.common.by import By
+
+        self.selenium.get(self.live_server_url + reverse('admin:admin_views_bookmark_add'))
+        input_ = self.selenium.find_element(By.ID, 'id_name')
+        input_.send_keys('Bookmark name')
+        save_button = self.selenium.find_element(By.CSS_SELECTOR, 'input[name=_save]')
+        save_button.click()
+        self.selenium.back()
+        submit_buttons = self.selenium.find_elements(By.CSS_SELECTOR, 'input[type=submit]')
+        # All submits buttons are ENABLED
+        for button in submit_buttons:
+            self.assertTrue(button.is_enabled())
+        self.assertEqual(Bookmark.objects.count(), 1)
 
     def test_double_submit_click_wont_create_multiple_objects(self):
         from selenium.webdriver.common.action_chains import ActionChains
@@ -42,23 +56,29 @@ class SeleniumTests(AdminSeleniumTestCase):
         input_ = self.selenium.find_element(By.ID, 'id_name')
         input_.send_keys('Bookmark name')
         save_button = self.selenium.find_element(By.CSS_SELECTOR, 'input[name=_save]')
-        ActionChains(self.selenium).double_click(save_button).perform()
+
+        with self.wait_page_loaded():
+            ActionChains(self.selenium).double_click(save_button).perform()
+
         self.assertEqual(Bookmark.objects.count(), 1)
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
 class SeleniumTestsWithJavascriptDisabled(AdminSeleniumTestCase):
     """
-    Without loading `change_form.js` we don't prevent multiple requests
+    If we don't load javascript, we don't prevent multiple requests
     """
+
     available_apps = ['admin_views'] + AdminSeleniumTestCase.available_apps
 
     @classmethod
     def setUpClass(cls):
         super(SeleniumTestCase, cls).setUpClass()
         options = cls.create_options()
-        if cls.browser == "chrome":
-            options.add_experimental_option("prefs", {'profile.managed_default_content_settings.javascript': 2})
+        if cls.browser == 'chrome':
+            options.add_experimental_option('prefs', {'profile.managed_default_content_settings.javascript': 2})
+        elif cls.browser == 'firefox':
+            options.set_preference('javascript.enabled', False)
         cls.selenium = cls.import_webdriver(cls.browser)(options=options)
         cls.selenium.implicitly_wait(cls.implicit_wait)
 
@@ -71,9 +91,6 @@ class SeleniumTestsWithJavascriptDisabled(AdminSeleniumTestCase):
         )
 
     def test_double_submit_click_will_create_multiple_objects(self):
-        """
-        Objects duplicated caused by faster clicks
-        """
         from selenium.webdriver.common.action_chains import ActionChains
         from selenium.webdriver.common.by import By
 
@@ -81,5 +98,11 @@ class SeleniumTestsWithJavascriptDisabled(AdminSeleniumTestCase):
         input_ = self.selenium.find_element(By.ID, 'id_name')
         input_.send_keys('Bookmark name')
         save_button = self.selenium.find_element(By.CSS_SELECTOR, 'input[name=_save]')
-        ActionChains(self.selenium).double_click(save_button).perform()
-        self.assertEqual(Bookmark.objects.count(), 2)
+
+        with self.wait_page_loaded():
+            ActionChains(self.selenium).double_click(save_button).perform()
+
+        if self.browser == 'chrome':
+            self.assertEqual(Bookmark.objects.count(), 2)
+        elif self.browser == 'firefox':  # no duplicated, it works without js!
+            self.assertEqual(Bookmark.objects.count(), 1)
