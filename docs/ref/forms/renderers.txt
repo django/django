@@ -79,17 +79,17 @@ widgets due to their usage of Django template tags.
 
 .. class:: TemplatesSetting
 
-This renderer gives you complete control of how widget templates are sourced.
-It uses :func:`~django.template.loader.get_template` to find widget
-templates based on what's configured in the :setting:`TEMPLATES` setting.
+This renderer gives you complete control of how form and widget templates are
+sourced. It uses :func:`~django.template.loader.get_template` to find templates
+based on what's configured in the :setting:`TEMPLATES` setting.
 
-Using this renderer along with the built-in widget templates requires either:
+Using this renderer along with the built-in templates requires either:
 
 * ``'django.forms'`` in :setting:`INSTALLED_APPS` and at least one engine
   with :setting:`APP_DIRS=True <TEMPLATES-APP_DIRS>`.
 
-* Adding the built-in widgets templates directory in :setting:`DIRS
-  <TEMPLATES-DIRS>` of one of your template engines. To generate that path::
+* Adding the built-in templates directory in :setting:`DIRS <TEMPLATES-DIRS>`
+  of one of your template engines. To generate that path::
 
     import django
     django.__path__[0] + '/forms/templates'  # or '/forms/jinja2'
