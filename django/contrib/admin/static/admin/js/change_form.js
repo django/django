@@ -2,16 +2,32 @@
 {
     const inputTags = ['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA'];
     const modelName = document.getElementById('django-admin-form-add-constants').dataset.modelName;
-    const submitButtons = document.querySelectorAll('input[type=submit]');
+    const buttons = document.querySelectorAll('input[type=submit]');
+    const disableSubmitButtons = () => {
+        buttons.forEach(button => {
+            button.setAttribute('disabled', true);
+        });
+    };
+    const enableSubmitButtons = () => {
+        buttons.forEach(button => {
+            button.removeAttribute('disabled');
+        });
+    };
+
+    // Enable buttons when browser displays the page
+    // In case the user is navigating forward
+    // and backward through history
+    window.addEventListener('pageshow', () => {
+        enableSubmitButtons();
+    });
 
     if (modelName) {
         const form = document.getElementById(modelName + '_form');
 
-        form.addEventListener('submit', function(event) {
+        // Disable buttons during submit to avoid multiple submissions
+        form.addEventListener('submit', (event) => {
             event.preventDefault();
-            submitButtons.forEach(button => {
-                button.setAttribute('disabled', true);
-            });
+            disableSubmitButtons();
             event.target.submit();
         });
 
