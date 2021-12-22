@@ -419,6 +419,9 @@ Dropped support for PostgreSQL 9.6
 Upstream support for PostgreSQL 9.6 ends in November 2021. Django 4.0 supports
 PostgreSQL 10 and higher.
 
+Also, the minimum supported version of ``psycopg2`` is increased from 2.5.4 to
+2.8.4, as ``psycopg2`` 2.8.4 is the first release to support Python 3.8.
+
 Dropped support for Oracle 12.2 and 18c
 ---------------------------------------
 
