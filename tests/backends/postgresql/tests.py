@@ -207,9 +207,7 @@ class Tests(TestCase):
         The transaction level can be configured with
         DATABASES ['OPTIONS']['isolation_level'].
         """
-        import psycopg2
         from psycopg2.extensions import (
-            ISOLATION_LEVEL_READ_COMMITTED as read_committed,
             ISOLATION_LEVEL_SERIALIZABLE as serializable,
         )
 
@@ -217,8 +215,7 @@ class Tests(TestCase):
         # and the isolation level isn't reported as 0. This test assumes that
         # PostgreSQL is configured with the default isolation level.
         # Check the level on the psycopg2 connection, not the Django wrapper.
-        default_level = read_committed if psycopg2.__version__ < '2.7' else None
-        self.assertEqual(connection.connection.isolation_level, default_level)
+        self.assertIsNone(connection.connection.isolation_level)
 
         new_connection = connection.copy()
         new_connection.settings_dict['OPTIONS']['isolation_level'] = serializable
