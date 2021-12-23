@@ -102,3 +102,77 @@ class SiteActionsTests(SimpleTestCase):
         self.assertEqual(self.site.get_action(action_name), delete_selected)
         self.site.disable_action(action_name)
         self.assertEqual(self.site.get_action(action_name), delete_selected)
+
+
+class ModelAdminTest(SimpleTestCase):
+    class ArticleModelAdmin(admin.ModelAdmin):
+        fields = ['title']
+        ordering = ['title']
+        readonly_fields = ['title']
+        prepopulated_fields = ['title']
+        list_display = ['title']
+        list_display_links = ['title']
+        list_filter = ['title']
+        search_fields = ['title']
+
+    def setUp(self):
+        self.article_model_admin = self.ArticleModelAdmin(
+            Article,
+            site,
+        )
+
+    def test_get_fields_returns_copies_of_its_attributes(self):
+        """ModelAdmin.get_fields() returns copies of its attributes."""
+        fields = self.article_model_admin.fields
+        actual = self.article_model_admin.get_fields(None)
+        self.assertListEqual(actual, fields)
+        self.assertIsNot(actual, fields)
+
+    def test_get_ordering_returns_copies_of_its_attributes(self):
+        """ModelAdmin.get_ordering() returns copies of its attributes."""
+        ordering = self.article_model_admin.ordering
+        actual = self.article_model_admin.get_ordering(None)
+        self.assertListEqual(actual, ordering)
+        self.assertIsNot(actual, ordering)
+
+    def test_get_readonly_fields_returns_copies_of_its_attributes(self):
+        """ModelAdmin.get_readonly_fields() returns copies of its attributes."""
+        readonly_fields = self.article_model_admin.readonly_fields
+        actual = self.article_model_admin.get_readonly_fields(None)
+        self.assertListEqual(actual, readonly_fields)
+        self.assertIsNot(actual, readonly_fields)
+
+    def test_get_prepopulated_fields_returns_copies_of_its_attributes(self):
+        """ModelAdmin.get_prepopulated_fields() returns copies of its attributes."""
+        prepopulated_fields = self.article_model_admin.prepopulated_fields
+        actual = self.article_model_admin.get_prepopulated_fields(None)
+        self.assertListEqual(actual, prepopulated_fields)
+        self.assertIsNot(actual, prepopulated_fields)
+
+    def test_get_list_display_returns_copies_of_its_attributes(self):
+        """ModelAdmin.get_list_display() returns copies of its attributes."""
+        list_display = self.article_model_admin.list_display
+        actual = self.article_model_admin.get_list_display(None)
+        self.assertListEqual(actual, list_display)
+        self.assertIsNot(actual, list_display)
+
+    def test_get_list_display_links_returns_copies_of_its_attributes(self):
+        """ModelAdmin.get_list_display_links() returns copies of its attributes."""
+        list_display_links = self.article_model_admin.list_display_links
+        actual = self.article_model_admin.get_list_display_links(None, [])
+        self.assertListEqual(actual, list_display_links)
+        self.assertIsNot(actual, list_display_links)
+
+    def test_get_list_filter_returns_copies_of_its_attributes(self):
+        """ModelAdmin.get_list_filter() returns copies of its attributes."""
+        list_filter = self.article_model_admin.list_filter
+        actual = self.article_model_admin.get_list_filter(None)
+        self.assertListEqual(actual, list_filter)
+        self.assertIsNot(actual, list_filter)
+
+    def test_get_search_fields_returns_copies_of_its_attributes(self):
+        """ModelAdmin.get_search_fields() returns copies of its attributes."""
+        search_fields = self.article_model_admin.search_fields
+        actual = self.article_model_admin.get_search_fields(None)
+        self.assertListEqual(actual, search_fields)
+        self.assertIsNot(actual, search_fields)

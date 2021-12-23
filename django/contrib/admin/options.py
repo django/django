@@ -322,7 +322,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         Hook for specifying fields.
         """
         if self.fields:
-            return self.fields
+            return copy.deepcopy(self.fields)
         # _get_form_for_get_fields() is implemented in subclasses.
         form = self._get_form_for_get_fields(request, obj)
         return [*form.base_fields, *self.get_readonly_fields(request, obj)]
@@ -343,19 +343,19 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         Hook for specifying field ordering.
         """
-        return self.ordering or ()  # otherwise we might try to *None, which is bad ;)
+        return copy.deepcopy(self.ordering) or ()  # otherwise we might try to *None, which is bad ;)
 
     def get_readonly_fields(self, request, obj=None):
         """
         Hook for specifying custom readonly fields.
         """
-        return self.readonly_fields
+        return copy.deepcopy(self.readonly_fields)
 
     def get_prepopulated_fields(self, request, obj=None):
         """
         Hook for specifying custom prepopulated fields.
         """
-        return self.prepopulated_fields
+        return copy.deepcopy(self.prepopulated_fields)
 
     def get_queryset(self, request):
         """
@@ -956,7 +956,7 @@ class ModelAdmin(BaseModelAdmin):
         Return a sequence containing the fields to be displayed on the
         changelist.
         """
-        return self.list_display
+        return copy.deepcopy(self.list_display)
 
     def get_list_display_links(self, request, list_display):
         """
@@ -965,7 +965,7 @@ class ModelAdmin(BaseModelAdmin):
         returned by get_list_display().
         """
         if self.list_display_links or self.list_display_links is None or not list_display:
-            return self.list_display_links
+            return copy.deepcopy(self.list_display_links)
         else:
             # Use only the first item in list_display as link
             return list(list_display)[:1]
@@ -975,7 +975,7 @@ class ModelAdmin(BaseModelAdmin):
         Return a sequence containing the fields to be displayed as filters in
         the right sidebar of the changelist page.
         """
-        return self.list_filter
+        return copy.deepcopy(self.list_filter)
 
     def get_list_select_related(self, request):
         """
@@ -989,7 +989,7 @@ class ModelAdmin(BaseModelAdmin):
         Return a sequence containing the fields to be searched whenever
         somebody submits a search query.
         """
-        return self.search_fields
+        return copy.deepcopy(self.search_fields)
 
     def get_search_results(self, request, queryset, search_term):
         """
