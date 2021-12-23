@@ -615,9 +615,10 @@ def _sqlite_regexp(re_pattern, re_string):
 
 @none_guard
 def _sqlite_lpad(text, length, fill_text):
-    if len(text) >= length:
+    delta = length - len(text)
+    if delta <= 0:
         return text[:length]
-    return (fill_text * length)[:length - len(text)] + text
+    return (fill_text * length)[:delta] + text
 
 
 @none_guard
