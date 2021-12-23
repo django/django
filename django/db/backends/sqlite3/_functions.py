@@ -2,7 +2,6 @@
 Implementations of SQL functions for SQLite.
 """
 import functools
-import operator
 import random
 import statistics
 from datetime import timedelta
@@ -20,19 +19,6 @@ from django.db.backends.utils import (
 from django.utils import timezone
 from django.utils.crypto import md5
 from django.utils.duration import duration_microseconds
-
-
-def none_guard(func):
-    """
-    Decorator that returns None if any of the arguments to the decorated
-    function are None. Many SQL functions return NULL if any of their arguments
-    are NULL. This decorator simplifies the implementation of this for the
-    custom functions registered below.
-    """
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        return None if None in args else func(*args, **kwargs)
-    return wrapper
 
 
 def list_aggregate(function):
@@ -60,37 +46,37 @@ def register(connection):
     create_deterministic_function('django_timestamp_diff', 2, _sqlite_timestamp_diff)
     create_deterministic_function('django_format_dtdelta', 3, _sqlite_format_dtdelta)
     create_deterministic_function('regexp', 2, _sqlite_regexp)
-    create_deterministic_function('ACOS', 1, none_guard(acos))
-    create_deterministic_function('ASIN', 1, none_guard(asin))
-    create_deterministic_function('ATAN', 1, none_guard(atan))
-    create_deterministic_function('ATAN2', 2, none_guard(atan2))
-    create_deterministic_function('BITXOR', 2, none_guard(operator.xor))
-    create_deterministic_function('CEILING', 1, none_guard(ceil))
-    create_deterministic_function('COS', 1, none_guard(cos))
-    create_deterministic_function('COT', 1, none_guard(lambda x: 1 / tan(x)))
-    create_deterministic_function('DEGREES', 1, none_guard(degrees))
-    create_deterministic_function('EXP', 1, none_guard(exp))
-    create_deterministic_function('FLOOR', 1, none_guard(floor))
-    create_deterministic_function('LN', 1, none_guard(log))
-    create_deterministic_function('LOG', 2, none_guard(lambda x, y: log(y, x)))
+    create_deterministic_function('ACOS', 1, _sqlite_acos)
+    create_deterministic_function('ASIN', 1, _sqlite_asin)
+    create_deterministic_function('ATAN', 1, _sqlite_atan)
+    create_deterministic_function('ATAN2', 2, _sqlite_atan2)
+    create_deterministic_function('BITXOR', 2, _sqlite_bitxor)
+    create_deterministic_function('CEILING', 1, _sqlite_ceiling)
+    create_deterministic_function('COS', 1, _sqlite_cos)
+    create_deterministic_function('COT', 1, _sqlite_cot)
+    create_deterministic_function('DEGREES', 1, _sqlite_degrees)
+    create_deterministic_function('EXP', 1, _sqlite_exp)
+    create_deterministic_function('FLOOR', 1, _sqlite_floor)
+    create_deterministic_function('LN', 1, _sqlite_ln)
+    create_deterministic_function('LOG', 2, _sqlite_log)
     create_deterministic_function('LPAD', 3, _sqlite_lpad)
-    create_deterministic_function('MD5', 1, none_guard(lambda x: md5(x.encode()).hexdigest()))
-    create_deterministic_function('MOD', 2, none_guard(fmod))
-    create_deterministic_function('PI', 0, lambda: pi)
-    create_deterministic_function('POWER', 2, none_guard(operator.pow))
-    create_deterministic_function('RADIANS', 1, none_guard(radians))
-    create_deterministic_function('REPEAT', 2, none_guard(operator.mul))
-    create_deterministic_function('REVERSE', 1, none_guard(lambda x: x[::-1]))
+    create_deterministic_function('MD5', 1, _sqlite_md5)
+    create_deterministic_function('MOD', 2, _sqlite_mod)
+    create_deterministic_function('PI', 0, _sqlite_pi)
+    create_deterministic_function('POWER', 2, _sqlite_power)
+    create_deterministic_function('RADIANS', 1, _sqlite_radians)
+    create_deterministic_function('REPEAT', 2, _sqlite_repeat)
+    create_deterministic_function('REVERSE', 1, _sqlite_reverse)
     create_deterministic_function('RPAD', 3, _sqlite_rpad)
-    create_deterministic_function('SHA1', 1, none_guard(lambda x: sha1(x.encode()).hexdigest()))
-    create_deterministic_function('SHA224', 1, none_guard(lambda x: sha224(x.encode()).hexdigest()))
-    create_deterministic_function('SHA256', 1, none_guard(lambda x: sha256(x.encode()).hexdigest()))
-    create_deterministic_function('SHA384', 1, none_guard(lambda x: sha384(x.encode()).hexdigest()))
-    create_deterministic_function('SHA512', 1, none_guard(lambda x: sha512(x.encode()).hexdigest()))
-    create_deterministic_function('SIGN', 1, none_guard(lambda x: (x > 0) - (x < 0)))
-    create_deterministic_function('SIN', 1, none_guard(sin))
-    create_deterministic_function('SQRT', 1, none_guard(sqrt))
-    create_deterministic_function('TAN', 1, none_guard(tan))
+    create_deterministic_function('SHA1', 1, _sqlite_sha1)
+    create_deterministic_function('SHA224', 1, _sqlite_sha224)
+    create_deterministic_function('SHA256', 1, _sqlite_sha256)
+    create_deterministic_function('SHA384', 1, _sqlite_sha384)
+    create_deterministic_function('SHA512', 1, _sqlite_sha512)
+    create_deterministic_function('SIGN', 1, _sqlite_sign)
+    create_deterministic_function('SIN', 1, _sqlite_sin)
+    create_deterministic_function('SQRT', 1, _sqlite_sqrt)
+    create_deterministic_function('TAN', 1, _sqlite_tan)
     # Don't use the built-in RANDOM() function because it returns a value
     # in the range [-1 * 2^63, 2^63 - 1] instead of [0, 1).
     connection.create_function('RAND', 0, random.random)
@@ -234,7 +220,6 @@ def _sqlite_prepare_dtdelta_param(conn, param):
     return param
 
 
-@none_guard
 def _sqlite_format_dtdelta(connector, lhs, rhs):
     """
     LHS and RHS can be either:
@@ -242,6 +227,8 @@ def _sqlite_format_dtdelta(connector, lhs, rhs):
     - A string representing a datetime
     - A scalar value, e.g. float
     """
+    if connector is None or lhs is None or rhs is None:
+        return None
     connector = connector.strip()
     try:
         real_lhs = _sqlite_prepare_dtdelta_param(connector, lhs)
@@ -261,8 +248,9 @@ def _sqlite_format_dtdelta(connector, lhs, rhs):
     return out
 
 
-@none_guard
 def _sqlite_time_diff(lhs, rhs):
+    if lhs is None or rhs is None:
+        return None
     left = typecast_time(lhs)
     right = typecast_time(rhs)
     return (
@@ -277,30 +265,205 @@ def _sqlite_time_diff(lhs, rhs):
     )
 
 
-@none_guard
 def _sqlite_timestamp_diff(lhs, rhs):
+    if lhs is None or rhs is None:
+        return None
     left = typecast_timestamp(lhs)
     right = typecast_timestamp(rhs)
     return duration_microseconds(left - right)
 
 
-@none_guard
 def _sqlite_regexp(pattern, string):
+    if pattern is None or string is None:
+        return None
     if not isinstance(string, str):
         string = str(string)
     return bool(re_search(pattern, string))
 
 
-@none_guard
+def _sqlite_acos(x):
+    if x is None:
+        return None
+    return acos(x)
+
+
+def _sqlite_asin(x):
+    if x is None:
+        return None
+    return asin(x)
+
+
+def _sqlite_atan(x):
+    if x is None:
+        return None
+    return atan(x)
+
+
+def _sqlite_atan2(y, x):
+    if y is None or x is None:
+        return None
+    return atan2(y, x)
+
+
+def _sqlite_bitxor(x, y):
+    if x is None or y is None:
+        return None
+    return x ^ y
+
+
+def _sqlite_ceiling(x):
+    if x is None:
+        return None
+    return ceil(x)
+
+
+def _sqlite_cos(x):
+    if x is None:
+        return None
+    return cos(x)
+
+
+def _sqlite_cot(x):
+    if x is None:
+        return None
+    return 1 / tan(x)
+
+
+def _sqlite_degrees(x):
+    if x is None:
+        return None
+    return degrees(x)
+
+
+def _sqlite_exp(x):
+    if x is None:
+        return None
+    return exp(x)
+
+
+def _sqlite_floor(x):
+    if x is None:
+        return None
+    return floor(x)
+
+
+def _sqlite_ln(x):
+    if x is None:
+        return None
+    return log(x)
+
+
+def _sqlite_log(base, x):
+    if base is None or x is None:
+        return None
+    # Arguments reversed to match SQL standard.
+    return log(x, base)
+
+
 def _sqlite_lpad(text, length, fill_text):
+    if text is None or length is None or fill_text is None:
+        return None
     delta = length - len(text)
     if delta <= 0:
         return text[:length]
     return (fill_text * length)[:delta] + text
 
 
-@none_guard
+def _sqlite_md5(text):
+    if text is None:
+        return None
+    return md5(text.encode()).hexdigest()
+
+
+def _sqlite_mod(x, y):
+    if x is None or y is None:
+        return None
+    return fmod(x, y)
+
+
+def _sqlite_pi():
+    return pi
+
+
+def _sqlite_power(x, y):
+    if x is None or y is None:
+        return None
+    return x ** y
+
+
+def _sqlite_radians(x):
+    if x is None:
+        return None
+    return radians(x)
+
+
+def _sqlite_repeat(text, count):
+    if text is None or count is None:
+        return None
+    return text * count
+
+
+def _sqlite_reverse(text):
+    if text is None:
+        return None
+    return text[::-1]
+
+
 def _sqlite_rpad(text, length, fill_text):
     if text is None or length is None or fill_text is None:
         return None
     return (text + fill_text * length)[:length]
+
+
+def _sqlite_sha1(text):
+    if text is None:
+        return None
+    return sha1(text.encode()).hexdigest()
+
+
+def _sqlite_sha224(text):
+    if text is None:
+        return None
+    return sha224(text.encode()).hexdigest()
+
+
+def _sqlite_sha256(text):
+    if text is None:
+        return None
+    return sha256(text.encode()).hexdigest()
+
+
+def _sqlite_sha384(text):
+    if text is None:
+        return None
+    return sha384(text.encode()).hexdigest()
+
+
+def _sqlite_sha512(text):
+    if text is None:
+        return None
+    return sha512(text.encode()).hexdigest()
+
+
+def _sqlite_sign(x):
+    if x is None:
+        return None
+    return (x > 0) - (x < 0)
+
+
+def _sqlite_sin(x):
+    if x is None:
+        return None
+    return sin(x)
+
+
+def _sqlite_sqrt(x):
+    if x is None:
+        return None
+    return sqrt(x)
+
+
+def _sqlite_tan(x):
+    if x is None:
+        return None
+    return tan(x)
