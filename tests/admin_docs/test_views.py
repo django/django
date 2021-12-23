@@ -138,6 +138,25 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         self.assertContains(response, 'View documentation')
 
 
+@unittest.skipUnless(utils.docutils_is_available, 'no docutils installed.')
+class AdminDocViewDefaultEngineOnly(TestDataMixin, AdminDocsTestCase):
+
+    def setUp(self):
+        self.client.force_login(self.superuser)
+
+    def test_template_detail_path_traversal_a(self):
+        response = self.client.get(
+            reverse('django-admindocs-templates', args=['/etc/passwd']),
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_template_detail_path_traversal_b(self):
+        response = self.client.get(
+            reverse('django-admindocs-templates', args=['../passwd']),
+        )
+        self.assertEqual(response.status_code, 400)
+
+
 @override_settings(TEMPLATES=[{
     'NAME': 'ONE',
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
