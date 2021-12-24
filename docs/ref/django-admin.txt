@@ -908,6 +908,14 @@ content types.
 Makes ``migrate`` exit with a non-zero status when unapplied migrations are
 detected.
 
+.. django-admin-option:: --prune
+
+.. versionadded:: 4.1
+
+Deletes nonexistent migrations from the ``django_migrations`` table. This is
+useful when migration files replaced by a squashed migration have been removed.
+See :ref:`migration-squashing` for more details.
+
 ``runserver``
 -------------
 

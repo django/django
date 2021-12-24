@@ -1043,6 +1043,92 @@ class MigrateTests(MigrationTestBase):
             call_command('migrate', 'migrated_app', 'zero', verbosity=0)
             call_command('migrate', 'migrated_unapplied_app', 'zero', verbosity=0)
 
+    @override_settings(MIGRATION_MODULES={
+        'migrations': 'migrations.test_migrations_squashed_no_replaces',
+    })
+    def test_migrate_prune(self):
+        """
+        With prune=True, references to migration files deleted from the
+        migrations module (such as after being squashed) are removed from the
+        django_migrations table.
+        """
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied('migrations', '0001_initial')
+        recorder.record_applied('migrations', '0002_second')
+        recorder.record_applied('migrations', '0001_squashed_0002')
+        out = io.StringIO()
+        try:
+            call_command('migrate', 'migrations', prune=True, stdout=out, no_color=True)
+            self.assertEqual(
+                out.getvalue(),
+                'Pruning migrations:\n'
+                '  Pruning migrations.0001_initial OK\n'
+                '  Pruning migrations.0002_second OK\n',
+            )
+            applied_migrations = [
+                migration
+                for migration in recorder.applied_migrations()
+                if migration[0] == 'migrations'
+            ]
+            self.assertEqual(applied_migrations, [('migrations', '0001_squashed_0002')])
+        finally:
+            recorder.record_unapplied('migrations', '0001_initial')
+            recorder.record_unapplied('migrations', '0001_second')
+            recorder.record_unapplied('migrations', '0001_squashed_0002')
+
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_squashed'})
+    def test_prune_deleted_squashed_migrations_in_replaces(self):
+        out = io.StringIO()
+        with self.temporary_migration_module(
+            module='migrations.test_migrations_squashed'
+        ) as migration_dir:
+            try:
+                call_command('migrate', 'migrations', verbosity=0)
+                # Delete the replaced migrations.
+                os.remove(os.path.join(migration_dir, '0001_initial.py'))
+                os.remove(os.path.join(migration_dir, '0002_second.py'))
+                # --prune cannot be used before removing the "replaces"
+                # attribute.
+                call_command(
+                    'migrate', 'migrations', prune=True, stdout=out, no_color=True,
+                )
+                self.assertEqual(
+                    out.getvalue(),
+                    "Pruning migrations:\n"
+                    "  Cannot use --prune because the following squashed "
+                    "migrations have their 'replaces' attributes and may not "
+                    "be recorded as applied:\n"
+                    "    migrations.0001_squashed_0002\n"
+                    "  Re-run 'manage.py migrate' if they are not marked as "
+                    "applied, and remove 'replaces' attributes in their "
+                    "Migration classes.\n"
+                )
+            finally:
+                # Unmigrate everything.
+                call_command('migrate', 'migrations', 'zero', verbosity=0)
+
+    @override_settings(
+        MIGRATION_MODULES={'migrations': 'migrations.test_migrations_squashed'}
+    )
+    def test_prune_no_migrations_to_prune(self):
+        out = io.StringIO()
+        call_command('migrate', 'migrations', prune=True, stdout=out, no_color=True)
+        self.assertEqual(
+            out.getvalue(),
+            'Pruning migrations:\n'
+            '  No migrations to prune.\n',
+        )
+        out = io.StringIO()
+        call_command(
+            'migrate', 'migrations', prune=True, stdout=out, no_color=True, verbosity=0,
+        )
+        self.assertEqual(out.getvalue(), '')
+
+    def test_prune_no_app_label(self):
+        msg = 'Migrations can be pruned only when an app is specified.'
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command('migrate', prune=True)
+
 
 class MakeMigrationsTests(MigrationTestBase):
     """

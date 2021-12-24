@@ -215,6 +215,9 @@ Management Commands
   input prompts to ``stderr``, writing only paths of generated migration files
   to ``stdout``.
 
+* The new :option:`migrate --prune` option allows deleting nonexistent
+  migrations from the ``django_migrations`` table.
+
 Migrations
 ~~~~~~~~~~
 
