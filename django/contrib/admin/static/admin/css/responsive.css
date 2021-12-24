@@ -61,6 +61,12 @@ input[type="submit"], button {
         line-height: 1.4;
     }
 
+    /* Sticky nav */
+
+    #nav-sidebar {
+        height: calc(100vh - 119px);
+    }
+
     /* Dashboard */
 
     .dashboard #content {

@@ -40,6 +40,7 @@
     border-right: 1px solid var(--hairline-color);
     background-color: var(--body-bg);
     overflow: auto;
+    height: calc(100vh - 87px);
 }
 
 [dir="rtl"] #nav-sidebar {
