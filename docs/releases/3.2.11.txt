@@ -1,0 +1,10 @@
+===========================
+Django 3.2.11 release notes
+===========================
+
+*January 4, 2022*
+
+Django 3.2.11 fixes one security issue with severity "medium" and two security
+issues with severity "low" in 3.2.10.
+
+...
