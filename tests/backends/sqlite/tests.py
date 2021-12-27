@@ -4,10 +4,8 @@ import tempfile
 import threading
 import unittest
 from pathlib import Path
-from sqlite3 import dbapi2
 from unittest import mock
 
-from django.core.exceptions import ImproperlyConfigured
 from django.db import NotSupportedError, connection, transaction
 from django.db.models import Aggregate, Avg, CharField, StdDev, Sum, Variance
 from django.db.utils import ConnectionHandler
@@ -21,27 +19,10 @@ from django.test.utils import isolate_apps
 
 from ..models import Author, Item, Object, Square
 
-try:
-    from django.db.backends.sqlite3.base import check_sqlite_version
-except ImproperlyConfigured:
-    # Ignore "SQLite is too old" when running tests on another database.
-    pass
-
 
 @unittest.skipUnless(connection.vendor == "sqlite", "SQLite tests")
 class Tests(TestCase):
     longMessage = True
-
-    def test_check_sqlite_version(self):
-        msg = "SQLite 3.9.0 or later is required (found 3.8.11.1)."
-        with mock.patch.object(
-            dbapi2, "sqlite_version_info", (3, 8, 11, 1)
-        ), mock.patch.object(
-            dbapi2, "sqlite_version", "3.8.11.1"
-        ), self.assertRaisesMessage(
-            ImproperlyConfigured, msg
-        ):
-            check_sqlite_version()
 
     def test_aggregation(self):
         """Raise NotSupportedError when aggregating on date/time fields."""
@@ -124,6 +105,13 @@ class Tests(TestCase):
             connections["default"].ensure_connection()
             connections["default"].close()
             self.assertTrue(os.path.isfile(os.path.join(tmp, "test.db")))
+
+    @mock.patch.object(connection, "get_database_version", return_value=(3, 8))
+    def test_check_database_version_supported(self, mocked_get_database_version):
+        msg = "SQLite 3.9 or later is required (found 3.8)."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            connection.check_database_version_supported()
+        self.assertTrue(mocked_get_database_version.called)
 
 
 @unittest.skipUnless(connection.vendor == "sqlite", "SQLite tests")

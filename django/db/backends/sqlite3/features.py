@@ -9,6 +9,7 @@ from .base import Database
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
+    minimum_database_version = (3, 9)
     test_db_allows_multiple_connections = False
     supports_unspecified_pk = True
     supports_timezones = False

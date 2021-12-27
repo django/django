@@ -239,6 +239,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         )
         self.features.can_return_columns_from_insert = use_returning_into
 
+    def get_database_version(self):
+        return self.oracle_version
+
     def get_connection_params(self):
         conn_params = self.settings_dict["OPTIONS"].copy()
         if "use_returning_into" in conn_params:
@@ -255,6 +258,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         )
 
     def init_connection_state(self):
+        super().init_connection_state()
         cursor = self.create_cursor()
         # Set the territory first. The territory overrides NLS_DATE_FORMAT
         # and NLS_TIMESTAMP_FORMAT to the territory default. When all of

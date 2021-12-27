@@ -4,6 +4,7 @@ from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
+    minimum_database_version = (19,)
     # Oracle crashes with "ORA-00932: inconsistent datatypes: expected - got
     # BLOB" when grouping by LOBs (#24096).
     allows_group_by_lob = False

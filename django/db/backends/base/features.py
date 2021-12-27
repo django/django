@@ -3,6 +3,8 @@ from django.utils.functional import cached_property
 
 
 class BaseDatabaseFeatures:
+    # An optional tuple indicating the minimum supported database version.
+    minimum_database_version = None
     gis_enabled = False
     # Oracle can't group by LOB (large object) data types.
     allows_group_by_lob = True

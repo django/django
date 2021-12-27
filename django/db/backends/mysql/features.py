@@ -49,6 +49,13 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     order_by_nulls_first = True
 
     @cached_property
+    def minimum_database_version(self):
+        if self.connection.mysql_is_mariadb:
+            return (10, 2)
+        else:
+            return (5, 7)
+
+    @cached_property
     def test_collations(self):
         charset = "utf8"
         if self.connection.mysql_is_mariadb and self.connection.mysql_version >= (

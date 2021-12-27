@@ -200,6 +200,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     ops_class = DatabaseOperations
     validation_class = DatabaseValidation
 
+    def get_database_version(self):
+        return self.mysql_version
+
     def get_connection_params(self):
         kwargs = {
             "conv": django_conversions,
@@ -251,6 +254,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return connection
 
     def init_connection_state(self):
+        super().init_connection_state()
         assignments = []
         if self.features.is_sql_auto_is_null_enabled:
             # SQL_AUTO_IS_NULL controls whether an AUTO_INCREMENT column on
