@@ -63,9 +63,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 'schema.tests.SchemaTests.test_alter_field_default_doesnt_perform_queries',
                 'schema.tests.SchemaTests.test_rename_column_renames_deferred_sql_references',
             },
-            "SQLite doesn't have a constraint.": {
-                'model_fields.test_integerfield.PositiveIntegerFieldTests.test_negative_values',
-            },
             "SQLite doesn't support negative precision for ROUND().": {
                 'db_functions.math.test_round.RoundTests.test_null_with_negative_precision',
                 'db_functions.math.test_round.RoundTests.test_decimal_with_negative_precision',
