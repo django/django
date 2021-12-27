@@ -1,0 +1,10 @@
+===========================
+Django 2.2.26 release notes
+===========================
+
+*January 4, 2022*
+
+Django 2.2.26 fixes one security issue with severity "medium" and two security
+issues with severity "low" in 2.2.25.
+
+...
