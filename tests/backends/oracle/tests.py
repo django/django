@@ -1,14 +1,15 @@
 import unittest
+from unittest import mock
 
-from django.db import DatabaseError, connection
+from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import BooleanField
-from django.test import TransactionTestCase
+from django.test import TestCase, TransactionTestCase
 
 from ..models import Square, VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
 
 
 @unittest.skipUnless(connection.vendor == "oracle", "Oracle tests")
-class Tests(unittest.TestCase):
+class Tests(TestCase):
     def test_quote_name(self):
         """'%' chars are escaped for query execution."""
         name = '"SOME%NAME"'
@@ -55,6 +56,17 @@ class Tests(unittest.TestCase):
             with self.subTest(field=field):
                 field.set_attributes_from_name("is_nice")
                 self.assertIn('"IS_NICE" IN (0,1)', field.db_check(connection))
+
+    @mock.patch.object(
+        connection,
+        "get_database_version",
+        return_value=(18, 1),
+    )
+    def test_check_database_version_supported(self, mocked_get_database_version):
+        msg = "Oracle 19 or later is required (found 18.1)."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            connection.check_database_version_supported()
+        self.assertTrue(mocked_get_database_version.called)
 
 
 @unittest.skipUnless(connection.vendor == "oracle", "Oracle tests")

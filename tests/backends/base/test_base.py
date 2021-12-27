@@ -41,6 +41,19 @@ class DatabaseWrapperTests(SimpleTestCase):
         self.assertEqual(BaseDatabaseWrapper.display_name, "unknown")
         self.assertNotEqual(connection.display_name, "unknown")
 
+    def test_get_database_version(self):
+        with patch.object(BaseDatabaseWrapper, "__init__", return_value=None):
+            msg = (
+                "subclasses of BaseDatabaseWrapper may require a "
+                "get_database_version() method."
+            )
+            with self.assertRaisesMessage(NotImplementedError, msg):
+                BaseDatabaseWrapper().get_database_version()
+
+    def test_check_database_version_supported_with_none_as_database_version(self):
+        with patch.object(connection.features, "minimum_database_version", None):
+            connection.check_database_version_supported()
+
 
 class ExecuteWrapperTests(TestCase):
     @staticmethod
@@ -297,3 +310,25 @@ class ConnectionHealthChecksTests(SimpleTestCase):
         connection.commit()
         connection.set_autocommit(True)
         self.assertIs(new_connection, connection.connection)
+
+
+class MultiDatabaseTests(TestCase):
+    databases = {"default", "other"}
+
+    def test_multi_database_init_connection_state_called_once(self):
+        for db in self.databases:
+            with self.subTest(database=db):
+                with patch.object(connections[db], "commit", return_value=None):
+                    with patch.object(
+                        connections[db],
+                        "check_database_version_supported",
+                    ) as mocked_check_database_version_supported:
+                        connections[db].init_connection_state()
+                        after_first_calls = len(
+                            mocked_check_database_version_supported.mock_calls
+                        )
+                        connections[db].init_connection_state()
+                        self.assertEqual(
+                            len(mocked_check_database_version_supported.mock_calls),
+                            after_first_calls,
+                        )

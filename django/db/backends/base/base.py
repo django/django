@@ -13,7 +13,7 @@ except ImportError:
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.db import DEFAULT_DB_ALIAS, DatabaseError
+from django.db import DEFAULT_DB_ALIAS, DatabaseError, NotSupportedError
 from django.db.backends import utils
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.signals import connection_created
@@ -24,6 +24,7 @@ from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 
 NO_DB_ALIAS = "__no_db__"
+RAN_DB_VERSION_CHECK = set()
 
 
 # RemovedInDjango50Warning
@@ -185,6 +186,29 @@ class BaseDatabaseWrapper:
             )
         return list(self.queries_log)
 
+    def get_database_version(self):
+        """Return a tuple of the database's version."""
+        raise NotImplementedError(
+            "subclasses of BaseDatabaseWrapper may require a get_database_version() "
+            "method."
+        )
+
+    def check_database_version_supported(self):
+        """
+        Raise an error if the database version isn't supported by this
+        version of Django.
+        """
+        if (
+            self.features.minimum_database_version is not None
+            and self.get_database_version() < self.features.minimum_database_version
+        ):
+            db_version = ".".join(map(str, self.get_database_version()))
+            min_db_version = ".".join(map(str, self.features.minimum_database_version))
+            raise NotSupportedError(
+                f"{self.display_name} {min_db_version} or later is required "
+                f"(found {db_version})."
+            )
+
     # ##### Backend-specific methods for creating connections and cursors #####
 
     def get_connection_params(self):
@@ -203,10 +227,10 @@ class BaseDatabaseWrapper:
 
     def init_connection_state(self):
         """Initialize the database connection settings."""
-        raise NotImplementedError(
-            "subclasses of BaseDatabaseWrapper may require an init_connection_state() "
-            "method"
-        )
+        global RAN_DB_VERSION_CHECK
+        if self.alias not in RAN_DB_VERSION_CHECK:
+            self.check_database_version_supported()
+            RAN_DB_VERSION_CHECK.add(self.alias)
 
     def create_cursor(self, name=None):
         """Create a cursor. Assume that a connection is established."""

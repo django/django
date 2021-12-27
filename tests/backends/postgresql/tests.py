@@ -4,7 +4,13 @@ from io import StringIO
 from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db import DEFAULT_DB_ALIAS, DatabaseError, connection, connections
+from django.db import (
+    DEFAULT_DB_ALIAS,
+    DatabaseError,
+    NotSupportedError,
+    connection,
+    connections,
+)
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.test import TestCase, override_settings
 
@@ -303,3 +309,15 @@ class Tests(TestCase):
             [q["sql"] for q in connection.queries],
             [copy_expert_sql, "COPY django_session TO STDOUT"],
         )
+
+    def test_get_database_version(self):
+        new_connection = connection.copy()
+        new_connection.pg_version = 110009
+        self.assertEqual(new_connection.get_database_version(), (11, 9))
+
+    @mock.patch.object(connection, "get_database_version", return_value=(9, 6))
+    def test_check_database_version_supported(self, mocked_get_database_version):
+        msg = "PostgreSQL 10 or later is required (found 9.6)."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            connection.check_database_version_supported()
+        self.assertTrue(mocked_get_database_version.called)

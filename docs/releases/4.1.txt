@@ -157,6 +157,18 @@ CSRF
 
 * ...
 
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* Third-party database backends can now specify the minimum required version of
+  the database using the ``DatabaseFeatures.minimum_database_version``
+  attribute which is a tuple (e.g. ``(10, 0)`` means "10.0"). If a minimum
+  version is specified, backends must also implement
+  ``DatabaseWrapper.get_database_version()``, which returns a tuple of the
+  current database version. The backend's
+  ``DatabaseWrapper.init_connection_state()`` method must call ``super()`` in
+  order for the check to run.
+
 Decorators
 ~~~~~~~~~~
 

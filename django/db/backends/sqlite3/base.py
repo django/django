@@ -29,15 +29,6 @@ def decoder(conv_func):
     return lambda s: conv_func(s.decode())
 
 
-def check_sqlite_version():
-    if Database.sqlite_version_info < (3, 9, 0):
-        raise ImproperlyConfigured(
-            "SQLite 3.9.0 or later is required (found %s)." % Database.sqlite_version
-        )
-
-
-check_sqlite_version()
-
 Database.register_converter("bool", b"1".__eq__)
 Database.register_converter("time", decoder(parse_time))
 Database.register_converter("datetime", decoder(parse_datetime))
@@ -168,6 +159,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         kwargs.update({"check_same_thread": False, "uri": True})
         return kwargs
 
+    def get_database_version(self):
+        return self.Database.sqlite_version_info
+
     @async_unsafe
     def get_new_connection(self, conn_params):
         conn = Database.connect(**conn_params)
@@ -178,9 +172,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # prevents atomic table renames (feature supports_atomic_references_rename)
         conn.execute("PRAGMA legacy_alter_table = OFF")
         return conn
-
-    def init_connection_state(self):
-        pass
 
     def create_cursor(self, name=None):
         return self.connection.cursor(factory=SQLiteCursorWrapper)

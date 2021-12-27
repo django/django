@@ -153,6 +153,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # PostgreSQL backend-specific attributes.
     _named_cursor_idx = 0
 
+    def get_database_version(self):
+        """
+        Return a tuple of the database's version.
+        E.g. for pg_version 120004, return (12, 4).
+        """
+        return divmod(self.pg_version, 10000)
+
     def get_connection_params(self):
         settings_dict = self.settings_dict
         # None may be used to connect to the default 'postgres' db
@@ -236,6 +243,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return False
 
     def init_connection_state(self):
+        super().init_connection_state()
         self.connection.set_client_encoding("UTF8")
 
         timezone_changed = self.ensure_timezone()
