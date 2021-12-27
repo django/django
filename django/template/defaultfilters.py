@@ -22,7 +22,7 @@ from django.utils.text import (
 from django.utils.timesince import timesince, timeuntil
 from django.utils.translation import gettext, ngettext
 
-from .base import Variable, VariableDoesNotExist
+from .base import VARIABLE_ATTRIBUTE_SEPARATOR
 from .library import Library
 
 register = Library()
@@ -465,7 +465,7 @@ def striptags(value):
 def _property_resolver(arg):
     """
     When arg is convertible to float, behave like operator.itemgetter(arg)
-    Otherwise, behave like Variable(arg).resolve
+    Otherwise, chain __getitem__() and getattr().
 
     >>> _property_resolver(1)('abc')
     'b'
@@ -483,7 +483,19 @@ def _property_resolver(arg):
     try:
         float(arg)
     except ValueError:
-        return Variable(arg).resolve
+        if VARIABLE_ATTRIBUTE_SEPARATOR + '_' in arg or arg[0] == '_':
+            raise AttributeError('Access to private variables is forbidden.')
+        parts = arg.split(VARIABLE_ATTRIBUTE_SEPARATOR)
+
+        def resolve(value):
+            for part in parts:
+                try:
+                    value = value[part]
+                except (AttributeError, IndexError, KeyError, TypeError, ValueError):
+                    value = getattr(value, part)
+            return value
+
+        return resolve
     else:
         return itemgetter(arg)
 
@@ -496,7 +508,7 @@ def dictsort(value, arg):
     """
     try:
         return sorted(value, key=_property_resolver(arg))
-    except (TypeError, VariableDoesNotExist):
+    except (AttributeError, TypeError):
         return ''
 
 
@@ -508,7 +520,7 @@ def dictsortreversed(value, arg):
     """
     try:
         return sorted(value, key=_property_resolver(arg), reverse=True)
-    except (TypeError, VariableDoesNotExist):
+    except (AttributeError, TypeError):
         return ''
 
 

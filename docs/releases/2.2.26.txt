@@ -20,3 +20,19 @@ In order to mitigate this issue, relatively long values are now ignored by
 
 This issue has severity "medium" according to the :ref:`Django security policy
 <security-disclosure>`.
+
+CVE-2021-45116: Potential information disclosure in ``dictsort`` template filter
+================================================================================
+
+Due to leveraging the Django Template Language's variable resolution logic, the
+:tfilter:`dictsort` template filter was potentially vulnerable to information
+disclosure or unintended method calls, if passed a suitably crafted key.
+
+In order to avoid this possibility, ``dictsort`` now works with a restricted
+resolution logic, that will not call methods, nor allow indexing on
+dictionaries.
+
+As a reminder, all untrusted user input should be validated before use.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<security-disclosure>`.
