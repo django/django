@@ -753,11 +753,11 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         )
         self.assertContains(response, '<div id="changelist-filter">')
         self.assertContains(
-            response, '<a href="?surface__exact=x" title="Horizontal">Horizontal</a>',
+            response, '<a href="?surface__exact=x">Horizontal</a>',
             msg_prefix=fail_msg, html=True
         )
         self.assertContains(
-            response, '<a href="?surface__exact=y" title="Vertical">Vertical</a>',
+            response, '<a href="?surface__exact=y">Vertical</a>',
             msg_prefix=fail_msg, html=True
         )
 
