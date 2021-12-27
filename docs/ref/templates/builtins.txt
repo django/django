@@ -1577,6 +1577,13 @@ produce empty output::
 
     {{ values|dictsort:"0" }}
 
+Ordering by elements at specified index is not supported on dictionaries.
+
+.. versionchanged:: 2.2.26
+
+    In older versions, ordering elements at specified index was supported on
+    dictionaries.
+
 .. templatefilter:: dictsortreversed
 
 ``dictsortreversed``
