@@ -586,8 +586,8 @@ Expiration policies for these cookies are not followed. If you want a cookie
 to expire, either delete it manually or create a new ``Client`` instance (which
 will effectively delete all cookies).
 
-A test client has two attributes that store persistent state information. You
-can access these properties as part of a test condition.
+A test client has attributes that store persistent state information. You can
+access these properties as part of a test condition.
 
 .. attribute:: Client.cookies
 
