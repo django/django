@@ -2735,6 +2735,24 @@ class SchemaTests(TransactionTestCase):
             editor.remove_index(Book, index)
         self.assertNotIn(index.name, self.get_constraints(table))
 
+    def test_composed_index_with_fk(self):
+        index = Index(fields=["author", "title"], name="book_author_title_idx")
+        self._test_composed_index_with_fk(index)
+
+    def test_composed_desc_index_with_fk(self):
+        index = Index(fields=["-author", "title"], name="book_author_title_idx")
+        self._test_composed_index_with_fk(index)
+
+    @skipUnlessDBFeature("supports_expression_indexes")
+    def test_composed_func_index_with_fk(self):
+        index = Index(F("author"), F("title"), name="book_author_title_idx")
+        self._test_composed_index_with_fk(index)
+
+    @skipUnlessDBFeature("supports_expression_indexes")
+    def test_composed_desc_func_index_with_fk(self):
+        index = Index(F("author").desc(), F("title"), name="book_author_title_idx")
+        self._test_composed_index_with_fk(index)
+
     @skipUnlessDBFeature("supports_expression_indexes")
     def test_composed_func_transform_index_with_fk(self):
         index = Index(F("title__lower"), name="book_title_lower_idx")
@@ -2755,6 +2773,13 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.remove_constraint(Book, constraint)
         self.assertNotIn(constraint.name, self.get_constraints(table))
+
+    def test_composed_constraint_with_fk(self):
+        constraint = UniqueConstraint(
+            fields=["author", "title"],
+            name="book_author_title_uniq",
+        )
+        self._test_composed_constraint_with_fk(constraint)
 
     @skipUnlessDBFeature(
         "supports_column_check_constraints", "can_introspect_check_constraints"
