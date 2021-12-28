@@ -569,12 +569,10 @@ A field to store raw binary data. It can be assigned :class:`bytes`,
 By default, ``BinaryField`` sets :attr:`~Field.editable` to ``False``, in which
 case it can't be included in a :class:`~django.forms.ModelForm`.
 
-``BinaryField`` has one extra optional argument:
-
 .. attribute:: BinaryField.max_length
 
-    The maximum length (in bytes) of the field. The maximum length is enforced
-    in Django's validation using
+    Optional. The maximum length (in bytes) of the field. The maximum length is
+    enforced in Django's validation using
     :class:`~django.core.validators.MaxLengthValidator`.
 
 .. admonition:: Abusing ``BinaryField``
@@ -607,7 +605,7 @@ For large amounts of text, use :class:`~django.db.models.TextField`.
 
 The default form widget for this field is a :class:`~django.forms.TextInput`.
 
-:class:`CharField` has two extra arguments:
+:class:`CharField` has the following extra arguments:
 
 .. attribute:: CharField.max_length
 
@@ -713,7 +711,7 @@ A fixed-precision decimal number, represented in Python by a
 :class:`~decimal.Decimal` instance. It validates the input using
 :class:`~django.core.validators.DecimalValidator`.
 
-Has two **required** arguments:
+Has the following **required** arguments:
 
 .. attribute:: DecimalField.max_digits
 
@@ -781,7 +779,7 @@ A file-upload field.
     The ``primary_key`` argument isn't supported and will raise an error if
     used.
 
-Has two optional arguments:
+Has the following optional arguments:
 
 .. attribute:: FileField.upload_to
 
@@ -1153,8 +1151,8 @@ validates that the uploaded object is a valid image.
 In addition to the special attributes that are available for :class:`FileField`,
 an :class:`ImageField` also has ``height`` and ``width`` attributes.
 
-To facilitate querying on those attributes, :class:`ImageField` has two extra
-optional arguments:
+To facilitate querying on those attributes, :class:`ImageField` has the
+following optional arguments:
 
 .. attribute:: ImageField.height_field
 
