@@ -116,7 +116,7 @@ def get_deleted_objects(objs, request, admin_site):
         return [], {}, set(), []
     else:
         using = router.db_for_write(obj._meta.model)
-    collector = NestedObjects(using=using)
+    collector = NestedObjects(using=using, origin=objs)
     collector.collect(objs)
     perms_needed = set()
 

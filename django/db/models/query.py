@@ -753,7 +753,7 @@ class QuerySet:
         del_query.query.select_related = False
         del_query.query.clear_ordering(force=True)
 
-        collector = Collector(using=del_query.db)
+        collector = Collector(using=del_query.db, origin=self)
         collector.collect(del_query)
         deleted, _rows_count = collector.delete()
 

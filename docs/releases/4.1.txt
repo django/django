@@ -249,7 +249,9 @@ Serialization
 Signals
 ~~~~~~~
 
-* ...
+* The :data:`~django.db.models.signals.pre_delete` and
+  :data:`~django.db.models.signals.post_delete` signals now dispatch the
+  ``origin`` of the deletion.
 
 Templates
 ~~~~~~~~~

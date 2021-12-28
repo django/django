@@ -51,7 +51,7 @@ class Command(BaseCommand):
                     ct_info = []
                     for ct in to_remove:
                         ct_info.append('    - Content type for %s.%s' % (ct.app_label, ct.model))
-                        collector = NoFastDeleteCollector(using=using)
+                        collector = NoFastDeleteCollector(using=using, origin=ct)
                         collector.collect([ct])
 
                         for obj_type, objs in collector.data.items():

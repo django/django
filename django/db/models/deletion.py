@@ -76,8 +76,10 @@ def get_candidate_relations_to_delete(opts):
 
 
 class Collector:
-    def __init__(self, using):
+    def __init__(self, using, origin=None):
         self.using = using
+        # A Model or QuerySet object.
+        self.origin = origin
         # Initially, {model: {instances}}, later values become lists.
         self.data = defaultdict(set)
         # {model: {(field, value): {instances}}}
@@ -404,7 +406,8 @@ class Collector:
             for model, obj in self.instances_with_model():
                 if not model._meta.auto_created:
                     signals.pre_delete.send(
-                        sender=model, instance=obj, using=self.using
+                        sender=model, instance=obj, using=self.using,
+                        origin=self.origin,
                     )
 
             # fast deletes
@@ -435,7 +438,8 @@ class Collector:
                 if not model._meta.auto_created:
                     for obj in instances:
                         signals.post_delete.send(
-                            sender=model, instance=obj, using=self.using
+                            sender=model, instance=obj, using=self.using,
+                            origin=self.origin,
                         )
 
         # update collected instances

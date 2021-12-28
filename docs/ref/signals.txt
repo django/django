@@ -195,6 +195,12 @@ Arguments sent with this signal:
 ``using``
     The database alias being used.
 
+``origin``
+    .. versionadded:: 4.1
+
+    The origin of the deletion being the instance of a ``Model`` or
+    ``QuerySet`` class.
+
 ``post_delete``
 ---------------
 
@@ -218,6 +224,12 @@ Arguments sent with this signal:
 
 ``using``
     The database alias being used.
+
+``origin``
+    .. versionadded:: 4.1
+
+    The origin of the deletion being the instance of a ``Model`` or
+    ``QuerySet`` class.
 
 ``m2m_changed``
 ---------------

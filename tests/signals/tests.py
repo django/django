@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import isolate_apps
 
-from .models import Author, Book, Car, Person
+from .models import Author, Book, Car, Page, Person
 
 
 class BaseSignalSetup:
@@ -118,9 +118,9 @@ class SignalTests(BaseSignalSetup, TestCase):
     def test_delete_signals(self):
         data = []
 
-        def pre_delete_handler(signal, sender, instance, **kwargs):
+        def pre_delete_handler(signal, sender, instance, origin, **kwargs):
             data.append(
-                (instance, sender, instance.id is None)
+                (instance, sender, instance.id is None, origin)
             )
 
         # #8285: signals can be any callable
@@ -128,9 +128,9 @@ class SignalTests(BaseSignalSetup, TestCase):
             def __init__(self, data):
                 self.data = data
 
-            def __call__(self, signal, sender, instance, **kwargs):
+            def __call__(self, signal, sender, instance, origin, **kwargs):
                 self.data.append(
-                    (instance, sender, instance.id is None)
+                    (instance, sender, instance.id is None, origin)
                 )
         post_delete_handler = PostDeleteHandler(data)
 
@@ -140,8 +140,8 @@ class SignalTests(BaseSignalSetup, TestCase):
             p1 = Person.objects.create(first_name="John", last_name="Smith")
             p1.delete()
             self.assertEqual(data, [
-                (p1, Person, False),
-                (p1, Person, False),
+                (p1, Person, False, p1),
+                (p1, Person, False, p1),
             ])
             data[:] = []
 
@@ -152,8 +152,8 @@ class SignalTests(BaseSignalSetup, TestCase):
             p2.save()
             p2.delete()
             self.assertEqual(data, [
-                (p2, Person, False),
-                (p2, Person, False),
+                (p2, Person, False, p2),
+                (p2, Person, False, p2),
             ])
             data[:] = []
 
@@ -163,6 +163,78 @@ class SignalTests(BaseSignalSetup, TestCase):
                 ],
                 str
             )
+        finally:
+            signals.pre_delete.disconnect(pre_delete_handler)
+            signals.post_delete.disconnect(post_delete_handler)
+
+    def test_delete_signals_origin_model(self):
+        data = []
+
+        def pre_delete_handler(signal, sender, instance, origin, **kwargs):
+            data.append((sender, origin))
+
+        def post_delete_handler(signal, sender, instance, origin, **kwargs):
+            data.append((sender, origin))
+
+        person = Person.objects.create(first_name='John', last_name='Smith')
+        book = Book.objects.create(name='Rayuela')
+        Page.objects.create(text='Page 1', book=book)
+        Page.objects.create(text='Page 2', book=book)
+
+        signals.pre_delete.connect(pre_delete_handler, weak=False)
+        signals.post_delete.connect(post_delete_handler, weak=False)
+        try:
+            # Instance deletion.
+            person.delete()
+            self.assertEqual(data, [(Person, person), (Person, person)])
+            data[:] = []
+            # Cascade deletion.
+            book.delete()
+            self.assertEqual(data, [
+                (Page, book),
+                (Page, book),
+                (Book, book),
+                (Page, book),
+                (Page, book),
+                (Book, book),
+            ])
+        finally:
+            signals.pre_delete.disconnect(pre_delete_handler)
+            signals.post_delete.disconnect(post_delete_handler)
+
+    def test_delete_signals_origin_queryset(self):
+        data = []
+
+        def pre_delete_handler(signal, sender, instance, origin, **kwargs):
+            data.append((sender, origin))
+
+        def post_delete_handler(signal, sender, instance, origin, **kwargs):
+            data.append((sender, origin))
+
+        Person.objects.create(first_name='John', last_name='Smith')
+        book = Book.objects.create(name='Rayuela')
+        Page.objects.create(text='Page 1', book=book)
+        Page.objects.create(text='Page 2', book=book)
+
+        signals.pre_delete.connect(pre_delete_handler, weak=False)
+        signals.post_delete.connect(post_delete_handler, weak=False)
+        try:
+            # Queryset deletion.
+            qs = Person.objects.all()
+            qs.delete()
+            self.assertEqual(data, [(Person, qs), (Person, qs)])
+            data[:] = []
+            # Cascade deletion.
+            qs = Book.objects.all()
+            qs.delete()
+            self.assertEqual(data, [
+                (Page, qs),
+                (Page, qs),
+                (Book, qs),
+                (Page, qs),
+                (Page, qs),
+                (Book, qs),
+            ])
         finally:
             signals.pre_delete.disconnect(pre_delete_handler)
             signals.post_delete.disconnect(post_delete_handler)

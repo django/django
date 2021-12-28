@@ -987,7 +987,7 @@ class Model(metaclass=ModelBase):
                 "to None." % (self._meta.object_name, self._meta.pk.attname)
             )
         using = using or router.db_for_write(self.__class__, instance=self)
-        collector = Collector(using=using)
+        collector = Collector(using=using, origin=self)
         collector.collect([self], keep_parents=keep_parents)
         return collector.delete()
 
