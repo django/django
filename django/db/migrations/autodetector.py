@@ -536,10 +536,10 @@ class MigrationAutodetector:
         )
         for app_label, model_name in all_added_models:
             model_state = self.to_state.models[app_label, model_name]
-            # Gather related fields
             related_fields = {}
             primary_key_rel = None
             for field_name, field in model_state.fields.items():
+                # Gather related fields.
                 if field.remote_field:
                     if field.remote_field.model:
                         if field.primary_key:
@@ -548,6 +548,13 @@ class MigrationAutodetector:
                             related_fields[field_name] = field
                     if getattr(field.remote_field, 'through', None):
                         related_fields[field_name] = field
+                # Warn user about callable defaults on unique fields.
+                if (
+                    field.unique and
+                    field.default is not models.NOT_PROVIDED and
+                    callable(field.default)
+                ):
+                    self.questioner.ask_unique_callable_default_addition(field_name, model_name)
 
             # Are there indexes/unique|index_together to defer?
             indexes = model_state.options.pop('indexes')

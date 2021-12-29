@@ -1996,6 +1996,27 @@ class MakeMigrationsTests(MigrationTestBase):
             out_value = out.getvalue()
             self.assertIn('Add field created to book', out_value)
 
+    def test_makemigrations_interactive_unique_callable_default_at_model_creation(self):
+        class Magazine(models.Model):
+            created = models.DateTimeField(unique=True, default=timezone.now)
+
+            class Meta:
+                app_label = 'migrations'
+
+        input_msg = (
+            'Callable default on unique field magazine.created will not generate '
+            'unique values upon migrating.\n'
+            'Please choose how to proceed:\n\n'
+        )
+        with self.temporary_migration_module(module='migrations.test_migrations'):
+            # 2 - quit.
+            with mock.patch('builtins.input', return_value='2'):
+                with captured_stdout() as out, self.assertRaises(SystemExit):
+                    call_command('makemigrations', 'migrations', interactive=True)
+            out_value = out.getvalue()
+            self.assertIn(input_msg, out_value)
+            self.assertNotIn('Add field created to magazine', out_value)
+
     @override_settings(
         MIGRATION_MODULES={'migrations': 'migrations.test_migrations_squashed'},
     )
