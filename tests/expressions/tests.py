@@ -1736,6 +1736,17 @@ class FTimeDeltaTests(TestCase):
             ],
         )
 
+    def test_datetime_and_duration_field_addition_with_annotate_and_no_output_field(
+        self,
+    ):
+        test_set = Experiment.objects.annotate(
+            estimated_end=F("start") + F("estimated_time")
+        )
+        self.assertEqual(
+            [e.estimated_end for e in test_set],
+            [e.start + e.estimated_time for e in test_set],
+        )
+
     @skipUnlessDBFeature("supports_temporal_subtraction")
     def test_datetime_subtraction_with_annotate_and_no_output_field(self):
         test_set = Experiment.objects.annotate(
@@ -2438,8 +2449,10 @@ class CombinedExpressionTests(SimpleTestCase):
             (null, Combinable.ADD, DateTimeField),
             (DateField, Combinable.SUB, null),
         ]
-        msg = "Expression contains mixed types: "
         for lhs, connector, rhs in tests:
+            msg = (
+                f"Cannot infer type of {connector!r} expression involving these types: "
+            )
             with self.subTest(lhs=lhs, connector=connector, rhs=rhs):
                 expr = CombinedExpression(
                     Expression(lhs()),
@@ -2452,16 +2465,34 @@ class CombinedExpressionTests(SimpleTestCase):
     def test_resolve_output_field_dates(self):
         tests = [
             # Add - same type.
+            (DateField, Combinable.ADD, DateField, FieldError),
+            (DateTimeField, Combinable.ADD, DateTimeField, FieldError),
+            (TimeField, Combinable.ADD, TimeField, FieldError),
             (DurationField, Combinable.ADD, DurationField, DurationField),
+            # Add - different type.
+            (DateField, Combinable.ADD, DurationField, DateTimeField),
+            (DateTimeField, Combinable.ADD, DurationField, DateTimeField),
+            (TimeField, Combinable.ADD, DurationField, TimeField),
+            (DurationField, Combinable.ADD, DateField, DateTimeField),
+            (DurationField, Combinable.ADD, DateTimeField, DateTimeField),
+            (DurationField, Combinable.ADD, TimeField, TimeField),
             # Subtract - same type.
+            (DateField, Combinable.SUB, DateField, DurationField),
+            (DateTimeField, Combinable.SUB, DateTimeField, DurationField),
+            (TimeField, Combinable.SUB, TimeField, DurationField),
             (DurationField, Combinable.SUB, DurationField, DurationField),
             # Subtract - different type.
+            (DateField, Combinable.SUB, DurationField, DateTimeField),
+            (DateTimeField, Combinable.SUB, DurationField, DateTimeField),
+            (TimeField, Combinable.SUB, DurationField, TimeField),
             (DurationField, Combinable.SUB, DateField, FieldError),
             (DurationField, Combinable.SUB, DateTimeField, FieldError),
             (DurationField, Combinable.SUB, DateTimeField, FieldError),
         ]
-        msg = "Expression contains mixed types: "
         for lhs, connector, rhs, combined in tests:
+            msg = (
+                f"Cannot infer type of {connector!r} expression involving these types: "
+            )
             with self.subTest(lhs=lhs, connector=connector, rhs=rhs, combined=combined):
                 expr = CombinedExpression(
                     Expression(lhs()),
@@ -2477,8 +2508,8 @@ class CombinedExpressionTests(SimpleTestCase):
     def test_mixed_char_date_with_annotate(self):
         queryset = Experiment.objects.annotate(nonsense=F("name") + F("assigned"))
         msg = (
-            "Expression contains mixed types: CharField, DateField. You must set "
-            "output_field."
+            "Cannot infer type of '+' expression involving these types: CharField, "
+            "DateField. You must set output_field."
         )
         with self.assertRaisesMessage(FieldError, msg):
             list(queryset)

@@ -310,18 +310,18 @@ class BaseExpression:
 
     def _resolve_output_field(self):
         """
-        Attempt to infer the output type of the expression. If the output
-        fields of all source fields match then, simply infer the same type
-        here. This isn't always correct, but it makes sense most of the time.
+        Attempt to infer the output type of the expression.
 
-        Consider the difference between `2 + 2` and `2 / 3`. Inferring
-        the type here is a convenience for the common case. The user should
-        supply their own output_field with more complex computations.
+        As a guess, if the output fields of all source fields match then simply
+        infer the same type here.
 
         If a source's output field resolves to None, exclude it from this check.
         If all sources are None, then an error is raised higher up the stack in
         the output_field property.
         """
+        # This guess is mostly a bad idea, but there is quite a lot of code
+        # (especially 3rd party Func subclasses) that depend on it, we'd need a
+        # deprecation path to fix it.
         sources_iter = (
             source for source in self.get_source_fields() if source is not None
         )
@@ -467,6 +467,13 @@ class Expression(BaseExpression, Combinable):
 
 
 # Type inference for CombinedExpression.output_field.
+# Missing items will result in FieldError, by design.
+#
+# The current approach for NULL is based on lowest common denominator behavior
+# i.e. if one of the supported databases is raising an error (rather than
+# return NULL) for `val <op> NULL`, then Django raises FieldError.
+NoneType = type(None)
+
 _connector_combinations = [
     # Numeric operations - operands of same type.
     {
@@ -482,6 +489,8 @@ _connector_combinations = [
             # Behavior for DIV with integer arguments follows Postgres/SQLite,
             # not MySQL/Oracle.
             Combinable.DIV,
+            Combinable.MOD,
+            Combinable.POW,
         )
     },
     # Numeric operations - operands of different type.
@@ -498,6 +507,66 @@ _connector_combinations = [
             Combinable.MUL,
             Combinable.DIV,
         )
+    },
+    # Bitwise operators.
+    {
+        connector: [
+            (fields.IntegerField, fields.IntegerField, fields.IntegerField),
+        ]
+        for connector in (
+            Combinable.BITAND,
+            Combinable.BITOR,
+            Combinable.BITLEFTSHIFT,
+            Combinable.BITRIGHTSHIFT,
+            Combinable.BITXOR,
+        )
+    },
+    # Numeric with NULL.
+    {
+        connector: [
+            (field_type, NoneType, field_type),
+            (NoneType, field_type, field_type),
+        ]
+        for connector in (
+            Combinable.ADD,
+            Combinable.SUB,
+            Combinable.MUL,
+            Combinable.DIV,
+            Combinable.MOD,
+            Combinable.POW,
+        )
+        for field_type in (fields.IntegerField, fields.DecimalField, fields.FloatField)
+    },
+    # Date/DateTimeField/DurationField/TimeField.
+    {
+        Combinable.ADD: [
+            # Date/DateTimeField.
+            (fields.DateField, fields.DurationField, fields.DateTimeField),
+            (fields.DateTimeField, fields.DurationField, fields.DateTimeField),
+            (fields.DurationField, fields.DateField, fields.DateTimeField),
+            (fields.DurationField, fields.DateTimeField, fields.DateTimeField),
+            # DurationField.
+            (fields.DurationField, fields.DurationField, fields.DurationField),
+            # TimeField.
+            (fields.TimeField, fields.DurationField, fields.TimeField),
+            (fields.DurationField, fields.TimeField, fields.TimeField),
+        ],
+    },
+    {
+        Combinable.SUB: [
+            # Date/DateTimeField.
+            (fields.DateField, fields.DurationField, fields.DateTimeField),
+            (fields.DateTimeField, fields.DurationField, fields.DateTimeField),
+            (fields.DateField, fields.DateField, fields.DurationField),
+            (fields.DateField, fields.DateTimeField, fields.DurationField),
+            (fields.DateTimeField, fields.DateField, fields.DurationField),
+            (fields.DateTimeField, fields.DateTimeField, fields.DurationField),
+            # DurationField.
+            (fields.DurationField, fields.DurationField, fields.DurationField),
+            # TimeField.
+            (fields.TimeField, fields.DurationField, fields.TimeField),
+            (fields.TimeField, fields.TimeField, fields.DurationField),
+        ],
     },
 ]
 
@@ -552,17 +621,21 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         self.lhs, self.rhs = exprs
 
     def _resolve_output_field(self):
-        try:
-            return super()._resolve_output_field()
-        except FieldError:
-            combined_type = _resolve_combined_type(
-                self.connector,
-                type(self.lhs.output_field),
-                type(self.rhs.output_field),
+        # We avoid using super() here for reasons given in
+        # Expression._resolve_output_field()
+        combined_type = _resolve_combined_type(
+            self.connector,
+            type(self.lhs._output_field_or_none),
+            type(self.rhs._output_field_or_none),
+        )
+        if combined_type is None:
+            raise FieldError(
+                f"Cannot infer type of {self.connector!r} expression involving these "
+                f"types: {self.lhs.output_field.__class__.__name__}, "
+                f"{self.rhs.output_field.__class__.__name__}. You must set "
+                f"output_field."
             )
-            if combined_type is None:
-                raise
-            return combined_type()
+        return combined_type()
 
     def as_sql(self, compiler, connection):
         expressions = []
