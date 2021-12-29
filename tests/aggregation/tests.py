@@ -1126,8 +1126,8 @@ class AggregateTestCase(TestCase):
 
     def test_combine_different_types(self):
         msg = (
-            "Expression contains mixed types: FloatField, DecimalField. "
-            "You must set output_field."
+            "Cannot infer type of '+' expression involving these types: FloatField, "
+            "DecimalField. You must set output_field."
         )
         qs = Book.objects.annotate(sums=Sum("rating") + Sum("pages") + Sum("price"))
         with self.assertRaisesMessage(FieldError, msg):
