@@ -5146,6 +5146,25 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[-1])
 
+    def test_hidden_fields_small_window(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(
+            username='super',
+            password='secret',
+            login_url=reverse('admin:index'),
+        )
+        self.selenium.get(self.live_server_url + reverse('admin:admin_views_story_add'))
+        field_title = self.selenium.find_element(By.CLASS_NAME, 'field-title')
+        current_size = self.selenium.get_window_size()
+        try:
+            self.selenium.set_window_size(1024, 768)
+            self.assertIs(field_title.is_displayed(), False)
+            self.selenium.set_window_size(767, 575)
+            self.assertIs(field_title.is_displayed(), False)
+        finally:
+            self.selenium.set_window_size(current_size['width'], current_size['height'])
+
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
 class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
