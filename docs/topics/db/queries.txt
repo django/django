@@ -17,6 +17,8 @@ models, which comprise a blog application:
 
 .. code-block:: python
 
+    from datetime import date
+
     from django.db import models
 
     class Blog(models.Model):
@@ -38,11 +40,11 @@ models, which comprise a blog application:
         headline = models.CharField(max_length=255)
         body_text = models.TextField()
         pub_date = models.DateField()
-        mod_date = models.DateField()
+        mod_date = models.DateField(default=date.today)
         authors = models.ManyToManyField(Author)
-        number_of_comments = models.IntegerField()
-        number_of_pingbacks = models.IntegerField()
-        rating = models.IntegerField()
+        number_of_comments = models.IntegerField(default=0)
+        number_of_pingbacks = models.IntegerField(default=0)
+        rating = models.IntegerField(default=5)
 
         def __str__(self):
             return self.headline
