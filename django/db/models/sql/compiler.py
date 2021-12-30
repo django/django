@@ -1267,6 +1267,14 @@ class SQLCompiler:
             else:
                 yield row
 
+    def qualified_table_name(self, table):
+        """
+        Return the fully qualified table name. For most databases, this is just
+        the quoted table name. For databases that support schemas, this is the
+        table name including the schema name.
+        """
+        return self.quote_name_unless_alias(query.base_table)
+
 
 class SQLInsertCompiler(SQLCompiler):
     returning_fields = None
@@ -1383,7 +1391,7 @@ class SQLInsertCompiler(SQLCompiler):
         qn = self.connection.ops.quote_name
         opts = self.query.get_meta()
         insert_statement = self.connection.ops.insert_statement(ignore_conflicts=self.query.ignore_conflicts)
-        result = ['%s %s' % (insert_statement, qn(opts.db_table))]
+        result = ['%s %s' % (insert_statement, self.qualified_table_name(opts.db_table))]
         fields = self.query.fields or [opts.pk]
         result.append('(%s)' % ', '.join(qn(f.column) for f in fields))
 
@@ -1495,7 +1503,7 @@ class SQLDeleteCompiler(SQLCompiler):
 
     def _as_sql(self, query):
         result = [
-            'DELETE FROM %s' % self.quote_name_unless_alias(query.base_table)
+            'DELETE FROM %s' % self.qualified_table_name(query.base_table)
         ]
         where, params = self.compile(query.where)
         if where:
@@ -1582,7 +1590,7 @@ class SQLUpdateCompiler(SQLCompiler):
                 values.append('%s = NULL' % qn(name))
         table = self.query.base_table
         result = [
-            'UPDATE %s SET' % qn(table),
+            'UPDATE %s SET' % self.qualified_table_name(table),
             ', '.join(values),
         ]
         where, params = self.compile(self.query.where)
