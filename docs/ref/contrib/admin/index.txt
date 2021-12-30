@@ -249,7 +249,7 @@ subclass::
         from django.contrib import admin
 
         class AuthorAdmin(admin.ModelAdmin):
-            fields = ('name', 'title', 'view_birth_date')
+            list_display = ('name', 'title', 'view_birth_date')
 
             @admin.display(empty_value='???')
             def view_birth_date(self, obj):
