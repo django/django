@@ -2,9 +2,24 @@
 // Inserts shortcut buttons after all of the following:
 //     <input type="text" class="vDateField">
 //     <input type="text" class="vTimeField">
+//calendar draw in brief: by loading browser tab, date icon and calendar will create by addCalendar function with display: none, this calendar will shown by openCalendar func after clicking on date icon, the drawMonthChoices func draw 12 months of year after clicking on clendar caption, the drawYearChoices func draw year list after clicking on monthlist caption.
 'use strict';
 {
     const DateTimeShortcuts = {
+        monthsOfYear: [
+            gettext('January'),
+            gettext('February'),
+            gettext('March'),
+            gettext('April'),
+            gettext('May'),
+            gettext('June'),
+            gettext('July'),
+            gettext('August'),
+            gettext('September'),
+            gettext('October'),
+            gettext('November'),
+            gettext('December')
+        ],
         calendars: [],
         calendarInputs: [],
         clockInputs: [],
@@ -265,10 +280,10 @@
             // Markup looks like:
             //
             // <div id="calendarbox3" class="calendarbox module">
-            //     <h2>
-            //           <a href="#" class="link-previous">&lsaquo;</a>
-            //           <a href="#" class="link-next">&rsaquo;</a> February 2003
-            //     </h2>
+            //     <div>
+            //           <a href="#" class="calendarnav-previous">&lsaquo;</a>
+            //           <a href="#" class="calendarnav-next">&rsaquo;</a>
+            //     </div>
             //     <div class="calendar" id="calendarin3">
             //         <!-- (cal) -->
             //     </div>
@@ -286,7 +301,7 @@
             cal_box.addEventListener('click', function(e) { e.stopPropagation(); });
 
             // next-prev links
-            const cal_nav = quickElement('div', cal_box);
+            const cal_nav = quickElement('div', cal_box, '', 'id', 'nextPrevLinks' + num);
             const cal_nav_prev = quickElement('a', cal_nav, '<', 'href', '#');
             cal_nav_prev.className = 'calendarnav-previous';
             cal_nav_prev.addEventListener('click', function(e) {
@@ -304,7 +319,7 @@
             // main box
             const cal_main = quickElement('div', cal_box, '', 'id', DateTimeShortcuts.calendarDivName2 + num);
             cal_main.className = 'calendar';
-            DateTimeShortcuts.calendars[num] = new Calendar(DateTimeShortcuts.calendarDivName2 + num, DateTimeShortcuts.handleCalendarCallback(num));
+            DateTimeShortcuts.calendars[num] = new Calendar(DateTimeShortcuts.calendarDivName2 + num, DateTimeShortcuts.handleCalendarCallback(num), DateTimeShortcuts.drawMonthChoices(num));
             DateTimeShortcuts.calendars[num].drawCurrent();
 
             // calendar shortcuts
@@ -344,6 +359,77 @@
                 }
             });
         },
+		drawYearChoices: function(num) {
+			document.getElementById('nextPrevLinks' + num).style.display = 'none';
+			const cal_main = document.getElementById(DateTimeShortcuts.calendarDivName2 + num);
+			removeChildren(cal_main);	
+			const currentYear = DateTimeShortcuts.calendars[num].currentYear;
+			let toyearClass = '';
+			    
+			const ul = quickElement('ul', cal_main, '', 'class', 'yearlist', 'id', 'yearlist' + num);	//yearlist id use as identifier for ul element
+			let yearLink = null;
+			for (let i = currentYear - 100; i < currentYear + 101; i++) {
+				if (i === currentYear) {
+					toyearClass = 'toyear';
+				} else {
+					toyearClass = '';
+				}
+				const li = quickElement('li', ul, '');	
+				const link = quickElement('a', li, i, 'href', '#', 'class', toyearClass);	
+				if (toyearClass === 'toyear') {
+					yearLink = link
+				}
+				link.addEventListener('click', function(e) {
+					e.preventDefault();
+					for (let childNode of ul.childNodes) {                   //this loop remove className of ul links
+						for (let k = 0; k < childNode.childNodes.length; k++) {
+							if (childNode.childNodes[k].tagName === "A") {
+								childNode.childNodes[k].className = '';
+							}
+						}
+					}
+					link.className = 'toyear';
+					DateTimeShortcuts.calendars[num].currentYear = parseInt(link.textContent);					
+					document.getElementById('nextPrevLinks' + num).style.display = 'block';
+					DateTimeShortcuts.drawMonthChoices(num)();					
+				});
+			}
+			ul.scrollTo(0, (yearLink.offsetTop - 82));
+		},
+		drawMonthChoices: function(num) {
+			return function() {
+				let tomonthClass = '';
+				const cal_main = document.getElementById(DateTimeShortcuts.calendarDivName2 + num);
+				removeChildren(cal_main);
+				const divMonthList = quickElement('div', cal_main, '', 'class', 'monthlist');
+				const calTable = quickElement('table', divMonthList, '');
+				const caption = quickElement('caption', calTable, '');
+				const captionLink = quickElement('a', caption, DateTimeShortcuts.calendars[num].currentYear, 'href', '#', 'id', 'yearcaption' + num);  //yearcaption id use as identifier for divMonthList element and also use in drawPreviousMonth and drawNextMonth funcs.
+				captionLink.addEventListener('click', function(e) {
+					e.preventDefault();
+					DateTimeShortcuts.drawYearChoices(num);
+				});
+				const tableBody = quickElement('tbody', calTable);
+				let tableRow = quickElement('tr', tableBody);
+				for (let i=0; i < 12; i++) {
+					if (i % 3 === 0) {
+						tableRow = quickElement('tr', tableBody);
+					}		
+					if (DateTimeShortcuts.calendars[num].currentMonth === i + 1) {
+						tomonthClass = 'selected';
+					} else {
+						tomonthClass = '';
+					}
+					const cell = quickElement('td', tableRow, '', 'class', tomonthClass);
+					const link = quickElement('a', cell, DateTimeShortcuts.monthsOfYear[i], 'href', '#');
+					link.addEventListener('click', function(e) {
+						e.preventDefault();
+						DateTimeShortcuts.calendars[num].currentMonth = i + 1;
+						DateTimeShortcuts.calendars[num].drawCurrent();
+					});
+				}
+			};
+		},
         openCalendar: function(num) {
             const cal_box = document.getElementById(DateTimeShortcuts.calendarDivName1 + num);
             const cal_link = document.getElementById(DateTimeShortcuts.calendarLinkName + num);
@@ -380,12 +466,17 @@
         dismissCalendar: function(num) {
             document.getElementById(DateTimeShortcuts.calendarDivName1 + num).style.display = 'none';
             document.removeEventListener('click', DateTimeShortcuts.dismissCalendarFunc[num]);
+			document.getElementById('nextPrevLinks' + num).style.display = 'block';          
+			if (document.getElementById('yearlist' + num) !== null) {
+				document.getElementById('yearlist' + num).remove();				
+			} 
+			DateTimeShortcuts.calendars[num].drawCurrent();
         },
         drawPrev: function(num) {
-            DateTimeShortcuts.calendars[num].drawPreviousMonth();
+            DateTimeShortcuts.calendars[num].drawPreviousMonth(num);
         },
         drawNext: function(num) {
-            DateTimeShortcuts.calendars[num].drawNextMonth();
+            DateTimeShortcuts.calendars[num].drawNextMonth(num);
         },
         handleCalendarCallback: function(num) {
             let format = get_format('DATE_INPUT_FORMATS')[0];

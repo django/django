@@ -199,6 +199,16 @@ fieldset .fieldBox {
     text-align: center;
 }
 
+.calendar .yearlist a {
+	padding-left: 0px;
+	padding-right: 15px;
+}
+
+.calendar .yearlist a.toyear {
+	padding-left: 0px;
+	padding-right: 15px;
+}
+
 .selector {
     float: right;
 }
