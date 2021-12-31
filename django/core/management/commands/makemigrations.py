@@ -144,7 +144,11 @@ class Command(BaseCommand):
             return self.handle_merge(loader, conflicts)
 
         if self.interactive:
-            questioner = InteractiveMigrationQuestioner(specified_apps=app_labels, dry_run=self.dry_run)
+            questioner = InteractiveMigrationQuestioner(
+                specified_apps=app_labels,
+                dry_run=self.dry_run,
+                prompt_output=self.stdout,
+            )
         else:
             questioner = NonInteractiveMigrationQuestioner(
                 specified_apps=app_labels,
@@ -250,7 +254,7 @@ class Command(BaseCommand):
         if it's safe; otherwise, advises on how to fix it.
         """
         if self.interactive:
-            questioner = InteractiveMigrationQuestioner()
+            questioner = InteractiveMigrationQuestioner(prompt_output=self.stdout)
         else:
             questioner = MigrationQuestioner(defaults={'ask_merge': True})
 

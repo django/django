@@ -1304,7 +1304,15 @@ class MakeMigrationsTests(MigrationTestBase):
         # Monkeypatch interactive questioner to auto reject
         with mock.patch('builtins.input', mock.Mock(return_value='N')):
             with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
-                call_command("makemigrations", "migrations", name="merge", merge=True, interactive=True, verbosity=0)
+                with captured_stdout():
+                    call_command(
+                        'makemigrations',
+                        'migrations',
+                        name='merge',
+                        merge=True,
+                        interactive=True,
+                        verbosity=0,
+                    )
                 merge_file = os.path.join(migration_dir, '0003_merge.py')
                 self.assertFalse(os.path.exists(merge_file))
 
@@ -1766,6 +1774,10 @@ class MakeMigrationsTests(MigrationTestBase):
                 '    - remove field silly_field from author\n'
                 '    - add field rating to author\n'
                 '    - create model book\n'
+                '\n'
+                'merging will only work if the operations printed above do not conflict\n'
+                'with each other (working on different fields or models)\n'
+                'should these migration branches be merged? [y/n] '
             )
 
     def test_makemigrations_with_custom_name(self):
@@ -1886,30 +1898,25 @@ class MakeMigrationsTests(MigrationTestBase):
             "It is impossible to add the field 'creation_date' with "
             "'auto_now_add=True' to entry without providing a default. This "
             "is because the database needs something to populate existing "
-            "rows.\n\n"
+            "rows.\n"
             " 1) Provide a one-off default now which will be set on all "
             "existing rows\n"
             " 2) Quit and manually define a default value in models.py."
         )
         # Monkeypatch interactive questioner to auto accept
-        with mock.patch('django.db.migrations.questioner.sys.stdout', new_callable=io.StringIO) as prompt_stdout:
-            out = io.StringIO()
-            with self.temporary_migration_module(module='migrations.test_auto_now_add'):
-                call_command('makemigrations', 'migrations', interactive=True, stdout=out)
-            output = out.getvalue()
-            prompt_output = prompt_stdout.getvalue()
-            self.assertIn(input_msg, prompt_output)
-            self.assertIn(
-                'Please enter the default value as valid Python.',
-                prompt_output,
-            )
-            self.assertIn(
-                "Accept the default 'timezone.now' by pressing 'Enter' or "
-                "provide another value.",
-                prompt_output,
-            )
-            self.assertIn("Type 'exit' to exit this prompt", prompt_output)
-            self.assertIn("Add field creation_date to entry", output)
+        prompt_stdout = io.StringIO()
+        with self.temporary_migration_module(module='migrations.test_auto_now_add'):
+            call_command('makemigrations', 'migrations', interactive=True, stdout=prompt_stdout)
+        prompt_output = prompt_stdout.getvalue()
+        self.assertIn(input_msg, prompt_output)
+        self.assertIn('Please enter the default value as valid Python.', prompt_output)
+        self.assertIn(
+            "Accept the default 'timezone.now' by pressing 'Enter' or provide "
+            "another value.",
+            prompt_output,
+        )
+        self.assertIn("Type 'exit' to exit this prompt", prompt_output)
+        self.assertIn("Add field creation_date to entry", prompt_output)
 
     @mock.patch('builtins.input', return_value='2')
     def test_makemigrations_auto_now_add_interactive_quit(self, mock_input):
@@ -1960,7 +1967,7 @@ class MakeMigrationsTests(MigrationTestBase):
         input_msg = (
             f'Callable default on unique field book.created will not generate '
             f'unique values upon migrating.\n'
-            f'Please choose how to proceed:\n\n'
+            f'Please choose how to proceed:\n'
             f' 1) Continue making this migration as the first step in writing '
             f'a manual migration to generate unique values described here: '
             f'https://docs.djangoproject.com/en/{version}/howto/'
