@@ -183,3 +183,94 @@ class BaseDatabaseIntrospection:
         if they don't name constraints of a certain type (e.g. SQLite)
         """
         raise NotImplementedError('subclasses of BaseDatabaseIntrospection may require a get_constraints() method')
+
+
+class BaseAsyncDatabaseIntrospection(BaseDatabaseIntrospection):
+    """See BaseDatabaseIntrospection."""
+
+    async def get_field_type(self, data_type, description):
+        """See BaseDatabaseIntrospection.get_field_type()."""
+        return super().get_field_type(data_type, description)
+
+    async def table_names(self, cursor=None, include_views=False):
+        """See BaseDatabaseIntrospection.table_names()."""
+
+        async def get_names(cursor):
+            return sorted(ti.name for ti in await self.get_table_list(cursor)
+                          if include_views or ti.type == 't')
+
+        if cursor is None:
+            with await self.connection.cursor() as cursor:
+                return await get_names(cursor)
+        return await get_names(cursor)
+
+    async def get_table_list(self, cursor):
+        """See BaseDatabaseIntrospection.get_table_list()."""
+        return super().get_table_list(cursor)
+
+    async def get_table_description(self, cursor, table_name):
+        """See BaseDatabaseInstrospection.get_table_description()."""
+        return super().get_table_description(cursor, table_name)
+
+    async def django_table_names(self, only_existing=False, include_views=True):
+        """
+        Return a list of all table names that have associated Django models and
+        are in INSTALLED_APPS.
+
+        If only_existing is True, include only the tables in the database.
+        """
+        tables = set()
+        for model in self.get_migratable_models():
+            if not model._meta.managed:
+                continue
+            tables.add(model._meta.db_table)
+            tables.update(
+                f.m2m_db_table() for f in model._meta.local_many_to_many
+                if f.remote_field.through._meta.managed
+            )
+        tables = list(tables)
+        if only_existing:
+            existing_tables = set(await self.table_names(include_views=include_views))
+            tables = [
+                t
+                for t in tables
+                if self.identifier_converter(t) in existing_tables
+            ]
+        return tables
+
+    async def sequence_list(self):
+        """See BaseDatabaseIntrospection.sequence_list()."""
+        sequence_list = []
+        with await self.connection.cursor() as cursor:
+            for model in self.get_migratable_models():
+                if not model._meta.managed:
+                    continue
+                if model._meta.swapped:
+                    continue
+                sequence_list.extend(await self.get_sequences(cursor, model._meta.db_table, model._meta.local_fields))
+                for f in model._meta.local_many_to_many:
+                    # If this is an m2m using an intermediate table,
+                    # we don't need to reset the sequence.
+                    if f.remote_field.through._meta.auto_created:
+                        sequence = await self.get_sequences(cursor, f.m2m_db_table())
+                        sequence_list.extend(sequence or [{'table': f.m2m_db_table(), 'column': None}])
+        return sequence_list
+
+    async def get_sequences(self, cursor, table_name, table_fields=()):
+        """See BaseDatabaseIntrospection.get_sequences()."""
+        return super().get_sequences(cursor, table_name, table_fields)
+
+    async def get_relations(self, cursor, table_name):
+        """See BaseDatabaseIntrospection.get_relations()."""
+        return super().get_relations(cursor, table_name)
+
+    async def get_primary_key_column(self, cursor, table_name):
+        """See BaseDatabaseIntrospection.get_primary_key_column()."""
+        for constraint in (await self.get_constraints(cursor, table_name)).values():
+            if constraint['primary_key']:
+                return constraint['columns'][0]
+        return None
+
+    async def get_constraints(self, cursor, table_name):
+        """See BaseDatabaseIntrospection.get_constraints()."""
+        return super().get_constraints(cursor, table_name)

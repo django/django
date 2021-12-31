@@ -51,8 +51,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         'expressions.tests.FTimeDeltaTests.test_mixed_comparisons1',
     }
 
-    @cached_property
-    def django_test_skips(self):
+    def _django_test_skips(self, sqlite_version_info):
         skips = {
             'SQLite stores values rounded to 15 significant digits.': {
                 'model_fields.test_decimalfield.DecimalFieldTests.test_fetch_from_db_without_float_rounding',
@@ -63,6 +62,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 'schema.tests.SchemaTests.test_alter_field_default_doesnt_perform_queries',
                 'schema.tests.SchemaTests.test_rename_column_renames_deferred_sql_references',
             },
+            "SQLite doesn't have a constraint.": {
+                'model_fields.test_integerfield.PositiveIntegerFieldTests.test_negative_values',
+            },
             "SQLite doesn't support negative precision for ROUND().": {
                 'db_functions.math.test_round.RoundTests.test_null_with_negative_precision',
                 'db_functions.math.test_round.RoundTests.test_decimal_with_negative_precision',
@@ -70,7 +72,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 'db_functions.math.test_round.RoundTests.test_integer_with_negative_precision',
             },
         }
-        if Database.sqlite_version_info < (3, 27):
+        if sqlite_version_info < (3, 27):
             skips.update({
                 'Nondeterministic failure on SQLite < 3.27.': {
                     'expressions_window.tests.WindowFunctionTests.test_subquery_row_range_rank',
@@ -87,12 +89,16 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return skips
 
     @cached_property
+    def django_test_skips(self):
+        return self._django_test_skips(Database.sqlite_version_info)
+
+    @cached_property
     def supports_atomic_references_rename(self):
         return Database.sqlite_version_info >= (3, 26, 0)
 
     @cached_property
     def introspected_field_types(self):
-        return{
+        return {
             **super().introspected_field_types,
             'BigAutoField': 'AutoField',
             'DurationField': 'BigIntegerField',

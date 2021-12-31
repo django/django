@@ -1,3 +1,4 @@
+import asyncio
 import os
 import subprocess
 
@@ -23,3 +24,11 @@ class BaseDatabaseClient:
         args, env = self.settings_to_cmd_args_env(self.connection.settings_dict, parameters)
         env = {**os.environ, **env} if env else None
         subprocess.run(args, env=env, check=True)
+
+
+class BaseAsyncDatabaseClient(BaseDatabaseClient):
+    async def runshell(self, parameters):
+        """Overriden so that you can check if this is a coroutine"""
+        args, env = self.settings_to_cmd_args_env(self.connection.settings_dict, parameters)
+        env = {**os.environ, **env} if env else None
+        await asyncio.create_subprocess_shell(args, env=env)
