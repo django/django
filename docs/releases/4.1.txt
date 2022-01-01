@@ -341,6 +341,10 @@ Miscellaneous
   ``request.META['CSRF_COOKIE']`` for storing the unmasked CSRF secret rather
   than a masked version. This is an undocumented, private API.
 
+* The :attr:`.ModelAdmin.actions` and
+  :attr:`~django.contrib.admin.ModelAdmin.inlines` attributes now default to an
+  empty tuple rather than an empty list to discourage unintended mutation.
+
 .. _deprecated-features-4.1:
 
 Features deprecated in 4.1

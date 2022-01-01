@@ -565,7 +565,7 @@ class ModelAdmin(BaseModelAdmin):
     save_on_top = False
     paginator = Paginator
     preserve_filters = True
-    inlines = []
+    inlines = ()
 
     # Custom templates (designed to be over-ridden in subclasses)
     add_form_template = None
@@ -577,7 +577,7 @@ class ModelAdmin(BaseModelAdmin):
     popup_response_template = None
 
     # Actions
-    actions = []
+    actions = ()
     action_form = helpers.ActionForm
     actions_on_top = True
     actions_on_bottom = False
