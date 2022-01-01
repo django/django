@@ -239,8 +239,12 @@ Management Commands
   migrations from the ``django_migrations`` table.
 
 * Python files created by :djadmin:`startproject`, :djadmin:`startapp`,
-  :djadmin:`makemigrations`, and :djadmin:`squashmigrations` are now formatted
-  using the ``black`` command if it is present on your ``PATH``.
+  :djadmin:`optimizemigration`, :djadmin:`makemigrations`, and
+  :djadmin:`squashmigrations` are now formatted using the ``black`` command if
+  it is present on your ``PATH``.
+
+* The new :djadmin:`optimizemigration` command allows optimizing operations for
+  a migration.
 
 Migrations
 ~~~~~~~~~~

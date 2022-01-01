@@ -916,6 +916,23 @@ Deletes nonexistent migrations from the ``django_migrations`` table. This is
 useful when migration files replaced by a squashed migration have been removed.
 See :ref:`migration-squashing` for more details.
 
+``optimizemigration``
+---------------------
+
+.. versionadded:: 4.1
+
+.. django-admin:: optimizemigration app_label migration_name
+
+Optimizes the operations for the named migration and overrides the existing
+file. If the migration contains functions that must be manually copied, the
+command creates a new migration file suffixed with ``_optimized`` that is meant
+to replace the named migration.
+
+.. django-admin-option:: --check
+
+Makes ``optimizemigration`` exit with a non-zero status when a migration can be
+optimized.
+
 ``runserver``
 -------------
 
@@ -2056,8 +2073,9 @@ Black formatting
 .. versionadded:: 4.1
 
 The Python files created by :djadmin:`startproject`, :djadmin:`startapp`,
-:djadmin:`makemigrations`, and :djadmin:`squashmigrations` are formatted using
-the ``black`` command if it is present on your ``PATH``.
+:djadmin:`optimizemigration`, :djadmin:`makemigrations`, and
+:djadmin:`squashmigrations` are formatted using the ``black`` command if it is
+present on your ``PATH``.
 
 If you have ``black`` globally installed, but do not wish it used for the
 current project, you can set the ``PATH`` explicitly::
