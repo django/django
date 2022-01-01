@@ -6,4 +6,12 @@ Django 3.2.12 release notes
 
 Django 3.2.12 fixes two security issues with severity "medium" in 3.2.11.
 
-...
+CVE-2022-22818: Possible XSS via ``{% debug %}`` template tag
+=============================================================
+
+The ``{% debug %}`` template tag didn't properly encode the current context,
+posing an XSS attack vector.
+
+In order to avoid this vulnerability, ``{% debug %}`` no longer outputs an
+information when the ``DEBUG`` setting is ``False``, and it ensures all context
+variables are correctly escaped when the ``DEBUG`` setting is ``True``.

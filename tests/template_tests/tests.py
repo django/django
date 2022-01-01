@@ -1,6 +1,5 @@
 import sys
 
-from django.contrib.auth.models import Group
 from django.template import Context, Engine, TemplateSyntaxError
 from django.template.base import UNKNOWN_SOURCE
 from django.test import SimpleTestCase, override_settings
@@ -142,15 +141,6 @@ class TemplateTests(SimpleTestCase):
         t = engine.get_template('included_content.html')
         with self.assertRaises(NoReverseMatch):
             t.render(Context())
-
-    def test_debug_tag_non_ascii(self):
-        """
-        #23060 -- Test non-ASCII model representation in debug output.
-        """
-        group = Group(name="清風")
-        c1 = Context({"objs": [group]})
-        t1 = Engine().from_string('{% debug %}')
-        self.assertIn("清風", t1.render(c1))
 
     def test_extends_generic_template(self):
         """
