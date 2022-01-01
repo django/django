@@ -194,7 +194,13 @@ from its first value when it's next encountered.
 ---------
 
 Outputs a whole load of debugging information, including the current context
-and imported modules.
+and imported modules. ``{% debug %}`` outputs nothing when the :setting:`DEBUG`
+setting is ``False``.
+
+.. versionchanged:: 2.2.27
+
+    In older versions, debugging information was displayed when the
+    :setting:`DEBUG` setting was ``False``.
 
 .. templatetag:: extends
 
