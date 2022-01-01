@@ -2025,6 +2025,14 @@ class ExpressionWrapperTests(SimpleTestCase):
         self.assertEqual(group_by_cols, [expr.expression])
         self.assertEqual(group_by_cols[0].output_field, expr.output_field)
 
+    def test_deconstruct_output_field(self):
+        ew = ExpressionWrapper('name', output_field=CharField())
+        path, args, kwargs = ew.deconstruct()
+        self.assertEqual(path, 'django.db.models.ExpressionWrapper')
+        self.assertEqual(args, (ew.expression,))
+        self.assertEqual(len(kwargs), 1)
+        self.assertEqual(kwargs['output_field'].deconstruct(), CharField().deconstruct())
+
 
 class OrderByTests(SimpleTestCase):
     def test_equal(self):
@@ -2046,3 +2054,10 @@ class OrderByTests(SimpleTestCase):
             hash(OrderBy(F('field'), nulls_last=True)),
             hash(OrderBy(F('field'), nulls_last=False)),
         )
+
+    def test_deconstruct_expression(self):
+        order = OrderBy(Expression('name'))
+        path, args, kwargs = order.deconstruct()
+        self.assertEqual(path, 'django.db.models.OrderBy')
+        self.assertEqual(args, (order.expression,))
+        self.assertEqual(kwargs, {})

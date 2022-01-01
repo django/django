@@ -1173,6 +1173,20 @@ class CaseExpressionTests(TestCase):
                     transform=itemgetter('string', 'case', 'integer_sum'),
                 )
 
+    def test_deconstruct(self):
+        case = Case()
+        path, args, kwargs = case.deconstruct()
+        self.assertEqual(path, 'django.db.models.Case')
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {})
+
+    def test_deconstruct_extra(self):
+        case = Case(extra='extra')
+        path, args, kwargs = case.deconstruct()
+        self.assertEqual(path, 'django.db.models.Case')
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, case.extra)
+
 
 class CaseDocumentationExamples(TestCase):
     @classmethod

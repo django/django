@@ -390,7 +390,7 @@ class BaseExpression:
         return sql, params
 
 
-@deconstructible
+@deconstructible(path='django.db.models.Expression')
 class Expression(BaseExpression, Combinable):
     """An expression that can be combined with other expressions."""
 
@@ -639,7 +639,6 @@ class ResolvedOuterRef(F):
         return []
 
 
-@deconstructible(path='django.db.models.OuterRef')
 class OuterRef(F):
     contains_aggregate = False
 
@@ -810,6 +809,7 @@ class Value(SQLiteNumericMixin, Expression):
         return self.value
 
 
+@deconstructible(path='django.db.models.RawSQL')
 class RawSQL(Expression):
     def __init__(self, sql, params, output_field=None):
         if output_field is None:
@@ -1314,7 +1314,6 @@ class OrderBy(Expression):
         self.descending = True
 
 
-@deconstructible(path='django.db.models.Window')
 class Window(SQLiteNumericMixin, Expression):
     template = '%(expression)s OVER (%(window)s)'
     # Although the main expression may either be an aggregate or an
@@ -1420,7 +1419,6 @@ class Window(SQLiteNumericMixin, Expression):
         return []
 
 
-@deconstructible(path='django.db.models.WindowFrame')
 class WindowFrame(Expression):
     """
     Model the frame clause in window expressions. There are two types of frame
@@ -1480,7 +1478,6 @@ class WindowFrame(Expression):
         raise NotImplementedError('Subclasses must implement window_frame_start_end().')
 
 
-@deconstructible(path='django.db.models.RowRange')
 class RowRange(WindowFrame):
     frame_type = 'ROWS'
 
@@ -1488,7 +1485,6 @@ class RowRange(WindowFrame):
         return connection.ops.window_frame_rows_start_end(start, end)
 
 
-@deconstructible(path='django.db.models.ValueRange')
 class ValueRange(WindowFrame):
     frame_type = 'RANGE'
 
