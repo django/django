@@ -508,7 +508,7 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
             pass
 
     def test_error_message(self):
-        msg = 'template_used/base.html was not rendered. No template was rendered.'
+        msg = 'No templates used to render the response'
         with self.assertRaisesMessage(AssertionError, msg):
             with self.assertTemplateUsed('template_used/base.html'):
                 pass
@@ -518,8 +518,8 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
                 pass
 
         msg2 = (
-            'template_used/base.html was not rendered. Following templates '
-            'were rendered: template_used/alternative.html'
+            "Template 'template_used/base.html' was not a template used to render "
+            "the response. Actual template(s) used: template_used/alternative.html"
         )
         with self.assertRaisesMessage(AssertionError, msg2):
             with self.assertTemplateUsed('template_used/base.html'):
@@ -528,6 +528,43 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
         with self.assertRaisesMessage(AssertionError, 'No templates used to render the response'):
             response = self.client.get('/test_utils/no_template_used/')
             self.assertTemplateUsed(response, 'template_used/base.html')
+
+    def test_msg_prefix(self):
+        msg_prefix = 'Prefix'
+        msg = f'{msg_prefix}: No templates used to render the response'
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertTemplateUsed('template_used/base.html', msg_prefix=msg_prefix):
+                pass
+
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertTemplateUsed(
+                template_name='template_used/base.html',
+                msg_prefix=msg_prefix,
+            ):
+                pass
+
+        msg = (
+            f"{msg_prefix}: Template 'template_used/base.html' was not a "
+            f"template used to render the response. Actual template(s) used: "
+            f"template_used/alternative.html"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertTemplateUsed('template_used/base.html', msg_prefix=msg_prefix):
+                render_to_string('template_used/alternative.html')
+
+    def test_count(self):
+        with self.assertTemplateUsed('template_used/base.html', count=2):
+            render_to_string('template_used/base.html')
+            render_to_string('template_used/base.html')
+
+        msg = (
+            "Template 'template_used/base.html' was expected to be rendered "
+            "3 time(s) but was actually rendered 2 time(s)."
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertTemplateUsed('template_used/base.html', count=3):
+                render_to_string('template_used/base.html')
+                render_to_string('template_used/base.html')
 
     def test_failure(self):
         msg = 'response and/or template_name argument must be provided'
@@ -549,8 +586,9 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
                 pass
 
         msg = (
-            'template_used/base.html was not rendered. Following '
-            'templates were rendered: template_used/alternative.html'
+            "Template 'template_used/base.html' was not a template used to "
+            "render the response. Actual template(s) used: "
+            "template_used/alternative.html"
         )
         with self.assertRaisesMessage(AssertionError, msg):
             with self.assertTemplateUsed('template_used/base.html'):

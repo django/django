@@ -93,9 +93,12 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
 
 
 class _AssertTemplateUsedContext:
-    def __init__(self, test_case, template_name):
+    def __init__(self, test_case, template_name, msg_prefix='', count=None):
         self.test_case = test_case
         self.template_name = template_name
+        self.msg_prefix = msg_prefix
+        self.count = count
+
         self.rendered_templates = []
         self.rendered_template_names = []
         self.context = ContextList()
@@ -106,10 +109,10 @@ class _AssertTemplateUsedContext:
         self.context.append(copy(context))
 
     def test(self):
-        return self.template_name in self.rendered_template_names
-
-    def message(self):
-        return '%s was not rendered.' % self.template_name
+        self.test_case._assert_template_used(
+            self.template_name, self.rendered_template_names, self.msg_prefix,
+            self.count,
+        )
 
     def __enter__(self):
         template_rendered.connect(self.on_template_render)
@@ -119,24 +122,16 @@ class _AssertTemplateUsedContext:
         template_rendered.disconnect(self.on_template_render)
         if exc_type is not None:
             return
-
-        if not self.test():
-            message = self.message()
-            if self.rendered_templates:
-                message += ' Following templates were rendered: %s' % (
-                    ', '.join(self.rendered_template_names)
-                )
-            else:
-                message += ' No template was rendered.'
-            self.test_case.fail(message)
+        self.test()
 
 
 class _AssertTemplateNotUsedContext(_AssertTemplateUsedContext):
     def test(self):
-        return self.template_name not in self.rendered_template_names
-
-    def message(self):
-        return '%s was rendered.' % self.template_name
+        self.test_case.assertFalse(
+            self.template_name in self.rendered_template_names,
+            f"{self.msg_prefix}Template '{self.template_name}' was used "
+            f"unexpectedly in rendering the response"
+        )
 
 
 class DatabaseOperationForbidden(AssertionError):
@@ -646,18 +641,7 @@ class SimpleTestCase(unittest.TestCase):
         template_names = [t.name for t in response.templates if t.name is not None]
         return None, template_names, msg_prefix
 
-    def assertTemplateUsed(self, response=None, template_name=None, msg_prefix='', count=None):
-        """
-        Assert that the template with the provided name was used in rendering
-        the response. Also usable as context manager.
-        """
-        context_mgr_template, template_names, msg_prefix = self._get_template_used(
-            response, template_name, msg_prefix, 'assertTemplateUsed',
-        )
-        if context_mgr_template:
-            # Use assertTemplateUsed as context manager.
-            return _AssertTemplateUsedContext(self, context_mgr_template)
-
+    def _assert_template_used(self, template_name, template_names, msg_prefix, count):
         if not template_names:
             self.fail(msg_prefix + "No templates used to render the response")
         self.assertTrue(
@@ -675,6 +659,20 @@ class SimpleTestCase(unittest.TestCase):
                 % (template_name, count, template_names.count(template_name))
             )
 
+    def assertTemplateUsed(self, response=None, template_name=None, msg_prefix='', count=None):
+        """
+        Assert that the template with the provided name was used in rendering
+        the response. Also usable as context manager.
+        """
+        context_mgr_template, template_names, msg_prefix = self._get_template_used(
+            response, template_name, msg_prefix, 'assertTemplateUsed',
+        )
+        if context_mgr_template:
+            # Use assertTemplateUsed as context manager.
+            return _AssertTemplateUsedContext(self, context_mgr_template, msg_prefix, count)
+
+        self._assert_template_used(template_name, template_names, msg_prefix, count)
+
     def assertTemplateNotUsed(self, response=None, template_name=None, msg_prefix=''):
         """
         Assert that the template with the provided name was NOT used in
@@ -685,7 +683,7 @@ class SimpleTestCase(unittest.TestCase):
         )
         if context_mgr_template:
             # Use assertTemplateNotUsed as context manager.
-            return _AssertTemplateNotUsedContext(self, context_mgr_template)
+            return _AssertTemplateNotUsedContext(self, context_mgr_template, msg_prefix)
 
         self.assertFalse(
             template_name in template_names,
