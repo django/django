@@ -8,6 +8,16 @@ Django 4.0.2 fixes two security issues with severity "medium" and several bugs
 in 4.0.1. Also, the latest string translations from Transifex are incorporated,
 with a special mention for Bulgarian (fully translated).
 
+CVE-2022-22818: Possible XSS via ``{% debug %}`` template tag
+=============================================================
+
+The ``{% debug %}`` template tag didn't properly encode the current context,
+posing an XSS attack vector.
+
+In order to avoid this vulnerability, ``{% debug %}`` no longer outputs an
+information when the ``DEBUG`` setting is ``False``, and it ensures all context
+variables are correctly escaped when the ``DEBUG`` setting is ``True``.
+
 Bugfixes
 ========
 
