@@ -19,10 +19,18 @@ class DeconstructibleWithPathClass:
     pass
 
 
+class DeconstructibleWithPathChildClass(DeconstructibleWithPathClass):
+    pass
+
+
 @deconstructible(
     path='utils_tests.deconstructible_classes.DeconstructibleInvalidPathClass',
 )
 class DeconstructibleInvalidPathClass:
+    pass
+
+
+class DeconstructibleInvalidPathChildClass(DeconstructibleInvalidPathClass):
     pass
 
 
@@ -51,6 +59,16 @@ class DeconstructibleTests(SimpleTestCase):
         self.assertEqual(args, ('arg',))
         self.assertEqual(kwargs, {'key': 'value'})
 
+    def test_deconstruct_child_with_path(self):
+        obj = DeconstructibleWithPathChildClass('arg', key='value')
+        path, args, kwargs = obj.deconstruct()
+        self.assertEqual(
+            path,
+            'utils_tests.test_deconstruct.DeconstructibleWithPathChildClass',
+        )
+        self.assertEqual(args, ('arg',))
+        self.assertEqual(kwargs, {'key': 'value'})
+
     def test_invalid_path(self):
         obj = DeconstructibleInvalidPathClass()
         docs_version = get_docs_version()
@@ -66,3 +84,13 @@ class DeconstructibleTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             obj.deconstruct()
+
+    def test_parent_invalid_path(self):
+        obj = DeconstructibleInvalidPathChildClass('arg', key='value')
+        path, args, kwargs = obj.deconstruct()
+        self.assertEqual(
+            path,
+            'utils_tests.test_deconstruct.DeconstructibleInvalidPathChildClass',
+        )
+        self.assertEqual(args, ('arg',))
+        self.assertEqual(kwargs, {'key': 'value'})
