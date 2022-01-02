@@ -988,6 +988,14 @@ class BaseDatabaseSchemaEditor:
             new_field.remote_field.through._meta.get_field(new_field.m2m_field_name()),
         )
 
+    def _get_index_name_part(self, name_part, max_length):
+        if len(name_part.encode()) == len(name_part):
+            return name_part[:max_length]
+        # Shorten name accounting for multibyte characters.
+        while len(name_part.encode()) > max_length:
+            name_part = name_part[:-1]
+        return name_part
+
     def _create_index_name(self, table_name, column_names, suffix=""):
         """
         Generate a unique name for an index/unique constraint.
@@ -998,17 +1006,18 @@ class BaseDatabaseSchemaEditor:
         _, table_name = split_identifier(table_name)
         hash_suffix_part = '%s%s' % (names_digest(table_name, *column_names, length=8), suffix)
         max_length = self.connection.ops.max_name_length() or 200
+        joined_column_names = '_'.join(column_names)
         # If everything fits into max_length, use that name.
-        index_name = '%s_%s_%s' % (table_name, '_'.join(column_names), hash_suffix_part)
-        if len(index_name) <= max_length:
+        index_name = f'{table_name}_{joined_column_names}_{hash_suffix_part}'
+        if len(index_name.encode()) <= max_length:
             return index_name
         # Shorten a long suffix.
         if len(hash_suffix_part) > max_length / 3:
             hash_suffix_part = hash_suffix_part[:max_length // 3]
         other_length = (max_length - len(hash_suffix_part)) // 2 - 1
         index_name = '%s_%s_%s' % (
-            table_name[:other_length],
-            '_'.join(column_names)[:other_length],
+            self._get_index_name_part(table_name, other_length),
+            self._get_index_name_part(joined_column_names, other_length),
             hash_suffix_part,
         )
         # Prepend D if needed to prevent the name from starting with an

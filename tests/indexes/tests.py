@@ -56,6 +56,23 @@ class SchemaIndexesTests(TestCase):
             self.skipTest('This test is only supported on the built-in database backends.')
         self.assertEqual(index_name, expected[connection.vendor])
 
+    def test_index_name_multibyte(self):
+        """Index names with multibyte chars in table and column names."""
+        max_length = connection.ops.max_name_length() or 200
+        hash_suffix_length = 10
+        half_max_length = (max_length - hash_suffix_length) // 2 - 1
+        # ♥ and ♣ are three bytes long.
+        number_of_chars_exceeding_limit = (half_max_length // 3) + 1
+        long_table_name = '♥' * number_of_chars_exceeding_limit
+        long_column_name = '♣' * number_of_chars_exceeding_limit
+        editor = connection.schema_editor()
+        index_name = editor._create_index_name(
+            table_name=long_table_name,
+            column_names=('c1', 'c2', long_column_name),
+            suffix='ix',
+        )
+        self.assertLessEqual(len(index_name.encode()), max_length)
+
     def test_index_together(self):
         editor = connection.schema_editor()
         index_sql = [str(statement) for statement in editor._model_indexes_sql(Article)]
