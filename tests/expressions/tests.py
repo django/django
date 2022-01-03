@@ -1859,6 +1859,7 @@ class ValueTests(TestCase):
         and this demonstrates that they don't throw an exception.
         """
         value_types = [
+            'str',
             True,
             42,
             3.14,
