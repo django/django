@@ -45,7 +45,8 @@ from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils.datastructures import MultiValueDict
 from django.utils.safestring import mark_safe
-from tests.forms_tests.tests import jinja2_tests
+
+from . import jinja2_tests
 
 
 class FrameworkForm(Form):
