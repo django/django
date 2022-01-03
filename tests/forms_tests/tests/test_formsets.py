@@ -14,7 +14,8 @@ from django.forms.formsets import (
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.test import SimpleTestCase
-from tests.forms_tests.tests import jinja2_tests
+
+from . import jinja2_tests
 
 
 class Choice(Form):
