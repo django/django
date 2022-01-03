@@ -13,7 +13,6 @@ from collections import namedtuple
 from django.core.exceptions import FieldError
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
-from django.utils.deconstruct import deconstructible
 
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
@@ -27,7 +26,6 @@ def subclasses(cls):
         yield from subclasses(subclass)
 
 
-@deconstructible(path='django.db.models.Q')
 class Q(tree.Node):
     """
     Encapsulate filters as objects that can then be combined logically (using
