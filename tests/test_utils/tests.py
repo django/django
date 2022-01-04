@@ -26,10 +26,11 @@ from django.test import (
 from django.test.html import HTMLParseError, parse_html
 from django.test.testcases import DatabaseOperationForbidden
 from django.test.utils import (
-    CaptureQueriesContext, TestContextDecorator, isolate_apps,
+    CaptureQueriesContext, TestContextDecorator, ignore_warnings, isolate_apps,
     override_settings, setup_test_environment,
 )
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.log import DEFAULT_LOGGING
 
 from .models import Car, Person, PossessedCar
@@ -1418,6 +1419,20 @@ class AssertFormErrorTests(SimpleTestCase):
         response = mock.Mock(context=[{'form': TestForm.invalid(nonfield=True)}])
         self.assertFormError(response, 'form', None, 'non-field error')
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
+    def test_errors_none(self):
+        response = mock.Mock(context=[{'form': TestForm.invalid()}])
+        self.assertFormError(response, 'form', 'field', None)
+
+    def test_errors_none_warning(self):
+        response = mock.Mock(context=[{'form': TestForm.invalid()}])
+        msg = (
+            'Passing errors=None to assertFormError() is deprecated, use '
+            'errors=[] instead.'
+        )
+        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+            self.assertFormError(response, 'form', 'value', None)
+
 
 class AssertFormsetErrorTests(SimpleTestCase):
     def _get_formset_data(self, field_value):
@@ -1559,6 +1574,20 @@ class AssertFormsetErrorTests(SimpleTestCase):
             {'form': formset.management_form},
         ])
         self.assertFormsetError(response, 'form', 0, 'field', 'invalid value')
+
+    @ignore_warnings(category=RemovedInDjango50Warning)
+    def test_errors_none(self):
+        response = mock.Mock(context=[{'formset': TestFormset.invalid()}])
+        self.assertFormsetError(response, 'formset', 0, 'field', None)
+
+    def test_errors_none_warning(self):
+        response = mock.Mock(context=[{'formset': TestFormset.invalid()}])
+        msg = (
+            'Passing errors=None to assertFormsetError() is deprecated, use '
+            'errors=[] instead.'
+        )
+        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+            self.assertFormsetError(response, 'formset', 0, 'field', None)
 
 
 class FirstUrls:

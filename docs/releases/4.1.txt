@@ -385,6 +385,11 @@ Miscellaneous
             ),
         ]
 
+* The undocumented ability to pass ``errors=None`` to
+  :meth:`.SimpleTestCase.assertFormError` and
+  :meth:`~.SimpleTestCase.assertFormsetError` is deprecated. Use ``errors=[]``
+  instead.
+
 Features removed in 4.1
 =======================
 

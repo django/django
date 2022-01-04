@@ -6,6 +6,7 @@ import posixpath
 import sys
 import threading
 import unittest
+import warnings
 from collections import Counter
 from contextlib import contextmanager
 from copy import copy, deepcopy
@@ -41,6 +42,7 @@ from django.test.utils import (
     CaptureQueriesContext, ContextList, compare_xml, modify_settings,
     override_settings,
 )
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import classproperty
 from django.utils.version import PY310
 from django.views.static import serve
@@ -50,13 +52,8 @@ __all__ = ('TestCase', 'TransactionTestCase',
 
 
 def to_list(value):
-    """
-    Put value into a list if it's not already one. Return an empty list if
-    value is None.
-    """
-    if value is None:
-        value = []
-    elif not isinstance(value, list):
+    """Put value into a list if it's not already one."""
+    if not isinstance(value, list):
         value = [value]
     return value
 
@@ -493,10 +490,18 @@ class SimpleTestCase(unittest.TestCase):
             msg_prefix += ": "
 
         # Put context(s) into a list to simplify processing.
-        contexts = to_list(response.context)
+        contexts = [] if response.context is None else to_list(response.context)
         if not contexts:
             self.fail(msg_prefix + "Response did not use any contexts to render the response")
 
+        if errors is None:
+            warnings.warn(
+                'Passing errors=None to assertFormError() is deprecated, use '
+                'errors=[] instead.',
+                RemovedInDjango50Warning,
+                stacklevel=2,
+            )
+            errors = []
         # Put error(s) into a list to simplify processing.
         errors = to_list(errors)
 
@@ -556,11 +561,19 @@ class SimpleTestCase(unittest.TestCase):
             msg_prefix += ": "
 
         # Put context(s) into a list to simplify processing.
-        contexts = to_list(response.context)
+        contexts = [] if response.context is None else to_list(response.context)
         if not contexts:
             self.fail(msg_prefix + 'Response did not use any contexts to '
                       'render the response')
 
+        if errors is None:
+            warnings.warn(
+                'Passing errors=None to assertFormsetError() is deprecated, '
+                'use errors=[] instead.',
+                RemovedInDjango50Warning,
+                stacklevel=2,
+            )
+            errors = []
         # Put error(s) into a list to simplify processing.
         errors = to_list(errors)
 

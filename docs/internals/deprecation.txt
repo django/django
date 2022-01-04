@@ -75,6 +75,10 @@ details on these changes.
 * The ``opclasses`` argument of
   ``django.contrib.postgres.constraints.ExclusionConstraint`` will be removed.
 
+* The undocumented ability to pass ``errors=None`` to
+  ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` will be
+  removed.
+
 .. _deprecation-removed-in-4.1:
 
 4.1
