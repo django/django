@@ -68,8 +68,6 @@ of built-in generic views to help generate list and detail views of objects.
 Let's start by looking at some examples of showing a list of objects or an
 individual object.
 
-.. comment: link here to the other topic pages (form handling, date based, mixins)
-
 We'll be using these models::
 
     # models.py
