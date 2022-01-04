@@ -1228,7 +1228,7 @@ implementation details see :ref:`using-the-views`.
 
     **Attributes:**
 
-    .. attribute: template_name
+    .. attribute:: template_name
 
         The full name of a template to use for displaying the password change
         form. Defaults to :file:`registration/password_change_form.html` if not
