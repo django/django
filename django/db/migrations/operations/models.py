@@ -34,8 +34,11 @@ class ModelOperation(Operation):
     def reduce(self, operation, app_label):
         return (
             super().reduce(operation, app_label) or
-            not operation.references_model(self.name, app_label)
+            self.can_reduce_through(operation, app_label)
         )
+
+    def can_reduce_through(self, operation, app_label):
+        return not operation.references_model(self.name, app_label)
 
 
 class CreateModel(ModelOperation):
@@ -527,6 +530,14 @@ class AlterTogetherOptionOperation(ModelOptionOperation):
     @property
     def migration_name_fragment(self):
         return 'alter_%s_%s' % (self.name_lower, self.option_name)
+
+    def can_reduce_through(self, operation, app_label):
+        return (
+            super().can_reduce_through(operation, app_label) or (
+                isinstance(operation, AlterTogetherOptionOperation) and
+                type(operation) is not type(self)
+            )
+        )
 
 
 class AlterUniqueTogether(AlterTogetherOptionOperation):
