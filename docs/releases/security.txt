@@ -36,6 +36,47 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+January 4, 2022 - :cve:`2021-45452`
+------------------------------------
+
+Potential directory-traversal via ``Storage.save()``. `Full description
+<https://www.djangoproject.com/weblog/2022/jan/04/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 4.0 :commit:`(patch) <e1592e0f26302e79856cc7f2218ae848ae19b0f6>`
+* Django 3.2 :commit:`(patch) <8d2f7cff76200cbd2337b2cf1707e383eb1fb54b>`
+* Django 2.2 :commit:`(patch) <4cb35b384ceef52123fc66411a73c36a706825e1>`
+
+January 4, 2022 - :cve:`2021-45116`
+------------------------------------
+
+Potential information disclosure in ``dictsort`` template filter. `Full
+description
+<https://www.djangoproject.com/weblog/2022/jan/04/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 4.0 :commit:`(patch) <2a8ec7f546d6d5806e221ec948c5146b55bd7489>`
+* Django 3.2 :commit:`(patch) <c7fe895bca06daf12cc1670b56eaf72a1ef27a16>`
+* Django 2.2 :commit:`(patch) <c9f648ccfac5ab90fb2829a66da4f77e68c7f93a>`
+
+January 4, 2022 - :cve:`2021-45115`
+------------------------------------
+
+Denial-of-service possibility in ``UserAttributeSimilarityValidator``. `Full
+description
+<https://www.djangoproject.com/weblog/2022/jan/04/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 4.0 :commit:`(patch) <df79ef03ac867c93caaa6be56bc69e66abfeef8f>`
+* Django 3.2 :commit:`(patch) <a8b32fe13bcaed1c0b772fdc53de84abc224fb20>`
+* Django 2.2 :commit:`(patch) <2135637fdd5ce994de110affef9e67dffdf77277>`
+
 December 7, 2021 - :cve:`2021-44420`
 ------------------------------------
 
