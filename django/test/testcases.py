@@ -1253,18 +1253,16 @@ class TestCase(TransactionTestCase):
         try:
             yield callbacks
         finally:
-            callback_count = len(connections[using].run_on_commit)
             while True:
-                run_on_commit = connections[using].run_on_commit[start_count:]
-                callbacks[:] = [func for sids, func in run_on_commit]
-                if execute:
-                    for callback in callbacks:
+                callback_count = len(connections[using].run_on_commit)
+                for _, callback in connections[using].run_on_commit[start_count:]:
+                    callbacks.append(callback)
+                    if execute:
                         callback()
 
                 if callback_count == len(connections[using].run_on_commit):
                     break
-                start_count = callback_count - 1
-                callback_count = len(connections[using].run_on_commit)
+                start_count = callback_count
 
 
 class CheckCondition:
