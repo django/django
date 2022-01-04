@@ -125,6 +125,10 @@ class RedisCacheClient:
             k: self._serializer.loads(v) for k, v in zip(keys, ret) if v is not None
         }
 
+    def get_keys(self, pattern):
+        client = self.get_client(None)
+        return client.keys(pattern)
+
     def has_key(self, key):
         client = self.get_client(key)
         return bool(client.exists(key))
@@ -202,6 +206,9 @@ class RedisCache(BaseCache):
         key_map = {self.make_and_validate_key(key, version=version): key for key in keys}
         ret = self._cache.get_many(key_map.keys())
         return {key_map[k]: v for k, v in ret.items()}
+
+    def keys(self, pattern):
+        return self._cache.get_keys(pattern)
 
     def has_key(self, key, version=None):
         key = self.make_and_validate_key(key, version=version)
