@@ -37,26 +37,26 @@ label {
 
 /* RADIO BUTTONS */
 
-form ul.radiolist li {
+form div.radiolist li {
     list-style-type: none;
 }
 
-form ul.radiolist label {
+form div.radiolist label {
     float: none;
     display: inline;
 }
 
-form ul.radiolist input[type="radio"] {
+form div.radiolist input[type="radio"] {
     margin: -2px 4px 0 0;
     padding: 0;
 }
 
-form ul.inline {
+form div.inline {
     margin-left: 0;
     padding: 0;
 }
 
-form ul.inline li {
+form div.inline li {
     float: left;
     padding-right: 7px;
 }
@@ -87,7 +87,7 @@ form ul.inline li {
     overflow-wrap: break-word;
 }
 
-.aligned ul label {
+.aligned div label {
     display: inline;
     float: none;
     width: auto;
@@ -101,12 +101,12 @@ form ul.inline li {
     width: 350px;
 }
 
-form .aligned ul {
+form .aligned div {
     margin-left: 160px;
     padding-left: 10px;
 }
 
-form .aligned ul.radiolist {
+form .aligned div.radiolist {
     display: inline-block;
     margin: 0;
     padding: 0;
@@ -142,7 +142,7 @@ form .aligned select + div.help {
     padding-left: 10px;
 }
 
-form .aligned ul li {
+form .aligned div li {
     list-style: none;
 }
 
@@ -196,7 +196,7 @@ form .wide div.help {
     padding-left: 38px;
 }
 
-form div.help ul {
+form div.help div {
     padding-left: 0;
     margin-left: 0;
 }
@@ -461,13 +461,13 @@ body.popup .submit-row {
     _width: 700px;
 }
 
-.inline-group ul.tools {
+.inline-group div.tools {
     padding: 0;
     margin: 0;
     list-style: none;
 }
 
-.inline-group ul.tools li {
+.inline-group div.tools li {
     display: inline;
     padding: 0 5px;
 }
@@ -485,7 +485,7 @@ body.popup .submit-row {
     border-bottom: 1px solid var(--hairline-color);
 }
 
-.inline-group ul.tools a.add,
+.inline-group div.tools a.add,
 .inline-group div.add-row a,
 .inline-group .tabular tr.add-row td a {
     background: url(../img/icon-addlink.svg) 0 1px no-repeat;
@@ -513,7 +513,7 @@ body.popup .submit-row {
     background-image: url(../img/search.svg);
 }
 
-form .related-widget-wrapper ul {
+form .related-widget-wrapper div {
     display: inline-block;
     margin-left: 0;
     padding-left: 0;
