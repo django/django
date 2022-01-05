@@ -51,7 +51,7 @@ form div.radiolist input[type="radio"] {
     padding: 0;
 }
 
-form div.inline {
+form ul.inline, form div.inline {
     margin-left: 0;
     padding: 0;
 }
