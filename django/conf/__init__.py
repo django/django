@@ -246,7 +246,7 @@ class Settings:
         while traceback:
             # Continue stepping through frames as long as we're in the importlib module.
             file = traceback.tb_frame.f_code.co_filename
-            if "importlib" not in file:
+            if not ("importlib" in Path(file).parts or file.startswith('<frozen importlib.')):
                 # The settings module was found before something went wrong.
                 return True
             traceback = traceback.tb_next
