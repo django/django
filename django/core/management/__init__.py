@@ -368,7 +368,9 @@ class ManagementUtility:
         try:
             settings.INSTALLED_APPS
         except ImproperlyConfigured as exc:
-            print(exc)
+            # The following commands can be run even without a valid settings file configured
+            if subcommand not in {'startproject', 'startapp', 'makemessages'}:
+                sys.stderr.write(str(exc) + '\n')
             self.settings_exception = exc
 
         if settings.configured:
