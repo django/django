@@ -196,7 +196,7 @@ form .wide div.help {
     padding-left: 38px;
 }
 
-form div.help div {
+form div.help ul, form div.help div {
     padding-left: 0;
     margin-left: 0;
 }
