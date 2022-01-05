@@ -625,7 +625,7 @@ class SimpleTestCase(unittest.TestCase):
         if not found_formset:
             self.fail(msg_prefix + "The formset '%s' was not used to render the response" % formset)
 
-    def _assert_template_used(self, response, template_name, msg_prefix, method_name):
+    def _get_template_used(self, response, template_name, msg_prefix, method_name):
 
         if response is None and template_name is None:
             raise TypeError('response and/or template_name argument must be provided')
@@ -651,7 +651,7 @@ class SimpleTestCase(unittest.TestCase):
         Assert that the template with the provided name was used in rendering
         the response. Also usable as context manager.
         """
-        context_mgr_template, template_names, msg_prefix = self._assert_template_used(
+        context_mgr_template, template_names, msg_prefix = self._get_template_used(
             response, template_name, msg_prefix, 'assertTemplateUsed',
         )
         if context_mgr_template:
@@ -680,7 +680,7 @@ class SimpleTestCase(unittest.TestCase):
         Assert that the template with the provided name was NOT used in
         rendering the response. Also usable as context manager.
         """
-        context_mgr_template, template_names, msg_prefix = self._assert_template_used(
+        context_mgr_template, template_names, msg_prefix = self._get_template_used(
             response, template_name, msg_prefix, 'assertTemplateNotUsed',
         )
         if context_mgr_template:
