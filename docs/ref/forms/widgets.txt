@@ -277,7 +277,8 @@ foundation for custom widgets.
     .. method:: id_for_label(id_)
 
         Returns the HTML ID attribute of this widget for use by a ``<label>``,
-        given the ID of the field. Returns ``None`` if an ID isn't available.
+        given the ID of the field. Returns an empty string if an ID isn't
+        available.
 
         This hook is necessary because some widgets have multiple HTML
         elements and, thus, multiple IDs. In that case, this method should
