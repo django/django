@@ -1,8 +1,8 @@
-import os
+
 import site
 import sys
 from distutils.sysconfig import get_python_lib
-
+import os
 from setuptools import setup
 
 # Allow editable install into user site directory.
