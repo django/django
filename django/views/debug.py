@@ -359,6 +359,7 @@ class ExceptionReporter:
             c['request_FILES_items'] = self.request.FILES.items()
             c['request_COOKIES_items'] = self.request.COOKIES.items()
             c['request_insecure_uri'] = self._get_raw_insecure_uri()
+            c['raising_view_name'] = get_caller(self.request)
 
         # Check whether exception info is available
         if self.exc_type:

@@ -133,6 +133,12 @@
       <td><span class="fname">{{ lastframe.filename }}</span>, line {{ lastframe.lineno }}, in {{ lastframe.function }}</td>
     </tr>
 {% endif %}
+{% if raising_view_name %}
+    <tr>
+      <th>Raised during:</th>
+      <td>{{ raising_view_name }}</td>
+    </tr>
+{% endif %}
     <tr>
       <th>Python Executable:</th>
       <td>{{ sys_executable }}</td>

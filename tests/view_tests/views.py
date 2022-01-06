@@ -51,6 +51,14 @@ def raises500(request):
         return technical_500_response(request, *sys.exc_info())
 
 
+class Raises500View(View):
+    def get(self, request):
+        try:
+            raise Exception
+        except Exception:
+            return technical_500_response(request, *sys.exc_info())
+
+
 def raises400(request):
     raise SuspiciousOperation
 
