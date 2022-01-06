@@ -4,6 +4,7 @@ import re
 import types
 from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
 from functools import wraps
+from inspect import unwrap
 from operator import itemgetter
 from pprint import pformat
 from urllib.parse import quote
@@ -37,20 +38,15 @@ def stringfilter(func):
     Decorator for filters which should only receive strings. The object
     passed as the first positional argument will be converted to a string.
     """
-    def _dec(*args, **kwargs):
-        args = list(args)
-        args[0] = str(args[0])
-        if (isinstance(args[0], SafeData) and
-                getattr(_dec._decorated_function, 'is_safe', False)):
-            return mark_safe(func(*args, **kwargs))
-        return func(*args, **kwargs)
+    @wraps(func)
+    def _dec(first, *args, **kwargs):
+        first = str(first)
+        result = func(first, *args, **kwargs)
+        if isinstance(first, SafeData) and getattr(unwrap(func), 'is_safe', False):
+            result = mark_safe(result)
+        return result
 
-    # Include a reference to the real function (used to check original
-    # arguments by the template parser, and to bear the 'is_safe' attribute
-    # when multiple decorators are applied).
-    _dec._decorated_function = getattr(func, '_decorated_function', func)
-
-    return wraps(func)(_dec)
+    return _dec
 
 
 ###################

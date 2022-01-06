@@ -48,7 +48,7 @@ class Library:
             )
 
     def tag_function(self, func):
-        self.tags[getattr(func, "_decorated_function", func).__name__] = func
+        self.tags[func.__name__] = func
         return func
 
     def filter(self, name=None, filter_func=None, **flags):
@@ -83,8 +83,7 @@ class Library:
                     setattr(filter_func, attr, value)
                     # set the flag on the innermost decorated function
                     # for decorators that need it, e.g. stringfilter
-                    if hasattr(filter_func, "_decorated_function"):
-                        setattr(filter_func._decorated_function, attr, value)
+                    setattr(unwrap(filter_func), attr, value)
             filter_func._filter_name = name
             return filter_func
         else:
@@ -94,8 +93,7 @@ class Library:
             )
 
     def filter_function(self, func, **flags):
-        name = getattr(func, "_decorated_function", func).__name__
-        return self.filter(name, func, **flags)
+        return self.filter(func.__name__, func, **flags)
 
     def simple_tag(self, func=None, takes_context=None, name=None):
         """
@@ -107,7 +105,7 @@ class Library:
         """
         def dec(func):
             params, varargs, varkw, defaults, kwonly, kwonly_defaults, _ = getfullargspec(unwrap(func))
-            function_name = (name or getattr(func, '_decorated_function', func).__name__)
+            function_name = (name or func.__name__)
 
             @functools.wraps(func)
             def compile_func(parser, token):
@@ -144,7 +142,7 @@ class Library:
         """
         def dec(func):
             params, varargs, varkw, defaults, kwonly, kwonly_defaults, _ = getfullargspec(unwrap(func))
-            function_name = (name or getattr(func, '_decorated_function', func).__name__)
+            function_name = name or func.__name__
 
             @functools.wraps(func)
             def compile_func(parser, token):
