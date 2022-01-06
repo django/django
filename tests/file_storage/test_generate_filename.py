@@ -47,11 +47,10 @@ class GenerateFilenameStorageTests(SimpleTestCase):
         s = FileSystemStorage()
         msg = "Could not derive file name from '%s'"
         for file_name, base_name in candidates:
-            with self.subTest(file_name=file_name):
-                with self.assertRaisesMessage(SuspiciousFileOperation, msg % base_name):
-                    s.get_available_name(file_name)
-                with self.assertRaisesMessage(SuspiciousFileOperation, msg % base_name):
-                    s.generate_filename(file_name)
+            with self.assertRaisesMessage(SuspiciousFileOperation, msg % base_name):
+                s.get_available_name(file_name)
+            with self.assertRaisesMessage(SuspiciousFileOperation, msg % base_name):
+                s.generate_filename(file_name)
 
     def test_storage_dangerous_paths_dir_name(self):
         file_name = '/tmp/../path'
@@ -67,9 +66,8 @@ class GenerateFilenameStorageTests(SimpleTestCase):
         f = FileField(upload_to='some/folder/')
         msg = "Could not derive file name from '%s'"
         for file_name in candidates:
-            with self.subTest(file_name=file_name):
-                with self.assertRaisesMessage(SuspiciousFileOperation, msg % file_name):
-                    f.generate_filename(None, file_name)
+            with self.assertRaisesMessage(SuspiciousFileOperation, msg % file_name):
+                f.generate_filename(None, file_name)
 
     def test_filefield_dangerous_filename_dir(self):
         f = FileField(upload_to='some/folder/')

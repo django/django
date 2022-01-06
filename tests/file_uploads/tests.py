@@ -85,8 +85,7 @@ class FileUploadTests(TestCase):
                 'c:\\tmp\\.',
             ])
         for file_name in candidates:
-            with self.subTest(file_name=file_name):
-                self.assertRaises(SuspiciousFileOperation, UploadedFile, name=file_name)
+            self.assertRaises(SuspiciousFileOperation, UploadedFile, name=file_name)
 
     def test_simple_upload(self):
         with open(__file__, 'rb') as fp:
@@ -633,7 +632,7 @@ class DirectoryCreationTests(SimpleTestCase):
         self.assertEqual(exc_info.exception.args[0], "%s exists and is not a directory." % UPLOAD_TO)
 
 
-class MultiParserTests(unittest.TestCase):
+class MultiParserTests(TestCase):
 
     def test_empty_upload_handlers(self):
         # We're not actually parsing here; just checking if the parser properly
@@ -670,8 +669,7 @@ class MultiParserTests(unittest.TestCase):
             'CONTENT_LENGTH': '1'
         }, StringIO('x'), [], 'utf-8')
         for file_name in CANDIDATE_TRAVERSAL_FILE_NAMES:
-            with self.subTest(file_name=file_name):
-                self.assertEqual(parser.sanitize_file_name(file_name), 'hax0rd.txt')
+            self.assertEqual(parser.sanitize_file_name(file_name), 'hax0rd.txt')
 
     def test_sanitize_invalid_file_name(self):
         parser = MultiPartParser({
@@ -679,8 +677,7 @@ class MultiParserTests(unittest.TestCase):
             'CONTENT_LENGTH': '1',
         }, StringIO('x'), [], 'utf-8')
         for file_name in CANDIDATE_INVALID_FILE_NAMES:
-            with self.subTest(file_name=file_name):
-                self.assertIsNone(parser.sanitize_file_name(file_name))
+            self.assertIsNone(parser.sanitize_file_name(file_name))
 
     def test_rfc2231_parsing(self):
         test_data = (

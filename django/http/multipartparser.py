@@ -10,6 +10,7 @@ import base64
 import binascii
 import cgi
 import sys
+import HTMLParser
 
 from django.conf import settings
 from django.core.exceptions import (
@@ -327,8 +328,9 @@ class MultiPartParser(object):
         """
         # NOTE Trying to backport to Python 2.7
         # file_name = html.unescape(file_name)
-        file_name = unquote(file_name).decode('utf8')
+        file_name = HTMLParser.HTMLParser().unescape(file_name)
         # NOTE Trying to backport to Python 2.7
+
         file_name = file_name.rsplit('/')[-1]
         file_name = file_name.rsplit('\\')[-1]
 

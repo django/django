@@ -1,9 +1,9 @@
 import errno
 import os
 import warnings
-import pathlib2
 from datetime import datetime
 
+import django.utils.six
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files import File, locks
@@ -20,6 +20,9 @@ from django.utils.functional import LazyObject, cached_property
 from django.utils.module_loading import import_string
 from django.utils.six.moves.urllib.parse import urljoin
 from django.utils.text import get_valid_filename
+
+if django.utils.six.PY2:
+    import pathlib2 as pathlib
 
 __all__ = ('Storage', 'FileSystemStorage', 'DefaultStorage', 'default_storage')
 
@@ -70,7 +73,7 @@ class Storage(object):
         available for new content to be written to.
         """
         dir_name, file_name = os.path.split(name)
-        if '..' in pathlib2.PurePath(dir_name).parts:
+        if '..' in pathlib.PurePath(dir_name).parts:
             raise SuspiciousFileOperation("Detected path traversal attempt in '%s'" % dir_name)
         validate_file_name(file_name)
         file_root, file_ext = os.path.splitext(file_name)
@@ -105,7 +108,7 @@ class Storage(object):
         """
         # `filename` may include a path as returned by FileField.upload_to.
         dirname, filename = os.path.split(filename)
-        if '..' in pathlib2.PurePath(dirname).parts:
+        if '..' in pathlib.PurePath(dirname).parts:
             raise SuspiciousFileOperation("Detected path traversal attempt in '%s'" % dirname)
         return os.path.normpath(os.path.join(dirname, self.get_valid_name(filename)))
 

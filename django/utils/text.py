@@ -246,7 +246,11 @@ def get_valid_filename(name):
     >>> get_valid_filename("john's portrait in 2004.jpg")
     'johns_portrait_in_2004.jpg'
     """
-    s = str(name).strip().replace(' ', '_')
+    # Whatever this is (and it may easily not be a str), make sure it ends up as a unicode type
+    if not isinstance(name,unicode):
+        name = name.decode("utf-8","replace")
+
+    s = name.strip().replace(' ', '_')
     s = re.sub(r'(?u)[^-\w.]', '', s)
     if s in {'', '.', '..'}:
         raise SuspiciousFileOperation("Could not derive file name from '%s'" % name)
@@ -271,10 +275,17 @@ def get_text_list(list_, last_word=ugettext_lazy('or')):
         return ''
     if len(list_) == 1:
         return force_text(list_[0])
-    return '%s %s %s' % (
-        # Translators: This string is used as a separator between list elements
-        _(', ').join(force_text(i) for i in list_[:-1]),
-        force_text(last_word), force_text(list_[-1]))
+    if six.PY2:
+        # Decode added to poper over some differences between str/unicode in Py2
+        return '%s %s %s' % (
+            # Translators: This string is used as a separator between list elements
+            _(', ').decode("utf-8","replace").join(force_text(i) for i in list_[:-1]),
+            force_text(last_word), force_text(list_[-1]))
+    else:
+        return '%s %s %s' % (
+            # Translators: This string is used as a separator between list elements
+            _(', ').join(force_text(i) for i in list_[:-1]),
+            force_text(last_word), force_text(list_[-1]))
 
 
 @keep_lazy_text
