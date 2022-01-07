@@ -68,7 +68,7 @@ def get_commands():
     if not settings.configured:
         return commands
 
-    for app_config in reversed(list(apps.get_app_configs())):
+    for app_config in reversed(apps.get_app_configs()):
         path = os.path.join(app_config.path, 'management')
         commands.update({name: app_config.name for name in find_commands(path)})
 

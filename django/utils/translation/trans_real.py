@@ -191,7 +191,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     def _add_installed_apps_translations(self):
         """Merge translations from each installed app."""
         try:
-            app_configs = reversed(list(apps.get_app_configs()))
+            app_configs = reversed(apps.get_app_configs())
         except AppRegistryNotReady:
             raise AppRegistryNotReady(
                 "The translation infrastructure cannot be initialized before the "
