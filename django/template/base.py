@@ -694,9 +694,10 @@ class FilterExpression:
 
         self.filters = filters
         self.var = var_obj
+        self.is_var = isinstance(var_obj, Variable)
 
     def resolve(self, context, ignore_failures=False):
-        if isinstance(self.var, Variable):
+        if self.is_var:
             try:
                 obj = self.var.resolve(context)
             except VariableDoesNotExist:
