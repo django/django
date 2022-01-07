@@ -630,14 +630,16 @@ class URLResolver:
     def url_patterns(self):
         # urlconf_module might be a valid set of patterns, so we default to it
         patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+        if not issubclass(type(patterns), list):
+            patterns = getattr(self.urlconf_module, "get_urls", lambda: self.urlconf_module)()
         try:
             iter(patterns)
         except TypeError as e:
             msg = (
                 "The included URLconf '{name}' does not appear to have "
-                "any patterns in it. If you see the 'urlpatterns' variable "
-                "with valid patterns in the file then the issue is probably "
-                "caused by a circular import."
+                "any patterns in it nor a get_urls function. If you see "
+                "the 'urlpatterns' variable with valid patterns in the "
+                "file then the issue is probably caused by a circular import."
             )
             raise ImproperlyConfigured(msg.format(name=self.urlconf_name)) from e
         return patterns

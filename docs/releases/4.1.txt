@@ -262,7 +262,7 @@ Tests
 URLs
 ~~~~
 
-* ...
+* Add so urls can also be loaded from `get_urls()` and not just from `urlpatterns`
 
 Utilities
 ~~~~~~~~~
