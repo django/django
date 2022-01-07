@@ -545,8 +545,9 @@ def technical_404_response(request, exception):
         obj = resolver_match.func
 
         if hasattr(obj, 'view_class'):
-            caller = obj.view_class
-        elif hasattr(obj, '__name__'):
+            obj = obj.view_class
+
+        if hasattr(obj, '__name__'):
             caller = obj.__name__
         elif hasattr(obj, '__class__') and hasattr(obj.__class__, '__name__'):
             caller = obj.__class__.__name__
