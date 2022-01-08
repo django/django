@@ -1077,7 +1077,7 @@ directory on the filesystem. Has some special arguments, of which the first is
 The one potential gotcha is that :attr:`~FilePathField.match` applies to the
 base filename, not the full path. So, this example::
 
-    FilePathField(path="/home/images", match="foo.*", recursive=True)
+    FilePathField(path="/home/images", match="foo*", recursive=True)
 
 ...will match ``/home/images/foo.png`` but not ``/home/images/foo/bar.png``
 because the :attr:`~FilePathField.match` applies to the base filename
