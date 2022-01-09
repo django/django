@@ -81,6 +81,10 @@ details on these changes.
 
 * ``django.contrib.sessions.serializers.PickleSerializer`` will be removed.
 
+* The usage of ``QuerySet.iterator()`` on a queryset that prefetches related
+  objects without providing the ``chunk_size`` argument will no longer be
+  allowed.
+
 .. _deprecation-removed-in-4.1:
 
 4.1

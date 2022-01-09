@@ -239,6 +239,10 @@ Models
   insertion fails uniqueness constraints. This is supported on MariaDB, MySQL,
   PostgreSQL, and SQLite 3.24+.
 
+* :meth:`.QuerySet.iterator` now supports prefetching related objects as long
+  as the ``chunk_size`` argument is provided. In older versions, no prefetching
+  was done.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -429,6 +433,11 @@ Miscellaneous
 
 * ``django.contrib.sessions.serializers.PickleSerializer`` is deprecated due to
   the risk of remote code execution.
+
+* The usage of ``QuerySet.iterator()`` on a queryset that prefetches related
+  objects without providing the ``chunk_size`` argument is deprecated. In older
+  versions, no prefetching was done. Providing a value for ``chunk_size``
+  signifies that the additional query per chunk needed to prefetch is desired.
 
 Features removed in 4.1
 =======================

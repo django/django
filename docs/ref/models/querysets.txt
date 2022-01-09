@@ -1215,8 +1215,10 @@ could be generated, which, depending on the database, might have performance
 problems of its own when it comes to parsing or executing the SQL query. Always
 profile for your use case!
 
-Note that if you use ``iterator()`` to run the query, ``prefetch_related()``
-calls will be ignored since these two optimizations do not make sense together.
+.. versionchanged:: 4.1
+
+    If you use ``iterator()`` to run the query, ``prefetch_related()``
+    calls will only be observed if a value for ``chunk_size`` is provided.
 
 You can use the :class:`~django.db.models.Prefetch` object to further control
 the prefetch operation.
@@ -2341,7 +2343,7 @@ If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 ``iterator()``
 ~~~~~~~~~~~~~~
 
-.. method:: iterator(chunk_size=2000)
+.. method:: iterator(chunk_size=None)
 
 Evaluates the ``QuerySet`` (by performing the query) and returns an iterator
 (see :pep:`234`) over the results. A ``QuerySet`` typically caches its results
@@ -2355,11 +2357,33 @@ performance and a significant reduction in memory.
 Note that using ``iterator()`` on a ``QuerySet`` which has already been
 evaluated will force it to evaluate again, repeating the query.
 
-Also, use of ``iterator()`` causes previous ``prefetch_related()`` calls to be
-ignored since these two optimizations do not make sense together.
+``iterator()`` is compatible with previous calls to ``prefetch_related()`` as
+long as ``chunk_size`` is given. Larger values will necessitate fewer queries
+to accomplish the prefetching at the cost of greater memory usage.
+
+On some databases (e.g. Oracle, `SQLite
+<https://www.sqlite.org/limits.html#max_variable_number>`_), the maximum number
+of terms in an SQL ``IN`` clause might be limited. Hence values below this
+limit should be used. (In particular, when prefetching across two or more
+relations, a ``chunk_size`` should be small enough that the anticipated number
+of results for each prefetched relation still falls below the limit.)
+
+So long as the QuerySet does not prefetch any related objects, providing no
+value for ``chunk_size`` will result in Django using an implicit default of
+2000.
 
 Depending on the database backend, query results will either be loaded all at
 once or streamed from the database using server-side cursors.
+
+.. versionchanged:: 4.1
+
+    Support for prefetching related objects was added.
+
+.. deprecated:: 4.1
+
+    Using ``iterator()`` on a queryset that prefetches related objects without
+    providing the ``chunk_size`` is deprecated. In Django 5.0, an exception
+    will be raise.
 
 With server-side cursors
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -2399,8 +2423,10 @@ The ``chunk_size`` parameter controls the size of batches Django retrieves from
 the database driver. Larger batches decrease the overhead of communicating with
 the database driver at the expense of a slight increase in memory consumption.
 
-The default value of ``chunk_size``, 2000, comes from `a calculation on the
-psycopg mailing list <https://www.postgresql.org/message-id/4D2F2C71.8080805%40dndg.it>`_:
+So long as the QuerySet does not prefetch any related objects, providing no
+value for ``chunk_size`` will result in Django using an implicit default of
+2000, a value derived from `a calculation on the psycopg mailing list
+<https://www.postgresql.org/message-id/4D2F2C71.8080805%40dndg.it>`_:
 
     Assuming rows of 10-20 columns with a mix of textual and numeric data, 2000
     is going to fetch less than 100KB of data, which seems a good compromise
