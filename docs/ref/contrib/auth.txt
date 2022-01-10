@@ -419,7 +419,7 @@ Login and logout signals
 The auth framework uses the following :doc:`signals </topics/signals>` that
 can be used for notification when a user logs in or out.
 
-.. function:: user_logged_in
+.. data:: user_logged_in
 
     Sent when a user logs in successfully.
 
@@ -434,7 +434,7 @@ can be used for notification when a user logs in or out.
     ``user``
         The user instance that just logged in.
 
-.. function:: user_logged_out
+.. data:: user_logged_out
 
     Sent when the logout method is called.
 
@@ -449,7 +449,7 @@ can be used for notification when a user logs in or out.
         The user instance that just logged out or ``None`` if the
         user was not authenticated.
 
-.. function:: user_login_failed
+.. data:: user_login_failed
 
     Sent when the user failed to login successfully
 
