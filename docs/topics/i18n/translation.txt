@@ -515,7 +515,7 @@ And then later::
 Localized names of languages
 ----------------------------
 
-.. function:: get_language_info
+.. function:: get_language_info(lang_code)
 
 The ``get_language_info()`` function provides detailed information about
 languages::
