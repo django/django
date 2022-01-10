@@ -1675,6 +1675,7 @@ class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
     def test_ForeignKey_using_to_field(self):
         from selenium.webdriver.common.by import By
+        from selenium.webdriver.support.ui import Select
 
         self.admin_login(username="super", password="secret", login_url="/")
         self.selenium.get(
@@ -1698,6 +1699,12 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         # The field now contains the new user
         self.selenium.find_element(By.CSS_SELECTOR, "#id_user option[value=newuser]")
 
+        self.selenium.find_element(By.ID, "view_id_user").click()
+        self.wait_for_value("#id_username", "newuser")
+        self.selenium.back()
+
+        select = Select(self.selenium.find_element(By.ID, "id_user"))
+        select.select_by_value("newuser")
         # Click the Change User button to change it
         self.selenium.find_element(By.ID, "change_id_user").click()
         self.wait_for_and_switch_to_popup()
@@ -1714,6 +1721,12 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
             By.CSS_SELECTOR, "#id_user option[value=changednewuser]"
         )
 
+        self.selenium.find_element(By.ID, "view_id_user").click()
+        self.wait_for_value("#id_username", "changednewuser")
+        self.selenium.back()
+
+        select = Select(self.selenium.find_element(By.ID, "id_user"))
+        select.select_by_value("changednewuser")
         # Go ahead and submit the form to make sure it works
         self.selenium.find_element(By.CSS_SELECTOR, save_button_css_selector).click()
         self.wait_for_text(
