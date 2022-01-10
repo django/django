@@ -1148,6 +1148,15 @@ class ResolverMatchTests(SimpleTestCase):
             "namespaces=[], route='^no_kwargs/([0-9]+)/([0-9]+)/$')",
         )
 
+    @override_settings(ROOT_URLCONF='urlpatterns_reverse.reverse_lazy_urls')
+    def test_classbased_repr(self):
+        self.assertEqual(
+            repr(resolve('/redirect/')),
+            "ResolverMatch(func=urlpatterns_reverse.views.LazyRedirectView, "
+            "args=(), kwargs={}, url_name=None, app_names=[], "
+            "namespaces=[], route='redirect/')",
+        )
+
     @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls')
     def test_repr_functools_partial(self):
         tests = [
