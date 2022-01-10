@@ -125,7 +125,7 @@
                 this.textContent = newRepr;
                 this.value = newId;
             }
-        });
+        }).trigger('change');
         selects.next().find('.select2-selection__rendered').each(function() {
             // The element can have a clear button as a child.
             // Use the lastChild to modify only the displayed value.
@@ -178,7 +178,7 @@
             event.preventDefault();
             opener.dismissRelatedLookupPopup(window, $(this).data("popup-opener"));
         });
-        $('body').on('click', '.related-widget-wrapper-link', function(e) {
+        $('body').on('click', '.related-widget-wrapper-link[data-popup="yes"]', function(e) {
             e.preventDefault();
             if (this.href) {
                 const event = $.Event('django:show-related', {href: this.href});

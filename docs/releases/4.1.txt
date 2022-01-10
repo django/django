@@ -61,6 +61,8 @@ Minor features
 * The admin :meth:`history view <django.contrib.admin.ModelAdmin.history_view>`
   is now paginated.
 
+* Related widget wrappers now have a link to object's change form.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
