@@ -547,7 +547,7 @@ subclass::
 
     There are four types of values that can be used in ``list_display``. All
     but the simplest may use the  :func:`~django.contrib.admin.display`
-    decorator is used to customize how the field is presented:
+    decorator, which is used to customize how the field is presented:
 
     * The name of a model field. For example::
 
