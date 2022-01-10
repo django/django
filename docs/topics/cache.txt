@@ -647,7 +647,7 @@ __ `Controlling cache: Using other headers`_
 The per-view cache
 ==================
 
-.. function:: django.views.decorators.cache.cache_page
+.. function:: django.views.decorators.cache.cache_page(timeout, *, cache=None, key_prefix=None)
 
 A more granular way to use the caching framework is by caching the output of
 individual views. ``django.views.decorators.cache`` defines a ``cache_page``

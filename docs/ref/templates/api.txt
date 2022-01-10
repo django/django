@@ -654,7 +654,7 @@ Here's what each of the built-in processors does:
 ``django.contrib.auth.context_processors.auth``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: auth
+.. function:: auth(request)
 
 If this processor is enabled, every ``RequestContext`` will contain these
 variables:
@@ -672,7 +672,7 @@ variables:
 ``django.template.context_processors.debug``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: debug
+.. function:: debug(request)
 
 If this processor is enabled, every ``RequestContext`` will contain these two
 variables -- but only if your :setting:`DEBUG` setting is set to ``True`` and
@@ -689,7 +689,7 @@ the request's IP address (``request.META['REMOTE_ADDR']``) is in the
 ``django.template.context_processors.i18n``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: i18n
+.. function:: i18n(request)
 
 If this processor is enabled, every ``RequestContext`` will contain these
 variables:
@@ -713,7 +713,7 @@ If this processor is enabled, every ``RequestContext`` will contain a variable
 ``django.template.context_processors.static``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: static
+.. function:: static(request)
 
 If this processor is enabled, every ``RequestContext`` will contain a variable
 ``STATIC_URL``, providing the value of the :setting:`STATIC_URL` setting.
@@ -734,7 +734,7 @@ If this processor is enabled, every ``RequestContext`` will contain a variable
 ``django.template.context_processors.tz``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: tz
+.. function:: tz(request)
 
 If this processor is enabled, every ``RequestContext`` will contain a variable
 ``TIME_ZONE``, providing the name of the currently active time zone.
