@@ -1290,7 +1290,7 @@ For each action, you can supply either a list of values or a string. When the
 value already exists in the list, ``append`` and ``prepend`` have no effect;
 neither does ``remove`` when the value doesn't exist.
 
-.. function:: override_settings
+.. function:: override_settings(**kwargs)
 
 In case you want to override a setting for a test method, Django provides the
 :func:`~django.test.override_settings` decorator (see :pep:`318`). It's used
@@ -1316,7 +1316,7 @@ The decorator can also be applied to :class:`~django.test.TestCase` classes::
             response = self.client.get('/sekrit/')
             self.assertRedirects(response, '/other/login/?next=/sekrit/')
 
-.. function:: modify_settings
+.. function:: modify_settings(*args, **kwargs)
 
 Likewise, Django provides the :func:`~django.test.modify_settings`
 decorator::
