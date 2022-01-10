@@ -46,6 +46,8 @@ class ResolverMatch:
         self.namespaces = [x for x in namespaces if x] if namespaces else []
         self.namespace = ':'.join(self.namespaces)
 
+        if hasattr(func, 'view_class'):
+            func = func.view_class
         if not hasattr(func, '__name__'):
             # A class-based view
             self._func_path = func.__class__.__module__ + '.' + func.__class__.__name__

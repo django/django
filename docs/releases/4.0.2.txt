@@ -17,3 +17,6 @@ Bugfixes
 
 * Fixed a regression in Django 4.0 that caused displaying an incorrect name for
   class-based views on the technical 404 debug page (:ticket:`33425`).
+
+* Fixed a regression in Django 4.0 that caused an incorrect ``repr`` of
+  ``ResolverMatch`` for class-based views (:ticket:`33426`).
