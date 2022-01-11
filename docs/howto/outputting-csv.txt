@@ -112,7 +112,7 @@ Here's an example, which generates the same CSV file as above::
     def some_view(request):
         # Create the HttpResponse object with the appropriate CSV header.
         response = HttpResponse(
-            content_type='text/csv'
+            content_type='text/csv',
             headers={'Content-Disposition': 'attachment; filename="somefilename.csv"'},
         )
 
