@@ -1,0 +1,9 @@
+===========================
+Django 2.2.27 release notes
+===========================
+
+*February 1, 2022*
+
+Django 2.2.27 fixes two security issues with severity "medium" in 2.2.26.
+
+...
