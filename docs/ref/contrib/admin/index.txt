@@ -1947,7 +1947,7 @@ templates used by the :class:`ModelAdmin` views:
                     'form_kwargs': {'request': request},
                 }
 
-    You can also used it to set ``initial`` for formset forms.
+    You can also use it to set ``initial`` for formset forms.
 
 .. method:: ModelAdmin.get_changeform_initial_data(request)
 
