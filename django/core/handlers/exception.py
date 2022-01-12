@@ -98,6 +98,7 @@ def response_for_exception(request, exc):
         security_logger = logging.getLogger('django.security.%s' % exc.__class__.__name__)
         security_logger.error(
             str(exc),
+            exc_info=exc,
             extra={'status_code': 400, 'request': request},
         )
         if settings.DEBUG:
