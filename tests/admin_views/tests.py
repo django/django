@@ -1122,14 +1122,28 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
     def test_render_views_no_subtitle(self):
         tests = [
             reverse('admin:index'),
+            reverse('admin:password_change'),
             reverse('admin:app_list', args=('admin_views',)),
             reverse('admin:admin_views_article_delete', args=(self.a1.pk,)),
             reverse('admin:admin_views_article_history', args=(self.a1.pk,)),
+            # Login must be after logout.
+            reverse('admin:logout'),
+            reverse('admin:login'),
         ]
         for url in tests:
             with self.subTest(url=url):
                 with self.assertNoLogs('django.template', 'DEBUG'):
                     self.client.get(url)
+
+    def test_render_delete_selected_confirmation_no_subtitle(self):
+        post_data = {
+            'action': 'delete_selected',
+            'selected_across': '0',
+            'index': '0',
+            '_selected_action': self.a1.pk,
+        }
+        with self.assertNoLogs('django.template', 'DEBUG'):
+            self.client.post(reverse('admin:admin_views_article_changelist'), post_data)
 
 
 @override_settings(TEMPLATES=[{

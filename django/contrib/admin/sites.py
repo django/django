@@ -400,6 +400,7 @@ class AdminSite:
         context = {
             **self.each_context(request),
             'title': _('Log in'),
+            'subtitle': None,
             'app_path': request.get_full_path(),
             'username': request.user.get_username(),
         }
