@@ -537,11 +537,13 @@ def technical_404_response(request, exception):
         urlconf = urlconf.__name__
 
     caller = ''
-    try:
-        resolver_match = resolve(request.path)
-    except Http404:
-        pass
-    else:
+    resolver_match = request.resolver_match
+    if resolver_match is None:
+        try:
+            resolver_match = resolve(request.path)
+        except Http404:
+            pass
+    if resolver_match is not None:
         obj = resolver_match.func
 
         if hasattr(obj, 'view_class'):
