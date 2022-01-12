@@ -536,27 +536,12 @@ def technical_404_response(request, exception):
     if isinstance(urlconf, types.ModuleType):
         urlconf = urlconf.__name__
 
-    caller = ''
     resolver_match = request.resolver_match
     if resolver_match is None:
         try:
             resolver_match = resolve(request.path)
         except Http404:
             pass
-    if resolver_match is not None:
-        obj = resolver_match.func
-
-        if hasattr(obj, 'view_class'):
-            obj = obj.view_class
-
-        if hasattr(obj, '__name__'):
-            caller = obj.__name__
-        elif hasattr(obj, '__class__') and hasattr(obj.__class__, '__name__'):
-            caller = obj.__class__.__name__
-
-        if hasattr(obj, '__module__'):
-            module = obj.__module__
-            caller = '%s.%s' % (module, caller)
 
     with builtin_template_path('technical_404.html').open(encoding='utf-8') as fh:
         t = DEBUG_ENGINE.from_string(fh.read())
@@ -570,7 +555,7 @@ def technical_404_response(request, exception):
         'reason': str(exception),
         'request': request,
         'settings': reporter_filter.get_safe_settings(),
-        'raising_view_name': caller,
+        'raising_view_name': '' if resolver_match is None else resolver_match._func_path,
     })
     return HttpResponseNotFound(t.render(c), content_type='text/html')
 
