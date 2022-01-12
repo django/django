@@ -64,7 +64,7 @@ def response_for_exception(request, exc):
             'Forbidden (Permission denied): %s', request.path,
             response=response,
             request=request,
-            exc_info=sys.exc_info(),
+            exception=exc,
         )
 
     elif isinstance(exc, MultiPartParserError):
@@ -73,7 +73,7 @@ def response_for_exception(request, exc):
             'Bad request (Unable to parse request body): %s', request.path,
             response=response,
             request=request,
-            exc_info=sys.exc_info(),
+            exception=exc,
         )
 
     elif isinstance(exc, BadRequest):
@@ -85,7 +85,7 @@ def response_for_exception(request, exc):
             '%s: %s', str(exc), request.path,
             response=response,
             request=request,
-            exc_info=sys.exc_info(),
+            exception=exc,
         )
     elif isinstance(exc, SuspiciousOperation):
         if isinstance(exc, (RequestDataTooBig, TooManyFieldsSent)):
@@ -113,7 +113,7 @@ def response_for_exception(request, exc):
             '%s: %s', response.reason_phrase, request.path,
             response=response,
             request=request,
-            exc_info=sys.exc_info(),
+            exception=exc,
         )
 
     # Force a TemplateResponse to be rendered.
