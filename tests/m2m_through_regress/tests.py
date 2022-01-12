@@ -1,5 +1,7 @@
 from io import StringIO
 
+import textwrap
+
 from django.contrib.auth.models import User
 from django.core import management
 from django.test import TestCase
@@ -83,22 +85,22 @@ class M2MThroughSerializationTestCase(TestCase):
 
         out = StringIO()
         management.call_command("dumpdata", "m2m_through_regress", format="xml", indent=2, stdout=out)
-        self.assertXMLEqual(out.getvalue().strip(), """
-<?xml version="1.0" encoding="utf-8"?>
-<django-objects version="1.0">
-  <object pk="%(m_pk)s" model="m2m_through_regress.membership">
-    <field to="m2m_through_regress.person" name="person" rel="ManyToOneRel">%(p_pk)s</field>
-    <field to="m2m_through_regress.group" name="group" rel="ManyToOneRel">%(g_pk)s</field>
-    <field type="IntegerField" name="price">100</field>
-  </object>
-  <object pk="%(p_pk)s" model="m2m_through_regress.person">
-    <field type="CharField" name="name">Bob</field>
-  </object>
-  <object pk="%(g_pk)s" model="m2m_through_regress.group">
-    <field type="CharField" name="name">Roll</field>
-  </object>
-</django-objects>
-        """.strip() % pks)
+        self.assertXMLEqual(out.getvalue().strip(), textwrap.dedent("""
+            <?xml version="1.0" encoding="utf-8"?>
+            <django-objects version="1.0">
+              <object pk="%(m_pk)s" model="m2m_through_regress.membership">
+                <field to="m2m_through_regress.person" name="person" rel="ManyToOneRel">%(p_pk)s</field>
+                <field to="m2m_through_regress.group" name="group" rel="ManyToOneRel">%(g_pk)s</field>
+                <field type="IntegerField" name="price">100</field>
+              </object>
+              <object pk="%(p_pk)s" model="m2m_through_regress.person">
+                <field type="CharField" name="name">Bob</field>
+              </object>
+              <object pk="%(g_pk)s" model="m2m_through_regress.group">
+                <field type="CharField" name="name">Roll</field>
+              </object>
+            </django-objects>
+        """) % pks)
 
 
 class ToFieldThroughTests(TestCase):
