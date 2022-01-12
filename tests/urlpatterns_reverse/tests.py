@@ -1183,6 +1183,19 @@ class ResolverMatchTests(SimpleTestCase):
         with self.assertRaisesMessage(pickle.PicklingError, msg):
             pickle.dumps(resolve('/users/'))
 
+    @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls')
+    def test_unnamed_partial_viewname(self):
+        tests = (
+            ('/unnamed_partial/', 'functools.partial'),
+            ('/unnamed_partial_nested/', 'functools.partial'),
+            ('/unnamed_partial_wrapped/', 'urlpatterns_reverse.views.empty_view'),
+        )
+        for url, name in tests:
+            with self.subTest(name=name):
+                match = resolve(url)
+                self.assertEqual(match.view_name, name)
+                self.assertEqual(match._func_path, name)
+
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.erroneous_urls')
 class ErroneousViewTests(SimpleTestCase):

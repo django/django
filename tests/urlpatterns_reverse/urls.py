@@ -63,6 +63,11 @@ urlpatterns = [
     path('partial_nested/', empty_view_nested_partial, name='partial_nested'),
     path('partial_wrapped/', empty_view_wrapped, name='partial_wrapped'),
 
+    # Unnamed partials will end up using the dotted path as the view name.
+    path('unnamed_partial/', empty_view_partial),
+    path('unnamed_partial_nested/', empty_view_nested_partial),
+    path('unnamed_partial_wrapped/', empty_view_wrapped),
+
     # This is non-reversible, but we shouldn't blow up when parsing it.
     re_path(r'^(?:foo|bar)(\w+)/$', empty_view, name='disjunction'),
 
