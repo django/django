@@ -190,11 +190,29 @@ class DebugViewTests(SimpleTestCase):
             html=True,
         )
 
+    def test_partial_technical_404(self):
+        response = self.client.get('/technical404/partial/')
+        self.assertContains(
+            response,
+            '<th>Raised by:</th><td>functools.partial</td>',
+            status_code=404,
+            html=True,
+        )
+
     def test_classbased_technical_404(self):
         response = self.client.get('/classbased404/')
         self.assertContains(
             response,
             '<th>Raised by:</th><td>view_tests.views.Http404View</td>',
+            status_code=404,
+            html=True,
+        )
+
+    def test_partial_classbased_technical_404(self):
+        response = self.client.get('/classbased404/partial/')
+        self.assertContains(
+            response,
+            '<th>Raised by:</th><td>functools.partial</td>',
             status_code=404,
             html=True,
         )

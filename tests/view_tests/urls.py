@@ -32,6 +32,8 @@ urlpatterns = [
     path('technical404/', views.technical404, name='my404'),
     path('classbased404/', views.Http404View.as_view()),
     path('classbased500/', views.Raises500View.as_view()),
+    path('technical404/partial/', partial(views.technical404), name='partial_404'),
+    path('classbased404/partial/', partial(views.Http404View.as_view()), name='partial_class_404'),
 
     # i18n views
     path('i18n/', include('django.conf.urls.i18n')),
