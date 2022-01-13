@@ -1196,9 +1196,9 @@ class ManageCheck(AdminScriptTestCase):
             "\tHINT: Error hint\n"
             "\n"
             "WARNINGS:\n"
-            "a: Second warning\n"
-            "obj: First warning\n"
+            "app_raising_messages.ModelRaisingMessages: First warning\n"
             "\tHINT: Hint\n"
+            "app_raising_messages.ModelRaisingMessages: Second warning\n"
             "\n"
             "System check identified 3 issues (0 silenced).\n"
         )

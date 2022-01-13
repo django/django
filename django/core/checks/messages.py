@@ -1,3 +1,7 @@
+from collections import defaultdict
+from functools import partial
+from weakref import WeakValueDictionary
+
 # Levels
 DEBUG = 10
 INFO = 20
@@ -48,7 +52,16 @@ class CheckMessage:
 
     def is_silenced(self):
         from django.conf import settings
-        return self.id in settings.SILENCED_SYSTEM_CHECKS
+
+        if self.id is None:
+            return False
+        elif self.id in settings.SILENCED_SYSTEM_CHECKS:
+            return True
+        elif self.obj is not None:
+            found = silenced_object_checks[self.id].get(id(self.obj), None)
+            if found is self.obj:
+                return True
+        return False
 
 
 class Debug(CheckMessage):
@@ -74,3 +87,16 @@ class Error(CheckMessage):
 class Critical(CheckMessage):
     def __init__(self, *args, **kwargs):
         super().__init__(CRITICAL, *args, **kwargs)
+
+
+silenced_object_checks = defaultdict(WeakValueDictionary)
+
+
+def silence_checks(check_ids, obj=None):
+    if obj is None:
+        return partial(silence_checks, check_ids)
+
+    for check_id in check_ids:
+        silenced_object_checks[check_id][id(obj)] = obj
+
+    return obj

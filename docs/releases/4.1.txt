@@ -253,6 +253,12 @@ Signals
   :data:`~django.db.models.signals.post_delete` signals now dispatch the
   ``origin`` of the deletion.
 
+System Checks
+~~~~~~~~~~~~~
+
+* The new :func:`~django.core.checks.silence_checks()` function allows ignoring
+  checks for a given object.
+
 Templates
 ~~~~~~~~~
 

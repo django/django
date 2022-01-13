@@ -6,7 +6,7 @@ class ModelRaisingMessages(models.Model):
     @classmethod
     def check(self, **kwargs):
         return [
-            checks.Warning('First warning', hint='Hint', obj='obj'),
-            checks.Warning('Second warning', obj='a'),
+            checks.Warning('First warning', hint='Hint', obj=ModelRaisingMessages),
+            checks.Warning('Second warning', obj=ModelRaisingMessages),
             checks.Error('An error', hint='Error hint'),
         ]

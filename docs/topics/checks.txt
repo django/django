@@ -15,9 +15,11 @@ WSGI stack that is used in deployment. If you need to run system checks on your
 deployment server, trigger them explicitly using :djadmin:`check`.
 
 Serious errors will prevent Django commands (such as :djadmin:`runserver`) from
-running at all. Minor problems are reported to the console. If you have inspected
-the cause of a warning and are happy to ignore it, you can hide specific warnings
-using the :setting:`SILENCED_SYSTEM_CHECKS` setting in your project settings file.
+running at all. Minor problems are reported to the console. If you have
+inspected the cause of a message and are happy to ignore it, you can silence
+the check. To silence a check for a given object, use
+:func:`~django.core.checks.silence_checks`. To silence a check across your
+project, use the :setting:`SILENCED_SYSTEM_CHECKS` setting.
 
 A full list of all checks that can be raised by Django can be found in the
 :doc:`System check reference </ref/checks>`.

@@ -3,7 +3,7 @@ from io import StringIO
 
 from django.apps import apps
 from django.core import checks
-from django.core.checks import Error, Warning
+from django.core.checks import Error, Warning, silence_checks
 from django.core.checks.messages import CheckMessage
 from django.core.checks.registry import CheckRegistry
 from django.core.management import call_command
@@ -276,6 +276,72 @@ class SilencingCheckTests(SimpleTestCase):
     def test_silenced_warning(self):
         out, err = self.call_command()
         self.assertEqual(out, 'System check identified no issues (1 silenced).\n')
+        self.assertEqual(err, '')
+
+    def test_silence_checks_instance(self):
+        class Example:
+            pass
+
+        instance = Example()
+
+        def custom_check(**kwargs):
+            return [Warning('Warning', obj=instance, id='mywarningcheck.E001')]
+
+        result = silence_checks(["mywarningcheck.E001"], instance)
+        with override_system_checks([custom_check]):
+            out, err = self.call_command()
+
+        self.assertIs(result, instance)
+        self.assertEqual(out, 'System check identified no issues (1 silenced).\n')
+        self.assertEqual(err, '')
+
+    def test_silence_checks_class(self):
+        class Example:
+            pass
+
+        def custom_check(**kwargs):
+            return [Warning('Warning', obj=Example, id='mywarningcheck.E001')]
+
+        result = silence_checks(["mywarningcheck.E001"], Example)
+        with override_system_checks([custom_check]):
+            out, err = self.call_command()
+
+        self.assertIs(result, Example)
+        self.assertEqual(out, 'System check identified no issues (1 silenced).\n')
+        self.assertEqual(err, '')
+
+    def test_silence_checks_class_decorator(self):
+        @silence_checks(["mywarningcheck.E001"])
+        class Example:
+            pass
+
+        def custom_check(**kwargs):
+            return [Warning('Warning', obj=Example, id='mywarningcheck.E001')]
+
+        with override_system_checks([custom_check]):
+            out, err = self.call_command()
+
+        self.assertEqual(out, 'System check identified no issues (1 silenced).\n')
+        self.assertEqual(err, '')
+
+    def test_silence_checks_multiple(self):
+        class Example:
+            pass
+
+        instance = Example()
+
+        def custom_check(**kwargs):
+            return [
+                Warning('Warning', obj=instance, id='mywarningcheck.E001'),
+                Warning('Warning', obj=instance, id='mywarningcheck.E002'),
+            ]
+
+        result = silence_checks(["mywarningcheck.E001", "mywarningcheck.E002"], instance)
+        with override_system_checks([custom_check]):
+            out, err = self.call_command()
+
+        self.assertIs(result, instance)
+        self.assertEqual(out, 'System check identified no issues (2 silenced).\n')
         self.assertEqual(err, '')
 
 

@@ -66,6 +66,40 @@ class name.
 .. class:: Error(msg, hint=None, obj=None, id=None)
 .. class:: Critical(msg, hint=None, obj=None, id=None)
 
+``silence_checks``
+------------------
+
+.. function:: silence_checks(check_ids, obj=None)
+
+Silence named checks for an object, and return the object unchanged. Can be
+used as a function or decorator. ``check_ids`` is an iterable of check ID’s to
+silence. ``obj`` is the target object, or ``None`` to return the decorator.
+
+For example, to silence a check for a given field, you can wrap it :
+
+.. code-block:: python
+
+    from django.core.checks import silence_checks
+    from django.db import models
+
+
+    class Book(models.Model):
+        title = silence_checks(
+            ["fields.E999"],
+            models.CharField(...),
+        )
+
+Or to silence a model check, decorate its class definition:
+
+.. code-block:: python
+
+    from django.core.checks import silence_checks
+    from django.db import models
+
+    @silence_checks(["models.E999"])
+    class Book(models.Model):
+        ...
+
 .. _system-check-builtin-tags:
 
 Builtin tags
