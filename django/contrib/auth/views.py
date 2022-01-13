@@ -162,6 +162,7 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
             'site': current_site,
             'site_name': current_site.name,
             'title': _('Logged out'),
+            'subtitle': None,
             **(self.extra_context or {})
         })
         return context
@@ -204,6 +205,7 @@ class PasswordContextMixin:
         context = super().get_context_data(**kwargs)
         context.update({
             'title': self.title,
+            'subtitle': None,
             **(self.extra_context or {})
         })
         return context

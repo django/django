@@ -59,6 +59,7 @@ def delete_selected(modeladmin, request, queryset):
     context = {
         **modeladmin.admin_site.each_context(request),
         'title': title,
+        'subtitle': None,
         'objects_name': str(objects_name),
         'deletable_objects': [deletable_objects],
         'model_count': dict(model_count).items(),
