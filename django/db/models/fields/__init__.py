@@ -542,11 +542,7 @@ class Field(RegisterLookupMixin):
         return NotImplemented
 
     def __hash__(self):
-        return hash((
-            self.creation_counter,
-            self.model._meta.app_label if hasattr(self, 'model') else None,
-            self.model._meta.model_name if hasattr(self, 'model') else None,
-        ))
+        return hash(self.creation_counter)
 
     def __deepcopy__(self, memodict):
         # We don't have to deepcopy very much here, since most things are not
