@@ -1,17 +1,26 @@
 import re
+import warnings
 
 from django.core.exceptions import ValidationError
-from django.forms.utils import pretty_name
+from django.forms.utils import RenderableFormMixin, pretty_name
 from django.forms.widgets import MultiWidget, Textarea, TextInput
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import cached_property
 from django.utils.html import format_html, html_safe
+from django.utils.safestring import SafeString, mark_safe
 from django.utils.translation import gettext_lazy as _
 
 __all__ = ('BoundField',)
 
 
 @html_safe
-class BoundField:
+class BoundField(RenderableFormMixin):
+    template_name = 'django/forms/fields/default.html'
+    template_name_p = 'django/forms/fields/p.html'
+    template_name_table = 'django/forms/fields/table.html'
+    template_name_ul = 'django/forms/fields/ul.html'
+    template_name_label = 'django/forms/fields/label.html'
+
     "A Field plus data"
     def __init__(self, form, field, name):
         self.form = form
@@ -48,6 +57,10 @@ class BoundField:
             BoundWidget(self.field.widget, widget, self.form.renderer)
             for widget in self.field.widget.subwidgets(self.html_name, self.value(), attrs=attrs)
         ]
+
+    @property
+    def renderer(self):
+        return self.form.renderer
 
     def __bool__(self):
         # BoundField evaluates to True even if it doesn't have subwidgets.
@@ -265,6 +278,24 @@ class BoundField:
     @property
     def widget_type(self):
         return re.sub(r'widget$|input$', '', self.field.widget.__class__.__name__.lower())
+
+    def get_context(self):
+        bf_errors = self.form.error_class(self.errors, renderer=self.renderer)
+
+        errors_str = str(bf_errors)
+        # RemovedInDjango50Warning.
+        if not isinstance(errors_str, SafeString):
+            warnings.warn(
+                f'Returning a plain string from '
+                f'{self.error_class.__name__} is deprecated. Please '
+                f'customize via the template system instead.',
+                RemovedInDjango50Warning,
+            )
+            errors_str = mark_safe(errors_str)
+        return {
+            "field": self,
+            "errors": errors_str
+        }
 
 
 @html_safe

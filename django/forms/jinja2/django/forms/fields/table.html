@@ -1,0 +1,11 @@
+<tr{% set classes = field.css_classes() %}{% if classes %} class="{{ classes }}"{% endif %}>
+  <th>{% if field.label %}{{ field.label_tag() }}{% endif %}</th>
+  <td>
+    {{ errors }}
+    {{ field }}
+    {% if field.help_text %}
+      <br>
+      <span class="helptext">{{ field.help_text|safe }}</span>
+    {% endif %}
+  </td>
+</tr>

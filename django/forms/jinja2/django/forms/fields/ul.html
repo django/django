@@ -1,0 +1,8 @@
+<li{% set classes = field.css_classes() %}{% if classes %} class="{{ classes }}"{% endif %}>
+  {{ errors }}
+  {% if field.label %}{{ field.label_tag() }}{% endif %}
+  {{ field }}
+  {% if field.help_text %}
+    <span class="helptext">{{ field.help_text|safe }}</span>
+  {% endif %}
+</li>
