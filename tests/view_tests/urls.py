@@ -27,11 +27,13 @@ urlpatterns = [
     path('raises403/', views.raises403),
     path('raises404/', views.raises404),
     path('raises500/', views.raises500),
+    path('raises500/partial/', partial(views.raises500)),
     path('custom_reporter_class_view/', views.custom_reporter_class_view),
 
     path('technical404/', views.technical404, name='my404'),
     path('classbased404/', views.Http404View.as_view()),
     path('classbased500/', views.Raises500View.as_view()),
+    path('classbased500/partial/', partial(views.Raises500View.as_view())),
     path('technical404/partial/', partial(views.technical404), name='partial_404'),
     path('classbased404/partial/', partial(views.Http404View.as_view()), name='partial_class_404'),
 

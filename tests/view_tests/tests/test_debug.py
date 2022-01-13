@@ -251,6 +251,40 @@ class DebugViewTests(SimpleTestCase):
             status_code=500,
         )
 
+    def test_partial_technical_500(self):
+        with self.assertLogs('django.request', 'ERROR'):
+            response = self.client.get('/raises500/partial/')
+        self.assertContains(
+            response,
+            '<th>Raised during:</th><td>functools.partial</td>',
+            status_code=500,
+            html=True,
+        )
+        with self.assertLogs('django.request', 'ERROR'):
+            response = self.client.get('/raises500/partial/', HTTP_ACCEPT='text/plain')
+        self.assertContains(
+            response,
+            'Raised during: functools.partial',
+            status_code=500,
+        )
+
+    def test_partial_classbased_technical_500(self):
+        with self.assertLogs('django.request', 'ERROR'):
+            response = self.client.get('/classbased500/partial/')
+        self.assertContains(
+            response,
+            '<th>Raised during:</th><td>functools.partial</td>',
+            status_code=500,
+            html=True,
+        )
+        with self.assertLogs('django.request', 'ERROR'):
+            response = self.client.get('/classbased500/partial/', HTTP_ACCEPT='text/plain')
+        self.assertContains(
+            response,
+            'Raised during: functools.partial',
+            status_code=500,
+        )
+
     def test_non_l10ned_numeric_ids(self):
         """
         Numeric IDs and fancy traceback context blocks line numbers shouldn't be localized.
