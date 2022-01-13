@@ -217,6 +217,10 @@ Forms
   objects implement the ``__html__()`` method (typically when decorated with
   the :func:`~django.utils.html.html_safe` decorator).
 
+* The new :attr:`.BoundField.use_fieldset` and :attr:`.Widget.use_fieldset`
+  attributes help to identify widgets where its inputs should be grouped in a
+  ``<fieldset>`` with a ``<legend>``.
+
 Generic Views
 ~~~~~~~~~~~~~
 

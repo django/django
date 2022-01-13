@@ -286,6 +286,13 @@ class BoundField:
             r"widget$|input$", "", self.field.widget.__class__.__name__.lower()
         )
 
+    @property
+    def use_fieldset(self):
+        """
+        Return the value of this BoundField widget's use_fieldset attribute.
+        """
+        return self.field.widget.use_fieldset
+
 
 @html_safe
 class BoundWidget:

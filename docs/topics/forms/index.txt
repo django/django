@@ -686,6 +686,32 @@ Useful attributes on ``{{ field }}`` include:
 
         <label for="id_email">Email address:</label>
 
+``{{ field.legend_tag }}``
+
+    .. versionadded:: 4.1
+
+    Similar to ``field.label_tag`` but uses a ``<legend>`` tag in place of
+    ``<label>``, for widgets with multiple inputs wrapped in a ``<fieldset>``.
+
+``{{ field.use_fieldset }}``
+
+    .. versionadded:: 4.1
+
+    This attribute is ``True`` if the form field's widget contains multiple
+    inputs that should be semantically grouped in a ``<fieldset>`` with a
+    ``<legend>`` to improve accessibility. An example use in a template:
+
+.. code-block:: html+django
+
+    {% if field.use_fieldset %}
+      <fieldset>
+      {% if field.label %}{{ field.legend_tag }}{% endif %}
+    {% else %}
+      {% if field.label %}{{ field.label_tag }}{% endif %}
+    {% endif %}
+    {{ field }}
+    {% if field.use_fieldset %}</fieldset>{% endif %}
+
 ``{{ field.value }}``
     The value of the field. e.g ``someone@example.com``.
 

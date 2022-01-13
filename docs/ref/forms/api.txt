@@ -1160,6 +1160,12 @@ Attributes of ``BoundField``
         >>> print(f['message'].name)
         message
 
+.. attribute:: BoundField.use_fieldset
+
+    .. versionadded:: 4.1
+
+    Returns the value of this BoundField widget's ``use_fieldset`` attribute.
+
 .. attribute:: BoundField.widget_type
 
     Returns the lowercased class name of the wrapped field's widget, with any
