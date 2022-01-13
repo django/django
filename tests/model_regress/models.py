@@ -1,3 +1,4 @@
+from django.core.checks import silence_checks
 from django.db import models
 
 
@@ -55,8 +56,14 @@ class Model1(models.Model):
 
 
 class Model2(models.Model):
-    model1 = models.ForeignKey(Model1, models.CASCADE, unique=True, to_field='pkey')
+    model1 = silence_checks(
+        ["fields.W342"],
+        models.ForeignKey(Model1, models.CASCADE, unique=True, to_field='pkey'),
+    )
 
 
 class Model3(models.Model):
-    model2 = models.ForeignKey(Model2, models.CASCADE, unique=True, to_field='model1')
+    model2 = silence_checks(
+        ["fields.W342"],
+        models.ForeignKey(Model2, models.CASCADE, unique=True, to_field='model1'),
+    )

@@ -1,3 +1,4 @@
+from django.core.checks import silence_checks
 from django.db import models
 
 
@@ -12,7 +13,10 @@ class Country(models.Model):
 
 
 class District(models.Model):
-    city = models.ForeignKey(City, models.CASCADE, primary_key=True)
+    city = silence_checks(
+        ["fields.W342"],
+        models.ForeignKey(City, models.CASCADE, primary_key=True),
+    )
     name = models.CharField(max_length=50)
 
 

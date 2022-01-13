@@ -8,6 +8,7 @@ from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
 from django.contrib.contenttypes.models import ContentType
+from django.core.checks import silence_checks
 from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
@@ -342,7 +343,10 @@ class PKChild(models.Model):
     """
     Used to check autocomplete to_field resolution when ForeignKey is PK.
     """
-    parent = models.ForeignKey(Parent, models.CASCADE, primary_key=True)
+    parent = silence_checks(
+        ["fields.W342"],
+        models.ForeignKey(Parent, models.CASCADE, primary_key=True),
+    )
     name = models.CharField(max_length=128)
 
     class Meta:

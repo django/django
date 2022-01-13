@@ -1,3 +1,4 @@
+from django.core.checks import silence_checks
 from django.db import models
 
 
@@ -12,7 +13,10 @@ class UserSite(models.Model):
 
 
 class UserProfile(models.Model):
-    user = models.ForeignKey(User, models.CASCADE, unique=True, to_field="username")
+    user = silence_checks(
+        ["fields.W342"],
+        models.ForeignKey(User, models.CASCADE, unique=True, to_field="username"),
+    )
     about = models.TextField()
 
 

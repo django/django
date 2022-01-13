@@ -1,6 +1,7 @@
 """Models for test_natural.py"""
 import uuid
 
+from django.core.checks import silence_checks
 from django.db import models
 
 
@@ -61,7 +62,10 @@ class FKAsPKNoNaturalKeyManager(models.Manager):
 
 
 class FKAsPKNoNaturalKey(models.Model):
-    pk_fk = models.ForeignKey(NaturalKeyAnchor, on_delete=models.CASCADE, primary_key=True)
+    pk_fk = silence_checks(
+        ["fields.W342"],
+        models.ForeignKey(NaturalKeyAnchor, on_delete=models.CASCADE, primary_key=True),
+    )
 
     objects = FKAsPKNoNaturalKeyManager()
 

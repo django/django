@@ -232,9 +232,6 @@ def setup_collect_tests(start_at, start_after, test_labels=None):
     # tests.
     log_config['loggers']['django']['level'] = 'ERROR'
     settings.LOGGING = log_config
-    settings.SILENCED_SYSTEM_CHECKS = [
-        'fields.W342',  # ForeignKey(unique=True) -> OneToOneField
-    ]
 
     # Load all the ALWAYS_INSTALLED_APPS.
     django.setup()

@@ -1,3 +1,4 @@
+from django.core.checks import silence_checks
 from django.db import models
 
 
@@ -18,7 +19,10 @@ class ManualPrimaryKeyTest(models.Model):
 
 
 class Profile(models.Model):
-    person = models.ForeignKey(Person, models.CASCADE, primary_key=True)
+    person = silence_checks(
+        ["fields.W342"],
+        models.ForeignKey(Person, models.CASCADE, primary_key=True),
+    )
 
 
 class Tag(models.Model):

@@ -1,6 +1,7 @@
 import datetime
 import uuid
 
+from django.core.checks import silence_checks
 from django.db import models
 
 
@@ -106,7 +107,10 @@ class Owner(models.Model):
 
 
 class Location(models.Model):
-    place = models.ForeignKey(Place, models.CASCADE, unique=True)
+    place = silence_checks(
+        ["fields.W342"],
+        models.ForeignKey(Place, models.CASCADE, unique=True),
+    )
     # this is purely for testing the data doesn't matter here :)
     lat = models.CharField(max_length=100)
     lon = models.CharField(max_length=100)

@@ -1,3 +1,4 @@
+from django.core.checks import silence_checks
 from django.db import models
 
 
@@ -24,7 +25,10 @@ class Book(models.Model):
 
 
 class BookFkAsPk(models.Model):
-    book = models.ForeignKey(Book, models.CASCADE, primary_key=True, db_column="not_the_default")
+    book = silence_checks(
+        ["fields.W342"],
+        models.ForeignKey(Book, models.CASCADE, primary_key=True, db_column="not_the_default"),
+    )
 
 
 class Coffee(models.Model):

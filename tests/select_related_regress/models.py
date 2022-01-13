@@ -1,3 +1,4 @@
+from django.core.checks import silence_checks
 from django.db import models
 
 
@@ -19,17 +20,23 @@ class Port(models.Model):
 
 
 class Connection(models.Model):
-    start = models.ForeignKey(
-        Port,
-        models.CASCADE,
-        related_name='connection_start',
-        unique=True,
+    start = silence_checks(
+        ["fields.W342"],
+        models.ForeignKey(
+            Port,
+            models.CASCADE,
+            related_name='connection_start',
+            unique=True,
+        ),
     )
-    end = models.ForeignKey(
-        Port,
-        models.CASCADE,
-        related_name='connection_end',
-        unique=True,
+    end = silence_checks(
+        ["fields.W342"],
+        models.ForeignKey(
+            Port,
+            models.CASCADE,
+            related_name='connection_end',
+            unique=True,
+        ),
     )
 
 # Another non-tree hierarchy that exercises code paths similar to the above
@@ -41,7 +48,10 @@ class TUser(models.Model):
 
 
 class Person(models.Model):
-    user = models.ForeignKey(TUser, models.CASCADE, unique=True)
+    user = silence_checks(
+        ["fields.W342"],
+        models.ForeignKey(TUser, models.CASCADE, unique=True),
+    )
 
 
 class Organizer(models.Model):

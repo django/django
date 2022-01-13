@@ -1,3 +1,4 @@
+from django.core.checks import silence_checks
 from django.db import connection, models
 
 
@@ -11,12 +12,18 @@ class Message(models.Model):
 
 
 class PeopleData(models.Model):
-    people_pk = models.ForeignKey(People, models.CASCADE, primary_key=True)
+    people_pk = silence_checks(
+        ["fields.W342"],
+        models.ForeignKey(People, models.CASCADE, primary_key=True),
+    )
     ssn = models.CharField(max_length=11)
 
 
 class PeopleMoreData(models.Model):
-    people_unique = models.ForeignKey(People, models.CASCADE, unique=True)
+    people_unique = silence_checks(
+        ["fields.W342"],
+        models.ForeignKey(People, models.CASCADE, unique=True),
+    )
     message = models.ForeignKey(Message, models.CASCADE, blank=True, null=True)
     license = models.CharField(max_length=255)
 

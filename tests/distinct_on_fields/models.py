@@ -1,3 +1,4 @@
+from django.core.checks import silence_checks
 from django.db import models
 
 
@@ -20,11 +21,14 @@ class Tag(models.Model):
 
 class Celebrity(models.Model):
     name = models.CharField("Name", max_length=20)
-    greatest_fan = models.ForeignKey(
-        "Fan",
-        models.SET_NULL,
-        null=True,
-        unique=True,
+    greatest_fan = silence_checks(
+        ["fields.W342"],
+        models.ForeignKey(
+            "Fan",
+            models.SET_NULL,
+            null=True,
+            unique=True,
+        )
     )
 
     def __str__(self):

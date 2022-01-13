@@ -1,6 +1,7 @@
 import uuid
 
 from django.contrib.auth.models import User
+from django.core.checks import silence_checks
 from django.db import models
 
 
@@ -56,7 +57,10 @@ class ReleaseEvent(models.Model):
     Used to check that autocomplete widget correctly resolves attname for FK as
     PK example.
     """
-    album = models.ForeignKey(Album, models.CASCADE, primary_key=True)
+    album = silence_checks(
+        ["fields.W342"],
+        models.ForeignKey(Album, models.CASCADE, primary_key=True),
+    )
     name = models.CharField(max_length=100)
 
     class Meta:

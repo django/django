@@ -1,6 +1,7 @@
 """
 Various complex queries that have been problematic in the past.
 """
+from django.core.checks import silence_checks
 from django.db import models
 from django.db.models.functions import Now
 
@@ -264,7 +265,10 @@ class CustomPkTag(models.Model):
 
 class Celebrity(models.Model):
     name = models.CharField("Name", max_length=20)
-    greatest_fan = models.ForeignKey("Fan", models.SET_NULL, null=True, unique=True)
+    greatest_fan = silence_checks(
+        ["fields.W342"],
+        models.ForeignKey("Fan", models.SET_NULL, null=True, unique=True),
+    )
 
     def __str__(self):
         return self.name
