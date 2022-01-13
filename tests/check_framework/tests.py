@@ -258,31 +258,25 @@ def custom_warning_system_check(app_configs, **kwargs):
 
 class SilencingCheckTests(SimpleTestCase):
 
-    def setUp(self):
-        self.old_stdout, self.old_stderr = sys.stdout, sys.stderr
-        self.stdout, self.stderr = StringIO(), StringIO()
-        sys.stdout, sys.stderr = self.stdout, self.stderr
-
-    def tearDown(self):
-        sys.stdout, sys.stderr = self.old_stdout, self.old_stderr
+    def call_command(self):
+        out = StringIO()
+        err = StringIO()
+        call_command('check', stdout=out, stderr=err)
+        return out.getvalue(), err.getvalue()
 
     @override_settings(SILENCED_SYSTEM_CHECKS=['myerrorcheck.E001'])
     @override_system_checks([custom_error_system_check])
     def test_silenced_error(self):
-        out = StringIO()
-        err = StringIO()
-        call_command('check', stdout=out, stderr=err)
-        self.assertEqual(out.getvalue(), 'System check identified no issues (1 silenced).\n')
-        self.assertEqual(err.getvalue(), '')
+        out, err = self.call_command()
+        self.assertEqual(out, 'System check identified no issues (1 silenced).\n')
+        self.assertEqual(err, '')
 
     @override_settings(SILENCED_SYSTEM_CHECKS=['mywarningcheck.E001'])
     @override_system_checks([custom_warning_system_check])
     def test_silenced_warning(self):
-        out = StringIO()
-        err = StringIO()
-        call_command('check', stdout=out, stderr=err)
-        self.assertEqual(out.getvalue(), 'System check identified no issues (1 silenced).\n')
-        self.assertEqual(err.getvalue(), '')
+        out, err = self.call_command()
+        self.assertEqual(out, 'System check identified no issues (1 silenced).\n')
+        self.assertEqual(err, '')
 
 
 class CheckFrameworkReservedNamesTests(SimpleTestCase):
