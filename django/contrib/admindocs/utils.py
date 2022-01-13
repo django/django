@@ -151,6 +151,33 @@ def replace_metacharacters(pattern):
     )
 
 
+def _get_group_start_end(start, end, pattern):
+    # Handle nested parentheses, e.g. '^(?P<a>(x|y))/b' or '^b/((x|y)\w+)$'.
+    unmatched_open_brackets, prev_char = 1, None
+    for idx, val in enumerate(pattern[end:]):
+        # Check for unescaped `(` and `)`. They mark the start and end of a
+        # nested group.
+        if val == '(' and prev_char != '\\':
+            unmatched_open_brackets += 1
+        elif val == ')' and prev_char != '\\':
+            unmatched_open_brackets -= 1
+        prev_char = val
+        # If brackets are balanced, the end of the string for the current named
+        # capture group pattern has been reached.
+        if unmatched_open_brackets == 0:
+            return start, end + idx + 1
+
+
+def _find_groups(pattern, group_matcher):
+    prev_end = None
+    for match in group_matcher.finditer(pattern):
+        if indices := _get_group_start_end(match.start(0), match.end(0), pattern):
+            start, end = indices
+            if prev_end and start > prev_end or not prev_end:
+                yield start, end, match
+            prev_end = end
+
+
 def replace_named_groups(pattern):
     r"""
     Find named groups in `pattern` and replace them with the group name. E.g.,
@@ -159,31 +186,10 @@ def replace_named_groups(pattern):
     3. ^(?P<a>\w+)/b/(\w+) ==> ^<a>/b/(\w+)
     4. ^(?P<a>\w+)/b/(?P<c>\w+) ==> ^<a>/b/<c>
     """
-    named_group_indices = [
-        (m.start(0), m.end(0), m[1])
-        for m in named_group_matcher.finditer(pattern)
+    group_pattern_and_name = [
+        (pattern[start:end], match[1])
+        for start, end, match in _find_groups(pattern, named_group_matcher)
     ]
-    # Tuples of (named capture group pattern, group name).
-    group_pattern_and_name = []
-    # Loop over the groups and their start and end indices.
-    for start, end, group_name in named_group_indices:
-        # Handle nested parentheses, e.g. '^(?P<a>(x|y))/b'.
-        unmatched_open_brackets, prev_char = 1, None
-        for idx, val in enumerate(pattern[end:]):
-            # Check for unescaped `(` and `)`. They mark the start and end of a
-            # nested group.
-            if val == '(' and prev_char != '\\':
-                unmatched_open_brackets += 1
-            elif val == ')' and prev_char != '\\':
-                unmatched_open_brackets -= 1
-            prev_char = val
-            # If brackets are balanced, the end of the string for the current
-            # named capture group pattern has been reached.
-            if unmatched_open_brackets == 0:
-                group_pattern_and_name.append((pattern[start:end + idx + 1], group_name))
-                break
-
-    # Replace the string for named capture groups with their group names.
     for group_pattern, group_name in group_pattern_and_name:
         pattern = pattern.replace(group_pattern, group_name)
     return pattern
@@ -197,44 +203,10 @@ def replace_unnamed_groups(pattern):
     3. ^(?P<a>\w+)/b/(\w+) ==> ^(?P<a>\w+)/b/<var>
     4. ^(?P<a>\w+)/b/((x|y)\w+) ==> ^(?P<a>\w+)/b/<var>
     """
-    unnamed_group_indices = [m.start(0) for m in unnamed_group_matcher.finditer(pattern)]
-    # Indices of the start of unnamed capture groups.
-    group_indices = []
-    # Loop over the start indices of the groups.
-    for start in unnamed_group_indices:
-        # Handle nested parentheses, e.g. '^b/((x|y)\w+)$'.
-        unmatched_open_brackets, prev_char = 1, None
-        for idx, val in enumerate(pattern[start + 1:]):
-            # Check for unescaped `(` and `)`. They mark the start and end of
-            # a nested group.
-            if val == '(' and prev_char != '\\':
-                unmatched_open_brackets += 1
-            elif val == ')' and prev_char != '\\':
-                unmatched_open_brackets -= 1
-            prev_char = val
-
-            if unmatched_open_brackets == 0:
-                group_indices.append((start, start + 2 + idx))
-                break
-    # Remove unnamed group matches inside other unnamed capture groups.
-    group_start_end_indices = []
-    prev_end = None
-    for start, end in group_indices:
-        if prev_end and start > prev_end or not prev_end:
-            group_start_end_indices.append((start, end))
+    final_pattern, prev_end = '', None
+    for start, end, _ in _find_groups(pattern, unnamed_group_matcher):
+        if prev_end:
+            final_pattern += pattern[prev_end:start]
+        final_pattern += pattern[:start] + '<var>'
         prev_end = end
-
-    if group_start_end_indices:
-        # Replace unnamed groups with <var>. Handle the fact that replacing the
-        # string between indices will change string length and thus indices
-        # will point to the wrong substring if not corrected.
-        final_pattern, prev_end = [], None
-        for start, end in group_start_end_indices:
-            if prev_end:
-                final_pattern.append(pattern[prev_end:start])
-            final_pattern.append(pattern[:start] + '<var>')
-            prev_end = end
-        final_pattern.append(pattern[prev_end:])
-        return ''.join(final_pattern)
-    else:
-        return pattern
+    return final_pattern + pattern[prev_end:]
