@@ -738,14 +738,16 @@ class ManyToOneTests(TestCase):
         self.assertEqual("id", cat.remote_field.get_related_field().name)
 
     def test_relation_unsaved(self):
-        # The <field>_set manager does not join on Null value fields (#17541)
         Third.objects.create(name="Third 1")
         Third.objects.create(name="Third 2")
         th = Third(name="testing")
-        # The object isn't saved and thus the relation field is null - we won't even
-        # execute a query in this case.
-        with self.assertNumQueries(0):
-            self.assertEqual(th.child_set.count(), 0)
+        # The object isn't saved and the relation cannot be used.
+        msg = (
+            "'Third' instance needs to have a primary key value before this "
+            "relationship can be used."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            th.child_set.count()
         th.save()
         # Now the model is saved, so we will need to execute a query.
         with self.assertNumQueries(1):
