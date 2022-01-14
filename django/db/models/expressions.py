@@ -1149,7 +1149,8 @@ class Subquery(BaseExpression, Combinable):
 
     def __init__(self, queryset, output_field=None, **extra):
         # Allow the usage of both QuerySet and sql.Query objects.
-        self.query = getattr(queryset, 'query', queryset)
+        self.query = getattr(queryset, 'query', queryset).clone()
+        self.query.subquery = True
         self.extra = extra
         super().__init__(output_field)
 
