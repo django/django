@@ -392,7 +392,7 @@ msgid "Welcome,"
 msgstr "Willkommen,"
 
 msgid "View site"
-msgstr "Auf der Website anzeigen"
+msgstr "Hauptseite anzeigen"
 
 msgid "Documentation"
 msgstr "Dokumentation"
