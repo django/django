@@ -137,9 +137,10 @@ if docutils_is_available:
     for name, urlbase in ROLES.items():
         create_reference_role(name, urlbase)
 
-# Match the beginning of a named or unnamed group.
+# Match the beginning of a named, unnamed, or non-capturing groups.
 named_group_matcher = _lazy_re_compile(r'\(\?P(<\w+>)')
 unnamed_group_matcher = _lazy_re_compile(r'\(')
+non_capturing_group_matcher = _lazy_re_compile(r'\(\?\:')
 
 
 def replace_metacharacters(pattern):
@@ -208,5 +209,20 @@ def replace_unnamed_groups(pattern):
         if prev_end:
             final_pattern += pattern[prev_end:start]
         final_pattern += pattern[:start] + '<var>'
+        prev_end = end
+    return final_pattern + pattern[prev_end:]
+
+
+def remove_non_capturing_groups(pattern):
+    r"""
+    Find non-capturing groups in the given `pattern` and remove them, e.g.
+    1. (?P<a>\w+)/b/(?:\w+)c(?:\w+) => (?P<a>\\w+)/b/c
+    2. ^(?:\w+(?:\w+))a => ^a
+    3. ^a(?:\w+)/b(?:\w+) => ^a/b
+    """
+    group_start_end_indices = _find_groups(pattern, non_capturing_group_matcher)
+    final_pattern, prev_end = '', None
+    for start, end, _ in group_start_end_indices:
+        final_pattern += pattern[prev_end:start]
         prev_end = end
     return final_pattern + pattern[prev_end:]

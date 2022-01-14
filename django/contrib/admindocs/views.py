@@ -8,7 +8,8 @@ from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admindocs import utils
 from django.contrib.admindocs.utils import (
-    replace_metacharacters, replace_named_groups, replace_unnamed_groups,
+    remove_non_capturing_groups, replace_metacharacters, replace_named_groups,
+    replace_unnamed_groups,
 )
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.db import models
@@ -410,6 +411,7 @@ def simplify_regex(pattern):
     example, turn "^(?P<sport_slug>\w+)/athletes/(?P<athlete_slug>\w+)/$"
     into "/<sport_slug>/athletes/<athlete_slug>/".
     """
+    pattern = remove_non_capturing_groups(pattern)
     pattern = replace_named_groups(pattern)
     pattern = replace_unnamed_groups(pattern)
     pattern = replace_metacharacters(pattern)
