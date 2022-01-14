@@ -44,9 +44,14 @@ class NullQueriesTests(TestCase):
         with self.assertRaisesMessage(ValueError, "Cannot use None as a query value"):
             Choice.objects.filter(id__gt=None)
 
-        # Related managers use __exact=None implicitly if the object hasn't been saved.
-        p2 = Poll(question="How?")
-        self.assertEqual(repr(p2.choice_set.all()), "<QuerySet []>")
+    def test_unsaved(self):
+        poll = Poll(question="How?")
+        msg = (
+            "'Poll' instance needs to have a primary key value before this "
+            "relationship can be used."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            poll.choice_set.all()
 
     def test_reverse_relations(self):
         """

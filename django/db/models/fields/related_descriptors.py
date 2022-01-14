@@ -627,12 +627,29 @@ def create_reverse_many_to_one_manager(superclass, rel):
 
             self.core_filters = {self.field.name: instance}
 
+            # Even if this relation is not to pk, we require still pk value.
+            # The wish is that the instance has been already saved to DB,
+            # although having a pk value isn't a guarantee of that.
+            if self.instance.pk is None:
+                raise ValueError(
+                    f"{instance.__class__.__name__!r} instance needs to have a primary "
+                    f"key value before this relationship can be used."
+                )
+
         def __call__(self, *, manager):
             manager = getattr(self.model, manager)
             manager_class = create_reverse_many_to_one_manager(manager.__class__, rel)
             return manager_class(self.instance)
 
         do_not_call_in_templates = True
+
+        def _check_fk_val(self):
+            for field in self.field.foreign_related_fields:
+                if getattr(self.instance, field.attname) is None:
+                    raise ValueError(
+                        f'"{self.instance!r}" needs to have a value for field '
+                        f'"{field.attname}" before this relationship can be used.'
+                    )
 
         def _apply_rel_filters(self, queryset):
             """
@@ -714,6 +731,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             return queryset, rel_obj_attr, instance_attr, False, cache_name, False
 
         def add(self, *objs, bulk=True):
+            self._check_fk_val()
             self._remove_prefetched_objects()
             db = router.db_for_write(self.model, instance=self.instance)
 
@@ -752,6 +770,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
         add.alters_data = True
 
         def create(self, **kwargs):
+            self._check_fk_val()
             kwargs[self.field.name] = self.instance
             db = router.db_for_write(self.model, instance=self.instance)
             return super(RelatedManager, self.db_manager(db)).create(**kwargs)
@@ -759,6 +778,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
         create.alters_data = True
 
         def get_or_create(self, **kwargs):
+            self._check_fk_val()
             kwargs[self.field.name] = self.instance
             db = router.db_for_write(self.model, instance=self.instance)
             return super(RelatedManager, self.db_manager(db)).get_or_create(**kwargs)
@@ -766,6 +786,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
         get_or_create.alters_data = True
 
         def update_or_create(self, **kwargs):
+            self._check_fk_val()
             kwargs[self.field.name] = self.instance
             db = router.db_for_write(self.model, instance=self.instance)
             return super(RelatedManager, self.db_manager(db)).update_or_create(**kwargs)
@@ -779,6 +800,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             def remove(self, *objs, bulk=True):
                 if not objs:
                     return
+                self._check_fk_val()
                 val = self.field.get_foreign_related_value(self.instance)
                 old_ids = set()
                 for obj in objs:
@@ -802,6 +824,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             remove.alters_data = True
 
             def clear(self, *, bulk=True):
+                self._check_fk_val()
                 self._clear(self, bulk)
 
             clear.alters_data = True
@@ -822,6 +845,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             _clear.alters_data = True
 
         def set(self, objs, *, bulk=True, clear=False):
+            self._check_fk_val()
             # Force evaluation of `objs` in case it's a queryset whose value
             # could be affected by `manager.clear()`. Refs #19816.
             objs = tuple(objs)

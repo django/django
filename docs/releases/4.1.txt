@@ -375,6 +375,14 @@ this difference. In Django 4.0 and earlier,
 second example query, but this undocumented behavior led to queries with
 excessive joins.
 
+Reverse foreign key changes for unsaved model instances
+-------------------------------------------------------
+
+In order to unify the behavior with many-to-many relations for unsaved model
+instances, a reverse foreign key now raises ``ValueError`` when calling
+:class:`related managers <django.db.models.fields.related.RelatedManager>` for
+unsaved objects.
+
 Miscellaneous
 -------------
 
