@@ -4,7 +4,7 @@ import re
 import types
 from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
 from functools import wraps
-from inspect import unwrap
+from inspect import signature, unwrap
 from operator import itemgetter
 from pprint import pformat
 from urllib.parse import quote
@@ -52,6 +52,26 @@ def stringfilter(func):
 ###################
 # STRINGS         #
 ###################
+
+@stringfilter
+def autoescape_aware(func):
+    """
+    Decorator for filters which should automatically escape text based
+    on whether or not autoescape is True.
+    """
+    def _dec(*args, **kwargs):
+        if 'autoescape' in kwargs:
+            autoescape = kwargs['autoescape']
+        else:
+            autoescape = signature(func).parameters['autoescape'].default
+        if autoescape:
+            return conditional_escape(args[0])
+        return func(*args, **kwargs)
+
+    _dec._decorated_function = getattr(func, '_decorated_function', func)
+
+    return wraps(func)(_dec)
+
 
 @register.filter(is_safe=True)
 @stringfilter

@@ -327,6 +327,22 @@ Template filter code falls into one of two situations:
    handle the auto-escaping issues and return a safe string, the
    ``is_safe`` flag won't change anything either way.
 
+   This pattern of using conditional_escape if autoescape is enabled is so
+   common that there is a decorator ``autoescape_aware()`` which can be
+   used as a shortcut. Filters can be made to automatically escape text
+   based on the value of the autoescape parameter. If the filter's
+   ``autoescape`` parameter is set to ``True``, the first argument will
+   be escaped. Otherwise, it will be left as is.
+
+   Here is an example of how this decorator could be used::
+
+        @register.filter(needs_autoescape=True)
+        @autoescape_aware
+        def autoescape_decorator_example_filter(text, autoescape=True):
+            result = '<p>%s</p>' % (text)
+            return mark_safe(result)
+
+
 .. warning:: Avoiding XSS vulnerabilities when reusing built-in filters
 
     Django's built-in filters have ``autoescape=True`` by default in order to
