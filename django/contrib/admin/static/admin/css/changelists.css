@@ -84,7 +84,7 @@
 
 #toolbar form input {
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 0.875rem;
     padding: 5px;
     color: var(--body-fg);
 }
@@ -95,7 +95,7 @@
     padding: 2px 5px;
     margin: 0;
     vertical-align: top;
-    font-size: 13px;
+    font-size: 0.8125rem;
     max-width: 100%;
 }
 
@@ -105,7 +105,7 @@
 
 #toolbar form input[type="submit"] {
     border: 1px solid var(--border-color);
-    font-size: 13px;
+    font-size: 0.8125rem;
     padding: 4px 8px;
     margin: 0;
     vertical-align: middle;
@@ -140,7 +140,7 @@
 }
 
 #changelist-filter h2 {
-    font-size: 14px;
+    font-size: 0.875rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     padding: 5px 15px;
@@ -193,7 +193,7 @@
 }
 
 #changelist-filter #changelist-filter-clear a {
-    font-size: 13px;
+    font-size: 0.8125rem;
     padding-bottom: 10px;
     border-bottom: 1px solid var(--hairline-color);
 }
@@ -253,7 +253,7 @@
 #changelist .actions span.action-counter,
 #changelist .actions span.clear,
 #changelist .actions span.question {
-    font-size: 13px;
+    font-size: 0.8125rem;
     margin: 0 0.5em;
 }
 
@@ -267,7 +267,7 @@
     color: var(--body-fg);
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 0.875rem;
     padding: 0 0 0 4px;
     margin: 0;
     margin-left: 10px;
@@ -280,11 +280,11 @@
 #changelist .actions label {
     display: inline-block;
     vertical-align: middle;
-    font-size: 13px;
+    font-size: 0.8125rem;
 }
 
 #changelist .actions .button {
-    font-size: 13px;
+    font-size: 0.8125rem;
     border: 1px solid var(--border-color);
     border-radius: 4px;
     background: var(--body-bg);

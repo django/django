@@ -44,7 +44,7 @@
     border-width: 0 1px;
     padding: 8px;
     color: var(--body-quiet-color);
-    font-size: 10px;
+    font-size: 0.625rem;
     margin: 0;
     text-align: left;
 }
@@ -273,7 +273,7 @@ p.datetime {
 .datetime span {
     white-space: nowrap;
     font-weight: normal;
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--body-quiet-color);
 }
 
@@ -283,7 +283,7 @@ p.datetime {
 }
 
 table p.datetime {
-    font-size: 11px;
+    font-size: 0.6875rem;
     margin-left: 0;
     padding-left: 0;
 }
@@ -317,7 +317,7 @@ table p.datetime {
 }
 
 .timezonewarning {
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--body-quiet-color);
 }
 
@@ -328,7 +328,7 @@ p.url {
     margin: 0;
     padding: 0;
     color: var(--body-quiet-color);
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-weight: bold;
 }
 
@@ -343,7 +343,7 @@ p.file-upload {
     margin: 0;
     padding: 0;
     color: var(--body-quiet-color);
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-weight: bold;
 }
 
@@ -361,7 +361,7 @@ p.file-upload {
 
 span.clearable-file-input label {
     color: var(--body-fg);
-    font-size: 11px;
+    font-size: 0.6875rem;
     display: inline;
     float: none;
 }
@@ -370,7 +370,7 @@ span.clearable-file-input label {
 
 .calendarbox, .clockbox {
     margin: 5px auto;
-    font-size: 12px;
+    font-size: 0.75rem;
     width: 19em;
     text-align: center;
     background: var(--body-bg);
@@ -404,7 +404,7 @@ span.clearable-file-input label {
     text-align: center;
     border-top: none;
     font-weight: 700;
-    font-size: 12px;
+    font-size: 0.75rem;
     color: #333;
     background: var(--accent);
 }
@@ -414,14 +414,14 @@ span.clearable-file-input label {
     background: var(--darkened-bg);
     border-bottom: 1px solid var(--border-color);
     font-weight: 400;
-    font-size: 12px;
+    font-size: 0.75rem;
     text-align: center;
     color: var(--body-quiet-color);
 }
 
 .calendar td {
     font-weight: 400;
-    font-size: 12px;
+    font-size: 0.75rem;
     text-align: center;
     padding: 0;
     border-top: 1px solid var(--hairline-color);
@@ -461,7 +461,7 @@ span.clearable-file-input label {
 }
 
 .calendarnav {
-    font-size: 10px;
+    font-size: 0.625rem;
     text-align: center;
     color: #ccc;
     margin: 0;
@@ -476,7 +476,7 @@ span.clearable-file-input label {
 .calendar-shortcuts {
     background: var(--body-bg);
     color: var(--body-quiet-color);
-    font-size: 11px;
+    font-size: 0.6875rem;
     line-height: 11px;
     border-top: 1px solid var(--hairline-color);
     padding: 8px 0;
@@ -515,7 +515,7 @@ span.clearable-file-input label {
 .calendar-cancel {
     margin: 0;
     padding: 4px 0;
-    font-size: 12px;
+    font-size: 0.75rem;
     background: #eee;
     border-top: 1px solid var(--border-color);
     color: var(--body-fg);

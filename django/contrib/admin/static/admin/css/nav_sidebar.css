@@ -16,7 +16,7 @@
     border-right: 1px solid var(--hairline-color);
     background-color: var(--body-bg);
     cursor: pointer;
-    font-size: 20px;
+    font-size: 1.25rem;
     color: var(--link-fg);
     padding: 0;
 }

@@ -64,7 +64,7 @@ html, body {
 body {
     margin: 0;
     padding: 0;
-    font-size: 14px;
+    font-size: 0.875rem;
     font-family: "Roboto","Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
     color: var(--body-fg);
     background: var(--body-bg);
@@ -117,12 +117,12 @@ h1,h2,h3,h4,h5 {
 h1 {
     margin: 0 0 20px;
     font-weight: 300;
-    font-size: 20px;
+    font-size: 1.25rem;
     color: var(--body-quiet-color);
 }
 
 h2 {
-    font-size: 16px;
+    font-size: 1rem;
     margin: 1em 0 .5em 0;
 }
 
@@ -132,20 +132,20 @@ h2.subhead {
 }
 
 h3 {
-    font-size: 14px;
+    font-size: 0.875rem;
     margin: .8em 0 .3em 0;
     color: var(--body-quiet-color);
     font-weight: bold;
 }
 
 h4 {
-    font-size: 12px;
+    font-size: 0.75rem;
     margin: 1em 0 .8em 0;
     padding-bottom: 3px;
 }
 
 h5 {
-    font-size: 10px;
+    font-size: 0.625rem;
     margin: 1.5em 0 .5em 0;
     color: var(--body-quiet-color);
     text-transform: uppercase;
@@ -162,7 +162,7 @@ li ul {
 }
 
 li, dt, dd {
-    font-size: 13px;
+    font-size: 0.8125rem;
     line-height: 20px;
 }
 
@@ -189,7 +189,7 @@ fieldset {
 }
 
 blockquote {
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: #777;
     margin-left: 2px;
     padding-left: 10px;
@@ -199,7 +199,7 @@ blockquote {
 code, pre {
     font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
     color: var(--body-quiet-color);
-    font-size: 12px;
+    font-size: 0.75rem;
     overflow-x: auto;
 }
 
@@ -227,15 +227,15 @@ hr {
 /* TEXT STYLES & MODIFIERS */
 
 .small {
-    font-size: 11px;
+    font-size: 0.6875rem;
 }
 
 .mini {
-    font-size: 10px;
+    font-size: 0.625rem;
 }
 
 .help, p.help, form p.help, div.help, form div.help, div.help li {
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--body-quiet-color);
 }
 
@@ -276,7 +276,7 @@ table {
 }
 
 td, th {
-    font-size: 13px;
+    font-size: 0.8125rem;
     line-height: 16px;
     border-bottom: 1px solid var(--hairline-color);
     vertical-align: top;
@@ -292,7 +292,7 @@ thead th,
 tfoot td {
     color: var(--body-quiet-color);
     padding: 5px 10px;
-    font-size: 11px;
+    font-size: 0.6875rem;
     background: var(--body-bg);
     border: none;
     border-top: 1px solid var(--hairline-color);
@@ -402,7 +402,7 @@ table thead th.sorted .sortoptions a.sortremove:after {
     top: -6px;
     left: 3px;
     font-weight: 200;
-    font-size: 18px;
+    font-size: 1.125rem;
     color: var(--body-quiet-color);
 }
 
@@ -443,7 +443,7 @@ input, textarea, select, .form-row p, form .button {
     vertical-align: middle;
     font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
     font-weight: normal;
-    font-size: 13px;
+    font-size: 0.8125rem;
 }
 .form-row div.help {
     padding: 2px 3px;
@@ -554,7 +554,7 @@ input[type=button][disabled].default {
     margin: 0;
     padding: 8px;
     font-weight: 400;
-    font-size: 13px;
+    font-size: 0.8125rem;
     text-align: left;
     background: var(--primary);
     color: var(--header-link-color);
@@ -562,7 +562,7 @@ input[type=button][disabled].default {
 
 .module caption,
 .inline-group h2 {
-    font-size: 12px;
+    font-size: 0.75rem;
     letter-spacing: 0.5px;
     text-transform: uppercase;
 }
@@ -581,7 +581,7 @@ ul.messagelist {
 ul.messagelist li {
     display: block;
     font-weight: 400;
-    font-size: 13px;
+    font-size: 0.8125rem;
     padding: 10px 10px 10px 65px;
     margin: 0 0 10px 0;
     background: var(--message-success-bg) url(../img/icon-yes.svg) 40px 12px no-repeat;
@@ -601,7 +601,7 @@ ul.messagelist li.error {
 }
 
 .errornote {
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 700;
     display: block;
     padding: 10px 12px;
@@ -622,7 +622,7 @@ ul.errorlist {
 }
 
 ul.errorlist li {
-    font-size: 13px;
+    font-size: 0.8125rem;
     display: block;
     margin-bottom: 4px;
     overflow-wrap: break-word;
@@ -663,7 +663,7 @@ td ul.errorlist + input, td ul.errorlist + select, td ul.errorlist + textarea {
 }
 
 .description {
-    font-size: 12px;
+    font-size: 0.75rem;
     padding: 5px 0 0 12px;
 }
 
@@ -719,7 +719,7 @@ a.deletelink:focus, a.deletelink:hover {
 /* OBJECT TOOLS */
 
 .object-tools {
-    font-size: 10px;
+    font-size: 0.625rem;
     font-weight: bold;
     padding-left: 0;
     float: right;
@@ -745,7 +745,7 @@ a.deletelink:focus, a.deletelink:hover {
     background: var(--object-tools-bg);
     color: var(--object-tools-fg);
     font-weight: 400;
-    font-size: 11px;
+    font-size: 0.6875rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -894,7 +894,7 @@ a.deletelink:focus, a.deletelink:hover {
     padding: 0;
     margin: 0 20px 0 0;
     font-weight: 300;
-    font-size: 24px;
+    font-size: 1.5rem;
     color: var(--accent);
 }
 
@@ -904,7 +904,7 @@ a.deletelink:focus, a.deletelink:hover {
 
 #branding h2 {
     padding: 0 10px;
-    font-size: 14px;
+    font-size: 0.875rem;
     margin: -8px 0 8px 0;
     font-weight: normal;
     color: var(--header-color);
@@ -919,7 +919,7 @@ a.deletelink:focus, a.deletelink:hover {
     padding: 0;
     margin: 0 0 0 20px;
     font-weight: 300;
-    font-size: 11px;
+    font-size: 0.6875rem;
     letter-spacing: 0.5px;
     text-transform: uppercase;
     text-align: right;
@@ -952,7 +952,7 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 #content-related h4 {
-    font-size: 13px;
+    font-size: 0.8125rem;
 }
 
 #content-related p {
@@ -976,7 +976,7 @@ a.deletelink:focus, a.deletelink:hover {
     padding: 16px;
     margin-bottom: 16px;
     border-bottom: 1px solid var(--hairline-color);
-    font-size: 18px;
+    font-size: 1.125rem;
     color: var(--body-fg);
 }
 
@@ -1027,7 +1027,7 @@ a.deletelink:focus, a.deletelink:hover {
 /* PAGINATOR */
 
 .paginator {
-    font-size: 13px;
+    font-size: 0.8125rem;
     padding-top: 10px;
     padding-bottom: 10px;
     line-height: 22px;
@@ -1061,7 +1061,7 @@ a.deletelink:focus, a.deletelink:hover {
 .paginator .this-page {
     padding: 2px 6px;
     font-weight: bold;
-    font-size: 13px;
+    font-size: 0.8125rem;
     vertical-align: top;
 }
 
