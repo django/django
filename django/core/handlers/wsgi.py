@@ -14,11 +14,10 @@ _slashes_re = _lazy_re_compile(br'/+')
 
 class LimitedStream:
     """Wrap another stream to disallow reading it past a number of bytes."""
-    def __init__(self, stream, limit, buf_size=64 * 1024 * 1024):
+    def __init__(self, stream, limit):
         self.stream = stream
         self.remaining = limit
         self.buffer = b''
-        self.buf_size = buf_size
 
     def _read_limited(self, size=None):
         if size is None or size > self.remaining:
