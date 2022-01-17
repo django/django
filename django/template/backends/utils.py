@@ -1,13 +1,11 @@
 from django.middleware.csrf import get_token
 from django.utils.functional import lazy
-from django.utils.html import format_html
 from django.utils.safestring import SafeString
 
 
 def csrf_input(request):
-    return format_html(
-        '<input type="hidden" name="csrfmiddlewaretoken" value="{}">',
-        get_token(request))
+    token = get_token(request)
+    return SafeString(f'<input type="hidden" name="csrfmiddlewaretoken" value="{token}">')
 
 
 csrf_input_lazy = lazy(csrf_input, SafeString, str)
