@@ -213,8 +213,8 @@ Configure, make and install::
 If you have any problems, please see the troubleshooting section below for
 suggestions and solutions.
 
-__ https://trac.osgeo.org/gdal/
-__ https://trac.osgeo.org/gdal/wiki/GdalOgrInPython
+__ https://gdal.org/
+__ https://gdal.org/api/python.html
 
 .. _gdaltrouble:
 

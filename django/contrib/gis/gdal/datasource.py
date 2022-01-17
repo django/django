@@ -58,7 +58,7 @@ class DataSource(GDALBase):
             self._write = 1
         else:
             self._write = 0
-        # See also https://trac.osgeo.org/gdal/wiki/rfc23_ogr_unicode
+        # See also https://gdal.org/development/rfc/rfc23_ogr_unicode.html
         self.encoding = encoding
 
         Driver.ensure_registered()
