@@ -503,7 +503,10 @@ class SQLCompiler:
                         part_sql = 'SELECT * FROM ({})'.format(part_sql)
                     # Add parentheses when combining with compound query if not
                     # already added for all compound queries.
-                    elif not features.supports_slicing_ordering_in_compound:
+                    elif (
+                        self.query.subquery or
+                        not features.supports_slicing_ordering_in_compound
+                    ):
                         part_sql = '({})'.format(part_sql)
                 parts += ((part_sql, part_args),)
             except EmptyResultSet:
@@ -517,7 +520,9 @@ class SQLCompiler:
         combinator_sql = self.connection.ops.set_operators[combinator]
         if all and combinator == 'union':
             combinator_sql += ' ALL'
-        braces = '({})' if features.supports_slicing_ordering_in_compound else '{}'
+        braces = '{}'
+        if not self.query.subquery and features.supports_slicing_ordering_in_compound:
+            braces = '({})'
         sql_parts, args_parts = zip(*((braces.format(sql), args) for sql, args in parts))
         result = [' {} '.format(combinator_sql).join(sql_parts)]
         params = []

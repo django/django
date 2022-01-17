@@ -1048,6 +1048,12 @@ class Query(BaseExpression):
         clone.bump_prefix(query)
         clone.subquery = True
         clone.where.resolve_expression(query, *args, **kwargs)
+        # Resolve combined queries.
+        if clone.combinator:
+            clone.combined_queries = tuple([
+                combined_query.resolve_expression(query, *args, **kwargs)
+                for combined_query in clone.combined_queries
+            ])
         for key, value in clone.annotations.items():
             resolved = value.resolve_expression(query, *args, **kwargs)
             if hasattr(resolved, 'external_aliases'):
