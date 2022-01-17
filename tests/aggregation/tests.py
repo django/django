@@ -178,7 +178,7 @@ class AggregateTestCase(TestCase):
         s3.books.add(cls.b3, cls.b4, cls.b6)
 
     def test_empty_aggregate(self):
-        self.assertEqual(Author.objects.all().aggregate(), {})
+        self.assertEqual(Author.objects.aggregate(), {})
 
     def test_aggregate_in_order_by(self):
         msg = (
@@ -209,11 +209,7 @@ class AggregateTestCase(TestCase):
         vals = Book.objects.filter(rating__lt=4.5).aggregate(Avg("authors__age"))
         self.assertEqual(vals, {"authors__age__avg": Approximate(38.2857, places=2)})
 
-        vals = (
-            Author.objects.all()
-            .filter(name__contains="a")
-            .aggregate(Avg("book__rating"))
-        )
+        vals = Author.objects.filter(name__contains="a").aggregate(Avg("book__rating"))
         self.assertEqual(vals, {"book__rating__avg": 4.0})
 
         vals = Book.objects.aggregate(Sum("publisher__num_awards"))
@@ -1016,7 +1012,7 @@ class AggregateTestCase(TestCase):
         """
         Aggregation over sliced queryset works correctly.
         """
-        qs = Book.objects.all().order_by("-rating")[0:3]
+        qs = Book.objects.order_by("-rating")[0:3]
         vals = qs.aggregate(average_top3_rating=Avg("rating"))["average_top3_rating"]
         self.assertAlmostEqual(vals, 4.5, places=2)
 
@@ -1026,8 +1022,7 @@ class AggregateTestCase(TestCase):
         select_related() stuff.
         """
         qs = (
-            Book.objects.all()
-            .select_for_update()
+            Book.objects.select_for_update()
             .order_by("pk")
             .select_related("publisher")
             .annotate(max_pk=Max("pk"))
@@ -2047,14 +2042,14 @@ class AggregateTestCase(TestCase):
         self.assertEqual(result["num_awards__sum"], 20)
 
     def test_exists_none_with_aggregate(self):
-        qs = Book.objects.all().annotate(
+        qs = Book.objects.annotate(
             count=Count("id"),
             exists=Exists(Author.objects.none()),
         )
         self.assertEqual(len(qs), 6)
 
     def test_exists_extra_where_with_aggregate(self):
-        qs = Book.objects.all().annotate(
+        qs = Book.objects.annotate(
             count=Count("id"),
             exists=Exists(Author.objects.extra(where=["1=0"])),
         )

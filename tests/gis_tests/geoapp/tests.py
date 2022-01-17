@@ -217,7 +217,7 @@ class GeoModelTest(TestCase):
         Test a dumpdata/loaddata cycle with geographic data.
         """
         out = StringIO()
-        original_data = list(City.objects.all().order_by("name"))
+        original_data = list(City.objects.order_by("name"))
         call_command("dumpdata", "geoapp.City", stdout=out)
         result = out.getvalue()
         houston = City.objects.get(name="Houston")
@@ -228,7 +228,7 @@ class GeoModelTest(TestCase):
             tmp.write(result)
             tmp.seek(0)
             call_command("loaddata", tmp.name, verbosity=0)
-        self.assertEqual(original_data, list(City.objects.all().order_by("name")))
+        self.assertEqual(original_data, list(City.objects.order_by("name")))
 
     @skipUnlessDBFeature("supports_empty_geometries")
     def test_empty_geometries(self):
@@ -623,7 +623,7 @@ class GeoQuerySetTest(TestCase):
         """
         Testing if extent supports limit.
         """
-        extent1 = City.objects.all().aggregate(Extent("point"))["point__extent"]
+        extent1 = City.objects.aggregate(Extent("point"))["point__extent"]
         extent2 = City.objects.all()[:3].aggregate(Extent("point"))["point__extent"]
         self.assertNotEqual(extent1, extent2)
 
@@ -633,7 +633,7 @@ class GeoQuerySetTest(TestCase):
         """
         if not connection.features.supports_make_line_aggr:
             with self.assertRaises(NotSupportedError):
-                City.objects.all().aggregate(MakeLine("point"))
+                City.objects.aggregate(MakeLine("point"))
             return
 
         # MakeLine on an inappropriate field returns simply None

@@ -529,8 +529,8 @@ class AnonymousUserTests(SimpleTestCase):
         self.assertIs(self.user.is_staff, False)
         self.assertIs(self.user.is_active, False)
         self.assertIs(self.user.is_superuser, False)
-        self.assertEqual(self.user.groups.all().count(), 0)
-        self.assertEqual(self.user.user_permissions.all().count(), 0)
+        self.assertEqual(self.user.groups.count(), 0)
+        self.assertEqual(self.user.user_permissions.count(), 0)
         self.assertEqual(self.user.get_user_permissions(), set())
         self.assertEqual(self.user.get_group_permissions(), set())
 

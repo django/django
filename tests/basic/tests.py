@@ -32,12 +32,12 @@ class ModelInstanceCreationTests(TestCase):
             pub_date=datetime(2005, 7, 28),
         )
         self.assertIsNone(a.id)
-        self.assertEqual(Article.objects.all().count(), 0)
+        self.assertEqual(Article.objects.count(), 0)
 
         # Save it into the database. You have to call save() explicitly.
         a.save()
         self.assertIsNotNone(a.id)
-        self.assertEqual(Article.objects.all().count(), 1)
+        self.assertEqual(Article.objects.count(), 1)
 
     def test_can_initialize_model_instance_using_positional_arguments(self):
         """
@@ -199,7 +199,7 @@ class ModelTest(TestCase):
         for headline in headlines:
             Article(headline=headline, pub_date=some_pub_date).save()
         self.assertQuerysetEqual(
-            Article.objects.all().order_by("headline"),
+            Article.objects.order_by("headline"),
             sorted(headlines),
             transform=lambda a: a.headline,
         )

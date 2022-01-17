@@ -20,7 +20,7 @@ class ExplainTests(TestCase):
             Tag.objects.filter(name="test").annotate(Count("children")),
             Tag.objects.filter(name="test").values_list("name"),
             Tag.objects.order_by().union(Tag.objects.order_by().filter(name="test")),
-            Tag.objects.all().select_for_update().filter(name="test"),
+            Tag.objects.select_for_update().filter(name="test"),
         ]
         supported_formats = connection.features.supported_explain_formats
         all_formats = (
@@ -60,7 +60,7 @@ class ExplainTests(TestCase):
     @skipUnlessDBFeature("validates_explain_options")
     def test_unknown_options(self):
         with self.assertRaisesMessage(ValueError, "Unknown options: test, test2"):
-            Tag.objects.all().explain(test=1, test2=1)
+            Tag.objects.explain(test=1, test2=1)
 
     def test_unknown_format(self):
         msg = "DOES NOT EXIST is not a recognized format."
@@ -69,7 +69,7 @@ class ExplainTests(TestCase):
                 sorted(connection.features.supported_explain_formats)
             )
         with self.assertRaisesMessage(ValueError, msg):
-            Tag.objects.all().explain(format="does not exist")
+            Tag.objects.explain(format="does not exist")
 
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
     def test_postgres_options(self):

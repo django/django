@@ -73,7 +73,7 @@ class BooleanFieldTests(TestCase):
 
         # When an extra clause exists, the boolean conversions are applied with
         # an offset (#13293).
-        b5 = BooleanModel.objects.all().extra(select={"string_col": "string"})[0]
+        b5 = BooleanModel.objects.extra(select={"string_col": "string"})[0]
         self.assertNotIsInstance(b5.pk, bool)
 
     def test_select_related(self):
