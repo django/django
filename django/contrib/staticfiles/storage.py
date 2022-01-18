@@ -51,6 +51,10 @@ class HashedFilesMixin:
                 r"""(?P<matched>@import\s*["']\s*(?P<url>.*?)["'])""",
                 """@import url("%(url)s")""",
             ),
+            (
+                r'(?m)(?P<matched>)^(/\*# (?-i:sourceMappingURL)=(?P<url>.*) \*/)$',
+                '/*# sourceMappingURL=%(url)s */',
+            ),
         )),
         ('*.js', (
             (
