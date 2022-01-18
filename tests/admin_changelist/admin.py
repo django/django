@@ -1,6 +1,6 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
+from django.contrib.auth.admin import GroupAdmin, UserAdmin
+from django.contrib.auth.models import Group, User
 from django.core.paginator import Paginator
 
 from .models import Band, Child, Event, Parent, Swallow
@@ -8,6 +8,7 @@ from .models import Band, Child, Event, Parent, Swallow
 site = admin.AdminSite(name="admin")
 
 site.register(User, UserAdmin)
+site.register(Group, GroupAdmin)
 
 
 class CustomPaginator(Paginator):

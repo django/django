@@ -16,7 +16,7 @@ from django.db.models import F, Field, IntegerField
 from django.db.models.functions import Upper
 from django.db.models.lookups import Contains, Exact
 from django.template import Context, Template, TemplateSyntaxError
-from django.test import TestCase, override_settings
+from django.test import TestCase, modify_settings, override_settings
 from django.test.client import RequestFactory
 from django.test.utils import (
     CaptureQueriesContext, isolate_apps, register_lookup,
@@ -1686,3 +1686,72 @@ class SeleniumTests(AdminSeleniumTestCase):
             )
         finally:
             alert.dismiss()
+
+
+@modify_settings(MIDDLEWARE={'remove': 'django.contrib.admin.tests.CSPMiddleware'})
+@override_settings(ROOT_URLCONF='admin_changelist.urls')
+class AdminFiltersSeleniumTests(AdminSeleniumTestCase):
+
+    available_apps = ['admin_changelist'] + AdminSeleniumTestCase.available_apps
+
+    def setUp(self):
+        User.objects.create_superuser(username='super', password='secret', email=None)
+
+    def test_collapse_filters(self):
+        from selenium.webdriver.common.by import By
+
+        from django.contrib.auth.models import Group as AdminGroup
+
+        # We create 10 new Groups in addition to the 'All' and 'groups__isnull'
+        # to have >10 filters and see if it is collapsed when enter to the list view
+        AdminGroup.objects.bulk_create([
+            Group(name='01'),
+            Group(name='02'),
+            Group(name='03'),
+            Group(name='04'),
+            Group(name='05'),
+            Group(name='06'),
+            Group(name='07'),
+            Group(name='08'),
+            Group(name='09'),
+            Group(name='10')
+        ])
+
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:auth_user_changelist'))
+
+        # The UserAdmin has 4 field filters by default:
+        expanded_fields = ('staff_status', 'superuser_status', 'active')
+        collapsed_fields = ('groups',)
+
+        # Check the filters with <10 filters are expanded
+        for field in expanded_fields:
+            self.assertTrue(
+                self.selenium.find_element(By.ID, f'expanded_{field}').is_displayed()
+            )  # it's expanded
+            self.assertFalse(
+                self.selenium.find_element(By.ID, f'collapsed_{field}').is_displayed()
+            )  # it's NOT collapsed
+
+        # Group field is collapsed because it has >10 filters
+        group_field = collapsed_fields[0]
+        expanded = self.selenium.find_element(By.ID, f'expanded_{group_field}')
+        collapsed = self.selenium.find_element(By.ID, f'collapsed_{group_field}')
+        self.assertFalse(expanded.is_displayed())  # it's NOT expanded
+        self.assertTrue(collapsed.is_displayed())  # it's collapsed
+
+        # now click the 'By groups' title to expand it
+        by_groups_title = self.selenium.find_element(By.CSS_SELECTOR, f'.filter_collapse_{group_field}')
+        by_groups_title.click()
+        self.assertTrue(expanded.is_displayed())  # it's expanded
+        self.assertFalse(collapsed.is_displayed())  # it's NOT collapsed
+
+        # Let's collapse the others filters
+        for field in expanded_fields:
+            self.selenium.find_element(By.CSS_SELECTOR, f'.filter_collapse_{field}').click()
+            self.assertTrue(
+                self.selenium.find_element(By.ID, f'collapsed_{field}').is_displayed()
+            )  # it's collapsed
+            self.assertFalse(
+                self.selenium.find_element(By.ID, f'expanded_{field}').is_displayed()
+            )  # it's NOT expanded
