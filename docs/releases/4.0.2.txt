@@ -20,3 +20,7 @@ Bugfixes
 
 * Fixed a regression in Django 4.0 that caused an incorrect ``repr`` of
   ``ResolverMatch`` for class-based views (:ticket:`33426`).
+
+* Fixed a regression in Django 4.0 that caused a crash of ``makemigrations`` on
+  models without ``Meta.order_with_respect_to`` but with a field named
+  ``_order`` (:ticket:`33449`).
