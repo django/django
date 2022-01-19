@@ -232,7 +232,7 @@ input[type="submit"], button {
         margin-left: 15px;
     }
 
-    form .aligned ul.radiolist {
+    form .aligned div.radiolist {
         margin-left: 2px;
     }
 
@@ -650,12 +650,13 @@ input[type="submit"], button {
         padding-left: 0;
     }
 
-    form .aligned ul.radiolist {
+    form .aligned div.radiolist {
+        margin-top: 5px;
         margin-right: 15px;
         margin-bottom: -3px;
     }
 
-    form .aligned ul.radiolist:not(.inline) li + li {
+    form .aligned div.radiolist:not(.inline) div + div {
         margin-top: 5px;
     }
 

@@ -37,16 +37,19 @@ label {
 
 /* RADIO BUTTONS */
 
-form ul.radiolist li {
-    list-style-type: none;
+form div.radiolist div {
+    padding-right: 7px;
 }
 
-form ul.radiolist label {
-    float: none;
-    display: inline;
+form div.radiolist.inline div {
+    display: inline-block;
 }
 
-form ul.radiolist input[type="radio"] {
+form div.radiolist label {
+    width: auto;
+}
+
+form div.radiolist input[type="radio"] {
     margin: -2px 4px 0 0;
     padding: 0;
 }
@@ -106,7 +109,7 @@ form .aligned ul {
     padding-left: 10px;
 }
 
-form .aligned ul.radiolist {
+form .aligned div.radiolist {
     display: inline-block;
     margin: 0;
     padding: 0;
