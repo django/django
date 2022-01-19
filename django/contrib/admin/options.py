@@ -653,6 +653,7 @@ class ModelAdmin(BaseModelAdmin):
             'urlify.js',
             'prepopulate.js',
             'vendor/xregexp/xregexp%s.js' % extra,
+            'filters.js',
         ]
         return forms.Media(js=['admin/js/%s' % url for url in js])
 

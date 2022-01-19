@@ -1,42 +1,19 @@
 {% load i18n %}
 
 {% with field=title.split|join:"_" %}
-<a href="#" class="filter_collapse_{{ field }}">
+<a href="#" data-toggle="{{ field }}">
     <h3>
-        <div id="expanded_{{ field }}">-</div>
-        <div id="collapsed_{{ field }}">+</div>
+        <div data-expanded="{{ field }}">-</div>
+        <div data-collapsed="{{ field }}">+</div>
         {% blocktranslate with filter_title=title %} By {{ filter_title }} {% endblocktranslate %}
     </h3>
 </a>
 <ul>
-    <div id="collapsable_{{ field }}">
+    <div data-target="{{ field }}">
     {% for choice in choices %}
         <li{% if choice.selected %} class="selected"{% endif %}>
         <a href="{{ choice.query_string|iriencode }}">{{ choice.display }}</a></li>
     {% endfor %}
     </div>
 </ul>
-
-<script>
-(function($) {
-    $(document).ready(function() {
-        const $expanded = $('#expanded_{{ field }}')
-        const $collapsed = $('#collapsed_{{ field }}')
-        const $collapsable = $('#collapsable_{{ field }}')
-
-        {% if choices|length > 10 %}
-            $expanded.hide();
-            $collapsable.slideToggle();
-        {% else %}
-            $collapsed.hide();
-        {% endif %}
-
-        $('.filter_collapse_{{ field }}').on('click', function () {
-            $collapsed.toggle();
-            $expanded.toggle();
-            $collapsable.slideToggle('slow');
-        });
-    });
-})(django.jQuery);
-</script>
 {% endwith %}

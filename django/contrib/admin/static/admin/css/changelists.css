@@ -198,8 +198,8 @@
     border-bottom: 1px solid var(--hairline-color);
 }
 
-#changelist-filter [id^="expanded_"],
-#changelist-filter [id^="collapsed_"] {
+#changelist-filter [data-expanded],
+#changelist-filter [data-collapsed] {
     display: inline;
 }
 
