@@ -317,3 +317,12 @@ class SpatialRefTest(SimpleTestCase):
         msg = 'AxisOrder.AUTHORITY is not supported in GDAL < 3.0.'
         with self.assertRaisesMessage(ValueError, msg):
             SpatialReference(4326, axis_order=AxisOrder.AUTHORITY)
+
+    def test_esri(self):
+        srs = SpatialReference('NAD83')
+        pre_esri_wkt = srs.wkt
+        srs.to_esri()
+        self.assertNotEqual(srs.wkt, pre_esri_wkt)
+        self.assertIn('DATUM["D_North_American_1983"', srs.wkt)
+        srs.from_esri()
+        self.assertIn('DATUM["North_American_Datum_1983"', srs.wkt)
