@@ -8,6 +8,7 @@ from django.db.migrations.operations import (
 from django.db.migrations.state import (
     ModelState, ProjectState, get_related_models_recursive,
 )
+from django.db.models.fields.related import ForeignKey
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import isolate_apps
 
@@ -958,6 +959,44 @@ class StateTests(SimpleTestCase):
             list(project_state.models['migrations', 'book'].fields),
             ["id", "author"],
         )
+
+    def test_modelstate_get_field_returns_order_wrt_field_for__order(self):
+        new_apps = Apps()
+
+        class Author(models.Model):
+            name = models.TextField()
+
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+
+        class Book(models.Model):
+            author = models.ForeignKey(Author, models.CASCADE)
+
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+                order_with_respect_to = "author"
+
+        model_state = ModelState.from_model(Book)
+        order_wrt_field = model_state.get_field('_order')
+        self.assertIsInstance(order_wrt_field, ForeignKey)
+        self.assertEqual(order_wrt_field.related_model, 'migrations.author')
+
+    def test_modelstate_get_field_returns__order_if_model_uses_no_order_wrt(self):
+        new_apps = Apps()
+
+        class HistoricalRecord(models.Model):
+            _order = models.PositiveSmallIntegerField()
+
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+
+        model_state = ModelState.from_model(HistoricalRecord)
+        order_field = model_state.get_field('_order')
+        self.assertIsNone(order_field.related_model)
+        self.assertIsInstance(order_field, models.PositiveSmallIntegerField)
 
     def test_manager_refer_correct_model_version(self):
         """

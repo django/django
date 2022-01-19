@@ -685,11 +685,8 @@ class ModelState:
         return self.name.lower()
 
     def get_field(self, field_name):
-        field_name = (
-            self.options['order_with_respect_to']
-            if field_name == '_order'
-            else field_name
-        )
+        if field_name == '_order' and 'order_with_respect_to' in self.options:
+            field_name = self.options['order_with_respect_to']
         return self.fields[field_name]
 
     @classmethod
