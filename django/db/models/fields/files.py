@@ -70,6 +70,11 @@ class FieldFile(File):
             return self.file.size
         return self.storage.size(self.name)
 
+    @property
+    def mode(self):
+        self._require_file()
+        return self.file.mode
+
     def open(self, mode='rb'):
         self._require_file()
         if getattr(self, '_file', None) is None:
