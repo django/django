@@ -225,7 +225,6 @@ OGRFieldTypes = {
     9: OFTDate,
     10: OFTTime,
     11: OFTDateTime,
-    # New 64-bit integer types in GDAL 2
     12: OFTInteger64,
     13: OFTInteger64List,
 }
