@@ -310,6 +310,11 @@ backends.
   ``DatabaseOperations.insert_statement()`` method is replaced by
   ``on_conflict`` that accepts ``django.db.models.constants.OnConflict``.
 
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for GDAL 2.1 is removed.
+
 Dropped support for MariaDB 10.2
 --------------------------------
 

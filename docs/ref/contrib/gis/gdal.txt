@@ -1521,8 +1521,7 @@ blue.
         to mark pixels that are not valid data. Such pixels should generally not
         be displayed, nor contribute to analysis operations.
 
-        To delete an existing "no data" value, set this property to ``None``
-        (requires GDAL ≥ 2.1).
+        To delete an existing "no data" value, set this property to ``None``.
 
     .. method:: datatype(as_string=False)
 
