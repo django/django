@@ -21,6 +21,7 @@ except ImportError as e:
 else:
     from django.apps import apps
     from django.conf import settings
+    from django.core.exceptions import ImproperlyConfigured
     from django.db import connection, connections
     from django.test import TestCase, TransactionTestCase
     from django.test.runner import get_max_test_processes, parallel_type
@@ -321,6 +322,10 @@ class ActionSelenium(argparse.Action):
     Validate the comma-separated list of requested browsers.
     """
     def __call__(self, parser, namespace, values, option_string=None):
+        try:
+            import selenium  # NOQA
+        except ImportError as e:
+            raise ImproperlyConfigured(f'Error loading selenium module: {e}')
         browsers = values.split(',')
         for browser in browsers:
             try:
