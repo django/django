@@ -416,6 +416,9 @@ Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
     # objects.all() displays all the questions in the database.
     >>> Question.objects.all()
     <QuerySet [<Question: Question object (1)>]>
+    
+    # we need to exit the shell and restart it to make changes to models.py
+    >>> quit()
 
 Wait a minute. ``<Question: Question object (1)>`` isn't a helpful
 representation of this object. Let's fix that by editing the ``Question`` model
@@ -545,6 +548,8 @@ Save these changes and start a new Python interactive shell by running
     # Let's delete one of the choices. Use delete() for that.
     >>> c = q.choice_set.filter(choice_text__startswith='Just hacking')
     >>> c.delete()
+    
+    >>> quit()
 
 For more information on model relations, see :doc:`Accessing related objects
 </ref/models/relations>`. For more on how to use double underscores to perform
