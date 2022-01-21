@@ -130,6 +130,8 @@ class HttpRequest:
             msg = "Invalid HTTP_HOST header: %r." % host
             if domain:
                 msg += " You may need to add %r to ALLOWED_HOSTS." % domain
+            elif "_" in domain:
+                msg += " %r contains _ and that is not valid according to RFC 1034/1035." % domain
             else:
                 msg += " The domain name provided is not valid according to RFC 1034/1035."
             raise DisallowedHost(msg)
