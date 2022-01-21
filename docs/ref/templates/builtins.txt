@@ -2637,7 +2637,7 @@ It is also able to consume standard context variables, e.g. assuming a
 ``user_stylesheet`` variable is passed to the template::
 
     {% load static %}
-    <link rel="stylesheet" href="{% static user_stylesheet %}" type="text/css" media="screen">
+    <link rel="stylesheet" href="{% static user_stylesheet %}" media="screen">
 
 If you'd like to retrieve a static URL without displaying it, you can use a
 slightly different call::

@@ -90,7 +90,7 @@ class Media:
         media = sorted(self._css)
         return chain.from_iterable([
             format_html(
-                '<link href="{}" type="text/css" media="{}" rel="stylesheet">',
+                '<link href="{}" media="{}" rel="stylesheet">',
                 self.absolute_path(path), medium
             ) for path in self._css[medium]
         ] for medium in media)
