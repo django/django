@@ -18,6 +18,12 @@ In order to avoid this vulnerability, ``{% debug %}`` no longer outputs an
 information when the ``DEBUG`` setting is ``False``, and it ensures all context
 variables are correctly escaped when the ``DEBUG`` setting is ``True``.
 
+CVE-2022-23833: Denial-of-service possibility in file uploads
+=============================================================
+
+Passing certain inputs to multipart forms could result in an infinite loop when
+parsing files.
+
 Bugfixes
 ========
 
