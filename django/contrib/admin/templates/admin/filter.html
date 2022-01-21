@@ -1,19 +1,15 @@
 {% load i18n %}
 
-{% with field=title.split|join:"_" %}
-<a href="#" data-toggle="{{ field }}">
+<a href="#" data-toggle="{{ lookup_kwarg }}">
     <h3>
-        <div data-expanded="{{ field }}">-</div>
-        <div data-collapsed="{{ field }}">+</div>
+        <div data-expanded="{{ lookup_kwarg }}">-</div>
+        <div data-collapsed="{{ lookup_kwarg }}">+</div>
         {% blocktranslate with filter_title=title %} By {{ filter_title }} {% endblocktranslate %}
     </h3>
 </a>
-<ul>
-    <div data-target="{{ field }}">
+<ul data-target="{{ lookup_kwarg }}">
     {% for choice in choices %}
         <li{% if choice.selected %} class="selected"{% endif %}>
         <a href="{{ choice.query_string|iriencode }}">{{ choice.display }}</a></li>
     {% endfor %}
-    </div>
 </ul>
-{% endwith %}

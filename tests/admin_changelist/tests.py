@@ -8,7 +8,7 @@ from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.main import (
     ALL_VAR, IS_POPUP_VAR, ORDER_VAR, PAGE_VAR, SEARCH_VAR, TO_FIELD_VAR,
 )
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group as AdminGroup, User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages.storage.cookie import CookieStorage
 from django.db import connection, models
@@ -1690,22 +1690,9 @@ class SeleniumTests(AdminSeleniumTestCase):
     def test_collapse_filters(self):
         from selenium.webdriver.common.by import By
 
-        from django.contrib.auth.models import Group as AdminGroup
-
         # We create 10 new Groups in addition to the 'All' and 'groups__isnull'
         # to have >10 filters and see if it is collapsed when enter to the list view
-        AdminGroup.objects.bulk_create([
-            Group(name='01'),
-            Group(name='02'),
-            Group(name='03'),
-            Group(name='04'),
-            Group(name='05'),
-            Group(name='06'),
-            Group(name='07'),
-            Group(name='08'),
-            Group(name='09'),
-            Group(name='10')
-        ])
+        AdminGroup.objects.bulk_create(Group(name=str(i)) for i in range(10))
 
         self.admin_login(username='super', password='secret')
         self.selenium.get(self.live_server_url + reverse('admin:auth_user_changelist'))
