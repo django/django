@@ -2485,8 +2485,8 @@ class OtherModelFormTests(TestCase):
         f = ModelFormWithMedia()
         self.assertHTMLEqual(
             str(f.media),
-            '''<link href="/some/form/css" type="text/css" media="all" rel="stylesheet">
-<script src="/some/form/javascript"></script>'''
+            '<link href="/some/form/css" media="all" rel="stylesheet">'
+            '<script src="/some/form/javascript"></script>'
         )
 
     def test_choices_type(self):

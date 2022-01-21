@@ -366,6 +366,9 @@ Miscellaneous
   :attr:`~django.contrib.admin.ModelAdmin.inlines` attributes now default to an
   empty tuple rather than an empty list to discourage unintended mutation.
 
+* The ``type="text/css"`` attribute is no longer included in ``<link>`` tags
+  for CSS :doc:`form media </topics/forms/media>`.
+
 .. _deprecated-features-4.1:
 
 Features deprecated in 4.1
