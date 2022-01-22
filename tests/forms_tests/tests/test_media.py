@@ -1,6 +1,8 @@
 from django.forms import CharField, Form, Media, MultiWidget, TextInput
 from django.template import Context, Template
+from django.templatetags.static import static
 from django.test import SimpleTestCase, override_settings
+from django.utils.html import format_html, html_safe
 
 
 @override_settings(
@@ -710,3 +712,160 @@ class FormsMediaTestCase(SimpleTestCase):
         merged = media + empty_media
         self.assertEqual(merged._css_lists, [{"screen": ["a.css"]}])
         self.assertEqual(merged._js_lists, [["a"]])
+
+
+@html_safe
+class Asset:
+    def __init__(self, path):
+        self.path = path
+
+    def __eq__(self, other):
+        return (self.__class__ == other.__class__ and self.path == other.path) or (
+            other.__class__ == str and self.path == other
+        )
+
+    def __hash__(self):
+        return hash(self.path)
+
+    def __str__(self):
+        return self.absolute_path(self.path)
+
+    def absolute_path(self, path):
+        """
+        Given a relative or absolute path to a static asset, return an absolute
+        path. An absolute path will be returned unchanged while a relative path
+        will be passed to django.templatetags.static.static().
+        """
+        if path.startswith(("http://", "https://", "/")):
+            return path
+        return static(path)
+
+    def __repr__(self):
+        return f"{self.path!r}"
+
+
+class CSS(Asset):
+    def __init__(self, path, medium):
+        super().__init__(path)
+        self.medium = medium
+
+    def __str__(self):
+        path = super().__str__()
+        return format_html(
+            '<link href="{}" media="{}" rel="stylesheet">',
+            self.absolute_path(path),
+            self.medium,
+        )
+
+
+class JS(Asset):
+    def __init__(self, path, integrity=None):
+        super().__init__(path)
+        self.integrity = integrity or ""
+
+    def __str__(self, integrity=None):
+        path = super().__str__()
+        template = '<script src="{}"%s></script>' % (
+            ' integrity="{}"' if self.integrity else "{}"
+        )
+        return format_html(template, self.absolute_path(path), self.integrity)
+
+
+@override_settings(
+    STATIC_URL="http://media.example.com/static/",
+)
+class FormsMediaObjectTestCase(SimpleTestCase):
+    """Media handling when media are objects instead of raw strings."""
+
+    def test_construction(self):
+        m = Media(
+            css={"all": (CSS("path/to/css1", "all"), CSS("/path/to/css2", "all"))},
+            js=(
+                JS("/path/to/js1"),
+                JS("http://media.other.com/path/to/js2"),
+                JS(
+                    "https://secure.other.com/path/to/js3",
+                    integrity="9d947b87fdeb25030d56d01f7aa75800",
+                ),
+            ),
+        )
+        self.assertEqual(
+            str(m),
+            '<link href="http://media.example.com/static/path/to/css1" media="all" '
+            'rel="stylesheet">\n'
+            '<link href="/path/to/css2" media="all" rel="stylesheet">\n'
+            '<script src="/path/to/js1"></script>\n'
+            '<script src="http://media.other.com/path/to/js2"></script>\n'
+            '<script src="https://secure.other.com/path/to/js3" '
+            'integrity="9d947b87fdeb25030d56d01f7aa75800"></script>',
+        )
+        self.assertEqual(
+            repr(m),
+            "Media(css={'all': ['path/to/css1', '/path/to/css2']}, "
+            "js=['/path/to/js1', 'http://media.other.com/path/to/js2', "
+            "'https://secure.other.com/path/to/js3'])",
+        )
+
+    def test_simplest_class(self):
+        @html_safe
+        class SimpleJS:
+            """The simplest possible asset class."""
+
+            def __str__(self):
+                return '<script src="https://example.org/asset.js" rel="stylesheet">'
+
+        m = Media(js=(SimpleJS(),))
+        self.assertEqual(
+            str(m),
+            '<script src="https://example.org/asset.js" rel="stylesheet">',
+        )
+
+    def test_combine_media(self):
+        class MyWidget1(TextInput):
+            class Media:
+                css = {"all": (CSS("path/to/css1", "all"), "/path/to/css2")}
+                js = (
+                    "/path/to/js1",
+                    "http://media.other.com/path/to/js2",
+                    "https://secure.other.com/path/to/js3",
+                    JS("/path/to/js4", integrity="9d947b87fdeb25030d56d01f7aa75800"),
+                )
+
+        class MyWidget2(TextInput):
+            class Media:
+                css = {"all": (CSS("/path/to/css2", "all"), "/path/to/css3")}
+                js = (JS("/path/to/js1"), "/path/to/js4")
+
+        w1 = MyWidget1()
+        w2 = MyWidget2()
+        self.assertEqual(
+            str(w1.media + w2.media),
+            '<link href="http://media.example.com/static/path/to/css1" media="all" '
+            'rel="stylesheet">\n'
+            '<link href="/path/to/css2" media="all" rel="stylesheet">\n'
+            '<link href="/path/to/css3" media="all" rel="stylesheet">\n'
+            '<script src="/path/to/js1"></script>\n'
+            '<script src="http://media.other.com/path/to/js2"></script>\n'
+            '<script src="https://secure.other.com/path/to/js3"></script>\n'
+            '<script src="/path/to/js4" integrity="9d947b87fdeb25030d56d01f7aa75800">'
+            "</script>",
+        )
+
+    def test_media_deduplication(self):
+        # The deduplication doesn't only happen at the point of merging two or
+        # more media objects.
+        media = Media(
+            css={
+                "all": (
+                    CSS("/path/to/css1", "all"),
+                    CSS("/path/to/css1", "all"),
+                    "/path/to/css1",
+                )
+            },
+            js=(JS("/path/to/js1"), JS("/path/to/js1"), "/path/to/js1"),
+        )
+        self.assertEqual(
+            str(media),
+            '<link href="/path/to/css1" media="all" rel="stylesheet">\n'
+            '<script src="/path/to/js1"></script>',
+        )

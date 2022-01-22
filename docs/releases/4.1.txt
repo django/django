@@ -192,6 +192,11 @@ Forms
 * The new ``edit_only`` argument for :func:`.modelformset_factory` and
   :func:`.inlineformset_factory` allows preventing new objects creation.
 
+* The ``js`` and ``css`` class attributes of :doc:`Media </topics/forms/media>`
+  now allow using hashable objects, not only path strings, as long as those
+  objects implement the ``__html__()`` method (typically when decorated with
+  the :func:`~django.utils.html.html_safe` decorator).
+
 Generic Views
 ~~~~~~~~~~~~~
 

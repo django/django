@@ -206,7 +206,10 @@ return values for dynamic ``media`` properties.
 Paths in asset definitions
 ==========================
 
-Paths used to specify assets can be either relative or absolute. If a
+Paths as strings
+----------------
+
+String paths used to specify assets can be either relative or absolute. If a
 path starts with ``/``, ``http://`` or ``https://``, it will be
 interpreted as an absolute path, and left as-is. All other paths will
 be prepended with the value of the appropriate prefix. If the
@@ -253,6 +256,28 @@ Or if :mod:`~django.contrib.staticfiles` is configured using the
     <link href="/css/pretty.css" media="all" rel="stylesheet">
     <script src="https://static.example.com/animations.27e20196a850.js"></script>
     <script src="http://othersite.com/actions.js"></script>
+
+Paths as objects
+----------------
+
+.. versionadded:: 4.1
+
+Asset paths may also be given as hashable objects implementing an
+``__html__()`` method. The ``__html__()`` method is typically added using the
+:func:`~django.utils.html.html_safe` decorator. The object is responsible for
+outputting the complete HTML ``<script>`` or ``<link>`` tag content::
+
+    >>> from django import forms
+    >>> from django.utils.html import html_safe
+    >>>
+    >>> @html_safe
+    >>> class JSPath:
+    ...     def __str__(self):
+    ...         return '<script src="https://example.org/asset.js" rel="stylesheet">'
+
+    >>> class SomeWidget(forms.TextInput):
+    ...     class Media:
+    ...         js = (JSPath(),)
 
 ``Media`` objects
 =================
