@@ -52,6 +52,12 @@ class CookieTests(BaseTests, SimpleTestCase):
     def stored_messages_count(self, storage, response):
         return stored_cookie_messages_count(storage, response)
 
+    def encode_decode(self, *args, **kwargs):
+        storage = self.get_storage()
+        message = Message(constants.DEBUG, *args, **kwargs)
+        encoded = storage._encode(message)
+        return storage._decode(encoded)
+
     def test_get(self):
         storage = self.storage_class(self.get_request())
         # Set initial data.
@@ -168,12 +174,23 @@ class CookieTests(BaseTests, SimpleTestCase):
         A message containing SafeData is keeping its safe status when
         retrieved from the message storage.
         """
-        def encode_decode(data):
-            message = Message(constants.DEBUG, data)
-            encoded = storage._encode(message)
-            decoded = storage._decode(encoded)
-            return decoded.message
+        self.assertIsInstance(
+            self.encode_decode(mark_safe('<b>Hello Django!</b>')).message,
+            SafeData,
+        )
+        self.assertNotIsInstance(
+            self.encode_decode('<b>Hello Django!</b>').message,
+            SafeData,
+        )
 
-        storage = self.get_storage()
-        self.assertIsInstance(encode_decode(mark_safe("<b>Hello Django!</b>")), SafeData)
-        self.assertNotIsInstance(encode_decode("<b>Hello Django!</b>"), SafeData)
+    def test_extra_tags(self):
+        """
+        A message's extra_tags attribute is correctly preserved when retrieved
+        from the message storage.
+        """
+        for extra_tags in ['', None, 'some tags']:
+            with self.subTest(extra_tags=extra_tags):
+                self.assertEqual(
+                    self.encode_decode('message', extra_tags=extra_tags).extra_tags,
+                    extra_tags,
+                )
