@@ -266,13 +266,53 @@ vector you wish to use. The PostgreSQL documentation has details on
 .. class:: SearchVectorField
 
 If this approach becomes too slow, you can add a ``SearchVectorField`` to your
-model. You'll need to keep it populated with triggers, for example, as
-described in the `PostgreSQL documentation`_. You can then query the field as
-if it were an annotated ``SearchVector``::
+model and index it using a :class:`~django.contrib.postgres.indexes.GinIndex`
+or :class:`~django.contrib.postgres.indexes.GistIndex`.
 
-    >>> Entry.objects.update(search_vector=SearchVector('body_text'))
-    >>> Entry.objects.filter(search_vector='cheese')
+.. code-block:: python
+
+    from django.contrib.postgres.search import SearchVectorField
+
+    class Entry(models.Model):
+        blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+        headline = models.CharField(max_length=255)
+        body_text = models.TextField()
+
+        # The search vector to store the content from the fields to actually
+        # search in an efficient and enriched format.
+        search_vector = models.SearchVectorField(null=True)
+
+        class Meta:
+            # The index to search the search_vector efficiently.
+            indexes = [GinIndex(fields=['search_vector']]
+
+Only once the other other fields have been stored in the database you can
+update the search vector field::
+
+    >>> from django.contrib.postgres.search import SearchVector
+    >>> entry.objects.update(search_vector=(
+    ...     SearchVector('headline', weight='A')
+    ...     + SearchVector('body_text', weight='B')
+    ... ))
+
+Alternatively, instead of manually updating the search vector field you can use
+triggers to do it automacally as described in the `PostgreSQL documentation`_.
+
+You can then query the field as if it were an annotated ``SearchVector``::
+
+    >>> from django.contrib.postgres.search import SearchQuery
+    >>> Entry.objects.filter(search_vector=SearchQuery('cheese'))
     [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]
+
+To use the search vector field for ranking, use an
+:class:`~django.db.models.F`: expression::
+
+    >>> from django.contrib.postgres.search import SearchQuery, SearchRank
+    >>> search_query = SearchQuery('cheese')
+    >>> search_rank = SearchRank(F('search_vector', search_query)
+    >>> Entry.objects.annotate(rank=search_rank).filter(
+    ...     search_vector=search_query
+    ... ).order_by('-rank')
 
 .. _PostgreSQL documentation: https://www.postgresql.org/docs/current/textsearch-features.html#TEXTSEARCH-UPDATE-TRIGGERS
 
