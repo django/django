@@ -15,7 +15,7 @@
     h2 { margin-bottom:.8em; }
     h3 { margin:1em 0 .5em 0; }
     h4 { margin:0 0 .5em 0; font-weight: normal; }
-    code, pre { font-size: 100%; white-space: pre-wrap; }
+    code, pre { font-size: 100%; white-space: pre-wrap; word-break: break-word; }
     summary { cursor: pointer; }
     table { border:1px solid #ccc; border-collapse: collapse; width:100%; background:white; }
     tbody td, tbody th { vertical-align:top; padding:2px 3px; }
@@ -27,10 +27,11 @@
     table.vars { margin:5px 10px 2px 40px; width: auto; }
     table.vars td, table.req td { font-family:monospace; }
     table td.code { width:100%; }
-    table td.code pre { overflow:hidden; word-break: break-word; }
+    table td.code pre { overflow:hidden; }
     table.source th { color:#666; }
     table.source td { font-family:monospace; white-space:pre; border-bottom:1px solid #eee; }
     ul.traceback { list-style-type:none; color: #222; }
+    ul.traceback li.cause { word-break: break-word; }
     ul.traceback li.frame { padding-bottom:1em; color:#4f4f4f; }
     ul.traceback li.user { background-color:#e0e0e0; color:#000 }
     div.context { padding:10px 0; overflow:hidden; }
@@ -214,7 +215,7 @@
     <ul class="traceback">
       {% for frame in frames %}
         {% ifchanged frame.exc_cause %}{% if frame.exc_cause %}
-          <li><h3>
+          <li class="cause"><h3>
           {% if frame.exc_cause_explicit %}
             The above exception ({{ frame.exc_cause|force_escape }}) was the direct cause of the following exception:
           {% else %}
