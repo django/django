@@ -227,7 +227,7 @@ class FieldGetDbPrepValueMixin:
         # For relational fields, use the 'target_field' attribute of the
         # output_field.
         field = getattr(self.lhs.output_field, 'target_field', None)
-        get_db_prep_value = getattr(field, 'get_db_prep_value', None) or self.lhs.output_field.get_db_prep_value
+        get_db_prep_value = getattr(self.lhs.output_field, "get_db_prep_value", None) or field.get_db_prep_value
         return (
             '%s',
             [get_db_prep_value(v, connection, prepared=True) for v in value]

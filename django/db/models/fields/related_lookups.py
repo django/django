@@ -120,9 +120,19 @@ class RelatedLookupMixin:
             # doesn't have validation for non-integers, so we must run validation
             # using the target field.
             if self.prepare_rhs and hasattr(self.lhs.output_field, 'path_infos'):
+                from django.db.models.fields.related import ForeignKey
+
                 # Get the target field. We can safely assume there is only one
                 # as we don't get to the direct value branch otherwise.
-                target_field = self.lhs.output_field.path_infos[-1].target_fields[-1]
+                if (
+                    not isinstance(self.lhs.output_field, ForeignKey) and
+                    hasattr(self.lhs.output_field, 'reverse_path_infos')
+                ):
+                    # This must be done when the target field is not a foreign key like with generic relationships.
+                    target_field = self.lhs.output_field.reverse_path_infos[-1].target_fields[-1]
+                else:
+                    target_field = self.lhs.output_field.path_infos[-1].target_fields[-1]
+
                 self.rhs = target_field.get_prep_value(self.rhs)
 
         return super().get_prep_lookup()

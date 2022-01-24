@@ -8,7 +8,7 @@ from .models import (
     AllowsNullGFK, Animal, Carrot, Comparison, ConcreteRelatedModel,
     ForConcreteModelModel, ForProxyModelModel, Gecko, ManualPK, Mineral,
     ProxyRelatedModel, Rock, TaggedItem, ValuableRock, ValuableTaggedItem,
-    Vegetable,
+    Vegetable, TIntegration, TTag,
 )
 
 
@@ -571,6 +571,19 @@ class GenericRelationsTests(TestCase):
         qs = Comparison.objects.prefetch_related('first_obj__comparisons')
         for comparison in qs:
             self.assertSequenceEqual(comparison.first_obj.comparisons.all(), [comparison])
+
+    def test_generic_relation_sql_uuid_and_id(self):
+        integration = TIntegration.objects.create()
+        integration.tags.create()
+
+        query_set_without_id = TTag.objects.filter(integration=integration)
+        query_set_with_id = TTag.objects.filter(integration__id=integration.id)
+
+        self.assertEqual(str(query_set_without_id.query), str(query_set_with_id.query))
+
+        # Ensure record is indeed found in both queries
+        self.assertTrue(query_set_without_id.exists())
+        self.assertTrue(query_set_with_id.exists())
 
 
 class ProxyRelatedModelTest(TestCase):

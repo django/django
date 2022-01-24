@@ -8,6 +8,7 @@ object, be it animal, vegetable, or mineral.
 The canonical example is tags (although this example implementation is *far*
 from complete).
 """
+import uuid
 
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
@@ -146,3 +147,18 @@ class AllowsNullGFK(models.Model):
     content_type = models.ForeignKey(ContentType, models.SET_NULL, null=True)
     object_id = models.PositiveIntegerField(null=True)
     content_object = GenericForeignKey()
+
+
+# To test fix for #33450
+class TTag(models.Model):
+    # Note that this models id is a UUID not a BigAutoField like TIntegration
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content = GenericForeignKey()
+
+
+class TIntegration(models.Model):
+    # Note that the id here is the default BigAutoField field
+    tags = GenericRelation(TTag, related_query_name='integration')
