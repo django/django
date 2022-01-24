@@ -230,14 +230,15 @@ def lower(value):
 
 @register.filter(is_safe=False)
 @stringfilter
-def make_list(value):
+def make_list(value, arg):
     """
     Return the value turned into a list.
 
     For an integer, it's a list of digits.
     For a string, it's a list of characters.
+    With arg, it's a list of strings.
     """
-    return list(value)
+    return value.split(arg) if arg else list(value)
 
 
 @register.filter(is_safe=True)
