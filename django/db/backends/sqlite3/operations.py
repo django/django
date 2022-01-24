@@ -337,10 +337,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         return bool(value) if value in (1, 0) else value
 
     def bulk_insert_sql(self, fields, placeholder_rows):
-        return " UNION ALL ".join(
-            "SELECT %s" % ", ".join(row)
-            for row in placeholder_rows
-        )
+        placeholder_rows_sql = (', '.join(row) for row in placeholder_rows)
+        values_sql = ', '.join(f'({sql})' for sql in placeholder_rows_sql)
+        return f'VALUES {values_sql}'
 
     def combine_expression(self, connector, sub_expressions):
         # SQLite doesn't have a ^ operator, so use the user-defined POWER
