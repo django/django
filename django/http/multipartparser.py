@@ -10,6 +10,7 @@ import base64
 import binascii
 import cgi
 import sys
+import HTMLParser
 
 from django.conf import settings
 from django.core.exceptions import (
@@ -44,6 +45,15 @@ FIELD = "field"
 
 _BASE64_DECODE_ERROR = TypeError if six.PY2 else binascii.Error
 
+import htmllib
+
+def unescape_custom(s):
+    ents = htmllib.constants.entities
+    for e in ents:
+        if e[-1] != ';':
+            e += ';'
+        s = s.replace('&{}'.format(e), ents[e])
+    return s
 
 class MultiPartParser(object):
     """
@@ -303,9 +313,32 @@ class MultiPartParser(object):
                 self._files.appendlist(force_text(old_field_name, self._encoding, errors='replace'), file_obj)
                 break
 
-    def IE_sanitize(self, filename):
-        """Cleanup filename from Internet Explorer full paths."""
-        return filename and filename[filename.rfind("\\") + 1:].strip()
+    def sanitize_file_name(self, file_name):
+        """
+        Sanitize the filename of an upload.
+
+        Remove all possible path separators, even though that might remove more
+        than actually required by the target system. Filenames that could
+        potentially cause problems (current/parent dir) are also discarded.
+
+        It should be noted that this function could still return a "filepath"
+        like "C:some_file.txt" which is handled later on by the storage layer.
+        So while this function does sanitize filenames to some extent, the
+        resulting filename should still be considered as untrusted user input.
+        """
+        # NOTE Trying to backport to Python 2.7
+        # file_name = html.unescape(file_name)
+        file_name = HTMLParser.HTMLParser().unescape(file_name)
+        # NOTE Trying to backport to Python 2.7
+
+        file_name = file_name.rsplit('/')[-1]
+        file_name = file_name.rsplit('\\')[-1]
+
+        if file_name in {'', '.', '..'}:
+            return None
+        return file_name
+
+    IE_sanitize = sanitize_file_name
 
     def _close_files(self):
         # Free up all file handles.
