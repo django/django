@@ -295,7 +295,7 @@ END;
         ) if sql)
 
     def last_executed_query(self, cursor, sql, params):
-        # https://cx-oracle.readthedocs.io/en/latest/cursor.html#Cursor.statement
+        # https://cx-oracle.readthedocs.io/en/latest/api_manual/cursor.html#Cursor.statement
         # The DB API definition does not define this attribute.
         statement = cursor.statement
         # Unlike Psycopg's `query` and MySQLdb`'s `_executed`, cx_Oracle's
