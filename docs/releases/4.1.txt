@@ -211,7 +211,7 @@ Management Commands
 * :option:`makemigrations --no-input` now logs default answers and reasons why
   migrations cannot be created.
 
-* The new :option:`makemigrations --scriptable` options diverts log output and
+* The new :option:`makemigrations --scriptable` option diverts log output and
   input prompts to ``stderr``, writing only paths of generated migration files
   to ``stdout``.
 
