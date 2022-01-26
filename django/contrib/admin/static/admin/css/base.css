@@ -588,6 +588,7 @@ ul.messagelist li {
     background: var(--message-success-bg) url(../img/icon-yes.svg) 40px 12px no-repeat;
     background-size: 16px auto;
     color: var(--body-fg);
+    word-break: break-word;
 }
 
 ul.messagelist li.warning {
