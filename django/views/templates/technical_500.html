@@ -190,7 +190,7 @@
 <div id="template">
    <h2>Error during template rendering</h2>
    <p>In template <code>{{ template_info.name }}</code>, error at line <strong>{{ template_info.line }}</strong></p>
-   <h3>{{ template_info.message }}</h3>
+   <h3>{{ template_info.message|force_escape }}</h3>
    <table class="source{% if template_info.top %} cut-top{% endif %}
       {% if template_info.bottom != template_info.total %} cut-bottom{% endif %}">
    {% for source_line in template_info.source_lines %}
@@ -316,7 +316,7 @@ Using engine {{ entry.backend.name }}:
 {% endif %}{% endif %}{% if template_info %}
 Template error:
 In template {{ template_info.name }}, error at line {{ template_info.line }}
-   {{ template_info.message }}
+   {{ template_info.message|force_escape }}
 {% for source_line in template_info.source_lines %}{% if source_line.0 == template_info.line %}   {{ source_line.0 }} : {{ template_info.before }} {{ template_info.during }} {{ template_info.after }}{% else %}   {{ source_line.0 }} : {{ source_line.1 }}{% endif %}{% endfor %}{% endif %}
 
 Traceback (most recent call last):{% for frame in frames %}

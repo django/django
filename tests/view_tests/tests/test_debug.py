@@ -7,7 +7,7 @@ import tempfile
 import threading
 from io import StringIO
 from pathlib import Path
-from unittest import mock
+from unittest import mock, skipIf
 
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -262,6 +262,27 @@ class DebugViewTests(SimpleTestCase):
                     "Failed to find 'raise Exception' in last frame of "
                     "traceback, instead found: %s" % raising_loc
                 )
+
+    @skipIf(
+        sys.platform == 'win32',
+        'Raises OSError instead of TemplateDoesNotExist on Windows.',
+    )
+    def test_safestring_in_exception(self):
+        with self.assertLogs('django.request', 'ERROR'):
+            response = self.client.get('/safestring_exception/')
+            self.assertNotContains(
+                response,
+                '<script>alert(1);</script>',
+                status_code=500,
+                html=True,
+            )
+            self.assertContains(
+                response,
+                '&lt;script&gt;alert(1);&lt;/script&gt;',
+                count=3,
+                status_code=500,
+                html=True,
+            )
 
     def test_template_loader_postmortem(self):
         """Tests for not existing file"""

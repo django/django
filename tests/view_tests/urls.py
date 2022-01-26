@@ -59,6 +59,11 @@ urlpatterns += i18n_patterns(
 )
 
 urlpatterns += [
+    path(
+        'safestring_exception/',
+        views.safestring_in_template_exception,
+        name='safestring_exception',
+    ),
     path('template_exception/', views.template_exception, name='template_exception'),
     path(
         'raises_template_does_not_exist/<path:path>',
