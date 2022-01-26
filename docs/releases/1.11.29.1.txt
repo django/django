@@ -30,6 +30,17 @@ As a mitigation, path sanitation is now applied and only files within the
 template root directories can be loaded.
 
 
+* April 6, 2021 *
+
+CVE-2021-28658: Potential directory-traversal via uploaded files
+================================================================
+
+``MultiPartParser`` allowed directory-traversal via uploaded files with
+suitably crafted file names.
+
+Built-in upload handlers were not affected by this vulnerability.
+
+
 *March 4, 2020*
 
 Django 1.11.29 fixes a security issue in 1.11.28.

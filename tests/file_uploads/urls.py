@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     url(r'^upload/$', views.file_upload_view),
+    url(r'^upload_traversal/$', views.file_upload_traversal_view),
     url(r'^verify/$', views.file_upload_view_verify),
     url(r'^unicode_name/$', views.file_upload_unicode_name),
     url(r'^echo/$', views.file_upload_echo),
