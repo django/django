@@ -32,6 +32,7 @@ from django.test import (
 )
 from django.urls import reverse_lazy
 from django.utils.decorators import async_only_middleware
+from django.views.generic import RedirectView
 
 from .views import TwoArgException, get_view, post_view, trace_view
 
@@ -212,6 +213,14 @@ class ClientTest(TestCase):
         """
         response = self.client.get('/get_view/')
         self.assertEqual(response.resolver_match.url_name, 'get_view')
+
+    def test_response_resolver_match_class_based_view(self):
+        """
+        The response ResolverMatch instance can be used to access the CBV view
+        class.
+        """
+        response = self.client.get('/accounts/')
+        self.assertIs(response.resolver_match.func.view_class, RedirectView)
 
     @modify_settings(MIDDLEWARE={'prepend': 'test_client.tests.middleware_urlconf'})
     def test_response_resolver_match_middleware_urlconf(self):
