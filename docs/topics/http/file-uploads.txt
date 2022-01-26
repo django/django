@@ -126,6 +126,19 @@ model::
             form = UploadFileForm()
         return render(request, 'upload.html', {'form': form})
 
+If you are constructing an object manually outside of a request, you can assign
+a :class:`~django.core.files.File` like object to the
+:class:`~django.db.models.FileField`::
+
+    from django.core.management.base import BaseCommand
+    from django.core.files.base import ContentFile
+
+    class MyCommand(BaseCommand):
+        def handle(self, *args, **options):
+            content_file = ContentFile(b'Hello world!', name='hello-world.txt')
+            instance = ModelWithFileField(file_field=content_file)
+            instance.save()
+
 Uploading multiple files
 ------------------------
 
