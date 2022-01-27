@@ -30,7 +30,9 @@ def _is_relevant_relation(relation, altered_field):
 
 
 def _all_related_fields(model):
-    return model._meta._get_fields(forward=False, reverse=True, include_hidden=True)
+    return model._meta._get_fields(
+        forward=False, reverse=True, include_hidden=True, include_parents=False,
+    )
 
 
 def _related_non_m2m_objects(old_field, new_field):
