@@ -895,6 +895,7 @@ input[type="submit"], button {
     }
 
     .login .submit-row {
+        margin: 0;
         padding: 15px 0 0;
     }
 
