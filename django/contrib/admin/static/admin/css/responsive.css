@@ -456,6 +456,13 @@ input[type="submit"], button {
     pre.literal-block {
         overflow: auto;
     }
+
+        
+    .submit-row input{
+        margin-top: 5px !important;
+        margin-bottom: 5px !important;
+    }
+
 }
 
 /* Mobile */
@@ -896,7 +903,6 @@ input[type="submit"], button {
     }
 
     .login .submit-row input {
-        margin: 0;
         text-transform: uppercase;
     }
 
