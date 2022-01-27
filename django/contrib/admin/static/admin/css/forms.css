@@ -264,11 +264,11 @@ body.popup .submit-row {
 .submit-row input {
     height: 40px;
     line-height: 15px;
-    margin: 0 0 0 5px;
+    margin: 5px 0 5px 5px;
 }
 
 .submit-row input.default {
-    margin: 0 0 0 8px;
+    margin: 5px 0 5px 8px;
     text-transform: uppercase;
 }
 
@@ -289,6 +289,7 @@ body.popup .submit-row {
     height: 15px;
     line-height: 15px;
     color: var(--button-fg);
+    margin: 5px 0 5px 5px;
 }
 
 .submit-row a.closelink {
