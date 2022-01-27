@@ -430,7 +430,7 @@ _connector_combinators = {
         (fields.IntegerField, fields.FloatField, fields.FloatField),
         (fields.FloatField, fields.IntegerField, fields.FloatField),
     ]
-    for connector in (Combinable.ADD, Combinable.SUB, Combinable.MUL, Combinable.DIV)
+    for connector in (Combinable.ADD, Combinable.SUB, Combinable.MUL, Combinable.DIV, Combinable.MOD)
 }
 
 
