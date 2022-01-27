@@ -482,6 +482,11 @@ select[multiple] {
 
 /* FORM BUTTONS */
 
+.submit-row input{
+    margin-top: 5px !important;
+    margin-bottom: 5px !important;
+}
+
 .button, input[type=submit], input[type=button], .submit-row input, a.button {
     background: var(--button-bg);
     padding: 10px 15px;
@@ -501,6 +506,7 @@ a.button {
 .button:hover, input[type=submit]:hover, input[type=button]:hover {
     background: var(--button-hover-bg);
 }
+
 
 .button[disabled], input[type=submit][disabled], input[type=button][disabled] {
     opacity: 0.4;

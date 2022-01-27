@@ -115,7 +115,7 @@ thead th.sorted .text {
 }
 
 .submit-row {
-    text-align: left
+    text-align: left;
 }
 
 .submit-row p.deletelink-box {
