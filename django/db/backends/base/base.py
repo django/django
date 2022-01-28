@@ -56,6 +56,7 @@ class BaseDatabaseWrapper:
     introspection_class = None
     ops_class = None
     validation_class = BaseDatabaseValidation
+    is_sync = True
 
     queries_limit = 9000
 
@@ -725,13 +726,18 @@ class BaseDatabaseWrapper:
 
 
 class BaseAsyncDatabaseWrapper(BaseDatabaseWrapper):
+    is_sync = False
+
     def __init__(self, settings_dict, alias=DEFAULT_DB_ALIAS):
         super().__init__(settings_dict, alias)
 
         # Context-safety related attributes.
         self._task_sharing_lock = asyncio.Lock()
         self._task_sharing_count = 0
-        self._task_ident = id(asyncio.current_task())
+        try:
+            self._task_ident = id(asyncio.current_task())
+        except RuntimeError:
+            pass
 
     # ##### Backend-specific methods for creating connections and cursors #####
 
@@ -752,6 +758,7 @@ class BaseAsyncDatabaseWrapper(BaseDatabaseWrapper):
     async def connect(self):
         """See BaseDatabaseWrapper.connect()."""
         self.setup_connect()
+        self._task_ident = id(asyncio.current_task())
         # Establish the connection
         conn_params = self.get_connection_params()
         self.connection = await self.get_new_connection(conn_params)

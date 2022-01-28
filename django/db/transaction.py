@@ -1,8 +1,9 @@
-from contextlib import AsyncContextDecorator, ContextDecorator, contextmanager
+from contextlib import ContextDecorator, contextmanager
 
 from django.db import (
     DEFAULT_DB_ALIAS, DatabaseError, Error, ProgrammingError, connections,
 )
+from django.utils.contextlib import AsyncContextDecorator
 
 
 class TransactionManagementError(ProgrammingError):
@@ -32,12 +33,12 @@ def set_autocommit(autocommit, using=None):
 
 def commit(using=None):
     """Commit a transaction."""
-    get_connection(using).commit()
+    return get_connection(using).commit()
 
 
 def rollback(using=None):
     """Roll back a transaction."""
-    get_connection(using).rollback()
+    return get_connection(using).rollback()
 
 
 def savepoint(using=None):
@@ -54,7 +55,7 @@ def savepoint_rollback(sid, using=None):
     Roll back the most recent savepoint (if one exists). Do nothing if
     savepoints are not supported.
     """
-    get_connection(using).savepoint_rollback(sid)
+    return get_connection(using).savepoint_rollback(sid)
 
 
 def savepoint_commit(sid, using=None):
@@ -62,14 +63,14 @@ def savepoint_commit(sid, using=None):
     Commit the most recent savepoint (if one exists). Do nothing if
     savepoints are not supported.
     """
-    get_connection(using).savepoint_commit(sid)
+    return get_connection(using).savepoint_commit(sid)
 
 
 def clean_savepoints(using=None):
     """
     Reset the counter used to generate unique savepoint ids in this thread.
     """
-    get_connection(using).clean_savepoints()
+    return get_connection(using).clean_savepoints()
 
 
 def get_rollback(using=None):
@@ -125,7 +126,7 @@ def on_commit(func, using=None):
     Register `func` to be called when the current transaction is committed.
     If the current transaction is rolled back, `func` will not be called.
     """
-    get_connection(using).on_commit(func)
+    return get_connection(using).on_commit(func)
 
 
 #################################

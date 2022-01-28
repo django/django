@@ -1,4 +1,5 @@
 aiosmtpd
+aiosqlite
 asgiref >= 3.4.1
 argon2-cffi >= 16.1.0
 backports.zoneinfo; python_version < '3.9'
