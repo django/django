@@ -255,8 +255,14 @@ run into performance problems. Full text search is a more intensive process
 than comparing the size of an integer, for example.
 
 In the event that all the fields you're querying on are contained within one
-particular model, you can create a functional index which matches the search
-vector you wish to use. The PostgreSQL documentation has details on
+particular model, you can create a functional
+:class:`GIN <django.contrib.postgres.indexes.GinIndex>` or
+:class:`GiST <django.contrib.postgres.indexes.GistIndex>` index which matches
+the search vector you wish to use. For example::
+
+    GinIndex(SearchVector('body_text'), name='body_search_vector_idx')
+
+The PostgreSQL documentation has details on
 `creating indexes for full text search
 <https://www.postgresql.org/docs/current/textsearch-tables.html#TEXTSEARCH-TABLES-INDEX>`_.
 
