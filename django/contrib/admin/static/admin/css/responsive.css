@@ -28,7 +28,7 @@ input[type="submit"], button {
     }
 
     #content {
-        padding: 20px 30px 30px;
+        padding: 15px 20px 20px;
     }
 
     div.breadcrumbs {
@@ -230,6 +230,22 @@ input[type="submit"], button {
 
     form .aligned div.radiolist {
         margin-left: 2px;
+    }
+
+    .submit-row {
+        padding: 8px 8px 3px 8px;
+    }
+
+    .submit-row a.deletelink {
+        padding: 10px 7px;
+    }
+
+    .submit-row input.default {
+        margin: 0 0 5px 5px;
+    }
+
+    .button, input[type=submit], input[type=button], .submit-row input, a.button {
+        padding: 7px;
     }
 
     /* Related widget */
@@ -808,7 +824,7 @@ input[type="submit"], button {
     /* Submit row */
 
     .submit-row {
-        padding: 10px 10px 0;
+        padding: 10px 10px 5px;
         margin: 0 0 15px;
         display: flex;
         flex-direction: column;

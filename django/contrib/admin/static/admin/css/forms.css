@@ -248,7 +248,7 @@ fieldset.monospace textarea {
 /* SUBMIT ROW */
 
 .submit-row {
-    padding: 12px 14px;
+    padding: 12px 14px 7px;
     margin: 0 0 20px;
     background: var(--darkened-bg);
     border: 1px solid var(--hairline-color);
@@ -264,11 +264,11 @@ body.popup .submit-row {
 .submit-row input {
     height: 35px;
     line-height: 15px;
-    margin: 0 0 0 5px;
+    margin: 0 0 5px 5px;
 }
 
 .submit-row input.default {
-    margin: 0 0 0 8px;
+    margin: 0 0 5px 8px;
     text-transform: uppercase;
 }
 
@@ -288,6 +288,7 @@ body.popup .submit-row {
     padding: 10px 15px;
     height: 15px;
     line-height: 15px;
+    margin-bottom: 5px;
     color: var(--button-fg);
 }
 
