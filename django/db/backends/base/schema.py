@@ -997,7 +997,7 @@ class BaseDatabaseSchemaEditor:
             if not four_way_default_alteration:
                 # If we don't have to do a 4-way default alteration we can
                 # directly run a (NOT) NULL alteration
-                actions = actions + null_actions
+                actions += null_actions
             # Combine actions together if we can (e.g. postgres)
             if self.connection.features.supports_combined_alters and actions:
                 sql, params = tuple(zip(*actions))

@@ -1531,7 +1531,7 @@ class Query(BaseExpression):
     ):
         """Add a Q-object to the current filter."""
         connector = q_object.connector
-        current_negated = current_negated ^ q_object.negated
+        current_negated ^= q_object.negated
         branch_negated = branch_negated or q_object.negated
         target_clause = WhereNode(connector=connector, negated=q_object.negated)
         joinpromoter = JoinPromoter(

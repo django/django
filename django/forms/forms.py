@@ -492,7 +492,7 @@ class BaseForm(RenderableFormMixin):
         """Return all media required to render the widgets on this form."""
         media = Media()
         for field in self.fields.values():
-            media = media + field.widget.media
+            media += field.widget.media
         return media
 
     def is_multipart(self):

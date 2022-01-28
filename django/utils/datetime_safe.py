@@ -95,10 +95,10 @@ def strftime(dt, fmt):
     # 6 years to get into the 28-year repeat cycle
     delta = 2000 - year
     off = 6 * (delta // 100 + delta // 400)
-    year = year + off
+    year += off
 
     # Move to around the year 2000
-    year = year + ((2000 - year) // 28) * 28
+    year += ((2000 - year) // 28) * 28
     timetuple = dt.timetuple()
     s1 = time.strftime(fmt, (year,) + timetuple[1:])
     sites1 = _findall(s1, str(year))

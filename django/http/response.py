@@ -241,7 +241,7 @@ class HttpResponseBase:
                 # Add one second so the date matches exactly (a fraction of
                 # time gets lost between converting to a timedelta and
                 # then the date string).
-                delta = delta + datetime.timedelta(seconds=1)
+                delta += datetime.timedelta(seconds=1)
                 # Just set max_age - the max_age logic will set expires.
                 expires = None
                 if max_age is not None:

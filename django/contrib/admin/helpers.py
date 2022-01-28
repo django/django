@@ -95,7 +95,7 @@ class AdminForm:
     def media(self):
         media = self.form.media
         for fs in self:
-            media = media + fs.media
+            media += fs.media
         return media
 
 
@@ -456,7 +456,7 @@ class InlineAdminFormSet:
     def media(self):
         media = self.opts.media + self.formset.media
         for fs in self:
-            media = media + fs.media
+            media += fs.media
         return media
 
 

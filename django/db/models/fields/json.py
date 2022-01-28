@@ -292,7 +292,7 @@ class JSONExact(lookups.Exact):
             rhs_params = ["null"]
         if connection.vendor == "mysql":
             func = ["JSON_EXTRACT(%s, '$')"] * len(rhs_params)
-            rhs = rhs % tuple(func)
+            rhs %= tuple(func)
         return rhs, rhs_params
 
 
@@ -455,9 +455,9 @@ class KeyTransformIn(lookups.In):
                 value = json.loads(param)
                 sql = "%s(JSON_OBJECT('value' VALUE %%s FORMAT JSON), '$.value')"
                 if isinstance(value, (list, dict)):
-                    sql = sql % "JSON_QUERY"
+                    sql %= "JSON_QUERY"
                 else:
-                    sql = sql % "JSON_VALUE"
+                    sql %= "JSON_VALUE"
             elif connection.vendor == "mysql" or (
                 connection.vendor == "sqlite"
                 and params[0] not in connection.ops.jsonfield_datatype_values
@@ -482,7 +482,7 @@ class KeyTransformExact(JSONExact):
                     func.append(sql % "JSON_QUERY")
                 else:
                     func.append(sql % "JSON_VALUE")
-            rhs = rhs % tuple(func)
+            rhs %= tuple(func)
         elif connection.vendor == "sqlite":
             func = []
             for value in rhs_params:
@@ -490,7 +490,7 @@ class KeyTransformExact(JSONExact):
                     func.append("%s")
                 else:
                     func.append("JSON_EXTRACT(%s, '$')")
-            rhs = rhs % tuple(func)
+            rhs %= tuple(func)
         return rhs, rhs_params
 
     def as_oracle(self, compiler, connection):
