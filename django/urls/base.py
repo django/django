@@ -70,7 +70,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
             try:
                 extra, resolver = resolver.namespace_dict[ns]
                 resolved_path.append(ns)
-                ns_pattern = ns_pattern + extra
+                ns_pattern += extra
                 ns_converters.update(resolver.pattern.converters)
             except KeyError as key:
                 if resolved_path:

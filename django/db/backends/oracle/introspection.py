@@ -166,7 +166,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         for desc in cursor.description:
             name = desc[0]
             internal_size, default, collation, is_autofield, is_json = field_map[name]
-            name = name % {}  # cx_Oracle, for some reason, doubles percent signs.
+            name %= {}  # cx_Oracle, for some reason, doubles percent signs.
             description.append(
                 FieldInfo(
                     self.identifier_converter(name),

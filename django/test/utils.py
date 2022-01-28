@@ -593,7 +593,7 @@ class modify_settings(override_settings):
                 if isinstance(items, str):
                     items = [items]
                 if action == "append":
-                    value = value + [item for item in items if item not in value]
+                    value += [item for item in items if item not in value]
                 elif action == "prepend":
                     value = [item for item in items if item not in value] + value
                 elif action == "remove":

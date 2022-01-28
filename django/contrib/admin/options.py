@@ -1840,7 +1840,7 @@ class ModelAdmin(BaseModelAdmin):
             request, formsets, inline_instances, obj
         )
         for inline_formset in inline_formsets:
-            media = media + inline_formset.media
+            media += inline_formset.media
 
         if add:
             title = _("Add %s")

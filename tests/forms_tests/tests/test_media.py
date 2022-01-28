@@ -643,7 +643,7 @@ class FormsMediaTestCase(SimpleTestCase):
         self.assertEqual(
             merged._css, {"screen": ["c.css", "a.css"], "all": ["d.css", "e.css"]}
         )
-        merged = merged + widget3
+        merged += widget3
         # widget3 contains an explicit ordering of c.css and a.css.
         self.assertEqual(
             merged._css,

@@ -528,7 +528,7 @@ class FormatStylePlaceholderCursor:
         elif hasattr(params, "keys"):
             # Handle params as dict
             args = {k: ":%s" % k for k in params}
-            query = query % args
+            query %= args
         elif unify_by_values and params:
             # Handle params as a dict with unified query parameters by their
             # values. It can be used only in single query execute() because
@@ -542,11 +542,11 @@ class FormatStylePlaceholderCursor:
             }
             args = [params_dict[param] for param in params]
             params = {value: key for key, value in params_dict.items()}
-            query = query % tuple(args)
+            query %= tuple(args)
         else:
             # Handle params as sequence
             args = [(":arg%d" % i) for i in range(len(params))]
-            query = query % tuple(args)
+            query %= tuple(args)
         return query, self._format_params(params)
 
     def execute(self, query, params=None):

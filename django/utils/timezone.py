@@ -334,7 +334,7 @@ def _is_pytz_zone(tz):
     _PYTZ_BASE_CLASSES = (pytz.tzinfo.BaseTzInfo, pytz._FixedOffset)
     # In releases prior to 2018.4, pytz.UTC was not a subclass of BaseTzInfo
     if not isinstance(pytz.UTC, pytz._FixedOffset):
-        _PYTZ_BASE_CLASSES = _PYTZ_BASE_CLASSES + (type(pytz.UTC),)
+        _PYTZ_BASE_CLASSES += (type(pytz.UTC),)
 
     return isinstance(tz, _PYTZ_BASE_CLASSES)
 
