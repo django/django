@@ -263,13 +263,19 @@ class TestSaveLoad(TestCase):
 class TestQuerying(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.primitives = [True, False, 'yes', 7, 9.6]
-        values = [
-            None,
-            [],
-            {},
-            {'a': 'b', 'c': 14},
-            {
+        cls.primitives = {
+            'TRUE': True,
+            'FALSE': False,
+            'STRING': 'yes',
+            'INTEGER': 7,
+            'FLOAT': 9.6,
+        }
+        values = {
+            'NONE': None,
+            'EMPTY_LIST': [],
+            'EMPTY_DICT': {},
+            'SIMPLE_DICT': {'a': 'b', 'c': 14},
+            'COMPLEX_DICT': {
                 'a': 'b',
                 'c': 14,
                 'd': ['e', {'f': 'g'}],
@@ -282,48 +288,48 @@ class TestQuerying(TestCase):
                 'p': 4.2,
                 'r': {'s': True, 't': False},
             },
-            [1, [2]],
-            {'k': True, 'l': False, 'foo': 'bax'},
-            {
+            'LIST_OF_INTS': [1, [2]],
+            'DICT_WITH_BOOLS': {'k': True, 'l': False, 'foo': 'bax'},
+            'DICT_SUB_STRUCTS': {
                 'foo': 'bar',
                 'baz': {'a': 'b', 'c': 'd'},
                 'bar': ['foo', 'bar'],
                 'bax': {'foo': 'bar'},
             },
-        ]
-        cls.objs = [
-            NullableJSONModel.objects.create(value=value)
-            for value in values
-        ]
+        }
+        cls.objs = {
+            key: NullableJSONModel.objects.create(value=value)
+            for key, value in values.items()
+        }
         if connection.features.supports_primitives_in_json_field:
-            cls.objs.extend([
-                NullableJSONModel.objects.create(value=value)
-                for value in cls.primitives
-            ])
+            cls.objs.update({
+                key: NullableJSONModel.objects.create(value=value)
+                for key, value in cls.primitives.items()
+            })
         cls.raw_sql = '%s::jsonb' if connection.vendor == 'postgresql' else '%s'
 
     def test_exact(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__exact={}),
-            [self.objs[2]],
+            [self.objs['EMPTY_DICT']],
         )
 
     def test_exact_complex(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__exact={'a': 'b', 'c': 14}),
-            [self.objs[3]],
+            [self.objs['SIMPLE_DICT']],
         )
 
     def test_icontains(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__icontains='BaX'),
-            self.objs[6:8],
+            [self.objs['DICT_WITH_BOOLS'], self.objs['DICT_SUB_STRUCTS']],
         )
 
     def test_isnull(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__isnull=True),
-            [self.objs[0]],
+            [self.objs['NONE']],
         )
 
     def test_ordering_by_transform(self):
@@ -356,7 +362,7 @@ class TestQuerying(TestCase):
             base_qs.order_by('value__d__0'),
             base_qs.annotate(key=KeyTransform('0', KeyTransform('d', 'value'))).order_by('key'),
         ):
-            self.assertSequenceEqual(qs, [self.objs[4]])
+            self.assertSequenceEqual(qs, [self.objs['COMPLEX_DICT']])
         qs = NullableJSONModel.objects.filter(value__isnull=False)
         self.assertQuerysetEqual(
             qs.filter(value__isnull=False).annotate(
@@ -388,14 +394,14 @@ class TestQuerying(TestCase):
         expr = RawSQL(self.raw_sql, ['{"x": "bar"}'])
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__foo=KeyTransform('x', expr)),
-            [self.objs[7]],
+            [self.objs['DICT_SUB_STRUCTS']],
         )
 
     def test_nested_key_transform_raw_expression(self):
         expr = RawSQL(self.raw_sql, ['{"x": {"y": "bar"}}'])
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__foo=KeyTransform('y', KeyTransform('x', expr))),
-            [self.objs[7]],
+            [self.objs['DICT_SUB_STRUCTS']],
         )
 
     def test_key_transform_expression(self):
@@ -405,7 +411,7 @@ class TestQuerying(TestCase):
                 chain=KeyTransform('0', 'key'),
                 expr=KeyTransform('0', Cast('key', models.JSONField())),
             ).filter(chain=F('expr')),
-            [self.objs[4]],
+            [self.objs['COMPLEX_DICT']],
         )
 
     def test_key_transform_annotation_expression(self):
@@ -426,7 +432,7 @@ class TestQuerying(TestCase):
                 chain=KeyTransform('f', KeyTransform('1', 'key')),
                 expr=KeyTransform('f', KeyTransform('1', Cast('key', models.JSONField()))),
             ).filter(chain=F('expr')),
-            [self.objs[4]],
+            [self.objs['COMPLEX_DICT']],
         )
 
     def test_nested_key_transform_annotation_expression(self):
@@ -451,7 +457,7 @@ class TestQuerying(TestCase):
                 key=KeyTransform('d', 'subquery_value'),
                 chain=KeyTransform('f', KeyTransform('1', 'key')),
             ).filter(chain='g'),
-            [self.objs[4]],
+            [self.objs['COMPLEX_DICT']],
         )
 
     def test_expression_wrapper_key_transform(self):
@@ -462,34 +468,34 @@ class TestQuerying(TestCase):
                     output_field=IntegerField(),
                 ),
             ).filter(expr__isnull=False),
-            self.objs[3:5],
+            [self.objs['SIMPLE_DICT'], self.objs['COMPLEX_DICT']],
         )
 
     def test_has_key(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__has_key='a'),
-            [self.objs[3], self.objs[4]],
+            [self.objs['SIMPLE_DICT'], self.objs['COMPLEX_DICT']],
         )
 
     def test_has_key_null_value(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__has_key='j'),
-            [self.objs[4]],
+            [self.objs['COMPLEX_DICT']],
         )
 
     def test_has_key_deep(self):
         tests = [
-            (Q(value__baz__has_key='a'), self.objs[7]),
-            (Q(value__has_key=KeyTransform('a', KeyTransform('baz', 'value'))), self.objs[7]),
-            (Q(value__has_key=F('value__baz__a')), self.objs[7]),
-            (Q(value__has_key=KeyTransform('c', KeyTransform('baz', 'value'))), self.objs[7]),
-            (Q(value__has_key=F('value__baz__c')), self.objs[7]),
-            (Q(value__d__1__has_key='f'), self.objs[4]),
+            (Q(value__baz__has_key='a'), self.objs['DICT_SUB_STRUCTS']),
+            (Q(value__has_key=KeyTransform('a', KeyTransform('baz', 'value'))), self.objs['DICT_SUB_STRUCTS']),
+            (Q(value__has_key=F('value__baz__a')), self.objs['DICT_SUB_STRUCTS']),
+            (Q(value__has_key=KeyTransform('c', KeyTransform('baz', 'value'))), self.objs['DICT_SUB_STRUCTS']),
+            (Q(value__has_key=F('value__baz__c')), self.objs['DICT_SUB_STRUCTS']),
+            (Q(value__d__1__has_key='f'), self.objs['COMPLEX_DICT']),
             (
                 Q(value__has_key=KeyTransform('f', KeyTransform('1', KeyTransform('d', 'value')))),
-                self.objs[4],
+                self.objs['COMPLEX_DICT'],
             ),
-            (Q(value__has_key=F('value__d__1__f')), self.objs[4]),
+            (Q(value__has_key=F('value__d__1__f')), self.objs['COMPLEX_DICT']),
         ]
         for condition, expected in tests:
             with self.subTest(condition=condition):
@@ -516,31 +522,31 @@ class TestQuerying(TestCase):
     def test_has_keys(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__has_keys=['a', 'c', 'h']),
-            [self.objs[4]],
+            [self.objs['COMPLEX_DICT']],
         )
 
     def test_has_any_keys(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__has_any_keys=['c', 'l']),
-            [self.objs[3], self.objs[4], self.objs[6]],
+            [self.objs['SIMPLE_DICT'], self.objs['COMPLEX_DICT'], self.objs['DICT_WITH_BOOLS']],
         )
 
     @skipUnlessDBFeature('supports_json_field_contains')
     def test_contains(self):
         tests = [
-            ({}, self.objs[2:5] + self.objs[6:8]),
-            ({'baz': {'a': 'b', 'c': 'd'}}, [self.objs[7]]),
-            ({'baz': {'a': 'b'}}, [self.objs[7]]),
-            ({'baz': {'c': 'd'}}, [self.objs[7]]),
-            ({'k': True, 'l': False}, [self.objs[6]]),
-            ({'d': ['e', {'f': 'g'}]}, [self.objs[4]]),
-            ({'d': ['e']}, [self.objs[4]]),
-            ({'d': [{'f': 'g'}]}, [self.objs[4]]),
-            ([1, [2]], [self.objs[5]]),
-            ([1], [self.objs[5]]),
-            ([[2]], [self.objs[5]]),
-            ({'n': [None, True, False]}, [self.objs[4]]),
-            ({'j': None}, [self.objs[4]]),
+            ({}, [val for key, val in self.objs.items() if 'DICT' in key]),
+            ({'baz': {'a': 'b', 'c': 'd'}}, [self.objs['DICT_SUB_STRUCTS']]),
+            ({'baz': {'a': 'b'}}, [self.objs['DICT_SUB_STRUCTS']]),
+            ({'baz': {'c': 'd'}}, [self.objs['DICT_SUB_STRUCTS']]),
+            ({'k': True, 'l': False}, [self.objs['DICT_WITH_BOOLS']]),
+            ({'d': ['e', {'f': 'g'}]}, [self.objs['COMPLEX_DICT']]),
+            ({'d': ['e']}, [self.objs['COMPLEX_DICT']]),
+            ({'d': [{'f': 'g'}]}, [self.objs['COMPLEX_DICT']]),
+            ([1, [2]], [self.objs['LIST_OF_INTS']]),
+            ([1], [self.objs['LIST_OF_INTS']]),
+            ([[2]], [self.objs['LIST_OF_INTS']]),
+            ({'n': [None, True, False]}, [self.objs['COMPLEX_DICT']]),
+            ({'j': None}, [self.objs['COMPLEX_DICT']]),
         ]
         for value, expected in tests:
             with self.subTest(value=value):
@@ -560,7 +566,7 @@ class TestQuerying(TestCase):
         'supports_json_field_contains',
     )
     def test_contains_primitives(self):
-        for value in self.primitives:
+        for value in self.primitives.values():
             with self.subTest(value=value):
                 qs = NullableJSONModel.objects.filter(value__contains=value)
                 self.assertIs(qs.exists(), True)
@@ -568,7 +574,7 @@ class TestQuerying(TestCase):
     @skipUnlessDBFeature('supports_json_field_contains')
     def test_contained_by(self):
         qs = NullableJSONModel.objects.filter(value__contained_by={'a': 'b', 'c': 14, 'h': True})
-        self.assertSequenceEqual(qs, self.objs[2:4])
+        self.assertSequenceEqual(qs, [self.objs['EMPTY_DICT'], self.objs['SIMPLE_DICT']])
 
     @skipIfDBFeature('supports_json_field_contains')
     def test_contained_by_unsupported(self):
@@ -591,32 +597,32 @@ class TestQuerying(TestCase):
         # key__isnull=False works the same as has_key='key'.
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__a__isnull=True),
-            self.objs[:3] + self.objs[5:],
+            [val for key, val in self.objs.items() if key not in {'SIMPLE_DICT', 'COMPLEX_DICT'}],
         )
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__j__isnull=True),
-            self.objs[:4] + self.objs[5:],
+            [val for key, val in self.objs.items() if key not in {'COMPLEX_DICT'}],
         )
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__a__isnull=False),
-            [self.objs[3], self.objs[4]],
+            [self.objs['SIMPLE_DICT'], self.objs['COMPLEX_DICT']],
         )
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__j__isnull=False),
-            [self.objs[4]],
+            [self.objs['COMPLEX_DICT']],
         )
 
     def test_isnull_key_or_none(self):
         obj = NullableJSONModel.objects.create(value={'a': None})
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(Q(value__a__isnull=True) | Q(value__a=None)),
-            self.objs[:3] + self.objs[5:] + [obj],
+            [val for key, val in self.objs.items() if key not in {'SIMPLE_DICT', 'COMPLEX_DICT'}] + [obj],
         )
 
     def test_none_key(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__j=None),
-            [self.objs[4]],
+            [self.objs['COMPLEX_DICT']],
         )
 
     def test_none_key_exclude(self):
@@ -626,7 +632,7 @@ class TestQuerying(TestCase):
             # current implementation doesn't support it.
             self.assertSequenceEqual(
                 NullableJSONModel.objects.exclude(value__j=None),
-                self.objs[1:4] + self.objs[5:] + [obj],
+                [val for key, val in self.objs.items() if key not in {'NONE', 'COMPLEX_DICT'}] + [obj],
             )
         else:
             self.assertSequenceEqual(NullableJSONModel.objects.exclude(value__j=None), [obj])
@@ -634,60 +640,60 @@ class TestQuerying(TestCase):
     def test_shallow_list_lookup(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__0=1),
-            [self.objs[5]],
+            [self.objs['LIST_OF_INTS']],
         )
 
     def test_shallow_obj_lookup(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__a='b'),
-            [self.objs[3], self.objs[4]],
+            [self.objs['SIMPLE_DICT'], self.objs['COMPLEX_DICT']],
         )
 
     def test_obj_subquery_lookup(self):
         qs = NullableJSONModel.objects.annotate(
             field=Subquery(NullableJSONModel.objects.filter(pk=OuterRef('pk')).values('value')),
         ).filter(field__a='b')
-        self.assertSequenceEqual(qs, [self.objs[3], self.objs[4]])
+        self.assertSequenceEqual(qs, [self.objs['SIMPLE_DICT'], self.objs['COMPLEX_DICT']])
 
     def test_deep_lookup_objs(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__k__l='m'),
-            [self.objs[4]],
+            [self.objs['COMPLEX_DICT']],
         )
 
     def test_shallow_lookup_obj_target(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__k={'l': 'm'}),
-            [self.objs[4]],
+            [self.objs['COMPLEX_DICT']],
         )
 
     def test_deep_lookup_array(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__1__0=2),
-            [self.objs[5]],
+            [self.objs['LIST_OF_INTS']],
         )
 
     def test_deep_lookup_mixed(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__d__1__f='g'),
-            [self.objs[4]],
+            [self.objs['COMPLEX_DICT']],
         )
 
     def test_deep_lookup_transform(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__c__gt=2),
-            [self.objs[3], self.objs[4]],
+            [self.objs['SIMPLE_DICT'], self.objs['COMPLEX_DICT']],
         )
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__c__gt=2.33),
-            [self.objs[3], self.objs[4]],
+            [self.objs['SIMPLE_DICT'], self.objs['COMPLEX_DICT']],
         )
         self.assertIs(NullableJSONModel.objects.filter(value__c__lt=5).exists(), False)
 
     def test_lookup_exclude(self):
         tests = [
-            (Q(value__a='b'), [self.objs[0]]),
-            (Q(value__foo='bax'), [self.objs[0], self.objs[7]]),
+            (Q(value__a='b'), [self.objs['NONE']]),
+            (Q(value__foo='bax'), [self.objs['NONE'], self.objs['DICT_SUB_STRUCTS']]),
         ]
         for condition, expected in tests:
             self.assertSequenceEqual(
@@ -702,8 +708,8 @@ class TestQuerying(TestCase):
     def test_lookup_exclude_nonexistent_key(self):
         # Values without the key are ignored.
         condition = Q(value__foo='bax')
-        objs_with_value = [self.objs[6]]
-        objs_with_different_value = [self.objs[0], self.objs[7]]
+        objs_with_value = [self.objs['DICT_WITH_BOOLS']]
+        objs_with_different_value = [self.objs['NONE'], self.objs['DICT_SUB_STRUCTS']]
         self.assertSequenceEqual(
             NullableJSONModel.objects.exclude(condition),
             objs_with_different_value,
@@ -723,7 +729,7 @@ class TestQuerying(TestCase):
         # Add the __isnull lookup to get an exhaustive set.
         self.assertSequenceEqual(
             NullableJSONModel.objects.exclude(condition & Q(value__foo__isnull=False)),
-            self.objs[0:6] + self.objs[7:],
+            [val for key, val in self.objs.items() if key != 'DICT_WITH_BOOLS'],
         )
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(condition & Q(value__foo__isnull=False)),
@@ -735,15 +741,15 @@ class TestQuerying(TestCase):
             NullableJSONModel.objects.filter(
                 id__in=NullableJSONModel.objects.filter(value__c=14),
             ),
-            self.objs[3:5],
+            [self.objs['SIMPLE_DICT'], self.objs['COMPLEX_DICT']],
         )
 
     @skipUnlessDBFeature('supports_json_field_contains')
     def test_array_key_contains(self):
         tests = [
-            ([], [self.objs[7]]),
-            ('bar', [self.objs[7]]),
-            (['bar'], [self.objs[7]]),
+            ([], [self.objs['DICT_SUB_STRUCTS']]),
+            ('bar', [self.objs['DICT_SUB_STRUCTS']]),
+            (['bar'], [self.objs['DICT_SUB_STRUCTS']]),
             ('ar', []),
         ]
         for value, expected in tests:
@@ -759,29 +765,29 @@ class TestQuerying(TestCase):
 
     def test_key_in(self):
         tests = [
-            ('value__c__in', [14], self.objs[3:5]),
-            ('value__c__in', [14, 15], self.objs[3:5]),
-            ('value__0__in', [1], [self.objs[5]]),
-            ('value__0__in', [1, 3], [self.objs[5]]),
-            ('value__foo__in', ['bar'], [self.objs[7]]),
+            ('value__c__in', [14], [self.objs['SIMPLE_DICT'], self.objs['COMPLEX_DICT']]),
+            ('value__c__in', [14, 15], [self.objs['SIMPLE_DICT'], self.objs['COMPLEX_DICT']]),
+            ('value__0__in', [1], [self.objs['LIST_OF_INTS']]),
+            ('value__0__in', [1, 3], [self.objs['LIST_OF_INTS']]),
+            ('value__foo__in', ['bar'], [self.objs['DICT_SUB_STRUCTS']]),
             (
                 'value__foo__in',
                 [KeyTransform('foo', KeyTransform('bax', 'value'))],
-                [self.objs[7]],
+                [self.objs['DICT_SUB_STRUCTS']],
             ),
-            ('value__foo__in', [F('value__bax__foo')], [self.objs[7]]),
+            ('value__foo__in', [F('value__bax__foo')], [self.objs['DICT_SUB_STRUCTS']]),
             (
                 'value__foo__in',
                 [KeyTransform('foo', KeyTransform('bax', 'value')), 'baz'],
-                [self.objs[7]],
+                [self.objs['DICT_SUB_STRUCTS']],
             ),
-            ('value__foo__in', [F('value__bax__foo'), 'baz'], [self.objs[7]]),
-            ('value__foo__in', ['bar', 'baz'], [self.objs[7]]),
-            ('value__bar__in', [['foo', 'bar']], [self.objs[7]]),
-            ('value__bar__in', [['foo', 'bar'], ['a']], [self.objs[7]]),
-            ('value__bax__in', [{'foo': 'bar'}, {'a': 'b'}], [self.objs[7]]),
-            ('value__h__in', [True, 'foo'], [self.objs[4]]),
-            ('value__i__in', [False, 'foo'], [self.objs[4]]),
+            ('value__foo__in', [F('value__bax__foo'), 'baz'], [self.objs['DICT_SUB_STRUCTS']]),
+            ('value__foo__in', ['bar', 'baz'], [self.objs['DICT_SUB_STRUCTS']]),
+            ('value__bar__in', [['foo', 'bar']], [self.objs['DICT_SUB_STRUCTS']]),
+            ('value__bar__in', [['foo', 'bar'], ['a']], [self.objs['DICT_SUB_STRUCTS']]),
+            ('value__bax__in', [{'foo': 'bar'}, {'a': 'b'}], [self.objs['DICT_SUB_STRUCTS']]),
+            ('value__h__in', [True, 'foo'], [self.objs['COMPLEX_DICT']]),
+            ('value__i__in', [False, 'foo'], [self.objs['COMPLEX_DICT']]),
         ]
         for lookup, value, expected in tests:
             with self.subTest(lookup=lookup, value=value):
@@ -847,7 +853,7 @@ class TestQuerying(TestCase):
     def test_key_quoted_string(self):
         self.assertEqual(
             NullableJSONModel.objects.filter(value__o='"quoted"').get(),
-            self.objs[4],
+            self.objs['COMPLEX_DICT'],
         )
 
     @skipUnlessDBFeature('has_json_operators')
@@ -879,7 +885,7 @@ class TestQuerying(TestCase):
     def test_none_key_and_exact_lookup(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__a='b', value__j=None),
-            [self.objs[4]],
+            [self.objs['COMPLEX_DICT']],
         )
 
     def test_lookups_with_key_transform(self):
@@ -925,11 +931,11 @@ class TestQuerying(TestCase):
     def test_join_key_transform_annotation_expression(self):
         related_obj = RelatedJSONModel.objects.create(
             value={'d': ['f', 'e']},
-            json_model=self.objs[4],
+            json_model=self.objs['COMPLEX_DICT'],
         )
         RelatedJSONModel.objects.create(
             value={'d': ['e', 'f']},
-            json_model=self.objs[4],
+            json_model=self.objs['COMPLEX_DICT'],
         )
         self.assertSequenceEqual(
             RelatedJSONModel.objects.annotate(
