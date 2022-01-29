@@ -651,6 +651,9 @@ class FilterExpression:
         >>> fe.var
         <Variable: 'variable'>
     """
+
+    __slots__ = ('token', 'filters', 'var', 'is_var')
+
     def __init__(self, token, parser):
         self.token = token
         matches = filter_re.finditer(token)
@@ -776,6 +779,8 @@ class Variable:
 
     (The example assumes VARIABLE_ATTRIBUTE_SEPARATOR is '.')
     """
+
+    __slots__ = ('var', 'literal', 'lookups', 'translate', 'message_context')
 
     def __init__(self, var):
         self.var = var
