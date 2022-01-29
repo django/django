@@ -978,9 +978,6 @@ class Node:
                     )
             raise
 
-    def __iter__(self):
-        yield self
-
     def get_nodes_by_type(self, nodetype):
         """
         Return a list of all nodes (within this node and its nodelist)
