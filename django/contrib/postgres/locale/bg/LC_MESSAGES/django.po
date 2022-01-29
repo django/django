@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Todor Lubenov <tgl.sysdev@gmail.com>, 2015
+# arneatec <arneatec@gmail.com>, 2022
+# Todor Lubenov <tlubenov@gmail.com>, 2015
 # Venelin Stoykov <vkstoykov@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-12 20:01+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2022-01-14 11:54+0000\n"
+"Last-Translator: arneatec <arneatec@gmail.com>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
 "bg/)\n"
 "MIME-Version: 1.0\n"
@@ -23,23 +24,23 @@ msgstr "PostgreSQL разширения"
 
 #, python-format
 msgid "Item %(nth)s in the array did not validate:"
-msgstr ""
+msgstr "Елемент %(nth)s в масива не се валидира:"
 
 msgid "Nested arrays must have the same length."
-msgstr "Вложените масиви, трябва да имат същата дължина."
+msgstr "Вложените масиви трябва да имат еднаква дължина."
 
 msgid "Map of strings to strings/nulls"
-msgstr ""
+msgstr "Мап от стрингове към стрингове/null-ове"
 
 #, python-format
 msgid "The value of “%(key)s” is not a string or null."
-msgstr ""
+msgstr "Стойността на “%(key)s” не е стринг или null."
 
 msgid "Could not load JSON data."
-msgstr "Не можа да зареди JSON данни ."
+msgstr "Не можа да зареди JSON данни."
 
 msgid "Input must be a JSON dictionary."
-msgstr ""
+msgstr "Входните данни трябва да са JSON речник."
 
 msgid "Enter two valid values."
 msgstr "Въведете две валидни стойности."
@@ -48,7 +49,7 @@ msgid "The start of the range must not exceed the end of the range."
 msgstr "Началото на обхвата не трябва да превишава края му."
 
 msgid "Enter two whole numbers."
-msgstr "Въведете две цели числа"
+msgstr "Въведете две цели числа."
 
 msgid "Enter two numbers."
 msgstr "Въведете две числа."
@@ -106,4 +107,4 @@ msgid ""
 "Ensure that this range is completely greater than or equal to "
 "%(limit_value)s."
 msgstr ""
-"Уверете се че интервала е изцяло по-голям от или равен на %(limit_value)s."
+"Уверете се, че интервалът е изцяло по-голям от или равен на %(limit_value)s."

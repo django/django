@@ -5,7 +5,8 @@ Django 4.0.2 release notes
 *February 1, 2022*
 
 Django 4.0.2 fixes two security issues with severity "medium" and several bugs
-in 4.0.1.
+in 4.0.1. Also, the latest string translations from Transifex are incorporated,
+with a special mention for Bulgarian (fully translated).
 
 Bugfixes
 ========
