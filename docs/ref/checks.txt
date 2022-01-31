@@ -395,6 +395,8 @@ Models
 * **models.W043**: ``<database>`` does not support indexes on expressions.
 * **models.W044**: ``<database>`` does not support unique constraints on
   expressions.
+* **models.W045**: Check constraint ``<constraint>`` contains ``RawSQL()``
+  expression and won't be validated during the model ``full_clean()``.
 
 Security
 --------

@@ -28,6 +28,7 @@ from django.db.models import NOT_PROVIDED, ExpressionWrapper, IntegerField, Max,
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.constraints import CheckConstraint, UniqueConstraint
 from django.db.models.deletion import CASCADE, Collector
+from django.db.models.expressions import RawSQL
 from django.db.models.fields.related import (
     ForeignObjectRel,
     OneToOneField,
@@ -1189,6 +1190,16 @@ class Model(metaclass=ModelBase):
             setattr(self, cachename, obj)
         return getattr(self, cachename)
 
+    def _get_field_value_map(self, meta, exclude=None):
+        if exclude is None:
+            exclude = set()
+        meta = meta or self._meta
+        return {
+            field.name: Value(getattr(self, field.attname), field)
+            for field in meta.local_concrete_fields
+            if field.name not in exclude
+        }
+
     def prepare_database_save(self, field):
         if self.pk is None:
             raise ValueError(
@@ -1221,7 +1232,7 @@ class Model(metaclass=ModelBase):
         if errors:
             raise ValidationError(errors)
 
-    def _get_unique_checks(self, exclude=None):
+    def _get_unique_checks(self, exclude=None, include_meta_constraints=False):
         """
         Return a list of checks to perform. Since validate_unique() could be
         called from a ModelForm, some fields may have been excluded; we can't
@@ -1234,13 +1245,15 @@ class Model(metaclass=ModelBase):
         unique_checks = []
 
         unique_togethers = [(self.__class__, self._meta.unique_together)]
-        constraints = [(self.__class__, self._meta.total_unique_constraints)]
+        constraints = []
+        if include_meta_constraints:
+            constraints = [(self.__class__, self._meta.total_unique_constraints)]
         for parent_class in self._meta.get_parent_list():
             if parent_class._meta.unique_together:
                 unique_togethers.append(
                     (parent_class, parent_class._meta.unique_together)
                 )
-            if parent_class._meta.total_unique_constraints:
+            if include_meta_constraints and parent_class._meta.total_unique_constraints:
                 constraints.append(
                     (parent_class, parent_class._meta.total_unique_constraints)
                 )
@@ -1251,10 +1264,11 @@ class Model(metaclass=ModelBase):
                     # Add the check if the field isn't excluded.
                     unique_checks.append((model_class, tuple(check)))
 
-        for model_class, model_constraints in constraints:
-            for constraint in model_constraints:
-                if not any(name in exclude for name in constraint.fields):
-                    unique_checks.append((model_class, constraint.fields))
+        if include_meta_constraints:
+            for model_class, model_constraints in constraints:
+                for constraint in model_constraints:
+                    if not any(name in exclude for name in constraint.fields):
+                        unique_checks.append((model_class, constraint.fields))
 
         # These are checks for the unique_for_<date/year/month>.
         date_checks = []
@@ -1410,10 +1424,35 @@ class Model(metaclass=ModelBase):
                 params=params,
             )
 
-    def full_clean(self, exclude=None, validate_unique=True):
+    def get_constraints(self):
+        constraints = [(self.__class__, self._meta.constraints)]
+        for parent_class in self._meta.get_parent_list():
+            if parent_class._meta.constraints:
+                constraints.append((parent_class, parent_class._meta.constraints))
+        return constraints
+
+    def validate_constraints(self, exclude=None):
+        constraints = self.get_constraints()
+        using = router.db_for_write(self.__class__, instance=self)
+
+        errors = {}
+        for model_class, model_constraints in constraints:
+            for constraint in model_constraints:
+                try:
+                    constraint.validate(model_class, self, exclude=exclude, using=using)
+                except ValidationError as e:
+                    if e.code == "unique" and len(constraint.fields) == 1:
+                        errors.setdefault(constraint.fields[0], []).append(e)
+                    else:
+                        errors = e.update_error_dict(errors)
+        if errors:
+            raise ValidationError(errors)
+
+    def full_clean(self, exclude=None, validate_unique=True, validate_constraints=True):
         """
-        Call clean_fields(), clean(), and validate_unique() on the model.
-        Raise a ValidationError for any errors that occur.
+        Call clean_fields(), clean(), validate_unique(), and
+        validate_constraints() on the model. Raise a ValidationError for any
+        errors that occur.
         """
         errors = {}
         if exclude is None:
@@ -1440,6 +1479,16 @@ class Model(metaclass=ModelBase):
                     exclude.add(name)
             try:
                 self.validate_unique(exclude=exclude)
+            except ValidationError as e:
+                errors = e.update_error_dict(errors)
+
+        # Run constraints checks, but only for fields that passed validation.
+        if validate_constraints:
+            for name in errors:
+                if name != NON_FIELD_ERRORS and name not in exclude:
+                    exclude.add(name)
+            try:
+                self.validate_constraints(exclude=exclude)
             except ValidationError as e:
                 errors = e.update_error_dict(errors)
 
@@ -2339,8 +2388,28 @@ class Model(metaclass=ModelBase):
                         connection.features.supports_table_check_constraints
                         or "supports_table_check_constraints"
                         not in cls._meta.required_db_features
-                    ) and isinstance(constraint.check, Q):
-                        references.update(cls._get_expr_references(constraint.check))
+                    ):
+                        if isinstance(constraint.check, Q):
+                            references.update(
+                                cls._get_expr_references(constraint.check)
+                            )
+                        if any(
+                            isinstance(expr, RawSQL)
+                            for expr in constraint.check.flatten()
+                        ):
+                            errors.append(
+                                checks.Warning(
+                                    f"Check constraint {constraint.name!r} contains "
+                                    f"RawSQL() expression and won't be validated "
+                                    f"during the model full_clean().",
+                                    hint=(
+                                        "Silence this warning if you don't care about "
+                                        "it."
+                                    ),
+                                    obj=cls,
+                                    id="models.W045",
+                                ),
+                            )
             for field_name, *lookups in references:
                 # pk is an alias that won't be found by opts.get_field.
                 if field_name != "pk":

@@ -806,7 +806,8 @@ class BaseModelFormSet(BaseFormSet):
         for form in valid_forms:
             exclude = form._get_validation_exclusions()
             unique_checks, date_checks = form.instance._get_unique_checks(
-                exclude=exclude
+                exclude=exclude,
+                include_meta_constraints=True,
             )
             all_unique_checks.update(unique_checks)
             all_date_checks.update(date_checks)

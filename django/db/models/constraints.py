@@ -1,16 +1,25 @@
 from enum import Enum
 
-from django.db.models.expressions import ExpressionList, F
+from django.core.exceptions import FieldError, ValidationError
+from django.db import connections
+from django.db.models.expressions import Exists, ExpressionList, F
 from django.db.models.indexes import IndexExpression
+from django.db.models.lookups import Exact
 from django.db.models.query_utils import Q
 from django.db.models.sql.query import Query
+from django.db.utils import DEFAULT_DB_ALIAS
+from django.utils.translation import gettext_lazy as _
 
 __all__ = ["BaseConstraint", "CheckConstraint", "Deferrable", "UniqueConstraint"]
 
 
 class BaseConstraint:
-    def __init__(self, name):
+    violation_error_message = _("Constraint “%(name)s” is violated.")
+
+    def __init__(self, name, violation_error_message=None):
         self.name = name
+        if violation_error_message is not None:
+            self.violation_error_message = violation_error_message
 
     @property
     def contains_expressions(self):
@@ -25,6 +34,12 @@ class BaseConstraint:
     def remove_sql(self, model, schema_editor):
         raise NotImplementedError("This method must be implemented by a subclass.")
 
+    def validate(self, model, instance, exclude=None, using=DEFAULT_DB_ALIAS):
+        raise NotImplementedError("This method must be implemented by a subclass.")
+
+    def get_violation_error_message(self):
+        return self.violation_error_message % {"name": self.name}
+
     def deconstruct(self):
         path = "%s.%s" % (self.__class__.__module__, self.__class__.__name__)
         path = path.replace("django.db.models.constraints", "django.db.models")
@@ -36,13 +51,13 @@ class BaseConstraint:
 
 
 class CheckConstraint(BaseConstraint):
-    def __init__(self, *, check, name):
+    def __init__(self, *, check, name, violation_error_message=None):
         self.check = check
         if not getattr(check, "conditional", False):
             raise TypeError(
                 "CheckConstraint.check must be a Q instance or boolean expression."
             )
-        super().__init__(name)
+        super().__init__(name, violation_error_message=violation_error_message)
 
     def _get_check_sql(self, model, schema_editor):
         query = Query(model=model, alias_cols=False)
@@ -61,6 +76,14 @@ class CheckConstraint(BaseConstraint):
 
     def remove_sql(self, model, schema_editor):
         return schema_editor._delete_check_sql(model, self.name)
+
+    def validate(self, model, instance, exclude=None, using=DEFAULT_DB_ALIAS):
+        against = instance._get_field_value_map(meta=model._meta, exclude=exclude)
+        try:
+            if not Q(self.check).check(against, using=using):
+                raise ValidationError(self.get_violation_error_message())
+        except FieldError:
+            pass
 
     def __repr__(self):
         return "<%s: check=%s name=%s>" % (
@@ -99,6 +122,7 @@ class UniqueConstraint(BaseConstraint):
         deferrable=None,
         include=None,
         opclasses=(),
+        violation_error_message=None,
     ):
         if not name:
             raise ValueError("A unique constraint must be named.")
@@ -148,7 +172,7 @@ class UniqueConstraint(BaseConstraint):
             F(expression) if isinstance(expression, str) else expression
             for expression in expressions
         )
-        super().__init__(name)
+        super().__init__(name, violation_error_message=violation_error_message)
 
     @property
     def contains_expressions(self):
@@ -265,3 +289,61 @@ class UniqueConstraint(BaseConstraint):
         if self.opclasses:
             kwargs["opclasses"] = self.opclasses
         return path, self.expressions, kwargs
+
+    def validate(self, model, instance, exclude=None, using=DEFAULT_DB_ALIAS):
+        queryset = model._default_manager.using(using)
+        if self.fields:
+            lookup_kwargs = {}
+            for field_name in self.fields:
+                if exclude and field_name in exclude:
+                    return
+                field = model._meta.get_field(field_name)
+                lookup_value = getattr(instance, field.attname)
+                if lookup_value is None or (
+                    lookup_value == ""
+                    and connections[using].features.interprets_empty_strings_as_nulls
+                ):
+                    # A composite constraint containing NULL value cannot cause
+                    # a violation since NULL != NULL in SQL.
+                    return
+                lookup_kwargs[field.name] = lookup_value
+            queryset = queryset.filter(**lookup_kwargs)
+        else:
+            # Ignore constraints with excluded fields.
+            if exclude:
+                for expression in self.expressions:
+                    for expr in expression.flatten():
+                        if isinstance(expr, F) and expr.name in exclude:
+                            return
+            replacement_map = instance._get_field_value_map(
+                meta=model._meta, exclude=exclude
+            )
+            expressions = [
+                Exact(expr, expr.replace_references(replacement_map))
+                for expr in self.expressions
+            ]
+            queryset = queryset.filter(*expressions)
+        model_class_pk = instance._get_pk_val(model._meta)
+        if not instance._state.adding and model_class_pk is not None:
+            queryset = queryset.exclude(pk=model_class_pk)
+        if not self.condition:
+            if queryset.exists():
+                if self.expressions:
+                    raise ValidationError(self.get_violation_error_message())
+                # When fields are defined, use the unique_error_message() for
+                # backward compatibility.
+                for model, constraints in instance.get_constraints():
+                    for constraint in constraints:
+                        if constraint is self:
+                            raise ValidationError(
+                                instance.unique_error_message(model, self.fields)
+                            )
+        else:
+            against = instance._get_field_value_map(meta=model._meta, exclude=exclude)
+            try:
+                if (self.condition & Exists(queryset.filter(self.condition))).check(
+                    against, using=using
+                ):
+                    raise ValidationError(self.get_violation_error_message())
+            except FieldError:
+                pass
