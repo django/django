@@ -1,14 +1,23 @@
 from datetime import datetime
 
 from django.core.exceptions import FieldError
+from django.db import DEFAULT_DB_ALIAS, connection
 from django.db.models import BooleanField, CharField, F, Q
-from django.db.models.expressions import Col, Func
+from django.db.models.expressions import (
+    Col,
+    Exists,
+    ExpressionWrapper,
+    Func,
+    RawSQL,
+    Value,
+)
 from django.db.models.fields.related_lookups import RelatedIsNull
 from django.db.models.functions import Lower
 from django.db.models.lookups import Exact, GreaterThan, IsNull, LessThan
-from django.db.models.sql.query import JoinPromoter, Query
+from django.db.models.sql.constants import SINGLE
+from django.db.models.sql.query import JoinPromoter, Query, get_field_names_from_opts
 from django.db.models.sql.where import OR
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import register_lookup
 
 from .models import Author, Item, ObjectC, Ranking
@@ -150,6 +159,56 @@ class TestQuery(SimpleTestCase):
         msg = "Cannot filter against a non-conditional expression."
         with self.assertRaisesMessage(TypeError, msg):
             query.build_where(Func(output_field=CharField()))
+
+
+class TestQueryNoModel(TestCase):
+    def test_rawsql_annotation(self):
+        query = Query(None)
+        sql = "%s IS NULL"
+        # Wrap with a CASE WHEN expression if a database backend (e.g. Oracle)
+        # doesn't support boolean expression in SELECT list.
+        if not connection.features.supports_boolean_expr_in_select_clause:
+            sql = f"CASE WHEN {sql} THEN 1 ELSE 0 END"
+        query.add_annotation(RawSQL(sql, (None,), BooleanField()), "_check")
+        result = query.get_compiler(using=DEFAULT_DB_ALIAS).execute_sql(SINGLE)
+        self.assertEqual(result[0], 1)
+
+    def test_subquery_annotation(self):
+        query = Query(None)
+        query.add_annotation(Exists(Item.objects.all()), "_check")
+        result = query.get_compiler(using=DEFAULT_DB_ALIAS).execute_sql(SINGLE)
+        self.assertEqual(result[0], 0)
+
+    @skipUnlessDBFeature("supports_boolean_expr_in_select_clause")
+    def test_q_annotation(self):
+        query = Query(None)
+        check = ExpressionWrapper(
+            Q(RawSQL("%s IS NULL", (None,), BooleanField()))
+            | Q(Exists(Item.objects.all())),
+            BooleanField(),
+        )
+        query.add_annotation(check, "_check")
+        result = query.get_compiler(using=DEFAULT_DB_ALIAS).execute_sql(SINGLE)
+        self.assertEqual(result[0], 1)
+
+    def test_names_to_path_field(self):
+        query = Query(None)
+        query.add_annotation(Value(True), "value")
+        path, final_field, targets, names = query.names_to_path(["value"], opts=None)
+        self.assertEqual(path, [])
+        self.assertIsInstance(final_field, BooleanField)
+        self.assertEqual(len(targets), 1)
+        self.assertIsInstance(targets[0], BooleanField)
+        self.assertEqual(names, [])
+
+    def test_names_to_path_field_error(self):
+        query = Query(None)
+        msg = "Cannot resolve keyword 'nonexistent' into field."
+        with self.assertRaisesMessage(FieldError, msg):
+            query.names_to_path(["nonexistent"], opts=None)
+
+    def test_get_field_names_from_opts(self):
+        self.assertEqual(get_field_names_from_opts(None), set())
 
 
 class JoinPromoterTest(SimpleTestCase):

@@ -46,6 +46,8 @@ __all__ = ["Query", "RawQuery"]
 
 
 def get_field_names_from_opts(opts):
+    if opts is None:
+        return set()
     return set(
         chain.from_iterable(
             (f.name, f.attname) if f.concrete else (f.name,) for f in opts.get_fields()
@@ -301,7 +303,8 @@ class Query(BaseExpression):
         processing. Normally, this is self.model._meta, but it can be changed
         by subclasses.
         """
-        return self.model._meta
+        if self.model:
+            return self.model._meta
 
     def clone(self):
         """
@@ -994,8 +997,10 @@ class Query(BaseExpression):
         if self.alias_map:
             alias = self.base_table
             self.ref_alias(alias)
-        else:
+        elif self.model:
             alias = self.join(self.base_table_class(self.get_meta().db_table, None))
+        else:
+            alias = None
         return alias
 
     def count_active_tables(self):
@@ -1619,6 +1624,8 @@ class Query(BaseExpression):
             field = None
             filtered_relation = None
             try:
+                if opts is None:
+                    raise FieldDoesNotExist
                 field = opts.get_field(name)
             except FieldDoesNotExist:
                 if name in self.annotation_select:
@@ -1673,7 +1680,7 @@ class Query(BaseExpression):
             # Check if we need any joins for concrete inheritance cases (the
             # field lives in parent, but we are currently in one of its
             # children)
-            if model is not opts.model:
+            if opts is not None and model is not opts.model:
                 path_to_parent = opts.get_path_to_parent(model)
                 if path_to_parent:
                     path.extend(path_to_parent)
