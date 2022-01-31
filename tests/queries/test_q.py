@@ -1,3 +1,4 @@
+from django.core.exceptions import FieldError
 from django.db.models import (
     BooleanField,
     Exists,
@@ -10,7 +11,7 @@ from django.db.models import (
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import Lower
 from django.db.models.sql.where import NothingNode
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 
 from .models import Tag
 
@@ -214,3 +215,40 @@ class QTests(SimpleTestCase):
         )
         flatten = list(q.flatten())
         self.assertEqual(len(flatten), 7)
+
+
+class QCheckTests(TestCase):
+    def test_basic(self):
+        q = Q(price__gt=20)
+        self.assertIs(q.check({"price": 30}), True)
+        self.assertIs(q.check({"price": 10}), False)
+
+    def test_expression(self):
+        q = Q(name="test")
+        self.assertIs(q.check({"name": Lower(Value("TeSt"))}), True)
+        self.assertIs(q.check({"name": Value("other")}), False)
+
+    def test_missing_field(self):
+        q = Q(description__startswith="prefix")
+        msg = "Cannot resolve keyword 'description' into field."
+        with self.assertRaisesMessage(FieldError, msg):
+            q.check({"name": "test"})
+
+    def test_boolean_expression(self):
+        q = Q(ExpressionWrapper(Q(price__gt=20), output_field=BooleanField()))
+        self.assertIs(q.check({"price": 25}), True)
+        self.assertIs(q.check({"price": Value(10)}), False)
+
+    def test_rawsql(self):
+        """
+        RawSQL expressions cause a database error because "price" cannot be
+        replaced by its value. In this case, Q.check() logs a warning and
+        return True.
+        """
+        q = Q(RawSQL("price > %s", params=(20,), output_field=BooleanField()))
+        with self.assertLogs("django.db.models", "WARNING") as cm:
+            self.assertIs(q.check({"price": 10}), True)
+        self.assertIn(
+            f"Got a database error calling check() on {q!r}: ",
+            cm.records[0].getMessage(),
+        )

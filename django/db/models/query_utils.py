@@ -8,11 +8,15 @@ circular import difficulties.
 import copy
 import functools
 import inspect
+import logging
 from collections import namedtuple
 
 from django.core.exceptions import FieldError
+from django.db import DEFAULT_DB_ALIAS, DatabaseError
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
+
+logger = logging.getLogger("django.db.models")
 
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
@@ -109,6 +113,31 @@ class Q(tree.Node):
                 yield from child.flatten()
             else:
                 yield child
+
+    def check(self, against, using=DEFAULT_DB_ALIAS):
+        """
+        Do a database query to check if the expressions of the Q instance
+        matches against the expressions.
+        """
+        # Avoid circular imports.
+        from django.db.models import Value
+        from django.db.models.sql import Query
+        from django.db.models.sql.constants import SINGLE
+
+        query = Query(None)
+        for name, value in against.items():
+            if not hasattr(value, "resolve_expression"):
+                value = Value(value)
+            query.add_annotation(value, name, select=False)
+        query.add_annotation(Value(1), "_check")
+        # This will raise a FieldError if a field is missing in "against".
+        query.add_q(self)
+        compiler = query.get_compiler(using=using)
+        try:
+            return compiler.execute_sql(SINGLE) is not None
+        except DatabaseError as e:
+            logger.warning("Got a database error calling check() on %r: %s", self, e)
+            return True
 
     def deconstruct(self):
         path = "%s.%s" % (self.__class__.__module__, self.__class__.__name__)
