@@ -369,11 +369,17 @@ SHORT_DATETIME_FORMAT = 'm/d/Y P'
 # https://docs.python.org/library/datetime.html#strftime-behavior
 # * Note that these format strings are different from the ones to display dates
 DATE_INPUT_FORMATS = [
-    '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y',  # '2006-10-25', '10/25/2006', '10/25/06'
-    '%b %d %Y', '%b %d, %Y',             # 'Oct 25 2006', 'Oct 25, 2006'
-    '%d %b %Y', '%d %b, %Y',             # '25 Oct 2006', '25 Oct, 2006'
-    '%B %d %Y', '%B %d, %Y',             # 'October 25 2006', 'October 25, 2006'
-    '%d %B %Y', '%d %B, %Y',             # '25 October 2006', '25 October, 2006'
+    '%Y-%m-%d',  # '2006-10-25'
+    '%m/%d/%Y',  # '10/25/2006'
+    '%m/%d/%y',  # '10/25/06'
+    '%b %d %Y',  # 'Oct 25 2006'
+    '%b %d, %Y',  # 'Oct 25, 2006'
+    '%d %b %Y',  # '25 Oct 2006'
+    '%d %b, %Y',  # '25 Oct, 2006'
+    '%B %d %Y',  # 'October 25 2006'
+    '%B %d, %Y',  # 'October 25, 2006'
+    '%d %B %Y',  # '25 October 2006'
+    '%d %B, %Y',  # '25 October, 2006'
 ]
 
 # Default formats to be used when parsing times from input boxes, in order
