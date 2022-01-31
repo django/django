@@ -16,8 +16,10 @@ FIRST_DAY_OF_WEEK = 1
 # Kept ISO formats as they are in first position
 DATE_INPUT_FORMATS = [
     '%Y-%m-%d',                     # '2006-10-25'
-    '%d.%m.%Y.', '%d.%m.%y.',       # '25.10.2006.', '25.10.06.'
-    '%d. %m. %Y.', '%d. %m. %y.',   # '25. 10. 2006.', '25. 10. 06.'
+    '%d.%m.%Y.',  # '25.10.2006.'
+    '%d.%m.%y.',  # '25.10.06.'
+    '%d. %m. %Y.',  # '25. 10. 2006.'
+    '%d. %m. %y.',  # '25. 10. 06.'
 ]
 DATETIME_INPUT_FORMATS = [
     '%Y-%m-%d %H:%M:%S',        # '2006-10-25 14:30:59'

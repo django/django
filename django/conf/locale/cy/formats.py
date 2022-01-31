@@ -14,7 +14,8 @@ FIRST_DAY_OF_WEEK = 1                   # 'Dydd Llun'
 # The *_INPUT_FORMATS strings use the Python strftime format syntax,
 # see https://docs.python.org/library/datetime.html#strftime-strptime-behavior
 DATE_INPUT_FORMATS = [
-    '%d/%m/%Y', '%d/%m/%y',             # '25/10/2006', '25/10/06'
+    '%d/%m/%Y',  # '25/10/2006'
+    '%d/%m/%y',  # '25/10/06'
 ]
 DATETIME_INPUT_FORMATS = [
     '%Y-%m-%d %H:%M:%S',                # '2006-10-25 14:30:59'
