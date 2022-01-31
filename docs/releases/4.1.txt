@@ -65,6 +65,15 @@ advantage of developments in the ORM's asynchronous support as it evolves.
 
 See :ref:`async-queries` for details and limitations.
 
+Validation of Constraints
+-------------------------
+
+:class:`Check <django.db.models.CheckConstraint>`,
+:class:`unique <django.db.models.UniqueConstraint>`, and :class:`exclusion
+<django.contrib.postgres.constraints.ExclusionConstraint>` constraints defined
+in the :attr:`Meta.constraints <django.db.models.Options.constraints>` option
+are now checked during :ref:`model validation <validating-objects>`.
+
 .. _csrf-cookie-masked-usage:
 
 ``CSRF_COOKIE_MASKED`` setting
@@ -550,6 +559,10 @@ Miscellaneous
 
 * The undocumented ``django.contrib.auth.views.SuccessURLAllowedHostsMixin``
   mixin is replaced by ``RedirectURLMixin``.
+
+* :class:`~django.db.models.BaseConstraint` subclasses must implement
+  :meth:`~django.db.models.BaseConstraint.validate` method to allow those
+  constraints to be used for validation.
 
 .. _deprecated-features-4.1:
 

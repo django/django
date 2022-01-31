@@ -38,6 +38,10 @@ class UniqueConstraintProduct(models.Model):
         ]
 
 
+class ChildUniqueConstraintProduct(UniqueConstraintProduct):
+    pass
+
+
 class UniqueConstraintConditionProduct(models.Model):
     name = models.CharField(max_length=255)
     color = models.CharField(max_length=32, null=True)

@@ -12,7 +12,7 @@ PostgreSQL supports additional data integrity constraints available from the
 ``ExclusionConstraint``
 =======================
 
-.. class:: ExclusionConstraint(*, name, expressions, index_type=None, condition=None, deferrable=None, include=None, opclasses=())
+.. class:: ExclusionConstraint(*, name, expressions, index_type=None, condition=None, deferrable=None, include=None, opclasses=(), violation_error_message=None)
 
     Creates an exclusion constraint in the database. Internally, PostgreSQL
     implements exclusion constraints using indexes. The default index type is
@@ -26,6 +26,14 @@ PostgreSQL supports additional data integrity constraints available from the
     If you attempt to insert a new row that conflicts with an existing row, an
     :exc:`~django.db.IntegrityError` is raised. Similarly, when update
     conflicts with an existing row.
+
+    Exclusion constraints are checked during the :ref:`model validation
+    <validating-objects>`.
+
+    .. versionchanged:: 4.1
+
+        In older versions, exclusion constraints were not checked during model
+        validation.
 
 ``name``
 --------
@@ -164,6 +172,15 @@ creates an exclusion constraint on ``circle`` using ``circle_ops``.
     The ``opclasses`` parameter is deprecated in favor of using
     :class:`OpClass() <django.contrib.postgres.indexes.OpClass>` in
     :attr:`~ExclusionConstraint.expressions`.
+
+``violation_error_message``
+---------------------------
+
+.. versionadded:: 4.1
+
+The error message used when ``ValidationError`` is raised during
+:ref:`model validation <validating-objects>`. Defaults to
+:attr:`.BaseConstraint.violation_error_message`.
 
 Examples
 --------
