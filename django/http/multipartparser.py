@@ -221,7 +221,7 @@ class MultiPartParser(object):
                     file_name = disposition.get('filename')
                     if file_name:
                         file_name = force_text(file_name, encoding, errors='replace')
-                        file_name = self.IE_sanitize(unescape_entities(file_name))
+                        file_name = self.sanitize_file_name(file_name)
                     if not file_name:
                         continue
 
