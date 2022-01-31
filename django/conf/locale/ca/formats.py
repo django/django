@@ -14,8 +14,8 @@ FIRST_DAY_OF_WEEK = 1  # Monday
 # The *_INPUT_FORMATS strings use the Python strftime format syntax,
 # see https://docs.python.org/library/datetime.html#strftime-strptime-behavior
 DATE_INPUT_FORMATS = [
-    # '31/12/2009', '31/12/09'
-    '%d/%m/%Y', '%d/%m/%y'
+    '%d/%m/%Y',  # '31/12/2009'
+    '%d/%m/%y',  # '31/12/09'
 ]
 DATETIME_INPUT_FORMATS = [
     '%d/%m/%Y %H:%M:%S',

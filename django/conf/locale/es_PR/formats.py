@@ -10,8 +10,8 @@ SHORT_DATETIME_FORMAT = 'd/m/Y H:i'
 FIRST_DAY_OF_WEEK = 0  # Sunday
 
 DATE_INPUT_FORMATS = [
-    # '31/12/2009', '31/12/09'
-    '%d/%m/%Y', '%d/%m/%y'
+    '%d/%m/%Y',  # '31/12/2009'
+    '%d/%m/%y',  # '31/12/09'
 ]
 DATETIME_INPUT_FORMATS = [
     '%d/%m/%Y %H:%M:%S',
