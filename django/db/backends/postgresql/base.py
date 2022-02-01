@@ -36,17 +36,17 @@ def psycopg2_version():
 
 PSYCOPG2_VERSION = psycopg2_version()
 
-if PSYCOPG2_VERSION < (2, 5, 4):
-    raise ImproperlyConfigured("psycopg2_version 2.5.4 or newer is required; you have %s" % psycopg2.__version__)
+if PSYCOPG2_VERSION < (2, 8, 4):
+    raise ImproperlyConfigured("psycopg2 version 2.8.4 or newer is required; you have %s" % psycopg2.__version__)
 
 
 # Some of these import psycopg2, so import them after checking if it's installed.
-from .client import DatabaseClient                          # NOQA isort:skip
-from .creation import DatabaseCreation                      # NOQA isort:skip
-from .features import DatabaseFeatures                      # NOQA isort:skip
-from .introspection import DatabaseIntrospection            # NOQA isort:skip
-from .operations import DatabaseOperations                  # NOQA isort:skip
-from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
+from .client import DatabaseClient  # NOQA
+from .creation import DatabaseCreation  # NOQA
+from .features import DatabaseFeatures  # NOQA
+from .introspection import DatabaseIntrospection  # NOQA
+from .operations import DatabaseOperations  # NOQA
+from .schema import DatabaseSchemaEditor  # NOQA
 
 psycopg2.extensions.register_adapter(SafeString, psycopg2.extensions.QuotedString)
 psycopg2.extras.register_uuid()
@@ -87,7 +87,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'IPAddressField': 'inet',
         'GenericIPAddressField': 'inet',
         'JSONField': 'jsonb',
-        'NullBooleanField': 'boolean',
         'OneToOneField': 'integer',
         'PositiveBigIntegerField': 'bigint',
         'PositiveIntegerField': 'integer',
@@ -153,10 +152,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def get_connection_params(self):
         settings_dict = self.settings_dict
         # None may be used to connect to the default 'postgres' db
-        if settings_dict['NAME'] == '':
+        if (
+            settings_dict['NAME'] == '' and
+            not settings_dict.get('OPTIONS', {}).get('service')
+        ):
             raise ImproperlyConfigured(
                 "settings.DATABASES is improperly configured. "
-                "Please supply the NAME value.")
+                "Please supply the NAME or OPTIONS['service'] value."
+            )
         if len(settings_dict['NAME'] or '') > self.ops.max_name_length():
             raise ImproperlyConfigured(
                 "The database name '%s' (%d characters) is longer than "
@@ -167,10 +170,19 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     self.ops.max_name_length(),
                 )
             )
-        conn_params = {
-            'database': settings_dict['NAME'] or 'postgres',
-            **settings_dict['OPTIONS'],
-        }
+        conn_params = {}
+        if settings_dict['NAME']:
+            conn_params = {
+                'database': settings_dict['NAME'],
+                **settings_dict['OPTIONS'],
+            }
+        elif settings_dict['NAME'] is None:
+            # Connect to the default 'postgres' db.
+            settings_dict.get('OPTIONS', {}).pop('service', None)
+            conn_params = {'database': 'postgres', **settings_dict['OPTIONS']}
+        else:
+            conn_params = {**settings_dict['OPTIONS']}
+
         conn_params.pop('isolation_level', None)
         if settings_dict['USER']:
             conn_params['user'] = settings_dict['USER']
@@ -249,12 +261,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # For now, it's here so that every use of "threading" is
         # also async-compatible.
         try:
-            if hasattr(asyncio, 'current_task'):
-                # Python 3.7 and up
-                current_task = asyncio.current_task()
-            else:
-                # Python 3.6
-                current_task = asyncio.Task.current_task()
+            current_task = asyncio.current_task()
         except RuntimeError:
             current_task = None
         # Current task can be none even if the current_task call didn't error
@@ -297,10 +304,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @contextmanager
     def _nodb_cursor(self):
+        cursor = None
         try:
             with super()._nodb_cursor() as cursor:
                 yield cursor
         except (Database.DatabaseError, WrappedDatabaseError):
+            if cursor is not None:
+                raise
             warnings.warn(
                 "Normally Django will use a connection to the 'postgres' database "
                 "to avoid running initialization queries against the production "
@@ -320,6 +330,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                             yield cursor
                     finally:
                         conn.close()
+                    break
+            else:
+                raise
 
     @cached_property
     def pg_version(self):

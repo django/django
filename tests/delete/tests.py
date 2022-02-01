@@ -275,6 +275,16 @@ class OnDeleteTests(TestCase):
 
 
 class DeletionTests(TestCase):
+    def test_sliced_queryset(self):
+        msg = "Cannot use 'limit' or 'offset' with delete()."
+        with self.assertRaisesMessage(TypeError, msg):
+            M.objects.all()[0:5].delete()
+
+    def test_pk_none(self):
+        m = M()
+        msg = "M object can't be deleted because its id attribute is set to None."
+        with self.assertRaisesMessage(ValueError, msg):
+            m.delete()
 
     def test_m2m(self):
         m = M.objects.create()
@@ -703,9 +713,8 @@ class FastDeleteTests(TestCase):
 
     def test_fast_delete_empty_no_update_can_self_select(self):
         """
-        #25932 - Fast deleting on backends that don't have the
-        `no_update_can_self_select` feature should work even if the specified
-        filter doesn't match any row.
+        Fast deleting when DatabaseFeatures.update_can_self_select = False
+        works even if the specified filter doesn't match any row (#25932).
         """
         with self.assertNumQueries(1):
             self.assertEqual(

@@ -3,7 +3,7 @@ import decimal
 from django.core.management.color import no_style
 from django.db import NotSupportedError, connection, transaction
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.models import DurationField
+from django.db.models import DurationField, Value
 from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, override_settings,
     skipIfDBFeature,
@@ -72,8 +72,16 @@ class SimpleDatabaseOperationTests(SimpleTestCase):
     def test_adapt_timefield_value_none(self):
         self.assertIsNone(self.ops.adapt_timefield_value(None))
 
-    def test_adapt_datetimefield_value(self):
+    def test_adapt_timefield_value_expression(self):
+        value = Value(timezone.now().time())
+        self.assertEqual(self.ops.adapt_timefield_value(value), value)
+
+    def test_adapt_datetimefield_value_none(self):
         self.assertIsNone(self.ops.adapt_datetimefield_value(None))
+
+    def test_adapt_datetimefield_value_expression(self):
+        value = Value(timezone.now())
+        self.assertEqual(self.ops.adapt_datetimefield_value(value), value)
 
     def test_adapt_timefield_value(self):
         msg = 'Django does not support timezone-aware times.'
@@ -84,6 +92,11 @@ class SimpleDatabaseOperationTests(SimpleTestCase):
     def test_adapt_timefield_value_unaware(self):
         now = timezone.now()
         self.assertEqual(self.ops.adapt_timefield_value(now), str(now))
+
+    def test_format_for_duration_arithmetic(self):
+        msg = self.may_require_msg % 'format_for_duration_arithmetic'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.ops.format_for_duration_arithmetic(None)
 
     def test_date_extract_sql(self):
         with self.assertRaisesMessage(NotImplementedError, self.may_require_msg % 'date_extract_sql'):

@@ -311,10 +311,10 @@ class TestInteractiveMessages(CollectionTestCase):
                 call_command('collectstatic', interactive=True)
 
 
-class TestCollectionExcludeNoDefaultIgnore(TestDefaults, CollectionTestCase):
+class TestCollectionNoDefaultIgnore(TestDefaults, CollectionTestCase):
     """
-    Test ``--exclude-dirs`` and ``--no-default-ignore`` options of the
-    ``collectstatic`` management command.
+    The ``--no-default-ignore`` option of the ``collectstatic`` management
+    command.
     """
     def run_collectstatic(self):
         super().run_collectstatic(use_default_ignore_patterns=False)

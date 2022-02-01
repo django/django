@@ -46,3 +46,9 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(dictsortreversed('Hello!', 'age'), '')
         self.assertEqual(dictsortreversed({'a': 1}, 'age'), '')
         self.assertEqual(dictsortreversed(1, 'age'), '')
+
+    def test_invalid_args(self):
+        """Fail silently if invalid lookups are passed."""
+        self.assertEqual(dictsortreversed([{}], '._private'), '')
+        self.assertEqual(dictsortreversed([{'_private': 'test'}], '_private'), '')
+        self.assertEqual(dictsortreversed([{'nested': {'_private': 'test'}}], 'nested._private'), '')

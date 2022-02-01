@@ -42,6 +42,9 @@ class BaseRangeField(forms.MultiValueField):
             kwargs['fields'] = [self.base_field(required=False), self.base_field(required=False)]
         kwargs.setdefault('required', False)
         kwargs.setdefault('require_all_fields', False)
+        self.range_kwargs = {}
+        if default_bounds := kwargs.pop('default_bounds', None):
+            self.range_kwargs = {'bounds': default_bounds}
         super().__init__(**kwargs)
 
     def prepare_value(self, value):
@@ -68,7 +71,7 @@ class BaseRangeField(forms.MultiValueField):
                 code='bound_ordering',
             )
         try:
-            range_value = self.range_type(lower, upper)
+            range_value = self.range_type(lower, upper, **self.range_kwargs)
         except TypeError:
             raise exceptions.ValidationError(
                 self.error_messages['invalid'],

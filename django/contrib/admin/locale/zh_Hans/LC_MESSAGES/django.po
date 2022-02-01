@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# lanbla <lanlinwen@buaa.edu.cn>, 2021
 # Brian Wang <singeeking@gmail.com>, 2018
 # Fulong Sun <sunfulong@neusoft.edu.cn>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -20,7 +21,7 @@
 # yf zhan <daxian12345@gmail.com>, 2018
 # dykai <yingkaidang@gmail.com>, 2019
 # ced773123cfad7b4e8b79ca80f736af9, 2012
-# 嘉琪 方 <370358679@qq.com>, 2020
+# fangjiaqi77 <370358679@qq.com>, 2020
 # Kevin Sze <leiarix@gmail.com>, 2012
 # 考证 李 <likaozheng@gmail.com>, 2020
 # 雨翌 <yumendy@163.com>, 2016
@@ -29,9 +30,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-09-11 01:47+0000\n"
-"Last-Translator: 嘉琪 方 <370358679@qq.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-22 03:10+0000\n"
+"Last-Translator: lanbla <lanlinwen@buaa.edu.cn>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -39,6 +40,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "删除所选的 %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -50,10 +55,6 @@ msgstr "无法删除 %(name)s"
 
 msgid "Are you sure?"
 msgstr "你确定吗？"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "删除所选的 %(verbose_name_plural)s"
 
 msgid "Administration"
 msgstr "管理"
@@ -526,6 +527,12 @@ msgstr "忘记了您的密码或用户名？"
 msgid "Toggle navigation"
 msgstr "切换导航"
 
+msgid "Start typing to filter…"
+msgstr "开始输入以筛选..."
+
+msgid "Filter navigation items"
+msgstr "筛选导航项目"
+
 msgid "Date/time"
 msgstr "日期/时间"
 
@@ -588,8 +595,8 @@ msgstr "增加另一个 %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "取消选中 %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "感谢您今天在本站花费了一些宝贵时间。"
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "感谢您今天与本网站共度一段高品质时光。"
 
 msgid "Log in again"
 msgstr "重新登录"

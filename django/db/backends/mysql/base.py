@@ -19,17 +19,17 @@ except ImportError as err:
         'Did you install mysqlclient?'
     ) from err
 
-from MySQLdb.constants import CLIENT, FIELD_TYPE                # isort:skip
-from MySQLdb.converters import conversions                      # isort:skip
+from MySQLdb.constants import CLIENT, FIELD_TYPE
+from MySQLdb.converters import conversions
 
 # Some of these import MySQLdb, so import them after checking if it's installed.
-from .client import DatabaseClient                          # isort:skip
-from .creation import DatabaseCreation                      # isort:skip
-from .features import DatabaseFeatures                      # isort:skip
-from .introspection import DatabaseIntrospection            # isort:skip
-from .operations import DatabaseOperations                  # isort:skip
-from .schema import DatabaseSchemaEditor                    # isort:skip
-from .validation import DatabaseValidation                  # isort:skip
+from .client import DatabaseClient
+from .creation import DatabaseCreation
+from .features import DatabaseFeatures
+from .introspection import DatabaseIntrospection
+from .operations import DatabaseOperations
+from .schema import DatabaseSchemaEditor
+from .validation import DatabaseValidation
 
 version = Database.version_info
 if version < (1, 4, 0):
@@ -119,7 +119,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'IPAddressField': 'char(15)',
         'GenericIPAddressField': 'char(39)',
         'JSONField': 'json',
-        'NullBooleanField': 'bool',
         'OneToOneField': 'integer',
         'PositiveBigIntegerField': 'bigint UNSIGNED',
         'PositiveIntegerField': 'integer UNSIGNED',
@@ -133,8 +132,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     }
 
     # For these data types:
-    # - MySQL < 8.0.13 and MariaDB < 10.2.1 don't accept default values and
-    #   implicitly treat them as nullable
+    # - MySQL < 8.0.13 doesn't accept default values and implicitly treats them
+    #   as nullable
     # - all versions of MySQL and MariaDB don't support full width database
     #   indexes
     _limited_data_types = (
@@ -201,9 +200,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if settings_dict['USER']:
             kwargs['user'] = settings_dict['USER']
         if settings_dict['NAME']:
-            kwargs['db'] = settings_dict['NAME']
+            kwargs['database'] = settings_dict['NAME']
         if settings_dict['PASSWORD']:
-            kwargs['passwd'] = settings_dict['PASSWORD']
+            kwargs['password'] = settings_dict['PASSWORD']
         if settings_dict['HOST'].startswith('/'):
             kwargs['unix_socket'] = settings_dict['HOST']
         elif settings_dict['HOST']:
@@ -231,7 +230,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @async_unsafe
     def get_new_connection(self, conn_params):
-        return Database.connect(**conn_params)
+        connection = Database.connect(**conn_params)
+        # bytes encoder in mysqlclient doesn't work and was added only to
+        # prevent KeyErrors in Django < 2.0. We can remove this workaround when
+        # mysqlclient 2.1 becomes the minimal mysqlclient supported by Django.
+        # See https://github.com/PyMySQL/mysqlclient/issues/489
+        if connection.encoders.get(bytes) is bytes:
+            connection.encoders.pop(bytes)
+        return connection
 
     def init_connection_state(self):
         assignments = []
@@ -302,8 +308,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 primary_key_column_name = self.introspection.get_primary_key_column(cursor, table_name)
                 if not primary_key_column_name:
                     continue
-                key_columns = self.introspection.get_key_columns(cursor, table_name)
-                for column_name, referenced_table_name, referenced_column_name in key_columns:
+                relations = self.introspection.get_relations(cursor, table_name)
+                for column_name, (referenced_column_name, referenced_table_name) in relations.items():
                     cursor.execute(
                         """
                         SELECT REFERRING.`%s`, REFERRING.`%s` FROM `%s` as REFERRING

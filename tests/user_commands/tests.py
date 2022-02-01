@@ -14,10 +14,8 @@ from django.core.management.utils import (
 )
 from django.db import connection
 from django.test import SimpleTestCase, override_settings
-from django.test.utils import captured_stderr, extend_sys_path, ignore_warnings
+from django.test.utils import captured_stderr, extend_sys_path
 from django.utils import translation
-from django.utils.deprecation import RemovedInDjango41Warning
-from django.utils.version import PY37
 
 from .management.commands import dance
 
@@ -244,8 +242,9 @@ class CommandTests(SimpleTestCase):
         management.call_command('mutually_exclusive_required', foo_name='foo', stdout=out)
         self.assertIn('foo_name', out.getvalue())
         msg = (
-            'Error: one of the arguments --foo-id --foo-name --append_const '
-            '--const --count --flag_false --flag_true is required'
+            'Error: one of the arguments --foo-id --foo-name --foo-list '
+            '--append_const --const --count --flag_false --flag_true is '
+            'required'
         )
         with self.assertRaisesMessage(CommandError, msg):
             management.call_command('mutually_exclusive_required', stdout=out)
@@ -274,6 +273,57 @@ class CommandTests(SimpleTestCase):
                     **{arg: value, 'stdout': out},
                 )
                 self.assertIn(expected_output, out.getvalue())
+
+    def test_mutually_exclusive_group_required_with_same_dest_options(self):
+        tests = [
+            {'until': '2'},
+            {'for': '1', 'until': '2'},
+        ]
+        msg = (
+            "Cannot pass the dest 'until' that matches multiple arguments via "
+            "**options."
+        )
+        for options in tests:
+            with self.subTest(options=options):
+                with self.assertRaisesMessage(TypeError, msg):
+                    management.call_command(
+                        'mutually_exclusive_required_with_same_dest',
+                        **options,
+                    )
+
+    def test_mutually_exclusive_group_required_with_same_dest_args(self):
+        tests = [
+            ('--until=1',),
+            ('--until', 1),
+            ('--for=1',),
+            ('--for', 1),
+        ]
+        for args in tests:
+            out = StringIO()
+            with self.subTest(options=args):
+                management.call_command(
+                    'mutually_exclusive_required_with_same_dest',
+                    *args,
+                    stdout=out,
+                )
+                output = out.getvalue()
+                self.assertIn('until=1', output)
+
+    def test_required_list_option(self):
+        tests = [
+            (('--foo-list', [1, 2]), {}),
+            ((), {'foo_list': [1, 2]}),
+        ]
+        for command in ['mutually_exclusive_required', 'required_list_option']:
+            for args, kwargs in tests:
+                with self.subTest(command=command, args=args, kwargs=kwargs):
+                    out = StringIO()
+                    management.call_command(
+                        command,
+                        *args,
+                        **{**kwargs, 'stdout': out},
+                    )
+                    self.assertIn('foo_list=[1, 2]', out.getvalue())
 
     def test_required_const_options(self):
         args = {
@@ -317,23 +367,12 @@ class CommandTests(SimpleTestCase):
         self.assertIn('bar', out.getvalue())
 
     def test_subparser_invalid_option(self):
-        msg = "Error: invalid choice: 'test' (choose from 'foo')"
+        msg = "invalid choice: 'test' (choose from 'foo')"
         with self.assertRaisesMessage(CommandError, msg):
             management.call_command('subparser', 'test', 12)
-        if PY37:
-            # "required" option requires Python 3.7 and later.
-            msg = 'Error: the following arguments are required: subcommand'
-            with self.assertRaisesMessage(CommandError, msg):
-                management.call_command('subparser_dest', subcommand='foo', bar=12)
-        else:
-            msg = (
-                'Unknown option(s) for subparser_dest command: subcommand. '
-                'Valid options are: bar, force_color, help, no_color, '
-                'pythonpath, settings, skip_checks, stderr, stdout, '
-                'traceback, verbosity, version.'
-            )
-            with self.assertRaisesMessage(TypeError, msg):
-                management.call_command('subparser_dest', subcommand='foo', bar=12)
+        msg = 'Error: the following arguments are required: subcommand'
+        with self.assertRaisesMessage(CommandError, msg):
+            management.call_command('subparser_dest', subcommand='foo', bar=12)
 
     def test_create_parser_kwargs(self):
         """BaseCommand.create_parser() passes kwargs to CommandParser."""
@@ -417,45 +456,3 @@ class UtilsTests(SimpleTestCase):
     def test_normalize_path_patterns_truncates_wildcard_base(self):
         expected = [os.path.normcase(p) for p in ['foo/bar', 'bar/*/']]
         self.assertEqual(normalize_path_patterns(['foo/bar/*', 'bar/*/']), expected)
-
-
-class DeprecationTests(SimpleTestCase):
-    def test_requires_system_checks_warning(self):
-        class Command(BaseCommand):
-            pass
-
-        msg = (
-            "Using a boolean value for requires_system_checks is deprecated. "
-            "Use '__all__' instead of True, and [] (an empty list) instead of "
-            "False."
-        )
-        for value in [False, True]:
-            Command.requires_system_checks = value
-            with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
-                Command()
-
-    @ignore_warnings(category=RemovedInDjango41Warning)
-    def test_requires_system_checks_true(self):
-        class Command(BaseCommand):
-            requires_system_checks = True
-
-            def handle(self, *args, **options):
-                pass
-
-        command = Command()
-        with mock.patch('django.core.management.base.BaseCommand.check') as mocked_check:
-            management.call_command(command, skip_checks=False)
-        mocked_check.assert_called_once_with()
-
-    @ignore_warnings(category=RemovedInDjango41Warning)
-    def test_requires_system_checks_false(self):
-        class Command(BaseCommand):
-            requires_system_checks = False
-
-            def handle(self, *args, **options):
-                pass
-
-        command = Command()
-        with mock.patch('django.core.management.base.BaseCommand.check') as mocked_check:
-            management.call_command(command)
-        self.assertIs(mocked_check.called, False)

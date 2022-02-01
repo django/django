@@ -2,13 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Sivert Olstad, 2021
+# Vibeke Uthaug, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2021-11-18 15:49+0000\n"
+"Last-Translator: Vibeke Uthaug\n"
 "Language-Team: Norwegian Nynorsk (http://www.transifex.com/django/django/"
 "language/nn/)\n"
 "MIME-Version: 1.0\n"
@@ -18,14 +20,15 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "GIS"
-msgstr ""
+msgstr "GIS"
 
 msgid "The base GIS field."
-msgstr ""
+msgstr "GIS-basefeltet"
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
+"Geometry-basefeltet - tilordnes til OpenGIS Specification Geometry-typen."
 
 msgid "Point"
 msgstr "Punkt"
@@ -49,19 +52,19 @@ msgid "Geometry collection"
 msgstr "Geometrisamling"
 
 msgid "Extent Aggregate Field"
-msgstr ""
+msgstr "Extent Aggregate-felt"
 
 msgid "Raster Field"
-msgstr ""
+msgstr "Raster-felt"
 
 msgid "No geometry value provided."
 msgstr "Ingen geometriverdi oppgjeve."
 
 msgid "Invalid geometry value."
-msgstr "Ugyldig geometriverdi"
+msgstr "Ugyldig geometriverdi."
 
 msgid "Invalid geometry type."
-msgstr "Ugyldig geometritype"
+msgstr "Ugyldig geometritype."
 
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
@@ -71,17 +74,17 @@ msgstr ""
 "geometrifeltet."
 
 msgid "Delete all Features"
-msgstr ""
+msgstr "Slett alle Features"
 
 msgid "WKT debugging window:"
-msgstr ""
+msgstr "WKT feilsøking-vindauge:"
 
 msgid "Debugging window (serialized value)"
-msgstr ""
+msgstr "Feilsøking-vindauge (serialisert verdi)"
 
 msgid "No feeds are registered."
-msgstr ""
+msgstr "Ingen feeds er registrert."
 
 #, python-format
-msgid "Slug %r isn't registered."
-msgstr ""
+msgid "Slug %r isn’t registered."
+msgstr "Slug %r er ikkje registrert."

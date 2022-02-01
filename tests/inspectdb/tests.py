@@ -204,6 +204,16 @@ class InspectDBTestCase(TestCase):
             output,
         )
 
+    @skipUnlessDBFeature('can_introspect_foreign_keys')
+    def test_foreign_key_to_field(self):
+        out = StringIO()
+        call_command('inspectdb', 'inspectdb_foreignkeytofield', stdout=out)
+        self.assertIn(
+            "to_field_fk = models.ForeignKey('InspectdbPeoplemoredata', "
+            "models.DO_NOTHING, to_field='people_unique_id')",
+            out.getvalue(),
+        )
+
     def test_digits_column_name_introspection(self):
         """Introspection of column names consist/start with digits (#16536/#17676)"""
         char_field_type = connection.features.introspected_field_types['CharField']
@@ -302,18 +312,17 @@ class InspectDBTestCase(TestCase):
         Introspection of columns with a custom field (#21090)
         """
         out = StringIO()
-        orig_data_types_reverse = connection.introspection.data_types_reverse
-        try:
-            connection.introspection.data_types_reverse = {
+        with mock.patch(
+            'django.db.connection.introspection.data_types_reverse.base_data_types_reverse',
+            {
                 'text': 'myfields.TextField',
                 'bigint': 'BigIntegerField',
-            }
+            },
+        ):
             call_command('inspectdb', 'inspectdb_columntypes', stdout=out)
             output = out.getvalue()
             self.assertIn("text_field = myfields.TextField()", output)
             self.assertIn("big_int_field = models.BigIntegerField()", output)
-        finally:
-            connection.introspection.data_types_reverse = orig_data_types_reverse
 
     def test_introspection_errors(self):
         """
@@ -399,7 +408,6 @@ class InspectDBTransactionalTests(TransactionTestCase):
                 cursor.execute('DROP MATERIALIZED VIEW inspectdb_people_materialized')
 
     @skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific SQL')
-    @skipUnlessDBFeature('supports_table_partitions')
     def test_include_partitions(self):
         """inspectdb --include-partitions creates models for partitions."""
         with connection.cursor() as cursor:

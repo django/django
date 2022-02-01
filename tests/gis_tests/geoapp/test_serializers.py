@@ -77,10 +77,11 @@ class GeoJSONSerializerTests(TestCase):
     def test_srid_option(self):
         geojson = serializers.serialize('geojson', City.objects.all().order_by('name'), srid=2847)
         geodata = json.loads(geojson)
-        self.assertEqual(
-            [int(c) for c in geodata['features'][0]['geometry']['coordinates']],
-            [1564802, 5613214]
-        )
+        coordinates = geodata['features'][0]['geometry']['coordinates']
+        # Different PROJ versions use different transformations, all are
+        # correct as having a 1 meter accuracy.
+        self.assertAlmostEqual(coordinates[0], 1564802, -1)
+        self.assertAlmostEqual(coordinates[1], 5613214, -1)
 
     def test_deserialization_exception(self):
         """

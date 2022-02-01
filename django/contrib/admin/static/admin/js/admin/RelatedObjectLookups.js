@@ -4,14 +4,45 @@
 'use strict';
 {
     const $ = django.jQuery;
+    let popupIndex = 0;
+    const relatedWindows = [];
+
+    function dismissChildPopups() {
+        relatedWindows.forEach(function(win) {
+            if(!win.closed) {
+                win.dismissChildPopups();
+                win.close();    
+            }
+        });
+    }
+
+    function setPopupIndex() {
+        if(document.getElementsByName("_popup").length > 0) {
+            const index = window.name.lastIndexOf("__") + 2;
+            popupIndex = parseInt(window.name.substring(index));   
+        } else {
+            popupIndex = 0;
+        }
+    }
+
+    function addPopupIndex(name) {
+        name = name + "__" + (popupIndex + 1);
+        return name;
+    }
+
+    function removePopupIndex(name) {
+        name = name.replace(new RegExp("__" + (popupIndex + 1) + "$"), '');
+        return name;
+    }
 
     function showAdminPopup(triggeringLink, name_regexp, add_popup) {
-        const name = triggeringLink.id.replace(name_regexp, '');
+        const name = addPopupIndex(triggeringLink.id.replace(name_regexp, ''));
         const href = new URL(triggeringLink.href);
         if (add_popup) {
             href.searchParams.set('_popup', 1);
         }
         const win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes');
+        relatedWindows.push(win);
         win.focus();
         return false;
     }
@@ -21,12 +52,16 @@
     }
 
     function dismissRelatedLookupPopup(win, chosenId) {
-        const name = win.name;
+        const name = removePopupIndex(win.name);
         const elem = document.getElementById(name);
         if (elem.classList.contains('vManyToManyRawIdAdminField') && elem.value) {
             elem.value += ',' + chosenId;
         } else {
             document.getElementById(name).value = chosenId;
+        }
+        const index = relatedWindows.indexOf(win);
+        if (index > -1) {
+            relatedWindows.splice(index, 1);
         }
         win.close();
     }
@@ -53,7 +88,7 @@
     }
 
     function dismissAddRelatedObjectPopup(win, newId, newRepr) {
-        const name = win.name;
+        const name = removePopupIndex(win.name);
         const elem = document.getElementById(name);
         if (elem) {
             const elemName = elem.nodeName.toUpperCase();
@@ -74,11 +109,15 @@
             SelectBox.add_to_cache(toId, o);
             SelectBox.redisplay(toId);
         }
+        const index = relatedWindows.indexOf(win);
+        if (index > -1) {
+            relatedWindows.splice(index, 1);
+        }
         win.close();
     }
 
     function dismissChangeRelatedObjectPopup(win, objId, newRepr, newId) {
-        const id = win.name.replace(/^edit_/, '');
+        const id = removePopupIndex(win.name.replace(/^edit_/, ''));
         const selectsSelector = interpolate('#%s, #%s_from, #%s_to', [id, id, id]);
         const selects = $(selectsSelector);
         selects.find('option').each(function() {
@@ -93,11 +132,15 @@
             this.lastChild.textContent = newRepr;
             this.title = newRepr;
         });
+        const index = relatedWindows.indexOf(win);
+        if (index > -1) {
+            relatedWindows.splice(index, 1);
+        }
         win.close();
     }
 
     function dismissDeleteRelatedObjectPopup(win, objId) {
-        const id = win.name.replace(/^delete_/, '');
+        const id = removePopupIndex(win.name.replace(/^delete_/, ''));
         const selectsSelector = interpolate('#%s, #%s_from, #%s_to', [id, id, id]);
         const selects = $(selectsSelector);
         selects.find('option').each(function() {
@@ -105,6 +148,10 @@
                 $(this).remove();
             }
         }).trigger('change');
+        const index = relatedWindows.indexOf(win);
+        if (index > -1) {
+            relatedWindows.splice(index, 1);
+        }
         win.close();
     }
 
@@ -115,12 +162,18 @@
     window.dismissAddRelatedObjectPopup = dismissAddRelatedObjectPopup;
     window.dismissChangeRelatedObjectPopup = dismissChangeRelatedObjectPopup;
     window.dismissDeleteRelatedObjectPopup = dismissDeleteRelatedObjectPopup;
+    window.dismissChildPopups = dismissChildPopups;
 
     // Kept for backward compatibility
     window.showAddAnotherPopup = showRelatedObjectPopup;
     window.dismissAddAnotherPopup = dismissAddRelatedObjectPopup;
 
+    window.addEventListener('unload', function(evt) {
+        window.dismissChildPopups();
+    });
+
     $(document).ready(function() {
+        setPopupIndex();
         $("a[data-popup-opener]").on('click', function(event) {
             event.preventDefault();
             opener.dismissRelatedLookupPopup(window, $(this).data("popup-opener"));

@@ -1,6 +1,6 @@
 import datetime
 from decimal import Decimal
-from unittest import mock, skipIf
+from unittest import mock
 
 from django.core.exceptions import FieldError
 from django.db import NotSupportedError, connection
@@ -48,24 +48,36 @@ class WindowFunctionTests(TestCase):
         ])
 
     def test_dense_rank(self):
-        qs = Employee.objects.annotate(rank=Window(
-            expression=DenseRank(),
-            order_by=ExtractYear(F('hire_date')).asc(),
-        ))
-        self.assertQuerysetEqual(qs, [
-            ('Jones', 45000, 'Accounting', datetime.date(2005, 11, 1), 1),
-            ('Miller', 100000, 'Management', datetime.date(2005, 6, 1), 1),
-            ('Johnson', 80000, 'Management', datetime.date(2005, 7, 1), 1),
-            ('Smith', 55000, 'Sales', datetime.date(2007, 6, 1), 2),
-            ('Jenson', 45000, 'Accounting', datetime.date(2008, 4, 1), 3),
-            ('Smith', 38000, 'Marketing', datetime.date(2009, 10, 1), 4),
-            ('Brown', 53000, 'Sales', datetime.date(2009, 9, 1), 4),
-            ('Williams', 37000, 'Accounting', datetime.date(2009, 6, 1), 4),
-            ('Wilkinson', 60000, 'IT', datetime.date(2011, 3, 1), 5),
-            ('Johnson', 40000, 'Marketing', datetime.date(2012, 3, 1), 6),
-            ('Moore', 34000, 'IT', datetime.date(2013, 8, 1), 7),
-            ('Adams', 50000, 'Accounting', datetime.date(2013, 7, 1), 7),
-        ], lambda entry: (entry.name, entry.salary, entry.department, entry.hire_date, entry.rank), ordered=False)
+        tests = [
+            ExtractYear(F('hire_date')).asc(),
+            F('hire_date__year').asc(),
+            'hire_date__year',
+        ]
+        for order_by in tests:
+            with self.subTest(order_by=order_by):
+                qs = Employee.objects.annotate(
+                    rank=Window(expression=DenseRank(), order_by=order_by),
+                )
+                self.assertQuerysetEqual(qs, [
+                    ('Jones', 45000, 'Accounting', datetime.date(2005, 11, 1), 1),
+                    ('Miller', 100000, 'Management', datetime.date(2005, 6, 1), 1),
+                    ('Johnson', 80000, 'Management', datetime.date(2005, 7, 1), 1),
+                    ('Smith', 55000, 'Sales', datetime.date(2007, 6, 1), 2),
+                    ('Jenson', 45000, 'Accounting', datetime.date(2008, 4, 1), 3),
+                    ('Smith', 38000, 'Marketing', datetime.date(2009, 10, 1), 4),
+                    ('Brown', 53000, 'Sales', datetime.date(2009, 9, 1), 4),
+                    ('Williams', 37000, 'Accounting', datetime.date(2009, 6, 1), 4),
+                    ('Wilkinson', 60000, 'IT', datetime.date(2011, 3, 1), 5),
+                    ('Johnson', 40000, 'Marketing', datetime.date(2012, 3, 1), 6),
+                    ('Moore', 34000, 'IT', datetime.date(2013, 8, 1), 7),
+                    ('Adams', 50000, 'Accounting', datetime.date(2013, 7, 1), 7),
+                ], lambda entry: (
+                    entry.name,
+                    entry.salary,
+                    entry.department,
+                    entry.hire_date,
+                    entry.rank,
+                ), ordered=False)
 
     def test_department_salary(self):
         qs = Employee.objects.annotate(department_sum=Window(
@@ -96,7 +108,7 @@ class WindowFunctionTests(TestCase):
         """
         qs = Employee.objects.annotate(rank=Window(
             expression=Rank(),
-            order_by=ExtractYear(F('hire_date')).asc(),
+            order_by=F('hire_date__year').asc(),
         ))
         self.assertQuerysetEqual(qs, [
             ('Jones', 45000, 'Accounting', datetime.date(2005, 11, 1), 1),
@@ -139,7 +151,6 @@ class WindowFunctionTests(TestCase):
             ('Johnson', 'Management', 12),
         ], lambda entry: (entry.name, entry.department, entry.row_number))
 
-    @skipIf(connection.vendor == 'oracle', "Oracle requires ORDER BY in row_number, ANSI:SQL doesn't")
     def test_row_number_no_ordering(self):
         """
         The row number window function computes the number based on the order
@@ -463,7 +474,7 @@ class WindowFunctionTests(TestCase):
         """
         qs = Employee.objects.annotate(ntile=Window(
             expression=Ntile(num_buckets=4),
-            order_by=F('salary').desc(),
+            order_by='-salary',
         )).order_by('ntile', '-salary', 'name')
         self.assertQuerysetEqual(qs, [
             ('Miller', 'Management', 100000, 1),
@@ -523,7 +534,7 @@ class WindowFunctionTests(TestCase):
         """
         qs = Employee.objects.annotate(max=Window(
             expression=Max('salary'),
-            partition_by=[F('department'), ExtractYear(F('hire_date'))],
+            partition_by=[F('department'), F('hire_date__year')],
         )).order_by('department', 'hire_date', 'name')
         self.assertQuerysetEqual(qs, [
             ('Jones', 45000, 'Accounting', datetime.date(2005, 11, 1), 45000),
@@ -622,10 +633,6 @@ class WindowFunctionTests(TestCase):
             ('Brown', 'Sales', 53000, datetime.date(2009, 9, 1), 148000)
         ], transform=lambda row: (row.name, row.department, row.salary, row.hire_date, row.sum))
 
-    @skipIf(
-        connection.vendor == 'sqlite' and connection.Database.sqlite_version_info < (3, 27),
-        'Nondeterministic failure on SQLite < 3.27.'
-    )
     def test_subquery_row_range_rank(self):
         qs = Employee.objects.annotate(
             highest_avg_salary_date=Subquery(
@@ -753,26 +760,32 @@ class WindowFunctionTests(TestCase):
             Detail(value={'department': 'HR', 'name': 'Smith', 'salary': 55000}),
             Detail(value={'department': 'PR', 'name': 'Moore', 'salary': 90000}),
         ])
-        qs = Detail.objects.annotate(department_sum=Window(
-            expression=Sum(Cast(
-                KeyTextTransform('salary', 'value'),
-                output_field=IntegerField(),
-            )),
-            partition_by=[KeyTransform('department', 'value')],
-            order_by=[KeyTransform('name', 'value')],
-        )).order_by('value__department', 'department_sum')
-        self.assertQuerysetEqual(qs, [
-            ('Brown', 'HR', 50000, 50000),
-            ('Smith', 'HR', 55000, 105000),
-            ('Nowak', 'IT', 32000, 32000),
-            ('Smith', 'IT', 37000, 69000),
-            ('Moore', 'PR', 90000, 90000),
-        ], lambda entry: (
-            entry.value['name'],
-            entry.value['department'],
-            entry.value['salary'],
-            entry.department_sum,
-        ))
+        tests = [
+            (KeyTransform('department', 'value'), KeyTransform('name', 'value')),
+            (F('value__department'), F('value__name')),
+        ]
+        for partition_by, order_by in tests:
+            with self.subTest(partition_by=partition_by, order_by=order_by):
+                qs = Detail.objects.annotate(department_sum=Window(
+                    expression=Sum(Cast(
+                        KeyTextTransform('salary', 'value'),
+                        output_field=IntegerField(),
+                    )),
+                    partition_by=[partition_by],
+                    order_by=[order_by],
+                )).order_by('value__department', 'department_sum')
+                self.assertQuerysetEqual(qs, [
+                    ('Brown', 'HR', 50000, 50000),
+                    ('Smith', 'HR', 55000, 105000),
+                    ('Nowak', 'IT', 32000, 32000),
+                    ('Smith', 'IT', 37000, 69000),
+                    ('Moore', 'PR', 90000, 90000),
+                ], lambda entry: (
+                    entry.value['name'],
+                    entry.value['department'],
+                    entry.value['salary'],
+                    entry.department_sum,
+                ))
 
     def test_invalid_start_value_range(self):
         msg = "start argument must be a negative integer, zero, or None, but got '3'."
@@ -863,7 +876,7 @@ class NonQueryWindowTests(SimpleTestCase):
         )
         self.assertEqual(
             repr(Window(expression=Avg('salary'), order_by=F('department').asc())),
-            '<Window: Avg(F(salary)) OVER (ORDER BY OrderBy(F(department), descending=False))>'
+            '<Window: Avg(F(salary)) OVER (OrderByList(OrderBy(F(department), descending=False)))>'
         )
 
     def test_window_frame_repr(self):
@@ -930,9 +943,12 @@ class NonQueryWindowTests(SimpleTestCase):
             qs.filter(equal=True)
 
     def test_invalid_order_by(self):
-        msg = 'order_by must be either an Expression or a sequence of expressions'
+        msg = (
+            'Window.order_by must be either a string reference to a field, an '
+            'expression, or a list or tuple of them.'
+        )
         with self.assertRaisesMessage(ValueError, msg):
-            Window(expression=Sum('power'), order_by='-horse')
+            Window(expression=Sum('power'), order_by={'-horse'})
 
     def test_invalid_source_expression(self):
         msg = "Expression 'Upper' isn't compatible with OVER clauses."

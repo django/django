@@ -1,18 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Dimce Grozdanoski <dimce.grozdanoski@gmail.com>, 2021
 # dekomote <dr.mote@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Vasil Vangelovski <vvangelovski@gmail.com>, 2016-2017,2019
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2016-2017,2019,2021
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2013-2015
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2011-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-17 01:31+0000\n"
-"Last-Translator: Ramiro Morales\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-09-22 07:21+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
 "mk/)\n"
 "MIME-Version: 1.0\n"
@@ -20,6 +21,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: mk\n"
 "Plural-Forms: nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Избриши ги избраните %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -31,10 +36,6 @@ msgstr "Не може да се избрише %(name)s"
 
 msgid "Are you sure?"
 msgstr "Сигурни сте?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Избриши ги избраните %(verbose_name_plural)s"
 
 msgid "Administration"
 msgstr "Администрација"
@@ -71,6 +72,12 @@ msgstr "Нема датум"
 
 msgid "Has date"
 msgstr "Има датум"
+
+msgid "Empty"
+msgstr "Празно"
+
+msgid "Not empty"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -130,7 +137,7 @@ msgstr "ставки во записникот"
 
 #, python-format
 msgid "Added “%(object)s”."
-msgstr ""
+msgstr "Додадено “%(object)s”."
 
 #, python-format
 msgid "Changed “%(object)s” — %(changes)s"
@@ -138,7 +145,7 @@ msgstr ""
 
 #, python-format
 msgid "Deleted “%(object)s.”"
-msgstr ""
+msgstr "Избришано “%(object)s.”"
 
 msgid "LogEntry Object"
 msgstr "Запис во дневник"
@@ -159,11 +166,11 @@ msgstr ""
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr "Изменето {fields}."
+msgstr "Изменети {fields}."
 
 #, python-brace-format
 msgid "Deleted {name} “{object}”."
-msgstr ""
+msgstr "Избришан {name} “{object}”."
 
 msgid "No fields changed."
 msgstr "Не е изменето ниедно поле."
@@ -172,11 +179,11 @@ msgid "None"
 msgstr "Ништо"
 
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
-msgstr ""
+msgstr "Држете “Control” или “Command” на Mac за да изберете повеќе."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
-msgstr ""
+msgstr "Успешно беше додадено {name} “{obj}”."
 
 msgid "You may edit it again below."
 msgstr "Можете повторно да го промените подолу."
@@ -327,6 +334,19 @@ msgstr "Избери ги сите %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Откажи го изборот"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Модели во %(name)s апликација"
+
+msgid "Add"
+msgstr "Додади"
+
+msgid "View"
+msgstr "Погледни"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr ""
+
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
@@ -372,6 +392,9 @@ msgstr "Погледни на сајтот"
 
 msgid "Filter"
 msgstr "Филтер"
+
+msgid "Clear all filters"
+msgstr ""
 
 msgid "Remove from sorting"
 msgstr "Отстрани од сортирање"
@@ -449,9 +472,6 @@ msgstr ""
 "Дали сте сигурни дека сакате да го избришете избраниот %(objects_name)s? "
 "Сите овие објекти и оние поврзани со нив ќе бидат избришани:"
 
-msgid "View"
-msgstr "Погледни"
-
 msgid "Delete?"
 msgstr "Избриши?"
 
@@ -461,16 +481,6 @@ msgstr " Според %(filter_title)s "
 
 msgid "Summary"
 msgstr "Резиме"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Модели во %(name)s апликација"
-
-msgid "Add"
-msgstr "Додади"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr ""
 
 msgid "Recent actions"
 msgstr "Последни акции"
@@ -500,6 +510,15 @@ msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr "Ја заборавивте вашата лозинка или корисничко име?"
+
+msgid "Toggle navigation"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
 
 msgid "Date/time"
 msgstr "Датум/час"
@@ -564,9 +583,8 @@ msgstr "Додади уште %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Избриши ги избраните %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
+msgid "Thanks for spending some quality time with the web site today."
 msgstr ""
-"Ви благодариме што денеска поминавте квалитетно време со интернет страницава."
 
 msgid "Log in again"
 msgstr "Најавете се повторно"

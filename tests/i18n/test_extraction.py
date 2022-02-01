@@ -152,6 +152,20 @@ class BasicExtractorTests(ExtractorTests):
             with self.assertRaisesRegex(CommandError, msg):
                 management.call_command('makemessages')
 
+    def test_valid_locale(self):
+        out = StringIO()
+        management.call_command('makemessages', locale=['de'], stdout=out, verbosity=1)
+        self.assertNotIn('invalid locale de', out.getvalue())
+        self.assertIn('processing locale de', out.getvalue())
+        self.assertIs(Path(self.PO_FILE).exists(), True)
+
+    def test_invalid_locale(self):
+        out = StringIO()
+        management.call_command('makemessages', locale=['pl-PL'], stdout=out, verbosity=1)
+        self.assertIn('invalid locale pl-PL, did you mean pl_PL?', out.getvalue())
+        self.assertNotIn('processing locale pl-PL', out.getvalue())
+        self.assertIs(Path('locale/pl-PL/LC_MESSAGES/django.po').exists(), False)
+
     def test_comments_extractor(self):
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
@@ -212,8 +226,9 @@ class BasicExtractorTests(ExtractorTests):
         )
         with self.assertRaisesMessage(SyntaxError, msg):
             management.call_command('makemessages', locale=[LOCALE], extensions=['tpl'], verbosity=0)
-        # The temporary file was cleaned up
+        # The temporary files were cleaned up.
         self.assertFalse(os.path.exists('./templates/template_with_error.tpl.py'))
+        self.assertFalse(os.path.exists('./templates/template_0_with_no_error.tpl.py'))
 
     def test_unicode_decode_error(self):
         shutil.copyfile('./not_utf8.sample', './not_utf8.txt')
@@ -430,7 +445,7 @@ class BasicExtractorTests(ExtractorTests):
             self.assertIn('mañana; charset=CHARSET', pot_contents)
 
 
-class JavascriptExtractorTests(ExtractorTests):
+class JavaScriptExtractorTests(ExtractorTests):
 
     PO_FILE = 'locale/%s/LC_MESSAGES/djangojs.po' % LOCALE
 
@@ -744,9 +759,15 @@ class CustomLayoutExtractionTests(ExtractorTests):
     work_subdir = 'project_dir'
 
     def test_no_locale_raises(self):
-        msg = "Unable to find a locale path to store translations for file"
+        msg = (
+            "Unable to find a locale path to store translations for file "
+            "__init__.py. Make sure the 'locale' directory exists in an app "
+            "or LOCALE_PATHS setting is set."
+        )
         with self.assertRaisesMessage(management.CommandError, msg):
-            management.call_command('makemessages', locale=LOCALE, verbosity=0)
+            management.call_command('makemessages', locale=[LOCALE], verbosity=0)
+        # Working files are cleaned up on an error.
+        self.assertFalse(os.path.exists('./app_no_locale/test.html.py'))
 
     def test_project_locale_paths(self):
         self._test_project_locale_paths(os.path.join(self.test_dir, 'project_locale'))
@@ -783,3 +804,37 @@ class NoSettingsExtractionTests(AdminScriptTestCase):
         out, err = self.run_django_admin(['makemessages', '-l', 'en', '-v', '0'])
         self.assertNoOutput(err)
         self.assertNoOutput(out)
+
+
+class UnchangedPoExtractionTests(ExtractorTests):
+    work_subdir = 'unchanged'
+
+    def setUp(self):
+        super().setUp()
+        po_file = Path(self.PO_FILE)
+        po_file_tmp = Path(self.PO_FILE + '.tmp')
+        if os.name == 'nt':
+            # msgmerge outputs Windows style paths on Windows.
+            po_contents = po_file_tmp.read_text().replace(
+                '#: __init__.py',
+                '#: .\\__init__.py',
+            )
+            po_file.write_text(po_contents)
+        else:
+            po_file_tmp.rename(po_file)
+        self.original_po_contents = po_file.read_text()
+
+    def test_po_remains_unchanged(self):
+        """PO files are unchanged unless there are new changes."""
+        _, po_contents = self._run_makemessages()
+        self.assertEqual(po_contents, self.original_po_contents)
+
+    def test_po_changed_with_new_strings(self):
+        """PO files are updated when new changes are detected."""
+        Path('models.py.tmp').rename('models.py')
+        _, po_contents = self._run_makemessages()
+        self.assertNotEqual(po_contents, self.original_po_contents)
+        self.assertMsgId(
+            'This is a hitherto undiscovered translatable string.',
+            po_contents,
+        )

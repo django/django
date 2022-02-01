@@ -1,6 +1,6 @@
-==========================
-Outputting CSV with Django
-==========================
+========================
+How to create CSV output
+========================
 
 This document explains how to output CSV (Comma Separated Values) dynamically
 using Django views. To do this, you can either use the Python CSV library or the
@@ -112,7 +112,7 @@ Here's an example, which generates the same CSV file as above::
     def some_view(request):
         # Create the HttpResponse object with the appropriate CSV header.
         response = HttpResponse(
-            content_type='text/csv'
+            content_type='text/csv',
             headers={'Content-Disposition': 'attachment; filename="somefilename.csv"'},
         )
 

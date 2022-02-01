@@ -309,7 +309,7 @@ class SystemChecksTestCase(SimpleTestCase):
         self.assertEqual(SongAdmin(Song, AdminSite()).check(), [
             checks.Error(
                 "The value of 'list_editable[0]' refers to 'test', which is "
-                "not an attribute of 'admin_checks.Song'.",
+                "not a field of 'admin_checks.Song'.",
                 obj=SongAdmin,
                 id='admin.E121',
             )
@@ -618,7 +618,7 @@ class SystemChecksTestCase(SimpleTestCase):
         expected = [
             checks.Error(
                 "The value of 'raw_id_fields[0]' refers to 'nonexistent', "
-                "which is not an attribute of 'admin_checks.Album'.",
+                "which is not a field of 'admin_checks.Album'.",
                 obj=RawIdNonexistentAdmin,
                 id='admin.E002',
             )
@@ -692,6 +692,7 @@ class SystemChecksTestCase(SimpleTestCase):
         self.assertEqual(errors, [])
 
     def test_readonly_on_method(self):
+        @admin.display
         def my_function(obj):
             pass
 
@@ -705,6 +706,7 @@ class SystemChecksTestCase(SimpleTestCase):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = ("readonly_method_on_modeladmin",)
 
+            @admin.display
             def readonly_method_on_modeladmin(self, obj):
                 pass
 
@@ -717,6 +719,7 @@ class SystemChecksTestCase(SimpleTestCase):
 
             def __getattr__(self, item):
                 if item == "dynamic_method":
+                    @admin.display
                     def method(obj):
                         pass
                     return method
@@ -777,6 +780,7 @@ class SystemChecksTestCase(SimpleTestCase):
 
     def test_extra(self):
         class SongAdmin(admin.ModelAdmin):
+            @admin.display
             def awesome_song(self, instance):
                 if instance.title == "Born to Run":
                     return "Best Ever!"

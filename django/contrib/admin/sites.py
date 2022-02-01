@@ -3,18 +3,24 @@ from functools import update_wrapper
 from weakref import WeakSet
 
 from django.apps import apps
+from django.conf import settings
 from django.contrib.admin import ModelAdmin, actions
+from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.base import ModelBase
-from django.http import Http404, HttpResponseRedirect
+from django.http import (
+    Http404, HttpResponsePermanentRedirect, HttpResponseRedirect,
+)
 from django.template.response import TemplateResponse
-from django.urls import NoReverseMatch, reverse
+from django.urls import NoReverseMatch, Resolver404, resolve, reverse
+from django.utils.decorators import method_decorator
 from django.utils.functional import LazyObject
 from django.utils.module_loading import import_string
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _, gettext_lazy
 from django.views.decorators.cache import never_cache
+from django.views.decorators.common import no_append_slash
 from django.views.decorators.csrf import csrf_protect
 from django.views.i18n import JavaScriptCatalog
 
@@ -52,7 +58,7 @@ class AdminSite:
 
     enable_nav_sidebar = True
 
-    _empty_value_display = '-'
+    empty_value_display = '-'
 
     login_form = None
     index_template = None
@@ -62,12 +68,17 @@ class AdminSite:
     password_change_template = None
     password_change_done_template = None
 
+    final_catch_all_view = True
+
     def __init__(self, name='admin'):
         self._registry = {}  # model_class class -> admin_class instance
         self.name = name
         self._actions = {'delete_selected': actions.delete_selected}
         self._global_actions = self._actions.copy()
         all_sites.add(self)
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}(name={self.name!r})'
 
     def check(self, app_configs):
         """
@@ -180,14 +191,6 @@ class AdminSite:
         """
         return self._actions.items()
 
-    @property
-    def empty_value_display(self):
-        return self._empty_value_display
-
-    @empty_value_display.setter
-    def empty_value_display(self, empty_value_display):
-        self._empty_value_display = empty_value_display
-
     def has_permission(self, request):
         """
         Return True if the given HttpRequest has permission to view
@@ -263,6 +266,7 @@ class AdminSite:
                 wrap(self.password_change_done, cacheable=True),
                 name='password_change_done',
             ),
+            path('autocomplete/', wrap(self.autocomplete_view), name='autocomplete'),
             path('jsi18n/', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
             path(
                 'r/<int:content_type_id>/<path:object_id>/',
@@ -288,6 +292,10 @@ class AdminSite:
             urlpatterns += [
                 re_path(regex, wrap(self.app_index), name='app_list'),
             ]
+
+        if self.final_catch_all_view:
+            urlpatterns.append(re_path(r'(?P<url>.*)$', wrap(self.catch_all_view)))
+
         return urlpatterns
 
     @property
@@ -353,7 +361,6 @@ class AdminSite:
         """
         return JavaScriptCatalog.as_view(packages=['django.contrib.admin'])(request)
 
-    @never_cache
     def logout(self, request, extra_context=None):
         """
         Log out the user for the given HttpRequest.
@@ -375,7 +382,7 @@ class AdminSite:
         request.current_app = self.name
         return LogoutView.as_view(**defaults)(request)
 
-    @never_cache
+    @method_decorator(never_cache)
     def login(self, request, extra_context=None):
         """
         Display the login form for the given HttpRequest.
@@ -393,6 +400,7 @@ class AdminSite:
         context = {
             **self.each_context(request),
             'title': _('Log in'),
+            'subtitle': None,
             'app_path': request.get_full_path(),
             'username': request.user.get_username(),
         }
@@ -408,6 +416,22 @@ class AdminSite:
         }
         request.current_app = self.name
         return LoginView.as_view(**defaults)(request)
+
+    def autocomplete_view(self, request):
+        return AutocompleteJsonView.as_view(admin_site=self)(request)
+
+    @no_append_slash
+    def catch_all_view(self, request, url):
+        if settings.APPEND_SLASH and not url.endswith('/'):
+            urlconf = getattr(request, 'urlconf', None)
+            try:
+                match = resolve('%s/' % request.path_info, urlconf)
+            except Resolver404:
+                pass
+            else:
+                if getattr(match.func, 'should_append_slash', True):
+                    return HttpResponsePermanentRedirect('%s/' % request.path)
+        raise Http404
 
     def _build_app_dict(self, request, label=None):
         """
@@ -440,6 +464,7 @@ class AdminSite:
 
             info = (app_label, model._meta.model_name)
             model_dict = {
+                'model': model,
                 'name': capfirst(model._meta.verbose_name_plural),
                 'object_name': model._meta.object_name,
                 'perms': perms,
@@ -493,7 +518,6 @@ class AdminSite:
 
         return app_list
 
-    @never_cache
     def index(self, request, extra_context=None):
         """
         Display the main admin index page, which lists all of the installed
@@ -504,6 +528,7 @@ class AdminSite:
         context = {
             **self.each_context(request),
             'title': self.index_title,
+            'subtitle': None,
             'app_list': app_list,
             **(extra_context or {}),
         }
@@ -521,6 +546,7 @@ class AdminSite:
         context = {
             **self.each_context(request),
             'title': _('%(app)s administration') % {'app': app_dict['name']},
+            'subtitle': None,
             'app_list': [app_dict],
             'app_label': app_label,
             **(extra_context or {}),
@@ -538,6 +564,9 @@ class DefaultAdminSite(LazyObject):
     def _setup(self):
         AdminSiteClass = import_string(apps.get_app_config('admin').default_site)
         self._wrapped = AdminSiteClass()
+
+    def __repr__(self):
+        return repr(self._wrapped)
 
 
 # This global object represents the default admin site, for the common case.

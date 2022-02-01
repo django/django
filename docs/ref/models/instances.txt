@@ -9,7 +9,7 @@ material presented in the :doc:`model </topics/db/models>` and :doc:`database
 query </topics/db/queries>` guides, so you'll probably want to read and
 understand those documents before reading this one.
 
-Throughout this reference we'll use the :ref:`example Weblog models
+Throughout this reference we'll use the :ref:`example blog models
 <queryset-model-example>` presented in the :doc:`database query guide
 </topics/db/queries>`.
 
@@ -355,6 +355,10 @@ To save an object back to the database, call ``save()``:
 
 .. method:: Model.save(force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None)
 
+For details on using the ``force_insert`` and ``force_update`` arguments, see
+:ref:`ref-models-force-insert`. Details about the ``update_fields`` argument
+can be found in the :ref:`ref-models-update-fields` section.
+
 If you want customized saving behavior, you can override this ``save()``
 method. See :ref:`overriding-model-methods` for more details.
 
@@ -549,6 +553,8 @@ For more details, see the documentation on :class:`F expressions
 <django.db.models.F>` and their :ref:`use in update queries
 <topics-db-queries-update>`.
 
+.. _ref-models-update-fields:
+
 Specifying which fields to save
 -------------------------------
 
@@ -562,7 +568,7 @@ all of the model fields from being updated in the database. For example::
     product.save(update_fields=['name'])
 
 The ``update_fields`` argument can be any iterable containing strings. An
-empty ``update_fields`` iterable will skip the save. A value of None will
+empty ``update_fields`` iterable will skip the save. A value of ``None`` will
 perform an update on all fields.
 
 Specifying ``update_fields`` will force an update.
@@ -715,7 +721,7 @@ For example::
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('people.views.details', args=[str(self.id)])
+        return reverse('people-detail', kwargs={'pk' : self.pk})
 
 One place Django uses ``get_absolute_url()`` is in the admin app. If an object
 defines this method, the object-editing page will have a "View on site" link
@@ -802,11 +808,6 @@ For example::
     'L'
     >>> p.get_shirt_size_display()
     'Large'
-
-.. versionchanged:: 3.1
-
-    Support for :class:`~django.contrib.postgres.fields.ArrayField` and
-    :class:`~django.contrib.postgres.fields.RangeField` was added.
 
 .. method:: Model.get_next_by_FOO(**kwargs)
 .. method:: Model.get_previous_by_FOO(**kwargs)

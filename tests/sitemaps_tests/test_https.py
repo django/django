@@ -14,9 +14,9 @@ class HTTPSSitemapTests(SitemapTestsBase):
         response = self.client.get('/secure/index.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<sitemap><loc>%s/secure/sitemap-simple.xml</loc></sitemap>
+<sitemap><loc>%s/secure/sitemap-simple.xml</loc><lastmod>%s</lastmod></sitemap>
 </sitemapindex>
-""" % self.base_url
+""" % (self.base_url, date.today())
         self.assertXMLEqual(response.content.decode(), expected_content)
 
     def test_secure_sitemap_section(self):
@@ -39,9 +39,9 @@ class HTTPSDetectionSitemapTests(SitemapTestsBase):
         response = self.client.get('/simple/index.xml', **self.extra)
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
+<sitemap><loc>%s/simple/sitemap-simple.xml</loc><lastmod>%s</lastmod></sitemap>
 </sitemapindex>
-""" % self.base_url.replace('http://', 'https://')
+""" % (self.base_url.replace('http://', 'https://'), date.today())
         self.assertXMLEqual(response.content.decode(), expected_content)
 
     def test_sitemap_section_with_https_request(self):

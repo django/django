@@ -6,8 +6,8 @@ from django.test import TestCase
 
 from .models import (
     CustomMembership, Employee, Event, Friendship, Group, Ingredient,
-    Invitation, Membership, Person, PersonSelfRefM2M, Recipe, RecipeIngredient,
-    Relationship, SymmetricalFriendship,
+    Invitation, Membership, Person, PersonChild, PersonSelfRefM2M, Recipe,
+    RecipeIngredient, Relationship, SymmetricalFriendship,
 )
 
 
@@ -19,6 +19,13 @@ class M2mThroughTests(TestCase):
         cls.jane = Person.objects.create(name='Jane')
         cls.rock = Group.objects.create(name='Rock')
         cls.roll = Group.objects.create(name='Roll')
+
+    def test_reverse_inherited_m2m_with_through_fields_list_hashable(self):
+        reverse_m2m = Person._meta.get_field('events_invited')
+        self.assertEqual(reverse_m2m.through_fields, ['event', 'invitee'])
+        inherited_reverse_m2m = PersonChild._meta.get_field('events_invited')
+        self.assertEqual(inherited_reverse_m2m.through_fields, ['event', 'invitee'])
+        self.assertEqual(hash(reverse_m2m), hash(inherited_reverse_m2m))
 
     def test_retrieve_intermediate_items(self):
         Membership.objects.create(person=self.jim, group=self.rock)
@@ -42,20 +49,12 @@ class M2mThroughTests(TestCase):
         )
 
     def test_filter_on_intermediate_model(self):
-        Membership.objects.create(person=self.jim, group=self.rock)
-        Membership.objects.create(person=self.jane, group=self.rock)
+        m1 = Membership.objects.create(person=self.jim, group=self.rock)
+        m2 = Membership.objects.create(person=self.jane, group=self.rock)
 
         queryset = Membership.objects.filter(group=self.rock)
 
-        expected = [
-            '<Membership: Jim is a member of Rock>',
-            '<Membership: Jane is a member of Rock>',
-        ]
-
-        self.assertQuerysetEqual(
-            queryset,
-            expected
-        )
+        self.assertSequenceEqual(queryset, [m1, m2])
 
     def test_add_on_m2m_with_intermediate_model(self):
         self.rock.members.add(self.bob, through_defaults={'invite_reason': 'He is good.'})
@@ -372,12 +371,8 @@ class M2mThroughTests(TestCase):
         )
 
     def test_custom_related_name_doesnt_conflict_with_fky_related_name(self):
-        CustomMembership.objects.create(person=self.bob, group=self.rock)
-
-        self.assertQuerysetEqual(
-            self.bob.custom_person_related_name.all(),
-            ['<CustomMembership: Bob is a member of Rock>']
-        )
+        c = CustomMembership.objects.create(person=self.bob, group=self.rock)
+        self.assertSequenceEqual(self.bob.custom_person_related_name.all(), [c])
 
     def test_through_fields(self):
         """

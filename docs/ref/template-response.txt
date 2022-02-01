@@ -93,10 +93,6 @@ Methods
     ``headers``
         A :class:`dict` of HTTP headers to add to the response.
 
-    .. versionchanged:: 3.2
-
-        The ``headers`` parameter was added.
-
 .. method:: SimpleTemplateResponse.resolve_context(context)
 
     Preprocesses context data that will be used for rendering a template.
@@ -194,10 +190,6 @@ Methods
 
     ``headers``
         A :class:`dict` of HTTP headers to add to the response.
-
-    .. versionchanged:: 3.2
-
-        The ``headers`` parameter was added.
 
 The rendering process
 =====================

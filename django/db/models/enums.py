@@ -1,4 +1,5 @@
 import enum
+from types import DynamicClassAttribute
 
 from django.utils.functional import Promise
 
@@ -8,7 +9,7 @@ __all__ = ['Choices', 'IntegerChoices', 'TextChoices']
 class ChoicesMeta(enum.EnumMeta):
     """A metaclass for creating a enum choices."""
 
-    def __new__(metacls, classname, bases, classdict):
+    def __new__(metacls, classname, bases, classdict, **kwds):
         labels = []
         for key in classdict._member_names:
             value = classdict[key]
@@ -25,13 +26,9 @@ class ChoicesMeta(enum.EnumMeta):
             # Use dict.__setitem__() to suppress defenses against double
             # assignment in enum's classdict.
             dict.__setitem__(classdict, key, value)
-        cls = super().__new__(metacls, classname, bases, classdict)
-        cls._value2label_map_ = dict(zip(cls._value2member_map_, labels))
-        # Add a label property to instances of enum which uses the enum member
-        # that is passed in as "self" as the value to use when looking up the
-        # label in the choices.
-        cls.label = property(lambda self: cls._value2label_map_.get(self.value))
-        cls.do_not_call_in_templates = True
+        cls = super().__new__(metacls, classname, bases, classdict, **kwds)
+        for member, label in zip(cls.__members__.values(), labels):
+            member._label_ = label
         return enum.unique(cls)
 
     def __contains__(cls, member):
@@ -62,12 +59,24 @@ class ChoicesMeta(enum.EnumMeta):
 class Choices(enum.Enum, metaclass=ChoicesMeta):
     """Class for creating enumerated choices."""
 
+    @DynamicClassAttribute
+    def label(self):
+        return self._label_
+
+    @property
+    def do_not_call_in_templates(self):
+        return True
+
     def __str__(self):
         """
         Use value when cast to str, so that Choices set as model instance
         attributes are rendered as expected in templates and similar contexts.
         """
         return str(self.value)
+
+    # A similar format was proposed for Python 3.10.
+    def __repr__(self):
+        return f'{self.__class__.__qualname__}.{self._name_}'
 
 
 class IntegerChoices(int, Choices):

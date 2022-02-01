@@ -30,8 +30,8 @@ from .admin import (
     DynamicListDisplayLinksChildAdmin, DynamicListFilterChildAdmin,
     DynamicSearchFieldsChildAdmin, EmptyValueChildAdmin, EventAdmin,
     FilteredChildAdmin, GroupAdmin, InvitationAdmin,
-    NoListDisplayLinksParentAdmin, ParentAdmin, QuartetAdmin, SwallowAdmin,
-    site as custom_site,
+    NoListDisplayLinksParentAdmin, ParentAdmin, ParentAdminTwoSearchFields,
+    QuartetAdmin, SwallowAdmin, site as custom_site,
 )
 from .models import (
     Band, CharPK, Child, ChordsBand, ChordsMusician, Concert, CustomIdUser,
@@ -66,6 +66,13 @@ class ChangeListTests(TestCase):
         request = self.factory.get(url)
         request.user = user
         return request
+
+    def test_repr(self):
+        m = ChildAdmin(Child, custom_site)
+        request = self.factory.get('/child/')
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        self.assertEqual(repr(cl), '<ChangeList: model=Child model_admin=ChildAdmin>')
 
     def test_specified_ordering_by_f_expression(self):
         class OrderedByFBandAdmin(admin.ModelAdmin):
@@ -104,6 +111,20 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertEqual(cl.queryset.query.select_related, {'parent': {}})
 
+    def test_select_related_preserved_when_multi_valued_in_search_fields(self):
+        parent = Parent.objects.create(name='Mary')
+        Child.objects.create(parent=parent, name='Danielle')
+        Child.objects.create(parent=parent, name='Daniel')
+
+        m = ParentAdmin(Parent, custom_site)
+        request = self.factory.get('/parent/', data={SEARCH_VAR: 'daniel'})
+        request.user = self.superuser
+
+        cl = m.get_changelist_instance(request)
+        self.assertEqual(cl.queryset.count(), 1)
+        # select_related is preserved.
+        self.assertEqual(cl.queryset.query.select_related, {'child': {}})
+
     def test_select_related_as_tuple(self):
         ia = InvitationAdmin(Invitation, custom_site)
         request = self.factory.get('/invitation/')
@@ -131,6 +152,42 @@ class ChangeListTests(TestCase):
         request.user = self.superuser
         cl = ia.get_changelist_instance(request)
         self.assertEqual(cl.queryset.query.select_related, {'player': {}, 'band': {}})
+
+    def test_many_search_terms(self):
+        parent = Parent.objects.create(name='Mary')
+        Child.objects.create(parent=parent, name='Danielle')
+        Child.objects.create(parent=parent, name='Daniel')
+
+        m = ParentAdmin(Parent, custom_site)
+        request = self.factory.get('/parent/', data={SEARCH_VAR: 'daniel ' * 80})
+        request.user = self.superuser
+
+        cl = m.get_changelist_instance(request)
+        with CaptureQueriesContext(connection) as context:
+            object_count = cl.queryset.count()
+        self.assertEqual(object_count, 1)
+        self.assertEqual(context.captured_queries[0]['sql'].count('JOIN'), 1)
+
+    def test_related_field_multiple_search_terms(self):
+        """
+        Searches over multi-valued relationships return rows from related
+        models only when all searched fields match that row.
+        """
+        parent = Parent.objects.create(name='Mary')
+        Child.objects.create(parent=parent, name='Danielle', age=18)
+        Child.objects.create(parent=parent, name='Daniel', age=19)
+
+        m = ParentAdminTwoSearchFields(Parent, custom_site)
+
+        request = self.factory.get('/parent/', data={SEARCH_VAR: 'danielle 19'})
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        self.assertEqual(cl.queryset.count(), 0)
+
+        request = self.factory.get('/parent/', data={SEARCH_VAR: 'daniel 19'})
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        self.assertEqual(cl.queryset.count(), 1)
 
     def test_result_list_empty_changelist_value(self):
         """
@@ -285,7 +342,7 @@ class ChangeListTests(TestCase):
         cl.get_results(request)
         self.assertIsInstance(cl.paginator, CustomPaginator)
 
-    def test_distinct_for_m2m_in_list_filter(self):
+    def test_no_duplicates_for_m2m_in_list_filter(self):
         """
         Regression test for #13902: When using a ManyToMany in list_filter,
         results shouldn't appear more than once. Basic ManyToMany.
@@ -305,8 +362,12 @@ class ChangeListTests(TestCase):
 
         # There's only one Group instance
         self.assertEqual(cl.result_count, 1)
+        # Queryset must be deletable.
+        self.assertIs(cl.queryset.query.distinct, False)
+        cl.queryset.delete()
+        self.assertEqual(cl.queryset.count(), 0)
 
-    def test_distinct_for_through_m2m_in_list_filter(self):
+    def test_no_duplicates_for_through_m2m_in_list_filter(self):
         """
         Regression test for #13902: When using a ManyToMany in list_filter,
         results shouldn't appear more than once. With an intermediate model.
@@ -325,12 +386,15 @@ class ChangeListTests(TestCase):
 
         # There's only one Group instance
         self.assertEqual(cl.result_count, 1)
+        # Queryset must be deletable.
+        self.assertIs(cl.queryset.query.distinct, False)
+        cl.queryset.delete()
+        self.assertEqual(cl.queryset.count(), 0)
 
-    def test_distinct_for_through_m2m_at_second_level_in_list_filter(self):
+    def test_no_duplicates_for_through_m2m_at_second_level_in_list_filter(self):
         """
         When using a ManyToMany in list_filter at the second level behind a
-        ForeignKey, distinct() must be called and results shouldn't appear more
-        than once.
+        ForeignKey, results shouldn't appear more than once.
         """
         lead = Musician.objects.create(name='Vox')
         band = Group.objects.create(name='The Hype')
@@ -347,8 +411,12 @@ class ChangeListTests(TestCase):
 
         # There's only one Concert instance
         self.assertEqual(cl.result_count, 1)
+        # Queryset must be deletable.
+        self.assertIs(cl.queryset.query.distinct, False)
+        cl.queryset.delete()
+        self.assertEqual(cl.queryset.count(), 0)
 
-    def test_distinct_for_inherited_m2m_in_list_filter(self):
+    def test_no_duplicates_for_inherited_m2m_in_list_filter(self):
         """
         Regression test for #13902: When using a ManyToMany in list_filter,
         results shouldn't appear more than once. Model managed in the
@@ -368,8 +436,12 @@ class ChangeListTests(TestCase):
 
         # There's only one Quartet instance
         self.assertEqual(cl.result_count, 1)
+        # Queryset must be deletable.
+        self.assertIs(cl.queryset.query.distinct, False)
+        cl.queryset.delete()
+        self.assertEqual(cl.queryset.count(), 0)
 
-    def test_distinct_for_m2m_to_inherited_in_list_filter(self):
+    def test_no_duplicates_for_m2m_to_inherited_in_list_filter(self):
         """
         Regression test for #13902: When using a ManyToMany in list_filter,
         results shouldn't appear more than once. Target of the relationship
@@ -389,11 +461,15 @@ class ChangeListTests(TestCase):
 
         # There's only one ChordsBand instance
         self.assertEqual(cl.result_count, 1)
+        # Queryset must be deletable.
+        self.assertIs(cl.queryset.query.distinct, False)
+        cl.queryset.delete()
+        self.assertEqual(cl.queryset.count(), 0)
 
-    def test_distinct_for_non_unique_related_object_in_list_filter(self):
+    def test_no_duplicates_for_non_unique_related_object_in_list_filter(self):
         """
-        Regressions tests for #15819: If a field listed in list_filters
-        is a non-unique related object, distinct() must be called.
+        Regressions tests for #15819: If a field listed in list_filters is a
+        non-unique related object, results shouldn't appear more than once.
         """
         parent = Parent.objects.create(name='Mary')
         # Two children with the same name
@@ -405,8 +481,12 @@ class ChangeListTests(TestCase):
         request.user = self.superuser
 
         cl = m.get_changelist_instance(request)
-        # Make sure distinct() was called
+        # Exists() is applied.
         self.assertEqual(cl.queryset.count(), 1)
+        # Queryset must be deletable.
+        self.assertIs(cl.queryset.query.distinct, False)
+        cl.queryset.delete()
+        self.assertEqual(cl.queryset.count(), 0)
 
     def test_changelist_search_form_validation(self):
         m = ConcertAdmin(Concert, custom_site)
@@ -424,10 +504,10 @@ class ChangeListTests(TestCase):
                 self.assertEqual(1, len(messages))
                 self.assertEqual(error, messages[0])
 
-    def test_distinct_for_non_unique_related_object_in_search_fields(self):
+    def test_no_duplicates_for_non_unique_related_object_in_search_fields(self):
         """
         Regressions tests for #15819: If a field listed in search_fields
-        is a non-unique related object, distinct() must be called.
+        is a non-unique related object, Exists() must be applied.
         """
         parent = Parent.objects.create(name='Mary')
         Child.objects.create(parent=parent, name='Danielle')
@@ -438,13 +518,17 @@ class ChangeListTests(TestCase):
         request.user = self.superuser
 
         cl = m.get_changelist_instance(request)
-        # Make sure distinct() was called
+        # Exists() is applied.
         self.assertEqual(cl.queryset.count(), 1)
+        # Queryset must be deletable.
+        self.assertIs(cl.queryset.query.distinct, False)
+        cl.queryset.delete()
+        self.assertEqual(cl.queryset.count(), 0)
 
-    def test_distinct_for_many_to_many_at_second_level_in_search_fields(self):
+    def test_no_duplicates_for_many_to_many_at_second_level_in_search_fields(self):
         """
         When using a ManyToMany in search_fields at the second level behind a
-        ForeignKey, distinct() must be called and results shouldn't appear more
+        ForeignKey, Exists() must be applied and results shouldn't appear more
         than once.
         """
         lead = Musician.objects.create(name='Vox')
@@ -460,6 +544,61 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         # There's only one Concert instance
         self.assertEqual(cl.queryset.count(), 1)
+        # Queryset must be deletable.
+        self.assertIs(cl.queryset.query.distinct, False)
+        cl.queryset.delete()
+        self.assertEqual(cl.queryset.count(), 0)
+
+    def test_multiple_search_fields(self):
+        """
+        All rows containing each of the searched words are returned, where each
+        word must be in one of search_fields.
+        """
+        band_duo = Group.objects.create(name='Duo')
+        band_hype = Group.objects.create(name='The Hype')
+        mary = Musician.objects.create(name='Mary Halvorson')
+        jonathan = Musician.objects.create(name='Jonathan Finlayson')
+        band_duo.members.set([mary, jonathan])
+        Concert.objects.create(name='Tiny desk concert', group=band_duo)
+        Concert.objects.create(name='Woodstock concert', group=band_hype)
+        # FK lookup.
+        concert_model_admin = ConcertAdmin(Concert, custom_site)
+        concert_model_admin.search_fields = ['group__name', 'name']
+        # Reverse FK lookup.
+        group_model_admin = GroupAdmin(Group, custom_site)
+        group_model_admin.search_fields = ['name', 'concert__name', 'members__name']
+        for search_string, result_count in (
+            ('Duo Concert', 1),
+            ('Tiny Desk Concert', 1),
+            ('Concert', 2),
+            ('Other Concert', 0),
+            ('Duo Woodstock', 0),
+        ):
+            with self.subTest(search_string=search_string):
+                # FK lookup.
+                request = self.factory.get('/concert/', data={SEARCH_VAR: search_string})
+                request.user = self.superuser
+                concert_changelist = concert_model_admin.get_changelist_instance(request)
+                self.assertEqual(concert_changelist.queryset.count(), result_count)
+                # Reverse FK lookup.
+                request = self.factory.get('/group/', data={SEARCH_VAR: search_string})
+                request.user = self.superuser
+                group_changelist = group_model_admin.get_changelist_instance(request)
+                self.assertEqual(group_changelist.queryset.count(), result_count)
+        # Many-to-many lookup.
+        for search_string, result_count in (
+            ('Finlayson Duo Tiny', 1),
+            ('Finlayson', 1),
+            ('Finlayson Hype', 0),
+            ('Jonathan Finlayson Duo', 1),
+            ('Mary Jonathan Duo', 0),
+            ('Oscar Finlayson Duo', 0),
+        ):
+            with self.subTest(search_string=search_string):
+                request = self.factory.get('/group/', data={SEARCH_VAR: search_string})
+                request.user = self.superuser
+                group_changelist = group_model_admin.get_changelist_instance(request)
+                self.assertEqual(group_changelist.queryset.count(), result_count)
 
     def test_pk_in_search_fields(self):
         band = Group.objects.create(name='The Hype')
@@ -552,23 +691,23 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [abcd])
 
-    def test_no_distinct_for_m2m_in_list_filter_without_params(self):
+    def test_no_exists_for_m2m_in_list_filter_without_params(self):
         """
         If a ManyToManyField is in list_filter but isn't in any lookup params,
-        the changelist's query shouldn't have distinct.
+        the changelist's query shouldn't have Exists().
         """
         m = BandAdmin(Band, custom_site)
         for lookup_params in ({}, {'name': 'test'}):
             request = self.factory.get('/band/', lookup_params)
             request.user = self.superuser
             cl = m.get_changelist_instance(request)
-            self.assertFalse(cl.queryset.query.distinct)
+            self.assertNotIn(' EXISTS', str(cl.queryset.query))
 
-        # A ManyToManyField in params does have distinct applied.
+        # A ManyToManyField in params does have Exists() applied.
         request = self.factory.get('/band/', {'genres': '0'})
         request.user = self.superuser
         cl = m.get_changelist_instance(request)
-        self.assertTrue(cl.queryset.query.distinct)
+        self.assertIn(' EXISTS', str(cl.queryset.query))
 
     def test_pagination(self):
         """
@@ -1283,6 +1422,22 @@ class ChangeListTests(TestCase):
         # The "Add" button inside the object-tools shouldn't appear.
         self.assertNotIn('Add ', response.rendered_content)
 
+    def test_search_help_text(self):
+        superuser = self._create_superuser('superuser')
+        m = BandAdmin(Band, custom_site)
+        # search_fields without search_help_text.
+        m.search_fields = ['name']
+        request = self._mocked_authenticated_request('/band/', superuser)
+        response = m.changelist_view(request)
+        self.assertIsNone(response.context_data['cl'].search_help_text)
+        self.assertNotContains(response, '<div class="help">')
+        # search_fields with search_help_text.
+        m.search_help_text = 'Search help text'
+        request = self._mocked_authenticated_request('/band/', superuser)
+        response = m.changelist_view(request)
+        self.assertEqual(response.context_data['cl'].search_help_text, 'Search help text')
+        self.assertContains(response, '<div class="help">Search help text</div>')
+
 
 class GetAdminLogTests(TestCase):
 
@@ -1344,23 +1499,27 @@ class SeleniumTests(AdminSeleniumTestCase):
         """
         The status line for selected rows gets updated correctly (#22038).
         """
+        from selenium.webdriver.common.by import By
         self.admin_login(username='super', password='secret')
         self.selenium.get(self.live_server_url + reverse('admin:auth_user_changelist'))
 
         form_id = '#changelist-form'
 
         # Test amount of rows in the Changelist
-        rows = self.selenium.find_elements_by_css_selector(
+        rows = self.selenium.find_elements(
+            By.CSS_SELECTOR,
             '%s #result_list tbody tr' % form_id
         )
         self.assertEqual(len(rows), 1)
         row = rows[0]
 
-        selection_indicator = self.selenium.find_element_by_css_selector(
+        selection_indicator = self.selenium.find_element(
+            By.CSS_SELECTOR,
             '%s .action-counter' % form_id
         )
-        all_selector = self.selenium.find_element_by_id('action-toggle')
-        row_selector = self.selenium.find_element_by_css_selector(
+        all_selector = self.selenium.find_element(By.ID, 'action-toggle')
+        row_selector = self.selenium.find_element(
+            By.CSS_SELECTOR,
             '%s #result_list tbody tr:first-child .action-select' % form_id
         )
 
@@ -1381,22 +1540,47 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertIs(all_selector.get_property('checked'), False)
         self.assertEqual(row.get_attribute('class'), '')
 
+    def test_modifier_allows_multiple_section(self):
+        """
+        Selecting a row and then selecting another row whilst holding shift
+        should select all rows in-between.
+        """
+        from selenium.webdriver.common.action_chains import ActionChains
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.common.keys import Keys
+
+        Parent.objects.bulk_create([Parent(name='parent%d' % i) for i in range(5)])
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_changelist_parent_changelist'))
+        checkboxes = self.selenium.find_elements(By.CSS_SELECTOR, 'tr input.action-select')
+        self.assertEqual(len(checkboxes), 5)
+        for c in checkboxes:
+            self.assertIs(c.get_property('checked'), False)
+        # Check first row. Hold-shift and check next-to-last row.
+        checkboxes[0].click()
+        ActionChains(self.selenium).key_down(Keys.SHIFT).click(checkboxes[-2]).key_up(Keys.SHIFT).perform()
+        for c in checkboxes[:-2]:
+            self.assertIs(c.get_property('checked'), True)
+        self.assertIs(checkboxes[-1].get_property('checked'), False)
+
     def test_select_all_across_pages(self):
+        from selenium.webdriver.common.by import By
         Parent.objects.bulk_create([Parent(name='parent%d' % i) for i in range(101)])
         self.admin_login(username='super', password='secret')
         self.selenium.get(self.live_server_url + reverse('admin:admin_changelist_parent_changelist'))
 
-        selection_indicator = self.selenium.find_element_by_css_selector('.action-counter')
-        select_all_indicator = self.selenium.find_element_by_css_selector('.actions .all')
-        question = self.selenium.find_element_by_css_selector('.actions > .question')
-        clear = self.selenium.find_element_by_css_selector('.actions > .clear')
-        select_all = self.selenium.find_element_by_id('action-toggle')
-        select_across = self.selenium.find_element_by_name('select_across')
+        selection_indicator = self.selenium.find_element(By.CSS_SELECTOR, '.action-counter')
+        select_all_indicator = self.selenium.find_element(By.CSS_SELECTOR, '.actions .all')
+        question = self.selenium.find_element(By.CSS_SELECTOR, '.actions > .question')
+        clear = self.selenium.find_element(By.CSS_SELECTOR, '.actions > .clear')
+        select_all = self.selenium.find_element(By.ID, 'action-toggle')
+        select_across = self.selenium.find_elements(By.NAME, 'select_across')
 
         self.assertIs(question.is_displayed(), False)
         self.assertIs(clear.is_displayed(), False)
         self.assertIs(select_all.get_property('checked'), False)
-        self.assertEqual(select_across.get_property('value'), '0')
+        for hidden_input in select_across:
+            self.assertEqual(hidden_input.get_property('value'), '0')
         self.assertIs(selection_indicator.is_displayed(), True)
         self.assertEqual(selection_indicator.text, '0 of 100 selected')
         self.assertIs(select_all_indicator.is_displayed(), False)
@@ -1405,7 +1589,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertIs(question.is_displayed(), True)
         self.assertIs(clear.is_displayed(), False)
         self.assertIs(select_all.get_property('checked'), True)
-        self.assertEqual(select_across.get_property('value'), '0')
+        for hidden_input in select_across:
+            self.assertEqual(hidden_input.get_property('value'), '0')
         self.assertIs(selection_indicator.is_displayed(), True)
         self.assertEqual(selection_indicator.text, '100 of 100 selected')
         self.assertIs(select_all_indicator.is_displayed(), False)
@@ -1414,7 +1599,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertIs(question.is_displayed(), False)
         self.assertIs(clear.is_displayed(), True)
         self.assertIs(select_all.get_property('checked'), True)
-        self.assertEqual(select_across.get_property('value'), '1')
+        for hidden_input in select_across:
+            self.assertEqual(hidden_input.get_property('value'), '1')
         self.assertIs(selection_indicator.is_displayed(), False)
         self.assertIs(select_all_indicator.is_displayed(), True)
 
@@ -1422,22 +1608,24 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertIs(question.is_displayed(), False)
         self.assertIs(clear.is_displayed(), False)
         self.assertIs(select_all.get_property('checked'), False)
-        self.assertEqual(select_across.get_property('value'), '0')
+        for hidden_input in select_across:
+            self.assertEqual(hidden_input.get_property('value'), '0')
         self.assertIs(selection_indicator.is_displayed(), True)
         self.assertEqual(selection_indicator.text, '0 of 100 selected')
         self.assertIs(select_all_indicator.is_displayed(), False)
 
     def test_actions_warn_on_pending_edits(self):
+        from selenium.webdriver.common.by import By
         Parent.objects.create(name='foo')
 
         self.admin_login(username='super', password='secret')
         self.selenium.get(self.live_server_url + reverse('admin:admin_changelist_parent_changelist'))
 
-        name_input = self.selenium.find_element_by_id('id_form-0-name')
+        name_input = self.selenium.find_element(By.ID, 'id_form-0-name')
         name_input.clear()
         name_input.send_keys('bar')
-        self.selenium.find_element_by_id('action-toggle').click()
-        self.selenium.find_element_by_name('index').click()  # Go
+        self.selenium.find_element(By.ID, 'action-toggle').click()
+        self.selenium.find_element(By.NAME, 'index').click()  # Go
         alert = self.selenium.switch_to.alert
         try:
             self.assertEqual(
@@ -1449,6 +1637,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             alert.dismiss()
 
     def test_save_with_changes_warns_on_pending_action(self):
+        from selenium.webdriver.common.by import By
         from selenium.webdriver.support.ui import Select
 
         Parent.objects.create(name='parent')
@@ -1456,13 +1645,13 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.admin_login(username='super', password='secret')
         self.selenium.get(self.live_server_url + reverse('admin:admin_changelist_parent_changelist'))
 
-        name_input = self.selenium.find_element_by_id('id_form-0-name')
+        name_input = self.selenium.find_element(By.ID, 'id_form-0-name')
         name_input.clear()
         name_input.send_keys('other name')
         Select(
-            self.selenium.find_element_by_name('action')
+            self.selenium.find_element(By.NAME, 'action')
         ).select_by_value('delete_selected')
-        self.selenium.find_element_by_name('_save').click()
+        self.selenium.find_element(By.NAME, '_save').click()
         alert = self.selenium.switch_to.alert
         try:
             self.assertEqual(
@@ -1475,6 +1664,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             alert.dismiss()
 
     def test_save_without_changes_warns_on_pending_action(self):
+        from selenium.webdriver.common.by import By
         from selenium.webdriver.support.ui import Select
 
         Parent.objects.create(name='parent')
@@ -1483,9 +1673,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(self.live_server_url + reverse('admin:admin_changelist_parent_changelist'))
 
         Select(
-            self.selenium.find_element_by_name('action')
+            self.selenium.find_element(By.NAME, 'action')
         ).select_by_value('delete_selected')
-        self.selenium.find_element_by_name('_save').click()
+        self.selenium.find_element(By.NAME, '_save').click()
         alert = self.selenium.switch_to.alert
         try:
             self.assertEqual(

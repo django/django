@@ -206,8 +206,6 @@ you can pass them in as the ``storage`` argument to a
 Using a callable
 ----------------
 
-.. versionadded:: 3.1
-
 You can use a callable as the :attr:`~django.db.models.FileField.storage`
 parameter for :class:`~django.db.models.FileField` or
 :class:`~django.db.models.ImageField`. This allows you to modify the used

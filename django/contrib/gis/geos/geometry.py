@@ -11,7 +11,7 @@ from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
 from django.contrib.gis.geos.error import GEOSException
-from django.contrib.gis.geos.libgeos import GEOM_PTR
+from django.contrib.gis.geos.libgeos import GEOM_PTR, geos_version_tuple
 from django.contrib.gis.geos.mutable_list import ListMixin
 from django.contrib.gis.geos.prepared import PreparedGeometry
 from django.contrib.gis.geos.prototypes.io import (
@@ -218,6 +218,15 @@ class GEOSGeometryBase(GEOSBase):
     def normalize(self):
         "Convert this Geometry to normal form (or canonical form)."
         capi.geos_normalize(self.ptr)
+
+    def make_valid(self):
+        """
+        Attempt to create a valid representation of a given invalid geometry
+        without losing any of the input vertices.
+        """
+        if geos_version_tuple() < (3, 8):
+            raise GEOSException('GEOSGeometry.make_valid() requires GEOS >= 3.8.0.')
+        return GEOSGeometry(capi.geos_makevalid(self.ptr), srid=self.srid)
 
     # #### Unary predicates ####
     @property

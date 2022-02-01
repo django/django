@@ -2,17 +2,24 @@ import collections.abc
 from datetime import datetime
 from math import ceil
 from operator import attrgetter
+from unittest import skipUnless
 
 from django.core.exceptions import FieldError
 from django.db import connection, models
-from django.db.models import Exists, Max, OuterRef
-from django.db.models.functions import Substr
+from django.db.models import (
+    BooleanField, Case, Exists, ExpressionWrapper, F, Max, OuterRef, Q,
+    Subquery, Value, When,
+)
+from django.db.models.functions import Cast, Substr
+from django.db.models.lookups import (
+    Exact, GreaterThan, GreaterThanOrEqual, LessThan, LessThanOrEqual,
+)
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
-from django.utils.deprecation import RemovedInDjango40Warning
 
 from .models import (
-    Article, Author, Freebie, Game, IsNullWithNoneAsRHS, Player, Season, Tag,
+    Article, Author, Freebie, Game, IsNullWithNoneAsRHS, Player, Product,
+    Season, Stock, Tag,
 )
 
 
@@ -84,23 +91,17 @@ class LookupTests(TestCase):
 
     def test_lookup_int_as_str(self):
         # Integer value can be queried using string
-        self.assertQuerysetEqual(Article.objects.filter(id__iexact=str(self.a1.id)),
-                                 ['<Article: Article 1>'])
+        self.assertSequenceEqual(
+            Article.objects.filter(id__iexact=str(self.a1.id)),
+            [self.a1],
+        )
 
     @skipUnlessDBFeature('supports_date_lookup_using_string')
     def test_lookup_date_as_str(self):
         # A date lookup can be performed using a string search
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(pub_date__startswith='2005'),
-            [
-                '<Article: Article 5>',
-                '<Article: Article 6>',
-                '<Article: Article 4>',
-                '<Article: Article 2>',
-                '<Article: Article 3>',
-                '<Article: Article 7>',
-                '<Article: Article 1>',
-            ]
+            [self.a5, self.a6, self.a4, self.a2, self.a3, self.a7, self.a1],
         )
 
     def test_iterator(self):
@@ -250,6 +251,11 @@ class LookupTests(TestCase):
             with self.subTest(field_name=field_name):
                 with self.assertRaisesMessage(ValueError, msg % field_name):
                     Model.objects.in_bulk(field_name=field_name)
+
+    def test_in_bulk_sliced_queryset(self):
+        msg = "Cannot use 'limit' or 'offset' with in_bulk()."
+        with self.assertRaisesMessage(TypeError, msg):
+            Article.objects.all()[0:5].in_bulk([self.a1.id, self.a2.id])
 
     def test_values(self):
         # values() returns a list of dictionaries instead of object instances --
@@ -492,96 +498,48 @@ class LookupTests(TestCase):
     def test_escaping(self):
         # Underscores, percent signs and backslashes have special meaning in the
         # underlying SQL code, but Django handles the quoting of them automatically.
-        Article.objects.create(headline='Article_ with underscore', pub_date=datetime(2005, 11, 20))
+        a8 = Article.objects.create(headline='Article_ with underscore', pub_date=datetime(2005, 11, 20))
 
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(headline__startswith='Article'),
-            [
-                '<Article: Article_ with underscore>',
-                '<Article: Article 5>',
-                '<Article: Article 6>',
-                '<Article: Article 4>',
-                '<Article: Article 2>',
-                '<Article: Article 3>',
-                '<Article: Article 7>',
-                '<Article: Article 1>',
-            ]
+            [a8, self.a5, self.a6, self.a4, self.a2, self.a3, self.a7, self.a1],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(headline__startswith='Article_'),
-            ['<Article: Article_ with underscore>']
+            [a8],
         )
-        Article.objects.create(headline='Article% with percent sign', pub_date=datetime(2005, 11, 21))
-        self.assertQuerysetEqual(
+        a9 = Article.objects.create(headline='Article% with percent sign', pub_date=datetime(2005, 11, 21))
+        self.assertSequenceEqual(
             Article.objects.filter(headline__startswith='Article'),
-            [
-                '<Article: Article% with percent sign>',
-                '<Article: Article_ with underscore>',
-                '<Article: Article 5>',
-                '<Article: Article 6>',
-                '<Article: Article 4>',
-                '<Article: Article 2>',
-                '<Article: Article 3>',
-                '<Article: Article 7>',
-                '<Article: Article 1>',
-            ]
+            [a9, a8, self.a5, self.a6, self.a4, self.a2, self.a3, self.a7, self.a1],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(headline__startswith='Article%'),
-            ['<Article: Article% with percent sign>']
+            [a9],
         )
-        Article.objects.create(headline='Article with \\ backslash', pub_date=datetime(2005, 11, 22))
-        self.assertQuerysetEqual(
+        a10 = Article.objects.create(headline='Article with \\ backslash', pub_date=datetime(2005, 11, 22))
+        self.assertSequenceEqual(
             Article.objects.filter(headline__contains='\\'),
-            [r'<Article: Article with \ backslash>']
+            [a10],
         )
 
     def test_exclude(self):
-        Article.objects.bulk_create([
-            Article(headline='Article_ with underscore', pub_date=datetime(2005, 11, 20)),
-            Article(headline='Article% with percent sign', pub_date=datetime(2005, 11, 21)),
-            Article(headline='Article with \\ backslash', pub_date=datetime(2005, 11, 22)),
-        ])
+        pub_date = datetime(2005, 11, 20)
+        a8 = Article.objects.create(headline='Article_ with underscore', pub_date=pub_date)
+        a9 = Article.objects.create(headline='Article% with percent sign', pub_date=pub_date)
+        a10 = Article.objects.create(headline='Article with \\ backslash', pub_date=pub_date)
         # exclude() is the opposite of filter() when doing lookups:
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(headline__contains='Article').exclude(headline__contains='with'),
-            [
-                '<Article: Article 5>',
-                '<Article: Article 6>',
-                '<Article: Article 4>',
-                '<Article: Article 2>',
-                '<Article: Article 3>',
-                '<Article: Article 7>',
-                '<Article: Article 1>',
-            ]
+            [self.a5, self.a6, self.a4, self.a2, self.a3, self.a7, self.a1],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.exclude(headline__startswith="Article_"),
-            [
-                '<Article: Article with \\ backslash>',
-                '<Article: Article% with percent sign>',
-                '<Article: Article 5>',
-                '<Article: Article 6>',
-                '<Article: Article 4>',
-                '<Article: Article 2>',
-                '<Article: Article 3>',
-                '<Article: Article 7>',
-                '<Article: Article 1>',
-            ]
+            [a10, a9, self.a5, self.a6, self.a4, self.a2, self.a3, self.a7, self.a1],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.exclude(headline="Article 7"),
-            [
-                '<Article: Article with \\ backslash>',
-                '<Article: Article% with percent sign>',
-                '<Article: Article_ with underscore>',
-                '<Article: Article 5>',
-                '<Article: Article 6>',
-                '<Article: Article 4>',
-                '<Article: Article 2>',
-                '<Article: Article 3>',
-                '<Article: Article 1>',
-            ]
+            [a10, a9, a8, self.a5, self.a6, self.a4, self.a2, self.a3, self.a1],
         )
 
     def test_none(self):
@@ -594,17 +552,9 @@ class LookupTests(TestCase):
         self.assertQuerysetEqual(Article.objects.none().iterator(), [])
 
     def test_in(self):
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.exclude(id__in=[]),
-            [
-                '<Article: Article 5>',
-                '<Article: Article 6>',
-                '<Article: Article 4>',
-                '<Article: Article 2>',
-                '<Article: Article 3>',
-                '<Article: Article 7>',
-                '<Article: Article 1>',
-            ]
+            [self.a5, self.a6, self.a4, self.a2, self.a3, self.a7, self.a1],
         )
 
     def test_in_empty_list(self):
@@ -706,49 +656,52 @@ class LookupTests(TestCase):
         # zero-or-more
         self.assertQuerysetEqual(
             Article.objects.filter(headline__regex=r'fo*'),
-            ['<Article: f>', '<Article: fo>', '<Article: foo>', '<Article: fooo>']
+            Article.objects.filter(headline__in=['f', 'fo', 'foo', 'fooo']),
         )
         self.assertQuerysetEqual(
             Article.objects.filter(headline__iregex=r'fo*'),
-            [
-                '<Article: f>',
-                '<Article: fo>',
-                '<Article: foo>',
-                '<Article: fooo>',
-                '<Article: hey-Foo>',
-            ]
+            Article.objects.filter(headline__in=['f', 'fo', 'foo', 'fooo', 'hey-Foo']),
         )
         # one-or-more
         self.assertQuerysetEqual(
             Article.objects.filter(headline__regex=r'fo+'),
-            ['<Article: fo>', '<Article: foo>', '<Article: fooo>']
+            Article.objects.filter(headline__in=['fo', 'foo', 'fooo']),
         )
         # wildcard
         self.assertQuerysetEqual(
             Article.objects.filter(headline__regex=r'fooo?'),
-            ['<Article: foo>', '<Article: fooo>']
+            Article.objects.filter(headline__in=['foo', 'fooo']),
         )
         # leading anchor
         self.assertQuerysetEqual(
             Article.objects.filter(headline__regex=r'^b'),
-            ['<Article: bar>', '<Article: baxZ>', '<Article: baz>']
+            Article.objects.filter(headline__in=['bar', 'baxZ', 'baz']),
         )
-        self.assertQuerysetEqual(Article.objects.filter(headline__iregex=r'^a'), ['<Article: AbBa>'])
+        self.assertQuerysetEqual(
+            Article.objects.filter(headline__iregex=r'^a'),
+            Article.objects.filter(headline='AbBa'),
+        )
         # trailing anchor
-        self.assertQuerysetEqual(Article.objects.filter(headline__regex=r'z$'), ['<Article: baz>'])
+        self.assertQuerysetEqual(
+            Article.objects.filter(headline__regex=r'z$'),
+            Article.objects.filter(headline='baz'),
+        )
         self.assertQuerysetEqual(
             Article.objects.filter(headline__iregex=r'z$'),
-            ['<Article: baxZ>', '<Article: baz>']
+            Article.objects.filter(headline__in=['baxZ', 'baz']),
         )
         # character sets
         self.assertQuerysetEqual(
             Article.objects.filter(headline__regex=r'ba[rz]'),
-            ['<Article: bar>', '<Article: baz>']
+            Article.objects.filter(headline__in=['bar', 'baz']),
         )
-        self.assertQuerysetEqual(Article.objects.filter(headline__regex=r'ba.[RxZ]'), ['<Article: baxZ>'])
+        self.assertQuerysetEqual(
+            Article.objects.filter(headline__regex=r'ba.[RxZ]'),
+            Article.objects.filter(headline='baxZ'),
+        )
         self.assertQuerysetEqual(
             Article.objects.filter(headline__iregex=r'ba[RxZ]'),
-            ['<Article: bar>', '<Article: baxZ>', '<Article: baz>']
+            Article.objects.filter(headline__in=['bar', 'baxZ', 'baz']),
         )
 
         # and more articles:
@@ -765,48 +718,48 @@ class LookupTests(TestCase):
         # alternation
         self.assertQuerysetEqual(
             Article.objects.filter(headline__regex=r'oo(f|b)'),
-            [
-                '<Article: barfoobaz>',
-                '<Article: foobar>',
-                '<Article: foobarbaz>',
-                '<Article: foobaz>',
-            ]
+            Article.objects.filter(headline__in=[
+                'barfoobaz',
+                'foobar',
+                'foobarbaz',
+                'foobaz',
+            ]),
         )
         self.assertQuerysetEqual(
             Article.objects.filter(headline__iregex=r'oo(f|b)'),
-            [
-                '<Article: barfoobaz>',
-                '<Article: foobar>',
-                '<Article: foobarbaz>',
-                '<Article: foobaz>',
-                '<Article: ooF>',
-            ]
+            Article.objects.filter(headline__in=[
+                'barfoobaz',
+                'foobar',
+                'foobarbaz',
+                'foobaz',
+                'ooF',
+            ]),
         )
         self.assertQuerysetEqual(
             Article.objects.filter(headline__regex=r'^foo(f|b)'),
-            ['<Article: foobar>', '<Article: foobarbaz>', '<Article: foobaz>']
+            Article.objects.filter(headline__in=['foobar', 'foobarbaz', 'foobaz']),
         )
 
         # greedy matching
         self.assertQuerysetEqual(
             Article.objects.filter(headline__regex=r'b.*az'),
-            [
-                '<Article: barfoobaz>',
-                '<Article: baz>',
-                '<Article: bazbaRFOO>',
-                '<Article: foobarbaz>',
-                '<Article: foobaz>',
-            ]
+            Article.objects.filter(headline__in=[
+                'barfoobaz',
+                'baz',
+                'bazbaRFOO',
+                'foobarbaz',
+                'foobaz',
+            ]),
         )
         self.assertQuerysetEqual(
             Article.objects.filter(headline__iregex=r'b.*ar'),
-            [
-                '<Article: bar>',
-                '<Article: barfoobaz>',
-                '<Article: bazbaRFOO>',
-                '<Article: foobar>',
-                '<Article: foobarbaz>',
-            ]
+            Article.objects.filter(headline__in=[
+                'bar',
+                'barfoobaz',
+                'bazbaRFOO',
+                'foobar',
+                'foobarbaz',
+            ]),
         )
 
     @skipUnlessDBFeature('supports_regex_backreferencing')
@@ -823,8 +776,8 @@ class LookupTests(TestCase):
             Article(pub_date=now, headline='bazbaRFOO'),
         ])
         self.assertQuerysetEqual(
-            Article.objects.filter(headline__regex=r'b(.).*b\1'),
-            ['<Article: barfoobaz>', '<Article: bazbaRFOO>', '<Article: foobarbaz>']
+            Article.objects.filter(headline__regex=r'b(.).*b\1').values_list('headline', flat=True),
+            ['barfoobaz', 'bazbaRFOO', 'foobarbaz'],
         )
 
     def test_regex_null(self):
@@ -838,8 +791,8 @@ class LookupTests(TestCase):
         """
         A regex lookup does not fail on non-string fields
         """
-        Season.objects.create(year=2013, gt=444)
-        self.assertQuerysetEqual(Season.objects.filter(gt__regex=r'^444$'), ['<Season: 2013>'])
+        s = Season.objects.create(year=2013, gt=444)
+        self.assertQuerysetEqual(Season.objects.filter(gt__regex=r'^444$'), [s])
 
     def test_regex_non_ascii(self):
         """
@@ -928,31 +881,21 @@ class LookupTests(TestCase):
         self.assertEqual(Player.objects.filter(games__season__gt__gt=222).distinct().count(), 2)
 
     def test_chain_date_time_lookups(self):
-        self.assertQuerysetEqual(
+        self.assertCountEqual(
             Article.objects.filter(pub_date__month__gt=7),
-            ['<Article: Article 5>', '<Article: Article 6>'],
-            ordered=False
+            [self.a5, self.a6],
         )
-        self.assertQuerysetEqual(
+        self.assertCountEqual(
             Article.objects.filter(pub_date__day__gte=27),
-            ['<Article: Article 2>', '<Article: Article 3>',
-             '<Article: Article 4>', '<Article: Article 7>'],
-            ordered=False
+            [self.a2, self.a3, self.a4, self.a7],
         )
-        self.assertQuerysetEqual(
+        self.assertCountEqual(
             Article.objects.filter(pub_date__hour__lt=8),
-            ['<Article: Article 1>', '<Article: Article 2>',
-             '<Article: Article 3>', '<Article: Article 4>',
-             '<Article: Article 7>'],
-            ordered=False
+            [self.a1, self.a2, self.a3, self.a4, self.a7],
         )
-        self.assertQuerysetEqual(
+        self.assertCountEqual(
             Article.objects.filter(pub_date__minute__lte=0),
-            ['<Article: Article 1>', '<Article: Article 2>',
-             '<Article: Article 3>', '<Article: Article 4>',
-             '<Article: Article 5>', '<Article: Article 6>',
-             '<Article: Article 7>'],
-            ordered=False
+            [self.a1, self.a2, self.a3, self.a4, self.a5, self.a6, self.a7],
         )
 
     def test_exact_none_transform(self):
@@ -984,6 +927,44 @@ class LookupTests(TestCase):
             list(Article.objects.filter(author=Author.objects.all()[:2]))
         with self.assertRaisesMessage(ValueError, msg):
             list(Article.objects.filter(author=Author.objects.all()[1:]))
+
+    @skipUnless(connection.vendor == 'mysql', 'MySQL-specific workaround.')
+    def test_exact_booleanfield(self):
+        # MySQL ignores indexes with boolean fields unless they're compared
+        # directly to a boolean value.
+        product = Product.objects.create(name='Paper', qty_target=5000)
+        Stock.objects.create(product=product, short=False, qty_available=5100)
+        stock_1 = Stock.objects.create(product=product, short=True, qty_available=180)
+        qs = Stock.objects.filter(short=True)
+        self.assertSequenceEqual(qs, [stock_1])
+        self.assertIn(
+            '%s = True' % connection.ops.quote_name('short'),
+            str(qs.query),
+        )
+
+    @skipUnless(connection.vendor == 'mysql', 'MySQL-specific workaround.')
+    def test_exact_booleanfield_annotation(self):
+        # MySQL ignores indexes with boolean fields unless they're compared
+        # directly to a boolean value.
+        qs = Author.objects.annotate(case=Case(
+            When(alias='a1', then=True),
+            default=False,
+            output_field=BooleanField(),
+        )).filter(case=True)
+        self.assertSequenceEqual(qs, [self.au1])
+        self.assertIn(' = True', str(qs.query))
+
+        qs = Author.objects.annotate(
+            wrapped=ExpressionWrapper(Q(alias='a1'), output_field=BooleanField()),
+        ).filter(wrapped=True)
+        self.assertSequenceEqual(qs, [self.au1])
+        self.assertIn(' = True', str(qs.query))
+        # EXISTS(...) shouldn't be compared to a boolean value.
+        qs = Author.objects.annotate(
+            exists=Exists(Author.objects.filter(alias='a1', pk=OuterRef('pk'))),
+        ).filter(exists=True)
+        self.assertSequenceEqual(qs, [self.au1])
+        self.assertNotIn(' = True', str(qs.query))
 
     def test_custom_field_none_rhs(self):
         """
@@ -1054,15 +1035,7 @@ class LookupTests(TestCase):
         self.assertEqual(authors.get(), newest_author)
 
     def test_isnull_non_boolean_value(self):
-        # These tests will catch ValueError in Django 4.0 when using
-        # non-boolean values for an isnull lookup becomes forbidden.
-        # msg = (
-        #     'The QuerySet value for an isnull lookup must be True or False.'
-        # )
-        msg = (
-            'Using a non-boolean value for an isnull lookup is deprecated, '
-            'use True or False instead.'
-        )
+        msg = 'The QuerySet value for an isnull lookup must be True or False.'
         tests = [
             Author.objects.filter(alias__isnull=1),
             Article.objects.filter(author__isnull=1),
@@ -1071,5 +1044,175 @@ class LookupTests(TestCase):
         ]
         for qs in tests:
             with self.subTest(qs=qs):
-                with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
+                with self.assertRaisesMessage(ValueError, msg):
                     qs.exists()
+
+    def test_lookup_rhs(self):
+        product = Product.objects.create(name='GME', qty_target=5000)
+        stock_1 = Stock.objects.create(product=product, short=True, qty_available=180)
+        stock_2 = Stock.objects.create(product=product, short=False, qty_available=5100)
+        Stock.objects.create(product=product, short=False, qty_available=4000)
+        self.assertCountEqual(
+            Stock.objects.filter(short=Q(qty_available__lt=F('product__qty_target'))),
+            [stock_1, stock_2],
+        )
+        self.assertCountEqual(
+            Stock.objects.filter(short=ExpressionWrapper(
+                Q(qty_available__lt=F('product__qty_target')),
+                output_field=BooleanField(),
+            )),
+            [stock_1, stock_2],
+        )
+
+
+class LookupQueryingTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.s1 = Season.objects.create(year=1942, gt=1942)
+        cls.s2 = Season.objects.create(year=1842, gt=1942)
+        cls.s3 = Season.objects.create(year=2042, gt=1942)
+
+    def test_annotate(self):
+        qs = Season.objects.annotate(equal=Exact(F('year'), 1942))
+        self.assertCountEqual(
+            qs.values_list('year', 'equal'),
+            ((1942, True), (1842, False), (2042, False)),
+        )
+
+    def test_alias(self):
+        qs = Season.objects.alias(greater=GreaterThan(F('year'), 1910))
+        self.assertCountEqual(qs.filter(greater=True), [self.s1, self.s3])
+
+    def test_annotate_value_greater_than_value(self):
+        qs = Season.objects.annotate(greater=GreaterThan(Value(40), Value(30)))
+        self.assertCountEqual(
+            qs.values_list('year', 'greater'),
+            ((1942, True), (1842, True), (2042, True)),
+        )
+
+    def test_annotate_field_greater_than_field(self):
+        qs = Season.objects.annotate(greater=GreaterThan(F('year'), F('gt')))
+        self.assertCountEqual(
+            qs.values_list('year', 'greater'),
+            ((1942, False), (1842, False), (2042, True)),
+        )
+
+    def test_annotate_field_greater_than_value(self):
+        qs = Season.objects.annotate(greater=GreaterThan(F('year'), Value(1930)))
+        self.assertCountEqual(
+            qs.values_list('year', 'greater'),
+            ((1942, True), (1842, False), (2042, True)),
+        )
+
+    def test_annotate_field_greater_than_literal(self):
+        qs = Season.objects.annotate(greater=GreaterThan(F('year'), 1930))
+        self.assertCountEqual(
+            qs.values_list('year', 'greater'),
+            ((1942, True), (1842, False), (2042, True)),
+        )
+
+    def test_annotate_literal_greater_than_field(self):
+        qs = Season.objects.annotate(greater=GreaterThan(1930, F('year')))
+        self.assertCountEqual(
+            qs.values_list('year', 'greater'),
+            ((1942, False), (1842, True), (2042, False)),
+        )
+
+    def test_annotate_less_than_float(self):
+        qs = Season.objects.annotate(lesser=LessThan(F('year'), 1942.1))
+        self.assertCountEqual(
+            qs.values_list('year', 'lesser'),
+            ((1942, True), (1842, True), (2042, False)),
+        )
+
+    def test_annotate_greater_than_or_equal(self):
+        qs = Season.objects.annotate(greater=GreaterThanOrEqual(F('year'), 1942))
+        self.assertCountEqual(
+            qs.values_list('year', 'greater'),
+            ((1942, True), (1842, False), (2042, True)),
+        )
+
+    def test_annotate_greater_than_or_equal_float(self):
+        qs = Season.objects.annotate(greater=GreaterThanOrEqual(F('year'), 1942.1))
+        self.assertCountEqual(
+            qs.values_list('year', 'greater'),
+            ((1942, False), (1842, False), (2042, True)),
+        )
+
+    def test_combined_lookups(self):
+        expression = Exact(F('year'), 1942) | GreaterThan(F('year'), 1942)
+        qs = Season.objects.annotate(gte=expression)
+        self.assertCountEqual(
+            qs.values_list('year', 'gte'),
+            ((1942, True), (1842, False), (2042, True)),
+        )
+
+    def test_lookup_in_filter(self):
+        qs = Season.objects.filter(GreaterThan(F('year'), 1910))
+        self.assertCountEqual(qs, [self.s1, self.s3])
+
+    def test_filter_lookup_lhs(self):
+        qs = Season.objects.annotate(before_20=LessThan(F('year'), 2000)).filter(
+            before_20=LessThan(F('year'), 1900),
+        )
+        self.assertCountEqual(qs, [self.s2, self.s3])
+
+    def test_filter_wrapped_lookup_lhs(self):
+        qs = Season.objects.annotate(before_20=ExpressionWrapper(
+            Q(year__lt=2000),
+            output_field=BooleanField(),
+        )).filter(before_20=LessThan(F('year'), 1900)).values_list('year', flat=True)
+        self.assertCountEqual(qs, [1842, 2042])
+
+    def test_filter_exists_lhs(self):
+        qs = Season.objects.annotate(before_20=Exists(
+            Season.objects.filter(pk=OuterRef('pk'), year__lt=2000),
+        )).filter(before_20=LessThan(F('year'), 1900))
+        self.assertCountEqual(qs, [self.s2, self.s3])
+
+    def test_filter_subquery_lhs(self):
+        qs = Season.objects.annotate(before_20=Subquery(
+            Season.objects.filter(pk=OuterRef('pk')).values(
+                lesser=LessThan(F('year'), 2000),
+            ),
+        )).filter(before_20=LessThan(F('year'), 1900))
+        self.assertCountEqual(qs, [self.s2, self.s3])
+
+    def test_combined_lookups_in_filter(self):
+        expression = Exact(F('year'), 1942) | GreaterThan(F('year'), 1942)
+        qs = Season.objects.filter(expression)
+        self.assertCountEqual(qs, [self.s1, self.s3])
+
+    def test_combined_annotated_lookups_in_filter(self):
+        expression = Exact(F('year'), 1942) | GreaterThan(F('year'), 1942)
+        qs = Season.objects.annotate(gte=expression).filter(gte=True)
+        self.assertCountEqual(qs, [self.s1, self.s3])
+
+    def test_combined_annotated_lookups_in_filter_false(self):
+        expression = Exact(F('year'), 1942) | GreaterThan(F('year'), 1942)
+        qs = Season.objects.annotate(gte=expression).filter(gte=False)
+        self.assertSequenceEqual(qs, [self.s2])
+
+    def test_lookup_in_order_by(self):
+        qs = Season.objects.order_by(LessThan(F('year'), 1910), F('year'))
+        self.assertSequenceEqual(qs, [self.s1, self.s3, self.s2])
+
+    @skipUnlessDBFeature('supports_boolean_expr_in_select_clause')
+    def test_aggregate_combined_lookup(self):
+        expression = Cast(GreaterThan(F('year'), 1900), models.IntegerField())
+        qs = Season.objects.aggregate(modern=models.Sum(expression))
+        self.assertEqual(qs['modern'], 2)
+
+    def test_conditional_expression(self):
+        qs = Season.objects.annotate(century=Case(
+            When(
+                GreaterThan(F('year'), 1900) & LessThanOrEqual(F('year'), 2000),
+                then=Value('20th'),
+            ),
+            default=Value('other'),
+        )).values('year', 'century')
+        self.assertCountEqual(qs, [
+            {'year': 1942, 'century': '20th'},
+            {'year': 1842, 'century': 'other'},
+            {'year': 2042, 'century': 'other'},
+        ])

@@ -7,7 +7,8 @@ from django.db.models import Prefetch, QuerySet, prefetch_related_objects
 from django.db.models.query import get_prefetcher
 from django.db.models.sql import Query
 from django.test import TestCase, override_settings
-from django.test.utils import CaptureQueriesContext
+from django.test.utils import CaptureQueriesContext, ignore_warnings
+from django.utils.deprecation import RemovedInDjango50Warning
 
 from .models import (
     Article, Author, Author2, AuthorAddress, AuthorWithAge, Bio, Book,
@@ -76,7 +77,7 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
             [list(b.first_time_authors.all())
              for b in Book.objects.prefetch_related('first_time_authors')]
 
-        self.assertQuerysetEqual(self.book2.authors.all(), ["<Author: Charlotte>"])
+        self.assertSequenceEqual(self.book2.authors.all(), [self.author1])
 
     def test_onetoone_reverse_no_match(self):
         # Regression for #17439
@@ -308,6 +309,45 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
                 ) as add_q_mock:
                     list(Book.objects.prefetch_related(relation))
                     self.assertEqual(add_q_mock.call_count, 1)
+
+    def test_named_values_list(self):
+        qs = Author.objects.prefetch_related('books')
+        self.assertCountEqual(
+            [value.name for value in qs.values_list('name', named=True)],
+            ['Anne', 'Charlotte', 'Emily', 'Jane'],
+        )
+
+    def test_m2m_prefetching_iterator_with_chunks(self):
+        with self.assertNumQueries(3):
+            authors = [
+                b.authors.first()
+                for b in Book.objects.prefetch_related('authors').iterator(chunk_size=2)
+            ]
+        self.assertEqual(
+            authors,
+            [self.author1, self.author1, self.author3, self.author4],
+        )
+
+    @ignore_warnings(category=RemovedInDjango50Warning)
+    def test_m2m_prefetching_iterator_without_chunks(self):
+        # prefetch_related() is ignored.
+        with self.assertNumQueries(5):
+            authors = [
+                b.authors.first()
+                for b in Book.objects.prefetch_related('authors').iterator()
+            ]
+        self.assertEqual(
+            authors,
+            [self.author1, self.author1, self.author3, self.author4],
+        )
+
+    def test_m2m_prefetching_iterator_without_chunks_warning(self):
+        msg = (
+            'Using QuerySet.iterator() after prefetch_related() without '
+            'specifying chunk_size is deprecated.'
+        )
+        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+            Book.objects.prefetch_related('authors').iterator()
 
 
 class RawQuerySetTests(TestDataMixin, TestCase):
@@ -1026,6 +1066,24 @@ class GenericRelationTests(TestCase):
         # instance returned by the manager.
         self.assertEqual(list(bookmark.tags.all()), list(bookmark.tags.all().all()))
 
+    def test_deleted_GFK(self):
+        TaggedItem.objects.create(tag='awesome', content_object=self.book1)
+        TaggedItem.objects.create(tag='awesome', content_object=self.book2)
+        ct = ContentType.objects.get_for_model(Book)
+
+        book1_pk = self.book1.pk
+        self.book1.delete()
+
+        with self.assertNumQueries(2):
+            qs = TaggedItem.objects.filter(tag='awesome').prefetch_related('content_object')
+            result = [
+                (tag.object_id, tag.content_type_id, tag.content_object) for tag in qs
+            ]
+            self.assertEqual(result, [
+                (book1_pk, ct.pk, None),
+                (self.book2.pk, ct.pk, self.book2),
+            ])
+
 
 class MultiTableInheritanceTest(TestCase):
 
@@ -1121,6 +1179,14 @@ class ForeignKeyToFieldTest(TestCase):
                     ([str(self.author1)], [str(self.author2)])
                 ]
             )
+
+    def test_m2m_manager_reused(self):
+        author = Author.objects.prefetch_related(
+            'favorite_authors',
+            'favors_me',
+        ).first()
+        self.assertIs(author.favorite_authors, author.favorite_authors)
+        self.assertIs(author.favors_me, author.favors_me)
 
 
 class LookupOrderingTest(TestCase):
@@ -1580,4 +1646,30 @@ class ReadPrefetchedObjectsCacheTests(TestCase):
         )
         with self.assertNumQueries(4):
             # AuthorWithAge -> Author -> FavoriteAuthors, Book
-            self.assertQuerysetEqual(authors, ['<AuthorWithAge: Rousseau>', '<AuthorWithAge: Voltaire>'])
+            self.assertSequenceEqual(authors, [self.author1, self.author2])
+
+
+class NestedPrefetchTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        house = House.objects.create(name='Big house', address='123 Main St')
+        cls.room = Room.objects.create(name='Kitchen', house=house)
+
+    def test_nested_prefetch_is_not_overwritten_by_related_object(self):
+        """
+        The prefetched relationship is used rather than populating the reverse
+        relationship from the parent, when prefetching a set of child objects
+        related to a set of parent objects and the child queryset itself
+        specifies a prefetch back to the parent.
+        """
+        queryset = House.objects.only('name').prefetch_related(
+            Prefetch('rooms', queryset=Room.objects.prefetch_related(
+                Prefetch('house', queryset=House.objects.only('address')),
+            )),
+        )
+        with self.assertNumQueries(3):
+            house = queryset.first()
+
+        self.assertIs(Room.house.is_cached(self.room), True)
+        with self.assertNumQueries(0):
+            house.rooms.first().house.address

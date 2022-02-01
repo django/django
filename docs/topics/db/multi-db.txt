@@ -74,7 +74,7 @@ example ``settings.py`` snippet defining two non-default databases, with the
 
 If you attempt to access a database that you haven't defined in your
 :setting:`DATABASES` setting, Django will raise a
-``django.db.utils.ConnectionDoesNotExist`` exception.
+``django.utils.connection.ConnectionDoesNotExist`` exception.
 
 .. _synchronizing_multiple_databases:
 
@@ -594,8 +594,8 @@ database other than that specified by your router chain, you'll
 need to write custom :class:`~django.contrib.admin.ModelAdmin` classes
 that will direct the admin to use a specific database for content.
 
-``ModelAdmin`` objects have five methods that require customization for
-multiple-database support::
+``ModelAdmin`` objects have the following methods that require customization
+for multiple-database support::
 
     class MultiDBModelAdmin(admin.ModelAdmin):
         # A handy constant for the name of the alternate database.

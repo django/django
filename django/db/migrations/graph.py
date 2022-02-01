@@ -100,7 +100,7 @@ class MigrationGraph:
         """
         This may create dummy nodes if they don't yet exist. If
         `skip_validation=True`, validate_consistency() should be called
-        afterwards.
+        afterward.
         """
         if child not in self.nodes:
             error_message = (

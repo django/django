@@ -50,6 +50,11 @@ class ModelAdminTests(TestCase):
         ma = ModelAdmin(Band, self.site)
         self.assertEqual(str(ma), 'modeladmin.ModelAdmin')
 
+    def test_default_attributes(self):
+        ma = ModelAdmin(Band, self.site)
+        self.assertEqual(ma.actions, ())
+        self.assertEqual(ma.inlines, ())
+
     # form/fields/fieldsets interaction ##############################
 
     def test_default_fields(self):
@@ -721,6 +726,13 @@ class ModelAdminTests(TestCase):
         self.assertEqual(model_count, {'bands': 1})
         self.assertEqual(perms_needed, {'band'})
         self.assertEqual(protected, [])
+
+    def test_modeladmin_repr(self):
+        ma = ModelAdmin(Band, self.site)
+        self.assertEqual(
+            repr(ma),
+            "<ModelAdmin: model=Band site=AdminSite(name='admin')>",
+        )
 
 
 class ModelAdminPermissionTests(SimpleTestCase):

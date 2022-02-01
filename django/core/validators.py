@@ -1,12 +1,10 @@
 import ipaddress
 import re
-import warnings
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
-from django.utils.deprecation import RemovedInDjango41Warning
 from django.utils.encoding import punycode
 from django.utils.ipv6 import is_valid_ipv6_address
 from django.utils.regex_helper import _lazy_re_compile
@@ -66,7 +64,10 @@ class URLValidator(RegexValidator):
     ul = '\u00a1-\uffff'  # Unicode letters range (must not be a raw string).
 
     # IP patterns
-    ipv4_re = r'(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)(?:\.(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}'
+    ipv4_re = (
+        r'(?:0|25[0-5]|2[0-4][0-9]|1[0-9]?[0-9]?|[1-9][0-9]?)'
+        r'(?:\.(?:0|25[0-5]|2[0-4][0-9]|1[0-9]?[0-9]?|[1-9][0-9]?)){3}'
+    )
     ipv6_re = r'\[[0-9a-f:.]+\]'  # (simple regex, validated later)
 
     # Host patterns
@@ -87,11 +88,12 @@ class URLValidator(RegexValidator):
         r'^(?:[a-z0-9.+-]*)://'  # scheme is validated separately
         r'(?:[^\s:@/]+(?::[^\s:@/]*)?@)?'  # user:pass authentication
         r'(?:' + ipv4_re + '|' + ipv6_re + '|' + host_re + ')'
-        r'(?::\d{2,5})?'  # port
+        r'(?::[0-9]{1,5})?'  # port
         r'(?:[/?#][^\s]*)?'  # resource path
         r'\Z', re.IGNORECASE)
     message = _('Enter a valid URL.')
     schemes = ['http', 'https', 'ftp', 'ftps']
+    unsafe_chars = frozenset('\t\r\n')
 
     def __init__(self, schemes=None, **kwargs):
         super().__init__(**kwargs)
@@ -101,6 +103,8 @@ class URLValidator(RegexValidator):
     def __call__(self, value):
         if not isinstance(value, str):
             raise ValidationError(self.message, code=self.code, params={'value': value})
+        if self.unsafe_chars.intersection(value):
+            raise ValidationError(self.message, code=self.code, params={'value': value})
         # Check if the scheme is valid.
         scheme = value.split('://')[0].lower()
         if scheme not in self.schemes:
@@ -108,14 +112,15 @@ class URLValidator(RegexValidator):
 
         # Then check full URL
         try:
+            splitted_url = urlsplit(value)
+        except ValueError:
+            raise ValidationError(self.message, code=self.code, params={'value': value})
+        try:
             super().__call__(value)
         except ValidationError as e:
             # Trivial case failed. Try for possible IDN domain
             if value:
-                try:
-                    scheme, netloc, path, query, fragment = urlsplit(value)
-                except ValueError:  # for example, "Invalid IPv6 URL"
-                    raise ValidationError(self.message, code=self.code, params={'value': value})
+                scheme, netloc, path, query, fragment = splitted_url
                 try:
                     netloc = punycode(netloc)  # IDN -> ACE
                 except UnicodeError:  # invalid domain part
@@ -126,7 +131,7 @@ class URLValidator(RegexValidator):
                 raise
         else:
             # Now verify IPv6 in the netloc part
-            host_match = re.search(r'^\[(.+)\](?::\d{2,5})?$', urlsplit(value).netloc)
+            host_match = re.search(r'^\[(.+)\](?::[0-9]{1,5})?$', splitted_url.netloc)
             if host_match:
                 potential_ip = host_match[1]
                 try:
@@ -138,7 +143,7 @@ class URLValidator(RegexValidator):
         # section 3.1. It's defined to be 255 bytes or less, but this includes
         # one byte for the length of the name and one byte for the trailing dot
         # that's used to indicate absolute names in DNS.
-        if len(urlsplit(value).netloc) > 253:
+        if splitted_url.hostname is None or len(splitted_url.hostname) > 253:
             raise ValidationError(self.message, code=self.code, params={'value': value})
 
 
@@ -167,38 +172,11 @@ class EmailValidator:
         re.IGNORECASE)
     literal_regex = _lazy_re_compile(
         # literal form, ipv4 or ipv6 address (SMTP 4.1.3)
-        r'\[([A-f0-9:.]+)\]\Z',
+        r'\[([A-F0-9:.]+)\]\Z',
         re.IGNORECASE)
     domain_allowlist = ['localhost']
 
-    @property
-    def domain_whitelist(self):
-        warnings.warn(
-            'The domain_whitelist attribute is deprecated in favor of '
-            'domain_allowlist.',
-            RemovedInDjango41Warning,
-            stacklevel=2,
-        )
-        return self.domain_allowlist
-
-    @domain_whitelist.setter
-    def domain_whitelist(self, allowlist):
-        warnings.warn(
-            'The domain_whitelist attribute is deprecated in favor of '
-            'domain_allowlist.',
-            RemovedInDjango41Warning,
-            stacklevel=2,
-        )
-        self.domain_allowlist = allowlist
-
-    def __init__(self, message=None, code=None, allowlist=None, *, whitelist=None):
-        if whitelist is not None:
-            allowlist = whitelist
-            warnings.warn(
-                'The whitelist argument is deprecated in favor of allowlist.',
-                RemovedInDjango41Warning,
-                stacklevel=2,
-            )
+    def __init__(self, message=None, code=None, allowlist=None):
         if message is not None:
             self.message = message
         if code is not None:
@@ -273,6 +251,19 @@ def validate_ipv4_address(value):
         ipaddress.IPv4Address(value)
     except ValueError:
         raise ValidationError(_('Enter a valid IPv4 address.'), code='invalid', params={'value': value})
+    else:
+        # Leading zeros are forbidden to avoid ambiguity with the octal
+        # notation. This restriction is included in Python 3.9.5+.
+        # TODO: Remove when dropping support for PY39.
+        if any(
+            octet != '0' and octet[0] == '0'
+            for octet in value.split('.')
+        ):
+            raise ValidationError(
+                _('Enter a valid IPv4 address.'),
+                code='invalid',
+                params={'value': value},
+            )
 
 
 def validate_ipv6_address(value):

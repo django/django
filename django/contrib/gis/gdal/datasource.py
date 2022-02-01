@@ -34,6 +34,7 @@
               val = field.value
 """
 from ctypes import byref
+from pathlib import Path
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.driver import Driver
@@ -43,8 +44,8 @@ from django.contrib.gis.gdal.prototypes import ds as capi
 from django.utils.encoding import force_bytes, force_str
 
 
-# For more information, see the OGR C API source code:
-#  https://www.gdal.org/ogr__api_8h.html
+# For more information, see the OGR C API documentation:
+#  https://gdal.org/api/vector_c_api.html
 #
 # The OGR_DS_* routines are relevant here.
 class DataSource(GDALBase):
@@ -57,12 +58,12 @@ class DataSource(GDALBase):
             self._write = 1
         else:
             self._write = 0
-        # See also https://trac.osgeo.org/gdal/wiki/rfc23_ogr_unicode
+        # See also https://gdal.org/development/rfc/rfc23_ogr_unicode.html
         self.encoding = encoding
 
         Driver.ensure_registered()
 
-        if isinstance(ds_input, str):
+        if isinstance(ds_input, (str, Path)):
             # The data source driver is a void pointer.
             ds_driver = Driver.ptr_type()
             try:

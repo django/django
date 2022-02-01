@@ -1,7 +1,6 @@
 from datetime import time
 
 from django.forms import TimeInput
-from django.test import override_settings
 from django.utils import translation
 
 from .base import WidgetTest
@@ -41,7 +40,6 @@ class TimeInputTest(WidgetTest):
         widget = TimeInput(format='%H:%M', attrs={'type': 'time'})
         self.check_html(widget, 'time', t, html='<input type="time" name="time" value="12:51">')
 
-    @override_settings(USE_L10N=True)
     @translation.override('de-at')
     def test_l10n(self):
         t = time(12, 51, 34, 482548)

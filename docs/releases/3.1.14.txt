@@ -1,0 +1,13 @@
+===========================
+Django 3.1.14 release notes
+===========================
+
+*December 7, 2021*
+
+Django 3.1.14 fixes a security issue with severity "low" in 3.1.13.
+
+CVE-2021-44420: Potential bypass of an upstream access control based on URL paths
+=================================================================================
+
+HTTP requests for URLs with trailing newlines could bypass an upstream access
+control based on URL paths.

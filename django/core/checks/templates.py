@@ -1,6 +1,8 @@
 import copy
+from collections import defaultdict
 
 from django.conf import settings
+from django.template.backends.django import get_template_tag_modules
 
 from . import Error, Tags, register
 
@@ -12,6 +14,10 @@ E001 = Error(
 E002 = Error(
     "'string_if_invalid' in TEMPLATES OPTIONS must be a string but got: {} ({}).",
     id="templates.E002",
+)
+E003 = Error(
+    '{} is used for multiple template tag modules: {}',
+    id='templates.E003',
 )
 
 
@@ -32,4 +38,30 @@ def check_string_if_invalid_is_string(app_configs, **kwargs):
             error = copy.copy(E002)
             error.msg = error.msg.format(string_if_invalid, type(string_if_invalid).__name__)
             errors.append(error)
+    return errors
+
+
+@register(Tags.templates)
+def check_for_template_tags_with_the_same_name(app_configs, **kwargs):
+    errors = []
+    libraries = defaultdict(list)
+
+    for conf in settings.TEMPLATES:
+        custom_libraries = conf.get('OPTIONS', {}).get('libraries', {})
+        for module_name, module_path in custom_libraries.items():
+            libraries[module_name].append(module_path)
+
+    for module_name, module_path in get_template_tag_modules():
+        libraries[module_name].append(module_path)
+
+    for library_name, items in libraries.items():
+        if len(items) > 1:
+            errors.append(Error(
+                E003.msg.format(
+                    repr(library_name),
+                    ', '.join(repr(item) for item in items),
+                ),
+                id=E003.id,
+            ))
+
     return errors

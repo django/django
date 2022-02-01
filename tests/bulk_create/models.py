@@ -16,6 +16,14 @@ class Country(models.Model):
     iso_two_letter = models.CharField(max_length=2)
     description = models.TextField()
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['iso_two_letter', 'name'],
+                name='country_name_iso_unique',
+            ),
+        ]
+
 
 class ProxyCountry(Country):
     class Meta:
@@ -58,6 +66,13 @@ class State(models.Model):
 class TwoFields(models.Model):
     f1 = models.IntegerField(unique=True)
     f2 = models.IntegerField(unique=True)
+    name = models.CharField(max_length=15, null=True)
+
+
+class UpsertConflict(models.Model):
+    number = models.IntegerField(unique=True)
+    rank = models.IntegerField()
+    name = models.CharField(max_length=15)
 
 
 class NoFields(models.Model):
@@ -83,7 +98,6 @@ class NullableFields(models.Model):
     float_field = models.FloatField(null=True, default=3.2)
     integer_field = models.IntegerField(null=True, default=2)
     null_boolean_field = models.BooleanField(null=True, default=False)
-    null_boolean_field_old = models.NullBooleanField(null=True, default=False)
     positive_big_integer_field = models.PositiveBigIntegerField(null=True, default=2 ** 63 - 1)
     positive_integer_field = models.PositiveIntegerField(null=True, default=3)
     positive_small_integer_field = models.PositiveSmallIntegerField(null=True, default=4)
@@ -104,3 +118,9 @@ class NullableFields(models.Model):
     text_field = models.TextField(null=True, default='text')
     url_field = models.URLField(null=True, default='/')
     uuid_field = models.UUIDField(null=True, default=uuid.uuid4)
+
+
+class RelatedModel(models.Model):
+    name = models.CharField(max_length=15, null=True)
+    country = models.OneToOneField(Country, models.CASCADE, primary_key=True)
+    big_auto_fields = models.ManyToManyField(BigAutoFieldModel)

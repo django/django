@@ -33,9 +33,9 @@ CONTEXT_SEPARATOR = "\x04"
 # Format of Accept-Language header values. From RFC 2616, section 14.4 and 3.9
 # and RFC 3066, section 2.1
 accept_language_re = _lazy_re_compile(r'''
-        ([A-Za-z]{1,8}(?:-[A-Za-z0-9]{1,8})*|\*)      # "en", "en-au", "x-y-z", "es-419", "*"
-        (?:\s*;\s*q=(0(?:\.\d{,3})?|1(?:\.0{,3})?))?  # Optional "q=1.00", "q=0.8"
-        (?:\s*,\s*|$)                                 # Multiple accepts per header.
+        ([A-Za-z]{1,8}(?:-[A-Za-z0-9]{1,8})*|\*)         # "en", "en-au", "x-y-z", "es-419", "*"
+        (?:\s*;\s*q=(0(?:\.[0-9]{,3})?|1(?:\.0{,3})?))?  # Optional "q=1.00", "q=0.8"
+        (?:\s*,\s*|$)                                    # Multiple accepts per header.
         ''', re.VERBOSE)
 
 language_code_re = _lazy_re_compile(
@@ -43,16 +43,16 @@ language_code_re = _lazy_re_compile(
     re.IGNORECASE
 )
 
-language_code_prefix_re = _lazy_re_compile(r'^/(\w+([@-]\w+)?)(/|$)')
+language_code_prefix_re = _lazy_re_compile(r'^/(\w+([@-]\w+){0,2})(/|$)')
 
 
 @receiver(setting_changed)
-def reset_cache(**kwargs):
+def reset_cache(*, setting, **kwargs):
     """
     Reset global state when LANGUAGES setting has been changed, as some
     languages should no longer be accepted.
     """
-    if kwargs['setting'] in ('LANGUAGES', 'LANGUAGE_CODE'):
+    if setting in ('LANGUAGES', 'LANGUAGE_CODE'):
         check_for_language.cache_clear()
         get_languages.cache_clear()
         get_supported_language_variant.cache_clear()
@@ -191,7 +191,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     def _add_installed_apps_translations(self):
         """Merge translations from each installed app."""
         try:
-            app_configs = reversed(list(apps.get_app_configs()))
+            app_configs = reversed(apps.get_app_configs())
         except AppRegistryNotReady:
             raise AppRegistryNotReady(
                 "The translation infrastructure cannot be initialized before the "
@@ -452,7 +452,7 @@ def check_for_language(lang_code):
     )
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def get_languages():
     """
     Cache of settings.LANGUAGES in a dictionary for easy lookups by key.
@@ -474,14 +474,17 @@ def get_supported_language_variant(lang_code, strict=False):
     <https://www.djangoproject.com/weblog/2007/oct/26/security-fix/>.
     """
     if lang_code:
-        # If 'fr-ca' is not supported, try special fallback or language-only 'fr'.
+        # If 'zh-hant-tw' is not supported, try special fallback or subsequent
+        # language codes i.e. 'zh-hant' and 'zh'.
         possible_lang_codes = [lang_code]
         try:
             possible_lang_codes.extend(LANG_INFO[lang_code]['fallback'])
         except KeyError:
             pass
-        generic_lang_code = lang_code.split('-')[0]
-        possible_lang_codes.append(generic_lang_code)
+        i = None
+        while (i := lang_code.rfind('-', 0, i)) > -1:
+            possible_lang_codes.append(lang_code[:i])
+        generic_lang_code = possible_lang_codes[-1]
         supported_lang_codes = get_languages()
 
         for code in possible_lang_codes:

@@ -5,8 +5,10 @@ from functools import lru_cache
 from django.conf import settings
 from django.db import DatabaseError, NotSupportedError
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.backends.utils import strip_quotes, truncate_name
-from django.db.models import AutoField, Exists, ExpressionWrapper
+from django.db.backends.utils import (
+    split_tzname_delta, strip_quotes, truncate_name,
+)
+from django.db.models import AutoField, Exists, ExpressionWrapper, Lookup
 from django.db.models.expressions import RawSQL
 from django.db.models.sql.where import WhereNode
 from django.utils import timezone
@@ -70,7 +72,12 @@ END;
     }
 
     def cache_key_culling_sql(self):
-        return 'SELECT cache_key FROM %s ORDER BY cache_key OFFSET %%s ROWS FETCH FIRST 1 ROWS ONLY'
+        cache_key = self.quote_name('cache_key')
+        return (
+            f'SELECT {cache_key} '
+            f'FROM %s '
+            f'ORDER BY {cache_key} OFFSET %%s ROWS FETCH FIRST 1 ROWS ONLY'
+        )
 
     def date_extract_sql(self, lookup_type, field_name):
         if lookup_type == 'week_day':
@@ -108,11 +115,8 @@ END;
     _tzname_re = _lazy_re_compile(r'^[\w/:+-]+$')
 
     def _prepare_tzname_delta(self, tzname):
-        if '+' in tzname:
-            return tzname[tzname.find('+'):]
-        elif '-' in tzname:
-            return tzname[tzname.find('-'):]
-        return tzname
+        tzname, sign, offset = split_tzname_delta(tzname)
+        return f'{sign}{offset}' if offset else tzname
 
     def _convert_field_to_tz(self, field_name, tzname):
         if not (settings.USE_TZ and tzname):
@@ -135,9 +139,15 @@ END;
         return 'TRUNC(%s)' % field_name
 
     def datetime_cast_time_sql(self, field_name, tzname):
-        # Since `TimeField` values are stored as TIMESTAMP where only the date
-        # part is ignored, convert the field to the specified timezone.
-        return self._convert_field_to_tz(field_name, tzname)
+        # Since `TimeField` values are stored as TIMESTAMP change to the
+        # default date and convert the field to the specified timezone.
+        convert_datetime_sql = (
+            "TO_TIMESTAMP(CONCAT('1900-01-01 ', TO_CHAR(%s, 'HH24:MI:SS.FF')), "
+            "'YYYY-MM-DD HH24:MI:SS.FF')"
+        ) % self._convert_field_to_tz(field_name, tzname)
+        return "CASE WHEN %s IS NOT NULL THEN %s ELSE NULL END" % (
+            field_name, convert_datetime_sql,
+        )
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)
@@ -182,7 +192,7 @@ END;
             converters.append(self.convert_textfield_value)
         elif internal_type == 'BinaryField':
             converters.append(self.convert_binaryfield_value)
-        elif internal_type in ['BooleanField', 'NullBooleanField']:
+        elif internal_type == 'BooleanField':
             converters.append(self.convert_booleanfield_value)
         elif internal_type == 'DateTimeField':
             if settings.USE_TZ:
@@ -196,7 +206,7 @@ END;
         # Oracle stores empty strings as null. If the field accepts the empty
         # string, undo this to adhere to the Django convention of using
         # the empty string instead of null.
-        if expression.field.empty_strings_allowed:
+        if expression.output_field.empty_strings_allowed:
             converters.append(
                 self.convert_empty_bytes
                 if internal_type == 'BinaryField' else
@@ -258,16 +268,14 @@ END;
         columns = []
         for param in returning_params:
             value = param.get_value()
-            if value is None or value == []:
-                # cx_Oracle < 6.3 returns None, >= 6.3 returns empty list.
+            if value == []:
                 raise DatabaseError(
                     'The database did not return a new row id. Probably '
                     '"ORA-1403: no data found" was raised internally but was '
                     'hidden by the Oracle OCI library (see '
                     'https://code.djangoproject.com/ticket/28859).'
                 )
-            # cx_Oracle < 7 returns value, >= 7 returns list with single value.
-            columns.append(value[0] if isinstance(value, list) else value)
+            columns.append(value[0])
         return tuple(columns)
 
     def field_cast_sql(self, db_type, internal_type):
@@ -287,7 +295,7 @@ END;
         ) if sql)
 
     def last_executed_query(self, cursor, sql, params):
-        # https://cx-oracle.readthedocs.io/en/latest/cursor.html#Cursor.statement
+        # https://cx-oracle.readthedocs.io/en/latest/api_manual/cursor.html#Cursor.statement
         # The DB API definition does not define this attribute.
         statement = cursor.statement
         # Unlike Psycopg's `query` and MySQLdb`'s `_executed`, cx_Oracle's
@@ -336,7 +344,7 @@ END;
         # always defaults to uppercase.
         # We simplify things by making Oracle identifiers always uppercase.
         if not name.startswith('"') and not name.endswith('"'):
-            name = '"%s"' % truncate_name(name.upper(), self.max_name_length())
+            name = '"%s"' % truncate_name(name, self.max_name_length())
         # Oracle puts the query text into a (query % args) construct, so % signs
         # in names need to be escaped. The '%%' will be collapsed back to '%' at
         # that stage so we aren't really making the name longer here.
@@ -635,7 +643,7 @@ END;
         Oracle supports only EXISTS(...) or filters in the WHERE clause, others
         must be compared with True.
         """
-        if isinstance(expression, (Exists, WhereNode)):
+        if isinstance(expression, (Exists, Lookup, WhereNode)):
             return True
         if isinstance(expression, ExpressionWrapper) and expression.conditional:
             return self.conditional_expression_supported_in_where_clause(expression.expression)

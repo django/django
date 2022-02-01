@@ -1,3 +1,5 @@
+import os
+
 from django.apps import apps
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
@@ -184,6 +186,10 @@ class Command(BaseCommand):
 
         # Write out the new migration file
         writer = MigrationWriter(new_migration, include_header)
+        if os.path.exists(writer.path):
+            raise CommandError(
+                f'Migration {new_migration.name} already exists. Use a different name.'
+            )
         with open(writer.path, "w", encoding='utf-8') as fh:
             fh.write(writer.as_string())
 

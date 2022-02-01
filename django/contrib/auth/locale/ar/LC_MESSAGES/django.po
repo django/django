@@ -1,8 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Ahmad Khayyat <akhayyat@gmail.com>, 2013
-# Bashar Al-Abdulhadi, 2015-2016
+# Ahmad Khayyat <akhayyat@gmail.com>, 2013,2021
+# Bashar Al-Abdulhadi, 2015-2016,2021
 # Bashar Al-Abdulhadi, 2014
 # Eyad Toma <d.eyad.t@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-03-28 17:26+0000\n"
-"Last-Translator: Omar Lajam\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-10-15 21:38+0000\n"
+"Last-Translator: Bashar Al-Abdulhadi\n"
 "Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -33,7 +33,7 @@ msgstr "تواريخ مهمة"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "العنصر %(name)s الذي به الحقل الأساسي %(key)r غير موجود."
+msgstr "العنصر من نوع %(name)s ذو الحقل الأساسي %(key)r غير موجود."
 
 msgid "Password changed successfully."
 msgstr "تم تغيير كلمة المرور بنجاح."
@@ -43,7 +43,7 @@ msgid "Change password: %s"
 msgstr "غيّر كلمة المرور: %s"
 
 msgid "Authentication and Authorization"
-msgstr "المصادقة والتخويل"
+msgstr "المصادقة والتفويض"
 
 msgid "password"
 msgstr "كلمة المرور"
@@ -52,13 +52,14 @@ msgid "last login"
 msgstr "آخر دخول"
 
 msgid "No password set."
-msgstr "لا يوجد كلمة سر حتى الآن."
+msgstr "لم يتم تعيين كلمة المرور."
 
 msgid "Invalid password format or unknown hashing algorithm."
-msgstr "تنسيق كلمة المرور غير صالح أو خوارزمية التجزئة غير معروفة."
+msgstr ""
+"صيغة كلمة المرور غير صحيحة أو أن خوارزمية البعثرة (hashing) غير معروفة."
 
 msgid "The two password fields didn’t match."
-msgstr "كلمات المرور غير متطابقة"
+msgstr "حقلا كلمة المرور غير متطابقين."
 
 msgid "Password"
 msgstr "كلمة المرور"
@@ -73,14 +74,14 @@ msgid ""
 "Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"لا يتم حفظ كلمات المرور بصورتها الأصلية، لذلك لا يمكنك عرض كلمة مرور "
+"لا يتم حفظ كلمات المرور بصورتها الأصلية، لذلك لا يمكنك عرض كلمة مرور هذا "
 "المستخدم، لكن يمكنك تغييرها باستخدام <a href=\"{}\">هذا النموذج</a>"
 
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
-msgstr "الرجاء إدخال ال%(username)s و كلمة السر الصحيحين."
+msgstr "الرجاء إدخال %(username)s وكلمة السر الصحيحين."
 
 msgid "This account is inactive."
 msgstr "هذا الحساب غير نشط."
@@ -136,6 +137,9 @@ msgstr "عامل العمل"
 msgid "checksum"
 msgstr "تدقيق المجموع"
 
+msgid "block size"
+msgstr "مقاس الكتله (البلوك)"
+
 msgid "name"
 msgstr "الاسم"
 
@@ -158,32 +162,32 @@ msgid "groups"
 msgstr "المجموعات"
 
 msgid "superuser status"
-msgstr "حالة المستخدم الخارق"
+msgstr "حالة المستخدم الفائق"
 
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
-"حدد بأن هذا المستخدم يمتلك كافة الصلاحيات دون الحاجة لتحديدها له تصريحا."
+"يقضي بأن هذا المستخدم يمتلك كافة الصلاحيات دون الحاجة لمنحها له تصريحاً."
 
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
-"المجموعات التي ينتمي إليها هذا المستخدم. ويمكن للمستخدم الحصول على كافة "
-"الأذونات الممنوحة لكل من مجموعاتهم."
+"المجموعات التي ينتمي إليها هذا المستخدم. يحصل المستخدم على كافة الصلاحيات "
+"الممنوحة لكل مجموعة ينتمي إليها."
 
 msgid "user permissions"
 msgstr "صلاحيات المستخدم"
 
 msgid "Specific permissions for this user."
-msgstr "صلاحيات خاصة لهذا المستخدم."
+msgstr "صلاحيات خاصة بهذا المستخدم."
 
 msgid "username"
 msgstr "اسم المستخدم"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "مطلوب. أدخل 150 رمز أو أقل، مكونة من حروف، أرقام، أو (@/./+/-/_) فقط"
+msgstr "مطلوب. 150 رمزاً أو أقل، مكونة من حروف وأرقام و @/./+/-/_ فقط"
 
 msgid "A user with that username already exists."
 msgstr "هناك مستخدم موجود مسبقاً بهذا الاسم."
@@ -201,7 +205,7 @@ msgid "staff status"
 msgstr "حالة الطاقم"
 
 msgid "Designates whether the user can log into this admin site."
-msgstr "يحدد ما إذا كان المستخدم يستطيع الدخول إلى موقع الإدارة هذا."
+msgstr "يحدد ما إذا كان يمكن للمستخدم الدخول إلى موقع الإدارة هذا."
 
 msgid "active"
 msgstr "نشط"
@@ -210,7 +214,7 @@ msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
-"يحدد ما إذا كان المستخدم سيُعامل على أنّه نشط. أزل تحديد ها الخيار بدلاً من حذف "
+"يحدد ما إذا كان المستخدم سيُعامل على أنّه نشط. أزل تحديد هذا الحقل بدلاً من حذف "
 "الحسابات."
 
 msgid "date joined"
@@ -220,7 +224,7 @@ msgid "user"
 msgstr "مستخدم"
 
 msgid "users"
-msgstr "المستخدمين"
+msgstr "المستخدمون"
 
 #, python-format
 msgid ""
@@ -240,7 +244,7 @@ msgstr[3] ""
 msgstr[4] ""
 "كلمة المرور هذه قصيرة جدا. يجب أن تتكون من %(min_length)d حرف على الأقل."
 msgstr[5] ""
-"كلمة المرور هذه قصيرة جدا. يجب أن تتكون من %(min_length)d حرف على الأقل."
+"كلمة المرور هذه قصيرة جداً. يجب أن تتكون من %(min_length)d رمزاً على الأقل."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -251,26 +255,26 @@ msgstr[1] ""
 msgstr[2] "كلمة المرور الخاصة بك يجب أن تتضمن %(min_length)d حرفين على الأقل."
 msgstr[3] "كلمة المرور الخاصة بك يجب أن تتضمن %(min_length)d حروف على الأقل."
 msgstr[4] "كلمة المرور الخاصة بك يجب أن تتضمن %(min_length)d أحرف على الأقل."
-msgstr[5] "كلمة المرور الخاصة بك يجب أن تتضمن %(min_length)d حرف على الأقل."
+msgstr[5] "يجب أن تتكون كلمة المرور من %(min_length)d رمزاً على الأقل."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr "كلمة المرور هذه مشابة جدا لـ %(verbose_name)s."
+msgstr "كلمة المرور مشابهة جداً لـ %(verbose_name)s."
 
 msgid "Your password can’t be too similar to your other personal information."
-msgstr "كلمة المرور لا يمكن أن تكون مشابهة للمعلومات الشخصية الأخرى."
+msgstr "لا يمكن لكلمة المرور أن تكون مشابهة للمعلومات الشخصية الأخرى."
 
 msgid "This password is too common."
-msgstr "كلمة المرور هذه شائعة جدا."
+msgstr "كلمة المرور هذه شائعة جداً."
 
 msgid "Your password can’t be a commonly used password."
-msgstr "كلمة المرور لا يمكن أن تكون سهلة شائعة الاستخدام."
+msgstr "لا يمكن أن تكون كلمة المرور شائعة الاستخدام."
 
 msgid "This password is entirely numeric."
 msgstr "كلمة المرور هذه تتكون من أرقام فقط."
 
 msgid "Your password can’t be entirely numeric."
-msgstr "كلمة المرور لا يمكن أن تحتوي على أرقام فقط."
+msgstr "لا يمكن أن تكون كلمة المرور مكونة من أرقام فقط."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
@@ -280,12 +284,15 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
-"يجب أن يتكون اسم المستخدم من أحرف إنجليزية، أرقام، أو الرموز (@/./+/-/_) فقط."
+"أدخل اسم مستخدم صحيحاً. يمكن أن يتكون اسم المستخدم من أحرف إنجليزية وأرقام و "
+"الرموز @/./+/-/_ فقط."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
-msgstr "يجب أن يتكون اسم المستخدم من حروف، أرقام، أو الرموز (@/./+/-/_) فقط."
+msgstr ""
+"أدخل اسم مستخدم صحيحاً. يمكن أن يتكون اسم المستخدم من حروف وأرقام و الرموز "
+"@/./+/-/_ فقط."
 
 msgid "Logged out"
 msgstr "تم الخروج"
@@ -294,7 +301,7 @@ msgid "Password reset"
 msgstr "إعادة ضبط كلمة المرور"
 
 msgid "Password reset sent"
-msgstr "إعادة ضبط كلمة المرور تم ارسالها"
+msgstr " تم ارسال إعادة ضبط كلمة المرور"
 
 msgid "Enter new password"
 msgstr "أدخل كلمة المرور الجديدة"
@@ -303,7 +310,7 @@ msgid "Password reset unsuccessful"
 msgstr "فشل عملية إعادة تعيين كلمة المرور"
 
 msgid "Password reset complete"
-msgstr "تم إعادة ضبط كلمة المرور بنجاح"
+msgstr "تمت إعادة ضبط كلمة المرور"
 
 msgid "Password change"
 msgstr "تغيير كلمة المرور"

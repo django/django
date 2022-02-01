@@ -6,19 +6,17 @@ from django.utils.deprecation import MiddlewareMixin
 
 
 class SecurityMiddleware(MiddlewareMixin):
-    # RemovedInDjango40Warning: when the deprecation ends, replace with:
-    #   def __init__(self, get_response):
-    def __init__(self, get_response=None):
+    def __init__(self, get_response):
         super().__init__(get_response)
         self.sts_seconds = settings.SECURE_HSTS_SECONDS
         self.sts_include_subdomains = settings.SECURE_HSTS_INCLUDE_SUBDOMAINS
         self.sts_preload = settings.SECURE_HSTS_PRELOAD
         self.content_type_nosniff = settings.SECURE_CONTENT_TYPE_NOSNIFF
-        self.xss_filter = settings.SECURE_BROWSER_XSS_FILTER
         self.redirect = settings.SECURE_SSL_REDIRECT
         self.redirect_host = settings.SECURE_SSL_HOST
         self.redirect_exempt = [re.compile(r) for r in settings.SECURE_REDIRECT_EXEMPT]
         self.referrer_policy = settings.SECURE_REFERRER_POLICY
+        self.cross_origin_opener_policy = settings.SECURE_CROSS_ORIGIN_OPENER_POLICY
 
     def process_request(self, request):
         path = request.path.lstrip("/")
@@ -43,9 +41,6 @@ class SecurityMiddleware(MiddlewareMixin):
         if self.content_type_nosniff:
             response.headers.setdefault('X-Content-Type-Options', 'nosniff')
 
-        if self.xss_filter:
-            response.headers.setdefault('X-XSS-Protection', '1; mode=block')
-
         if self.referrer_policy:
             # Support a comma-separated string or iterable of values to allow
             # fallback.
@@ -54,4 +49,9 @@ class SecurityMiddleware(MiddlewareMixin):
                 if isinstance(self.referrer_policy, str) else self.referrer_policy
             ))
 
+        if self.cross_origin_opener_policy:
+            response.setdefault(
+                'Cross-Origin-Opener-Policy',
+                self.cross_origin_opener_policy,
+            )
         return response

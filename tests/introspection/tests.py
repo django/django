@@ -1,12 +1,10 @@
-from unittest import mock, skipUnless
-
 from django.db import DatabaseError, connection
 from django.db.models import Index
 from django.test import TransactionTestCase, skipUnlessDBFeature
 
 from .models import (
     Article, ArticleReporter, CheckConstraintModel, City, Comment, Country,
-    District, Reporter,
+    District, Reporter, UniqueConstraintConditionModel,
 )
 
 
@@ -152,31 +150,6 @@ class IntrospectionTests(TransactionTestCase):
             editor.add_field(Article, body)
         self.assertEqual(relations, expected_relations)
 
-    @skipUnless(connection.vendor == 'sqlite', "This is an sqlite-specific issue")
-    def test_get_relations_alt_format(self):
-        """
-        With SQLite, foreign keys can be added with different syntaxes and
-        formatting.
-        """
-        create_table_statements = [
-            "CREATE TABLE track(id, art_id INTEGER, FOREIGN KEY(art_id) REFERENCES {}(id));",
-            "CREATE TABLE track(id, art_id INTEGER, FOREIGN KEY (art_id) REFERENCES {}(id));"
-        ]
-        for statement in create_table_statements:
-            with connection.cursor() as cursor:
-                cursor.fetchone = mock.Mock(return_value=[statement.format(Article._meta.db_table), 'table'])
-                relations = connection.introspection.get_relations(cursor, 'mocked_table')
-            self.assertEqual(relations, {'art_id': ('id', Article._meta.db_table)})
-
-    @skipUnlessDBFeature('can_introspect_foreign_keys')
-    def test_get_key_columns(self):
-        with connection.cursor() as cursor:
-            key_columns = connection.introspection.get_key_columns(cursor, Article._meta.db_table)
-        self.assertEqual(set(key_columns), {
-            ('reporter_id', Reporter._meta.db_table, 'id'),
-            ('response_to_id', Article._meta.db_table, 'id'),
-        })
-
     def test_get_primary_key_column(self):
         with connection.cursor() as cursor:
             primary_key_column = connection.introspection.get_primary_key_column(cursor, Article._meta.db_table)
@@ -220,6 +193,19 @@ class IntrospectionTests(TransactionTestCase):
                 self.assertEqual(val['orders'], ['ASC'] * len(val['columns']))
                 indexes_verified += 1
         self.assertEqual(indexes_verified, len(expected_columns))
+
+    @skipUnlessDBFeature('supports_index_column_ordering', 'supports_partial_indexes')
+    def test_get_constraints_unique_indexes_orders(self):
+        with connection.cursor() as cursor:
+            constraints = connection.introspection.get_constraints(
+                cursor,
+                UniqueConstraintConditionModel._meta.db_table,
+            )
+        self.assertIn('cond_name_without_color_uniq', constraints)
+        constraint = constraints['cond_name_without_color_uniq']
+        self.assertIs(constraint['unique'], True)
+        self.assertEqual(constraint['columns'], ['name'])
+        self.assertEqual(constraint['orders'], ['ASC'])
 
     def test_get_constraints(self):
         def assertDetails(details, cols, primary_key=False, unique=False, index=False, check=False, foreign_key=None):

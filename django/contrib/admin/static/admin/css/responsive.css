@@ -28,7 +28,7 @@ input[type="submit"], button {
     }
 
     #content {
-        padding: 20px 30px 30px;
+        padding: 15px 20px 20px;
     }
 
     div.breadcrumbs {
@@ -131,16 +131,12 @@ input[type="submit"], button {
         padding: 15px 0;
     }
 
-    #changelist .actions.selected {
-        border: none;
-    }
-
     #changelist .actions label {
         display: flex;
     }
 
     #changelist .actions select {
-        background: #fff;
+        background: var(--body-bg);
     }
 
     #changelist .actions .button {
@@ -157,7 +153,7 @@ input[type="submit"], button {
     }
 
     #changelist-filter {
-        width: 200px;
+        flex-basis: 200px;
     }
 
     .change-list .filtered .results,
@@ -166,7 +162,7 @@ input[type="submit"], button {
     .filtered .actions,
 
     #changelist .paginator {
-        border-top-color: #eee;
+        border-top-color: var(--hairline-color); /* XXX Is this used at all? */
     }
 
     #changelist .results + .paginator {
@@ -213,11 +209,11 @@ input[type="submit"], button {
     fieldset .fieldBox + .fieldBox {
         margin-top: 10px;
         padding-top: 10px;
-        border-top: 1px solid #eee;
+        border-top: 1px solid var(--hairline-color);
     }
 
     textarea {
-        max-width: 518px;
+        max-width: 100%;
         max-height: 120px;
     }
 
@@ -232,8 +228,24 @@ input[type="submit"], button {
         margin-left: 15px;
     }
 
-    form .aligned ul.radiolist {
+    form .aligned div.radiolist {
         margin-left: 2px;
+    }
+
+    .submit-row {
+        padding: 8px 8px 3px 8px;
+    }
+
+    .submit-row a.deletelink {
+        padding: 10px 7px;
+    }
+
+    .submit-row input.default {
+        margin: 0 0 5px 5px;
+    }
+
+    .button, input[type=submit], input[type=button], .submit-row input, a.button {
+        padding: 7px;
     }
 
     /* Related widget */
@@ -399,11 +411,11 @@ input[type="submit"], button {
     .datetime .timezonewarning {
         display: block;
         font-size: 11px;
-        color: #999;
+        color: var(--body-quiet-color);
     }
 
     .datetimeshortcuts {
-        color: #ccc;
+        color: var(--border-color); /* XXX Redundant, .datetime span also sets #ccc */
     }
 
     .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
@@ -650,12 +662,13 @@ input[type="submit"], button {
         padding-left: 0;
     }
 
-    form .aligned ul.radiolist {
+    form .aligned div.radiolist {
+        margin-top: 5px;
         margin-right: 15px;
         margin-bottom: -3px;
     }
 
-    form .aligned ul.radiolist:not(.inline) li + li {
+    form .aligned div.radiolist:not(.inline) div + div {
         margin-top: 5px;
     }
 
@@ -740,7 +753,7 @@ input[type="submit"], button {
     /* Inlines */
 
     .inline-group[data-inline-type="stacked"] .inline-related {
-        border: 2px solid #eee;
+        border: 1px solid var(--hairline-color);
         border-radius: 4px;
         margin-top: 15px;
         overflow: auto;
@@ -750,16 +763,17 @@ input[type="submit"], button {
         box-sizing: border-box;
     }
 
-    .inline-group[data-inline-type="stacked"] .inline-related + .inline-related {
-        margin-top: 30px;
-    }
-
     .inline-group[data-inline-type="stacked"] .inline-related .module {
         padding: 0 10px;
     }
 
-    .inline-group[data-inline-type="stacked"] .inline-related .module .form-row:last-child {
+    .inline-group[data-inline-type="stacked"] .inline-related .module .form-row {
+        border-top: 1px solid var(--hairline-color);
         border-bottom: none;
+    }
+
+    .inline-group[data-inline-type="stacked"] .inline-related .module .form-row:first-child {
+        border-top: none;
     }
 
     .inline-group[data-inline-type="stacked"] .inline-related h3 {
@@ -791,7 +805,7 @@ input[type="submit"], button {
 
     .inline-group[data-inline-type="stacked"] div.add-row {
         margin-top: 15px;
-        border: 1px solid #eee;
+        border: 1px solid var(--hairline-color);
         border-radius: 4px;
     }
 
@@ -810,7 +824,7 @@ input[type="submit"], button {
     /* Submit row */
 
     .submit-row {
-        padding: 10px 10px 0;
+        padding: 10px 10px 5px;
         margin: 0 0 15px;
         display: flex;
         flex-direction: column;
@@ -961,7 +975,7 @@ input[type="submit"], button {
     }
 
     .timelist a {
-        background: #fff;
+        background: var(--body-bg);
         padding: 4px;
     }
 

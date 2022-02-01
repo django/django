@@ -2,6 +2,7 @@ import collections.abc
 import copy
 import datetime
 import decimal
+import math
 import operator
 import uuid
 import warnings
@@ -183,8 +184,7 @@ class Field(RegisterLookupMixin):
         if not hasattr(self, 'model'):
             return super().__str__()
         model = self.model
-        app = model._meta.app_label
-        return '%s.%s.%s' % (app, model._meta.object_name, self.name)
+        return '%s.%s' % (model._meta.label, self.name)
 
     def __repr__(self):
         """Display the module, class, and name of the field."""
@@ -393,13 +393,13 @@ class Field(RegisterLookupMixin):
         return []
 
     def get_col(self, alias, output_field=None):
-        if output_field is None:
-            output_field = self
-        if alias != self.model._meta.db_table or output_field != self:
-            from django.db.models.expressions import Col
-            return Col(alias, self, output_field)
-        else:
+        if (
+            alias == self.model._meta.db_table and
+            (output_field is None or output_field == self)
+        ):
             return self.cached_col
+        from django.db.models.expressions import Col
+        return Col(alias, self, output_field)
 
     @cached_property
     def cached_col(self):
@@ -420,8 +420,8 @@ class Field(RegisterLookupMixin):
 
          * The name of the field on the model, if contribute_to_class() has
            been run.
-         * The import path of the field, including the class:e.g.
-           django.db.models.IntegerField This should be the most portable
+         * The import path of the field, including the class, e.g.
+           django.db.models.IntegerField. This should be the most portable
            version, so less specific may be better.
          * A list of positional arguments.
          * A dict of keyword arguments.
@@ -542,11 +542,7 @@ class Field(RegisterLookupMixin):
         return NotImplemented
 
     def __hash__(self):
-        return hash((
-            self.creation_counter,
-            self.model._meta.app_label if hasattr(self, 'model') else None,
-            self.model._meta.model_name if hasattr(self, 'model') else None,
-        ))
+        return hash(self.creation_counter)
 
     def __deepcopy__(self, memodict):
         # We don't have to deepcopy very much here, since most things are not
@@ -783,11 +779,7 @@ class Field(RegisterLookupMixin):
         self.model = cls
         cls._meta.add_field(self, private=private_only)
         if self.column:
-            # Don't override classmethods with the descriptor. This means that
-            # if you have a classmethod and a field with the same name, then
-            # such fields can't be deferred (we don't have a check for this).
-            if not getattr(cls, self.attname, None):
-                setattr(cls, self.attname, self.descriptor_class(self))
+            setattr(cls, self.attname, self.descriptor_class(self))
         if self.choices is not None:
             # Don't override a get_FOO_display() method defined explicitly on
             # this class, but don't check methods derived from inheritance, to
@@ -998,6 +990,15 @@ class BooleanField(Field):
             defaults = {'form_class': form_class, 'required': False}
         return super().formfield(**{**defaults, **kwargs})
 
+    def select_format(self, compiler, sql, params):
+        sql, params = super().select_format(compiler, sql, params)
+        # Filters that match everything are handled as empty strings in the
+        # WHERE clause, but in SELECT or GROUP BY list they must use a
+        # predicate that's always True.
+        if sql == '':
+            sql = '1'
+        return sql, params
+
 
 class CharField(Field):
     description = _("String (up to %(max_length)s)")
@@ -1005,7 +1006,8 @@ class CharField(Field):
     def __init__(self, *args, db_collation=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.db_collation = db_collation
-        self.validators.append(validators.MaxLengthValidator(self.max_length))
+        if self.max_length is not None:
+            self.validators.append(validators.MaxLengthValidator(self.max_length))
 
     def check(self, **kwargs):
         databases = kwargs.get('databases') or []
@@ -1108,6 +1110,16 @@ class CommaSeparatedIntegerField(CharField):
     }
 
 
+def _to_naive(value):
+    if timezone.is_aware(value):
+        value = timezone.make_naive(value, timezone.utc)
+    return value
+
+
+def _get_naive_now():
+    return _to_naive(timezone.now())
+
+
 class DateTimeCheckMixin:
 
     def check(self, **kwargs):
@@ -1139,6 +1151,42 @@ class DateTimeCheckMixin:
     def _check_fix_default_value(self):
         return []
 
+    # Concrete subclasses use this in their implementations of
+    # _check_fix_default_value().
+    def _check_if_value_fixed(self, value, now=None):
+        """
+        Check if the given value appears to have been provided as a "fixed"
+        time value, and include a warning in the returned list if it does. The
+        value argument must be a date object or aware/naive datetime object. If
+        now is provided, it must be a naive datetime object.
+        """
+        if now is None:
+            now = _get_naive_now()
+        offset = datetime.timedelta(seconds=10)
+        lower = now - offset
+        upper = now + offset
+        if isinstance(value, datetime.datetime):
+            value = _to_naive(value)
+        else:
+            assert isinstance(value, datetime.date)
+            lower = lower.date()
+            upper = upper.date()
+        if lower <= value <= upper:
+            return [
+                checks.Warning(
+                    'Fixed default value provided.',
+                    hint=(
+                        'It seems you set a fixed date / time / datetime '
+                        'value as default for this field. This may not be '
+                        'what you want. If you want to have the current date '
+                        'as default, use `django.utils.timezone.now`'
+                    ),
+                    obj=self,
+                    id='fields.W161',
+                )
+            ]
+        return []
+
 
 class DateField(DateTimeCheckMixin, Field):
     empty_strings_allowed = False
@@ -1166,37 +1214,16 @@ class DateField(DateTimeCheckMixin, Field):
         if not self.has_default():
             return []
 
-        now = timezone.now()
-        if not timezone.is_naive(now):
-            now = timezone.make_naive(now, timezone.utc)
         value = self.default
         if isinstance(value, datetime.datetime):
-            if not timezone.is_naive(value):
-                value = timezone.make_naive(value, timezone.utc)
-            value = value.date()
+            value = _to_naive(value).date()
         elif isinstance(value, datetime.date):
-            # Nothing to do, as dates don't have tz information
             pass
         else:
             # No explicit date / datetime value -- no checks necessary
             return []
-        offset = datetime.timedelta(days=1)
-        lower = (now - offset).date()
-        upper = (now + offset).date()
-        if lower <= value <= upper:
-            return [
-                checks.Warning(
-                    'Fixed default value provided.',
-                    hint='It seems you set a fixed date / time / datetime '
-                         'value as default for this field. This may not be '
-                         'what you want. If you want to have the current date '
-                         'as default, use `django.utils.timezone.now`',
-                    obj=self,
-                    id='fields.W161',
-                )
-            ]
-
-        return []
+        # At this point, value is a date object.
+        return self._check_if_value_fixed(value)
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
@@ -1306,39 +1333,10 @@ class DateTimeField(DateField):
         if not self.has_default():
             return []
 
-        now = timezone.now()
-        if not timezone.is_naive(now):
-            now = timezone.make_naive(now, timezone.utc)
         value = self.default
-        if isinstance(value, datetime.datetime):
-            second_offset = datetime.timedelta(seconds=10)
-            lower = now - second_offset
-            upper = now + second_offset
-            if timezone.is_aware(value):
-                value = timezone.make_naive(value, timezone.utc)
-        elif isinstance(value, datetime.date):
-            second_offset = datetime.timedelta(seconds=10)
-            lower = now - second_offset
-            lower = datetime.datetime(lower.year, lower.month, lower.day)
-            upper = now + second_offset
-            upper = datetime.datetime(upper.year, upper.month, upper.day)
-            value = datetime.datetime(value.year, value.month, value.day)
-        else:
-            # No explicit date / datetime value -- no checks necessary
-            return []
-        if lower <= value <= upper:
-            return [
-                checks.Warning(
-                    'Fixed default value provided.',
-                    hint='It seems you set a fixed date / time / datetime '
-                         'value as default for this field. This may not be '
-                         'what you want. If you want to have the current date '
-                         'as default, use `django.utils.timezone.now`',
-                    obj=self,
-                    id='fields.W161',
-                )
-            ]
-
+        if isinstance(value, (datetime.datetime, datetime.date)):
+            return self._check_if_value_fixed(value)
+        # No explicit date / datetime value -- no checks necessary.
         return []
 
     def get_internal_type(self):
@@ -1548,6 +1546,12 @@ class DecimalField(Field):
         if value is None:
             return value
         if isinstance(value, float):
+            if math.isnan(value):
+                raise exceptions.ValidationError(
+                    self.error_messages['invalid'],
+                    code='invalid',
+                    params={'value': value},
+                )
             return self.context.create_decimal_from_float(value)
         try:
             return decimal.Decimal(value)
@@ -1864,6 +1868,13 @@ class BigIntegerField(IntegerField):
         })
 
 
+class SmallIntegerField(IntegerField):
+    description = _('Small integer')
+
+    def get_internal_type(self):
+        return 'SmallIntegerField'
+
+
 class IPAddressField(Field):
     empty_strings_allowed = False
     description = _("IPv4 address")
@@ -1981,13 +1992,13 @@ class NullBooleanField(BooleanField):
         'invalid_nullable': _('“%(value)s” value must be either None, True or False.'),
     }
     description = _("Boolean (Either True, False or None)")
-    system_check_deprecated_details = {
+    system_check_removed_details = {
         'msg': (
-            'NullBooleanField is deprecated. Support for it (except in '
-            'historical migrations) will be removed in Django 4.0.'
+            'NullBooleanField is removed except for support in historical '
+            'migrations.'
         ),
         'hint': 'Use BooleanField(null=True) instead.',
-        'id': 'fields.W903',
+        'id': 'fields.E903',
     }
 
     def __init__(self, *args, **kwargs):
@@ -2001,11 +2012,19 @@ class NullBooleanField(BooleanField):
         del kwargs['blank']
         return name, path, args, kwargs
 
-    def get_internal_type(self):
-        return "NullBooleanField"
-
 
 class PositiveIntegerRelDbTypeMixin:
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        if not hasattr(cls, 'integer_field_class'):
+            cls.integer_field_class = next(
+                (
+                    parent
+                    for parent in cls.__mro__[1:]
+                    if issubclass(parent, IntegerField)
+                ),
+                None,
+            )
 
     def rel_db_type(self, connection):
         """
@@ -2019,10 +2038,10 @@ class PositiveIntegerRelDbTypeMixin:
         if connection.features.related_fields_match_type:
             return self.db_type(connection)
         else:
-            return IntegerField().db_type(connection=connection)
+            return self.integer_field_class().db_type(connection=connection)
 
 
-class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField):
+class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField):
     description = _('Positive big integer')
 
     def get_internal_type(self):
@@ -2048,7 +2067,7 @@ class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField):
         })
 
 
-class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField):
+class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField):
     description = _("Positive small integer")
 
     def get_internal_type(self):
@@ -2092,13 +2111,6 @@ class SlugField(CharField):
             'allow_unicode': self.allow_unicode,
             **kwargs,
         })
-
-
-class SmallIntegerField(IntegerField):
-    description = _("Small integer")
-
-    def get_internal_type(self):
-        return "SmallIntegerField"
 
 
 class TextField(Field):
@@ -2191,40 +2203,19 @@ class TimeField(DateTimeCheckMixin, Field):
         if not self.has_default():
             return []
 
-        now = timezone.now()
-        if not timezone.is_naive(now):
-            now = timezone.make_naive(now, timezone.utc)
         value = self.default
         if isinstance(value, datetime.datetime):
-            second_offset = datetime.timedelta(seconds=10)
-            lower = now - second_offset
-            upper = now + second_offset
-            if timezone.is_aware(value):
-                value = timezone.make_naive(value, timezone.utc)
+            now = None
         elif isinstance(value, datetime.time):
-            second_offset = datetime.timedelta(seconds=10)
-            lower = now - second_offset
-            upper = now + second_offset
+            now = _get_naive_now()
+            # This will not use the right date in the race condition where now
+            # is just before the date change and value is just past 0:00.
             value = datetime.datetime.combine(now.date(), value)
-            if timezone.is_aware(value):
-                value = timezone.make_naive(value, timezone.utc).time()
         else:
             # No explicit time / datetime value -- no checks necessary
             return []
-        if lower <= value <= upper:
-            return [
-                checks.Warning(
-                    'Fixed default value provided.',
-                    hint='It seems you set a fixed date / time / datetime '
-                         'value as default for this field. This may not be '
-                         'what you want. If you want to have the current date '
-                         'as default, use `django.utils.timezone.now`',
-                    obj=self,
-                    id='fields.W161',
-                )
-            ]
-
-        return []
+        # At this point, value is a datetime object.
+        return self._check_if_value_fixed(value, now=now)
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
@@ -2478,10 +2469,11 @@ class AutoFieldMixin:
         return value
 
     def contribute_to_class(self, cls, name, **kwargs):
-        assert not cls._meta.auto_field, (
-            "Model %s can't have more than one auto-generated field."
-            % cls._meta.label
-        )
+        if cls._meta.auto_field:
+            raise ValueError(
+                "Model %s can't have more than one auto-generated field."
+                % cls._meta.label
+            )
         super().contribute_to_class(cls, name, **kwargs)
         cls._meta.auto_field = self
 
@@ -2514,7 +2506,7 @@ class AutoFieldMeta(type):
         return isinstance(instance, self._subclasses) or super().__instancecheck__(instance)
 
     def __subclasscheck__(self, subclass):
-        return subclass in self._subclasses or super().__subclasscheck__(subclass)
+        return issubclass(subclass, self._subclasses) or super().__subclasscheck__(subclass)
 
 
 class AutoField(AutoFieldMixin, IntegerField, metaclass=AutoFieldMeta):

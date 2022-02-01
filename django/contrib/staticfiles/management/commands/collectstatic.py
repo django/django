@@ -314,10 +314,6 @@ class Command(BaseCommand):
                 if os.path.lexists(full_path):
                     os.unlink(full_path)
                 os.symlink(source_path, full_path)
-            except AttributeError:
-                import platform
-                raise CommandError("Symlinking is not supported by Python %s." %
-                                   platform.python_version())
             except NotImplementedError:
                 import platform
                 raise CommandError("Symlinking is not supported in this "

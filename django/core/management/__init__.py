@@ -68,7 +68,7 @@ def get_commands():
     if not settings.configured:
         return commands
 
-    for app_config in reversed(list(apps.get_app_configs())):
+    for app_config in reversed(apps.get_app_configs()):
         path = os.path.join(app_config.path, 'management')
         commands.update({name: app_config.name for name in find_commands(path)})
 
@@ -120,7 +120,12 @@ def call_command(command_name, *args, **options):
         for s_opt in parser._actions if s_opt.option_strings
     }
     arg_options = {opt_mapping.get(key, key): value for key, value in options.items()}
-    parse_args = [str(a) for a in args]
+    parse_args = []
+    for arg in args:
+        if isinstance(arg, (list, tuple)):
+            parse_args += map(str, arg)
+        else:
+            parse_args.append(str(arg))
 
     def get_actions(parser):
         # Parser actions and actions from sub-parser choices.
@@ -139,15 +144,25 @@ def call_command(command_name, *args, **options):
     }
     # Any required arguments which are passed in via **options must be passed
     # to parse_args().
-    parse_args += [
-        min(opt.option_strings)
-        if isinstance(opt, (_AppendConstAction, _CountAction, _StoreConstAction))
-        else '{}={}'.format(min(opt.option_strings), arg_options[opt.dest])
-        for opt in parser_actions if (
+    for opt in parser_actions:
+        if (
             opt.dest in options and
             (opt.required or opt in mutually_exclusive_required_options)
-        )
-    ]
+        ):
+            opt_dest_count = sum(v == opt.dest for v in opt_mapping.values())
+            if opt_dest_count > 1:
+                raise TypeError(
+                    f'Cannot pass the dest {opt.dest!r} that matches multiple '
+                    f'arguments via **options.'
+                )
+            parse_args.append(min(opt.option_strings))
+            if isinstance(opt, (_AppendConstAction, _CountAction, _StoreConstAction)):
+                continue
+            value = arg_options[opt.dest]
+            if isinstance(value, (list, tuple)):
+                parse_args += map(str, value)
+            else:
+                parse_args.append(str(value))
     defaults = parser.parse_args(args=parse_args)
     defaults = dict(defaults._get_kwargs(), **arg_options)
     # Raise an error if any unknown options were passed.
@@ -335,7 +350,12 @@ class ManagementUtility:
         # Preprocess options to extract --settings and --pythonpath.
         # These options could affect the commands that are available, so they
         # must be processed early.
-        parser = CommandParser(usage='%(prog)s subcommand [options] [args]', add_help=False, allow_abbrev=False)
+        parser = CommandParser(
+            prog=self.prog_name,
+            usage='%(prog)s subcommand [options] [args]',
+            add_help=False,
+            allow_abbrev=False,
+        )
         parser.add_argument('--settings')
         parser.add_argument('--pythonpath')
         parser.add_argument('args', nargs='*')  # catch-all

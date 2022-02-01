@@ -85,6 +85,21 @@ def post_view(request):
     return HttpResponse(t.render(c))
 
 
+def post_then_get_view(request):
+    """
+    A view that expects a POST request, returns a redirect response
+    to itself providing only a ?success=true querystring,
+    the value of this querystring is then rendered upon GET.
+    """
+    if request.method == 'POST':
+        return HttpResponseRedirect('?success=true')
+
+    t = Template('The value of success is {{ value }}.', name='GET Template')
+    c = Context({'value': request.GET.get('success', 'false')})
+
+    return HttpResponse(t.render(c))
+
+
 def json_view(request):
     """
     A view that expects a request with the header 'application/json' and JSON
@@ -237,8 +252,7 @@ class BaseTestFormSet(BaseFormSet):
             return
 
         emails = []
-        for i in range(0, self.total_form_count()):
-            form = self.forms[i]
+        for form in self.forms:
             email = form.cleaned_data['email']
             if email in emails:
                 raise ValidationError(
@@ -380,6 +394,22 @@ def nesting_exception_view(request):
 
 def django_project_redirect(request):
     return HttpResponseRedirect('https://www.djangoproject.com/')
+
+
+def no_trailing_slash_external_redirect(request):
+    """
+    RFC 2616 3.2.2: A bare domain without any abs_path element should be
+    treated as having the trailing `/`.
+
+    Use https://testserver, rather than an external domain, in order to allow
+    use of follow=True, triggering Client._handle_redirects().
+    """
+    return HttpResponseRedirect('https://testserver')
+
+
+def index_view(request):
+    """Target for no_trailing_slash_external_redirect with follow=True."""
+    return HttpResponse('Hello world')
 
 
 def upload_view(request):

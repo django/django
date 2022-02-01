@@ -2,14 +2,14 @@
 #
 # Translators:
 # Besnik Bleta <besnik@programeshqip.org>, 2011-2012,2015
-# Besnik Bleta <besnik@programeshqip.org>, 2020
+# Besnik Bleta <besnik@programeshqip.org>, 2020-2021
 # Besnik Bleta <besnik@programeshqip.org>, 2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-30 09:11+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-15 13:33+0000\n"
 "Last-Translator: Besnik Bleta <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
@@ -185,6 +185,54 @@ msgstr "Nëntor"
 
 msgid "December"
 msgstr "Dhjetor"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Jan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Shk"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mar"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Pri"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Maj"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Qer"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Kor"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Gus"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Sht"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Tet"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Nën"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Dhje"
 
 msgctxt "one letter Sunday"
 msgid "S"

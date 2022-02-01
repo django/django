@@ -663,6 +663,13 @@ class StreamingHttpResponseTests(SimpleTestCase):
         r = StreamingHttpResponse(iter(['hello', 'world']))
         self.assertEqual(r.getvalue(), b'helloworld')
 
+    def test_repr(self):
+        r = StreamingHttpResponse(iter(['hello', 'café']))
+        self.assertEqual(
+            repr(r),
+            '<StreamingHttpResponse status_code=200, "text/html; charset=utf-8">',
+        )
+
 
 class FileCloseTests(SimpleTestCase):
 
@@ -834,6 +841,10 @@ class HttpResponseHeadersTestCase(SimpleTestCase):
         self.assertNotIn('X-Foo', response.headers)
         # del doesn't raise a KeyError on nonexistent headers.
         del response['X-Foo']
+
+    def test_headers_as_iterable_of_tuple_pairs(self):
+        response = HttpResponse(headers=(('X-Foo', 'bar'),))
+        self.assertEqual(response['X-Foo'], 'bar')
 
     def test_headers_bytestring(self):
         response = HttpResponse()

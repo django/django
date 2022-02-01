@@ -8,8 +8,7 @@ from itertools import cycle as itertools_cycle, groupby
 
 from django.conf import settings
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango40Warning
-from django.utils.html import conditional_escape, format_html
+from django.utils.html import conditional_escape, escape, format_html
 from django.utils.lorem_ipsum import paragraphs, words
 from django.utils.safestring import mark_safe
 
@@ -45,11 +44,15 @@ class AutoEscapeControlNode(Node):
 
 
 class CommentNode(Node):
+    child_nodelists = ()
+
     def render(self, context):
         return ''
 
 
 class CsrfTokenNode(Node):
+    child_nodelists = ()
+
     def render(self, context):
         csrf_token = context.get('csrf_token')
         if csrf_token:
@@ -96,10 +99,13 @@ class CycleNode(Node):
 
 class DebugNode(Node):
     def render(self, context):
+        if not settings.DEBUG:
+            return ''
+
         from pprint import pformat
-        output = [pformat(val) for val in context]
+        output = [escape(pformat(val)) for val in context]
         output.append('\n\n')
-        output.append(pformat(sys.modules))
+        output.append(escape(pformat(sys.modules)))
         return ''.join(output)
 
 
@@ -261,26 +267,6 @@ class IfChangedNode(Node):
             return context.render_context
 
 
-class IfEqualNode(Node):
-    # RemovedInDjango40Warning.
-    child_nodelists = ('nodelist_true', 'nodelist_false')
-
-    def __init__(self, var1, var2, nodelist_true, nodelist_false, negate):
-        self.var1, self.var2 = var1, var2
-        self.nodelist_true, self.nodelist_false = nodelist_true, nodelist_false
-        self.negate = negate
-
-    def __repr__(self):
-        return '<%s>' % self.__class__.__name__
-
-    def render(self, context):
-        val1 = self.var1.resolve(context, ignore_failures=True)
-        val2 = self.var2.resolve(context, ignore_failures=True)
-        if (self.negate and val1 != val2) or (not self.negate and val1 == val2):
-            return self.nodelist_true.render(context)
-        return self.nodelist_false.render(context)
-
-
 class IfNode(Node):
 
     def __init__(self, conditions_nodelists):
@@ -363,6 +349,8 @@ class RegroupNode(Node):
 
 
 class LoadNode(Node):
+    child_nodelists = ()
+
     def render(self, context):
         return ''
 
@@ -421,11 +409,22 @@ class TemplateTagNode(Node):
 
 
 class URLNode(Node):
+    child_nodelists = ()
+
     def __init__(self, view_name, args, kwargs, asvar):
         self.view_name = view_name
         self.args = args
         self.kwargs = kwargs
         self.asvar = asvar
+
+    def __repr__(self):
+        return "<%s view_name='%s' args=%s kwargs=%s as=%s>" % (
+            self.__class__.__qualname__,
+            self.view_name,
+            repr(self.args),
+            repr(self.kwargs),
+            repr(self.asvar),
+        )
 
     def render(self, context):
         from django.urls import NoReverseMatch, reverse
@@ -819,62 +818,6 @@ def do_for(parser, token):
     else:
         nodelist_empty = None
     return ForNode(loopvars, sequence, is_reversed, nodelist_loop, nodelist_empty)
-
-
-def do_ifequal(parser, token, negate):
-    # RemovedInDjango40Warning.
-    bits = list(token.split_contents())
-    if len(bits) != 3:
-        raise TemplateSyntaxError("%r takes two arguments" % bits[0])
-    end_tag = 'end' + bits[0]
-    nodelist_true = parser.parse(('else', end_tag))
-    token = parser.next_token()
-    if token.contents == 'else':
-        nodelist_false = parser.parse((end_tag,))
-        parser.delete_first_token()
-    else:
-        nodelist_false = NodeList()
-    val1 = parser.compile_filter(bits[1])
-    val2 = parser.compile_filter(bits[2])
-    return IfEqualNode(val1, val2, nodelist_true, nodelist_false, negate)
-
-
-@register.tag
-def ifequal(parser, token):
-    """
-    Output the contents of the block if the two arguments equal each other.
-
-    Examples::
-
-        {% ifequal user.id comment.user_id %}
-            ...
-        {% endifequal %}
-
-        {% ifnotequal user.id comment.user_id %}
-            ...
-        {% else %}
-            ...
-        {% endifnotequal %}
-    """
-    warnings.warn(
-        'The {% ifequal %} template tag is deprecated in favor of {% if %}.',
-        RemovedInDjango40Warning,
-    )
-    return do_ifequal(parser, token, False)
-
-
-@register.tag
-def ifnotequal(parser, token):
-    """
-    Output the contents of the block if the two arguments are not equal.
-    See ifequal.
-    """
-    warnings.warn(
-        'The {% ifnotequal %} template tag is deprecated in favor of '
-        '{% if %}.',
-        RemovedInDjango40Warning,
-    )
-    return do_ifequal(parser, token, True)
 
 
 class TemplateLiteral(Literal):

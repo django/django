@@ -4,7 +4,10 @@ import re
 from datetime import datetime, timedelta
 from importlib import import_module
 
-import pytz
+try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo
 
 from django import forms
 from django.conf import settings
@@ -23,8 +26,8 @@ from django.utils import translation
 
 from .models import (
     Advisor, Album, Band, Bee, Car, Company, Event, Honeycomb, Individual,
-    Inventory, Member, MyFileField, Profile, School, Student,
-    UnsafeLimitChoicesTo,
+    Inventory, Member, MyFileField, Profile, ReleaseEvent, School, Student,
+    UnsafeLimitChoicesTo, VideoStream,
 )
 from .widgetadmin import site as widget_admin_site
 
@@ -338,7 +341,7 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
     def test_localization(self):
         w = widgets.AdminSplitDateTime()
 
-        with self.settings(USE_L10N=True), translation.override('de-at'):
+        with translation.override('de-at'):
             w.is_localized = True
             self.assertHTMLEqual(
                 w.render('test', datetime(2007, 12, 1, 9, 30)),
@@ -535,17 +538,25 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         band.album_set.create(
             name='Hybrid Theory', cover_art=r'albums\hybrid_theory.jpg'
         )
-        rel = Album._meta.get_field('band').remote_field
-
-        w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
+        rel_uuid = Album._meta.get_field('band').remote_field
+        w = widgets.ForeignKeyRawIdWidget(rel_uuid, widget_admin_site)
         self.assertHTMLEqual(
-            w.render('test', band.pk, attrs={}),
-            '<input type="text" name="test" value="%(bandpk)s" '
-            'class="vForeignKeyRawIdAdminField">'
-            '<a href="/admin_widgets/band/?_to_field=id" class="related-lookup" '
+            w.render('test', band.uuid, attrs={}),
+            '<input type="text" name="test" value="%(banduuid)s" '
+            'class="vForeignKeyRawIdAdminField vUUIDField">'
+            '<a href="/admin_widgets/band/?_to_field=uuid" class="related-lookup" '
             'id="lookup_id_test" title="Lookup"></a>&nbsp;<strong>'
             '<a href="/admin_widgets/band/%(bandpk)s/change/">Linkin Park</a>'
-            '</strong>' % {'bandpk': band.pk}
+            '</strong>' % {'banduuid': band.uuid, 'bandpk': band.pk}
+        )
+
+        rel_id = ReleaseEvent._meta.get_field('album').remote_field
+        w = widgets.ForeignKeyRawIdWidget(rel_id, widget_admin_site)
+        self.assertHTMLEqual(
+            w.render('test', None, attrs={}),
+            '<input type="text" name="test" class="vForeignKeyRawIdAdminField">'
+            '<a href="/admin_widgets/album/?_to_field=id" class="related-lookup" '
+            'id="lookup_id_test" title="Lookup"></a>',
         )
 
     def test_relations_to_non_primary_key(self):
@@ -624,7 +635,17 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         self.assertHTMLEqual(
             w.render('test', None),
             '<input type="text" name="test" class="vForeignKeyRawIdAdminField">\n'
-            '<a href="/admin_widgets/band/?name=%22%26%3E%3Cescapeme&amp;_to_field=id" '
+            '<a href="/admin_widgets/band/?name=%22%26%3E%3Cescapeme&amp;_to_field=artist_ptr" '
+            'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
+        )
+
+    def test_render_fk_as_pk_model(self):
+        rel = VideoStream._meta.get_field('release_event').remote_field
+        w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
+        self.assertHTMLEqual(
+            w.render('test', None),
+            '<input type="text" name="test" class="vForeignKeyRawIdAdminField">\n'
+            '<a href="/admin_widgets/releaseevent/?_to_field=album" '
             'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
         )
 
@@ -776,6 +797,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         Pressing the ESC key or clicking on a widget value closes the date and
         time picker widgets.
         """
+        from selenium.webdriver.common.by import By
         from selenium.webdriver.common.keys import Keys
 
         self.admin_login(username='super', password='secret', login_url='/')
@@ -783,51 +805,51 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         self.selenium.get(self.live_server_url + reverse('admin:admin_widgets_member_add'))
 
         # First, with the date picker widget ---------------------------------
-        cal_icon = self.selenium.find_element_by_id('calendarlink0')
+        cal_icon = self.selenium.find_element(By.ID, 'calendarlink0')
         # The date picker is hidden
-        self.assertFalse(self.selenium.find_element_by_id('calendarbox0').is_displayed())
+        self.assertFalse(self.selenium.find_element(By.ID, 'calendarbox0').is_displayed())
         # Click the calendar icon
         cal_icon.click()
         # The date picker is visible
-        self.assertTrue(self.selenium.find_element_by_id('calendarbox0').is_displayed())
+        self.assertTrue(self.selenium.find_element(By.ID, 'calendarbox0').is_displayed())
         # Press the ESC key
-        self.selenium.find_element_by_tag_name('body').send_keys([Keys.ESCAPE])
+        self.selenium.find_element(By.TAG_NAME, 'body').send_keys([Keys.ESCAPE])
         # The date picker is hidden again
-        self.assertFalse(self.selenium.find_element_by_id('calendarbox0').is_displayed())
+        self.assertFalse(self.selenium.find_element(By.ID, 'calendarbox0').is_displayed())
         # Click the calendar icon, then on the 15th of current month
         cal_icon.click()
-        self.selenium.find_element_by_xpath("//a[contains(text(), '15')]").click()
-        self.assertFalse(self.selenium.find_element_by_id('calendarbox0').is_displayed())
+        self.selenium.find_element(By.XPATH, "//a[contains(text(), '15')]").click()
+        self.assertFalse(self.selenium.find_element(By.ID, 'calendarbox0').is_displayed())
         self.assertEqual(
-            self.selenium.find_element_by_id('id_birthdate_0').get_attribute('value'),
+            self.selenium.find_element(By.ID, 'id_birthdate_0').get_attribute('value'),
             datetime.today().strftime('%Y-%m-') + '15',
         )
 
         # Then, with the time picker widget ----------------------------------
-        time_icon = self.selenium.find_element_by_id('clocklink0')
+        time_icon = self.selenium.find_element(By.ID, 'clocklink0')
         # The time picker is hidden
-        self.assertFalse(self.selenium.find_element_by_id('clockbox0').is_displayed())
+        self.assertFalse(self.selenium.find_element(By.ID, 'clockbox0').is_displayed())
         # Click the time icon
         time_icon.click()
         # The time picker is visible
-        self.assertTrue(self.selenium.find_element_by_id('clockbox0').is_displayed())
+        self.assertTrue(self.selenium.find_element(By.ID, 'clockbox0').is_displayed())
         self.assertEqual(
             [
                 x.text for x in
-                self.selenium.find_elements_by_xpath("//ul[@class='timelist']/li/a")
+                self.selenium.find_elements(By.XPATH, "//ul[@class='timelist']/li/a")
             ],
             ['Now', 'Midnight', '6 a.m.', 'Noon', '6 p.m.']
         )
         # Press the ESC key
-        self.selenium.find_element_by_tag_name('body').send_keys([Keys.ESCAPE])
+        self.selenium.find_element(By.TAG_NAME, 'body').send_keys([Keys.ESCAPE])
         # The time picker is hidden again
-        self.assertFalse(self.selenium.find_element_by_id('clockbox0').is_displayed())
+        self.assertFalse(self.selenium.find_element(By.ID, 'clockbox0').is_displayed())
         # Click the time icon, then select the 'Noon' value
         time_icon.click()
-        self.selenium.find_element_by_xpath("//a[contains(text(), 'Noon')]").click()
-        self.assertFalse(self.selenium.find_element_by_id('clockbox0').is_displayed())
+        self.selenium.find_element(By.XPATH, "//a[contains(text(), 'Noon')]").click()
+        self.assertFalse(self.selenium.find_element(By.ID, 'clockbox0').is_displayed())
         self.assertEqual(
-            self.selenium.find_element_by_id('id_birthdate_1').get_attribute('value'),
+            self.selenium.find_element(By.ID, 'id_birthdate_1').get_attribute('value'),
             '12:00:00',
         )
 
@@ -836,19 +858,20 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         Ensure cells that are not days of the month have the `nonday` CSS class.
         Refs #4574.
         """
+        from selenium.webdriver.common.by import By
         self.admin_login(username='super', password='secret', login_url='/')
         # Open a page that has a date and time picker widgets
         self.selenium.get(self.live_server_url + reverse('admin:admin_widgets_member_add'))
 
         # fill in the birth date.
-        self.selenium.find_element_by_id('id_birthdate_0').send_keys('2013-06-01')
+        self.selenium.find_element(By.ID, 'id_birthdate_0').send_keys('2013-06-01')
 
         # Click the calendar icon
-        self.selenium.find_element_by_id('calendarlink0').click()
+        self.selenium.find_element(By.ID, 'calendarlink0').click()
 
         # get all the tds within the calendar
-        calendar0 = self.selenium.find_element_by_id('calendarin0')
-        tds = calendar0.find_elements_by_tag_name('td')
+        calendar0 = self.selenium.find_element(By.ID, 'calendarin0')
+        tds = calendar0.find_elements(By.TAG_NAME, 'td')
 
         # make sure the first and last 6 cells have class nonday
         for td in tds[:6] + tds[-6:]:
@@ -859,19 +882,20 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         Ensure cell for the day in the input has the `selected` CSS class.
         Refs #4574.
         """
+        from selenium.webdriver.common.by import By
         self.admin_login(username='super', password='secret', login_url='/')
         # Open a page that has a date and time picker widgets
         self.selenium.get(self.live_server_url + reverse('admin:admin_widgets_member_add'))
 
         # fill in the birth date.
-        self.selenium.find_element_by_id('id_birthdate_0').send_keys('2013-06-01')
+        self.selenium.find_element(By.ID, 'id_birthdate_0').send_keys('2013-06-01')
 
         # Click the calendar icon
-        self.selenium.find_element_by_id('calendarlink0').click()
+        self.selenium.find_element(By.ID, 'calendarlink0').click()
 
         # get all the tds within the calendar
-        calendar0 = self.selenium.find_element_by_id('calendarin0')
-        tds = calendar0.find_elements_by_tag_name('td')
+        calendar0 = self.selenium.find_element(By.ID, 'calendarin0')
+        tds = calendar0.find_elements(By.TAG_NAME, 'td')
 
         # verify the selected cell
         selected = tds[6]
@@ -884,16 +908,17 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         Ensure no cells are given the selected class when the field is empty.
         Refs #4574.
         """
+        from selenium.webdriver.common.by import By
         self.admin_login(username='super', password='secret', login_url='/')
         # Open a page that has a date and time picker widgets
         self.selenium.get(self.live_server_url + reverse('admin:admin_widgets_member_add'))
 
         # Click the calendar icon
-        self.selenium.find_element_by_id('calendarlink0').click()
+        self.selenium.find_element(By.ID, 'calendarlink0').click()
 
         # get all the tds within the calendar
-        calendar0 = self.selenium.find_element_by_id('calendarin0')
-        tds = calendar0.find_elements_by_tag_name('td')
+        calendar0 = self.selenium.find_element(By.ID, 'calendarin0')
+        tds = calendar0.find_elements(By.TAG_NAME, 'td')
 
         # verify there are no cells with the selected class
         selected = [td for td in tds if td.get_attribute('class') == 'selected']
@@ -905,6 +930,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         The calendar shows the date from the input field for every locale
         supported by Django.
         """
+        from selenium.webdriver.common.by import By
         self.selenium.set_window_size(1024, 768)
         self.admin_login(username='super', password='secret', login_url='/')
 
@@ -929,13 +955,13 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
             expected_caption = '{:s} {:d}'.format(may_translation.upper(), 1984)
 
             # Test with every locale
-            with override_settings(LANGUAGE_CODE=language_code, USE_L10N=True):
+            with override_settings(LANGUAGE_CODE=language_code):
 
                 # Open a page that has a date picker widget
                 url = reverse('admin:admin_widgets_member_change', args=(member.pk,))
                 self.selenium.get(self.live_server_url + url)
                 # Click on the calendar icon
-                self.selenium.find_element_by_id('calendarlink0').click()
+                self.selenium.find_element(By.ID, 'calendarlink0').click()
                 # Make sure that the right month and year are displayed
                 self.wait_for_text('#calendarin0 caption', expected_caption)
 
@@ -952,13 +978,14 @@ class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
         in the default time zone "America/Chicago" despite `override_settings` changing
         the time zone to "Asia/Singapore".
         """
+        from selenium.webdriver.common.by import By
         self.admin_login(username='super', password='secret', login_url='/')
 
         error_margin = timedelta(seconds=10)
 
         # If we are neighbouring a DST, we add an hour of error margin.
-        tz = pytz.timezone('America/Chicago')
-        utc_now = datetime.now(pytz.utc)
+        tz = zoneinfo.ZoneInfo('America/Chicago')
+        utc_now = datetime.now(zoneinfo.ZoneInfo('UTC'))
         tz_yesterday = (utc_now - timedelta(days=1)).astimezone(tz).tzname()
         tz_tomorrow = (utc_now + timedelta(days=1)).astimezone(tz).tzname()
         if tz_yesterday != tz_tomorrow:
@@ -966,26 +993,26 @@ class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
 
         self.selenium.get(self.live_server_url + reverse('admin:admin_widgets_member_add'))
 
-        self.selenium.find_element_by_id('id_name').send_keys('test')
+        self.selenium.find_element(By.ID, 'id_name').send_keys('test')
 
         # Click on the "today" and "now" shortcuts.
-        shortcuts = self.selenium.find_elements_by_css_selector('.field-birthdate .datetimeshortcuts')
+        shortcuts = self.selenium.find_elements(By.CSS_SELECTOR, '.field-birthdate .datetimeshortcuts')
 
         now = datetime.now()
         for shortcut in shortcuts:
-            shortcut.find_element_by_tag_name('a').click()
+            shortcut.find_element(By.TAG_NAME, 'a').click()
 
         # There is a time zone mismatch warning.
         # Warning: This would effectively fail if the TIME_ZONE defined in the
         # settings has the same UTC offset as "Asia/Singapore" because the
         # mismatch warning would be rightfully missing from the page.
-        self.selenium.find_elements_by_css_selector('.field-birthdate .timezonewarning')
+        self.assertCountSeleniumElements('.field-birthdate .timezonewarning', 1)
 
         # Submit the form.
         with self.wait_page_loaded():
-            self.selenium.find_element_by_name('_save').click()
+            self.selenium.find_element(By.NAME, '_save').click()
 
-        # Make sure that "now" in javascript is within 10 seconds
+        # Make sure that "now" in JavaScript is within 10 seconds
         # from "now" on the server side.
         member = Member.objects.get(name='test')
         self.assertGreater(member.birthdate, now - error_margin)
@@ -1025,6 +1052,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             self.assertEqual(self.has_css_class(remove_all_link, 'active'), remove_all)
 
     def execute_basic_operations(self, mode, field_name):
+        from selenium.webdriver.common.by import By
         original_url = self.selenium.current_url
 
         from_box = '#id_%s_from' % field_name
@@ -1045,13 +1073,13 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
         # Click 'Choose all' --------------------------------------------------
         if mode == 'horizontal':
-            self.selenium.find_element_by_id(choose_all_link).click()
+            self.selenium.find_element(By.ID, choose_all_link).click()
         elif mode == 'vertical':
             # There 's no 'Choose all' button in vertical mode, so individually
             # select all options and click 'Choose'.
-            for option in self.selenium.find_elements_by_css_selector(from_box + ' > option'):
+            for option in self.selenium.find_elements(By.CSS_SELECTOR, from_box + ' > option'):
                 option.click()
-            self.selenium.find_element_by_id(choose_link).click()
+            self.selenium.find_element(By.ID, choose_link).click()
         self.assertSelectOptions(from_box, [])
         self.assertSelectOptions(to_box, [
             str(self.lisa.id), str(self.peter.id),
@@ -1063,13 +1091,13 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
         # Click 'Remove all' --------------------------------------------------
         if mode == 'horizontal':
-            self.selenium.find_element_by_id(remove_all_link).click()
+            self.selenium.find_element(By.ID, remove_all_link).click()
         elif mode == 'vertical':
             # There 's no 'Remove all' button in vertical mode, so individually
             # select all options and click 'Remove'.
-            for option in self.selenium.find_elements_by_css_selector(to_box + ' > option'):
+            for option in self.selenium.find_elements(By.CSS_SELECTOR, to_box + ' > option'):
                 option.click()
-            self.selenium.find_element_by_id(remove_link).click()
+            self.selenium.find_element(By.ID, remove_link).click()
         self.assertSelectOptions(from_box, [
             str(self.lisa.id), str(self.peter.id),
             str(self.arthur.id), str(self.bob.id),
@@ -1080,7 +1108,8 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertActiveButtons(mode, field_name, False, False, True, False)
 
         # Choose some options ------------------------------------------------
-        from_lisa_select_option = self.selenium.find_element_by_css_selector(
+        from_lisa_select_option = self.selenium.find_element(
+            By.CSS_SELECTOR,
             '{} > option[value="{}"]'.format(from_box, self.lisa.id)
         )
 
@@ -1092,7 +1121,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.select_option(from_box, str(self.bob.id))
         self.select_option(from_box, str(self.john.id))
         self.assertActiveButtons(mode, field_name, True, False, True, False)
-        self.selenium.find_element_by_id(choose_link).click()
+        self.selenium.find_element(By.ID, choose_link).click()
         self.assertActiveButtons(mode, field_name, False, False, True, True)
 
         self.assertSelectOptions(from_box, [
@@ -1105,7 +1134,8 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         ])
 
         # Check the tooltip is still there after moving: ticket #20821
-        to_lisa_select_option = self.selenium.find_element_by_css_selector(
+        to_lisa_select_option = self.selenium.find_element(
+            By.CSS_SELECTOR,
             '{} > option[value="{}"]'.format(to_box, self.lisa.id)
         )
         self.assertEqual(to_lisa_select_option.get_attribute('title'), to_lisa_select_option.get_attribute('text'))
@@ -1114,7 +1144,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.select_option(to_box, str(self.lisa.id))
         self.select_option(to_box, str(self.bob.id))
         self.assertActiveButtons(mode, field_name, False, True, True, True)
-        self.selenium.find_element_by_id(remove_link).click()
+        self.selenium.find_element(By.ID, remove_link).click()
         self.assertActiveButtons(mode, field_name, False, False, True, True)
 
         self.assertSelectOptions(from_box, [
@@ -1127,7 +1157,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         # Choose some more options --------------------------------------------
         self.select_option(from_box, str(self.arthur.id))
         self.select_option(from_box, str(self.cliff.id))
-        self.selenium.find_element_by_id(choose_link).click()
+        self.selenium.find_element(By.ID, choose_link).click()
 
         self.assertSelectOptions(from_box, [
             str(self.peter.id), str(self.jenny.id),
@@ -1144,7 +1174,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
         # Confirm they're selected after clicking inactive buttons: ticket #26575
         self.assertSelectedOptions(from_box, [str(self.peter.id), str(self.lisa.id)])
-        self.selenium.find_element_by_id(remove_link).click()
+        self.selenium.find_element(By.ID, remove_link).click()
         self.assertSelectedOptions(from_box, [str(self.peter.id), str(self.lisa.id)])
 
         # Unselect the options ------------------------------------------------
@@ -1157,7 +1187,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
         # Confirm they're selected after clicking inactive buttons: ticket #26575
         self.assertSelectedOptions(to_box, [str(self.jason.id), str(self.john.id)])
-        self.selenium.find_element_by_id(choose_link).click()
+        self.selenium.find_element(By.ID, choose_link).click()
         self.assertSelectedOptions(to_box, [str(self.jason.id), str(self.john.id)])
 
         # Unselect the options ------------------------------------------------
@@ -1168,6 +1198,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertEqual(self.selenium.current_url, original_url)
 
     def test_basic(self):
+        from selenium.webdriver.common.by import By
         self.selenium.set_window_size(1024, 768)
         self.school.students.set([self.lisa, self.peter])
         self.school.alumni.set([self.lisa, self.peter])
@@ -1180,7 +1211,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.execute_basic_operations('horizontal', 'alumni')
 
         # Save and check that everything is properly stored in the database ---
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
         self.wait_page_ready()
         self.school = School.objects.get(id=self.school.id)  # Reload from database
         self.assertEqual(list(self.school.students.all()), [self.arthur, self.cliff, self.jason, self.john])
@@ -1191,6 +1222,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         Typing in the search box filters out options displayed in the 'from'
         box.
         """
+        from selenium.webdriver.common.by import By
         from selenium.webdriver.common.keys import Keys
 
         self.selenium.set_window_size(1024, 768)
@@ -1205,7 +1237,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             to_box = '#id_%s_to' % field_name
             choose_link = 'id_%s_add_link' % field_name
             remove_link = 'id_%s_remove_link' % field_name
-            input = self.selenium.find_element_by_id('id_%s_input' % field_name)
+            input = self.selenium.find_element(By.ID, 'id_%s_input' % field_name)
 
             # Initial values
             self.assertSelectOptions(from_box, [
@@ -1235,14 +1267,14 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             input.send_keys('a')
             self.assertSelectOptions(from_box, [str(self.arthur.id), str(self.jason.id)])
             self.select_option(from_box, str(self.jason.id))
-            self.selenium.find_element_by_id(choose_link).click()
+            self.selenium.find_element(By.ID, choose_link).click()
             self.assertSelectOptions(from_box, [str(self.arthur.id)])
             self.assertSelectOptions(to_box, [
                 str(self.lisa.id), str(self.peter.id), str(self.jason.id),
             ])
 
             self.select_option(to_box, str(self.lisa.id))
-            self.selenium.find_element_by_id(remove_link).click()
+            self.selenium.find_element(By.ID, remove_link).click()
             self.assertSelectOptions(from_box, [str(self.arthur.id), str(self.lisa.id)])
             self.assertSelectOptions(to_box, [str(self.peter.id), str(self.jason.id)])
 
@@ -1258,7 +1290,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             # Pressing enter on a filtered option sends it properly to
             # the 'to' box.
             self.select_option(to_box, str(self.jason.id))
-            self.selenium.find_element_by_id(remove_link).click()
+            self.selenium.find_element(By.ID, remove_link).click()
             input.send_keys('ja')
             self.assertSelectOptions(from_box, [str(self.jason.id)])
             input.send_keys([Keys.ENTER])
@@ -1267,7 +1299,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
         # Save and check that everything is properly stored in the database ---
         with self.wait_page_loaded():
-            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+            self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
         self.school = School.objects.get(id=self.school.id)  # Reload from database
         self.assertEqual(list(self.school.students.all()), [self.jason, self.peter])
         self.assertEqual(list(self.school.alumni.all()), [self.jason, self.peter])
@@ -1278,13 +1310,14 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         and then clicking the browser's back button would clear the
         filter_horizontal/filter_vertical widgets (#13614).
         """
+        from selenium.webdriver.common.by import By
         self.school.students.set([self.lisa, self.peter])
         self.school.alumni.set([self.lisa, self.peter])
         self.admin_login(username='super', password='secret', login_url='/')
         change_url = reverse('admin:admin_widgets_school_change', args=(self.school.id,))
         self.selenium.get(self.live_server_url + change_url)
         # Navigate away and go back to the change form page.
-        self.selenium.find_element_by_link_text('Home').click()
+        self.selenium.find_element(By.LINK_TEXT, 'Home').click()
         self.selenium.back()
         expected_unselected_values = [
             str(self.arthur.id), str(self.bob.id), str(self.cliff.id),
@@ -1309,8 +1342,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         change_url = reverse('admin:admin_widgets_school_change', args=(self.school.id,))
         self.selenium.get(self.live_server_url + change_url)
 
-        options_len = len(self.selenium.find_elements_by_css_selector('#id_students_to > option'))
-        self.assertEqual(options_len, 2)
+        self.assertCountSeleniumElements('#id_students_to > option', 2)
 
         # self.selenium.refresh() or send_keys(Keys.F5) does hard reload and
         # doesn't replicate what happens when a user clicks the browser's
@@ -1318,8 +1350,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         with self.wait_page_loaded():
             self.selenium.execute_script("location.reload()")
 
-        options_len = len(self.selenium.find_elements_by_css_selector('#id_students_to > option'))
-        self.assertEqual(options_len, 2)
+        self.assertCountSeleniumElements('#id_students_to > option', 2)
 
 
 class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
@@ -1330,17 +1361,18 @@ class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         Band.objects.create(id=98, name='Green Potatoes')
 
     def test_ForeignKey(self):
+        from selenium.webdriver.common.by import By
         self.admin_login(username='super', password='secret', login_url='/')
         self.selenium.get(self.live_server_url + reverse('admin:admin_widgets_event_add'))
         main_window = self.selenium.current_window_handle
 
         # No value has been selected yet
-        self.assertEqual(self.selenium.find_element_by_id('id_main_band').get_attribute('value'), '')
+        self.assertEqual(self.selenium.find_element(By.ID, 'id_main_band').get_attribute('value'), '')
 
         # Open the popup window and click on a band
-        self.selenium.find_element_by_id('lookup_id_main_band').click()
+        self.selenium.find_element(By.ID, 'lookup_id_main_band').click()
         self.wait_for_and_switch_to_popup()
-        link = self.selenium.find_element_by_link_text('Bogey Blues')
+        link = self.selenium.find_element(By.LINK_TEXT, 'Bogey Blues')
         self.assertIn('/band/42/', link.get_attribute('href'))
         link.click()
 
@@ -1349,9 +1381,9 @@ class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         self.wait_for_value('#id_main_band', '42')
 
         # Reopen the popup window and click on another band
-        self.selenium.find_element_by_id('lookup_id_main_band').click()
+        self.selenium.find_element(By.ID, 'lookup_id_main_band').click()
         self.wait_for_and_switch_to_popup()
-        link = self.selenium.find_element_by_link_text('Green Potatoes')
+        link = self.selenium.find_element(By.LINK_TEXT, 'Green Potatoes')
         self.assertIn('/band/98/', link.get_attribute('href'))
         link.click()
 
@@ -1360,23 +1392,24 @@ class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         self.wait_for_value('#id_main_band', '98')
 
     def test_many_to_many(self):
+        from selenium.webdriver.common.by import By
         self.admin_login(username='super', password='secret', login_url='/')
         self.selenium.get(self.live_server_url + reverse('admin:admin_widgets_event_add'))
         main_window = self.selenium.current_window_handle
 
         # No value has been selected yet
-        self.assertEqual(self.selenium.find_element_by_id('id_supporting_bands').get_attribute('value'), '')
+        self.assertEqual(self.selenium.find_element(By.ID, 'id_supporting_bands').get_attribute('value'), '')
 
         # Help text for the field is displayed
         self.assertEqual(
-            self.selenium.find_element_by_css_selector('.field-supporting_bands div.help').text,
+            self.selenium.find_element(By.CSS_SELECTOR, '.field-supporting_bands div.help').text,
             'Supporting Bands.'
         )
 
         # Open the popup window and click on a band
-        self.selenium.find_element_by_id('lookup_id_supporting_bands').click()
+        self.selenium.find_element(By.ID, 'lookup_id_supporting_bands').click()
         self.wait_for_and_switch_to_popup()
-        link = self.selenium.find_element_by_link_text('Bogey Blues')
+        link = self.selenium.find_element(By.LINK_TEXT, 'Bogey Blues')
         self.assertIn('/band/42/', link.get_attribute('href'))
         link.click()
 
@@ -1385,9 +1418,9 @@ class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         self.wait_for_value('#id_supporting_bands', '42')
 
         # Reopen the popup window and click on another band
-        self.selenium.find_element_by_id('lookup_id_supporting_bands').click()
+        self.selenium.find_element(By.ID, 'lookup_id_supporting_bands').click()
         self.wait_for_and_switch_to_popup()
-        link = self.selenium.find_element_by_link_text('Green Potatoes')
+        link = self.selenium.find_element(By.LINK_TEXT, 'Green Potatoes')
         self.assertIn('/band/98/', link.get_attribute('href'))
         link.click()
 
@@ -1399,42 +1432,43 @@ class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 
     def test_ForeignKey_using_to_field(self):
+        from selenium.webdriver.common.by import By
         self.admin_login(username='super', password='secret', login_url='/')
         self.selenium.get(self.live_server_url + reverse('admin:admin_widgets_profile_add'))
 
         main_window = self.selenium.current_window_handle
         # Click the Add User button to add new
-        self.selenium.find_element_by_id('add_id_user').click()
+        self.selenium.find_element(By.ID, 'add_id_user').click()
         self.wait_for_and_switch_to_popup()
-        password_field = self.selenium.find_element_by_id('id_password')
+        password_field = self.selenium.find_element(By.ID, 'id_password')
         password_field.send_keys('password')
 
-        username_field = self.selenium.find_element_by_id('id_username')
+        username_field = self.selenium.find_element(By.ID, 'id_username')
         username_value = 'newuser'
         username_field.send_keys(username_value)
 
         save_button_css_selector = '.submit-row > input[type=submit]'
-        self.selenium.find_element_by_css_selector(save_button_css_selector).click()
+        self.selenium.find_element(By.CSS_SELECTOR, save_button_css_selector).click()
         self.selenium.switch_to.window(main_window)
         # The field now contains the new user
-        self.selenium.find_element_by_css_selector('#id_user option[value=newuser]')
+        self.selenium.find_element(By.CSS_SELECTOR, '#id_user option[value=newuser]')
 
         # Click the Change User button to change it
-        self.selenium.find_element_by_id('change_id_user').click()
+        self.selenium.find_element(By.ID, 'change_id_user').click()
         self.wait_for_and_switch_to_popup()
 
-        username_field = self.selenium.find_element_by_id('id_username')
+        username_field = self.selenium.find_element(By.ID, 'id_username')
         username_value = 'changednewuser'
         username_field.clear()
         username_field.send_keys(username_value)
 
         save_button_css_selector = '.submit-row > input[type=submit]'
-        self.selenium.find_element_by_css_selector(save_button_css_selector).click()
+        self.selenium.find_element(By.CSS_SELECTOR, save_button_css_selector).click()
         self.selenium.switch_to.window(main_window)
-        self.selenium.find_element_by_css_selector('#id_user option[value=changednewuser]')
+        self.selenium.find_element(By.CSS_SELECTOR, '#id_user option[value=changednewuser]')
 
         # Go ahead and submit the form to make sure it works
-        self.selenium.find_element_by_css_selector(save_button_css_selector).click()
+        self.selenium.find_element(By.CSS_SELECTOR, save_button_css_selector).click()
         self.wait_for_text('li.success', 'The profile “changednewuser” was added successfully.')
         profiles = Profile.objects.all()
         self.assertEqual(len(profiles), 1)

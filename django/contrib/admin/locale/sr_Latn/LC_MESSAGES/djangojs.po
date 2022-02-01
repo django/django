@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Igor Jerosimić, 2019
+# Igor Jerosimić, 2019,2021
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2019-06-27 19:12+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-15 17:00+0000\n"
 "Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
 "language/sr@latin/)\n"
@@ -84,16 +84,21 @@ msgstr ""
 "Imate nesačivane izmene. Ako pokrenete akciju, izmene će biti izgubljene."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
-msgstr "Izabrali ste akciju ali niste sačuvali promene polja."
+msgstr ""
+"Izabrali ste akciju, ali niste sačuvali vaše promene u pojedinačna polja. "
+"Kliknite na OK da sačuvate promene. Biće neophodno da ponovo pokrenete "
+"akciju."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
-msgstr "Izabrali ste akciju ali niste izmenili ni jedno polje."
+msgstr ""
+"Izabrali ste akciju i niste napravili nijednu promenu na pojedinačnim "
+"poljima. Verovatno tražite Kreni dugme umesto Sačuvaj."
 
 msgid "Now"
 msgstr "Trenutno vreme"
@@ -180,6 +185,54 @@ msgstr "Novembar"
 
 msgid "December"
 msgstr "Decembar"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "jan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "feb"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "mart"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "maj"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "jun"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "jul"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "avg"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "sep"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "dec"
 
 msgctxt "one letter Sunday"
 msgid "S"

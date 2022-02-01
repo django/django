@@ -30,6 +30,8 @@ class DurationFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         msg = 'Enter a valid duration.'
         with self.assertRaisesMessage(ValidationError, msg):
             f.clean('not_a_time')
+        with self.assertRaisesMessage(ValidationError, msg):
+            DurationField().clean('P3(3D')
 
     def test_durationfield_clean_not_required(self):
         f = DurationField(required=False)

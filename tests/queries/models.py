@@ -40,7 +40,7 @@ class Tag(models.Model):
 
 class Note(models.Model):
     note = models.CharField(max_length=100)
-    misc = models.CharField(max_length=10)
+    misc = models.CharField(max_length=25)
     tag = models.ForeignKey(Tag, models.SET_NULL, blank=True, null=True)
     negate = models.BooleanField(default=True)
 
@@ -408,7 +408,7 @@ class ChildObjectA(ObjectA):
 class ObjectB(models.Model):
     name = models.CharField(max_length=50)
     objecta = models.ForeignKey(ObjectA, models.CASCADE)
-    num = models.PositiveSmallIntegerField()
+    num = models.PositiveIntegerField()
 
     def __str__(self):
         return self.name
@@ -430,14 +430,14 @@ class ObjectC(models.Model):
 
 
 class SimpleCategory(models.Model):
-    name = models.CharField(max_length=15)
+    name = models.CharField(max_length=25)
 
     def __str__(self):
         return self.name
 
 
 class SpecialCategory(SimpleCategory):
-    special_name = models.CharField(max_length=15)
+    special_name = models.CharField(max_length=35)
 
     def __str__(self):
         return self.name + " " + self.special_name
@@ -613,13 +613,14 @@ class OrderItem(models.Model):
 
 
 class BaseUser(models.Model):
-    pass
+    annotation = models.ForeignKey(Annotation, models.CASCADE, null=True, blank=True)
 
 
 class Task(models.Model):
     title = models.CharField(max_length=10)
     owner = models.ForeignKey(BaseUser, models.CASCADE, related_name='owner')
     creator = models.ForeignKey(BaseUser, models.CASCADE, related_name='creator')
+    note = models.ForeignKey(Note, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -636,7 +637,7 @@ class StaffUser(BaseUser):
     staff = models.OneToOneField(Staff, models.CASCADE, related_name='user')
 
     def __str__(self):
-        return self.staff
+        return str(self.staff)
 
 
 class Ticket21203Parent(models.Model):

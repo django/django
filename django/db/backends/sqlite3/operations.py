@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, NotSupportedError, models
 from django.db.backends.base.operations import BaseDatabaseOperations
+from django.db.models.constants import OnConflict
 from django.db.models.expressions import Col
 from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
@@ -21,6 +22,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         'DateTimeField': 'TEXT',
     }
     explain_prefix = 'EXPLAIN QUERY PLAN'
+    # List of datatypes to that cannot be extracted with JSON_EXTRACT() on
+    # SQLite. Use JSON_TYPE() instead.
+    jsonfield_datatype_values = frozenset(['null', 'false', 'true'])
 
     def bulk_batch_size(self, fields, objs):
         """
@@ -72,6 +76,13 @@ class DatabaseOperations(BaseDatabaseOperations):
         string and could otherwise cause a collision with a field name.
         """
         return "django_date_extract('%s', %s)" % (lookup_type.lower(), field_name)
+
+    def fetch_returned_insert_rows(self, cursor):
+        """
+        Given a cursor object that has just performed an INSERT...RETURNING
+        statement into a table, return the list of returned data.
+        """
+        return cursor.fetchall()
 
     def format_for_duration_arithmetic(self, sql):
         """Do nothing since formatting is handled in the custom function."""
@@ -277,7 +288,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             converters.append(self.get_decimalfield_converter(expression))
         elif internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
-        elif internal_type in ('NullBooleanField', 'BooleanField'):
+        elif internal_type == 'BooleanField':
             converters.append(self.convert_booleanfield_value)
         return converters
 
@@ -326,10 +337,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         return bool(value) if value in (1, 0) else value
 
     def bulk_insert_sql(self, fields, placeholder_rows):
-        return " UNION ALL ".join(
-            "SELECT %s" % ", ".join(row)
-            for row in placeholder_rows
-        )
+        placeholder_rows_sql = (', '.join(row) for row in placeholder_rows)
+        values_sql = ', '.join(f'({sql})' for sql in placeholder_rows_sql)
+        return f'VALUES {values_sql}'
 
     def combine_expression(self, connector, sub_expressions):
         # SQLite doesn't have a ^ operator, so use the user-defined POWER
@@ -341,7 +351,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return super().combine_expression(connector, sub_expressions)
 
     def combine_duration_expression(self, connector, sub_expressions):
-        if connector not in ['+', '-']:
+        if connector not in ['+', '-', '*', '/']:
             raise DatabaseError('Invalid connector for timedelta: %s.' % connector)
         fn_params = ["'%s'" % connector] + sub_expressions
         if len(fn_params) > 3:
@@ -360,5 +370,35 @@ class DatabaseOperations(BaseDatabaseOperations):
             return 'django_time_diff(%s, %s)' % (lhs_sql, rhs_sql), params
         return 'django_timestamp_diff(%s, %s)' % (lhs_sql, rhs_sql), params
 
-    def insert_statement(self, ignore_conflicts=False):
-        return 'INSERT OR IGNORE INTO' if ignore_conflicts else super().insert_statement(ignore_conflicts)
+    def insert_statement(self, on_conflict=None):
+        if on_conflict == OnConflict.IGNORE:
+            return 'INSERT OR IGNORE INTO'
+        return super().insert_statement(on_conflict=on_conflict)
+
+    def return_insert_columns(self, fields):
+        # SQLite < 3.35 doesn't support an INSERT...RETURNING statement.
+        if not fields:
+            return '', ()
+        columns = [
+            '%s.%s' % (
+                self.quote_name(field.model._meta.db_table),
+                self.quote_name(field.column),
+            ) for field in fields
+        ]
+        return 'RETURNING %s' % ', '.join(columns), ()
+
+    def on_conflict_suffix_sql(self, fields, on_conflict, update_fields, unique_fields):
+        if (
+            on_conflict == OnConflict.UPDATE and
+            self.connection.features.supports_update_conflicts_with_target
+        ):
+            return 'ON CONFLICT(%s) DO UPDATE SET %s' % (
+                ', '.join(map(self.quote_name, unique_fields)),
+                ', '.join([
+                    f'{field} = EXCLUDED.{field}'
+                    for field in map(self.quote_name, update_fields)
+                ]),
+            )
+        return super().on_conflict_suffix_sql(
+            fields, on_conflict, update_fields, unique_fields,
+        )

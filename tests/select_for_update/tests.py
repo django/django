@@ -244,6 +244,14 @@ class SelectForUpdateTests(TransactionTestCase):
             values = list(Person.objects.select_related('born').select_for_update(of=('self',)).values('born__name'))
         self.assertEqual(values, [{'born__name': self.city1.name}])
 
+    @skipUnlessDBFeature(
+        'has_select_for_update_of', 'supports_select_for_update_with_limit',
+    )
+    def test_for_update_of_with_exists(self):
+        with transaction.atomic():
+            qs = Person.objects.select_for_update(of=('self', 'born'))
+            self.assertIs(qs.exists(), True)
+
     @skipUnlessDBFeature('has_select_for_update_nowait')
     def test_nowait_raises_error_on_block(self):
         """

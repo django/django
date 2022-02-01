@@ -1,12 +1,10 @@
 """
 Internationalization support.
 """
-import warnings
 from contextlib import ContextDecorator
 from decimal import ROUND_UP, Decimal
 
 from django.utils.autoreload import autoreload_started, file_changed
-from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import lazy
 from django.utils.regex_helper import _lazy_re_compile
 
@@ -16,15 +14,10 @@ __all__ = [
     'get_language_info', 'get_language_bidi',
     'check_for_language', 'to_language', 'to_locale', 'templatize',
     'gettext', 'gettext_lazy', 'gettext_noop',
-    'ugettext', 'ugettext_lazy', 'ugettext_noop',
     'ngettext', 'ngettext_lazy',
-    'ungettext', 'ungettext_lazy',
     'pgettext', 'pgettext_lazy',
     'npgettext', 'npgettext_lazy',
-    'LANGUAGE_SESSION_KEY',
 ]
-
-LANGUAGE_SESSION_KEY = '_language'
 
 
 class TranslatorCommentWarning(SyntaxWarning):
@@ -77,51 +70,12 @@ def gettext_noop(message):
     return _trans.gettext_noop(message)
 
 
-def ugettext_noop(message):
-    """
-    A legacy compatibility wrapper for Unicode handling on Python 2.
-    Alias of gettext_noop() since Django 2.0.
-    """
-    warnings.warn(
-        'django.utils.translation.ugettext_noop() is deprecated in favor of '
-        'django.utils.translation.gettext_noop().',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return gettext_noop(message)
-
-
 def gettext(message):
     return _trans.gettext(message)
 
 
-def ugettext(message):
-    """
-    A legacy compatibility wrapper for Unicode handling on Python 2.
-    Alias of gettext() since Django 2.0.
-    """
-    warnings.warn(
-        'django.utils.translation.ugettext() is deprecated in favor of '
-        'django.utils.translation.gettext().',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return gettext(message)
-
-
 def ngettext(singular, plural, number):
     return _trans.ngettext(singular, plural, number)
-
-
-def ungettext(singular, plural, number):
-    """
-    A legacy compatibility wrapper for Unicode handling on Python 2.
-    Alias of ngettext() since Django 2.0.
-    """
-    warnings.warn(
-        'django.utils.translation.ungettext() is deprecated in favor of '
-        'django.utils.translation.ngettext().',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return ngettext(singular, plural, number)
 
 
 def pgettext(context, message):
@@ -134,19 +88,6 @@ def npgettext(context, singular, plural, number):
 
 gettext_lazy = lazy(gettext, str)
 pgettext_lazy = lazy(pgettext, str)
-
-
-def ugettext_lazy(message):
-    """
-    A legacy compatibility wrapper for Unicode handling on Python 2. Has been
-    Alias of gettext_lazy since Django 2.0.
-    """
-    warnings.warn(
-        'django.utils.translation.ugettext_lazy() is deprecated in favor of '
-        'django.utils.translation.gettext_lazy().',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return gettext_lazy(message)
 
 
 def lazy_number(func, resultclass, number=None, **kwargs):
@@ -202,19 +143,6 @@ def _lazy_number_unpickle(func, resultclass, number, kwargs):
 
 def ngettext_lazy(singular, plural, number=None):
     return lazy_number(ngettext, str, singular=singular, plural=plural, number=number)
-
-
-def ungettext_lazy(singular, plural, number=None):
-    """
-    A legacy compatibility wrapper for Unicode handling on Python 2.
-    An alias of ungettext_lazy() since Django 2.0.
-    """
-    warnings.warn(
-        'django.utils.translation.ungettext_lazy() is deprecated in favor of '
-        'django.utils.translation.ngettext_lazy().',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return ngettext_lazy(singular, plural, number)
 
 
 def npgettext_lazy(context, singular, plural, number=None):
@@ -273,9 +201,9 @@ def to_language(locale):
 
 def to_locale(language):
     """Turn a language name (en-us) into a locale name (en_US)."""
-    language, _, country = language.lower().partition('-')
+    lang, _, country = language.lower().partition('-')
     if not country:
-        return language
+        return language[:3].lower() + language[3:]
     # A language with > 2 characters after the dash only has its first
     # character after the dash capitalized; e.g. sr-latn becomes sr_Latn.
     # A language with 2 characters after the dash has both characters
@@ -284,7 +212,7 @@ def to_locale(language):
     country = country.title() if len(country) > 2 else country.upper()
     if tail:
         country += '-' + tail
-    return language + '_' + country
+    return lang + '_' + country
 
 
 def get_language_from_request(request, check_path=False):

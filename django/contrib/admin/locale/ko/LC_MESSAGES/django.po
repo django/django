@@ -3,6 +3,7 @@
 # Translators:
 # Jiyoon, Ha <cryptography@konkuk.ac.kr>, 2016
 # DONGHO JEONG <nearermg@gmail.com>, 2020
+# 코딩 영, 2021
 # Geonho Kim / Leo Kim <gh.leokim@gmail.com>, 2019
 # Gihun Ham <progh2@gmail.com>, 2018
 # Hang Park <hangpark@kaist.ac.kr>, 2019
@@ -20,15 +21,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-09-05 05:57+0000\n"
-"Last-Translator: DONGHO JEONG <nearermg@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-04 03:40+0000\n"
+"Last-Translator: 코딩 영\n"
 "Language-Team: Korean (http://www.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "선택된 %(verbose_name_plural)s 을/를 삭제합니다."
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -40,10 +45,6 @@ msgstr "%(name)s를 삭제할 수 없습니다."
 
 msgid "Are you sure?"
 msgstr "확실합니까?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "선택된 %(verbose_name_plural)s 을/를 삭제합니다."
 
 msgid "Administration"
 msgstr "관리"
@@ -539,6 +540,12 @@ msgstr "아이디 또는 비밀번호를 분실하였습니까?"
 msgid "Toggle navigation"
 msgstr "토글 메뉴"
 
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
+
 msgid "Date/time"
 msgstr "날짜/시간"
 
@@ -603,7 +610,7 @@ msgstr "%(model)s 추가"
 msgid "Delete selected %(model)s"
 msgstr "선택된 %(model)s 제거"
 
-msgid "Thanks for spending some quality time with the Web site today."
+msgid "Thanks for spending some quality time with the web site today."
 msgstr "사이트를 이용해 주셔서 고맙습니다."
 
 msgid "Log in again"

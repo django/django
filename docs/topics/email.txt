@@ -209,7 +209,7 @@ from the request's POST data, sends that to admin@example.com and redirects to
             # to get proper validation errors.
             return HttpResponse('Make sure all fields are entered and valid.')
 
-.. _Header injection: http://www.nyphp.org/phundamentals/8_Preventing-Email-Header-Injection
+.. _Header injection: http://www.nyphp.org/phundamentals/8_Preventing-Email-Header-Injection.html
 
 .. _emailmessage-and-smtpconnection:
 
@@ -306,7 +306,8 @@ The class has the following methods:
   Otherwise, an instance of the default backend will be instantiated and
   used. If the keyword argument ``fail_silently`` is ``True``, exceptions
   raised while sending the message will be quashed. An empty list of
-  recipients will not raise an exception.
+  recipients will not raise an exception. It will return ``1`` if the message
+  was sent successfully, otherwise ``0``.
 
 * ``message()`` constructs a ``django.core.mail.SafeMIMEText`` object (a
   subclass of Python's :class:`~email.mime.text.MIMEText` class) or a
@@ -419,7 +420,7 @@ The email backend class has the following methods:
 * ``send_messages(email_messages)`` sends a list of
   :class:`~django.core.mail.EmailMessage` objects. If the connection is
   not open, this call will implicitly open the connection, and close the
-  connection afterwards. If the connection is already open, it will be
+  connection afterward. If the connection is already open, it will be
   left open after mail has been sent.
 
 It can also be used as a context manager, which will automatically call
@@ -528,10 +529,6 @@ To specify this backend, put the following in your settings::
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
-
-.. versionchanged:: 3.1
-
-    Support for :class:`pathlib.Path` was added.
 
 .. _topic-email-memory-backend:
 

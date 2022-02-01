@@ -1,6 +1,6 @@
 from unittest import skipUnless
 
-from django.db import connection
+from django.db import connection, connections
 from django.test import TestCase
 
 
@@ -27,3 +27,33 @@ class ParsingTests(TestCase):
             with self.subTest(check_clause):
                 check_columns = _parse_constraint_columns(check_clause, table_columns)
                 self.assertEqual(list(check_columns), expected_columns)
+
+
+@skipUnless(connection.vendor == 'mysql', 'MySQL tests')
+class StorageEngineTests(TestCase):
+    databases = {'default', 'other'}
+
+    def test_get_storage_engine(self):
+        table_name = 'test_storage_engine'
+        create_sql = 'CREATE TABLE %s (id INTEGER) ENGINE = %%s' % table_name
+        drop_sql = 'DROP TABLE %s' % table_name
+        default_connection = connections['default']
+        other_connection = connections['other']
+        try:
+            with default_connection.cursor() as cursor:
+                cursor.execute(create_sql % 'InnoDB')
+                self.assertEqual(
+                    default_connection.introspection.get_storage_engine(cursor, table_name),
+                    'InnoDB',
+                )
+            with other_connection.cursor() as cursor:
+                cursor.execute(create_sql % 'MyISAM')
+                self.assertEqual(
+                    other_connection.introspection.get_storage_engine(cursor, table_name),
+                    'MyISAM',
+                )
+        finally:
+            with default_connection.cursor() as cursor:
+                cursor.execute(drop_sql)
+            with other_connection.cursor() as cursor:
+                cursor.execute(drop_sql)

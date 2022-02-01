@@ -54,10 +54,7 @@ class DatabaseCache(BaseDatabaseCache):
         if not keys:
             return {}
 
-        key_map = {}
-        for key in keys:
-            self.validate_key(key)
-            key_map[self.make_key(key, version)] = key
+        key_map = {self.make_and_validate_key(key, version=version): key for key in keys}
 
         db = router.db_for_read(self.cache_model_class)
         connection = connections[db]
@@ -95,18 +92,15 @@ class DatabaseCache(BaseDatabaseCache):
         return result
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         self._base_set('set', key, value, timeout)
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         return self._base_set('add', key, value, timeout)
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         return self._base_set('touch', key, None, timeout)
 
     def _base_set(self, mode, key, value, timeout=DEFAULT_TIMEOUT):
@@ -123,13 +117,12 @@ class DatabaseCache(BaseDatabaseCache):
             now = now.replace(microsecond=0)
             if timeout is None:
                 exp = datetime.max
-            elif settings.USE_TZ:
-                exp = datetime.utcfromtimestamp(timeout)
             else:
-                exp = datetime.fromtimestamp(timeout)
+                tz = timezone.utc if settings.USE_TZ else None
+                exp = datetime.fromtimestamp(timeout, tz=tz)
             exp = exp.replace(microsecond=0)
             if num > self._max_entries:
-                self._cull(db, cursor, now)
+                self._cull(db, cursor, now, num)
             pickled = pickle.dumps(value, self.pickle_protocol)
             # The DB column is expecting a string, so make sure the value is a
             # string, not bytes. Refs #19274.
@@ -197,15 +190,12 @@ class DatabaseCache(BaseDatabaseCache):
                 return True
 
     def delete(self, key, version=None):
-        self.validate_key(key)
-        return self._base_delete_many([self.make_key(key, version)])
+        key = self.make_and_validate_key(key, version=version)
+        return self._base_delete_many([key])
 
     def delete_many(self, keys, version=None):
-        key_list = []
-        for key in keys:
-            self.validate_key(key)
-            key_list.append(self.make_key(key, version))
-        self._base_delete_many(key_list)
+        keys = [self.make_and_validate_key(key, version=version) for key in keys]
+        self._base_delete_many(keys)
 
     def _base_delete_many(self, keys):
         if not keys:
@@ -225,52 +215,53 @@ class DatabaseCache(BaseDatabaseCache):
                 ),
                 keys,
             )
-        return bool(cursor.rowcount)
+            return bool(cursor.rowcount)
 
     def has_key(self, key, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
 
         db = router.db_for_read(self.cache_model_class)
         connection = connections[db]
         quote_name = connection.ops.quote_name
 
-        if settings.USE_TZ:
-            now = datetime.utcnow()
-        else:
-            now = datetime.now()
-        now = now.replace(microsecond=0)
+        now = timezone.now().replace(microsecond=0, tzinfo=None)
 
         with connection.cursor() as cursor:
             cursor.execute(
-                'SELECT %s FROM %s WHERE %s = %%s and expires > %%s' % (
+                'SELECT %s FROM %s WHERE %s = %%s and %s > %%s' % (
                     quote_name('cache_key'),
                     quote_name(self._table),
                     quote_name('cache_key'),
+                    quote_name('expires'),
                 ),
                 [key, connection.ops.adapt_datetimefield_value(now)]
             )
             return cursor.fetchone() is not None
 
-    def _cull(self, db, cursor, now):
+    def _cull(self, db, cursor, now, num):
         if self._cull_frequency == 0:
             self.clear()
         else:
             connection = connections[db]
             table = connection.ops.quote_name(self._table)
-            cursor.execute("DELETE FROM %s WHERE expires < %%s" % table,
-                           [connection.ops.adapt_datetimefield_value(now)])
-            cursor.execute("SELECT COUNT(*) FROM %s" % table)
-            num = cursor.fetchone()[0]
-            if num > self._max_entries:
-                cull_num = num // self._cull_frequency
+            cursor.execute('DELETE FROM %s WHERE %s < %%s' % (
+                table,
+                connection.ops.quote_name('expires'),
+            ), [connection.ops.adapt_datetimefield_value(now)])
+            deleted_count = cursor.rowcount
+            remaining_num = num - deleted_count
+            if remaining_num > self._max_entries:
+                cull_num = remaining_num // self._cull_frequency
                 cursor.execute(
                     connection.ops.cache_key_culling_sql() % table,
                     [cull_num])
                 last_cache_key = cursor.fetchone()
                 if last_cache_key:
                     cursor.execute(
-                        'DELETE FROM %s WHERE cache_key < %%s' % table,
+                        'DELETE FROM %s WHERE %s < %%s' % (
+                            table,
+                            connection.ops.quote_name('cache_key'),
+                        ),
                         [last_cache_key[0]],
                     )
 

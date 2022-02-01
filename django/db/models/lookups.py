@@ -1,20 +1,18 @@
 import itertools
 import math
-import warnings
-from copy import copy
 
 from django.core.exceptions import EmptyResultSet
-from django.db.models.expressions import Case, Exists, Func, Value, When
+from django.db.models.expressions import Case, Expression, Func, Value, When
 from django.db.models.fields import (
-    CharField, DateTimeField, Field, IntegerField, UUIDField,
+    BooleanField, CharField, DateTimeField, Field, IntegerField, UUIDField,
 )
 from django.db.models.query_utils import RegisterLookupMixin
 from django.utils.datastructures import OrderedSet
-from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import cached_property
+from django.utils.hashable import make_hashable
 
 
-class Lookup:
+class Lookup(Expression):
     lookup_name = None
     prepare_rhs = True
     can_use_none_as_rhs = False
@@ -22,6 +20,7 @@ class Lookup:
     def __init__(self, lhs, rhs):
         self.lhs, self.rhs = lhs, rhs
         self.rhs = self.get_prep_lookup()
+        self.lhs = self.get_prep_lhs()
         if hasattr(self.lhs, 'get_bilateral_transforms'):
             bilateral_transforms = self.lhs.get_bilateral_transforms()
         else:
@@ -40,6 +39,9 @@ class Lookup:
         for transform in self.bilateral_transforms:
             value = transform(value)
         return value
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.lhs!r}, {self.rhs!r})'
 
     def batch_process_rhs(self, compiler, connection, rhs=None):
         if rhs is None:
@@ -70,11 +72,19 @@ class Lookup:
             self.lhs, self.rhs = new_exprs
 
     def get_prep_lookup(self):
-        if hasattr(self.rhs, 'resolve_expression'):
+        if not self.prepare_rhs or hasattr(self.rhs, 'resolve_expression'):
             return self.rhs
-        if self.prepare_rhs and hasattr(self.lhs.output_field, 'get_prep_value'):
-            return self.lhs.output_field.get_prep_value(self.rhs)
+        if hasattr(self.lhs, 'output_field'):
+            if hasattr(self.lhs.output_field, 'get_prep_value'):
+                return self.lhs.output_field.get_prep_value(self.rhs)
+        elif self.rhs_is_direct_value():
+            return Value(self.rhs)
         return self.rhs
+
+    def get_prep_lhs(self):
+        if hasattr(self.lhs, 'resolve_expression'):
+            return self.lhs
+        return Value(self.lhs)
 
     def get_db_prep_lookup(self, value, connection):
         return ('%s', [value])
@@ -83,7 +93,11 @@ class Lookup:
         lhs = lhs or self.lhs
         if hasattr(lhs, 'resolve_expression'):
             lhs = lhs.resolve_expression(compiler.query)
-        return compiler.compile(lhs)
+        sql, params = compiler.compile(lhs)
+        if isinstance(lhs, Lookup):
+            # Wrapped in parentheses to respect operator precedence.
+            sql = f'({sql})'
+        return sql, params
 
     def process_rhs(self, compiler, connection):
         value = self.rhs
@@ -95,36 +109,32 @@ class Lookup:
             value = self.apply_bilateral_transforms(value)
             value = value.resolve_expression(compiler.query)
         if hasattr(value, 'as_sql'):
-            return compiler.compile(value)
+            sql, params = compiler.compile(value)
+            # Ensure expression is wrapped in parentheses to respect operator
+            # precedence but avoid double wrapping as it can be misinterpreted
+            # on some backends (e.g. subqueries on SQLite).
+            if sql and sql[0] != '(':
+                sql = '(%s)' % sql
+            return sql, params
         else:
             return self.get_db_prep_lookup(value, connection)
 
     def rhs_is_direct_value(self):
         return not hasattr(self.rhs, 'as_sql')
 
-    def relabeled_clone(self, relabels):
-        new = copy(self)
-        new.lhs = new.lhs.relabeled_clone(relabels)
-        if hasattr(new.rhs, 'relabeled_clone'):
-            new.rhs = new.rhs.relabeled_clone(relabels)
-        return new
-
     def get_group_by_cols(self, alias=None):
-        cols = self.lhs.get_group_by_cols()
-        if hasattr(self.rhs, 'get_group_by_cols'):
-            cols.extend(self.rhs.get_group_by_cols())
+        cols = []
+        for source in self.get_source_expressions():
+            cols.extend(source.get_group_by_cols())
         return cols
 
-    def as_sql(self, compiler, connection):
-        raise NotImplementedError
-
     def as_oracle(self, compiler, connection):
-        # Oracle doesn't allow EXISTS() to be compared to another expression
-        # unless it's wrapped in a CASE WHEN.
+        # Oracle doesn't allow EXISTS() and filters to be compared to another
+        # expression unless they're wrapped in a CASE WHEN.
         wrapped = False
         exprs = []
         for expr in (self.lhs, self.rhs):
-            if isinstance(expr, Exists):
+            if connection.ops.conditional_expression_supported_in_where_clause(expr):
                 expr = Case(When(expr, then=True), default=False)
                 wrapped = True
             exprs.append(expr)
@@ -132,16 +142,35 @@ class Lookup:
         return lookup.as_sql(compiler, connection)
 
     @cached_property
-    def contains_aggregate(self):
-        return self.lhs.contains_aggregate or getattr(self.rhs, 'contains_aggregate', False)
-
-    @cached_property
-    def contains_over_clause(self):
-        return self.lhs.contains_over_clause or getattr(self.rhs, 'contains_over_clause', False)
+    def output_field(self):
+        return BooleanField()
 
     @property
-    def is_summary(self):
-        return self.lhs.is_summary or getattr(self.rhs, 'is_summary', False)
+    def identity(self):
+        return self.__class__, self.lhs, self.rhs
+
+    def __eq__(self, other):
+        if not isinstance(other, Lookup):
+            return NotImplemented
+        return self.identity == other.identity
+
+    def __hash__(self):
+        return hash(make_hashable(self.identity))
+
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
+        c = self.copy()
+        c.is_summary = summarize
+        c.lhs = self.lhs.resolve_expression(query, allow_joins, reuse, summarize, for_save)
+        c.rhs = self.rhs.resolve_expression(query, allow_joins, reuse, summarize, for_save)
+        return c
+
+    def select_format(self, compiler, sql, params):
+        # Wrap filters with a CASE WHEN expression if a database backend
+        # (e.g. Oracle) doesn't support boolean expression in SELECT or GROUP
+        # BY list.
+        if not compiler.connection.features.supports_boolean_expr_in_select_clause:
+            sql = f'CASE WHEN {sql} THEN 1 ELSE 0 END'
+        return sql, params
 
 
 class Transform(RegisterLookupMixin, Func):
@@ -273,8 +302,8 @@ class PostgresOperatorLookup(FieldGetDbPrepValueMixin, Lookup):
 class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name = 'exact'
 
-    def process_rhs(self, compiler, connection):
-        from django.db.models.sql.query import Query
+    def get_prep_lookup(self):
+        from django.db.models.sql.query import Query  # avoid circular import
         if isinstance(self.rhs, Query):
             if self.rhs.has_limit_one():
                 if not self.rhs.has_select_fields:
@@ -285,7 +314,7 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
                     'The QuerySet value for an exact lookup must be limited to '
                     'one result using slicing.'
                 )
-        return super().process_rhs(compiler, connection)
+        return super().get_prep_lookup()
 
     def as_sql(self, compiler, connection):
         # Avoid comparison against direct rhs if lhs is a boolean value. That
@@ -359,6 +388,15 @@ class IntegerLessThan(IntegerFieldFloatRounding, LessThan):
 class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     lookup_name = 'in'
 
+    def get_prep_lookup(self):
+        from django.db.models.sql.query import Query  # avoid circular import
+        if isinstance(self.rhs, Query):
+            self.rhs.clear_ordering(clear_default=True)
+            if not self.rhs.has_select_fields:
+                self.rhs.clear_select_clause()
+                self.rhs.add_fields(['pk'])
+        return super().get_prep_lookup()
+
     def process_rhs(self, compiler, connection):
         db_rhs = getattr(self.rhs, '_db', None)
         if db_rhs is not None and db_rhs != connection.alias:
@@ -383,11 +421,7 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             sqls, sqls_params = self.batch_process_rhs(compiler, connection, rhs)
             placeholder = '(' + ', '.join(sqls) + ')'
             return (placeholder, sqls_params)
-        else:
-            if not getattr(self.rhs, 'has_select_fields', True):
-                self.rhs.clear_select_clause()
-                self.rhs.add_fields(['pk'])
-            return super().process_rhs(compiler, connection)
+        return super().process_rhs(compiler, connection)
 
     def get_rhs_op(self, connection, rhs):
         return 'IN %s' % rhs
@@ -495,15 +529,9 @@ class IsNull(BuiltinLookup):
 
     def as_sql(self, compiler, connection):
         if not isinstance(self.rhs, bool):
-            # When the deprecation ends, replace with:
-            # raise ValueError(
-            #     'The QuerySet value for an isnull lookup must be True or '
-            #     'False.'
-            # )
-            warnings.warn(
-                'Using a non-boolean value for an isnull lookup is '
-                'deprecated, use True or False instead.',
-                RemovedInDjango40Warning,
+            raise ValueError(
+                'The QuerySet value for an isnull lookup must be True or '
+                'False.'
             )
         sql, params = compiler.compile(self.lhs)
         if self.rhs:
@@ -534,11 +562,17 @@ class IRegex(Regex):
 
 class YearLookup(Lookup):
     def year_lookup_bounds(self, connection, year):
+        from django.db.models.functions import ExtractIsoYear
+        iso_year = isinstance(self.lhs, ExtractIsoYear)
         output_field = self.lhs.lhs.output_field
         if isinstance(output_field, DateTimeField):
-            bounds = connection.ops.year_lookup_bounds_for_datetime_field(year)
+            bounds = connection.ops.year_lookup_bounds_for_datetime_field(
+                year, iso_year=iso_year,
+            )
         else:
-            bounds = connection.ops.year_lookup_bounds_for_date_field(year)
+            bounds = connection.ops.year_lookup_bounds_for_date_field(
+                year, iso_year=iso_year,
+            )
         return bounds
 
     def as_sql(self, compiler, connection):

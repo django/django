@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# András Veres-Szentkirályi, 2016,2020
+# András Veres-Szentkirályi, 2016,2020-2021
 # Attila Nagy <>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # János R, 2011
@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-07-20 07:33+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-04-01 15:16+0000\n"
 "Last-Translator: András Veres-Szentkirályi\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
@@ -185,6 +185,54 @@ msgstr "november"
 
 msgid "December"
 msgstr "december"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "jan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "feb"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "már"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "ápr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "máj"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "jún"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "júl"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "aug"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "szep"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "dec"
 
 msgctxt "one letter Sunday"
 msgid "S"

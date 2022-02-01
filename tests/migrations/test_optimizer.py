@@ -119,6 +119,42 @@ class OptimizerTests(SimpleTestCase):
             ]
         )
 
+    def test_create_model_and_remove_model_options(self):
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel(
+                    'MyModel',
+                    fields=[],
+                    options={'verbose_name': 'My Model'},
+                ),
+                migrations.AlterModelOptions('MyModel', options={}),
+            ],
+            [migrations.CreateModel('MyModel', fields=[])],
+        )
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel(
+                    'MyModel',
+                    fields=[],
+                    options={
+                        'verbose_name': 'My Model',
+                        'verbose_name_plural': 'My Model plural',
+                    },
+                ),
+                migrations.AlterModelOptions(
+                    'MyModel',
+                    options={'verbose_name': 'My Model'},
+                ),
+            ],
+            [
+                migrations.CreateModel(
+                    'MyModel',
+                    fields=[],
+                    options={'verbose_name': 'My Model'},
+                ),
+            ],
+        )
+
     def _test_create_alter_foo_delete_model(self, alter_foo):
         """
         CreateModel, AlterModelTable, AlterUniqueTogether/AlterIndexTogether/
@@ -533,6 +569,23 @@ class OptimizerTests(SimpleTestCase):
             [
                 migrations.RenameField("Foo", "name", "nom"),
                 migrations.AlterField("Foo", "nom", models.CharField(max_length=255)),
+            ],
+        )
+
+    def test_swapping_fields_names(self):
+        self.assertDoesNotOptimize(
+            [
+                migrations.CreateModel(
+                    'MyModel',
+                    [
+                        ('field_a', models.IntegerField()),
+                        ('field_b', models.IntegerField()),
+                    ],
+                ),
+                migrations.RunPython(migrations.RunPython.noop),
+                migrations.RenameField('MyModel', 'field_a', 'field_c'),
+                migrations.RenameField('MyModel', 'field_b', 'field_a'),
+                migrations.RenameField('MyModel', 'field_c', 'field_b'),
             ],
         )
 

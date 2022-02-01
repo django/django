@@ -57,6 +57,11 @@ class NodeTests(unittest.TestCase):
         self.assertEqual(len(self.node1) + 1, len(node3))
         self.assertEqual(str(node3), "(DEFAULT: ('a', 1), ('b', 2), ('c', 3))")
 
+    def test_add_eq_child_mixed_connector(self):
+        node = Node(['a', 'b'], 'OR')
+        self.assertEqual(node.add('a', 'AND'), 'a')
+        self.assertEqual(node, Node([Node(['a', 'b'], 'OR'), 'a'], 'AND'))
+
     def test_negate(self):
         # negated is False by default
         self.assertFalse(self.node1.negated)

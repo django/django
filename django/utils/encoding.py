@@ -1,11 +1,9 @@
 import codecs
 import datetime
 import locale
-import warnings
 from decimal import Decimal
 from urllib.parse import quote
 
-from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import Promise
 
 
@@ -99,22 +97,6 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
     return str(s).encode(encoding, errors)
 
 
-def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
-    warnings.warn(
-        'smart_text() is deprecated in favor of smart_str().',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return smart_str(s, encoding, strings_only, errors)
-
-
-def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
-    warnings.warn(
-        'force_text() is deprecated in favor of force_str().',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return force_str(s, encoding, strings_only, errors)
-
-
 def iri_to_uri(iri):
     """
     Convert an Internationalized Resource Identifier (IRI) portion to a URI
@@ -178,7 +160,7 @@ def uri_to_iri(uri):
     if uri is None:
         return uri
     uri = force_bytes(uri)
-    # Fast selective unqote: First, split on '%' and then starting with the
+    # Fast selective unquote: First, split on '%' and then starting with the
     # second block, decode the first 2 bytes if they represent a hex code to
     # decode. The rest of the block is the part after '%AB', not containing
     # any '%'. Add that to the output without further processing.

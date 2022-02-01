@@ -184,7 +184,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     def get_relations(self, cursor, table_name):
         """
         Return a dictionary of {field_name: (field_name_other_table, other_table)}
-        representing all relationships to the given table.
+        representing all foreign keys in the given table.
         """
         table_name = table_name.upper()
         cursor.execute("""
@@ -201,20 +201,6 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 self.identifier_converter(rel_table_name),
             ) for field_name, rel_table_name, rel_field_name in cursor.fetchall()
         }
-
-    def get_key_columns(self, cursor, table_name):
-        cursor.execute("""
-            SELECT ccol.column_name, rcol.table_name AS referenced_table, rcol.column_name AS referenced_column
-            FROM user_constraints c
-            JOIN user_cons_columns ccol
-              ON ccol.constraint_name = c.constraint_name
-            JOIN user_cons_columns rcol
-              ON rcol.constraint_name = c.r_constraint_name
-            WHERE c.table_name = %s AND c.constraint_type = 'R'""", [table_name.upper()])
-        return [
-            tuple(self.identifier_converter(cell) for cell in row)
-            for row in cursor.fetchall()
-        ]
 
     def get_primary_key_column(self, cursor, table_name):
         cursor.execute("""
@@ -307,6 +293,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             SELECT
                 ind.index_name,
                 LOWER(ind.index_type),
+                LOWER(ind.uniqueness),
                 LISTAGG(LOWER(cols.column_name), ',') WITHIN GROUP (ORDER BY cols.column_position),
                 LISTAGG(cols.descend, ',') WITHIN GROUP (ORDER BY cols.column_position)
             FROM
@@ -318,13 +305,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     FROM user_constraints cons
                     WHERE ind.index_name = cons.index_name
                 ) AND cols.index_name = ind.index_name
-            GROUP BY ind.index_name, ind.index_type
+            GROUP BY ind.index_name, ind.index_type, ind.uniqueness
         """, [table_name])
-        for constraint, type_, columns, orders in cursor.fetchall():
+        for constraint, type_, unique, columns, orders in cursor.fetchall():
             constraint = self.identifier_converter(constraint)
             constraints[constraint] = {
                 'primary_key': False,
-                'unique': False,
+                'unique': unique == 'unique',
                 'foreign_key': None,
                 'check': False,
                 'index': True,

@@ -12,8 +12,8 @@ from django.contrib.gis.gdal.prototypes import raster as capi
 from django.contrib.gis.gdal.raster.band import BandList
 from django.contrib.gis.gdal.raster.base import GDALRasterBase
 from django.contrib.gis.gdal.raster.const import (
-    GDAL_RESAMPLE_ALGORITHMS, VSI_DELETE_BUFFER_ON_READ,
-    VSI_FILESYSTEM_BASE_PATH, VSI_TAKE_BUFFER_OWNERSHIP,
+    GDAL_RESAMPLE_ALGORITHMS, VSI_DELETE_BUFFER_ON_READ, VSI_FILESYSTEM_PREFIX,
+    VSI_MEM_FILESYSTEM_BASE_PATH, VSI_TAKE_BUFFER_OWNERSHIP,
 )
 from django.contrib.gis.gdal.srs import SpatialReference, SRSException
 from django.contrib.gis.geometry import json_regex
@@ -74,7 +74,7 @@ class GDALRaster(GDALRasterBase):
         # If input is a valid file path, try setting file as source.
         if isinstance(ds_input, str):
             if (
-                not ds_input.startswith(VSI_FILESYSTEM_BASE_PATH) and
+                not ds_input.startswith(VSI_FILESYSTEM_PREFIX) and
                 not os.path.exists(ds_input)
             ):
                 raise GDALException(
@@ -95,7 +95,7 @@ class GDALRaster(GDALRasterBase):
             # deleted.
             self._ds_input = c_buffer(ds_input)
             # Create random name to reference in vsimem filesystem.
-            vsi_path = os.path.join(VSI_FILESYSTEM_BASE_PATH, str(uuid.uuid4()))
+            vsi_path = os.path.join(VSI_MEM_FILESYSTEM_BASE_PATH, str(uuid.uuid4()))
             # Create vsimem file from buffer.
             capi.create_vsi_file_from_mem_buffer(
                 force_bytes(vsi_path),
@@ -217,7 +217,10 @@ class GDALRaster(GDALRasterBase):
 
     @property
     def vsi_buffer(self):
-        if not self.is_vsi_based:
+        if not (
+            self.is_vsi_based and
+            self.name.startswith(VSI_MEM_FILESYSTEM_BASE_PATH)
+        ):
             return None
         # Prepare an integer that will contain the buffer length.
         out_length = c_int()
@@ -232,7 +235,7 @@ class GDALRaster(GDALRasterBase):
 
     @cached_property
     def is_vsi_based(self):
-        return self._ptr and self.name.startswith(VSI_FILESYSTEM_BASE_PATH)
+        return self._ptr and self.name.startswith(VSI_FILESYSTEM_PREFIX)
 
     @property
     def name(self):
@@ -432,7 +435,7 @@ class GDALRaster(GDALRasterBase):
         elif self.driver.name != 'MEM':
             clone_name = self.name + '_copy.' + self.driver.name
         else:
-            clone_name = os.path.join(VSI_FILESYSTEM_BASE_PATH, str(uuid.uuid4()))
+            clone_name = os.path.join(VSI_MEM_FILESYSTEM_BASE_PATH, str(uuid.uuid4()))
         return GDALRaster(
             capi.copy_ds(
                 self.driver._ptr,
@@ -500,6 +503,4 @@ class GDALRaster(GDALRasterBase):
         Return information about this raster in a string format equivalent
         to the output of the gdalinfo command line utility.
         """
-        if not capi.get_ds_info:
-            raise ValueError('GDAL ≥ 2.1 is required for using the info property.')
         return capi.get_ds_info(self.ptr, None).decode()

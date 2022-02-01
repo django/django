@@ -2,6 +2,9 @@ import uuid
 
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
+from django.db.backends.utils import split_tzname_delta
+from django.db.models import Exists, ExpressionWrapper, Lookup
+from django.db.models.constants import OnConflict
 from django.utils import timezone
 from django.utils.encoding import force_str
 
@@ -76,11 +79,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "DATE(%s)" % (field_name)
 
     def _prepare_tzname_delta(self, tzname):
-        if '+' in tzname:
-            return tzname[tzname.find('+'):]
-        elif '-' in tzname:
-            return tzname[tzname.find('-'):]
-        return tzname
+        tzname, sign, offset = split_tzname_delta(tzname)
+        return f'{sign}{offset}' if offset else tzname
 
     def _convert_field_to_tz(self, field_name, tzname):
         if tzname and settings.USE_TZ and self.connection.timezone_name != tzname:
@@ -159,6 +159,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         implicit sorting going on.
         """
         return [(None, ("NULL", [], False))]
+
+    def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
+        return value
 
     def last_executed_query(self, cursor, sql, params):
         # With MySQLdb, cursor objects have an (undocumented) "_executed"
@@ -262,7 +265,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if timezone.is_aware(value):
             raise ValueError("MySQL backend does not support timezone-aware times.")
 
-        return str(value)
+        return value.isoformat(timespec='microseconds')
 
     def max_name_length(self):
         return 64
@@ -291,7 +294,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def get_db_converters(self, expression):
         converters = super().get_db_converters(expression)
         internal_type = expression.output_field.get_internal_type()
-        if internal_type in ['BooleanField', 'NullBooleanField']:
+        if internal_type == 'BooleanField':
             converters.append(self.convert_booleanfield_value)
         elif internal_type == 'DateTimeField':
             if settings.USE_TZ:
@@ -363,8 +366,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         match_option = 'c' if lookup_type == 'regex' else 'i'
         return "REGEXP_LIKE(%%s, %%s, '%s')" % match_option
 
-    def insert_statement(self, ignore_conflicts=False):
-        return 'INSERT IGNORE INTO' if ignore_conflicts else super().insert_statement(ignore_conflicts)
+    def insert_statement(self, on_conflict=None):
+        if on_conflict == OnConflict.IGNORE:
+            return 'INSERT IGNORE INTO'
+        return super().insert_statement(on_conflict=on_conflict)
 
     def lookup_cast(self, lookup_type, internal_type=None):
         lookup = '%s'
@@ -375,3 +380,38 @@ class DatabaseOperations(BaseDatabaseOperations):
             ):
                 lookup = 'JSON_UNQUOTE(%s)'
         return lookup
+
+    def conditional_expression_supported_in_where_clause(self, expression):
+        # MySQL ignores indexes with boolean fields unless they're compared
+        # directly to a boolean value.
+        if isinstance(expression, (Exists, Lookup)):
+            return True
+        if isinstance(expression, ExpressionWrapper) and expression.conditional:
+            return self.conditional_expression_supported_in_where_clause(expression.expression)
+        if getattr(expression, 'conditional', False):
+            return False
+        return super().conditional_expression_supported_in_where_clause(expression)
+
+    def on_conflict_suffix_sql(self, fields, on_conflict, update_fields, unique_fields):
+        if on_conflict == OnConflict.UPDATE:
+            conflict_suffix_sql = 'ON DUPLICATE KEY UPDATE %(fields)s'
+            field_sql = '%(field)s = VALUES(%(field)s)'
+            # The use of VALUES() is deprecated in MySQL 8.0.20+. Instead, use
+            # aliases for the new row and its columns available in MySQL
+            # 8.0.19+.
+            if not self.connection.mysql_is_mariadb:
+                if self.connection.mysql_version >= (8, 0, 19):
+                    conflict_suffix_sql = f'AS new {conflict_suffix_sql}'
+                    field_sql = '%(field)s = new.%(field)s'
+            # VALUES() was renamed to VALUE() in MariaDB 10.3.3+.
+            elif self.connection.mysql_version >= (10, 3, 3):
+                field_sql = '%(field)s = VALUE(%(field)s)'
+
+            fields = ', '.join([
+                field_sql % {'field': field}
+                for field in map(self.quote_name, update_fields)
+            ])
+            return conflict_suffix_sql % {'fields': fields}
+        return super().on_conflict_suffix_sql(
+            fields, on_conflict, update_fields, unique_fields,
+        )

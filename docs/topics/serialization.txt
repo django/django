@@ -167,7 +167,7 @@ Identifier  Information
 ==========  ==============================================================
 
 .. _json: https://json.org/
-.. _jsonl: http://jsonlines.org/
+.. _jsonl: https://jsonlines.org/
 .. _PyYAML: https://pyyaml.org/
 
 XML
@@ -277,11 +277,6 @@ function::
 Also note that GeoDjango provides a :doc:`customized GeoJSON serializer
 </ref/contrib/gis/serializers>`.
 
-.. versionchanged:: 3.1
-
-    All data is now dumped with Unicode. If you need the previous behavior,
-    pass ``ensure_ascii=True`` to the ``serializers.serialize()`` function.
-
 ``DjangoJSONEncoder``
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -308,14 +303,12 @@ The JSON serializer uses ``DjangoJSONEncoder`` for encoding. A subclass of
 :class:`~decimal.Decimal`, ``Promise`` (``django.utils.functional.lazy()`` objects), :class:`~uuid.UUID`
    A string representation of the object.
 
-.. _ecma-262: https://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15
+.. _ecma-262: https://262.ecma-international.org/5.1/#sec-15.9.1.15
 
 .. _serialization-formats-jsonl:
 
 JSONL
 -----
-
-.. versionadded:: 3.2
 
 *JSONL* stands for *JSON Lines*. With this format, objects are separated by new
 lines, and each line contains a valid JSON object. JSONL serialized data looks
@@ -335,16 +328,12 @@ YAML serialization looks quite similar to JSON. The object list is serialized
 as a sequence mappings with the keys "pk", "model" and "fields". Each field is
 again a mapping with the key being name of the field and the value the value::
 
-    -   fields: {expire_date: !!timestamp '2013-01-16 08:16:59.844560+00:00'}
-        model: sessions.session
-        pk: 4b678b301dfd8a4e0dad910de3ae245b
+    - model: sessions.session
+      pk: 4b678b301dfd8a4e0dad910de3ae245b
+      fields:
+        expire_date: 2013-01-16 08:16:59.844560+00:00
 
 Referential fields are again represented by the PK or sequence of PKs.
-
-.. versionchanged:: 3.1
-
-    All data is now dumped with Unicode. If you need the previous behavior,
-    pass ``allow_unicode=False`` to the ``serializers.serialize()`` function.
 
 .. _topics-serialization-natural-keys:
 

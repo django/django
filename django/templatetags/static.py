@@ -91,12 +91,19 @@ def get_media_prefix(parser, token):
 
 
 class StaticNode(template.Node):
+    child_nodelists = ()
+
     def __init__(self, varname=None, path=None):
         if path is None:
             raise template.TemplateSyntaxError(
                 "Static template nodes must be given a path to return.")
         self.path = path
         self.varname = varname
+
+    def __repr__(self):
+        return (
+            f'{self.__class__.__name__}(varname={self.varname!r}, path={self.path!r})'
+        )
 
     def url(self, context):
         path = self.path.resolve(context)

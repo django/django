@@ -1,7 +1,7 @@
 """
  The OGRGeometry is a wrapper for using the OGR Geometry class
- (see https://www.gdal.org/classOGRGeometry.html).  OGRGeometry
- may be instantiated when reading geometries from OGR Data Sources
+ (see https://gdal.org/api/ogrgeometry_cpp.html#_CPPv411OGRGeometry).
+ OGRGeometry may be instantiated when reading geometries from OGR Data Sources
  (e.g. SHP files), or when given OGC WKT (a string).
 
  While the 'full' API is not present yet, the API is "pythonic" unlike
@@ -53,7 +53,7 @@ from django.utils.encoding import force_bytes
 
 
 # For more information, see the OGR C API source code:
-#  https://www.gdal.org/ogr__api_8h.html
+#  https://gdal.org/api/vector_c_api.html
 #
 # The OGR_G_* routines are relevant here.
 class OGRGeometry(GDALBase):

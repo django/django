@@ -2,7 +2,7 @@
 URL dispatcher
 ==============
 
-A clean, elegant URL scheme is an important detail in a high-quality Web
+A clean, elegant URL scheme is an important detail in a high-quality web
 application. Django lets you design URLs however you want, with no framework
 limitations.
 
@@ -157,10 +157,6 @@ A converter is a class that includes the following:
   and as a consequence :func:`~django.urls.reverse` will raise
   :class:`~django.urls.NoReverseMatch` unless another URL pattern matches.
 
-  .. versionchanged:: 3.1
-
-    Support for raising ``ValueError`` to indicate no match was added.
-
 For example::
 
     class FourDigitYearConverter:
@@ -250,8 +246,8 @@ following URL patterns which optionally take a page argument::
     from django.urls import re_path
 
     urlpatterns = [
-        re_path(r'^blog/(page-(\d+)/)?$', blog_articles),                  # bad
-        re_path(r'^comments/(?:page-(?P<page_number>\d+)/)?$', comments),  # good
+        re_path(r'^blog/(page-([0-9]+)/)?$', blog_articles),                  # bad
+        re_path(r'^comments/(?:page-(?P<page_number>[0-9]+)/)?$', comments),  # good
     ]
 
 Both patterns use nested arguments and will resolve: for example,

@@ -3,15 +3,18 @@ Form classes
 """
 
 import copy
+import datetime
+import warnings
 
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.forms.fields import Field, FileField
-from django.forms.utils import ErrorDict, ErrorList
+from django.forms.utils import ErrorDict, ErrorList, RenderableFormMixin
 from django.forms.widgets import Media, MediaDefiningClass
 from django.utils.datastructures import MultiValueDict
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import cached_property
-from django.utils.html import conditional_escape, html_safe
-from django.utils.safestring import mark_safe
+from django.utils.html import conditional_escape
+from django.utils.safestring import SafeString, mark_safe
 from django.utils.translation import gettext as _
 
 from .renderers import get_default_renderer
@@ -22,13 +25,11 @@ __all__ = ('BaseForm', 'Form')
 class DeclarativeFieldsMetaclass(MediaDefiningClass):
     """Collect Fields declared on the base classes."""
     def __new__(mcs, name, bases, attrs):
-        # Collect fields from current class.
-        current_fields = []
-        for key, value in list(attrs.items()):
-            if isinstance(value, Field):
-                current_fields.append((key, value))
-                attrs.pop(key)
-        attrs['declared_fields'] = dict(current_fields)
+        # Collect fields from current class and remove them from attrs.
+        attrs['declared_fields'] = {
+            key: attrs.pop(key) for key, value in list(attrs.items())
+            if isinstance(value, Field)
+        }
 
         new_class = super().__new__(mcs, name, bases, attrs)
 
@@ -50,8 +51,7 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
         return new_class
 
 
-@html_safe
-class BaseForm:
+class BaseForm(RenderableFormMixin):
     """
     The main implementation of all the Form logic. Note that this class is
     different than Form. See the comments by the Form class for more info. Any
@@ -62,6 +62,12 @@ class BaseForm:
     field_order = None
     prefix = None
     use_required_attribute = True
+
+    template_name = 'django/forms/default.html'
+    template_name_p = 'django/forms/p.html'
+    template_name_table = 'django/forms/table.html'
+    template_name_ul = 'django/forms/ul.html'
+    template_name_label = 'django/forms/label.html'
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=None,
@@ -130,9 +136,6 @@ class BaseForm:
         fields.update(self.fields)  # add remaining fields in original order
         self.fields = fields
 
-    def __str__(self):
-        return self.as_table()
-
     def __repr__(self):
         if self._errors is None:
             is_valid = "Unknown"
@@ -145,12 +148,22 @@ class BaseForm:
             'fields': ';'.join(self.fields),
         }
 
+    def _bound_items(self):
+        """Yield (name, bf) pairs, where bf is a BoundField object."""
+        for name in self.fields:
+            yield name, self[name]
+
     def __iter__(self):
+        """Yield the form's fields as BoundField objects."""
         for name in self.fields:
             yield self[name]
 
     def __getitem__(self, name):
         """Return a BoundField with the given name."""
+        try:
+            return self._bound_fields_cache[name]
+        except KeyError:
+            pass
         try:
             field = self.fields[name]
         except KeyError:
@@ -161,9 +174,9 @@ class BaseForm:
                     ', '.join(sorted(self.fields)),
                 )
             )
-        if name not in self._bound_fields_cache:
-            self._bound_fields_cache[name] = field.get_bound_field(self, name)
-        return self._bound_fields_cache[name]
+        bound_field = field.get_bound_field(self, name)
+        self._bound_fields_cache[name] = bound_field
+        return bound_field
 
     @property
     def errors(self):
@@ -189,15 +202,27 @@ class BaseForm:
         """Add an 'initial' prefix for checking dynamic initial values."""
         return 'initial-%s' % self.add_prefix(field_name)
 
+    def _widget_data_value(self, widget, html_name):
+        # value_from_datadict() gets the data from the data dictionaries.
+        # Each widget type knows how to retrieve its own data, because some
+        # widgets split data over several HTML fields.
+        return widget.value_from_datadict(self.data, self.files, html_name)
+
     def _html_output(self, normal_row, error_row, row_ender, help_text_html, errors_on_separate_row):
         "Output HTML. Used by as_table(), as_ul(), as_p()."
+        warnings.warn(
+            'django.forms.BaseForm._html_output() is deprecated. '
+            'Please use .render() and .get_context() instead.',
+            RemovedInDjango50Warning,
+            stacklevel=2,
+        )
         # Errors that should be displayed above all fields.
         top_errors = self.non_field_errors().copy()
         output, hidden_fields = [], []
 
-        for name, field in self.fields.items():
+        for name, bf in self._bound_items():
+            field = bf.field
             html_class_attr = ''
-            bf = self[name]
             bf_errors = self.error_class(bf.errors)
             if bf.is_hidden:
                 if bf_errors:
@@ -267,35 +292,37 @@ class BaseForm:
                 output.append(str_hidden)
         return mark_safe('\n'.join(output))
 
-    def as_table(self):
-        "Return this form rendered as HTML <tr>s -- excluding the <table></table>."
-        return self._html_output(
-            normal_row='<tr%(html_class_attr)s><th>%(label)s</th><td>%(errors)s%(field)s%(help_text)s</td></tr>',
-            error_row='<tr><td colspan="2">%s</td></tr>',
-            row_ender='</td></tr>',
-            help_text_html='<br><span class="helptext">%s</span>',
-            errors_on_separate_row=False,
-        )
-
-    def as_ul(self):
-        "Return this form rendered as HTML <li>s -- excluding the <ul></ul>."
-        return self._html_output(
-            normal_row='<li%(html_class_attr)s>%(errors)s%(label)s %(field)s%(help_text)s</li>',
-            error_row='<li>%s</li>',
-            row_ender='</li>',
-            help_text_html=' <span class="helptext">%s</span>',
-            errors_on_separate_row=False,
-        )
-
-    def as_p(self):
-        "Return this form rendered as HTML <p>s."
-        return self._html_output(
-            normal_row='<p%(html_class_attr)s>%(label)s %(field)s%(help_text)s</p>',
-            error_row='%s',
-            row_ender='</p>',
-            help_text_html=' <span class="helptext">%s</span>',
-            errors_on_separate_row=True,
-        )
+    def get_context(self):
+        fields = []
+        hidden_fields = []
+        top_errors = self.non_field_errors().copy()
+        for name, bf in self._bound_items():
+            bf_errors = self.error_class(bf.errors, renderer=self.renderer)
+            if bf.is_hidden:
+                if bf_errors:
+                    top_errors += [
+                        _('(Hidden field %(name)s) %(error)s') % {'name': name, 'error': str(e)}
+                        for e in bf_errors
+                    ]
+                hidden_fields.append(bf)
+            else:
+                errors_str = str(bf_errors)
+                # RemovedInDjango50Warning.
+                if not isinstance(errors_str, SafeString):
+                    warnings.warn(
+                        f'Returning a plain string from '
+                        f'{self.error_class.__name__} is deprecated. Please '
+                        f'customize via the template system instead.',
+                        RemovedInDjango50Warning,
+                    )
+                    errors_str = mark_safe(errors_str)
+                fields.append((bf, errors_str))
+        return {
+            'form': self,
+            'fields': fields,
+            'hidden_fields': hidden_fields,
+            'errors': top_errors,
+        }
 
     def non_field_errors(self):
         """
@@ -303,7 +330,10 @@ class BaseForm:
         field -- i.e., from Form.clean(). Return an empty ErrorList if there
         are none.
         """
-        return self.errors.get(NON_FIELD_ERRORS, self.error_class(error_class='nonfield'))
+        return self.errors.get(
+            NON_FIELD_ERRORS,
+            self.error_class(error_class='nonfield', renderer=self.renderer),
+        )
 
     def add_error(self, field, error):
         """
@@ -345,9 +375,9 @@ class BaseForm:
                     raise ValueError(
                         "'%s' has no field named '%s'." % (self.__class__.__name__, field))
                 if field == NON_FIELD_ERRORS:
-                    self._errors[field] = self.error_class(error_class='nonfield')
+                    self._errors[field] = self.error_class(error_class='nonfield', renderer=self.renderer)
                 else:
-                    self._errors[field] = self.error_class()
+                    self._errors[field] = self.error_class(renderer=self.renderer)
             self._errors[field].extend(error_list)
             if field in self.cleaned_data:
                 del self.cleaned_data[field]
@@ -376,18 +406,12 @@ class BaseForm:
         self._post_clean()
 
     def _clean_fields(self):
-        for name, field in self.fields.items():
-            # value_from_datadict() gets the data from the data dictionaries.
-            # Each widget type knows how to retrieve its own data, because some
-            # widgets split data over several HTML fields.
-            if field.disabled:
-                value = self.get_initial_for_field(field, name)
-            else:
-                value = field.widget.value_from_datadict(self.data, self.files, self.add_prefix(name))
+        for name, bf in self._bound_items():
+            field = bf.field
+            value = bf.initial if field.disabled else bf.data
             try:
                 if isinstance(field, FileField):
-                    initial = self.get_initial_for_field(field, name)
-                    value = field.clean(value, initial)
+                    value = field.clean(value, bf.initial)
                 else:
                     value = field.clean(value)
                 self.cleaned_data[name] = value
@@ -428,27 +452,7 @@ class BaseForm:
 
     @cached_property
     def changed_data(self):
-        data = []
-        for name, field in self.fields.items():
-            prefixed_name = self.add_prefix(name)
-            data_value = field.widget.value_from_datadict(self.data, self.files, prefixed_name)
-            if not field.show_hidden_initial:
-                # Use the BoundField's initial as this is the value passed to
-                # the widget.
-                initial_value = self[name].initial
-            else:
-                initial_prefixed_name = self.add_initial_prefix(name)
-                hidden_widget = field.hidden_widget()
-                try:
-                    initial_value = field.to_python(hidden_widget.value_from_datadict(
-                        self.data, self.files, initial_prefixed_name))
-                except ValidationError:
-                    # Always assume data has changed if validation fails.
-                    data.append(name)
-                    continue
-            if field.has_changed(initial_value, data_value):
-                data.append(name)
-        return data
+        return [name for name, bf in self._bound_items() if bf._has_changed()]
 
     @property
     def media(self):
@@ -487,6 +491,11 @@ class BaseForm:
         value = self.initial.get(field_name, field.initial)
         if callable(value):
             value = value()
+        # If this is an auto-generated default date, nix the microseconds
+        # for standardized handling. See #22502.
+        if (isinstance(value, (datetime.datetime, datetime.time)) and
+                not field.widget.supports_microseconds):
+            value = value.replace(microsecond=0)
         return value
 
 

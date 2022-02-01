@@ -10,6 +10,7 @@ import inspect
 import re
 import string
 from importlib import import_module
+from pickle import PicklingError
 from urllib.parse import quote
 
 from asgiref.local import Local
@@ -45,6 +46,8 @@ class ResolverMatch:
         self.namespaces = [x for x in namespaces if x] if namespaces else []
         self.namespace = ':'.join(self.namespaces)
 
+        if hasattr(func, 'view_class'):
+            func = func.view_class
         if not hasattr(func, '__name__'):
             # A class-based view
             self._func_path = func.__class__.__module__ + '.' + func.__class__.__name__
@@ -59,10 +62,20 @@ class ResolverMatch:
         return (self.func, self.args, self.kwargs)[index]
 
     def __repr__(self):
-        return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name=%s, app_names=%s, namespaces=%s, route=%s)" % (
-            self._func_path, self.args, self.kwargs, self.url_name,
-            self.app_names, self.namespaces, self.route,
+        if isinstance(self.func, functools.partial):
+            func = repr(self.func)
+        else:
+            func = self._func_path
+        return (
+            'ResolverMatch(func=%s, args=%r, kwargs=%r, url_name=%r, '
+            'app_names=%r, namespaces=%r, route=%r)' % (
+                func, self.args, self.kwargs, self.url_name,
+                self.app_names, self.namespaces, self.route,
+            )
         )
+
+    def __reduce_ex__(self, protocol):
+        raise PicklingError(f'Cannot pickle {self.__class__.__qualname__}.')
 
 
 def get_resolver(urlconf=None):
@@ -154,7 +167,11 @@ class RegexPattern(CheckURLMixin):
         self.converters = {}
 
     def match(self, path):
-        match = self.regex.search(path)
+        match = (
+            self.regex.fullmatch(path)
+            if self._is_endpoint and self.regex.pattern.endswith('$')
+            else self.regex.search(path)
+        )
         if match:
             # If there are any named groups, use those as kwargs, ignoring
             # non-named groups. Otherwise, pass all non-named arguments as
@@ -244,7 +261,7 @@ def _route_to_regex(route, is_endpoint=False):
         converters[parameter] = converter
         parts.append('(?P<' + parameter + '>' + converter.regex + ')')
     if is_endpoint:
-        parts.append('$')
+        parts.append(r'\Z')
     return ''.join(parts), converters
 
 
@@ -338,6 +355,7 @@ class URLPattern:
     def check(self):
         warnings = self._check_pattern_name()
         warnings.extend(self.pattern.check())
+        warnings.extend(self._check_callback())
         return warnings
 
     def _check_pattern_name(self):
@@ -353,6 +371,22 @@ class URLPattern:
             return [warning]
         else:
             return []
+
+    def _check_callback(self):
+        from django.views import View
+
+        view = self.callback
+        if inspect.isclass(view) and issubclass(view, View):
+            return [Error(
+                'Your URL pattern %s has an invalid view, pass %s.as_view() '
+                'instead of %s.' % (
+                    self.pattern.describe(),
+                    view.__name__,
+                    view.__name__,
+                ),
+                id='urls.E009',
+            )]
+        return []
 
     def resolve(self, path):
         match = self.pattern.match(path)
@@ -371,7 +405,9 @@ class URLPattern:
         callback = self.callback
         if isinstance(callback, functools.partial):
             callback = callback.func
-        if not hasattr(callback, '__name__'):
+        if hasattr(callback, 'view_class'):
+            callback = callback.view_class
+        elif not hasattr(callback, '__name__'):
             return callback.__module__ + "." + callback.__class__.__name__
         return callback.__module__ + "." + callback.__qualname__
 
@@ -581,7 +617,7 @@ class URLResolver:
                             self._join_route(current_route, sub_match.route),
                             tried,
                         )
-                    self._extend_tried(tried, pattern)
+                    tried.append([pattern])
             raise Resolver404({'tried': tried, 'path': new_path})
         raise Resolver404({'path': path})
 
@@ -600,9 +636,10 @@ class URLResolver:
             iter(patterns)
         except TypeError as e:
             msg = (
-                "The included URLconf '{name}' does not appear to have any "
-                "patterns in it. If you see valid patterns in the file then "
-                "the issue is probably caused by a circular import."
+                "The included URLconf '{name}' does not appear to have "
+                "any patterns in it. If you see the 'urlpatterns' variable "
+                "with valid patterns in the file then the issue is probably "
+                "caused by a circular import."
             )
             raise ImproperlyConfigured(msg.format(name=self.urlconf_name)) from e
         return patterns

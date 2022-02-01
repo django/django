@@ -1,6 +1,7 @@
 from django.template import (
     Context, Engine, TemplateDoesNotExist, TemplateSyntaxError, loader,
 )
+from django.template.loader_tags import IncludeNode
 from django.test import SimpleTestCase
 
 from ..utils import setup
@@ -314,3 +315,12 @@ class IncludeTests(SimpleTestCase):
         ], libraries={'custom': 'template_tests.templatetags.custom'})
         output = engine.render_to_string('template', {'vars': range(9)})
         self.assertEqual(output, '012345678')
+
+
+class IncludeNodeTests(SimpleTestCase):
+    def test_repr(self):
+        include_node = IncludeNode('app/template.html')
+        self.assertEqual(
+            repr(include_node),
+            "<IncludeNode: template='app/template.html'>",
+        )

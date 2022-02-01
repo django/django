@@ -17,9 +17,9 @@ implements the OpenGIS `Simple Features for SQL`__ spatial predicate functions
 and spatial operators. GEOS, now an OSGeo project, was initially developed and
 maintained by `Refractions Research`__ of Victoria, Canada.
 
-__ https://trac.osgeo.org/geos/
+__ https://libgeos.org/
 __ https://sourceforge.net/projects/jts-topo-suite/
-__ https://www.opengeospatial.org/standards/sfs
+__ https://www.ogc.org/standards/sfs
 __ http://www.refractions.net/
 
 Features
@@ -87,7 +87,7 @@ Finally, there is the :func:`fromfile` factory method which returns a
 .. admonition:: My logs are filled with GEOS-related errors
 
     You find many ``TypeError`` or ``AttributeError`` exceptions filling your
-    Web server's log files. This generally means that you are creating GEOS
+    web server's log files. This generally means that you are creating GEOS
     objects at the top level of some of your Python modules. Then, due to a race
     condition in the garbage collector, your module is garbage collected before
     the GEOS object. To prevent this, create :class:`GEOSGeometry` objects
@@ -655,6 +655,16 @@ Other Properties & Methods
         doesn't impose any constraints on the geometry's SRID if called with a
         :class:`~django.contrib.gis.gdal.CoordTransform` object.
 
+.. method:: GEOSGeometry.make_valid()
+
+    .. versionadded:: 4.1
+
+    Returns a valid :class:`GEOSGeometry` equivalent, trying not to lose any of
+    the input vertices. If the geometry is already valid, it is returned
+    untouched. This is similar to the
+    :class:`~django.contrib.gis.db.models.functions.MakeValid` database
+    function. Requires GEOS 3.8.
+
 .. method:: GEOSGeometry.normalize()
 
     Converts this geometry to canonical form::
@@ -729,8 +739,6 @@ Other Properties & Methods
 
     .. attribute:: is_counterclockwise
 
-        .. versionadded:: 3.1
-
         Returns whether this ``LinearRing`` is counterclockwise.
 
 ``Polygon``
@@ -768,6 +776,8 @@ Other Properties & Methods
         >>> if poly_1.area > poly_2.area:
         >>>     pass
 
+.. _geos-geometry-collections:
+
 Geometry Collections
 ====================
 
@@ -803,7 +813,7 @@ Geometry Collections
 
     .. attribute:: closed
 
-        Returns ``True`` if and only if all elements are closed. Requires GEOS 3.5.
+        Returns ``True`` if and only if all elements are closed.
 
 ``MultiPolygon``
 ----------------

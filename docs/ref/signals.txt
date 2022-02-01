@@ -195,6 +195,12 @@ Arguments sent with this signal:
 ``using``
     The database alias being used.
 
+``origin``
+    .. versionadded:: 4.1
+
+    The origin of the deletion being the instance of a ``Model`` or
+    ``QuerySet`` class.
+
 ``post_delete``
 ---------------
 
@@ -218,6 +224,12 @@ Arguments sent with this signal:
 
 ``using``
     The database alias being used.
+
+``origin``
+    .. versionadded:: 4.1
+
+    The origin of the deletion being the instance of a ``Model`` or
+    ``QuerySet`` class.
 
 ``m2m_changed``
 ---------------
@@ -424,6 +436,11 @@ Arguments sent with this signal:
     For example, the :mod:`django.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
 
+``stdout``
+    .. versionadded:: 4.0
+
+    A stream-like object where verbose output should be redirected.
+
 ``using``
     The alias of database on which a command will operate.
 
@@ -477,6 +494,11 @@ Arguments sent with this signal:
 
     For example, the :mod:`django.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
+
+``stdout``
+    .. versionadded:: 4.0
+
+    A stream-like object where verbose output should be redirected.
 
 ``using``
     The database alias used for synchronization. Defaults to the ``default``

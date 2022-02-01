@@ -3,7 +3,6 @@ Query subclasses which provide extra functionality beyond simple data retrieval.
 """
 
 from django.core.exceptions import FieldError
-from django.db.models.query_utils import Q
 from django.db.models.sql.constants import (
     CURSOR, GET_ITERATOR_CHUNK_SIZE, NO_RESULTS,
 )
@@ -37,9 +36,11 @@ class DeleteQuery(Query):
         num_deleted = 0
         field = self.get_meta().pk
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
-            self.where = self.where_class()
-            self.add_q(Q(
-                **{field.attname + '__in': pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]}))
+            self.clear_where()
+            self.add_filter(
+                f'{field.attname}__in',
+                pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE],
+            )
             num_deleted += self.do_query(self.get_meta().db_table, self.where, using=using)
         return num_deleted
 
@@ -70,8 +71,8 @@ class UpdateQuery(Query):
     def update_batch(self, pk_list, values, using):
         self.add_update_values(values)
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
-            self.where = self.where_class()
-            self.add_q(Q(pk__in=pk_list[offset: offset + GET_ITERATOR_CHUNK_SIZE]))
+            self.clear_where()
+            self.add_filter('pk__in', pk_list[offset: offset + GET_ITERATOR_CHUNK_SIZE])
             self.get_compiler(using).execute_sql(NO_RESULTS)
 
     def add_update_values(self, values):
@@ -129,7 +130,7 @@ class UpdateQuery(Query):
             query = UpdateQuery(model)
             query.values = values
             if self.related_ids is not None:
-                query.add_filter(('pk__in', self.related_ids))
+                query.add_filter('pk__in', self.related_ids)
             result.append(query)
         return result
 
@@ -137,11 +138,13 @@ class UpdateQuery(Query):
 class InsertQuery(Query):
     compiler = 'SQLInsertCompiler'
 
-    def __init__(self, *args, ignore_conflicts=False, **kwargs):
+    def __init__(self, *args, on_conflict=None, update_fields=None, unique_fields=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields = []
         self.objs = []
-        self.ignore_conflicts = ignore_conflicts
+        self.on_conflict = on_conflict
+        self.update_fields = update_fields or []
+        self.unique_fields = unique_fields or []
 
     def insert_values(self, fields, objs, raw=False):
         self.fields = fields
@@ -157,6 +160,6 @@ class AggregateQuery(Query):
 
     compiler = 'SQLAggregateCompiler'
 
-    def add_subquery(self, query, using):
-        query.subquery = True
-        self.subquery, self.sub_params = query.get_compiler(using).as_sql(with_col_aliases=True)
+    def __init__(self, model, inner_query):
+        self.inner_query = inner_query
+        super().__init__(model)

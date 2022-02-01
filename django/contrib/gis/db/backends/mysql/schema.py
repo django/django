@@ -16,11 +16,16 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
         self.geometry_sql = []
 
     def skip_default(self, field):
-        # Geometry fields are stored as BLOB/TEXT, for which MySQL < 8.0.13 and
-        # MariaDB < 10.2.1 don't support defaults.
+        # Geometry fields are stored as BLOB/TEXT, for which MySQL < 8.0.13
+        # doesn't support defaults.
         if isinstance(field, GeometryField) and not self._supports_limited_data_type_defaults:
             return True
         return super().skip_default(field)
+
+    def quote_value(self, value):
+        if isinstance(value, self.connection.ops.Adapter):
+            return super().quote_value(str(value))
+        return super().quote_value(value)
 
     def column_sql(self, model, field, include_default=False):
         column_sql = super().column_sql(model, field, include_default)

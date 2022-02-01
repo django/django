@@ -153,24 +153,6 @@ Requires core.js and SelectBox.js.
             // Move selected from_box options to to_box
             SelectBox.move(field_id + '_from', field_id + '_to');
 
-            if (!is_stacked) {
-                // In horizontal mode, give the same height to the two boxes.
-                const j_from_box = document.getElementById(field_id + '_from');
-                const j_to_box = document.getElementById(field_id + '_to');
-                let height = filter_p.offsetHeight + j_from_box.offsetHeight;
-
-                const j_to_box_style = window.getComputedStyle(j_to_box);
-                if (j_to_box_style.getPropertyValue('box-sizing') === 'border-box') {
-                    // Add the padding and border to the final height.
-                    height += parseInt(j_to_box_style.getPropertyValue('padding-top'), 10)
-                        + parseInt(j_to_box_style.getPropertyValue('padding-bottom'), 10)
-                        + parseInt(j_to_box_style.getPropertyValue('border-top-width'), 10)
-                        + parseInt(j_to_box_style.getPropertyValue('border-bottom-width'), 10);
-                }
-
-                j_to_box.style.height = height + 'px';
-            }
-
             // Initial icon refresh
             SelectFilter.refresh_icons(field_id);
         },

@@ -13,7 +13,8 @@ request_logger = logging.getLogger('django.request')
 # Default logging for Django. This sends an email to the site admins on every
 # HTTP 500 error. Depending on DEBUG, all other log records are either sent to
 # the console (DEBUG=True) or discarded (DEBUG=False) by means of the
-# require_debug_true filter.
+# require_debug_true filter. This configuration is quoted in
+# docs/ref/logging.txt; please amend it there if edited here.
 DEFAULT_LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -198,7 +199,7 @@ class ServerFormatter(logging.Formatter):
         return self._fmt.find('{server_time}') >= 0
 
 
-def log_response(message, *args, response=None, request=None, logger=request_logger, level=None, exc_info=None):
+def log_response(message, *args, response=None, request=None, logger=request_logger, level=None, exception=None):
     """
     Log errors based on HttpResponse status.
 
@@ -208,8 +209,8 @@ def log_response(message, *args, response=None, request=None, logger=request_log
     """
     # Check if the response has already been logged. Multiple requests to log
     # the same response can be received in some cases, e.g., when the
-    # response is the result of an exception and is logged at the time the
-    # exception is caught so that the exc_info can be recorded.
+    # response is the result of an exception and is logged when the exception
+    # is caught, to record the exception.
     if getattr(response, '_has_been_logged', False):
         return
 
@@ -227,6 +228,6 @@ def log_response(message, *args, response=None, request=None, logger=request_log
             'status_code': response.status_code,
             'request': request,
         },
-        exc_info=exc_info,
+        exc_info=exception,
     )
     response._has_been_logged = True

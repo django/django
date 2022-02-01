@@ -26,7 +26,15 @@ DEBUG_ENGINE = Engine(
     libraries={'i18n': 'django.templatetags.i18n'},
 )
 
-CURRENT_DIR = Path(__file__).parent
+
+def builtin_template_path(name):
+    """
+    Return a path to a builtin template.
+
+    Avoid calling this function at the module level or in a class-definition
+    because __file__ may not exist, e.g. in frozen environments.
+    """
+    return Path(__file__).parent / 'templates' / name
 
 
 class ExceptionCycleWarning(UserWarning):
@@ -61,7 +69,7 @@ def technical_500_response(request, exc_type, exc_value, tb, status_code=500):
         return HttpResponse(text, status=status_code, content_type='text/plain; charset=utf-8')
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def get_default_exception_reporter_filter():
     # Instantiate the default filter for the first time and cache it.
     return import_string(settings.DEFAULT_EXCEPTION_REPORTER_FILTER)()
@@ -75,6 +83,16 @@ def get_exception_reporter_filter(request):
 def get_exception_reporter_class(request):
     default_exception_reporter_class = import_string(settings.DEFAULT_EXCEPTION_REPORTER)
     return getattr(request, 'exception_reporter_class', default_exception_reporter_class)
+
+
+def get_caller(request):
+    resolver_match = request.resolver_match
+    if resolver_match is None:
+        try:
+            resolver_match = resolve(request.path)
+        except Http404:
+            pass
+    return '' if resolver_match is None else resolver_match._func_path
 
 
 class SafeExceptionReporterFilter:
@@ -245,8 +263,14 @@ class SafeExceptionReporterFilter:
 
 class ExceptionReporter:
     """Organize and coordinate reporting on exceptions."""
-    html_template_path = CURRENT_DIR / 'templates' / 'technical_500.html'
-    text_template_path = CURRENT_DIR / 'templates' / 'technical_500.txt'
+
+    @property
+    def html_template_path(self):
+        return builtin_template_path('technical_500.html')
+
+    @property
+    def text_template_path(self):
+        return builtin_template_path('technical_500.txt')
 
     def __init__(self, request, exc_type, exc_value, tb, is_email=False):
         self.request = request
@@ -259,6 +283,17 @@ class ExceptionReporter:
         self.template_info = getattr(self.exc_value, 'template_debug', None)
         self.template_does_not_exist = False
         self.postmortem = None
+
+    def _get_raw_insecure_uri(self):
+        """
+        Return an absolute URI from variables available in this request. Skip
+        allowed hosts protection, so may return insecure URI.
+        """
+        return '{scheme}://{host}{path}'.format(
+            scheme=self.request.scheme,
+            host=self.request._get_raw_host(),
+            path=self.request.get_full_path(),
+        )
 
     def get_traceback_data(self):
         """Return a dictionary containing traceback information."""
@@ -323,6 +358,9 @@ class ExceptionReporter:
             c['request_GET_items'] = self.request.GET.items()
             c['request_FILES_items'] = self.request.FILES.items()
             c['request_COOKIES_items'] = self.request.COOKIES.items()
+            c['request_insecure_uri'] = self._get_raw_insecure_uri()
+            c['raising_view_name'] = get_caller(self.request)
+
         # Check whether exception info is available
         if self.exc_type:
             c['exception_type'] = self.exc_type.__name__
@@ -439,7 +477,13 @@ class ExceptionReporter:
     def get_exception_traceback_frames(self, exc_value, tb):
         exc_cause = self._get_explicit_or_implicit_cause(exc_value)
         exc_cause_explicit = getattr(exc_value, '__cause__', True)
-
+        if tb is None:
+            yield {
+                'exc_cause': exc_cause,
+                'exc_cause_explicit': exc_cause_explicit,
+                'tb': None,
+                'type': 'user',
+            }
         while tb is not None:
             # Support for __traceback_hide__ which is used by a few libraries
             # to hide internal frames.
@@ -503,24 +547,7 @@ def technical_404_response(request, exception):
     if isinstance(urlconf, types.ModuleType):
         urlconf = urlconf.__name__
 
-    caller = ''
-    try:
-        resolver_match = resolve(request.path)
-    except Http404:
-        pass
-    else:
-        obj = resolver_match.func
-
-        if hasattr(obj, '__name__'):
-            caller = obj.__name__
-        elif hasattr(obj, '__class__') and hasattr(obj.__class__, '__name__'):
-            caller = obj.__class__.__name__
-
-        if hasattr(obj, '__module__'):
-            module = obj.__module__
-            caller = '%s.%s' % (module, caller)
-
-    with Path(CURRENT_DIR, 'templates', 'technical_404.html').open(encoding='utf-8') as fh:
+    with builtin_template_path('technical_404.html').open(encoding='utf-8') as fh:
         t = DEBUG_ENGINE.from_string(fh.read())
     reporter_filter = get_default_exception_reporter_filter()
     c = Context({
@@ -532,14 +559,14 @@ def technical_404_response(request, exception):
         'reason': str(exception),
         'request': request,
         'settings': reporter_filter.get_safe_settings(),
-        'raising_view_name': caller,
+        'raising_view_name': get_caller(request),
     })
     return HttpResponseNotFound(t.render(c), content_type='text/html')
 
 
 def default_urlconf(request):
     """Create an empty URLconf 404 error response."""
-    with Path(CURRENT_DIR, 'templates', 'default_urlconf.html').open(encoding='utf-8') as fh:
+    with builtin_template_path('default_urlconf.html').open(encoding='utf-8') as fh:
         t = DEBUG_ENGINE.from_string(fh.read())
     c = Context({
         'version': get_docs_version(),

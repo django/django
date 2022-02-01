@@ -28,7 +28,9 @@ class GeometryFieldTest(SimpleTestCase):
         # Making the field in a different SRID from that of the geometry, and
         # asserting it transforms.
         fld = forms.GeometryField(srid=32140)
-        tol = 0.0001
+        # Different PROJ versions use different transformations, all are
+        # correct as having a 1 meter accuracy.
+        tol = 1
         xform_geom = GEOSGeometry('POINT (951640.547328465 4219369.26171664)', srid=32140)
         # The cleaned geometry is transformed to 32140 (the widget map_srid is 3857).
         cleaned_geom = fld.clean('SRID=3857;POINT (-10615777.40976205 3473169.895707852)')
@@ -236,7 +238,7 @@ class SpecializedFieldTest(SimpleTestCase):
         self.assertIn(escape(ogr.json), rendered)
 
     # map_srid in openlayers.html template must not be localized.
-    @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
+    @override_settings(USE_THOUSAND_SEPARATOR=True)
     def test_pointfield(self):
         class PointForm(forms.Form):
             p = forms.PointField()
@@ -374,10 +376,18 @@ class OSMWidgetTest(SimpleTestCase):
 class GeometryWidgetTests(SimpleTestCase):
 
     def test_get_context_attrs(self):
-        """The Widget.get_context() attrs argument overrides self.attrs."""
+        # The Widget.get_context() attrs argument overrides self.attrs.
         widget = BaseGeometryWidget(attrs={'geom_type': 'POINT'})
         context = widget.get_context('point', None, attrs={'geom_type': 'POINT2'})
         self.assertEqual(context['geom_type'], 'POINT2')
+        # Widget.get_context() returns expected name for geom_type.
+        widget = BaseGeometryWidget(attrs={'geom_type': 'POLYGON'})
+        context = widget.get_context('polygon', None, None)
+        self.assertEqual(context['geom_type'], 'Polygon')
+        # Widget.get_context() returns 'Geometry' instead of 'Unknown'.
+        widget = BaseGeometryWidget(attrs={'geom_type': 'GEOMETRY'})
+        context = widget.get_context('geometry', None, None)
+        self.assertEqual(context['geom_type'], 'Geometry')
 
     def test_subwidgets(self):
         widget = forms.BaseGeometryWidget()

@@ -64,6 +64,9 @@ class BaseDatabaseFeatures:
     has_real_datatype = False
     supports_subqueries_in_group_by = True
 
+    # Does the backend ignore unnecessary ORDER BY clauses in subqueries?
+    ignores_unnecessary_order_by_in_subqueries = True
+
     # Is there a true datatype for uuid?
     has_native_uuid_field = False
 
@@ -108,9 +111,6 @@ class BaseDatabaseFeatures:
     # Do we need to NULL a ForeignKey out, or can the constraint check be
     # deferred
     can_defer_constraint_checks = False
-
-    # date_interval_sql can properly handle mixed Date/DateTime fields and timedeltas
-    supports_mixed_date_datetime_comparisons = True
 
     # Does the backend support tablespaces? Default to False because it isn't
     # in the SQL standard.
@@ -198,7 +198,7 @@ class BaseDatabaseFeatures:
     closed_cursor_error_class = ProgrammingError
 
     # Does 'a' LIKE 'A' match?
-    has_case_insensitive_like = True
+    has_case_insensitive_like = False
 
     # Suffix for backends that don't support "SELECT xxx;" queries.
     bare_select_suffix = ''
@@ -271,6 +271,10 @@ class BaseDatabaseFeatures:
     # Does the backend support ignoring constraint or uniqueness errors during
     # INSERT?
     supports_ignore_conflicts = True
+    # Does the backend support updating rows on constraint or uniqueness errors
+    # during INSERT?
+    supports_update_conflicts = False
+    supports_update_conflicts_with_target = False
 
     # Does this backend require casting the results of CASE expressions used
     # in UPDATE statements to ensure the expression has the correct type?
@@ -281,6 +285,10 @@ class BaseDatabaseFeatures:
     supports_functions_in_partial_indexes = True
     # Does the backend support covering indexes (CREATE INDEX ... INCLUDE ...)?
     supports_covering_indexes = False
+    # Does the backend support indexes on expressions?
+    supports_expression_indexes = True
+    # Does the backend treat COLLATE as an indexed expression?
+    collate_as_index_expression = False
 
     # Does the database allow more than one constraint or index on the same
     # field(s)?
@@ -306,6 +314,8 @@ class BaseDatabaseFeatures:
     # Does value__d__contains={'f': 'g'} (without a list around the dict) match
     # {'d': [{'f': 'g'}]}?
     json_key_contains_list_matching_requires_list = False
+    # Does the backend support JSONObject() database function?
+    has_json_object_function = True
 
     # Does the backend support column collations?
     supports_collation_on_charfield = True
@@ -320,6 +330,15 @@ class BaseDatabaseFeatures:
         'non_default': None,  # Non-default.
         'swedish_ci': None  # Swedish case-insensitive.
     }
+    # SQL template override for tests.aggregation.tests.NowUTC
+    test_now_utc_template = None
+
+    # A set of dotted paths to tests in Django's test suite that are expected
+    # to fail on this database.
+    django_test_expected_failures = set()
+    # A map of reasons to sets of dotted paths to tests in Django's test suite
+    # that should be skipped for this database.
+    django_test_skips = {}
 
     def __init__(self, connection):
         self.connection = connection

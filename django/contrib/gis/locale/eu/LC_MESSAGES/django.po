@@ -3,13 +3,13 @@
 # Translators:
 # Aitzol Naberan <anaberan@codesyntax.com>, 2011-2012
 # Eneko Illarramendi <eneko@illarra.com>, 2017
-# Urtzi Odriozola <urtzi.odriozola@gmail.com>, 2017
+# Urtzi Odriozola <urtzi.odriozola@gmail.com>, 2017,2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-25 08:06+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2021-03-18 15:45+0000\n"
 "Last-Translator: Urtzi Odriozola <urtzi.odriozola@gmail.com>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
@@ -25,10 +25,9 @@ msgid "The base GIS field."
 msgstr "Oinarrizko GIS eremua."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
-"Oinarrizko Geometria eremua -- OpenGIS zehaztapeneko Geomtry motarentzat "
-"mapak"
+"Oinarrizko Geometria eremua — OpenGIS zehaztapeneko Geomtry motarentzat mapak"
 
 msgid "Point"
 msgstr "Puntua"
@@ -84,5 +83,5 @@ msgid "No feeds are registered."
 msgstr "Ez dago jariorik erregistratuta."
 
 #, python-format
-msgid "Slug %r isn't registered."
+msgid "Slug %r isn’t registered."
 msgstr "%r sluga ez dago erregistratuta."

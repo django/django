@@ -1,6 +1,10 @@
 """
 Tests for django test runner
 """
+import collections.abc
+import multiprocessing
+import os
+import sys
 import unittest
 from unittest import mock
 
@@ -11,12 +15,238 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.core.management.base import SystemCheckError
-from django.test import TransactionTestCase, skipUnlessDBFeature, testcases
-from django.test.runner import DiscoverRunner
+from django.test import (
+    SimpleTestCase, TransactionTestCase, skipUnlessDBFeature,
+)
+from django.test.runner import (
+    DiscoverRunner, Shuffler, reorder_test_bin, reorder_tests, shuffle_tests,
+)
 from django.test.testcases import connections_support_transactions
-from django.test.utils import captured_stderr, dependency_ordered
+from django.test.utils import (
+    captured_stderr, dependency_ordered, get_unique_databases_and_mirrors,
+    iter_test_cases,
+)
+from django.utils.deprecation import RemovedInDjango50Warning
 
 from .models import B, Person, Through
+
+
+class MySuite:
+    def __init__(self):
+        self.tests = []
+
+    def addTest(self, test):
+        self.tests.append(test)
+
+    def __iter__(self):
+        yield from self.tests
+
+
+class TestSuiteTests(SimpleTestCase):
+    def build_test_suite(self, test_classes, suite=None, suite_class=None):
+        if suite_class is None:
+            suite_class = unittest.TestSuite
+        if suite is None:
+            suite = suite_class()
+
+        loader = unittest.defaultTestLoader
+        for test_class in test_classes:
+            tests = loader.loadTestsFromTestCase(test_class)
+            subsuite = suite_class()
+            # Only use addTest() to simplify testing a custom TestSuite.
+            for test in tests:
+                subsuite.addTest(test)
+            suite.addTest(subsuite)
+
+        return suite
+
+    def make_test_suite(self, suite=None, suite_class=None):
+        class Tests1(unittest.TestCase):
+            def test1(self):
+                pass
+
+            def test2(self):
+                pass
+
+        class Tests2(unittest.TestCase):
+            def test1(self):
+                pass
+
+            def test2(self):
+                pass
+
+        return self.build_test_suite(
+            (Tests1, Tests2),
+            suite=suite,
+            suite_class=suite_class,
+        )
+
+    def assertTestNames(self, tests, expected):
+        # Each test.id() has a form like the following:
+        # "test_runner.tests.IterTestCasesTests.test_iter_test_cases.<locals>.Tests1.test1".
+        # It suffices to check only the last two parts.
+        names = ['.'.join(test.id().split('.')[-2:]) for test in tests]
+        self.assertEqual(names, expected)
+
+    def test_iter_test_cases_basic(self):
+        suite = self.make_test_suite()
+        tests = iter_test_cases(suite)
+        self.assertTestNames(tests, expected=[
+            'Tests1.test1', 'Tests1.test2', 'Tests2.test1', 'Tests2.test2',
+        ])
+
+    def test_iter_test_cases_string_input(self):
+        msg = (
+            "Test 'a' must be a test case or test suite not string (was found "
+            "in 'abc')."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            list(iter_test_cases('abc'))
+
+    def test_iter_test_cases_iterable_of_tests(self):
+        class Tests(unittest.TestCase):
+            def test1(self):
+                pass
+
+            def test2(self):
+                pass
+
+        tests = list(unittest.defaultTestLoader.loadTestsFromTestCase(Tests))
+        actual_tests = iter_test_cases(tests)
+        self.assertTestNames(actual_tests, expected=[
+            'Tests.test1', 'Tests.test2',
+        ])
+
+    def test_iter_test_cases_custom_test_suite_class(self):
+        suite = self.make_test_suite(suite_class=MySuite)
+        tests = iter_test_cases(suite)
+        self.assertTestNames(tests, expected=[
+            'Tests1.test1', 'Tests1.test2', 'Tests2.test1', 'Tests2.test2',
+        ])
+
+    def test_iter_test_cases_mixed_test_suite_classes(self):
+        suite = self.make_test_suite(suite=MySuite())
+        child_suite = list(suite)[0]
+        self.assertNotIsInstance(child_suite, MySuite)
+        tests = list(iter_test_cases(suite))
+        self.assertEqual(len(tests), 4)
+        self.assertNotIsInstance(tests[0], unittest.TestSuite)
+
+    def make_tests(self):
+        """Return an iterable of tests."""
+        suite = self.make_test_suite()
+        tests = list(iter_test_cases(suite))
+        return tests
+
+    def test_shuffle_tests(self):
+        tests = self.make_tests()
+        # Choose a seed that shuffles both the classes and methods.
+        shuffler = Shuffler(seed=9)
+        shuffled_tests = shuffle_tests(tests, shuffler)
+        self.assertIsInstance(shuffled_tests, collections.abc.Iterator)
+        self.assertTestNames(shuffled_tests, expected=[
+            'Tests2.test1', 'Tests2.test2', 'Tests1.test2', 'Tests1.test1',
+        ])
+
+    def test_reorder_test_bin_no_arguments(self):
+        tests = self.make_tests()
+        reordered_tests = reorder_test_bin(tests)
+        self.assertIsInstance(reordered_tests, collections.abc.Iterator)
+        self.assertTestNames(reordered_tests, expected=[
+            'Tests1.test1', 'Tests1.test2', 'Tests2.test1', 'Tests2.test2',
+        ])
+
+    def test_reorder_test_bin_reverse(self):
+        tests = self.make_tests()
+        reordered_tests = reorder_test_bin(tests, reverse=True)
+        self.assertIsInstance(reordered_tests, collections.abc.Iterator)
+        self.assertTestNames(reordered_tests, expected=[
+            'Tests2.test2', 'Tests2.test1', 'Tests1.test2', 'Tests1.test1',
+        ])
+
+    def test_reorder_test_bin_random(self):
+        tests = self.make_tests()
+        # Choose a seed that shuffles both the classes and methods.
+        shuffler = Shuffler(seed=9)
+        reordered_tests = reorder_test_bin(tests, shuffler=shuffler)
+        self.assertIsInstance(reordered_tests, collections.abc.Iterator)
+        self.assertTestNames(reordered_tests, expected=[
+            'Tests2.test1', 'Tests2.test2', 'Tests1.test2', 'Tests1.test1',
+        ])
+
+    def test_reorder_test_bin_random_and_reverse(self):
+        tests = self.make_tests()
+        # Choose a seed that shuffles both the classes and methods.
+        shuffler = Shuffler(seed=9)
+        reordered_tests = reorder_test_bin(tests, shuffler=shuffler, reverse=True)
+        self.assertIsInstance(reordered_tests, collections.abc.Iterator)
+        self.assertTestNames(reordered_tests, expected=[
+            'Tests1.test1', 'Tests1.test2', 'Tests2.test2', 'Tests2.test1',
+        ])
+
+    def test_reorder_tests_same_type_consecutive(self):
+        """Tests of the same type are made consecutive."""
+        tests = self.make_tests()
+        # Move the last item to the front.
+        tests.insert(0, tests.pop())
+        self.assertTestNames(tests, expected=[
+            'Tests2.test2', 'Tests1.test1', 'Tests1.test2', 'Tests2.test1',
+        ])
+        reordered_tests = reorder_tests(tests, classes=[])
+        self.assertTestNames(reordered_tests, expected=[
+            'Tests2.test2', 'Tests2.test1', 'Tests1.test1', 'Tests1.test2',
+        ])
+
+    def test_reorder_tests_random(self):
+        tests = self.make_tests()
+        # Choose a seed that shuffles both the classes and methods.
+        shuffler = Shuffler(seed=9)
+        reordered_tests = reorder_tests(tests, classes=[], shuffler=shuffler)
+        self.assertIsInstance(reordered_tests, collections.abc.Iterator)
+        self.assertTestNames(reordered_tests, expected=[
+            'Tests2.test1', 'Tests2.test2', 'Tests1.test2', 'Tests1.test1',
+        ])
+
+    def test_reorder_tests_random_mixed_classes(self):
+        tests = self.make_tests()
+        # Move the last item to the front.
+        tests.insert(0, tests.pop())
+        shuffler = Shuffler(seed=9)
+        self.assertTestNames(tests, expected=[
+            'Tests2.test2', 'Tests1.test1', 'Tests1.test2', 'Tests2.test1',
+        ])
+        reordered_tests = reorder_tests(tests, classes=[], shuffler=shuffler)
+        self.assertTestNames(reordered_tests, expected=[
+            'Tests2.test1', 'Tests2.test2', 'Tests1.test2', 'Tests1.test1',
+        ])
+
+    def test_reorder_tests_reverse_with_duplicates(self):
+        class Tests1(unittest.TestCase):
+            def test1(self):
+                pass
+
+        class Tests2(unittest.TestCase):
+            def test2(self):
+                pass
+
+            def test3(self):
+                pass
+
+        suite = self.build_test_suite((Tests1, Tests2))
+        subsuite = list(suite)[0]
+        suite.addTest(subsuite)
+        tests = list(iter_test_cases(suite))
+        self.assertTestNames(tests, expected=[
+            'Tests1.test1', 'Tests2.test2', 'Tests2.test3', 'Tests1.test1',
+        ])
+        reordered_tests = reorder_tests(tests, classes=[])
+        self.assertTestNames(reordered_tests, expected=[
+            'Tests1.test1', 'Tests2.test2', 'Tests2.test3',
+        ])
+        reordered_tests = reorder_tests(tests, classes=[], reverse=True)
+        self.assertTestNames(reordered_tests, expected=[
+            'Tests2.test3', 'Tests2.test2', 'Tests1.test1',
+        ])
 
 
 class DependencyOrderingTests(unittest.TestCase):
@@ -131,7 +361,8 @@ class DependencyOrderingTests(unittest.TestCase):
 
 class MockTestRunner:
     def __init__(self, *args, **kwargs):
-        pass
+        if parallel := kwargs.get('parallel'):
+            sys.stderr.write(f'parallel={parallel}')
 
 
 MockTestRunner.run_tests = mock.Mock(return_value=[])
@@ -152,6 +383,83 @@ class ManageCommandTests(unittest.TestCase):
         with captured_stderr() as stderr:
             call_command('test', '--timing', 'sites', testrunner='test_runner.tests.MockTestRunner')
         self.assertIn('Total run took', stderr.getvalue())
+
+
+# Isolate from the real environment.
+@mock.patch.dict(os.environ, {}, clear=True)
+@mock.patch.object(multiprocessing, 'cpu_count', return_value=12)
+# Python 3.8 on macOS defaults to 'spawn' mode.
+@mock.patch.object(multiprocessing, 'get_start_method', return_value='fork')
+class ManageCommandParallelTests(SimpleTestCase):
+    def test_parallel_default(self, *mocked_objects):
+        with captured_stderr() as stderr:
+            call_command(
+                'test',
+                '--parallel',
+                testrunner='test_runner.tests.MockTestRunner',
+            )
+        self.assertIn('parallel=12', stderr.getvalue())
+
+    def test_parallel_auto(self, *mocked_objects):
+        with captured_stderr() as stderr:
+            call_command(
+                'test',
+                '--parallel=auto',
+                testrunner='test_runner.tests.MockTestRunner',
+            )
+        self.assertIn('parallel=12', stderr.getvalue())
+
+    def test_no_parallel(self, *mocked_objects):
+        with captured_stderr() as stderr:
+            call_command('test', testrunner='test_runner.tests.MockTestRunner')
+        # Parallel is disabled by default.
+        self.assertEqual(stderr.getvalue(), '')
+
+    def test_parallel_spawn(self, mocked_get_start_method, mocked_cpu_count):
+        mocked_get_start_method.return_value = 'spawn'
+        with captured_stderr() as stderr:
+            call_command(
+                'test',
+                '--parallel=auto',
+                testrunner='test_runner.tests.MockTestRunner',
+            )
+        self.assertIn('parallel=1', stderr.getvalue())
+
+    def test_no_parallel_spawn(self, mocked_get_start_method, mocked_cpu_count):
+        mocked_get_start_method.return_value = 'spawn'
+        with captured_stderr() as stderr:
+            call_command(
+                'test',
+                testrunner='test_runner.tests.MockTestRunner',
+            )
+        self.assertEqual(stderr.getvalue(), '')
+
+    @mock.patch.dict(os.environ, {'DJANGO_TEST_PROCESSES': '7'})
+    def test_no_parallel_django_test_processes_env(self, *mocked_objects):
+        with captured_stderr() as stderr:
+            call_command('test', testrunner='test_runner.tests.MockTestRunner')
+        self.assertEqual(stderr.getvalue(), '')
+
+    @mock.patch.dict(os.environ, {'DJANGO_TEST_PROCESSES': 'invalid'})
+    def test_django_test_processes_env_non_int(self, *mocked_objects):
+        with self.assertRaises(ValueError):
+            call_command(
+                'test',
+                '--parallel',
+                testrunner='test_runner.tests.MockTestRunner',
+            )
+
+    @mock.patch.dict(os.environ, {'DJANGO_TEST_PROCESSES': '7'})
+    def test_django_test_processes_parallel_default(self, *mocked_objects):
+        for parallel in ['--parallel', '--parallel=auto']:
+            with self.subTest(parallel=parallel):
+                with captured_stderr() as stderr:
+                    call_command(
+                        'test',
+                        parallel,
+                        testrunner='test_runner.tests.MockTestRunner',
+                    )
+                self.assertIn('parallel=7', stderr.getvalue())
 
 
 class CustomTestRunnerOptionsSettingsTests(AdminScriptTestCase):
@@ -313,7 +621,7 @@ class AliasedDefaultTestSetupTest(unittest.TestCase):
             runner_instance.teardown_databases(old_config)
 
 
-class SetupDatabasesTests(unittest.TestCase):
+class SetupDatabasesTests(SimpleTestCase):
 
     def setUp(self):
         self.runner_instance = DiscoverRunner(verbosity=0)
@@ -335,6 +643,33 @@ class SetupDatabasesTests(unittest.TestCase):
                 old_config = self.runner_instance.setup_databases()
                 self.runner_instance.teardown_databases(old_config)
         mocked_db_creation.return_value.destroy_test_db.assert_called_once_with('dbname', 0, False)
+
+    def test_setup_test_database_aliases(self):
+        """
+        The default database must be the first because data migrations
+        use the default alias by default.
+        """
+        tested_connections = db.ConnectionHandler({
+            'other': {
+                'ENGINE': 'django.db.backends.dummy',
+                'NAME': 'dbname',
+            },
+            'default': {
+                'ENGINE': 'django.db.backends.dummy',
+                'NAME': 'dbname',
+            }
+        })
+        with mock.patch('django.test.utils.connections', new=tested_connections):
+            test_databases, _ = get_unique_databases_and_mirrors()
+            self.assertEqual(
+                test_databases,
+                {
+                    ('', '', 'django.db.backends.dummy', 'test_dbname'): (
+                        'dbname',
+                        ['default', 'other'],
+                    ),
+                },
+            )
 
     def test_destroy_test_db_restores_db_name(self):
         tested_connections = db.ConnectionHandler({
@@ -369,9 +704,15 @@ class SetupDatabasesTests(unittest.TestCase):
                 'TEST': {'SERIALIZE': False},
             },
         })
+        msg = (
+            'The SERIALIZE test database setting is deprecated as it can be '
+            'inferred from the TestCase/TransactionTestCase.databases that '
+            'enable the serialized_rollback feature.'
+        )
         with mock.patch('django.db.backends.dummy.base.DatabaseWrapper.creation_class') as mocked_db_creation:
             with mock.patch('django.test.utils.connections', new=tested_connections):
-                self.runner_instance.setup_databases()
+                with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+                    self.runner_instance.setup_databases()
         mocked_db_creation.return_value.create_test_db.assert_called_once_with(
             verbosity=0, autoclobber=False, serialize=False, keepdb=False
         )
@@ -413,10 +754,11 @@ class EmptyDefaultDatabaseTest(unittest.TestCase):
         An empty default database in settings does not raise an ImproperlyConfigured
         error when running a unit test that does not use a database.
         """
-        testcases.connections = db.ConnectionHandler({'default': {}})
-        connection = testcases.connections[db.utils.DEFAULT_DB_ALIAS]
-        self.assertEqual(connection.settings_dict['ENGINE'], 'django.db.backends.dummy')
-        connections_support_transactions()
+        tested_connections = db.ConnectionHandler({'default': {}})
+        with mock.patch('django.db.connections', new=tested_connections):
+            connection = tested_connections[db.utils.DEFAULT_DB_ALIAS]
+            self.assertEqual(connection.settings_dict['ENGINE'], 'django.db.backends.dummy')
+            connections_support_transactions()
 
 
 class RunTestsExceptionHandlingTests(unittest.TestCase):
@@ -473,3 +815,42 @@ class RunTestsExceptionHandlingTests(unittest.TestCase):
                     runner.run_tests(['test_runner_apps.sample.tests_sample.TestDjangoTestCase'])
             self.assertTrue(teardown_databases.called)
             self.assertFalse(teardown_test_environment.called)
+
+
+# RemovedInDjango50Warning
+class NoOpTestRunner(DiscoverRunner):
+    def setup_test_environment(self, **kwargs):
+        return
+
+    def setup_databases(self, **kwargs):
+        return
+
+    def run_checks(self, databases):
+        return
+
+    def teardown_databases(self, old_config, **kwargs):
+        return
+
+    def teardown_test_environment(self, **kwargs):
+        return
+
+
+class DiscoverRunnerExtraTestsDeprecationTests(SimpleTestCase):
+    msg = 'The extra_tests argument is deprecated.'
+
+    def get_runner(self):
+        return NoOpTestRunner(verbosity=0, interactive=False)
+
+    def test_extra_tests_build_suite(self):
+        runner = self.get_runner()
+        with self.assertWarnsMessage(RemovedInDjango50Warning, self.msg):
+            runner.build_suite(extra_tests=[])
+
+    def test_extra_tests_run_tests(self):
+        runner = self.get_runner()
+        with captured_stderr():
+            with self.assertWarnsMessage(RemovedInDjango50Warning, self.msg):
+                runner.run_tests(
+                    test_labels=['test_runner_apps.sample.tests_sample.EmptyTestCase'],
+                    extra_tests=[],
+                )

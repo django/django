@@ -40,10 +40,6 @@ Fields
         Optional (:attr:`blank=True <django.db.models.Field.blank>`). 150
         characters or fewer.
 
-        .. versionchanged:: 3.1
-
-            The ``max_length`` increased from 30 to 150 characters.
-
     .. attribute:: last_name
 
         Optional (:attr:`blank=True <django.db.models.Field.blank>`). 150
@@ -338,7 +334,7 @@ Manager methods
 
 In practice, you probably won't need to use
 :class:`~django.contrib.auth.models.AnonymousUser` objects on your own, but
-they're used by Web requests, as explained in the next section.
+they're used by web requests, as explained in the next section.
 
 ``Permission`` model
 ====================
@@ -423,7 +419,7 @@ Login and logout signals
 The auth framework uses the following :doc:`signals </topics/signals>` that
 can be used for notification when a user logs in or out.
 
-.. function:: user_logged_in
+.. data:: user_logged_in
 
     Sent when a user logs in successfully.
 
@@ -438,7 +434,7 @@ can be used for notification when a user logs in or out.
     ``user``
         The user instance that just logged in.
 
-.. function:: user_logged_out
+.. data:: user_logged_out
 
     Sent when the logout method is called.
 
@@ -453,7 +449,7 @@ can be used for notification when a user logs in or out.
         The user instance that just logged out or ``None`` if the
         user was not authenticated.
 
-.. function:: user_login_failed
+.. data:: user_login_failed
 
     Sent when the user failed to login successfully
 

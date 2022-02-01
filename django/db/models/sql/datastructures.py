@@ -78,8 +78,7 @@ class Join:
 
         # Add a single condition inside parentheses for whatever
         # get_extra_restriction() returns.
-        extra_cond = self.join_field.get_extra_restriction(
-            compiler.query.where_class, self.table_alias, self.parent_alias)
+        extra_cond = self.join_field.get_extra_restriction(self.table_alias, self.parent_alias)
         if extra_cond:
             extra_sql, extra_params = compiler.compile(extra_cond)
             join_conditions.append('(%s)' % extra_sql)
@@ -114,17 +113,27 @@ class Join:
             self.join_field, self.nullable, filtered_relation=filtered_relation,
         )
 
-    def equals(self, other, with_filtered_relation):
+    @property
+    def identity(self):
         return (
-            isinstance(other, self.__class__) and
-            self.table_name == other.table_name and
-            self.parent_alias == other.parent_alias and
-            self.join_field == other.join_field and
-            (not with_filtered_relation or self.filtered_relation == other.filtered_relation)
+            self.__class__,
+            self.table_name,
+            self.parent_alias,
+            self.join_field,
+            self.filtered_relation,
         )
 
     def __eq__(self, other):
-        return self.equals(other, with_filtered_relation=True)
+        if not isinstance(other, Join):
+            return NotImplemented
+        return self.identity == other.identity
+
+    def __hash__(self):
+        return hash(self.identity)
+
+    def equals(self, other):
+        # Ignore filtered_relation in equality check.
+        return self.identity[:-1] == other.identity[:-1]
 
     def demote(self):
         new = self.relabeled_clone({})
@@ -160,9 +169,17 @@ class BaseTable:
     def relabeled_clone(self, change_map):
         return self.__class__(self.table_name, change_map.get(self.table_alias, self.table_alias))
 
-    def equals(self, other, with_filtered_relation):
-        return (
-            isinstance(self, other.__class__) and
-            self.table_name == other.table_name and
-            self.table_alias == other.table_alias
-        )
+    @property
+    def identity(self):
+        return self.__class__, self.table_name, self.table_alias
+
+    def __eq__(self, other):
+        if not isinstance(other, BaseTable):
+            return NotImplemented
+        return self.identity == other.identity
+
+    def __hash__(self):
+        return hash(self.identity)
+
+    def equals(self, other):
+        return self.identity == other.identity

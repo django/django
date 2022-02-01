@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Davide Targa <davide.targa@gmail.com>, 2021
 # Federico Capoano <federico.capoano@teletu.it>, 2011
 # Flavio Curella <flavio.curella@gmail.com>, 2013-2014
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -13,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-24 08:45+0000\n"
-"Last-Translator: palmux <palmux@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-12 12:08+0000\n"
+"Last-Translator: Davide Targa <davide.targa@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -141,6 +142,9 @@ msgstr "work factor"
 
 msgid "checksum"
 msgstr "checksum"
+
+msgid "block size"
+msgstr "dimensione del blocco"
 
 msgid "name"
 msgstr "nome"

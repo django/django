@@ -86,7 +86,7 @@ MRO is an acronym for Method Resolution Order.
     .. method:: dispatch(request, *args, **kwargs)
 
         The ``view`` part of the view -- the method that accepts a ``request``
-        argument plus arguments, and returns a HTTP response.
+        argument plus arguments, and returns an HTTP response.
 
         The default implementation will inspect the HTTP method and attempt to
         delegate to a method that matches the HTTP method; a ``GET`` will be
@@ -99,7 +99,7 @@ MRO is an acronym for Method Resolution Order.
 
     .. method:: http_method_not_allowed(request, *args, **kwargs)
 
-        If the view was called with a HTTP method it doesn't support, this
+        If the view was called with an HTTP method it doesn't support, this
         method is called instead.
 
         The default implementation returns ``HttpResponseNotAllowed`` with a
@@ -220,12 +220,12 @@ MRO is an acronym for Method Resolution Order.
         from django.urls import path
         from django.views.generic.base import RedirectView
 
-        from article.views import ArticleCounterRedirectView, ArticleDetail
+        from article.views import ArticleCounterRedirectView, ArticleDetailView
 
         urlpatterns = [
             path('counter/<int:pk>/', ArticleCounterRedirectView.as_view(), name='article-counter'),
-            path('details/<int:pk>/', ArticleDetail.as_view(), name='article-detail'),
-            path('go-to-django/', RedirectView.as_view(url='https://djangoproject.com'), name='go-to-django'),
+            path('details/<int:pk>/', ArticleDetailView.as_view(), name='article-detail'),
+            path('go-to-django/', RedirectView.as_view(url='https://www.djangoproject.com/'), name='go-to-django'),
         ]
 
     **Attributes**

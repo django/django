@@ -2,7 +2,7 @@ import json
 
 from django.core import checks, exceptions, serializers
 from django.db import connection
-from django.db.models import OuterRef, Subquery
+from django.db.models import F, OuterRef, Subquery
 from django.db.models.expressions import RawSQL
 from django.forms import Form
 from django.test.utils import CaptureQueriesContext, isolate_apps
@@ -78,6 +78,10 @@ class TestQuerying(PostgreSQLTestCase):
             HStoreModel(field={'c': 'd'}),
             HStoreModel(field={}),
             HStoreModel(field=None),
+            HStoreModel(field={'cat': 'TigrOu', 'breed': 'birman'}),
+            HStoreModel(field={'cat': 'minou', 'breed': 'ragdoll'}),
+            HStoreModel(field={'cat': 'kitty', 'breed': 'Persian'}),
+            HStoreModel(field={'cat': 'Kit Kat', 'breed': 'persian'}),
         ])
 
     def test_exact(self):
@@ -137,6 +141,13 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[:2]
         )
 
+    def test_key_transform_annotation(self):
+        qs = HStoreModel.objects.annotate(a=F('field__a'))
+        self.assertCountEqual(
+            qs.values_list('a', flat=True),
+            ['b', 'b', None, None, None, None, None, None, None],
+        )
+
     def test_keys(self):
         self.assertSequenceEqual(
             HStoreModel.objects.filter(field__keys=['a']),
@@ -149,10 +160,58 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[:1]
         )
 
-    def test_field_chaining(self):
+    def test_field_chaining_contains(self):
         self.assertSequenceEqual(
             HStoreModel.objects.filter(field__a__contains='b'),
             self.objs[:2]
+        )
+
+    def test_field_chaining_icontains(self):
+        self.assertSequenceEqual(
+            HStoreModel.objects.filter(field__cat__icontains='INo'),
+            [self.objs[6]],
+        )
+
+    def test_field_chaining_startswith(self):
+        self.assertSequenceEqual(
+            HStoreModel.objects.filter(field__cat__startswith='kit'),
+            [self.objs[7]],
+        )
+
+    def test_field_chaining_istartswith(self):
+        self.assertSequenceEqual(
+            HStoreModel.objects.filter(field__cat__istartswith='kit'),
+            self.objs[7:],
+        )
+
+    def test_field_chaining_endswith(self):
+        self.assertSequenceEqual(
+            HStoreModel.objects.filter(field__cat__endswith='ou'),
+            [self.objs[6]],
+        )
+
+    def test_field_chaining_iendswith(self):
+        self.assertSequenceEqual(
+            HStoreModel.objects.filter(field__cat__iendswith='ou'),
+            self.objs[5:7],
+        )
+
+    def test_field_chaining_iexact(self):
+        self.assertSequenceEqual(
+            HStoreModel.objects.filter(field__breed__iexact='persian'),
+            self.objs[7:],
+        )
+
+    def test_field_chaining_regex(self):
+        self.assertSequenceEqual(
+            HStoreModel.objects.filter(field__cat__regex=r'ou$'),
+            [self.objs[6]],
+        )
+
+    def test_field_chaining_iregex(self):
+        self.assertSequenceEqual(
+            HStoreModel.objects.filter(field__cat__iregex=r'oU$'),
+            self.objs[5:7],
         )
 
     def test_order_by_field(self):
@@ -183,7 +242,7 @@ class TestQuerying(PostgreSQLTestCase):
         obj = HStoreModel.objects.create(field={'a': None})
         self.assertSequenceEqual(
             HStoreModel.objects.filter(field__a__isnull=True),
-            self.objs[2:5] + [obj]
+            self.objs[2:9] + [obj],
         )
         self.assertSequenceEqual(
             HStoreModel.objects.filter(field__a__isnull=False),

@@ -13,7 +13,7 @@ from django.utils.functional import Promise
 
 def render(request, template_name, context=None, content_type=None, status=None, using=None):
     """
-    Return a HttpResponse whose content is filled with the result of calling
+    Return an HttpResponse whose content is filled with the result of calling
     django.template.loader.render_to_string() with the passed arguments.
     """
     content = loader.render_to_string(template_name, context, request, using=using)
@@ -56,7 +56,7 @@ def _get_queryset(klass):
 
 def get_object_or_404(klass, *args, **kwargs):
     """
-    Use get() to return an object, or raise a Http404 exception if the object
+    Use get() to return an object, or raise an Http404 exception if the object
     does not exist.
 
     klass may be a Model, Manager, or QuerySet object. All other passed
@@ -80,7 +80,7 @@ def get_object_or_404(klass, *args, **kwargs):
 
 def get_list_or_404(klass, *args, **kwargs):
     """
-    Use filter() to return a list of objects, or raise a Http404 exception if
+    Use filter() to return a list of objects, or raise an Http404 exception if
     the list is empty.
 
     klass may be a Model, Manager, or QuerySet object. All other passed
@@ -121,10 +121,9 @@ def resolve_url(to, *args, **kwargs):
         # further to some Python functions like urlparse.
         to = str(to)
 
-    if isinstance(to, str):
-        # Handle relative URLs
-        if to.startswith(('./', '../')):
-            return to
+    # Handle relative URLs
+    if isinstance(to, str) and to.startswith(('./', '../')):
+        return to
 
     # Next try a reverse URL resolution.
     try:

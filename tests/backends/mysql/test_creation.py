@@ -78,6 +78,7 @@ class DatabaseCreationTests(SimpleTestCase):
                             'source_db',
                         ],
                         stdout=subprocess.PIPE,
+                        env=None,
                     ),
                 ])
         finally:

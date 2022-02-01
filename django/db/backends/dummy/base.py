@@ -44,7 +44,6 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     get_table_description = complain
     get_relations = complain
     get_indexes = complain
-    get_key_columns = complain
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):

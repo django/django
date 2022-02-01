@@ -1,6 +1,5 @@
 import functools
 import itertools
-import operator
 from collections import defaultdict
 
 from django.contrib.contenttypes.models import ContentType
@@ -14,6 +13,8 @@ from django.db.models.fields.related import (
     ReverseManyToOneDescriptor, lazy_related_operation,
 )
 from django.db.models.query_utils import PathInfo
+from django.db.models.sql import AND
+from django.db.models.sql.where import WhereNode
 from django.utils.functional import cached_property
 
 
@@ -70,8 +71,7 @@ class GenericForeignKey(FieldCacheMixin):
 
     def __str__(self):
         model = self.model
-        app = model._meta.app_label
-        return '%s.%s.%s' % (app, model._meta.object_name, self.name)
+        return '%s.%s' % (model._meta.label, self.name)
 
     def check(self, **kwargs):
         return [
@@ -213,7 +213,7 @@ class GenericForeignKey(FieldCacheMixin):
             gfk_key,
             True,
             self.name,
-            True,
+            False,
         )
 
     def __get__(self, instance, cls=None):
@@ -229,6 +229,8 @@ class GenericForeignKey(FieldCacheMixin):
         pk_val = getattr(instance, self.fk_field)
 
         rel_obj = self.get_cached_value(instance, default=None)
+        if rel_obj is None and self.is_cached(instance):
+            return rel_obj
         if rel_obj is not None:
             ct_match = ct_id == self.get_content_type(obj=rel_obj, using=instance._state.db).id
             pk_match = rel_obj._meta.pk.to_python(pk_val) == rel_obj.pk
@@ -343,9 +345,8 @@ class GenericRelation(ForeignObject):
                 return [
                     checks.Error(
                         "The GenericRelation defines a relation with the model "
-                        "'%s.%s', but that model does not have a GenericForeignKey." % (
-                            target._meta.app_label, target._meta.object_name
-                        ),
+                        "'%s', but that model does not have a GenericForeignKey."
+                        % target._meta.label,
                         obj=self,
                         id='contenttypes.E004',
                     )
@@ -394,7 +395,7 @@ class GenericRelation(ForeignObject):
             opts = field.remote_field.model._meta
         parent_field_chain.reverse()
         for field in parent_field_chain:
-            path.extend(field.remote_field.get_path_info())
+            path.extend(field.remote_field.path_infos)
         return path
 
     def get_path_info(self, filtered_relation=None):
@@ -467,13 +468,11 @@ class GenericRelation(ForeignObject):
         return ContentType.objects.get_for_model(self.model,
                                                  for_concrete_model=self.for_concrete_model)
 
-    def get_extra_restriction(self, where_class, alias, remote_alias):
+    def get_extra_restriction(self, alias, remote_alias):
         field = self.remote_field.model._meta.get_field(self.content_type_field_name)
         contenttype_pk = self.get_content_type().pk
-        cond = where_class()
         lookup = field.get_lookup('exact')(field.get_col(remote_alias), contenttype_pk)
-        cond.add(lookup, 'AND')
-        return cond
+        return WhereNode([lookup], connector=AND)
 
     def bulk_related_objects(self, objs, using=DEFAULT_DB_ALIAS):
         """
@@ -505,6 +504,14 @@ class ReverseGenericManyToOneDescriptor(ReverseManyToOneDescriptor):
             self.rel.model._default_manager.__class__,
             self.rel,
         )
+
+    @cached_property
+    def related_manager_cache_key(self):
+        # By default, GenericRel instances will be marked as hidden unless
+        # related_query_name is given (their accessor name being "+" when
+        # hidden), which would cause multiple GenericRelations declared on a
+        # single model to collide, so always use the remote field's name.
+        return self.field.get_cache_name()
 
 
 def create_generic_related_manager(superclass, rel):
@@ -573,16 +580,16 @@ def create_generic_related_manager(superclass, rel):
             queryset = queryset.using(queryset._db or self._db)
             # Group instances by content types.
             content_type_queries = (
-                models.Q(**{
-                    '%s__pk' % self.content_type_field_name: content_type_id,
-                    '%s__in' % self.object_id_field_name: {obj.pk for obj in objs}
-                })
+                models.Q(
+                    (f'{self.content_type_field_name}__pk', content_type_id),
+                    (f'{self.object_id_field_name}__in', {obj.pk for obj in objs}),
+                )
                 for content_type_id, objs in itertools.groupby(
                     sorted(instances, key=lambda obj: self.get_content_type(obj).pk),
                     lambda obj: self.get_content_type(obj).pk,
                 )
             )
-            query = functools.reduce(operator.or_, content_type_queries)
+            query = models.Q(*content_type_queries, _connector=models.Q.OR)
             # We (possibly) need to convert object IDs to the type of the
             # instances' PK in order to match up instances:
             object_id_converter = instances[0]._meta.pk.to_python

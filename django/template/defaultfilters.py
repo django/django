@@ -4,6 +4,7 @@ import re
 import types
 from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
 from functools import wraps
+from inspect import unwrap
 from operator import itemgetter
 from pprint import pformat
 from urllib.parse import quote
@@ -22,7 +23,7 @@ from django.utils.text import (
 from django.utils.timesince import timesince, timeuntil
 from django.utils.translation import gettext, ngettext
 
-from .base import Variable, VariableDoesNotExist
+from .base import VARIABLE_ATTRIBUTE_SEPARATOR
 from .library import Library
 
 register = Library()
@@ -37,20 +38,15 @@ def stringfilter(func):
     Decorator for filters which should only receive strings. The object
     passed as the first positional argument will be converted to a string.
     """
-    def _dec(*args, **kwargs):
-        args = list(args)
-        args[0] = str(args[0])
-        if (isinstance(args[0], SafeData) and
-                getattr(_dec._decorated_function, 'is_safe', False)):
-            return mark_safe(func(*args, **kwargs))
-        return func(*args, **kwargs)
+    @wraps(func)
+    def _dec(first, *args, **kwargs):
+        first = str(first)
+        result = func(first, *args, **kwargs)
+        if isinstance(first, SafeData) and getattr(unwrap(func), 'is_safe', False):
+            result = mark_safe(result)
+        return result
 
-    # Include a reference to the real function (used to check original
-    # arguments by the template parser, and to bear the 'is_safe' attribute
-    # when multiple decorators are applied).
-    _dec._decorated_function = getattr(func, '_decorated_function', func)
-
-    return wraps(func)(_dec)
+    return _dec
 
 
 ###################
@@ -83,10 +79,10 @@ def escapejs_filter(value):
 
 
 @register.filter(is_safe=True)
-def json_script(value, element_id):
+def json_script(value, element_id=None):
     """
     Output value JSON-encoded, wrapped in a <script type="application/json">
-    tag.
+    tag (with an optional id).
     """
     return _json_script(value, element_id)
 
@@ -126,13 +122,29 @@ def floatformat(text, arg=-1):
     * {{ 6666.6666|floatformat:"2g" }} displays "6,666.67"
     * {{ 10000|floatformat:"g" }} displays "10,000"
 
+    If arg has the 'u' suffix, force the result to be unlocalized. When the
+    active locale is pl (Polish):
+
+    * {{ 66666.6666|floatformat:"2" }} displays "66666,67"
+    * {{ 66666.6666|floatformat:"2u" }} displays "66666.67"
+
     If the input float is infinity or NaN, display the string representation
     of that value.
     """
     force_grouping = False
-    if isinstance(arg, str) and arg.endswith('g'):
-        force_grouping = True
-        arg = arg[:-1] or -1
+    use_l10n = True
+    if isinstance(arg, str):
+        last_char = arg[-1]
+        if arg[-2:] in {'gu', 'ug'}:
+            force_grouping = True
+            use_l10n = False
+            arg = arg[:-2] or -1
+        elif last_char == 'g':
+            force_grouping = True
+            arg = arg[:-1] or -1
+        elif last_char == 'u':
+            use_l10n = False
+            arg = arg[:-1] or -1
     try:
         input_val = repr(text)
         d = Decimal(input_val)
@@ -152,9 +164,12 @@ def floatformat(text, arg=-1):
         return input_val
 
     if not m and p < 0:
-        return mark_safe(
-            formats.number_format('%d' % (int(d)), 0, force_grouping=force_grouping),
-        )
+        return mark_safe(formats.number_format(
+            '%d' % (int(d)),
+            0,
+            use_l10n=use_l10n,
+            force_grouping=force_grouping,
+        ))
 
     exp = Decimal(1).scaleb(-abs(p))
     # Set the precision high enough to avoid an exception (#15789).
@@ -174,9 +189,12 @@ def floatformat(text, arg=-1):
     if sign and rounded_d:
         digits.append('-')
     number = ''.join(reversed(digits))
-    return mark_safe(
-        formats.number_format(number, abs(p), force_grouping=force_grouping),
-    )
+    return mark_safe(formats.number_format(
+        number,
+        abs(p),
+        use_l10n=use_l10n,
+        force_grouping=force_grouping,
+    ))
 
 
 @register.filter(is_safe=True)
@@ -481,7 +499,7 @@ def striptags(value):
 def _property_resolver(arg):
     """
     When arg is convertible to float, behave like operator.itemgetter(arg)
-    Otherwise, behave like Variable(arg).resolve
+    Otherwise, chain __getitem__() and getattr().
 
     >>> _property_resolver(1)('abc')
     'b'
@@ -499,7 +517,19 @@ def _property_resolver(arg):
     try:
         float(arg)
     except ValueError:
-        return Variable(arg).resolve
+        if VARIABLE_ATTRIBUTE_SEPARATOR + '_' in arg or arg[0] == '_':
+            raise AttributeError('Access to private variables is forbidden.')
+        parts = arg.split(VARIABLE_ATTRIBUTE_SEPARATOR)
+
+        def resolve(value):
+            for part in parts:
+                try:
+                    value = value[part]
+                except (AttributeError, IndexError, KeyError, TypeError, ValueError):
+                    value = getattr(value, part)
+            return value
+
+        return resolve
     else:
         return itemgetter(arg)
 
@@ -512,7 +542,7 @@ def dictsort(value, arg):
     """
     try:
         return sorted(value, key=_property_resolver(arg))
-    except (TypeError, VariableDoesNotExist):
+    except (AttributeError, TypeError):
         return ''
 
 
@@ -524,7 +554,7 @@ def dictsortreversed(value, arg):
     """
     try:
         return sorted(value, key=_property_resolver(arg), reverse=True)
-    except (TypeError, VariableDoesNotExist):
+    except (AttributeError, TypeError):
         return ''
 
 

@@ -5,6 +5,8 @@ from functools import partial, wraps
 from asgiref.local import Local
 
 from django.template import Context, Template, TemplateSyntaxError
+from django.template.base import Token, TokenType
+from django.templatetags.i18n import BlockTranslateNode
 from django.test import SimpleTestCase, override_settings
 from django.utils import translation
 from django.utils.safestring import mark_safe
@@ -584,3 +586,17 @@ class MiscTests(SimpleTestCase):
 
 class MiscBlockTranslationTests(MiscTests):
     tag_name = 'blocktrans'
+
+
+class BlockTranslateNodeTests(SimpleTestCase):
+    def test_repr(self):
+        block_translate_node = BlockTranslateNode(extra_context={}, singular=[
+            Token(TokenType.TEXT, 'content'),
+            Token(TokenType.VAR, 'variable'),
+        ])
+        self.assertEqual(
+            repr(block_translate_node),
+            '<BlockTranslateNode: extra_context={} '
+            'singular=[<Text token: "content...">, <Var token: "variable...">] '
+            'plural=None>',
+        )

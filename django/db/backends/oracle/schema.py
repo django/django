@@ -3,7 +3,10 @@ import datetime
 import re
 
 from django.db import DatabaseError
-from django.db.backends.base.schema import BaseDatabaseSchemaEditor
+from django.db.backends.base.schema import (
+    BaseDatabaseSchemaEditor, _related_non_m2m_objects,
+)
+from django.utils.duration import duration_iso_string
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -14,6 +17,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_alter_column_not_null = "MODIFY %(column)s NOT NULL"
     sql_alter_column_default = "MODIFY %(column)s DEFAULT %(default)s"
     sql_alter_column_no_default = "MODIFY %(column)s DEFAULT NULL"
+    sql_alter_column_no_default_null = sql_alter_column_no_default
     sql_alter_column_collate = "MODIFY %(column)s %(type)s%(collation)s"
 
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
@@ -24,6 +28,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def quote_value(self, value):
         if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
             return "'%s'" % value
+        elif isinstance(value, datetime.timedelta):
+            return "'%s'" % duration_iso_string(value)
         elif isinstance(value, str):
             return "'%s'" % value.replace("\'", "\'\'").replace('%', '%%')
         elif isinstance(value, (bytes, bytearray, memoryview)):
@@ -123,6 +129,17 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self.remove_field(model, old_field)
         # Rename and possibly make the new field NOT NULL
         super().alter_field(model, new_temp_field, new_field)
+        # Recreate foreign key (if necessary) because the old field is not
+        # passed to the alter_field() and data types of new_temp_field and
+        # new_field always match.
+        new_type = new_field.db_type(self.connection)
+        if (
+            (old_field.primary_key and new_field.primary_key) or
+            (old_field.unique and new_field.unique)
+        ) and old_type != new_type:
+            for _, rel in _related_non_m2m_objects(new_temp_field, new_field):
+                if rel.field.db_constraint:
+                    self.execute(self._create_fk_sql(rel.related_model, rel.field, '_fk'))
 
     def _alter_column_type_sql(self, model, old_field, new_field, new_type):
         auto_field_types = {'AutoField', 'BigAutoField', 'SmallAutoField'}
@@ -159,12 +176,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if db_type is not None and db_type.lower() in self.connection._limited_data_types:
             return False
         return create_index
-
-    def _unique_should_be_added(self, old_field, new_field):
-        return (
-            super()._unique_should_be_added(old_field, new_field) and
-            not self._field_became_primary_key(old_field, new_field)
-        )
 
     def _is_identity_column(self, table_name, column_name):
         with self.connection.cursor() as cursor:

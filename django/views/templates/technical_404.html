@@ -20,11 +20,13 @@
     #info ol li { font-family: monospace; }
     #summary { background: #ffc; }
     #explanation { background:#eee; border-bottom: 0px none; }
+    pre.exception_value { font-family: sans-serif; color: #575757; font-size: 1.5em; margin: 10px 0 10px 0; }
   </style>
 </head>
 <body>
   <div id="summary">
     <h1>Page not found <span>(404)</span></h1>
+    {% if reason and resolved %}<pre class="exception_value">{{ reason }}</pre>{% endif %}
     <table class="meta">
       <tr>
         <th>Request Method:</th>
@@ -66,8 +68,6 @@
         {% endif %}
         {% if resolved %}matched the last one.{% else %}didn’t match any of these.{% endif %}
       </p>
-    {% else %}
-      <p>{{ reason }}</p>
     {% endif %}
   </div>
 

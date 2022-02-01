@@ -3,6 +3,7 @@ import socket
 import geoip2.database
 
 from django.conf import settings
+from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv46_address
 from django.utils._os import to_path
@@ -67,9 +68,7 @@ class GeoIP2:
             'GeoLite2-City.mmdb'; overrides the GEOIP_CITY setting.
         """
         # Checking the given cache option.
-        if cache in self.cache_options:
-            self._cache = cache
-        else:
+        if cache not in self.cache_options:
             raise GeoIP2Exception('Invalid GeoIP caching option: %s' % cache)
 
         # Getting the GeoIP data path.
@@ -139,7 +138,7 @@ class GeoIP2:
             'city': self._city_file,
         }
 
-    def _check_query(self, query, country=False, city=False, city_or_country=False):
+    def _check_query(self, query, city=False, city_or_country=False):
         "Check the query and database availability."
         # Making sure a string was passed in for the query.
         if not isinstance(query, str):
@@ -148,8 +147,6 @@ class GeoIP2:
         # Extra checks for the existence of country and city databases.
         if city_or_country and not (self._country or self._city):
             raise GeoIP2Exception('Invalid GeoIP country and city data files.')
-        elif country and not self._country:
-            raise GeoIP2Exception('Invalid GeoIP country data file: %s' % self._country_file)
         elif city and not self._city:
             raise GeoIP2Exception('Invalid GeoIP city data file: %s' % self._city_file)
 
@@ -172,13 +169,11 @@ class GeoIP2:
 
     def country_code(self, query):
         "Return the country code for the given IP Address or FQDN."
-        enc_query = self._check_query(query, city_or_country=True)
-        return self.country(enc_query)['country_code']
+        return self.country(query)['country_code']
 
     def country_name(self, query):
         "Return the country name for the given IP Address or FQDN."
-        enc_query = self._check_query(query, city_or_country=True)
-        return self.country(enc_query)['country_name']
+        return self.country(query)['country_name']
 
     def country(self, query):
         """
@@ -210,7 +205,6 @@ class GeoIP2:
         "Return a GEOS Point object for the given query."
         ll = self.lon_lat(query)
         if ll:
-            from django.contrib.gis.geos import Point
             return Point(ll, srid=4326)
         else:
             return None

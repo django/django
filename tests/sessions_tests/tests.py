@@ -7,6 +7,7 @@ import unittest
 from datetime import timedelta
 from http import cookies
 from pathlib import Path
+from unittest import mock
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import UpdateError
@@ -24,20 +25,18 @@ from django.contrib.sessions.exceptions import (
 )
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sessions.models import Session
-from django.contrib.sessions.serializers import (
-    JSONSerializer, PickleSerializer,
-)
+from django.contrib.sessions.serializers import JSONSerializer
 from django.core import management
 from django.core.cache import caches
 from django.core.cache.backends.base import InvalidCacheBackendError
 from django.core.exceptions import ImproperlyConfigured
+from django.core.signing import TimestampSigner
 from django.http import HttpResponse
 from django.test import (
     RequestFactory, SimpleTestCase, TestCase, ignore_warnings,
     override_settings,
 )
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango40Warning
 
 from .models import SessionStore as CustomDatabaseSession
 
@@ -315,25 +314,6 @@ class SessionTestsMixin:
         encoded = self.session.encode(data)
         self.assertEqual(self.session.decode(encoded), data)
 
-    @override_settings(SECRET_KEY='django_tests_secret_key')
-    def test_decode_legacy(self):
-        # RemovedInDjango40Warning: pre-Django 3.1 sessions will be invalid.
-        legacy_encoded = (
-            'OWUzNTNmNWQxNTBjOWExZmM4MmQ3NzNhMDRmMjU4NmYwNDUyNGI2NDp7ImEgdGVzd'
-            'CBrZXkiOiJhIHRlc3QgdmFsdWUifQ=='
-        )
-        self.assertEqual(
-            self.session.decode(legacy_encoded),
-            {'a test key': 'a test value'},
-        )
-
-    @ignore_warnings(category=RemovedInDjango40Warning)
-    def test_default_hashing_algorith_legacy_decode(self):
-        with self.settings(DEFAULT_HASHING_ALGORITHM='sha1'):
-            data = {'a test key': 'a test value'}
-            encoded = self.session.encode(data)
-            self.assertEqual(self.session._legacy_decode(encoded), data)
-
     def test_decode_failure_logged_to_security(self):
         tests = [
             base64.b64encode(b'flaskdj:alkdjf').decode('ascii'),
@@ -346,26 +326,26 @@ class SessionTestsMixin:
                 # The failed decode is logged.
                 self.assertIn('Session data corrupted', cm.output[0])
 
-    def test_actual_expiry(self):
-        # this doesn't work with JSONSerializer (serializing timedelta)
-        with override_settings(SESSION_SERIALIZER='django.contrib.sessions.serializers.PickleSerializer'):
-            self.session = self.backend()  # reinitialize after overriding settings
+    def test_decode_serializer_exception(self):
+        signer = TimestampSigner(salt=self.session.key_salt)
+        encoded = signer.sign(b'invalid data')
+        self.assertEqual(self.session.decode(encoded), {})
 
-            # Regression test for #19200
-            old_session_key = None
-            new_session_key = None
-            try:
-                self.session['foo'] = 'bar'
-                self.session.set_expiry(-timedelta(seconds=10))
-                self.session.save()
-                old_session_key = self.session.session_key
-                # With an expiry date in the past, the session expires instantly.
-                new_session = self.backend(self.session.session_key)
-                new_session_key = new_session.session_key
-                self.assertNotIn('foo', new_session)
-            finally:
-                self.session.delete(old_session_key)
-                self.session.delete(new_session_key)
+    def test_actual_expiry(self):
+        old_session_key = None
+        new_session_key = None
+        try:
+            self.session['foo'] = 'bar'
+            self.session.set_expiry(-timedelta(seconds=10))
+            self.session.save()
+            old_session_key = self.session.session_key
+            # With an expiry date in the past, the session expires instantly.
+            new_session = self.backend(self.session.session_key)
+            new_session_key = new_session.session_key
+            self.assertNotIn('foo', new_session)
+        finally:
+            self.session.delete(old_session_key)
+            self.session.delete(new_session_key)
 
     def test_session_load_does_not_create_record(self):
         """
@@ -899,9 +879,8 @@ class CookieSessionTests(SessionTestsMixin, SimpleTestCase):
         # by creating a new session
         self.assertEqual(self.session.serializer, JSONSerializer)
         self.session.save()
-
-        self.session.serializer = PickleSerializer
-        self.session.load()
+        with mock.patch('django.core.signing.loads', side_effect=ValueError):
+            self.session.load()
 
     @unittest.skip("Cookie backend doesn't have an external store to create records in.")
     def test_session_load_does_not_create_record(self):
@@ -910,3 +889,14 @@ class CookieSessionTests(SessionTestsMixin, SimpleTestCase):
     @unittest.skip("CookieSession is stored in the client and there is no way to query it.")
     def test_session_save_does_not_resurrect_session_logged_out_in_other_context(self):
         pass
+
+
+class ClearSessionsCommandTests(SimpleTestCase):
+    def test_clearsessions_unsupported(self):
+        msg = (
+            "Session engine 'tests.sessions_tests.no_clear_expired' doesn't "
+            "support clearing expired sessions."
+        )
+        with self.settings(SESSION_ENGINE='tests.sessions_tests.no_clear_expired'):
+            with self.assertRaisesMessage(management.CommandError, msg):
+                management.call_command('clearsessions')

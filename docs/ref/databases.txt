@@ -62,8 +62,19 @@ At the end of each request, Django closes the connection if it has reached its
 maximum age or if it is in an unrecoverable error state. If any database
 errors have occurred while processing the requests, Django checks whether the
 connection still works, and closes it if it doesn't. Thus, database errors
-affect at most one request; if the connection becomes unusable, the next
-request gets a fresh connection.
+affect at most one request per each application's worker thread; if the
+connection becomes unusable, the next request gets a fresh connection.
+
+Setting :setting:`CONN_HEALTH_CHECKS` to ``True`` can be used to improve the
+robustness of connection reuse and prevent errors when a connection has been
+closed by the database server which is now ready to accept and serve new
+connections, e.g. after database server restart. The health check is performed
+only once per request and only if the database is being accessed during the
+handling of the request.
+
+.. versionchanged:: 4.1
+
+    The :setting:`CONN_HEALTH_CHECKS` setting was added.
 
 Caveats
 ~~~~~~~
@@ -103,15 +114,56 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 9.6 and higher. `psycopg2`_ 2.5.4 or higher is
+Django supports PostgreSQL 10 and higher. `psycopg2`_ 2.8.4 or higher is
 required, though the latest release is recommended.
 
 .. _psycopg2: https://www.psycopg.org/
+
+.. _postgresql-connection-settings:
 
 PostgreSQL connection settings
 -------------------------------
 
 See :setting:`HOST` for details.
+
+To connect using a service name from the `connection service file`_ and a
+password from the `password file`_, you must specify them in the
+:setting:`OPTIONS` part of your database configuration in :setting:`DATABASES`:
+
+.. code-block:: python
+    :caption: settings.py
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'OPTIONS': {
+                'service': 'my_service',
+                'passfile': '.my_pgpass',
+            },
+        }
+    }
+
+.. code-block:: text
+    :caption: .pg_service.conf
+
+    [my_service]
+    host=localhost
+    user=USER
+    dbname=NAME
+    port=5432
+
+.. code-block:: text
+    :caption: .my_pgpass
+
+    localhost:5432:NAME:USER:PASSWORD
+
+.. _connection service file: https://www.postgresql.org/docs/current/libpq-pgservice.html
+.. _password file: https://www.postgresql.org/docs/current/libpq-pgpass.html
+
+.. versionchanged:: 4.0
+
+    Support for connecting by a service name, and specifying a password file
+    was added.
 
 Optimizing PostgreSQL's configuration
 -------------------------------------
@@ -232,7 +284,7 @@ Another option is to wrap each ``QuerySet`` using server-side cursors in an
 for the duration of the transaction. This way, the server-side cursor will only
 live for the duration of the transaction.
 
-.. _PgBouncer: https://pgbouncer.github.io/
+.. _PgBouncer: https://www.pgbouncer.org/
 
 .. _manually-specified-autoincrement-pk:
 
@@ -254,7 +306,7 @@ cause a conflict. For example::
     IntegrityError: duplicate key value violates unique constraint
     "auth_user_pkey" DETAIL:  Key (id)=(1) already exists.
 
-If you need to specify such values, reset the sequence afterwards to avoid
+If you need to specify such values, reset the sequence afterward to avoid
 reusing a value that's already in the table. The :djadmin:`sqlsequencereset`
 management command generates the SQL statements to do that.
 
@@ -287,7 +339,7 @@ non-durable <https://www.postgresql.org/docs/current/non-durability.html>`_.
 MariaDB notes
 =============
 
-Django supports MariaDB 10.2 and higher.
+Django supports MariaDB 10.3 and higher.
 
 To use MariaDB, use the MySQL backend, which is shared between the two. See the
 :ref:`MySQL notes <mysql-notes>` for more details.
@@ -346,7 +398,7 @@ MySQL has a couple drivers that implement the Python Database API described in
   library.
 
 .. _mysqlclient: https://pypi.org/project/mysqlclient/
-.. _MySQL Connector/Python: https://dev.mysql.com/downloads/connector/python
+.. _MySQL Connector/Python: https://dev.mysql.com/downloads/connector/python/
 
 These drivers are thread-safe and provide connection pooling.
 
@@ -436,10 +488,6 @@ because it is more accurate.
     differ only by case will pass validation, but upon calling ``save()``, an
     ``IntegrityError`` will be raised.
 
-.. versionchanged:: 3.2
-
-    Support for setting a database collation for the field was added.
-
 Connecting to the database
 --------------------------
 
@@ -487,7 +535,7 @@ Several other `MySQLdb connection options`_ may be useful, such as ``ssl``,
 Setting ``sql_mode``
 ~~~~~~~~~~~~~~~~~~~~
 
-From MySQL 5.7 onwards, the default value of the ``sql_mode`` option contains
+From MySQL 5.7 onward, the default value of the ``sql_mode`` option contains
 ``STRICT_TRANS_TABLES``. That option escalates warnings into errors when data
 are truncated upon insertion, so Django highly recommends activating a
 `strict mode`_ for MySQL to prevent data loss (either ``STRICT_TRANS_TABLES``
@@ -645,16 +693,16 @@ a :exc:`~django.db.NotSupportedError` is raised.
 =============== ========= ==========
 Option          MariaDB   MySQL
 =============== ========= ==========
-``SKIP LOCKED``           X (≥8.0.1)
-``NOWAIT``      X (≥10.3) X (≥8.0.1)
+``SKIP LOCKED`` X (≥10.6) X (≥8.0.1)
+``NOWAIT``      X         X (≥8.0.1)
 ``OF``                    X (≥8.0.1)
 ``NO KEY``
 =============== ========= ==========
 
 When using ``select_for_update()`` on MySQL, make sure you filter a queryset
-against at least set of fields contained in unique constraints or only against
-fields covered by indexes. Otherwise, an exclusive write lock will be acquired
-over the full table for the duration of the transaction.
+against at least a set of fields contained in unique constraints or only
+against fields covered by indexes. Otherwise, an exclusive write lock will be
+acquired over the full table for the duration of the transaction.
 
 Automatic typecasting can cause unexpected results
 --------------------------------------------------
@@ -679,7 +727,7 @@ appropriate typecasting.
 SQLite notes
 ============
 
-Django supports SQLite 3.8.3 and later.
+Django supports SQLite 3.9.0 and later.
 
 SQLite_ provides an excellent development alternative for applications that
 are predominantly read-only or require a smaller installation footprint. As
@@ -787,7 +835,7 @@ a row is added, changed, or deleted within the loop, then that row may or may
 not appear, or may appear twice, in subsequent results fetched from the
 iterator. Your code must handle this.
 
-.. _`Isolation in SQLite`: https://sqlite.org/isolation.html
+.. _`Isolation in SQLite`: https://www.sqlite.org/isolation.html
 
 .. _sqlite-json1:
 
@@ -810,8 +858,8 @@ To enable the JSON1 extension you can follow the instruction on
 Oracle notes
 ============
 
-Django supports `Oracle Database Server`_ versions 12.2 and higher. Version
-6.0 or higher of the `cx_Oracle`_ Python driver is required.
+Django supports `Oracle Database Server`_ versions 19c and higher. Version 7.0
+or higher of the `cx_Oracle`_ Python driver is required.
 
 .. _`Oracle Database Server`: https://www.oracle.com/
 .. _`cx_Oracle`: https://oracle.github.io/python-cx_Oracle/
@@ -1067,6 +1115,7 @@ by 3rd parties that allow you to use other databases with Django:
 
 * `CockroachDB`_
 * `Firebird`_
+* `Google Cloud Spanner`_
 * `Microsoft SQL Server`_
 
 The Django versions and ORM features supported by these unofficial backends
@@ -1076,4 +1125,5 @@ the support channels provided by each 3rd party project.
 
 .. _CockroachDB: https://pypi.org/project/django-cockroachdb/
 .. _Firebird: https://pypi.org/project/django-firebird/
-.. _Microsoft SQL Server: https://pypi.org/project/django-mssql-backend/
+.. _Google Cloud Spanner: https://pypi.org/project/django-google-spanner/
+.. _Microsoft SQL Server: https://pypi.org/project/mssql-django/

@@ -28,6 +28,13 @@ def cache_control(**kwargs):
     def _cache_controller(viewfunc):
         @wraps(viewfunc)
         def _cache_controlled(request, *args, **kw):
+            # Ensure argument looks like a request.
+            if not hasattr(request, 'META'):
+                raise TypeError(
+                    "cache_control didn't receive an HttpRequest. If you are "
+                    "decorating a classmethod, be sure to use "
+                    "@method_decorator."
+                )
             response = viewfunc(request, *args, **kw)
             patch_cache_control(response, **kwargs)
             return response
@@ -41,6 +48,12 @@ def never_cache(view_func):
     """
     @wraps(view_func)
     def _wrapped_view_func(request, *args, **kwargs):
+        # Ensure argument looks like a request.
+        if not hasattr(request, 'META'):
+            raise TypeError(
+                "never_cache didn't receive an HttpRequest. If you are "
+                "decorating a classmethod, be sure to use @method_decorator."
+            )
         response = view_func(request, *args, **kwargs)
         add_never_cache_headers(response)
         return response

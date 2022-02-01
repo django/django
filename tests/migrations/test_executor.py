@@ -1,14 +1,16 @@
 from unittest import mock
 
 from django.apps.registry import apps as global_apps
-from django.db import DatabaseError, connection
+from django.db import DatabaseError, connection, migrations, models
 from django.db.migrations.exceptions import InvalidMigrationPlan
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
+from django.db.migrations.state import ProjectState
 from django.test import (
     SimpleTestCase, modify_settings, override_settings, skipUnlessDBFeature,
 )
+from django.test.utils import isolate_lru_cache
 
 from .test_base import MigrationTestBase
 
@@ -102,6 +104,29 @@ class ExecutorTests(MigrationTestBase):
         # Are the tables gone?
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_book")
+
+    @override_settings(
+        MIGRATION_MODULES={'migrations': 'migrations.test_migrations_squashed'},
+    )
+    def test_migrate_backward_to_squashed_migration(self):
+        executor = MigrationExecutor(connection)
+        try:
+            self.assertTableNotExists('migrations_author')
+            self.assertTableNotExists('migrations_book')
+            executor.migrate([('migrations', '0001_squashed_0002')])
+            self.assertTableExists('migrations_author')
+            self.assertTableExists('migrations_book')
+            executor.loader.build_graph()
+            # Migrate backward to a squashed migration.
+            executor.migrate([('migrations', '0001_initial')])
+            self.assertTableExists('migrations_author')
+            self.assertTableNotExists('migrations_book')
+        finally:
+            # Unmigrate everything.
+            executor = MigrationExecutor(connection)
+            executor.migrate([('migrations', None)])
+            self.assertTableNotExists('migrations_author')
+            self.assertTableNotExists('migrations_book')
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_non_atomic"})
     def test_non_atomic_migration(self):
@@ -320,32 +345,39 @@ class ExecutorTests(MigrationTestBase):
         Regression test for #22325 - references to a custom user model defined in the
         same app are not resolved correctly.
         """
-        executor = MigrationExecutor(connection)
-        self.assertTableNotExists("migrations_author")
-        self.assertTableNotExists("migrations_tribble")
-        # Migrate forwards
-        executor.migrate([("migrations", "0001_initial")])
-        self.assertTableExists("migrations_author")
-        self.assertTableExists("migrations_tribble")
-        # Make sure the soft-application detection works (#23093)
-        # Change table_names to not return auth_user during this as
-        # it wouldn't be there in a normal run, and ensure migrations.Author
-        # exists in the global app registry temporarily.
-        old_table_names = connection.introspection.table_names
-        connection.introspection.table_names = lambda c: [x for x in old_table_names(c) if x != "auth_user"]
-        migrations_apps = executor.loader.project_state(("migrations", "0001_initial")).apps
-        global_apps.get_app_config("migrations").models["author"] = migrations_apps.get_model("migrations", "author")
-        try:
-            migration = executor.loader.get_migration("auth", "0001_initial")
-            self.assertIs(executor.detect_soft_applied(None, migration)[0], True)
-        finally:
-            connection.introspection.table_names = old_table_names
-            del global_apps.get_app_config("migrations").models["author"]
-        # And migrate back to clean up the database
-        executor.loader.build_graph()
-        executor.migrate([("migrations", None)])
-        self.assertTableNotExists("migrations_author")
-        self.assertTableNotExists("migrations_tribble")
+        with isolate_lru_cache(global_apps.get_swappable_settings_name):
+            executor = MigrationExecutor(connection)
+            self.assertTableNotExists('migrations_author')
+            self.assertTableNotExists('migrations_tribble')
+            # Migrate forwards
+            executor.migrate([('migrations', '0001_initial')])
+            self.assertTableExists('migrations_author')
+            self.assertTableExists('migrations_tribble')
+            # The soft-application detection works.
+            # Change table_names to not return auth_user during this as it
+            # wouldn't be there in a normal run, and ensure migrations.Author
+            # exists in the global app registry temporarily.
+            old_table_names = connection.introspection.table_names
+            connection.introspection.table_names = lambda c: [
+                x for x in old_table_names(c) if x != 'auth_user'
+            ]
+            migrations_apps = executor.loader.project_state(
+                ('migrations', '0001_initial'),
+            ).apps
+            global_apps.get_app_config('migrations').models['author'] = (
+                migrations_apps.get_model('migrations', 'author')
+            )
+            try:
+                migration = executor.loader.get_migration('auth', '0001_initial')
+                self.assertIs(executor.detect_soft_applied(None, migration)[0], True)
+            finally:
+                connection.introspection.table_names = old_table_names
+                del global_apps.get_app_config('migrations').models['author']
+                # Migrate back to clean up the database.
+                executor.loader.build_graph()
+                executor.migrate([('migrations', None)])
+                self.assertTableNotExists('migrations_author')
+                self.assertTableNotExists('migrations_tribble')
 
     @override_settings(
         MIGRATION_MODULES={
@@ -652,27 +684,98 @@ class ExecutorTests(MigrationTestBase):
             recorder.applied_migrations(),
         )
 
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_squashed'})
+    def test_migrate_marks_replacement_unapplied(self):
+        executor = MigrationExecutor(connection)
+        executor.migrate([('migrations', '0001_squashed_0002')])
+        try:
+            self.assertIn(
+                ('migrations', '0001_squashed_0002'),
+                executor.recorder.applied_migrations(),
+            )
+        finally:
+            executor.loader.build_graph()
+            executor.migrate([('migrations', None)])
+            self.assertNotIn(
+                ('migrations', '0001_squashed_0002'),
+                executor.recorder.applied_migrations(),
+            )
+
     # When the feature is False, the operation and the record won't be
     # performed in a transaction and the test will systematically pass.
     @skipUnlessDBFeature('can_rollback_ddl')
-    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations'})
     def test_migrations_applied_and_recorded_atomically(self):
         """Migrations are applied and recorded atomically."""
+        class Migration(migrations.Migration):
+            operations = [
+                migrations.CreateModel('model', [
+                    ('id', models.AutoField(primary_key=True)),
+                ]),
+            ]
+
         executor = MigrationExecutor(connection)
         with mock.patch('django.db.migrations.executor.MigrationExecutor.record_migration') as record_migration:
             record_migration.side_effect = RuntimeError('Recording migration failed.')
             with self.assertRaisesMessage(RuntimeError, 'Recording migration failed.'):
+                executor.apply_migration(
+                    ProjectState(),
+                    Migration('0001_initial', 'record_migration'),
+                )
                 executor.migrate([('migrations', '0001_initial')])
         # The migration isn't recorded as applied since it failed.
         migration_recorder = MigrationRecorder(connection)
-        self.assertFalse(migration_recorder.migration_qs.filter(app='migrations', name='0001_initial').exists())
-        self.assertTableNotExists('migrations_author')
+        self.assertIs(
+            migration_recorder.migration_qs.filter(
+                app='record_migration', name='0001_initial',
+            ).exists(),
+            False,
+        )
+        self.assertTableNotExists('record_migration_model')
+
+    def test_migrations_not_applied_on_deferred_sql_failure(self):
+        """Migrations are not recorded if deferred SQL application fails."""
+        class DeferredSQL:
+            def __str__(self):
+                raise DatabaseError('Failed to apply deferred SQL')
+
+        class Migration(migrations.Migration):
+            atomic = False
+
+            def apply(self, project_state, schema_editor, collect_sql=False):
+                schema_editor.deferred_sql.append(DeferredSQL())
+
+        executor = MigrationExecutor(connection)
+        with self.assertRaisesMessage(DatabaseError, 'Failed to apply deferred SQL'):
+            executor.apply_migration(
+                ProjectState(),
+                Migration('0001_initial', 'deferred_sql'),
+            )
+        # The migration isn't recorded as applied since it failed.
+        migration_recorder = MigrationRecorder(connection)
+        self.assertIs(
+            migration_recorder.migration_qs.filter(
+                app='deferred_sql', name='0001_initial',
+            ).exists(),
+            False,
+        )
+
+    @mock.patch.object(MigrationRecorder, 'has_table', return_value=False)
+    def test_migrate_skips_schema_creation(self, mocked_has_table):
+        """
+        The django_migrations table is not created if there are no migrations
+        to record.
+        """
+        executor = MigrationExecutor(connection)
+        # 0 queries, since the query for has_table is being mocked.
+        with self.assertNumQueries(0):
+            executor.migrate([], plan=[])
 
 
 class FakeLoader:
     def __init__(self, graph, applied):
         self.graph = graph
         self.applied_migrations = applied
+        self.replace_migrations = True
 
 
 class FakeMigration:

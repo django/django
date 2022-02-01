@@ -2,13 +2,13 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016,2020
+# znotdead <zhirafchik@gmail.com>, 2016,2020-2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-13 17:57+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-15 18:10+0000\n"
 "Last-Translator: znotdead <zhirafchik@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
@@ -188,6 +188,54 @@ msgstr "Лістапад"
 
 msgid "December"
 msgstr "Снежань"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Сту"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Лют"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Сак"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Кра"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Май"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Чэр"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Ліп"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Жні"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Вер"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Кас"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Ліс"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Сне"
 
 msgctxt "one letter Sunday"
 msgid "S"

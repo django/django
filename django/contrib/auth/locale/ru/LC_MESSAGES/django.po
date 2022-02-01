@@ -6,14 +6,15 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Алексей Борискин <sun.void@gmail.com>, 2012-2015
 # Андрей Щуров <shurov9009@gmail.com>, 2016
+# Влад Мещеряков <victimofamisery@gmail.com>, 2021
 # Дмитрий Шатера <mr.bobsans@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-05-13 18:48+0000\n"
-"Last-Translator: crazyzubr <hjcnbckfd@gmail.com>\n"
+"PO-Revision-Date: 2021-05-02 03:02+0000\n"
+"Last-Translator: Влад Мещеряков <victimofamisery@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -268,7 +269,7 @@ msgid "This password is too common."
 msgstr "Введённый пароль слишком широко распространён."
 
 msgid "Your password can’t be a commonly used password."
-msgstr "Такой пароль часто используется."
+msgstr "Пароль не должен быть слишком простым и распространенным."
 
 msgid "This password is entirely numeric."
 msgstr "Введённый пароль состоит только из цифр."

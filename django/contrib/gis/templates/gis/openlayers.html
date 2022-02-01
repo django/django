@@ -9,11 +9,10 @@
 
 <div id="{{ id }}_div_map">
     <div id="{{ id }}_map"></div>
-    {% if not disabled %}<span class="clear_features"><a href="javascript:{{ module }}.clearFeatures()">{% translate "Delete all Features" %}</a></span>{% endif %}
+    {% if not disabled %}<span class="clear_features"><a href="">{% translate "Delete all Features" %}</a></span>{% endif %}
     {% if display_raw %}<p>{% translate "Debugging window (serialized value)" %}</p>{% endif %}
     <textarea id="{{ id }}" class="vSerializedField required" cols="150" rows="10" name="{{ name }}">{{ serialized }}</textarea>
     <script>
-        {% block map_options %}var map_options = {};{% endblock %}
         {% block base_layer %}
             var base_layer = new ol.layer.Tile({
                 source: new ol.source.XYZ({
@@ -30,7 +29,6 @@
             geom_name: '{{ geom_type }}',
             id: '{{ id }}',
             map_id: '{{ id }}_map',
-            map_options: map_options,
             map_srid: {{ map_srid|unlocalize }},
             name: '{{ name }}'
         };

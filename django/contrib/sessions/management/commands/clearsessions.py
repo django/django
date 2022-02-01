@@ -1,13 +1,13 @@
 from importlib import import_module
 
 from django.conf import settings
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 
 class Command(BaseCommand):
     help = (
         "Can be run as a cronjob or directly to clean out expired sessions "
-        "(only with the database backend at the moment)."
+        "when the backend supports it."
     )
 
     def handle(self, **options):
@@ -15,7 +15,7 @@ class Command(BaseCommand):
         try:
             engine.SessionStore.clear_expired()
         except NotImplementedError:
-            self.stderr.write(
+            raise CommandError(
                 "Session engine '%s' doesn't support clearing expired "
                 "sessions." % settings.SESSION_ENGINE
             )

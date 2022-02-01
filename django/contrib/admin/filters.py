@@ -118,6 +118,7 @@ class SimpleListFilter(ListFilter):
 class FieldListFilter(ListFilter):
     _field_list_filters = []
     _take_priority_index = 0
+    list_separator = ','
 
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.field = field
@@ -127,7 +128,7 @@ class FieldListFilter(ListFilter):
         for p in self.expected_parameters():
             if p in params:
                 value = params.pop(p)
-                self.used_parameters[p] = prepare_lookup_value(p, value)
+                self.used_parameters[p] = prepare_lookup_value(p, value, self.list_separator)
 
     def has_output(self):
         return True
@@ -451,11 +452,12 @@ class EmptyFieldListFilter(FieldListFilter):
         if self.lookup_val not in ('0', '1'):
             raise IncorrectLookupParameters
 
-        lookup_condition = models.Q()
+        lookup_conditions = []
         if self.field.empty_strings_allowed:
-            lookup_condition |= models.Q(**{self.field_path: ''})
+            lookup_conditions.append((self.field_path, ''))
         if self.field.null:
-            lookup_condition |= models.Q(**{'%s__isnull' % self.field_path: True})
+            lookup_conditions.append((f'{self.field_path}__isnull', True))
+        lookup_condition = models.Q(*lookup_conditions, _connector=models.Q.OR)
         if self.lookup_val == '1':
             return queryset.filter(lookup_condition)
         return queryset.exclude(lookup_condition)

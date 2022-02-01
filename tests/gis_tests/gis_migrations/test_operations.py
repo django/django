@@ -10,8 +10,6 @@ from django.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
 
-from ..utils import mysql, oracle
-
 try:
     GeometryColumns = connection.ops.geometry_columns()
     HAS_GEOMETRY_COLUMNS = True
@@ -21,6 +19,12 @@ except NotImplementedError:
 
 class OperationTestCase(TransactionTestCase):
     available_apps = ['gis_tests.gis_migrations']
+    get_opclass_query = '''
+        SELECT opcname, c.relname FROM pg_opclass AS oc
+        JOIN pg_index as i on oc.oid = ANY(i.indclass)
+        JOIN pg_class as c on c.oid = i.indexrelid
+        WHERE c.relname = %s
+    '''
 
     def tearDown(self):
         # Delete table after testing
@@ -30,7 +34,7 @@ class OperationTestCase(TransactionTestCase):
 
     @property
     def has_spatial_indexes(self):
-        if mysql:
+        if connection.ops.mysql:
             with connection.cursor() as cursor:
                 return connection.introspection.supports_spatial_index(cursor, 'gis_neighborhood')
         return True
@@ -120,7 +124,7 @@ class OperationTests(OperationTestCase):
     def test_geom_col_name(self):
         self.assertEqual(
             GeometryColumns.geom_col_name(),
-            'column_name' if oracle else 'f_geometry_column',
+            'column_name' if connection.ops.oracle else 'f_geometry_column',
         )
 
     @skipUnlessDBFeature('supports_raster')
@@ -190,6 +194,29 @@ class OperationTests(OperationTestCase):
         if connection.features.supports_raster:
             self.assertSpatialIndexExists('gis_neighborhood', 'rast', raster=True)
 
+    @skipUnlessDBFeature('supports_3d_storage')
+    def test_add_3d_field_opclass(self):
+        if not connection.ops.postgis:
+            self.skipTest('PostGIS-specific test.')
+
+        self.alter_gis_model(
+            migrations.AddField,
+            'Neighborhood',
+            'point3d',
+            field_class=fields.PointField,
+            field_class_kwargs={'dim': 3},
+        )
+        self.assertColumnExists('gis_neighborhood', 'point3d')
+        self.assertSpatialIndexExists('gis_neighborhood', 'point3d')
+
+        with connection.cursor() as cursor:
+            index_name = 'gis_neighborhood_point3d_113bc868_id'
+            cursor.execute(self.get_opclass_query, [index_name])
+            self.assertEqual(
+                cursor.fetchall(),
+                [('gist_geometry_ops_nd', index_name)],
+            )
+
     @skipUnlessDBFeature('can_alter_geometry_field', 'supports_3d_storage')
     def test_alter_geom_field_dim(self):
         Neighborhood = self.current_state.apps.get_model('gis', 'Neighborhood')
@@ -207,6 +234,24 @@ class OperationTests(OperationTestCase):
             fields.MultiPolygonField, field_class_kwargs={'srid': 4326, 'dim': 2}
         )
         self.assertFalse(Neighborhood.objects.first().geom.hasz)
+
+    @skipUnlessDBFeature('supports_column_check_constraints', 'can_introspect_check_constraints')
+    def test_add_check_constraint(self):
+        Neighborhood = self.current_state.apps.get_model('gis', 'Neighborhood')
+        poly = Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
+        constraint = models.CheckConstraint(
+            check=models.Q(geom=poly),
+            name='geom_within_constraint',
+        )
+        Neighborhood._meta.constraints = [constraint]
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Neighborhood, constraint)
+        with connection.cursor() as cursor:
+            constraints = connection.introspection.get_constraints(
+                cursor,
+                Neighborhood._meta.db_table,
+            )
+            self.assertIn('geom_within_constraint', constraints)
 
 
 @skipIfDBFeature('supports_raster')

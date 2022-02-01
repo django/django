@@ -175,34 +175,6 @@ class SecurityMiddlewareTest(SimpleTestCase):
         """
         self.assertNotIn('X-Content-Type-Options', self.process_response().headers)
 
-    @override_settings(SECURE_BROWSER_XSS_FILTER=True)
-    def test_xss_filter_on(self):
-        """
-        With SECURE_BROWSER_XSS_FILTER set to True, the middleware adds
-        "s-xss-protection: 1; mode=block" header to the response.
-        """
-        self.assertEqual(
-            self.process_response().headers['X-XSS-Protection'],
-            '1; mode=block',
-        )
-
-    @override_settings(SECURE_BROWSER_XSS_FILTER=True)
-    def test_xss_filter_already_present(self):
-        """
-        The middleware will not override an "X-XSS-Protection" header
-        already present in the response.
-        """
-        response = self.process_response(secure=True, headers={"X-XSS-Protection": "foo"})
-        self.assertEqual(response.headers["X-XSS-Protection"], "foo")
-
-    @override_settings(SECURE_BROWSER_XSS_FILTER=False)
-    def test_xss_filter_off(self):
-        """
-        With SECURE_BROWSER_XSS_FILTER set to False, the middleware does not
-        add an "X-XSS-Protection" header to the response.
-        """
-        self.assertNotIn('X-XSS-Protection', self.process_response().headers)
-
     @override_settings(SECURE_SSL_REDIRECT=True)
     def test_ssl_redirect_on(self):
         """
@@ -282,3 +254,42 @@ class SecurityMiddlewareTest(SimpleTestCase):
         """
         response = self.process_response(headers={'Referrer-Policy': 'unsafe-url'})
         self.assertEqual(response.headers['Referrer-Policy'], 'unsafe-url')
+
+    @override_settings(SECURE_CROSS_ORIGIN_OPENER_POLICY=None)
+    def test_coop_off(self):
+        """
+        With SECURE_CROSS_ORIGIN_OPENER_POLICY set to None, the middleware does
+        not add a "Cross-Origin-Opener-Policy" header to the response.
+        """
+        self.assertNotIn('Cross-Origin-Opener-Policy', self.process_response())
+
+    def test_coop_default(self):
+        """SECURE_CROSS_ORIGIN_OPENER_POLICY defaults to same-origin."""
+        self.assertEqual(
+            self.process_response().headers['Cross-Origin-Opener-Policy'],
+            'same-origin',
+        )
+
+    def test_coop_on(self):
+        """
+        With SECURE_CROSS_ORIGIN_OPENER_POLICY set to a valid value, the
+        middleware adds a "Cross-Origin_Opener-Policy" header to the response.
+        """
+        tests = ['same-origin', 'same-origin-allow-popups', 'unsafe-none']
+        for value in tests:
+            with self.subTest(value=value), override_settings(
+                SECURE_CROSS_ORIGIN_OPENER_POLICY=value,
+            ):
+                self.assertEqual(
+                    self.process_response().headers['Cross-Origin-Opener-Policy'],
+                    value,
+                )
+
+    @override_settings(SECURE_CROSS_ORIGIN_OPENER_POLICY='unsafe-none')
+    def test_coop_already_present(self):
+        """
+        The middleware doesn't override a "Cross-Origin-Opener-Policy" header
+        already present in the response.
+        """
+        response = self.process_response(headers={'Cross-Origin-Opener-Policy': 'same-origin'})
+        self.assertEqual(response.headers['Cross-Origin-Opener-Policy'], 'same-origin')

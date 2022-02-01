@@ -16,13 +16,13 @@ cache keys to prevent delivery of wrong content.
 An example: i18n middleware would need to distinguish caches by the
 "Accept-language" header.
 """
-import hashlib
 import time
 from collections import defaultdict
 
 from django.conf import settings
 from django.core.cache import caches
 from django.http import HttpResponse, HttpResponseNotModified
+from django.utils.crypto import md5
 from django.utils.http import (
     http_date, parse_etags, parse_http_date_safe, quote_etag,
 )
@@ -118,7 +118,9 @@ def get_max_age(response):
 
 def set_response_etag(response):
     if not response.streaming and response.content:
-        response.headers['ETag'] = quote_etag(hashlib.md5(response.content).hexdigest())
+        response.headers['ETag'] = quote_etag(
+            md5(response.content, usedforsecurity=False).hexdigest(),
+        )
     return response
 
 
@@ -180,10 +182,13 @@ def get_conditional_response(request, etag=None, last_modified=None, response=No
             return _precondition_failed(request)
 
     # Step 4: Test the If-Modified-Since precondition.
-    if (not if_none_match_etags and if_modified_since and
-            not _if_modified_since_passes(last_modified, if_modified_since)):
-        if request.method in ('GET', 'HEAD'):
-            return _not_modified(request, response)
+    if (
+        not if_none_match_etags and
+        if_modified_since and
+        not _if_modified_since_passes(last_modified, if_modified_since) and
+        request.method in ('GET', 'HEAD')
+    ):
+        return _not_modified(request, response)
 
     # Step 5: Test the If-Range precondition (not supported).
     # Step 6: Return original response since there isn't a conditional response.
@@ -322,12 +327,12 @@ def _i18n_cache_key_suffix(request, cache_key):
 
 def _generate_cache_key(request, method, headerlist, key_prefix):
     """Return a cache key from the headers given in the header list."""
-    ctx = hashlib.md5()
+    ctx = md5(usedforsecurity=False)
     for header in headerlist:
         value = request.META.get(header)
         if value is not None:
             ctx.update(value.encode())
-    url = hashlib.md5(request.build_absolute_uri().encode('ascii'))
+    url = md5(request.build_absolute_uri().encode('ascii'), usedforsecurity=False)
     cache_key = 'views.decorators.cache.cache_page.%s.%s.%s.%s' % (
         key_prefix, method, url.hexdigest(), ctx.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
@@ -335,7 +340,7 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
 
 def _generate_cache_header_key(key_prefix, request):
     """Return a cache key for the header cache."""
-    url = hashlib.md5(request.build_absolute_uri().encode('ascii'))
+    url = md5(request.build_absolute_uri().encode('ascii'), usedforsecurity=False)
     cache_key = 'views.decorators.cache.cache_header.%s.%s' % (
         key_prefix, url.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)

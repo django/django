@@ -10,6 +10,7 @@ from ..models import (
     BoundaryModel, ChoiceFieldModel, ChoiceModel, ChoiceOptionModel, Defaults,
     FileModel, OptionalMultiChoiceModel,
 )
+from . import jinja2_tests
 
 
 class ChoiceFieldForm(ModelForm):
@@ -372,3 +373,8 @@ class EmptyLabelTestCase(TestCase):
 <option value="2">Bar</option>
 </select></p>"""
         )
+
+
+@jinja2_tests
+class Jinja2EmptyLabelTestCase(EmptyLabelTestCase):
+    pass

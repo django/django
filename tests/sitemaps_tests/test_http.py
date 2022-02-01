@@ -4,8 +4,9 @@ from datetime import date
 from django.contrib.sitemaps import Sitemap
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
-from django.test import modify_settings, override_settings
+from django.test import ignore_warnings, modify_settings, override_settings
 from django.utils import translation
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.formats import localize
 
 from .base import SitemapTestsBase
@@ -23,9 +24,9 @@ class HTTPSitemapTests(SitemapTestsBase):
         response = self.client.get('/simple/index.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
+<sitemap><loc>%s/simple/sitemap-simple.xml</loc><lastmod>%s</lastmod></sitemap>
 </sitemapindex>
-""" % self.base_url
+""" % (self.base_url, date.today())
         self.assertXMLEqual(response.content.decode(), expected_content)
 
     def test_sitemap_not_callable(self):
@@ -33,9 +34,9 @@ class HTTPSitemapTests(SitemapTestsBase):
         response = self.client.get('/simple-not-callable/index.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
+<sitemap><loc>%s/simple/sitemap-simple.xml</loc><lastmod>%s</lastmod></sitemap>
 </sitemapindex>
-""" % self.base_url
+""" % (self.base_url, date.today())
         self.assertXMLEqual(response.content.decode(), expected_content)
 
     def test_paged_sitemap(self):
@@ -43,24 +44,24 @@ class HTTPSitemapTests(SitemapTestsBase):
         response = self.client.get('/simple-paged/index.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<sitemap><loc>{0}/simple/sitemap-simple.xml</loc></sitemap><sitemap><loc>{0}/simple/sitemap-simple.xml?p=2</loc></sitemap>
+<sitemap><loc>{0}/simple/sitemap-simple.xml</loc><lastmod>{1}</lastmod></sitemap><sitemap><loc>{0}/simple/sitemap-simple.xml?p=2</loc><lastmod>{1}</lastmod></sitemap>
 </sitemapindex>
-""".format(self.base_url)
+""".format(self.base_url, date.today())
         self.assertXMLEqual(response.content.decode(), expected_content)
 
     @override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(os.path.dirname(__file__), 'templates')],
     }])
-    def test_simple_sitemap_custom_index(self):
+    def test_simple_sitemap_custom_lastmod_index(self):
         "A simple sitemap index can be rendered with a custom template"
-        response = self.client.get('/simple/custom-index.xml')
+        response = self.client.get('/simple/custom-lastmod-index.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <!-- This is a customised template -->
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
+<sitemap><loc>%s/simple/sitemap-simple.xml</loc><lastmod>%s</lastmod></sitemap>
 </sitemapindex>
-""" % self.base_url
+""" % (self.base_url, date.today())
         self.assertXMLEqual(response.content.decode(), expected_content)
 
     def test_simple_sitemap_section(self):
@@ -175,7 +176,30 @@ class HTTPSitemapTests(SitemapTestsBase):
         response = self.client.get('/lastmod-sitemaps/descending.xml')
         self.assertEqual(response.headers['Last-Modified'], 'Sat, 20 Apr 2013 05:00:00 GMT')
 
-    @override_settings(USE_I18N=True, USE_L10N=True)
+    def test_sitemap_get_latest_lastmod_none(self):
+        """
+        sitemapindex.lastmod is ommitted when Sitemap.lastmod is
+        callable and Sitemap.get_latest_lastmod is not implemented
+        """
+        response = self.client.get('/lastmod/get-latest-lastmod-none-sitemap.xml')
+        self.assertNotContains(response, '<lastmod>')
+
+    def test_sitemap_get_latest_lastmod(self):
+        """
+        sitemapindex.lastmod is included when Sitemap.lastmod is
+        attribute and Sitemap.get_latest_lastmod is implemented
+        """
+        response = self.client.get('/lastmod/get-latest-lastmod-sitemap.xml')
+        self.assertContains(response, '<lastmod>2013-03-13T10:00:00</lastmod>')
+
+    def test_sitemap_latest_lastmod_timezone(self):
+        """
+        lastmod datestamp shows timezones if Sitemap.get_latest_lastmod
+        returns an aware datetime.
+        """
+        response = self.client.get('/lastmod/latest-lastmod-timezone-sitemap.xml')
+        self.assertContains(response, '<lastmod>2013-03-13T10:00:00-05:00</lastmod>')
+
     def test_localized_priority(self):
         """The priority value should not be localized."""
         with translation.override('fr'):
@@ -197,6 +221,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 """ % date.today()
         self.assertXMLEqual(response.content.decode(), expected_content)
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_sitemap_get_urls_no_site_1(self):
         """
         Check we get ImproperlyConfigured if we don't pass a site object to
@@ -207,6 +232,7 @@ class HTTPSitemapTests(SitemapTestsBase):
             Sitemap().get_urls()
 
     @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_sitemap_get_urls_no_site_2(self):
         """
         Check we get ImproperlyConfigured when we don't pass a site object to
@@ -216,6 +242,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         with self.assertRaisesMessage(ImproperlyConfigured, self.use_sitemap_err_msg):
             Sitemap().get_urls()
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_sitemap_item(self):
         """
         Check to make sure that the raw item is included with each
@@ -236,9 +263,9 @@ class HTTPSitemapTests(SitemapTestsBase):
         response = self.client.get('/cached/index.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<sitemap><loc>%s/cached/sitemap-simple.xml</loc></sitemap>
+<sitemap><loc>%s/cached/sitemap-simple.xml</loc><lastmod>%s</lastmod></sitemap>
 </sitemapindex>
-""" % self.base_url
+""" % (self.base_url, date.today())
         self.assertXMLEqual(response.content.decode(), expected_content)
 
     def test_x_robots_sitemap(self):
@@ -255,9 +282,11 @@ class HTTPSitemapTests(SitemapTestsBase):
     @override_settings(LANGUAGES=(('en', 'English'), ('pt', 'Portuguese')))
     def test_simple_i18n_sitemap_index(self):
         """
-        A simple i18n sitemap index can be rendered.
+        A simple i18n sitemap index can be rendered, without logging variable
+        lookup errors.
         """
-        response = self.client.get('/simple/i18n.xml')
+        with self.assertNoLogs('django.template', 'DEBUG'):
+            response = self.client.get('/simple/i18n.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 <url><loc>{0}/en/i18n/testmodel/{1}/</loc><changefreq>never</changefreq><priority>0.5</priority></url><url><loc>{0}/pt/i18n/testmodel/{1}/</loc><changefreq>never</changefreq><priority>0.5</priority></url>
@@ -345,4 +374,76 @@ class HTTPSitemapTests(SitemapTestsBase):
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
 </urlset>"""
+        self.assertXMLEqual(response.content.decode(), expected_content)
+
+    def test_callable_sitemod_partial(self):
+        """
+        Not all items have `lastmod`. Therefore the `Last-Modified` header
+        is not set by the detail or index sitemap view.
+        """
+        index_response = self.client.get('/callable-lastmod-partial/index.xml')
+        sitemap_response = self.client.get('/callable-lastmod-partial/sitemap.xml')
+        self.assertNotIn('Last-Modified', index_response)
+        self.assertNotIn('Last-Modified', sitemap_response)
+        expected_content_index = """<?xml version="1.0" encoding="UTF-8"?>
+        <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+        <sitemap><loc>http://example.com/simple/sitemap-callable-lastmod.xml</loc></sitemap>
+        </sitemapindex>
+        """
+        expected_content_sitemap = """<?xml version="1.0" encoding="UTF-8"?>
+        <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+        <url><loc>http://example.com/location/</loc><lastmod>2013-03-13</lastmod></url><url><loc>http://example.com/location/</loc></url>
+        </urlset>
+        """
+        self.assertXMLEqual(index_response.content.decode(), expected_content_index)
+        self.assertXMLEqual(sitemap_response.content.decode(), expected_content_sitemap)
+
+    def test_callable_sitemod_full(self):
+        """
+        All items in the sitemap have `lastmod`. The `Last-Modified` header
+        is set for the detail and index sitemap view.
+        """
+        index_response = self.client.get('/callable-lastmod-full/index.xml')
+        sitemap_response = self.client.get('/callable-lastmod-full/sitemap.xml')
+        self.assertEqual(index_response.headers['Last-Modified'], 'Thu, 13 Mar 2014 10:00:00 GMT')
+        self.assertEqual(sitemap_response.headers['Last-Modified'], 'Thu, 13 Mar 2014 10:00:00 GMT')
+        expected_content_index = """<?xml version="1.0" encoding="UTF-8"?>
+        <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+        <sitemap><loc>http://example.com/simple/sitemap-callable-lastmod.xml</loc><lastmod>2014-03-13T10:00:00</lastmod></sitemap>
+        </sitemapindex>
+        """
+        expected_content_sitemap = """<?xml version="1.0" encoding="UTF-8"?>
+        <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+        <url><loc>http://example.com/location/</loc><lastmod>2013-03-13</lastmod></url><url><loc>http://example.com/location/</loc><lastmod>2014-03-13</lastmod></url>
+        </urlset>
+        """
+        self.assertXMLEqual(index_response.content.decode(), expected_content_index)
+        self.assertXMLEqual(sitemap_response.content.decode(), expected_content_sitemap)
+
+
+# RemovedInDjango50Warning
+class DeprecatedTests(SitemapTestsBase):
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(os.path.dirname(__file__), 'templates')],
+    }])
+    def test_simple_sitemap_custom_index_warning(self):
+        msg = 'Calling `__str__` on SitemapIndexItem is deprecated, use the `location` attribute instead.'
+        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
+            self.client.get('/simple/custom-index.xml')
+
+    @ignore_warnings(category=RemovedInDjango50Warning)
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(os.path.dirname(__file__), 'templates')],
+    }])
+    def test_simple_sitemap_custom_index(self):
+        "A simple sitemap index can be rendered with a custom template"
+        response = self.client.get('/simple/custom-index.xml')
+        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
+    <!-- This is a customised template -->
+    <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
+    </sitemapindex>
+    """ % (self.base_url)
         self.assertXMLEqual(response.content.decode(), expected_content)

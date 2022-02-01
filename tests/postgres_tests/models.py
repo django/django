@@ -46,6 +46,7 @@ class IntegerArrayModel(PostgreSQLModel):
 class NullableIntegerArrayModel(PostgreSQLModel):
     field = ArrayField(models.IntegerField(), blank=True, null=True)
     field_nested = ArrayField(ArrayField(models.IntegerField(null=True)), null=True)
+    order = models.IntegerField(null=True)
 
 
 class CharArrayModel(PostgreSQLModel):
@@ -82,7 +83,7 @@ class ArrayEnumModel(PostgreSQLModel):
 
 
 class CharFieldModel(models.Model):
-    field = models.CharField(max_length=16)
+    field = models.CharField(max_length=64)
 
 
 class TextFieldModel(models.Model):
@@ -100,7 +101,7 @@ class BigAutoFieldModel(models.Model):
 # Scene/Character/Line models are used to test full text search. They're
 # populated with content from Monty Python and the Holy Grail.
 class Scene(models.Model):
-    scene = models.CharField(max_length=255)
+    scene = models.TextField()
     setting = models.CharField(max_length=255)
 
 
@@ -134,6 +135,9 @@ class RangesModel(PostgreSQLModel):
     decimals = DecimalRangeField(blank=True, null=True)
     timestamps = DateTimeRangeField(blank=True, null=True)
     timestamps_inner = DateTimeRangeField(blank=True, null=True)
+    timestamps_closed_bounds = DateTimeRangeField(
+        blank=True, null=True, default_bounds='[]',
+    )
     dates = DateRangeField(blank=True, null=True)
     dates_inner = DateRangeField(blank=True, null=True)
 
@@ -159,6 +163,7 @@ class AggregateTestModel(PostgreSQLModel):
     To test postgres-specific general aggregation functions
     """
     char_field = models.CharField(max_length=30, blank=True)
+    text_field = models.TextField(blank=True)
     integer_field = models.IntegerField(null=True)
     boolean_field = models.BooleanField(null=True)
     json_field = models.JSONField(null=True)

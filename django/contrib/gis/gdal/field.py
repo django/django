@@ -8,7 +8,7 @@ from django.utils.encoding import force_str
 
 
 # For more information, see the OGR C API source code:
-#  https://www.gdal.org/ogr__api_8h.html
+#  https://gdal.org/api/vector_c_api.html
 #
 # The OGR_Fld_* routines are relevant here.
 class Field(GDALBase):
@@ -225,7 +225,6 @@ OGRFieldTypes = {
     9: OFTDate,
     10: OFTTime,
     11: OFTDateTime,
-    # New 64-bit integer types in GDAL 2
     12: OFTInteger64,
     13: OFTInteger64List,
 }

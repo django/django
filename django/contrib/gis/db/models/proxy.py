@@ -58,7 +58,7 @@ class SpatialProxy(DeferredAttribute):
         gtype = self.field.geom_type
 
         if gtype == 'RASTER' and (value is None or isinstance(value, (str, dict, self._klass))):
-            # For raster fields, assure input is None or a string, dict, or
+            # For raster fields, ensure input is None or a string, dict, or
             # raster instance.
             pass
         elif isinstance(value, self._klass):

@@ -2,16 +2,16 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015-2016,2019
+# BouRock, 2015-2016,2019,2021
 # BouRock, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Murat Çorlu <muratcorlu@gmail.com>, 2012
+# Murat Çorlu <muratcorlu@me.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-17 08:21+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-16 19:32+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -104,7 +104,7 @@ msgstr "Lütfen docutils’i yükleyin"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
+"The admin documentation system requires Python’s <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
 "Yönetici belge sistemi, Python’un <a href=\"%(link)s\">docutils</a> "

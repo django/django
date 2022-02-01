@@ -107,6 +107,13 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
         if (initial_value && !this.options.is_collection) {
             this.disableDrawing();
         }
+        const clearNode = document.getElementById(this.map.getTarget()).nextElementSibling;
+        if (clearNode.classList.contains('clear_features')) {
+            clearNode.querySelector('a').addEventListener('click', (ev) => {
+                ev.preventDefault();
+                self.clearFeatures();
+            });
+        }
         this.ready = true;
     }
 
@@ -133,7 +140,7 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
 
         // Initialize the draw interaction
         let geomType = this.options.geom_name;
-        if (geomType === "Unknown" || geomType === "GeometryCollection") {
+        if (geomType === "Geometry" || geomType === "GeometryCollection") {
             // Default to Point, but create icons to switch type
             geomType = "Point";
             this.currentGeometryType = new GeometryTypeControl({widget: this, type: "Point", active: true});

@@ -8,11 +8,12 @@ from django.urls import reverse
 
 from .admin import InnerInline, site as admin_site
 from .models import (
-    Author, BinaryTree, Book, Chapter, Child, ChildModel1, ChildModel2,
-    Fashionista, FootNote, Holder, Holder2, Holder3, Holder4, Inner, Inner2,
-    Inner3, Inner4Stacked, Inner4Tabular, Novel, OutfitItem, Parent,
-    ParentModelWithCustomPk, Person, Poll, Profile, ProfileCollection,
-    Question, Sighting, SomeChildModel, SomeParentModel, Teacher,
+    Author, BinaryTree, Book, BothVerboseNameProfile, Chapter, Child,
+    ChildModel1, ChildModel2, Fashionista, FootNote, Holder, Holder2, Holder3,
+    Holder4, Inner, Inner2, Inner3, Inner4Stacked, Inner4Tabular, Novel,
+    OutfitItem, Parent, ParentModelWithCustomPk, Person, Poll, Profile,
+    ProfileCollection, Question, ShowInlineParent, Sighting, SomeChildModel,
+    SomeParentModel, Teacher, VerboseNamePluralProfile, VerboseNameProfile,
 )
 
 INLINE_CHANGELINK_HTML = 'class="inlinechangelink">Change</a>'
@@ -34,6 +35,26 @@ class TestInline(TestDataMixin, TestCase):
         super().setUpTestData()
         cls.holder = Holder.objects.create(dummy=13)
         Inner.objects.create(dummy=42, holder=cls.holder)
+
+        cls.parent = SomeParentModel.objects.create(name='a')
+        SomeChildModel.objects.create(name='b', position='0', parent=cls.parent)
+        SomeChildModel.objects.create(name='c', position='1', parent=cls.parent)
+
+        cls.view_only_user = User.objects.create_user(
+            username='user', password='pwd', is_staff=True,
+        )
+        parent_ct = ContentType.objects.get_for_model(SomeParentModel)
+        child_ct = ContentType.objects.get_for_model(SomeChildModel)
+        permission = Permission.objects.get(
+            codename='view_someparentmodel',
+            content_type=parent_ct,
+        )
+        cls.view_only_user.user_permissions.add(permission)
+        permission = Permission.objects.get(
+            codename='view_somechildmodel',
+            content_type=child_ct,
+        )
+        cls.view_only_user.user_permissions.add(permission)
 
     def setUp(self):
         self.client.force_login(self.superuser)
@@ -154,7 +175,6 @@ class TestInline(TestDataMixin, TestCase):
         # Identically named callable isn't present in the parent ModelAdmin,
         # rendering of the add view shouldn't explode
         response = self.client.get(reverse('admin:admin_inlines_novel_add'))
-        self.assertEqual(response.status_code, 200)
         # View should have the child inlines section
         self.assertContains(
             response,
@@ -164,7 +184,6 @@ class TestInline(TestDataMixin, TestCase):
     def test_callable_lookup(self):
         """Admin inline should invoke local callable when its name is listed in readonly_fields"""
         response = self.client.get(reverse('admin:admin_inlines_poll_add'))
-        self.assertEqual(response.status_code, 200)
         # Add parent object view should have the child inlines section
         self.assertContains(
             response,
@@ -228,6 +247,113 @@ class TestInline(TestDataMixin, TestCase):
             response.rendered_content,
         )
 
+    def test_tabular_inline_hidden_field_with_view_only_permissions(self):
+        """
+        Content of hidden field is not visible in tabular inline when user has
+        view-only permission.
+        """
+        self.client.force_login(self.view_only_user)
+        url = reverse(
+            'tabular_inline_hidden_field_admin:admin_inlines_someparentmodel_change',
+            args=(self.parent.pk,),
+        )
+        response = self.client.get(url)
+        self.assertInHTML('<th class="column-position hidden">Position</th>', response.rendered_content)
+        self.assertInHTML('<td class="field-position hidden"><p>0</p></td>', response.rendered_content)
+        self.assertInHTML('<td class="field-position hidden"><p>1</p></td>', response.rendered_content)
+
+    def test_stacked_inline_hidden_field_with_view_only_permissions(self):
+        """
+        Content of hidden field is not visible in stacked inline when user has
+        view-only permission.
+        """
+        self.client.force_login(self.view_only_user)
+        url = reverse(
+            'stacked_inline_hidden_field_in_group_admin:admin_inlines_someparentmodel_change',
+            args=(self.parent.pk,),
+        )
+        response = self.client.get(url)
+        # The whole line containing name + position fields is not hidden.
+        self.assertContains(response, '<div class="form-row field-name field-position">')
+        # The div containing the position field is hidden.
+        self.assertInHTML(
+            '<div class="fieldBox field-position hidden">'
+            '<label class="inline">Position:</label>'
+            '<div class="readonly">0</div></div>',
+            response.rendered_content,
+        )
+        self.assertInHTML(
+            '<div class="fieldBox field-position hidden">'
+            '<label class="inline">Position:</label>'
+            '<div class="readonly">1</div></div>',
+            response.rendered_content,
+        )
+
+    def test_stacked_inline_single_hidden_field_in_line_with_view_only_permissions(self):
+        """
+        Content of hidden field is not visible in stacked inline when user has
+        view-only permission and the field is grouped on a separate line.
+        """
+        self.client.force_login(self.view_only_user)
+        url = reverse(
+            'stacked_inline_hidden_field_on_single_line_admin:admin_inlines_someparentmodel_change',
+            args=(self.parent.pk,),
+        )
+        response = self.client.get(url)
+        # The whole line containing position field is hidden.
+        self.assertInHTML(
+            '<div class="form-row hidden field-position">'
+            '<div><label>Position:</label>'
+            '<div class="readonly">0</div></div></div>',
+            response.rendered_content,
+        )
+        self.assertInHTML(
+            '<div class="form-row hidden field-position">'
+            '<div><label>Position:</label>'
+            '<div class="readonly">1</div></div></div>',
+            response.rendered_content,
+        )
+
+    def test_tabular_inline_with_hidden_field_non_field_errors_has_correct_colspan(self):
+        """
+        In tabular inlines, when a form has non-field errors, those errors
+        are rendered in a table line with a single cell spanning the whole
+        table width. Colspan must be equal to the number of visible columns.
+        """
+        parent = SomeParentModel.objects.create(name='a')
+        child = SomeChildModel.objects.create(name='b', position='0', parent=parent)
+        url = reverse(
+            'tabular_inline_hidden_field_admin:admin_inlines_someparentmodel_change',
+            args=(parent.id,),
+        )
+        data = {
+            'name': parent.name,
+            'somechildmodel_set-TOTAL_FORMS': 1,
+            'somechildmodel_set-INITIAL_FORMS': 1,
+            'somechildmodel_set-MIN_NUM_FORMS': 0,
+            'somechildmodel_set-MAX_NUM_FORMS': 1000,
+            '_save': 'Save',
+            'somechildmodel_set-0-id': child.id,
+            'somechildmodel_set-0-parent': parent.id,
+            'somechildmodel_set-0-name': child.name,
+            'somechildmodel_set-0-position': 1,
+        }
+        response = self.client.post(url, data)
+        # Form has 3 visible columns and 1 hidden column.
+        self.assertInHTML(
+            '<thead><tr><th class="original"></th>'
+            '<th class="column-name required">Name</th>'
+            '<th class="column-position required hidden">Position</th>'
+            '<th>Delete?</th></tr></thead>',
+            response.rendered_content,
+        )
+        # The non-field error must be spanned on 3 (visible) columns.
+        self.assertInHTML(
+            '<tr class="row-form-errors"><td colspan="3">'
+            '<ul class="errorlist nonfield"><li>A non-field error</li></ul></td></tr>',
+            response.rendered_content,
+        )
+
     def test_non_related_name_inline(self):
         """
         Multiple inlines with related_name='+' have correct form prefixes.
@@ -256,7 +382,7 @@ class TestInline(TestDataMixin, TestCase):
             html=True
         )
 
-    @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
+    @override_settings(USE_THOUSAND_SEPARATOR=True)
     def test_localize_pk_shortcut(self):
         """
         The "View on Site" link is correct for locales that use thousand
@@ -481,6 +607,31 @@ class TestInline(TestDataMixin, TestCase):
             'class="vTextField" maxlength="40" id="id_chapter_set-0-name">',
             html=True
         )
+
+    def test_inlines_plural_heading_foreign_key(self):
+        response = self.client.get(reverse('admin:admin_inlines_holder4_add'))
+        self.assertContains(response, '<h2>Inner4 stackeds</h2>', html=True)
+        self.assertContains(response, '<h2>Inner4 tabulars</h2>', html=True)
+
+    def test_inlines_singular_heading_one_to_one(self):
+        response = self.client.get(reverse('admin:admin_inlines_person_add'))
+        self.assertContains(response, '<h2>Author</h2>', html=True)  # Tabular.
+        self.assertContains(response, '<h2>Fashionista</h2>', html=True)  # Stacked.
+
+    def test_inlines_based_on_model_state(self):
+        parent = ShowInlineParent.objects.create(show_inlines=False)
+        data = {
+            'show_inlines': 'on',
+            '_save': 'Save',
+        }
+        change_url = reverse(
+            'admin:admin_inlines_showinlineparent_change',
+            args=(parent.id,),
+        )
+        response = self.client.post(change_url, data)
+        self.assertEqual(response.status_code, 302)
+        parent.refresh_from_db()
+        self.assertIs(parent.show_inlines, True)
 
 
 @override_settings(ROOT_URLCONF='admin_inlines.urls')
@@ -955,6 +1106,164 @@ class TestReadOnlyChangeViewInlinePermissions(TestCase):
 
 
 @override_settings(ROOT_URLCONF='admin_inlines.urls')
+class TestVerboseNameInlineForms(TestDataMixin, TestCase):
+    factory = RequestFactory()
+
+    def test_verbose_name_inline(self):
+        class NonVerboseProfileInline(TabularInline):
+            model = Profile
+            verbose_name = 'Non-verbose childs'
+
+        class VerboseNameProfileInline(TabularInline):
+            model = VerboseNameProfile
+            verbose_name = 'Childs with verbose name'
+
+        class VerboseNamePluralProfileInline(TabularInline):
+            model = VerboseNamePluralProfile
+            verbose_name = 'Childs with verbose name plural'
+
+        class BothVerboseNameProfileInline(TabularInline):
+            model = BothVerboseNameProfile
+            verbose_name = 'Childs with both verbose names'
+
+        modeladmin = ModelAdmin(ProfileCollection, admin_site)
+        modeladmin.inlines = [
+            NonVerboseProfileInline,
+            VerboseNameProfileInline,
+            VerboseNamePluralProfileInline,
+            BothVerboseNameProfileInline,
+        ]
+        obj = ProfileCollection.objects.create()
+        url = reverse('admin:admin_inlines_profilecollection_change', args=(obj.pk,))
+        request = self.factory.get(url)
+        request.user = self.superuser
+        response = modeladmin.changeform_view(request)
+        self.assertNotContains(response, 'Add another Profile')
+        # Non-verbose model.
+        self.assertContains(response, '<h2>Non-verbose childss</h2>')
+        self.assertContains(response, 'Add another Non-verbose child')
+        self.assertNotContains(response, '<h2>Profiles</h2>')
+        # Model with verbose name.
+        self.assertContains(response, '<h2>Childs with verbose names</h2>')
+        self.assertContains(response, 'Add another Childs with verbose name')
+        self.assertNotContains(response, '<h2>Model with verbose name onlys</h2>')
+        self.assertNotContains(response, 'Add another Model with verbose name only')
+        # Model with verbose name plural.
+        self.assertContains(response, '<h2>Childs with verbose name plurals</h2>')
+        self.assertContains(response, 'Add another Childs with verbose name plural')
+        self.assertNotContains(response, '<h2>Model with verbose name plural only</h2>')
+        # Model with both verbose names.
+        self.assertContains(response, '<h2>Childs with both verbose namess</h2>')
+        self.assertContains(response, 'Add another Childs with both verbose names')
+        self.assertNotContains(response, '<h2>Model with both - plural name</h2>')
+        self.assertNotContains(response, 'Add another Model with both - name')
+
+    def test_verbose_name_plural_inline(self):
+        class NonVerboseProfileInline(TabularInline):
+            model = Profile
+            verbose_name_plural = 'Non-verbose childs'
+
+        class VerboseNameProfileInline(TabularInline):
+            model = VerboseNameProfile
+            verbose_name_plural = 'Childs with verbose name'
+
+        class VerboseNamePluralProfileInline(TabularInline):
+            model = VerboseNamePluralProfile
+            verbose_name_plural = 'Childs with verbose name plural'
+
+        class BothVerboseNameProfileInline(TabularInline):
+            model = BothVerboseNameProfile
+            verbose_name_plural = 'Childs with both verbose names'
+
+        modeladmin = ModelAdmin(ProfileCollection, admin_site)
+        modeladmin.inlines = [
+            NonVerboseProfileInline,
+            VerboseNameProfileInline,
+            VerboseNamePluralProfileInline,
+            BothVerboseNameProfileInline,
+        ]
+        obj = ProfileCollection.objects.create()
+        url = reverse('admin:admin_inlines_profilecollection_change', args=(obj.pk,))
+        request = self.factory.get(url)
+        request.user = self.superuser
+        response = modeladmin.changeform_view(request)
+        # Non-verbose model.
+        self.assertContains(response, '<h2>Non-verbose childs</h2>')
+        self.assertContains(response, 'Add another Profile')
+        self.assertNotContains(response, '<h2>Profiles</h2>')
+        # Model with verbose name.
+        self.assertContains(response, '<h2>Childs with verbose name</h2>')
+        self.assertContains(response, 'Add another Model with verbose name only')
+        self.assertNotContains(response, '<h2>Model with verbose name onlys</h2>')
+        # Model with verbose name plural.
+        self.assertContains(response, '<h2>Childs with verbose name plural</h2>')
+        self.assertContains(response, 'Add another Profile')
+        self.assertNotContains(response, '<h2>Model with verbose name plural only</h2>')
+        # Model with both verbose names.
+        self.assertContains(response, '<h2>Childs with both verbose names</h2>')
+        self.assertContains(response, 'Add another Model with both - name')
+        self.assertNotContains(response, '<h2>Model with both - plural name</h2>')
+
+    def test_both_verbose_names_inline(self):
+        class NonVerboseProfileInline(TabularInline):
+            model = Profile
+            verbose_name = 'Non-verbose childs - name'
+            verbose_name_plural = 'Non-verbose childs - plural name'
+
+        class VerboseNameProfileInline(TabularInline):
+            model = VerboseNameProfile
+            verbose_name = 'Childs with verbose name - name'
+            verbose_name_plural = 'Childs with verbose name - plural name'
+
+        class VerboseNamePluralProfileInline(TabularInline):
+            model = VerboseNamePluralProfile
+            verbose_name = 'Childs with verbose name plural - name'
+            verbose_name_plural = 'Childs with verbose name plural - plural name'
+
+        class BothVerboseNameProfileInline(TabularInline):
+            model = BothVerboseNameProfile
+            verbose_name = 'Childs with both - name'
+            verbose_name_plural = 'Childs with both - plural name'
+
+        modeladmin = ModelAdmin(ProfileCollection, admin_site)
+        modeladmin.inlines = [
+            NonVerboseProfileInline,
+            VerboseNameProfileInline,
+            VerboseNamePluralProfileInline,
+            BothVerboseNameProfileInline,
+        ]
+        obj = ProfileCollection.objects.create()
+        url = reverse('admin:admin_inlines_profilecollection_change', args=(obj.pk,))
+        request = self.factory.get(url)
+        request.user = self.superuser
+        response = modeladmin.changeform_view(request)
+        self.assertNotContains(response, 'Add another Profile')
+        # Non-verbose model.
+        self.assertContains(response, '<h2>Non-verbose childs - plural name</h2>')
+        self.assertContains(response, 'Add another Non-verbose childs - name')
+        self.assertNotContains(response, '<h2>Profiles</h2>')
+        # Model with verbose name.
+        self.assertContains(response, '<h2>Childs with verbose name - plural name</h2>')
+        self.assertContains(response, 'Add another Childs with verbose name - name')
+        self.assertNotContains(response, '<h2>Model with verbose name onlys</h2>')
+        # Model with verbose name plural.
+        self.assertContains(
+            response,
+            '<h2>Childs with verbose name plural - plural name</h2>',
+        )
+        self.assertContains(
+            response,
+            'Add another Childs with verbose name plural - name',
+        )
+        self.assertNotContains(response, '<h2>Model with verbose name plural only</h2>')
+        # Model with both verbose names.
+        self.assertContains(response, '<h2>Childs with both - plural name</h2>')
+        self.assertContains(response, 'Add another Childs with both - name')
+        self.assertNotContains(response, '<h2>Model with both - plural name</h2>')
+        self.assertNotContains(response, 'Add another Model with both - name')
+
+
+@override_settings(ROOT_URLCONF='admin_inlines.urls')
 class SeleniumTests(AdminSeleniumTestCase):
 
     available_apps = ['admin_inlines'] + AdminSeleniumTestCase.available_apps
@@ -966,129 +1275,134 @@ class SeleniumTests(AdminSeleniumTestCase):
         """
         The "Add another XXX" link correctly adds items to the stacked formset.
         """
+        from selenium.webdriver.common.by import By
         self.admin_login(username='super', password='secret')
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder4_add'))
 
         inline_id = '#inner4stacked_set-group'
+        rows_selector = '%s .dynamic-inner4stacked_set' % inline_id
 
-        def rows_length():
-            return len(self.selenium.find_elements_by_css_selector('%s .dynamic-inner4stacked_set' % inline_id))
-        self.assertEqual(rows_length(), 3)
-
-        add_button = self.selenium.find_element_by_link_text(
-            'Add another Inner4 stacked')
+        self.assertCountSeleniumElements(rows_selector, 3)
+        add_button = self.selenium.find_element(By.LINK_TEXT, 'Add another Inner4 stacked')
         add_button.click()
-
-        self.assertEqual(rows_length(), 4)
+        self.assertCountSeleniumElements(rows_selector, 4)
 
     def test_delete_stackeds(self):
+        from selenium.webdriver.common.by import By
         self.admin_login(username='super', password='secret')
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder4_add'))
 
         inline_id = '#inner4stacked_set-group'
+        rows_selector = '%s .dynamic-inner4stacked_set' % inline_id
 
-        def rows_length():
-            return len(self.selenium.find_elements_by_css_selector('%s .dynamic-inner4stacked_set' % inline_id))
-        self.assertEqual(rows_length(), 3)
+        self.assertCountSeleniumElements(rows_selector, 3)
 
-        add_button = self.selenium.find_element_by_link_text(
-            'Add another Inner4 stacked')
+        add_button = self.selenium.find_element(By.LINK_TEXT, 'Add another Inner4 stacked')
         add_button.click()
         add_button.click()
 
-        self.assertEqual(rows_length(), 5, msg="sanity check")
-        for delete_link in self.selenium.find_elements_by_css_selector('%s .inline-deletelink' % inline_id):
+        self.assertCountSeleniumElements(rows_selector, 5)
+        for delete_link in self.selenium.find_elements(By.CSS_SELECTOR, '%s .inline-deletelink' % inline_id):
             delete_link.click()
         with self.disable_implicit_wait():
-            self.assertEqual(rows_length(), 0)
+            self.assertCountSeleniumElements(rows_selector, 0)
 
     def test_delete_invalid_stacked_inlines(self):
         from selenium.common.exceptions import NoSuchElementException
+        from selenium.webdriver.common.by import By
         self.admin_login(username='super', password='secret')
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder4_add'))
 
         inline_id = '#inner4stacked_set-group'
+        rows_selector = '%s .dynamic-inner4stacked_set' % inline_id
 
-        def rows_length():
-            return len(self.selenium.find_elements_by_css_selector('%s .dynamic-inner4stacked_set' % inline_id))
-        self.assertEqual(rows_length(), 3)
+        self.assertCountSeleniumElements(rows_selector, 3)
 
-        add_button = self.selenium.find_element_by_link_text(
-            'Add another Inner4 stacked')
+        add_button = self.selenium.find_element(
+            By.LINK_TEXT,
+            'Add another Inner4 stacked',
+        )
         add_button.click()
         add_button.click()
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector('#id_inner4stacked_set-4-dummy')), 1)
+        self.assertCountSeleniumElements('#id_inner4stacked_set-4-dummy', 1)
 
         # Enter some data and click 'Save'.
-        self.selenium.find_element_by_name('dummy').send_keys('1')
-        self.selenium.find_element_by_name('inner4stacked_set-0-dummy').send_keys('100')
-        self.selenium.find_element_by_name('inner4stacked_set-1-dummy').send_keys('101')
-        self.selenium.find_element_by_name('inner4stacked_set-2-dummy').send_keys('222')
-        self.selenium.find_element_by_name('inner4stacked_set-3-dummy').send_keys('103')
-        self.selenium.find_element_by_name('inner4stacked_set-4-dummy').send_keys('222')
+        self.selenium.find_element(By.NAME, 'dummy').send_keys('1')
+        self.selenium.find_element(By.NAME, 'inner4stacked_set-0-dummy').send_keys('100')
+        self.selenium.find_element(By.NAME, 'inner4stacked_set-1-dummy').send_keys('101')
+        self.selenium.find_element(By.NAME, 'inner4stacked_set-2-dummy').send_keys('222')
+        self.selenium.find_element(By.NAME, 'inner4stacked_set-3-dummy').send_keys('103')
+        self.selenium.find_element(By.NAME, 'inner4stacked_set-4-dummy').send_keys('222')
         with self.wait_page_loaded():
-            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+            self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
 
-        self.assertEqual(rows_length(), 5, msg="sanity check")
-        errorlist = self.selenium.find_element_by_css_selector(
-            '%s .dynamic-inner4stacked_set .errorlist li' % inline_id
+        # Sanity check.
+        self.assertCountSeleniumElements(rows_selector, 5)
+        errorlist = self.selenium.find_element(
+            By.CSS_SELECTOR,
+            '%s .dynamic-inner4stacked_set .errorlist li' % inline_id,
         )
         self.assertEqual('Please correct the duplicate values below.', errorlist.text)
-        delete_link = self.selenium.find_element_by_css_selector('#inner4stacked_set-4 .inline-deletelink')
+        delete_link = self.selenium.find_element(By.CSS_SELECTOR, '#inner4stacked_set-4 .inline-deletelink')
         delete_link.click()
-        self.assertEqual(rows_length(), 4)
+        self.assertCountSeleniumElements(rows_selector, 4)
         with self.disable_implicit_wait(), self.assertRaises(NoSuchElementException):
-            self.selenium.find_element_by_css_selector('%s .dynamic-inner4stacked_set .errorlist li' % inline_id)
+            self.selenium.find_element(By.CSS_SELECTOR, '%s .dynamic-inner4stacked_set .errorlist li' % inline_id)
 
         with self.wait_page_loaded():
-            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+            self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
 
         # The objects have been created in the database.
         self.assertEqual(Inner4Stacked.objects.all().count(), 4)
 
     def test_delete_invalid_tabular_inlines(self):
         from selenium.common.exceptions import NoSuchElementException
+        from selenium.webdriver.common.by import By
         self.admin_login(username='super', password='secret')
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder4_add'))
 
         inline_id = '#inner4tabular_set-group'
+        rows_selector = '%s .dynamic-inner4tabular_set' % inline_id
 
-        def rows_length():
-            return len(self.selenium.find_elements_by_css_selector('%s .dynamic-inner4tabular_set' % inline_id))
-        self.assertEqual(rows_length(), 3)
+        self.assertCountSeleniumElements(rows_selector, 3)
 
-        add_button = self.selenium.find_element_by_link_text(
-            'Add another Inner4 tabular')
+        add_button = self.selenium.find_element(
+            By.LINK_TEXT,
+            'Add another Inner4 tabular'
+        )
         add_button.click()
         add_button.click()
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector('#id_inner4tabular_set-4-dummy')), 1)
+        self.assertCountSeleniumElements('#id_inner4tabular_set-4-dummy', 1)
 
         # Enter some data and click 'Save'.
-        self.selenium.find_element_by_name('dummy').send_keys('1')
-        self.selenium.find_element_by_name('inner4tabular_set-0-dummy').send_keys('100')
-        self.selenium.find_element_by_name('inner4tabular_set-1-dummy').send_keys('101')
-        self.selenium.find_element_by_name('inner4tabular_set-2-dummy').send_keys('222')
-        self.selenium.find_element_by_name('inner4tabular_set-3-dummy').send_keys('103')
-        self.selenium.find_element_by_name('inner4tabular_set-4-dummy').send_keys('222')
+        self.selenium.find_element(By.NAME, 'dummy').send_keys('1')
+        self.selenium.find_element(By.NAME, 'inner4tabular_set-0-dummy').send_keys('100')
+        self.selenium.find_element(By.NAME, 'inner4tabular_set-1-dummy').send_keys('101')
+        self.selenium.find_element(By.NAME, 'inner4tabular_set-2-dummy').send_keys('222')
+        self.selenium.find_element(By.NAME, 'inner4tabular_set-3-dummy').send_keys('103')
+        self.selenium.find_element(By.NAME, 'inner4tabular_set-4-dummy').send_keys('222')
         with self.wait_page_loaded():
-            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+            self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
 
-        self.assertEqual(rows_length(), 5, msg="sanity check")
+        # Sanity Check.
+        self.assertCountSeleniumElements(rows_selector, 5)
 
         # Non-field errorlist is in its own <tr> just before
         # tr#inner4tabular_set-3:
-        errorlist = self.selenium.find_element_by_css_selector(
+        errorlist = self.selenium.find_element(
+            By.CSS_SELECTOR,
             '%s #inner4tabular_set-3 + .row-form-errors .errorlist li' % inline_id
         )
         self.assertEqual('Please correct the duplicate values below.', errorlist.text)
-        delete_link = self.selenium.find_element_by_css_selector('#inner4tabular_set-4 .inline-deletelink')
+        delete_link = self.selenium.find_element(By.CSS_SELECTOR, '#inner4tabular_set-4 .inline-deletelink')
         delete_link.click()
-        self.assertEqual(rows_length(), 4)
+
+        self.assertCountSeleniumElements(rows_selector, 4)
         with self.disable_implicit_wait(), self.assertRaises(NoSuchElementException):
-            self.selenium.find_element_by_css_selector('%s .dynamic-inner4tabular_set .errorlist li' % inline_id)
+            self.selenium.find_element(By.CSS_SELECTOR, '%s .dynamic-inner4tabular_set .errorlist li' % inline_id)
 
         with self.wait_page_loaded():
-            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+            self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
 
         # The objects have been created in the database.
         self.assertEqual(Inner4Tabular.objects.all().count(), 4)
@@ -1097,53 +1411,51 @@ class SeleniumTests(AdminSeleniumTestCase):
         """
         The "Add another XXX" link correctly adds items to the inline form.
         """
+        from selenium.webdriver.common.by import By
         self.admin_login(username='super', password='secret')
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_profilecollection_add'))
 
         # There's only one inline to start with and it has the correct ID.
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set')), 1)
-        self.assertEqual(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set')[0].get_attribute('id'),
-            'profile_set-0')
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set#profile_set-0 input[name=profile_set-0-first_name]')), 1)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set#profile_set-0 input[name=profile_set-0-last_name]')), 1)
+        self.assertCountSeleniumElements('.dynamic-profile_set', 1)
+        self.assertEqual(
+            self.selenium.find_elements(By.CSS_SELECTOR, '.dynamic-profile_set')[0].get_attribute('id'),
+            'profile_set-0',
+        )
+        self.assertCountSeleniumElements('.dynamic-profile_set#profile_set-0 input[name=profile_set-0-first_name]', 1)
+        self.assertCountSeleniumElements('.dynamic-profile_set#profile_set-0 input[name=profile_set-0-last_name]', 1)
 
         # Add an inline
-        self.selenium.find_element_by_link_text('Add another Profile').click()
+        self.selenium.find_element(By.LINK_TEXT, 'Add another Profile').click()
 
         # The inline has been added, it has the right id, and it contains the
         # correct fields.
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector('.dynamic-profile_set')), 2)
-        self.assertEqual(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set')[1].get_attribute('id'), 'profile_set-1')
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set#profile_set-1 input[name=profile_set-1-first_name]')), 1)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set#profile_set-1 input[name=profile_set-1-last_name]')), 1)
-
+        self.assertCountSeleniumElements('.dynamic-profile_set', 2)
+        self.assertEqual(
+            self.selenium.find_elements(By.CSS_SELECTOR, '.dynamic-profile_set')[1].get_attribute('id'),
+            'profile_set-1',
+        )
+        self.assertCountSeleniumElements('.dynamic-profile_set#profile_set-1 input[name=profile_set-1-first_name]', 1)
+        self.assertCountSeleniumElements('.dynamic-profile_set#profile_set-1 input[name=profile_set-1-last_name]', 1)
         # Let's add another one to be sure
-        self.selenium.find_element_by_link_text('Add another Profile').click()
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector('.dynamic-profile_set')), 3)
-        self.assertEqual(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set')[2].get_attribute('id'), 'profile_set-2')
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set#profile_set-2 input[name=profile_set-2-first_name]')), 1)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            '.dynamic-profile_set#profile_set-2 input[name=profile_set-2-last_name]')), 1)
+        self.selenium.find_element(By.LINK_TEXT, 'Add another Profile').click()
+        self.assertCountSeleniumElements('.dynamic-profile_set', 3)
+        self.assertEqual(
+            self.selenium.find_elements(By.CSS_SELECTOR, '.dynamic-profile_set')[2].get_attribute('id'),
+            'profile_set-2',
+        )
+        self.assertCountSeleniumElements('.dynamic-profile_set#profile_set-2 input[name=profile_set-2-first_name]', 1)
+        self.assertCountSeleniumElements('.dynamic-profile_set#profile_set-2 input[name=profile_set-2-last_name]', 1)
 
         # Enter some data and click 'Save'
-        self.selenium.find_element_by_name('profile_set-0-first_name').send_keys('0 first name 1')
-        self.selenium.find_element_by_name('profile_set-0-last_name').send_keys('0 last name 2')
-        self.selenium.find_element_by_name('profile_set-1-first_name').send_keys('1 first name 1')
-        self.selenium.find_element_by_name('profile_set-1-last_name').send_keys('1 last name 2')
-        self.selenium.find_element_by_name('profile_set-2-first_name').send_keys('2 first name 1')
-        self.selenium.find_element_by_name('profile_set-2-last_name').send_keys('2 last name 2')
+        self.selenium.find_element(By.NAME, 'profile_set-0-first_name').send_keys('0 first name 1')
+        self.selenium.find_element(By.NAME, 'profile_set-0-last_name').send_keys('0 last name 2')
+        self.selenium.find_element(By.NAME, 'profile_set-1-first_name').send_keys('1 first name 1')
+        self.selenium.find_element(By.NAME, 'profile_set-1-last_name').send_keys('1 last name 2')
+        self.selenium.find_element(By.NAME, 'profile_set-2-first_name').send_keys('2 first name 1')
+        self.selenium.find_element(By.NAME, 'profile_set-2-last_name').send_keys('2 last name 2')
 
         with self.wait_page_loaded():
-            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+            self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
 
         # The objects have been created in the database
         self.assertEqual(ProfileCollection.objects.all().count(), 1)
@@ -1151,6 +1463,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
     def test_add_inline_link_absent_for_view_only_parent_model(self):
         from selenium.common.exceptions import NoSuchElementException
+        from selenium.webdriver.common.by import By
         user = User.objects.create_user('testing', password='password', is_staff=True)
         user.user_permissions.add(
             Permission.objects.get(codename='view_poll', content_type=ContentType.objects.get_for_model(Poll))
@@ -1166,58 +1479,54 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(self.live_server_url + change_url)
         with self.disable_implicit_wait():
             with self.assertRaises(NoSuchElementException):
-                self.selenium.find_element_by_link_text('Add another Question')
+                self.selenium.find_element(By.LINK_TEXT, 'Add another Question')
 
     def test_delete_inlines(self):
+        from selenium.webdriver.common.by import By
         self.admin_login(username='super', password='secret')
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_profilecollection_add'))
 
         # Add a few inlines
-        self.selenium.find_element_by_link_text('Add another Profile').click()
-        self.selenium.find_element_by_link_text('Add another Profile').click()
-        self.selenium.find_element_by_link_text('Add another Profile').click()
-        self.selenium.find_element_by_link_text('Add another Profile').click()
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            '#profile_set-group table tr.dynamic-profile_set')), 5)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-0')), 1)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-1')), 1)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-2')), 1)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-3')), 1)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-4')), 1)
-
+        self.selenium.find_element(By.LINK_TEXT, 'Add another Profile').click()
+        self.selenium.find_element(By.LINK_TEXT, 'Add another Profile').click()
+        self.selenium.find_element(By.LINK_TEXT, 'Add another Profile').click()
+        self.selenium.find_element(By.LINK_TEXT, 'Add another Profile').click()
+        self.assertCountSeleniumElements('#profile_set-group table tr.dynamic-profile_set', 5)
+        self.assertCountSeleniumElements('form#profilecollection_form tr.dynamic-profile_set#profile_set-0', 1)
+        self.assertCountSeleniumElements('form#profilecollection_form tr.dynamic-profile_set#profile_set-1', 1)
+        self.assertCountSeleniumElements('form#profilecollection_form tr.dynamic-profile_set#profile_set-2', 1)
+        self.assertCountSeleniumElements('form#profilecollection_form tr.dynamic-profile_set#profile_set-3', 1)
+        self.assertCountSeleniumElements('form#profilecollection_form tr.dynamic-profile_set#profile_set-4', 1)
         # Click on a few delete buttons
-        self.selenium.find_element_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-1 td.delete a').click()
-        self.selenium.find_element_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-2 td.delete a').click()
+        self.selenium.find_element(
+            By.CSS_SELECTOR,
+            'form#profilecollection_form tr.dynamic-profile_set#profile_set-1 td.delete a',
+        ).click()
+        self.selenium.find_element(
+            By.CSS_SELECTOR,
+            'form#profilecollection_form tr.dynamic-profile_set#profile_set-2 td.delete a',
+        ).click()
         # The rows are gone and the IDs have been re-sequenced
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            '#profile_set-group table tr.dynamic-profile_set')), 3)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-0')), 1)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-1')), 1)
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-2')), 1)
+        self.assertCountSeleniumElements('#profile_set-group table tr.dynamic-profile_set', 3)
+        self.assertCountSeleniumElements('form#profilecollection_form tr.dynamic-profile_set#profile_set-0', 1)
+        self.assertCountSeleniumElements('form#profilecollection_form tr.dynamic-profile_set#profile_set-1', 1)
+        self.assertCountSeleniumElements('form#profilecollection_form tr.dynamic-profile_set#profile_set-2', 1)
 
     def test_collapsed_inlines(self):
+        from selenium.webdriver.common.by import By
+
         # Collapsed inlines have SHOW/HIDE links.
         self.admin_login(username='super', password='secret')
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_author_add'))
         # One field is in a stacked inline, other in a tabular one.
         test_fields = ['#id_nonautopkbook_set-0-title', '#id_nonautopkbook_set-2-0-title']
-        show_links = self.selenium.find_elements_by_link_text('SHOW')
+        show_links = self.selenium.find_elements(By.LINK_TEXT, 'SHOW')
         self.assertEqual(len(show_links), 3)
         for show_index, field_name in enumerate(test_fields, 0):
             self.wait_until_invisible(field_name)
             show_links[show_index].click()
             self.wait_until_visible(field_name)
-        hide_links = self.selenium.find_elements_by_link_text('HIDE')
+        hide_links = self.selenium.find_elements(By.LINK_TEXT, 'HIDE')
         self.assertEqual(len(hide_links), 2)
         for hide_index, field_name in enumerate(test_fields, 0):
             self.wait_until_visible(field_name)
@@ -1225,17 +1534,18 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.wait_until_invisible(field_name)
 
     def test_added_stacked_inline_with_collapsed_fields(self):
+        from selenium.webdriver.common.by import By
         self.admin_login(username='super', password='secret')
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_teacher_add'))
-        self.selenium.find_element_by_link_text('Add another Child').click()
+        self.selenium.find_element(By.LINK_TEXT, 'Add another Child').click()
         test_fields = ['#id_child_set-0-name', '#id_child_set-1-name']
-        show_links = self.selenium.find_elements_by_link_text('SHOW')
+        show_links = self.selenium.find_elements(By.LINK_TEXT, 'SHOW')
         self.assertEqual(len(show_links), 2)
         for show_index, field_name in enumerate(test_fields, 0):
             self.wait_until_invisible(field_name)
             show_links[show_index].click()
             self.wait_until_visible(field_name)
-        hide_links = self.selenium.find_elements_by_link_text('HIDE')
+        hide_links = self.selenium.find_elements(By.LINK_TEXT, 'HIDE')
         self.assertEqual(len(hide_links), 2)
         for hide_index, field_name in enumerate(test_fields, 0):
             self.wait_until_visible(field_name)
@@ -1270,31 +1580,32 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.assertIn(element.value_of_css_property(prop), colors)
 
     def test_inline_formset_error_input_border(self):
+        from selenium.webdriver.common.by import By
         self.admin_login(username='super', password='secret')
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder5_add'))
         self.wait_until_visible('#id_dummy')
-        self.selenium.find_element_by_id('id_dummy').send_keys(1)
+        self.selenium.find_element(By.ID, 'id_dummy').send_keys(1)
         fields = ['id_inner5stacked_set-0-dummy', 'id_inner5tabular_set-0-dummy']
-        show_links = self.selenium.find_elements_by_link_text('SHOW')
+        show_links = self.selenium.find_elements(By.LINK_TEXT, 'SHOW')
         for show_index, field_name in enumerate(fields):
             show_links[show_index].click()
             self.wait_until_visible('#' + field_name)
-            self.selenium.find_element_by_id(field_name).send_keys(1)
+            self.selenium.find_element(By.ID, field_name).send_keys(1)
 
         # Before save all inputs have default border
         for inline in ('stacked', 'tabular'):
             for field_name in ('name', 'select', 'text'):
                 element_id = 'id_inner5%s_set-0-%s' % (inline, field_name)
                 self.assertBorder(
-                    self.selenium.find_element_by_id(element_id),
+                    self.selenium.find_element(By.ID, element_id),
                     '1px solid #cccccc',
                 )
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
         # Test the red border around inputs by css selectors
         stacked_selectors = ['.errors input', '.errors select', '.errors textarea']
         for selector in stacked_selectors:
             self.assertBorder(
-                self.selenium.find_element_by_css_selector(selector),
+                self.selenium.find_element(By.CSS_SELECTOR, selector),
                 '1px solid #ba2121',
             )
         tabular_selectors = [
@@ -1302,24 +1613,21 @@ class SeleniumTests(AdminSeleniumTestCase):
         ]
         for selector in tabular_selectors:
             self.assertBorder(
-                self.selenium.find_element_by_css_selector(selector),
+                self.selenium.find_element(By.CSS_SELECTOR, selector),
                 '1px solid #ba2121',
             )
 
     def test_inline_formset_error(self):
+        from selenium.webdriver.common.by import By
         self.admin_login(username='super', password='secret')
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder5_add'))
         stacked_inline_formset_selector = 'div#inner5stacked_set-group fieldset.module.collapse'
         tabular_inline_formset_selector = 'div#inner5tabular_set-group fieldset.module.collapse'
         # Inlines without errors, both inlines collapsed
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-        self.assertEqual(
-            len(self.selenium.find_elements_by_css_selector(stacked_inline_formset_selector + '.collapsed')), 1
-        )
-        self.assertEqual(
-            len(self.selenium.find_elements_by_css_selector(tabular_inline_formset_selector + '.collapsed')), 1
-        )
-        show_links = self.selenium.find_elements_by_link_text('SHOW')
+        self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        self.assertCountSeleniumElements(stacked_inline_formset_selector + '.collapsed', 1)
+        self.assertCountSeleniumElements(tabular_inline_formset_selector + '.collapsed', 1)
+        show_links = self.selenium.find_elements(By.LINK_TEXT, 'SHOW')
         self.assertEqual(len(show_links), 2)
 
         # Inlines with errors, both inlines expanded
@@ -1327,24 +1635,57 @@ class SeleniumTests(AdminSeleniumTestCase):
         for show_index, field_name in enumerate(test_fields):
             show_links[show_index].click()
             self.wait_until_visible(field_name)
-            self.selenium.find_element_by_id(field_name[1:]).send_keys(1)
-        hide_links = self.selenium.find_elements_by_link_text('HIDE')
+            self.selenium.find_element(By.ID, field_name[1:]).send_keys(1)
+        hide_links = self.selenium.find_elements(By.LINK_TEXT, 'HIDE')
         self.assertEqual(len(hide_links), 2)
         for hide_index, field_name in enumerate(test_fields):
             hide_link = hide_links[hide_index]
             self.selenium.execute_script('window.scrollTo(0, %s);' % hide_link.location['y'])
             hide_link.click()
             self.wait_until_invisible(field_name)
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-        self.assertEqual(
-            len(self.selenium.find_elements_by_css_selector(stacked_inline_formset_selector + '.collapsed')), 0
-        )
-        self.assertEqual(
-            len(self.selenium.find_elements_by_css_selector(tabular_inline_formset_selector + '.collapsed')), 0
-        )
-        self.assertEqual(
-            len(self.selenium.find_elements_by_css_selector(stacked_inline_formset_selector)), 1
-        )
-        self.assertEqual(
-            len(self.selenium.find_elements_by_css_selector(tabular_inline_formset_selector)), 1
-        )
+        with self.wait_page_loaded():
+            self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        with self.disable_implicit_wait():
+            self.assertCountSeleniumElements(stacked_inline_formset_selector + '.collapsed', 0)
+            self.assertCountSeleniumElements(tabular_inline_formset_selector + '.collapsed', 0)
+        self.assertCountSeleniumElements(stacked_inline_formset_selector, 1)
+        self.assertCountSeleniumElements(tabular_inline_formset_selector, 1)
+
+    def test_inlines_verbose_name(self):
+        """
+        The item added by the "Add another XXX" link must use the correct
+        verbose_name in the inline form.
+        """
+        from selenium.webdriver.common.by import By
+        self.admin_login(username='super', password='secret')
+        # Hide sidebar.
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_course_add'))
+        toggle_button = self.selenium.find_element(By.CSS_SELECTOR, '#toggle-nav-sidebar')
+        toggle_button.click()
+        # Each combination of horizontal/vertical filter with stacked/tabular
+        # inlines.
+        tests = [
+            'admin:admin_inlines_course_add',
+            'admin:admin_inlines_courseproxy_add',
+            'admin:admin_inlines_courseproxy1_add',
+            'admin:admin_inlines_courseproxy2_add',
+        ]
+        css_selector = '.dynamic-class_set#class_set-%s h2'
+
+        for url_name in tests:
+            with self.subTest(url=url_name):
+                self.selenium.get(self.live_server_url + reverse(url_name))
+                # First inline shows the verbose_name.
+                available, chosen = self.selenium.find_elements(By.CSS_SELECTOR, css_selector % 0)
+                self.assertEqual(available.text, 'AVAILABLE ATTENDANT')
+                self.assertEqual(chosen.text, 'CHOSEN ATTENDANT')
+                # Added inline should also have the correct verbose_name.
+                self.selenium.find_element(By.LINK_TEXT, 'Add another Class').click()
+                available, chosen = self.selenium.find_elements(By.CSS_SELECTOR, css_selector % 1)
+                self.assertEqual(available.text, 'AVAILABLE ATTENDANT')
+                self.assertEqual(chosen.text, 'CHOSEN ATTENDANT')
+                # Third inline should also have the correct verbose_name.
+                self.selenium.find_element(By.LINK_TEXT, 'Add another Class').click()
+                available, chosen = self.selenium.find_elements(By.CSS_SELECTOR, css_selector % 2)
+                self.assertEqual(available.text, 'AVAILABLE ATTENDANT')
+                self.assertEqual(chosen.text, 'CHOSEN ATTENDANT')

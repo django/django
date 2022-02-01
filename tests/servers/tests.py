@@ -4,12 +4,15 @@ Tests for django.core.servers.
 import errno
 import os
 import socket
+import threading
 from http.client import HTTPConnection
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
-from django.core.servers.basehttp import WSGIServer
+from django.conf import settings
+from django.core.servers.basehttp import ThreadedWSGIServer, WSGIServer
+from django.db import DEFAULT_DB_ALIAS, connections
 from django.test import LiveServerTestCase, override_settings
 from django.test.testcases import LiveServerThread, QuietWSGIRequestHandler
 
@@ -17,9 +20,9 @@ from .models import Person
 
 TEST_ROOT = os.path.dirname(__file__)
 TEST_SETTINGS = {
-    'MEDIA_URL': '/media/',
+    'MEDIA_URL': 'media/',
     'MEDIA_ROOT': os.path.join(TEST_ROOT, 'media'),
-    'STATIC_URL': '/static/',
+    'STATIC_URL': 'static/',
     'STATIC_ROOT': os.path.join(TEST_ROOT, 'static'),
 }
 
@@ -37,6 +40,101 @@ class LiveServerBase(LiveServerTestCase):
 
     def urlopen(self, url):
         return urlopen(self.live_server_url + url)
+
+
+class CloseConnectionTestServer(ThreadedWSGIServer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # This event is set right after the first time a request closes its
+        # database connections.
+        self._connections_closed = threading.Event()
+
+    def _close_connections(self):
+        super()._close_connections()
+        self._connections_closed.set()
+
+
+class CloseConnectionTestLiveServerThread(LiveServerThread):
+
+    server_class = CloseConnectionTestServer
+
+    def _create_server(self, connections_override=None):
+        return super()._create_server(connections_override=self.connections_override)
+
+
+class LiveServerTestCloseConnectionTest(LiveServerBase):
+
+    server_thread_class = CloseConnectionTestLiveServerThread
+
+    @classmethod
+    def _make_connections_override(cls):
+        conn = connections[DEFAULT_DB_ALIAS]
+        cls.conn = conn
+        cls.old_conn_max_age = conn.settings_dict['CONN_MAX_AGE']
+        # Set the connection's CONN_MAX_AGE to None to simulate the
+        # CONN_MAX_AGE setting being set to None on the server. This prevents
+        # Django from closing the connection and allows testing that
+        # ThreadedWSGIServer closes connections.
+        conn.settings_dict['CONN_MAX_AGE'] = None
+        # Pass a database connection through to the server to check it is being
+        # closed by ThreadedWSGIServer.
+        return {DEFAULT_DB_ALIAS: conn}
+
+    @classmethod
+    def tearDownConnectionTest(cls):
+        cls.conn.settings_dict['CONN_MAX_AGE'] = cls.old_conn_max_age
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tearDownConnectionTest()
+        super().tearDownClass()
+
+    def test_closes_connections(self):
+        # The server's request thread sets this event after closing
+        # its database connections.
+        closed_event = self.server_thread.httpd._connections_closed
+        conn = self.conn
+        # Open a connection to the database.
+        conn.connect()
+        self.assertIsNotNone(conn.connection)
+        with self.urlopen('/model_view/') as f:
+            # The server can access the database.
+            self.assertEqual(f.read().splitlines(), [b'jane', b'robert'])
+        # Wait for the server's request thread to close the connection.
+        # A timeout of 0.1 seconds should be more than enough. If the wait
+        # times out, the assertion after should fail.
+        closed_event.wait(timeout=0.1)
+        self.assertIsNone(conn.connection)
+
+
+class FailingLiveServerThread(LiveServerThread):
+    def _create_server(self):
+        raise RuntimeError('Error creating server.')
+
+
+class LiveServerTestCaseSetupTest(LiveServerBase):
+    server_thread_class = FailingLiveServerThread
+
+    @classmethod
+    def check_allowed_hosts(cls, expected):
+        if settings.ALLOWED_HOSTS != expected:
+            raise RuntimeError(f'{settings.ALLOWED_HOSTS} != {expected}')
+
+    @classmethod
+    def setUpClass(cls):
+        cls.check_allowed_hosts(['testserver'])
+        try:
+            super().setUpClass()
+        except RuntimeError:
+            # LiveServerTestCase's change to ALLOWED_HOSTS should be reverted.
+            cls.doClassCleanups()
+            cls.check_allowed_hosts(['testserver'])
+        else:
+            raise RuntimeError('Server did not fail.')
+        cls.set_up_called = True
+
+    def test_set_up_class(self):
+        self.assertIs(self.set_up_called, True)
 
 
 class LiveServerAddress(LiveServerBase):
@@ -69,7 +167,7 @@ class LiveServerViews(LiveServerBase):
 
     def test_closes_connection_without_content_length(self):
         """
-        A HTTP 1.1 server is supposed to support keep-alive. Since our
+        An HTTP 1.1 server is supposed to support keep-alive. Since our
         development server is rather simple we support it only in cases where
         we can detect a content length from the response. This should be doable
         for all simple views and streaming responses where an iterable with
@@ -174,7 +272,7 @@ class LiveServerViews(LiveServerBase):
 
 
 @override_settings(ROOT_URLCONF='servers.urls')
-class SingleTreadLiveServerViews(SingleThreadLiveServerTestCase):
+class SingleThreadLiveServerViews(SingleThreadLiveServerTestCase):
     available_apps = ['servers']
 
     def test_closes_connection_with_content_length(self):
@@ -184,8 +282,8 @@ class SingleTreadLiveServerViews(SingleThreadLiveServerTestCase):
         Persistent connections require threading server.
         """
         conn = HTTPConnection(
-            SingleTreadLiveServerViews.server_thread.host,
-            SingleTreadLiveServerViews.server_thread.port,
+            SingleThreadLiveServerViews.server_thread.host,
+            SingleThreadLiveServerViews.server_thread.port,
             timeout=1,
         )
         try:
@@ -230,7 +328,7 @@ class LiveServerPort(LiveServerBase):
         """
         TestCase = type("TestCase", (LiveServerBase,), {})
         try:
-            TestCase.setUpClass()
+            TestCase._start_server_thread()
         except OSError as e:
             if e.errno == errno.EADDRINUSE:
                 # We're out of ports, LiveServerTestCase correctly fails with
@@ -238,15 +336,12 @@ class LiveServerPort(LiveServerBase):
                 return
             # Unexpected error.
             raise
-        try:
-            # We've acquired a port, ensure our server threads acquired
-            # different addresses.
-            self.assertNotEqual(
-                self.live_server_url, TestCase.live_server_url,
-                "Acquired duplicate server addresses for server threads: %s" % self.live_server_url
-            )
-        finally:
-            TestCase.tearDownClass()
+        self.assertNotEqual(
+            self.live_server_url,
+            TestCase.live_server_url,
+            f'Acquired duplicate server addresses for server threads: '
+            f'{self.live_server_url}',
+        )
 
     def test_specified_port_bind(self):
         """LiveServerTestCase.port customizes the server's port."""
@@ -256,18 +351,17 @@ class LiveServerPort(LiveServerBase):
         s.bind(('', 0))
         TestCase.port = s.getsockname()[1]
         s.close()
-        TestCase.setUpClass()
-        try:
-            self.assertEqual(
-                TestCase.port, TestCase.server_thread.port,
-                'Did not use specified port for LiveServerTestCase thread: %s' % TestCase.port
-            )
-        finally:
-            TestCase.tearDownClass()
+        TestCase._start_server_thread()
+        self.assertEqual(
+            TestCase.port,
+            TestCase.server_thread.port,
+            f'Did not use specified port for LiveServerTestCase thread: '
+            f'{TestCase.port}',
+        )
 
 
-class LiverServerThreadedTests(LiveServerBase):
-    """If LiverServerTestCase isn't threaded, these tests will hang."""
+class LiveServerThreadedTests(LiveServerBase):
+    """If LiveServerTestCase isn't threaded, these tests will hang."""
 
     def test_view_calls_subview(self):
         url = '/subview_calling_view/?%s' % urlencode({'url': self.live_server_url})

@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015,2019
+# BouRock, 2015,2019,2021
 # BouRock, 2014
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-17 08:49+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-16 19:34+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -40,11 +40,11 @@ msgid "redirect to"
 msgstr "yönlendirildiği adres"
 
 msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"“http://”."
+"This can be either an absolute path (as above) or a full URL starting with a "
+"scheme such as “https://”."
 msgstr ""
-"Bu, ya bir tam yol (yukarıdaki gibi) ya da “http://” ile başlayan bir tam "
-"URL olabilir."
+"Bu, ya bir tam yol (yukarıdaki gibi) ya da “https://” gibi bir şema ile "
+"başlayan tam bir URL olabilir."
 
 msgid "redirect"
 msgstr "yönlendirme"

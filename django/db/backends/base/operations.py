@@ -74,6 +74,12 @@ class BaseDatabaseOperations:
         """
         return len(objs)
 
+    def format_for_duration_arithmetic(self, sql):
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseOperations may require a '
+            'format_for_duration_arithmetic() method.'
+        )
+
     def cache_key_culling_sql(self):
         """
         Return an SQL query that retrieves the first cache key greater than the
@@ -82,7 +88,8 @@ class BaseDatabaseOperations:
         This is used by the 'db' cache backend to determine where to start
         culling.
         """
-        return "SELECT cache_key FROM %s ORDER BY cache_key LIMIT 1 OFFSET %%s"
+        cache_key = self.quote_name('cache_key')
+        return f'SELECT {cache_key} FROM %s ORDER BY {cache_key} LIMIT 1 OFFSET %%s'
 
     def unification_cast_sql(self, output_field):
         """
@@ -499,6 +506,10 @@ class BaseDatabaseOperations:
         """
         if value is None:
             return None
+        # Expression values are adapted by the database.
+        if hasattr(value, 'resolve_expression'):
+            return value
+
         return str(value)
 
     def adapt_timefield_value(self, value):
@@ -508,6 +519,10 @@ class BaseDatabaseOperations:
         """
         if value is None:
             return None
+        # Expression values are adapted by the database.
+        if hasattr(value, 'resolve_expression'):
+            return value
+
         if timezone.is_aware(value):
             raise ValueError("Django does not support timezone-aware times.")
         return str(value)
@@ -526,30 +541,46 @@ class BaseDatabaseOperations:
         """
         return value or None
 
-    def year_lookup_bounds_for_date_field(self, value):
+    def year_lookup_bounds_for_date_field(self, value, iso_year=False):
         """
         Return a two-elements list with the lower and upper bound to be used
         with a BETWEEN operator to query a DateField value using a year
         lookup.
 
         `value` is an int, containing the looked-up year.
+        If `iso_year` is True, return bounds for ISO-8601 week-numbering years.
         """
-        first = datetime.date(value, 1, 1)
-        second = datetime.date(value, 12, 31)
+        if iso_year:
+            first = datetime.date.fromisocalendar(value, 1, 1)
+            second = (
+                datetime.date.fromisocalendar(value + 1, 1, 1) -
+                datetime.timedelta(days=1)
+            )
+        else:
+            first = datetime.date(value, 1, 1)
+            second = datetime.date(value, 12, 31)
         first = self.adapt_datefield_value(first)
         second = self.adapt_datefield_value(second)
         return [first, second]
 
-    def year_lookup_bounds_for_datetime_field(self, value):
+    def year_lookup_bounds_for_datetime_field(self, value, iso_year=False):
         """
         Return a two-elements list with the lower and upper bound to be used
         with a BETWEEN operator to query a DateTimeField value using a year
         lookup.
 
         `value` is an int, containing the looked-up year.
+        If `iso_year` is True, return bounds for ISO-8601 week-numbering years.
         """
-        first = datetime.datetime(value, 1, 1)
-        second = datetime.datetime(value, 12, 31, 23, 59, 59, 999999)
+        if iso_year:
+            first = datetime.datetime.fromisocalendar(value, 1, 1)
+            second = (
+                datetime.datetime.fromisocalendar(value + 1, 1, 1) -
+                datetime.timedelta(microseconds=1)
+            )
+        else:
+            first = datetime.datetime(value, 1, 1)
+            second = datetime.datetime(value, 12, 31, 23, 59, 59, 999999)
         if settings.USE_TZ:
             tz = timezone.get_current_timezone()
             first = timezone.make_aware(first, tz)
@@ -686,8 +717,8 @@ class BaseDatabaseOperations:
             raise ValueError('Unknown options: %s' % ', '.join(sorted(options.keys())))
         return self.explain_prefix
 
-    def insert_statement(self, ignore_conflicts=False):
+    def insert_statement(self, on_conflict=None):
         return 'INSERT INTO'
 
-    def ignore_conflicts_suffix_sql(self, ignore_conflicts=None):
+    def on_conflict_suffix_sql(self, fields, on_conflict, update_fields, unique_fields):
         return ''

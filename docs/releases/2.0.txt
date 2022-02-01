@@ -99,7 +99,7 @@ Minor features
 
 * The new :attr:`.ModelAdmin.autocomplete_fields` attribute and
   :meth:`.ModelAdmin.get_autocomplete_fields` method allow using a
-  `Select2 <https://select2.org>`_ search widget for ``ForeignKey`` and
+  `Select2 <https://select2.org/>`_ search widget for ``ForeignKey`` and
   ``ManyToManyField``.
 
 :mod:`django.contrib.auth`
@@ -306,7 +306,7 @@ Pagination
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* The :djadmin:`runserver` Web server supports HTTP 1.1.
+* The :djadmin:`runserver` web server supports HTTP 1.1.
 
 Templates
 ~~~~~~~~~
@@ -558,7 +558,7 @@ Miscellaneous
 * :class:`~django.views.generic.base.RedirectView` no longer silences
   ``NoReverseMatch`` if the ``pattern_name`` doesn't exist.
 
-* When :setting:`USE_L10N` is off, :class:`~django.forms.FloatField` and
+* When ``USE_L10N`` is off, :class:`~django.forms.FloatField` and
   :class:`~django.forms.DecimalField` now respect :setting:`DECIMAL_SEPARATOR`
   and :setting:`THOUSAND_SEPARATOR` during validation. For example, with the
   settings::

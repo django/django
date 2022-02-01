@@ -1,8 +1,7 @@
 import copy
 import json
-import operator
 import re
-from functools import partial, reduce, update_wrapper
+from functools import partial, update_wrapper
 from urllib.parse import quote as urlquote
 
 from django import forms
@@ -12,14 +11,14 @@ from django.contrib.admin import helpers, widgets
 from django.contrib.admin.checks import (
     BaseModelAdminChecks, InlineModelAdminChecks, ModelAdminChecks,
 )
+from django.contrib.admin.decorators import display
 from django.contrib.admin.exceptions import DisallowedModelAdminToField
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     NestedObjects, construct_change_message, flatten_fieldsets,
-    get_deleted_objects, lookup_needs_distinct, model_format_dict,
+    get_deleted_objects, lookup_spawns_duplicates, model_format_dict,
     model_ngettext, quote, unquote,
 )
-from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.admin.widgets import (
     AutocompleteSelect, AutocompleteSelectMultiple,
 )
@@ -225,7 +224,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
         if 'widget' not in kwargs:
             if db_field.name in self.get_autocomplete_fields(request):
-                kwargs['widget'] = AutocompleteSelect(db_field.remote_field, self.admin_site, using=db)
+                kwargs['widget'] = AutocompleteSelect(db_field, self.admin_site, using=db)
             elif db_field.name in self.raw_id_fields:
                 kwargs['widget'] = widgets.ForeignKeyRawIdWidget(db_field.remote_field, self.admin_site, using=db)
             elif db_field.name in self.radio_fields:
@@ -255,7 +254,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             autocomplete_fields = self.get_autocomplete_fields(request)
             if db_field.name in autocomplete_fields:
                 kwargs['widget'] = AutocompleteSelectMultiple(
-                    db_field.remote_field,
+                    db_field,
                     self.admin_site,
                     using=db,
                 )
@@ -401,14 +400,14 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             # model anyways. For example, if you filter on employee__department__id,
             # then the id value would be found already from employee__department_id.
             if not prev_field or (prev_field.is_relation and
-                                  field not in prev_field.get_path_info()[-1].target_fields):
+                                  field not in prev_field.path_infos[-1].target_fields):
                 relation_parts.append(part)
-            if not getattr(field, 'get_path_info', None):
+            if not getattr(field, 'path_infos', None):
                 # This is not a relational field, so further parts
                 # must be transforms.
                 break
             prev_field = field
-            model = field.get_path_info()[-1].to_opts.model
+            model = field.path_infos[-1].to_opts.model
 
         if len(relation_parts) <= 1:
             # Either a local field filter, or no fields at all.
@@ -559,13 +558,14 @@ class ModelAdmin(BaseModelAdmin):
     list_max_show_all = 200
     list_editable = ()
     search_fields = ()
+    search_help_text = None
     date_hierarchy = None
     save_as = False
     save_as_continue = True
     save_on_top = False
     paginator = Paginator
     preserve_filters = True
-    inlines = []
+    inlines = ()
 
     # Custom templates (designed to be over-ridden in subclasses)
     add_form_template = None
@@ -577,7 +577,7 @@ class ModelAdmin(BaseModelAdmin):
     popup_response_template = None
 
     # Actions
-    actions = []
+    actions = ()
     action_form = helpers.ActionForm
     actions_on_top = True
     actions_on_bottom = False
@@ -592,6 +592,12 @@ class ModelAdmin(BaseModelAdmin):
 
     def __str__(self):
         return "%s.%s" % (self.model._meta.app_label, self.__class__.__name__)
+
+    def __repr__(self):
+        return (
+            f'<{self.__class__.__qualname__}: model={self.model.__qualname__} '
+            f'site={self.admin_site!r}>'
+        )
 
     def get_inline_instances(self, request, obj=None):
         inline_instances = []
@@ -622,7 +628,6 @@ class ModelAdmin(BaseModelAdmin):
         return [
             path('', wrap(self.changelist_view), name='%s_%s_changelist' % info),
             path('add/', wrap(self.add_view), name='%s_%s_add' % info),
-            path('autocomplete/', wrap(self.autocomplete_view), name='%s_%s_autocomplete' % info),
             path('<path:object_id>/history/', wrap(self.history_view), name='%s_%s_history' % info),
             path('<path:object_id>/delete/', wrap(self.delete_view), name='%s_%s_delete' % info),
             path('<path:object_id>/change/', wrap(self.change_view), name='%s_%s_change' % info),
@@ -748,6 +753,7 @@ class ModelAdmin(BaseModelAdmin):
             self.list_editable,
             self,
             sortable_by,
+            self.search_help_text,
         )
 
     def get_object(self, request, object_id, from_field=None):
@@ -802,7 +808,7 @@ class ModelAdmin(BaseModelAdmin):
     def get_paginator(self, request, queryset, per_page, orphans=0, allow_empty_first_page=True):
         return self.paginator(queryset, per_page, orphans, allow_empty_first_page)
 
-    def log_addition(self, request, object, message):
+    def log_addition(self, request, obj, message):
         """
         Log that an object has been successfully added.
 
@@ -811,14 +817,14 @@ class ModelAdmin(BaseModelAdmin):
         from django.contrib.admin.models import ADDITION, LogEntry
         return LogEntry.objects.log_action(
             user_id=request.user.pk,
-            content_type_id=get_content_type_for_model(object).pk,
-            object_id=object.pk,
-            object_repr=str(object),
+            content_type_id=get_content_type_for_model(obj).pk,
+            object_id=obj.pk,
+            object_repr=str(obj),
             action_flag=ADDITION,
             change_message=message,
         )
 
-    def log_change(self, request, object, message):
+    def log_change(self, request, obj, message):
         """
         Log that an object has been successfully changed.
 
@@ -827,14 +833,14 @@ class ModelAdmin(BaseModelAdmin):
         from django.contrib.admin.models import CHANGE, LogEntry
         return LogEntry.objects.log_action(
             user_id=request.user.pk,
-            content_type_id=get_content_type_for_model(object).pk,
-            object_id=object.pk,
-            object_repr=str(object),
+            content_type_id=get_content_type_for_model(obj).pk,
+            object_id=obj.pk,
+            object_repr=str(obj),
             action_flag=CHANGE,
             change_message=message,
         )
 
-    def log_deletion(self, request, object, object_repr):
+    def log_deletion(self, request, obj, object_repr):
         """
         Log that an object will be deleted. Note that this method must be
         called before the deletion.
@@ -844,18 +850,22 @@ class ModelAdmin(BaseModelAdmin):
         from django.contrib.admin.models import DELETION, LogEntry
         return LogEntry.objects.log_action(
             user_id=request.user.pk,
-            content_type_id=get_content_type_for_model(object).pk,
-            object_id=object.pk,
+            content_type_id=get_content_type_for_model(obj).pk,
+            object_id=obj.pk,
             object_repr=object_repr,
             action_flag=DELETION,
         )
 
+    @display(description=mark_safe('<input type="checkbox" id="action-toggle">'))
     def action_checkbox(self, obj):
         """
         A list_display column containing a checkbox widget.
         """
         return helpers.checkbox.render(helpers.ACTION_CHECKBOX_NAME, str(obj.pk))
-    action_checkbox.short_description = mark_safe('<input type="checkbox" id="action-toggle">')
+
+    @staticmethod
+    def _get_action_description(func, name):
+        return getattr(func, 'short_description', capfirst(name.replace('_', ' ')))
 
     def _get_base_actions(self):
         """Return the list of actions, prior to any request-based filtering."""
@@ -869,7 +879,7 @@ class ModelAdmin(BaseModelAdmin):
         for (name, func) in self.admin_site.actions:
             if name in base_action_names:
                 continue
-            description = getattr(func, 'short_description', name.replace('_', ' '))
+            description = self._get_action_description(func, name)
             actions.append((func, name, description))
         # Add actions from this ModelAdmin.
         actions.extend(base_actions)
@@ -938,10 +948,7 @@ class ModelAdmin(BaseModelAdmin):
             except KeyError:
                 return None
 
-        if hasattr(func, 'short_description'):
-            description = func.short_description
-        else:
-            description = capfirst(action.replace('_', ' '))
+        description = self._get_action_description(func, action)
         return func, action, description
 
     def get_list_display(self, request):
@@ -1013,26 +1020,32 @@ class ModelAdmin(BaseModelAdmin):
                         return field_name
                 else:
                     prev_field = field
-                    if hasattr(field, 'get_path_info'):
+                    if hasattr(field, 'path_infos'):
                         # Update opts to follow the relation.
-                        opts = field.get_path_info()[-1].to_opts
+                        opts = field.path_infos[-1].to_opts
             # Otherwise, use the field with icontains.
             return "%s__icontains" % field_name
 
-        use_distinct = False
+        may_have_duplicates = False
         search_fields = self.get_search_fields(request)
         if search_fields and search_term:
             orm_lookups = [construct_search(str(search_field))
                            for search_field in search_fields]
+            term_queries = []
             for bit in smart_split(search_term):
-                if bit.startswith(('"', "'")):
+                if bit.startswith(('"', "'")) and bit[0] == bit[-1]:
                     bit = unescape_string_literal(bit)
-                or_queries = [models.Q(**{orm_lookup: bit})
-                              for orm_lookup in orm_lookups]
-                queryset = queryset.filter(reduce(operator.or_, or_queries))
-            use_distinct |= any(lookup_needs_distinct(self.opts, search_spec) for search_spec in orm_lookups)
-
-        return queryset, use_distinct
+                or_queries = models.Q(
+                    *((orm_lookup, bit) for orm_lookup in orm_lookups),
+                    _connector=models.Q.OR,
+                )
+                term_queries.append(or_queries)
+            queryset = queryset.filter(models.Q(*term_queries))
+            may_have_duplicates |= any(
+                lookup_spawns_duplicates(self.opts, search_spec)
+                for search_spec in orm_lookups
+            )
+        return queryset, may_have_duplicates
 
     def get_preserved_filters(self, request):
         """
@@ -1574,12 +1587,16 @@ class ModelAdmin(BaseModelAdmin):
         )
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES, instance=obj)
+            formsets, inline_instances = self._create_formsets(
+                request,
+                form.instance if add else obj,
+                change=not add,
+            )
             form_validated = form.is_valid()
             if form_validated:
                 new_object = self.save_form(request, form, change=not add)
             else:
                 new_object = form.instance
-            formsets, inline_instances = self._create_formsets(request, new_object, change=not add)
             if all_valid(formsets) and form_validated:
                 self.save_model(request, new_object, form, not add)
                 self.save_related(request, form, formsets, not add)
@@ -1650,9 +1667,6 @@ class ModelAdmin(BaseModelAdmin):
         context.update(extra_context or {})
 
         return self.render_change_form(request, context, add=add, change=not add, obj=obj, form_url=form_url)
-
-    def autocomplete_view(self, request):
-        return AutocompleteJsonView.as_view(model_admin=self)(request)
 
     def add_view(self, request, form_url='', extra_context=None):
         return self.changeform_view(request, None, form_url, extra_context)
@@ -1893,6 +1907,7 @@ class ModelAdmin(BaseModelAdmin):
         context = {
             **self.admin_site.each_context(request),
             'title': title,
+            'subtitle': None,
             'object_name': object_name,
             'object': obj,
             'deleted_objects': deleted_objects,
@@ -1912,6 +1927,7 @@ class ModelAdmin(BaseModelAdmin):
     def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."
         from django.contrib.admin.models import LogEntry
+        from django.contrib.admin.views.main import PAGE_VAR
 
         # First check if the user can see this history.
         model = self.model
@@ -1930,10 +1946,19 @@ class ModelAdmin(BaseModelAdmin):
             content_type=get_content_type_for_model(model)
         ).select_related().order_by('action_time')
 
+        paginator = self.get_paginator(request, action_list, 100)
+        page_number = request.GET.get(PAGE_VAR, 1)
+        page_obj = paginator.get_page(page_number)
+        page_range = paginator.get_elided_page_range(page_obj.number)
+
         context = {
             **self.admin_site.each_context(request),
             'title': _('Change history: %s') % obj,
-            'action_list': action_list,
+            'subtitle': None,
+            'action_list': page_obj,
+            'page_range': page_range,
+            'page_var': PAGE_VAR,
+            'pagination_required': paginator.count > 100,
             'module_name': str(capfirst(opts.verbose_name_plural)),
             'object': obj,
             'opts': opts,
@@ -1949,6 +1974,20 @@ class ModelAdmin(BaseModelAdmin):
             "admin/object_history.html"
         ], context)
 
+    def get_formset_kwargs(self, request, obj, inline, prefix):
+        formset_params = {
+            'instance': obj,
+            'prefix': prefix,
+            'queryset': inline.get_queryset(request),
+        }
+        if request.method == 'POST':
+            formset_params.update({
+                'data': request.POST.copy(),
+                'files': request.FILES,
+                'save_as_new': '_saveasnew' in request.POST
+            })
+        return formset_params
+
     def _create_formsets(self, request, obj, change):
         "Helper function to generate formsets for add/change_view."
         formsets = []
@@ -1962,17 +2001,7 @@ class ModelAdmin(BaseModelAdmin):
             prefixes[prefix] = prefixes.get(prefix, 0) + 1
             if prefixes[prefix] != 1 or not prefix:
                 prefix = "%s-%s" % (prefix, prefixes[prefix])
-            formset_params = {
-                'instance': obj,
-                'prefix': prefix,
-                'queryset': inline.get_queryset(request),
-            }
-            if request.method == 'POST':
-                formset_params.update({
-                    'data': request.POST.copy(),
-                    'files': request.FILES,
-                    'save_as_new': '_saveasnew' in request.POST
-                })
+            formset_params = self.get_formset_kwargs(request, obj, inline, prefix)
             formset = FormSet(**formset_params)
 
             def user_deleted_form(request, obj, formset, index):
@@ -2023,10 +2052,13 @@ class InlineModelAdmin(BaseModelAdmin):
         self.opts = self.model._meta
         self.has_registered_model = admin_site.is_registered(self.model)
         super().__init__()
+        if self.verbose_name_plural is None:
+            if self.verbose_name is None:
+                self.verbose_name_plural = self.model._meta.verbose_name_plural
+            else:
+                self.verbose_name_plural = format_lazy('{}s', self.verbose_name)
         if self.verbose_name is None:
             self.verbose_name = self.model._meta.verbose_name
-        if self.verbose_name_plural is None:
-            self.verbose_name_plural = self.model._meta.verbose_name_plural
 
     @property
     def media(self):

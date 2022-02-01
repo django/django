@@ -17,11 +17,14 @@ from unittest import mock, skipIf
 from django.conf import settings
 from django.core import management, signals
 from django.core.cache import (
-    DEFAULT_CACHE_ALIAS, CacheKeyWarning, InvalidCacheKey, cache, caches,
+    DEFAULT_CACHE_ALIAS, CacheHandler, CacheKeyWarning, InvalidCacheKey, cache,
+    caches,
 )
 from django.core.cache.backends.base import InvalidCacheBackendError
+from django.core.cache.backends.redis import RedisCacheClient
 from django.core.cache.utils import make_template_fragment_key
 from django.db import close_old_connections, connection, connections
+from django.db.backends.utils import CursorWrapper
 from django.http import (
     HttpRequest, HttpResponse, HttpResponseNotModified, StreamingHttpResponse,
 )
@@ -37,6 +40,7 @@ from django.test import (
     override_settings,
 )
 from django.test.signals import setting_changed
+from django.test.utils import CaptureQueriesContext
 from django.utils import timezone, translation
 from django.utils.cache import (
     get_cache_key, learn_cache_key, patch_cache_control, patch_vary_headers,
@@ -134,6 +138,8 @@ class DummyCacheTests(SimpleTestCase):
             cache.incr('answer')
         with self.assertRaises(ValueError):
             cache.incr('does_not_exist')
+        with self.assertRaises(ValueError):
+            cache.incr('does_not_exist', -1)
 
     def test_decr(self):
         "Dummy cache values can't be decremented"
@@ -142,6 +148,8 @@ class DummyCacheTests(SimpleTestCase):
             cache.decr('answer')
         with self.assertRaises(ValueError):
             cache.decr('does_not_exist')
+        with self.assertRaises(ValueError):
+            cache.decr('does_not_exist', -1)
 
     def test_touch(self):
         """Dummy cache can't do touch()."""
@@ -149,17 +157,20 @@ class DummyCacheTests(SimpleTestCase):
 
     def test_data_types(self):
         "All data types are ignored equally by the dummy cache"
-        stuff = {
+        tests = {
             'string': 'this is a string',
             'int': 42,
+            'bool': True,
             'list': [1, 2, 3, 4],
             'tuple': (1, 2, 3, 4),
             'dict': {'A': 1, 'B': 2},
             'function': f,
             'class': C,
         }
-        cache.set("stuff", stuff)
-        self.assertIsNone(cache.get("stuff"))
+        for key, value in tests.items():
+            with self.subTest(key=key):
+                cache.set(key, value)
+                self.assertIsNone(cache.get(key))
 
     def test_expiration(self):
         "Expiration has no effect on the dummy cache"
@@ -204,7 +215,7 @@ class DummyCacheTests(SimpleTestCase):
     def test_delete_many_invalid_key(self):
         msg = KEY_ERRORS_WITH_MEMCACHED_MSG % ':1:key with spaces'
         with self.assertWarnsMessage(CacheKeyWarning, msg):
-            cache.delete_many({'key with spaces': 'foo'})
+            cache.delete_many(['key with spaces'])
 
     def test_clear(self):
         "clear does nothing for the dummy cache backend"
@@ -275,6 +286,10 @@ class BaseCacheTests:
     # A common set of tests to apply to all cache backends
     factory = RequestFactory()
 
+    # Some clients raise custom exceptions when .incr() or .decr() are called
+    # with a non-integer value.
+    incr_decr_type_error = TypeError
+
     def tearDown(self):
         cache.clear()
 
@@ -317,6 +332,8 @@ class BaseCacheTests:
         self.assertEqual(cache.get_many(['a', 'c', 'd']), {'a': 'a', 'c': 'c', 'd': 'd'})
         self.assertEqual(cache.get_many(['a', 'b', 'e']), {'a': 'a', 'b': 'b'})
         self.assertEqual(cache.get_many(iter(['a', 'b', 'e'])), {'a': 'a', 'b': 'b'})
+        cache.set_many({'x': None, 'y': 1})
+        self.assertEqual(cache.get_many(['x', 'y']), {'x': None, 'y': 1})
 
     def test_delete(self):
         # Cache keys can be deleted
@@ -336,12 +353,16 @@ class BaseCacheTests:
         self.assertIs(cache.has_key("goodbye1"), False)
         cache.set("no_expiry", "here", None)
         self.assertIs(cache.has_key("no_expiry"), True)
+        cache.set('null', None)
+        self.assertIs(cache.has_key('null'), True)
 
     def test_in(self):
         # The in operator can be used to inspect cache contents
         cache.set("hello2", "goodbye2")
         self.assertIn("hello2", cache)
         self.assertNotIn("goodbye2", cache)
+        cache.set('null', None)
+        self.assertIn('null', cache)
 
     def test_incr(self):
         # Cache values can be incremented
@@ -353,6 +374,11 @@ class BaseCacheTests:
         self.assertEqual(cache.incr('answer', -10), 42)
         with self.assertRaises(ValueError):
             cache.incr('does_not_exist')
+        with self.assertRaises(ValueError):
+            cache.incr('does_not_exist', -1)
+        cache.set('null', None)
+        with self.assertRaises(self.incr_decr_type_error):
+            cache.incr('null')
 
     def test_decr(self):
         # Cache values can be decremented
@@ -364,6 +390,11 @@ class BaseCacheTests:
         self.assertEqual(cache.decr('answer', -10), 42)
         with self.assertRaises(ValueError):
             cache.decr('does_not_exist')
+        with self.assertRaises(ValueError):
+            cache.incr('does_not_exist', -1)
+        cache.set('null', None)
+        with self.assertRaises(self.incr_decr_type_error):
+            cache.decr('null')
 
     def test_close(self):
         self.assertTrue(hasattr(cache, 'close'))
@@ -371,17 +402,20 @@ class BaseCacheTests:
 
     def test_data_types(self):
         # Many different data types can be cached
-        stuff = {
+        tests = {
             'string': 'this is a string',
             'int': 42,
+            'bool': True,
             'list': [1, 2, 3, 4],
             'tuple': (1, 2, 3, 4),
             'dict': {'A': 1, 'B': 2},
             'function': f,
             'class': C,
         }
-        cache.set("stuff", stuff)
-        self.assertEqual(cache.get("stuff"), stuff)
+        for key, value in tests.items():
+            with self.subTest(key=key):
+                cache.set(key, value)
+                self.assertEqual(cache.get(key), value)
 
     def test_cache_read_for_model_instance(self):
         # Don't want fields with callable as default to be called on cache read
@@ -636,7 +670,7 @@ class BaseCacheTests:
         finally:
             cull_cache._max_entries = old_max_entries
 
-    def _perform_invalid_key_test(self, key, expected_warning):
+    def _perform_invalid_key_test(self, key, expected_warning, key_func=None):
         """
         All the builtin backends should warn (except memcached that should
         error) on keys that would be refused by memcached. This encourages
@@ -649,7 +683,7 @@ class BaseCacheTests:
             return key
 
         old_func = cache.key_func
-        cache.key_func = func
+        cache.key_func = key_func or func
 
         tests = [
             ('add', [key, 1]),
@@ -661,7 +695,7 @@ class BaseCacheTests:
             ('delete', [key]),
             ('get_many', [[key, 'b']]),
             ('set_many', [{key: 1, 'b': 2}]),
-            ('delete_many', [{key: 1, 'b': 2}]),
+            ('delete_many', [[key, 'b']]),
         ]
         try:
             for operation, args in tests:
@@ -685,6 +719,19 @@ class BaseCacheTests:
             '%r (longer than %s)' % (key, 250)
         )
         self._perform_invalid_key_test(key, expected_warning)
+
+    def test_invalid_with_version_key_length(self):
+        # Custom make_key() that adds a version to the key and exceeds the
+        # limit.
+        def key_func(key, *args):
+            return key + ':1'
+
+        key = 'a' * 249
+        expected_warning = (
+            'Cache key will cause errors if used with memcached: '
+            '%r (longer than %s)' % (key_func(key), 250)
+        )
+        self._perform_invalid_key_test(key, expected_warning, key_func=key_func)
 
     def test_cache_versioning_get_set(self):
         # set, using default version = 1
@@ -911,6 +958,9 @@ class BaseCacheTests:
         with self.assertRaises(ValueError):
             cache.incr_version('does_not_exist')
 
+        cache.set('null', None)
+        self.assertEqual(cache.incr_version('null'), 2)
+
     def test_decr_version(self):
         cache.set('answer', 42, version=2)
         self.assertIsNone(cache.get('answer'))
@@ -935,6 +985,9 @@ class BaseCacheTests:
         with self.assertRaises(ValueError):
             cache.decr_version('does_not_exist', version=2)
 
+        cache.set('null', None, version=2)
+        self.assertEqual(cache.decr_version('null', version=2), 1)
+
     def test_custom_key_func(self):
         # Two caches with different key functions aren't visible to each other
         cache.set('answer1', 42)
@@ -947,9 +1000,9 @@ class BaseCacheTests:
         self.assertEqual(caches['custom_key'].get('answer2'), 42)
         self.assertEqual(caches['custom_key2'].get('answer2'), 42)
 
+    @override_settings(CACHE_MIDDLEWARE_ALIAS=DEFAULT_CACHE_ALIAS)
     def test_cache_write_unpicklable_object(self):
         fetch_middleware = FetchFromCacheMiddleware(empty_response)
-        fetch_middleware.cache = cache
 
         request = self.factory.get('/cache/test')
         request._cache_update_cache = True
@@ -964,7 +1017,6 @@ class BaseCacheTests:
             return response
 
         update_middleware = UpdateCacheMiddleware(get_response)
-        update_middleware.cache = cache
         response = update_middleware(request)
 
         get_cache_data = fetch_middleware.process_request(request)
@@ -992,6 +1044,8 @@ class BaseCacheTests:
         self.assertEqual(cache.get_or_set('projector', 42), 42)
         self.assertEqual(cache.get('projector'), 42)
         self.assertIsNone(cache.get_or_set('null', None))
+        # Previous get_or_set() stores None in the cache.
+        self.assertIsNone(cache.get('null', 'default'))
 
     def test_get_or_set_callable(self):
         def my_callable():
@@ -1000,10 +1054,9 @@ class BaseCacheTests:
         self.assertEqual(cache.get_or_set('mykey', my_callable), 'value')
         self.assertEqual(cache.get_or_set('mykey', my_callable()), 'value')
 
-    def test_get_or_set_callable_returning_none(self):
-        self.assertIsNone(cache.get_or_set('mykey', lambda: None))
-        # Previous get_or_set() doesn't store None in the cache.
-        self.assertEqual(cache.get('mykey', 'default'), 'default')
+        self.assertIsNone(cache.get_or_set('null', lambda: None))
+        # Previous get_or_set() stores None in the cache.
+        self.assertIsNone(cache.get('null', 'default'))
 
     def test_get_or_set_version(self):
         msg = "get_or_set() missing 1 required positional argument: 'default'"
@@ -1066,6 +1119,46 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         with self.assertNumQueries(1):
             cache.delete_many(['a', 'b', 'c'])
 
+    def test_cull_queries(self):
+        old_max_entries = cache._max_entries
+        # Force _cull to delete on first cached record.
+        cache._max_entries = -1
+        with CaptureQueriesContext(connection) as captured_queries:
+            try:
+                cache.set('force_cull', 'value', 1000)
+            finally:
+                cache._max_entries = old_max_entries
+        num_count_queries = sum('COUNT' in query['sql'] for query in captured_queries)
+        self.assertEqual(num_count_queries, 1)
+        # Column names are quoted.
+        for query in captured_queries:
+            sql = query['sql']
+            if 'expires' in sql:
+                self.assertIn(connection.ops.quote_name('expires'), sql)
+            if 'cache_key' in sql:
+                self.assertIn(connection.ops.quote_name('cache_key'), sql)
+
+    def test_delete_cursor_rowcount(self):
+        """
+        The rowcount attribute should not be checked on a closed cursor.
+        """
+        class MockedCursorWrapper(CursorWrapper):
+            is_closed = False
+
+            def close(self):
+                self.cursor.close()
+                self.is_closed = True
+
+            @property
+            def rowcount(self):
+                if self.is_closed:
+                    raise Exception('Cursor is closed.')
+                return self.cursor.rowcount
+
+        cache.set_many({'a': 1, 'b': 2})
+        with mock.patch('django.db.backends.utils.CursorWrapper', MockedCursorWrapper):
+            self.assertIs(cache.delete('a'), True)
+
     def test_zero_cull(self):
         self._perform_cull_test('zero_cull', 50, 18)
 
@@ -1099,6 +1192,15 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
             stdout=out,
         )
         self.assertEqual(out.getvalue(), "Cache table 'test cache table' created.\n")
+
+    def test_has_key_query_columns_quoted(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            cache.has_key('key')
+        self.assertEqual(len(captured_queries), 1)
+        sql = captured_queries[0]['sql']
+        # Column names are quoted.
+        self.assertIn(connection.ops.quote_name('expires'), sql)
+        self.assertIn(connection.ops.quote_name('cache_key'), sql)
 
 
 @override_settings(USE_TZ=True)
@@ -1267,20 +1369,23 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(cache.get(9), 9)
 
 
-# memcached backend isn't guaranteed to be available.
-# To check the memcached backend, the test settings file will
-# need to contain at least one cache backend setting that points at
-# your memcache server.
+# memcached and redis backends aren't guaranteed to be available.
+# To check the backends, the test settings file will need to contain at least
+# one cache backend setting that points at your cache server.
 configured_caches = {}
 for _cache_params in settings.CACHES.values():
     configured_caches[_cache_params['BACKEND']] = _cache_params
 
-MemcachedCache_params = configured_caches.get('django.core.cache.backends.memcached.MemcachedCache')
 PyLibMCCache_params = configured_caches.get('django.core.cache.backends.memcached.PyLibMCCache')
 PyMemcacheCache_params = configured_caches.get('django.core.cache.backends.memcached.PyMemcacheCache')
 
 # The memcached backends don't support cull-related options like `MAX_ENTRIES`.
 memcached_excluded_caches = {'cull', 'zero_cull'}
+
+RedisCache_params = configured_caches.get('django.core.cache.backends.redis.RedisCache')
+
+# The redis backend does not support cull-related options like `MAX_ENTRIES`.
+redis_excluded_caches = {'cull', 'zero_cull'}
 
 
 class BaseMemcachedTests(BaseCacheTests):
@@ -1317,13 +1422,22 @@ class BaseMemcachedTests(BaseCacheTests):
             ('delete', [key]),
             ('get_many', [[key, 'b']]),
             ('set_many', [{key: 1, 'b': 2}]),
-            ('delete_many', [{key: 1, 'b': 2}]),
+            ('delete_many', [[key, 'b']]),
         ]
         for operation, args in tests:
             with self.subTest(operation=operation):
                 with self.assertRaises(InvalidCacheKey) as cm:
                     getattr(cache, operation)(*args)
                 self.assertEqual(str(cm.exception), msg)
+
+    def test_invalid_with_version_key_length(self):
+        # make_key() adds a version to the key and exceeds the limit.
+        key = 'a' * 248
+        expected_warning = (
+            'Cache key will cause errors if used with memcached: '
+            '%r (longer than %s)' % (key, 250)
+        )
+        self._perform_invalid_key_test(key, expected_warning)
 
     def test_default_never_expiring_timeout(self):
         # Regression test for #22845
@@ -1348,10 +1462,7 @@ class BaseMemcachedTests(BaseCacheTests):
         # By default memcached allows objects up to 1MB. For the cache_db session
         # backend to always use the current session, memcached needs to delete
         # the old key if it fails to set.
-        # pylibmc doesn't seem to have SERVER_MAX_VALUE_LENGTH as far as I can
-        # tell from a quick check of its source code. This is falling back to
-        # the default value exposed by python-memcached on my system.
-        max_value_length = getattr(cache._lib, 'SERVER_MAX_VALUE_LENGTH', 1048576)
+        max_value_length = 2 ** 20
 
         cache.set('small_value', 'a')
         self.assertEqual(cache.get('small_value'), 'a')
@@ -1360,11 +1471,10 @@ class BaseMemcachedTests(BaseCacheTests):
         try:
             cache.set('small_value', large_value)
         except Exception:
-            # Some clients (e.g. pylibmc) raise when the value is too large,
-            # while others (e.g. python-memcached) intentionally return True
-            # indicating success. This test is primarily checking that the key
-            # was deleted, so the return/exception behavior for the set()
-            # itself is not important.
+            # Most clients (e.g. pymemcache or pylibmc) raise when the value is
+            # too large. This test is primarily checking that the key was
+            # deleted, so the return/exception behavior for the set() itself is
+            # not important.
             pass
         # small_value should be deleted, or set if configured to accept larger values
         value = cache.get('small_value')
@@ -1389,37 +1499,6 @@ class BaseMemcachedTests(BaseCacheTests):
             self.assertEqual(failing_keys, ['key'])
 
 
-@unittest.skipUnless(MemcachedCache_params, "MemcachedCache backend not configured")
-@override_settings(CACHES=caches_setting_for_tests(
-    base=MemcachedCache_params,
-    exclude=memcached_excluded_caches,
-))
-class MemcachedCacheTests(BaseMemcachedTests, TestCase):
-    base_params = MemcachedCache_params
-
-    def test_memcached_uses_highest_pickle_version(self):
-        # Regression test for #19810
-        for cache_key in settings.CACHES:
-            with self.subTest(cache_key=cache_key):
-                self.assertEqual(caches[cache_key]._cache.pickleProtocol, pickle.HIGHEST_PROTOCOL)
-
-    @override_settings(CACHES=caches_setting_for_tests(
-        base=MemcachedCache_params,
-        exclude=memcached_excluded_caches,
-        OPTIONS={'server_max_value_length': 9999},
-    ))
-    def test_memcached_options(self):
-        self.assertEqual(cache._cache.server_max_value_length, 9999)
-
-    def test_default_used_when_none_is_set(self):
-        """
-        python-memcached doesn't support default in get() so this test
-        overrides the one in BaseCacheTests.
-        """
-        cache.set('key_default_none', None)
-        self.assertEqual(cache.get('key_default_none', default='default'), 'default')
-
-
 @unittest.skipUnless(PyLibMCCache_params, "PyLibMCCache backend not configured")
 @override_settings(CACHES=caches_setting_for_tests(
     base=PyLibMCCache_params,
@@ -1429,6 +1508,10 @@ class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
     base_params = PyLibMCCache_params
     # libmemcached manages its own connections.
     should_disconnect_on_close = False
+
+    @property
+    def incr_decr_type_error(self):
+        return cache._lib.ClientError
 
     @override_settings(CACHES=caches_setting_for_tests(
         base=PyLibMCCache_params,
@@ -1467,6 +1550,10 @@ class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
 ))
 class PyMemcacheCacheTests(BaseMemcachedTests, TestCase):
     base_params = PyMemcacheCache_params
+
+    @property
+    def incr_decr_type_error(self):
+        return cache._lib.exceptions.MemcacheClientError
 
     def test_pymemcache_highest_pickle_version(self):
         self.assertEqual(
@@ -1576,6 +1663,65 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
             self.assertIs(cache._is_expired(fh), True)
 
 
+@unittest.skipUnless(RedisCache_params, "Redis backend not configured")
+@override_settings(CACHES=caches_setting_for_tests(
+    base=RedisCache_params,
+    exclude=redis_excluded_caches,
+))
+class RedisCacheTests(BaseCacheTests, TestCase):
+
+    def setUp(self):
+        import redis
+        super().setUp()
+        self.lib = redis
+
+    @property
+    def incr_decr_type_error(self):
+        return self.lib.ResponseError
+
+    def test_cache_client_class(self):
+        self.assertIs(cache._class, RedisCacheClient)
+        self.assertIsInstance(cache._cache, RedisCacheClient)
+
+    def test_get_backend_timeout_method(self):
+        positive_timeout = 10
+        positive_backend_timeout = cache.get_backend_timeout(positive_timeout)
+        self.assertEqual(positive_backend_timeout, positive_timeout)
+
+        negative_timeout = -5
+        negative_backend_timeout = cache.get_backend_timeout(negative_timeout)
+        self.assertEqual(negative_backend_timeout, 0)
+
+        none_timeout = None
+        none_backend_timeout = cache.get_backend_timeout(none_timeout)
+        self.assertIsNone(none_backend_timeout)
+
+    def test_get_connection_pool_index(self):
+        pool_index = cache._cache._get_connection_pool_index(write=True)
+        self.assertEqual(pool_index, 0)
+        pool_index = cache._cache._get_connection_pool_index(write=False)
+        if len(cache._cache._servers) == 1:
+            self.assertEqual(pool_index, 0)
+        else:
+            self.assertGreater(pool_index, 0)
+            self.assertLess(pool_index, len(cache._cache._servers))
+
+    def test_get_connection_pool(self):
+        pool = cache._cache._get_connection_pool(write=True)
+        self.assertIsInstance(pool, self.lib.ConnectionPool)
+
+        pool = cache._cache._get_connection_pool(write=False)
+        self.assertIsInstance(pool, self.lib.ConnectionPool)
+
+    def test_get_client(self):
+        self.assertIsInstance(cache._cache.get_client(), self.lib.Redis)
+
+    def test_serializer_dumps(self):
+        self.assertEqual(cache._cache._serializer.dumps(123), 123)
+        self.assertIsInstance(cache._cache._serializer.dumps(True), bytes)
+        self.assertIsInstance(cache._cache._serializer.dumps('abc'), bytes)
+
+
 class FileBasedCachePathLibTests(FileBasedCacheTests):
     def mkdtemp(self):
         tmp_dir = super().mkdtemp()
@@ -1614,6 +1760,19 @@ class CacheClosingTests(SimpleTestCase):
         self.assertFalse(cache.closed)
         signals.request_finished.send(self.__class__)
         self.assertTrue(cache.closed)
+
+    def test_close_only_initialized(self):
+        with self.settings(CACHES={
+            'cache_1': {
+                'BACKEND': 'cache.closeable_cache.CacheClass',
+            },
+            'cache_2': {
+                'BACKEND': 'cache.closeable_cache.CacheClass',
+            },
+        }):
+            self.assertEqual(caches.all(initialized_only=True), [])
+            signals.request_finished.send(self.__class__)
+            self.assertEqual(caches.all(initialized_only=True), [])
 
 
 DEFAULT_MEMORY_CACHES_SETTINGS = {
@@ -1714,7 +1873,7 @@ class CacheUtils(SimpleTestCase):
     def _get_request_cache(self, method='GET', query_string=None, update_cache=None):
         request = self._get_request(self.host, self.path,
                                     method, query_string=query_string)
-        request._cache_update_cache = True if not update_cache else update_cache
+        request._cache_update_cache = update_cache if update_cache else True
         return request
 
     def test_patch_vary_headers(self):
@@ -2356,6 +2515,21 @@ class CacheMiddlewareTest(SimpleTestCase):
         self.assertIn('Cache-Control', response)
         self.assertIn('Expires', response)
 
+    def test_per_thread(self):
+        """The cache instance is different for each thread."""
+        thread_caches = []
+        middleware = CacheMiddleware(empty_response)
+
+        def runner():
+            thread_caches.append(middleware.cache)
+
+        for _ in range(2):
+            thread = threading.Thread(target=runner)
+            thread.start()
+            thread.join()
+
+        self.assertIsNot(thread_caches[0], thread_caches[1])
+
 
 @override_settings(
     CACHE_MIDDLEWARE_KEY_PREFIX='settingsprefix',
@@ -2499,3 +2673,38 @@ class CacheHandlerTest(SimpleTestCase):
             t.join()
 
         self.assertIsNot(c[0], c[1])
+
+    def test_nonexistent_alias(self):
+        msg = "The connection 'nonexistent' doesn't exist."
+        with self.assertRaisesMessage(InvalidCacheBackendError, msg):
+            caches['nonexistent']
+
+    def test_nonexistent_backend(self):
+        test_caches = CacheHandler({
+            'invalid_backend': {
+                'BACKEND': 'django.nonexistent.NonexistentBackend',
+            },
+        })
+        msg = (
+            "Could not find backend 'django.nonexistent.NonexistentBackend': "
+            "No module named 'django.nonexistent'"
+        )
+        with self.assertRaisesMessage(InvalidCacheBackendError, msg):
+            test_caches['invalid_backend']
+
+    def test_all(self):
+        test_caches = CacheHandler({
+            'cache_1': {
+                'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+            },
+            'cache_2': {
+                'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+            },
+        })
+        self.assertEqual(test_caches.all(initialized_only=True), [])
+        cache_1 = test_caches['cache_1']
+        self.assertEqual(test_caches.all(initialized_only=True), [cache_1])
+        self.assertEqual(len(test_caches.all()), 2)
+        # .all() initializes all caches.
+        self.assertEqual(len(test_caches.all(initialized_only=True)), 2)
+        self.assertEqual(test_caches.all(), test_caches.all(initialized_only=True))

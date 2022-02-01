@@ -3,7 +3,7 @@
 <style type="text/css">
   #{{ id }}_map { width: {{ map_width }}px; height: {{ map_height }}px; }
   #{{ id }}_map .aligned label { float:inherit; }
-  #{{ id }}_admin_map { position: relative; vertical-align: top; float: {{ LANGUAGE_BIDI|yesno:"right,left" }}; }
+  #{{ id }}_admin_map { position: relative; vertical-align: top; z-index: 0; float: {{ LANGUAGE_BIDI|yesno:"right,left" }}; }
   {% if not display_wkt %}#{{ id }} { display: none; }{% endif %}
   .olControlEditingToolbar .olControlModifyFeatureItemActive {
      background-image: url("{% static "admin/img/gis/move_vertex_on.svg" %}");
@@ -21,7 +21,7 @@
 {% block openlayers %}{% include "gis/admin/openlayers.js" %}{% endblock %}
 //]]>
 </script>
-<div id="{{ id }}_map"{% if LANGUAGE_BIDI %} dir="ltr"{% endif %}></div>
+<div id="{{ id }}_map" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}"></div>
 {% if editable %}
 <a href="javascript:{{ module }}.clearFeatures()">{% translate "Delete all Features" %}</a>
 {% endif %}

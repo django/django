@@ -6,7 +6,7 @@ from decimal import Decimal
 from uuid import UUID
 
 from django.core.exceptions import EmptyResultSet, FieldError
-from django.db import NotSupportedError, connection
+from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import fields
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import Q
@@ -147,10 +147,10 @@ class Combinable:
         )
 
 
-@deconstructible
 class BaseExpression:
     """Base class for all query expressions."""
 
+    empty_result_set_value = NotImplemented
     # aggregate specific fields
     is_summary = False
     _output_field_resolved_to_none = False
@@ -375,7 +375,10 @@ class BaseExpression:
         yield self
         for expr in self.get_source_expressions():
             if expr:
-                yield from expr.flatten()
+                if hasattr(expr, 'flatten'):
+                    yield from expr.flatten()
+                else:
+                    yield expr
 
     def select_format(self, compiler, sql, params):
         """
@@ -385,6 +388,11 @@ class BaseExpression:
         if hasattr(self.output_field, 'select_format'):
             return self.output_field.select_format(compiler, sql, params)
         return sql, params
+
+
+@deconstructible
+class Expression(BaseExpression, Combinable):
+    """An expression that can be combined with other expressions."""
 
     @cached_property
     def identity(self):
@@ -406,17 +414,12 @@ class BaseExpression:
         return tuple(identity)
 
     def __eq__(self, other):
-        if not isinstance(other, BaseExpression):
+        if not isinstance(other, Expression):
             return NotImplemented
         return other.identity == self.identity
 
     def __hash__(self):
         return hash(self.identity)
-
-
-class Expression(BaseExpression, Combinable):
-    """An expression that can be combined with other expressions."""
-    pass
 
 
 _connector_combinators = {
@@ -543,6 +546,24 @@ class DurationExpression(CombinedExpression):
         sql = connection.ops.combine_duration_expression(self.connector, expressions)
         return expression_wrapper % sql, expression_params
 
+    def as_sqlite(self, compiler, connection, **extra_context):
+        sql, params = self.as_sql(compiler, connection, **extra_context)
+        if self.connector in {Combinable.MUL, Combinable.DIV}:
+            try:
+                lhs_type = self.lhs.output_field.get_internal_type()
+                rhs_type = self.rhs.output_field.get_internal_type()
+            except (AttributeError, FieldError):
+                pass
+            else:
+                allowed_fields = {
+                    'DecimalField', 'DurationField', 'FloatField', 'IntegerField',
+                }
+                if lhs_type not in allowed_fields or rhs_type not in allowed_fields:
+                    raise DatabaseError(
+                        f'Invalid arguments for operator {self.connector}.'
+                    )
+        return sql, params
+
 
 class TemporalSubtraction(CombinedExpression):
     output_field = fields.DurationField()
@@ -557,7 +578,7 @@ class TemporalSubtraction(CombinedExpression):
         return connection.ops.subtract_temporals(self.lhs.output_field.get_internal_type(), lhs, rhs)
 
 
-@deconstructible
+@deconstructible(path='django.db.models.F')
 class F(Combinable):
     """An object capable of resolving references to existing query objects."""
 
@@ -630,6 +651,7 @@ class OuterRef(F):
         return self
 
 
+@deconstructible(path='django.db.models.Func')
 class Func(SQLiteNumericMixin, Expression):
     """An SQL function call."""
     function = None
@@ -681,7 +703,13 @@ class Func(SQLiteNumericMixin, Expression):
         sql_parts = []
         params = []
         for arg in self.source_expressions:
-            arg_sql, arg_params = compiler.compile(arg)
+            try:
+                arg_sql, arg_params = compiler.compile(arg)
+            except EmptyResultSet:
+                empty_result_set_value = getattr(arg, 'empty_result_set_value', NotImplemented)
+                if empty_result_set_value is NotImplemented:
+                    raise
+                arg_sql, arg_params = compiler.compile(Value(empty_result_set_value))
             sql_parts.append(arg_sql)
             params.extend(arg_params)
         data = {**self.extra, **extra_context}
@@ -704,7 +732,8 @@ class Func(SQLiteNumericMixin, Expression):
         return copy
 
 
-class Value(Expression):
+@deconstructible(path='django.db.models.Value')
+class Value(SQLiteNumericMixin, Expression):
     """Represent a wrapped value as a node within an expression."""
     # Provide a default value for `for_save` in order to allow unresolved
     # instances to be compiled until a decision is taken in #25425.
@@ -723,7 +752,7 @@ class Value(Expression):
         self.value = value
 
     def __repr__(self):
-        return "{}({})".format(self.__class__.__name__, self.value)
+        return f'{self.__class__.__name__}({self.value!r})'
 
     def as_sql(self, compiler, connection):
         connection.ops.check_expression_support(self)
@@ -774,6 +803,10 @@ class Value(Expression):
             return fields.BinaryField()
         if isinstance(self.value, UUID):
             return fields.UUIDField()
+
+    @property
+    def empty_result_set_value(self):
+        return self.value
 
 
 class RawSQL(Expression):
@@ -884,8 +917,8 @@ class Ref(Expression):
 class ExpressionList(Func):
     """
     An expression containing multiple expressions. Can be used to provide a
-    list of expressions as an argument to another expression, like an
-    ordering clause.
+    list of expressions as an argument to another expression, like a partition
+    clause.
     """
     template = '%(expressions)s'
 
@@ -897,8 +930,33 @@ class ExpressionList(Func):
     def __str__(self):
         return self.arg_joiner.join(str(arg) for arg in self.source_expressions)
 
+    def as_sqlite(self, compiler, connection, **extra_context):
+        # Casting to numeric is unnecessary.
+        return self.as_sql(compiler, connection, **extra_context)
 
-class ExpressionWrapper(Expression):
+
+class OrderByList(Func):
+    template = 'ORDER BY %(expressions)s'
+
+    def __init__(self, *expressions, **extra):
+        expressions = (
+            (
+                OrderBy(F(expr[1:]), descending=True)
+                if isinstance(expr, str) and expr[0] == '-'
+                else expr
+            )
+            for expr in expressions
+        )
+        super().__init__(*expressions, **extra)
+
+    def as_sql(self, *args, **kwargs):
+        if not self.source_expressions:
+            return '', ()
+        return super().as_sql(*args, **kwargs)
+
+
+@deconstructible(path='django.db.models.ExpressionWrapper')
+class ExpressionWrapper(SQLiteNumericMixin, Expression):
     """
     An expression that can wrap another expression so that it can provide
     extra context to the inner expression, such as the output_field.
@@ -915,9 +973,13 @@ class ExpressionWrapper(Expression):
         return [self.expression]
 
     def get_group_by_cols(self, alias=None):
-        expression = self.expression.copy()
-        expression.output_field = self.output_field
-        return expression.get_group_by_cols(alias=alias)
+        if isinstance(self.expression, Expression):
+            expression = self.expression.copy()
+            expression.output_field = self.output_field
+            return expression.get_group_by_cols(alias=alias)
+        # For non-expressions e.g. an SQL WHERE clause, the entire
+        # `expression` must be included in the GROUP BY clause.
+        return super().get_group_by_cols()
 
     def as_sql(self, compiler, connection):
         return compiler.compile(self.expression)
@@ -926,6 +988,7 @@ class ExpressionWrapper(Expression):
         return "{}({})".format(self.__class__.__name__, self.expression)
 
 
+@deconstructible(path='django.db.models.When')
 class When(Expression):
     template = 'WHEN %(condition)s THEN %(result)s'
     # This isn't a complete conditional expression, must be used in Case().
@@ -993,7 +1056,8 @@ class When(Expression):
         return cols
 
 
-class Case(Expression):
+@deconstructible(path='django.db.models.Case')
+class Case(SQLiteNumericMixin, Expression):
     """
     An SQL searched CASE expression:
 
@@ -1074,30 +1138,21 @@ class Case(Expression):
         return super().get_group_by_cols(alias)
 
 
-class Subquery(Expression):
+class Subquery(BaseExpression, Combinable):
     """
     An explicit subquery. It may contain OuterRef() references to the outer
     query which will be resolved when it is applied to that query.
     """
     template = '(%(subquery)s)'
     contains_aggregate = False
+    empty_result_set_value = None
 
     def __init__(self, queryset, output_field=None, **extra):
-        self.query = queryset.query
+        # Allow the usage of both QuerySet and sql.Query objects.
+        self.query = getattr(queryset, 'query', queryset).clone()
+        self.query.subquery = True
         self.extra = extra
-        # Prevent the QuerySet from being evaluated.
-        self.queryset = queryset._chain(_result_cache=[], prefetch_done=True)
         super().__init__(output_field)
-
-    def __getstate__(self):
-        state = super().__getstate__()
-        args, kwargs = state['_constructor_args']
-        if args:
-            args = (self.queryset, *args[1:])
-        else:
-            kwargs['queryset'] = self.queryset
-        state['_constructor_args'] = args, kwargs
-        return state
 
     def get_source_expressions(self):
         return [self.query]
@@ -1117,10 +1172,14 @@ class Subquery(Expression):
     def external_aliases(self):
         return self.query.external_aliases
 
-    def as_sql(self, compiler, connection, template=None, **extra_context):
+    def get_external_cols(self):
+        return self.query.get_external_cols()
+
+    def as_sql(self, compiler, connection, template=None, query=None, **extra_context):
         connection.ops.check_expression_support(self)
         template_params = {**self.extra, **extra_context}
-        subquery_sql, sql_params = self.query.as_sql(compiler, connection)
+        query = query or self.query
+        subquery_sql, sql_params = query.as_sql(compiler, connection)
         template_params['subquery'] = subquery_sql[1:-1]
 
         template = template or template_params.get('template', self.template)
@@ -1128,12 +1187,13 @@ class Subquery(Expression):
         return sql, sql_params
 
     def get_group_by_cols(self, alias=None):
+        # If this expression is referenced by an alias for an explicit GROUP BY
+        # through values() a reference to this expression and not the
+        # underlying .query must be returned to ensure external column
+        # references are not grouped against as well.
         if alias:
             return [Ref(alias, self)]
-        external_cols = self.query.get_external_cols()
-        if any(col.possibly_multivalued for col in external_cols):
-            return [self]
-        return external_cols
+        return self.query.get_group_by_cols()
 
 
 class Exists(Subquery):
@@ -1143,7 +1203,6 @@ class Exists(Subquery):
     def __init__(self, queryset, negated=False, **kwargs):
         self.negated = negated
         super().__init__(queryset, **kwargs)
-        self.query = self.query.exists()
 
     def __invert__(self):
         clone = self.copy()
@@ -1151,7 +1210,14 @@ class Exists(Subquery):
         return clone
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
-        sql, params = super().as_sql(compiler, connection, template, **extra_context)
+        query = self.query.exists(using=connection.alias)
+        sql, params = super().as_sql(
+            compiler,
+            connection,
+            template=template,
+            query=query,
+            **extra_context,
+        )
         if self.negated:
             sql = 'NOT {}'.format(sql)
         return sql, params
@@ -1165,7 +1231,8 @@ class Exists(Subquery):
         return sql, params
 
 
-class OrderBy(BaseExpression):
+@deconstructible(path='django.db.models.OrderBy')
+class OrderBy(Expression):
     template = '%(expression)s %(ordering)s'
     conditional = False
 
@@ -1212,14 +1279,13 @@ class OrderBy(BaseExpression):
             'ordering': 'DESC' if self.descending else 'ASC',
             **extra_context,
         }
-        template = template or self.template
         params *= template.count('%(expression)s')
         return (template % placeholders).rstrip(), params
 
     def as_oracle(self, compiler, connection):
-        # Oracle doesn't allow ORDER BY EXISTS() unless it's wrapped in
-        # a CASE WHEN.
-        if isinstance(self.expression, Exists):
+        # Oracle doesn't allow ORDER BY EXISTS() or filters unless it's wrapped
+        # in a CASE WHEN.
+        if connection.ops.conditional_expression_supported_in_where_clause(self.expression):
             copy = self.copy()
             copy.expression = Case(
                 When(self.expression, then=True),
@@ -1275,11 +1341,13 @@ class Window(SQLiteNumericMixin, Expression):
 
         if self.order_by is not None:
             if isinstance(self.order_by, (list, tuple)):
-                self.order_by = ExpressionList(*self.order_by)
-            elif not isinstance(self.order_by, BaseExpression):
+                self.order_by = OrderByList(*self.order_by)
+            elif isinstance(self.order_by, (BaseExpression, str)):
+                self.order_by = OrderByList(self.order_by)
+            else:
                 raise ValueError(
-                    'order_by must be either an Expression or a sequence of '
-                    'expressions.'
+                    'Window.order_by must be either a string reference to a '
+                    'field, an expression, or a list or tuple of them.'
                 )
         super().__init__(output_field=output_field)
         self.source_expression = self._parse_expressions(expression)[0]
@@ -1305,18 +1373,17 @@ class Window(SQLiteNumericMixin, Expression):
                 compiler=compiler, connection=connection,
                 template='PARTITION BY %(expressions)s',
             )
-            window_sql.extend(sql_expr)
+            window_sql.append(sql_expr)
             window_params.extend(sql_params)
 
         if self.order_by is not None:
-            window_sql.append(' ORDER BY ')
             order_sql, order_params = compiler.compile(self.order_by)
-            window_sql.extend(order_sql)
+            window_sql.append(order_sql)
             window_params.extend(order_params)
 
         if self.frame:
             frame_sql, frame_params = compiler.compile(self.frame)
-            window_sql.append(' ' + frame_sql)
+            window_sql.append(frame_sql)
             window_params.extend(frame_params)
 
         params.extend(window_params)
@@ -1324,7 +1391,7 @@ class Window(SQLiteNumericMixin, Expression):
 
         return template % {
             'expression': expr_sql,
-            'window': ''.join(window_sql).strip()
+            'window': ' '.join(window_sql).strip()
         }, params
 
     def as_sqlite(self, compiler, connection):
@@ -1341,7 +1408,7 @@ class Window(SQLiteNumericMixin, Expression):
         return '{} OVER ({}{}{})'.format(
             str(self.source_expression),
             'PARTITION BY ' + str(self.partition_by) if self.partition_by else '',
-            'ORDER BY ' + str(self.order_by) if self.order_by else '',
+            str(self.order_by or ''),
             str(self.frame or ''),
         )
 

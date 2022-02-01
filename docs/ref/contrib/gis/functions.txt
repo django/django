@@ -44,7 +44,7 @@ Oracle, `PostGIS <https://postgis.net/docs/ST_Area.html>`__, SpatiaLite
 Accepts a single geographic field or expression and returns the area of the
 field as an :class:`~django.contrib.gis.measure.Area` measure.
 
-MySQL and SpatiaLite without LWGEOM don't support area calculations on
+MySQL and SpatiaLite without LWGEOM/RTTOPO don't support area calculations on
 geographic SRSes.
 
 ``AsGeoJSON``
@@ -52,7 +52,7 @@ geographic SRSes.
 
 .. class:: AsGeoJSON(expression, bbox=False, crs=False, precision=8, **extra)
 
-*Availability*: MariaDB (≥ 10.2.4), `MySQL
+*Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/spatial-geojson-functions.html#function_st-asgeojson>`__ (≥ 5.7.5),
 Oracle, `PostGIS <https://postgis.net/docs/ST_AsGeoJSON.html>`__, SpatiaLite
 
@@ -82,10 +82,6 @@ Keyword Argument       Description
                        representation -- the default value is 8. Ignored on
                        Oracle.
 =====================  =====================================================
-
-.. versionchanged:: 3.1
-
-    Oracle support was added.
 
 ``AsGML``
 =========
@@ -144,10 +140,6 @@ Keyword Argument       Description
 
 __ https://developers.google.com/kml/documentation/
 
-.. versionchanged:: 3.1
-
-    The undocumented ``version`` parameter was removed.
-
 ``AsSVG``
 =========
 
@@ -177,8 +169,6 @@ __ https://www.w3.org/Graphics/SVG/
 
 .. class:: AsWKB(expression, **extra)
 
-.. versionadded:: 3.1
-
 *Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-format-conversion-functions.html#function_st-asbinary>`__,
 Oracle, `PostGIS <https://postgis.net/docs/ST_AsBinary.html>`__, SpatiaLite
@@ -197,8 +187,6 @@ __ https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry#Well
 =========
 
 .. class:: AsWKT(expression, **extra)
-
-.. versionadded:: 3.1
 
 *Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-format-conversion-functions.html#function_st-astext>`__,
@@ -220,7 +208,7 @@ __ https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry
 .. class:: Azimuth(point_a, point_b, **extra)
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Azimuth.html>`__,
-SpatiaLite (LWGEOM)
+SpatiaLite (LWGEOM/RTTOPO)
 
 Returns the azimuth in radians of the segment defined by the given point
 geometries, or ``None`` if the two points are coincident. The azimuth is angle
@@ -346,7 +334,8 @@ are returned unchanged.
 
 *Availability*: `MySQL
 <https://dev.mysql.com/doc/refman/en/spatial-geohash-functions.html#function_st-geohash>`__ (≥ 5.7.5),
-`PostGIS <https://postgis.net/docs/ST_GeoHash.html>`__, SpatiaLite (LWGEOM)
+`PostGIS <https://postgis.net/docs/ST_GeoHash.html>`__, SpatiaLite
+(LWGEOM/RTTOPO)
 
 Accepts a single geographic field or expression and returns a `GeoHash`__
 representation of the geometry.
@@ -386,7 +375,7 @@ intersection between them.
 
 *Availability*: `MySQL
 <https://dev.mysql.com/doc/refman/en/spatial-convenience-functions.html#function_st-isvalid>`__ (≥ 5.7.5),
-`PostGIS <https://postgis.net/docs/ST_IsValid.html>`__, Oracle, SpatiaLite (LWGEOM)
+`PostGIS <https://postgis.net/docs/ST_IsValid.html>`__, Oracle, SpatiaLite
 
 Accepts a geographic field or expression and tests if the value is well formed.
 Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
@@ -428,7 +417,7 @@ Returns a float between 0 and 1 representing the location of the closest point o
 .. class:: MakeValid(expr)
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_MakeValid.html>`__,
-SpatiaLite (LWGEOM)
+SpatiaLite (LWGEOM/RTTOPO)
 
 Accepts a geographic field or expression and attempts to convert the value into
 a valid geometry without losing any of the input vertices. Geometries that are

@@ -5,12 +5,13 @@ from collections import defaultdict
 
 from django.apps import apps
 from django.conf import settings
-from django.core.exceptions import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
 from django.db import connections
 from django.db.models import AutoField, Manager, OrderWrt, UniqueConstraint
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.functional import cached_property
+from django.utils.module_loading import import_string
 from django.utils.text import camel_case_to_spaces, format_lazy
 from django.utils.translation import override
 
@@ -140,10 +141,6 @@ class Options:
         # Don't go through get_app_config to avoid triggering imports.
         return self.apps.app_configs.get(self.app_label)
 
-    @property
-    def installed(self):
-        return self.app_config is not None
-
     def contribute_to_class(self, cls, name):
         from django.db import connection
         from django.db.backends.utils import truncate_name
@@ -217,6 +214,37 @@ class Options:
             new_objs.append(obj)
         return new_objs
 
+    def _get_default_pk_class(self):
+        pk_class_path = getattr(
+            self.app_config,
+            'default_auto_field',
+            settings.DEFAULT_AUTO_FIELD,
+        )
+        if self.app_config and self.app_config._is_default_auto_field_overridden:
+            app_config_class = type(self.app_config)
+            source = (
+                f'{app_config_class.__module__}.'
+                f'{app_config_class.__qualname__}.default_auto_field'
+            )
+        else:
+            source = 'DEFAULT_AUTO_FIELD'
+        if not pk_class_path:
+            raise ImproperlyConfigured(f'{source} must not be empty.')
+        try:
+            pk_class = import_string(pk_class_path)
+        except ImportError as e:
+            msg = (
+                f"{source} refers to the module '{pk_class_path}' that could "
+                f"not be imported."
+            )
+            raise ImproperlyConfigured(msg) from e
+        if not issubclass(pk_class, AutoField):
+            raise ValueError(
+                f"Primary key '{pk_class_path}' referred by {source} must "
+                f"subclass AutoField."
+            )
+        return pk_class
+
     def _prepare(self, model):
         if self.order_with_respect_to:
             # The app registry will not be ready at this point, so we cannot
@@ -250,7 +278,8 @@ class Options:
                 field.primary_key = True
                 self.setup_pk(field)
             else:
-                auto = AutoField(verbose_name='ID', primary_key=True, auto_created=True)
+                pk_class = self._get_default_pk_class()
+                auto = pk_class(verbose_name='ID', primary_key=True, auto_created=True)
                 model.add_to_class('id', auto)
 
     def add_manager(self, manager):
@@ -673,7 +702,7 @@ class Options:
         for i, ancestor in enumerate(chain[:-1]):
             child = chain[i + 1]
             link = child._meta.get_ancestor_link(ancestor)
-            path.extend(link.get_reverse_path_info())
+            path.extend(link.reverse_path_infos)
         return path
 
     def _populate_directed_relation_graph(self):
@@ -837,7 +866,11 @@ class Options:
         return [
             constraint
             for constraint in self.constraints
-            if isinstance(constraint, UniqueConstraint) and constraint.condition is None
+            if (
+                isinstance(constraint, UniqueConstraint) and
+                constraint.condition is None and
+                not constraint.contains_expressions
+            )
         ]
 
     @cached_property

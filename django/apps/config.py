@@ -1,10 +1,9 @@
 import inspect
 import os
-import warnings
 from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.deprecation import RemovedInDjango41Warning
+from django.utils.functional import cached_property
 from django.utils.module_loading import import_string, module_has_submodule
 
 APPS_MODULE_NAME = 'apps'
@@ -33,6 +32,10 @@ class AppConfig:
         # This value must be unique across a Django project.
         if not hasattr(self, 'label'):
             self.label = app_name.rpartition(".")[2]
+        if not self.label.isidentifier():
+            raise ImproperlyConfigured(
+                "The app label '%s' is not a valid Python identifier." % self.label
+            )
 
         # Human-readable name for the application e.g. "Admin".
         if not hasattr(self, 'verbose_name'):
@@ -55,12 +58,20 @@ class AppConfig:
     def __repr__(self):
         return '<%s: %s>' % (self.__class__.__name__, self.label)
 
+    @cached_property
+    def default_auto_field(self):
+        from django.conf import settings
+        return settings.DEFAULT_AUTO_FIELD
+
+    @property
+    def _is_default_auto_field_overridden(self):
+        return self.__class__.default_auto_field is not AppConfig.default_auto_field
+
     def _path_from_module(self, module):
         """Attempt to determine app's filesystem path from its module."""
         # See #21874 for extended discussion of the behavior of this method in
         # various cases.
-        # Convert paths to list because Python's _NamespacePath doesn't support
-        # indexing.
+        # Convert to list because __path__ may not support indexing.
         paths = list(getattr(module, '__path__', []))
         if len(paths) != 1:
             filename = getattr(module, '__file__', None)
@@ -89,7 +100,6 @@ class AppConfig:
         """
         # create() eventually returns app_config_class(app_name, app_module).
         app_config_class = None
-        app_config_name = None
         app_name = None
         app_module = None
 
@@ -121,7 +131,6 @@ class AppConfig:
                 ]
                 if len(app_configs) == 1:
                     app_config_class = app_configs[0][1]
-                    app_config_name = '%s.%s' % (mod_path, app_configs[0][0])
                 else:
                     # Check if there's exactly one AppConfig subclass,
                     # among those that explicitly define default = True.
@@ -138,43 +147,11 @@ class AppConfig:
                         )
                     elif len(app_configs) == 1:
                         app_config_class = app_configs[0][1]
-                        app_config_name = '%s.%s' % (mod_path, app_configs[0][0])
 
-            # If app_module specifies a default_app_config, follow the link.
-            # default_app_config is deprecated, but still takes over the
-            # automatic detection for backwards compatibility during the
-            # deprecation period.
-            try:
-                new_entry = app_module.default_app_config
-            except AttributeError:
-                # Use the default app config class if we didn't find anything.
-                if app_config_class is None:
-                    app_config_class = cls
-                    app_name = entry
-            else:
-                message = (
-                    '%r defines default_app_config = %r. ' % (entry, new_entry)
-                )
-                if new_entry == app_config_name:
-                    message += (
-                        'Django now detects this configuration automatically. '
-                        'You can remove default_app_config.'
-                    )
-                else:
-                    message += (
-                        "However, Django's automatic detection %s. You should "
-                        "move the default config class to the apps submodule "
-                        "of your application and, if this module defines "
-                        "several config classes, mark the default one with "
-                        "default = True." % (
-                            "picked another configuration, %r" % app_config_name
-                            if app_config_name
-                            else "did not find this configuration"
-                        )
-                    )
-                warnings.warn(message, RemovedInDjango41Warning, stacklevel=2)
-                entry = new_entry
-                app_config_class = None
+            # Use the default app config class if we didn't find anything.
+            if app_config_class is None:
+                app_config_class = cls
+                app_name = entry
 
         # If import_string succeeds, entry is an app config class.
         if app_config_class is None:

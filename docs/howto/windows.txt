@@ -22,7 +22,7 @@ Install Python
 Django is a Python web framework, thus requiring Python to be installed on your
 machine. At the time of writing, Python 3.8 is the latest version.
 
-To install Python on your machine go to https://python.org/downloads/. The
+To install Python on your machine go to https://www.python.org/downloads/. The
 website should offer you a download button for the latest Python version.
 Download the executable installer and run it. Check the boxes next to "Install
 launcher for all users (recommended)" then click "Install Now".
@@ -65,7 +65,7 @@ following::
     ...\> py -m venv project-name
 
 This will create a folder called 'project-name' if it does not already exist
-and setup the virtual environment. To activate the environment, run::
+and set up the virtual environment. To activate the environment, run::
 
     ...\> project-name\Scripts\activate.bat
 
@@ -91,6 +91,23 @@ by executing ``django-admin --version`` in the command prompt.
 See :ref:`database-installation` for information on database installation
 with Django.
 
+Colored terminal output
+=======================
+
+A quality-of-life feature adds colored (rather than monochrome) output to the
+terminal. In modern terminals this should work for both CMD and PowerShell. If
+for some reason this needs to be disabled, set the environmental variable
+:envvar:`DJANGO_COLORS` to ``nocolor``.
+
+On older Windows versions, or legacy terminals, colorama_ must be installed to
+enable syntax coloring::
+
+    ...\> py -m pip install colorama
+
+See :ref:`syntax-coloring` for more information on color settings.
+
+.. _colorama: https://pypi.org/project/colorama/
+
 Common pitfalls
 ===============
 
@@ -106,3 +123,11 @@ Common pitfalls
 
     ...\> set http_proxy=http://username:password@proxyserver:proxyport
     ...\> set https_proxy=https://username:password@proxyserver:proxyport
+
+* In general, Django assumes that ``UTF-8`` encoding is used for I/O. This may
+  cause problems if your system is set to use a different encoding. Recent
+  versions of Python allow setting the :envvar:`PYTHONUTF8` environment
+  variable in order to force a ``UTF-8`` encoding. Windows 10 also provides a
+  system-wide setting by checking ``Use Unicode UTF-8 for worldwide language
+  support`` in :menuselection:`Language --> Administrative Language Settings
+  --> Change system locale` in system settings.

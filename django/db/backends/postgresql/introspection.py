@@ -48,13 +48,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """Return a list of table and view names in the current database."""
         cursor.execute("""
             SELECT c.relname,
-            CASE WHEN {} THEN 'p' WHEN c.relkind IN ('m', 'v') THEN 'v' ELSE 't' END
+            CASE WHEN c.relispartition THEN 'p' WHEN c.relkind IN ('m', 'v') THEN 'v' ELSE 't' END
             FROM pg_catalog.pg_class c
             LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
             WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
                 AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
                 AND pg_catalog.pg_table_is_visible(c.oid)
-        """.format('c.relispartition' if self.connection.features.supports_table_partitions else 'FALSE'))
+        """)
         return [TableInfo(*row) for row in cursor.fetchall() if row[0] not in self.ignored_tables]
 
     def get_table_description(self, cursor, table_name):
@@ -119,11 +119,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     def get_relations(self, cursor, table_name):
         """
         Return a dictionary of {field_name: (field_name_other_table, other_table)}
-        representing all relationships to the given table.
+        representing all foreign keys in the given table.
         """
-        return {row[0]: (row[2], row[1]) for row in self.get_key_columns(cursor, table_name)}
-
-    def get_key_columns(self, cursor, table_name):
         cursor.execute("""
             SELECT a1.attname, c2.relname, a2.attname
             FROM pg_constraint con
@@ -137,7 +134,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 c1.relnamespace = c2.relnamespace AND
                 pg_catalog.pg_table_is_visible(c1.oid)
         """, [table_name])
-        return cursor.fetchall()
+        return {row[0]: (row[2], row[1]) for row in cursor.fetchall()}
 
     def get_constraints(self, cursor, table_name):
         """

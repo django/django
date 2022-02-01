@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2016
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2021
 # Jannis Leidel <jannis@leidel.info>, 2011
+# oon arfiandwi <oon.arfiandwi@gmail.com>, 2020
 # rodin <romihardiyanto@gmail.com>, 2011-2012
 # rodin <romihardiyanto@gmail.com>, 2014,2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: rodin <romihardiyanto@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-09-14 00:31+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -85,21 +86,21 @@ msgstr ""
 "telah dilakukan akan hilang."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Anda telah memilih sebuah aksi, tetapi belum menyimpan perubahan ke bidang "
-"yang ada. Klik OK untuk menyimpan perubahan ini. Anda akan perlu mengulangi "
-"aksi tersebut kembali."
+"Anda telah memilih tindakan, tetapi Anda belum menyimpan perubahan ke masing-"
+"masing bidang. Silakan klik OK untuk menyimpan. Anda harus menjalankan "
+"kembali tindakan tersebut."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Anda telah memilih sebuah aksi, tetapi belum mengubah bidang apapun. "
-"Kemungkinan Anda mencari tombol Buka dan bukan tombol Simpan."
+"Anda telah memilih tindakan, dan Anda belum membuat perubahan apa pun di "
+"setiap bidang. Anda mungkin mencari tombol Buka daripada tombol Simpan."
 
 msgid "Now"
 msgstr "Sekarang"
@@ -182,6 +183,54 @@ msgstr "November"
 
 msgid "December"
 msgstr "Desember"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Jan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Feb"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mar"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Mei"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Jun"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Jul"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Agu"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Sep"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Des"
 
 msgctxt "one letter Sunday"
 msgid "S"

@@ -3,10 +3,11 @@
 # Translators:
 # akiyoko <ayokose@gmail.com>, 2020
 # Claude Paroz <claude@2xlibre.net>, 2016
-# GOTO Hayato <habita.gh@gmail.com>, 2019
+# Goto Hayato <habita.gh@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Shinichi Katsumata <shinichi.katsumata@gmail.com>, 2019
-# Shinya Okano <tokibito@gmail.com>, 2012-2018
+# Shinya Okano <tokibito@gmail.com>, 2012-2018,2021
+# Takuro Onoue <kusanaginoturugi@gmail.com>, 2020
 # Takuya N <takninnovationresearch@gmail.com>, 2020
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
 # 上田慶祐 <kei.mokusyun@gmail.com>, 2015
@@ -14,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-08-18 04:06+0000\n"
-"Last-Translator: akiyoko <ayokose@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-10-13 11:41+0000\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -24,6 +25,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "選択された %(verbose_name_plural)s の削除"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -35,10 +40,6 @@ msgstr "%(name)s が削除できません"
 
 msgid "Are you sure?"
 msgstr "よろしいですか？"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "選択された %(verbose_name_plural)s の削除"
 
 msgid "Administration"
 msgstr "管理"
@@ -522,7 +523,13 @@ msgid "Forgotten your password or username?"
 msgstr "パスワードまたはユーザー名を忘れましたか？"
 
 msgid "Toggle navigation"
-msgstr ""
+msgstr "ナビゲーションを切り替えます"
+
+msgid "Start typing to filter…"
+msgstr "絞り込みの入力..."
+
+msgid "Filter navigation items"
+msgstr "ナビゲーション項目の絞り込み"
 
 msgid "Date/time"
 msgstr "日付/時刻"
@@ -588,7 +595,7 @@ msgstr "%(model)s の追加"
 msgid "Delete selected %(model)s"
 msgstr "選択された %(model)s を削除"
 
-msgid "Thanks for spending some quality time with the Web site today."
+msgid "Thanks for spending some quality time with the web site today."
 msgstr "ご利用ありがとうございました。"
 
 msgid "Log in again"

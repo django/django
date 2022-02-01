@@ -9,6 +9,8 @@ from functools import wraps
 
 
 class SafeData:
+    __slots__ = ()
+
     def __html__(self):
         """
         Return the html representation of a string for interoperability.
@@ -23,6 +25,9 @@ class SafeString(str, SafeData):
     A str subclass that has been specifically marked as "safe" for HTML output
     purposes.
     """
+
+    __slots__ = ()
+
     def __add__(self, rhs):
         """
         Concatenating a safe string with another safe bytestring or

@@ -12,12 +12,18 @@ from django.utils.functional import cached_property
 
 
 class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
-
-    mysql = True
     name = 'mysql'
     geom_func_prefix = 'ST_'
 
     Adapter = WKTAdapter
+
+    @cached_property
+    def mariadb(self):
+        return self.connection.mysql_is_mariadb
+
+    @cached_property
+    def mysql(self):
+        return not self.connection.mysql_is_mariadb
 
     @cached_property
     def select(self):
@@ -64,8 +70,6 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         if self.connection.mysql_is_mariadb:
             unsupported.remove('PointOnSurface')
             unsupported.update({'GeoHash', 'IsValid'})
-            if self.connection.mysql_version < (10, 2, 4):
-                unsupported.add('AsGeoJSON')
         elif self.connection.mysql_version < (5, 7, 5):
             unsupported.update({'AsGeoJSON', 'GeoHash', 'IsValid'})
         return unsupported

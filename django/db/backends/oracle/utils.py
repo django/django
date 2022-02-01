@@ -55,9 +55,9 @@ class Oracle_datetime(datetime.datetime):
 
 class BulkInsertMapper:
     BLOB = 'TO_BLOB(%s)'
-    CLOB = 'TO_CLOB(%s)'
     DATE = 'TO_DATE(%s)'
     INTERVAL = 'CAST(%s as INTERVAL DAY(9) TO SECOND(6))'
+    NCLOB = 'TO_NCLOB(%s)'
     NUMBER = 'TO_NUMBER(%s)'
     TIMESTAMP = 'TO_TIMESTAMP(%s)'
 
@@ -73,12 +73,18 @@ class BulkInsertMapper:
         'DurationField': INTERVAL,
         'FloatField': NUMBER,
         'IntegerField': NUMBER,
-        'NullBooleanField': NUMBER,
         'PositiveBigIntegerField': NUMBER,
         'PositiveIntegerField': NUMBER,
         'PositiveSmallIntegerField': NUMBER,
         'SmallAutoField': NUMBER,
         'SmallIntegerField': NUMBER,
-        'TextField': CLOB,
+        'TextField': NCLOB,
         'TimeField': TIMESTAMP,
     }
+
+
+def dsn(settings_dict):
+    if settings_dict['PORT']:
+        host = settings_dict['HOST'].strip() or 'localhost'
+        return Database.makedsn(host, int(settings_dict['PORT']), settings_dict['NAME'])
+    return settings_dict['NAME']

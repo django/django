@@ -2,8 +2,9 @@ from django.contrib.postgres.signals import (
     get_citext_oids, get_hstore_oids, register_type_handlers,
 )
 from django.db import NotSupportedError, router
-from django.db.migrations import AddIndex, RemoveIndex
+from django.db.migrations import AddConstraint, AddIndex, RemoveIndex
 from django.db.migrations.operations.base import Operation
+from django.db.models.constraints import CheckConstraint
 
 
 class CreateExtension(Operation):
@@ -196,11 +197,6 @@ class CollationOperation(Operation):
             raise NotSupportedError(
                 'Non-deterministic collations require PostgreSQL 12+.'
             )
-        if (
-            self.provider != 'libc' and
-            not schema_editor.connection.features.supports_alternate_collation_providers
-        ):
-            raise NotSupportedError('Non-libc providers require PostgreSQL 10+.')
         args = {'locale': schema_editor.quote_name(self.locale)}
         if self.provider != 'libc':
             args['provider'] = schema_editor.quote_name(self.provider)
@@ -261,3 +257,73 @@ class RemoveCollation(CollationOperation):
     @property
     def migration_name_fragment(self):
         return 'remove_collation_%s' % self.name.lower()
+
+
+class AddConstraintNotValid(AddConstraint):
+    """
+    Add a table constraint without enforcing validation, using PostgreSQL's
+    NOT VALID syntax.
+    """
+
+    def __init__(self, model_name, constraint):
+        if not isinstance(constraint, CheckConstraint):
+            raise TypeError(
+                'AddConstraintNotValid.constraint must be a check constraint.'
+            )
+        super().__init__(model_name, constraint)
+
+    def describe(self):
+        return 'Create not valid constraint %s on model %s' % (
+            self.constraint.name,
+            self.model_name,
+        )
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        model = from_state.apps.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
+            constraint_sql = self.constraint.create_sql(model, schema_editor)
+            if constraint_sql:
+                # Constraint.create_sql returns interpolated SQL which makes
+                # params=None a necessity to avoid escaping attempts on
+                # execution.
+                schema_editor.execute(str(constraint_sql) + ' NOT VALID', params=None)
+
+    @property
+    def migration_name_fragment(self):
+        return super().migration_name_fragment + '_not_valid'
+
+
+class ValidateConstraint(Operation):
+    """Validate a table NOT VALID constraint."""
+
+    def __init__(self, model_name, name):
+        self.model_name = model_name
+        self.name = name
+
+    def describe(self):
+        return 'Validate constraint %s on model %s' % (self.name, self.model_name)
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        model = from_state.apps.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
+            schema_editor.execute('ALTER TABLE %s VALIDATE CONSTRAINT %s' % (
+                schema_editor.quote_name(model._meta.db_table),
+                schema_editor.quote_name(self.name),
+            ))
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        # PostgreSQL does not provide a way to make a constraint invalid.
+        pass
+
+    def state_forwards(self, app_label, state):
+        pass
+
+    @property
+    def migration_name_fragment(self):
+        return '%s_validate_%s' % (self.model_name.lower(), self.name.lower())
+
+    def deconstruct(self):
+        return self.__class__.__name__, [], {
+            'model_name': self.model_name,
+            'name': self.name,
+        }

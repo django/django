@@ -2,6 +2,7 @@ import sys
 import unittest
 
 from django.conf import settings
+from django.contrib import admin
 from django.contrib.admindocs import utils, views
 from django.contrib.admindocs.views import get_return_data_type, simplify_regex
 from django.contrib.sites.models import Site
@@ -9,7 +10,8 @@ from django.db import models
 from django.db.models import fields
 from django.test import SimpleTestCase, modify_settings, override_settings
 from django.test.utils import captured_stderr
-from django.urls import reverse
+from django.urls import include, path, reverse
+from django.utils.functional import SimpleLazyObject
 
 from .models import Company, Person
 from .tests import AdminDocsTestCase, TestDataMixin
@@ -136,6 +138,37 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         response = self.client.get(reverse('django-admindocs-views-index'))
         self.assertContains(response, 'View documentation')
 
+    def test_callable_urlconf(self):
+        """
+        Index view should correctly resolve view patterns when ROOT_URLCONF is
+        not a string.
+        """
+        def urlpatterns():
+            return (
+                path('admin/doc/', include('django.contrib.admindocs.urls')),
+                path('admin/', admin.site.urls),
+            )
+
+        with self.settings(ROOT_URLCONF=SimpleLazyObject(urlpatterns)):
+            response = self.client.get(reverse('django-admindocs-views-index'))
+            self.assertEqual(response.status_code, 200)
+
+
+@unittest.skipUnless(utils.docutils_is_available, 'no docutils installed.')
+class AdminDocViewDefaultEngineOnly(TestDataMixin, AdminDocsTestCase):
+
+    def setUp(self):
+        self.client.force_login(self.superuser)
+
+    def test_template_detail_path_traversal(self):
+        cases = ['/etc/passwd', '../passwd']
+        for fpath in cases:
+            with self.subTest(path=fpath):
+                response = self.client.get(
+                    reverse('django-admindocs-templates', args=[fpath]),
+                )
+                self.assertEqual(response.status_code, 400)
+
 
 @override_settings(TEMPLATES=[{
     'NAME': 'ONE',
@@ -214,6 +247,10 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
     def test_instance_of_property_methods_are_displayed(self):
         """Model properties are displayed as fields."""
         self.assertContains(self.response, '<td>a_property</td>')
+
+    def test_instance_of_cached_property_methods_are_displayed(self):
+        """Model cached properties are displayed as fields."""
+        self.assertContains(self.response, '<td>a_cached_property</td>')
 
     def test_method_data_types(self):
         company = Company.objects.create(name="Django")
@@ -348,7 +385,7 @@ class AdminDocViewFunctionsTests(SimpleTestCase):
 
     def test_simplify_regex(self):
         tests = (
-            (r'^a', '/a'),
+            # Named and unnamed groups.
             (r'^(?P<a>\w+)/b/(?P<c>\w+)/$', '/<a>/b/<c>/'),
             (r'^(?P<a>\w+)/b/(?P<c>\w+)$', '/<a>/b/<c>'),
             (r'^(?P<a>\w+)/b/(?P<c>\w+)', '/<a>/b/<c>'),
@@ -360,7 +397,96 @@ class AdminDocViewFunctionsTests(SimpleTestCase):
             (r'^(?P<a>(x|y))/b/(?P<c>\w+)', '/<a>/b/<c>'),
             (r'^(?P<a>(x|y))/b/(?P<c>\w+)ab', '/<a>/b/<c>ab'),
             (r'^(?P<a>(x|y)(\(|\)))/b/(?P<c>\w+)ab', '/<a>/b/<c>ab'),
+            # Non-capturing groups.
+            (r'^a(?:\w+)b', '/ab'),
+            (r'^a(?:(x|y))', '/a'),
+            (r'^(?:\w+(?:\w+))a', '/a'),
+            (r'^a(?:\w+)/b(?:\w+)', '/a/b'),
+            (r'(?P<a>\w+)/b/(?:\w+)c(?:\w+)', '/<a>/b/c'),
+            (r'(?P<a>\w+)/b/(\w+)/(?:\w+)c(?:\w+)', '/<a>/b/<var>/c'),
+            # Single and repeated metacharacters.
+            (r'^a', '/a'),
+            (r'^^a', '/a'),
+            (r'^^^a', '/a'),
+            (r'a$', '/a'),
+            (r'a$$', '/a'),
+            (r'a$$$', '/a'),
+            (r'a?', '/a'),
+            (r'a??', '/a'),
+            (r'a???', '/a'),
+            (r'a*', '/a'),
+            (r'a**', '/a'),
+            (r'a***', '/a'),
+            (r'a+', '/a'),
+            (r'a++', '/a'),
+            (r'a+++', '/a'),
+            (r'\Aa', '/a'),
+            (r'\A\Aa', '/a'),
+            (r'\A\A\Aa', '/a'),
+            (r'a\Z', '/a'),
+            (r'a\Z\Z', '/a'),
+            (r'a\Z\Z\Z', '/a'),
+            (r'\ba', '/a'),
+            (r'\b\ba', '/a'),
+            (r'\b\b\ba', '/a'),
+            (r'a\B', '/a'),
+            (r'a\B\B', '/a'),
+            (r'a\B\B\B', '/a'),
+            # Multiple mixed metacharacters.
             (r'^a/?$', '/a/'),
+            (r'\Aa\Z', '/a'),
+            (r'\ba\B', '/a'),
+            # Escaped single metacharacters.
+            (r'\^a', r'/^a'),
+            (r'\\^a', r'/\\a'),
+            (r'\\\^a', r'/\\^a'),
+            (r'\\\\^a', r'/\\\\a'),
+            (r'\\\\\^a', r'/\\\\^a'),
+            (r'a\$', r'/a$'),
+            (r'a\\$', r'/a\\'),
+            (r'a\\\$', r'/a\\$'),
+            (r'a\\\\$', r'/a\\\\'),
+            (r'a\\\\\$', r'/a\\\\$'),
+            (r'a\?', r'/a?'),
+            (r'a\\?', r'/a\\'),
+            (r'a\\\?', r'/a\\?'),
+            (r'a\\\\?', r'/a\\\\'),
+            (r'a\\\\\?', r'/a\\\\?'),
+            (r'a\*', r'/a*'),
+            (r'a\\*', r'/a\\'),
+            (r'a\\\*', r'/a\\*'),
+            (r'a\\\\*', r'/a\\\\'),
+            (r'a\\\\\*', r'/a\\\\*'),
+            (r'a\+', r'/a+'),
+            (r'a\\+', r'/a\\'),
+            (r'a\\\+', r'/a\\+'),
+            (r'a\\\\+', r'/a\\\\'),
+            (r'a\\\\\+', r'/a\\\\+'),
+            (r'\\Aa', r'/\Aa'),
+            (r'\\\Aa', r'/\\a'),
+            (r'\\\\Aa', r'/\\\Aa'),
+            (r'\\\\\Aa', r'/\\\\a'),
+            (r'\\\\\\Aa', r'/\\\\\Aa'),
+            (r'a\\Z', r'/a\Z'),
+            (r'a\\\Z', r'/a\\'),
+            (r'a\\\\Z', r'/a\\\Z'),
+            (r'a\\\\\Z', r'/a\\\\'),
+            (r'a\\\\\\Z', r'/a\\\\\Z'),
+            # Escaped mixed metacharacters.
+            (r'^a\?$', r'/a?'),
+            (r'^a\\?$', r'/a\\'),
+            (r'^a\\\?$', r'/a\\?'),
+            (r'^a\\\\?$', r'/a\\\\'),
+            (r'^a\\\\\?$', r'/a\\\\?'),
+            # Adjacent escaped metacharacters.
+            (r'^a\?\$', r'/a?$'),
+            (r'^a\\?\\$', r'/a\\\\'),
+            (r'^a\\\?\\\$', r'/a\\?\\$'),
+            (r'^a\\\\?\\\\$', r'/a\\\\\\\\'),
+            (r'^a\\\\\?\\\\\$', r'/a\\\\?\\\\$'),
+            # Complex examples with metacharacters and (un)named groups.
+            (r'^\b(?P<slug>\w+)\B/(\w+)?', '/<slug>/<var>'),
+            (r'^\A(?P<slug>\w+)\Z', '/<slug>'),
         )
         for pattern, output in tests:
             with self.subTest(pattern=pattern):

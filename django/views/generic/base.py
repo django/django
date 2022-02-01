@@ -1,5 +1,4 @@
 import logging
-from functools import update_wrapper
 
 from django.core.exceptions import ImproperlyConfigured
 from django.http import (
@@ -71,12 +70,16 @@ class View:
         view.view_class = cls
         view.view_initkwargs = initkwargs
 
-        # take name and docstring from class
-        update_wrapper(view, cls, updated=())
+        # __name__ and __qualname__ are intentionally left unchanged as
+        # view_class should be used to robustly determine the name of the view
+        # instead.
+        view.__doc__ = cls.__doc__
+        view.__module__ = cls.__module__
+        view.__annotations__ = cls.dispatch.__annotations__
+        # Copy possible attributes set by decorators, e.g. @csrf_exempt, from
+        # the dispatch method.
+        view.__dict__.update(cls.dispatch.__dict__)
 
-        # and possible attributes set by decorators
-        # like csrf_exempt from dispatch
-        update_wrapper(view, cls.dispatch, assigned=())
         return view
 
     def setup(self, request, *args, **kwargs):

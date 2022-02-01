@@ -123,7 +123,7 @@ class Tag(models.Model):
 
 
 class Board(models.Model):
-    name = models.CharField(primary_key=True, max_length=15)
+    name = models.CharField(primary_key=True, max_length=25)
 
 
 class SpecialGenericRelation(GenericRelation):

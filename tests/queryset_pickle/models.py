@@ -48,6 +48,10 @@ class Happening(models.Model):
     event = models.OneToOneField(Event, models.CASCADE, null=True)
 
 
+class BinaryFieldModel(models.Model):
+    data = models.BinaryField(null=True)
+
+
 class Container:
     # To test pickling we need a class that isn't defined on module, but
     # is still available from app-cache. So, the Container class moves

@@ -7,7 +7,7 @@ Sample usage:
 >>> feed = feedgenerator.Rss201rev2Feed(
 ...     title="Poynter E-Media Tidbits",
 ...     link="http://www.poynter.org/column.asp?id=31",
-...     description="A group Weblog by the sharpest minds in online media/journalism/publishing.",
+...     description="A group blog by the sharpest minds in online media/journalism/publishing.",
 ...     language="en",
 ... )
 >>> feed.add_item(
@@ -172,8 +172,7 @@ class SyndicationFeed:
                     if latest_date is None or item_date > latest_date:
                         latest_date = item_date
 
-        # datetime.now(tz=utc) is slower, as documented in django.utils.timezone.now
-        return latest_date or datetime.datetime.utcnow().replace(tzinfo=utc)
+        return latest_date or datetime.datetime.now(tz=utc)
 
 
 class Enclosure:
@@ -188,7 +187,7 @@ class RssFeed(SyndicationFeed):
     content_type = 'application/rss+xml; charset=utf-8'
 
     def write(self, outfile, encoding):
-        handler = SimplerXMLGenerator(outfile, encoding)
+        handler = SimplerXMLGenerator(outfile, encoding, short_empty_elements=True)
         handler.startDocument()
         handler.startElement("rss", self.rss_attributes())
         handler.startElement("channel", self.root_attributes())
@@ -297,7 +296,7 @@ class Atom1Feed(SyndicationFeed):
     ns = "http://www.w3.org/2005/Atom"
 
     def write(self, outfile, encoding):
-        handler = SimplerXMLGenerator(outfile, encoding)
+        handler = SimplerXMLGenerator(outfile, encoding, short_empty_elements=True)
         handler.startDocument()
         handler.startElement('feed', self.root_attributes())
         self.add_root_elements(handler)

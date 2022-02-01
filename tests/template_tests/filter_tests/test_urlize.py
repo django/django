@@ -313,28 +313,28 @@ class FunctionTests(SimpleTestCase):
         #20364 - Check urlize correctly include quotation marks in links
         """
         self.assertEqual(
-            urlize('before "hi@example.com" afterwards', autoescape=False),
-            'before "<a href="mailto:hi@example.com">hi@example.com</a>" afterwards',
+            urlize('before "hi@example.com" afterward', autoescape=False),
+            'before "<a href="mailto:hi@example.com">hi@example.com</a>" afterward',
         )
         self.assertEqual(
-            urlize('before hi@example.com" afterwards', autoescape=False),
-            'before <a href="mailto:hi@example.com">hi@example.com</a>" afterwards',
+            urlize('before hi@example.com" afterward', autoescape=False),
+            'before <a href="mailto:hi@example.com">hi@example.com</a>" afterward',
         )
         self.assertEqual(
-            urlize('before "hi@example.com afterwards', autoescape=False),
-            'before "<a href="mailto:hi@example.com">hi@example.com</a> afterwards',
+            urlize('before "hi@example.com afterward', autoescape=False),
+            'before "<a href="mailto:hi@example.com">hi@example.com</a> afterward',
         )
         self.assertEqual(
-            urlize('before \'hi@example.com\' afterwards', autoescape=False),
-            'before \'<a href="mailto:hi@example.com">hi@example.com</a>\' afterwards',
+            urlize('before \'hi@example.com\' afterward', autoescape=False),
+            'before \'<a href="mailto:hi@example.com">hi@example.com</a>\' afterward',
         )
         self.assertEqual(
-            urlize('before hi@example.com\' afterwards', autoescape=False),
-            'before <a href="mailto:hi@example.com">hi@example.com</a>\' afterwards',
+            urlize('before hi@example.com\' afterward', autoescape=False),
+            'before <a href="mailto:hi@example.com">hi@example.com</a>\' afterward',
         )
         self.assertEqual(
-            urlize('before \'hi@example.com afterwards', autoescape=False),
-            'before \'<a href="mailto:hi@example.com">hi@example.com</a> afterwards',
+            urlize('before \'hi@example.com afterward', autoescape=False),
+            'before \'<a href="mailto:hi@example.com">hi@example.com</a> afterward',
         )
 
     def test_quote_commas(self):

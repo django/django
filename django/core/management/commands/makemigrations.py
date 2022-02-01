@@ -57,6 +57,20 @@ class Command(BaseCommand):
             '--check', action='store_true', dest='check_changes',
             help='Exit with a non-zero status if model changes are missing migrations.',
         )
+        parser.add_argument(
+            '--scriptable', action='store_true', dest='scriptable',
+            help=(
+                'Divert log output and input prompts to stderr, writing only '
+                'paths of generated migration files to stdout.'
+            ),
+        )
+
+    @property
+    def log_output(self):
+        return self.stderr if self.scriptable else self.stdout
+
+    def log(self, msg):
+        self.log_output.write(msg)
 
     @no_translations
     def handle(self, *app_labels, **options):
@@ -70,6 +84,10 @@ class Command(BaseCommand):
             raise CommandError('The migration name must be a valid Python identifier.')
         self.include_header = options['include_header']
         check_changes = options['check_changes']
+        self.scriptable = options['scriptable']
+        # If logs and prompts are diverted to stderr, remove the ERROR style.
+        if self.scriptable:
+            self.stderr.style_func = None
 
         # Make sure the app they asked for exists
         app_labels = set(app_labels)
@@ -132,7 +150,7 @@ class Command(BaseCommand):
 
         # If they want to merge and there's nothing to merge, then politely exit
         if self.merge and not conflicts:
-            self.stdout.write("No conflicts detected to merge.")
+            self.log('No conflicts detected to merge.')
             return
 
         # If they want to merge and there is something to merge, then
@@ -141,9 +159,18 @@ class Command(BaseCommand):
             return self.handle_merge(loader, conflicts)
 
         if self.interactive:
-            questioner = InteractiveMigrationQuestioner(specified_apps=app_labels, dry_run=self.dry_run)
+            questioner = InteractiveMigrationQuestioner(
+                specified_apps=app_labels,
+                dry_run=self.dry_run,
+                prompt_output=self.log_output,
+            )
         else:
-            questioner = NonInteractiveMigrationQuestioner(specified_apps=app_labels, dry_run=self.dry_run)
+            questioner = NonInteractiveMigrationQuestioner(
+                specified_apps=app_labels,
+                dry_run=self.dry_run,
+                verbosity=self.verbosity,
+                log=self.log,
+            )
         # Set up autodetector
         autodetector = MigrationAutodetector(
             loader.project_state(),
@@ -181,11 +208,11 @@ class Command(BaseCommand):
             if self.verbosity >= 1:
                 if app_labels:
                     if len(app_labels) == 1:
-                        self.stdout.write("No changes detected in app '%s'" % app_labels.pop())
+                        self.log("No changes detected in app '%s'" % app_labels.pop())
                     else:
-                        self.stdout.write("No changes detected in apps '%s'" % ("', '".join(app_labels)))
+                        self.log("No changes detected in apps '%s'" % ("', '".join(app_labels)))
                 else:
-                    self.stdout.write("No changes detected")
+                    self.log('No changes detected')
         else:
             self.write_migration_files(changes)
             if check_changes:
@@ -198,7 +225,7 @@ class Command(BaseCommand):
         directory_created = {}
         for app_label, app_migrations in changes.items():
             if self.verbosity >= 1:
-                self.stdout.write(self.style.MIGRATE_HEADING("Migrations for '%s':" % app_label))
+                self.log(self.style.MIGRATE_HEADING("Migrations for '%s':" % app_label))
             for migration in app_migrations:
                 # Describe the migration
                 writer = MigrationWriter(migration, self.include_header)
@@ -211,9 +238,11 @@ class Command(BaseCommand):
                         migration_string = writer.path
                     if migration_string.startswith('..'):
                         migration_string = writer.path
-                    self.stdout.write('  %s\n' % self.style.MIGRATE_LABEL(migration_string))
+                    self.log('  %s\n' % self.style.MIGRATE_LABEL(migration_string))
                     for operation in migration.operations:
-                        self.stdout.write('    - %s' % operation.describe())
+                        self.log('    - %s' % operation.describe())
+                    if self.scriptable:
+                        self.stdout.write(migration_string)
                 if not self.dry_run:
                     # Write the migrations file to the disk.
                     migrations_directory = os.path.dirname(writer.path)
@@ -229,12 +258,12 @@ class Command(BaseCommand):
                         fh.write(migration_string)
                 elif self.verbosity == 3:
                     # Alternatively, makemigrations --dry-run --verbosity 3
-                    # will output the migrations to stdout rather than saving
-                    # the file to the disk.
-                    self.stdout.write(self.style.MIGRATE_HEADING(
+                    # will log the migrations rather than saving the file to
+                    # the disk.
+                    self.log(self.style.MIGRATE_HEADING(
                         "Full migrations file '%s':" % writer.filename
                     ))
-                    self.stdout.write(writer.as_string())
+                    self.log(writer.as_string())
 
     def handle_merge(self, loader, conflicts):
         """
@@ -242,7 +271,7 @@ class Command(BaseCommand):
         if it's safe; otherwise, advises on how to fix it.
         """
         if self.interactive:
-            questioner = InteractiveMigrationQuestioner()
+            questioner = InteractiveMigrationQuestioner(prompt_output=self.log_output)
         else:
             questioner = MigrationQuestioner(defaults={'ask_merge': True})
 
@@ -276,11 +305,11 @@ class Command(BaseCommand):
             # (can_optimize_through) to automatically see if they're
             # mergeable. For now, we always just prompt the user.
             if self.verbosity > 0:
-                self.stdout.write(self.style.MIGRATE_HEADING("Merging %s" % app_label))
+                self.log(self.style.MIGRATE_HEADING('Merging %s' % app_label))
                 for migration in merge_migrations:
-                    self.stdout.write(self.style.MIGRATE_LABEL("  Branch %s" % migration.name))
+                    self.log(self.style.MIGRATE_LABEL('  Branch %s' % migration.name))
                     for operation in migration.merged_operations:
-                        self.stdout.write('    - %s' % operation.describe())
+                        self.log('    - %s' % operation.describe())
             if questioner.ask_merge(app_label):
                 # If they still want to merge it, then write out an empty
                 # file depending on the migrations needing merging.
@@ -314,12 +343,14 @@ class Command(BaseCommand):
                     with open(writer.path, "w", encoding='utf-8') as fh:
                         fh.write(writer.as_string())
                     if self.verbosity > 0:
-                        self.stdout.write("\nCreated new merge migration %s" % writer.path)
+                        self.log('\nCreated new merge migration %s' % writer.path)
+                        if self.scriptable:
+                            self.stdout.write(writer.path)
                 elif self.verbosity == 3:
                     # Alternatively, makemigrations --merge --dry-run --verbosity 3
-                    # will output the merge migrations to stdout rather than saving
-                    # the file to the disk.
-                    self.stdout.write(self.style.MIGRATE_HEADING(
+                    # will log the merge migrations rather than saving the file
+                    # to the disk.
+                    self.log(self.style.MIGRATE_HEADING(
                         "Full merge migrations file '%s':" % writer.filename
                     ))
-                    self.stdout.write(writer.as_string())
+                    self.log(writer.as_string())

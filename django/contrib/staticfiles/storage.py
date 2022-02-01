@@ -1,4 +1,3 @@
-import hashlib
 import json
 import os
 import posixpath
@@ -10,6 +9,7 @@ from django.contrib.staticfiles.utils import check_settings, matches_patterns
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
+from django.utils.crypto import md5
 from django.utils.functional import LazyObject
 
 
@@ -42,12 +42,25 @@ class StaticFilesStorage(FileSystemStorage):
 
 
 class HashedFilesMixin:
-    default_template = """url("%s")"""
+    default_template = """url("%(url)s")"""
     max_post_process_passes = 5
     patterns = (
         ("*.css", (
-            r"""(url\(['"]{0,1}\s*(.*?)["']{0,1}\))""",
-            (r"""(@import\s*["']\s*(.*?)["'])""", """@import url("%s")"""),
+            r"""(?P<matched>url\(['"]{0,1}\s*(?P<url>.*?)["']{0,1}\))""",
+            (
+                r"""(?P<matched>@import\s*["']\s*(?P<url>.*?)["'])""",
+                """@import url("%(url)s")""",
+            ),
+            (
+                r'(?m)(?P<matched>)^(/\*# (?-i:sourceMappingURL)=(?P<url>.*) \*/)$',
+                '/*# sourceMappingURL=%(url)s */',
+            ),
+        )),
+        ('*.js', (
+            (
+                r'(?m)(?P<matched>)^(//# (?-i:sourceMappingURL)=(?P<url>.*))$',
+                '//# sourceMappingURL=%(url)s',
+            ),
         )),
     )
     keep_intermediate_files = True
@@ -71,10 +84,10 @@ class HashedFilesMixin:
         """
         if content is None:
             return None
-        md5 = hashlib.md5()
+        hasher = md5(usedforsecurity=False)
         for chunk in content.chunks():
-            md5.update(chunk)
-        return md5.hexdigest()[:12]
+            hasher.update(chunk)
+        return hasher.hexdigest()[:12]
 
     def hashed_name(self, name, content=None, filename=None):
         # `filename` is the name of file to hash if `content` isn't given.
@@ -160,7 +173,9 @@ class HashedFilesMixin:
             This requires figuring out which files the matched URL resolves
             to and calling the url() method of the storage.
             """
-            matched, url = matchobj.groups()
+            matches = matchobj.groupdict()
+            matched = matches['matched']
+            url = matches['url']
 
             # Ignore absolute/protocol-relative and data-uri URLs.
             if re.match(r'^[a-z]+:', url):
@@ -196,7 +211,8 @@ class HashedFilesMixin:
                 transformed_url += ('?#' if '?#' in url else '#') + fragment
 
             # Return the hashed version to the file
-            return template % unquote(transformed_url)
+            matches['url'] = unquote(transformed_url)
+            return template % matches
 
         return converter
 
@@ -226,17 +242,26 @@ class HashedFilesMixin:
             path for path in paths
             if matches_patterns(path, self._patterns)
         ]
-        # Do a single pass first. Post-process all files once, then repeat for
-        # adjustable files.
+
+        # Adjustable files to yield at end, keyed by the original path.
+        processed_adjustable_paths = {}
+
+        # Do a single pass first. Post-process all files once, yielding not
+        # adjustable files and exceptions, and collecting adjustable files.
         for name, hashed_name, processed, _ in self._post_process(paths, adjustable_paths, hashed_files):
-            yield name, hashed_name, processed
+            if name not in adjustable_paths or isinstance(processed, Exception):
+                yield name, hashed_name, processed
+            else:
+                processed_adjustable_paths[name] = (name, hashed_name, processed)
 
         paths = {path: paths[path] for path in adjustable_paths}
+        substitutions = False
 
         for i in range(self.max_post_process_passes):
             substitutions = False
             for name, hashed_name, processed, subst in self._post_process(paths, adjustable_paths, hashed_files):
-                yield name, hashed_name, processed
+                # Overwrite since hashed_name may be newer.
+                processed_adjustable_paths[name] = (name, hashed_name, processed)
                 substitutions = substitutions or subst
 
             if not substitutions:
@@ -247,6 +272,9 @@ class HashedFilesMixin:
 
         # Store the processed paths
         self.hashed_files.update(hashed_files)
+
+        # Yield adjustable files with final, hashed name.
+        yield from processed_adjustable_paths.values()
 
     def _post_process(self, paths, adjustable_paths, hashed_files):
         # Sort the files by directory level
@@ -368,13 +396,16 @@ class ManifestFilesMixin(HashedFilesMixin):
     manifest_strict = True
     keep_intermediate_files = False
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, manifest_storage=None, **kwargs):
         super().__init__(*args, **kwargs)
+        if manifest_storage is None:
+            manifest_storage = self
+        self.manifest_storage = manifest_storage
         self.hashed_files = self.load_manifest()
 
     def read_manifest(self):
         try:
-            with self.open(self.manifest_name) as manifest:
+            with self.manifest_storage.open(self.manifest_name) as manifest:
                 return manifest.read().decode()
         except FileNotFoundError:
             return None
@@ -402,10 +433,10 @@ class ManifestFilesMixin(HashedFilesMixin):
 
     def save_manifest(self):
         payload = {'paths': self.hashed_files, 'version': self.manifest_version}
-        if self.exists(self.manifest_name):
-            self.delete(self.manifest_name)
+        if self.manifest_storage.exists(self.manifest_name):
+            self.manifest_storage.delete(self.manifest_name)
         contents = json.dumps(payload).encode()
-        self._save(self.manifest_name, ContentFile(contents))
+        self.manifest_storage._save(self.manifest_name, ContentFile(contents))
 
     def stored_name(self, name):
         parsed_name = urlsplit(unquote(name))

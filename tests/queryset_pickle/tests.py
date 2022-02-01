@@ -5,7 +5,9 @@ import django
 from django.db import models
 from django.test import TestCase
 
-from .models import Container, Event, Group, Happening, M2MModel, MyEvent
+from .models import (
+    BinaryFieldModel, Container, Event, Group, Happening, M2MModel, MyEvent,
+)
 
 
 class PickleabilityTestCase(TestCase):
@@ -15,6 +17,10 @@ class PickleabilityTestCase(TestCase):
 
     def assert_pickles(self, qs):
         self.assertEqual(list(pickle.loads(pickle.dumps(qs))), list(qs))
+
+    def test_binaryfield(self):
+        BinaryFieldModel.objects.create(data=b'binary data')
+        self.assert_pickles(BinaryFieldModel.objects.all())
 
     def test_related_field(self):
         g = Group.objects.create(name="Ponies Who Own Maybachs")
@@ -171,6 +177,17 @@ class PickleabilityTestCase(TestCase):
         m2ms = M2MModel.objects.prefetch_related('groups')
         m2ms = pickle.loads(pickle.dumps(m2ms))
         self.assertSequenceEqual(m2ms, [m2m])
+
+    def test_pickle_boolean_expression_in_Q__queryset(self):
+        group = Group.objects.create(name='group')
+        Event.objects.create(title='event', group=group)
+        groups = Group.objects.filter(
+            models.Q(models.Exists(
+                Event.objects.filter(group_id=models.OuterRef('id')),
+            )),
+        )
+        groups2 = pickle.loads(pickle.dumps(groups))
+        self.assertSequenceEqual(groups2, [group])
 
     def test_pickle_exists_queryset_still_usable(self):
         group = Group.objects.create(name='group')

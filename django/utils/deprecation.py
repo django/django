@@ -5,15 +5,12 @@ import warnings
 from asgiref.sync import sync_to_async
 
 
-class RemovedInDjango40Warning(DeprecationWarning):
+class RemovedInNextVersionWarning(DeprecationWarning):
     pass
 
 
-class RemovedInDjango41Warning(PendingDeprecationWarning):
+class RemovedInDjango50Warning(PendingDeprecationWarning):
     pass
-
-
-RemovedInNextVersionWarning = RemovedInDjango40Warning
 
 
 class warn_about_renamed_method:
@@ -89,13 +86,22 @@ class MiddlewareMixin:
     sync_capable = True
     async_capable = True
 
-    # RemovedInDjango40Warning: when the deprecation ends, replace with:
-    #   def __init__(self, get_response):
-    def __init__(self, get_response=None):
-        self._get_response_none_deprecation(get_response)
+    def __init__(self, get_response):
+        if get_response is None:
+            raise ValueError('get_response must be provided.')
         self.get_response = get_response
         self._async_check()
         super().__init__()
+
+    def __repr__(self):
+        return '<%s get_response=%s>' % (
+            self.__class__.__qualname__,
+            getattr(
+                self.get_response,
+                '__qualname__',
+                self.get_response.__class__.__name__,
+            ),
+        )
 
     def _async_check(self):
         """
@@ -106,10 +112,12 @@ class MiddlewareMixin:
             # Mark the class as async-capable, but do the actual switch
             # inside __call__ to avoid swapping out dunder methods
             self._is_coroutine = asyncio.coroutines._is_coroutine
+        else:
+            self._is_coroutine = None
 
     def __call__(self, request):
         # Exit out to async mode, if needed
-        if asyncio.iscoroutinefunction(self.get_response):
+        if self._is_coroutine:
             return self.__acall__(request)
         response = None
         if hasattr(self, 'process_request'):
@@ -137,11 +145,3 @@ class MiddlewareMixin:
                 thread_sensitive=True,
             )(request, response)
         return response
-
-    def _get_response_none_deprecation(self, get_response):
-        if get_response is None:
-            warnings.warn(
-                'Passing None for the middleware get_response argument is '
-                'deprecated.',
-                RemovedInDjango40Warning, stacklevel=3,
-            )

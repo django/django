@@ -12,13 +12,11 @@ object.
 
 See docs/topics/cache.txt for information on the public API.
 """
-from asgiref.local import Local
-
-from django.conf import settings
 from django.core import signals
 from django.core.cache.backends.base import (
     BaseCache, CacheKeyWarning, InvalidCacheBackendError, InvalidCacheKey,
 )
+from django.utils.connection import BaseConnectionHandler, ConnectionProxy
 from django.utils.module_loading import import_string
 
 __all__ = [
@@ -29,95 +27,39 @@ __all__ = [
 DEFAULT_CACHE_ALIAS = 'default'
 
 
-def _create_cache(backend, **kwargs):
-    try:
-        # Try to get the CACHES entry for the given backend name first
+class CacheHandler(BaseConnectionHandler):
+    settings_name = 'CACHES'
+    exception_class = InvalidCacheBackendError
+
+    def create_connection(self, alias):
+        params = self.settings[alias].copy()
+        backend = params.pop('BACKEND')
+        location = params.pop('LOCATION', '')
         try:
-            conf = settings.CACHES[backend]
-        except KeyError:
-            try:
-                # Trying to import the given backend, in case it's a dotted path
-                import_string(backend)
-            except ImportError as e:
-                raise InvalidCacheBackendError("Could not find backend '%s': %s" % (
-                    backend, e))
-            location = kwargs.pop('LOCATION', '')
-            params = kwargs
-        else:
-            params = {**conf, **kwargs}
-            backend = params.pop('BACKEND')
-            location = params.pop('LOCATION', '')
-        backend_cls = import_string(backend)
-    except ImportError as e:
-        raise InvalidCacheBackendError(
-            "Could not find backend '%s': %s" % (backend, e))
-    return backend_cls(location, params)
-
-
-class CacheHandler:
-    """
-    A Cache Handler to manage access to Cache instances.
-
-    Ensure only one instance of each alias exists per thread.
-    """
-    def __init__(self):
-        self._caches = Local()
-
-    def __getitem__(self, alias):
-        try:
-            return self._caches.caches[alias]
-        except AttributeError:
-            self._caches.caches = {}
-        except KeyError:
-            pass
-
-        if alias not in settings.CACHES:
+            backend_cls = import_string(backend)
+        except ImportError as e:
             raise InvalidCacheBackendError(
-                "Could not find config for '%s' in settings.CACHES" % alias
-            )
+                "Could not find backend '%s': %s" % (backend, e)
+            ) from e
+        return backend_cls(location, params)
 
-        cache = _create_cache(alias)
-        self._caches.caches[alias] = cache
-        return cache
-
-    def all(self):
-        return getattr(self._caches, 'caches', {}).values()
+    def all(self, initialized_only=False):
+        return [
+            self[alias] for alias in self
+            # If initialized_only is True, return only initialized caches.
+            if not initialized_only or hasattr(self._connections, alias)
+        ]
 
 
 caches = CacheHandler()
 
-
-class DefaultCacheProxy:
-    """
-    Proxy access to the default Cache object's attributes.
-
-    This allows the legacy `cache` object to be thread-safe using the new
-    ``caches`` API.
-    """
-    def __getattr__(self, name):
-        return getattr(caches[DEFAULT_CACHE_ALIAS], name)
-
-    def __setattr__(self, name, value):
-        return setattr(caches[DEFAULT_CACHE_ALIAS], name, value)
-
-    def __delattr__(self, name):
-        return delattr(caches[DEFAULT_CACHE_ALIAS], name)
-
-    def __contains__(self, key):
-        return key in caches[DEFAULT_CACHE_ALIAS]
-
-    def __eq__(self, other):
-        return caches[DEFAULT_CACHE_ALIAS] == other
-
-
-cache = DefaultCacheProxy()
+cache = ConnectionProxy(caches, DEFAULT_CACHE_ALIAS)
 
 
 def close_caches(**kwargs):
-    # Some caches -- python-memcached in particular -- need to do a cleanup at the
-    # end of a request cycle. If not implemented in a particular backend
-    # cache.close is a no-op
-    for cache in caches.all():
+    # Some caches need to do a cleanup at the end of a request cycle. If not
+    # implemented in a particular backend cache.close() is a no-op.
+    for cache in caches.all(initialized_only=True):
         cache.close()
 
 

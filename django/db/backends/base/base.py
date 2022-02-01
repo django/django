@@ -6,7 +6,10 @@ import warnings
 from collections import deque
 from contextlib import contextmanager
 
-import pytz
+try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -21,6 +24,14 @@ from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 
 NO_DB_ALIAS = '__no_db__'
+
+
+# RemovedInDjango50Warning
+def timezone_constructor(tzname):
+    if settings.USE_DEPRECATED_PYTZ:
+        import pytz
+        return pytz.timezone(tzname)
+    return zoneinfo.ZoneInfo(tzname)
 
 
 class BaseDatabaseWrapper:
@@ -68,6 +79,8 @@ class BaseDatabaseWrapper:
         self.savepoint_state = 0
         # List of savepoints created by 'atomic'.
         self.savepoint_ids = []
+        # Stack of active 'atomic' blocks.
+        self.atomic_blocks = []
         # Tracks if the outermost 'atomic' block should commit on exit,
         # ie. if autocommit was active on entry.
         self.commit_on_exit = True
@@ -79,6 +92,8 @@ class BaseDatabaseWrapper:
         self.close_at = None
         self.closed_in_transaction = False
         self.errors_occurred = False
+        self.health_check_enabled = False
+        self.health_check_done = False
 
         # Thread-safety related attributes.
         self._thread_sharing_lock = threading.Lock()
@@ -106,6 +121,12 @@ class BaseDatabaseWrapper:
         self.introspection = self.introspection_class(self)
         self.ops = self.ops_class(self)
         self.validation = self.validation_class(self)
+
+    def __repr__(self):
+        return (
+            f'<{self.__class__.__qualname__} '
+            f'vendor={self.vendor!r} alias={self.alias!r}>'
+        )
 
     def ensure_timezone(self):
         """
@@ -135,7 +156,7 @@ class BaseDatabaseWrapper:
         elif self.settings_dict['TIME_ZONE'] is None:
             return timezone.utc
         else:
-            return pytz.timezone(self.settings_dict['TIME_ZONE'])
+            return timezone_constructor(self.settings_dict['TIME_ZONE'])
 
     @cached_property
     def timezone_name(self):
@@ -189,12 +210,16 @@ class BaseDatabaseWrapper:
         # In case the previous connection was closed while in an atomic block
         self.in_atomic_block = False
         self.savepoint_ids = []
+        self.atomic_blocks = []
         self.needs_rollback = False
-        # Reset parameters defining when to close the connection
+        # Reset parameters defining when to close/health-check the connection.
+        self.health_check_enabled = self.settings_dict['CONN_HEALTH_CHECKS']
         max_age = self.settings_dict['CONN_MAX_AGE']
         self.close_at = None if max_age is None else time.monotonic() + max_age
         self.closed_in_transaction = False
         self.errors_occurred = False
+        # New connections are healthy.
+        self.health_check_done = True
         # Establish the connection
         conn_params = self.get_connection_params()
         self.connection = self.get_new_connection(conn_params)
@@ -232,6 +257,7 @@ class BaseDatabaseWrapper:
         return wrapped_cursor
 
     def _cursor(self, name=None):
+        self.close_if_health_check_failed()
         self.ensure_connection()
         with self.wrap_database_errors:
             return self._prepare_cursor(self.create_cursor(name))
@@ -402,6 +428,7 @@ class BaseDatabaseWrapper:
         backends.
         """
         self.validate_no_atomic_block()
+        self.close_if_health_check_failed()
         self.ensure_connection()
 
         start_transaction_under_autocommit = (
@@ -499,12 +526,26 @@ class BaseDatabaseWrapper:
         raise NotImplementedError(
             "subclasses of BaseDatabaseWrapper may require an is_usable() method")
 
+    def close_if_health_check_failed(self):
+        """Close existing connection if it fails a health check."""
+        if (
+            self.connection is None or
+            not self.health_check_enabled or
+            self.health_check_done
+        ):
+            return
+
+        if not self.is_usable():
+            self.close()
+        self.health_check_done = True
+
     def close_if_unusable_or_obsolete(self):
         """
         Close the current connection if unrecoverable errors have occurred
         or if it outlived its maximum age.
         """
         if self.connection is not None:
+            self.health_check_done = False
             # If the application didn't restore the original autocommit setting,
             # don't take chances, drop the connection.
             if self.get_autocommit() != self.settings_dict['AUTOCOMMIT']:
@@ -516,6 +557,7 @@ class BaseDatabaseWrapper:
             if self.errors_occurred:
                 if self.is_usable():
                     self.errors_occurred = False
+                    self.health_check_done = True
                 else:
                     self.close()
                     return

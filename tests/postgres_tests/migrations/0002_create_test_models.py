@@ -99,6 +99,7 @@ class Migration(migrations.Migration):
                     'field_nested',
                     ArrayField(ArrayField(models.IntegerField(), size=None, null=True), size=None, null=True),
                 ),
+                ('order', models.IntegerField(null=True)),
             ],
             options={
                 'required_db_vendor': 'postgresql',
@@ -109,7 +110,7 @@ class Migration(migrations.Migration):
             name='CharFieldModel',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('field', models.CharField(max_length=16)),
+                ('field', models.CharField(max_length=64)),
             ],
             options=None,
             bases=None,
@@ -141,7 +142,7 @@ class Migration(migrations.Migration):
             name='Scene',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('scene', models.CharField(max_length=255)),
+                ('scene', models.TextField()),
                 ('setting', models.CharField(max_length=255)),
             ],
             options=None,
@@ -201,6 +202,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('boolean_field', models.BooleanField(null=True)),
                 ('char_field', models.CharField(max_length=30, blank=True)),
+                ('text_field', models.TextField(blank=True)),
                 ('integer_field', models.IntegerField(null=True)),
                 ('json_field', models.JSONField(null=True)),
             ],
@@ -247,6 +249,7 @@ class Migration(migrations.Migration):
                 ('decimals', DecimalRangeField(null=True, blank=True)),
                 ('timestamps', DateTimeRangeField(null=True, blank=True)),
                 ('timestamps_inner', DateTimeRangeField(null=True, blank=True)),
+                ('timestamps_closed_bounds', DateTimeRangeField(null=True, blank=True, default_bounds='[]')),
                 ('dates', DateRangeField(null=True, blank=True)),
                 ('dates_inner', DateRangeField(null=True, blank=True)),
             ],

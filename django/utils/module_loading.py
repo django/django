@@ -1,7 +1,19 @@
 import copy
 import os
+import sys
 from importlib import import_module
 from importlib.util import find_spec as importlib_find
+
+
+def cached_import(module_path, class_name):
+    # Check whether module is loaded and fully initialized.
+    if not (
+        (module := sys.modules.get(module_path)) and
+        (spec := getattr(module, '__spec__', None)) and
+        getattr(spec, '_initializing', False) is False
+    ):
+        module = import_module(module_path)
+    return getattr(module, class_name)
 
 
 def import_string(dotted_path):
@@ -14,10 +26,8 @@ def import_string(dotted_path):
     except ValueError as err:
         raise ImportError("%s doesn't look like a module path" % dotted_path) from err
 
-    module = import_module(module_path)
-
     try:
-        return getattr(module, class_name)
+        return cached_import(module_path, class_name)
     except AttributeError as err:
         raise ImportError('Module "%s" does not define a "%s" attribute/class' % (
             module_path, class_name)
@@ -72,10 +82,9 @@ def module_has_submodule(package, module_name):
     full_module_name = package_name + '.' + module_name
     try:
         return importlib_find(full_module_name, package_path) is not None
-    except (ModuleNotFoundError, AttributeError):
+    except ModuleNotFoundError:
         # When module_name is an invalid dotted path, Python raises
-        # ModuleNotFoundError. AttributeError is raised on PY36 (fixed in PY37)
-        # if the penultimate part of the path is not a package.
+        # ModuleNotFoundError.
         return False
 
 
@@ -86,7 +95,7 @@ def module_dir(module):
     Raise ValueError otherwise, e.g. for namespace packages that are split
     over several directories.
     """
-    # Convert to list because _NamespacePath does not support indexing.
+    # Convert to list because __path__ may not support indexing.
     paths = list(getattr(module, '__path__', []))
     if len(paths) == 1:
         return paths[0]

@@ -31,6 +31,7 @@ urlpatterns = [
 
     path('technical404/', views.technical404, name='my404'),
     path('classbased404/', views.Http404View.as_view()),
+    path('classbased500/', views.Raises500View.as_view()),
 
     # i18n views
     path('i18n/', include('django.conf.urls.i18n')),
@@ -58,6 +59,11 @@ urlpatterns += i18n_patterns(
 )
 
 urlpatterns += [
+    path(
+        'safestring_exception/',
+        views.safestring_in_template_exception,
+        name='safestring_exception',
+    ),
     path('template_exception/', views.template_exception, name='template_exception'),
     path(
         'raises_template_does_not_exist/<path:path>',

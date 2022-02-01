@@ -59,7 +59,7 @@ from django.template.context import BaseContext
 from django.utils.formats import localize
 from django.utils.html import conditional_escape, escape
 from django.utils.regex_helper import _lazy_re_compile
-from django.utils.safestring import SafeData, mark_safe
+from django.utils.safestring import SafeData, SafeString, mark_safe
 from django.utils.text import (
     get_text_list, smart_split, unescape_string_literal,
 )
@@ -78,7 +78,6 @@ VARIABLE_TAG_START = '{{'
 VARIABLE_TAG_END = '}}'
 COMMENT_TAG_START = '{#'
 COMMENT_TAG_END = '#}'
-TRANSLATOR_COMMENT_MARK = 'Translators'
 SINGLE_BRACE_START = '{'
 SINGLE_BRACE_END = '}'
 
@@ -86,12 +85,10 @@ SINGLE_BRACE_END = '}'
 # (e.g. strings)
 UNKNOWN_SOURCE = '<unknown source>'
 
-# match a variable or block tag and capture the entire tag, including start/end
-# delimiters
-tag_re = (_lazy_re_compile('(%s.*?%s|%s.*?%s|%s.*?%s)' %
-          (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END),
-           re.escape(VARIABLE_TAG_START), re.escape(VARIABLE_TAG_END),
-           re.escape(COMMENT_TAG_START), re.escape(COMMENT_TAG_END))))
+# Match BLOCK_TAG_*, VARIABLE_TAG_*, and COMMENT_TAG_* tags and capture the
+# entire tag, including start/end delimiters. Using re.compile() is faster
+# than instantiating SimpleLazyObject with _lazy_re_compile().
+tag_re = re.compile(r'({%.*?%}|{{.*?}}|{#.*?#})')
 
 logger = logging.getLogger('django.template')
 
@@ -121,6 +118,9 @@ class Origin:
 
     def __str__(self):
         return self.name
+
+    def __repr__(self):
+        return '<%s name=%r>' % (self.__class__.__qualname__, self.name)
 
     def __eq__(self, other):
         return (
@@ -157,6 +157,12 @@ class Template:
     def __iter__(self):
         for node in self.nodelist:
             yield from node
+
+    def __repr__(self):
+        return '<%s template_string="%s...">' % (
+            self.__class__.__qualname__,
+            self.source[:20].replace('\n', ''),
+        )
 
     def _render(self, context):
         return self.nodelist.render(context)
@@ -308,7 +314,7 @@ class Token:
         self.lineno = lineno
         self.position = position
 
-    def __str__(self):
+    def __repr__(self):
         token_name = self.token_type.name.capitalize()
         return ('<%s token: "%s...">' %
                 (token_name, self.contents[:20].replace('\n', '')))
@@ -334,6 +340,13 @@ class Lexer:
         self.template_string = template_string
         self.verbatim = False
 
+    def __repr__(self):
+        return '<%s template_string="%s...", verbatim=%s>' % (
+            self.__class__.__qualname__,
+            self.template_string[:20].replace('\n', ''),
+            self.verbatim,
+        )
+
     def tokenize(self):
         """
         Return a list of tokens from a given template_string.
@@ -341,11 +354,11 @@ class Lexer:
         in_tag = False
         lineno = 1
         result = []
-        for bit in tag_re.split(self.template_string):
-            if bit:
-                result.append(self.create_token(bit, None, lineno, in_tag))
+        for token_string in tag_re.split(self.template_string):
+            if token_string:
+                result.append(self.create_token(token_string, None, lineno, in_tag))
+                lineno += token_string.count('\n')
             in_tag = not in_tag
-            lineno += bit.count('\n')
         return result
 
     def create_token(self, token_string, position, lineno, in_tag):
@@ -354,53 +367,66 @@ class Lexer:
         If in_tag is True, we are processing something that matched a tag,
         otherwise it should be treated as a literal string.
         """
-        if in_tag and token_string.startswith(BLOCK_TAG_START):
-            # The [2:-2] ranges below strip off *_TAG_START and *_TAG_END.
-            # We could do len(BLOCK_TAG_START) to be more "correct", but we've
-            # hard-coded the 2s here for performance. And it's not like
-            # the TAG_START values are going to change anytime, anyway.
-            block_content = token_string[2:-2].strip()
-            if self.verbatim and block_content == self.verbatim:
-                self.verbatim = False
-        if in_tag and not self.verbatim:
-            if token_string.startswith(VARIABLE_TAG_START):
-                return Token(TokenType.VAR, token_string[2:-2].strip(), position, lineno)
-            elif token_string.startswith(BLOCK_TAG_START):
-                if block_content[:9] in ('verbatim', 'verbatim '):
-                    self.verbatim = 'end%s' % block_content
-                return Token(TokenType.BLOCK, block_content, position, lineno)
-            elif token_string.startswith(COMMENT_TAG_START):
-                content = ''
-                if token_string.find(TRANSLATOR_COMMENT_MARK):
-                    content = token_string[2:-2].strip()
+        if in_tag:
+            # The [0:2] and [2:-2] ranges below strip off *_TAG_START and
+            # *_TAG_END. The 2's are hard-coded for performance. Using
+            # len(BLOCK_TAG_START) would permit BLOCK_TAG_START to be
+            # different, but it's not likely that the TAG_START values will
+            # change anytime soon.
+            token_start = token_string[0:2]
+            if token_start == BLOCK_TAG_START:
+                content = token_string[2:-2].strip()
+                if self.verbatim:
+                    # Then a verbatim block is being processed.
+                    if content != self.verbatim:
+                        return Token(TokenType.TEXT, token_string, position, lineno)
+                    # Otherwise, the current verbatim block is ending.
+                    self.verbatim = False
+                elif content[:9] in ('verbatim', 'verbatim '):
+                    # Then a verbatim block is starting.
+                    self.verbatim = 'end%s' % content
+                return Token(TokenType.BLOCK, content, position, lineno)
+            if not self.verbatim:
+                content = token_string[2:-2].strip()
+                if token_start == VARIABLE_TAG_START:
+                    return Token(TokenType.VAR, content, position, lineno)
+                # BLOCK_TAG_START was handled above.
+                assert token_start == COMMENT_TAG_START
                 return Token(TokenType.COMMENT, content, position, lineno)
-        else:
-            return Token(TokenType.TEXT, token_string, position, lineno)
+        return Token(TokenType.TEXT, token_string, position, lineno)
 
 
 class DebugLexer(Lexer):
+    def _tag_re_split_positions(self):
+        last = 0
+        for match in tag_re.finditer(self.template_string):
+            start, end = match.span()
+            yield last, start
+            yield start, end
+            last = end
+        yield last, len(self.template_string)
+
+    # This parallels the use of tag_re.split() in Lexer.tokenize().
+    def _tag_re_split(self):
+        for position in self._tag_re_split_positions():
+            yield self.template_string[slice(*position)], position
+
     def tokenize(self):
         """
         Split a template string into tokens and annotates each token with its
         start and end position in the source. This is slower than the default
         lexer so only use it when debug is True.
         """
+        # For maintainability, it is helpful if the implementation below can
+        # continue to closely parallel Lexer.tokenize()'s implementation.
+        in_tag = False
         lineno = 1
         result = []
-        upto = 0
-        for match in tag_re.finditer(self.template_string):
-            start, end = match.span()
-            if start > upto:
-                token_string = self.template_string[upto:start]
-                result.append(self.create_token(token_string, (upto, start), lineno, in_tag=False))
+        for token_string, position in self._tag_re_split():
+            if token_string:
+                result.append(self.create_token(token_string, position, lineno, in_tag))
                 lineno += token_string.count('\n')
-            token_string = self.template_string[start:end]
-            result.append(self.create_token(token_string, (start, end), lineno, in_tag=True))
-            lineno += token_string.count('\n')
-            upto = end
-        last_bit = self.template_string[upto:]
-        if last_bit:
-            result.append(self.create_token(last_bit, (upto, upto + len(last_bit)), lineno, in_tag=False))
+            in_tag = not in_tag
         return result
 
 
@@ -423,6 +449,9 @@ class Parser:
             self.add_library(builtin)
         self.origin = origin
 
+    def __repr__(self):
+        return '<%s tokens=%r>' % (self.__class__.__qualname__, self.tokens)
+
     def parse(self, parse_until=None):
         """
         Iterate through the parser tokens and compiles each one into a node.
@@ -438,9 +467,10 @@ class Parser:
         while self.tokens:
             token = self.next_token()
             # Use the raw values here for TokenType.* for a tiny performance boost.
-            if token.token_type.value == 0:  # TokenType.TEXT
+            token_type = token.token_type.value
+            if token_type == 0:  # TokenType.TEXT
                 self.extend_nodelist(nodelist, TextNode(token.contents), token)
-            elif token.token_type.value == 1:  # TokenType.VAR
+            elif token_type == 1:  # TokenType.VAR
                 if not token.contents:
                     raise self.error(token, 'Empty variable tag on line %d' % token.lineno)
                 try:
@@ -449,7 +479,7 @@ class Parser:
                     raise self.error(token, e)
                 var_node = VariableNode(filter_expression)
                 self.extend_nodelist(nodelist, var_node, token)
-            elif token.token_type.value == 2:  # TokenType.BLOCK
+            elif token_type == 2:  # TokenType.BLOCK
                 try:
                     command = token.contents.split()[0]
                 except IndexError:
@@ -496,7 +526,7 @@ class Parser:
             raise self.error(
                 token, '%r must be the first tag in the template.' % node,
             )
-        if isinstance(nodelist, NodeList) and not isinstance(node, TextNode):
+        if not isinstance(node, TextNode):
             nodelist.contains_nontext = True
         # Set origin and token here since we can't modify the node __init__()
         # method.
@@ -664,9 +694,10 @@ class FilterExpression:
 
         self.filters = filters
         self.var = var_obj
+        self.is_var = isinstance(var_obj, Variable)
 
     def resolve(self, context, ignore_failures=False):
-        if isinstance(self.var, Variable):
+        if self.is_var:
             try:
                 obj = self.var.resolve(context)
             except VariableDoesNotExist:
@@ -723,6 +754,9 @@ class FilterExpression:
     def __str__(self):
         return self.token
 
+    def __repr__(self):
+        return "<%s %r>" % (self.__class__.__qualname__, self.token)
+
 
 class Variable:
     """
@@ -765,13 +799,13 @@ class Variable:
             if '.' in var or 'e' in var.lower():
                 self.literal = float(var)
                 # "2." is invalid
-                if var.endswith('.'):
+                if var[-1] == '.':
                     raise ValueError
             else:
                 self.literal = int(var)
         except ValueError:
             # A ValueError means that the variable isn't a number.
-            if var.startswith('_(') and var.endswith(')'):
+            if var[0:2] == '_(' and var[-1] == ')':
                 # The result of the lookup should be translated at rendering
                 # time.
                 self.translate = True
@@ -783,7 +817,7 @@ class Variable:
             except ValueError:
                 # Otherwise we'll set self.lookups so that resolve() knows we're
                 # dealing with a bonafide variable
-                if var.find(VARIABLE_ATTRIBUTE_SEPARATOR + '_') > -1 or var[0] == '_':
+                if VARIABLE_ATTRIBUTE_SEPARATOR + '_' in var or var[0] == '_':
                     raise TemplateSyntaxError("Variables and attributes may "
                                               "not begin with underscores: '%s'" %
                                               var)
@@ -904,8 +938,17 @@ class Node:
         try:
             return self.render(context)
         except Exception as e:
-            if context.template.engine.debug and not hasattr(e, 'template_debug'):
-                e.template_debug = context.render_context.template.get_exception_info(e, self.token)
+            if context.template.engine.debug:
+                # Store the actual node that caused the exception.
+                if not hasattr(e, '_culprit_node'):
+                    e._culprit_node = self
+                if (
+                    not hasattr(e, 'template_debug') and
+                    context.render_context.template.origin == e._culprit_node.origin
+                ):
+                    e.template_debug = context.render_context.template.get_exception_info(
+                        e, e._culprit_node.token,
+                    )
             raise
 
     def __iter__(self):
@@ -932,14 +975,9 @@ class NodeList(list):
     contains_nontext = False
 
     def render(self, context):
-        bits = []
-        for node in self:
-            if isinstance(node, Node):
-                bit = node.render_annotated(context)
-            else:
-                bit = node
-            bits.append(str(bit))
-        return mark_safe(''.join(bits))
+        return SafeString(''.join([
+            node.render_annotated(context) for node in self
+        ]))
 
     def get_nodes_by_type(self, nodetype):
         "Return a list of all nodes of the given type"
@@ -950,6 +988,8 @@ class NodeList(list):
 
 
 class TextNode(Node):
+    child_nodelists = ()
+
     def __init__(self, s):
         self.s = s
 
@@ -957,6 +997,15 @@ class TextNode(Node):
         return "<%s: %r>" % (self.__class__.__name__, self.s[:25])
 
     def render(self, context):
+        return self.s
+
+    def render_annotated(self, context):
+        """
+        Return the given value.
+
+        The default implementation of this method handles exceptions raised
+        during rendering, which is not necessary for text nodes.
+        """
         return self.s
 
 
@@ -977,6 +1026,8 @@ def render_value_in_context(value, context):
 
 
 class VariableNode(Node):
+    child_nodelists = ()
+
     def __init__(self, filter_expression):
         self.filter_expression = filter_expression
 

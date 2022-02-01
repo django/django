@@ -146,7 +146,8 @@ class WhereNode(tree.Node):
         value) tuples, or objects supporting .clone().
         """
         clone = self.__class__._new_instance(
-            children=[], connector=self.connector, negated=self.negated)
+            children=None, connector=self.connector, negated=self.negated,
+        )
         for child in self.children:
             if hasattr(child, 'clone'):
                 clone.children.append(child.clone())
@@ -182,10 +183,6 @@ class WhereNode(tree.Node):
     def contains_over_clause(self):
         return self._contains_over_clause(self)
 
-    @property
-    def is_summary(self):
-        return any(child.is_summary for child in self.children)
-
     @staticmethod
     def _resolve_leaf(expr, query, *args, **kwargs):
         if hasattr(expr, 'resolve_expression'):
@@ -207,6 +204,25 @@ class WhereNode(tree.Node):
         clone._resolve_node(clone, *args, **kwargs)
         clone.resolved = True
         return clone
+
+    @cached_property
+    def output_field(self):
+        from django.db.models import BooleanField
+        return BooleanField()
+
+    def select_format(self, compiler, sql, params):
+        # Wrap filters with a CASE WHEN expression if a database backend
+        # (e.g. Oracle) doesn't support boolean expression in SELECT or GROUP
+        # BY list.
+        if not compiler.connection.features.supports_boolean_expr_in_select_clause:
+            sql = f'CASE WHEN {sql} THEN 1 ELSE 0 END'
+        return sql, params
+
+    def get_db_converters(self, connection):
+        return self.output_field.get_db_converters(connection)
+
+    def get_lookup(self, lookup):
+        return self.output_field.get_lookup(lookup)
 
 
 class NothingNode:
@@ -239,6 +255,7 @@ class SubqueryConstraint:
         self.alias = alias
         self.columns = columns
         self.targets = targets
+        query_object.clear_ordering(clear_default=True)
         self.query_object = query_object
 
     def as_sql(self, compiler, connection):

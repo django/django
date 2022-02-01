@@ -118,8 +118,8 @@ class ExtraRegressTests(TestCase):
         extra() bits.
         """
         qs = User.objects.all().extra(where=['id=%s'], params=[self.u.id])
-        self.assertQuerysetEqual(qs, ['<User: fred>'])
-        self.assertQuerysetEqual(qs[:1], ['<User: fred>'])
+        self.assertSequenceEqual(qs, [self.u])
+        self.assertSequenceEqual(qs[:1], [self.u])
 
     def test_regression_8039(self):
         """
@@ -140,17 +140,17 @@ class ExtraRegressTests(TestCase):
         Regression test for #8819: Fields in the extra(select=...) list
         should be available to extra(order_by=...).
         """
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             User.objects.filter(pk=self.u.id).extra(select={'extra_field': 1}).distinct(),
-            ['<User: fred>']
+            [self.u],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             User.objects.filter(pk=self.u.id).extra(select={'extra_field': 1}, order_by=['extra_field']),
-            ['<User: fred>']
+            [self.u],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             User.objects.filter(pk=self.u.id).extra(select={'extra_field': 1}, order_by=['extra_field']).distinct(),
-            ['<User: fred>']
+            [self.u],
         )
 
     def test_dates_query(self):
@@ -364,11 +364,11 @@ class ExtraRegressTests(TestCase):
             [{'pk': obj.pk}]
         )
 
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             TestObject.objects.filter(
                 pk__in=TestObject.objects.extra(select={'extra': 1}).values('pk')
             ),
-            ['<TestObject: TestObject: first,second,third>']
+            [obj],
         )
 
         self.assertEqual(
@@ -376,16 +376,16 @@ class ExtraRegressTests(TestCase):
             [{'pk': obj.pk}]
         )
 
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             TestObject.objects.filter(
                 pk__in=TestObject.objects.values('pk').extra(select={'extra': 1})
             ),
-            ['<TestObject: TestObject: first,second,third>']
+            [obj],
         )
 
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             TestObject.objects.filter(pk=obj.pk) | TestObject.objects.extra(where=["id > %s"], params=[obj.pk]),
-            ['<TestObject: TestObject: first,second,third>']
+            [obj],
         )
 
     def test_regression_17877(self):
@@ -394,11 +394,9 @@ class ExtraRegressTests(TestCase):
         contain OR operations.
         """
         # Test Case 1: should appear in queryset.
-        t = TestObject(first='a', second='a', third='a')
-        t.save()
+        t1 = TestObject.objects.create(first='a', second='a', third='a')
         # Test Case 2: should appear in queryset.
-        t = TestObject(first='b', second='a', third='a')
-        t.save()
+        t2 = TestObject.objects.create(first='b', second='a', third='a')
         # Test Case 3: should not appear in queryset, bug case.
         t = TestObject(first='a', second='a', third='b')
         t.save()
@@ -412,12 +410,11 @@ class ExtraRegressTests(TestCase):
         t = TestObject(first='a', second='b', third='b')
         t.save()
 
-        self.assertQuerysetEqual(
+        self.assertCountEqual(
             TestObject.objects.extra(
                 where=["first = 'a' OR second = 'a'", "third = 'a'"],
             ),
-            ['<TestObject: TestObject: a,a,a>', '<TestObject: TestObject: b,a,a>'],
-            ordered=False
+            [t1, t2],
         )
 
     def test_extra_values_distinct_ordering(self):

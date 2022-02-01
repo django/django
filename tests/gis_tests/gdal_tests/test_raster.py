@@ -2,9 +2,10 @@ import os
 import shutil
 import struct
 import tempfile
+import zipfile
 from unittest import mock
 
-from django.contrib.gis.gdal import GDAL_VERSION, GDALRaster, SpatialReference
+from django.contrib.gis.gdal import GDALRaster, SpatialReference
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.raster.band import GDALBand
 from django.contrib.gis.shortcuts import numpy
@@ -229,6 +230,17 @@ class GDALRasterTests(SimpleTestCase):
         # The vsi buffer is None for rasters that are not vsi based.
         self.assertIsNone(self.rs.vsi_buffer)
 
+    def test_vsi_vsizip_filesystem(self):
+        rst_zipfile = tempfile.NamedTemporaryFile(suffix='.zip')
+        with zipfile.ZipFile(rst_zipfile, mode='w') as zf:
+            zf.write(self.rs_path, 'raster.tif')
+        rst_path = '/vsizip/' + os.path.join(rst_zipfile.name, 'raster.tif')
+        rst = GDALRaster(rst_path)
+        self.assertEqual(rst.driver.name, self.rs.driver.name)
+        self.assertEqual(rst.name, rst_path)
+        self.assertIs(rst.is_vsi_based, True)
+        self.assertIsNone(rst.vsi_buffer)
+
     def test_offset_size_and_shape_on_raster_creation(self):
         rast = GDALRaster({
             'datatype': 1,
@@ -270,8 +282,6 @@ class GDALRasterTests(SimpleTestCase):
         self.assertEqual(result, [23] * 4)
 
     def test_set_nodata_none_on_raster_creation(self):
-        if GDAL_VERSION < (2, 1):
-            self.skipTest("GDAL >= 2.1 is required for this test.")
         # Create raster without data and without nodata value.
         rast = GDALRaster({
             'datatype': 1,
@@ -322,11 +332,6 @@ class GDALRasterTests(SimpleTestCase):
         self.assertNotIn('OWNER', source.metadata['DEFAULT'])
 
     def test_raster_info_accessor(self):
-        if GDAL_VERSION < (2, 1):
-            msg = 'GDAL ≥ 2.1 is required for using the info property.'
-            with self.assertRaisesMessage(ValueError, msg):
-                self.rs.info
-            return
         infos = self.rs.info
         # Data
         info_lines = [line.strip() for line in infos.split('\n') if line.strip() != '']
@@ -389,8 +394,7 @@ class GDALRasterTests(SimpleTestCase):
         compressed = GDALRaster(compressed.name)
         self.assertEqual(compressed.metadata['IMAGE_STRUCTURE']['COMPRESSION'], 'PACKBITS',)
         self.assertEqual(compressed.bands[0].metadata['IMAGE_STRUCTURE']['PIXELTYPE'], 'SIGNEDBYTE')
-        if GDAL_VERSION >= (2, 1):
-            self.assertIn('Block=40x23', compressed.info)
+        self.assertIn('Block=40x23', compressed.info)
 
     def test_raster_warp(self):
         # Create in memory raster
@@ -796,13 +800,8 @@ class GDALBandTests(SimpleTestCase):
             'height': 1,
             'bands': [{'data': [0], 'nodata_value': 1}],
         })
-        if GDAL_VERSION < (2, 1):
-            msg = 'GDAL >= 2.1 required to delete nodata values.'
-            with self.assertRaisesMessage(ValueError, msg):
-                rsmem.bands[0].nodata_value = None
-        else:
-            rsmem.bands[0].nodata_value = None
-            self.assertIsNone(rsmem.bands[0].nodata_value)
+        rsmem.bands[0].nodata_value = None
+        self.assertIsNone(rsmem.bands[0].nodata_value)
 
     def test_band_data_replication(self):
         band = GDALRaster({

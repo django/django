@@ -13,10 +13,10 @@ To create any syndication feed, all you have to do is write a short
 Python class. You can create as many feeds as you want.
 
 Django also comes with a lower-level feed-generating API. Use this if
-you want to generate feeds outside of a Web context, or in some other
+you want to generate feeds outside of a web context, or in some other
 lower-level way.
 
-.. _RSS: http://www.whatisrss.com/
+.. _RSS: https://developer.mozilla.org/en-US/docs/Glossary/RSS
 
 The high-level framework
 ========================
@@ -906,11 +906,6 @@ This example illustrates all possible attributes and methods for a
 
         item_comments = 'https://www.example.com/comments' # Hard-coded comments URL
 
-.. versionchanged:: 3.2
-
-    Support for a comments URL per feed item was added through the
-    ``item_comments`` hook.
-
 The low-level framework
 =======================
 
@@ -1014,7 +1009,7 @@ For example, to create an Atom 1.0 feed and print it to standard output::
     >>> from django.utils import feedgenerator
     >>> from datetime import datetime
     >>> f = feedgenerator.Atom1Feed(
-    ...     title="My Weblog",
+    ...     title="My Blog",
     ...     link="https://www.example.com/",
     ...     description="In which I write about what I ate today.",
     ...     language="en",

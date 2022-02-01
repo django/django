@@ -411,9 +411,14 @@ class StumpJoke(models.Model):
         Character,
         models.CASCADE,
         limit_choices_to=today_callable_dict,
-        related_name="+",
+        related_name='jokes',
     )
-    has_fooled_today = models.ManyToManyField(Character, limit_choices_to=today_callable_q, related_name="+")
+    has_fooled_today = models.ManyToManyField(
+        Character,
+        limit_choices_to=today_callable_q,
+        related_name='jokes_today',
+    )
+    funny = models.BooleanField(default=False)
 
 
 # Model for #13776
@@ -475,3 +480,20 @@ class NullableUniqueCharFieldModel(models.Model):
     email = models.EmailField(blank=True, null=True)
     slug = models.SlugField(blank=True, null=True)
     url = models.URLField(blank=True, null=True)
+
+
+class Number(models.Model):
+    value = models.IntegerField()
+
+
+class NumbersToDice(models.Model):
+    number = models.ForeignKey('Number', on_delete=models.CASCADE)
+    die = models.ForeignKey('Dice', on_delete=models.CASCADE)
+
+
+class Dice(models.Model):
+    numbers = models.ManyToManyField(
+        Number,
+        through=NumbersToDice,
+        limit_choices_to=models.Q(value__gte=1),
+    )

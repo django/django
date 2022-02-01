@@ -5,14 +5,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jargalan <jargalanch@gmail.com>, 2011
 # Zorig, 2016
-# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2016,2018-2019
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2016,2018-2019,2021
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-02-13 09:17+0000\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-16 17:18+0000\n"
 "Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
@@ -21,6 +21,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: mn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Сонгосон %(verbose_name_plural)s-ийг устга"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -32,10 +36,6 @@ msgstr "%(name)s устгаж чадахгүй."
 
 msgid "Are you sure?"
 msgstr "Итгэлтэй байна уу?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Сонгосон %(verbose_name_plural)s-ийг устга"
 
 msgid "Administration"
 msgstr "Удирдлага"
@@ -72,6 +72,12 @@ msgstr "Огноогүй"
 
 msgid "Has date"
 msgstr "Огноотой"
+
+msgid "Empty"
+msgstr ""
+
+msgid "Not empty"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -130,23 +136,23 @@ msgid "log entries"
 msgstr "лог өгөгдөлүүд"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "\"%(object)s\" нэмсэн."
+msgid "Added “%(object)s”."
+msgstr "Нэмэгдсэн \"%(object)s\"."
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "\"%(object)s\"-ийг %(changes)s өөрчилсөн."
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "Өөрчлөгдсөн \"%(object)s\"— %(changes)s"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "\"%(object)s\" устгасан."
+msgid "Deleted “%(object)s.”"
+msgstr "Устгагдсан \"%(object)s\"."
 
 msgid "LogEntry Object"
 msgstr "Лог бүртгэлийн обект"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr "Нэмэгдсэн {name} \"{object}\"."
+msgid "Added {name} “{object}”."
+msgstr ""
 
 msgid "Added."
 msgstr "Нэмэгдсэн."
@@ -155,16 +161,16 @@ msgid "and"
 msgstr "ба"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "{name} \"{object}\"-ны {fields} өөрчилөгдсөн."
+msgid "Changed {fields} for {name} “{object}”."
+msgstr ""
 
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr "Өөрчлөгдсөн {fields}."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr "Устгасан {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
+msgstr ""
 
 msgid "No fields changed."
 msgstr "Өөрчилсөн талбар алга байна."
@@ -172,48 +178,39 @@ msgstr "Өөрчилсөн талбар алга байна."
 msgid "None"
 msgstr "Хоосон"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
-"Олон утга сонгохын тулд \"Control\", эсвэл Mac дээр \"Command\" товчыг дарж "
-"байгаад сонгоно."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr " {name} \"{obj}\" амжилттай нэмэгдлээ."
+msgid "The {name} “{obj}” was added successfully."
+msgstr ""
 
 msgid "You may edit it again below."
 msgstr "Та дараахийг дахин засах боломжтой"
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
-"{name} \"{obj}\" амжилттай нэмэгдлээ. Доорх хэсгээс {name} өөрийн нэмэх "
-"боломжтой."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" амжилттай өөрчилөгдлөө. Та дахин засах боломжтой."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" амжилттай нэмэгдлээ. Та дахин засах боломжтой."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
+msgid "The {name} “{obj}” was changed successfully."
 msgstr ""
-"{name} \"{obj}\" амжилттай өөрчилөгдлөө. Доорх хэсгээс {name} өөрийн нэмэх "
-"боломжтой."
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
-msgstr "{name} \"{obj}\" амжилттай засагдлаа."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -225,13 +222,12 @@ msgid "No action selected."
 msgstr "Үйлдэл сонгоогүй."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr " %(name)s \"%(obj)s\" амжилттай устгагдлаа."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr ""
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
-"\"%(key)s\" дугаартай %(name)s байхгүй байна. Устсан байсан юм болов уу?"
 
 #, python-format
 msgid "Add %s"
@@ -301,8 +297,8 @@ msgstr "%(app)s удирдлага"
 msgid "Page not found"
 msgstr "Хуудас олдсонгүй."
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Уучлаарай, хандахыг хүссэн хуудас тань олдсонгүй."
+msgid "We’re sorry, but the requested page could not be found."
+msgstr ""
 
 msgid "Home"
 msgstr "Нүүр"
@@ -317,11 +313,9 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Серверийн алдаа <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Алдаа гарсан байна. Энэ алдааг сайт хариуцагчид имэйлээр мэдэгдсэн бөгөөд "
-"тэд нэн даруй засах хэрэгтэй. Хүлээцтэй хандсанд баярлалаа."
 
 msgid "Run the selected action"
 msgstr "Сонгосон үйлдэлийг ажилуулах"
@@ -339,12 +333,23 @@ msgstr "Бүгдийг сонгох %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Сонгосонг цэвэрлэх"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "%(name)s хэрэглүүр дэх моделууд."
+
+msgid "Add"
+msgstr "Нэмэх"
+
+msgid "View"
+msgstr "Харах"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr ""
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
-"Эхлээд хэрэглэгчийн нэр нууц үгээ оруулна уу. Ингэснээр та хэрэглэгчийн "
-"сонголтыг нэмж засварлах боломжтой болно. "
 
 msgid "Enter a username and password."
 msgstr "Хэрэглэгчийн нэр ба нууц үгээ оруулна."
@@ -387,6 +392,9 @@ msgstr "Сайтаас харах"
 msgid "Filter"
 msgstr "Шүүлтүүр"
 
+msgid "Clear all filters"
+msgstr ""
+
 msgid "Remove from sorting"
 msgstr "Эрэмблэлтээс хасах"
 
@@ -428,8 +436,8 @@ msgstr ""
 msgid "Objects"
 msgstr "Бичлэгүүд"
 
-msgid "Yes, I'm sure"
-msgstr "Тийм, итгэлтэй байна."
+msgid "Yes, I’m sure"
+msgstr ""
 
 msgid "No, take me back"
 msgstr "Үгүй, намайг буцаа"
@@ -462,9 +470,6 @@ msgstr ""
 "Та %(objects_name)s ийг устгах гэж байна итгэлтэй байна? Дараах обектууд "
 "болон холбоотой зүйлс хамт устагдах болно:"
 
-msgid "View"
-msgstr "Харах"
-
 msgid "Delete?"
 msgstr "Устгах уу?"
 
@@ -474,16 +479,6 @@ msgstr " %(filter_title)s -ээр"
 
 msgid "Summary"
 msgstr "Нийт"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s хэрэглүүр дэх моделууд."
-
-msgid "Add"
-msgstr "Нэмэх"
-
-msgid "You don't have permission to view or edit anything."
-msgstr "Танд харах болон засах эрх алга."
 
 msgid "Recent actions"
 msgstr "Сүүлд хийсэн үйлдлүүд"
@@ -498,13 +493,10 @@ msgid "Unknown content"
 msgstr "Тодорхойгүй агуулга"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Өгөгдлийн сангийн ямар нэг зүйл буруу суугдсан байна. Өгөгдлийн сангийн "
-"зохих хүснэгт үүсгэгдсэн эсэх, өгөгдлийн санг зохих хэрэглэгч унших "
-"боломжтой байгаа эсэхийг шалгаарай."
 
 #, python-format
 msgid ""
@@ -517,6 +509,15 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "Таны мартсан нууц үг эсвэл нэрвтэр нэр?"
 
+msgid "Toggle navigation"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
+
 msgid "Date/time"
 msgstr "Огноо/цаг"
 
@@ -527,11 +528,9 @@ msgid "Action"
 msgstr "Үйлдэл"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
-"Уг объектэд өөрчлөлтийн түүх байхгүй байна. Магадгүй үүнийг уг удирдлагын "
-"сайтаар дамжуулан нэмээгүй байх."
 
 msgid "Show all"
 msgstr "Бүгдийг харуулах"
@@ -582,8 +581,8 @@ msgstr "Өөр %(model)s нэмэх"
 msgid "Delete selected %(model)s"
 msgstr "Сонгосон %(model)s устгах"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Манай вэб сайтыг ашигласанд баярлалаа."
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
 
 msgid "Log in again"
 msgstr "Ахин нэвтрэх "
@@ -595,11 +594,9 @@ msgid "Your password was changed."
 msgstr "Нууц үг тань өөрчлөгдлөө."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Аюулгүй байдлын үүднээс хуучин нууц үгээ оруулаад шинэ нууц үгээ хоёр удаа "
-"хийнэ үү. Ингэснээр нууц үгээ зөв бичиж байгаа эсэхийг тань шалгах юм."
 
 msgid "Change my password"
 msgstr "Нууц үгээ  солих"
@@ -634,18 +631,14 @@ msgstr ""
 "байж болзошгүй.  Шинэ нууц үг авахаар хүсэлт гаргана уу. "
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Таны оруулсан имайл хаяг бүртгэлтэй бол таны имайл хаягруу нууц үг "
-"тохируулах зааварыг удахгүй очих болно. Та удахгүй имайл хүлээж авах болно. "
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"Хэрвээ та имайл хүлээж аваагүй бол оруулсан имайл хаягаараа бүртгүүлсэн "
-"эсхээ шалгаад мөн имайлийнхаа Spam фолдер ийг шалгана уу."
 
 #, python-format
 msgid ""
@@ -658,8 +651,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Дараах хуудас руу орон шинэ нууц үг сонгоно уу:"
 
-msgid "Your username, in case you've forgotten:"
-msgstr "Хэрэглэгчийн нэрээ мартсан бол :"
+msgid "Your username, in case you’ve forgotten:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "Манай сайтыг хэрэглэсэнд баярлалаа!"
@@ -669,11 +662,9 @@ msgid "The %(site_name)s team"
 msgstr "%(site_name)s баг"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"Нууц үгээ мартсан уу? Доорх хэсэгт имайл хаягаа оруулвал бид хаягаар тань "
-"нууц үг сэргэх зааварчилгаа явуулах болно."
 
 msgid "Email address:"
 msgstr "Имэйл хаяг:"

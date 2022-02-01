@@ -9,6 +9,7 @@ from django.test.utils import extend_sys_path
 from django.utils.module_loading import (
     autodiscover_modules, import_string, module_has_submodule,
 )
+from django.utils.version import PY310
 
 
 class DefaultLoader(unittest.TestCase):
@@ -184,32 +185,38 @@ class AutodiscoverModulesTestCase(SimpleTestCase):
         self.assertEqual(site._registry, {'lorem': 'ipsum'})
 
 
-class TestFinder:
-    def __init__(self, *args, **kwargs):
-        self.importer = zipimporter(*args, **kwargs)
+if PY310:
+    class TestFinder:
+        def __init__(self, *args, **kwargs):
+            self.importer = zipimporter(*args, **kwargs)
 
-    def find_module(self, path):
-        importer = self.importer.find_module(path)
-        if importer is None:
-            return
-        return TestLoader(importer)
+        def find_spec(self, path, target=None):
+            return self.importer.find_spec(path, target)
+else:
+    class TestFinder:
+        def __init__(self, *args, **kwargs):
+            self.importer = zipimporter(*args, **kwargs)
 
+        def find_module(self, path):
+            importer = self.importer.find_module(path)
+            if importer is None:
+                return
+            return TestLoader(importer)
 
-class TestLoader:
-    def __init__(self, importer):
-        self.importer = importer
+    class TestLoader:
+        def __init__(self, importer):
+            self.importer = importer
 
-    def load_module(self, name):
-        mod = self.importer.load_module(name)
-        mod.__loader__ = self
-        return mod
+        def load_module(self, name):
+            mod = self.importer.load_module(name)
+            mod.__loader__ = self
+            return mod
 
 
 class CustomLoader(EggLoader):
     """The Custom Loader test is exactly the same as the EggLoader, but
-    it uses a custom defined Loader and Finder that is intentionally
-    split into two classes. Although the EggLoader combines both functions
-    into one class, this isn't required.
+    it uses a custom defined Loader class. Although the EggLoader combines both
+    functions into one class, this isn't required.
     """
     def setUp(self):
         super().setUp()

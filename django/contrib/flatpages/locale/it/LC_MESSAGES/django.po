@@ -5,14 +5,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Marco Bonetti, 2014
 # Mirco Grillo <mirco.grillomg@gmail.com>, 2020
-# palmux <palmux@gmail.com>, 2015
+# palmux <palmux@gmail.com>, 2015,2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-07-23 08:58+0000\n"
-"Last-Translator: Mirco Grillo <mirco.grillomg@gmail.com>\n"
+"PO-Revision-Date: 2021-01-15 16:01+0000\n"
+"Last-Translator: palmux <palmux@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -71,8 +71,8 @@ msgid ""
 "Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
 "will use “flatpages/default.html”."
 msgstr ""
-"Esempio: 'flatpages/contact_page.html'. Se non specificato, il sistema userà "
-"'flatpages/default.html'."
+"Esempio: \"flatpages/contact_page.html\". Se non specificato, il sistema "
+"userà \"flatpages/default.html\"."
 
 msgid "registration required"
 msgstr "registrazione obbligatoria"

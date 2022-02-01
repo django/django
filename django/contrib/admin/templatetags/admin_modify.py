@@ -10,7 +10,7 @@ register = template.Library()
 
 def prepopulated_fields_js(context):
     """
-    Create a list of prepopulated_fields that should render Javascript for
+    Create a list of prepopulated_fields that should render JavaScript for
     the prepopulated fields for both the admin form and inlines.
     """
     prepopulated_fields = []
@@ -106,10 +106,11 @@ def cell_count(inline_admin_form):
     """Return the number of cells used in a tabular inline."""
     count = 1  # Hidden cell with hidden 'id' field
     for fieldset in inline_admin_form:
-        # Loop through all the fields (one per cell)
+        # Count all visible fields.
         for line in fieldset:
             for field in line:
-                count += 1
+                if not field.field.is_hidden:
+                    count += 1
     if inline_admin_form.formset.can_delete:
         # Delete checkbox
         count += 1

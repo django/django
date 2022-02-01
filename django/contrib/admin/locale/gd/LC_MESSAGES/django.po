@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# GunChleoc, 2015-2017
+# GunChleoc, 2015-2017,2021
 # GunChleoc, 2015
 # GunChleoc, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-12-13 12:51+0000\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-10-27 12:57+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
 "language/gd/)\n"
@@ -21,6 +21,10 @@ msgstr ""
 "(n > 2 && n < 20) ? 2 : 3;\n"
 
 #, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Sguab às na %(verbose_name_plural)s a chaidh a thaghadh"
+
+#, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Chaidh %(count)d %(items)s a sguabadh às."
 
@@ -30,10 +34,6 @@ msgstr "Chan urrainn dhuinn %(name)s a sguabadh às"
 
 msgid "Are you sure?"
 msgstr "A bheil thu cinnteach?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Sguab às na %(verbose_name_plural)s a chaidh a thaghadh"
 
 msgid "Administration"
 msgstr "Rianachd"
@@ -70,6 +70,12 @@ msgstr "Gun cheann-là"
 
 msgid "Has date"
 msgstr "Tha ceann-là aige"
+
+msgid "Empty"
+msgstr "Falamh"
+
+msgid "Not empty"
+msgstr "Neo-fhalamh"
 
 #, python-format
 msgid ""
@@ -345,6 +351,19 @@ msgstr "Tagh a h-uile %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Falamhaich an taghadh"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modailean ann an aplacaid %(name)s"
+
+msgid "Add"
+msgstr "Cuir ris"
+
+msgid "View"
+msgstr "Seall"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Chan eil cead agad gus dad a shealltainn no a dheasachadh."
+
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
@@ -394,6 +413,9 @@ msgstr "Seall e air an làrach"
 
 msgid "Filter"
 msgstr "Criathraich"
+
+msgid "Clear all filters"
+msgstr "Falamhaich gach crithrag"
 
 msgid "Remove from sorting"
 msgstr "Thoir air falbh on t-seòrsachadh"
@@ -474,9 +496,6 @@ msgstr ""
 "sguabadh às? Thèid a h-uile oibseact seo ’s na nithean dàimheach aca a "
 "sguabadh às:"
 
-msgid "View"
-msgstr "Seall"
-
 msgid "Delete?"
 msgstr "A bheil thu airson a sguabadh às?"
 
@@ -486,16 +505,6 @@ msgstr " le %(filter_title)s "
 
 msgid "Summary"
 msgstr "Gearr-chunntas"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modailean ann an aplacaid %(name)s"
-
-msgid "Add"
-msgstr "Cuir ris"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr "Chan eil cead agad gus dad a shealltainn no a dheasachadh."
 
 msgid "Recent actions"
 msgstr "Gnìomhan o chionn goirid"
@@ -529,6 +538,15 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr ""
 "An do dhìochuimhnich thu am facal-faire no an t-ainm-cleachdaiche agad?"
+
+msgid "Toggle navigation"
+msgstr "Toglaich an t-seòladaireachd"
+
+msgid "Start typing to filter…"
+msgstr "Tòisich air sgrìobhadh airson criathradh…"
+
+msgid "Filter navigation items"
+msgstr "Criathraich nithean na seòladaireachd"
 
 msgid "Date/time"
 msgstr "Ceann-là ’s àm"
@@ -597,7 +615,7 @@ msgstr "Cuir %(model)s eile ris"
 msgid "Delete selected %(model)s"
 msgstr "Sguab às a’ %(model)s a thagh thu"
 
-msgid "Thanks for spending some quality time with the Web site today."
+msgid "Thanks for spending some quality time with the web site today."
 msgstr ""
 "Mòran taing gun do chuir thu seachad deagh-àm air an làrach-lìn an-diugh."
 

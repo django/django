@@ -6,7 +6,9 @@ from admin_scripts.tests import AdminScriptTestCase
 
 from django.conf import settings
 from django.core import mail
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import (
+    DisallowedHost, PermissionDenied, SuspiciousOperation,
+)
 from django.core.files.temp import NamedTemporaryFile
 from django.core.management import color
 from django.http.multipartparser import MultiPartParserError
@@ -53,13 +55,8 @@ class SetupDefaultLoggingMixin:
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls._logging = settings.LOGGING
         logging.config.dictConfig(DEFAULT_LOGGING)
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        logging.config.dictConfig(cls._logging)
+        cls.addClassCleanup(logging.config.dictConfig, settings.LOGGING)
 
 
 class DefaultLoggingTests(SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleTestCase):
@@ -427,6 +424,22 @@ class AdminEmailHandlerTest(SimpleTestCase):
         msg = mail.outbox[0]
         self.assertEqual(msg.body, 'message\n\ncustom traceback text')
 
+    @override_settings(ADMINS=[('admin', 'admin@example.com')])
+    def test_emit_no_form_tag(self):
+        """HTML email doesn't contain forms."""
+        handler = AdminEmailHandler(include_html=True)
+        record = self.logger.makeRecord(
+            'name', logging.ERROR, 'function', 'lno', 'message', None, None,
+        )
+        handler.emit(record)
+        self.assertEqual(len(mail.outbox), 1)
+        msg = mail.outbox[0]
+        self.assertEqual(msg.subject, '[Django] ERROR: message')
+        self.assertEqual(len(msg.alternatives), 1)
+        body_html = str(msg.alternatives[0][0])
+        self.assertIn('<div id="traceback">', body_html)
+        self.assertNotIn('<form', body_html)
+
 
 class SettingsConfigTest(AdminScriptTestCase):
     """
@@ -487,6 +500,7 @@ class SecurityLoggerTest(LoggingAssertionMixin, SimpleTestCase):
             msg='dubious',
             status_code=400,
             logger='django.security.SuspiciousOperation',
+            exc_class=SuspiciousOperation,
         )
 
     def test_suspicious_operation_uses_sublogger(self):
@@ -496,6 +510,7 @@ class SecurityLoggerTest(LoggingAssertionMixin, SimpleTestCase):
             msg='dubious',
             status_code=400,
             logger='django.security.DisallowedHost',
+            exc_class=DisallowedHost,
         )
 
     @override_settings(
@@ -505,7 +520,7 @@ class SecurityLoggerTest(LoggingAssertionMixin, SimpleTestCase):
     def test_suspicious_email_admins(self):
         self.client.get('/suspicious/')
         self.assertEqual(len(mail.outbox), 1)
-        self.assertIn('Report at /suspicious/', mail.outbox[0].body)
+        self.assertIn('SuspiciousOperation at /suspicious/', mail.outbox[0].body)
 
 
 class SettingsCustomLoggingTest(AdminScriptTestCase):

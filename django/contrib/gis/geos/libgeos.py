@@ -57,7 +57,7 @@ def load_geos():
     # Getting the GEOS C library.  The C interface (CDLL) is used for
     # both *NIX and Windows.
     # See the GEOS C API source code for more details on the library function calls:
-    # https://geos.osgeo.org/doxygen/geos__c_8h_source.html
+    # https://libgeos.org/doxygen/geos__c_8h_source.html
     _lgeos = CDLL(lib_path)
     # Here we set up the prototypes for the initGEOS_r and finishGEOS_r
     # routines.  These functions aren't actually called until they are

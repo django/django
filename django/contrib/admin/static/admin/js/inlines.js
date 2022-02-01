@@ -218,12 +218,10 @@
             // instantiate a new SelectFilter instance for it.
             if (typeof SelectFilter !== 'undefined') {
                 $('.selectfilter').each(function(index, value) {
-                    const namearr = value.name.split('-');
-                    SelectFilter.init(value.id, namearr[namearr.length - 1], false);
+                    SelectFilter.init(value.id, this.dataset.fieldName, false);
                 });
                 $('.selectfilterstacked').each(function(index, value) {
-                    const namearr = value.name.split('-');
-                    SelectFilter.init(value.id, namearr[namearr.length - 1], true);
+                    SelectFilter.init(value.id, this.dataset.fieldName, true);
                 });
             }
         };
@@ -283,12 +281,10 @@
             // If any SelectFilter widgets were added, instantiate a new instance.
             if (typeof SelectFilter !== "undefined") {
                 $(".selectfilter").each(function(index, value) {
-                    const namearr = value.name.split('-');
-                    SelectFilter.init(value.id, namearr[namearr.length - 1], false);
+                    SelectFilter.init(value.id, this.dataset.fieldName, false);
                 });
                 $(".selectfilterstacked").each(function(index, value) {
-                    const namearr = value.name.split('-');
-                    SelectFilter.init(value.id, namearr[namearr.length - 1], true);
+                    SelectFilter.init(value.id, this.dataset.fieldName, true);
                 });
             }
         };
@@ -300,7 +296,13 @@
                     dependency_list = input.data('dependency_list') || [],
                     dependencies = [];
                 $.each(dependency_list, function(i, field_name) {
-                    dependencies.push('#' + row.find('.form-row .field-' + field_name).find('input, select, textarea').attr('id'));
+                    // Dependency in a fieldset.
+                    let field_element = row.find('.form-row .field-' + field_name);
+                    // Dependency without a fieldset.
+                    if (!field_element.length) {
+                        field_element = row.find('.form-row.field-' + field_name);
+                    }
+                    dependencies.push('#' + field_element.find('input, select, textarea').attr('id'));
                 });
                 if (dependencies.length) {
                     input.prepopulate(dependencies, input.attr('maxlength'));

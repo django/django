@@ -15,22 +15,28 @@ from pathlib import Path
 
 import django
 from django.conf import global_settings
-from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.core.validators import URLValidator
-from django.utils.deprecation import RemovedInDjango40Warning
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 
-PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG = (
-    'The PASSWORD_RESET_TIMEOUT_DAYS setting is deprecated. Use '
-    'PASSWORD_RESET_TIMEOUT instead.'
+# RemovedInDjango50Warning
+USE_DEPRECATED_PYTZ_DEPRECATED_MSG = (
+    'The USE_DEPRECATED_PYTZ setting, and support for pytz timezones is '
+    'deprecated in favor of the stdlib zoneinfo module. Please update your '
+    'code to use zoneinfo and remove the USE_DEPRECATED_PYTZ setting.'
 )
 
-DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG = (
-    'The DEFAULT_HASHING_ALGORITHM transitional setting is deprecated. '
-    'Support for it and tokens, cookies, sessions, and signatures that use '
-    'SHA-1 hashing algorithm will be removed in Django 4.0.'
+USE_L10N_DEPRECATED_MSG = (
+    'The USE_L10N setting is deprecated. Starting with Django 5.0, localized '
+    'formatting of data will always be enabled. For example Django will '
+    'display numbers and dates using the format of the current locale.'
+)
+
+CSRF_COOKIE_MASKED_DEPRECATED_MSG = (
+    'The CSRF_COOKIE_MASKED transitional setting is deprecated. Support for '
+    'it will be removed in Django 5.0.'
 )
 
 
@@ -132,14 +138,8 @@ class LazySettings(LazyObject):
         Useful when the app is being served at a subpath and manually prefixing
         subpath to STATIC_URL and MEDIA_URL in settings is inconvenient.
         """
-        # Don't apply prefix to valid URLs.
-        try:
-            URLValidator()(value)
-            return value
-        except (ValidationError, AttributeError):
-            pass
-        # Don't apply prefix to absolute paths.
-        if value.startswith('/'):
+        # Don't apply prefix to absolute paths and URLs.
+        if value.startswith(('http://', 'https://', '/')):
             return value
         from django.urls import get_script_prefix
         return '%s%s' % (get_script_prefix(), value)
@@ -150,18 +150,25 @@ class LazySettings(LazyObject):
         return self._wrapped is not empty
 
     @property
-    def PASSWORD_RESET_TIMEOUT_DAYS(self):
+    def USE_L10N(self):
         stack = traceback.extract_stack()
         # Show a warning if the setting is used outside of Django.
         # Stack index: -1 this line, -2 the caller.
         filename, _, _, _ = stack[-2]
         if not filename.startswith(os.path.dirname(django.__file__)):
             warnings.warn(
-                PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG,
-                RemovedInDjango40Warning,
+                USE_L10N_DEPRECATED_MSG,
+                RemovedInDjango50Warning,
                 stacklevel=2,
             )
-        return self.__getattr__('PASSWORD_RESET_TIMEOUT_DAYS')
+        return self.__getattr__('USE_L10N')
+
+    # RemovedInDjango50Warning.
+    @property
+    def _USE_L10N_INTERNAL(self):
+        # Special hook to avoid checking a traceback in internal use on hot
+        # paths.
+        return self.__getattr__('USE_L10N')
 
 
 class Settings:
@@ -177,9 +184,11 @@ class Settings:
         mod = importlib.import_module(self.SETTINGS_MODULE)
 
         tuple_settings = (
+            'ALLOWED_HOSTS',
             "INSTALLED_APPS",
             "TEMPLATE_DIRS",
             "LOCALE_PATHS",
+            "SECRET_KEY_FALLBACKS",
         )
         self._explicit_settings = set()
         for setting in dir(mod):
@@ -188,21 +197,23 @@ class Settings:
 
                 if (setting in tuple_settings and
                         not isinstance(setting_value, (list, tuple))):
-                    raise ImproperlyConfigured("The %s setting must be a list or a tuple. " % setting)
+                    raise ImproperlyConfigured("The %s setting must be a list or a tuple." % setting)
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
-        if self.is_overridden('PASSWORD_RESET_TIMEOUT_DAYS'):
-            if self.is_overridden('PASSWORD_RESET_TIMEOUT'):
-                raise ImproperlyConfigured(
-                    'PASSWORD_RESET_TIMEOUT_DAYS/PASSWORD_RESET_TIMEOUT are '
-                    'mutually exclusive.'
-                )
-            setattr(self, 'PASSWORD_RESET_TIMEOUT', self.PASSWORD_RESET_TIMEOUT_DAYS * 60 * 60 * 24)
-            warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
+        if self.USE_TZ is False and not self.is_overridden('USE_TZ'):
+            warnings.warn(
+                'The default value of USE_TZ will change from False to True '
+                'in Django 5.0. Set USE_TZ to False in your project settings '
+                'if you want to keep the current default behavior.',
+                category=RemovedInDjango50Warning,
+            )
 
-        if self.is_overridden('DEFAULT_HASHING_ALGORITHM'):
-            warnings.warn(DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG, RemovedInDjango40Warning)
+        if self.is_overridden('USE_DEPRECATED_PYTZ'):
+            warnings.warn(USE_DEPRECATED_PYTZ_DEPRECATED_MSG, RemovedInDjango50Warning)
+
+        if self.is_overridden('CSRF_COOKIE_MASKED'):
+            warnings.warn(CSRF_COOKIE_MASKED_DEPRECATED_MSG, RemovedInDjango50Warning)
 
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
@@ -215,6 +226,9 @@ class Settings:
             # we don't do this unconditionally (breaks Windows).
             os.environ['TZ'] = self.TIME_ZONE
             time.tzset()
+
+        if self.is_overridden('USE_L10N'):
+            warnings.warn(USE_L10N_DEPRECATED_MSG, RemovedInDjango50Warning)
 
     def is_overridden(self, setting):
         return setting in self._explicit_settings
@@ -247,12 +261,13 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        if name == 'PASSWORD_RESET_TIMEOUT_DAYS':
-            setattr(self, 'PASSWORD_RESET_TIMEOUT', value * 60 * 60 * 24)
-            warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
-        if name == 'DEFAULT_HASHING_ALGORITHM':
-            warnings.warn(DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG, RemovedInDjango40Warning)
+        if name == 'USE_L10N':
+            warnings.warn(USE_L10N_DEPRECATED_MSG, RemovedInDjango50Warning)
+        if name == 'CSRF_COOKIE_MASKED':
+            warnings.warn(CSRF_COOKIE_MASKED_DEPRECATED_MSG, RemovedInDjango50Warning)
         super().__setattr__(name, value)
+        if name == 'USE_DEPRECATED_PYTZ':
+            warnings.warn(USE_DEPRECATED_PYTZ_DEPRECATED_MSG, RemovedInDjango50Warning)
 
     def __delattr__(self, name):
         self._deleted.add(name)

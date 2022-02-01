@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django.test import TestCase
@@ -10,7 +11,7 @@ class GetObjectOr404Tests(TestCase):
         a1 = Author.objects.create(name="Brave Sir Robin")
         a2 = Author.objects.create(name="Patsy")
 
-        # No Articles yet, so we should get a Http404 error.
+        # No Articles yet, so we should get an Http404 error.
         with self.assertRaises(Http404):
             get_object_or_404(Article, title="Foo")
 
@@ -28,7 +29,7 @@ class GetObjectOr404Tests(TestCase):
             article
         )
 
-        # No articles containing "Camelot".  This should raise a Http404 error.
+        # No articles containing "Camelot". This should raise an Http404 error.
         with self.assertRaises(Http404):
             get_object_or_404(a1.article_set, title__contains="Camelot")
 
@@ -50,7 +51,7 @@ class GetObjectOr404Tests(TestCase):
         with self.assertRaises(Author.MultipleObjectsReturned):
             get_object_or_404(Author.objects.all())
 
-        # Using an empty QuerySet raises a Http404 error.
+        # Using an empty QuerySet raises an Http404 error.
         with self.assertRaises(Http404):
             get_object_or_404(Article.objects.none(), title__contains="Run")
 
@@ -74,6 +75,23 @@ class GetObjectOr404Tests(TestCase):
         self.assertEqual(
             get_list_or_404(Article.objects.all(), title__icontains="Run"),
             [article]
+        )
+        # Q objects.
+        self.assertEqual(
+            get_object_or_404(
+                Article,
+                Q(title__startswith='Run') | Q(title__startswith='Walk'),
+                authors__name__contains='Brave',
+            ),
+            article,
+        )
+        self.assertEqual(
+            get_list_or_404(
+                Article,
+                Q(title__startswith='Run') | Q(title__startswith='Walk'),
+                authors__name='Patsy',
+            ),
+            [article],
         )
 
     def test_bad_class(self):

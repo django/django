@@ -114,7 +114,7 @@ Detail Views
 
 * :meth:`~django.views.generic.base.View.as_view`
 * :meth:`~django.views.generic.base.View.dispatch`
-* ``get()``
+* :meth:`~django.views.generic.detail.BaseDetailView.get`
 * :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data`
 * :meth:`~django.views.generic.detail.SingleObjectMixin.get_object`
 * ``head()``

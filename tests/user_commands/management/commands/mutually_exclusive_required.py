@@ -7,6 +7,7 @@ class Command(BaseCommand):
         group = parser.add_mutually_exclusive_group(required=True)
         group.add_argument('--foo-id', type=int, nargs='?', default=None)
         group.add_argument('--foo-name', type=str, nargs='?', default=None)
+        group.add_argument('--foo-list', type=int, nargs='+')
         group.add_argument('--append_const', action='append_const', const=42)
         group.add_argument('--const', action='store_const', const=31)
         group.add_argument('--count', action='count')

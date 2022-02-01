@@ -1,4 +1,4 @@
-from django.db.models import TextField
+from django.db.models import Subquery, TextField
 from django.db.models.functions import Coalesce, Lower
 from django.test import TestCase
 from django.utils import timezone
@@ -70,3 +70,14 @@ class CoalesceTests(TestCase):
             authors, ['John Smith', 'Rhonda'],
             lambda a: a.name
         )
+
+    def test_empty_queryset(self):
+        Author.objects.create(name='John Smith')
+        tests = [
+            Author.objects.none(),
+            Subquery(Author.objects.none()),
+        ]
+        for empty_query in tests:
+            with self.subTest(empty_query.__class__.__name__):
+                qs = Author.objects.annotate(annotation=Coalesce(empty_query, 42))
+                self.assertEqual(qs.first().annotation, 42)

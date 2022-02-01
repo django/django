@@ -3,6 +3,7 @@ import datetime
 import threading
 import unittest
 import warnings
+from unittest import mock
 
 from django.core.management.color import no_style
 from django.db import (
@@ -20,7 +21,7 @@ from django.test import (
 
 from .models import (
     Article, Object, ObjectReference, Person, Post, RawData, Reporter,
-    ReporterProxy, SchoolClass, Square,
+    ReporterProxy, SchoolClass, SQLKeywordsModel, Square,
     VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ,
 )
 
@@ -491,6 +492,23 @@ class BackendTestCase(TransactionTestCase):
             BaseDatabaseWrapper.queries_limit = old_queries_limit
             new_connection.close()
 
+    @mock.patch('django.db.backends.utils.logger')
+    @override_settings(DEBUG=True)
+    def test_queries_logger(self, mocked_logger):
+        sql = 'SELECT 1' + connection.features.bare_select_suffix
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
+        params, kwargs = mocked_logger.debug.call_args
+        self.assertIn('; alias=%s', params[0])
+        self.assertEqual(params[2], sql)
+        self.assertIsNone(params[3])
+        self.assertEqual(params[4], connection.alias)
+        self.assertEqual(
+            list(kwargs['extra']),
+            ['duration', 'sql', 'params', 'alias'],
+        )
+        self.assertEqual(tuple(kwargs['extra'].values()), params[1:])
+
     def test_timezone_none_use_tz_false(self):
         connection.ensure_connection()
         with self.settings(TIME_ZONE=None, USE_TZ=False):
@@ -622,7 +640,18 @@ class FkConstraintsTests(TransactionTestCase):
             with connection.constraint_checks_disabled():
                 a.save()
                 with self.assertRaises(IntegrityError):
-                    connection.check_constraints()
+                    connection.check_constraints(table_names=[Article._meta.db_table])
+            transaction.set_rollback(True)
+
+    def test_check_constraints_sql_keywords(self):
+        with transaction.atomic():
+            obj = SQLKeywordsModel.objects.create(reporter=self.r)
+            obj.refresh_from_db()
+            obj.reporter_id = 30
+            with connection.constraint_checks_disabled():
+                obj.save()
+                with self.assertRaises(IntegrityError):
+                    connection.check_constraints(table_names=['order'])
             transaction.set_rollback(True)
 
 
@@ -665,10 +694,9 @@ class ThreadTests(TransactionTestCase):
             # (the connection opened in the main thread will automatically be
             # closed on teardown).
             for conn in connections_dict.values():
-                if conn is not connection:
-                    if conn.allow_thread_sharing:
-                        conn.close()
-                        conn.dec_thread_sharing()
+                if conn is not connection and conn.allow_thread_sharing:
+                    conn.close()
+                    conn.dec_thread_sharing()
 
     def test_connections_thread_local(self):
         """
@@ -702,10 +730,9 @@ class ThreadTests(TransactionTestCase):
             # (the connection opened in the main thread will automatically be
             # closed on teardown).
             for conn in connections_dict.values():
-                if conn is not connection:
-                    if conn.allow_thread_sharing:
-                        conn.close()
-                        conn.dec_thread_sharing()
+                if conn is not connection and conn.allow_thread_sharing:
+                    conn.close()
+                    conn.dec_thread_sharing()
 
     def test_pass_connection_between_threads(self):
         """

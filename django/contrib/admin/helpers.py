@@ -44,6 +44,13 @@ class AdminForm:
             readonly_fields = ()
         self.readonly_fields = readonly_fields
 
+    def __repr__(self):
+        return (
+            f'<{self.__class__.__qualname__}: '
+            f'form={self.form.__class__.__qualname__} '
+            f'fieldsets={self.fieldsets!r}>'
+        )
+
     def __iter__(self):
         for name, options in self.fieldsets:
             yield Fieldset(
@@ -170,11 +177,17 @@ class AdminReadonlyField:
         else:
             help_text = help_text_for_field(class_name, form._meta.model)
 
+        if field in form.fields:
+            is_hidden = form.fields[field].widget.is_hidden
+        else:
+            is_hidden = False
+
         self.field = {
             'name': class_name,
             'label': label,
             'help_text': help_text,
             'field': field,
+            'is_hidden': is_hidden,
         }
         self.form = form
         self.model_admin = model_admin
@@ -196,7 +209,11 @@ class AdminReadonlyField:
             remote_field.model._meta.model_name,
         )
         try:
-            url = reverse(url_name, args=[quote(remote_obj.pk)])
+            url = reverse(
+                url_name,
+                args=[quote(remote_obj.pk)],
+                current_app=self.model_admin.admin_site.name,
+            )
             return format_html('<a href="{}">{}</a>', url, remote_obj)
         except NoReverseMatch:
             return str(remote_obj)
@@ -295,6 +312,10 @@ class InlineAdminFormSet:
             if fk and fk.name == field_name:
                 continue
             if not self.has_change_permission or field_name in self.readonly_fields:
+                form_field = empty_form.fields.get(field_name)
+                widget_is_hidden = False
+                if form_field is not None:
+                    widget_is_hidden = form_field.widget.is_hidden
                 yield {
                     'name': field_name,
                     'label': meta_labels.get(field_name) or label_for_field(
@@ -303,7 +324,7 @@ class InlineAdminFormSet:
                         self.opts,
                         form=empty_form,
                     ),
-                    'widget': {'is_hidden': False},
+                    'widget': {'is_hidden': widget_is_hidden},
                     'required': False,
                     'help_text': meta_help_texts.get(field_name) or help_text_for_field(field_name, self.opts.model),
                 }

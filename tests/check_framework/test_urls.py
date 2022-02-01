@@ -134,6 +134,16 @@ class CheckUrlConfigTests(SimpleTestCase):
         result = check_url_namespaces_unique(None)
         self.assertEqual(result, [])
 
+    @override_settings(ROOT_URLCONF='check_framework.urls.cbv_as_view')
+    def test_check_view_not_class(self):
+        self.assertEqual(check_url_config(None), [
+            Error(
+                "Your URL pattern 'missing_as_view' has an invalid view, pass "
+                "EmptyCBV.as_view() instead of EmptyCBV.",
+                id='urls.E009',
+            ),
+        ])
+
 
 class UpdatedToPathTests(SimpleTestCase):
 
@@ -167,17 +177,38 @@ class UpdatedToPathTests(SimpleTestCase):
 
 class CheckCustomErrorHandlersTests(SimpleTestCase):
 
-    @override_settings(ROOT_URLCONF='check_framework.urls.bad_error_handlers')
-    def test_bad_handlers(self):
+    @override_settings(
+        ROOT_URLCONF='check_framework.urls.bad_function_based_error_handlers',
+    )
+    def test_bad_function_based_handlers(self):
         result = check_url_config(None)
         self.assertEqual(len(result), 4)
         for code, num_params, error in zip([400, 403, 404, 500], [2, 2, 2, 1], result):
             with self.subTest('handler{}'.format(code)):
                 self.assertEqual(error, Error(
-                    "The custom handler{} view "
-                    "'check_framework.urls.bad_error_handlers.bad_handler' "
+                    "The custom handler{} view 'check_framework.urls."
+                    "bad_function_based_error_handlers.bad_handler' "
                     "does not take the correct number of arguments (request{})."
                     .format(code, ', exception' if num_params == 2 else ''),
+                    id='urls.E007',
+                ))
+
+    @override_settings(
+        ROOT_URLCONF='check_framework.urls.bad_class_based_error_handlers',
+    )
+    def test_bad_class_based_handlers(self):
+        result = check_url_config(None)
+        self.assertEqual(len(result), 4)
+        for code, num_params, error in zip([400, 403, 404, 500], [2, 2, 2, 1], result):
+            with self.subTest('handler%s' % code):
+                self.assertEqual(error, Error(
+                    "The custom handler%s view 'check_framework.urls."
+                    "bad_class_based_error_handlers.HandlerView.as_view."
+                    "<locals>.view' does not take the correct number of "
+                    "arguments (request%s)." % (
+                        code,
+                        ', exception' if num_params == 2 else '',
+                    ),
                     id='urls.E007',
                 ))
 
@@ -204,8 +235,17 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
                     id='urls.E008',
                 ))
 
-    @override_settings(ROOT_URLCONF='check_framework.urls.good_error_handlers')
-    def test_good_handlers(self):
+    @override_settings(
+        ROOT_URLCONF='check_framework.urls.good_function_based_error_handlers',
+    )
+    def test_good_function_based_handlers(self):
+        result = check_url_config(None)
+        self.assertEqual(result, [])
+
+    @override_settings(
+        ROOT_URLCONF='check_framework.urls.good_class_based_error_handlers',
+    )
+    def test_good_class_based_handlers(self):
         result = check_url_config(None)
         self.assertEqual(result, [])
 

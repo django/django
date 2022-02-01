@@ -1,6 +1,7 @@
 """
 Unit tests for reverse URL lookups.
 """
+import pickle
 import sys
 import threading
 
@@ -271,8 +272,9 @@ class NoURLPatternsTests(SimpleTestCase):
         with self.assertRaisesMessage(
             ImproperlyConfigured,
             "The included URLconf 'urlpatterns_reverse.no_urls' does not "
-            "appear to have any patterns in it. If you see valid patterns in "
-            "the file then the issue is probably caused by a circular import."
+            "appear to have any patterns in it. If you see the 'urlpatterns' "
+            "variable with valid patterns in the file then the issue is "
+            "probably caused by a circular import."
         ):
             getattr(resolver, 'url_patterns')
 
@@ -1095,8 +1097,9 @@ class NoRootUrlConfTests(SimpleTestCase):
     def test_no_handler_exception(self):
         msg = (
             "The included URLconf 'None' does not appear to have any patterns "
-            "in it. If you see valid patterns in the file then the issue is "
-            "probably caused by a circular import."
+            "in it. If you see the 'urlpatterns' variable with valid patterns "
+            "in the file then the issue is probably caused by a circular "
+            "import."
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.client.get('/test/me/')
@@ -1141,9 +1144,44 @@ class ResolverMatchTests(SimpleTestCase):
         self.assertEqual(
             repr(resolve('/no_kwargs/42/37/')),
             "ResolverMatch(func=urlpatterns_reverse.views.empty_view, "
-            "args=('42', '37'), kwargs={}, url_name=no-kwargs, app_names=[], "
-            "namespaces=[], route=^no_kwargs/([0-9]+)/([0-9]+)/$)",
+            "args=('42', '37'), kwargs={}, url_name='no-kwargs', app_names=[], "
+            "namespaces=[], route='^no_kwargs/([0-9]+)/([0-9]+)/$')",
         )
+
+    @override_settings(ROOT_URLCONF='urlpatterns_reverse.reverse_lazy_urls')
+    def test_classbased_repr(self):
+        self.assertEqual(
+            repr(resolve('/redirect/')),
+            "ResolverMatch(func=urlpatterns_reverse.views.LazyRedirectView, "
+            "args=(), kwargs={}, url_name=None, app_names=[], "
+            "namespaces=[], route='redirect/')",
+        )
+
+    @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls')
+    def test_repr_functools_partial(self):
+        tests = [
+            ('partial', 'template.html'),
+            ('partial_nested', 'nested_partial.html'),
+            ('partial_wrapped', 'template.html'),
+        ]
+        for name, template_name in tests:
+            with self.subTest(name=name):
+                func = (
+                    f"functools.partial({views.empty_view!r}, "
+                    f"template_name='{template_name}')"
+                )
+                self.assertEqual(
+                    repr(resolve(f'/{name}/')),
+                    f"ResolverMatch(func={func}, args=(), kwargs={{}}, "
+                    f"url_name='{name}', app_names=[], namespaces=[], "
+                    f"route='{name}/')",
+                )
+
+    @override_settings(ROOT_URLCONF='urlpatterns.path_urls')
+    def test_pickling(self):
+        msg = 'Cannot pickle ResolverMatch.'
+        with self.assertRaisesMessage(pickle.PicklingError, msg):
+            pickle.dumps(resolve('/users/'))
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.erroneous_urls')

@@ -1,6 +1,7 @@
 import os
 import re
 from datetime import datetime
+from pathlib import Path
 
 from django.contrib.gis.gdal import (
     DataSource, Envelope, GDALException, OGRGeometry,
@@ -8,6 +9,7 @@ from django.contrib.gis.gdal import (
 from django.contrib.gis.gdal.field import (
     OFTDateTime, OFTInteger, OFTReal, OFTString,
 )
+from django.contrib.gis.geos import GEOSGeometry
 from django.test import SimpleTestCase
 
 from ..test_data import TEST_DATA, TestDS, get_ds_file
@@ -120,6 +122,11 @@ class DataSourceTest(SimpleTestCase):
             with self.assertRaisesMessage(IndexError, 'Invalid OGR layer name given: invalid.'):
                 ds.__getitem__('invalid')
 
+    def test_ds_input_pathlib(self):
+        test_shp = Path(get_ds_file('test_point', 'shp'))
+        ds = DataSource(test_shp)
+        self.assertEqual(len(ds), 1)
+
     def test02_invalid_shp(self):
         "Testing invalid SHP files for the Data Source."
         for source in bad_ds:
@@ -133,6 +140,8 @@ class DataSourceTest(SimpleTestCase):
 
             # Incrementing through each layer, this tests DataSource.__iter__
             for layer in ds:
+                self.assertEqual(layer.name, source.name)
+                self.assertEqual(str(layer), source.name)
                 # Making sure we get the number of features we expect
                 self.assertEqual(len(layer), source.nfeat)
 
@@ -248,9 +257,15 @@ class DataSourceTest(SimpleTestCase):
 
             # Incrementing through each layer and feature.
             for layer in ds:
-                for feat in layer:
+                geoms = layer.get_geoms()
+                geos_geoms = layer.get_geoms(geos=True)
+                self.assertEqual(len(geoms), len(geos_geoms))
+                self.assertEqual(len(geoms), len(layer))
+                for feat, geom, geos_geom in zip(layer, geoms, geos_geoms):
                     g = feat.geom
-
+                    self.assertEqual(geom, g)
+                    self.assertIsInstance(geos_geom, GEOSGeometry)
+                    self.assertEqual(g, geos_geom.ogr)
                     # Making sure we get the right Geometry name & type
                     self.assertEqual(source.geom, g.geom_name)
                     self.assertEqual(source.gtype, g.geom_type)
@@ -308,3 +323,10 @@ class DataSourceTest(SimpleTestCase):
         feat = ds[0][0]
         # Reference value obtained using `ogrinfo`.
         self.assertEqual(676586997978, feat.get('ALAND10'))
+
+    def test_nonexistent_field(self):
+        source = ds_list[0]
+        ds = DataSource(source.ds)
+        msg = 'invalid field name: nonexistent'
+        with self.assertRaisesMessage(GDALException, msg):
+            ds[0].get_fields('nonexistent')

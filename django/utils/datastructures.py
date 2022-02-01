@@ -25,6 +25,9 @@ class OrderedSet:
     def __iter__(self):
         return iter(self.dict)
 
+    def __reversed__(self):
+        return reversed(self.dict)
+
     def __contains__(self, item):
         return item in self.dict
 
@@ -33,6 +36,10 @@ class OrderedSet:
 
     def __len__(self):
         return len(self.dict)
+
+    def __repr__(self):
+        data = repr(list(self.dict)) if self.dict else ''
+        return f'{self.__class__.__qualname__}({data})'
 
 
 class MultiValueDictKeyError(KeyError):
@@ -58,7 +65,7 @@ class MultiValueDict(dict):
     >>> d.setlist('lastname', ['Holovaty', 'Willison'])
 
     This class exists to solve the irritating problem raised by cgi.parse_qs,
-    which returns a list for every key, even though most Web forms submit
+    which returns a list for every key, even though most web forms submit
     single name-value pairs.
     """
     def __init__(self, key_to_list_mapping=()):
@@ -194,16 +201,15 @@ class MultiValueDict(dict):
         if len(args) > 1:
             raise TypeError("update expected at most 1 argument, got %d" % len(args))
         if args:
-            other_dict = args[0]
-            if isinstance(other_dict, MultiValueDict):
-                for key, value_list in other_dict.lists():
+            arg = args[0]
+            if isinstance(arg, MultiValueDict):
+                for key, value_list in arg.lists():
                     self.setlistdefault(key).extend(value_list)
             else:
-                try:
-                    for key, value in other_dict.items():
-                        self.setlistdefault(key).append(value)
-                except TypeError:
-                    raise ValueError("MultiValueDict.update() takes either a MultiValueDict or dictionary")
+                if isinstance(arg, Mapping):
+                    arg = arg.items()
+                for key, value in arg:
+                    self.setlistdefault(key).append(value)
         for key, value in kwargs.items():
             self.setlistdefault(key).append(value)
 
@@ -230,11 +236,8 @@ class ImmutableList(tuple):
         self.warning = warning
         return self
 
-    def complain(self, *wargs, **kwargs):
-        if isinstance(self.warning, Exception):
-            raise self.warning
-        else:
-            raise AttributeError(self.warning)
+    def complain(self, *args, **kwargs):
+        raise AttributeError(self.warning)
 
     # All list mutation functions complain.
     __delitem__ = complain
@@ -281,18 +284,6 @@ class DictWrapper(dict):
         return value
 
 
-def _destruct_iterable_mapping_values(data):
-    for i, elem in enumerate(data):
-        if len(elem) != 2:
-            raise ValueError(
-                'dictionary update sequence element #{} has '
-                'length {}; 2 is required.'.format(i, len(elem))
-            )
-        if not isinstance(elem[0], str):
-            raise ValueError('Element key %r invalid, only strings are allowed' % elem[0])
-        yield tuple(elem)
-
-
 class CaseInsensitiveMapping(Mapping):
     """
     Mapping allowing case-insensitive key lookups. Original case of keys is
@@ -312,9 +303,7 @@ class CaseInsensitiveMapping(Mapping):
     """
 
     def __init__(self, data):
-        if not isinstance(data, Mapping):
-            data = {k: v for k, v in _destruct_iterable_mapping_values(data)}
-        self._store = {k.lower(): (k, v) for k, v in data.items()}
+        self._store = {k.lower(): (k, v) for k, v in self._unpack_items(data)}
 
     def __getitem__(self, key):
         return self._store[key.lower()][1]
@@ -337,3 +326,20 @@ class CaseInsensitiveMapping(Mapping):
 
     def copy(self):
         return self
+
+    @staticmethod
+    def _unpack_items(data):
+        if isinstance(data, Mapping):
+            yield from data.items()
+            return
+        for i, elem in enumerate(data):
+            if len(elem) != 2:
+                raise ValueError(
+                    'dictionary update sequence element #{} has length {}; '
+                    '2 is required.'.format(i, len(elem))
+                )
+            if not isinstance(elem[0], str):
+                raise ValueError(
+                    'Element key %r invalid, only strings are allowed' % elem[0]
+                )
+            yield elem

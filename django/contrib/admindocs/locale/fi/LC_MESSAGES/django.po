@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015,2017
+# Aarni Koskela, 2015,2017,2020-2021
 # Elias Luttinen <elias.luttinen@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-04-14 12:19+0000\n"
 "Last-Translator: Aarni Koskela\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
@@ -98,7 +98,7 @@ msgstr "Ole hyvä ja asenna docutils"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
+"The admin documentation system requires Python’s <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
 "Hallinnan dokumentaatio vaatii Pythonin <a href=\"%(link)s\">docutils</a>-"
@@ -151,13 +151,13 @@ msgid "Template: %(name)s"
 msgstr "Malline: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Malline: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr "Malline: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "Polun \"%(name)s\" hakupolku:"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "Mallineen <q>%(name)s</q> hakupolku"
 
 msgid "(does not exist)"
 msgstr "(ei ole olemassa)"

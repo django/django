@@ -44,6 +44,10 @@ class RangeField(models.Field):
     empty_strings_allowed = False
 
     def __init__(self, *args, **kwargs):
+        if 'default_bounds' in kwargs:
+            raise TypeError(
+                f"Cannot use 'default_bounds' with {self.__class__.__name__}."
+            )
         # Initializing base_field here ensures that its model matches the model for self.
         if hasattr(self, 'base_field'):
             self.base_field = self.base_field()
@@ -112,6 +116,37 @@ class RangeField(models.Field):
         return super().formfield(**kwargs)
 
 
+CANONICAL_RANGE_BOUNDS = '[)'
+
+
+class ContinuousRangeField(RangeField):
+    """
+    Continuous range field. It allows specifying default bounds for list and
+    tuple inputs.
+    """
+
+    def __init__(self, *args, default_bounds=CANONICAL_RANGE_BOUNDS, **kwargs):
+        if default_bounds not in ('[)', '(]', '()', '[]'):
+            raise ValueError("default_bounds must be one of '[)', '(]', '()', or '[]'.")
+        self.default_bounds = default_bounds
+        super().__init__(*args, **kwargs)
+
+    def get_prep_value(self, value):
+        if isinstance(value, (list, tuple)):
+            return self.range_type(value[0], value[1], self.default_bounds)
+        return super().get_prep_value(value)
+
+    def formfield(self, **kwargs):
+        kwargs.setdefault('default_bounds', self.default_bounds)
+        return super().formfield(**kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super().deconstruct()
+        if self.default_bounds and self.default_bounds != CANONICAL_RANGE_BOUNDS:
+            kwargs['default_bounds'] = self.default_bounds
+        return name, path, args, kwargs
+
+
 class IntegerRangeField(RangeField):
     base_field = models.IntegerField
     range_type = NumericRange
@@ -130,7 +165,7 @@ class BigIntegerRangeField(RangeField):
         return 'int8range'
 
 
-class DecimalRangeField(RangeField):
+class DecimalRangeField(ContinuousRangeField):
     base_field = models.DecimalField
     range_type = NumericRange
     form_field = forms.DecimalRangeField
@@ -139,7 +174,7 @@ class DecimalRangeField(RangeField):
         return 'numrange'
 
 
-class DateTimeRangeField(RangeField):
+class DateTimeRangeField(ContinuousRangeField):
     base_field = models.DateTimeField
     range_type = DateTimeTZRange
     form_field = forms.DateTimeRangeField

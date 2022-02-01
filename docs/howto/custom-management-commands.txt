@@ -1,6 +1,6 @@
-========================================
-Writing custom ``django-admin`` commands
-========================================
+==============================================
+How to create custom ``django-admin`` commands
+==============================================
 
 .. module:: django.core.management
 
@@ -218,14 +218,10 @@ All attributes can be set in your derived class and can be used in
 .. attribute:: BaseCommand.requires_system_checks
 
     A list or tuple of tags, e.g. ``[Tags.staticfiles, Tags.models]``. System
-    checks registered in the chosen tags will be checked for errors prior to
-    executing the command. The value ``'__all__'`` can be used to specify
-    that all system checks should be performed. Default value is ``'__all__'``.
-
-    .. versionchanged:: 3.2
-
-        In older versions, the ``requires_system_checks`` attribute expects a
-        boolean value instead of a list or tuple of tags.
+    checks :ref:`registered in the chosen tags <registering-labeling-checks>`
+    will be checked for errors prior to executing the command. The value
+    ``'__all__'`` can be used to specify that all system checks should be
+    performed. Default value is ``'__all__'``.
 
 .. attribute:: BaseCommand.style
 
@@ -240,6 +236,14 @@ All attributes can be set in your derived class and can be used in
 
     If you pass the :option:`--no-color` option when running your command, all
     ``self.style()`` calls will return the original string uncolored.
+
+.. attribute:: BaseCommand.suppressed_base_arguments
+
+    .. versionadded:: 4.0
+
+    The default command options to suppress in the help output. This should be
+    a set of option names (e.g. ``'--verbosity'``). The default values for the
+    suppressed options are still passed.
 
 Methods
 -------
@@ -364,7 +368,3 @@ the management command to exit with, using :func:`sys.exit`.
 If a management command is called from code through
 :func:`~django.core.management.call_command`, it's up to you to catch the
 exception when needed.
-
-.. versionchanged:: 3.1
-
-    The ``returncode`` argument was added.

@@ -4,6 +4,7 @@ Classes to represent the definitions of aggregate functions.
 from django.core.exceptions import FieldError
 from django.db.models.expressions import Case, Func, Star, When
 from django.db.models.fields import IntegerField
+from django.db.models.functions.comparison import Coalesce
 from django.db.models.functions.mixins import (
     FixDurationInputMixin, NumericOutputFieldMixin,
 )
@@ -20,12 +21,16 @@ class Aggregate(Func):
     filter_template = '%s FILTER (WHERE %%(filter)s)'
     window_compatible = True
     allow_distinct = False
+    empty_result_set_value = None
 
-    def __init__(self, *expressions, distinct=False, filter=None, **extra):
+    def __init__(self, *expressions, distinct=False, filter=None, default=None, **extra):
         if distinct and not self.allow_distinct:
             raise TypeError("%s does not allow distinct." % self.__class__.__name__)
+        if default is not None and self.empty_result_set_value is not None:
+            raise TypeError(f'{self.__class__.__name__} does not allow default.')
         self.distinct = distinct
         self.filter = filter
+        self.default = default
         super().__init__(*expressions, **extra)
 
     def get_source_fields(self):
@@ -55,7 +60,14 @@ class Aggregate(Func):
                     before_resolved = self.get_source_expressions()[index]
                     name = before_resolved.name if hasattr(before_resolved, 'name') else repr(before_resolved)
                     raise FieldError("Cannot compute %s('%s'): '%s' is an aggregate" % (c.name, name, name))
-        return c
+        if (default := c.default) is None:
+            return c
+        if hasattr(default, 'resolve_expression'):
+            default = default.resolve_expression(query, allow_joins, reuse, summarize)
+        c.default = None  # Reset the default argument before wrapping.
+        coalesce = Coalesce(c, default, output_field=c._output_field_or_none)
+        coalesce.is_summary = c.is_summary
+        return coalesce
 
     @property
     def default_alias(self):
@@ -77,7 +89,7 @@ class Aggregate(Func):
                     compiler, connection, template=template, filter=filter_sql,
                     **extra_context
                 )
-                return sql, params + filter_params
+                return sql, (*params, *filter_params)
             else:
                 copy = self.copy()
                 copy.filter = None
@@ -107,6 +119,7 @@ class Count(Aggregate):
     name = 'Count'
     output_field = IntegerField()
     allow_distinct = True
+    empty_result_set_value = 0
 
     def __init__(self, expression, filter=None, **extra):
         if expression == '*':
@@ -114,9 +127,6 @@ class Count(Aggregate):
         if isinstance(expression, Star) and filter is not None:
             raise ValueError('Star cannot be used with filter. Please specify a field.')
         super().__init__(expression, filter=filter, **extra)
-
-    def convert_value(self, value, expression, connection):
-        return 0 if value is None else value
 
 
 class Max(Aggregate):

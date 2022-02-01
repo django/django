@@ -101,10 +101,10 @@ Model field                         Form field
 
 :class:`GenericIPAddressField`      :class:`~django.forms.GenericIPAddressField`
 
+:class:`JSONField`                  :class:`~django.forms.JSONField`
+
 :class:`ManyToManyField`            :class:`~django.forms.ModelMultipleChoiceField`
                                     (see below)
-
-:class:`NullBooleanField`           :class:`~django.forms.NullBooleanField`
 
 :class:`PositiveBigIntegerField`    :class:`~django.forms.IntegerField`
 
@@ -422,7 +422,7 @@ form is rendered, the problem may not even be visible on the web page.
 The alternative approach would be to include all fields automatically, or
 remove only some. This fundamental approach is known to be much less secure
 and has led to serious exploits on major websites (e.g. `GitHub
-<https://github.com/blog/1068-public-key-security-vulnerability-and-mitigation>`_).
+<https://github.blog/2012-03-04-public-key-security-vulnerability-and-mitigation/>`_).
 
 There are, however, two shortcuts available for cases where you can guarantee
 these security concerns do not apply to you:
@@ -772,7 +772,7 @@ with the ``Author`` model. It works just like a regular formset::
 
     >>> formset = AuthorFormSet()
     >>> print(formset)
-    <input type="hidden" name="form-TOTAL_FORMS" value="1" id="id_form-TOTAL_FORMS"><input type="hidden" name="form-INITIAL_FORMS" value="0" id="id_form-INITIAL_FORMS"><input type="hidden" name="form-MAX_NUM_FORMS" id="id_form-MAX_NUM_FORMS">
+    <input type="hidden" name="form-TOTAL_FORMS" value="1" id="id_form-TOTAL_FORMS"><input type="hidden" name="form-INITIAL_FORMS" value="0" id="id_form-INITIAL_FORMS"><input type="hidden" name="form-MIN_NUM_FORMS" value="0" id="id_form-MIN_NUM_FORMS"><input type="hidden" name="form-MAX_NUM_FORMS" value="1000" id="id_form-MAX_NUM_FORMS">
     <tr><th><label for="id_form-0-name">Name:</label></th><td><input id="id_form-0-name" type="text" name="form-0-name" maxlength="100"></td></tr>
     <tr><th><label for="id_form-0-title">Title:</label></th><td><select name="form-0-title" id="id_form-0-title">
     <option value="" selected>---------</option>
@@ -953,8 +953,8 @@ extra forms displayed.
 
 Also, ``extra=0`` doesn't prevent creation of new model instances as you can
 :ref:`add additional forms with JavaScript <understanding-the-managementform>`
-or send additional POST data. Formsets :ticket:`don't yet provide functionality
-<26142>` for an "edit only" view that prevents creation of new instances.
+or send additional POST data. See :ref:`model-formsets-edit-only` on how to do
+this.
 
 If the value of ``max_num`` is greater than the number of existing related
 objects, up to ``extra`` additional blank forms will be added to the formset,
@@ -971,6 +971,25 @@ so long as the total number of forms does not exceed ``max_num``::
 
 A ``max_num`` value of ``None`` (the default) puts a high limit on the number
 of forms displayed (1000). In practice this is equivalent to no limit.
+
+.. _model-formsets-edit-only:
+
+Preventing new objects creation
+-------------------------------
+
+.. versionadded:: 4.1
+
+Using the ``edit_only`` parameter, you can prevent creation of any new
+objects::
+
+    >>> AuthorFormSet = modelformset_factory(
+    ...     Author,
+    ...     fields=('name', 'title'),
+    ...     edit_only=True,
+    ... )
+
+Here, the formset will only edit existing ``Author`` instances. No other
+objects will be created or edited.
 
 Using a model formset in a view
 -------------------------------

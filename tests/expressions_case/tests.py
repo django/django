@@ -256,6 +256,15 @@ class CaseExpressionTests(TestCase):
             transform=attrgetter('integer', 'test')
         )
 
+    def test_annotate_filter_decimal(self):
+        obj = CaseTestModel.objects.create(integer=0, decimal=Decimal('1'))
+        qs = CaseTestModel.objects.annotate(
+            x=Case(When(integer=0, then=F('decimal'))),
+            y=Case(When(integer=0, then=Value(Decimal('1')))),
+        )
+        self.assertSequenceEqual(qs.filter(Q(x=1) & Q(x=Decimal('1'))), [obj])
+        self.assertSequenceEqual(qs.filter(Q(y=1) & Q(y=Decimal('1'))), [obj])
+
     def test_annotate_values_not_in_order_by(self):
         self.assertEqual(
             list(CaseTestModel.objects.annotate(test=Case(
@@ -803,19 +812,6 @@ class CaseExpressionTests(TestCase):
             CaseTestModel.objects.all().order_by('pk'),
             [(1, True), (2, False), (3, None), (2, False), (3, None), (3, None), (4, None)],
             transform=attrgetter('integer', 'null_boolean')
-        )
-
-    def test_update_null_boolean_old(self):
-        CaseTestModel.objects.update(
-            null_boolean_old=Case(
-                When(integer=1, then=True),
-                When(integer=2, then=False),
-            ),
-        )
-        self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
-            [(1, True), (2, False), (3, None), (2, False), (3, None), (3, None), (4, None)],
-            transform=attrgetter('integer', 'null_boolean_old')
         )
 
     def test_update_positive_big_integer(self):

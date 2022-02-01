@@ -89,6 +89,18 @@ class RelatedField(FieldCacheMixin, Field):
     many_to_many = False
     many_to_one = False
 
+    def __init__(
+        self,
+        related_name=None,
+        related_query_name=None,
+        limit_choices_to=None,
+        **kwargs,
+    ):
+        self._related_name = related_name
+        self._related_query_name = related_query_name
+        self._limit_choices_to = limit_choices_to
+        super().__init__(**kwargs)
+
     @cached_property
     def related_model(self):
         # Can't cache this property until all the models are loaded.
@@ -172,14 +184,10 @@ class RelatedField(FieldCacheMixin, Field):
         if (self.remote_field.model not in self.opts.apps.get_models() and
                 not isinstance(self.remote_field.model, str) and
                 self.remote_field.model._meta.swapped):
-            model = "%s.%s" % (
-                self.remote_field.model._meta.app_label,
-                self.remote_field.model._meta.object_name
-            )
             return [
                 checks.Error(
                     "Field defines a relation with the model '%s', which has "
-                    "been swapped out." % model,
+                    "been swapped out." % self.remote_field.model._meta.label,
                     hint="Update the relation to point at 'settings.%s'." % self.remote_field.model._meta.swappable,
                     obj=self,
                     id='fields.E301',
@@ -218,18 +226,22 @@ class RelatedField(FieldCacheMixin, Field):
         rel_is_hidden = self.remote_field.is_hidden()
         rel_name = self.remote_field.get_accessor_name()  # i. e. "model_set"
         rel_query_name = self.related_query_name()  # i. e. "model"
-        field_name = "%s.%s" % (opts.object_name, self.name)  # i. e. "Model.field"
+        # i.e. "app_label.Model.field".
+        field_name = '%s.%s' % (opts.label, self.name)
 
         # Check clashes between accessor or reverse query name of `field`
         # and any other field name -- i.e. accessor for Model.foreign is
         # model_set and it clashes with Target.model_set.
         potential_clashes = rel_opts.fields + rel_opts.many_to_many
         for clash_field in potential_clashes:
-            clash_name = "%s.%s" % (rel_opts.object_name, clash_field.name)  # i.e. "Target.model_set"
+            # i.e. "app_label.Target.model_set".
+            clash_name = '%s.%s' % (rel_opts.label, clash_field.name)
             if not rel_is_hidden and clash_field.name == rel_name:
                 errors.append(
                     checks.Error(
-                        "Reverse accessor for '%s' clashes with field name '%s'." % (field_name, clash_name),
+                        f"Reverse accessor '{rel_opts.object_name}.{rel_name}' "
+                        f"for '{field_name}' clashes with field name "
+                        f"'{clash_name}'.",
                         hint=("Rename field '%s', or add/change a related_name "
                               "argument to the definition for field '%s'.") % (clash_name, field_name),
                         obj=self,
@@ -253,13 +265,17 @@ class RelatedField(FieldCacheMixin, Field):
         # Model.m2m accessor.
         potential_clashes = (r for r in rel_opts.related_objects if r.field is not self)
         for clash_field in potential_clashes:
-            clash_name = "%s.%s" % (  # i. e. "Model.m2m"
-                clash_field.related_model._meta.object_name,
-                clash_field.field.name)
+            # i.e. "app_label.Model.m2m".
+            clash_name = '%s.%s' % (
+                clash_field.related_model._meta.label,
+                clash_field.field.name,
+            )
             if not rel_is_hidden and clash_field.get_accessor_name() == rel_name:
                 errors.append(
                     checks.Error(
-                        "Reverse accessor for '%s' clashes with reverse accessor for '%s'." % (field_name, clash_name),
+                        f"Reverse accessor '{rel_opts.object_name}.{rel_name}' "
+                        f"for '{field_name}' clashes with reverse accessor for "
+                        f"'{clash_name}'.",
                         hint=("Add or change a related_name argument "
                               "to the definition for '%s' or '%s'.") % (field_name, clash_name),
                         obj=self,
@@ -319,12 +335,12 @@ class RelatedField(FieldCacheMixin, Field):
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
-        if self.remote_field.limit_choices_to:
-            kwargs['limit_choices_to'] = self.remote_field.limit_choices_to
-        if self.remote_field.related_name is not None:
-            kwargs['related_name'] = self.remote_field.related_name
-        if self.remote_field.related_query_name is not None:
-            kwargs['related_query_name'] = self.remote_field.related_query_name
+        if self._limit_choices_to:
+            kwargs['limit_choices_to'] = self._limit_choices_to
+        if self._related_name is not None:
+            kwargs['related_name'] = self._related_name
+        if self._related_query_name is not None:
+            kwargs['related_query_name'] = self._related_query_name
         return name, path, args, kwargs
 
     def get_forward_related_filter(self, obj):
@@ -347,12 +363,12 @@ class RelatedField(FieldCacheMixin, Field):
         select all instances of self.related_field.model related through
         this field to obj. obj is an instance of self.model.
         """
-        base_filter = {
-            rh_field.attname: getattr(obj, lh_field.attname)
+        base_filter = (
+            (rh_field.attname, getattr(obj, lh_field.attname))
             for lh_field, rh_field in self.related_fields
-        }
+        )
         descriptor_filter = self.get_extra_descriptor_filter(obj)
-        base_q = Q(**base_filter)
+        base_q = Q(*base_filter)
         if isinstance(descriptor_filter, dict):
             return base_q & Q(**descriptor_filter)
         elif descriptor_filter:
@@ -431,7 +447,7 @@ class RelatedField(FieldCacheMixin, Field):
         When filtering against this relation, return the field on the remote
         model against which the filtering should happen.
         """
-        target_fields = self.get_path_info()[-1].target_fields
+        target_fields = self.path_infos[-1].target_fields
         if len(target_fields) > 1:
             raise exceptions.FieldError(
                 "The relation has multiple target fields, but only single target field was asked for")
@@ -471,11 +487,24 @@ class ForeignObject(RelatedField):
                 on_delete=on_delete,
             )
 
-        super().__init__(rel=rel, **kwargs)
+        super().__init__(
+            rel=rel,
+            related_name=related_name,
+            related_query_name=related_query_name,
+            limit_choices_to=limit_choices_to,
+            **kwargs,
+        )
 
         self.from_fields = from_fields
         self.to_fields = to_fields
         self.swappable = swappable
+
+    def __copy__(self):
+        obj = super().__copy__()
+        # Remove any cached PathInfo values.
+        obj.__dict__.pop('path_infos', None)
+        obj.__dict__.pop('reverse_path_infos', None)
+        return obj
 
     def check(self, **kwargs):
         return [
@@ -693,7 +722,7 @@ class ForeignObject(RelatedField):
         """
         return {}
 
-    def get_extra_restriction(self, where_class, alias, related_alias):
+    def get_extra_restriction(self, alias, related_alias):
         """
         Return a pair condition used for joining and subquery pushdown. The
         condition is something that responds to as_sql(compiler, connection)
@@ -721,6 +750,10 @@ class ForeignObject(RelatedField):
             filtered_relation=filtered_relation,
         )]
 
+    @cached_property
+    def path_infos(self):
+        return self.get_path_info()
+
     def get_reverse_path_info(self, filtered_relation=None):
         """Get path from the related model to this field's model."""
         opts = self.model._meta
@@ -734,6 +767,10 @@ class ForeignObject(RelatedField):
             direct=False,
             filtered_relation=filtered_relation,
         )]
+
+    @cached_property
+    def reverse_path_infos(self):
+        return self.get_reverse_path_info()
 
     @classmethod
     @functools.lru_cache(maxsize=None)
@@ -797,13 +834,13 @@ class ForeignKey(ForeignObject):
         try:
             to._meta.model_name
         except AttributeError:
-            assert isinstance(to, str), (
-                "%s(%r) is invalid. First parameter to ForeignKey must be "
-                "either a model, a model name, or the string %r" % (
-                    self.__class__.__name__, to,
-                    RECURSIVE_RELATIONSHIP_CONSTANT,
+            if not isinstance(to, str):
+                raise TypeError(
+                    '%s(%r) is invalid. First parameter to ForeignKey must be '
+                    'either a model, a model name, or the string %r' % (
+                        self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT,
+                    )
                 )
-            )
         else:
             # For backwards compatibility purposes, we need to *try* and set
             # the to_field during FK construction. It won't be guaranteed to
@@ -825,6 +862,9 @@ class ForeignKey(ForeignObject):
         super().__init__(
             to,
             on_delete,
+            related_name=related_name,
+            related_query_name=related_query_name,
+            limit_choices_to=limit_choices_to,
             from_fields=[RECURSIVE_RELATIONSHIP_CONSTANT],
             to_fields=[to_field],
             **kwargs,
@@ -995,7 +1035,7 @@ class ForeignKey(ForeignObject):
         })
 
     def db_check(self, connection):
-        return []
+        return None
 
     def db_type(self, connection):
         return self.target_field.rel_db_type(connection=connection)
@@ -1148,18 +1188,20 @@ class ManyToManyField(RelatedField):
         try:
             to._meta
         except AttributeError:
-            assert isinstance(to, str), (
-                "%s(%r) is invalid. First parameter to ManyToManyField must be "
-                "either a model, a model name, or the string %r" %
-                (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
-            )
+            if not isinstance(to, str):
+                raise TypeError(
+                    '%s(%r) is invalid. First parameter to ManyToManyField '
+                    'must be either a model, a model name, or the string %r' % (
+                        self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT,
+                    )
+                )
 
         if symmetrical is None:
             symmetrical = (to == RECURSIVE_RELATIONSHIP_CONSTANT)
 
-        if through is not None:
-            assert db_table is None, (
-                "Cannot specify a db_table if an intermediary model is used."
+        if through is not None and db_table is not None:
+            raise ValueError(
+                'Cannot specify a db_table if an intermediary model is used.'
             )
 
         kwargs['rel'] = self.rel_class(
@@ -1174,7 +1216,12 @@ class ManyToManyField(RelatedField):
         )
         self.has_null_arg = 'null' in kwargs
 
-        super().__init__(**kwargs)
+        super().__init__(
+            related_name=related_name,
+            related_query_name=related_query_name,
+            limit_choices_to=limit_choices_to,
+            **kwargs,
+        )
 
         self.db_table = db_table
         self.swappable = swappable
@@ -1219,14 +1266,13 @@ class ManyToManyField(RelatedField):
                     id='fields.W341',
                 )
             )
-        if (self.remote_field.limit_choices_to and self.remote_field.through and
-                not self.remote_field.through._meta.auto_created):
+        if self.remote_field.symmetrical and self._related_name:
             warnings.append(
                 checks.Warning(
-                    'limit_choices_to has no effect on ManyToManyField '
-                    'with a through model.',
+                    'related_name has no effect on ManyToManyField '
+                    'with a symmetrical relationship, e.g. to "self".',
                     obj=self,
-                    id='fields.W343',
+                    id='fields.W345',
                 )
             )
 
@@ -1479,18 +1525,12 @@ class ManyToManyField(RelatedField):
         if isinstance(self.remote_field.model, str):
             kwargs['to'] = self.remote_field.model
         else:
-            kwargs['to'] = "%s.%s" % (
-                self.remote_field.model._meta.app_label,
-                self.remote_field.model._meta.object_name,
-            )
+            kwargs['to'] = self.remote_field.model._meta.label
         if getattr(self.remote_field, 'through', None) is not None:
             if isinstance(self.remote_field.through, str):
                 kwargs['through'] = self.remote_field.through
             elif not self.remote_field.through._meta.auto_created:
-                kwargs['through'] = "%s.%s" % (
-                    self.remote_field.through._meta.app_label,
-                    self.remote_field.through._meta.object_name,
-                )
+                kwargs['through'] = self.remote_field.through._meta.label
         # If swappable is True, then see if we're actually pointing to the target
         # of a swap.
         swappable_setting = self.swappable_setting
@@ -1516,12 +1556,17 @@ class ManyToManyField(RelatedField):
         linkfield1 = int_model._meta.get_field(self.m2m_field_name())
         linkfield2 = int_model._meta.get_field(self.m2m_reverse_field_name())
         if direct:
-            join1infos = linkfield1.get_reverse_path_info()
-            join2infos = linkfield2.get_path_info(filtered_relation)
+            join1infos = linkfield1.reverse_path_infos
+            if filtered_relation:
+                join2infos = linkfield2.get_path_info(filtered_relation)
+            else:
+                join2infos = linkfield2.path_infos
         else:
-            join1infos = linkfield2.get_reverse_path_info()
-            join2infos = linkfield1.get_path_info(filtered_relation)
-
+            join1infos = linkfield2.reverse_path_infos
+            if filtered_relation:
+                join2infos = linkfield1.get_path_info(filtered_relation)
+            else:
+                join2infos = linkfield1.path_infos
         # Get join infos between the last model of join 1 and the first model
         # of join 2. Assume the only reason these may differ is due to model
         # inheritance.
@@ -1539,8 +1584,16 @@ class ManyToManyField(RelatedField):
     def get_path_info(self, filtered_relation=None):
         return self._get_path_info(direct=True, filtered_relation=filtered_relation)
 
+    @cached_property
+    def path_infos(self):
+        return self.get_path_info()
+
     def get_reverse_path_info(self, filtered_relation=None):
         return self._get_path_info(direct=False, filtered_relation=filtered_relation)
+
+    @cached_property
+    def reverse_path_infos(self):
+        return self.get_reverse_path_info()
 
     def _get_m2m_db_table(self, opts):
         """
@@ -1620,7 +1673,11 @@ class ManyToManyField(RelatedField):
             # related_name with one generated from the m2m field name. Django
             # still uses backwards relations internally and we need to avoid
             # clashes between multiple m2m fields with related_name == '+'.
-            self.remote_field.related_name = "_%s_%s_+" % (cls.__name__.lower(), name)
+            self.remote_field.related_name = '_%s_%s_%s_+' % (
+                cls._meta.app_label,
+                cls.__name__.lower(),
+                name,
+            )
 
         super().contribute_to_class(cls, name, **kwargs)
 

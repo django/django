@@ -3,7 +3,7 @@ import sys
 import tempfile
 import traceback
 
-from asgiref.sync import sync_to_async
+from asgiref.sync import ThreadSensitiveContext, sync_to_async
 
 from django.conf import settings
 from django.core import signals
@@ -144,6 +144,14 @@ class ASGIHandler(base.BaseHandler):
                 'Django can only handle ASGI/HTTP connections, not %s.'
                 % scope['type']
             )
+
+        async with ThreadSensitiveContext():
+            await self.handle(scope, receive, send)
+
+    async def handle(self, scope, receive, send):
+        """
+        Handles the ASGI request. Called via the __call__ method.
+        """
         # Receive the HTTP request body as a stream object.
         try:
             body_file = await self.read_body(receive)
@@ -168,7 +176,7 @@ class ASGIHandler(base.BaseHandler):
         await self.send_response(response, send)
 
     async def read_body(self, receive):
-        """Reads a HTTP body from an ASGI connection."""
+        """Reads an HTTP body from an ASGI connection."""
         # Use the tempfile that auto rolls-over to a disk file as it fills up.
         body_file = tempfile.SpooledTemporaryFile(max_size=settings.FILE_UPLOAD_MAX_MEMORY_SIZE, mode='w+b')
         while True:

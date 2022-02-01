@@ -5,14 +5,15 @@
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Fariman Ghaedi <farimanghaedi@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
+# rahim agh <rahim.aghareb@gmail.com>, 2021
 # Reza Mohammadi <reza@teeleh.ir>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-17 01:03+0000\n"
-"Last-Translator: Ramiro Morales\n"
+"PO-Revision-Date: 2021-04-19 03:16+0000\n"
+"Last-Translator: rahim agh <rahim.aghareb@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -33,6 +34,8 @@ msgstr "نشانی اینترنتی"
 msgid ""
 "Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
+"مثال: '/about/contact/'. مطمئن شوید که اسلش را هم در ابتدا و هم در انتها "
+"گذاشته‌اید."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
@@ -40,7 +43,7 @@ msgid ""
 msgstr "این مقدار فقط باید حاوی حروف، اعداد، خط زیر، خط تیره و یا اسلش باشد."
 
 msgid "Example: “/about/contact”. Make sure to have a leading slash."
-msgstr ""
+msgstr "مثال: 'about/contact/'. مطمئن شوید که یک اسلش در ابتدا وجود دارد. "
 
 msgid "URL is missing a leading slash."
 msgstr "در آدرس اسلش آغازین فراموش شده است."
@@ -68,6 +71,8 @@ msgid ""
 "Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
 "will use “flatpages/default.html”."
 msgstr ""
+"مثال: 'flatpages/contact_page.html'. اگر این مشخص نشود، سیستم از 'flatpages/"
+"default.html' استفاده خواهد کرد."
 
 msgid "registration required"
 msgstr "عضویت لازم است"

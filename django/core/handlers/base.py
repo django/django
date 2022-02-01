@@ -51,11 +51,11 @@ class BaseHandler:
                 middleware_is_async = middleware_can_async
             try:
                 # Adapt handler, if needed.
-                handler = self.adapt_method_mode(
+                adapted_handler = self.adapt_method_mode(
                     middleware_is_async, handler, handler_is_async,
                     debug=settings.DEBUG, name='middleware %s' % middleware_path,
                 )
-                mw_instance = middleware(handler)
+                mw_instance = middleware(adapted_handler)
             except MiddlewareNotUsed as exc:
                 if settings.DEBUG:
                     if str(exc):
@@ -63,6 +63,8 @@ class BaseHandler:
                     else:
                         logger.debug('MiddlewareNotUsed: %r', middleware_path)
                 continue
+            else:
+                handler = adapted_handler
 
             if mw_instance is None:
                 raise ImproperlyConfigured(
@@ -148,7 +150,7 @@ class BaseHandler:
         response = await self._middleware_chain(request)
         response._resource_closers.append(request.close)
         if response.status_code >= 400:
-            await sync_to_async(log_response)(
+            await sync_to_async(log_response, thread_sensitive=False)(
                 '%s: %s', response.reason_phrase, request.path,
                 response=response,
                 request=request,

@@ -4,7 +4,7 @@ from datetime import date
 from decimal import Decimal
 
 from django import forms
-from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.forms.models import (
     BaseModelFormSet, _get_foreign_key, inlineformset_factory,
@@ -368,21 +368,19 @@ class ModelFormsetTest(TestCase):
             instance.created = date.today()
             instance.save()
         formset.save_m2m()
-        self.assertQuerysetEqual(instances[0].authors.all(), [
-            '<Author: Charles Baudelaire>',
-            '<Author: John Steinbeck>',
-            '<Author: Paul Verlaine>',
-            '<Author: Walt Whitman>',
-        ])
+        self.assertSequenceEqual(
+            instances[0].authors.all(),
+            [author1, author4, author2, author3],
+        )
 
     def test_max_num(self):
         # Test the behavior of max_num with model formsets. It should allow
         # all existing related objects/inlines for a given object to be
         # displayed, but not allow the creation of new inlines beyond max_num.
 
-        Author.objects.create(name='Charles Baudelaire')
-        Author.objects.create(name='Paul Verlaine')
-        Author.objects.create(name='Walt Whitman')
+        a1 = Author.objects.create(name='Charles Baudelaire')
+        a2 = Author.objects.create(name='Paul Verlaine')
+        a3 = Author.objects.create(name='Walt Whitman')
 
         qs = Author.objects.order_by('name')
 
@@ -403,27 +401,15 @@ class ModelFormsetTest(TestCase):
 
         AuthorFormSet = modelformset_factory(Author, fields="__all__", max_num=None)
         formset = AuthorFormSet(queryset=qs)
-        self.assertQuerysetEqual(formset.get_queryset(), [
-            '<Author: Charles Baudelaire>',
-            '<Author: Paul Verlaine>',
-            '<Author: Walt Whitman>',
-        ])
+        self.assertSequenceEqual(formset.get_queryset(), [a1, a2, a3])
 
         AuthorFormSet = modelformset_factory(Author, fields="__all__", max_num=0)
         formset = AuthorFormSet(queryset=qs)
-        self.assertQuerysetEqual(formset.get_queryset(), [
-            '<Author: Charles Baudelaire>',
-            '<Author: Paul Verlaine>',
-            '<Author: Walt Whitman>',
-        ])
+        self.assertSequenceEqual(formset.get_queryset(), [a1, a2, a3])
 
         AuthorFormSet = modelformset_factory(Author, fields="__all__", max_num=4)
         formset = AuthorFormSet(queryset=qs)
-        self.assertQuerysetEqual(formset.get_queryset(), [
-            '<Author: Charles Baudelaire>',
-            '<Author: Paul Verlaine>',
-            '<Author: Walt Whitman>',
-        ])
+        self.assertSequenceEqual(formset.get_queryset(), [a1, a2, a3])
 
     def test_min_num(self):
         # Test the behavior of min_num with model formsets. It should be
@@ -633,7 +619,7 @@ class ModelFormsetTest(TestCase):
         self.assertEqual(len(saved), 1)
         book1, = saved
         self.assertEqual(book1, Book.objects.get(title='Les Fleurs du Mal'))
-        self.assertQuerysetEqual(author.book_set.all(), ['<Book: Les Fleurs du Mal>'])
+        self.assertSequenceEqual(author.book_set.all(), [book1])
 
         # Now that we've added a book to Charles Baudelaire, let's try adding
         # another one. This time though, an edit form will be available for
@@ -689,10 +675,7 @@ class ModelFormsetTest(TestCase):
 
         # As you can see, 'Les Paradis Artificiels' is now a book belonging to
         # Charles Baudelaire.
-        self.assertQuerysetEqual(author.book_set.order_by('title'), [
-            '<Book: Les Fleurs du Mal>',
-            '<Book: Les Paradis Artificiels>',
-        ])
+        self.assertSequenceEqual(author.book_set.order_by('title'), [book1, book2])
 
     def test_inline_formsets_save_as_new(self):
         # The save_as_new parameter lets you re-associate the data to a new
@@ -1722,7 +1705,7 @@ class ModelFormsetTest(TestCase):
         formset.save()
         # The name of other_author shouldn't be changed and new models aren't
         # created.
-        self.assertQuerysetEqual(Author.objects.all(), ['<Author: Charles>', '<Author: Walt>'])
+        self.assertSequenceEqual(Author.objects.all(), [author, other_author])
 
     def test_validation_without_id(self):
         AuthorFormSet = modelformset_factory(Author, fields='__all__')
@@ -1783,11 +1766,77 @@ class ModelFormsetTest(TestCase):
             [{'id': ['Select a valid choice. That choice is not one of the available choices.']}],
         )
 
-    def test_initial_form_count_empty_data_raises_validation_error(self):
+    def test_initial_form_count_empty_data(self):
         AuthorFormSet = modelformset_factory(Author, fields='__all__')
-        msg = 'ManagementForm data is missing or has been tampered with'
-        with self.assertRaisesMessage(ValidationError, msg):
-            AuthorFormSet({}).initial_form_count()
+        formset = AuthorFormSet({})
+        self.assertEqual(formset.initial_form_count(), 0)
+
+    def test_edit_only(self):
+        charles = Author.objects.create(name='Charles Baudelaire')
+        AuthorFormSet = modelformset_factory(Author, fields='__all__', edit_only=True)
+        data = {
+            'form-TOTAL_FORMS': '2',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '0',
+            'form-0-name': 'Arthur Rimbaud',
+            'form-1-name': 'Walt Whitman',
+        }
+        formset = AuthorFormSet(data)
+        self.assertIs(formset.is_valid(), True)
+        formset.save()
+        self.assertSequenceEqual(Author.objects.all(), [charles])
+        data = {
+            'form-TOTAL_FORMS': '2',
+            'form-INITIAL_FORMS': '1',
+            'form-MAX_NUM_FORMS': '0',
+            'form-0-id': charles.pk,
+            'form-0-name': 'Arthur Rimbaud',
+            'form-1-name': 'Walt Whitman',
+        }
+        formset = AuthorFormSet(data)
+        self.assertIs(formset.is_valid(), True)
+        formset.save()
+        charles.refresh_from_db()
+        self.assertEqual(charles.name, 'Arthur Rimbaud')
+        self.assertSequenceEqual(Author.objects.all(), [charles])
+
+    def test_edit_only_inlineformset_factory(self):
+        charles = Author.objects.create(name='Charles Baudelaire')
+        book = Book.objects.create(author=charles, title='Les Paradis Artificiels')
+        AuthorFormSet = inlineformset_factory(
+            Author, Book, can_delete=False, fields='__all__', edit_only=True,
+        )
+        data = {
+            'book_set-TOTAL_FORMS': '4',
+            'book_set-INITIAL_FORMS': '1',
+            'book_set-MAX_NUM_FORMS': '0',
+            'book_set-0-id': book.pk,
+            'book_set-0-title': 'Les Fleurs du Mal',
+            'book_set-0-author': charles.pk,
+            'book_set-1-title': 'Flowers of Evil',
+            'book_set-1-author': charles.pk,
+        }
+        formset = AuthorFormSet(data, instance=charles)
+        self.assertIs(formset.is_valid(), True)
+        formset.save()
+        book.refresh_from_db()
+        self.assertEqual(book.title, 'Les Fleurs du Mal')
+        self.assertSequenceEqual(Book.objects.all(), [book])
+
+    def test_edit_only_object_outside_of_queryset(self):
+        charles = Author.objects.create(name='Charles Baudelaire')
+        walt = Author.objects.create(name='Walt Whitman')
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '1',
+            'form-0-id': walt.pk,
+            'form-0-name': 'Parth Patil',
+        }
+        AuthorFormSet = modelformset_factory(Author, fields='__all__', edit_only=True)
+        formset = AuthorFormSet(data, queryset=Author.objects.filter(pk=charles.pk))
+        self.assertIs(formset.is_valid(), True)
+        formset.save()
+        self.assertCountEqual(Author.objects.all(), [charles, walt])
 
 
 class TestModelFormsetOverridesTroughFormMeta(TestCase):
@@ -1819,6 +1868,10 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         })
         form = BookFormSet.form()
         self.assertHTMLEqual(form['title'].label_tag(), '<label for="id_title">Name:</label>')
+        self.assertHTMLEqual(
+            form['title'].legend_tag(),
+            '<legend for="id_title">Name:</legend>',
+        )
 
     def test_inlineformset_factory_labels_overrides(self):
         BookFormSet = inlineformset_factory(Author, Book, fields="__all__", labels={
@@ -1826,6 +1879,10 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         })
         form = BookFormSet.form()
         self.assertHTMLEqual(form['title'].label_tag(), '<label for="id_title">Name:</label>')
+        self.assertHTMLEqual(
+            form['title'].legend_tag(),
+            '<legend for="id_title">Name:</legend>',
+        )
 
     def test_modelformset_factory_help_text_overrides(self):
         BookFormSet = modelformset_factory(Book, fields="__all__", help_texts={
@@ -2012,3 +2069,22 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         self.assertEqual(len(formset), 2)
         self.assertNotIn('DELETE', formset.forms[0].fields)
         self.assertNotIn('DELETE', formset.forms[1].fields)
+
+    def test_inlineformset_factory_passes_renderer(self):
+        from django.forms.renderers import Jinja2
+        renderer = Jinja2()
+        BookFormSet = inlineformset_factory(
+            Author,
+            Book,
+            fields='__all__',
+            renderer=renderer,
+        )
+        formset = BookFormSet()
+        self.assertEqual(formset.renderer, renderer)
+
+    def test_modelformset_factory_passes_renderer(self):
+        from django.forms.renderers import Jinja2
+        renderer = Jinja2()
+        BookFormSet = modelformset_factory(Author, fields='__all__', renderer=renderer)
+        formset = BookFormSet()
+        self.assertEqual(formset.renderer, renderer)

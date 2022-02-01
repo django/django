@@ -1,10 +1,20 @@
+import warnings
+
+from django.contrib.postgres.indexes import OpClass
 from django.db import NotSupportedError
-from django.db.backends.ddl_references import Statement, Table
+from django.db.backends.ddl_references import Expressions, Statement, Table
 from django.db.models import Deferrable, F, Q
 from django.db.models.constraints import BaseConstraint
+from django.db.models.expressions import ExpressionList
+from django.db.models.indexes import IndexExpression
 from django.db.models.sql import Query
+from django.utils.deprecation import RemovedInDjango50Warning
 
 __all__ = ['ExclusionConstraint']
+
+
+class ExclusionConstraintExpression(IndexExpression):
+    template = '%(expressions)s WITH %(operator)s'
 
 
 class ExclusionConstraint(BaseConstraint):
@@ -44,10 +54,6 @@ class ExclusionConstraint(BaseConstraint):
             raise ValueError(
                 'ExclusionConstraint.include must be a list or tuple.'
             )
-        if include and index_type and index_type.lower() != 'gist':
-            raise ValueError(
-                'Covering exclusion constraints only support GiST indexes.'
-            )
         if not isinstance(opclasses, (list, tuple)):
             raise ValueError(
                 'ExclusionConstraint.opclasses must be a list or tuple.'
@@ -64,24 +70,29 @@ class ExclusionConstraint(BaseConstraint):
         self.deferrable = deferrable
         self.include = tuple(include) if include else ()
         self.opclasses = opclasses
+        if self.opclasses:
+            warnings.warn(
+                'The opclasses argument is deprecated in favor of using '
+                'django.contrib.postgres.indexes.OpClass in '
+                'ExclusionConstraint.expressions.',
+                category=RemovedInDjango50Warning,
+                stacklevel=2,
+            )
         super().__init__(name=name)
 
-    def _get_expression_sql(self, compiler, schema_editor, query):
+    def _get_expressions(self, schema_editor, query):
         expressions = []
         for idx, (expression, operator) in enumerate(self.expressions):
             if isinstance(expression, str):
                 expression = F(expression)
-            expression = expression.resolve_expression(query=query)
-            sql, params = compiler.compile(expression)
             try:
-                opclass = self.opclasses[idx]
-                if opclass:
-                    sql = '%s %s' % (sql, opclass)
+                expression = OpClass(expression, self.opclasses[idx])
             except IndexError:
                 pass
-            sql = sql % tuple(schema_editor.quote_value(p) for p in params)
-            expressions.append('%s WITH %s' % (sql, operator))
-        return expressions
+            expression = ExclusionConstraintExpression(expression, operator=operator)
+            expression.set_wrapper_classes(schema_editor.connection)
+            expressions.append(expression)
+        return ExpressionList(*expressions).resolve_expression(query)
 
     def _get_condition_sql(self, compiler, schema_editor, query):
         if self.condition is None:
@@ -93,17 +104,20 @@ class ExclusionConstraint(BaseConstraint):
     def constraint_sql(self, model, schema_editor):
         query = Query(model, alias_cols=False)
         compiler = query.get_compiler(connection=schema_editor.connection)
-        expressions = self._get_expression_sql(compiler, schema_editor, query)
+        expressions = self._get_expressions(schema_editor, query)
+        table = model._meta.db_table
         condition = self._get_condition_sql(compiler, schema_editor, query)
         include = [model._meta.get_field(field_name).column for field_name in self.include]
-        return self.template % {
-            'name': schema_editor.quote_name(self.name),
-            'index_type': self.index_type,
-            'expressions': ', '.join(expressions),
-            'include': schema_editor._index_include_sql(model, include),
-            'where': ' WHERE (%s)' % condition if condition else '',
-            'deferrable': schema_editor._deferrable_constraint_sql(self.deferrable),
-        }
+        return Statement(
+            self.template,
+            table=Table(table, schema_editor.quote_name),
+            name=schema_editor.quote_name(self.name),
+            index_type=self.index_type,
+            expressions=Expressions(table, expressions, compiler, schema_editor.quote_value),
+            where=' WHERE (%s)' % condition if condition else '',
+            include=schema_editor._index_include_sql(model, include),
+            deferrable=schema_editor._deferrable_constraint_sql(self.deferrable),
+        )
 
     def create_sql(self, model, schema_editor):
         self.check_supported(schema_editor)
@@ -121,9 +135,23 @@ class ExclusionConstraint(BaseConstraint):
         )
 
     def check_supported(self, schema_editor):
-        if self.include and not schema_editor.connection.features.supports_covering_gist_indexes:
+        if (
+            self.include and
+            self.index_type.lower() == 'gist' and
+            not schema_editor.connection.features.supports_covering_gist_indexes
+        ):
             raise NotSupportedError(
-                'Covering exclusion constraints requires PostgreSQL 12+.'
+                'Covering exclusion constraints using a GiST index require '
+                'PostgreSQL 12+.'
+            )
+        if (
+            self.include and
+            self.index_type.lower() == 'spgist' and
+            not schema_editor.connection.features.supports_covering_spgist_indexes
+        ):
+            raise NotSupportedError(
+                'Covering exclusion constraints using an SP-GiST index '
+                'require PostgreSQL 14+.'
             )
 
     def deconstruct(self):
@@ -155,12 +183,13 @@ class ExclusionConstraint(BaseConstraint):
         return super().__eq__(other)
 
     def __repr__(self):
-        return '<%s: index_type=%s, expressions=%s%s%s%s%s>' % (
+        return '<%s: index_type=%s expressions=%s name=%s%s%s%s%s>' % (
             self.__class__.__qualname__,
-            self.index_type,
-            self.expressions,
-            '' if self.condition is None else ', condition=%s' % self.condition,
-            '' if self.deferrable is None else ', deferrable=%s' % self.deferrable,
-            '' if not self.include else ', include=%s' % repr(self.include),
-            '' if not self.opclasses else ', opclasses=%s' % repr(self.opclasses),
+            repr(self.index_type),
+            repr(self.expressions),
+            repr(self.name),
+            '' if self.condition is None else ' condition=%s' % self.condition,
+            '' if self.deferrable is None else ' deferrable=%r' % self.deferrable,
+            '' if not self.include else ' include=%s' % repr(self.include),
+            '' if not self.opclasses else ' opclasses=%s' % repr(self.opclasses),
         )

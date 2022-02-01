@@ -1,11 +1,9 @@
-import html.entities
 import re
 import unicodedata
-import warnings
-from gzip import GzipFile
+from gzip import GzipFile, compress as gzip_compress
 from io import BytesIO
 
-from django.utils.deprecation import RemovedInDjango40Warning
+from django.core.exceptions import SuspiciousFileOperation
 from django.utils.functional import SimpleLazyObject, keep_lazy_text, lazy
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.translation import gettext as _, gettext_lazy, pgettext
@@ -14,7 +12,11 @@ from django.utils.translation import gettext as _, gettext_lazy, pgettext
 @keep_lazy_text
 def capfirst(x):
     """Capitalize the first letter of a string."""
-    return x and str(x)[0].upper() + str(x)[1:]
+    if not x:
+        return x
+    if not isinstance(x, str):
+        x = str(x)
+    return x[0].upper() + x[1:]
 
 
 # Set up regular expressions
@@ -219,7 +221,7 @@ class Truncator(SimpleLazyObject):
 
 
 @keep_lazy_text
-def get_valid_filename(s):
+def get_valid_filename(name):
     """
     Return the given string converted to a string that can be used for a clean
     filename. Remove leading and trailing spaces; convert other spaces to
@@ -228,8 +230,11 @@ def get_valid_filename(s):
     >>> get_valid_filename("john's portrait in 2004.jpg")
     'johns_portrait_in_2004.jpg'
     """
-    s = str(s).strip().replace(' ', '_')
-    return re.sub(r'(?u)[^-\w.]', '', s)
+    s = str(name).strip().replace(' ', '_')
+    s = re.sub(r'(?u)[^-\w.]', '', s)
+    if s in {'', '.', '..'}:
+        raise SuspiciousFileOperation("Could not derive file name from '%s'" % name)
+    return s
 
 
 @keep_lazy_text
@@ -274,13 +279,8 @@ def phone2numeric(phone):
     return ''.join(char2number.get(c, c) for c in phone.lower())
 
 
-# From http://www.xhaus.com/alan/python/httpcomp.html#gzip
-# Used with permission.
 def compress_string(s):
-    zbuf = BytesIO()
-    with GzipFile(mode='wb', compresslevel=6, fileobj=zbuf, mtime=0) as zfile:
-        zfile.write(s)
-    return zbuf.getvalue()
+    return gzip_compress(s, compresslevel=6, mtime=0)
 
 
 class StreamingBuffer(BytesIO):
@@ -337,38 +337,6 @@ def smart_split(text):
         yield bit[0]
 
 
-def _replace_entity(match):
-    text = match[1]
-    if text[0] == '#':
-        text = text[1:]
-        try:
-            if text[0] in 'xX':
-                c = int(text[1:], 16)
-            else:
-                c = int(text)
-            return chr(c)
-        except ValueError:
-            return match[0]
-    else:
-        try:
-            return chr(html.entities.name2codepoint[text])
-        except KeyError:
-            return match[0]
-
-
-_entity_re = _lazy_re_compile(r"&(#?[xX]?(?:[0-9a-fA-F]+|\w{1,8}));")
-
-
-@keep_lazy_text
-def unescape_entities(text):
-    warnings.warn(
-        'django.utils.text.unescape_entities() is deprecated in favor of '
-        'html.unescape().',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return _entity_re.sub(_replace_entity, str(text))
-
-
 @keep_lazy_text
 def unescape_string_literal(s):
     r"""
@@ -384,7 +352,7 @@ def unescape_string_literal(s):
         >>> unescape_string_literal("'\'ab\' c'")
         "'ab' c"
     """
-    if s[0] not in "\"'" or s[-1] != s[0]:
+    if not s or s[0] not in "\"'" or s[-1] != s[0]:
         raise ValueError("Not a string literal: %r" % s)
     quote = s[0]
     return s[1:-1].replace(r'\%s' % quote, quote).replace(r'\\', '\\')

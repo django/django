@@ -239,6 +239,14 @@ class BaseModelAdminChecks:
         except FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label, obj=obj, id='admin.E002')
         else:
+            # Using attname is not supported.
+            if field.name != field_name:
+                return refer_to_missing_field(
+                    field=field_name,
+                    option=label,
+                    obj=obj,
+                    id='admin.E002',
+                )
             if not field.many_to_many and not isinstance(field, models.ForeignKey):
                 return must_be('a foreign key or a many-to-many field', option=label, obj=obj, id='admin.E003')
             else:
@@ -1129,8 +1137,8 @@ def must_inherit_from(parent, option, obj, id):
 def refer_to_missing_field(field, option, obj, id):
     return [
         checks.Error(
-            "The value of '%s' refers to '%s', which is not an attribute of "
-            "'%s'." % (option, field, obj.model._meta.label),
+            "The value of '%s' refers to '%s', which is not a field of '%s'."
+            % (option, field, obj.model._meta.label),
             obj=obj.__class__,
             id=id,
         ),

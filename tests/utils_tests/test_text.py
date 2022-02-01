@@ -1,9 +1,9 @@
 import json
 import sys
 
-from django.test import SimpleTestCase, ignore_warnings
+from django.core.exceptions import SuspiciousFileOperation
+from django.test import SimpleTestCase
 from django.utils import text
-from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import lazystr
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy, override
@@ -213,32 +213,6 @@ class TestUtilsText(SimpleTestCase):
         with self.subTest('intern'):
             self.assertEqual(sys.intern(text.slugify('a')), 'a')
 
-    @ignore_warnings(category=RemovedInDjango40Warning)
-    def test_unescape_entities(self):
-        items = [
-            ('', ''),
-            ('foo', 'foo'),
-            ('&amp;', '&'),
-            ('&am;', '&am;'),
-            ('&#x26;', '&'),
-            ('&#xk;', '&#xk;'),
-            ('&#38;', '&'),
-            ('foo &amp; bar', 'foo & bar'),
-            ('foo & bar', 'foo & bar'),
-        ]
-        for value, output in items:
-            with self.subTest(value=value):
-                self.assertEqual(text.unescape_entities(value), output)
-                self.assertEqual(text.unescape_entities(lazystr(value)), output)
-
-    def test_unescape_entities_deprecated(self):
-        msg = (
-            'django.utils.text.unescape_entities() is deprecated in favor of '
-            'html.unescape().'
-        )
-        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
-            text.unescape_entities('foo')
-
     def test_unescape_string_literal(self):
         items = [
             ('"abc"', 'abc'),
@@ -251,10 +225,24 @@ class TestUtilsText(SimpleTestCase):
                 self.assertEqual(text.unescape_string_literal(value), output)
                 self.assertEqual(text.unescape_string_literal(lazystr(value)), output)
 
+    def test_unescape_string_literal_invalid_value(self):
+        items = ['', 'abc', "'abc\""]
+        for item in items:
+            msg = f'Not a string literal: {item!r}'
+            with self.assertRaisesMessage(ValueError, msg):
+                text.unescape_string_literal(item)
+
     def test_get_valid_filename(self):
         filename = "^&'@{}[],$=!-#()%+~_123.txt"
         self.assertEqual(text.get_valid_filename(filename), "-_123.txt")
         self.assertEqual(text.get_valid_filename(lazystr(filename)), "-_123.txt")
+        msg = "Could not derive file name from '???'"
+        with self.assertRaisesMessage(SuspiciousFileOperation, msg):
+            text.get_valid_filename('???')
+        # After sanitizing this would yield '..'.
+        msg = "Could not derive file name from '$.$.$'"
+        with self.assertRaisesMessage(SuspiciousFileOperation, msg):
+            text.get_valid_filename('$.$.$')
 
     def test_compress_sequence(self):
         data = [{'key': i} for i in range(10)]

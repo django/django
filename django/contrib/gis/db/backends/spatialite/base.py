@@ -71,4 +71,7 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
         with self.cursor() as cursor:
             cursor.execute("PRAGMA table_info(geometry_columns);")
             if cursor.fetchall() == []:
-                cursor.execute("SELECT InitSpatialMetaData(1)")
+                if self.ops.spatial_version < (5,):
+                    cursor.execute('SELECT InitSpatialMetaData(1)')
+                else:
+                    cursor.execute('SELECT InitSpatialMetaDataFull(1)')
