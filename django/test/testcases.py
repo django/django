@@ -224,7 +224,7 @@ class SimpleTestCase(unittest.TestCase):
             for name, _ in cls._disallowed_connection_methods:
                 method = getattr(connection, name)
                 setattr(connection, name, method.wrapped)
-      
+
     def __call__(self, result=None):
         """
         Wrapper around default __call__ method to perform common Django test
@@ -232,7 +232,7 @@ class SimpleTestCase(unittest.TestCase):
         include a call to super().setUp().
         """
         self._setup_and_call(result)
-    
+
     def __getstate__(self):
         """Returns a pickleable copy of the test.
 
@@ -243,7 +243,7 @@ class SimpleTestCase(unittest.TestCase):
             '_testMethodName': self._testMethodName,
             '_testMethodDoc': self._testMethodDoc,
         }
-        
+
     def debug(self):
         """Perform the same as __call__(), without catching the exception."""
         debug_result = _DebugResult()
