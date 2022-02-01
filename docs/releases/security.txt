@@ -1286,3 +1286,28 @@ Versions affected
 * Django 3.2 :commit:`(patch) <8d2f7cff76200cbd2337b2cf1707e383eb1fb54b>`
 * Django 2.2 :commit:`(patch) <4cb35b384ceef52123fc66411a73c36a706825e1>`
 
+February 1, 2022 - :cve:`2022-22818`
+------------------------------------
+
+Possible XSS via ``{% debug %}`` template tag. `Full description
+<https://www.djangoproject.com/weblog/2022/feb/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 4.0 :commit:`(patch) <01422046065d2b51f8f613409cad2c81b39487e5>`
+* Django 3.2 :commit:`(patch) <1a1e8278c46418bde24c86a65443b0674bae65e2>`
+* Django 2.2 :commit:`(patch) <c27a7eb9f40b64990398978152e62b6ff839c2e6>`
+
+February 1, 2022 - :cve:`2022-23833`
+------------------------------------
+
+Denial-of-service possibility in file uploads. `Full description
+<https://www.djangoproject.com/weblog/2022/feb/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 4.0 :commit:`(patch) <f9c7d48fdd6f198a6494a9202f90242f176e4fc9>`
+* Django 3.2 :commit:`(patch) <d16133568ef9c9b42cb7a08bdf9ff3feec2e5468>`
+* Django 2.2 :commit:`(patch) <c477b761804984c932704554ad35f78a2e230c6a>`
