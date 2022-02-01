@@ -1,7 +1,7 @@
 import unittest
 
 from django.test import SimpleTestCase
-from django.test.runner import RemoteTestResult, TestCaseDTO
+from django.test.runner import RemoteTestResult
 from django.utils.version import PY37
 
 try:
@@ -105,41 +105,9 @@ class RemoteTestResultTest(SimpleTestCase):
         result = RemoteTestResult()
         subtest_test = SampleFailingSubtest(methodName="pickle_error_test")
 
-        # This is the meat of the test: without TestCaseDTO, we'd expect an
-        # ugly "Can't pickle local object" exception when trying to run.
+        # Previously raised a "Can't pickle local object" exception:
         result = subtest_test.run(result=result)
 
         add_subtest_event = result.events[1]
         error = add_subtest_event[3][1]
         self.assertEqual(str(error), "False is not true")
-
-
-class TestCaseDTOTest(SimpleTestCase):
-    @unittest.skipUnless(tblib is not None, 'requires tblib to be installed')
-    def test_fields_are_set(self):
-        """
-        TestCaseDTO picks up the right fields from the wrapped TestCase.
-        """
-
-        result = RemoteTestResult()
-        subtest_test = SampleFailingSubtest(methodName="pickle_error_test")
-        result = subtest_test.run(result=result)
-
-        add_subtest_event = result.events[1]
-        subtest = add_subtest_event[2]
-
-        self.assertIsInstance(subtest, TestCaseDTO)
-        self.assertEqual(subtest.shortDescription(), "A dummy test for testing TestCaseDTO.")
-        self.assertEqual(subtest._subDescription(), "[I should fail]")
-        self.assertEqual(
-            subtest.id(),
-            "test_runner.test_parallel.SampleFailingSubtest.pickle_error_test [I should fail]"
-        )
-        self.assertEqual(
-            str(subtest),
-            "pickle_error_test (test_runner.test_parallel.SampleFailingSubtest) [I should fail]"
-        )
-        self.assertEqual(
-            subtest.test_case.id(),
-            'test_runner.test_parallel.SampleFailingSubtest.pickle_error_test'
-        )

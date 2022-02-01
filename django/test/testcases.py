@@ -236,6 +236,17 @@ class SimpleTestCase(unittest.TestCase):
             delattr(cls, '_cls_overridden_context')
         super().tearDownClass()
 
+    def __getstate__(self):
+        """Returns a pickleable copy of the test.
+
+        ParallelTestSuite requires that all TestCases are pickleable,
+        but subclasses may add unpickleable properties to objects.
+        """
+        return {
+            '_testMethodName': self._testMethodName,
+            '_testMethodDoc': self._testMethodDoc,
+        }
+
     def __call__(self, result=None):
         """
         Wrapper around default __call__ method to perform common Django test

@@ -101,43 +101,6 @@ class PDBDebugResult(unittest.TextTestResult):
         pdb.post_mortem(traceback)
 
 
-class TestCaseDTO:
-    """
-    The ParallelTestSuite requires that all test cases be pickleable. When a
-    SubTest fails with an exception, it's pickled and shipped back to the main
-    process to be displayed to the user. Unfortunately, Django's TestCases
-    aren't always pickleable (for example, they may contain an instance of
-    django.test.Client, which can't be cleanly pickled if an exception was
-    raised by the view).
-
-    Luckily the outer TestRunner only cares about a small subset of the fields
-    on TestCase, and those are usually pickleable. We use this object to pluck
-    out those fields, discarding extra unpickleable members.
-    """
-
-    def __init__(self, test):
-        self._inner_id = test.id()
-        self._inner_str = str(test)
-        self._inner_shortDescription = test.shortDescription()
-        if hasattr(test, "test_case"):
-            self.test_case = TestCaseDTO(test.test_case)
-        if hasattr(test, "_subDescription"):
-            self._inner_subDescription = test._subDescription()
-
-    def _subDescription(self):
-        """conforming to _SubTest"""
-        return self._inner_subDescription
-
-    def id(self):
-        return self._inner_id
-
-    def shortDescription(self):
-        return self._inner_shortDescription
-
-    def __str__(self):
-        return self._inner_str
-
-
 class RemoteTestResult:
     """
     Record information about which tests have succeeded and which have failed.
@@ -274,7 +237,6 @@ failure and get a correct traceback.
         # Follow Python 3.5's implementation of unittest.TestResult.addSubTest()
         # by not doing anything when a subtest is successful.
         if err is not None:
-            subtest = TestCaseDTO(subtest)
             # Call check_picklable() before check_subtest_picklable() since
             # check_picklable() performs the tblib check.
             self.check_picklable(test, err)

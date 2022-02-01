@@ -1,11 +1,20 @@
+import pickle
 from functools import wraps
 
 from django.db import IntegrityError, connections, transaction
-from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, ignore_warnings, skipUnlessDBFeature
 from django.test.testcases import TestData
 from django.utils.deprecation import RemovedInDjango41Warning
 
 from .models import Car, Person, PossessedCar
+
+
+class TestSimpleTestCase(SimpleTestCase):
+
+    def test_is_pickleable_with_non_pickleable_properties(self):
+        """ParallelTestSuite requires that all TestCases are pickleable."""
+        self.non_pickleable = lambda: 0
+        self.assertEqual(self, pickle.loads(pickle.dumps(self)))
 
 
 class TestTestCase(TestCase):
