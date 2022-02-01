@@ -36,6 +36,32 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+February 1, 2022 - :cve:`2022-22818`
+------------------------------------
+
+Possible XSS via ``{% debug %}`` template tag. `Full description
+<https://www.djangoproject.com/weblog/2022/feb/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 4.0 :commit:`(patch) <01422046065d2b51f8f613409cad2c81b39487e5>`
+* Django 3.2 :commit:`(patch) <1a1e8278c46418bde24c86a65443b0674bae65e2>`
+* Django 2.2 :commit:`(patch) <c27a7eb9f40b64990398978152e62b6ff839c2e6>`
+
+February 1, 2022 - :cve:`2022-23833`
+------------------------------------
+
+Denial-of-service possibility in file uploads. `Full description
+<https://www.djangoproject.com/weblog/2022/feb/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 4.0 :commit:`(patch) <f9c7d48fdd6f198a6494a9202f90242f176e4fc9>`
+* Django 3.2 :commit:`(patch) <d16133568ef9c9b42cb7a08bdf9ff3feec2e5468>`
+* Django 2.2 :commit:`(patch) <c477b761804984c932704554ad35f78a2e230c6a>`
+
 January 4, 2022 - :cve:`2021-45452`
 ------------------------------------
 
