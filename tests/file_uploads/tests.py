@@ -45,7 +45,6 @@ CANDIDATE_TRAVERSAL_FILE_NAMES = [
     '..\\..\\hax0rd.txt',       # Relative path, win-style.
     '../..\\hax0rd.txt',        # Relative path, mixed.
     '..&#x2F;hax0rd.txt',       # HTML entities.
-    '..&sol;hax0rd.txt',        # HTML entities.
 ]
 
 CANDIDATE_INVALID_FILE_NAMES = [
