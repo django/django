@@ -48,6 +48,8 @@ def watch_for_template_changes(sender, **kwargs):
 
 @receiver(file_changed, dispatch_uid='template_loaders_file_changed')
 def template_changed(sender, file_path, **kwargs):
+    if file_path.suffix == '.py':
+        return
     for template_dir in get_template_directories():
         if template_dir in file_path.parents:
             reset_loaders()
