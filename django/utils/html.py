@@ -24,7 +24,7 @@ def escape(text):
     This may result in double-escaping. If this is a concern, use
     conditional_escape() instead.
     """
-    return mark_safe(html.escape(str(text)))
+    return SafeString(html.escape(str(text)))
 
 
 _js_escapes = {
