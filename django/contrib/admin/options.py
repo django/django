@@ -2051,6 +2051,7 @@ class InlineModelAdmin(BaseModelAdmin):
         self.parent_model = parent_model
         self.opts = self.model._meta
         self.has_registered_model = admin_site.is_registered(self.model)
+        self._cached_fields_choices = {}
         super().__init__()
         if self.verbose_name_plural is None:
             if self.verbose_name is None:
@@ -2170,6 +2171,29 @@ class InlineModelAdmin(BaseModelAdmin):
             defaults['fields'] = forms.ALL_FIELDS
 
         return inlineformset_factory(self.parent_model, self.model, **defaults)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        should_use_cache = db_field.name not in self.raw_id_fields
+        cache_key = (db_field.name, kwargs.get('queryset'))
+        already_set = cache_key in self._cached_fields_choices
+        if should_use_cache and already_set:
+            kwargs['choices'] = self._cached_fields_choices[cache_key]
+
+        formfield = super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+        if should_use_cache and not already_set:
+            # Fetch choices lazily due to HiddenInput-like widgets.
+            # Such widgets don't use choices property for representation
+            # so it will be useless extra query.
+            def lazy_evaluation():
+                choices = self._cached_fields_choices[cache_key]
+                if not isinstance(choices, list):
+                    # call iter to not send extra counting query by __len__
+                    choices = list(iter(formfield.choices))
+                    self._cached_fields_choices[cache_key] = choices
+                return choices
+            self._cached_fields_choices[cache_key] = lazy_evaluation
+        return formfield
 
     def _get_form_for_get_fields(self, request, obj=None):
         return self.get_formset(request, obj, fields=None).form

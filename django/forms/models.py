@@ -1226,11 +1226,9 @@ class ModelChoiceField(ChoiceField):
     def __init__(self, queryset, *, empty_label="---------",
                  required=True, widget=None, label=None, initial=None,
                  help_text='', to_field_name=None, limit_choices_to=None,
-                 blank=False, **kwargs):
-        # Call Field instead of ChoiceField __init__() because we don't need
-        # ChoiceField.__init__().
-        Field.__init__(
-            self, required=required, widget=widget, label=label,
+                 choices=None, blank=False, **kwargs):
+        super().__init__(
+            required=required, widget=widget, label=label, choices=choices,
             initial=initial, help_text=help_text, **kwargs
         )
         if (
