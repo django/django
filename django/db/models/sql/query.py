@@ -1735,8 +1735,7 @@ class Query(BaseExpression):
                 for alias in self._gen_col_aliases([annotation]):
                     if isinstance(self.alias_map[alias], Join):
                         raise FieldError(
-                            'Joined field references are not permitted in '
-                            'this query'
+                            'Joined field references are not permitted in this query'
                         )
             if summarize:
                 # Summarize currently means we are doing an aggregate() query
@@ -1763,8 +1762,9 @@ class Query(BaseExpression):
             if not allow_joins and len(join_list) > 1:
                 raise FieldError('Joined field references are not permitted in this query')
             if len(targets) > 1:
-                raise FieldError("Referencing multicolumn fields with F() objects "
-                                 "isn't supported")
+                raise FieldError(
+                    "Referencing multicolumn fields with F() objects isn't supported"
+                )
             # Verify that the last lookup in name is a field or a transform:
             # transform_function() raises FieldError if not.
             transform = join_info.transform_function(targets[0], final_alias)

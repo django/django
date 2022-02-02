@@ -429,8 +429,7 @@ class BulkCreateTests(TestCase):
     )
     def test_update_conflicts_invalid_update_fields(self):
         msg = (
-            'bulk_create() can only be used with concrete fields in '
-            'update_fields.'
+            'bulk_create() can only be used with concrete fields in update_fields.'
         )
         # Reverse one-to-one relationship.
         with self.assertRaisesMessage(ValueError, msg):
@@ -467,8 +466,7 @@ class BulkCreateTests(TestCase):
     )
     def test_update_conflicts_invalid_unique_fields(self):
         msg = (
-            'bulk_create() can only be used with concrete fields in '
-            'unique_fields.'
+            'bulk_create() can only be used with concrete fields in unique_fields.'
         )
         # Reverse one-to-one relationship.
         with self.assertRaisesMessage(ValueError, msg):

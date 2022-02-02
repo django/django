@@ -36,8 +36,7 @@ class Index:
             raise ValueError('Index.opclasses must be a list or tuple.')
         if not expressions and not fields:
             raise ValueError(
-                'At least one field or expression is required to define an '
-                'index.'
+                'At least one field or expression is required to define an index.'
             )
         if expressions and fields:
             raise ValueError(

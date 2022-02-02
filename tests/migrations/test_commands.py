@@ -308,9 +308,7 @@ class MigrateTests(MigrationTestBase):
         with mock.patch('django.core.management.color.supports_color', lambda *args: True):
             call_command("showmigrations", format='list', stdout=out, verbosity=0, no_color=False)
         self.assertEqual(
-            '\x1b[1mmigrations\n\x1b[0m'
-            ' [ ] 0001_initial\n'
-            ' [ ] 0002_second\n',
+            '\x1b[1mmigrations\n\x1b[0m [ ] 0001_initial\n [ ] 0002_second\n',
             out.getvalue().lower()
         )
 
@@ -320,9 +318,7 @@ class MigrateTests(MigrationTestBase):
         # Giving the explicit app_label tests for selective `show_list` in the command
         call_command("showmigrations", "migrations", format='list', stdout=out, verbosity=0, no_color=True)
         self.assertEqual(
-            'migrations\n'
-            ' [x] 0001_initial\n'
-            ' [ ] 0002_second\n',
+            'migrations\n [x] 0001_initial\n [ ] 0002_second\n',
             out.getvalue().lower()
         )
         out = io.StringIO()
@@ -343,8 +339,7 @@ class MigrateTests(MigrationTestBase):
         out = io.StringIO()
         call_command('showmigrations', format='list', stdout=out, verbosity=2, no_color=True)
         self.assertEqual(
-            'migrations\n'
-            ' [ ] 0001_squashed_0002 (2 squashed migrations)\n',
+            'migrations\n [ ] 0001_squashed_0002 (2 squashed migrations)\n',
             out.getvalue().lower(),
         )
         out = io.StringIO()
@@ -368,8 +363,7 @@ class MigrateTests(MigrationTestBase):
             out = io.StringIO()
             call_command('showmigrations', format='list', stdout=out, verbosity=2, no_color=True)
             self.assertEqual(
-                'migrations\n'
-                ' [x] 0001_squashed_0002 (2 squashed migrations)\n',
+                'migrations\n [x] 0001_squashed_0002 (2 squashed migrations)\n',
                 out.getvalue().lower(),
             )
         finally:
@@ -447,8 +441,7 @@ class MigrateTests(MigrationTestBase):
             # Show the plan for when there is nothing to apply.
             call_command('migrate', 'migrations', '0003', plan=True, stdout=out, no_color=True)
             self.assertEqual(
-                'Planned operations:\n'
-                '  No planned migration operations.\n',
+                'Planned operations:\n  No planned migration operations.\n',
                 out.getvalue()
             )
             out = io.StringIO()
@@ -609,8 +602,7 @@ class MigrateTests(MigrationTestBase):
         out = io.StringIO()
         call_command('showmigrations', 'mutate_state_b', format='plan', stdout=out)
         self.assertEqual(
-            '[ ]  mutate_state_b.0001_initial\n'
-            '[ ]  mutate_state_b.0002_add_field\n',
+            '[ ]  mutate_state_b.0001_initial\n[ ]  mutate_state_b.0002_add_field\n',
             out.getvalue()
         )
         # Single app with dependencies.
@@ -911,8 +903,7 @@ class MigrateTests(MigrationTestBase):
         call_command("migrate", "migrations", verbosity=0)
         call_command("showmigrations", "migrations", stdout=out, no_color=True)
         self.assertEqual(
-            'migrations\n'
-            ' [x] 0001_squashed_0002 (2 squashed migrations)\n',
+            'migrations\n [x] 0001_squashed_0002 (2 squashed migrations)\n',
             out.getvalue().lower()
         )
         applied_migrations = recorder.applied_migrations()
@@ -944,8 +935,7 @@ class MigrateTests(MigrationTestBase):
         call_command("migrate", "migrations", verbosity=0)
         call_command("showmigrations", "migrations", stdout=out, no_color=True)
         self.assertEqual(
-            'migrations\n'
-            ' [x] 0001_squashed_0002 (2 squashed migrations)\n',
+            'migrations\n [x] 0001_squashed_0002 (2 squashed migrations)\n',
             out.getvalue().lower()
         )
         self.assertIn(
@@ -1115,8 +1105,7 @@ class MigrateTests(MigrationTestBase):
         call_command('migrate', 'migrations', prune=True, stdout=out, no_color=True)
         self.assertEqual(
             out.getvalue(),
-            'Pruning migrations:\n'
-            '  No migrations to prune.\n',
+            'Pruning migrations:\n  No migrations to prune.\n',
         )
         out = io.StringIO()
         call_command(
@@ -2311,8 +2300,7 @@ class AppLabelErrorTests(TestCase):
     """
     nonexistent_app_error = "No installed app with label 'nonexistent_app'."
     did_you_mean_auth_error = (
-        "No installed app with label 'django.contrib.auth'. Did you mean "
-        "'auth'?"
+        "No installed app with label 'django.contrib.auth'. Did you mean 'auth'?"
     )
 
     def test_makemigrations_nonexistent_app_label(self):

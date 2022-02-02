@@ -50,8 +50,9 @@ def check_settings(base_url=None):
             "You're using the staticfiles app "
             "without having set the required STATIC_URL setting.")
     if settings.MEDIA_URL == base_url:
-        raise ImproperlyConfigured("The MEDIA_URL and STATIC_URL "
-                                   "settings must have different values")
+        raise ImproperlyConfigured(
+            "The MEDIA_URL and STATIC_URL settings must have different values"
+        )
     if (settings.DEBUG and settings.MEDIA_URL and settings.STATIC_URL and
             settings.MEDIA_URL.startswith(settings.STATIC_URL)):
         raise ImproperlyConfigured(
@@ -59,5 +60,6 @@ def check_settings(base_url=None):
         )
     if ((settings.MEDIA_ROOT and settings.STATIC_ROOT) and
             (settings.MEDIA_ROOT == settings.STATIC_ROOT)):
-        raise ImproperlyConfigured("The MEDIA_ROOT and STATIC_ROOT "
-                                   "settings must have different values")
+        raise ImproperlyConfigured(
+            "The MEDIA_ROOT and STATIC_ROOT settings must have different values"
+        )

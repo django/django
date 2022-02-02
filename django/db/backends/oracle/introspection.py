@@ -93,7 +93,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         interface.
         """
         # user_tab_columns gives data default for columns
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 user_tab_cols.column_name,
                 user_tab_cols.data_default,
@@ -126,7 +127,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             LEFT OUTER JOIN
                 user_tables ON user_tables.table_name = user_tab_cols.table_name
             WHERE user_tab_cols.table_name = UPPER(%s)
-        """, [table_name])
+            """,
+            [table_name],
+        )
         field_map = {
             column: (internal_size, default if default != 'NULL' else None, collation, is_autofield, is_json)
             for column, default, collation, internal_size, is_autofield, is_json in cursor.fetchall()
@@ -151,7 +154,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         return name.lower()
 
     def get_sequences(self, cursor, table_name, table_fields=()):
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 user_tab_identity_cols.sequence_name,
                 user_tab_identity_cols.column_name
@@ -165,7 +169,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 AND cols.column_name = user_tab_identity_cols.column_name
                 AND user_constraints.constraint_type = 'P'
                 AND user_tab_identity_cols.table_name = UPPER(%s)
-        """, [table_name])
+            """,
+            [table_name],
+        )
         # Oracle allows only one identity column per table.
         row = cursor.fetchone()
         if row:
@@ -203,7 +209,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         }
 
     def get_primary_key_column(self, cursor, table_name):
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 cols.column_name
             FROM
@@ -214,7 +221,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 user_constraints.constraint_type = 'P' AND
                 user_constraints.table_name = UPPER(%s) AND
                 cols.position = 1
-        """, [table_name])
+            """,
+            [table_name],
+        )
         row = cursor.fetchone()
         return self.identifier_converter(row[0]) if row else None
 
@@ -225,7 +234,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """
         constraints = {}
         # Loop over the constraints, getting PKs, uniques, and checks
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 user_constraints.constraint_name,
                 LISTAGG(LOWER(cols.column_name), ',') WITHIN GROUP (ORDER BY cols.position),
@@ -249,7 +259,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 user_constraints.constraint_type = ANY('P', 'U', 'C')
                 AND user_constraints.table_name = UPPER(%s)
             GROUP BY user_constraints.constraint_name, user_constraints.constraint_type
-        """, [table_name])
+            """,
+            [table_name],
+        )
         for constraint, columns, pk, unique, check in cursor.fetchall():
             constraint = self.identifier_converter(constraint)
             constraints[constraint] = {
@@ -261,7 +273,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 'index': unique,  # All uniques come with an index
             }
         # Foreign key constraints
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 cons.constraint_name,
                 LISTAGG(LOWER(cols.column_name), ',') WITHIN GROUP (ORDER BY cols.position),
@@ -277,7 +290,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 cons.constraint_type = 'R' AND
                 cons.table_name = UPPER(%s)
             GROUP BY cons.constraint_name, rcols.table_name, rcols.column_name
-        """, [table_name])
+            """,
+            [table_name],
+        )
         for constraint, columns, other_table, other_column in cursor.fetchall():
             constraint = self.identifier_converter(constraint)
             constraints[constraint] = {
@@ -289,7 +304,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 'columns': columns.split(','),
             }
         # Now get indexes
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 ind.index_name,
                 LOWER(ind.index_type),
@@ -306,7 +322,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     WHERE ind.index_name = cons.index_name
                 ) AND cols.index_name = ind.index_name
             GROUP BY ind.index_name, ind.index_type, ind.uniqueness
-        """, [table_name])
+            """,
+            [table_name],
+        )
         for constraint, type_, unique, columns, orders in cursor.fetchall():
             constraint = self.identifier_converter(constraint)
             constraints[constraint] = {

@@ -316,7 +316,7 @@ class RequestsTests(SimpleTestCase):
             '',
             'value',
             '--boundary--'
-            '']))
+        ]))
         request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
             'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
@@ -341,7 +341,7 @@ class RequestsTests(SimpleTestCase):
             b'',
             b'value',
             b'--boundary--'
-            b''])
+        ])
         payload = FakePayload(payload_data)
         request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
@@ -366,7 +366,7 @@ class RequestsTests(SimpleTestCase):
             '',
             'value',
             '--boundary--'
-            '']))
+        ]))
         request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
             'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',

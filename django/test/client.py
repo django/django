@@ -894,8 +894,7 @@ class AsyncClient(ClientMixin, AsyncRequestFactory):
         """
         if 'follow' in request:
             raise NotImplementedError(
-                'AsyncClient request methods do not accept the follow '
-                'parameter.'
+                'AsyncClient request methods do not accept the follow parameter.'
             )
         scope = self._base_scope(**request)
         # Curry a data dictionary into an instance of the template renderer

@@ -1707,8 +1707,7 @@ class ConstraintsTests(TestCase):
 
         self.assertEqual(Model.check(databases=self.databases), [
             Error(
-                "'constraints' refers to the nonexistent field "
-                "'missing_field'.",
+                "'constraints' refers to the nonexistent field 'missing_field'.",
                 obj=Model,
                 id='models.E012',
             ),
@@ -1972,8 +1971,7 @@ class ConstraintsTests(TestCase):
 
         self.assertEqual(Model.check(databases=self.databases), [
             Error(
-                "'constraints' refers to the nonexistent field "
-                "'missing_field'.",
+                "'constraints' refers to the nonexistent field 'missing_field'.",
                 obj=Model,
                 id='models.E012',
             ),
@@ -2075,8 +2073,7 @@ class ConstraintsTests(TestCase):
 
         self.assertEqual(Model.check(databases=self.databases), [
             Error(
-                "'constraints' refers to the nonexistent field "
-                "'missing_field'.",
+                "'constraints' refers to the nonexistent field 'missing_field'.",
                 obj=Model,
                 id='models.E012',
             ),
@@ -2193,8 +2190,7 @@ class ConstraintsTests(TestCase):
 
         self.assertEqual(Model.check(databases=self.databases), [
             Error(
-                "'constraints' refers to the nonexistent field "
-                "'missing_field'.",
+                "'constraints' refers to the nonexistent field 'missing_field'.",
                 obj=Model,
                 id='models.E012',
             ),
@@ -2331,8 +2327,7 @@ class ConstraintsTests(TestCase):
 
         self.assertEqual(Model.check(databases=self.databases), [
             Error(
-                "'constraints' refers to the nonexistent field "
-                "'missing_field'.",
+                "'constraints' refers to the nonexistent field 'missing_field'.",
                 obj=Model,
                 id='models.E012',
             ),
@@ -2348,8 +2343,7 @@ class ConstraintsTests(TestCase):
 
         self.assertEqual(Model.check(databases=self.databases), [
             Error(
-                "'constraints' refers to the nonexistent field "
-                "'missing_field'.",
+                "'constraints' refers to the nonexistent field 'missing_field'.",
                 obj=Model,
                 id='models.E012',
             ),

@@ -11,10 +11,7 @@ from django.test.utils import captured_stdin, captured_stdout
 class ShellCommandTestCase(SimpleTestCase):
     script_globals = 'print("__name__" in globals())'
     script_with_inline_function = (
-        'import django\n'
-        'def f():\n'
-        '    print(django.__version__)\n'
-        'f()'
+        'import django\ndef f():\n    print(django.__version__)\nf()'
     )
 
     def test_command_option(self):

@@ -315,13 +315,15 @@ def do_include(parser, token):
     while remaining_bits:
         option = remaining_bits.pop(0)
         if option in options:
-            raise TemplateSyntaxError('The %r option was specified more '
-                                      'than once.' % option)
+            raise TemplateSyntaxError(
+                'The %r option was specified more than once.' % option
+            )
         if option == 'with':
             value = token_kwargs(remaining_bits, parser, support_legacy=False)
             if not value:
-                raise TemplateSyntaxError('"with" in %r tag needs at least '
-                                          'one keyword argument.' % bits[0])
+                raise TemplateSyntaxError(
+                    '"with" in %r tag needs at least one keyword argument.' % bits[0]
+                )
         elif option == 'only':
             value = True
         else:

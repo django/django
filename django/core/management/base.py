@@ -552,8 +552,8 @@ class AppCommand(BaseCommand):
         corresponding to an application label given on the command line.
         """
         raise NotImplementedError(
-            "Subclasses of AppCommand must provide"
-            "a handle_app_config() method.")
+            "Subclasses of AppCommand must provide a handle_app_config() method."
+        )
 
 
 class LabelCommand(BaseCommand):

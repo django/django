@@ -411,8 +411,7 @@ class PrepopulatedFieldsCheckTests(CheckTestCase):
 
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
-            'The value of \'prepopulated_fields["slug"]\' must be a list '
-            'or tuple.',
+            'The value of \'prepopulated_fields["slug"]\' must be a list or tuple.',
             'admin.E029'
         )
 

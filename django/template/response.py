@@ -49,8 +49,9 @@ class SimpleTemplateResponse(HttpResponse):
         """
         obj_dict = self.__dict__.copy()
         if not self._is_rendered:
-            raise ContentNotRenderedError('The response content must be '
-                                          'rendered before it can be pickled.')
+            raise ContentNotRenderedError(
+                'The response content must be rendered before it can be pickled.'
+            )
         for attr in self.rendering_attrs:
             if attr in obj_dict:
                 del obj_dict[attr]
