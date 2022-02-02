@@ -60,11 +60,11 @@ sure you've configured your cache; see the :doc:`cache documentation
 
 .. warning::
 
-    You should only use cache-based sessions if you're using the Memcached
-    cache backend. The local-memory cache backend doesn't retain data long
-    enough to be a good choice, and it'll be faster to use file or database
-    sessions directly instead of sending everything through the file or
-    database cache backends. Additionally, the local-memory cache backend is
+    You should only use cache-based sessions if you're using the Memcached or
+    Redis cache backend. The local-memory cache backend doesn't retain data
+    long enough to be a good choice, and it'll be faster to use file or
+    database sessions directly instead of sending everything through the file
+    or database cache backends. Additionally, the local-memory cache backend is
     NOT multi-process safe, therefore probably not a good choice for production
     environments.
 
