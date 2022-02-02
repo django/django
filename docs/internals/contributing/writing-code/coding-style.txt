@@ -35,10 +35,13 @@ them.
 Python style
 ============
 
-* Please conform to the indentation style dictated in the ``.editorconfig``
-  file. We recommend using a text editor with `EditorConfig`_ support to avoid
-  indentation and whitespace issues. The Python files use 4 spaces for
-  indentation and the HTML files use 2 spaces.
+* All files should be formatted using the `black`_ auto-formatter. This will be
+  run by ``pre-commit`` if that is configured.
+
+* The project repository includes an ``.editorconfig`` file. We recommend using
+  a text editor with `EditorConfig`_ support to avoid indentation and
+  whitespace issues. The Python files use 4 spaces for indentation and the HTML
+  files use 2 spaces.
 
 * Unless otherwise specified, follow :pep:`8`.
 
@@ -51,32 +54,10 @@ Python style
 
   An exception to :pep:`8` is our rules on line lengths. Don't limit lines of
   code to 79 characters if it means the code looks significantly uglier or is
-  harder to read. We allow up to 119 characters as this is the width of GitHub
-  code review; anything longer requires horizontal scrolling which makes review
-  more difficult. This check is included when you run ``flake8``. Documentation,
+  harder to read. We allow up to 88 characters as this is the line length used
+  by ``black``. This check is included when you run ``flake8``. Documentation,
   comments, and docstrings should be wrapped at 79 characters, even though
   :pep:`8` suggests 72.
-
-* Use four spaces for indentation.
-
-* Use four space hanging indentation rather than vertical alignment::
-
-    raise AttributeError(
-        'Here is a multiline error message '
-        'shortened for clarity.'
-    )
-
-  Instead of::
-
-      raise AttributeError('Here is a multiline error message '
-                           'shortened for clarity.')
-
-  This makes better use of space and avoids having to realign strings if the
-  length of the first line changes.
-
-* Use single quotes for strings, or a double quote if the string contains a
-  single quote. Don't waste time doing unrelated refactoring of existing code
-  to conform to this style.
 
 * String variable interpolation may use
   :py:ref:`%-formatting <old-string-formatting>`, :py:ref:`f-strings
@@ -145,6 +126,10 @@ Python style
         A test docstring looks like this (#123456).
         """
         ...
+
+.. versionchanged:: 4.0.3
+
+    All Python code in Django was reformatted with `black`_.
 
 .. _coding-style-imports:
 
@@ -397,5 +382,6 @@ JavaScript style
 For details about the JavaScript code style used by Django, see
 :doc:`javascript`.
 
+.. _black: https://black.readthedocs.io/en/stable/
 .. _editorconfig: https://editorconfig.org/
 .. _flake8: https://pypi.org/project/flake8/
