@@ -22,7 +22,7 @@ class CheckSessionCookieSecureTest(SimpleTestCase):
     @override_settings(
         SESSION_COOKIE_SECURE=False,
         INSTALLED_APPS=[],
-        MIDDLEWARE=['django.contrib.sessions.middleware.SessionMiddleware'],
+        MIDDLEWARE=["django.contrib.sessions.middleware.SessionMiddleware"],
     )
     def test_session_cookie_secure_with_middleware(self):
         """
@@ -35,7 +35,7 @@ class CheckSessionCookieSecureTest(SimpleTestCase):
     @override_settings(
         SESSION_COOKIE_SECURE=False,
         INSTALLED_APPS=["django.contrib.sessions"],
-        MIDDLEWARE=['django.contrib.sessions.middleware.SessionMiddleware'],
+        MIDDLEWARE=["django.contrib.sessions.middleware.SessionMiddleware"],
     )
     def test_session_cookie_secure_both(self):
         """
@@ -47,7 +47,7 @@ class CheckSessionCookieSecureTest(SimpleTestCase):
     @override_settings(
         SESSION_COOKIE_SECURE=True,
         INSTALLED_APPS=["django.contrib.sessions"],
-        MIDDLEWARE=['django.contrib.sessions.middleware.SessionMiddleware'],
+        MIDDLEWARE=["django.contrib.sessions.middleware.SessionMiddleware"],
     )
     def test_session_cookie_secure_true(self):
         """
@@ -72,7 +72,7 @@ class CheckSessionCookieHttpOnlyTest(SimpleTestCase):
     @override_settings(
         SESSION_COOKIE_HTTPONLY=False,
         INSTALLED_APPS=[],
-        MIDDLEWARE=['django.contrib.sessions.middleware.SessionMiddleware'],
+        MIDDLEWARE=["django.contrib.sessions.middleware.SessionMiddleware"],
     )
     def test_session_cookie_httponly_with_middleware(self):
         """
@@ -85,7 +85,7 @@ class CheckSessionCookieHttpOnlyTest(SimpleTestCase):
     @override_settings(
         SESSION_COOKIE_HTTPONLY=False,
         INSTALLED_APPS=["django.contrib.sessions"],
-        MIDDLEWARE=['django.contrib.sessions.middleware.SessionMiddleware'],
+        MIDDLEWARE=["django.contrib.sessions.middleware.SessionMiddleware"],
     )
     def test_session_cookie_httponly_both(self):
         """
@@ -97,7 +97,7 @@ class CheckSessionCookieHttpOnlyTest(SimpleTestCase):
     @override_settings(
         SESSION_COOKIE_HTTPONLY=True,
         INSTALLED_APPS=["django.contrib.sessions"],
-        MIDDLEWARE=['django.contrib.sessions.middleware.SessionMiddleware'],
+        MIDDLEWARE=["django.contrib.sessions.middleware.SessionMiddleware"],
     )
     def test_session_cookie_httponly_true(self):
         """
@@ -114,7 +114,7 @@ class CheckCSRFMiddlewareTest(SimpleTestCase):
         """
         self.assertEqual(csrf.check_csrf_middleware(None), [csrf.W003])
 
-    @override_settings(MIDDLEWARE=['django.middleware.csrf.CsrfViewMiddleware'])
+    @override_settings(MIDDLEWARE=["django.middleware.csrf.CsrfViewMiddleware"])
     def test_with_csrf_middleware(self):
         self.assertEqual(csrf.check_csrf_middleware(None), [])
 
@@ -167,7 +167,7 @@ class CheckSecurityMiddlewareTest(SimpleTestCase):
         """
         self.assertEqual(base.check_security_middleware(None), [base.W001])
 
-    @override_settings(MIDDLEWARE=['django.middleware.security.SecurityMiddleware'])
+    @override_settings(MIDDLEWARE=["django.middleware.security.SecurityMiddleware"])
     def test_with_security_middleware(self):
         self.assertEqual(base.check_security_middleware(None), [])
 
@@ -254,7 +254,9 @@ class CheckStrictTransportSecurityPreloadTest(SimpleTestCase):
         """
         self.assertEqual(base.check_sts_preload(None), [base.W021])
 
-    @override_settings(MIDDLEWARE=[], SECURE_HSTS_PRELOAD=False, SECURE_HSTS_SECONDS=3600)
+    @override_settings(
+        MIDDLEWARE=[], SECURE_HSTS_PRELOAD=False, SECURE_HSTS_SECONDS=3600
+    )
     def test_no_sts_preload_no_middleware(self):
         """
         Don't warn if SecurityMiddleware isn't installed.
@@ -289,7 +291,9 @@ class CheckXFrameOptionsMiddlewareTest(SimpleTestCase):
         """
         self.assertEqual(base.check_xframe_options_middleware(None), [base.W002])
 
-    @override_settings(MIDDLEWARE=["django.middleware.clickjacking.XFrameOptionsMiddleware"])
+    @override_settings(
+        MIDDLEWARE=["django.middleware.clickjacking.XFrameOptionsMiddleware"]
+    )
     def test_middleware_installed(self):
         self.assertEqual(base.check_xframe_options_middleware(None), [])
 
@@ -297,7 +301,7 @@ class CheckXFrameOptionsMiddlewareTest(SimpleTestCase):
 class CheckXFrameOptionsDenyTest(SimpleTestCase):
     @override_settings(
         MIDDLEWARE=["django.middleware.clickjacking.XFrameOptionsMiddleware"],
-        X_FRAME_OPTIONS='SAMEORIGIN',
+        X_FRAME_OPTIONS="SAMEORIGIN",
     )
     def test_x_frame_options_not_deny(self):
         """
@@ -306,7 +310,7 @@ class CheckXFrameOptionsDenyTest(SimpleTestCase):
         """
         self.assertEqual(base.check_xframe_deny(None), [base.W019])
 
-    @override_settings(MIDDLEWARE=[], X_FRAME_OPTIONS='SAMEORIGIN')
+    @override_settings(MIDDLEWARE=[], X_FRAME_OPTIONS="SAMEORIGIN")
     def test_middleware_not_installed(self):
         """
         No error if XFrameOptionsMiddleware isn't in MIDDLEWARE even if
@@ -316,7 +320,7 @@ class CheckXFrameOptionsDenyTest(SimpleTestCase):
 
     @override_settings(
         MIDDLEWARE=["django.middleware.clickjacking.XFrameOptionsMiddleware"],
-        X_FRAME_OPTIONS='DENY',
+        X_FRAME_OPTIONS="DENY",
     )
     def test_xframe_deny(self):
         self.assertEqual(base.check_xframe_deny(None), [])
@@ -377,13 +381,15 @@ class CheckSSLRedirectTest(SimpleTestCase):
 
 
 class CheckSecretKeyTest(SimpleTestCase):
-    @override_settings(SECRET_KEY=('abcdefghijklmnopqrstuvwx' * 2) + 'ab')
+    @override_settings(SECRET_KEY=("abcdefghijklmnopqrstuvwx" * 2) + "ab")
     def test_okay_secret_key(self):
         self.assertEqual(len(settings.SECRET_KEY), base.SECRET_KEY_MIN_LENGTH)
-        self.assertGreater(len(set(settings.SECRET_KEY)), base.SECRET_KEY_MIN_UNIQUE_CHARACTERS)
+        self.assertGreater(
+            len(set(settings.SECRET_KEY)), base.SECRET_KEY_MIN_UNIQUE_CHARACTERS
+        )
         self.assertEqual(base.check_secret_key(None), [])
 
-    @override_settings(SECRET_KEY='')
+    @override_settings(SECRET_KEY="")
     def test_empty_secret_key(self):
         self.assertEqual(base.check_secret_key(None), [base.W009])
 
@@ -402,20 +408,22 @@ class CheckSecretKeyTest(SimpleTestCase):
     def test_insecure_secret_key(self):
         self.assertEqual(base.check_secret_key(None), [base.W009])
 
-    @override_settings(SECRET_KEY=('abcdefghijklmnopqrstuvwx' * 2) + 'a')
+    @override_settings(SECRET_KEY=("abcdefghijklmnopqrstuvwx" * 2) + "a")
     def test_low_length_secret_key(self):
         self.assertEqual(len(settings.SECRET_KEY), base.SECRET_KEY_MIN_LENGTH - 1)
         self.assertEqual(base.check_secret_key(None), [base.W009])
 
-    @override_settings(SECRET_KEY='abcd' * 20)
+    @override_settings(SECRET_KEY="abcd" * 20)
     def test_low_entropy_secret_key(self):
         self.assertGreater(len(settings.SECRET_KEY), base.SECRET_KEY_MIN_LENGTH)
-        self.assertLess(len(set(settings.SECRET_KEY)), base.SECRET_KEY_MIN_UNIQUE_CHARACTERS)
+        self.assertLess(
+            len(set(settings.SECRET_KEY)), base.SECRET_KEY_MIN_UNIQUE_CHARACTERS
+        )
         self.assertEqual(base.check_secret_key(None), [base.W009])
 
 
 class CheckSecretKeyFallbacksTest(SimpleTestCase):
-    @override_settings(SECRET_KEY_FALLBACKS=[('abcdefghijklmnopqrstuvwx' * 2) + 'ab'])
+    @override_settings(SECRET_KEY_FALLBACKS=[("abcdefghijklmnopqrstuvwx" * 2) + "ab"])
     def test_okay_secret_key_fallbacks(self):
         self.assertEqual(
             len(settings.SECRET_KEY_FALLBACKS[0]),
@@ -430,29 +438,38 @@ class CheckSecretKeyFallbacksTest(SimpleTestCase):
     def test_no_secret_key_fallbacks(self):
         with self.settings(SECRET_KEY_FALLBACKS=None):
             del settings.SECRET_KEY_FALLBACKS
-            self.assertEqual(base.check_secret_key_fallbacks(None), [
-                Warning(base.W025.msg % 'SECRET_KEY_FALLBACKS', id=base.W025.id),
-            ])
+            self.assertEqual(
+                base.check_secret_key_fallbacks(None),
+                [
+                    Warning(base.W025.msg % "SECRET_KEY_FALLBACKS", id=base.W025.id),
+                ],
+            )
 
-    @override_settings(SECRET_KEY_FALLBACKS=[
-        base.SECRET_KEY_INSECURE_PREFIX + get_random_secret_key()
-    ])
+    @override_settings(
+        SECRET_KEY_FALLBACKS=[base.SECRET_KEY_INSECURE_PREFIX + get_random_secret_key()]
+    )
     def test_insecure_secret_key_fallbacks(self):
-        self.assertEqual(base.check_secret_key_fallbacks(None), [
-            Warning(base.W025.msg % 'SECRET_KEY_FALLBACKS[0]', id=base.W025.id),
-        ])
+        self.assertEqual(
+            base.check_secret_key_fallbacks(None),
+            [
+                Warning(base.W025.msg % "SECRET_KEY_FALLBACKS[0]", id=base.W025.id),
+            ],
+        )
 
-    @override_settings(SECRET_KEY_FALLBACKS=[('abcdefghijklmnopqrstuvwx' * 2) + 'a'])
+    @override_settings(SECRET_KEY_FALLBACKS=[("abcdefghijklmnopqrstuvwx" * 2) + "a"])
     def test_low_length_secret_key_fallbacks(self):
         self.assertEqual(
             len(settings.SECRET_KEY_FALLBACKS[0]),
             base.SECRET_KEY_MIN_LENGTH - 1,
         )
-        self.assertEqual(base.check_secret_key_fallbacks(None), [
-            Warning(base.W025.msg % 'SECRET_KEY_FALLBACKS[0]', id=base.W025.id),
-        ])
+        self.assertEqual(
+            base.check_secret_key_fallbacks(None),
+            [
+                Warning(base.W025.msg % "SECRET_KEY_FALLBACKS[0]", id=base.W025.id),
+            ],
+        )
 
-    @override_settings(SECRET_KEY_FALLBACKS=['abcd' * 20])
+    @override_settings(SECRET_KEY_FALLBACKS=["abcd" * 20])
     def test_low_entropy_secret_key_fallbacks(self):
         self.assertGreater(
             len(settings.SECRET_KEY_FALLBACKS[0]),
@@ -462,29 +479,42 @@ class CheckSecretKeyFallbacksTest(SimpleTestCase):
             len(set(settings.SECRET_KEY_FALLBACKS[0])),
             base.SECRET_KEY_MIN_UNIQUE_CHARACTERS,
         )
-        self.assertEqual(base.check_secret_key_fallbacks(None), [
-            Warning(base.W025.msg % 'SECRET_KEY_FALLBACKS[0]', id=base.W025.id),
-        ])
+        self.assertEqual(
+            base.check_secret_key_fallbacks(None),
+            [
+                Warning(base.W025.msg % "SECRET_KEY_FALLBACKS[0]", id=base.W025.id),
+            ],
+        )
 
-    @override_settings(SECRET_KEY_FALLBACKS=[
-        ('abcdefghijklmnopqrstuvwx' * 2) + 'ab',
-        'badkey',
-    ])
+    @override_settings(
+        SECRET_KEY_FALLBACKS=[
+            ("abcdefghijklmnopqrstuvwx" * 2) + "ab",
+            "badkey",
+        ]
+    )
     def test_multiple_keys(self):
-        self.assertEqual(base.check_secret_key_fallbacks(None), [
-            Warning(base.W025.msg % 'SECRET_KEY_FALLBACKS[1]', id=base.W025.id),
-        ])
+        self.assertEqual(
+            base.check_secret_key_fallbacks(None),
+            [
+                Warning(base.W025.msg % "SECRET_KEY_FALLBACKS[1]", id=base.W025.id),
+            ],
+        )
 
-    @override_settings(SECRET_KEY_FALLBACKS=[
-        ('abcdefghijklmnopqrstuvwx' * 2) + 'ab',
-        'badkey1',
-        'badkey2',
-    ])
+    @override_settings(
+        SECRET_KEY_FALLBACKS=[
+            ("abcdefghijklmnopqrstuvwx" * 2) + "ab",
+            "badkey1",
+            "badkey2",
+        ]
+    )
     def test_multiple_bad_keys(self):
-        self.assertEqual(base.check_secret_key_fallbacks(None), [
-            Warning(base.W025.msg % 'SECRET_KEY_FALLBACKS[1]', id=base.W025.id),
-            Warning(base.W025.msg % 'SECRET_KEY_FALLBACKS[2]', id=base.W025.id),
-        ])
+        self.assertEqual(
+            base.check_secret_key_fallbacks(None),
+            [
+                Warning(base.W025.msg % "SECRET_KEY_FALLBACKS[1]", id=base.W025.id),
+                Warning(base.W025.msg % "SECRET_KEY_FALLBACKS[2]", id=base.W025.id),
+            ],
+        )
 
 
 class CheckDebugTest(SimpleTestCase):
@@ -505,14 +535,14 @@ class CheckAllowedHostsTest(SimpleTestCase):
     def test_allowed_hosts_empty(self):
         self.assertEqual(base.check_allowed_hosts(None), [base.W020])
 
-    @override_settings(ALLOWED_HOSTS=['.example.com'])
+    @override_settings(ALLOWED_HOSTS=[".example.com"])
     def test_allowed_hosts_set(self):
         self.assertEqual(base.check_allowed_hosts(None), [])
 
 
 class CheckReferrerPolicyTest(SimpleTestCase):
     @override_settings(
-        MIDDLEWARE=['django.middleware.security.SecurityMiddleware'],
+        MIDDLEWARE=["django.middleware.security.SecurityMiddleware"],
         SECURE_REFERRER_POLICY=None,
     )
     def test_no_referrer_policy(self):
@@ -526,22 +556,24 @@ class CheckReferrerPolicyTest(SimpleTestCase):
         """
         self.assertEqual(base.check_referrer_policy(None), [])
 
-    @override_settings(MIDDLEWARE=['django.middleware.security.SecurityMiddleware'])
+    @override_settings(MIDDLEWARE=["django.middleware.security.SecurityMiddleware"])
     def test_with_referrer_policy(self):
         tests = (
-            'strict-origin',
-            'strict-origin,origin',
-            'strict-origin, origin',
-            ['strict-origin', 'origin'],
-            ('strict-origin', 'origin'),
+            "strict-origin",
+            "strict-origin,origin",
+            "strict-origin, origin",
+            ["strict-origin", "origin"],
+            ("strict-origin", "origin"),
         )
         for value in tests:
-            with self.subTest(value=value), override_settings(SECURE_REFERRER_POLICY=value):
+            with self.subTest(value=value), override_settings(
+                SECURE_REFERRER_POLICY=value
+            ):
                 self.assertEqual(base.check_referrer_policy(None), [])
 
     @override_settings(
-        MIDDLEWARE=['django.middleware.security.SecurityMiddleware'],
-        SECURE_REFERRER_POLICY='invalid-value',
+        MIDDLEWARE=["django.middleware.security.SecurityMiddleware"],
+        SECURE_REFERRER_POLICY="invalid-value",
     )
     def test_with_invalid_referrer_policy(self):
         self.assertEqual(base.check_referrer_policy(None), [base.E023])
@@ -552,20 +584,20 @@ def failure_view_with_invalid_signature():
 
 
 class CSRFFailureViewTest(SimpleTestCase):
-    @override_settings(CSRF_FAILURE_VIEW='')
+    @override_settings(CSRF_FAILURE_VIEW="")
     def test_failure_view_import_error(self):
         self.assertEqual(
             csrf.check_csrf_failure_view(None),
             [
                 Error(
                     "The CSRF failure view '' could not be imported.",
-                    id='security.E102',
+                    id="security.E102",
                 )
             ],
         )
 
     @override_settings(
-        CSRF_FAILURE_VIEW='check_framework.test_security.failure_view_with_invalid_signature',
+        CSRF_FAILURE_VIEW="check_framework.test_security.failure_view_with_invalid_signature",
     )
     def test_failure_view_invalid_signature(self):
         msg = (
@@ -575,21 +607,21 @@ class CSRFFailureViewTest(SimpleTestCase):
         )
         self.assertEqual(
             csrf.check_csrf_failure_view(None),
-            [Error(msg, id='security.E101')],
+            [Error(msg, id="security.E101")],
         )
 
 
 class CheckCrossOriginOpenerPolicyTest(SimpleTestCase):
     @override_settings(
-        MIDDLEWARE=['django.middleware.security.SecurityMiddleware'],
+        MIDDLEWARE=["django.middleware.security.SecurityMiddleware"],
         SECURE_CROSS_ORIGIN_OPENER_POLICY=None,
     )
     def test_no_coop(self):
         self.assertEqual(base.check_cross_origin_opener_policy(None), [])
 
-    @override_settings(MIDDLEWARE=['django.middleware.security.SecurityMiddleware'])
+    @override_settings(MIDDLEWARE=["django.middleware.security.SecurityMiddleware"])
     def test_with_coop(self):
-        tests = ['same-origin', 'same-origin-allow-popups', 'unsafe-none']
+        tests = ["same-origin", "same-origin-allow-popups", "unsafe-none"]
         for value in tests:
             with self.subTest(value=value), override_settings(
                 SECURE_CROSS_ORIGIN_OPENER_POLICY=value,
@@ -597,8 +629,8 @@ class CheckCrossOriginOpenerPolicyTest(SimpleTestCase):
                 self.assertEqual(base.check_cross_origin_opener_policy(None), [])
 
     @override_settings(
-        MIDDLEWARE=['django.middleware.security.SecurityMiddleware'],
-        SECURE_CROSS_ORIGIN_OPENER_POLICY='invalid-value',
+        MIDDLEWARE=["django.middleware.security.SecurityMiddleware"],
+        SECURE_CROSS_ORIGIN_OPENER_POLICY="invalid-value",
     )
     def test_with_invalid_coop(self):
         self.assertEqual(base.check_cross_origin_opener_policy(None), [base.E024])

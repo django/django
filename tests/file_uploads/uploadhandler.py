@@ -5,7 +5,9 @@ import os
 from tempfile import NamedTemporaryFile
 
 from django.core.files.uploadhandler import (
-    FileUploadHandler, StopUpload, TemporaryFileUploadHandler,
+    FileUploadHandler,
+    StopUpload,
+    TemporaryFileUploadHandler,
 )
 
 
@@ -15,7 +17,7 @@ class QuotaUploadHandler(FileUploadHandler):
     (5MB) is uploaded.
     """
 
-    QUOTA = 5 * 2 ** 20  # 5 MB
+    QUOTA = 5 * 2**20  # 5 MB
 
     def __init__(self, request=None):
         super().__init__(request)
@@ -33,6 +35,7 @@ class QuotaUploadHandler(FileUploadHandler):
 
 class StopUploadTemporaryFileHandler(TemporaryFileUploadHandler):
     """A handler that raises a StopUpload exception."""
+
     def receive_data_chunk(self, raw_data, start):
         raise StopUpload()
 
@@ -43,12 +46,14 @@ class CustomUploadError(Exception):
 
 class ErroringUploadHandler(FileUploadHandler):
     """A handler that raises an exception."""
+
     def receive_data_chunk(self, raw_data, start):
         raise CustomUploadError("Oops!")
 
 
 class TraversalUploadHandler(FileUploadHandler):
     """A handler with potential directory-traversal vulnerability."""
+
     def __init__(self, request=None):
         from .views import UPLOAD_TO
 
@@ -58,19 +63,28 @@ class TraversalUploadHandler(FileUploadHandler):
     def file_complete(self, file_size):
         self.file.seek(0)
         self.file.size = file_size
-        with open(os.path.join(self.upload_dir, self.file_name), 'wb') as fp:
+        with open(os.path.join(self.upload_dir, self.file_name), "wb") as fp:
             fp.write(self.file.read())
         return self.file
 
     def new_file(
-        self, field_name, file_name, content_type, content_length, charset=None,
+        self,
+        field_name,
+        file_name,
+        content_type,
+        content_length,
+        charset=None,
         content_type_extra=None,
     ):
         super().new_file(
-            file_name, file_name, content_length, content_length, charset,
+            file_name,
+            file_name,
+            content_length,
+            content_length,
+            charset,
             content_type_extra,
         )
-        self.file = NamedTemporaryFile(suffix='.upload', dir=self.upload_dir)
+        self.file = NamedTemporaryFile(suffix=".upload", dir=self.upload_dir)
 
     def receive_data_chunk(self, raw_data, start):
         self.file.write(raw_data)

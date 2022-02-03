@@ -20,7 +20,7 @@ class SitemapIndexItem:
 
     # RemovedInDjango50Warning
     def __str__(self):
-        msg = 'Calling `__str__` on SitemapIndexItem is deprecated, use the `location` attribute instead.'
+        msg = "Calling `__str__` on SitemapIndexItem is deprecated, use the `location` attribute instead."
         warnings.warn(msg, RemovedInDjango50Warning, stacklevel=2)
         return self.location
 
@@ -29,8 +29,9 @@ def x_robots_tag(func):
     @wraps(func)
     def inner(request, *args, **kwargs):
         response = func(request, *args, **kwargs)
-        response.headers['X-Robots-Tag'] = 'noindex, noodp, noarchive'
+        response.headers["X-Robots-Tag"] = "noindex, noodp, noarchive"
         return response
+
     return inner
 
 
@@ -47,9 +48,13 @@ def _get_latest_lastmod(current_lastmod, new_lastmod):
 
 
 @x_robots_tag
-def index(request, sitemaps,
-          template_name='sitemap_index.xml', content_type='application/xml',
-          sitemap_url_name='django.contrib.sitemaps.views.sitemap'):
+def index(
+    request,
+    sitemaps,
+    template_name="sitemap_index.xml",
+    content_type="application/xml",
+    sitemap_url_name="django.contrib.sitemaps.views.sitemap",
+):
 
     req_protocol = request.scheme
     req_site = get_current_site(request)
@@ -63,8 +68,8 @@ def index(request, sitemaps,
         if callable(site):
             site = site()
         protocol = req_protocol if site.protocol is None else site.protocol
-        sitemap_url = reverse(sitemap_url_name, kwargs={'section': section})
-        absolute_url = '%s://%s%s' % (protocol, req_site.domain, sitemap_url)
+        sitemap_url = reverse(sitemap_url_name, kwargs={"section": section})
+        absolute_url = "%s://%s%s" % (protocol, req_site.domain, sitemap_url)
         site_lastmod = site.get_latest_lastmod()
         if all_indexes_lastmod:
             if site_lastmod is not None:
@@ -74,25 +79,32 @@ def index(request, sitemaps,
         sites.append(SitemapIndexItem(absolute_url, site_lastmod))
         # Add links to all pages of the sitemap.
         for page in range(2, site.paginator.num_pages + 1):
-            sites.append(SitemapIndexItem('%s?p=%s' % (absolute_url, page), site_lastmod))
+            sites.append(
+                SitemapIndexItem("%s?p=%s" % (absolute_url, page), site_lastmod)
+            )
     # If lastmod is defined for all sites, set header so as
     # ConditionalGetMiddleware is able to send 304 NOT MODIFIED
     if all_indexes_lastmod and latest_lastmod:
-        headers = {'Last-Modified': http_date(latest_lastmod.timestamp())}
+        headers = {"Last-Modified": http_date(latest_lastmod.timestamp())}
     else:
         headers = None
     return TemplateResponse(
         request,
         template_name,
-        {'sitemaps': sites},
+        {"sitemaps": sites},
         content_type=content_type,
         headers=headers,
     )
 
 
 @x_robots_tag
-def sitemap(request, sitemaps, section=None,
-            template_name='sitemap.xml', content_type='application/xml'):
+def sitemap(
+    request,
+    sitemaps,
+    section=None,
+    template_name="sitemap.xml",
+    content_type="application/xml",
+):
 
     req_protocol = request.scheme
     req_site = get_current_site(request)
@@ -112,10 +124,9 @@ def sitemap(request, sitemaps, section=None,
         try:
             if callable(site):
                 site = site()
-            urls.extend(site.get_urls(page=page, site=req_site,
-                                      protocol=req_protocol))
+            urls.extend(site.get_urls(page=page, site=req_site, protocol=req_protocol))
             if all_sites_lastmod:
-                site_lastmod = getattr(site, 'latest_lastmod', None)
+                site_lastmod = getattr(site, "latest_lastmod", None)
                 if site_lastmod is not None:
                     lastmod = _get_latest_lastmod(lastmod, site_lastmod)
                 else:
@@ -127,13 +138,13 @@ def sitemap(request, sitemaps, section=None,
     # If lastmod is defined for all sites, set header so as
     # ConditionalGetMiddleware is able to send 304 NOT MODIFIED
     if all_sites_lastmod:
-        headers = {'Last-Modified': http_date(lastmod.timestamp())} if lastmod else None
+        headers = {"Last-Modified": http_date(lastmod.timestamp())} if lastmod else None
     else:
         headers = None
     return TemplateResponse(
         request,
         template_name,
-        {'urlset': urls},
+        {"urlset": urls},
         content_type=content_type,
         headers=headers,
     )

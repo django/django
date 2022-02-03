@@ -9,14 +9,10 @@ class Concrete(models.Model):
 class Proxy(Concrete):
     class Meta:
         proxy = True
-        permissions = (
-            ('display_proxys', 'May display proxys information'),
-        )
+        permissions = (("display_proxys", "May display proxys information"),)
 
 
 class UserProxy(User):
     class Meta:
         proxy = True
-        permissions = (
-            ('use_different_app_label', 'May use a different app label'),
-        )
+        permissions = (("use_different_app_label", "May use a different app label"),)

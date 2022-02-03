@@ -23,19 +23,21 @@ from django.utils import timezone
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 
-NO_DB_ALIAS = '__no_db__'
+NO_DB_ALIAS = "__no_db__"
 
 
 # RemovedInDjango50Warning
 def timezone_constructor(tzname):
     if settings.USE_DEPRECATED_PYTZ:
         import pytz
+
         return pytz.timezone(tzname)
     return zoneinfo.ZoneInfo(tzname)
 
 
 class BaseDatabaseWrapper:
     """Represent a database connection."""
+
     # Mapping of Field objects to their column types.
     data_types = {}
     # Mapping of Field objects to their SQL suffix such as AUTOINCREMENT.
@@ -43,8 +45,8 @@ class BaseDatabaseWrapper:
     # Mapping of Field objects to their SQL for CHECK constraints.
     data_type_check_constraints = {}
     ops = None
-    vendor = 'unknown'
-    display_name = 'unknown'
+    vendor = "unknown"
+    display_name = "unknown"
     SchemaEditorClass = None
     # Classes instantiated in __init__().
     client_class = None
@@ -124,8 +126,8 @@ class BaseDatabaseWrapper:
 
     def __repr__(self):
         return (
-            f'<{self.__class__.__qualname__} '
-            f'vendor={self.vendor!r} alias={self.alias!r}>'
+            f"<{self.__class__.__qualname__} "
+            f"vendor={self.vendor!r} alias={self.alias!r}>"
         )
 
     def ensure_timezone(self):
@@ -153,10 +155,10 @@ class BaseDatabaseWrapper:
         """
         if not settings.USE_TZ:
             return None
-        elif self.settings_dict['TIME_ZONE'] is None:
+        elif self.settings_dict["TIME_ZONE"] is None:
             return timezone.utc
         else:
-            return timezone_constructor(self.settings_dict['TIME_ZONE'])
+            return timezone_constructor(self.settings_dict["TIME_ZONE"])
 
     @cached_property
     def timezone_name(self):
@@ -165,10 +167,10 @@ class BaseDatabaseWrapper:
         """
         if not settings.USE_TZ:
             return settings.TIME_ZONE
-        elif self.settings_dict['TIME_ZONE'] is None:
-            return 'UTC'
+        elif self.settings_dict["TIME_ZONE"] is None:
+            return "UTC"
         else:
-            return self.settings_dict['TIME_ZONE']
+            return self.settings_dict["TIME_ZONE"]
 
     @property
     def queries_logged(self):
@@ -179,26 +181,35 @@ class BaseDatabaseWrapper:
         if len(self.queries_log) == self.queries_log.maxlen:
             warnings.warn(
                 "Limit for query logging exceeded, only the last {} queries "
-                "will be returned.".format(self.queries_log.maxlen))
+                "will be returned.".format(self.queries_log.maxlen)
+            )
         return list(self.queries_log)
 
     # ##### Backend-specific methods for creating connections and cursors #####
 
     def get_connection_params(self):
         """Return a dict of parameters suitable for get_new_connection."""
-        raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a get_connection_params() method')
+        raise NotImplementedError(
+            "subclasses of BaseDatabaseWrapper may require a get_connection_params() method"
+        )
 
     def get_new_connection(self, conn_params):
         """Open a connection to the database."""
-        raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a get_new_connection() method')
+        raise NotImplementedError(
+            "subclasses of BaseDatabaseWrapper may require a get_new_connection() method"
+        )
 
     def init_connection_state(self):
         """Initialize the database connection settings."""
-        raise NotImplementedError('subclasses of BaseDatabaseWrapper may require an init_connection_state() method')
+        raise NotImplementedError(
+            "subclasses of BaseDatabaseWrapper may require an init_connection_state() method"
+        )
 
     def create_cursor(self, name=None):
         """Create a cursor. Assume that a connection is established."""
-        raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a create_cursor() method')
+        raise NotImplementedError(
+            "subclasses of BaseDatabaseWrapper may require a create_cursor() method"
+        )
 
     # ##### Backend-specific methods for creating connections #####
 
@@ -213,8 +224,8 @@ class BaseDatabaseWrapper:
         self.atomic_blocks = []
         self.needs_rollback = False
         # Reset parameters defining when to close/health-check the connection.
-        self.health_check_enabled = self.settings_dict['CONN_HEALTH_CHECKS']
-        max_age = self.settings_dict['CONN_MAX_AGE']
+        self.health_check_enabled = self.settings_dict["CONN_HEALTH_CHECKS"]
+        max_age = self.settings_dict["CONN_MAX_AGE"]
         self.close_at = None if max_age is None else time.monotonic() + max_age
         self.closed_in_transaction = False
         self.errors_occurred = False
@@ -223,14 +234,14 @@ class BaseDatabaseWrapper:
         # Establish the connection
         conn_params = self.get_connection_params()
         self.connection = self.get_new_connection(conn_params)
-        self.set_autocommit(self.settings_dict['AUTOCOMMIT'])
+        self.set_autocommit(self.settings_dict["AUTOCOMMIT"])
         self.init_connection_state()
         connection_created.send(sender=self.__class__, connection=self)
 
         self.run_on_commit = []
 
     def check_settings(self):
-        if self.settings_dict['TIME_ZONE'] is not None and not settings.USE_TZ:
+        if self.settings_dict["TIME_ZONE"] is not None and not settings.USE_TZ:
             raise ImproperlyConfigured(
                 "Connection '%s' cannot set TIME_ZONE because USE_TZ is False."
                 % self.alias
@@ -356,7 +367,7 @@ class BaseDatabaseWrapper:
             return
 
         thread_ident = _thread.get_ident()
-        tid = str(thread_ident).replace('-', '')
+        tid = str(thread_ident).replace("-", "")
 
         self.savepoint_state += 1
         sid = "s%s_x%d" % (tid, self.savepoint_state)
@@ -406,7 +417,9 @@ class BaseDatabaseWrapper:
         """
         Backend-specific implementation to enable or disable autocommit.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a _set_autocommit() method')
+        raise NotImplementedError(
+            "subclasses of BaseDatabaseWrapper may require a _set_autocommit() method"
+        )
 
     # ##### Generic transaction management methods #####
 
@@ -415,7 +428,9 @@ class BaseDatabaseWrapper:
         self.ensure_connection()
         return self.autocommit
 
-    def set_autocommit(self, autocommit, force_begin_transaction_with_broken_autocommit=False):
+    def set_autocommit(
+        self, autocommit, force_begin_transaction_with_broken_autocommit=False
+    ):
         """
         Enable or disable autocommit.
 
@@ -432,8 +447,9 @@ class BaseDatabaseWrapper:
         self.ensure_connection()
 
         start_transaction_under_autocommit = (
-            force_begin_transaction_with_broken_autocommit and not autocommit and
-            hasattr(self, '_start_transaction_under_autocommit')
+            force_begin_transaction_with_broken_autocommit
+            and not autocommit
+            and hasattr(self, "_start_transaction_under_autocommit")
         )
 
         if start_transaction_under_autocommit:
@@ -451,7 +467,8 @@ class BaseDatabaseWrapper:
         """Get the "needs rollback" flag -- for *advanced use* only."""
         if not self.in_atomic_block:
             raise TransactionManagementError(
-                "The rollback flag doesn't work outside of an 'atomic' block.")
+                "The rollback flag doesn't work outside of an 'atomic' block."
+            )
         return self.needs_rollback
 
     def set_rollback(self, rollback):
@@ -460,20 +477,23 @@ class BaseDatabaseWrapper:
         """
         if not self.in_atomic_block:
             raise TransactionManagementError(
-                "The rollback flag doesn't work outside of an 'atomic' block.")
+                "The rollback flag doesn't work outside of an 'atomic' block."
+            )
         self.needs_rollback = rollback
 
     def validate_no_atomic_block(self):
         """Raise an error if an atomic block is active."""
         if self.in_atomic_block:
             raise TransactionManagementError(
-                "This is forbidden when an 'atomic' block is active.")
+                "This is forbidden when an 'atomic' block is active."
+            )
 
     def validate_no_broken_transaction(self):
         if self.needs_rollback:
             raise TransactionManagementError(
                 "An error occurred in the current transaction. You can't "
-                "execute queries until the end of the 'atomic' block.")
+                "execute queries until the end of the 'atomic' block."
+            )
 
     # ##### Foreign key constraints checks handling #####
 
@@ -524,14 +544,15 @@ class BaseDatabaseWrapper:
         as that may prevent Django from recycling unusable connections.
         """
         raise NotImplementedError(
-            "subclasses of BaseDatabaseWrapper may require an is_usable() method")
+            "subclasses of BaseDatabaseWrapper may require an is_usable() method"
+        )
 
     def close_if_health_check_failed(self):
         """Close existing connection if it fails a health check."""
         if (
-            self.connection is None or
-            not self.health_check_enabled or
-            self.health_check_done
+            self.connection is None
+            or not self.health_check_enabled
+            or self.health_check_done
         ):
             return
 
@@ -548,7 +569,7 @@ class BaseDatabaseWrapper:
             self.health_check_done = False
             # If the application didn't restore the original autocommit setting,
             # don't take chances, drop the connection.
-            if self.get_autocommit() != self.settings_dict['AUTOCOMMIT']:
+            if self.get_autocommit() != self.settings_dict["AUTOCOMMIT"]:
                 self.close()
                 return
 
@@ -580,7 +601,9 @@ class BaseDatabaseWrapper:
     def dec_thread_sharing(self):
         with self._thread_sharing_lock:
             if self._thread_sharing_count <= 0:
-                raise RuntimeError('Cannot decrement the thread sharing count below zero.')
+                raise RuntimeError(
+                    "Cannot decrement the thread sharing count below zero."
+                )
             self._thread_sharing_count -= 1
 
     def validate_thread_sharing(self):
@@ -595,8 +618,7 @@ class BaseDatabaseWrapper:
                 "DatabaseWrapper objects created in a "
                 "thread can only be used in that same thread. The object "
                 "with alias '%s' was created in thread id %s and this is "
-                "thread id %s."
-                % (self.alias, self._thread_ident, _thread.get_ident())
+                "thread id %s." % (self.alias, self._thread_ident, _thread.get_ident())
             )
 
     # ##### Miscellaneous #####
@@ -657,7 +679,7 @@ class BaseDatabaseWrapper:
         being exposed to potential child threads while (or after) the test
         database is destroyed. Refs #10868, #17786, #16969.
         """
-        conn = self.__class__({**self.settings_dict, 'NAME': None}, alias=NO_DB_ALIAS)
+        conn = self.__class__({**self.settings_dict, "NAME": None}, alias=NO_DB_ALIAS)
         try:
             with conn.cursor() as cursor:
                 yield cursor
@@ -670,7 +692,8 @@ class BaseDatabaseWrapper:
         """
         if self.SchemaEditorClass is None:
             raise NotImplementedError(
-                'The SchemaEditorClass attribute of this database wrapper is still None')
+                "The SchemaEditorClass attribute of this database wrapper is still None"
+            )
         return self.SchemaEditorClass(self, *args, **kwargs)
 
     def on_commit(self, func):
@@ -680,7 +703,9 @@ class BaseDatabaseWrapper:
             # Transaction in progress; save for execution on commit.
             self.run_on_commit.append((set(self.savepoint_ids), func))
         elif not self.get_autocommit():
-            raise TransactionManagementError('on_commit() cannot be used in manual transaction management')
+            raise TransactionManagementError(
+                "on_commit() cannot be used in manual transaction management"
+            )
         else:
             # No transaction in progress and in autocommit mode; execute
             # immediately.

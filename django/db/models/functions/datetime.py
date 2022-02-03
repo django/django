@@ -3,10 +3,20 @@ from datetime import datetime
 from django.conf import settings
 from django.db.models.expressions import Func
 from django.db.models.fields import (
-    DateField, DateTimeField, DurationField, Field, IntegerField, TimeField,
+    DateField,
+    DateTimeField,
+    DurationField,
+    Field,
+    IntegerField,
+    TimeField,
 )
 from django.db.models.lookups import (
-    Transform, YearExact, YearGt, YearGte, YearLt, YearLte,
+    Transform,
+    YearExact,
+    YearGt,
+    YearGte,
+    YearLt,
+    YearLte,
 )
 from django.utils import timezone
 
@@ -36,7 +46,7 @@ class Extract(TimezoneMixin, Transform):
         if self.lookup_name is None:
             self.lookup_name = lookup_name
         if self.lookup_name is None:
-            raise ValueError('lookup_name must be provided')
+            raise ValueError("lookup_name must be provided")
         self.tzinfo = tzinfo
         super().__init__(expression, **extra)
 
@@ -47,14 +57,16 @@ class Extract(TimezoneMixin, Transform):
             tzname = self.get_tzname()
             sql = connection.ops.datetime_extract_sql(self.lookup_name, sql, tzname)
         elif self.tzinfo is not None:
-            raise ValueError('tzinfo can only be used with DateTimeField.')
+            raise ValueError("tzinfo can only be used with DateTimeField.")
         elif isinstance(lhs_output_field, DateField):
             sql = connection.ops.date_extract_sql(self.lookup_name, sql)
         elif isinstance(lhs_output_field, TimeField):
             sql = connection.ops.time_extract_sql(self.lookup_name, sql)
         elif isinstance(lhs_output_field, DurationField):
             if not connection.features.has_native_duration_field:
-                raise ValueError('Extract requires native DurationField database support.')
+                raise ValueError(
+                    "Extract requires native DurationField database support."
+                )
             sql = connection.ops.time_extract_sql(self.lookup_name, sql)
         else:
             # resolve_expression has already validated the output_field so this
@@ -62,24 +74,38 @@ class Extract(TimezoneMixin, Transform):
             assert False, "Tried to Extract from an invalid type."
         return sql, params
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        copy = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
-        field = getattr(copy.lhs, 'output_field', None)
+    def resolve_expression(
+        self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
+    ):
+        copy = super().resolve_expression(
+            query, allow_joins, reuse, summarize, for_save
+        )
+        field = getattr(copy.lhs, "output_field", None)
         if field is None:
             return copy
         if not isinstance(field, (DateField, DateTimeField, TimeField, DurationField)):
             raise ValueError(
-                'Extract input expression must be DateField, DateTimeField, '
-                'TimeField, or DurationField.'
+                "Extract input expression must be DateField, DateTimeField, "
+                "TimeField, or DurationField."
             )
         # Passing dates to functions expecting datetimes is most likely a mistake.
-        if type(field) == DateField and copy.lookup_name in ('hour', 'minute', 'second'):
+        if type(field) == DateField and copy.lookup_name in (
+            "hour",
+            "minute",
+            "second",
+        ):
             raise ValueError(
-                "Cannot extract time component '%s' from DateField '%s'." % (copy.lookup_name, field.name)
+                "Cannot extract time component '%s' from DateField '%s'."
+                % (copy.lookup_name, field.name)
             )
-        if (
-            isinstance(field, DurationField) and
-            copy.lookup_name in ('year', 'iso_year', 'month', 'week', 'week_day', 'iso_week_day', 'quarter')
+        if isinstance(field, DurationField) and copy.lookup_name in (
+            "year",
+            "iso_year",
+            "month",
+            "week",
+            "week_day",
+            "iso_week_day",
+            "quarter",
         ):
             raise ValueError(
                 "Cannot extract component '%s' from DurationField '%s'."
@@ -89,20 +115,21 @@ class Extract(TimezoneMixin, Transform):
 
 
 class ExtractYear(Extract):
-    lookup_name = 'year'
+    lookup_name = "year"
 
 
 class ExtractIsoYear(Extract):
     """Return the ISO-8601 week-numbering year."""
-    lookup_name = 'iso_year'
+
+    lookup_name = "iso_year"
 
 
 class ExtractMonth(Extract):
-    lookup_name = 'month'
+    lookup_name = "month"
 
 
 class ExtractDay(Extract):
-    lookup_name = 'day'
+    lookup_name = "day"
 
 
 class ExtractWeek(Extract):
@@ -110,7 +137,8 @@ class ExtractWeek(Extract):
     Return 1-52 or 53, based on ISO-8601, i.e., Monday is the first of the
     week.
     """
-    lookup_name = 'week'
+
+    lookup_name = "week"
 
 
 class ExtractWeekDay(Extract):
@@ -119,28 +147,30 @@ class ExtractWeekDay(Extract):
 
     To replicate this in Python: (mydatetime.isoweekday() % 7) + 1
     """
-    lookup_name = 'week_day'
+
+    lookup_name = "week_day"
 
 
 class ExtractIsoWeekDay(Extract):
     """Return Monday=1 through Sunday=7, based on ISO-8601."""
-    lookup_name = 'iso_week_day'
+
+    lookup_name = "iso_week_day"
 
 
 class ExtractQuarter(Extract):
-    lookup_name = 'quarter'
+    lookup_name = "quarter"
 
 
 class ExtractHour(Extract):
-    lookup_name = 'hour'
+    lookup_name = "hour"
 
 
 class ExtractMinute(Extract):
-    lookup_name = 'minute'
+    lookup_name = "minute"
 
 
 class ExtractSecond(Extract):
-    lookup_name = 'second'
+    lookup_name = "second"
 
 
 DateField.register_lookup(ExtractYear)
@@ -174,14 +204,16 @@ ExtractIsoYear.register_lookup(YearLte)
 
 
 class Now(Func):
-    template = 'CURRENT_TIMESTAMP'
+    template = "CURRENT_TIMESTAMP"
     output_field = DateTimeField()
 
     def as_postgresql(self, compiler, connection, **extra_context):
         # PostgreSQL's CURRENT_TIMESTAMP means "the time at the start of the
         # transaction". Use STATEMENT_TIMESTAMP to be cross-compatible with
         # other databases.
-        return self.as_sql(compiler, connection, template='STATEMENT_TIMESTAMP()', **extra_context)
+        return self.as_sql(
+            compiler, connection, template="STATEMENT_TIMESTAMP()", **extra_context
+        )
 
 
 class TruncBase(TimezoneMixin, Transform):
@@ -190,7 +222,14 @@ class TruncBase(TimezoneMixin, Transform):
 
     # RemovedInDjango50Warning: when the deprecation ends, remove is_dst
     # argument.
-    def __init__(self, expression, output_field=None, tzinfo=None, is_dst=timezone.NOT_PASSED, **extra):
+    def __init__(
+        self,
+        expression,
+        output_field=None,
+        tzinfo=None,
+        is_dst=timezone.NOT_PASSED,
+        **extra,
+    ):
         self.tzinfo = tzinfo
         self.is_dst = is_dst
         super().__init__(expression, output_field=output_field, **extra)
@@ -201,7 +240,7 @@ class TruncBase(TimezoneMixin, Transform):
         if isinstance(self.lhs.output_field, DateTimeField):
             tzname = self.get_tzname()
         elif self.tzinfo is not None:
-            raise ValueError('tzinfo can only be used with DateTimeField.')
+            raise ValueError("tzinfo can only be used with DateTimeField.")
         if isinstance(self.output_field, DateTimeField):
             sql = connection.ops.datetime_trunc_sql(self.kind, inner_sql, tzname)
         elif isinstance(self.output_field, DateField):
@@ -209,11 +248,17 @@ class TruncBase(TimezoneMixin, Transform):
         elif isinstance(self.output_field, TimeField):
             sql = connection.ops.time_trunc_sql(self.kind, inner_sql, tzname)
         else:
-            raise ValueError('Trunc only valid on DateField, TimeField, or DateTimeField.')
+            raise ValueError(
+                "Trunc only valid on DateField, TimeField, or DateTimeField."
+            )
         return sql, inner_params
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        copy = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
+    def resolve_expression(
+        self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
+    ):
+        copy = super().resolve_expression(
+            query, allow_joins, reuse, summarize, for_save
+        )
         field = copy.lhs.output_field
         # DateTimeField is a subclass of DateField so this works for both.
         if not isinstance(field, (DateField, TimeField)):
@@ -223,23 +268,46 @@ class TruncBase(TimezoneMixin, Transform):
         # If self.output_field was None, then accessing the field will trigger
         # the resolver to assign it to self.lhs.output_field.
         if not isinstance(copy.output_field, (DateField, DateTimeField, TimeField)):
-            raise ValueError('output_field must be either DateField, TimeField, or DateTimeField')
+            raise ValueError(
+                "output_field must be either DateField, TimeField, or DateTimeField"
+            )
         # Passing dates or times to functions expecting datetimes is most
         # likely a mistake.
-        class_output_field = self.__class__.output_field if isinstance(self.__class__.output_field, Field) else None
+        class_output_field = (
+            self.__class__.output_field
+            if isinstance(self.__class__.output_field, Field)
+            else None
+        )
         output_field = class_output_field or copy.output_field
-        has_explicit_output_field = class_output_field or field.__class__ is not copy.output_field.__class__
+        has_explicit_output_field = (
+            class_output_field or field.__class__ is not copy.output_field.__class__
+        )
         if type(field) == DateField and (
-                isinstance(output_field, DateTimeField) or copy.kind in ('hour', 'minute', 'second', 'time')):
-            raise ValueError("Cannot truncate DateField '%s' to %s." % (
-                field.name, output_field.__class__.__name__ if has_explicit_output_field else 'DateTimeField'
-            ))
+            isinstance(output_field, DateTimeField)
+            or copy.kind in ("hour", "minute", "second", "time")
+        ):
+            raise ValueError(
+                "Cannot truncate DateField '%s' to %s."
+                % (
+                    field.name,
+                    output_field.__class__.__name__
+                    if has_explicit_output_field
+                    else "DateTimeField",
+                )
+            )
         elif isinstance(field, TimeField) and (
-                isinstance(output_field, DateTimeField) or
-                copy.kind in ('year', 'quarter', 'month', 'week', 'day', 'date')):
-            raise ValueError("Cannot truncate TimeField '%s' to %s." % (
-                field.name, output_field.__class__.__name__ if has_explicit_output_field else 'DateTimeField'
-            ))
+            isinstance(output_field, DateTimeField)
+            or copy.kind in ("year", "quarter", "month", "week", "day", "date")
+        ):
+            raise ValueError(
+                "Cannot truncate TimeField '%s' to %s."
+                % (
+                    field.name,
+                    output_field.__class__.__name__
+                    if has_explicit_output_field
+                    else "DateTimeField",
+                )
+            )
         return copy
 
     def convert_value(self, value, expression, connection):
@@ -251,8 +319,8 @@ class TruncBase(TimezoneMixin, Transform):
                 value = timezone.make_aware(value, self.tzinfo, is_dst=self.is_dst)
             elif not connection.features.has_zoneinfo_database:
                 raise ValueError(
-                    'Database returned an invalid datetime value. Are time '
-                    'zone definitions for your database installed?'
+                    "Database returned an invalid datetime value. Are time "
+                    "zone definitions for your database installed?"
                 )
         elif isinstance(value, datetime):
             if value is None:
@@ -268,38 +336,46 @@ class Trunc(TruncBase):
 
     # RemovedInDjango50Warning: when the deprecation ends, remove is_dst
     # argument.
-    def __init__(self, expression, kind, output_field=None, tzinfo=None, is_dst=timezone.NOT_PASSED, **extra):
+    def __init__(
+        self,
+        expression,
+        kind,
+        output_field=None,
+        tzinfo=None,
+        is_dst=timezone.NOT_PASSED,
+        **extra,
+    ):
         self.kind = kind
         super().__init__(
-            expression, output_field=output_field, tzinfo=tzinfo,
-            is_dst=is_dst, **extra
+            expression, output_field=output_field, tzinfo=tzinfo, is_dst=is_dst, **extra
         )
 
 
 class TruncYear(TruncBase):
-    kind = 'year'
+    kind = "year"
 
 
 class TruncQuarter(TruncBase):
-    kind = 'quarter'
+    kind = "quarter"
 
 
 class TruncMonth(TruncBase):
-    kind = 'month'
+    kind = "month"
 
 
 class TruncWeek(TruncBase):
     """Truncate to midnight on the Monday of the week."""
-    kind = 'week'
+
+    kind = "week"
 
 
 class TruncDay(TruncBase):
-    kind = 'day'
+    kind = "day"
 
 
 class TruncDate(TruncBase):
-    kind = 'date'
-    lookup_name = 'date'
+    kind = "date"
+    lookup_name = "date"
     output_field = DateField()
 
     def as_sql(self, compiler, connection):
@@ -311,8 +387,8 @@ class TruncDate(TruncBase):
 
 
 class TruncTime(TruncBase):
-    kind = 'time'
-    lookup_name = 'time'
+    kind = "time"
+    lookup_name = "time"
     output_field = TimeField()
 
     def as_sql(self, compiler, connection):
@@ -324,15 +400,15 @@ class TruncTime(TruncBase):
 
 
 class TruncHour(TruncBase):
-    kind = 'hour'
+    kind = "hour"
 
 
 class TruncMinute(TruncBase):
-    kind = 'minute'
+    kind = "minute"
 
 
 class TruncSecond(TruncBase):
-    kind = 'second'
+    kind = "second"
 
 
 DateTimeField.register_lookup(TruncDate)

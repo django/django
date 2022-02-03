@@ -8,7 +8,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-
         migrations.CreateModel(
             "Author",
             [
@@ -16,13 +15,16 @@ class Migration(migrations.Migration):
                 ("name", models.CharField(max_length=255)),
             ],
         ),
-
         migrations.CreateModel(
             "Tribble",
             [
                 ("id", models.AutoField(primary_key=True)),
-                ("author", models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, to_field="id")),
+                (
+                    "author",
+                    models.ForeignKey(
+                        settings.AUTH_USER_MODEL, models.CASCADE, to_field="id"
+                    ),
+                ),
             ],
-        )
-
+        ),
     ]

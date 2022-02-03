@@ -17,23 +17,25 @@ class NullChangeURLconfMiddleware(MiddlewareMixin):
 
 class ReverseInnerInResponseMiddleware(MiddlewareMixin):
     def process_response(self, *args, **kwargs):
-        return HttpResponse(reverse('inner'))
+        return HttpResponse(reverse("inner"))
 
 
 class ReverseOuterInResponseMiddleware(MiddlewareMixin):
     def process_response(self, *args, **kwargs):
-        return HttpResponse(reverse('outer'))
+        return HttpResponse(reverse("outer"))
 
 
 class ReverseInnerInStreaming(MiddlewareMixin):
     def process_view(self, *args, **kwargs):
         def stream():
-            yield reverse('inner')
+            yield reverse("inner")
+
         return StreamingHttpResponse(stream())
 
 
 class ReverseOuterInStreaming(MiddlewareMixin):
     def process_view(self, *args, **kwargs):
         def stream():
-            yield reverse('outer')
+            yield reverse("outer")
+
         return StreamingHttpResponse(stream())

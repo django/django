@@ -9,7 +9,7 @@ class ArticleAdminForm(forms.ModelForm):
 
     class Meta:
         model = Article
-        fields = ['title']
+        fields = ["title"]
 
     @property
     def changed_data(self):
@@ -17,13 +17,13 @@ class ArticleAdminForm(forms.ModelForm):
         if data:
             # Add arbitrary name to changed_data to test
             # change message construction.
-            return data + ['not_a_form_field']
+            return data + ["not_a_form_field"]
         return data
 
 
 class ArticleInline(admin.TabularInline):
     model = Article
-    fields = ['title']
+    fields = ["title"]
     form = ArticleAdminForm
 
 
@@ -31,7 +31,7 @@ class SiteAdmin(admin.ModelAdmin):
     inlines = [ArticleInline]
 
 
-site = admin.AdminSite(name='admin')
+site = admin.AdminSite(name="admin")
 site.register(Article)
 site.register(ArticleProxy)
 site.register(Site, SiteAdmin)

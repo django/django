@@ -13,5 +13,5 @@ class SQLCompilerTest(SimpleTestCase):
             repr(compiler),
             f"<SQLCompiler model=Item connection="
             f"<DatabaseWrapper vendor={connection.vendor!r} alias='default'> "
-            f"using='default'>"
+            f"using='default'>",
         )

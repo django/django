@@ -3,7 +3,8 @@ from itertools import chain
 
 from django import forms
 from django.contrib.postgres.validators import (
-    ArrayMaxLengthValidator, ArrayMinLengthValidator,
+    ArrayMaxLengthValidator,
+    ArrayMinLengthValidator,
 )
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -13,10 +14,12 @@ from ..utils import prefix_validation_error
 
 class SimpleArrayField(forms.CharField):
     default_error_messages = {
-        'item_invalid': _('Item %(nth)s in the array did not validate:'),
+        "item_invalid": _("Item %(nth)s in the array did not validate:"),
     }
 
-    def __init__(self, base_field, *, delimiter=',', max_length=None, min_length=None, **kwargs):
+    def __init__(
+        self, base_field, *, delimiter=",", max_length=None, min_length=None, **kwargs
+    ):
         self.base_field = base_field
         self.delimiter = delimiter
         super().__init__(**kwargs)
@@ -33,7 +36,9 @@ class SimpleArrayField(forms.CharField):
 
     def prepare_value(self, value):
         if isinstance(value, list):
-            return self.delimiter.join(str(self.base_field.prepare_value(v)) for v in value)
+            return self.delimiter.join(
+                str(self.base_field.prepare_value(v)) for v in value
+            )
         return value
 
     def to_python(self, value):
@@ -49,12 +54,14 @@ class SimpleArrayField(forms.CharField):
             try:
                 values.append(self.base_field.to_python(item))
             except ValidationError as error:
-                errors.append(prefix_validation_error(
-                    error,
-                    prefix=self.error_messages['item_invalid'],
-                    code='item_invalid',
-                    params={'nth': index + 1},
-                ))
+                errors.append(
+                    prefix_validation_error(
+                        error,
+                        prefix=self.error_messages["item_invalid"],
+                        code="item_invalid",
+                        params={"nth": index + 1},
+                    )
+                )
         if errors:
             raise ValidationError(errors)
         return values
@@ -66,12 +73,14 @@ class SimpleArrayField(forms.CharField):
             try:
                 self.base_field.validate(item)
             except ValidationError as error:
-                errors.append(prefix_validation_error(
-                    error,
-                    prefix=self.error_messages['item_invalid'],
-                    code='item_invalid',
-                    params={'nth': index + 1},
-                ))
+                errors.append(
+                    prefix_validation_error(
+                        error,
+                        prefix=self.error_messages["item_invalid"],
+                        code="item_invalid",
+                        params={"nth": index + 1},
+                    )
+                )
         if errors:
             raise ValidationError(errors)
 
@@ -82,12 +91,14 @@ class SimpleArrayField(forms.CharField):
             try:
                 self.base_field.run_validators(item)
             except ValidationError as error:
-                errors.append(prefix_validation_error(
-                    error,
-                    prefix=self.error_messages['item_invalid'],
-                    code='item_invalid',
-                    params={'nth': index + 1},
-                ))
+                errors.append(
+                    prefix_validation_error(
+                        error,
+                        prefix=self.error_messages["item_invalid"],
+                        code="item_invalid",
+                        params={"nth": index + 1},
+                    )
+                )
         if errors:
             raise ValidationError(errors)
 
@@ -103,7 +114,7 @@ class SimpleArrayField(forms.CharField):
 
 
 class SplitArrayWidget(forms.Widget):
-    template_name = 'postgres/widgets/split_array.html'
+    template_name = "postgres/widgets/split_array.html"
 
     def __init__(self, widget, size, **kwargs):
         self.widget = widget() if isinstance(widget, type) else widget
@@ -115,19 +126,21 @@ class SplitArrayWidget(forms.Widget):
         return self.widget.is_hidden
 
     def value_from_datadict(self, data, files, name):
-        return [self.widget.value_from_datadict(data, files, '%s_%s' % (name, index))
-                for index in range(self.size)]
+        return [
+            self.widget.value_from_datadict(data, files, "%s_%s" % (name, index))
+            for index in range(self.size)
+        ]
 
     def value_omitted_from_data(self, data, files, name):
         return all(
-            self.widget.value_omitted_from_data(data, files, '%s_%s' % (name, index))
+            self.widget.value_omitted_from_data(data, files, "%s_%s" % (name, index))
             for index in range(self.size)
         )
 
     def id_for_label(self, id_):
         # See the comment for RadioSelect.id_for_label()
         if id_:
-            id_ += '_0'
+            id_ += "_0"
         return id_
 
     def get_context(self, name, value, attrs=None):
@@ -136,18 +149,20 @@ class SplitArrayWidget(forms.Widget):
         if self.is_localized:
             self.widget.is_localized = self.is_localized
         value = value or []
-        context['widget']['subwidgets'] = []
+        context["widget"]["subwidgets"] = []
         final_attrs = self.build_attrs(attrs)
-        id_ = final_attrs.get('id')
+        id_ = final_attrs.get("id")
         for i in range(max(len(value), self.size)):
             try:
                 widget_value = value[i]
             except IndexError:
                 widget_value = None
             if id_:
-                final_attrs = {**final_attrs, 'id': '%s_%s' % (id_, i)}
-            context['widget']['subwidgets'].append(
-                self.widget.get_context(name + '_%s' % i, widget_value, final_attrs)['widget']
+                final_attrs = {**final_attrs, "id": "%s_%s" % (id_, i)}
+            context["widget"]["subwidgets"].append(
+                self.widget.get_context(name + "_%s" % i, widget_value, final_attrs)[
+                    "widget"
+                ]
             )
         return context
 
@@ -167,7 +182,7 @@ class SplitArrayWidget(forms.Widget):
 
 class SplitArrayField(forms.Field):
     default_error_messages = {
-        'item_invalid': _('Item %(nth)s in the array did not validate:'),
+        "item_invalid": _("Item %(nth)s in the array did not validate:"),
     }
 
     def __init__(self, base_field, size, *, remove_trailing_nulls=False, **kwargs):
@@ -175,7 +190,7 @@ class SplitArrayField(forms.Field):
         self.size = size
         self.remove_trailing_nulls = remove_trailing_nulls
         widget = SplitArrayWidget(widget=base_field.widget, size=size)
-        kwargs.setdefault('widget', widget)
+        kwargs.setdefault("widget", widget)
         super().__init__(**kwargs)
 
     def _remove_trailing_nulls(self, values):
@@ -198,19 +213,21 @@ class SplitArrayField(forms.Field):
         cleaned_data = []
         errors = []
         if not any(value) and self.required:
-            raise ValidationError(self.error_messages['required'])
+            raise ValidationError(self.error_messages["required"])
         max_size = max(self.size, len(value))
         for index in range(max_size):
             item = value[index]
             try:
                 cleaned_data.append(self.base_field.clean(item))
             except ValidationError as error:
-                errors.append(prefix_validation_error(
-                    error,
-                    self.error_messages['item_invalid'],
-                    code='item_invalid',
-                    params={'nth': index + 1},
-                ))
+                errors.append(
+                    prefix_validation_error(
+                        error,
+                        self.error_messages["item_invalid"],
+                        code="item_invalid",
+                        params={"nth": index + 1},
+                    )
+                )
                 cleaned_data.append(None)
             else:
                 errors.append(None)

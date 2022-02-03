@@ -10,13 +10,14 @@ class PasswordResetTokenGenerator:
     Strategy object used to generate and check tokens for the password
     reset mechanism.
     """
+
     key_salt = "django.contrib.auth.tokens.PasswordResetTokenGenerator"
     algorithm = None
     _secret = None
     _secret_fallbacks = None
 
     def __init__(self):
-        self.algorithm = self.algorithm or 'sha256'
+        self.algorithm = self.algorithm or "sha256"
 
     def _get_secret(self):
         return self._secret or settings.SECRET_KEY
@@ -89,7 +90,9 @@ class PasswordResetTokenGenerator:
             self._make_hash_value(user, timestamp),
             secret=secret,
             algorithm=self.algorithm,
-        ).hexdigest()[::2]  # Limit to shorten the URL.
+        ).hexdigest()[
+            ::2
+        ]  # Limit to shorten the URL.
         return "%s-%s" % (ts_b36, hash_string)
 
     def _make_hash_value(self, user, timestamp):
@@ -109,10 +112,14 @@ class PasswordResetTokenGenerator:
         """
         # Truncate microseconds so that tokens are consistent even if the
         # database doesn't support microseconds.
-        login_timestamp = '' if user.last_login is None else user.last_login.replace(microsecond=0, tzinfo=None)
+        login_timestamp = (
+            ""
+            if user.last_login is None
+            else user.last_login.replace(microsecond=0, tzinfo=None)
+        )
         email_field = user.get_email_field_name()
-        email = getattr(user, email_field, '') or ''
-        return f'{user.pk}{user.password}{login_timestamp}{timestamp}{email}'
+        email = getattr(user, email_field, "") or ""
+        return f"{user.pk}{user.password}{login_timestamp}{timestamp}{email}"
 
     def _num_seconds(self, dt):
         return int((dt - datetime(2001, 1, 1)).total_seconds())

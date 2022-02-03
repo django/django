@@ -20,12 +20,12 @@ else:
 
 
 def get_view_name(view_func):
-    if hasattr(view_func, 'view_class'):
+    if hasattr(view_func, "view_class"):
         klass = view_func.view_class
-        return f'{klass.__module__}.{klass.__qualname__}'
+        return f"{klass.__module__}.{klass.__qualname__}"
     mod_name = view_func.__module__
-    view_name = getattr(view_func, '__qualname__', view_func.__class__.__name__)
-    return mod_name + '.' + view_name
+    view_name = getattr(view_func, "__qualname__", view_func.__class__.__name__)
+    return mod_name + "." + view_name
 
 
 def parse_docstring(docstring):
@@ -33,12 +33,12 @@ def parse_docstring(docstring):
     Parse out the parts of a docstring.  Return (title, body, metadata).
     """
     if not docstring:
-        return '', '', {}
+        return "", "", {}
     docstring = cleandoc(docstring)
-    parts = re.split(r'\n{2,}', docstring)
+    parts = re.split(r"\n{2,}", docstring)
     title = parts[0]
     if len(parts) == 1:
-        body = ''
+        body = ""
         metadata = {}
     else:
         parser = HeaderParser()
@@ -61,14 +61,14 @@ def parse_rst(text, default_reference_context, thing_being_parsed=None):
     Convert the string from reST to an XHTML fragment.
     """
     overrides = {
-        'doctitle_xform': True,
-        'initial_header_level': 3,
+        "doctitle_xform": True,
+        "initial_header_level": 3,
         "default_reference_context": default_reference_context,
-        "link_base": reverse('django-admindocs-docroot').rstrip('/'),
-        'raw_enabled': False,
-        'file_insertion_enabled': False,
+        "link_base": reverse("django-admindocs-docroot").rstrip("/"),
+        "raw_enabled": False,
+        "file_insertion_enabled": False,
     }
-    thing_being_parsed = thing_being_parsed and '<%s>' % thing_being_parsed
+    thing_being_parsed = thing_being_parsed and "<%s>" % thing_being_parsed
     # Wrap ``text`` in some reST that sets the default role to ``cmsreference``,
     # then restores it.
     source = """
@@ -80,21 +80,23 @@ def parse_rst(text, default_reference_context, thing_being_parsed=None):
 """
     parts = docutils.core.publish_parts(
         source % text,
-        source_path=thing_being_parsed, destination_path=None,
-        writer_name='html', settings_overrides=overrides,
+        source_path=thing_being_parsed,
+        destination_path=None,
+        writer_name="html",
+        settings_overrides=overrides,
     )
-    return mark_safe(parts['fragment'])
+    return mark_safe(parts["fragment"])
 
 
 #
 # reST roles
 #
 ROLES = {
-    'model': '%s/models/%s/',
-    'view': '%s/views/%s/',
-    'template': '%s/templates/%s/',
-    'filter': '%s/filters/#%s',
-    'tag': '%s/tags/#%s',
+    "model": "%s/models/%s/",
+    "view": "%s/views/%s/",
+    "template": "%s/templates/%s/",
+    "filter": "%s/filters/#%s",
+    "tag": "%s/tags/#%s",
 }
 
 
@@ -105,48 +107,59 @@ def create_reference_role(rolename, urlbase):
         node = docutils.nodes.reference(
             rawtext,
             text,
-            refuri=(urlbase % (
-                inliner.document.settings.link_base,
-                text.lower(),
-            )),
-            **options
+            refuri=(
+                urlbase
+                % (
+                    inliner.document.settings.link_base,
+                    text.lower(),
+                )
+            ),
+            **options,
         )
         return [node], []
+
     docutils.parsers.rst.roles.register_canonical_role(rolename, _role)
 
 
-def default_reference_role(name, rawtext, text, lineno, inliner, options=None, content=None):
+def default_reference_role(
+    name, rawtext, text, lineno, inliner, options=None, content=None
+):
     if options is None:
         options = {}
     context = inliner.document.settings.default_reference_context
     node = docutils.nodes.reference(
         rawtext,
         text,
-        refuri=(ROLES[context] % (
-            inliner.document.settings.link_base,
-            text.lower(),
-        )),
-        **options
+        refuri=(
+            ROLES[context]
+            % (
+                inliner.document.settings.link_base,
+                text.lower(),
+            )
+        ),
+        **options,
     )
     return [node], []
 
 
 if docutils_is_available:
-    docutils.parsers.rst.roles.register_canonical_role('cmsreference', default_reference_role)
+    docutils.parsers.rst.roles.register_canonical_role(
+        "cmsreference", default_reference_role
+    )
 
     for name, urlbase in ROLES.items():
         create_reference_role(name, urlbase)
 
 # Match the beginning of a named, unnamed, or non-capturing groups.
-named_group_matcher = _lazy_re_compile(r'\(\?P(<\w+>)')
-unnamed_group_matcher = _lazy_re_compile(r'\(')
-non_capturing_group_matcher = _lazy_re_compile(r'\(\?\:')
+named_group_matcher = _lazy_re_compile(r"\(\?P(<\w+>)")
+unnamed_group_matcher = _lazy_re_compile(r"\(")
+non_capturing_group_matcher = _lazy_re_compile(r"\(\?\:")
 
 
 def replace_metacharacters(pattern):
     """Remove unescaped metacharacters from the pattern."""
     return re.sub(
-        r'((?:^|(?<!\\))(?:\\\\)*)(\\?)([?*+^$]|\\[bBAZ])',
+        r"((?:^|(?<!\\))(?:\\\\)*)(\\?)([?*+^$]|\\[bBAZ])",
         lambda m: m[1] + m[3] if m[2] else m[1],
         pattern,
     )
@@ -158,9 +171,9 @@ def _get_group_start_end(start, end, pattern):
     for idx, val in enumerate(pattern[end:]):
         # Check for unescaped `(` and `)`. They mark the start and end of a
         # nested group.
-        if val == '(' and prev_char != '\\':
+        if val == "(" and prev_char != "\\":
             unmatched_open_brackets += 1
-        elif val == ')' and prev_char != '\\':
+        elif val == ")" and prev_char != "\\":
             unmatched_open_brackets -= 1
         prev_char = val
         # If brackets are balanced, the end of the string for the current named
@@ -204,11 +217,11 @@ def replace_unnamed_groups(pattern):
     3. ^(?P<a>\w+)/b/(\w+) ==> ^(?P<a>\w+)/b/<var>
     4. ^(?P<a>\w+)/b/((x|y)\w+) ==> ^(?P<a>\w+)/b/<var>
     """
-    final_pattern, prev_end = '', None
+    final_pattern, prev_end = "", None
     for start, end, _ in _find_groups(pattern, unnamed_group_matcher):
         if prev_end:
             final_pattern += pattern[prev_end:start]
-        final_pattern += pattern[:start] + '<var>'
+        final_pattern += pattern[:start] + "<var>"
         prev_end = end
     return final_pattern + pattern[prev_end:]
 
@@ -221,7 +234,7 @@ def remove_non_capturing_groups(pattern):
     3. ^a(?:\w+)/b(?:\w+) => ^a/b
     """
     group_start_end_indices = _find_groups(pattern, non_capturing_group_matcher)
-    final_pattern, prev_end = '', None
+    final_pattern, prev_end = "", None
     for start, end, _ in group_start_end_indices:
         final_pattern += pattern[prev_end:start]
         prev_end = end

@@ -36,7 +36,7 @@ def default_key_func(key, key_prefix, version):
     the `key_prefix`. KEY_FUNCTION can be used to specify an alternate
     function with custom key making behavior.
     """
-    return '%s:%s:%s' % (key_prefix, version, key)
+    return "%s:%s:%s" % (key_prefix, version, key)
 
 
 def get_key_func(key_func):
@@ -57,7 +57,7 @@ class BaseCache:
     _missing_key = object()
 
     def __init__(self, params):
-        timeout = params.get('timeout', params.get('TIMEOUT', 300))
+        timeout = params.get("timeout", params.get("TIMEOUT", 300))
         if timeout is not None:
             try:
                 timeout = int(timeout)
@@ -65,22 +65,22 @@ class BaseCache:
                 timeout = 300
         self.default_timeout = timeout
 
-        options = params.get('OPTIONS', {})
-        max_entries = params.get('max_entries', options.get('MAX_ENTRIES', 300))
+        options = params.get("OPTIONS", {})
+        max_entries = params.get("max_entries", options.get("MAX_ENTRIES", 300))
         try:
             self._max_entries = int(max_entries)
         except (ValueError, TypeError):
             self._max_entries = 300
 
-        cull_frequency = params.get('cull_frequency', options.get('CULL_FREQUENCY', 3))
+        cull_frequency = params.get("cull_frequency", options.get("CULL_FREQUENCY", 3))
         try:
             self._cull_frequency = int(cull_frequency)
         except (ValueError, TypeError):
             self._cull_frequency = 3
 
-        self.key_prefix = params.get('KEY_PREFIX', '')
-        self.version = params.get('VERSION', 1)
-        self.key_func = get_key_func(params.get('KEY_FUNCTION'))
+        self.key_prefix = params.get("KEY_PREFIX", "")
+        self.version = params.get("VERSION", 1)
+        self.key_func = get_key_func(params.get("KEY_FUNCTION"))
 
     def get_backend_timeout(self, timeout=DEFAULT_TIMEOUT):
         """
@@ -130,47 +130,61 @@ class BaseCache:
 
         Return True if the value was stored, False otherwise.
         """
-        raise NotImplementedError('subclasses of BaseCache must provide an add() method')
+        raise NotImplementedError(
+            "subclasses of BaseCache must provide an add() method"
+        )
 
     async def aadd(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        return await sync_to_async(self.add, thread_sensitive=True)(key, value, timeout, version)
+        return await sync_to_async(self.add, thread_sensitive=True)(
+            key, value, timeout, version
+        )
 
     def get(self, key, default=None, version=None):
         """
         Fetch a given key from the cache. If the key does not exist, return
         default, which itself defaults to None.
         """
-        raise NotImplementedError('subclasses of BaseCache must provide a get() method')
+        raise NotImplementedError("subclasses of BaseCache must provide a get() method")
 
     async def aget(self, key, default=None, version=None):
-        return await sync_to_async(self.get, thread_sensitive=True)(key, default, version)
+        return await sync_to_async(self.get, thread_sensitive=True)(
+            key, default, version
+        )
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         """
         Set a value in the cache. If timeout is given, use that timeout for the
         key; otherwise use the default cache timeout.
         """
-        raise NotImplementedError('subclasses of BaseCache must provide a set() method')
+        raise NotImplementedError("subclasses of BaseCache must provide a set() method")
 
     async def aset(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        return await sync_to_async(self.set, thread_sensitive=True)(key, value, timeout, version)
+        return await sync_to_async(self.set, thread_sensitive=True)(
+            key, value, timeout, version
+        )
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
         """
         Update the key's expiry time using timeout. Return True if successful
         or False if the key does not exist.
         """
-        raise NotImplementedError('subclasses of BaseCache must provide a touch() method')
+        raise NotImplementedError(
+            "subclasses of BaseCache must provide a touch() method"
+        )
 
     async def atouch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
-        return await sync_to_async(self.touch, thread_sensitive=True)(key, timeout, version)
+        return await sync_to_async(self.touch, thread_sensitive=True)(
+            key, timeout, version
+        )
 
     def delete(self, key, version=None):
         """
         Delete a key from the cache and return whether it succeeded, failing
         silently.
         """
-        raise NotImplementedError('subclasses of BaseCache must provide a delete() method')
+        raise NotImplementedError(
+            "subclasses of BaseCache must provide a delete() method"
+        )
 
     async def adelete(self, key, version=None):
         return await sync_to_async(self.delete, thread_sensitive=True)(key, version)
@@ -234,7 +248,9 @@ class BaseCache:
         """
         Return True if the key is in the cache and has not expired.
         """
-        return self.get(key, self._missing_key, version=version) is not self._missing_key
+        return (
+            self.get(key, self._missing_key, version=version) is not self._missing_key
+        )
 
     async def ahas_key(self, key, version=None):
         return (
@@ -318,7 +334,9 @@ class BaseCache:
 
     def clear(self):
         """Remove *all* values from the cache at once."""
-        raise NotImplementedError('subclasses of BaseCache must provide a clear() method')
+        raise NotImplementedError(
+            "subclasses of BaseCache must provide a clear() method"
+        )
 
     async def aclear(self):
         return await sync_to_async(self.clear, thread_sensitive=True)()
@@ -373,13 +391,13 @@ class BaseCache:
 def memcache_key_warnings(key):
     if len(key) > MEMCACHE_MAX_KEY_LENGTH:
         yield (
-            'Cache key will cause errors if used with memcached: %r '
-            '(longer than %s)' % (key, MEMCACHE_MAX_KEY_LENGTH)
+            "Cache key will cause errors if used with memcached: %r "
+            "(longer than %s)" % (key, MEMCACHE_MAX_KEY_LENGTH)
         )
     for char in key:
         if ord(char) < 33 or ord(char) == 127:
             yield (
-                'Cache key contains characters that will cause errors if '
-                'used with memcached: %r' % key
+                "Cache key contains characters that will cause errors if "
+                "used with memcached: %r" % key
             )
             break

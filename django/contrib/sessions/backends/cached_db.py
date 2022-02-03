@@ -13,6 +13,7 @@ class SessionStore(DBStore):
     """
     Implement cached, database backed sessions.
     """
+
     cache_key_prefix = KEY_PREFIX
 
     def __init__(self, session_key=None):
@@ -35,13 +36,19 @@ class SessionStore(DBStore):
             s = self._get_session_from_db()
             if s:
                 data = self.decode(s.session_data)
-                self._cache.set(self.cache_key, data, self.get_expiry_age(expiry=s.expire_date))
+                self._cache.set(
+                    self.cache_key, data, self.get_expiry_age(expiry=s.expire_date)
+                )
             else:
                 data = {}
         return data
 
     def exists(self, session_key):
-        return session_key and (self.cache_key_prefix + session_key) in self._cache or super().exists(session_key)
+        return (
+            session_key
+            and (self.cache_key_prefix + session_key) in self._cache
+            or super().exists(session_key)
+        )
 
     def save(self, must_create=False):
         super().save(must_create)

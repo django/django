@@ -13,8 +13,8 @@ from django.utils.translation import gettext_lazy as _
 def pretty_name(name):
     """Convert 'first_name' to 'First name'."""
     if not name:
-        return ''
-    return name.replace('_', ' ').capitalize()
+        return ""
+    return name.replace("_", " ").capitalize()
 
 
 def flatatt(attrs):
@@ -37,23 +37,24 @@ def flatatt(attrs):
         elif value is not None:
             key_value_attrs.append((attr, value))
 
-    return (
-        format_html_join('', ' {}="{}"', sorted(key_value_attrs)) +
-        format_html_join('', ' {}', sorted(boolean_attrs))
+    return format_html_join("", ' {}="{}"', sorted(key_value_attrs)) + format_html_join(
+        "", " {}", sorted(boolean_attrs)
     )
 
 
 class RenderableMixin:
     def get_context(self):
         raise NotImplementedError(
-            'Subclasses of RenderableMixin must provide a get_context() method.'
+            "Subclasses of RenderableMixin must provide a get_context() method."
         )
 
     def render(self, template_name=None, context=None, renderer=None):
-        return mark_safe((renderer or self.renderer).render(
-            template_name or self.template_name,
-            context or self.get_context(),
-        ))
+        return mark_safe(
+            (renderer or self.renderer).render(
+                template_name or self.template_name,
+                context or self.get_context(),
+            )
+        )
 
     __str__ = render
     __html__ = render
@@ -90,9 +91,10 @@ class ErrorDict(dict, RenderableErrorMixin):
 
     The dictionary keys are the field names, and the values are the errors.
     """
-    template_name = 'django/forms/errors/dict/default.html'
-    template_name_text = 'django/forms/errors/dict/text.txt'
-    template_name_ul = 'django/forms/errors/dict/ul.html'
+
+    template_name = "django/forms/errors/dict/default.html"
+    template_name_text = "django/forms/errors/dict/text.txt"
+    template_name_ul = "django/forms/errors/dict/ul.html"
 
     def __init__(self, *args, renderer=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -106,8 +108,8 @@ class ErrorDict(dict, RenderableErrorMixin):
 
     def get_context(self):
         return {
-            'errors': self.items(),
-            'error_class': 'errorlist',
+            "errors": self.items(),
+            "error_class": "errorlist",
         }
 
 
@@ -115,17 +117,18 @@ class ErrorList(UserList, list, RenderableErrorMixin):
     """
     A collection of errors that knows how to display itself in various formats.
     """
-    template_name = 'django/forms/errors/list/default.html'
-    template_name_text = 'django/forms/errors/list/text.txt'
-    template_name_ul = 'django/forms/errors/list/ul.html'
+
+    template_name = "django/forms/errors/list/default.html"
+    template_name_text = "django/forms/errors/list/text.txt"
+    template_name_ul = "django/forms/errors/list/ul.html"
 
     def __init__(self, initlist=None, error_class=None, renderer=None):
         super().__init__(initlist)
 
         if error_class is None:
-            self.error_class = 'errorlist'
+            self.error_class = "errorlist"
         else:
-            self.error_class = 'errorlist {}'.format(error_class)
+            self.error_class = "errorlist {}".format(error_class)
         self.renderer = renderer or get_default_renderer()
 
     def as_data(self):
@@ -140,16 +143,18 @@ class ErrorList(UserList, list, RenderableErrorMixin):
         errors = []
         for error in self.as_data():
             message = next(iter(error))
-            errors.append({
-                'message': escape(message) if escape_html else message,
-                'code': error.code or '',
-            })
+            errors.append(
+                {
+                    "message": escape(message) if escape_html else message,
+                    "code": error.code or "",
+                }
+            )
         return errors
 
     def get_context(self):
         return {
-            'errors': self,
-            'error_class': self.error_class,
+            "errors": self,
+            "error_class": self.error_class,
         }
 
     def __repr__(self):
@@ -179,6 +184,7 @@ class ErrorList(UserList, list, RenderableErrorMixin):
 
 # Utilities for time zone support in DateTimeField et al.
 
+
 def from_current_timezone(value):
     """
     When time zone support is enabled, convert naive datetimes
@@ -187,19 +193,20 @@ def from_current_timezone(value):
     if settings.USE_TZ and value is not None and timezone.is_naive(value):
         current_timezone = timezone.get_current_timezone()
         try:
-            if (
-                not timezone._is_pytz_zone(current_timezone) and
-                timezone._datetime_ambiguous_or_imaginary(value, current_timezone)
-            ):
-                raise ValueError('Ambiguous or non-existent time.')
+            if not timezone._is_pytz_zone(
+                current_timezone
+            ) and timezone._datetime_ambiguous_or_imaginary(value, current_timezone):
+                raise ValueError("Ambiguous or non-existent time.")
             return timezone.make_aware(value, current_timezone)
         except Exception as exc:
             raise ValidationError(
-                _('%(datetime)s couldn’t be interpreted '
-                  'in time zone %(current_timezone)s; it '
-                  'may be ambiguous or it may not exist.'),
-                code='ambiguous_timezone',
-                params={'datetime': value, 'current_timezone': current_timezone}
+                _(
+                    "%(datetime)s couldn’t be interpreted "
+                    "in time zone %(current_timezone)s; it "
+                    "may be ambiguous or it may not exist."
+                ),
+                code="ambiguous_timezone",
+                params={"datetime": value, "current_timezone": current_timezone},
             ) from exc
     return value
 

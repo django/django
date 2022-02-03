@@ -18,4 +18,4 @@ class MyEmailBackend(BaseEmailBackend):
 
 class CustomExceptionReporter(ExceptionReporter):
     def get_traceback_text(self):
-        return 'custom traceback text'
+        return "custom traceback text"

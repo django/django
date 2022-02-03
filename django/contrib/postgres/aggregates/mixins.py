@@ -2,7 +2,6 @@ from django.db.models.expressions import OrderByList
 
 
 class OrderableAggMixin:
-
     def __init__(self, *expressions, ordering=(), **extra):
         if isinstance(ordering, (list, tuple)):
             self.order_by = OrderByList(*ordering)

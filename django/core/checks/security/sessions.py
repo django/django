@@ -15,7 +15,7 @@ W010 = Warning(
         "You have 'django.contrib.sessions' in your INSTALLED_APPS, "
         "but you have not set SESSION_COOKIE_SECURE to True."
     ),
-    id='security.W010',
+    id="security.W010",
 )
 
 W011 = Warning(
@@ -24,12 +24,12 @@ W011 = Warning(
         "in your MIDDLEWARE, but you have not set "
         "SESSION_COOKIE_SECURE to True."
     ),
-    id='security.W011',
+    id="security.W011",
 )
 
 W012 = Warning(
     add_session_cookie_message("SESSION_COOKIE_SECURE is not set to True."),
-    id='security.W012',
+    id="security.W012",
 )
 
 
@@ -45,7 +45,7 @@ W013 = Warning(
         "You have 'django.contrib.sessions' in your INSTALLED_APPS, "
         "but you have not set SESSION_COOKIE_HTTPONLY to True.",
     ),
-    id='security.W013',
+    id="security.W013",
 )
 
 W014 = Warning(
@@ -54,12 +54,12 @@ W014 = Warning(
         "in your MIDDLEWARE, but you have not set "
         "SESSION_COOKIE_HTTPONLY to True."
     ),
-    id='security.W014',
+    id="security.W014",
 )
 
 W015 = Warning(
     add_httponly_message("SESSION_COOKIE_HTTPONLY is not set to True."),
-    id='security.W015',
+    id="security.W015",
 )
 
 
@@ -90,7 +90,7 @@ def check_session_cookie_httponly(app_configs, **kwargs):
 
 
 def _session_middleware():
-    return 'django.contrib.sessions.middleware.SessionMiddleware' in settings.MIDDLEWARE
+    return "django.contrib.sessions.middleware.SessionMiddleware" in settings.MIDDLEWARE
 
 
 def _session_app():

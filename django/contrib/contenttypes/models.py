@@ -81,10 +81,7 @@ class ContentTypeManager(models.Manager):
                 results[model] = ct
         if needed_opts:
             # Lookup required content types from the DB.
-            cts = self.filter(
-                app_label__in=needed_app_labels,
-                model__in=needed_models
-            )
+            cts = self.filter(app_label__in=needed_app_labels, model__in=needed_models)
             for ct in cts:
                 opts_models = needed_opts.pop(ct.model_class()._meta, [])
                 for model in opts_models:
@@ -132,14 +129,14 @@ class ContentTypeManager(models.Manager):
 
 class ContentType(models.Model):
     app_label = models.CharField(max_length=100)
-    model = models.CharField(_('python model class name'), max_length=100)
+    model = models.CharField(_("python model class name"), max_length=100)
     objects = ContentTypeManager()
 
     class Meta:
-        verbose_name = _('content type')
-        verbose_name_plural = _('content types')
-        db_table = 'django_content_type'
-        unique_together = [['app_label', 'model']]
+        verbose_name = _("content type")
+        verbose_name_plural = _("content types")
+        db_table = "django_content_type"
+        unique_together = [["app_label", "model"]]
 
     def __str__(self):
         return self.app_labeled_name
@@ -156,7 +153,7 @@ class ContentType(models.Model):
         model = self.model_class()
         if not model:
             return self.model
-        return '%s | %s' % (model._meta.app_label, model._meta.verbose_name)
+        return "%s | %s" % (model._meta.app_label, model._meta.verbose_name)
 
     def model_class(self):
         """Return the model class for this type of content."""

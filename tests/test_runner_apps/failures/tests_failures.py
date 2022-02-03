@@ -8,7 +8,7 @@ class FailureTestCase(TestCase):
 
 class ErrorTestCase(TestCase):
     def test_sample(self):
-        raise Exception('test')
+        raise Exception("test")
 
 
 class ExpectedFailureTestCase(TestCase):

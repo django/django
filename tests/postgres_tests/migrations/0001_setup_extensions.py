@@ -4,8 +4,14 @@ from django.db import connection, migrations
 
 try:
     from django.contrib.postgres.operations import (
-        BloomExtension, BtreeGinExtension, BtreeGistExtension, CITextExtension,
-        CreateExtension, CryptoExtension, HStoreExtension, TrigramExtension,
+        BloomExtension,
+        BtreeGinExtension,
+        BtreeGistExtension,
+        CITextExtension,
+        CreateExtension,
+        CryptoExtension,
+        HStoreExtension,
+        TrigramExtension,
         UnaccentExtension,
     )
 except ImportError:
@@ -20,8 +26,7 @@ except ImportError:
     needs_crypto_extension = False
 else:
     needs_crypto_extension = (
-        connection.vendor == 'postgresql' and
-        not connection.features.is_postgresql_13
+        connection.vendor == "postgresql" and not connection.features.is_postgresql_13
     )
 
 
@@ -34,7 +39,7 @@ class Migration(migrations.Migration):
         CITextExtension(),
         # Ensure CreateExtension quotes extension names by creating one with a
         # dash in its name.
-        CreateExtension('uuid-ossp'),
+        CreateExtension("uuid-ossp"),
         # CryptoExtension is required for RandomUUID() on PostgreSQL < 13.
         CryptoExtension() if needs_crypto_extension else mock.Mock(),
         HStoreExtension(),

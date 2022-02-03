@@ -56,14 +56,18 @@ class Operation:
         Take the state from the previous migration, and mutate it
         so that it matches what this migration would perform.
         """
-        raise NotImplementedError('subclasses of Operation must provide a state_forwards() method')
+        raise NotImplementedError(
+            "subclasses of Operation must provide a state_forwards() method"
+        )
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         """
         Perform the mutation on the database schema in the normal
         (forwards) direction.
         """
-        raise NotImplementedError('subclasses of Operation must provide a database_forwards() method')
+        raise NotImplementedError(
+            "subclasses of Operation must provide a database_forwards() method"
+        )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         """
@@ -71,7 +75,9 @@ class Operation:
         direction - e.g. if this were CreateModel, it would in fact
         drop the model's table.
         """
-        raise NotImplementedError('subclasses of Operation must provide a database_backwards() method')
+        raise NotImplementedError(
+            "subclasses of Operation must provide a database_backwards() method"
+        )
 
     def describe(self):
         """

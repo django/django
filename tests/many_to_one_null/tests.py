@@ -7,20 +7,20 @@ class ManyToOneNullTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         # Create a Reporter.
-        cls.r = Reporter(name='John Smith')
+        cls.r = Reporter(name="John Smith")
         cls.r.save()
         # Create an Article.
-        cls.a = Article(headline='First', reporter=cls.r)
+        cls.a = Article(headline="First", reporter=cls.r)
         cls.a.save()
         # Create an Article via the Reporter object.
-        cls.a2 = cls.r.article_set.create(headline='Second')
+        cls.a2 = cls.r.article_set.create(headline="Second")
         # Create an Article with no Reporter by passing "reporter=None".
-        cls.a3 = Article(headline='Third', reporter=None)
+        cls.a3 = Article(headline="Third", reporter=None)
         cls.a3.save()
         # Create another article and reporter
-        cls.r2 = Reporter(name='Paul Jones')
+        cls.r2 = Reporter(name="Paul Jones")
         cls.r2.save()
-        cls.a4 = cls.r2.article_set.create(headline='Fourth')
+        cls.a4 = cls.r2.article_set.create(headline="Fourth")
 
     def test_get_related(self):
         self.assertEqual(self.a.reporter.id, self.r.id)
@@ -34,7 +34,9 @@ class ManyToOneNullTests(TestCase):
     def test_related_set(self):
         # Reporter objects have access to their related Article objects.
         self.assertSequenceEqual(self.r.article_set.all(), [self.a, self.a2])
-        self.assertSequenceEqual(self.r.article_set.filter(headline__startswith='Fir'), [self.a])
+        self.assertSequenceEqual(
+            self.r.article_set.filter(headline__startswith="Fir"), [self.a]
+        )
         self.assertEqual(self.r.article_set.count(), 2)
 
     def test_created_without_related(self):
@@ -42,12 +44,14 @@ class ManyToOneNullTests(TestCase):
         # Need to reget a3 to refresh the cache
         a3 = Article.objects.get(pk=self.a3.pk)
         with self.assertRaises(AttributeError):
-            getattr(a3.reporter, 'id')
+            getattr(a3.reporter, "id")
         # Accessing an article's 'reporter' attribute returns None
         # if the reporter is set to None.
         self.assertIsNone(a3.reporter)
         # To retrieve the articles with no reporters set, use "reporter__isnull=True".
-        self.assertSequenceEqual(Article.objects.filter(reporter__isnull=True), [self.a3])
+        self.assertSequenceEqual(
+            Article.objects.filter(reporter__isnull=True), [self.a3]
+        )
         # We can achieve the same thing by filtering for the case where the
         # reporter is None.
         self.assertSequenceEqual(Article.objects.filter(reporter=None), [self.a3])
@@ -61,7 +65,9 @@ class ManyToOneNullTests(TestCase):
         # Remove an article from the set, and check that it was removed.
         self.r.article_set.remove(a3)
         self.assertSequenceEqual(self.r.article_set.all(), [self.a, self.a2])
-        self.assertSequenceEqual(Article.objects.filter(reporter__isnull=True), [self.a3])
+        self.assertSequenceEqual(
+            Article.objects.filter(reporter__isnull=True), [self.a3]
+        )
 
     def test_remove_from_wrong_set(self):
         self.assertSequenceEqual(self.r2.article_set.all(), [self.a4])

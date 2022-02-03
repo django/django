@@ -14,7 +14,7 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if kwargs.get('alias', '') != NO_DB_ALIAS:
+        if kwargs.get("alias", "") != NO_DB_ALIAS:
             self.features = DatabaseFeatures(self)
             self.ops = PostGISOperations(self)
             self.introspection = PostGISIntrospection(self)

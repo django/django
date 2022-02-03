@@ -4,9 +4,7 @@ from django.dispatch import receiver
 from django.template import engines
 from django.template.backends.django import DjangoTemplates
 from django.utils._os import to_path
-from django.utils.autoreload import (
-    autoreload_started, file_changed, is_django_path,
-)
+from django.utils.autoreload import autoreload_started, file_changed, is_django_path
 
 
 def get_template_directories():
@@ -22,7 +20,7 @@ def get_template_directories():
         items.update(cwd / to_path(dir) for dir in backend.engine.dirs)
 
         for loader in backend.engine.template_loaders:
-            if not hasattr(loader, 'get_dirs'):
+            if not hasattr(loader, "get_dirs"):
                 continue
             items.update(
                 cwd / to_path(directory)
@@ -40,15 +38,15 @@ def reset_loaders():
             loader.reset()
 
 
-@receiver(autoreload_started, dispatch_uid='template_loaders_watch_changes')
+@receiver(autoreload_started, dispatch_uid="template_loaders_watch_changes")
 def watch_for_template_changes(sender, **kwargs):
     for directory in get_template_directories():
-        sender.watch_dir(directory, '**/*')
+        sender.watch_dir(directory, "**/*")
 
 
-@receiver(file_changed, dispatch_uid='template_loaders_file_changed')
+@receiver(file_changed, dispatch_uid="template_loaders_file_changed")
 def template_changed(sender, file_path, **kwargs):
-    if file_path.suffix == '.py':
+    if file_path.suffix == ".py":
         return
     for template_dir in get_template_directories():
         if template_dir in file_path.parents:

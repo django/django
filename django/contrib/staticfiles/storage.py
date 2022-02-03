@@ -20,6 +20,7 @@ class StaticFilesStorage(FileSystemStorage):
     The defaults for ``location`` and ``base_url`` are
     ``STATIC_ROOT`` and ``STATIC_URL``.
     """
+
     def __init__(self, location=None, base_url=None, *args, **kwargs):
         if location is None:
             location = settings.STATIC_ROOT
@@ -35,9 +36,11 @@ class StaticFilesStorage(FileSystemStorage):
 
     def path(self, name):
         if not self.location:
-            raise ImproperlyConfigured("You're using the staticfiles app "
-                                       "without having set the STATIC_ROOT "
-                                       "setting to a filesystem path.")
+            raise ImproperlyConfigured(
+                "You're using the staticfiles app "
+                "without having set the STATIC_ROOT "
+                "setting to a filesystem path."
+            )
         return super().path(name)
 
 
@@ -45,23 +48,29 @@ class HashedFilesMixin:
     default_template = """url("%(url)s")"""
     max_post_process_passes = 5
     patterns = (
-        ("*.css", (
-            r"""(?P<matched>url\(['"]{0,1}\s*(?P<url>.*?)["']{0,1}\))""",
+        (
+            "*.css",
             (
-                r"""(?P<matched>@import\s*["']\s*(?P<url>.*?)["'])""",
-                """@import url("%(url)s")""",
+                r"""(?P<matched>url\(['"]{0,1}\s*(?P<url>.*?)["']{0,1}\))""",
+                (
+                    r"""(?P<matched>@import\s*["']\s*(?P<url>.*?)["'])""",
+                    """@import url("%(url)s")""",
+                ),
+                (
+                    r"(?m)(?P<matched>)^(/\*# (?-i:sourceMappingURL)=(?P<url>.*) \*/)$",
+                    "/*# sourceMappingURL=%(url)s */",
+                ),
             ),
+        ),
+        (
+            "*.js",
             (
-                r'(?m)(?P<matched>)^(/\*# (?-i:sourceMappingURL)=(?P<url>.*) \*/)$',
-                '/*# sourceMappingURL=%(url)s */',
+                (
+                    r"(?m)(?P<matched>)^(//# (?-i:sourceMappingURL)=(?P<url>.*))$",
+                    "//# sourceMappingURL=%(url)s",
+                ),
             ),
-        )),
-        ('*.js', (
-            (
-                r'(?m)(?P<matched>)^(//# (?-i:sourceMappingURL)=(?P<url>.*))$',
-                '//# sourceMappingURL=%(url)s',
-            ),
-        )),
+        ),
     )
     keep_intermediate_files = True
 
@@ -98,7 +107,9 @@ class HashedFilesMixin:
         opened = content is None
         if opened:
             if not self.exists(filename):
-                raise ValueError("The file '%s' could not be found with %r." % (filename, self))
+                raise ValueError(
+                    "The file '%s' could not be found with %r." % (filename, self)
+                )
             try:
                 content = self.open(filename)
             except OSError:
@@ -111,15 +122,14 @@ class HashedFilesMixin:
                 content.close()
         path, filename = os.path.split(clean_name)
         root, ext = os.path.splitext(filename)
-        file_hash = ('.%s' % file_hash) if file_hash else ''
-        hashed_name = os.path.join(path, "%s%s%s" %
-                                   (root, file_hash, ext))
+        file_hash = (".%s" % file_hash) if file_hash else ""
+        hashed_name = os.path.join(path, "%s%s%s" % (root, file_hash, ext))
         unparsed_name = list(parsed_name)
         unparsed_name[2] = hashed_name
         # Special casing for a @font-face hack, like url(myfont.eot?#iefix")
         # http://www.fontspring.com/blog/the-new-bulletproof-font-face-syntax
-        if '?#' in name and not unparsed_name[3]:
-            unparsed_name[2] += '?'
+        if "?#" in name and not unparsed_name[3]:
+            unparsed_name[2] += "?"
         return urlunsplit(unparsed_name)
 
     def _url(self, hashed_name_func, name, force=False, hashed_files=None):
@@ -127,10 +137,10 @@ class HashedFilesMixin:
         Return the non-hashed URL in DEBUG mode.
         """
         if settings.DEBUG and not force:
-            hashed_name, fragment = name, ''
+            hashed_name, fragment = name, ""
         else:
             clean_name, fragment = urldefrag(name)
-            if urlsplit(clean_name).path.endswith('/'):  # don't hash paths
+            if urlsplit(clean_name).path.endswith("/"):  # don't hash paths
                 hashed_name = name
             else:
                 args = (clean_name,)
@@ -142,13 +152,13 @@ class HashedFilesMixin:
 
         # Special casing for a @font-face hack, like url(myfont.eot?#iefix")
         # http://www.fontspring.com/blog/the-new-bulletproof-font-face-syntax
-        query_fragment = '?#' in name  # [sic!]
+        query_fragment = "?#" in name  # [sic!]
         if fragment or query_fragment:
             urlparts = list(urlsplit(final_url))
             if fragment and not urlparts[4]:
                 urlparts[4] = fragment
             if query_fragment and not urlparts[3]:
-                urlparts[2] += '?'
+                urlparts[2] += "?"
             final_url = urlunsplit(urlparts)
 
         return unquote(final_url)
@@ -174,44 +184,48 @@ class HashedFilesMixin:
             to and calling the url() method of the storage.
             """
             matches = matchobj.groupdict()
-            matched = matches['matched']
-            url = matches['url']
+            matched = matches["matched"]
+            url = matches["url"]
 
             # Ignore absolute/protocol-relative and data-uri URLs.
-            if re.match(r'^[a-z]+:', url):
+            if re.match(r"^[a-z]+:", url):
                 return matched
 
             # Ignore absolute URLs that don't point to a static file (dynamic
             # CSS / JS?). Note that STATIC_URL cannot be empty.
-            if url.startswith('/') and not url.startswith(settings.STATIC_URL):
+            if url.startswith("/") and not url.startswith(settings.STATIC_URL):
                 return matched
 
             # Strip off the fragment so a path-like fragment won't interfere.
             url_path, fragment = urldefrag(url)
 
-            if url_path.startswith('/'):
+            if url_path.startswith("/"):
                 # Otherwise the condition above would have returned prematurely.
                 assert url_path.startswith(settings.STATIC_URL)
-                target_name = url_path[len(settings.STATIC_URL):]
+                target_name = url_path[len(settings.STATIC_URL) :]
             else:
                 # We're using the posixpath module to mix paths and URLs conveniently.
-                source_name = name if os.sep == '/' else name.replace(os.sep, '/')
+                source_name = name if os.sep == "/" else name.replace(os.sep, "/")
                 target_name = posixpath.join(posixpath.dirname(source_name), url_path)
 
             # Determine the hashed name of the target file with the storage backend.
             hashed_url = self._url(
-                self._stored_name, unquote(target_name),
-                force=True, hashed_files=hashed_files,
+                self._stored_name,
+                unquote(target_name),
+                force=True,
+                hashed_files=hashed_files,
             )
 
-            transformed_url = '/'.join(url_path.split('/')[:-1] + hashed_url.split('/')[-1:])
+            transformed_url = "/".join(
+                url_path.split("/")[:-1] + hashed_url.split("/")[-1:]
+            )
 
             # Restore the fragment that was stripped off earlier.
             if fragment:
-                transformed_url += ('?#' if '?#' in url else '#') + fragment
+                transformed_url += ("?#" if "?#" in url else "#") + fragment
 
             # Return the hashed version to the file
-            matches['url'] = unquote(transformed_url)
+            matches["url"] = unquote(transformed_url)
             return template % matches
 
         return converter
@@ -239,8 +253,7 @@ class HashedFilesMixin:
 
         # build a list of adjustable files
         adjustable_paths = [
-            path for path in paths
-            if matches_patterns(path, self._patterns)
+            path for path in paths if matches_patterns(path, self._patterns)
         ]
 
         # Adjustable files to yield at end, keyed by the original path.
@@ -248,7 +261,9 @@ class HashedFilesMixin:
 
         # Do a single pass first. Post-process all files once, yielding not
         # adjustable files and exceptions, and collecting adjustable files.
-        for name, hashed_name, processed, _ in self._post_process(paths, adjustable_paths, hashed_files):
+        for name, hashed_name, processed, _ in self._post_process(
+            paths, adjustable_paths, hashed_files
+        ):
             if name not in adjustable_paths or isinstance(processed, Exception):
                 yield name, hashed_name, processed
             else:
@@ -259,7 +274,9 @@ class HashedFilesMixin:
 
         for i in range(self.max_post_process_passes):
             substitutions = False
-            for name, hashed_name, processed, subst in self._post_process(paths, adjustable_paths, hashed_files):
+            for name, hashed_name, processed, subst in self._post_process(
+                paths, adjustable_paths, hashed_files
+            ):
                 # Overwrite since hashed_name may be newer.
                 processed_adjustable_paths[name] = (name, hashed_name, processed)
                 substitutions = substitutions or subst
@@ -268,7 +285,7 @@ class HashedFilesMixin:
                 break
 
         if substitutions:
-            yield 'All', None, RuntimeError('Max post-process passes exceeded.')
+            yield "All", None, RuntimeError("Max post-process passes exceeded.")
 
         # Store the processed paths
         self.hashed_files.update(hashed_files)
@@ -298,7 +315,7 @@ class HashedFilesMixin:
                     hashed_name = hashed_files[hash_key]
 
                 # then get the original's file content..
-                if hasattr(original_file, 'seek'):
+                if hasattr(original_file, "seek"):
                     original_file.seek(0)
 
                 hashed_file_exists = self.exists(hashed_name)
@@ -307,11 +324,13 @@ class HashedFilesMixin:
                 # ..to apply each replacement pattern to the content
                 if name in adjustable_paths:
                     old_hashed_name = hashed_name
-                    content = original_file.read().decode('utf-8')
+                    content = original_file.read().decode("utf-8")
                     for extension, patterns in self._patterns.items():
                         if matches_patterns(path, (extension,)):
                             for pattern, template in patterns:
-                                converter = self.url_converter(name, hashed_files, template)
+                                converter = self.url_converter(
+                                    name, hashed_files, template
+                                )
                                 try:
                                     content = pattern.sub(converter, content)
                                 except ValueError as exc:
@@ -349,7 +368,7 @@ class HashedFilesMixin:
                 yield name, hashed_name, processed, substitutions
 
     def clean_name(self, name):
-        return name.replace('\\', '/')
+        return name.replace("\\", "/")
 
     def hash_key(self, name):
         return name
@@ -391,8 +410,8 @@ class HashedFilesMixin:
 
 
 class ManifestFilesMixin(HashedFilesMixin):
-    manifest_version = '1.0'  # the manifest format standard
-    manifest_name = 'staticfiles.json'
+    manifest_version = "1.0"  # the manifest format standard
+    manifest_name = "staticfiles.json"
     manifest_strict = True
     keep_intermediate_files = False
 
@@ -419,20 +438,22 @@ class ManifestFilesMixin(HashedFilesMixin):
         except json.JSONDecodeError:
             pass
         else:
-            version = stored.get('version')
-            if version == '1.0':
-                return stored.get('paths', {})
-        raise ValueError("Couldn't load manifest '%s' (version %s)" %
-                         (self.manifest_name, self.manifest_version))
+            version = stored.get("version")
+            if version == "1.0":
+                return stored.get("paths", {})
+        raise ValueError(
+            "Couldn't load manifest '%s' (version %s)"
+            % (self.manifest_name, self.manifest_version)
+        )
 
     def post_process(self, *args, **kwargs):
         self.hashed_files = {}
         yield from super().post_process(*args, **kwargs)
-        if not kwargs.get('dry_run'):
+        if not kwargs.get("dry_run"):
             self.save_manifest()
 
     def save_manifest(self):
-        payload = {'paths': self.hashed_files, 'version': self.manifest_version}
+        payload = {"paths": self.hashed_files, "version": self.manifest_version}
         if self.manifest_storage.exists(self.manifest_name):
             self.manifest_storage.delete(self.manifest_name)
         contents = json.dumps(payload).encode()
@@ -445,14 +466,16 @@ class ManifestFilesMixin(HashedFilesMixin):
         cache_name = self.hashed_files.get(hash_key)
         if cache_name is None:
             if self.manifest_strict:
-                raise ValueError("Missing staticfiles manifest entry for '%s'" % clean_name)
+                raise ValueError(
+                    "Missing staticfiles manifest entry for '%s'" % clean_name
+                )
             cache_name = self.clean_name(self.hashed_name(name))
         unparsed_name = list(parsed_name)
         unparsed_name[2] = cache_name
         # Special casing for a @font-face hack, like url(myfont.eot?#iefix")
         # http://www.fontspring.com/blog/the-new-bulletproof-font-face-syntax
-        if '?#' in name and not unparsed_name[3]:
-            unparsed_name[2] += '?'
+        if "?#" in name and not unparsed_name[3]:
+            unparsed_name[2] += "?"
         return urlunsplit(unparsed_name)
 
 
@@ -461,6 +484,7 @@ class ManifestStaticFilesStorage(ManifestFilesMixin, StaticFilesStorage):
     A static file system storage backend which also saves
     hashed copies of the files it saves.
     """
+
     pass
 
 

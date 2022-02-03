@@ -6,10 +6,14 @@ from .models import DataModel
 
 
 class BinaryFieldTests(TestCase):
-    binary_data = b'\x00\x46\xFE'
+    binary_data = b"\x00\x46\xFE"
 
     def test_set_and_retrieve(self):
-        data_set = (self.binary_data, bytearray(self.binary_data), memoryview(self.binary_data))
+        data_set = (
+            self.binary_data,
+            bytearray(self.binary_data),
+            memoryview(self.binary_data),
+        )
         for bdata in data_set:
             with self.subTest(data=repr(bdata)):
                 dm = DataModel(data=bdata)
@@ -21,7 +25,7 @@ class BinaryFieldTests(TestCase):
                 dm = DataModel.objects.get(pk=dm.pk)
                 self.assertEqual(bytes(dm.data), bytes(bdata))
                 # Test default value
-                self.assertEqual(bytes(dm.short_data), b'\x08')
+                self.assertEqual(bytes(dm.short_data), b"\x08")
 
     def test_max_length(self):
         dm = DataModel(short_data=self.binary_data * 4)
@@ -38,15 +42,19 @@ class BinaryFieldTests(TestCase):
 
     def test_filter(self):
         dm = DataModel.objects.create(data=self.binary_data)
-        DataModel.objects.create(data=b'\xef\xbb\xbf')
+        DataModel.objects.create(data=b"\xef\xbb\xbf")
         self.assertSequenceEqual(DataModel.objects.filter(data=self.binary_data), [dm])
 
     def test_filter_bytearray(self):
         dm = DataModel.objects.create(data=self.binary_data)
-        DataModel.objects.create(data=b'\xef\xbb\xbf')
-        self.assertSequenceEqual(DataModel.objects.filter(data=bytearray(self.binary_data)), [dm])
+        DataModel.objects.create(data=b"\xef\xbb\xbf")
+        self.assertSequenceEqual(
+            DataModel.objects.filter(data=bytearray(self.binary_data)), [dm]
+        )
 
     def test_filter_memoryview(self):
         dm = DataModel.objects.create(data=self.binary_data)
-        DataModel.objects.create(data=b'\xef\xbb\xbf')
-        self.assertSequenceEqual(DataModel.objects.filter(data=memoryview(self.binary_data)), [dm])
+        DataModel.objects.create(data=b"\xef\xbb\xbf")
+        self.assertSequenceEqual(
+            DataModel.objects.filter(data=memoryview(self.binary_data)), [dm]
+        )

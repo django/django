@@ -4,7 +4,6 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     operations = [
-
         migrations.CreateModel(
             "Salamander",
             [
@@ -13,5 +12,4 @@ class Migration(migrations.Migration):
                 ("silly_field", models.BooleanField(default=False)),
             ],
         ),
-
     ]

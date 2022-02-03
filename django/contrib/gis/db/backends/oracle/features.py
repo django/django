@@ -12,14 +12,16 @@ class DatabaseFeatures(BaseSpatialFeatures, OracleDatabaseFeatures):
     supports_perimeter_geodetic = True
     supports_dwithin_distance_expr = False
     supports_tolerance_parameter = True
-    unsupported_geojson_options = {'bbox', 'crs', 'precision'}
+    unsupported_geojson_options = {"bbox", "crs", "precision"}
 
     @cached_property
     def django_test_skips(self):
         skips = super().django_test_skips
-        skips.update({
-            "Oracle doesn't support spatial operators in constraints.": {
-                'gis_tests.gis_migrations.test_operations.OperationTests.test_add_check_constraint',
-            },
-        })
+        skips.update(
+            {
+                "Oracle doesn't support spatial operators in constraints.": {
+                    "gis_tests.gis_migrations.test_operations.OperationTests.test_add_check_constraint",
+                },
+            }
+        )
         return skips

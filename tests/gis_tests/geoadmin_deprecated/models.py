@@ -10,12 +10,12 @@ class City(models.Model):
     point = models.PointField()
 
     class Meta:
-        app_label = 'geoadmini_deprecated'
+        app_label = "geoadmini_deprecated"
 
     def __str__(self):
         return self.name
 
 
-site = admin.AdminSite(name='admin_gis')
+site = admin.AdminSite(name="admin_gis")
 with ignore_warnings(category=RemovedInDjango50Warning):
     site.register(City, admin.OSMGeoAdmin)

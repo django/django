@@ -49,6 +49,7 @@ def _safety_decorator(safety_marker, func):
     @wraps(func)
     def wrapped(*args, **kwargs):
         return safety_marker(func(*args, **kwargs))
+
     return wrapped
 
 
@@ -61,7 +62,7 @@ def mark_safe(s):
 
     Can be called multiple times on a single string.
     """
-    if hasattr(s, '__html__'):
+    if hasattr(s, "__html__"):
         return s
     if callable(s):
         return _safety_decorator(mark_safe, s)

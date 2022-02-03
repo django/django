@@ -130,21 +130,21 @@ class BaseDatabaseFeatures:
     # Map fields which some backends may not be able to differentiate to the
     # field it's introspected as.
     introspected_field_types = {
-        'AutoField': 'AutoField',
-        'BigAutoField': 'BigAutoField',
-        'BigIntegerField': 'BigIntegerField',
-        'BinaryField': 'BinaryField',
-        'BooleanField': 'BooleanField',
-        'CharField': 'CharField',
-        'DurationField': 'DurationField',
-        'GenericIPAddressField': 'GenericIPAddressField',
-        'IntegerField': 'IntegerField',
-        'PositiveBigIntegerField': 'PositiveBigIntegerField',
-        'PositiveIntegerField': 'PositiveIntegerField',
-        'PositiveSmallIntegerField': 'PositiveSmallIntegerField',
-        'SmallAutoField': 'SmallAutoField',
-        'SmallIntegerField': 'SmallIntegerField',
-        'TimeField': 'TimeField',
+        "AutoField": "AutoField",
+        "BigAutoField": "BigAutoField",
+        "BigIntegerField": "BigIntegerField",
+        "BinaryField": "BinaryField",
+        "BooleanField": "BooleanField",
+        "CharField": "CharField",
+        "DurationField": "DurationField",
+        "GenericIPAddressField": "GenericIPAddressField",
+        "IntegerField": "IntegerField",
+        "PositiveBigIntegerField": "PositiveBigIntegerField",
+        "PositiveIntegerField": "PositiveIntegerField",
+        "PositiveSmallIntegerField": "PositiveSmallIntegerField",
+        "SmallAutoField": "SmallAutoField",
+        "SmallIntegerField": "SmallIntegerField",
+        "TimeField": "TimeField",
     }
 
     # Can the backend introspect the column order (ASC/DESC) for indexes?
@@ -201,7 +201,7 @@ class BaseDatabaseFeatures:
     has_case_insensitive_like = False
 
     # Suffix for backends that don't support "SELECT xxx;" queries.
-    bare_select_suffix = ''
+    bare_select_suffix = ""
 
     # If NULL is implied on columns without needing to be explicitly specified
     implied_column_null = False
@@ -325,10 +325,10 @@ class BaseDatabaseFeatures:
 
     # Collation names for use by the Django test suite.
     test_collations = {
-        'ci': None,  # Case-insensitive.
-        'cs': None,  # Case-sensitive.
-        'non_default': None,  # Non-default.
-        'swedish_ci': None  # Swedish case-insensitive.
+        "ci": None,  # Case-insensitive.
+        "cs": None,  # Case-sensitive.
+        "non_default": None,  # Non-default.
+        "swedish_ci": None,  # Swedish case-insensitive.
     }
     # SQL template override for tests.aggregation.tests.NowUTC
     test_now_utc_template = None
@@ -352,14 +352,14 @@ class BaseDatabaseFeatures:
     def supports_transactions(self):
         """Confirm support for transactions."""
         with self.connection.cursor() as cursor:
-            cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
+            cursor.execute("CREATE TABLE ROLLBACK_TEST (X INT)")
             self.connection.set_autocommit(False)
-            cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
+            cursor.execute("INSERT INTO ROLLBACK_TEST (X) VALUES (8)")
             self.connection.rollback()
             self.connection.set_autocommit(True)
-            cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
-            count, = cursor.fetchone()
-            cursor.execute('DROP TABLE ROLLBACK_TEST')
+            cursor.execute("SELECT COUNT(X) FROM ROLLBACK_TEST")
+            (count,) = cursor.fetchone()
+            cursor.execute("DROP TABLE ROLLBACK_TEST")
         return count == 0
 
     def allows_group_by_selected_pks_on_model(self, model):
