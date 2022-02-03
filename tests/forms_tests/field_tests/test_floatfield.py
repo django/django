@@ -1,7 +1,9 @@
 from django.core.exceptions import ValidationError
 from django.forms import FloatField, NumberInput
 from django.test import SimpleTestCase
+from django.test.selenium import SeleniumTestCase
 from django.test.utils import ignore_warnings, override_settings
+from django.urls import reverse
 from django.utils import formats, translation
 from django.utils.deprecation import RemovedInDjango50Warning
 
@@ -111,3 +113,24 @@ class FloatFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         msg = "'Enter a number.'"
         with self.assertRaisesMessage(ValidationError, msg):
             f.clean('1,001.1')
+
+
+@override_settings(ROOT_URLCONF='forms_tests.urls')
+class FloatFieldHTMLTest(SeleniumTestCase):
+
+    available_apps = ['forms_tests']
+
+    def test_float_field_rendering_passes_client_side_validation(self):
+        """
+        Rendered widget allows non-integer value with the client-side
+        validation.
+        """
+        from selenium.webdriver.common.by import By
+
+        self.selenium.get(self.live_server_url + reverse('form_view'))
+        number_input = self.selenium.find_element(By.ID, 'id_number')
+        number_input.send_keys('0.5')
+        is_valid = self.selenium.execute_script(
+            "return document.getElementById('id_number').checkValidity()"
+        )
+        self.assertTrue(is_valid)
