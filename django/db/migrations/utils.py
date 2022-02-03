@@ -42,8 +42,7 @@ def resolve_relation(model, app_label=None, model_name=None):
             return app_label, model_name.lower()
         if app_label is None:
             raise TypeError(
-                'app_label must be provided to resolve unscoped model '
-                'relationships.'
+                'app_label must be provided to resolve unscoped model relationships.'
             )
         return app_label, model.lower()
     return model._meta.app_label, model._meta.model_name

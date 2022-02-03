@@ -820,8 +820,7 @@ class QuerySet:
         self._not_support_combined_queries('contains')
         if self._fields is not None:
             raise TypeError(
-                'Cannot call QuerySet.contains() after .values() or '
-                '.values_list().'
+                'Cannot call QuerySet.contains() after .values() or .values_list().'
             )
         try:
             if obj._meta.concrete_model != self.model._meta.concrete_model:
@@ -1611,8 +1610,7 @@ class Prefetch:
             )
         ):
             raise ValueError(
-                'Prefetch querysets cannot use raw(), values(), and '
-                'values_list().'
+                'Prefetch querysets cannot use raw(), values(), and values_list().'
             )
         if to_attr:
             self.prefetch_to = LOOKUP_SEP.join(lookup.split(LOOKUP_SEP)[:-1] + [to_attr])

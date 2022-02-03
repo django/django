@@ -53,8 +53,7 @@ class AddIndexConcurrentlyTests(OperationTestBase):
         operation = AddIndexConcurrently('Pony', index)
         self.assertEqual(
             operation.describe(),
-            'Concurrently create index pony_pink_idx on field(s) pink of '
-            'model Pony'
+            'Concurrently create index pony_pink_idx on field(s) pink of model Pony',
         )
         operation.state_forwards(self.app_label, new_state)
         self.assertEqual(len(new_state.models[self.app_label, 'pony'].options['indexes']), 1)

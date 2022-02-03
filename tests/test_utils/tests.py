@@ -462,8 +462,7 @@ class AssertNumQueriesContextManagerTests(TestCase):
 
     def test_failure(self):
         msg = (
-            '1 != 2 : 1 queries executed, 2 expected\nCaptured queries were:\n'
-            '1.'
+            '1 != 2 : 1 queries executed, 2 expected\nCaptured queries were:\n1.'
         )
         with self.assertRaisesMessage(AssertionError, msg):
             with self.assertNumQueries(2):

@@ -15,8 +15,7 @@ try:
     import MySQLdb as Database
 except ImportError as err:
     raise ImproperlyConfigured(
-        'Error loading MySQLdb module.\n'
-        'Did you install mysqlclient?'
+        'Error loading MySQLdb module.\nDid you install mysqlclient?'
     ) from err
 
 from MySQLdb.constants import CLIENT, FIELD_TYPE

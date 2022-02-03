@@ -72,8 +72,7 @@ def empty_response(request):
 
 
 KEY_ERRORS_WITH_MEMCACHED_MSG = (
-    'Cache key contains characters that will cause errors if used with '
-    'memcached: %r'
+    'Cache key contains characters that will cause errors if used with memcached: %r'
 )
 
 
