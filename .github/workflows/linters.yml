@@ -43,3 +43,11 @@ jobs:
         with:
           linters: isort
           run: isort --check --diff django tests scripts
+
+  black:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: black
+        uses: psf/black@stable
