@@ -292,8 +292,7 @@ def setup_run_tests(verbosity, start_at, start_after, test_labels=None):
     # Force declaring available_apps in TransactionTestCase for faster tests.
     def no_available_apps(self):
         raise Exception(
-            'Please define available_apps in TransactionTestCase and its '
-            'subclasses.'
+            'Please define available_apps in TransactionTestCase and its subclasses.'
         )
     TransactionTestCase.available_apps = property(no_available_apps)
     TestCase.available_apps = None

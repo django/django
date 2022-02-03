@@ -41,7 +41,6 @@ class DataUploadMaxMemorySizeMultipartPostTests(SimpleTestCase):
             '',
             'value',
             '--boundary--'
-            ''
         ]))
         self.request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
@@ -70,7 +69,6 @@ class DataUploadMaxMemorySizeMultipartPostTests(SimpleTestCase):
             '',
             'value',
             '--boundary--'
-            ''
         ]))
         request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
@@ -143,7 +141,6 @@ class DataUploadMaxNumberOfFieldsMultipartPost(SimpleTestCase):
             '',
             'value2',
             '--boundary--'
-            ''
         ]))
         self.request = WSGIRequest({
             'REQUEST_METHOD': 'POST',

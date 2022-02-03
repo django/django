@@ -179,13 +179,16 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def _is_identity_column(self, table_name, column_name):
         with self.connection.cursor() as cursor:
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT
                     CASE WHEN identity_column = 'YES' THEN 1 ELSE 0 END
                 FROM user_tab_cols
                 WHERE table_name = %s AND
                       column_name = %s
-            """, [self.normalize_name(table_name), self.normalize_name(column_name)])
+                """,
+                [self.normalize_name(table_name), self.normalize_name(column_name)],
+            )
             row = cursor.fetchone()
             return row[0] if row else False
 
@@ -197,9 +200,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def _get_default_collation(self, table_name):
         with self.connection.cursor() as cursor:
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT default_collation FROM user_tables WHERE table_name = %s
-            """, [self.normalize_name(table_name)])
+                """,
+                [self.normalize_name(table_name)],
+            )
             return cursor.fetchone()[0]
 
     def _alter_column_collation_sql(self, model, new_field, new_type, new_collation):

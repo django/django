@@ -793,8 +793,9 @@ def do_for(parser, token):
     """
     bits = token.split_contents()
     if len(bits) < 4:
-        raise TemplateSyntaxError("'for' statements should have at least four"
-                                  " words: %s" % token.contents)
+        raise TemplateSyntaxError(
+            "'for' statements should have at least four words: %s" % token.contents
+        )
 
     is_reversed = bits[-1] == 'reversed'
     in_index = -3 if is_reversed else -2
@@ -806,8 +807,9 @@ def do_for(parser, token):
     loopvars = re.split(r' *, *', ' '.join(bits[1:in_index]))
     for var in loopvars:
         if not var or not invalid_chars.isdisjoint(var):
-            raise TemplateSyntaxError("'for' tag received an invalid argument:"
-                                      " %s" % token.contents)
+            raise TemplateSyntaxError(
+                "'for' tag received an invalid argument: %s" % token.contents
+            )
 
     sequence = parser.compile_filter(bits[in_index + 1])
     nodelist_loop = parser.parse(('empty', 'endfor',))
@@ -1160,8 +1162,9 @@ def regroup(parser, token):
     if bits[2] != 'by':
         raise TemplateSyntaxError("second argument to 'regroup' tag must be 'by'")
     if bits[4] != 'as':
-        raise TemplateSyntaxError("next-to-last argument to 'regroup' tag must"
-                                  " be 'as'")
+        raise TemplateSyntaxError(
+            "next-to-last argument to 'regroup' tag must be 'as'"
+        )
     var_name = bits[5]
     # RegroupNode will take each item in 'target', put it in the context under
     # 'var_name', evaluate 'var_name'.'expression' in the current context, and
@@ -1420,8 +1423,9 @@ def do_with(parser, token):
     remaining_bits = bits[1:]
     extra_context = token_kwargs(remaining_bits, parser, support_legacy=True)
     if not extra_context:
-        raise TemplateSyntaxError("%r expected at least one variable "
-                                  "assignment" % bits[0])
+        raise TemplateSyntaxError(
+            "%r expected at least one variable assignment" % bits[0]
+        )
     if remaining_bits:
         raise TemplateSyntaxError("%r received an invalid token: %r" %
                                   (bits[0], remaining_bits[0]))

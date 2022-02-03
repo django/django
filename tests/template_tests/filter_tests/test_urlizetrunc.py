@@ -60,14 +60,13 @@ class FunctionTests(SimpleTestCase):
 
         self.assertEqual(
             urlizetrunc(uri, 1),
-            '<a href="http://31characteruri.com/test/"'
-            ' rel="nofollow">…</a>',
+            '<a href="http://31characteruri.com/test/" rel="nofollow">…</a>',
         )
 
     def test_overtruncate(self):
         self.assertEqual(
-            urlizetrunc('http://short.com/', 20), '<a href='
-            '"http://short.com/" rel="nofollow">http://short.com/</a>',
+            urlizetrunc('http://short.com/', 20),
+            '<a href="http://short.com/" rel="nofollow">http://short.com/</a>',
         )
 
     def test_query_string(self):

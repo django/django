@@ -104,8 +104,7 @@ class SimpleTagTests(TagTestCase):
             (
                 "'simple_keyword_only_param' received multiple values for "
                 "keyword argument 'kwarg'",
-                '{% load custom %}{% simple_keyword_only_param kwarg=42 '
-                'kwarg=37 %}',
+                '{% load custom %}{% simple_keyword_only_param kwarg=42 kwarg=37 %}',
             ),
             (
                 "'simple_keyword_only_default' received multiple values for "

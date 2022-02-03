@@ -530,8 +530,7 @@ class IsNull(BuiltinLookup):
     def as_sql(self, compiler, connection):
         if not isinstance(self.rhs, bool):
             raise ValueError(
-                'The QuerySet value for an isnull lookup must be True or '
-                'False.'
+                'The QuerySet value for an isnull lookup must be True or False.'
             )
         sql, params = compiler.compile(self.lhs)
         if self.rhs:

@@ -649,8 +649,7 @@ class FileUploadTests(TestCase):
             'Content-Disposition: form-data; name="file_field"; filename="MiXeD_cAsE.txt"',
             'Content-Type: application/octet-stream',
             '',
-            'file contents\n'
-            '',
+            'file contents\n',
             '--%(boundary)s--\r\n',
         ]
         response = self.client.post(

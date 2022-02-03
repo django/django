@@ -437,8 +437,7 @@ class AssertNumQueriesContextManagerTests(TestCase):
 
     def test_failure(self):
         msg = (
-            '1 != 2 : 1 queries executed, 2 expected\nCaptured queries were:\n'
-            '1.'
+            '1 != 2 : 1 queries executed, 2 expected\nCaptured queries were:\n1.'
         )
         with self.assertRaisesMessage(AssertionError, msg):
             with self.assertNumQueries(2):
@@ -927,11 +926,7 @@ class HTMLEqualTests(SimpleTestCase):
             parse_html('</p>')
 
     def test_escaped_html_errors(self):
-        msg = (
-            '<p>\n<foo>\n</p>'
-            ' != '
-            '<p>\n&lt;foo&gt;\n</p>\n'
-        )
+        msg = '<p>\n<foo>\n</p> != <p>\n&lt;foo&gt;\n</p>\n'
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertHTMLEqual('<p><foo></p>', '<p>&lt;foo&gt;</p>')
         with self.assertRaisesMessage(AssertionError, msg):

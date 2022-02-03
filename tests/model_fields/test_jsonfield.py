@@ -129,8 +129,7 @@ class TestFormField(SimpleTestCase):
 
 class TestSerialization(SimpleTestCase):
     test_data = (
-        '[{"fields": {"value": %s}, '
-        '"model": "model_fields.jsonmodel", "pk": null}]'
+        '[{"fields": {"value": %s}, "model": "model_fields.jsonmodel", "pk": null}]'
     )
     test_values = (
         # (Python value, serialized value),

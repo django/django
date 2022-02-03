@@ -675,8 +675,9 @@ class FilterExpression:
                     except VariableDoesNotExist:
                         var_obj = None
                 elif var is None:
-                    raise TemplateSyntaxError("Could not find variable at "
-                                              "start of %s." % token)
+                    raise TemplateSyntaxError(
+                        "Could not find variable at start of %s." % token
+                    )
                 else:
                     var_obj = Variable(var)
             else:
@@ -884,9 +885,10 @@ class Variable:
                                 ValueError,  # invalid literal for int()
                                 KeyError,    # current is a dict without `int(bit)` key
                                 TypeError):  # unsubscriptable object
-                            raise VariableDoesNotExist("Failed lookup for key "
-                                                       "[%s] in %r",
-                                                       (bit, current))  # missing attribute
+                            raise VariableDoesNotExist(
+                                "Failed lookup for key [%s] in %r",
+                                (bit, current),
+                            )  # missing attribute
                 if callable(current):
                     if getattr(current, 'do_not_call_in_templates', False):
                         pass

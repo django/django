@@ -86,8 +86,7 @@ class OperationWriterTests(SimpleTestCase):
         self.assertEqual(imports, {'import custom_migration_operations.operations'})
         self.assertEqual(
             buff,
-            'custom_migration_operations.operations.TestOperation(\n'
-            '),'
+            'custom_migration_operations.operations.TestOperation(\n),',
         )
 
     def test_args_signature(self):

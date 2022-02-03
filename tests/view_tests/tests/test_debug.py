@@ -690,14 +690,12 @@ class ExceptionReporterTests(SimpleTestCase):
             html,
         )
         self.assertIn(
-            '"generated", line 2, in funcName\n'
-            '    &lt;source code not available&gt;',
+            '"generated", line 2, in funcName\n    &lt;source code not available&gt;',
             html,
         )
         text = reporter.get_traceback_text()
         self.assertIn(
-            '"generated", line 2, in funcName\n'
-            '    <source code not available>',
+            '"generated", line 2, in funcName\n    <source code not available>',
             text,
         )
 
@@ -731,14 +729,12 @@ class ExceptionReporterTests(SimpleTestCase):
                 html,
             )
             self.assertIn(
-                '"generated", line 2, in funcName\n'
-                '    &lt;source code not available&gt;',
+                '"generated", line 2, in funcName\n    &lt;source code not available&gt;',
                 html,
             )
             text = reporter.get_traceback_text()
             self.assertIn(
-                '"generated", line 2, in funcName\n'
-                '    <source code not available>',
+                '"generated", line 2, in funcName\n    <source code not available>',
                 text,
             )
 
