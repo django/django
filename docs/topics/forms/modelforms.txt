@@ -1069,16 +1069,17 @@ formset::
 
     def manage_authors(request):
         AuthorFormSet = modelformset_factory(Author, fields=('name', 'title'))
+        queryset = Author.objects.filter(name__startswith='O')
         if request.method == "POST":
             formset = AuthorFormSet(
                 request.POST, request.FILES,
-                queryset=Author.objects.filter(name__startswith='O'),
+                queryset=queryset,
             )
             if formset.is_valid():
                 formset.save()
                 # Do something.
         else:
-            formset = AuthorFormSet(queryset=Author.objects.filter(name__startswith='O'))
+            formset = AuthorFormSet(queryset=queryset)
         return render(request, 'manage_authors.html', {'formset': formset})
 
 Note that we pass the ``queryset`` argument in both the ``POST`` and ``GET``
