@@ -258,7 +258,8 @@ class DebugViewTests(SimpleTestCase):
             except Exception:
                 raising_loc = inspect.trace()[-1][-2][0].strip()
                 self.assertNotEqual(
-                    raising_loc.find("raise Exception('boom')"), -1,
+                    raising_loc.find('raise Exception("boom")'),
+                    -1,
                     "Failed to find 'raise Exception' in last frame of "
                     "traceback, instead found: %s" % raising_loc
                 )
