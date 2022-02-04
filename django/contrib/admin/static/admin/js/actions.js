@@ -94,6 +94,13 @@
         let lastChecked = null;
         let shiftPressed = false;
 
+        // Show counter by default
+        updateCounter(actionCheckboxes, options);
+        // Check state of checkboxes and reinit state if needed
+        Array.from(actionCheckboxes).forEach(function(el) {
+            el.closest('tr').classList.toggle(options.selectedClass, el.checked);
+        });
+
         document.addEventListener('keydown', (event) => {
             shiftPressed = event.shiftKey;
         });
@@ -195,7 +202,10 @@
     ready(function() {
         const actionsEls = document.querySelectorAll('tr input.action-select');
         if (actionsEls.length > 0) {
-            Actions(actionsEls);
+            // It's hacky, but it won't work without it. Any other ideas?
+            setTimeout(function() {
+                Actions(actionsEls);
+            }, 1);
         }
     });
 }
