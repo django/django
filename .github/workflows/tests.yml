@@ -25,8 +25,8 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-          # cache: 'pip'
-          # cache-dependency-path: 'tests/requirements/py3.txt'
+          cache: 'pip'
+          cache-dependency-path: 'tests/requirements/py3.txt'
       - run: pip install -r tests/requirements/py3.txt -e .
       - name: Run tests
         run: python tests/runtests.py -v2
