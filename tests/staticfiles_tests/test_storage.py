@@ -109,7 +109,8 @@ class TestHashedFiles:
                 b"fonts/font.b8d603e42714.svg#path/to/../../fonts/font.svg", content
             )
             self.assertIn(
-                b"data:font/woff;charset=utf-8;base64,d09GRgABAAAAADJoAA0AAAAAR2QAAQAAAAAAAAAAAAA",
+                b"data:font/woff;charset=utf-8;"
+                b"base64,d09GRgABAAAAADJoAA0AAAAAR2QAAQAAAAAAAAAAAAA",
                 content,
             )
             self.assertIn(b"#default#VML", content)

@@ -52,9 +52,9 @@ class CheckUrlConfigTests(SimpleTestCase):
         self.assertRegex(
             warning.msg,
             (
-                r"^Your URL pattern \('\^tuple/\$', <function <lambda> at 0x(\w+)>\) is "
-                r"invalid. Ensure that urlpatterns is a list of path\(\) and/or re_path\(\) "
-                r"instances\.$"
+                r"^Your URL pattern \('\^tuple/\$', <function <lambda> at 0x(\w+)>\) "
+                r"is invalid. Ensure that urlpatterns is a list of path\(\) and/or "
+                r"re_path\(\) instances\.$"
             ),
         )
 
@@ -66,9 +66,9 @@ class CheckUrlConfigTests(SimpleTestCase):
         self.assertRegex(
             warning.msg,
             (
-                r"^Your URL pattern \('\^tuple/\$', <function <lambda> at 0x(\w+)>\) is "
-                r"invalid. Ensure that urlpatterns is a list of path\(\) and/or re_path\(\) "
-                r"instances\.$"
+                r"^Your URL pattern \('\^tuple/\$', <function <lambda> at 0x(\w+)>\) "
+                r"is invalid. Ensure that urlpatterns is a list of path\(\) and/or "
+                r"re_path\(\) instances\.$"
             ),
         )
 
@@ -211,7 +211,8 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
                     Error(
                         "The custom handler{} view 'check_framework.urls."
                         "bad_function_based_error_handlers.bad_handler' "
-                        "does not take the correct number of arguments (request{}).".format(
+                        "does not take the correct number of arguments "
+                        "(request{}).".format(
                             code, ", exception" if num_params == 2 else ""
                         ),
                         id="urls.E007",
@@ -254,7 +255,8 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
         ]
         hints = [
             "Could not import '{}'. View does not exist in module django.views.",
-            "Could not import '{}'. Parent module django.invalid_module does not exist.",
+            "Could not import '{}'. Parent module django.invalid_module does not "
+            "exist.",
             "No module named 'invalid_module'",
             "Could not import '{}'. The path must be fully qualified.",
         ]

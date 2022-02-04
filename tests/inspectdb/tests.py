@@ -57,7 +57,10 @@ class InspectDBTestCase(TestCase):
         self.assertNotIn("InspectdbPeopledata", output)
 
     def make_field_type_asserter(self):
-        """Call inspectdb and return a function to validate a field type in its output"""
+        """
+        Call inspectdb and return a function to validate a field type in its
+        output.
+        """
         out = StringIO()
         call_command("inspectdb", "inspectdb_columntypes", stdout=out)
         output = out.getvalue()
@@ -233,13 +236,16 @@ class InspectDBTestCase(TestCase):
             output,
             msg=error_message,
         )
-        # As InspectdbPeople model is defined after InspectdbMessage, it should be quoted
+        # As InspectdbPeople model is defined after InspectdbMessage, it should
+        # be quoted.
         self.assertIn(
-            "from_field = models.ForeignKey('InspectdbPeople', models.DO_NOTHING, db_column='from_id')",
+            "from_field = models.ForeignKey('InspectdbPeople', models.DO_NOTHING, "
+            "db_column='from_id')",
             output,
         )
         self.assertIn(
-            "people_pk = models.OneToOneField(InspectdbPeople, models.DO_NOTHING, primary_key=True)",
+            "people_pk = models.OneToOneField(InspectdbPeople, models.DO_NOTHING, "
+            "primary_key=True)",
             output,
         )
         self.assertIn(
@@ -325,7 +331,9 @@ class InspectDBTestCase(TestCase):
         self.assertIn("class InspectdbSpecialTableName(models.Model):", output)
 
     def test_managed_models(self):
-        """By default the command generates models with `Meta.managed = False` (#14305)"""
+        """
+        By default the command generates models with `Meta.managed = False`.
+        """
         out = StringIO()
         call_command("inspectdb", "inspectdb_columntypes", stdout=out)
         output = out.getvalue()
@@ -390,7 +398,8 @@ class InspectDBTestCase(TestCase):
         """
         out = StringIO()
         with mock.patch(
-            "django.db.connection.introspection.data_types_reverse.base_data_types_reverse",
+            "django.db.connection.introspection.data_types_reverse."
+            "base_data_types_reverse",
             {
                 "text": "myfields.TextField",
                 "bigint": "BigIntegerField",

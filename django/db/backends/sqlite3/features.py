@@ -57,26 +57,34 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def django_test_skips(self):
         skips = {
             "SQLite stores values rounded to 15 significant digits.": {
-                "model_fields.test_decimalfield.DecimalFieldTests.test_fetch_from_db_without_float_rounding",
+                "model_fields.test_decimalfield.DecimalFieldTests."
+                "test_fetch_from_db_without_float_rounding",
             },
             "SQLite naively remakes the table on field alteration.": {
                 "schema.tests.SchemaTests.test_unique_no_unnecessary_fk_drops",
                 "schema.tests.SchemaTests.test_unique_and_reverse_m2m",
-                "schema.tests.SchemaTests.test_alter_field_default_doesnt_perform_queries",
-                "schema.tests.SchemaTests.test_rename_column_renames_deferred_sql_references",
+                "schema.tests.SchemaTests."
+                "test_alter_field_default_doesnt_perform_queries",
+                "schema.tests.SchemaTests."
+                "test_rename_column_renames_deferred_sql_references",
             },
             "SQLite doesn't support negative precision for ROUND().": {
-                "db_functions.math.test_round.RoundTests.test_null_with_negative_precision",
-                "db_functions.math.test_round.RoundTests.test_decimal_with_negative_precision",
-                "db_functions.math.test_round.RoundTests.test_float_with_negative_precision",
-                "db_functions.math.test_round.RoundTests.test_integer_with_negative_precision",
+                "db_functions.math.test_round.RoundTests."
+                "test_null_with_negative_precision",
+                "db_functions.math.test_round.RoundTests."
+                "test_decimal_with_negative_precision",
+                "db_functions.math.test_round.RoundTests."
+                "test_float_with_negative_precision",
+                "db_functions.math.test_round.RoundTests."
+                "test_integer_with_negative_precision",
             },
         }
         if Database.sqlite_version_info < (3, 27):
             skips.update(
                 {
                     "Nondeterministic failure on SQLite < 3.27.": {
-                        "expressions_window.tests.WindowFunctionTests.test_subquery_row_range_rank",
+                        "expressions_window.tests.WindowFunctionTests."
+                        "test_subquery_row_range_rank",
                     },
                 }
             )
@@ -85,8 +93,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 {
                     "the sqlite backend's close() method is a no-op when using an "
                     "in-memory database": {
-                        "servers.test_liveserverthread.LiveServerThreadTest.test_closes_connections",
-                        "servers.tests.LiveServerTestCloseConnectionTest.test_closes_connections",
+                        "servers.test_liveserverthread.LiveServerThreadTest."
+                        "test_closes_connections",
+                        "servers.tests.LiveServerTestCloseConnectionTest."
+                        "test_closes_connections",
                     },
                 }
             )

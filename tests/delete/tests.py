@@ -132,8 +132,9 @@ class OnDeleteTests(TestCase):
         self.assertEqual(cm.exception.protected_objects, {a})
 
     def test_do_nothing(self):
-        # Testing DO_NOTHING is a bit harder: It would raise IntegrityError for a normal model,
-        # so we connect to pre_delete and set the fk to a known value.
+        # Testing DO_NOTHING is a bit harder: It would raise IntegrityError for
+        # a normal model, so we connect to pre_delete and set the fk to a known
+        # value.
         replacement_r = R.objects.create()
 
         def check_do_nothing(sender, **kwargs):
@@ -502,7 +503,8 @@ class DeletionTests(TestCase):
         # One query for Avatar.objects.all() and then one related fast delete for
         # each batch.
         fetches_to_mem = 1 + batches
-        # The Avatar objects are going to be deleted in batches of GET_ITERATOR_CHUNK_SIZE
+        # The Avatar objects are going to be deleted in batches of
+        # GET_ITERATOR_CHUNK_SIZE.
         queries = fetches_to_mem + TEST_SIZE // GET_ITERATOR_CHUNK_SIZE
         self.assertNumQueries(queries, Avatar.objects.all().delete)
         self.assertFalse(Avatar.objects.exists())

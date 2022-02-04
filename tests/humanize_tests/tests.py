@@ -528,7 +528,8 @@ class HumanizeTests(SimpleTestCase):
 
         orig_humanize_datetime, humanize.datetime = humanize.datetime, MockDateTime
         try:
-            # Choose a language with different naturaltime-past/naturaltime-future translations
+            # Choose a language with different
+            # naturaltime-past/naturaltime-future translations.
             with translation.override("cs"):
                 self.humanize_tester(test_list, result_list, "naturaltime")
         finally:

@@ -127,7 +127,7 @@ class LoaderTests(TestCase):
     )
     def test_load_unmigrated_dependency(self):
         """
-        Makes sure the loader can load migrations with a dependency on an unmigrated app.
+        The loader can load migrations with a dependency on an unmigrated app.
         """
         # Load and test the plan
         migration_loader = MigrationLoader(connection)
@@ -430,10 +430,10 @@ class LoaderTests(TestCase):
 
         # However, starting at 3 or 4, nonexistent migrations would be needed.
         msg = (
-            "Migration migrations.6_auto depends on nonexistent node ('migrations', '5_auto'). "
-            "Django tried to replace migration migrations.5_auto with any of "
-            "[migrations.3_squashed_5] but wasn't able to because some of the replaced "
-            "migrations are already applied."
+            "Migration migrations.6_auto depends on nonexistent node "
+            "('migrations', '5_auto'). Django tried to replace migration "
+            "migrations.5_auto with any of [migrations.3_squashed_5] but wasn't able "
+            "to because some of the replaced migrations are already applied."
         )
 
         self.record_applied(recorder, "migrations", "3_auto")

@@ -17,7 +17,9 @@ class AutoescapeStringfilterTests(SimpleTestCase):
 
     @setup(
         {
-            "autoescape-stringfilter02": "{% autoescape off %}{{ unsafe|capfirst }}{% endautoescape %}"
+            "autoescape-stringfilter02": (
+                "{% autoescape off %}{{ unsafe|capfirst }}{% endautoescape %}"
+            )
         }
     )
     def test_autoescape_stringfilter02(self):
@@ -35,7 +37,9 @@ class AutoescapeStringfilterTests(SimpleTestCase):
 
     @setup(
         {
-            "autoescape-stringfilter04": "{% autoescape off %}{{ safe|capfirst }}{% endautoescape %}"
+            "autoescape-stringfilter04": (
+                "{% autoescape off %}{{ safe|capfirst }}{% endautoescape %}"
+            )
         }
     )
     def test_autoescape_stringfilter04(self):

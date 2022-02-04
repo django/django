@@ -22,7 +22,10 @@ class EggLoadingTest(SimpleTestCase):
         del apps.all_models["app_with_models"]
 
     def test_egg2(self):
-        """Loading an app from an egg that has no models returns no models (and no error)"""
+        """
+        Loading an app from an egg that has no models returns no models (and no
+        error).
+        """
         egg_name = "%s/nomodelapp.egg" % self.egg_dir
         with extend_sys_path(egg_name):
             with self.settings(INSTALLED_APPS=["app_no_models"]):
@@ -31,7 +34,10 @@ class EggLoadingTest(SimpleTestCase):
         del apps.all_models["app_no_models"]
 
     def test_egg3(self):
-        """Models module can be loaded from an app located under an egg's top-level package"""
+        """
+        Models module can be loaded from an app located under an egg's
+        top-level package.
+        """
         egg_name = "%s/omelet.egg" % self.egg_dir
         with extend_sys_path(egg_name):
             with self.settings(INSTALLED_APPS=["omelet.app_with_models"]):
@@ -40,7 +46,10 @@ class EggLoadingTest(SimpleTestCase):
         del apps.all_models["app_with_models"]
 
     def test_egg4(self):
-        """Loading an app with no models from under the top-level egg package generates no error"""
+        """
+        Loading an app with no models from under the top-level egg package
+        generates no error.
+        """
         egg_name = "%s/omelet.egg" % self.egg_dir
         with extend_sys_path(egg_name):
             with self.settings(INSTALLED_APPS=["omelet.app_no_models"]):
@@ -49,7 +58,10 @@ class EggLoadingTest(SimpleTestCase):
         del apps.all_models["app_no_models"]
 
     def test_egg5(self):
-        """Loading an app from an egg that has an import error in its models module raises that error"""
+        """
+        Loading an app from an egg that has an import error in its models
+        module raises that error.
+        """
         egg_name = "%s/brokenapp.egg" % self.egg_dir
         with extend_sys_path(egg_name):
             with self.assertRaisesMessage(ImportError, "modelz"):

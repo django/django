@@ -13,7 +13,9 @@ class UpperTests(SimpleTestCase):
 
     @setup(
         {
-            "upper01": "{% autoescape off %}{{ a|upper }} {{ b|upper }}{% endautoescape %}"
+            "upper01": (
+                "{% autoescape off %}{{ a|upper }} {{ b|upper }}{% endautoescape %}"
+            )
         }
     )
     def test_upper01(self):

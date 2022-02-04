@@ -550,13 +550,14 @@ class TestSerialization(PostgreSQLSimpleTestCase):
     test_data = (
         '[{"fields": {"ints": "{\\"upper\\": \\"10\\", \\"lower\\": \\"0\\", '
         '\\"bounds\\": \\"[)\\"}", "decimals": "{\\"empty\\": true}", '
-        '"bigints": null, "timestamps": "{\\"upper\\": \\"2014-02-02T12:12:12+00:00\\", '
+        '"bigints": null, "timestamps": '
+        '"{\\"upper\\": \\"2014-02-02T12:12:12+00:00\\", '
         '\\"lower\\": \\"2014-01-01T00:00:00+00:00\\", \\"bounds\\": \\"[)\\"}", '
         '"timestamps_inner": null, '
         '"timestamps_closed_bounds": "{\\"upper\\": \\"2014-02-02T12:12:12+00:00\\", '
         '\\"lower\\": \\"2014-01-01T00:00:00+00:00\\", \\"bounds\\": \\"()\\"}", '
-        '"dates": "{\\"upper\\": \\"2014-02-02\\", \\"lower\\": \\"2014-01-01\\", \\"bounds\\": \\"[)\\"}", '
-        '"dates_inner": null }, '
+        '"dates": "{\\"upper\\": \\"2014-02-02\\", \\"lower\\": \\"2014-01-01\\", '
+        '\\"bounds\\": \\"[)\\"}", "dates_inner": null }, '
         '"model": "postgres_tests.rangesmodel", "pk": null}]'
     )
 
@@ -730,8 +731,10 @@ class TestFormField(PostgreSQLSimpleTestCase):
             </th><td>
             <input type="text" name="datetime_field_0" id="id_datetime_field_0">
             <input type="text" name="datetime_field_1" id="id_datetime_field_1">
-            <input type="hidden" name="initial-datetime_field_0" id="initial-id_datetime_field_0">
-            <input type="hidden" name="initial-datetime_field_1" id="initial-id_datetime_field_1">
+            <input type="hidden" name="initial-datetime_field_0"
+            id="initial-id_datetime_field_0">
+            <input type="hidden" name="initial-datetime_field_1"
+            id="initial-id_datetime_field_1">
             </td></tr>
             """,
         )
@@ -751,10 +754,10 @@ class TestFormField(PostgreSQLSimpleTestCase):
             value="2010-01-01 11:13:00" id="id_datetime_field_0">
             <input type="text" name="datetime_field_1"
             value="2020-12-12 16:59:00" id="id_datetime_field_1">
-            <input type="hidden" name="initial-datetime_field_0" value="2010-01-01 11:13:00"
-            id="initial-id_datetime_field_0">
-            <input type="hidden" name="initial-datetime_field_1" value="2020-12-12 16:59:00"
-            id="initial-id_datetime_field_1"></td></tr>
+            <input type="hidden" name="initial-datetime_field_0"
+            value="2010-01-01 11:13:00" id="initial-id_datetime_field_0">
+            <input type="hidden" name="initial-datetime_field_1"
+            value="2020-12-12 16:59:00" id="initial-id_datetime_field_1"></td></tr>
             """,
         )
 
@@ -1074,11 +1077,13 @@ class TestWidget(PostgreSQLSimpleTestCase):
         f = pg_forms.ranges.DateTimeRangeField()
         self.assertHTMLEqual(
             f.widget.render("datetimerange", ""),
-            '<input type="text" name="datetimerange_0"><input type="text" name="datetimerange_1">',
+            '<input type="text" name="datetimerange_0">'
+            '<input type="text" name="datetimerange_1">',
         )
         self.assertHTMLEqual(
             f.widget.render("datetimerange", None),
-            '<input type="text" name="datetimerange_0"><input type="text" name="datetimerange_1">',
+            '<input type="text" name="datetimerange_0">'
+            '<input type="text" name="datetimerange_1">',
         )
         dt_range = DateTimeTZRange(
             datetime.datetime(2006, 1, 10, 7, 30), datetime.datetime(2006, 2, 12, 9, 50)

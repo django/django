@@ -61,8 +61,8 @@ def check_user_model(app_configs=None, **kwargs):
         ]:
             errors.append(
                 checks.Error(
-                    "'%s.%s' must be unique because it is named as the 'USERNAME_FIELD'."
-                    % (cls._meta.object_name, cls.USERNAME_FIELD),
+                    "'%s.%s' must be unique because it is named as the "
+                    "'USERNAME_FIELD'." % (cls._meta.object_name, cls.USERNAME_FIELD),
                     obj=cls,
                     id="auth.E003",
                 )
@@ -72,7 +72,10 @@ def check_user_model(app_configs=None, **kwargs):
                 checks.Warning(
                     "'%s.%s' is named as the 'USERNAME_FIELD', but it is not unique."
                     % (cls._meta.object_name, cls.USERNAME_FIELD),
-                    hint="Ensure that your authentication backend(s) can handle non-unique usernames.",
+                    hint=(
+                        "Ensure that your authentication backend(s) can handle "
+                        "non-unique usernames."
+                    ),
                     obj=cls,
                     id="auth.W004",
                 )
@@ -197,8 +200,8 @@ def check_models_permissions(app_configs=None, **kwargs):
             if codename in builtin_permissions:
                 errors.append(
                     checks.Error(
-                        "The permission codenamed '%s' clashes with a builtin permission "
-                        "for model '%s'." % (codename, opts.label),
+                        "The permission codenamed '%s' clashes with a builtin "
+                        "permission for model '%s'." % (codename, opts.label),
                         obj=model,
                         id="auth.E005",
                     )

@@ -132,10 +132,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 new_value = "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS.FF')" % new_value
             elif new_internal_type == "TimeField":
                 # TimeField are stored as TIMESTAMP with a 1900-01-01 date part.
-                new_value = (
-                    "TO_TIMESTAMP(CONCAT('1900-01-01 ', %s), 'YYYY-MM-DD HH24:MI:SS.FF')"
-                    % new_value
-                )
+                new_value = "CONCAT('1900-01-01 ', %s)" % new_value
+                new_value = "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS.FF')" % new_value
         # Transfer values across
         self.execute(
             "UPDATE %s set %s=%s"

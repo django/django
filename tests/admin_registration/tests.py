@@ -43,7 +43,10 @@ class TestRegistration(SimpleTestCase):
             pass
 
         self.site.register(Person, PersonAdmin)
-        msg = "The model Person is already registered with 'admin_registration.PersonAdmin'."
+        msg = (
+            "The model Person is already registered with "
+            "'admin_registration.PersonAdmin'."
+        )
         with self.assertRaisesMessage(admin.sites.AlreadyRegistered, msg):
             self.site.register(Person, PersonAdmin)
 

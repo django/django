@@ -21,7 +21,10 @@ class LinebreaksTests(SimpleTestCase):
 
     @setup(
         {
-            "linebreaks02": "{% autoescape off %}{{ a|linebreaks }} {{ b|linebreaks }}{% endautoescape %}"
+            "linebreaks02": (
+                "{% autoescape off %}{{ a|linebreaks }} {{ b|linebreaks }}"
+                "{% endautoescape %}"
+            )
         }
     )
     def test_linebreaks02(self):

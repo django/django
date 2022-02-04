@@ -24,7 +24,9 @@ class VerbatimTagTests(SimpleTestCase):
 
     @setup(
         {
-            "verbatim-tag04": "{% verbatim %}{% verbatim %}{% endverbatim %}{% endverbatim %}"
+            "verbatim-tag04": (
+                "{% verbatim %}{% verbatim %}{% endverbatim %}{% endverbatim %}"
+            )
         }
     )
     def test_verbatim_tag04(self):
@@ -33,7 +35,9 @@ class VerbatimTagTests(SimpleTestCase):
 
     @setup(
         {
-            "verbatim-tag05": "{% verbatim %}{% endverbatim %}{% verbatim %}{% endverbatim %}"
+            "verbatim-tag05": (
+                "{% verbatim %}{% endverbatim %}{% verbatim %}{% endverbatim %}"
+            )
         }
     )
     def test_verbatim_tag05(self):

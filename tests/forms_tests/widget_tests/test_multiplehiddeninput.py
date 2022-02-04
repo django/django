@@ -31,7 +31,10 @@ class MultipleHiddenInputTest(WidgetTest):
             "email",
             ["test@example.com"],
             attrs={"class": "fun"},
-            html='<input type="hidden" name="email" value="test@example.com" class="fun">',
+            html=(
+                '<input type="hidden" name="email" value="test@example.com" '
+                'class="fun">'
+            ),
         )
 
     def test_render_attrs_multiple(self):
@@ -41,7 +44,8 @@ class MultipleHiddenInputTest(WidgetTest):
             ["test@example.com", "foo@example.com"],
             attrs={"class": "fun"},
             html=(
-                '<input type="hidden" name="email" value="test@example.com" class="fun">\n'
+                '<input type="hidden" name="email" value="test@example.com" '
+                'class="fun">\n'
                 '<input type="hidden" name="email" value="foo@example.com" class="fun">'
             ),
         )
@@ -53,15 +57,19 @@ class MultipleHiddenInputTest(WidgetTest):
             widget,
             "email",
             ["foo@example.com"],
-            html='<input type="hidden" class="fun" value="foo@example.com" name="email">',
+            html=(
+                '<input type="hidden" class="fun" value="foo@example.com" name="email">'
+            ),
         )
         self.check_html(
             widget,
             "email",
             ["foo@example.com", "test@example.com"],
             html=(
-                '<input type="hidden" class="fun" value="foo@example.com" name="email">\n'
-                '<input type="hidden" class="fun" value="test@example.com" name="email">'
+                '<input type="hidden" class="fun" value="foo@example.com" '
+                'name="email">\n'
+                '<input type="hidden" class="fun" value="test@example.com" '
+                'name="email">'
             ),
         )
         self.check_html(
@@ -69,7 +77,10 @@ class MultipleHiddenInputTest(WidgetTest):
             "email",
             ["foo@example.com"],
             attrs={"class": "special"},
-            html='<input type="hidden" class="special" value="foo@example.com" name="email">',
+            html=(
+                '<input type="hidden" class="special" value="foo@example.com" '
+                'name="email">'
+            ),
         )
 
     def test_render_empty(self):

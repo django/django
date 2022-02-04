@@ -104,7 +104,9 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual({p.ewkt for p in ref_u1}, {p.ewkt for p in u3})
 
     def test05_select_related_fk_to_subclass(self):
-        "Testing that calling select_related on a query over a model with an FK to a model subclass works"
+        """
+        select_related on a query over a model with an FK to a model subclass.
+        """
         # Regression test for #9752.
         list(DirectoryEntry.objects.all().select_related())
 
@@ -282,9 +284,13 @@ class RelatedGeoModelTest(TestCase):
         Testing the `Collect` aggregate.
         """
         # Reference query:
-        # SELECT AsText(ST_Collect("relatedapp_location"."point")) FROM "relatedapp_city" LEFT OUTER JOIN
-        #    "relatedapp_location" ON ("relatedapp_city"."location_id" = "relatedapp_location"."id")
-        #    WHERE "relatedapp_city"."state" = 'TX';
+        # SELECT AsText(ST_Collect("relatedapp_location"."point"))
+        # FROM "relatedapp_city"
+        # LEFT OUTER JOIN
+        #   "relatedapp_location" ON (
+        #       "relatedapp_city"."location_id" = "relatedapp_location"."id"
+        #   )
+        # WHERE "relatedapp_city"."state" = 'TX';
         ref_geom = GEOSGeometry(
             "MULTIPOINT(-97.516111 33.058333,-96.801611 32.782057,"
             "-95.363151 29.763374,-96.801611 32.782057)"
@@ -299,7 +305,9 @@ class RelatedGeoModelTest(TestCase):
         self.assertTrue(ref_geom.equals(coll))
 
     def test15_invalid_select_related(self):
-        "Testing doing select_related on the related name manager of a unique FK. See #13934."
+        """
+        select_related on the related name manager of a unique FK.
+        """
         qs = Article.objects.select_related("author__article")
         # This triggers TypeError when `get_default_columns` has no `local_only`
         # keyword.  The TypeError is swallowed if QuerySet is actually

@@ -541,7 +541,8 @@ class CustomPrefetchTests(TestCase):
                     [["houses", "rooms"]],
                 )
 
-        # Ambiguous: Lookup houses_lst doesn't yet exist when performing houses_lst__rooms.
+        # Ambiguous: Lookup houses_lst doesn't yet exist when performing
+        # houses_lst__rooms.
         msg = (
             "Cannot find 'houses_lst' on Person object, 'houses_lst__rooms' is "
             "an invalid parameter to prefetch_related()"
@@ -1084,7 +1085,8 @@ class DefaultManagerTests(TestCase):
             self.assertEqual(
                 depts,
                 "English department: Mr Cleese (BA, BSci, MA, PhD), Mr Idle (BA)\n"
-                "Physics department: Mr Cleese (BA, BSci, MA, PhD), Mr Chapman (BSci)\n",
+                "Physics department: Mr Cleese (BA, BSci, MA, PhD), Mr Chapman "
+                "(BSci)\n",
             )
 
 

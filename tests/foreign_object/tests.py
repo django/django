@@ -79,7 +79,8 @@ class MultiColumnFKTests(TestCase):
             group_id=self.cia.id,
         )
 
-        # Creating an invalid membership because it has a different country has the person
+        # Creating an invalid membership because it has a different country has
+        # the person.
         Membership.objects.create(
             membership_country_id=self.soviet_union.id,
             person_id=self.bob.id,
@@ -289,7 +290,7 @@ class MultiColumnFKTests(TestCase):
             membership_country=self.usa, person=self.jim, group=self.cia
         )
 
-        # Let's check to make sure that it worked.  Bob and Jim should be members of the CIA.
+        # Bob and Jim should be members of the CIA.
 
         self.assertQuerysetEqual(
             self.cia.members.all(), ["Bob", "Jim"], attrgetter("name")
@@ -315,7 +316,8 @@ class MultiColumnFKTests(TestCase):
         # We start out by making sure that the Group 'CIA' has no members.
         self.assertQuerysetEqual(self.cia.members.all(), [])
 
-        # Something adds jane to group CIA but Jane is in Soviet Union which isn't CIA's country
+        # Something adds jane to group CIA but Jane is in Soviet Union which
+        # isn't CIA's country.
         Membership.objects.create(
             membership_country=self.usa, person=self.jane, group=self.cia
         )
@@ -327,7 +329,8 @@ class MultiColumnFKTests(TestCase):
         # We start out by making sure that Jane has no groups.
         self.assertQuerysetEqual(self.jane.groups.all(), [])
 
-        # Something adds jane to group CIA but Jane is in Soviet Union which isn't CIA's country
+        # Something adds jane to group CIA but Jane is in Soviet Union which
+        # isn't CIA's country.
         Membership.objects.create(
             membership_country=self.usa, person=self.jane, group=self.cia
         )
@@ -352,8 +355,9 @@ class MultiColumnFKTests(TestCase):
     def test_m2m_through_on_self_ignores_mismatch_columns(self):
         self.assertQuerysetEqual(self.jane.friends.all(), [])
 
-        # Note that we use ids instead of instances. This is because instances on ForeignObject
-        # properties will set all related field off of the given instance
+        # Note that we use ids instead of instances. This is because instances
+        # on ForeignObject properties will set all related field off of the
+        # given instance.
         Friendship.objects.create(
             from_friend_id=self.jane.id,
             to_friend_id=self.george.id,

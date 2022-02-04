@@ -128,9 +128,6 @@ class DistanceTest(TestCase):
 
     @skipUnlessDBFeature("supports_distances_lookups")
     def test_distance_lookups(self):
-        """
-        Test the `distance_lt`, `distance_gt`, `distance_lte`, and `distance_gte` lookup types.
-        """
         # Retrieving the cities within a 20km 'donut' w/a 7km radius 'hole'
         # (thus, Houston and Southside place will be excluded as tested in
         # the `test02_dwithin` above).
@@ -316,7 +313,10 @@ class DistanceTest(TestCase):
     def test_mysql_geodetic_distance_error(self):
         if not connection.ops.mysql:
             self.skipTest("This is a MySQL-specific test.")
-        msg = "Only numeric values of degree units are allowed on geodetic distance queries."
+        msg = (
+            "Only numeric values of degree units are allowed on geodetic distance "
+            "queries."
+        )
         with self.assertRaisesMessage(ValueError, msg):
             AustraliaCity.objects.filter(
                 point__distance_lte=(Point(0, 0), D(m=100))
@@ -440,7 +440,10 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         lagrange = GEOSGeometry("POINT(-96.876369 29.905320)", 4326)
         # Reference distances in feet and in meters. Got these values from
         # using the provided raw SQL statements.
-        #  SELECT ST_Distance(point, ST_Transform(ST_GeomFromText('POINT(-96.876369 29.905320)', 4326), 32140))
+        #  SELECT ST_Distance(
+        #      point,
+        #      ST_Transform(ST_GeomFromText('POINT(-96.876369 29.905320)', 4326), 32140)
+        #  )
         #  FROM distapp_southtexascity;
         m_distances = [
             147075.069813,
@@ -453,7 +456,10 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
             165337.758878,
             139196.085105,
         ]
-        #  SELECT ST_Distance(point, ST_Transform(ST_GeomFromText('POINT(-96.876369 29.905320)', 4326), 2278))
+        #  SELECT ST_Distance(
+        #      point,
+        #      ST_Transform(ST_GeomFromText('POINT(-96.876369 29.905320)', 4326), 2278)
+        #  )
         #  FROM distapp_southtexascityft;
         ft_distances = [
             482528.79154625,
@@ -494,7 +500,10 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         ls = LineString(((150.902, -34.4245), (150.87, -34.5789)), srid=4326)
 
         # Reference query:
-        #  SELECT ST_distance_sphere(point, ST_GeomFromText('LINESTRING(150.9020 -34.4245,150.8700 -34.5789)', 4326))
+        #  SELECT ST_distance_sphere(
+        #      point,
+        #      ST_GeomFromText('LINESTRING(150.9020 -34.4245,150.8700 -34.5789)', 4326)
+        #  )
         #  FROM distapp_australiacity ORDER BY name;
         distances = [
             1120954.92533513,
@@ -523,9 +532,16 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         tol = 2 if connection.ops.oracle else 4
 
         # Got the reference distances using the raw SQL statements:
-        #  SELECT ST_distance_spheroid(point, ST_GeomFromText('POINT(151.231341 -33.952685)', 4326),
-        #    'SPHEROID["WGS 84",6378137.0,298.257223563]') FROM distapp_australiacity WHERE (NOT (id = 11));
-        #  SELECT ST_distance_sphere(point, ST_GeomFromText('POINT(151.231341 -33.952685)', 4326))
+        #  SELECT ST_distance_spheroid(
+        #      point,
+        #      ST_GeomFromText('POINT(151.231341 -33.952685)', 4326),
+        #      'SPHEROID["WGS 84",6378137.0,298.257223563]'
+        #  )
+        #  FROM distapp_australiacity WHERE (NOT (id = 11));
+        #  SELECT ST_distance_sphere(
+        #      point,
+        #      ST_GeomFromText('POINT(151.231341 -33.952685)', 4326)
+        #  )
         #  FROM distapp_australiacity WHERE (NOT (id = 11));  st_distance_sphere
         spheroid_distances = [
             60504.0628957201,
@@ -688,8 +704,10 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         Test the `Length` function.
         """
         # Reference query (should use `length_spheroid`).
-        # SELECT ST_length_spheroid(ST_GeomFromText('<wkt>', 4326) 'SPHEROID["WGS 84",6378137,298.257223563,
-        #   AUTHORITY["EPSG","7030"]]');
+        #  SELECT ST_length_spheroid(
+        #      ST_GeomFromText('<wkt>', 4326)
+        #      'SPHEROID["WGS 84",6378137,298.257223563, AUTHORITY["EPSG","7030"]]'
+        #  );
         len_m1 = 473504.769553813
         len_m2 = 4617.668
 
@@ -723,7 +741,8 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         Test the `Perimeter` function.
         """
         # Reference query:
-        # SELECT ST_Perimeter(distapp_southtexaszipcode.poly) FROM distapp_southtexaszipcode;
+        #  SELECT ST_Perimeter(distapp_southtexaszipcode.poly)
+        #  FROM distapp_southtexaszipcode;
         perim_m = [
             18404.3550889361,
             15627.2108551001,

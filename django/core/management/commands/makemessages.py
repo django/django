@@ -203,11 +203,11 @@ def write_pot_file(potfile, msgs):
 
 class Command(BaseCommand):
     help = (
-        "Runs over the entire source tree of the current directory and "
-        "pulls out all strings marked for translation. It creates (or updates) a message "
-        "file in the conf/locale (in the django tree) or locale (for projects and "
-        "applications) directory.\n\nYou must run this command with one of either the "
-        "--locale, --exclude, or --all options."
+        "Runs over the entire source tree of the current directory and pulls out all "
+        "strings marked for translation. It creates (or updates) a message file in the "
+        "conf/locale (in the django tree) or locale (for projects and applications) "
+        "directory.\n\nYou must run this command with one of either the --locale, "
+        "--exclude, or --all options."
     )
 
     translatable_file_class = TranslatableFile
@@ -226,8 +226,10 @@ class Command(BaseCommand):
             "-l",
             default=[],
             action="append",
-            help="Creates or updates the message files for the given locale(s) (e.g. pt_BR). "
-            "Can be used multiple times.",
+            help=(
+                "Creates or updates the message files for the given locale(s) (e.g. "
+                "pt_BR). Can be used multiple times."
+            ),
         )
         parser.add_argument(
             "--exclude",
@@ -278,7 +280,10 @@ class Command(BaseCommand):
             "--no-default-ignore",
             action="store_false",
             dest="use_default_ignore_patterns",
-            help="Don't ignore the common glob-style patterns 'CVS', '.*', '*~' and '*.pyc'.",
+            help=(
+                "Don't ignore the common glob-style patterns 'CVS', '.*', '*~' and "
+                "'*.pyc'."
+            ),
         )
         parser.add_argument(
             "--no-wrap",

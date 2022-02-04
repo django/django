@@ -38,7 +38,10 @@ class Command(BaseCommand):
             "args",
             metavar="app_label[.ModelName]",
             nargs="*",
-            help="Restricts dumped data to the specified app_label or app_label.ModelName.",
+            help=(
+                "Restricts dumped data to the specified app_label or "
+                "app_label.ModelName."
+            ),
         )
         parser.add_argument(
             "--format",
@@ -81,8 +84,11 @@ class Command(BaseCommand):
             "--all",
             action="store_true",
             dest="use_base_manager",
-            help="Use Django's base manager to dump all models stored in the database, "
-            "including those that would otherwise be filtered or modified by a custom manager.",
+            help=(
+                "Use Django's base manager to dump all models stored in the database, "
+                "including those that would otherwise be filtered or modified by a "
+                "custom manager."
+            ),
         )
         parser.add_argument(
             "--pks",

@@ -92,7 +92,8 @@ class CookieTests(BaseTests, SimpleTestCase):
         self.assertIs(response.cookies["messages"]["httponly"], True)
         self.assertEqual(response.cookies["messages"]["samesite"], "Strict")
 
-        # Test deletion of the cookie (storing with an empty value) after the messages have been consumed
+        # Deletion of the cookie (storing with an empty value) after the
+        # messages have been consumed.
         storage = self.get_storage()
         response = self.get_response()
         storage.add(constants.INFO, "test")

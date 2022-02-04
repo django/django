@@ -228,7 +228,8 @@ class UniqueTogetherTests(SimpleTestCase):
             Model.check(),
             [
                 Error(
-                    "'unique_together' refers to the nonexistent field 'missing_field'.",
+                    "'unique_together' refers to the nonexistent field "
+                    "'missing_field'.",
                     obj=Model,
                     id="models.E012",
                 ),
@@ -1452,7 +1453,8 @@ class OtherModelTests(SimpleTestCase):
             Model.check(),
             [
                 Error(
-                    "The model cannot have more than one field with 'primary_key=True'.",
+                    "The model cannot have more than one field with "
+                    "'primary_key=True'.",
                     obj=Model,
                     id="models.E026",
                 )
@@ -1469,7 +1471,8 @@ class OtherModelTests(SimpleTestCase):
             Model.check(),
             [
                 Error(
-                    "'TEST_SWAPPED_MODEL_BAD_VALUE' is not of the form 'app_label.app_name'.",
+                    "'TEST_SWAPPED_MODEL_BAD_VALUE' is not of the form "
+                    "'app_label.app_name'.",
                     id="models.E001",
                 ),
             ],

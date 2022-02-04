@@ -25,7 +25,8 @@ class Serializer(JSONSerializer):
         self._init_options()
         self._cts = {}  # cache of CoordTransform's
         self.stream.write(
-            '{"type": "FeatureCollection", "crs": {"type": "name", "properties": {"name": "EPSG:%d"}},'
+            '{"type": "FeatureCollection", '
+            '"crs": {"type": "name", "properties": {"name": "EPSG:%d"}},'
             ' "features": [' % self.srid
         )
 
@@ -53,7 +54,8 @@ class Serializer(JSONSerializer):
             data["properties"]["pk"] = obj._meta.pk.value_to_string(obj)
         if self._geometry:
             if self._geometry.srid != self.srid:
-                # If needed, transform the geometry in the srid of the global geojson srid
+                # If needed, transform the geometry in the srid of the global
+                # geojson srid.
                 if self._geometry.srid not in self._cts:
                     srs = SpatialReference(self.srid)
                     self._cts[self._geometry.srid] = CoordTransform(

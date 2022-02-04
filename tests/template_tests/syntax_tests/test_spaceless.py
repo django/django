@@ -6,7 +6,9 @@ from ..utils import setup
 class SpacelessTagTests(SimpleTestCase):
     @setup(
         {
-            "spaceless01": "{% spaceless %} <b>    <i> text </i>    </b> {% endspaceless %}"
+            "spaceless01": (
+                "{% spaceless %} <b>    <i> text </i>    </b> {% endspaceless %}"
+            )
         }
     )
     def test_spaceless01(self):
@@ -15,7 +17,9 @@ class SpacelessTagTests(SimpleTestCase):
 
     @setup(
         {
-            "spaceless02": "{% spaceless %} <b> \n <i> text </i> \n </b> {% endspaceless %}"
+            "spaceless02": (
+                "{% spaceless %} <b> \n <i> text </i> \n </b> {% endspaceless %}"
+            )
         }
     )
     def test_spaceless02(self):
@@ -29,7 +33,9 @@ class SpacelessTagTests(SimpleTestCase):
 
     @setup(
         {
-            "spaceless04": "{% spaceless %}<b>   <i>{{ text }}</i>  </b>{% endspaceless %}"
+            "spaceless04": (
+                "{% spaceless %}<b>   <i>{{ text }}</i>  </b>{% endspaceless %}"
+            )
         }
     )
     def test_spaceless04(self):
@@ -49,7 +55,9 @@ class SpacelessTagTests(SimpleTestCase):
 
     @setup(
         {
-            "spaceless06": "{% spaceless %}<b>   <i>{{ text|safe }}</i>  </b>{% endspaceless %}"
+            "spaceless06": (
+                "{% spaceless %}<b>   <i>{{ text|safe }}</i>  </b>{% endspaceless %}"
+            )
         }
     )
     def test_spaceless06(self):

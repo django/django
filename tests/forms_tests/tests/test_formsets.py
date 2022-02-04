@@ -657,7 +657,8 @@ class FormsFormsetTestCase(SimpleTestCase):
     def test_formsets_with_ordering(self):
         """
         formset_factory's can_order argument adds an integer field to each
-        form. When form validation succeeds, [form.cleaned_data for form in formset.forms]
+        form. When form validation succeeds,
+            [form.cleaned_data for form in formset.forms]
         will have the data in the correct order specified by the ordering
         fields. If a number is duplicated in the set of ordering fields, for
         instance form 0 and form 3 are both marked as 1, then the form index
@@ -959,10 +960,13 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = LimitedFavoriteDrinkFormSet(initial=[{"name": "Fernet and Coke"}])
         self.assertHTMLEqual(
             "\n".join(str(form) for form in formset.forms),
-            """<tr><th><label for="id_form-0-name">Name:</label></th>
-<td><input type="text" name="form-0-name" value="Fernet and Coke" id="id_form-0-name"></td></tr>
-<tr><th><label for="id_form-1-name">Name:</label></th>
-<td><input type="text" name="form-1-name" id="id_form-1-name"></td></tr>""",
+            """
+            <tr><th><label for="id_form-0-name">Name:</label></th>
+            <td><input type="text" name="form-0-name" value="Fernet and Coke"
+                id="id_form-0-name"></td></tr>
+            <tr><th><label for="id_form-1-name">Name:</label></th>
+            <td><input type="text" name="form-1-name" id="id_form-1-name"></td></tr>
+            """,
         )
 
     def test_max_num_zero(self):
@@ -988,10 +992,14 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = LimitedFavoriteDrinkFormSet(initial=initial)
         self.assertHTMLEqual(
             "\n".join(str(form) for form in formset.forms),
-            """<tr><th><label for="id_form-0-name">Name:</label></th>
-<td><input id="id_form-0-name" name="form-0-name" type="text" value="Fernet and Coke"></td></tr>
-<tr><th><label for="id_form-1-name">Name:</label></th>
-<td><input id="id_form-1-name" name="form-1-name" type="text" value="Bloody Mary"></td></tr>""",
+            """
+            <tr><th><label for="id_form-0-name">Name:</label></th>
+            <td><input id="id_form-0-name" name="form-0-name" type="text"
+                value="Fernet and Coke"></td></tr>
+            <tr><th><label for="id_form-1-name">Name:</label></th>
+            <td><input id="id_form-1-name" name="form-1-name" type="text"
+                value="Bloody Mary"></td></tr>
+            """,
         )
 
     def test_more_initial_than_max_num(self):
@@ -1010,12 +1018,20 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = LimitedFavoriteDrinkFormSet(initial=initial)
         self.assertHTMLEqual(
             "\n".join(str(form) for form in formset.forms),
-            """<tr><th><label for="id_form-0-name">Name:</label></th>
-<td><input id="id_form-0-name" name="form-0-name" type="text" value="Gin Tonic"></td></tr>
-<tr><th><label for="id_form-1-name">Name:</label></th>
-<td><input id="id_form-1-name" name="form-1-name" type="text" value="Bloody Mary"></td></tr>
-<tr><th><label for="id_form-2-name">Name:</label></th>
-<td><input id="id_form-2-name" name="form-2-name" type="text" value="Jack and Coke"></td></tr>""",
+            """
+            <tr><th><label for="id_form-0-name">Name:</label></th>
+            <td>
+            <input id="id_form-0-name" name="form-0-name" type="text" value="Gin Tonic">
+            </td></tr>
+            <tr><th><label for="id_form-1-name">Name:</label></th>
+            <td>
+            <input id="id_form-1-name" name="form-1-name" type="text"
+                value="Bloody Mary"></td></tr>
+            <tr><th><label for="id_form-2-name">Name:</label></th>
+            <td>
+            <input id="id_form-2-name" name="form-2-name" type="text"
+                value="Jack and Coke"></td></tr>
+            """,
         )
 
     def test_default_absolute_max(self):
@@ -1093,10 +1109,13 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = LimitedFavoriteDrinkFormSet(initial=[{"name": "Gin Tonic"}])
         self.assertHTMLEqual(
             "\n".join(str(form) for form in formset.forms),
-            """<tr><th><label for="id_form-0-name">Name:</label></th>
-<td><input type="text" name="form-0-name" value="Gin Tonic" id="id_form-0-name"></td></tr>
-<tr><th><label for="id_form-1-name">Name:</label></th>
-<td><input type="text" name="form-1-name" id="id_form-1-name"></td></tr>""",
+            """
+            <tr><th><label for="id_form-0-name">Name:</label></th>
+            <td>
+            <input type="text" name="form-0-name" value="Gin Tonic" id="id_form-0-name">
+            </td></tr>
+            <tr><th><label for="id_form-1-name">Name:</label></th>
+            <td><input type="text" name="form-1-name" id="id_form-1-name"></td></tr>""",
         )
 
     def test_management_form_field_names(self):
@@ -1539,7 +1558,8 @@ class FormsetAsTagTests(SimpleTestCase):
             self.formset.as_p(),
             self.management_form_html
             + (
-                '<p>Choice: <input type="text" name="choices-0-choice" value="Calexico"></p>'
+                "<p>Choice: "
+                '<input type="text" name="choices-0-choice" value="Calexico"></p>'
                 '<p>Votes: <input type="number" name="choices-0-votes" value="100"></p>'
             ),
         )
@@ -1549,8 +1569,10 @@ class FormsetAsTagTests(SimpleTestCase):
             self.formset.as_ul(),
             self.management_form_html
             + (
-                '<li>Choice: <input type="text" name="choices-0-choice" value="Calexico"></li>'
-                '<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>'
+                "<li>Choice: "
+                '<input type="text" name="choices-0-choice" value="Calexico"></li>'
+                "<li>Votes: "
+                '<input type="number" name="choices-0-votes" value="100"></li>'
             ),
         )
 
@@ -1620,8 +1642,10 @@ class TestIsBoundBehavior(SimpleTestCase):
             "<li>(Hidden field TOTAL_FORMS) Enter a whole number.</li>"
             "<li>(Hidden field INITIAL_FORMS) Enter a whole number.</li>"
             "</ul>"
-            '<input type="hidden" name="form-TOTAL_FORMS" value="two" id="id_form-TOTAL_FORMS">'
-            '<input type="hidden" name="form-INITIAL_FORMS" value="one" id="id_form-INITIAL_FORMS">'
+            '<input type="hidden" name="form-TOTAL_FORMS" value="two" '
+            'id="id_form-TOTAL_FORMS">'
+            '<input type="hidden" name="form-INITIAL_FORMS" value="one" '
+            'id="id_form-INITIAL_FORMS">'
             '<input type="hidden" name="form-MIN_NUM_FORMS" id="id_form-MIN_NUM_FORMS">'
             '<input type="hidden" name="form-MAX_NUM_FORMS" id="id_form-MAX_NUM_FORMS">'
             "</td></tr>\n",

@@ -32,7 +32,8 @@ class Migration(migrations.Migration):
                     "old_path",
                     models.CharField(
                         help_text=(
-                            "This should be an absolute path, excluding the domain name. Example: “/events/search/”."
+                            "This should be an absolute path, excluding the domain "
+                            "name. Example: “/events/search/”."
                         ),
                         max_length=200,
                         verbose_name="redirect from",
@@ -42,7 +43,10 @@ class Migration(migrations.Migration):
                 (
                     "new_path",
                     models.CharField(
-                        help_text="This can be either an absolute path (as above) or a full URL starting with “http://”.",
+                        help_text=(
+                            "This can be either an absolute path (as above) or a full "
+                            "URL starting with “http://”."
+                        ),
                         max_length=200,
                         verbose_name="redirect to",
                         blank=True,

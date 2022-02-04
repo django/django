@@ -17,7 +17,10 @@ class Migration(migrations.Migration):
                 error_messages={"unique": "A user with that username already exists."},
                 max_length=30,
                 validators=[validators.UnicodeUsernameValidator()],
-                help_text="Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.",
+                help_text=(
+                    "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ "
+                    "only."
+                ),
                 unique=True,
                 verbose_name="username",
             ),

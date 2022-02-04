@@ -271,7 +271,9 @@ class MigrateTests(MigrationTestBase):
 
         with override_settings(
             MIGRATION_MODULES={
-                "migrations": "migrations.test_fake_initial_case_insensitive.fake_initial",
+                "migrations": (
+                    "migrations.test_fake_initial_case_insensitive.fake_initial"
+                ),
             }
         ):
             out = io.StringIO()
@@ -488,7 +490,8 @@ class MigrateTests(MigrationTestBase):
         self.assertEqual(
             "[ ]  migrations.0001_initial\n"
             "[ ]  migrations.0003_third ... (migrations.0001_initial)\n"
-            "[ ]  migrations.0002_second ... (migrations.0001_initial, migrations.0003_third)\n",
+            "[ ]  migrations.0002_second ... (migrations.0001_initial, "
+            "migrations.0003_third)\n",
             out.getvalue().lower(),
         )
         call_command("migrate", "migrations", "0003", verbosity=0)
@@ -507,7 +510,8 @@ class MigrateTests(MigrationTestBase):
         self.assertEqual(
             "[x]  migrations.0001_initial\n"
             "[x]  migrations.0003_third ... (migrations.0001_initial)\n"
-            "[ ]  migrations.0002_second ... (migrations.0001_initial, migrations.0003_third)\n",
+            "[ ]  migrations.0002_second ... (migrations.0001_initial, "
+            "migrations.0003_third)\n",
             out.getvalue().lower(),
         )
 
@@ -835,13 +839,15 @@ class MigrateTests(MigrationTestBase):
             self.assertGreater(
                 index_tx_end,
                 index_op_desc_unique_together,
-                "Transaction end not found or found before operation description (unique_together)",
+                "Transaction end not found or found before operation description "
+                "(unique_together)",
             )
 
         self.assertGreater(
             index_op_desc_author,
             index_tx_start,
-            "Operation description (author) not found or found before transaction start",
+            "Operation description (author) not found or found before transaction "
+            "start",
         )
         self.assertGreater(
             index_create_table,
@@ -851,12 +857,14 @@ class MigrateTests(MigrationTestBase):
         self.assertGreater(
             index_op_desc_tribble,
             index_create_table,
-            "Operation description (tribble) not found or found before CREATE TABLE (author)",
+            "Operation description (tribble) not found or found before CREATE TABLE "
+            "(author)",
         )
         self.assertGreater(
             index_op_desc_unique_together,
             index_op_desc_tribble,
-            "Operation description (unique_together) not found or found before operation description (tribble)",
+            "Operation description (unique_together) not found or found before "
+            "operation description (tribble)",
         )
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
@@ -888,17 +896,20 @@ class MigrateTests(MigrationTestBase):
         self.assertGreater(
             index_op_desc_unique_together,
             index_tx_start,
-            "Operation description (unique_together) not found or found before transaction start",
+            "Operation description (unique_together) not found or found before "
+            "transaction start",
         )
         self.assertGreater(
             index_op_desc_tribble,
             index_op_desc_unique_together,
-            "Operation description (tribble) not found or found before operation description (unique_together)",
+            "Operation description (tribble) not found or found before operation "
+            "description (unique_together)",
         )
         self.assertGreater(
             index_op_desc_author,
             index_op_desc_tribble,
-            "Operation description (author) not found or found before operation description (tribble)",
+            "Operation description (author) not found or found before operation "
+            "description (tribble)",
         )
 
         self.assertGreater(
@@ -1173,7 +1184,10 @@ class MigrateTests(MigrationTestBase):
         """
         recorder = MigrationRecorder(connection)
         recorder.record_applied("migrations", "0002_second")
-        msg = "Migration migrations.0002_second is applied before its dependency migrations.0001_initial"
+        msg = (
+            "Migration migrations.0002_second is applied before its dependency "
+            "migrations.0001_initial"
+        )
         with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
             call_command("migrate")
         applied_migrations = recorder.applied_migrations()
@@ -2203,7 +2217,8 @@ class MakeMigrationsTests(MigrationTestBase):
                 "    - add field rating to author\n"
                 "    - create model book\n"
                 "\n"
-                "merging will only work if the operations printed above do not conflict\n"
+                "merging will only work if the operations printed above do not "
+                "conflict\n"
                 "with each other (working on different fields or models)\n"
                 "should these migration branches be merged? [y/n] ",
             )
@@ -2308,7 +2323,10 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         recorder = MigrationRecorder(connection)
         recorder.record_applied("migrations", "0002_second")
-        msg = "Migration migrations.0002_second is applied before its dependency migrations.0001_initial"
+        msg = (
+            "Migration migrations.0002_second is applied before its dependency "
+            "migrations.0001_initial"
+        )
         with self.temporary_migration_module(module="migrations.test_migrations"):
             with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
                 call_command("makemigrations")
@@ -2512,7 +2530,8 @@ class SquashMigrationsTests(MigrationTestBase):
             "Created new squashed migration %s\n"
             "  You should commit this migration but leave the old ones in place;\n"
             "  the new migration will be used for new installs. Once you are sure\n"
-            "  all instances of the codebase have applied the migrations you squashed,\n"
+            "  all instances of the codebase have applied the migrations you "
+            "squashed,\n"
             "  you can delete them.\n" % squashed_migration_file,
         )
 
@@ -2696,10 +2715,12 @@ class SquashMigrationsTests(MigrationTestBase):
             f"Created new squashed migration {squashed_migration_file}\n"
             f"  You should commit this migration but leave the old ones in place;\n"
             f"  the new migration will be used for new installs. Once you are sure\n"
-            f"  all instances of the codebase have applied the migrations you squashed,\n"
+            f"  all instances of the codebase have applied the migrations you "
+            f"squashed,\n"
             f"  you can delete them.\n"
             f"Manual porting required\n"
-            f"  Your migrations contained functions that must be manually copied over,\n"
+            f"  Your migrations contained functions that must be manually copied "
+            f"over,\n"
             f"  as we could not safely copy their implementation.\n"
             f"  See the comment at the top of the squashed migration for details.\n",
         )

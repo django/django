@@ -123,7 +123,10 @@ class AggregationTests(TestCase):
         )
         cls.b6 = HardbackBook.objects.create(
             isbn="155860191",
-            name="Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp",
+            name=(
+                "Paradigms of Artificial Intelligence Programming: Case Studies in "
+                "Common Lisp"
+            ),
             pages=946,
             rating=5.0,
             price=Decimal("75.00"),
@@ -824,7 +827,8 @@ class AggregationTests(TestCase):
             [
                 "Practical Django Projects",
                 "The Definitive Guide to Django: Web Development Done Right",
-                "Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp",
+                "Paradigms of Artificial Intelligence Programming: Case Studies in "
+                "Common Lisp",
                 "Artificial Intelligence: A Modern Approach",
                 "Python Web Development with Django",
                 "Sams Teach Yourself Django in 24 Hours",
@@ -952,8 +956,8 @@ class AggregationTests(TestCase):
             Book.objects.annotate(contact_id=F("publisher_id"))
 
     def test_values_queryset_non_conflict(self):
-        # Regression for #14707 -- If you're using a values query set, some potential conflicts are avoided.
-
+        # If you're using a values query set, some potential conflicts are
+        # avoided.
         # age is a field on Author, so it shouldn't be allowed as an aggregate.
         # But age isn't included in values(), so it is.
         results = (
@@ -1015,7 +1019,8 @@ class AggregationTests(TestCase):
             books.all(),
             [
                 "Artificial Intelligence: A Modern Approach",
-                "Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp",
+                "Paradigms of Artificial Intelligence Programming: Case Studies in "
+                "Common Lisp",
                 "Practical Django Projects",
                 "Python Web Development with Django",
                 "Sams Teach Yourself Django in 24 Hours",
@@ -1107,7 +1112,10 @@ class AggregationTests(TestCase):
                 {"n_authors": 2, "name": "Artificial Intelligence: A Modern Approach"},
                 {
                     "n_authors": 1,
-                    "name": "Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp",
+                    "name": (
+                        "Paradigms of Artificial Intelligence Programming: Case "
+                        "Studies in Common Lisp"
+                    ),
                 },
             ],
         )
@@ -1123,7 +1131,10 @@ class AggregationTests(TestCase):
                 {"n_authors": 2, "name": "Artificial Intelligence: A Modern Approach"},
                 {
                     "n_authors": 1,
-                    "name": "Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp",
+                    "name": (
+                        "Paradigms of Artificial Intelligence Programming: Case "
+                        "Studies in Common Lisp"
+                    ),
                 },
             ],
         )
@@ -1462,7 +1473,8 @@ class AggregationTests(TestCase):
             num_authors=Count("authors")
         )
         _, _, grouping = results.query.get_compiler(using="default").pre_sql_setup()
-        # In the case of `group_by_selected_pks` we also group by contact.id because of the select_related.
+        # In the case of `group_by_selected_pks` we also group by contact.id
+        # because of the select_related.
         self.assertEqual(
             len(grouping), 1 if connection.features.allows_group_by_pk else 2
         )
@@ -1474,7 +1486,8 @@ class AggregationTests(TestCase):
             [
                 ("Artificial Intelligence: A Modern Approach", 2),
                 (
-                    "Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp",
+                    "Paradigms of Artificial Intelligence Programming: Case Studies in "
+                    "Common Lisp",
                     1,
                 ),
                 ("Practical Django Projects", 1),
@@ -1497,7 +1510,8 @@ class AggregationTests(TestCase):
                 [
                     ("Artificial Intelligence: A Modern Approach", 2),
                     (
-                        "Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp",
+                        "Paradigms of Artificial Intelligence Programming: Case "
+                        "Studies in Common Lisp",
                         1,
                     ),
                     ("Practical Django Projects", 1),
@@ -1553,14 +1567,16 @@ class AggregationTests(TestCase):
                     [
                         ("Artificial Intelligence: A Modern Approach", 2),
                         (
-                            "Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp",
+                            "Paradigms of Artificial Intelligence Programming: Case "
+                            "Studies in Common Lisp",
                             1,
                         ),
                         ("Practical Django Projects", 1),
                         ("Python Web Development with Django", 3),
                         ("Sams Teach Yourself Django in 24 Hours", 1),
                         (
-                            "The Definitive Guide to Django: Web Development Done Right",
+                            "The Definitive Guide to Django: Web Development Done "
+                            "Right",
                             2,
                         ),
                     ],
@@ -1614,7 +1630,8 @@ class AggregationTests(TestCase):
             [
                 ("Practical Django Projects", 2),
                 (
-                    "Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp",
+                    "Paradigms of Artificial Intelligence Programming: Case Studies in "
+                    "Common Lisp",
                     1,
                 ),
                 ("Artificial Intelligence: A Modern Approach", 0),

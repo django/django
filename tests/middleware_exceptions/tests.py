@@ -197,7 +197,8 @@ class MiddlewareNotUsedTests(SimpleTestCase):
             self.client.get("/middleware_exceptions/view/")
         self.assertEqual(
             cm.records[0].getMessage(),
-            "MiddlewareNotUsed('middleware_exceptions.tests.MyMiddlewareWithExceptionMessage'): spam eggs",
+            "MiddlewareNotUsed('middleware_exceptions.tests."
+            "MyMiddlewareWithExceptionMessage'): spam eggs",
         )
 
     @override_settings(

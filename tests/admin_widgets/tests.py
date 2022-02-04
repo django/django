@@ -314,7 +314,8 @@ class AdminForeignKeyRawIdWidget(TestDataMixin, TestCase):
 
             self.assertContains(
                 response,
-                "Select a valid choice. That choice is not one of the available choices.",
+                "Select a valid choice. That choice is not one of the available "
+                "choices.",
             )
 
     def test_url_params_from_lookup_dict_any_iterable(self):
@@ -363,13 +364,15 @@ class AdminDateWidgetTest(SimpleTestCase):
         w = widgets.AdminDateWidget()
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
-            '<input value="2007-12-01" type="text" class="vDateField" name="test" size="10">',
+            '<input value="2007-12-01" type="text" class="vDateField" name="test" '
+            'size="10">',
         )
         # pass attrs to widget
         w = widgets.AdminDateWidget(attrs={"size": 20, "class": "myDateField"})
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
-            '<input value="2007-12-01" type="text" class="myDateField" name="test" size="20">',
+            '<input value="2007-12-01" type="text" class="myDateField" name="test" '
+            'size="20">',
         )
 
 
@@ -378,13 +381,15 @@ class AdminTimeWidgetTest(SimpleTestCase):
         w = widgets.AdminTimeWidget()
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
-            '<input value="09:30:00" type="text" class="vTimeField" name="test" size="8">',
+            '<input value="09:30:00" type="text" class="vTimeField" name="test" '
+            'size="8">',
         )
         # pass attrs to widget
         w = widgets.AdminTimeWidget(attrs={"size": 20, "class": "myTimeField"})
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
-            '<input value="09:30:00" type="text" class="myTimeField" name="test" size="20">',
+            '<input value="09:30:00" type="text" class="myTimeField" name="test" '
+            'size="20">',
         )
 
 
@@ -486,7 +491,8 @@ class AdminURLWidgetTest(SimpleTestCase):
         )
         self.assertEqual(
             HREF_RE.search(output)[1],
-            "http://www.example.com/%C3%A4%22%3E%3Cscript%3Ealert(%22XSS!%22)%3C/script%3E%22",
+            "http://www.example.com/%C3%A4%22%3E%3Cscript%3Ealert(%22XSS!%22)"
+            "%3C/script%3E%22",
         )
         self.assertEqual(
             TEXT_RE.search(output)[1],
@@ -495,7 +501,8 @@ class AdminURLWidgetTest(SimpleTestCase):
         )
         self.assertEqual(
             VALUE_RE.search(output)[1],
-            "http://www.example.com/%C3%A4&quot;&gt;&lt;script&gt;alert(&quot;XSS!&quot;)&lt;/script&gt;&quot;",
+            "http://www.example.com/%C3%A4&quot;&gt;&lt;script&gt;"
+            "alert(&quot;XSS!&quot;)&lt;/script&gt;&quot;",
         )
 
 
@@ -504,12 +511,14 @@ class AdminUUIDWidgetTests(SimpleTestCase):
         w = widgets.AdminUUIDInputWidget()
         self.assertHTMLEqual(
             w.render("test", "550e8400-e29b-41d4-a716-446655440000"),
-            '<input value="550e8400-e29b-41d4-a716-446655440000" type="text" class="vUUIDField" name="test">',
+            '<input value="550e8400-e29b-41d4-a716-446655440000" type="text" '
+            'class="vUUIDField" name="test">',
         )
         w = widgets.AdminUUIDInputWidget(attrs={"class": "myUUIDInput"})
         self.assertHTMLEqual(
             w.render("test", "550e8400-e29b-41d4-a716-446655440000"),
-            '<input value="550e8400-e29b-41d4-a716-446655440000" type="text" class="myUUIDInput" name="test">',
+            '<input value="550e8400-e29b-41d4-a716-446655440000" type="text" '
+            'class="myUUIDInput" name="test">',
         )
 
 
@@ -685,7 +694,8 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         )
         self.assertHTMLEqual(
             w.render("test", child_of_hidden.parent_id, attrs={}),
-            '<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField">'
+            '<input type="text" name="test" value="93" '
+            '   class="vForeignKeyRawIdAdminField">'
             '<a href="/admin_widgets/inventory/?_to_field=barcode" '
             'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
             '&nbsp;<strong><a href="/admin_widgets/inventory/%(pk)s/change/">'
@@ -698,8 +708,9 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         self.assertHTMLEqual(
             w.render("test", None),
             '<input type="text" name="test" class="vForeignKeyRawIdAdminField">\n'
-            '<a href="/admin_widgets/band/?name=%22%26%3E%3Cescapeme&amp;_to_field=artist_ptr" '
-            'class="related-lookup" id="lookup_id_test" title="Lookup"></a>',
+            '<a href="/admin_widgets/band/?name=%22%26%3E%3Cescapeme&amp;'
+            '_to_field=artist_ptr" class="related-lookup" id="lookup_id_test" '
+            'title="Lookup"></a>',
         )
 
     def test_render_fk_as_pk_model(self):
@@ -727,8 +738,10 @@ class ManyToManyRawIdWidgetTest(TestCase):
         self.assertHTMLEqual(
             w.render("test", [m1.pk, m2.pk], attrs={}),
             (
-                '<input type="text" name="test" value="%(m1pk)s,%(m2pk)s" class="vManyToManyRawIdAdminField">'
-                '<a href="/admin_widgets/member/" class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
+                '<input type="text" name="test" value="%(m1pk)s,%(m2pk)s" '
+                '   class="vManyToManyRawIdAdminField">'
+                '<a href="/admin_widgets/member/" class="related-lookup" '
+                '   id="lookup_id_test" title="Lookup"></a>'
             )
             % {"m1pk": m1.pk, "m2pk": m2.pk},
         )
@@ -736,8 +749,10 @@ class ManyToManyRawIdWidgetTest(TestCase):
         self.assertHTMLEqual(
             w.render("test", [m1.pk]),
             (
-                '<input type="text" name="test" value="%(m1pk)s" class="vManyToManyRawIdAdminField">'
-                '<a href="/admin_widgets/member/" class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
+                '<input type="text" name="test" value="%(m1pk)s" '
+                '   class="vManyToManyRawIdAdminField">'
+                '<a href="/admin_widgets/member/" class="related-lookup" '
+                '   id="lookup_id_test" title="Lookup"></a>'
             )
             % {"m1pk": m1.pk},
         )

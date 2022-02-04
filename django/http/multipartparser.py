@@ -218,7 +218,8 @@ class MultiPartParser:
                         and num_bytes_read > settings.DATA_UPLOAD_MAX_MEMORY_SIZE
                     ):
                         raise RequestDataTooBig(
-                            "Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE."
+                            "Request body exceeded "
+                            "settings.DATA_UPLOAD_MAX_MEMORY_SIZE."
                         )
 
                     self._post.appendlist(
@@ -263,8 +264,8 @@ class MultiPartParser:
                         for chunk in field_stream:
                             if transfer_encoding == "base64":
                                 # We only special-case base64 transfer encoding
-                                # We should always decode base64 chunks by multiple of 4,
-                                # ignoring whitespace.
+                                # We should always decode base64 chunks by
+                                # multiple of 4, ignoring whitespace.
 
                                 stripped_chunk = b"".join(chunk.split())
 
@@ -279,7 +280,8 @@ class MultiPartParser:
                                 try:
                                     chunk = base64.b64decode(stripped_chunk)
                                 except Exception as exc:
-                                    # Since this is only a chunk, any error is an unfixable error.
+                                    # Since this is only a chunk, any error is
+                                    # an unfixable error.
                                     raise MultiPartParserError(
                                         "Could not decode base64 data."
                                     ) from exc
@@ -362,7 +364,8 @@ class MultiPartParser:
     def _close_files(self):
         # Free up all file handles.
         # FIXME: this currently assumes that upload handlers store the file as 'file'
-        # We should document that... (Maybe add handler.free_file to complement new_file)
+        # We should document that...
+        # (Maybe add handler.free_file to complement new_file)
         for handler in self._upload_handlers:
             if hasattr(handler, "file"):
                 handler.file.close()

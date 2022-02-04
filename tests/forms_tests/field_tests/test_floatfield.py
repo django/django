@@ -54,7 +54,8 @@ class FloatFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         f = FloatField(max_value=1.5, min_value=0.5)
         self.assertWidgetRendersTo(
             f,
-            '<input step="any" name="f" min="0.5" max="1.5" type="number" id="id_f" required>',
+            '<input step="any" name="f" min="0.5" max="1.5" type="number" id="id_f" '
+            "required>",
         )
         with self.assertRaisesMessage(
             ValidationError, "'Ensure this value is less than or equal to 1.5.'"
@@ -73,7 +74,8 @@ class FloatFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         f = FloatField(widget=NumberInput(attrs={"step": 0.01, "max": 1.0, "min": 0.0}))
         self.assertWidgetRendersTo(
             f,
-            '<input step="0.01" name="f" min="0.0" max="1.0" type="number" id="id_f" required>',
+            '<input step="0.01" name="f" min="0.0" max="1.0" type="number" id="id_f" '
+            "required>",
         )
 
     def test_floatfield_localized(self):

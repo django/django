@@ -119,7 +119,7 @@ class DataSourceTest(SimpleTestCase):
             # Loading up the data source
             ds = DataSource(source.ds)
 
-            # Making sure the layer count is what's expected (only 1 layer in a SHP file)
+            # The layer count is what's expected (only 1 layer in a SHP file).
             self.assertEqual(1, len(ds))
 
             # Making sure GetName works
@@ -194,8 +194,9 @@ class DataSourceTest(SimpleTestCase):
                     for i, fid in enumerate(source.fids):
                         feat = layer[fid]
                         self.assertEqual(fid, feat.fid)
-                        # Maybe this should be in the test below, but we might as well test
-                        # the feature values here while in this loop.
+                        # Maybe this should be in the test below, but we might
+                        # as well test the feature values here while in this
+                        # loop.
                         for fld_name, fld_value in source.field_values.items():
                             self.assertEqual(fld_value[i], feat.get(fld_name))
 

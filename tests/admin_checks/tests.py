@@ -564,7 +564,8 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = SongAdmin(Song, AdminSite()).check()
         expected = [
             checks.Error(
-                "'ct_field' references 'nonexistent', which is not a field on 'admin_checks.Influence'.",
+                "'ct_field' references 'nonexistent', which is not a field on "
+                "'admin_checks.Influence'.",
                 obj=InfluenceInline,
                 id="admin.E302",
             )
@@ -587,7 +588,8 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = SongAdmin(Song, AdminSite()).check()
         expected = [
             checks.Error(
-                "'ct_fk_field' references 'nonexistent', which is not a field on 'admin_checks.Influence'.",
+                "'ct_fk_field' references 'nonexistent', which is not a field on "
+                "'admin_checks.Influence'.",
                 obj=InfluenceInline,
                 id="admin.E303",
             )
@@ -865,8 +867,9 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = FieldsetBookAdmin(Book, AdminSite()).check()
         expected = [
             checks.Error(
-                "The value of 'fieldsets[1][1][\"fields\"]' cannot include the ManyToManyField "
-                "'authors', because that field manually specifies a relationship model.",
+                "The value of 'fieldsets[1][1][\"fields\"]' cannot include the "
+                "ManyToManyField 'authors', because that field manually specifies a "
+                "relationship model.",
                 obj=FieldsetBookAdmin,
                 id="admin.E013",
             )

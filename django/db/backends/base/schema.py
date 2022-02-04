@@ -104,7 +104,10 @@ class BaseDatabaseSchemaEditor:
     sql_create_check = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s CHECK (%(check)s)"
     sql_delete_check = sql_delete_constraint
 
-    sql_create_unique = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s UNIQUE (%(columns)s)%(deferrable)s"
+    sql_create_unique = (
+        "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s "
+        "UNIQUE (%(columns)s)%(deferrable)s"
+    )
     sql_delete_unique = sql_delete_constraint
 
     sql_create_fk = (
@@ -115,8 +118,14 @@ class BaseDatabaseSchemaEditor:
     sql_create_column_inline_fk = None
     sql_delete_fk = sql_delete_constraint
 
-    sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(include)s%(extra)s%(condition)s"
-    sql_create_unique_index = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)%(include)s%(condition)s"
+    sql_create_index = (
+        "CREATE INDEX %(name)s ON %(table)s "
+        "(%(columns)s)%(include)s%(extra)s%(condition)s"
+    )
+    sql_create_unique_index = (
+        "CREATE UNIQUE INDEX %(name)s ON %(table)s "
+        "(%(columns)s)%(include)s%(condition)s"
+    )
     sql_delete_index = "DROP INDEX %(name)s"
 
     sql_create_pk = (
@@ -418,10 +427,12 @@ class BaseDatabaseSchemaEditor:
         the given `model`.
         """
         sql, params = self.table_sql(model)
-        # Prevent using [] as params, in the case a literal '%' is used in the definition
+        # Prevent using [] as params, in the case a literal '%' is used in the
+        # definition.
         self.execute(sql, params or None)
 
-        # Add any field index and index_together's (deferred as SQLite _remake_table needs it)
+        # Add any field index and index_together's (deferred as SQLite
+        # _remake_table needs it).
         self.deferred_sql.extend(self._model_indexes_sql(model))
 
         # Make M2M tables
@@ -1190,8 +1201,9 @@ class BaseDatabaseSchemaEditor:
         # Repoint the FK to the other side
         self.alter_field(
             new_field.remote_field.through,
-            # We need the field that points to the target model, so we can tell alter_field to change it -
-            # this is m2m_reverse_field_name() (as opposed to m2m_field_name, which points to our model)
+            # The field that points to the target model is needed, so we can
+            # tell alter_field to change it - this is m2m_reverse_field_name()
+            # (as opposed to m2m_field_name(), which points to our model).
             old_field.remote_field.through._meta.get_field(
                 old_field.m2m_reverse_field_name()
             ),

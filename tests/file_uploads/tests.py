@@ -198,8 +198,8 @@ class FileUploadTests(TestCase):
             "\r\n".join(
                 [
                     "--" + client.BOUNDARY,
-                    "Content-Disposition: form-data; name=\"file_unicode\"; filename*=UTF-8''%s"
-                    % quote(UNICODE_FILENAME),
+                    'Content-Disposition: form-data; name="file_unicode"; '
+                    "filename*=UTF-8''%s" % quote(UNICODE_FILENAME),
                     "Content-Type: application/octet-stream",
                     "",
                     "You got pwnd.\r\n",
@@ -228,8 +228,8 @@ class FileUploadTests(TestCase):
             "\r\n".join(
                 [
                     "--" + client.BOUNDARY,
-                    "Content-Disposition: form-data; name*=UTF-8''file_unicode; filename*=UTF-8''%s"
-                    % quote(UNICODE_FILENAME),
+                    "Content-Disposition: form-data; name*=UTF-8''file_unicode; "
+                    "filename*=UTF-8''%s" % quote(UNICODE_FILENAME),
                     "Content-Type: application/octet-stream",
                     "",
                     "You got pwnd.\r\n",
@@ -349,7 +349,8 @@ class FileUploadTests(TestCase):
             "\r\n".join(
                 [
                     "--" + client.BOUNDARY,
-                    f'Content-Disposition: form-data; name="file"; filename="{file_name}"',
+                    f'Content-Disposition: form-data; name="file"; '
+                    f'filename="{file_name}"',
                     "Content-Type: application/octet-stream",
                     "",
                     "You got pwnd.\r\n",
@@ -706,7 +707,8 @@ class FileUploadTests(TestCase):
                 self.assertNotEqual(
                     str(err),
                     str(reference_error),
-                    "Caught a repeated exception that'll cause an infinite loop in file uploads.",
+                    "Caught a repeated exception that'll cause an infinite loop in "
+                    "file uploads.",
                 )
             except Exception as err:
                 # CustomUploadError is the error that should have been raised
@@ -723,7 +725,8 @@ class FileUploadTests(TestCase):
         vars = {"boundary": "oUrBoUnDaRyStRiNg"}
         post_data = [
             "--%(boundary)s",
-            'Content-Disposition: form-data; name="file_field"; filename="MiXeD_cAsE.txt"',
+            'Content-Disposition: form-data; name="file_field"; '
+            'filename="MiXeD_cAsE.txt"',
             "Content-Type: application/octet-stream",
             "",
             "file contents\n",
@@ -907,7 +910,8 @@ class MultiParserTests(SimpleTestCase):
     def test_rfc2231_parsing(self):
         test_data = (
             (
-                b"Content-Type: application/x-stuff; title*=us-ascii'en-us'This%20is%20%2A%2A%2Afun%2A%2A%2A",
+                b"Content-Type: application/x-stuff; "
+                b"title*=us-ascii'en-us'This%20is%20%2A%2A%2Afun%2A%2A%2A",
                 "This is ***fun***",
             ),
             (
@@ -930,7 +934,8 @@ class MultiParserTests(SimpleTestCase):
         """
         test_data = (
             (
-                b"Content-Type: application/x-stuff; title*='This%20is%20%2A%2A%2Afun%2A%2A%2A",
+                b"Content-Type: application/x-stuff; "
+                b"title*='This%20is%20%2A%2A%2Afun%2A%2A%2A",
                 b"'This%20is%20%2A%2A%2Afun%2A%2A%2A",
             ),
             (b"Content-Type: application/x-stuff; title*='foo.html", b"'foo.html"),

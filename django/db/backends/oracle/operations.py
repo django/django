@@ -399,12 +399,15 @@ END;
                         user_tables
                     JOIN
                         user_constraints cons
-                        ON (user_tables.table_name = cons.table_name AND cons.constraint_type = ANY('P', 'U'))
+                        ON (user_tables.table_name = cons.table_name
+                        AND cons.constraint_type = ANY('P', 'U'))
                     LEFT JOIN
                         user_constraints rcons
-                        ON (user_tables.table_name = rcons.table_name AND rcons.constraint_type = 'R')
+                        ON (user_tables.table_name = rcons.table_name
+                        AND rcons.constraint_type = 'R')
                     START WITH user_tables.table_name = UPPER(%s)
-                    CONNECT BY NOCYCLE PRIOR cons.constraint_name = rcons.r_constraint_name
+                    CONNECT BY
+                        NOCYCLE PRIOR cons.constraint_name = rcons.r_constraint_name
                     GROUP BY
                         user_tables.table_name, rcons.constraint_name
                     HAVING user_tables.table_name != UPPER(%s)
@@ -583,7 +586,8 @@ END;
                 value = timezone.make_naive(value, self.connection.timezone)
             else:
                 raise ValueError(
-                    "Oracle backend does not support timezone-aware datetimes when USE_TZ is False."
+                    "Oracle backend does not support timezone-aware datetimes when "
+                    "USE_TZ is False."
                 )
 
         return Oracle_datetime.from_datetime(value)

@@ -131,7 +131,8 @@ class SpatialReference(GDALBase):
         4326
         >>> print(srs['TOWGS84', 4]) # the fourth value in this wkt
         0
-        >>> print(srs['UNIT|AUTHORITY']) # For the units authority, have to use the pipe symbole.
+        >>> # For the units authority, have to use the pipe symbole.
+        >>> print(srs['UNIT|AUTHORITY'])
         EPSG
         >>> print(srs['UNIT|AUTHORITY', 1]) # The authority value for the units
         9122

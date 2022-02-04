@@ -127,7 +127,10 @@ class ProxyModelTests(TestCase):
             StatusPerson.objects.get(id__lt=max_id + 1)
 
     def test_abstract_base_with_model_fields(self):
-        msg = "Abstract base class containing model fields not permitted for proxy model 'NoAbstract'."
+        msg = (
+            "Abstract base class containing model fields not permitted for proxy model "
+            "'NoAbstract'."
+        )
         with self.assertRaisesMessage(TypeError, msg):
 
             class NoAbstract(Abstract):
@@ -135,7 +138,10 @@ class ProxyModelTests(TestCase):
                     proxy = True
 
     def test_too_many_concrete_classes(self):
-        msg = "Proxy model 'TooManyBases' has more than one non-abstract model base class."
+        msg = (
+            "Proxy model 'TooManyBases' has more than one non-abstract model base "
+            "class."
+        )
         with self.assertRaisesMessage(TypeError, msg):
 
             class TooManyBases(User, Person):

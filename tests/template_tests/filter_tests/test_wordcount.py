@@ -8,7 +8,10 @@ from ..utils import setup
 class WordcountTests(SimpleTestCase):
     @setup(
         {
-            "wordcount01": "{% autoescape off %}{{ a|wordcount }} {{ b|wordcount }}{% endautoescape %}"
+            "wordcount01": (
+                "{% autoescape off %}{{ a|wordcount }} {{ b|wordcount }}"
+                "{% endautoescape %}"
+            )
         }
     )
     def test_wordcount01(self):

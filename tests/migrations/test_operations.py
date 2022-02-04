@@ -26,7 +26,8 @@ class OperationTests(OperationTestBase):
     def test_create_model(self):
         """
         Tests the CreateModel operation.
-        Most other tests use this operation as part of setup, so check failures here first.
+        Most other tests use this operation as part of setup, so check failures
+        here first.
         """
         operation = migrations.CreateModel(
             "Pony",
@@ -97,7 +98,10 @@ class OperationTests(OperationTestBase):
                     "test_crmo.pony",
                 ),
             )
-        message = "Found duplicate value migrations.unicodemodel in CreateModel bases argument."
+        message = (
+            "Found duplicate value migrations.unicodemodel in CreateModel bases "
+            "argument."
+        )
         with self.assertRaisesMessage(ValueError, message):
             migrations.CreateModel(
                 "Pony",
@@ -125,7 +129,10 @@ class OperationTests(OperationTestBase):
                     "migrations.UnicodeModel",
                 ),
             )
-        message = "Found duplicate value <class 'django.db.models.base.Model'> in CreateModel bases argument."
+        message = (
+            "Found duplicate value <class 'django.db.models.base.Model'> in "
+            "CreateModel bases argument."
+        )
         with self.assertRaisesMessage(ValueError, message):
             migrations.CreateModel(
                 "Pony",
@@ -135,7 +142,10 @@ class OperationTests(OperationTestBase):
                     models.Model,
                 ),
             )
-        message = "Found duplicate value <class 'migrations.test_operations.Mixin'> in CreateModel bases argument."
+        message = (
+            "Found duplicate value <class 'migrations.test_operations.Mixin'> in "
+            "CreateModel bases argument."
+        )
         with self.assertRaisesMessage(ValueError, message):
             migrations.CreateModel(
                 "Pony",
@@ -838,7 +848,8 @@ class OperationTests(OperationTestBase):
             .remote_field.model,
             new_state.models["test_rmwsc", "rider"].fields["pony"].remote_field.model,
         )
-        # Before running the migration we have a table for Shetland Pony, not Little Horse
+        # Before running the migration we have a table for Shetland Pony, not
+        # Little Horse.
         self.assertTableExists("test_rmwsc_shetlandpony")
         self.assertTableNotExists("test_rmwsc_littlehorse")
         if connection.features.supports_foreign_keys:
@@ -1772,7 +1783,8 @@ class OperationTests(OperationTestBase):
 
     def test_alter_field_pk(self):
         """
-        Tests the AlterField operation on primary keys (for things like PostgreSQL's SERIAL weirdness)
+        The AlterField operation on primary keys (things like PostgreSQL's
+        SERIAL weirdness).
         """
         project_state = self.set_up_test_model("test_alflpk")
         # Test the state alteration
@@ -2114,7 +2126,7 @@ class OperationTests(OperationTestBase):
         self.assertEqual(id_null, fk_null)
 
     @skipUnlessDBFeature("supports_foreign_keys")
-    def test_alter_field_reloads_state_on_fk_with_to_field_related_name_target_type_change(
+    def test_alter_field_reloads_state_fk_with_to_field_related_name_target_type_change(
         self,
     ):
         app_label = "test_alflrsfkwtflrnttc"
@@ -3278,7 +3290,8 @@ class OperationTests(OperationTestBase):
         )
         self.assertEqual(
             gt_operation.describe(),
-            "Remove constraint test_constraint_pony_pink_for_weight_gt_5_uniq from model Pony",
+            "Remove constraint test_constraint_pony_pink_for_weight_gt_5_uniq from "
+            "model Pony",
         )
         # Test state alteration
         new_state = project_state.clone()
@@ -3935,12 +3948,17 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model("test_runsql")
         # Create the operation
         operation = migrations.RunSQL(
-            # Use a multi-line string with a comment to test splitting on SQLite and MySQL respectively
+            # Use a multi-line string with a comment to test splitting on
+            # SQLite and MySQL respectively.
             "CREATE TABLE i_love_ponies (id int, special_thing varchar(15));\n"
-            "INSERT INTO i_love_ponies (id, special_thing) VALUES (1, 'i love ponies'); -- this is magic!\n"
-            "INSERT INTO i_love_ponies (id, special_thing) VALUES (2, 'i love django');\n"
-            "UPDATE i_love_ponies SET special_thing = 'Ponies' WHERE special_thing LIKE '%%ponies';"
-            "UPDATE i_love_ponies SET special_thing = 'Django' WHERE special_thing LIKE '%django';",
+            "INSERT INTO i_love_ponies (id, special_thing) "
+            "VALUES (1, 'i love ponies'); -- this is magic!\n"
+            "INSERT INTO i_love_ponies (id, special_thing) "
+            "VALUES (2, 'i love django');\n"
+            "UPDATE i_love_ponies SET special_thing = 'Ponies' "
+            "WHERE special_thing LIKE '%%ponies';"
+            "UPDATE i_love_ponies SET special_thing = 'Django' "
+            "WHERE special_thing LIKE '%django';",
             # Run delete queries to test for parameter substitution failure
             # reported in #23426
             "DELETE FROM i_love_ponies WHERE special_thing LIKE '%Django%';"
@@ -4182,7 +4200,8 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[1], [])
         self.assertEqual(sorted(definition[2]), ["code", "reverse_code"])
 
-        # Also test reversal fails, with an operation identical to above but without reverse_code set
+        # Also test reversal fails, with an operation identical to above but
+        # without reverse_code set.
         no_reverse_operation = migrations.RunPython(inner_method)
         self.assertFalse(no_reverse_operation.reversible)
         with connection.schema_editor() as editor:

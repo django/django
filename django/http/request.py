@@ -256,7 +256,8 @@ class HttpRequest:
                 header, secure_value = settings.SECURE_PROXY_SSL_HEADER
             except ValueError:
                 raise ImproperlyConfigured(
-                    "The SECURE_PROXY_SSL_HEADER setting must be a tuple containing two values."
+                    "The SECURE_PROXY_SSL_HEADER setting must be a tuple containing "
+                    "two values."
                 )
             header_value = self.META.get(header)
             if header_value is not None:
@@ -300,7 +301,8 @@ class HttpRequest:
     def upload_handlers(self, upload_handlers):
         if hasattr(self, "_files"):
             raise AttributeError(
-                "You cannot set the upload handlers after the upload has been processed."
+                "You cannot set the upload handlers after the upload has been "
+                "processed."
             )
         self._upload_handlers = upload_handlers
 
@@ -308,7 +310,10 @@ class HttpRequest:
         """Return a tuple of (POST QueryDict, FILES MultiValueDict)."""
         self.upload_handlers = ImmutableList(
             self.upload_handlers,
-            warning="You cannot alter upload handlers after the upload has been processed.",
+            warning=(
+                "You cannot alter upload handlers after the upload has been "
+                "processed."
+            ),
         )
         parser = MultiPartParser(META, post_data, self.upload_handlers, self.encoding)
         return parser.parse()

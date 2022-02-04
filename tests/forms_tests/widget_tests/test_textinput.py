@@ -48,7 +48,10 @@ class TextInputTest(WidgetTest):
             self.widget,
             "email",
             'some "quoted" & ampersanded value',
-            html='<input type="text" name="email" value="some &quot;quoted&quot; &amp; ampersanded value">',
+            html=(
+                '<input type="text" name="email" '
+                'value="some &quot;quoted&quot; &amp; ampersanded value">'
+            ),
         )
 
     def test_render_custom_attrs(self):
@@ -57,7 +60,9 @@ class TextInputTest(WidgetTest):
             "email",
             "test@example.com",
             attrs={"class": "fun"},
-            html='<input type="text" name="email" value="test@example.com" class="fun">',
+            html=(
+                '<input type="text" name="email" value="test@example.com" class="fun">'
+            ),
         )
 
     def test_render_unicode(self):
@@ -81,7 +86,9 @@ class TextInputTest(WidgetTest):
             widget,
             "email",
             "foo@example.com",
-            html='<input type="email" class="fun" value="foo@example.com" name="email">',
+            html=(
+                '<input type="email" class="fun" value="foo@example.com" name="email">'
+            ),
         )
 
     def test_attrs_precedence(self):

@@ -421,7 +421,8 @@ class RequestsTests(SimpleTestCase):
 
     def test_POST_multipart_with_content_length_zero(self):
         """
-        Multipart POST requests with Content-Length >= 0 are valid and need to be handled.
+        Multipart POST requests with Content-Length >= 0 are valid and need to
+        be handled.
         """
         # According to:
         # https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.13
@@ -591,7 +592,10 @@ class RequestsTests(SimpleTestCase):
                 "wsgi.input": FakePayload(),
             }
         )
-        msg = "Invalid non-ASCII Content-Type in multipart: multipart/form-data; boundary = à"
+        msg = (
+            "Invalid non-ASCII Content-Type in multipart: multipart/form-data; "
+            "boundary = à"
+        )
         with self.assertRaisesMessage(MultiPartParserError, msg):
             request.POST
 
@@ -874,7 +878,10 @@ class HostValidationTests(SimpleTestCase):
 
     @override_settings(ALLOWED_HOSTS=[])
     def test_get_host_suggestion_of_allowed_host(self):
-        """get_host() makes helpful suggestions if a valid-looking host is not in ALLOWED_HOSTS."""
+        """
+        get_host() makes helpful suggestions if a valid-looking host is not in
+        ALLOWED_HOSTS.
+        """
         msg_invalid_host = "Invalid HTTP_HOST header: %r."
         msg_suggestion = msg_invalid_host + " You may need to add %r to ALLOWED_HOSTS."
         msg_suggestion2 = (

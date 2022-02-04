@@ -21,7 +21,9 @@ class EscapeTests(SimpleTestCase):
 
     @setup(
         {
-            "escape02": "{% autoescape off %}{{ a|escape }} {{ b|escape }}{% endautoescape %}"
+            "escape02": (
+                "{% autoescape off %}{{ a|escape }} {{ b|escape }}{% endautoescape %}"
+            )
         }
     )
     def test_escape02(self):

@@ -132,7 +132,8 @@ class OGRInspectTest(SimpleTestCase):
 
         self.assertTrue(
             model_def.startswith(
-                "# This is an auto-generated Django model module created by ogrinspect.\n"
+                "# This is an auto-generated Django model module created by "
+                "ogrinspect.\n"
                 "from django.contrib.gis.db import models\n"
                 "\n"
                 "\n"
@@ -140,7 +141,8 @@ class OGRInspectTest(SimpleTestCase):
             )
         )
 
-        # The ordering of model fields might vary depending on several factors (version of GDAL, etc.)
+        # The ordering of model fields might vary depending on several factors
+        # (version of GDAL, etc.).
         if connection.vendor == "sqlite":
             # SpatiaLite introspection is somewhat lacking (#29461).
             self.assertIn("    f_decimal = models.CharField(max_length=0)", model_def)

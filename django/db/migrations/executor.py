@@ -405,6 +405,6 @@ class MigrationExecutor:
                         break
                 else:
                     return False, project_state
-        # If we get this far and we found at least one CreateModel or AddField migration,
-        # the migration is considered implicitly applied.
+        # If we get this far and we found at least one CreateModel or AddField
+        # migration, the migration is considered implicitly applied.
         return (found_create_model_migration or found_add_field_migration), after_state

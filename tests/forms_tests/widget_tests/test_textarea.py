@@ -47,7 +47,8 @@ class TextareaTest(WidgetTest):
             "msg",
             'some "quoted" & ampersanded value',
             html=(
-                '<textarea rows="10" cols="40" name="msg">some &quot;quoted&quot; &amp; ampersanded value</textarea>'
+                '<textarea rows="10" cols="40" name="msg">'
+                "some &quot;quoted&quot; &amp; ampersanded value</textarea>"
             ),
         )
 
@@ -57,6 +58,7 @@ class TextareaTest(WidgetTest):
             "msg",
             mark_safe("pre &quot;quoted&quot; value"),
             html=(
-                '<textarea rows="10" cols="40" name="msg">pre &quot;quoted&quot; value</textarea>'
+                '<textarea rows="10" cols="40" name="msg">pre &quot;quoted&quot; value'
+                "</textarea>"
             ),
         )

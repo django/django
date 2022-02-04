@@ -682,7 +682,8 @@ class Query(BaseExpression):
             # the extra complexity when you can write a real query instead.
             if self.extra and rhs.extra:
                 raise ValueError(
-                    "When merging querysets using 'or', you cannot have extra(select=...) on both sides."
+                    "When merging querysets using 'or', you cannot have "
+                    "extra(select=...) on both sides."
                 )
         self.extra.update(rhs.extra)
         extra_select_mask = set()

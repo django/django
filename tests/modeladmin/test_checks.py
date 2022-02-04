@@ -413,7 +413,8 @@ class RadioFieldsCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin,
             ValidationTestModel,
-            "The value of 'radio_fields[\"state\"]' must be either admin.HORIZONTAL or admin.VERTICAL.",
+            "The value of 'radio_fields[\"state\"]' must be either admin.HORIZONTAL or "
+            "admin.VERTICAL.",
             "admin.E024",
         )
 
@@ -466,8 +467,9 @@ class PrepopulatedFieldsCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin,
             ValidationTestModel,
-            "The value of 'prepopulated_fields[\"slug\"][0]' refers to 'non_existent_field', "
-            "which is not a field of 'modeladmin.ValidationTestModel'.",
+            "The value of 'prepopulated_fields[\"slug\"][0]' refers to "
+            "'non_existent_field', which is not a field of "
+            "'modeladmin.ValidationTestModel'.",
             "admin.E030",
         )
 
@@ -496,8 +498,9 @@ class PrepopulatedFieldsCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin,
             ValidationTestModel,
-            "The value of 'prepopulated_fields' refers to 'best_friend', which must not be "
-            "a DateTimeField, a ForeignKey, a OneToOneField, or a ManyToManyField.",
+            "The value of 'prepopulated_fields' refers to 'best_friend', which must "
+            "not be a DateTimeField, a ForeignKey, a OneToOneField, or a "
+            "ManyToManyField.",
             "admin.E028",
         )
 
@@ -606,7 +609,8 @@ class ListDisplayLinksCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin,
             ValidationTestModel,
-            "The value of 'list_display_links[0]' refers to 'name', which is not defined in 'list_display'.",
+            "The value of 'list_display_links[0]' refers to 'name', which is not "
+            "defined in 'list_display'.",
             "admin.E111",
         )
 
@@ -1170,7 +1174,8 @@ class FkNameCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin,
             ValidationTestModel,
-            "'modeladmin.ValidationTestInlineModel' has no field named 'non_existent_field'.",
+            "'modeladmin.ValidationTestInlineModel' has no field named "
+            "'non_existent_field'.",
             "admin.E202",
             invalid_obj=ValidationTestInline,
         )

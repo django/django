@@ -72,7 +72,7 @@ class JsTokensTest(SimpleTestCase):
         (r"a=/\//,1", ["id a", "punct =", r"regex /\//", "punct ,", "dnum 1"]),
         # next two are from https://www-archive.mozilla.org/js/language/js20-2002-04/rationale/syntax.html#regular-expressions  # NOQA
         (
-            """for (var x = a in foo && "</x>" || mot ? z:/x:3;x<5;y</g/i) {xyz(x++);}""",
+            'for (var x = a in foo && "</x>" || mot ? z:/x:3;x<5;y</g/i) {xyz(x++);}',
             [
                 "keyword for",
                 "punct (",
@@ -104,7 +104,7 @@ class JsTokensTest(SimpleTestCase):
             ],
         ),
         (
-            """for (var x = a in foo && "</x>" || mot ? z/x:3;x<5;y</g/i) {xyz(x++);}""",
+            'for (var x = a in foo && "</x>" || mot ? z/x:3;x<5;y</g/i) {xyz(x++);}',
             [
                 "keyword for",
                 "punct (",
@@ -240,7 +240,8 @@ class JsTokensTest(SimpleTestCase):
             ],
         ),
         (
-            r""" this._js = "e.str(\"" + this.value.replace(/\\/g, "\\\\").replace(/"/g, "\\\"") + "\")"; """,
+            r' this._js = "e.str(\"" + this.value.replace(/\\/g, "\\\\")'
+            r'.replace(/"/g, "\\\"") + "\")"; ',
             [
                 "keyword this",
                 "punct .",

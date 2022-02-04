@@ -37,7 +37,8 @@ from .utils import URLObject
 from .views import empty_view
 
 resolve_test_data = (
-    # These entries are in the format: (path, url_name, app_name, namespace, view_name, func, args, kwargs)
+    # These entries are in the format:
+    #   (path, url_name, app_name, namespace, view_name, func, args, kwargs)
     # Simple case
     (
         "/normal/42/37/",
@@ -505,12 +506,18 @@ class URLPatternReverse(SimpleTestCase):
             reverse("places")
 
     def test_illegal_args_message(self):
-        msg = "Reverse for 'places' with arguments '(1, 2)' not found. 1 pattern(s) tried:"
+        msg = (
+            "Reverse for 'places' with arguments '(1, 2)' not found. 1 pattern(s) "
+            "tried:"
+        )
         with self.assertRaisesMessage(NoReverseMatch, msg):
             reverse("places", args=(1, 2))
 
     def test_illegal_kwargs_message(self):
-        msg = "Reverse for 'places' with keyword arguments '{'arg1': 2}' not found. 1 pattern(s) tried:"
+        msg = (
+            "Reverse for 'places' with keyword arguments '{'arg1': 2}' not found. 1 "
+            "pattern(s) tried:"
+        )
         with self.assertRaisesMessage(NoReverseMatch, msg):
             reverse("places", kwargs={"arg1": 2})
 
@@ -709,7 +716,10 @@ class ReverseLazySettingsTest(AdminScriptTestCase):
         super().setUp()
         self.write_settings(
             "settings.py",
-            extra="from django.urls import reverse_lazy\nLOGIN_URL = reverse_lazy('login')",
+            extra=(
+                "from django.urls import reverse_lazy\n"
+                "LOGIN_URL = reverse_lazy('login')"
+            ),
         )
 
     def test_lazy_in_settings(self):
@@ -1673,7 +1683,10 @@ class IncludeTests(SimpleTestCase):
             include((self.url_patterns, "app_name", "namespace"))
 
     def test_include_3_tuple_namespace(self):
-        msg = "Cannot override the namespace for a dynamic module that provides a namespace."
+        msg = (
+            "Cannot override the namespace for a dynamic module that provides a "
+            "namespace."
+        )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             include((self.url_patterns, "app_name", "namespace"), "namespace")
 

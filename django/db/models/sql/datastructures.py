@@ -26,7 +26,8 @@ class Join:
     """
     Used by sql.Query and sql.SQLCompiler to generate JOIN clauses into the
     FROM entry. For example, the SQL generated could be
-        LEFT OUTER JOIN "sometable" T1 ON ("othertable"."sometable_id" = "sometable"."id")
+        LEFT OUTER JOIN "sometable" T1
+        ON ("othertable"."sometable_id" = "sometable"."id")
 
     This class is primarily used in Query.alias_map. All entries in alias_map
     must be Join compatible by providing the following attributes and methods:

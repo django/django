@@ -520,7 +520,8 @@ class SelectDateWidgetTest(WidgetTest):
             """,
         )
 
-        # Even with an invalid date, the widget should reflect the entered value (#17401).
+        # Even with an invalid date, the widget should reflect the entered
+        # value.
         self.assertEqual(w.render("mydate", "2010-02-30").count("selected"), 3)
 
         # Years before 1900 should work.

@@ -27,9 +27,11 @@ class NullBooleanFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
         f = HiddenNullBooleanForm()
         self.assertHTMLEqual(
-            '<input type="hidden" name="hidden_nullbool1" value="True" id="id_hidden_nullbool1">'
-            '<input type="hidden" name="hidden_nullbool2" value="False" id="id_hidden_nullbool2">',
             str(f),
+            '<input type="hidden" name="hidden_nullbool1" value="True" '
+            'id="id_hidden_nullbool1">'
+            '<input type="hidden" name="hidden_nullbool2" value="False" '
+            'id="id_hidden_nullbool2">',
         )
 
     def test_nullbooleanfield_3(self):
@@ -69,7 +71,8 @@ class NullBooleanFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertTrue(f.has_changed(True, False))
         self.assertTrue(f.has_changed(True, None))
         self.assertTrue(f.has_changed(True, False))
-        # HiddenInput widget sends string values for boolean but doesn't clean them in value_from_datadict
+        # HiddenInput widget sends string values for boolean but doesn't clean
+        # them in value_from_datadict.
         self.assertFalse(f.has_changed(False, "False"))
         self.assertFalse(f.has_changed(True, "True"))
         self.assertFalse(f.has_changed(None, ""))

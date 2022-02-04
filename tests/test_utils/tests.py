@@ -804,7 +804,7 @@ class HTMLEqualTests(SimpleTestCase):
 <tr><th><label for="id_last_name">Last name:</label></th>
 <td><input type="text" id="id_last_name" name="last_name" value="Lennon" /></td></tr>
 <tr><th><label for="id_birthday">Birthday:</label></th>
-<td><input type="text" value="1940-10-9" name="birthday" id="id_birthday" /></td></tr>""",
+<td><input type="text" value="1940-10-9" name="birthday" id="id_birthday" /></td></tr>""",  # NOQA
             """
         <tr><th>
             <label for="id_first_name">First name:</label></th><td>
@@ -2023,8 +2023,8 @@ class DatabaseAliasTests(SimpleTestCase):
     def test_no_close_match(self):
         self.__class__.databases = {"void"}
         message = (
-            "test_utils.tests.DatabaseAliasTests.databases refers to 'void' which is not defined "
-            "in settings.DATABASES."
+            "test_utils.tests.DatabaseAliasTests.databases refers to 'void' which is "
+            "not defined in settings.DATABASES."
         )
         with self.assertRaisesMessage(ImproperlyConfigured, message):
             self._validate_databases()
@@ -2032,8 +2032,8 @@ class DatabaseAliasTests(SimpleTestCase):
     def test_close_match(self):
         self.__class__.databases = {"defualt"}
         message = (
-            "test_utils.tests.DatabaseAliasTests.databases refers to 'defualt' which is not defined "
-            "in settings.DATABASES. Did you mean 'default'?"
+            "test_utils.tests.DatabaseAliasTests.databases refers to 'defualt' which "
+            "is not defined in settings.DATABASES. Did you mean 'default'?"
         )
         with self.assertRaisesMessage(ImproperlyConfigured, message):
             self._validate_databases()

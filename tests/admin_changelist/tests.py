@@ -1243,7 +1243,8 @@ class ChangeListTests(TestCase):
                     self.assertEqual(result.id, counter)
             custom_site.unregister(OrderedObject)
 
-        # When no order is defined at all, use the model's default ordering (i.e. 'number')
+        # When no order is defined at all, use the model's default ordering
+        # (i.e. 'number').
         check_results_order(ascending=True)
 
         # When an order field is defined but multiple records have the same

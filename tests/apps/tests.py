@@ -78,7 +78,10 @@ class AppsTests(SimpleTestCase):
         with self.assertRaises(ImportError):
             with self.settings(INSTALLED_APPS=["there is no such app"]):
                 pass
-        msg = "Cannot import 'there is no such app'. Check that 'apps.apps.NoSuchApp.name' is correct."
+        msg = (
+            "Cannot import 'there is no such app'. Check that "
+            "'apps.apps.NoSuchApp.name' is correct."
+        )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             with self.settings(INSTALLED_APPS=["apps.apps.NoSuchApp"]):
                 pass

@@ -96,7 +96,9 @@ class CsrfViewTests(SimpleTestCase):
                         (
                             "django.template.loaders.locmem.Loader",
                             {
-                                CSRF_FAILURE_TEMPLATE_NAME: "Test template for CSRF failure"
+                                CSRF_FAILURE_TEMPLATE_NAME: (
+                                    "Test template for CSRF failure"
+                                )
                             },
                         ),
                     ],

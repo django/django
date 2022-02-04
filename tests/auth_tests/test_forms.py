@@ -174,10 +174,15 @@ class UserCreationFormTest(TestDataMixin, TestCase):
     @override_settings(
         AUTH_PASSWORD_VALIDATORS=[
             {
-                "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+                "NAME": (
+                    "django.contrib.auth.password_validation."
+                    "UserAttributeSimilarityValidator"
+                )
             },
             {
-                "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+                "NAME": (
+                    "django.contrib.auth.password_validation.MinimumLengthValidator"
+                ),
                 "OPTIONS": {
                     "min_length": 12,
                 },
@@ -259,7 +264,10 @@ class UserCreationFormTest(TestDataMixin, TestCase):
     @override_settings(
         AUTH_PASSWORD_VALIDATORS=[
             {
-                "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+                "NAME": (
+                    "django.contrib.auth.password_validation."
+                    "UserAttributeSimilarityValidator"
+                )
             },
         ]
     )
@@ -267,13 +275,18 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         form = UserCreationForm()
         self.assertEqual(
             form.fields["password1"].help_text,
-            "<ul><li>Your password can’t be too similar to your other personal information.</li></ul>",
+            "<ul><li>"
+            "Your password can’t be too similar to your other personal information."
+            "</li></ul>",
         )
 
     @override_settings(
         AUTH_PASSWORD_VALIDATORS=[
             {
-                "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+                "NAME": (
+                    "django.contrib.auth.password_validation."
+                    "UserAttributeSimilarityValidator"
+                )
             },
         ]
     )
@@ -610,10 +623,15 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
     @override_settings(
         AUTH_PASSWORD_VALIDATORS=[
             {
-                "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+                "NAME": (
+                    "django.contrib.auth.password_validation."
+                    "UserAttributeSimilarityValidator"
+                )
             },
             {
-                "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+                "NAME": (
+                    "django.contrib.auth.password_validation.MinimumLengthValidator"
+                ),
                 "OPTIONS": {
                     "min_length": 12,
                 },
@@ -651,10 +669,15 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
     @override_settings(
         AUTH_PASSWORD_VALIDATORS=[
             {
-                "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+                "NAME": (
+                    "django.contrib.auth.password_validation."
+                    "UserAttributeSimilarityValidator"
+                )
             },
             {
-                "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+                "NAME": (
+                    "django.contrib.auth.password_validation.MinimumLengthValidator"
+                ),
                 "OPTIONS": {
                     "min_length": 12,
                 },
@@ -663,7 +686,8 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
     )
     def test_help_text_translation(self):
         french_help_texts = [
-            "Votre mot de passe ne peut pas trop ressembler à vos autres informations personnelles.",
+            "Votre mot de passe ne peut pas trop ressembler à vos autres informations "
+            "personnelles.",
             "Votre mot de passe doit contenir au minimum 12 caractères.",
         ]
         form = SetPasswordForm(self.u1)
@@ -1129,7 +1153,10 @@ class ReadOnlyPasswordHashTest(SimpleTestCase):
     )
     def test_render(self):
         widget = ReadOnlyPasswordHashWidget()
-        value = "pbkdf2_sha256$100000$a6Pucb1qSFcD$WmCkn9Hqidj48NVe5x0FEM6A9YiOqQcl/83m2Z5udm0="
+        value = (
+            "pbkdf2_sha256$100000$a6Pucb1qSFcD$WmCkn9Hqidj48NVe5x0FEM6A9YiOqQcl/83m2Z5u"
+            "dm0="
+        )
         self.assertHTMLEqual(
             widget.render("name", value, {"id": "id_password"}),
             """

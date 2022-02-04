@@ -51,7 +51,8 @@ class Index:
             )
         if opclasses and len(fields) != len(opclasses):
             raise ValueError(
-                "Index.fields and Index.opclasses must have the same number of elements."
+                "Index.fields and Index.opclasses must have the same number of "
+                "elements."
             )
         if fields and not all(isinstance(field, str) for field in fields):
             raise ValueError("Index.fields must contain only strings with field names.")

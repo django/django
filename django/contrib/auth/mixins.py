@@ -25,8 +25,9 @@ class AccessMixin:
         login_url = self.login_url or settings.LOGIN_URL
         if not login_url:
             raise ImproperlyConfigured(
-                "{0} is missing the login_url attribute. Define {0}.login_url, settings.LOGIN_URL, or override "
-                "{0}.get_login_url().".format(self.__class__.__name__)
+                f"{self.__class__.__name__} is missing the login_url attribute. Define "
+                f"{self.__class__.__name__}.login_url, settings.LOGIN_URL, or override "
+                f"{self.__class__.__name__}.get_login_url()."
             )
         return str(login_url)
 
@@ -84,8 +85,10 @@ class PermissionRequiredMixin(AccessMixin):
         """
         if self.permission_required is None:
             raise ImproperlyConfigured(
-                "{0} is missing the permission_required attribute. Define {0}.permission_required, or override "
-                "{0}.get_permission_required().".format(self.__class__.__name__)
+                f"{self.__class__.__name__} is missing the "
+                f"permission_required attribute. Define "
+                f"{self.__class__.__name__}.permission_required, or override "
+                f"{self.__class__.__name__}.get_permission_required()."
             )
         if isinstance(self.permission_required, str):
             perms = (self.permission_required,)

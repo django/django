@@ -252,8 +252,8 @@ class ForwardManyToOneDescriptor:
                 )
             if not router.allow_relation(value, instance):
                 raise ValueError(
-                    'Cannot assign "%r": the current database router prevents this relation.'
-                    % value
+                    'Cannot assign "%r": the current database router prevents this '
+                    "relation." % value
                 )
 
         remote_field = self.field.remote_field
@@ -515,15 +515,16 @@ class ReverseOneToOneDescriptor:
                 )
             if not router.allow_relation(value, instance):
                 raise ValueError(
-                    'Cannot assign "%r": the current database router prevents this relation.'
-                    % value
+                    'Cannot assign "%r": the current database router prevents this '
+                    "relation." % value
                 )
 
             related_pk = tuple(
                 getattr(instance, field.attname)
                 for field in self.related.field.foreign_related_fields
             )
-            # Set the value of the related field to the value of the related object's related field
+            # Set the value of the related field to the value of the related
+            # object's related field.
             for index, field in enumerate(self.related.field.local_related_fields):
                 setattr(value, field.attname, related_pk[index])
 
@@ -771,7 +772,8 @@ def create_reverse_many_to_one_manager(superclass, rel):
 
         update_or_create.alters_data = True
 
-        # remove() and clear() are only provided if the ForeignKey can have a value of null.
+        # remove() and clear() are only provided if the ForeignKey can have a
+        # value of null.
         if rel.field.null:
 
             def remove(self, *objs, bulk=True):
@@ -1273,7 +1275,8 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
         ):
             # source_field_name: the PK fieldname in join table for the source object
             # target_field_name: the PK fieldname in join table for the target object
-            # *objs - objects to add. Either object instances, or primary keys of object instances.
+            # *objs - objects to add. Either object instances, or primary keys
+            # of object instances.
             if not objs:
                 return
 

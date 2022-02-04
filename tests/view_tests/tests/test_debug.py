@@ -127,7 +127,10 @@ class DebugViewTests(SimpleTestCase):
                         (
                             "django.template.loaders.locmem.Loader",
                             {
-                                "403.html": "This is a test template for a 403 error ({{ exception }}).",
+                                "403.html": (
+                                    "This is a test template for a 403 error "
+                                    "({{ exception }})."
+                                ),
                             },
                         ),
                     ],
@@ -259,13 +262,15 @@ class DebugViewTests(SimpleTestCase):
 
     def test_non_l10ned_numeric_ids(self):
         """
-        Numeric IDs and fancy traceback context blocks line numbers shouldn't be localized.
+        Numeric IDs and fancy traceback context blocks line numbers shouldn't
+        be localized.
         """
         with self.settings(DEBUG=True):
             with self.assertLogs("django.request", "ERROR"):
                 response = self.client.get("/raises500/")
             # We look for a HTML fragment of the form
-            # '<div class="context" id="c38123208">', not '<div class="context" id="c38,123,208"'
+            # '<div class="context" id="c38123208">',
+            # not '<div class="context" id="c38,123,208"'.
             self.assertContains(response, '<div class="context" id="', status_code=500)
             match = re.search(
                 b'<div class="context" id="(?P<id>[^"]+)">', response.content
@@ -274,8 +279,8 @@ class DebugViewTests(SimpleTestCase):
             id_repr = match["id"]
             self.assertFalse(
                 re.search(b"[^c0-9]", id_repr),
-                "Numeric IDs in debug response HTML page shouldn't be localized (value: %s)."
-                % id_repr.decode(),
+                "Numeric IDs in debug response HTML page shouldn't be localized "
+                "(value: %s)." % id_repr.decode(),
             )
 
     def test_template_exceptions(self):
@@ -791,7 +796,8 @@ class ExceptionReporterTests(SimpleTestCase):
                 html,
             )
             self.assertIn(
-                '"generated", line 2, in funcName\n    &lt;source code not available&gt;',
+                '"generated", line 2, in funcName\n'
+                "    &lt;source code not available&gt;",
                 html,
             )
             text = reporter.get_traceback_text()
@@ -903,7 +909,8 @@ class ExceptionReporterTests(SimpleTestCase):
             exc_type, exc_value, tb = sys.exc_info()
         html = ExceptionReporter(None, exc_type, exc_value, tb).get_traceback_html()
         self.assertIn(
-            '<td class="code"><pre>&#x27;&lt;p&gt;Local variable&lt;/p&gt;&#x27;</pre></td>',
+            '<td class="code"><pre>&#x27;&lt;p&gt;Local variable&lt;/p&gt;&#x27;</pre>'
+            "</td>",
             html,
         )
 

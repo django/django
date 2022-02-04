@@ -500,7 +500,8 @@ class DiscoverRunnerTests(SimpleTestCase):
             [test.id() for test in suite],
             [
                 "unittest.loader._FailedTest.doesnotexist",
-                "unittest.loader._FailedTest.test_runner_apps.tagged.tests_syntax_error",
+                "unittest.loader._FailedTest.test_runner_apps.tagged."
+                "tests_syntax_error",
             ],
         )
 
@@ -563,7 +564,8 @@ class DiscoverRunnerTests(SimpleTestCase):
         with captured_stdout() as stdout, captured_stderr() as stderr:
             suite = runner.build_suite(
                 [
-                    "test_runner_apps.buffer.tests_buffer.WriteToStdoutStderrTestCase.test_pass",
+                    "test_runner_apps.buffer.tests_buffer.WriteToStdoutStderrTestCase."
+                    "test_pass",
                 ]
             )
             runner.run_suite(suite)
@@ -575,7 +577,8 @@ class DiscoverRunnerTests(SimpleTestCase):
         with captured_stdout() as stdout, captured_stderr() as stderr:
             suite = runner.build_suite(
                 [
-                    "test_runner_apps.buffer.tests_buffer.WriteToStdoutStderrTestCase.test_fail",
+                    "test_runner_apps.buffer.tests_buffer.WriteToStdoutStderrTestCase."
+                    "test_fail",
                 ]
             )
             runner.run_suite(suite)

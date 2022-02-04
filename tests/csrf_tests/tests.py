@@ -712,14 +712,18 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         self.assertContains(response, malformed_referer_msg, status_code=403)
         # missing scheme
         # >>> urlparse('//example.com/')
-        # ParseResult(scheme='', netloc='example.com', path='/', params='', query='', fragment='')
+        # ParseResult(
+        #   scheme='', netloc='example.com', path='/', params='', query='', fragment='',
+        # )
         req.META["HTTP_REFERER"] = "//example.com/"
         self._check_referer_rejects(mw, req)
         response = mw.process_view(req, post_form_view, (), {})
         self.assertContains(response, malformed_referer_msg, status_code=403)
         # missing netloc
         # >>> urlparse('https://')
-        # ParseResult(scheme='https', netloc='', path='', params='', query='', fragment='')
+        # ParseResult(
+        #   scheme='https', netloc='', path='', params='', query='', fragment='',
+        # )
         req.META["HTTP_REFERER"] = "https://"
         self._check_referer_rejects(mw, req)
         response = mw.process_view(req, post_form_view, (), {})

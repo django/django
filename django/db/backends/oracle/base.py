@@ -158,16 +158,31 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     _standard_operators = {
         "exact": "= %s",
         "iexact": "= UPPER(%s)",
-        "contains": "LIKE TRANSLATE(%s USING NCHAR_CS) ESCAPE TRANSLATE('\\' USING NCHAR_CS)",
-        "icontains": "LIKE UPPER(TRANSLATE(%s USING NCHAR_CS)) ESCAPE TRANSLATE('\\' USING NCHAR_CS)",
+        "contains": (
+            "LIKE TRANSLATE(%s USING NCHAR_CS) ESCAPE TRANSLATE('\\' USING NCHAR_CS)"
+        ),
+        "icontains": (
+            "LIKE UPPER(TRANSLATE(%s USING NCHAR_CS)) "
+            "ESCAPE TRANSLATE('\\' USING NCHAR_CS)"
+        ),
         "gt": "> %s",
         "gte": ">= %s",
         "lt": "< %s",
         "lte": "<= %s",
-        "startswith": "LIKE TRANSLATE(%s USING NCHAR_CS) ESCAPE TRANSLATE('\\' USING NCHAR_CS)",
-        "endswith": "LIKE TRANSLATE(%s USING NCHAR_CS) ESCAPE TRANSLATE('\\' USING NCHAR_CS)",
-        "istartswith": "LIKE UPPER(TRANSLATE(%s USING NCHAR_CS)) ESCAPE TRANSLATE('\\' USING NCHAR_CS)",
-        "iendswith": "LIKE UPPER(TRANSLATE(%s USING NCHAR_CS)) ESCAPE TRANSLATE('\\' USING NCHAR_CS)",
+        "startswith": (
+            "LIKE TRANSLATE(%s USING NCHAR_CS) ESCAPE TRANSLATE('\\' USING NCHAR_CS)"
+        ),
+        "endswith": (
+            "LIKE TRANSLATE(%s USING NCHAR_CS) ESCAPE TRANSLATE('\\' USING NCHAR_CS)"
+        ),
+        "istartswith": (
+            "LIKE UPPER(TRANSLATE(%s USING NCHAR_CS)) "
+            "ESCAPE TRANSLATE('\\' USING NCHAR_CS)"
+        ),
+        "iendswith": (
+            "LIKE UPPER(TRANSLATE(%s USING NCHAR_CS)) "
+            "ESCAPE TRANSLATE('\\' USING NCHAR_CS)"
+        ),
     }
 
     _likec_operators = {

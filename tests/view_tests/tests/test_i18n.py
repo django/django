@@ -518,7 +518,8 @@ class I18nSeleniumTests(SeleniumTestCase):
         elem = self.selenium.find_element(By.ID, "formats")
         self.assertEqual(
             elem.text,
-            "DATE_INPUT_FORMATS is an object; DECIMAL_SEPARATOR is a string; FIRST_DAY_OF_WEEK is a number;",
+            "DATE_INPUT_FORMATS is an object; DECIMAL_SEPARATOR is a string; "
+            "FIRST_DAY_OF_WEEK is a number;",
         )
 
     @modify_settings(INSTALLED_APPS={"append": ["view_tests.app1", "view_tests.app2"]})

@@ -67,7 +67,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     django_test_skips = {
         "opclasses are PostgreSQL only.": {
-            "indexes.tests.SchemaIndexesNotPostgreSQLTests.test_create_index_ignores_opclasses",
+            "indexes.tests.SchemaIndexesNotPostgreSQLTests."
+            "test_create_index_ignores_opclasses",
         },
     }
 

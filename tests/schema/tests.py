@@ -1402,7 +1402,8 @@ class SchemaTests(TransactionTestCase):
             Book._meta.get_field("author").column,
             (Author._meta.db_table, Author._meta.pk.column),
         )
-        # The index on ForeignKey is replaced with a unique constraint for OneToOneField.
+        # The index on ForeignKey is replaced with a unique constraint for
+        # OneToOneField.
         self.assertEqual(counts, {"fks": expected_fks, "uniques": 1, "indexes": 0})
 
     def test_alter_field_fk_keeps_index(self):
@@ -1466,7 +1467,8 @@ class SchemaTests(TransactionTestCase):
             BookWithO2O._meta.get_field("author").column,
             (Author._meta.db_table, Author._meta.pk.column),
         )
-        # The unique constraint on OneToOneField is replaced with an index for ForeignKey.
+        # The unique constraint on OneToOneField is replaced with an index for
+        # ForeignKey.
         self.assertEqual(counts, {"fks": expected_fks, "uniques": 0, "indexes": 1})
 
     def test_alter_field_o2o_keeps_unique(self):

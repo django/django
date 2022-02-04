@@ -763,7 +763,8 @@ class SessionMiddlewareTests(TestCase):
 
         # The cookie was deleted, not recreated.
         # A deleted cookie header looks like:
-        #  Set-Cookie: sessionid=; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; Path=/
+        #  "Set-Cookie: sessionid=; expires=Thu, 01 Jan 1970 00:00:00 GMT; "
+        #  "Max-Age=0; Path=/"
         self.assertEqual(
             'Set-Cookie: {}=""; expires=Thu, 01 Jan 1970 00:00:00 GMT; '
             "Max-Age=0; Path=/; SameSite={}".format(

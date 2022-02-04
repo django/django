@@ -49,7 +49,8 @@ class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         f = EmailField(min_length=10, max_length=15)
         self.assertWidgetRendersTo(
             f,
-            '<input id="id_f" type="email" name="f" maxlength="15" minlength="10" required>',
+            '<input id="id_f" type="email" name="f" maxlength="15" minlength="10" '
+            "required>",
         )
         with self.assertRaisesMessage(
             ValidationError,

@@ -150,7 +150,7 @@ class CommandTests(SimpleTestCase):
             "Dave, my mind is going. I can feel it. I can feel it.\n", out.getvalue()
         )
 
-    def test_calling_a_command_with_no_app_labels_and_parameters_should_raise_a_command_error(
+    def test_calling_a_command_with_no_app_labels_and_parameters_raise_command_error(
         self,
     ):
         with self.assertRaises(CommandError):

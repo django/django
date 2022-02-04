@@ -907,7 +907,8 @@ class Queries1Tests(TestCase):
 
     def test_ticket10205(self):
         # When bailing out early because of an empty "__in" filter, we need
-        # to set things up correctly internally so that subqueries can continue properly.
+        # to set things up correctly internally so that subqueries can continue
+        # properly.
         self.assertEqual(Tag.objects.filter(name__in=()).update(name="foo"), 0)
 
     def test_ticket10432(self):
@@ -1475,7 +1476,10 @@ class Queries4Tests(TestCase):
 
     def test_ticket11811(self):
         unsaved_category = NamedCategory(name="Other")
-        msg = "Unsaved model instance <NamedCategory: Other> cannot be used in an ORM query."
+        msg = (
+            "Unsaved model instance <NamedCategory: Other> cannot be used in an ORM "
+            "query."
+        )
         with self.assertRaisesMessage(ValueError, msg):
             Tag.objects.filter(pk=self.t1.pk).update(category=unsaved_category)
 
@@ -2441,7 +2445,9 @@ class QuerySetBitwiseOperationTests(TestCase):
 
 class CloneTests(TestCase):
     def test_evaluated_queryset_as_argument(self):
-        "#13227 -- If a queryset is already evaluated, it can still be used as a query arg"
+        """
+        If a queryset is already evaluated, it can still be used as a query arg.
+        """
         n = Note(note="Test1", misc="misc")
         n.save()
         e = ExtraInfo(info="good", note=n)
@@ -4158,7 +4164,7 @@ class RelatedLookupTypeTests(TestCase):
 
     def test_values_queryset_lookup(self):
         """
-        #23396 - Ensure ValueQuerySets are not checked for compatibility with the lookup field
+        ValueQuerySets are not checked for compatibility with the lookup field.
         """
         # Make sure the num and objecta field values match.
         ob = ObjectB.objects.get(name="ob")

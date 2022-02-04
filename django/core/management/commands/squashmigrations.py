@@ -12,7 +12,10 @@ from django.utils.version import get_docs_version
 
 
 class Command(BaseCommand):
-    help = "Squashes an existing set of migrations (from first until specified) into a single new one."
+    help = (
+        "Squashes an existing set of migrations (from first until specified) into a "
+        "single new one."
+    )
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -22,7 +25,10 @@ class Command(BaseCommand):
         parser.add_argument(
             "start_migration_name",
             nargs="?",
-            help="Migrations will be squashed starting from and including this migration.",
+            help=(
+                "Migrations will be squashed starting from and including this "
+                "migration."
+            ),
         )
         parser.add_argument(
             "migration_name",
@@ -66,7 +72,8 @@ class Command(BaseCommand):
             apps.get_app_config(app_label)
         except LookupError as err:
             raise CommandError(str(err))
-        # Load the current graph state, check the app and migration they asked for exists
+        # Load the current graph state, check the app and migration they asked
+        # for exists.
         loader = MigrationLoader(connections[DEFAULT_DB_ALIAS])
         if app_label not in loader.migrated_apps:
             raise CommandError(
@@ -135,10 +142,9 @@ class Command(BaseCommand):
         for smigration in migrations_to_squash:
             if smigration.replaces:
                 raise CommandError(
-                    "You cannot squash squashed migrations! Please transition "
-                    "it to a normal migration first: "
-                    "https://docs.djangoproject.com/en/%s/topics/migrations/#squashing-migrations"
-                    % get_docs_version()
+                    "You cannot squash squashed migrations! Please transition it to a "
+                    "normal migration first: https://docs.djangoproject.com/en/%s/"
+                    "topics/migrations/#squashing-migrations" % get_docs_version()
                 )
             operations.extend(smigration.operations)
             for dependency in smigration.dependencies:
@@ -223,15 +229,18 @@ class Command(BaseCommand):
                 + "\n"
                 "  You should commit this migration but leave the old ones in place;\n"
                 "  the new migration will be used for new installs. Once you are sure\n"
-                "  all instances of the codebase have applied the migrations you squashed,\n"
+                "  all instances of the codebase have applied the migrations you "
+                "squashed,\n"
                 "  you can delete them."
             )
             if writer.needs_manual_porting:
                 self.stdout.write(
                     self.style.MIGRATE_HEADING("Manual porting required") + "\n"
-                    "  Your migrations contained functions that must be manually copied over,\n"
+                    "  Your migrations contained functions that must be manually "
+                    "copied over,\n"
                     "  as we could not safely copy their implementation.\n"
-                    "  See the comment at the top of the squashed migration for details."
+                    "  See the comment at the top of the squashed migration for "
+                    "details."
                 )
 
     def find_migration(self, loader, app_label, name):

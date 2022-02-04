@@ -447,9 +447,9 @@ class BaseModelAdminChecks:
                 ):
                     return [
                         checks.Error(
-                            "The value of '%s' cannot include the ManyToManyField '%s', "
-                            "because that field manually specifies a relationship model."
-                            % (label, field_name),
+                            "The value of '%s' cannot include the ManyToManyField "
+                            "'%s', because that field manually specifies a "
+                            "relationship model." % (label, field_name),
                             obj=obj.__class__,
                             id="admin.E013",
                         )
@@ -568,8 +568,8 @@ class BaseModelAdminChecks:
                 return [
                     checks.Error(
                         "The value of '%s' refers to '%s', which is not an "
-                        "instance of ForeignKey, and does not have a 'choices' definition."
-                        % (label, field_name),
+                        "instance of ForeignKey, and does not have a 'choices' "
+                        "definition." % (label, field_name),
                         obj=obj.__class__,
                         id="admin.E023",
                     )
@@ -585,8 +585,8 @@ class BaseModelAdminChecks:
         if val not in (HORIZONTAL, VERTICAL):
             return [
                 checks.Error(
-                    "The value of '%s' must be either admin.HORIZONTAL or admin.VERTICAL."
-                    % label,
+                    "The value of '%s' must be either admin.HORIZONTAL or "
+                    "admin.VERTICAL." % label,
                     obj=obj.__class__,
                     id="admin.E024",
                 )
@@ -598,7 +598,8 @@ class BaseModelAdminChecks:
         if not callable(obj.view_on_site) and not isinstance(obj.view_on_site, bool):
             return [
                 checks.Error(
-                    "The value of 'view_on_site' must be a callable or a boolean value.",
+                    "The value of 'view_on_site' must be a callable or a boolean "
+                    "value.",
                     obj=obj.__class__,
                     id="admin.E025",
                 )
@@ -643,9 +644,9 @@ class BaseModelAdminChecks:
             ):
                 return [
                     checks.Error(
-                        "The value of '%s' refers to '%s', which must not be a DateTimeField, "
-                        "a ForeignKey, a OneToOneField, or a ManyToManyField."
-                        % (label, field_name),
+                        "The value of '%s' refers to '%s', which must not be a "
+                        "DateTimeField, a ForeignKey, a OneToOneField, or a "
+                        "ManyToManyField." % (label, field_name),
                         obj=obj.__class__,
                         id="admin.E028",
                     )
@@ -955,8 +956,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
         if field_name not in obj.list_display:
             return [
                 checks.Error(
-                    "The value of '%s' refers to '%s', which is not defined in 'list_display'."
-                    % (label, field_name),
+                    "The value of '%s' refers to '%s', which is not defined in "
+                    "'list_display'." % (label, field_name),
                     obj=obj.__class__,
                     id="admin.E111",
                 )
@@ -1027,8 +1028,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
             except (NotRelationField, FieldDoesNotExist):
                 return [
                     checks.Error(
-                        "The value of '%s' refers to '%s', which does not refer to a Field."
-                        % (label, field),
+                        "The value of '%s' refers to '%s', which does not refer to a "
+                        "Field." % (label, field),
                         obj=obj.__class__,
                         id="admin.E116",
                     )
@@ -1107,8 +1108,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
             elif obj.list_display_links and field_name in obj.list_display_links:
                 return [
                     checks.Error(
-                        "The value of '%s' cannot be in both 'list_editable' and 'list_display_links'."
-                        % field_name,
+                        "The value of '%s' cannot be in both 'list_editable' and "
+                        "'list_display_links'." % field_name,
                         obj=obj.__class__,
                         id="admin.E123",
                     )
@@ -1122,9 +1123,9 @@ class ModelAdminChecks(BaseModelAdminChecks):
             ):
                 return [
                     checks.Error(
-                        "The value of '%s' refers to the first field in 'list_display' ('%s'), "
-                        "which cannot be used unless 'list_display_links' is set."
-                        % (label, obj.list_display[0]),
+                        "The value of '%s' refers to the first field in 'list_display' "
+                        "('%s'), which cannot be used unless 'list_display_links' is "
+                        "set." % (label, obj.list_display[0]),
                         obj=obj.__class__,
                         id="admin.E124",
                     )
@@ -1132,8 +1133,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
             elif not field.editable:
                 return [
                     checks.Error(
-                        "The value of '%s' refers to '%s', which is not editable through the admin."
-                        % (label, field_name),
+                        "The value of '%s' refers to '%s', which is not editable "
+                        "through the admin." % (label, field_name),
                         obj=obj.__class__,
                         id="admin.E125",
                     )

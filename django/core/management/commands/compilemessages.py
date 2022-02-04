@@ -173,8 +173,8 @@ class Command(BaseCommand):
                 # Check writability on first location
                 if i == 0 and not is_writable(mo_path):
                     self.stderr.write(
-                        "The po files under %s are in a seemingly not writable location. "
-                        "mo files will not be updated/created." % dirpath
+                        "The po files under %s are in a seemingly not writable "
+                        "location. mo files will not be updated/created." % dirpath
                     )
                     self.has_errors = True
                     return

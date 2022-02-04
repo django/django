@@ -349,9 +349,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     )
                     for bad_row in cursor.fetchall():
                         raise IntegrityError(
-                            "The row in table '%s' with primary key '%s' has an invalid "
-                            "foreign key: %s.%s contains a value '%s' that does not "
-                            "have a corresponding value in %s.%s."
+                            "The row in table '%s' with primary key '%s' has an "
+                            "invalid foreign key: %s.%s contains a value '%s' that "
+                            "does not have a corresponding value in %s.%s."
                             % (
                                 table_name,
                                 bad_row[0],

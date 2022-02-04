@@ -317,9 +317,11 @@ class Distance(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
                 )
 
         if not geography and self.geo_field.geodetic(connection):
-            # Geometry fields with geodetic (lon/lat) coordinates need special distance functions
+            # Geometry fields with geodetic (lon/lat) coordinates need special
+            # distance functions.
             if self.spheroid:
-                # DistanceSpheroid is more accurate and resource intensive than DistanceSphere
+                # DistanceSpheroid is more accurate and resource intensive than
+                # DistanceSphere.
                 function = connection.ops.spatial_function_name("DistanceSpheroid")
                 # Replace boolean param by the real spheroid of the base field
                 clone.source_expressions.append(

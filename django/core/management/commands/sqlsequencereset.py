@@ -14,7 +14,10 @@ class Command(AppCommand):
         parser.add_argument(
             "--database",
             default=DEFAULT_DB_ALIAS,
-            help='Nominates a database to print the SQL for. Defaults to the "default" database.',
+            help=(
+                'Nominates a database to print the SQL for. Defaults to the "default" '
+                "database."
+            ),
         )
 
     def handle_app_config(self, app_config, **options):

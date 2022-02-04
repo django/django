@@ -319,7 +319,10 @@ class BasicExpressionsTests(TestCase):
 
     def test_object_create_with_aggregate(self):
         # Aggregates are not allowed when inserting new data
-        msg = "Aggregate functions are not allowed in this query (num_employees=Max(Value(1)))."
+        msg = (
+            "Aggregate functions are not allowed in this query "
+            "(num_employees=Max(Value(1)))."
+        )
         with self.assertRaisesMessage(FieldError, msg):
             Company.objects.create(
                 name="Company",
@@ -1059,9 +1062,10 @@ class IterableLookupInnerExpressionsTests(TestCase):
 
     @unittest.skipUnless(
         connection.vendor == "sqlite",
-        "This defensive test only works on databases that don't validate parameter types",
+        "This defensive test only works on databases that don't validate parameter "
+        "types",
     )
-    def test_complex_expressions_do_not_introduce_sql_injection_via_untrusted_string_inclusion(
+    def test_expressions_not_introduce_sql_injection_via_untrusted_string_inclusion(
         self,
     ):
         """

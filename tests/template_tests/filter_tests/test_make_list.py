@@ -23,7 +23,10 @@ class MakeListTests(SimpleTestCase):
 
     @setup(
         {
-            "make_list03": '{% autoescape off %}{{ a|make_list|stringformat:"s"|safe }}{% endautoescape %}'
+            "make_list03": (
+                '{% autoescape off %}{{ a|make_list|stringformat:"s"|safe }}'
+                "{% endautoescape %}"
+            )
         }
     )
     def test_make_list03(self):

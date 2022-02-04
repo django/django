@@ -202,7 +202,8 @@ class ChangepasswordManagementCommandTestCase(TestCase):
 
         self.assertEqual(
             command_output,
-            "Changing password for user 'joe'\nPassword changed successfully for user 'joe'",
+            "Changing password for user 'joe'\n"
+            "Password changed successfully for user 'joe'",
         )
         self.assertTrue(User.objects.get(username="joe").check_password("not qwerty"))
 
@@ -267,7 +268,8 @@ class MultiDBChangepasswordManagementCommandTestCase(TestCase):
 
         self.assertEqual(
             command_output,
-            "Changing password for user 'joe'\nPassword changed successfully for user 'joe'",
+            "Changing password for user 'joe'\n"
+            "Password changed successfully for user 'joe'",
         )
         self.assertTrue(
             User.objects.using("other").get(username="joe").check_password("not qwerty")
@@ -785,7 +787,10 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
     @override_settings(
         AUTH_PASSWORD_VALIDATORS=[
             {
-                "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+                "NAME": (
+                    "django.contrib.auth.password_validation."
+                    "UserAttributeSimilarityValidator"
+                )
             },
         ]
     )
@@ -830,7 +835,10 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         AUTH_USER_MODEL="auth_tests.CustomUser",
         AUTH_PASSWORD_VALIDATORS=[
             {
-                "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+                "NAME": (
+                    "django.contrib.auth.password_validation."
+                    "UserAttributeSimilarityValidator"
+                )
             },
         ],
     )
@@ -877,7 +885,10 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         AUTH_USER_MODEL="auth_tests.CustomUser",
         AUTH_PASSWORD_VALIDATORS=[
             {
-                "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+                "NAME": (
+                    "django.contrib.auth.password_validation."
+                    "UserAttributeSimilarityValidator"
+                )
             },
         ],
     )
@@ -1094,7 +1105,10 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
                 stdout=new_io,
                 stderr=new_io,
             )
-            msg = "Error: That username is already taken.\nSuperuser created successfully."
+            msg = (
+                "Error: That username is already taken.\n"
+                "Superuser created successfully."
+            )
             self.assertEqual(new_io.getvalue().strip(), msg)
 
         test(self)

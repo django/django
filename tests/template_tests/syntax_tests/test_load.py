@@ -12,7 +12,9 @@ class LoadTagTests(SimpleTestCase):
 
     @setup(
         {
-            "load01": '{% load testtags subpackage.echo %}{% echo test %} {% echo2 "test" %}'
+            "load01": (
+                '{% load testtags subpackage.echo %}{% echo test %} {% echo2 "test" %}'
+            )
         }
     )
     def test_load01(self):
@@ -64,24 +66,36 @@ class LoadTagTests(SimpleTestCase):
 
     @setup({"load08": "{% load echo other_echo bad_tag from %}"})
     def test_load08(self):
-        msg = "'echo' is not a registered tag library. Must be one of:\nsubpackage.echo\ntesttags"
+        msg = (
+            "'echo' is not a registered tag library. Must be one of:\n"
+            "subpackage.echo\ntesttags"
+        )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.get_template("load08")
 
     @setup({"load09": "{% load from testtags %}"})
     def test_load09(self):
-        msg = "'from' is not a registered tag library. Must be one of:\nsubpackage.echo\ntesttags"
+        msg = (
+            "'from' is not a registered tag library. Must be one of:\n"
+            "subpackage.echo\ntesttags"
+        )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.get_template("load09")
 
     @setup({"load10": "{% load echo from bad_library %}"})
     def test_load10(self):
-        msg = "'bad_library' is not a registered tag library. Must be one of:\nsubpackage.echo\ntesttags"
+        msg = (
+            "'bad_library' is not a registered tag library. Must be one of:\n"
+            "subpackage.echo\ntesttags"
+        )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.get_template("load10")
 
     @setup({"load12": "{% load subpackage.missing %}"})
     def test_load12(self):
-        msg = "'subpackage.missing' is not a registered tag library. Must be one of:\nsubpackage.echo\ntesttags"
+        msg = (
+            "'subpackage.missing' is not a registered tag library. Must be one of:\n"
+            "subpackage.echo\ntesttags"
+        )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.get_template("load12")

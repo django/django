@@ -48,7 +48,9 @@ class NamedEndblockTests(SimpleTestCase):
 
     @setup(
         {
-            "namedendblocks05": "1{% block first %}_{% block second %}2{% endblock first %}"
+            "namedendblocks05": (
+                "1{% block first %}_{% block second %}2{% endblock first %}"
+            )
         }
     )
     def test_namedendblocks05(self):

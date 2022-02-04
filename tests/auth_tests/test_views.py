@@ -172,7 +172,10 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertIn("<html>", message.get_payload(1).get_payload())
 
     def test_email_found_custom_from(self):
-        "Email is sent if a valid email address is provided for password reset when a custom from_email is provided."
+        """
+        Email is sent if a valid email address is provided for password reset
+        when a custom from_email is provided.
+        """
         response = self.client.post(
             "/password_reset_from_email/", {"email": "staffmember@example.com"}
         )

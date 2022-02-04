@@ -190,19 +190,22 @@ class BaseDatabaseWrapper:
     def get_connection_params(self):
         """Return a dict of parameters suitable for get_new_connection."""
         raise NotImplementedError(
-            "subclasses of BaseDatabaseWrapper may require a get_connection_params() method"
+            "subclasses of BaseDatabaseWrapper may require a get_connection_params() "
+            "method"
         )
 
     def get_new_connection(self, conn_params):
         """Open a connection to the database."""
         raise NotImplementedError(
-            "subclasses of BaseDatabaseWrapper may require a get_new_connection() method"
+            "subclasses of BaseDatabaseWrapper may require a get_new_connection() "
+            "method"
         )
 
     def init_connection_state(self):
         """Initialize the database connection settings."""
         raise NotImplementedError(
-            "subclasses of BaseDatabaseWrapper may require an init_connection_state() method"
+            "subclasses of BaseDatabaseWrapper may require an init_connection_state() "
+            "method"
         )
 
     def create_cursor(self, name=None):

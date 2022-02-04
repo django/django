@@ -147,7 +147,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 is_autofield,
                 is_json,
             )
-            for column, default, collation, internal_size, is_autofield, is_json in cursor.fetchall()
+            for (
+                column,
+                default,
+                collation,
+                internal_size,
+                is_autofield,
+                is_json,
+            ) in cursor.fetchall()
         }
         self.cache_bust_counter += 1
         cursor.execute(
@@ -271,7 +278,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             """
             SELECT
                 user_constraints.constraint_name,
-                LISTAGG(LOWER(cols.column_name), ',') WITHIN GROUP (ORDER BY cols.position),
+                LISTAGG(LOWER(cols.column_name), ',')
+                    WITHIN GROUP (ORDER BY cols.position),
                 CASE user_constraints.constraint_type
                     WHEN 'P' THEN 1
                     ELSE 0
@@ -287,7 +295,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             FROM
                 user_constraints
             LEFT OUTER JOIN
-                user_cons_columns cols ON user_constraints.constraint_name = cols.constraint_name
+                user_cons_columns cols
+                ON user_constraints.constraint_name = cols.constraint_name
             WHERE
                 user_constraints.constraint_type = ANY('P', 'U', 'C')
                 AND user_constraints.table_name = UPPER(%s)
@@ -310,15 +319,18 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             """
             SELECT
                 cons.constraint_name,
-                LISTAGG(LOWER(cols.column_name), ',') WITHIN GROUP (ORDER BY cols.position),
+                LISTAGG(LOWER(cols.column_name), ',')
+                    WITHIN GROUP (ORDER BY cols.position),
                 LOWER(rcols.table_name),
                 LOWER(rcols.column_name)
             FROM
                 user_constraints cons
             INNER JOIN
-                user_cons_columns rcols ON rcols.constraint_name = cons.r_constraint_name AND rcols.position = 1
+                user_cons_columns rcols
+                ON rcols.constraint_name = cons.r_constraint_name AND rcols.position = 1
             LEFT OUTER JOIN
-                user_cons_columns cols ON cons.constraint_name = cols.constraint_name
+                user_cons_columns cols
+                ON cons.constraint_name = cols.constraint_name
             WHERE
                 cons.constraint_type = 'R' AND
                 cons.table_name = UPPER(%s)
@@ -343,7 +355,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 ind.index_name,
                 LOWER(ind.index_type),
                 LOWER(ind.uniqueness),
-                LISTAGG(LOWER(cols.column_name), ',') WITHIN GROUP (ORDER BY cols.column_position),
+                LISTAGG(LOWER(cols.column_name), ',')
+                    WITHIN GROUP (ORDER BY cols.column_position),
                 LISTAGG(cols.descend, ',') WITHIN GROUP (ORDER BY cols.column_position)
             FROM
                 user_ind_columns cols, user_indexes ind

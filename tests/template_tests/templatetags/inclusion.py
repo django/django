@@ -75,7 +75,9 @@ inclusion_explicit_no_context_from_template.anything = (
 def inclusion_no_params_with_context(context):
     """Expected inclusion_no_params_with_context __doc__"""
     return {
-        "result": "inclusion_no_params_with_context - Expected result (context value: %s)"
+        "result": (
+            "inclusion_no_params_with_context - Expected result (context value: %s)"
+        )
         % context["value"]
     }
 
@@ -90,9 +92,10 @@ def inclusion_no_params_with_context_from_template(context):
     """Expected inclusion_no_params_with_context_from_template __doc__"""
     return {
         "result": (
-            "inclusion_no_params_with_context_from_template - Expected result (context value: %s)"
-            % context["value"]
+            "inclusion_no_params_with_context_from_template - Expected result (context "
+            "value: %s)"
         )
+        % context["value"]
     }
 
 
@@ -105,7 +108,9 @@ inclusion_no_params_with_context_from_template.anything = (
 def inclusion_params_and_context(context, arg):
     """Expected inclusion_params_and_context __doc__"""
     return {
-        "result": "inclusion_params_and_context - Expected result (context value: %s): %s"
+        "result": (
+            "inclusion_params_and_context - Expected result (context value: %s): %s"
+        )
         % (context["value"], arg)
     }
 

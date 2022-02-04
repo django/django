@@ -229,7 +229,8 @@ def do_get_available_languages(parser, token):
 
     This puts settings.LANGUAGES into the named variable.
     """
-    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
+    # token.split_contents() isn't useful here because this tag doesn't accept
+    # variable as arguments.
     args = token.contents.split()
     if len(args) != 3 or args[1] != "as":
         raise TemplateSyntaxError(
@@ -321,7 +322,8 @@ def do_get_current_language(parser, token):
     This fetches the currently active language and puts its value into the
     ``language`` context variable.
     """
-    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
+    # token.split_contents() isn't useful here because this tag doesn't accept
+    # variable as arguments.
     args = token.contents.split()
     if len(args) != 3 or args[1] != "as":
         raise TemplateSyntaxError(
@@ -343,7 +345,8 @@ def do_get_current_language_bidi(parser, token):
     the ``bidi`` context variable. True indicates right-to-left layout,
     otherwise left-to-right.
     """
-    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
+    # token.split_contents() isn't useful here because this tag doesn't accept
+    # variable as arguments.
     args = token.contents.split()
     if len(args) != 3 or args[1] != "as":
         raise TemplateSyntaxError(
@@ -424,8 +427,8 @@ def do_translate(parser, token):
                 )
             if value in invalid_context:
                 raise TemplateSyntaxError(
-                    "Invalid argument '%s' provided to the '%s' tag for the context option"
-                    % (value, bits[0]),
+                    "Invalid argument '%s' provided to the '%s' tag for the context "
+                    "option" % (value, bits[0]),
                 )
             message_context = parser.compile_filter(value)
         elif option == "as":

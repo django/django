@@ -1310,7 +1310,8 @@ class NonQueryWindowTests(SimpleTestCase):
         )
         self.assertEqual(
             repr(Window(expression=Avg("salary"), order_by=F("department").asc())),
-            "<Window: Avg(F(salary)) OVER (OrderByList(OrderBy(F(department), descending=False)))>",
+            "<Window: Avg(F(salary)) OVER (OrderByList(OrderBy(F(department), "
+            "descending=False)))>",
         )
 
     def test_window_frame_repr(self):

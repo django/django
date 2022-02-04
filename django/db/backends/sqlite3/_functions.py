@@ -209,9 +209,15 @@ def _sqlite_datetime_trunc(lookup_type, dt, tzname, conn_tzname):
     elif lookup_type == "hour":
         return f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d} {dt.hour:02d}:00:00"
     elif lookup_type == "minute":
-        return f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d} {dt.hour:02d}:{dt.minute:02d}:00"
+        return (
+            f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d} "
+            f"{dt.hour:02d}:{dt.minute:02d}:00"
+        )
     elif lookup_type == "second":
-        return f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d} {dt.hour:02d}:{dt.minute:02d}:{dt.second:02d}"
+        return (
+            f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d} "
+            f"{dt.hour:02d}:{dt.minute:02d}:{dt.second:02d}"
+        )
     raise ValueError(f"Unsupported lookup type: {lookup_type!r}")
 
 

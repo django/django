@@ -468,12 +468,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             old_field.remote_field.through._meta.db_table
             == new_field.remote_field.through._meta.db_table
         ):
-            # The field name didn't change, but some options did; we have to propagate this altering.
+            # The field name didn't change, but some options did, so we have to
+            # propagate this altering.
             self._remake_table(
                 old_field.remote_field.through,
                 alter_field=(
-                    # We need the field that points to the target model, so we can tell alter_field to change it -
-                    # this is m2m_reverse_field_name() (as opposed to m2m_field_name, which points to our model)
+                    # The field that points to the target model is needed, so
+                    # we can tell alter_field to change it - this is
+                    # m2m_reverse_field_name() (as opposed to m2m_field_name(),
+                    # which points to our model).
                     old_field.remote_field.through._meta.get_field(
                         old_field.m2m_reverse_field_name()
                     ),

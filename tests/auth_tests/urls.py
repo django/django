@@ -148,7 +148,9 @@ urlpatterns = auth_urlpatterns + [
         "reset/post_reset_login_custom_backend/<uidb64>/<token>/",
         views.PasswordResetConfirmView.as_view(
             post_reset_login=True,
-            post_reset_login_backend="django.contrib.auth.backends.AllowAllUsersModelBackend",
+            post_reset_login_backend=(
+                "django.contrib.auth.backends.AllowAllUsersModelBackend"
+            ),
         ),
     ),
     path("reset/missing_parameters/", views.PasswordResetConfirmView.as_view()),

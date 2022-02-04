@@ -28,7 +28,7 @@
   >>> print(mpnt.proj)
   +proj=longlat +ellps=clrk66 +datum=NAD27 +no_defs
   >>> print(mpnt)
-  MULTIPOINT (-89.999930378602485 29.999797886557641,-89.999930378602485 29.999797886557641)
+  MULTIPOINT (-89.99993037860248 29.99979788655764,-89.99993037860248 29.99979788655764)
 
   The OGRGeomType class is to make it easy to specify an OGR geometry type:
   >>> from django.contrib.gis.gdal import OGRGeomType

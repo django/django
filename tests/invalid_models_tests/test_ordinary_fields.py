@@ -750,7 +750,8 @@ class FilePathFieldTests(SimpleTestCase):
             field.check(),
             [
                 Error(
-                    "FilePathFields must have either 'allow_files' or 'allow_folders' set to True.",
+                    "FilePathFields must have either 'allow_files' or 'allow_folders' "
+                    "set to True.",
                     obj=field,
                     id="fields.E140",
                 ),

@@ -213,7 +213,8 @@ def do_block(parser, token):
     """
     Define a block that can be overridden by child templates.
     """
-    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
+    # token.split_contents() isn't useful here because this tag doesn't accept
+    # variable as arguments.
     bits = token.contents.split()
     if len(bits) != 2:
         raise TemplateSyntaxError("'%s' tag takes only one argument" % bits[0])

@@ -60,8 +60,8 @@ def check_csrf_failure_view(app_configs, **kwargs):
             inspect.signature(view).bind(None, reason=None)
         except TypeError:
             msg = (
-                "The CSRF failure view '%s' does not take the correct number of arguments."
-                % settings.CSRF_FAILURE_VIEW
+                "The CSRF failure view '%s' does not take the correct number of "
+                "arguments." % settings.CSRF_FAILURE_VIEW
             )
             errors.append(Error(msg, id="security.E101"))
     return errors

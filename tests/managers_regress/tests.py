@@ -152,7 +152,8 @@ class ManagersRegressionTests(TestCase):
         relation.m2m.add(related)
 
         t = Template(
-            "{{ related.test_fk.all.0 }}{{ related.test_gfk.all.0 }}{{ related.test_m2m.all.0 }}"
+            "{{ related.test_fk.all.0 }}{{ related.test_gfk.all.0 }}"
+            "{{ related.test_m2m.all.0 }}"
         )
 
         self.assertEqual(

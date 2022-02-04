@@ -34,10 +34,13 @@ CONTEXT_SEPARATOR = "\x04"
 # and RFC 3066, section 2.1
 accept_language_re = _lazy_re_compile(
     r"""
-        ([A-Za-z]{1,8}(?:-[A-Za-z0-9]{1,8})*|\*)         # "en", "en-au", "x-y-z", "es-419", "*"
-        (?:\s*;\s*q=(0(?:\.[0-9]{,3})?|1(?:\.0{,3})?))?  # Optional "q=1.00", "q=0.8"
-        (?:\s*,\s*|$)                                    # Multiple accepts per header.
-        """,
+        # "en", "en-au", "x-y-z", "es-419", "*"
+        ([A-Za-z]{1,8}(?:-[A-Za-z0-9]{1,8})*|\*)
+        # Optional "q=1.00", "q=0.8"
+        (?:\s*;\s*q=(0(?:\.[0-9]{,3})?|1(?:\.0{,3})?))?
+        # Multiple accepts per header.
+        (?:\s*,\s*|$)
+    """,
     re.VERBOSE,
 )
 

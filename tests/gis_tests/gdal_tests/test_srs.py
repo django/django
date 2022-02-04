@@ -45,7 +45,8 @@ srlist = (
         ),
     ),
     TestSRS(
-        'PROJCS["NAD83 / Texas South Central",GEOGCS["NAD83",DATUM["North_American_Datum_1983",'
+        'PROJCS["NAD83 / Texas South Central",'
+        'GEOGCS["NAD83",DATUM["North_American_Datum_1983",'
         'SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],'
         'AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],'
         'UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],'
@@ -78,13 +79,18 @@ srlist = (
     TestSRS(
         'PROJCS["NAD83 / Texas South Central (ftUS)",'
         'GEOGCS["NAD83",DATUM["North_American_Datum_1983",'
-        'SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","6269"]],'
+        'SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],'
+        'AUTHORITY["EPSG","6269"]],'
         'PRIMEM["Greenwich",0],'
         'UNIT["Degree",0.0174532925199433]],PROJECTION["Lambert_Conformal_Conic_2SP"],'
-        'PARAMETER["false_easting",1968500],PARAMETER["false_northing",13123333.3333333],'
-        'PARAMETER["central_meridian",-99],PARAMETER["standard_parallel_1",28.3833333333333],'
-        'PARAMETER["standard_parallel_2",30.2833333333333],PARAMETER["latitude_of_origin",27.8333333333333],'
-        'UNIT["US survey foot",0.304800609601219],AXIS["Easting",EAST],AXIS["Northing",NORTH]]',
+        'PARAMETER["false_easting",1968500],'
+        'PARAMETER["false_northing",13123333.3333333],'
+        'PARAMETER["central_meridian",-99],'
+        'PARAMETER["standard_parallel_1",28.3833333333333],'
+        'PARAMETER["standard_parallel_2",30.2833333333333],'
+        'PARAMETER["latitude_of_origin",27.8333333333333],'
+        'UNIT["US survey foot",0.304800609601219],AXIS["Easting",EAST],'
+        'AXIS["Northing",NORTH]]',
         epsg=None,
         projected=True,
         geographic=False,
@@ -122,7 +128,8 @@ well_known = (
     TestSRS(
         'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,'
         'AUTHORITY["EPSG","7030"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY["EPSG","6326"]],'
-        'PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,'
+        'PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],'
+        'UNIT["degree",0.01745329251994328,'
         'AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]',
         wk="WGS84",
         name="WGS 84",
@@ -324,13 +331,16 @@ class SpatialRefTest(SimpleTestCase):
         wkt = (
             'PROJCS["DHDN / Soldner 39 Langschoß",'
             'GEOGCS["DHDN",DATUM["Deutsches_Hauptdreiecksnetz",'
-            'SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],AUTHORITY["EPSG","6314"]],'
+            'SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],'
+            'AUTHORITY["EPSG","6314"]],'
             'PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],'
             'UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],'
             'AUTHORITY["EPSG","4314"]],PROJECTION["Cassini_Soldner"],'
-            'PARAMETER["latitude_of_origin",50.66738711],PARAMETER["central_meridian",6.28935703],'
+            'PARAMETER["latitude_of_origin",50.66738711],'
+            'PARAMETER["central_meridian",6.28935703],'
             'PARAMETER["false_easting",0],PARAMETER["false_northing",0],'
-            'UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",NORTH],AXIS["Y",EAST],AUTHORITY["mj10777.de","187939"]]'
+            'UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",NORTH],AXIS["Y",EAST],'
+            'AUTHORITY["mj10777.de","187939"]]'
         )
         srs = SpatialReference(wkt)
         srs_list = [srs, srs.clone()]

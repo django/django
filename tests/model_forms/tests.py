@@ -251,7 +251,8 @@ class ModelFormBaseTest(TestCase):
 
     def test_empty_fields_to_construct_instance(self):
         """
-        No fields should be set on a model instance if construct_instance receives fields=().
+        No fields should be set on a model instance if construct_instance
+        receives fields=().
         """
         form = modelform_factory(Person, fields="__all__")({"name": "John Doe"})
         self.assertTrue(form.is_valid())
@@ -498,8 +499,11 @@ class ModelFormBaseTest(TestCase):
                     fields = ["nonexistent"]
 
     def test_limit_fields_with_string(self):
-        expected_msg = "CategoryForm.Meta.fields cannot be a string. Did you mean to type: ('url',)?"
-        with self.assertRaisesMessage(TypeError, expected_msg):
+        msg = (
+            "CategoryForm.Meta.fields cannot be a string. Did you mean to type: "
+            "('url',)?"
+        )
+        with self.assertRaisesMessage(TypeError, msg):
 
             class CategoryForm(forms.ModelForm):
                 class Meta:
@@ -523,8 +527,11 @@ class ModelFormBaseTest(TestCase):
         self.assertEqual(list(ExcludeFields.base_fields), ["name", "slug", "url"])
 
     def test_exclude_fields_with_string(self):
-        expected_msg = "CategoryForm.Meta.exclude cannot be a string. Did you mean to type: ('url',)?"
-        with self.assertRaisesMessage(TypeError, expected_msg):
+        msg = (
+            "CategoryForm.Meta.exclude cannot be a string. Did you mean to type: "
+            "('url',)?"
+        )
+        with self.assertRaisesMessage(TypeError, msg):
 
             class CategoryForm(forms.ModelForm):
                 class Meta:
@@ -923,11 +930,13 @@ class TestFieldOverridesByFormMeta(SimpleTestCase):
         form = FieldOverridesByFormMetaForm()
         self.assertHTMLEqual(
             str(form["name"]),
-            '<textarea id="id_name" rows="10" cols="40" name="name" maxlength="20" required></textarea>',
+            '<textarea id="id_name" rows="10" cols="40" name="name" maxlength="20" '
+            "required></textarea>",
         )
         self.assertHTMLEqual(
             str(form["url"]),
-            '<input id="id_url" type="text" class="url" name="url" maxlength="40" required>',
+            '<input id="id_url" type="text" class="url" name="url" maxlength="40" '
+            "required>",
         )
         self.assertHTMLEqual(
             str(form["slug"]),
@@ -1392,7 +1401,9 @@ class UniqueTest(TestCase):
             class Meta(PriceForm.Meta):
                 error_messages = {
                     NON_FIELD_ERRORS: {
-                        "unique_together": "%(model_name)s's %(field_labels)s not unique.",
+                        "unique_together": (
+                            "%(model_name)s's %(field_labels)s not unique."
+                        ),
                     }
                 }
 
@@ -1458,9 +1469,14 @@ class ModelFormBasicTests(TestCase):
         )
         self.assertHTMLEqual(
             str(f.as_ul()),
-            """<li><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" maxlength="20" required></li>
-<li><label for="id_slug">Slug:</label> <input id="id_slug" type="text" name="slug" maxlength="20" required></li>
-<li><label for="id_url">The URL:</label> <input id="id_url" type="text" name="url" maxlength="40" required></li>""",
+            """
+            <li><label for="id_name">Name:</label>
+            <input id="id_name" type="text" name="name" maxlength="20" required></li>
+            <li><label for="id_slug">Slug:</label>
+            <input id="id_slug" type="text" name="slug" maxlength="20" required></li>
+            <li><label for="id_url">The URL:</label>
+            <input id="id_url" type="text" name="url" maxlength="40" required></li>
+            """,
         )
         self.assertHTMLEqual(
             str(f["name"]),
@@ -1488,26 +1504,32 @@ class ModelFormBasicTests(TestCase):
         )
         self.assertHTMLEqual(
             f.as_ul(),
-            """<li>Headline: <input type="text" name="headline" value="Your headline here" maxlength="50" required></li>
-<li>Slug: <input type="text" name="slug" maxlength="50" required></li>
-<li>Pub date: <input type="text" name="pub_date" required></li>
-<li>Writer: <select name="writer" required>
-<option value="" selected>---------</option>
-<option value="%s">Bob Woodward</option>
-<option value="%s">Mike Royko</option>
-</select></li>
-<li>Article: <textarea rows="10" cols="40" name="article" required></textarea></li>
-<li>Categories: <select multiple name="categories">
-<option value="%s" selected>Entertainment</option>
-<option value="%s" selected>It&#x27;s a test</option>
-<option value="%s">Third test</option>
-</select></li>
-<li>Status: <select name="status">
-<option value="" selected>---------</option>
-<option value="1">Draft</option>
-<option value="2">Pending</option>
-<option value="3">Live</option>
-</select></li>"""
+            """
+            <li>Headline:
+            <input type="text" name="headline" value="Your headline here" maxlength="50"
+                required>
+            </li>
+            <li>Slug: <input type="text" name="slug" maxlength="50" required></li>
+            <li>Pub date: <input type="text" name="pub_date" required></li>
+            <li>Writer: <select name="writer" required>
+            <option value="" selected>---------</option>
+            <option value="%s">Bob Woodward</option>
+            <option value="%s">Mike Royko</option>
+            </select></li>
+            <li>Article:
+            <textarea rows="10" cols="40" name="article" required></textarea></li>
+            <li>Categories: <select multiple name="categories">
+            <option value="%s" selected>Entertainment</option>
+            <option value="%s" selected>It&#x27;s a test</option>
+            <option value="%s">Third test</option>
+            </select></li>
+            <li>Status: <select name="status">
+            <option value="" selected>---------</option>
+            <option value="1">Draft</option>
+            <option value="2">Pending</option>
+            <option value="3">Live</option>
+            </select></li>
+            """
             % (self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk),
         )
 
@@ -1516,8 +1538,12 @@ class ModelFormBasicTests(TestCase):
         f = RoykoForm(auto_id=False, instance=self.w_royko)
         self.assertHTMLEqual(
             str(f),
-            """<tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="50" required><br>
-            <span class="helptext">Use both first and last names.</span></td></tr>""",
+            """
+            <tr><th>Name:</th><td>
+            <input type="text" name="name" value="Mike Royko" maxlength="50" required>
+            <br>
+            <span class="helptext">Use both first and last names.</span></td></tr>
+            """,
         )
 
         art = Article.objects.create(
@@ -1532,26 +1558,35 @@ class ModelFormBasicTests(TestCase):
         f = ArticleForm(auto_id=False, instance=art)
         self.assertHTMLEqual(
             f.as_ul(),
-            """<li>Headline: <input type="text" name="headline" value="Test article" maxlength="50" required></li>
-<li>Slug: <input type="text" name="slug" value="test-article" maxlength="50" required></li>
-<li>Pub date: <input type="text" name="pub_date" value="1988-01-04" required></li>
-<li>Writer: <select name="writer" required>
-<option value="">---------</option>
-<option value="%s">Bob Woodward</option>
-<option value="%s" selected>Mike Royko</option>
-</select></li>
-<li>Article: <textarea rows="10" cols="40" name="article" required>Hello.</textarea></li>
-<li>Categories: <select multiple name="categories">
-<option value="%s">Entertainment</option>
-<option value="%s">It&#x27;s a test</option>
-<option value="%s">Third test</option>
-</select></li>
-<li>Status: <select name="status">
-<option value="" selected>---------</option>
-<option value="1">Draft</option>
-<option value="2">Pending</option>
-<option value="3">Live</option>
-</select></li>"""
+            """
+            <li>Headline:
+            <input type="text" name="headline" value="Test article" maxlength="50"
+                required>
+            </li>
+            <li>Slug:
+            <input type="text" name="slug" value="test-article" maxlength="50" required>
+            </li>
+            <li>Pub date:
+            <input type="text" name="pub_date" value="1988-01-04" required></li>
+            <li>Writer: <select name="writer" required>
+            <option value="">---------</option>
+            <option value="%s">Bob Woodward</option>
+            <option value="%s" selected>Mike Royko</option>
+            </select></li>
+            <li>Article:
+            <textarea rows="10" cols="40" name="article" required>Hello.</textarea></li>
+            <li>Categories: <select multiple name="categories">
+            <option value="%s">Entertainment</option>
+            <option value="%s">It&#x27;s a test</option>
+            <option value="%s">Third test</option>
+            </select></li>
+            <li>Status: <select name="status">
+            <option value="" selected>---------</option>
+            <option value="1">Draft</option>
+            <option value="2">Pending</option>
+            <option value="3">Live</option>
+            </select></li>
+            """
             % (self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk),
         )
 
@@ -1574,7 +1609,7 @@ class ModelFormBasicTests(TestCase):
 
     def test_m2m_initial_callable(self):
         """
-        Regression for #10349: A callable can be provided as the initial value for an m2m field
+        A callable can be provided as the initial value for an m2m field.
         """
         self.maxDiff = 1200
         self.create_basic_data()
@@ -1647,7 +1682,8 @@ class ModelFormBasicTests(TestCase):
         self.assertEqual(
             f.errors["slug"],
             [
-                "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
+                "Enter a valid “slug” consisting of letters, numbers, underscores or "
+                "hyphens."
             ],
         )
         self.assertEqual(f.cleaned_data, {"url": "foo"})
@@ -1666,26 +1702,32 @@ class ModelFormBasicTests(TestCase):
         f = ArticleForm(auto_id=False)
         self.assertHTMLEqual(
             str(f),
-            """<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" required></td></tr>
-<tr><th>Slug:</th><td><input type="text" name="slug" maxlength="50" required></td></tr>
-<tr><th>Pub date:</th><td><input type="text" name="pub_date" required></td></tr>
-<tr><th>Writer:</th><td><select name="writer" required>
-<option value="" selected>---------</option>
-<option value="%s">Bob Woodward</option>
-<option value="%s">Mike Royko</option>
-</select></td></tr>
-<tr><th>Article:</th><td><textarea rows="10" cols="40" name="article" required></textarea></td></tr>
-<tr><th>Categories:</th><td><select multiple name="categories">
-<option value="%s">Entertainment</option>
-<option value="%s">It&#x27;s a test</option>
-<option value="%s">Third test</option>
-</select></td></tr>
-<tr><th>Status:</th><td><select name="status">
-<option value="" selected>---------</option>
-<option value="1">Draft</option>
-<option value="2">Pending</option>
-<option value="3">Live</option>
-</select></td></tr>"""
+            """
+            <tr><th>Headline:</th><td>
+            <input type="text" name="headline" maxlength="50" required></td></tr>
+            <tr><th>Slug:</th><td>
+            <input type="text" name="slug" maxlength="50" required></td></tr>
+            <tr><th>Pub date:</th><td>
+            <input type="text" name="pub_date" required></td></tr>
+            <tr><th>Writer:</th><td><select name="writer" required>
+            <option value="" selected>---------</option>
+            <option value="%s">Bob Woodward</option>
+            <option value="%s">Mike Royko</option>
+            </select></td></tr>
+            <tr><th>Article:</th><td>
+            <textarea rows="10" cols="40" name="article" required></textarea></td></tr>
+            <tr><th>Categories:</th><td><select multiple name="categories">
+            <option value="%s">Entertainment</option>
+            <option value="%s">It&#x27;s a test</option>
+            <option value="%s">Third test</option>
+            </select></td></tr>
+            <tr><th>Status:</th><td><select name="status">
+            <option value="" selected>---------</option>
+            <option value="1">Draft</option>
+            <option value="2">Pending</option>
+            <option value="3">Live</option>
+            </select></td></tr>
+            """
             % (self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk),
         )
 
@@ -1702,26 +1744,35 @@ class ModelFormBasicTests(TestCase):
         f = ArticleForm(auto_id=False, instance=new_art)
         self.assertHTMLEqual(
             f.as_ul(),
-            """<li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" required></li>
-<li>Slug: <input type="text" name="slug" value="new-headline" maxlength="50" required></li>
-<li>Pub date: <input type="text" name="pub_date" value="1988-01-04" required></li>
-<li>Writer: <select name="writer" required>
-<option value="">---------</option>
-<option value="%s">Bob Woodward</option>
-<option value="%s" selected>Mike Royko</option>
-</select></li>
-<li>Article: <textarea rows="10" cols="40" name="article" required>Hello.</textarea></li>
-<li>Categories: <select multiple name="categories">
-<option value="%s" selected>Entertainment</option>
-<option value="%s">It&#x27;s a test</option>
-<option value="%s">Third test</option>
-</select></li>
-<li>Status: <select name="status">
-<option value="" selected>---------</option>
-<option value="1">Draft</option>
-<option value="2">Pending</option>
-<option value="3">Live</option>
-</select></li>"""
+            """
+            <li>Headline:
+            <input type="text" name="headline" value="New headline" maxlength="50"
+                required>
+            </li>
+            <li>Slug:
+            <input type="text" name="slug" value="new-headline" maxlength="50" required>
+            </li>
+            <li>Pub date:
+            <input type="text" name="pub_date" value="1988-01-04" required></li>
+            <li>Writer: <select name="writer" required>
+            <option value="">---------</option>
+            <option value="%s">Bob Woodward</option>
+            <option value="%s" selected>Mike Royko</option>
+            </select></li>
+            <li>Article:
+            <textarea rows="10" cols="40" name="article" required>Hello.</textarea></li>
+            <li>Categories: <select multiple name="categories">
+            <option value="%s" selected>Entertainment</option>
+            <option value="%s">It&#x27;s a test</option>
+            <option value="%s">Third test</option>
+            </select></li>
+            <li>Status: <select name="status">
+            <option value="" selected>---------</option>
+            <option value="1">Draft</option>
+            <option value="2">Pending</option>
+            <option value="3">Live</option>
+            </select></li>
+            """
             % (self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk),
         )
 
@@ -1740,8 +1791,12 @@ class ModelFormBasicTests(TestCase):
         f = PartialArticleForm(auto_id=False)
         self.assertHTMLEqual(
             str(f),
-            """<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" required></td></tr>
-<tr><th>Pub date:</th><td><input type="text" name="pub_date" required></td></tr>""",
+            """
+            <tr><th>Headline:</th><td>
+            <input type="text" name="headline" maxlength="50" required></td></tr>
+            <tr><th>Pub date:</th><td>
+            <input type="text" name="pub_date" required></td></tr>
+            """,
         )
 
         class PartialArticleFormWithSlug(forms.ModelForm):
@@ -1768,9 +1823,18 @@ class ModelFormBasicTests(TestCase):
         )
         self.assertHTMLEqual(
             f.as_ul(),
-            """<li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" required></li>
-<li>Slug: <input type="text" name="slug" value="new-headline" maxlength="50" required></li>
-<li>Pub date: <input type="text" name="pub_date" value="1988-01-04" required></li>""",
+            """
+            <li>Headline:
+            <input type="text" name="headline" value="New headline" maxlength="50"
+                required>
+            </li>
+            <li>Slug:
+            <input type="text" name="slug" value="new-headline" maxlength="50"
+                required>
+            </li>
+            <li>Pub date:
+            <input type="text" name="pub_date" value="1988-01-04" required></li>
+            """,
         )
         self.assertTrue(f.is_valid())
         new_art = f.save()
@@ -1797,7 +1861,8 @@ class ModelFormBasicTests(TestCase):
             new_art.categories.order_by("name"), [self.c1, self.c2]
         )
 
-        # Now, submit form data with no categories. This deletes the existing categories.
+        # Now, submit form data with no categories. This deletes the existing
+        # categories.
         form_data["categories"] = []
         f = ArticleForm(form_data, instance=new_art)
         new_art = f.save()
@@ -1835,9 +1900,9 @@ class ModelFormBasicTests(TestCase):
         )
 
     def test_custom_form_fields(self):
-        # Here, we define a custom ModelForm. Because it happens to have the same fields as
-        # the Category model, we can just call the form's save() to apply its changes to an
-        # existing Category instance.
+        # Here, we define a custom ModelForm. Because it happens to have the
+        # same fields as the Category model, we can just call the form's save()
+        # to apply its changes to an existing Category instance.
         class ShortCategory(forms.ModelForm):
             name = forms.CharField(max_length=5)
             slug = forms.CharField(max_length=5)
@@ -1961,7 +2026,8 @@ class ModelFormBasicTests(TestCase):
             form.errors,
             {
                 "writer": [
-                    "Select a valid choice. That choice is not one of the available choices."
+                    "Select a valid choice. That choice is not one of the available "
+                    "choices."
                 ]
             },
         )
@@ -2234,7 +2300,8 @@ class ModelOneToOneFieldTests(TestCase):
     def test_modelform_subclassed_model(self):
         class BetterWriterForm(forms.ModelForm):
             class Meta:
-                # BetterWriter model is a subclass of Writer with an additional `score` field
+                # BetterWriter model is a subclass of Writer with an additional
+                # `score` field.
                 model = BetterWriter
                 fields = "__all__"
 
@@ -2271,12 +2338,16 @@ class ModelOneToOneFieldTests(TestCase):
         form = WriterProfileForm()
         self.assertHTMLEqual(
             form.as_p(),
-            """<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer" required>
-<option value="" selected>---------</option>
-<option value="%s">Bob Woodward</option>
-<option value="%s">Mike Royko</option>
-</select></p>
-<p><label for="id_age">Age:</label> <input type="number" name="age" id="id_age" min="0" required></p>"""
+            """
+            <p><label for="id_writer">Writer:</label>
+            <select name="writer" id="id_writer" required>
+            <option value="" selected>---------</option>
+            <option value="%s">Bob Woodward</option>
+            <option value="%s">Mike Royko</option>
+            </select></p>
+            <p><label for="id_age">Age:</label>
+            <input type="number" name="age" id="id_age" min="0" required></p>
+            """
             % (
                 self.w_woodward.pk,
                 self.w_royko.pk,
@@ -2294,13 +2365,16 @@ class ModelOneToOneFieldTests(TestCase):
         form = WriterProfileForm(instance=instance)
         self.assertHTMLEqual(
             form.as_p(),
-            """<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer" required>
-<option value="">---------</option>
-<option value="%s" selected>Bob Woodward</option>
-<option value="%s">Mike Royko</option>
-</select></p>
-<p><label for="id_age">Age:</label>
-<input type="number" name="age" value="65" id="id_age" min="0" required></p>"""
+            """
+            <p><label for="id_writer">Writer:</label>
+            <select name="writer" id="id_writer" required>
+            <option value="">---------</option>
+            <option value="%s" selected>Bob Woodward</option>
+            <option value="%s">Mike Royko</option>
+            </select></p>
+            <p><label for="id_age">Age:</label>
+            <input type="number" name="age" value="65" id="id_age" min="0" required>
+            </p>"""
             % (
                 self.w_woodward.pk,
                 self.w_royko.pk,
@@ -2508,7 +2582,8 @@ class FileAndImageFieldTests(TestCase):
         instance = f.save()
         self.assertEqual(instance.file.name, "tests/test3.txt")
 
-        # Instance can be edited w/out re-uploading the file and existing file should be preserved.
+        # Instance can be edited w/out re-uploading the file and existing file
+        # should be preserved.
         f = TextFileForm({"description": "New Description"}, instance=instance)
         f.fields["file"].required = False
         self.assertTrue(f.is_valid())
@@ -2615,8 +2690,9 @@ class FileAndImageFieldTests(TestCase):
         self.assertEqual(instance.width, 16)
         self.assertEqual(instance.height, 16)
 
-        # Edit an instance that already has the (required) image defined in the model. This will not
-        # save the image again, but leave it exactly as it is.
+        # Edit an instance that already has the (required) image defined in the
+        # model. This will not save the image again, but leave it exactly as it
+        # is.
 
         f = ImageFileForm(data={"description": "Look, it changed"}, instance=instance)
         self.assertTrue(f.is_valid())
@@ -2712,7 +2788,8 @@ class FileAndImageFieldTests(TestCase):
         self.assertEqual(instance.width, 48)
         self.assertEqual(instance.height, 32)
         instance.delete()
-        # Test callable upload_to behavior that's dependent on the value of another field in the model
+        # Callable upload_to behavior that's dependent on the value of another
+        # field in the model.
         f = ImageFileForm(
             data={"description": "And a final one", "path": "foo"},
             files={"image": SimpleUploadedFile("test4.png", image_data)},
@@ -2748,7 +2825,8 @@ class ModelOtherFieldTests(SimpleTestCase):
             bif.errors,
             {
                 "biggie": [
-                    "Ensure this value is greater than or equal to -9223372036854775808."
+                    "Ensure this value is greater than or equal to "
+                    "-9223372036854775808."
                 ]
             },
         )
@@ -2797,7 +2875,10 @@ class ModelOtherFieldTests(SimpleTestCase):
         # 'created', non-editable, is excluded by default
         self.assertNotIn("created", ArticleForm().fields)
 
-        msg = "'created' cannot be specified for Article model form as it is a non-editable field"
+        msg = (
+            "'created' cannot be specified for Article model form as it is a "
+            "non-editable field"
+        )
         with self.assertRaisesMessage(FieldError, msg):
 
             class InvalidArticleForm(forms.ModelForm):
@@ -2807,7 +2888,7 @@ class ModelOtherFieldTests(SimpleTestCase):
 
     def test_http_prefixing(self):
         """
-        If the http:// prefix is omitted on form input, the field adds it again. (Refs #13613)
+        If the http:// prefix is omitted on form input, the field adds it again.
         """
 
         class HomepageForm(forms.ModelForm):
@@ -2948,11 +3029,15 @@ class OtherModelFormTests(TestCase):
         self.maxDiff = 1024
         self.assertHTMLEqual(
             form.as_p(),
-            """<p><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" maxlength="50" required></p>
-        <p><label for="id_colours">Colours:</label>
-        <select multiple name="colours" id="id_colours" required>
-        <option value="%(blue_pk)s">Blue</option>
-        </select></p>"""
+            """
+            <p>
+            <label for="id_name">Name:</label>
+            <input id="id_name" type="text" name="name" maxlength="50" required></p>
+            <p><label for="id_colours">Colours:</label>
+            <select multiple name="colours" id="id_colours" required>
+            <option value="%(blue_pk)s">Blue</option>
+            </select></p>
+            """
             % {"blue_pk": colour.pk},
         )
 
@@ -2969,19 +3054,27 @@ class OtherModelFormTests(TestCase):
             form.as_p(),
             """
             <p><label for="id_title">Title:</label>
-                <input id="id_title" maxlength="30" name="title" type="text" required></p>
+            <input id="id_title" maxlength="30" name="title" type="text" required>
+            </p>
             <p><label for="id_date_published">Date published:</label>
-                <input id="id_date_published" name="date_published" type="text" value="{0}" required>
-                <input id="initial-id_date_published" name="initial-date_published" type="hidden" value="{0}"></p>
+            <input id="id_date_published" name="date_published" type="text" value="{0}"
+                required>
+            <input id="initial-id_date_published" name="initial-date_published"
+                type="hidden" value="{0}">
+            </p>
             <p><label for="id_mode">Mode:</label> <select id="id_mode" name="mode">
-                <option value="di" selected>direct</option>
-                <option value="de">delayed</option></select>
-                <input id="initial-id_mode" name="initial-mode" type="hidden" value="di"></p>
-           <p><label for="id_category">Category:</label> <select id="id_category" name="category">
-                <option value="1">Games</option>
-                <option value="2">Comics</option>
-                <option value="3" selected>Novel</option></select>
-                <input id="initial-id_category" name="initial-category" type="hidden" value="3">
+            <option value="di" selected>direct</option>
+            <option value="de">delayed</option></select>
+            <input id="initial-id_mode" name="initial-mode" type="hidden" value="di">
+            </p>
+            <p>
+            <label for="id_category">Category:</label>
+            <select id="id_category" name="category">
+            <option value="1">Games</option>
+            <option value="2">Comics</option>
+            <option value="3" selected>Novel</option></select>
+            <input id="initial-id_category" name="initial-category" type="hidden"
+                value="3">
             """.format(
                 today_str
             ),
@@ -3025,7 +3118,8 @@ class ModelFormCustomErrorTests(SimpleTestCase):
         self.assertFalse(form.is_valid())
         self.assertHTMLEqual(
             str(form.errors["name1"]),
-            '<ul class="errorlist"><li>Model.clean() error messages (simpler syntax).</li></ul>',
+            '<ul class="errorlist">'
+            "<li>Model.clean() error messages (simpler syntax).</li></ul>",
         )
         data = {"name1": "GLOBAL_ERROR", "name2": "ABC"}
         form = CustomErrorMessageForm(data)
@@ -3301,7 +3395,9 @@ class LimitChoicesToTests(TestCase):
 
 class FormFieldCallbackTests(SimpleTestCase):
     def test_baseform_with_widgets_in_meta(self):
-        """Regression for #13095: Using base forms with widgets defined in Meta should not raise errors."""
+        """
+        Using base forms with widgets defined in Meta should not raise errors.
+        """
         widget = forms.Textarea()
 
         class BaseForm(forms.ModelForm):

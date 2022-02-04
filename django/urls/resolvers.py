@@ -492,7 +492,8 @@ class URLResolver:
             except (ImportError, ViewDoesNotExist) as e:
                 path = getattr(self.urlconf_module, "handler%s" % status_code)
                 msg = (
-                    "The custom handler{status_code} view '{path}' could not be imported."
+                    "The custom handler{status_code} view '{path}' could not be "
+                    "imported."
                 ).format(status_code=status_code, path=path)
                 messages.append(Error(msg, hint=str(e), id="urls.E008"))
                 continue
@@ -657,7 +658,8 @@ class URLResolver:
                         # Update the sub_match_dict with the kwargs from the sub_match.
                         sub_match_dict.update(sub_match.kwargs)
                         # If there are *any* named groups, ignore all non-named groups.
-                        # Otherwise, pass all non-named arguments as positional arguments.
+                        # Otherwise, pass all non-named arguments as positional
+                        # arguments.
                         sub_match_args = sub_match.args
                         if not sub_match_dict:
                             sub_match_args = args + sub_match.args

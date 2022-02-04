@@ -1072,34 +1072,38 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             )
         self.assertEqual(response.status_code, 400)
 
-        # #23839 - Primary key should always be allowed, even if the referenced model isn't registered.
+        # Primary key should always be allowed, even if the referenced model
+        # isn't registered.
         response = self.client.get(
             reverse("admin:admin_views_notreferenced_changelist"), {TO_FIELD_VAR: "id"}
         )
         self.assertEqual(response.status_code, 200)
 
-        # #23915 - Specifying a field referenced by another model though a m2m should be allowed.
+        # Specifying a field referenced by another model though a m2m should be
+        # allowed.
         response = self.client.get(
             reverse("admin:admin_views_recipe_changelist"), {TO_FIELD_VAR: "rname"}
         )
         self.assertEqual(response.status_code, 200)
 
-        # #23604, #23915 - Specifying a field referenced through a reverse m2m relationship should be allowed.
+        # Specifying a field referenced through a reverse m2m relationship
+        # should be allowed.
         response = self.client.get(
             reverse("admin:admin_views_ingredient_changelist"), {TO_FIELD_VAR: "iname"}
         )
         self.assertEqual(response.status_code, 200)
 
-        # #23329 - Specifying a field that is not referred by any other model directly registered
-        # to this admin site but registered through inheritance should be allowed.
+        # Specifying a field that is not referred by any other model directly
+        # registered to this admin site but registered through inheritance
+        # should be allowed.
         response = self.client.get(
             reverse("admin:admin_views_referencedbyparent_changelist"),
             {TO_FIELD_VAR: "name"},
         )
         self.assertEqual(response.status_code, 200)
 
-        # #23431 - Specifying a field that is only referred to by a inline of a registered
-        # model should be allowed.
+        # Specifying a field that is only referred to by a inline of a
+        # registered model should be allowed.
         response = self.client.get(
             reverse("admin:admin_views_referencedbyinline_changelist"),
             {TO_FIELD_VAR: "name"},
@@ -1138,7 +1142,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         ForeignKey 'limit_choices_to' should be allowed, otherwise raw_id_fields
         can break.
         """
-        # Filters should be allowed if they are defined on a ForeignKey pointing to this model
+        # Filters should be allowed if they are defined on a ForeignKey
+        # pointing to this model.
         url = "%s?leader__name=Palin&leader__age=27" % reverse(
             "admin:admin_views_inquisition_changelist"
         )
@@ -1169,7 +1174,10 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertNotContains(
             response,
             reverse("admin:password_change"),
-            msg_prefix='The "change password" link should not be displayed if a user does not have a usable password.',
+            msg_prefix=(
+                'The "change password" link should not be displayed if a user does not '
+                "have a usable password."
+            ),
         )
 
     def test_change_view_with_show_delete_extra_context(self):
@@ -1427,8 +1435,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
     TEMPLATES=[
         {
             "BACKEND": "django.template.backends.django.DjangoTemplates",
-            # Put this app's and the shared tests templates dirs in DIRS to take precedence
-            # over the admin's templates dir.
+            # Put this app's and the shared tests templates dirs in DIRS to
+            # take precedence over the admin's templates dir.
             "DIRS": [
                 os.path.join(os.path.dirname(__file__), "templates"),
                 os.path.join(os.path.dirname(os.path.dirname(__file__)), "templates"),
@@ -2271,7 +2279,10 @@ class AdminViewPermissionsTest(TestCase):
         self.assertNotContains(
             addpage,
             change_list_link,
-            msg_prefix="User restricted to add permission is given link to change list view in breadcrumbs.",
+            msg_prefix=(
+                "User restricted to add permission is given link to change list view "
+                "in breadcrumbs."
+            ),
         )
         post = self.client.post(reverse("admin:admin_views_article_add"), add_dict)
         self.assertRedirects(post, self.index_url)
@@ -2297,7 +2308,10 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(
             addpage,
             change_list_link,
-            msg_prefix="Unrestricted user is not given link to change list view in breadcrumbs.",
+            msg_prefix=(
+                "Unrestricted user is not given link to change list view in "
+                "breadcrumbs."
+            ),
         )
         post = self.client.post(reverse("admin:admin_views_article_add"), add_dict)
         self.assertRedirects(post, reverse("admin:admin_views_article_changelist"))
@@ -2374,7 +2388,8 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, "<label>Extra form field:</label>")
         self.assertContains(
             response,
-            '<a href="/test_admin/admin/admin_views/article/" class="closelink">Close</a>',
+            '<a href="/test_admin/admin/admin_views/article/" class="closelink">Close'
+            "</a>",
         )
         self.assertEqual(response.context["title"], "View article")
         post = self.client.post(article_change_url, change_dict)
@@ -2406,13 +2421,16 @@ class AdminViewPermissionsTest(TestCase):
             Article.objects.get(pk=self.a1.pk).content, "<p>edited article</p>"
         )
 
-        # one error in form should produce singular error message, multiple errors plural
+        # one error in form should produce singular error message, multiple
+        # errors plural.
         change_dict["title"] = ""
         post = self.client.post(article_change_url, change_dict)
         self.assertContains(
             post,
             "Please correct the error below.",
-            msg_prefix="Singular error message not found in response to post with one error",
+            msg_prefix=(
+                "Singular error message not found in response to post with one error"
+            ),
         )
 
         change_dict["content"] = ""
@@ -2420,7 +2438,10 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(
             post,
             "Please correct the errors below.",
-            msg_prefix="Plural error message not found in response to post with multiple errors",
+            msg_prefix=(
+                "Plural error message not found in response to post with multiple "
+                "errors"
+            ),
         )
         self.client.get(reverse("admin:logout"))
 
@@ -2519,7 +2540,8 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, "<h1>View article</h1>")
         self.assertContains(
             response,
-            '<a href="/test_admin/admin9/admin_views/article/" class="closelink">Close</a>',
+            '<a href="/test_admin/admin9/admin_views/article/" class="closelink">Close'
+            "</a>",
         )
 
     def test_change_view_save_as_new(self):
@@ -2870,13 +2892,15 @@ class AdminViewPermissionsTest(TestCase):
             )
 
         self.client.force_login(self.adduser)
-        # The user can't change sections yet, so they shouldn't see the "change section" link.
+        # The user can't change sections yet, so they shouldn't see the
+        # "change section" link.
         url = reverse("admin:admin_views_article_add")
         change_link_text = "change_id_section"
         response = self.client.get(url)
         self.assertFalse(get_change_related(response))
         self.assertNotContains(response, change_link_text)
-        # Allow the user to change sections too. Now they can see the "change section" link.
+        # Allow the user to change sections too. Now they can see the
+        # "change section" link.
         user = User.objects.get(username="adduser")
         perm = get_perm(Section, get_permission_codename("change", Section._meta))
         user.user_permissions.add(perm)
@@ -2898,13 +2922,15 @@ class AdminViewPermissionsTest(TestCase):
             )
 
         self.client.force_login(self.adduser)
-        # The user can't delete sections yet, so they shouldn't see the "delete section" link.
+        # The user can't delete sections yet, so they shouldn't see the
+        # "delete section" link.
         url = reverse("admin:admin_views_article_add")
         delete_link_text = "delete_id_sub_section"
         response = self.client.get(url)
         self.assertFalse(get_delete_related(response))
         self.assertNotContains(response, delete_link_text)
-        # Allow the user to delete sections too. Now they can see the "delete section" link.
+        # Allow the user to delete sections too. Now they can see the
+        # "delete section" link.
         user = User.objects.get(username="adduser")
         perm = get_perm(Section, get_permission_codename("delete", Section._meta))
         user.user_permissions.add(perm)
@@ -3076,7 +3102,8 @@ class AdminViewPermissionsTest(TestCase):
         )
         self.assertContains(
             response,
-            '<li class="success">The article “Fun &amp; games” was added successfully.</li>',
+            '<li class="success">The article “Fun &amp; games” was added successfully.'
+            "</li>",
             html=True,
         )
 
@@ -3313,7 +3340,8 @@ class AdminViewDeletedObjectsTest(TestCase):
         )
         self.assertContains(
             response,
-            "your account doesn't have permission to delete the following types of objects",
+            "your account doesn't have permission to delete the following types of "
+            "objects",
         )
         self.assertContains(response, "<li>plot details</li>")
 
@@ -3580,7 +3608,10 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         self.assertContains(response, escape(self.pk))
 
     def test_changelist_to_changeform_link(self):
-        "Link to the changeform of the object in changelist should use reverse() and be quoted -- #18072"
+        """
+        Link to the changeform of the object in changelist should use reverse()
+        and be quoted.
+        """
         response = self.client.get(
             reverse("admin:admin_views_modelwithstringprimarykey_changelist")
         )
@@ -3596,7 +3627,10 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         self.assertContains(response, should_contain)
 
     def test_recentactions_link(self):
-        "The link from the recent actions list referring to the changeform of the object should be quoted"
+        """
+        The link from the recent actions list referring to the changeform of
+        the object should be quoted.
+        """
         response = self.client.get(reverse("admin:index"))
         link = reverse(
             "admin:admin_views_modelwithstringprimarykey_change", args=(quote(self.pk),)
@@ -3605,7 +3639,10 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         self.assertContains(response, should_contain)
 
     def test_deleteconfirmation_link(self):
-        "The link from the delete confirmation page referring back to the changeform of the object should be quoted"
+        """ "
+        The link from the delete confirmation page referring back to the
+        changeform of the object should be quoted.
+        """
         url = reverse(
             "admin:admin_views_modelwithstringprimarykey_delete", args=(quote(self.pk),)
         )
@@ -3800,10 +3837,14 @@ class AdminViewUnicodeTest(TestCase):
             "chapter_set-MAX_NUM_FORMS": "0",
             "chapter_set-0-id": self.chap1.pk,
             "chapter_set-0-title": "Norske bostaver æøå skaper problemer",
-            "chapter_set-0-content": "&lt;p&gt;Svært frustrerende med UnicodeDecodeError&lt;/p&gt;",
+            "chapter_set-0-content": (
+                "&lt;p&gt;Svært frustrerende med UnicodeDecodeError&lt;/p&gt;"
+            ),
             "chapter_set-1-id": self.chap2.id,
             "chapter_set-1-title": "Kjærlighet.",
-            "chapter_set-1-content": "&lt;p&gt;La kjærligheten til de lidende seire.&lt;/p&gt;",
+            "chapter_set-1-content": (
+                "&lt;p&gt;La kjærligheten til de lidende seire.&lt;/p&gt;"
+            ),
             "chapter_set-2-id": self.chap3.id,
             "chapter_set-2-title": "Need a title.",
             "chapter_set-2-content": "&lt;p&gt;Newest content&lt;/p&gt;",
@@ -4227,8 +4268,8 @@ class AdminViewListEditable(TestCase):
             response,
             '<div class="hiddenfields">\n'
             '<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id">'
-            '<input type="hidden" name="form-1-id" value="%d" id="id_form-1-id">\n</div>'
-            % (story2.id, story1.id),
+            '<input type="hidden" name="form-1-id" value="%d" id="id_form-1-id">\n'
+            "</div>" % (story2.id, story1.id),
             html=True,
         )
         self.assertContains(response, '<td class="field-id">%d</td>' % story1.id, 1)
@@ -4257,8 +4298,8 @@ class AdminViewListEditable(TestCase):
             response,
             '<div class="hiddenfields">\n'
             '<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id">'
-            '<input type="hidden" name="form-1-id" value="%d" id="id_form-1-id">\n</div>'
-            % (story2.id, story1.id),
+            '<input type="hidden" name="form-1-id" value="%d" id="id_form-1-id">\n'
+            "</div>" % (story2.id, story1.id),
             html=True,
         )
         self.assertContains(
@@ -5069,7 +5110,9 @@ class AdminInlineTests(TestCase):
         self.assertEqual(Widget.objects.all()[0].name, "Widget 1 Updated")
 
     def test_explicit_autofield_inline(self):
-        "A model with an explicit autofield primary key can be saved as inlines. Regression for #8093"
+        """
+        A model with an explicit autofield primary key can be saved as inlines.
+        """
         # First add a new inline
         self.post_data["grommet_set-0-name"] = "Grommet 1"
         collector_url = reverse(
@@ -5512,7 +5555,8 @@ class SeleniumTests(AdminSeleniumTestCase):
             By.ID, "id_relatedprepopulated_set-1-name"
         ).send_keys(
             " now you haVe anöther   sŤāÇkeð  inline with a very ... "
-            "loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooog text... "
+            "loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooog "
+            "text... "
         )
         slug1 = self.selenium.find_element(
             By.ID, "id_relatedprepopulated_set-1-slug1"
@@ -5643,7 +5687,10 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         RelatedPrepopulated.objects.get(
             # 75 characters in name field
-            name=" now you haVe anöther   sŤāÇkeð  inline with a very ... loooooooooooooooooo",
+            name=(
+                " now you haVe anöther   sŤāÇkeð  inline with a very ... "
+                "loooooooooooooooooo"
+            ),
             pubdate="1999-01-25",
             status="option two",
             slug1="now-you-have-another-stacked-inline-with-a-very-lo",
@@ -6203,17 +6250,20 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         self.assertContains(response, '<div class="help">', 3)
         self.assertContains(
             response,
-            '<div class="help">Some help text for the title (with Unicode ŠĐĆŽćžšđ)</div>',
+            '<div class="help">Some help text for the title (with Unicode ŠĐĆŽćžšđ)'
+            "</div>",
             html=True,
         )
         self.assertContains(
             response,
-            '<div class="help">Some help text for the content (with Unicode ŠĐĆŽćžšđ)</div>',
+            '<div class="help">Some help text for the content (with Unicode ŠĐĆŽćžšđ)'
+            "</div>",
             html=True,
         )
         self.assertContains(
             response,
-            '<div class="help">Some help text for the date (with Unicode ŠĐĆŽćžšđ)</div>',
+            '<div class="help">Some help text for the date (with Unicode ŠĐĆŽćžšđ)'
+            "</div>",
             html=True,
         )
 
@@ -6648,7 +6698,10 @@ class UserAdminTest(TestCase):
         )
 
     def test_user_fk_add_popup(self):
-        """User addition through a FK popup should return the appropriate JavaScript response."""
+        """
+        User addition through a FK popup should return the appropriate
+        JavaScript response.
+        """
         response = self.client.get(reverse("admin:admin_views_album_add"))
         self.assertContains(response, reverse("admin:auth_user_add"))
         self.assertContains(
@@ -6673,7 +6726,10 @@ class UserAdminTest(TestCase):
         self.assertContains(response, "&quot;obj&quot;: &quot;newuser&quot;")
 
     def test_user_fk_change_popup(self):
-        """User change through a FK popup should return the appropriate JavaScript response."""
+        """
+        User change through a FK popup should return the appropriate JavaScript
+        response.
+        """
         response = self.client.get(reverse("admin:admin_views_album_add"))
         self.assertContains(
             response, reverse("admin:auth_user_change", args=("__fk__",))
@@ -6705,7 +6761,10 @@ class UserAdminTest(TestCase):
         self.assertContains(response, "&quot;action&quot;: &quot;change&quot;")
 
     def test_user_fk_delete_popup(self):
-        """User deletion through a FK popup should return the appropriate JavaScript response."""
+        """
+        User deletion through a FK popup should return the appropriate
+        JavaScript response.
+        """
         response = self.client.get(reverse("admin:admin_views_album_add"))
         self.assertContains(
             response, reverse("admin:auth_user_delete", args=("__fk__",))
@@ -6915,8 +6974,8 @@ class CSSTest(TestCase):
 
     def test_changelist_field_classes(self):
         """
-        Cells of the change list table should contain the field name in their class attribute
-        Refs #11195.
+        Cells of the change list table should contain the field name in their
+        class attribute.
         """
         Podcast.objects.create(name="Django Dose", release_date=datetime.date.today())
         response = self.client.get(reverse("admin:admin_views_podcast_changelist"))
@@ -7409,33 +7468,27 @@ class AdminKeepChangeListFiltersTests(TestCase):
             "admin:auth_user_change", args=(self.joepublicuser.pk,)
         )
         self.assertURLEqual(
-            "http://testserver{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0".format(
-                change_user_url
-            ),
-            "http://testserver{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0".format(
-                change_user_url
-            ),
+            "http://testserver{}?_changelist_filters="
+            "is_staff__exact%3D0%26is_superuser__exact%3D0".format(change_user_url),
+            "http://testserver{}?_changelist_filters="
+            "is_staff__exact%3D0%26is_superuser__exact%3D0".format(change_user_url),
         )
 
         # Test inequality.
         with self.assertRaises(AssertionError):
             self.assertURLEqual(
-                "http://testserver{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0".format(
-                    change_user_url
-                ),
-                "http://testserver{}?_changelist_filters=is_staff__exact%3D1%26is_superuser__exact%3D1".format(
-                    change_user_url
-                ),
+                "http://testserver{}?_changelist_filters="
+                "is_staff__exact%3D0%26is_superuser__exact%3D0".format(change_user_url),
+                "http://testserver{}?_changelist_filters="
+                "is_staff__exact%3D1%26is_superuser__exact%3D1".format(change_user_url),
             )
 
         # Ignore scheme and host.
         self.assertURLEqual(
-            "http://testserver{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0".format(
-                change_user_url
-            ),
-            "{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0".format(
-                change_user_url
-            ),
+            "http://testserver{}?_changelist_filters="
+            "is_staff__exact%3D0%26is_superuser__exact%3D0".format(change_user_url),
+            "{}?_changelist_filters="
+            "is_staff__exact%3D0%26is_superuser__exact%3D0".format(change_user_url),
         )
 
         # Ignore ordering of querystring.
@@ -7450,12 +7503,10 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         # Ignore ordering of _changelist_filters.
         self.assertURLEqual(
-            "{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0".format(
-                change_user_url
-            ),
-            "{}?_changelist_filters=is_superuser__exact%3D0%26is_staff__exact%3D0".format(
-                change_user_url
-            ),
+            "{}?_changelist_filters="
+            "is_staff__exact%3D0%26is_superuser__exact%3D0".format(change_user_url),
+            "{}?_changelist_filters="
+            "is_superuser__exact%3D0%26is_staff__exact%3D0".format(change_user_url),
         )
 
     def get_changelist_filters(self):
@@ -7765,7 +7816,10 @@ class AdminViewOnSiteTests(TestCase):
         self.assertFormError(
             response, "adminform", "some_required_info", ["This field is required."]
         )
-        msg = "The form 'adminform' in context 0 does not contain the non-field error 'Error'"
+        msg = (
+            "The form 'adminform' in context 0 does not contain the non-field error "
+            "'Error'"
+        )
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertFormError(response, "adminform", None, ["Error"])
         self.assertFormsetError(
@@ -7774,10 +7828,14 @@ class AdminViewOnSiteTests(TestCase):
             0,
             None,
             [
-                "Children must share a family name with their parents in this contrived test case"
+                "Children must share a family name with their parents in this "
+                "contrived test case"
             ],
         )
-        msg = "The formset 'inline_admin_formset' in context 22 does not contain any non-form errors."
+        msg = (
+            "The formset 'inline_admin_formset' in context 22 does not contain any "
+            "non-form errors."
+        )
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertFormsetError(
                 response, "inline_admin_formset", None, None, ["Error"]
@@ -7819,7 +7877,8 @@ class AdminViewOnSiteTests(TestCase):
             0,
             None,
             [
-                "Children must share a family name with their parents in this contrived test case"
+                "Children must share a family name with their parents in this "
+                "contrived test case"
             ],
         )
 
@@ -7838,7 +7897,8 @@ class AdminViewOnSiteTests(TestCase):
                 admin.check(),
                 [
                     Error(
-                        "The value of 'view_on_site' must be a callable or a boolean value.",
+                        "The value of 'view_on_site' must be a callable or a boolean "
+                        "value.",
                         obj=CityAdmin,
                         id="admin.E025",
                     ),
@@ -8175,7 +8235,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
         response = self.client.get(unknown_url)
         self.assertEqual(response.status_code, 404)
 
-    def test_known_url_redirects_login_if_not_authenticated_without_final_catch_all_view(
+    def test_known_url_redirects_login_if_not_auth_without_final_catch_all_view(
         self,
     ):
         known_url = reverse("admin10:admin_views_article_changelist")
@@ -8184,7 +8244,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
             response, "%s?next=%s" % (reverse("admin10:login"), known_url)
         )
 
-    def test_known_url_missing_slash_redirects_with_slash_if_not_authenticated_without_final_catch_all_view(
+    def test_known_url_missing_slash_redirects_with_slash_if_not_auth_no_catch_all_view(
         self,
     ):
         known_url = reverse("admin10:admin_views_article_changelist")
@@ -8198,14 +8258,14 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
         response = self.client.get(url[:-1])
         self.assertRedirects(response, url, status_code=301)
 
-    def test_url_without_trailing_slash_if_not_authenticated_without_final_catch_all_view(
+    def test_url_no_trailing_slash_if_not_auth_without_final_catch_all_view(
         self,
     ):
         url = reverse("admin10:article_extra_json")
         response = self.client.get(url)
         self.assertRedirects(response, "%s?next=%s" % (reverse("admin10:login"), url))
 
-    def test_unkown_url_without_trailing_slash_if_not_authenticated_without_final_catch_all_view(
+    def test_unknown_url_no_trailing_slash_if_not_auth_without_final_catch_all_view(
         self,
     ):
         url = reverse("admin10:article_extra_json")[:-1]

@@ -140,7 +140,10 @@ class AggregateTestCase(TestCase):
         )
         cls.b6 = Book.objects.create(
             isbn="155860191",
-            name="Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp",
+            name=(
+                "Paradigms of Artificial Intelligence Programming: Case Studies in "
+                "Common Lisp"
+            ),
             pages=946,
             rating=5.0,
             price=Decimal("75.00"),
@@ -249,7 +252,8 @@ class AggregateTestCase(TestCase):
                 "Practical Django Projects",
                 "Python Web Development with Django",
                 "Artificial Intelligence: A Modern Approach",
-                "Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp",
+                "Paradigms of Artificial Intelligence Programming: Case Studies in "
+                "Common Lisp",
             ],
             lambda b: b.name,
         )
@@ -326,7 +330,8 @@ class AggregateTestCase(TestCase):
             [
                 ("Artificial Intelligence: A Modern Approach", 2),
                 (
-                    "Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp",
+                    "Paradigms of Artificial Intelligence Programming: Case Studies in "
+                    "Common Lisp",
                     1,
                 ),
                 ("Practical Django Projects", 1),
@@ -380,7 +385,8 @@ class AggregateTestCase(TestCase):
             [
                 ("Artificial Intelligence: A Modern Approach", 7),
                 (
-                    "Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp",
+                    "Paradigms of Artificial Intelligence Programming: Case Studies in "
+                    "Common Lisp",
                     9,
                 ),
                 ("Practical Django Projects", 3),
@@ -418,7 +424,9 @@ class AggregateTestCase(TestCase):
                     "id": self.b1.id,
                     "isbn": "159059725",
                     "mean_age": 34.5,
-                    "name": "The Definitive Guide to Django: Web Development Done Right",
+                    "name": (
+                        "The Definitive Guide to Django: Web Development Done Right"
+                    ),
                     "pages": 447,
                     "price": Approximate(Decimal("30")),
                     "pubdate": datetime.date(2007, 12, 6),
@@ -467,7 +475,9 @@ class AggregateTestCase(TestCase):
                     "id": self.b1.id,
                     "isbn": "159059725",
                     "mean_age": 34.5,
-                    "name": "The Definitive Guide to Django: Web Development Done Right",
+                    "name": (
+                        "The Definitive Guide to Django: Web Development Done Right"
+                    ),
                     "pages": 447,
                     "price": Approximate(Decimal("30")),
                     "pubdate": datetime.date(2007, 12, 6),
@@ -1476,7 +1486,9 @@ class AggregateTestCase(TestCase):
             [
                 {"name": "Practical Django Projects", "min_age": 34},
                 {
-                    "name": "The Definitive Guide to Django: Web Development Done Right",
+                    "name": (
+                        "The Definitive Guide to Django: Web Development Done Right"
+                    ),
                     "min_age": 29,
                 },
             ],

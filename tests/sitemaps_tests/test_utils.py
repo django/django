@@ -34,7 +34,10 @@ class PingGoogleTests(SitemapTestsBase):
 
     @override_settings(ROOT_URLCONF="sitemaps_tests.urls.empty")
     def test_get_sitemap_full_url_not_detected(self):
-        msg = "You didn't provide a sitemap_url, and the sitemap URL couldn't be auto-detected."
+        msg = (
+            "You didn't provide a sitemap_url, and the sitemap URL couldn't be "
+            "auto-detected."
+        )
         with self.assertRaisesMessage(SitemapNotFound, msg):
             _get_sitemap_full_url(None)
 

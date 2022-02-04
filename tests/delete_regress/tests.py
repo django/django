@@ -159,7 +159,9 @@ class DeleteCascadeTransactionTests(TransactionTestCase):
 
 class LargeDeleteTests(TestCase):
     def test_large_deletes(self):
-        "Regression for #13309 -- if the number of objects > chunk size, deletion still occurs"
+        """
+        If the number of objects > chunk size, deletion still occurs.
+        """
         for x in range(300):
             Book.objects.create(pagecount=x + 100)
         # attach a signal to make sure we will not fast-delete

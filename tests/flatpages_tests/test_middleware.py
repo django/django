@@ -113,7 +113,10 @@ class FlatpageMiddlewareTests(TestDataMixin, TestCase):
         self.assertContains(response, "<p>Isn't it sekrit!</p>")
 
     def test_fallback_flatpage_special_chars(self):
-        "A flatpage with special chars in the URL can be served by the fallback middleware"
+        """
+        A flatpage with special chars in the URL can be served by the fallback
+        middleware.
+        """
         fp = FlatPage.objects.create(
             url="/some.very_special~chars-here/",
             title="A very special page",
@@ -171,7 +174,10 @@ class FlatpageMiddlewareAppendSlashTests(TestDataMixin, TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_redirect_fallback_flatpage_special_chars(self):
-        "A flatpage with special chars in the URL can be served by the fallback middleware and should add a slash"
+        """
+        A flatpage with special chars in the URL can be served by the fallback
+        middleware and should add a slash.
+        """
         fp = FlatPage.objects.create(
             url="/some.very_special~chars-here/",
             title="A very special page",

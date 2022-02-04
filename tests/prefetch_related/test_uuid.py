@@ -76,7 +76,8 @@ class UUIDPrefetchRelatedLookups(TestCase):
             self.assertEqual("Racoon", spooky.fleas_hosted.all()[0].current_room.name)
 
     def test_from_uuid_pk_lookup_integer_pk2_uuid_pk2(self):
-        # From uuid-pk model, prefetch <integer-pk model>.<integer-pk model>.<uuid-pk model>.<uuid-pk model>:
+        # From uuid-pk model, prefetch
+        # <integer-pk model>.<integer-pk model>.<uuid-pk model>.<uuid-pk model>:
         with self.assertNumQueries(5):
             spooky = Pet.objects.prefetch_related("people__houses__rooms__fleas").get(
                 name="Spooky"
@@ -104,7 +105,8 @@ class UUIDPrefetchRelatedLookups(TestCase):
             self.assertEqual(3, len(redwood.rooms.all()[0].fleas.all()))
 
     def test_from_integer_pk_lookup_integer_pk_uuid_pk_uuid_pk(self):
-        # From integer-pk model, prefetch <integer-pk model>.<uuid-pk model>.<uuid-pk model>:
+        # From integer-pk model, prefetch
+        # <integer-pk model>.<uuid-pk model>.<uuid-pk model>:
         with self.assertNumQueries(4):
             redwood = House.objects.prefetch_related("rooms__fleas__pets_visited").get(
                 name="Redwood"

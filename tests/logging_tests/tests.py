@@ -271,7 +271,8 @@ class AdminEmailHandlerTest(SimpleTestCase):
             self.assertEqual(mail.outbox[0].to, ["admin@example.com"])
             self.assertEqual(
                 mail.outbox[0].subject,
-                "-SuperAwesomeSubject-ERROR: Custom message that says 'ping' and 'pong'",
+                "-SuperAwesomeSubject-ERROR: "
+                "Custom message that says 'ping' and 'pong'",
             )
         finally:
             # Restore original filters
@@ -309,7 +310,8 @@ class AdminEmailHandlerTest(SimpleTestCase):
             self.assertEqual(mail.outbox[0].to, ["admin@example.com"])
             self.assertEqual(
                 mail.outbox[0].subject,
-                "-SuperAwesomeSubject-ERROR (internal IP): Custom message that says 'ping' and 'pong'",
+                "-SuperAwesomeSubject-ERROR (internal IP): "
+                "Custom message that says 'ping' and 'pong'",
             )
         finally:
             # Restore original filters

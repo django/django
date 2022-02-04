@@ -92,7 +92,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 FROM information_schema.check_constraints AS c
                 WHERE
                     c.table_name = %s AND
-                    LOWER(c.check_clause) = 'json_valid(`' + LOWER(c.constraint_name) + '`)' AND
+                    LOWER(c.check_clause) =
+                        'json_valid(`' + LOWER(c.constraint_name) + '`)' AND
                     c.constraint_schema = DATABASE()
                 """,
                 [table_name],

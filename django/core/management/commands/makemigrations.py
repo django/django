@@ -147,7 +147,8 @@ class Command(BaseCommand):
         # hard if there are any and they don't want to merge
         conflicts = loader.detect_conflicts()
 
-        # If app_labels is specified, filter out conflicting migrations for unspecified apps
+        # If app_labels is specified, filter out conflicting migrations for
+        # unspecified apps.
         if app_labels:
             conflicts = {
                 app_label: conflict

@@ -183,24 +183,28 @@ class TestUtilsHtml(SimpleTestCase):
             (
                 (
                     "&<>",
-                    '<script id="test_id" type="application/json">"\\u0026\\u003C\\u003E"</script>',
+                    '<script id="test_id" type="application/json">'
+                    '"\\u0026\\u003C\\u003E"</script>',
                 )
             ),
             # "<", ">" and "&" are quoted inside JSON objects
             (
                 {"a": "<script>test&ing</script>"},
                 '<script id="test_id" type="application/json">'
-                '{"a": "\\u003Cscript\\u003Etest\\u0026ing\\u003C/script\\u003E"}</script>',
+                '{"a": "\\u003Cscript\\u003Etest\\u0026ing\\u003C/script\\u003E"}'
+                "</script>",
             ),
             # Lazy strings are quoted
             (
                 lazystr("&<>"),
-                '<script id="test_id" type="application/json">"\\u0026\\u003C\\u003E"</script>',
+                '<script id="test_id" type="application/json">"\\u0026\\u003C\\u003E"'
+                "</script>",
             ),
             (
                 {"a": lazystr("<script>test&ing</script>")},
                 '<script id="test_id" type="application/json">'
-                '{"a": "\\u003Cscript\\u003Etest\\u0026ing\\u003C/script\\u003E"}</script>',
+                '{"a": "\\u003Cscript\\u003Etest\\u0026ing\\u003C/script\\u003E"}'
+                "</script>",
             ),
         )
         for arg, expected in tests:
@@ -228,11 +232,14 @@ class TestUtilsHtml(SimpleTestCase):
             ("http://example.com/?x=<>\"'", "http://example.com/?x=%3C%3E%22%27"),
             (
                 "http://example.com/?q=http://example.com/?x=1%26q=django",
-                "http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3Ddjango",
+                "http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3D"
+                "django",
             ),
             (
-                "http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3Ddjango",
-                "http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3Ddjango",
+                "http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3D"
+                "django",
+                "http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3D"
+                "django",
             ),
             ("http://.www.f oo.bar/", "http://.www.f%20oo.bar/"),
         )
@@ -297,11 +304,13 @@ class TestUtilsHtml(SimpleTestCase):
         tests = (
             (
                 "Search for google.com/?q=! and see.",
-                'Search for <a href="http://google.com/?q=">google.com/?q=</a>! and see.',
+                'Search for <a href="http://google.com/?q=">google.com/?q=</a>! and '
+                "see.",
             ),
             (
                 "Search for google.com/?q=1&lt! and see.",
-                'Search for <a href="http://google.com/?q=1%3C">google.com/?q=1&lt</a>! and see.',
+                'Search for <a href="http://google.com/?q=1%3C">google.com/?q=1&lt'
+                "</a>! and see.",
             ),
             (
                 lazystr("Search for google.com/?q=!"),

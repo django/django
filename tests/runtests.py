@@ -603,8 +603,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "--external-host",
         default=socket.gethostname(),
-        help="The external host that can be reached by the selenium hub instance when running Selenium "
-        "tests via Selenium Hub.",
+        help=(
+            "The external host that can be reached by the selenium hub instance when "
+            "running Selenium tests via Selenium Hub."
+        ),
     )
     parser.add_argument(
         "--debug-sql",
@@ -695,7 +697,8 @@ if __name__ == "__main__":
     ].count(True)
     if enabled_module_options > 1:
         print(
-            "Aborting: --start-at, --start-after, and test labels are mutually exclusive."
+            "Aborting: --start-at, --start-after, and test labels are mutually "
+            "exclusive."
         )
         sys.exit(1)
     for opt_name in ["start_at", "start_after"]:

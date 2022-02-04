@@ -208,7 +208,8 @@ class BaseHandler:
         if hasattr(response, "render") and callable(response.render):
             for middleware_method in self._template_response_middleware:
                 response = middleware_method(request, response)
-                # Complain if the template response middleware returned None (a common error).
+                # Complain if the template response middleware returned None
+                # (a common error).
                 self.check_response(
                     response,
                     middleware_method,

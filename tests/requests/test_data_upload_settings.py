@@ -77,7 +77,8 @@ class DataUploadMaxMemorySizeMultipartPostTests(SimpleTestCase):
             "\r\n".join(
                 [
                     "--boundary",
-                    'Content-Disposition: form-data; name="file1"; filename="test.file"',
+                    'Content-Disposition: form-data; name="file1"; '
+                    'filename="test.file"',
                     "",
                     "value",
                     "--boundary--",

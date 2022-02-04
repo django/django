@@ -195,8 +195,8 @@ def fields_for_model(
                 and (exclude is None or f.name not in exclude)
             ):
                 raise FieldError(
-                    "'%s' cannot be specified for %s model form as it is a non-editable field"
-                    % (f.name, model.__name__)
+                    "'%s' cannot be specified for %s model form as it is a "
+                    "non-editable field" % (f.name, model.__name__)
                 )
             continue
         if fields is not None and f.name not in fields:
@@ -816,7 +816,8 @@ class BaseModelFormSet(BaseFormSet):
         for uclass, unique_check in all_unique_checks:
             seen_data = set()
             for form in valid_forms:
-                # Get the data for the set of fields that must be unique among the forms.
+                # Get the data for the set of fields that must be unique among
+                # the forms.
                 row_data = (
                     field if field in self.unique_fields else form.cleaned_data[field]
                     for field in unique_check
@@ -839,7 +840,8 @@ class BaseModelFormSet(BaseFormSet):
                             [self.get_form_error()],
                             renderer=self.renderer,
                         )
-                        # remove the data from the cleaned_data dict since it was invalid
+                        # Remove the data from the cleaned_data dict since it
+                        # was invalid.
                         for field in unique_check:
                             if field in form.cleaned_data:
                                 del form.cleaned_data[field]
@@ -874,7 +876,8 @@ class BaseModelFormSet(BaseFormSet):
                             [self.get_form_error()],
                             renderer=self.renderer,
                         )
-                        # remove the data from the cleaned_data dict since it was invalid
+                        # Remove the data from the cleaned_data dict since it
+                        # was invalid.
                         del form.cleaned_data[field]
                     # mark the data as seen
                     seen_data.add(data)

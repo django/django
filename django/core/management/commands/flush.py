@@ -82,7 +82,8 @@ Are you sure you want to do this?
                     % (connection.settings_dict["NAME"],)
                 ) from exc
 
-            # Empty sql_list may signify an empty database and post_migrate would then crash
+            # Empty sql_list may signify an empty database and post_migrate
+            # would then crash.
             if sql_list and not inhibit_post_migrate:
                 # Emit the post migrate signal. This allows individual applications to
                 # respond as if the database had been migrated from scratch.

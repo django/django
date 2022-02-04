@@ -308,7 +308,10 @@ class BaseCommand:
             default=1,
             type=int,
             choices=[0, 1, 2, 3],
-            help="Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output",
+            help=(
+                "Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, "
+                "3=very verbose output"
+            ),
         )
         self.add_base_argument(
             parser,
@@ -322,7 +325,10 @@ class BaseCommand:
         self.add_base_argument(
             parser,
             "--pythonpath",
-            help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".',
+            help=(
+                "A directory to add to the Python path, e.g. "
+                '"/home/djangoprojects/myproject".'
+            ),
         )
         self.add_base_argument(
             parser,

@@ -1098,7 +1098,8 @@ class AutodetectorTests(TestCase):
         for attr, value in attrs.items():
             if getattr(field, attr, None) != value:
                 self.fail(
-                    "Field attribute mismatch for %s.%s op #%s, field.%s (expected %r, got %r):\n%s"
+                    "Field attribute mismatch for %s.%s op #%s, field.%s (expected %r, "
+                    "got %r):\n%s"
                     % (
                         app_label,
                         migration.name,
@@ -2361,7 +2362,8 @@ class AutodetectorTests(TestCase):
                         validators=[
                             RegexValidator(
                                 re.compile("^[-a-zA-Z0-9_]+\\Z"),
-                                "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.",
+                                "Enter a valid “slug” consisting of letters, numbers, "
+                                "underscores or hyphens.",
                                 "invalid",
                             )
                         ],
@@ -2390,7 +2392,8 @@ class AutodetectorTests(TestCase):
                         validators=[
                             RegexValidator(
                                 re.compile("^[a-z]+\\Z", 32),
-                                "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.",
+                                "Enter a valid “slug” consisting of letters, numbers, "
+                                "underscores or hyphens.",
                                 "invalid",
                             )
                         ],
@@ -4058,7 +4061,9 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, app_label, 0, 2, name="restaurant")
 
     def test_multiple_bases(self):
-        """#23956 - Inheriting models doesn't move *_ptr fields into AddField operations."""
+        """
+        Inheriting models doesn't move *_ptr fields into AddField operations.
+        """
         A = ModelState("app", "A", [("a_id", models.AutoField(primary_key=True))])
         B = ModelState("app", "B", [("b_id", models.AutoField(primary_key=True))])
         C = ModelState("app", "C", [], bases=("app.A", "app.B"))

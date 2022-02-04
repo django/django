@@ -119,7 +119,10 @@ class NonAggregateAnnotationTestCase(TestCase):
         )
         cls.b6 = Book.objects.create(
             isbn="155860191",
-            name="Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp",
+            name=(
+                "Paradigms of Artificial Intelligence Programming: Case Studies in "
+                "Common Lisp"
+            ),
             pages=946,
             rating=5.0,
             price=Decimal("75.00"),
@@ -1121,7 +1124,10 @@ class AliasTests(TestCase):
             contact=cls.a4,
             publisher=p1,
             pubdate=datetime.date(1991, 10, 15),
-            name="Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp",
+            name=(
+                "Paradigms of Artificial Intelligence Programming: Case Studies in "
+                "Common Lisp"
+            ),
         )
         cls.b1.authors.add(cls.a1, cls.a2)
         cls.b2.authors.add(cls.a3)

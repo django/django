@@ -21,8 +21,8 @@ DEBUG = False
 # on a live site.
 DEBUG_PROPAGATE_EXCEPTIONS = False
 
-# People who get code error notifications.
-# In the format [('Full Name', 'email@example.com'), ('Full Name', 'anotheremail@example.com')]
+# People who get code error notifications. In the format
+# [('Full Name', 'email@example.com'), ('Full Name', 'anotheremail@example.com')]
 ADMINS = []
 
 # List of IP addresses, as strings, that:
@@ -319,7 +319,8 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
 FILE_UPLOAD_TEMP_DIR = None
 
 # The numeric mode to set newly-uploaded files to. The value should be a mode
-# you'd pass directly to os.chmod; see https://docs.python.org/library/os.html#files-and-directories.
+# you'd pass directly to os.chmod; see
+# https://docs.python.org/library/os.html#files-and-directories.
 FILE_UPLOAD_PERMISSIONS = 0o644
 
 # The numeric mode to assign to newly-created directories, when uploading files.

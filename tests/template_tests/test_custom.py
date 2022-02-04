@@ -111,8 +111,11 @@ class SimpleTagTests(TagTestCase):
                 "simple_only_unlimited_args - Expected result: 37, 42, 56, 89",
             ),
             (
-                '{% load custom %}{% simple_unlimited_args_kwargs 37 40|add:2 56 eggs="scrambled" four=1|add:3 %}',
-                "simple_unlimited_args_kwargs - Expected result: 37, 42, 56 / eggs=scrambled, four=4",
+                "{% load custom %}"
+                '{% simple_unlimited_args_kwargs 37 40|add:2 56 eggs="scrambled" '
+                "four=1|add:3 %}",
+                "simple_unlimited_args_kwargs - Expected result: 37, 42, 56 / "
+                "eggs=scrambled, four=4",
             ),
         ]
 
@@ -141,7 +144,8 @@ class SimpleTagTests(TagTestCase):
                 "{% load custom %}{% simple_one_default 37 42 56 %}",
             ),
             (
-                "'simple_keyword_only_param' did not receive value(s) for the argument(s): 'kwarg'",
+                "'simple_keyword_only_param' did not receive value(s) for the "
+                "argument(s): 'kwarg'",
                 "{% load custom %}{% simple_keyword_only_param %}",
             ),
             (
@@ -156,12 +160,18 @@ class SimpleTagTests(TagTestCase):
                 "kwarg=37 %}",
             ),
             (
-                "'simple_unlimited_args_kwargs' received some positional argument(s) after some keyword argument(s)",
-                '{% load custom %}{% simple_unlimited_args_kwargs 37 40|add:2 eggs="scrambled" 56 four=1|add:3 %}',
+                "'simple_unlimited_args_kwargs' received some positional argument(s) "
+                "after some keyword argument(s)",
+                "{% load custom %}"
+                "{% simple_unlimited_args_kwargs 37 40|add:2 "
+                'eggs="scrambled" 56 four=1|add:3 %}',
             ),
             (
-                "'simple_unlimited_args_kwargs' received multiple values for keyword argument 'eggs'",
-                '{% load custom %}{% simple_unlimited_args_kwargs 37 eggs="scrambled" eggs="scrambled" %}',
+                "'simple_unlimited_args_kwargs' received multiple values for keyword "
+                "argument 'eggs'",
+                "{% load custom %}"
+                "{% simple_unlimited_args_kwargs 37 "
+                'eggs="scrambled" eggs="scrambled" %}',
             ),
         ]
 
@@ -252,11 +262,13 @@ class InclusionTagTests(TagTestCase):
             ),
             (
                 "{% load inclusion %}{% inclusion_no_params_with_context %}",
-                "inclusion_no_params_with_context - Expected result (context value: 42)\n",
+                "inclusion_no_params_with_context - Expected result (context value: "
+                "42)\n",
             ),
             (
                 "{% load inclusion %}{% inclusion_params_and_context 37 %}",
-                "inclusion_params_and_context - Expected result (context value: 42): 37\n",
+                "inclusion_params_and_context - Expected result (context value: 42): "
+                "37\n",
             ),
             (
                 "{% load inclusion %}{% inclusion_two_params 37 42 %}",
@@ -299,8 +311,11 @@ class InclusionTagTests(TagTestCase):
                 "inclusion_only_unlimited_args - Expected result: 37, 42, 56, 89\n",
             ),
             (
-                '{% load inclusion %}{% inclusion_unlimited_args_kwargs 37 40|add:2 56 eggs="scrambled" four=1|add:3 %}',
-                "inclusion_unlimited_args_kwargs - Expected result: 37, 42, 56 / eggs=scrambled, four=4\n",
+                "{% load inclusion %}"
+                '{% inclusion_unlimited_args_kwargs 37 40|add:2 56 eggs="scrambled" '
+                "four=1|add:3 %}",
+                "inclusion_unlimited_args_kwargs - Expected result: 37, 42, 56 / "
+                "eggs=scrambled, four=4\n",
             ),
         ]
 
@@ -312,7 +327,8 @@ class InclusionTagTests(TagTestCase):
         errors = [
             (
                 "'inclusion_one_default' received unexpected keyword argument 'three'",
-                '{% load inclusion %}{% inclusion_one_default 99 two="hello" three="foo" %}',
+                "{% load inclusion %}"
+                '{% inclusion_one_default 99 two="hello" three="foo" %}',
             ),
             (
                 "'inclusion_two_params' received too many positional arguments",
@@ -323,7 +339,8 @@ class InclusionTagTests(TagTestCase):
                 "{% load inclusion %}{% inclusion_one_default 37 42 56 %}",
             ),
             (
-                "'inclusion_one_default' did not receive value(s) for the argument(s): 'one'",
+                "'inclusion_one_default' did not receive value(s) for the argument(s): "
+                "'one'",
                 "{% load inclusion %}{% inclusion_one_default %}",
             ),
             (
@@ -333,17 +350,23 @@ class InclusionTagTests(TagTestCase):
                 "kwarg=37 kwarg=42 %}",
             ),
             (
-                "'inclusion_unlimited_args' did not receive value(s) for the argument(s): 'one'",
+                "'inclusion_unlimited_args' did not receive value(s) for the "
+                "argument(s): 'one'",
                 "{% load inclusion %}{% inclusion_unlimited_args %}",
             ),
             (
-                "'inclusion_unlimited_args_kwargs' received some positional argument(s) "
-                "after some keyword argument(s)",
-                '{% load inclusion %}{% inclusion_unlimited_args_kwargs 37 40|add:2 eggs="boiled" 56 four=1|add:3 %}',
+                "'inclusion_unlimited_args_kwargs' received some positional "
+                "argument(s) after some keyword argument(s)",
+                "{% load inclusion %}"
+                "{% inclusion_unlimited_args_kwargs 37 40|add:2 "
+                'eggs="boiled" 56 four=1|add:3 %}',
             ),
             (
-                "'inclusion_unlimited_args_kwargs' received multiple values for keyword argument 'eggs'",
-                '{% load inclusion %}{% inclusion_unlimited_args_kwargs 37 eggs="scrambled" eggs="scrambled" %}',
+                "'inclusion_unlimited_args_kwargs' received multiple values for "
+                "keyword argument 'eggs'",
+                "{% load inclusion %}"
+                "{% inclusion_unlimited_args_kwargs 37 "
+                'eggs="scrambled" eggs="scrambled" %}',
             ),
         ]
 
@@ -385,16 +408,21 @@ class InclusionTagTests(TagTestCase):
                 "inclusion_one_param_from_template - Expected result: 37\n",
             ),
             (
-                "{% load inclusion %}{% inclusion_explicit_no_context_from_template 37 %}",
+                "{% load inclusion %}"
+                "{% inclusion_explicit_no_context_from_template 37 %}",
                 "inclusion_explicit_no_context_from_template - Expected result: 37\n",
             ),
             (
-                "{% load inclusion %}{% inclusion_no_params_with_context_from_template %}",
-                "inclusion_no_params_with_context_from_template - Expected result (context value: 42)\n",
+                "{% load inclusion %}"
+                "{% inclusion_no_params_with_context_from_template %}",
+                "inclusion_no_params_with_context_from_template - Expected result "
+                "(context value: 42)\n",
             ),
             (
-                "{% load inclusion %}{% inclusion_params_and_context_from_template 37 %}",
-                "inclusion_params_and_context_from_template - Expected result (context value: 42): 37\n",
+                "{% load inclusion %}"
+                "{% inclusion_params_and_context_from_template 37 %}",
+                "inclusion_params_and_context_from_template - Expected result (context "
+                "value: 42): 37\n",
             ),
             (
                 "{% load inclusion %}{% inclusion_two_params_from_template 37 42 %}",
@@ -413,16 +441,20 @@ class InclusionTagTests(TagTestCase):
                 "inclusion_unlimited_args_from_template - Expected result: 37, hi\n",
             ),
             (
-                "{% load inclusion %}{% inclusion_unlimited_args_from_template 37 42 56 89 %}",
-                "inclusion_unlimited_args_from_template - Expected result: 37, 42, 56, 89\n",
+                "{% load inclusion %}"
+                "{% inclusion_unlimited_args_from_template 37 42 56 89 %}",
+                "inclusion_unlimited_args_from_template - Expected result: 37, 42, 56, "
+                "89\n",
             ),
             (
                 "{% load inclusion %}{% inclusion_only_unlimited_args_from_template %}",
                 "inclusion_only_unlimited_args_from_template - Expected result: \n",
             ),
             (
-                "{% load inclusion %}{% inclusion_only_unlimited_args_from_template 37 42 56 89 %}",
-                "inclusion_only_unlimited_args_from_template - Expected result: 37, 42, 56, 89\n",
+                "{% load inclusion %}"
+                "{% inclusion_only_unlimited_args_from_template 37 42 56 89 %}",
+                "inclusion_only_unlimited_args_from_template - Expected result: 37, "
+                "42, 56, 89\n",
             ),
         ]
 

@@ -648,7 +648,8 @@ class FormattingTests(SimpleTestCase):
                     thousand_sep=",",
                 ),
             )
-            # This unusual grouping/force_grouping combination may be triggered by the intcomma filter (#17414)
+            # This unusual grouping/force_grouping combination may be triggered
+            # by the intcomma filter.
             self.assertEqual(
                 "10000",
                 nformat(
@@ -1119,10 +1120,12 @@ class FormattingTests(SimpleTestCase):
                 '<option value="6">\u0418\u044e\u043d\u044c</option>'
                 '<option value="7">\u0418\u044e\u043b\u044c</option>'
                 '<option value="8">\u0410\u0432\u0433\u0443\u0441\u0442</option>'
-                '<option value="9">\u0421\u0435\u043d\u0442\u044f\u0431\u0440\u044c</option>'
+                '<option value="9">\u0421\u0435\u043d\u0442\u044f\u0431\u0440\u044c'
+                "</option>"
                 '<option value="10">\u041e\u043a\u0442\u044f\u0431\u0440\u044c</option>'
                 '<option value="11">\u041d\u043e\u044f\u0431\u0440\u044c</option>'
-                '<option value="12" selected>\u0414\u0435\u043a\u0430\u0431\u0440\u044c</option>'
+                '<option value="12" selected>\u0414\u0435\u043a\u0430\u0431\u0440\u044c'
+                "</option>"
                 "</select>"
                 '<select name="mydate_year" id="id_mydate_year">'
                 '<option value="">---</option>'
@@ -1333,13 +1336,17 @@ class FormattingTests(SimpleTestCase):
             self.assertHTMLEqual(
                 form6.as_ul(),
                 '<li><label for="id_name">Name:</label>'
-                '<input id="id_name" type="text" name="name" value="acme" maxlength="50" required></li>'
+                '<input id="id_name" type="text" name="name" value="acme" '
+                '   maxlength="50" required></li>'
                 '<li><label for="id_date_added">Date added:</label>'
-                '<input type="text" name="date_added" value="31.12.2009 06:00:00" id="id_date_added" required></li>'
+                '<input type="text" name="date_added" value="31.12.2009 06:00:00" '
+                '   id="id_date_added" required></li>'
                 '<li><label for="id_cents_paid">Cents paid:</label>'
-                '<input type="text" name="cents_paid" value="59,47" id="id_cents_paid" required></li>'
+                '<input type="text" name="cents_paid" value="59,47" id="id_cents_paid" '
+                "   required></li>"
                 '<li><label for="id_products_delivered">Products delivered:</label>'
-                '<input type="text" name="products_delivered" value="12000" id="id_products_delivered" required>'
+                '<input type="text" name="products_delivered" value="12000" '
+                '   id="id_products_delivered" required>'
                 "</li>",
             )
             self.assertEqual(
@@ -1516,7 +1523,8 @@ class FormattingTests(SimpleTestCase):
             {"int": 1455, "float": 3.14, "date": datetime.date(2016, 12, 31)}
         )
         template1 = Template(
-            "{% load l10n %}{% localize %}{{ int }}/{{ float }}/{{ date }}{% endlocalize %}; "
+            "{% load l10n %}{% localize %}"
+            "{{ int }}/{{ float }}/{{ date }}{% endlocalize %}; "
             "{% localize on %}{{ int }}/{{ float }}/{{ date }}{% endlocalize %}"
         )
         template2 = Template(
@@ -1589,7 +1597,7 @@ class FormattingTests(SimpleTestCase):
 
     def test_localized_as_text_as_hidden_input(self):
         """
-        Tests if form input with 'as_hidden' or 'as_text' is correctly localized. Ticket #18777
+        Form input with 'as_hidden' or 'as_text' is correctly localized.
         """
         self.maxDiff = 1200
 
@@ -1598,10 +1606,12 @@ class FormattingTests(SimpleTestCase):
                 "{% load l10n %}{{ form.date_added }}; {{ form.cents_paid }}"
             )
             template_as_text = Template(
-                "{% load l10n %}{{ form.date_added.as_text }}; {{ form.cents_paid.as_text }}"
+                "{% load l10n %}"
+                "{{ form.date_added.as_text }}; {{ form.cents_paid.as_text }}"
             )
             template_as_hidden = Template(
-                "{% load l10n %}{{ form.date_added.as_hidden }}; {{ form.cents_paid.as_hidden }}"
+                "{% load l10n %}"
+                "{{ form.date_added.as_hidden }}; {{ form.cents_paid.as_hidden }}"
             )
             form = CompanyForm(
                 {
@@ -1616,18 +1626,24 @@ class FormattingTests(SimpleTestCase):
 
             self.assertHTMLEqual(
                 template.render(context),
-                '<input id="id_date_added" name="date_added" type="text" value="31.12.2009 06:00:00" required>;'
-                '<input id="id_cents_paid" name="cents_paid" type="text" value="59,47" required>',
+                '<input id="id_date_added" name="date_added" type="text" '
+                'value="31.12.2009 06:00:00" required>;'
+                '<input id="id_cents_paid" name="cents_paid" type="text" value="59,47" '
+                "required>",
             )
             self.assertHTMLEqual(
                 template_as_text.render(context),
-                '<input id="id_date_added" name="date_added" type="text" value="31.12.2009 06:00:00" required>;'
-                ' <input id="id_cents_paid" name="cents_paid" type="text" value="59,47" required>',
+                '<input id="id_date_added" name="date_added" type="text" '
+                'value="31.12.2009 06:00:00" required>;'
+                '<input id="id_cents_paid" name="cents_paid" type="text" value="59,47" '
+                "required>",
             )
             self.assertHTMLEqual(
                 template_as_hidden.render(context),
-                '<input id="id_date_added" name="date_added" type="hidden" value="31.12.2009 06:00:00">;'
-                '<input id="id_cents_paid" name="cents_paid" type="hidden" value="59,47">',
+                '<input id="id_date_added" name="date_added" type="hidden" '
+                'value="31.12.2009 06:00:00">;'
+                '<input id="id_cents_paid" name="cents_paid" type="hidden" '
+                'value="59,47">',
             )
 
     def test_format_arbitrary_settings(self):
@@ -1999,8 +2015,8 @@ class ResolutionOrderI18NTests(SimpleTestCase):
         self.assertIn(
             msgstr,
             result,
-            "The string '%s' isn't in the translation of '%s'; the actual result is '%s'."
-            % (msgstr, msgid, result),
+            "The string '%s' isn't in the translation of '%s'; the actual result is "
+            "'%s'." % (msgstr, msgid, result),
         )
 
 

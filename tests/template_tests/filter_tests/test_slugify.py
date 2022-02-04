@@ -14,7 +14,9 @@ class SlugifyTests(SimpleTestCase):
 
     @setup(
         {
-            "slugify01": "{% autoescape off %}{{ a|slugify }} {{ b|slugify }}{% endautoescape %}"
+            "slugify01": (
+                "{% autoescape off %}{{ a|slugify }} {{ b|slugify }}{% endautoescape %}"
+            )
         }
     )
     def test_slugify01(self):

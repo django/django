@@ -15,7 +15,9 @@ class FirstTests(SimpleTestCase):
 
     @setup(
         {
-            "first02": "{% autoescape off %}{{ a|first }} {{ b|first }}{% endautoescape %}"
+            "first02": (
+                "{% autoescape off %}{{ a|first }} {{ b|first }}{% endautoescape %}"
+            )
         }
     )
     def test_first02(self):

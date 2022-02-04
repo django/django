@@ -532,7 +532,10 @@ class HttpResponseSubclassesTests(SimpleTestCase):
 
     def test_redirect_repr(self):
         response = HttpResponseRedirect("/redirected/")
-        expected = '<HttpResponseRedirect status_code=302, "text/html; charset=utf-8", url="/redirected/">'
+        expected = (
+            '<HttpResponseRedirect status_code=302, "text/html; charset=utf-8", '
+            'url="/redirected/">'
+        )
         self.assertEqual(repr(response), expected)
 
     def test_invalid_redirect_repr(self):
@@ -545,7 +548,10 @@ class HttpResponseSubclassesTests(SimpleTestCase):
             DisallowedRedirect, "Unsafe redirect to URL with protocol 'ssh'"
         ):
             HttpResponseRedirect.__init__(response, "ssh://foo")
-        expected = '<HttpResponseRedirect status_code=302, "text/html; charset=utf-8", url="ssh://foo">'
+        expected = (
+            '<HttpResponseRedirect status_code=302, "text/html; charset=utf-8", '
+            'url="ssh://foo">'
+        )
         self.assertEqual(repr(response), expected)
 
     def test_not_modified(self):

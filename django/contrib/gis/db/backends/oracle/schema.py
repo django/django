@@ -16,7 +16,10 @@ class OracleGISSchemaEditor(DatabaseSchemaEditor):
             ),
             %(srid)s
         )"""
-    sql_add_spatial_index = "CREATE INDEX %(index)s ON %(table)s(%(column)s) INDEXTYPE IS MDSYS.SPATIAL_INDEX"
+    sql_add_spatial_index = (
+        "CREATE INDEX %(index)s ON %(table)s(%(column)s) "
+        "INDEXTYPE IS MDSYS.SPATIAL_INDEX"
+    )
     sql_drop_spatial_index = "DROP INDEX %(index)s"
     sql_clear_geometry_table_metadata = (
         "DELETE FROM USER_SDO_GEOM_METADATA WHERE TABLE_NAME = %(table)s"

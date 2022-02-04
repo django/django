@@ -12,7 +12,8 @@ class FlatpageForm(forms.ModelForm):
         max_length=100,
         regex=r"^[-\w/\.~]+$",
         help_text=_(
-            "Example: “/about/contact/”. Make sure to have leading and trailing slashes."
+            "Example: “/about/contact/”. Make sure to have leading and trailing "
+            "slashes."
         ),
         error_messages={
             "invalid": _(

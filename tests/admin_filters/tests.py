@@ -1262,7 +1262,10 @@ class ListFiltersTests(TestCase):
         modeladmin = DecadeFilterBookAdminWithoutParameter(Book, site)
         request = self.request_factory.get("/", {})
         request.user = self.alfred
-        msg = "The list filter 'DecadeListFilterWithoutParameter' does not specify a 'parameter_name'."
+        msg = (
+            "The list filter 'DecadeListFilterWithoutParameter' does not specify a "
+            "'parameter_name'."
+        )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             modeladmin.get_changelist_instance(request)
 

@@ -14,7 +14,9 @@ class LengthIsTests(SimpleTestCase):
 
     @setup(
         {
-            "length_is02": '{% if some_list|length_is:"4" %}Four{% else %}Not Four{% endif %}'
+            "length_is02": (
+                '{% if some_list|length_is:"4" %}Four{% else %}Not Four{% endif %}'
+            )
         }
     )
     def test_length_is02(self):
@@ -30,7 +32,9 @@ class LengthIsTests(SimpleTestCase):
 
     @setup(
         {
-            "length_is04": '{% if mystring|length_is:"4" %}Four{% else %}Not Four{% endif %}'
+            "length_is04": (
+                '{% if mystring|length_is:"4" %}Four{% else %}Not Four{% endif %}'
+            )
         }
     )
     def test_length_is04(self):
@@ -39,7 +43,9 @@ class LengthIsTests(SimpleTestCase):
 
     @setup(
         {
-            "length_is05": '{% if mystring|length_is:"4" %}Four{% else %}Not Four{% endif %}'
+            "length_is05": (
+                '{% if mystring|length_is:"4" %}Four{% else %}Not Four{% endif %}'
+            )
         }
     )
     def test_length_is05(self):
@@ -48,7 +54,9 @@ class LengthIsTests(SimpleTestCase):
 
     @setup(
         {
-            "length_is06": "{% with var|length as my_length %}{{ my_length }}{% endwith %}"
+            "length_is06": (
+                "{% with var|length as my_length %}{{ my_length }}{% endwith %}"
+            )
         }
     )
     def test_length_is06(self):
@@ -58,7 +66,9 @@ class LengthIsTests(SimpleTestCase):
     # Boolean return value from length_is should not be coerced to a string
     @setup(
         {
-            "length_is07": '{% if "X"|length_is:0 %}Length is 0{% else %}Length not 0{% endif %}'
+            "length_is07": (
+                '{% if "X"|length_is:0 %}Length is 0{% else %}Length not 0{% endif %}'
+            )
         }
     )
     def test_length_is07(self):
@@ -67,7 +77,9 @@ class LengthIsTests(SimpleTestCase):
 
     @setup(
         {
-            "length_is08": '{% if "X"|length_is:1 %}Length is 1{% else %}Length not 1{% endif %}'
+            "length_is08": (
+                '{% if "X"|length_is:1 %}Length is 1{% else %}Length not 1{% endif %}'
+            )
         }
     )
     def test_length_is08(self):

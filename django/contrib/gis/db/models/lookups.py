@@ -202,7 +202,8 @@ class BBContainsLookup(GISLookup):
 @BaseSpatialField.register_lookup
 class BBOverlapsLookup(GISLookup):
     """
-    The 'bboverlaps' operator returns true if A's bounding box overlaps B's bounding box.
+    The 'bboverlaps' operator returns true if A's bounding box overlaps B's
+    bounding box.
     """
 
     lookup_name = "bboverlaps"
@@ -307,7 +308,8 @@ class DistanceLookupBase(GISLookup):
             )
         elif len(self.rhs_params) == 3 and self.rhs_params[2] != "spheroid":
             raise ValueError(
-                "For 4-element tuples the last argument must be the 'spheroid' directive."
+                "For 4-element tuples the last argument must be the 'spheroid' "
+                "directive."
             )
 
         # Check if the second parameter is a band index.

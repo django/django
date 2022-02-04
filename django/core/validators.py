@@ -174,8 +174,11 @@ class EmailValidator:
     message = _("Enter a valid email address.")
     code = "invalid"
     user_regex = _lazy_re_compile(
-        r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*\Z"  # dot-atom
-        r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"\Z)',  # quoted-string
+        # dot-atom
+        r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*\Z"
+        # quoted-string
+        r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])'
+        r'*"\Z)',
         re.IGNORECASE,
     )
     domain_regex = _lazy_re_compile(
@@ -257,7 +260,8 @@ slug_unicode_re = _lazy_re_compile(r"^[-\w]+\Z")
 validate_unicode_slug = RegexValidator(
     slug_unicode_re,
     _(
-        "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or hyphens."
+        "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
+        "hyphens."
     ),
     "invalid",
 )
@@ -400,8 +404,10 @@ class MinValueValidator(BaseValidator):
 @deconstructible
 class MinLengthValidator(BaseValidator):
     message = ngettext_lazy(
-        "Ensure this value has at least %(limit_value)d character (it has %(show_value)d).",
-        "Ensure this value has at least %(limit_value)d characters (it has %(show_value)d).",
+        "Ensure this value has at least %(limit_value)d character (it has "
+        "%(show_value)d).",
+        "Ensure this value has at least %(limit_value)d characters (it has "
+        "%(show_value)d).",
         "limit_value",
     )
     code = "min_length"
@@ -416,8 +422,10 @@ class MinLengthValidator(BaseValidator):
 @deconstructible
 class MaxLengthValidator(BaseValidator):
     message = ngettext_lazy(
-        "Ensure this value has at most %(limit_value)d character (it has %(show_value)d).",
-        "Ensure this value has at most %(limit_value)d characters (it has %(show_value)d).",
+        "Ensure this value has at most %(limit_value)d character (it has "
+        "%(show_value)d).",
+        "Ensure this value has at most %(limit_value)d characters (it has "
+        "%(show_value)d).",
         "limit_value",
     )
     code = "max_length"
@@ -449,8 +457,10 @@ class DecimalValidator:
             "max",
         ),
         "max_whole_digits": ngettext_lazy(
-            "Ensure that there are no more than %(max)s digit before the decimal point.",
-            "Ensure that there are no more than %(max)s digits before the decimal point.",
+            "Ensure that there are no more than %(max)s digit before the decimal "
+            "point.",
+            "Ensure that there are no more than %(max)s digits before the decimal "
+            "point.",
             "max",
         ),
     }

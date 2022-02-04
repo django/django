@@ -94,7 +94,8 @@ class SQLCompiler:
         #    SomeModel.objects.annotate(Count('somecol')).values('name')
         #    GROUP BY: all cols of the model
         #
-        #    SomeModel.objects.values('name', 'pk').annotate(Count('somecol')).values('pk')
+        #    SomeModel.objects.values('name', 'pk')
+        #    .annotate(Count('somecol')).values('pk')
         #    GROUP BY: name, pk
         #
         #    SomeModel.objects.values('name').annotate(Count('somecol')).values('pk')
@@ -647,10 +648,7 @@ class SQLCompiler:
                 result += [", ".join(out_cols), "FROM", *from_]
                 params.extend(f_params)
 
-                if (
-                    self.query.select_for_update
-                    and self.connection.features.has_select_for_update
-                ):
+                if self.query.select_for_update and features.has_select_for_update:
                     if self.connection.get_autocommit():
                         raise TransactionManagementError(
                             "select_for_update cannot be used outside of a transaction."
@@ -658,7 +656,7 @@ class SQLCompiler:
 
                     if (
                         with_limit_offset
-                        and not self.connection.features.supports_select_for_update_with_limit
+                        and not features.supports_select_for_update_with_limit
                     ):
                         raise NotSupportedError(
                             "LIMIT/OFFSET is not supported with "
@@ -671,28 +669,19 @@ class SQLCompiler:
                     # If it's a NOWAIT/SKIP LOCKED/OF/NO KEY query but the
                     # backend doesn't support it, raise NotSupportedError to
                     # prevent a possible deadlock.
-                    if (
-                        nowait
-                        and not self.connection.features.has_select_for_update_nowait
-                    ):
+                    if nowait and not features.has_select_for_update_nowait:
                         raise NotSupportedError(
                             "NOWAIT is not supported on this database backend."
                         )
-                    elif (
-                        skip_locked
-                        and not self.connection.features.has_select_for_update_skip_locked
-                    ):
+                    elif skip_locked and not features.has_select_for_update_skip_locked:
                         raise NotSupportedError(
                             "SKIP LOCKED is not supported on this database backend."
                         )
-                    elif of and not self.connection.features.has_select_for_update_of:
+                    elif of and not features.has_select_for_update_of:
                         raise NotSupportedError(
                             "FOR UPDATE OF is not supported on this database backend."
                         )
-                    elif (
-                        no_key
-                        and not self.connection.features.has_select_for_no_key_update
-                    ):
+                    elif no_key and not features.has_select_for_no_key_update:
                         raise NotSupportedError(
                             "FOR NO KEY UPDATE is not supported on this "
                             "database backend."
@@ -704,7 +693,7 @@ class SQLCompiler:
                         no_key=no_key,
                     )
 
-                if for_update_part and self.connection.features.for_update_after_from:
+                if for_update_part and features.for_update_after_from:
                     result.append(for_update_part)
 
                 if where:
@@ -751,7 +740,7 @@ class SQLCompiler:
                     )
                 )
 
-            if for_update_part and not self.connection.features.for_update_after_from:
+            if for_update_part and not features.for_update_after_from:
                 result.append(for_update_part)
 
             if self.query.subquery and extra_select:

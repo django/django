@@ -34,7 +34,9 @@ class ForTagTests(SimpleTestCase):
 
     @setup(
         {
-            "for-tag-vars03": "{% for val in values %}{{ forloop.revcounter }}{% endfor %}"
+            "for-tag-vars03": (
+                "{% for val in values %}{{ forloop.revcounter }}{% endfor %}"
+            )
         }
     )
     def test_for_tag_vars03(self):
@@ -43,7 +45,9 @@ class ForTagTests(SimpleTestCase):
 
     @setup(
         {
-            "for-tag-vars04": "{% for val in values %}{{ forloop.revcounter0 }}{% endfor %}"
+            "for-tag-vars04": (
+                "{% for val in values %}{{ forloop.revcounter0 }}{% endfor %}"
+            )
         }
     )
     def test_for_tag_vars04(self):
@@ -72,7 +76,9 @@ class ForTagTests(SimpleTestCase):
 
     @setup(
         {
-            "for-tag-unpack01": "{% for key,value in items %}{{ key }}:{{ value }}/{% endfor %}"
+            "for-tag-unpack01": (
+                "{% for key,value in items %}{{ key }}:{{ value }}/{% endfor %}"
+            )
         }
     )
     def test_for_tag_unpack01(self):
@@ -83,7 +89,9 @@ class ForTagTests(SimpleTestCase):
 
     @setup(
         {
-            "for-tag-unpack03": "{% for key, value in items %}{{ key }}:{{ value }}/{% endfor %}"
+            "for-tag-unpack03": (
+                "{% for key, value in items %}{{ key }}:{{ value }}/{% endfor %}"
+            )
         }
     )
     def test_for_tag_unpack03(self):
@@ -94,7 +102,9 @@ class ForTagTests(SimpleTestCase):
 
     @setup(
         {
-            "for-tag-unpack04": "{% for key , value in items %}{{ key }}:{{ value }}/{% endfor %}"
+            "for-tag-unpack04": (
+                "{% for key , value in items %}{{ key }}:{{ value }}/{% endfor %}"
+            )
         }
     )
     def test_for_tag_unpack04(self):
@@ -105,7 +115,9 @@ class ForTagTests(SimpleTestCase):
 
     @setup(
         {
-            "for-tag-unpack05": "{% for key ,value in items %}{{ key }}:{{ value }}/{% endfor %}"
+            "for-tag-unpack05": (
+                "{% for key ,value in items %}{{ key }}:{{ value }}/{% endfor %}"
+            )
         }
     )
     def test_for_tag_unpack05(self):
@@ -116,7 +128,9 @@ class ForTagTests(SimpleTestCase):
 
     @setup(
         {
-            "for-tag-unpack06": "{% for key value in items %}{{ key }}:{{ value }}/{% endfor %}"
+            "for-tag-unpack06": (
+                "{% for key value in items %}{{ key }}:{{ value }}/{% endfor %}"
+            )
         }
     )
     def test_for_tag_unpack06(self):
@@ -128,7 +142,9 @@ class ForTagTests(SimpleTestCase):
 
     @setup(
         {
-            "for-tag-unpack07": "{% for key,,value in items %}{{ key }}:{{ value }}/{% endfor %}"
+            "for-tag-unpack07": (
+                "{% for key,,value in items %}{{ key }}:{{ value }}/{% endfor %}"
+            )
         }
     )
     def test_for_tag_unpack07(self):
@@ -140,7 +156,9 @@ class ForTagTests(SimpleTestCase):
 
     @setup(
         {
-            "for-tag-unpack08": "{% for key,value, in items %}{{ key }}:{{ value }}/{% endfor %}"
+            "for-tag-unpack08": (
+                "{% for key,value, in items %}{{ key }}:{{ value }}/{% endfor %}"
+            )
         }
     )
     def test_for_tag_unpack08(self):
@@ -170,7 +188,9 @@ class ForTagTests(SimpleTestCase):
 
     @setup(
         {
-            "for-tag-unpack09": "{% for val in items %}{{ val.0 }}:{{ val.1 }}/{% endfor %}"
+            "for-tag-unpack09": (
+                "{% for val in items %}{{ val.0 }}:{{ val.1 }}/{% endfor %}"
+            )
         }
     )
     def test_for_tag_unpack09(self):
@@ -184,7 +204,9 @@ class ForTagTests(SimpleTestCase):
 
     @setup(
         {
-            "for-tag-unpack13": "{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}"
+            "for-tag-unpack13": (
+                "{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}"
+            )
         }
     )
     def test_for_tag_unpack13(self):
@@ -198,7 +220,9 @@ class ForTagTests(SimpleTestCase):
 
     @setup(
         {
-            "for-tag-empty01": "{% for val in values %}{{ val }}{% empty %}empty text{% endfor %}"
+            "for-tag-empty01": (
+                "{% for val in values %}{{ val }}{% empty %}empty text{% endfor %}"
+            )
         }
     )
     def test_for_tag_empty01(self):
@@ -207,7 +231,10 @@ class ForTagTests(SimpleTestCase):
 
     @setup(
         {
-            "for-tag-empty02": "{% for val in values %}{{ val }}{% empty %}values array empty{% endfor %}"
+            "for-tag-empty02": (
+                "{% for val in values %}{{ val }}{% empty %}values array empty"
+                "{% endfor %}"
+            )
         }
     )
     def test_for_tag_empty02(self):
@@ -226,7 +253,9 @@ class ForTagTests(SimpleTestCase):
 
     @setup(
         {
-            "for-tag-filter-ws": "{% load custom %}{% for x in s|noop:'x y' %}{{ x }}{% endfor %}"
+            "for-tag-filter-ws": (
+                "{% load custom %}{% for x in s|noop:'x y' %}{{ x }}{% endfor %}"
+            )
         }
     )
     def test_for_tag_filter_ws(self):
@@ -257,7 +286,9 @@ class ForTagTests(SimpleTestCase):
 
     @setup(
         {
-            "for-tag-unpack11": "{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}"
+            "for-tag-unpack11": (
+                "{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}"
+            )
         }
     )
     def test_for_tag_unpack11(self):
@@ -271,7 +302,9 @@ class ForTagTests(SimpleTestCase):
 
     @setup(
         {
-            "for-tag-unpack12": "{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}"
+            "for-tag-unpack12": (
+                "{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}"
+            )
         }
     )
     def test_for_tag_unpack12(self):

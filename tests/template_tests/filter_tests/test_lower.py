@@ -8,7 +8,9 @@ from ..utils import setup
 class LowerTests(SimpleTestCase):
     @setup(
         {
-            "lower01": "{% autoescape off %}{{ a|lower }} {{ b|lower }}{% endautoescape %}"
+            "lower01": (
+                "{% autoescape off %}{{ a|lower }} {{ b|lower }}{% endautoescape %}"
+            )
         }
     )
     def test_lower01(self):

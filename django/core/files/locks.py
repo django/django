@@ -6,7 +6,7 @@ Cookbook [1] (licensed under the Python Software License) and a ctypes port by
 Anatoly Techtonik for Roundup [2] (license [3]).
 
 [1] https://code.activestate.com/recipes/65203/
-[2] https://sourceforge.net/p/roundup/code/ci/default/tree/roundup/backends/portalocker.py
+[2] https://sourceforge.net/p/roundup/code/ci/default/tree/roundup/backends/portalocker.py  # NOQA
 [3] https://sourceforge.net/p/roundup/code/ci/default/tree/COPYING.txt
 
 Example Usage::

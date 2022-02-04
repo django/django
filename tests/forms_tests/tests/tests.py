@@ -66,7 +66,10 @@ class TestTicket14567(TestCase):
     """
 
     def test_empty_queryset_return(self):
-        "If a model's ManyToManyField has blank=True and is saved with no data, a queryset is returned."
+        """
+        If a model's ManyToManyField has blank=True and is saved with no data,
+        a queryset is returned.
+        """
         option = ChoiceOptionModel.objects.create(name="default")
         form = OptionalMultiChoiceModelForm(
             {"multi_choice_optional": "", "multi_choice": [option.pk]}
@@ -82,7 +85,10 @@ class TestTicket14567(TestCase):
 
 class ModelFormCallableModelDefault(TestCase):
     def test_no_empty_option(self):
-        "If a model's ForeignKey has blank=False and a default, no empty option is created (Refs #10792)."
+        """
+        If a model's ForeignKey has blank=False and a default, no empty option
+        is created.
+        """
         option = ChoiceOptionModel.objects.create(name="default")
 
         choices = list(ChoiceFieldForm().fields["choice"].choices)
@@ -90,34 +96,52 @@ class ModelFormCallableModelDefault(TestCase):
         self.assertEqual(choices[0], (option.pk, str(option)))
 
     def test_callable_initial_value(self):
-        "The initial value for a callable default returning a queryset is the pk (refs #13769)"
+        """
+        The initial value for a callable default returning a queryset is the
+        pk.
+        """
         ChoiceOptionModel.objects.create(id=1, name="default")
         ChoiceOptionModel.objects.create(id=2, name="option 2")
         ChoiceOptionModel.objects.create(id=3, name="option 3")
         self.assertHTMLEqual(
             ChoiceFieldForm().as_p(),
-            """<p><label for="id_choice">Choice:</label> <select name="choice" id="id_choice">
-<option value="1" selected>ChoiceOption 1</option>
-<option value="2">ChoiceOption 2</option>
-<option value="3">ChoiceOption 3</option>
-</select><input type="hidden" name="initial-choice" value="1" id="initial-id_choice"></p>
-<p><label for="id_choice_int">Choice int:</label> <select name="choice_int" id="id_choice_int">
-<option value="1" selected>ChoiceOption 1</option>
-<option value="2">ChoiceOption 2</option>
-<option value="3">ChoiceOption 3</option>
-</select><input type="hidden" name="initial-choice_int" value="1" id="initial-id_choice_int"></p>
-<p><label for="id_multi_choice">Multi choice:</label>
-<select multiple name="multi_choice" id="id_multi_choice" required>
-<option value="1" selected>ChoiceOption 1</option>
-<option value="2">ChoiceOption 2</option>
-<option value="3">ChoiceOption 3</option>
-</select><input type="hidden" name="initial-multi_choice" value="1" id="initial-id_multi_choice_0"></p>
-<p><label for="id_multi_choice_int">Multi choice int:</label>
-<select multiple name="multi_choice_int" id="id_multi_choice_int" required>
-<option value="1" selected>ChoiceOption 1</option>
-<option value="2">ChoiceOption 2</option>
-<option value="3">ChoiceOption 3</option>
-</select><input type="hidden" name="initial-multi_choice_int" value="1" id="initial-id_multi_choice_int_0"></p>""",
+            """
+            <p><label for="id_choice">Choice:</label>
+            <select name="choice" id="id_choice">
+            <option value="1" selected>ChoiceOption 1</option>
+            <option value="2">ChoiceOption 2</option>
+            <option value="3">ChoiceOption 3</option>
+            </select>
+            <input type="hidden" name="initial-choice" value="1" id="initial-id_choice">
+            </p>
+            <p><label for="id_choice_int">Choice int:</label>
+            <select name="choice_int" id="id_choice_int">
+            <option value="1" selected>ChoiceOption 1</option>
+            <option value="2">ChoiceOption 2</option>
+            <option value="3">ChoiceOption 3</option>
+            </select>
+            <input type="hidden" name="initial-choice_int" value="1"
+                id="initial-id_choice_int">
+            </p>
+            <p><label for="id_multi_choice">Multi choice:</label>
+            <select multiple name="multi_choice" id="id_multi_choice" required>
+            <option value="1" selected>ChoiceOption 1</option>
+            <option value="2">ChoiceOption 2</option>
+            <option value="3">ChoiceOption 3</option>
+            </select>
+            <input type="hidden" name="initial-multi_choice" value="1"
+                id="initial-id_multi_choice_0">
+            </p>
+            <p><label for="id_multi_choice_int">Multi choice int:</label>
+            <select multiple name="multi_choice_int" id="id_multi_choice_int" required>
+            <option value="1" selected>ChoiceOption 1</option>
+            <option value="2">ChoiceOption 2</option>
+            <option value="3">ChoiceOption 3</option>
+            </select>
+            <input type="hidden" name="initial-multi_choice_int" value="1"
+                id="initial-id_multi_choice_int_0">
+            </p>
+            """,
         )
 
     def test_initial_instance_value(self):
@@ -136,30 +160,47 @@ class ModelFormCallableModelDefault(TestCase):
                     ),
                 }
             ).as_p(),
-            """<p><label for="id_choice">Choice:</label> <select name="choice" id="id_choice">
-<option value="1">ChoiceOption 1</option>
-<option value="2" selected>ChoiceOption 2</option>
-<option value="3">ChoiceOption 3</option>
-</select><input type="hidden" name="initial-choice" value="2" id="initial-id_choice"></p>
-<p><label for="id_choice_int">Choice int:</label> <select name="choice_int" id="id_choice_int">
-<option value="1">ChoiceOption 1</option>
-<option value="2" selected>ChoiceOption 2</option>
-<option value="3">ChoiceOption 3</option>
-</select><input type="hidden" name="initial-choice_int" value="2" id="initial-id_choice_int"></p>
-<p><label for="id_multi_choice">Multi choice:</label>
-<select multiple name="multi_choice" id="id_multi_choice" required>
-<option value="1">ChoiceOption 1</option>
-<option value="2" selected>ChoiceOption 2</option>
-<option value="3" selected>ChoiceOption 3</option>
-</select><input type="hidden" name="initial-multi_choice" value="2" id="initial-id_multi_choice_0">
-<input type="hidden" name="initial-multi_choice" value="3" id="initial-id_multi_choice_1"></p>
-<p><label for="id_multi_choice_int">Multi choice int:</label>
-<select multiple name="multi_choice_int" id="id_multi_choice_int" required>
-<option value="1">ChoiceOption 1</option>
-<option value="2" selected>ChoiceOption 2</option>
-<option value="3" selected>ChoiceOption 3</option>
-</select><input type="hidden" name="initial-multi_choice_int" value="2" id="initial-id_multi_choice_int_0">
-<input type="hidden" name="initial-multi_choice_int" value="3" id="initial-id_multi_choice_int_1"></p>""",
+            """
+            <p><label for="id_choice">Choice:</label>
+            <select name="choice" id="id_choice">
+            <option value="1">ChoiceOption 1</option>
+            <option value="2" selected>ChoiceOption 2</option>
+            <option value="3">ChoiceOption 3</option>
+            </select>
+            <input type="hidden" name="initial-choice" value="2" id="initial-id_choice">
+            </p>
+            <p><label for="id_choice_int">Choice int:</label>
+            <select name="choice_int" id="id_choice_int">
+            <option value="1">ChoiceOption 1</option>
+            <option value="2" selected>ChoiceOption 2</option>
+            <option value="3">ChoiceOption 3</option>
+            </select>
+            <input type="hidden" name="initial-choice_int" value="2"
+                id="initial-id_choice_int">
+            </p>
+            <p><label for="id_multi_choice">Multi choice:</label>
+            <select multiple name="multi_choice" id="id_multi_choice" required>
+            <option value="1">ChoiceOption 1</option>
+            <option value="2" selected>ChoiceOption 2</option>
+            <option value="3" selected>ChoiceOption 3</option>
+            </select>
+            <input type="hidden" name="initial-multi_choice" value="2"
+                id="initial-id_multi_choice_0">
+            <input type="hidden" name="initial-multi_choice" value="3"
+                id="initial-id_multi_choice_1">
+            </p>
+            <p><label for="id_multi_choice_int">Multi choice int:</label>
+            <select multiple name="multi_choice_int" id="id_multi_choice_int" required>
+            <option value="1">ChoiceOption 1</option>
+            <option value="2" selected>ChoiceOption 2</option>
+            <option value="3" selected>ChoiceOption 3</option>
+            </select>
+            <input type="hidden" name="initial-multi_choice_int" value="2"
+                id="initial-id_multi_choice_int_0">
+            <input type="hidden" name="initial-multi_choice_int" value="3"
+                id="initial-id_multi_choice_int_1">
+            </p>
+            """,
         )
 
 
@@ -194,9 +235,8 @@ class FormsModelTestCase(TestCase):
         self.assertFalse(f.is_valid())
 
     def test_formfield_initial(self):
-        # Formfield initial values ########
-        # If the model has default values for some fields, they are used as the formfield
-        # initial values.
+        # If the model has default values for some fields, they are used as the
+        # formfield initial values.
         class DefaultsForm(ModelForm):
             class Meta:
                 model = Defaults
@@ -323,25 +363,32 @@ class EmptyLabelTestCase(TestCase):
         f = EmptyCharLabelChoiceForm()
         self.assertHTMLEqual(
             f.as_p(),
-            """<p><label for="id_name">Name:</label> <input id="id_name" maxlength="10" name="name" type="text" required></p>
-<p><label for="id_choice">Choice:</label> <select id="id_choice" name="choice">
-<option value="" selected>No Preference</option>
-<option value="f">Foo</option>
-<option value="b">Bar</option>
-</select></p>""",
+            """
+            <p><label for="id_name">Name:</label>
+            <input id="id_name" maxlength="10" name="name" type="text" required></p>
+            <p><label for="id_choice">Choice:</label>
+            <select id="id_choice" name="choice">
+            <option value="" selected>No Preference</option>
+            <option value="f">Foo</option>
+            <option value="b">Bar</option>
+            </select></p>
+            """,
         )
 
     def test_empty_field_char_none(self):
         f = EmptyCharLabelNoneChoiceForm()
         self.assertHTMLEqual(
             f.as_p(),
-            """<p><label for="id_name">Name:</label> <input id="id_name" maxlength="10" name="name" type="text" required></p>
-<p><label for="id_choice_string_w_none">Choice string w none:</label>
-<select id="id_choice_string_w_none" name="choice_string_w_none">
-<option value="" selected>No Preference</option>
-<option value="f">Foo</option>
-<option value="b">Bar</option>
-</select></p>""",
+            """
+            <p><label for="id_name">Name:</label>
+            <input id="id_name" maxlength="10" name="name" type="text" required></p>
+            <p><label for="id_choice_string_w_none">Choice string w none:</label>
+            <select id="id_choice_string_w_none" name="choice_string_w_none">
+            <option value="" selected>No Preference</option>
+            <option value="f">Foo</option>
+            <option value="b">Bar</option>
+            </select></p>
+            """,
         )
 
     def test_save_empty_label_forms(self):
@@ -367,13 +414,16 @@ class EmptyLabelTestCase(TestCase):
         f = EmptyIntegerLabelChoiceForm()
         self.assertHTMLEqual(
             f.as_p(),
-            """<p><label for="id_name">Name:</label> <input id="id_name" maxlength="10" name="name" type="text" required></p>
-<p><label for="id_choice_integer">Choice integer:</label>
-<select id="id_choice_integer" name="choice_integer">
-<option value="" selected>No Preference</option>
-<option value="1">Foo</option>
-<option value="2">Bar</option>
-</select></p>""",
+            """
+            <p><label for="id_name">Name:</label>
+            <input id="id_name" maxlength="10" name="name" type="text" required></p>
+            <p><label for="id_choice_integer">Choice integer:</label>
+            <select id="id_choice_integer" name="choice_integer">
+            <option value="" selected>No Preference</option>
+            <option value="1">Foo</option>
+            <option value="2">Bar</option>
+            </select></p>
+            """,
         )
 
     def test_get_display_value_on_none(self):
@@ -386,28 +436,36 @@ class EmptyLabelTestCase(TestCase):
         f = EmptyIntegerLabelChoiceForm(instance=none_model)
         self.assertHTMLEqual(
             f.as_p(),
-            """<p><label for="id_name">Name:</label>
-<input id="id_name" maxlength="10" name="name" type="text" value="none-test" required></p>
-<p><label for="id_choice_integer">Choice integer:</label>
-<select id="id_choice_integer" name="choice_integer">
-<option value="" selected>No Preference</option>
-<option value="1">Foo</option>
-<option value="2">Bar</option>
-</select></p>""",
+            """
+            <p><label for="id_name">Name:</label>
+            <input id="id_name" maxlength="10" name="name" type="text"
+                value="none-test" required>
+            </p>
+            <p><label for="id_choice_integer">Choice integer:</label>
+            <select id="id_choice_integer" name="choice_integer">
+            <option value="" selected>No Preference</option>
+            <option value="1">Foo</option>
+            <option value="2">Bar</option>
+            </select></p>
+            """,
         )
 
         foo_model = ChoiceModel(name="foo-test", choice_integer=1)
         f = EmptyIntegerLabelChoiceForm(instance=foo_model)
         self.assertHTMLEqual(
             f.as_p(),
-            """<p><label for="id_name">Name:</label>
-<input id="id_name" maxlength="10" name="name" type="text" value="foo-test" required></p>
-<p><label for="id_choice_integer">Choice integer:</label>
-<select id="id_choice_integer" name="choice_integer">
-<option value="">No Preference</option>
-<option value="1" selected>Foo</option>
-<option value="2">Bar</option>
-</select></p>""",
+            """
+            <p><label for="id_name">Name:</label>
+            <input id="id_name" maxlength="10" name="name" type="text"
+                value="foo-test" required>
+            </p>
+            <p><label for="id_choice_integer">Choice integer:</label>
+            <select id="id_choice_integer" name="choice_integer">
+            <option value="">No Preference</option>
+            <option value="1" selected>Foo</option>
+            <option value="2">Bar</option>
+            </select></p>
+            """,
         )
 
 

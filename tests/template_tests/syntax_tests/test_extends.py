@@ -6,7 +6,9 @@ from django.test import SimpleTestCase
 from ..utils import setup
 
 inheritance_templates = {
-    "inheritance01": "1{% block first %}&{% endblock %}3{% block second %}_{% endblock %}",
+    "inheritance01": (
+        "1{% block first %}&{% endblock %}3{% block second %}_{% endblock %}"
+    ),
     "inheritance02": "{% extends 'inheritance01' %}"
     "{% block first %}2{% endblock %}{% block second %}4{% endblock %}",
     "inheritance03": "{% extends 'inheritance02' %}",
@@ -22,7 +24,9 @@ inheritance_templates = {
     "inheritance12": "{% extends 'inheritance07' %}{% block first %}2{% endblock %}",
     "inheritance13": "{% extends 'inheritance02' %}"
     "{% block first %}a{% endblock %}{% block second %}b{% endblock %}",
-    "inheritance14": "{% extends 'inheritance01' %}{% block newblock %}NO DISPLAY{% endblock %}",
+    "inheritance14": (
+        "{% extends 'inheritance01' %}{% block newblock %}NO DISPLAY{% endblock %}"
+    ),
     "inheritance15": "{% extends 'inheritance01' %}"
     "{% block first %}2{% block inner %}inner{% endblock %}{% endblock %}",
     "inheritance16": "{% extends 'inheritance15' %}{% block inner %}out{% endblock %}",
@@ -30,10 +34,18 @@ inheritance_templates = {
     "inheritance18": "{% load testtags %}{% echo this that theother %}5678",
     "inheritance19": "{% extends 'inheritance01' %}"
     "{% block first %}{% load testtags %}{% echo 400 %}5678{% endblock %}",
-    "inheritance20": "{% extends 'inheritance01' %}{% block first %}{{ block.super }}a{% endblock %}",
-    "inheritance21": "{% extends 'inheritance02' %}{% block first %}{{ block.super }}a{% endblock %}",
-    "inheritance22": "{% extends 'inheritance04' %}{% block first %}{{ block.super }}a{% endblock %}",
-    "inheritance23": "{% extends 'inheritance20' %}{% block first %}{{ block.super }}b{% endblock %}",
+    "inheritance20": (
+        "{% extends 'inheritance01' %}{% block first %}{{ block.super }}a{% endblock %}"
+    ),
+    "inheritance21": (
+        "{% extends 'inheritance02' %}{% block first %}{{ block.super }}a{% endblock %}"
+    ),
+    "inheritance22": (
+        "{% extends 'inheritance04' %}{% block first %}{{ block.super }}a{% endblock %}"
+    ),
+    "inheritance23": (
+        "{% extends 'inheritance20' %}{% block first %}{{ block.super }}b{% endblock %}"
+    ),
     "inheritance24": "{% extends context_template %}"
     "{% block first %}2{% endblock %}{% block second %}4{% endblock %}",
     "inheritance25": "{% extends context_template.1 %}"
@@ -45,19 +57,32 @@ inheritance_templates = {
     "inheritance30": "1{% if optional %}{% block opt %}2{% endblock %}{% endif %}3",
     "inheritance31": "{% extends 'inheritance30' %}{% block opt %}two{% endblock %}",
     "inheritance32": "{% extends 'inheritance30' %}{% block opt %}two{% endblock %}",
-    "inheritance33": "1{% if optional == 1 %}{% block opt %}2{% endblock %}{% endif %}3",
+    "inheritance33": (
+        "1{% if optional == 1 %}{% block opt %}2{% endblock %}{% endif %}3"
+    ),
     "inheritance34": "{% extends 'inheritance33' %}{% block opt %}two{% endblock %}",
     "inheritance35": "{% extends 'inheritance33' %}{% block opt %}two{% endblock %}",
-    "inheritance36": "{% for n in numbers %}_{% block opt %}{{ n }}{% endblock %}{% endfor %}_",
+    "inheritance36": (
+        "{% for n in numbers %}_{% block opt %}{{ n }}{% endblock %}{% endfor %}_"
+    ),
     "inheritance37": "{% extends 'inheritance36' %}{% block opt %}X{% endblock %}",
     "inheritance38": "{% extends 'inheritance36' %}{% block opt %}X{% endblock %}",
-    "inheritance39": "{% extends 'inheritance30' %}{% block opt %}new{{ block.super }}{% endblock %}",
-    "inheritance40": "{% extends 'inheritance33' %}{% block opt %}new{{ block.super }}{% endblock %}",
-    "inheritance41": "{% extends 'inheritance36' %}{% block opt %}new{{ block.super }}{% endblock %}",
+    "inheritance39": (
+        "{% extends 'inheritance30' %}{% block opt %}new{{ block.super }}{% endblock %}"
+    ),
+    "inheritance40": (
+        "{% extends 'inheritance33' %}{% block opt %}new{{ block.super }}{% endblock %}"
+    ),
+    "inheritance41": (
+        "{% extends 'inheritance36' %}{% block opt %}new{{ block.super }}{% endblock %}"
+    ),
     "inheritance42": "{% extends 'inheritance02'|cut:' ' %}",
     "inheritance_empty": "{% extends %}",
     "extends_duplicate": "{% extends 'base.html' %}{% extends 'base.html' %}",
-    "duplicate_block": "{% extends 'base.html' %}{% block content %}2{% endblock %}{% block content %}4{% endblock %}",
+    "duplicate_block": (
+        "{% extends 'base.html' %}{% block content %}2{% endblock %}{% block content %}"
+        "4{% endblock %}"
+    ),
 }
 
 

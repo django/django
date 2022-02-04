@@ -326,7 +326,8 @@ class AssertRedirectsTests(SimpleTestCase):
             self.assertRedirects(response, "/get_view/")
         except AssertionError as e:
             self.assertIn(
-                "Response didn't redirect as expected: Response code was 301 (expected 302)",
+                "Response didn't redirect as expected: Response code was 301 "
+                "(expected 302)",
                 str(e),
             )
 
@@ -334,12 +335,16 @@ class AssertRedirectsTests(SimpleTestCase):
             self.assertRedirects(response, "/get_view/", msg_prefix="abc")
         except AssertionError as e:
             self.assertIn(
-                "abc: Response didn't redirect as expected: Response code was 301 (expected 302)",
+                "abc: Response didn't redirect as expected: Response code was 301 "
+                "(expected 302)",
                 str(e),
             )
 
     def test_lost_query(self):
-        "An assertion is raised if the redirect location doesn't preserve GET parameters"
+        """
+        An assertion is raised if the redirect location doesn't preserve GET
+        parameters.
+        """
         response = self.client.get("/redirect_view/", {"var": "value"})
         try:
             self.assertRedirects(response, "/get_view/")
@@ -353,7 +358,8 @@ class AssertRedirectsTests(SimpleTestCase):
             self.assertRedirects(response, "/get_view/", msg_prefix="abc")
         except AssertionError as e:
             self.assertIn(
-                "abc: Response redirected to '/get_view/?var=value', expected '/get_view/'",
+                "abc: Response redirected to '/get_view/?var=value', expected "
+                "'/get_view/'",
                 str(e),
             )
 
@@ -365,12 +371,16 @@ class AssertRedirectsTests(SimpleTestCase):
             self.assertRedirects(response, "/some_view/")
         except AssertionError as e:
             self.assertIn(
-                "Response didn't redirect as expected: Response code was 301 (expected 302)",
+                "Response didn't redirect as expected: Response code was 301 "
+                "(expected 302)",
                 str(e),
             )
 
     def test_target_page(self):
-        "An assertion is raised if the response redirect target cannot be retrieved as expected"
+        """
+        An assertion is raised if the response redirect target cannot be
+        retrieved as expected.
+        """
         response = self.client.get("/double_redirect_view/")
         try:
             # The redirect target responds with a 301 code, not 200
@@ -509,14 +519,18 @@ class AssertRedirectsTests(SimpleTestCase):
         )
 
     def test_redirect_chain_on_non_redirect_page(self):
-        "An assertion is raised if the original page couldn't be retrieved as expected"
+        """
+        An assertion is raised if the original page couldn't be retrieved as
+        expected.
+        """
         # This page will redirect with code 301, not 302
         response = self.client.get("/get_view/", follow=True)
         try:
             self.assertRedirects(response, "/get_view/")
         except AssertionError as e:
             self.assertIn(
-                "Response didn't redirect as expected: Response code was 200 (expected 302)",
+                "Response didn't redirect as expected: Response code was 200 "
+                "(expected 302)",
                 str(e),
             )
 
@@ -524,7 +538,8 @@ class AssertRedirectsTests(SimpleTestCase):
             self.assertRedirects(response, "/get_view/", msg_prefix="abc")
         except AssertionError as e:
             self.assertIn(
-                "abc: Response didn't redirect as expected: Response code was 200 (expected 302)",
+                "abc: Response didn't redirect as expected: Response code was 200 "
+                "(expected 302)",
                 str(e),
             )
 
@@ -536,7 +551,8 @@ class AssertRedirectsTests(SimpleTestCase):
             self.assertRedirects(response, "/get_view/")
         except AssertionError as e:
             self.assertIn(
-                "Response didn't redirect as expected: Response code was 200 (expected 302)",
+                "Response didn't redirect as expected: Response code was 200 "
+                "(expected 302)",
                 str(e),
             )
 
@@ -544,12 +560,16 @@ class AssertRedirectsTests(SimpleTestCase):
             self.assertRedirects(response, "/get_view/", msg_prefix="abc")
         except AssertionError as e:
             self.assertIn(
-                "abc: Response didn't redirect as expected: Response code was 200 (expected 302)",
+                "abc: Response didn't redirect as expected: Response code was 200 "
+                "(expected 302)",
                 str(e),
             )
 
     def test_redirect_scheme(self):
-        "An assertion is raised if the response doesn't have the scheme specified in expected_url"
+        """
+        An assertion is raised if the response doesn't have the scheme
+        specified in expected_url.
+        """
 
         # For all possible True/False combinations of follow and secure
         for follow, secure in itertools.product([True, False], repeat=2):
@@ -782,7 +802,8 @@ class AssertFormsetErrorTests(SimpleTestCase):
         for prefix, kwargs in self.msg_prefixes:
             msg = (
                 prefix
-                + "The formset 'my_formset', form 0 in context 0 does not contain the field 'Some_field'"
+                + "The formset 'my_formset', form 0 in context 0 does not contain the "
+                "field 'Some_field'"
             )
             with self.assertRaisesMessage(AssertionError, msg):
                 self.assertFormsetError(
@@ -799,7 +820,8 @@ class AssertFormsetErrorTests(SimpleTestCase):
         for prefix, kwargs in self.msg_prefixes:
             msg = (
                 prefix
-                + "The field 'value' on formset 'my_formset', form 1 in context 0 contains no errors"
+                + "The field 'value' on formset 'my_formset', form 1 in context 0 "
+                "contains no errors"
             )
             with self.assertRaisesMessage(AssertionError, msg):
                 self.assertFormsetError(
@@ -838,11 +860,15 @@ class AssertFormsetErrorTests(SimpleTestCase):
             )
 
     def test_no_nonfield_error(self):
-        "An assertion is raised if the formsets non-field errors doesn't contain any errors."
+        """
+        An assertion is raised if the formsets non-field errors doesn't contain
+        any errors.
+        """
         for prefix, kwargs in self.msg_prefixes:
             msg = (
                 prefix
-                + "The formset 'my_formset', form 1 in context 0 does not contain any non-field errors."
+                + "The formset 'my_formset', form 1 in context 0 does not contain any "
+                "non-field errors."
             )
             with self.assertRaisesMessage(AssertionError, msg):
                 self.assertFormsetError(
@@ -855,7 +881,10 @@ class AssertFormsetErrorTests(SimpleTestCase):
                 )
 
     def test_unknown_nonfield_error(self):
-        "An assertion is raised if the formsets non-field errors doesn't contain the provided error."
+        """
+        An assertion is raised if the formsets non-field errors doesn't contain
+        the provided error.
+        """
         for prefix, kwargs in self.msg_prefixes:
             msg = prefix + (
                 "The formset 'my_formset', form 0 in context 0 does not "
@@ -873,7 +902,10 @@ class AssertFormsetErrorTests(SimpleTestCase):
                 )
 
     def test_nonfield_error(self):
-        "No assertion is raised if the formsets non-field errors contains the provided error."
+        """
+        No assertion is raised if the formsets non-field errors contains the
+        provided error.
+        """
         for prefix, kwargs in self.msg_prefixes:
             self.assertFormsetError(
                 self.response_form_errors,
@@ -885,11 +917,15 @@ class AssertFormsetErrorTests(SimpleTestCase):
             )
 
     def test_no_nonform_error(self):
-        "An assertion is raised if the formsets non-form errors doesn't contain any errors."
+        """
+        An assertion is raised if the formsets non-form errors doesn't contain
+        any errors.
+        """
         for prefix, kwargs in self.msg_prefixes:
             msg = (
                 prefix
-                + "The formset 'my_formset' in context 0 does not contain any non-form errors."
+                + "The formset 'my_formset' in context 0 does not contain any non-form "
+                "errors."
             )
             with self.assertRaisesMessage(AssertionError, msg):
                 self.assertFormsetError(
@@ -902,7 +938,10 @@ class AssertFormsetErrorTests(SimpleTestCase):
                 )
 
     def test_unknown_nonform_error(self):
-        "An assertion is raised if the formsets non-form errors doesn't contain the provided error."
+        """
+        An assertion is raised if the formsets non-form errors doesn't contain
+        the provided error.
+        """
         for prefix, kwargs in self.msg_prefixes:
             msg = prefix + (
                 "The formset 'my_formset' in context 0 does not contain the "
@@ -920,7 +959,10 @@ class AssertFormsetErrorTests(SimpleTestCase):
                 )
 
     def test_nonform_error(self):
-        "No assertion is raised if the formsets non-form errors contains the provided error."
+        """
+        No assertion is raised if the formsets non-form errors contains the
+        provided error.
+        """
         msg = "Forms in a set must have distinct email addresses."
         for prefix, kwargs in self.msg_prefixes:
             self.assertFormsetError(
@@ -1421,7 +1463,8 @@ class QueryStringTests(SimpleTestCase):
             response = method("/request_data/?foo=whiz")
             self.assertEqual(response.context["get-foo"], "whiz")
 
-            # Data provided in the URL to a GET-like request is overridden by actual form data
+            # Data provided in the URL to a GET-like request is overridden by
+            # actual form data.
             response = method("/request_data/?foo=whiz", data={"foo": "bang"})
             self.assertEqual(response.context["get-foo"], "bang")
 
@@ -1504,7 +1547,8 @@ class UploadedFileEncodingTest(SimpleTestCase):
         )
         self.assertEqual(b"--TEST_BOUNDARY", encoded_file[0])
         self.assertEqual(
-            b'Content-Disposition: form-data; name="TEST_KEY"; filename="test_name.bin"',
+            b'Content-Disposition: form-data; name="TEST_KEY"; '
+            b'filename="test_name.bin"',
             encoded_file[1],
         )
         self.assertEqual(b"TEST_FILE_CONTENT", encoded_file[-1])

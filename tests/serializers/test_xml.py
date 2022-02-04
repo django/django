@@ -82,7 +82,10 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
         This is the most straightforward way to prevent all entity definitions
         and avoid both external entities and entity-expansion attacks.
         """
-        xml = '<?xml version="1.0" standalone="no"?><!DOCTYPE example SYSTEM "http://example.com/example.dtd">'
+        xml = (
+            '<?xml version="1.0" standalone="no"?>'
+            '<!DOCTYPE example SYSTEM "http://example.com/example.dtd">'
+        )
         with self.assertRaises(DTDForbidden):
             next(serializers.deserialize("xml", xml))
 
@@ -107,4 +110,4 @@ class XmlSerializerTransactionTestCase(
     </object>
     <object pk="1" model="serializers.category">
         <field type="CharField" name="name">Reference</field></object>
-</django-objects>"""
+</django-objects>"""  # NOQA

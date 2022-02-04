@@ -1063,7 +1063,8 @@ class QuerySet:
             raise TypeError("'flat' and 'named' can't be used together.")
         if flat and len(fields) > 1:
             raise TypeError(
-                "'flat' is not valid when values_list is called with more than one field."
+                "'flat' is not valid when values_list is called with more than one "
+                "field."
             )
 
         field_names = {f for f in fields if not hasattr(f, "resolve_expression")}

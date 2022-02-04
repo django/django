@@ -32,7 +32,8 @@ class Polygon(GEOSGeometry):
         ext_ring, *init_holes = args
         n_holes = len(init_holes)
 
-        # If initialized as Polygon(shell, (LinearRing, LinearRing)) [for backward-compatibility]
+        # If initialized as Polygon(shell, (LinearRing, LinearRing))
+        # [for backward-compatibility]
         if n_holes == 1 and isinstance(init_holes[0], (tuple, list)):
             if not init_holes[0]:
                 init_holes = ()
@@ -101,7 +102,8 @@ class Polygon(GEOSGeometry):
         self,
         param,
         msg=(
-            "Parameter must be a sequence of LinearRings or objects that can initialize to LinearRings"
+            "Parameter must be a sequence of LinearRings or objects that can "
+            "initialize to LinearRings"
         ),
     ):
         "Try to construct a ring from the given parameter."

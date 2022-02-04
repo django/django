@@ -15,7 +15,10 @@ class SliceTests(SimpleTestCase):
 
     @setup(
         {
-            "slice02": '{% autoescape off %}{{ a|slice:"1:3" }} {{ b|slice:"1:3" }}{% endautoescape %}'
+            "slice02": (
+                '{% autoescape off %}{{ a|slice:"1:3" }} {{ b|slice:"1:3" }}'
+                "{% endautoescape %}"
+            )
         }
     )
     def test_slice02(self):

@@ -105,7 +105,8 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         )
         self.assertWidgetRendersTo(
             f,
-            '<input step="0.01" name="f" min="0.5" max="1.5" type="number" id="id_f" required>',
+            '<input step="0.01" name="f" min="0.5" max="1.5" type="number" id="id_f" '
+            "required>",
         )
         with self.assertRaisesMessage(
             ValidationError, "'Ensure this value is less than or equal to 1.5.'"

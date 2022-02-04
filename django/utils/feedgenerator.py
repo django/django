@@ -7,7 +7,7 @@ Sample usage:
 >>> feed = feedgenerator.Rss201rev2Feed(
 ...     title="Poynter E-Media Tidbits",
 ...     link="http://www.poynter.org/column.asp?id=31",
-...     description="A group blog by the sharpest minds in online media/journalism/publishing.",
+...     description="A group blog by the sharpest minds in online journalism.",
 ...     language="en",
 ... )
 >>> feed.add_item(
@@ -47,7 +47,8 @@ def get_tag_uri(url, date):
     """
     Create a TagURI.
 
-    See https://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id
+    See
+    https://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id
     """
     bits = urlparse(url)
     d = ""

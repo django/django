@@ -40,7 +40,10 @@ class SDORelate(SpatialOperator):
     sql_template = "SDO_RELATE(%(lhs)s, %(rhs)s, 'mask=%(mask)s') = 'TRUE'"
 
     def check_relate_argument(self, arg):
-        masks = "TOUCH|OVERLAPBDYDISJOINT|OVERLAPBDYINTERSECT|EQUAL|INSIDE|COVEREDBY|CONTAINS|COVERS|ANYINTERACT|ON"
+        masks = (
+            "TOUCH|OVERLAPBDYDISJOINT|OVERLAPBDYINTERSECT|EQUAL|INSIDE|COVEREDBY|"
+            "CONTAINS|COVERS|ANYINTERACT|ON"
+        )
         mask_regex = re.compile(r"^(%s)(\+(%s))*$" % (masks, masks), re.I)
         if not isinstance(arg, str) or not mask_regex.match(arg):
             raise ValueError('Invalid SDO_RELATE mask: "%s"' % arg)
@@ -105,7 +108,8 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         "exact": SDOOperator(func="SDO_EQUAL"),
         "overlaps": SDOOperator(func="SDO_OVERLAPS"),
         "same_as": SDOOperator(func="SDO_EQUAL"),
-        "relate": SDORelate(),  # Oracle uses a different syntax, e.g., 'mask=inside+touch'
+        # Oracle uses a different syntax, e.g., 'mask=inside+touch'
+        "relate": SDORelate(),
         "touches": SDOOperator(func="SDO_TOUCH"),
         "within": SDOOperator(func="SDO_INSIDE"),
         "dwithin": SDODWithin(),

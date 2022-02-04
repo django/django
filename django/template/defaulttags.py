@@ -278,15 +278,17 @@ class IfChangedNode(Node):
         return ""
 
     def _get_context_stack_frame(self, context):
-        # The Context object behaves like a stack where each template tag can create a new scope.
-        # Find the place where to store the state to detect changes.
+        # The Context object behaves like a stack where each template tag can
+        # create a new scope. Find the place where to store the state to detect
+        # changes.
         if "forloop" in context:
             # Ifchanged is bound to the local for loop.
             # When there is a loop-in-loop, the state is bound to the inner loop,
             # so it resets when the outer loop continues.
             return context["forloop"]
         else:
-            # Using ifchanged outside loops. Effectively this is a no-op because the state is associated with 'self'.
+            # Using ifchanged outside loops. Effectively this is a no-op
+            # because the state is associated with 'self'.
             return context.render_context
 
 
@@ -545,7 +547,8 @@ def autoescape(parser, token):
     """
     Force autoescape behavior for this block.
     """
-    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
+    # token.split_contents() isn't useful here because this tag doesn't accept
+    # variable as arguments.
     args = token.contents.split()
     if len(args) != 2:
         raise TemplateSyntaxError("'autoescape' tag requires exactly one argument.")
@@ -697,7 +700,8 @@ def do_filter(parser, token):
     Instead, use the ``autoescape`` tag to manage autoescaping for blocks of
     template code.
     """
-    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
+    # token.split_contents() isn't useful here because this tag doesn't accept
+    # variable as arguments.
     _, rest = token.contents.split(None, 1)
     filter_expr = parser.compile_filter("var|%s" % (rest))
     for func, unused in filter_expr.filters:
@@ -1070,7 +1074,8 @@ def load(parser, token):
 
         {% load byline from news %}
     """
-    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
+    # token.split_contents() isn't useful here because this tag doesn't accept
+    # variable as arguments.
     bits = token.contents.split()
     if len(bits) >= 4 and bits[-2] == "from":
         # from syntax is used; load individual tags from the library
@@ -1304,7 +1309,8 @@ def templatetag(parser, token):
         ``closecomment``    ``#}``
         ==================  =======
     """
-    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
+    # token.split_contents() isn't useful here because this tag doesn't accept
+    # variable as arguments.
     bits = token.contents.split()
     if len(bits) != 2:
         raise TemplateSyntaxError("'templatetag' statement takes one argument")

@@ -45,9 +45,9 @@ class Command(BaseCommand):
             dest="format",
             const="plan",
             help=(
-                "Shows all migrations in the order they will be applied. "
-                "With a verbosity level of 2 or above all direct migration dependencies "
-                "and reverse dependencies (run_before) will be included."
+                "Shows all migrations in the order they will be applied. With a "
+                "verbosity level of 2 or above all direct migration dependencies and "
+                "reverse dependencies (run_before) will be included."
             ),
         )
 

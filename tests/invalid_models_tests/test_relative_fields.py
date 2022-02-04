@@ -343,7 +343,10 @@ class RelativeFieldTests(SimpleTestCase):
                     "foreign keys to 'Person', which is ambiguous. You must specify "
                     "which two foreign keys Django should use via the through_fields "
                     "keyword argument.",
-                    hint="Use through_fields to specify which two foreign keys Django should use.",
+                    hint=(
+                        "Use through_fields to specify which two foreign keys Django "
+                        "should use."
+                    ),
                     obj=InvalidRelationship,
                     id="fields.E333",
                 ),
@@ -425,7 +428,8 @@ class RelativeFieldTests(SimpleTestCase):
             field.check(),
             [
                 Error(
-                    "'Target.bad' must be unique because it is referenced by a foreign key.",
+                    "'Target.bad' must be unique because it is referenced by a foreign "
+                    "key.",
                     hint=(
                         "Add unique=True to this field or add a UniqueConstraint "
                         "(without condition) in the model Meta.constraints."
@@ -448,7 +452,8 @@ class RelativeFieldTests(SimpleTestCase):
             field.check(),
             [
                 Error(
-                    "'Target.bad' must be unique because it is referenced by a foreign key.",
+                    "'Target.bad' must be unique because it is referenced by a foreign "
+                    "key.",
                     hint=(
                         "Add unique=True to this field or add a UniqueConstraint "
                         "(without condition) in the model Meta.constraints."
@@ -532,7 +537,8 @@ class RelativeFieldTests(SimpleTestCase):
             field.check(),
             [
                 Error(
-                    "No subset of the fields 'country_id', 'city_id' on model 'Person' is unique.",
+                    "No subset of the fields 'country_id', 'city_id' on model 'Person' "
+                    "is unique.",
                     hint=(
                         "Mark a single field as unique=True or add a set of "
                         "fields to a unique constraint (via unique_together or a "
@@ -627,7 +633,10 @@ class RelativeFieldTests(SimpleTestCase):
             [
                 Error(
                     "Field specifies on_delete=SET_NULL, but cannot be null.",
-                    hint="Set null=True argument on the field, or change the on_delete rule.",
+                    hint=(
+                        "Set null=True argument on the field, or change the on_delete "
+                        "rule."
+                    ),
                     obj=field,
                     id="fields.E320",
                 ),
@@ -668,7 +677,10 @@ class RelativeFieldTests(SimpleTestCase):
             [
                 Error(
                     "Primary keys must not have null=True.",
-                    hint="Set null=False on the field, or remove primary_key=True argument.",
+                    hint=(
+                        "Set null=False on the field, or remove primary_key=True "
+                        "argument."
+                    ),
                     obj=field,
                     id="fields.E007",
                 ),
@@ -802,7 +814,10 @@ class RelativeFieldTests(SimpleTestCase):
                     Error(
                         "The name '%s' is invalid related_name for field Child%s.parent"
                         % (invalid_related_name, invalid_related_name),
-                        hint="Related name must be a valid Python identifier or end with a '+'",
+                        hint=(
+                            "Related name must be a valid Python identifier or end "
+                            "with a '+'"
+                        ),
                         obj=field,
                         id="fields.E306",
                     ),
@@ -861,12 +876,14 @@ class RelativeFieldTests(SimpleTestCase):
             field.check(),
             [
                 Error(
-                    "The to_field 'a' doesn't exist on the related model 'invalid_models_tests.Parent'.",
+                    "The to_field 'a' doesn't exist on the related model "
+                    "'invalid_models_tests.Parent'.",
                     obj=field,
                     id="fields.E312",
                 ),
                 Error(
-                    "The to_field 'b' doesn't exist on the related model 'invalid_models_tests.Parent'.",
+                    "The to_field 'b' doesn't exist on the related model "
+                    "'invalid_models_tests.Parent'.",
                     obj=field,
                     id="fields.E312",
                 ),
@@ -889,8 +906,9 @@ class RelativeFieldTests(SimpleTestCase):
             field.check(),
             [
                 Error(
-                    "Field defines a relation with model 'invalid_models_tests.Parent', "
-                    "which is either not installed, or is abstract.",
+                    "Field defines a relation with model "
+                    "'invalid_models_tests.Parent', which is either not installed, or "
+                    "is abstract.",
                     id="fields.E300",
                     obj=field,
                 ),
@@ -1831,13 +1849,19 @@ class M2mThroughFieldsTests(SimpleTestCase):
             [
                 Error(
                     "'Invitation.invitee' is not a foreign key to 'Event'.",
-                    hint="Did you mean one of the following foreign keys to 'Event': event?",
+                    hint=(
+                        "Did you mean one of the following foreign keys to 'Event': "
+                        "event?"
+                    ),
                     obj=field,
                     id="fields.E339",
                 ),
                 Error(
                     "'Invitation.event' is not a foreign key to 'Fan'.",
-                    hint="Did you mean one of the following foreign keys to 'Fan': invitee, inviter?",
+                    hint=(
+                        "Did you mean one of the following foreign keys to 'Fan': "
+                        "invitee, inviter?"
+                    ),
                     obj=field,
                     id="fields.E339",
                 ),
@@ -1870,14 +1894,22 @@ class M2mThroughFieldsTests(SimpleTestCase):
             field.check(from_model=Event),
             [
                 Error(
-                    "The intermediary model 'invalid_models_tests.Invitation' has no field 'invalid_field_1'.",
-                    hint="Did you mean one of the following foreign keys to 'Event': event?",
+                    "The intermediary model 'invalid_models_tests.Invitation' has no "
+                    "field 'invalid_field_1'.",
+                    hint=(
+                        "Did you mean one of the following foreign keys to 'Event': "
+                        "event?"
+                    ),
                     obj=field,
                     id="fields.E338",
                 ),
                 Error(
-                    "The intermediary model 'invalid_models_tests.Invitation' has no field 'invalid_field_2'.",
-                    hint="Did you mean one of the following foreign keys to 'Fan': invitee, inviter?",
+                    "The intermediary model 'invalid_models_tests.Invitation' has no "
+                    "field 'invalid_field_2'.",
+                    hint=(
+                        "Did you mean one of the following foreign keys to 'Fan': "
+                        "invitee, inviter?"
+                    ),
                     obj=field,
                     id="fields.E338",
                 ),
@@ -1911,7 +1943,10 @@ class M2mThroughFieldsTests(SimpleTestCase):
                     "Field specifies 'through_fields' but does not provide the names "
                     "of the two link fields that should be used for the relation "
                     "through model 'invalid_models_tests.Invitation'.",
-                    hint="Make sure you specify 'through_fields' as through_fields=('field1', 'field2')",
+                    hint=(
+                        "Make sure you specify 'through_fields' as "
+                        "through_fields=('field1', 'field2')"
+                    ),
                     obj=field,
                     id="fields.E337",
                 ),
@@ -1985,7 +2020,8 @@ class M2mThroughFieldsTests(SimpleTestCase):
             field.check(from_model=Child),
             [
                 Error(
-                    "No subset of the fields 'a', 'b', 'd' on model 'Parent' is unique.",
+                    "No subset of the fields 'a', 'b', 'd' on model 'Parent' is "
+                    "unique.",
                     hint=(
                         "Mark a single field as unique=True or add a set of "
                         "fields to a unique constraint (via unique_together or a "

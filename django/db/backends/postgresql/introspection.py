@@ -50,8 +50,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """Return a list of table and view names in the current database."""
         cursor.execute(
             """
-            SELECT c.relname,
-            CASE WHEN c.relispartition THEN 'p' WHEN c.relkind IN ('m', 'v') THEN 'v' ELSE 't' END
+            SELECT
+                c.relname,
+                CASE
+                    WHEN c.relispartition THEN 'p'
+                    WHEN c.relkind IN ('m', 'v') THEN 'v'
+                    ELSE 't'
+                END
             FROM pg_catalog.pg_class c
             LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
             WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
@@ -116,9 +121,15 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             SELECT s.relname as sequence_name, col.attname
             FROM pg_class s
                 JOIN pg_namespace sn ON sn.oid = s.relnamespace
-                JOIN pg_depend d ON d.refobjid = s.oid AND d.refclassid = 'pg_class'::regclass
-                JOIN pg_attrdef ad ON ad.oid = d.objid AND d.classid = 'pg_attrdef'::regclass
-                JOIN pg_attribute col ON col.attrelid = ad.adrelid AND col.attnum = ad.adnum
+                JOIN
+                    pg_depend d ON d.refobjid = s.oid
+                    AND d.refclassid = 'pg_class'::regclass
+                JOIN
+                    pg_attrdef ad ON ad.oid = d.objid
+                    AND d.classid = 'pg_attrdef'::regclass
+                JOIN
+                    pg_attribute col ON col.attrelid = ad.adrelid
+                    AND col.attnum = ad.adnum
                 JOIN pg_class tbl ON tbl.oid = ad.adrelid
             WHERE s.relkind = 'S'
               AND d.deptype in ('a', 'n')
@@ -143,8 +154,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             FROM pg_constraint con
             LEFT JOIN pg_class c1 ON con.conrelid = c1.oid
             LEFT JOIN pg_class c2 ON con.confrelid = c2.oid
-            LEFT JOIN pg_attribute a1 ON c1.oid = a1.attrelid AND a1.attnum = con.conkey[1]
-            LEFT JOIN pg_attribute a2 ON c2.oid = a2.attrelid AND a2.attnum = con.confkey[1]
+            LEFT JOIN
+                pg_attribute a1 ON c1.oid = a1.attrelid AND a1.attnum = con.conkey[1]
+            LEFT JOIN
+                pg_attribute a2 ON c2.oid = a2.attrelid AND a2.attnum = con.confkey[1]
             WHERE
                 c1.relname = %s AND
                 con.contype = 'f' AND
@@ -203,8 +216,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         cursor.execute(
             """
             SELECT
-                indexname, array_agg(attname ORDER BY arridx), indisunique, indisprimary,
-                array_agg(ordering ORDER BY arridx), amname, exprdef, s2.attoptions
+                indexname,
+                array_agg(attname ORDER BY arridx),
+                indisunique,
+                indisprimary,
+                array_agg(ordering ORDER BY arridx),
+                amname,
+                exprdef,
+                s2.attoptions
             FROM (
                 SELECT
                     c2.relname as indexname, idx.*, attr.attname, am.amname,
@@ -221,12 +240,16 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     c2.reloptions as attoptions
                 FROM (
                     SELECT *
-                    FROM pg_index i, unnest(i.indkey, i.indoption) WITH ORDINALITY koi(key, option, arridx)
+                    FROM
+                        pg_index i,
+                        unnest(i.indkey, i.indoption)
+                            WITH ORDINALITY koi(key, option, arridx)
                 ) idx
                 LEFT JOIN pg_class c ON idx.indrelid = c.oid
                 LEFT JOIN pg_class c2 ON idx.indexrelid = c2.oid
                 LEFT JOIN pg_am am ON c2.relam = am.oid
-                LEFT JOIN pg_attribute attr ON attr.attrelid = c.oid AND attr.attnum = idx.key
+                LEFT JOIN
+                    pg_attribute attr ON attr.attrelid = c.oid AND attr.attnum = idx.key
                 WHERE c.relname = %s AND pg_catalog.pg_table_is_visible(c.oid)
             ) s2
             GROUP BY indexname, indisunique, indisprimary, amname, exprdef, attoptions;

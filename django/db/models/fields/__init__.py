@@ -1834,7 +1834,8 @@ class FilePathField(Field):
         if not self.allow_files and not self.allow_folders:
             return [
                 checks.Error(
-                    "FilePathFields must have either 'allow_files' or 'allow_folders' set to True.",
+                    "FilePathFields must have either 'allow_files' or 'allow_folders' "
+                    "set to True.",
                     obj=self,
                     id="fields.E140",
                 )

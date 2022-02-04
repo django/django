@@ -206,10 +206,12 @@ class TestInline(TestDataMixin, TestCase):
         response = self.client.post(
             reverse("admin:admin_inlines_titlecollection_add"), data
         )
-        # Here colspan is "4": two fields (title1 and title2), one hidden field and the delete checkbox.
+        # Here colspan is "4": two fields (title1 and title2), one hidden field
+        # and the delete checkbox.
         self.assertContains(
             response,
-            '<tr class="row-form-errors"><td colspan="4"><ul class="errorlist nonfield">'
+            '<tr class="row-form-errors"><td colspan="4">'
+            '<ul class="errorlist nonfield">'
             "<li>The two titles must be the same</li></ul></td></tr>",
         )
 
@@ -225,7 +227,10 @@ class TestInline(TestDataMixin, TestCase):
         )
 
     def test_callable_lookup(self):
-        """Admin inline should invoke local callable when its name is listed in readonly_fields"""
+        """
+        Admin inline should invoke local callable when its name is listed in
+        readonly_fields.
+        """
         response = self.client.get(reverse("admin:admin_inlines_poll_add"))
         # Add parent object view should have the child inlines section
         self.assertContains(
@@ -323,7 +328,8 @@ class TestInline(TestDataMixin, TestCase):
         """
         self.client.force_login(self.view_only_user)
         url = reverse(
-            "stacked_inline_hidden_field_in_group_admin:admin_inlines_someparentmodel_change",
+            "stacked_inline_hidden_field_in_group_admin:"
+            "admin_inlines_someparentmodel_change",
             args=(self.parent.pk,),
         )
         response = self.client.get(url)
@@ -354,7 +360,8 @@ class TestInline(TestDataMixin, TestCase):
         """
         self.client.force_login(self.view_only_user)
         url = reverse(
-            "stacked_inline_hidden_field_on_single_line_admin:admin_inlines_someparentmodel_change",
+            "stacked_inline_hidden_field_on_single_line_admin:"
+            "admin_inlines_someparentmodel_change",
             args=(self.parent.pk,),
         )
         response = self.client.get(url)
@@ -424,12 +431,14 @@ class TestInline(TestDataMixin, TestCase):
         )
         self.assertContains(
             response,
-            '<input type="hidden" name="-1-0-capo_famiglia" id="id_-1-0-capo_famiglia">',
+            '<input type="hidden" name="-1-0-capo_famiglia" '
+            'id="id_-1-0-capo_famiglia">',
             html=True,
         )
         self.assertContains(
             response,
-            '<input id="id_-1-0-name" type="text" class="vTextField" name="-1-0-name" maxlength="100">',
+            '<input id="id_-1-0-name" type="text" class="vTextField" name="-1-0-name" '
+            'maxlength="100">',
             html=True,
         )
         self.assertContains(
@@ -437,12 +446,14 @@ class TestInline(TestDataMixin, TestCase):
         )
         self.assertContains(
             response,
-            '<input type="hidden" name="-2-0-capo_famiglia" id="id_-2-0-capo_famiglia">',
+            '<input type="hidden" name="-2-0-capo_famiglia" '
+            'id="id_-2-0-capo_famiglia">',
             html=True,
         )
         self.assertContains(
             response,
-            '<input id="id_-2-0-name" type="text" class="vTextField" name="-2-0-name" maxlength="100">',
+            '<input id="id_-2-0-name" type="text" class="vTextField" name="-2-0-name" '
+            'maxlength="100">',
             html=True,
         )
 
@@ -870,7 +881,8 @@ class TestInlinePermissions(TestCase):
         cls.author_change_url = reverse(
             "admin:admin_inlines_author_change", args=(author.id,)
         )
-        # Get the ID of the automatically created intermediate model for the Author-Book m2m
+        # Get the ID of the automatically created intermediate model for the
+        # Author-Book m2m.
         author_book_auto_m2m_intermediate = Author.books.through.objects.get(
             author=author, book=cls.book
         )
@@ -1011,7 +1023,8 @@ class TestInlinePermissions(TestCase):
         self.assertContains(response, "<p>%s</p>" % self.book)
         self.assertNotContains(
             response,
-            '<input type="checkbox" name="Author_books-0-DELETE" id="id_Author_books-0-DELETE">',
+            '<input type="checkbox" name="Author_books-0-DELETE" '
+            'id="id_Author_books-0-DELETE">',
             html=True,
         )
 
@@ -1066,8 +1079,8 @@ class TestInlinePermissions(TestCase):
         )
         self.assertNotContains(
             response,
-            '<input type="hidden" id="id_inner2_set-0-id" value="%i" name="inner2_set-0-id">'
-            % self.inner2.id,
+            '<input type="hidden" id="id_inner2_set-0-id" value="%i" '
+            'name="inner2_set-0-id">' % self.inner2.id,
             html=True,
         )
 
@@ -1082,19 +1095,21 @@ class TestInlinePermissions(TestCase):
         # Just the one form for existing instances
         self.assertContains(
             response,
-            '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" value="1" name="inner2_set-TOTAL_FORMS">',
+            '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" value="1" '
+            'name="inner2_set-TOTAL_FORMS">',
             html=True,
         )
         self.assertContains(
             response,
-            '<input type="hidden" id="id_inner2_set-0-id" value="%i" name="inner2_set-0-id">'
-            % self.inner2.id,
+            '<input type="hidden" id="id_inner2_set-0-id" value="%i" '
+            'name="inner2_set-0-id">' % self.inner2.id,
             html=True,
         )
         # max-num 0 means we can't add new ones
         self.assertContains(
             response,
-            '<input type="hidden" id="id_inner2_set-MAX_NUM_FORMS" value="0" name="inner2_set-MAX_NUM_FORMS">',
+            '<input type="hidden" id="id_inner2_set-MAX_NUM_FORMS" value="0" '
+            'name="inner2_set-MAX_NUM_FORMS">',
             html=True,
         )
         # TabularInline
@@ -1123,13 +1138,14 @@ class TestInlinePermissions(TestCase):
         # One form for existing instance and three extra for new
         self.assertContains(
             response,
-            '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" value="4" name="inner2_set-TOTAL_FORMS">',
+            '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" value="4" '
+            'name="inner2_set-TOTAL_FORMS">',
             html=True,
         )
         self.assertContains(
             response,
-            '<input type="hidden" id="id_inner2_set-0-id" value="%i" name="inner2_set-0-id">'
-            % self.inner2.id,
+            '<input type="hidden" id="id_inner2_set-0-id" value="%i" '
+            'name="inner2_set-0-id">' % self.inner2.id,
             html=True,
         )
 
@@ -1148,13 +1164,14 @@ class TestInlinePermissions(TestCase):
         # One form for existing instance only, no new
         self.assertContains(
             response,
-            '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" value="1" name="inner2_set-TOTAL_FORMS">',
+            '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" value="1" '
+            'name="inner2_set-TOTAL_FORMS">',
             html=True,
         )
         self.assertContains(
             response,
-            '<input type="hidden" id="id_inner2_set-0-id" value="%i" name="inner2_set-0-id">'
-            % self.inner2.id,
+            '<input type="hidden" id="id_inner2_set-0-id" value="%i" '
+            'name="inner2_set-0-id">' % self.inner2.id,
             html=True,
         )
         self.assertContains(response, 'id="id_inner2_set-0-DELETE"')
@@ -1178,13 +1195,14 @@ class TestInlinePermissions(TestCase):
         # One form for existing instance only, three for new
         self.assertContains(
             response,
-            '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" value="4" name="inner2_set-TOTAL_FORMS">',
+            '<input type="hidden" id="id_inner2_set-TOTAL_FORMS" value="4" '
+            'name="inner2_set-TOTAL_FORMS">',
             html=True,
         )
         self.assertContains(
             response,
-            '<input type="hidden" id="id_inner2_set-0-id" value="%i" name="inner2_set-0-id">'
-            % self.inner2.id,
+            '<input type="hidden" id="id_inner2_set-0-id" value="%i" '
+            'name="inner2_set-0-id">' % self.inner2.id,
             html=True,
         )
         self.assertContains(response, 'id="id_inner2_set-0-DELETE"')
@@ -1247,7 +1265,10 @@ class TestReadOnlyChangeViewInlinePermissions(TestCase):
         self.assertContains(
             response, '<div class="readonly">%s</div>' % self.poll.name, html=True
         )
-        input = '<input type="text" name="name" value="%s" class="vTextField" maxlength="40" required id="id_name">'
+        input = (
+            '<input type="text" name="name" value="%s" class="vTextField" '
+            'maxlength="40" required id="id_name">'
+        )
         self.assertNotContains(response, input % self.poll.name, html=True)
 
     def test_inlines_are_rendered_as_read_only(self):
@@ -1284,7 +1305,8 @@ class TestReadOnlyChangeViewInlinePermissions(TestCase):
         response = self.client.get(self.change_url)
         self.assertNotContains(
             response,
-            '<input type="checkbox" name="question_set-0-DELETE" id="id_question_set-0-DELETE">',
+            '<input type="checkbox" name="question_set-0-DELETE" '
+            'id="id_question_set-0-DELETE">',
             html=True,
         )
 
@@ -1790,11 +1812,13 @@ class SeleniumTests(AdminSeleniumTestCase):
         # Click on a few delete buttons
         self.selenium.find_element(
             By.CSS_SELECTOR,
-            "form#profilecollection_form tr.dynamic-profile_set#profile_set-1 td.delete a",
+            "form#profilecollection_form tr.dynamic-profile_set#profile_set-1 "
+            "td.delete a",
         ).click()
         self.selenium.find_element(
             By.CSS_SELECTOR,
-            "form#profilecollection_form tr.dynamic-profile_set#profile_set-2 td.delete a",
+            "form#profilecollection_form tr.dynamic-profile_set#profile_set-2 "
+            "td.delete a",
         ).click()
         # The rows are gone and the IDs have been re-sequenced
         self.assertCountSeleniumElements(

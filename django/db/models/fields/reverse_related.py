@@ -90,7 +90,8 @@ class ForeignObjectRel(FieldCacheMixin):
     def related_model(self):
         if not self.field.model:
             raise AttributeError(
-                "This property can't be accessed before self.field.contribute_to_class has been called."
+                "This property can't be accessed before self.field.contribute_to_class "
+                "has been called."
             )
         return self.field.model
 
@@ -211,7 +212,8 @@ class ForeignObjectRel(FieldCacheMixin):
         opts = model._meta if model else self.related_model._meta
         model = model or self.related_model
         if self.multiple:
-            # If this is a symmetrical m2m relation on self, there is no reverse accessor.
+            # If this is a symmetrical m2m relation on self, there is no
+            # reverse accessor.
             if self.symmetrical and model == self.model:
                 return None
         if self.related_name:

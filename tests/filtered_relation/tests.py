@@ -877,7 +877,9 @@ class FilteredRelationAnalyticalAggregationTests(TestCase):
                                 recent_sales__currency__rates_from__rate_date=F(
                                     "recent_sales__sale_date"
                                 ),
-                                recent_sales__currency__rates_from__to_currency=self.usd,
+                                recent_sales__currency__rates_from__to_currency=(
+                                    self.usd
+                                ),
                             ),
                         ),
                     )

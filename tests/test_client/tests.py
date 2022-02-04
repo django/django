@@ -238,7 +238,8 @@ class ClientTest(TestCase):
     def test_raw_post(self):
         "POST raw data (with a content type) to a view"
         test_doc = """<?xml version="1.0" encoding="utf-8"?>
-        <library><book><title>Blink</title><author>Malcolm Gladwell</author></book></library>
+        <library><book><title>Blink</title><author>Malcolm Gladwell</author></book>
+        </library>
         """
         response = self.client.post(
             "/raw_post_view/", test_doc, content_type="text/xml"
@@ -587,7 +588,10 @@ class ClientTest(TestCase):
         self.assertEqual(response.context["user"].username, "testclient")
 
     def test_view_with_login_and_custom_redirect(self):
-        "Request a page that is protected with @login_required(redirect_field_name='redirect_to')"
+        """
+        Request a page that is protected with
+        @login_required(redirect_field_name='redirect_to')
+        """
 
         # Get the page without logging in. Should result in 302.
         response = self.client.get("/login_protected_view_custom_redirect/")
@@ -784,7 +788,10 @@ class ClientTest(TestCase):
         # TODO: Log in with right permissions and request the page again
 
     def test_view_with_permissions_exception(self):
-        "Request a page that is protected with @permission_required but raises an exception"
+        """
+        Request a page that is protected with @permission_required but raises
+        an exception.
+        """
 
         # Get the page without logging in. Should result in 403.
         response = self.client.get("/permission_protected_view_exception/")

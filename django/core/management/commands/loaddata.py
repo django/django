@@ -55,7 +55,10 @@ class Command(BaseCommand):
         parser.add_argument(
             "--database",
             default=DEFAULT_DB_ALIAS,
-            help='Nominates a specific database to load fixtures into. Defaults to the "default" database.',
+            help=(
+                "Nominates a specific database to load fixtures into. Defaults to the "
+                '"default" database.'
+            ),
         )
         parser.add_argument(
             "--app",
@@ -75,7 +78,10 @@ class Command(BaseCommand):
             "--exclude",
             action="append",
             default=[],
-            help="An app_label or app_label.ModelName to exclude. Can be used multiple times.",
+            help=(
+                "An app_label or app_label.ModelName to exclude. Can be used multiple "
+                "times."
+            ),
         )
         parser.add_argument(
             "--format",
@@ -105,7 +111,8 @@ class Command(BaseCommand):
     @cached_property
     def compression_formats(self):
         """A dict mapping format names to (open function, mode arg) tuples."""
-        # Forcing binary mode may be revisited after dropping Python 2 support (see #22399)
+        # Forcing binary mode may be revisited after dropping Python 2 support
+        # (see #22399).
         compression_formats = {
             None: (open, "rb"),
             "gz": (gzip.GzipFile, "rb"),

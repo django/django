@@ -80,9 +80,9 @@ class TransactionalTests(TransactionTestCase):
             with self.assertRaisesMessage(
                 DatabaseError,
                 (
-                    'The database did not return a new row id. Probably "ORA-1403: '
-                    'no data found" was raised internally but was hidden by the '
-                    "Oracle OCI library (see https://code.djangoproject.com/ticket/28859)."
+                    'The database did not return a new row id. Probably "ORA-1403: no '
+                    'data found" was raised internally but was hidden by the Oracle '
+                    "OCI library (see https://code.djangoproject.com/ticket/28859)."
                 ),
             ):
                 Square.objects.create(root=2, square=4)

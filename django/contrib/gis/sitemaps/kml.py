@@ -42,7 +42,8 @@ class KMLSitemap(Sitemap):
             elif isinstance(source, (list, tuple)):
                 if len(source) != 3:
                     raise ValueError(
-                        "Must specify a 3-tuple of (app_label, module_name, field_name)."
+                        "Must specify a 3-tuple of (app_label, module_name, "
+                        "field_name)."
                     )
                 kml_sources.append(source)
             else:

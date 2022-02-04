@@ -158,7 +158,10 @@ class OneToOneTests(TestCase):
         place = Place(name="User", address="London")
         with self.assertRaises(Restaurant.DoesNotExist):
             place.restaurant
-        msg = "save() prohibited to prevent data loss due to unsaved related object 'place'."
+        msg = (
+            "save() prohibited to prevent data loss due to unsaved related object "
+            "'place'."
+        )
         with self.assertRaisesMessage(ValueError, msg):
             Restaurant.objects.create(
                 place=place, serves_hot_dogs=True, serves_pizza=False
@@ -445,7 +448,10 @@ class OneToOneTests(TestCase):
         p.undergroundbar = b
 
         # However saving the object is not allowed.
-        msg = "save() prohibited to prevent data loss due to unsaved related object 'place'."
+        msg = (
+            "save() prohibited to prevent data loss due to unsaved related object "
+            "'place'."
+        )
         with self.assertNumQueries(0):
             with self.assertRaisesMessage(ValueError, msg):
                 b.save()

@@ -143,7 +143,8 @@ class MultiWidgetTest(WidgetTest):
             attrs={"id": "foo"},
             html=(
                 '<input id="foo_0" type="text" class="big" value="john" name="name_0">'
-                '<input id="foo_1" type="text" class="small" value="lennon" name="name_1">'
+                '<input id="foo_1" type="text" class="small" value="lennon" '
+                'name="name_1">'
             ),
         )
 
@@ -161,7 +162,8 @@ class MultiWidgetTest(WidgetTest):
             ["john", "lennon"],
             html=(
                 '<input id="bar_0" type="text" class="big" value="john" name="name_0">'
-                '<input id="bar_1" type="text" class="small" value="lennon" name="name_1">'
+                '<input id="bar_1" type="text" class="small" value="lennon" '
+                'name="name_1">'
             ),
         )
 

@@ -16,7 +16,9 @@ class UnorderedListTests(SimpleTestCase):
 
     @setup(
         {
-            "unordered_list02": "{% autoescape off %}{{ a|unordered_list }}{% endautoescape %}"
+            "unordered_list02": (
+                "{% autoescape off %}{{ a|unordered_list }}{% endautoescape %}"
+            )
         }
     )
     def test_unordered_list02(self):
@@ -34,7 +36,9 @@ class UnorderedListTests(SimpleTestCase):
 
     @setup(
         {
-            "unordered_list04": "{% autoescape off %}{{ a|unordered_list }}{% endautoescape %}"
+            "unordered_list04": (
+                "{% autoescape off %}{{ a|unordered_list }}{% endautoescape %}"
+            )
         }
     )
     def test_unordered_list04(self):
@@ -45,7 +49,9 @@ class UnorderedListTests(SimpleTestCase):
 
     @setup(
         {
-            "unordered_list05": "{% autoescape off %}{{ a|unordered_list }}{% endautoescape %}"
+            "unordered_list05": (
+                "{% autoescape off %}{{ a|unordered_list }}{% endautoescape %}"
+            )
         }
     )
     def test_unordered_list05(self):
@@ -126,7 +132,8 @@ class FunctionTests(SimpleTestCase):
         c = ULItem("<a>c</a>")
         self.assertEqual(
             unordered_list([a, b, c]),
-            "\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>\n\t<li>ulitem-&lt;a&gt;c&lt;/a&gt;</li>",
+            "\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>\n\t"
+            "<li>ulitem-&lt;a&gt;c&lt;/a&gt;</li>",
         )
 
         def item_generator():
@@ -134,7 +141,8 @@ class FunctionTests(SimpleTestCase):
 
         self.assertEqual(
             unordered_list(item_generator()),
-            "\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>\n\t<li>ulitem-&lt;a&gt;c&lt;/a&gt;</li>",
+            "\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>\n\t"
+            "<li>ulitem-&lt;a&gt;c&lt;/a&gt;</li>",
         )
 
     def test_nested_generators(self):
@@ -148,7 +156,8 @@ class FunctionTests(SimpleTestCase):
 
         self.assertEqual(
             unordered_list(item_generator()),
-            "\t<li>A\n\t<ul>\n\t\t<li>B</li>\n\t\t<li>C</li>\n\t</ul>\n\t</li>\n\t<li>D</li>",
+            "\t<li>A\n\t<ul>\n\t\t<li>B</li>\n\t\t<li>C</li>\n\t</ul>\n\t</li>\n\t"
+            "<li>D</li>",
         )
 
     def test_ulitem_autoescape_off(self):

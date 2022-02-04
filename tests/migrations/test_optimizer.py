@@ -238,9 +238,9 @@ class OptimizerTests(SimpleTestCase):
 
     def test_optimize_through_create(self):
         """
-        We should be able to optimize away create/delete through a create or delete
-        of a different model, but only if the create operation does not mention the model
-        at all.
+        We should be able to optimize away create/delete through a create or
+        delete of a different model, but only if the create operation does not
+        mention the model at all.
         """
         # These should work
         self.assertOptimizesTo(

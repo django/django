@@ -217,7 +217,7 @@ class ModelTests(TestCase):
 
     def test_chained_fks(self):
         """
-        Regression for #18432: Chained foreign keys with to_field produce incorrect query
+        Chained foreign keys with to_field produce incorrect query.
         """
 
         m1 = Model1.objects.create(pkey=1000)

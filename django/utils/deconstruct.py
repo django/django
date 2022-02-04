@@ -38,8 +38,8 @@ def deconstructible(*args, path=None):
                     "classes. Please move the object into the main module "
                     "body to use migrations.\n"
                     "For more information, see "
-                    "https://docs.djangoproject.com/en/%s/topics/migrations/#serializing-values"
-                    % (name, module_name, get_docs_version())
+                    "https://docs.djangoproject.com/en/%s/topics/migrations/"
+                    "#serializing-values" % (name, module_name, get_docs_version())
                 )
             return (
                 path

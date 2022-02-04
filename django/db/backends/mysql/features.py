@@ -69,8 +69,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def django_test_skips(self):
         skips = {
             "This doesn't work on MySQL.": {
-                "db_functions.comparison.test_greatest.GreatestTests.test_coalesce_workaround",
-                "db_functions.comparison.test_least.LeastTests.test_coalesce_workaround",
+                "db_functions.comparison.test_greatest.GreatestTests."
+                "test_coalesce_workaround",
+                "db_functions.comparison.test_least.LeastTests."
+                "test_coalesce_workaround",
             },
             "Running on MySQL requires utf8mb4 encoding (#18392).": {
                 "model_fields.test_textfield.TextFieldTests.test_emoji",
@@ -90,8 +92,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 {
                     "GROUP BY optimization does not work properly when "
                     "ONLY_FULL_GROUP_BY mode is enabled on MySQL, see #31331.": {
-                        "aggregation.tests.AggregateTestCase.test_aggregation_subquery_annotation_multivalued",
-                        "annotations.tests.NonAggregateAnnotationTestCase.test_annotation_aggregate_with_m2o",
+                        "aggregation.tests.AggregateTestCase."
+                        "test_aggregation_subquery_annotation_multivalued",
+                        "annotations.tests.NonAggregateAnnotationTestCase."
+                        "test_annotation_aggregate_with_m2o",
                     },
                 }
             )
@@ -100,13 +104,19 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         ):
             skips.update(
                 {
-                    "Casting to datetime/time is not supported by MySQL < 8.0. (#30224)": {
-                        "aggregation.tests.AggregateTestCase.test_aggregation_default_using_time_from_python",
-                        "aggregation.tests.AggregateTestCase.test_aggregation_default_using_datetime_from_python",
+                    "Casting to datetime/time is not supported by MySQL < 8.0. "
+                    "(#30224)": {
+                        "aggregation.tests.AggregateTestCase."
+                        "test_aggregation_default_using_time_from_python",
+                        "aggregation.tests.AggregateTestCase."
+                        "test_aggregation_default_using_datetime_from_python",
                     },
-                    "MySQL < 8.0 returns string type instead of datetime/time. (#30224)": {
-                        "aggregation.tests.AggregateTestCase.test_aggregation_default_using_time_from_database",
-                        "aggregation.tests.AggregateTestCase.test_aggregation_default_using_datetime_from_database",
+                    "MySQL < 8.0 returns string type instead of datetime/time. "
+                    "(#30224)": {
+                        "aggregation.tests.AggregateTestCase."
+                        "test_aggregation_default_using_time_from_database",
+                        "aggregation.tests.AggregateTestCase."
+                        "test_aggregation_default_using_datetime_from_database",
                     },
                 }
             )
@@ -118,7 +128,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             skips.update(
                 {
                     "https://jira.mariadb.org/browse/MDEV-19598": {
-                        "schema.tests.SchemaTests.test_alter_not_unique_field_to_primary_key",
+                        "schema.tests.SchemaTests."
+                        "test_alter_not_unique_field_to_primary_key",
                     },
                 }
             )
@@ -130,7 +141,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             skips.update(
                 {
                     "https://jira.mariadb.org/browse/MDEV-22775": {
-                        "schema.tests.SchemaTests.test_alter_pk_with_self_referential_field",
+                        "schema.tests.SchemaTests."
+                        "test_alter_pk_with_self_referential_field",
                     },
                 }
             )

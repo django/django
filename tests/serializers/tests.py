@@ -54,7 +54,10 @@ class SerializerRegistrationTests(SimpleTestCase):
         self.assertIn("xml", public_formats)
 
     def test_unregister(self):
-        "Unregistering a serializer doesn't cause the registry to be repopulated. Refs #14823"
+        """
+        Unregistering a serializer doesn't cause the registry to be
+        repopulated.
+        """
         serializers.unregister_serializer("xml")
         serializers.register_serializer("json3", "django.core.serializers.json")
 

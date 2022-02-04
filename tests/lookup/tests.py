@@ -793,9 +793,9 @@ class LookupTests(TestCase):
             Tag.objects.filter(articles__foo="bar")
 
     def test_regex(self):
-        # Create some articles with a bit more interesting headlines for testing field lookups:
-        for a in Article.objects.all():
-            a.delete()
+        # Create some articles with a bit more interesting headlines for
+        # testing field lookups.
+        Article.objects.all().delete()
         now = datetime.now()
         Article.objects.bulk_create(
             [
@@ -976,7 +976,10 @@ class LookupTests(TestCase):
         """
         A lookup query containing non-fields raises the proper exception.
         """
-        msg = "Unsupported lookup 'blahblah' for CharField or join on the field not permitted."
+        msg = (
+            "Unsupported lookup 'blahblah' for CharField or join on the field not "
+            "permitted."
+        )
         with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(headline__blahblah=99)
         with self.assertRaisesMessage(FieldError, msg):

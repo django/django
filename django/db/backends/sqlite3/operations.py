@@ -168,7 +168,9 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def last_executed_query(self, cursor, sql, params):
         # Python substitutes parameters in Modules/_sqlite/cursor.c with:
-        # pysqlite_statement_bind_parameters(self->statement, parameters, allow_8bit_chars);
+        # pysqlite_statement_bind_parameters(
+        #   self->statement, parameters, allow_8bit_chars
+        # );
         # Unfortunately there is no way to reach self->statement from Python,
         # so we quote and substitute parameters manually.
         if params:
@@ -271,7 +273,8 @@ class DatabaseOperations(BaseDatabaseOperations):
                 value = timezone.make_naive(value, self.connection.timezone)
             else:
                 raise ValueError(
-                    "SQLite backend does not support timezone-aware datetimes when USE_TZ is False."
+                    "SQLite backend does not support timezone-aware datetimes when "
+                    "USE_TZ is False."
                 )
 
         return str(value)

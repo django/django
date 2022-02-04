@@ -56,8 +56,11 @@ class ChoiceModel(models.Model):
 
 
 class ChoiceOptionModel(models.Model):
-    """Destination for ChoiceFieldModel's ForeignKey.
-    Can't reuse ChoiceModel because error_message tests require that it have no instances."""
+    """
+    Destination for ChoiceFieldModel's ForeignKey.
+    Can't reuse ChoiceModel because error_message tests require that it have no
+    instances.
+    """
 
     name = models.CharField(max_length=10)
 

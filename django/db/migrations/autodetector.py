@@ -310,12 +310,17 @@ class MigrationAutodetector:
                                         (dep[0], self.migrations[dep[0]][-1].name)
                                     )
                                 else:
-                                    # If we can't find the other app, we add a first/last dependency,
-                                    # but only if we've already been through once and checked everything
+                                    # If we can't find the other app, we add a
+                                    # first/last dependency, but only if we've
+                                    # already been through once and checked
+                                    # everything.
                                     if chop_mode:
-                                        # If the app already exists, we add a dependency on the last migration,
-                                        # as we don't know which migration contains the target field.
-                                        # If it's not yet migrated or has no migrations, we use __first__
+                                        # If the app already exists, we add a
+                                        # dependency on the last migration, as
+                                        # we don't know which migration
+                                        # contains the target field. If it's
+                                        # not yet migrated or has no
+                                        # migrations, we use __first__.
                                         if graph and graph.leaf_nodes(dep[0]):
                                             operation_dependencies.add(
                                                 graph.leaf_nodes(dep[0])[0]
@@ -469,7 +474,8 @@ class MigrationAutodetector:
             raise ValueError("Can't handle dependency %r" % (dependency,))
 
     def add_operation(self, app_label, operation, dependencies=None, beginning=False):
-        # Dependencies are (app_label, model_name, field_name, create/delete as True/False)
+        # Dependencies are
+        # (app_label, model_name, field_name, create/delete as True/False)
         operation._auto_deps = dependencies or []
         if beginning:
             self.generated_operations.setdefault(app_label, []).insert(0, operation)

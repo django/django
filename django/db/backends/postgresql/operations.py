@@ -187,11 +187,12 @@ class DatabaseOperations(BaseDatabaseOperations):
         output = []
         qn = self.quote_name
         for model in model_list:
-            # Use `coalesce` to set the sequence for each model to the max pk value if there are records,
-            # or 1 if there are none. Set the `is_called` property (the third argument to `setval`) to true
-            # if there are records (as the max pk value is already in use), otherwise set it to false.
-            # Use pg_get_serial_sequence to get the underlying sequence name from the table name
-            # and column name (available since PostgreSQL 8)
+            # Use `coalesce` to set the sequence for each model to the max pk
+            # value if there are records, or 1 if there are none. Set the
+            # `is_called` property (the third argument to `setval`) to true if
+            # there are records (as the max pk value is already in use),
+            # otherwise set it to false. Use pg_get_serial_sequence to get the
+            # underlying sequence name from the table name and column name.
 
             for f in model._meta.local_fields:
                 if isinstance(f, models.AutoField):
@@ -209,7 +210,9 @@ class DatabaseOperations(BaseDatabaseOperations):
                             style.SQL_TABLE(qn(model._meta.db_table)),
                         )
                     )
-                    break  # Only one AutoField is allowed per model, so don't bother continuing.
+                    # Only one AutoField is allowed per model, so don't bother
+                    # continuing.
+                    break
         return output
 
     def prep_for_iexact_query(self, x):

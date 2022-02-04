@@ -8,7 +8,10 @@ from ..utils import setup
 class AddslashesTests(SimpleTestCase):
     @setup(
         {
-            "addslashes01": "{% autoescape off %}{{ a|addslashes }} {{ b|addslashes }}{% endautoescape %}"
+            "addslashes01": (
+                "{% autoescape off %}{{ a|addslashes }} {{ b|addslashes }}"
+                "{% endautoescape %}"
+            )
         }
     )
     def test_addslashes01(self):

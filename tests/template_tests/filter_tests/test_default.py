@@ -43,7 +43,9 @@ class DefaultIfNoneTests(SimpleTestCase):
 
     @setup(
         {
-            "default_if_none02": '{% autoescape off %}{{ a|default:"x<" }}{% endautoescape %}'
+            "default_if_none02": (
+                '{% autoescape off %}{{ a|default:"x<" }}{% endautoescape %}'
+            )
         }
     )
     def test_default_if_none02(self):

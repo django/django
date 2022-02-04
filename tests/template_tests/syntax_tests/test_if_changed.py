@@ -9,7 +9,9 @@ class IfChangedTagTests(SimpleTestCase):
 
     @setup(
         {
-            "ifchanged01": "{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}"
+            "ifchanged01": (
+                "{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}"
+            )
         }
     )
     def test_ifchanged01(self):
@@ -18,7 +20,9 @@ class IfChangedTagTests(SimpleTestCase):
 
     @setup(
         {
-            "ifchanged02": "{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}"
+            "ifchanged02": (
+                "{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}"
+            )
         }
     )
     def test_ifchanged02(self):
@@ -27,7 +31,9 @@ class IfChangedTagTests(SimpleTestCase):
 
     @setup(
         {
-            "ifchanged03": "{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}"
+            "ifchanged03": (
+                "{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}"
+            )
         }
     )
     def test_ifchanged03(self):
@@ -108,8 +114,10 @@ class IfChangedTagTests(SimpleTestCase):
 
     @setup(
         {
-            "ifchanged-param01": "{% for n in num %}{% ifchanged n %}..{% endifchanged %}"
-            "{{ n }}{% endfor %}"
+            "ifchanged-param01": (
+                "{% for n in num %}{% ifchanged n %}..{% endifchanged %}"
+                "{{ n }}{% endfor %}"
+            )
         }
     )
     def test_ifchanged_param01(self):
@@ -121,8 +129,11 @@ class IfChangedTagTests(SimpleTestCase):
 
     @setup(
         {
-            "ifchanged-param02": "{% for n in num %}{% for x in numx %}{% ifchanged n %}..{% endifchanged %}"
-            "{{ x }}{% endfor %}{% endfor %}"
+            "ifchanged-param02": (
+                "{% for n in num %}{% for x in numx %}"
+                "{% ifchanged n %}..{% endifchanged %}{{ x }}"
+                "{% endfor %}{% endfor %}"
+            )
         }
     )
     def test_ifchanged_param02(self):
@@ -149,9 +160,11 @@ class IfChangedTagTests(SimpleTestCase):
 
     @setup(
         {
-            "ifchanged-param04": "{% for d in days %}{% ifchanged %}{{ d.day }}{% endifchanged %}"
-            "{% for h in d.hours %}{% ifchanged d h %}{{ h }}{% endifchanged %}"
-            "{% endfor %}{% endfor %}"
+            "ifchanged-param04": (
+                "{% for d in days %}{% ifchanged %}{{ d.day }}{% endifchanged %}"
+                "{% for h in d.hours %}{% ifchanged d h %}{{ h }}{% endifchanged %}"
+                "{% endfor %}{% endfor %}"
+            )
         }
     )
     def test_ifchanged_param04(self):
@@ -167,9 +180,11 @@ class IfChangedTagTests(SimpleTestCase):
 
     @setup(
         {
-            "ifchanged-param05": "{% for d in days %}{% ifchanged d.day %}{{ d.day }}{% endifchanged %}"
-            "{% for h in d.hours %}{% ifchanged d.day h %}{{ h }}{% endifchanged %}"
-            "{% endfor %}{% endfor %}"
+            "ifchanged-param05": (
+                "{% for d in days %}{% ifchanged d.day %}{{ d.day }}{% endifchanged %}"
+                "{% for h in d.hours %}{% ifchanged d.day h %}{{ h }}{% endifchanged %}"
+                "{% endfor %}{% endfor %}"
+            )
         }
     )
     def test_ifchanged_param05(self):
@@ -275,7 +290,8 @@ class IfChangedTests(SimpleTestCase):
             yield 1
             yield 2
             # Simulate that another thread is now rendering.
-            # When the IfChangeNode stores state at 'self' it stays at '3' and skip the last yielded value below.
+            # When the IfChangeNode stores state at 'self' it stays at '3' and
+            # skip the last yielded value below.
             iter2 = iter([1, 2, 3])
             output2 = template.render(
                 Context({"foo": range(3), "get_value": lambda: next(iter2)})
@@ -319,7 +335,9 @@ class IfChangedTests(SimpleTestCase):
                 (
                     "django.template.loaders.locmem.Loader",
                     {
-                        "template": '{% for x in vars %}{% include "include" %}{% endfor %}',
+                        "template": (
+                            '{% for x in vars %}{% include "include" %}{% endfor %}'
+                        ),
                         "include": "{% ifchanged %}{{ x }}{% endifchanged %}",
                     },
                 ),
@@ -335,7 +353,10 @@ class IfChangedTests(SimpleTestCase):
                 (
                     "django.template.loaders.locmem.Loader",
                     {
-                        "template": '{% for x in vars %}{% include "include" %}{% include "include" %}{% endfor %}',
+                        "template": (
+                            '{% for x in vars %}{% include "include" %}'
+                            '{% include "include" %}{% endfor %}'
+                        ),
                         "include": "{% ifchanged %}{{ x }}{% endifchanged %}",
                     },
                 ),

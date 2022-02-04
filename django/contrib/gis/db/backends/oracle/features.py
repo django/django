@@ -20,7 +20,8 @@ class DatabaseFeatures(BaseSpatialFeatures, OracleDatabaseFeatures):
         skips.update(
             {
                 "Oracle doesn't support spatial operators in constraints.": {
-                    "gis_tests.gis_migrations.test_operations.OperationTests.test_add_check_constraint",
+                    "gis_tests.gis_migrations.test_operations.OperationTests."
+                    "test_add_check_constraint",
                 },
             }
         )

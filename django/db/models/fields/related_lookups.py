@@ -98,8 +98,9 @@ class RelatedIn(In):
     def as_sql(self, compiler, connection):
         if isinstance(self.lhs, MultiColSource):
             # For multicolumn lookups we need to build a multicolumn where clause.
-            # This clause is either a SubqueryConstraint (for values that need to be compiled to
-            # SQL) or an OR-combined list of (col1 = val1 AND col2 = val2 AND ...) clauses.
+            # This clause is either a SubqueryConstraint (for values that need
+            # to be compiled to SQL) or an OR-combined list of
+            # (col1 = val1 AND col2 = val2 AND ...) clauses.
             from django.db.models.sql.where import (
                 AND,
                 OR,

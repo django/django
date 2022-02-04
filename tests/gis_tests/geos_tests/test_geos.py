@@ -807,7 +807,8 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 buf_ring = buf[j]
                 self.assertEqual(len(exp_ring), len(buf_ring))
                 for k in range(len(exp_ring)):
-                    # Asserting the X, Y of each point are almost equal (due to floating point imprecision)
+                    # Asserting the X, Y of each point are almost equal (due to
+                    # floating point imprecision).
                     self.assertAlmostEqual(exp_ring[k][0], buf_ring[k][0], 9)
                     self.assertAlmostEqual(exp_ring[k][1], buf_ring[k][1], 9)
 
@@ -1496,7 +1497,8 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(
             GEOSGeometry("POINT(0 0)"),
             GEOSGeometry.from_gml(
-                '<gml:Point gml:id="p21" srsName="http://www.opengis.net/def/crs/EPSG/0/4326">'
+                '<gml:Point gml:id="p21" '
+                'srsName="http://www.opengis.net/def/crs/EPSG/0/4326">'
                 '    <gml:pos srsDimension="2">0 0</gml:pos>'
                 "</gml:Point>"
             ),

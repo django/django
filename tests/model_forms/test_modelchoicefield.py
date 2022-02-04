@@ -56,7 +56,10 @@ class ModelChoiceFieldTests(TestCase):
         # instantiated. This proves clean() checks the database during clean()
         # rather than caching it at instantiation time.
         Category.objects.get(url="4th").delete()
-        msg = "['Select a valid choice. That choice is not one of the available choices.']"
+        msg = (
+            "['Select a valid choice. That choice is not one of the available "
+            "choices.']"
+        )
         with self.assertRaisesMessage(ValidationError, msg):
             f.clean(c4.id)
 
@@ -64,7 +67,10 @@ class ModelChoiceFieldTests(TestCase):
         f = forms.ModelChoiceField(Category.objects.all())
         self.assertEqual(f.clean(self.c1), self.c1)
         # An instance of incorrect model.
-        msg = "['Select a valid choice. That choice is not one of the available choices.']"
+        msg = (
+            "['Select a valid choice. That choice is not one of the available "
+            "choices.']"
+        )
         with self.assertRaisesMessage(ValidationError, msg):
             f.clean(Book.objects.create())
 
@@ -379,11 +385,18 @@ class ModelChoiceFieldTests(TestCase):
         field = CustomModelMultipleChoiceField(Category.objects.all())
         self.assertHTMLEqual(
             field.widget.render("name", []),
-            """<div>
-<div><label><input type="checkbox" name="name" value="%d" data-slug="entertainment">Entertainment</label></div>
-<div><label><input type="checkbox" name="name" value="%d" data-slug="test">A test</label></div>
-<div><label><input type="checkbox" name="name" value="%d" data-slug="third-test">Third</label></div>
-</div>"""
+            """
+            <div><div>
+            <label><input type="checkbox" name="name" value="%d"
+                data-slug="entertainment">Entertainment
+            </label></div>
+            <div><label>
+            <input type="checkbox" name="name" value="%d" data-slug="test">A test
+            </label></div>
+            <div><label>
+            <input type="checkbox" name="name" value="%d" data-slug="third-test">Third
+            </label></div></div>
+            """
             % (self.c1.pk, self.c2.pk, self.c3.pk),
         )
 

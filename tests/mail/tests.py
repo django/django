@@ -295,8 +295,8 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         Test for space continuation character in long (ASCII) subject headers (#7747)
         """
         email = EmailMessage(
-            "Long subject lines that get wrapped should contain a space "
-            "continuation character to get expected behavior in Outlook and Thunderbird",
+            "Long subject lines that get wrapped should contain a space continuation "
+            "character to get expected behavior in Outlook and Thunderbird",
             "Content",
             "from@example.com",
             ["to@example.com"],
@@ -367,7 +367,8 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             email.to, ["list-subscriber@example.com", "list-subscriber2@example.com"]
         )
 
-        # If we don't set the To header manually, it should default to the `to` argument to the constructor
+        # If we don't set the To header manually, it should default to the `to`
+        # argument to the constructor.
         email = EmailMessage(
             "Subject",
             "Content",
@@ -558,7 +559,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
         self.assertEqual(message.get_payload(), "Firstname S=FCrname is a great guy.")
 
-        # Make sure MIME attachments also works correctly with other encodings than utf-8
+        # MIME attachments works correctly with other encodings than utf-8.
         text_content = "Firstname Sürname is a great guy."
         html_content = "<p>Firstname Sürname is a <strong>great</strong> guy.</p>"
         msg = EmailMultiAlternatives(
@@ -790,7 +791,10 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             )
 
         if sys.platform == "win32":
-            msg = "_getfullpathname: path should be string, bytes or os.PathLike, not object"
+            msg = (
+                "_getfullpathname: path should be string, bytes or os.PathLike, not "
+                "object"
+            )
         else:
             msg = "expected str, bytes or os.PathLike object, not object"
         with self.assertRaisesMessage(TypeError, msg):
@@ -871,7 +875,8 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertIn(b"Content-Transfer-Encoding: 7bit", msg.message().as_bytes())
 
         # Ticket #11212
-        # Shouldn't use quoted printable, should detect it can represent content with 7 bit data
+        # Shouldn't use quoted printable, should detect it can represent
+        # content with 7 bit data.
         msg = EmailMessage(
             "Subject",
             "Body with only ASCII characters.",
@@ -882,7 +887,8 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         s = msg.message().as_bytes()
         self.assertIn(b"Content-Transfer-Encoding: 7bit", s)
 
-        # Shouldn't use quoted printable, should detect it can represent content with 8 bit data
+        # Shouldn't use quoted printable, should detect it can represent
+        # content with 8 bit data.
         msg = EmailMessage(
             "Subject",
             "Body with latin characters: àáä.",
@@ -1182,7 +1188,8 @@ class BaseEmailBackendTests(HeadersCheckMixin):
 
     def get_mailbox_content(self):
         raise NotImplementedError(
-            "subclasses of BaseEmailBackendTests must provide a get_mailbox_content() method"
+            "subclasses of BaseEmailBackendTests must provide a get_mailbox_content() "
+            "method"
         )
 
     def flush_mailbox(self):

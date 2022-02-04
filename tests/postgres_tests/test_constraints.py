@@ -920,7 +920,8 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         )
         with connection.schema_editor() as editor:
             with mock.patch(
-                "django.db.backends.postgresql.features.DatabaseFeatures.supports_covering_gist_indexes",
+                "django.db.backends.postgresql.features.DatabaseFeatures."
+                "supports_covering_gist_indexes",
                 False,
             ):
                 with self.assertRaisesMessage(NotSupportedError, msg):

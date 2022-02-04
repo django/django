@@ -89,7 +89,10 @@ class UserModelChecksTests(SimpleTestCase):
                     checks.Warning(
                         "'CustomUserNonUniqueUsername.username' is named as "
                         "the 'USERNAME_FIELD', but it is not unique.",
-                        hint="Ensure that your authentication backend(s) can handle non-unique usernames.",
+                        hint=(
+                            "Ensure that your authentication backend(s) can handle "
+                            "non-unique usernames."
+                        ),
                         obj=CustomUserNonUniqueUsername,
                         id="auth.W004",
                     ),
@@ -264,8 +267,9 @@ class ModelsPermissionsChecksTests(SimpleTestCase):
             errors,
             [
                 checks.Error(
-                    "The verbose_name of model 'auth_tests.Checked' must be at most 244 "
-                    "characters for its builtin permission names to be at most 255 characters.",
+                    "The verbose_name of model 'auth_tests.Checked' must be at most "
+                    "244 characters for its builtin permission names to be at most 255 "
+                    "characters.",
                     obj=Checked,
                     id="auth.E007",
                 ),

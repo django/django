@@ -90,7 +90,10 @@ class I18nStringLiteralTests(SimpleTestCase):
 
     @setup(
         {
-            "i18n14": '{% cycle "foo" _("Password") _(\'Password\') as c %} {% cycle c %} {% cycle c %}'
+            "i18n14": (
+                '{% cycle "foo" _("Password") _(\'Password\') as c %} {% cycle c %} '
+                "{% cycle c %}"
+            )
         }
     )
     def test_i18n14(self):

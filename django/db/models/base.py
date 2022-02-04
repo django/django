@@ -215,8 +215,8 @@ class ModelBase(type):
                     base = parent
                 elif parent._meta.concrete_model is not base._meta.concrete_model:
                     raise TypeError(
-                        "Proxy model '%s' has more than one non-abstract model base class."
-                        % name
+                        "Proxy model '%s' has more than one non-abstract model base "
+                        "class." % name
                     )
             if base is None:
                 raise TypeError(
@@ -1973,8 +1973,8 @@ class Model(metaclass=ModelBase):
                 elif field not in cls._meta.local_fields:
                     errors.append(
                         checks.Error(
-                            "'%s' refers to field '%s' which is not local to model '%s'."
-                            % (option, field_name, cls._meta.object_name),
+                            "'%s' refers to field '%s' which is not local to model "
+                            "'%s'." % (option, field_name, cls._meta.object_name),
                             hint="This issue may be caused by multi-table inheritance.",
                             obj=cls,
                             id="models.E016",
@@ -2003,7 +2003,8 @@ class Model(metaclass=ModelBase):
         if not isinstance(cls._meta.ordering, (list, tuple)):
             return [
                 checks.Error(
-                    "'ordering' must be a tuple or list (even if you want to order by only one field).",
+                    "'ordering' must be a tuple or list (even if you want to order by "
+                    "only one field).",
                     obj=cls,
                     id="models.E014",
                 )

@@ -233,7 +233,8 @@ class LayerMapping:
             if isinstance(model_field, GeometryField):
                 if self.geom_field:
                     raise LayerMapError(
-                        "LayerMapping does not support more than one GeometryField per model."
+                        "LayerMapping does not support more than one GeometryField per "
+                        "model."
                     )
 
                 # Getting the coordinate dimension of the geometry field.
@@ -695,7 +696,8 @@ class LayerMapping:
             # Incremental saving is requested at the given interval (step)
             if default_range:
                 raise LayerMapError(
-                    "The `step` keyword may not be used in conjunction with the `fid_range` keyword."
+                    "The `step` keyword may not be used in conjunction with the "
+                    "`fid_range` keyword."
                 )
             beg, num_feat, num_saved = (0, 0, 0)
             indices = range(step, nfeat, step)

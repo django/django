@@ -45,13 +45,16 @@ class ExtendsBehaviorTests(SimpleTestCase):
                     "django.template.loaders.locmem.Loader",
                     {
                         "one.html": (
-                            '{% extends "one.html" %}{% block content %}{{ block.super }} locmem-one{% endblock %}'
+                            '{% extends "one.html" %}{% block content %}'
+                            "{{ block.super }} locmem-one{% endblock %}"
                         ),
                         "two.html": (
-                            '{% extends "two.html" %}{% block content %}{{ block.super }} locmem-two{% endblock %}'
+                            '{% extends "two.html" %}{% block content %}'
+                            "{{ block.super }} locmem-two{% endblock %}"
                         ),
                         "three.html": (
-                            '{% extends "three.html" %}{% block content %}{{ block.super }} locmem-three{% endblock %}'
+                            '{% extends "three.html" %}{% block content %}'
+                            "{{ block.super }} locmem-three{% endblock %}"
                         ),
                     },
                 ),
@@ -126,7 +129,10 @@ class ExtendsBehaviorTests(SimpleTestCase):
                 [
                     "django.template.loaders.locmem.Loader",
                     {
-                        "base.html": '{% extends "base.html" %}{% block content %}{{ block.super }} loader1{% endblock %}',
+                        "base.html": (
+                            '{% extends "base.html" %}{% block content %}'
+                            "{{ block.super }} loader1{% endblock %}"
+                        ),
                     },
                 ],
                 [
@@ -151,14 +157,23 @@ class ExtendsBehaviorTests(SimpleTestCase):
                 [
                     "django.template.loaders.locmem.Loader",
                     {
-                        "base.html": "{% extends 'base.html' %}{% block base %}{{ block.super }}2{% endblock %}",
-                        "included.html": "{% extends 'included.html' %}{% block included %}{{ block.super }}B{% endblock %}",
+                        "base.html": (
+                            "{% extends 'base.html' %}{% block base %}{{ block.super }}"
+                            "2{% endblock %}"
+                        ),
+                        "included.html": (
+                            "{% extends 'included.html' %}{% block included %}"
+                            "{{ block.super }}B{% endblock %}"
+                        ),
                     },
                 ],
                 [
                     "django.template.loaders.locmem.Loader",
                     {
-                        "base.html": "{% block base %}1{% endblock %}{% include 'included.html' %}",
+                        "base.html": (
+                            "{% block base %}1{% endblock %}"
+                            "{% include 'included.html' %}"
+                        ),
                         "included.html": "{% block included %}A{% endblock %}",
                     },
                 ],

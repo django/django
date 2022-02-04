@@ -209,7 +209,10 @@ class TestFixtures(TestCase):
         Test for ticket #4371 -- Loading data of an unknown format should fail
         Validate that error conditions are caught correctly
         """
-        msg = "Problem installing fixture 'bad_fix.ture1': unkn is not a known serialization format."
+        msg = (
+            "Problem installing fixture 'bad_fix.ture1': unkn is not a known "
+            "serialization format."
+        )
         with self.assertRaisesMessage(management.CommandError, msg):
             management.call_command(
                 "loaddata",
@@ -438,14 +441,14 @@ class TestFixtures(TestCase):
         )
         self.assertJSONEqual(
             out.getvalue(),
-            """[{"pk": %d, "model": "fixtures_regress.widget", "fields": {"name": "grommet"}}]"""
-            % widget.pk,
+            '[{"pk": %d, "model": "fixtures_regress.widget", '
+            '"fields": {"name": "grommet"}}]' % widget.pk,
         )
 
     @skipUnlessDBFeature("supports_forward_references")
     def test_loaddata_works_when_fixture_has_forward_refs(self):
         """
-        Regression for #3615 - Forward references cause fixtures not to load in MySQL (InnoDB)
+        Forward references cause fixtures not to load in MySQL (InnoDB).
         """
         management.call_command(
             "loaddata",
@@ -457,7 +460,7 @@ class TestFixtures(TestCase):
 
     def test_loaddata_raises_error_when_fixture_has_invalid_foreign_key(self):
         """
-        Regression for #3615 - Ensure data with nonexistent child key references raises error
+        Data with nonexistent child key references raises error.
         """
         with self.assertRaisesMessage(IntegrityError, "Problem installing fixture"):
             management.call_command(
@@ -489,9 +492,13 @@ class TestFixtures(TestCase):
 
     def test_loaddata_no_fixture_specified(self):
         """
-        Regression for #7043 - Error is quickly reported when no fixtures is provided in the command line.
+        Error is quickly reported when no fixtures is provided in the command
+        line.
         """
-        msg = "No database fixture specified. Please provide the path of at least one fixture in the command line."
+        msg = (
+            "No database fixture specified. Please provide the path of at least one "
+            "fixture in the command line."
+        )
         with self.assertRaisesMessage(management.CommandError, msg):
             management.call_command(
                 "loaddata",
@@ -648,10 +655,13 @@ class NaturalKeyFixtureTests(TestCase):
         self.assertJSONEqual(
             out.getvalue(),
             """
-            [{"fields": {"main": null, "name": "Amazon"}, "model": "fixtures_regress.store"},
-            {"fields": {"main": null, "name": "Borders"}, "model": "fixtures_regress.store"},
+            [{"fields": {"main": null, "name": "Amazon"},
+            "model": "fixtures_regress.store"},
+            {"fields": {"main": null, "name": "Borders"},
+            "model": "fixtures_regress.store"},
             {"fields": {"name": "Neal Stephenson"}, "model": "fixtures_regress.person"},
-            {"pk": 1, "model": "fixtures_regress.book", "fields": {"stores": [["Amazon"], ["Borders"]],
+            {"pk": 1, "model": "fixtures_regress.book",
+            "fields": {"stores": [["Amazon"], ["Borders"]],
             "name": "Cryptonomicon", "author": ["Neal Stephenson"]}}]
             """,
         )
@@ -770,9 +780,12 @@ class NaturalKeyFixtureTests(TestCase):
         self.assertQuerysetEqual(
             books,
             [
-                "<Book: Cryptonomicon by Neal Stephenson (available at Amazon, Borders)>",
-                "<Book: Ender's Game by Orson Scott Card (available at Collins Bookstore)>",
-                "<Book: Permutation City by Greg Egan (available at Angus and Robertson)>",
+                "<Book: Cryptonomicon by Neal Stephenson (available at Amazon, "
+                "Borders)>",
+                "<Book: Ender's Game by Orson Scott Card (available at Collins "
+                "Bookstore)>",
+                "<Book: Permutation City by Greg Egan (available at Angus and "
+                "Robertson)>",
             ],
             transform=repr,
         )

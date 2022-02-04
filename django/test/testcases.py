@@ -209,7 +209,8 @@ class SimpleTestCase(unittest.TestCase):
         for alias in cls.databases:
             if alias not in connections:
                 message = (
-                    "%s.%s.databases refers to %r which is not defined in settings.DATABASES."
+                    "%s.%s.databases refers to %r which is not defined in "
+                    "settings.DATABASES."
                     % (
                         cls.__module__,
                         cls.__qualname__,
@@ -352,7 +353,10 @@ class SimpleTestCase(unittest.TestCase):
             self.assertTrue(
                 response.redirect_chain,
                 msg_prefix
-                + "Response didn't redirect as expected: Response code was %d (expected %d)"
+                + (
+                    "Response didn't redirect as expected: Response code was %d "
+                    "(expected %d)"
+                )
                 % (response.status_code, status_code),
             )
 
@@ -360,7 +364,10 @@ class SimpleTestCase(unittest.TestCase):
                 response.redirect_chain[0][1],
                 status_code,
                 msg_prefix
-                + "Initial response didn't redirect as expected: Response code was %d (expected %d)"
+                + (
+                    "Initial response didn't redirect as expected: Response code was "
+                    "%d (expected %d)"
+                )
                 % (response.redirect_chain[0][1], status_code),
             )
 
@@ -370,7 +377,10 @@ class SimpleTestCase(unittest.TestCase):
                 response.status_code,
                 target_status_code,
                 msg_prefix
-                + "Response didn't redirect as expected: Final Response code was %d (expected %d)"
+                + (
+                    "Response didn't redirect as expected: Final Response code was %d "
+                    "(expected %d)"
+                )
                 % (response.status_code, target_status_code),
             )
 
@@ -380,7 +390,10 @@ class SimpleTestCase(unittest.TestCase):
                 response.status_code,
                 status_code,
                 msg_prefix
-                + "Response didn't redirect as expected: Response code was %d (expected %d)"
+                + (
+                    "Response didn't redirect as expected: Response code was %d "
+                    "(expected %d)"
+                )
                 % (response.status_code, status_code),
             )
 
@@ -401,7 +414,8 @@ class SimpleTestCase(unittest.TestCase):
                     raise ValueError(
                         "The test client is unable to fetch remote URLs (got %s). "
                         "If the host is served by Django, add '%s' to ALLOWED_HOSTS. "
-                        "Otherwise, use assertRedirects(..., fetch_redirect_response=False)."
+                        "Otherwise, use "
+                        "assertRedirects(..., fetch_redirect_response=False)."
                         % (url, domain)
                     )
                 # Get the redirection page, using the same client that was used
@@ -417,7 +431,10 @@ class SimpleTestCase(unittest.TestCase):
                     redirect_response.status_code,
                     target_status_code,
                     msg_prefix
-                    + "Couldn't retrieve redirection page '%s': response code was %d (expected %d)"
+                    + (
+                        "Couldn't retrieve redirection page '%s': response code was %d "
+                        "(expected %d)"
+                    )
                     % (path, redirect_response.status_code, target_status_code),
                 )
 
@@ -593,13 +610,19 @@ class SimpleTestCase(unittest.TestCase):
                     elif field in context[form].fields:
                         self.fail(
                             msg_prefix
-                            + "The field '%s' on form '%s' in context %d contains no errors"
+                            + (
+                                "The field '%s' on form '%s' in context %d contains no "
+                                "errors"
+                            )
                             % (field, form, i)
                         )
                     else:
                         self.fail(
                             msg_prefix
-                            + "The form '%s' in context %d does not contain the field '%s'"
+                            + (
+                                "The form '%s' in context %d does not contain the "
+                                "field '%s'"
+                            )
                             % (form, i, field)
                         )
                 else:
@@ -672,13 +695,19 @@ class SimpleTestCase(unittest.TestCase):
                     elif field in context[formset].forms[form_index].fields:
                         self.fail(
                             msg_prefix
-                            + "The field '%s' on formset '%s', form %d in context %d contains no errors"
+                            + (
+                                "The field '%s' on formset '%s', form %d in context "
+                                "%d contains no errors"
+                            )
                             % (field, formset, form_index, i)
                         )
                     else:
                         self.fail(
                             msg_prefix
-                            + "The formset '%s', form %d in context %d does not contain the field '%s'"
+                            + (
+                                "The formset '%s', form %d in context %d does not "
+                                "contain the field '%s'"
+                            )
                             % (formset, form_index, i, field)
                         )
                 elif form_index is not None:

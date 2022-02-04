@@ -63,7 +63,8 @@ class BaseDatabaseIntrospection:
         views that exist in the database.
         """
         raise NotImplementedError(
-            "subclasses of BaseDatabaseIntrospection may require a get_table_list() method"
+            "subclasses of BaseDatabaseIntrospection may require a get_table_list() "
+            "method"
         )
 
     def get_table_description(self, cursor, table_name):
@@ -158,7 +159,8 @@ class BaseDatabaseIntrospection:
         'name' key can be added if the backend supports named sequences.
         """
         raise NotImplementedError(
-            "subclasses of BaseDatabaseIntrospection may require a get_sequences() method"
+            "subclasses of BaseDatabaseIntrospection may require a get_sequences() "
+            "method"
         )
 
     def get_relations(self, cursor, table_name):
@@ -200,5 +202,6 @@ class BaseDatabaseIntrospection:
         if they don't name constraints of a certain type (e.g. SQLite)
         """
         raise NotImplementedError(
-            "subclasses of BaseDatabaseIntrospection may require a get_constraints() method"
+            "subclasses of BaseDatabaseIntrospection may require a get_constraints() "
+            "method"
         )

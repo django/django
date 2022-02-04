@@ -34,8 +34,8 @@ class ListOptionAction(argparse.Action):
 
 class Command(BaseCommand):
     help = (
-        "Inspects the given OGR-compatible data source (e.g., a shapefile) and outputs\n"
-        "a GeoDjango model with the given model name. For example:\n"
+        "Inspects the given OGR-compatible data source (e.g., a shapefile) and "
+        "outputs\na GeoDjango model with the given model name. For example:\n"
         " ./manage.py ogrinspect zipcode.shp Zipcode"
     )
 

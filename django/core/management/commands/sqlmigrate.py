@@ -19,7 +19,10 @@ class Command(BaseCommand):
         parser.add_argument(
             "--database",
             default=DEFAULT_DB_ALIAS,
-            help='Nominates a database to create SQL for. Defaults to the "default" database.',
+            help=(
+                'Nominates a database to create SQL for. Defaults to the "default" '
+                "database."
+            ),
         )
         parser.add_argument(
             "--backwards",
@@ -55,13 +58,13 @@ class Command(BaseCommand):
             migration = loader.get_migration_by_prefix(app_label, migration_name)
         except AmbiguityError:
             raise CommandError(
-                "More than one migration matches '%s' in app '%s'. Please be more specific."
-                % (migration_name, app_label)
+                "More than one migration matches '%s' in app '%s'. Please be more "
+                "specific." % (migration_name, app_label)
             )
         except KeyError:
             raise CommandError(
-                "Cannot find a migration matching '%s' from app '%s'. Is it in INSTALLED_APPS?"
-                % (migration_name, app_label)
+                "Cannot find a migration matching '%s' from app '%s'. Is it in "
+                "INSTALLED_APPS?" % (migration_name, app_label)
             )
         target = (app_label, migration.name)
 

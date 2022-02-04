@@ -73,9 +73,12 @@ class IncludeTagTests(SimpleTestCase):
 
     @setup(
         {
-            "include09": "{{ first }}--"
-            '{% include "basic-syntax03" with first=second|lower|upper second=first|upper %}'
-            "--{{ second }}"
+            "include09": (
+                "{{ first }}--"
+                '{% include "basic-syntax03" with '
+                "first=second|lower|upper second=first|upper %}"
+                "--{{ second }}"
+            )
         },
         basic_templates,
     )
@@ -117,7 +120,9 @@ class IncludeTagTests(SimpleTestCase):
 
     @setup(
         {
-            "include13": '{% autoescape off %}{% include "basic-syntax03" %}{% endautoescape %}'
+            "include13": (
+                '{% autoescape off %}{% include "basic-syntax03" %}{% endautoescape %}'
+            )
         },
         basic_templates,
     )
@@ -350,7 +355,9 @@ class IncludeTests(SimpleTestCase):
                 (
                     "django.template.loaders.locmem.Loader",
                     {
-                        "template": '{% for x in vars %}{% include "include" %}{% endfor %}',
+                        "template": (
+                            '{% for x in vars %}{% include "include" %}{% endfor %}'
+                        ),
                         "include": '{% include "next" %}',
                         "next": "{% load custom %}{% counter %}",
                     },

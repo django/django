@@ -128,7 +128,10 @@ class LastExecutedQueryTest(TestCase):
 
 class ParameterHandlingTest(TestCase):
     def test_bad_parameter_count(self):
-        "An executemany call with too many/not enough parameters will raise an exception (Refs #12612)"
+        """
+        An executemany call with too many/not enough parameters will raise an
+        exception.
+        """
         with connection.cursor() as cursor:
             query = "INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % (
                 connection.introspection.identifier_converter("backends_square"),
@@ -152,7 +155,7 @@ class LongNameTest(TransactionTestCase):
     available_apps = ["backends"]
 
     def test_sequence_name_length_limits_create(self):
-        """Test creation of model with long name and long pk name doesn't error. Ref #8901"""
+        """Creation of model with long name and long pk name doesn't error."""
         VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
 
     def test_sequence_name_length_limits_m2m(self):
@@ -517,7 +520,10 @@ class BackendTestCase(TransactionTestCase):
                 cursor.execute("SELECT 3" + new_connection.features.bare_select_suffix)
                 cursor.execute("SELECT 4" + new_connection.features.bare_select_suffix)
 
-            msg = "Limit for query logging exceeded, only the last 3 queries will be returned."
+            msg = (
+                "Limit for query logging exceeded, only the last 3 queries will be "
+                "returned."
+            )
             with self.assertWarnsMessage(UserWarning, msg):
                 self.assertEqual(3, len(new_connection.queries))
 

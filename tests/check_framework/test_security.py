@@ -597,7 +597,9 @@ class CSRFFailureViewTest(SimpleTestCase):
         )
 
     @override_settings(
-        CSRF_FAILURE_VIEW="check_framework.test_security.failure_view_with_invalid_signature",
+        CSRF_FAILURE_VIEW=(
+            "check_framework.test_security.failure_view_with_invalid_signature"
+        ),
     )
     def test_failure_view_invalid_signature(self):
         msg = (

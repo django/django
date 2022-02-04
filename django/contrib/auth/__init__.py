@@ -70,12 +70,14 @@ def authenticate(request=None, **credentials):
         try:
             backend_signature.bind(request, **credentials)
         except TypeError:
-            # This backend doesn't accept these credentials as arguments. Try the next one.
+            # This backend doesn't accept these credentials as arguments. Try
+            # the next one.
             continue
         try:
             user = backend.authenticate(request, **credentials)
         except PermissionDenied:
-            # This backend says to stop in our tracks - this user should not be allowed in at all.
+            # This backend says to stop in our tracks - this user should not be
+            # allowed in at all.
             break
         if user is None:
             continue

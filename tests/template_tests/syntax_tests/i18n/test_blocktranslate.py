@@ -52,7 +52,9 @@ class I18nBlockTransTagTests(SimpleTestCase):
 
     @setup(
         {
-            "i18n03": "{% load i18n %}{% blocktranslate %}{{ anton }}{% endblocktranslate %}"
+            "i18n03": (
+                "{% load i18n %}{% blocktranslate %}{{ anton }}{% endblocktranslate %}"
+            )
         }
     )
     def test_i18n03(self):
@@ -62,7 +64,10 @@ class I18nBlockTransTagTests(SimpleTestCase):
 
     @setup(
         {
-            "i18n04": "{% load i18n %}{% blocktranslate with berta=anton|lower %}{{ berta }}{% endblocktranslate %}"
+            "i18n04": (
+                "{% load i18n %}{% blocktranslate with berta=anton|lower %}{{ berta }}"
+                "{% endblocktranslate %}"
+            )
         }
     )
     def test_i18n04(self):
@@ -72,8 +77,11 @@ class I18nBlockTransTagTests(SimpleTestCase):
 
     @setup(
         {
-            "legacyi18n04": "{% load i18n %}"
-            "{% blocktranslate with anton|lower as berta %}{{ berta }}{% endblocktranslate %}"
+            "legacyi18n04": (
+                "{% load i18n %}"
+                "{% blocktranslate with anton|lower as berta %}{{ berta }}"
+                "{% endblocktranslate %}"
+            )
         }
     )
     def test_legacyi18n04(self):
@@ -83,7 +91,10 @@ class I18nBlockTransTagTests(SimpleTestCase):
 
     @setup(
         {
-            "i18n05": "{% load i18n %}{% blocktranslate %}xxx{{ anton }}xxx{% endblocktranslate %}"
+            "i18n05": (
+                "{% load i18n %}{% blocktranslate %}xxx{{ anton }}xxx"
+                "{% endblocktranslate %}"
+            )
         }
     )
     def test_i18n05(self):
@@ -141,8 +152,11 @@ class I18nBlockTransTagTests(SimpleTestCase):
 
     @setup(
         {
-            "i18n17": "{% load i18n %}"
-            "{% blocktranslate with berta=anton|escape %}{{ berta }}{% endblocktranslate %}"
+            "i18n17": (
+                "{% load i18n %}"
+                "{% blocktranslate with berta=anton|escape %}{{ berta }}"
+                "{% endblocktranslate %}"
+            )
         }
     )
     def test_i18n17(self):
@@ -155,8 +169,11 @@ class I18nBlockTransTagTests(SimpleTestCase):
 
     @setup(
         {
-            "i18n18": "{% load i18n %}"
-            "{% blocktranslate with berta=anton|force_escape %}{{ berta }}{% endblocktranslate %}"
+            "i18n18": (
+                "{% load i18n %}"
+                "{% blocktranslate with berta=anton|force_escape %}{{ berta }}"
+                "{% endblocktranslate %}"
+            )
         }
     )
     def test_i18n18(self):
@@ -165,7 +182,9 @@ class I18nBlockTransTagTests(SimpleTestCase):
 
     @setup(
         {
-            "i18n19": "{% load i18n %}{% blocktranslate %}{{ andrew }}{% endblocktranslate %}"
+            "i18n19": (
+                "{% load i18n %}{% blocktranslate %}{{ andrew }}{% endblocktranslate %}"
+            )
         }
     )
     def test_i18n19(self):
@@ -174,7 +193,9 @@ class I18nBlockTransTagTests(SimpleTestCase):
 
     @setup(
         {
-            "i18n21": "{% load i18n %}{% blocktranslate %}{{ andrew }}{% endblocktranslate %}"
+            "i18n21": (
+                "{% load i18n %}{% blocktranslate %}{{ andrew }}{% endblocktranslate %}"
+            )
         }
     )
     def test_i18n21(self):
@@ -183,8 +204,11 @@ class I18nBlockTransTagTests(SimpleTestCase):
 
     @setup(
         {
-            "legacyi18n17": "{% load i18n %}"
-            "{% blocktranslate with anton|escape as berta %}{{ berta }}{% endblocktranslate %}"
+            "legacyi18n17": (
+                "{% load i18n %}"
+                "{% blocktranslate with anton|escape as berta %}{{ berta }}"
+                "{% endblocktranslate %}"
+            )
         }
     )
     def test_legacyi18n17(self):
@@ -220,9 +244,12 @@ class I18nBlockTransTagTests(SimpleTestCase):
 
     @setup(
         {
-            "legacyi18n26": "{% load i18n %}"
-            "{% blocktranslate with myextra_field as extra_field count number as counter %}"
-            "singular {{ extra_field }}{% plural %}plural{% endblocktranslate %}"
+            "legacyi18n26": (
+                "{% load i18n %}"
+                "{% blocktranslate with myextra_field as extra_field "
+                "count number as counter %}singular {{ extra_field }}{% plural %}plural"
+                "{% endblocktranslate %}"
+            )
         }
     )
     def test_legacyi18n26(self):
@@ -262,8 +289,11 @@ class I18nBlockTransTagTests(SimpleTestCase):
 
     @setup(
         {
-            "i18n28": "{% load i18n %}"
-            "{% blocktranslate with a=anton b=berta %}{{ a }} + {{ b }}{% endblocktranslate %}"
+            "i18n28": (
+                "{% load i18n %}"
+                "{% blocktranslate with a=anton b=berta %}{{ a }} + {{ b }}"
+                "{% endblocktranslate %}"
+            )
         }
     )
     def test_i18n28(self):
@@ -288,7 +318,10 @@ class I18nBlockTransTagTests(SimpleTestCase):
     # this should work as if blocktranslate was not there (#19915)
     @setup(
         {
-            "i18n34": "{% load i18n %}{% blocktranslate %}{{ missing }}{% endblocktranslate %}"
+            "i18n34": (
+                "{% load i18n %}{% blocktranslate %}{{ missing }}"
+                "{% endblocktranslate %}"
+            )
         }
     )
     def test_i18n34(self):
@@ -300,7 +333,10 @@ class I18nBlockTransTagTests(SimpleTestCase):
 
     @setup(
         {
-            "i18n34_2": "{% load i18n %}{% blocktranslate with a='α' %}{{ missing }}{% endblocktranslate %}"
+            "i18n34_2": (
+                "{% load i18n %}{% blocktranslate with a='α' %}{{ missing }}"
+                "{% endblocktranslate %}"
+            )
         }
     )
     def test_i18n34_2(self):
@@ -312,7 +348,10 @@ class I18nBlockTransTagTests(SimpleTestCase):
 
     @setup(
         {
-            "i18n34_3": "{% load i18n %}{% blocktranslate with a=anton %}{{ missing }}{% endblocktranslate %}"
+            "i18n34_3": (
+                "{% load i18n %}{% blocktranslate with a=anton %}{{ missing }}"
+                "{% endblocktranslate %}"
+            )
         }
     )
     def test_i18n34_3(self):
@@ -337,9 +376,11 @@ class I18nBlockTransTagTests(SimpleTestCase):
     # blocktranslate tag with asvar
     @setup(
         {
-            "i18n39": "{% load i18n %}"
-            "{% blocktranslate asvar page_not_found %}Page not found{% endblocktranslate %}"
-            ">{{ page_not_found }}<"
+            "i18n39": (
+                "{% load i18n %}"
+                "{% blocktranslate asvar page_not_found %}Page not found"
+                "{% endblocktranslate %}>{{ page_not_found }}<"
+            )
         }
     )
     def test_i18n39(self):
@@ -377,7 +418,9 @@ class I18nBlockTransTagTests(SimpleTestCase):
 
     @setup(
         {
-            "template": "{% load i18n %}{% blocktranslate asvar %}Yes{% endblocktranslate %}"
+            "template": (
+                "{% load i18n %}{% blocktranslate asvar %}Yes{% endblocktranslate %}"
+            )
         }
     )
     def test_blocktrans_syntax_error_missing_assignment(self, tag_name):
@@ -394,7 +437,10 @@ class I18nBlockTransTagTests(SimpleTestCase):
 
     @setup(
         {
-            "template": "{% load i18n %}{% blocktranslate %}{% block b %} {% endblock %}{% endblocktranslate %}"
+            "template": (
+                "{% load i18n %}{% blocktranslate %}{% block b %} {% endblock %}"
+                "{% endblocktranslate %}"
+            )
         }
     )
     def test_with_block(self, tag_name):
@@ -414,15 +460,19 @@ class I18nBlockTransTagTests(SimpleTestCase):
         }
     )
     def test_with_for(self, tag_name):
-        msg = "'{}' doesn't allow other block tags (seen 'for b in [1, 2, 3]') inside it".format(
-            tag_name
+        msg = (
+            f"'{tag_name}' doesn't allow other block tags (seen 'for b in [1, 2, 3]') "
+            f"inside it"
         )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string("template")
 
     @setup(
         {
-            "template": "{% load i18n %}{% blocktranslate with foo=bar with %}{{ foo }}{% endblocktranslate %}"
+            "template": (
+                "{% load i18n %}{% blocktranslate with foo=bar with %}{{ foo }}"
+                "{% endblocktranslate %}"
+            )
         }
     )
     def test_variable_twice(self):
@@ -443,7 +493,9 @@ class I18nBlockTransTagTests(SimpleTestCase):
 
     @setup(
         {
-            "template": "{% load i18n %}{% blocktranslate count a %}{% endblocktranslate %}"
+            "template": (
+                "{% load i18n %}{% blocktranslate count a %}{% endblocktranslate %}"
+            )
         }
     )
     def test_count(self, tag_name):
@@ -509,12 +561,14 @@ class TranslationBlockTranslateTagTests(SimpleTestCase):
 
             # Existing context...  using a literal
             t = self.get_template(
-                '{% load i18n %}{% blocktranslate context "month name" %}May{% endblocktranslate %}'
+                "{% load i18n %}"
+                '{% blocktranslate context "month name" %}May{% endblocktranslate %}'
             )
             rendered = t.render(Context())
             self.assertEqual(rendered, "Mai")
             t = self.get_template(
-                '{% load i18n %}{% blocktranslate context "verb" %}May{% endblocktranslate %}'
+                "{% load i18n %}"
+                '{% blocktranslate context "verb" %}May{% endblocktranslate %}'
             )
             rendered = t.render(Context())
             self.assertEqual(rendered, "Kann")
@@ -535,51 +589,65 @@ class TranslationBlockTranslateTagTests(SimpleTestCase):
 
             # Using a filter
             t = self.get_template(
-                "{% load i18n %}{% blocktranslate context message_context|lower %}May{% endblocktranslate %}"
+                "{% load i18n %}"
+                "{% blocktranslate context message_context|lower %}May"
+                "{% endblocktranslate %}"
             )
             rendered = t.render(Context({"message_context": "MONTH NAME"}))
             self.assertEqual(rendered, "Mai")
             t = self.get_template(
-                "{% load i18n %}{% blocktranslate context message_context|lower %}May{% endblocktranslate %}"
+                "{% load i18n %}"
+                "{% blocktranslate context message_context|lower %}May"
+                "{% endblocktranslate %}"
             )
             rendered = t.render(Context({"message_context": "VERB"}))
             self.assertEqual(rendered, "Kann")
 
             # Using 'count'
             t = self.get_template(
-                '{% load i18n %}{% blocktranslate count number=1 context "super search" %}'
-                "{{ number }} super result{% plural %}{{ number }} super results{% endblocktranslate %}"
+                "{% load i18n %}"
+                '{% blocktranslate count number=1 context "super search" %}{{ number }}'
+                " super result{% plural %}{{ number }} super results"
+                "{% endblocktranslate %}"
             )
             rendered = t.render(Context())
             self.assertEqual(rendered, "1 Super-Ergebnis")
             t = self.get_template(
-                '{% load i18n %}{% blocktranslate count number=2 context "super search" %}{{ number }}'
-                " super result{% plural %}{{ number }} super results{% endblocktranslate %}"
+                "{% load i18n %}"
+                '{% blocktranslate count number=2 context "super search" %}{{ number }}'
+                " super result{% plural %}{{ number }} super results"
+                "{% endblocktranslate %}"
             )
             rendered = t.render(Context())
             self.assertEqual(rendered, "2 Super-Ergebnisse")
             t = self.get_template(
-                '{% load i18n %}{% blocktranslate context "other super search" count number=1 %}'
-                "{{ number }} super result{% plural %}{{ number }} super results{% endblocktranslate %}"
+                "{% load i18n %}"
+                '{% blocktranslate context "other super search" count number=1 %}'
+                "{{ number }} super result{% plural %}{{ number }} super results"
+                "{% endblocktranslate %}"
             )
             rendered = t.render(Context())
             self.assertEqual(rendered, "1 anderen Super-Ergebnis")
             t = self.get_template(
-                '{% load i18n %}{% blocktranslate context "other super search" count number=2 %}'
-                "{{ number }} super result{% plural %}{{ number }} super results{% endblocktranslate %}"
+                "{% load i18n %}"
+                '{% blocktranslate context "other super search" count number=2 %}'
+                "{{ number }} super result{% plural %}{{ number }} super results"
+                "{% endblocktranslate %}"
             )
             rendered = t.render(Context())
             self.assertEqual(rendered, "2 andere Super-Ergebnisse")
 
             # Using 'with'
             t = self.get_template(
-                '{% load i18n %}{% blocktranslate with num_comments=5 context "comment count" %}'
+                "{% load i18n %}"
+                '{% blocktranslate with num_comments=5 context "comment count" %}'
                 "There are {{ num_comments }} comments{% endblocktranslate %}"
             )
             rendered = t.render(Context())
             self.assertEqual(rendered, "Es gibt 5 Kommentare")
             t = self.get_template(
-                '{% load i18n %}{% blocktranslate with num_comments=5 context "other comment count" %}'
+                "{% load i18n %}"
+                '{% blocktranslate with num_comments=5 context "other comment count" %}'
                 "There are {{ num_comments }} comments{% endblocktranslate %}"
             )
             rendered = t.render(Context())
@@ -593,14 +661,19 @@ class TranslationBlockTranslateTagTests(SimpleTestCase):
             rendered = t.render(Context())
             self.assertEqual(rendered, "There are 5 comments")
             t = self.get_template(
-                '{% load i18n %}{% blocktranslate with num_comments=5 context "comment count" trimmed %}\n\n'
-                "There are  \t\n  \t {{ num_comments }} comments\n\n{% endblocktranslate %}"
+                "{% load i18n %}"
+                '{% blocktranslate with num_comments=5 context "comment count" trimmed '
+                "%}\n\n"
+                "There are  \t\n  \t {{ num_comments }} comments\n\n"
+                "{% endblocktranslate %}"
             )
             rendered = t.render(Context())
             self.assertEqual(rendered, "Es gibt 5 Kommentare")
             t = self.get_template(
-                '{% load i18n %}{% blocktranslate context "other super search" count number=2 trimmed %}\n'
-                "{{ number }} super \n result{% plural %}{{ number }} super results{% endblocktranslate %}"
+                "{% load i18n %}"
+                '{% blocktranslate context "other super search" count number=2 trimmed '
+                "%}\n{{ number }} super \n result{% plural %}{{ number }} super results"
+                "{% endblocktranslate %}"
             )
             rendered = t.render(Context())
             self.assertEqual(rendered, "2 andere Super-Ergebnisse")
@@ -609,7 +682,8 @@ class TranslationBlockTranslateTagTests(SimpleTestCase):
             msg = "Unknown argument for 'blocktranslate' tag: %r."
             with self.assertRaisesMessage(TemplateSyntaxError, msg % 'month="May"'):
                 self.get_template(
-                    '{% load i18n %}{% blocktranslate context with month="May" %}{{ month }}{% endblocktranslate %}'
+                    '{% load i18n %}{% blocktranslate context with month="May" %}'
+                    "{{ month }}{% endblocktranslate %}"
                 )
             msg = (
                 '"context" in %r tag expected exactly one argument.' % "blocktranslate"
@@ -633,7 +707,8 @@ class TranslationBlockTranslateTagTests(SimpleTestCase):
         """
         with translation.override("fr"):
             t = Template(
-                "{% load i18n %}{% blocktranslate %}My name is {{ person }}.{% endblocktranslate %}"
+                "{% load i18n %}{% blocktranslate %}My name is {{ person }}."
+                "{% endblocktranslate %}"
             )
             rendered = t.render(Context({"person": "James"}))
             self.assertEqual(rendered, "My name is James.")
@@ -647,7 +722,8 @@ class TranslationBlockTranslateTagTests(SimpleTestCase):
         """
         with translation.override("fr"):
             t = Template(
-                "{% load i18n %}{% blocktranslate %}My other name is {{ person }}.{% endblocktranslate %}"
+                "{% load i18n %}{% blocktranslate %}My other name is {{ person }}."
+                "{% endblocktranslate %}"
             )
             rendered = t.render(Context({"person": "James"}))
             self.assertEqual(rendered, "My other name is James.")
@@ -728,7 +804,8 @@ class MiscTests(SimpleTestCase):
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_percent_in_translatable_block(self):
         t_sing = self.get_template(
-            "{% load i18n %}{% blocktranslate %}The result was {{ percent }}%{% endblocktranslate %}"
+            "{% load i18n %}{% blocktranslate %}The result was {{ percent }}%"
+            "{% endblocktranslate %}"
         )
         t_plur = self.get_template(
             "{% load i18n %}{% blocktranslate count num as number %}"
@@ -755,7 +832,8 @@ class MiscTests(SimpleTestCase):
         or plural.
         """
         t_sing = self.get_template(
-            "{% load i18n %}{% blocktranslate %}There are %(num_comments)s comments{% endblocktranslate %}"
+            "{% load i18n %}{% blocktranslate %}There are %(num_comments)s comments"
+            "{% endblocktranslate %}"
         )
         t_plur = self.get_template(
             "{% load i18n %}{% blocktranslate count num as number %}"

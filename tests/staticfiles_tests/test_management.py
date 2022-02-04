@@ -142,7 +142,9 @@ class TestConfiguration(StaticFilesTestCase):
         try:
             storage.staticfiles_storage._wrapped = empty
             with self.settings(
-                STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage"
+                STATICFILES_STORAGE=(
+                    "django.contrib.staticfiles.storage.StaticFilesStorage"
+                )
             ):
                 command = collectstatic.Command()
                 self.assertTrue(command.is_local_storage())
@@ -240,7 +242,9 @@ class TestCollectionVerbosity(CollectionTestCase):
         self.assertIn(self.copying_msg, output)
 
     @override_settings(
-        STATICFILES_STORAGE="django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+        STATICFILES_STORAGE=(
+            "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+        )
     )
     def test_verbosity_1_with_post_process(self):
         stdout = StringIO()
@@ -248,7 +252,9 @@ class TestCollectionVerbosity(CollectionTestCase):
         self.assertNotIn(self.post_process_msg, stdout.getvalue())
 
     @override_settings(
-        STATICFILES_STORAGE="django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+        STATICFILES_STORAGE=(
+            "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+        )
     )
     def test_verbosity_2_with_post_process(self):
         stdout = StringIO()

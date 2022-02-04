@@ -240,7 +240,8 @@ class CommonMiddlewareTest(SimpleTestCase):
         r = CommonMiddleware(get_response_404)(request)
         self.assertIsNotNone(
             r,
-            "CommonMiddleware failed to return APPEND_SLASH redirect using request.urlconf",
+            "CommonMiddleware failed to return APPEND_SLASH redirect using "
+            "request.urlconf",
         )
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url, "/customurlconf/slash/")
@@ -278,7 +279,8 @@ class CommonMiddlewareTest(SimpleTestCase):
         r = CommonMiddleware(get_response_404)(request)
         self.assertIsNotNone(
             r,
-            "CommonMiddleware failed to return APPEND_SLASH redirect using request.urlconf",
+            "CommonMiddleware failed to return APPEND_SLASH redirect using "
+            "request.urlconf",
         )
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url, "/customurlconf/needsquoting%23/")
@@ -454,7 +456,7 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
         self.assertEqual(len(mail.outbox), 1)
 
     @override_settings(APPEND_SLASH=True)
-    def test_referer_equal_to_requested_url_without_trailing_slash_when_append_slash_is_set(
+    def test_referer_equal_to_requested_url_without_trailing_slash_with_append_slash(
         self,
     ):
         self.req.path = self.req.path_info = "/regular_url/that/does/not/exist/"
@@ -463,7 +465,7 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
         self.assertEqual(len(mail.outbox), 0)
 
     @override_settings(APPEND_SLASH=False)
-    def test_referer_equal_to_requested_url_without_trailing_slash_when_append_slash_is_unset(
+    def test_referer_equal_to_requested_url_without_trailing_slash_with_no_append_slash(
         self,
     ):
         self.req.path = self.req.path_info = "/regular_url/that/does/not/exist/"

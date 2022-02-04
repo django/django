@@ -1680,9 +1680,9 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
     def setUp(self):
         super().setUp()
         self.dirname = self.mkdtemp()
-        # Caches location cannot be modified through override_settings / modify_settings,
-        # hence settings are manipulated directly here and the setting_changed signal
-        # is triggered manually.
+        # Caches location cannot be modified through override_settings /
+        # modify_settings, hence settings are manipulated directly here and the
+        # setting_changed signal is triggered manually.
         for cache_params in settings.CACHES.values():
             cache_params["LOCATION"] = self.dirname
         setting_changed.send(self.__class__, setting="CACHES", enter=False)
@@ -2079,7 +2079,8 @@ class CacheUtils(SimpleTestCase):
 
     def test_patch_cache_control(self):
         tests = (
-            # Initial Cache-Control, kwargs to patch_cache_control, expected Cache-Control parts
+            # Initial Cache-Control, kwargs to patch_cache_control, expected
+            # Cache-Control parts.
             (None, {"private": True}, {"private"}),
             ("", {"private": True}, {"private"}),
             # no-cache.
@@ -2460,9 +2461,9 @@ class CacheMiddlewareTest(SimpleTestCase):
 
     def test_constructor(self):
         """
-        Ensure the constructor is correctly distinguishing between usage of CacheMiddleware as
-        Middleware vs. usage of CacheMiddleware as view decorator and setting attributes
-        appropriately.
+        The constructor is correctly distinguishing between usage of
+        CacheMiddleware as Middleware vs. usage of CacheMiddleware as view
+        decorator and setting attributes appropriately.
         """
         # If only one argument is passed in construction, it's being used as
         # middleware.

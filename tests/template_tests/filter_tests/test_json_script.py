@@ -12,7 +12,8 @@ class JsonScriptTests(SimpleTestCase):
         self.assertEqual(
             output,
             '<script id="test_id" type="application/json">'
-            '{"a": "testing\\r\\njson \'string\\" \\u003Cb\\u003Eescaping\\u003C/b\\u003E"}'
+            '{"a": "testing\\r\\njson \'string\\" '
+            '\\u003Cb\\u003Eescaping\\u003C/b\\u003E"}'
             "</script>",
         )
 
