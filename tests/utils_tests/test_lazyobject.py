@@ -317,6 +317,17 @@ class SimpleLazyObjectTestCase(LazyObjectTestCase):
         self.assertIsInstance(obj._wrapped, int)
         self.assertEqual(repr(obj), "<SimpleLazyObject: 42>")
 
+    def test_add(self):
+        obj1 = self.lazy_wrap(1)
+        self.assertEqual(obj1 + 1, 2)
+        obj2 = self.lazy_wrap(2)
+        self.assertEqual(obj2 + obj1, 3)
+        self.assertEqual(obj1 + obj2, 3)
+
+    def test_radd(self):
+        obj1 = self.lazy_wrap(1)
+        self.assertEqual(1 + obj1, 2)
+
     def test_trace(self):
         # See ticket #19456
         old_trace_func = sys.gettrace()

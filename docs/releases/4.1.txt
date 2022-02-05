@@ -294,7 +294,7 @@ URLs
 Utilities
 ~~~~~~~~~
 
-* ...
+* ``SimpleLazyObject`` now supports addition operations.
 
 Validators
 ~~~~~~~~~~
