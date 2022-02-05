@@ -85,6 +85,8 @@ details on these changes.
   objects without providing the ``chunk_size`` argument will no longer be
   allowed.
 
+* Passing unsaved model instances to related filters will no longer be allowed.
+
 .. _deprecation-removed-in-4.1:
 
 4.1

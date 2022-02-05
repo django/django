@@ -484,6 +484,9 @@ Miscellaneous
   versions, no prefetching was done. Providing a value for ``chunk_size``
   signifies that the additional query per chunk needed to prefetch is desired.
 
+* Passing unsaved model instances to related filters is deprecated. In Django
+  5.0, the exception will be raised.
+
 Features removed in 4.1
 =======================
 
