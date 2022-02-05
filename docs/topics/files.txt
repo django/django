@@ -33,7 +33,7 @@ store a photo::
         name = models.CharField(max_length=255)
         price = models.DecimalField(max_digits=5, decimal_places=2)
         photo = models.ImageField(upload_to='cars')
-        specs = models.FileFile(upload_to='specs')
+        specs = models.FileField(upload_to='specs')
 
 Any ``Car`` instance will have a ``photo`` attribute that you can use to get at
 the details of the attached photo::
