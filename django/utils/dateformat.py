@@ -32,21 +32,33 @@ re_escaped = _lazy_re_compile(r'\\(.)')
 class Formatter:
     def format(self, formatstr):
         escape = "\\"
-        pieces = []
-        possibilities = re_formatchars.split(str(formatstr))
-        formatters = possibilities[1::2]
-        # There are always other, non-formatter values, though they may all
-        # be 0-length strings. We need to keep all of them so the offsets can
-        # be correct when we re-pair them with zip.
-        if escape in formatstr:
-            others = [
-                piece.replace(escape, "") if escape in piece else piece
-                for piece in possibilities[0::2]
-            ]
+        formatstr = str(formatstr)
+        # Special case format-strings like 'Z', 'U', 'c'
+        # This slows down the common case a bit, but without special-casing it
+        # single-char format strings suffer and become slower than previously.
+        if len(formatstr) == 1:
+            if formatstr in self.time_formats or formatstr in self.date_formats:
+                formatters = [formatstr]
+                others = []
+            else:
+                formatters = []
+                others = [formatstr]
         else:
-            others = possibilities[0::2]
-        is_date = type(self.data) is datetime.date
+            possibilities = re_formatchars.split(formatstr)
+            formatters = possibilities[1::2]
+            # There are always other, non-formatter values, though they may all
+            # be 0-length strings. We need to keep all of them so the offsets can
+            # be correct when we re-pair them with zip.
+            if escape in formatstr:
+                others = [
+                    piece.replace(escape, "") if escape in piece else piece
+                    for piece in possibilities[0::2]
+                ]
+            else:
+                others = possibilities[0::2]
 
+        is_date = type(self.data) is datetime.date
+        pieces = []
         for piece in formatters:
             if is_date and piece in self.time_formats:
                 raise TypeError(
