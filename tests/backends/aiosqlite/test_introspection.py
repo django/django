@@ -2,11 +2,11 @@ import unittest
 
 import sqlparse
 
-from django.db import connection
+from django.db import connections
 from django.test import TestCase
 
 
-@unittest.skipUnless(connection.vendor == 'sqlite', 'Async SQLite tests')
+@unittest.skipUnless(connections["async"].vendor == 'sqlite', 'Async SQLite tests')
 class IntrospectionTests(TestCase):
     async def test_get_primary_key_column(self):
         """
@@ -17,13 +17,13 @@ class IntrospectionTests(TestCase):
             ('id', 'id'), ('[id]', 'id'), ('`id`', 'id'), ('"id"', 'id'),
             ('[id col]', 'id col'), ('`id col`', 'id col'), ('"id col"', 'id col')
         )
-        async with connection.cursor() as cursor:
+        async with await connections["async"].cursor() as cursor:
             for column, expected_string in testable_column_strings:
                 sql = 'CREATE TABLE test_primary (%s int PRIMARY KEY NOT NULL)' % column
                 with self.subTest(column=column):
                     try:
                         await cursor.execute(sql)
-                        field = await connection.introspection.get_primary_key_column(cursor, 'test_primary')
+                        field = await connections["async"].introspection.get_primary_key_column(cursor, 'test_primary')
                         self.assertEqual(field, expected_string)
                     finally:
                         await cursor.execute('DROP TABLE test_primary')
@@ -36,10 +36,10 @@ class IntrospectionTests(TestCase):
                 PRIMARY KEY(id)
             )
         """
-        async with connection.cursor() as cursor:
+        async with await connections["async"].cursor() as cursor:
             try:
                 await cursor.execute(sql)
-                field = await connection.introspection.get_primary_key_column(
+                field = await connections["async"].introspection.get_primary_key_column(
                     cursor,
                     'test_primary',
                 )
@@ -48,14 +48,14 @@ class IntrospectionTests(TestCase):
                 await cursor.execute('DROP TABLE test_primary')
 
 
-@unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests')
+@unittest.skipUnless(connections["async"].vendor == 'sqlite', 'SQLite tests')
 class ParsingTests(TestCase):
     async def parse_definition(self, sql, columns):
         """Parse a column or constraint definition."""
         statement = sqlparse.parse(sql)[0]
         tokens = (token for token in statement.flatten() if not token.is_whitespace)
-        async with connection.cursor():
-            return connection.introspection._parse_column_or_constraint_definition(tokens, set(columns))
+        async with await connections["async"].cursor():
+            return connections["async"].introspection._parse_column_or_constraint_definition(tokens, set(columns))
 
     def assertConstraint(self, constraint_details, cols, unique=False, check=False):
         self.assertEqual(constraint_details, {

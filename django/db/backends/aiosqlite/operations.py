@@ -75,7 +75,9 @@ class DatabaseOperations(SQLiteDatabaseOperations, BaseAsyncDatabaseOperations):
         if tables and allow_cascade:
             # Simulate TRUNCATE CASCADE by recursively collecting the tables
             # referencing the tables to be flushed.
-            tables = set(chain.from_iterable(await self._references_graph(table) for table in tables))
+            tables = set(chain.from_iterable(
+                [await self._references_graph(table) for table in tables]
+            ))
         sql = ['%s %s %s;' % (
             style.SQL_KEYWORD('DELETE'),
             style.SQL_KEYWORD('FROM'),

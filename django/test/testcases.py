@@ -1042,7 +1042,10 @@ class TransactionTestCase(SimpleTestCase):
                 # created with the wrong time). To make sure this doesn't
                 # happen, get a clean connection at the start of every test.
                 for conn in connections.all():
-                    conn.close()
+                    if asyncio.iscoroutinefunction(conn.close):
+                        async_to_sync(conn.close)()
+                    else:
+                        conn.close()
         finally:
             if self.available_apps is not None:
                 apps.unset_available_apps()
@@ -1206,7 +1209,10 @@ class TestCase(TransactionTestCase):
         if cls._databases_support_transactions():
             cls._rollback_atomics(cls.cls_atomics)
             for conn in connections.all():
-                conn.close()
+                if asyncio.iscoroutinefunction(conn.close):
+                    async_to_sync(conn.close)()
+                else:
+                    conn.close()
         super().tearDownClass()
 
     @classmethod

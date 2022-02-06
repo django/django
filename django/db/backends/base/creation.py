@@ -20,8 +20,9 @@ class BaseDatabaseCreation:
     Encapsulate backend-specific differences pertaining to creation and
     destruction of the test database.
     """
-    def __init__(self, connection):
+    def __init__(self, connection, async_connection=None):
         self.connection = connection
+        self.aconnection = async_connection
 
     def _nodb_cursor(self):
         return self.connection._nodb_cursor()
@@ -340,3 +341,9 @@ class BaseDatabaseCreation:
             settings_dict['ENGINE'],
             self._get_test_db_name(),
         )
+
+
+class BaseAsyncDatabaseCreation(BaseDatabaseCreation):
+    def set_as_test_mirror(self, primary_settings_dict):
+        """Sets the async connection's settings to be the mirror of the primary"""
+        self.aconnection.settings_dict['NAME'] = primary_settings_dict['NAME']

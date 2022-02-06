@@ -18,6 +18,13 @@ DATABASES = {
     },
     'other': {
         'ENGINE': 'django.db.backends.sqlite3',
+    },
+    'async': {
+        'ENGINE': 'django.db.backends.aiosqlite',
+        'SYNC_DATABASE_ALIAS': 'default',
+        'TEST': {
+            'MIRROR': 'default',
+        },
     }
 }
 

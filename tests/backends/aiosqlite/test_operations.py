@@ -1,17 +1,17 @@
 import unittest
 
 from django.core.management.color import no_style
-from django.db import connection
+from django.db import connections
 from django.test import TestCase
 
 from ..models import Person, Tag
 
 
-@unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests.')
+@unittest.skipUnless(connections["async"].vendor == 'sqlite', 'SQLite tests.')
 class SQLiteOperationsTests(TestCase):
     async def test_sql_flush(self):
         self.assertEqual(
-            await connection.ops.sql_flush(
+            await connections["async"].ops.sql_flush(
                 no_style(),
                 [Person._meta.db_table, Tag._meta.db_table],
             ),
@@ -22,7 +22,7 @@ class SQLiteOperationsTests(TestCase):
         )
 
     async def test_sql_flush_allow_cascade(self):
-        statements = await connection.ops.sql_flush(
+        statements = await connections["async"].ops.sql_flush(
             no_style(),
             [Person._meta.db_table, Tag._meta.db_table],
             allow_cascade=True,
@@ -41,7 +41,7 @@ class SQLiteOperationsTests(TestCase):
 
     async def test_sql_flush_sequences(self):
         self.assertEqual(
-            await connection.ops.sql_flush(
+            await connections["async"].ops.sql_flush(
                 no_style(),
                 [Person._meta.db_table, Tag._meta.db_table],
                 reset_sequences=True,
@@ -55,7 +55,7 @@ class SQLiteOperationsTests(TestCase):
         )
 
     async def test_sql_flush_sequences_allow_cascade(self):
-        statements = await connection.ops.sql_flush(
+        statements = await connections["async"].ops.sql_flush(
             no_style(),
             [Person._meta.db_table, Tag._meta.db_table],
             reset_sequences=True,

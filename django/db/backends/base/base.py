@@ -16,7 +16,7 @@ from asgiref.sync import sync_to_async
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.db import DEFAULT_DB_ALIAS, DatabaseError
+from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections
 from django.db.backends import utils
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.signals import connection_created
@@ -120,7 +120,8 @@ class BaseDatabaseWrapper:
         self.execute_wrappers = []
 
         self.client = self.client_class(self)
-        self.creation = self.creation_class(self)
+        if self.is_sync:
+            self.creation = self.creation_class(self)
         self.features = self.features_class(self)
         self.introspection = self.introspection_class(self)
         self.ops = self.ops_class(self)
@@ -739,6 +740,16 @@ class BaseAsyncDatabaseWrapper(BaseDatabaseWrapper):
         except RuntimeError:
             pass
 
+        self._creation = None
+
+    @property
+    def creation(self):
+        if self._creation:
+            return self._creation
+        sync_conn = connections[self.settings_dict["SYNC_DATABASE_ALIAS"]]
+        self._creation = self.creation_class(sync_conn, self)
+        return self._creation
+
     # ##### Backend-specific methods for creating connections and cursors #####
 
     async def get_new_connection(self, conn_params):
@@ -754,6 +765,14 @@ class BaseAsyncDatabaseWrapper(BaseDatabaseWrapper):
         return super().create_cursor(name)
 
     # ##### Backend-specific methods for creating connections #####
+
+    def check_settings(self):
+        if not self.settings_dict["SYNC_DATABASE_ALIAS"]:
+            raise NotImplementedError(
+                "The sync database alias is not set for the async engine. Add the "
+                "SYNC_DATABASE_ALIAS key in your engine's settings dictionary"
+            )
+        super().check_settings()
 
     async def connect(self):
         """See BaseDatabaseWrapper.connect()."""
@@ -787,7 +806,7 @@ class BaseAsyncDatabaseWrapper(BaseDatabaseWrapper):
             wrapped_cursor = self.make_debug_cursor(cursor)
         else:
             wrapped_cursor = self.make_cursor(cursor)
-        return wrapped_cursor
+        return await wrapped_cursor
 
     async def _cursor(self, name=None):
         await self.close_if_health_check_failed()
@@ -1063,6 +1082,14 @@ class BaseAsyncDatabaseWrapper(BaseDatabaseWrapper):
         """See BaseDatabaseWrapper.chunked_cursor()."""
         return await self.cursor()
 
+    async def make_debug_cursor(self, cursor):
+        """See BaseDatabaseWrapper.make_debug_cursor()."""
+        return utils.AsyncCursorDebugWrapper(cursor, self)
+
+    async def make_cursor(self, cursor):
+        """See BaseDatabaseWrapper.make_cursor()."""
+        return utils.AsyncCursorWrapper(cursor, self)
+
     @asynccontextmanager
     async def temporary_connection(self):
         """See BaseDatabaseWrapper.temporary_connection()."""
@@ -1083,6 +1110,15 @@ class BaseAsyncDatabaseWrapper(BaseDatabaseWrapper):
                 yield cursor
         finally:
             await conn.close()
+
+    def schema_editor(self, *args, **kwargs):
+        """
+        Return a new instance of this backend's sync compatible SchemaEditor.
+        """
+        if self.SchemaEditorClass is None:
+            raise NotImplementedError(
+                'The SchemaEditorClass attribute of this database wrapper is still None')
+        return connections[self.settings_dict["SYNC_DATABASE_ALIAS"]].schema_editor(*args, **kwargs)
 
     async def on_commit(self, func):
         is_coroutine_func = asyncio.iscoroutinefunction(func)

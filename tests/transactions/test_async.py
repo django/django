@@ -6,7 +6,7 @@ from asgiref.sync import async_to_sync, sync_to_async
 
 from django.db import (
     DatabaseError, Error, IntegrityError, OperationalError, connection,
-    transaction,
+    connections, transaction,
 )
 from django.test import (
     TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
@@ -212,7 +212,7 @@ class AtomicTests(TransactionTestCase):
             # trigger a database error inside an inner atomic without savepoint
             with self.assertRaises(DatabaseError):
                 async with transaction.aatomic(savepoint=False):
-                    async with connection.cursor() as cursor:
+                    async with await connections["async"].cursor() as cursor:
                         await cursor.execute(
                             "SELECT no_such_col FROM transactions_reporter")
             # prevent atomic from rolling back since we're recovering manually
@@ -312,7 +312,7 @@ class AtomicErrorsTests(TransactionTestCase):
             with self.assertRaisesMessage(transaction.TransactionManagementError, self.forbidden_atomic_msg):
                 await transaction.set_autocommit(not autocommit)
         # Make sure autocommit wasn't changed.
-        self.assertEqual(connection.autocommit, autocommit)
+        self.assertEqual(connections["async"].autocommit, autocommit)
 
     async def test_atomic_prevents_calling_transaction_methods(self):
         async with transaction.aatomic():
@@ -357,7 +357,7 @@ class AtomicErrorsTests(TransactionTestCase):
         async with transaction.aatomic():
             await sync_to_async(Reporter.objects.create, thread_sensitive=True)(first_name="Archibald",
                                                                                 last_name="Haddock")
-            await connection.close()
+            await connections["async"].close()
             # The connection is closed and the transaction is marked as
             # needing rollback. This will raise an InterfaceError on databases
             # that refuse to create cursors on closed connections (PostgreSQL)
@@ -389,7 +389,7 @@ class AtomicMySQLTests(TransactionTestCase):
                     await sync_to_async(Reporter.objects.exclude, thread_sensitive=True)(id=1).update(id=2)
             finally:
                 # This is the thread-local connection, not the main connection.
-                await connection.close()
+                await connections["async"].close()
 
         task = asyncio.create_task(other_task())
 
@@ -434,11 +434,11 @@ class AtomicMiscTests(TransactionTestCase):
                 with self.assertRaisesMessage(Exception, "Oops"):
                     # Start a sub-transaction with a savepoint.
                     async with transaction.aatomic():
-                        sid = connection.savepoint_ids[-1]
+                        sid = connections["async"].savepoint_ids[-1]
                         raise Exception("Oops")
 
                 # This is expected to fail because the savepoint no longer exists.
-                await connection.savepoint_rollback(sid)
+                await connections["async"].savepoint_rollback(sid)
 
     async def test_mark_for_rollback_on_error_in_transaction(self):
         async with transaction.aatomic(savepoint=False):

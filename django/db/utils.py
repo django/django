@@ -1,5 +1,8 @@
+import asyncio
 import pkgutil
 from importlib import import_module
+
+from asgiref.sync import async_to_sync
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -175,7 +178,15 @@ class ConnectionHandler(BaseConnectionHandler):
         conn.setdefault('CONN_HEALTH_CHECKS', False)
         conn.setdefault('OPTIONS', {})
         conn.setdefault('TIME_ZONE', None)
-        for setting in ['NAME', 'USER', 'PASSWORD', 'HOST', 'PORT']:
+        for setting in [
+            'NAME',
+            'USER',
+            'PASSWORD',
+            'HOST',
+            'PORT',
+            'SYNC_DATABASE_ALIAS',
+            'ASYNC_DATABASE_ALIAS',
+        ]:
             conn.setdefault(setting, '')
 
     def prepare_test_settings(self, alias):
@@ -211,7 +222,10 @@ class ConnectionHandler(BaseConnectionHandler):
                 connection = getattr(self._connections, alias)
             except AttributeError:
                 continue
-            connection.close()
+            if asyncio.iscoroutinefunction(connection.close):
+                async_to_sync(connection.close)()
+            else:
+                connection.close()
 
 
 class ConnectionRouter:

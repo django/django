@@ -9,7 +9,7 @@ from django.db.backends.sqlite3.introspection import (
 from django.db.models import Index
 
 
-class DatabaseIntrospection(SQLiteDatabaseIntrospection, BaseAsyncDatabaseIntrospection):
+class DatabaseIntrospection(BaseAsyncDatabaseIntrospection, SQLiteDatabaseIntrospection):
     data_types_reverse = FlexibleFieldLookupDict()
 
     async def get_field_type(self, data_type, description):

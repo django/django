@@ -3,8 +3,10 @@ SQLite backend for the sqlite3 module in the standard library.
 """
 import decimal
 from itertools import chain
+from sqlite3 import dbapi2
 
 import aiosqlite as Database
+from aiosqlite.context import contextmanager as aiosqlite_contextmanager
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
@@ -14,9 +16,9 @@ from django.db.backends.sqlite3.base import (
 )
 from django.utils.dateparse import parse_datetime, parse_time
 
+from ..base.creation import BaseAsyncDatabaseCreation
 from ._functions import register as register_functions
 from .client import DatabaseClient
-from .creation import DatabaseCreation
 from .features import DatabaseFeatures
 from .introspection import DatabaseIntrospection
 from .operations import DatabaseOperations
@@ -39,17 +41,36 @@ Database.register_converter("timestamp", decoder(parse_datetime))
 Database.register_adapter(decimal.Decimal, str)
 
 
-class DatabaseWrapper(SQLiteDatabaseWrapper, BaseAsyncDatabaseWrapper):
+def setup():
+    for exc in [
+        "DataError",
+        "OperationalError",
+        "IntegrityError",
+        "InternalError",
+        "ProgrammingError",
+        "NotSupportedError",
+        "DatabaseError",
+        "InterfaceError",
+        "Error",
+    ]:
+        setattr(Database, exc, getattr(dbapi2, exc))
+
+
+setup()
+del setup
+
+
+class DatabaseWrapper(BaseAsyncDatabaseWrapper, SQLiteDatabaseWrapper):
     Database = Database
     # Classes instantiated in __init__().
     client_class = DatabaseClient
-    creation_class = DatabaseCreation
+    creation_class = BaseAsyncDatabaseCreation
     features_class = DatabaseFeatures
     introspection_class = DatabaseIntrospection
     ops_class = DatabaseOperations
 
     async def get_new_connection(self, conn_params):
-        conn = Database.connect(**conn_params)
+        conn = await Database.connect(**conn_params)
         await register_functions(conn)
 
         await conn.execute('PRAGMA foreign_keys = ON')
@@ -59,7 +80,15 @@ class DatabaseWrapper(SQLiteDatabaseWrapper, BaseAsyncDatabaseWrapper):
         return conn
 
     def create_cursor(self, name=None):
-        return self.connection.cursor(factory=SQLiteCursorWrapper)
+
+        @aiosqlite_contextmanager
+        async def cursor(conn):
+            """Create an aiosqlite cursor wrapping a sqlite3 cursor object."""
+            return SQLiteCursorWrapper(
+                conn, await conn._execute(self.connection._conn.cursor),
+            )
+
+        return cursor(self.connection)
 
     async def close(self):
         await self.validate_task_sharing()
@@ -192,4 +221,4 @@ class SQLiteCursorWrapper(Database.Cursor):
         return await Database.Cursor.executemany(self, query, param_list)
 
     def convert_query(self, query):
-        return FORMAT_QMARK_REGEX
+        return FORMAT_QMARK_REGEX.sub('?', query).replace('%%', '%')

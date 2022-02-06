@@ -1,4 +1,5 @@
 import argparse
+import asyncio
 import ctypes
 import faulthandler
 import io
@@ -16,6 +17,8 @@ from collections import defaultdict
 from contextlib import contextmanager
 from importlib import import_module
 from io import StringIO
+
+from asgiref.sync import async_to_sync
 
 from django.core.management import call_command
 from django.db import connections
@@ -392,7 +395,10 @@ def _init_worker(counter):
         # connection.settings_dict = settings_dict, new threads would connect
         # to the default database instead of the appropriate clone.
         connection.settings_dict.update(settings_dict)
-        connection.close()
+        if asyncio.iscoroutinefunction(connection.close):
+            async_to_sync(connection.close)()
+        else:
+            connection.close()
 
 
 def _run_subsuite(args):
