@@ -3538,6 +3538,7 @@ class SchemaTests(TransactionTestCase):
             blank=True,
             editable=False,
             error_messages={'invalid': 'error message'},
+            choices=[('1stChoice', 'First Choice'), ('2ndChoice', 'Second Choice')],
             help_text='help text',
             limit_choices_to={'limit': 'choice'},
             on_delete=PROTECT,
