@@ -16,9 +16,9 @@ from django.db.backends.sqlite3.base import (
 )
 from django.utils.dateparse import parse_datetime, parse_time
 
-from ..base.creation import BaseAsyncDatabaseCreation
 from ._functions import register as register_functions
 from .client import DatabaseClient
+from .creation import DatabaseCreation
 from .features import DatabaseFeatures
 from .introspection import DatabaseIntrospection
 from .operations import DatabaseOperations
@@ -64,7 +64,7 @@ class DatabaseWrapper(BaseAsyncDatabaseWrapper, SQLiteDatabaseWrapper):
     Database = Database
     # Classes instantiated in __init__().
     client_class = DatabaseClient
-    creation_class = BaseAsyncDatabaseCreation
+    creation_class = DatabaseCreation
     features_class = DatabaseFeatures
     introspection_class = DatabaseIntrospection
     ops_class = DatabaseOperations

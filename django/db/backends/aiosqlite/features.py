@@ -22,7 +22,7 @@ class DatabaseFeatures(SQLiteDatabaseFeatures):
         return Database.sqlite_version_info >= (3, 26, 0)
 
     async def _supports_json_field(self):
-        with await self.connection.cursor() as cursor:
+        async with await self.connection.cursor() as cursor:
             try:
                 async with transaction.aatomic(self.connection.alias):
                     await cursor.execute('SELECT JSON(\'{"a": "b"}\')')

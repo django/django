@@ -200,7 +200,7 @@ class BaseAsyncDatabaseIntrospection(BaseDatabaseIntrospection):
                           if include_views or ti.type == 't')
 
         if cursor is None:
-            with await self.connection.cursor() as cursor:
+            async with await self.connection.cursor() as cursor:
                 return await get_names(cursor)
         return await get_names(cursor)
 
@@ -241,7 +241,7 @@ class BaseAsyncDatabaseIntrospection(BaseDatabaseIntrospection):
     async def sequence_list(self):
         """See BaseDatabaseIntrospection.sequence_list()."""
         sequence_list = []
-        with await self.connection.cursor() as cursor:
+        async with await self.connection.cursor() as cursor:
             for model in self.get_migratable_models():
                 if not model._meta.managed:
                     continue

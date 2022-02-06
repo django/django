@@ -63,7 +63,7 @@ class DatabaseOperations(SQLiteDatabaseOperations, BaseAsyncDatabaseOperations):
             r'(?i)\s+references\s+("|\')?',
             r'("|\')?\s*\(',
         )
-        with await self.connection.cursor() as cursor:
+        async with await self.connection.cursor() as cursor:
             results = await cursor.execute(query, params)
             return [row[0] for row in await results.fetchall()]
 

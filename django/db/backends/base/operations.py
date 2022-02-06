@@ -743,6 +743,6 @@ class BaseAsyncDatabaseOperations(BaseDatabaseOperations):
             using=self.connection.alias,
             savepoint=self.connection.features.can_rollback_ddl,
         ):
-            with await self.connection.cursor() as cursor:
+            async with await self.connection.cursor() as cursor:
                 for sql in sql_list:
                     await cursor.execute(sql)
