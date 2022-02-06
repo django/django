@@ -13,6 +13,7 @@ Usage:
 import calendar
 import datetime
 from email.utils import format_datetime as format_datetime_rfc5322
+from itertools import zip_longest
 
 from django.utils.dates import (
     MONTHS, MONTHS_3, MONTHS_ALT, MONTHS_AP, WEEKDAYS, WEEKDAYS_ABBR,
@@ -30,6 +31,38 @@ re_escaped = _lazy_re_compile(r'\\(.)')
 
 class Formatter:
     def format(self, formatstr):
+        escape = "\\"
+        pieces = []
+        possibilities = re_formatchars.split(str(formatstr))
+        formatters = possibilities[1::2]
+        # There are always other, non-formatter values, though they may all
+        # be 0-length strings. We need to keep all of them so the offsets can
+        # be correct when we re-pair them with zip.
+        if escape in formatstr:
+            others = [
+                piece.replace(escape, "") if escape in piece else piece
+                for piece in possibilities[0::2]
+            ]
+        else:
+            others = possibilities[0::2]
+        is_date = type(self.data) is datetime.date
+
+        for piece in formatters:
+            if is_date and piece in self.time_formats:
+                raise TypeError(
+                    "The format for date objects may not contain "
+                    f"time-related format specifiers (found '{piece}')."
+                )
+            pieces.append(str(getattr(self, piece)()))
+
+        return "".join(
+            [
+                f"{piece}{other}"
+                for piece, other in zip_longest(others, pieces, fillvalue="")
+            ]
+        )
+
+    def format_old(self, formatstr):
         pieces = []
         for i, piece in enumerate(re_formatchars.split(str(formatstr))):
             if i % 2:
@@ -45,6 +78,7 @@ class Formatter:
 
 
 class TimeFormat(Formatter):
+    time_formats = "AGHOPTZaefghisu"
 
     def __init__(self, obj):
         self.data = obj
@@ -192,6 +226,8 @@ class TimeFormat(Formatter):
 
 
 class DateFormat(TimeFormat):
+    date_formats = "DEFILMNSUWYbcdjlmnortwyz"
+
     def b(self):
         "Month, textual, 3 letters, lowercase; e.g. 'jan'"
         return MONTHS_3[self.data.month]
