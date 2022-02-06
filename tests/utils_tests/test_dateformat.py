@@ -151,11 +151,10 @@ class DateFormatTests(SimpleTestCase):
             ("jS \\o\\f F\\", "8th of July\\"),
             # More pathological cases of nested escaping.
             (r"Y z \C\E\T", "1979 189 CET"),
+            (r"Y z \\C\\E\\T", r"1979 189 \C\July\CET"),
             (r"Y z \\\C\\\E\\\T", r"1979 189 \C\E\T"),
+            (r"Y z \\\\C\\\\E\\\\T", r"1979 189 \\C\\July\\CET"),
             (r"Y z \\\\\C\\\\\E\\\\\T", r"1979 189 \\C\\E\\T"),
-            # FIXME: These should work, but the current implementation is broken.
-            # (r"Y z \\C\\E\\T", r"1979 189 \C\July\CET"),
-            # (r"Y z \\\\C\\\\E\\\\T", r"1979 189 \\C\\July\\CET"),
         ]:
             with self.subTest(format=format_):
                 self.assertEqual(dateformat.format(my_birthday, format_), expected)
