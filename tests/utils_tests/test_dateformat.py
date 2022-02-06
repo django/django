@@ -276,3 +276,16 @@ class DateFormatTests(SimpleTestCase):
             with self.subTest(hour=hour):
                 self.assertEqual(dateformat.format(dt, 'g'), g_expected)
                 self.assertEqual(dateformat.format(dt, 'h'), h_expected)
+
+    def test_multibyte_single_char_format(self):
+        tests = [
+            "😀",
+            "à",
+            "ă",
+            "⌚",
+            "ខ",
+        ]
+        dt = datetime(1970, 1, 1, tzinfo=utc)
+        for format in tests:
+            with self.subTest(format=format):
+                self.assertEqual(dateformat.format(dt, format), format)
