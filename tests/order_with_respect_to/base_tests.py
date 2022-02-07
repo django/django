@@ -6,6 +6,8 @@ from operator import attrgetter
 
 
 class BaseOrderWithRespectToTests:
+    databases = {"default", "other"}
+
     # Hook to allow subclasses to run these tests with alternate models.
     Answer = None
     Post = None
@@ -108,3 +110,15 @@ class BaseOrderWithRespectToTests:
         a1.delete()
         new_answer = self.Answer.objects.create(text="Black", question=q1)
         self.assertSequenceEqual(q1.answer_set.all(), [a2, a4, new_answer])
+
+    def test_database_routing(self):
+        class WriteToOtherRouter:
+            def db_for_write(self, model, **hints):
+                return "other"
+
+        with self.settings(DATABASE_ROUTERS=[WriteToOtherRouter()]):
+            with self.assertNumQueries(0, using="default"), self.assertNumQueries(
+                1,
+                using="other",
+            ):
+                self.q1.set_answer_order([3, 1, 2, 4])
