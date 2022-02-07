@@ -1221,7 +1221,10 @@ class Exists(Subquery):
             )
         except EmptyResultSet:
             if self.negated:
-                return '', ()
+                features = compiler.connection.features
+                if not features.supports_boolean_expr_in_select_clause:
+                    return "1=1", ()
+                return compiler.compile(Value(True))
             raise
         if self.negated:
             sql = 'NOT {}'.format(sql)
