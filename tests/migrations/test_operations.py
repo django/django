@@ -2531,7 +2531,7 @@ class OperationTests(OperationTestBase):
             new_state.models["app", "othermodel"].fields["fk"].remote_field.field_name,
             "renamed",
         )
-        self.assertEqual(
+        self.assertSequenceEqual(
             new_state.models["app", "othermodel"].fields["fk"].from_fields, ["self"]
         )
         self.assertEqual(

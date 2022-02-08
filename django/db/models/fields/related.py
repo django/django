@@ -95,6 +95,11 @@ class RelatedField(FieldCacheMixin, Field):
     many_to_many = False
     many_to_one = False
 
+    # Defaults
+    _related_name = None
+    _related_query_name = None
+    _limit_choices_to = None
+
     def __init__(
         self,
         related_name=None,
@@ -102,9 +107,12 @@ class RelatedField(FieldCacheMixin, Field):
         limit_choices_to=None,
         **kwargs,
     ):
-        self._related_name = related_name
-        self._related_query_name = related_query_name
-        self._limit_choices_to = limit_choices_to
+        if self._related_name is not related_name:
+            self._related_name = related_name
+        if self._related_query_name is not related_query_name:
+            self._related_query_name = related_query_name
+        if self._limit_choices_to is not limit_choices_to:
+            self._limit_choices_to = limit_choices_to
         super().__init__(**kwargs)
 
     @cached_property
@@ -526,6 +534,10 @@ class ForeignObject(RelatedField):
     forward_related_accessor_class = ForwardManyToOneDescriptor
     rel_class = ForeignObjectRel
 
+    # Defaults
+    from_fields = (RECURSIVE_RELATIONSHIP_CONSTANT,)
+    swappable = True
+
     def __init__(
         self,
         to,
@@ -560,9 +572,11 @@ class ForeignObject(RelatedField):
             **kwargs,
         )
 
-        self.from_fields = from_fields
+        if self.from_fields != from_fields:
+            self.from_fields = from_fields
         self.to_fields = to_fields
-        self.swappable = swappable
+        if self.swappable is not swappable:
+            self.swappable = swappable
 
     def __copy__(self):
         obj = super().__copy__()
@@ -920,6 +934,7 @@ class ForeignKey(ForeignObject):
         "invalid": _("%(model)s instance with %(field)s %(value)r does not exist.")
     }
     description = _("Foreign Key (type determined by related field)")
+    db_constraint = True
 
     def __init__(
         self,
@@ -972,11 +987,12 @@ class ForeignKey(ForeignObject):
             related_name=related_name,
             related_query_name=related_query_name,
             limit_choices_to=limit_choices_to,
-            from_fields=[RECURSIVE_RELATIONSHIP_CONSTANT],
+            from_fields=(RECURSIVE_RELATIONSHIP_CONSTANT,),
             to_fields=[to_field],
             **kwargs,
         )
-        self.db_constraint = db_constraint
+        if self.db_constraint is not db_constraint:
+            self.db_constraint = db_constraint
 
     def check(self, **kwargs):
         return [
@@ -1327,6 +1343,11 @@ class ManyToManyField(RelatedField):
 
     description = _("Many-to-many relationship")
 
+    # Defaults
+    has_null_arg = False
+    db_table = None
+    swappable = True
+
     def __init__(
         self,
         to,
@@ -1374,7 +1395,8 @@ class ManyToManyField(RelatedField):
             through_fields=through_fields,
             db_constraint=db_constraint,
         )
-        self.has_null_arg = "null" in kwargs
+        if "null" in kwargs:
+            self.has_null_arg = True
 
         super().__init__(
             related_name=related_name,
@@ -1383,8 +1405,10 @@ class ManyToManyField(RelatedField):
             **kwargs,
         )
 
-        self.db_table = db_table
-        self.swappable = swappable
+        if self.db_table is not db_table:
+            self.db_table = db_table
+        if self.swappable is not swappable:
+            self.swappable = swappable
 
     def check(self, **kwargs):
         return [

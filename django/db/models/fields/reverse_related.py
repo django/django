@@ -30,11 +30,17 @@ class ForeignObjectRel(FieldCacheMixin):
     concrete = False
     editable = False
     is_relation = True
+    symmetrical = False
+    multiple = True
 
     # Reverse relations are always nullable (Django can't enforce that a
     # foreign key on the related model points to this model).
     null = True
     empty_strings_allowed = False
+
+    # Defaults
+    related_query_name = None
+    parent_link = False
 
     def __init__(
         self,
@@ -49,13 +55,12 @@ class ForeignObjectRel(FieldCacheMixin):
         self.field = field
         self.model = to
         self.related_name = related_name
-        self.related_query_name = related_query_name
+        if self.related_query_name != related_query_name:
+            self.related_query_name = related_query_name
         self.limit_choices_to = {} if limit_choices_to is None else limit_choices_to
-        self.parent_link = parent_link
+        if self.parent_link != parent_link:
+            self.parent_link = parent_link
         self.on_delete = on_delete
-
-        self.symmetrical = False
-        self.multiple = True
 
     # Some of the following cached_properties can't be initialized in
     # __init__ as the field doesn't have its model yet. Calling these methods
@@ -308,6 +313,8 @@ class OneToOneRel(ManyToOneRel):
     flags for the reverse relation.
     """
 
+    multiple = False
+
     def __init__(
         self,
         field,
@@ -330,8 +337,6 @@ class OneToOneRel(ManyToOneRel):
             on_delete=on_delete,
         )
 
-        self.multiple = False
-
 
 class ManyToManyRel(ForeignObjectRel):
     """
@@ -340,6 +345,10 @@ class ManyToManyRel(ForeignObjectRel):
     ``_meta.get_fields()`` returns this class to provide access to the field
     flags for the reverse relation.
     """
+
+    symmetrical = True
+    db_constraint = True
+    through_fields = None
 
     def __init__(
         self,
@@ -367,10 +376,13 @@ class ManyToManyRel(ForeignObjectRel):
 
         if through_fields and not through:
             raise ValueError("Cannot specify through_fields without a through model")
-        self.through_fields = through_fields
+        if self.through_fields != through_fields:
+            self.through_fields = through_fields
 
-        self.symmetrical = symmetrical
-        self.db_constraint = db_constraint
+        if self.symmetrical != symmetrical:
+            self.symmetrical = symmetrical
+        if self.db_constraint != db_constraint:
+            self.db_constraint = db_constraint
 
     @property
     def identity(self):
