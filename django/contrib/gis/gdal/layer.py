@@ -19,7 +19,10 @@ from django.utils.encoding import force_bytes, force_str
 #
 # The OGR_L_* routines are relevant here.
 class Layer(GDALBase):
-    "A class that wraps an OGR Layer, needs to be instantiated from a DataSource object."
+    """
+    A class that wraps an OGR Layer, needs to be instantiated from a DataSource
+    object.
+    """
 
     def __init__(self, layer_ptr, ds):
         """
@@ -192,7 +195,8 @@ class Layer(GDALBase):
             capi.set_spatial_filter(self.ptr, None)
         else:
             raise TypeError(
-                "Spatial filter must be either an OGRGeometry instance, a 4-tuple, or None."
+                "Spatial filter must be either an OGRGeometry instance, a 4-tuple, or "
+                "None."
             )
 
     spatial_filter = property(_get_spatial_filter, _set_spatial_filter)

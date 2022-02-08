@@ -519,7 +519,8 @@ class SchemaTests(PostgreSQLTestCase):
         msg = "Covering GiST indexes requires PostgreSQL 12+."
         with self.assertRaisesMessage(NotSupportedError, msg):
             with mock.patch(
-                "django.db.backends.postgresql.features.DatabaseFeatures.supports_covering_gist_indexes",
+                "django.db.backends.postgresql.features.DatabaseFeatures."
+                "supports_covering_gist_indexes",
                 False,
             ):
                 with connection.schema_editor() as editor:

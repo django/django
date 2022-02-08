@@ -51,7 +51,10 @@ class TestQuerying(TestCase):
 
 
 class TestSerialization(SimpleTestCase):
-    test_data = '[{"fields": {"field": "1 01:00:00"}, "model": "model_fields.durationmodel", "pk": null}]'
+    test_data = (
+        '[{"fields": {"field": "1 01:00:00"}, "model": "model_fields.durationmodel", '
+        '"pk": null}]'
+    )
 
     def test_dumping(self):
         instance = DurationModel(field=datetime.timedelta(days=1, hours=1))

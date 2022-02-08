@@ -20,7 +20,10 @@ class StriptagsTests(SimpleTestCase):
 
     @setup(
         {
-            "striptags02": "{% autoescape off %}{{ a|striptags }} {{ b|striptags }}{% endautoescape %}"
+            "striptags02": (
+                "{% autoescape off %}{{ a|striptags }} {{ b|striptags }}"
+                "{% endautoescape %}"
+            )
         }
     )
     def test_striptags02(self):
@@ -38,7 +41,8 @@ class FunctionTests(SimpleTestCase):
     def test_strip(self):
         self.assertEqual(
             striptags(
-                'some <b>html</b> with <script>alert("You smell")</script> disallowed <img /> tags'
+                'some <b>html</b> with <script>alert("You smell")</script> disallowed '
+                "<img /> tags"
             ),
             'some html with alert("You smell") disallowed  tags',
         )
@@ -50,7 +54,8 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(
             striptags(
                 lazystr(
-                    'some <b>html</b> with <script>alert("Hello")</script> disallowed <img /> tags'
+                    'some <b>html</b> with <script>alert("Hello")</script> disallowed '
+                    "<img /> tags"
                 )
             ),
             'some html with alert("Hello") disallowed  tags',

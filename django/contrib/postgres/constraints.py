@@ -9,7 +9,10 @@ __all__ = ["ExclusionConstraint"]
 
 
 class ExclusionConstraint(BaseConstraint):
-    template = "CONSTRAINT %(name)s EXCLUDE USING %(index_type)s (%(expressions)s)%(include)s%(where)s%(deferrable)s"
+    template = (
+        "CONSTRAINT %(name)s EXCLUDE USING %(index_type)s "
+        "(%(expressions)s)%(include)s%(where)s%(deferrable)s"
+    )
 
     def __init__(
         self,

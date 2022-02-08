@@ -35,7 +35,10 @@ class RawQueryTests(TestCase):
             title="The awesome book",
             author=cls.a1,
             paperback=False,
-            opening_line="It was a bright cold day in April and the clocks were striking thirteen.",
+            opening_line=(
+                "It was a bright cold day in April and the clocks were striking "
+                "thirteen."
+            ),
         )
         cls.b2 = Book.objects.create(
             title="The horrible book",
@@ -193,7 +196,10 @@ class RawQueryTests(TestCase):
         Test of raw query's optional ability to translate unexpected result
         column names to specific model fields
         """
-        query = "SELECT first_name AS first, last_name AS last, dob, id FROM raw_query_author"
+        query = (
+            "SELECT first_name AS first, last_name AS last, dob, id "
+            "FROM raw_query_author"
+        )
         translations = {"first": "first_name", "last": "last_name"}
         authors = Author.objects.all()
         self.assertSuccessfulRawQuery(Author, query, authors, translations=translations)
@@ -358,7 +364,8 @@ class RawQueryTests(TestCase):
     def test_subquery_in_raw_sql(self):
         list(
             Book.objects.raw(
-                "SELECT id FROM (SELECT * FROM raw_query_book WHERE paperback IS NOT NULL) sq"
+                "SELECT id FROM "
+                "(SELECT * FROM raw_query_book WHERE paperback IS NOT NULL) sq"
             )
         )
 

@@ -540,11 +540,17 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
     def test_unsupported_lookup(self):
-        msg = "Unsupported lookup '0_bar' for ArrayField or join on the field not permitted."
+        msg = (
+            "Unsupported lookup '0_bar' for ArrayField or join on the field not "
+            "permitted."
+        )
         with self.assertRaisesMessage(FieldError, msg):
             list(NullableIntegerArrayModel.objects.filter(field__0_bar=[2]))
 
-        msg = "Unsupported lookup '0bar' for ArrayField or join on the field not permitted."
+        msg = (
+            "Unsupported lookup '0bar' for ArrayField or join on the field not "
+            "permitted."
+        )
         with self.assertRaisesMessage(FieldError, msg):
             list(NullableIntegerArrayModel.objects.filter(field__0bar=[2]))
 
@@ -881,7 +887,10 @@ class TestMigrations(TransactionTestCase):
 
 
 class TestSerialization(PostgreSQLSimpleTestCase):
-    test_data = '[{"fields": {"field": "[\\"1\\", \\"2\\", null]"}, "model": "postgres_tests.integerarraymodel", "pk": null}]'
+    test_data = (
+        '[{"fields": {"field": "[\\"1\\", \\"2\\", null]"}, '
+        '"model": "postgres_tests.integerarraymodel", "pk": null}]'
+    )
 
     def test_dumping(self):
         instance = IntegerArrayModel(field=[1, 2, None])
@@ -937,7 +946,8 @@ class TestValidation(PostgreSQLSimpleTestCase):
         exception = cm.exception.error_list[0]
         self.assertEqual(
             exception.message,
-            "Item 1 in the array did not validate: Ensure this value has at most 2 characters (it has 3).",
+            "Item 1 in the array did not validate: Ensure this value has at most 2 "
+            "characters (it has 3).",
         )
         self.assertEqual(exception.code, "item_invalid")
         self.assertEqual(
@@ -956,7 +966,8 @@ class TestValidation(PostgreSQLSimpleTestCase):
         exception = cm.exception.error_list[0]
         self.assertEqual(
             exception.message,
-            "Item 1 in the array did not validate: Ensure this value is greater than or equal to 1.",
+            "Item 1 in the array did not validate: Ensure this value is greater than "
+            "or equal to 1.",
         )
         self.assertEqual(exception.code, "item_invalid")
         self.assertEqual(
@@ -997,7 +1008,8 @@ class TestSimpleFormField(PostgreSQLSimpleTestCase):
         first_error = errors[0]
         self.assertEqual(
             first_error.message,
-            "Item 1 in the array did not validate: Ensure this value has at most 2 characters (it has 3).",
+            "Item 1 in the array did not validate: Ensure this value has at most 2 "
+            "characters (it has 3).",
         )
         self.assertEqual(first_error.code, "item_invalid")
         self.assertEqual(
@@ -1007,7 +1019,8 @@ class TestSimpleFormField(PostgreSQLSimpleTestCase):
         second_error = errors[1]
         self.assertEqual(
             second_error.message,
-            "Item 3 in the array did not validate: Ensure this value has at most 2 characters (it has 4).",
+            "Item 3 in the array did not validate: Ensure this value has at most 2 "
+            "characters (it has 4).",
         )
         self.assertEqual(second_error.code, "item_invalid")
         self.assertEqual(
@@ -1169,7 +1182,10 @@ class TestSplitFormField(PostgreSQLSimpleTestCase):
         )
 
     def test_invalid_integer(self):
-        msg = "Item 2 in the array did not validate: Ensure this value is less than or equal to 100."
+        msg = (
+            "Item 2 in the array did not validate: Ensure this value is less than or "
+            "equal to 100."
+        )
         with self.assertRaisesMessage(exceptions.ValidationError, msg):
             SplitArrayField(forms.IntegerField(max_value=100), size=2).clean([0, 101])
 
@@ -1200,8 +1216,10 @@ class TestSplitFormField(PostgreSQLSimpleTestCase):
         self.assertEqual(
             cm.exception.messages,
             [
-                "Item 1 in the array did not validate: Ensure this value has at most 2 characters (it has 3).",
-                "Item 3 in the array did not validate: Ensure this value has at most 2 characters (it has 4).",
+                "Item 1 in the array did not validate: Ensure this value has at most 2 "
+                "characters (it has 3).",
+                "Item 3 in the array did not validate: Ensure this value has at most 2 "
+                "characters (it has 4).",
             ],
         )
 

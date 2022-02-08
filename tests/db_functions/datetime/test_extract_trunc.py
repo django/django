@@ -247,7 +247,10 @@ class DateFunctionTests(TestCase):
         with self.assertRaisesMessage(ValueError, "lookup_name must be provided"):
             Extract("start_datetime")
 
-        msg = "Extract input expression must be DateField, DateTimeField, TimeField, or DurationField."
+        msg = (
+            "Extract input expression must be DateField, DateTimeField, TimeField, or "
+            "DurationField."
+        )
         with self.assertRaisesMessage(ValueError, msg):
             list(DTModel.objects.annotate(extracted=Extract("name", "hour")))
 

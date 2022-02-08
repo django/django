@@ -129,9 +129,9 @@ def non_sensitive_view(request):
     # so that the tests don't return false positives when the function's source
     # is displayed in the exception report.
     cooked_eggs = "".join(["s", "c", "r", "a", "m", "b", "l", "e", "d"])  # NOQA
-    sauce = "".join(
+    sauce = "".join(  # NOQA
         ["w", "o", "r", "c", "e", "s", "t", "e", "r", "s", "h", "i", "r", "e"]
-    )  # NOQA
+    )
     try:
         raise Exception
     except Exception:
@@ -147,9 +147,9 @@ def sensitive_view(request):
     # so that the tests don't return false positives when the function's source
     # is displayed in the exception report.
     cooked_eggs = "".join(["s", "c", "r", "a", "m", "b", "l", "e", "d"])  # NOQA
-    sauce = "".join(
+    sauce = "".join(  # NOQA
         ["w", "o", "r", "c", "e", "s", "t", "e", "r", "s", "h", "i", "r", "e"]
-    )  # NOQA
+    )
     try:
         raise Exception
     except Exception:
@@ -165,9 +165,9 @@ def paranoid_view(request):
     # so that the tests don't return false positives when the function's source
     # is displayed in the exception report.
     cooked_eggs = "".join(["s", "c", "r", "a", "m", "b", "l", "e", "d"])  # NOQA
-    sauce = "".join(
+    sauce = "".join(  # NOQA
         ["w", "o", "r", "c", "e", "s", "t", "e", "r", "s", "h", "i", "r", "e"]
-    )  # NOQA
+    )
     try:
         raise Exception
     except Exception:
@@ -239,9 +239,9 @@ def custom_exception_reporter_filter_view(request):
     # so that the tests don't return false positives when the function's source
     # is displayed in the exception report.
     cooked_eggs = "".join(["s", "c", "r", "a", "m", "b", "l", "e", "d"])  # NOQA
-    sauce = "".join(
+    sauce = "".join(  # NOQA
         ["w", "o", "r", "c", "e", "s", "t", "e", "r", "s", "h", "i", "r", "e"]
-    )  # NOQA
+    )
     request.exception_reporter_filter = UnsafeExceptionReporterFilter()
     try:
         raise Exception
@@ -279,9 +279,9 @@ class Klass:
         # so that the tests don't return false positives when the function's
         # source is displayed in the exception report.
         cooked_eggs = "".join(["s", "c", "r", "a", "m", "b", "l", "e", "d"])  # NOQA
-        sauce = "".join(
+        sauce = "".join(  # NOQA
             ["w", "o", "r", "c", "e", "s", "t", "e", "r", "s", "h", "i", "r", "e"]
-        )  # NOQA
+        )
         try:
             raise Exception
         except Exception:
@@ -298,9 +298,9 @@ def sensitive_method_view(request):
 @sensitive_post_parameters("bacon-key", "sausage-key")
 def multivalue_dict_key_error(request):
     cooked_eggs = "".join(["s", "c", "r", "a", "m", "b", "l", "e", "d"])  # NOQA
-    sauce = "".join(
+    sauce = "".join(  # NOQA
         ["w", "o", "r", "c", "e", "s", "t", "e", "r", "s", "h", "i", "r", "e"]
-    )  # NOQA
+    )
     try:
         request.POST["bar"]
     except Exception:

@@ -7,7 +7,10 @@ from django.db.models.constants import LOOKUP_SEP
 
 
 class Command(BaseCommand):
-    help = "Introspects the database tables in the given database and outputs a Django model module."
+    help = (
+        "Introspects the database tables in the given database and outputs a Django "
+        "model module."
+    )
     requires_system_checks = []
     stealth_options = ("table_name_filter",)
     db_module = "django.db"
@@ -22,7 +25,10 @@ class Command(BaseCommand):
         parser.add_argument(
             "--database",
             default=DEFAULT_DB_ALIAS,
-            help='Nominates a database to introspect. Defaults to using the "default" database.',
+            help=(
+                'Nominates a database to introspect. Defaults to using the "default" '
+                "database."
+            ),
         )
         parser.add_argument(
             "--include-partitions",
@@ -41,7 +47,8 @@ class Command(BaseCommand):
                 self.stdout.write(line)
         except NotImplementedError:
             raise CommandError(
-                "Database inspection isn't supported for the currently selected database backend."
+                "Database inspection isn't supported for the currently selected "
+                "database backend."
             )
 
     def handle_inspection(self, options):
@@ -57,12 +64,18 @@ class Command(BaseCommand):
             yield "# You'll have to do the following manually to clean this up:"
             yield "#   * Rearrange models' order"
             yield "#   * Make sure each model has one field with primary_key=True"
-            yield "#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior"
+            yield (
+                "#   * Make sure each ForeignKey and OneToOneField has `on_delete` set "
+                "to the desired behavior"
+            )
             yield (
                 "#   * Remove `managed = False` lines if you wish to allow "
                 "Django to create, modify, and delete the table"
             )
-            yield "# Feel free to rename the models, but don't rename db_table values or field names."
+            yield (
+                "# Feel free to rename the models, but don't rename db_table values or "
+                "field names."
+            )
             yield "from %s import models" % self.db_module
             known_models = []
             table_info = connection.introspection.get_table_list(cursor)

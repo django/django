@@ -97,7 +97,7 @@ CSRF_FAILURE_TEMPLATE = """
 {% endif %}
 </body>
 </html>
-"""
+"""  # NOQA
 CSRF_FAILURE_TEMPLATE_NAME = "403_csrf.html"
 
 

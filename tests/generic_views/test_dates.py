@@ -278,7 +278,8 @@ class YearArchiveViewTests(TestDataMixin, TestCase):
         self.assertTemplateUsed(res, "generic_views/book_archive_year.html")
 
     def test_year_view_custom_sort_order(self):
-        # Zebras comes after Dreaming by name, but before on '-pubdate' which is the default sorting
+        # Zebras comes after Dreaming by name, but before on '-pubdate' which
+        # is the default sorting.
         Book.objects.create(
             name="Zebras for Dummies", pages=600, pubdate=datetime.date(2006, 9, 1)
         )
@@ -797,12 +798,14 @@ class DayArchiveViewTests(TestDataMixin, TestCase):
         )
         res = self.client.get("/dates/booksignings/2008/apr/2/")
         self.assertEqual(res.status_code, 200)
-        # 2008-04-02T00:00:00+03:00 (beginning of day) > 2008-04-01T22:00:00+00:00 (book signing event date)
+        # 2008-04-02T00:00:00+03:00 (beginning of day) >
+        # 2008-04-01T22:00:00+00:00 (book signing event date).
         bs.event_date = datetime.datetime(2008, 4, 1, 22, 0, tzinfo=timezone.utc)
         bs.save()
         res = self.client.get("/dates/booksignings/2008/apr/2/")
         self.assertEqual(res.status_code, 200)
-        # 2008-04-03T00:00:00+03:00 (end of day) > 2008-04-02T22:00:00+00:00 (book signing event date)
+        # 2008-04-03T00:00:00+03:00 (end of day) > 2008-04-02T22:00:00+00:00
+        # (book signing event date).
         bs.event_date = datetime.datetime(2008, 4, 2, 22, 0, tzinfo=timezone.utc)
         bs.save()
         res = self.client.get("/dates/booksignings/2008/apr/2/")
@@ -898,12 +901,14 @@ class DateDetailViewTests(TestDataMixin, TestCase):
         )
         res = self.client.get("/dates/booksignings/2008/apr/2/%d/" % bs.pk)
         self.assertEqual(res.status_code, 200)
-        # 2008-04-02T00:00:00+03:00 (beginning of day) > 2008-04-01T22:00:00+00:00 (book signing event date)
+        # 2008-04-02T00:00:00+03:00 (beginning of day) >
+        # 2008-04-01T22:00:00+00:00 (book signing event date).
         bs.event_date = datetime.datetime(2008, 4, 1, 22, 0, tzinfo=timezone.utc)
         bs.save()
         res = self.client.get("/dates/booksignings/2008/apr/2/%d/" % bs.pk)
         self.assertEqual(res.status_code, 200)
-        # 2008-04-03T00:00:00+03:00 (end of day) > 2008-04-02T22:00:00+00:00 (book signing event date)
+        # 2008-04-03T00:00:00+03:00 (end of day) > 2008-04-02T22:00:00+00:00
+        # (book signing event date).
         bs.event_date = datetime.datetime(2008, 4, 2, 22, 0, tzinfo=timezone.utc)
         bs.save()
         res = self.client.get("/dates/booksignings/2008/apr/2/%d/" % bs.pk)

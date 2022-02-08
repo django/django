@@ -379,7 +379,8 @@ class UtilsTests(SimpleTestCase):
         )
         self.assertHTMLEqual(
             helpers.AdminField(form, "cb", is_first=False).label_tag(),
-            '<label for="id_cb" class="vCheckboxLabel required inline"><i>cb</i></label>',
+            '<label for="id_cb" class="vCheckboxLabel required inline">'
+            "<i>cb</i></label>",
         )
 
         # normal strings needs to be escaped

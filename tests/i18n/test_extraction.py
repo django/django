@@ -108,7 +108,8 @@ class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
         r"""
         self.assertLocationCommentPresent('django.po', 42, 'dirA', 'dirB', 'foo.py')
 
-        verifies that the django.po file has a gettext-style location comment of the form
+        verifies that the django.po file has a gettext-style location comment
+        of the form
 
         `#: dirA/dirB/foo.py:42`
 
@@ -128,14 +129,16 @@ class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
 
     def assertRecentlyModified(self, path):
         """
-        Assert that file was recently modified (modification time was less than 10 seconds ago).
+        Assert that file was recently modified (modification time was less than
+        10 seconds ago).
         """
         delta = time.time() - os.stat(path).st_mtime
         self.assertLess(delta, 10, "%s was recently modified" % path)
 
     def assertNotRecentlyModified(self, path):
         """
-        Assert that file was not recently modified (modification time was more than 10 seconds ago).
+        Assert that file was not recently modified (modification time was more
+        than 10 seconds ago).
         """
         delta = time.time() - os.stat(path).st_mtime
         self.assertGreater(delta, 10, "%s wasn't recently modified" % path)
@@ -443,7 +446,8 @@ class BasicExtractorTests(ExtractorTests):
         mocked_popen_wrapper.return_value = (
             "xgettext (GNU gettext-tools) 0.18.1\n"
             "Copyright (C) 1995-1998, 2000-2010 Free Software Foundation, Inc.\n"
-            "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n"
+            "License GPLv3+: GNU GPL version 3 or later "
+            "<http://gnu.org/licenses/gpl.html>\n"
             "This is free software: you are free to change and redistribute it.\n"
             "There is NO WARRANTY, to the extent permitted by law.\n"
             "Written by Ulrich Drepper.\n",
@@ -773,7 +777,10 @@ class LocationCommentsTests(ExtractorTests):
         CommandError is raised when using makemessages --add-location with
         gettext < 0.19.
         """
-        msg = "The --add-location option requires gettext 0.19 or later. You have 0.18.99."
+        msg = (
+            "The --add-location option requires gettext 0.19 or later. You have "
+            "0.18.99."
+        )
         with self.assertRaisesMessage(CommandError, msg):
             management.call_command(
                 "makemessages", locale=[LOCALE], verbosity=0, add_location="full"

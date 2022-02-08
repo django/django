@@ -54,7 +54,8 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         response = self.client.get(reverse("django-admindocs-views-index"))
         self.assertContains(
             response,
-            '<h3><a href="/admindocs/views/django.contrib.admindocs.views.BaseAdminDocsView/">/admindocs/</a></h3>',
+            '<h3><a href="/admindocs/views/django.contrib.admindocs.views.'
+            'BaseAdminDocsView/">/admindocs/</a></h3>',
             html=True,
         )
         self.assertContains(response, "Views by namespace test")
@@ -73,7 +74,9 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         response = self.client.get(reverse("django-admindocs-views-index"))
         self.assertContains(
             response,
-            '<h3><a href="/admindocs/views/django.contrib.admin.sites.AdminSite.index/">/admin/</a></h3>',
+            "<h3>"
+            '<a href="/admindocs/views/django.contrib.admin.sites.AdminSite.index/">'
+            "/admin/</a></h3>",
             html=True,
         )
 
@@ -118,7 +121,8 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         response = self.client.get(reverse("django-admindocs-models-index"))
         self.assertContains(
             response,
-            '<h2 id="app-auth">Authentication and Authorization (django.contrib.auth)</h2>',
+            '<h2 id="app-auth">Authentication and Authorization (django.contrib.auth)'
+            "</h2>",
             html=True,
         )
 
@@ -380,11 +384,15 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
 
     def test_model_docstring_renders_correctly(self):
         summary = (
-            '<h2 class="subhead"><p>Stores information about a person, related to <a class="reference external" '
-            'href="/admindocs/models/myapp.company/">myapp.Company</a>.</p></h2>'
+            '<h2 class="subhead"><p>Stores information about a person, related to '
+            '<a class="reference external" href="/admindocs/models/myapp.company/">'
+            "myapp.Company</a>.</p></h2>"
         )
         subheading = "<p><strong>Notes</strong></p>"
-        body = '<p>Use <tt class="docutils literal">save_changes()</tt> when saving this object.</p>'
+        body = (
+            '<p>Use <tt class="docutils literal">save_changes()</tt> when saving this '
+            "object.</p>"
+        )
         model_body = (
             '<dl class="docutils"><dt><tt class="'
             'docutils literal">company</tt></dt><dd>Field storing <a class="'

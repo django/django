@@ -55,7 +55,9 @@ class InvalidStringTests(SimpleTestCase):
 
     @setup(
         {
-            "invalidstr07": "{% load i18n %}{% blocktranslate %}{{ var }}{% endblocktranslate %}"
+            "invalidstr07": (
+                "{% load i18n %}{% blocktranslate %}{{ var }}{% endblocktranslate %}"
+            )
         }
     )
     def test_invalidstr07(self):

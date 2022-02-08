@@ -727,7 +727,8 @@ class ForcedTimeZoneDatabaseTests(TransactionTestCase):
             raise SkipTest("Database has feature(s) supports_timezones")
         if not connection.features.test_db_allows_multiple_connections:
             raise SkipTest(
-                "Database doesn't support feature(s): test_db_allows_multiple_connections"
+                "Database doesn't support feature(s): "
+                "test_db_allows_multiple_connections"
             )
 
         super().setUpClass()
@@ -979,7 +980,8 @@ class TemplateTests(SimpleTestCase):
         }
         templates = {
             "notag": Template(
-                "{% load tz %}{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:ICT }}"
+                "{% load tz %}"
+                "{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:ICT }}"
             ),
             "noarg": Template(
                 "{% load tz %}{% localtime %}{{ dt }}|{{ dt|localtime }}|"
@@ -1130,7 +1132,8 @@ class TemplateTests(SimpleTestCase):
         )
         self.assertEqual(
             tpl.render(ctx),
-            "2011-09-01T13:20:30+03:00|2011-09-01T17:20:30+07:00|2011-09-01T13:20:30+03:00",
+            "2011-09-01T13:20:30+03:00|2011-09-01T17:20:30+07:00|"
+            "2011-09-01T13:20:30+03:00",
         )
 
     def test_timezone_templatetag_with_iana(self):
@@ -1217,7 +1220,10 @@ class TemplateTests(SimpleTestCase):
         self.assertEqual(tpl.render(Context()), "Europe/Paris")
 
     def test_get_current_timezone_templatetag_invalid_argument(self):
-        msg = "'get_current_timezone' requires 'as variable' (got ['get_current_timezone'])"
+        msg = (
+            "'get_current_timezone' requires 'as variable' (got "
+            "['get_current_timezone'])"
+        )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             Template("{% load tz %}{% get_current_timezone %}").render()
 

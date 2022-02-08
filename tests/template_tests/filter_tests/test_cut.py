@@ -8,7 +8,9 @@ from ..utils import setup
 class CutTests(SimpleTestCase):
     @setup(
         {
-            "cut01": '{% autoescape off %}{{ a|cut:"x" }} {{ b|cut:"x" }}{% endautoescape %}'
+            "cut01": (
+                '{% autoescape off %}{{ a|cut:"x" }} {{ b|cut:"x" }}{% endautoescape %}'
+            )
         }
     )
     def test_cut01(self):
@@ -26,7 +28,9 @@ class CutTests(SimpleTestCase):
 
     @setup(
         {
-            "cut03": '{% autoescape off %}{{ a|cut:"&" }} {{ b|cut:"&" }}{% endautoescape %}'
+            "cut03": (
+                '{% autoescape off %}{{ a|cut:"&" }} {{ b|cut:"&" }}{% endautoescape %}'
+            )
         }
     )
     def test_cut03(self):
@@ -46,7 +50,9 @@ class CutTests(SimpleTestCase):
     # are auto-escaped.
     @setup(
         {
-            "cut05": '{% autoescape off %}{{ a|cut:";" }} {{ b|cut:";" }}{% endautoescape %}'
+            "cut05": (
+                '{% autoescape off %}{{ a|cut:";" }} {{ b|cut:";" }}{% endautoescape %}'
+            )
         }
     )
     def test_cut05(self):

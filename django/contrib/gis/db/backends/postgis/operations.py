@@ -56,7 +56,8 @@ class PostGISOperator(SpatialOperator):
         if lookup.band_lhs is not None and lhs_is_raster:
             if not self.func:
                 raise ValueError(
-                    "Band indices are not allowed for this operator, it works on bbox only."
+                    "Band indices are not allowed for this operator, it works on bbox "
+                    "only."
                 )
             template_params["lhs"] = "%s, %s" % (
                 template_params["lhs"],
@@ -66,7 +67,8 @@ class PostGISOperator(SpatialOperator):
         if lookup.band_rhs is not None and rhs_is_raster:
             if not self.func:
                 raise ValueError(
-                    "Band indices are not allowed for this operator, it works on bbox only."
+                    "Band indices are not allowed for this operator, it works on bbox "
+                    "only."
                 )
             template_params["rhs"] = "%s, %s" % (
                 template_params["rhs"],

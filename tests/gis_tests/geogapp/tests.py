@@ -39,7 +39,10 @@ class GeographyTest(TestCase):
             self.assertEqual(["Dallas", "Houston", "Oklahoma City"], cities)
 
     def test04_invalid_operators_functions(self):
-        "Ensuring exceptions are raised for operators & functions invalid on geography fields."
+        """
+        Exceptions are raised for operators & functions invalid on geography
+        fields.
+        """
         if not connection.ops.postgis:
             self.skipTest("This is a PostGIS-specific test.")
         # Only a subset of the geometry functions & operator are available

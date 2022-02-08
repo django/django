@@ -12,7 +12,8 @@ class Migration:
     and subclass it as a class called Migration. It will have one or more
     of the following attributes:
 
-     - operations: A list of Operation instances, probably from django.db.migrations.operations
+     - operations: A list of Operation instances, probably from
+       django.db.migrations.operations
      - dependencies: A list of tuples of (app_path, migration_name)
      - run_before: A list of tuples of (app_path, migration_name)
      - replaces: A list of migration_names
@@ -104,7 +105,8 @@ class Migration:
                 schema_editor.collected_sql.append("--")
                 if not operation.reduces_to_sql:
                     schema_editor.collected_sql.append(
-                        "-- MIGRATION NOW PERFORMS OPERATION THAT CANNOT BE WRITTEN AS SQL:"
+                        "-- MIGRATION NOW PERFORMS OPERATION THAT CANNOT BE WRITTEN AS "
+                        "SQL:"
                     )
                 schema_editor.collected_sql.append("-- %s" % operation.describe())
                 schema_editor.collected_sql.append("--")
@@ -167,7 +169,8 @@ class Migration:
                 schema_editor.collected_sql.append("--")
                 if not operation.reduces_to_sql:
                     schema_editor.collected_sql.append(
-                        "-- MIGRATION NOW PERFORMS OPERATION THAT CANNOT BE WRITTEN AS SQL:"
+                        "-- MIGRATION NOW PERFORMS OPERATION THAT CANNOT BE WRITTEN AS "
+                        "SQL:"
                     )
                 schema_editor.collected_sql.append("-- %s" % operation.describe())
                 schema_editor.collected_sql.append("--")

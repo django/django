@@ -13,7 +13,9 @@ class ForceEscapeTests(SimpleTestCase):
 
     @setup(
         {
-            "force-escape01": "{% autoescape off %}{{ a|force_escape }}{% endautoescape %}"
+            "force-escape01": (
+                "{% autoescape off %}{{ a|force_escape }}{% endautoescape %}"
+            )
         }
     )
     def test_force_escape01(self):
@@ -27,7 +29,10 @@ class ForceEscapeTests(SimpleTestCase):
 
     @setup(
         {
-            "force-escape03": "{% autoescape off %}{{ a|force_escape|force_escape }}{% endautoescape %}"
+            "force-escape03": (
+                "{% autoescape off %}{{ a|force_escape|force_escape }}"
+                "{% endautoescape %}"
+            )
         }
     )
     def test_force_escape03(self):
@@ -43,7 +48,9 @@ class ForceEscapeTests(SimpleTestCase):
     # escape filter has no effect.
     @setup(
         {
-            "force-escape05": "{% autoescape off %}{{ a|force_escape|escape }}{% endautoescape %}"
+            "force-escape05": (
+                "{% autoescape off %}{{ a|force_escape|escape }}{% endautoescape %}"
+            )
         }
     )
     def test_force_escape05(self):
@@ -57,7 +64,9 @@ class ForceEscapeTests(SimpleTestCase):
 
     @setup(
         {
-            "force-escape07": "{% autoescape off %}{{ a|escape|force_escape }}{% endautoescape %}"
+            "force-escape07": (
+                "{% autoescape off %}{{ a|escape|force_escape }}{% endautoescape %}"
+            )
         }
     )
     def test_force_escape07(self):

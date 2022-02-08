@@ -56,12 +56,14 @@ class ClearableFileInputTest(WidgetTest):
             StrangeFieldFile(),
             html=(
                 """
-            Currently: <a href="something?chapter=1&amp;sect=2&amp;copy=3&amp;lang=en">
-            something&lt;div onclick=&quot;alert(&#x27;oops&#x27;)&quot;&gt;.jpg</a>
-            <input type="checkbox" name="my&lt;div&gt;file-clear" id="my&lt;div&gt;file-clear_id">
-            <label for="my&lt;div&gt;file-clear_id">Clear</label><br>
-            Change: <input type="file" name="my&lt;div&gt;file">
-            """
+                Currently:
+                <a href="something?chapter=1&amp;sect=2&amp;copy=3&amp;lang=en">
+                something&lt;div onclick=&quot;alert(&#x27;oops&#x27;)&quot;&gt;.jpg</a>
+                <input type="checkbox" name="my&lt;div&gt;file-clear"
+                    id="my&lt;div&gt;file-clear_id">
+                <label for="my&lt;div&gt;file-clear_id">Clear</label><br>
+                Change: <input type="file" name="my&lt;div&gt;file">
+                """
             ),
         )
 

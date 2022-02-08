@@ -84,7 +84,10 @@ class ManyToOneTests(TestCase):
         new_article2 = Article(
             headline="Paul's story", pub_date=datetime.date(2006, 1, 17)
         )
-        msg = "<Article: Paul's story> instance isn't saved. Use bulk=False or save the object first."
+        msg = (
+            "<Article: Paul's story> instance isn't saved. Use bulk=False or save the "
+            "object first."
+        )
         with self.assertRaisesMessage(ValueError, msg):
             self.r.article_set.add(new_article2)
 
@@ -268,7 +271,8 @@ class ManyToOneTests(TestCase):
             ),
             [new_article1, self.a],
         )
-        # The underlying query only makes one join when a related table is referenced twice.
+        # The underlying query only makes one join when a related table is
+        # referenced twice.
         queryset = Article.objects.filter(
             reporter__first_name__exact="John", reporter__last_name__exact="Smith"
         )
@@ -284,7 +288,8 @@ class ManyToOneTests(TestCase):
             ),
             [new_article1, self.a],
         )
-        # ... and should work fine with the string that comes out of forms.Form.cleaned_data
+        # ... and should work fine with the string that comes out of
+        # forms.Form.cleaned_data.
         self.assertQuerysetEqual(
             (
                 Article.objects.filter(reporter__first_name__exact="John").extra(
@@ -632,11 +637,13 @@ class ManyToOneTests(TestCase):
 
         # Creation using keyword argument and unsaved related instance (#8070).
         p = Parent()
-        msg = "save() prohibited to prevent data loss due to unsaved related object 'parent'."
+        msg = (
+            "save() prohibited to prevent data loss due to unsaved related object "
+            "'parent'."
+        )
         with self.assertRaisesMessage(ValueError, msg):
             Child.objects.create(parent=p)
 
-        msg = "save() prohibited to prevent data loss due to unsaved related object 'parent'."
         with self.assertRaisesMessage(ValueError, msg):
             ToFieldChild.objects.create(parent=p)
 

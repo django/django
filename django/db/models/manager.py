@@ -95,7 +95,8 @@ class BaseManager:
             # Only copy missing methods.
             if hasattr(cls, name):
                 continue
-            # Only copy public methods or methods with the attribute `queryset_only=False`.
+            # Only copy public methods or methods with the attribute
+            # queryset_only=False.
             queryset_only = getattr(method, "queryset_only", None)
             if queryset_only or (queryset_only is None and name.startswith("_")):
                 continue

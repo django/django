@@ -19,8 +19,8 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
         return []
 
     def _check_relation(self, obj, parent_model):
-        # There's no FK, but we do need to confirm that the ct_field and ct_fk_field are valid,
-        # and that they are part of a GenericForeignKey.
+        # There's no FK, but we do need to confirm that the ct_field and
+        # ct_fk_field are valid, and that they are part of a GenericForeignKey.
 
         gfks = [
             f
@@ -75,7 +75,8 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
 
             return [
                 checks.Error(
-                    "'%s' has no GenericForeignKey using content type field '%s' and object ID field '%s'."
+                    "'%s' has no GenericForeignKey using content type field '%s' and "
+                    "object ID field '%s'."
                     % (
                         obj.model._meta.label,
                         obj.ct_field,

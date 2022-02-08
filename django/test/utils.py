@@ -199,7 +199,10 @@ def setup_databases(
                 with time_keeper.timed("  Creating '%s'" % alias):
                     # RemovedInDjango50Warning: when the deprecation ends,
                     # replace with:
-                    # serialize_alias = serialized_aliases is None or alias in serialized_aliases
+                    # serialize_alias = (
+                    #     serialized_aliases is None
+                    #     or alias in serialized_aliases
+                    # )
                     try:
                         serialize_alias = connection.settings_dict["TEST"]["SERIALIZE"]
                     except KeyError:

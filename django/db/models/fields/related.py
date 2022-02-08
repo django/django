@@ -141,7 +141,10 @@ class RelatedField(FieldCacheMixin, Field):
                         self.model._meta.object_name,
                         self.name,
                     ),
-                    hint="Related name must be a valid Python identifier or end with a '+'",
+                    hint=(
+                        "Related name must be a valid Python identifier or end with a "
+                        "'+'"
+                    ),
                     obj=self,
                     id="fields.E306",
                 )
@@ -227,8 +230,8 @@ class RelatedField(FieldCacheMixin, Field):
         errors = []
         opts = self.model._meta
 
-        # `f.remote_field.model` may be a string instead of a model. Skip if model name is
-        # not resolved.
+        # f.remote_field.model may be a string instead of a model. Skip if
+        # model name is not resolved.
         if not isinstance(self.remote_field.model, ModelBase):
             return []
 
@@ -304,8 +307,8 @@ class RelatedField(FieldCacheMixin, Field):
             if not rel_is_hidden and clash_field.get_accessor_name() == rel_name:
                 errors.append(
                     checks.Error(
-                        "Reverse accessor for '%s' clashes with reverse accessor for '%s'."
-                        % (field_name, clash_name),
+                        "Reverse accessor for '%s' clashes with reverse accessor for "
+                        "'%s'." % (field_name, clash_name),
                         hint=(
                             "Add or change a related_name argument "
                             "to the definition for '%s' or '%s'."
@@ -319,8 +322,8 @@ class RelatedField(FieldCacheMixin, Field):
             if clash_field.get_accessor_name() == rel_query_name:
                 errors.append(
                     checks.Error(
-                        "Reverse query name for '%s' clashes with reverse query name for '%s'."
-                        % (field_name, clash_name),
+                        "Reverse query name for '%s' clashes with reverse query name "
+                        "for '%s'." % (field_name, clash_name),
                         hint=(
                             "Add or change a related_name argument "
                             "to the definition for '%s' or '%s'."
@@ -496,7 +499,8 @@ class RelatedField(FieldCacheMixin, Field):
         target_fields = self.get_path_info()[-1].target_fields
         if len(target_fields) > 1:
             raise exceptions.FieldError(
-                "The relation has multiple target fields, but only single target field was asked for"
+                "The relation has multiple target fields, but only single target field "
+                "was asked for"
             )
         return target_fields[0]
 
@@ -970,7 +974,10 @@ class ForeignKey(ForeignObject):
             return [
                 checks.Error(
                     "Field specifies on_delete=SET_NULL, but cannot be null.",
-                    hint="Set null=True argument on the field, or change the on_delete rule.",
+                    hint=(
+                        "Set null=True argument on the field, or change the on_delete "
+                        "rule."
+                    ),
                     obj=self,
                     id="fields.E320",
                 )
@@ -991,8 +998,12 @@ class ForeignKey(ForeignObject):
         return (
             [
                 checks.Warning(
-                    "Setting unique=True on a ForeignKey has the same effect as using a OneToOneField.",
-                    hint="ForeignKey(unique=True) is usually better served by a OneToOneField.",
+                    "Setting unique=True on a ForeignKey has the same effect as using "
+                    "a OneToOneField.",
+                    hint=(
+                        "ForeignKey(unique=True) is usually better served by a "
+                        "OneToOneField."
+                    ),
                     obj=self,
                     id="fields.W342",
                 )
@@ -1465,7 +1476,10 @@ class ManyToManyField(RelatedField):
                             "which two foreign keys Django should use via the "
                             "through_fields keyword argument."
                             % (self, from_model_name),
-                            hint="Use through_fields to specify which two foreign keys Django should use.",
+                            hint=(
+                                "Use through_fields to specify which two foreign keys "
+                                "Django should use."
+                            ),
                             obj=self.remote_field.through,
                             id="fields.E333",
                         )
@@ -1552,7 +1566,10 @@ class ManyToManyField(RelatedField):
                         "Field specifies 'through_fields' but does not provide "
                         "the names of the two link fields that should be used "
                         "for the relation through model '%s'." % qualified_model_name,
-                        hint="Make sure you specify 'through_fields' as through_fields=('field1', 'field2')",
+                        hint=(
+                            "Make sure you specify 'through_fields' as "
+                            "through_fields=('field1', 'field2')"
+                        ),
                         obj=self,
                         id="fields.E337",
                     )
@@ -1591,7 +1608,8 @@ class ManyToManyField(RelatedField):
                             possible_field_names.append(f.name)
                     if possible_field_names:
                         hint = (
-                            "Did you mean one of the following foreign keys to '%s': %s?"
+                            "Did you mean one of the following foreign keys to '%s': "
+                            "%s?"
                             % (
                                 related_model._meta.object_name,
                                 ", ".join(possible_field_names),

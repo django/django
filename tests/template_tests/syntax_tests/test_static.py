@@ -44,7 +44,10 @@ class StaticTagTests(SimpleTestCase):
 
     @setup(
         {
-            "t": "{% load static %}{% get_media_prefix ad media_prefix %}{{ media_prefix }}"
+            "t": (
+                "{% load static %}{% get_media_prefix ad media_prefix %}"
+                "{{ media_prefix }}"
+            )
         }
     )
     def test_static_prefixtag_without_as(self):
@@ -66,7 +69,9 @@ class StaticTagTests(SimpleTestCase):
 
     @setup(
         {
-            "static-statictag03": '{% load static %}{% static "admin/base.css" as foo %}{{ foo }}'
+            "static-statictag03": (
+                '{% load static %}{% static "admin/base.css" as foo %}{{ foo }}'
+            )
         }
     )
     def test_static_statictag03(self):
@@ -84,7 +89,9 @@ class StaticTagTests(SimpleTestCase):
 
     @setup(
         {
-            "static-statictag05": '{% load static %}{% static "special?chars&quoted.html" %}'
+            "static-statictag05": (
+                '{% load static %}{% static "special?chars&quoted.html" %}'
+            )
         }
     )
     def test_static_quotes_urls(self):

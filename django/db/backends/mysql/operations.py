@@ -67,7 +67,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "CAST(DATE_FORMAT(%s, '%s') AS DATE)" % (field_name, format_str)
         elif lookup_type == "quarter":
             return (
-                "MAKEDATE(YEAR(%s), 1) + INTERVAL QUARTER(%s) QUARTER - INTERVAL 1 QUARTER"
+                "MAKEDATE(YEAR(%s), 1) + "
+                "INTERVAL QUARTER(%s) QUARTER - INTERVAL 1 QUARTER"
                 % (field_name, field_name)
             )
         elif lookup_type == "week":
@@ -264,7 +265,8 @@ class DatabaseOperations(BaseDatabaseOperations):
                 value = timezone.make_naive(value, self.connection.timezone)
             else:
                 raise ValueError(
-                    "MySQL backend does not support timezone-aware datetimes when USE_TZ is False."
+                    "MySQL backend does not support timezone-aware datetimes when "
+                    "USE_TZ is False."
                 )
         return str(value)
 
@@ -345,7 +347,10 @@ class DatabaseOperations(BaseDatabaseOperations):
             if self.connection.mysql_is_mariadb:
                 # MariaDB includes the microsecond component in TIME_TO_SEC as
                 # a decimal. MySQL returns an integer without microseconds.
-                return "CAST((TIME_TO_SEC(%(lhs)s) - TIME_TO_SEC(%(rhs)s)) * 1000000 AS SIGNED)" % {
+                return (
+                    "CAST((TIME_TO_SEC(%(lhs)s) - TIME_TO_SEC(%(rhs)s)) "
+                    "* 1000000 AS SIGNED)"
+                ) % {
                     "lhs": lhs_sql,
                     "rhs": rhs_sql,
                 }, (

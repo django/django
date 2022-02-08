@@ -22,7 +22,10 @@ class Command(BaseCommand):
             "args",
             metavar="table_name",
             nargs="*",
-            help="Optional table names. Otherwise, settings.CACHES is used to find cache tables.",
+            help=(
+                "Optional table names. Otherwise, settings.CACHES is used to find "
+                "cache tables."
+            ),
         )
         parser.add_argument(
             "--database",

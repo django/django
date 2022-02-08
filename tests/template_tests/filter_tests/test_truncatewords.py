@@ -8,7 +8,10 @@ from ..utils import setup
 class TruncatewordsTests(SimpleTestCase):
     @setup(
         {
-            "truncatewords01": '{% autoescape off %}{{ a|truncatewords:"2" }} {{ b|truncatewords:"2"}}{% endautoescape %}'
+            "truncatewords01": (
+                '{% autoescape off %}{{ a|truncatewords:"2" }} {{ b|truncatewords:"2"}}'
+                "{% endautoescape %}"
+            )
         }
     )
     def test_truncatewords01(self):

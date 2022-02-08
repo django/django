@@ -61,7 +61,8 @@ class DatabaseCreation(BaseDatabaseCreation):
                                     cursor, parameters, verbosity, autoclobber
                                 )
                             else:
-                                # Ran into a database error that isn't about leftover objects in the tablespace
+                                # Ran into a database error that isn't about
+                                # leftover objects in the tablespace.
                                 self.log(
                                     "Got an error destroying the old test database: %s"
                                     % e
@@ -117,7 +118,8 @@ class DatabaseCreation(BaseDatabaseCreation):
                     else:
                         self.log("Tests cancelled.")
                         sys.exit(1)
-        self._maindb_connection.close()  # done with main user -- test user and tablespaces created
+        # Done with main user -- test user and tablespaces created.
+        self._maindb_connection.close()
         self._switch_to_test_user(parameters)
         return self.connection.settings_dict["NAME"]
 
@@ -160,8 +162,8 @@ class DatabaseCreation(BaseDatabaseCreation):
         # There are objects in the test tablespace which prevent dropping it
         # The easy fix is to drop the test user -- but are we allowed to do so?
         self.log(
-            "There are objects in the old test database which prevent its destruction.\n"
-            "If they belong to the test user, deleting the user will allow the test "
+            "There are objects in the old test database which prevent its destruction."
+            "\nIf they belong to the test user, deleting the user will allow the test "
             "database to be recreated.\n"
             "Otherwise, you will need to find and remove each of these objects, "
             "or use a different tablespace.\n"
@@ -301,8 +303,10 @@ class DatabaseCreation(BaseDatabaseCreation):
         if verbosity >= 2:
             self.log("_execute_test_db_destruction(): dbname=%s" % parameters["user"])
         statements = [
-            "DROP TABLESPACE %(tblspace)s INCLUDING CONTENTS AND DATAFILES CASCADE CONSTRAINTS",
-            "DROP TABLESPACE %(tblspace_temp)s INCLUDING CONTENTS AND DATAFILES CASCADE CONSTRAINTS",
+            "DROP TABLESPACE %(tblspace)s "
+            "INCLUDING CONTENTS AND DATAFILES CASCADE CONSTRAINTS",
+            "DROP TABLESPACE %(tblspace_temp)s "
+            "INCLUDING CONTENTS AND DATAFILES CASCADE CONSTRAINTS",
         ]
         self._execute_statements(cursor, statements, parameters, verbosity)
 

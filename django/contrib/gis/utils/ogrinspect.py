@@ -209,7 +209,9 @@ def _ogrinspect(
             # may also be mapped to `DecimalField` if specified in the
             # `decimal` keyword.
             if field_name.lower() in decimal_fields:
-                yield "    %s = models.DecimalField(max_digits=%d, decimal_places=%d%s)" % (
+                yield (
+                    "    %s = models.DecimalField(max_digits=%d, decimal_places=%d%s)"
+                ) % (
                     mfield,
                     width,
                     precision,

@@ -99,7 +99,8 @@ class BaseDatabaseOperations:
         extracts a value from the given date field field_name.
         """
         raise NotImplementedError(
-            "subclasses of BaseDatabaseOperations may require a date_extract_sql() method"
+            "subclasses of BaseDatabaseOperations may require a date_extract_sql() "
+            "method"
         )
 
     def date_trunc_sql(self, lookup_type, field_name, tzname=None):
@@ -112,7 +113,8 @@ class BaseDatabaseOperations:
         timezone.
         """
         raise NotImplementedError(
-            "subclasses of BaseDatabaseOperations may require a date_trunc_sql() method."
+            "subclasses of BaseDatabaseOperations may require a date_trunc_sql() "
+            "method."
         )
 
     def datetime_cast_date_sql(self, field_name, tzname):
@@ -129,7 +131,8 @@ class BaseDatabaseOperations:
         Return the SQL to cast a datetime value to time value.
         """
         raise NotImplementedError(
-            "subclasses of BaseDatabaseOperations may require a datetime_cast_time_sql() method"
+            "subclasses of BaseDatabaseOperations may require a "
+            "datetime_cast_time_sql() method"
         )
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
@@ -139,7 +142,8 @@ class BaseDatabaseOperations:
         datetime field field_name.
         """
         raise NotImplementedError(
-            "subclasses of BaseDatabaseOperations may require a datetime_extract_sql() method"
+            "subclasses of BaseDatabaseOperations may require a datetime_extract_sql() "
+            "method"
         )
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
@@ -149,7 +153,8 @@ class BaseDatabaseOperations:
         field_name to a datetime object with only the given specificity.
         """
         raise NotImplementedError(
-            "subclasses of BaseDatabaseOperations may require a datetime_trunc_sql() method"
+            "subclasses of BaseDatabaseOperations may require a datetime_trunc_sql() "
+            "method"
         )
 
     def time_trunc_sql(self, lookup_type, field_name, tzname=None):
@@ -712,9 +717,9 @@ class BaseDatabaseOperations:
 
     def window_frame_range_start_end(self, start=None, end=None):
         start_, end_ = self.window_frame_rows_start_end(start, end)
-        if (
-            self.connection.features.only_supports_unbounded_with_preceding_and_following
-            and ((start and start < 0) or (end and end > 0))
+        features = self.connection.features
+        if features.only_supports_unbounded_with_preceding_and_following and (
+            (start and start < 0) or (end and end > 0)
         ):
             raise NotSupportedError(
                 "%s only supports UNBOUNDED together with PRECEDING and "

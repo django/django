@@ -44,11 +44,14 @@ class HandlerTests(SimpleTestCase):
             b"want=caf%C3%A9",  # This is the proper way to encode 'café'
             b"want=caf\xc3\xa9",  # UA forgot to quote bytes
             b"want=caf%E9",  # UA quoted, but not in UTF-8
-            b"want=caf\xe9",  # UA forgot to convert Latin-1 to UTF-8 and to quote (typical of MSIE)
+            # UA forgot to convert Latin-1 to UTF-8 and to quote (typical of
+            # MSIE).
+            b"want=caf\xe9",
         ]
         got = []
         for raw_query_string in raw_query_strings:
-            # Simulate http.server.BaseHTTPRequestHandler.parse_request handling of raw request
+            # Simulate http.server.BaseHTTPRequestHandler.parse_request
+            # handling of raw request.
             environ["QUERY_STRING"] = str(raw_query_string, "iso-8859-1")
             request = WSGIRequest(environ)
             got.append(request.GET["want"])
@@ -219,7 +222,10 @@ class HandlerRequestTests(SimpleTestCase):
             self.client.get("/")
 
     def test_no_response(self):
-        msg = "The view %s didn't return an HttpResponse object. It returned None instead."
+        msg = (
+            "The view %s didn't return an HttpResponse object. It returned None "
+            "instead."
+        )
         tests = (
             ("/no_response_fbv/", "handlers.views.no_response"),
             ("/no_response_cbv/", "handlers.views.NoResponse.__call__"),

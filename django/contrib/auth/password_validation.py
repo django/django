@@ -28,7 +28,10 @@ def get_password_validators(validator_config):
         try:
             klass = import_string(validator["NAME"])
         except ImportError:
-            msg = "The module in NAME could not be imported: %s. Check your AUTH_PASSWORD_VALIDATORS setting."
+            msg = (
+                "The module in NAME could not be imported: %s. Check your "
+                "AUTH_PASSWORD_VALIDATORS setting."
+            )
             raise ImproperlyConfigured(msg % validator["NAME"])
         validators.append(klass(**validator.get("OPTIONS", {})))
 
@@ -105,8 +108,10 @@ class MinimumLengthValidator:
         if len(password) < self.min_length:
             raise ValidationError(
                 ngettext(
-                    "This password is too short. It must contain at least %(min_length)d character.",
-                    "This password is too short. It must contain at least %(min_length)d characters.",
+                    "This password is too short. It must contain at least "
+                    "%(min_length)d character.",
+                    "This password is too short. It must contain at least "
+                    "%(min_length)d characters.",
                     self.min_length,
                 ),
                 code="password_too_short",

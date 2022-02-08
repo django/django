@@ -285,7 +285,10 @@ class GenericRelationsTests(TestCase):
 
     def test_add_rejects_unsaved_objects(self):
         t1 = TaggedItem(content_object=self.quartz, tag="shiny")
-        msg = "<TaggedItem: shiny> instance isn't saved. Use bulk=False or save the object first."
+        msg = (
+            "<TaggedItem: shiny> instance isn't saved. Use bulk=False or save the "
+            "object first."
+        )
         with self.assertRaisesMessage(ValueError, msg):
             self.bacon.tags.add(t1)
 
@@ -443,7 +446,8 @@ class GenericRelationsTests(TestCase):
         self.assertEqual(ValuableTaggedItem.objects.count(), 0)
 
     def test_gfk_manager(self):
-        # GenericForeignKey should not use the default manager (which may filter objects) #16048
+        # GenericForeignKey should not use the default manager (which may
+        # filter objects).
         tailless = Gecko.objects.create(has_tail=False)
         tag = TaggedItem.objects.create(content_object=tailless, tag="lizard")
         self.assertEqual(tag.content_object, tailless)

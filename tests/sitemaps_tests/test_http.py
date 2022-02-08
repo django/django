@@ -82,11 +82,14 @@ class HTTPSitemapTests(SitemapTestsBase):
     def test_simple_sitemap_section(self):
         "A simple sitemap section can be rendered"
         response = self.client.get("/simple/sitemap-simple.xml")
-        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-<url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
-</urlset>
-""" % (
+        expected_content = (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+            'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+            "<url><loc>%s/location/</loc><lastmod>%s</lastmod>"
+            "<changefreq>never</changefreq><priority>0.5</priority></url>\n"
+            "</urlset>"
+        ) % (
             self.base_url,
             date.today(),
         )
@@ -113,11 +116,14 @@ class HTTPSitemapTests(SitemapTestsBase):
     def test_simple_sitemap(self):
         "A simple sitemap can be rendered"
         response = self.client.get("/simple/sitemap.xml")
-        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-<url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
-</urlset>
-""" % (
+        expected_content = (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+            'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+            "<url><loc>%s/location/</loc><lastmod>%s</lastmod>"
+            "<changefreq>never</changefreq><priority>0.5</priority></url>\n"
+            "</urlset>"
+        ) % (
             self.base_url,
             date.today(),
         )
@@ -233,13 +239,13 @@ class HTTPSitemapTests(SitemapTestsBase):
         # doesn't raise an exception.
         response = self.client.get("/simple/sitemap.xml")
         expected_content = (
-            """<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-<url><loc>http://testserver/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
-</urlset>
-"""
-            % date.today()
-        )
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+            'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+            "<url><loc>http://testserver/location/</loc><lastmod>%s</lastmod>"
+            "<changefreq>never</changefreq><priority>0.5</priority></url>\n"
+            "</urlset>"
+        ) % date.today()
         self.assertXMLEqual(response.content.decode(), expected_content)
 
     @ignore_warnings(category=RemovedInDjango50Warning)
@@ -312,13 +318,15 @@ class HTTPSitemapTests(SitemapTestsBase):
         """
         with self.assertNoLogs("django.template", "DEBUG"):
             response = self.client.get("/simple/i18n.xml")
-        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-<url><loc>{0}/en/i18n/testmodel/{1}/</loc><changefreq>never</changefreq><priority>0.5</priority></url><url><loc>{0}/pt/i18n/testmodel/{1}/</loc><changefreq>never</changefreq><priority>0.5</priority></url>
-</urlset>
-""".format(
-            self.base_url, self.i18n_model.pk
-        )
+        expected_content = (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+            'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+            "<url><loc>{0}/en/i18n/testmodel/{1}/</loc><changefreq>never</changefreq>"
+            "<priority>0.5</priority></url><url><loc>{0}/pt/i18n/testmodel/{1}/</loc>"
+            "<changefreq>never</changefreq><priority>0.5</priority></url>\n"
+            "</urlset>"
+        ).format(self.base_url, self.i18n_model.pk)
         self.assertXMLEqual(response.content.decode(), expected_content)
 
     @override_settings(LANGUAGES=(("en", "English"), ("pt", "Portuguese")))
@@ -340,11 +348,13 @@ class HTTPSitemapTests(SitemapTestsBase):
 """.replace(
             "\n", ""
         )
-        expected_content = f"""<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-{expected_urls}
-</urlset>
-"""
+        expected_content = (
+            f'<?xml version="1.0" encoding="UTF-8"?>\n'
+            f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+            f'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+            f"{expected_urls}\n"
+            f"</urlset>"
+        )
         self.assertXMLEqual(response.content.decode(), expected_content)
 
     @override_settings(
@@ -368,11 +378,13 @@ class HTTPSitemapTests(SitemapTestsBase):
 """.replace(
             "\n", ""
         )
-        expected_content = f"""<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-{expected_urls}
-</urlset>
-"""
+        expected_content = (
+            f'<?xml version="1.0" encoding="UTF-8"?>\n'
+            f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+            f'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+            f"{expected_urls}\n"
+            f"</urlset>"
+        )
         self.assertXMLEqual(response.content.decode(), expected_content)
 
     @override_settings(LANGUAGES=(("en", "English"), ("pt", "Portuguese")))
@@ -396,17 +408,21 @@ class HTTPSitemapTests(SitemapTestsBase):
 """.replace(
             "\n", ""
         )
-        expected_content = f"""<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-{expected_urls}
-</urlset>
-"""
+        expected_content = (
+            f'<?xml version="1.0" encoding="UTF-8"?>\n'
+            f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+            f'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+            f"{expected_urls}\n"
+            f"</urlset>"
+        )
         self.assertXMLEqual(response.content.decode(), expected_content)
 
     def test_sitemap_without_entries(self):
         response = self.client.get("/sitemap-without-entries/sitemap.xml")
-        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-
-</urlset>"""
+        expected_content = (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+            'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n\n'
+            "</urlset>"
+        )
         self.assertXMLEqual(response.content.decode(), expected_content)

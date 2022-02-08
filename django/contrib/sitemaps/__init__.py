@@ -48,7 +48,8 @@ def _get_sitemap_full_url(sitemap_url, sitemap_uses_https=True):
 
     if sitemap_url is None:
         raise SitemapNotFound(
-            "You didn't provide a sitemap_url, and the sitemap URL couldn't be auto-detected."
+            "You didn't provide a sitemap_url, and the sitemap URL couldn't be "
+            "auto-detected."
         )
 
     Site = django_apps.get_model("sites.Site")

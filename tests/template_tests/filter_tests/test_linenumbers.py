@@ -23,7 +23,10 @@ class LinenumbersTests(SimpleTestCase):
 
     @setup(
         {
-            "linenumbers02": "{% autoescape off %}{{ a|linenumbers }} {{ b|linenumbers }}{% endautoescape %}"
+            "linenumbers02": (
+                "{% autoescape off %}{{ a|linenumbers }} {{ b|linenumbers }}"
+                "{% endautoescape %}"
+            )
         }
     )
     def test_linenumbers02(self):

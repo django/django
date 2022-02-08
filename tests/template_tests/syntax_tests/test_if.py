@@ -53,7 +53,10 @@ class IfTagTests(SimpleTestCase):
 
     @setup(
         {
-            "if-tag10": "{% if foo %}foo{% elif bar %}bar{% elif baz %}baz{% else %}nothing{% endif %}"
+            "if-tag10": (
+                "{% if foo %}foo{% elif bar %}bar{% elif baz %}baz{% else %}nothing"
+                "{% endif %}"
+            )
         }
     )
     def test_if_tag10(self):
@@ -62,7 +65,10 @@ class IfTagTests(SimpleTestCase):
 
     @setup(
         {
-            "if-tag11": "{% if foo %}foo{% elif bar %}bar{% elif baz %}baz{% else %}nothing{% endif %}"
+            "if-tag11": (
+                "{% if foo %}foo{% elif bar %}bar{% elif baz %}baz{% else %}nothing"
+                "{% endif %}"
+            )
         }
     )
     def test_if_tag11(self):
@@ -71,7 +77,10 @@ class IfTagTests(SimpleTestCase):
 
     @setup(
         {
-            "if-tag12": "{% if foo %}foo{% elif bar %}bar{% elif baz %}baz{% else %}nothing{% endif %}"
+            "if-tag12": (
+                "{% if foo %}foo{% elif bar %}bar{% elif baz %}baz{% else %}nothing"
+                "{% endif %}"
+            )
         }
     )
     def test_if_tag12(self):
@@ -80,7 +89,10 @@ class IfTagTests(SimpleTestCase):
 
     @setup(
         {
-            "if-tag13": "{% if foo %}foo{% elif bar %}bar{% elif baz %}baz{% else %}nothing{% endif %}"
+            "if-tag13": (
+                "{% if foo %}foo{% elif bar %}bar{% elif baz %}baz{% else %}nothing"
+                "{% endif %}"
+            )
         }
     )
     def test_if_tag13(self):
@@ -588,7 +600,9 @@ class IfTagTests(SimpleTestCase):
 
     @setup(
         {
-            "else-if-tag-error01": "{% if foo is bar %} yes {% else if foo is not bar %} no {% endif %}"
+            "else-if-tag-error01": (
+                "{% if foo is bar %} yes {% else if foo is not bar %} no {% endif %}"
+            )
         }
     )
     def test_else_if_tag_error01(self):
@@ -598,7 +612,9 @@ class IfTagTests(SimpleTestCase):
 
     @setup(
         {
-            "if-tag-shortcircuit01": "{% if x.is_true or x.is_bad %}yes{% else %}no{% endif %}"
+            "if-tag-shortcircuit01": (
+                "{% if x.is_true or x.is_bad %}yes{% else %}no{% endif %}"
+            )
         }
     )
     def test_if_tag_shortcircuit01(self):
@@ -610,7 +626,9 @@ class IfTagTests(SimpleTestCase):
 
     @setup(
         {
-            "if-tag-shortcircuit02": "{% if x.is_false and x.is_bad %}yes{% else %}no{% endif %}"
+            "if-tag-shortcircuit02": (
+                "{% if x.is_false and x.is_bad %}yes{% else %}no{% endif %}"
+            )
         }
     )
     def test_if_tag_shortcircuit02(self):

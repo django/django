@@ -158,12 +158,14 @@ class BaseSpatialOperations:
     # Routines for getting the OGC-compliant models.
     def geometry_columns(self):
         raise NotImplementedError(
-            "Subclasses of BaseSpatialOperations must provide a geometry_columns() method."
+            "Subclasses of BaseSpatialOperations must provide a geometry_columns() "
+            "method."
         )
 
     def spatial_ref_sys(self):
         raise NotImplementedError(
-            "subclasses of BaseSpatialOperations must a provide spatial_ref_sys() method"
+            "subclasses of BaseSpatialOperations must a provide spatial_ref_sys() "
+            "method"
         )
 
     distance_expr_for_lookup = staticmethod(Distance)

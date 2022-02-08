@@ -151,7 +151,10 @@ class LayerMapTest(TestCase):
                 self.assertEqual(n, qs.count())
 
     def test_layermap_unique_multigeometry_fk(self):
-        "Testing the `unique`, and `transform`, geometry collection conversion, and ForeignKey mappings."
+        """
+        The `unique`, and `transform`, geometry collection conversion, and
+        ForeignKey mappings.
+        """
         # All the following should work.
 
         # Telling LayerMapping that we want no transformations performed on the data.

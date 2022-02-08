@@ -34,8 +34,8 @@ class Migration(migrations.Migration):
                     "template_name",
                     models.CharField(
                         help_text=(
-                            "Example: “flatpages/contact_page.html”. If this isn’t provided, the system will use "
-                            "“flatpages/default.html”."
+                            "Example: “flatpages/contact_page.html”. If this isn’t "
+                            "provided, the system will use “flatpages/default.html”."
                         ),
                         max_length=70,
                         verbose_name="template name",
@@ -46,7 +46,10 @@ class Migration(migrations.Migration):
                     "registration_required",
                     models.BooleanField(
                         default=False,
-                        help_text="If this is checked, only logged-in users will be able to view the page.",
+                        help_text=(
+                            "If this is checked, only logged-in users will be able to "
+                            "view the page."
+                        ),
                         verbose_name="registration required",
                     ),
                 ),

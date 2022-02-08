@@ -50,7 +50,8 @@ class RangeField(models.Field):
     empty_strings_allowed = False
 
     def __init__(self, *args, **kwargs):
-        # Initializing base_field here ensures that its model matches the model for self.
+        # Initializing base_field here ensures that its model matches the model
+        # for self.
         if hasattr(self, "base_field"):
             self.base_field = self.base_field()
         super().__init__(*args, **kwargs)

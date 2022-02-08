@@ -25,8 +25,8 @@ class Command(BaseCommand):
             "--default",
             metavar="MODULE",
             help=(
-                "The settings module to compare the current settings against. Leave empty to "
-                "compare against Django's default settings."
+                "The settings module to compare the current settings against. Leave "
+                "empty to compare against Django's default settings."
             ),
         )
         parser.add_argument(

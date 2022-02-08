@@ -83,7 +83,10 @@ class Command(BaseCommand):
             "--no-default-ignore",
             action="store_false",
             dest="use_default_ignore_patterns",
-            help="Don't ignore the common private glob-style patterns (defaults to 'CVS', '.*' and '*~').",
+            help=(
+                "Don't ignore the common private glob-style patterns (defaults to "
+                "'CVS', '.*' and '*~')."
+            ),
         )
 
     def set_options(self, **options):
@@ -169,7 +172,8 @@ class Command(BaseCommand):
         message = ["\n"]
         if self.dry_run:
             message.append(
-                "You have activated the --dry-run option so no files will be modified.\n\n"
+                "You have activated the --dry-run option so no files will be "
+                "modified.\n\n"
             )
 
         message.append(

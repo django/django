@@ -11,7 +11,10 @@ from ..utils import setup
 class FloatformatTests(SimpleTestCase):
     @setup(
         {
-            "floatformat01": "{% autoescape off %}{{ a|floatformat }} {{ b|floatformat }}{% endautoescape %}"
+            "floatformat01": (
+                "{% autoescape off %}{{ a|floatformat }} {{ b|floatformat }}"
+                "{% endautoescape %}"
+            )
         }
     )
     def test_floatformat01(self):

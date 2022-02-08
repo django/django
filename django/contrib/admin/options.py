@@ -1274,7 +1274,9 @@ class ModelAdmin(BaseModelAdmin):
                 "has_add_permission": self.has_add_permission(request),
                 "has_change_permission": self.has_change_permission(request, obj),
                 "has_delete_permission": self.has_delete_permission(request, obj),
-                "has_editable_inline_admin_formsets": has_editable_inline_admin_formsets,
+                "has_editable_inline_admin_formsets": (
+                    has_editable_inline_admin_formsets
+                ),
                 "has_file_field": context["adminform"].form.is_multipart()
                 or any(
                     admin_formset.formset.is_multipart()
@@ -1381,7 +1383,8 @@ class ModelAdmin(BaseModelAdmin):
         elif "_addanother" in request.POST:
             msg = format_html(
                 _(
-                    "The {name} “{obj}” was added successfully. You may add another {name} below."
+                    "The {name} “{obj}” was added successfully. You may add another "
+                    "{name} below."
                 ),
                 **msg_dict,
             )
@@ -1442,7 +1445,8 @@ class ModelAdmin(BaseModelAdmin):
         if "_continue" in request.POST:
             msg = format_html(
                 _(
-                    "The {name} “{obj}” was changed successfully. You may edit it again below."
+                    "The {name} “{obj}” was changed successfully. You may edit it "
+                    "again below."
                 ),
                 **msg_dict,
             )
@@ -1456,7 +1460,8 @@ class ModelAdmin(BaseModelAdmin):
         elif "_saveasnew" in request.POST:
             msg = format_html(
                 _(
-                    "The {name} “{obj}” was added successfully. You may edit it again below."
+                    "The {name} “{obj}” was added successfully. You may edit it again "
+                    "below."
                 ),
                 **msg_dict,
             )
@@ -1474,7 +1479,8 @@ class ModelAdmin(BaseModelAdmin):
         elif "_addanother" in request.POST:
             msg = format_html(
                 _(
-                    "The {name} “{obj}” was changed successfully. You may add another {name} below."
+                    "The {name} “{obj}” was changed successfully. You may add another "
+                    "{name} below."
                 ),
                 **msg_dict,
             )
@@ -2378,8 +2384,9 @@ class InlineModelAdmin(BaseModelAdmin):
                         objs = []
                         for p in collector.protected:
                             objs.append(
-                                # Translators: Model verbose name and instance representation,
-                                # suitable to be an item in a list.
+                                # Translators: Model verbose name and instance
+                                # representation, suitable to be an item in a
+                                # list.
                                 _("%(class_name)s %(instance)s")
                                 % {"class_name": p._meta.verbose_name, "instance": p}
                             )

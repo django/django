@@ -64,7 +64,8 @@ class LogEntry(models.Model):
         null=True,
     )
     object_id = models.TextField(_("object id"), blank=True, null=True)
-    # Translators: 'repr' means representation (https://docs.python.org/library/functions.html#repr)
+    # Translators: 'repr' means representation
+    # (https://docs.python.org/library/functions.html#repr)
     object_repr = models.CharField(_("object repr"), max_length=200)
     action_flag = models.PositiveSmallIntegerField(
         _("action flag"), choices=ACTION_FLAG_CHOICES

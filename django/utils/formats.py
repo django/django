@@ -302,7 +302,8 @@ def sanitize_separators(value):
                 and value.count(".") == 1
                 and len(value.split(".")[-1]) != 3
             ):
-                # Special case where we suspect a dot meant decimal separator (see #22171)
+                # Special case where we suspect a dot meant decimal separator
+                # (see #22171).
                 pass
             else:
                 for replacement in {

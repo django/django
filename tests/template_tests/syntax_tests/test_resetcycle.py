@@ -33,7 +33,9 @@ class ResetCycleTagTests(SimpleTestCase):
 
     @setup(
         {
-            "resetcycle05": "{% for i in test %}{% cycle 'a' 'b' %}{% resetcycle %}{% endfor %}"
+            "resetcycle05": (
+                "{% for i in test %}{% cycle 'a' 'b' %}{% resetcycle %}{% endfor %}"
+            )
         }
     )
     def test_resetcycle05(self):

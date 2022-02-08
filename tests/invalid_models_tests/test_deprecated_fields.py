@@ -37,7 +37,11 @@ class DeprecatedFieldsTests(SimpleTestCase):
                 checks.Error(
                     "CommaSeparatedIntegerField is removed except for support in "
                     "historical migrations.",
-                    hint="Use CharField(validators=[validate_comma_separated_integer_list]) instead.",
+                    hint=(
+                        "Use "
+                        "CharField(validators=[validate_comma_separated_integer_list]) "
+                        "instead."
+                    ),
                     obj=CommaSeparatedIntegerModel._meta.get_field("csi"),
                     id="fields.E901",
                 )

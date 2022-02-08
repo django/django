@@ -346,7 +346,8 @@ class SchemaIndexesMySQLTests(TransactionTestCase):
         self.assertEqual(
             index_sql,
             [
-                "CREATE INDEX `indexes_articletranslation_article_no_constraint_id_d6c0806b` "
+                "CREATE INDEX "
+                "`indexes_articletranslation_article_no_constraint_id_d6c0806b` "
                 "ON `indexes_articletranslation` (`article_no_constraint_id`)"
             ],
         )

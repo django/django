@@ -22,7 +22,8 @@ class DatabaseValidation(BaseDatabaseValidation):
                         "%s, such as data truncation upon insertion, by "
                         "escalating warnings into errors. It is strongly "
                         "recommended you activate it. See: "
-                        "https://docs.djangoproject.com/en/%s/ref/databases/#mysql-sql-mode"
+                        "https://docs.djangoproject.com/en/%s/ref/databases/"
+                        "#mysql-sql-mode"
                         % (
                             self.connection.display_name,
                             self.connection.display_name,

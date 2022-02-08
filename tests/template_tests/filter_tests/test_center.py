@@ -8,7 +8,10 @@ from ..utils import setup
 class CenterTests(SimpleTestCase):
     @setup(
         {
-            "center01": '{% autoescape off %}.{{ a|center:"5" }}. .{{ b|center:"5" }}.{% endautoescape %}'
+            "center01": (
+                '{% autoescape off %}.{{ a|center:"5" }}. .{{ b|center:"5" }}.'
+                "{% endautoescape %}"
+            )
         }
     )
     def test_center01(self):

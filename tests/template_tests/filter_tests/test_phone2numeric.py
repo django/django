@@ -16,7 +16,10 @@ class Phone2numericTests(SimpleTestCase):
 
     @setup(
         {
-            "phone2numeric02": "{% autoescape off %}{{ a|phone2numeric }} {{ b|phone2numeric }}{% endautoescape %}"
+            "phone2numeric02": (
+                "{% autoescape off %}{{ a|phone2numeric }} {{ b|phone2numeric }}"
+                "{% endautoescape %}"
+            )
         }
     )
     def test_phone2numeric02(self):

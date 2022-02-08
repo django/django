@@ -8,7 +8,10 @@ from ..utils import setup
 class LjustTests(SimpleTestCase):
     @setup(
         {
-            "ljust01": '{% autoescape off %}.{{ a|ljust:"5" }}. .{{ b|ljust:"5" }}.{% endautoescape %}'
+            "ljust01": (
+                '{% autoescape off %}.{{ a|ljust:"5" }}. .{{ b|ljust:"5" }}.'
+                "{% endautoescape %}"
+            )
         }
     )
     def test_ljust01(self):

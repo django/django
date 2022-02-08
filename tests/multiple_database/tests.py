@@ -216,7 +216,8 @@ class QueryTestCase(TestCase):
         dive = Book.objects.using("other").get(title="Dive into Python")
         mark = Person.objects.using("other").get(name="Mark Pilgrim")
 
-        # Retrieve related object by descriptor. Related objects should be database-bound
+        # Retrieve related object by descriptor. Related objects should be
+        # database-bound.
         self.assertEqual(
             list(dive.authors.all().values_list("name", flat=True)), ["Mark Pilgrim"]
         )
@@ -597,7 +598,8 @@ class QueryTestCase(TestCase):
         chris = Person.objects.using("other").get(name="Chris Mills")
         dive = Book.objects.using("other").get(title="Dive into Python")
 
-        # Retrieve related object by descriptor. Related objects should be database-bound
+        # Retrieve related object by descriptor. Related objects should be
+        # database-bound.
         self.assertEqual(
             list(chris.edited.values_list("title", flat=True)), ["Dive into Python"]
         )
@@ -743,7 +745,10 @@ class QueryTestCase(TestCase):
                 marty.edited.add(dive)
 
     def test_foreign_key_deletion(self):
-        "Cascaded deletions of Foreign Key relations issue queries on the right database"
+        """
+        Cascaded deletions of Foreign Key relations issue queries on the right
+        database.
+        """
         mark = Person.objects.using("other").create(name="Mark Pilgrim")
         Pet.objects.using("other").create(name="Fido", owner=mark)
 
@@ -843,7 +848,8 @@ class QueryTestCase(TestCase):
         alice_profile = UserProfile.objects.using("default").get(flavor="chocolate")
         bob_profile = UserProfile.objects.using("other").get(flavor="crunchy frog")
 
-        # Retrieve related object by descriptor. Related objects should be database-bound
+        # Retrieve related object by descriptor. Related objects should be
+        # database-bound.
         self.assertEqual(alice_profile.user.username, "alice")
         self.assertEqual(bob_profile.user.username, "bob")
 
@@ -976,7 +982,8 @@ class QueryTestCase(TestCase):
         # Reget the objects to clear caches
         dive = Book.objects.using("other").get(title="Dive into Python")
 
-        # Retrieve related object by descriptor. Related objects should be database-bound
+        # Retrieve related object by descriptor. Related objects should be
+        # database-bound.
         self.assertEqual(
             list(dive.reviews.all().values_list("source", flat=True)), ["Python Weekly"]
         )
@@ -1090,7 +1097,10 @@ class QueryTestCase(TestCase):
         )
 
     def test_generic_key_cross_database_protection(self):
-        "Operations that involve sharing generic key objects across databases raise an error"
+        """
+        Operations that involve sharing generic key objects across databases
+        raise an error.
+        """
         # Create a book and author on the default database
         pro = Book.objects.create(
             title="Pro Django", published=datetime.date(2008, 12, 16)
@@ -1171,7 +1181,10 @@ class QueryTestCase(TestCase):
         )
 
     def test_generic_key_deletion(self):
-        "Cascaded deletions of Generic Key relations issue queries on the right database"
+        """
+        Cascaded deletions of Generic Key relations issue queries on the right
+        database.
+        """
         dive = Book.objects.using("other").create(
             title="Dive into Python", published=datetime.date(2009, 5, 4)
         )
@@ -1223,7 +1236,10 @@ class QueryTestCase(TestCase):
         self.assertQuerysetEqual(val, [dive.pk], attrgetter("pk"))
 
     def test_select_related(self):
-        "Database assignment is retained if an object is retrieved with select_related()"
+        """
+        Database assignment is retained if an object is retrieved with
+        select_related().
+        """
         # Create a book and author on the other database
         mark = Person.objects.using("other").create(name="Mark Pilgrim")
         Book.objects.using("other").create(
@@ -1465,7 +1481,10 @@ class RouterTestCase(TestCase):
             published=datetime.date(2009, 5, 4),
         )
         # Set a foreign key set with an object from a different database
-        msg = "<Book: Dive into Python> instance isn't saved. Use bulk=False or save the object first."
+        msg = (
+            "<Book: Dive into Python> instance isn't saved. Use bulk=False or save the "
+            "object first."
+        )
         with self.assertRaisesMessage(ValueError, msg):
             marty.edited.set([dive])
 
@@ -1508,7 +1527,8 @@ class RouterTestCase(TestCase):
         # Set a foreign key set with an object from a different database
         marty.edited.set([pro, dive], bulk=False)
 
-        # Assignment implies a save, so database assignments of original objects have changed...
+        # Assignment implies a save, so database assignments of original
+        # objects have changed...
         self.assertEqual(marty._state.db, "default")
         self.assertEqual(pro._state.db, "default")
         self.assertEqual(dive._state.db, "default")
@@ -1524,7 +1544,8 @@ class RouterTestCase(TestCase):
         # Add to a foreign key set with an object from a different database
         marty.edited.add(dive, bulk=False)
 
-        # Add implies a save, so database assignments of original objects have changed...
+        # Add implies a save, so database assignments of original objects have
+        # changed...
         self.assertEqual(marty._state.db, "default")
         self.assertEqual(pro._state.db, "default")
         self.assertEqual(dive._state.db, "default")
@@ -1813,7 +1834,10 @@ class RouterTestCase(TestCase):
         self.assertEqual(marty.book_set.db_manager("default").all().db, "default")
 
     def test_foreign_key_managers(self):
-        "FK reverse relations are represented by managers, and can be controlled like managers"
+        """
+        FK reverse relations are represented by managers, and can be controlled
+        like managers.
+        """
         marty = Person.objects.using("other").create(pk=1, name="Marty Alchin")
         Book.objects.using("other").create(
             pk=1,
@@ -1826,7 +1850,10 @@ class RouterTestCase(TestCase):
         self.assertEqual(marty.edited.db_manager("default").all().db, "default")
 
     def test_generic_key_managers(self):
-        "Generic key relations are represented by managers, and can be controlled like managers"
+        """
+        Generic key relations are represented by managers, and can be
+        controlled like managers.
+        """
         pro = Book.objects.using("other").create(
             title="Pro Django", published=datetime.date(2008, 12, 16)
         )

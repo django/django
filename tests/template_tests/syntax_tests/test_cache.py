@@ -105,7 +105,10 @@ class CacheTagTests(SimpleTestCase):
 
     @setup(
         {
-            "cache17": "{% load cache %}{% cache 10 long_cache_key poem %}Some Content{% endcache %}"
+            "cache17": (
+                "{% load cache %}{% cache 10 long_cache_key poem %}Some Content"
+                "{% endcache %}"
+            )
         }
     )
     def test_cache17(self):
@@ -119,8 +122,8 @@ class CacheTagTests(SimpleTestCase):
                     "Oh freddled gruntbuggly/Thy micturations are to me/"
                     "As plurdled gabbleblotchits/On a lurgid bee/"
                     "That mordiously hath bitled out/Its earted jurtles/"
-                    "Into a rancid festering/Or else I shall rend thee in the gobberwarts"
-                    "with my blurglecruncheon/See if I don't."
+                    "Into a rancid festering/Or else I shall rend thee in the "
+                    "gobberwarts with my blurglecruncheon/See if I don't."
                 ),
             },
         )
@@ -128,7 +131,10 @@ class CacheTagTests(SimpleTestCase):
 
     @setup(
         {
-            "cache18": '{% load cache custom %}{% cache 2|noop:"x y" cache18 %}cache18{% endcache %}'
+            "cache18": (
+                '{% load cache custom %}{% cache 2|noop:"x y" cache18 %}cache18'
+                "{% endcache %}"
+            )
         }
     )
     def test_cache18(self):
@@ -141,7 +147,9 @@ class CacheTagTests(SimpleTestCase):
     @setup(
         {
             "first": "{% load cache %}{% cache None fragment19 %}content{% endcache %}",
-            "second": "{% load cache %}{% cache None fragment19 %}not rendered{% endcache %}",
+            "second": (
+                "{% load cache %}{% cache None fragment19 %}not rendered{% endcache %}"
+            ),
         }
     )
     def test_none_timeout(self):

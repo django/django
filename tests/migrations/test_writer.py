@@ -624,7 +624,8 @@ class WriterTests(SimpleTestCase):
         string = MigrationWriter.serialize(validator)[0]
         self.assertEqual(
             string,
-            "django.core.validators.RegexValidator('^[0-9]+$', flags=re.RegexFlag['DOTALL'])",
+            "django.core.validators.RegexValidator('^[0-9]+$', "
+            "flags=re.RegexFlag['DOTALL'])",
         )
         self.serialize_round_trip(validator)
 
@@ -633,7 +634,8 @@ class WriterTests(SimpleTestCase):
         string = MigrationWriter.serialize(validator)[0]
         self.assertEqual(
             string,
-            "django.core.validators.RegexValidator('^[-a-zA-Z0-9_]+$', 'Invalid', 'invalid')",
+            "django.core.validators.RegexValidator('^[-a-zA-Z0-9_]+$', 'Invalid', "
+            "'invalid')",
         )
         self.serialize_round_trip(validator)
 

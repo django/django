@@ -256,7 +256,8 @@ class NaturalTimeFormatter:
         ),
     }
     future_substrings = {
-        # Translators: 'naturaltime-future' strings will be included in '%(delta)s from now'
+        # Translators: 'naturaltime-future' strings will be included in
+        # '%(delta)s from now'.
         "year": npgettext_lazy(
             "naturaltime-future", "%(num)d year", "%(num)d years", "num"
         ),

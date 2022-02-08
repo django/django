@@ -9,7 +9,9 @@ from ..utils import setup
 class UrlizeTests(SimpleTestCase):
     @setup(
         {
-            "urlize01": "{% autoescape off %}{{ a|urlize }} {{ b|urlize }}{% endautoescape %}"
+            "urlize01": (
+                "{% autoescape off %}{{ a|urlize }} {{ b|urlize }}{% endautoescape %}"
+            )
         }
     )
     def test_urlize01(self):
@@ -22,8 +24,10 @@ class UrlizeTests(SimpleTestCase):
         )
         self.assertEqual(
             output,
-            '<a href="http://example.com/?x=&amp;y=" rel="nofollow">http://example.com/?x=&y=</a> '
-            '<a href="http://example.com?x=&amp;y=%3C2%3E" rel="nofollow">http://example.com?x=&amp;y=&lt;2&gt;</a>',
+            '<a href="http://example.com/?x=&amp;y=" rel="nofollow">'
+            "http://example.com/?x=&y=</a> "
+            '<a href="http://example.com?x=&amp;y=%3C2%3E" rel="nofollow">'
+            "http://example.com?x=&amp;y=&lt;2&gt;</a>",
         )
 
     @setup({"urlize02": "{{ a|urlize }} {{ b|urlize }}"})
@@ -37,8 +41,10 @@ class UrlizeTests(SimpleTestCase):
         )
         self.assertEqual(
             output,
-            '<a href="http://example.com/?x=&amp;y=" rel="nofollow">http://example.com/?x=&amp;y=</a> '
-            '<a href="http://example.com?x=&amp;y=" rel="nofollow">http://example.com?x=&amp;y=</a>',
+            '<a href="http://example.com/?x=&amp;y=" rel="nofollow">'
+            "http://example.com/?x=&amp;y=</a> "
+            '<a href="http://example.com?x=&amp;y=" rel="nofollow">'
+            "http://example.com?x=&amp;y=</a>",
         )
 
     @setup({"urlize03": "{% autoescape off %}{{ a|urlize }}{% endautoescape %}"})
@@ -95,7 +101,8 @@ class UrlizeTests(SimpleTestCase):
         )
         self.assertEqual(
             output,
-            '<a href="http://example.com/?x=&amp;y=%3C2%3E" rel="nofollow">http://example.com/?x=&amp;y=&lt;2&gt;</a>',
+            '<a href="http://example.com/?x=&amp;y=%3C2%3E" rel="nofollow">'
+            "http://example.com/?x=&amp;y=&lt;2&gt;</a>",
         )
 
 
@@ -127,11 +134,13 @@ class FunctionTests(SimpleTestCase):
         # part of URLs.
         self.assertEqual(
             urlize('www.server.com"abc'),
-            '<a href="http://www.server.com" rel="nofollow">www.server.com</a>&quot;abc',
+            '<a href="http://www.server.com" rel="nofollow">www.server.com</a>&quot;'
+            "abc",
         )
         self.assertEqual(
             urlize("www.server.com'abc"),
-            '<a href="http://www.server.com" rel="nofollow">www.server.com</a>&#x27;abc',
+            '<a href="http://www.server.com" rel="nofollow">www.server.com</a>&#x27;'
+            "abc",
         )
         self.assertEqual(
             urlize("www.server.com<abc"),
@@ -164,8 +173,9 @@ class FunctionTests(SimpleTestCase):
         """
         self.assertEqual(
             urlize("http://hi.baidu.com/%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B"),
-            '<a href="http://hi.baidu.com/%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B" rel="nofollow">'
-            "http://hi.baidu.com/%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B</a>",
+            '<a href="http://hi.baidu.com/%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B" '
+            'rel="nofollow">http://hi.baidu.com/%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B'
+            "</a>",
         )
 
     def test_urlencoded(self):
@@ -193,13 +203,13 @@ class FunctionTests(SimpleTestCase):
         """
         self.assertEqual(
             urlize("https://en.wikipedia.org/wiki/Django_(web_framework)"),
-            '<a href="https://en.wikipedia.org/wiki/Django_(web_framework)" rel="nofollow">'
-            "https://en.wikipedia.org/wiki/Django_(web_framework)</a>",
+            '<a href="https://en.wikipedia.org/wiki/Django_(web_framework)" '
+            'rel="nofollow">https://en.wikipedia.org/wiki/Django_(web_framework)</a>',
         )
         self.assertEqual(
             urlize("(see https://en.wikipedia.org/wiki/Django_(web_framework))"),
-            '(see <a href="https://en.wikipedia.org/wiki/Django_(web_framework)" rel="nofollow">'
-            "https://en.wikipedia.org/wiki/Django_(web_framework)</a>)",
+            '(see <a href="https://en.wikipedia.org/wiki/Django_(web_framework)" '
+            'rel="nofollow">https://en.wikipedia.org/wiki/Django_(web_framework)</a>)',
         )
 
     def test_nofollow(self):
@@ -269,25 +279,30 @@ class FunctionTests(SimpleTestCase):
         """
         self.assertEqual(
             urlize("(Go to http://www.example.com/foo.)"),
-            '(Go to <a href="http://www.example.com/foo" rel="nofollow">http://www.example.com/foo</a>.)',
+            '(Go to <a href="http://www.example.com/foo" rel="nofollow">'
+            "http://www.example.com/foo</a>.)",
         )
 
     def test_trailing_multiple_punctuation(self):
         self.assertEqual(
             urlize("A test http://testing.com/example.."),
-            'A test <a href="http://testing.com/example" rel="nofollow">http://testing.com/example</a>..',
+            'A test <a href="http://testing.com/example" rel="nofollow">'
+            "http://testing.com/example</a>..",
         )
         self.assertEqual(
             urlize("A test http://testing.com/example!!"),
-            'A test <a href="http://testing.com/example" rel="nofollow">http://testing.com/example</a>!!',
+            'A test <a href="http://testing.com/example" rel="nofollow">'
+            "http://testing.com/example</a>!!",
         )
         self.assertEqual(
             urlize("A test http://testing.com/example!!!"),
-            'A test <a href="http://testing.com/example" rel="nofollow">http://testing.com/example</a>!!!',
+            'A test <a href="http://testing.com/example" rel="nofollow">'
+            "http://testing.com/example</a>!!!",
         )
         self.assertEqual(
             urlize('A test http://testing.com/example.,:;)"!'),
-            'A test <a href="http://testing.com/example" rel="nofollow">http://testing.com/example</a>.,:;)&quot;!',
+            'A test <a href="http://testing.com/example" rel="nofollow">'
+            "http://testing.com/example</a>.,:;)&quot;!",
         )
 
     def test_brackets(self):
@@ -300,7 +315,8 @@ class FunctionTests(SimpleTestCase):
         )
         self.assertEqual(
             urlize("see test[at[example.com"),
-            'see <a href="http://test[at[example.com" rel="nofollow">test[at[example.com</a>',
+            'see <a href="http://test[at[example.com" rel="nofollow">'
+            "test[at[example.com</a>",
         )
         self.assertEqual(
             urlize("[http://168.192.0.1](http://168.192.0.1)"),
@@ -321,21 +337,22 @@ class FunctionTests(SimpleTestCase):
                 start_in, end_in = wrapping_in
                 self.assertEqual(
                     urlize(start_in + "https://www.example.org/" + end_in),
-                    start_out
-                    + '<a href="https://www.example.org/" rel="nofollow">https://www.example.org/</a>'
-                    + end_out,
+                    f'{start_out}<a href="https://www.example.org/" rel="nofollow">'
+                    f"https://www.example.org/</a>{end_out}",
                 )
 
     def test_ipv4(self):
         self.assertEqual(
             urlize("http://192.168.0.15/api/9"),
-            '<a href="http://192.168.0.15/api/9" rel="nofollow">http://192.168.0.15/api/9</a>',
+            '<a href="http://192.168.0.15/api/9" rel="nofollow">'
+            "http://192.168.0.15/api/9</a>",
         )
 
     def test_ipv6(self):
         self.assertEqual(
             urlize("http://[2001:db8:cafe::2]/api/9"),
-            '<a href="http://[2001:db8:cafe::2]/api/9" rel="nofollow">http://[2001:db8:cafe::2]/api/9</a>',
+            '<a href="http://[2001:db8:cafe::2]/api/9" rel="nofollow">'
+            "http://[2001:db8:cafe::2]/api/9</a>",
         )
 
     def test_quotation_marks(self):
@@ -375,7 +392,8 @@ class FunctionTests(SimpleTestCase):
             urlize(
                 'Email us at "hi@example.com", or phone us at +xx.yy', autoescape=False
             ),
-            'Email us at "<a href="mailto:hi@example.com">hi@example.com</a>", or phone us at +xx.yy',
+            'Email us at "<a href="mailto:hi@example.com">hi@example.com</a>", or '
+            "phone us at +xx.yy",
         )
 
     def test_exclamation_marks(self):
@@ -385,19 +403,23 @@ class FunctionTests(SimpleTestCase):
         """
         self.assertEqual(
             urlize("Go to djangoproject.com! and enjoy."),
-            'Go to <a href="http://djangoproject.com" rel="nofollow">djangoproject.com</a>! and enjoy.',
+            'Go to <a href="http://djangoproject.com" rel="nofollow">djangoproject.com'
+            "</a>! and enjoy.",
         )
         self.assertEqual(
             urlize("Search for google.com/?q=! and see."),
-            'Search for <a href="http://google.com/?q=" rel="nofollow">google.com/?q=</a>! and see.',
+            'Search for <a href="http://google.com/?q=" rel="nofollow">google.com/?q='
+            "</a>! and see.",
         )
         self.assertEqual(
             urlize("Search for google.com/?q=dj!`? and see."),
-            'Search for <a href="http://google.com/?q=dj%21%60%3F" rel="nofollow">google.com/?q=dj!`?</a> and see.',
+            'Search for <a href="http://google.com/?q=dj%21%60%3F" rel="nofollow">'
+            "google.com/?q=dj!`?</a> and see.",
         )
         self.assertEqual(
             urlize("Search for google.com/?q=dj!`?! and see."),
-            'Search for <a href="http://google.com/?q=dj%21%60%3F" rel="nofollow">google.com/?q=dj!`?</a>! and see.',
+            'Search for <a href="http://google.com/?q=dj%21%60%3F" rel="nofollow">'
+            "google.com/?q=dj!`?</a>! and see.",
         )
 
     def test_non_string_input(self):
@@ -406,13 +428,15 @@ class FunctionTests(SimpleTestCase):
     def test_autoescape(self):
         self.assertEqual(
             urlize('foo<a href=" google.com ">bar</a>buz'),
-            'foo&lt;a href=&quot; <a href="http://google.com" rel="nofollow">google.com</a> &quot;&gt;bar&lt;/a&gt;buz',
+            'foo&lt;a href=&quot; <a href="http://google.com" rel="nofollow">google.com'
+            "</a> &quot;&gt;bar&lt;/a&gt;buz",
         )
 
     def test_autoescape_off(self):
         self.assertEqual(
             urlize('foo<a href=" google.com ">bar</a>buz', autoescape=False),
-            'foo<a href=" <a href="http://google.com" rel="nofollow">google.com</a> ">bar</a>buz',
+            'foo<a href=" <a href="http://google.com" rel="nofollow">google.com</a> ">'
+            "bar</a>buz",
         )
 
     def test_lazystring(self):

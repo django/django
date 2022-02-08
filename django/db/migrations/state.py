@@ -645,10 +645,12 @@ class StateApps(Apps):
                         new_unrendered_models.append(model)
                 if len(new_unrendered_models) == len(unrendered_models):
                     raise InvalidBasesError(
-                        "Cannot resolve bases for %r\nThis can happen if you are inheriting models from an "
-                        "app with migrations (e.g. contrib.auth)\n in an app with no migrations; see "
-                        "https://docs.djangoproject.com/en/%s/topics/migrations/#dependencies "
-                        "for more" % (new_unrendered_models, get_docs_version())
+                        "Cannot resolve bases for %r\nThis can happen if you are "
+                        "inheriting models from an app with migrations (e.g. "
+                        "contrib.auth)\n in an app with no migrations; see "
+                        "https://docs.djangoproject.com/en/%s/topics/migrations/"
+                        "#dependencies for more"
+                        % (new_unrendered_models, get_docs_version())
                     )
                 unrendered_models = new_unrendered_models
 
@@ -717,8 +719,8 @@ class ModelState:
                 )
             if field.many_to_many and hasattr(field.remote_field.through, "_meta"):
                 raise ValueError(
-                    'ModelState.fields cannot refer to a model class - "%s.through" does. '
-                    "Use a string reference instead." % name
+                    'ModelState.fields cannot refer to a model class - "%s.through" '
+                    "does. Use a string reference instead." % name
                 )
         # Sanity-check that indexes have their name set.
         for index in self.options["indexes"]:

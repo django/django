@@ -25,7 +25,8 @@ class PrefixNode(template.Node):
         """
         Class method to parse prefix node and return a Node.
         """
-        # token.split_contents() isn't useful here because tags using this method don't accept variable as arguments
+        # token.split_contents() isn't useful here because tags using this
+        # method don't accept variable as arguments.
         tokens = token.contents.split()
         if len(tokens) > 1 and tokens[1] != "as":
             raise template.TemplateSyntaxError(

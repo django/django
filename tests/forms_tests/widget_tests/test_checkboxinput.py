@@ -86,7 +86,8 @@ class CheckboxInputTest(WidgetTest):
             "greeting",
             "hello & goodbye",
             html=(
-                '<input checked type="checkbox" name="greeting" value="hello &amp; goodbye">'
+                '<input checked type="checkbox" name="greeting" '
+                'value="hello &amp; goodbye">'
             ),
         )
 

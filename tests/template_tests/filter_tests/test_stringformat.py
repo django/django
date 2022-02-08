@@ -13,7 +13,10 @@ class StringformatTests(SimpleTestCase):
 
     @setup(
         {
-            "stringformat01": '{% autoescape off %}.{{ a|stringformat:"5s" }}. .{{ b|stringformat:"5s" }}.{% endautoescape %}'
+            "stringformat01": (
+                '{% autoescape off %}.{{ a|stringformat:"5s" }}. .'
+                '{{ b|stringformat:"5s" }}.{% endautoescape %}'
+            )
         }
     )
     def test_stringformat01(self):

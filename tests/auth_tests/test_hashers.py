@@ -390,7 +390,8 @@ class TestUtilsHashPass(SimpleTestCase):
         encoded = hasher.encode("lètmein", "seasalt2")
         self.assertEqual(
             encoded,
-            "pbkdf2_sha256$320000$seasalt2$BRr4pYNIQDsLFP+u4dzjs7pFuWJEin4lFMMoO9wBYvo=",
+            "pbkdf2_sha256$320000$seasalt2$BRr4pYNIQDsLFP+u4dzjs7pFuWJEin4lFMM"
+            "oO9wBYvo=",
         )
         self.assertTrue(hasher.verify("lètmein", encoded))
 

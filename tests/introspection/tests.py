@@ -227,8 +227,10 @@ class IntrospectionTests(TransactionTestCase):
         formatting.
         """
         create_table_statements = [
-            "CREATE TABLE track(id, art_id INTEGER, FOREIGN KEY(art_id) REFERENCES {}(id));",
-            "CREATE TABLE track(id, art_id INTEGER, FOREIGN KEY (art_id) REFERENCES {}(id));",
+            "CREATE TABLE track(id, art_id INTEGER, "
+            "FOREIGN KEY(art_id) REFERENCES {}(id));",
+            "CREATE TABLE track(id, art_id INTEGER, "
+            "FOREIGN KEY (art_id) REFERENCES {}(id));",
         ]
         for statement in create_table_statements:
             with connection.cursor() as cursor:

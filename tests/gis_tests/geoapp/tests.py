@@ -301,8 +301,8 @@ class GeoLookupTest(TestCase):
         ks = State.objects.get(poly__contains=lawrence.point)
         self.assertEqual("Kansas", ks.name)
 
-        # Pueblo and Oklahoma City (even though OK City is within the bounding box of Texas)
-        # are not contained in Texas or New Zealand.
+        # Pueblo and Oklahoma City (even though OK City is within the bounding
+        # box of Texas) are not contained in Texas or New Zealand.
         self.assertEqual(
             len(Country.objects.filter(mpoly__contains=pueblo.point)), 0
         )  # Query w/GEOSGeometry object
@@ -597,8 +597,10 @@ class GeoQuerySetTest(TestCase):
         Testing the `Extent` aggregate.
         """
         # Reference query:
-        # `SELECT ST_extent(point) FROM geoapp_city WHERE (name='Houston' or name='Dallas');`
-        #   =>  BOX(-96.8016128540039 29.7633724212646,-95.3631439208984 32.7820587158203)
+        #  SELECT ST_extent(point)
+        #  FROM geoapp_city
+        #  WHERE (name='Houston' or name='Dallas');`
+        #  => BOX(-96.8016128540039 29.7633724212646,-95.3631439208984 32.7820587158203)
         expected = (
             -96.8016128540039,
             29.7633724212646,

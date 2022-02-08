@@ -28,7 +28,10 @@ class Command(BaseCommand):
             "args",
             metavar="test_label",
             nargs="*",
-            help="Module paths to test; can be modulename, modulename.TestCase or modulename.TestCase.test_method",
+            help=(
+                "Module paths to test; can be modulename, modulename.TestCase or "
+                "modulename.TestCase.test_method"
+            ),
         )
         parser.add_argument(
             "--noinput",

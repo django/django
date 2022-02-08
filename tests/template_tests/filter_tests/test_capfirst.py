@@ -8,7 +8,10 @@ from ..utils import setup
 class CapfirstTests(SimpleTestCase):
     @setup(
         {
-            "capfirst01": "{% autoescape off %}{{ a|capfirst }} {{ b|capfirst }}{% endautoescape %}"
+            "capfirst01": (
+                "{% autoescape off %}{{ a|capfirst }} {{ b|capfirst }}"
+                "{% endautoescape %}"
+            )
         }
     )
     def test_capfirst01(self):

@@ -85,7 +85,10 @@ class DateTimeInputTest(WidgetTest):
                         self.widget,
                         "date",
                         d,
-                        html='<input type="text" name="date" value="2007-09-17 12:51:34">',
+                        html=(
+                            '<input type="text" name="date" '
+                            'value="2007-09-17 12:51:34">'
+                        ),
                     )
         with translation.override("es"):
             self.check_html(

@@ -22,7 +22,9 @@ class PostGISIntrospection(DatabaseIntrospection):
             # dictionary isn't updated until introspection is performed here.
             with self.connection.cursor() as cursor:
                 cursor.execute(
-                    "SELECT oid, typname FROM pg_type WHERE typname IN ('geometry', 'geography')"
+                    "SELECT oid, typname "
+                    "FROM pg_type "
+                    "WHERE typname IN ('geometry', 'geography')"
                 )
                 self.postgis_oid_lookup = dict(cursor.fetchall())
             self.data_types_reverse.update(

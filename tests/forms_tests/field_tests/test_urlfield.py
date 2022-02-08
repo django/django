@@ -99,7 +99,8 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         f = URLField(min_length=15, max_length=20)
         self.assertWidgetRendersTo(
             f,
-            '<input id="id_f" type="url" name="f" maxlength="20" minlength="15" required>',
+            '<input id="id_f" type="url" name="f" maxlength="20" minlength="15" '
+            "required>",
         )
         with self.assertRaisesMessage(
             ValidationError,

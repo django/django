@@ -69,8 +69,12 @@ class DjangoTemplatesTests(TemplateStringsTests):
                 "NAME": "django",
                 "OPTIONS": {
                     "libraries": {
-                        "alternate": "template_backends.apps.good.templatetags.good_tags",
-                        "override": "template_backends.apps.good.templatetags.good_tags",
+                        "alternate": (
+                            "template_backends.apps.good.templatetags.good_tags"
+                        ),
+                        "override": (
+                            "template_backends.apps.good.templatetags.good_tags"
+                        ),
                     },
                 },
             }

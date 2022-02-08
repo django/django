@@ -104,7 +104,8 @@ class Storage:
             truncation = len(name) - max_length
             if truncation > 0:
                 file_root = file_root[:-truncation]
-                # Entire file_root was truncated in attempt to find an available filename.
+                # Entire file_root was truncated in attempt to find an
+                # available filename.
                 if not file_root:
                     raise SuspiciousFileOperation(
                         'Storage can not find an available filename for "%s". '

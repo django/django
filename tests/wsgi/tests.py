@@ -44,8 +44,10 @@ class WSGITest(SimpleTestCase):
         self.assertIn(
             bytes(response),
             [
-                b"Content-Length: 12\r\nContent-Type: text/html; charset=utf-8\r\n\r\nHello World!",
-                b"Content-Type: text/html; charset=utf-8\r\nContent-Length: 12\r\n\r\nHello World!",
+                b"Content-Length: 12\r\nContent-Type: text/html; "
+                b"charset=utf-8\r\n\r\nHello World!",
+                b"Content-Type: text/html; "
+                b"charset=utf-8\r\nContent-Length: 12\r\n\r\nHello World!",
             ],
         )
 

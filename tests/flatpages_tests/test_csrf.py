@@ -105,12 +105,18 @@ class FlatpageCSRFTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_post_view_flatpage(self):
-        "POSTing to a flatpage served through a view will raise a CSRF error if no token is provided (Refs #14156)"
+        """
+        POSTing to a flatpage served through a view will raise a CSRF error if
+        no token is provided.
+        """
         response = self.client.post("/flatpage_root/flatpage/")
         self.assertEqual(response.status_code, 403)
 
     def test_post_fallback_flatpage(self):
-        "POSTing to a flatpage served by the middleware will raise a CSRF error if no token is provided (Refs #14156)"
+        """
+        POSTing to a flatpage served by the middleware will raise a CSRF error
+        if no token is provided.
+        """
         response = self.client.post("/flatpage/")
         self.assertEqual(response.status_code, 403)
 

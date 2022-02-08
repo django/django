@@ -33,7 +33,10 @@ class NullQueriesTests(TestCase):
         )
 
         # Valid query, but fails because foo isn't a keyword
-        msg = "Cannot resolve keyword 'foo' into field. Choices are: choice, id, poll, poll_id"
+        msg = (
+            "Cannot resolve keyword 'foo' into field. Choices are: choice, id, poll, "
+            "poll_id"
+        )
         with self.assertRaisesMessage(FieldError, msg):
             Choice.objects.filter(foo__exact=None)
 

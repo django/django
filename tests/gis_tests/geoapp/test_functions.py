@@ -36,12 +36,14 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             '{"name":"EPSG:4326"}},"coordinates":[-95.363151,29.763374]}'
         )
         victoria_json = json.loads(
-            '{"type":"Point","bbox":[-123.30519600,48.46261100,-123.30519600,48.46261100],'
+            '{"type":"Point",'
+            '"bbox":[-123.30519600,48.46261100,-123.30519600,48.46261100],'
             '"coordinates":[-123.305196,48.462611]}'
         )
         chicago_json = json.loads(
             '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},'
-            '"bbox":[-87.65018,41.85039,-87.65018,41.85039],"coordinates":[-87.65018,41.85039]}'
+            '"bbox":[-87.65018,41.85039,-87.65018,41.85039],'
+            '"coordinates":[-87.65018,41.85039]}'
         )
         if "crs" in connection.features.unsupported_geojson_options:
             del houston_json["crs"]
@@ -131,8 +133,10 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         if connection.ops.oracle:
             # No precision parameter for Oracle :-/
             gml_regex = re.compile(
-                r'^<gml:Point srsName="EPSG:4326" xmlns:gml="http://www.opengis.net/gml">'
-                r'<gml:coordinates decimal="\." cs="," ts=" ">-104.60925\d+,38.25500\d+ '
+                r'^<gml:Point srsName="EPSG:4326" '
+                r'xmlns:gml="http://www.opengis.net/gml">'
+                r'<gml:coordinates decimal="\." cs="," ts=" ">'
+                r"-104.60925\d+,38.25500\d+ "
                 r"</gml:coordinates></gml:Point>"
             )
         else:
@@ -588,7 +592,8 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         # to pass into GEOS `equals_exact`.
         tol = 0.000000001
 
-        # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.1)) FROM "geoapp_country"
+        # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.1))
+        # FROM "geoapp_country"
         # WHERE "geoapp_country"."name" = 'San Marino';
         ref = fromstr("MULTIPOLYGON(((12.4 44,12.5 44,12.5 43.9,12.4 43.9,12.4 44)))")
         self.assertTrue(
@@ -600,7 +605,8 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             )
         )
 
-        # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.05, 0.23)) FROM "geoapp_country"
+        # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.05, 0.23))
+        # FROM "geoapp_country"
         # WHERE "geoapp_country"."name" = 'San Marino';
         ref = fromstr(
             "MULTIPOLYGON(((12.4 43.93,12.45 43.93,12.5 43.93,12.45 43.93,12.4 43.93)))"
@@ -614,10 +620,12 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             )
         )
 
-        # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.5, 0.17, 0.05, 0.23)) FROM "geoapp_country"
+        # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.5, 0.17, 0.05, 0.23))
+        # FROM "geoapp_country"
         # WHERE "geoapp_country"."name" = 'San Marino';
         ref = fromstr(
-            "MULTIPOLYGON(((12.4 43.87,12.45 43.87,12.45 44.1,12.5 44.1,12.5 43.87,12.45 43.87,12.4 43.87)))"
+            "MULTIPOLYGON(((12.4 43.87,12.45 43.87,12.45 44.1,12.5 44.1,12.5 43.87,"
+            "12.45 43.87,12.4 43.87)))"
         )
         self.assertTrue(
             ref.equals_exact(

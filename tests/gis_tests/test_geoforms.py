@@ -96,7 +96,8 @@ class GeometryFieldTest(SimpleTestCase):
             "MULTI   POLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))",
             "BLAH(0 0, 1 1)",
             '{"type": "FeatureCollection", "features": ['
-            '{"geometry": {"type": "Point", "coordinates": [508375, 148905]}, "type": "Feature"}]}',
+            '{"geometry": {"type": "Point", "coordinates": [508375, 148905]}, '
+            '"type": "Feature"}]}',
         ]
         fld = forms.GeometryField()
         # to_python returns the same GEOSGeometry for a WKT

@@ -122,10 +122,12 @@ class TestUtilsText(SimpleTestCase):
 
     def test_truncate_html_words(self):
         truncator = text.Truncator(
-            '<p id="par"><strong><em>The quick brown fox jumped over the lazy dog.</em></strong></p>'
+            '<p id="par"><strong><em>The quick brown fox jumped over the lazy dog.</em>'
+            "</strong></p>"
         )
         self.assertEqual(
-            '<p id="par"><strong><em>The quick brown fox jumped over the lazy dog.</em></strong></p>',
+            '<p id="par"><strong><em>The quick brown fox jumped over the lazy dog.</em>'
+            "</strong></p>",
             truncator.words(10, html=True),
         )
         self.assertEqual(
@@ -143,7 +145,8 @@ class TestUtilsText(SimpleTestCase):
 
         # Test with new line inside tag
         truncator = text.Truncator(
-            '<p>The quick <a href="xyz.html"\n id="mylink">brown fox</a> jumped over the lazy dog.</p>'
+            '<p>The quick <a href="xyz.html"\n id="mylink">brown fox</a> jumped over '
+            "the lazy dog.</p>"
         )
         self.assertEqual(
             '<p>The quick <a href="xyz.html"\n id="mylink">brown…</a></p>',

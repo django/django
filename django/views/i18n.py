@@ -188,7 +188,7 @@ js_catalog_template = r"""
   }
 };
 {% endautoescape %}
-"""
+"""  # NOQA
 
 
 class JavaScriptCatalog(View):

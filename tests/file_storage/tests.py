@@ -953,7 +953,10 @@ class FieldCallableFileStorageTests(SimpleTestCase):
         class NotStorage:
             pass
 
-        msg = "FileField.storage must be a subclass/instance of django.core.files.storage.Storage"
+        msg = (
+            "FileField.storage must be a subclass/instance of "
+            "django.core.files.storage.Storage"
+        )
         for invalid_type in (NotStorage, str, list, set, tuple):
             with self.subTest(invalid_type=invalid_type):
                 with self.assertRaisesMessage(TypeError, msg):

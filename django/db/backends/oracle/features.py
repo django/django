@@ -32,7 +32,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_literal_defaults = True
     closed_cursor_error_class = InterfaceError
     bare_select_suffix = " FROM DUAL"
-    # select for update with limit can be achieved on Oracle, but not with the current backend.
+    # select for update with limit can be achieved on Oracle, but not with the
+    # current backend.
     supports_select_for_update_with_limit = False
     supports_temporal_subtraction = True
     # Oracle doesn't ignore quoted identifiers case but the current backend
@@ -93,7 +94,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     django_test_expected_failures = {
         # A bug in Django/cx_Oracle with respect to string handling (#23843).
         "annotations.tests.NonAggregateAnnotationTestCase.test_custom_functions",
-        "annotations.tests.NonAggregateAnnotationTestCase.test_custom_functions_can_ref_other_functions",
+        "annotations.tests.NonAggregateAnnotationTestCase."
+        "test_custom_functions_can_ref_other_functions",
     }
 
     @cached_property

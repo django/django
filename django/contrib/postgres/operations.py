@@ -185,9 +185,8 @@ class CollationOperation(Operation):
         )
 
     def create_collation(self, schema_editor):
-        if (
-            self.deterministic is False
-            and not schema_editor.connection.features.supports_non_deterministic_collations
+        if self.deterministic is False and not (
+            schema_editor.connection.features.supports_non_deterministic_collations
         ):
             raise NotSupportedError(
                 "Non-deterministic collations require PostgreSQL 12+."

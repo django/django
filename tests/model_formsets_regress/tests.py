@@ -24,7 +24,9 @@ from .models import (
 
 class InlineFormsetTests(TestCase):
     def test_formset_over_to_field(self):
-        "A formset over a ForeignKey with a to_field can be saved. Regression for #10243"
+        """
+        A formset over a ForeignKey with a to_field can be saved.
+        """
         Form = modelform_factory(User, fields="__all__")
         FormSet = inlineformset_factory(User, UserSite, fields="__all__")
 
@@ -100,7 +102,9 @@ class InlineFormsetTests(TestCase):
             self.fail("Errors found on formset:%s" % form_set.errors)
 
     def test_formset_over_inherited_model(self):
-        "A formset over a ForeignKey with a to_field can be saved. Regression for #11120"
+        """
+        A formset over a ForeignKey with a to_field can be saved.
+        """
         Form = modelform_factory(Restaurant, fields="__all__")
         FormSet = inlineformset_factory(Restaurant, Manager, fields="__all__")
 
@@ -418,7 +422,7 @@ class BaseCustomDeleteFormSet(BaseFormSet):
 
 class FormfieldShouldDeleteFormTests(TestCase):
     """
-    Regression for #14099: BaseModelFormSet should use ModelFormSet method _should_delete_form
+    BaseModelFormSet should use ModelFormSet method _should_delete_form.
     """
 
     class BaseCustomDeleteModelFormSet(BaseModelFormSet, BaseCustomDeleteFormSet):

@@ -33,8 +33,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     )
     # Setting the constraint to IMMEDIATE runs any deferred checks to allow
     # dropping it in the same transaction.
-    sql_delete_fk = "SET CONSTRAINTS %(name)s IMMEDIATE; ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
-
+    sql_delete_fk = (
+        "SET CONSTRAINTS %(name)s IMMEDIATE; "
+        "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
+    )
     sql_delete_procedure = "DROP FUNCTION %(procedure)s(%(param_types)s)"
 
     def quote_value(self, value):

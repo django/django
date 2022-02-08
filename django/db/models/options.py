@@ -20,8 +20,8 @@ PROXY_PARENTS = object()
 EMPTY_RELATION_TREE = ()
 
 IMMUTABLE_WARNING = (
-    "The return type of '%s' should never be mutated. If you want to manipulate this list "
-    "for your own use, make a copy first."
+    "The return type of '%s' should never be mutated. If you want to manipulate this "
+    "list for your own use, make a copy first."
 )
 
 DEFAULT_NAMES = (

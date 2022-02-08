@@ -314,7 +314,9 @@ action)</option>
         self.assertContains(
             response,
             "jquery.min.js",
-            msg_prefix="jQuery missing from admin pages for model with no admin actions",
+            msg_prefix=(
+                "jQuery missing from admin pages for model with no admin actions"
+            ),
         )
 
     def test_action_column_class(self):
@@ -365,7 +367,10 @@ action)</option>
         response = self.client.post(url, action_data)
         self.assertRedirects(response, url, fetch_redirect_response=False)
         response = self.client.get(response.url)
-        msg = "Items must be selected in order to perform actions on them. No items have been changed."
+        msg = (
+            "Items must be selected in order to perform actions on them. No items have "
+            "been changed."
+        )
         self.assertContains(response, msg)
         self.assertEqual(Subscriber.objects.count(), 2)
 

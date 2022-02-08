@@ -11,7 +11,10 @@ class SafeseqTests(SimpleTestCase):
 
     @setup(
         {
-            "safeseq02": '{% autoescape off %}{{ a|join:", " }} -- {{ a|safeseq|join:", " }}{% endautoescape %}'
+            "safeseq02": (
+                '{% autoescape off %}{{ a|join:", " }} -- {{ a|safeseq|join:", " }}'
+                "{% endautoescape %}"
+            )
         }
     )
     def test_safeseq02(self):

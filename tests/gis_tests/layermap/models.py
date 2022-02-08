@@ -92,7 +92,8 @@ class DoesNotAllowNulls(models.Model):
 # Mapping dictionaries for the models above.
 co_mapping = {
     "name": "Name",
-    # ForeignKey's use another mapping dictionary for the _related_ Model (State in this case).
+    # ForeignKey's use another mapping dictionary for the _related_ Model
+    # (State in this case).
     "state": {"name": "State"},
     "mpoly": "MULTIPOLYGON",  # Will convert POLYGON features into MULTIPOLYGONS.
 }

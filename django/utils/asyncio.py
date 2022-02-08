@@ -30,7 +30,10 @@ def async_unsafe(message):
     # If the message is actually a function, then be a no-arguments decorator.
     if callable(message):
         func = message
-        message = "You cannot call this from an async context - use a thread or sync_to_async."
+        message = (
+            "You cannot call this from an async context - use a thread or "
+            "sync_to_async."
+        )
         return decorator(func)
     else:
         return decorator

@@ -35,7 +35,10 @@ class CycleTagTests(SimpleTestCase):
 
     @setup(
         {
-            "cycle12": "{% cycle 'a' 'b' 'c' as abc %}{% cycle abc %}{% cycle abc %}{% cycle abc %}"
+            "cycle12": (
+                "{% cycle 'a' 'b' 'c' as abc %}{% cycle abc %}{% cycle abc %}"
+                "{% cycle abc %}"
+            )
         }
     )
     def test_cycle12(self):
@@ -106,7 +109,10 @@ class CycleTagTests(SimpleTestCase):
 
     @setup(
         {
-            "cycle22": "{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ x }}{% endfor %}"
+            "cycle22": (
+                "{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ x }}"
+                "{% endfor %}"
+            )
         }
     )
     def test_cycle22(self):
@@ -125,8 +131,11 @@ class CycleTagTests(SimpleTestCase):
 
     @setup(
         {
-            "cycle24": "{% for x in values %}"
-            "{% cycle 'a' 'b' 'c' as abc silent %}{% include 'included-cycle' %}{% endfor %}",
+            "cycle24": (
+                "{% for x in values %}"
+                "{% cycle 'a' 'b' 'c' as abc silent %}{% include 'included-cycle' %}"
+                "{% endfor %}"
+            ),
             "included-cycle": "{{ abc }}",
         }
     )
@@ -146,7 +155,10 @@ class CycleTagTests(SimpleTestCase):
 
     @setup(
         {
-            "cycle27": "{% autoescape off %}{% cycle a b as ab %}{% cycle ab %}{% endautoescape %}"
+            "cycle27": (
+                "{% autoescape off %}{% cycle a b as ab %}{% cycle ab %}"
+                "{% endautoescape %}"
+            )
         }
     )
     def test_cycle27(self):

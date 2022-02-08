@@ -14,7 +14,9 @@ class RandomTests(SimpleTestCase):
 
     @setup(
         {
-            "random02": "{% autoescape off %}{{ a|random }} {{ b|random }}{% endautoescape %}"
+            "random02": (
+                "{% autoescape off %}{{ a|random }} {{ b|random }}{% endautoescape %}"
+            )
         }
     )
     def test_random02(self):

@@ -18,7 +18,10 @@ class ChainingTests(SimpleTestCase):
 
     @setup(
         {
-            "chaining02": '{% autoescape off %}{{ a|capfirst|center:"7" }}.{{ b|capfirst|center:"7" }}{% endautoescape %}'
+            "chaining02": (
+                '{% autoescape off %}{{ a|capfirst|center:"7" }}.'
+                '{{ b|capfirst|center:"7" }}{% endautoescape %}'
+            )
         }
     )
     def test_chaining02(self):
@@ -37,7 +40,10 @@ class ChainingTests(SimpleTestCase):
 
     @setup(
         {
-            "chaining04": '{% autoescape off %}{{ a|cut:"b"|capfirst }}.{{ b|cut:"b"|capfirst }}{% endautoescape %}'
+            "chaining04": (
+                '{% autoescape off %}{{ a|cut:"b"|capfirst }}.{{ b|cut:"b"|capfirst }}'
+                "{% endautoescape %}"
+            )
         }
     )
     def test_chaining04(self):
@@ -68,7 +74,9 @@ class ChainingTests(SimpleTestCase):
 
     @setup(
         {
-            "chaining08": '{% autoescape off %}{{ a|force_escape|cut:";" }}{% endautoescape %}'
+            "chaining08": (
+                '{% autoescape off %}{{ a|force_escape|cut:";" }}{% endautoescape %}'
+            )
         }
     )
     def test_chaining08(self):
@@ -82,7 +90,9 @@ class ChainingTests(SimpleTestCase):
 
     @setup(
         {
-            "chaining10": '{% autoescape off %}{{ a|cut:";"|force_escape }}{% endautoescape %}'
+            "chaining10": (
+                '{% autoescape off %}{{ a|cut:";"|force_escape }}{% endautoescape %}'
+            )
         }
     )
     def test_chaining10(self):
@@ -108,7 +118,9 @@ class ChainingTests(SimpleTestCase):
 
     @setup(
         {
-            "chaining14": "{% autoescape off %}{{ a|safe|force_escape }}{% endautoescape %}"
+            "chaining14": (
+                "{% autoescape off %}{{ a|safe|force_escape }}{% endautoescape %}"
+            )
         }
     )
     def test_chaining14(self):

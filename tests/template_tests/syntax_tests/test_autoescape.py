@@ -28,7 +28,10 @@ class AutoescapeTagTests(SimpleTestCase):
     # Autoescape disabling and enabling nest in a predictable way.
     @setup(
         {
-            "autoescape-tag04": "{% autoescape off %}{{ first }} {% autoescape on %}{{ first }}{% endautoescape %}{% endautoescape %}"
+            "autoescape-tag04": (
+                "{% autoescape off %}{{ first }} {% autoescape on %}{{ first }}"
+                "{% endautoescape %}{% endautoescape %}"
+            )
         }
     )
     def test_autoescape_tag04(self):
@@ -60,7 +63,10 @@ class AutoescapeTagTests(SimpleTestCase):
 
     @setup(
         {
-            "autoescape-tag08": r'{% autoescape on %}{{ var|default_if_none:" endquote\" hah" }}{% endautoescape %}'
+            "autoescape-tag08": (
+                r'{% autoescape on %}{{ var|default_if_none:" endquote\" hah" }}'
+                r"{% endautoescape %}"
+            )
         }
     )
     def test_autoescape_tag08(self):
@@ -86,7 +92,9 @@ class AutoescapeTagTests(SimpleTestCase):
 
     @setup(
         {
-            "autoescape-filtertag01": "{{ first }}{% filter safe %}{{ first }} x<y{% endfilter %}"
+            "autoescape-filtertag01": (
+                "{{ first }}{% filter safe %}{{ first }} x<y{% endfilter %}"
+            )
         }
     )
     def test_autoescape_filtertag01(self):
@@ -143,7 +151,9 @@ class AutoescapeTagTests(SimpleTestCase):
 
     @setup(
         {
-            "autoescape-incorrect-arg": "{% autoescape true %}{{ var.key }}{% endautoescape %}"
+            "autoescape-incorrect-arg": (
+                "{% autoescape true %}{{ var.key }}{% endautoescape %}"
+            )
         }
     )
     def test_invalid_arg(self):

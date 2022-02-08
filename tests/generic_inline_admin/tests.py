@@ -74,22 +74,19 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
         """
         A smoke test to ensure POST on edit_view works.
         """
+        prefix = "generic_inline_admin-media-content_type-object_id"
         post_data = {
             "name": "This Week in Django",
             # inline data
-            "generic_inline_admin-media-content_type-object_id-TOTAL_FORMS": "3",
-            "generic_inline_admin-media-content_type-object_id-INITIAL_FORMS": "2",
-            "generic_inline_admin-media-content_type-object_id-MAX_NUM_FORMS": "0",
-            "generic_inline_admin-media-content_type-object_id-0-id": str(
-                self.mp3_media_pk
-            ),
-            "generic_inline_admin-media-content_type-object_id-0-url": "http://example.com/podcast.mp3",
-            "generic_inline_admin-media-content_type-object_id-1-id": str(
-                self.png_media_pk
-            ),
-            "generic_inline_admin-media-content_type-object_id-1-url": "http://example.com/logo.png",
-            "generic_inline_admin-media-content_type-object_id-2-id": "",
-            "generic_inline_admin-media-content_type-object_id-2-url": "",
+            f"{prefix}-TOTAL_FORMS": "3",
+            f"{prefix}-INITIAL_FORMS": "2",
+            f"{prefix}-MAX_NUM_FORMS": "0",
+            f"{prefix}-0-id": str(self.mp3_media_pk),
+            f"{prefix}-0-url": "http://example.com/podcast.mp3",
+            f"{prefix}-1-id": str(self.png_media_pk),
+            f"{prefix}-1-url": "http://example.com/logo.png",
+            f"{prefix}-2-id": "",
+            f"{prefix}-2-url": "",
         }
         url = reverse(
             "admin:generic_inline_admin_episode_change", args=(self.episode_pk,)
@@ -264,17 +261,16 @@ class GenericInlineAdminWithUniqueTogetherTest(TestDataMixin, TestCase):
 
     def test_add(self):
         category_id = Category.objects.create(name="male").pk
+        prefix = "generic_inline_admin-phonenumber-content_type-object_id"
         post_data = {
             "name": "John Doe",
             # inline data
-            "generic_inline_admin-phonenumber-content_type-object_id-TOTAL_FORMS": "1",
-            "generic_inline_admin-phonenumber-content_type-object_id-INITIAL_FORMS": "0",
-            "generic_inline_admin-phonenumber-content_type-object_id-MAX_NUM_FORMS": "0",
-            "generic_inline_admin-phonenumber-content_type-object_id-0-id": "",
-            "generic_inline_admin-phonenumber-content_type-object_id-0-phone_number": "555-555-5555",
-            "generic_inline_admin-phonenumber-content_type-object_id-0-category": str(
-                category_id
-            ),
+            f"{prefix}-TOTAL_FORMS": "1",
+            f"{prefix}-INITIAL_FORMS": "0",
+            f"{prefix}-MAX_NUM_FORMS": "0",
+            f"{prefix}-0-id": "",
+            f"{prefix}-0-phone_number": "555-555-5555",
+            f"{prefix}-0-category": str(category_id),
         }
         response = self.client.get(reverse("admin:generic_inline_admin_contact_add"))
         self.assertEqual(response.status_code, 200)

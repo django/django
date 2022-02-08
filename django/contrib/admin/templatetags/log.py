@@ -32,7 +32,7 @@ def get_admin_log(parser, token):
 
     Usage::
 
-        {% get_admin_log [limit] as [varname] for_user [context_var_containing_user_obj] %}
+        {% get_admin_log [limit] as [varname] for_user [context_var_with_user_obj] %}
 
     Examples::
 

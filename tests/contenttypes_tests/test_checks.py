@@ -60,7 +60,8 @@ class GenericForeignKeyTests(SimpleTestCase):
             Model.content_object.check(),
             [
                 checks.Error(
-                    "'Model.content_type' is not a ForeignKey to 'contenttypes.ContentType'.",
+                    "'Model.content_type' is not a ForeignKey to "
+                    "'contenttypes.ContentType'.",
                     hint=(
                         "GenericForeignKeys must use a ForeignKey to "
                         "'contenttypes.ContentType' as the 'content_type' field."
@@ -221,7 +222,9 @@ class GenericRelationTests(SimpleTestCase):
                     "Field defines a relation with the model "
                     "'contenttypes_tests.SwappedModel', "
                     "which has been swapped out.",
-                    hint="Update the relation to point at 'settings.TEST_SWAPPED_MODEL'.",
+                    hint=(
+                        "Update the relation to point at 'settings.TEST_SWAPPED_MODEL'."
+                    ),
                     obj=Model.rel.field,
                     id="fields.E301",
                 )

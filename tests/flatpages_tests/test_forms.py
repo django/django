@@ -91,7 +91,10 @@ class FlatpageAdminFormTests(TestCase):
             )
 
     def test_flatpage_admin_form_url_uniqueness_validation(self):
-        "The flatpage admin form correctly enforces url uniqueness among flatpages of the same site"
+        """
+        The flatpage admin form correctly enforces url uniqueness among
+        flatpages of the same site.
+        """
         data = dict(url="/myflatpage1/", **self.form_data)
 
         FlatpageForm(data=data).save()
@@ -105,7 +108,8 @@ class FlatpageAdminFormTests(TestCase):
                 f.errors,
                 {
                     "__all__": [
-                        "Flatpage with url /myflatpage1/ already exists for site example.com"
+                        "Flatpage with url /myflatpage1/ already exists for site "
+                        "example.com"
                     ]
                 },
             )

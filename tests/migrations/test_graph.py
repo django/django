@@ -240,7 +240,10 @@ class GraphTests(SimpleTestCase):
         graph.add_node(("app_b", "0001"), None)
         graph.add_dependency("app_a.0003", ("app_a", "0003"), ("app_a", "0002"))
         graph.add_dependency("app_a.0002", ("app_a", "0002"), ("app_a", "0001"))
-        msg = "Migration app_a.0001 dependencies reference nonexistent parent node ('app_b', '0002')"
+        msg = (
+            "Migration app_a.0001 dependencies reference nonexistent parent node "
+            "('app_b', '0002')"
+        )
         with self.assertRaisesMessage(NodeNotFoundError, msg):
             graph.add_dependency("app_a.0001", ("app_a", "0001"), ("app_b", "0002"))
 
@@ -251,7 +254,10 @@ class GraphTests(SimpleTestCase):
         # Build graph
         graph = MigrationGraph()
         graph.add_node(("app_a", "0001"), None)
-        msg = "Migration app_a.0002 dependencies reference nonexistent child node ('app_a', '0002')"
+        msg = (
+            "Migration app_a.0002 dependencies reference nonexistent child node "
+            "('app_a', '0002')"
+        )
         with self.assertRaisesMessage(NodeNotFoundError, msg):
             graph.add_dependency("app_a.0002", ("app_a", "0002"), ("app_a", "0001"))
 
@@ -261,7 +267,10 @@ class GraphTests(SimpleTestCase):
         graph.add_dependency(
             "app_a.0001", ("app_a", "0001"), ("app_b", "0002"), skip_validation=True
         )
-        msg = "Migration app_a.0001 dependencies reference nonexistent parent node ('app_b', '0002')"
+        msg = (
+            "Migration app_a.0001 dependencies reference nonexistent parent node "
+            "('app_b', '0002')"
+        )
         with self.assertRaisesMessage(NodeNotFoundError, msg):
             graph.validate_consistency()
 
@@ -271,7 +280,10 @@ class GraphTests(SimpleTestCase):
         graph.add_dependency(
             "app_b.0002", ("app_a", "0001"), ("app_b", "0002"), skip_validation=True
         )
-        msg = "Migration app_b.0002 dependencies reference nonexistent child node ('app_a', '0001')"
+        msg = (
+            "Migration app_b.0002 dependencies reference nonexistent child node "
+            "('app_a', '0001')"
+        )
         with self.assertRaisesMessage(NodeNotFoundError, msg):
             graph.validate_consistency()
 
@@ -323,8 +335,8 @@ class GraphTests(SimpleTestCase):
         )
         # Try replacing before replacement node exists.
         msg = (
-            "Unable to find replacement node ('app_a', '0001_squashed_0002'). It was either"
-            " never added to the migration graph, or has been removed."
+            "Unable to find replacement node ('app_a', '0001_squashed_0002'). It was "
+            "either never added to the migration graph, or has been removed."
         )
         with self.assertRaisesMessage(NodeNotFoundError, msg):
             graph.remove_replaced_nodes(
@@ -387,7 +399,8 @@ class GraphTests(SimpleTestCase):
         child_node = graph.node_map[("app_b", "0001")]
         self.assertIn(child_node, replaced_node.children)
         self.assertIn(replaced_node, child_node.parents)
-        # Ensure child dependency hasn't also gotten remapped to the other replaced node.
+        # Child dependency hasn't also gotten remapped to the other replaced
+        # node.
         other_replaced_node = graph.node_map[("app_a", "0001")]
         self.assertNotIn(child_node, other_replaced_node.children)
         self.assertNotIn(other_replaced_node, child_node.parents)

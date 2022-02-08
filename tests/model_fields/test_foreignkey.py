@@ -40,8 +40,12 @@ class ForeignKeyTests(TestCase):
         model = FKUniqueTrue()
         expected_warnings = [
             checks.Warning(
-                "Setting unique=True on a ForeignKey has the same effect as using a OneToOneField.",
-                hint="ForeignKey(unique=True) is usually better served by a OneToOneField.",
+                "Setting unique=True on a ForeignKey has the same effect as using a "
+                "OneToOneField.",
+                hint=(
+                    "ForeignKey(unique=True) is usually better served by a "
+                    "OneToOneField."
+                ),
                 obj=FKUniqueTrue.fk_field.field,
                 id="fields.W342",
             )

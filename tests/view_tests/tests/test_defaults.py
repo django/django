@@ -111,8 +111,11 @@ class DefaultsTests(TestCase):
                         (
                             "django.template.loaders.locmem.Loader",
                             {
-                                "404.html": "This is a test template for a 404 error "
-                                "(path: {{ request_path }}, exception: {{ exception }}).",
+                                "404.html": (
+                                    "This is a test template for a 404 error "
+                                    "(path: {{ request_path }}, "
+                                    "exception: {{ exception }})."
+                                ),
                                 "500.html": "This is a test template for a 500 error.",
                             },
                         ),

@@ -384,11 +384,16 @@ class GDALRasterTests(SimpleTestCase):
         ]:
             self.assertIn(line, info_lines)
         for line in [
-            r'Upper Left  \(  511700.468,  435103.377\) \( 82d51\'46.1\d"W, 27d55\' 1.5\d"N\)',
-            r'Lower Left  \(  511700.468,  417703.377\) \( 82d51\'52.0\d"W, 27d45\'37.5\d"N\)',
-            r'Upper Right \(  528000.468,  435103.377\) \( 82d41\'48.8\d"W, 27d54\'56.3\d"N\)',
-            r'Lower Right \(  528000.468,  417703.377\) \( 82d41\'55.5\d"W, 27d45\'32.2\d"N\)',
-            r'Center      \(  519850.468,  426403.377\) \( 82d46\'50.6\d"W, 27d50\'16.9\d"N\)',
+            r"Upper Left  \(  511700.468,  435103.377\) "
+            r'\( 82d51\'46.1\d"W, 27d55\' 1.5\d"N\)',
+            r"Lower Left  \(  511700.468,  417703.377\) "
+            r'\( 82d51\'52.0\d"W, 27d45\'37.5\d"N\)',
+            r"Upper Right \(  528000.468,  435103.377\) "
+            r'\( 82d41\'48.8\d"W, 27d54\'56.3\d"N\)',
+            r"Lower Right \(  528000.468,  417703.377\) "
+            r'\( 82d41\'55.5\d"W, 27d45\'32.2\d"N\)',
+            r"Center      \(  519850.468,  426403.377\) "
+            r'\( 82d46\'50.6\d"W, 27d50\'16.9\d"N\)',
         ]:
             self.assertRegex(infos, line)
         # CRS (skip the name because string depends on the GDAL/Proj versions).
