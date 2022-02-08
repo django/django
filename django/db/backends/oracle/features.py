@@ -67,45 +67,45 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_json_field_contains = False
     supports_collation_on_textfield = False
     test_collations = {
-        'ci': 'BINARY_CI',
-        'cs': 'BINARY',
-        'non_default': 'SWEDISH_CI',
-        'swedish_ci': 'SWEDISH_CI',
+        "ci": "BINARY_CI",
+        "cs": "BINARY",
+        "non_default": "SWEDISH_CI",
+        "swedish_ci": "SWEDISH_CI",
     }
     test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
 
     django_test_skips = {
         "Oracle doesn't support SHA224.": {
-            'db_functions.text.test_sha224.SHA224Tests.test_basic',
-            'db_functions.text.test_sha224.SHA224Tests.test_transform',
+            "db_functions.text.test_sha224.SHA224Tests.test_basic",
+            "db_functions.text.test_sha224.SHA224Tests.test_transform",
         },
         "Oracle doesn't support bitwise XOR.": {
-            'expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor',
-            'expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor_null',
+            "expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor",
+            "expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor_null",
         },
         "Oracle requires ORDER BY in row_number, ANSI:SQL doesn't.": {
-            'expressions_window.tests.WindowFunctionTests.test_row_number_no_ordering',
+            "expressions_window.tests.WindowFunctionTests.test_row_number_no_ordering",
         },
-        'Raises ORA-00600: internal error code.': {
-            'model_fields.test_jsonfield.TestQuerying.test_usage_in_subquery',
+        "Raises ORA-00600: internal error code.": {
+            "model_fields.test_jsonfield.TestQuerying.test_usage_in_subquery",
         },
     }
     django_test_expected_failures = {
         # A bug in Django/cx_Oracle with respect to string handling (#23843).
-        'annotations.tests.NonAggregateAnnotationTestCase.test_custom_functions',
-        'annotations.tests.NonAggregateAnnotationTestCase.test_custom_functions_can_ref_other_functions',
+        "annotations.tests.NonAggregateAnnotationTestCase.test_custom_functions",
+        "annotations.tests.NonAggregateAnnotationTestCase.test_custom_functions_can_ref_other_functions",
     }
 
     @cached_property
     def introspected_field_types(self):
         return {
             **super().introspected_field_types,
-            'GenericIPAddressField': 'CharField',
-            'PositiveBigIntegerField': 'BigIntegerField',
-            'PositiveIntegerField': 'IntegerField',
-            'PositiveSmallIntegerField': 'IntegerField',
-            'SmallIntegerField': 'IntegerField',
-            'TimeField': 'DateTimeField',
+            "GenericIPAddressField": "CharField",
+            "PositiveBigIntegerField": "BigIntegerField",
+            "PositiveIntegerField": "IntegerField",
+            "PositiveSmallIntegerField": "IntegerField",
+            "SmallIntegerField": "IntegerField",
+            "TimeField": "DateTimeField",
         }
 
     @cached_property

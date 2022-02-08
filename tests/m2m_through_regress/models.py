@@ -4,16 +4,16 @@ from django.db import models
 
 # Forward declared intermediate model
 class Membership(models.Model):
-    person = models.ForeignKey('Person', models.CASCADE)
-    group = models.ForeignKey('Group', models.CASCADE)
+    person = models.ForeignKey("Person", models.CASCADE)
+    group = models.ForeignKey("Group", models.CASCADE)
     price = models.IntegerField(default=100)
 
 
 # using custom id column to test ticket #11107
 class UserMembership(models.Model):
-    id = models.AutoField(db_column='usermembership_id', primary_key=True)
+    id = models.AutoField(db_column="usermembership_id", primary_key=True)
     user = models.ForeignKey(User, models.CASCADE)
-    group = models.ForeignKey('Group', models.CASCADE)
+    group = models.ForeignKey("Group", models.CASCADE)
     price = models.IntegerField(default=100)
 
 
@@ -28,7 +28,7 @@ class Group(models.Model):
     name = models.CharField(max_length=128)
     # Membership object defined as a class
     members = models.ManyToManyField(Person, through=Membership)
-    user_members = models.ManyToManyField(User, through='UserMembership')
+    user_members = models.ManyToManyField(User, through="UserMembership")
 
     def __str__(self):
         return self.name
@@ -37,7 +37,7 @@ class Group(models.Model):
 # Using to_field on the through model
 class Car(models.Model):
     make = models.CharField(max_length=20, unique=True, null=True)
-    drivers = models.ManyToManyField('Driver', through='CarDriver')
+    drivers = models.ManyToManyField("Driver", through="CarDriver")
 
     def __str__(self):
         return str(self.make)
@@ -47,15 +47,15 @@ class Driver(models.Model):
     name = models.CharField(max_length=20, unique=True, null=True)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
     def __str__(self):
         return str(self.name)
 
 
 class CarDriver(models.Model):
-    car = models.ForeignKey('Car', models.CASCADE, to_field='make')
-    driver = models.ForeignKey('Driver', models.CASCADE, to_field='name')
+    car = models.ForeignKey("Car", models.CASCADE, to_field="make")
+    driver = models.ForeignKey("Driver", models.CASCADE, to_field="name")
 
     def __str__(self):
         return "pk=%s car=%s driver=%s" % (str(self.pk), self.car, self.driver)
@@ -64,13 +64,13 @@ class CarDriver(models.Model):
 # Through models using multi-table inheritance
 class Event(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    people = models.ManyToManyField('Person', through='IndividualCompetitor')
+    people = models.ManyToManyField("Person", through="IndividualCompetitor")
     special_people = models.ManyToManyField(
-        'Person',
-        through='ProxiedIndividualCompetitor',
-        related_name='special_event_set',
+        "Person",
+        through="ProxiedIndividualCompetitor",
+        related_name="special_event_set",
     )
-    teams = models.ManyToManyField('Group', through='CompetingTeam')
+    teams = models.ManyToManyField("Group", through="CompetingTeam")
 
 
 class Competitor(models.Model):

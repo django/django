@@ -15,13 +15,14 @@ class TestConnectionOnCommit(TransactionTestCase):
     Creation/checking of database objects in parallel with callback tracking is
     to verify that the behavior of the two match in all tested cases.
     """
-    available_apps = ['transaction_hooks']
+
+    available_apps = ["transaction_hooks"]
 
     def setUp(self):
         self.notified = []
 
     def notify(self, id_):
-        if id_ == 'error':
+        if id_ == "error":
             raise ForcedError()
         self.notified.append(id_)
 
@@ -163,7 +164,7 @@ class TestConnectionOnCommit(TransactionTestCase):
 
         self.assertDone([2])
 
-    @skipUnlessDBFeature('test_db_allows_multiple_connections')
+    @skipUnlessDBFeature("test_db_allows_multiple_connections")
     def test_hooks_cleared_on_reconnect(self):
         with transaction.atomic():
             self.do(1)
@@ -179,7 +180,7 @@ class TestConnectionOnCommit(TransactionTestCase):
     def test_error_in_hook_doesnt_prevent_clearing_hooks(self):
         try:
             with transaction.atomic():
-                transaction.on_commit(lambda: self.notify('error'))
+                transaction.on_commit(lambda: self.notify("error"))
         except ForcedError:
             pass
 
@@ -224,11 +225,11 @@ class TestConnectionOnCommit(TransactionTestCase):
 
     def test_raises_exception_non_autocommit_mode(self):
         def should_never_be_called():
-            raise AssertionError('this function should never be called')
+            raise AssertionError("this function should never be called")
 
         try:
             connection.set_autocommit(False)
-            msg = 'on_commit() cannot be used in manual transaction management'
+            msg = "on_commit() cannot be used in manual transaction management"
             with self.assertRaisesMessage(transaction.TransactionManagementError, msg):
                 transaction.on_commit(should_never_be_called)
         finally:

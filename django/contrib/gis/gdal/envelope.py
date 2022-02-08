@@ -20,11 +20,12 @@ from django.contrib.gis.gdal.error import GDALException
 #   https://gdal.org/doxygen/ogr__core_8h_source.html
 class OGREnvelope(Structure):
     "Represent the OGREnvelope C Structure."
-    _fields_ = [("MinX", c_double),
-                ("MaxX", c_double),
-                ("MinY", c_double),
-                ("MaxY", c_double),
-                ]
+    _fields_ = [
+        ("MinX", c_double),
+        ("MaxX", c_double),
+        ("MinY", c_double),
+        ("MaxY", c_double),
+    ]
 
 
 class Envelope:
@@ -47,23 +48,25 @@ class Envelope:
             elif isinstance(args[0], (tuple, list)):
                 # A tuple was passed in.
                 if len(args[0]) != 4:
-                    raise GDALException('Incorrect number of tuple elements (%d).' % len(args[0]))
+                    raise GDALException(
+                        "Incorrect number of tuple elements (%d)." % len(args[0])
+                    )
                 else:
                     self._from_sequence(args[0])
             else:
-                raise TypeError('Incorrect type of argument: %s' % type(args[0]))
+                raise TypeError("Incorrect type of argument: %s" % type(args[0]))
         elif len(args) == 4:
             # Individual parameters passed in.
             #  Thanks to ww for the help
             self._from_sequence([float(a) for a in args])
         else:
-            raise GDALException('Incorrect number (%d) of arguments.' % len(args))
+            raise GDALException("Incorrect number (%d) of arguments." % len(args))
 
         # Checking the x,y coordinates
         if self.min_x > self.max_x:
-            raise GDALException('Envelope minimum X > maximum X.')
+            raise GDALException("Envelope minimum X > maximum X.")
         if self.min_y > self.max_y:
-            raise GDALException('Envelope minimum Y > maximum Y.')
+            raise GDALException("Envelope minimum Y > maximum Y.")
 
     def __eq__(self, other):
         """
@@ -71,13 +74,21 @@ class Envelope:
         other Envelopes and 4-tuples.
         """
         if isinstance(other, Envelope):
-            return (self.min_x == other.min_x) and (self.min_y == other.min_y) and \
-                   (self.max_x == other.max_x) and (self.max_y == other.max_y)
+            return (
+                (self.min_x == other.min_x)
+                and (self.min_y == other.min_y)
+                and (self.max_x == other.max_x)
+                and (self.max_y == other.max_y)
+            )
         elif isinstance(other, tuple) and len(other) == 4:
-            return (self.min_x == other[0]) and (self.min_y == other[1]) and \
-                   (self.max_x == other[2]) and (self.max_y == other[3])
+            return (
+                (self.min_x == other[0])
+                and (self.min_y == other[1])
+                and (self.max_x == other[2])
+                and (self.max_y == other[3])
+            )
         else:
-            raise GDALException('Equivalence testing only works with other Envelopes.')
+            raise GDALException("Equivalence testing only works with other Envelopes.")
 
     def __str__(self):
         "Return a string representation of the tuple."
@@ -104,12 +115,16 @@ class Envelope:
         if len(args) == 1:
             if isinstance(args[0], Envelope):
                 return self.expand_to_include(args[0].tuple)
-            elif hasattr(args[0], 'x') and hasattr(args[0], 'y'):
-                return self.expand_to_include(args[0].x, args[0].y, args[0].x, args[0].y)
+            elif hasattr(args[0], "x") and hasattr(args[0], "y"):
+                return self.expand_to_include(
+                    args[0].x, args[0].y, args[0].x, args[0].y
+                )
             elif isinstance(args[0], (tuple, list)):
                 # A tuple was passed in.
                 if len(args[0]) == 2:
-                    return self.expand_to_include((args[0][0], args[0][1], args[0][0], args[0][1]))
+                    return self.expand_to_include(
+                        (args[0][0], args[0][1], args[0][0], args[0][1])
+                    )
                 elif len(args[0]) == 4:
                     (minx, miny, maxx, maxy) = args[0]
                     if minx < self._envelope.MinX:
@@ -121,9 +136,11 @@ class Envelope:
                     if maxy > self._envelope.MaxY:
                         self._envelope.MaxY = maxy
                 else:
-                    raise GDALException('Incorrect number of tuple elements (%d).' % len(args[0]))
+                    raise GDALException(
+                        "Incorrect number of tuple elements (%d)." % len(args[0])
+                    )
             else:
-                raise TypeError('Incorrect type of argument: %s' % type(args[0]))
+                raise TypeError("Incorrect type of argument: %s" % type(args[0]))
         elif len(args) == 2:
             # An x and an y parameter were passed in
             return self.expand_to_include((args[0], args[1], args[0], args[1]))
@@ -131,7 +148,7 @@ class Envelope:
             # Individual parameters passed in.
             return self.expand_to_include(args)
         else:
-            raise GDALException('Incorrect number (%d) of arguments.' % len(args[0]))
+            raise GDALException("Incorrect number (%d) of arguments." % len(args[0]))
 
     @property
     def min_x(self):
@@ -172,7 +189,15 @@ class Envelope:
     def wkt(self):
         "Return WKT representing a Polygon for this envelope."
         # TODO: Fix significant figures.
-        return 'POLYGON((%s %s,%s %s,%s %s,%s %s,%s %s))' % \
-               (self.min_x, self.min_y, self.min_x, self.max_y,
-                self.max_x, self.max_y, self.max_x, self.min_y,
-                self.min_x, self.min_y)
+        return "POLYGON((%s %s,%s %s,%s %s,%s %s,%s %s))" % (
+            self.min_x,
+            self.min_y,
+            self.min_x,
+            self.max_y,
+            self.max_x,
+            self.max_y,
+            self.max_x,
+            self.min_y,
+            self.min_x,
+            self.min_y,
+        )

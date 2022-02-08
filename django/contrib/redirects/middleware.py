@@ -13,7 +13,7 @@ class RedirectFallbackMiddleware(MiddlewareMixin):
     response_redirect_class = HttpResponsePermanentRedirect
 
     def __init__(self, get_response):
-        if not apps.is_installed('django.contrib.sites'):
+        if not apps.is_installed("django.contrib.sites"):
             raise ImproperlyConfigured(
                 "You cannot use RedirectFallbackMiddleware when "
                 "django.contrib.sites is not installed."
@@ -33,7 +33,7 @@ class RedirectFallbackMiddleware(MiddlewareMixin):
             r = Redirect.objects.get(site=current_site, old_path=full_path)
         except Redirect.DoesNotExist:
             pass
-        if r is None and settings.APPEND_SLASH and not request.path.endswith('/'):
+        if r is None and settings.APPEND_SLASH and not request.path.endswith("/"):
             try:
                 r = Redirect.objects.get(
                     site=current_site,
@@ -42,7 +42,7 @@ class RedirectFallbackMiddleware(MiddlewareMixin):
             except Redirect.DoesNotExist:
                 pass
         if r is not None:
-            if r.new_path == '':
+            if r.new_path == "":
                 return self.response_gone_class()
             return self.response_redirect_class(r.new_path)
 

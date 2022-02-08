@@ -9,6 +9,7 @@ class TestSerializeMixin(SimpleTestCase):
             "base class."
         )
         with self.assertRaisesMessage(ValueError, msg):
+
             class ExampleTests(SerializeMixin, SimpleTestCase):
                 pass
 

@@ -4,14 +4,14 @@ from .models import City
 
 
 class TestGeoRSS1(feeds.Feed):
-    link = '/city/'
-    title = 'Test GeoDjango Cities'
+    link = "/city/"
+    title = "Test GeoDjango Cities"
 
     def items(self):
         return City.objects.all()
 
     def item_link(self, item):
-        return '/city/%s/' % item.pk
+        return "/city/%s/" % item.pk
 
     def item_geometry(self, item):
         return item.point
@@ -56,16 +56,17 @@ class TestW3CGeo3(TestGeoRSS1):
 
     def item_geometry(self, item):
         from django.contrib.gis.geos import Polygon
+
         return Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
 
 
 # The feed dictionary to use for URLs.
 feed_dict = {
-    'rss1': TestGeoRSS1,
-    'rss2': TestGeoRSS2,
-    'atom1': TestGeoAtom1,
-    'atom2': TestGeoAtom2,
-    'w3cgeo1': TestW3CGeo1,
-    'w3cgeo2': TestW3CGeo2,
-    'w3cgeo3': TestW3CGeo3,
+    "rss1": TestGeoRSS1,
+    "rss2": TestGeoRSS2,
+    "atom1": TestGeoAtom1,
+    "atom2": TestGeoAtom2,
+    "w3cgeo1": TestW3CGeo1,
+    "w3cgeo2": TestW3CGeo2,
+    "w3cgeo3": TestW3CGeo3,
 }

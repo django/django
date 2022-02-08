@@ -23,6 +23,7 @@ class SafeString(str, SafeData):
     A str subclass that has been specifically marked as "safe" for HTML output
     purposes.
     """
+
     def __add__(self, rhs):
         """
         Concatenating a safe string with another safe bytestring or
@@ -44,6 +45,7 @@ def _safety_decorator(safety_marker, func):
     @wraps(func)
     def wrapped(*args, **kwargs):
         return safety_marker(func(*args, **kwargs))
+
     return wrapped
 
 
@@ -56,7 +58,7 @@ def mark_safe(s):
 
     Can be called multiple times on a single string.
     """
-    if hasattr(s, '__html__'):
+    if hasattr(s, "__html__"):
         return s
     if callable(s):
         return _safety_decorator(mark_safe, s)

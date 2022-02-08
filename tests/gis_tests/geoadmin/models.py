@@ -8,14 +8,14 @@ class City(models.Model):
     point = models.PointField()
 
     class Meta:
-        app_label = 'geoadmin'
+        app_label = "geoadmin"
 
     def __str__(self):
         return self.name
 
 
-site = admin.AdminSite(name='gis_admin_modeladmin')
+site = admin.AdminSite(name="gis_admin_modeladmin")
 site.register(City, admin.ModelAdmin)
 
-site_gis = admin.AdminSite(name='gis_admin_gismodeladmin')
+site_gis = admin.AdminSite(name="gis_admin_gismodeladmin")
 site_gis.register(City, admin.GISModelAdmin)

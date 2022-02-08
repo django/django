@@ -46,11 +46,14 @@ class GeometryCollection(GEOSGeometry):
     # ### Methods for compatibility with ListMixin ###
     def _create_collection(self, length, items):
         # Creating the geometry pointer array.
-        geoms = (GEOM_PTR * length)(*[
-            # this is a little sloppy, but makes life easier
-            # allow GEOSGeometry types (python wrappers) or pointer types
-            capi.geom_clone(getattr(g, 'ptr', g)) for g in items
-        ])
+        geoms = (GEOM_PTR * length)(
+            *[
+                # this is a little sloppy, but makes life easier
+                # allow GEOSGeometry types (python wrappers) or pointer types
+                capi.geom_clone(getattr(g, "ptr", g))
+                for g in items
+            ]
+        )
         return capi.create_collection(self._typeid, geoms, length)
 
     def _get_single_internal(self, index):
@@ -59,7 +62,9 @@ class GeometryCollection(GEOSGeometry):
     def _get_single_external(self, index):
         "Return the Geometry from this Collection at the given index (0-based)."
         # Checking the index and returning the corresponding GEOS geometry.
-        return GEOSGeometry(capi.geom_clone(self._get_single_internal(index)), srid=self.srid)
+        return GEOSGeometry(
+            capi.geom_clone(self._get_single_internal(index)), srid=self.srid
+        )
 
     def _set_list(self, length, items):
         "Create a new collection, and destroy the contents of the previous pointer."
@@ -76,12 +81,13 @@ class GeometryCollection(GEOSGeometry):
     @property
     def kml(self):
         "Return the KML for this Geometry Collection."
-        return '<MultiGeometry>%s</MultiGeometry>' % ''.join(g.kml for g in self)
+        return "<MultiGeometry>%s</MultiGeometry>" % "".join(g.kml for g in self)
 
     @property
     def tuple(self):
         "Return a tuple of all the coordinates in this Geometry Collection"
         return tuple(g.tuple for g in self)
+
     coords = tuple
 
 
@@ -103,4 +109,12 @@ class MultiPolygon(GeometryCollection):
 
 # Setting the allowed types here since GeometryCollection is defined before
 # its subclasses.
-GeometryCollection._allowed = (Point, LineString, LinearRing, Polygon, MultiPoint, MultiLineString, MultiPolygon)
+GeometryCollection._allowed = (
+    Point,
+    LineString,
+    LinearRing,
+    Polygon,
+    MultiPoint,
+    MultiLineString,
+    MultiPolygon,
+)

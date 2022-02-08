@@ -13,16 +13,16 @@ from .base import BaseEngine
 
 class DjangoTemplates(BaseEngine):
 
-    app_dirname = 'templates'
+    app_dirname = "templates"
 
     def __init__(self, params):
         params = params.copy()
-        options = params.pop('OPTIONS').copy()
-        options.setdefault('autoescape', True)
-        options.setdefault('debug', settings.DEBUG)
-        options.setdefault('file_charset', 'utf-8')
-        libraries = options.get('libraries', {})
-        options['libraries'] = self.get_templatetag_libraries(libraries)
+        options = params.pop("OPTIONS").copy()
+        options.setdefault("autoescape", True)
+        options.setdefault("debug", settings.DEBUG)
+        options.setdefault("file_charset", "utf-8")
+        libraries = options.get("libraries", {})
+        options["libraries"] = self.get_templatetag_libraries(libraries)
         super().__init__(params)
         self.engine = Engine(self.dirs, self.app_dirs, **options)
 
@@ -46,7 +46,6 @@ class DjangoTemplates(BaseEngine):
 
 
 class Template:
-
     def __init__(self, template, backend):
         self.template = template
         self.backend = backend
@@ -56,7 +55,9 @@ class Template:
         return self.template.origin
 
     def render(self, context=None, request=None):
-        context = make_context(context, request, autoescape=self.backend.engine.autoescape)
+        context = make_context(
+            context, request, autoescape=self.backend.engine.autoescape
+        )
         try:
             return self.template.render(context)
         except TemplateDoesNotExist as exc:
@@ -71,7 +72,7 @@ def copy_exception(exc, backend=None):
     """
     backend = backend or exc.backend
     new = exc.__class__(*exc.args, tried=exc.tried, backend=backend, chain=exc.chain)
-    if hasattr(exc, 'template_debug'):
+    if hasattr(exc, "template_debug"):
         new.template_debug = exc.template_debug
     return new
 
@@ -92,10 +93,10 @@ def get_installed_libraries():
     django.templatetags.i18n is stored as i18n.
     """
     libraries = {}
-    candidates = ['django.templatetags']
+    candidates = ["django.templatetags"]
     candidates.extend(
-        '%s.templatetags' % app_config.name
-        for app_config in apps.get_app_configs())
+        "%s.templatetags" % app_config.name for app_config in apps.get_app_configs()
+    )
 
     for candidate in candidates:
         try:
@@ -104,9 +105,9 @@ def get_installed_libraries():
             # No templatetags package defined. This is safe to ignore.
             continue
 
-        if hasattr(pkg, '__path__'):
+        if hasattr(pkg, "__path__"):
             for name in get_package_libraries(pkg):
-                libraries[name[len(candidate) + 1:]] = name
+                libraries[name[len(candidate) + 1 :]] = name
 
     return libraries
 
@@ -116,7 +117,7 @@ def get_package_libraries(pkg):
     Recursively yield template tag libraries defined in submodules of a
     package.
     """
-    for entry in walk_packages(pkg.__path__, pkg.__name__ + '.'):
+    for entry in walk_packages(pkg.__path__, pkg.__name__ + "."):
         try:
             module = import_module(entry[1])
         except ImportError as e:
@@ -125,5 +126,5 @@ def get_package_libraries(pkg):
                 "trying to load '%s': %s" % (entry[1], e)
             ) from e
 
-        if hasattr(module, 'register'):
+        if hasattr(module, "register"):
             yield entry[1]

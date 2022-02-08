@@ -17,7 +17,7 @@ class Numbers:
 class PreviousDjangoVersionQuerySet(models.QuerySet):
     def __getstate__(self):
         state = super().__getstate__()
-        state[DJANGO_VERSION_PICKLE_KEY] = '1.0'
+        state[DJANGO_VERSION_PICKLE_KEY] = "1.0"
         return state
 
 
@@ -29,7 +29,7 @@ class MissingDjangoVersionQuerySet(models.QuerySet):
 
 
 class Group(models.Model):
-    name = models.CharField(_('name'), max_length=100)
+    name = models.CharField(_("name"), max_length=100)
     objects = models.Manager()
     previous_django_version_objects = PreviousDjangoVersionQuerySet.as_manager()
     missing_django_version_objects = MissingDjangoVersionQuerySet.as_manager()
@@ -68,7 +68,7 @@ class M2MModel(models.Model):
 class AbstractEvent(Event):
     class Meta:
         abstract = True
-        ordering = ['title']
+        ordering = ["title"]
 
 
 class MyEvent(AbstractEvent):
@@ -76,4 +76,4 @@ class MyEvent(AbstractEvent):
 
 
 class Edition(models.Model):
-    event = models.ForeignKey('MyEvent', on_delete=models.CASCADE)
+    event = models.ForeignKey("MyEvent", on_delete=models.CASCADE)

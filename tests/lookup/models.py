@@ -13,7 +13,7 @@ class Alarm(models.Model):
     time = models.TimeField()
 
     def __str__(self):
-        return '%s (%s)' % (self.time, self.desc)
+        return "%s (%s)" % (self.time, self.desc)
 
 
 class Author(models.Model):
@@ -21,7 +21,7 @@ class Author(models.Model):
     alias = models.CharField(max_length=50, null=True, blank=True)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
 
 class Article(models.Model):
@@ -31,7 +31,7 @@ class Article(models.Model):
     slug = models.SlugField(unique=True, blank=True, null=True)
 
     class Meta:
-        ordering = ('-pub_date', 'headline')
+        ordering = ("-pub_date", "headline")
 
     def __str__(self):
         return self.headline
@@ -42,23 +42,23 @@ class Tag(models.Model):
     name = models.CharField(max_length=100)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
 
 class NulledTextField(models.TextField):
     def get_prep_value(self, value):
-        return None if value == '' else value
+        return None if value == "" else value
 
 
 @NulledTextField.register_lookup
 class NulledTransform(models.Transform):
-    lookup_name = 'nulled'
-    template = 'NULL'
+    lookup_name = "nulled"
+    template = "NULL"
 
 
 @NulledTextField.register_lookup
 class IsNullWithNoneAsRHS(IsNull):
-    lookup_name = 'isnull_none_rhs'
+    lookup_name = "isnull_none_rhs"
     can_use_none_as_rhs = True
 
 
@@ -69,7 +69,7 @@ class Season(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['year'], name='season_year_unique'),
+            models.UniqueConstraint(fields=["year"], name="season_year_unique"),
         ]
 
     def __str__(self):
@@ -77,14 +77,14 @@ class Season(models.Model):
 
 
 class Game(models.Model):
-    season = models.ForeignKey(Season, models.CASCADE, related_name='games')
+    season = models.ForeignKey(Season, models.CASCADE, related_name="games")
     home = models.CharField(max_length=100)
     away = models.CharField(max_length=100)
 
 
 class Player(models.Model):
     name = models.CharField(max_length=100)
-    games = models.ManyToManyField(Game, related_name='players')
+    games = models.ManyToManyField(Game, related_name="players")
 
 
 class Product(models.Model):
@@ -104,7 +104,7 @@ class Freebie(models.Model):
 
     stock = models.ForeignObject(
         Stock,
-        from_fields=['stock_id', 'gift_product'],
-        to_fields=['id', 'product'],
+        from_fields=["stock_id", "gift_product"],
+        to_fields=["id", "product"],
         on_delete=models.CASCADE,
     )

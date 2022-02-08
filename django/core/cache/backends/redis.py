@@ -14,6 +14,7 @@ class RedisSerializer(PickleSerializer):
     Similar to PickSerializer, except integers are serialized as native Redis
     integers for better incr() and decr() atomicity.
     """
+
     def dumps(self, obj):
         # Only skip pickling for integers, a int subclasses as bool should be
         # pickled.
@@ -59,7 +60,7 @@ class RedisCacheClient:
             parser_class = import_string(parser_class)
         parser_class = parser_class or self._lib.connection.DefaultParser
 
-        self._pool_options = {'parser_class': parser_class, 'db': db}
+        self._pool_options = {"parser_class": parser_class, "db": db}
 
     def _get_connection_pool_index(self, write):
         # Write to the first server. Read from other servers if there are more,
@@ -72,7 +73,8 @@ class RedisCacheClient:
         index = self._get_connection_pool_index(write)
         if index not in self._pools:
             self._pools[index] = self._pool_class.from_url(
-                self._servers[index], **self._pool_options,
+                self._servers[index],
+                **self._pool_options,
             )
         return self._pools[index]
 
@@ -160,12 +162,12 @@ class RedisCache(BaseCache):
     def __init__(self, server, params):
         super().__init__(params)
         if isinstance(server, str):
-            self._servers = re.split('[;,]', server)
+            self._servers = re.split("[;,]", server)
         else:
             self._servers = server
 
         self._class = RedisCacheClient
-        self._options = params.get('OPTIONS', {})
+        self._options = params.get("OPTIONS", {})
 
     @cached_property
     def _cache(self):
@@ -199,7 +201,9 @@ class RedisCache(BaseCache):
         return self._cache.delete(key)
 
     def get_many(self, keys, version=None):
-        key_map = {self.make_and_validate_key(key, version=version): key for key in keys}
+        key_map = {
+            self.make_and_validate_key(key, version=version): key for key in keys
+        }
         ret = self._cache.get_many(key_map.keys())
         return {key_map[k]: v for k, v in ret.items()}
 

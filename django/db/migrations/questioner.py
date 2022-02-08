@@ -33,7 +33,7 @@ class MigrationQuestioner:
         # file check will ensure we skip South ones.
         try:
             app_config = apps.get_app_config(app_label)
-        except LookupError:         # It's a fake app.
+        except LookupError:  # It's a fake app.
             return self.defaults.get("ask_initial", False)
         migrations_import_path, _ = MigrationLoader.migrations_module(app_config.label)
         if migrations_import_path is None:
@@ -81,7 +81,6 @@ class MigrationQuestioner:
 
 
 class InteractiveMigrationQuestioner(MigrationQuestioner):
-
     def _boolean_input(self, question, default=None):
         result = input("%s " % question)
         if not result and default is not None:
@@ -105,7 +104,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                     return value
             result = input("Please select a valid option: ")
 
-    def _ask_default(self, default=''):
+    def _ask_default(self, default=""):
         """
         Prompt for a default value.
 
@@ -113,15 +112,15 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         string) which will be shown to the user and used as the return value
         if the user doesn't provide any other input.
         """
-        print('Please enter the default value as valid Python.')
+        print("Please enter the default value as valid Python.")
         if default:
             print(
                 f"Accept the default '{default}' by pressing 'Enter' or "
                 f"provide another value."
             )
         print(
-            'The datetime and django.utils.timezone modules are available, so '
-            'it is possible to provide e.g. timezone.now as a value.'
+            "The datetime and django.utils.timezone modules are available, so "
+            "it is possible to provide e.g. timezone.now as a value."
         )
         print("Type 'exit' to exit this prompt")
         while True:
@@ -138,7 +137,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 sys.exit(1)
             else:
                 try:
-                    return eval(code, {}, {'datetime': datetime, 'timezone': timezone})
+                    return eval(code, {}, {"datetime": datetime, "timezone": timezone})
                 except (SyntaxError, NameError) as e:
                     print("Invalid input: %s" % e)
 
@@ -152,10 +151,12 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 f"rows.\n"
                 f"Please select a fix:",
                 [
-                    ("Provide a one-off default now (will be set on all existing "
-                     "rows with a null value for this column)"),
-                    'Quit and manually define a default value in models.py.',
-                ]
+                    (
+                        "Provide a one-off default now (will be set on all existing "
+                        "rows with a null value for this column)"
+                    ),
+                    "Quit and manually define a default value in models.py.",
+                ],
             )
             if choice == 2:
                 sys.exit(3)
@@ -173,13 +174,15 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 f"populate existing rows.\n"
                 f"Please select a fix:",
                 [
-                    ("Provide a one-off default now (will be set on all existing "
-                     "rows with a null value for this column)"),
-                    'Ignore for now. Existing rows that contain NULL values '
-                    'will have to be handled manually, for example with a '
-                    'RunPython or RunSQL operation.',
-                    'Quit and manually define a default value in models.py.',
-                ]
+                    (
+                        "Provide a one-off default now (will be set on all existing "
+                        "rows with a null value for this column)"
+                    ),
+                    "Ignore for now. Existing rows that contain NULL values "
+                    "will have to be handled manually, for example with a "
+                    "RunPython or RunSQL operation.",
+                    "Quit and manually define a default value in models.py.",
+                ],
             )
             if choice == 2:
                 return NOT_PROVIDED
@@ -191,21 +194,33 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
 
     def ask_rename(self, model_name, old_name, new_name, field_instance):
         """Was this field really renamed?"""
-        msg = 'Was %s.%s renamed to %s.%s (a %s)? [y/N]'
-        return self._boolean_input(msg % (model_name, old_name, model_name, new_name,
-                                          field_instance.__class__.__name__), False)
+        msg = "Was %s.%s renamed to %s.%s (a %s)? [y/N]"
+        return self._boolean_input(
+            msg
+            % (
+                model_name,
+                old_name,
+                model_name,
+                new_name,
+                field_instance.__class__.__name__,
+            ),
+            False,
+        )
 
     def ask_rename_model(self, old_model_state, new_model_state):
         """Was this model really renamed?"""
-        msg = 'Was the model %s.%s renamed to %s? [y/N]'
-        return self._boolean_input(msg % (old_model_state.app_label, old_model_state.name,
-                                          new_model_state.name), False)
+        msg = "Was the model %s.%s renamed to %s? [y/N]"
+        return self._boolean_input(
+            msg
+            % (old_model_state.app_label, old_model_state.name, new_model_state.name),
+            False,
+        )
 
     def ask_merge(self, app_label):
         return self._boolean_input(
-            "\nMerging will only work if the operations printed above do not conflict\n" +
-            "with each other (working on different fields or models)\n" +
-            'Should these migration branches be merged? [y/N]',
+            "\nMerging will only work if the operations printed above do not conflict\n"
+            + "with each other (working on different fields or models)\n"
+            + "Should these migration branches be merged? [y/N]",
             False,
         )
 
@@ -218,20 +233,19 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 f"default. This is because the database needs something to "
                 f"populate existing rows.\n",
                 [
-                    'Provide a one-off default now which will be set on all '
-                    'existing rows',
-                    'Quit and manually define a default value in models.py.',
-                ]
+                    "Provide a one-off default now which will be set on all "
+                    "existing rows",
+                    "Quit and manually define a default value in models.py.",
+                ],
             )
             if choice == 2:
                 sys.exit(3)
             else:
-                return self._ask_default(default='timezone.now')
+                return self._ask_default(default="timezone.now")
         return None
 
 
 class NonInteractiveMigrationQuestioner(MigrationQuestioner):
-
     def ask_not_null_addition(self, field_name, model_name):
         # We can't ask the user, so act like the user aborted.
         sys.exit(3)

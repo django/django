@@ -8,15 +8,15 @@ class Artist(models.Model):
     name = models.CharField(max_length=100)
 
     class Meta:
-        ordering = ['name']
-        verbose_name = 'professional artist'
-        verbose_name_plural = 'professional artists'
+        ordering = ["name"]
+        verbose_name = "professional artist"
+        verbose_name_plural = "professional artists"
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('artist_detail', kwargs={'pk': self.id})
+        return reverse("artist_detail", kwargs={"pk": self.id})
 
 
 class Author(models.Model):
@@ -24,7 +24,7 @@ class Author(models.Model):
     slug = models.SlugField()
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
@@ -49,7 +49,7 @@ class Book(models.Model):
     does_not_exist = DoesNotExistBookManager()
 
     class Meta:
-        ordering = ['-pubdate']
+        ordering = ["-pubdate"]
 
     def __str__(self):
         return self.name

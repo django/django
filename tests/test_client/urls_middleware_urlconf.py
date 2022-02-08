@@ -7,5 +7,5 @@ def empty_response(request):
 
 
 urlpatterns = [
-    path('middleware_urlconf_view/', empty_response, name='middleware_urlconf_view'),
+    path("middleware_urlconf_view/", empty_response, name="middleware_urlconf_view"),
 ]

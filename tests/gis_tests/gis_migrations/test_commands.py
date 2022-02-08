@@ -7,6 +7,7 @@ class MigrateTests(TransactionTestCase):
     """
     Tests running the migrate command in Geodjango.
     """
+
     available_apps = ["gis_tests.gis_migrations"]
 
     def get_table_description(self, table):
@@ -52,7 +53,10 @@ class MigrateTests(TransactionTestCase):
             pass
         else:
             qs = GeoColumn.objects.filter(
-                **{'%s__in' % GeoColumn.table_name_col(): ["gis_neighborhood", "gis_household"]}
+                **{
+                    "%s__in"
+                    % GeoColumn.table_name_col(): ["gis_neighborhood", "gis_household"]
+                }
             )
             self.assertEqual(qs.count(), 0)
         # Revert the "unmigration"

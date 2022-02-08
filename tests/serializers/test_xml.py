@@ -72,7 +72,7 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
         self.a1.headline = "HT \u0009, LF \u000A, and CR \u000D are allowed"
         self.assertIn(
             "HT \t, LF \n, and CR \r are allowed",
-            serializers.serialize(self.serializer_name, [self.a1])
+            serializers.serialize(self.serializer_name, [self.a1]),
         )
 
     def test_no_dtd(self):
@@ -84,10 +84,12 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
         """
         xml = '<?xml version="1.0" standalone="no"?><!DOCTYPE example SYSTEM "http://example.com/example.dtd">'
         with self.assertRaises(DTDForbidden):
-            next(serializers.deserialize('xml', xml))
+            next(serializers.deserialize("xml", xml))
 
 
-class XmlSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
+class XmlSerializerTransactionTestCase(
+    SerializersTransactionTestBase, TransactionTestCase
+):
     serializer_name = "xml"
     fwd_ref_str = """<?xml version="1.0" encoding="utf-8"?>
 <django-objects version="1.0">

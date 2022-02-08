@@ -17,6 +17,7 @@ class TestFinders:
     path(s) they find can differ. Compare them using os.path.normcase() to
     avoid false negatives.
     """
+
     def test_find_first(self):
         src, dst = self.find_first
         found = self.finder.find(src)
@@ -34,76 +35,86 @@ class TestFileSystemFinder(TestFinders, StaticFilesTestCase):
     """
     Test FileSystemFinder.
     """
+
     def setUp(self):
         super().setUp()
         self.finder = finders.FileSystemFinder()
-        test_file_path = os.path.join(TEST_ROOT, 'project', 'documents', 'test', 'file.txt')
-        self.find_first = (os.path.join('test', 'file.txt'), test_file_path)
-        self.find_all = (os.path.join('test', 'file.txt'), [test_file_path])
+        test_file_path = os.path.join(
+            TEST_ROOT, "project", "documents", "test", "file.txt"
+        )
+        self.find_first = (os.path.join("test", "file.txt"), test_file_path)
+        self.find_all = (os.path.join("test", "file.txt"), [test_file_path])
 
 
 class TestAppDirectoriesFinder(TestFinders, StaticFilesTestCase):
     """
     Test AppDirectoriesFinder.
     """
+
     def setUp(self):
         super().setUp()
         self.finder = finders.AppDirectoriesFinder()
-        test_file_path = os.path.join(TEST_ROOT, 'apps', 'test', 'static', 'test', 'file1.txt')
-        self.find_first = (os.path.join('test', 'file1.txt'), test_file_path)
-        self.find_all = (os.path.join('test', 'file1.txt'), [test_file_path])
+        test_file_path = os.path.join(
+            TEST_ROOT, "apps", "test", "static", "test", "file1.txt"
+        )
+        self.find_first = (os.path.join("test", "file1.txt"), test_file_path)
+        self.find_all = (os.path.join("test", "file1.txt"), [test_file_path])
 
 
 class TestDefaultStorageFinder(TestFinders, StaticFilesTestCase):
     """
     Test DefaultStorageFinder.
     """
+
     def setUp(self):
         super().setUp()
         self.finder = finders.DefaultStorageFinder(
-            storage=storage.StaticFilesStorage(location=settings.MEDIA_ROOT))
-        test_file_path = os.path.join(settings.MEDIA_ROOT, 'media-file.txt')
-        self.find_first = ('media-file.txt', test_file_path)
-        self.find_all = ('media-file.txt', [test_file_path])
+            storage=storage.StaticFilesStorage(location=settings.MEDIA_ROOT)
+        )
+        test_file_path = os.path.join(settings.MEDIA_ROOT, "media-file.txt")
+        self.find_first = ("media-file.txt", test_file_path)
+        self.find_all = ("media-file.txt", [test_file_path])
 
 
 @override_settings(
-    STATICFILES_FINDERS=['django.contrib.staticfiles.finders.FileSystemFinder'],
-    STATICFILES_DIRS=[os.path.join(TEST_ROOT, 'project', 'documents')],
+    STATICFILES_FINDERS=["django.contrib.staticfiles.finders.FileSystemFinder"],
+    STATICFILES_DIRS=[os.path.join(TEST_ROOT, "project", "documents")],
 )
 class TestMiscFinder(SimpleTestCase):
     """
     A few misc finder tests.
     """
+
     def test_get_finder(self):
-        self.assertIsInstance(finders.get_finder(
-            'django.contrib.staticfiles.finders.FileSystemFinder'),
-            finders.FileSystemFinder)
+        self.assertIsInstance(
+            finders.get_finder("django.contrib.staticfiles.finders.FileSystemFinder"),
+            finders.FileSystemFinder,
+        )
 
     def test_get_finder_bad_classname(self):
         with self.assertRaises(ImportError):
-            finders.get_finder('django.contrib.staticfiles.finders.FooBarFinder')
+            finders.get_finder("django.contrib.staticfiles.finders.FooBarFinder")
 
     def test_get_finder_bad_module(self):
         with self.assertRaises(ImportError):
-            finders.get_finder('foo.bar.FooBarFinder')
+            finders.get_finder("foo.bar.FooBarFinder")
 
     def test_cache(self):
         finders.get_finder.cache_clear()
         for n in range(10):
-            finders.get_finder('django.contrib.staticfiles.finders.FileSystemFinder')
+            finders.get_finder("django.contrib.staticfiles.finders.FileSystemFinder")
         cache_info = finders.get_finder.cache_info()
         self.assertEqual(cache_info.hits, 9)
         self.assertEqual(cache_info.currsize, 1)
 
     def test_searched_locations(self):
-        finders.find('spam')
+        finders.find("spam")
         self.assertEqual(
             finders.searched_locations,
-            [os.path.join(TEST_ROOT, 'project', 'documents')]
+            [os.path.join(TEST_ROOT, "project", "documents")],
         )
 
-    @override_settings(MEDIA_ROOT='')
+    @override_settings(MEDIA_ROOT="")
     def test_location_empty(self):
         msg = (
             "The storage backend of the staticfiles finder "

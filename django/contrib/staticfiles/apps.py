@@ -5,9 +5,9 @@ from django.utils.translation import gettext_lazy as _
 
 
 class StaticFilesConfig(AppConfig):
-    name = 'django.contrib.staticfiles'
+    name = "django.contrib.staticfiles"
     verbose_name = _("Static Files")
-    ignore_patterns = ['CVS', '.*', '*~']
+    ignore_patterns = ["CVS", ".*", "*~"]
 
     def ready(self):
         checks.register(check_finders, checks.Tags.staticfiles)

@@ -31,7 +31,9 @@ class PostGISAdapter:
         if proto == ISQLQuote:
             return self
         else:
-            raise Exception('Error implementing psycopg2 protocol. Is psycopg2 installed?')
+            raise Exception(
+                "Error implementing psycopg2 protocol. Is psycopg2 installed?"
+            )
 
     def __eq__(self, other):
         return isinstance(other, PostGISAdapter) and self.ewkb == other.ewkb
@@ -60,9 +62,9 @@ class PostGISAdapter:
         """
         if self.is_geometry:
             # Psycopg will figure out whether to use E'\\000' or '\000'.
-            return '%s(%s)' % (
-                'ST_GeogFromWKB' if self.geography else 'ST_GeomFromEWKB',
-                self._adapter.getquoted().decode()
+            return "%s(%s)" % (
+                "ST_GeogFromWKB" if self.geography else "ST_GeomFromEWKB",
+                self._adapter.getquoted().decode(),
             )
         else:
             # For rasters, add explicit type cast to WKB string.

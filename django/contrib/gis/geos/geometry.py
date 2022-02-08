@@ -14,9 +14,7 @@ from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.libgeos import GEOM_PTR
 from django.contrib.gis.geos.mutable_list import ListMixin
 from django.contrib.gis.geos.prepared import PreparedGeometry
-from django.contrib.gis.geos.prototypes.io import (
-    ewkb_w, wkb_r, wkb_w, wkt_r, wkt_w,
-)
+from django.contrib.gis.geos.prototypes.io import ewkb_w, wkb_r, wkb_w, wkt_r, wkt_w
 from django.utils.deconstruct import deconstructible
 from django.utils.encoding import force_bytes, force_str
 
@@ -38,12 +36,15 @@ class GEOSGeometryBase(GEOSBase):
                 if GEOSGeometryBase._GEOS_CLASSES is None:
                     # Inner imports avoid import conflicts with GEOSGeometry.
                     from .collections import (
-                        GeometryCollection, MultiLineString, MultiPoint,
+                        GeometryCollection,
+                        MultiLineString,
+                        MultiPoint,
                         MultiPolygon,
                     )
                     from .linestring import LinearRing, LineString
                     from .point import Point
                     from .polygon import Polygon
+
                     GEOSGeometryBase._GEOS_CLASSES = {
                         0: Point,
                         1: LineString,
@@ -62,7 +63,9 @@ class GEOSGeometryBase(GEOSBase):
         "Perform post-initialization setup."
         # Setting the coordinate sequence for the geometry (will be None on
         # geometries that do not have coordinate sequences)
-        self._cs = GEOSCoordSeq(capi.get_cs(self.ptr), self.hasz) if self.has_cs else None
+        self._cs = (
+            GEOSCoordSeq(capi.get_cs(self.ptr), self.hasz) if self.has_cs else None
+        )
 
     def __copy__(self):
         """
@@ -85,7 +88,7 @@ class GEOSGeometryBase(GEOSBase):
 
     def __repr__(self):
         "Short-hand representation because WKT may be very large."
-        return '<%s object at %s>' % (self.geom_type, hex(addressof(self.ptr)))
+        return "<%s object at %s>" % (self.geom_type, hex(addressof(self.ptr)))
 
     # Pickling support
     def _to_pickle_wkb(self):
@@ -104,7 +107,7 @@ class GEOSGeometryBase(GEOSBase):
         wkb, srid = state
         ptr = self._from_pickle_wkb(wkb)
         if not ptr:
-            raise GEOSException('Invalid Geometry loaded from pickled state.')
+            raise GEOSException("Invalid Geometry loaded from pickled state.")
         self.ptr = ptr
         self._post_init()
         self.srid = srid
@@ -117,17 +120,17 @@ class GEOSGeometryBase(GEOSBase):
     def from_ewkt(ewkt):
         ewkt = force_bytes(ewkt)
         srid = None
-        parts = ewkt.split(b';', 1)
+        parts = ewkt.split(b";", 1)
         if len(parts) == 2:
             srid_part, wkt = parts
-            match = re.match(br'SRID=(?P<srid>\-?\d+)', srid_part)
+            match = re.match(rb"SRID=(?P<srid>\-?\d+)", srid_part)
             if not match:
-                raise ValueError('EWKT has invalid SRID part.')
-            srid = int(match['srid'])
+                raise ValueError("EWKT has invalid SRID part.")
+            srid = int(match["srid"])
         else:
             wkt = ewkt
         if not wkt:
-            raise ValueError('Expected WKT but got an empty string.')
+            raise ValueError("Expected WKT but got an empty string.")
         return GEOSGeometry(GEOSGeometry._from_wkt(wkt), srid=srid)
 
     @staticmethod
@@ -149,7 +152,11 @@ class GEOSGeometryBase(GEOSBase):
                 other = GEOSGeometry.from_ewkt(other)
             except (ValueError, GEOSException):
                 return False
-        return isinstance(other, GEOSGeometry) and self.srid == other.srid and self.equals_exact(other)
+        return (
+            isinstance(other, GEOSGeometry)
+            and self.srid == other.srid
+            and self.equals_exact(other)
+        )
 
     def __hash__(self):
         return hash((self.srid, self.wkt))
@@ -314,7 +321,7 @@ class GEOSGeometryBase(GEOSBase):
         two Geometries match the elements in pattern.
         """
         if not isinstance(pattern, str) or len(pattern) > 9:
-            raise GEOSException('invalid intersection matrix pattern')
+            raise GEOSException("invalid intersection matrix pattern")
         return capi.geos_relatepattern(self.ptr, other.ptr, force_bytes(pattern))
 
     def touches(self, other):
@@ -353,7 +360,7 @@ class GEOSGeometryBase(GEOSBase):
         Return the EWKT (SRID + WKT) of the Geometry.
         """
         srid = self.srid
-        return 'SRID=%s;%s' % (srid, self.wkt) if srid else self.wkt
+        return "SRID=%s;%s" % (srid, self.wkt) if srid else self.wkt
 
     @property
     def wkt(self):
@@ -386,6 +393,7 @@ class GEOSGeometryBase(GEOSBase):
         Return GeoJSON representation of this Geometry.
         """
         return self.ogr.json
+
     geojson = json
 
     @property
@@ -410,7 +418,7 @@ class GEOSGeometryBase(GEOSBase):
     def kml(self):
         "Return the KML representation of this Geometry."
         gtype = self.geom_type
-        return '<%s>%s</%s>' % (gtype, self.coord_seq.kml, gtype)
+        return "<%s>%s</%s>" % (gtype, self.coord_seq.kml, gtype)
 
     @property
     def prepared(self):
@@ -484,7 +492,7 @@ class GEOSGeometryBase(GEOSBase):
             self._post_init()
             self.srid = g.srid
         else:
-            raise GEOSException('Transformed WKB was invalid.')
+            raise GEOSException("Transformed WKB was invalid.")
 
     # #### Topology Routines ####
     def _topology(self, gptr):
@@ -506,7 +514,9 @@ class GEOSGeometryBase(GEOSBase):
         """
         return self._topology(capi.geos_buffer(self.ptr, width, quadsegs))
 
-    def buffer_with_style(self, width, quadsegs=8, end_cap_style=1, join_style=1, mitre_limit=5.0):
+    def buffer_with_style(
+        self, width, quadsegs=8, end_cap_style=1, join_style=1, mitre_limit=5.0
+    ):
         """
         Same as buffer() but allows customizing the style of the buffer.
 
@@ -515,7 +525,9 @@ class GEOSGeometryBase(GEOSBase):
         Mitre ratio limit only affects mitered join style.
         """
         return self._topology(
-            capi.geos_bufferwithstyle(self.ptr, width, quadsegs, end_cap_style, join_style, mitre_limit),
+            capi.geos_bufferwithstyle(
+                self.ptr, width, quadsegs, end_cap_style, join_style, mitre_limit
+            ),
         )
 
     @property
@@ -606,7 +618,7 @@ class GEOSGeometryBase(GEOSBase):
         the Geometry.
         """
         if not isinstance(other, GEOSGeometry):
-            raise TypeError('distance() works only on other GEOS Geometries.')
+            raise TypeError("distance() works only on other GEOS Geometries.")
         return capi.geos_distance(self.ptr, other.ptr, byref(c_double()))
 
     @property
@@ -616,6 +628,7 @@ class GEOSGeometryBase(GEOSBase):
         (xmin, ymin, xmax, ymax).
         """
         from .point import Point
+
         env = self.envelope
         if isinstance(env, Point):
             xmin, ymin = env.tuple
@@ -642,6 +655,7 @@ class LinearGeometryMixin:
     """
     Used for LineString and MultiLineString.
     """
+
     def interpolate(self, distance):
         return self._topology(capi.geos_interpolate(self.ptr, distance))
 
@@ -650,14 +664,16 @@ class LinearGeometryMixin:
 
     def project(self, point):
         from .point import Point
+
         if not isinstance(point, Point):
-            raise TypeError('locate_point argument must be a Point')
+            raise TypeError("locate_point argument must be a Point")
         return capi.geos_project(self.ptr, point.ptr)
 
     def project_normalized(self, point):
         from .point import Point
+
         if not isinstance(point, Point):
-            raise TypeError('locate_point argument must be a Point')
+            raise TypeError("locate_point argument must be a Point")
         return capi.geos_project_normalized(self.ptr, point.ptr)
 
     @property
@@ -701,9 +717,9 @@ class GEOSGeometry(GEOSGeometryBase, ListMixin):
             wkt_m = wkt_regex.match(geo_input)
             if wkt_m:
                 # Handle WKT input.
-                if wkt_m['srid']:
-                    input_srid = int(wkt_m['srid'])
-                g = self._from_wkt(force_bytes(wkt_m['wkt']))
+                if wkt_m["srid"]:
+                    input_srid = int(wkt_m["srid"])
+                g = self._from_wkt(force_bytes(wkt_m["wkt"]))
             elif hex_regex.match(geo_input):
                 # Handle HEXEWKB input.
                 g = wkb_r().read(force_bytes(geo_input))
@@ -713,7 +729,7 @@ class GEOSGeometry(GEOSGeometryBase, ListMixin):
                 g = ogr._geos_ptr()
                 input_srid = ogr.srid
             else:
-                raise ValueError('String input unrecognized as WKT EWKT, and HEXEWKB.')
+                raise ValueError("String input unrecognized as WKT EWKT, and HEXEWKB.")
         elif isinstance(geo_input, GEOM_PTR):
             # When the input is a pointer to a geometry (GEOM_PTR).
             g = geo_input
@@ -723,14 +739,14 @@ class GEOSGeometry(GEOSGeometryBase, ListMixin):
         elif isinstance(geo_input, GEOSGeometry):
             g = capi.geom_clone(geo_input.ptr)
         else:
-            raise TypeError('Improper geometry input type: %s' % type(geo_input))
+            raise TypeError("Improper geometry input type: %s" % type(geo_input))
 
         if not g:
-            raise GEOSException('Could not initialize GEOS Geometry with given input.')
+            raise GEOSException("Could not initialize GEOS Geometry with given input.")
 
         input_srid = input_srid or capi.geos_get_srid(g) or None
         if input_srid and srid and input_srid != srid:
-            raise ValueError('Input geometry already has SRID: %d.' % input_srid)
+            raise ValueError("Input geometry already has SRID: %d." % input_srid)
 
         super().__init__(g, None)
         # Set the SRID, if given.

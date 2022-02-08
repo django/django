@@ -8,14 +8,13 @@ class MySQLIntrospection(DatabaseIntrospection):
     # Updating the data_types_reverse dictionary with the appropriate
     # type for Geometry fields.
     data_types_reverse = DatabaseIntrospection.data_types_reverse.copy()
-    data_types_reverse[FIELD_TYPE.GEOMETRY] = 'GeometryField'
+    data_types_reverse[FIELD_TYPE.GEOMETRY] = "GeometryField"
 
     def get_geometry_type(self, table_name, description):
         with self.connection.cursor() as cursor:
             # In order to get the specific geometry type of the field,
             # we introspect on the table definition using `DESCRIBE`.
-            cursor.execute('DESCRIBE %s' %
-                           self.connection.ops.quote_name(table_name))
+            cursor.execute("DESCRIBE %s" % self.connection.ops.quote_name(table_name))
             # Increment over description info until we get to the geometry
             # column.
             for column, typ, null, key, default, extra in cursor.fetchall():
@@ -31,8 +30,8 @@ class MySQLIntrospection(DatabaseIntrospection):
     def supports_spatial_index(self, cursor, table_name):
         # Supported with MyISAM/Aria, or InnoDB on MySQL 5.7.5+/MariaDB 10.2.2+
         storage_engine = self.get_storage_engine(cursor, table_name)
-        if storage_engine == 'InnoDB':
+        if storage_engine == "InnoDB":
             return self.connection.mysql_version >= (
                 (10, 2, 2) if self.connection.mysql_is_mariadb else (5, 7, 5)
             )
-        return storage_engine in ('MyISAM', 'Aria')
+        return storage_engine in ("MyISAM", "Aria")

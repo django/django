@@ -8,22 +8,32 @@ from django.db import models
 
 try:
     from django.contrib.postgres.fields import (
-        ArrayField, BigIntegerRangeField, CICharField, CIEmailField,
-        CITextField, DateRangeField, DateTimeRangeField, DecimalRangeField,
-        HStoreField, IntegerRangeField,
+        ArrayField,
+        BigIntegerRangeField,
+        CICharField,
+        CIEmailField,
+        CITextField,
+        DateRangeField,
+        DateTimeRangeField,
+        DecimalRangeField,
+        HStoreField,
+        IntegerRangeField,
     )
     from django.contrib.postgres.search import SearchVector, SearchVectorField
 except ImportError:
+
     class DummyArrayField(models.Field):
         def __init__(self, base_field, size=None, **kwargs):
             super().__init__(**kwargs)
 
         def deconstruct(self):
             name, path, args, kwargs = super().deconstruct()
-            kwargs.update({
-                'base_field': '',
-                'size': 1,
-            })
+            kwargs.update(
+                {
+                    "base_field": "",
+                    "size": 1,
+                }
+            )
             return name, path, args, kwargs
 
     ArrayField = DummyArrayField

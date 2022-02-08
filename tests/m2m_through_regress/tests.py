@@ -4,9 +4,7 @@ from django.contrib.auth.models import User
 from django.core import management
 from django.test import TestCase
 
-from .models import (
-    Car, CarDriver, Driver, Group, Membership, Person, UserMembership,
-)
+from .models import Car, CarDriver, Driver, Group, Membership, Person, UserMembership
 
 
 class M2MThroughTestCase(TestCase):
@@ -23,8 +21,12 @@ class M2MThroughTestCase(TestCase):
 
         # normal intermediate model
         cls.bob_rock = Membership.objects.create(person=cls.bob, group=cls.rock)
-        cls.bob_roll = Membership.objects.create(person=cls.bob, group=cls.roll, price=50)
-        cls.jim_rock = Membership.objects.create(person=cls.jim, group=cls.rock, price=50)
+        cls.bob_roll = Membership.objects.create(
+            person=cls.bob, group=cls.roll, price=50
+        )
+        cls.jim_rock = Membership.objects.create(
+            person=cls.jim, group=cls.rock, price=50
+        )
 
         # intermediate model with custom id column
         cls.frank_rock = UserMembership.objects.create(user=cls.frank, group=cls.rock)
@@ -72,18 +74,24 @@ class M2MThroughSerializationTestCase(TestCase):
         pks = {"p_pk": self.bob.pk, "g_pk": self.roll.pk, "m_pk": self.bob_roll.pk}
 
         out = StringIO()
-        management.call_command("dumpdata", "m2m_through_regress", format="json", stdout=out)
+        management.call_command(
+            "dumpdata", "m2m_through_regress", format="json", stdout=out
+        )
         self.assertJSONEqual(
             out.getvalue().strip(),
             '[{"pk": %(m_pk)s, "model": "m2m_through_regress.membership", "fields": {"person": %(p_pk)s, "price": '
             '100, "group": %(g_pk)s}}, {"pk": %(p_pk)s, "model": "m2m_through_regress.person", "fields": {"name": '
             '"Bob"}}, {"pk": %(g_pk)s, "model": "m2m_through_regress.group", "fields": {"name": "Roll"}}]'
-            % pks
+            % pks,
         )
 
         out = StringIO()
-        management.call_command("dumpdata", "m2m_through_regress", format="xml", indent=2, stdout=out)
-        self.assertXMLEqual(out.getvalue().strip(), """
+        management.call_command(
+            "dumpdata", "m2m_through_regress", format="xml", indent=2, stdout=out
+        )
+        self.assertXMLEqual(
+            out.getvalue().strip(),
+            """
 <?xml version="1.0" encoding="utf-8"?>
 <django-objects version="1.0">
   <object pk="%(m_pk)s" model="m2m_through_regress.membership">
@@ -98,7 +106,9 @@ class M2MThroughSerializationTestCase(TestCase):
     <field type="CharField" name="name">Roll</field>
   </object>
 </django-objects>
-        """.strip() % pks)
+        """.strip()
+            % pks,
+        )
 
 
 class ToFieldThroughTests(TestCase):
@@ -138,7 +148,7 @@ class ToFieldThroughTests(TestCase):
     def test_add(self):
         self.assertSequenceEqual(self.car.drivers.all(), [self.driver])
         # Yikes - barney is going to drive...
-        self.car.drivers._add_items('car', 'driver', self.unused_driver)
+        self.car.drivers._add_items("car", "driver", self.unused_driver)
         self.assertSequenceEqual(
             self.car.drivers.all(),
             [self.unused_driver, self.driver],
@@ -148,7 +158,7 @@ class ToFieldThroughTests(TestCase):
         nullcar = Car(make=None)
         msg = (
             '"<Car: None>" needs to have a value for field "make" before this '
-            'many-to-many relationship can be used.'
+            "many-to-many relationship can be used."
         )
         with self.assertRaisesMessage(ValueError, msg):
             nullcar.drivers.all()
@@ -159,43 +169,43 @@ class ToFieldThroughTests(TestCase):
             "many-to-many relationship can be used."
         )
         with self.assertRaisesMessage(ValueError, msg):
-            Car(make='Ford').drivers.all()
+            Car(make="Ford").drivers.all()
 
     def test_add_related_null(self):
         nulldriver = Driver.objects.create(name=None)
         msg = 'Cannot add "<Driver: None>": the value for field "driver" is None'
         with self.assertRaisesMessage(ValueError, msg):
-            self.car.drivers._add_items('car', 'driver', nulldriver)
+            self.car.drivers._add_items("car", "driver", nulldriver)
 
     def test_add_reverse(self):
         car2 = Car.objects.create(make="Honda")
         self.assertCountEqual(self.driver.car_set.all(), [self.car])
-        self.driver.car_set._add_items('driver', 'car', car2)
+        self.driver.car_set._add_items("driver", "car", car2)
         self.assertCountEqual(self.driver.car_set.all(), [self.car, car2])
 
     def test_add_null_reverse(self):
         nullcar = Car.objects.create(make=None)
         msg = 'Cannot add "<Car: None>": the value for field "car" is None'
         with self.assertRaisesMessage(ValueError, msg):
-            self.driver.car_set._add_items('driver', 'car', nullcar)
+            self.driver.car_set._add_items("driver", "car", nullcar)
 
     def test_add_null_reverse_related(self):
         nulldriver = Driver.objects.create(name=None)
         msg = (
             '"<Driver: None>" needs to have a value for field "name" before '
-            'this many-to-many relationship can be used.'
+            "this many-to-many relationship can be used."
         )
         with self.assertRaisesMessage(ValueError, msg):
-            nulldriver.car_set._add_items('driver', 'car', self.car)
+            nulldriver.car_set._add_items("driver", "car", self.car)
 
     def test_remove(self):
         self.assertSequenceEqual(self.car.drivers.all(), [self.driver])
-        self.car.drivers._remove_items('car', 'driver', self.driver)
+        self.car.drivers._remove_items("car", "driver", self.driver)
         self.assertSequenceEqual(self.car.drivers.all(), [])
 
     def test_remove_reverse(self):
         self.assertSequenceEqual(self.driver.car_set.all(), [self.car])
-        self.driver.car_set._remove_items('driver', 'car', self.car)
+        self.driver.car_set._remove_items("driver", "car", self.car)
         self.assertSequenceEqual(self.driver.car_set.all(), [])
 
 
@@ -208,10 +218,12 @@ class ThroughLoadDataTestCase(TestCase):
         phantom auto-generated m2m table (#11107).
         """
         out = StringIO()
-        management.call_command("dumpdata", "m2m_through_regress", format="json", stdout=out)
+        management.call_command(
+            "dumpdata", "m2m_through_regress", format="json", stdout=out
+        )
         self.assertJSONEqual(
             out.getvalue().strip(),
             '[{"pk": 1, "model": "m2m_through_regress.usermembership", "fields": {"price": 100, "group": 1, "user"'
             ': 1}}, {"pk": 1, "model": "m2m_through_regress.person", "fields": {"name": "Guido"}}, {"pk": 1, '
-            '"model": "m2m_through_regress.group", "fields": {"name": "Python Core Group"}}]'
+            '"model": "m2m_through_regress.group", "fields": {"name": "Python Core Group"}}]',
         )

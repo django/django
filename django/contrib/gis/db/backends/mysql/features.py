@@ -1,7 +1,5 @@
 from django.contrib.gis.db.backends.base.features import BaseSpatialFeatures
-from django.db.backends.mysql.features import (
-    DatabaseFeatures as MySQLDatabaseFeatures,
-)
+from django.db.backends.mysql.features import DatabaseFeatures as MySQLDatabaseFeatures
 from django.utils.functional import cached_property
 
 
@@ -14,13 +12,13 @@ class DatabaseFeatures(BaseSpatialFeatures, MySQLDatabaseFeatures):
     supports_transform = False
     supports_null_geometries = False
     supports_num_points_poly = False
-    unsupported_geojson_options = {'crs'}
+    unsupported_geojson_options = {"crs"}
 
     @cached_property
     def empty_intersection_returns_none(self):
         return (
-            not self.connection.mysql_is_mariadb and
-            self.connection.mysql_version < (5, 7, 5)
+            not self.connection.mysql_is_mariadb
+            and self.connection.mysql_version < (5, 7, 5)
         )
 
     @cached_property
@@ -31,13 +29,16 @@ class DatabaseFeatures(BaseSpatialFeatures, MySQLDatabaseFeatures):
     @cached_property
     def django_test_skips(self):
         skips = super().django_test_skips
-        if (
-            not self.connection.mysql_is_mariadb and
-            self.connection.mysql_version < (8, 0, 0)
+        if not self.connection.mysql_is_mariadb and self.connection.mysql_version < (
+            8,
+            0,
+            0,
         ):
-            skips.update({
-                'MySQL < 8 gives different results.': {
-                    'gis_tests.geoapp.tests.GeoLookupTest.test_disjoint_lookup',
-                },
-            })
+            skips.update(
+                {
+                    "MySQL < 8 gives different results.": {
+                        "gis_tests.geoapp.tests.GeoLookupTest.test_disjoint_lookup",
+                    },
+                }
+            )
         return skips

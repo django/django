@@ -3,9 +3,9 @@ from django.db import migrations, models
 
 def raise_error(apps, schema_editor):
     # Test operation in non-atomic migration is not wrapped in transaction
-    Publisher = apps.get_model('migrations', 'Publisher')
-    Publisher.objects.create(name='Test Publisher')
-    raise RuntimeError('Abort migration')
+    Publisher = apps.get_model("migrations", "Publisher")
+    Publisher.objects.create(name="Test Publisher")
+    raise RuntimeError("Abort migration")
 
 
 class Migration(migrations.Migration):
@@ -23,7 +23,12 @@ class Migration(migrations.Migration):
             "Book",
             [
                 ("title", models.CharField(primary_key=True, max_length=255)),
-                ("publisher", models.ForeignKey("migrations.Publisher", models.SET_NULL, null=True)),
+                (
+                    "publisher",
+                    models.ForeignKey(
+                        "migrations.Publisher", models.SET_NULL, null=True
+                    ),
+                ),
             ],
         ),
     ]

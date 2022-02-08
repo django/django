@@ -18,11 +18,11 @@ class EventLocalizedForm(forms.Form):
 class EventModelForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = '__all__'
+        fields = "__all__"
 
 
 class EventLocalizedModelForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = '__all__'
-        localized_fields = '__all__'
+        fields = "__all__"
+        localized_fields = "__all__"

@@ -18,10 +18,10 @@ class Thing(models.Model):
     alter = models.CharField(max_length=1)
     having = models.CharField(max_length=1)
     where = models.DateField(max_length=1)
-    has_hyphen = models.CharField(max_length=1, db_column='has-hyphen')
+    has_hyphen = models.CharField(max_length=1, db_column="has-hyphen")
 
     class Meta:
-        db_table = 'select'
+        db_table = "select"
 
     def __str__(self):
         return self.when

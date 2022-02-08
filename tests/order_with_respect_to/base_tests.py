@@ -13,7 +13,9 @@ class BaseOrderWithRespectToTests:
 
     @classmethod
     def setUpTestData(cls):
-        cls.q1 = cls.Question.objects.create(text="Which Beatle starts with the letter 'R'?")
+        cls.q1 = cls.Question.objects.create(
+            text="Which Beatle starts with the letter 'R'?"
+        )
         cls.Answer.objects.create(text="John", question=cls.q1)
         cls.Answer.objects.create(text="Paul", question=cls.q1)
         cls.Answer.objects.create(text="George", question=cls.q1)
@@ -22,8 +24,12 @@ class BaseOrderWithRespectToTests:
     def test_default_to_insertion_order(self):
         # Answers will always be ordered in the order they were inserted.
         self.assertQuerysetEqual(
-            self.q1.answer_set.all(), [
-                "John", "Paul", "George", "Ringo",
+            self.q1.answer_set.all(),
+            [
+                "John",
+                "Paul",
+                "George",
+                "Ringo",
             ],
             attrgetter("text"),
         )
@@ -48,12 +54,14 @@ class BaseOrderWithRespectToTests:
         # It doesn't matter which answer we use to check the order, it will
         # always be the same.
         a2 = self.Answer.objects.create(text="Number five", question=self.q1)
-        self.assertEqual(list(a1.question.get_answer_order()), list(a2.question.get_answer_order()))
+        self.assertEqual(
+            list(a1.question.get_answer_order()), list(a2.question.get_answer_order())
+        )
 
     def test_set_order_unrelated_object(self):
         """An answer that's not related isn't updated."""
-        q = self.Question.objects.create(text='other')
-        a = self.Answer.objects.create(text='Number five', question=q)
+        q = self.Question.objects.create(text="other")
+        a = self.Answer.objects.create(text="Number five", question=q)
         self.q1.set_answer_order([o.pk for o in self.q1.answer_set.all()] + [a.pk])
         self.assertEqual(self.Answer.objects.get(pk=a.pk)._order, 0)
 
@@ -73,10 +81,9 @@ class BaseOrderWithRespectToTests:
         # this changes the ordering of the queryset.
         a.question.set_answer_order(id_list)
         self.assertQuerysetEqual(
-            self.q1.answer_set.all(), [
-                "John", "Paul", "George", "Number five", "Ringo"
-            ],
-            attrgetter("text")
+            self.q1.answer_set.all(),
+            ["John", "Paul", "George", "Number five", "Ringo"],
+            attrgetter("text"),
         )
 
     def test_recursive_ordering(self):
@@ -89,15 +96,15 @@ class BaseOrderWithRespectToTests:
         self.assertSequenceEqual(p1.get_post_order(), [p1_1.pk, p1_2.pk, p1_3.pk])
 
     def test_delete_and_insert(self):
-        q1 = self.Question.objects.create(text='What is your favorite color?')
-        q2 = self.Question.objects.create(text='What color is it?')
-        a1 = self.Answer.objects.create(text='Blue', question=q1)
-        a2 = self.Answer.objects.create(text='Red', question=q1)
-        a3 = self.Answer.objects.create(text='Green', question=q1)
-        a4 = self.Answer.objects.create(text='Yellow', question=q1)
+        q1 = self.Question.objects.create(text="What is your favorite color?")
+        q2 = self.Question.objects.create(text="What color is it?")
+        a1 = self.Answer.objects.create(text="Blue", question=q1)
+        a2 = self.Answer.objects.create(text="Red", question=q1)
+        a3 = self.Answer.objects.create(text="Green", question=q1)
+        a4 = self.Answer.objects.create(text="Yellow", question=q1)
         self.assertSequenceEqual(q1.answer_set.all(), [a1, a2, a3, a4])
         a3.question = q2
         a3.save()
         a1.delete()
-        new_answer = self.Answer.objects.create(text='Black', question=q1)
+        new_answer = self.Answer.objects.create(text="Black", question=q1)
         self.assertSequenceEqual(q1.answer_set.all(), [a2, a4, new_answer])

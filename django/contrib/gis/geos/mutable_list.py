@@ -60,10 +60,10 @@ class ListMixin:
     # ### Python initialization and special list interface methods ###
 
     def __init__(self, *args, **kwargs):
-        if not hasattr(self, '_get_single_internal'):
+        if not hasattr(self, "_get_single_internal"):
             self._get_single_internal = self._get_single_external
 
-        if not hasattr(self, '_set_single'):
+        if not hasattr(self, "_set_single"):
             self._set_single = self._set_single_rebuild
             self._assign_extended_slice = self._assign_extended_slice_rebuild
 
@@ -72,7 +72,9 @@ class ListMixin:
     def __getitem__(self, index):
         "Get the item(s) at the specified index/slice."
         if isinstance(index, slice):
-            return [self._get_single_external(i) for i in range(*index.indices(len(self)))]
+            return [
+                self._get_single_external(i) for i in range(*index.indices(len(self)))
+            ]
         else:
             index = self._checkindex(index)
             return self._get_single_external(index)
@@ -91,9 +93,9 @@ class ListMixin:
             indexRange = range(*index.indices(origLen))
 
         newLen = origLen - len(indexRange)
-        newItems = (self._get_single_internal(i)
-                    for i in range(origLen)
-                    if i not in indexRange)
+        newItems = (
+            self._get_single_internal(i) for i in range(origLen) if i not in indexRange
+        )
 
         self._rebuild(newLen, newItems)
 
@@ -108,28 +110,28 @@ class ListMixin:
 
     # ### Special methods for arithmetic operations ###
     def __add__(self, other):
-        'add another list-like object'
+        "add another list-like object"
         return self.__class__([*self, *other])
 
     def __radd__(self, other):
-        'add to another list-like object'
+        "add to another list-like object"
         return other.__class__([*other, *self])
 
     def __iadd__(self, other):
-        'add another list-like object to self'
+        "add another list-like object to self"
         self.extend(other)
         return self
 
     def __mul__(self, n):
-        'multiply'
+        "multiply"
         return self.__class__(list(self) * n)
 
     def __rmul__(self, n):
-        'multiply'
+        "multiply"
         return self.__class__(list(self) * n)
 
     def __imul__(self, n):
-        'multiply'
+        "multiply"
         if n <= 0:
             del self[:]
         else:
@@ -179,16 +181,16 @@ class ListMixin:
         for i in range(0, len(self)):
             if self[i] == val:
                 return i
-        raise ValueError('%s not found in object' % val)
+        raise ValueError("%s not found in object" % val)
 
     # ## Mutating ##
     def append(self, val):
         "Standard list append method"
-        self[len(self):] = [val]
+        self[len(self) :] = [val]
 
     def extend(self, vals):
         "Standard list extend method"
-        self[len(self):] = vals
+        self[len(self) :] = vals
 
     def insert(self, index, val):
         "Standard list insert method"
@@ -217,9 +219,9 @@ class ListMixin:
     # ### Private routines ###
     def _rebuild(self, newLen, newItems):
         if newLen and newLen < self._minlength:
-            raise ValueError('Must have at least %d items' % self._minlength)
+            raise ValueError("Must have at least %d items" % self._minlength)
         if self._maxlength is not None and newLen > self._maxlength:
-            raise ValueError('Cannot have more than %d items' % self._maxlength)
+            raise ValueError("Cannot have more than %d items" % self._maxlength)
 
         self._set_list(newLen, newItems)
 
@@ -232,19 +234,19 @@ class ListMixin:
             return index
         if -length <= index < 0:
             return index + length
-        raise IndexError('invalid index: %s' % index)
+        raise IndexError("invalid index: %s" % index)
 
     def _check_allowed(self, items):
-        if hasattr(self, '_allowed'):
+        if hasattr(self, "_allowed"):
             if False in [isinstance(val, self._allowed) for val in items]:
-                raise TypeError('Invalid type encountered in the arguments.')
+                raise TypeError("Invalid type encountered in the arguments.")
 
     def _set_slice(self, index, values):
         "Assign values to a slice of the object"
         try:
             valueList = list(values)
         except TypeError:
-            raise TypeError('can only assign an iterable to a slice')
+            raise TypeError("can only assign an iterable to a slice")
 
         self._check_allowed(valueList)
 
@@ -259,13 +261,14 @@ class ListMixin:
             self._assign_extended_slice(start, stop, step, valueList)
 
     def _assign_extended_slice_rebuild(self, start, stop, step, valueList):
-        'Assign an extended slice by rebuilding entire list'
+        "Assign an extended slice by rebuilding entire list"
         indexList = range(start, stop, step)
         # extended slice, only allow assigning slice of same size
         if len(valueList) != len(indexList):
-            raise ValueError('attempt to assign sequence of size %d '
-                             'to extended slice of size %d'
-                             % (len(valueList), len(indexList)))
+            raise ValueError(
+                "attempt to assign sequence of size %d "
+                "to extended slice of size %d" % (len(valueList), len(indexList))
+            )
 
         # we're not changing the length of the sequence
         newLen = len(self)
@@ -281,19 +284,20 @@ class ListMixin:
         self._rebuild(newLen, newItems())
 
     def _assign_extended_slice(self, start, stop, step, valueList):
-        'Assign an extended slice by re-assigning individual items'
+        "Assign an extended slice by re-assigning individual items"
         indexList = range(start, stop, step)
         # extended slice, only allow assigning slice of same size
         if len(valueList) != len(indexList):
-            raise ValueError('attempt to assign sequence of size %d '
-                             'to extended slice of size %d'
-                             % (len(valueList), len(indexList)))
+            raise ValueError(
+                "attempt to assign sequence of size %d "
+                "to extended slice of size %d" % (len(valueList), len(indexList))
+            )
 
         for i, val in zip(indexList, valueList):
             self._set_single(i, val)
 
     def _assign_simple_slice(self, start, stop, valueList):
-        'Assign a simple slice; Can assign slice of any length'
+        "Assign a simple slice; Can assign slice of any length"
         origLen = len(self)
         stop = max(start, stop)
         newLen = origLen - stop + start + len(valueList)

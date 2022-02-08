@@ -10,7 +10,7 @@ class ContainsTests(TestCase):
         cls.proxy_category = ProxyCategory.objects.create()
 
     def test_unsaved_obj(self):
-        msg = 'QuerySet.contains() cannot be used on unsaved objects.'
+        msg = "QuerySet.contains() cannot be used on unsaved objects."
         with self.assertRaisesMessage(ValueError, msg):
             DumbCategory.objects.contains(DumbCategory())
 
@@ -20,11 +20,11 @@ class ContainsTests(TestCase):
             DumbCategory.objects.contains(object())
 
     def test_values(self):
-        msg = 'Cannot call QuerySet.contains() after .values() or .values_list().'
+        msg = "Cannot call QuerySet.contains() after .values() or .values_list()."
         with self.assertRaisesMessage(TypeError, msg):
-            DumbCategory.objects.values_list('pk').contains(self.category)
+            DumbCategory.objects.values_list("pk").contains(self.category)
         with self.assertRaisesMessage(TypeError, msg):
-            DumbCategory.objects.values('pk').contains(self.category)
+            DumbCategory.objects.values("pk").contains(self.category)
 
     def test_basic(self):
         with self.assertNumQueries(1):
@@ -53,7 +53,7 @@ class ContainsTests(TestCase):
 
     def test_wrong_model(self):
         qs = DumbCategory.objects.all()
-        named_category = NamedCategory(name='category')
+        named_category = NamedCategory(name="category")
         with self.assertNumQueries(0):
             self.assertIs(qs.contains(named_category), False)
         # Evaluate the queryset.
