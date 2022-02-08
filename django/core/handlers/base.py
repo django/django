@@ -125,11 +125,11 @@ class BaseHandler:
         if is_async:
             if not method_is_async:
                 if debug:
-                    logger.debug("Synchronous %s adapted.", name)
+                    logger.debug("Synchronous handler adapted for %s.", name)
                 return sync_to_async(method, thread_sensitive=True)
         elif method_is_async:
             if debug:
-                logger.debug("Asynchronous %s adapted.", name)
+                logger.debug("Asynchronous handler adapted for %s.", name)
             return async_to_sync(method)
         return method
 

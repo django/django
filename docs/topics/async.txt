@@ -52,9 +52,9 @@ If you want to use these, you will need to deploy Django using
 
     Middleware can be built to support :ref:`both sync and async
     <async-middleware>` contexts. Some of Django's middleware is built like
-    this, but not all. To see what middleware Django has to adapt, you can turn
-    on debug logging for the ``django.request`` logger and look for log
-    messages about *"Synchronous middleware ... adapted"*.
+    this, but not all. To see what middleware Django has to adapt for, you can
+    turn on debug logging for the ``django.request`` logger and look for log
+    messages about *"Asynchronous handler adapted for middleware ..."*.
 
 In both ASGI and WSGI mode, you can still safely use asynchronous support to
 run code concurrently rather than serially. This is especially handy when
