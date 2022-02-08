@@ -6,6 +6,7 @@ from itertools import takewhile
 from django.apps import apps
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError, no_translations
+from django.core.management.utils import run_formatters
 from django.db import DEFAULT_DB_ALIAS, OperationalError, connections, router
 from django.db.migrations import Migration
 from django.db.migrations.autodetector import MigrationAutodetector
@@ -88,6 +89,7 @@ class Command(BaseCommand):
 
     @no_translations
     def handle(self, *app_labels, **options):
+        self.written_files = []
         self.verbosity = options["verbosity"]
         self.interactive = options["interactive"]
         self.dry_run = options["dry_run"]
@@ -276,6 +278,7 @@ class Command(BaseCommand):
                     migration_string = writer.as_string()
                     with open(writer.path, "w", encoding="utf-8") as fh:
                         fh.write(migration_string)
+                        self.written_files.append(writer.path)
                 elif self.verbosity == 3:
                     # Alternatively, makemigrations --dry-run --verbosity 3
                     # will log the migrations rather than saving the file to
@@ -286,6 +289,7 @@ class Command(BaseCommand):
                         )
                     )
                     self.log(writer.as_string())
+        run_formatters(self.written_files)
 
     def handle_merge(self, loader, conflicts):
         """
@@ -382,6 +386,7 @@ class Command(BaseCommand):
                     # Write the merge migrations file to the disk
                     with open(writer.path, "w", encoding="utf-8") as fh:
                         fh.write(writer.as_string())
+                    run_formatters([writer.path])
                     if self.verbosity > 0:
                         self.log("\nCreated new merge migration %s" % writer.path)
                         if self.scriptable:

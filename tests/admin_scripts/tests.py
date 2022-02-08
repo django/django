@@ -41,6 +41,8 @@ custom_templates_dir = os.path.join(os.path.dirname(__file__), "custom_templates
 
 SYSTEM_CHECK_MSG = "System check identified no issues"
 
+HAS_BLACK = shutil.which("black")
+
 
 class AdminScriptTestCase(SimpleTestCase):
     def setUp(self):
@@ -732,7 +734,10 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         with open(os.path.join(app_path, "apps.py")) as f:
             content = f.read()
             self.assertIn("class SettingsTestConfig(AppConfig)", content)
-            self.assertIn("name = 'settings_test'", content)
+            self.assertIn(
+                'name = "settings_test"' if HAS_BLACK else "name = 'settings_test'",
+                content,
+            )
 
     def test_setup_environ_custom_template(self):
         "directory: startapp creates the correct directory with a custom template"
@@ -754,7 +759,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         with open(os.path.join(app_path, "apps.py"), encoding="utf8") as f:
             content = f.read()
             self.assertIn("class こんにちはConfig(AppConfig)", content)
-            self.assertIn("name = 'こんにちは'", content)
+            self.assertIn('name = "こんにちは"' if HAS_BLACK else "name = 'こんにちは'", content)
 
     def test_builtin_command(self):
         """
@@ -2614,8 +2619,8 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         test_manage_py = os.path.join(testproject_dir, "manage.py")
         with open(test_manage_py) as fp:
             content = fp.read()
-            self.assertIn("project_name = 'another_project'", content)
-            self.assertIn("project_directory = '%s'" % testproject_dir, content)
+            self.assertIn('project_name = "another_project"', content)
+            self.assertIn('project_directory = "%s"' % testproject_dir, content)
 
     def test_no_escaping_of_project_variables(self):
         "Make sure template context variables are not html escaped"
@@ -2880,11 +2885,15 @@ class StartApp(AdminScriptTestCase):
         with open(os.path.join(app_path, "apps.py")) as f:
             content = f.read()
             self.assertIn("class NewAppConfig(AppConfig)", content)
+            if HAS_BLACK:
+                test_str = 'default_auto_field = "django.db.models.BigAutoField"'
+            else:
+                test_str = "default_auto_field = 'django.db.models.BigAutoField'"
+            self.assertIn(test_str, content)
             self.assertIn(
-                "default_auto_field = 'django.db.models.BigAutoField'",
+                'name = "new_app"' if HAS_BLACK else "name = 'new_app'",
                 content,
             )
-            self.assertIn("name = 'new_app'", content)
 
 
 class DiffSettings(AdminScriptTestCase):

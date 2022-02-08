@@ -2,6 +2,7 @@ import datetime
 import importlib
 import io
 import os
+import shutil
 import sys
 from unittest import mock
 
@@ -27,6 +28,8 @@ from django.utils.version import get_docs_version
 from .models import UnicodeModel, UnserializableModel
 from .routers import TestRouter
 from .test_base import MigrationTestBase
+
+HAS_BLACK = shutil.which("black")
 
 
 class MigrateTests(MigrationTestBase):
@@ -1524,8 +1527,12 @@ class MakeMigrationsTests(MigrationTestBase):
 
                 # Remove all whitespace to check for empty dependencies and operations
                 content = content.replace(" ", "")
-                self.assertIn("dependencies=[\n]", content)
-                self.assertIn("operations=[\n]", content)
+                self.assertIn(
+                    "dependencies=[]" if HAS_BLACK else "dependencies=[\n]", content
+                )
+                self.assertIn(
+                    "operations=[]" if HAS_BLACK else "operations=[\n]", content
+                )
 
     @override_settings(MIGRATION_MODULES={"migrations": None})
     def test_makemigrations_disabled_migrations_for_app(self):
@@ -1661,6 +1668,13 @@ class MakeMigrationsTests(MigrationTestBase):
                 "0003_merge_0002_conflicting_second_0002_second.py",
             )
             self.assertIs(os.path.exists(merge_file), True)
+            with open(merge_file, encoding="utf-8") as fp:
+                content = fp.read()
+            if HAS_BLACK:
+                target_str = '("migrations", "0002_conflicting_second")'
+            else:
+                target_str = "('migrations', '0002_conflicting_second')"
+            self.assertIn(target_str, content)
         self.assertIn("Created new merge migration %s" % merge_file, out.getvalue())
 
     @mock.patch("django.db.migrations.utils.datetime")
@@ -2252,7 +2266,9 @@ class MakeMigrationsTests(MigrationTestBase):
             # generate an initial migration
             migration_name_0001 = "my_initial_migration"
             content = cmd("0001", migration_name_0001)
-            self.assertIn("dependencies=[\n]", content)
+            self.assertIn(
+                "dependencies=[]" if HAS_BLACK else "dependencies=[\n]", content
+            )
 
             # importlib caches os.listdir() on some platforms like macOS
             # (#23850).
@@ -2262,11 +2278,15 @@ class MakeMigrationsTests(MigrationTestBase):
             # generate an empty migration
             migration_name_0002 = "my_custom_migration"
             content = cmd("0002", migration_name_0002, "--empty")
+            if HAS_BLACK:
+                template_str = 'dependencies=[\n("migrations","0001_%s"),\n]'
+            else:
+                template_str = "dependencies=[\n('migrations','0001_%s'),\n]"
             self.assertIn(
-                "dependencies=[\n('migrations','0001_%s'),\n]" % migration_name_0001,
+                template_str % migration_name_0001,
                 content,
             )
-            self.assertIn("operations=[\n]", content)
+            self.assertIn("operations=[]" if HAS_BLACK else "operations=[\n]", content)
 
     def test_makemigrations_with_invalid_custom_name(self):
         msg = "The migration name must be a valid Python identifier."
@@ -2606,7 +2626,11 @@ class SquashMigrationsTests(MigrationTestBase):
             )
             with open(squashed_migration_file, encoding="utf-8") as fp:
                 content = fp.read()
-                self.assertIn("        ('migrations', '0001_initial')", content)
+                if HAS_BLACK:
+                    test_str = '        ("migrations", "0001_initial")'
+                else:
+                    test_str = "        ('migrations', '0001_initial')"
+                self.assertIn(test_str, content)
                 self.assertNotIn("initial = True", content)
         out = out.getvalue()
         self.assertNotIn(" - 0001_initial", out)

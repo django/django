@@ -1,5 +1,7 @@
 import fnmatch
 import os
+import shutil
+import subprocess
 from pathlib import Path
 from subprocess import run
 
@@ -153,3 +155,14 @@ def is_ignored_path(path, ignore_patterns):
         )
 
     return any(ignore(pattern) for pattern in normalize_path_patterns(ignore_patterns))
+
+
+def run_formatters(written_files):
+    """
+    Run the black formatter on the specified files.
+    """
+    if black_path := shutil.which("black"):
+        subprocess.run(
+            [black_path, "--fast", "--", *written_files],
+            capture_output=True,
+        )

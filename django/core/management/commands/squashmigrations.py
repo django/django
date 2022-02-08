@@ -3,6 +3,7 @@ import os
 from django.apps import apps
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
+from django.core.management.utils import run_formatters
 from django.db import DEFAULT_DB_ALIAS, connections, migrations
 from django.db.migrations.loader import AmbiguityError, MigrationLoader
 from django.db.migrations.migration import SwappableTuple
@@ -220,6 +221,7 @@ class Command(BaseCommand):
             )
         with open(writer.path, "w", encoding="utf-8") as fh:
             fh.write(writer.as_string())
+        run_formatters([writer.path])
 
         if self.verbosity > 0:
             self.stdout.write(

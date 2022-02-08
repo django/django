@@ -2050,6 +2050,24 @@ distribution. It enables tab-completion of ``django-admin`` and
 
 See :doc:`/howto/custom-management-commands` for how to add customized actions.
 
+Black formatting
+----------------
+
+.. versionadded:: 4.1
+
+The Python files created by :djadmin:`startproject`, :djadmin:`startapp`,
+:djadmin:`makemigrations`, and :djadmin:`squashmigrations` are formatted using
+the ``black`` command if it is present on your ``PATH``.
+
+If you have ``black`` globally installed, but do not wish it used for the
+current project, you can set the ``PATH`` explicitly::
+
+    PATH=path/to/venv/bin django-admin makemigrations
+
+For commands using ``stdout`` you can pipe the output to ``black`` if needed::
+
+    django-admin inspectdb | black -
+
 ==========================================
 Running management commands from your code
 ==========================================

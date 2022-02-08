@@ -12,7 +12,7 @@ from urllib.request import build_opener
 import django
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from django.core.management.utils import handle_extensions
+from django.core.management.utils import handle_extensions, run_formatters
 from django.template import Context, Engine
 from django.utils import archive
 from django.utils.version import get_docs_version
@@ -80,6 +80,7 @@ class TemplateCommand(BaseCommand):
         )
 
     def handle(self, app_or_project, name, target=None, **options):
+        self.written_files = []
         self.app_or_project = app_or_project
         self.a_or_an = "an" if app_or_project == "app" else "a"
         self.paths_to_remove = []
@@ -200,6 +201,7 @@ class TemplateCommand(BaseCommand):
                 else:
                     shutil.copyfile(old_path, new_path)
 
+                self.written_files.append(new_path)
                 if self.verbosity >= 2:
                     self.stdout.write("Creating %s" % new_path)
                 try:
@@ -221,6 +223,8 @@ class TemplateCommand(BaseCommand):
                     os.remove(path_to_remove)
                 else:
                     shutil.rmtree(path_to_remove)
+
+        run_formatters(self.written_files)
 
     def handle_template(self, template, subdir):
         """

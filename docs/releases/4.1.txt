@@ -226,6 +226,10 @@ Management Commands
 * The new :option:`migrate --prune` option allows deleting nonexistent
   migrations from the ``django_migrations`` table.
 
+* Python files created by :djadmin:`startproject`, :djadmin:`startapp`,
+  :djadmin:`makemigrations`, and :djadmin:`squashmigrations` are now formatted
+  using the ``black`` command if it is present on your ``PATH``.
+
 Migrations
 ~~~~~~~~~~
 
