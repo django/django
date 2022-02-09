@@ -181,6 +181,7 @@ class Field(RegisterLookupMixin):
     _db_tablespace = None
     auto_created = False
     _error_messages = None
+    _validators = ()
 
     def __init__(
         self,
@@ -259,9 +260,10 @@ class Field(RegisterLookupMixin):
             self.creation_counter = Field.creation_counter
             Field.creation_counter += 1
 
-        self._validators = list(validators)  # Store for deconstruction later
+        if self._validators is not validators:
+            self._validators = validators  # Store for deconstruction later
 
-        if error_messages != self._error_messages:
+        if error_messages is not self._error_messages:
             self._error_messages = error_messages  # Store for deconstruction later
 
     def __str__(self):
@@ -586,6 +588,8 @@ class Field(RegisterLookupMixin):
             value = getattr(self, attr_overrides.get(name, name))
             # Unroll anything iterable for choices into a concrete list
             if name == "choices" and isinstance(value, collections.abc.Iterable):
+                value = list(value)
+            if name == "validators" and value == ():
                 value = list(value)
             # Do correct kind of comparison
             if name in equals_comparison:
