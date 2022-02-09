@@ -3,13 +3,15 @@ import datetime
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models import F
 from django.db.models.functions import Lower
-from django.test import TestCase, skipUnlessDBFeature
+from django.db.utils import IntegrityError
+from django.test import TestCase, override_settings, skipUnlessDBFeature
 
 from .models import (
     Article,
     CustomDbColumn,
     CustomPk,
     Detail,
+    Food,
     Individual,
     JSONFieldNullable,
     Member,
@@ -23,6 +25,11 @@ from .models import (
     Tag,
     Valid,
 )
+
+
+class WriteToOtherRouter:
+    def db_for_write(self, model, **hints):
+        return "other"
 
 
 class BulkUpdateNoteTests(TestCase):
@@ -107,6 +114,8 @@ class BulkUpdateNoteTests(TestCase):
 
 
 class BulkUpdateTests(TestCase):
+    databases = {"default", "other"}
+
     def test_no_fields(self):
         msg = "Field names must be given to bulk_update()."
         with self.assertRaisesMessage(ValueError, msg):
@@ -302,3 +311,20 @@ class BulkUpdateTests(TestCase):
         parent.refresh_from_db()
         self.assertEqual(parent.f, 42)
         self.assertIsNone(parent.single)
+
+    @override_settings(DATABASE_ROUTERS=[WriteToOtherRouter()])
+    def test_database_routing(self):
+        note = Note.objects.create(note="create")
+        note.note = "bulk_update"
+        with self.assertNumQueries(1, using="other"):
+            Note.objects.bulk_update([note], fields=["note"])
+
+    @override_settings(DATABASE_ROUTERS=[WriteToOtherRouter()])
+    def test_database_routing_batch_atomicity(self):
+        f1 = Food.objects.create(name="Banana")
+        f2 = Food.objects.create(name="Apple")
+        f1.name = "Kiwi"
+        f2.name = "Kiwi"
+        with self.assertRaises(IntegrityError):
+            Food.objects.bulk_update([f1, f2], fields=["name"], batch_size=1)
+        self.assertIs(Food.objects.filter(name="Kiwi").exists(), False)
