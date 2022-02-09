@@ -261,13 +261,8 @@ class Field(RegisterLookupMixin):
 
         self._validators = list(validators)  # Store for deconstruction later
 
-        messages = {}
-        for c in reversed(self.__class__.__mro__):
-            messages.update(getattr(c, "default_error_messages", {}))
-        messages.update(error_messages or {})
         if error_messages != self._error_messages:
             self._error_messages = error_messages  # Store for deconstruction later
-        self.error_messages = messages
 
     def __str__(self):
         """
@@ -713,6 +708,14 @@ class Field(RegisterLookupMixin):
         Return the converted value. Subclasses should override this.
         """
         return value
+
+    @cached_property
+    def error_messages(self):
+        messages = {}
+        for c in reversed(self.__class__.__mro__):
+            messages.update(getattr(c, "default_error_messages", {}))
+        messages.update(self._error_messages or {})
+        return messages
 
     @cached_property
     def validators(self):
