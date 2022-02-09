@@ -33,8 +33,9 @@ class ResponseHeaders(CaseInsensitiveMapping):
         correctly encoded.
         """
         self._store = {}
-        for header, value in self._unpack_items(data):
-            self[header] = value
+        if data:
+            for header, value in self._unpack_items(data):
+                self[header] = value
 
     def _convert_to_charset(self, value, charset, mime_encode=False):
         """
@@ -98,7 +99,7 @@ class HttpResponseBase:
     def __init__(
         self, content_type=None, status=None, reason=None, charset=None, headers=None
     ):
-        self.headers = ResponseHeaders(headers or {})
+        self.headers = ResponseHeaders(headers)
         self._charset = charset
         if content_type and "Content-Type" in self.headers:
             raise ValueError(
