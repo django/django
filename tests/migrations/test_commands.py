@@ -1021,10 +1021,50 @@ class MigrateTests(MigrationTestBase):
     @override_settings(
         MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_operations"}
     )
-    def test_migrations_no_operations(self):
+    def test_sqlmigrate_no_operations(self):
         err = io.StringIO()
         call_command("sqlmigrate", "migrations", "0001_initial", stderr=err)
         self.assertEqual(err.getvalue(), "No operations found.\n")
+
+    @override_settings(
+        MIGRATION_MODULES={"migrations": "migrations.test_migrations_noop"}
+    )
+    def test_sqlmigrate_noop(self):
+        out = io.StringIO()
+        call_command("sqlmigrate", "migrations", "0001", stdout=out)
+        lines = out.getvalue().splitlines()
+
+        if connection.features.can_rollback_ddl:
+            lines = lines[1:-1]
+        self.assertEqual(
+            lines,
+            [
+                "--",
+                "-- Raw SQL operation",
+                "--",
+                "-- (no-op)",
+            ],
+        )
+
+    @override_settings(
+        MIGRATION_MODULES={"migrations": "migrations.test_migrations_manual_porting"}
+    )
+    def test_sqlmigrate_unrepresentable(self):
+        out = io.StringIO()
+        call_command("sqlmigrate", "migrations", "0002", stdout=out)
+        lines = out.getvalue().splitlines()
+
+        if connection.features.can_rollback_ddl:
+            lines = lines[1:-1]
+        self.assertEqual(
+            lines,
+            [
+                "--",
+                "-- Raw Python operation",
+                "--",
+                "-- THIS OPERATION CANNOT BE WRITTEN AS SQL",
+            ],
+        )
 
     @override_settings(
         INSTALLED_APPS=[
