@@ -112,6 +112,7 @@ class Migration:
                 schema_editor.collected_sql.append("--")
                 if not operation.reduces_to_sql:
                     continue
+                collected_sql_before = len(schema_editor.collected_sql)
             # Save the state before the operation has run
             old_state = project_state.clone()
             operation.state_forwards(self.app_label, project_state)
@@ -131,6 +132,8 @@ class Migration:
                 operation.database_forwards(
                     self.app_label, schema_editor, old_state, project_state
                 )
+            if collect_sql and collected_sql_before == len(schema_editor.collected_sql):
+                schema_editor.collected_sql.append("-- (no-op)")
         return project_state
 
     def unapply(self, project_state, schema_editor, collect_sql=False):
