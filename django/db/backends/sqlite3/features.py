@@ -28,6 +28,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_case_insensitive_like = True
     # Is "ALTER TABLE ... RENAME COLUMN" supported?
     can_alter_table_rename_column = Database.sqlite_version_info >= (3, 25, 0)
+    # Is "ALTER TABLE ... DROP COLUMN" supported?
+    can_alter_table_drop_column = Database.sqlite_version_info >= (3, 35, 5)
     supports_parentheses_in_compound = False
     # Deferred constraint checks can be emulated on SQLite < 3.20 but not in a
     # reasonably performant way.
