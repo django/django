@@ -174,7 +174,9 @@ def iter_modules_and_files(modules, extra_files):
 
         if is_django_path(path):
             results.add((resolved_path, 10))
-        elif filename.startswith((stdlib_location_1, stdlib_location_2, django_location)):
+        elif filename.startswith(
+            (stdlib_location_1, stdlib_location_2, django_location)
+        ):
             results.add((resolved_path, 5))
         elif filename.startswith(tuple(site.getsitepackages())):
             results.add((resolved_path, 30))
