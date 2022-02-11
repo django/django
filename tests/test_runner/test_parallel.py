@@ -51,10 +51,9 @@ class SampleFailingSubtest(SimpleTestCase):
                 self.assertEqual(i, 1)
 
     def pickle_error_test(self):
-        """A dummy test for testing TestCaseDTO."""
-        # ^ note: 3.6's implementation of TestCase.shortDescription()
-        #   doesn't strip whitespace before taking the first line of the
-        #   docstring, so the single-line docstring is part of this test
+        """
+        A dummy test for testing TestCaseDTO.
+        """
         with self.subTest("I should fail"):
             self.not_pickleable = lambda: 0
             self.assertTrue(False)
