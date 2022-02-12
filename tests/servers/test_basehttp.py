@@ -50,7 +50,7 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
 
         with self.assertLogs("django.server", "ERROR") as cm:
             handler.log_message("GET %s %s", "\x16\x03", "4")
-        self.assertIn(
+        self.assertEqual(
             "You're accessing the development server over HTTPS, "
             "but it only supports HTTP.",
             cm.records[0].getMessage(),
@@ -114,7 +114,7 @@ class WSGIServerTestCase(SimpleTestCase):
         """WSGIServer handles broken pipe errors."""
         request = WSGIRequest(self.request_factory.get("/").environ)
         client_address = ("192.168.2.0", 8080)
-        msg = f"- Broken pipe from {client_address}\n"
+        msg = f"- Broken pipe from {client_address}"
         tests = [
             BrokenPipeError,
             ConnectionAbortedError,

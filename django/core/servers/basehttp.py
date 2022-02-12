@@ -77,7 +77,7 @@ class WSGIServer(simple_server.WSGIServer):
 
     def handle_error(self, request, client_address):
         if is_broken_pipe_error():
-            logger.info("- Broken pipe from %s\n", client_address)
+            logger.info("- Broken pipe from %s", client_address)
         else:
             super().handle_error(request, client_address)
 
@@ -166,7 +166,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
                 extra["status_code"] = 500
                 logger.error(
                     "You're accessing the development server over HTTPS, but "
-                    "it only supports HTTP.\n",
+                    "it only supports HTTP.",
                     extra=extra,
                 )
                 return
