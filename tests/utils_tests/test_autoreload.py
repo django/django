@@ -156,7 +156,7 @@ class TestIterModulesAndFiles(SimpleTestCase):
         module = types.ModuleType("test_module")
         del module.__spec__
         self.assertEqual(
-            autoreload.iter_modules_and_files((module,), frozenset()), frozenset()
+            autoreload.iter_modules_and_files((module,), frozenset()), ()
         )
 
     def test_main_module_is_resolved(self):
@@ -166,7 +166,7 @@ class TestIterModulesAndFiles(SimpleTestCase):
     def test_main_module_without_file_is_not_resolved(self):
         fake_main = types.ModuleType("__main__")
         self.assertEqual(
-            autoreload.iter_modules_and_files((fake_main,), frozenset()), frozenset()
+            autoreload.iter_modules_and_files((fake_main,), frozenset()), ()
         )
 
     def test_path_with_embedded_null_bytes(self):
@@ -177,7 +177,7 @@ class TestIterModulesAndFiles(SimpleTestCase):
             with self.subTest(path=path):
                 self.assertEqual(
                     autoreload.iter_modules_and_files((), frozenset([path])),
-                    frozenset(),
+                    (),
                 )
 
 
