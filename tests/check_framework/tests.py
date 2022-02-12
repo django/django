@@ -362,5 +362,7 @@ class CheckFrameworkReservedNamesTests(SimpleTestCase):
 
 
 class ChecksRunDuringTests(SimpleTestCase):
+    databases = "__all__"
+
     def test_registered_check_did_run(self):
         self.assertTrue(my_check.did_run)

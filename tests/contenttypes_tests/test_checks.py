@@ -11,6 +11,8 @@ from django.test.utils import isolate_apps
 
 @isolate_apps("contenttypes_tests", attr_name="apps")
 class GenericForeignKeyTests(SimpleTestCase):
+    databases = "__all__"
+
     def test_missing_content_type_field(self):
         class TaggedItem(models.Model):
             # no content_type field
