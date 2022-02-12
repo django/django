@@ -130,7 +130,7 @@ def iter_modules_and_files(modules, extra_files):
         # cause issues here.
         if not isinstance(module, ModuleType):
             continue
-        if module.__name__ == "__main__":
+        if module.__name__ in ("__main__", "__mp_main__"):
             # __main__ (usually manage.py) doesn't always have a __spec__ set.
             # Handle this by falling back to using __file__, resolved below.
             # See https://docs.python.org/reference/import.html#main-spec

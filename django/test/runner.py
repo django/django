@@ -20,7 +20,12 @@ from io import StringIO
 from django.core.management import call_command
 from django.db import connections
 from django.test import SimpleTestCase, TestCase
-from django.test.utils import NullTimeKeeper, TimeKeeper, iter_test_cases
+from django.test.utils import (
+    NullTimeKeeper,
+    TimeKeeper,
+    captured_stdout,
+    iter_test_cases,
+)
 from django.test.utils import setup_databases as _setup_databases
 from django.test.utils import setup_test_environment
 from django.test.utils import teardown_databases as _teardown_databases
@@ -367,8 +372,8 @@ def get_max_test_processes():
     The maximum number of test processes when using the --parallel option.
     """
     # The current implementation of the parallel test runner requires
-    # multiprocessing to start subprocesses with fork().
-    if multiprocessing.get_start_method() != "fork":
+    # multiprocessing to start subprocesses with fork() or spawn().
+    if multiprocessing.get_start_method() not in {"fork", "spawn"}:
         return 1
     try:
         return int(os.environ["DJANGO_TEST_PROCESSES"])
@@ -391,7 +396,13 @@ def parallel_type(value):
 _worker_id = 0
 
 
-def _init_worker(counter):
+def _init_worker(
+    counter,
+    initial_settings=None,
+    serialized_contents=None,
+    process_setup=None,
+    process_setup_args=None,
+):
     """
     Switch to databases dedicated to this worker.
 
@@ -405,9 +416,22 @@ def _init_worker(counter):
         counter.value += 1
         _worker_id = counter.value
 
+    start_method = multiprocessing.get_start_method()
+
+    if start_method == "spawn":
+        process_setup(*process_setup_args)
+        setup_test_environment()
+
     for alias in connections:
         connection = connections[alias]
+        if start_method == "spawn":
+            # Restore initial settings in spawned processes.
+            connection.settings_dict.update(initial_settings[alias])
+            if value := serialized_contents.get(alias):
+                connection._test_serialized_contents = value
         connection.creation.setup_worker_connection(_worker_id)
+        with captured_stdout():
+            call_command("check", databases=connections)
 
 
 def _run_subsuite(args):
@@ -449,6 +473,8 @@ class ParallelTestSuite(unittest.TestSuite):
         self.processes = processes
         self.failfast = failfast
         self.buffer = buffer
+        self.initial_settings = None
+        self.serialized_contents = None
         super().__init__()
 
     def run(self, result):
@@ -469,8 +495,12 @@ class ParallelTestSuite(unittest.TestSuite):
         counter = multiprocessing.Value(ctypes.c_int, 0)
         pool = multiprocessing.Pool(
             processes=self.processes,
-            initializer=self.init_worker.__func__,
-            initargs=[counter],
+            initializer=self.init_worker,
+            initargs=[
+                counter,
+                self.initial_settings,
+                self.serialized_contents,
+            ],
         )
         args = [
             (self.runner_class, index, subsuite, self.failfast, self.buffer)
@@ -507,6 +537,17 @@ class ParallelTestSuite(unittest.TestSuite):
 
     def __iter__(self):
         return iter(self.subsuites)
+
+    def initialize_suite(self):
+        if multiprocessing.get_start_method() == "spawn":
+            self.initial_settings = {
+                alias: connections[alias].settings_dict for alias in connections
+            }
+            self.serialized_contents = {
+                alias: connections[alias]._test_serialized_contents
+                for alias in connections
+                if alias in self.serialized_aliases
+            }
 
 
 class Shuffler:
@@ -921,6 +962,8 @@ class DiscoverRunner:
     def run_suite(self, suite, **kwargs):
         kwargs = self.get_test_runner_kwargs()
         runner = self.test_runner(**kwargs)
+        if hasattr(suite, "initialize_suite"):
+            suite.initialize_suite()
         try:
             return runner.run(suite)
         finally:
@@ -989,13 +1032,13 @@ class DiscoverRunner:
         self.setup_test_environment()
         suite = self.build_suite(test_labels, extra_tests)
         databases = self.get_databases(suite)
-        serialized_aliases = set(
+        suite.serialized_aliases = set(
             alias for alias, serialize in databases.items() if serialize
         )
         with self.time_keeper.timed("Total database setup"):
             old_config = self.setup_databases(
                 aliases=databases,
-                serialized_aliases=serialized_aliases,
+                serialized_aliases=suite.serialized_aliases,
             )
         run_failed = False
         try:

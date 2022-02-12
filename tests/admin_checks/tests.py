@@ -70,6 +70,8 @@ class SessionMiddlewareSubclass(SessionMiddleware):
     ],
 )
 class SystemChecksTestCase(SimpleTestCase):
+    databases = "__all__"
+
     def test_checks_are_performed(self):
         admin.site.register(Song, MyAdmin)
         try:
