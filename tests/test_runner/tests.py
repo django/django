@@ -480,8 +480,6 @@ class ManageCommandTests(unittest.TestCase):
 # Isolate from the real environment.
 @mock.patch.dict(os.environ, {}, clear=True)
 @mock.patch.object(multiprocessing, "cpu_count", return_value=12)
-# Python 3.8 on macOS defaults to 'spawn' mode.
-@mock.patch.object(multiprocessing, "get_start_method", return_value="fork")
 class ManageCommandParallelTests(SimpleTestCase):
     def test_parallel_default(self, *mocked_objects):
         with captured_stderr() as stderr:
@@ -507,8 +505,8 @@ class ManageCommandParallelTests(SimpleTestCase):
         # Parallel is disabled by default.
         self.assertEqual(stderr.getvalue(), "")
 
-    def test_parallel_spawn(self, mocked_get_start_method, mocked_cpu_count):
-        mocked_get_start_method.return_value = "spawn"
+    @mock.patch.object(multiprocessing, "get_start_method", return_value="spawn")
+    def test_parallel_spawn(self, *mocked_objects):
         with captured_stderr() as stderr:
             call_command(
                 "test",
@@ -517,8 +515,8 @@ class ManageCommandParallelTests(SimpleTestCase):
             )
         self.assertIn("parallel=1", stderr.getvalue())
 
-    def test_no_parallel_spawn(self, mocked_get_start_method, mocked_cpu_count):
-        mocked_get_start_method.return_value = "spawn"
+    @mock.patch.object(multiprocessing, "get_start_method", return_value="spawn")
+    def test_no_parallel_spawn(self, *mocked_objects):
         with captured_stderr() as stderr:
             call_command(
                 "test",
