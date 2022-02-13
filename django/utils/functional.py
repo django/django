@@ -266,6 +266,7 @@ def new_method_proxy(func):
             self._setup()
         return func(self._wrapped, *args)
 
+    inner._mask_wrapped = False
     return inner
 
 
@@ -285,6 +286,14 @@ class LazyObject:
         # Note: if a subclass overrides __init__(), it will likely need to
         # override __copy__() and __deepcopy__() as well.
         self._wrapped = empty
+
+    def __getattribute__(self, name):
+        value = super().__getattribute__(name)
+        # If attribute is a proxy method, raise an AttributeError to call
+        # __getattr__() and use the wrapped object method.
+        if not getattr(value, "_mask_wrapped", True):
+            raise AttributeError
+        return value
 
     __getattr__ = new_method_proxy(getattr)
 
