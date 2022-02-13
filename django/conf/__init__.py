@@ -157,8 +157,9 @@ class LazySettings(LazyObject):
     def USE_L10N(self):
         stack = traceback.extract_stack()
         # Show a warning if the setting is used outside of Django.
-        # Stack index: -1 this line, -2 the caller.
-        filename, _, _, _ = stack[-2]
+        # Stack index: -1 this line, -2 the LazyObject __getattribute__(),
+        # -3 the caller.
+        filename, _, _, _ = stack[-3]
         if not filename.startswith(os.path.dirname(django.__file__)):
             warnings.warn(
                 USE_L10N_DEPRECATED_MSG,
