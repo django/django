@@ -1,6 +1,8 @@
 """Database functions that do comparisons or type conversions."""
+from collections.abc import Mapping
+
 from django.db import NotSupportedError
-from django.db.models.expressions import Func, Value
+from django.db.models.expressions import Func, Value, F
 from django.db.models.fields.json import JSONField
 from django.utils.regex_helper import _lazy_re_compile
 
@@ -176,6 +178,65 @@ class JSONObject(Func):
             connection,
             arg_joiner=ArgJoiner(),
             template="%(function)s(%(expressions)s RETURNING CLOB)",
+            **extra_context,
+        )
+
+
+class JSONSet(Func):
+    function = "JSON_SET"
+    template = "%(function)s(%(expressions)s)"
+    output_field = JSONField()
+
+    def __init__(self, field=None, op_type="SET", create=True, fields=None):
+        self.field_ = field
+        self.op_type_ = op_type
+        self.create_ = create
+        from django.db.models import TextField
+
+        if list(fields.keys())[0].find("{") != -1:
+            expressions = [F(field)]
+        else:
+            expressions = [Cast(F(field), TextField())]
+        for key, value in fields.items():
+            expressions.extend((Value(key), value))
+        super().__init__(*expressions)
+
+    def as_sql(self, compiler, connection, **extra_context):
+        if not connection.features.has_json_object_function:
+            raise NotSupportedError(
+                "JSONSet() is not supported on this database backend."
+            )
+        return super().as_sql(compiler, connection, **extra_context)
+
+    def as_postgresql(self, compiler, connection, **extra_context):
+        return self.as_sql(
+            compiler,
+            connection,
+            function="jsonb_set",
+            create=", true" if self.create_ else ", false",
+            template="%(function)s(%(expressions)s%(create)s)",
+            **extra_context,
+        )
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        op_types = {
+            "REMOVE": "REMOVE",
+            "INSERT": "INSERT",
+            "REPLACE": "REPLACE",
+            "APPEND": "APPEND",
+            "SET": "SET",
+            "RENAME": "RENAME",
+            "KEEP": "KEEP",
+            # "RHSEXPR": "RHSEXPR",  # not sure, self.rhs some how?
+        }
+        assert self.op_type_ in op_types, f"op_type: {self.op_type_} doesn't exist"
+        return self.as_sql(
+            compiler,
+            connection,
+            function="JSON_TRANSFORM",
+            arg_joiner=" = ",
+            op_type=" " if not self.op_type_ else f" {op_types[self.op_type_]} ",
+            template="%(function)s(%(op_type)s%(expressions)s)",
             **extra_context,
         )
 

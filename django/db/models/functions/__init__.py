@@ -1,4 +1,13 @@
-from .comparison import Cast, Coalesce, Collate, Greatest, JSONObject, Least, NullIf
+from .comparison import (
+    Cast,
+    Coalesce,
+    Collate,
+    Greatest,
+    JSONObject,
+    JSONSet,
+    Least,
+    NullIf,
+)
 from .datetime import (
     Extract,
     ExtractDay,
@@ -98,6 +107,7 @@ __all__ = [
     "Collate",
     "Greatest",
     "JSONObject",
+    "JSONSet",
     "Least",
     "NullIf",
     # datetime

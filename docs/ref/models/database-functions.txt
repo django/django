@@ -172,6 +172,84 @@ Usage example::
     >>> author.json_object
     {'name': 'margaret smith', 'alias': 'msmith', 'age': 50}
 
+``JSONSet``
+--------------
+
+.. class:: JSONSet(field="the_json_column_name",
+                   fields: dict = {},
+                   create: bool = True,
+                   op_type: str = "SET"
+                   )
+
+.. versionadded:: 4.1
+
+Takes a ``field`` and ``fields`` dictionary
+
+- sqlite: can have any number of key, value in the ``fields`` dictionary (field,
+  fields)
+- postgresql: only 1 key, value in the ``fields`` dictionary, optionally can
+  set ``create`` to ``False`` (field, fields, create)
+- mariadb: can have any number of key, value in the ``fields`` dictionary (field,
+  fields)
+- oracle: only 1 key, value in the ``fields`` dictionary, optionally pass in
+  ``op_type`` default to "SET" ( field, fields, op_type )
+
+Usage example::
+
+
+    cls.c1 = Flying.objects.create(
+        circus={
+            "id": 1,
+            "name": "Bingo Monty DuClownPort I",
+            "profession": {"active": False, "specialization": ["physical", "bits"]},
+        }
+    )
+    cls.c2 = Flying.objects.create(
+        circus={
+            "id": 2,
+            "name": "Bingo Monty DuClownPort II",
+            "profession": {"active": True, "specialization": ["tumbling"]},
+        }
+    )
+    cls.c3 = Flying.objects.create(
+        circus={
+            "id": 3,
+            "name": "Bingo Monty DuClownPort III",
+            "profession": {"active": False, "specialization": ["fire tumbling"]},
+        }
+    )
+
+    ##########################################################
+
+    objs = Flying.objects.all()
+    name = "Ringo Monty DuClownTown I"
+    key = "$.name"
+    if connection.vendor == "postgresql":
+        key = "{name}"
+        name = '"Ringo Monty DuClownTown I"'
+    ready = JSONSet(field="circus", fields={key: Value(name)})
+    objs.update(circus=ready)
+    assertTrue(
+        all([obj.circus["name"] == name.replace('"', "") for obj in objs])
+    )
+
+    ##########################################################
+
+    objs = Flying.objects.filter(circus__id=1)
+    key = "$.profession.specialization[1]"
+    value = Value("flips")
+    if connection.vendor == "postgresql":
+        key = "{profession,specialization,1}"
+        value = Value('"flips"')
+    ready = JSONSet(field="circus", fields={key: value})
+    objs.update(circus=ready)
+    self.assertEqual(
+        "physical flips",
+        " ".join(objs.first().circus["profession"]["specialization"]),
+    )
+
+
+
 ``Least``
 ---------
 
