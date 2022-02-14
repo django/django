@@ -1454,8 +1454,13 @@ class AssertFormErrorTests(SimpleTestCase):
         self.assertFormError(response, "form", "field", "invalid value")
 
     def test_empty_errors_unbound_form(self):
+        msg = (
+            "The form <TestForm bound=False, valid=Unknown, fields=(field)> is not "
+            "bound, it will never have any errors."
+        )
         response = mock.Mock(context=[{"form": TestForm()}])
-        self.assertFormError(response, "form", "field", [])
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormError(response, "form", "field", [])
 
     def test_empty_errors_valid_form(self):
         response = mock.Mock(context=[{"form": TestForm.valid()}])
@@ -1590,8 +1595,13 @@ class AssertFormsetErrorTests(SimpleTestCase):
         self.assertFormsetError(response, "formset", 0, "field", "invalid value")
 
     def test_empty_errors_unbound_formset(self):
+        msg = (
+            "The formset <TestFormset: bound=False valid=Unknown total_forms=1> is not "
+            "bound, it will never have any errors."
+        )
         response = mock.Mock(context=[{"formset": TestFormset()}])
-        self.assertFormsetError(response, "formset", 0, "field", [])
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormsetError(response, "formset", 0, "field", [])
 
     def test_empty_errors_valid_formset(self):
         response = mock.Mock(context=[{}, {"formset": TestFormset.valid()}])

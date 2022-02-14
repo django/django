@@ -84,6 +84,10 @@ class AdminForm:
         return self.form.non_field_errors
 
     @property
+    def is_bound(self):
+        return self.form.is_bound
+
+    @property
     def media(self):
         media = self.form.media
         for fs in self:
@@ -436,6 +440,10 @@ class InlineAdminFormSet:
     @property
     def non_form_errors(self):
         return self.formset.non_form_errors
+
+    @property
+    def is_bound(self):
+        return self.formset.is_bound
 
     @property
     def media(self):
