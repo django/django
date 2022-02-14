@@ -446,6 +446,10 @@ class InlineAdminFormSet:
         return self.formset.is_bound
 
     @property
+    def total_form_count(self):
+        return self.formset.total_form_count
+
+    @property
     def media(self):
         media = self.opts.media + self.formset.media
         for fs in self:

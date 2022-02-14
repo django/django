@@ -686,13 +686,21 @@ class SimpleTestCase(unittest.TestCase):
         for i, context in enumerate(contexts):
             if formset not in context or not hasattr(context[formset], "forms"):
                 continue
+            formset_repr = repr(context[formset])
             if not context[formset].is_bound:
-                formset_repr = repr(context[formset])
                 self.fail(
                     f"{msg_prefix}The formset {formset_repr} is not bound, it will "
                     f"never have any errors."
                 )
             found_formset = True
+            if form_index is not None:
+                form_count = context[formset].total_form_count()
+                if form_index >= form_count:
+                    form_or_forms = "forms" if form_count > 1 else "form"
+                    self.fail(
+                        f"{msg_prefix}The formset {formset_repr} only has "
+                        f"{form_count} {form_or_forms}."
+                    )
             for err in errors:
                 if field is not None:
                     if field in context[formset].forms[form_index].errors:

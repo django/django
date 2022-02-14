@@ -1629,6 +1629,33 @@ class AssertFormsetErrorTests(SimpleTestCase):
         )
         self.assertFormsetError(response, "formset", None, None, "error")
 
+    def test_form_index_too_big(self):
+        msg = (
+            "The formset <TestFormset: bound=True valid=False total_forms=1> only has "
+            "1 form."
+        )
+        response = mock.Mock(context=[{}, {"formset": TestFormset.invalid()}])
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormsetError(response, "formset", 2, "field", "error")
+
+    def test_form_index_too_big_plural(self):
+        formset = TestFormset(
+            {
+                "form-TOTAL_FORMS": "2",
+                "form-INITIAL_FORMS": "0",
+                "form-0-field": "valid",
+                "form-1-field": "valid",
+            }
+        )
+        formset.full_clean()
+        msg = (
+            "The formset <TestFormset: bound=True valid=True total_forms=2> only has 2 "
+            "forms."
+        )
+        response = mock.Mock(context=[{}, {"formset": formset}])
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormsetError(response, "formset", 2, "field", "error")
+
     def test_formset_named_form(self):
         formset = TestFormset.invalid()
         # The mocked context emulates the template-based rendering of the
