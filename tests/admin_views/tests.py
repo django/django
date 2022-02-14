@@ -6689,7 +6689,7 @@ class UserAdminTest(TestCase):
             },
         )
         self.assertEqual(response.status_code, 200)
-        self.assertFormError(response, "adminform", "password", [])
+        self.assertFormError(response, "adminform", "password1", [])
         self.assertFormError(
             response,
             "adminform",
