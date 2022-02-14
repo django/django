@@ -7816,12 +7816,7 @@ class AdminViewOnSiteTests(TestCase):
         self.assertFormError(
             response, "adminform", "some_required_info", ["This field is required."]
         )
-        msg = (
-            "The form 'adminform' in context 0 does not contain the non-field error "
-            "'Error'"
-        )
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(response, "adminform", None, ["Error"])
+        self.assertFormError(response, "adminform", None, [])
         self.assertFormsetError(
             response,
             "inline_admin_formset",
@@ -7832,14 +7827,7 @@ class AdminViewOnSiteTests(TestCase):
                 "contrived test case"
             ],
         )
-        msg = (
-            "The formset 'inline_admin_formset' in context 22 does not contain any "
-            "non-form errors."
-        )
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormsetError(
-                response, "inline_admin_formset", None, None, ["Error"]
-            )
+        self.assertFormsetError(response, "inline_admin_formset", None, None, [])
 
     def test_change_view_form_and_formsets_run_validation(self):
         """
