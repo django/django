@@ -84,6 +84,10 @@ class AdminForm:
         return self.form.non_field_errors
 
     @property
+    def fields(self):
+        return self.form.fields
+
+    @property
     def is_bound(self):
         return self.form.is_bound
 

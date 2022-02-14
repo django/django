@@ -563,6 +563,28 @@ class SimpleTestCase(unittest.TestCase):
                 "the Django test Client."
             )
 
+    def _assert_form_error(self, form, field, errors, msg_prefix, form_repr):
+        if not form.is_bound:
+            self.fail(
+                f"{msg_prefix} The {form_repr} is not bound, it will never have any "
+                f"errors."
+            )
+
+        if field is not None and field not in form.fields:
+            self.fail(
+                f"{msg_prefix}The {form_repr} does not contain the field {field!r}."
+            )
+        if field is None:
+            field_errors = form.non_field_errors()
+            failure_message = f"The non-field errors of {form_repr} don't match."
+        else:
+            field_errors = form.errors.get(field, [])
+            failure_message = (
+                f"The errors of field {field!r} on {form_repr} don't match."
+            )
+
+        self.assertEqual(field_errors, errors, msg_prefix + failure_message)
+
     def assertFormError(self, response, form, field, errors, msg_prefix=""):
         """
         Assert that a form used to render the response has a specific field
@@ -593,53 +615,11 @@ class SimpleTestCase(unittest.TestCase):
         # Search all contexts for the error.
         found_form = False
         for i, context in enumerate(contexts):
-            if form not in context:
-                continue
-            if not context[form].is_bound:
-                form_repr = repr(context[form])
-                self.fail(
-                    f"{msg_prefix}The form {form_repr} is not bound, it will never "
-                    f"have any errors."
+            if form in context:
+                found_form = True
+                self._assert_form_error(
+                    context[form], field, errors, msg_prefix, "form %r" % context[form]
                 )
-            found_form = True
-            for err in errors:
-                if field:
-                    if field in context[form].errors:
-                        field_errors = context[form].errors[field]
-                        self.assertTrue(
-                            err in field_errors,
-                            msg_prefix + "The field '%s' on form '%s' in"
-                            " context %d does not contain the error '%s'"
-                            " (actual errors: %s)"
-                            % (field, form, i, err, repr(field_errors)),
-                        )
-                    elif field in context[form].fields:
-                        self.fail(
-                            msg_prefix
-                            + (
-                                "The field '%s' on form '%s' in context %d contains no "
-                                "errors"
-                            )
-                            % (field, form, i)
-                        )
-                    else:
-                        self.fail(
-                            msg_prefix
-                            + (
-                                "The form '%s' in context %d does not contain the "
-                                "field '%s'"
-                            )
-                            % (form, i, field)
-                        )
-                else:
-                    non_field_errors = context[form].non_field_errors()
-                    self.assertTrue(
-                        err in non_field_errors,
-                        msg_prefix + "The form '%s' in context %d does not"
-                        " contain the non-field error '%s'"
-                        " (actual errors: %s)"
-                        % (form, i, err, non_field_errors or "none"),
-                    )
         if not found_form:
             self.fail(
                 msg_prefix + "The form '%s' was not used to render the response" % form
@@ -701,64 +681,23 @@ class SimpleTestCase(unittest.TestCase):
                         f"{msg_prefix}The formset {formset_repr} only has "
                         f"{form_count} {form_or_forms}."
                     )
-            for err in errors:
-                if field is not None:
-                    if field in context[formset].forms[form_index].errors:
-                        field_errors = context[formset].forms[form_index].errors[field]
-                        self.assertTrue(
-                            err in field_errors,
-                            msg_prefix + "The field '%s' on formset '%s', "
-                            "form %d in context %d does not contain the "
-                            "error '%s' (actual errors: %s)"
-                            % (field, formset, form_index, i, err, repr(field_errors)),
-                        )
-                    elif field in context[formset].forms[form_index].fields:
-                        self.fail(
-                            msg_prefix
-                            + (
-                                "The field '%s' on formset '%s', form %d in context "
-                                "%d contains no errors"
-                            )
-                            % (field, formset, form_index, i)
-                        )
-                    else:
-                        self.fail(
-                            msg_prefix
-                            + (
-                                "The formset '%s', form %d in context %d does not "
-                                "contain the field '%s'"
-                            )
-                            % (formset, form_index, i, field)
-                        )
-                elif form_index is not None:
-                    non_field_errors = (
-                        context[formset].forms[form_index].non_field_errors()
-                    )
-                    self.assertFalse(
-                        not non_field_errors,
-                        msg_prefix + "The formset '%s', form %d in context %d "
-                        "does not contain any non-field errors."
-                        % (formset, form_index, i),
-                    )
-                    self.assertTrue(
-                        err in non_field_errors,
-                        msg_prefix + "The formset '%s', form %d in context %d "
-                        "does not contain the non-field error '%s' (actual errors: %s)"
-                        % (formset, form_index, i, err, repr(non_field_errors)),
-                    )
-                else:
-                    non_form_errors = context[formset].non_form_errors()
-                    self.assertFalse(
-                        not non_form_errors,
-                        msg_prefix + "The formset '%s' in context %d does not "
-                        "contain any non-form errors." % (formset, i),
-                    )
-                    self.assertTrue(
-                        err in non_form_errors,
-                        msg_prefix + "The formset '%s' in context %d does not "
-                        "contain the non-form error '%s' (actual errors: %s)"
-                        % (formset, i, err, repr(non_form_errors)),
-                    )
+            if form_index is not None:
+                form_repr = f"form {form_index} of formset {formset_repr}"
+                self._assert_form_error(
+                    context[formset].forms[form_index],
+                    field,
+                    errors,
+                    msg_prefix,
+                    form_repr,
+                )
+            else:
+                failure_message = (
+                    f"{msg_prefix}The non-form errors of formset {formset_repr} don't "
+                    f"match."
+                )
+                self.assertEqual(
+                    context[formset].non_form_errors(), errors, failure_message
+                )
         if not found_formset:
             self.fail(
                 msg_prefix

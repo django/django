@@ -651,7 +651,11 @@ class AssertFormErrorTests(SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "Invalid POST Template")
 
-        msg = "The form 'form' in context 0 does not contain the field 'some_field'"
+        msg = (
+            "The form <TestForm bound=True, valid=False, "
+            "fields=(text;email;value;single;multi)> does not contain the field "
+            "'some_field'."
+        )
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertFormError(response, "form", "some_field", "Some error.")
         with self.assertRaisesMessage(AssertionError, "abc: " + msg):
@@ -672,7 +676,10 @@ class AssertFormErrorTests(SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "Invalid POST Template")
 
-        msg = "The field 'value' on form 'form' in context 0 contains no errors"
+        msg = (
+            "The errors of field 'value' on form <TestForm bound=True, valid=False, "
+            "fields=(text;email;value;single;multi)> don't match."
+        )
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertFormError(response, "form", "value", "Some error.")
         with self.assertRaisesMessage(AssertionError, "abc: " + msg):
@@ -694,9 +701,8 @@ class AssertFormErrorTests(SimpleTestCase):
         self.assertTemplateUsed(response, "Invalid POST Template")
 
         msg = (
-            "The field 'email' on form 'form' in context 0 does not contain "
-            "the error 'Some error.' (actual errors: ['Enter a valid email "
-            "address.'])"
+            "The errors of field 'email' on form <TestForm bound=True, valid=False, "
+            "fields=(text;email;value;single;multi)> don't match."
         )
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertFormError(response, "form", "email", "Some error.")
@@ -722,8 +728,8 @@ class AssertFormErrorTests(SimpleTestCase):
         self.assertTemplateUsed(response, "Invalid POST Template")
 
         msg = (
-            "The form 'form' in context 0 does not contain the non-field "
-            "error 'Some error.' (actual errors: none)"
+            "The non-field errors of form <TestForm bound=True, valid=False, "
+            "fields=(text;email;value;single;multi)> don't match."
         )
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertFormError(response, "form", None, "Some error.")
@@ -801,9 +807,8 @@ class AssertFormsetErrorTests(SimpleTestCase):
         "An assertion is raised if the field name is unknown"
         for prefix, kwargs in self.msg_prefixes:
             msg = (
-                prefix
-                + "The formset 'my_formset', form 0 in context 0 does not contain the "
-                "field 'Some_field'"
+                f"{prefix}The form 0 of formset <TestFormFormSet: bound=True "
+                f"valid=False total_forms=2> does not contain the field 'Some_field'."
             )
             with self.assertRaisesMessage(AssertionError, msg):
                 self.assertFormsetError(
@@ -819,9 +824,8 @@ class AssertFormsetErrorTests(SimpleTestCase):
         "An assertion is raised if the field doesn't have any errors"
         for prefix, kwargs in self.msg_prefixes:
             msg = (
-                prefix
-                + "The field 'value' on formset 'my_formset', form 1 in context 0 "
-                "contains no errors"
+                f"{prefix}The errors of field 'value' on form 1 of formset "
+                f"<TestFormFormSet: bound=True valid=False total_forms=2> don't match."
             )
             with self.assertRaisesMessage(AssertionError, msg):
                 self.assertFormsetError(
@@ -836,10 +840,9 @@ class AssertFormsetErrorTests(SimpleTestCase):
     def test_unknown_error(self):
         "An assertion is raised if the field doesn't contain the specified error"
         for prefix, kwargs in self.msg_prefixes:
-            msg = prefix + (
-                "The field 'email' on formset 'my_formset', form 0 "
-                "in context 0 does not contain the error 'Some error.' "
-                "(actual errors: ['Enter a valid email address.'])"
+            msg = (
+                f"{prefix}The errors of field 'email' on form 0 of formset "
+                f"<TestFormFormSet: bound=True valid=False total_forms=2> don't match."
             )
             with self.assertRaisesMessage(AssertionError, msg):
                 self.assertFormsetError(
@@ -866,9 +869,8 @@ class AssertFormsetErrorTests(SimpleTestCase):
         """
         for prefix, kwargs in self.msg_prefixes:
             msg = (
-                prefix
-                + "The formset 'my_formset', form 1 in context 0 does not contain any "
-                "non-field errors."
+                f"{prefix}The non-field errors of form 1 of formset <TestFormFormSet: "
+                f"bound=True valid=False total_forms=2> don't match."
             )
             with self.assertRaisesMessage(AssertionError, msg):
                 self.assertFormsetError(
@@ -886,10 +888,9 @@ class AssertFormsetErrorTests(SimpleTestCase):
         the provided error.
         """
         for prefix, kwargs in self.msg_prefixes:
-            msg = prefix + (
-                "The formset 'my_formset', form 0 in context 0 does not "
-                "contain the non-field error 'Some error.' (actual errors: "
-                "['Non-field error.'])"
+            msg = (
+                f"{prefix}The non-field errors of form 0 of formset <TestFormFormSet: "
+                f"bound=True valid=False total_forms=2> don't match."
             )
             with self.assertRaisesMessage(AssertionError, msg):
                 self.assertFormsetError(
@@ -923,9 +924,8 @@ class AssertFormsetErrorTests(SimpleTestCase):
         """
         for prefix, kwargs in self.msg_prefixes:
             msg = (
-                prefix
-                + "The formset 'my_formset' in context 0 does not contain any non-form "
-                "errors."
+                f"{prefix}The non-form errors of formset <TestFormFormSet: bound=True "
+                f"valid=False total_forms=2> don't match"
             )
             with self.assertRaisesMessage(AssertionError, msg):
                 self.assertFormsetError(
@@ -943,10 +943,9 @@ class AssertFormsetErrorTests(SimpleTestCase):
         the provided error.
         """
         for prefix, kwargs in self.msg_prefixes:
-            msg = prefix + (
-                "The formset 'my_formset' in context 0 does not contain the "
-                "non-form error 'Some error.' (actual errors: ['Forms in a set "
-                "must have distinct email addresses.'])"
+            msg = (
+                f"{prefix}The non-form errors of formset <TestFormFormSet: bound=True "
+                f"valid=False total_forms=2> don't match"
             )
             with self.assertRaisesMessage(AssertionError, msg):
                 self.assertFormsetError(

@@ -1404,46 +1404,33 @@ class AssertFormErrorTests(SimpleTestCase):
             self.assertFormError(response, "form", "field", "invalid value")
 
     def test_field_not_in_form(self):
-        msg = "The form 'form' in context 0 does not contain the field 'other_field'"
+        msg = (
+            "The form <TestForm bound=True, valid=False, fields=(field)> does not "
+            "contain the field 'other_field'."
+        )
         response = mock.Mock(context=[{"form": TestForm.invalid()}])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(response, "form", "other_field", "invalid value")
-
-    def test_field_not_in_form_multicontext(self):
-        msg = "The form 'form' in context 1 does not contain the field 'other_field'"
-        response = mock.Mock(context=[{}, {"form": TestForm.invalid()}])
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertFormError(response, "form", "other_field", "invalid value")
 
     def test_field_with_no_errors(self):
-        msg = "The field 'field' on form 'form' in context 0 contains no errors"
+        msg = (
+            "The errors of field 'field' on form <TestForm bound=True, valid=True, "
+            "fields=(field)> don't match."
+        )
         response = mock.Mock(context=[{"form": TestForm.valid()}])
-        with self.assertRaisesMessage(AssertionError, msg):
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
             self.assertFormError(response, "form", "field", "invalid value")
-
-    def test_field_with_no_errors_multicontext(self):
-        msg = "The field 'field' on form 'form' in context 1 contains no errors"
-        response = mock.Mock(context=[{}, {"form": TestForm.valid()}])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(response, "form", "field", "invalid value")
+        self.assertIn("[] != ['invalid value']", str(ctx.exception))
 
     def test_field_with_different_error(self):
         msg = (
-            "The field 'field' on form 'form' in context 0 does not contain "
-            "the error 'other error' (actual errors: ['invalid value'])"
+            "The errors of field 'field' on form <TestForm bound=True, valid=False, "
+            "fields=(field)> don't match."
         )
         response = mock.Mock(context=[{"form": TestForm.invalid()}])
-        with self.assertRaisesMessage(AssertionError, msg):
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
             self.assertFormError(response, "form", "field", "other error")
-
-    def test_field_with_different_error_multicontext(self):
-        msg = (
-            "The field 'field' on form 'form' in context 1 does not contain "
-            "the error 'other error' (actual errors: ['invalid value'])"
-        )
-        response = mock.Mock(context=[{}, {"form": TestForm.invalid()}])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(response, "form", "field", "other error")
+        self.assertIn("['invalid value'] != ['other error']", str(ctx.exception))
 
     def test_basic_positive_assertion(self):
         response = mock.Mock(context=[{"form": TestForm.invalid()}])
@@ -1467,8 +1454,14 @@ class AssertFormErrorTests(SimpleTestCase):
         self.assertFormError(response, "form", "field", [])
 
     def test_empty_errors_invalid_form(self):
+        msg = (
+            "The errors of field 'field' on form <TestForm bound=True, valid=False, "
+            "fields=(field)> don't match."
+        )
         response = mock.Mock(context=[{"form": TestForm.invalid()}])
-        self.assertFormError(response, "form", "field", [])
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
+            self.assertFormError(response, "form", "field", [])
+        self.assertIn("['invalid value'] != []", str(ctx.exception))
 
     def test_non_field_errors(self):
         response = mock.Mock(context=[{"form": TestForm.invalid(nonfield=True)}])
@@ -1476,17 +1469,22 @@ class AssertFormErrorTests(SimpleTestCase):
 
     @ignore_warnings(category=RemovedInDjango50Warning)
     def test_errors_none(self):
+        msg = (
+            "The errors of field 'field' on form <TestForm bound=True, valid=False, "
+            "fields=(field)> don't match."
+        )
         response = mock.Mock(context=[{"form": TestForm.invalid()}])
-        self.assertFormError(response, "form", "field", None)
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormError(response, "form", "field", None)
 
     def test_errors_none_warning(self):
-        response = mock.Mock(context=[{"form": TestForm.invalid()}])
+        response = mock.Mock(context=[{"form": TestForm.valid()}])
         msg = (
             "Passing errors=None to assertFormError() is deprecated, use "
             "errors=[] instead."
         )
         with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
-            self.assertFormError(response, "form", "value", None)
+            self.assertFormError(response, "form", "field", None)
 
 
 class AssertFormsetErrorTests(SimpleTestCase):
@@ -1520,25 +1518,10 @@ class AssertFormsetErrorTests(SimpleTestCase):
 
     def test_field_not_in_form(self):
         msg = (
-            "The formset 'formset', form 0 in context 0 does not contain the "
-            "field 'other_field'"
+            "The form 0 of formset <TestFormset: bound=True valid=False total_forms=1> "
+            "does not contain the field 'other_field'."
         )
         response = mock.Mock(context=[{"formset": TestFormset.invalid()}])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormsetError(
-                response,
-                "formset",
-                0,
-                "other_field",
-                "invalid value",
-            )
-
-    def test_field_not_in_form_multicontext(self):
-        msg = (
-            "The formset 'formset', form 0 in context 1 does not contain the "
-            "field 'other_field'"
-        )
-        response = mock.Mock(context=[{}, {"formset": TestFormset.invalid()}])
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertFormsetError(
                 response,
@@ -1550,41 +1533,23 @@ class AssertFormsetErrorTests(SimpleTestCase):
 
     def test_field_with_no_errors(self):
         msg = (
-            "The field 'field' on formset 'formset', form 0 in context 0 "
-            "contains no errors"
+            "The errors of field 'field' on form 0 of formset <TestFormset: bound=True "
+            "valid=True total_forms=1> don't match."
         )
         response = mock.Mock(context=[{"formset": TestFormset.valid()}])
-        with self.assertRaisesMessage(AssertionError, msg):
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
             self.assertFormsetError(response, "formset", 0, "field", "invalid value")
-
-    def test_field_with_no_errors_multicontext(self):
-        msg = (
-            "The field 'field' on formset 'formset', form 0 in context 1 "
-            "contains no errors"
-        )
-        response = mock.Mock(context=[{}, {"formset": TestFormset.valid()}])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormsetError(response, "formset", 0, "field", "invalid value")
+        self.assertIn("[] != ['invalid value']", str(ctx.exception))
 
     def test_field_with_different_error(self):
         msg = (
-            "The field 'field' on formset 'formset', form 0 in context 0 does"
-            " not contain the error 'other error' (actual errors: ['invalid "
-            "value'])"
+            "The errors of field 'field' on form 0 of formset <TestFormset: bound=True "
+            "valid=False total_forms=1> don't match."
         )
         response = mock.Mock(context=[{"formset": TestFormset.invalid()}])
-        with self.assertRaisesMessage(AssertionError, msg):
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
             self.assertFormsetError(response, "formset", 0, "field", "other error")
-
-    def test_field_with_different_error_multicontext(self):
-        msg = (
-            "The field 'field' on formset 'formset', form 0 in context 1 does"
-            " not contain the error 'other error' (actual errors: ['invalid "
-            "value'])"
-        )
-        response = mock.Mock(context=[{}, {"formset": TestFormset.invalid()}])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormsetError(response, "formset", 0, "field", "other error")
+        self.assertIn("['invalid value'] != ['other error']", str(ctx.exception))
 
     def test_basic_positive_assertion(self):
         response = mock.Mock(context=[{"formset": TestFormset.invalid()}])
@@ -1608,8 +1573,14 @@ class AssertFormsetErrorTests(SimpleTestCase):
         self.assertFormsetError(response, "formset", 0, "field", [])
 
     def test_empty_errors_invalid_formset(self):
+        msg = (
+            "The errors of field 'field' on form 0 of formset <TestFormset: bound=True "
+            "valid=False total_forms=1> don't match."
+        )
         response = mock.Mock(context=[{}, {"formset": TestFormset.invalid()}])
-        self.assertFormsetError(response, "formset", 0, "field", [])
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
+            self.assertFormsetError(response, "formset", 0, "field", [])
+        self.assertIn("['invalid value'] != []", str(ctx.exception))
 
     def test_non_field_errors(self):
         response = mock.Mock(
@@ -1670,11 +1641,16 @@ class AssertFormsetErrorTests(SimpleTestCase):
 
     @ignore_warnings(category=RemovedInDjango50Warning)
     def test_errors_none(self):
+        msg = (
+            "The errors of field 'field' on form 0 of formset <TestFormset: bound=True "
+            "valid=False total_forms=1> don't match."
+        )
         response = mock.Mock(context=[{"formset": TestFormset.invalid()}])
-        self.assertFormsetError(response, "formset", 0, "field", None)
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormsetError(response, "formset", 0, "field", None)
 
     def test_errors_none_warning(self):
-        response = mock.Mock(context=[{"formset": TestFormset.invalid()}])
+        response = mock.Mock(context=[{"formset": TestFormset.valid()}])
         msg = (
             "Passing errors=None to assertFormsetError() is deprecated, use "
             "errors=[] instead."
