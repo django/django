@@ -658,6 +658,10 @@ class SimpleTestCase(unittest.TestCase):
                 stacklevel=2,
             )
             errors = []
+
+        if form_index is None and field is not None:
+            raise ValueError("You must use field=None with form_index=None.")
+
         # Put error(s) into a list to simplify processing.
         errors = to_list(errors)
 

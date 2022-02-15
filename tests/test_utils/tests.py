@@ -1603,6 +1603,17 @@ class AssertFormsetErrorTests(SimpleTestCase):
         )
         self.assertFormsetError(response, "formset", None, None, "error")
 
+    def test_non_form_errors_with_field(self):
+        response = mock.Mock(
+            context=[
+                {},
+                {"formset": TestFormset.invalid(nonform=True)},
+            ]
+        )
+        msg = "You must use field=None with form_index=None."
+        with self.assertRaisesMessage(ValueError, msg):
+            self.assertFormsetError(response, "formset", None, "field", "error")
+
     def test_form_index_too_big(self):
         msg = (
             "The formset <TestFormset: bound=True valid=False total_forms=1> only has "
