@@ -31,7 +31,7 @@ from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import cached_property, partition
 
 # The maximum number of results to fetch in a get() query.
-MAX_GET_RESULTS = 21
+MAX_GET_RESULTS = 2
 
 # The maximum number of items to display in a QuerySet.__repr__
 REPR_OUTPUT_SIZE = 20
