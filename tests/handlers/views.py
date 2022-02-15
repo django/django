@@ -63,7 +63,11 @@ class CoroutineClearingView:
         return self._unawaited_coroutine
 
     def __del__(self):
-        self._unawaited_coroutine.close()
+        try:
+            self._unawaited_coroutine.close()
+        except AttributeError:
+            # View was never called.
+            pass
 
 
 async_unawaited = CoroutineClearingView()
