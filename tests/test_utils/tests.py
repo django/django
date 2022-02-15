@@ -1448,6 +1448,9 @@ class AssertFormErrorTests(SimpleTestCase):
         response = mock.Mock(context=[{"form": TestForm()}])
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertFormError(response, "form", "field", [])
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormError(response, "form", "field", [], msg_prefix=msg_prefix)
 
     def test_empty_errors_valid_form(self):
         response = mock.Mock(context=[{"form": TestForm.valid()}])

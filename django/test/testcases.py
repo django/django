@@ -566,7 +566,7 @@ class SimpleTestCase(unittest.TestCase):
     def _assert_form_error(self, form, field, errors, msg_prefix, form_repr):
         if not form.is_bound:
             self.fail(
-                f"{msg_prefix} The {form_repr} is not bound, it will never have any "
+                f"{msg_prefix}The {form_repr} is not bound, it will never have any "
                 f"errors."
             )
 
