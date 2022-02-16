@@ -1728,11 +1728,15 @@ class ManyToManyField(RelatedField):
             kwargs["db_table"] = self.db_table
         if self.remote_field.db_constraint is not True:
             kwargs["db_constraint"] = self.remote_field.db_constraint
-        # Rel needs more work.
+        # Lowercase model names as they should be treated as case-insensitive.
         if isinstance(self.remote_field.model, str):
-            kwargs["to"] = self.remote_field.model
+            if "." in self.remote_field.model:
+                app_label, model_name = self.remote_field.model.split(".")
+                kwargs["to"] = "%s.%s" % (app_label, model_name.lower())
+            else:
+                kwargs["to"] = self.remote_field.model.lower()
         else:
-            kwargs["to"] = self.remote_field.model._meta.label
+            kwargs["to"] = self.remote_field.model._meta.label_lower
         if getattr(self.remote_field, "through", None) is not None:
             if isinstance(self.remote_field.through, str):
                 kwargs["through"] = self.remote_field.through
