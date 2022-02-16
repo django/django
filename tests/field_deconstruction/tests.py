@@ -475,34 +475,34 @@ class FieldDeconstructionTests(SimpleTestCase):
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ManyToManyField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission"})
+        self.assertEqual(kwargs, {"to": "auth.permission"})
         self.assertFalse(hasattr(kwargs["to"], "setting_name"))
         # Test swappable
         field = models.ManyToManyField("auth.User")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ManyToManyField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.User"})
+        self.assertEqual(kwargs, {"to": "auth.user"})
         self.assertEqual(kwargs["to"].setting_name, "AUTH_USER_MODEL")
         # Test through
         field = models.ManyToManyField("auth.Permission", through="auth.Group")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ManyToManyField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission", "through": "auth.Group"})
+        self.assertEqual(kwargs, {"to": "auth.permission", "through": "auth.Group"})
         # Test custom db_table
         field = models.ManyToManyField("auth.Permission", db_table="custom_table")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ManyToManyField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission", "db_table": "custom_table"})
+        self.assertEqual(kwargs, {"to": "auth.permission", "db_table": "custom_table"})
         # Test related_name
         field = models.ManyToManyField("auth.Permission", related_name="custom_table")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ManyToManyField")
         self.assertEqual(args, [])
         self.assertEqual(
-            kwargs, {"to": "auth.Permission", "related_name": "custom_table"}
+            kwargs, {"to": "auth.permission", "related_name": "custom_table"}
         )
         # Test related_query_name
         field = models.ManyToManyField("auth.Permission", related_query_name="foobar")
@@ -510,7 +510,7 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(path, "django.db.models.ManyToManyField")
         self.assertEqual(args, [])
         self.assertEqual(
-            kwargs, {"to": "auth.Permission", "related_query_name": "foobar"}
+            kwargs, {"to": "auth.permission", "related_query_name": "foobar"}
         )
         # Test limit_choices_to
         field = models.ManyToManyField(
@@ -520,7 +520,7 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(path, "django.db.models.ManyToManyField")
         self.assertEqual(args, [])
         self.assertEqual(
-            kwargs, {"to": "auth.Permission", "limit_choices_to": {"foo": "bar"}}
+            kwargs, {"to": "auth.permission", "limit_choices_to": {"foo": "bar"}}
         )
 
     @override_settings(AUTH_USER_MODEL="auth.Permission")
@@ -533,7 +533,7 @@ class FieldDeconstructionTests(SimpleTestCase):
 
         self.assertEqual(path, "django.db.models.ManyToManyField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission"})
+        self.assertEqual(kwargs, {"to": "auth.permission"})
         self.assertEqual(kwargs["to"].setting_name, "AUTH_USER_MODEL")
 
     def test_many_to_many_field_related_name(self):
@@ -551,7 +551,7 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(args, [])
         # deconstruct() should not include attributes which were not passed to
         # the field during initialization.
-        self.assertEqual(kwargs, {"to": "field_deconstruction.MyModel"})
+        self.assertEqual(kwargs, {"to": "field_deconstruction.mymodel"})
         # Passed attributes.
         name, path, args, kwargs = MyModel.m2m_related_name.field.deconstruct()
         self.assertEqual(path, "django.db.models.ManyToManyField")
@@ -559,7 +559,7 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(
             kwargs,
             {
-                "to": "field_deconstruction.MyModel",
+                "to": "field_deconstruction.mymodel",
                 "related_query_name": "custom_query_name",
                 "limit_choices_to": {"flag": True},
             },
