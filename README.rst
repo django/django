@@ -25,12 +25,12 @@ here's how we recommend you read the docs:
 
 Docs are updated rigorously. If you find any problems in the docs, or think
 they should be clarified in any way, please take 30 seconds to fill out a
-ticket here: https://code.djangoproject.com/newticket
+ticket here: https://code.djangoproject.com/newticket/
 
 To get more help:
 
 * Join the ``#django`` channel on ``irc.libera.chat``. Lots of helpful people
-  hang out there. See https://web.libera.chat if you're new to IRC.
+  hang out there. See https://web.libera.chat/ if you're new to IRC.
 
 * Join the django-users mailing list, or read the archives, at
   https://groups.google.com/group/django-users.
@@ -44,7 +44,7 @@ To run Django's test suite:
 
 * Follow the instructions in the "Unit tests" section of
   ``docs/internals/contributing/writing-code/unit-tests.txt``, published online at
-  https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#running-the-unit-tests
+  https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#running-the-unit-tests/
 
 Supporting the Development of Django
 ====================================
