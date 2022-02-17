@@ -26,9 +26,9 @@ On the first commit ``pre-commit`` will install the hooks, these are
 installed in their own environments and will take a short while to
 install on the first run. Subsequent checks will be significantly faster.
 If an error is found an appropriate error message will be displayed.
-If the error was with ``isort`` then the tool will go ahead and fix them for
-you. Review the changes and re-stage for commit if you are happy with
-them.
+If the error was with ``black`` or ``isort`` then the tool will go ahead and
+fix them for you. Review the changes and re-stage for commit if you are happy
+with them.
 
 .. _coding-style-python:
 
