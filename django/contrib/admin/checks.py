@@ -1130,7 +1130,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                         id="admin.E124",
                     )
                 ]
-            elif not field.editable:
+            elif not field.editable or field.primary_key:
                 return [
                     checks.Error(
                         "The value of '%s' refers to '%s', which is not editable "
