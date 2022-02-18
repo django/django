@@ -1247,7 +1247,7 @@ URL::
     # The value returned by get_version() must change when translations change.
     urlpatterns = [
         path('jsi18n/',
-             cache_page(86400, key_prefix='js18n-%s' % get_version())(JavaScriptCatalog.as_view()),
+             cache_page(86400, key_prefix='jsi18n-%s' % get_version())(JavaScriptCatalog.as_view()),
              name='javascript-catalog'),
     ]
 
