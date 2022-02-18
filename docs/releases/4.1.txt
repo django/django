@@ -312,6 +312,8 @@ Utilities
 
 * ``SimpleLazyObject`` now supports addition operations.
 
+* :func:`~django.utils.safestring.mark_safe` now preserves lazy objects.
+
 Validators
 ~~~~~~~~~~
 
