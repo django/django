@@ -450,6 +450,19 @@ SELECT2_TRANSLATIONS = {
 SELECT2_TRANSLATIONS.update({"zh-hans": "zh-CN", "zh-hant": "zh-TW"})
 
 
+def get_select2_language():
+    lang_code = get_language()
+    supported_code = SELECT2_TRANSLATIONS.get(lang_code)
+    if supported_code is None:
+        # If 'zh-hant-tw' is not supported, try subsequent language codes i.e.
+        # 'zh-hant' and 'zh'.
+        i = None
+        while (i := lang_code.rfind("-", 0, i)) > -1:
+            if supported_code := SELECT2_TRANSLATIONS.get(lang_code[:i]):
+                return supported_code
+    return supported_code
+
+
 class AutocompleteMixin:
     """
     Select widget mixin that loads options from AutocompleteJsonView via AJAX.
@@ -466,7 +479,7 @@ class AutocompleteMixin:
         self.db = using
         self.choices = choices
         self.attrs = {} if attrs is None else attrs.copy()
-        self.i18n_name = SELECT2_TRANSLATIONS.get(get_language())
+        self.i18n_name = get_select2_language()
 
     def get_url(self):
         return reverse(self.url_name % self.admin_site.name)
