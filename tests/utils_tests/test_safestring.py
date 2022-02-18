@@ -1,8 +1,9 @@
 from django.template import Context, Template
 from django.test import SimpleTestCase
-from django.utils import html
-from django.utils.functional import lazy, lazystr
+from django.utils import html, translation
+from django.utils.functional import Promise, lazy, lazystr
 from django.utils.safestring import SafeData, SafeString, mark_safe
+from django.utils.translation import gettext_lazy
 
 
 class customescape(str):
@@ -40,10 +41,17 @@ class SafeStringTest(SimpleTestCase):
         self.assertRenderEqual("{{ s|force_escape }}", "&lt;a&amp;b&gt;", s=s)
 
     def test_mark_safe_lazy(self):
-        s = lazystr("a&b")
+        safe_s = mark_safe(lazystr("a&b"))
 
-        self.assertIsInstance(mark_safe(s), SafeData)
-        self.assertRenderEqual("{{ s }}", "a&b", s=mark_safe(s))
+        self.assertIsInstance(safe_s, Promise)
+        self.assertRenderEqual("{{ s }}", "a&b", s=safe_s)
+        self.assertIsInstance(str(safe_s), SafeData)
+
+    def test_mark_safe_lazy_i18n(self):
+        s = mark_safe(gettext_lazy("name"))
+        tpl = Template("{{ s }}")
+        with translation.override("fr"):
+            self.assertEqual(tpl.render(Context({"s": s})), "nom")
 
     def test_mark_safe_object_implementing_dunder_str(self):
         class Obj:
