@@ -171,7 +171,6 @@ def iter_modules_and_files(modules, extra_files):
             logger.debug('"%s" raised when resolving path: "%s"', e, path)
             continue
         resolved_path = path.resolve().absolute()
-
         if is_django_path(path):
             results.add((resolved_path, 10))
         elif filename.startswith(
