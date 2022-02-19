@@ -29,6 +29,7 @@ from django.core.mail.message import BadHeaderError, sanitize_address
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import requires_tz_support
 from django.utils.translation import gettext_lazy
+from django.utils.version import PY311
 
 try:
     from aiosmtpd.controller import Controller
@@ -790,7 +791,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 filebased.EmailBackend,
             )
 
-        if sys.platform == "win32":
+        if sys.platform == "win32" and not PY311:
             msg = (
                 "_getfullpathname: path should be string, bytes or os.PathLike, not "
                 "object"
