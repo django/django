@@ -14,7 +14,7 @@ from django.utils.safestring import SafeData, SafeString, mark_safe
 from django.utils.text import normalize_newlines
 
 
-@keep_lazy(str, SafeString)
+@keep_lazy(SafeString)
 def escape(text):
     """
     Return the given text with ampersands, quotes and angle brackets encoded
@@ -46,7 +46,7 @@ _js_escapes = {
 _js_escapes.update((ord("%c" % z), "\\u%04X" % z) for z in range(32))
 
 
-@keep_lazy(str, SafeString)
+@keep_lazy(SafeString)
 def escapejs(value):
     """Hex encode characters for use in JavaScript strings."""
     return mark_safe(str(value).translate(_js_escapes))
