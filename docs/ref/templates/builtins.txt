@@ -2237,7 +2237,7 @@ Note that you can backslash-escape a format string if you want to use the
 otherwise each is a format string that displays the hour and the month,
 respectively::
 
-    {% value|time:"H\h i\m" %}
+    {{ value|time:"H\h i\m" }}
 
 This would display as "01h 23m".
 
