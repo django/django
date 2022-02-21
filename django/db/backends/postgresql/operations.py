@@ -77,12 +77,21 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)
+        if lookup_type == "second":
+            # Truncate fractional seconds.
+            return f"EXTRACT('second' FROM DATE_TRUNC('second', {field_name}))"
         return self.date_extract_sql(lookup_type, field_name)
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)
         # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
         return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
+
+    def time_extract_sql(self, lookup_type, field_name):
+        if lookup_type == "second":
+            # Truncate fractional seconds.
+            return f"EXTRACT('second' FROM DATE_TRUNC('second', {field_name}))"
+        return self.date_extract_sql(lookup_type, field_name)
 
     def time_trunc_sql(self, lookup_type, field_name, tzname=None):
         field_name = self._convert_field_to_tz(field_name, tzname)
