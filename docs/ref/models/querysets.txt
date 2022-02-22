@@ -1110,7 +1110,7 @@ item in the Pizza ``QuerySet``.
 
 We can reduce to just two queries using ``prefetch_related``:
 
-    >>> Pizza.objects.all().prefetch_related('toppings')
+    >>> Pizza.objects.prefetch_related('toppings')
 
 This implies a ``self.toppings.all()`` for each ``Pizza``; now each time
 ``self.toppings.all()`` is called, instead of having to go to the database for
@@ -1648,7 +1648,7 @@ one, doing so will result in an error.
 
         # Two equivalent QuerySets:
         CommonlyUsedModel.objects.all()
-        ManagedModel.objects.all().defer('f2')
+        ManagedModel.objects.defer('f2')
 
     If many fields need to be duplicated in the unmanaged model, it may be best
     to create an abstract model with the shared fields and then have the
@@ -3771,7 +3771,7 @@ as the string based lookups passed to
     <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
     # This will only execute two queries regardless of the number of Question
     # and Choice objects.
-    >>> Question.objects.prefetch_related(Prefetch('choice_set')).all()
+    >>> Question.objects.prefetch_related(Prefetch('choice_set'))
     <QuerySet [<Question: What's up?>]>
 
 The ``queryset`` argument supplies a base ``QuerySet`` for the given lookup.

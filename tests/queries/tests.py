@@ -1787,7 +1787,7 @@ class Queries5Tests(TestCase):
             [self.rank3, self.rank2, self.rank1],
         )
         self.assertSequenceEqual(
-            Ranking.objects.all().order_by("rank"),
+            Ranking.objects.order_by("rank"),
             [self.rank1, self.rank2, self.rank3],
         )
 
@@ -1944,9 +1944,9 @@ class NullableRelOrderingTests(TestCase):
         s = SingleObject.objects.create(name="s")
         r = RelatedObject.objects.create(single=s, f=1)
         p2 = Plaything.objects.create(name="p2", others=r)
-        qs = Plaything.objects.all().filter(others__isnull=False).order_by("pk")
+        qs = Plaything.objects.filter(others__isnull=False).order_by("pk")
         self.assertNotIn("JOIN", str(qs.query))
-        qs = Plaything.objects.all().filter(others__f__isnull=False).order_by("pk")
+        qs = Plaything.objects.filter(others__f__isnull=False).order_by("pk")
         self.assertIn("INNER", str(qs.query))
         qs = qs.order_by("others__single__name")
         # The ordering by others__single__pk will add one new join (to single)
@@ -2219,16 +2219,16 @@ class QuerysetOrderedTests(unittest.TestCase):
 
     def test_cleared_default_ordering(self):
         self.assertIs(Tag.objects.all().ordered, True)
-        self.assertIs(Tag.objects.all().order_by().ordered, False)
+        self.assertIs(Tag.objects.order_by().ordered, False)
 
     def test_explicit_ordering(self):
-        self.assertIs(Annotation.objects.all().order_by("id").ordered, True)
+        self.assertIs(Annotation.objects.order_by("id").ordered, True)
 
     def test_empty_queryset(self):
         self.assertIs(Annotation.objects.none().ordered, True)
 
     def test_order_by_extra(self):
-        self.assertIs(Annotation.objects.all().extra(order_by=["id"]).ordered, True)
+        self.assertIs(Annotation.objects.extra(order_by=["id"]).ordered, True)
 
     def test_annotated_ordering(self):
         qs = Annotation.objects.annotate(num_notes=Count("notes"))
@@ -2685,7 +2685,7 @@ class QuerySetSupportsPythonIdioms(TestCase):
         ]
 
     def get_ordered_articles(self):
-        return Article.objects.all().order_by("name")
+        return Article.objects.order_by("name")
 
     def test_can_get_items_using_index_and_slice_notation(self):
         self.assertEqual(self.get_ordered_articles()[0].name, "Article 1")
@@ -2839,7 +2839,7 @@ class EscapingTests(TestCase):
         r_a = ReservedName.objects.create(name="a", order=42)
         r_b = ReservedName.objects.create(name="b", order=37)
         self.assertSequenceEqual(
-            ReservedName.objects.all().order_by("order"),
+            ReservedName.objects.order_by("order"),
             [r_b, r_a],
         )
         self.assertSequenceEqual(
@@ -2983,7 +2983,7 @@ class ConditionalTests(TestCase):
         # ... but you can still order in a non-recursive fashion among linked
         # fields (the previous test failed because the default ordering was
         # recursive).
-        self.assertQuerysetEqual(LoopX.objects.all().order_by("y__x__y__x__id"), [])
+        self.assertQuerysetEqual(LoopX.objects.order_by("y__x__y__x__id"), [])
 
     # When grouping without specifying ordering, we add an explicit "ORDER BY NULL"
     # portion in MySQL to prevent unnecessary sorting.
@@ -4175,7 +4175,7 @@ class RelatedLookupTypeTests(TestCase):
         pob.save()
         self.assertSequenceEqual(
             ObjectB.objects.filter(
-                objecta__in=ObjectB.objects.all().values_list("num")
+                objecta__in=ObjectB.objects.values_list("num")
             ).order_by("pk"),
             [ob, pob],
         )

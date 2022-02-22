@@ -185,8 +185,8 @@ class OneToOneTests(TestCase):
         bar.save()
         self.p1.delete()
 
-        self.assertEqual(Place.objects.all().count(), 1)
-        self.assertEqual(UndergroundBar.objects.all().count(), 1)
+        self.assertEqual(Place.objects.count(), 1)
+        self.assertEqual(UndergroundBar.objects.count(), 1)
 
     def test_create_models_m2m(self):
         """

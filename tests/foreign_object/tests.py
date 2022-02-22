@@ -238,7 +238,7 @@ class MultiColumnFKTests(TestCase):
                 for m in Membership.objects.select_related("person").order_by("pk")
             ]
 
-        normal_people = [m.person for m in Membership.objects.all().order_by("pk")]
+        normal_people = [m.person for m in Membership.objects.order_by("pk")]
         self.assertEqual(people, normal_people)
 
     def test_prefetch_foreignkey_forward_works(self):

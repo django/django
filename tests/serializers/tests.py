@@ -282,7 +282,7 @@ class SerializersTestBase:
         with self.assertNumQueries(3):
             serializers.serialize(
                 self.serializer_name,
-                Article.objects.all().prefetch_related("categories", "meta_data"),
+                Article.objects.prefetch_related("categories", "meta_data"),
             )
         # One query for the Article table, and two m2m queries for each
         # article.
@@ -361,7 +361,7 @@ class SerializersTestBase:
         for obj in deserial_objs:
             self.assertFalse(obj.object.id)
             obj.save()
-        self.assertEqual(Category.objects.all().count(), 5)
+        self.assertEqual(Category.objects.count(), 5)
 
     def test_deterministic_mapping_ordering(self):
         """Mapping such as fields should be deterministically ordered. (#24558)"""
@@ -454,9 +454,9 @@ class SerializersTransactionTestBase:
                     obj.save()
 
         for model_cls in (Category, Author, Article):
-            self.assertEqual(model_cls.objects.all().count(), 1)
+            self.assertEqual(model_cls.objects.count(), 1)
         art_obj = Article.objects.all()[0]
-        self.assertEqual(art_obj.categories.all().count(), 1)
+        self.assertEqual(art_obj.categories.count(), 1)
         self.assertEqual(art_obj.author.name, "Agnes")
 
 

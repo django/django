@@ -1617,7 +1617,7 @@ class ModelFormBasicTests(TestCase):
         # Set up a callable initial value
         def formfield_for_dbfield(db_field, **kwargs):
             if db_field.name == "categories":
-                kwargs["initial"] = lambda: Category.objects.all().order_by("name")[:2]
+                kwargs["initial"] = lambda: Category.objects.order_by("name")[:2]
             return db_field.formfield(**kwargs)
 
         # Create a ModelForm, instantiate it, and check that the output is as expected

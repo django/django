@@ -55,7 +55,7 @@ class InlineFormsetTests(TestCase):
         form_set = FormSet(data, instance=user)
         if form_set.is_valid():
             form_set.save()
-            usersite = UserSite.objects.all().values()
+            usersite = UserSite.objects.values()
             self.assertEqual(usersite[0]["data"], 10)
             self.assertEqual(usersite[0]["user_id"], "apollo13")
         else:
@@ -73,7 +73,7 @@ class InlineFormsetTests(TestCase):
         form_set = FormSet(data, instance=user)
         if form_set.is_valid():
             form_set.save()
-            usersite = UserSite.objects.all().values()
+            usersite = UserSite.objects.values()
             self.assertEqual(usersite[0]["data"], 11)
             self.assertEqual(usersite[0]["user_id"], "apollo13")
         else:
@@ -93,7 +93,7 @@ class InlineFormsetTests(TestCase):
         form_set = FormSet(data, instance=user)
         if form_set.is_valid():
             form_set.save()
-            usersite = UserSite.objects.all().values().order_by("data")
+            usersite = UserSite.objects.values().order_by("data")
             self.assertEqual(usersite[0]["data"], 11)
             self.assertEqual(usersite[0]["user_id"], "apollo13")
             self.assertEqual(usersite[1]["data"], 42)
@@ -131,7 +131,7 @@ class InlineFormsetTests(TestCase):
         form_set = FormSet(data, instance=restaurant)
         if form_set.is_valid():
             form_set.save()
-            manager = Manager.objects.all().values()
+            manager = Manager.objects.values()
             self.assertEqual(manager[0]["name"], "Guido Van Rossum")
         else:
             self.fail("Errors found on formset:%s" % form_set.errors)
@@ -147,7 +147,7 @@ class InlineFormsetTests(TestCase):
         form_set = FormSet(data, instance=restaurant)
         if form_set.is_valid():
             form_set.save()
-            manager = Manager.objects.all().values()
+            manager = Manager.objects.values()
             self.assertEqual(manager[0]["name"], "Terry Gilliam")
         else:
             self.fail("Errors found on formset:%s" % form_set.errors)
@@ -164,7 +164,7 @@ class InlineFormsetTests(TestCase):
         form_set = FormSet(data, instance=restaurant)
         if form_set.is_valid():
             form_set.save()
-            manager = Manager.objects.all().values().order_by("name")
+            manager = Manager.objects.values().order_by("name")
             self.assertEqual(manager[0]["name"], "John Cleese")
             self.assertEqual(manager[1]["name"], "Terry Gilliam")
         else:

@@ -471,12 +471,8 @@ class AggregationTests(TestCase):
     def test_aggregate_annotation(self):
         # Aggregates can be composed over annotations.
         # The return type is derived from the composed aggregate
-        vals = (
-            Book.objects.all()
-            .annotate(num_authors=Count("authors__id"))
-            .aggregate(
-                Max("pages"), Max("price"), Sum("num_authors"), Avg("num_authors")
-            )
+        vals = Book.objects.annotate(num_authors=Count("authors__id")).aggregate(
+            Max("pages"), Max("price"), Sum("num_authors"), Avg("num_authors")
         )
         self.assertEqual(
             vals,
@@ -588,10 +584,10 @@ class AggregationTests(TestCase):
             "pubdate, publisher, publisher_id, rating, store, tags"
         )
         with self.assertRaisesMessage(FieldError, msg):
-            Book.objects.all().aggregate(num_authors=Count("foo"))
+            Book.objects.aggregate(num_authors=Count("foo"))
 
         with self.assertRaisesMessage(FieldError, msg):
-            Book.objects.all().annotate(num_authors=Count("foo"))
+            Book.objects.annotate(num_authors=Count("foo"))
 
         msg = (
             "Cannot resolve keyword 'foo' into field. Choices are: authors, "
@@ -599,7 +595,7 @@ class AggregationTests(TestCase):
             "pages, price, pubdate, publisher, publisher_id, rating, store, tags"
         )
         with self.assertRaisesMessage(FieldError, msg):
-            Book.objects.all().annotate(num_authors=Count("authors__id")).aggregate(
+            Book.objects.annotate(num_authors=Count("authors__id")).aggregate(
                 Max("foo")
             )
 
@@ -932,7 +928,7 @@ class AggregationTests(TestCase):
             "the default name for another annotation."
         )
         with self.assertRaisesMessage(ValueError, msg):
-            Book.objects.all().annotate(
+            Book.objects.annotate(
                 Avg("authors__age"), authors__age__avg=Avg("authors__age")
             )
 

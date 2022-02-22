@@ -236,7 +236,7 @@ class OrderingTests(TestCase):
         and then take the first two).
         """
         self.assertQuerysetEqual(
-            Article.objects.all().reverse()[:2],
+            Article.objects.reverse()[:2],
             [
                 "Article 1",
                 "Article 3",

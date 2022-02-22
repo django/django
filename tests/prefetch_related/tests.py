@@ -269,7 +269,7 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
             list(qs.all())
 
     def test_attribute_error(self):
-        qs = Reader.objects.all().prefetch_related("books_read__xyz")
+        qs = Reader.objects.prefetch_related("books_read__xyz")
         msg = (
             "Cannot find 'xyz' on Book object, 'books_read__xyz' "
             "is an invalid parameter to prefetch_related()"
@@ -872,43 +872,33 @@ class CustomPrefetchTests(TestCase):
         # Test ForwardManyToOneDescriptor.
         houses = House.objects.select_related("owner")
         with self.assertNumQueries(6):
-            rooms = Room.objects.all().prefetch_related("house")
+            rooms = Room.objects.prefetch_related("house")
             lst1 = self.traverse_qs(rooms, [["house", "owner"]])
         with self.assertNumQueries(2):
-            rooms = Room.objects.all().prefetch_related(
-                Prefetch("house", queryset=houses.all())
-            )
+            rooms = Room.objects.prefetch_related(Prefetch("house", queryset=houses))
             lst2 = self.traverse_qs(rooms, [["house", "owner"]])
         self.assertEqual(lst1, lst2)
         with self.assertNumQueries(2):
             houses = House.objects.select_related("owner")
-            rooms = Room.objects.all().prefetch_related(
-                Prefetch("house", queryset=houses.all(), to_attr="house_attr")
+            rooms = Room.objects.prefetch_related(
+                Prefetch("house", queryset=houses, to_attr="house_attr")
             )
             lst2 = self.traverse_qs(rooms, [["house_attr", "owner"]])
         self.assertEqual(lst1, lst2)
-        room = (
-            Room.objects.all()
-            .prefetch_related(
-                Prefetch("house", queryset=houses.filter(address="DoesNotExist"))
-            )
-            .first()
-        )
+        room = Room.objects.prefetch_related(
+            Prefetch("house", queryset=houses.filter(address="DoesNotExist"))
+        ).first()
         with self.assertRaises(ObjectDoesNotExist):
             getattr(room, "house")
-        room = (
-            Room.objects.all()
-            .prefetch_related(
-                Prefetch(
-                    "house",
-                    queryset=houses.filter(address="DoesNotExist"),
-                    to_attr="house_attr",
-                )
+        room = Room.objects.prefetch_related(
+            Prefetch(
+                "house",
+                queryset=houses.filter(address="DoesNotExist"),
+                to_attr="house_attr",
             )
-            .first()
-        )
+        ).first()
         self.assertIsNone(room.house_attr)
-        rooms = Room.objects.all().prefetch_related(
+        rooms = Room.objects.prefetch_related(
             Prefetch("house", queryset=House.objects.only("name"))
         )
         with self.assertNumQueries(2):
@@ -919,20 +909,20 @@ class CustomPrefetchTests(TestCase):
         # Test ReverseOneToOneDescriptor.
         houses = House.objects.select_related("owner")
         with self.assertNumQueries(6):
-            rooms = Room.objects.all().prefetch_related("main_room_of")
+            rooms = Room.objects.prefetch_related("main_room_of")
             lst1 = self.traverse_qs(rooms, [["main_room_of", "owner"]])
         with self.assertNumQueries(2):
-            rooms = Room.objects.all().prefetch_related(
-                Prefetch("main_room_of", queryset=houses.all())
+            rooms = Room.objects.prefetch_related(
+                Prefetch("main_room_of", queryset=houses)
             )
             lst2 = self.traverse_qs(rooms, [["main_room_of", "owner"]])
         self.assertEqual(lst1, lst2)
         with self.assertNumQueries(2):
             rooms = list(
-                Room.objects.all().prefetch_related(
+                Room.objects.prefetch_related(
                     Prefetch(
                         "main_room_of",
-                        queryset=houses.all(),
+                        queryset=houses,
                         to_attr="main_room_of_attr",
                     )
                 )
@@ -1346,7 +1336,7 @@ class ForeignKeyToFieldTest(TestCase):
 
     def test_m2m(self):
         with self.assertNumQueries(3):
-            qs = Author.objects.all().prefetch_related("favorite_authors", "favors_me")
+            qs = Author.objects.prefetch_related("favorite_authors", "favors_me")
             favorites = [
                 (
                     [str(i_like) for i_like in author.favorite_authors.all()],

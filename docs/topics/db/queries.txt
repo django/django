@@ -1327,7 +1327,7 @@ new value to be the new model instance you want to point to. For example::
     >>> b = Blog.objects.get(pk=1)
 
     # Change every Entry so that it belongs to this Blog.
-    >>> Entry.objects.all().update(blog=b)
+    >>> Entry.objects.update(blog=b)
 
 The ``update()`` method is applied instantly and returns the number of rows
 matched by the query (which may not be equal to the number of rows updated if
@@ -1361,7 +1361,7 @@ update one field based on the value of another field in the model. This is
 especially useful for incrementing counters based upon their current value. For
 example, to increment the pingback count for every entry in the blog::
 
-    >>> Entry.objects.all().update(number_of_pingbacks=F('number_of_pingbacks') + 1)
+    >>> Entry.objects.update(number_of_pingbacks=F('number_of_pingbacks') + 1)
 
 However, unlike ``F()`` objects in filter and exclude clauses, you can't
 introduce joins when you use ``F()`` objects in an update -- you can only
