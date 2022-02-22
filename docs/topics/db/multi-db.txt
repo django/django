@@ -459,10 +459,10 @@ which you want to run the query. For example::
     >>> Author.objects.all()
 
     >>> # So will this.
-    >>> Author.objects.using('default').all()
+    >>> Author.objects.using('default')
 
     >>> # This will run on the 'other' database.
-    >>> Author.objects.using('other').all()
+    >>> Author.objects.using('other')
 
 Selecting a database for ``save()``
 -----------------------------------

@@ -21,12 +21,12 @@ class GeoJSONSerializerTests(TestCase):
         self.assertIn("geojson", public_formats)
 
     def test_serialization_base(self):
-        geojson = serializers.serialize("geojson", City.objects.all().order_by("name"))
+        geojson = serializers.serialize("geojson", City.objects.order_by("name"))
         geodata = json.loads(geojson)
         self.assertEqual(len(geodata["features"]), len(City.objects.all()))
         self.assertEqual(geodata["features"][0]["geometry"]["type"], "Point")
         self.assertEqual(geodata["features"][0]["properties"]["name"], "Chicago")
-        first_city = City.objects.all().order_by("name").first()
+        first_city = City.objects.order_by("name").first()
         self.assertEqual(geodata["features"][0]["properties"]["pk"], str(first_city.pk))
 
     def test_geometry_field_option(self):
@@ -81,7 +81,7 @@ class GeoJSONSerializerTests(TestCase):
 
     def test_srid_option(self):
         geojson = serializers.serialize(
-            "geojson", City.objects.all().order_by("name"), srid=2847
+            "geojson", City.objects.order_by("name"), srid=2847
         )
         geodata = json.loads(geojson)
         coordinates = geodata["features"][0]["geometry"]["coordinates"]

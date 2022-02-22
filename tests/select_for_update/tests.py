@@ -90,7 +90,7 @@ class SelectForUpdateTests(TransactionTestCase):
         generated SQL when select_for_update is invoked.
         """
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
-            list(Person.objects.all().select_for_update())
+            list(Person.objects.select_for_update())
         self.assertTrue(self.has_for_update_sql(ctx.captured_queries))
 
     @skipUnlessDBFeature("has_select_for_update_nowait")
@@ -100,7 +100,7 @@ class SelectForUpdateTests(TransactionTestCase):
         generated SQL when select_for_update is invoked.
         """
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
-            list(Person.objects.all().select_for_update(nowait=True))
+            list(Person.objects.select_for_update(nowait=True))
         self.assertTrue(self.has_for_update_sql(ctx.captured_queries, nowait=True))
 
     @skipUnlessDBFeature("has_select_for_update_skip_locked")
@@ -110,7 +110,7 @@ class SelectForUpdateTests(TransactionTestCase):
         generated SQL when select_for_update is invoked.
         """
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
-            list(Person.objects.all().select_for_update(skip_locked=True))
+            list(Person.objects.select_for_update(skip_locked=True))
         self.assertTrue(self.has_for_update_sql(ctx.captured_queries, skip_locked=True))
 
     @skipUnlessDBFeature("has_select_for_no_key_update")
@@ -120,7 +120,7 @@ class SelectForUpdateTests(TransactionTestCase):
         select_for_update() is invoked.
         """
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
-            list(Person.objects.all().select_for_update(no_key=True))
+            list(Person.objects.select_for_update(no_key=True))
         self.assertIs(self.has_for_update_sql(ctx.captured_queries, no_key=True), True)
 
     @skipUnlessDBFeature("has_select_for_update_of")
@@ -499,7 +499,7 @@ class SelectForUpdateTests(TransactionTestCase):
         """
         msg = "select_for_update cannot be used outside of a transaction."
         with self.assertRaisesMessage(transaction.TransactionManagementError, msg):
-            list(Person.objects.all().select_for_update())
+            list(Person.objects.select_for_update())
 
     @skipUnlessDBFeature("has_select_for_update")
     def test_for_update_requires_transaction_only_in_execution(self):
@@ -508,7 +508,7 @@ class SelectForUpdateTests(TransactionTestCase):
         when select_for_update is invoked outside of a transaction -
         only when the query is executed.
         """
-        people = Person.objects.all().select_for_update()
+        people = Person.objects.select_for_update()
         msg = "select_for_update cannot be used outside of a transaction."
         with self.assertRaisesMessage(transaction.TransactionManagementError, msg):
             list(people)
@@ -517,7 +517,7 @@ class SelectForUpdateTests(TransactionTestCase):
     def test_select_for_update_with_limit(self):
         other = Person.objects.create(name="Grappeli", born=self.city1, died=self.city2)
         with transaction.atomic():
-            qs = list(Person.objects.all().order_by("pk").select_for_update()[1:2])
+            qs = list(Person.objects.order_by("pk").select_for_update()[1:2])
             self.assertEqual(qs[0], other)
 
     @skipIfDBFeature("supports_select_for_update_with_limit")
@@ -528,7 +528,7 @@ class SelectForUpdateTests(TransactionTestCase):
         )
         with self.assertRaisesMessage(NotSupportedError, msg):
             with transaction.atomic():
-                list(Person.objects.all().order_by("pk").select_for_update()[1:2])
+                list(Person.objects.order_by("pk").select_for_update()[1:2])
 
     def run_select_for_update(self, status, **kwargs):
         """

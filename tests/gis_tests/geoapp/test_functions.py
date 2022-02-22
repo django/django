@@ -690,7 +690,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
     )
     def test_diff_intersection_union(self):
         geom = Point(5, 23, srid=4326)
-        qs = Country.objects.all().annotate(
+        qs = Country.objects.annotate(
             difference=functions.Difference("mpoly", geom),
             sym_difference=functions.SymDifference("mpoly", geom),
             union=functions.Union("mpoly", geom),

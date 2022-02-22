@@ -1478,7 +1478,7 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
         self.assertRedirects(
             post, reverse("admin:admin_views_customarticle_changelist")
         )
-        self.assertEqual(CustomArticle.objects.all().count(), 1)
+        self.assertEqual(CustomArticle.objects.count(), 1)
         article_pk = CustomArticle.objects.all()[0].pk
 
         # Test custom delete, change, and object history templates
@@ -5668,7 +5668,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         # Save and check that everything is properly stored in the database
         with self.wait_page_loaded():
             self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
-        self.assertEqual(MainPrepopulated.objects.all().count(), 1)
+        self.assertEqual(MainPrepopulated.objects.count(), 1)
         MainPrepopulated.objects.get(
             name=" the mAin nÀMë and it's awεšomeıııİ",
             pubdate="2012-02-18",
@@ -5677,7 +5677,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             slug2="option-two-the-main-name-and-its-awesomeiiii",
             slug3="the-main-nàmë-and-its-awεšomeıııi",
         )
-        self.assertEqual(RelatedPrepopulated.objects.all().count(), 6)
+        self.assertEqual(RelatedPrepopulated.objects.count(), 6)
         RelatedPrepopulated.objects.get(
             name=" here is a sŤāÇkeð   inline !  ",
             pubdate="2011-12-17",

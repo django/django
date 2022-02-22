@@ -56,12 +56,12 @@ above::
 
     # Average price across all books.
     >>> from django.db.models import Avg
-    >>> Book.objects.all().aggregate(Avg('price'))
+    >>> Book.objects.aggregate(Avg('price'))
     {'price__avg': 34.35}
 
     # Max price across all books.
     >>> from django.db.models import Max
-    >>> Book.objects.all().aggregate(Max('price'))
+    >>> Book.objects.aggregate(Max('price'))
     {'price__max': Decimal('81.20')}
 
     # Difference between the highest priced book and the average price of all books.
@@ -111,7 +111,7 @@ belong to this ``QuerySet``. This is done by appending an ``aggregate()``
 clause onto the ``QuerySet``::
 
     >>> from django.db.models import Avg
-    >>> Book.objects.all().aggregate(Avg('price'))
+    >>> Book.objects.aggregate(Avg('price'))
     {'price__avg': 34.35}
 
 The ``all()`` is redundant in this example, so this could be simplified to::

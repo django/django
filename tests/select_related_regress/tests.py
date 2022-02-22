@@ -92,7 +92,7 @@ class SelectRelatedRegressTests(TestCase):
         c = Class.objects.create(org=o)
         Enrollment.objects.create(std=s, cls=c)
 
-        e_related = Enrollment.objects.all().select_related()[0]
+        e_related = Enrollment.objects.select_related()[0]
         self.assertEqual(e_related.std.person.user.name, "std")
         self.assertEqual(e_related.cls.org.person.user.name, "org")
 
@@ -228,19 +228,15 @@ class SelectRelatedRegressTests(TestCase):
         c = C.objects.create(
             name="c", lots_of_text="lots_of_text_c", is_published=True, c_a=a, c_b=b
         )
-        results = (
-            C.objects.all()
-            .only(
-                "name",
-                "lots_of_text",
-                "c_a",
-                "c_b",
-                "c_b__lots_of_text",
-                "c_a__name",
-                "c_b__name",
-            )
-            .select_related()
-        )
+        results = C.objects.only(
+            "name",
+            "lots_of_text",
+            "c_a",
+            "c_b",
+            "c_b__lots_of_text",
+            "c_a__name",
+            "c_b__name",
+        ).select_related()
         self.assertSequenceEqual(results, [c])
         with self.assertNumQueries(0):
             qs_c = results[0]

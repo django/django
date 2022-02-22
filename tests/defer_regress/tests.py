@@ -226,7 +226,7 @@ class DeferRegressionTest(TestCase):
         item = Item.objects.create(name="first", value=47)
         RelatedItem.objects.create(item=item)
         # Defer fields with only()
-        obj = ProxyRelated.objects.all().select_related().only("item__name")[0]
+        obj = ProxyRelated.objects.select_related().only("item__name")[0]
         with self.assertNumQueries(0):
             self.assertEqual(obj.item.name, "first")
         with self.assertNumQueries(1):

@@ -329,7 +329,7 @@ class LiveServerDatabase(LiveServerBase):
         with self.urlopen("/create_model_instance/"):
             pass
         self.assertQuerysetEqual(
-            Person.objects.all().order_by("pk"),
+            Person.objects.order_by("pk"),
             ["jane", "robert", "emily"],
             lambda b: b.name,
         )

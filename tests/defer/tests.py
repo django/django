@@ -48,7 +48,7 @@ class DeferTests(AssertionMixin, TestCase):
         # You can use 'pk' with reverse foreign key lookups.
         # The related_id is always set even if it's not fetched from the DB,
         # so pk and related_id are not deferred.
-        self.assert_delayed(self.s1.primary_set.all().only("pk")[0], 2)
+        self.assert_delayed(self.s1.primary_set.only("pk")[0], 2)
 
     def test_defer_only_chaining(self):
         qs = Primary.objects.all()
@@ -248,7 +248,7 @@ class TestDefer2(AssertionMixin, TestCase):
         """
         related = Secondary.objects.create(first="x1", second="x2")
         ChildProxy.objects.create(name="p1", value="xx", related=related)
-        children = ChildProxy.objects.all().select_related().only("id", "name")
+        children = ChildProxy.objects.select_related().only("id", "name")
         self.assertEqual(len(children), 1)
         child = children[0]
         self.assert_delayed(child, 2)

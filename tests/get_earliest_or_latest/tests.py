@@ -232,9 +232,9 @@ class TestFirstLast(TestCase):
             with self.assertRaises(IndexError):
                 IndexErrorArticle.objects.all()[:10:2]
             with self.assertRaises(IndexError):
-                IndexErrorArticle.objects.all().first()
+                IndexErrorArticle.objects.first()
             with self.assertRaises(IndexError):
-                IndexErrorArticle.objects.all().last()
+                IndexErrorArticle.objects.last()
 
         check()
 

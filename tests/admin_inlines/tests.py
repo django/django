@@ -1595,7 +1595,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
 
         # The objects have been created in the database.
-        self.assertEqual(Inner4Stacked.objects.all().count(), 4)
+        self.assertEqual(Inner4Stacked.objects.count(), 4)
 
     def test_delete_invalid_tabular_inlines(self):
         from selenium.common.exceptions import NoSuchElementException
@@ -1664,7 +1664,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
 
         # The objects have been created in the database.
-        self.assertEqual(Inner4Tabular.objects.all().count(), 4)
+        self.assertEqual(Inner4Tabular.objects.count(), 4)
 
     def test_add_inlines(self):
         """
@@ -1750,8 +1750,8 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
 
         # The objects have been created in the database
-        self.assertEqual(ProfileCollection.objects.all().count(), 1)
-        self.assertEqual(Profile.objects.all().count(), 3)
+        self.assertEqual(ProfileCollection.objects.count(), 1)
+        self.assertEqual(Profile.objects.count(), 3)
 
     def test_add_inline_link_absent_for_view_only_parent_model(self):
         from selenium.common.exceptions import NoSuchElementException

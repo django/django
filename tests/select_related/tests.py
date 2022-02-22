@@ -94,7 +94,7 @@ class SelectRelatedTests(TestCase):
     def test_list_with_select_related(self):
         """select_related() applies to entire lists, not just items."""
         with self.assertNumQueries(1):
-            world = Species.objects.all().select_related()
+            world = Species.objects.select_related()
             families = [o.genus.family.name for o in world]
             self.assertEqual(
                 sorted(families),
@@ -113,7 +113,7 @@ class SelectRelatedTests(TestCase):
         well.
         """
         with self.assertNumQueries(5):
-            world = Species.objects.all().select_related("genus__family")
+            world = Species.objects.select_related("genus__family")
             orders = [o.genus.family.order.name for o in world]
             self.assertEqual(
                 sorted(orders), ["Agaricales", "Diptera", "Fabales", "Primates"]

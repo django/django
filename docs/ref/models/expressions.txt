@@ -156,7 +156,7 @@ the field value on multiple objects - which could be very much faster than
 pulling them all into Python from the database, looping over them, incrementing
 the field value of each one, and saving each one back to the database::
 
-    Reporter.objects.all().update(stories_filed=F('stories_filed') + 1)
+    Reporter.objects.update(stories_filed=F('stories_filed') + 1)
 
 ``F()`` therefore can offer performance advantages by:
 

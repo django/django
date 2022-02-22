@@ -721,7 +721,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [
                 (1, "one"),
                 (2, "two"),
@@ -742,7 +742,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [(1, 1), (2, 2), (3, None), (2, 2), (3, None), (3, None), (4, None)],
             transform=attrgetter("integer", "integer2"),
         )
@@ -756,7 +756,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [("1", 2), ("2", 5), ("3", 3), ("2", 5), ("3", 3), ("3", 3), ("4", 4)],
             transform=attrgetter("string", "integer"),
         )
@@ -769,7 +769,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [
                 (1, "equal"),
                 (2, "+1"),
@@ -814,7 +814,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [(1, 1), (2, 2), (3, None), (2, 2), (3, None), (3, None), (4, None)],
             transform=attrgetter("integer", "big_integer"),
         )
@@ -828,7 +828,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [
                 (1, b"one"),
                 (2, b"two"),
@@ -850,7 +850,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [
                 (1, True),
                 (2, True),
@@ -871,7 +871,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [
                 (1, date(2015, 1, 1)),
                 (2, date(2015, 1, 2)),
@@ -892,7 +892,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [
                 (1, datetime(2015, 1, 1)),
                 (2, datetime(2015, 1, 2)),
@@ -915,7 +915,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [
                 (1, Decimal("1.1")),
                 (2, Decimal("2.2")),
@@ -936,7 +936,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [
                 (1, timedelta(1)),
                 (2, timedelta(2)),
@@ -958,7 +958,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [
                 (1, "1@example.com"),
                 (2, "2@example.com"),
@@ -979,7 +979,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [(1, "~/1"), (2, "~/2"), (3, ""), (2, "~/2"), (3, ""), (3, ""), (4, "")],
             transform=lambda o: (o.integer, str(o.file)),
         )
@@ -993,7 +993,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [(1, "~/1"), (2, "~/2"), (3, ""), (2, "~/2"), (3, ""), (3, ""), (4, "")],
             transform=attrgetter("integer", "file_path"),
         )
@@ -1006,7 +1006,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [(1, 1.1), (2, 2.2), (3, None), (2, 2.2), (3, None), (3, None), (4, None)],
             transform=attrgetter("integer", "float"),
         )
@@ -1020,7 +1020,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [(1, "~/1"), (2, "~/2"), (3, ""), (2, "~/2"), (3, ""), (3, ""), (4, "")],
             transform=lambda o: (o.integer, str(o.image)),
         )
@@ -1034,7 +1034,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [
                 (1, "1.1.1.1"),
                 (2, "2.2.2.2"),
@@ -1055,7 +1055,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [
                 (1, True),
                 (2, False),
@@ -1076,7 +1076,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [(1, 1), (2, 2), (3, None), (2, 2), (3, None), (3, None), (4, None)],
             transform=attrgetter("integer", "positive_big_integer"),
         )
@@ -1089,7 +1089,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [(1, 1), (2, 2), (3, None), (2, 2), (3, None), (3, None), (4, None)],
             transform=attrgetter("integer", "positive_integer"),
         )
@@ -1102,7 +1102,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [(1, 1), (2, 2), (3, None), (2, 2), (3, None), (3, None), (4, None)],
             transform=attrgetter("integer", "positive_small_integer"),
         )
@@ -1116,7 +1116,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [(1, "1"), (2, "2"), (3, ""), (2, "2"), (3, ""), (3, ""), (4, "")],
             transform=attrgetter("integer", "slug"),
         )
@@ -1129,7 +1129,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [(1, 1), (2, 2), (3, None), (2, 2), (3, None), (3, None), (4, None)],
             transform=attrgetter("integer", "small_integer"),
         )
@@ -1156,7 +1156,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [(1, "1"), (2, "2"), (3, ""), (2, "2"), (3, ""), (3, ""), (4, "")],
             transform=attrgetter("integer", "text"),
         )
@@ -1169,7 +1169,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [
                 (1, time(1)),
                 (2, time(2)),
@@ -1191,7 +1191,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [
                 (1, "http://1.example.com/"),
                 (2, "http://2.example.com/"),
@@ -1212,7 +1212,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [
                 (1, UUID("11111111111111111111111111111111")),
                 (2, UUID("22222222222222222222222222222222")),
@@ -1235,7 +1235,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by("pk"),
+            CaseTestModel.objects.order_by("pk"),
             [
                 (1, obj1.pk),
                 (2, obj2.pk),
@@ -1550,7 +1550,7 @@ class CaseDocumentationExamples(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            Client.objects.all().order_by("pk"),
+            Client.objects.order_by("pk"),
             [("Jane Doe", "G"), ("James Smith", "R"), ("Jack Black", "P")],
             transform=attrgetter("name", "account_type"),
         )

@@ -270,37 +270,37 @@ class AssertQuerysetEqualTests(TestCase):
 
     def test_ordered(self):
         self.assertQuerysetEqual(
-            Person.objects.all().order_by("name"),
+            Person.objects.order_by("name"),
             [self.p1, self.p2],
         )
 
     def test_unordered(self):
         self.assertQuerysetEqual(
-            Person.objects.all().order_by("name"), [self.p2, self.p1], ordered=False
+            Person.objects.order_by("name"), [self.p2, self.p1], ordered=False
         )
 
     def test_queryset(self):
         self.assertQuerysetEqual(
-            Person.objects.all().order_by("name"),
-            Person.objects.all().order_by("name"),
+            Person.objects.order_by("name"),
+            Person.objects.order_by("name"),
         )
 
     def test_flat_values_list(self):
         self.assertQuerysetEqual(
-            Person.objects.all().order_by("name").values_list("name", flat=True),
+            Person.objects.order_by("name").values_list("name", flat=True),
             ["p1", "p2"],
         )
 
     def test_transform(self):
         self.assertQuerysetEqual(
-            Person.objects.all().order_by("name"),
+            Person.objects.order_by("name"),
             [self.p1.pk, self.p2.pk],
             transform=lambda x: x.pk,
         )
 
     def test_repr_transform(self):
         self.assertQuerysetEqual(
-            Person.objects.all().order_by("name"),
+            Person.objects.order_by("name"),
             [repr(self.p1), repr(self.p2)],
             transform=repr,
         )

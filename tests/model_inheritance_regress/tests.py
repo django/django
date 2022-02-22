@@ -260,7 +260,7 @@ class ModelInheritanceTest(TestCase):
         """
         Regression test for #11764
         """
-        wholesalers = list(Wholesaler.objects.all().select_related())
+        wholesalers = list(Wholesaler.objects.select_related())
         self.assertEqual(wholesalers, [])
 
     def test_issue_7853(self):
@@ -525,7 +525,7 @@ class ModelInheritanceTest(TestCase):
             serves_pizza=True,
             serves_hot_dogs=True,
         )
-        p = Place.objects.all().select_related("restaurant")[0]
+        p = Place.objects.select_related("restaurant")[0]
         self.assertIsInstance(p.restaurant.serves_pizza, bool)
 
     def test_inheritance_select_related(self):

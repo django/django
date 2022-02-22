@@ -113,7 +113,7 @@ class DepartmentListFilterLookupWithNonStringValue(SimpleListFilter):
                     employee.department.id,  # Intentionally not a string (Refs #19318)
                     employee.department.code,
                 )
-                for employee in model_admin.get_queryset(request).all()
+                for employee in model_admin.get_queryset(request)
             }
         )
 
@@ -1150,7 +1150,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), list(Book.objects.all().order_by("-id")))
+        self.assertEqual(list(queryset), list(Book.objects.order_by("-id")))
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][1]

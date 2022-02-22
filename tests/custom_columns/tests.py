@@ -82,7 +82,7 @@ class CustomColumnsTests(TestCase):
 
     def test_author_querying(self):
         self.assertSequenceEqual(
-            Author.objects.all().order_by("last_name"),
+            Author.objects.order_by("last_name"),
             [self.a2, self.a1],
         )
 
@@ -119,7 +119,7 @@ class CustomColumnsTests(TestCase):
 
     def test_m2m_table(self):
         self.assertSequenceEqual(
-            self.article.authors.all().order_by("last_name"),
+            self.article.authors.order_by("last_name"),
             [self.a2, self.a1],
         )
         self.assertSequenceEqual(self.a1.article_set.all(), [self.article])
