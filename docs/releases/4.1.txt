@@ -412,6 +412,10 @@ Miscellaneous
 * The ``type="text/css"`` attribute is no longer included in ``<link>`` tags
   for CSS :doc:`form media </topics/forms/media>`.
 
+* ``formset:added`` and ``formset:removed`` JavaScript events are now pure
+  JavaScript events and don't depend on jQuery. See
+  :ref:`admin-javascript-inline-form-events` for more details on the change.
+
 .. _deprecated-features-4.1:
 
 Features deprecated in 4.1
