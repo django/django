@@ -111,15 +111,15 @@ class HttpResponseBase:
     ):
         self.headers = ResponseHeaders(headers)
         self._charset = charset
-        if content_type and "Content-Type" in self.headers:
+        if "Content-Type" not in self.headers:
+            if content_type is None:
+                content_type = f"text/html; charset={self.charset}"
+            self.headers["Content-Type"] = content_type
+        elif content_type:
             raise ValueError(
                 "'headers' must not contain 'Content-Type' when the "
                 "'content_type' parameter is provided."
             )
-        if "Content-Type" not in self.headers:
-            if content_type is None:
-                content_type = "text/html; charset=%s" % self.charset
-            self.headers["Content-Type"] = content_type
         self._resource_closers = []
         # This parameter is set by the handler. It's necessary to preserve the
         # historical behavior of request_finished.
