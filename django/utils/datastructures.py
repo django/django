@@ -327,7 +327,10 @@ class CaseInsensitiveMapping(Mapping):
 
     @staticmethod
     def _unpack_items(data):
-        if isinstance(data, Mapping):
+        # Explicitly test for dict first as the common case for performance,
+        # avoiding abc's __instancecheck__ and _abc_instancecheck for the
+        # general Mapping case.
+        if isinstance(data, (dict, Mapping)):
             yield from data.items()
             return
         for i, elem in enumerate(data):
