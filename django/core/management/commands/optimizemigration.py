@@ -1,3 +1,4 @@
+import shutil
 import sys
 
 from django.apps import apps
@@ -111,6 +112,13 @@ class Command(BaseCommand):
                     "  See the comment at the top of the optimized migration for "
                     "details."
                 )
+                if shutil.which("black"):
+                    self.stdout.write(
+                        self.style.WARNING(
+                            "Optimized migration couldn't be formatted using the "
+                            '"black" command. You can call it manually.'
+                        )
+                    )
         with open(writer.path, "w", encoding="utf-8") as fh:
             fh.write(migration_file_string)
         run_formatters([writer.path])

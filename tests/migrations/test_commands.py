@@ -2729,6 +2729,12 @@ class SquashMigrationsTests(MigrationTestBase):
                 "0001_squashed_0002_second.py",
             )
             self.assertTrue(os.path.exists(squashed_migration_file))
+        black_warning = ""
+        if HAS_BLACK:
+            black_warning = (
+                "Squashed migration couldn't be formatted using the "
+                '"black" command. You can call it manually.\n'
+            )
         self.assertEqual(
             out.getvalue(),
             f"Will squash the following migrations:\n"
@@ -2746,7 +2752,8 @@ class SquashMigrationsTests(MigrationTestBase):
             f"  Your migrations contained functions that must be manually copied "
             f"over,\n"
             f"  as we could not safely copy their implementation.\n"
-            f"  See the comment at the top of the squashed migration for details.\n",
+            f"  See the comment at the top of the squashed migration for details.\n"
+            + black_warning,
         )
 
 
@@ -2905,15 +2912,21 @@ class OptimizeMigrationTests(MigrationTestBase):
             with open(optimized_migration_file) as fp:
                 content = fp.read()
                 self.assertIn("replaces = [", content)
+        black_warning = ""
+        if HAS_BLACK:
+            black_warning = (
+                "Optimized migration couldn't be formatted using the "
+                '"black" command. You can call it manually.\n'
+            )
         self.assertEqual(
             out.getvalue(),
-            f"Optimizing from 3 operations to 2 operations.\n"
-            f"Manual porting required\n"
-            f"  Your migrations contained functions that must be manually copied over,"
-            f"\n"
-            f"  as we could not safely copy their implementation.\n"
-            f"  See the comment at the top of the optimized migration for details.\n"
-            f"Optimized migration {optimized_migration_file}\n",
+            "Optimizing from 3 operations to 2 operations.\n"
+            "Manual porting required\n"
+            "  Your migrations contained functions that must be manually copied over,\n"
+            "  as we could not safely copy their implementation.\n"
+            "  See the comment at the top of the optimized migration for details.\n"
+            + black_warning
+            + f"Optimized migration {optimized_migration_file}\n",
         )
 
     def test_fails_squash_migration_manual_porting(self):

@@ -1,4 +1,5 @@
 import os
+import shutil
 
 from django.apps import apps
 from django.conf import settings
@@ -244,6 +245,13 @@ class Command(BaseCommand):
                     "  See the comment at the top of the squashed migration for "
                     "details."
                 )
+                if shutil.which("black"):
+                    self.stdout.write(
+                        self.style.WARNING(
+                            "Squashed migration couldn't be formatted using the "
+                            '"black" command. You can call it manually.'
+                        )
+                    )
 
     def find_migration(self, loader, app_label, name):
         try:
