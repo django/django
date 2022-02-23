@@ -50,3 +50,29 @@ Two points to keep in mind:
 * ``{{ block.super }}`` is added because Django's
   ``admin_change_form_document_ready`` block contains JavaScript code to handle
   various operations in the change form and we need that to be rendered too.
+
+Supporting versions of Django older than 4.1
+--------------------------------------------
+
+If your event listener still has to support older versions of Django you have
+to use jQuery to register your event listener. jQuery handles JavaScript events
+but the reverse isn't true.
+
+You could check for the presence of ``event.detail.formsetName`` and fall back
+to the old listener signature as follows:
+
+.. code-block:: javascript
+
+    function handleFormsetAdded(row, formsetName) {
+        // Do something
+    }
+
+    $(document).on('formset:added', (event, $row, formsetName) => {
+        if (event.detail.formsetName) {
+            // Django >= 4.1
+            handleFormsetAdded(event.target, event.detail.formsetName)
+        } else {
+            // Django < 4.1, use $row and formsetName
+            handleFormsetAdded($row.get(0), formsetName)
+        }
+    })
