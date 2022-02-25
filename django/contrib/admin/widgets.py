@@ -300,10 +300,11 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         rel_opts = self.rel.model._meta
         info = (rel_opts.app_label, rel_opts.model_name)
         self.widget.choices = self.choices
+        related_field_name = self.rel.get_related_field().name
         url_params = "&".join(
             "%s=%s" % param
             for param in [
-                (TO_FIELD_VAR, self.rel.get_related_field().name),
+                (TO_FIELD_VAR, related_field_name),
                 (IS_POPUP_VAR, 1),
             ]
         )
@@ -325,6 +326,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
                 info, "delete", "__fk__"
             )
         if self.can_view_related or self.can_change_related:
+            context["view_related_url_params"] = f"{TO_FIELD_VAR}={related_field_name}"
             context["change_related_template_url"] = self.get_related_url(
                 info, "change", "__fk__"
             )
