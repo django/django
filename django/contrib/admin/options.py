@@ -1787,7 +1787,7 @@ class ModelAdmin(BaseModelAdmin):
             form = ModelForm(request.POST, request.FILES, instance=obj)
             formsets, inline_instances = self._create_formsets(
                 request,
-                form.instance if add else obj,
+                form.instance,
                 change=not add,
             )
             form_validated = form.is_valid()
