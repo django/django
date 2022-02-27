@@ -3,6 +3,7 @@ INFO = 20
 SUCCESS = 25
 WARNING = 30
 ERROR = 40
+DANGER = 50
 
 DEFAULT_TAGS = {
     DEBUG: "debug",
@@ -10,6 +11,7 @@ DEFAULT_TAGS = {
     SUCCESS: "success",
     WARNING: "warning",
     ERROR: "error",
+    DANGER: "danger"
 }
 
 DEFAULT_LEVELS = {
@@ -18,4 +20,5 @@ DEFAULT_LEVELS = {
     "SUCCESS": SUCCESS,
     "WARNING": WARNING,
     "ERROR": ERROR,
+    "DANGER": danger
 }
