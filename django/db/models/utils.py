@@ -12,7 +12,7 @@ def make_model_tuple(model):
         if isinstance(model, tuple):
             model_tuple = model
         elif isinstance(model, str):
-            app_label, model_name = model.split(".")
+            app_label, model_name = model.rsplit(".", 1)
             model_tuple = app_label, model_name.lower()
         else:
             model_tuple = model._meta.app_label, model._meta.model_name
