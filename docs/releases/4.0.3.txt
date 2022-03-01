@@ -15,3 +15,7 @@ Bugfixes
 * Prevented, following a regression in Django 4.0.1, :djadmin:`makemigrations`
   from generating infinite migrations for a model with ``ManyToManyField`` to
   a lowercased swappable model such as ``'auth.user'`` (:ticket:`33515`).
+
+* Fixed a regression in Django 4.0 that caused a crash when rendering invalid
+  inlines with :attr:`~django.contrib.admin.ModelAdmin.readonly_fields` in the
+  admin (:ticket:`33547`).
