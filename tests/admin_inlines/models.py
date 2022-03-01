@@ -5,6 +5,7 @@ import random
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -203,6 +204,9 @@ class Poll(models.Model):
 class Question(models.Model):
     text = models.CharField(max_length=40)
     poll = models.ForeignKey(Poll, models.CASCADE)
+
+    def clean(self):
+        raise ValidationError("Always invalid model.")
 
 
 class Novel(models.Model):

@@ -138,7 +138,11 @@ def cell_count(inline_admin_form):
         # Count all visible fields.
         for line in fieldset:
             for field in line:
-                if not field.field.is_hidden:
+                try:
+                    is_hidden = field.field.is_hidden
+                except AttributeError:
+                    is_hidden = field.field["is_hidden"]
+                if not is_hidden:
                     count += 1
     if inline_admin_form.formset.can_delete:
         # Delete checkbox
