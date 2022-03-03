@@ -262,9 +262,10 @@ empty = object()
 
 def new_method_proxy(func):
     def inner(self, *args):
-        if self._wrapped is empty:
+        if (_wrapped := self._wrapped) is empty:
             self._setup()
-        return func(self._wrapped, *args)
+            _wrapped = self._wrapped
+        return func(_wrapped, *args)
 
     inner._mask_wrapped = False
     return inner
