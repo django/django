@@ -244,6 +244,8 @@ class HttpResponseBase:
                 delta = delta + datetime.timedelta(seconds=1)
                 # Just set max_age - the max_age logic will set expires.
                 expires = None
+                if max_age is not None:
+                    raise ValueError("'expires' and 'max_age' can't be used together.")
                 max_age = max(0, delta.days * 86400 + delta.seconds)
             else:
                 self.cookies[key]["expires"] = expires

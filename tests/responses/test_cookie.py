@@ -76,6 +76,14 @@ class SetCookieTests(SimpleTestCase):
         response.set_cookie("max_age", max_age=timedelta(hours=1))
         self.assertEqual(response.cookies["max_age"]["max-age"], 3600)
 
+    def test_max_age_with_expires(self):
+        response = HttpResponse()
+        msg = "'expires' and 'max_age' can't be used together."
+        with self.assertRaisesMessage(ValueError, msg):
+            response.set_cookie(
+                "max_age", expires=datetime(2000, 1, 1), max_age=timedelta(hours=1)
+            )
+
     def test_httponly_cookie(self):
         response = HttpResponse()
         response.set_cookie("example", httponly=True)
