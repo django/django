@@ -74,6 +74,9 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   320,000 to 390,000.
 
+* The :meth:`.RemoteUserBackend.configure_user` method now allows synchronizing
+  user attributes with attributes in a remote system such as an LDAP directory.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -492,6 +495,10 @@ Miscellaneous
 
 * Passing unsaved model instances to related filters is deprecated. In Django
   5.0, the exception will be raised.
+
+* ``created=True`` is added to the signature of
+  :meth:`.RemoteUserBackend.configure_user`. Support  for ``RemoteUserBackend``
+  subclasses that do not accept this argument is deprecated.
 
 Features removed in 4.1
 =======================
