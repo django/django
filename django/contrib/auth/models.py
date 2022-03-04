@@ -497,3 +497,85 @@ class AnonymousUser:
 
     def get_username(self):
         return self.username
+
+
+
+class IPBlackListManager(models.Manager):
+    """
+    The Manager for `IP Black List` that provide methods to check IP address simpler.
+    """
+    def is_blocked(self, ip_address) -> bool:
+        """
+        Check if IP address is blocked.
+        returns True if blocked (makes threats more than 10 times) else returns False
+        """
+        try:
+            ip = self.get(ip=ip_address).only("threats")
+            if ip.threats >= 10:
+                return True
+        except:
+            ...
+        
+        return False
+        
+    def increase_by_1(self, ip_address):
+        """
+        If IP does exist, Increase Threat by 1
+        otherwise creates one and sets Threat to 1
+        """
+        try:
+            ip = self.get(ip=ip_address)
+            ip.threats += 1
+            ip.save()
+        except:
+            new_black_ip = self.create(ip=ip_address, threads=1)
+            new_black_ip.save()
+            
+
+
+    def decrease_by_1(self, ip_address):
+        """
+        If IP does exist, Increase Threat by 1
+        otherwise pass.
+        """
+        try:
+            ip = self.get(ip=ip_address)
+            if ip.threats > 1:
+                ip.threats -= 1
+                ip.save()
+            elif ip.threats == 1:
+                ip.delete()
+        except:
+            ...
+
+
+
+
+class IPBlackList(models.Model):
+    """
+    ## IP Black List Model
+    This model used for checking spam or dangerous users or requests,
+    which trys to Brute Force login or DOS/DDOS attack (& etc) on server.
+    
+    Using this can make response slower for simple views but for views
+    that has heavy calculations can make response faster and prevents
+    unnecessary works on server.
+    """
+
+    ip = models.GenericIPAddressField(
+        verbose_name=_("IP address"),
+        editable=False
+    )
+    threats = models.PositiveSmallIntegerField(
+        verbose_name=_("Number of threats"),
+        help_text=_("Specifies how many times the user has made a threat."),
+        default=0,
+    )
+
+    objects = IPBlackListManager()
+
+
+    class Meta:
+        verbose_name = _('IP address')
+        verbose_name_plural = _('IP addresses')
+

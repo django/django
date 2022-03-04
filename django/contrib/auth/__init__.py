@@ -90,6 +90,13 @@ def authenticate(request=None, **credentials):
         sender=__name__, credentials=_clean_credentials(credentials), request=request
     )
 
+    # Add User IP to Black List for more security
+    try:
+        from django.contrib.auth.models import IPBlackList
+        IPBlackList.objects.increase_by_1(ip_address=request.user.ip_address)
+    except:
+        ...
+
 
 def login(request, user, backend=None):
     """
