@@ -377,5 +377,4 @@ class BaseDatabaseCreation:
         # connection.settings_dict = settings_dict, new threads would connect
         # to the default database instead of the appropriate clone.
         self.connection.settings_dict.update(settings_dict)
-        self.mark_expected_failures_and_skips()
         self.connection.close()
