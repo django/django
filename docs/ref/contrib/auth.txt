@@ -660,6 +660,23 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         if it wasn't provided to :func:`~django.contrib.auth.authenticate`
         (which passes it on to the backend).
 
+    .. method:: synchronize_user(request, user)
+
+        .. versionadded:: 4.1
+
+        Synchronizes existing users with the remote authentication backend.
+        This method is called right after attempting to fetch the user and
+        can be used to synchronize attributes between the remote system and
+        the local Django users. Returns the user object.
+
+        ``request`` is an :class:`~django.http.HttpRequest` and may be ``None``
+        if it wasn't provided to :func:`~django.contrib.auth.authenticate`
+        (which passes it on to the backend).
+
+        ``user`` is an :class:`~django.contrib.auth.models.AbstractUser` and
+        may be ``None``, it's up to implementors to safeguard against this
+        possibility.
+
     .. method:: user_can_authenticate()
 
         Returns whether the user is allowed to authenticate. This method

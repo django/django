@@ -223,11 +223,19 @@ class CustomRemoteUserBackend(RemoteUserBackend):
         user.save()
         return user
 
+    def synchronize_user(self, request, user):
+        """
+        Updates the user's email if it has changed since last authentication.
+        """
+        user.email = request.META.get(RemoteUserTest.email_header, "")
+        user.save()
+        return user
+
 
 class RemoteUserCustomTest(RemoteUserTest):
     """
     Tests a custom RemoteUserBackend subclass that overrides the clean_username
-    and configure_user methods.
+    configure_user and synchronize_user methods.
     """
 
     backend = "auth_tests.test_remote_user.CustomRemoteUserBackend"
@@ -263,6 +271,21 @@ class RemoteUserCustomTest(RemoteUserTest):
         self.assertEqual(User.objects.count(), num_users + 1)
         newuser = User.objects.get(username="newuser")
         self.assertEqual(newuser.email, "user@example.com")
+
+    def test_known_user_sync(self):
+        """
+        Test that a given user's email address is updated within Django
+        on every authentication if it has changed in the remote system.
+        """
+        self.test_known_user()
+        num_users = User.objects.count()
+        response = self.client.get(
+            "/remote_user/",
+            **{self.header: "knownuser", self.email_header: "knownuser@example.com"},
+        )
+        self.assertEqual(response.context["user"].username, "knownuser")
+        self.assertEqual(response.context["user"].email, "knownuser@example.com")
+        self.assertEqual(User.objects.count(), num_users)
 
 
 class CustomHeaderMiddleware(RemoteUserMiddleware):

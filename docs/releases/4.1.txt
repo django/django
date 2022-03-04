@@ -74,6 +74,10 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   320,000 to 390,000.
 
+* The new :meth:`.backends.RemoteUserBackend.synchronize_user` allows for the
+  synchronization of user attributes between a remote system (e.g. LDAP) and
+  the local Django instance on each authentication attempt.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

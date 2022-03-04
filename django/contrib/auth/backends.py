@@ -209,6 +209,7 @@ class RemoteUserBackend(ModelBackend):
                 user = UserModel._default_manager.get_by_natural_key(username)
             except UserModel.DoesNotExist:
                 pass
+        user = self.synchronize_user(request, user)
         return user if self.user_can_authenticate(user) else None
 
     def clean_username(self, username):
@@ -223,6 +224,15 @@ class RemoteUserBackend(ModelBackend):
     def configure_user(self, request, user):
         """
         Configure a user after creation and return the updated user.
+
+        By default, return the user unmodified.
+        """
+        return user
+
+    def synchronize_user(self, request, user):
+        """
+        Synchronize the user's attributes with the remote system's.
+        Return the updated user.
 
         By default, return the user unmodified.
         """
