@@ -14,6 +14,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.text import capfirst
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.debug import sensitive_variables
 
 UserModel = get_user_model()
 
@@ -115,6 +116,7 @@ class UserCreationForm(forms.ModelForm):
                 "autofocus"
             ] = True
 
+    @sensitive_variables("password1", "password2")
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
@@ -125,6 +127,7 @@ class UserCreationForm(forms.ModelForm):
             )
         return password2
 
+    @sensitive_variables("password")
     def _post_clean(self):
         super()._post_clean()
         # Validate the password after self.instance is updated with form data
@@ -209,6 +212,7 @@ class AuthenticationForm(forms.Form):
         if self.fields["username"].label is None:
             self.fields["username"].label = capfirst(self.username_field.verbose_name)
 
+    @sensitive_variables("password")
     def clean(self):
         username = self.cleaned_data.get("username")
         password = self.cleaned_data.get("password")
@@ -375,6 +379,7 @@ class SetPasswordForm(forms.Form):
         self.user = user
         super().__init__(*args, **kwargs)
 
+    @sensitive_variables("password1", "password2")
     def clean_new_password2(self):
         password1 = self.cleaned_data.get("new_password1")
         password2 = self.cleaned_data.get("new_password2")
@@ -387,6 +392,7 @@ class SetPasswordForm(forms.Form):
         password_validation.validate_password(password2, self.user)
         return password2
 
+    @sensitive_variables("password")
     def save(self, commit=True):
         password = self.cleaned_data["new_password1"]
         self.user.set_password(password)
@@ -417,6 +423,7 @@ class PasswordChangeForm(SetPasswordForm):
 
     field_order = ["old_password", "new_password1", "new_password2"]
 
+    @sensitive_variables("old_password")
     def clean_old_password(self):
         """
         Validate that the old_password field is correct.
@@ -458,6 +465,7 @@ class AdminPasswordChangeForm(forms.Form):
         self.user = user
         super().__init__(*args, **kwargs)
 
+    @sensitive_variables("password1", "password2")
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
@@ -469,6 +477,7 @@ class AdminPasswordChangeForm(forms.Form):
         password_validation.validate_password(password2, self.user)
         return password2
 
+    @sensitive_variables("password")
     def save(self, commit=True):
         """Save the new password."""
         password = self.cleaned_data["password1"]
