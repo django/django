@@ -1830,7 +1830,7 @@ templates used by the :class:`ModelAdmin` views:
     viewing of objects of this type is permitted in general (e.g., ``False``
     will be interpreted as meaning that the current user is not permitted to
     view any object of this type). The object type’s list view is
-    only accessible when ```True``` is returned.
+    only accessible when ``True`` is returned.
 
     The default implementation returns ``True`` if the user has either the
     "change" or "view" permission.
