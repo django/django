@@ -281,7 +281,8 @@ Models
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :meth:`.HttpResponse.set_cookie` now supports :class:`~datetime.timedelta`
+  objects for the ``max_age`` argument.
 
 Security
 ~~~~~~~~

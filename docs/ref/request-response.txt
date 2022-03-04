@@ -853,9 +853,15 @@ Methods
     Sets a cookie. The parameters are the same as in the
     :class:`~http.cookies.Morsel` cookie object in the Python standard library.
 
-    * ``max_age`` should be an integer number of seconds, or ``None`` (default)
-      if the cookie should last only as long as the client's browser session.
-      If ``expires`` is not specified, it will be calculated.
+    * ``max_age`` should be a :class:`~datetime.timedelta` object, an integer
+      number of seconds, or ``None`` (default) if the cookie should last only
+      as long as the client's browser session. If ``expires`` is not specified,
+      it will be calculated.
+
+      .. versionchanged:: 4.1
+
+        Support for ``timedelta`` objects was added.
+
     * ``expires`` should either be a string in the format
       ``"Wdy, DD-Mon-YY HH:MM:SS GMT"`` or a ``datetime.datetime`` object
       in UTC. If ``expires`` is a ``datetime`` object, the ``max_age``
