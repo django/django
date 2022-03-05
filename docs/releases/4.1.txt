@@ -63,6 +63,9 @@ Minor features
 
 * Related widget wrappers now have a link to object's change form.
 
+* The :meth:`.AdminSite.get_app_list` method now allows changing the order of
+  apps and models on the admin index page.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
