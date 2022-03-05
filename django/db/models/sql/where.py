@@ -1,14 +1,19 @@
 """
 Code to manage the creation and SQL rendering of 'where' constraints.
 """
+import operator
+from functools import reduce
 
 from django.core.exceptions import EmptyResultSet
+from django.db.models.expressions import Case, When
+from django.db.models.lookups import Exact
 from django.utils import tree
 from django.utils.functional import cached_property
 
 # Connection types
 AND = "AND"
 OR = "OR"
+XOR = "XOR"
 
 
 class WhereNode(tree.Node):
@@ -39,10 +44,12 @@ class WhereNode(tree.Node):
         if not self.contains_aggregate:
             return self, None
         in_negated = negated ^ self.negated
-        # If the effective connector is OR and this node contains an aggregate,
-        # then we need to push the whole branch to HAVING clause.
-        may_need_split = (in_negated and self.connector == AND) or (
-            not in_negated and self.connector == OR
+        # If the effective connector is OR or XOR and this node contains an
+        # aggregate, then we need to push the whole branch to HAVING clause.
+        may_need_split = (
+            (in_negated and self.connector == AND)
+            or (not in_negated and self.connector == OR)
+            or self.connector == XOR
         )
         if may_need_split and self.contains_aggregate:
             return None, self
@@ -84,6 +91,21 @@ class WhereNode(tree.Node):
             full_needed, empty_needed = len(self.children), 1
         else:
             full_needed, empty_needed = 1, len(self.children)
+
+        if self.connector == XOR and not connection.features.supports_logical_xor:
+            # Convert if the database doesn't support XOR:
+            #   a XOR b XOR c XOR ...
+            # to:
+            #   (a OR b OR c OR ...) AND (a + b + c + ...) == 1
+            lhs = self.__class__(self.children, OR)
+            rhs_sum = reduce(
+                operator.add,
+                (Case(When(c, then=1), default=0) for c in self.children),
+            )
+            rhs = Exact(1, rhs_sum)
+            return self.__class__([lhs, rhs], AND, self.negated).as_sql(
+                compiler, connection
+            )
 
         for child in self.children:
             try:

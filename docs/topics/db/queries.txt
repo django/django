@@ -1111,8 +1111,8 @@ For example, this ``Q`` object encapsulates a single ``LIKE`` query::
     from django.db.models import Q
     Q(question__startswith='What')
 
-``Q`` objects can be combined using the ``&`` and ``|`` operators. When an
-operator is used on two ``Q`` objects, it yields a new ``Q`` object.
+``Q`` objects can be combined using the ``&``, ``|``, and ``^`` operators. When
+an operator is used on two ``Q`` objects, it yields a new ``Q`` object.
 
 For example, this statement yields a single ``Q`` object that represents the
 "OR" of two ``"question__startswith"`` queries::
@@ -1124,9 +1124,10 @@ This is equivalent to the following SQL ``WHERE`` clause::
     WHERE question LIKE 'Who%' OR question LIKE 'What%'
 
 You can compose statements of arbitrary complexity by combining ``Q`` objects
-with the ``&`` and ``|`` operators and use parenthetical grouping. Also, ``Q``
-objects can be negated using the ``~`` operator, allowing for combined lookups
-that combine both a normal query and a negated (``NOT``) query::
+with the ``&``, ``|``, and ``^`` operators and use parenthetical grouping.
+Also, ``Q`` objects can be negated using the ``~`` operator, allowing for
+combined lookups that combine both a normal query and a negated (``NOT``)
+query::
 
     Q(question__startswith='Who') | ~Q(pub_date__year=2005)
 
@@ -1174,6 +1175,10 @@ precede the definition of any keyword arguments. For example::
 
     The :source:`OR lookups examples <tests/or_lookups/tests.py>` in Django's
     unit tests show some possible uses of ``Q``.
+
+.. versionchanged:: 4.1
+
+    Support for the ``^`` (``XOR``) operator was added.
 
 Comparing objects
 =================

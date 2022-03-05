@@ -1883,6 +1883,10 @@ class Queries5Tests(TestCase):
             Note.objects.exclude(~Q() & ~Q()),
             [self.n1, self.n2],
         )
+        self.assertSequenceEqual(
+            Note.objects.exclude(~Q() ^ ~Q()),
+            [self.n1, self.n2],
+        )
 
     def test_extra_select_literal_percent_s(self):
         # Allow %%s to escape select clauses
@@ -2128,6 +2132,15 @@ class Queries6Tests(TestCase):
             )
         sql = captured_queries[0]["sql"]
         self.assertIn("AS %s" % connection.ops.quote_name("col1"), sql)
+
+    def test_xor_subquery(self):
+        self.assertSequenceEqual(
+            Tag.objects.filter(
+                Exists(Tag.objects.filter(id=OuterRef("id"), name="t3"))
+                ^ Exists(Tag.objects.filter(id=OuterRef("id"), parent=self.t1))
+            ),
+            [self.t2],
+        )
 
 
 class RawQueriesTests(TestCase):
@@ -2431,6 +2444,30 @@ class QuerySetBitwiseOperationTests(TestCase):
         qs1 = Classroom.objects.filter(has_blackboard=False).order_by("-pk")[:1]
         qs2 = Classroom.objects.filter(has_blackboard=True).order_by("-name")[:1]
         self.assertCountEqual(qs1 | qs2, [self.room_3, self.room_4])
+
+    @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
+    def test_xor_with_rhs_slice(self):
+        qs1 = Classroom.objects.filter(has_blackboard=True)
+        qs2 = Classroom.objects.filter(has_blackboard=False)[:1]
+        self.assertCountEqual(qs1 ^ qs2, [self.room_1, self.room_2, self.room_3])
+
+    @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
+    def test_xor_with_lhs_slice(self):
+        qs1 = Classroom.objects.filter(has_blackboard=True)[:1]
+        qs2 = Classroom.objects.filter(has_blackboard=False)
+        self.assertCountEqual(qs1 ^ qs2, [self.room_1, self.room_2, self.room_4])
+
+    @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
+    def test_xor_with_both_slice(self):
+        qs1 = Classroom.objects.filter(has_blackboard=False)[:1]
+        qs2 = Classroom.objects.filter(has_blackboard=True)[:1]
+        self.assertCountEqual(qs1 ^ qs2, [self.room_1, self.room_2])
+
+    @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
+    def test_xor_with_both_slice_and_ordering(self):
+        qs1 = Classroom.objects.filter(has_blackboard=False).order_by("-pk")[:1]
+        qs2 = Classroom.objects.filter(has_blackboard=True).order_by("-name")[:1]
+        self.assertCountEqual(qs1 ^ qs2, [self.room_3, self.room_4])
 
     def test_subquery_aliases(self):
         combined = School.objects.filter(pk__isnull=False) & School.objects.filter(
