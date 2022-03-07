@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.core import signing
 from django.http import HttpRequest, HttpResponse
 from django.test import SimpleTestCase, override_settings
@@ -52,8 +54,13 @@ class SignedCookieTest(SimpleTestCase):
         with freeze_time(123456800):
             self.assertEqual(request.get_signed_cookie("c", max_age=12), value)
             self.assertEqual(request.get_signed_cookie("c", max_age=11), value)
+            self.assertEqual(
+                request.get_signed_cookie("c", max_age=timedelta(seconds=11)), value
+            )
             with self.assertRaises(signing.SignatureExpired):
                 request.get_signed_cookie("c", max_age=10)
+            with self.assertRaises(signing.SignatureExpired):
+                request.get_signed_cookie("c", max_age=timedelta(seconds=10))
 
     @override_settings(SECRET_KEY=b"\xe7")
     def test_signed_cookies_with_binary_key(self):
