@@ -425,6 +425,18 @@ class SecureProxySslHeaderTest(SimpleTestCase):
         self.assertIs(req.is_secure(), True)
 
     @override_settings(SECURE_PROXY_SSL_HEADER=("HTTP_X_FORWARDED_PROTO", "https"))
+    def test_set_with_xheader_right_multiple(self):
+        req = HttpRequest()
+        req.META["HTTP_X_FORWARDED_PROTO"] = "https, http"
+        self.assertIs(req.is_secure(), True)
+
+    @override_settings(SECURE_PROXY_SSL_HEADER=("HTTP_X_FORWARDED_PROTO", "https"))
+    def test_set_with_xheader_http_only_multiple(self):
+        req = HttpRequest()
+        req.META["HTTP_X_FORWARDED_PROTO"] = "http, http"
+        self.assertIs(req.is_secure(), False)
+
+    @override_settings(SECURE_PROXY_SSL_HEADER=("HTTP_X_FORWARDED_PROTO", "https"))
     def test_xheader_preferred_to_underlying_request(self):
         class ProxyRequest(HttpRequest):
             def _get_scheme(self):

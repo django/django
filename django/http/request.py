@@ -261,7 +261,8 @@ class HttpRequest:
                 )
             header_value = self.META.get(header)
             if header_value is not None:
-                return "https" if header_value == secure_value else "http"
+                header_values = [val.strip() for val in header_value.split(",")]
+                return "https" if secure_value in header_values else "http"
         return self._get_scheme()
 
     def is_secure(self):
