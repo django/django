@@ -293,6 +293,9 @@ Security
 * The new :setting:`SECRET_KEY_FALLBACKS` setting allows providing a list of
   values for secret key rotation.
 
+* The :setting:`SECURE_PROXY_SSL_HEADER` setting now supports a comma-separated
+  list of protocols in the header value.
+
 Serialization
 ~~~~~~~~~~~~~
 
