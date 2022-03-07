@@ -12,6 +12,10 @@ on:
       - 'docs/**'
       - '.github/workflows/docs.yml'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   docs:
     # OS must be the same as on djangoproject.com.
