@@ -96,14 +96,12 @@ contenttypes
 contrib
 coroutine
 coroutines
-covariance
 criticals
 cron
 crontab
 cryptographic
 cryptographically
 csrfmiddlewaretoken
-css
 csv
 ctime
 Ctrl
@@ -139,7 +137,6 @@ dimensioned
 discoverable
 Disqus
 distro
-Django
 djangoproject
 dm
 docstring
@@ -152,7 +149,6 @@ Dreamweaver
 drilldown
 dropdown
 dropdowns
-drupal
 Dunck
 editability
 encodings
@@ -175,7 +171,6 @@ filesystem
 filesystems
 flatpage
 flatpages
-Flatpages
 fooapp
 formatter
 formatters
@@ -218,7 +213,6 @@ hostname
 hostnames
 hstore
 html
-http
 https
 Hypercorn
 ie
@@ -233,8 +227,6 @@ init
 inlines
 instantiation
 interdependencies
-interoperability
-iOS
 ipsum
 IPv
 IPython
@@ -424,7 +416,6 @@ recomputation
 recursed
 redeclare
 redirections
-redis
 redisplay
 redisplayed
 redisplaying
@@ -578,7 +569,6 @@ unhashable
 unioning
 uniterated
 unlocalized
-unmaintained
 unmanaged
 unparseable
 unparsed
@@ -606,7 +596,6 @@ UTF
 util
 utils
 Uvicorn
-uwsgi
 uWSGI
 validator
 validators
@@ -614,7 +603,6 @@ validsite
 VARCHAR
 variadic
 vendored
-viewable
 virtualized
 whitespace
 whitespaces
