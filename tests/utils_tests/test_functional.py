@@ -1,6 +1,8 @@
 from unittest import mock
 
 from django.test import SimpleTestCase
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import cached_property, classproperty, lazy
 
 
@@ -97,11 +99,35 @@ class FunctionalTests(SimpleTestCase):
                 """Here is the docstring..."""
                 return 1, object()
 
-            other = cached_property(other_value, name='other')
+            other = cached_property(other_value)
 
         attrs = ['value', 'other', '__foo__']
         for attr in attrs:
             self.assertCachedPropertyWorks(attr, Class)
+
+    @ignore_warnings(category=RemovedInDjango50Warning)
+    def test_cached_property_name(self):
+        class Class:
+            def other_value(self):
+                """Here is the docstring..."""
+                return 1, object()
+
+            other = cached_property(other_value, name='other')
+            other2 = cached_property(other_value, name='different_name')
+
+        self.assertCachedPropertyWorks('other', Class)
+        # An explicit name is ignored.
+        obj = Class()
+        obj.other2
+        self.assertFalse(hasattr(obj, 'different_name'))
+
+    def test_cached_property_name_deprecation_warning(self):
+        def value(self):
+            return 1
+
+        msg = "The name argument is deprecated as it's unnecessary as of Python 3.6."
+        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+            cached_property(value, name='other_name')
 
     def test_cached_property_auto_name(self):
         """
@@ -119,16 +145,10 @@ class FunctionalTests(SimpleTestCase):
                 return 1, object()
 
             other = cached_property(other_value)
-            other2 = cached_property(other_value, name='different_name')
 
         attrs = ['_Class__value', 'other']
         for attr in attrs:
             self.assertCachedPropertyWorks(attr, Class)
-
-        # An explicit name is ignored.
-        obj = Class()
-        obj.other2
-        self.assertFalse(hasattr(obj, 'different_name'))
 
     def test_cached_property_reuse_different_names(self):
         """Disallow this case because the decorated function wouldn't be cached."""

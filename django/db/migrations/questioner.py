@@ -4,6 +4,7 @@ import os
 import sys
 
 from django.apps import apps
+from django.core.management.base import OutputWrapper
 from django.db.models import NOT_PROVIDED
 from django.utils import timezone
 from django.utils.version import get_docs_version
@@ -87,20 +88,26 @@ class MigrationQuestioner:
 
 
 class InteractiveMigrationQuestioner(MigrationQuestioner):
+    def __init__(self, defaults=None, specified_apps=None, dry_run=None, prompt_output=None):
+        super().__init__(defaults=defaults, specified_apps=specified_apps, dry_run=dry_run)
+        self.prompt_output = prompt_output or OutputWrapper(sys.stdout)
 
     def _boolean_input(self, question, default=None):
-        result = input("%s " % question)
+        self.prompt_output.write(f'{question} ', ending='')
+        result = input()
         if not result and default is not None:
             return default
         while not result or result[0].lower() not in "yn":
-            result = input("Please answer yes or no: ")
+            self.prompt_output.write('Please answer yes or no: ', ending='')
+            result = input()
         return result[0].lower() == "y"
 
     def _choice_input(self, question, choices):
-        print(question)
+        self.prompt_output.write(f'{question}')
         for i, choice in enumerate(choices):
-            print(" %s) %s" % (i + 1, choice))
-        result = input("Select an option: ")
+            self.prompt_output.write(' %s) %s' % (i + 1, choice))
+        self.prompt_output.write('Select an option: ', ending='')
+        result = input()
         while True:
             try:
                 value = int(result)
@@ -109,7 +116,8 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
             else:
                 if 0 < value <= len(choices):
                     return value
-            result = input("Please select a valid option: ")
+            self.prompt_output.write('Please select a valid option: ', ending='')
+            result = input()
 
     def _ask_default(self, default=''):
         """
@@ -119,34 +127,35 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         string) which will be shown to the user and used as the return value
         if the user doesn't provide any other input.
         """
-        print('Please enter the default value as valid Python.')
+        self.prompt_output.write('Please enter the default value as valid Python.')
         if default:
-            print(
+            self.prompt_output.write(
                 f"Accept the default '{default}' by pressing 'Enter' or "
                 f"provide another value."
             )
-        print(
+        self.prompt_output.write(
             'The datetime and django.utils.timezone modules are available, so '
             'it is possible to provide e.g. timezone.now as a value.'
         )
-        print("Type 'exit' to exit this prompt")
+        self.prompt_output.write("Type 'exit' to exit this prompt")
         while True:
             if default:
                 prompt = "[default: {}] >>> ".format(default)
             else:
                 prompt = ">>> "
-            code = input(prompt)
+            self.prompt_output.write(prompt, ending='')
+            code = input()
             if not code and default:
                 code = default
             if not code:
-                print("Please enter some code, or 'exit' (without quotes) to exit.")
+                self.prompt_output.write("Please enter some code, or 'exit' (without quotes) to exit.")
             elif code == "exit":
                 sys.exit(1)
             else:
                 try:
                     return eval(code, {}, {'datetime': datetime, 'timezone': timezone})
                 except (SyntaxError, NameError) as e:
-                    print("Invalid input: %s" % e)
+                    self.prompt_output.write('Invalid input: %s' % e)
 
     def ask_not_null_addition(self, field_name, model_name):
         """Adding a NOT NULL field to a model."""

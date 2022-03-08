@@ -298,6 +298,12 @@ class FileStorageTests(SimpleTestCase):
 
         self.storage.delete('path/to/test.file')
 
+    def test_file_save_abs_path(self):
+        test_name = 'path/to/test.file'
+        f = ContentFile('file saved with path')
+        f_name = self.storage.save(os.path.join(self.temp_dir, test_name), f)
+        self.assertEqual(f_name, test_name)
+
     @unittest.skipUnless(symlinks_supported(), 'Must be able to symlink to run this test.')
     def test_file_save_broken_symlink(self):
         """A new path is created on save when a broken symlink is supplied."""

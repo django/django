@@ -769,7 +769,7 @@ This is useful if you want to :ref:`use more than one formset in a view
 Using a formset in views and templates
 ======================================
 
-Formsets have five attributes and five methods associated with rendering.
+Formsets have the following attributes and methods associated with rendering:
 
 .. attribute:: BaseFormSet.renderer
 

@@ -418,9 +418,8 @@ The ``Aggregate`` API is as follows:
 
         .. versionadded:: 4.0
 
-        Override :attr:`~django.db.models.Expression.empty_result_set_value` to
-        ``None`` since most aggregate functions result in ``NULL`` when applied
-        to an empty result set.
+        Defaults to ``None`` since most aggregate functions result in ``NULL``
+        when applied to an empty result set.
 
 The ``expressions`` positional arguments can include expressions, transforms of
 the model field, or the names of model fields. They will be converted to a

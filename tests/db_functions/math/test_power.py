@@ -13,9 +13,11 @@ class PowerTests(TestCase):
         obj = IntegerModel.objects.annotate(
             null_power_small=Power('small', 'normal'),
             null_power_normal=Power('normal', 'big'),
+            null_power_big=Power('big', 'normal'),
         ).first()
         self.assertIsNone(obj.null_power_small)
         self.assertIsNone(obj.null_power_normal)
+        self.assertIsNone(obj.null_power_big)
 
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('1.0'), n2=Decimal('-0.6'))

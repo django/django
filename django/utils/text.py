@@ -1,4 +1,3 @@
-import html.entities
 import re
 import unicodedata
 from gzip import GzipFile, compress as gzip_compress
@@ -336,28 +335,6 @@ def smart_split(text):
     """
     for bit in smart_split_re.finditer(str(text)):
         yield bit[0]
-
-
-def _replace_entity(match):
-    text = match[1]
-    if text[0] == '#':
-        text = text[1:]
-        try:
-            if text[0] in 'xX':
-                c = int(text[1:], 16)
-            else:
-                c = int(text)
-            return chr(c)
-        except ValueError:
-            return match[0]
-    else:
-        try:
-            return chr(html.entities.name2codepoint[text])
-        except KeyError:
-            return match[0]
-
-
-_entity_re = _lazy_re_compile(r"&(#?[xX]?(?:[0-9a-fA-F]+|\w{1,8}));")
 
 
 @keep_lazy_text

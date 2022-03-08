@@ -1,6 +1,5 @@
 from functools import wraps
 
-from django.http import HttpRequest
 from django.middleware.cache import CacheMiddleware
 from django.utils.cache import add_never_cache_headers, patch_cache_control
 from django.utils.decorators import decorator_from_middleware_with_args
@@ -29,7 +28,8 @@ def cache_control(**kwargs):
     def _cache_controller(viewfunc):
         @wraps(viewfunc)
         def _cache_controlled(request, *args, **kw):
-            if not isinstance(request, HttpRequest):
+            # Ensure argument looks like a request.
+            if not hasattr(request, 'META'):
                 raise TypeError(
                     "cache_control didn't receive an HttpRequest. If you are "
                     "decorating a classmethod, be sure to use "
@@ -48,7 +48,8 @@ def never_cache(view_func):
     """
     @wraps(view_func)
     def _wrapped_view_func(request, *args, **kwargs):
-        if not isinstance(request, HttpRequest):
+        # Ensure argument looks like a request.
+        if not hasattr(request, 'META'):
             raise TypeError(
                 "never_cache didn't receive an HttpRequest. If you are "
                 "decorating a classmethod, be sure to use @method_decorator."

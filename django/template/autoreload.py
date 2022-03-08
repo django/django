@@ -13,18 +13,19 @@ def get_template_directories():
     # Iterate through each template backend and find
     # any template_loader that has a 'get_dirs' method.
     # Collect the directories, filtering out Django templates.
+    cwd = Path.cwd()
     items = set()
     for backend in engines.all():
         if not isinstance(backend, DjangoTemplates):
             continue
 
-        items.update(Path.cwd() / to_path(dir) for dir in backend.engine.dirs)
+        items.update(cwd / to_path(dir) for dir in backend.engine.dirs)
 
         for loader in backend.engine.template_loaders:
             if not hasattr(loader, 'get_dirs'):
                 continue
             items.update(
-                Path.cwd() / to_path(directory)
+                cwd / to_path(directory)
                 for directory in loader.get_dirs()
                 if not is_django_path(directory)
             )

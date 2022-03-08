@@ -517,14 +517,11 @@ class AssertFormErrorTests(SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "Invalid POST Template")
 
-        try:
+        msg = "The form 'wrong_form' was not used to render the response"
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertFormError(response, 'wrong_form', 'some_field', 'Some error.')
-        except AssertionError as e:
-            self.assertIn("The form 'wrong_form' was not used to render the response", str(e))
-        try:
+        with self.assertRaisesMessage(AssertionError, 'abc: ' + msg):
             self.assertFormError(response, 'wrong_form', 'some_field', 'Some error.', msg_prefix='abc')
-        except AssertionError as e:
-            self.assertIn("abc: The form 'wrong_form' was not used to render the response", str(e))
 
     def test_unknown_field(self):
         "An assertion is raised if the field name is unknown"
@@ -539,14 +536,11 @@ class AssertFormErrorTests(SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "Invalid POST Template")
 
-        try:
+        msg = "The form 'form' in context 0 does not contain the field 'some_field'"
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertFormError(response, 'form', 'some_field', 'Some error.')
-        except AssertionError as e:
-            self.assertIn("The form 'form' in context 0 does not contain the field 'some_field'", str(e))
-        try:
+        with self.assertRaisesMessage(AssertionError, 'abc: ' + msg):
             self.assertFormError(response, 'form', 'some_field', 'Some error.', msg_prefix='abc')
-        except AssertionError as e:
-            self.assertIn("abc: The form 'form' in context 0 does not contain the field 'some_field'", str(e))
 
     def test_noerror_field(self):
         "An assertion is raised if the field doesn't have any errors"
@@ -561,14 +555,11 @@ class AssertFormErrorTests(SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "Invalid POST Template")
 
-        try:
+        msg = "The field 'value' on form 'form' in context 0 contains no errors"
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertFormError(response, 'form', 'value', 'Some error.')
-        except AssertionError as e:
-            self.assertIn("The field 'value' on form 'form' in context 0 contains no errors", str(e))
-        try:
+        with self.assertRaisesMessage(AssertionError, 'abc: ' + msg):
             self.assertFormError(response, 'form', 'value', 'Some error.', msg_prefix='abc')
-        except AssertionError as e:
-            self.assertIn("abc: The field 'value' on form 'form' in context 0 contains no errors", str(e))
 
     def test_unknown_error(self):
         "An assertion is raised if the field doesn't contain the provided error"
@@ -583,24 +574,15 @@ class AssertFormErrorTests(SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "Invalid POST Template")
 
-        try:
+        msg = (
+            "The field 'email' on form 'form' in context 0 does not contain "
+            "the error 'Some error.' (actual errors: ['Enter a valid email "
+            "address.'])"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertFormError(response, 'form', 'email', 'Some error.')
-        except AssertionError as e:
-            self.assertIn(
-                "The field 'email' on form 'form' in context 0 does not "
-                "contain the error 'Some error.' (actual errors: "
-                "['Enter a valid email address.'])",
-                str(e)
-            )
-        try:
+        with self.assertRaisesMessage(AssertionError, 'abc: ' + msg):
             self.assertFormError(response, 'form', 'email', 'Some error.', msg_prefix='abc')
-        except AssertionError as e:
-            self.assertIn(
-                "abc: The field 'email' on form 'form' in context 0 does "
-                "not contain the error 'Some error.' (actual errors: "
-                "['Enter a valid email address.'])",
-                str(e)
-            )
 
     def test_unknown_nonfield_error(self):
         """
@@ -618,22 +600,14 @@ class AssertFormErrorTests(SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "Invalid POST Template")
 
-        try:
+        msg = (
+            "The form 'form' in context 0 does not contain the non-field "
+            "error 'Some error.' (actual errors: none)"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertFormError(response, 'form', None, 'Some error.')
-        except AssertionError as e:
-            self.assertIn(
-                "The form 'form' in context 0 does not contain the non-field "
-                "error 'Some error.' (actual errors: none)",
-                str(e)
-            )
-        try:
+        with self.assertRaisesMessage(AssertionError, 'abc: ' + msg):
             self.assertFormError(response, 'form', None, 'Some error.', msg_prefix='abc')
-        except AssertionError as e:
-            self.assertIn(
-                "abc: The form 'form' in context 0 does not contain the "
-                "non-field error 'Some error.' (actual errors: none)",
-                str(e)
-            )
 
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls')

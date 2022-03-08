@@ -417,7 +417,7 @@ This simplistic view logs in a "member" of the site::
 
     def login(request):
         m = Member.objects.get(username=request.POST['username'])
-        if m.password == request.POST['password']:
+        if m.check_password(request.POST['password']):
             request.session['member_id'] = m.id
             return HttpResponse("You're logged in.")
         else:

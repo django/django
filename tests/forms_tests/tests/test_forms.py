@@ -23,7 +23,8 @@ from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils.datastructures import MultiValueDict
 from django.utils.safestring import mark_safe
-from tests.forms_tests.tests import jinja2_tests
+
+from . import jinja2_tests
 
 
 class FrameworkForm(Form):
@@ -791,6 +792,79 @@ Java</label></div>
 <option value="J">John Lennon</option>
 <option value="P" selected>Paul McCartney</option>
 </select>""")
+        f = SongForm()
+        self.assertHTMLEqual(
+            f.as_table(),
+            '<tr><th><label for="id_name">Name:</label></th>'
+            '<td><input type="text" name="name" required id="id_name"></td>'
+            '</tr><tr><th><label for="id_composers">Composers:</label></th>'
+            '<td><select name="composers" required id="id_composers" multiple>'
+            '<option value="J">John Lennon</option>'
+            '<option value="P">Paul McCartney</option>'
+            '</select></td></tr>',
+        )
+        self.assertHTMLEqual(
+            f.as_ul(),
+            '<li><label for="id_name">Name:</label>'
+            '<input type="text" name="name" required id="id_name"></li>'
+            '<li><label for="id_composers">Composers:</label>'
+            '<select name="composers" required id="id_composers" multiple>'
+            '<option value="J">John Lennon</option>'
+            '<option value="P">Paul McCartney</option>'
+            '</select></li>',
+        )
+        self.assertHTMLEqual(
+            f.as_p(),
+            '<p><label for="id_name">Name:</label>'
+            '<input type="text" name="name" required id="id_name"></p>'
+            '<p><label for="id_composers">Composers:</label>'
+            '<select name="composers" required id="id_composers" multiple>'
+            '<option value="J">John Lennon</option>'
+            '<option value="P">Paul McCartney</option>'
+            '</select></p>',
+        )
+
+    def test_multiple_checkbox_render(self):
+        f = SongForm()
+        self.assertHTMLEqual(
+            f.as_table(),
+            '<tr><th><label for="id_name">Name:</label></th><td>'
+            '<input type="text" name="name" required id="id_name"></td></tr>'
+            '<tr><th><label>Composers:</label></th><td><div id="id_composers">'
+            '<div><label for="id_composers_0">'
+            '<input type="checkbox" name="composers" value="J" '
+            'id="id_composers_0">John Lennon</label></div>'
+            '<div><label for="id_composers_1">'
+            '<input type="checkbox" name="composers" value="P" '
+            'id="id_composers_1">Paul McCartney</label></div>'
+            '</div></td></tr>',
+        )
+        self.assertHTMLEqual(
+            f.as_ul(),
+            '<li><label for="id_name">Name:</label>'
+            '<input type="text" name="name" required id="id_name"></li>'
+            '<li><label>Composers:</label><div id="id_composers">'
+            '<div><label for="id_composers_0">'
+            '<input type="checkbox" name="composers" value="J" '
+            'id="id_composers_0">John Lennon</label></div>'
+            '<div><label for="id_composers_1">'
+            '<input type="checkbox" name="composers" value="P" '
+            'id="id_composers_1">Paul McCartney</label></div>'
+            '</div></li>',
+        )
+        self.assertHTMLEqual(
+            f.as_p(),
+            '<p><label for="id_name">Name:</label>'
+            '<input type="text" name="name" required id="id_name"></p>'
+            '<p><label>Composers:</label><div id="id_composers">'
+            '<div><label for="id_composers_0">'
+            '<input type="checkbox" name="composers" value="J" '
+            'id="id_composers_0">John Lennon</label></div>'
+            '<div><label for="id_composers_1">'
+            '<input type="checkbox" name="composers" value="P" '
+            'id="id_composers_1">Paul McCartney</label></div>'
+            '</div></p>',
+        )
 
     def test_form_with_disabled_fields(self):
         class PersonForm(Form):

@@ -161,6 +161,11 @@ class DurationParseTests(unittest.TestCase):
             ('-PT0.000005S', timedelta(microseconds=-5)),
             ('-PT0,000005S', timedelta(microseconds=-5)),
             ('-P4DT1H', timedelta(days=-4, hours=-1)),
+            # Invalid separators for decimal fractions.
+            ('P3(3D', None),
+            ('PT3)3H', None),
+            ('PT3|3M', None),
+            ('PT3/3S', None),
         )
         for source, expected in test_values:
             with self.subTest(source=source):

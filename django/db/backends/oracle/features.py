@@ -85,6 +85,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         "Oracle doesn't support bitwise XOR.": {
             'expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor',
             'expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor_null',
+            'expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor_right_null',
         },
         "Oracle requires ORDER BY in row_number, ANSI:SQL doesn't.": {
             'expressions_window.tests.WindowFunctionTests.test_row_number_no_ordering',

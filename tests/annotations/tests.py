@@ -210,6 +210,26 @@ class NonAggregateAnnotationTestCase(TestCase):
         self.assertEqual(len(books), Book.objects.count())
         self.assertTrue(all(not book.selected for book in books))
 
+    def test_full_expression_annotation(self):
+        books = Book.objects.annotate(
+            selected=ExpressionWrapper(~Q(pk__in=[]), output_field=BooleanField()),
+        )
+        self.assertEqual(len(books), Book.objects.count())
+        self.assertTrue(all(book.selected for book in books))
+
+    def test_full_expression_annotation_with_aggregation(self):
+        qs = Book.objects.filter(isbn='159059725').annotate(
+            selected=ExpressionWrapper(~Q(pk__in=[]), output_field=BooleanField()),
+            rating_count=Count('rating'),
+        )
+        self.assertEqual([book.rating_count for book in qs], [1])
+
+    def test_aggregate_over_full_expression_annotation(self):
+        qs = Book.objects.annotate(
+            selected=ExpressionWrapper(~Q(pk__in=[]), output_field=BooleanField()),
+        ).aggregate(Sum('selected'))
+        self.assertEqual(qs['selected__sum'], Book.objects.count())
+
     def test_empty_queryset_annotation(self):
         qs = Author.objects.annotate(
             empty=Subquery(Author.objects.values('id').none())

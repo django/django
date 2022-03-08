@@ -26,10 +26,11 @@ from django.test import (
 from django.test.html import HTMLParseError, parse_html
 from django.test.testcases import DatabaseOperationForbidden
 from django.test.utils import (
-    CaptureQueriesContext, TestContextDecorator, isolate_apps,
+    CaptureQueriesContext, TestContextDecorator, ignore_warnings, isolate_apps,
     override_settings, setup_test_environment,
 )
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.log import DEFAULT_LOGGING
 
 from .models import Car, Person, PossessedCar
@@ -508,7 +509,7 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
             pass
 
     def test_error_message(self):
-        msg = 'template_used/base.html was not rendered. No template was rendered.'
+        msg = 'No templates used to render the response'
         with self.assertRaisesMessage(AssertionError, msg):
             with self.assertTemplateUsed('template_used/base.html'):
                 pass
@@ -518,8 +519,8 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
                 pass
 
         msg2 = (
-            'template_used/base.html was not rendered. Following templates '
-            'were rendered: template_used/alternative.html'
+            "Template 'template_used/base.html' was not a template used to render "
+            "the response. Actual template(s) used: template_used/alternative.html"
         )
         with self.assertRaisesMessage(AssertionError, msg2):
             with self.assertTemplateUsed('template_used/base.html'):
@@ -528,6 +529,43 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
         with self.assertRaisesMessage(AssertionError, 'No templates used to render the response'):
             response = self.client.get('/test_utils/no_template_used/')
             self.assertTemplateUsed(response, 'template_used/base.html')
+
+    def test_msg_prefix(self):
+        msg_prefix = 'Prefix'
+        msg = f'{msg_prefix}: No templates used to render the response'
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertTemplateUsed('template_used/base.html', msg_prefix=msg_prefix):
+                pass
+
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertTemplateUsed(
+                template_name='template_used/base.html',
+                msg_prefix=msg_prefix,
+            ):
+                pass
+
+        msg = (
+            f"{msg_prefix}: Template 'template_used/base.html' was not a "
+            f"template used to render the response. Actual template(s) used: "
+            f"template_used/alternative.html"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertTemplateUsed('template_used/base.html', msg_prefix=msg_prefix):
+                render_to_string('template_used/alternative.html')
+
+    def test_count(self):
+        with self.assertTemplateUsed('template_used/base.html', count=2):
+            render_to_string('template_used/base.html')
+            render_to_string('template_used/base.html')
+
+        msg = (
+            "Template 'template_used/base.html' was expected to be rendered "
+            "3 time(s) but was actually rendered 2 time(s)."
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertTemplateUsed('template_used/base.html', count=3):
+                render_to_string('template_used/base.html')
+                render_to_string('template_used/base.html')
 
     def test_failure(self):
         msg = 'response and/or template_name argument must be provided'
@@ -549,8 +587,9 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
                 pass
 
         msg = (
-            'template_used/base.html was not rendered. Following '
-            'templates were rendered: template_used/alternative.html'
+            "Template 'template_used/base.html' was not a template used to "
+            "render the response. Actual template(s) used: "
+            "template_used/alternative.html"
         )
         with self.assertRaisesMessage(AssertionError, msg):
             with self.assertTemplateUsed('template_used/base.html'):
@@ -1380,6 +1419,20 @@ class AssertFormErrorTests(SimpleTestCase):
         response = mock.Mock(context=[{'form': TestForm.invalid(nonfield=True)}])
         self.assertFormError(response, 'form', None, 'non-field error')
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
+    def test_errors_none(self):
+        response = mock.Mock(context=[{'form': TestForm.invalid()}])
+        self.assertFormError(response, 'form', 'field', None)
+
+    def test_errors_none_warning(self):
+        response = mock.Mock(context=[{'form': TestForm.invalid()}])
+        msg = (
+            'Passing errors=None to assertFormError() is deprecated, use '
+            'errors=[] instead.'
+        )
+        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+            self.assertFormError(response, 'form', 'value', None)
+
 
 class AssertFormsetErrorTests(SimpleTestCase):
     def _get_formset_data(self, field_value):
@@ -1521,6 +1574,20 @@ class AssertFormsetErrorTests(SimpleTestCase):
             {'form': formset.management_form},
         ])
         self.assertFormsetError(response, 'form', 0, 'field', 'invalid value')
+
+    @ignore_warnings(category=RemovedInDjango50Warning)
+    def test_errors_none(self):
+        response = mock.Mock(context=[{'formset': TestFormset.invalid()}])
+        self.assertFormsetError(response, 'formset', 0, 'field', None)
+
+    def test_errors_none_warning(self):
+        response = mock.Mock(context=[{'formset': TestFormset.invalid()}])
+        msg = (
+            'Passing errors=None to assertFormsetError() is deprecated, use '
+            'errors=[] instead.'
+        )
+        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+            self.assertFormsetError(response, 'formset', 0, 'field', None)
 
 
 class FirstUrls:
@@ -1790,6 +1857,58 @@ class CaptureOnCommitCallbacksTests(TestCase):
 
         self.assertEqual(len(callbacks), 2)
         self.assertIs(self.callback_called, True)
+
+    def test_execute_tree(self):
+        """
+        A visualisation of the callback tree tested. Each node is expected to
+        be visited only once:
+
+        └─branch_1
+          ├─branch_2
+          │ ├─leaf_1
+          │ └─leaf_2
+          └─leaf_3
+        """
+        branch_1_call_counter = 0
+        branch_2_call_counter = 0
+        leaf_1_call_counter = 0
+        leaf_2_call_counter = 0
+        leaf_3_call_counter = 0
+
+        def leaf_1():
+            nonlocal leaf_1_call_counter
+            leaf_1_call_counter += 1
+
+        def leaf_2():
+            nonlocal leaf_2_call_counter
+            leaf_2_call_counter += 1
+
+        def leaf_3():
+            nonlocal leaf_3_call_counter
+            leaf_3_call_counter += 1
+
+        def branch_1():
+            nonlocal branch_1_call_counter
+            branch_1_call_counter += 1
+            transaction.on_commit(branch_2)
+            transaction.on_commit(leaf_3)
+
+        def branch_2():
+            nonlocal branch_2_call_counter
+            branch_2_call_counter += 1
+            transaction.on_commit(leaf_1)
+            transaction.on_commit(leaf_2)
+
+        with self.captureOnCommitCallbacks(execute=True) as callbacks:
+            transaction.on_commit(branch_1)
+
+        self.assertEqual(branch_1_call_counter, 1)
+        self.assertEqual(branch_2_call_counter, 1)
+        self.assertEqual(leaf_1_call_counter, 1)
+        self.assertEqual(leaf_2_call_counter, 1)
+        self.assertEqual(leaf_3_call_counter, 1)
+
+        self.assertEqual(callbacks, [branch_1, branch_2, leaf_3, leaf_1, leaf_2])
 
 
 class DisallowedDatabaseQueriesTests(SimpleTestCase):

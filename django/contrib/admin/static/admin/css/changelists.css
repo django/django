@@ -173,8 +173,7 @@
 #changelist-filter a {
     display: block;
     color: var(--body-quiet-color);
-    text-overflow: ellipsis;
-    overflow-x: hidden;
+    word-break: break-word;
 }
 
 #changelist-filter li.selected {

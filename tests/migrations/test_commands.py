@@ -1304,7 +1304,15 @@ class MakeMigrationsTests(MigrationTestBase):
         # Monkeypatch interactive questioner to auto reject
         with mock.patch('builtins.input', mock.Mock(return_value='N')):
             with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
-                call_command("makemigrations", "migrations", name="merge", merge=True, interactive=True, verbosity=0)
+                with captured_stdout():
+                    call_command(
+                        'makemigrations',
+                        'migrations',
+                        name='merge',
+                        merge=True,
+                        interactive=True,
+                        verbosity=0,
+                    )
                 merge_file = os.path.join(migration_dir, '0003_merge.py')
                 self.assertFalse(os.path.exists(merge_file))
 
@@ -1458,6 +1466,12 @@ class MakeMigrationsTests(MigrationTestBase):
             " 3) Quit and manually define a default value in models.py."
         )
         with self.temporary_migration_module(module='migrations.test_migrations'):
+            # No message appears if --dry-run.
+            with captured_stdout() as out:
+                call_command(
+                    'makemigrations', 'migrations', interactive=True, dry_run=True,
+                )
+            self.assertNotIn(input_msg, out.getvalue())
             # 3 - quit.
             with mock.patch('builtins.input', return_value='3'):
                 with captured_stdout() as out, self.assertRaises(SystemExit):
@@ -1511,6 +1525,39 @@ class MakeMigrationsTests(MigrationTestBase):
             call_command("makemigrations", "migrations", interactive=False, stdout=out)
         self.assertIn("Remove field silly_field from sillymodel", out.getvalue())
         self.assertIn("Add field silly_rename to sillymodel", out.getvalue())
+
+    @mock.patch('builtins.input', return_value='Y')
+    def test_makemigrations_model_rename_interactive(self, mock_input):
+        class RenamedModel(models.Model):
+            silly_field = models.BooleanField(default=False)
+
+            class Meta:
+                app_label = 'migrations'
+
+        with self.temporary_migration_module(
+            module='migrations.test_migrations_no_default',
+        ):
+            with captured_stdout() as out:
+                call_command('makemigrations', 'migrations', interactive=True)
+        self.assertIn('Rename model SillyModel to RenamedModel', out.getvalue())
+
+    @mock.patch('builtins.input', return_value='Y')
+    def test_makemigrations_field_rename_interactive(self, mock_input):
+        class SillyModel(models.Model):
+            silly_rename = models.BooleanField(default=False)
+
+            class Meta:
+                app_label = 'migrations'
+
+        with self.temporary_migration_module(
+            module='migrations.test_migrations_no_default',
+        ):
+            with captured_stdout() as out:
+                call_command('makemigrations', 'migrations', interactive=True)
+        self.assertIn(
+            'Rename field silly_field on sillymodel to silly_rename',
+            out.getvalue(),
+        )
 
     def test_makemigrations_handle_merge(self):
         """
@@ -1581,6 +1628,7 @@ class MakeMigrationsTests(MigrationTestBase):
         class SillyModel(models.Model):
             silly_field = models.BooleanField(default=False)
             silly_date = models.DateField()  # Added field without a default
+            silly_auto_now = models.DateTimeField(auto_now_add=True)
 
             class Meta:
                 app_label = "migrations"
@@ -1726,6 +1774,10 @@ class MakeMigrationsTests(MigrationTestBase):
                 '    - remove field silly_field from author\n'
                 '    - add field rating to author\n'
                 '    - create model book\n'
+                '\n'
+                'merging will only work if the operations printed above do not conflict\n'
+                'with each other (working on different fields or models)\n'
+                'should these migration branches be merged? [y/n] '
             )
 
     def test_makemigrations_with_custom_name(self):
@@ -1846,30 +1898,25 @@ class MakeMigrationsTests(MigrationTestBase):
             "It is impossible to add the field 'creation_date' with "
             "'auto_now_add=True' to entry without providing a default. This "
             "is because the database needs something to populate existing "
-            "rows.\n\n"
+            "rows.\n"
             " 1) Provide a one-off default now which will be set on all "
             "existing rows\n"
             " 2) Quit and manually define a default value in models.py."
         )
         # Monkeypatch interactive questioner to auto accept
-        with mock.patch('django.db.migrations.questioner.sys.stdout', new_callable=io.StringIO) as prompt_stdout:
-            out = io.StringIO()
-            with self.temporary_migration_module(module='migrations.test_auto_now_add'):
-                call_command('makemigrations', 'migrations', interactive=True, stdout=out)
-            output = out.getvalue()
-            prompt_output = prompt_stdout.getvalue()
-            self.assertIn(input_msg, prompt_output)
-            self.assertIn(
-                'Please enter the default value as valid Python.',
-                prompt_output,
-            )
-            self.assertIn(
-                "Accept the default 'timezone.now' by pressing 'Enter' or "
-                "provide another value.",
-                prompt_output,
-            )
-            self.assertIn("Type 'exit' to exit this prompt", prompt_output)
-            self.assertIn("Add field creation_date to entry", output)
+        prompt_stdout = io.StringIO()
+        with self.temporary_migration_module(module='migrations.test_auto_now_add'):
+            call_command('makemigrations', 'migrations', interactive=True, stdout=prompt_stdout)
+        prompt_output = prompt_stdout.getvalue()
+        self.assertIn(input_msg, prompt_output)
+        self.assertIn('Please enter the default value as valid Python.', prompt_output)
+        self.assertIn(
+            "Accept the default 'timezone.now' by pressing 'Enter' or provide "
+            "another value.",
+            prompt_output,
+        )
+        self.assertIn("Type 'exit' to exit this prompt", prompt_output)
+        self.assertIn("Add field creation_date to entry", prompt_output)
 
     @mock.patch('builtins.input', return_value='2')
     def test_makemigrations_auto_now_add_interactive_quit(self, mock_input):
@@ -1920,7 +1967,7 @@ class MakeMigrationsTests(MigrationTestBase):
         input_msg = (
             f'Callable default on unique field book.created will not generate '
             f'unique values upon migrating.\n'
-            f'Please choose how to proceed:\n\n'
+            f'Please choose how to proceed:\n'
             f' 1) Continue making this migration as the first step in writing '
             f'a manual migration to generate unique values described here: '
             f'https://docs.djangoproject.com/en/{version}/howto/'
@@ -2090,6 +2137,42 @@ class SquashMigrationsTests(MigrationTestBase):
                     'squashmigrations', 'migrations', '0001', '0002',
                     squashed_name='initial', interactive=False, verbosity=0,
                 )
+
+    def test_squashmigrations_manual_porting(self):
+        out = io.StringIO()
+        with self.temporary_migration_module(
+            module='migrations.test_migrations_manual_porting',
+        ) as migration_dir:
+            call_command(
+                'squashmigrations',
+                'migrations',
+                '0002',
+                interactive=False,
+                stdout=out,
+                no_color=True,
+            )
+            squashed_migration_file = os.path.join(
+                migration_dir,
+                '0001_squashed_0002_second.py',
+            )
+            self.assertTrue(os.path.exists(squashed_migration_file))
+        self.assertEqual(
+            out.getvalue(),
+            f'Will squash the following migrations:\n'
+            f' - 0001_initial\n'
+            f' - 0002_second\n'
+            f'Optimizing...\n'
+            f'  No optimizations possible.\n'
+            f'Created new squashed migration {squashed_migration_file}\n'
+            f'  You should commit this migration but leave the old ones in place;\n'
+            f'  the new migration will be used for new installs. Once you are sure\n'
+            f'  all instances of the codebase have applied the migrations you squashed,\n'
+            f'  you can delete them.\n'
+            f'Manual porting required\n'
+            f'  Your migrations contained functions that must be manually copied over,\n'
+            f'  as we could not safely copy their implementation.\n'
+            f'  See the comment at the top of the squashed migration for details.\n'
+        )
 
 
 class AppLabelErrorTests(TestCase):

@@ -374,7 +374,7 @@ For each field, we describe the default widget used if you don't specify
       ``min_length`` are provided. Otherwise, all inputs are valid.
     * Error message keys: ``required``, ``max_length``, ``min_length``
 
-    Has four optional arguments for validation:
+    Has the following optional arguments for validation:
 
     .. attribute:: max_length
     .. attribute:: min_length
@@ -550,7 +550,7 @@ For each field, we describe the default widget used if you don't specify
       regular expression.
     * Error message keys: ``required``, ``invalid``
 
-    Has three optional arguments ``max_length``, ``min_length``, and
+    Has the optional arguments ``max_length``, ``min_length``, and
     ``empty_value`` which work just as they do for :class:`CharField`.
 
 ``FileField``
@@ -566,7 +566,7 @@ For each field, we describe the default widget used if you don't specify
     * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``,
       ``max_length``
 
-    Has two optional arguments for validation, ``max_length`` and
+    Has the optional arguments for validation: ``max_length`` and
     ``allow_empty_file``. If provided, these ensure that the file name is at
     most the given length, and that validation will succeed even if the file
     content is empty.
@@ -1009,7 +1009,7 @@ For each field, we describe the default widget used if you don't specify
       given value is a valid URL.
     * Error message keys: ``required``, ``invalid``
 
-    Has three optional arguments ``max_length``, ``min_length``, and
+    Has the optional arguments ``max_length``, ``min_length``, and
     ``empty_value`` which work just as they do for :class:`CharField`.
 
 ``UUIDField``

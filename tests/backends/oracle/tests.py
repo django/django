@@ -37,12 +37,6 @@ class Tests(unittest.TestCase):
             cursor.execute("BEGIN %s := 'X'; END; ", [var])
             self.assertEqual(var.getvalue(), 'X')
 
-    def test_client_encoding(self):
-        """Client encoding is set correctly."""
-        connection.ensure_connection()
-        self.assertEqual(connection.connection.encoding, 'UTF-8')
-        self.assertEqual(connection.connection.nencoding, 'UTF-8')
-
     def test_order_of_nls_parameters(self):
         """
         An 'almost right' datetime works with configured NLS parameters

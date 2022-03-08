@@ -6,6 +6,7 @@ import posixpath
 import sys
 import threading
 import unittest
+import warnings
 from collections import Counter
 from contextlib import contextmanager
 from copy import copy, deepcopy
@@ -41,6 +42,7 @@ from django.test.utils import (
     CaptureQueriesContext, ContextList, compare_xml, modify_settings,
     override_settings,
 )
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import classproperty
 from django.utils.version import PY310
 from django.views.static import serve
@@ -50,13 +52,8 @@ __all__ = ('TestCase', 'TransactionTestCase',
 
 
 def to_list(value):
-    """
-    Put value into a list if it's not already one. Return an empty list if
-    value is None.
-    """
-    if value is None:
-        value = []
-    elif not isinstance(value, list):
+    """Put value into a list if it's not already one."""
+    if not isinstance(value, list):
         value = [value]
     return value
 
@@ -93,9 +90,12 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
 
 
 class _AssertTemplateUsedContext:
-    def __init__(self, test_case, template_name):
+    def __init__(self, test_case, template_name, msg_prefix='', count=None):
         self.test_case = test_case
         self.template_name = template_name
+        self.msg_prefix = msg_prefix
+        self.count = count
+
         self.rendered_templates = []
         self.rendered_template_names = []
         self.context = ContextList()
@@ -106,10 +106,10 @@ class _AssertTemplateUsedContext:
         self.context.append(copy(context))
 
     def test(self):
-        return self.template_name in self.rendered_template_names
-
-    def message(self):
-        return '%s was not rendered.' % self.template_name
+        self.test_case._assert_template_used(
+            self.template_name, self.rendered_template_names, self.msg_prefix,
+            self.count,
+        )
 
     def __enter__(self):
         template_rendered.connect(self.on_template_render)
@@ -119,24 +119,16 @@ class _AssertTemplateUsedContext:
         template_rendered.disconnect(self.on_template_render)
         if exc_type is not None:
             return
-
-        if not self.test():
-            message = self.message()
-            if self.rendered_templates:
-                message += ' Following templates were rendered: %s' % (
-                    ', '.join(self.rendered_template_names)
-                )
-            else:
-                message += ' No template was rendered.'
-            self.test_case.fail(message)
+        self.test()
 
 
 class _AssertTemplateNotUsedContext(_AssertTemplateUsedContext):
     def test(self):
-        return self.template_name not in self.rendered_template_names
-
-    def message(self):
-        return '%s was rendered.' % self.template_name
+        self.test_case.assertFalse(
+            self.template_name in self.rendered_template_names,
+            f"{self.msg_prefix}Template '{self.template_name}' was used "
+            f"unexpectedly in rendering the response"
+        )
 
 
 class DatabaseOperationForbidden(AssertionError):
@@ -498,10 +490,18 @@ class SimpleTestCase(unittest.TestCase):
             msg_prefix += ": "
 
         # Put context(s) into a list to simplify processing.
-        contexts = to_list(response.context)
+        contexts = [] if response.context is None else to_list(response.context)
         if not contexts:
             self.fail(msg_prefix + "Response did not use any contexts to render the response")
 
+        if errors is None:
+            warnings.warn(
+                'Passing errors=None to assertFormError() is deprecated, use '
+                'errors=[] instead.',
+                RemovedInDjango50Warning,
+                stacklevel=2,
+            )
+            errors = []
         # Put error(s) into a list to simplify processing.
         errors = to_list(errors)
 
@@ -561,11 +561,19 @@ class SimpleTestCase(unittest.TestCase):
             msg_prefix += ": "
 
         # Put context(s) into a list to simplify processing.
-        contexts = to_list(response.context)
+        contexts = [] if response.context is None else to_list(response.context)
         if not contexts:
             self.fail(msg_prefix + 'Response did not use any contexts to '
                       'render the response')
 
+        if errors is None:
+            warnings.warn(
+                'Passing errors=None to assertFormsetError() is deprecated, '
+                'use errors=[] instead.',
+                RemovedInDjango50Warning,
+                stacklevel=2,
+            )
+            errors = []
         # Put error(s) into a list to simplify processing.
         errors = to_list(errors)
 
@@ -625,7 +633,7 @@ class SimpleTestCase(unittest.TestCase):
         if not found_formset:
             self.fail(msg_prefix + "The formset '%s' was not used to render the response" % formset)
 
-    def _assert_template_used(self, response, template_name, msg_prefix, method_name):
+    def _get_template_used(self, response, template_name, msg_prefix, method_name):
 
         if response is None and template_name is None:
             raise TypeError('response and/or template_name argument must be provided')
@@ -646,18 +654,7 @@ class SimpleTestCase(unittest.TestCase):
         template_names = [t.name for t in response.templates if t.name is not None]
         return None, template_names, msg_prefix
 
-    def assertTemplateUsed(self, response=None, template_name=None, msg_prefix='', count=None):
-        """
-        Assert that the template with the provided name was used in rendering
-        the response. Also usable as context manager.
-        """
-        context_mgr_template, template_names, msg_prefix = self._assert_template_used(
-            response, template_name, msg_prefix, 'assertTemplateUsed',
-        )
-        if context_mgr_template:
-            # Use assertTemplateUsed as context manager.
-            return _AssertTemplateUsedContext(self, context_mgr_template)
-
+    def _assert_template_used(self, template_name, template_names, msg_prefix, count):
         if not template_names:
             self.fail(msg_prefix + "No templates used to render the response")
         self.assertTrue(
@@ -675,17 +672,31 @@ class SimpleTestCase(unittest.TestCase):
                 % (template_name, count, template_names.count(template_name))
             )
 
+    def assertTemplateUsed(self, response=None, template_name=None, msg_prefix='', count=None):
+        """
+        Assert that the template with the provided name was used in rendering
+        the response. Also usable as context manager.
+        """
+        context_mgr_template, template_names, msg_prefix = self._get_template_used(
+            response, template_name, msg_prefix, 'assertTemplateUsed',
+        )
+        if context_mgr_template:
+            # Use assertTemplateUsed as context manager.
+            return _AssertTemplateUsedContext(self, context_mgr_template, msg_prefix, count)
+
+        self._assert_template_used(template_name, template_names, msg_prefix, count)
+
     def assertTemplateNotUsed(self, response=None, template_name=None, msg_prefix=''):
         """
         Assert that the template with the provided name was NOT used in
         rendering the response. Also usable as context manager.
         """
-        context_mgr_template, template_names, msg_prefix = self._assert_template_used(
+        context_mgr_template, template_names, msg_prefix = self._get_template_used(
             response, template_name, msg_prefix, 'assertTemplateNotUsed',
         )
         if context_mgr_template:
             # Use assertTemplateNotUsed as context manager.
-            return _AssertTemplateNotUsedContext(self, context_mgr_template)
+            return _AssertTemplateNotUsedContext(self, context_mgr_template, msg_prefix)
 
         self.assertFalse(
             template_name in template_names,
@@ -1255,18 +1266,16 @@ class TestCase(TransactionTestCase):
         try:
             yield callbacks
         finally:
-            callback_count = len(connections[using].run_on_commit)
             while True:
-                run_on_commit = connections[using].run_on_commit[start_count:]
-                callbacks[:] = [func for sids, func in run_on_commit]
-                if execute:
-                    for callback in callbacks:
+                callback_count = len(connections[using].run_on_commit)
+                for _, callback in connections[using].run_on_commit[start_count:]:
+                    callbacks.append(callback)
+                    if execute:
                         callback()
 
                 if callback_count == len(connections[using].run_on_commit):
                     break
-                start_count = callback_count - 1
-                callback_count = len(connections[using].run_on_commit)
+                start_count = callback_count
 
 
 class CheckCondition:

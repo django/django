@@ -147,7 +147,7 @@ Here's the formal declaration of a ``QuerySet``:
     ``QuerySet`` methods return new querysets. These methods are covered in
     detail later in this section.
 
-    The ``QuerySet`` class has two public attributes you can use for
+    The ``QuerySet`` class has the following public attributes you can use for
     introspection:
 
     .. attribute:: ordered
@@ -3599,13 +3599,11 @@ by the aggregate.
     * Return type: ``float`` if input is ``int``, otherwise same as input
       field, or ``output_field`` if supplied
 
-    Has one optional argument:
-
     .. attribute:: distinct
 
-        If ``distinct=True``, ``Avg`` returns the mean value of unique values.
-        This is the SQL equivalent of ``AVG(DISTINCT <field>)``. The default
-        value is ``False``.
+        Optional. If ``distinct=True``, ``Avg`` returns the mean value of
+        unique values. This is the SQL equivalent of ``AVG(DISTINCT <field>)``.
+        The default value is ``False``.
 
 ``Count``
 ~~~~~~~~~
@@ -3618,13 +3616,11 @@ by the aggregate.
     * Default alias: ``<field>__count``
     * Return type: ``int``
 
-    Has one optional argument:
-
     .. attribute:: distinct
 
-        If ``distinct=True``, the count will only include unique instances.
-        This is the SQL equivalent of ``COUNT(DISTINCT <field>)``. The default
-        value is ``False``.
+        Optional. If ``distinct=True``, the count will only include unique
+        instances. This is the SQL equivalent of ``COUNT(DISTINCT <field>)``.
+        The default value is ``False``.
 
     .. note::
 
@@ -3661,12 +3657,11 @@ by the aggregate.
     * Return type: ``float`` if input is ``int``, otherwise same as input
       field, or ``output_field`` if supplied
 
-    Has one optional argument:
-
     .. attribute:: sample
 
-        By default, ``StdDev`` returns the population standard deviation. However,
-        if ``sample=True``, the return value will be the sample standard deviation.
+        Optional. By default, ``StdDev`` returns the population standard
+        deviation. However, if ``sample=True``, the return value will be the
+        sample standard deviation.
 
 ``Sum``
 ~~~~~~~
@@ -3678,13 +3673,11 @@ by the aggregate.
     * Default alias: ``<field>__sum``
     * Return type: same as input field, or ``output_field`` if supplied
 
-    Has one optional argument:
-
     .. attribute:: distinct
 
-        If ``distinct=True``, ``Sum`` returns the sum of unique values. This is
-        the SQL equivalent of ``SUM(DISTINCT <field>)``. The default value is
-        ``False``.
+        Optional. If ``distinct=True``, ``Sum`` returns the sum of unique
+        values. This is the SQL equivalent of ``SUM(DISTINCT <field>)``. The
+        default value is ``False``.
 
 ``Variance``
 ~~~~~~~~~~~~
@@ -3697,12 +3690,11 @@ by the aggregate.
     * Return type: ``float`` if input is ``int``, otherwise same as input
       field, or ``output_field`` if supplied
 
-    Has one optional argument:
-
     .. attribute:: sample
 
-        By default, ``Variance`` returns the population variance. However,
-        if ``sample=True``, the return value will be the sample variance.
+        Optional. By default, ``Variance`` returns the population variance.
+        However, if ``sample=True``, the return value will be the sample
+        variance.
 
 Query-related tools
 ===================
