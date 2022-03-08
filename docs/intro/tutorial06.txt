@@ -94,17 +94,19 @@ Adding a background-image
 =========================
 
 Next, we'll create a subdirectory for images. Create an ``images`` subdirectory
-in the ``polls/static/polls/`` directory. Inside this directory, put an image
-called ``background.gif``. In other words, put your image in
-``polls/static/polls/images/background.gif``.
+in the ``polls/static/polls/`` directory. Inside this directory, add any image
+file that you'd like to use as a background. For the purposes of this tutorial,
+we're using a file named ``background.png``, which will have the full path
+``polls/static/polls/images/background.png``.
 
-Then, add to your stylesheet (``polls/static/polls/style.css``):
+Then, add a reference to your image in your stylesheet
+(``polls/static/polls/style.css``):
 
 .. code-block:: css
     :caption: polls/static/polls/style.css
 
     body {
-        background: white url("images/background.gif") no-repeat;
+        background: white url("images/background.png") no-repeat;
     }
 
 Reload ``http://localhost:8000/polls/`` and you should see the background
