@@ -539,7 +539,6 @@ class HttpResponseSubclassesTests(SimpleTestCase):
         response = HttpResponseRedirect(
             "/redirected/",
             content="The resource has temporarily moved",
-            content_type="text/html",
         )
         self.assertContains(
             response, "The resource has temporarily moved", status_code=302
@@ -592,7 +591,7 @@ class HttpResponseSubclassesTests(SimpleTestCase):
         self.assertEqual(response.status_code, 405)
         # Standard HttpResponse init args can be used
         response = HttpResponseNotAllowed(
-            ["GET"], content="Only the GET method is allowed", content_type="text/html"
+            ["GET"], content="Only the GET method is allowed"
         )
         self.assertContains(response, "Only the GET method is allowed", status_code=405)
 

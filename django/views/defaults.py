@@ -62,7 +62,6 @@ def page_not_found(request, exception, template_name=ERROR_404_TEMPLATE_NAME):
     try:
         template = loader.get_template(template_name)
         body = template.render(context, request)
-        content_type = None  # Django will use 'text/html'.
     except TemplateDoesNotExist:
         if template_name != ERROR_404_TEMPLATE_NAME:
             # Reraise if it's a missing custom template.
@@ -77,8 +76,7 @@ def page_not_found(request, exception, template_name=ERROR_404_TEMPLATE_NAME):
             },
         )
         body = template.render(Context(context))
-        content_type = "text/html"
-    return HttpResponseNotFound(body, content_type=content_type)
+    return HttpResponseNotFound(body)
 
 
 @requires_csrf_token
@@ -97,7 +95,6 @@ def server_error(request, template_name=ERROR_500_TEMPLATE_NAME):
             raise
         return HttpResponseServerError(
             ERROR_PAGE_TEMPLATE % {"title": "Server Error (500)", "details": ""},
-            content_type="text/html",
         )
     return HttpResponseServerError(template.render())
 
@@ -118,7 +115,6 @@ def bad_request(request, exception, template_name=ERROR_400_TEMPLATE_NAME):
             raise
         return HttpResponseBadRequest(
             ERROR_PAGE_TEMPLATE % {"title": "Bad Request (400)", "details": ""},
-            content_type="text/html",
         )
     # No exception content is passed to the template, to not disclose any
     # sensitive information.
@@ -147,7 +143,6 @@ def permission_denied(request, exception, template_name=ERROR_403_TEMPLATE_NAME)
             raise
         return HttpResponseForbidden(
             ERROR_PAGE_TEMPLATE % {"title": "403 Forbidden", "details": ""},
-            content_type="text/html",
         )
     return HttpResponseForbidden(
         template.render(request=request, context={"exception": str(exception)})
