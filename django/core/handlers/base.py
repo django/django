@@ -344,16 +344,13 @@ class BaseHandler:
 
     def make_view_atomic(self, view):
         non_atomic_requests = getattr(view, "_non_atomic_requests", set())
-        for db in connections.all():
-            if (
-                db.settings_dict["ATOMIC_REQUESTS"]
-                and db.alias not in non_atomic_requests
-            ):
+        for alias, settings_dict in connections.settings.items():
+            if settings_dict["ATOMIC_REQUESTS"] and alias not in non_atomic_requests:
                 if asyncio.iscoroutinefunction(view):
                     raise RuntimeError(
                         "You cannot use ATOMIC_REQUESTS with async views."
                     )
-                view = transaction.atomic(using=db.alias)(view)
+                view = transaction.atomic(using=alias)(view)
         return view
 
     def process_exception_by_middleware(self, exception, request):
