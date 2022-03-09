@@ -794,8 +794,10 @@ The ``__init__`` method for the ``Context`` class takes a parameter called
 This is not a very common situation, but it's useful if you're rendering a
 template yourself. For example::
 
+    from django.template import Context
+
     def render(self, context):
-        t = context.template.engine.get_template('small_fragment.html')
+        t = context.template.engine.get_template('small_fragment.html').template
         return t.render(Context({'var': obj}, autoescape=context.autoescape))
 
 If we had neglected to pass in the current ``context.autoescape`` value to our
