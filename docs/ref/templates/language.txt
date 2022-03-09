@@ -471,7 +471,7 @@ That would result in a rendered template like this::
 
     Hello, <b>username
 
-...which, in turn, would result in the remainder of the web page being bolded!
+...which, in turn, would result in the remainder of the web page being in bold!
 
 Clearly, user-submitted data shouldn't be trusted blindly and inserted directly
 into your web pages, because a malicious user could use this kind of hole to
