@@ -8,7 +8,7 @@ Why do I get an error about importing :envvar:`DJANGO_SETTINGS_MODULE`?
 Make sure that:
 
 * The environment variable :envvar:`DJANGO_SETTINGS_MODULE` is set to a
-  fully-qualified Python module (i.e. "mysite.settings").
+  fully-qualified Python module (i.e. ``mysite.settings``).
 
 * Said module is on ``sys.path`` (``import mysite.settings`` should work).
 
