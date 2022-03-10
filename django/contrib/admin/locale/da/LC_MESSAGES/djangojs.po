@@ -2,6 +2,7 @@
 #
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
+# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2021
 # Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2012,2015-2016,2020
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -11,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-13 20:46+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-15 18:53+0000\n"
 "Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -185,6 +186,54 @@ msgstr "November"
 
 msgid "December"
 msgstr "December"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "jan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "feb"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "mar"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "maj"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "jun"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "jul"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "aug"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "sep"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "dec"
 
 msgctxt "one letter Sunday"
 msgid "S"

@@ -1,6 +1,6 @@
-=========================================
-Integrating Django with a legacy database
-=========================================
+==============================================
+How to integrate Django with a legacy database
+==============================================
 
 While Django is best suited for developing new applications, it's quite
 possible to integrate it into legacy databases. Django includes a couple of

@@ -43,8 +43,8 @@ how to install.
 
 Spatial database
 ----------------
-PostgreSQL (with PostGIS), MySQL (mostly with MyISAM engine), Oracle, and SQLite
-(with SpatiaLite) are the spatial databases currently supported.
+PostgreSQL (with PostGIS), MySQL, Oracle, and SQLite (with SpatiaLite) are the
+spatial databases currently supported.
 
 .. note::
 
@@ -58,10 +58,10 @@ supported versions, and any notes for each of the supported database backends:
 ==================  ==============================  ==================  =========================================
 Database            Library Requirements            Supported Versions  Notes
 ==================  ==============================  ==================  =========================================
-PostgreSQL          GEOS, GDAL, PROJ, PostGIS       9.6+                Requires PostGIS.
+PostgreSQL          GEOS, GDAL, PROJ, PostGIS       10+                 Requires PostGIS.
 MySQL               GEOS, GDAL                      5.7+                :ref:`Limited functionality <mysql-spatial-limitations>`.
-Oracle              GEOS, GDAL                      12.2+               XE not supported.
-SQLite              GEOS, GDAL, PROJ, SpatiaLite    3.8.3+              Requires SpatiaLite 4.3+
+Oracle              GEOS, GDAL                      19+                 XE not supported.
+SQLite              GEOS, GDAL, PROJ, SpatiaLite    3.9.0+              Requires SpatiaLite 4.3+
 ==================  ==============================  ==================  =========================================
 
 See also `this comparison matrix`__ on the OSGeo Wiki for
@@ -109,15 +109,15 @@ Troubleshooting
 If you can't find the solution to your problem here then participate in the
 community!  You can:
 
-* Join the ``#geodjango`` IRC channel on Freenode. Please be patient and polite
-  -- while you may not get an immediate response, someone will attempt to answer
-  your question as soon as they see it.
-* Ask your question on the `GeoDjango`__ mailing list.
+* Join the ``#django-geo`` IRC channel on Libera.Chat. Please be patient and
+  polite -- while you may not get an immediate response, someone will attempt
+  to answer your question as soon as they see it.
+* Ask your question on the `GeoDjango`__ forum.
 * File a ticket on the `Django trac`__ if you think there's a bug.  Make
   sure to provide a complete description of the problem, versions used,
   and specify the component as "GIS".
 
-__ https://groups.google.com/d/forum/geodjango
+__ https://forum.djangoproject.com/c/internals/geodjango/13
 __ https://code.djangoproject.com/newticket
 
 .. _libsettings:
@@ -292,7 +292,7 @@ Download the framework packages for:
 Install the packages in the order they are listed above, as the GDAL and SQLite
 packages require the packages listed before them.
 
-Afterwards, you can also install the KyngChaos binary packages for `PostgreSQL
+Afterward, you can also install the KyngChaos binary packages for `PostgreSQL
 and PostGIS`__.
 
 After installing the binary packages, you'll want to add the following to
@@ -333,8 +333,8 @@ of the `Fink`__ package system. `Different packages are available`__ (starting
 with ``django-gis``), depending on which version of Python you want to use.
 
 __ https://schwehr.blogspot.com/
-__ http://www.finkproject.org/
-__ http://pdb.finkproject.org/pdb/browse.php?summary=django-gis
+__ https://www.finkproject.org/
+__ https://pdb.finkproject.org/pdb/browse.php?summary=django-gis
 
 .. _macports:
 
@@ -347,11 +347,11 @@ running macOS.  Because MacPorts still builds the software from source,
 
 Summary::
 
-    $ sudo port install postgresql93-server
+    $ sudo port install postgresql13-server
     $ sudo port install geos
-    $ sudo port install proj
-    $ sudo port install postgis
-    $ sudo port install gdal +geos
+    $ sudo port install proj6
+    $ sudo port install postgis3
+    $ sudo port install gdal
     $ sudo port install libgeoip
 
 .. note::
@@ -359,12 +359,12 @@ Summary::
     You will also have to modify the ``PATH`` in your ``.profile`` so
     that the MacPorts programs are accessible from the command-line::
 
-        export PATH=/opt/local/bin:/opt/local/lib/postgresql93/bin
+        export PATH=/opt/local/bin:/opt/local/lib/postgresql13/bin
 
     In addition, add the ``DYLD_FALLBACK_LIBRARY_PATH`` setting so that
     the libraries can be found by Python::
 
-        export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local/lib/postgresql93
+        export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local/lib/postgresql13
 
 __ https://www.macports.org/
 
@@ -484,7 +484,7 @@ Install Django and set up database
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :ref:`install Django <installing-official-release>` on your system. It is
-recommended that you create a :doc:`virtural environment
+recommended that you create a :doc:`virtual environment
 <python:tutorial/venv>` for each project you create.
 
 psycopg2
@@ -494,7 +494,7 @@ The ``psycopg2`` Python module provides the interface between Python and the
 PostgreSQL database. ``psycopg2`` can be installed via pip within your Python
 virtual environment::
 
-    pip install psycopg2
+    ...\> py -m pip install psycopg2
 
 .. rubric:: Footnotes
 .. [#] GeoDjango uses the :func:`~ctypes.util.find_library` routine from

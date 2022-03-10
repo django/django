@@ -77,7 +77,7 @@ should be used only for requests that do not affect the state of the system.
 ``GET`` would also be unsuitable for a password form, because the password
 would appear in the URL, and thus, also in browser history and server logs,
 all in plain text. Neither would it be suitable for large quantities of data,
-or for binary data, such as an image. A Web application that uses ``GET``
+or for binary data, such as an image. A web application that uses ``GET``
 requests for admin forms is a security risk: it can be easy for an attacker to
 mimic a form's request to gain access to sensitive parts of the system.
 ``POST``, coupled with other protections like Django's :doc:`CSRF protection
@@ -115,7 +115,7 @@ Forms in Django
 We've described HTML forms briefly, but an HTML ``<form>`` is just one part of
 the machinery required.
 
-In the context of a Web application, 'form' might refer to that HTML
+In the context of a web application, 'form' might refer to that HTML
 ``<form>``, or to the Django :class:`Form` that produces it, or to the
 structured data returned when it is submitted, or to the end-to-end working
 collection of these parts.
@@ -640,37 +640,30 @@ loop:
 
 Useful attributes on ``{{ field }}`` include:
 
-``{{ field.label }}``
-    The label of the field, e.g. ``Email address``.
+``{{ field.errors }}``
+    Outputs a ``<ul class="errorlist">`` containing any validation errors
+    corresponding to this field. You can customize the presentation of
+    the errors with a ``{% for error in field.errors %}`` loop. In this
+    case, each object in the loop is a string containing the error message.
 
-``{{ field.label_tag }}``
-    The field's label wrapped in the appropriate HTML ``<label>`` tag. This
-    includes the form's :attr:`~django.forms.Form.label_suffix`. For example,
-    the default ``label_suffix`` is a colon::
+``{{ field.field }}``
+    The :class:`~django.forms.Field` instance from the form class that
+    this :class:`~django.forms.BoundField` wraps. You can use it to access
+    :class:`~django.forms.Field` attributes, e.g.
+    ``{{ char_field.field.max_length }}``.
 
-        <label for="id_email">Email address:</label>
+``{{ field.help_text }}``
+    Any help text that has been associated with the field.
+
+``{{ field.html_name }}``
+    The name of the field that will be used in the input element's name
+    field. This takes the form prefix into account, if it has been set.
 
 ``{{ field.id_for_label }}``
     The ID that will be used for this field (``id_email`` in the example
     above). If you are constructing the label manually, you may want to use
     this in lieu of ``label_tag``. It's also useful, for example, if you have
     some inline JavaScript and want to avoid hardcoding the field's ID.
-
-``{{ field.value }}``
-    The value of the field. e.g ``someone@example.com``.
-
-``{{ field.html_name }}``
-    The name of the field that will be used in the input element's name
-    field. This takes the form prefix into account, if it has been set.
-
-``{{ field.help_text }}``
-    Any help text that has been associated with the field.
-
-``{{ field.errors }}``
-    Outputs a ``<ul class="errorlist">`` containing any validation errors
-    corresponding to this field. You can customize the presentation of
-    the errors with a ``{% for error in field.errors %}`` loop. In this
-    case, each object in the loop is a string containing the error message.
 
 ``{{ field.is_hidden }}``
     This attribute is ``True`` if the form field is a hidden field and
@@ -683,11 +676,18 @@ Useful attributes on ``{{ field }}`` include:
        {# Do something special #}
     {% endif %}
 
-``{{ field.field }}``
-    The :class:`~django.forms.Field` instance from the form class that
-    this :class:`~django.forms.BoundField` wraps. You can use it to access
-    :class:`~django.forms.Field` attributes, e.g.
-    ``{{ char_field.field.max_length }}``.
+``{{ field.label }}``
+    The label of the field, e.g. ``Email address``.
+
+``{{ field.label_tag }}``
+    The field's label wrapped in the appropriate HTML ``<label>`` tag. This
+    includes the form's :attr:`~django.forms.Form.label_suffix`. For example,
+    the default ``label_suffix`` is a colon::
+
+        <label for="id_email">Email address:</label>
+
+``{{ field.value }}``
+    The value of the field. e.g ``someone@example.com``.
 
 .. seealso::
 
@@ -733,12 +733,17 @@ Reusable form templates
 
 If your site uses the same rendering logic for forms in multiple places, you
 can reduce duplication by saving the form's loop in a standalone template and
-using the :ttag:`include` tag to reuse it in other templates:
+overriding the forms :attr:`~django.forms.Form.template_name` attribute to
+render the form using the custom template. The below example will result in
+``{{ form }}`` being rendered as the output of the ``form_snippet.html``
+template.
+
+In your templates:
 
 .. code-block:: html+django
 
-    # In your form template:
-    {% include "form_snippet.html" %}
+    # In your template:
+    {{ form }}
 
     # In form_snippet.html:
     {% for field in form %}
@@ -748,16 +753,15 @@ using the :ttag:`include` tag to reuse it in other templates:
         </div>
     {% endfor %}
 
-If the form object passed to a template has a different name within the
-context, you can alias it using the ``with`` argument of the :ttag:`include`
-tag:
+In your form::
 
-.. code-block:: html+django
+    class MyForm(forms.Form):
+        template_name = 'form_snippet.html'
+        ...
 
-    {% include "form_snippet.html" with form=comment_form %}
+.. versionchanged:: 4.0
 
-If you find yourself doing this often, you might consider creating a custom
-:ref:`inclusion tag<howto-custom-template-tags-inclusion-tags>`.
+    Template rendering of forms was added.
 
 Further topics
 ==============

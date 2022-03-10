@@ -7,12 +7,19 @@
 # >>> datetime_safe.date(10, 8, 2).strftime("%Y/%m/%d was a %A")
 # '0010/08/02 was a Monday'
 
-import time as ttime
-from datetime import (
-    date as real_date, datetime as real_datetime, time as real_time,
-)
+import time
+import warnings
+from datetime import date as real_date
+from datetime import datetime as real_datetime
 
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.regex_helper import _lazy_re_compile
+
+warnings.warn(
+    "The django.utils.datetime_safe module is deprecated.",
+    category=RemovedInDjango50Warning,
+    stacklevel=2,
+)
 
 
 class date(real_date):
@@ -26,16 +33,19 @@ class datetime(real_datetime):
 
     @classmethod
     def combine(cls, date, time):
-        return cls(date.year, date.month, date.day,
-                   time.hour, time.minute, time.second,
-                   time.microsecond, time.tzinfo)
+        return cls(
+            date.year,
+            date.month,
+            date.day,
+            time.hour,
+            time.minute,
+            time.second,
+            time.microsecond,
+            time.tzinfo,
+        )
 
     def date(self):
         return date(self.year, self.month, self.day)
-
-
-class time(real_time):
-    pass
 
 
 def new_date(d):
@@ -76,7 +86,9 @@ def strftime(dt, fmt):
         return super(type(dt), dt).strftime(fmt)
     illegal_formatting = _illegal_formatting.search(fmt)
     if illegal_formatting:
-        raise TypeError('strftime of dates before 1000 does not handle ' + illegal_formatting[0])
+        raise TypeError(
+            "strftime of dates before 1000 does not handle " + illegal_formatting[0]
+        )
 
     year = dt.year
     # For every non-leap year century, advance by
@@ -88,10 +100,10 @@ def strftime(dt, fmt):
     # Move to around the year 2000
     year = year + ((2000 - year) // 28) * 28
     timetuple = dt.timetuple()
-    s1 = ttime.strftime(fmt, (year,) + timetuple[1:])
+    s1 = time.strftime(fmt, (year,) + timetuple[1:])
     sites1 = _findall(s1, str(year))
 
-    s2 = ttime.strftime(fmt, (year + 28,) + timetuple[1:])
+    s2 = time.strftime(fmt, (year + 28,) + timetuple[1:])
     sites2 = _findall(s2, str(year + 28))
 
     sites = []
@@ -102,5 +114,5 @@ def strftime(dt, fmt):
     s = s1
     syear = "%04d" % dt.year
     for site in sites:
-        s = s[:site] + syear + s[site + 4:]
+        s = s[:site] + syear + s[site + 4 :]
     return s

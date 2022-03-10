@@ -1,16 +1,16 @@
-from django.contrib.auth import HASH_SESSION_KEY
 from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest, HttpResponse
-from django.test import TestCase, override_settings
-from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango40Warning
+from django.test import TestCase
 
 
 class TestAuthenticationMiddleware(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = User.objects.create_user('test_user', 'test@example.com', 'test_password')
+        cls.user = User.objects.create_user(
+            "test_user", "test@example.com", "test_password"
+        )
 
     def setUp(self):
         self.middleware = AuthenticationMiddleware(lambda req: HttpResponse())
@@ -24,25 +24,9 @@ class TestAuthenticationMiddleware(TestCase):
         self.assertIsNotNone(self.request.user)
         self.assertFalse(self.request.user.is_anonymous)
 
-    def test_no_password_change_does_not_invalidate_legacy_session(self):
-        # RemovedInDjango40Warning: pre-Django 3.1 hashes will be invalid.
-        session = self.client.session
-        session[HASH_SESSION_KEY] = self.user._legacy_get_session_auth_hash()
-        session.save()
-        self.request.session = session
-        self.middleware(self.request)
-        self.assertIsNotNone(self.request.user)
-        self.assertFalse(self.request.user.is_anonymous)
-
-    @ignore_warnings(category=RemovedInDjango40Warning)
-    def test_session_default_hashing_algorithm(self):
-        hash_session = self.client.session[HASH_SESSION_KEY]
-        with override_settings(DEFAULT_HASHING_ALGORITHM='sha1'):
-            self.assertNotEqual(hash_session, self.user.get_session_auth_hash())
-
     def test_changed_password_invalidates_session(self):
         # After password change, user should be anonymous
-        self.user.set_password('new_password')
+        self.user.set_password("new_password")
         self.user.save()
         self.middleware(self.request)
         self.assertIsNotNone(self.request.user)
@@ -57,5 +41,5 @@ class TestAuthenticationMiddleware(TestCase):
             "'django.contrib.sessions.middleware.SessionMiddleware' before "
             "'django.contrib.auth.middleware.AuthenticationMiddleware'."
         )
-        with self.assertRaisesMessage(AssertionError, msg):
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.middleware(HttpRequest())

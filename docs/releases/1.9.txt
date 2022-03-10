@@ -265,7 +265,7 @@ Minor features
 * Added support for the :lookup:`rangefield.contained_by` lookup for some built
   in fields which correspond to the range fields.
 
-* Added :class:`~django.contrib.postgres.fields.JSONField`.
+* Added ``django.contrib.postgres.fields.JSONField``.
 
 * Added :doc:`/ref/contrib/postgres/aggregates`.
 
@@ -406,8 +406,8 @@ Internationalization
   project and it will find all the app message files that were created by
   :djadmin:`makemessages`.
 
-* :djadmin:`makemessages` now calls xgettext once per locale directory rather
-  than once per translatable file. This speeds up localization builds.
+* :djadmin:`makemessages` now calls ``xgettext`` once per locale directory
+  rather than once per translatable file. This speeds up localization builds.
 
 * :ttag:`blocktrans` supports assigning its output to a variable using
   ``asvar``.
@@ -591,7 +591,7 @@ Requests and Responses
 
 * The :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` now
   ignores 404s when the referer is equal to the requested URL. To circumvent
-  the empty referer check already implemented, some Web bots set the referer to
+  the empty referer check already implemented, some web bots set the referer to
   the requested URL.
 
 Templates

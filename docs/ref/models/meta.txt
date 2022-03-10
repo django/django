@@ -44,7 +44,7 @@ Retrieving a single field instance of a model by name
     :class:`~django.core.exceptions.FieldDoesNotExist` exception will be
     raised.
 
-    .. code-block:: python
+    .. code-block:: pycon
 
         >>> from django.contrib.auth.models import User
 
@@ -84,7 +84,7 @@ Retrieving all field instances of a model
         as :class:`~django.db.models.ManyToManyField`, or
         :class:`~django.db.models.ForeignKey`) that start with a "+".
 
-    .. code-block:: python
+    .. code-block:: pycon
 
         >>> from django.contrib.auth.models import User
         >>> User._meta.get_fields()

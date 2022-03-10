@@ -3,14 +3,15 @@
 # Translators:
 # crazyzubr <hjcnbckfd@gmail.com>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Panasoft, 2021
 # Алексей Борискин <sun.void@gmail.com>, 2014-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-05-14 05:27+0000\n"
-"Last-Translator: crazyzubr <hjcnbckfd@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-03-16 22:53+0000\n"
+"Last-Translator: Panasoft\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -39,11 +40,11 @@ msgid "redirect to"
 msgstr "перенаправить на"
 
 msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"“http://”."
+"This can be either an absolute path (as above) or a full URL starting with a "
+"scheme such as “https://”."
 msgstr ""
-"Можно указать корневой относительный путь или полный URL, начинающийся с "
-"“http://”."
+"Это может быть либо абсолютный путь (как указано выше), либо полный URL-"
+"адрес, начинающийся со схемы, такой как «https://»."
 
 msgid "redirect"
 msgstr "перенаправление"

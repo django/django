@@ -88,7 +88,7 @@ caveats:
   so you can't define ``__init__()`` as requiring any other arguments.
 
 * Unlike the ``__call__()`` method which is called once per request,
-  ``__init__()`` is called only *once*, when the Web server starts.
+  ``__init__()`` is called only *once*, when the web server starts.
 
 Marking middleware as unused
 ----------------------------
@@ -286,12 +286,13 @@ if the very next middleware in the chain raises an
 that exception; instead it will get an :class:`~django.http.HttpResponse`
 object with a :attr:`~django.http.HttpResponse.status_code` of 404.
 
+You can set :setting:`DEBUG_PROPAGATE_EXCEPTIONS` to ``True`` to skip this
+conversion and propagate exceptions upward.
+
 .. _async-middleware:
 
 Asynchronous support
 ====================
-
-.. versionadded:: 3.1
 
 Middleware can support any combination of synchronous and asynchronous
 requests. Django will adapt requests to fit the middleware's requirements if it
@@ -423,7 +424,3 @@ These are the behavioral differences between using :setting:`MIDDLEWARE` and
    HTTP response, and then the next middleware in line will see that
    response. Middleware are never skipped due to a middleware raising an
    exception.
-
-.. versionchanged:: 3.1
-
-    Support for asynchronous requests was added to the ``MiddlewareMixin``.

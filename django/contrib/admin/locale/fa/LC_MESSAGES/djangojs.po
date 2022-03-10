@@ -6,15 +6,15 @@
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Pouya Abbassi, 2016
-# rahim agh <rahim.aghareb@gmail.com>, 2020
+# rahim agh <rahim.aghareb@gmail.com>, 2020-2021
 # Reza Mohammadi <reza@teeleh.ir>, 2014
 # Sina Cheraghi <sinacher@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-27 09:38+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-04-03 13:56+0000\n"
 "Last-Translator: rahim agh <rahim.aghareb@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
@@ -186,6 +186,54 @@ msgid "November"
 msgstr "نوامبر"
 
 msgid "December"
+msgstr "دسامبر"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "ژانویه"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "فوریه"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "مارس"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "آوریل"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "می"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "ژوئن"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "ژوئیه"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "اوت"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "سپتامبر"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "اکتبر"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "نوامبر"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
 msgstr "دسامبر"
 
 msgctxt "one letter Sunday"

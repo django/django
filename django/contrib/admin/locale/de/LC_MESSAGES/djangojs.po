@@ -2,7 +2,7 @@
 #
 # Translators:
 # André Hagenbruch, 2011-2012
-# Florian Apolloner <florian@apolloner.eu>, 2020
+# Florian Apolloner <florian@apolloner.eu>, 2020-2021
 # Jannis Leidel <jannis@leidel.info>, 2011,2013-2016
 # Jannis Vajen, 2016
 # Markus Holtermann <info@markusholtermann.eu>, 2020
@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-06-16 13:07+0000\n"
-"Last-Translator: Florian Apolloner <florian@apolloner.eu>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-11-28 17:14+0000\n"
+"Last-Translator: Raphael Michel <mail@raphaelmichel.de>\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -187,6 +187,54 @@ msgstr "November"
 
 msgid "December"
 msgstr "Dezember"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Jan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Feb"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mrz"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Mai"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Jun"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Jul"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Aug"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Sep"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Dez"
 
 msgctxt "one letter Sunday"
 msgid "S"

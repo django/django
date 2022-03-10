@@ -3,22 +3,23 @@
 # Translators:
 # albertoalcolea <albertoalcolea@gmail.com>, 2014
 # Antoni Aloy <aaloy@apsl.net>, 2012-2013,2015-2017
-# Ernesto Avilés, 2015-2016
-# Ernesto Avilés, 2020
+# e4db27214f7e7544f2022c647b585925_bb0e321, 2015-2016
+# e4db27214f7e7544f2022c647b585925_bb0e321, 2020
 # Ernesto Rico Schmidt <e.rico.schmidt@gmail.com>, 2017
 # guillem <serra.guillem@gmail.com>, 2012
 # Igor Támara <igor@tamarapatino.org>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011
+# Uriel Medina <urimeba511@gmail.com>, 2020-2021
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-01-08 08:16+0000\n"
-"Last-Translator: Ernesto Avilés\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-10 03:52+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -119,7 +120,7 @@ msgid "iterations"
 msgstr "iteraciones"
 
 msgid "salt"
-msgstr "sal"
+msgstr "salto"
 
 msgid "hash"
 msgstr "función resumen"
@@ -145,6 +146,9 @@ msgstr "factor trabajo"
 msgid "checksum"
 msgstr "suma de verificación"
 
+msgid "block size"
+msgstr "tamaño de bloque"
+
 msgid "name"
 msgstr "nombre"
 
@@ -167,7 +171,7 @@ msgid "groups"
 msgstr "grupos"
 
 msgid "superuser status"
-msgstr "es superusuario"
+msgstr "estado de superusuario"
 
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "

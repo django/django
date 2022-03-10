@@ -1,2 +1,2 @@
 def special(request):
-    return {'path': request.special_path}
+    return {"path": request.special_path}

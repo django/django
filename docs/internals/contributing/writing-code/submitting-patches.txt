@@ -268,8 +268,8 @@ Bugs
   is applied)?
 * If it's a bug that :ref:`qualifies for a backport <supported-versions-policy>`
   to the stable version of Django, is there a release note in
-  ``docs/releases/A.B.C.txt``? Bug fixes that will be applied only to the
-  master branch don't need a release note.
+  ``docs/releases/A.B.C.txt``? Bug fixes that will be applied only to the main
+  branch don't need a release note.
 
 New Features
 ------------
@@ -290,7 +290,9 @@ All code changes
 
 * Does the :doc:`coding style
   </internals/contributing/writing-code/coding-style>` conform to our
-  guidelines? Are there any ``flake8`` errors?
+  guidelines? Are there any  ``black``, ``flake8``, or ``isort`` errors? You
+  can install the :ref:`pre-commit <coding-style-pre-commit>` hooks to
+  automatically catch these errors.
 * If the change is backwards incompatible in any way, is there a note
   in the release notes (``docs/releases/A.B.txt``)?
 * Is Django's test suite passing?

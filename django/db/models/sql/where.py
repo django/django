@@ -1,14 +1,19 @@
 """
 Code to manage the creation and SQL rendering of 'where' constraints.
 """
+import operator
+from functools import reduce
 
 from django.core.exceptions import EmptyResultSet
+from django.db.models.expressions import Case, When
+from django.db.models.lookups import Exact
 from django.utils import tree
 from django.utils.functional import cached_property
 
 # Connection types
-AND = 'AND'
-OR = 'OR'
+AND = "AND"
+OR = "OR"
+XOR = "XOR"
 
 
 class WhereNode(tree.Node):
@@ -25,6 +30,7 @@ class WhereNode(tree.Node):
     relabeled_clone() method or relabel_aliases() and clone() methods and
     contains_aggregate attribute.
     """
+
     default = AND
     resolved = False
     conditional = True
@@ -38,17 +44,19 @@ class WhereNode(tree.Node):
         if not self.contains_aggregate:
             return self, None
         in_negated = negated ^ self.negated
-        # If the effective connector is OR and this node contains an aggregate,
-        # then we need to push the whole branch to HAVING clause.
+        # If the effective connector is OR or XOR and this node contains an
+        # aggregate, then we need to push the whole branch to HAVING clause.
         may_need_split = (
-            (in_negated and self.connector == AND) or
-            (not in_negated and self.connector == OR))
+            (in_negated and self.connector == AND)
+            or (not in_negated and self.connector == OR)
+            or self.connector == XOR
+        )
         if may_need_split and self.contains_aggregate:
             return None, self
         where_parts = []
         having_parts = []
         for c in self.children:
-            if hasattr(c, 'split_having'):
+            if hasattr(c, "split_having"):
                 where_part, having_part = c.split_having(in_negated)
                 if where_part is not None:
                     where_parts.append(where_part)
@@ -58,8 +66,16 @@ class WhereNode(tree.Node):
                 having_parts.append(c)
             else:
                 where_parts.append(c)
-        having_node = self.__class__(having_parts, self.connector, self.negated) if having_parts else None
-        where_node = self.__class__(where_parts, self.connector, self.negated) if where_parts else None
+        having_node = (
+            self.__class__(having_parts, self.connector, self.negated)
+            if having_parts
+            else None
+        )
+        where_node = (
+            self.__class__(where_parts, self.connector, self.negated)
+            if where_parts
+            else None
+        )
         return where_node, having_node
 
     def as_sql(self, compiler, connection):
@@ -75,6 +91,21 @@ class WhereNode(tree.Node):
             full_needed, empty_needed = len(self.children), 1
         else:
             full_needed, empty_needed = 1, len(self.children)
+
+        if self.connector == XOR and not connection.features.supports_logical_xor:
+            # Convert if the database doesn't support XOR:
+            #   a XOR b XOR c XOR ...
+            # to:
+            #   (a OR b OR c OR ...) AND (a + b + c + ...) == 1
+            lhs = self.__class__(self.children, OR)
+            rhs_sum = reduce(
+                operator.add,
+                (Case(When(c, then=1), default=0) for c in self.children),
+            )
+            rhs = Exact(1, rhs_sum)
+            return self.__class__([lhs, rhs], AND, self.negated).as_sql(
+                compiler, connection
+            )
 
         for child in self.children:
             try:
@@ -94,24 +125,24 @@ class WhereNode(tree.Node):
             # counts.
             if empty_needed == 0:
                 if self.negated:
-                    return '', []
+                    return "", []
                 else:
                     raise EmptyResultSet
             if full_needed == 0:
                 if self.negated:
                     raise EmptyResultSet
                 else:
-                    return '', []
-        conn = ' %s ' % self.connector
+                    return "", []
+        conn = " %s " % self.connector
         sql_string = conn.join(result)
         if sql_string:
             if self.negated:
                 # Some backends (Oracle at least) need parentheses
                 # around the inner SQL in the negated case, even if the
                 # inner SQL contains just a single expression.
-                sql_string = 'NOT (%s)' % sql_string
+                sql_string = "NOT (%s)" % sql_string
             elif len(result) > 1 or self.resolved:
-                sql_string = '(%s)' % sql_string
+                sql_string = "(%s)" % sql_string
         return sql_string, result_params
 
     def get_group_by_cols(self, alias=None):
@@ -133,10 +164,10 @@ class WhereNode(tree.Node):
         mapping old (current) alias values to the new values.
         """
         for pos, child in enumerate(self.children):
-            if hasattr(child, 'relabel_aliases'):
+            if hasattr(child, "relabel_aliases"):
                 # For example another WhereNode
                 child.relabel_aliases(change_map)
-            elif hasattr(child, 'relabeled_clone'):
+            elif hasattr(child, "relabeled_clone"):
                 self.children[pos] = child.relabeled_clone(change_map)
 
     def clone(self):
@@ -146,9 +177,12 @@ class WhereNode(tree.Node):
         value) tuples, or objects supporting .clone().
         """
         clone = self.__class__._new_instance(
-            children=[], connector=self.connector, negated=self.negated)
+            children=None,
+            connector=self.connector,
+            negated=self.negated,
+        )
         for child in self.children:
-            if hasattr(child, 'clone'):
+            if hasattr(child, "clone"):
                 clone.children.append(child.clone())
             else:
                 clone.children.append(child)
@@ -158,6 +192,9 @@ class WhereNode(tree.Node):
         clone = self.clone()
         clone.relabel_aliases(change_map)
         return clone
+
+    def copy(self):
+        return self.clone()
 
     @classmethod
     def _contains_aggregate(cls, obj):
@@ -179,24 +216,20 @@ class WhereNode(tree.Node):
     def contains_over_clause(self):
         return self._contains_over_clause(self)
 
-    @property
-    def is_summary(self):
-        return any(child.is_summary for child in self.children)
-
     @staticmethod
     def _resolve_leaf(expr, query, *args, **kwargs):
-        if hasattr(expr, 'resolve_expression'):
+        if hasattr(expr, "resolve_expression"):
             expr = expr.resolve_expression(query, *args, **kwargs)
         return expr
 
     @classmethod
     def _resolve_node(cls, node, query, *args, **kwargs):
-        if hasattr(node, 'children'):
+        if hasattr(node, "children"):
             for child in node.children:
                 cls._resolve_node(child, query, *args, **kwargs)
-        if hasattr(node, 'lhs'):
+        if hasattr(node, "lhs"):
             node.lhs = cls._resolve_leaf(node.lhs, query, *args, **kwargs)
-        if hasattr(node, 'rhs'):
+        if hasattr(node, "rhs"):
             node.rhs = cls._resolve_leaf(node.rhs, query, *args, **kwargs)
 
     def resolve_expression(self, *args, **kwargs):
@@ -205,9 +238,30 @@ class WhereNode(tree.Node):
         clone.resolved = True
         return clone
 
+    @cached_property
+    def output_field(self):
+        from django.db.models import BooleanField
+
+        return BooleanField()
+
+    def select_format(self, compiler, sql, params):
+        # Wrap filters with a CASE WHEN expression if a database backend
+        # (e.g. Oracle) doesn't support boolean expression in SELECT or GROUP
+        # BY list.
+        if not compiler.connection.features.supports_boolean_expr_in_select_clause:
+            sql = f"CASE WHEN {sql} THEN 1 ELSE 0 END"
+        return sql, params
+
+    def get_db_converters(self, connection):
+        return self.output_field.get_db_converters(connection)
+
+    def get_lookup(self, lookup):
+        return self.output_field.get_lookup(lookup)
+
 
 class NothingNode:
     """A node that matches nothing."""
+
     contains_aggregate = False
 
     def as_sql(self, compiler=None, connection=None):
@@ -236,6 +290,7 @@ class SubqueryConstraint:
         self.alias = alias
         self.columns = columns
         self.targets = targets
+        query_object.clear_ordering(clear_default=True)
         self.query_object = query_object
 
     def as_sql(self, compiler, connection):

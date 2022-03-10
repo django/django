@@ -4,7 +4,7 @@
 # André Hagenbruch, 2012
 # Florian Apolloner <florian@apolloner.eu>, 2011
 # Dimitris Glezos <glezos@transifex.com>, 2012
-# Florian Apolloner <florian@apolloner.eu>, 2020
+# Florian Apolloner <florian@apolloner.eu>, 2020-2022
 # Jannis Vajen, 2013
 # Jannis Leidel <jannis@leidel.info>, 2013-2018,2020
 # Jannis Vajen, 2016
@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-17 07:47+0000\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2022-01-15 11:22+0000\n"
 "Last-Translator: Florian Apolloner <florian@apolloner.eu>\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -23,6 +23,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Ausgewählte %(verbose_name_plural)s löschen"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -34,10 +38,6 @@ msgstr "Kann %(name)s nicht löschen"
 
 msgid "Are you sure?"
 msgstr "Sind Sie sicher?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Ausgewählte %(verbose_name_plural)s löschen"
 
 msgid "Administration"
 msgstr "Administration"
@@ -392,7 +392,7 @@ msgid "Welcome,"
 msgstr "Willkommen,"
 
 msgid "View site"
-msgstr "Auf der Website anzeigen"
+msgstr "Website anzeigen"
 
 msgid "Documentation"
 msgstr "Dokumentation"
@@ -538,6 +538,12 @@ msgstr "Benutzername oder Passwort vergessen?"
 msgid "Toggle navigation"
 msgstr "Navigation ein-/ausblenden"
 
+msgid "Start typing to filter…"
+msgstr "Eingabe beginnen um zu filtern…"
+
+msgid "Filter navigation items"
+msgstr "Navigationselemente filtern"
+
 msgid "Date/time"
 msgstr "Datum/Zeit"
 
@@ -603,8 +609,10 @@ msgstr "%(model)s hinzufügen"
 msgid "Delete selected %(model)s"
 msgstr "Ausgewählte %(model)s löschen"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Vielen Dank, dass Sie hier ein paar nette Minuten verbracht haben."
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
+"Vielen Dank, dass Sie heute ein paar nette Minuten auf dieser Webseite "
+"verbracht haben."
 
 msgid "Log in again"
 msgstr "Erneut anmelden"

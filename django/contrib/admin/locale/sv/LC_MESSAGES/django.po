@@ -7,6 +7,7 @@
 # Cybjit <cybjit@gmail.com>, 2012
 # Henrik Palmlund Wahlgren <henrik@pwit.se>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Johan Rohdin, 2021
 # Jonathan Lindén, 2015
 # Jonathan Lindén, 2014
 # metteludwig <luudde@gmail.com>, 2019
@@ -17,9 +18,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-11-18 14:26+0000\n"
-"Last-Translator: metteludwig <luudde@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-04-01 12:33+0000\n"
+"Last-Translator: Johan Rohdin\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -27,6 +28,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: sv\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Ta bort markerade %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -38,10 +43,6 @@ msgstr "Kan inte ta bort %(name)s"
 
 msgid "Are you sure?"
 msgstr "Är du säker?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Ta bort markerade %(verbose_name_plural)s"
 
 msgid "Administration"
 msgstr "Administration"
@@ -78,6 +79,12 @@ msgstr "Inget datum"
 
 msgid "Has date"
 msgstr "Har datum"
+
+msgid "Empty"
+msgstr ""
+
+msgid "Not empty"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -240,7 +247,7 @@ msgstr "Ändra %s"
 
 #, python-format
 msgid "View %s"
-msgstr "Visa 1%s"
+msgstr "Visa %s"
 
 msgid "Database error"
 msgstr "Databasfel"
@@ -318,7 +325,7 @@ msgid ""
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 "Ett fel har inträffat. Felet är rapporterat till sidans administratörer via "
-"e-post, och borde åtgärdas skyndsamt. Tack för ditt tålamod."
+"e-post och bör vara åtgärdat inom kort. Tack för ditt tålamod."
 
 msgid "Run the selected action"
 msgstr "Kör markerade operationer"
@@ -335,6 +342,19 @@ msgstr "Välj alla %(total_count)s %(module_name)s"
 
 msgid "Clear selection"
 msgstr "Rensa urval"
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modeller i applikationen %(name)s"
+
+msgid "Add"
+msgstr "Lägg till"
+
+msgid "View"
+msgstr "Visa"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Du har inte tillåtelse att se eller ändra någonting."
 
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
@@ -383,6 +403,9 @@ msgstr "Visa på webbplats"
 
 msgid "Filter"
 msgstr "Filtrera"
+
+msgid "Clear all filters"
+msgstr ""
 
 msgid "Remove from sorting"
 msgstr "Ta bort från sortering"
@@ -461,9 +484,6 @@ msgstr ""
 "Är du säker på att du vill ta bort valda %(objects_name)s? Alla följande "
 "objekt samt relaterade objekt kommer att tas bort: "
 
-msgid "View"
-msgstr "Visa"
-
 msgid "Delete?"
 msgstr "Radera?"
 
@@ -473,16 +493,6 @@ msgstr " På %(filter_title)s "
 
 msgid "Summary"
 msgstr "Översikt"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modeller i applikationen %(name)s"
-
-msgid "Add"
-msgstr "Lägg till"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr "Du har inte tillåtelse att se eller ändra någonting."
 
 msgid "Recent actions"
 msgstr "Senaste Händelser"
@@ -515,6 +525,9 @@ msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr "Har du glömt lösenordet eller användarnamnet?"
+
+msgid "Toggle navigation"
+msgstr ""
 
 msgid "Date/time"
 msgstr "Datum tid"
@@ -694,7 +707,7 @@ msgstr "Välj %s att ändra"
 
 #, python-format
 msgid "Select %s to view"
-msgstr "Välj 1%s för visning"
+msgstr "Välj %s för visning"
 
 msgid "Date:"
 msgstr "Datum:"

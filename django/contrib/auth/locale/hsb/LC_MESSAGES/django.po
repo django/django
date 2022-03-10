@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2017,2019
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2017,2019,2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-21 19:21+0000\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-09-28 18:17+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
 "language/hsb/)\n"
@@ -133,6 +133,9 @@ msgstr "dźěłowy faktor"
 
 msgid "checksum"
 msgstr "pruwowanska suma"
+
+msgid "block size"
+msgstr "blokowa wulkosć"
 
 msgid "name"
 msgstr "mjeno"

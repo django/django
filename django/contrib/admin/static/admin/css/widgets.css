@@ -3,18 +3,21 @@
 .selector {
     width: 800px;
     float: left;
+    display: flex;
 }
 
 .selector select {
     width: 380px;
     height: 17.2em;
+    flex: 1 0 auto;
 }
 
 .selector-available, .selector-chosen {
-    float: left;
     width: 380px;
     text-align: center;
     margin-bottom: 5px;
+    display: flex;
+    flex-direction: column;
 }
 
 .selector-chosen select {
@@ -22,27 +25,26 @@
 }
 
 .selector-available h2, .selector-chosen h2 {
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     border-radius: 4px 4px 0 0;
 }
 
 .selector-chosen h2 {
-    background: #79aec8;
-    color: #fff;
+    background: var(--primary);
+    color: var(--header-link-color);
 }
 
 .selector .selector-available h2 {
-    background: #f8f8f8;
-    color: #666;
+    background: var(--darkened-bg);
+    color: var(--body-quiet-color);
 }
 
 .selector .selector-filter {
-    background: white;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     border-width: 0 1px;
     padding: 8px;
-    color: #999;
-    font-size: 10px;
+    color: var(--body-quiet-color);
+    font-size: 0.625rem;
     margin: 0;
     text-align: left;
 }
@@ -64,12 +66,13 @@
 }
 
 .selector ul.selector-chooser {
-    float: left;
+    align-self: center;
     width: 22px;
-    background-color: #eee;
+    background-color: var(--selected-bg);
     border-radius: 10px;
-    margin: 10em 5px 0 5px;
+    margin: 0 5px;
     padding: 0;
+    transform: translateY(-17px);
 }
 
 .selector-chooser li {
@@ -91,7 +94,7 @@
     text-indent: -3000px;
     overflow: hidden;
     cursor: default;
-    opacity: 0.3;
+    opacity: 0.55;
 }
 
 .active.selector-add, .active.selector-remove {
@@ -126,14 +129,14 @@ a.selector-chooseall, a.selector-clearall {
     overflow: hidden;
     font-weight: bold;
     line-height: 16px;
-    color: #666;
+    color: var(--body-quiet-color);
     text-decoration: none;
-    opacity: 0.3;
+    opacity: 0.55;
 }
 
 a.active.selector-chooseall:focus, a.active.selector-clearall:focus,
 a.active.selector-chooseall:hover, a.active.selector-clearall:hover {
-    color: #447e9b;
+    color: var(--link-fg);
 }
 
 a.active.selector-chooseall, a.active.selector-clearall {
@@ -169,6 +172,7 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 .stacked {
     float: left;
     width: 490px;
+    display: block;
 }
 
 .stacked select {
@@ -194,6 +198,7 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
     margin: 0 0 10px 40%;
     background-color: #eee;
     border-radius: 10px;
+    transform: none;
 }
 
 .stacked .selector-chooser li {
@@ -261,15 +266,15 @@ p.datetime {
     line-height: 20px;
     margin: 0;
     padding: 0;
-    color: #666;
+    color: var(--body-quiet-color);
     font-weight: bold;
 }
 
 .datetime span {
     white-space: nowrap;
     font-weight: normal;
-    font-size: 11px;
-    color: #ccc;
+    font-size: 0.6875rem;
+    color: var(--body-quiet-color);
 }
 
 .datetime input, .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
@@ -278,7 +283,7 @@ p.datetime {
 }
 
 table p.datetime {
-    font-size: 11px;
+    font-size: 0.6875rem;
     margin-left: 0;
     padding-left: 0;
 }
@@ -312,8 +317,8 @@ table p.datetime {
 }
 
 .timezonewarning {
-    font-size: 11px;
-    color: #999;
+    font-size: 0.6875rem;
+    color: var(--body-quiet-color);
 }
 
 /* URL */
@@ -322,8 +327,8 @@ p.url {
     line-height: 20px;
     margin: 0;
     padding: 0;
-    color: #666;
-    font-size: 11px;
+    color: var(--body-quiet-color);
+    font-size: 0.6875rem;
     font-weight: bold;
 }
 
@@ -337,8 +342,8 @@ p.file-upload {
     line-height: 20px;
     margin: 0;
     padding: 0;
-    color: #666;
-    font-size: 11px;
+    color: var(--body-quiet-color);
+    font-size: 0.6875rem;
     font-weight: bold;
 }
 
@@ -355,8 +360,8 @@ p.file-upload {
 }
 
 span.clearable-file-input label {
-    color: #333;
-    font-size: 11px;
+    color: var(--body-fg);
+    font-size: 0.6875rem;
     display: inline;
     float: none;
 }
@@ -365,11 +370,12 @@ span.clearable-file-input label {
 
 .calendarbox, .clockbox {
     margin: 5px auto;
-    font-size: 12px;
+    font-size: 0.75rem;
     width: 19em;
     text-align: center;
-    background: white;
-    border: 1px solid #ddd;
+    background: var(--body-bg);
+    color: var(--body-fg);
+    border: 1px solid var(--hairline-color);
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
     overflow: hidden;
@@ -397,38 +403,38 @@ span.clearable-file-input label {
     margin: 0;
     text-align: center;
     border-top: none;
-    background: #f5dd5d;
     font-weight: 700;
-    font-size: 12px;
+    font-size: 0.75rem;
     color: #333;
+    background: var(--accent);
 }
 
 .calendar th {
     padding: 8px 5px;
-    background: #f8f8f8;
-    border-bottom: 1px solid #ddd;
+    background: var(--darkened-bg);
+    border-bottom: 1px solid var(--border-color);
     font-weight: 400;
-    font-size: 12px;
+    font-size: 0.75rem;
     text-align: center;
-    color: #666;
+    color: var(--body-quiet-color);
 }
 
 .calendar td {
     font-weight: 400;
-    font-size: 12px;
+    font-size: 0.75rem;
     text-align: center;
     padding: 0;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--hairline-color);
     border-bottom: none;
 }
 
 .calendar td.selected a {
-    background: #79aec8;
-    color: #fff;
+    background: var(--primary);
+    color: var(--button-fg);
 }
 
 .calendar td.nonday {
-    background: #f8f8f8;
+    background: var(--darkened-bg);
 }
 
 .calendar td.today a {
@@ -440,22 +446,22 @@ span.clearable-file-input label {
     font-weight: 400;
     padding: 6px;
     text-decoration: none;
-    color: #444;
+    color: var(--body-quiet-color);
 }
 
 .calendar td a:focus, .timelist a:focus,
 .calendar td a:hover, .timelist a:hover {
-    background: #79aec8;
+    background: var(--primary);
     color: white;
 }
 
 .calendar td a:active, .timelist a:active {
-    background: #417690;
+    background: var(--header-bg);
     color: white;
 }
 
 .calendarnav {
-    font-size: 10px;
+    font-size: 0.625rem;
     text-align: center;
     color: #ccc;
     margin: 0;
@@ -464,16 +470,16 @@ span.clearable-file-input label {
 
 .calendarnav a:link, #calendarnav a:visited,
 #calendarnav a:focus, #calendarnav a:hover {
-    color: #999;
+    color: var(--body-quiet-color);
 }
 
 .calendar-shortcuts {
-    background: white;
-    font-size: 11px;
+    background: var(--body-bg);
+    color: var(--body-quiet-color);
+    font-size: 0.6875rem;
     line-height: 11px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--hairline-color);
     padding: 8px 0;
-    color: #ccc;
 }
 
 .calendarbox .calendarnav-previous, .calendarbox .calendarnav-next {
@@ -509,10 +515,10 @@ span.clearable-file-input label {
 .calendar-cancel {
     margin: 0;
     padding: 4px 0;
-    font-size: 12px;
+    font-size: 0.75rem;
     background: #eee;
-    border-top: 1px solid #ddd;
-    color: #333;
+    border-top: 1px solid var(--border-color);
+    color: var(--body-fg);
 }
 
 .calendar-cancel:focus, .calendar-cancel:hover {

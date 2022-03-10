@@ -38,9 +38,9 @@ subclass) in the form. So the data from the above form would
 be accessible as ``request.FILES['file']``.
 
 Note that :attr:`request.FILES <django.http.HttpRequest.FILES>` will only
-contain data if the request method was ``POST`` and the ``<form>`` that posted
-the request has the attribute ``enctype="multipart/form-data"``. Otherwise,
-``request.FILES`` will be empty.
+contain data if the request method was ``POST``, at least one file field was
+actually posted, and the ``<form>`` that posted the request has the attribute
+``enctype="multipart/form-data"``. Otherwise, ``request.FILES`` will be empty.
 
 Most of the time, you'll pass the file data from ``request`` into the form as
 described in :ref:`binding-uploaded-files`. This would look something like:
@@ -126,6 +126,19 @@ model::
             form = UploadFileForm()
         return render(request, 'upload.html', {'form': form})
 
+If you are constructing an object manually outside of a request, you can assign
+a :class:`~django.core.files.File` like object to the
+:class:`~django.db.models.FileField`::
+
+    from django.core.management.base import BaseCommand
+    from django.core.files.base import ContentFile
+
+    class MyCommand(BaseCommand):
+        def handle(self, *args, **options):
+            content_file = ContentFile(b'Hello world!', name='hello-world.txt')
+            instance = ModelWithFileField(file_field=content_file)
+            instance.save()
+
 Uploading multiple files
 ------------------------
 
@@ -150,7 +163,7 @@ uploads:
     from django.views.generic.edit import FormView
     from .forms import FileFieldForm
 
-    class FileFieldView(FormView):
+    class FileFieldFormView(FormView):
         form_class = FileFieldForm
         template_name = 'upload.html'  # Replace with your template.
         success_url = '...'  # Replace with your URL or reverse().
@@ -271,3 +284,24 @@ list::
         @csrf_protect
         def _upload_file_view(request):
             ... # Process request
+
+    If you are using a class-based view, you will need to use
+    :func:`~django.views.decorators.csrf.csrf_exempt` on its
+    :meth:`~django.views.generic.base.View.dispatch` method and
+    :func:`~django.views.decorators.csrf.csrf_protect` on the method that
+    actually processes the request. Example code::
+
+        from django.utils.decorators import method_decorator
+        from django.views import View
+        from django.views.decorators.csrf import csrf_exempt, csrf_protect
+
+        @method_decorator(csrf_exempt, name='dispatch')
+        class UploadFileView(View):
+
+            def setup(self, request, *args, **kwargs):
+                request.upload_handlers.insert(0, ProgressBarUploadHandler(request))
+                super().setup(request, *args, **kwargs)
+
+            @method_decorator(csrf_protect)
+            def post(self, request, *args, **kwargs):
+                ... # Process request

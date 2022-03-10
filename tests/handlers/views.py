@@ -1,7 +1,7 @@
 import asyncio
 from http import HTTPStatus
 
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import BadRequest, SuspiciousOperation
 from django.db import connection, transaction
 from django.http import HttpResponse, StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -33,8 +33,12 @@ def not_in_transaction(request):
     return HttpResponse(str(connection.in_atomic_block))
 
 
+def bad_request(request):
+    raise BadRequest()
+
+
 def suspicious(request):
-    raise SuspiciousOperation('dubious')
+    raise SuspiciousOperation("dubious")
 
 
 @csrf_exempt
@@ -48,7 +52,7 @@ def httpstatus_enum(request):
 
 
 async def async_regular(request):
-    return HttpResponse(b'regular content')
+    return HttpResponse(b"regular content")
 
 
 class CoroutineClearingView:
@@ -59,7 +63,11 @@ class CoroutineClearingView:
         return self._unawaited_coroutine
 
     def __del__(self):
-        self._unawaited_coroutine.close()
+        try:
+            self._unawaited_coroutine.close()
+        except AttributeError:
+            # View was never called.
+            pass
 
 
 async_unawaited = CoroutineClearingView()

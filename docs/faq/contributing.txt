@@ -2,6 +2,8 @@
 FAQ: Contributing code
 ======================
 
+.. _new-contributors-faq:
+
 How can I get started contributing code to Django?
 ==================================================
 
@@ -79,10 +81,10 @@ people that will likely be affected by a given bug. Bugs that have the
 potential to affect many people will generally get priority over those that
 are edge cases.
 
-Another reason that bugs might be ignored for while is if the bug is a symptom
-of a larger problem. While we can spend time writing, testing and applying
-lots of little patches, sometimes the right solution is to rebuild. If a
-rebuild or refactor of a particular component has been proposed or is
+Another reason that a bug might be ignored for a while is if the bug is a
+symptom of a larger problem. While we can spend time writing, testing and
+applying lots of little patches, sometimes the right solution is to rebuild. If
+a rebuild or refactor of a particular component has been proposed or is
 underway, you may find that bugs affecting that component will not get as much
 attention. Again, this is a matter of prioritizing scarce resources. By
 concentrating on the rebuild, we can close all the little bugs at once, and
@@ -97,3 +99,9 @@ entire community, instead of prioritizing the impact on one particular user.
 This doesn't mean that we think your problem is unimportant -- just that in the
 limited time we have available, we will always err on the side of making 10
 people happy rather than making a single person happy.
+
+I'm sure my ticket is absolutely 100% perfect, can I mark it as "Ready For Checkin" myself?
+===========================================================================================
+
+Sorry, no. It's always better to get another set of eyes on a ticket. If
+you're having trouble getting that second set of eyes, see questions above.

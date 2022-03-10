@@ -51,16 +51,16 @@ All attributes should be considered read-only, unless stated otherwise.
 .. attribute:: HttpRequest.path
 
     A string representing the full path to the requested page, not including
-    the scheme or domain.
+    the scheme, domain, or query string.
 
     Example: ``"/music/bands/the_beatles/"``
 
 .. attribute:: HttpRequest.path_info
 
-    Under some Web server configurations, the portion of the URL after the
+    Under some web server configurations, the portion of the URL after the
     host name is split up into a script prefix portion and a path info
     portion. The ``path_info`` attribute always contains the path info portion
-    of the path, no matter what Web server is being used. Using this instead
+    of the path, no matter what web server is being used. Using this instead
     of :attr:`~HttpRequest.path` can make your code easier to move between
     test and deployment servers.
 
@@ -151,7 +151,7 @@ All attributes should be considered read-only, unless stated otherwise.
     * ``QUERY_STRING`` -- The query string, as a single (unparsed) string.
     * ``REMOTE_ADDR`` -- The IP address of the client.
     * ``REMOTE_HOST`` -- The hostname of the client.
-    * ``REMOTE_USER`` -- The user authenticated by the Web server, if any.
+    * ``REMOTE_USER`` -- The user authenticated by the web server, if any.
     * ``REQUEST_METHOD`` -- A string such as ``"GET"`` or ``"POST"``.
     * ``SERVER_NAME`` -- The hostname of the server.
     * ``SERVER_PORT`` -- The port of the server (as a string).
@@ -167,7 +167,7 @@ All attributes should be considered read-only, unless stated otherwise.
     name, so you won't see them in ``META``. This prevents header-spoofing
     based on ambiguity between underscores and dashes both being normalizing to
     underscores in WSGI environment variables. It matches the behavior of
-    Web servers like Nginx and Apache 2.4+.
+    web servers like Nginx and Apache 2.4+.
 
     :attr:`HttpRequest.headers` is a simpler way to access all HTTP-prefixed
     headers, plus ``CONTENT_LENGTH`` and ``CONTENT_TYPE``.
@@ -290,6 +290,10 @@ Methods
 
     Example: ``"127.0.0.1:8000"``
 
+    Raises ``django.core.exceptions.DisallowedHost`` if the host is not in
+    :setting:`ALLOWED_HOSTS` or the domain name is invalid according to
+    :rfc:`1034`/:rfc:`1035 <1035>`.
+
     .. note:: The :meth:`~HttpRequest.get_host()` method fails when the host is
         behind multiple proxies. One solution is to use middleware to rewrite
         the proxy headers, as in the following example::
@@ -361,7 +365,7 @@ Methods
         Mixing HTTP and HTTPS on the same site is discouraged, therefore
         :meth:`~HttpRequest.build_absolute_uri()` will always generate an
         absolute URI with the same scheme the current request has. If you need
-        to redirect users to HTTPS, it's best to let your Web server redirect
+        to redirect users to HTTPS, it's best to let your web server redirect
         all HTTP traffic to HTTPS.
 
 .. method:: HttpRequest.get_signed_cookie(key, default=RAISE_ERROR, salt='', max_age=None)
@@ -406,8 +410,6 @@ Methods
 
 .. method:: HttpRequest.accepts(mime_type)
 
-    .. versionadded:: 3.1
-
     Returns ``True`` if the request ``Accept`` header matches the ``mime_type``
     argument::
 
@@ -424,23 +426,6 @@ Methods
     you are using some form of caching like Django's :mod:`cache middleware
     <django.middleware.cache>`, you should decorate the view with
     :func:`vary_on_headers('Accept')
-    <django.views.decorators.vary.vary_on_headers>` so that the responses are
-    properly cached.
-
-.. method:: HttpRequest.is_ajax()
-
-    .. deprecated:: 3.1
-
-    Returns ``True`` if the request was made via an ``XMLHttpRequest``, by
-    checking the ``HTTP_X_REQUESTED_WITH`` header for the string
-    ``'XMLHttpRequest'``. Most modern JavaScript libraries send this header.
-    If you write your own ``XMLHttpRequest`` call (on the browser side), you'll
-    have to set this header manually if you want ``is_ajax()`` to work.
-
-    If a response varies on whether or not it's requested via AJAX and you are
-    using some form of caching like Django's :mod:`cache middleware
-    <django.middleware.cache>`, you should decorate the view with
-    :func:`vary_on_headers('X-Requested-With')
     <django.views.decorators.vary.vary_on_headers>` so that the responses are
     properly cached.
 
@@ -584,8 +569,8 @@ In addition, ``QueryDict`` has the following methods:
 .. method:: QueryDict.getlist(key, default=None)
 
     Returns a list of the data with the requested key. Returns an empty list if
-    the key doesn't exist and a default value wasn't provided. It's guaranteed
-    to return a list unless the default value provided isn't a list.
+    the key doesn't exist and ``default`` is ``None``. It's guaranteed to
+    return a list unless the default value provided isn't a list.
 
 .. method:: QueryDict.setlist(key, list_)
 
@@ -677,7 +662,7 @@ Typical usage is to pass the contents of the page, as a string, bytestring,
 or :class:`memoryview`, to the :class:`HttpResponse` constructor::
 
     >>> from django.http import HttpResponse
-    >>> response = HttpResponse("Here's the text of the Web page.")
+    >>> response = HttpResponse("Here's the text of the web page.")
     >>> response = HttpResponse("Text only, please.", content_type="text/plain")
     >>> response = HttpResponse(b'Bytestrings are also accepted.')
     >>> response = HttpResponse(memoryview(b'Memoryview as well.'))
@@ -686,7 +671,7 @@ But if you want to add content incrementally, you can use ``response`` as a
 file-like object::
 
     >>> response = HttpResponse()
-    >>> response.write("<p>Here's the text of the Web page.</p>")
+    >>> response.write("<p>Here's the text of the web page.</p>")
     >>> response.write("<p>Here's another paragraph.</p>")
 
 Passing iterators
@@ -700,17 +685,33 @@ generators are immediately closed.
 If you need the response to be streamed from the iterator to the client, you
 must use the :class:`StreamingHttpResponse` class instead.
 
+.. _setting-header-fields:
+
 Setting header fields
 ~~~~~~~~~~~~~~~~~~~~~
 
-To set or remove a header field in your response, treat it like a dictionary::
+To set or remove a header field in your response, use
+:attr:`HttpResponse.headers`::
+
+    >>> response = HttpResponse()
+    >>> response.headers['Age'] = 120
+    >>> del response.headers['Age']
+
+You can also manipulate headers by treating your response like a dictionary::
 
     >>> response = HttpResponse()
     >>> response['Age'] = 120
     >>> del response['Age']
 
-Note that unlike a dictionary, ``del`` doesn't raise ``KeyError`` if the header
-field doesn't exist.
+This proxies to ``HttpResponse.headers``, and is the original interface offered
+by ``HttpResponse``.
+
+When using this interface, unlike a dictionary, ``del`` doesn't raise
+``KeyError`` if the header field doesn't exist.
+
+You can also set headers on instantiation::
+
+    >>> response = HttpResponse(headers={'Age': 120})
 
 For setting the ``Cache-Control`` and ``Vary`` header fields, it is recommended
 to use the :func:`~django.utils.cache.patch_cache_control` and
@@ -725,12 +726,14 @@ containing a newline character (CR or LF) will raise ``BadHeaderError``
 Telling the browser to treat the response as a file attachment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To tell the browser to treat the response as a file attachment, use the
-``content_type`` argument and set the ``Content-Disposition`` header. For example,
-this is how you might return a Microsoft Excel spreadsheet::
+To tell the browser to treat the response as a file attachment, set the
+``Content-Type`` and ``Content-Disposition`` headers. For example, this is how
+you might return a Microsoft Excel spreadsheet::
 
-    >>> response = HttpResponse(my_data, content_type='application/vnd.ms-excel')
-    >>> response['Content-Disposition'] = 'attachment; filename="foo.xls"'
+    >>> response = HttpResponse(my_data, headers={
+    ...     'Content-Type': 'application/vnd.ms-excel',
+    ...     'Content-Disposition': 'attachment; filename="foo.xls"',
+    ... })
 
 There's nothing Django-specific about the ``Content-Disposition`` header, but
 it's easy to forget the syntax, so we've included it here.
@@ -741,6 +744,11 @@ Attributes
 .. attribute:: HttpResponse.content
 
     A bytestring representing the content, encoded from a string if necessary.
+
+.. attribute:: HttpResponse.headers
+
+    A case insensitive, dict-like object that provides an interface to all
+    HTTP headers on the response. See :ref:`setting-header-fields`.
 
 .. attribute:: HttpResponse.charset
 
@@ -779,10 +787,10 @@ Attributes
 Methods
 -------
 
-.. method:: HttpResponse.__init__(content=b'', content_type=None, status=200, reason=None, charset=None)
+.. method:: HttpResponse.__init__(content=b'', content_type=None, status=200, reason=None, charset=None, headers=None)
 
-    Instantiates an ``HttpResponse`` object with the given page content and
-    content type.
+    Instantiates an ``HttpResponse`` object with the given page content,
+    content type, and headers.
 
     ``content`` is most commonly an iterator, bytestring, :class:`memoryview`,
     or string. Other types will be converted to a bytestring by encoding their
@@ -806,6 +814,8 @@ Methods
     given it will be extracted from ``content_type``, and if that
     is unsuccessful, the :setting:`DEFAULT_CHARSET` setting will be used.
 
+    ``headers`` is a :class:`dict` of HTTP headers for the response.
+
 .. method:: HttpResponse.__setitem__(header, value)
 
     Sets the given header name to the given value. Both ``header`` and
@@ -820,10 +830,19 @@ Methods
 
     Returns the value for the given header name. Case-insensitive.
 
+.. method:: HttpResponse.get(header, alternate=None)
+
+    Returns the value for the given header, or an ``alternate`` if the header
+    doesn't exist.
+
 .. method:: HttpResponse.has_header(header)
 
     Returns ``True`` or ``False`` based on a case-insensitive check for a
     header with the given name.
+
+.. method:: HttpResponse.items()
+
+    Acts like :meth:`dict.items` for HTTP headers on the response.
 
 .. method:: HttpResponse.setdefault(header, value)
 
@@ -834,9 +853,15 @@ Methods
     Sets a cookie. The parameters are the same as in the
     :class:`~http.cookies.Morsel` cookie object in the Python standard library.
 
-    * ``max_age`` should be a number of seconds, or ``None`` (default) if
-      the cookie should last only as long as the client's browser session.
-      If ``expires`` is not specified, it will be calculated.
+    * ``max_age`` should be a :class:`~datetime.timedelta` object, an integer
+      number of seconds, or ``None`` (default) if the cookie should last only
+      as long as the client's browser session. If ``expires`` is not specified,
+      it will be calculated.
+
+      .. versionchanged:: 4.1
+
+        Support for ``timedelta`` objects was added.
+
     * ``expires`` should either be a string in the format
       ``"Wdy, DD-Mon-YY HH:MM:SS GMT"`` or a ``datetime.datetime`` object
       in UTC. If ``expires`` is a ``datetime`` object, the ``max_age``
@@ -865,10 +890,6 @@ Methods
     .. _HttpOnly: https://owasp.org/www-community/HttpOnly
     .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
 
-    .. versionchanged:: 3.1
-
-        Using ``samesite='None'`` (string) was allowed.
-
     .. warning::
 
         :rfc:`RFC 6265 <6265#section-6.1>` states that user agents should
@@ -886,10 +907,6 @@ Methods
     you will need to remember to pass it to the corresponding
     :meth:`HttpRequest.get_signed_cookie` call.
 
-    .. versionchanged:: 3.1
-
-        Using ``samesite='None'`` (string) was allowed.
-
 .. method:: HttpResponse.delete_cookie(key, path='/', domain=None, samesite=None)
 
     Deletes the cookie with the given key. Fails silently if the key doesn't
@@ -898,10 +915,6 @@ Methods
     Due to the way cookies work, ``path`` and ``domain`` should be the same
     values you used in ``set_cookie()`` -- otherwise the cookie may not be
     deleted.
-
-    .. versionchanged:: 2.2.15
-
-        The ``samesite`` argument was added.
 
 .. method:: HttpResponse.close()
 
@@ -1073,14 +1086,18 @@ parameter to ``False``::
 
 Without passing ``safe=False``, a :exc:`TypeError` will be raised.
 
+Note that an API based on ``dict`` objects is more extensible, flexible, and
+makes it easier to maintain forwards compatibility. Therefore, you should avoid
+using non-dict objects in JSON-encoded response.
+
 .. warning::
 
     Before the `5th edition of ECMAScript
-    <https://www.ecma-international.org/ecma-262/5.1/index.html#sec-11.1.4>`_
-    it was possible to poison the JavaScript ``Array`` constructor. For this
-    reason, Django does not allow passing non-dict objects to the
+    <https://262.ecma-international.org/5.1/#sec-11.1.4>`_ it was possible to
+    poison the JavaScript ``Array`` constructor. For this reason, Django does
+    not allow passing non-dict objects to the
     :class:`~django.http.JsonResponse` constructor by default.  However, most
-    modern browsers implement EcmaScript 5 which removes this attack vector.
+    modern browsers implement ECMAScript 5 which removes this attack vector.
     Therefore it is possible to disable this security precaution.
 
 Changing the default JSON encoder

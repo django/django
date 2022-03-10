@@ -33,7 +33,7 @@ a model object and return its URL. This is a way of inserting or overriding
 ``get_absolute_url()`` methods on a per-installation basis. Example::
 
     ABSOLUTE_URL_OVERRIDES = {
-        'blogs.weblog': lambda o: "/blogs/%s/" % o.slug,
+        'blogs.blog': lambda o: "/blogs/%s/" % o.slug,
         'news.story': lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
     }
 
@@ -99,11 +99,6 @@ This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
 if your code accesses the ``Host`` header directly from ``request.META`` you
 are bypassing this security protection.
 
-.. versionchanged:: 3.1
-
-    If ``ALLOWED_HOSTS`` is empty and ``DEBUG=True``, subdomains of localhost
-    were allowed.
-
 .. setting:: APPEND_SLASH
 
 ``APPEND_SLASH``
@@ -156,12 +151,17 @@ The cache backend to use. The built-in cache backends are:
 * ``'django.core.cache.backends.dummy.DummyCache'``
 * ``'django.core.cache.backends.filebased.FileBasedCache'``
 * ``'django.core.cache.backends.locmem.LocMemCache'``
-* ``'django.core.cache.backends.memcached.MemcachedCache'``
+* ``'django.core.cache.backends.memcached.PyMemcacheCache'``
 * ``'django.core.cache.backends.memcached.PyLibMCCache'``
+* ``'django.core.cache.backends.redis.RedisCache'``
 
 You can use a cache backend that doesn't ship with Django by setting
 :setting:`BACKEND <CACHES-BACKEND>` to a fully-qualified path of a cache
 backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
+
+.. versionchanged:: 4.0
+
+    The ``RedisCache`` backend was added.
 
 .. setting:: CACHES-KEY_FUNCTION
 
@@ -233,7 +233,8 @@ consult your backend module's own documentation.
 Default: ``300``
 
 The number of seconds before a cache entry is considered stale. If the value of
-this settings is ``None``, cache entries will not expire.
+this setting is ``None``, cache entries will not expire. A value of ``0``
+causes keys to immediately expire (effectively "don't cache").
 
 .. setting:: CACHES-VERSION
 
@@ -313,7 +314,7 @@ Default: ``None``
 The domain to be used when setting the CSRF cookie.  This can be useful for
 easily allowing cross-subdomain requests to be excluded from the normal cross
 site request forgery protection.  It should be set to a string such as
-``"example.com"`` to allow a POST request from a form on one subdomain to be
+``".example.com"`` to allow a POST request from a form on one subdomain to be
 accepted by a view served from another subdomain.
 
 Please note that the presence of this setting does not imply that Django's CSRF
@@ -345,6 +346,22 @@ form input <acquiring-csrf-token-from-html>` instead of :ref:`from the cookie
 <acquiring-csrf-token-from-cookie>`.
 
 See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
+
+.. setting:: CSRF_COOKIE_MASKED
+
+``CSRF_COOKIE_MASKED``
+----------------------
+
+.. versionadded:: 4.1
+
+Default: ``False``
+
+Whether to mask the CSRF cookie. See
+:ref:`release notes <csrf-cookie-masked-usage>` for usage details.
+
+.. deprecated:: 4.1
+
+    This transitional setting is deprecated and will be removed in Django 5.0.
 
 .. setting:: CSRF_COOKIE_NAME
 
@@ -382,10 +399,6 @@ The value of the `SameSite`_ flag on the CSRF cookie. This flag prevents the
 cookie from being sent in cross-site requests.
 
 See :setting:`SESSION_COOKIE_SAMESITE` for details about ``SameSite``.
-
-.. versionchanged:: 3.1
-
-    Setting ``CSRF_COOKIE_SAMESITE = 'None'`` was allowed.
 
 .. setting:: CSRF_COOKIE_SECURE
 
@@ -462,15 +475,31 @@ should be ``'HTTP_X_XSRF_TOKEN'``.
 
 Default: ``[]`` (Empty list)
 
-A list of hosts which are trusted origins for unsafe requests (e.g. ``POST``).
+A list of trusted origins for unsafe requests (e.g. ``POST``).
+
+For requests that include the ``Origin`` header, Django's CSRF protection
+requires that header match the origin present in the ``Host`` header.
+
 For a :meth:`secure <django.http.HttpRequest.is_secure>` unsafe
-request, Django's CSRF protection requires that the request have a ``Referer``
-header that matches the origin present in the ``Host`` header. This prevents,
-for example, a ``POST`` request from ``subdomain.example.com`` from succeeding
-against ``api.example.com``. If you need cross-origin unsafe requests over
-HTTPS, continuing the example, add ``"subdomain.example.com"`` to this list.
-The setting also supports subdomains, so you could add ``".example.com"``, for
-example, to allow access from all subdomains of ``example.com``.
+request that doesn't include the ``Origin`` header, the request must have a
+``Referer`` header that matches the origin present in the ``Host`` header.
+
+These checks prevent, for example, a ``POST`` request from
+``subdomain.example.com`` from succeeding against ``api.example.com``. If you
+need cross-origin unsafe requests, continuing the example, add
+``'https://subdomain.example.com'`` to this list (and/or ``http://...`` if
+requests originate from an insecure page).
+
+The setting also supports subdomains, so you could add
+``'https://*.example.com'``, for example, to allow access from all subdomains
+of ``example.com``.
+
+.. versionchanged:: 4.0
+
+    The values in older versions must only include the hostname (possibly with
+    a leading dot) and not the scheme or an asterisk.
+
+    Also, ``Origin`` header checking isn't performed in older versions.
 
 .. setting:: DATABASES
 
@@ -599,7 +628,25 @@ Default: ``0``
 
 The lifetime of a database connection, as an integer of seconds. Use ``0`` to
 close database connections at the end of each request — Django's historical
-behavior — and ``None`` for unlimited persistent connections.
+behavior — and ``None`` for unlimited :ref:`persistent database connections
+<persistent-database-connections>`.
+
+.. setting:: CONN_HEALTH_CHECKS
+
+``CONN_HEALTH_CHECKS``
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 4.1
+
+Default: ``False``
+
+If set to ``True``, existing :ref:`persistent database connections
+<persistent-database-connections>` will be health checked before they are
+reused in each request performing database access. If the health check fails,
+the connection will be re-established without failing the request when the
+connection is no longer usable but the database server is ready to accept and
+serve new connections (e.g. after database server restart closing existing
+connections).
 
 .. setting:: OPTIONS
 
@@ -660,8 +707,8 @@ When :setting:`USE_TZ` is ``False``, it is an error to set this option.
     otherwise, you should leave this option unset. It's best to store datetimes
     in UTC because it avoids ambiguous or nonexistent datetimes during daylight
     saving time changes. Also, receiving datetimes in UTC keeps datetime
-    arithmetic simple — there's no need for the ``normalize()`` method provided
-    by pytz.
+    arithmetic simple — there's no need to consider potential offset changes
+    over a DST transition.
 
   * If you're connecting to a third-party database that stores datetimes in a
     local time rather than UTC, then you must set this option to the
@@ -678,15 +725,11 @@ When :setting:`USE_TZ` is ``False``, it is an error to set this option.
   as ``date_trunc``, because their results depend on the time zone.
 
   However, this has a downside: receiving all datetimes in local time makes
-  datetime arithmetic more tricky — you must call the ``normalize()`` method
-  provided by pytz after each operation.
+  datetime arithmetic more tricky — you must account for possible offset
+  changes over DST transitions.
 
   Consider converting to local time explicitly with ``AT TIME ZONE`` in raw SQL
   queries instead of setting the ``TIME_ZONE`` option.
-
-.. versionchanged:: 3.1
-
-  Using this option when the database backend supports time zones was allowed.
 
 .. setting:: DATABASE-DISABLE_SERVER_SIDE_CURSORS
 
@@ -782,11 +825,11 @@ on :ref:`controlling the creation order of test databases
 ``MIGRATE``
 ^^^^^^^^^^^
 
-.. versionadded:: 3.1
-
 Default: ``True``
 
 When set to ``False``, migrations won't run when creating the test database.
+This is similar to setting ``None`` as a value in :setting:`MIGRATION_MODULES`,
+but for all apps.
 
 .. setting:: TEST_MIRROR
 
@@ -829,6 +872,12 @@ database into an in-memory JSON string before running tests (used to restore
 the database state between tests if you don't have transactions). You can set
 this to ``False`` to speed up creation time if you don't have any test classes
 with :ref:`serialized_rollback=True <test-case-serialized-rollback>`.
+
+.. deprecated:: 4.0
+
+   This setting is deprecated as it can be inferred from the
+   :attr:`~django.test.TestCase.databases` with the
+   :ref:`serialized_rollback <test-case-serialized-rollback>` option enabled.
 
 .. setting:: TEST_TEMPLATE
 
@@ -1018,8 +1067,8 @@ The amount by which the DATAFILE_TMP is extended when more space is required.
 
 .. setting:: DATA_UPLOAD_MAX_MEMORY_SIZE
 
-DATA_UPLOAD_MAX_MEMORY_SIZE
----------------------------
+``DATA_UPLOAD_MAX_MEMORY_SIZE``
+-------------------------------
 
 Default: ``2621440`` (i.e. 2.5 MB).
 
@@ -1040,8 +1089,8 @@ See also :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`.
 
 .. setting:: DATA_UPLOAD_MAX_NUMBER_FIELDS
 
-DATA_UPLOAD_MAX_NUMBER_FIELDS
------------------------------
+``DATA_UPLOAD_MAX_NUMBER_FIELDS``
+---------------------------------
 
 Default: ``1000``
 
@@ -1092,11 +1141,17 @@ See also :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_
 Default::
 
     [
-        '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y', # '2006-10-25', '10/25/2006', '10/25/06'
-        '%b %d %Y', '%b %d, %Y',            # 'Oct 25 2006', 'Oct 25, 2006'
-        '%d %b %Y', '%d %b, %Y',            # '25 Oct 2006', '25 Oct, 2006'
-        '%B %d %Y', '%B %d, %Y',            # 'October 25 2006', 'October 25, 2006'
-        '%d %B %Y', '%d %B, %Y',            # '25 October 2006', '25 October, 2006'
+        '%Y-%m-%d',  # '2006-10-25'
+        '%m/%d/%Y',  # '10/25/2006'
+        '%m/%d/%y',  # '10/25/06'
+        '%b %d %Y',  # 'Oct 25 2006'
+        '%b %d, %Y',  # 'Oct 25, 2006'
+        '%d %b %Y',  # '25 Oct 2006'
+        '%d %b, %Y',  # '25 Oct, 2006'
+        '%B %d %Y',  # 'October 25 2006'
+        '%B %d, %Y',  # 'October 25, 2006'
+        '%d %B %Y',  # '25 October 2006'
+        '%d %B, %Y',  # '25 October, 2006'
     ]
 
 A list of formats that will be accepted when inputting data on a date field.
@@ -1154,10 +1209,6 @@ When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
 precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
-
-.. versionchanged:: 3.1
-
-    In older versions, the default is a list containing also date-only formats.
 
 .. setting:: DEBUG
 
@@ -1217,7 +1268,7 @@ Default: ``False``
 If set to ``True``, Django's exception handling of view functions
 (:data:`~django.conf.urls.handler500`, or the debug view if :setting:`DEBUG`
 is ``True``) and logging of 500 responses (:ref:`django-request-logger`) is
-skipped and exceptions propagate upwards.
+skipped and exceptions propagate upward.
 
 This can be useful for some test setups. It shouldn't be used on a live site
 unless you want your web server (instead of Django) to generate "Internal
@@ -1239,6 +1290,40 @@ format has higher precedence and will be applied instead.
 See also :setting:`NUMBER_GROUPING`, :setting:`THOUSAND_SEPARATOR` and
 :setting:`USE_THOUSAND_SEPARATOR`.
 
+.. setting:: DEFAULT_AUTO_FIELD
+
+``DEFAULT_AUTO_FIELD``
+----------------------
+
+Default: ``'``:class:`django.db.models.AutoField`\ ``'``
+
+Default primary key field type to use for models that don't have a field with
+:attr:`primary_key=True <django.db.models.Field.primary_key>`.
+
+.. admonition:: Migrating auto-created through tables
+
+    The value of ``DEFAULT_AUTO_FIELD`` will be respected when creating new
+    auto-created through tables for many-to-many relationships.
+
+    Unfortunately, the primary keys of existing auto-created through tables
+    cannot currently be updated by the migrations framework.
+
+    This means that if you switch the value of ``DEFAULT_AUTO_FIELD`` and then
+    generate migrations, the primary keys of the related models will be
+    updated, as will the foreign keys from the through table, but the primary
+    key of the auto-created through table will not be migrated.
+
+    In order to address this, you should add a
+    :class:`~django.db.migrations.operations.RunSQL` operation to your
+    migrations to perform the required ``ALTER TABLE`` step. You can check the
+    existing table name through ``sqlmigrate``, ``dbshell``, or with the
+    field’s ``remote_field.through._meta.db_table`` property.
+
+    Explicitly defined through models are already handled by the migrations
+    system.
+
+    Allowing automatic migrations for the primary key of existing auto-created
+    through tables :ticket:`may be implemented at a later date <32674>`.
 
 .. setting:: DEFAULT_CHARSET
 
@@ -1254,8 +1339,6 @@ manually specified. Used when constructing the ``Content-Type`` header.
 
 ``DEFAULT_EXCEPTION_REPORTER``
 ------------------------------
-
-.. versionadded:: 3.1
 
 Default: ``'``:class:`django.views.debug.ExceptionReporter`\ ``'``
 
@@ -1294,27 +1377,6 @@ Default: ``'webmaster@localhost'``
 Default email address to use for various automated correspondence from the
 site manager(s). This doesn't include error messages sent to :setting:`ADMINS`
 and :setting:`MANAGERS`; for that, see :setting:`SERVER_EMAIL`.
-
-.. setting:: DEFAULT_HASHING_ALGORITHM
-
-``DEFAULT_HASHING_ALGORITHM``
------------------------------
-
-.. versionadded:: 3.1
-
-Default: ``'sha256'``
-
-Default hashing algorithm to use for encoding cookies, password reset tokens in
-the admin site, user sessions, and signatures created by
-:class:`django.core.signing.Signer` and :meth:`django.core.signing.dumps`.
-Algorithm must be ``'sha1'`` or ``'sha256'``. See
-:ref:`release notes <default-hashing-algorithm-usage>` for usage details.
-
-.. deprecated:: 3.1
-
-    This transitional setting is deprecated. Support for it and tokens,
-    cookies, sessions, and signatures that use SHA-1 hashing algorithm will be
-    removed in Django 4.0.
 
 .. setting:: DEFAULT_INDEX_TABLESPACE
 
@@ -1367,10 +1429,6 @@ Default: Not defined
 
 The directory used by the :ref:`file email backend <topic-email-file-backend>`
 to store output files.
-
-.. versionchanged:: 3.1
-
-    Support for :class:`pathlib.Path` was added.
 
 .. setting:: EMAIL_HOST
 
@@ -1647,8 +1705,13 @@ generate correct URLs when ``SCRIPT_NAME`` is not ``/``.
 
 Default: ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``
 
-The class that renders form widgets. It must implement :ref:`the low-level
-render API <low-level-widget-render-api>`.
+The class that renders forms and form widgets. It must implement
+:ref:`the low-level render API <low-level-widget-render-api>`. Included form
+renderers are:
+
+* ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``
+* ``'``:class:`django.forms.renderers.Jinja2`\ ``'``
+* ``'``:class:`django.forms.renderers.TemplatesSetting`\ ``'``
 
 .. setting:: FORMAT_MODULE_PATH
 
@@ -1892,10 +1955,6 @@ The value of the `SameSite`_ flag on the language cookie. This flag prevents the
 cookie from being sent in cross-site requests.
 
 See :setting:`SESSION_COOKIE_SAMESITE` for details about ``SameSite``.
-
-.. versionchanged:: 3.1
-
-    Setting ``LANGUAGE_COOKIE_SAMESITE = 'None'`` was allowed.
 
 .. setting:: LANGUAGE_COOKIE_SECURE
 
@@ -2238,9 +2297,11 @@ The secret key is used for:
 * Any usage of :doc:`cryptographic signing </topics/signing>`, unless a
   different key is provided.
 
-If you rotate your secret key, all of the above will be invalidated.
-Secret keys are not used for passwords of users and key rotation will not
-affect them.
+When a secret key is no longer set as :setting:`SECRET_KEY` or contained within
+:setting:`SECRET_KEY_FALLBACKS` all of the above will be invalidated. When
+rotating your secret key, you should move the old key to
+:setting:`SECRET_KEY_FALLBACKS` temporarily. Secret keys are not used for
+passwords of users and key rotation will not affect them.
 
 .. note::
 
@@ -2248,19 +2309,35 @@ affect them.
     startproject <startproject>` creates a unique ``SECRET_KEY`` for
     convenience.
 
-.. setting:: SECURE_BROWSER_XSS_FILTER
+.. setting:: SECRET_KEY_FALLBACKS
 
-``SECURE_BROWSER_XSS_FILTER``
------------------------------
+``SECRET_KEY_FALLBACKS``
+------------------------
 
-Default: ``False``
+.. versionadded:: 4.1
 
-If ``True``, the :class:`~django.middleware.security.SecurityMiddleware` sets
-the :ref:`x-xss-protection` header on all responses that do not already have it.
+Default: ``[]``
 
-Modern browsers don't honor ``X-XSS-Protection`` HTTP header anymore. Although
-the setting offers little practical benefit, you may still want to set the
-header if you support older browsers.
+A list of fallback secret keys for a particular Django installation. These are
+used to allow rotation of the ``SECRET_KEY``.
+
+In order to rotate your secret keys, set a new ``SECRET_KEY`` and move the
+previous value to the beginning of ``SECRET_KEY_FALLBACKS``. Then remove the
+old values from the end of the ``SECRET_KEY_FALLBACKS`` when you are ready to
+expire the sessions, password reset tokens, and so on, that make use of them.
+
+.. note::
+
+    Signing operations are computationally expensive. Having multiple old key
+    values in ``SECRET_KEY_FALLBACKS`` adds additional overhead to all checks
+    that don't match an earlier key.
+
+    As such, fallback values should be removed after an appropriate period,
+    allowing for key rotation.
+
+Uses of the secret key values shouldn't assume that they are text or bytes.
+Every use should go through :func:`~django.utils.encoding.force_str` or
+:func:`~django.utils.encoding.force_bytes` to convert it to the desired type.
 
 .. setting:: SECURE_CONTENT_TYPE_NOSNIFF
 
@@ -2272,6 +2349,20 @@ Default: ``True``
 If ``True``, the :class:`~django.middleware.security.SecurityMiddleware`
 sets the :ref:`x-content-type-options` header on all responses that do not
 already have it.
+
+.. setting:: SECURE_CROSS_ORIGIN_OPENER_POLICY
+
+``SECURE_CROSS_ORIGIN_OPENER_POLICY``
+-------------------------------------
+
+.. versionadded:: 4.0
+
+Default: ``'same-origin'``
+
+Unless set to ``None``, the
+:class:`~django.middleware.security.SecurityMiddleware` sets the
+:ref:`cross-origin-opener-policy` header on all responses that do not already
+have it to the value provided.
 
 .. setting:: SECURE_HSTS_INCLUDE_SUBDOMAINS
 
@@ -2325,7 +2416,7 @@ already have it.
 
 Default: ``None``
 
-A tuple representing a HTTP header/value combination that signifies a request
+A tuple representing an HTTP header/value combination that signifies a request
 is secure. This controls the behavior of the request object's ``is_secure()``
 method.
 
@@ -2404,10 +2495,6 @@ Default: ``'same-origin'``
 If configured, the :class:`~django.middleware.security.SecurityMiddleware` sets
 the :ref:`referrer-policy` header on all responses that do not already have it
 to the value provided.
-
-.. versionchanged:: 3.1
-
-    In older versions, the default value is ``None``.
 
 .. setting:: SECURE_SSL_HOST
 
@@ -2739,6 +2826,23 @@ the correct environment.
 
 .. _list of time zones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
+.. setting:: USE_DEPRECATED_PYTZ
+
+``USE_DEPRECATED_PYTZ``
+-----------------------
+
+.. versionadded:: 4.0
+
+Default: ``False``
+
+A boolean that specifies whether to use ``pytz``, rather than :mod:`zoneinfo`,
+as the default time zone implementation.
+
+.. deprecated:: 4.0
+
+    This transitional setting is deprecated. Support for using ``pytz`` will be
+    removed in Django 5.0.
+
 .. setting:: USE_I18N
 
 ``USE_I18N``
@@ -2763,7 +2867,7 @@ See also :setting:`LANGUAGE_CODE`, :setting:`USE_L10N` and :setting:`USE_TZ`.
 ``USE_L10N``
 ------------
 
-Default: ``False``
+Default: ``True``
 
 A boolean that specifies if localized formatting of data will be enabled by
 default or not. If this is set to ``True``, e.g. Django will display numbers and
@@ -2771,10 +2875,15 @@ dates using the format of the current locale.
 
 See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
 
-.. note::
+.. versionchanged:: 4.0
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin
-    startproject <startproject>` includes ``USE_L10N = True`` for convenience.
+    In older versions, the default value is ``False``.
+
+.. deprecated:: 4.0
+
+    This setting is deprecated. Starting with Django 5.0, localized formatting
+    of data will always be enabled. For example Django will display numbers and
+    dates using the format of the current locale.
 
 .. setting:: USE_THOUSAND_SEPARATOR
 
@@ -2798,6 +2907,10 @@ See also :setting:`DECIMAL_SEPARATOR`, :setting:`NUMBER_GROUPING` and
 ----------
 
 Default: ``False``
+
+.. note::
+
+    In Django 5.0, the default value will change from ``False`` to ``True``.
 
 A boolean that specifies if datetimes will be timezone-aware by default or not.
 If this is set to ``True``, Django will use timezone-aware datetimes internally.
@@ -2969,8 +3082,6 @@ rendered.
 ``PASSWORD_RESET_TIMEOUT``
 --------------------------
 
-.. versionadded:: 3.1
-
 Default: ``259200`` (3 days, in seconds)
 
 The number of seconds a password reset link is valid for.
@@ -2986,21 +3097,6 @@ Used by the :class:`~django.contrib.auth.views.PasswordResetConfirmView`.
    This timeout exists to protect against some unlikely attack scenarios, such
    as someone gaining access to email archives that may contain old, unused
    password reset tokens.
-
-.. setting:: PASSWORD_RESET_TIMEOUT_DAYS
-
-``PASSWORD_RESET_TIMEOUT_DAYS``
--------------------------------
-
-Default: ``3``
-
-The number of days a password reset link is valid for.
-
-Used by the :class:`~django.contrib.auth.views.PasswordResetConfirmView`.
-
-.. deprecated:: 3.1
-
-    This setting is deprecated. Use :setting:`PASSWORD_RESET_TIMEOUT` instead.
 
 .. setting:: PASSWORD_HASHERS
 
@@ -3150,6 +3246,10 @@ The domain to use for session cookies. Set this to a string such as
 ``"example.com"`` for cross-domain cookies, or use ``None`` for a standard
 domain cookie.
 
+To use cross-domain cookies with :setting:`CSRF_USE_SESSIONS`, you must include
+a leading dot (e.g. ``".example.com"``) to accommodate the CSRF middleware's
+referer checking.
+
 Be cautious when updating this setting on a production site. If you update
 this setting to enable cross-domain cookies on a site that previously used
 standard domain cookies, existing user cookies will be set to the old
@@ -3246,10 +3346,6 @@ Possible values for the setting are:
     Modern browsers provide a more secure default policy for the ``SameSite``
     flag and will assume ``Lax`` for cookies without an explicit value set.
 
-.. versionchanged:: 3.1
-
-    Setting ``SESSION_COOKIE_SAMESITE = 'None'`` was allowed.
-
 .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
 
 .. setting:: SESSION_COOKIE_SECURE
@@ -3326,14 +3422,11 @@ sessions won't be created, even if this setting is active.
 Default: ``'django.contrib.sessions.serializers.JSONSerializer'``
 
 Full import path of a serializer class to use for serializing session data.
-Included serializers are:
+Included serializer is:
 
-* ``'django.contrib.sessions.serializers.PickleSerializer'``
 * ``'django.contrib.sessions.serializers.JSONSerializer'``
 
-See :ref:`session_serialization` for details, including a warning regarding
-possible remote code execution when using
-:class:`~django.contrib.sessions.serializers.PickleSerializer`.
+See :ref:`session_serialization` for details.
 
 Sites
 =====
@@ -3397,7 +3490,7 @@ Default: ``None``
 
 URL to use when referring to static files located in :setting:`STATIC_ROOT`.
 
-Example: ``"/static/"`` or ``"http://static.example.com/"``
+Example: ``"static/"`` or ``"http://static.example.com/"``
 
 If not ``None``, this will be used as the base path for
 :ref:`asset definitions<form-asset-paths>` (the ``Media`` class) and the
@@ -3454,7 +3547,7 @@ tuples, e.g.::
         ("downloads", "/opt/webfiles/stats"),
     ]
 
-For example, assuming you have :setting:`STATIC_URL` set to ``'/static/'``, the
+For example, assuming you have :setting:`STATIC_URL` set to ``'static/'``, the
 :djadmin:`collectstatic` management command would collect the "stats" files
 in a ``'downloads'`` subdirectory of :setting:`STATIC_ROOT`.
 
@@ -3464,7 +3557,7 @@ This would allow you to refer to the local file
 
 .. code-block:: html+django
 
-    <a href="{% static "downloads/polls_20101022.tar.gz" %}">
+    <a href="{% static 'downloads/polls_20101022.tar.gz' %}">
 
 .. setting:: STATICFILES_STORAGE
 
@@ -3629,8 +3722,8 @@ HTTP
 * :setting:`MIDDLEWARE`
 * Security
 
-  * :setting:`SECURE_BROWSER_XSS_FILTER`
   * :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
+  * :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY`
   * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
   * :setting:`SECURE_HSTS_PRELOAD`
   * :setting:`SECURE_HSTS_SECONDS`
@@ -3670,6 +3763,7 @@ Security
   * :setting:`CSRF_USE_SESSIONS`
 
 * :setting:`SECRET_KEY`
+* :setting:`SECRET_KEY_FALLBACKS`
 * :setting:`X_FRAME_OPTIONS`
 
 Serialization

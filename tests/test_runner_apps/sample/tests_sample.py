@@ -1,19 +1,18 @@
 import doctest
 from unittest import TestCase
 
-from django.test import SimpleTestCase, TestCase as DjangoTestCase
+from django.test import SimpleTestCase
+from django.test import TestCase as DjangoTestCase
 
 from . import doctests
 
 
 class TestVanillaUnittest(TestCase):
-
     def test_sample(self):
         self.assertEqual(1, 1)
 
 
 class TestDjangoTestCase(DjangoTestCase):
-
     def test_sample(self):
         self.assertEqual(1, 1)
 

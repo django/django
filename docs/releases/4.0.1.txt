@@ -1,0 +1,70 @@
+==========================
+Django 4.0.1 release notes
+==========================
+
+*January 4, 2022*
+
+Django 4.0.1 fixes one security issue with severity "medium", two security
+issues with severity "low", and several bugs in 4.0.
+
+CVE-2021-45115: Denial-of-service possibility in ``UserAttributeSimilarityValidator``
+=====================================================================================
+
+:class:`.UserAttributeSimilarityValidator` incurred significant overhead
+evaluating submitted password that were artificially large in relative to the
+comparison values. On the assumption that access to user registration was
+unrestricted this provided a potential vector for a denial-of-service attack.
+
+In order to mitigate this issue, relatively long values are now ignored by
+``UserAttributeSimilarityValidator``.
+
+This issue has severity "medium" according to the :ref:`Django security policy
+<security-disclosure>`.
+
+CVE-2021-45116: Potential information disclosure in ``dictsort`` template filter
+================================================================================
+
+Due to leveraging the Django Template Language's variable resolution logic, the
+:tfilter:`dictsort` template filter was potentially vulnerable to information
+disclosure or unintended method calls, if passed a suitably crafted key.
+
+In order to avoid this possibility, ``dictsort`` now works with a restricted
+resolution logic, that will not call methods, nor allow indexing on
+dictionaries.
+
+As a reminder, all untrusted user input should be validated before use.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<security-disclosure>`.
+
+CVE-2021-45452: Potential directory-traversal via ``Storage.save()``
+====================================================================
+
+``Storage.save()`` allowed directory-traversal if directly passed suitably
+crafted file names.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<security-disclosure>`.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 4.0 that caused a crash of
+  :meth:`~django.test.SimpleTestCase.assertFormsetError` on a formset named
+  ``form`` (:ticket:`33346`).
+
+* Fixed a bug in Django 4.0 that caused a crash on booleans with the
+  ``RedisCache`` backend (:ticket:`33361`).
+
+* Relaxed the check added in Django 4.0 to reallow use of a duck-typed
+  ``HttpRequest`` in ``django.views.decorators.cache.cache_control()`` and
+  ``never_cache()`` decorators (:ticket:`33350`).
+
+* Fixed a regression in Django 4.0 that caused creating bogus migrations for
+  models that reference swappable models such as ``auth.User``
+  (:ticket:`33366`).
+
+* Fixed a long standing bug in :ref:`geos-geometry-collections` and
+  :class:`~django.contrib.gis.geos.Polygon` that caused a crash on some
+  platforms (reported on macOS based on the ``ARM64`` architecture)
+  (:ticket:`32600`).

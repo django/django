@@ -1,10 +1,10 @@
+import binascii
 import json
 
 from django.conf import settings
 from django.contrib.messages.storage.base import BaseStorage, Message
 from django.core import signing
 from django.http import SimpleCookie
-from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.safestring import SafeData, mark_safe
 
 
@@ -12,14 +12,15 @@ class MessageEncoder(json.JSONEncoder):
     """
     Compactly serialize instances of the ``Message`` class as JSON.
     """
-    message_key = '__json_message'
+
+    message_key = "__json_message"
 
     def default(self, obj):
         if isinstance(obj, Message):
             # Using 0/1 here instead of False/True to produce more compact json
             is_safedata = 1 if isinstance(obj.message, SafeData) else 0
             message = [self.message_key, is_safedata, obj.level, obj.message]
-            if obj.extra_tags:
+            if obj.extra_tags is not None:
                 message.append(obj.extra_tags)
             return message
         return super().default(obj)
@@ -38,8 +39,7 @@ class MessageDecoder(json.JSONDecoder):
                 return Message(*obj[2:])
             return [self.process_messages(item) for item in obj]
         if isinstance(obj, dict):
-            return {key: self.process_messages(value)
-                    for key, value in obj.items()}
+            return {key: self.process_messages(value) for key, value in obj.items()}
         return obj
 
     def decode(self, s, **kwargs):
@@ -47,17 +47,30 @@ class MessageDecoder(json.JSONDecoder):
         return self.process_messages(decoded)
 
 
+class MessageSerializer:
+    def dumps(self, obj):
+        return json.dumps(
+            obj,
+            separators=(",", ":"),
+            cls=MessageEncoder,
+        ).encode("latin-1")
+
+    def loads(self, data):
+        return json.loads(data.decode("latin-1"), cls=MessageDecoder)
+
+
 class CookieStorage(BaseStorage):
     """
     Store messages in a cookie.
     """
-    cookie_name = 'messages'
+
+    cookie_name = "messages"
     # uwsgi's default configuration enforces a maximum size of 4kb for all the
     # HTTP headers. In order to leave some room for other cookies and headers,
     # restrict the session cookie to 1/2 of 4kb. See #18781.
     max_cookie_size = 2048
-    not_finished = '__messagesnotfinished__'
-    key_salt = 'django.contrib.messages'
+    not_finished = "__messagesnotfinished__"
+    key_salt = "django.contrib.messages"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -85,7 +98,8 @@ class CookieStorage(BaseStorage):
         """
         if encoded_data:
             response.set_cookie(
-                self.cookie_name, encoded_data,
+                self.cookie_name,
+                encoded_data,
                 domain=settings.SESSION_COOKIE_DOMAIN,
                 secure=settings.SESSION_COOKIE_SECURE or None,
                 httponly=settings.SESSION_COOKIE_HTTPONLY or None,
@@ -122,22 +136,11 @@ class CookieStorage(BaseStorage):
                     unstored_messages.append(messages.pop(0))
                 else:
                     unstored_messages.insert(0, messages.pop())
-                encoded_data = self._encode(messages + [self.not_finished],
-                                            encode_empty=unstored_messages)
+                encoded_data = self._encode(
+                    messages + [self.not_finished], encode_empty=unstored_messages
+                )
         self._update_cookie(encoded_data, response)
         return unstored_messages
-
-    def _legacy_hash(self, value):
-        """
-        # RemovedInDjango40Warning: pre-Django 3.1 hashes will be invalid.
-        Create an HMAC/SHA1 hash based on the value and the project setting's
-        SECRET_KEY, modified to make it unique for the present purpose.
-        """
-        # The class wide key salt is not reused here since older Django
-        # versions had it fixed and making it dynamic would break old hashes if
-        # self.key_salt is changed.
-        key_salt = 'django.contrib.messages'
-        return salted_hmac(key_salt, value).hexdigest()
 
     def _encode(self, messages, encode_empty=False):
         """
@@ -148,9 +151,9 @@ class CookieStorage(BaseStorage):
         also contains a hash to ensure that the data was not tampered with.
         """
         if messages or encode_empty:
-            encoder = MessageEncoder(separators=(',', ':'))
-            value = encoder.encode(messages)
-            return self.signer.sign(value)
+            return self.signer.sign_object(
+                messages, serializer=MessageSerializer, compress=True
+            )
 
     def _decode(self, data):
         """
@@ -162,27 +165,10 @@ class CookieStorage(BaseStorage):
         if not data:
             return None
         try:
-            decoded = self.signer.unsign(data)
-        except signing.BadSignature:
-            # RemovedInDjango40Warning: when the deprecation ends, replace
-            # with:
-            #   decoded = None.
-            decoded = self._legacy_decode(data)
-        if decoded:
-            try:
-                return json.loads(decoded, cls=MessageDecoder)
-            except json.JSONDecodeError:
-                pass
+            return self.signer.unsign_object(data, serializer=MessageSerializer)
+        except (signing.BadSignature, binascii.Error, json.JSONDecodeError):
+            pass
         # Mark the data as used (so it gets removed) since something was wrong
         # with the data.
         self.used = True
-        return None
-
-    def _legacy_decode(self, data):
-        # RemovedInDjango40Warning: pre-Django 3.1 hashes will be invalid.
-        bits = data.split('$', 1)
-        if len(bits) == 2:
-            hash_, value = bits
-            if constant_time_compare(hash_, self._legacy_hash(value)):
-                return value
         return None

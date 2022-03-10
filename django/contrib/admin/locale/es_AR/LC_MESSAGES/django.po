@@ -3,14 +3,14 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Leonardo José Guzmán <ljguzman@gmail.com>, 2013
-# Ramiro Morales, 2013-2020
+# Ramiro Morales, 2013-2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-14 22:38+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-19 14:47+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
 "MIME-Version: 1.0\n"
@@ -18,6 +18,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es_AR\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Eliminar %(verbose_name_plural)s seleccionados/as"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -29,10 +33,6 @@ msgstr "No se puede eliminar %(name)s"
 
 msgid "Are you sure?"
 msgstr "¿Está seguro?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Eliminar %(verbose_name_plural)s seleccionados/as"
 
 msgid "Administration"
 msgstr "Administración"
@@ -528,7 +528,13 @@ msgid "Forgotten your password or username?"
 msgstr "¿Olvidó su contraseña o nombre de usuario?"
 
 msgid "Toggle navigation"
-msgstr ""
+msgstr "(des)activar navegación"
+
+msgid "Start typing to filter…"
+msgstr "Empiece a escribir para filtrar…"
+
+msgid "Filter navigation items"
+msgstr "Filtrar elementos de navegación"
 
 msgid "Date/time"
 msgstr "Fecha/hora"
@@ -595,7 +601,7 @@ msgstr "Agregar otro/a %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Eliminar %(model)s seleccionados/as"
 
-msgid "Thanks for spending some quality time with the Web site today."
+msgid "Thanks for spending some quality time with the web site today."
 msgstr "Gracias por el tiempo que ha dedicado al sitio web hoy."
 
 msgid "Log in again"

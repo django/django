@@ -1,0 +1,7 @@
+[build-system]
+requires = ['setuptools>=40.8.0', 'wheel']
+build-backend = 'setuptools.build_meta:__legacy__'
+
+[tool.black]
+target-version = ['py38']
+force-exclude = 'tests/test_runner_apps/tagged/tests_syntax_error.py'

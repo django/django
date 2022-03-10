@@ -654,7 +654,7 @@ Here's what each of the built-in processors does:
 ``django.contrib.auth.context_processors.auth``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: auth
+.. function:: auth(request)
 
 If this processor is enabled, every ``RequestContext`` will contain these
 variables:
@@ -672,7 +672,7 @@ variables:
 ``django.template.context_processors.debug``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: debug
+.. function:: debug(request)
 
 If this processor is enabled, every ``RequestContext`` will contain these two
 variables -- but only if your :setting:`DEBUG` setting is set to ``True`` and
@@ -689,7 +689,7 @@ the request's IP address (``request.META['REMOTE_ADDR']``) is in the
 ``django.template.context_processors.i18n``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: i18n
+.. function:: i18n(request)
 
 If this processor is enabled, every ``RequestContext`` will contain these
 variables:
@@ -713,7 +713,7 @@ If this processor is enabled, every ``RequestContext`` will contain a variable
 ``django.template.context_processors.static``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: static
+.. function:: static(request)
 
 If this processor is enabled, every ``RequestContext`` will contain a variable
 ``STATIC_URL``, providing the value of the :setting:`STATIC_URL` setting.
@@ -734,7 +734,7 @@ If this processor is enabled, every ``RequestContext`` will contain a variable
 ``django.template.context_processors.tz``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: tz
+.. function:: tz(request)
 
 If this processor is enabled, every ``RequestContext`` will contain a variable
 ``TIME_ZONE``, providing the name of the currently active time zone.
@@ -755,8 +755,17 @@ Writing your own context processors
 
 A context processor has a simple interface: It's a Python function that takes
 one argument, an :class:`~django.http.HttpRequest` object, and returns a
-dictionary that gets added to the template context. Each context processor
-*must* return a dictionary.
+dictionary that gets added to the template context.
+
+For example, to add the :setting:`DEFAULT_FROM_EMAIL` setting to every
+context::
+
+    from django.conf import settings
+
+    def from_email(request):
+        return {
+            "DEFAULT_FROM_EMAIL": settings.DEFAULT_FROM_EMAIL,
+        }
 
 Custom context processors can live anywhere in your code base. All Django
 cares about is that your custom context processors are pointed to by the
@@ -796,7 +805,7 @@ directories::
     ]
 
 Your templates can go anywhere you want, as long as the directories and
-templates are readable by the Web server. They can have any extension you want,
+templates are readable by the web server. They can have any extension you want,
 such as ``.html`` or ``.txt``, or they can have no extension at all.
 
 Note that these paths should use Unix-style forward slashes, even on Windows.

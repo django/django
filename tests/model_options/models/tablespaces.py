@@ -15,35 +15,39 @@ class ScientistRef(models.Model):
 class ArticleRef(models.Model):
     title = models.CharField(max_length=50, unique=True)
     code = models.CharField(max_length=50, unique=True)
-    authors = models.ManyToManyField(ScientistRef, related_name='articles_written_set')
-    reviewers = models.ManyToManyField(ScientistRef, related_name='articles_reviewed_set')
+    authors = models.ManyToManyField(ScientistRef, related_name="articles_written_set")
+    reviewers = models.ManyToManyField(
+        ScientistRef, related_name="articles_reviewed_set"
+    )
 
 
 class Scientist(models.Model):
     name = models.CharField(max_length=50)
 
     class Meta:
-        db_table = 'model_options_scientistref'
-        db_tablespace = 'tbl_tbsp'
+        db_table = "model_options_scientistref"
+        db_tablespace = "tbl_tbsp"
         managed = False
 
 
 class Article(models.Model):
     title = models.CharField(max_length=50, unique=True)
-    code = models.CharField(max_length=50, unique=True, db_tablespace='idx_tbsp')
-    authors = models.ManyToManyField(Scientist, related_name='articles_written_set')
-    reviewers = models.ManyToManyField(Scientist, related_name='articles_reviewed_set', db_tablespace='idx_tbsp')
+    code = models.CharField(max_length=50, unique=True, db_tablespace="idx_tbsp")
+    authors = models.ManyToManyField(Scientist, related_name="articles_written_set")
+    reviewers = models.ManyToManyField(
+        Scientist, related_name="articles_reviewed_set", db_tablespace="idx_tbsp"
+    )
 
     class Meta:
-        db_table = 'model_options_articleref'
-        db_tablespace = 'tbl_tbsp'
+        db_table = "model_options_articleref"
+        db_tablespace = "tbl_tbsp"
         managed = False
 
 
 # Also set the tables for automatically created models
 
-Authors = Article._meta.get_field('authors').remote_field.through
-Authors._meta.db_table = 'model_options_articleref_authors'
+Authors = Article._meta.get_field("authors").remote_field.through
+Authors._meta.db_table = "model_options_articleref_authors"
 
-Reviewers = Article._meta.get_field('reviewers').remote_field.through
-Reviewers._meta.db_table = 'model_options_articleref_reviewers'
+Reviewers = Article._meta.get_field("reviewers").remote_field.through
+Reviewers._meta.db_table = "model_options_articleref_reviewers"

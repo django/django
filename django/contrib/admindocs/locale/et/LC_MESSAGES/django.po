@@ -3,16 +3,17 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013,2015
-# Martin Pajuste <martinpajuste@gmail.com>, 2016
+# Martin <martinpajuste@gmail.com>, 2021
+# Martin <martinpajuste@gmail.com>, 2016
 # Marti Raudsepp <marti@juffo.org>, 2014
 # Ragnar Rebase <rrebase@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-12-28 01:40+0000\n"
-"Last-Translator: Ragnar Rebase <rrebase@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-11-22 11:26+0000\n"
+"Last-Translator: Martin <martinpajuste@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -104,7 +105,7 @@ msgstr "Palun paigaldage docutils"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
+"The admin documentation system requires Python’s <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
 "Administreerimise dokumentatsioon vajab Python'i <a href=\"%(link)s"

@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>, 2020
+# Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>, 2020-2021
 # Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-05-23 05:58+0000\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-27 14:11+0000\n"
 "Last-Translator: Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>\n"
 "Language-Team: Kyrgyz (http://www.transifex.com/django/django/language/ky/)\n"
 "MIME-Version: 1.0\n"
@@ -69,7 +69,7 @@ msgid ""
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Сырсөздөр кам түрүндө сакталбайт, мындан улам сиз аны эч качан көрө "
-"албайсыз. Бирок аны сиз <a href=\"{}\">бул формду</a>колдонуп өзгөртсөңүз "
+"албайсыз. Бирок аны сиз <a href=\"{}\">бул формду</a> колдонуп өзгөртсөңүз "
 "болот."
 
 #, python-format
@@ -132,6 +132,9 @@ msgstr "жумуш фактору"
 
 msgid "checksum"
 msgstr "текшерүү"
+
+msgid "block size"
+msgstr "блок өлчөмү"
 
 msgid "name"
 msgstr "аты"
@@ -226,17 +229,17 @@ msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
 msgstr[0] ""
-"Бул сырсөз өтө эле кыска. Ал өзүнө жок дегенде %(min_length)dсимвол камтышы "
+"Бул сырсөз өтө эле кыска. Ал өзүнө жок дегенде %(min_length)d символ камтышы "
 "керек."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] "Сиздин сырсөз  жок дегенде %(min_length)dсимвол камтышы керек."
+msgstr[0] "Сиздин сырсөз  жок дегенде %(min_length)d символ камтышы керек."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr "Сырсөз жана%(verbose_name)sөтө эле окшош."
+msgstr "Сырсөз жана %(verbose_name)s өтө эле окшош."
 
 msgid "Your password can’t be too similar to your other personal information."
 msgstr "Сиздин сырсөз башка жеке маалыматыңызга окшош болбоосу керек."

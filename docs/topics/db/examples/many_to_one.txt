@@ -185,7 +185,7 @@ Queries can go round in circles::
     >>> Reporter.objects.filter(article__reporter=r).distinct()
     <QuerySet [<Reporter: John Smith>]>
 
-If you delete a reporter, his articles will be deleted (assuming that the
+If you delete a reporter, their articles will be deleted (assuming that the
 ForeignKey was defined with :attr:`django.db.models.ForeignKey.on_delete` set to
 ``CASCADE``, which is the default)::
 

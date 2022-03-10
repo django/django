@@ -4,8 +4,13 @@ from django.contrib.gis.gdal.envelope import OGREnvelope
 from django.contrib.gis.gdal.libgdal import lgdal
 from django.contrib.gis.gdal.prototypes.errcheck import check_envelope
 from django.contrib.gis.gdal.prototypes.generation import (
-    const_string_output, double_output, geom_output, int_output, srs_output,
-    string_output, void_output,
+    const_string_output,
+    double_output,
+    geom_output,
+    int_output,
+    srs_output,
+    string_output,
+    void_output,
 )
 
 
@@ -34,8 +39,12 @@ def topology_func(f):
 
 # GeoJSON routines.
 from_json = geom_output(lgdal.OGR_G_CreateGeometryFromJson, [c_char_p])
-to_json = string_output(lgdal.OGR_G_ExportToJson, [c_void_p], str_result=True, decoding='ascii')
-to_kml = string_output(lgdal.OGR_G_ExportToKML, [c_void_p, c_char_p], str_result=True, decoding='ascii')
+to_json = string_output(
+    lgdal.OGR_G_ExportToJson, [c_void_p], str_result=True, decoding="ascii"
+)
+to_kml = string_output(
+    lgdal.OGR_G_ExportToKML, [c_void_p, c_char_p], str_result=True, decoding="ascii"
+)
 
 # GetX, GetY, GetZ all return doubles.
 getx = pnt_func(lgdal.OGR_G_GetX)
@@ -43,8 +52,14 @@ gety = pnt_func(lgdal.OGR_G_GetY)
 getz = pnt_func(lgdal.OGR_G_GetZ)
 
 # Geometry creation routines.
-from_wkb = geom_output(lgdal.OGR_G_CreateFromWkb, [c_char_p, c_void_p, POINTER(c_void_p), c_int], offset=-2)
-from_wkt = geom_output(lgdal.OGR_G_CreateFromWkt, [POINTER(c_char_p), c_void_p, POINTER(c_void_p)], offset=-1)
+from_wkb = geom_output(
+    lgdal.OGR_G_CreateFromWkb, [c_char_p, c_void_p, POINTER(c_void_p), c_int], offset=-2
+)
+from_wkt = geom_output(
+    lgdal.OGR_G_CreateFromWkt,
+    [POINTER(c_char_p), c_void_p, POINTER(c_void_p)],
+    offset=-1,
+)
 from_gml = geom_output(lgdal.OGR_G_CreateFromGML, [c_char_p])
 create_geom = geom_output(lgdal.OGR_G_CreateGeometry, [c_int])
 clone_geom = geom_output(lgdal.OGR_G_Clone, [c_void_p])
@@ -64,13 +79,21 @@ import_wkt = void_output(lgdal.OGR_G_ImportFromWkt, [c_void_p, POINTER(c_char_p)
 destroy_geom = void_output(lgdal.OGR_G_DestroyGeometry, [c_void_p], errcheck=False)
 
 # Geometry export routines.
-to_wkb = void_output(lgdal.OGR_G_ExportToWkb, None, errcheck=True)  # special handling for WKB.
-to_wkt = string_output(lgdal.OGR_G_ExportToWkt, [c_void_p, POINTER(c_char_p)], decoding='ascii')
-to_gml = string_output(lgdal.OGR_G_ExportToGML, [c_void_p], str_result=True, decoding='ascii')
+to_wkb = void_output(
+    lgdal.OGR_G_ExportToWkb, None, errcheck=True
+)  # special handling for WKB.
+to_wkt = string_output(
+    lgdal.OGR_G_ExportToWkt, [c_void_p, POINTER(c_char_p)], decoding="ascii"
+)
+to_gml = string_output(
+    lgdal.OGR_G_ExportToGML, [c_void_p], str_result=True, decoding="ascii"
+)
 get_wkbsize = int_output(lgdal.OGR_G_WkbSize, [c_void_p])
 
 # Geometry spatial-reference related routines.
-assign_srs = void_output(lgdal.OGR_G_AssignSpatialReference, [c_void_p, c_void_p], errcheck=False)
+assign_srs = void_output(
+    lgdal.OGR_G_AssignSpatialReference, [c_void_p, c_void_p], errcheck=False
+)
 get_geom_srs = srs_output(lgdal.OGR_G_GetSpatialReference, [c_void_p])
 
 # Geometry properties
@@ -78,16 +101,23 @@ get_area = double_output(lgdal.OGR_G_GetArea, [c_void_p])
 get_centroid = void_output(lgdal.OGR_G_Centroid, [c_void_p, c_void_p])
 get_dims = int_output(lgdal.OGR_G_GetDimension, [c_void_p])
 get_coord_dim = int_output(lgdal.OGR_G_GetCoordinateDimension, [c_void_p])
-set_coord_dim = void_output(lgdal.OGR_G_SetCoordinateDimension, [c_void_p, c_int], errcheck=False)
-is_empty = int_output(lgdal.OGR_G_IsEmpty, [c_void_p], errcheck=lambda result, func, cargs: bool(result))
+set_coord_dim = void_output(
+    lgdal.OGR_G_SetCoordinateDimension, [c_void_p, c_int], errcheck=False
+)
+is_empty = int_output(
+    lgdal.OGR_G_IsEmpty, [c_void_p], errcheck=lambda result, func, cargs: bool(result)
+)
 
 get_geom_count = int_output(lgdal.OGR_G_GetGeometryCount, [c_void_p])
-get_geom_name = const_string_output(lgdal.OGR_G_GetGeometryName, [c_void_p], decoding='ascii')
+get_geom_name = const_string_output(
+    lgdal.OGR_G_GetGeometryName, [c_void_p], decoding="ascii"
+)
 get_geom_type = int_output(lgdal.OGR_G_GetGeometryType, [c_void_p])
 get_point_count = int_output(lgdal.OGR_G_GetPointCount, [c_void_p])
 get_point = void_output(
     lgdal.OGR_G_GetPoint,
-    [c_void_p, c_int, POINTER(c_double), POINTER(c_double), POINTER(c_double)], errcheck=False
+    [c_void_p, c_int, POINTER(c_double), POINTER(c_double), POINTER(c_double)],
+    errcheck=False,
 )
 geom_close_rings = void_output(lgdal.OGR_G_CloseRings, [c_void_p], errcheck=False)
 

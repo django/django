@@ -60,11 +60,11 @@ sure you've configured your cache; see the :doc:`cache documentation
 
 .. warning::
 
-    You should only use cache-based sessions if you're using the Memcached
-    cache backend. The local-memory cache backend doesn't retain data long
-    enough to be a good choice, and it'll be faster to use file or database
-    sessions directly instead of sending everything through the file or
-    database cache backends. Additionally, the local-memory cache backend is
+    You should only use cache-based sessions if you're using the Memcached or
+    Redis cache backend. The local-memory cache backend doesn't retain data
+    long enough to be a good choice, and it'll be faster to use file or
+    database sessions directly instead of sending everything through the file
+    or database cache backends. Additionally, the local-memory cache backend is
     NOT multi-process safe, therefore probably not a good choice for production
     environments.
 
@@ -103,7 +103,7 @@ To use file-based sessions, set the :setting:`SESSION_ENGINE` setting to
 
 You might also want to set the :setting:`SESSION_FILE_PATH` setting (which
 defaults to output from ``tempfile.gettempdir()``, most likely ``/tmp``) to
-control where Django stores session files. Be sure to check that your Web
+control where Django stores session files. Be sure to check that your web
 server has permissions to read and write to this location.
 
 .. _cookie-session-backend:
@@ -123,13 +123,15 @@ and the :setting:`SECRET_KEY` setting.
 
 .. warning::
 
-    **If the SECRET_KEY is not kept secret and you are using the**
-    :class:`~django.contrib.sessions.serializers.PickleSerializer`, **this can
-    lead to arbitrary remote code execution.**
+    **If the ``SECRET_KEY`` or ``SECRET_KEY_FALLBACKS`` are not kept secret and
+    you are using the**
+    ``django.contrib.sessions.serializers.PickleSerializer``, **this can lead
+    to arbitrary remote code execution.**
 
-    An attacker in possession of the :setting:`SECRET_KEY` can not only
-    generate falsified session data, which your site will trust, but also
-    remotely execute arbitrary code, as the data is serialized using pickle.
+    An attacker in possession of the :setting:`SECRET_KEY` or
+    :setting:`SECRET_KEY_FALLBACKS` can not only generate falsified session
+    data, which your site will trust, but also remotely execute arbitrary code,
+    as the data is serialized using pickle.
 
     If you use cookie-based sessions, pay extra care that your secret key is
     always kept completely secret, for any system which might be remotely
@@ -164,10 +166,9 @@ and the :setting:`SECRET_KEY` setting.
 
     **Performance**
 
-    Finally, the size of a cookie can have an impact on the `speed of your site`_.
+    Finally, the size of a cookie can have an impact on the speed of your site.
 
 .. _`replay attacks`: https://en.wikipedia.org/wiki/Replay_attack
-.. _`speed of your site`: https://yuiblog.com/blog/2007/03/01/performance-research-part-3/
 
 Using sessions in views
 =======================
@@ -259,13 +260,11 @@ You can edit it multiple times.
         ``request.session.set_expiry(300)`` would make the session expire
         in 5 minutes.
 
-      * If ``value`` is a ``datetime`` or ``timedelta`` object, the
-        session will expire at that specific date/time. Note that ``datetime``
-        and ``timedelta`` values are only serializable if you are using the
-        :class:`~django.contrib.sessions.serializers.PickleSerializer`.
+      * If ``value`` is a ``datetime`` or ``timedelta`` object, the session
+        will expire at that specific date/time.
 
       * If ``value`` is ``0``, the user's session cookie will expire
-        when the user's Web browser is closed.
+        when the user's web browser is closed.
 
       * If ``value`` is ``None``, the session reverts to using the global
         session expiry policy.
@@ -300,7 +299,7 @@ You can edit it multiple times.
     .. method:: get_expire_at_browser_close()
 
       Returns either ``True`` or ``False``, depending on whether the user's
-      session cookie will expire when the user's Web browser is closed.
+      session cookie will expire when the user's web browser is closed.
 
     .. method:: clear_expired()
 
@@ -326,11 +325,12 @@ cookie backend*.
 
 For example, here's an attack scenario if you use :mod:`pickle` to serialize
 session data. If you're using the :ref:`signed cookie session backend
-<cookie-session-backend>` and :setting:`SECRET_KEY` is known by an attacker
-(there isn't an inherent vulnerability in Django that would cause it to leak),
-the attacker could insert a string into their session which, when unpickled,
-executes arbitrary code on the server. The technique for doing so is simple and
-easily available on the internet. Although the cookie session storage signs the
+<cookie-session-backend>` and :setting:`SECRET_KEY` (or any key of
+:setting:`SECRET_KEY_FALLBACKS`) is known by an attacker (there isn't an
+inherent vulnerability in Django that would cause it to leak), the attacker
+could insert a string into their session which, when unpickled, executes
+arbitrary code on the server. The technique for doing so is simple and easily
+available on the internet. Although the cookie session storage signs the
 cookie-stored data to prevent tampering, a :setting:`SECRET_KEY` leak
 immediately escalates to a remote code execution vulnerability.
 
@@ -362,22 +362,26 @@ Bundled serializers
 .. class:: serializers.PickleSerializer
 
     Supports arbitrary Python objects, but, as described above, can lead to a
-    remote code execution vulnerability if :setting:`SECRET_KEY` becomes known
-    by an attacker.
+    remote code execution vulnerability if :setting:`SECRET_KEY` or any key of
+    :setting:`SECRET_KEY_FALLBACKS` becomes known by an attacker.
+
+    .. deprecated:: 4.1
+
+        Due to the risk of remote code execution, this serializer is deprecated
+        and will be removed in Django 5.0.
 
 .. _custom-serializers:
 
 Write your own serializer
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Note that unlike :class:`~django.contrib.sessions.serializers.PickleSerializer`,
-the :class:`~django.contrib.sessions.serializers.JSONSerializer` cannot handle
-arbitrary Python data types. As is often the case, there is a trade-off between
-convenience and security. If you wish to store more advanced data types
-including ``datetime`` and ``Decimal`` in JSON backed sessions, you will need
-to write a custom serializer (or convert such values to a JSON serializable
-object before storing them in ``request.session``). While serializing these
-values is often straightforward
+Note that the :class:`~django.contrib.sessions.serializers.JSONSerializer`
+cannot handle arbitrary Python data types. As is often the case, there is a
+trade-off between convenience and security. If you wish to store more advanced
+data types including ``datetime`` and ``Decimal`` in JSON backed sessions, you
+will need to write a custom serializer (or convert such values to a JSON
+serializable object before storing them in ``request.session``). While
+serializing these values is often straightforward
 (:class:`~django.core.serializers.json.DjangoJSONEncoder` may be helpful),
 writing a decoder that can reliably get back the same thing that you put in is
 more fragile. For example, you run the risk of returning a ``datetime`` that
@@ -418,7 +422,7 @@ This simplistic view logs in a "member" of the site::
 
     def login(request):
         m = Member.objects.get(username=request.POST['username'])
-        if m.password == request.POST['password']:
+        if m.check_password(request.POST['password']):
             request.session['member_id'] = m.id
             return HttpResponse("You're logged in.")
         else:
@@ -667,10 +671,7 @@ Technical details
 =================
 
 * The session dictionary accepts any :mod:`json` serializable value when using
-  :class:`~django.contrib.sessions.serializers.JSONSerializer` or any
-  picklable Python object when using
-  :class:`~django.contrib.sessions.serializers.PickleSerializer`. See the
-  :mod:`pickle` module for more information.
+  :class:`~django.contrib.sessions.serializers.JSONSerializer`.
 
 * Session data is stored in a database table named ``django_session`` .
 

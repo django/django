@@ -35,10 +35,12 @@ option.
     not raise ``ValidationError``\s. Rather you'll get a database integrity
     error on ``save()``. ``UniqueConstraint``\s without a
     :attr:`~UniqueConstraint.condition` (i.e. non-partial unique constraints)
-    are different in this regard, in that they leverage the existing
-    ``validate_unique()`` logic, and thus enable two-stage validation. In
-    addition to ``IntegrityError`` on ``save()``, ``ValidationError`` is also
-    raised during model validation when the ``UniqueConstraint`` is violated.
+    and :attr:`~UniqueConstraint.expressions` (i.e. non-functional unique
+    constraints) are different in this regard, in that they leverage the
+    existing ``validate_unique()`` logic, and thus enable two-stage validation.
+    In addition to ``IntegrityError`` on ``save()``, ``ValidationError`` is
+    also raised during model validation when the ``UniqueConstraint`` is
+    violated.
 
 ``CheckConstraint``
 ===================
@@ -58,10 +60,6 @@ specifies the check you want the constraint to enforce.
 For example, ``CheckConstraint(check=Q(age__gte=18), name='age_gte_18')``
 ensures the age field is never less than 18.
 
-.. versionchanged:: 3.1
-
-    Support for boolean :class:`~django.db.models.Expression` was added.
-
 ``name``
 --------
 
@@ -73,9 +71,29 @@ constraint.
 ``UniqueConstraint``
 ====================
 
-.. class:: UniqueConstraint(*, fields, name, condition=None, deferrable=None, include=None, opclasses=())
+.. class:: UniqueConstraint(*expressions, fields=(), name=None, condition=None, deferrable=None, include=None, opclasses=())
 
     Creates a unique constraint in the database.
+
+``expressions``
+---------------
+
+.. attribute:: UniqueConstraint.expressions
+
+.. versionadded:: 4.0
+
+Positional argument ``*expressions`` allows creating functional unique
+constraints on expressions and database functions.
+
+For example::
+
+    UniqueConstraint(Lower('name').desc(), 'category', name='unique_lower_name_category')
+
+creates a unique constraint on the lowercased value of the ``name`` field in
+descending order and the ``category`` field in the default ascending order.
+
+Functional unique constraints have the same database restrictions as
+:attr:`Index.expressions`.
 
 ``fields``
 ----------
@@ -119,8 +137,6 @@ These conditions have the same database restrictions as
 
 .. attribute:: UniqueConstraint.deferrable
 
-.. versionadded:: 3.1
-
 Set this parameter to create a deferrable unique constraint. Accepted values
 are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example::
 
@@ -151,8 +167,6 @@ enforced immediately after every command.
 
 .. attribute:: UniqueConstraint.include
 
-.. versionadded:: 3.2
-
 A list or tuple of the names of the fields to be included in the covering
 unique index as non-key columns. This allows index-only scans to be used for
 queries that select only included fields (:attr:`~UniqueConstraint.include`)
@@ -174,8 +188,6 @@ Non-key columns have the same database restrictions as :attr:`Index.include`.
 -------------
 
 .. attribute:: UniqueConstraint.opclasses
-
-.. versionadded:: 3.2
 
 The names of the `PostgreSQL operator classes
 <https://www.postgresql.org/docs/current/indexes-opclass.html>`_ to use for

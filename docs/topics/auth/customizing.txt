@@ -64,7 +64,7 @@ That's the basic authentication backend that checks the Django users database
 and queries the built-in permissions. It does not provide protection against
 brute force attacks via any rate limiting mechanism. You may either implement
 your own rate limiting mechanism in a custom auth backend, or use the
-mechanisms provided by most Web servers.
+mechanisms provided by most web servers.
 
 The order of :setting:`AUTHENTICATION_BACKENDS` matters, so if the same
 username and password is valid in multiple backends, Django will stop
@@ -382,9 +382,9 @@ the :setting:`AUTH_USER_MODEL` setting that references a custom model::
 
      AUTH_USER_MODEL = 'myapp.MyUser'
 
-This dotted pair describes the name of the Django app (which must be in your
-:setting:`INSTALLED_APPS`), and the name of the Django model that you wish to
-use as your user model.
+This dotted pair describes the :attr:`~django.apps.AppConfig.label` of the
+Django app (which must be in your :setting:`INSTALLED_APPS`), and the name of
+the Django model that you wish to use as your user model.
 
 Using a custom user model when starting a project
 -------------------------------------------------
@@ -504,8 +504,8 @@ different user model.
         from django.dispatch import receiver
 
         @receiver(setting_changed)
-        def user_model_swapped(**kwargs):
-            if kwargs['setting'] == 'AUTH_USER_MODEL':
+        def user_model_swapped(*, setting, **kwargs):
+            if setting == 'AUTH_USER_MODEL':
                 apps.clear_cache()
                 from myapp import some_module
                 some_module.UserModel = get_user_model()
@@ -704,10 +704,6 @@ The following attributes and methods are available on any subclass of
 
         Returns an HMAC of the password field. Used for
         :ref:`session-invalidation-on-password-change`.
-
-        .. versionchanged:: 3.1
-
-            The hashing algorithm was changed to the SHA-256.
 
 :class:`~models.AbstractUser` subclasses :class:`~models.AbstractBaseUser`:
 
@@ -1129,19 +1125,13 @@ code would be required in the app's ``admin.py`` file::
     class UserChangeForm(forms.ModelForm):
         """A form for updating users. Includes all the fields on
         the user, but replaces the password field with admin's
-        password hash display field.
+        disabled password hash display field.
         """
         password = ReadOnlyPasswordHashField()
 
         class Meta:
             model = MyUser
             fields = ('email', 'password', 'date_of_birth', 'is_active', 'is_admin')
-
-        def clean_password(self):
-            # Regardless of what the user provides, return the initial value.
-            # This is done here, rather than on the field, because the
-            # field does not have access to the initial value
-            return self.initial["password"]
 
 
     class UserAdmin(BaseUserAdmin):

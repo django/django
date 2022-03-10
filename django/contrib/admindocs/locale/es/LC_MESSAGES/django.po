@@ -4,19 +4,20 @@
 # Antoni Aloy <aaloy@apsl.net>, 2012-2013
 # Claude Paroz <claude@2xlibre.net>, 2014
 # Eduardo <edos21@gmail.com>, 2017
-# Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015
+# e4db27214f7e7544f2022c647b585925_bb0e321, 2015
 # Herty Nava <translation@bolmedia.ca>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # José Luis <alagunajs@gmail.com>, 2016
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
+# Uriel Medina <urimeba511@gmail.com>, 2020-2021
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Eduardo <edos21@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-02-11 05:39+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -26,7 +27,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Administrative Documentation"
-msgstr "Documentacion Administrativa"
+msgstr "Documentación Administrativa"
 
 msgid "Home"
 msgstr "Inicio"
@@ -47,7 +48,7 @@ msgid ""
 msgstr ""
 "Para instalar bookmarklets, arrastre el enlace a su barra de favoritos, o "
 "pulse con el botón derecho el enlace y añádalo a sus favoritos. Ahora puede "
-"escoger el bookmarklet desde cualquier página del sitio. "
+"seleccionar el bookmarklet desde cualquier página del sitio. "
 
 msgid "Documentation for this page"
 msgstr "Documentación para esta página"
@@ -56,7 +57,7 @@ msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
-"Lleva desde cualquier página a la documentación de la vista que la genera."
+"Lo lleva desde cualquier página a la documentación de la vista que la genera."
 
 msgid "Tags"
 msgstr "Etiquetas"
@@ -71,7 +72,7 @@ msgid ""
 "Filters are actions which can be applied to variables in a template to alter "
 "the output."
 msgstr ""
-"Los filtros son accciones se pueden aplicar a variables en una plantilla "
+"Los filtros son acciones que se pueden aplicar a variables en una plantilla "
 "para alterar el resultado."
 
 msgid "Models"
@@ -83,7 +84,7 @@ msgid ""
 "template variables"
 msgstr ""
 "Los modelos son descripciones de todos los objetos en el sistema y sus "
-"campos asociados.  Cada modelo tienen una lista de campos a los que se puede "
+"campos asociados. Cada modelo tienen una lista de campos a los que se puede "
 "acceder como variables de plantilla"
 
 msgid "Views"
@@ -95,30 +96,30 @@ msgid ""
 "that template."
 msgstr ""
 "Cada página en el sitio público se genera a través de una vista.  La vista "
-"define qué plantilla se usa para generar la página y qué objetos están "
+"define que plantilla se usa para generar la página y que objetos están "
 "disponibles para esa plantilla."
 
 msgid "Tools for your browser to quickly access admin functionality."
 msgstr ""
-"Herramientas para tu navegador para acceder a funciones de administración "
+"Herramientas para el navegador para acceder a funciones de administración "
 "rápidamente."
 
 msgid "Please install docutils"
-msgstr "Por favor instale docutils"
+msgstr "Por favor, instale docutils"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
+"The admin documentation system requires Python’s <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
-"El sistema de documentación de la administración require la biblioteca <a "
-"href=\"%(link)s\">docutils</a> de Python."
+"El sistema de documentación del administrador requiere la librería de Python "
+"<a href=\"%(link)s\">docutils</a>."
 
 #, python-format
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
 msgstr ""
-"Por favor pida al administrador que instale <a href=\"%(link)s\">docutils</"
+"Por favor, pida al administrador que instale <a href=\"%(link)s\">docutils</"
 "a>."
 
 #, python-format
@@ -147,10 +148,10 @@ msgid "Arguments"
 msgstr "Argumentos"
 
 msgid "Back to Model documentation"
-msgstr "Volver a la documentación del modelo"
+msgstr "Volver a la documentación de modelos"
 
 msgid "Model documentation"
-msgstr "Documentación del modelo"
+msgstr "Documentación de modelos"
 
 msgid "Model groups"
 msgstr "Grupo de modelos"
@@ -163,13 +164,13 @@ msgid "Template: %(name)s"
 msgstr "Plantilla: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Plantilla: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr "Plantilla: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "Buscar ruta para ejemplo \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "Buscar ruta de la plantilla <q>%(name)s</q>:"
 
 msgid "(does not exist)"
 msgstr "(no existe)"
@@ -222,10 +223,10 @@ msgid "Templates:"
 msgstr "Plantillas:"
 
 msgid "Back to View documentation"
-msgstr "Volver a la documentación de la vista"
+msgstr "Volver a la documentación de vistas"
 
 msgid "View documentation"
-msgstr "Ver la documentación"
+msgstr "Documentación de vistas"
 
 msgid "Jump to namespace"
 msgstr "Ir al espacio de nombres"
@@ -247,7 +248,7 @@ msgid ""
 "code>.\n"
 msgstr ""
 "\n"
-"Visualizar funcion: <code>%(full_name)s</code>. Nombre: <code>%(url_name)s</"
+"Visualizar función: <code>%(full_name)s</code>. Nombre: <code>%(url_name)s</"
 "code>.\n"
 
 msgid "tag:"
@@ -261,7 +262,7 @@ msgstr "vista:"
 
 #, python-format
 msgid "App %(app_label)r not found"
-msgstr "App %(app_label)r no encontrado"
+msgstr "Aplicación %(app_label)r no encontrada"
 
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"

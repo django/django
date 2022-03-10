@@ -61,7 +61,7 @@ To get started contributing, you'll want to read the :ref:`reStructuredText
 reference <sphinx:rst-index>`.
 
 Your locally-built documentation will be themed differently than the
-documentation at `docs.djangoproject.com <https://docs.djangoproject.com>`_.
+documentation at `docs.djangoproject.com <https://docs.djangoproject.com/>`_.
 This is OK! If your changes look good on your local machine, they'll look good
 on the website.
 
@@ -80,7 +80,7 @@ The documentation is organized into several categories:
   understands what we're trying to achieve. Don't feel that you need to begin
   with explanations of how things work - what matters is what the reader does,
   not what you explain. It can be helpful to refer back to what you've done and
-  explain afterwards.
+  explain afterward.
 
 * :doc:`Topic guides </topics/index>` aim to explain a concept or subject at a
   fairly high level.
@@ -146,6 +146,9 @@ documentation:
 
 * **email** -- no hyphen.
 
+* **HTTP** -- the expected pronunciation is "Aitch Tee Tee Pee" and therefore
+  should be preceded by "an" and not "a".
+
 * **MySQL**, **PostgreSQL**, **SQLite**
 
 * **SQL** -- when referring to SQL, the expected pronunciation should be
@@ -160,8 +163,7 @@ documentation:
 * **subclass** -- it's a single word without a hyphen, both as a verb
   ("subclass that model") and as a noun ("create a subclass").
 
-* **Web**, **World Wide Web**, **the Web** -- note Web is always
-  capitalized when referring to the World Wide Web.
+* **the web**, **web framework** -- it's not capitalized.
 
 * **website** -- use one word, without capitalization.
 
@@ -414,7 +416,7 @@ AdvanceCOMP's ``advpng``:
    $ advpng -z4 `find . -type f -not -path "./_build/*" -name "*.png"`
 
 This is based on OptiPNG version 0.7.5. Older versions may complain about the
-``--strip all`` option being lossy.
+``-strip all`` option being lossy.
 
 An example
 ==========
@@ -509,6 +511,28 @@ one of the following:
 * Find synonyms that the spell checker recognizes.
 * If, and only if, you are sure the word you are using is correct - add it
   to ``docs/spelling_wordlist`` (please keep the list in alphabetical order).
+
+.. _documentation-link-check:
+
+Link check
+==========
+
+Links in documentation can become broken or changed such that they are no
+longer the canonical link. Sphinx provides a builder that can check whether the
+links in the documentation are working. From the ``docs`` directory, run ``make
+linkcheck``. Output is printed to the terminal, but can also be found in
+``_build/linkcheck/output.txt`` and ``_build/linkcheck/output.json``.
+
+Entries that have a status of "working" are fine, those that are "unchecked" or
+"ignored" have been skipped because they either cannot be checked or have
+matched ignore rules in the configuration.
+
+Entries that have a status of "broken" need to be fixed. Those that have a
+status of "redirected" may need to be updated to point to the canonical
+location, e.g. the scheme has changed ``http://`` → ``https://``. In certain
+cases, we do not want to update a "redirected" link, e.g. a rewrite to always
+point to the latest or stable version of documentation, e.g. ``/en/stable/`` →
+``/en/3.2/``.
 
 Translating documentation
 =========================

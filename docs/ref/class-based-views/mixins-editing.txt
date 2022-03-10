@@ -51,7 +51,7 @@ The following mixins are used to construct Django's editing views:
     .. method:: get_form_class()
 
         Retrieve the form class to instantiate. By default
-        :attr:`.form_class`.
+        :attr:`~django.views.generic.edit.FormMixin.form_class`.
 
     .. method:: get_form(form_class=None)
 
@@ -218,7 +218,7 @@ The following mixins are used to construct Django's editing views:
 
 .. class:: django.views.generic.edit.DeletionMixin
 
-    Enables handling of the ``DELETE`` http action.
+    Enables handling of the ``DELETE`` HTTP action.
 
     **Methods and Attributes**
 

@@ -14,13 +14,16 @@ def vary_on_headers(*headers):
 
     Note that the header names are not case-sensitive.
     """
+
     def decorator(func):
         @wraps(func)
         def inner_func(*args, **kwargs):
             response = func(*args, **kwargs)
             patch_vary_headers(response, headers)
             return response
+
         return inner_func
+
     return decorator
 
 
@@ -33,9 +36,11 @@ def vary_on_cookie(func):
         def index(request):
             ...
     """
+
     @wraps(func)
     def inner_func(*args, **kwargs):
         response = func(*args, **kwargs)
-        patch_vary_headers(response, ('Cookie',))
+        patch_vary_headers(response, ("Cookie",))
         return response
+
     return inner_func

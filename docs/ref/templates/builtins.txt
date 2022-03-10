@@ -194,7 +194,13 @@ from its first value when it's next encountered.
 ---------
 
 Outputs a whole load of debugging information, including the current context
-and imported modules.
+and imported modules. ``{% debug %}`` outputs nothing when the :setting:`DEBUG`
+setting is ``False``.
+
+.. versionchanged:: 2.2.27
+
+    In older versions, debugging information was displayed when the
+    :setting:`DEBUG` setting was ``False``.
 
 .. templatetag:: extends
 
@@ -608,15 +614,6 @@ you should use::
 
     {% if a > b and b > c %}
 
-``ifequal`` and ``ifnotequal``
-------------------------------
-
-.. deprecated:: 3.1
-
-``{% ifequal a b %} ... {% endifequal %}`` is an obsolete way to write
-``{% if a == b %} ... {% endif %}``. Likewise, ``{% ifnotequal a b %} ...
-{% endifnotequal %}`` is superseded by ``{% if a != b %} ... {% endif %}``.
-
 .. templatetag:: ifchanged
 
 ``ifchanged``
@@ -728,10 +725,6 @@ available to the included template::
     that includes blocks from another will contain blocks that have *already
     been evaluated and rendered* - not blocks that can be overridden by, for
     example, an extending template.
-
-.. versionchanged:: 3.1
-
-    Support for iterables of template names was added.
 
 .. templatetag:: load
 
@@ -1067,8 +1060,9 @@ this example, the space around ``Hello`` won't be stripped::
 
 Outputs one of the syntax characters used to compose template tags.
 
-Since the template system has no concept of "escaping", to display one of the
-bits used in template tags, you must use the ``{% templatetag %}`` tag.
+The template system has no concept of "escaping" individual characters.
+However, you can use the ``{% templatetag %}`` tag to display one of the
+template tag character combinations.
 
 The argument tells which template bit to output:
 
@@ -1087,7 +1081,10 @@ Argument            Outputs
 
 Sample usage::
 
-    {% templatetag openblock %} url 'entry_list' {% templatetag closeblock %}
+    The {% templatetag openblock %} characters open a block.
+
+See also the :ttag:`verbatim` tag for another way of including these
+characters.
 
 .. templatetag:: url
 
@@ -1337,8 +1334,9 @@ If ``value`` is ``"String with spaces"``, the output will be
 
 Formats a date according to the given format.
 
-Uses a similar format as PHP's ``date()`` function (https://php.net/date)
-with some differences.
+Uses a similar format to PHP's `date()
+<https://www.php.net/manual/en/function.date.php>`_ function with some
+differences.
 
 .. note::
     These format characters are not used in Django outside of templates. They
@@ -1379,8 +1377,8 @@ Format character  Description                               Example output
                   style. Proprietary extension.
 ``t``             Number of days in the given month.        ``28`` to ``31``
 **Year**
-``y``             Year, 2 digits.                           ``'99'``
-``Y``             Year, 4 digits.                           ``'1999'``
+``y``             Year, 2 digits with leading zeros.        ``'00'`` to ``'99'``
+``Y``             Year, 4 digits with leading zeros.        ``'0001'``, ..., ``'1999'``, ..., ``'9999'``
 ``L``             Boolean for whether it's a leap year.     ``True`` or ``False``
 ``o``             ISO-8601 week-numbering year,             ``'1999'``
                   corresponding to the ISO-8601 week
@@ -1413,8 +1411,8 @@ Format character  Description                               Example output
 ``e``             Timezone name. Could be in any format,
                   or might return an empty string,          ``''``, ``'GMT'``, ``'-500'``, ``'US/Eastern'``, etc.
                   depending on the datetime.
-``I``             Daylight Savings Time, whether it's       ``'1'`` or ``'0'``
-                  in effect or not.
+``I``             Daylight saving time, whether it's in     ``'1'`` or ``'0'``
+                  effect or not.
 ``O``             Difference to Greenwich time in hours.    ``'+0200'``
 ``T``             Time zone of this machine.                ``'EST'``, ``'MDT'``
 ``Z``             Time zone offset in seconds. The          ``-43200`` to ``43200``
@@ -1422,7 +1420,7 @@ Format character  Description                               Example output
                   always negative, and for those east of
                   UTC is always positive.
 **Date/Time**
-``c``             ISO 8601 format. (Note: unlike others     ``2008-01-02T10:30:00.000123+02:00``,
+``c``             ISO 8601 format. (Note: unlike other      ``2008-01-02T10:30:00.000123+02:00``,
                   formatters, such as "Z", "O" or "r",      or ``2008-01-02T10:30:00.000123`` if the datetime is naive
                   the "c" formatter will not add timezone
                   offset if value is a naive datetime
@@ -1585,6 +1583,13 @@ produce empty output::
 
     {{ values|dictsort:"0" }}
 
+Ordering by elements at specified index is not supported on dictionaries.
+
+.. versionchanged:: 2.2.26
+
+    In older versions, ordering elements at specified index was supported on
+    dictionaries.
+
 .. templatefilter:: dictsortreversed
 
 ``dictsortreversed``
@@ -1732,13 +1737,39 @@ displayed. For example:
 ``34.26000``  ``{{ value|floatformat:"-3" }}``  ``34.260``
 ============  ================================  ==========
 
+If the argument passed to ``floatformat`` has the ``g`` suffix, it will force
+grouping by the :setting:`THOUSAND_SEPARATOR` for the active locale. For
+example, when the active locale is ``en`` (English):
+
+============ ================================= =============
+``value``    Template                          Output
+============ ================================= =============
+``34232.34`` ``{{ value|floatformat:"2g" }}``  ``34,232.34``
+``34232.06`` ``{{ value|floatformat:"g" }}``   ``34,232.1``
+``34232.00`` ``{{ value|floatformat:"-3g" }}`` ``34,232``
+============ ================================= =============
+
+Output is always localized (independently of the :ttag:`{% localize off %}
+<localize>` tag) unless the argument passed to ``floatformat`` has the ``u``
+suffix, which will force disabling localization. For example, when the active
+locale is ``pl`` (Polish):
+
+============ ================================= =============
+``value``    Template                          Output
+============ ================================= =============
+``34.23234`` ``{{ value|floatformat:"3" }}``   ``34,232``
+``34.23234`` ``{{ value|floatformat:"3u" }}``  ``34.232``
+============ ================================= =============
+
 Using ``floatformat`` with no argument is equivalent to using ``floatformat``
 with an argument of ``-1``.
 
-.. versionchanged:: 3.1
+.. versionchanged:: 4.0
 
-    In older versions, a negative zero ``-0`` was returned for negative numbers
-    which round to zero.
+    ``floatformat`` template filter no longer depends on the
+    :setting:`USE_L10N` setting and always returns localized output.
+
+    The ``u`` suffix to force disabling localization was added.
 
 .. templatefilter:: force_escape
 
@@ -1814,7 +1845,7 @@ If ``value`` is the list ``['a', 'b', 'c']``, the output will be the string
 Safely outputs a Python object as JSON, wrapped in a ``<script>`` tag, ready
 for use with JavaScript.
 
-**Argument:** HTML "id" of the ``<script>`` tag.
+**Argument:** The optional HTML "id" of the ``<script>`` tag.
 
 For example::
 
@@ -1842,6 +1873,10 @@ example if ``value`` is ``{'hello': 'world</script>&amp;'}``, the output is:
 This is compatible with a strict Content Security Policy that prohibits in-page
 script execution. It also maintains a clean separation between passive data and
 executable code.
+
+.. versionchanged:: 4.1
+
+    In older versions, the HTML "id" was a required argument.
 
 .. templatefilter:: last
 
@@ -2108,8 +2143,8 @@ individual elements of the sequence.
 Returns a slice of the list.
 
 Uses the same syntax as Python's list slicing. See
-https://www.diveinto.org/python3/native-datatypes.html#slicinglists
-for an introduction.
+https://diveinto.org/python3/native-datatypes.html#slicinglists for an
+introduction.
 
 Example::
 
@@ -2194,7 +2229,7 @@ Note that you can backslash-escape a format string if you want to use the
 otherwise each is a format string that displays the hour and the month,
 respectively::
 
-    {% value|time:"H\h i\m" %}
+    {{ value|time:"H\h i\m" }}
 
 This would display as "01h 23m".
 
@@ -2362,7 +2397,7 @@ Newlines in the HTML content will be preserved.
 ------------------
 
 Recursively takes a self-nested list and returns an HTML unordered list --
-WITHOUT opening and closing <ul> tags.
+WITHOUT opening and closing ``<ul>`` tags.
 
 The list is assumed to be in the proper format. For example, if ``var``
 contains ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``, then
@@ -2602,13 +2637,13 @@ app is installed, the tag will serve files using ``url()`` method of the
 storage specified by :setting:`STATICFILES_STORAGE`. For example::
 
     {% load static %}
-    <img src="{% static "images/hi.jpg" %}" alt="Hi!">
+    <img src="{% static 'images/hi.jpg' %}" alt="Hi!">
 
 It is also able to consume standard context variables, e.g. assuming a
 ``user_stylesheet`` variable is passed to the template::
 
     {% load static %}
-    <link rel="stylesheet" href="{% static user_stylesheet %}" type="text/css" media="screen">
+    <link rel="stylesheet" href="{% static user_stylesheet %}" media="screen">
 
 If you'd like to retrieve a static URL without displaying it, you can use a
 slightly different call::

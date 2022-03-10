@@ -5,13 +5,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Shinya Okano <tokibito@gmail.com>, 2013-2016
 # Takuya N <takninnovationresearch@gmail.com>, 2020
+# Tsuboi Yuto <y_tsuboi@ga-tech.co.jp>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-02-06 12:01+0000\n"
-"Last-Translator: Takuya N <takninnovationresearch@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-05-09 04:02+0000\n"
+"Last-Translator: Tsuboi Yuto <y_tsuboi@ga-tech.co.jp>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -100,11 +101,11 @@ msgstr "docutilsをインストールして下さい"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
+"The admin documentation system requires Python’s <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
-"管理ドキュメントシステムには、Pythonの <a href=\"%(link)s\">docutils</a> ライ"
-"ブラリが必要です。"
+"管理用ドキュメントシステムにはPythonの<a href=\"%(link)s\">docutils</a>ライブ"
+"ラリが必要です。"
 
 #, python-format
 msgid ""

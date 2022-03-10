@@ -1,15 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Goto Hayato <habita.gh@gmail.com>, 2021
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Shinya Okano <tokibito@gmail.com>, 2012,2014-2016
+# Takuro Onoue <kusanaginoturugi@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-07-02 13:55+0000\n"
+"Last-Translator: Goto Hayato <habita.gh@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -81,16 +83,16 @@ msgstr ""
 "す。"
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
 "操作を選択しましたが、フィールドに未保存の変更があります。OKをクリックして保"
 "存してください。その後、操作を再度実行する必要があります。"
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
 "操作を選択しましたが、フィールドに変更はありませんでした。もしかして保存ボタ"
@@ -176,6 +178,54 @@ msgid "November"
 msgstr "11月"
 
 msgid "December"
+msgstr "12月"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "1月"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "2月"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "3月"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "4月"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "5月"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "6月"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "7月"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "8月"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "9月"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "10月"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "11月"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
 msgstr "12月"
 
 msgctxt "one letter Sunday"

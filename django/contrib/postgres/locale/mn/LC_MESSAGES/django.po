@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2019-02-19 02:29+0000\n"
-"Last-Translator: Zorig\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
@@ -34,24 +34,14 @@ msgid "Map of strings to strings/nulls"
 msgstr "Тэмдэгтийг тэмдэгт/null руу заагч"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "\"%(key)s\" -ийн утга тэмдэгт мөр биш эсвэл null биш байна."
-
-msgid "A JSON object"
-msgstr "JSON объект"
-
-msgid "Value must be valid JSON."
-msgstr "Утга заавал JSON байх ёстой"
+msgid "The value of “%(key)s” is not a string or null."
+msgstr ""
 
 msgid "Could not load JSON data."
 msgstr "JSON дата-г уншиж чадахгүй байна."
 
 msgid "Input must be a JSON dictionary."
 msgstr "Оролт JSON dictionary байх ёстой."
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "'%(value)s' JSON байх ёстой."
 
 msgid "Enter two valid values."
 msgstr "Хоёр зөв утга оруулна уу"

@@ -23,9 +23,8 @@ __ `executing custom SQL directly`_
       :doc:`custom query expressions </ref/models/expressions/>`.
 
     Before using raw SQL, explore :doc:`the ORM </topics/db/index>`. Ask on
-    |django-users| or the `#django IRC channel
-    <https://webchat.freenode.net/#django>`_ to see if the ORM supports your
-    use case.
+    one of :doc:`the support channels </faq/help>` to see if the ORM supports
+    your use case.
 
 .. warning::
 
@@ -43,7 +42,7 @@ Performing raw queries
 The ``raw()`` manager method can be used to perform raw SQL queries that
 return model instances:
 
-.. method:: Manager.raw(raw_query, params=None, translations=None)
+.. method:: Manager.raw(raw_query, params=(), translations=None)
 
 This method takes a raw SQL query, executes it, and returns a
 ``django.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance

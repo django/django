@@ -1,6 +1,6 @@
-===========================
-Writing custom model fields
-===========================
+=================================
+How to create custom model fields
+=================================
 
 .. currentmodule:: django.db.models
 
@@ -394,13 +394,14 @@ If you aim to build a database-agnostic application, you should account for
 differences in database column types. For example, the date/time column type
 in PostgreSQL is called ``timestamp``, while the same column in MySQL is called
 ``datetime``. You can handle this in a :meth:`~Field.db_type` method by
-checking the ``connection.settings_dict['ENGINE']`` attribute.
+checking the ``connection.vendor`` attribute. Current built-in vendor names
+are: ``sqlite``, ``postgresql``, ``mysql``, and ``oracle``.
 
 For example::
 
     class MyDateField(models.Field):
         def db_type(self, connection):
-            if connection.settings_dict['ENGINE'] == 'django.db.backends.mysql':
+            if connection.vendor == 'mysql':
                 return 'datetime'
             else:
                 return 'timestamp'
@@ -492,8 +493,8 @@ following arguments:
 
 * ``None`` (if the field allows ``null=True``)
 
-In our ``HandField`` class, we're storing the data as a VARCHAR field in the
-database, so we need to be able to process strings and ``None`` in the
+In our ``HandField`` class, we're storing the data as a ``VARCHAR`` field in
+the database, so we need to be able to process strings and ``None`` in the
 ``from_db_value()``. In ``to_python()``, we need to also handle ``Hand``
 instances::
 

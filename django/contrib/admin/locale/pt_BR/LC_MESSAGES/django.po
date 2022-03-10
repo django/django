@@ -24,6 +24,7 @@
 # Otávio Reis <otaviocha@gmail.com>, 2018
 # Raysa Dutra, 2016
 # R.J Lelis <renatojlelis@gmail.com>, 2019
+# Samuel Nogueira Bacelar <samuelnbacelar@hotmail.com>, 2020
 # Sergio Garcia <sergio@ginx.com.br>, 2015
 # Vinícius Damaceno <lvdamaceno@gmail.com>, 2019
 # Vinícius Muniz de Melo <viniciusdesk@icloud.com>, 2019
@@ -31,9 +32,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-12-19 17:58+0000\n"
-"Last-Translator: Vinícius Muniz de Melo <viniciusdesk@icloud.com>\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-09-22 14:07+0000\n"
+"Last-Translator: Samuel Nogueira Bacelar <samuelnbacelar@hotmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -92,6 +93,12 @@ msgstr "Sem data"
 
 msgid "Has date"
 msgstr "Tem data"
+
+msgid "Empty"
+msgstr "Vazio"
+
+msgid "Not empty"
+msgstr "Não está vazio"
 
 #, python-format
 msgid ""
@@ -358,6 +365,19 @@ msgstr "Selecionar todos %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Limpar seleção"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modelos na aplicação %(name)s"
+
+msgid "Add"
+msgstr "Adicionar"
+
+msgid "View"
+msgstr "Visualizar"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Você não tem permissão para ver ou editar nada."
+
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
@@ -405,6 +425,9 @@ msgstr "Ver no site"
 
 msgid "Filter"
 msgstr "Filtro"
+
+msgid "Clear all filters"
+msgstr "Limpar todos os filtros"
 
 msgid "Remove from sorting"
 msgstr "Remover da ordenação"
@@ -483,9 +506,6 @@ msgstr ""
 "Tem certeza de que deseja apagar o %(objects_name)s selecionado? Todos os "
 "seguintes objetos e seus itens relacionados serão removidos:"
 
-msgid "View"
-msgstr "Visualizar"
-
 msgid "Delete?"
 msgstr "Apagar?"
 
@@ -495,16 +515,6 @@ msgstr "Por %(filter_title)s "
 
 msgid "Summary"
 msgstr "Resumo"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modelos na aplicação %(name)s"
-
-msgid "Add"
-msgstr "Adicionar"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr "Você não tem permissão para ver ou editar nada."
 
 msgid "Recent actions"
 msgstr "Ações recentes"
@@ -537,6 +547,9 @@ msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr "Esqueceu sua senha ou nome de usuário?"
+
+msgid "Toggle navigation"
+msgstr "Alternar navegação"
 
 msgid "Date/time"
 msgstr "Data/hora"

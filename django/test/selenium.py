@@ -27,7 +27,9 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
         """
         test_class = super().__new__(cls, name, bases, attrs)
         # If the test class is either browser-specific or a test base, return it.
-        if test_class.browser or not any(name.startswith('test') and callable(value) for name, value in attrs.items()):
+        if test_class.browser or not any(
+            name.startswith("test") and callable(value) for name, value in attrs.items()
+        ):
             return test_class
         elif test_class.browsers:
             # Reuse the created test class to make it browser-specific.
@@ -37,7 +39,7 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
             first_browser = test_class.browsers[0]
             test_class.browser = first_browser
             # Listen on an external interface if using a selenium hub.
-            host = test_class.host if not test_class.selenium_hub else '0.0.0.0'
+            host = test_class.host if not test_class.selenium_hub else "0.0.0.0"
             test_class.host = host
             test_class.external_host = cls.external_host
             # Create subclasses for each of the remaining browsers and expose
@@ -49,16 +51,16 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
                     "%s%s" % (capfirst(browser), name),
                     (test_class,),
                     {
-                        'browser': browser,
-                        'host': host,
-                        'external_host': cls.external_host,
-                        '__module__': test_class.__module__,
-                    }
+                        "browser": browser,
+                        "host": host,
+                        "external_host": cls.external_host,
+                        "__module__": test_class.__module__,
+                    },
                 )
                 setattr(module, browser_test_class.__name__, browser_test_class)
             return test_class
         # If no browsers were specified, skip this class (it'll still be discovered).
-        return unittest.skip('No browsers specified.')(test_class)
+        return unittest.skip("No browsers specified.")(test_class)
 
     @classmethod
     def import_webdriver(cls, browser):
@@ -66,13 +68,12 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
 
     @classmethod
     def import_options(cls, browser):
-        return import_string('selenium.webdriver.%s.options.Options' % browser)
+        return import_string("selenium.webdriver.%s.options.Options" % browser)
 
     @classmethod
     def get_capability(cls, browser):
-        from selenium.webdriver.common.desired_capabilities import (
-            DesiredCapabilities,
-        )
+        from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
         return getattr(DesiredCapabilities, browser.upper())
 
     def create_options(self):
@@ -87,6 +88,7 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
     def create_webdriver(self):
         if self.selenium_hub:
             from selenium import webdriver
+
             return webdriver.Remote(
                 command_executor=self.selenium_hub,
                 desired_capabilities=self.get_capability(self.browser),
@@ -94,14 +96,14 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
         return self.import_webdriver(self.browser)(options=self.create_options())
 
 
-@tag('selenium')
+@tag("selenium")
 class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
     implicit_wait = 10
     external_host = None
 
     @classproperty
     def live_server_url(cls):
-        return 'http://%s:%s' % (cls.external_host or cls.host, cls.server_thread.port)
+        return "http://%s:%s" % (cls.external_host or cls.host, cls.server_thread.port)
 
     @classproperty
     def allowed_host(cls):
@@ -118,7 +120,7 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
         # quit() the WebDriver before attempting to terminate and join the
         # single-threaded LiveServerThread to avoid a dead lock if the browser
         # kept a connection alive.
-        if hasattr(cls, 'selenium'):
+        if hasattr(cls, "selenium"):
             cls.selenium.quit()
         super()._tearDownClassInternal()
 

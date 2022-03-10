@@ -35,10 +35,6 @@ query and the vector.
 To use the ``search`` lookup, ``'django.contrib.postgres'`` must be in your
 :setting:`INSTALLED_APPS`.
 
-.. versionchanged:: 3.1
-
-    Support for query expressions was added.
-
 ``SearchVector``
 ================
 
@@ -110,11 +106,6 @@ Examples:
 See :ref:`postgresql-fts-search-configuration` for an explanation of the
 ``config`` parameter.
 
-.. versionchanged:: 3.1
-
-    Support for ``'websearch'`` search type and query expressions in
-    ``SearchQuery.value`` were added.
-
 ``SearchRank``
 ==============
 
@@ -159,14 +150,8 @@ normalization options`_.
 
 .. _different rank normalization options: https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-RANKING
 
-.. versionadded:: 3.1
-
-    The ``normalization`` and ``cover_density`` parameters were added.
-
 ``SearchHeadline``
 ==================
-
-.. versionadded:: 3.1
 
 .. class:: SearchHeadline(expression, query, config=None, start_sel=None, stop_sel=None, max_words=None, min_words=None, short_word=None, highlight_all=None, max_fragments=None, fragment_delimiter=None)
 
@@ -270,8 +255,14 @@ run into performance problems. Full text search is a more intensive process
 than comparing the size of an integer, for example.
 
 In the event that all the fields you're querying on are contained within one
-particular model, you can create a functional index which matches the search
-vector you wish to use. The PostgreSQL documentation has details on
+particular model, you can create a functional
+:class:`GIN <django.contrib.postgres.indexes.GinIndex>` or
+:class:`GiST <django.contrib.postgres.indexes.GistIndex>` index which matches
+the search vector you wish to use. For example::
+
+    GinIndex(SearchVector('body_text'), name='body_search_vector_idx')
+
+The PostgreSQL documentation has details on
 `creating indexes for full text search
 <https://www.postgresql.org/docs/current/textsearch-tables.html#TEXTSEARCH-TABLES-INDEX>`_.
 
@@ -295,8 +286,9 @@ Trigram similarity
 ==================
 
 Another approach to searching is trigram similarity. A trigram is a group of
-three consecutive characters. In addition to the :lookup:`trigram_similar`
-lookup, you can use a couple of other expressions.
+three consecutive characters. In addition to the :lookup:`trigram_similar` and
+:lookup:`trigram_word_similar` lookups, you can use a couple of other
+expressions.
 
 To use them, you need to activate the `pg_trgm extension
 <https://www.postgresql.org/docs/current/pgtrgm.html>`_ on PostgreSQL. You can
@@ -323,6 +315,27 @@ Usage example::
     ... ).filter(similarity__gt=0.3).order_by('-similarity')
     [<Author: Katy Stevens>, <Author: Stephen Keats>]
 
+``TrigramWordSimilarity``
+-------------------------
+
+.. versionadded:: 4.0
+
+.. class:: TrigramWordSimilarity(string, expression, **extra)
+
+Accepts a string or expression, and a field name or expression. Returns the
+trigram word similarity between the two arguments.
+
+Usage example::
+
+    >>> from django.contrib.postgres.search import TrigramWordSimilarity
+    >>> Author.objects.create(name='Katy Stevens')
+    >>> Author.objects.create(name='Stephen Keats')
+    >>> test = 'Kat'
+    >>> Author.objects.annotate(
+    ...     similarity=TrigramWordSimilarity(test, 'name'),
+    ... ).filter(similarity__gt=0.3).order_by('-similarity')
+    [<Author: Katy Stevens>]
+
 ``TrigramDistance``
 -------------------
 
@@ -341,3 +354,24 @@ Usage example::
     ...     distance=TrigramDistance('name', test),
     ... ).filter(distance__lte=0.7).order_by('distance')
     [<Author: Katy Stevens>, <Author: Stephen Keats>]
+
+``TrigramWordDistance``
+-----------------------
+
+.. versionadded:: 4.0
+
+.. class:: TrigramWordDistance(string, expression, **extra)
+
+Accepts a string or expression, and a field name or expression. Returns the
+trigram word distance between the two arguments.
+
+Usage example::
+
+    >>> from django.contrib.postgres.search import TrigramWordDistance
+    >>> Author.objects.create(name='Katy Stevens')
+    >>> Author.objects.create(name='Stephen Keats')
+    >>> test = 'Kat'
+    >>> Author.objects.annotate(
+    ...     distance=TrigramWordDistance(test, 'name'),
+    ... ).filter(distance__lte=0.7).order_by('distance')
+    [<Author: Katy Stevens>]

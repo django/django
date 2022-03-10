@@ -3,7 +3,11 @@ from django.utils.functional import cached_property
 
 
 class BaseDatabaseFeatures:
+    # An optional tuple indicating the minimum supported database version.
+    minimum_database_version = None
     gis_enabled = False
+    # Oracle can't group by LOB (large object) data types.
+    allows_group_by_lob = True
     allows_group_by_pk = False
     allows_group_by_selected_pks = False
     empty_fetchmany_value = []
@@ -62,6 +66,9 @@ class BaseDatabaseFeatures:
     has_real_datatype = False
     supports_subqueries_in_group_by = True
 
+    # Does the backend ignore unnecessary ORDER BY clauses in subqueries?
+    ignores_unnecessary_order_by_in_subqueries = True
+
     # Is there a true datatype for uuid?
     has_native_uuid_field = False
 
@@ -107,9 +114,6 @@ class BaseDatabaseFeatures:
     # deferred
     can_defer_constraint_checks = False
 
-    # date_interval_sql can properly handle mixed Date/DateTime fields and timedeltas
-    supports_mixed_date_datetime_comparisons = True
-
     # Does the backend support tablespaces? Default to False because it isn't
     # in the SQL standard.
     supports_tablespaces = False
@@ -128,21 +132,21 @@ class BaseDatabaseFeatures:
     # Map fields which some backends may not be able to differentiate to the
     # field it's introspected as.
     introspected_field_types = {
-        'AutoField': 'AutoField',
-        'BigAutoField': 'BigAutoField',
-        'BigIntegerField': 'BigIntegerField',
-        'BinaryField': 'BinaryField',
-        'BooleanField': 'BooleanField',
-        'CharField': 'CharField',
-        'DurationField': 'DurationField',
-        'GenericIPAddressField': 'GenericIPAddressField',
-        'IntegerField': 'IntegerField',
-        'PositiveBigIntegerField': 'PositiveBigIntegerField',
-        'PositiveIntegerField': 'PositiveIntegerField',
-        'PositiveSmallIntegerField': 'PositiveSmallIntegerField',
-        'SmallAutoField': 'SmallAutoField',
-        'SmallIntegerField': 'SmallIntegerField',
-        'TimeField': 'TimeField',
+        "AutoField": "AutoField",
+        "BigAutoField": "BigAutoField",
+        "BigIntegerField": "BigIntegerField",
+        "BinaryField": "BinaryField",
+        "BooleanField": "BooleanField",
+        "CharField": "CharField",
+        "DurationField": "DurationField",
+        "GenericIPAddressField": "GenericIPAddressField",
+        "IntegerField": "IntegerField",
+        "PositiveBigIntegerField": "PositiveBigIntegerField",
+        "PositiveIntegerField": "PositiveIntegerField",
+        "PositiveSmallIntegerField": "PositiveSmallIntegerField",
+        "SmallAutoField": "SmallAutoField",
+        "SmallIntegerField": "SmallIntegerField",
+        "TimeField": "TimeField",
     }
 
     # Can the backend introspect the column order (ASC/DESC) for indexes?
@@ -172,6 +176,9 @@ class BaseDatabaseFeatures:
     # Can it create foreign key constraints inline when adding columns?
     can_create_inline_fk = True
 
+    # Does it automatically index foreign keys?
+    indexes_foreign_keys = True
+
     # Does it support CHECK constraints?
     supports_column_check_constraints = True
     supports_table_check_constraints = True
@@ -193,10 +200,10 @@ class BaseDatabaseFeatures:
     closed_cursor_error_class = ProgrammingError
 
     # Does 'a' LIKE 'A' match?
-    has_case_insensitive_like = True
+    has_case_insensitive_like = False
 
     # Suffix for backends that don't support "SELECT xxx;" queries.
-    bare_select_suffix = ''
+    bare_select_suffix = ""
 
     # If NULL is implied on columns without needing to be explicitly specified
     implied_column_null = False
@@ -266,6 +273,10 @@ class BaseDatabaseFeatures:
     # Does the backend support ignoring constraint or uniqueness errors during
     # INSERT?
     supports_ignore_conflicts = True
+    # Does the backend support updating rows on constraint or uniqueness errors
+    # during INSERT?
+    supports_update_conflicts = False
+    supports_update_conflicts_with_target = False
 
     # Does this backend require casting the results of CASE expressions used
     # in UPDATE statements to ensure the expression has the correct type?
@@ -276,6 +287,10 @@ class BaseDatabaseFeatures:
     supports_functions_in_partial_indexes = True
     # Does the backend support covering indexes (CREATE INDEX ... INCLUDE ...)?
     supports_covering_indexes = False
+    # Does the backend support indexes on expressions?
+    supports_expression_indexes = True
+    # Does the backend treat COLLATE as an indexed expression?
+    collate_as_index_expression = False
 
     # Does the database allow more than one constraint or index on the same
     # field(s)?
@@ -301,13 +316,34 @@ class BaseDatabaseFeatures:
     # Does value__d__contains={'f': 'g'} (without a list around the dict) match
     # {'d': [{'f': 'g'}]}?
     json_key_contains_list_matching_requires_list = False
+    # Does the backend support JSONObject() database function?
+    has_json_object_function = True
+
+    # Does the backend support column collations?
+    supports_collation_on_charfield = True
+    supports_collation_on_textfield = True
+    # Does the backend support non-deterministic collations?
+    supports_non_deterministic_collations = True
+
+    # Does the backend support the logical XOR operator?
+    supports_logical_xor = False
 
     # Collation names for use by the Django test suite.
     test_collations = {
-        'ci': None,  # Case-insensitive.
-        'cs': None,  # Case-sensitive.
-        'swedish-ci': None  # Swedish case-insensitive.
+        "ci": None,  # Case-insensitive.
+        "cs": None,  # Case-sensitive.
+        "non_default": None,  # Non-default.
+        "swedish_ci": None,  # Swedish case-insensitive.
     }
+    # SQL template override for tests.aggregation.tests.NowUTC
+    test_now_utc_template = None
+
+    # A set of dotted paths to tests in Django's test suite that are expected
+    # to fail on this database.
+    django_test_expected_failures = set()
+    # A map of reasons to sets of dotted paths to tests in Django's test suite
+    # that should be skipped for this database.
+    django_test_skips = {}
 
     def __init__(self, connection):
         self.connection = connection
@@ -321,14 +357,14 @@ class BaseDatabaseFeatures:
     def supports_transactions(self):
         """Confirm support for transactions."""
         with self.connection.cursor() as cursor:
-            cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
+            cursor.execute("CREATE TABLE ROLLBACK_TEST (X INT)")
             self.connection.set_autocommit(False)
-            cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
+            cursor.execute("INSERT INTO ROLLBACK_TEST (X) VALUES (8)")
             self.connection.rollback()
             self.connection.set_autocommit(True)
-            cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
-            count, = cursor.fetchone()
-            cursor.execute('DROP TABLE ROLLBACK_TEST')
+            cursor.execute("SELECT COUNT(X) FROM ROLLBACK_TEST")
+            (count,) = cursor.fetchone()
+            cursor.execute("DROP TABLE ROLLBACK_TEST")
         return count == 0
 
     def allows_group_by_selected_pks_on_model(self, model):

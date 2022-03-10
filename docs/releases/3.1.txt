@@ -19,8 +19,8 @@ project.
 Python compatibility
 ====================
 
-Django 3.1 supports Python 3.6, 3.7, and 3.8. We **highly recommend** and only
-officially support the latest release of each series.
+Django 3.1 supports Python 3.6, 3.7, 3.8, and 3.9 (as of 3.1.3). We **highly
+recommend** and only officially support the latest release of each series.
 
 .. _whats-new-3.1:
 
@@ -101,17 +101,17 @@ of this release <deprecated-jsonfield>`.
 ``DEFAULT_HASHING_ALGORITHM`` settings
 --------------------------------------
 
-The new :setting:`DEFAULT_HASHING_ALGORITHM` transitional setting allows
-specifying the default hashing algorithm to use for encoding cookies, password
-reset tokens in the admin site, user sessions, and signatures created by
+The new ``DEFAULT_HASHING_ALGORITHM`` transitional setting allows specifying
+the default hashing algorithm to use for encoding cookies, password reset
+tokens in the admin site, user sessions, and signatures created by
 :class:`django.core.signing.Signer` and :meth:`django.core.signing.dumps`.
 
 Support for SHA-256 was added in Django 3.1. If you are upgrading multiple
 instances of the same project to Django 3.1, you should set
-:setting:`DEFAULT_HASHING_ALGORITHM` to ``'sha1'`` during the transition, in
-order to allow compatibility with the older versions of Django. Note that this
-requires Django 3.1.1+. Once the transition to 3.1 is complete you can stop
-overriding :setting:`DEFAULT_HASHING_ALGORITHM`.
+``DEFAULT_HASHING_ALGORITHM`` to ``'sha1'`` during the transition, in order to
+allow compatibility with the older versions of Django. Note that this requires
+Django 3.1.1+. Once the transition to 3.1 is complete you can stop overriding
+``DEFAULT_HASHING_ALGORITHM``.
 
 This setting is deprecated as of this release, because support for tokens,
 cookies, sessions, and signatures that use SHA-1 algorithm will be removed in
@@ -138,6 +138,9 @@ Minor features
   CSS and ARIA role affordances. This requires using
   ``'django.template.context_processors.request'`` in the
   ``'context_processors'`` option of :setting:`OPTIONS <TEMPLATES-OPTIONS>`.
+
+* Initially empty ``extra`` inlines can now be removed, in the same way as
+  dynamically created ones.
 
 * ``XRegExp`` is upgraded from version 2.0.0 to 3.2.0.
 
@@ -723,6 +726,14 @@ Miscellaneous
 * The :doc:`Media </topics/forms/media>` class now renders ``<script>`` tags
   without the ``type`` attribute to follow `WHATWG recommendations
   <https://html.spec.whatwg.org/multipage/scripting.html#the-script-element>`_.
+
+* :class:`~django.forms.ModelChoiceIterator`, used by
+  :class:`~django.forms.ModelChoiceField` and
+  :class:`~django.forms.ModelMultipleChoiceField`, now yields 2-tuple choices
+  containing :class:`~django.forms.ModelChoiceIteratorValue` instances as the
+  first ``value`` element in each choice. In most cases this proxies
+  transparently, but if you need the ``field`` value itself, use the
+  :attr:`.ModelChoiceIteratorValue.value` attribute instead.
 
 .. _deprecated-features-3.1:
 

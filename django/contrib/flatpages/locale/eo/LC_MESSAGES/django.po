@@ -1,16 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2011-2012
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2014-2015,2017,2019
+# Batist D 🐍 <baptiste+transifex@darthenay.fr>, 2011-2012
+# Batist D 🐍 <baptiste+transifex@darthenay.fr>, 2014-2015,2017,2019
+# Matthieu Desplantes <matmututu@gmail.com>, 2021
 # Robin van der Vliet <info@robinvandervliet.nl>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-02-04 21:33+0000\n"
-"Last-Translator: Robin van der Vliet <info@robinvandervliet.nl>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2021-04-13 08:09+0000\n"
+"Last-Translator: Matthieu Desplantes <matmututu@gmail.com>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
 "MIME-Version: 1.0\n"
@@ -29,9 +30,10 @@ msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
-"Ekzemplo: '/pri/kontakto/'. Certigu, ke estas kondukaj kaj sekvaj strekoj."
+"Ekzemple: “/about/contact/”. Certigu, ke estas suprenstrekoj komence kaj "
+"fine."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
@@ -40,8 +42,8 @@ msgstr ""
 "Ĉi tiu valoro devus enhavi sole leterojn, nombrojn, punktojn, substrekoj, "
 "haltostrekoj, oblikvoj aŭ tildoj."
 
-msgid "Example: '/about/contact'. Make sure to have a leading slash."
-msgstr "Ekzemple: “/pri-ni/kontakto”. Certiĝu, ke ekas per oblikva streko."
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr "Ekzemple: “/about/contact”. Certigu, ke estas suprenstreko komence."
 
 msgid "URL is missing a leading slash."
 msgstr "La streka signo \"/\" ne ĉeestas en komenco de ĉeno."
@@ -66,11 +68,9 @@ msgid "template name"
 msgstr "ŝablono nomo"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
-"Ekzemplo: 'flatpages/contact_page.html'. Se ĉi tiu ne provizas, la sistemo "
-"uzos 'flatpages/default.html'."
 
 msgid "registration required"
 msgstr "registrado postulita"

@@ -46,23 +46,30 @@ from .utils import EngineHandler
 
 engines = EngineHandler()
 
-__all__ = ('Engine', 'engines')
+__all__ = ("Engine", "engines")
 
 
 # Django Template Language
 
 # Public exceptions
-from .base import VariableDoesNotExist                                  # NOQA isort:skip
-from .context import Context, ContextPopException, RequestContext       # NOQA isort:skip
-from .exceptions import TemplateDoesNotExist, TemplateSyntaxError       # NOQA isort:skip
+from .base import VariableDoesNotExist  # NOQA isort:skip
+from .context import Context, ContextPopException, RequestContext  # NOQA isort:skip
+from .exceptions import TemplateDoesNotExist, TemplateSyntaxError  # NOQA isort:skip
 
 # Template parts
-from .base import (                                                     # NOQA isort:skip
-    Node, NodeList, Origin, Template, Variable,
+from .base import (  # NOQA isort:skip
+    Node,
+    NodeList,
+    Origin,
+    Template,
+    Variable,
 )
 
 # Library management
-from .library import Library                                            # NOQA isort:skip
+from .library import Library  # NOQA isort:skip
+
+# Import the .autoreload module to trigger the registrations of signals.
+from . import autoreload  # NOQA isort:skip
 
 
-__all__ += ('Template', 'Context', 'RequestContext')
+__all__ += ("Template", "Context", "RequestContext")

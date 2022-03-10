@@ -1,11 +1,36 @@
 from datetime import datetime, tzinfo
 
-import pytz
+try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo
 
+from django.conf import settings
 from django.template import Library, Node, TemplateSyntaxError
 from django.utils import timezone
 
 register = Library()
+
+
+# RemovedInDjango50Warning: shim to allow catching the exception in the calling
+# scope if pytz is not installed.
+class UnknownTimezoneException(BaseException):
+    pass
+
+
+# RemovedInDjango50Warning
+def timezone_constructor(tzname):
+    if settings.USE_DEPRECATED_PYTZ:
+        import pytz
+
+        try:
+            return pytz.timezone(tzname)
+        except pytz.UnknownTimeZoneError:
+            raise UnknownTimezoneException
+    try:
+        return zoneinfo.ZoneInfo(tzname)
+    except zoneinfo.ZoneInfoNotFoundError:
+        raise UnknownTimezoneException
 
 
 # HACK: datetime instances cannot be assigned new attributes. Define a subclass
@@ -15,6 +40,7 @@ class datetimeobject(datetime):
 
 
 # Template filters
+
 
 @register.filter
 def localtime(value):
@@ -34,7 +60,7 @@ def utc(value):
     return do_timezone(value, timezone.utc)
 
 
-@register.filter('timezone')
+@register.filter("timezone")
 def do_timezone(value, arg):
     """
     Convert a datetime to local time in a given time zone.
@@ -44,7 +70,7 @@ def do_timezone(value, arg):
     Naive datetimes are assumed to be in local time in the default time zone.
     """
     if not isinstance(value, datetime):
-        return ''
+        return ""
 
     # Obtain a timezone-aware datetime
     try:
@@ -54,36 +80,45 @@ def do_timezone(value, arg):
     # Filters must never raise exceptions, and pytz' exceptions inherit
     # Exception directly, not a specific subclass. So catch everything.
     except Exception:
-        return ''
+        return ""
 
     # Obtain a tzinfo instance
     if isinstance(arg, tzinfo):
         tz = arg
     elif isinstance(arg, str):
         try:
-            tz = pytz.timezone(arg)
-        except pytz.UnknownTimeZoneError:
-            return ''
+            tz = timezone_constructor(arg)
+        except UnknownTimezoneException:
+            return ""
     else:
-        return ''
+        return ""
 
     result = timezone.localtime(value, tz)
 
     # HACK: the convert_to_local_time flag will prevent
     #       automatic conversion of the value to local time.
-    result = datetimeobject(result.year, result.month, result.day,
-                            result.hour, result.minute, result.second,
-                            result.microsecond, result.tzinfo)
+    result = datetimeobject(
+        result.year,
+        result.month,
+        result.day,
+        result.hour,
+        result.minute,
+        result.second,
+        result.microsecond,
+        result.tzinfo,
+    )
     result.convert_to_local_time = False
     return result
 
 
 # Template tags
 
+
 class LocalTimeNode(Node):
     """
     Template node class used by ``localtime_tag``.
     """
+
     def __init__(self, nodelist, use_tz):
         self.nodelist = nodelist
         self.use_tz = use_tz
@@ -100,6 +135,7 @@ class TimezoneNode(Node):
     """
     Template node class used by ``timezone_tag``.
     """
+
     def __init__(self, nodelist, tz):
         self.nodelist = nodelist
         self.tz = tz
@@ -114,15 +150,16 @@ class GetCurrentTimezoneNode(Node):
     """
     Template node class used by ``get_current_timezone_tag``.
     """
+
     def __init__(self, variable):
         self.variable = variable
 
     def render(self, context):
         context[self.variable] = timezone.get_current_timezone_name()
-        return ''
+        return ""
 
 
-@register.tag('localtime')
+@register.tag("localtime")
 def localtime_tag(parser, token):
     """
     Force or prevent conversion of datetime objects to local time,
@@ -135,17 +172,16 @@ def localtime_tag(parser, token):
     bits = token.split_contents()
     if len(bits) == 1:
         use_tz = True
-    elif len(bits) > 2 or bits[1] not in ('on', 'off'):
-        raise TemplateSyntaxError("%r argument should be 'on' or 'off'" %
-                                  bits[0])
+    elif len(bits) > 2 or bits[1] not in ("on", "off"):
+        raise TemplateSyntaxError("%r argument should be 'on' or 'off'" % bits[0])
     else:
-        use_tz = bits[1] == 'on'
-    nodelist = parser.parse(('endlocaltime',))
+        use_tz = bits[1] == "on"
+    nodelist = parser.parse(("endlocaltime",))
     parser.delete_first_token()
     return LocalTimeNode(nodelist, use_tz)
 
 
-@register.tag('timezone')
+@register.tag("timezone")
 def timezone_tag(parser, token):
     """
     Enable a given time zone just for this block.
@@ -162,10 +198,9 @@ def timezone_tag(parser, token):
     """
     bits = token.split_contents()
     if len(bits) != 2:
-        raise TemplateSyntaxError("'%s' takes one argument (timezone)" %
-                                  bits[0])
+        raise TemplateSyntaxError("'%s' takes one argument (timezone)" % bits[0])
     tz = parser.compile_filter(bits[1])
-    nodelist = parser.parse(('endtimezone',))
+    nodelist = parser.parse(("endtimezone",))
     parser.delete_first_token()
     return TimezoneNode(nodelist, tz)
 
@@ -182,9 +217,11 @@ def get_current_timezone_tag(parser, token):
     This will fetch the currently active time zone and put its name
     into the ``TIME_ZONE`` context variable.
     """
-    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
+    # token.split_contents() isn't useful here because this tag doesn't accept
+    # variable as arguments.
     args = token.contents.split()
-    if len(args) != 3 or args[1] != 'as':
-        raise TemplateSyntaxError("'get_current_timezone' requires "
-                                  "'as variable' (got %r)" % args)
+    if len(args) != 3 or args[1] != "as":
+        raise TemplateSyntaxError(
+            "'get_current_timezone' requires 'as variable' (got %r)" % args
+        )
     return GetCurrentTimezoneNode(args[2])

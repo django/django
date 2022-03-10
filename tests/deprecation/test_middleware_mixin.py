@@ -5,7 +5,8 @@ from asgiref.sync import async_to_sync
 
 from django.contrib.admindocs.middleware import XViewMiddleware
 from django.contrib.auth.middleware import (
-    AuthenticationMiddleware, RemoteUserMiddleware,
+    AuthenticationMiddleware,
+    RemoteUserMiddleware,
 )
 from django.contrib.flatpages.middleware import FlatpageFallbackMiddleware
 from django.contrib.messages.middleware import MessageMiddleware
@@ -16,26 +17,22 @@ from django.db import connection
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.middleware.cache import (
-    CacheMiddleware, FetchFromCacheMiddleware, UpdateCacheMiddleware,
+    CacheMiddleware,
+    FetchFromCacheMiddleware,
+    UpdateCacheMiddleware,
 )
 from django.middleware.clickjacking import XFrameOptionsMiddleware
-from django.middleware.common import (
-    BrokenLinkEmailsMiddleware, CommonMiddleware,
-)
+from django.middleware.common import BrokenLinkEmailsMiddleware, CommonMiddleware
 from django.middleware.csrf import CsrfViewMiddleware
 from django.middleware.gzip import GZipMiddleware
 from django.middleware.http import ConditionalGetMiddleware
 from django.middleware.locale import LocaleMiddleware
 from django.middleware.security import SecurityMiddleware
 from django.test import SimpleTestCase
-from django.utils.deprecation import MiddlewareMixin, RemovedInDjango40Warning
+from django.utils.deprecation import MiddlewareMixin
 
 
 class MiddlewareMixinTests(SimpleTestCase):
-    """
-    Deprecation warning is raised when using get_response=None.
-    """
-    msg = 'Passing None for the middleware get_response argument is deprecated.'
     middlewares = [
         AuthenticationMiddleware,
         BrokenLinkEmailsMiddleware,
@@ -58,16 +55,38 @@ class MiddlewareMixinTests(SimpleTestCase):
         XViewMiddleware,
     ]
 
-    def test_deprecation(self):
-        for middleware in self.middlewares:
-            with self.subTest(middleware=middleware):
-                with self.assertRaisesMessage(RemovedInDjango40Warning, self.msg):
-                    middleware()
+    def test_repr(self):
+        class GetResponse:
+            def __call__(self):
+                return HttpResponse()
+
+        def get_response():
+            return HttpResponse()
+
+        self.assertEqual(
+            repr(MiddlewareMixin(GetResponse())),
+            "<MiddlewareMixin get_response=GetResponse>",
+        )
+        self.assertEqual(
+            repr(MiddlewareMixin(get_response)),
+            "<MiddlewareMixin get_response="
+            "MiddlewareMixinTests.test_repr.<locals>.get_response>",
+        )
+        self.assertEqual(
+            repr(CsrfViewMiddleware(GetResponse())),
+            "<CsrfViewMiddleware get_response=GetResponse>",
+        )
+        self.assertEqual(
+            repr(CsrfViewMiddleware(get_response)),
+            "<CsrfViewMiddleware get_response="
+            "MiddlewareMixinTests.test_repr.<locals>.get_response>",
+        )
 
     def test_passing_explicit_none(self):
+        msg = "get_response must be provided."
         for middleware in self.middlewares:
             with self.subTest(middleware=middleware):
-                with self.assertRaisesMessage(RemovedInDjango40Warning, self.msg):
+                with self.assertRaisesMessage(ValueError, msg):
                     middleware(None)
 
     def test_coroutine(self):
@@ -94,6 +113,7 @@ class MiddlewareMixinTests(SimpleTestCase):
         the sync_to_async thread_sensitive flag enabled, so that database
         operations use the correct thread and connection.
         """
+
         def request_lifecycle():
             """Fake request_started/request_finished."""
             return (threading.get_ident(), id(connection))

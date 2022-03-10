@@ -18,8 +18,7 @@ If you find an incorrect translation or want to discuss specific translations,
 go to the `Django project page`_. If you would like to help out with
 translating or add a language that isn't yet translated, here's what to do:
 
-* Join the :ref:`Django i18n mailing list <django-i18n-mailing-list>` and
-  introduce yourself.
+* Introduce yourself on the `Django internationalization forum`_.
 
 * Make sure you read the notes about :ref:`specialties-of-django-i18n`.
 
@@ -63,13 +62,14 @@ The format files aren't managed by the use of Transifex. To change them, you
 must :doc:`create a patch<writing-code/submitting-patches>` against the
 Django source tree, as for any code change:
 
-* Create a diff against the current Git master branch.
+* Create a diff against the current Git main branch.
 
 * Open a ticket in Django's ticket system, set its ``Component`` field to
   ``Translations``, and attach the patch to it.
 
 .. _Transifex: https://www.transifex.com/
 .. _Django project page: https://www.transifex.com/django/django/
+.. _Django internationalization forum: https://forum.djangoproject.com/c/internals/i18n/14
 .. _Transifex User Guide: https://docs.transifex.com/
 
 .. _translating-documentation:

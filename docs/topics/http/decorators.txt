@@ -118,6 +118,23 @@ client-side caching.
 
 .. function:: never_cache(view_func)
 
+    This decorator adds an ``Expires`` header to the current date/time.
+
     This decorator adds a ``Cache-Control: max-age=0, no-cache, no-store,
     must-revalidate, private`` header to a response to indicate that a page
     should never be cached.
+
+    Each header is only added if it isn't already set.
+
+.. module:: django.views.decorators.common
+
+Common
+======
+
+The decorators in :mod:`django.views.decorators.common` allow per-view
+customization of :class:`~django.middleware.common.CommonMiddleware` behavior.
+
+.. function:: no_append_slash()
+
+    This decorator allows individual views to be excluded from
+    :setting:`APPEND_SLASH` URL normalization.

@@ -6,7 +6,9 @@ from functools import partial, update_wrapper, wraps
 class classonlymethod(classmethod):
     def __get__(self, instance, cls=None):
         if instance is not None:
-            raise AttributeError("This method is available only on the class, not on instances.")
+            raise AttributeError(
+                "This method is available only on the class, not on instances."
+            )
         return super().__get__(instance, cls)
 
 
@@ -16,6 +18,7 @@ def _update_method_wrapper(_wrapper, decorator):
     @decorator
     def dummy(*args, **kwargs):
         pass
+
     update_wrapper(_wrapper, dummy)
 
 
@@ -24,7 +27,7 @@ def _multi_decorate(decorators, method):
     Decorate `method` with one or more function decorators. `decorators` can be
     a single decorator or an iterable of decorators.
     """
-    if hasattr(decorators, '__iter__'):
+    if hasattr(decorators, "__iter__"):
         # Apply a list/tuple of decorators if 'decorators' is one. Decorator
         # functions are applied so that the call order is the same as the
         # order in which they appear in the iterable.
@@ -37,7 +40,7 @@ def _multi_decorate(decorators, method):
         # 'self' argument, but it's a closure over self so it can call
         # 'func'. Also, wrap method.__get__() in a function because new
         # attributes can't be set on bound method objects, only on functions.
-        bound_method = partial(method.__get__(self, type(self)))
+        bound_method = wraps(method)(partial(method.__get__(self, type(self))))
         for dec in decorators:
             bound_method = dec(bound_method)
         return bound_method(*args, **kwargs)
@@ -50,7 +53,7 @@ def _multi_decorate(decorators, method):
     return _wrapper
 
 
-def method_decorator(decorator, name=''):
+def method_decorator(decorator, name=""):
     """
     Convert a function decorator into a method decorator
     """
@@ -78,11 +81,11 @@ def method_decorator(decorator, name=''):
 
     # Don't worry about making _dec look similar to a list/tuple as it's rather
     # meaningless.
-    if not hasattr(decorator, '__iter__'):
+    if not hasattr(decorator, "__iter__"):
         update_wrapper(_dec, decorator)
     # Change the name to aid debugging.
-    obj = decorator if hasattr(decorator, '__name__') else decorator.__class__
-    _dec.__name__ = 'method_decorator(%s)' % obj.__name__
+    obj = decorator if hasattr(decorator, "__name__") else decorator.__class__
+    _dec.__name__ = "method_decorator(%s)" % obj.__name__
     return _dec
 
 
@@ -118,37 +121,44 @@ def make_middleware_decorator(middleware_class):
 
             @wraps(view_func)
             def _wrapped_view(request, *args, **kwargs):
-                if hasattr(middleware, 'process_request'):
+                if hasattr(middleware, "process_request"):
                     result = middleware.process_request(request)
                     if result is not None:
                         return result
-                if hasattr(middleware, 'process_view'):
+                if hasattr(middleware, "process_view"):
                     result = middleware.process_view(request, view_func, args, kwargs)
                     if result is not None:
                         return result
                 try:
                     response = view_func(request, *args, **kwargs)
                 except Exception as e:
-                    if hasattr(middleware, 'process_exception'):
+                    if hasattr(middleware, "process_exception"):
                         result = middleware.process_exception(request, e)
                         if result is not None:
                             return result
                     raise
-                if hasattr(response, 'render') and callable(response.render):
-                    if hasattr(middleware, 'process_template_response'):
-                        response = middleware.process_template_response(request, response)
+                if hasattr(response, "render") and callable(response.render):
+                    if hasattr(middleware, "process_template_response"):
+                        response = middleware.process_template_response(
+                            request, response
+                        )
                     # Defer running of process_response until after the template
                     # has been rendered:
-                    if hasattr(middleware, 'process_response'):
+                    if hasattr(middleware, "process_response"):
+
                         def callback(response):
                             return middleware.process_response(request, response)
+
                         response.add_post_render_callback(callback)
                 else:
-                    if hasattr(middleware, 'process_response'):
+                    if hasattr(middleware, "process_response"):
                         return middleware.process_response(request, response)
                 return response
+
             return _wrapped_view
+
         return _decorator
+
     return _make_decorator
 
 

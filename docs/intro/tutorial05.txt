@@ -3,7 +3,7 @@ Writing your first Django app, part 5
 =====================================
 
 This tutorial begins where :doc:`Tutorial 4 </intro/tutorial04>` left off.
-We've built a Web-poll application, and we'll now create some automated tests
+We've built a web-poll application, and we'll now create some automated tests
 for it.
 
 .. admonition:: Where to get help:
@@ -368,7 +368,7 @@ environment in the :djadmin:`shell`:
 :meth:`~django.test.utils.setup_test_environment` installs a template renderer
 which will allow us to examine some additional attributes on responses such as
 ``response.context`` that otherwise wouldn't be available. Note that this
-method *does not* setup a test database, so the following will be run against
+method *does not* set up a test database, so the following will be run against
 the existing database and the output may differ slightly depending on what
 questions you already created. You might get unexpected results if your
 ``TIME_ZONE`` in ``settings.py`` isn't correct. If you don't remember setting
@@ -498,11 +498,11 @@ class:
             Questions with a pub_date in the past are displayed on the
             index page.
             """
-            create_question(question_text="Past question.", days=-30)
+            question = create_question(question_text="Past question.", days=-30)
             response = self.client.get(reverse('polls:index'))
             self.assertQuerysetEqual(
                 response.context['latest_question_list'],
-                ['<Question: Past question.>']
+                [question],
             )
 
         def test_future_question(self):
@@ -520,24 +520,24 @@ class:
             Even if both past and future questions exist, only past questions
             are displayed.
             """
-            create_question(question_text="Past question.", days=-30)
+            question = create_question(question_text="Past question.", days=-30)
             create_question(question_text="Future question.", days=30)
             response = self.client.get(reverse('polls:index'))
             self.assertQuerysetEqual(
                 response.context['latest_question_list'],
-                ['<Question: Past question.>']
+                [question],
             )
 
         def test_two_past_questions(self):
             """
             The questions index page may display multiple questions.
             """
-            create_question(question_text="Past question 1.", days=-30)
-            create_question(question_text="Past question 2.", days=-5)
+            question1 = create_question(question_text="Past question 1.", days=-30)
+            question2 = create_question(question_text="Past question 2.", days=-5)
             response = self.client.get(reverse('polls:index'))
             self.assertQuerysetEqual(
                 response.context['latest_question_list'],
-                ['<Question: Past question 2.>', '<Question: Past question 1.>']
+                [question2, question1],
             )
 
 
@@ -689,7 +689,7 @@ Coverage will help to identify dead code. See
 :doc:`Testing in Django </topics/testing/index>` has comprehensive
 information about testing.
 
-.. _Selenium: http://seleniumhq.org/
+.. _Selenium: https://www.selenium.dev/
 .. _continuous integration: https://en.wikipedia.org/wiki/Continuous_integration
 
 What's next?

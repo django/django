@@ -17,11 +17,11 @@ if HAS_GEOIP2:
 # 'GeoLite2-City.mmdb'.
 @skipUnless(
     HAS_GEOIP2 and getattr(settings, "GEOIP_PATH", None),
-    "GeoIP is required along with the GEOIP_PATH setting."
+    "GeoIP is required along with the GEOIP_PATH setting.",
 )
 class GeoIPTest(SimpleTestCase):
-    addr = '75.41.39.1'
-    fqdn = 'tmc.edu'
+    addr = "129.237.192.1"
+    fqdn = "ku.edu"
 
     def test01_init(self):
         "GeoIP initialization."
@@ -40,15 +40,15 @@ class GeoIPTest(SimpleTestCase):
             self.assertTrue(g._city)
 
         # Only passing in the location of one database.
-        city = os.path.join(path, 'GeoLite2-City.mmdb')
-        cntry = os.path.join(path, 'GeoLite2-Country.mmdb')
-        g4 = GeoIP2(city, country='')
+        city = os.path.join(path, "GeoLite2-City.mmdb")
+        cntry = os.path.join(path, "GeoLite2-Country.mmdb")
+        g4 = GeoIP2(city, country="")
         self.assertIsNone(g4._country)
-        g5 = GeoIP2(cntry, city='')
+        g5 = GeoIP2(cntry, city="")
         self.assertIsNone(g5._city)
 
         # Improper parameters.
-        bad_params = (23, 'foo', 15.23)
+        bad_params = (23, "foo", 15.23)
         for bad in bad_params:
             with self.assertRaises(GeoIP2Exception):
                 GeoIP2(cache=bad)
@@ -60,19 +60,19 @@ class GeoIPTest(SimpleTestCase):
                 GeoIP2(bad, 0)
 
     def test_no_database_file(self):
-        invalid_path = os.path.join(os.path.dirname(__file__), 'data')
-        msg = 'Could not load a database from %s.' % invalid_path
+        invalid_path = os.path.join(os.path.dirname(__file__), "data")
+        msg = "Could not load a database from %s." % invalid_path
         with self.assertRaisesMessage(GeoIP2Exception, msg):
             GeoIP2(invalid_path)
 
     def test02_bad_query(self):
         "GeoIP query parameter checking."
-        cntry_g = GeoIP2(city='<foo>')
+        cntry_g = GeoIP2(city="<foo>")
         # No city database available, these calls should fail.
         with self.assertRaises(GeoIP2Exception):
-            cntry_g.city('tmc.edu')
+            cntry_g.city("tmc.edu")
         with self.assertRaises(GeoIP2Exception):
-            cntry_g.coords('tmc.edu')
+            cntry_g.coords("tmc.edu")
 
         # Non-string query should raise TypeError
         with self.assertRaises(TypeError):
@@ -80,92 +80,105 @@ class GeoIPTest(SimpleTestCase):
         with self.assertRaises(TypeError):
             cntry_g.country_name(GeoIP2)
 
-    @mock.patch('socket.gethostbyname')
+    @mock.patch("socket.gethostbyname")
     def test03_country(self, gethostbyname):
         "GeoIP country querying methods."
-        gethostbyname.return_value = '128.249.1.1'
-        g = GeoIP2(city='<foo>')
+        gethostbyname.return_value = "128.249.1.1"
+        g = GeoIP2(city="<foo>")
 
         for query in (self.fqdn, self.addr):
             self.assertEqual(
-                'US',
+                "US",
                 g.country_code(query),
-                'Failed for func country_code and query %s' % query
+                "Failed for func country_code and query %s" % query,
             )
             self.assertEqual(
-                'United States',
+                "United States",
                 g.country_name(query),
-                'Failed for func country_name and query %s' % query
+                "Failed for func country_name and query %s" % query,
             )
             self.assertEqual(
-                {'country_code': 'US', 'country_name': 'United States'},
-                g.country(query)
+                {"country_code": "US", "country_name": "United States"},
+                g.country(query),
             )
 
-    @mock.patch('socket.gethostbyname')
+    @mock.patch("socket.gethostbyname")
     def test04_city(self, gethostbyname):
         "GeoIP city querying methods."
-        gethostbyname.return_value = '75.41.39.1'
-        g = GeoIP2(country='<foo>')
+        gethostbyname.return_value = "129.237.192.1"
+        g = GeoIP2(country="<foo>")
 
         for query in (self.fqdn, self.addr):
             # Country queries should still work.
             self.assertEqual(
-                'US',
+                "US",
                 g.country_code(query),
-                'Failed for func country_code and query %s' % query
+                "Failed for func country_code and query %s" % query,
             )
             self.assertEqual(
-                'United States',
+                "United States",
                 g.country_name(query),
-                'Failed for func country_name and query %s' % query
+                "Failed for func country_name and query %s" % query,
             )
             self.assertEqual(
-                {'country_code': 'US', 'country_name': 'United States'},
-                g.country(query)
+                {"country_code": "US", "country_name": "United States"},
+                g.country(query),
             )
 
             # City information dictionary.
             d = g.city(query)
-            self.assertEqual('NA', d['continent_code'])
-            self.assertEqual('North America', d['continent_name'])
-            self.assertEqual('US', d['country_code'])
-            self.assertEqual('Dallas', d['city'])
-            self.assertEqual('TX', d['region'])
-            self.assertEqual('America/Chicago', d['time_zone'])
-            self.assertFalse(d['is_in_european_union'])
+            self.assertEqual("NA", d["continent_code"])
+            self.assertEqual("North America", d["continent_name"])
+            self.assertEqual("US", d["country_code"])
+            self.assertEqual("Lawrence", d["city"])
+            self.assertEqual("KS", d["region"])
+            self.assertEqual("America/Chicago", d["time_zone"])
+            self.assertFalse(d["is_in_european_union"])
             geom = g.geos(query)
             self.assertIsInstance(geom, GEOSGeometry)
 
-            for e1, e2 in (geom.tuple, g.coords(query), g.lon_lat(query), g.lat_lon(query)):
+            for e1, e2 in (
+                geom.tuple,
+                g.coords(query),
+                g.lon_lat(query),
+                g.lat_lon(query),
+            ):
                 self.assertIsInstance(e1, float)
                 self.assertIsInstance(e2, float)
 
     def test06_ipv6_query(self):
         "GeoIP can lookup IPv6 addresses."
         g = GeoIP2()
-        d = g.city('2002:81ed:c9a5::81ed:c9a5')  # IPv6 address for www.nhm.ku.edu
-        self.assertEqual('US', d['country_code'])
-        self.assertEqual('Lawrence', d['city'])
-        self.assertEqual('KS', d['region'])
+        d = g.city("2002:81ed:c9a5::81ed:c9a5")  # IPv6 address for www.nhm.ku.edu
+        self.assertEqual("US", d["country_code"])
+        self.assertEqual("Lawrence", d["city"])
+        self.assertEqual("KS", d["region"])
 
     def test_repr(self):
         path = settings.GEOIP_PATH
         g = GeoIP2(path=path)
         meta = g._reader.metadata()
-        version = '%s.%s' % (meta.binary_format_major_version, meta.binary_format_minor_version)
+        version = "%s.%s" % (
+            meta.binary_format_major_version,
+            meta.binary_format_minor_version,
+        )
         country_path = g._country_file
         city_path = g._city_file
-        expected = '<GeoIP2 [v%(version)s] _country_file="%(country)s", _city_file="%(city)s">' % {
-            'version': version,
-            'country': country_path,
-            'city': city_path,
-        }
+        expected = (
+            '<GeoIP2 [v%(version)s] _country_file="%(country)s", _city_file="%(city)s">'
+            % {
+                "version": version,
+                "country": country_path,
+                "city": city_path,
+            }
+        )
         self.assertEqual(repr(g), expected)
 
-    @mock.patch('socket.gethostbyname', return_value='expected')
+    @mock.patch("socket.gethostbyname", return_value="expected")
     def test_check_query(self, gethostbyname):
         g = GeoIP2()
-        self.assertEqual(g._check_query('127.0.0.1'), '127.0.0.1')
-        self.assertEqual(g._check_query('2002:81ed:c9a5::81ed:c9a5'), '2002:81ed:c9a5::81ed:c9a5')
-        self.assertEqual(g._check_query('invalid-ip-address'), 'expected')
+        self.assertEqual(g._check_query("127.0.0.1"), "127.0.0.1")
+        self.assertEqual(
+            g._check_query("2002:81ed:c9a5::81ed:c9a5"), "2002:81ed:c9a5::81ed:c9a5"
+        )
+        self.assertEqual(g._check_query("invalid-ip-address"), "expected")

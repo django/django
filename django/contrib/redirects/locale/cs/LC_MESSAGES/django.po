@@ -3,13 +3,13 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Vláďa Macek <macek@sandbox.cz>, 2014
-# Vláďa Macek <macek@sandbox.cz>, 2015,2019
+# Vláďa Macek <macek@sandbox.cz>, 2015,2019,2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-19 09:23+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-03-18 23:14+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -38,11 +38,11 @@ msgid "redirect to"
 msgstr "přesměrovat na"
 
 msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"“http://”."
+"This can be either an absolute path (as above) or a full URL starting with a "
+"scheme such as “https://”."
 msgstr ""
-"Toto může být buď absolutní cesta (jako výše) nebo plné URL začínající na "
-"\"http://\"."
+"Toto by měla být buď absolutní cesta (jako výše) nebo plná adresa URL "
+"začínající schématem, tedy například \"https://\"."
 
 msgid "redirect"
 msgstr "přesměrování"

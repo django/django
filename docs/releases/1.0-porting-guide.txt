@@ -79,8 +79,8 @@ see `the admin`_ below for more details.
     A contributor to djangosnippets__ has written a script that'll `scan your
     models.py and generate a corresponding admin.py`__.
 
-    __ https://www.djangosnippets.org/
-    __ https://www.djangosnippets.org/snippets/603/
+    __ https://djangosnippets.org/
+    __ https://djangosnippets.org/snippets/603/
 
 Example
 ~~~~~~~
@@ -551,7 +551,7 @@ need to reload your data. Do this after you have made the change to using
 
   For SQLite, this means making a copy of the single file that stores the
   database (the name of that file is the ``DATABASE_NAME`` in your
-  settings.py file).
+  ``settings.py`` file).
 
 To upgrade each application to use a ``DecimalField``, you can do the
 following, replacing ``<app>`` in the code below with each app's name:

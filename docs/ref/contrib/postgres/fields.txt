@@ -182,7 +182,7 @@ the SQL operator ``&&``. For example::
 ``len``
 ~~~~~~~
 
-Returns the length of the array. The lookups available afterwards are those
+Returns the length of the array. The lookups available afterward are those
 available for :class:`~django.db.models.IntegerField`. For example::
 
     >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
@@ -261,7 +261,7 @@ transform do not change. For example::
     Read about `the performance considerations`_ prior to using it.
 
     To use ``citext``, use the :class:`.CITextExtension` operation to
-    :ref:`setup the citext extension <create-postgresql-extensions>` in
+    :ref:`set up the citext extension <create-postgresql-extensions>` in
     PostgreSQL before the first ``CreateModel`` migration operation.
 
     If you're using an :class:`~django.contrib.postgres.fields.ArrayField`
@@ -285,6 +285,16 @@ transform do not change. For example::
     .. _citext: https://www.postgresql.org/docs/current/citext.html
     .. _the performance considerations: https://www.postgresql.org/docs/current/citext.html#id-1.11.7.17.7
 
+.. admonition:: Case-insensitive collations
+
+    On PostgreSQL 12+, it's preferable to use non-deterministic collations
+    instead of the ``citext`` extension. You can create them using the
+    :class:`~django.contrib.postgres.operations.CreateCollation` migration
+    operation. For more details, see :ref:`manage-postgresql-collations` and
+    the PostgreSQL documentation about `non-deterministic collations`_.
+
+    .. _non-deterministic collations: https://www.postgresql.org/docs/current/collation.html#COLLATION-NONDETERMINISTIC
+
 ``HStoreField``
 ===============
 
@@ -297,7 +307,7 @@ transform do not change. For example::
     To use this field, you'll need to:
 
     #. Add ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`.
-    #. :ref:`Setup the hstore extension <create-postgresql-extensions>` in
+    #. :ref:`Set up the hstore extension <create-postgresql-extensions>` in
        PostgreSQL.
 
     You'll see an error like ``can't adapt type 'dict'`` if you skip the first
@@ -347,6 +357,13 @@ You can chain other lookups after key lookups::
 
 If the key you wish to query by clashes with the name of another lookup, you
 need to use the :lookup:`hstorefield.contains` lookup instead.
+
+.. note::
+
+    Key transforms can also be chained with: :lookup:`contains`,
+    :lookup:`icontains`, :lookup:`endswith`, :lookup:`iendswith`,
+    :lookup:`iexact`, :lookup:`regex`, :lookup:`iregex`, :lookup:`startswith`,
+    and :lookup:`istartswith` lookups.
 
 .. warning::
 
@@ -464,66 +481,13 @@ Returns objects where the array of values is the given value. Note that the
 order is not guaranteed to be reliable, so this transform is mainly useful for
 using in conjunction with lookups on
 :class:`~django.contrib.postgres.fields.ArrayField`. Uses the SQL function
-``avalues()``. For example::
+``avals()``. For example::
 
     >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
     >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
 
     >>> Dog.objects.filter(data__values__contains=['collie'])
     <QuerySet [<Dog: Meg>]>
-
-``JSONField``
-=============
-
-.. class:: JSONField(encoder=None, **options)
-
-    A field for storing JSON encoded data. In Python the data is represented in
-    its Python native format: dictionaries, lists, strings, numbers, booleans
-    and ``None``.
-
-    .. attribute:: encoder
-
-        An optional JSON-encoding class to serialize data types not supported
-        by the standard JSON serializer (``datetime``, ``uuid``, etc.). For
-        example, you can use the
-        :class:`~django.core.serializers.json.DjangoJSONEncoder` class or any
-        other :py:class:`json.JSONEncoder` subclass.
-
-        When the value is retrieved from the database, it will be in the format
-        chosen by the custom encoder (most often a string), so you'll need to
-        take extra steps to convert the value back to the initial data type
-        (:meth:`Model.from_db() <django.db.models.Model.from_db>` and
-        :meth:`Field.from_db_value() <django.db.models.Field.from_db_value>`
-        are two possible hooks for that purpose). Your deserialization may need
-        to account for the fact that you can't be certain of the input type.
-        For example, you run the risk of returning a ``datetime`` that was
-        actually a string that just happened to be in the same format chosen
-        for ``datetime``\s.
-
-    If you give the field a :attr:`~django.db.models.Field.default`, ensure
-    it's a callable such as ``dict`` (for an empty default) or a callable that
-    returns a dict (such as a function). Incorrectly using ``default={}``
-    creates a mutable default that is shared between all instances of
-    ``JSONField``.
-
-.. note::
-
-    PostgreSQL has two native JSON based data types: ``json`` and ``jsonb``.
-    The main difference between them is how they are stored and how they can be
-    queried. PostgreSQL's ``json`` field is stored as the original string
-    representation of the JSON and must be decoded on the fly when queried
-    based on keys. The ``jsonb`` field is stored based on the actual structure
-    of the JSON which allows indexing. The trade-off is a small additional cost
-    on writing to the ``jsonb`` field. ``JSONField`` uses ``jsonb``.
-
-.. deprecated:: 3.1
-
-    Use :class:`django.db.models.JSONField` instead.
-
-Querying ``JSONField``
-----------------------
-
-See :ref:`querying-jsonfield` for details.
 
 .. _range-fields:
 
@@ -539,9 +503,9 @@ All of the range fields translate to :ref:`psycopg2 Range objects
 <psycopg2:adapt-range>` in Python, but also accept tuples as input if no bounds
 information is necessary. The default is lower bound included, upper bound
 excluded, that is ``[)`` (see the PostgreSQL documentation for details about
-`different bounds`_).
-
-.. _different bounds: https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-IO
+`different bounds`_). The default bounds can be changed for non-discrete range
+fields (:class:`.DateTimeRangeField` and :class:`.DecimalRangeField`) by using
+the ``default_bounds`` argument.
 
 ``IntegerRangeField``
 ---------------------
@@ -574,22 +538,42 @@ excluded, that is ``[)`` (see the PostgreSQL documentation for details about
 ``DecimalRangeField``
 ---------------------
 
-.. class:: DecimalRangeField(**options)
+.. class:: DecimalRangeField(default_bounds='[)', **options)
 
     Stores a range of floating point values. Based on a
     :class:`~django.db.models.DecimalField`. Represented by a ``numrange`` in
     the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
     Python.
 
+    .. attribute:: DecimalRangeField.default_bounds
+
+        .. versionadded:: 4.1
+
+        Optional. The value of ``bounds`` for list and tuple inputs. The
+        default is lower bound included, upper bound excluded, that is ``[)``
+        (see the PostgreSQL documentation for details about
+        `different bounds`_). ``default_bounds`` is not used for
+        :class:`~psycopg2:psycopg2.extras.NumericRange` inputs.
+
 ``DateTimeRangeField``
 ----------------------
 
-.. class:: DateTimeRangeField(**options)
+.. class:: DateTimeRangeField(default_bounds='[)', **options)
 
     Stores a range of timestamps. Based on a
     :class:`~django.db.models.DateTimeField`. Represented by a ``tstzrange`` in
     the database and a :class:`~psycopg2:psycopg2.extras.DateTimeTZRange` in
     Python.
+
+    .. attribute:: DateTimeRangeField.default_bounds
+
+        .. versionadded:: 4.1
+
+        Optional. The value of ``bounds`` for list and tuple inputs. The
+        default is lower bound included, upper bound excluded, that is ``[)``
+        (see the PostgreSQL documentation for details about
+        `different bounds`_). ``default_bounds`` is not used for
+        :class:`~psycopg2:psycopg2.extras.DateTimeTZRange` inputs.
 
 ``DateRangeField``
 ------------------
@@ -676,14 +660,6 @@ The ``contained_by`` lookup is also available on the non-range field types:
     ... )
     <QuerySet [<Event: Soft play>]>
 
-.. versionchanged:: 3.1
-
-    Support for :class:`~django.db.models.SmallAutoField`,
-    :class:`~django.db.models.AutoField`,
-    :class:`~django.db.models.BigAutoField`,
-    :class:`~django.db.models.SmallIntegerField`, and
-    :class:`~django.db.models.DecimalField` was added.
-
 .. fieldlookup:: rangefield.overlap
 
 ``overlap``
@@ -762,8 +738,7 @@ The returned ranges share a bound with the passed range.
 Querying using the bounds
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There are three transforms available for use in queries. You can extract the
-lower or upper bound, or query based on emptiness.
+Range fields support several extra lookups.
 
 .. fieldlookup:: rangefield.startswith
 
@@ -803,8 +778,6 @@ Returned objects are empty ranges. Can be chained to valid lookups for a
 ``lower_inc``
 ^^^^^^^^^^^^^
 
-.. versionadded:: 3.1
-
 Returns objects that have inclusive or exclusive lower bounds, depending on the
 boolean value passed. Can be chained to valid lookups for a
 :class:`~django.db.models.BooleanField`.
@@ -816,8 +789,6 @@ boolean value passed. Can be chained to valid lookups for a
 
 ``lower_inf``
 ^^^^^^^^^^^^^
-
-.. versionadded:: 3.1
 
 Returns objects that have unbounded (infinite) or bounded lower bound,
 depending on the boolean value passed. Can be chained to valid lookups for a
@@ -831,8 +802,6 @@ depending on the boolean value passed. Can be chained to valid lookups for a
 ``upper_inc``
 ^^^^^^^^^^^^^
 
-.. versionadded:: 3.1
-
 Returns objects that have inclusive or exclusive upper bounds, depending on the
 boolean value passed. Can be chained to valid lookups for a
 :class:`~django.db.models.BooleanField`.
@@ -844,8 +813,6 @@ boolean value passed. Can be chained to valid lookups for a
 
 ``upper_inf``
 ^^^^^^^^^^^^^
-
-.. versionadded:: 3.1
 
 Returns objects that have unbounded (infinite) or bounded upper bound,
 depending on the boolean value passed. Can be chained to valid lookups for a
@@ -937,3 +904,5 @@ used with a custom range functions that expected boundaries, for example to
 define :class:`~django.contrib.postgres.constraints.ExclusionConstraint`. See
 `the PostgreSQL documentation for the full details <https://www.postgresql.org/
 docs/current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_.
+
+.. _different bounds: https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-IO

@@ -21,17 +21,20 @@ class XFrameOptionsMiddleware(MiddlewareMixin):
     response from being loaded in a frame in any site, set X_FRAME_OPTIONS in
     your project's Django settings to 'DENY'.
     """
+
     def process_response(self, request, response):
         # Don't set it if it's already in the response
-        if response.get('X-Frame-Options') is not None:
+        if response.get("X-Frame-Options") is not None:
             return response
 
         # Don't set it if they used @xframe_options_exempt
-        if getattr(response, 'xframe_options_exempt', False):
+        if getattr(response, "xframe_options_exempt", False):
             return response
 
-        response['X-Frame-Options'] = self.get_xframe_options_value(request,
-                                                                    response)
+        response.headers["X-Frame-Options"] = self.get_xframe_options_value(
+            request,
+            response,
+        )
         return response
 
     def get_xframe_options_value(self, request, response):
@@ -42,4 +45,4 @@ class XFrameOptionsMiddleware(MiddlewareMixin):
         This method can be overridden if needed, allowing it to vary based on
         the request or response.
         """
-        return getattr(settings, 'X_FRAME_OPTIONS', 'DENY').upper()
+        return getattr(settings, "X_FRAME_OPTIONS", "DENY").upper()

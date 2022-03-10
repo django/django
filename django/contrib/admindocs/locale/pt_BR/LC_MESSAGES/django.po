@@ -10,14 +10,15 @@
 # semente, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lucas Infante <maccinza@gmail.com>, 2015
+# Rafael Fontenelle <rffontenelle@gmail.com>, 2021
 # Vinícius Muniz de Melo <viniciusdesk@icloud.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-12-19 17:59+0000\n"
-"Last-Translator: Vinícius Muniz de Melo <viniciusdesk@icloud.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-17 05:53+0000\n"
+"Last-Translator: Rafael Fontenelle <rffontenelle@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -109,7 +110,7 @@ msgstr "Por favor, instale o docutils"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
+"The admin documentation system requires Python’s <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
 "O sistema de documentação de administração exige a biblioteca <a href="

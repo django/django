@@ -14,9 +14,10 @@ class Node:
     connection (the root) with the children being either leaf nodes or other
     Node instances.
     """
+
     # Standard connector type. Clients usually won't use this at all and
     # subclasses will usually override the value.
-    default = 'DEFAULT'
+    default = "DEFAULT"
 
     def __init__(self, children=None, connector=None, negated=False):
         """Construct a new Node. If no connector is given, use the default."""
@@ -41,8 +42,8 @@ class Node:
         return obj
 
     def __str__(self):
-        template = '(NOT (%s: %s))' if self.negated else '(%s: %s)'
-        return template % (self.connector, ', '.join(str(c) for c in self.children))
+        template = "(NOT (%s: %s))" if self.negated else "(%s: %s)"
+        return template % (self.connector, ", ".join(str(c) for c in self.children))
 
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self)
@@ -67,15 +68,23 @@ class Node:
 
     def __eq__(self, other):
         return (
-            self.__class__ == other.__class__ and
-            (self.connector, self.negated) == (other.connector, other.negated) and
-            self.children == other.children
+            self.__class__ == other.__class__
+            and self.connector == other.connector
+            and self.negated == other.negated
+            and self.children == other.children
         )
 
     def __hash__(self):
-        return hash((self.__class__, self.connector, self.negated, *make_hashable(self.children)))
+        return hash(
+            (
+                self.__class__,
+                self.connector,
+                self.negated,
+                *make_hashable(self.children),
+            )
+        )
 
-    def add(self, data, conn_type, squash=True):
+    def add(self, data, conn_type):
         """
         Combine this tree and the data represented by data using the
         connector conn_type. The combine is done by squashing the node other
@@ -86,37 +95,28 @@ class Node:
 
         Return a node which can be used in place of data regardless if the
         node other got squashed or not.
-
-        If `squash` is False the data is prepared and added as a child to
-        this tree without further logic.
         """
-        if data in self.children:
-            return data
-        if not squash:
-            self.children.append(data)
-            return data
-        if self.connector == conn_type:
-            # We can reuse self.children to append or squash the node other.
-            if (isinstance(data, Node) and not data.negated and
-                    (data.connector == conn_type or len(data) == 1)):
-                # We can squash the other node's children directly into this
-                # node. We are just doing (AB)(CD) == (ABCD) here, with the
-                # addition that if the length of the other node is 1 the
-                # connector doesn't matter. However, for the len(self) == 1
-                # case we don't want to do the squashing, as it would alter
-                # self.connector.
-                self.children.extend(data.children)
-                return self
-            else:
-                # We could use perhaps additional logic here to see if some
-                # children could be used for pushdown here.
-                self.children.append(data)
-                return data
-        else:
-            obj = self._new_instance(self.children, self.connector,
-                                     self.negated)
+        if self.connector != conn_type:
+            obj = self._new_instance(self.children, self.connector, self.negated)
             self.connector = conn_type
             self.children = [obj, data]
+            return data
+        elif (
+            isinstance(data, Node)
+            and not data.negated
+            and (data.connector == conn_type or len(data) == 1)
+        ):
+            # We can squash the other node's children directly into this node.
+            # We are just doing (AB)(CD) == (ABCD) here, with the addition that
+            # if the length of the other node is 1 the connector doesn't
+            # matter. However, for the len(self) == 1 case we don't want to do
+            # the squashing, as it would alter self.connector.
+            self.children.extend(data.children)
+            return self
+        else:
+            # We could use perhaps additional logic here to see if some
+            # children could be used for pushdown here.
+            self.children.append(data)
             return data
 
     def negate(self):

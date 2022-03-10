@@ -4,15 +4,15 @@ from django.db import models
 class Tag(models.Model):
     name = models.CharField(max_length=10)
     parent = models.ForeignKey(
-        'self',
+        "self",
         models.SET_NULL,
         blank=True,
         null=True,
-        related_name='children',
+        related_name="children",
     )
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
@@ -39,8 +39,8 @@ class Staff(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=50)
     organisation = models.CharField(max_length=100)
-    tags = models.ManyToManyField(Tag, through='StaffTag')
-    coworkers = models.ManyToManyField('self')
+    tags = models.ManyToManyField(Tag, through="StaffTag")
+    coworkers = models.ManyToManyField("self")
 
     def __str__(self):
         return self.name
