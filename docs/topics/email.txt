@@ -664,7 +664,7 @@ and that those emails will contain the correct content.
 
 The easiest way to configure email for local development is to use the
 :ref:`console <topic-email-console-backend>` email backend. This backend
-redirects all email to stdout, allowing you to inspect the content of mail.
+redirects all email to ``stdout``, allowing you to inspect the content of mail.
 
 The :ref:`file <topic-email-file-backend>` email backend can also be useful
 during development -- this backend dumps the contents of every SMTP connection

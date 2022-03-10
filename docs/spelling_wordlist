@@ -20,7 +20,6 @@ args
 async
 atomicity
 auth
-autoclobber
 autocommit
 autocomplete
 autocompletion
@@ -314,8 +313,6 @@ multitenancy
 multithreaded
 multithreading
 multivalued
-myapp
-mysite
 mysql
 mysqlclient
 naïve
@@ -466,7 +463,6 @@ serializability
 serializable
 serializer
 serializers
-sessionid
 shapefile
 shapefiles
 sharding
@@ -483,9 +479,7 @@ stacktrace
 stateful
 staticfile
 staticfiles
-stderr
 stdlib
-stdout
 storages
 stylesheet
 stylesheets
@@ -608,7 +602,6 @@ uwsgi
 uWSGI
 validator
 validators
-validsite
 VARCHAR
 variadic
 vendored

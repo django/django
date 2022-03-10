@@ -821,7 +821,7 @@ can be useful during testing.
       approve destroying the existing database. ``sys.exit`` is
       called if the user does not approve.
 
-    * If autoclobber is ``True``, the database will be destroyed
+    * If ``autoclobber`` is ``True``, the database will be destroyed
       without consulting the user.
 
     ``serialize`` determines if Django serializes the database into an
