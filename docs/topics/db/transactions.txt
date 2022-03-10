@@ -609,7 +609,7 @@ When autocommit is enabled, savepoints don't make sense. When it's disabled,
 commits before any statement other than ``SELECT``, ``INSERT``, ``UPDATE``,
 ``DELETE`` and ``REPLACE``.) This bug has two consequences:
 
-- The low level APIs for savepoints are only usable inside a transaction ie.
+- The low level APIs for savepoints are only usable inside a transaction i.e.
   inside an :func:`atomic` block.
 - It's impossible to use :func:`atomic` when autocommit is turned off.
 

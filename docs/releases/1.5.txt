@@ -485,10 +485,10 @@ in some circumstances.
 JSON-related features in Django 1.4 always used ``django.utils.simplejson``.
 This module was actually:
 
-- A system version of ``simplejson``, if one was available (ie. ``import
+- A system version of ``simplejson``, if one was available (i.e. ``import
   simplejson`` works), if it was more recent than Django's built-in copy or it
   had the C speedups, or
-- The :mod:`json` module from the standard library, if it was available (ie.
+- The :mod:`json` module from the standard library, if it was available (i.e.
   Python 2.6 or greater), or
 - A built-in copy of version 2.0.7 of ``simplejson``.
 
