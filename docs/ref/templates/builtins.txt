@@ -2405,7 +2405,7 @@ Newlines in the HTML content will be preserved.
 ------------------
 
 Recursively takes a self-nested list and returns an HTML unordered list --
-WITHOUT opening and closing <ul> tags.
+WITHOUT opening and closing ``<ul>`` tags.
 
 The list is assumed to be in the proper format. For example, if ``var``
 contains ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``, then

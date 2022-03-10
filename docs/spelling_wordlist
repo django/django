@@ -196,7 +196,6 @@ GiST
 Googol
 Greenhill
 gunicorn
-gz
 GZip
 gzipped
 hardcode
@@ -357,13 +356,11 @@ Pinterest
 plaintext
 pluggable
 pluralizations
-po
 pooler
 postfix
 postgis
 postgres
 postgresql
-pq
 pre
 precisions
 precomputation
@@ -391,7 +388,6 @@ pseudocode
 psycopg
 Punycode
 Puthraya
-py
 pyformat
 pysqlite
 pythonic
@@ -401,7 +397,6 @@ querysets
 querystring
 queueing
 Quickstart
-QUnit
 quoteless
 Radziej
 rasters
@@ -536,7 +531,6 @@ titlecase
 tokenized
 toolkits
 toolset
-Tox
 trac
 tracebacks
 transactional
@@ -549,7 +543,6 @@ trigram
 trigrams
 Turkmen
 tv
-ul
 umask
 unannotated
 unapplied
@@ -601,7 +594,6 @@ uWSGI
 validator
 validators
 validsite
-VARCHAR
 variadic
 vendored
 virtualized
@@ -615,6 +607,5 @@ wrappable
 wsgi
 www
 xe
-xgettext
 xxxxx
 Zope

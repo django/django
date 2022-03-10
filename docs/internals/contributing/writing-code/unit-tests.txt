@@ -107,8 +107,9 @@ The remainder of this documentation shows commands for running tests without
 ``tox``, however, any option passed to ``runtests.py`` can also be passed to
 ``tox`` by prefixing the argument list with ``--``, as above.
 
-Tox also respects the :envvar:`DJANGO_SETTINGS_MODULE` environment variable, if
-set. For example, the following is equivalent to the command above:
+``Tox`` also respects the :envvar:`DJANGO_SETTINGS_MODULE` environment
+variable, if set. For example, the following is equivalent to the command
+above:
 
 .. code-block:: console
 

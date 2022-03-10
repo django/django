@@ -121,9 +121,9 @@ any time leading up to the actual release:
 
         $ python scripts/manage_translations.py fetch
 
-   and then commit the changed/added files (both .po and .mo). Sometimes there
-   are validation errors which need to be debugged, so avoid doing this task
-   immediately before a release is needed.
+   and then commit the changed/added files (both ``.po`` and ``.mo``).
+   Sometimes there are validation errors which need to be debugged, so avoid
+   doing this task immediately before a release is needed.
 
 #. :ref:`Update the django-admin manual page <django-admin-manpage>`::
 
@@ -345,9 +345,9 @@ Now you're ready to actually put the release out there. To do this:
        $ twine upload -s dist/*
 
 #. Go to the `Add release page in the admin`__, enter the new release number
-   exactly as it appears in the name of the tarball (Django-<version>.tar.gz).
-   So for example enter "1.5.1" or "1.4c2", etc. If the release is part of
-   an LTS branch, mark it so.
+   exactly as it appears in the name of the tarball
+   (``Django-<version>.tar.gz``). So for example enter "1.5.1" or "1.4c2", etc.
+   If the release is part of an LTS branch, mark it so.
 
    __ https://www.djangoproject.com/admin/releases/release/add/
 

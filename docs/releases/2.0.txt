@@ -212,7 +212,7 @@ Management Commands
   ``PositiveIntegerField`` or ``PositiveSmallIntegerField``.
 
 * The new :option:`makemessages --add-location` option controls the comment
-  format in PO files.
+  format in ``.po`` files.
 
 * :djadmin:`loaddata` can now :ref:`read from stdin <loading-fixtures-stdin>`.
 

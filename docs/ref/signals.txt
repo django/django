@@ -422,7 +422,7 @@ Arguments sent with this signal:
     Same as ``sender``.
 
 ``verbosity``
-    Indicates how much information manage.py is printing on screen. See
+    Indicates how much information ``manage.py`` is printing on screen. See
     the :option:`--verbosity` flag for details.
 
     Functions which listen for :data:`pre_migrate` should adjust what they
@@ -481,7 +481,7 @@ Arguments sent with this signal:
     Same as ``sender``.
 
 ``verbosity``
-    Indicates how much information manage.py is printing on screen. See
+    Indicates how much information ``manage.py`` is printing on screen. See
     the :option:`--verbosity` flag for details.
 
     Functions which listen for :data:`post_migrate` should adjust what they

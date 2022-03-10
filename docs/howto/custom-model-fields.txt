@@ -493,8 +493,8 @@ following arguments:
 
 * ``None`` (if the field allows ``null=True``)
 
-In our ``HandField`` class, we're storing the data as a VARCHAR field in the
-database, so we need to be able to process strings and ``None`` in the
+In our ``HandField`` class, we're storing the data as a ``VARCHAR`` field in
+the database, so we need to be able to process strings and ``None`` in the
 ``from_db_value()``. In ``to_python()``, we need to also handle ``Hand``
 instances::
 

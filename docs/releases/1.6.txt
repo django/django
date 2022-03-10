@@ -946,7 +946,7 @@ Miscellaneous
   with ``localhost`` as the domain.
 
 * The new :option:`makemessages --keep-pot` option prevents deleting the
-  temporary .pot file generated before creating the .po file.
+  temporary ``.pot`` file generated before creating the ``.po`` file.
 
 * The undocumented ``django.core.servers.basehttp.WSGIServerException`` has
   been removed. Use ``socket.error`` provided by the standard library instead.
