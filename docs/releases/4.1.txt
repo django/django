@@ -430,6 +430,9 @@ Miscellaneous
 * The ``exc_info`` argument of the undocumented
   ``django.utils.log.log_response()`` function is replaced by ``exception``.
 
+* The ``size`` argument of the undocumented
+  ``django.views.static.was_modified_since()`` function is removed.
+
 .. _deprecated-features-4.1:
 
 Features deprecated in 4.1

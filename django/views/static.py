@@ -4,7 +4,6 @@ during development, and SHOULD NOT be used in a production setting.
 """
 import mimetypes
 import posixpath
-import re
 from pathlib import Path
 
 from django.http import FileResponse, Http404, HttpResponse, HttpResponseNotModified
@@ -42,7 +41,7 @@ def serve(request, path, document_root=None, show_indexes=False):
     # Respect the If-Modified-Since header.
     statobj = fullpath.stat()
     if not was_modified_since(
-        request.META.get("HTTP_IF_MODIFIED_SINCE"), statobj.st_mtime, statobj.st_size
+        request.META.get("HTTP_IF_MODIFIED_SINCE"), statobj.st_mtime
     ):
         return HttpResponseNotModified()
     content_type, encoding = mimetypes.guess_type(str(fullpath))
@@ -111,7 +110,7 @@ def directory_index(path, fullpath):
     return HttpResponse(t.render(c))
 
 
-def was_modified_since(header=None, mtime=0, size=0):
+def was_modified_since(header=None, mtime=0):
     """
     Was something modified since the user last downloaded it?
 
@@ -121,20 +120,11 @@ def was_modified_since(header=None, mtime=0, size=0):
 
     mtime
       This is the modification time of the item we're talking about.
-
-    size
-      This is the size of the item we're talking about.
     """
     try:
         if header is None:
             raise ValueError
-        matches = re.match(r"^([^;]+)(; length=([0-9]+))?$", header, re.IGNORECASE)
-        if matches is None:
-            raise ValueError
-        header_mtime = parse_http_date(matches[1])
-        header_len = matches[3]
-        if header_len and int(header_len) != size:
-            raise ValueError
+        header_mtime = parse_http_date(header)
         if int(mtime) > header_mtime:
             raise ValueError
     except (ValueError, OverflowError):
