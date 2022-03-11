@@ -203,7 +203,7 @@ present in Django. These include imports of the form library from
 ``django.newforms`` (now located simply at ``django.forms``), the
 ``form_for_model`` and ``form_for_instance`` helper functions (which have been
 replaced by ``ModelForm``) and a number of deprecated features which were
-replaced by the dispatcher, file-uploading and file-storage refactorings
+replaced by the dispatcher, file-uploading and file-storage refactoring
 introduced in the Django 1.0 alpha releases.
 
 Known issues
