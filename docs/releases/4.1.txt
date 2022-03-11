@@ -427,6 +427,9 @@ Miscellaneous
   JavaScript events and don't depend on jQuery. See
   :ref:`admin-javascript-inline-form-events` for more details on the change.
 
+* The ``exc_info`` argument of the undocumented
+  ``django.utils.log.log_response()`` function is replaced by ``exception``.
+
 .. _deprecated-features-4.1:
 
 Features deprecated in 4.1
@@ -481,9 +484,6 @@ Miscellaneous
   :meth:`.SimpleTestCase.assertFormError` and
   :meth:`~.SimpleTestCase.assertFormsetError` is deprecated. Use ``errors=[]``
   instead.
-
-* The ``exc_info`` argument of the undocumented
-  ``django.utils.log.log_response()`` function is replaced by ``exception``.
 
 * ``django.contrib.sessions.serializers.PickleSerializer`` is deprecated due to
   the risk of remote code execution.
