@@ -643,7 +643,7 @@ Default: ``False``
 If set to ``True``, existing :ref:`persistent database connections
 <persistent-database-connections>` will be health checked before they are
 reused in each request performing database access. If the health check fails,
-the connection will be re-established without failing the request when the
+the connection will be reestablished without failing the request when the
 connection is no longer usable but the database server is ready to accept and
 serve new connections (e.g. after database server restart closing existing
 connections).

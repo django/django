@@ -30,7 +30,7 @@ General notes
 Persistent connections
 ----------------------
 
-Persistent connections avoid the overhead of re-establishing a connection to
+Persistent connections avoid the overhead of reestablishing a connection to
 the database in each request. They're controlled by the
 :setting:`CONN_MAX_AGE` parameter which defines the maximum lifetime of a
 connection. It can be set independently for each database.

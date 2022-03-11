@@ -312,7 +312,7 @@ Disabling a site-wide action
     Once you've done the above, that action will no longer be available
     site-wide.
 
-    If, however, you need to re-enable a globally-disabled action for one
+    If, however, you need to reenable a globally-disabled action for one
     particular model, list it explicitly in your ``ModelAdmin.actions`` list::
 
         # Globally disable delete selected

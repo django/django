@@ -289,7 +289,7 @@ It is optimal because:
    ``display_group_members`` is ``False``.
 
 #. Storing ``group.members.all()`` in the ``members`` variable allows its
-   result cache to be re-used.
+   result cache to be reused.
 
 #. The line ``if members:`` causes ``QuerySet.__bool__()`` to be called, which
    causes the ``group.members.all()`` query to be run on the database. If there

@@ -972,7 +972,7 @@ calling the appropriate methods on the wrapped expression.
 
     .. method:: resolve_expression(query=None, allow_joins=True, reuse=None, summarize=False, for_save=False)
 
-        Provides the chance to do any pre-processing or validation of
+        Provides the chance to do any preprocessing or validation of
         the expression before it's added to the query. ``resolve_expression()``
         must also be called on any nested expressions. A ``copy()`` of ``self``
         should be returned with any necessary transformations.
@@ -1091,7 +1091,7 @@ We do some basic validation on the parameters, including requiring at least
 ``output_field`` here so that Django knows what kind of model field to assign
 the eventual result to.
 
-Now we implement the pre-processing and validation. Since we do not have
+Now we implement the preprocessing and validation. Since we do not have
 any of our own validation at this point, we delegate to the nested
 expressions::
 

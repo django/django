@@ -10,7 +10,7 @@ Writing validators
 
 A validator is a callable that takes a value and raises a
 :exc:`~django.core.exceptions.ValidationError` if it doesn't meet some
-criteria. Validators can be useful for re-using validation logic between
+criteria. Validators can be useful for reusing validation logic between
 different types of fields.
 
 For example, here's a validator that only allows even numbers::
