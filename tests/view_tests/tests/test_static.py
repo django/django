@@ -191,3 +191,6 @@ class StaticUtilsTests(unittest.TestCase):
         mtime = 1343416141.107817
         header = http_date(mtime)
         self.assertFalse(was_modified_since(header, mtime))
+
+    def test_was_modified_since_empty_string(self):
+        self.assertTrue(was_modified_since(header="", mtime=1))
