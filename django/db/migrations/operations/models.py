@@ -171,6 +171,19 @@ class CreateModel(ModelOperation):
                 ),
             ]
         elif (
+            isinstance(operation, AlterModelManagers)
+            and self.name_lower == operation.name_lower
+        ):
+            return [
+                CreateModel(
+                    self.name,
+                    fields=self.fields,
+                    options=self.options,
+                    bases=self.bases,
+                    managers=operation.managers,
+                ),
+            ]
+        elif (
             isinstance(operation, AlterTogetherOptionOperation)
             and self.name_lower == operation.name_lower
         ):
