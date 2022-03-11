@@ -164,7 +164,7 @@ So when we handle a model instance in a view, we typically retrieve it from the
 database. When we're dealing with a form we typically instantiate it in the
 view.
 
-When we instantiate a form, we can opt to leave it empty or pre-populate it, for
+When we instantiate a form, we can opt to leave it empty or prepopulate it, for
 example with:
 
 * data from a saved model instance (as in the case of admin forms for editing)
@@ -207,7 +207,7 @@ Now you'll also need a view corresponding to that ``/your-name/`` URL which will
 find the appropriate key/value pairs in the request, and then process them.
 
 This is a very simple form. In practice, a form might contain dozens or
-hundreds of fields, many of which might need to be pre-populated, and we might
+hundreds of fields, many of which might need to be prepopulated, and we might
 expect the user to work through the edit-submit cycle several times before
 concluding the operation.
 

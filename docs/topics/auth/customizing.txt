@@ -77,7 +77,7 @@ backends that follow.
 .. note::
 
     Once a user has authenticated, Django stores which backend was used to
-    authenticate the user in the user's session, and re-uses the same backend
+    authenticate the user in the user's session, and reuses the same backend
     for the duration of that session whenever access to the currently
     authenticated user is needed. This effectively means that authentication
     sources are cached on a per-session basis, so if you change
@@ -229,7 +229,7 @@ Django's permission framework does not have a place to store permissions for
 anonymous users. However, the user object passed to an authentication backend
 may be an :class:`django.contrib.auth.models.AnonymousUser` object, allowing
 the backend to specify custom authorization behavior for anonymous users. This
-is especially useful for the authors of re-usable apps, who can delegate all
+is especially useful for the authors of reusable apps, who can delegate all
 questions of authorization to the auth backend, rather than needing settings,
 for example, to control anonymous access.
 

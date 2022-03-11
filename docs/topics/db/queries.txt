@@ -810,7 +810,7 @@ reuse it::
 
     >>> queryset = Entry.objects.all()
     >>> print([p.headline for p in queryset]) # Evaluate the query set.
-    >>> print([p.pub_date for p in queryset]) # Re-use the cache from the evaluation.
+    >>> print([p.pub_date for p in queryset]) # Reuse the cache from the evaluation.
 
 When ``QuerySet``\s are not cached
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1640,7 +1640,7 @@ instances::
     b = Blog.objects.get(id=1)
     b.entry_set.set([e1, e2])
 
-If the ``clear()`` method is available, any pre-existing objects will be
+If the ``clear()`` method is available, any preexisting objects will be
 removed from the ``entry_set`` before all objects in the iterable (in this
 case, a list) are added to the set. If the ``clear()`` method is *not*
 available, all objects in the iterable will be added without removing any

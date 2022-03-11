@@ -601,7 +601,7 @@ escaping HTML.
 
 .. function:: conditional_escape(text)
 
-    Similar to ``escape()``, except that it doesn't operate on pre-escaped
+    Similar to ``escape()``, except that it doesn't operate on preescaped
     strings, so it will not double escape.
 
 .. function:: format_html(format_string, *args, **kwargs)
