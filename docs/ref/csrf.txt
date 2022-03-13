@@ -14,7 +14,7 @@ who visits the malicious site in their browser. A related type of attack,
 a site with someone else's credentials, is also covered.
 
 The first defense against CSRF attacks is to ensure that GET requests (and other
-'safe' methods, as defined by :rfc:`7231#section-4.2.1`) are side-effect free.
+'safe' methods, as defined by :rfc:`7231#section-4.2.1`) are side effect free.
 Requests via 'unsafe' methods, such as POST, PUT, and DELETE, can then be
 protected by following the steps below.
 
