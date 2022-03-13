@@ -21,11 +21,11 @@ class DatabaseOperations(SQLiteDatabaseOperations, BaseAsyncDatabaseOperations):
         if len(params) > BATCH_SIZE:
             results = ()
             for index in range(0, len(params), BATCH_SIZE):
-                chunk = params[index:index + BATCH_SIZE]
+                chunk = params[index : index + BATCH_SIZE]
                 results += await self._quote_params_for_last_executed_query(chunk)
             return results
 
-        sql = 'SELECT ' + ', '.join(['QUOTE(?)'] * len(params))
+        sql = "SELECT " + ", ".join(["QUOTE(?)"] * len(params))
         # Bypass Django's wrappers and use the underlying sqlite3 connection
         # to avoid logging this query - it would trigger infinite recursion.
         cursor = await self.connection.connection.cursor()
@@ -71,19 +71,27 @@ class DatabaseOperations(SQLiteDatabaseOperations, BaseAsyncDatabaseOperations):
     def _references_graph(self):
         return alru_cache(maxsize=512)(self.__references_graph)
 
-    async def sql_flush(self, style, tables, *, reset_sequences=False, allow_cascade=False):
+    async def sql_flush(
+        self, style, tables, *, reset_sequences=False, allow_cascade=False
+    ):
         if tables and allow_cascade:
             # Simulate TRUNCATE CASCADE by recursively collecting the tables
             # referencing the tables to be flushed.
-            tables = set(chain.from_iterable(
-                [await self._references_graph(table) for table in tables]
-            ))
-        sql = ['%s %s %s;' % (
-            style.SQL_KEYWORD('DELETE'),
-            style.SQL_KEYWORD('FROM'),
-            style.SQL_FIELD(self.quote_name(table))
-        ) for table in tables]
+            tables = set(
+                chain.from_iterable(
+                    [await self._references_graph(table) for table in tables]
+                )
+            )
+        sql = [
+            "%s %s %s;"
+            % (
+                style.SQL_KEYWORD("DELETE"),
+                style.SQL_KEYWORD("FROM"),
+                style.SQL_FIELD(self.quote_name(table)),
+            )
+            for table in tables
+        ]
         if reset_sequences:
-            sequences = [{'table': table} for table in tables]
+            sequences = [{"table": table} for table in tables]
             sql.extend(self.sequence_reset_by_name_sql(style, sequences))
         return sql

@@ -99,7 +99,7 @@ class AsyncCursorWrapper:
         self.cursor = cursor
         self.db = db
 
-    WRAP_ERROR_ATTRS = frozenset(['fetchone', 'fetchmany', 'fetchall', 'nextset'])
+    WRAP_ERROR_ATTRS = frozenset(["fetchone", "fetchmany", "fetchall", "nextset"])
 
     def __getattr__(self, attr):
         cursor_attr = getattr(self.cursor, attr)
@@ -132,8 +132,8 @@ class AsyncCursorWrapper:
         # database driver may support them (e.g. cx_Oracle).
         if kparams is not None and not self.db.features.supports_callproc_kwargs:
             raise NotSupportedError(
-                'Keyword parameters for callproc are not supported on this '
-                'database backend.'
+                "Keyword parameters for callproc are not supported on this "
+                "database backend."
             )
         self.db.validate_no_broken_transaction()
         with self.db.wrap_database_errors:
@@ -146,13 +146,17 @@ class AsyncCursorWrapper:
                 return self.cursor.callproc(procname, params, kparams)
 
     async def execute(self, sql, params=None):
-        return await self._execute_with_wrappers(sql, params, many=False, executor=self._execute)
+        return await self._execute_with_wrappers(
+            sql, params, many=False, executor=self._execute
+        )
 
     async def executemany(self, sql, param_list):
-        return await self._execute_with_wrappers(sql, param_list, many=True, executor=self._executemany)
+        return await self._execute_with_wrappers(
+            sql, param_list, many=True, executor=self._executemany
+        )
 
     async def _execute_with_wrappers(self, sql, params, many, executor):
-        context = {'connection': self.db, 'cursor': self}
+        context = {"connection": self.db, "cursor": self}
         for wrapper in reversed(self.db.execute_wrappers):
             executor = functools.partial(wrapper, executor)
         return await executor(sql, params, many, context)
@@ -235,7 +239,9 @@ class AsyncCursorDebugWrapper(AsyncCursorWrapper):
             return await super().executemany(sql, param_list)
 
     @asynccontextmanager
-    async def debug_sql(self, sql=None, params=None, use_last_executed_query=False, many=False):
+    async def debug_sql(
+        self, sql=None, params=None, use_last_executed_query=False, many=False
+    ):
         start = time.monotonic()
         try:
             yield
@@ -245,21 +251,28 @@ class AsyncCursorDebugWrapper(AsyncCursorWrapper):
             if use_last_executed_query:
                 sql = await self.db.ops.last_executed_query(self.cursor, sql, params)
             try:
-                times = len(params) if many else ''
+                times = len(params) if many else ""
             except TypeError:
                 # params could be an iterator.
-                times = '?'
-            self.db.queries_log.append({
-                'sql': '%s times: %s' % (times, sql) if many else sql,
-                'time': '%.3f' % duration,
-            })
+                times = "?"
+            self.db.queries_log.append(
+                {
+                    "sql": "%s times: %s" % (times, sql) if many else sql,
+                    "time": "%.3f" % duration,
+                }
+            )
             logger.debug(
-                '(%.3f) %s; args=%s; alias=%s',
+                "(%.3f) %s; args=%s; alias=%s",
                 duration,
                 sql,
                 params,
                 self.db.alias,
-                extra={'duration': duration, 'sql': sql, 'params': params, 'alias': self.db.alias},
+                extra={
+                    "duration": duration,
+                    "sql": sql,
+                    "params": params,
+                    "alias": self.db.alias,
+                },
             )
 
 

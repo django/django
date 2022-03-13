@@ -34,11 +34,13 @@ class DatabaseFeatures(SQLiteDatabaseFeatures):
     def supports_json_field(self):
         return async_to_sync(self._supports_json_field)()
 
-    can_introspect_json_field = property(operator.attrgetter('supports_json_field'))
-    has_json_object_function = property(operator.attrgetter('supports_json_field'))
+    can_introspect_json_field = property(operator.attrgetter("supports_json_field"))
+    has_json_object_function = property(operator.attrgetter("supports_json_field"))
 
     @cached_property
     def can_return_columns_from_insert(self):
         return Database.sqlite_version_info >= (3, 35)
 
-    can_return_rows_from_bulk_insert = property(operator.attrgetter('can_return_columns_from_insert'))
+    can_return_rows_from_bulk_insert = property(
+        operator.attrgetter("can_return_columns_from_insert")
+    )

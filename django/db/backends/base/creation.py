@@ -8,7 +8,7 @@ from asgiref.sync import async_to_sync
 from django.apps import apps
 from django.conf import settings
 from django.core import serializers
-from django.db import router
+from django.db import connection, router
 from django.db.transaction import atomic
 from django.utils.module_loading import import_string
 
@@ -22,6 +22,7 @@ class BaseDatabaseCreation:
     Encapsulate backend-specific differences pertaining to creation and
     destruction of the test database.
     """
+
     def __init__(self, connection, async_connection=None):
         self.connection = connection
         self.aconnection = async_connection
@@ -292,7 +293,7 @@ class BaseDatabaseCreation:
         if suffix is None:
             test_database_name = (
                 self.aconnection if self.aconnection else self.connection
-            ).settings_dict['NAME']
+            ).settings_dict["NAME"]
         else:
             test_database_name = self.get_test_db_clone_settings(suffix)["NAME"]
 
@@ -397,4 +398,4 @@ class BaseDatabaseCreation:
 class BaseAsyncDatabaseCreation(BaseDatabaseCreation):
     def set_as_test_mirror(self, primary_settings_dict):
         """Sets the async connection's settings to be the mirror of the primary"""
-        self.aconnection.settings_dict['NAME'] = primary_settings_dict['NAME']
+        self.aconnection.settings_dict["NAME"] = primary_settings_dict["NAME"]

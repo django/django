@@ -326,13 +326,13 @@ class AsyncAtomic(AsyncContextDecorator):
         connection = get_connection(self.using)
 
         if (
-            self.durable and
-            connection.atomic_blocks and
-            not connection.atomic_blocks[-1]._from_testcase
+            self.durable
+            and connection.atomic_blocks
+            and not connection.atomic_blocks[-1]._from_testcase
         ):
             raise RuntimeError(
-                'A durable atomic block cannot be nested within another '
-                'atomic block.'
+                "A durable atomic block cannot be nested within another "
+                "atomic block."
             )
         if not connection.in_atomic_block:
             # Reset state when entering an outermost atomic block.
@@ -356,7 +356,9 @@ class AsyncAtomic(AsyncContextDecorator):
             else:
                 connection.savepoint_ids.append(None)
         else:
-            await connection.set_autocommit(False, force_begin_transaction_with_broken_autocommit=True)
+            await connection.set_autocommit(
+                False, force_begin_transaction_with_broken_autocommit=True
+            )
             connection.in_atomic_block = True
 
         if connection.in_atomic_block:

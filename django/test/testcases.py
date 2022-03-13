@@ -1333,8 +1333,8 @@ class TestCase(TransactionTestCase):
         atomics = {}
         for db_name in cls._databases_names():
             is_sync = connections[db_name].is_sync
-            atomic = (
-                (transaction.atomic if is_sync else transaction.aatomic)(using=db_name)
+            atomic = (transaction.atomic if is_sync else transaction.aatomic)(
+                using=db_name
             )
             atomic._from_testcase = True
             if is_sync:
@@ -1429,10 +1429,14 @@ class TestCase(TransactionTestCase):
                 if self._should_check_constraints(_conn):
                     if _conn.is_sync and db_name not in sync_dbs_checked:
                         _conn.check_constraints()
-                        async_dbs_checked.append(_conn.settings_dict["ASYNC_DATABASE_ALIAS"])
+                        async_dbs_checked.append(
+                            _conn.settings_dict["ASYNC_DATABASE_ALIAS"]
+                        )
                     elif not _conn.is_sync and db_name not in async_dbs_checked:
                         asyncio.run(_conn.check_constraints())
-                        sync_dbs_checked.append(_conn.settings_dict["SYNC_DATABASE_ALIAS"])
+                        sync_dbs_checked.append(
+                            _conn.settings_dict["SYNC_DATABASE_ALIAS"]
+                        )
         finally:
             self._rollback_atomics(self.atomics)
 

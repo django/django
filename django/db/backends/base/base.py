@@ -833,11 +833,11 @@ class BaseAsyncDatabaseWrapper(BaseDatabaseWrapper):
         # Establish the connection
         conn_params = self.get_connection_params()
         self.connection = await self.get_new_connection(conn_params)
-        await self.set_autocommit(self.settings_dict['AUTOCOMMIT'])
+        await self.set_autocommit(self.settings_dict["AUTOCOMMIT"])
         await self.init_connection_state()
-        await sync_to_async(
-            connection_created.send, thread_sensitive=True
-        )(sender=self.__class__, connection=self)
+        await sync_to_async(connection_created.send, thread_sensitive=True)(
+            sender=self.__class__, connection=self
+        )
 
         self.run_on_commit = []
 
@@ -1002,15 +1002,18 @@ class BaseAsyncDatabaseWrapper(BaseDatabaseWrapper):
         await self.ensure_connection()
         return self.autocommit
 
-    async def set_autocommit(self, autocommit, force_begin_transaction_with_broken_autocommit=False):
+    async def set_autocommit(
+        self, autocommit, force_begin_transaction_with_broken_autocommit=False
+    ):
         """See BaseDatabaseWrapper.set_autocommit()."""
         self.validate_no_atomic_block()
         await self.close_if_health_check_failed()
         await self.ensure_connection()
 
         start_transaction_under_autocommit = (
-            force_begin_transaction_with_broken_autocommit and not autocommit and
-            hasattr(self, '_start_transaction_under_autocommit')
+            force_begin_transaction_with_broken_autocommit
+            and not autocommit
+            and hasattr(self, "_start_transaction_under_autocommit")
         )
 
         if start_transaction_under_autocommit:
@@ -1058,9 +1061,9 @@ class BaseAsyncDatabaseWrapper(BaseDatabaseWrapper):
     async def close_if_health_check_failed(self):
         """Close existing connection if it fails a health check."""
         if (
-            self.connection is None or
-            not self.health_check_enabled or
-            self.health_check_done
+            self.connection is None
+            or not self.health_check_enabled
+            or self.health_check_done
         ):
             return
 
@@ -1074,7 +1077,7 @@ class BaseAsyncDatabaseWrapper(BaseDatabaseWrapper):
             self.health_check_done = False
             # If the application didn't restore the original autocommit setting,
             # don't take chances, drop the connection.
-            if await self.get_autocommit() != self.settings_dict['AUTOCOMMIT']:
+            if await self.get_autocommit() != self.settings_dict["AUTOCOMMIT"]:
                 await self.close()
                 return
 
@@ -1105,7 +1108,9 @@ class BaseAsyncDatabaseWrapper(BaseDatabaseWrapper):
     async def dec_task_sharing(self):
         async with self._task_sharing_lock:
             if self._task_sharing_count <= 0:
-                raise RuntimeError('Cannot decrement the task sharing count below zero.')
+                raise RuntimeError(
+                    "Cannot decrement the task sharing count below zero."
+                )
             self._task_sharing_count -= 1
 
     async def validate_task_sharing(self):
@@ -1116,9 +1121,9 @@ class BaseAsyncDatabaseWrapper(BaseDatabaseWrapper):
         method). Raise an exception if the validation fails.
         """
         if not (
-            await self.allow_task_sharing() or
-            self._task_ident == id(asyncio.current_task()) or
-            self._task_ident is None
+            await self.allow_task_sharing()
+            or self._task_ident == id(asyncio.current_task())
+            or self._task_ident is None
         ):
             raise DatabaseError(
                 "DatabaseWrapper objects created in a "
@@ -1160,7 +1165,7 @@ class BaseAsyncDatabaseWrapper(BaseDatabaseWrapper):
     @asynccontextmanager
     async def _nodb_cursor(self):
         """See BaseDatabaseWrapper._nodb_cursor()."""
-        conn = self.__class__({**self.settings_dict, 'NAME': None}, alias=NO_DB_ALIAS)
+        conn = self.__class__({**self.settings_dict, "NAME": None}, alias=NO_DB_ALIAS)
         try:
             with await conn.cursor() as cursor:
                 yield cursor
@@ -1173,8 +1178,11 @@ class BaseAsyncDatabaseWrapper(BaseDatabaseWrapper):
         """
         if self.SchemaEditorClass is None:
             raise NotImplementedError(
-                'The SchemaEditorClass attribute of this database wrapper is still None')
-        return connections[self.settings_dict["SYNC_DATABASE_ALIAS"]].schema_editor(*args, **kwargs)
+                "The SchemaEditorClass attribute of this database wrapper is still None"
+            )
+        return connections[self.settings_dict["SYNC_DATABASE_ALIAS"]].schema_editor(
+            *args, **kwargs
+        )
 
     async def on_commit(self, func):
         is_coroutine_func = asyncio.iscoroutinefunction(func)
@@ -1184,7 +1192,9 @@ class BaseAsyncDatabaseWrapper(BaseDatabaseWrapper):
             # Transaction in progress; save for execution on commit.
             self.run_on_commit.append((set(self.savepoint_ids), func))
         elif not self.get_autocommit():
-            raise TransactionManagementError('on_commit() cannot be used in manual transaction management')
+            raise TransactionManagementError(
+                "on_commit() cannot be used in manual transaction management"
+            )
         else:
             # No transaction in progress and in autocommit mode; execute
             # immediately.

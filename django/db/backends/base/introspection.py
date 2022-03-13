@@ -218,8 +218,11 @@ class BaseAsyncDatabaseIntrospection(BaseDatabaseIntrospection):
         """See BaseDatabaseIntrospection.table_names()."""
 
         async def get_names(cursor):
-            return sorted(ti.name for ti in await self.get_table_list(cursor)
-                          if include_views or ti.type == 't')
+            return sorted(
+                ti.name
+                for ti in await self.get_table_list(cursor)
+                if include_views or ti.type == "t"
+            )
 
         if cursor is None:
             async with await self.connection.cursor() as cursor:
@@ -247,16 +250,15 @@ class BaseAsyncDatabaseIntrospection(BaseDatabaseIntrospection):
                 continue
             tables.add(model._meta.db_table)
             tables.update(
-                f.m2m_db_table() for f in model._meta.local_many_to_many
+                f.m2m_db_table()
+                for f in model._meta.local_many_to_many
                 if f.remote_field.through._meta.managed
             )
         tables = list(tables)
         if only_existing:
             existing_tables = set(await self.table_names(include_views=include_views))
             tables = [
-                t
-                for t in tables
-                if self.identifier_converter(t) in existing_tables
+                t for t in tables if self.identifier_converter(t) in existing_tables
             ]
         return tables
 
@@ -269,13 +271,19 @@ class BaseAsyncDatabaseIntrospection(BaseDatabaseIntrospection):
                     continue
                 if model._meta.swapped:
                     continue
-                sequence_list.extend(await self.get_sequences(cursor, model._meta.db_table, model._meta.local_fields))
+                sequence_list.extend(
+                    await self.get_sequences(
+                        cursor, model._meta.db_table, model._meta.local_fields
+                    )
+                )
                 for f in model._meta.local_many_to_many:
                     # If this is an m2m using an intermediate table,
                     # we don't need to reset the sequence.
                     if f.remote_field.through._meta.auto_created:
                         sequence = await self.get_sequences(cursor, f.m2m_db_table())
-                        sequence_list.extend(sequence or [{'table': f.m2m_db_table(), 'column': None}])
+                        sequence_list.extend(
+                            sequence or [{"table": f.m2m_db_table(), "column": None}]
+                        )
         return sequence_list
 
     async def get_sequences(self, cursor, table_name, table_fields=()):
@@ -289,8 +297,8 @@ class BaseAsyncDatabaseIntrospection(BaseDatabaseIntrospection):
     async def get_primary_key_column(self, cursor, table_name):
         """See BaseDatabaseIntrospection.get_primary_key_column()."""
         for constraint in (await self.get_constraints(cursor, table_name)).values():
-            if constraint['primary_key']:
-                return constraint['columns'][0]
+            if constraint["primary_key"]:
+                return constraint["columns"][0]
         return None
 
     async def get_constraints(self, cursor, table_name):
