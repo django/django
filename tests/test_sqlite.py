@@ -22,9 +22,6 @@ DATABASES = {
     'async': {
         'ENGINE': 'django.db.backends.aiosqlite',
         'SYNC_DATABASE_ALIAS': 'default',
-        'TEST': {
-            'MIRROR': 'default',
-        },
     }
 }
 

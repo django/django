@@ -3,6 +3,8 @@ import sys
 from io import StringIO
 from unittest import expectedFailure, skip
 
+from asgiref.sync import async_to_sync
+
 from django.apps import apps
 from django.conf import settings
 from django.core import serializers
@@ -263,6 +265,8 @@ class BaseDatabaseCreation:
         database already exists.
         """
         self.connection.close()
+        if self.aconnection:
+            async_to_sync(self.aconnection.close)()
         if suffix is None:
             test_database_name = self.connection.settings_dict['NAME']
         else:
@@ -279,13 +283,17 @@ class BaseDatabaseCreation:
 
         # if we want to preserve the database
         # skip the actual destroying piece.
-        if not keepdb:
+        # Async engines only need to disconnect; their sync alias will destroy
+        if not keepdb and not self.aconnection:
             self._destroy_test_db(test_database_name, verbosity)
 
         # Restore the original database name
         if old_database_name is not None:
             settings.DATABASES[self.connection.alias]["NAME"] = old_database_name
             self.connection.settings_dict["NAME"] = old_database_name
+            if self.aconnection:
+                settings.DATABASES[self.aconnection.alias]["NAME"] = old_database_name
+                self.aconnection.settings_dict["NAME"] = old_database_name
 
     def _destroy_test_db(self, test_database_name, verbosity):
         """

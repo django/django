@@ -181,7 +181,9 @@ def setup_databases(
         first_alias = None
         for alias in aliases:
             connection = connections[alias]
-            old_names.append((connection, db_name, first_alias is None))
+            old_names.append(
+                (connection, db_name, first_alias is None or not connection.is_sync)
+            )
 
             # Actually create the database for the first connection
             if first_alias is None:

@@ -8,6 +8,8 @@ from django.test import TestCase
 
 @unittest.skipUnless(connections["async"].vendor == 'sqlite', 'Async SQLite tests')
 class IntrospectionTests(TestCase):
+    databases = ["default", "async"]
+
     async def test_get_primary_key_column(self):
         """
         Get the primary key column regardless of whether or not it has

@@ -107,7 +107,7 @@ class DatabaseWrapper(BaseAsyncDatabaseWrapper, SQLiteDatabaseWrapper):
         return self.in_atomic_block
 
     async def disable_constraint_checking(self):
-        with await self.cursor() as cursor:
+        async with await self.cursor() as cursor:
             await cursor.execute('PRAGMA foreign_keys = OFF')
             # Foreign key constraints cannot be turned off while in a multi-
             # statement transaction. Fetch the current state of the pragma
@@ -117,7 +117,7 @@ class DatabaseWrapper(BaseAsyncDatabaseWrapper, SQLiteDatabaseWrapper):
         return not bool(enabled)
 
     async def enable_constraint_checking(self):
-        with await self.cursor() as cursor:
+        async with await self.cursor() as cursor:
             await cursor.execute('PRAGMA foreign_keys = ON')
 
     async def check_constraints(self, table_names=None):

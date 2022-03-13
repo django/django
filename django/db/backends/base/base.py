@@ -738,7 +738,7 @@ class BaseAsyncDatabaseWrapper(BaseDatabaseWrapper):
         try:
             self._task_ident = id(asyncio.current_task())
         except RuntimeError:
-            pass
+            self._task_ident = None
 
         self._creation = None
 
@@ -1063,7 +1063,11 @@ class BaseAsyncDatabaseWrapper(BaseDatabaseWrapper):
         authorized to be shared between tasks (via the `inc_task_sharing()`
         method). Raise an exception if the validation fails.
         """
-        if not (await self.allow_task_sharing() or self._task_ident == id(asyncio.current_task())):
+        if not (
+            await self.allow_task_sharing() or
+            self._task_ident == id(asyncio.current_task()) or
+            self._task_ident is None
+        ):
             raise DatabaseError(
                 "DatabaseWrapper objects created in a "
                 "task can only be used in that same task. The object "

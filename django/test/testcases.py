@@ -1163,9 +1163,12 @@ class TestCase(TransactionTestCase):
         """Open atomic blocks for multiple databases."""
         atomics = {}
         for db_name in cls._databases_names():
-            atomic = transaction.atomic(using=db_name)
+            is_sync = connections[db_name].is_sync
+            atomic = (
+                (transaction.atomic if is_sync else transaction.aatomic)(using=db_name)
+            )
             atomic._from_testcase = True
-            atomic.__enter__()
+            (atomic.__enter__ if is_sync else async_to_sync(atomic.__aenter__))()
             atomics[db_name] = atomic
         return atomics
 
@@ -1174,7 +1177,12 @@ class TestCase(TransactionTestCase):
         """Rollback atomic blocks opened by the previous method."""
         for db_name in reversed(cls._databases_names()):
             transaction.set_rollback(True, using=db_name)
-            atomics[db_name].__exit__(None, None, None)
+            atomic = atomics[db_name]
+            (
+                atomic.__exit__
+                if isinstance(atomic, transaction.Atomic)
+                else async_to_sync(atomic.__aexit__)
+            )(None, None, None)
 
     @classmethod
     def _databases_support_transactions(cls):

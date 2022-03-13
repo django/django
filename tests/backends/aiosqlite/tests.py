@@ -162,7 +162,7 @@ class SchemaTests(TransactionTestCase):
                     (await (await cursor.execute('PRAGMA foreign_keys')).fetchone())[0]
                 )
 
-        async with connections["async"].constraint_checks_disabled(), transaction.aatomic():
+        async with connections["async"].constraint_checks_disabled(), transaction.aatomic("async"):
             with connections["async"].schema_editor(atomic=True):
                 self.assertFalse(await constraint_checks_enabled())
             self.assertFalse(await constraint_checks_enabled())
