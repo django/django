@@ -6,15 +6,15 @@ Cross Site Request Forgery protection
    :synopsis: Protects against Cross Site Request Forgeries
 
 The CSRF middleware and template tag provides easy-to-use protection against
-`Cross Site Request Forgeries`_.  This type of attack occurs when a malicious
+`Cross Site Request Forgeries`_. This type of attack occurs when a malicious
 website contains a link, a form button or some JavaScript that is intended to
 perform some action on your website, using the credentials of a logged-in user
-who visits the malicious site in their browser.  A related type of attack,
+who visits the malicious site in their browser. A related type of attack,
 'login CSRF', where an attacking site tricks a user's browser into logging into
 a site with someone else's credentials, is also covered.
 
 The first defense against CSRF attacks is to ensure that GET requests (and other
-'safe' methods, as defined by :rfc:`7231#section-4.2.1`) are side effect free.
+'safe' methods, as defined by :rfc:`7231#section-4.2.1`) are side-effect free.
 Requests via 'unsafe' methods, such as POST, PUT, and DELETE, can then be
 protected by following the steps below.
 
