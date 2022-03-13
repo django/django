@@ -876,15 +876,15 @@ class BaseAsyncDatabaseWrapper(BaseDatabaseWrapper):
     # ##### Backend-specific savepoint management methods #####
 
     async def _savepoint(self, sid):
-        with await self.cursor() as cursor:
+        async with await self.cursor() as cursor:
             await cursor.execute(self.ops.savepoint_create_sql(sid))
 
     async def _savepoint_rollback(self, sid):
-        with await self.cursor() as cursor:
+        async with await self.cursor() as cursor:
             await cursor.execute(self.ops.savepoint_rollback_sql(sid))
 
     async def _savepoint_commit(self, sid):
-        with await self.cursor() as cursor:
+        async with await self.cursor() as cursor:
             await cursor.execute(self.ops.savepoint_commit_sql(sid))
 
     async def _savepoint_allowed(self):
@@ -1099,7 +1099,7 @@ class BaseAsyncDatabaseWrapper(BaseDatabaseWrapper):
         """See BaseDatabaseWrapper.temporary_connection()."""
         must_close = self.connection is None
         try:
-            with await self.cursor() as cursor:
+            async with await self.cursor() as cursor:
                 yield cursor
         finally:
             if must_close:

@@ -93,10 +93,9 @@ class DatabaseWrapper(BaseAsyncDatabaseWrapper, SQLiteDatabaseWrapper):
     async def close(self):
         await self.validate_task_sharing()
         # If database is in memory, closing the connection destroys the
-        # database. To prevent accidental data loss, ignore close requests on
-        # an in-memory db.
-        if not self.is_in_memory_db():
-            await BaseAsyncDatabaseWrapper.close(self)
+        # database. However, we only worry about this on the sync side.
+        # All async connections have a sync counterpart with creation permissions.
+        await BaseAsyncDatabaseWrapper.close(self)
 
     async def _savepoint_allowed(self):
         # When 'isolation_level' is not None, sqlite3 commits before each
@@ -123,9 +122,11 @@ class DatabaseWrapper(BaseAsyncDatabaseWrapper, SQLiteDatabaseWrapper):
     async def check_constraints(self, table_names=None):
         """See SQLiteDatabaseWrapper.check_constraints()."""
         if self.features.supports_pragma_foreign_key_check:
-            with await self.cursor() as cursor:
+            async with await self.cursor() as cursor:
                 if table_names is None:
-                    violations = await cursor.execute('PRAGMA foreign_key_check').fetchall()
+                    violations = await (
+                        await cursor.execute('PRAGMA foreign_key_check')
+                    ).fetchall()
                 else:
                     violations = chain.from_iterable(
                         await (
@@ -160,7 +161,7 @@ class DatabaseWrapper(BaseAsyncDatabaseWrapper, SQLiteDatabaseWrapper):
                         )
                     )
         else:
-            with await self.cursor() as cursor:
+            async with await self.cursor() as cursor:
                 if table_names is None:
                     table_names = await self.introspection.table_names(cursor)
                 for table_name in table_names:

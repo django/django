@@ -1,9 +1,8 @@
+import asyncio
 import os
 import sys
 from io import StringIO
 from unittest import expectedFailure, skip
-
-from asgiref.sync import async_to_sync
 
 from django.apps import apps
 from django.conf import settings
@@ -163,7 +162,7 @@ class BaseDatabaseCreation:
         Return display string for a database for use in various actions.
         """
         return "'%s'%s" % (
-            self.connection.alias,
+            (self.aconnection if self.aconnection else self.connection).alias,
             (" ('%s')" % database_name) if verbosity >= 2 else '',
         )
 
@@ -266,9 +265,11 @@ class BaseDatabaseCreation:
         """
         self.connection.close()
         if self.aconnection:
-            async_to_sync(self.aconnection.close)()
+            asyncio.run(self.aconnection.close())
         if suffix is None:
-            test_database_name = self.connection.settings_dict['NAME']
+            test_database_name = (
+                self.aconnection if self.aconnection else self.connection
+            ).settings_dict['NAME']
         else:
             test_database_name = self.get_test_db_clone_settings(suffix)['NAME']
 

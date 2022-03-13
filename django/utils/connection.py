@@ -1,4 +1,4 @@
-from asgiref.local import Local
+import contextvars
 
 from django.conf import settings as django_settings
 from django.utils.functional import cached_property
@@ -35,10 +35,10 @@ class BaseConnectionHandler:
     settings_name = None
     exception_class = ConnectionDoesNotExist
     thread_critical = False
+    _connections = contextvars.ContextVar("_connections", default={})
 
     def __init__(self, settings=None):
         self._settings = settings
-        self._connections = Local(self.thread_critical)
 
     @cached_property
     def settings(self):
@@ -55,19 +55,19 @@ class BaseConnectionHandler:
 
     def __getitem__(self, alias):
         try:
-            return getattr(self._connections, alias)
-        except AttributeError:
+            return self._connections.get()[alias]
+        except KeyError:
             if alias not in self.settings:
                 raise self.exception_class(f"The connection '{alias}' doesn't exist.")
         conn = self.create_connection(alias)
-        setattr(self._connections, alias, conn)
+        self._connections.get()[alias] = conn
         return conn
 
     def __setitem__(self, key, value):
-        setattr(self._connections, key, value)
+        self._connections.get()[key] = value
 
     def __delitem__(self, key):
-        delattr(self._connections, key)
+        del self._connections.get()[key]
 
     def __iter__(self):
         return iter(self.settings)

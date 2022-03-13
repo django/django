@@ -1168,7 +1168,10 @@ class TestCase(TransactionTestCase):
                 (transaction.atomic if is_sync else transaction.aatomic)(using=db_name)
             )
             atomic._from_testcase = True
-            (atomic.__enter__ if is_sync else async_to_sync(atomic.__aenter__))()
+            if is_sync:
+                atomic.__enter__()
+            else:  # Do not use async_to_sync, otherwise attr are not saved
+                asyncio.run(atomic.__aenter__())
             atomics[db_name] = atomic
         return atomics
 
@@ -1178,11 +1181,10 @@ class TestCase(TransactionTestCase):
         for db_name in reversed(cls._databases_names()):
             transaction.set_rollback(True, using=db_name)
             atomic = atomics[db_name]
-            (
-                atomic.__exit__
-                if isinstance(atomic, transaction.Atomic)
-                else async_to_sync(atomic.__aexit__)
-            )(None, None, None)
+            if isinstance(atomic, transaction.Atomic):
+                atomic.__exit__(None, None, None)
+            else:
+                asyncio.run(atomic.__aexit__(None, None, None))
 
     @classmethod
     def _databases_support_transactions(cls):
@@ -1218,7 +1220,7 @@ class TestCase(TransactionTestCase):
             cls._rollback_atomics(cls.cls_atomics)
             for conn in connections.all():
                 if asyncio.iscoroutinefunction(conn.close):
-                    async_to_sync(conn.close)()
+                    asyncio.run(conn.close())
                 else:
                     conn.close()
         super().tearDownClass()
@@ -1248,16 +1250,29 @@ class TestCase(TransactionTestCase):
         if not self._databases_support_transactions():
             return super()._fixture_teardown()
         try:
+            sync_dbs_checked, async_dbs_checked = [], []
             for db_name in reversed(self._databases_names()):
-                if self._should_check_constraints(connections[db_name]):
-                    connections[db_name].check_constraints()
+                _conn = connections[db_name]
+                if self._should_check_constraints(_conn):
+                    if _conn.is_sync and db_name not in sync_dbs_checked:
+                        _conn.check_constraints()
+                        async_dbs_checked.append(_conn.settings_dict["ASYNC_DATABASE_ALIAS"])
+                    elif not _conn.is_sync and db_name not in async_dbs_checked:
+                        asyncio.run(_conn.check_constraints())
+                        sync_dbs_checked.append(_conn.settings_dict["SYNC_DATABASE_ALIAS"])
         finally:
             self._rollback_atomics(self.atomics)
 
     def _should_check_constraints(self, connection):
+        is_usable = (
+            connection.is_usable()
+            if connection.is_sync
+            else asyncio.run(connection.is_usable())
+        )
         return (
             connection.features.can_defer_constraint_checks and
-            not connection.needs_rollback and connection.is_usable()
+            not connection.needs_rollback and
+            is_usable
         )
 
     @classmethod
