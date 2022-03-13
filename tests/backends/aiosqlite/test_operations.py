@@ -7,7 +7,7 @@ from django.test import TestCase
 from ..models import Person, Tag
 
 
-@unittest.skipUnless(connections["async"].vendor == 'sqlite', 'SQLite tests.')
+@unittest.skipUnless("async" in connections and connections["async"].vendor == 'sqlite', 'SQLite tests.')
 class SQLiteOperationsTests(TestCase):
     async def test_sql_flush(self):
         self.assertEqual(

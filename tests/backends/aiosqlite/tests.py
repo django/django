@@ -25,7 +25,7 @@ except ImproperlyConfigured:
     pass
 
 
-@unittest.skipUnless(connections["async"].vendor == 'sqlite', 'SQLite tests')
+@unittest.skipUnless("async" in connections and connections["async"].vendor == 'sqlite', 'SQLite tests')
 class Tests(TestCase):
     longMessage = True
 
@@ -113,7 +113,7 @@ class Tests(TestCase):
             self.assertTrue(os.path.isfile(os.path.join(tmp, 'test.db')))
 
 
-@unittest.skipUnless(connections["async"].vendor == 'sqlite', 'SQLite tests')
+@unittest.skipUnless("async" in connections and connections["async"].vendor == 'sqlite', 'SQLite tests')
 @isolate_apps('backends')
 class SchemaTests(TransactionTestCase):
     available_apps = ['backends']
@@ -202,7 +202,7 @@ class SchemaTests(TransactionTestCase):
                 editor.alter_db_table(Author, "backends_author", "renamed_table")
 
 
-@unittest.skipUnless(connections["async"].vendor == 'sqlite', 'Test only for SQLite')
+@unittest.skipUnless("async" in connections and connections["async"].vendor == 'sqlite', 'Test only for SQLite')
 @override_settings(DEBUG=True)
 class LastExecutedQueryTest(TestCase):
 
@@ -235,7 +235,7 @@ class LastExecutedQueryTest(TestCase):
             await cursor.db.ops.last_executed_query(cursor.cursor, sql, params)
 
 
-@unittest.skipUnless(connections["async"].vendor == 'sqlite', 'SQLite tests')
+@unittest.skipUnless("async" in connections and connections["async"].vendor == 'sqlite', 'SQLite tests')
 class EscapingChecks(TestCase):
     """
     All tests in this test case are also run with settings.DEBUG=True in
@@ -251,12 +251,12 @@ class EscapingChecks(TestCase):
         self.assertTrue(int(response))
 
 
-@unittest.skipUnless(connections["async"].vendor == 'sqlite', 'SQLite tests')
+@unittest.skipUnless("async" in connections and connections["async"].vendor == 'sqlite', 'SQLite tests')
 @override_settings(DEBUG=True)
 class EscapingChecksDebug(EscapingChecks):
     pass
 
-# @unittest.skipUnless(connections["async"].vendor == 'sqlite', 'SQLite tests')
+# @unittest.skipUnless("async" in connections and connections["async"].vendor == 'sqlite', 'SQLite tests')
 # class ThreadSharing(TransactionTestCase):
 #     available_apps = ['backends']
 #

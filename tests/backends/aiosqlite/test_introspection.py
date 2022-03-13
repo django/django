@@ -6,7 +6,7 @@ from django.db import connections
 from django.test import TestCase
 
 
-@unittest.skipUnless(connections["async"].vendor == 'sqlite', 'Async SQLite tests')
+@unittest.skipUnless("async" in connections and connections["async"].vendor == 'sqlite', 'Async SQLite tests')
 class IntrospectionTests(TestCase):
     databases = ["default", "async"]
 
@@ -50,7 +50,7 @@ class IntrospectionTests(TestCase):
                 await cursor.execute('DROP TABLE test_primary')
 
 
-@unittest.skipUnless(connections["async"].vendor == 'sqlite', 'SQLite tests')
+@unittest.skipUnless("async" in connections and connections["async"].vendor == 'sqlite', 'SQLite tests')
 class ParsingTests(TestCase):
     async def parse_definition(self, sql, columns):
         """Parse a column or constraint definition."""
