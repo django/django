@@ -3,7 +3,6 @@ from django.core import signing
 
 
 class SessionStore(SessionBase):
-
     def load(self):
         """
         Load the data from the key itself instead of fetching from some
@@ -16,7 +15,7 @@ class SessionStore(SessionBase):
                 serializer=self.serializer,
                 # This doesn't handle non-default expiry dates, see #19201
                 max_age=self.get_session_cookie_age(),
-                salt='django.contrib.sessions.backends.signed_cookies',
+                salt="django.contrib.sessions.backends.signed_cookies",
             )
         except Exception:
             # BadSignature, ValueError, or unpickling exceptions. If any of
@@ -54,7 +53,7 @@ class SessionStore(SessionBase):
         and set the modified flag so that the cookie is set on the client for
         the current request.
         """
-        self._session_key = ''
+        self._session_key = ""
         self._session_cache = {}
         self.modified = True
 
@@ -71,8 +70,9 @@ class SessionStore(SessionBase):
         base64-encoded string of data as our session key.
         """
         return signing.dumps(
-            self._session, compress=True,
-            salt='django.contrib.sessions.backends.signed_cookies',
+            self._session,
+            compress=True,
+            salt="django.contrib.sessions.backends.signed_cookies",
             serializer=self.serializer,
         )
 

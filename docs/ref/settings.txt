@@ -1141,11 +1141,17 @@ See also :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_
 Default::
 
     [
-        '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y', # '2006-10-25', '10/25/2006', '10/25/06'
-        '%b %d %Y', '%b %d, %Y',            # 'Oct 25 2006', 'Oct 25, 2006'
-        '%d %b %Y', '%d %b, %Y',            # '25 Oct 2006', '25 Oct, 2006'
-        '%B %d %Y', '%B %d, %Y',            # 'October 25 2006', 'October 25, 2006'
-        '%d %B %Y', '%d %B, %Y',            # '25 October 2006', '25 October, 2006'
+        '%Y-%m-%d',  # '2006-10-25'
+        '%m/%d/%Y',  # '10/25/2006'
+        '%m/%d/%y',  # '10/25/06'
+        '%b %d %Y',  # 'Oct 25 2006'
+        '%b %d, %Y',  # 'Oct 25, 2006'
+        '%d %b %Y',  # '25 Oct 2006'
+        '%d %b, %Y',  # '25 Oct, 2006'
+        '%B %d %Y',  # 'October 25 2006'
+        '%B %d, %Y',  # 'October 25, 2006'
+        '%d %B %Y',  # '25 October 2006'
+        '%d %B, %Y',  # '25 October, 2006'
     ]
 
 A list of formats that will be accepted when inputting data on a date field.
@@ -2291,15 +2297,47 @@ The secret key is used for:
 * Any usage of :doc:`cryptographic signing </topics/signing>`, unless a
   different key is provided.
 
-If you rotate your secret key, all of the above will be invalidated.
-Secret keys are not used for passwords of users and key rotation will not
-affect them.
+When a secret key is no longer set as :setting:`SECRET_KEY` or contained within
+:setting:`SECRET_KEY_FALLBACKS` all of the above will be invalidated. When
+rotating your secret key, you should move the old key to
+:setting:`SECRET_KEY_FALLBACKS` temporarily. Secret keys are not used for
+passwords of users and key rotation will not affect them.
 
 .. note::
 
     The default :file:`settings.py` file created by :djadmin:`django-admin
     startproject <startproject>` creates a unique ``SECRET_KEY`` for
     convenience.
+
+.. setting:: SECRET_KEY_FALLBACKS
+
+``SECRET_KEY_FALLBACKS``
+------------------------
+
+.. versionadded:: 4.1
+
+Default: ``[]``
+
+A list of fallback secret keys for a particular Django installation. These are
+used to allow rotation of the ``SECRET_KEY``.
+
+In order to rotate your secret keys, set a new ``SECRET_KEY`` and move the
+previous value to the beginning of ``SECRET_KEY_FALLBACKS``. Then remove the
+old values from the end of the ``SECRET_KEY_FALLBACKS`` when you are ready to
+expire the sessions, password reset tokens, and so on, that make use of them.
+
+.. note::
+
+    Signing operations are computationally expensive. Having multiple old key
+    values in ``SECRET_KEY_FALLBACKS`` adds additional overhead to all checks
+    that don't match an earlier key.
+
+    As such, fallback values should be removed after an appropriate period,
+    allowing for key rotation.
+
+Uses of the secret key values shouldn't assume that they are text or bytes.
+Every use should go through :func:`~django.utils.encoding.force_str` or
+:func:`~django.utils.encoding.force_bytes` to convert it to the desired type.
 
 .. setting:: SECURE_CONTENT_TYPE_NOSNIFF
 
@@ -3384,14 +3422,11 @@ sessions won't be created, even if this setting is active.
 Default: ``'django.contrib.sessions.serializers.JSONSerializer'``
 
 Full import path of a serializer class to use for serializing session data.
-Included serializers are:
+Included serializer is:
 
-* ``'django.contrib.sessions.serializers.PickleSerializer'``
 * ``'django.contrib.sessions.serializers.JSONSerializer'``
 
-See :ref:`session_serialization` for details, including a warning regarding
-possible remote code execution when using
-:class:`~django.contrib.sessions.serializers.PickleSerializer`.
+See :ref:`session_serialization` for details.
 
 Sites
 =====
@@ -3728,6 +3763,7 @@ Security
   * :setting:`CSRF_USE_SESSIONS`
 
 * :setting:`SECRET_KEY`
+* :setting:`SECRET_KEY_FALLBACKS`
 * :setting:`X_FRAME_OPTIONS`
 
 Serialization

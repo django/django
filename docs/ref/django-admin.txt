@@ -632,10 +632,10 @@ If you're in a multi-database setup, you might have fixture data that
 you want to load onto one database, but not onto another. In this
 situation, you can add a database identifier into the names of your fixtures.
 
-For example, if your :setting:`DATABASES` setting has a 'master' database
-defined, name the fixture ``mydata.master.json`` or
-``mydata.master.json.gz`` and the fixture will only be loaded when you
-specify you want to load data into the ``master`` database.
+For example, if your :setting:`DATABASES` setting has a 'users' database
+defined, name the fixture ``mydata.users.json`` or
+``mydata.users.json.gz`` and the fixture will only be loaded when you
+specify you want to load data into the ``users`` database.
 
 .. _loading-fixtures-stdin:
 
@@ -825,6 +825,13 @@ Generate migration files without Django version and timestamp header.
 Makes ``makemigrations`` exit with a non-zero status when model changes without
 migrations are detected.
 
+.. django-admin-option:: --scriptable
+
+.. versionadded:: 4.1
+
+Diverts log output and input prompts to ``stderr``, writing only paths of
+generated migration files to ``stdout``.
+
 ``migrate``
 -----------
 
@@ -900,6 +907,31 @@ content types.
 
 Makes ``migrate`` exit with a non-zero status when unapplied migrations are
 detected.
+
+.. django-admin-option:: --prune
+
+.. versionadded:: 4.1
+
+Deletes nonexistent migrations from the ``django_migrations`` table. This is
+useful when migration files replaced by a squashed migration have been removed.
+See :ref:`migration-squashing` for more details.
+
+``optimizemigration``
+---------------------
+
+.. versionadded:: 4.1
+
+.. django-admin:: optimizemigration app_label migration_name
+
+Optimizes the operations for the named migration and overrides the existing
+file. If the migration contains functions that must be manually copied, the
+command creates a new migration file suffixed with ``_optimized`` that is meant
+to replace the named migration.
+
+.. django-admin-option:: --check
+
+Makes ``optimizemigration`` exit with a non-zero status when a migration can be
+optimized.
 
 ``runserver``
 -------------
@@ -1279,7 +1311,7 @@ fly.
 For example, taking advantage of GitHub's feature to expose repositories as
 zip files, you can use a URL like::
 
-    django-admin startapp --template=https://github.com/githubuser/django-app-template/archive/master.zip myapp
+    django-admin startapp --template=https://github.com/githubuser/django-app-template/archive/main.zip myapp
 
 .. django-admin-option:: --extension EXTENSIONS, -e EXTENSIONS
 
@@ -2034,6 +2066,25 @@ distribution. It enables tab-completion of ``django-admin`` and
   with ``sql``.
 
 See :doc:`/howto/custom-management-commands` for how to add customized actions.
+
+Black formatting
+----------------
+
+.. versionadded:: 4.1
+
+The Python files created by :djadmin:`startproject`, :djadmin:`startapp`,
+:djadmin:`optimizemigration`, :djadmin:`makemigrations`, and
+:djadmin:`squashmigrations` are formatted using the ``black`` command if it is
+present on your ``PATH``.
+
+If you have ``black`` globally installed, but do not wish it used for the
+current project, you can set the ``PATH`` explicitly::
+
+    PATH=path/to/venv/bin django-admin makemigrations
+
+For commands using ``stdout`` you can pipe the output to ``black`` if needed::
+
+    django-admin inspectdb | black -
 
 ==========================================
 Running management commands from your code

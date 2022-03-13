@@ -1,6 +1,4 @@
-from django.core.exceptions import (
-    ImproperlyConfigured, SuspiciousFileOperation,
-)
+from django.core.exceptions import ImproperlyConfigured, SuspiciousFileOperation
 from django.template.utils import get_app_template_dirs
 from django.utils._os import safe_join
 from django.utils.functional import cached_property
@@ -18,18 +16,20 @@ class BaseEngine:
         `params` is a dict of configuration settings.
         """
         params = params.copy()
-        self.name = params.pop('NAME')
-        self.dirs = list(params.pop('DIRS'))
-        self.app_dirs = params.pop('APP_DIRS')
+        self.name = params.pop("NAME")
+        self.dirs = list(params.pop("DIRS"))
+        self.app_dirs = params.pop("APP_DIRS")
         if params:
             raise ImproperlyConfigured(
-                "Unknown parameters: {}".format(", ".join(params)))
+                "Unknown parameters: {}".format(", ".join(params))
+            )
 
     @property
     def app_dirname(self):
         raise ImproperlyConfigured(
             "{} doesn't support loading templates from installed "
-            "applications.".format(self.__class__.__name__))
+            "applications.".format(self.__class__.__name__)
+        )
 
     def from_string(self, template_code):
         """
@@ -38,8 +38,8 @@ class BaseEngine:
         This method is optional.
         """
         raise NotImplementedError(
-            "subclasses of BaseEngine should provide "
-            "a from_string() method")
+            "subclasses of BaseEngine should provide a from_string() method"
+        )
 
     def get_template(self, template_name):
         """
@@ -48,8 +48,8 @@ class BaseEngine:
         Raise TemplateDoesNotExist if no such template exists.
         """
         raise NotImplementedError(
-            "subclasses of BaseEngine must provide "
-            "a get_template() method")
+            "subclasses of BaseEngine must provide a get_template() method"
+        )
 
     # Utility methods: they are provided to minimize code duplication and
     #                  security issues in third-party backends.

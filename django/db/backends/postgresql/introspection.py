@@ -1,5 +1,7 @@
 from django.db.backends.base.introspection import (
-    BaseDatabaseIntrospection, FieldInfo, TableInfo,
+    BaseDatabaseIntrospection,
+    FieldInfo,
+    TableInfo,
 )
 from django.db.models import Index
 
@@ -7,55 +9,66 @@ from django.db.models import Index
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     # Maps type codes to Django Field types.
     data_types_reverse = {
-        16: 'BooleanField',
-        17: 'BinaryField',
-        20: 'BigIntegerField',
-        21: 'SmallIntegerField',
-        23: 'IntegerField',
-        25: 'TextField',
-        700: 'FloatField',
-        701: 'FloatField',
-        869: 'GenericIPAddressField',
-        1042: 'CharField',  # blank-padded
-        1043: 'CharField',
-        1082: 'DateField',
-        1083: 'TimeField',
-        1114: 'DateTimeField',
-        1184: 'DateTimeField',
-        1186: 'DurationField',
-        1266: 'TimeField',
-        1700: 'DecimalField',
-        2950: 'UUIDField',
-        3802: 'JSONField',
+        16: "BooleanField",
+        17: "BinaryField",
+        20: "BigIntegerField",
+        21: "SmallIntegerField",
+        23: "IntegerField",
+        25: "TextField",
+        700: "FloatField",
+        701: "FloatField",
+        869: "GenericIPAddressField",
+        1042: "CharField",  # blank-padded
+        1043: "CharField",
+        1082: "DateField",
+        1083: "TimeField",
+        1114: "DateTimeField",
+        1184: "DateTimeField",
+        1186: "DurationField",
+        1266: "TimeField",
+        1700: "DecimalField",
+        2950: "UUIDField",
+        3802: "JSONField",
     }
     # A hook for subclasses.
-    index_default_access_method = 'btree'
+    index_default_access_method = "btree"
 
     ignored_tables = []
 
     def get_field_type(self, data_type, description):
         field_type = super().get_field_type(data_type, description)
-        if description.default and 'nextval' in description.default:
-            if field_type == 'IntegerField':
-                return 'AutoField'
-            elif field_type == 'BigIntegerField':
-                return 'BigAutoField'
-            elif field_type == 'SmallIntegerField':
-                return 'SmallAutoField'
+        if description.default and "nextval" in description.default:
+            if field_type == "IntegerField":
+                return "AutoField"
+            elif field_type == "BigIntegerField":
+                return "BigAutoField"
+            elif field_type == "SmallIntegerField":
+                return "SmallAutoField"
         return field_type
 
     def get_table_list(self, cursor):
         """Return a list of table and view names in the current database."""
-        cursor.execute("""
-            SELECT c.relname,
-            CASE WHEN c.relispartition THEN 'p' WHEN c.relkind IN ('m', 'v') THEN 'v' ELSE 't' END
+        cursor.execute(
+            """
+            SELECT
+                c.relname,
+                CASE
+                    WHEN c.relispartition THEN 'p'
+                    WHEN c.relkind IN ('m', 'v') THEN 'v'
+                    ELSE 't'
+                END
             FROM pg_catalog.pg_class c
             LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
             WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
                 AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
                 AND pg_catalog.pg_table_is_visible(c.oid)
-        """)
-        return [TableInfo(*row) for row in cursor.fetchall() if row[0] not in self.ignored_tables]
+        """
+        )
+        return [
+            TableInfo(*row)
+            for row in cursor.fetchall()
+            if row[0] not in self.ignored_tables
+        ]
 
     def get_table_description(self, cursor, table_name):
         """
@@ -65,7 +78,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # Query the pg_catalog tables as cursor.description does not reliably
         # return the nullable property and information_schema.columns does not
         # contain details of materialized views.
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 a.attname AS column_name,
                 NOT (a.attnotnull OR (t.typtype = 'd' AND t.typnotnull)) AS is_nullable,
@@ -81,9 +95,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 AND c.relname = %s
                 AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
                 AND pg_catalog.pg_table_is_visible(c.oid)
-        """, [table_name])
+        """,
+            [table_name],
+        )
         field_map = {line[0]: line[1:] for line in cursor.fetchall()}
-        cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
+        cursor.execute(
+            "SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name)
+        )
         return [
             FieldInfo(
                 line.name,
@@ -98,21 +116,30 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         ]
 
     def get_sequences(self, cursor, table_name, table_fields=()):
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT s.relname as sequence_name, col.attname
             FROM pg_class s
                 JOIN pg_namespace sn ON sn.oid = s.relnamespace
-                JOIN pg_depend d ON d.refobjid = s.oid AND d.refclassid = 'pg_class'::regclass
-                JOIN pg_attrdef ad ON ad.oid = d.objid AND d.classid = 'pg_attrdef'::regclass
-                JOIN pg_attribute col ON col.attrelid = ad.adrelid AND col.attnum = ad.adnum
+                JOIN
+                    pg_depend d ON d.refobjid = s.oid
+                    AND d.refclassid = 'pg_class'::regclass
+                JOIN
+                    pg_attrdef ad ON ad.oid = d.objid
+                    AND d.classid = 'pg_attrdef'::regclass
+                JOIN
+                    pg_attribute col ON col.attrelid = ad.adrelid
+                    AND col.attnum = ad.adnum
                 JOIN pg_class tbl ON tbl.oid = ad.adrelid
             WHERE s.relkind = 'S'
               AND d.deptype in ('a', 'n')
               AND pg_catalog.pg_table_is_visible(tbl.oid)
               AND tbl.relname = %s
-        """, [table_name])
+        """,
+            [table_name],
+        )
         return [
-            {'name': row[0], 'table': table_name, 'column': row[1]}
+            {"name": row[0], "table": table_name, "column": row[1]}
             for row in cursor.fetchall()
         ]
 
@@ -121,19 +148,24 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Return a dictionary of {field_name: (field_name_other_table, other_table)}
         representing all foreign keys in the given table.
         """
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT a1.attname, c2.relname, a2.attname
             FROM pg_constraint con
             LEFT JOIN pg_class c1 ON con.conrelid = c1.oid
             LEFT JOIN pg_class c2 ON con.confrelid = c2.oid
-            LEFT JOIN pg_attribute a1 ON c1.oid = a1.attrelid AND a1.attnum = con.conkey[1]
-            LEFT JOIN pg_attribute a2 ON c2.oid = a2.attrelid AND a2.attnum = con.confkey[1]
+            LEFT JOIN
+                pg_attribute a1 ON c1.oid = a1.attrelid AND a1.attnum = con.conkey[1]
+            LEFT JOIN
+                pg_attribute a2 ON c2.oid = a2.attrelid AND a2.attnum = con.confkey[1]
             WHERE
                 c1.relname = %s AND
                 con.contype = 'f' AND
                 c1.relnamespace = c2.relnamespace AND
                 pg_catalog.pg_table_is_visible(c1.oid)
-        """, [table_name])
+        """,
+            [table_name],
+        )
         return {row[0]: (row[2], row[1]) for row in cursor.fetchall()}
 
     def get_constraints(self, cursor, table_name):
@@ -146,7 +178,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # Loop over the key table, collecting things as constraints. The column
         # array must return column names in the same order in which they were
         # created.
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 c.conname,
                 array(
@@ -165,7 +198,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             FROM pg_constraint AS c
             JOIN pg_class AS cl ON c.conrelid = cl.oid
             WHERE cl.relname = %s AND pg_catalog.pg_table_is_visible(cl.oid)
-        """, [table_name])
+        """,
+            [table_name],
+        )
         for constraint, columns, kind, used_cols, options in cursor.fetchall():
             constraints[constraint] = {
                 "columns": columns,
@@ -178,10 +213,17 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 "options": options,
             }
         # Now get indexes
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
-                indexname, array_agg(attname ORDER BY arridx), indisunique, indisprimary,
-                array_agg(ordering ORDER BY arridx), amname, exprdef, s2.attoptions
+                indexname,
+                array_agg(attname ORDER BY arridx),
+                indisunique,
+                indisprimary,
+                array_agg(ordering ORDER BY arridx),
+                amname,
+                exprdef,
+                s2.attoptions
             FROM (
                 SELECT
                     c2.relname as indexname, idx.*, attr.attname, am.amname,
@@ -198,23 +240,40 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     c2.reloptions as attoptions
                 FROM (
                     SELECT *
-                    FROM pg_index i, unnest(i.indkey, i.indoption) WITH ORDINALITY koi(key, option, arridx)
+                    FROM
+                        pg_index i,
+                        unnest(i.indkey, i.indoption)
+                            WITH ORDINALITY koi(key, option, arridx)
                 ) idx
                 LEFT JOIN pg_class c ON idx.indrelid = c.oid
                 LEFT JOIN pg_class c2 ON idx.indexrelid = c2.oid
                 LEFT JOIN pg_am am ON c2.relam = am.oid
-                LEFT JOIN pg_attribute attr ON attr.attrelid = c.oid AND attr.attnum = idx.key
+                LEFT JOIN
+                    pg_attribute attr ON attr.attrelid = c.oid AND attr.attnum = idx.key
                 WHERE c.relname = %s AND pg_catalog.pg_table_is_visible(c.oid)
             ) s2
             GROUP BY indexname, indisunique, indisprimary, amname, exprdef, attoptions;
-        """, [self.index_default_access_method, table_name])
-        for index, columns, unique, primary, orders, type_, definition, options in cursor.fetchall():
+        """,
+            [self.index_default_access_method, table_name],
+        )
+        for (
+            index,
+            columns,
+            unique,
+            primary,
+            orders,
+            type_,
+            definition,
+            options,
+        ) in cursor.fetchall():
             if index not in constraints:
                 basic_index = (
-                    type_ == self.index_default_access_method and
+                    type_ == self.index_default_access_method
+                    and
                     # '_btree' references
                     # django.contrib.postgres.indexes.BTreeIndex.suffix.
-                    not index.endswith('_btree') and options is None
+                    not index.endswith("_btree")
+                    and options is None
                 )
                 constraints[index] = {
                     "columns": columns if columns != [None] else [],

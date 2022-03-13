@@ -35,6 +35,7 @@ Traceback (most recent call last):
 {% endfor %}
 {% if exception_type %}Exception Type: {{ exception_type }}{% if request %} at {{ request.path_info }}{% endif %}
 {% if exception_value %}Exception Value: {{ exception_value }}{% endif %}{% endif %}{% endif %}
+{% if raising_view_name %}Raised during: {{ raising_view_name }}{% endif %}
 {% if request %}Request information:
 {% if user_str %}USER: {{ user_str }}{% endif %}
 

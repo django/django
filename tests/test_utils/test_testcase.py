@@ -8,9 +8,8 @@ from .models import Car, Person, PossessedCar
 
 
 class TestTestCase(TestCase):
-
-    @skipUnlessDBFeature('can_defer_constraint_checks')
-    @skipUnlessDBFeature('supports_foreign_keys')
+    @skipUnlessDBFeature("can_defer_constraint_checks")
+    @skipUnlessDBFeature("supports_foreign_keys")
     def test_fixture_teardown_checks_constraints(self):
         rollback_atomics = self._rollback_atomics
         self._rollback_atomics = lambda connection: None  # noop
@@ -29,9 +28,9 @@ class TestTestCase(TestCase):
             "ensure proper test isolation and silence this failure."
         )
         with self.assertRaisesMessage(DatabaseOperationForbidden, message):
-            connections['other'].connect()
+            connections["other"].connect()
         with self.assertRaisesMessage(DatabaseOperationForbidden, message):
-            connections['other'].temporary_connection()
+            connections["other"].temporary_connection()
 
     def test_disallowed_database_queries(self):
         message = (
@@ -40,12 +39,12 @@ class TestTestCase(TestCase):
             "ensure proper test isolation and silence this failure."
         )
         with self.assertRaisesMessage(DatabaseOperationForbidden, message):
-            Car.objects.using('other').get()
+            Car.objects.using("other").get()
 
     def test_reset_sequences(self):
         old_reset_sequences = self.reset_sequences
         self.reset_sequences = True
-        msg = 'reset_sequences cannot be used on TestCase instances'
+        msg = "reset_sequences cannot be used on TestCase instances"
         try:
             with self.assertRaisesMessage(TypeError, msg):
                 self._fixture_setup()
@@ -58,6 +57,7 @@ def assert_no_queries(test):
     def inner(self):
         with self.assertNumQueries(0):
             test(self)
+
     return inner
 
 
@@ -67,14 +67,14 @@ class TestDataTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.jim_douglas = Person.objects.create(name='Jim Douglas')
-        cls.car = Car.objects.create(name='1963 Volkswagen Beetle')
+        cls.jim_douglas = Person.objects.create(name="Jim Douglas")
+        cls.car = Car.objects.create(name="1963 Volkswagen Beetle")
         cls.herbie = cls.jim_douglas.possessed_cars.create(
             car=cls.car,
             belongs_to=cls.jim_douglas,
         )
 
-        cls.person_binary = Person.objects.create(name='Person', data=b'binary data')
+        cls.person_binary = Person.objects.create(name="Person", data=b"binary data")
         cls.person_binary_get = Person.objects.get(pk=cls.person_binary.pk)
 
     @assert_no_queries
@@ -95,8 +95,8 @@ class TestDataTests(TestCase):
 
     @assert_no_queries
     def test_binaryfield_data_type(self):
-        self.assertEqual(bytes(self.person_binary.data), b'binary data')
-        self.assertEqual(bytes(self.person_binary_get.data), b'binary data')
+        self.assertEqual(bytes(self.person_binary.data), b"binary data")
+        self.assertEqual(bytes(self.person_binary_get.data), b"binary data")
         self.assertEqual(
             type(self.person_binary_get.data),
             type(self.__class__.person_binary_get.data),
@@ -119,7 +119,7 @@ class TestDataTests(TestCase):
 
     def test_repr(self):
         self.assertEqual(
-            repr(TestData('attr', 'value')),
+            repr(TestData("attr", "value")),
             "<TestData: name='attr', data='value'>",
         )
 
@@ -129,16 +129,17 @@ class SetupTestDataIsolationTests(TestCase):
     In-memory data isolation is respected for model instances assigned to class
     attributes during setUpTestData.
     """
+
     @classmethod
     def setUpTestData(cls):
-        cls.car = Car.objects.create(name='Volkswagen Beetle')
+        cls.car = Car.objects.create(name="Volkswagen Beetle")
 
     def test_book_name_deutsh(self):
-        self.assertEqual(self.car.name, 'Volkswagen Beetle')
-        self.car.name = 'VW sKäfer'
+        self.assertEqual(self.car.name, "Volkswagen Beetle")
+        self.car.name = "VW sKäfer"
         self.car.save()
 
     def test_book_name_french(self):
-        self.assertEqual(self.car.name, 'Volkswagen Beetle')
-        self.car.name = 'Volkswagen Coccinelle'
+        self.assertEqual(self.car.name, "Volkswagen Beetle")
+        self.car.name = "Volkswagen Coccinelle"
         self.car.save()

@@ -1110,7 +1110,7 @@ item in the Pizza ``QuerySet``.
 
 We can reduce to just two queries using ``prefetch_related``:
 
-    >>> Pizza.objects.all().prefetch_related('toppings')
+    >>> Pizza.objects.prefetch_related('toppings')
 
 This implies a ``self.toppings.all()`` for each ``Pizza``; now each time
 ``self.toppings.all()`` is called, instead of having to go to the database for
@@ -1215,8 +1215,10 @@ could be generated, which, depending on the database, might have performance
 problems of its own when it comes to parsing or executing the SQL query. Always
 profile for your use case!
 
-Note that if you use ``iterator()`` to run the query, ``prefetch_related()``
-calls will be ignored since these two optimizations do not make sense together.
+.. versionchanged:: 4.1
+
+    If you use ``iterator()`` to run the query, ``prefetch_related()``
+    calls will only be observed if a value for ``chunk_size`` is provided.
 
 You can use the :class:`~django.db.models.Prefetch` object to further control
 the prefetch operation.
@@ -1646,7 +1648,7 @@ one, doing so will result in an error.
 
         # Two equivalent QuerySets:
         CommonlyUsedModel.objects.all()
-        ManagedModel.objects.all().defer('f2')
+        ManagedModel.objects.defer('f2')
 
     If many fields need to be duplicated in the unmanaged model, it may be best
     to create an abstract model with the shared fields and then have the
@@ -1900,6 +1902,40 @@ SQL equivalent:
 
 ``|`` is not a commutative operation, as different (though equivalent) queries
 may be generated.
+
+XOR (``^``)
+~~~~~~~~~~~
+
+.. versionadded:: 4.1
+
+Combines two ``QuerySet``\s using the SQL ``XOR`` operator.
+
+The following are equivalent::
+
+    Model.objects.filter(x=1) ^ Model.objects.filter(y=2)
+    from django.db.models import Q
+    Model.objects.filter(Q(x=1) ^ Q(y=2))
+
+SQL equivalent:
+
+.. code-block:: sql
+
+    SELECT ... WHERE x=1 XOR y=2
+
+.. note::
+
+    ``XOR`` is natively supported on MariaDB and MySQL. On other databases,
+    ``x ^ y ^ ... ^ z`` is converted to an equivalent:
+
+    .. code-block:: sql
+
+        (x OR y OR ... OR z) AND
+        1=(
+            (CASE WHEN x THEN 1 ELSE 0 END) +
+            (CASE WHEN y THEN 1 ELSE 0 END) +
+            ...
+            (CASE WHEN z THEN 1 ELSE 0 END) +
+        )
 
 Methods that do not return ``QuerySet``\s
 -----------------------------------------
@@ -2155,7 +2191,7 @@ exists in the database, an :exc:`~django.db.IntegrityError` is raised.
 ``bulk_create()``
 ~~~~~~~~~~~~~~~~~
 
-.. method:: bulk_create(objs, batch_size=None, ignore_conflicts=False)
+.. method:: bulk_create(objs, batch_size=None, ignore_conflicts=False, update_conflicts=False, update_fields=None, unique_fields=None)
 
 This method inserts the provided list of objects into the database in an
 efficient manner (generally only 1 query, no matter how many objects there
@@ -2198,9 +2234,17 @@ where the default is such that at most 999 variables per query are used.
 
 On databases that support it (all but Oracle), setting the ``ignore_conflicts``
 parameter to ``True`` tells the database to ignore failure to insert any rows
-that fail constraints such as duplicate unique values. Enabling this parameter
-disables setting the primary key on each model instance (if the database
-normally supports it).
+that fail constraints such as duplicate unique values.
+
+On databases that support it (all except Oracle and SQLite < 3.24), setting the
+``update_conflicts`` parameter to ``True``, tells the database to update
+``update_fields`` when a row insertion fails on conflicts. On PostgreSQL and
+SQLite, in addition to ``update_fields``, a list of ``unique_fields`` that may
+be in conflict must be provided.
+
+Enabling the ``ignore_conflicts`` or ``update_conflicts`` parameter disable
+setting the primary key on each model instance (if the database normally
+support it).
 
 .. warning::
 
@@ -2216,6 +2260,12 @@ normally supports it).
 .. versionchanged:: 4.0
 
     Support for the fetching primary key attributes on SQLite 3.35+ was added.
+
+.. versionchanged:: 4.1
+
+    The ``update_conflicts``, ``update_fields``, and ``unique_fields``
+    parameters were added to support updating fields when a row insertion fails
+    on conflict.
 
 ``bulk_update()``
 ~~~~~~~~~~~~~~~~~
@@ -2327,7 +2377,7 @@ If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 ``iterator()``
 ~~~~~~~~~~~~~~
 
-.. method:: iterator(chunk_size=2000)
+.. method:: iterator(chunk_size=None)
 
 Evaluates the ``QuerySet`` (by performing the query) and returns an iterator
 (see :pep:`234`) over the results. A ``QuerySet`` typically caches its results
@@ -2341,11 +2391,33 @@ performance and a significant reduction in memory.
 Note that using ``iterator()`` on a ``QuerySet`` which has already been
 evaluated will force it to evaluate again, repeating the query.
 
-Also, use of ``iterator()`` causes previous ``prefetch_related()`` calls to be
-ignored since these two optimizations do not make sense together.
+``iterator()`` is compatible with previous calls to ``prefetch_related()`` as
+long as ``chunk_size`` is given. Larger values will necessitate fewer queries
+to accomplish the prefetching at the cost of greater memory usage.
+
+On some databases (e.g. Oracle, `SQLite
+<https://www.sqlite.org/limits.html#max_variable_number>`_), the maximum number
+of terms in an SQL ``IN`` clause might be limited. Hence values below this
+limit should be used. (In particular, when prefetching across two or more
+relations, a ``chunk_size`` should be small enough that the anticipated number
+of results for each prefetched relation still falls below the limit.)
+
+So long as the QuerySet does not prefetch any related objects, providing no
+value for ``chunk_size`` will result in Django using an implicit default of
+2000.
 
 Depending on the database backend, query results will either be loaded all at
 once or streamed from the database using server-side cursors.
+
+.. versionchanged:: 4.1
+
+    Support for prefetching related objects was added.
+
+.. deprecated:: 4.1
+
+    Using ``iterator()`` on a queryset that prefetches related objects without
+    providing the ``chunk_size`` is deprecated. In Django 5.0, an exception
+    will be raise.
 
 With server-side cursors
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -2385,8 +2457,10 @@ The ``chunk_size`` parameter controls the size of batches Django retrieves from
 the database driver. Larger batches decrease the overhead of communicating with
 the database driver at the expense of a slight increase in memory consumption.
 
-The default value of ``chunk_size``, 2000, comes from `a calculation on the
-psycopg mailing list <https://www.postgresql.org/message-id/4D2F2C71.8080805%40dndg.it>`_:
+So long as the QuerySet does not prefetch any related objects, providing no
+value for ``chunk_size`` will result in Django using an implicit default of
+2000, a value derived from `a calculation on the psycopg mailing list
+<https://www.postgresql.org/message-id/4D2F2C71.8080805%40dndg.it>`_:
 
     Assuming rows of 10-20 columns with a mix of textual and numeric data, 2000
     is going to fetch less than 100KB of data, which seems a good compromise
@@ -3711,8 +3785,12 @@ A ``Q()`` object represents an SQL condition that can be used in
 database-related operations. It's similar to how an
 :class:`F() <django.db.models.F>` object represents the value of a model field
 or annotation. They make it possible to define and reuse conditions, and
-combine them using operators such as ``|`` (``OR``) and ``&`` (``AND``). See
-:ref:`complex-lookups-with-q`.
+combine them using operators such as ``|`` (``OR``), ``&`` (``AND``), and ``^``
+(``XOR``). See :ref:`complex-lookups-with-q`.
+
+.. versionchanged:: 4.1
+
+    Support for the ``^`` (``XOR``) operator was added.
 
 ``Prefetch()`` objects
 ----------------------
@@ -3731,7 +3809,7 @@ as the string based lookups passed to
     <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
     # This will only execute two queries regardless of the number of Question
     # and Choice objects.
-    >>> Question.objects.prefetch_related(Prefetch('choice_set')).all()
+    >>> Question.objects.prefetch_related(Prefetch('choice_set'))
     <QuerySet [<Question: What's up?>]>
 
 The ``queryset`` argument supplies a base ``QuerySet`` for the given lookup.

@@ -12,48 +12,58 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            'app_label', nargs='*',
-            help='App labels of applications to limit the output to.',
+            "app_label",
+            nargs="*",
+            help="App labels of applications to limit the output to.",
         )
         parser.add_argument(
-            '--database', default=DEFAULT_DB_ALIAS,
+            "--database",
+            default=DEFAULT_DB_ALIAS,
             help=(
-                'Nominates a database to show migrations for. Defaults to the '
+                "Nominates a database to show migrations for. Defaults to the "
                 '"default" database.'
             ),
         )
 
         formats = parser.add_mutually_exclusive_group()
         formats.add_argument(
-            '--list', '-l', action='store_const', dest='format', const='list',
+            "--list",
+            "-l",
+            action="store_const",
+            dest="format",
+            const="list",
             help=(
-                'Shows a list of all migrations and which are applied. '
-                'With a verbosity level of 2 or above, the applied datetimes '
-                'will be included.'
+                "Shows a list of all migrations and which are applied. "
+                "With a verbosity level of 2 or above, the applied datetimes "
+                "will be included."
             ),
         )
         formats.add_argument(
-            '--plan', '-p', action='store_const', dest='format', const='plan',
+            "--plan",
+            "-p",
+            action="store_const",
+            dest="format",
+            const="plan",
             help=(
-                'Shows all migrations in the order they will be applied. '
-                'With a verbosity level of 2 or above all direct migration dependencies '
-                'and reverse dependencies (run_before) will be included.'
-            )
+                "Shows all migrations in the order they will be applied. With a "
+                "verbosity level of 2 or above all direct migration dependencies and "
+                "reverse dependencies (run_before) will be included."
+            ),
         )
 
-        parser.set_defaults(format='list')
+        parser.set_defaults(format="list")
 
     def handle(self, *args, **options):
-        self.verbosity = options['verbosity']
+        self.verbosity = options["verbosity"]
 
         # Get the database we're operating from
-        db = options['database']
+        db = options["database"]
         connection = connections[db]
 
-        if options['format'] == "plan":
-            return self.show_plan(connection, options['app_label'])
+        if options["format"] == "plan":
+            return self.show_plan(connection, options["app_label"])
         else:
-            return self.show_list(connection, options['app_label'])
+            return self.show_list(connection, options["app_label"])
 
     def _validate_app_names(self, loader, app_names):
         has_bad_names = False
@@ -93,17 +103,26 @@ class Command(BaseCommand):
                         # Give it a nice title if it's a squashed one
                         title = plan_node[1]
                         if graph.nodes[plan_node].replaces:
-                            title += " (%s squashed migrations)" % len(graph.nodes[plan_node].replaces)
+                            title += " (%s squashed migrations)" % len(
+                                graph.nodes[plan_node].replaces
+                            )
                         applied_migration = loader.applied_migrations.get(plan_node)
                         # Mark it as applied/unapplied
                         if applied_migration:
                             if plan_node in recorded_migrations:
-                                output = ' [X] %s' % title
+                                output = " [X] %s" % title
                             else:
                                 title += " Run 'manage.py migrate' to finish recording."
-                                output = ' [-] %s' % title
-                            if self.verbosity >= 2 and hasattr(applied_migration, 'applied'):
-                                output += ' (applied at %s)' % applied_migration.applied.strftime('%Y-%m-%d %H:%M:%S')
+                                output = " [-] %s" % title
+                            if self.verbosity >= 2 and hasattr(
+                                applied_migration, "applied"
+                            ):
+                                output += (
+                                    " (applied at %s)"
+                                    % applied_migration.applied.strftime(
+                                        "%Y-%m-%d %H:%M:%S"
+                                    )
+                                )
                             self.stdout.write(output)
                         else:
                             self.stdout.write(" [ ] %s" % title)
@@ -154,4 +173,4 @@ class Command(BaseCommand):
             else:
                 self.stdout.write("[ ]  %s.%s%s" % (node.key[0], node.key[1], deps))
         if not plan:
-            self.stdout.write('(no migrations)', self.style.ERROR)
+            self.stdout.write("(no migrations)", self.style.ERROR)

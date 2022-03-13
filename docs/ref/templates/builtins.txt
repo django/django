@@ -194,7 +194,13 @@ from its first value when it's next encountered.
 ---------
 
 Outputs a whole load of debugging information, including the current context
-and imported modules.
+and imported modules. ``{% debug %}`` outputs nothing when the :setting:`DEBUG`
+setting is ``False``.
+
+.. versionchanged:: 2.2.27
+
+    In older versions, debugging information was displayed when the
+    :setting:`DEBUG` setting was ``False``.
 
 .. templatetag:: extends
 
@@ -1577,6 +1583,13 @@ produce empty output::
 
     {{ values|dictsort:"0" }}
 
+Ordering by elements at specified index is not supported on dictionaries.
+
+.. versionchanged:: 2.2.26
+
+    In older versions, ordering elements at specified index was supported on
+    dictionaries.
+
 .. templatefilter:: dictsortreversed
 
 ``dictsortreversed``
@@ -2216,7 +2229,7 @@ Note that you can backslash-escape a format string if you want to use the
 otherwise each is a format string that displays the hour and the month,
 respectively::
 
-    {% value|time:"H\h i\m" %}
+    {{ value|time:"H\h i\m" }}
 
 This would display as "01h 23m".
 
@@ -2384,7 +2397,7 @@ Newlines in the HTML content will be preserved.
 ------------------
 
 Recursively takes a self-nested list and returns an HTML unordered list --
-WITHOUT opening and closing <ul> tags.
+WITHOUT opening and closing ``<ul>`` tags.
 
 The list is assumed to be in the proper format. For example, if ``var``
 contains ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``, then
@@ -2630,7 +2643,7 @@ It is also able to consume standard context variables, e.g. assuming a
 ``user_stylesheet`` variable is passed to the template::
 
     {% load static %}
-    <link rel="stylesheet" href="{% static user_stylesheet %}" type="text/css" media="screen">
+    <link rel="stylesheet" href="{% static user_stylesheet %}" media="screen">
 
 If you'd like to retrieve a static URL without displaying it, you can use a
 slightly different call::

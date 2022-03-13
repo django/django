@@ -4,6 +4,7 @@ from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
+    minimum_database_version = (19,)
     # Oracle crashes with "ORA-00932: inconsistent datatypes: expected - got
     # BLOB" when grouping by LOBs (#24096).
     allows_group_by_lob = False
@@ -31,7 +32,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_literal_defaults = True
     closed_cursor_error_class = InterfaceError
     bare_select_suffix = " FROM DUAL"
-    # select for update with limit can be achieved on Oracle, but not with the current backend.
+    # Select for update with limit can be achieved on Oracle, but not with the
+    # current backend.
     supports_select_for_update_with_limit = False
     supports_temporal_subtraction = True
     # Oracle doesn't ignore quoted identifiers case but the current backend
@@ -65,51 +67,61 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_json_field_contains = False
     supports_collation_on_textfield = False
     test_collations = {
-        'ci': 'BINARY_CI',
-        'cs': 'BINARY',
-        'non_default': 'SWEDISH_CI',
-        'swedish_ci': 'SWEDISH_CI',
+        "ci": "BINARY_CI",
+        "cs": "BINARY",
+        "non_default": "SWEDISH_CI",
+        "swedish_ci": "SWEDISH_CI",
     }
     test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
 
     django_test_skips = {
         "Oracle doesn't support SHA224.": {
-            'db_functions.text.test_sha224.SHA224Tests.test_basic',
-            'db_functions.text.test_sha224.SHA224Tests.test_transform',
+            "db_functions.text.test_sha224.SHA224Tests.test_basic",
+            "db_functions.text.test_sha224.SHA224Tests.test_transform",
         },
         "Oracle doesn't correctly calculate ISO 8601 week numbering before "
         "1583 (the Gregorian calendar was introduced in 1582).": {
-            'db_functions.datetime.test_extract_trunc.DateFunctionTests.test_trunc_week_before_1000',
-            'db_functions.datetime.test_extract_trunc.DateFunctionWithTimeZoneTests.test_trunc_week_before_1000',
+            "db_functions.datetime.test_extract_trunc.DateFunctionTests."
+            "test_trunc_week_before_1000",
+            "db_functions.datetime.test_extract_trunc.DateFunctionWithTimeZoneTests."
+            "test_trunc_week_before_1000",
+        },
+        "Oracle extracts seconds including fractional seconds (#33517).": {
+            "db_functions.datetime.test_extract_trunc.DateFunctionTests."
+            "test_extract_second_func_no_fractional",
+            "db_functions.datetime.test_extract_trunc.DateFunctionWithTimeZoneTests."
+            "test_extract_second_func_no_fractional",
         },
         "Oracle doesn't support bitwise XOR.": {
-            'expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor',
-            'expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor_null',
-            'expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor_right_null',
+            "expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor",
+            "expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor_null",
+            "expressions.tests.ExpressionOperatorTests."
+            "test_lefthand_bitwise_xor_right_null",
         },
         "Oracle requires ORDER BY in row_number, ANSI:SQL doesn't.": {
-            'expressions_window.tests.WindowFunctionTests.test_row_number_no_ordering',
+            "expressions_window.tests.WindowFunctionTests.test_row_number_no_ordering",
         },
-        'Raises ORA-00600: internal error code.': {
-            'model_fields.test_jsonfield.TestQuerying.test_usage_in_subquery',
+        "Raises ORA-00600: internal error code.": {
+            "model_fields.test_jsonfield.TestQuerying.test_usage_in_subquery",
         },
     }
     django_test_expected_failures = {
         # A bug in Django/cx_Oracle with respect to string handling (#23843).
-        'annotations.tests.NonAggregateAnnotationTestCase.test_custom_functions',
-        'annotations.tests.NonAggregateAnnotationTestCase.test_custom_functions_can_ref_other_functions',
+        "annotations.tests.NonAggregateAnnotationTestCase.test_custom_functions",
+        "annotations.tests.NonAggregateAnnotationTestCase."
+        "test_custom_functions_can_ref_other_functions",
     }
 
     @cached_property
     def introspected_field_types(self):
         return {
             **super().introspected_field_types,
-            'GenericIPAddressField': 'CharField',
-            'PositiveBigIntegerField': 'BigIntegerField',
-            'PositiveIntegerField': 'IntegerField',
-            'PositiveSmallIntegerField': 'IntegerField',
-            'SmallIntegerField': 'IntegerField',
-            'TimeField': 'DateTimeField',
+            "GenericIPAddressField": "CharField",
+            "PositiveBigIntegerField": "BigIntegerField",
+            "PositiveIntegerField": "IntegerField",
+            "PositiveSmallIntegerField": "IntegerField",
+            "SmallIntegerField": "IntegerField",
+            "TimeField": "DateTimeField",
         }
 
     @cached_property

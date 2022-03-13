@@ -6,10 +6,10 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            'SomeModel',
+            "SomeModel",
             [
-                ('id', models.AutoField(primary_key=True)),
-                ('name', models.CharField(max_length=255)),
+                ("id", models.AutoField(primary_key=True)),
+                ("name", models.CharField(max_length=255)),
             ],
         ),
     ]

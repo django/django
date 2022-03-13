@@ -14,9 +14,10 @@ class Node:
     connection (the root) with the children being either leaf nodes or other
     Node instances.
     """
+
     # Standard connector type. Clients usually won't use this at all and
     # subclasses will usually override the value.
-    default = 'DEFAULT'
+    default = "DEFAULT"
 
     def __init__(self, children=None, connector=None, negated=False):
         """Construct a new Node. If no connector is given, use the default."""
@@ -41,8 +42,8 @@ class Node:
         return obj
 
     def __str__(self):
-        template = '(NOT (%s: %s))' if self.negated else '(%s: %s)'
-        return template % (self.connector, ', '.join(str(c) for c in self.children))
+        template = "(NOT (%s: %s))" if self.negated else "(%s: %s)"
+        return template % (self.connector, ", ".join(str(c) for c in self.children))
 
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self)
@@ -67,14 +68,21 @@ class Node:
 
     def __eq__(self, other):
         return (
-            self.__class__ == other.__class__ and
-            self.connector == other.connector and
-            self.negated == other.negated and
-            self.children == other.children
+            self.__class__ == other.__class__
+            and self.connector == other.connector
+            and self.negated == other.negated
+            and self.children == other.children
         )
 
     def __hash__(self):
-        return hash((self.__class__, self.connector, self.negated, *make_hashable(self.children)))
+        return hash(
+            (
+                self.__class__,
+                self.connector,
+                self.negated,
+                *make_hashable(self.children),
+            )
+        )
 
     def add(self, data, conn_type):
         """
@@ -94,9 +102,9 @@ class Node:
             self.children = [obj, data]
             return data
         elif (
-            isinstance(data, Node) and
-            not data.negated and
-            (data.connector == conn_type or len(data) == 1)
+            isinstance(data, Node)
+            and not data.negated
+            and (data.connector == conn_type or len(data) == 1)
         ):
             # We can squash the other node's children directly into this node.
             # We are just doing (AB)(CD) == (ABCD) here, with the addition that

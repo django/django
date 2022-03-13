@@ -13,7 +13,7 @@ def sensitive_fbv(request, *args, **kwargs):
     return HttpResponse()
 
 
-@method_decorator(no_append_slash, name='dispatch')
+@method_decorator(no_append_slash, name="dispatch")
 class SensitiveCBV(View):
     def get(self, *args, **kwargs):
         return HttpResponse()

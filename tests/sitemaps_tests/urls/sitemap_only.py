@@ -3,7 +3,9 @@ from django.urls import path
 
 urlpatterns = [
     path(
-        'sitemap-without-entries/sitemap.xml', views.sitemap,
-        {'sitemaps': {}}, name='django.contrib.sitemaps.views.sitemap',
+        "sitemap-without-entries/sitemap.xml",
+        views.sitemap,
+        {"sitemaps": {}},
+        name="django.contrib.sitemaps.views.sitemap",
     ),
 ]

@@ -32,7 +32,7 @@ class Point(GEOSGeometry):
             else:
                 coords = [x, y]
         else:
-            raise TypeError('Invalid parameters given for Point initialization.')
+            raise TypeError("Invalid parameters given for Point initialization.")
 
         point = self._create_point(len(coords), coords)
 
@@ -47,7 +47,9 @@ class Point(GEOSGeometry):
         return self._create_empty() if wkb is None else super()._from_pickle_wkb(wkb)
 
     def _ogr_ptr(self):
-        return gdal.geometries.Point._create_empty() if self.empty else super()._ogr_ptr()
+        return (
+            gdal.geometries.Point._create_empty() if self.empty else super()._ogr_ptr()
+        )
 
     @classmethod
     def _create_empty(cls):
@@ -62,7 +64,7 @@ class Point(GEOSGeometry):
             return capi.create_point(None)
 
         if ndim < 2 or ndim > 3:
-            raise TypeError('Invalid point dimension: %s' % ndim)
+            raise TypeError("Invalid point dimension: %s" % ndim)
 
         cs = capi.create_cs(c_uint(1), c_uint(ndim))
         i = iter(coords)
@@ -84,7 +86,7 @@ class Point(GEOSGeometry):
             self._post_init()
         else:
             # can this happen?
-            raise GEOSException('Geometry resulting from slice deletion was invalid.')
+            raise GEOSException("Geometry resulting from slice deletion was invalid.")
 
     def _set_single(self, index, value):
         self._cs.setOrdinate(index, 0, value)
@@ -142,7 +144,7 @@ class Point(GEOSGeometry):
     def z(self, value):
         "Set the Z component of the Point."
         if not self.hasz:
-            raise GEOSException('Cannot set Z on 2D Point.')
+            raise GEOSException("Cannot set Z on 2D Point.")
         self._cs.setOrdinate(2, 0, value)
 
     # ### Tuple setting and retrieval routines. ###

@@ -199,8 +199,8 @@ work and haven't broken other parts of Django. If you've never run Django's test
 suite before, it's a good idea to run it once beforehand to get familiar with
 its output.
 
-Before running the test suite, install its dependencies by ``cd``-ing into the
-Django ``tests/`` directory and then running:
+Before running the test suite, enter the Django ``tests/`` directory using the
+``cd tests`` command, and install test dependencies by running:
 
 .. console::
 

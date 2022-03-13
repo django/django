@@ -38,7 +38,7 @@ def bad_request(request):
 
 
 def suspicious(request):
-    raise SuspiciousOperation('dubious')
+    raise SuspiciousOperation("dubious")
 
 
 @csrf_exempt
@@ -52,7 +52,7 @@ def httpstatus_enum(request):
 
 
 async def async_regular(request):
-    return HttpResponse(b'regular content')
+    return HttpResponse(b"regular content")
 
 
 class CoroutineClearingView:
@@ -63,7 +63,11 @@ class CoroutineClearingView:
         return self._unawaited_coroutine
 
     def __del__(self):
-        self._unawaited_coroutine.close()
+        try:
+            self._unawaited_coroutine.close()
+        except AttributeError:
+            # View was never called.
+            pass
 
 
 async_unawaited = CoroutineClearingView()

@@ -21,11 +21,11 @@ class TestQuery(SimpleTestCase):
         lookup = where.children[0]
         self.assertIsInstance(lookup, GreaterThan)
         self.assertEqual(lookup.rhs, 2)
-        self.assertEqual(lookup.lhs.target, Author._meta.get_field('num'))
+        self.assertEqual(lookup.lhs.target, Author._meta.get_field("num"))
 
     def test_non_alias_cols_query(self):
         query = Query(Author, alias_cols=False)
-        where = query.build_where(Q(num__gt=2, name__isnull=False) | Q(num__lt=F('id')))
+        where = query.build_where(Q(num__gt=2, name__isnull=False) | Q(num__lt=F("id")))
 
         name_isnull_lookup, num_gt_lookup = where.children[0].children
         self.assertIsInstance(num_gt_lookup, GreaterThan)
@@ -50,35 +50,35 @@ class TestQuery(SimpleTestCase):
         lookup = where.children[0]
         self.assertIsInstance(lookup, GreaterThan)
         self.assertEqual(lookup.rhs, 2)
-        self.assertEqual(lookup.lhs.target, Author._meta.get_field('num'))
+        self.assertEqual(lookup.lhs.target, Author._meta.get_field("num"))
 
         lookup = where.children[1]
         self.assertIsInstance(lookup, LessThan)
         self.assertEqual(lookup.rhs, 0)
-        self.assertEqual(lookup.lhs.target, Author._meta.get_field('num'))
+        self.assertEqual(lookup.lhs.target, Author._meta.get_field("num"))
 
     def test_multiple_fields(self):
         query = Query(Item, alias_cols=False)
-        where = query.build_where(Q(modified__gt=F('created')))
+        where = query.build_where(Q(modified__gt=F("created")))
         lookup = where.children[0]
         self.assertIsInstance(lookup, GreaterThan)
         self.assertIsInstance(lookup.rhs, Col)
         self.assertIsNone(lookup.rhs.alias)
         self.assertIsInstance(lookup.lhs, Col)
         self.assertIsNone(lookup.lhs.alias)
-        self.assertEqual(lookup.rhs.target, Item._meta.get_field('created'))
-        self.assertEqual(lookup.lhs.target, Item._meta.get_field('modified'))
+        self.assertEqual(lookup.rhs.target, Item._meta.get_field("created"))
+        self.assertEqual(lookup.lhs.target, Item._meta.get_field("modified"))
 
     def test_transform(self):
         query = Query(Author, alias_cols=False)
         with register_lookup(CharField, Lower):
-            where = query.build_where(~Q(name__lower='foo'))
+            where = query.build_where(~Q(name__lower="foo"))
         lookup = where.children[0]
         self.assertIsInstance(lookup, Exact)
         self.assertIsInstance(lookup.lhs, Lower)
         self.assertIsInstance(lookup.lhs.lhs, Col)
         self.assertIsNone(lookup.lhs.lhs.alias)
-        self.assertEqual(lookup.lhs.lhs.target, Author._meta.get_field('name'))
+        self.assertEqual(lookup.lhs.lhs.target, Author._meta.get_field("name"))
 
     def test_negated_nullable(self):
         query = Query(Item)
@@ -86,21 +86,21 @@ class TestQuery(SimpleTestCase):
         self.assertTrue(where.negated)
         lookup = where.children[0]
         self.assertIsInstance(lookup, LessThan)
-        self.assertEqual(lookup.lhs.target, Item._meta.get_field('modified'))
+        self.assertEqual(lookup.lhs.target, Item._meta.get_field("modified"))
         lookup = where.children[1]
         self.assertIsInstance(lookup, IsNull)
-        self.assertEqual(lookup.lhs.target, Item._meta.get_field('modified'))
+        self.assertEqual(lookup.lhs.target, Item._meta.get_field("modified"))
 
     def test_foreign_key(self):
         query = Query(Item)
-        msg = 'Joined field references are not permitted in this query'
+        msg = "Joined field references are not permitted in this query"
         with self.assertRaisesMessage(FieldError, msg):
             query.build_where(Q(creator__num__gt=2))
 
     def test_foreign_key_f(self):
         query = Query(Ranking)
         with self.assertRaises(FieldError):
-            query.build_where(Q(rank__gt=F('author__num')))
+            query.build_where(Q(rank__gt=F("author__num")))
 
     def test_foreign_key_exclusive(self):
         query = Query(ObjectC, alias_cols=False)
@@ -109,23 +109,23 @@ class TestQuery(SimpleTestCase):
         self.assertIsInstance(a_isnull, RelatedIsNull)
         self.assertIsInstance(a_isnull.lhs, Col)
         self.assertIsNone(a_isnull.lhs.alias)
-        self.assertEqual(a_isnull.lhs.target, ObjectC._meta.get_field('objecta'))
+        self.assertEqual(a_isnull.lhs.target, ObjectC._meta.get_field("objecta"))
         b_isnull = where.children[1]
         self.assertIsInstance(b_isnull, RelatedIsNull)
         self.assertIsInstance(b_isnull.lhs, Col)
         self.assertIsNone(b_isnull.lhs.alias)
-        self.assertEqual(b_isnull.lhs.target, ObjectC._meta.get_field('objectb'))
+        self.assertEqual(b_isnull.lhs.target, ObjectC._meta.get_field("objectb"))
 
     def test_clone_select_related(self):
         query = Query(Item)
-        query.add_select_related(['creator'])
+        query.add_select_related(["creator"])
         clone = query.clone()
-        clone.add_select_related(['note', 'creator__extra'])
-        self.assertEqual(query.select_related, {'creator': {}})
+        clone.add_select_related(["note", "creator__extra"])
+        self.assertEqual(query.select_related, {"creator": {}})
 
     def test_iterable_lookup_value(self):
         query = Query(Item)
-        where = query.build_where(Q(name=['a', 'b']))
+        where = query.build_where(Q(name=["a", "b"]))
         name_exact = where.children[0]
         self.assertIsInstance(name_exact, Exact)
         self.assertEqual(name_exact.rhs, "['a', 'b']")
@@ -140,14 +140,14 @@ class TestQuery(SimpleTestCase):
 
     def test_filter_conditional_join(self):
         query = Query(Item)
-        filter_expr = Func('note__note', output_field=BooleanField())
-        msg = 'Joined field references are not permitted in this query'
+        filter_expr = Func("note__note", output_field=BooleanField())
+        msg = "Joined field references are not permitted in this query"
         with self.assertRaisesMessage(FieldError, msg):
             query.build_where(filter_expr)
 
     def test_filter_non_conditional(self):
         query = Query(Item)
-        msg = 'Cannot filter against a non-conditional expression.'
+        msg = "Cannot filter against a non-conditional expression."
         with self.assertRaisesMessage(TypeError, msg):
             query.build_where(Func(output_field=CharField()))
 
@@ -155,6 +155,6 @@ class TestQuery(SimpleTestCase):
 class JoinPromoterTest(SimpleTestCase):
     def test_repr(self):
         self.assertEqual(
-            repr(JoinPromoter('AND', 3, True)),
+            repr(JoinPromoter("AND", 3, True)),
             "JoinPromoter(connector='AND', num_children=3, negated=True)",
         )

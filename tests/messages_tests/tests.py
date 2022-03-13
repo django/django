@@ -8,9 +8,9 @@ from django.test import SimpleTestCase, override_settings
 
 class MessageTests(SimpleTestCase):
     def test_eq(self):
-        msg_1 = Message(constants.INFO, 'Test message 1')
-        msg_2 = Message(constants.INFO, 'Test message 2')
-        msg_3 = Message(constants.WARNING, 'Test message 1')
+        msg_1 = Message(constants.INFO, "Test message 1")
+        msg_2 = Message(constants.INFO, "Test message 2")
+        msg_3 = Message(constants.WARNING, "Test message 1")
         self.assertEqual(msg_1, msg_1)
         self.assertEqual(msg_1, mock.ANY)
         self.assertNotEqual(msg_1, msg_2)
@@ -20,12 +20,12 @@ class MessageTests(SimpleTestCase):
 
 class TestLevelTags(SimpleTestCase):
     message_tags = {
-        constants.INFO: 'info',
-        constants.DEBUG: '',
-        constants.WARNING: '',
-        constants.ERROR: 'bad',
-        constants.SUCCESS: '',
-        12: 'custom',
+        constants.INFO: "info",
+        constants.DEBUG: "",
+        constants.WARNING: "",
+        constants.ERROR: "bad",
+        constants.SUCCESS: "",
+        12: "custom",
     }
 
     @override_settings(MESSAGE_TAGS=message_tags)

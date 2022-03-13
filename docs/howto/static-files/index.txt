@@ -89,7 +89,7 @@ This is not suitable for production use! For some common deployment
 strategies, see :doc:`/howto/static-files/deployment`.
 
 For example, if your :setting:`STATIC_URL` is defined as ``static/``, you can
-do this by adding the following snippet to your urls.py::
+do this by adding the following snippet to your ``urls.py``::
 
     from django.conf import settings
     from django.conf.urls.static import static
@@ -107,6 +107,10 @@ do this by adding the following snippet to your urls.py::
     Also this helper function only serves the actual :setting:`STATIC_ROOT`
     folder; it doesn't perform static files discovery like
     :mod:`django.contrib.staticfiles`.
+
+    Finally, static files are served via a wrapper at the WSGI application
+    layer. As a consequence, static files requests do not pass through the
+    normal :doc:`middleware chain </topics/http/middleware>`.
 
 .. _serving-uploaded-files-in-development:
 

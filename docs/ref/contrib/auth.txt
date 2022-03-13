@@ -419,7 +419,7 @@ Login and logout signals
 The auth framework uses the following :doc:`signals </topics/signals>` that
 can be used for notification when a user logs in or out.
 
-.. function:: user_logged_in
+.. data:: user_logged_in
 
     Sent when a user logs in successfully.
 
@@ -434,7 +434,7 @@ can be used for notification when a user logs in or out.
     ``user``
         The user instance that just logged in.
 
-.. function:: user_logged_out
+.. data:: user_logged_out
 
     Sent when the logout method is called.
 
@@ -449,7 +449,7 @@ can be used for notification when a user logs in or out.
         The user instance that just logged out or ``None`` if the
         user was not authenticated.
 
-.. function:: user_login_failed
+.. data:: user_login_failed
 
     Sent when the user failed to login successfully
 
@@ -649,16 +649,26 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         information) prior to using it to get or create a user object. Returns
         the cleaned username.
 
-    .. method:: configure_user(request, user)
+    .. method:: configure_user(request, user, created=True)
 
-        Configures a newly created user.  This method is called immediately
-        after a new user is created, and can be used to perform custom setup
-        actions, such as setting the user's groups based on attributes in an
-        LDAP directory. Returns the user object.
+        Configures the user on each authentication attempt. This method is
+        called immediately after fetching or creating the user being
+        authenticated, and can be used to perform custom setup actions, such as
+        setting the user's groups based on attributes in an LDAP directory.
+        Returns the user object.
+
+        The setup can be performed either once when the user is created
+        (``created`` is ``True``) or on existing users (``created`` is
+        ``False``) as a way of synchronizing attributes between the remote and
+        the local systems.
 
         ``request`` is an :class:`~django.http.HttpRequest` and may be ``None``
         if it wasn't provided to :func:`~django.contrib.auth.authenticate`
         (which passes it on to the backend).
+
+        .. versionchanged:: 4.1
+
+            The ``created`` argument was added.
 
     .. method:: user_can_authenticate()
 

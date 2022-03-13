@@ -3,5 +3,5 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('fileresponse/', views.file_response),
+    path("fileresponse/", views.file_response),
 ]

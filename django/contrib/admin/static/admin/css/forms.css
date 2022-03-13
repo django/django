@@ -5,7 +5,7 @@
 .form-row {
     overflow: hidden;
     padding: 10px;
-    font-size: 13px;
+    font-size: 0.8125rem;
     border-bottom: 1px solid var(--hairline-color);
 }
 
@@ -27,7 +27,7 @@ form .form-row p {
 label {
     font-weight: normal;
     color: var(--body-quiet-color);
-    font-size: 13px;
+    font-size: 0.8125rem;
 }
 
 .required label, label.required {
@@ -37,16 +37,19 @@ label {
 
 /* RADIO BUTTONS */
 
-form ul.radiolist li {
-    list-style-type: none;
+form div.radiolist div {
+    padding-right: 7px;
 }
 
-form ul.radiolist label {
-    float: none;
-    display: inline;
+form div.radiolist.inline div {
+    display: inline-block;
 }
 
-form ul.radiolist input[type="radio"] {
+form div.radiolist label {
+    width: auto;
+}
+
+form div.radiolist input[type="radio"] {
     margin: -2px 4px 0 0;
     padding: 0;
 }
@@ -106,7 +109,7 @@ form .aligned ul {
     padding-left: 10px;
 }
 
-form .aligned ul.radiolist {
+form .aligned div.radiolist {
     display: inline-block;
     margin: 0;
     padding: 0;
@@ -245,7 +248,7 @@ fieldset.monospace textarea {
 /* SUBMIT ROW */
 
 .submit-row {
-    padding: 12px 14px;
+    padding: 12px 14px 7px;
     margin: 0 0 20px;
     background: var(--darkened-bg);
     border: 1px solid var(--hairline-color);
@@ -261,11 +264,11 @@ body.popup .submit-row {
 .submit-row input {
     height: 35px;
     line-height: 15px;
-    margin: 0 0 0 5px;
+    margin: 0 0 5px 5px;
 }
 
 .submit-row input.default {
-    margin: 0 0 0 8px;
+    margin: 0 0 5px 8px;
     text-transform: uppercase;
 }
 
@@ -285,6 +288,7 @@ body.popup .submit-row {
     padding: 10px 15px;
     height: 15px;
     line-height: 15px;
+    margin-bottom: 5px;
     color: var(--button-fg);
 }
 
@@ -389,7 +393,7 @@ body.popup .submit-row {
     margin: 0;
     color: var(--body-quiet-color);
     padding: 5px;
-    font-size: 13px;
+    font-size: 0.8125rem;
     background: var(--darkened-bg);
     border-top: 1px solid var(--hairline-color);
     border-bottom: 1px solid var(--hairline-color);
@@ -401,7 +405,7 @@ body.popup .submit-row {
 
 .inline-related h3 span.delete label {
     margin-left: 2px;
-    font-size: 11px;
+    font-size: 0.6875rem;
 }
 
 .inline-related fieldset {
@@ -414,7 +418,7 @@ body.popup .submit-row {
 .inline-related fieldset.module h3 {
     margin: 0;
     padding: 2px 5px 3px 5px;
-    font-size: 11px;
+    font-size: 0.6875rem;
     text-align: left;
     font-weight: bold;
     background: #bcd;
@@ -455,7 +459,7 @@ body.popup .submit-row {
     height: 1.1em;
     padding: 2px 9px;
     overflow: hidden;
-    font-size: 9px;
+    font-size: 0.5625rem;
     font-weight: bold;
     color: var(--body-quiet-color);
     _width: 700px;
@@ -490,7 +494,7 @@ body.popup .submit-row {
 .inline-group .tabular tr.add-row td a {
     background: url(../img/icon-addlink.svg) 0 1px no-repeat;
     padding-left: 16px;
-    font-size: 12px;
+    font-size: 0.75rem;
 }
 
 .empty-form {

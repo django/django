@@ -8,13 +8,14 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-
         migrations.CreateModel(
             "Book",
             [
                 ("id", models.AutoField(primary_key=True)),
-                ("author", models.ForeignKey("migrations.Author", models.SET_NULL, null=True)),
+                (
+                    "author",
+                    models.ForeignKey("migrations.Author", models.SET_NULL, null=True),
+                ),
             ],
         )
-
     ]

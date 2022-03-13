@@ -7,7 +7,7 @@ from django.test import SimpleTestCase
 from ..models import Person, Tag
 
 
-@unittest.skipUnless(connection.vendor == 'mysql', 'MySQL tests.')
+@unittest.skipUnless(connection.vendor == "mysql", "MySQL tests.")
 class MySQLOperationsTests(SimpleTestCase):
     def test_sql_flush(self):
         # allow_cascade doesn't change statements on MySQL.
@@ -20,10 +20,10 @@ class MySQLOperationsTests(SimpleTestCase):
                         allow_cascade=allow_cascade,
                     ),
                     [
-                        'SET FOREIGN_KEY_CHECKS = 0;',
-                        'DELETE FROM `backends_person`;',
-                        'DELETE FROM `backends_tag`;',
-                        'SET FOREIGN_KEY_CHECKS = 1;',
+                        "SET FOREIGN_KEY_CHECKS = 0;",
+                        "DELETE FROM `backends_person`;",
+                        "DELETE FROM `backends_tag`;",
+                        "SET FOREIGN_KEY_CHECKS = 1;",
                     ],
                 )
 
@@ -39,9 +39,9 @@ class MySQLOperationsTests(SimpleTestCase):
                         allow_cascade=allow_cascade,
                     ),
                     [
-                        'SET FOREIGN_KEY_CHECKS = 0;',
-                        'TRUNCATE `backends_person`;',
-                        'TRUNCATE `backends_tag`;',
-                        'SET FOREIGN_KEY_CHECKS = 1;',
+                        "SET FOREIGN_KEY_CHECKS = 0;",
+                        "TRUNCATE `backends_person`;",
+                        "TRUNCATE `backends_tag`;",
+                        "SET FOREIGN_KEY_CHECKS = 1;",
                     ],
                 )

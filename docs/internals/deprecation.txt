@@ -75,6 +75,21 @@ details on these changes.
 * The ``opclasses`` argument of
   ``django.contrib.postgres.constraints.ExclusionConstraint`` will be removed.
 
+* The undocumented ability to pass ``errors=None`` to
+  ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` will be
+  removed.
+
+* ``django.contrib.sessions.serializers.PickleSerializer`` will be removed.
+
+* The usage of ``QuerySet.iterator()`` on a queryset that prefetches related
+  objects without providing the ``chunk_size`` argument will no longer be
+  allowed.
+
+* Passing unsaved model instances to related filters will no longer be allowed.
+
+* ``created=True`` will be required in the signature of
+  ``RemoteUserBackend.configure_user()`` subclasses.
+
 .. _deprecation-removed-in-4.1:
 
 4.1

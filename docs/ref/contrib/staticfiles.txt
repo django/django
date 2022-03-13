@@ -294,7 +294,7 @@ method). The regular expressions used to find those paths
 (``django.contrib.staticfiles.storage.HashedFilesMixin.patterns``) cover:
 
 * The `@import`_ rule and `url()`_ statement of `Cascading Style Sheets`_.
-* The `source map`_ comment in JavaScript.
+* `Source map`_ comments in CSS and JavaScript files.
 
 For example, the ``'css/styles.css'`` file with this content:
 
@@ -327,9 +327,13 @@ argument. For example::
 
 .. versionchanged:: 4.0
 
-    Support for finding paths in the source map comments was added.
+    Support for finding paths in JavaScript source map comments was added.
 
     The ``manifest_storage`` argument was added.
+
+.. versionchanged:: 4.1
+
+    Support for finding paths in CSS source map comments was added.
 
 .. attribute:: storage.ManifestStaticFilesStorage.max_post_process_passes
 

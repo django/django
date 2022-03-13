@@ -15,15 +15,15 @@ class CsrfCookieMaskedDeprecationTests(SimpleTestCase):
                 pass
 
     def test_settings_init_warning(self):
-        settings_module = ModuleType('fake_settings_module')
+        settings_module = ModuleType("fake_settings_module")
         settings_module.USE_TZ = False
         settings_module.CSRF_COOKIE_MASKED = True
-        sys.modules['fake_settings_module'] = settings_module
+        sys.modules["fake_settings_module"] = settings_module
         try:
             with self.assertRaisesMessage(RemovedInDjango50Warning, self.msg):
-                Settings('fake_settings_module')
+                Settings("fake_settings_module")
         finally:
-            del sys.modules['fake_settings_module']
+            del sys.modules["fake_settings_module"]
 
     def test_access(self):
         # Warning is not raised on access.

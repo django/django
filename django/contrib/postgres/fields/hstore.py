@@ -7,19 +7,19 @@ from django.db.models import Field, TextField, Transform
 from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.utils.translation import gettext_lazy as _
 
-__all__ = ['HStoreField']
+__all__ = ["HStoreField"]
 
 
 class HStoreField(CheckFieldDefaultMixin, Field):
     empty_strings_allowed = False
-    description = _('Map of strings to strings/nulls')
+    description = _("Map of strings to strings/nulls")
     default_error_messages = {
-        'not_a_string': _('The value of “%(key)s” is not a string or null.'),
+        "not_a_string": _("The value of “%(key)s” is not a string or null."),
     }
-    _default_hint = ('dict', '{}')
+    _default_hint = ("dict", "{}")
 
     def db_type(self, connection):
-        return 'hstore'
+        return "hstore"
 
     def get_transform(self, name):
         transform = super().get_transform(name)
@@ -32,9 +32,9 @@ class HStoreField(CheckFieldDefaultMixin, Field):
         for key, val in value.items():
             if not isinstance(val, str) and val is not None:
                 raise exceptions.ValidationError(
-                    self.error_messages['not_a_string'],
-                    code='not_a_string',
-                    params={'key': key},
+                    self.error_messages["not_a_string"],
+                    code="not_a_string",
+                    params={"key": key},
                 )
 
     def to_python(self, value):
@@ -46,10 +46,12 @@ class HStoreField(CheckFieldDefaultMixin, Field):
         return json.dumps(self.value_from_object(obj))
 
     def formfield(self, **kwargs):
-        return super().formfield(**{
-            'form_class': forms.HStoreField,
-            **kwargs,
-        })
+        return super().formfield(
+            **{
+                "form_class": forms.HStoreField,
+                **kwargs,
+            }
+        )
 
     def get_prep_value(self, value):
         value = super().get_prep_value(value)
@@ -85,11 +87,10 @@ class KeyTransform(Transform):
 
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
-        return '(%s -> %%s)' % lhs, tuple(params) + (self.key_name,)
+        return "(%s -> %%s)" % lhs, tuple(params) + (self.key_name,)
 
 
 class KeyTransformFactory:
-
     def __init__(self, key_name):
         self.key_name = key_name
 
@@ -99,13 +100,13 @@ class KeyTransformFactory:
 
 @HStoreField.register_lookup
 class KeysTransform(Transform):
-    lookup_name = 'keys'
-    function = 'akeys'
+    lookup_name = "keys"
+    function = "akeys"
     output_field = ArrayField(TextField())
 
 
 @HStoreField.register_lookup
 class ValuesTransform(Transform):
-    lookup_name = 'values'
-    function = 'avals'
+    lookup_name = "values"
+    function = "avals"
     output_field = ArrayField(TextField())

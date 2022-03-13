@@ -6,8 +6,14 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import helpers
 from django.contrib.admin.utils import (
-    NestedObjects, display_for_field, display_for_value, flatten,
-    flatten_fieldsets, help_text_for_field, label_for_field, lookup_field,
+    NestedObjects,
+    display_for_field,
+    display_for_value,
+    flatten,
+    flatten_fieldsets,
+    help_text_for_field,
+    label_for_field,
+    lookup_field,
     quote,
 )
 from django.db import DEFAULT_DB_ALIAS, models
@@ -15,15 +21,14 @@ from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils.formats import localize
 from django.utils.safestring import mark_safe
 
-from .models import (
-    Article, Car, Count, Event, EventGuide, Location, Site, Vehicle,
-)
+from .models import Article, Car, Count, Event, EventGuide, Location, Site, Vehicle
 
 
 class NestedObjectsTests(TestCase):
     """
     Tests for ``NestedObject`` utility collection.
     """
+
     @classmethod
     def setUpTestData(cls):
         cls.n = NestedObjects(using=DEFAULT_DB_ALIAS)
@@ -95,18 +100,18 @@ class NestedObjectsTests(TestCase):
 
 class UtilsTests(SimpleTestCase):
 
-    empty_value = '-empty-'
+    empty_value = "-empty-"
 
     def test_values_from_lookup_field(self):
         """
         Regression test for #12654: lookup_field
         """
-        SITE_NAME = 'example.com'
-        TITLE_TEXT = 'Some title'
+        SITE_NAME = "example.com"
+        TITLE_TEXT = "Some title"
         CREATED_DATE = datetime.min
-        ADMIN_METHOD = 'admin method'
-        SIMPLE_FUNCTION = 'function'
-        INSTANCE_ATTRIBUTE = 'attr'
+        ADMIN_METHOD = "admin method"
+        SIMPLE_FUNCTION = "function"
+        INSTANCE_ATTRIBUTE = "attr"
 
         class MockModelAdmin:
             def get_admin_value(self, obj):
@@ -124,13 +129,13 @@ class UtilsTests(SimpleTestCase):
         article.non_field = INSTANCE_ATTRIBUTE
 
         verifications = (
-            ('site', SITE_NAME),
-            ('created', localize(CREATED_DATE)),
-            ('title', TITLE_TEXT),
-            ('get_admin_value', ADMIN_METHOD),
+            ("site", SITE_NAME),
+            ("created", localize(CREATED_DATE)),
+            ("title", TITLE_TEXT),
+            ("get_admin_value", ADMIN_METHOD),
             (simple_function, SIMPLE_FUNCTION),
-            ('test_from_model', article.test_from_model()),
-            ('non_field', INSTANCE_ATTRIBUTE)
+            ("test_from_model", article.test_from_model()),
+            ("non_field", INSTANCE_ATTRIBUTE),
         )
 
         mock_admin = MockModelAdmin()
@@ -138,7 +143,9 @@ class UtilsTests(SimpleTestCase):
             field, attr, resolved_value = lookup_field(name, article, mock_admin)
 
             if field is not None:
-                resolved_value = display_for_field(resolved_value, field, self.empty_value)
+                resolved_value = display_for_field(
+                    resolved_value, field, self.empty_value
+                )
 
             self.assertEqual(value, resolved_value)
 
@@ -150,11 +157,9 @@ class UtilsTests(SimpleTestCase):
         display_value = display_for_field(None, models.CharField(), self.empty_value)
         self.assertEqual(display_value, self.empty_value)
 
-        display_value = display_for_field(None, models.CharField(
-            choices=(
-                (None, "test_none"),
-            )
-        ), self.empty_value)
+        display_value = display_for_field(
+            None, models.CharField(choices=((None, "test_none"),)), self.empty_value
+        )
         self.assertEqual(display_value, "test_none")
 
         display_value = display_for_field(None, models.DateField(), self.empty_value)
@@ -163,8 +168,13 @@ class UtilsTests(SimpleTestCase):
         display_value = display_for_field(None, models.TimeField(), self.empty_value)
         self.assertEqual(display_value, self.empty_value)
 
-        display_value = display_for_field(None, models.BooleanField(null=True), self.empty_value)
-        expected = '<img src="%sadmin/img/icon-unknown.svg" alt="None" />' % settings.STATIC_URL
+        display_value = display_for_field(
+            None, models.BooleanField(null=True), self.empty_value
+        )
+        expected = (
+            '<img src="%sadmin/img/icon-unknown.svg" alt="None" />'
+            % settings.STATIC_URL
+        )
         self.assertHTMLEqual(display_value, expected)
 
         display_value = display_for_field(None, models.DecimalField(), self.empty_value)
@@ -178,11 +188,11 @@ class UtilsTests(SimpleTestCase):
 
     def test_json_display_for_field(self):
         tests = [
-            ({'a': {'b': 'c'}}, '{"a": {"b": "c"}}'),
-            (['a', 'b'], '["a", "b"]'),
-            ('a', '"a"'),
-            ({'a': '你好 世界'}, '{"a": "你好 世界"}'),
-            ({('a', 'b'): 'c'}, "{('a', 'b'): 'c'}"),  # Invalid JSON.
+            ({"a": {"b": "c"}}, '{"a": {"b": "c"}}'),
+            (["a", "b"], '["a", "b"]'),
+            ("a", '"a"'),
+            ({"a": "你好 世界"}, '{"a": "你好 世界"}'),
+            ({("a", "b"): "c"}, "{('a', 'b'): 'c'}"),  # Invalid JSON.
         ]
         for value, display_value in tests:
             with self.subTest(value=value):
@@ -192,113 +202,113 @@ class UtilsTests(SimpleTestCase):
                 )
 
     def test_number_formats_display_for_field(self):
-        display_value = display_for_field(12345.6789, models.FloatField(), self.empty_value)
-        self.assertEqual(display_value, '12345.6789')
+        display_value = display_for_field(
+            12345.6789, models.FloatField(), self.empty_value
+        )
+        self.assertEqual(display_value, "12345.6789")
 
-        display_value = display_for_field(Decimal('12345.6789'), models.DecimalField(), self.empty_value)
-        self.assertEqual(display_value, '12345.6789')
+        display_value = display_for_field(
+            Decimal("12345.6789"), models.DecimalField(), self.empty_value
+        )
+        self.assertEqual(display_value, "12345.6789")
 
-        display_value = display_for_field(12345, models.IntegerField(), self.empty_value)
-        self.assertEqual(display_value, '12345')
+        display_value = display_for_field(
+            12345, models.IntegerField(), self.empty_value
+        )
+        self.assertEqual(display_value, "12345")
 
     @override_settings(USE_THOUSAND_SEPARATOR=True)
     def test_number_formats_with_thousand_separator_display_for_field(self):
-        display_value = display_for_field(12345.6789, models.FloatField(), self.empty_value)
-        self.assertEqual(display_value, '12,345.6789')
+        display_value = display_for_field(
+            12345.6789, models.FloatField(), self.empty_value
+        )
+        self.assertEqual(display_value, "12,345.6789")
 
-        display_value = display_for_field(Decimal('12345.6789'), models.DecimalField(), self.empty_value)
-        self.assertEqual(display_value, '12,345.6789')
+        display_value = display_for_field(
+            Decimal("12345.6789"), models.DecimalField(), self.empty_value
+        )
+        self.assertEqual(display_value, "12,345.6789")
 
-        display_value = display_for_field(12345, models.IntegerField(), self.empty_value)
-        self.assertEqual(display_value, '12,345')
+        display_value = display_for_field(
+            12345, models.IntegerField(), self.empty_value
+        )
+        self.assertEqual(display_value, "12,345")
 
     def test_list_display_for_value(self):
         display_value = display_for_value([1, 2, 3], self.empty_value)
-        self.assertEqual(display_value, '1, 2, 3')
+        self.assertEqual(display_value, "1, 2, 3")
 
-        display_value = display_for_value([1, 2, 'buckle', 'my', 'shoe'], self.empty_value)
-        self.assertEqual(display_value, '1, 2, buckle, my, shoe')
+        display_value = display_for_value(
+            [1, 2, "buckle", "my", "shoe"], self.empty_value
+        )
+        self.assertEqual(display_value, "1, 2, buckle, my, shoe")
 
     @override_settings(USE_THOUSAND_SEPARATOR=True)
     def test_list_display_for_value_boolean(self):
         self.assertEqual(
-            display_for_value(True, '', boolean=True),
-            '<img src="/static/admin/img/icon-yes.svg" alt="True">'
+            display_for_value(True, "", boolean=True),
+            '<img src="/static/admin/img/icon-yes.svg" alt="True">',
         )
         self.assertEqual(
-            display_for_value(False, '', boolean=True),
-            '<img src="/static/admin/img/icon-no.svg" alt="False">'
+            display_for_value(False, "", boolean=True),
+            '<img src="/static/admin/img/icon-no.svg" alt="False">',
         )
-        self.assertEqual(display_for_value(True, ''), 'True')
-        self.assertEqual(display_for_value(False, ''), 'False')
+        self.assertEqual(display_for_value(True, ""), "True")
+        self.assertEqual(display_for_value(False, ""), "False")
 
     def test_label_for_field(self):
         """
         Tests for label_for_field
         """
+        self.assertEqual(label_for_field("title", Article), "title")
+        self.assertEqual(label_for_field("hist", Article), "History")
         self.assertEqual(
-            label_for_field("title", Article),
-            "title"
-        )
-        self.assertEqual(
-            label_for_field("hist", Article),
-            "History"
-        )
-        self.assertEqual(
-            label_for_field("hist", Article, return_attr=True),
-            ("History", None)
+            label_for_field("hist", Article, return_attr=True), ("History", None)
         )
 
-        self.assertEqual(
-            label_for_field("__str__", Article),
-            "article"
-        )
+        self.assertEqual(label_for_field("__str__", Article), "article")
 
-        with self.assertRaisesMessage(AttributeError, "Unable to lookup 'unknown' on Article"):
+        with self.assertRaisesMessage(
+            AttributeError, "Unable to lookup 'unknown' on Article"
+        ):
             label_for_field("unknown", Article)
 
         def test_callable(obj):
             return "nothing"
-        self.assertEqual(
-            label_for_field(test_callable, Article),
-            "Test callable"
-        )
+
+        self.assertEqual(label_for_field(test_callable, Article), "Test callable")
         self.assertEqual(
             label_for_field(test_callable, Article, return_attr=True),
-            ("Test callable", test_callable)
+            ("Test callable", test_callable),
         )
 
-        self.assertEqual(
-            label_for_field("test_from_model", Article),
-            "Test from model"
-        )
+        self.assertEqual(label_for_field("test_from_model", Article), "Test from model")
         self.assertEqual(
             label_for_field("test_from_model", Article, return_attr=True),
-            ("Test from model", Article.test_from_model)
+            ("Test from model", Article.test_from_model),
         )
         self.assertEqual(
             label_for_field("test_from_model_with_override", Article),
-            "not What you Expect"
+            "not What you Expect",
         )
 
-        self.assertEqual(
-            label_for_field(lambda x: "nothing", Article),
-            "--"
-        )
-        self.assertEqual(label_for_field('site_id', Article), 'Site id')
+        self.assertEqual(label_for_field(lambda x: "nothing", Article), "--")
+        self.assertEqual(label_for_field("site_id", Article), "Site id")
 
         class MockModelAdmin:
-            @admin.display(description='not Really the Model')
+            @admin.display(description="not Really the Model")
             def test_from_model(self, obj):
                 return "nothing"
 
         self.assertEqual(
             label_for_field("test_from_model", Article, model_admin=MockModelAdmin),
-            "not Really the Model"
+            "not Really the Model",
         )
         self.assertEqual(
-            label_for_field("test_from_model", Article, model_admin=MockModelAdmin, return_attr=True),
-            ("not Really the Model", MockModelAdmin.test_from_model)
+            label_for_field(
+                "test_from_model", Article, model_admin=MockModelAdmin, return_attr=True
+            ),
+            ("not Really the Model", MockModelAdmin.test_from_model),
         )
 
     def test_label_for_field_form_argument(self):
@@ -306,34 +316,34 @@ class UtilsTests(SimpleTestCase):
             extra_form_field = forms.BooleanField()
 
             class Meta:
-                fields = '__all__'
+                fields = "__all__"
                 model = Article
 
         self.assertEqual(
-            label_for_field('extra_form_field', Article, form=ArticleForm()),
-            'Extra form field'
+            label_for_field("extra_form_field", Article, form=ArticleForm()),
+            "Extra form field",
         )
         msg = "Unable to lookup 'nonexistent' on Article or ArticleForm"
         with self.assertRaisesMessage(AttributeError, msg):
-            label_for_field('nonexistent', Article, form=ArticleForm()),
+            label_for_field("nonexistent", Article, form=ArticleForm()),
 
     def test_label_for_property(self):
         class MockModelAdmin:
             @property
-            @admin.display(description='property short description')
+            @admin.display(description="property short description")
             def test_from_property(self):
                 return "this if from property"
 
         self.assertEqual(
             label_for_field("test_from_property", Article, model_admin=MockModelAdmin),
-            'property short description'
+            "property short description",
         )
 
     def test_help_text_for_field(self):
         tests = [
-            ('article', ''),
-            ('unknown', ''),
-            ('hist', 'History help text'),
+            ("article", ""),
+            ("unknown", ""),
+            ("hist", "History help text"),
         ]
         for name, help_text in tests:
             with self.subTest(name=name):
@@ -344,48 +354,57 @@ class UtilsTests(SimpleTestCase):
         Regression test for #13963
         """
         self.assertEqual(
-            label_for_field('location', Event, return_attr=True),
-            ('location', None),
+            label_for_field("location", Event, return_attr=True),
+            ("location", None),
         )
         self.assertEqual(
-            label_for_field('event', Location, return_attr=True),
-            ('awesome event', None),
+            label_for_field("event", Location, return_attr=True),
+            ("awesome event", None),
         )
         self.assertEqual(
-            label_for_field('guest', Event, return_attr=True),
-            ('awesome guest', None),
+            label_for_field("guest", Event, return_attr=True),
+            ("awesome guest", None),
         )
 
     def test_safestring_in_field_label(self):
         # safestring should not be escaped
         class MyForm(forms.Form):
-            text = forms.CharField(label=mark_safe('<i>text</i>'))
-            cb = forms.BooleanField(label=mark_safe('<i>cb</i>'))
+            text = forms.CharField(label=mark_safe("<i>text</i>"))
+            cb = forms.BooleanField(label=mark_safe("<i>cb</i>"))
 
         form = MyForm()
-        self.assertHTMLEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
-                             '<label for="id_text" class="required inline"><i>text</i>:</label>')
-        self.assertHTMLEqual(helpers.AdminField(form, 'cb', is_first=False).label_tag(),
-                             '<label for="id_cb" class="vCheckboxLabel required inline"><i>cb</i></label>')
+        self.assertHTMLEqual(
+            helpers.AdminField(form, "text", is_first=False).label_tag(),
+            '<label for="id_text" class="required inline"><i>text</i>:</label>',
+        )
+        self.assertHTMLEqual(
+            helpers.AdminField(form, "cb", is_first=False).label_tag(),
+            '<label for="id_cb" class="vCheckboxLabel required inline">'
+            "<i>cb</i></label>",
+        )
 
         # normal strings needs to be escaped
         class MyForm(forms.Form):
-            text = forms.CharField(label='&text')
-            cb = forms.BooleanField(label='&cb')
+            text = forms.CharField(label="&text")
+            cb = forms.BooleanField(label="&cb")
 
         form = MyForm()
-        self.assertHTMLEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
-                             '<label for="id_text" class="required inline">&amp;text:</label>')
-        self.assertHTMLEqual(helpers.AdminField(form, 'cb', is_first=False).label_tag(),
-                             '<label for="id_cb" class="vCheckboxLabel required inline">&amp;cb</label>')
+        self.assertHTMLEqual(
+            helpers.AdminField(form, "text", is_first=False).label_tag(),
+            '<label for="id_text" class="required inline">&amp;text:</label>',
+        )
+        self.assertHTMLEqual(
+            helpers.AdminField(form, "cb", is_first=False).label_tag(),
+            '<label for="id_cb" class="vCheckboxLabel required inline">&amp;cb</label>',
+        )
 
     def test_flatten(self):
-        flat_all = ['url', 'title', 'content', 'sites']
+        flat_all = ["url", "title", "content", "sites"]
         inputs = (
             ((), []),
-            (('url', 'title', ('content', 'sites')), flat_all),
-            (('url', 'title', 'content', 'sites'), flat_all),
-            ((('url', 'title'), ('content', 'sites')), flat_all)
+            (("url", "title", ("content", "sites")), flat_all),
+            (("url", "title", "content", "sites"), flat_all),
+            ((("url", "title"), ("content", "sites")), flat_all),
         )
         for orig, expected in inputs:
             self.assertEqual(flatten(orig), expected)
@@ -394,19 +413,15 @@ class UtilsTests(SimpleTestCase):
         """
         Regression test for #18051
         """
-        fieldsets = (
-            (None, {
-                'fields': ('url', 'title', ('content', 'sites'))
-            }),
+        fieldsets = ((None, {"fields": ("url", "title", ("content", "sites"))}),)
+        self.assertEqual(
+            flatten_fieldsets(fieldsets), ["url", "title", "content", "sites"]
         )
-        self.assertEqual(flatten_fieldsets(fieldsets), ['url', 'title', 'content', 'sites'])
 
-        fieldsets = (
-            (None, {
-                'fields': ('url', 'title', ['content', 'sites'])
-            }),
+        fieldsets = ((None, {"fields": ("url", "title", ["content", "sites"])}),)
+        self.assertEqual(
+            flatten_fieldsets(fieldsets), ["url", "title", "content", "sites"]
         )
-        self.assertEqual(flatten_fieldsets(fieldsets), ['url', 'title', 'content', 'sites'])
 
     def test_quote(self):
-        self.assertEqual(quote('something\nor\nother'), 'something_0Aor_0Aother')
+        self.assertEqual(quote("something\nor\nother"), "something_0Aor_0Aother")

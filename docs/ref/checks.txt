@@ -457,8 +457,8 @@ The following checks are run if you use the :option:`check --deploy` option:
 * **security.W009**: Your :setting:`SECRET_KEY` has less than 50 characters,
   less than 5 unique characters, or it's prefixed with ``'django-insecure-'``
   indicating that it was generated automatically by Django. Please generate a
-  long and random ``SECRET_KEY``, otherwise many of Django's security-critical
-  features will be vulnerable to attack.
+  long and random value, otherwise many of Django's security-critical features
+  will be vulnerable to attack.
 * **security.W010**: You have :mod:`django.contrib.sessions` in your
   :setting:`INSTALLED_APPS` but you have not set
   :setting:`SESSION_COOKIE_SECURE` to ``True``. Using a secure-only session
@@ -511,6 +511,12 @@ The following checks are run if you use the :option:`check --deploy` option:
   to an invalid value.
 * **security.E024**: You have set the
   :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY` setting to an invalid value.
+* **security.W025**: Your
+  :setting:`SECRET_KEY_FALLBACKS[n] <SECRET_KEY_FALLBACKS>` has less than 50
+  characters, less than 5 unique characters, or it's prefixed with
+  ``'django-insecure-'`` indicating that it was generated automatically by
+  Django. Please generate a long and random value, otherwise many of Django's
+  security-critical features will be vulnerable to attack.
 
 The following checks verify that your security-related settings are correctly
 configured:

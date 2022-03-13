@@ -263,7 +263,7 @@ Django 1.5 also includes several smaller improvements worth noting:
 * The :djadmin:`dumpdata` management command outputs one row at a time,
   preventing out-of-memory errors when dumping large datasets.
 
-* In the localflavor for Canada, "pq" was added to the acceptable codes for
+* In the localflavor for Canada, ``pq`` was added to the acceptable codes for
   Quebec. It's an old abbreviation.
 
 * The :ref:`receiver <connecting-receiver-functions>` decorator is now able to

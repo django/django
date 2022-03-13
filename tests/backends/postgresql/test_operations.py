@@ -7,7 +7,7 @@ from django.test import SimpleTestCase
 from ..models import Person, Tag
 
 
-@unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL tests.')
+@unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL tests.")
 class PostgreSQLOperationsTests(SimpleTestCase):
     def test_sql_flush(self):
         self.assertEqual(

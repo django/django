@@ -13,15 +13,15 @@
 # file for each of the backends you test against.
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
     },
-    'other': {
-        'ENGINE': 'django.db.backends.sqlite3',
+    "other": {
+        "ENGINE": "django.db.backends.sqlite3",
     },
-    'async': {
-        'ENGINE': 'django.db.backends.aiosqlite',
-        'SYNC_DATABASE_ALIAS': 'default',
+    "async": {
+        "ENGINE": "django.db.backends.aiosqlite",
+        "SYNC_DATABASE_ALIAS": "default",
     }
 }
 
@@ -29,9 +29,9 @@ SECRET_KEY = "django_tests_secret_key"
 
 # Use a fast hasher to speed up tests.
 PASSWORD_HASHERS = [
-    'django.contrib.auth.hashers.MD5PasswordHasher',
+    "django.contrib.auth.hashers.MD5PasswordHasher",
 ]
 
-DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 USE_TZ = False

@@ -22,25 +22,29 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            'username', nargs='?',
-            help='Username to change password for; by default, it\'s the current username.',
+            "username",
+            nargs="?",
+            help=(
+                "Username to change password for; by default, it's the current "
+                "username."
+            ),
         )
         parser.add_argument(
-            '--database',
+            "--database",
             default=DEFAULT_DB_ALIAS,
             help='Specifies the database to use. Default is "default".',
         )
 
     def handle(self, *args, **options):
-        if options['username']:
-            username = options['username']
+        if options["username"]:
+            username = options["username"]
         else:
             username = getpass.getuser()
 
         try:
-            u = UserModel._default_manager.using(options['database']).get(**{
-                UserModel.USERNAME_FIELD: username
-            })
+            u = UserModel._default_manager.using(options["database"]).get(
+                **{UserModel.USERNAME_FIELD: username}
+            )
         except UserModel.DoesNotExist:
             raise CommandError("user '%s' does not exist" % username)
 
@@ -54,20 +58,22 @@ class Command(BaseCommand):
             p1 = self._get_pass()
             p2 = self._get_pass("Password (again): ")
             if p1 != p2:
-                self.stdout.write('Passwords do not match. Please try again.')
+                self.stdout.write("Passwords do not match. Please try again.")
                 count += 1
                 # Don't validate passwords that don't match.
                 continue
             try:
                 validate_password(p2, u)
             except ValidationError as err:
-                self.stderr.write('\n'.join(err.messages))
+                self.stderr.write("\n".join(err.messages))
                 count += 1
             else:
                 password_validated = True
 
         if count == MAX_TRIES:
-            raise CommandError("Aborting password change for user '%s' after %s attempts" % (u, count))
+            raise CommandError(
+                "Aborting password change for user '%s' after %s attempts" % (u, count)
+            )
 
         u.set_password(p1)
         u.save()

@@ -59,6 +59,22 @@ or from a file::
     with open('/etc/secret_key.txt') as f:
         SECRET_KEY = f.read().strip()
 
+If rotating secret keys, you may use :setting:`SECRET_KEY_FALLBACKS`::
+
+    import os
+    SECRET_KEY = os.environ['CURRENT_SECRET_KEY']
+    SECRET_KEY_FALLBACKS = [
+        os.environ['OLD_SECRET_KEY'],
+    ]
+
+Ensure that old secret keys are removed from ``SECRET_KEY_FALLBACKS`` in a
+timely manner.
+
+.. versionchanged:: 4.1
+
+    The ``SECRET_KEY_FALLBACKS`` setting was added to support rotating secret
+    keys.
+
 :setting:`DEBUG`
 ----------------
 

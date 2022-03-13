@@ -38,8 +38,8 @@ class OrderedSet:
         return len(self.dict)
 
     def __repr__(self):
-        data = repr(list(self.dict)) if self.dict else ''
-        return f'{self.__class__.__qualname__}({data})'
+        data = repr(list(self.dict)) if self.dict else ""
+        return f"{self.__class__.__qualname__}({data})"
 
 
 class MultiValueDictKeyError(KeyError):
@@ -68,6 +68,7 @@ class MultiValueDict(dict):
     which returns a list for every key, even though most web forms submit
     single name-value pairs.
     """
+
     def __init__(self, key_to_list_mapping=()):
         super().__init__(key_to_list_mapping)
 
@@ -92,24 +93,22 @@ class MultiValueDict(dict):
         super().__setitem__(key, [value])
 
     def __copy__(self):
-        return self.__class__([
-            (k, v[:])
-            for k, v in self.lists()
-        ])
+        return self.__class__([(k, v[:]) for k, v in self.lists()])
 
     def __deepcopy__(self, memo):
         result = self.__class__()
         memo[id(self)] = result
         for key, value in dict.items(self):
-            dict.__setitem__(result, copy.deepcopy(key, memo),
-                             copy.deepcopy(value, memo))
+            dict.__setitem__(
+                result, copy.deepcopy(key, memo), copy.deepcopy(value, memo)
+            )
         return result
 
     def __getstate__(self):
-        return {**self.__dict__, '_data': {k: self._getlist(k) for k in self}}
+        return {**self.__dict__, "_data": {k: self._getlist(k) for k in self}}
 
     def __setstate__(self, obj_dict):
-        data = obj_dict.pop('_data', {})
+        data = obj_dict.pop("_data", {})
         for k, v in data.items():
             self.setlist(k, v)
         self.__dict__.update(obj_dict)
@@ -231,7 +230,7 @@ class ImmutableList(tuple):
         AttributeError: You cannot mutate this.
     """
 
-    def __new__(cls, *args, warning='ImmutableList object is immutable.', **kwargs):
+    def __new__(cls, *args, warning="ImmutableList object is immutable.", **kwargs):
         self = tuple.__new__(cls, *args, **kwargs)
         self.warning = warning
         return self
@@ -264,6 +263,7 @@ class DictWrapper(dict):
     Used by the SQL construction code to ensure that values are correctly
     quoted before being used.
     """
+
     def __init__(self, data, func, prefix):
         super().__init__(data)
         self.func = func
@@ -277,7 +277,7 @@ class DictWrapper(dict):
         """
         use_func = key.startswith(self.prefix)
         if use_func:
-            key = key[len(self.prefix):]
+            key = key[len(self.prefix) :]
         value = super().__getitem__(key)
         if use_func:
             return self.func(value)
@@ -314,9 +314,7 @@ class CaseInsensitiveMapping(Mapping):
     def __eq__(self, other):
         return isinstance(other, Mapping) and {
             k.lower(): v for k, v in self.items()
-        } == {
-            k.lower(): v for k, v in other.items()
-        }
+        } == {k.lower(): v for k, v in other.items()}
 
     def __iter__(self):
         return (original_key for original_key, value in self._store.values())
@@ -329,17 +327,20 @@ class CaseInsensitiveMapping(Mapping):
 
     @staticmethod
     def _unpack_items(data):
-        if isinstance(data, Mapping):
+        # Explicitly test for dict first as the common case for performance,
+        # avoiding abc's __instancecheck__ and _abc_instancecheck for the
+        # general Mapping case.
+        if isinstance(data, (dict, Mapping)):
             yield from data.items()
             return
         for i, elem in enumerate(data):
             if len(elem) != 2:
                 raise ValueError(
-                    'dictionary update sequence element #{} has length {}; '
-                    '2 is required.'.format(i, len(elem))
+                    "dictionary update sequence element #{} has length {}; "
+                    "2 is required.".format(i, len(elem))
                 )
             if not isinstance(elem[0], str):
                 raise ValueError(
-                    'Element key %r invalid, only strings are allowed' % elem[0]
+                    "Element key %r invalid, only strings are allowed" % elem[0]
                 )
             yield elem

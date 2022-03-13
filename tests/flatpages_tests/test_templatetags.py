@@ -6,28 +6,43 @@ from django.test import TestCase
 
 
 class FlatpageTemplateTagTests(TestCase):
-
     @classmethod
     def setUpTestData(cls):
         # don't use the manager because we want to ensure the site exists
         # with pk=1, regardless of whether or not it already exists.
-        cls.site1 = Site(pk=1, domain='example.com', name='example.com')
+        cls.site1 = Site(pk=1, domain="example.com", name="example.com")
         cls.site1.save()
         cls.fp1 = FlatPage.objects.create(
-            url='/flatpage/', title='A Flatpage', content="Isn't it flat!",
-            enable_comments=False, template_name='', registration_required=False
+            url="/flatpage/",
+            title="A Flatpage",
+            content="Isn't it flat!",
+            enable_comments=False,
+            template_name="",
+            registration_required=False,
         )
         cls.fp2 = FlatPage.objects.create(
-            url='/location/flatpage/', title='A Nested Flatpage', content="Isn't it flat and deep!",
-            enable_comments=False, template_name='', registration_required=False
+            url="/location/flatpage/",
+            title="A Nested Flatpage",
+            content="Isn't it flat and deep!",
+            enable_comments=False,
+            template_name="",
+            registration_required=False,
         )
         cls.fp3 = FlatPage.objects.create(
-            url='/sekrit/', title='Sekrit Flatpage', content="Isn't it sekrit!",
-            enable_comments=False, template_name='', registration_required=True
+            url="/sekrit/",
+            title="Sekrit Flatpage",
+            content="Isn't it sekrit!",
+            enable_comments=False,
+            template_name="",
+            registration_required=True,
         )
         cls.fp4 = FlatPage.objects.create(
-            url='/location/sekrit/', title='Sekrit Nested Flatpage', content="Isn't it sekrit and deep!",
-            enable_comments=False, template_name='', registration_required=True
+            url="/location/sekrit/",
+            title="Sekrit Nested Flatpage",
+            content="Isn't it sekrit and deep!",
+            enable_comments=False,
+            template_name="",
+            registration_required=True,
         )
         cls.fp1.sites.add(cls.site1)
         cls.fp2.sites.add(cls.site1)
@@ -46,31 +61,32 @@ class FlatpageTemplateTagTests(TestCase):
         self.assertEqual(out, "A Flatpage,A Nested Flatpage,")
 
     def test_get_flatpages_tag_for_anon_user(self):
-        "The flatpage template tag retrieves unregistered flatpages for an anonymous user"
+        """
+        The flatpage template tag retrieves unregistered flatpages for an
+        anonymous user.
+        """
         out = Template(
             "{% load flatpages %}"
             "{% get_flatpages for anonuser as flatpages %}"
             "{% for page in flatpages %}"
             "{{ page.title }},"
             "{% endfor %}"
-        ).render(Context({
-            'anonuser': AnonymousUser()
-        }))
+        ).render(Context({"anonuser": AnonymousUser()}))
         self.assertEqual(out, "A Flatpage,A Nested Flatpage,")
 
     def test_get_flatpages_tag_for_user(self):
         "The flatpage template tag retrieves all flatpages for an authenticated user"
-        me = User.objects.create_user('testuser', 'test@example.com', 's3krit')
+        me = User.objects.create_user("testuser", "test@example.com", "s3krit")
         out = Template(
             "{% load flatpages %}"
             "{% get_flatpages for me as flatpages %}"
             "{% for page in flatpages %}"
             "{{ page.title }},"
             "{% endfor %}"
-        ).render(Context({
-            'me': me
-        }))
-        self.assertEqual(out, "A Flatpage,A Nested Flatpage,Sekrit Nested Flatpage,Sekrit Flatpage,")
+        ).render(Context({"me": me}))
+        self.assertEqual(
+            out, "A Flatpage,A Nested Flatpage,Sekrit Nested Flatpage,Sekrit Flatpage,"
+        )
 
     def test_get_flatpages_with_prefix(self):
         "The flatpage template tag retrieves unregistered prefixed flatpages by default"
@@ -84,30 +100,32 @@ class FlatpageTemplateTagTests(TestCase):
         self.assertEqual(out, "A Nested Flatpage,")
 
     def test_get_flatpages_with_prefix_for_anon_user(self):
-        "The flatpage template tag retrieves unregistered prefixed flatpages for an anonymous user"
+        """
+        The flatpage template tag retrieves unregistered prefixed flatpages for
+        an anonymous user.
+        """
         out = Template(
             "{% load flatpages %}"
             "{% get_flatpages '/location/' for anonuser as location_flatpages %}"
             "{% for page in location_flatpages %}"
             "{{ page.title }},"
             "{% endfor %}"
-        ).render(Context({
-            'anonuser': AnonymousUser()
-        }))
+        ).render(Context({"anonuser": AnonymousUser()}))
         self.assertEqual(out, "A Nested Flatpage,")
 
     def test_get_flatpages_with_prefix_for_user(self):
-        "The flatpage template tag retrieve prefixed flatpages for an authenticated user"
-        me = User.objects.create_user('testuser', 'test@example.com', 's3krit')
+        """
+        The flatpage template tag retrieve prefixed flatpages for an
+        authenticated user.
+        """
+        me = User.objects.create_user("testuser", "test@example.com", "s3krit")
         out = Template(
             "{% load flatpages %}"
             "{% get_flatpages '/location/' for me as location_flatpages %}"
             "{% for page in location_flatpages %}"
             "{{ page.title }},"
             "{% endfor %}"
-        ).render(Context({
-            'me': me
-        }))
+        ).render(Context({"me": me}))
         self.assertEqual(out, "A Nested Flatpage,Sekrit Nested Flatpage,")
 
     def test_get_flatpages_with_variable_prefix(self):
@@ -118,13 +136,12 @@ class FlatpageTemplateTagTests(TestCase):
             "{% for page in location_flatpages %}"
             "{{ page.title }},"
             "{% endfor %}"
-        ).render(Context({
-            'location_prefix': '/location/'
-        }))
+        ).render(Context({"location_prefix": "/location/"}))
         self.assertEqual(out, "A Nested Flatpage,")
 
     def test_parsing_errors(self):
         "There are various ways that the flatpages template tag won't parse"
+
         def render(t):
             return Template(t).render(Context())
 
@@ -141,8 +158,13 @@ class FlatpageTemplateTagTests(TestCase):
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             render("{% load flatpages %}{% get_flatpages as flatpages asdf %}")
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
-            render("{% load flatpages %}{% get_flatpages cheesecake user as flatpages %}")
+            render(
+                "{% load flatpages %}{% get_flatpages cheesecake user as flatpages %}"
+            )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             render("{% load flatpages %}{% get_flatpages for user as flatpages asdf %}")
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
-            render("{% load flatpages %}{% get_flatpages prefix for user as flatpages asdf %}")
+            render(
+                "{% load flatpages %}"
+                "{% get_flatpages prefix for user as flatpages asdf %}"
+            )

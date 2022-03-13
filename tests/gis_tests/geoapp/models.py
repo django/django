@@ -25,7 +25,7 @@ class City(NamedModel):
     point = models.PointField()
 
     class Meta:
-        app_label = 'geoapp'
+        app_label = "geoapp"
 
 
 # This is an inherited model from City
@@ -34,14 +34,16 @@ class PennsylvaniaCity(City):
     founded = models.DateTimeField(null=True)
 
     class Meta:
-        app_label = 'geoapp'
+        app_label = "geoapp"
 
 
 class State(NamedModel):
-    poly = models.PolygonField(null=gisfield_may_be_null)  # Allowing NULL geometries here.
+    poly = models.PolygonField(
+        null=gisfield_may_be_null
+    )  # Allowing NULL geometries here.
 
     class Meta:
-        app_label = 'geoapp'
+        app_label = "geoapp"
 
 
 class Track(NamedModel):
@@ -59,8 +61,8 @@ class UniqueTogetherModel(models.Model):
     point = models.PointField()
 
     class Meta:
-        unique_together = ('city', 'point')
-        required_db_features = ['supports_geometry_field_unique_index']
+        unique_together = ("city", "point")
+        required_db_features = ["supports_geometry_field_unique_index"]
 
 
 class Truth(models.Model):
@@ -76,7 +78,6 @@ class MinusOneSRID(models.Model):
 
 
 class NonConcreteField(models.IntegerField):
-
     def db_type(self, connection):
         return None
 

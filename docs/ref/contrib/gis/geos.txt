@@ -17,7 +17,7 @@ implements the OpenGIS `Simple Features for SQL`__ spatial predicate functions
 and spatial operators. GEOS, now an OSGeo project, was initially developed and
 maintained by `Refractions Research`__ of Victoria, Canada.
 
-__ https://trac.osgeo.org/geos/
+__ https://libgeos.org/
 __ https://sourceforge.net/projects/jts-topo-suite/
 __ https://www.ogc.org/standards/sfs
 __ http://www.refractions.net/

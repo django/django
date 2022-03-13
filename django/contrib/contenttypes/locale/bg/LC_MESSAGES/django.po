@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# arneatec <arneatec@gmail.com>, 2022
 # Boris Chervenkov <office@sentido.bg>, 2012
 # Georgi Kostadinov <grgkostadinov@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -9,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2022-01-13 18:20+0000\n"
+"Last-Translator: arneatec <arneatec@gmail.com>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
 "bg/)\n"
 "MIME-Version: 1.0\n"
@@ -37,9 +38,9 @@ msgid "Content type %(ct_id)s object has no associated model"
 msgstr "Обект с тип на съдържанието %(ct_id)s няма асоцииран модел."
 
 #, python-format
-msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
+msgid "Content type %(ct_id)s object %(obj_id)s doesn’t exist"
 msgstr "Обект %(obj_id)s с тип на съдържанието %(ct_id)s не съществува."
 
 #, python-format
-msgid "%(ct_name)s objects don't have a get_absolute_url() method"
+msgid "%(ct_name)s objects don’t have a get_absolute_url() method"
 msgstr "%(ct_name)s обекти нямат метода get_absolute_url()"

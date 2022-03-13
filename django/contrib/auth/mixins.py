@@ -12,8 +12,9 @@ class AccessMixin:
     Abstract CBV mixin that gives access mixins the same customizable
     functionality.
     """
+
     login_url = None
-    permission_denied_message = ''
+    permission_denied_message = ""
     raise_exception = False
     redirect_field_name = REDIRECT_FIELD_NAME
 
@@ -24,8 +25,9 @@ class AccessMixin:
         login_url = self.login_url or settings.LOGIN_URL
         if not login_url:
             raise ImproperlyConfigured(
-                '{0} is missing the login_url attribute. Define {0}.login_url, settings.LOGIN_URL, or override '
-                '{0}.get_login_url().'.format(self.__class__.__name__)
+                f"{self.__class__.__name__} is missing the login_url attribute. Define "
+                f"{self.__class__.__name__}.login_url, settings.LOGIN_URL, or override "
+                f"{self.__class__.__name__}.get_login_url()."
             )
         return str(login_url)
 
@@ -51,9 +53,8 @@ class AccessMixin:
         # path as the "next" url.
         login_scheme, login_netloc = urlparse(resolved_login_url)[:2]
         current_scheme, current_netloc = urlparse(path)[:2]
-        if (
-            (not login_scheme or login_scheme == current_scheme) and
-            (not login_netloc or login_netloc == current_netloc)
+        if (not login_scheme or login_scheme == current_scheme) and (
+            not login_netloc or login_netloc == current_netloc
         ):
             path = self.request.get_full_path()
         return redirect_to_login(
@@ -65,6 +66,7 @@ class AccessMixin:
 
 class LoginRequiredMixin(AccessMixin):
     """Verify that the current user is authenticated."""
+
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
@@ -73,6 +75,7 @@ class LoginRequiredMixin(AccessMixin):
 
 class PermissionRequiredMixin(AccessMixin):
     """Verify that the current user has all specified permissions."""
+
     permission_required = None
 
     def get_permission_required(self):
@@ -82,8 +85,10 @@ class PermissionRequiredMixin(AccessMixin):
         """
         if self.permission_required is None:
             raise ImproperlyConfigured(
-                '{0} is missing the permission_required attribute. Define {0}.permission_required, or override '
-                '{0}.get_permission_required().'.format(self.__class__.__name__)
+                f"{self.__class__.__name__} is missing the "
+                f"permission_required attribute. Define "
+                f"{self.__class__.__name__}.permission_required, or override "
+                f"{self.__class__.__name__}.get_permission_required()."
             )
         if isinstance(self.permission_required, str):
             perms = (self.permission_required,)
@@ -112,7 +117,9 @@ class UserPassesTestMixin(AccessMixin):
 
     def test_func(self):
         raise NotImplementedError(
-            '{} is missing the implementation of the test_func() method.'.format(self.__class__.__name__)
+            "{} is missing the implementation of the test_func() method.".format(
+                self.__class__.__name__
+            )
         )
 
     def get_test_func(self):

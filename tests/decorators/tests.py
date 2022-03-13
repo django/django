@@ -3,7 +3,9 @@ from unittest import TestCase, mock
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import (
-    login_required, permission_required, user_passes_test,
+    login_required,
+    permission_required,
+    user_passes_test,
 )
 from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.middleware.clickjacking import XFrameOptionsMiddleware
@@ -11,21 +13,25 @@ from django.test import SimpleTestCase
 from django.utils.decorators import method_decorator
 from django.utils.functional import keep_lazy, keep_lazy_text, lazy
 from django.utils.safestring import mark_safe
-from django.views.decorators.cache import (
-    cache_control, cache_page, never_cache,
-)
+from django.views.decorators.cache import cache_control, cache_page, never_cache
 from django.views.decorators.clickjacking import (
-    xframe_options_deny, xframe_options_exempt, xframe_options_sameorigin,
+    xframe_options_deny,
+    xframe_options_exempt,
+    xframe_options_sameorigin,
 )
 from django.views.decorators.http import (
-    condition, require_GET, require_http_methods, require_POST, require_safe,
+    condition,
+    require_GET,
+    require_http_methods,
+    require_POST,
+    require_safe,
 )
 from django.views.decorators.vary import vary_on_cookie, vary_on_headers
 
 
 def fully_decorated(request):
     """Expected __doc__"""
-    return HttpResponse('<html><body>dummy</body></html>')
+    return HttpResponse("<html><body>dummy</body></html>")
 
 
 fully_decorated.anything = "Expected __dict__"
@@ -40,6 +46,7 @@ def compose(*functions):
         for f in functions[1:]:
             result = f(result)
         return result
+
     return _inner
 
 
@@ -50,30 +57,24 @@ full_decorator = compose(
     require_POST,
     require_safe,
     condition(lambda r: None, lambda r: None),
-
     # django.views.decorators.vary
-    vary_on_headers('Accept-language'),
+    vary_on_headers("Accept-language"),
     vary_on_cookie,
-
     # django.views.decorators.cache
     cache_page(60 * 15),
     cache_control(private=True),
     never_cache,
-
     # django.contrib.auth.decorators
     # Apply user_passes_test twice to check #9474
     user_passes_test(lambda u: True),
     login_required,
-    permission_required('change_world'),
-
+    permission_required("change_world"),
     # django.contrib.admin.views.decorators
     staff_member_required,
-
     # django.utils.functional
     keep_lazy(HttpResponse),
     keep_lazy_text,
     lazy,
-
     # django.utils.safestring
     mark_safe,
 )
@@ -82,25 +83,25 @@ fully_decorated = full_decorator(fully_decorated)
 
 
 class DecoratorsTest(TestCase):
-
     def test_attributes(self):
         """
         Built-in decorators set certain attributes of the wrapped function.
         """
-        self.assertEqual(fully_decorated.__name__, 'fully_decorated')
-        self.assertEqual(fully_decorated.__doc__, 'Expected __doc__')
-        self.assertEqual(fully_decorated.__dict__['anything'], 'Expected __dict__')
+        self.assertEqual(fully_decorated.__name__, "fully_decorated")
+        self.assertEqual(fully_decorated.__doc__, "Expected __doc__")
+        self.assertEqual(fully_decorated.__dict__["anything"], "Expected __dict__")
 
     def test_user_passes_test_composition(self):
         """
         The user_passes_test decorator can be applied multiple times (#9474).
         """
+
         def test1(user):
-            user.decorators_applied.append('test1')
+            user.decorators_applied.append("test1")
             return True
 
         def test2(user):
-            user.decorators_applied.append('test2')
+            user.decorators_applied.append("test2")
             return True
 
         def callback(request):
@@ -120,11 +121,12 @@ class DecoratorsTest(TestCase):
         request.user.decorators_applied = []
         response = callback(request)
 
-        self.assertEqual(response, ['test2', 'test1'])
+        self.assertEqual(response, ["test2", "test1"])
 
     def test_cache_page(self):
         def my_view(request):
             return "response"
+
         my_view_cached = cache_page(123)(my_view)
         self.assertEqual(my_view_cached(HttpRequest()), "response")
         my_view_cached2 = cache_page(123, key_prefix="test")(my_view)
@@ -136,19 +138,21 @@ class DecoratorsTest(TestCase):
         A view returns either a response or an exception.
         Refs #15637.
         """
+
         def my_view(request):
             return HttpResponse("OK")
+
         my_safe_view = require_safe(my_view)
         request = HttpRequest()
-        request.method = 'GET'
+        request.method = "GET"
         self.assertIsInstance(my_safe_view(request), HttpResponse)
-        request.method = 'HEAD'
+        request.method = "HEAD"
         self.assertIsInstance(my_safe_view(request), HttpResponse)
-        request.method = 'POST'
+        request.method = "POST"
         self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
-        request.method = 'PUT'
+        request.method = "PUT"
         self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
-        request.method = 'DELETE'
+        request.method = "DELETE"
         self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
 
 
@@ -157,6 +161,7 @@ class DecoratorsTest(TestCase):
 def simple_dec(func):
     def wrapper(arg):
         return func("test:" + arg)
+
     return wraps(func)(wrapper)
 
 
@@ -167,6 +172,7 @@ simple_dec_m = method_decorator(simple_dec)
 def myattr_dec(func):
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
+
     wrapper.myattr = True
     return wrapper
 
@@ -177,6 +183,7 @@ myattr_dec_m = method_decorator(myattr_dec)
 def myattr2_dec(func):
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
+
     wrapper.myattr2 = True
     return wrapper
 
@@ -189,9 +196,9 @@ class ClsDec:
         self.myattr = myattr
 
     def __call__(self, f):
-
         def wrapped():
             return f() and self.myattr
+
         return update_wrapper(wrapped, f)
 
 
@@ -199,6 +206,7 @@ class MethodDecoratorTests(SimpleTestCase):
     """
     Tests for method_decorator
     """
+
     def test_preserve_signature(self):
         class Test:
             @simple_dec_m
@@ -212,20 +220,22 @@ class MethodDecoratorTests(SimpleTestCase):
         @myattr_dec
         def func():
             pass
-        self.assertIs(getattr(func, 'myattr', False), True)
+
+        self.assertIs(getattr(func, "myattr", False), True)
 
         @myattr2_dec
         def func():
             pass
-        self.assertIs(getattr(func, 'myattr2', False), True)
+
+        self.assertIs(getattr(func, "myattr2", False), True)
 
         @myattr_dec
         @myattr2_dec
         def func():
             pass
 
-        self.assertIs(getattr(func, 'myattr', False), True)
-        self.assertIs(getattr(func, 'myattr2', False), False)
+        self.assertIs(getattr(func, "myattr", False), True)
+        self.assertIs(getattr(func, "myattr2", False), False)
 
         # Decorate using method_decorator() on the method.
         class TestPlain:
@@ -246,7 +256,7 @@ class MethodDecoratorTests(SimpleTestCase):
                 pass
 
         # Decorate using an iterable of function decorators.
-        @method_decorator((myattr_dec, myattr2_dec), 'method')
+        @method_decorator((myattr_dec, myattr2_dec), "method")
         class TestFunctionIterable:
             def method(self):
                 "A method"
@@ -261,18 +271,24 @@ class MethodDecoratorTests(SimpleTestCase):
                 "A method"
                 pass
 
-        tests = (TestPlain, TestMethodAndClass, TestFunctionIterable, TestMethodIterable)
+        tests = (
+            TestPlain,
+            TestMethodAndClass,
+            TestFunctionIterable,
+            TestMethodIterable,
+        )
         for Test in tests:
             with self.subTest(Test=Test):
-                self.assertIs(getattr(Test().method, 'myattr', False), True)
-                self.assertIs(getattr(Test().method, 'myattr2', False), True)
-                self.assertIs(getattr(Test.method, 'myattr', False), True)
-                self.assertIs(getattr(Test.method, 'myattr2', False), True)
-                self.assertEqual(Test.method.__doc__, 'A method')
-                self.assertEqual(Test.method.__name__, 'method')
+                self.assertIs(getattr(Test().method, "myattr", False), True)
+                self.assertIs(getattr(Test().method, "myattr2", False), True)
+                self.assertIs(getattr(Test.method, "myattr", False), True)
+                self.assertIs(getattr(Test.method, "myattr2", False), True)
+                self.assertEqual(Test.method.__doc__, "A method")
+                self.assertEqual(Test.method.__name__, "method")
 
     def test_new_attribute(self):
         """A decorator that sets a new attribute on the method."""
+
         def decorate(func):
             func.x = 1
             return func
@@ -290,6 +306,7 @@ class MethodDecoratorTests(SimpleTestCase):
         decorators = {myattr_dec_m, myattr2_dec_m}
         msg = "'set' object is not subscriptable"
         with self.assertRaisesMessage(TypeError, msg):
+
             @method_decorator(decorators, "method")
             class TestIterable:
                 def method(self):
@@ -306,7 +323,6 @@ class MethodDecoratorTests(SimpleTestCase):
         self.assertIs(Test().method(), False)
 
     def test_descriptors(self):
-
         def original_dec(wrapped):
             def _wrapped(arg):
                 return wrapped(arg)
@@ -346,9 +362,11 @@ class MethodDecoratorTests(SimpleTestCase):
         """
         @method_decorator can be used to decorate a class and its methods.
         """
+
         def deco(func):
             def _wrapper(*args, **kwargs):
                 return True
+
             return _wrapper
 
         @method_decorator(deco, name="method")
@@ -362,14 +380,17 @@ class MethodDecoratorTests(SimpleTestCase):
         """
         @method_decorator can accept a tuple of decorators.
         """
+
         def add_question_mark(func):
             def _wrapper(*args, **kwargs):
                 return func(*args, **kwargs) + "?"
+
             return _wrapper
 
         def add_exclamation_mark(func):
             def _wrapper(*args, **kwargs):
                 return func(*args, **kwargs) + "!"
+
             return _wrapper
 
         # The order should be consistent with the usual order in which
@@ -402,6 +423,7 @@ class MethodDecoratorTests(SimpleTestCase):
             "<class 'Test'> (1)"
         )
         with self.assertRaisesMessage(TypeError, msg):
+
             @method_decorator(lambda: None, name="prop")
             class Test:
                 prop = 1
@@ -419,7 +441,8 @@ class MethodDecoratorTests(SimpleTestCase):
             "decorated class: <class 'Test'>. Got 'nonexistent_method' instead"
         )
         with self.assertRaisesMessage(ValueError, msg):
-            @method_decorator(lambda: None, name='nonexistent_method')
+
+            @method_decorator(lambda: None, name="nonexistent_method")
             class Test:
                 @classmethod
                 def __module__(cls):
@@ -434,18 +457,19 @@ class MethodDecoratorTests(SimpleTestCase):
             @wraps(func)
             def inner(*args, **kwargs):
                 nonlocal func_name, func_module
-                func_name = getattr(func, '__name__', None)
-                func_module = getattr(func, '__module__', None)
+                func_name = getattr(func, "__name__", None)
+                func_module = getattr(func, "__module__", None)
                 return func(*args, **kwargs)
+
             return inner
 
         class Test:
             @method_decorator(decorator)
             def method(self):
-                return 'tests'
+                return "tests"
 
         Test().method()
-        self.assertEqual(func_name, 'method')
+        self.assertEqual(func_name, "method")
         self.assertIsNotNone(func_module)
 
 
@@ -453,44 +477,51 @@ class XFrameOptionsDecoratorsTests(TestCase):
     """
     Tests for the X-Frame-Options decorators.
     """
+
     def test_deny_decorator(self):
         """
         Ensures @xframe_options_deny properly sets the X-Frame-Options header.
         """
+
         @xframe_options_deny
         def a_view(request):
             return HttpResponse()
+
         r = a_view(HttpRequest())
-        self.assertEqual(r.headers['X-Frame-Options'], 'DENY')
+        self.assertEqual(r.headers["X-Frame-Options"], "DENY")
 
     def test_sameorigin_decorator(self):
         """
         Ensures @xframe_options_sameorigin properly sets the X-Frame-Options
         header.
         """
+
         @xframe_options_sameorigin
         def a_view(request):
             return HttpResponse()
+
         r = a_view(HttpRequest())
-        self.assertEqual(r.headers['X-Frame-Options'], 'SAMEORIGIN')
+        self.assertEqual(r.headers["X-Frame-Options"], "SAMEORIGIN")
 
     def test_exempt_decorator(self):
         """
         Ensures @xframe_options_exempt properly instructs the
         XFrameOptionsMiddleware to NOT set the header.
         """
+
         @xframe_options_exempt
         def a_view(request):
             return HttpResponse()
+
         req = HttpRequest()
         resp = a_view(req)
-        self.assertIsNone(resp.get('X-Frame-Options', None))
+        self.assertIsNone(resp.get("X-Frame-Options", None))
         self.assertTrue(resp.xframe_options_exempt)
 
         # Since the real purpose of the exempt decorator is to suppress
         # the middleware's functionality, let's make sure it actually works...
         r = XFrameOptionsMiddleware(a_view)(req)
-        self.assertIsNone(r.get('X-Frame-Options', None))
+        self.assertIsNone(r.get("X-Frame-Options", None))
 
 
 class HttpRequestProxy:
@@ -503,8 +534,7 @@ class HttpRequestProxy:
 
 
 class NeverCacheDecoratorTest(SimpleTestCase):
-
-    @mock.patch('time.time')
+    @mock.patch("time.time")
     def test_never_cache_decorator_headers(self, mocked_time):
         @never_cache
         def a_view(request):
@@ -513,21 +543,21 @@ class NeverCacheDecoratorTest(SimpleTestCase):
         mocked_time.return_value = 1167616461.0
         response = a_view(HttpRequest())
         self.assertEqual(
-            response.headers['Expires'],
-            'Mon, 01 Jan 2007 01:54:21 GMT',
+            response.headers["Expires"],
+            "Mon, 01 Jan 2007 01:54:21 GMT",
         )
         self.assertEqual(
-            response.headers['Cache-Control'],
-            'max-age=0, no-cache, no-store, must-revalidate, private',
+            response.headers["Cache-Control"],
+            "max-age=0, no-cache, no-store, must-revalidate, private",
         )
 
     def test_never_cache_decorator_expires_not_overridden(self):
         @never_cache
         def a_view(request):
-            return HttpResponse(headers={'Expires': 'tomorrow'})
+            return HttpResponse(headers={"Expires": "tomorrow"})
 
         response = a_view(HttpRequest())
-        self.assertEqual(response.headers['Expires'], 'tomorrow')
+        self.assertEqual(response.headers["Expires"], "tomorrow")
 
     def test_never_cache_decorator_http_request(self):
         class MyClass:
@@ -553,14 +583,14 @@ class NeverCacheDecoratorTest(SimpleTestCase):
 
         request = HttpRequest()
         response = MyClass().a_view(HttpRequestProxy(request))
-        self.assertIn('Cache-Control', response.headers)
-        self.assertIn('Expires', response.headers)
+        self.assertIn("Cache-Control", response.headers)
+        self.assertIn("Expires", response.headers)
 
 
 class CacheControlDecoratorTest(SimpleTestCase):
     def test_cache_control_decorator_http_request(self):
         class MyClass:
-            @cache_control(a='b')
+            @cache_control(a="b")
             def a_view(self, request):
                 return HttpResponse()
 
@@ -576,10 +606,10 @@ class CacheControlDecoratorTest(SimpleTestCase):
 
     def test_cache_control_decorator_http_request_proxy(self):
         class MyClass:
-            @method_decorator(cache_control(a='b'))
+            @method_decorator(cache_control(a="b"))
             def a_view(self, request):
                 return HttpResponse()
 
         request = HttpRequest()
         response = MyClass().a_view(HttpRequestProxy(request))
-        self.assertEqual(response.headers['Cache-Control'], 'a=b')
+        self.assertEqual(response.headers["Cache-Control"], "a=b")

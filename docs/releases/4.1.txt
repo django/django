@@ -61,6 +61,8 @@ Minor features
 * The admin :meth:`history view <django.contrib.admin.ModelAdmin.history_view>`
   is now paginated.
 
+* Related widget wrappers now have a link to object's change form.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -71,6 +73,9 @@ Minor features
 
 * The default iteration count for the PBKDF2 password hasher is increased from
   320,000 to 390,000.
+
+* The :meth:`.RemoteUserBackend.configure_user` method now allows synchronizing
+  user attributes with attributes in a remote system such as an LDAP directory.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -139,7 +144,8 @@ Minor features
 :mod:`django.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` now
+  replaces paths to CSS source map references with their hashed counterparts.
 
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -155,6 +161,18 @@ CSRF
 ~~~~
 
 * ...
+
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* Third-party database backends can now specify the minimum required version of
+  the database using the ``DatabaseFeatures.minimum_database_version``
+  attribute which is a tuple (e.g. ``(10, 0)`` means "10.0"). If a minimum
+  version is specified, backends must also implement
+  ``DatabaseWrapper.get_database_version()``, which returns a tuple of the
+  current database version. The backend's
+  ``DatabaseWrapper.init_connection_state()`` method must call ``super()`` in
+  order for the check to run.
 
 Decorators
 ~~~~~~~~~~
@@ -188,6 +206,14 @@ Forms
   labels in ``<legend>`` tags via the new ``tag`` argument of
   :meth:`~django.forms.BoundField.label_tag`.
 
+* The new ``edit_only`` argument for :func:`.modelformset_factory` and
+  :func:`.inlineformset_factory` allows preventing new objects creation.
+
+* The ``js`` and ``css`` class attributes of :doc:`Media </topics/forms/media>`
+  now allow using hashable objects, not only path strings, as long as those
+  objects implement the ``__html__()`` method (typically when decorated with
+  the :func:`~django.utils.html.html_safe` decorator).
+
 Generic Views
 ~~~~~~~~~~~~~
 
@@ -210,6 +236,21 @@ Management Commands
 * :option:`makemigrations --no-input` now logs default answers and reasons why
   migrations cannot be created.
 
+* The new :option:`makemigrations --scriptable` option diverts log output and
+  input prompts to ``stderr``, writing only paths of generated migration files
+  to ``stdout``.
+
+* The new :option:`migrate --prune` option allows deleting nonexistent
+  migrations from the ``django_migrations`` table.
+
+* Python files created by :djadmin:`startproject`, :djadmin:`startapp`,
+  :djadmin:`optimizemigration`, :djadmin:`makemigrations`, and
+  :djadmin:`squashmigrations` are now formatted using the ``black`` command if
+  it is present on your ``PATH``.
+
+* The new :djadmin:`optimizemigration` command allows optimizing operations for
+  a migration.
+
 Migrations
 ~~~~~~~~~~
 
@@ -227,15 +268,30 @@ Models
   in order to reduce the number of failed requests, e.g. after database server
   restart.
 
+* :meth:`.QuerySet.bulk_create` now supports updating fields when a row
+  insertion fails uniqueness constraints. This is supported on MariaDB, MySQL,
+  PostgreSQL, and SQLite 3.24+.
+
+* :meth:`.QuerySet.iterator` now supports prefetching related objects as long
+  as the ``chunk_size`` argument is provided. In older versions, no prefetching
+  was done.
+
+* :class:`~django.db.models.Q` objects and querysets can now be combined using
+  ``^`` as the exclusive or (``XOR``) operator. ``XOR`` is natively supported
+  on MariaDB and MySQL. For databases that do not support ``XOR``, the query
+  will be converted to an equivalent using ``AND``, ``OR``, and ``NOT``.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :meth:`.HttpResponse.set_cookie` now supports :class:`~datetime.timedelta`
+  objects for the ``max_age`` argument.
 
 Security
 ~~~~~~~~
 
-* ...
+* The new :setting:`SECRET_KEY_FALLBACKS` setting allows providing a list of
+  values for secret key rotation.
 
 Serialization
 ~~~~~~~~~~~~~
@@ -245,7 +301,9 @@ Serialization
 Signals
 ~~~~~~~
 
-* ...
+* The :data:`~django.db.models.signals.pre_delete` and
+  :data:`~django.db.models.signals.post_delete` signals now dispatch the
+  ``origin`` of the deletion.
 
 Templates
 ~~~~~~~~~
@@ -267,7 +325,9 @@ URLs
 Utilities
 ~~~~~~~~~
 
-* ...
+* ``SimpleLazyObject`` now supports addition operations.
+
+* :func:`~django.utils.safestring.mark_safe` now preserves lazy objects.
 
 Validators
 ~~~~~~~~~~
@@ -290,6 +350,19 @@ backends.
 
 * ``DatabaseIntrospection.get_key_columns()`` is removed. Use
   ``DatabaseIntrospection.get_relations()`` instead.
+
+* ``DatabaseOperations.ignore_conflicts_suffix_sql()`` method is replaced by
+  ``DatabaseOperations.on_conflict_suffix_sql()`` that accepts the ``fields``,
+  ``on_conflict``, ``update_fields``, and ``unique_fields`` arguments.
+
+* The ``ignore_conflicts`` argument of the
+  ``DatabaseOperations.insert_statement()`` method is replaced by
+  ``on_conflict`` that accepts ``django.db.models.constants.OnConflict``.
+
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for GDAL 2.1 is removed.
 
 Dropped support for MariaDB 10.2
 --------------------------------
@@ -317,6 +390,14 @@ this difference. In Django 4.0 and earlier,
 second example query, but this undocumented behavior led to queries with
 excessive joins.
 
+Reverse foreign key changes for unsaved model instances
+-------------------------------------------------------
+
+In order to unify the behavior with many-to-many relations for unsaved model
+instances, a reverse foreign key now raises ``ValueError`` when calling
+:class:`related managers <django.db.models.fields.related.RelatedManager>` for
+unsaved objects.
+
 Miscellaneous
 -------------
 
@@ -334,6 +415,20 @@ Miscellaneous
 * :class:`~django.middleware.csrf.CsrfViewMiddleware` now uses
   ``request.META['CSRF_COOKIE']`` for storing the unmasked CSRF secret rather
   than a masked version. This is an undocumented, private API.
+
+* The :attr:`.ModelAdmin.actions` and
+  :attr:`~django.contrib.admin.ModelAdmin.inlines` attributes now default to an
+  empty tuple rather than an empty list to discourage unintended mutation.
+
+* The ``type="text/css"`` attribute is no longer included in ``<link>`` tags
+  for CSS :doc:`form media </topics/forms/media>`.
+
+* ``formset:added`` and ``formset:removed`` JavaScript events are now pure
+  JavaScript events and don't depend on jQuery. See
+  :ref:`admin-javascript-inline-form-events` for more details on the change.
+
+* The ``exc_info`` argument of the undocumented
+  ``django.utils.log.log_response()`` function is replaced by ``exception``.
 
 .. _deprecated-features-4.1:
 
@@ -384,6 +479,26 @@ Miscellaneous
                 ],
             ),
         ]
+
+* The undocumented ability to pass ``errors=None`` to
+  :meth:`.SimpleTestCase.assertFormError` and
+  :meth:`~.SimpleTestCase.assertFormsetError` is deprecated. Use ``errors=[]``
+  instead.
+
+* ``django.contrib.sessions.serializers.PickleSerializer`` is deprecated due to
+  the risk of remote code execution.
+
+* The usage of ``QuerySet.iterator()`` on a queryset that prefetches related
+  objects without providing the ``chunk_size`` argument is deprecated. In older
+  versions, no prefetching was done. Providing a value for ``chunk_size``
+  signifies that the additional query per chunk needed to prefetch is desired.
+
+* Passing unsaved model instances to related filters is deprecated. In Django
+  5.0, the exception will be raised.
+
+* ``created=True`` is added to the signature of
+  :meth:`.RemoteUserBackend.configure_user`. Support  for ``RemoteUserBackend``
+  subclasses that do not accept this argument is deprecated.
 
 Features removed in 4.1
 =======================

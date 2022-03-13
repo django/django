@@ -19,9 +19,9 @@ from django.core.wsgi import get_wsgi_application
 from django.db import connections
 from django.utils.module_loading import import_string
 
-__all__ = ('WSGIServer', 'WSGIRequestHandler')
+__all__ = ("WSGIServer", "WSGIRequestHandler")
 
-logger = logging.getLogger('django.server')
+logger = logging.getLogger("django.server")
 
 
 def get_internal_wsgi_application():
@@ -38,7 +38,8 @@ def get_internal_wsgi_application():
     whatever ``django.core.wsgi.get_wsgi_application`` returns.
     """
     from django.conf import settings
-    app_path = getattr(settings, 'WSGI_APPLICATION')
+
+    app_path = getattr(settings, "WSGI_APPLICATION")
     if app_path is None:
         return get_wsgi_application()
 
@@ -53,11 +54,14 @@ def get_internal_wsgi_application():
 
 def is_broken_pipe_error():
     exc_type, _, _ = sys.exc_info()
-    return issubclass(exc_type, (
-        BrokenPipeError,
-        ConnectionAbortedError,
-        ConnectionResetError,
-    ))
+    return issubclass(
+        exc_type,
+        (
+            BrokenPipeError,
+            ConnectionAbortedError,
+            ConnectionResetError,
+        ),
+    )
 
 
 class WSGIServer(simple_server.WSGIServer):
@@ -73,13 +77,14 @@ class WSGIServer(simple_server.WSGIServer):
 
     def handle_error(self, request, client_address):
         if is_broken_pipe_error():
-            logger.info("- Broken pipe from %s\n", client_address)
+            logger.info("- Broken pipe from %s", client_address)
         else:
             super().handle_error(request, client_address)
 
 
 class ThreadedWSGIServer(socketserver.ThreadingMixIn, WSGIServer):
     """A threaded version of the WSGIServer"""
+
     daemon_threads = True
 
     def __init__(self, *args, connections_override=None, **kwargs):
@@ -106,7 +111,7 @@ class ThreadedWSGIServer(socketserver.ThreadingMixIn, WSGIServer):
 
 
 class ServerHandler(simple_server.ServerHandler):
-    http_version = '1.1'
+    http_version = "1.1"
 
     def __init__(self, stdin, stdout, stderr, environ, **kwargs):
         """
@@ -116,24 +121,26 @@ class ServerHandler(simple_server.ServerHandler):
         This fix applies only for testserver/runserver.
         """
         try:
-            content_length = int(environ.get('CONTENT_LENGTH'))
+            content_length = int(environ.get("CONTENT_LENGTH"))
         except (ValueError, TypeError):
             content_length = 0
-        super().__init__(LimitedStream(stdin, content_length), stdout, stderr, environ, **kwargs)
+        super().__init__(
+            LimitedStream(stdin, content_length), stdout, stderr, environ, **kwargs
+        )
 
     def cleanup_headers(self):
         super().cleanup_headers()
         # HTTP/1.1 requires support for persistent connections. Send 'close' if
         # the content length is unknown to prevent clients from reusing the
         # connection.
-        if 'Content-Length' not in self.headers:
-            self.headers['Connection'] = 'close'
+        if "Content-Length" not in self.headers:
+            self.headers["Connection"] = "close"
         # Persistent connections require threading server.
         elif not isinstance(self.request_handler.server, socketserver.ThreadingMixIn):
-            self.headers['Connection'] = 'close'
+            self.headers["Connection"] = "close"
         # Mark the connection for closing if it's set as such above or if the
         # application sent the header.
-        if self.headers.get('Connection') == 'close':
+        if self.headers.get("Connection") == "close":
             self.request_handler.close_connection = True
 
     def close(self):
@@ -142,7 +149,7 @@ class ServerHandler(simple_server.ServerHandler):
 
 
 class WSGIRequestHandler(simple_server.WSGIRequestHandler):
-    protocol_version = 'HTTP/1.1'
+    protocol_version = "HTTP/1.1"
 
     def address_string(self):
         # Short-circuit parent method to not call socket.getfqdn
@@ -150,22 +157,23 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
 
     def log_message(self, format, *args):
         extra = {
-            'request': self.request,
-            'server_time': self.log_date_time_string(),
+            "request": self.request,
+            "server_time": self.log_date_time_string(),
         }
-        if args[1][0] == '4':
+        if args[1][0] == "4":
             # 0x16 = Handshake, 0x03 = SSL 3.0 or TLS 1.x
-            if args[0].startswith('\x16\x03'):
-                extra['status_code'] = 500
+            if args[0].startswith("\x16\x03"):
+                extra["status_code"] = 500
                 logger.error(
                     "You're accessing the development server over HTTPS, but "
-                    "it only supports HTTP.\n", extra=extra,
+                    "it only supports HTTP.",
+                    extra=extra,
                 )
                 return
 
         if args[1].isdigit() and len(args[1]) == 3:
             status_code = int(args[1])
-            extra['status_code'] = status_code
+            extra["status_code"] = status_code
 
             if status_code >= 500:
                 level = logger.error
@@ -184,7 +192,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
         # between underscores and dashes both normalized to underscores in WSGI
         # env vars. Nginx and Apache 2.4+ both do this as well.
         for k in self.headers:
-            if '_' in k:
+            if "_" in k:
                 del self.headers[k]
 
         return super().get_environ()
@@ -203,9 +211,9 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
         """Copy of WSGIRequestHandler.handle() but with different ServerHandler"""
         self.raw_requestline = self.rfile.readline(65537)
         if len(self.raw_requestline) > 65536:
-            self.requestline = ''
-            self.request_version = ''
-            self.command = ''
+            self.requestline = ""
+            self.request_version = ""
+            self.command = ""
             self.send_error(414)
             return
 
@@ -215,14 +223,14 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
         handler = ServerHandler(
             self.rfile, self.wfile, self.get_stderr(), self.get_environ()
         )
-        handler.request_handler = self      # backpointer for logging & connection closing
+        handler.request_handler = self  # backpointer for logging & connection closing
         handler.run(self.server.get_app())
 
 
 def run(addr, port, wsgi_handler, ipv6=False, threading=False, server_cls=WSGIServer):
     server_address = (addr, port)
     if threading:
-        httpd_cls = type('WSGIServer', (socketserver.ThreadingMixIn, server_cls), {})
+        httpd_cls = type("WSGIServer", (socketserver.ThreadingMixIn, server_cls), {})
     else:
         httpd_cls = server_cls
     httpd = httpd_cls(server_address, WSGIRequestHandler, ipv6=ipv6)

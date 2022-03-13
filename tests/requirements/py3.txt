@@ -4,6 +4,7 @@ asgiref >= 3.4.1
 argon2-cffi >= 16.1.0
 backports.zoneinfo; python_version < '3.9'
 bcrypt
+black
 docutils
 geoip2
 jinja2 >= 2.9.2
@@ -12,8 +13,6 @@ Pillow >= 6.2.0
 # pylibmc/libmemcached can't be built on Windows.
 pylibmc; sys.platform != 'win32'
 pymemcache >= 3.4.0
-# RemovedInDjango41Warning.
-python-memcached >= 1.59
 pytz
 pywatchman; sys.platform != 'win32'
 PyYAML

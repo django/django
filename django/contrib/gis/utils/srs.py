@@ -2,8 +2,9 @@ from django.contrib.gis.gdal import SpatialReference
 from django.db import DEFAULT_DB_ALIAS, connections
 
 
-def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
-                  database=None):
+def add_srs_entry(
+    srs, auth_name="EPSG", auth_srid=None, ref_sys_name=None, database=None
+):
     """
     Take a GDAL SpatialReference system and add its information to the
     `spatial_ref_sys` table of the spatial backend. Doing this enables
@@ -35,11 +36,10 @@ def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
     database = database or DEFAULT_DB_ALIAS
     connection = connections[database]
 
-    if not hasattr(connection.ops, 'spatial_version'):
-        raise Exception('The `add_srs_entry` utility only works '
-                        'with spatial backends.')
+    if not hasattr(connection.ops, "spatial_version"):
+        raise Exception("The `add_srs_entry` utility only works with spatial backends.")
     if not connection.features.supports_add_srs_entry:
-        raise Exception('This utility does not support your database backend.')
+        raise Exception("This utility does not support your database backend.")
     SpatialRefSys = connection.ops.spatial_ref_sys()
 
     # If argument is not a `SpatialReference` instance, use it as parameter
@@ -48,24 +48,26 @@ def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
         srs = SpatialReference(srs)
 
     if srs.srid is None:
-        raise Exception('Spatial reference requires an SRID to be '
-                        'compatible with the spatial backend.')
+        raise Exception(
+            "Spatial reference requires an SRID to be "
+            "compatible with the spatial backend."
+        )
 
     # Initializing the keyword arguments dictionary for both PostGIS
     # and SpatiaLite.
     kwargs = {
-        'srid': srs.srid,
-        'auth_name': auth_name,
-        'auth_srid': auth_srid or srs.srid,
-        'proj4text': srs.proj4,
+        "srid": srs.srid,
+        "auth_name": auth_name,
+        "auth_srid": auth_srid or srs.srid,
+        "proj4text": srs.proj4,
     }
     # Backend-specific fields for the SpatialRefSys model.
     srs_field_names = {f.name for f in SpatialRefSys._meta.get_fields()}
-    if 'srtext' in srs_field_names:
-        kwargs['srtext'] = srs.wkt
-    if 'ref_sys_name' in srs_field_names:
+    if "srtext" in srs_field_names:
+        kwargs["srtext"] = srs.wkt
+    if "ref_sys_name" in srs_field_names:
         # SpatiaLite specific
-        kwargs['ref_sys_name'] = ref_sys_name or srs.name
+        kwargs["ref_sys_name"] = ref_sys_name or srs.name
 
     # Creating the spatial_ref_sys model.
     try:

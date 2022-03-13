@@ -296,7 +296,8 @@ security protection of the web server, operating system and other components.
 * Django does not throttle requests to authenticate users. To protect against
   brute-force attacks against the authentication system, you may consider
   deploying a Django plugin or web server module to throttle these requests.
-* Keep your :setting:`SECRET_KEY` a secret.
+* Keep your :setting:`SECRET_KEY`, and :setting:`SECRET_KEY_FALLBACKS` if in
+  use, secret.
 * It is a good idea to limit the accessibility of your caching system and
   database using a firewall.
 * Take a look at the Open Web Application Security Project (OWASP) `Top 10
