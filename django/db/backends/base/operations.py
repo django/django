@@ -762,7 +762,7 @@ class BaseDatabaseOperations:
     def insert_statement(self, on_conflict=None):
         return "INSERT INTO"
 
-    def ignore_conflicts_suffix_sql(self, fields, on_conflict, update_fields, unique_fields):
+    def on_conflict_suffix_sql(self, fields, on_conflict, update_fields, unique_fields):
         return ""
 
 
@@ -775,9 +775,13 @@ class BaseAsyncDatabaseOperations(BaseDatabaseOperations):
         """See BaseDatabaseOperations.last_executed_query()."""
         return super().last_executed_query(cursor, sql, params)
 
-    async def sql_flush(self, style, tables, *, reset_sequences=False, allow_cascade=False):
+    async def sql_flush(
+        self, style, tables, *, reset_sequences=False, allow_cascade=False
+    ):
         """See BaseDatabaseOperations.sql_flush()."""
-        return super().sql_flush(style, tables, reset_sequences=reset_sequences, allow_cascade=allow_cascade)
+        return super().sql_flush(
+            style, tables, reset_sequences=reset_sequences, allow_cascade=allow_cascade
+        )
 
     async def execute_sql_flush(self, sql_list):
         """See BaseDatabaseOperations.exceute_sql_flush()."""
