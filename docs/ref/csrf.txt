@@ -6,10 +6,10 @@ Cross Site Request Forgery protection
    :synopsis: Protects against Cross Site Request Forgeries
 
 The CSRF middleware and template tag provides easy-to-use protection against
-`Cross Site Request Forgeries`_.  This type of attack occurs when a malicious
+`Cross Site Request Forgeries`_. This type of attack occurs when a malicious
 website contains a link, a form button or some JavaScript that is intended to
 perform some action on your website, using the credentials of a logged-in user
-who visits the malicious site in their browser.  A related type of attack,
+who visits the malicious site in their browser. A related type of attack,
 'login CSRF', where an attacking site tricks a user's browser into logging into
 a site with someone else's credentials, is also covered.
 
@@ -213,13 +213,13 @@ Rejected requests
 =================
 
 By default, a '403 Forbidden' response is sent to the user if an incoming
-request fails the checks performed by ``CsrfViewMiddleware``.  This should
+request fails the checks performed by ``CsrfViewMiddleware``. This should
 usually only be seen when there is a genuine Cross Site Request Forgery, or
 when, due to a programming error, the CSRF token has not been included with a
 POST form.
 
 The error page, however, is not very friendly, so you may want to provide your
-own view for handling this condition.  To do this, set the
+own view for handling this condition. To do this, set the
 :setting:`CSRF_FAILURE_VIEW` setting.
 
 CSRF failures are logged as warnings to the :ref:`django.security.csrf
@@ -359,9 +359,9 @@ Testing
 
 The ``CsrfViewMiddleware`` will usually be a big hindrance to testing view
 functions, due to the need for the CSRF token which must be sent with every POST
-request.  For this reason, Django's HTTP client for tests has been modified to
+request. For this reason, Django's HTTP client for tests has been modified to
 set a flag on requests which relaxes the middleware and the ``csrf_protect``
-decorator so that they no longer rejects requests.  In every other respect
+decorator so that they no longer rejects requests. In every other respect
 (e.g. sending cookies etc.), they behave the same.
 
 If, for some reason, you *want* the test client to perform CSRF
@@ -377,10 +377,10 @@ Limitations
 ===========
 
 Subdomains within a site will be able to set cookies on the client for the whole
-domain.  By setting the cookie and using a corresponding token, subdomains will
-be able to circumvent the CSRF protection.  The only way to avoid this is to
+domain. By setting the cookie and using a corresponding token, subdomains will
+be able to circumvent the CSRF protection. The only way to avoid this is to
 ensure that subdomains are controlled by trusted users (or, are at least unable
-to set cookies).  Note that even without CSRF, there are other vulnerabilities,
+to set cookies). Note that even without CSRF, there are other vulnerabilities,
 such as session fixation, that make giving subdomains to untrusted parties a bad
 idea, and these vulnerabilities cannot easily be fixed with current browsers.
 
@@ -503,7 +503,7 @@ Contrib and reusable apps
 
 Because it is possible for the developer to turn off the ``CsrfViewMiddleware``,
 all relevant views in contrib apps use the ``csrf_protect`` decorator to ensure
-the security of these applications against CSRF.  It is recommended that the
+the security of these applications against CSRF. It is recommended that the
 developers of other reusable apps that want the same guarantees also use the
 ``csrf_protect`` decorator on their views.
 
