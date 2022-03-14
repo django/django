@@ -1,42 +1,52 @@
+{% extends "base.html" %}
 {% load static %}
 <!-- # What is on every project detail page -->
 {% block page_content %}
-{% include 'project_nav.html' %}
-<!-- # NAV for prev/next projects -->
+  <!-- # NAV for prev/next projects -->
+  <div class="frame">
+    <div class="bit-2 talign left">
+      <a href="/">← Back to list of projects</a>
+    </div>
+    <div class="bit-2 talign right">
+      <a href="{% block prev-url %}{% endblock prev-url %}">{% block prev %}{% endblock prev %}</a>
+      <span>/</span>
+      <a href="{% block next-url %}...{% endblock next-url %}">{% block next %}{% endblock next %}</a>
+    </div>
+  </div>
 
-<!-- # Project NAME -->
-<h1>Project Name {% block p-name %}{% endblock p-name %}</h1>
-<div class="frame project-indiv intro">
-  <div class="bit-60">
-    <p class="intro"><!-- # Project BLURB -->{% block p-blurb %}{% endblock p-blurb %}</p>
-  </div>
-  <div class="bit-40">
-    <div class="meta">
-      <!-- # Project METADATA 1 (YEAR & COMPANY) -->
-      <p class="meta-title">Year &amp; Company</p>
-      <p class="meta-value"></p>
+  <!-- # Project NAME -->
+  <h1>Project Name {% block p-name %}{% endblock p-name %}</h1>
+  <div class="frame project-indiv intro">
+    <div class="bit-60">
+      <p class="intro">{% block p-blurb %}{% endblock p-blurb %}</p>
     </div>
-    <div class="meta">
-      <!-- # Project METADATA 2 (ROLE & responsibilities) -->
-      <p class="meta-title">Role</p>
-      <p class="meta-value"></p>
-      <p class="meta-detail"></p>
+    <div class="bit-40">
+      <div class="meta">
+        <!-- # Project METADATA 1 (YEAR & COMPANY) -->
+        <p class="meta-title">Company</p>
+        <p class="meta-value">{% block p-company %}{% endblock p-company %}</p>
+      </div>
+      <div class="meta">
+        <!-- # Project METADATA 2 (ROLE & responsibilities) -->
+        <p class="meta-title">Role</p>
+        <p class="meta-value">{% block p-role %}{% endblock p-role %}</p>
+        <p class="meta-detail">{% block p-responsibilities %}{% endblock p-responsibilities %}</p>
+      </div>
     </div>
   </div>
-</div>
-<div class="frame">
-  <div class="bit-1">
-    <!-- # Project INTRO IMG -->
-    <img src="" alt="" class="proj-intro-img" />
+  <div class="frame">
+    <div class="bit-1">
+      <!-- # Project INTRO IMG -->
+      <img src="{% block p-introimg %}{% endblock p-introimg %}" alt="{% block p-introalt %}{% endblock p-introalt %}" class="proj-intro-img" width="100%"/>
+    </div>
   </div>
-</div>
-<div class="frame project-indiv body">
+  <div class="frame project-indiv body">
+    <!-- # Actual PROJECT DETAILS & CONTENT -->
+    {% block p-goals %}{% endblock p-goals %}
+    {% block projectbody %}{% endblock projectbody %}
+  </div>
+  <!-- # Project METADATA 1 (YEAR & COMPANY) -->
+  <!-- # Project METADATA 2 (ROLE & responsibilities) -->
+  <!-- # Project INTRO IMG -->
   <!-- # Actual PROJECT DETAILS & CONTENT -->
-  {% block projectbody %}
-  {% endblock projectbody %}
-</div>
-<!-- # Project METADATA 1 (YEAR & COMPANY) -->
-<!-- # Project METADATA 2 (ROLE & responsibilities) -->
-<!-- # Project INTRO IMG -->
-<!-- # Actual PROJECT DETAILS & CONTENT -->
 {% endblock %}

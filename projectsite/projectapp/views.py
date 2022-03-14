@@ -11,3 +11,7 @@ def index(request):
 # Displaying Project Details
 def project_detail(request):
     return render(request, 'project_detail.html')
+
+# Displaying Email Strategy
+def p_email_strategy(request):
+    return render(request, 'p_email_strategy.html')
