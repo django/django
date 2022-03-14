@@ -1,0 +1,130 @@
+// Lemonade v2.5
+// By Joe Richardson (@joericho)
+// Licensed under the MIT license, 2016
+// Documentation: http://lemonade.im
+
+// Helpers
+$full:              100%;
+$half:              100% / 2;
+
+// Media Queries Breakpoints
+// Can be tweaked if need be.
+$small:             30em; // Portrait mobile to landscape mobile
+$medium:            50em; // Portrait tablet to landscape tablet
+$large:             68.750em; // Small desktop to large desktop
+
+// Example padding for grid
+// Doesn't actually need to be kept in.
+$bit-padding:       0.3em;
+
+// Grid widths
+// ----------------------------------------------
+// Feel free to change this to how many columns
+// you want this grid system to have.
+$start:             1;
+$end:               12;
+
+// Commons widths
+// ----------------------------------------------
+// A list that contains common percentage widths
+// as column classes e.g bit-60, bit-40, bit-75
+// customise this list as you require
+$common: 25, 40, 60, 75;
+
+// Frame width (grid wrapper)
+$frame-width:       100%;
+
+// Start the grid.
+// Optional hard reset
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+// clearfix
+.frame {
+    margin: 0 auto;
+    max-width: $frame-width;
+    &:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+}
+
+// Attribute selector
+// Also I've removed :last-of-type
+[class*='bit-'] {
+    float: left;
+    padding: $bit-padding;
+}
+
+// Create grid widths (1-12)
+@for $i from $start through $end {
+    .bit-#{$i} {
+        width: $full / $i;
+    }
+}
+
+// Common widths
+// Please use the media queries below to respond these widths
+// Feel free to pull request new widths
+@each $i in $common {
+    .bit-#{$i} {
+        width: percentage($i / 100);
+    }
+}
+
+// Responsiveness
+// Feel free to use your own responsive widths and styles for the grid
+// These are mostly for example use only.
+// -------------------------------------------------------------------
+// Portrait Tablet
+@media (min-width: $small) and (max-width: $medium) {
+    .bit-4,
+    .bit-6,
+    .bit-8,
+    .bit-10,
+    .bit-12 {
+        width: $half;
+    }
+
+    .bit-1,
+    .bit-2,
+    .bit-3,
+    .bit-5,
+    .bit-7,
+    .bit-9,
+    .bit-11 {
+        width: $full;
+    }
+}
+
+// Landscape Tablet
+@media (min-width: $medium) and (max-width: $large) {
+    .bit-2,
+    .bit-7 {
+        width: $full;
+    }
+
+    .bit-4,
+    .bit-8,
+    .bit-10,
+    .bit-12 {
+        width: $half;
+    }
+}
+// Mobile
+@media (max-width: 500px) {
+    @each $i in $common {
+        .bit-#{$i} {
+            width: $full;
+        }
+    }
+    @each $i in $common {
+        .bit-#{$i} {
+            width: $full !important;
+        }
+    }
+}

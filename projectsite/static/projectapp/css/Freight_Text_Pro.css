@@ -1,0 +1,28 @@
+/**
+ * @license
+ * MyFonts Webfont Build ID 4532334, 2022-03-14T13:24:18-0400
+ * 
+ * The fonts listed in this notice are subject to the End User License
+ * Agreement(s) entered into by the website owner. All other parties are 
+ * explicitly restricted from using the Licensed Webfonts(s).
+ * 
+ * You may obtain a valid license at the URLs below.
+ * 
+ * Webfont: FreightTextBold-Regular by Freight Collection
+ * URL: https://www.myfonts.com/fonts/freight-collection/freight-text-pro/bold/
+ * Copyright: Copyright © 2004-2009, Joshua Darden &amp; Phil&#x27;s Fonts, Inc. All rights reserved. Published by Garagefonts USA 301-879-9222 www.garagefonts.com
+ * 
+ * 
+ * 
+ * © 2022 MyFonts Inc
+*/
+
+
+/* @import must be at top of file, otherwise CSS will not work */
+@import url("//hello.myfonts.net/count/45286e");
+  
+@font-face {
+  font-family: "FreightTextBold-Regular";
+  src: url('webFonts/FreightTextBoldRegular/font.woff2') format('woff2'), url('webFonts/FreightTextBoldRegular/font.woff') format('woff');
+}
+

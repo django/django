@@ -1,0 +1,72 @@
+/* line 2, static/projectapp/css/main.scss */
+.lilac {
+  background: lavender; }
+
+/* line 3, static/projectapp/css/main.scss */
+.papayawhip {
+  background: papayawhip; }
+
+/* line 4, static/projectapp/css/main.scss */
+.light-pink {
+  background: light-pink; }
+
+/* line 5, static/projectapp/css/main.scss */
+.gray {
+  background: gray; }
+
+/* line 6, static/projectapp/css/main.scss */
+.circle {
+  border-radius: 100px; }
+
+/* line 28, static/projectapp/css/main.scss */
+h1, h2 {
+  background-image: linear-gradient(45deg, #DA2500 0%, #F00016 50%, #EC0055 100%);
+  background-clip: text;
+  text-fill-color: transparent;
+  font-family: "FreightTextBold-Regular", serif;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-background-clip: text;
+  -moz-text-fill-color: transparent; }
+
+/* line 38, static/projectapp/css/main.scss */
+h1 {
+  font-size: 72px;
+  line-height: 80px; }
+
+/* line 39, static/projectapp/css/main.scss */
+h2 {
+  font-size: 48px;
+  line-height: normal; }
+
+/* line 40, static/projectapp/css/main.scss */
+h3 {
+  font-size: 24px;
+  line-height: 32px; }
+
+/* line 42, static/projectapp/css/main.scss */
+p {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 24px;
+  line-height: 36px; }
+  /* line 46, static/projectapp/css/main.scss */
+  p .sm {
+    font-size: 18px;
+    line-height: 24px; }
+
+/* line 51, static/projectapp/css/main.scss */
+body {
+  max-width: 935px;
+  margin: 0 auto; }
+
+/* line 58, static/projectapp/css/main.scss */
+.block {
+  display: block; }
+
+/* line 59, static/projectapp/css/main.scss */
+.inline {
+  display: inline-block; }
+
+/* line 60, static/projectapp/css/main.scss */
+.hide {
+  display: none !important; }

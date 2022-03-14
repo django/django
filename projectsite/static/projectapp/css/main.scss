@@ -1,0 +1,95 @@
+// ============= DEV PURPOSES
+.lilac {background: lavender;}
+.papayawhip {background: papayawhip;}
+.light-pink {background: light-pink;}
+.gray {background: gray;}
+.circle {border-radius: 100px;}
+
+
+// ============= VARIABLES
+$white: #fff;
+$gray: #E8E8E8;
+$dark-gray: #999;
+$black: #000;
+$dark-red: #A40C31;
+$light-red: #FFBBB1;
+$brick-red: #DA2500;
+$poppy-red: #F00016;
+$cool-red: #EC0055;
+$freight-font: "FreightTextBold-Regular", serif;
+$ibm-plex-font:  "IBM Plex Sans", sans-serif;
+
+$gradient: linear-gradient(45deg, $brick-red 0%, $poppy-red 50%, $cool-red 100%);
+$dark-gradient: linear-gradient(45deg, #CD3213 0%, #CD134B 100%);
+
+$slow: all 1s ease;
+$fast: all 0.25s ease;
+
+
+h1, h2 {
+  // background-image: $gradient;
+  // background-clip: text;
+  // text-fill-color: transparent;
+  // font-family: $freight-font;
+  // -webkit-background-clip: text;
+  // -webkit-text-fill-color: transparent;
+  // -moz-background-clip: text;
+  // -moz-text-fill-color: transparent;
+}
+h1 {font-size: 72px; line-height: 80px;}
+h2 {font-size: 48px; line-height: normal;}
+h3 {font-size: 24px; line-height: 32px;}
+
+p, a {
+    // font-family: $ibm-plex-font;
+    font-size: 24px;
+    line-height: 36px;
+
+    &.sm {
+        font-size: 18px;
+        line-height: 24px;
+    }
+}
+// .freight-text {font-family: $freight-font;}
+// .ibm-plex {font-family: $ibm-plex-font;}
+
+body {
+    max-width: 935px;
+    margin: 0 auto;
+}
+// ============= HELPER classes
+.block {display: block;}
+.inline {display: inline-block;}
+.hide {display: none !important;}
+.img {
+  &.placeholder {
+    background: $gray;
+    border-radius: 300px;
+    width: 215px;
+    height: 215px;
+    display: inline-block;
+    position: relative;
+    &::after {
+      content: 'Placeholder';
+      display: block;
+      position: absolute;
+      top: 45%;
+      left: 30%;
+    }
+    &.avatar {
+      width: 120px;
+      height: 120px;
+    }
+  }
+  &.img-tile {
+    width: 100%;
+    height: 175px;
+    background: $gray;
+    display: block;
+
+  }
+}
+.flex { display: flex;
+  &.row {flex-direction: row;}
+  &.align-center {align-items: center;}
+}
