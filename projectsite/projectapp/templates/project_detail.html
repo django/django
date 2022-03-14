@@ -1,21 +1,42 @@
-<!-- # Logo -->
-{% include "logo.html" %}
-<!-- # ??? -->
 {% load static %}
 <!-- # What is on every project detail page -->
 {% block page_content %}
-    <div class="frame">
-        <div class="bit-3">third</div>
-        <div class="bit-3">third</div>
-        <div class="bit-3">third</div>
-    </div>
-
+{% include 'project_nav.html' %}
 <!-- # NAV for prev/next projects -->
+
 <!-- # Project NAME -->
-<!-- # Project BLURB -->
+<h1>Project Name {% block p-name %}{% endblock p-name %}</h1>
+<div class="frame project-indiv intro">
+  <div class="bit-60">
+    <p class="intro"><!-- # Project BLURB -->{% block p-blurb %}{% endblock p-blurb %}</p>
+  </div>
+  <div class="bit-40">
+    <div class="meta">
+      <!-- # Project METADATA 1 (YEAR & COMPANY) -->
+      <p class="meta-title">Year &amp; Company</p>
+      <p class="meta-value"></p>
+    </div>
+    <div class="meta">
+      <!-- # Project METADATA 2 (ROLE & responsibilities) -->
+      <p class="meta-title">Role</p>
+      <p class="meta-value"></p>
+      <p class="meta-detail"></p>
+    </div>
+  </div>
+</div>
+<div class="frame">
+  <div class="bit-1">
+    <!-- # Project INTRO IMG -->
+    <img src="" alt="" class="proj-intro-img" />
+  </div>
+</div>
+<div class="frame project-indiv body">
+  <!-- # Actual PROJECT DETAILS & CONTENT -->
+  {% block projectbody %}
+  {% endblock projectbody %}
+</div>
 <!-- # Project METADATA 1 (YEAR & COMPANY) -->
 <!-- # Project METADATA 2 (ROLE & responsibilities) -->
 <!-- # Project INTRO IMG -->
 <!-- # Actual PROJECT DETAILS & CONTENT -->
-
 {% endblock %}

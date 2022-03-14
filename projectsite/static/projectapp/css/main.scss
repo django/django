@@ -93,3 +93,7 @@ body {
   &.row {flex-direction: row;}
   &.align-center {align-items: center;}
 }
+.talign {
+  &.left {text-align: left;}
+  &.right {text-align: right;}
+}

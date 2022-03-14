@@ -1,7 +1,24 @@
 {% load static %}
-{% block page_content %}
-
-<!-- # Everything that should be available on ALL pages
-# Which is basically the LOGO/navigation, right? -->
-
-{% endblock %}
+{% load compress %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Florence Tsai | Designer</title>
+    {% compress css %}
+        <link type="text/x-scss" href="{% static 'projectapp/css/lemonade.scss' %}" rel="stylesheet" media="screen">
+        <link type="text/x-scss" href="{% static 'projectapp/css/main.scss' %}" rel="stylesheet" media="screen">
+    {% endcompress %}
+    <link type="text/css" href="{% static 'projectapp/css/Freight_Text_Pro.css' %}" rel="stylesheet" media="screen">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+    </style>
+    <script src="https://kit.fontawesome.com/c728571775.js" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    {# TODO LOGO HERE #}
+    {% include 'logo.html' %}
+    {% block page_content %}
+    {% endblock %}
+  </body>
+</html>
