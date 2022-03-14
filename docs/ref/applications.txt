@@ -242,7 +242,7 @@ Read-only attributes
 Methods
 -------
 
-.. method:: AppConfig.get_models()
+.. method:: AppConfig.get_models(include_auto_created=False, include_swapped=False)
 
     Returns an iterable of :class:`~django.db.models.Model` classes for this
     application.
