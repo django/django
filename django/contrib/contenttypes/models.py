@@ -82,7 +82,7 @@ class ContentTypeManager(models.Manager):
             # Lookup required content types from the DB.
             condition = Q(
                 *(
-                    Q(("app_label", app_label), ("model__in", models), _connector=Q.AND)
+                    Q(("app_label", app_label), ("model__in", models))
                     for app_label, models in needed_models.items()
                 ),
                 _connector=Q.OR,
