@@ -143,8 +143,8 @@ class OGRInspectTest(SimpleTestCase):
 
         # The ordering of model fields might vary depending on several factors
         # (version of GDAL, etc.).
-        if connection.vendor == "sqlite":
-            # SpatiaLite introspection is somewhat lacking (#29461).
+        if connection.vendor == "sqlite" and GDAL_VERSION < (3, 4):
+            # SpatiaLite introspection is somewhat lacking on GDAL < 3.4 (#29461).
             self.assertIn("    f_decimal = models.CharField(max_length=0)", model_def)
         else:
             self.assertIn(
@@ -156,7 +156,7 @@ class OGRInspectTest(SimpleTestCase):
             # Probably a bug between GDAL and MariaDB on time fields.
             self.assertIn("    f_datetime = models.DateTimeField()", model_def)
             self.assertIn("    f_time = models.TimeField()", model_def)
-        if connection.vendor == "sqlite":
+        if connection.vendor == "sqlite" and GDAL_VERSION < (3, 4):
             self.assertIn("    f_float = models.CharField(max_length=0)", model_def)
         else:
             self.assertIn("    f_float = models.FloatField()", model_def)
