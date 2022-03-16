@@ -3,8 +3,7 @@ import warnings
 from django.contrib.postgres.indexes import OpClass
 from django.db import NotSupportedError
 from django.db.backends.ddl_references import Expressions, Statement, Table
-from django.db.models import Deferrable, F, Q
-from django.db.models.constraints import BaseConstraint
+from django.db.models import BaseConstraint, Deferrable, F, Q
 from django.db.models.expressions import ExpressionList
 from django.db.models.indexes import IndexExpression
 from django.db.models.sql import Query

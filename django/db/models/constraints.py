@@ -5,7 +5,7 @@ from django.db.models.indexes import IndexExpression
 from django.db.models.query_utils import Q
 from django.db.models.sql.query import Query
 
-__all__ = ["CheckConstraint", "Deferrable", "UniqueConstraint"]
+__all__ = ["BaseConstraint", "CheckConstraint", "Deferrable", "UniqueConstraint"]
 
 
 class BaseConstraint:
