@@ -492,6 +492,7 @@ class ParallelTestSuite(unittest.TestSuite):
         Even with tblib, errors may still occur for dynamically created
         exception classes which cannot be unpickled.
         """
+        self.initialize_suite()
         counter = multiprocessing.Value(ctypes.c_int, 0)
         pool = multiprocessing.Pool(
             processes=self.processes,
@@ -962,8 +963,6 @@ class DiscoverRunner:
     def run_suite(self, suite, **kwargs):
         kwargs = self.get_test_runner_kwargs()
         runner = self.test_runner(**kwargs)
-        if hasattr(suite, "initialize_suite"):
-            suite.initialize_suite()
         try:
             return runner.run(suite)
         finally:
