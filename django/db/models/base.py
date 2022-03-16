@@ -1214,7 +1214,7 @@ class Model(metaclass=ModelBase):
         but they need to be passed in via the exclude argument.
         """
         if exclude is None:
-            exclude = []
+            exclude = set()
         unique_checks = []
 
         unique_togethers = [(self.__class__, self._meta.unique_together)]
@@ -1401,9 +1401,9 @@ class Model(metaclass=ModelBase):
         """
         errors = {}
         if exclude is None:
-            exclude = []
+            exclude = set()
         else:
-            exclude = list(exclude)
+            exclude = set(exclude)
 
         try:
             self.clean_fields(exclude=exclude)
@@ -1421,7 +1421,7 @@ class Model(metaclass=ModelBase):
         if validate_unique:
             for name in errors:
                 if name != NON_FIELD_ERRORS and name not in exclude:
-                    exclude.append(name)
+                    exclude.add(name)
             try:
                 self.validate_unique(exclude=exclude)
             except ValidationError as e:
@@ -1436,7 +1436,7 @@ class Model(metaclass=ModelBase):
         of all validation errors if any occur.
         """
         if exclude is None:
-            exclude = []
+            exclude = set()
 
         errors = {}
         for f in self._meta.fields:
