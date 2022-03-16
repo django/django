@@ -16,214 +16,9 @@ a site with someone else's credentials, is also covered.
 The first defense against CSRF attacks is to ensure that GET requests (and other
 'safe' methods, as defined by :rfc:`7231#section-4.2.1`) are side effect free.
 Requests via 'unsafe' methods, such as POST, PUT, and DELETE, can then be
-protected by following the steps below.
+protected by the steps outlined in :ref:`using-csrf`.
 
 .. _Cross Site Request Forgeries: https://www.squarefree.com/securitytips/web-developers.html#CSRF
-
-.. _using-csrf:
-
-How to use it
-=============
-
-To take advantage of CSRF protection in your views, follow these steps:
-
-#. The CSRF middleware is activated by default in the :setting:`MIDDLEWARE`
-   setting. If you override that setting, remember that
-   ``'django.middleware.csrf.CsrfViewMiddleware'`` should come before any view
-   middleware that assume that CSRF attacks have been dealt with.
-
-   If you disabled it, which is not recommended, you can use
-   :func:`~django.views.decorators.csrf.csrf_protect` on particular views
-   you want to protect (see below).
-
-#. In any template that uses a POST form, use the :ttag:`csrf_token` tag inside
-   the ``<form>`` element if the form is for an internal URL, e.g.:
-
-   .. code-block:: html+django
-
-       <form method="post">{% csrf_token %}
-
-   This should not be done for POST forms that target external URLs, since
-   that would cause the CSRF token to be leaked, leading to a vulnerability.
-
-#. In the corresponding view functions, ensure that
-   :class:`~django.template.RequestContext` is used to render the response so
-   that ``{% csrf_token %}`` will work properly. If you're using the
-   :func:`~django.shortcuts.render` function, generic views, or contrib apps,
-   you are covered already since these all use ``RequestContext``.
-
-.. _csrf-ajax:
-
-AJAX
-----
-
-While the above method can be used for AJAX POST requests, it has some
-inconveniences: you have to remember to pass the CSRF token in as POST data with
-every POST request. For this reason, there is an alternative method: on each
-XMLHttpRequest, set a custom ``X-CSRFToken`` header (as specified by the
-:setting:`CSRF_HEADER_NAME` setting) to the value of the CSRF token. This is
-often easier because many JavaScript frameworks provide hooks that allow
-headers to be set on every request.
-
-First, you must get the CSRF token. How to do that depends on whether or not
-the :setting:`CSRF_USE_SESSIONS` and :setting:`CSRF_COOKIE_HTTPONLY` settings
-are enabled.
-
-.. _acquiring-csrf-token-from-cookie:
-
-Acquiring the token if :setting:`CSRF_USE_SESSIONS` and :setting:`CSRF_COOKIE_HTTPONLY` are ``False``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The recommended source for the token is the ``csrftoken`` cookie, which will be
-set if you've enabled CSRF protection for your views as outlined above.
-
-The CSRF token cookie is named ``csrftoken`` by default, but you can control
-the cookie name via the :setting:`CSRF_COOKIE_NAME` setting.
-
-You can acquire the token like this:
-
-.. code-block:: javascript
-
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    const csrftoken = getCookie('csrftoken');
-
-The above code could be simplified by using the `JavaScript Cookie library
-<https://github.com/js-cookie/js-cookie/>`_ to replace ``getCookie``:
-
-.. code-block:: javascript
-
-    const csrftoken = Cookies.get('csrftoken');
-
-.. note::
-
-    The CSRF token is also present in the DOM in a masked form, but only if
-    explicitly included using :ttag:`csrf_token` in a template. The cookie
-    contains the canonical, unmasked token. The
-    :class:`~django.middleware.csrf.CsrfViewMiddleware` will accept either.
-    However, in order to protect against `BREACH`_ attacks, it's recommended to
-    use a masked token.
-
-.. warning::
-
-    If your view is not rendering a template containing the :ttag:`csrf_token`
-    template tag, Django might not set the CSRF token cookie. This is common in
-    cases where forms are dynamically added to the page. To address this case,
-    Django provides a view decorator which forces setting of the cookie:
-    :func:`~django.views.decorators.csrf.ensure_csrf_cookie`.
-
-.. _acquiring-csrf-token-from-html:
-
-Acquiring the token if :setting:`CSRF_USE_SESSIONS` or :setting:`CSRF_COOKIE_HTTPONLY` is ``True``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you activate :setting:`CSRF_USE_SESSIONS` or
-:setting:`CSRF_COOKIE_HTTPONLY`, you must include the CSRF token in your HTML
-and read the token from the DOM with JavaScript:
-
-.. code-block:: html+django
-
-    {% csrf_token %}
-    <script>
-    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    </script>
-
-Setting the token on the AJAX request
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Finally, you'll need to set the header on your AJAX request. Using the
-`fetch()`_ API:
-
-.. code-block:: javascript
-
-    const request = new Request(
-        /* URL */,
-        {
-            method: 'POST',
-            headers: {'X-CSRFToken': csrftoken},
-            mode: 'same-origin' // Do not send CSRF token to another domain.
-        }
-    );
-    fetch(request).then(function(response) {
-        // ...
-    });
-
-.. _fetch(): https://developer.mozilla.org/en-US/docs/Web/API/fetch
-
-Using CSRF in Jinja2 templates
-------------------------------
-
-Django's :class:`~django.template.backends.jinja2.Jinja2` template backend
-adds ``{{ csrf_input }}`` to the context of all templates which is equivalent
-to ``{% csrf_token %}`` in the Django template language. For example:
-
-.. code-block:: html+jinja
-
-    <form method="post">{{ csrf_input }}
-
-The decorator method
---------------------
-
-.. module:: django.views.decorators.csrf
-
-Rather than adding ``CsrfViewMiddleware`` as a blanket protection, you can use
-the ``csrf_protect`` decorator, which has exactly the same functionality, on
-particular views that need the protection. It must be used **both** on views
-that insert the CSRF token in the output, and on those that accept the POST form
-data. (These are often the same view function, but not always).
-
-Use of the decorator by itself is **not recommended**, since if you forget to
-use it, you will have a security hole. The 'belt and braces' strategy of using
-both is fine, and will incur minimal overhead.
-
-.. function:: csrf_protect(view)
-
-    Decorator that provides the protection of ``CsrfViewMiddleware`` to a view.
-
-    Usage::
-
-        from django.shortcuts import render
-        from django.views.decorators.csrf import csrf_protect
-
-        @csrf_protect
-        def my_view(request):
-            c = {}
-            # ...
-            return render(request, "a_template.html", c)
-
-    If you are using class-based views, you can refer to
-    :ref:`Decorating class-based views<decorating-class-based-views>`.
-
-.. _csrf-rejected-requests:
-
-Rejected requests
-=================
-
-By default, a '403 Forbidden' response is sent to the user if an incoming
-request fails the checks performed by ``CsrfViewMiddleware``. This should
-usually only be seen when there is a genuine Cross Site Request Forgery, or
-when, due to a programming error, the CSRF token has not been included with a
-POST form.
-
-The error page, however, is not very friendly, so you may want to provide your
-own view for handling this condition. To do this, set the
-:setting:`CSRF_FAILURE_VIEW` setting.
-
-CSRF failures are logged as warnings to the :ref:`django.security.csrf
-<django-security-logger>` logger.
 
 .. _how-csrf-works:
 
@@ -328,49 +123,6 @@ vulnerability allows and much worse).
 .. _Origin header: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin
 .. _disable the referer: https://www.w3.org/TR/referrer-policy/#referrer-policy-delivery
 
-Caching
-=======
-
-If the :ttag:`csrf_token` template tag is used by a template (or the
-``get_token`` function is called some other way), ``CsrfViewMiddleware`` will
-add a cookie and a ``Vary: Cookie`` header to the response. This means that the
-middleware will play well with the cache middleware if it is used as instructed
-(``UpdateCacheMiddleware`` goes before all other middleware).
-
-However, if you use cache decorators on individual views, the CSRF middleware
-will not yet have been able to set the Vary header or the CSRF cookie, and the
-response will be cached without either one. In this case, on any views that
-will require a CSRF token to be inserted you should use the
-:func:`django.views.decorators.csrf.csrf_protect` decorator first::
-
-  from django.views.decorators.cache import cache_page
-  from django.views.decorators.csrf import csrf_protect
-
-  @cache_page(60 * 15)
-  @csrf_protect
-  def my_view(request):
-      ...
-
-If you are using class-based views, you can refer to :ref:`Decorating
-class-based views<decorating-class-based-views>`.
-
-Testing
-=======
-
-The ``CsrfViewMiddleware`` will usually be a big hindrance to testing view
-functions, due to the need for the CSRF token which must be sent with every POST
-request. For this reason, Django's HTTP client for tests has been modified to
-set a flag on requests which relaxes the middleware and the ``csrf_protect``
-decorator so that they no longer rejects requests. In every other respect
-(e.g. sending cookies etc.), they behave the same.
-
-If, for some reason, you *want* the test client to perform CSRF
-checks, you can create an instance of the test client that enforces
-CSRF checks::
-
-    >>> from django.test import Client
-    >>> csrf_client = Client(enforce_csrf_checks=True)
-
 .. _csrf-limitations:
 
 Limitations
@@ -384,16 +136,10 @@ to set cookies). Note that even without CSRF, there are other vulnerabilities,
 such as session fixation, that make giving subdomains to untrusted parties a bad
 idea, and these vulnerabilities cannot easily be fixed with current browsers.
 
-Edge cases
-==========
-
-Certain views can have unusual requirements that mean they don't fit the normal
-pattern envisaged here. A number of utilities can be useful in these
-situations. The scenarios they might be needed in are described in the following
-section.
-
 Utilities
----------
+=========
+
+.. module:: django.views.decorators.csrf
 
 The examples below assume you are using function-based views. If you
 are working with class-based views, you can refer to :ref:`Decorating
@@ -410,6 +156,21 @@ class-based views<decorating-class-based-views>`.
         @csrf_exempt
         def my_view(request):
             return HttpResponse('Hello world')
+
+.. function:: csrf_protect(view)
+
+    Decorator that provides the protection of ``CsrfViewMiddleware`` to a view.
+
+    Usage::
+
+        from django.shortcuts import render
+        from django.views.decorators.csrf import csrf_protect
+
+        @csrf_protect
+        def my_view(request):
+            c = {}
+            # ...
+            return render(request, "a_template.html", c)
 
 .. function:: requires_csrf_token(view)
 
@@ -433,79 +194,6 @@ class-based views<decorating-class-based-views>`.
 .. function:: ensure_csrf_cookie(view)
 
     This decorator forces a view to send the CSRF cookie.
-
-Scenarios
----------
-
-CSRF protection should be disabled for just a few views
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Most views requires CSRF protection, but a few do not.
-
-Solution: rather than disabling the middleware and applying ``csrf_protect`` to
-all the views that need it, enable the middleware and use
-:func:`~django.views.decorators.csrf.csrf_exempt`.
-
-CsrfViewMiddleware.process_view not used
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-There are cases when ``CsrfViewMiddleware.process_view`` may not have run
-before your view is run - 404 and 500 handlers, for example - but you still
-need the CSRF token in a form.
-
-Solution: use :func:`~django.views.decorators.csrf.requires_csrf_token`
-
-Unprotected view needs the CSRF token
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-There may be some views that are unprotected and have been exempted by
-``csrf_exempt``, but still need to include the CSRF token.
-
-Solution: use :func:`~django.views.decorators.csrf.csrf_exempt` followed by
-:func:`~django.views.decorators.csrf.requires_csrf_token`. (i.e. ``requires_csrf_token``
-should be the innermost decorator).
-
-View needs protection for one path
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-A view needs CSRF protection under one set of conditions only, and mustn't have
-it for the rest of the time.
-
-Solution: use :func:`~django.views.decorators.csrf.csrf_exempt` for the whole
-view function, and :func:`~django.views.decorators.csrf.csrf_protect` for the
-path within it that needs protection. Example::
-
-    from django.views.decorators.csrf import csrf_exempt, csrf_protect
-
-    @csrf_exempt
-    def my_view(request):
-
-        @csrf_protect
-        def protected_path(request):
-            do_something()
-
-        if some_condition():
-           return protected_path(request)
-        else:
-           do_something_else()
-
-Page uses AJAX without any HTML form
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-A page makes a POST request via AJAX, and the page does not have an HTML form
-with a :ttag:`csrf_token` that would cause the required CSRF cookie to be sent.
-
-Solution: use :func:`~django.views.decorators.csrf.ensure_csrf_cookie` on the
-view that sends the page.
-
-Contrib and reusable apps
-=========================
-
-Because it is possible for the developer to turn off the ``CsrfViewMiddleware``,
-all relevant views in contrib apps use the ``csrf_protect`` decorator to ensure
-the security of these applications against CSRF. It is recommended that the
-developers of other reusable apps that want the same guarantees also use the
-``csrf_protect`` decorator on their views.
 
 Settings
 ========
