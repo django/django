@@ -32,7 +32,7 @@ PostgreSQL supports additional data integrity constraints available from the
 
 .. attribute:: ExclusionConstraint.name
 
-The name of the constraint.
+See :attr:`.BaseConstraint.name`.
 
 ``expressions``
 ---------------
