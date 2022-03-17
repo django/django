@@ -976,12 +976,12 @@ every time you change the schema.
 Additionally, like the rest of Django's old ``syncdb`` code, ``initial_data``
 has been started down the deprecation path and will be removed in Django 1.9.
 
-deconstruct() and serializability
----------------------------------
+``deconstruct()`` and serializability
+-------------------------------------
 
 Django now requires all Field classes and all of their constructor arguments
 to be serializable. If you modify the constructor signature in your custom
-Field in any way, you'll need to implement a deconstruct() method;
+Field in any way, you'll need to implement a ``deconstruct()`` method;
 we've expanded the custom field documentation with :ref:`instructions
 on implementing this method <custom-field-deconstruct-method>`.
 
