@@ -332,7 +332,8 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
 .. class:: SyndicationFeed
 
-    Base class for all syndication feeds. Subclasses should provide write().
+    Base class for all syndication feeds. Subclasses should provide
+    ``write()``.
 
     .. method:: __init__(title, link, description, language=None, author_email=None, author_name=None, author_link=None, subtitle=None, categories=None, feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs)
 
