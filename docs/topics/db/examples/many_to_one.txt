@@ -169,7 +169,7 @@ Querying in the opposite direction::
     >>> Reporter.objects.filter(article__headline__startswith='This').distinct()
     <QuerySet [<Reporter: John Smith>]>
 
-Counting in the opposite direction works in conjunction with distinct()::
+Counting in the opposite direction works in conjunction with ``distinct()``::
 
     >>> Reporter.objects.filter(article__headline__startswith='This').count()
     3

@@ -165,7 +165,7 @@ fields that are omitted from the query will be loaded on demand. For example::
 
 From outward appearances, this looks like the query has retrieved both
 the first name and last name. However, this example actually issued 3
-queries. Only the first names were retrieved by the raw() query -- the
+queries. Only the first names were retrieved by the ``raw()`` query -- the
 last names were both retrieved on demand when they were printed.
 
 There is only one field that you can't leave out - the primary key

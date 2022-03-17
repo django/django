@@ -247,8 +247,8 @@ validation step, right after the form's ``clean()`` method is called.
 
 .. _overriding-modelform-clean-method:
 
-Overriding the clean() method
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Overriding the ``clean()`` method
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can override the ``clean()`` method on a model form to provide additional
 validation in the same way you can on a normal form.

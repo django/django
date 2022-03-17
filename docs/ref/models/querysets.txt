@@ -1618,8 +1618,8 @@ one, doing so will result in an error.
     the full set of fields for the model will be significant.
 
     Even if you think you are in the advanced use-case situation, **only use
-    defer() when you cannot, at queryset load time, determine if you will need
-    the extra fields or not**. If you are frequently loading and using a
+    ``defer()`` when you cannot, at queryset load time, determine if you will
+    need the extra fields or not**. If you are frequently loading and using a
     particular subset of your data, the best choice you can make is to
     normalize your models and put the non-loaded data into a separate model
     (and database table). If the columns *must* stay in the one table for some
