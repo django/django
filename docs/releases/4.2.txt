@@ -155,7 +155,8 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :djadmin:`makemessages` command now supports locales with private sub-tags
+  such as ``nl_NL-x-informal``.
 
 Migrations
 ~~~~~~~~~~
