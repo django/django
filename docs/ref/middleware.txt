@@ -297,10 +297,11 @@ for:
 
 .. warning::
     When your site is served via HTTPS, :ref:`Django's CSRF protection system
-    <using-csrf>` requires the ``Referer`` header to be present, so completely
-    disabling the ``Referer`` header will interfere with CSRF protection. To
-    gain most of the benefits of disabling ``Referer`` headers while also
-    keeping CSRF protection, consider enabling only same-origin referrers.
+    <how-csrf-works>` requires the ``Referer`` header to be present, so
+    completely disabling the ``Referer`` header will interfere with CSRF
+    protection. To gain most of the benefits of disabling ``Referer`` headers
+    while also keeping CSRF protection, consider enabling only same-origin
+    referrers.
 
 ``SecurityMiddleware`` can set the ``Referrer-Policy`` header for you, based on
 the :setting:`SECURE_REFERRER_POLICY` setting (note spelling: browsers send a
