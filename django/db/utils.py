@@ -166,7 +166,7 @@ class ConnectionHandler(BaseConnectionHandler):
         where no settings is provided.
         """
         try:
-            conn = self.databases[alias]
+            conn = self.settings[alias]
         except KeyError:
             raise self.exception_class(f"The connection '{alias}' doesn't exist.")
 
@@ -187,7 +187,7 @@ class ConnectionHandler(BaseConnectionHandler):
         Make sure the test settings are available in the 'TEST' sub-dictionary.
         """
         try:
-            conn = self.databases[alias]
+            conn = self.settings[alias]
         except KeyError:
             raise self.exception_class(f"The connection '{alias}' doesn't exist.")
 
@@ -205,7 +205,7 @@ class ConnectionHandler(BaseConnectionHandler):
     def create_connection(self, alias):
         self.ensure_defaults(alias)
         self.prepare_test_settings(alias)
-        db = self.databases[alias]
+        db = self.settings[alias]
         backend = load_backend(db["ENGINE"])
         return backend.DatabaseWrapper(db, alias)
 

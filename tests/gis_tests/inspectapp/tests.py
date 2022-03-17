@@ -204,7 +204,7 @@ def get_ogr_db_string():
     GDAL will create its own connection to the database, so we re-use the
     connection settings from the Django test.
     """
-    db = connections.databases["default"]
+    db = connections.settings["default"]
 
     # Map from the django backend into the OGR driver name and database identifier
     # https://gdal.org/drivers/vector/
