@@ -1,7 +1,10 @@
+{% load static %}
 <div class="intro">
-  <div class="img placeholder avatar block"></div>
-  <h2 class="h1 inline-block">Nice to meet you! I’m Florence </h2>
-  <p class="h1 inline-block freight-text gradient">– a designer with 10+ years of experience in product &amp; visual design</p>
+  <div class="img avatar block">
+    <img src="{% static 'projectapp/imgs/avatar.png' %}" alt="Photo of Florence">
+  </div>
+  <h2 class="h1 inline gradient">Nice to meet you! </h2>
+  <p class="h1 inline freight-text"> I’m Florence – a designer with 10+ years of experience in product &amp; visual design</p>
 </div>
 <div class="frame flex row align-center post-intro">
     <div class="bit-75">
@@ -16,6 +19,8 @@
       </p>
     </div>
     <div class="bit-25">
-        <div class="img placeholder"></div>
+        <div class="img bean circle sand">
+          <img src="{% static 'projectapp/imgs/Illo-bean.png' %}" alt="A small illustration of The Bean sculpture of Chicago.">
+        </div>
     </div>
 </div>

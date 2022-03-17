@@ -1,11 +1,14 @@
+{% load static %}
 <div class="frame footer">
   <div class="bit-1 flex row align-center">
-    <div class="img placeholder"></div>
+    <div class="img desk circle sand">
+      <img src="{% static 'projectapp/imgs/Illo-desk.png' %}" alt="A small illustration of Flo's workdesk. It shows a laptop, a small notebook, coffee, and a plant.">
+    </div>
     <div class="thank-you">
       <p>You can find additional works on Dribbble. Thank you for visiting!</p>
-      <p class="sm"><i class="fa-brands fa-dribbble"></i><span class="ibm-plex">Dribbble</span></p>
-      <p class="sm"><i class="fa-brands fa-linkedin"></i><span class="ibm-plex">LinkedIn</span></p>
-      <p class="sm"><i class="fa-regular fa-download"></i><span class="ibm-plex">Download resume</span></p>
+      <p class="sm"><a><i class="fa-brands fa-dribbble"></i></a><span class="ibm-plex">Dribbble</span></p>
+      <p class="sm"><a><i class="fa-brands fa-linkedin"></i></a><span class="ibm-plex">LinkedIn</span></p>
+      <p class="sm"><a><i class="fa-regular fa-download"></i></a><span class="ibm-plex">Download resume</span></p>
     </div>
   </div>
 </div>

@@ -5,26 +5,32 @@
 .gray {background: gray;}
 .circle {border-radius: 100px;}
 
+// FIGURE OUT THE CORRECT SPACING FOR EACH PROJECT CARD AND FIGURE OUT THE CORRECT PROJECT IMAGE
+.bit-3:nth-child(3n-1) .project-tile { background: white;padding-left:1.25rem;padding-right:1.25rem;}
+.bit-3:nth-child(3n+1) .project-tile { background: white;padding-right:1.25rem;}
+.bit-3:nth-child(3n) .project-tile { background: white; padding-left:1.25rem;padding-right: 0 !important;}
+
 
 // ============= VARIABLES
 $white: #fff;
 $gray: #E8E8E8;
 $dark-gray: #999;
 $black: #000;
-$dark-red: #A40C31;
-$light-red: #FFBBB1;
-$brick-red: #DA2500;
-$poppy-red: #F00016;
-$cool-red: #EC0055;
+$dark-blue: #042873;
+$purple-blue: #4422F0;
+$blue: #1F51F3;
+$perwinkle: #DDE8FC;
+$dusty-blue: #A1B0CF;
+$sand: #FFE7D1;
+
 $freight-font: "FreightTextBold-Regular", serif;
 $ibm-plex-font:  "IBM Plex Sans", sans-serif;
 
-$gradient: linear-gradient(45deg, $brick-red 0%, $poppy-red 50%, $cool-red 100%);
-$dark-gradient: linear-gradient(45deg, #CD3213 0%, #CD134B 100%);
+$gradient: linear-gradient(33deg, #3C23E0 0%, $purple-blue 50%, #0372F4 100%);
+$gradient-alt: linear-gradient(33deg, $dark-blue 0%, $purple-blue 50%, $blue 100%);
 
 $slow: all 1s ease;
 $fast: all 0.25s ease;
-
 
 h1, h2, .gradient {
   background-image: $gradient;
@@ -54,46 +60,42 @@ p, a {
 .ibm-plex {font-family: $ibm-plex-font;}
 
 body {margin: 0 auto;}
+
+
 // ============= Specifics
-// LOGO
- h1.logo {-webkit-text-fill-color: $dark-gray; -moz-text-fill-color: $dark-gray; margin-top: 1rem; margin-bottom: 3rem;}
- // AVATAR + INTRO
- .avatar {margin-bottom: 1rem;}
- // SPACING
- .post-intro .bit-75 p {padding-right: 1rem;}
- .works {margin-top: 5rem;}
+  // LOGO
+     h1.logo {-webkit-text-fill-color: $dark-gray; -moz-text-fill-color: $dark-gray; margin-top: 1rem; margin-bottom: 3rem;}
+   // HOME - INDEX
+     .img.avatar img {margin-bottom: 1rem; width: 120px; height: 120px;}
+     .intro p {color: $dark-blue;}
+   // FOOTER
+     .thank-you p.sm {
+       color: $blue;
+       i {margin-right: 0.4rem;}
+     }
+   // SPACING
+     .post-intro .bit-75 p {padding-right: 1rem;}
+     .works {margin-top: 5rem;}
+   // WIDTHS
+     .footer {max-width: 680px; margin: 0 auto;}
+
+
 // ============= HELPER classes
 .block {display: block !important;}
 .inline-block {display: inline-block;}
 .inline {display: inline;}
 .hide {display: none !important;}
 .img {
-  &.placeholder {
-    background: $gray;
-    border-radius: 300px;
-    width: 215px;
-    height: 215px;
-    display: inline-block;
-    position: relative;
-    &::after {
-      content: 'Placeholder';
-      display: block;
-      position: absolute;
-      top: 45%;
-      left: 30%;
-    }
-    &.avatar {
-      width: 120px;
-      height: 120px;
-    }
-  }
+
+  // &.sand {background-color: $sand;}
+  &.circle {border-radius: 50rem;}
   &.img-tile {
     width: 100%;
     height: 175px;
     background: $gray;
     display: block;
-
   }
+  img {width: 170px; height: 170px; display: block;}
 }
 .flex { display: flex;
   &.row {flex-direction: row;}
