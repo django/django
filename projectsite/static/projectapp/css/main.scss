@@ -30,7 +30,7 @@ $gradient-alt: linear-gradient(33deg, $dark-blue 0%, $purple-blue 50%, $blue 100
 $slow: all 1s ease;
 $fast: all 0.25s ease;
 
-h1, h2, .gradient {
+.gradient {
   background-image: $gradient;
   background-clip: text;
   text-fill-color: transparent;
@@ -40,6 +40,7 @@ h1, h2, .gradient {
   -moz-background-clip: text;
   -moz-text-fill-color: transparent;
 }
+h1, h2, h3 {color: $dark-blue;}
 h1, .h1 {font-size: 72px; line-height: 80px;}
 h2 {font-size: 48px; line-height: normal;}
 h3, .logo {font-size: 24px; line-height: 32px;}
@@ -53,6 +54,7 @@ p, a, span {
         font-size: 18px;
         line-height: 24px;
     }
+    .details {color: $dark-gray;}
 }
 .freight-text {font-family: $freight-font;}
 .ibm-plex {font-family: $ibm-plex-font;}
