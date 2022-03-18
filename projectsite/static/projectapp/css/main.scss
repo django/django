@@ -1,14 +1,12 @@
 // ============= DEV PURPOSES
 .lilac {background: lavender;}
 .papayawhip {background: papayawhip;}
-.light-pink {background: light-pink;}
 .gray {background: gray;}
-.circle {border-radius: 100px;}
 
 // FIGURE OUT THE CORRECT SPACING FOR EACH PROJECT CARD AND FIGURE OUT THE CORRECT PROJECT IMAGE
-.bit-3:nth-child(3n-1) .project-tile { background: white;padding-left:1.25rem;padding-right:1.25rem;}
-.bit-3:nth-child(3n+1) .project-tile { background: white;padding-right:1.25rem;}
-.bit-3:nth-child(3n) .project-tile { background: white; padding-left:1.25rem;padding-right: 0 !important;}
+.bit-3:nth-child(3n-1) .project-tile { background: lavender ;padding-left:1.25rem;padding-right:1.25rem;}
+.bit-3:nth-child(3n+1) .project-tile { background: papayawhip;padding-right:1.25rem;}
+.bit-3:nth-child(3n) .project-tile { background: gray; padding-left:1.25rem;padding-right: 0 !important;}
 
 
 // ============= VARIABLES
@@ -46,7 +44,7 @@ h1, .h1 {font-size: 72px; line-height: 80px;}
 h2 {font-size: 48px; line-height: normal;}
 h3, .logo {font-size: 24px; line-height: 32px;}
 
-p, a {
+p, a, span {
     font-family: $ibm-plex-font;
     font-size: 24px;
     line-height: 36px;
@@ -68,10 +66,19 @@ body {margin: 0 auto;}
    // HOME - INDEX
      .img.avatar img {margin-bottom: 1rem; width: 120px; height: 120px;}
      .intro p {color: $dark-blue;}
+   // HOME - PROJECT THUMBS
+     .project-tile {
+       display: block;
+       text-decoration: none;
+       h3{}
+       span{}
+     }
+
    // FOOTER
-     .thank-you p.sm {
+     .thank-you .sm {
        color: $blue;
        i {margin-right: 0.4rem;}
+       display: block;
      }
    // SPACING
      .post-intro .bit-75 p {padding-right: 1rem;}
@@ -86,16 +93,13 @@ body {margin: 0 auto;}
 .inline {display: inline;}
 .hide {display: none !important;}
 .img {
-
-  // &.sand {background-color: $sand;}
   &.circle {border-radius: 50rem;}
-  &.img-tile {
+  &.thumb img {
     width: 100%;
-    height: 175px;
-    background: $gray;
-    display: block;
+    height: auto;
+    display: inline-block;
   }
-  img {width: 170px; height: 170px; display: block;}
+  &.illo img { width: 170px; height: auto; display: block;}
 }
 .flex { display: flex;
   &.row {flex-direction: row;}

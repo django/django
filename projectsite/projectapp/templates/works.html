@@ -1,3 +1,4 @@
+{% load static %}
 <div class="works">
   <h2>What I've worked on</h2>
   <div class="frame filter">
@@ -12,60 +13,86 @@
   </div>
 
   <div class="frame project-row">
-    <!-- for loop -->
+    <div class="bit-3">
+      <a class="project-tile" href="{% url 'p_email_strategy' %}">
+        <div class="img thumb">
+          <img src="{% static 'projectapp/imgs/th-ro-website.png' %}" alt="Project thumbnail for Florence's work on RevOps Website.">
+        </div>
+        <h3 class="name">RevOps website</h3>
+        <span class="details sm">Visual / Branding Design  </span>
+      </a>
+    </div>
+    <div class="bit-3">
+      <a class="project-tile"  href="{% url 'p_email_strategy' %}">
+        <div class="img thumb">
+          <img src="{% static 'projectapp/imgs/th-ro-ftux.png' %}" alt="Project thumbnail for Florence's work on RevOps First-Time User Experience (FTUX).">
+        </div>
+        <h3 class="name">RevOps first-time UX</h3>
+        <span class="details sm">Product Design  ·  UX Design</span>
+      </a>
+    </div>
+    <div class="bit-3">
+      <a class="project-tile" href="{% url 'p_email_strategy' %}">
+        <div class="img thumb">
+          <img src="{% static 'projectapp/imgs/th-codepen.png' %}" alt="...">
+        </div>
+        <h3 class="name">Codepen projects</h3>
+        <span class="details sm">HTML/CSS  ·  Javascript</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="frame project-row">
+    <div class="bit-3">
+      <div class="project-tile">
+        <div class="img thumb">
+          <img src="{% static 'projectapp/imgs/th-rev-ds.png' %}" alt="...">
+        </div>
+        <h3 class="name"><a href="{% url 'p_email_strategy' %}">...</a></h3>
+        <span class="details sm">...</span>
+      </div>
+    </div>
+
+    <div class="bit-3">
+      <div class="project-tile">
+        <div class="img thumb">
+          <img src="{% static 'projectapp/imgs/th-rev-email.png' %}" alt="...">
+        </div>
+        <h3 class="name"><a href="{% url 'p_email_strategy' %}">...</a></h3>
+        <span class="details sm">...</span>
+      </div>
+    </div>
+
+    <div class="bit-3">
+      <div class="project-tile">
+        <div class="img thumb">
+          <img src="{% static 'projectapp/imgs/th-rev-mktg.png' %}" alt="...">
+        </div>
+        <h3 class="name"><a href="{% url 'p_email_strategy' %}">...</a></h3>
+        <span class="details sm">...</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame project-row">
       <div class="bit-3">
         <div class="project-tile">
-          <div class="img img-tile">
-            <img src="..." alt="...">
+          <div class="img thumb">
+            <img src="{% static 'projectapp/imgs/th-print.png' %}" alt="...">
           </div>
           <h3 class="name"><a href="{% url 'p_email_strategy' %}">...</a></h3>
-          <span class="details">...</span>
+          <span class="details sm">...</span>
         </div>
       </div>
-    <!-- for loop -->
-    <div class="bit-3">
-      <div class="project-tile">
-        <div class="img img-tile">
-          <img src="..." alt="...">
+
+      <div class="bit-3">
+        <div class="project-tile">
+          <div class="img thumb">
+            <img src="{% static 'projectapp/imgs/th-portfolio.png' %}" alt="...">
+          </div>
+          <h3 class="name"><a href="{% url 'p_email_strategy' %}">...</a></h3>
+          <span class="details sm">...</span>
         </div>
-        <h3 class="name"><a href="{% url 'p_email_strategy' %}">...</a></h3>
-        <span class="details">...</span>
-      </div>
-    </div>
-    <div class="bit-3">
-      <div class="project-tile">
-        <div class="img img-tile">
-          <img src="..." alt="...">
-        </div>
-        <h3 class="name"><a href="{% url 'p_email_strategy' %}">...</a></h3>
-        <span class="details">...</span>
-      </div>
-    </div>
-    <div class="bit-3">
-      <div class="project-tile">
-        <div class="img img-tile">
-          <img src="..." alt="...">
-        </div>
-        <h3 class="name"><a href="{% url 'p_email_strategy' %}">...</a></h3>
-        <span class="details">...</span>
-      </div>
-    </div>
-    <div class="bit-3">
-      <div class="project-tile">
-        <div class="img img-tile">
-          <img src="..." alt="...">
-        </div>
-        <h3 class="name"><a href="{% url 'p_email_strategy' %}">...</a></h3>
-        <span class="details">...</span>
-      </div>
-    </div>
-    <div class="bit-3">
-      <div class="project-tile">
-        <div class="img img-tile">
-          <img src="..." alt="...">
-        </div>
-        <h3 class="name"><a href="{% url 'p_email_strategy' %}">...</a></h3>
-        <span class="details">...</span>
       </div>
     </div>
   </div>
