@@ -34,8 +34,9 @@ $gradient: linear-gradient(33deg, #3C23E0 0%, $purple-blue 50%, #0372F4 100%);
 $gradient-alt: linear-gradient(33deg, $dark-blue 0%, $purple-blue 50%, $blue 100%);
 $gradient-light: linear-gradient(33deg, #E3DEFD 0%, #D9EAFD 100%);
 
-$slow: all 1s ease;
-$fast: all 0.1s ease;
+$slow: all 0.5s ease-in;
+$fast: all 0.2s ease-in;
+$v-fast: all 0.1s ease-in;
 
 .gradient {
   background-image: $gradient;
@@ -86,6 +87,13 @@ body {margin: 0 auto;}
        display: block;
        text-decoration: none;
        margin-bottom: 4rem;
+       position: relative;
+       transition: all 0.2s ease-out;
+       top:0;
+       &:hover {
+         top: -8px;
+         transition: $v-fast;
+       }
     }
     a { text-decoration: none;
       h3 {
@@ -99,25 +107,18 @@ body {margin: 0 auto;}
          &:hover {
            color: $blue;
            border-bottom-color: #D9EAFD;
-           transition: $slow;
+           transition: $fast;
          }
-        //  &::after {
-        //    content: '';
-        //    height: 10px;
-        //    width: 300px;
-        //   //  background: red;
-        //    display: block;
-        //    position: relative;
-        //  }
+         &:active, &:focus {
+           color: $blue;
+           transition: $fast;
+         }
        }
        .details {color: $dark-gray; display: block;}
      }
       span.line {
         position: relative;
         top: 12px;
-      // display: inline;
-      // box-shadow: 0 7px 0 $perwinkle;bottom: -3rem;
-      //  border-bottom: 10px solid $perwinkle;
     }
 
    // FOOTER
