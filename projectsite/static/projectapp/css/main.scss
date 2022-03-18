@@ -32,6 +32,7 @@ $ibm-plex-font:  "IBM Plex Sans", sans-serif;
 
 $gradient: linear-gradient(33deg, #3C23E0 0%, $purple-blue 50%, #0372F4 100%);
 $gradient-alt: linear-gradient(33deg, $dark-blue 0%, $purple-blue 50%, $blue 100%);
+$gradient-light: linear-gradient(33deg, #E3DEFD 0%, #D9EAFD 100%);
 
 $slow: all 1s ease;
 $fast: all 0.1s ease;
@@ -55,7 +56,6 @@ p, a, span {
     font-family: $ibm-plex-font;
     font-size: 24px;
     line-height: 36px;
-    transition: $fast;
 
     &.sm {
         font-size: 18px;
@@ -75,7 +75,7 @@ body {margin: 0 auto;}
       a {
         color: $dark-gray;
         &:hover {color: $dark-blue;}
-        span {font-size: 1.5rem; font-family: $freight-font;}
+        span {font-size: 2rem; font-family: $freight-font;}
       }
     }
    // HOME - INDEX
@@ -85,7 +85,7 @@ body {margin: 0 auto;}
      .project-tile {
        display: block;
        text-decoration: none;
-       margin-bottom: 2rem;
+       margin-bottom: 4rem;
     }
     a { text-decoration: none;
       h3 {
@@ -94,10 +94,12 @@ body {margin: 0 auto;}
         position: relative;
         color: $black;
         font-weight: 300;
-        box-shadow: 0 10px 0 $perwinkle;
+        border-bottom: 10px solid #ECF4FE;
         top: -15px;
          &:hover {
            color: $blue;
+           border-bottom-color: #D9EAFD;
+           transition: $slow;
          }
         //  &::after {
         //    content: '';
@@ -159,14 +161,14 @@ body {margin: 0 auto;}
 
 // ============= MEDIA QUERIES
 /** Large Desktop ------------ **/
-@media (min-width: 1440px), (min-device-width: 1440px) {
-	body {
-    max-width: 1164px;
-  }
-}
-
-@media (min-width: 935px) and (max-width: 1440px), (min-device-width: 935px) and (max-device-width-width: 1440px){
-	body {
-    max-width: 935px;
-  }
-}
+// @media (min-width: 1440px), (min-device-width: 1440px) {
+// 	body {
+//     max-width: 1164px;
+//   }
+// }
+//
+// @media (min-width: 935px) and (max-width: 1440px), (min-device-width: 935px) and (max-device-width-width: 1440px){
+// 	body {
+//     max-width: 935px;
+//   }
+// }

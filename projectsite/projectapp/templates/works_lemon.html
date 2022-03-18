@@ -1,8 +1,8 @@
 {% load static %}
-<div class="works container">
+<div class="works">
   <h2>What I've worked on</h2>
-  <div class="row filter">
-    <div class="twelve columns flex align-center">
+  <div class="frame filter">
+    <div class="bit-1 flex row align-center">
       <span>Filters</span>
       <div class="option all">All projects</div>
       <div class="option visual">Visual / Branding</div>
@@ -12,8 +12,8 @@
     </div>
   </div>
 
-  <div class="row">
-    <div class="four columns">
+  <div class="frame project-row">
+    <div class="bit-3">
       <a class="project-tile" href="{% url 'p_ro_website' %}">
         <div class="img thumb">
           <img src="{% static 'projectapp/imgs/th-ro-website.png' %}" alt="Project thumbnail for Florence's work on RevOps Website.">
@@ -22,7 +22,7 @@
         <span class="details sm">Visual / Branding Design</span>
       </a>
     </div>
-    <div class="four columns">
+    <div class="bit-3">
       <a class="project-tile"  href="{% url 'p_ro_ftux' %}">
         <div class="img thumb">
           <img src="{% static 'projectapp/imgs/th-ro-ftux.png' %}" alt="Project thumbnail for Florence's work on RevOps First-Time User Experience (FTUX).">
@@ -31,7 +31,7 @@
         <span class="details sm">Product Design  ·  UX Design</span>
       </a>
     </div>
-    <div class="four columns">
+    <div class="bit-3">
       <a class="project-tile" href="{% url 'p_codepen' %}">
         <div class="img thumb">
           <img src="{% static 'projectapp/imgs/th-codepen.png' %}" alt="...">
@@ -42,8 +42,8 @@
     </div>
   </div>
 
-  <div class="row">
-    <div class="four columns">
+  <div class="frame project-row">
+    <div class="bit-3">
       <a class="project-tile" href="{% url 'p_rev_design' %}">
         <div class="img thumb">
           <img src="{% static 'projectapp/imgs/th-rev-ds.png' %}" alt="...">
@@ -52,7 +52,8 @@
         <span class="details sm">Visual    ·  Product Design</span>
       </a>
     </div>
-    <div class="four columns">
+
+    <div class="bit-3">
       <a class="project-tile" href="{% url 'p_rev_email' %}">
         <div class="img thumb">
           <img src="{% static 'projectapp/imgs/th-rev-email.png' %}" alt="...">
@@ -62,7 +63,7 @@
       </a>
     </div>
 
-    <div class="four columns">
+    <div class="bit-3">
       <a class="project-tile" href="{% url 'p_rev_mktg' %}">
         <div class="img thumb">
           <img src="{% static 'projectapp/imgs/th-rev-mktg.png' %}" alt="...">
@@ -73,8 +74,8 @@
     </div>
   </div>
 
-  <div class="row">
-      <div class="four columns">
+  <div class="frame project-row">
+      <div class="bit-3">
         <a class="project-tile" href="{% url 'p_print' %}">
           <div class="img thumb">
             <img src="{% static 'projectapp/imgs/th-print.png' %}" alt="...">
@@ -83,7 +84,8 @@
           <span class="details sm">Print    ·  Visual Design</span>
         </a>
       </div>
-      <div class="four columns">
+
+      <div class="bit-3">
         <a class="project-tile" href="{% url 'p_portfolio' %}">
           <div class="img thumb">
             <img src="{% static 'projectapp/imgs/th-portfolio.png' %}" alt="...">
@@ -94,7 +96,7 @@
       </div>
     </div>
   </div>
-{# </div>#}
+</div>
 
 
 <!-- List Reference
