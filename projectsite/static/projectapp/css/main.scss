@@ -4,9 +4,15 @@
 .gray {background: gray;}
 
 // FIGURE OUT THE CORRECT SPACING FOR EACH PROJECT CARD AND FIGURE OUT THE CORRECT PROJECT IMAGE
-.bit-3:nth-child(3n-1) .project-tile { background: lavender ;padding-left:1.25rem;padding-right:1.25rem;}
-.bit-3:nth-child(3n+1) .project-tile { background: papayawhip;padding-right:1.25rem;}
-.bit-3:nth-child(3n) .project-tile { background: gray; padding-left:1.25rem;padding-right: 0 !important;}
+.bit-3:nth-child(3n-1) .project-tile {
+  // background: lavender;
+  padding-left:0.625rem;padding-right:0.625rem;}
+.bit-3:nth-child(3n+1) .project-tile {
+  // background: papayawhip;
+  padding-right:1.25rem;}
+.bit-3:nth-child(3n) .project-tile {
+  // background: gray;
+  padding-left:1.25rem;padding-right: 0 !important;}
 
 
 // ============= VARIABLES
@@ -28,7 +34,7 @@ $gradient: linear-gradient(33deg, #3C23E0 0%, $purple-blue 50%, #0372F4 100%);
 $gradient-alt: linear-gradient(33deg, $dark-blue 0%, $purple-blue 50%, $blue 100%);
 
 $slow: all 1s ease;
-$fast: all 0.25s ease;
+$fast: all 0.1s ease;
 
 .gradient {
   background-image: $gradient;
@@ -43,20 +49,20 @@ $fast: all 0.25s ease;
 h1, h2, h3 {color: $dark-blue;}
 h1, .h1 {font-size: 72px; line-height: 80px;}
 h2 {font-size: 48px; line-height: normal;}
-h3, .logo {font-size: 24px; line-height: 32px;}
+h3, .logo {font-size: 24px; line-height: 28px;}
 
 p, a, span {
     font-family: $ibm-plex-font;
     font-size: 24px;
     line-height: 36px;
+    transition: $fast;
 
     &.sm {
         font-size: 18px;
         line-height: 24px;
     }
-    .details {color: $dark-gray;}
 }
-.freight-text {font-family: $freight-font;}
+h1, h2, .freight-text {font-family: $freight-font;}
 .ibm-plex {font-family: $ibm-plex-font;}
 
 body {margin: 0 auto;}
@@ -64,7 +70,14 @@ body {margin: 0 auto;}
 
 // ============= Specifics
   // LOGO
-     h1.logo {-webkit-text-fill-color: $dark-gray; -moz-text-fill-color: $dark-gray; margin-top: 1rem; margin-bottom: 3rem;}
+    h1.logo {
+      margin-top: 1rem; margin-bottom: 3rem;
+      a {
+        color: $dark-gray;
+        &:hover {color: $dark-blue;}
+        span {font-size: 1.5rem; font-family: $freight-font;}
+      }
+    }
    // HOME - INDEX
      .img.avatar img {margin-bottom: 1rem; width: 120px; height: 120px;}
      .intro p {color: $dark-blue;}
@@ -72,15 +85,45 @@ body {margin: 0 auto;}
      .project-tile {
        display: block;
        text-decoration: none;
-       h3{}
-       span{}
+       margin-bottom: 2rem;
+    }
+    a { text-decoration: none;
+      h3 {
+        line-height: 0;
+        display: inline;
+        position: relative;
+        color: $black;
+        font-weight: 300;
+        box-shadow: 0 10px 0 $perwinkle;
+        top: -15px;
+         &:hover {
+           color: $blue;
+         }
+        //  &::after {
+        //    content: '';
+        //    height: 10px;
+        //    width: 300px;
+        //   //  background: red;
+        //    display: block;
+        //    position: relative;
+        //  }
+       }
+       .details {color: $dark-gray; display: block;}
      }
+      span.line {
+        position: relative;
+        top: 12px;
+      // display: inline;
+      // box-shadow: 0 7px 0 $perwinkle;bottom: -3rem;
+      //  border-bottom: 10px solid $perwinkle;
+    }
 
    // FOOTER
      .thank-you .sm {
        color: $blue;
-       i {margin-right: 0.4rem;}
        display: block;
+       text-decoration: none;
+       i {margin-right: 0.4rem;}
      }
    // SPACING
      .post-intro .bit-75 p {padding-right: 1rem;}
