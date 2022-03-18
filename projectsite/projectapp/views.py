@@ -12,6 +12,22 @@ def index(request):
 def project_detail(request):
     return render(request, 'project_detail.html')
 
-# Displaying Email Strategy
-def p_email_strategy(request):
-    return render(request, 'p_email_strategy.html')
+# Displaying Individual Projects
+# def p_(request):
+#     return render(request, 'p_.html')
+def p_ro_website(request):
+    return render(request, 'p_ro_website.html')
+def p_ro_ftux(request):
+    return render(request, 'p_ro_ftux.html')
+def p_codepen(request):
+    return render(request, 'p_codepen.html')
+def p_rev_design(request):
+    return render(request, 'p_rev_design.html')
+def p_rev_email(request):
+    return render(request, 'p_rev_email.html')
+def p_rev_mktg(request):
+    return render(request, 'p_rev_mktg.html')
+def p_print(request):
+    return render(request, 'p_print.html')
+def p_portfolio(request):
+    return render(request, 'p_portfolio.html')
