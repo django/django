@@ -41,7 +41,7 @@ msgid "Click to choose all %s at once."
 msgstr ""
 
 msgid "Choose"
-msgstr ""
+msgstr "ជ្រើសរើស"
 
 msgid "Remove"
 msgstr "លប់ចេញ"
@@ -57,11 +57,11 @@ msgid ""
 msgstr ""
 
 msgid "Remove all"
-msgstr ""
+msgstr "ដកចេញទាំងអស់"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
-msgstr ""
+msgstr "ចុចដើម្បីលុប %s ដែលបានជ្រើសរើសទាំងអស់ក្នុងពេលតែមួយ។"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -104,7 +104,7 @@ msgid "Choose a time"
 msgstr "ជ្រើសរើសម៉ោង"
 
 msgid "Midnight"
-msgstr "អធ្រាត្រ"
+msgstr "កណ្តាលអធ្រាត្ររ"
 
 msgid "6 a.m."
 msgstr "ម៉ោង ៦ ព្រឹក"
@@ -113,7 +113,7 @@ msgid "Noon"
 msgstr "ពេលថ្ងែត្រង់"
 
 msgid "6 p.m."
-msgstr ""
+msgstr "ម៉ោង ៦ ល្ងាច"
 
 msgid "Cancel"
 msgstr "លប់ចោល"
@@ -122,7 +122,7 @@ msgid "Today"
 msgstr "ថ្ងៃនេះ"
 
 msgid "Choose a Date"
-msgstr ""
+msgstr "ជ្រើសរើសកាលបរិច្ឆេទ"
 
 msgid "Yesterday"
 msgstr "ម្សិលមិញ"
@@ -131,71 +131,71 @@ msgid "Tomorrow"
 msgstr "ថ្ងៃស្អែក"
 
 msgid "January"
-msgstr ""
+msgstr "មករា"
 
 msgid "February"
-msgstr ""
+msgstr "កុម្ភៈ"
 
 msgid "March"
-msgstr ""
+msgstr "មីនា"
 
 msgid "April"
-msgstr ""
+msgstr "មេសា"
 
 msgid "May"
-msgstr ""
+msgstr "ឧសភា"
 
 msgid "June"
-msgstr ""
+msgstr "មិថុនា"
 
 msgid "July"
-msgstr ""
+msgstr "កក្កដា"
 
 msgid "August"
-msgstr ""
+msgstr "សីហា"
 
 msgid "September"
-msgstr ""
+msgstr "កញ្ញា"
 
 msgid "October"
-msgstr ""
+msgstr "តុលា"
 
 msgid "November"
-msgstr ""
+msgstr "វិច្ឆិកា"
 
 msgid "December"
-msgstr ""
+msgstr "ធ្នូ"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "សំបុត្រមួយនៅថ្ងៃអាទិត្យ"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "សំបុត្រមួយនៅថ្ងៃច័ន្ទ"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "សំបុត្រមួយនៅថ្ងៃអង្គារ"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "សំបុត្រមួយនៅថ្ងៃពុធ"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "សំបុត្រមួយនៅថ្ងៃព្រហស្បតិ៍"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "មួយសំបុត្រថ្ងៃសុក្រ"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "សំបុត្រមួយថ្ងៃសៅរ៍"
 
 msgid "Show"
-msgstr ""
+msgstr "បង្ហាញ"
 
 msgid "Hide"
-msgstr ""
+msgstr "លាក់"
