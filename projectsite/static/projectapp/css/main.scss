@@ -22,6 +22,7 @@ $dark-gray: #999;
 $black: #000;
 $dark-blue: #042873;
 $purple-blue: #4422F0;
+$active-blue: #0372F4;
 $blue: #1F51F3;
 $perwinkle: #DDE8FC;
 $dusty-blue: #A1B0CF;
@@ -33,6 +34,7 @@ $ibm-plex-font:  "IBM Plex Sans", sans-serif;
 $gradient: linear-gradient(33deg, #3C23E0 0%, $purple-blue 50%, #0372F4 100%);
 $gradient-alt: linear-gradient(33deg, $dark-blue 0%, $purple-blue 50%, $blue 100%);
 $gradient-light: linear-gradient(33deg, #E3DEFD 0%, #D9EAFD 100%);
+$gradient-fake: linear-gradient(33deg, $dark-blue 0%, $dark-blue 100%);
 
 $slow: all 0.5s ease-in;
 $fast: all 0.2s ease-in;
@@ -42,15 +44,14 @@ $v-fast: all 0.1s ease-in;
   background-image: $gradient;
   background-clip: text;
   text-fill-color: transparent;
-  font-family: $freight-font;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   -moz-background-clip: text;
   -moz-text-fill-color: transparent;
 }
 h1, h2, h3 {color: $dark-blue;}
-h1, .h1 {font-size: 72px; line-height: 80px;}
-h2 {font-size: 48px; line-height: normal;}
+h1, .h1 {font-size: 7.2rem; line-height: 8rem;}
+h2 {font-size: 4.8rem; line-height: normal;}
 h3, .logo {font-size: 24px; line-height: 28px;}
 
 p, a, span {
@@ -61,13 +62,13 @@ p, a, span {
     &.sm {
         font-size: 18px;
         line-height: 24px;
+        color: $dark-gray;
     }
 }
 h1, h2, .freight-text {font-family: $freight-font;}
 .ibm-plex {font-family: $ibm-plex-font;}
 
 body {margin: 0 auto;}
-
 
 // ============= Specifics
   // LOGO
@@ -83,42 +84,74 @@ body {margin: 0 auto;}
      .img.avatar img {margin-bottom: 1rem; width: 120px; height: 120px;}
      .intro p {color: $dark-blue;}
    // HOME - PROJECT THUMBS
-     .project-tile {
+     a { text-decoration: none;
+       h3 {
+         line-height: 0;
+         display: inline;
+         position: relative;
+         font-weight: 300;
+         border-bottom: 1rem solid #ECF4FE;
+         top: 0.125rem;
+        }
+        .details {color: $dark-gray; display: block;margin-top: 1.5rem;}
+      }
+     .z-project-tile {
        display: block;
        text-decoration: none;
-       margin-bottom: 4rem;
+       margin-bottom: 5rem;
+       position: relative;
+       transition: all 0.2s ease-out;
+       top:0;
+       h3 {font-weight: 400;color: $dark-gray;top: -1rem;margin-top: 2rem;margin-bottom: 0.75rem;}
+      }
+      .project-tile {
+       display: block;
+       text-decoration: none;
+       margin-bottom: 5rem;
        position: relative;
        transition: all 0.2s ease-out;
        top:0;
        &:hover {
          top: -8px;
          transition: $v-fast;
+         h3 {border-bottom-color: #D9EAFD;}
+         .line {
+           background-image: $gradient;
+           background-clip: text;
+           text-fill-color: transparent;
+           -webkit-background-clip: text;
+           -webkit-text-fill-color: transparent;
+           -moz-background-clip: text;
+           -moz-text-fill-color: transparent;
+           transition: $fast;
+         }
+       }
+       &:active, &:focus {
+         color: $dark-blue
        }
     }
-    a { text-decoration: none;
-      h3 {
-        line-height: 0;
-        display: inline;
-        position: relative;
-        color: $black;
-        font-weight: 300;
-        border-bottom: 10px solid #ECF4FE;
-        top: -15px;
-         &:hover {
-           color: $blue;
-           border-bottom-color: #D9EAFD;
-           transition: $fast;
-         }
-         &:active, &:focus {
-           color: $blue;
-           transition: $fast;
-         }
-       }
-       .details {color: $dark-gray; display: block;}
-     }
       span.line {
         position: relative;
         top: 12px;
+    }
+    .thumb {
+      height: 16.6rem;
+      width: 100%;
+      display: block;
+      background-size: cover;
+      background-repeat:no-repeat;
+      transition: $fast;
+      background: no-repeat center center gray cover;
+
+      &.ro-website {background-image:url("../imgs/th-ro-website.png"); &:hover {background-image:url("../imgs/th-ro-website2.png");}}
+      &.ro-ftux {background-image:url("../imgs/th-ro-ftux.png"); &:hover {background-image:url("../imgs/th-ro-ftux2.png");}}
+      &.codepen {background-image:url("../imgs/th-codepen.png");opacity: 0.85; &:hover {opacity: 1;}}
+      &.rev-design {background-image:url("../imgs/th-rev-design.png"); &:hover {background-image:url("../imgs/th-rev-design2.png");}}
+      &.rev-email {background-image:url("../imgs/th-rev-email.png"); &:hover {background-image:url("../imgs/th-rev-email2.png");}}
+      &.rev-mktg {background-image:url("../imgs/th-rev-mktg.png"); &:hover {background-image:url("../imgs/th-rev-mktg2.png");}}
+      &.print {background-image:url("../imgs/th-print.png");opacity:0.85; &:hover {opacity: 1;}}
+      &.portfolio {background-image:url("../imgs/th-portfolio.png");}
+
     }
 
    // FOOTER
@@ -130,7 +163,7 @@ body {margin: 0 auto;}
      }
    // SPACING
      .post-intro .bit-75 p {padding-right: 1rem;}
-     .works {margin-top: 5rem;}
+     .works.container {margin-top: 6rem;}
    // WIDTHS
      .footer {max-width: 680px; margin: 0 auto;}
 

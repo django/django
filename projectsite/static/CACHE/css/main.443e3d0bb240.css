@@ -1,0 +1,304 @@
+/* line 2, static/projectapp/css/main.scss */
+.lilac {
+  background: lavender; }
+
+/* line 3, static/projectapp/css/main.scss */
+.papayawhip {
+  background: papayawhip; }
+
+/* line 4, static/projectapp/css/main.scss */
+.gray {
+  background: gray; }
+
+/* line 7, static/projectapp/css/main.scss */
+.bit-3:nth-child(3n-1) .project-tile {
+  padding-left: 0.625rem;
+  padding-right: 0.625rem; }
+
+/* line 10, static/projectapp/css/main.scss */
+.bit-3:nth-child(3n+1) .project-tile {
+  padding-right: 1.25rem; }
+
+/* line 13, static/projectapp/css/main.scss */
+.bit-3:nth-child(3n) .project-tile {
+  padding-left: 1.25rem;
+  padding-right: 0 !important; }
+
+/* line 43, static/projectapp/css/main.scss */
+.gradient {
+  background-image: linear-gradient(33deg, #3C23E0 0%, #4422F0 50%, #0372F4 100%);
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-background-clip: text;
+  -moz-text-fill-color: transparent; }
+
+/* line 52, static/projectapp/css/main.scss */
+h1, h2, h3 {
+  color: #042873; }
+
+/* line 53, static/projectapp/css/main.scss */
+h1, .h1 {
+  font-size: 7.2rem;
+  line-height: 8rem; }
+
+/* line 54, static/projectapp/css/main.scss */
+h2 {
+  font-size: 4.8rem;
+  line-height: normal; }
+
+/* line 55, static/projectapp/css/main.scss */
+h3, .logo {
+  font-size: 24px;
+  line-height: 28px; }
+
+/* line 57, static/projectapp/css/main.scss */
+p, a, span {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 24px;
+  line-height: 36px; }
+  /* line 62, static/projectapp/css/main.scss */
+  p.sm, a.sm, span.sm {
+    font-size: 18px;
+    line-height: 24px;
+    color: #999; }
+
+/* line 68, static/projectapp/css/main.scss */
+h1, h2, .freight-text {
+  font-family: "FreightTextBold-Regular", serif; }
+
+/* line 69, static/projectapp/css/main.scss */
+.ibm-plex {
+  font-family: "IBM Plex Sans", sans-serif; }
+
+/* line 71, static/projectapp/css/main.scss */
+body {
+  margin: 0 auto; }
+
+/* line 75, static/projectapp/css/main.scss */
+h1.logo {
+  margin-top: 1rem;
+  margin-bottom: 3rem; }
+  /* line 77, static/projectapp/css/main.scss */
+  h1.logo a {
+    color: #999; }
+    /* line 79, static/projectapp/css/main.scss */
+    h1.logo a:hover {
+      color: #042873; }
+    /* line 80, static/projectapp/css/main.scss */
+    h1.logo a span {
+      font-size: 2rem;
+      font-family: "FreightTextBold-Regular", serif; }
+
+/* line 84, static/projectapp/css/main.scss */
+.img.avatar img {
+  margin-bottom: 1rem;
+  width: 120px;
+  height: 120px; }
+
+/* line 85, static/projectapp/css/main.scss */
+.intro p {
+  color: #042873; }
+
+/* line 87, static/projectapp/css/main.scss */
+a {
+  text-decoration: none; }
+  /* line 88, static/projectapp/css/main.scss */
+  a h3 {
+    line-height: 0;
+    display: inline;
+    position: relative;
+    font-weight: 300;
+    border-bottom: 1rem solid #ECF4FE;
+    top: 0.125rem; }
+  /* line 96, static/projectapp/css/main.scss */
+  a .details {
+    color: #999;
+    display: block;
+    margin-top: 1.5rem; }
+
+/* line 98, static/projectapp/css/main.scss */
+.z-project-tile {
+  display: block;
+  text-decoration: none;
+  margin-bottom: 4rem;
+  position: relative;
+  transition: all 0.2s ease-out;
+  top: 0; }
+  /* line 105, static/projectapp/css/main.scss */
+  .z-project-tile h3 {
+    font-weight: 400;
+    color: #999;
+    top: -1rem;
+    margin-top: .8rem;
+    margin-bottom: 0.75rem; }
+
+/* line 107, static/projectapp/css/main.scss */
+.project-tile {
+  display: block;
+  text-decoration: none;
+  margin-bottom: 4rem;
+  position: relative;
+  transition: all 0.2s ease-out;
+  top: 0; }
+  /* line 114, static/projectapp/css/main.scss */
+  .project-tile:hover {
+    top: -8px;
+    transition: all 0.1s ease-in; }
+    /* line 117, static/projectapp/css/main.scss */
+    .project-tile:hover h3 {
+      border-bottom-color: #D9EAFD; }
+    /* line 118, static/projectapp/css/main.scss */
+    .project-tile:hover .line {
+      background-image: linear-gradient(33deg, #3C23E0 0%, #4422F0 50%, #0372F4 100%);
+      background-clip: text;
+      text-fill-color: transparent;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      -moz-background-clip: text;
+      -moz-text-fill-color: transparent;
+      transition: all 0.2s ease-in; }
+  /* line 129, static/projectapp/css/main.scss */
+  .project-tile:active, .project-tile:focus {
+    color: #042873; }
+
+/* line 133, static/projectapp/css/main.scss */
+span.line {
+  position: relative;
+  top: 12px; }
+
+/* line 137, static/projectapp/css/main.scss */
+.thumb {
+  height: 16.6rem;
+  width: 100%;
+  display: block;
+  background-size: cover;
+  background-repeat: no-repeat;
+  transition: all 0.2s ease-in;
+  background: no-repeat center center gray cover; }
+  /* line 146, static/projectapp/css/main.scss */
+  .thumb.ro-website {
+    background-image: url("/static/projectapp/imgs/th-ro-website.png?a04fcea79861"); }
+    /* line 146, static/projectapp/css/main.scss */
+    .thumb.ro-website:hover {
+      background-image: url("/static/projectapp/imgs/th-ro-website2.png?def1f85cc332"); }
+  /* line 147, static/projectapp/css/main.scss */
+  .thumb.ro-ftux {
+    background-image: url("/static/projectapp/imgs/th-ro-ftux.png?656486224ac3"); }
+    /* line 147, static/projectapp/css/main.scss */
+    .thumb.ro-ftux:hover {
+      background-image: url("/static/projectapp/imgs/th-ro-ftux2.png?d0ae6f98a778"); }
+  /* line 148, static/projectapp/css/main.scss */
+  .thumb.codepen {
+    background-image: url("/static/projectapp/imgs/th-codepen.png?fddac059f01f");
+    opacity: 0.85; }
+    /* line 148, static/projectapp/css/main.scss */
+    .thumb.codepen:hover {
+      opacity: 1; }
+  /* line 149, static/projectapp/css/main.scss */
+  .thumb.rev-design {
+    background-image: url("/static/projectapp/imgs/th-rev-design.png?e452eea54a6f"); }
+    /* line 149, static/projectapp/css/main.scss */
+    .thumb.rev-design:hover {
+      background-image: url("/static/projectapp/imgs/th-rev-design2.png?df9dea959384"); }
+  /* line 150, static/projectapp/css/main.scss */
+  .thumb.rev-email {
+    background-image: url("/static/projectapp/imgs/th-rev-email.png?c3a8a7b26231"); }
+    /* line 150, static/projectapp/css/main.scss */
+    .thumb.rev-email:hover {
+      background-image: url("/static/projectapp/imgs/th-rev-email2.png?75b90473fd7d"); }
+  /* line 151, static/projectapp/css/main.scss */
+  .thumb.rev-mktg {
+    background-image: url("/static/projectapp/imgs/th-rev-mktg.png?cbfceb3c27c2"); }
+    /* line 151, static/projectapp/css/main.scss */
+    .thumb.rev-mktg:hover {
+      background-image: url("/static/projectapp/imgs/th-rev-mktg2.png?64f30702574b"); }
+  /* line 152, static/projectapp/css/main.scss */
+  .thumb.print {
+    background-image: url("/static/projectapp/imgs/th-print.png?5854cf40cb76");
+    opacity: 0.85; }
+    /* line 152, static/projectapp/css/main.scss */
+    .thumb.print:hover {
+      opacity: 1; }
+  /* line 153, static/projectapp/css/main.scss */
+  .thumb.portfolio {
+    background-image: url("/static/projectapp/imgs/th-portfolio.png?e3d1d2df339e"); }
+
+/* line 158, static/projectapp/css/main.scss */
+.thank-you .sm {
+  color: #1F51F3;
+  display: block;
+  text-decoration: none; }
+  /* line 162, static/projectapp/css/main.scss */
+  .thank-you .sm i {
+    margin-right: 0.4rem; }
+
+/* line 165, static/projectapp/css/main.scss */
+.post-intro .bit-75 p {
+  padding-right: 1rem; }
+
+/* line 166, static/projectapp/css/main.scss */
+.works.container {
+  margin-top: 6rem; }
+
+/* line 168, static/projectapp/css/main.scss */
+.footer {
+  max-width: 680px;
+  margin: 0 auto; }
+
+/* line 172, static/projectapp/css/main.scss */
+.block {
+  display: block !important; }
+
+/* line 173, static/projectapp/css/main.scss */
+.inline-block {
+  display: inline-block; }
+
+/* line 174, static/projectapp/css/main.scss */
+.inline {
+  display: inline; }
+
+/* line 175, static/projectapp/css/main.scss */
+.hide {
+  display: none !important; }
+
+/* line 177, static/projectapp/css/main.scss */
+.img.circle {
+  border-radius: 50rem; }
+
+/* line 178, static/projectapp/css/main.scss */
+.img.thumb img {
+  width: 100%;
+  height: auto;
+  display: inline-block; }
+
+/* line 183, static/projectapp/css/main.scss */
+.img.illo img {
+  width: 170px;
+  height: auto;
+  display: block; }
+
+/* line 185, static/projectapp/css/main.scss */
+.flex {
+  display: flex; }
+  /* line 186, static/projectapp/css/main.scss */
+  .flex.row {
+    flex-direction: row; }
+  /* line 187, static/projectapp/css/main.scss */
+  .flex.align-center {
+    align-items: center; }
+
+/* line 190, static/projectapp/css/main.scss */
+.talign.left {
+  text-align: left; }
+
+/* line 191, static/projectapp/css/main.scss */
+.talign.right {
+  text-align: right; }
+
+/* line 192, static/projectapp/css/main.scss */
+.talign.center {
+  text-align: center; }
+
+/** Large Desktop ------------ **/
