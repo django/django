@@ -347,6 +347,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
                     "content_type_id": get_content_type_for_model(obj).pk,
                     "object_id": obj.pk,
                 },
+                current_app=self.admin_site.name,
             )
 
     def get_empty_value_display(self):
