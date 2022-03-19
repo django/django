@@ -1,0 +1,33 @@
+// ==== Media Queries Breakpoints
+$small:             480px; // Portrait mobile to landscape mobile
+$medium:            768px; // Portrait tablet to landscape tablet
+$large:             1024px; // Small desktop to large desktop
+$v-large:           1224px; // Large desktop
+$x-large:           1440px; // Widescreen
+
+// ==== Responsiveness
+// Widescreen
+@media (min-width: $v-large) and (max-width: $x-large) {
+
+}
+@media (min-width: $large) and (max-width: $v-large) {
+  body {
+    max-width: 1164px;
+  }
+}
+// Tablet
+@media (min-width: $medium) and (max-width: $large) {
+	body {
+    max-width: 935px;
+  }
+}
+
+// Portrait Tablet
+@media (min-width: $small) and (max-width: $medium) {
+
+}
+
+// Mobile
+@media (max-width: $small) {
+
+}
