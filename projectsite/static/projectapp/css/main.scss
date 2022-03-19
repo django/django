@@ -233,7 +233,6 @@ body {margin: 0 auto;}
 .inline {display: inline;}
 .hide {display: none !important;}
 .img {
-  &.circle {border-radius: 50rem;}
   &.thumb img {
     width: 100%;
     height: auto;
@@ -250,18 +249,3 @@ body {margin: 0 auto;}
   &.right {text-align: right;}
   &.center {text-align: center;}
 }
-
-
-// ============= MEDIA QUERIES
-/** Large Desktop ------------ **/
-// @media (min-width: 1440px), (min-device-width: 1440px) {
-// 	body {
-//     max-width: 1164px;
-//   }
-// }
-//
-// @media (min-width: 935px) and (max-width: 1440px), (min-device-width: 935px) and (max-device-width-width: 1440px){
-// 	body {
-//     max-width: 935px;
-//   }
-// }
