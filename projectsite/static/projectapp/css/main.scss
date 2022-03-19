@@ -4,15 +4,9 @@
 .gray {background: gray;}
 
 // FIGURE OUT THE CORRECT SPACING FOR EACH PROJECT CARD AND FIGURE OUT THE CORRECT PROJECT IMAGE
-.bit-3:nth-child(3n-1) .project-tile {
-  // background: lavender;
-  padding-left:0.625rem;padding-right:0.625rem;}
-.bit-3:nth-child(3n+1) .project-tile {
-  // background: papayawhip;
-  padding-right:1.25rem;}
-.bit-3:nth-child(3n) .project-tile {
-  // background: gray;
-  padding-left:1.25rem;padding-right: 0 !important;}
+.bit-3:nth-child(3n-1) .project-tile { padding-left:0.625rem;padding-right:0.625rem;}
+.bit-3:nth-child(3n+1) .project-tile { padding-right:1.25rem;}
+.bit-3:nth-child(3n) .project-tile { padding-left:1.25rem;padding-right: 0 !important;}
 
 
 // ============= VARIABLES
@@ -83,6 +77,57 @@ body {margin: 0 auto;}
    // HOME - INDEX
      .img.avatar img {margin-bottom: 1rem; width: 120px; height: 120px;}
      .intro p {color: $dark-blue;}
+    // Hats animation
+    .hat-wrap {
+      position: relative;
+      display: inline;
+      width: 3.2rem;
+    }
+    .hats {
+      overflow: hidden;
+      height: 2.75rem;
+      position: absolute;
+      &::before {
+        content: '';
+        width:30px;
+        height: 8px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-image:
+        linear-gradient(360deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+        z-index: 100;
+      }
+      &::after{
+        content: '';
+        width:30px;
+        height: 8px;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        background-image:
+        linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+        z-index: 100;
+      }
+      .hat-unit {
+        padding: 0;
+        margin: 0;
+        margin-left: 5px;
+        position: relative;
+        display: inline-block;
+        -webkit-animation: hatswap 5s ease-out infinite;
+        animation-delay: 2s;
+      }
+    }
+      @keyframes hatswap {
+        0% { opacity: 1; -webkit-transform: translateY(0px);}
+        33% { opacity: 1;-webkit-transform: translateY(-40px);}
+        66% { opacity: 1;-webkit-transform: translateY(-78px);}
+        99.99% { opacity: 1;-webkit-transform: translateY(-109px);}
+        100% {opacity: 0; -webkit-transform: translateY(0px);}
+      }
+
+
    // HOME - PROJECT THUMBS
      a { text-decoration: none;
        h3 {
