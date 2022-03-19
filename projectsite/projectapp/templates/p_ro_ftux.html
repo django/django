@@ -1,9 +1,9 @@
 {% extends 'project_detail.html' %}
 
-{% block prev %}{% endblock prev %}
-{% block prev-url %} ... {% endblock prev-url %}
-{% block next %}{% endblock next %}
-{% block next-url %} ... {% endblock next-url %}
+{% block prev %}Prev: RevOps Website{% endblock prev %}
+{% block prev-url %} {% url 'p_ro_website' %} {% endblock prev-url %}
+{% block next %}Next: Invite New User{% endblock next %}
+{% block next-url %} {% url 'p_codepen_invite' %} {% endblock next-url %}
 
 <!-- # Project NAME -->
   {% block p-type %}

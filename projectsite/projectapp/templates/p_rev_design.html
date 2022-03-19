@@ -1,9 +1,9 @@
 {% extends 'project_detail.html' %}
 
-{% block prev %}{% endblock prev %}
-{% block prev-url %} ... {% endblock prev-url %}
-{% block next %}{% endblock next %}
-{% block next-url %} ... {% endblock next-url %}
+{% block prev %}Prev: Intro to Custom Dashboards{% endblock prev %}
+{% block prev-url %} {% url 'p_codepen_dashboard' %} {% endblock prev-url %}
+{% block next %}Next: Revinate Email Design Strategy{% endblock next %}
+{% block next-url %} {% url 'p_rev_email' %} {% endblock next-url %}
 
 <!-- # Project NAME -->
   {% block p-type %}

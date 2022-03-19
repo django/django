@@ -1,9 +1,9 @@
 {% extends 'project_detail.html' %}
 
-{% block prev %}{% endblock prev %}
-{% block prev-url %} ... {% endblock prev-url %}
-{% block next %}{% endblock next %}
-{% block next-url %} ... {% endblock next-url %}
+{% block prev %}Prev: Revinate Email Design Strategy{% endblock prev %}
+{% block prev-url %} {% url 'p_rev_email' %} {% endblock prev-url %}
+{% block next %}Next: Magazine, Media Kits, &amp; Printwork{% endblock next %}
+{% block next-url %} {% url 'p_print' %} {% endblock next-url %}
 
 <!-- # Project NAME -->
   {% block p-type %}

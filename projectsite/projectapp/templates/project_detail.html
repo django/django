@@ -1,22 +1,23 @@
 {% extends "base.html" %}
 {% load static %}
 {% block page_content %}
-  <div class="frame">
-    <div class="bit-2 talign left">
+<div class="container">
+  <div class="row">
+    <div class="six columns talign left">
       <a href="/">← Back to list of projects</a>
     </div>
-    <div class="bit-2 talign right">
+    <div class="six columns talign right">
       <a href="{% block prev-url %}{% endblock prev-url %}">{% block prev %}{% endblock prev %}</a>
       <span>/</span>
       <a href="{% block next-url %}...{% endblock next-url %}">{% block next %}{% endblock next %}</a>
     </div>
   </div>
   <h1 class="inline">{% block p-type %}{% endblock p-type %}</h1><h1 class="inline gradient">{% block p-name %}{% endblock p-name %}</h1>
-  <div class="frame project-indiv intro">
-    <div class="bit-60">
+  <div class="row project-indiv intro">
+    <div class="nine columns">
       <p class="intro">{% block p-blurb %}{% endblock p-blurb %}</p>
     </div>
-    <div class="bit-40">
+    <div class="three columns">
       <div class="meta">
         <p class="meta-title">Role</p>
         <p class="meta-value">{% block p-role %}{% endblock p-role %}</p>
@@ -24,15 +25,16 @@
       </div>
     </div>
   </div>
-  <div class="frame">
+  <div class="row">
     <div class="bit-1">
       <img src="{% block p-introimg %}{% endblock p-introimg %}" alt="{% block p-introalt %}{% endblock p-introalt %}" class="proj-intro-img" width="100%"/>
     </div>
   </div>
-  <div class="frame project-indiv body">
+  <div class="row project-indiv body">
     {% block p-goals %}{% endblock p-goals %}
     {% block projectbody %}{% endblock projectbody %}
   </div>
+</div>
 {% endblock %}
 
 

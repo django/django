@@ -1,9 +1,9 @@
 {% extends 'project_detail.html' %}
 
-{% block prev %}{% endblock prev %}
-{% block prev-url %} ... {% endblock prev-url %}
-{% block next %}{% endblock next %}
-{% block next-url %} ... {% endblock next-url %}
+{% block prev %}Prev: Invite New User {% endblock prev %}
+{% block prev-url %}{% url 'p_codepen_invite' %}{% endblock prev-url %}
+{% block next %}Next: Revinate Design System &amp; UI Unification{% endblock next %}
+{% block next-url %}{% url 'p_rev_design' %}{% endblock next-url %}
 
 <!-- # Project NAME -->
   {% block p-type %}
@@ -73,5 +73,6 @@
 
 <!-- # Actual PROJECT DETAILS & CONTENT -->
   {% block projectbody %}
-    ...
+    <p data-height="650" data-theme-id="0" data-slug-hash="OMYMjL" data-default-tab="result" data-user="flobot" class="codepen">See the Pen <a href="http://codepen.io/flobot/pen/OMYMjL/">Dashboard Intro</a> by Florence Tsai (<a href="http://codepen.io/flobot">@flobot</a>) on <a href="http://codepen.io">CodePen</a>.</p>
+    <script async src="//assets.codepen.io/assets/embed/ei.js"></script>
   {% endblock projectbody %}

@@ -1,9 +1,9 @@
 {% extends 'project_detail.html' %}
 
-{% block prev %}{% endblock prev %}
-{% block prev-url %} ... {% endblock prev-url %}
-{% block next %}{% endblock next %}
-{% block next-url %} ... {% endblock next-url %}
+{% block prev %}Prev: RevOps First-time User Experience{% endblock prev %}
+{% block prev-url %}{% url 'p_ro_ftux' %}{% endblock prev-url %}
+{% block next %}Next: Intro to Custom Dashboards{% endblock next %}
+{% block next-url %}{% url 'p_codepen_dashboard' %}{% endblock next-url %}
 
 <!-- # Project NAME -->
   {% block p-type %}
@@ -40,38 +40,38 @@
 
 <!-- # Project INTRO IMG -->
   {% block p-introimg %}
-    ...
   {% endblock p-introimg %}
   {% block p-introalt %}
-  <p class="highlight">
-  I coded up a design I had for a simple permissions form Revinate users see when they add a colleague to an account.
-</p>
-<h5>Improvements</h5>
-  <ul class="goals-list">
-    <li>
-      <span class="number">
-        <span class="circle">1</span>
-      </span>
-      <span class="goal-txt">
-        <h6>Adding visual distinction</h6>
-        I added icons and pops of color to the form to distinguish different permissions from each other, and to make it very obvious what each permission related to.
-      </span>
-    </li>
-    <li>
-      <span class="number">
-        <span class="circle">2</span>
-      </span>
-      <span class="goal-txt">
-        <h6>Floating labels for better form usability</h6>
-        The floating label pattern cleverly uses placeholder text as the label to save space and allows the user to stay in context and know what they are supposed to type.
-      </span>
-    </li>
-  </ul>
   {% endblock p-introalt %}
 
 
 
 <!-- # Actual PROJECT DETAILS & CONTENT -->
   {% block projectbody %}
-    ...
+    <p data-height="703" data-theme-id="0" data-slug-hash="yeRoLG" data-default-tab="result" data-user="flobot" class="codepen">See the Pen <a href="http://codepen.io/flobot/pen/yeRoLG/">Invite New User</a> by Florence Tsai (<a href="http://codepen.io/flobot">@flobot</a>) on <a href="http://codepen.io">CodePen</a>.</p>
+    <script async src="//assets.codepen.io/assets/embed/ei.js"></script>
+    <p class="highlight">
+      I coded up a design I had for a simple permissions form Revinate users see when they add a colleague to an account.
+    </p>
+    <h5>Improvements</h5>
+      <ul class="goals-list">
+        <li>
+          <span class="number">
+            <span class="circle">1</span>
+          </span>
+          <span class="goal-txt">
+            <h6>Adding visual distinction</h6>
+            I added icons and pops of color to the form to distinguish different permissions from each other, and to make it very obvious what each permission related to.
+          </span>
+        </li>
+        <li>
+          <span class="number">
+            <span class="circle">2</span>
+          </span>
+          <span class="goal-txt">
+            <h6>Floating labels for better form usability</h6>
+            The floating label pattern cleverly uses placeholder text as the label to save space and allows the user to stay in context and know what they are supposed to type.
+          </span>
+        </li>
+      </ul>
   {% endblock projectbody %}

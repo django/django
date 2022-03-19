@@ -1,9 +1,9 @@
 {% extends 'project_detail.html' %}
 
-{% block prev %}{% endblock prev %}
-{% block prev-url %} ... {% endblock prev-url %}
+{% block prev %}Prev: {% endblock prev %}
+{% block prev-url %} {% url 'p_' %} {% endblock prev-url %}
 {% block next %}{% endblock next %}
-{% block next-url %} ... {% endblock next-url %}
+{% block next-url %} {% url 'p_' %} {% endblock next-url %}
 
 <!-- # Project NAME -->
   {% block p-type %}
