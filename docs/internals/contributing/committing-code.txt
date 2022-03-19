@@ -20,11 +20,11 @@ best pull requests possible. In practice however, committers - who will likely
 be more familiar with the commit guidelines - may decide to bring a commit up
 to standard themselves.
 
-You may want to have Jenkins test the pull request with one of the pull request
-builders that doesn't run automatically, such as Oracle or Selenium. See the
-`Jenkins wiki page`_ for instructions.
+You may want to have Jenkins or GitHub actions test the pull request with one
+of the pull request builders that doesn't run automatically, such as Oracle or
+Selenium. See the `CI wiki page`_ for instructions.
 
-.. _Jenkins wiki page: https://code.djangoproject.com/wiki/Jenkins
+.. _CI wiki page: https://code.djangoproject.com/wiki/CI
 
 If you find yourself checking out pull requests locally more often, this git
 alias will be helpful::
