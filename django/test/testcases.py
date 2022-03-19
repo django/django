@@ -1197,7 +1197,7 @@ class TransactionTestCase(SimpleTestCase):
                 # tests (e.g., losing a timezone setting causing objects to be
                 # created with the wrong time). To make sure this doesn't
                 # happen, get a clean connection at the start of every test.
-                for conn in connections.all():
+                for conn in connections.all(initialized_only=True):
                     conn.close()
         finally:
             if self.available_apps is not None:
@@ -1378,7 +1378,7 @@ class TestCase(TransactionTestCase):
     def tearDownClass(cls):
         if cls._databases_support_transactions():
             cls._rollback_atomics(cls.cls_atomics)
-            for conn in connections.all():
+            for conn in connections.all(initialized_only=True):
                 conn.close()
         super().tearDownClass()
 

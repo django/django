@@ -87,6 +87,9 @@ details on these changes.
 
 * Passing unsaved model instances to related filters will no longer be allowed.
 
+* ``created=True`` will be required in the signature of
+  ``RemoteUserBackend.configure_user()`` subclasses.
+
 .. _deprecation-removed-in-4.1:
 
 4.1

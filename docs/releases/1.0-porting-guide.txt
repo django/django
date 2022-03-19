@@ -551,7 +551,7 @@ need to reload your data. Do this after you have made the change to using
 
   For SQLite, this means making a copy of the single file that stores the
   database (the name of that file is the ``DATABASE_NAME`` in your
-  settings.py file).
+  ``settings.py`` file).
 
 To upgrade each application to use a ``DecimalField``, you can do the
 following, replacing ``<app>`` in the code below with each app's name:

@@ -1,14 +1,7 @@
-name: Tests
+name: Schedule tests
 
 on:
-  pull_request:
-    paths-ignore:
-      - 'docs/**'
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - 'docs/**'
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -20,8 +13,12 @@ jobs:
     strategy:
       matrix:
         python-version:
+          - '3.8'
+          - '3.9'
           - '3.10'
+          - '3.11.0-alpha - 3.11.0'
     name: Windows, SQLite, Python ${{ matrix.python-version }}
+    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3

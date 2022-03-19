@@ -406,8 +406,8 @@ Internationalization
   project and it will find all the app message files that were created by
   :djadmin:`makemessages`.
 
-* :djadmin:`makemessages` now calls xgettext once per locale directory rather
-  than once per translatable file. This speeds up localization builds.
+* :djadmin:`makemessages` now calls ``xgettext`` once per locale directory
+  rather than once per translatable file. This speeds up localization builds.
 
 * :ttag:`blocktrans` supports assigning its output to a variable using
   ``asvar``.

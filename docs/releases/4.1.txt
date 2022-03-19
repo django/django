@@ -74,6 +74,9 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   320,000 to 390,000.
 
+* The :meth:`.RemoteUserBackend.configure_user` method now allows synchronizing
+  user attributes with attributes in a remote system such as an LDAP directory.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -281,7 +284,8 @@ Models
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :meth:`.HttpResponse.set_cookie` now supports :class:`~datetime.timedelta`
+  objects for the ``max_age`` argument.
 
 Security
 ~~~~~~~~
@@ -423,6 +427,12 @@ Miscellaneous
   JavaScript events and don't depend on jQuery. See
   :ref:`admin-javascript-inline-form-events` for more details on the change.
 
+* The ``exc_info`` argument of the undocumented
+  ``django.utils.log.log_response()`` function is replaced by ``exception``.
+
+* The ``size`` argument of the undocumented
+  ``django.views.static.was_modified_since()`` function is removed.
+
 .. _deprecated-features-4.1:
 
 Features deprecated in 4.1
@@ -478,9 +488,6 @@ Miscellaneous
   :meth:`~.SimpleTestCase.assertFormsetError` is deprecated. Use ``errors=[]``
   instead.
 
-* The ``exc_info`` argument of the undocumented
-  ``django.utils.log.log_response()`` function is replaced by ``exception``.
-
 * ``django.contrib.sessions.serializers.PickleSerializer`` is deprecated due to
   the risk of remote code execution.
 
@@ -491,6 +498,10 @@ Miscellaneous
 
 * Passing unsaved model instances to related filters is deprecated. In Django
   5.0, the exception will be raised.
+
+* ``created=True`` is added to the signature of
+  :meth:`.RemoteUserBackend.configure_user`. Support  for ``RemoteUserBackend``
+  subclasses that do not accept this argument is deprecated.
 
 Features removed in 4.1
 =======================

@@ -157,4 +157,4 @@ def csrf_failure(request, reason="", template_name=CSRF_FAILURE_TEMPLATE_NAME):
         else:
             # Raise if a developer-specified template doesn't exist.
             raise
-    return HttpResponseForbidden(t.render(c), content_type="text/html")
+    return HttpResponseForbidden(t.render(c))

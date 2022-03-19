@@ -375,6 +375,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(403, resp.status_code)
+        self.assertEqual(resp["Content-Type"], "text/html; charset=utf-8")
         self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % expected)
 
     def test_csrf_cookie_bad_or_missing_token(self):

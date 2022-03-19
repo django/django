@@ -1,6 +1,10 @@
+import warnings
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.db.models import Exists, OuterRef, Q
+from django.utils.deprecation import RemovedInDjango50Warning
+from django.utils.inspect import func_supports_parameter
 
 UserModel = get_user_model()
 
@@ -192,6 +196,7 @@ class RemoteUserBackend(ModelBackend):
         """
         if not remote_user:
             return
+        created = False
         user = None
         username = self.clean_username(remote_user)
 
@@ -202,13 +207,24 @@ class RemoteUserBackend(ModelBackend):
             user, created = UserModel._default_manager.get_or_create(
                 **{UserModel.USERNAME_FIELD: username}
             )
-            if created:
-                user = self.configure_user(request, user)
         else:
             try:
                 user = UserModel._default_manager.get_by_natural_key(username)
             except UserModel.DoesNotExist:
                 pass
+
+        # RemovedInDjango50Warning: When the deprecation ends, replace with:
+        #   user = self.configure_user(request, user, created=created)
+        if func_supports_parameter(self.configure_user, "created"):
+            user = self.configure_user(request, user, created=created)
+        else:
+            warnings.warn(
+                f"`created=True` must be added to the signature of "
+                f"{self.__class__.__qualname__}.configure_user().",
+                category=RemovedInDjango50Warning,
+            )
+            if created:
+                user = self.configure_user(request, user)
         return user if self.user_can_authenticate(user) else None
 
     def clean_username(self, username):
@@ -220,9 +236,9 @@ class RemoteUserBackend(ModelBackend):
         """
         return username
 
-    def configure_user(self, request, user):
+    def configure_user(self, request, user, created=True):
         """
-        Configure a user after creation and return the updated user.
+        Configure a user and return the updated user.
 
         By default, return the user unmodified.
         """

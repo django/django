@@ -720,8 +720,8 @@ the content of the ``{% blocktranslate %}`` tag, replace any whitespace at the
 beginning and end of a line and merge all lines into one using a space
 character to separate them. This is quite useful for indenting the content of a
 ``{% blocktranslate %}`` tag without having the indentation characters end up
-in the corresponding entry in the PO file, which makes the translation process
-easier.
+in the corresponding entry in the ``.po`` file, which makes the translation
+process easier.
 
 For instance, the following ``{% blocktranslate %}`` tag::
 
@@ -730,8 +730,8 @@ For instance, the following ``{% blocktranslate %}`` tag::
       Second paragraph.
     {% endblocktranslate %}
 
-will result in the entry ``"First sentence. Second paragraph."`` in the PO file,
-compared to ``"\n  First sentence.\n  Second paragraph.\n"``, if the
+will result in the entry ``"First sentence. Second paragraph."`` in the ``.po``
+file, compared to ``"\n  First sentence.\n  Second paragraph.\n"``, if the
 ``trimmed`` option had not been specified.
 
 String literals passed to tags and filters
@@ -1607,9 +1607,9 @@ otherwise, they'll be tacked together without whitespace!
 
     Due to the way the ``gettext`` tools work internally and because we want to
     allow non-ASCII source strings in Django's core and your applications, you
-    **must** use UTF-8 as the encoding for your PO files (the default when PO
-    files are created).  This means that everybody will be using the same
-    encoding, which is important when Django processes the PO files.
+    **must** use UTF-8 as the encoding for your ``.po`` files (the default when
+    ``.po`` files are created).  This means that everybody will be using the
+    same encoding, which is important when Django processes the ``.po`` files.
 
 .. admonition:: Fuzzy entries
 
@@ -1646,7 +1646,7 @@ That's it. Your translations are ready for use.
    :djadmin:`django-admin compilemessages <compilemessages>` works see
    :ref:`gettext_on_windows` for more information.
 
-.. admonition:: .po files: Encoding and BOM usage.
+.. admonition:: ``.po`` files: Encoding and BOM usage.
 
    Django only supports ``.po`` files encoded in UTF-8 and without any BOM
    (Byte Order Mark) so if your text editor adds such marks to the beginning of
@@ -1709,7 +1709,7 @@ You may also use ``gettext`` binaries you have obtained elsewhere, so long as
 the ``xgettext --version`` command works properly. Do not attempt to use Django
 translation utilities with a ``gettext`` package if the command ``xgettext
 --version`` entered at a Windows command prompt causes a popup window saying
-"xgettext.exe has generated errors and will be closed by Windows".
+"``xgettext.exe`` has generated errors and will be closed by Windows".
 
 .. _customizing-makemessages:
 

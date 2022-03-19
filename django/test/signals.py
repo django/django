@@ -70,7 +70,7 @@ def update_connections_time_zone(*, setting, **kwargs):
 
     # Reset the database connections' time zone
     if setting in {"TIME_ZONE", "USE_TZ"}:
-        for conn in connections.all():
+        for conn in connections.all(initialized_only=True):
             try:
                 del conn.timezone
             except AttributeError:
