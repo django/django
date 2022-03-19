@@ -11,16 +11,12 @@
       <a href="{% block next-url %}...{% endblock next-url %}">{% block next %}{% endblock next %}</a>
     </div>
   </div>
-  <h1>Project Name {% block p-name %}{% endblock p-name %}</h1>
+  <h1 class="inline">{% block p-type %}{% endblock p-type %}</h1><h1 class="inline gradient">{% block p-name %}{% endblock p-name %}</h1>
   <div class="frame project-indiv intro">
     <div class="bit-60">
       <p class="intro">{% block p-blurb %}{% endblock p-blurb %}</p>
     </div>
     <div class="bit-40">
-      <div class="meta">
-        <p class="meta-title">Company</p>
-        <p class="meta-value">{% block p-company %}{% endblock p-company %}</p>
-      </div>
       <div class="meta">
         <p class="meta-title">Role</p>
         <p class="meta-value">{% block p-role %}{% endblock p-role %}</p>

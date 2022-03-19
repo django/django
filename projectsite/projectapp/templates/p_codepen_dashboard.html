@@ -1,0 +1,77 @@
+{% extends 'project_detail.html' %}
+
+{% block prev %}{% endblock prev %}
+{% block prev-url %} ... {% endblock prev-url %}
+{% block next %}{% endblock next %}
+{% block next-url %} ... {% endblock next-url %}
+
+<!-- # Project NAME -->
+  {% block p-type %}
+    Codepen
+  {% endblock p-type %}
+  {% block p-name %}
+    Intro to Custom Dashboards
+  {% endblock p-name %}
+
+
+<!-- # Project BLURB -->
+  {% block p-blurb %}
+    This is a small collection of a few pens I made on Codepen.io. These were small projects to quickly explore visual and interactive design through code.
+  {% endblock p-blurb %}
+
+
+
+<!-- # Project METADATA 1 (YEAR & COMPANY) -->
+  {% block p-year %}
+    ...
+  {% endblock p-year %}
+
+
+
+<!-- # Project METADATA 2 (ROLE & responsibilities) -->
+  {% block p-role %}
+    Visual designer &amp; front-end coder
+  {% endblock p-role %}
+  {% block p-responsibilities %}
+    Visual design, UI/Interaction Design, HTML/CSS, JQuery
+  {% endblock p-responsibilities %}
+
+
+
+<!-- # Project INTRO IMG -->
+  {% block p-introimg %}
+    ...
+  {% endblock p-introimg %}
+  {% block p-introalt %}
+  <p class="highlight">
+  I coded up a design I had for a simple permissions form Revinate users see when they add a colleague to an account.
+</p>
+<h5>Improvements</h5>
+  <ul class="goals-list">
+    <li>
+      <span class="number">
+        <span class="circle">1</span>
+      </span>
+      <span class="goal-txt">
+        <h6>Adding visual distinction</h6>
+        I added icons and pops of color to the form to distinguish different permissions from each other, and to make it very obvious what each permission related to.
+      </span>
+    </li>
+    <li>
+      <span class="number">
+        <span class="circle">2</span>
+      </span>
+      <span class="goal-txt">
+        <h6>Floating labels for better form usability</h6>
+        The floating label pattern cleverly uses placeholder text as the label to save space and allows the user to stay in context and know what they are supposed to type.
+      </span>
+    </li>
+  </ul>
+  {% endblock p-introalt %}
+
+
+
+<!-- # Actual PROJECT DETAILS & CONTENT -->
+  {% block projectbody %}
+    ...
+  {% endblock projectbody %}

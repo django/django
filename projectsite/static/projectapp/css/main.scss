@@ -179,6 +179,19 @@ body {margin: 0 auto;}
         position: relative;
         top: 12px;
     }
+    span.label {
+      background-color: $perwinkle;
+      border-radius: 3px;
+      color: $dusty-blue;
+      display: inline;
+      font-size: 1.2rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      padding: .2rem .5rem;
+      text-transform: uppercase;
+      margin-left: .5rem;
+      vertical-align: middle;
+    }
     .thumb {
       height: 16.6rem;
       width: 100%;
@@ -190,7 +203,8 @@ body {margin: 0 auto;}
 
       &.ro-website {background-image:url("../imgs/th-ro-website.png"); &:hover {background-image:url("../imgs/th-ro-website2.png");}}
       &.ro-ftux {background-image:url("../imgs/th-ro-ftux.png"); &:hover {background-image:url("../imgs/th-ro-ftux2.png");}}
-      &.codepen {background-image:url("../imgs/th-codepen.png");opacity: 0.85; &:hover {opacity: 1;}}
+      &.codepen-invite {background-image:url("../imgs/th-codepen-invite.png");opacity: 0.85; &:hover {opacity: 1;}}
+      &.codepen-dashboard {background-image:url("../imgs/th-codepen-dashboard.png");opacity: 0.85; &:hover {opacity: 1;}}
       &.rev-design {background-image:url("../imgs/th-rev-design.png"); &:hover {background-image:url("../imgs/th-rev-design2.png");}}
       &.rev-email {background-image:url("../imgs/th-rev-email.png"); &:hover {background-image:url("../imgs/th-rev-email2.png");}}
       &.rev-mktg {background-image:url("../imgs/th-rev-mktg.png"); &:hover {background-image:url("../imgs/th-rev-mktg2.png");}}

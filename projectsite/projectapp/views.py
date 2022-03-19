@@ -19,8 +19,10 @@ def p_ro_website(request):
     return render(request, 'p_ro_website.html')
 def p_ro_ftux(request):
     return render(request, 'p_ro_ftux.html')
-def p_codepen(request):
-    return render(request, 'p_codepen.html')
+def p_codepen_invite(request):
+    return render(request, 'p_codepen_invite.html')
+def p_codepen_dashboard(request):
+    return render(request, 'p_codepen_dashboard.html')
 def p_rev_design(request):
     return render(request, 'p_rev_design.html')
 def p_rev_email(request):

@@ -174,11 +174,11 @@ span.line {
       background-image: url("/static/projectapp/imgs/th-ro-ftux2.png?4056b4fa1381"); }
   /* line 138, static/projectapp/css/main.scss */
   .thumb.codepen {
-    background-image: url("/static/projectapp/imgs/th-codepen.png?fddac059f01f");
+    background-image: url("/static/projectapp/imgs/th-codepen-invite.png?fddac059f01f");
     opacity: 0.8; }
     /* line 138, static/projectapp/css/main.scss */
     .thumb.codepen:hover {
-      background-image: url("/static/projectapp/imgs/th-codepen2.png");
+      background-image: url("/static/projectapp/imgs/th-codepen-invite2.png");
       opacity: 1; }
   /* line 139, static/projectapp/css/main.scss */
   .thumb.rev-design {

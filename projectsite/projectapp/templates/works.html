@@ -28,15 +28,22 @@
       </a>
     </div>
     <div class="four columns">
-      <a class="project-tile" href="{% url 'p_codepen' %}">
-        <div class="img thumb codepen"></div>
-        <h3 class="name"><span class="line">Codepen projects</span></h3>
+      <a class="project-tile" href="{% url 'p_codepen_invite' %}">
+        <div class="img thumb codepen-invite"></div>
+        <h3 class="name"><span class="line">Invite New User</span></h3>
         <span class="details sm">HTML/CSS  ·  Javascript</span>
       </a>
     </div>
   </div>
 
   <div class="row">
+    <div class="four columns">
+      <a class="project-tile" href="{% url 'p_codepen_dashboard' %}">
+        <div class="img thumb codepen-dashboard"></div>
+        <h3 class="name"><span class="line">Intro to Custom Dashboards</span></h3>
+        <span class="details sm">HTML/CSS  ·  Javascript</span>
+      </a>
+    </div>
     <div class="four columns">
       <a class="project-tile rev-design" href="{% url 'p_rev_design' %}">
         <div class="img thumb rev-design"></div>
@@ -51,7 +58,9 @@
         <span class="details sm">Visual    ·  Product Design</span>
       </a>
     </div>
+  </div>
 
+  <div class="row">
     <div class="four columns">
       <a class="project-tile" href="{% url 'p_rev_mktg' %}">
         <div class="img thumb rev-mktg"></div>
@@ -59,9 +68,6 @@
         <span class="details sm">Print    ·  Visual Design</span>
       </a>
     </div>
-  </div>
-
-  <div class="row">
       <div class="four columns">
         <a class="project-tile" href="{% url 'p_print' %}">
           <div class="img thumb print"></div>
@@ -72,7 +78,7 @@
       <div class="four columns">
         <div class="z-project-tile">
           <div class="img thumb portfolio"></div>
-          <h3 class="name">How I built this portfolio site</h3>
+          <h3 class="name">How I built this portfolio site<span class="label">Coming soon</span></h3>
           <span class="details sm">Visual Design   ·  HTML/SCSS  ·  Django</span>
         </div>
       </div>
