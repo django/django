@@ -2,14 +2,16 @@
 {% load static %}
 {% block page_content %}
 <div class="container">
-  <div class="row">
-    <div class="six columns talign left">
-      <a href="/">← Back to list of projects</a>
+  <div class="row project-nav top">
+    <div class="four columns talign left">
+      <a href="/"><span class="line sm">← Back to list of projects</span></a>
     </div>
-    <div class="six columns talign right">
-      <a href="{% block prev-url %}{% endblock prev-url %}">{% block prev %}{% endblock prev %}</a>
-      <span>/</span>
-      <a href="{% block next-url %}...{% endblock next-url %}">{% block next %}{% endblock next %}</a>
+    <div class="four columns talign right">
+      <a href="{% block prev-url %}{% endblock prev-url %}"><span class="line sm">{% block prev %}{% endblock prev %}</span></a>
+    </div>
+    <div class="four columns talign right">
+      <span class="sm">/  </span>
+      <a href="{% block next-url %}...{% endblock next-url %}"><span class="line sm">{% block next %}{% endblock next %}</span></a>
     </div>
   </div>
   <h1 class="inline">{% block p-type %}{% endblock p-type %}</h1><h1 class="inline gradient">{% block p-name %}{% endblock p-name %}</h1>
@@ -21,7 +23,7 @@
       <div class="meta">
         <p class="meta-title">Role</p>
         <p class="meta-value">{% block p-role %}{% endblock p-role %}</p>
-        <p class="meta-detail">{% block p-responsibilities %}{% endblock p-responsibilities %}</p>
+        <p class="meta-detail sm">{% block p-responsibilities %}{% endblock p-responsibilities %}</p>
       </div>
     </div>
   </div>
@@ -35,6 +37,7 @@
     {% block projectbody %}{% endblock projectbody %}
   </div>
 </div>
+{# ADD BOTTOM NAVIGATION #}
 {% endblock %}
 
 

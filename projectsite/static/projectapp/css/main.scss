@@ -18,7 +18,7 @@ $dark-blue: #042873;
 $purple-blue: #4422F0;
 $active-blue: #0372F4;
 $blue: #1F51F3;
-$perwinkle: #DDE8FC;
+$periwinkle: #DDE8FC;
 $dusty-blue: #A1B0CF;
 $sand: #FFE7D1;
 
@@ -180,7 +180,7 @@ body {margin: 0 auto;}
         top: 12px;
     }
     span.label {
-      background-color: $perwinkle;
+      background-color: $periwinkle;
       border-radius: 3px;
       color: $dusty-blue;
       display: inline;
@@ -212,19 +212,49 @@ body {margin: 0 auto;}
       &.portfolio {background-image:url("../imgs/th-portfolio.png");}
 
     }
-
-   // FOOTER
-     .thank-you .sm {
-       color: $blue;
-       display: block;
-       text-decoration: none;
-       i {margin-right: 0.4rem;}
+  // FOOTER
+    .thank-you .sm {
+      color: $blue;
+      display: block;
+      text-decoration: none;
+      i {margin-right: 0.4rem;}
      }
-   // SPACING
-     .post-intro .bit-75 p {padding-right: 1rem;}
-     .works.container {margin-top: 6rem;}
-   // WIDTHS
-     .footer {max-width: 680px; margin: 0 auto;}
+  // PROJECT INDIVIDUAL PAGE
+    .project-nav {
+      position: relative;
+      display: block;
+      &.top {
+        border-top: 1px solid $periwinkle;
+        top: -1.75rem;
+        margin-bottom: 6rem;
+      }
+      a {
+        border-bottom: 1rem solid #ECF4FE;
+        transition: $fast;
+        display: inline;
+        &:hover {
+          border-bottom-color: #D9EAFD;
+          .line {
+            background-image: $gradient;
+            background-clip: text;
+            text-fill-color: transparent;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            -moz-background-clip: text;
+            -moz-text-fill-color: transparent;
+            transition: $fast;
+          }
+        }
+        span {
+          top: 10px; color: $blue;
+        }
+      }
+    }
+  // SPACING
+    .post-intro .bit-75 p {padding-right: 1rem;}
+    .works.container {margin-top: 6rem;}
+  // WIDTHS
+    .footer {max-width: 680px; margin: 0 auto;}
 
 
 // ============= HELPER classes
