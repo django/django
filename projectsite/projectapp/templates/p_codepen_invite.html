@@ -19,31 +19,26 @@
     I coded up a design I had for a simple permissions form Revinate users see when they add a colleague to an account.
   {% endblock p-blurb %}
   {% block p-blurb-html %}
-    <h5>Improvements</h5>
-    <ul class="goals-list">
-      <li>
-        <span class="goal-number">1</span>
-        <span class="goal-txt">
-          <h6>Adding visual distinction</h6>
-          I added icons and pops of color to the form to distinguish different permissions from each other, and to make it very obvious what each permission related to.
-        </span>
-      </li>
-      <li>
-        <span class="goal-number">2</span>
-        <span class="goal-txt">
-          <h6>Floating labels for better form usability</h6>
-          The floating label pattern cleverly uses placeholder text as the label to save space and allows the user to stay in context and know what they are supposed to type.
-        </span>
-      </li>
-    </ul>
+    <div class="project-indiv body">
+      <h2 class="h3">Improvements</h2>
+      <ul class="goals-list sm">
+        <li>
+          <span class="circle-number sm">1</span>
+          <span class="goal-text">
+            <h3 class="h4">Adding visual distinction</h3>
+            I added icons and pops of color to the form to distinguish different permissions from each other, and to make it very obvious what each permission related to.
+          </span>
+        </li>
+        <li>
+          <span class="circle-number sm">2</span>
+          <span class="goal-text">
+            <h3 class="h4">Floating labels for better form usability</h3>
+            The floating label pattern cleverly uses placeholder text as the label to save space and allows the user to stay in context and know what they are supposed to type.
+          </span>
+        </li>
+      </ul>
+    </div>
   {% endblock p-blurb-html %}
-
-
-<!-- # Project METADATA 1 (YEAR & COMPANY) -->
-  {% block p-year %}
-    ...
-  {% endblock p-year %}
-
 
 
 <!-- # Project METADATA 2 (ROLE & responsibilities) -->
@@ -65,6 +60,8 @@
 
 
 <!-- # Actual PROJECT DETAILS & CONTENT -->
+  {% block p-goals %}
+  {% endblock p-goals %}
   {% block p-body %}
     <p data-height="703" data-theme-id="0" data-slug-hash="yeRoLG" data-default-tab="result" data-user="flobot" class="codepen">See the Pen <a href="http://codepen.io/flobot/pen/yeRoLG/">Invite New User</a> by Florence Tsai (<a href="http://codepen.io/flobot">@flobot</a>) on <a href="http://codepen.io">CodePen</a>.</p>
     <script async src="//assets.codepen.io/assets/embed/ei.js"></script>

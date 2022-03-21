@@ -8,7 +8,7 @@
   <h1 class="inline">{% block p-type %}{% endblock p-type %}</h1><h1 class="inline gradient">{% block p-name %}{% endblock p-name %}</h1>
   <div class="row project-indiv">
     <div class="nine columns">
-      <p class="blurb dark-blue">{% block p-blurb %}{% endblock p-blurb %}</p>
+      <p class="blurb">{% block p-blurb %}{% endblock p-blurb %}</p>
       {% block p-blurb-html %}{% endblock p-blurb-html %}
     </div>
     <div class="three columns">
@@ -19,14 +19,11 @@
       </div>
     </div>
   </div>
-  <div class="row">
-    <div class="bit-1">
-      <img src="{% block p-introimg %}{% endblock p-introimg %}" alt="{% block p-introalt %}{% endblock p-introalt %}" class="proj-intro-img" width="100%"/>
-    </div>
-  </div>
+  {% block p-introimg %}{% endblock p-introimg %}
   <div class="row project-indiv body">
-    {% block p-goals %}{% endblock p-goals %}
-    {% block p-body %}{% endblock p-body %}
+    <div class="twelve columns">
+      {% block p-body %}{% endblock p-body %}
+    </div>
   </div>
   </div>
 </div>

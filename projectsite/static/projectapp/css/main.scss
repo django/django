@@ -12,7 +12,7 @@
 // ============= VARIABLES
 $white: #fff;
 $gray: #E8E8E8;
-$dark-gray: #999;
+$dark-gray: #777;
 $black: #000;
 $dark-blue: #042873;
 $purple-blue: #4422F0;
@@ -46,25 +46,25 @@ $v-fast: all 0.1s ease-in;
 h1, h2, h3 {color: $dark-blue;}
 h1, .h1 {font-size: 7.2rem; line-height: 8rem;}
 h2 {font-size: 4.8rem; line-height: normal;}
-h3, .logo {font-size: 24px; line-height: 28px;}
+h3, .h3, .logo {font-size: 2.4rem; line-height: 2.8rem;}
 
 p, a, span {
   font-family: $ibm-plex-font;
-  font-size: 24px;
-  line-height: 36px;
+  font-size: 2.4rem;;
+  line-height: 3.6rem;
 
   &.sm {
-      font-size: 18px;
-      line-height: 24px;
+      font-size: 1.8rem;
+      line-height: 2.4rem;
   }
-  &.label {font-size: 1.6rem;line-height: 2.4rem;text-transform: uppercase;}
-  &.v-sm {font-size:1.4rem;line-height:2.4rem;}
+  &.label {font-size: 1.6rem;line-height: 2.4rem;text-transform: uppercase;font-weight: bold;margin-bottom: -1.5rem;}
+  &.v-sm {font-size:1.6rem;line-height:2.4rem;}
   &.dark-gray {color: $dark-gray;}
   &.gray {color: $gray;}
   &.dark-blue {color: $dark-blue;}
 }
 h1, h2, .freight-text {font-family: $freight-font;}
-.ibm-plex {font-family: $ibm-plex-font;}
+h3, .h3, .ibm-plex {font-family: $ibm-plex-font;}
 
 body {margin: 0 auto;}
 
@@ -81,7 +81,7 @@ body {margin: 0 auto;}
     .p-nav.top {margin-bottom: 5rem;}
     .back-link {
       position: absolute;
-      top: -8rem;
+      top: -5.5rem;
       left: 0;
 
     }
@@ -190,7 +190,7 @@ body {margin: 0 auto;}
         position: relative;
         top: 12px;
     }
-    span.label {
+    span.tag {
       background-color: $periwinkle;
       border-radius: 3px;
       color: $dusty-blue;
@@ -233,7 +233,7 @@ body {margin: 0 auto;}
      .made-with {margin-top: 7rem;}
   // PROJECT INDIVIDUAL PAGE
     // PROJECT NAV
-    .project-nav {
+    .p-nav {
       position: relative;
       display: block;
       &.top {
@@ -263,7 +263,34 @@ body {margin: 0 auto;}
         }
       }
     }
-    .meta-title {font-weight: bold; text-transform: uppercase;}
+    // P BODY
+      .project-indiv {
+        .blurb {margin-bottom: 3rem;}
+        .body {
+          p, ul, .h3, h3, .goal-text {
+            color: $black;
+            font-size: 1.8rem;
+            line-height: 2.4rem;
+          }
+          h3 {margin: 0 0 1rem;}
+          .h3 {text-decoration: underline;}
+          li {list-style-type: none;display: flex;flex-direction: row;margin-bottom: 3rem;align-items: flex-start;}
+          .goal-text {color: $dark-gray;}
+        }
+      }
+      .meta {
+        padding-top: 1.25rem;
+        p:last-child {margin-top: -1.5rem;}
+      }
+      .goals-list {margin-bottom: 5rem;}
+      .circle-number {
+        background: $periwinkle;
+        color: $dark-blue;
+        border-radius: 3rem;
+        padding: .25rem 1rem;
+        display: inline-block;
+        margin-right: 2rem;
+      }
   // SPACING
     .post-intro .bit-75 p {padding-right: 1rem;}
     .works.container {margin-top: 6rem;}

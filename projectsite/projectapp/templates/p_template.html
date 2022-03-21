@@ -18,14 +18,9 @@
   {% block p-blurb %}
     ...
   {% endblock p-blurb %}
-
-
-
-<!-- # Project METADATA 1 (YEAR & COMPANY) -->
-  {% block p-year %}
+  {% block p-blur-htmlb %}
     ...
-  {% endblock p-year %}
-
+  {% endblock p-blurb-html %}
 
 
 <!-- # Project METADATA 2 (ROLE & responsibilities) -->
@@ -40,7 +35,11 @@
 
 <!-- # Project INTRO IMG -->
   {% block p-introimg %}
-    ...
+    <div class="row">
+      <div class="bit-1">
+        <img src="..." alt="..." class="proj-intro-img" width="100%"/>
+      </div>
+    </div>
   {% endblock p-introimg %}
   {% block p-introalt %}
     ...
