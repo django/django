@@ -49,15 +49,19 @@ h2 {font-size: 4.8rem; line-height: normal;}
 h3, .logo {font-size: 24px; line-height: 28px;}
 
 p, a, span {
-    font-family: $ibm-plex-font;
-    font-size: 24px;
-    line-height: 36px;
+  font-family: $ibm-plex-font;
+  font-size: 24px;
+  line-height: 36px;
 
-    &.sm {
-        font-size: 18px;
-        line-height: 24px;
-        color: $dark-gray;
-    }
+  &.sm {
+      font-size: 18px;
+      line-height: 24px;
+  }
+  &.label {font-size: 1.6rem;line-height: 2.4rem;text-transform: uppercase;}
+  &.v-sm {font-size:1.4rem;line-height:2.4rem;}
+  &.dark-gray {color: $dark-gray;}
+  &.gray {color: $gray;}
+  &.dark-blue {color: $dark-blue;}
 }
 h1, h2, .freight-text {font-family: $freight-font;}
 .ibm-plex {font-family: $ibm-plex-font;}
@@ -73,6 +77,13 @@ body {margin: 0 auto;}
         &:hover {color: $dark-blue;}
         span {font-size: 2rem; font-family: $freight-font;}
       }
+    }
+    .p-nav.top {margin-bottom: 5rem;}
+    .back-link {
+      position: absolute;
+      top: -8rem;
+      left: 0;
+
     }
    // HOME - INDEX
      .img.avatar img {margin-bottom: 1rem; width: 120px; height: 120px;}
@@ -221,6 +232,7 @@ body {margin: 0 auto;}
      }
      .made-with {margin-top: 7rem;}
   // PROJECT INDIVIDUAL PAGE
+    // PROJECT NAV
     .project-nav {
       position: relative;
       display: block;
@@ -251,6 +263,7 @@ body {margin: 0 auto;}
         }
       }
     }
+    .meta-title {font-weight: bold; text-transform: uppercase;}
   // SPACING
     .post-intro .bit-75 p {padding-right: 1rem;}
     .works.container {margin-top: 6rem;}

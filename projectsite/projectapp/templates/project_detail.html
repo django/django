@@ -2,29 +2,20 @@
 {% load static %}
 {% block page_content %}
 <div class="container">
-  <div class="row project-nav top">
-    <div class="four columns talign left">
-      <a href="/"><span class="line sm">← Back to list of projects</span></a>
-    </div>
-    <div class="four columns talign right">
-      <a href="{% block prev-url %}{% endblock prev-url %}"><span class="line sm">{% block prev %}{% endblock prev %}</span></a>
-    </div>
-    <div class="four columns talign right">
-      <span class="sm">/  </span>
-      <a href="{% block next-url %}...{% endblock next-url %}"><span class="line sm">{% block next %}{% endblock next %}</span></a>
-    </div>
+  <div class="row p-nav top">
+    <a href="/" class="back-link v-sm"><span class="line sm">← Back to list of projects test </span></a>
   </div>
   <h1 class="inline">{% block p-type %}{% endblock p-type %}</h1><h1 class="inline gradient">{% block p-name %}{% endblock p-name %}</h1>
-  <div class="row project-indiv intro">
+  <div class="row project-indiv">
     <div class="nine columns">
-      <p class="intro">{% block p-blurb %}{% endblock p-blurb %}</p>
+      <p class="blurb dark-blue">{% block p-blurb %}{% endblock p-blurb %}</p>
       {% block p-blurb-html %}{% endblock p-blurb-html %}
     </div>
     <div class="three columns">
       <div class="meta">
-        <p class="meta-title">Role</p>
-        <p class="meta-value">{% block p-role %}{% endblock p-role %}</p>
-        <p class="meta-detail sm">{% block p-responsibilities %}{% endblock p-responsibilities %}</p>
+        <p class="label dark-gray">Role</p>
+        <p class="sm">{% block p-role %}{% endblock p-role %}</p>
+        <p class="v-sm dark-gray">{% block p-responsibilities %}{% endblock p-responsibilities %}</p>
       </div>
     </div>
   </div>
@@ -35,10 +26,31 @@
   </div>
   <div class="row project-indiv body">
     {% block p-goals %}{% endblock p-goals %}
-    {% block projectbody %}{% endblock projectbody %}
+    {% block p-body %}{% endblock p-body %}
+  </div>
   </div>
 </div>
-{# ADD BOTTOM NAVIGATION #}
+<!-- ADDING IN WORKS NAV -->
+<div class="container p-nav bottom">
+  <div class="row">
+    <div class="six columns talign left">
+      <a href="{% block prev-url %}{% endblock prev-url %}" style="display: flex; flex-direction: row;align-items: center;" class="line">
+        <span><</span>
+        <div class="img placeholder" style="width: 150px; height: 75px; background: gray;display: inline-block;">
+          Test
+        </div>
+        <span class="inline-block sm line">{% block prev %}{% endblock prev %}</span>
+      </a>
+    </div>
+    <div class="six columns talign right">
+      <span class="sm">/  </span>
+      <a href="{% block next-url %}...{% endblock next-url %}"><span class="line sm">{% block next %}{% endblock next %}</span></a>
+    </div>
+    <a href="/" class="go-home talign center block sm">Go back to home</a>
+  </div>
+</div>
+<!-- -->
+{% include "footer_note.html" %}
 {% endblock %}
 
 
