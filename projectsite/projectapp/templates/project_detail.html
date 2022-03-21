@@ -25,25 +25,30 @@
       {% block p-body %}{% endblock p-body %}
     </div>
   </div>
-  </div>
 </div>
 <!-- ADDING IN WORKS NAV -->
-<div class="container p-nav bottom">
-  <div class="row">
+<div class="container">
+  <div class="row p-nav bottom">
     <div class="six columns talign left">
-      <a href="{% block prev-url %}{% endblock prev-url %}" style="display: flex; flex-direction: row;align-items: center;" class="line">
+      <a href="{% block prev-url %}{% endblock prev-url %}" class=" prev-link">
         <span><</span>
-        <div class="img placeholder" style="width: 150px; height: 75px; background: gray;display: inline-block;">
-          Test
+        <div class="p-nav-name">
+          <span class="p-link block">Previous project</span>
+          <span class="line sm">{% block prev %}{% endblock prev %}</span>
         </div>
-        <span class="inline-block sm line">{% block prev %}{% endblock prev %}</span>
       </a>
     </div>
-    <div class="six columns talign right">
-      <span class="sm">/  </span>
-      <a href="{% block next-url %}...{% endblock next-url %}"><span class="line sm">{% block next %}{% endblock next %}</span></a>
+    <div class="six columns talign left">
+      <a href="{% block next-url %}{% endblock next-url %}" class=" next-link">
+        <div class="p-nav-name">
+          <span class="p-link block">Next project</span>
+          <span class="line sm">{% block next %}{% endblock next %}</span>
+        </div>
+          <span>></span>
+        </div>
+      </a>
     </div>
-    <a href="/" class="go-home talign center block sm">Go back to home</a>
+    <!-- <div class="row"><div class="twelve columns"><a href="/" class="go-home talign center block sm">Go back to home</a></div></div> -->
   </div>
 </div>
 <!-- -->

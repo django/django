@@ -83,7 +83,6 @@ body {margin: 0 auto;}
       position: absolute;
       top: -5.5rem;
       left: 0;
-
     }
    // HOME - INDEX
      .img.avatar img {margin-bottom: 1rem; width: 120px; height: 120px;}
@@ -236,10 +235,10 @@ body {margin: 0 auto;}
     .p-nav {
       position: relative;
       display: block;
+      border-top: 1px solid $periwinkle;
+      top: -1.75rem;
+      margin-bottom: 6rem;
       &.top {
-        border-top: 1px solid $periwinkle;
-        top: -1.75rem;
-        margin-bottom: 6rem;
       }
       a {
         border-bottom: 1rem solid #ECF4FE;
@@ -291,6 +290,53 @@ body {margin: 0 auto;}
         display: inline-block;
         margin-right: 2rem;
       }
+    // BOTTOM NAVIGATION
+    .p-nav.bottom {
+      border-bottom: 1px solid $periwinkle;
+      margin: 6rem 0 0;
+      padding: 1.5rem 0 2rem;
+      a {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        align-self: center;
+        border: none;
+        // min-height: 10rem;
+        &.prev-link {justify-content: flex-start;}
+        &.next-link {justify-content: flex-end;}
+        .p-link {
+          color: $dark-blue;
+          font-size: 1.25rem;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+        .p-nav-name {display: inline-block;line-height: 2.25rem;margin: 0 2rem;}
+        .line {
+          border-bottom: 1rem solid #ECF4FE;
+          transition: $fast;
+          display: inline;
+          top: -1rem;
+          color: $blue;
+          // max-width: 10rem;
+          &:hover {
+            border-bottom-color: #D9EAFD;
+            .line {
+              background-image: $gradient;
+              background-clip: text;
+              text-fill-color: transparent;
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              -moz-background-clip: text;
+              -moz-text-fill-color: transparent;
+              transition: $fast;
+            }
+          }
+        }
+        span, div {align-self: center;}
+      }
+      .six.columns:first-child {border-right: 1px dashed $periwinkle;}
+    }
+
   // SPACING
     .post-intro .bit-75 p {padding-right: 1rem;}
     .works.container {margin-top: 6rem;}
