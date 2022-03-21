@@ -226,9 +226,9 @@ The release candidate marks the string freeze, and it happens at least two
 weeks before the final release. After this point, new translatable strings
 must not be added.
 
-During this phase, committers will be more and more conservative with
-backports, to avoid introducing regressions. After the release candidate, only
-release blockers and documentation fixes should be backported.
+During this phase, mergers will be more and more conservative with backports,
+to avoid introducing regressions. After the release candidate, only release
+blockers and documentation fixes should be backported.
 
 In parallel to this phase, ``main`` can receive new features, to be released
 in the ``A.B+1`` cycle.
