@@ -211,9 +211,9 @@ We follow this policy:
   been released yet, or "New in version X.Y" for released versions.
 
 * Documentation fixes and improvements may be backported to the last release
-  branch, at the discretion of the committer, however, once a version of
-  Django is :ref:`no longer supported<supported-versions-policy>`, that version
-  of the docs won't get any further updates.
+  branch, at the discretion of the merger, however, once a version of Django is
+  :ref:`no longer supported<supported-versions-policy>`, that version of the
+  docs won't get any further updates.
 
 * The `main documentation web page`_ includes links to documentation for
   previous versions. Be sure you are using the version of the docs
