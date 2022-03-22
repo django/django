@@ -548,6 +548,12 @@ class BackendTestCase(TransactionTestCase):
         )
         self.assertEqual(tuple(kwargs["extra"].values()), params[1:])
 
+    def test_queries_bare_where(self):
+        sql = f"SELECT 1{connection.features.bare_select_suffix} WHERE 1=1"
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
+            self.assertEqual(cursor.fetchone(), (1,))
+
     def test_timezone_none_use_tz_false(self):
         connection.ensure_connection()
         with self.settings(TIME_ZONE=None, USE_TZ=False):
