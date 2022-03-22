@@ -36,7 +36,7 @@
   {% block p-introimg %}
     <div class="row">
       <div class="twelve columns">
-        <img src="{% static 'projectapp/imgs/prj/rev_email/_intro.png' %}" alt="..." class="proj-intro-img" width="100%"/>
+        <img src="{% static 'projectapp/imgs/prj/rev_email/_intro.png' %}" alt="..." width="100%"/>
       </div>
     </div>
   {% endblock p-introimg %}
@@ -84,9 +84,9 @@
     <div class="row project-indiv">
       <div class="nine columns">
         <div class="project-indiv body">
-          <h2 class="h3">Project Details</h2>
+          <h2 class="new-section">Project Details</h2>
         	<h3 class="h4">Taking Inventory</h3>
-        	<p class="description">
+        	<p>
         		This project gave us the opportunity to rethink the entirety of our customer communication from the ground up. I started with taking inventory of the entirety of the emails we send out to customers. Throughout the years the teams lost track of what kinds of emails were being sent out and when across all the different departments, so having a list and document for everyone to refer to was helpful to understand the variety of all the different emails we sent in totality.
         	</p>
         </div>
@@ -96,11 +96,13 @@
     <div class="row project-indiv">
       <div class="nine columns">
         <div class="project-indiv body">
-          <img src="{% static 'projectapp/imgs/prj/rev_email/email_inventory.png' %}" alt="Images of the old and new Invite Email designs" class="project-detail-imgs border" width="100%" title="A Google spreadsheet of all the emails">
+          <img src="{% static 'projectapp/imgs/prj/rev_email/email_inventory.png' %}" alt="Images of the old and new Invite Email designs" class="space top x-bottom border" width="100%" title="A Google spreadsheet of all the emails">
         </div>
       </div>
-      <div class="three columns x-caption">
-        THIS IS A CAPTION
+      <div class="three columns">
+        <span class="caption block">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+        </span>
       </div>
     </div>
     <!-- This is Starting from Scratch paragraph -->
@@ -108,7 +110,7 @@
       <div class="nine columns">
         <div class="project-indiv body">
           <h3>Starting from Scratch</h3>
-        	<p class="description">
+        	<p>
         		I began looking for repeated layout patterns in the emails. After sketching a few out, I identified rough building blocks such as 1-column, 2-column, 3-column layouts (and how that would translate on mobile); as well as individual elements that would need to be defined (i.e. H1 text, body text, CTAs, etc.).
         	</p>
         </div>
@@ -118,83 +120,90 @@
       <div class="nine columns">
         <div class="project-indiv body">
           <img src="{% static 'projectapp/imgs/prj/rev_email/sketches_email_surveyInsights_layout.jpg' %}" alt="Sketches of email layouts" class="project-detail-imgs" width="100%" title="Sketches of email layouts (1 of 4)">
-          <img src="{% static 'projectapp/imgs/prj/rev_email/sketches_email_mobilesurveyInsights_layout.jpg' %}" alt="Sketch of mobile email layoutv" class="project-detail-imgs" width="100%" title="Sketch of mobile email layout (2 of 4)">
-          <img src="{% static 'projectapp/imgs/prj/rev_email/email_dailydigest_block.png' %}" alt="Example of email elements defined in an application email layout" class="project-detail-imgs border" width="100%" title="Example of email elements defined in an application email layout (3 of 4)">
-          <img src="{% static 'projectapp/imgs/prj/rev_email/block_content_example.png' %}" alt="Example of email elements defined in a marketing email layout" class="project-detail-imgs border" width="100%" title="Example of email elements defined in a marketing email layout(4 of 4)">
+        </div>
+        <div class="row">
+          <div class="one-half column">
+            <img src="{% static 'projectapp/imgs/prj/rev_email/email_dailydigest_block.png' %}" alt="Example of email elements defined in an application email layout" class="border space top x-bottom" width="100%" title="Example of email elements defined in an application email layout (3 of 4)">
+          </div>
+          <div class="one-half column">
+            <img src="{% static 'projectapp/imgs/prj/rev_email/block_content_example.png' %}" alt="Example of email elements defined in a marketing email layout" class="border space top x-bottom" width="100%" title="Example of email elements defined in a marketing email layout(4 of 4)">
+          </div>
         </div>
       </div>
       <div class="three columns caption">
-        CAPTION HERE
+        <span class="caption block">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+        </span>
       </div>
     </div>
-
-          <!-- -->
-
-        	<div class="img-wrap">
-        		<ul class="bxslider">
-        			<li><img src="{% static 'projectapp/imgs/prj/rev_email/sketches_email_surveyInsights_layout.jpg' %}" alt="Sketches of email layouts" class="project-detail-imgs" width="100%" title="Sketches of email layouts (1 of 4)"></li>
-        			<li><img src="{% static 'projectapp/imgs/prj/rev_email/sketches_email_mobilesurveyInsights_layout.jpg' %}" alt="Sketch of mobile email layoutv" class="project-detail-imgs" width="100%" title="Sketch of mobile email layout (2 of 4)"></li>
-        			<li><img src="{% static 'projectapp/imgs/prj/rev_email/email_dailydigest_block.png' %}" alt="Example of email elements defined in an application email layout" class="project-detail-imgs border" width="100%" title="Example of email elements defined in an application email layout (3 of 4)"></li>
-        			<li><img src="{% static 'projectapp/imgs/prj/rev_email/block_content_example.png' %}" alt="Example of email elements defined in a marketing email layout" class="project-detail-imgs border" width="100%" title="Example of email elements defined in a marketing email layout(4 of 4)"></li>
-        		</ul>
-        	</div>
-        	<h3>Application Emails</h3>
-        	<p class="description">
-        		I worked closely with Product and Support to determine what content we should keep and what content we could cut from the emails. Some emails had a lot of text (i.e. our email to invite users to create accounts, which is a critical email). I proposed a more focused email so users would not get distracted (or worse, lose interest and abandon the email).
-        	</p>
-        	<p class="description">
-        		I took the opportunity to inject some visual elements into the emails to break up blocks of text; I wanted to make the point of contact engaging and friendly.
-        	</p>
-        	<div class="img-wrap">
-        		<ul class="bxslider">
-        			<li>
-        				<img src="{% static 'projectapp/imgs/prj/rev_email/new-old-invite.png' %}" alt="Images of the old and new Invite Email designs" class="project-detail-imgs" width="905" title="Old and new Invite Emails (1 of 9)"></li>
-        			<li>
-        				<img src="{% static 'projectapp/imgs/prj/rev_email/old/invitation.png' %}" alt="Screenshot of the old Invite Email" class="project-detail-imgs" width="100%" title="Old Invite Email(2 of 9)"></li>
-        			<li>
-        				<img src="{% static 'projectapp/imgs/prj/rev_email/new/invitation.png' %}" alt="Screenshot of an old Invite Email" class="project-detail-imgs" width="100%" title="New Invite Email (3 of 9)"></li>
-        			<li>
-        				<img src="{% static 'projectapp/imgs/prj/rev_email/new-old-guides.png' %}" alt="Images of the old and new Guides and Resources email designs" class="project-detail-imgs" width="905" title="New and old Guides & Resources Emails (4 of 9)"></li>
-        			<li>
-        				<img src="{% static 'projectapp/imgs/prj/rev_email/old/Revinate_guides_and_resources.png' %}" alt="Screenshot of the old Guides & Resources email" class="project-detail-imgs" width="100%" title="Screenshot of the old Guides & Resources email (5 of 9)"></li>
-        			<li>
-        				<img src="{% static 'projectapp/imgs/prj/rev_email/new/guides-resources.png' %}" alt="Screenshot of the new Guides & Resources email" class="project-detail-imgs" width="100%" title="Example of the new guides & resources email (6 of 9)"></li>
-        			<li>
-        				<img src="{% static 'projectapp/imgs/prj/rev_email/new-old-tix.png' %}" alt="New and old ticket emails" class="project-detail-imgs" width="905" title="New and old ticket emails (7 of 9)"></li>
-        			<li>
-        				<img src="{% static 'projectapp/imgs/prj/rev_email/old/old-tix.png' %}" alt="Example of an old ticket email" class="project-detail-imgs" width="100%" title="Example of an old ticket (8 of 9)"></li>
-        			<li>
-        				<img src="{% static 'projectapp/imgs/prj/rev_email/new/new-tix.png' %}" alt="Example of a new ticket email" class="project-detail-imgs" width="100%" title="Example of a new ticket email (9 of 9)"></li>
-        		</ul>
-        	</div>
-        	<h3>Marketing Emails</h3>
-        	<p class="description">I designed email templates with modular sections for Marketing so that the team would be more self-sufficient in building email campaigns. The layouts were made to be flexible so that they could delete/add sections as need be.</p>
-        	<div class="img-wrap">
-        		<ul class="bxslider">
-        			<li><img src="{% static 'projectapp/imgs/prj/rev_email/new-old-mktg.png' %}" alt="Images of the old and new Marketing Email designs" class="project-detail-imgs" width="905" title="Old and new marketing emails (1 of 5)"></li>
-        			<li><img src="{% static 'projectapp/imgs/prj/rev_email/old/old_marketing.png' %}" alt="Example of an old marketing email" class="project-detail-imgs" width="100%" title="The old Marketing email template (2 of 5)"></li>
-        			<li><img src="{% static 'projectapp/imgs/prj/rev_email/new/webinar.png' %}" alt="Example of a webinar email template" class="project-detail-imgs" width="100%" title="New webinar email (3 of 5)"></li>
-        			<li><img src="{% static 'projectapp/imgs/prj/rev_email/new/nurture.png' %}" alt="Example of a nurture email template" class="project-detail-imgs" width="100%" title="New nurture email (4 of 5)"></li>
-        			<li><img src="{% static 'projectapp/imgs/prj/rev_email/new/newsletter.png' %}" alt="Example of a newsletter email template" class="project-detail-imgs" width="100%" title="New newsletter email (5 of 5)"></li>
-        		</ul>
-        	</div>
-        	<h3>Cohesion and Consistency</h3>
-        	<p class="description">
-        		With this project, application and marketing emails were updated to be on-brand and consistent with each other. We also tackled responsiveness since we knew that many users checked their reporting emails on their phones.
-        	</p>
-        	<p class="description">
-        		Kevin Scott, the general manager of HOTEL MAX actually emailed in a compliment to one of our account managers and told her: "Love the new look of this. You guys continue to keep it fresh."
-        	</p>
-        	<p class="description">
-        		Below is a screenshot of some application and marketing email templates together. A consistent visual story is told, and layouts are organized into consistent patterns.
-        	</p>
-        	<div class="img-wrap">
-        		<ul class="bxslider">
-        			<li><img src="{% static 'projectapp/imgs/prj/rev_email/overview_appEmails.png' %}" alt="Image of all the application and marketing emails" class="project-detail-imgs" width="905" title="Image of all the application and marketing emails (1 of 3)"></li>
-        			<li><img src="{% static 'projectapp/imgs/prj/rev_email/new/application-emails.png' %}" alt="Closer examples of reporting emails" class="project-detail-imgs" width="100%" title="Closer examples of reporting emails (2 of 3)"></li>
-        			<li><img src="{% static 'projectapp/imgs/prj/rev_email/new/application-alerts.png' %}" alt="Closer examples of alerts emails (3 of 3)" class="project-detail-imgs" width="100%" title="Closer examples of alerts emails (3 of 3)"></li>
-        		</ul>
-        	</div>
+    <div class="row project-indiv">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <h3>Application Emails</h3>
+          <p>I worked closely with Product and Support to determine what content we should keep and what content we could cut from the emails. Some emails had a lot of text (i.e. our email to invite users to create accounts, which is a critical email). I proposed a more focused email so users would not get distracted (or worse, lose interest and abandon the email).</p>
+          <p>I took the opportunity to inject some visual elements into the emails to break up blocks of text; I wanted to make the point of contact engaging and friendly.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Invite Emails -->
+    <div class="row project-indiv">
+      <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/rev_email/old/invitation.png' %}" alt="Screenshot of the old Invite Email" class="project-detail-imgs" width="100%" title="Old Invite Email(2 of 9)"></div>
+      <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/rev_email/new/invitation.png' %}" alt="Screenshot of an old Invite Email" class="project-detail-imgs" width="100%" title="New Invite Email (3 of 9)"></div>
+    </div>
+    <!-- Guides & Resources -->
+    <div class="row project-indiv">
+      <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/rev_email/old/Revinate_guides_and_resources.png' %}" alt="Screenshot of the old Guides & Resources email" class="project-detail-imgs" width="100%" title="Screenshot of the old Guides & Resources email (5 of 9)"></div>
+      <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/rev_email/new/guides-resources.png' %}" alt="Screenshot of the new Guides & Resources email" class="project-detail-imgs" width="100%" title="Example of the new guides & resources email (6 of 9)"></div>
+    </div>
+    <!-- Tickets -->
+    <div class="row project-indiv">
+      <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/rev_email/old/old-tix.png' %}" alt="Example of an old ticket email" class="project-detail-imgs" width="100%" title="Example of an old ticket (8 of 9)"></div>
+      <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/rev_email/new/new-tix.png' %}" alt="Example of a new ticket email" class="project-detail-imgs" width="100%" title="Example of a new ticket email (9 of 9)"></div>
+    </div>
+    <!-- Marketing Email -->
+    <div class="row project-indiv">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <h3>Marketing Emails</h3>
+          <p >I designed email templates with modular sections for Marketing so that the team would be more self-sufficient in building email campaigns. The layouts were made to be flexible so that they could delete/add sections as need be.</p>
+        </div>
+      </div>
+    </div>
+    <div class="row project-indiv">
+      <div class="one-third column"><img src="{% static 'projectapp/imgs/prj/rev_email/old/old_marketing.png' %}" alt="Example of an old marketing email" class="project-detail-imgs" width="100%" title="The old Marketing email template (2 of 5)"></div>
+      <div class="one-third column"><img src="{% static 'projectapp/imgs/prj/rev_email/new/nurture.png' %}" alt="Example of a nurture email template" class="project-detail-imgs" width="100%" title="New nurture email (4 of 5)"></div>
+      <div class="one-third column"><img src="{% static 'projectapp/imgs/prj/rev_email/new/webinar.png' %}" alt="Example of a webinar email template" class="project-detail-imgs" width="100%" title="New webinar email (3 of 5)"></div>
+    </div>
+    <div class="row project-indiv">
+      <div class="one-third column">...</div>
+      <div class="two-thirds column">
+        <img src="{% static 'projectapp/imgs/prj/rev_email/new/newsletter.png' %}" alt="Example of a newsletter email template" class="project-detail-imgs" width="100%" title="New newsletter email (5 of 5)">
+      </div>
+    </div>
+    <!-- Conclusion -->
+    <div class="row project-indiv">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <h3>Cohesion and Consistency</h3>
+          <p>With this project, application and marketing emails were updated to be on-brand and consistent with each other. We also tackled responsiveness since we knew that many users checked their reporting emails on their phones.</p>
+          <p>Kevin Scott, the general manager of HOTEL MAX actually emailed in a compliment to one of our account managers and told her: "Love the new look of this. You guys continue to keep it fresh."</p>
+          <p>Below is a screenshot of some application and marketing email templates together. A consistent visual story is told, and layouts are organized into consistent patterns.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Closing image -->
+    <div class="row project-indiv">
+      <div class="twelve columns">
+        <img src="{% static 'projectapp/imgs/prj/rev_email/overview_appEmails.png' %}" alt="Image of all the application and marketing emails" class="project-detail-imgs" width="100%" title="Image of all the application and marketing emails (1 of 3)">
+        <img src="{% static 'projectapp/imgs/prj/rev_email/new/application-emails.png' %}" alt="Closer examples of reporting emails" class="project-detail-imgs" width="100%" title="Closer examples of reporting emails (2 of 3)">
+        <img src="{% static 'projectapp/imgs/prj/rev_email/new/application-alerts.png' %}" alt="Closer examples of alerts emails (3 of 3)" class="project-detail-imgs" width="100%" title="Closer examples of alerts emails (3 of 3)">
+      </div>
+    </div>
+    <!--  -->
+    <div class="row project-indiv">
+      <div class="one-half column"></div>
+      <div class="one-half column"></div>
+    </div>
         </div>
       </div>
     </div>

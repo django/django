@@ -1,4 +1,5 @@
 {% extends 'project_detail.html' %}
+{% load static %}
 
 {% block prev %}Prev: {% endblock prev %}
 {% block prev-url %} {% url 'p_' %} {% endblock prev-url %}
@@ -36,14 +37,12 @@
 <!-- # Project INTRO IMG -->
   {% block p-introimg %}
     <div class="row">
-      <div class="bit-1">
-        <img src="..." alt="..." class="proj-intro-img" width="100%"/>
+      <div class="twelve columns">
+        <img src="..." alt="..." class="border" width="100%"/>
       </div>
     </div>
   {% endblock p-introimg %}
-  {% block p-introalt %}
-    ...
-  {% endblock p-introalt %}
+
 
 
 
