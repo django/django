@@ -45,12 +45,12 @@ $v-fast: all 0.1s ease-in;
 }
 h1, h2, h3 {color: $dark-blue;}
 h1, .h1 {font-size: 7.2rem; line-height: 8rem;}
-h2 {font-size: 4.8rem; line-height: normal;}
-h3, .h3, .logo {font-size: 2.4rem; line-height: 2.8rem;}
+h2, .h2 {font-size: 4.8rem; line-height: normal;}
+h3, .h3, .logo, q {font-size: 2.4rem; line-height: 2.8rem;}
 
 p, a, span {
   font-family: $ibm-plex-font;
-  font-size: 2.4rem;;
+  font-size: 2.4rem;
   line-height: 3.6rem;
 
   &.sm {
@@ -62,6 +62,9 @@ p, a, span {
   &.dark-gray {color: $dark-gray;}
   &.gray {color: $gray;}
   &.dark-blue {color: $dark-blue;}
+  &.normal {font-weight: normal;}
+  &.antialias {font-smooth: antialias;}
+  &.caption {color: $dusty-blue;font-size: 1.6rem;line-height: 2.4rem;border-left: 1px solid $dusty-blue;padding-left: 2rem;}
 }
 h1, h2, .freight-text {font-family: $freight-font;}
 h3, .h3, .ibm-plex {font-family: $ibm-plex-font;}
@@ -263,18 +266,31 @@ body {margin: 0 auto;}
       }
     }
     // P BODY
+      .quote {
+        background-image: $gradient;
+        background-clip: text;
+        text-fill-color: transparent;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        -moz-background-clip: text;
+        -moz-text-fill-color: transparent;
+        border-left: 1px solid $dusty-blue;
+        padding: 1rem 5rem;
+        .quote-from {margin-top: 1rem;}
+      }
       .project-indiv {
         .blurb {margin-bottom: 3rem;}
         .body {
           p, ul, .h3, h3, .goal-text {
             color: $black;
             font-size: 1.8rem;
-            line-height: 2.4rem;
+            line-height: 2.6rem;
           }
           h3 {margin: 0 0 1rem;}
           .h3 {text-decoration: underline;}
           li {list-style-type: none;display: flex;flex-direction: row;margin-bottom: 3rem;align-items: flex-start;}
           .goal-text {color: $dark-gray;}
+          .new-section {border-top: 5px solid $periwinkle;padding-top: 5rem;}
         }
       }
       .meta {
@@ -290,6 +306,16 @@ body {margin: 0 auto;}
         display: inline-block;
         margin-right: 2rem;
       }
+      img {
+        &.border {border: 1px solid $dusty-blue;}
+        &.space {
+          &.top {margin-top: 1rem;}
+          &.x-top {margin-top: 4rem;}
+          &.bottom {margin-bottom: 1rem;}
+          &.x-bottom {margin-bottom: 4rem;}
+        }
+      }
+
     // BOTTOM NAVIGATION
     .p-nav.bottom {
       border-bottom: 1px solid $periwinkle;

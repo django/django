@@ -1,4 +1,5 @@
 {% extends 'project_detail.html' %}
+{% load static %}
 
 {% block prev %}{% endblock prev %}
 {% block prev-url %} ... {% endblock prev-url %}
@@ -18,14 +19,9 @@
   {% block p-blurb %}
     ...
   {% endblock p-blurb %}
-
-
-
-<!-- # Project METADATA 1 (YEAR & COMPANY) -->
-  {% block p-year %}
+  {% block p-blurb-html %}
     ...
-  {% endblock p-year %}
-
+  {% endblock p-blurb-html %}
 
 
 <!-- # Project METADATA 2 (ROLE & responsibilities) -->
@@ -40,11 +36,12 @@
 
 <!-- # Project INTRO IMG -->
   {% block p-introimg %}
-    ...
+    <div class="row">
+      <div class="twelve columns">
+        <img src="{% static 'projectapp/imgs/prj/ro_website/_intro.png' %}" alt="..." class="border" width="100%"/>
+      </div>
+    </div>
   {% endblock p-introimg %}
-  {% block p-introalt %}
-    ...
-  {% endblock p-introalt %}
 
 
 

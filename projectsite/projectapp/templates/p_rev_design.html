@@ -1,4 +1,5 @@
 {% extends 'project_detail.html' %}
+{% load static %}
 
 {% block prev %}Prev: Intro to Custom Dashboards{% endblock prev %}
 {% block prev-url %} {% url 'p_codepen_dashboard' %} {% endblock prev-url %}
@@ -16,35 +17,33 @@
 
 <!-- # Project BLURB -->
   {% block p-blurb %}
-    ...
+    Revinate’s products lived on two sets of UI since they were developed separately. In late 2015 we decided to unify them onto one consolidated interface.
   {% endblock p-blurb %}
-
-
-
-<!-- # Project METADATA 1 (YEAR & COMPANY) -->
-  {% block p-year %}
-    ...
-  {% endblock p-year %}
-
+  {% block p-blurb-html %}
+    <p>
+        This gave us better upsell opportunities, more consistent branding, and less design and front-end overhead. It was an enormous task, but a really significant step to bettering our and our product's UX, our process, and our teamwork.
+    </p>
+  {% endblock p-blurb-html %}
 
 
 <!-- # Project METADATA 2 (ROLE & responsibilities) -->
   {% block p-role %}
-    ...
+    UX Lead, UI Designer
   {% endblock p-role %}
   {% block p-responsibilities %}
-    ...
+    Design leadership, UI/UX, information hierarchy
   {% endblock p-responsibilities %}
 
 
 
 <!-- # Project INTRO IMG -->
-  {% block p-introimg %}
-    ...
-  {% endblock p-introimg %}
-  {% block p-introalt %}
-    ...
-  {% endblock p-introalt %}
+{% block p-introimg %}
+  <div class="row">
+    <div class="twelve columns">
+      <img src="{% static 'projectapp/imgs/prj/rev_design/_intro.png' %}" alt="..." class="" width="100%"/>
+    </div>
+  </div>
+{% endblock p-introimg %}
 
 
 

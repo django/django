@@ -1,4 +1,5 @@
 {% extends 'project_detail.html' %}
+{% load static %}
 
 {% block prev %}Prev: {% endblock prev %}
 {% block prev-url %} {% url 'p_' %} {% endblock prev-url %}
@@ -18,12 +19,12 @@
   {% block p-blurb %}
     ...
   {% endblock p-blurb %}
-  {% block p-blur-htmlb %}
+  {% block p-blurb-html %}
     ...
   {% endblock p-blurb-html %}
 
 
-<!-- # Project METADATA 2 (ROLE & responsibilities) -->
+<!-- # Project METADATA (ROLE & responsibilities) -->
   {% block p-role %}
     ...
   {% endblock p-role %}
@@ -36,14 +37,12 @@
 <!-- # Project INTRO IMG -->
   {% block p-introimg %}
     <div class="row">
-      <div class="bit-1">
-        <img src="..." alt="..." class="proj-intro-img" width="100%"/>
+      <div class="twelve columns">
+        <img src="..." alt="..." class="border" width="100%"/>
       </div>
     </div>
   {% endblock p-introimg %}
-  {% block p-introalt %}
-    ...
-  {% endblock p-introalt %}
+
 
 
 
@@ -51,3 +50,16 @@
   {% block p-body %}
     ...
   {% endblock p-body %}
+
+
+  <!--  Image of spreadsheet with caption-->
+  <div class="row project-indiv">
+    <div class="nine columns">
+      <div class="project-indiv body">
+        ...
+      </div>
+    </div>
+    <div class="three columns caption">
+      ...
+    </div>
+  </div>
