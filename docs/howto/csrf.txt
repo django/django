@@ -33,8 +33,8 @@ To take advantage of CSRF protection in your views, follow these steps:
 
 .. _csrf-ajax:
 
-AJAX
-====
+Using CSRF protection with AJAX
+===============================
 
 While the above method can be used for AJAX POST requests, it has some
 inconveniences: you have to remember to pass the CSRF token in as POST data with
@@ -171,8 +171,8 @@ both is fine, and will incur minimal overhead.
 
 .. _csrf-rejected-requests:
 
-Handle rejected requests
-========================
+Handling rejected requests
+==========================
 
 By default, a '403 Forbidden' response is sent to the user if an incoming
 request fails the checks performed by ``CsrfViewMiddleware``. This should
@@ -187,8 +187,8 @@ own view for handling this condition. To do this, set the
 CSRF failures are logged as warnings to the :ref:`django.security.csrf
 <django-security-logger>` logger.
 
-Caching
-=======
+Using CSRF protection with caching
+==================================
 
 If the :ttag:`csrf_token` template tag is used by a template (or the
 ``get_token`` function is called some other way), ``CsrfViewMiddleware`` will
@@ -247,8 +247,8 @@ Solution: rather than disabling the middleware and applying ``csrf_protect`` to
 all the views that need it, enable the middleware and use
 :func:`~django.views.decorators.csrf.csrf_exempt`.
 
-Setting the token when CsrfViewMiddleware.process_view is not used
-------------------------------------------------------------------
+Setting the token when ``CsrfViewMiddleware.process_view()`` is not used
+------------------------------------------------------------------------
 
 There are cases when ``CsrfViewMiddleware.process_view`` may not have run
 before your view is run - 404 and 500 handlers, for example - but you still
@@ -299,8 +299,8 @@ with a :ttag:`csrf_token` that would cause the required CSRF cookie to be sent.
 Solution: use :func:`~django.views.decorators.csrf.ensure_csrf_cookie` on the
 view that sends the page.
 
-Contrib and reusable apps
-=========================
+CSRF protection in reusable applications
+========================================
 
 Because it is possible for the developer to turn off the ``CsrfViewMiddleware``,
 all relevant views in contrib apps use the ``csrf_protect`` decorator to ensure
