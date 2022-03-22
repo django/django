@@ -17,20 +17,19 @@
 
 <!-- # Project BLURB -->
   {% block p-blurb %}
-    ...
+    First-time user experience can make or break whether someone becomes a potential buyer. After a year of seeing what customers responded to, we reassessed who we were targeting and how to encourage them to take important first steps.
   {% endblock p-blurb %}
   {% block p-blurb-html %}
-    ...
   {% endblock p-blurb-html %}
 
 
 
 <!-- # Project METADATA 2 (ROLE & responsibilities) -->
   {% block p-role %}
-    ...
+    Product Designer
   {% endblock p-role %}
   {% block p-responsibilities %}
-    ...
+    User journey mapping, visual design, product design
   {% endblock p-responsibilities %}
 
 
@@ -39,7 +38,7 @@
 {% block p-introimg %}
   <div class="row">
     <div class="twelve columns">
-      <img src="{% static 'projectapp/imgs/prj/ro_ftux/_intro.png' %}" alt="..." class="border" width="100%"/>
+      <img src="{% static 'projectapp/imgs/prj/ro_ftux/_intro.png' %}" alt="..." width="100%" class="space x-top x-bottom"/>
     </div>
   </div>
 {% endblock p-introimg %}
@@ -48,5 +47,31 @@
 
 <!-- # Actual PROJECT DETAILS & CONTENT -->
   {% block p-body %}
-    ...
+    <div class="row project-indiv">
+      <div class="twelve columns">
+        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_ftux/sketch_salesops.png' %}" alt="..." class="space top bottom" width="100%"/></div>
+        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_ftux/sketch_salesops2.png' %}" alt="..." class="space top bottom" width="100%"/></div>
+      </div>
+    </div>
+    <div class="row project-indiv">
+      <div class="twelve columns">
+        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_ftux/sketch_sales.png' %}" alt="..." class="space top bottom" width="100%"/></div>
+        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_ftux/sketch_sales2.png' %}" alt="..." class="space top bottom" width="100%"/></div>
+      </div>
+    </div>
+    <div class="row project-indiv">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <img src="{% static 'projectapp/imgs/prj/ro_ftux/template_gallery_cr.png' %}" alt="..." class="border" width="100%"/>
+        </div>
+      </div>
+    </div>
   {% endblock p-body %}
+
+  <div class="row project-indiv">
+    <div class="nine columns">
+      <div class="project-indiv body">
+        ...
+      </div>
+    </div>
+  </div>
