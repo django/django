@@ -1,4 +1,5 @@
 {% extends 'project_detail.html' %}
+{% load static %}
 
 {% block prev %}Prev: Revinate Marketing Collateral{% endblock prev %}
 {% block prev-url %} {% url 'p_rev_design' %} {% endblock prev-url %}
@@ -40,12 +41,12 @@
 
 <!-- # Project INTRO IMG -->
   {% block p-introimg %}
-    ...
+    <div class="row">
+      <div class="twelve columns">
+        <img src="{% static 'projectapp/imgs/prj/print/_intro.png' %}" alt="..." class="border" width="100%"/>
+      </div>
+    </div>
   {% endblock p-introimg %}
-  {% block p-introalt %}
-    ...
-  {% endblock p-introalt %}
-
 
 
 <!-- # Actual PROJECT DETAILS & CONTENT -->

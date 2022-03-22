@@ -64,6 +64,7 @@ p, a, span {
   &.dark-blue {color: $dark-blue;}
   &.normal {font-weight: normal;}
   &.antialias {font-smooth: antialias;}
+  &.caption {color: $dusty-blue;font-size: 1.6rem;line-height: 2.4rem;border-left: 1px solid $dusty-blue;padding-left: 2rem;}
 }
 h1, h2, .freight-text {font-family: $freight-font;}
 h3, .h3, .ibm-plex {font-family: $ibm-plex-font;}
@@ -283,12 +284,13 @@ body {margin: 0 auto;}
           p, ul, .h3, h3, .goal-text {
             color: $black;
             font-size: 1.8rem;
-            line-height: 2.4rem;
+            line-height: 2.6rem;
           }
           h3 {margin: 0 0 1rem;}
           .h3 {text-decoration: underline;}
           li {list-style-type: none;display: flex;flex-direction: row;margin-bottom: 3rem;align-items: flex-start;}
           .goal-text {color: $dark-gray;}
+          .new-section {border-top: 5px solid $periwinkle;padding-top: 5rem;}
         }
       }
       .meta {
@@ -304,6 +306,16 @@ body {margin: 0 auto;}
         display: inline-block;
         margin-right: 2rem;
       }
+      img {
+        &.border {border: 1px solid $dusty-blue;}
+        &.space {
+          &.top {margin-top: 1rem;}
+          &.x-top {margin-top: 4rem;}
+          &.bottom {margin-bottom: 1rem;}
+          &.x-bottom {margin-bottom: 4rem;}
+        }
+      }
+
     // BOTTOM NAVIGATION
     .p-nav.bottom {
       border-bottom: 1px solid $periwinkle;

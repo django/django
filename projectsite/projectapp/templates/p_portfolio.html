@@ -1,4 +1,5 @@
 {% extends 'project_detail.html' %}
+{% load static %}
 
 {% block prev %}{% endblock prev %}
 {% block prev-url %} ... {% endblock prev-url %}
@@ -38,12 +39,12 @@
 
 <!-- # Project INTRO IMG -->
   {% block p-introimg %}
-    ...
+  <div class="row">
+    <div class="twelve columns">
+      <img src="{% static 'projectapp/imgs/prj/portfolio/_intro.png' %}" alt="..." class="border" width="100%"/>
+    </div>
+  </div>
   {% endblock p-introimg %}
-  {% block p-introalt %}
-    ...
-  {% endblock p-introalt %}
-
 
 
 <!-- # Actual PROJECT DETAILS & CONTENT -->
