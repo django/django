@@ -131,6 +131,8 @@ body {margin: 0 auto;}
         -webkit-animation: hatswap 5s ease-out infinite;
         animation-delay: 2s;
       }
+      .sun-hat, .top-hat {transform: rotateY(0deg) rotate(25deg); display: inline-block;}
+      .baseball {transform: rotateY(0deg) rotate(25deg) scaleX(-1); display: inline-block;}
     }
       @keyframes hatswap {
         0% { opacity: 1; -webkit-transform: translateY(0px);}
@@ -204,6 +206,8 @@ body {margin: 0 auto;}
       text-transform: uppercase;
       margin-left: .5rem;
       vertical-align: middle;
+      position: relative;
+      top: -2px;
     }
     .thumb {
       height: 16.6rem;

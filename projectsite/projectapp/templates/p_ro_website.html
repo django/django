@@ -26,10 +26,10 @@
 
 <!-- # Project METADATA 2 (ROLE & responsibilities) -->
   {% block p-role %}
-    ...
+    Web Designer
   {% endblock p-role %}
   {% block p-responsibilities %}
-    ...
+    Graphics, animations, creating reusable layout templates.
   {% endblock p-responsibilities %}
 
 
@@ -37,8 +37,17 @@
 <!-- # Project INTRO IMG -->
   {% block p-introimg %}
     <div class="row">
-      <div class="twelve columns">
-        <img src="{% static 'projectapp/imgs/prj/ro_website/_intro.png' %}" alt="..." class="border" width="100%"/>
+      <div class="nine columns">
+        ...
+        </video>
+      </div>
+    </div>
+    <div class="row project-indiv">
+      <div class="nine columns">
+        <div class="column two-thirds">
+          <video src="{% static 'projectapp/imgs/prj/ro_website/_intro.mp4' %}" width="100%" preload="auto" playsinline autoplay >
+          </video>
+        </div>
       </div>
     </div>
   {% endblock p-introimg %}
@@ -49,3 +58,11 @@
   {% block p-body %}
     ...
   {% endblock p-body %}
+
+  <div class="row project-indiv">
+    <div class="nine columns">
+      <div class="project-indiv body">
+        ...
+      </div>
+    </div>
+  </div>
