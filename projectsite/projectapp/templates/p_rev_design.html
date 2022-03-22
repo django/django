@@ -20,9 +20,9 @@
     Revinate’s products lived on two sets of UI since they were developed separately. In late 2015 we decided to unify them onto one consolidated interface.
   {% endblock p-blurb %}
   {% block p-blurb-html %}
-    <p>
-        This gave us better upsell opportunities, more consistent branding, and less design and front-end overhead. It was an enormous task, but a really significant step to bettering our and our product's UX, our process, and our teamwork.
-    </p>
+    <div class="project-indiv body">
+      <p>This gave us better upsell opportunities, more consistent branding, and less design and front-end overhead. It was an enormous task, but a really significant step to bettering our and our product's UX, our process, and our teamwork.</p>
+    </div>
   {% endblock p-blurb-html %}
 
 
@@ -49,5 +49,179 @@
 
 <!-- # Actual PROJECT DETAILS & CONTENT -->
   {% block p-body %}
-    ...
+  <!-- GOALS -->
+    <div class="project-indiv row">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <h2 class="h3">Goals</h2>
+          <ul class="goals-list sm">
+            <li>
+              <span class="circle-number sm">1</span>
+              <span class="goal-text">
+                <h3 class="h4">Surface features better</h3>
+                Allow users to be easily aware of what other services we provide for upsell opportunities.
+              </span>
+            </li>
+            <li>
+              <span class="circle-number sm">2</span>
+              <span class="goal-text">
+                <h3 class="h4">Consolidate our UI to give a consistent product experience.</h3>
+              </span>
+            </li>
+            <li>
+              <span class="circle-number sm">3</span>
+              <span class="goal-text">
+                <h3 class="h4">Create a style guide &amp; pattern library</h3>
+                Create a living style guide to document all UI elements and patterns for developers and product managers to reference.
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- Project Details -->
+    <div class="project-indiv row">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <h2 class="new-section">The Process</h2>
+        	<h3 class="h4">Old -vs- New UI</h3>
+        	<p class="description">
+        		To move the older Reputation and Surveys products onto the new UI with our Marketing and Engage products, we had to update the navigation, sitemap, and consolidate UI patterns. The Marketing/Engage track had been developed without full design involvement, so this project was an opportunity to lay down basic color, page layout guidelines, and make patterns consistent in the new UI as well.
+        	</p>
+        </div>
+      </div>
+    </div>
+    <div class="project-indiv row">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <img src="{% static 'projectapp/imgs/prj/rev_design/old-rev-dash.jpg' %}" alt="Screenshot of the Reputation dashboard" class="border" width="100%" title="Example of the Reputation Dashboard (1 of 2)">
+          <img src="{% static 'projectapp/imgs/prj/rev_design/new-rev-dash.jpg' %}" alt="Screenshot of the Marketing dashboard" class="border space top x-bottom" width="100%" title="Example of the Marketing Dashboard (2 of 2)">
+        </div>
+      </div>
+      <div class="three columns">
+        <span class="caption block">
+          This is a caption
+        </span>
+      </div>
+    </div>
+    <!--  -->
+    <div class="project-indiv row">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <h3>Prioritizing &amp; Planning</h3>
+        	<p>As design lead, I solidified the project prioritization and timeline with the lead FE engineer and our CPO after I inherited this project. I laid out our shared understanding of the entire process, what the timelines are, what state different parts of the UI were in, what items still needed to be tackled (and how to prioritize them) -- and finally, action items we needed to take care of.</p>
+        </div>
+      </div>
+    </div>
+    <div class="project-indiv row">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <img src="{% static 'projectapp/imgs/prj/rev_design/whiteboard.jpg' %}" alt="Photo of the whiteboard during or discussion" class="space top x-bottom" width="100%" title="(1 of 3)">
+        </div>
+      </div>
+      <div class="three columns">
+        <span class="block caption">
+            Voluptatibus, perspiciatis magni sunt similique eveniet omnis molestiae accusantium?
+        </span>
+      </div>
+    </div>
+
+
+    <!-- Sitemap -->
+    <div class="project-indiv row">
+      <div class="nine columns">
+        <div class="one-half column">
+          <img src="{% static 'projectapp/imgs/prj/rev_design/sitemap1.png' %}" alt="Partial screenshot of new sitemap" width="100%" title="New sitemap (2 of 3)">
+        </div>
+        <div class="one-half column">
+          <img src="{% static 'projectapp/imgs/prj/rev_design/sitemap2.png' %}" alt="Partial screenshot of new sitemap" width="100%" title="New sitemap (3 of 3)">
+        </div>
+      </div>
+      <div class="three columns">
+        <span class="block caption">
+          Voluptatibus, perspiciatis magni sunt similique eveniet omnis molestiae accusantium?
+        </span>
+      </div>
+    </div>
+
+
+    <!--  -->
+    <div class="project-indiv row">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <p>I led the charge to gather feedback from our Customer Success team to learn different use-cases, and worked closely with Product and Eng to determine the application sitemap and hierarchy.</p>
+          <h3>Case Study: Dashboard</h3>
+          <p>The first page a user lands on once they sign in is the dashboard. Both Reputation and Marketing had their dashboard layouts as well as their own specific kinds of modules. My first step to unifying the interface was to inventory all the different modules by layout, function, and which of the apps they appeared in.</p>
+        </div>
+      </div>
+    </div>
+
+
+    <!--  -->
+    <div class="project-indiv row">
+      <div class="twelve columns">
+        <div class="project-indiv body">
+          <div class="one-half column">
+            <img src="{% static 'projectapp/imgs/prj/rev_design/dashboard-modules.png' %}" alt="An image of a mock that categorizes all dashboard modules across all four apps" class="" width="100%" title="A categorization of all the different kinds of dashboard modules across all 4 applications">
+          </div>
+          <div class="one-half column">
+            <img src="{% static 'projectapp/imgs/prj/rev_design/dashboard-libraryofmodules.png' %}" alt="A mock of all dashboard modules across all four apps, fleshed out in visual detail" class="" width="100%" title="A detailed look at how all different kinds of dashboard modules would look like">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--  -->
+    <div class="project-indiv row">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <p>After identifying shared attributes and potential for shared layouts, I mocked up what all the modules from the Reputation dashboard might look like using the visual pattern of the newer Revinate Marketing dashboard. A few tweaks would need to be made for both interfaces, but the translation was smooth.</p>
+        </div>
+      </div>
+    </div>
+
+
+    <!--  -->
+    <div class="project-indiv row">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <h3>Style Guide</h3>
+        	<p class="description">
+        		The timing presented a great opportunity to establish a style guide in parallel. While unifying all the elements of the four applications, we also documented navigation patterns (treatments for primary, secondary, tertiary navigation), as well as color interaction rules, and repeated visual patterns.
+        	</p>
+        </div>
+      </div>
+    </div>
+    <!-- -->
+    <div class="project-indiv row">
+      <div class="two-thirds column">
+        <img src="{% static 'projectapp/imgs/prj/rev_design/color-rules.png' %}" alt="Color palette for within the application" class="space top x-bottom" width="100%" title="(1 of 5)">
+      </div>
+    </div>
+    <div class="project-indiv row">
+      <div class="nine columns">
+          <img src="{% static 'projectapp/imgs/prj/rev_design/surveys-nav.png' %}" alt="Example of the active Surveys tab" class="space top bottom" width="100%" title="Surveys Navigation (4 of 5)">
+          <img src="{% static 'projectapp/imgs/prj/rev_design/review-nav.png' %}" alt="Example of an active Reviews tab" class="space top bottom" width="100%" title="Reputation navigation with Reports dropdown (5 of 5)">
+          <img src="{% static 'projectapp/imgs/prj/rev_design/reviewcard.png' %}" alt="Image of a review card, which was a content/visual pattern we leveraged across the application" class="space x-top bottom" width="100%" title="Example of a review (2 of 5)">
+          <img src="{% static 'projectapp/imgs/prj/rev_design/reviewcard-responded.png' %}" alt="Different state of the review card" class="space top bottom" width="100%" title="Example of a review that has been responded to (3 of 5)">
+      </div>
+    </div>
+
+
+    <!--  -->
+
   {% endblock p-body %}
+
+
+  <!-- REGARDING WIDGET ... Was ultimately cut because not sure if it was an add  -->
+  <!--div class="project-indiv row">
+    <div class="nine columns">
+      <div class="project-indiv body">
+        <h3>Future-proofing: Custom Dashboard</h3>
+        <p>While this work for unifying the dashboard layout and modules was being addressed in Unification, I knew our Reputation team was working on a feature called "Custom Dashboard." Because of good team communication, I was aware of what work the dev team had already built out and was able to translate the UI to the new design in preparation for the feature's launch.</p>
+      </div>
+      <img src="{% static 'projectapp/imgs/prj/rev_design/dashboard-widget01.png' %}" alt="A mock of how users would be able to add and delete modules from their dashboard as part of the Custom Dashboard feature" class="" width="935" title="A mock of how users would be able to add and delete modules from their dashboard as part of the Custom Dashboard feature (1 of 3)">
+        <img src="{% static 'projectapp/imgs/prj/rev_design/dashboard-widget03-hover-edit.png' %}" alt="Screenshot of the Marketing dashboard" class="" width="935" title="If users hover on a module, actions to move, delete, or edit the modules show up as icons (2 of 3)">
+        <img src="{% static 'projectapp/imgs/prj/rev_design/dashboard-widget02-list.png' %}" alt="A mock of the extended list of modules" class="" width="935" title="A mock of the extended list of modules (3 of 3)">
+    </div>
+  </div-->
