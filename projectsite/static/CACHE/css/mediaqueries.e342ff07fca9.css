@@ -1,9 +1,0 @@
-@media (min-width: 1024px) and (max-width: 1224px) {
-  /* line 14, static/projectapp/css/mediaqueries.scss */
-  body {
-    max-width: 1164px; } }
-
-@media (min-width: 768px) and (max-width: 1024px) {
-  /* line 20, static/projectapp/css/mediaqueries.scss */
-  body {
-    max-width: 935px; } }
