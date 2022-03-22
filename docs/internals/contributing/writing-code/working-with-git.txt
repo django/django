@@ -58,12 +58,12 @@ Your GitHub repository will be called "origin" in Git.
 You should also set up ``django/django`` as an "upstream" remote (that is, tell
 git that the reference Django repository was the source of your fork of it)::
 
-    git remote add upstream git@github.com:django/django.git
+    git remote add upstream https://github.com/django/django.git
     git fetch upstream
 
 You can add other remotes similarly, for example::
 
-    git remote add akaariai git@github.com:akaariai/django.git
+    git remote add akaariai https://github.com/akaariai/django.git
 
 Working on a ticket
 ===================
