@@ -57,6 +57,17 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             return (5, 7)
 
     @cached_property
+    def bare_select_suffix(self):
+        if (
+            self.connection.mysql_is_mariadb and self.connection.mysql_version < (10, 4)
+        ) or (
+            not self.connection.mysql_is_mariadb
+            and self.connection.mysql_version < (8,)
+        ):
+            return " FROM DUAL"
+        return ""
+
+    @cached_property
     def test_collations(self):
         charset = "utf8"
         if self.connection.mysql_is_mariadb and self.connection.mysql_version >= (
