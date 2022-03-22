@@ -55,7 +55,7 @@ Since a picture is worth a thousand words, let's start there:
 
 We've got two roles in this diagram:
 
-* Committers: people with commit access who are responsible for making the
+* Mergers: people with commit access who are responsible for making the
   final decision to merge a patch.
 
 * Ticket triagers: anyone in the Django community who chooses to
@@ -84,7 +84,8 @@ By way of example, here we see the lifecycle of an average ticket:
 
 * Daisy reviews the pull request and marks the ticket as "Ready for checkin".
 
-* Jacob, a committer, reviews the pull request and merges it.
+* Jacob, a :ref:`merger <mergers-team>`, reviews the pull request and merges
+  it.
 
 Some tickets require much less feedback than this, but then again some tickets
 require much much more.
@@ -142,8 +143,8 @@ Ready For Checkin
 
 The ticket was reviewed by any member of the community other than the person
 who supplied the patch and found to meet all the requirements for a
-commit-ready patch. A committer now needs to give the patch a final
-review prior to being committed.
+commit-ready patch. A :ref:`merger <mergers-team>` now needs to give the patch
+a final review prior to being committed.
 
 There are a lot of pull requests. It can take a while for your patch to get
 reviewed. See the :ref:`contributing code FAQ<new-contributors-faq>` for some

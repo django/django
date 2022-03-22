@@ -242,10 +242,10 @@ the "Triage Stage" on the corresponding Trac ticket to "Ready for checkin".
 If you've left comments for improvement on the pull request, please tick the
 appropriate flags on the Trac ticket based on the results of your review:
 "Patch needs improvement", "Needs documentation", and/or "Needs tests". As time
-and interest permits, committers do final reviews of "Ready for checkin"
-tickets and will either commit the patch or bump it back to "Accepted" if
-further works need to be done. If you're looking to become a committer,
-doing thorough reviews of patches is a great way to earn trust.
+and interest permits, mergers do final reviews of "Ready for checkin" tickets
+and will either commit the patch or bump it back to "Accepted" if further works
+need to be done. If you're looking to become a merger, doing thorough reviews
+of patches is a great way to earn trust.
 
 Looking for a patch to review? Check out the "Patches needing review" section
 of the `Django Development Dashboard <https://dashboard.djangoproject.com/>`_.
