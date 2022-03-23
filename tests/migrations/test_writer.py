@@ -537,8 +537,9 @@ class WriterTests(SimpleTestCase):
                 self.assertSerializedResultEqual(
                     datetime.datetime(2012, 1, 1, 1, 1, tzinfo=tzinfo),
                     (
-                        "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc)",
-                        {"import datetime", "from django.utils.timezone import utc"},
+                        "datetime.datetime"
+                        "(2012, 1, 1, 1, 1, tzinfo=datetime.timezone.utc)",
+                        {"import datetime"},
                     ),
                 )
 
@@ -547,8 +548,8 @@ class WriterTests(SimpleTestCase):
                 2012, 1, 1, 2, 1, tzinfo=zoneinfo.ZoneInfo("Europe/Paris")
             ),
             (
-                "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc)",
-                {"import datetime", "from django.utils.timezone import utc"},
+                "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=datetime.timezone.utc)",
+                {"import datetime"},
             ),
         )
         if pytz:
@@ -557,8 +558,8 @@ class WriterTests(SimpleTestCase):
                     datetime.datetime(2012, 1, 1, 2, 1)
                 ),
                 (
-                    "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc)",
-                    {"import datetime", "from django.utils.timezone import utc"},
+                    "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=datetime.timezone.utc)",
+                    {"import datetime"},
                 ),
             )
 
@@ -888,7 +889,9 @@ class WriterTests(SimpleTestCase):
                         "mymodel",
                         "myfield",
                         models.DateTimeField(
-                            default=datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc),
+                            default=datetime.datetime(
+                                2012, 1, 1, 1, 1, tzinfo=datetime.timezone.utc
+                            ),
                         ),
                     ),
                 ]
@@ -897,9 +900,7 @@ class WriterTests(SimpleTestCase):
         writer = MigrationWriter(migration)
         output = writer.as_string()
         self.assertIn(
-            "import datetime\n"
-            "from django.db import migrations, models\n"
-            "from django.utils.timezone import utc\n",
+            "import datetime\nfrom django.db import migrations, models\n",
             output,
         )
 
