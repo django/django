@@ -11,7 +11,7 @@
         relatedWindows.forEach(function(win) {
             if(!win.closed) {
                 win.dismissChildPopups();
-                win.close();    
+                win.close();
             }
         });
     }
@@ -19,7 +19,7 @@
     function setPopupIndex() {
         if(document.getElementsByName("_popup").length > 0) {
             const index = window.name.lastIndexOf("__") + 2;
-            popupIndex = parseInt(window.name.substring(index));   
+            popupIndex = parseInt(window.name.substring(index));
         } else {
             popupIndex = 0;
         }
@@ -184,7 +184,7 @@
                 const event = $.Event('django:show-related', {href: this.href});
                 $(this).trigger(event);
                 if (!event.isDefaultPrevented()) {
-                    showRelatedObjectPopup(this);
+                    window.showRelatedObjectPopup(this);
                 }
             }
         });
@@ -192,7 +192,7 @@
             const event = $.Event('django:update-related');
             $(this).trigger(event);
             if (!event.isDefaultPrevented()) {
-                updateRelatedObjectLinks(this);
+                window.updateRelatedObjectLinks(this);
             }
         });
         $('.related-widget-wrapper select').trigger('change');
@@ -201,7 +201,7 @@
             const event = $.Event('django:lookup-related');
             $(this).trigger(event);
             if (!event.isDefaultPrevented()) {
-                showRelatedObjectLookupPopup(this);
+                window.showRelatedObjectLookupPopup(this);
             }
         });
     });
