@@ -75,7 +75,7 @@ except ImportError:
 # datetime.datetime(2011, 9, 1, 13, 20, 30), which translates to
 # 10:20:30 in UTC and 17:20:30 in ICT.
 
-UTC = timezone.utc
+UTC = datetime.timezone.utc
 EAT = timezone.get_fixed_timezone(180)  # Africa/Nairobi
 ICT = timezone.get_fixed_timezone(420)  # Asia/Bangkok
 
@@ -651,7 +651,7 @@ class NewDatabaseTests(TestCase):
     @skipIfDBFeature("supports_timezones")
     def test_cursor_execute_accepts_naive_datetime(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
-        utc_naive_dt = timezone.make_naive(dt, timezone.utc)
+        utc_naive_dt = timezone.make_naive(dt, datetime.timezone.utc)
         with connection.cursor() as cursor:
             cursor.execute(
                 "INSERT INTO timezones_event (dt) VALUES (%s)", [utc_naive_dt]
@@ -670,7 +670,7 @@ class NewDatabaseTests(TestCase):
     @skipIfDBFeature("supports_timezones")
     def test_cursor_execute_returns_naive_datetime(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
-        utc_naive_dt = timezone.make_naive(dt, timezone.utc)
+        utc_naive_dt = timezone.make_naive(dt, datetime.timezone.utc)
         Event.objects.create(dt=dt)
         with connection.cursor() as cursor:
             cursor.execute(

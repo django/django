@@ -1847,7 +1847,7 @@ class AggregateTestCase(TestCase):
         )
 
     def test_aggregation_default_using_time_from_database(self):
-        now = timezone.now().astimezone(timezone.utc)
+        now = timezone.now().astimezone(datetime.timezone.utc)
         expr = Min(
             "store__friday_night_closing",
             filter=~Q(store__name="Amazon.com"),
@@ -1899,7 +1899,7 @@ class AggregateTestCase(TestCase):
         )
 
     def test_aggregation_default_using_date_from_database(self):
-        now = timezone.now().astimezone(timezone.utc)
+        now = timezone.now().astimezone(datetime.timezone.utc)
         expr = Min("book__pubdate", default=TruncDate(NowUTC()))
         queryset = Publisher.objects.annotate(earliest_pubdate=expr).order_by("name")
         self.assertSequenceEqual(
@@ -1960,7 +1960,7 @@ class AggregateTestCase(TestCase):
         )
 
     def test_aggregation_default_using_datetime_from_database(self):
-        now = timezone.now().astimezone(timezone.utc)
+        now = timezone.now().astimezone(datetime.timezone.utc)
         expr = Min(
             "store__original_opening",
             filter=~Q(store__name="Amazon.com"),

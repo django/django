@@ -13,7 +13,6 @@ from django.contrib.sessions.backends.base import (
 )
 from django.contrib.sessions.exceptions import InvalidSessionKey
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
-from django.utils import timezone
 
 
 class SessionStore(SessionBase):
@@ -65,7 +64,7 @@ class SessionStore(SessionBase):
         Return the modification time of the file storing the session's content.
         """
         modification = os.stat(self._key_to_file()).st_mtime
-        tz = timezone.utc if settings.USE_TZ else None
+        tz = datetime.timezone.utc if settings.USE_TZ else None
         return datetime.datetime.fromtimestamp(modification, tz=tz)
 
     def _expiry_date(self, session_data):

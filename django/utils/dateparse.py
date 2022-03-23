@@ -8,7 +8,7 @@
 import datetime
 
 from django.utils.regex_helper import _lazy_re_compile
-from django.utils.timezone import get_fixed_timezone, utc
+from django.utils.timezone import get_fixed_timezone
 
 date_re = _lazy_re_compile(r"(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})$")
 
@@ -118,7 +118,7 @@ def parse_datetime(value):
             kw["microsecond"] = kw["microsecond"] and kw["microsecond"].ljust(6, "0")
             tzinfo = kw.pop("tzinfo")
             if tzinfo == "Z":
-                tzinfo = utc
+                tzinfo = datetime.timezone.utc
             elif tzinfo is not None:
                 offset_mins = int(tzinfo[-2:]) if len(tzinfo) > 3 else 0
                 offset = 60 * int(tzinfo[1:3]) + offset_mins

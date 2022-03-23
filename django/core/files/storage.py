@@ -1,6 +1,6 @@
 import os
 import pathlib
-from datetime import datetime
+from datetime import datetime, timezone
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -9,7 +9,6 @@ from django.core.files import File, locks
 from django.core.files.move import file_move_safe
 from django.core.files.utils import validate_file_name
 from django.core.signals import setting_changed
-from django.utils import timezone
 from django.utils._os import safe_join
 from django.utils.crypto import get_random_string
 from django.utils.deconstruct import deconstructible

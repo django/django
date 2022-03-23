@@ -1,5 +1,6 @@
 import _thread
 import copy
+import datetime
 import threading
 import time
 import warnings
@@ -19,7 +20,6 @@ from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.signals import connection_created
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseErrorWrapper
-from django.utils import timezone
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 
@@ -157,7 +157,7 @@ class BaseDatabaseWrapper:
         if not settings.USE_TZ:
             return None
         elif self.settings_dict["TIME_ZONE"] is None:
-            return timezone.utc
+            return datetime.timezone.utc
         else:
             return timezone_constructor(self.settings_dict["TIME_ZONE"])
 

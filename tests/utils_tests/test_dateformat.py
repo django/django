@@ -1,15 +1,10 @@
-from datetime import date, datetime, time, tzinfo
+from datetime import date, datetime, time, timezone, tzinfo
 
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import TZ_SUPPORT, requires_tz_support
 from django.utils import dateformat, translation
 from django.utils.dateformat import format
-from django.utils.timezone import (
-    get_default_timezone,
-    get_fixed_timezone,
-    make_aware,
-    utc,
-)
+from django.utils.timezone import get_default_timezone, get_fixed_timezone, make_aware
 
 
 @override_settings(TIME_ZONE="Europe/Copenhagen")
@@ -71,7 +66,7 @@ class DateFormatTests(SimpleTestCase):
         )
 
     def test_epoch(self):
-        udt = datetime(1970, 1, 1, tzinfo=utc)
+        udt = datetime(1970, 1, 1, tzinfo=timezone.utc)
         self.assertEqual(format(udt, "U"), "0")
 
     def test_empty_format(self):
@@ -216,7 +211,7 @@ class DateFormatTests(SimpleTestCase):
 
     @requires_tz_support
     def test_e_format_with_named_time_zone(self):
-        dt = datetime(1970, 1, 1, tzinfo=utc)
+        dt = datetime(1970, 1, 1, tzinfo=timezone.utc)
         self.assertEqual(dateformat.format(dt, "e"), "UTC")
 
     @requires_tz_support

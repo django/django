@@ -1,12 +1,11 @@
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from http import cookies
 
 from django.http import HttpResponse
 from django.test import SimpleTestCase
 from django.test.utils import freeze_time
 from django.utils.http import http_date
-from django.utils.timezone import utc
 
 
 class SetCookieTests(SimpleTestCase):
@@ -18,7 +17,9 @@ class SetCookieTests(SimpleTestCase):
         # evaluated expiration time and the time evaluated in set_cookie(). If
         # this difference doesn't exist, the cookie time will be 1 second
         # larger. The sleep guarantees that there will be a time difference.
-        expires = datetime.now(tz=utc).replace(tzinfo=None) + timedelta(seconds=10)
+        expires = datetime.now(tz=timezone.utc).replace(tzinfo=None) + timedelta(
+            seconds=10
+        )
         time.sleep(0.001)
         response.set_cookie("datetime", expires=expires)
         datetime_cookie = response.cookies["datetime"]
@@ -27,7 +28,7 @@ class SetCookieTests(SimpleTestCase):
     def test_aware_expiration(self):
         """set_cookie() accepts an aware datetime as expiration time."""
         response = HttpResponse()
-        expires = datetime.now(tz=utc) + timedelta(seconds=10)
+        expires = datetime.now(tz=timezone.utc) + timedelta(seconds=10)
         time.sleep(0.001)
         response.set_cookie("datetime", expires=expires)
         datetime_cookie = response.cookies["datetime"]
