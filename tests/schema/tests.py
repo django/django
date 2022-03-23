@@ -55,7 +55,6 @@ from django.db.models.indexes import IndexExpression
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext, isolate_apps, register_lookup
-from django.utils import timezone
 
 from .fields import CustomManyToManyField, InheritedManyToManyField, MediumBlobField
 from .models import (
@@ -4231,7 +4230,7 @@ class SchemaTests(TransactionTestCase):
         """
         now = datetime.datetime(month=1, day=1, year=2000, hour=1, minute=1)
         now_tz = datetime.datetime(
-            month=1, day=1, year=2000, hour=1, minute=1, tzinfo=timezone.utc
+            month=1, day=1, year=2000, hour=1, minute=1, tzinfo=datetime.timezone.utc
         )
         mocked_datetime.now = mock.MagicMock(return_value=now)
         mocked_tz.now = mock.MagicMock(return_value=now_tz)

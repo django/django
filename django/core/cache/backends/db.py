@@ -1,12 +1,12 @@
 "Database cache backend."
 import base64
 import pickle
-from datetime import datetime
+from datetime import datetime, timezone
 
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.db import DatabaseError, connections, models, router, transaction
-from django.utils import timezone
+from django.utils.timezone import now as tz_now
 
 
 class Options:
@@ -89,7 +89,7 @@ class DatabaseCache(BaseDatabaseCache):
         for key, value, expires in rows:
             for converter in converters:
                 expires = converter(expires, expression, connection)
-            if expires < timezone.now():
+            if expires < tz_now():
                 expired_keys.append(key)
             else:
                 value = connection.ops.process_clob(value)
@@ -120,7 +120,7 @@ class DatabaseCache(BaseDatabaseCache):
         with connection.cursor() as cursor:
             cursor.execute("SELECT COUNT(*) FROM %s" % table)
             num = cursor.fetchone()[0]
-            now = timezone.now()
+            now = tz_now()
             now = now.replace(microsecond=0)
             if timeout is None:
                 exp = datetime.max
@@ -239,7 +239,7 @@ class DatabaseCache(BaseDatabaseCache):
         connection = connections[db]
         quote_name = connection.ops.quote_name
 
-        now = timezone.now().replace(microsecond=0, tzinfo=None)
+        now = tz_now().replace(microsecond=0, tzinfo=None)
 
         with connection.cursor() as cursor:
             cursor.execute(

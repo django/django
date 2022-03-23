@@ -563,8 +563,8 @@ class TestSerialization(PostgreSQLSimpleTestCase):
 
     lower_date = datetime.date(2014, 1, 1)
     upper_date = datetime.date(2014, 2, 2)
-    lower_dt = datetime.datetime(2014, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
-    upper_dt = datetime.datetime(2014, 2, 2, 12, 12, 12, tzinfo=timezone.utc)
+    lower_dt = datetime.datetime(2014, 1, 1, 0, 0, 0, tzinfo=datetime.timezone.utc)
+    upper_dt = datetime.datetime(2014, 2, 2, 12, 12, 12, tzinfo=datetime.timezone.utc)
 
     def test_dumping(self):
         instance = RangesModel(
@@ -991,7 +991,8 @@ class TestFormField(PostgreSQLSimpleTestCase):
         field = pg_forms.DateTimeRangeField()
         value = field.prepare_value(
             DateTimeTZRange(
-                datetime.datetime(2015, 5, 22, 16, 6, 33, tzinfo=timezone.utc), None
+                datetime.datetime(2015, 5, 22, 16, 6, 33, tzinfo=datetime.timezone.utc),
+                None,
             )
         )
         self.assertEqual(value, [datetime.datetime(2015, 5, 22, 18, 6, 33), None])

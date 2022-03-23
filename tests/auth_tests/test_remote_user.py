@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from django.conf import settings
 from django.contrib.auth import authenticate
@@ -13,7 +13,6 @@ from django.test import (
     modify_settings,
     override_settings,
 )
-from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango50Warning
 
 
