@@ -1,10 +1,10 @@
 {% extends 'project_detail.html' %}
 {% load static %}
 
-{% block prev %}{% endblock prev %}
-{% block prev-url %} ... {% endblock prev-url %}
-{% block next %}Next: RevOps First-time User Experience{% endblock next %}
-{% block next-url %} {% url 'p_ro_ftux' %} {% endblock next-url %}
+{% block prev %}Back to list of projects{% endblock prev %}
+{% block prev-url %}{% url 'index' %}#projects{% endblock prev-url %}
+{% block next %}Next: RevOps Evolution of the Deal Editor UX{% endblock next %}
+{% block next-url %} {% url 'p_ro_deal_editor' %} {% endblock next-url %}
 
 <!-- # Project NAME -->
   {% block p-type %}
@@ -51,6 +51,7 @@
     <div class="row project-indiv">
       <div class="nine columns">
         <div class="project-indiv body">
+          <a href="{% url 'index' %}#projects">This is a test link</a>
           <p>The hero image is an animation I made to better explain what RevOps could do for those who were looking to standardize sales agreement templates for their sales team.</p>
         </div>
       </div>
