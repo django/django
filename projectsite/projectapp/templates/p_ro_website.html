@@ -36,16 +36,179 @@
 
 <!-- # Project INTRO IMG -->
   {% block p-introimg %}
+<<<<<<< Updated upstream
     <div class="row">
       <div class="twelve columns">
         <img src="{% static 'projectapp/imgs/prj/ro_website/_intro.png' %}" alt="..." class="border" width="100%"/>
       </div>
+=======
+  <div class="row project-indiv">
+    <!-- <div class="nine columns ro-website-video"> -->
+    <div class="nine columns">
+      <img src="{% static 'projectapp/imgs/prj/ro_website/_intro.png' %}" alt="..." class="" width="100%"/>
     </div>
+  </div>
+  <div class="row project-indiv">
+    <div class="nine columns ro-website-video">
+      <!-- Video -->
+      <div class="two-thirds column video-wrap">
+        <video
+          width="100%"
+          preload="auto"
+          playsinline
+          muted
+          controls="controls"
+          autoplay>
+            <source src="{% static 'projectapp/imgs/prj/ro_website/anim_hero.mp4' %}" type="video/mp4" />
+            <source src="{% static 'projectapp/imgs/prj/ro_website/anim_hero.webm' %}" type="video/webm" />
+        </video>
+      </div>
+    </div>
+    <div class="three columns">
+      <span class="block caption">
+        Lorem
+      </span>
+>>>>>>> Stashed changes
+    </div>
+  </div>
   {% endblock p-introimg %}
 
 
 
 <!-- # Actual PROJECT DETAILS & CONTENT -->
   {% block p-body %}
-    ...
+    {# TEMPLATE #}
+    <div class="row project-indiv">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          ...
+        </div>
+      </div>
+      <div class="columns three">
+        <div class="columns three">
+          <span class="block caption">
+            Lorem
+          </span>
+        </div>
+      </div>
+    </div>
+      <div class="row project-indiv">
+        <div class="nine columns">
+          <img src="{% static 'projectapp/imgs/prj/ro_website/templates_overview.png' %}" alt="..." class="" width="100%"/>
+        </div>
+        <div class="columns three">
+          <div class="columns three">
+            <span class="block caption">
+              Lorem
+            </span>
+          </div>
+        </div>
+      </div>
+    {# PAGES#}
+      <div class="row project-indiv">
+        <div class="nine columns">
+          <div class="project-indiv body">
+            ...
+          </div>
+        </div>
+      </div>
+      {# HOME#}
+
+        <div class="row project-indiv">
+          <div class="nine columns">
+            <div class="project-indiv body">
+              ...
+            </div>
+          </div>
+          <div class="columns three">
+            <div class="span block caption">
+              ...
+            </div>
+          </div>
+        </div>
+      {# FEATURES = TEMPLATES#}
+        <div class="row project-indiv">
+          <div class="nine columns">
+            <div class="project-indiv body">
+              <img src="{% static 'projectapp/imgs/prj/ro_website/page_deal_studio.png' %}" alt="..." class="space border x-top x-bottom" width="100%"/>
+            </div>
+          </div>
+          <div class="columns three">
+            <div class="columns three">
+              <span class="block caption">
+                ...
+              </span>
+            </div>
+          </div>
+        </div>
+      {# PRICING PAGE DESIGN#}
+        <div class="row project-indiv">
+          <div class="nine columns">
+            <div class="project-indiv body">
+              ...
+            </div>
+          </div>
+        </div>
+    {# OLD GRAPHICS - maybe use the graphics in the intro image#}
+      <div class="row project-indiv">
+        <div class="nine columns">
+          <img src="{% static 'projectapp/imgs/prj/ro_website/img_deal_studio.png' %}" alt="..." class="" width="70%"/>
+        </div>
+        <div class="columns three">
+          <div class="columns three">
+            <span class="block caption">
+              ...
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="row project-indiv">
+        <div class="nine columns">
+          <div class="one-half column">
+            <video
+              width="100%"
+              preload="auto"
+              playsinline
+              muted
+              controls="controls"
+              autoplay>
+                <source src="{% static 'projectapp/imgs/prj/ro_website/anim_hero.mp4' %}" type="video/mp4" />
+                <source src="{% static 'projectapp/imgs/prj/ro_website/anim_hero.webm' %}" type="video/webm" />
+            </video>
+          </div>
+          <div class="one-half column">
+            <video
+              width="100%"
+              preload="auto"
+              loop
+              playsinline
+              muted
+              autoplay>
+                <source src="{% static 'projectapp/imgs/prj/ro_website/anim_templates_slide.mp4' %}" type="video/mp4" />
+                <source src="{% static 'projectapp/imgs/prj/ro_website/anim_templates_slide.webm' %}" type="video/webm" />
+            </video>
+          </div>
+        </div>
+      </div>
+    {# Unused designs - Deal Rooms#}
+      <div class="row project-indiv">
+        <div class="nine columns">
+          <div class="project-indiv body">
+            ...
+          </div>
+        </div>
+      </div>
   {% endblock p-body %}
+<<<<<<< Updated upstream
+=======
+
+  <div class="row project-indiv">
+    <div class="nine columns">
+      <div class="project-indiv body">
+        ...
+      </div>
+    </div>
+  </div>
+
+  <img src="{% static 'projectapp/imgs/prj/ro_website/' %}" alt="..." class="" width="100%"/>
+>>>>>>> Stashed changes
