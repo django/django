@@ -801,19 +801,20 @@ class GDALBandTests(SimpleTestCase):
             rs = band = None
             self.assertTrue(os.path.isfile(pam_file))
 
+    def _remove_aux_file(self):
+        pam_file = self.rs_path + ".aux.xml"
+        if os.path.isfile(pam_file):
+            os.remove(pam_file)
+
     def test_read_mode_error(self):
         # Open raster in read mode
         rs = GDALRaster(self.rs_path, write=False)
         band = rs.bands[0]
+        self.addCleanup(self._remove_aux_file)
 
         # Setting attributes in write mode raises exception in the _flush method
-        try:
-            with self.assertRaises(GDALException):
-                setattr(band, "nodata_value", 10)
-        finally:
-            pam_file = self.rs_path + ".aux.xml"
-            if os.path.isfile(pam_file):
-                os.remove(pam_file)
+        with self.assertRaises(GDALException):
+            setattr(band, "nodata_value", 10)
 
     def test_band_data_setters(self):
         # Create in-memory raster and get band
