@@ -1,0 +1,116 @@
+{% extends 'project_detail.html' %}
+{% load static %}
+
+{% block prev %}Prev: RevOps Website{% endblock prev %}
+{% block prev-url %} {% url 'p_ro_website' %} {% endblock prev-url %}
+{% block next %}Next: Invite New User{% endblock next %}
+{% block next-url %} {% url 'p_codepen_invite' %} {% endblock next-url %}
+
+<!-- # Project NAME -->
+  {% block p-type %}
+    RevOps
+  {% endblock p-type %}
+  {% block p-name %}
+    The Evolution of the Deal Editor UX
+  {% endblock p-name %}
+
+
+<!-- # Project BLURB -->
+  {% block p-blurb %}
+    First-time user experience can make or break whether someone becomes a potential buyer. After a year of seeing what customers responded to, we reassessed who we were targeting and how to encourage them to take important first steps.
+  {% endblock p-blurb %}
+  {% block p-blurb-html %}
+  {% endblock p-blurb-html %}
+
+
+
+<!-- # Project METADATA 2 (ROLE & responsibilities) -->
+  {% block p-role %}
+    Product Designer
+  {% endblock p-role %}
+  {% block p-responsibilities %}
+    User journey mapping, visual design, product design
+  {% endblock p-responsibilities %}
+
+
+
+<!-- # Project INTRO IMG -->
+{% block p-introimg %}
+  <div class="row">
+    <div class="twelve columns border">
+      <!-- <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/_intro.gif' %}" alt="..." width="100%" class="space x-top x-bottom"/> -->
+      <video
+        width="100%"
+        preload="auto"
+        playsinline
+        muted
+        controls="controls"
+        autoplay>
+          <source src="{% static 'projectapp/imgs/prj/ro_deal_editor/_intro.mp4' %}" type="video/mp4" />
+          <source src="{% static 'projectapp/imgs/prj/ro_deal_editor/_intro.webm' %}" type="video/webm" />
+      </video>
+    </div>
+  </div>
+{% endblock p-introimg %}
+
+
+
+<!-- # Actual PROJECT DETAILS & CONTENT -->
+  {% block p-body %}
+    <div class="row project-indiv">
+      <div class="twelve columns">
+        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/sketch_salesops.png' %}" alt="..." class="space top bottom" width="100%"/></div>
+        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/sketch_salesops2.png' %}" alt="..." class="space top bottom" width="100%"/></div>
+      </div>
+    </div>
+    <div class="row project-indiv">
+      <div class="twelve columns">
+        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/sketch_sales.png' %}" alt="..." class="space top bottom" width="100%"/></div>
+        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/sketch_sales2.png' %}" alt="..." class="space top bottom" width="100%"/></div>
+      </div>
+    </div>
+    <div class="row project-indiv">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/template_gallery_cr.png' %}" alt="..." class="border" width="100%"/>
+        </div>
+      </div>
+    </div>
+    <div class="row project-indiv">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/template_in_app.gif' %}" alt="..." class="border" width="100%"/>
+        </div>
+      </div>
+    </div>
+    <!-- DEAL EDITOR  -->
+    <div class="row project-indiv">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <h3 class="h4">Future steps</h3>
+          <p></p>
+          ...
+        </div>
+      </div>
+    </div>
+    <div class="row project-indiv">
+      <div class="twelve columns">
+        <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/deal_editor_future.png' %}" alt="..." class="" width="100%"/>
+      </div>
+    </div>
+    <div class="row project-indiv">
+      <div class="twelve columns">
+        <div class="one-third column">
+          <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/deal_editor_nav_m_loop.gif' %}" alt="..." class="" width="100%"/>
+        </div>
+      </div>
+    </div>
+  {% endblock p-body %}
+
+  <div class="row project-indiv">
+    <div class="nine columns">
+      <div class="project-indiv body">
+        ...
+      </div>
+    </div>
+  </div>

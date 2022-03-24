@@ -17,8 +17,8 @@ def project_detail(request):
 #     return render(request, 'p_.html')
 def p_ro_website(request):
     return render(request, 'p_ro_website.html')
-def p_ro_ftux(request):
-    return render(request, 'p_ro_ftux.html')
+def p_ro_deal_editor(request):
+    return render(request, 'p_ro_deal_editor.html')
 def p_codepen_invite(request):
     return render(request, 'p_codepen_invite.html')
 def p_codepen_dashboard(request):
