@@ -306,7 +306,7 @@ body {margin: 0 auto;}
         display: inline-block;
         margin-right: 2rem;
       }
-      img {
+      img, div {
         &.border {border: 1px solid $dusty-blue;}
         &.space {
           &.top {margin-top: 1rem;}
@@ -342,7 +342,6 @@ body {margin: 0 auto;}
           display: inline;
           top: -1rem;
           color: $blue;
-          // max-width: 10rem;
           &:hover {
             border-bottom-color: #D9EAFD;
             .line {
@@ -363,13 +362,10 @@ body {margin: 0 auto;}
     }
     // RevOps Website Hero Image
       .ro-website-video {
-        // background: url('../imgs/bg_pattern.png') #042873 cover no-repeat center center;
-        // background-color: #042873;
         background-image: url('../imgs/bg_pattern_lite.png');
         background-position: center;
         background-size: cover;
         width: 100%;
-        // padding: 2rem 1rem;
         display: flex;
         align-items: center;
         justify-content: center;
