@@ -17,7 +17,7 @@
 
 <!-- # Project BLURB -->
   {% block p-blurb %}
-    ...
+    I established the branding for RevOps in 2018-2020. I wanted to bring a sense of ease, friendliness, and dynamism to the (sometimes very dry) subject of revenue operations. This is a snippet of the various works I made: reusable layout templates, designs for the home and feature pages, and animations and graphics.
   {% endblock p-blurb %}
   {% block p-blurb-html %}
     ...
@@ -26,26 +26,135 @@
 
 <!-- # Project METADATA 2 (ROLE & responsibilities) -->
   {% block p-role %}
-    ...
+    Lead Designer
   {% endblock p-role %}
   {% block p-responsibilities %}
-    ...
+    Branding, visual, layout &amp; page designs, templatization, illustrations, animations
   {% endblock p-responsibilities %}
 
 
 
 <!-- # Project INTRO IMG -->
   {% block p-introimg %}
-    <div class="row">
-      <div class="twelve columns">
-        <img src="{% static 'projectapp/imgs/prj/ro_website/_intro.png' %}" alt="..." class="border" width="100%"/>
-      </div>
+  <div class="row project-indiv">
+    <!-- <div class="nine columns ro-website-video"> -->
+    <div class="twelve columns">
+      <img src="{% static 'projectapp/imgs/prj/ro_website/_intro.png' %}" alt="..." class="space x-bottom" width="100%"/>
     </div>
+  </div>
   {% endblock p-introimg %}
 
 
 
 <!-- # Actual PROJECT DETAILS & CONTENT -->
   {% block p-body %}
-    ...
+    <div class="row project-indiv">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <p>The hero image is an animation I made to better explain what RevOps could do for those who were looking to standardize sales agreement templates for their sales team.</p>
+        </div>
+      </div>
+    </div>
+    <div class="row project-indiv">
+      <div class="nine columns ro-website-video space x-bottom">
+        <!-- Video -->
+        <div class="two-thirds column video-wrap">
+          <video
+            width="100%"
+            preload="auto"
+            playsinline
+            muted
+            controls="controls"
+            autoplay>
+              <source src="{% static 'projectapp/imgs/prj/ro_website/anim_hero.mp4' %}" type="video/mp4" />
+              <source src="{% static 'projectapp/imgs/prj/ro_website/anim_hero.webm' %}" type="video/webm" />
+          </video>
+        </div>
+      </div>
+      <div class="three columns">
+        <span class="block caption">
+          This animation was created in Adobe After Effects
+        </span>
+      </div>
+    </div>
+    {# TEMPLATE #}
+      <div class="row project-indiv">
+        <div class="nine columns">
+          <div class="project-indiv body">
+            <h3 class="h4">Creating reusable page templates + establishing a design system</h3>
+            <p>I worked with Marketing to build reusable layout templates to empower the team to quickly deploy and experiment with marketing content without bothering engineering.</p>
+          </div>
+        </div>
+      </div>
+      <div class="row project-indiv">
+        <div class="nine columns">
+          <img src="{% static 'projectapp/imgs/prj/ro_website/templates_overview.png' %}" alt="..." class="space" width="100%"/>
+        </div>
+        <div class="three columns">
+          <span class="caption block">
+            Each section of these page templates were self-contained and therefore could be changed and updated as Marketing saw fit.
+          </span>
+        </div>
+      </div>
+      <div class="row project-indiv">
+        <div class="nine columns">
+          <div class="project-indiv body">
+            <p>My colleague and fellow designer Mario Nikolic suggested the Atomic Design Methodology where we would break down elements of the web pages into discrete units and turn them into components to begin establishing a strong design system for RevOps.</p>
+          </div>
+        </div>
+      </div>
+      <div class="row project-indiv">
+        <div class="nine columns">
+          <img src="{% static 'projectapp/imgs/prj/ro_website/component_atom_molecule.png' %}" alt="..." class="space" width="100%"/>
+          <img src="{% static 'projectapp/imgs/prj/ro_website/component_organism.png' %}" alt="..." class="space x-bottom" width="100%"/>
+        </div>
+        <div class="columns three">
+          <span class="block caption">
+            Examples of Atom, Molecule, and Organism components. Atoms make up Molecules, which in turn make up Organism components.
+          </span>
+        </div>
+      </div>
+    {# PAGES#}
+      <div class="row project-indiv">
+        <div class="nine columns">
+          <div class="project-indiv body">
+            <h3 class="h4">Feature pages</h3>
+            <p>The following are a small collection of the pages I created for the marketing website. Below are the Deal Studio page and the Pricing page.</p>
+          </div>
+        </div>
+      </div>
+      {# HOME#}
+        <div class="row project-indiv">
+          <div class="twelve columns">
+            <div class="one-half column">
+              <img src="{% static 'projectapp/imgs/prj/ro_website/page_deal_studio.png' %}" alt="..." class="space border x-bottom" width="100%"/>
+              <p class="caption">Below is a detail view at the animation that was originally on the Templates Studio page.</p>
+              <video
+                width="100%"
+                preload="auto"
+                playsinline
+                muted
+                autoplay>
+                  <source src="{% static 'projectapp/imgs/prj/ro_website/anim_templates_slide.mp4' %}" type="video/mp4" />
+                  <source src="{% static 'projectapp/imgs/prj/ro_website/anim_templates_slide.webm' %}" type="video/webm" />
+              </video>
+            </div>
+            <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_website/page_pricing.png' %}" alt="..." class="space border x-bottom" width="100%"/></div>
+          </div>
+          <div class="columns three">
+            <div class="span block caption">
+              ...
+            </div>
+          </div>
+        </div>
   {% endblock p-body %}
+
+  <div class="row project-indiv">
+    <div class="nine columns">
+      <div class="project-indiv body">
+        ...
+      </div>
+    </div>
+  </div>
+
+  <img src="{% static 'projectapp/imgs/prj/ro_website/' %}" alt="..." class="" width="100%"/>
