@@ -88,6 +88,19 @@ def get_timezones(key):
     return [constructor(key) for constructor in ZONE_CONSTRUCTORS]
 
 
+class UTCAliasTests(SimpleTestCase):
+    def test_alias_deprecation_warning(self):
+        msg = (
+            "The django.utils.timezone.utc alias is deprecated. "
+            "Please update your code to use datetime.timezone.utc instead."
+        )
+        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
+            timezone.utc
+
+    def test_timezone_module_dir_includes_utc(self):
+        self.assertIn("utc", dir(timezone))
+
+
 @contextmanager
 def override_database_connection_timezone(timezone):
     try:

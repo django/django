@@ -545,6 +545,9 @@ Miscellaneous
   :meth:`.RemoteUserBackend.configure_user`. Support  for ``RemoteUserBackend``
   subclasses that do not accept this argument is deprecated.
 
+* The :data:`django.utils.timezone.utc` alias to :attr:`datetime.timezone.utc`
+  is deprecated. Use :attr:`datetime.timezone.utc` directly.
+
 Features removed in 4.1
 =======================
 
