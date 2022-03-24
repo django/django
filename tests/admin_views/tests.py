@@ -911,7 +911,11 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_logout_and_password_change_URLs(self):
         response = self.client.get(reverse("admin:admin_views_article_changelist"))
-        self.assertContains(response, '<a href="%s">' % reverse("admin:logout"))
+        self.assertContains(
+            response,
+            '<form id="logout-form" method="post" action="%s">'
+            % reverse("admin:logout"),
+        )
         self.assertContains(
             response, '<a href="%s">' % reverse("admin:password_change")
         )
@@ -1411,14 +1415,15 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             reverse("admin:app_list", args=("admin_views",)),
             reverse("admin:admin_views_article_delete", args=(self.a1.pk,)),
             reverse("admin:admin_views_article_history", args=(self.a1.pk,)),
-            # Login must be after logout.
-            reverse("admin:logout"),
-            reverse("admin:login"),
         ]
         for url in tests:
             with self.subTest(url=url):
                 with self.assertNoLogs("django.template", "DEBUG"):
                     self.client.get(url)
+        # Login must be after logout.
+        with self.assertNoLogs("django.template", "DEBUG"):
+            self.client.post(reverse("admin:logout"))
+            self.client.get(reverse("admin:login"))
 
     def test_render_delete_selected_confirmation_no_subtitle(self):
         post_data = {
@@ -1833,7 +1838,7 @@ class CustomModelAdminTest(AdminViewBasicTestCase):
         self.assertContains(response, "Hello from a custom login template")
 
     def test_custom_admin_site_logout_template(self):
-        response = self.client.get(reverse("admin2:logout"))
+        response = self.client.post(reverse("admin2:logout"))
         self.assertIsInstance(response, TemplateResponse)
         self.assertTemplateUsed(response, "custom_admin/logout.html")
         self.assertContains(response, "Hello from a custom logout template")
@@ -2050,7 +2055,7 @@ class AdminViewPermissionsTest(TestCase):
         login = self.client.post(login_url, self.super_login)
         self.assertRedirects(login, self.index_url)
         self.assertFalse(login.context)
-        self.client.get(reverse("admin:logout"))
+        self.client.post(reverse("admin:logout"))
 
         # Test if user enters email address
         response = self.client.get(self.index_url)
@@ -2072,7 +2077,7 @@ class AdminViewPermissionsTest(TestCase):
         login = self.client.post(login_url, self.viewuser_login)
         self.assertRedirects(login, self.index_url)
         self.assertFalse(login.context)
-        self.client.get(reverse("admin:logout"))
+        self.client.post(reverse("admin:logout"))
 
         # Add User
         response = self.client.get(self.index_url)
@@ -2080,7 +2085,7 @@ class AdminViewPermissionsTest(TestCase):
         login = self.client.post(login_url, self.adduser_login)
         self.assertRedirects(login, self.index_url)
         self.assertFalse(login.context)
-        self.client.get(reverse("admin:logout"))
+        self.client.post(reverse("admin:logout"))
 
         # Change User
         response = self.client.get(self.index_url)
@@ -2088,7 +2093,7 @@ class AdminViewPermissionsTest(TestCase):
         login = self.client.post(login_url, self.changeuser_login)
         self.assertRedirects(login, self.index_url)
         self.assertFalse(login.context)
-        self.client.get(reverse("admin:logout"))
+        self.client.post(reverse("admin:logout"))
 
         # Delete User
         response = self.client.get(self.index_url)
@@ -2096,7 +2101,7 @@ class AdminViewPermissionsTest(TestCase):
         login = self.client.post(login_url, self.deleteuser_login)
         self.assertRedirects(login, self.index_url)
         self.assertFalse(login.context)
-        self.client.get(reverse("admin:logout"))
+        self.client.post(reverse("admin:logout"))
 
         # Regular User should not be able to login.
         response = self.client.get(self.index_url)
@@ -2137,7 +2142,7 @@ class AdminViewPermissionsTest(TestCase):
         )
         self.assertRedirects(login, reverse("has_permission_admin:index"))
         self.assertFalse(login.context)
-        self.client.get(reverse("has_permission_admin:logout"))
+        self.client.post(reverse("has_permission_admin:logout"))
 
         # Staff should be able to login.
         response = self.client.get(reverse("has_permission_admin:index"))
@@ -2152,7 +2157,7 @@ class AdminViewPermissionsTest(TestCase):
         )
         self.assertRedirects(login, reverse("has_permission_admin:index"))
         self.assertFalse(login.context)
-        self.client.get(reverse("has_permission_admin:logout"))
+        self.client.post(reverse("has_permission_admin:logout"))
 
     def test_login_successfully_redirects_to_original_URL(self):
         response = self.client.get(self.index_url)
@@ -2192,7 +2197,7 @@ class AdminViewPermissionsTest(TestCase):
         login = self.client.post(login_url, self.super_login)
         self.assertRedirects(login, self.index_url)
         self.assertFalse(login.context)
-        self.client.get(reverse("admin:logout"))
+        self.client.post(reverse("admin:logout"))
 
     def test_login_page_notice_for_non_staff_users(self):
         """
@@ -2234,7 +2239,7 @@ class AdminViewPermissionsTest(TestCase):
         post = self.client.post(reverse("admin:admin_views_article_add"), add_dict)
         self.assertEqual(post.status_code, 403)
         self.assertEqual(Article.objects.count(), 3)
-        self.client.get(reverse("admin:logout"))
+        self.client.post(reverse("admin:logout"))
 
         # View User should not have access to add articles
         self.client.force_login(self.viewuser)
@@ -2268,7 +2273,7 @@ class AdminViewPermissionsTest(TestCase):
             '<li class="success">The article “Døm ikke” was added successfully.</li>',
         )
         article.delete()
-        self.client.get(reverse("admin:logout"))
+        self.client.post(reverse("admin:logout"))
 
         # Add user may login and POST to add view, then redirect to admin root
         self.client.force_login(self.adduser)
@@ -2289,7 +2294,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(Article.objects.count(), 4)
         self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(mail.outbox[0].subject, "Greetings from a created object")
-        self.client.get(reverse("admin:logout"))
+        self.client.post(reverse("admin:logout"))
 
         # The addition was logged correctly
         addition_log = LogEntry.objects.all()[0]
@@ -2316,7 +2321,7 @@ class AdminViewPermissionsTest(TestCase):
         post = self.client.post(reverse("admin:admin_views_article_add"), add_dict)
         self.assertRedirects(post, reverse("admin:admin_views_article_changelist"))
         self.assertEqual(Article.objects.count(), 5)
-        self.client.get(reverse("admin:logout"))
+        self.client.post(reverse("admin:logout"))
 
         # 8509 - if a normal user is already logged in, it is possible
         # to change user into the superuser without error
@@ -2371,7 +2376,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(response.status_code, 403)
         post = self.client.post(article_change_url, change_dict)
         self.assertEqual(post.status_code, 403)
-        self.client.get(reverse("admin:logout"))
+        self.client.post(reverse("admin:logout"))
 
         # view user can view articles but not make changes.
         self.client.force_login(self.viewuser)
@@ -2397,7 +2402,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(
             Article.objects.get(pk=self.a1.pk).content, "<p>Middle content</p>"
         )
-        self.client.get(reverse("admin:logout"))
+        self.client.post(reverse("admin:logout"))
 
         # change user can view all items and edit them
         self.client.force_login(self.changeuser)
@@ -2443,7 +2448,7 @@ class AdminViewPermissionsTest(TestCase):
                 "errors"
             ),
         )
-        self.client.get(reverse("admin:logout"))
+        self.client.post(reverse("admin:logout"))
 
         # Test redirection when using row-level change permissions. Refs #11513.
         r1 = RowLevelChangePermissionModel.objects.create(id=1, name="odd id")
@@ -2502,7 +2507,7 @@ class AdminViewPermissionsTest(TestCase):
                 )
                 self.assertRedirects(response, self.index_url)
 
-                self.client.get(reverse("admin:logout"))
+                self.client.post(reverse("admin:logout"))
 
         for login_user in [self.joepublicuser, self.nostaffuser]:
             with self.subTest(login_user.username):
@@ -2525,7 +2530,7 @@ class AdminViewPermissionsTest(TestCase):
                     RowLevelChangePermissionModel.objects.get(id=2).name, "changed"
                 )
                 self.assertContains(response, "login-form")
-                self.client.get(reverse("admin:logout"))
+                self.client.post(reverse("admin:logout"))
 
     def test_change_view_without_object_change_permission(self):
         """
@@ -2785,7 +2790,7 @@ class AdminViewPermissionsTest(TestCase):
             reverse("admin:admin_views_article_history", args=(self.a1.pk,))
         )
         self.assertEqual(response.status_code, 403)
-        self.client.get(reverse("admin:logout"))
+        self.client.post(reverse("admin:logout"))
 
         # view user can view all items
         self.client.force_login(self.viewuser)
@@ -2793,7 +2798,7 @@ class AdminViewPermissionsTest(TestCase):
             reverse("admin:admin_views_article_history", args=(self.a1.pk,))
         )
         self.assertEqual(response.status_code, 200)
-        self.client.get(reverse("admin:logout"))
+        self.client.post(reverse("admin:logout"))
 
         # change user can view all items and edit them
         self.client.force_login(self.changeuser)
@@ -2829,7 +2834,7 @@ class AdminViewPermissionsTest(TestCase):
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, 200)
 
-                self.client.get(reverse("admin:logout"))
+                self.client.post(reverse("admin:logout"))
 
         for login_user in [self.joepublicuser, self.nostaffuser]:
             with self.subTest(login_user.username):
@@ -2847,7 +2852,7 @@ class AdminViewPermissionsTest(TestCase):
                 response = self.client.get(url, follow=True)
                 self.assertContains(response, "login-form")
 
-                self.client.get(reverse("admin:logout"))
+                self.client.post(reverse("admin:logout"))
 
     def test_history_view_bad_url(self):
         self.client.force_login(self.changeuser)
@@ -3229,7 +3234,7 @@ class AdminViewsNoUrlTest(TestCase):
         r = self.client.get(reverse("admin:index"))
         # we shouldn't get a 500 error caused by a NoReverseMatch
         self.assertEqual(r.status_code, 200)
-        self.client.get(reverse("admin:logout"))
+        self.client.post(reverse("admin:logout"))
 
 
 @skipUnlessDBFeature("can_defer_constraint_checks")
@@ -3933,10 +3938,10 @@ class AdminViewListEditable(TestCase):
         # 4 action inputs (3 regular checkboxes, 1 checkbox to select all)
         # main form submit button = 1
         # search field and search submit button = 2
-        # CSRF field = 1
+        # CSRF field = 2
         # field to track 'select all' across paginated views = 1
-        # 6 + 4 + 4 + 1 + 2 + 1 + 1 = 19 inputs
-        self.assertContains(response, "<input", count=20)
+        # 6 + 4 + 4 + 1 + 2 + 2 + 1 = 20 inputs
+        self.assertContains(response, "<input", count=21)
         # 1 select per object = 3 selects
         self.assertContains(response, "<select", count=4)
 
@@ -4513,6 +4518,7 @@ class AdminInheritedInlinesTest(TestCase):
         # test the add case
         response = self.client.get(reverse("admin:admin_views_persona_add"))
         names = name_re.findall(response.content)
+        names.remove(b"csrfmiddlewaretoken")
         # make sure we have no duplicate HTML names
         self.assertEqual(len(names), len(set(names)))
 
@@ -4549,6 +4555,7 @@ class AdminInheritedInlinesTest(TestCase):
             reverse("admin:admin_views_persona_change", args=(persona_id,))
         )
         names = name_re.findall(response.content)
+        names.remove(b"csrfmiddlewaretoken")
         # make sure we have no duplicate HTML names
         self.assertEqual(len(names), len(set(names)))
 
@@ -5366,7 +5373,7 @@ class NeverCacheTests(TestCase):
 
     def test_logout(self):
         "Check the never-cache status of logout view"
-        response = self.client.get(reverse("admin:logout"))
+        response = self.client.post(reverse("admin:logout"))
         self.assertEqual(get_max_age(response), 0)
 
     def test_password_change(self):
@@ -6221,7 +6228,8 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         self.assertNotContains(response, 'name="posted"')
         # 3 fields + 2 submit buttons + 5 inline management form fields, + 2
         # hidden fields for inlines + 1 field for the inline + 2 empty form
-        self.assertContains(response, "<input", count=16)
+        # + 1 logout form.
+        self.assertContains(response, "<input", count=17)
         self.assertContains(response, formats.localize(datetime.date.today()))
         self.assertContains(response, "<label>Awesomeness level:</label>")
         self.assertContains(response, "Very awesome.")
@@ -7335,7 +7343,7 @@ class AdminViewLogoutTests(TestCase):
 
     def test_logout(self):
         self.client.force_login(self.superuser)
-        response = self.client.get(reverse("admin:logout"))
+        response = self.client.post(reverse("admin:logout"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "registration/logged_out.html")
         self.assertEqual(response.request["PATH_INFO"], reverse("admin:logout"))
@@ -7345,13 +7353,13 @@ class AdminViewLogoutTests(TestCase):
         )  # user-tools div shouldn't visible.
 
     def test_client_logout_url_can_be_used_to_login(self):
-        response = self.client.get(reverse("admin:logout"))
+        response = self.client.post(reverse("admin:logout"))
         self.assertEqual(
             response.status_code, 302
         )  # we should be redirected to the login page.
 
         # follow the redirect and test results.
-        response = self.client.get(reverse("admin:logout"), follow=True)
+        response = self.client.post(reverse("admin:logout"), follow=True)
         self.assertContains(
             response,
             '<input type="hidden" name="next" value="%s">' % reverse("admin:index"),

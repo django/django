@@ -436,6 +436,8 @@ Miscellaneous
 * The ``size`` argument of the undocumented
   ``django.views.static.was_modified_since()`` function is removed.
 
+* The admin log out UI now uses ``POST`` requests.
+
 .. _deprecated-features-4.1:
 
 Features deprecated in 4.1
