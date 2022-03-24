@@ -904,6 +904,9 @@ class BaseDatabaseSchemaEditor:
         actions = []
         null_actions = []
         post_actions = []
+        # Type suffix change? (e.g. auto increment).
+        old_type_suffix = old_field.db_type_suffix(connection=self.connection)
+        new_type_suffix = new_field.db_type_suffix(connection=self.connection)
         # Collation change?
         old_collation = getattr(old_field, "db_collation", None)
         new_collation = getattr(new_field, "db_collation", None)
@@ -914,7 +917,7 @@ class BaseDatabaseSchemaEditor:
             )
             actions.append(fragment)
         # Type change?
-        elif old_type != new_type:
+        elif (old_type, old_type_suffix) != (new_type, new_type_suffix):
             fragment, other_actions = self._alter_column_type_sql(
                 model, old_field, new_field, new_type
             )

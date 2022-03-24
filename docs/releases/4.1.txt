@@ -309,6 +309,9 @@ Models
   allows customizing attributes of fields that don't affect a column
   definition.
 
+* On PostgreSQL, ``AutoField``, ``BigAutoField``, and ``SmallAutoField`` are
+  now created as identity columns rather than serial columns with sequences.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
