@@ -11,7 +11,7 @@
     RevOps
   {% endblock p-type %}
   {% block p-name %}
-    The Evolution of the Deal Editor UX
+    Deal Editor
   {% endblock p-name %}
 
 
@@ -62,9 +62,9 @@
         <div class="project-indiv body">
           <h2 class="new-section">Project Details</h2>
           <h3 class="h4">Context</h3>
-          <p>The Deal Editor in RevOps is a tool to create a standardized Sales Agreement easily. Sales Operations can create “templates” and Sales could then use those templates and edit prices and additional products, but if they exceed a certain threshold (i.e. price change is beyond 10% or they have removed/added a product/service they shouldn’t have).</p>
+          <p>The Deal Editor in RevOps is a tool to create a standardized Sales Agreement easily. Sales Operations can create “templates” and Sales could then use those templates and edit prices and additional products, but if they exceed a certain threshold (i.e. price change is beyond 10%).</p>
           <h3>Where we started</h3>
-          <p>Before adopting RevOps our users were working with silo’d programs such as Microsoft Word and Excel – this made it extremely difficult to easily experiment with pricing on-the-fly because none of the changes would be tracked; no one would know *who* made the pricing change; and it is not obvious that any pricing change were made until you open up the file itself.</p>
+          <p>Before adopting RevOps our users were working with silo’d programs such as Microsoft Word and Excel – this made it extremely difficult to easily experiment with pricing on-the-fly because none of the changes would be tracked; no one would know <i>who</i> made the pricing change; and it is not obvious that any pricing change were made until you open up the file itself.</p>
           <p>The first version of RevOps solved these pains by becoming the source of truth for products/SKUs, pricing, and deal information.</p>
         </div>
       </div>
@@ -90,7 +90,6 @@
               <span class="circle-number sm">1</span>
               <span class="goal-text">
                 <h3 class="h4">How might we make the Deal Editor even more intuitive so that SalesOps doesn’t have to spend time training their teams to use the tool?</h3>
-                lorem
               </span>
             </li>
             <li>
@@ -107,18 +106,18 @@
   <!--  -->
     <div class="row project-indiv">
       <div class="twelve columns">
-        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/sketch_salesops.png' %}" alt="..." class="space top bottom" width="100%"/>
-          <p class="caption">Above: I hope this works</p>
+        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/sketch_salesops.png' %}" alt="..." class="space top " width="100%"/>
+          <p class="caption"><strong>Above</strong> User journey exercise for the SalesOps persona.</p>
         </div>
-        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/sketch_salesops2.png' %}" alt="..." class="space top bottom" width="100%"/>
-          <p class="caption">Below: I hope this works</p>
+        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/sketch_salesops2.png' %}" alt="..." class="space top " width="100%"/>
+          <p class="caption"><strong>Below</strong> User journey exercise for the Sales Rep persona.</p>
         </div>
       </div>
     </div>
     <div class="row project-indiv">
       <div class="twelve columns">
-        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/sketch_sales.png' %}" alt="..." class="space top bottom" width="100%"/></div>
-        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/sketch_sales2.png' %}" alt="..." class="space top bottom" width="100%"/></div>
+        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/sketch_sales.png' %}" alt="..." class="space top x-bottom" width="100%"/></div>
+        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/sketch_sales2.png' %}" alt="..." class="space top x-bottom" width="100%"/></div>
       </div>
     </div>
     <div class="row project-indiv">
@@ -141,23 +140,23 @@
               <source src="{% static 'projectapp/imgs/prj/ro_deal_editor/_intro.mp4' %}" type="video/mp4" />
               <source src="{% static 'projectapp/imgs/prj/ro_deal_editor/_intro.webm' %}" type="video/webm" />
           </video>
+          <p class="caption">The above video shows the new UI for showing price adjustments and informing the Sales Rep of any needed approvals.</p>
       </div>
     </div>
     <div class="row project-indiv">
       <div class="twelve columns">
           <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/img_deal_editor_future.png' %}" alt="..." class="space top bottom" width="100%"/>
+          <p class="caption">The mock above is an overview of the design improvements we explored: Table of Contents for easy navigation of the sales agreement, and ablity to add comments on specific parts of the deal.</p>
       </div>
     </div>
     <!-- Price Adjustment -->
     <div class="row project-indiv">
       <div class="twelve columns">
         <div class="column one-half">
-          <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/img_price_adj.png' %}" alt="..." class="space top bottom" width="100%"/>
-          <p class="caption">asdf</p>
+          <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/img_ToC.png' %}" alt="..." class="space top bottom" width="100%"/>
         </div>
         <div class="column one-half">
-          <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/img_ToC.png' %}" alt="..." class="space top bottom" width="100%"/>
-          <p class="caption">This</p>
+          <p class="caption">The "Table of Contents" on the left serves as a way for quick navigation to different parts of the deal. It also highlights the parts where required fields may be missing – making if extremely easy for Sales Reps to know what they need to fill out.</p>
         </div>
       </div>
     </div>
