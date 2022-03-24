@@ -1570,11 +1570,7 @@ class SchemaTests(TransactionTestCase):
         Author.objects.create(name="Foo")
         Author.objects.create(name="Bar")
 
-    def test_alter_autofield_pk_to_bigautofield_pk_sequence_owner(self):
-        """
-        Converting an implicit PK to BigAutoField(primary_key=True) should keep
-        a sequence owner on PostgreSQL.
-        """
+    def test_alter_autofield_pk_to_bigautofield_pk(self):
         with connection.schema_editor() as editor:
             editor.create_model(Author)
         old_field = Author._meta.get_field("id")
@@ -1591,14 +1587,9 @@ class SchemaTests(TransactionTestCase):
             )
             if sequence_reset_sqls:
                 cursor.execute(sequence_reset_sqls[0])
-        # Fail on PostgreSQL if sequence is missing an owner.
         self.assertIsNotNone(Author.objects.create(name="Bar"))
 
-    def test_alter_autofield_pk_to_smallautofield_pk_sequence_owner(self):
-        """
-        Converting an implicit PK to SmallAutoField(primary_key=True) should
-        keep a sequence owner on PostgreSQL.
-        """
+    def test_alter_autofield_pk_to_smallautofield_pk(self):
         with connection.schema_editor() as editor:
             editor.create_model(Author)
         old_field = Author._meta.get_field("id")
@@ -1615,7 +1606,6 @@ class SchemaTests(TransactionTestCase):
             )
             if sequence_reset_sqls:
                 cursor.execute(sequence_reset_sqls[0])
-        # Fail on PostgreSQL if sequence is missing an owner.
         self.assertIsNotNone(Author.objects.create(name="Bar"))
 
     def test_alter_int_pk_to_autofield_pk(self):
