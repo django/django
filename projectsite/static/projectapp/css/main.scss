@@ -218,13 +218,13 @@ body {margin: 0 auto;}
       transition: $fast;
       background: no-repeat center center gray cover;
 
-      &.ro-website {background-image:url("../imgs/th-ro-website.png"); &:hover {background-image:url("../imgs/th-ro-website2.png");}}
-      &.ro-deal-editor {background-image:url("../imgs/th-ro-deal-editor.png"); &:hover {background-image:url("../imgs/th-ro-deal-editor2.png");}}
-      &.codepen-invite {background-image:url("../imgs/th-codepen-invite.png");opacity: 0.85; &:hover {opacity: 1;}}
+      &.ro-website {background-image:url("../imgs/th-ro-website2.png");}
+      &.ro-deal-editor {background-image:url("../imgs/th-ro-deal-editor2.png");}
+      &.codepen-invite {background-image:url("../imgs/th-codepen-invite.png");opacity: 0.85;}
       &.codepen-dashboard {background-image:url("../imgs/th-codepen-dashboard.png");opacity: 0.85; &:hover {opacity: 1;}}
-      &.rev-design {background-image:url("../imgs/th-rev-design.png"); &:hover {background-image:url("../imgs/th-rev-design2.png");}}
-      &.rev-email {background-image:url("../imgs/th-rev-email.png"); &:hover {background-image:url("../imgs/th-rev-email2.png");}}
-      &.rev-mktg {background-image:url("../imgs/th-rev-mktg.png"); &:hover {background-image:url("../imgs/th-rev-mktg2.png");}}
+      &.rev-design {background-image:url("../imgs/th-rev-design2.png");}
+      &.rev-email {background-image:url("../imgs/th-rev-email2.png");}
+      &.rev-mktg {background-image:url("../imgs/th-rev-mktg2.png"); }
       &.print {background-image:url("../imgs/th-print.png");opacity:0.85; &:hover {opacity: 1;}}
       &.portfolio {background-image:url("../imgs/th-portfolio.png");}
 

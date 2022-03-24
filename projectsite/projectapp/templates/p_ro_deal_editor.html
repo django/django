@@ -17,7 +17,7 @@
 
 <!-- # Project BLURB -->
   {% block p-blurb %}
-    First-time user experience can make or break whether someone becomes a potential buyer. After a year of seeing what customers responded to, we reassessed who we were targeting and how to encourage them to take important first steps.
+  The Deal Editor was the most-used part of the RevOps platform. SalesOps and Sales teams used it to streamline their sales agreement process. After a year of watching users and receiving feedback, we identified key points to improve its UX to make it even more attractive to brand new customers.
   {% endblock p-blurb %}
   {% block p-blurb-html %}
   {% endblock p-blurb-html %}
@@ -29,7 +29,7 @@
     Product Designer
   {% endblock p-role %}
   {% block p-responsibilities %}
-    User journey mapping, visual design, product design
+    User journey mapping, prototyping, visual design, product design
   {% endblock p-responsibilities %}
 
 
@@ -58,9 +58,61 @@
 <!-- # Actual PROJECT DETAILS & CONTENT -->
   {% block p-body %}
     <div class="row project-indiv">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <h2 class="new-section">Project Details</h2>
+          <h3 class="h4">Context</h3>
+          <p>The Deal Editor in RevOps is a tool to create a standardized Sales Agreement easily. Sales Operations can create “templates” and Sales could then use those templates and edit prices and additional products, but if they exceed a certain threshold (i.e. price change is beyond 10% or they have removed/added a product/service they shouldn’t have).</p>
+          <h3>Where we started</h3>
+          <p>Before adopting RevOps our users were working with silo’d programs such as Microsoft Word and Excel – this made it extremely difficult to easily experiment with pricing on-the-fly because none of the changes would be tracked; no one would know *who* made the pricing change; and it is not obvious that any pricing change were made until you open up the file itself.</p>
+          <p>The first version of RevOps solved these pains by becoming the source of truth for products/SKUs, pricing, and deal information.</p>
+        </div>
+      </div>
+    </div>
+    <div class="row project-indiv">
+      <div class="nine columns">
+        <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/template_in_app.gif' %}" alt="..." class="space top bottom" width="100%"/>
+      </div>
+      <div class="three columns">
+        <span class="block caption">
+          Caption
+        </span>
+      </div>
+    </div>
+    <!--  -->
+    <div class="row project-indiv">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <p>The Deal Editor is the most-used part of the RevOps platform. To make it enticing to brand new users who may sign up for the service itself, we wanted to explore how we could make the tool’s UX better and even stickier. I made a <strong>user journey map</strong> for 2 personas – Sales Operations and Sales – to track potential questions, concerns, and hopes a brand new user may have.</p>
+          <p>I came with 2 goals for the new design:</p>
+          <ol class="goals-list sm">
+            <li>
+              <span class="circle-number sm">1</span>
+              <span class="goal-text">
+                <h3 class="h4">How might we make the Deal Editor even more intuitive so that SalesOps doesn’t have to spend time training their teams to use the tool?</h3>
+                lorem
+              </span>
+            </li>
+            <li>
+              <span class="circle-number sm">2</span>
+              <span class="goal-text">
+                <h3 class="h4">How might we give Sales Reps immediate feedback and context for whether their deal customization will trigger a need for manual approval? </h3>
+                Since time is of the essence, Sales Reps would like to estimate what criteria would cause a manual approval vs. automatic approval. That way they could craft the best deal possibly given the situation.
+              </span>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  <!--  -->
+    <div class="row project-indiv">
       <div class="twelve columns">
-        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/sketch_salesops.png' %}" alt="..." class="space top bottom" width="100%"/></div>
-        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/sketch_salesops2.png' %}" alt="..." class="space top bottom" width="100%"/></div>
+        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/sketch_salesops.png' %}" alt="..." class="space top bottom" width="100%"/>
+          <p class="caption">Above: I hope this works</p>
+        </div>
+        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/sketch_salesops2.png' %}" alt="..." class="space top bottom" width="100%"/>
+          <p class="caption">Below: I hope this works</p>
+        </div>
       </div>
     </div>
     <div class="row project-indiv">
@@ -72,39 +124,53 @@
     <div class="row project-indiv">
       <div class="nine columns">
         <div class="project-indiv body">
-          <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/template_gallery_cr.png' %}" alt="..." class="border" width="100%"/>
-        </div>
-      </div>
-    </div>
-    <div class="row project-indiv">
-      <div class="nine columns">
-        <div class="project-indiv body">
-          <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/template_in_app.gif' %}" alt="..." class="border" width="100%"/>
-        </div>
-      </div>
-    </div>
-    <!-- DEAL EDITOR  -->
-    <div class="row project-indiv">
-      <div class="nine columns">
-        <div class="project-indiv body">
-          <h3 class="h4">Future steps</h3>
-          <p></p>
-          ...
+          <h3 class="h4">The Result</h3>
+          <p>With the goals in mind, I mocked up a new design for the Deal Editor that was a hybrid of inline editing and using a sidepanel. Our users were very familiar with tools like Word and Google Docs, so leveraging preëxisting familiarity was best and most intuitive.</p>
         </div>
       </div>
     </div>
     <div class="row project-indiv">
       <div class="twelve columns">
-        <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/deal_editor_future.png' %}" alt="..." class="" width="100%"/>
+          <video
+            width="100%"
+            preload="auto"
+            playsinline
+            muted
+            controls="controls"
+            autoplay>
+              <source src="{% static 'projectapp/imgs/prj/ro_deal_editor/_intro.mp4' %}" type="video/mp4" />
+              <source src="{% static 'projectapp/imgs/prj/ro_deal_editor/_intro.webm' %}" type="video/webm" />
+          </video>
       </div>
     </div>
     <div class="row project-indiv">
       <div class="twelve columns">
-        <div class="one-third column">
-          <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/deal_editor_nav_m_loop.gif' %}" alt="..." class="" width="100%"/>
+          <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/img_deal_editor_future.png' %}" alt="..." class="space top bottom" width="100%"/>
+      </div>
+    </div>
+    <!-- Price Adjustment -->
+    <div class="row project-indiv">
+      <div class="twelve columns">
+        <div class="column one-half">
+          <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/img_price_adj.png' %}" alt="..." class="space top bottom" width="100%"/>
+          <p class="caption">asdf</p>
+        </div>
+        <div class="column one-half">
+          <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/img_ToC.png' %}" alt="..." class="space top bottom" width="100%"/>
+          <p class="caption">This</p>
         </div>
       </div>
     </div>
+    <!-- Table of Contents -->
+    <div class="row project-indiv">
+      <div class="twelve columns">
+        <div class="project-indiv body">
+          <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/img_comment.png' %}" alt="..." class="space top bottom" width="100%"/>
+        </div>
+      </div>
+    </div>
+
+
   {% endblock p-body %}
 
   <div class="row project-indiv">
@@ -112,5 +178,32 @@
       <div class="project-indiv body">
         ...
       </div>
+    </div>
+  </div>
+
+
+  <!-- Mobile Nav  -->
+  <div class="row project-indiv">
+    <div class="nine columns">
+      <div class="project-indiv body">
+        <p>I also made a prototype for the Deal Editor navigation on mobile screens as an exploration exercise.</p>
+      </div>
+    </div>
+  </div>
+  <div class="row project-indiv">
+    <div class="twelve columns">
+      <div class="one-third column">
+        <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/deal_editor_nav_m_loop.gif' %}" alt="..." class="" width="100%"/>
+      </div>
+    </div>
+  </div>
+
+
+
+<!-- Variables -->
+  <div class="row project-indiv">
+    <div class="twelve columns">
+      <div class="column one-half"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/img_product_desc.png' %}" alt="..." class="" width="100%"/></div>
+      <div class="column one-half"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/img_product_desc2.png' %}" alt="..." class="" width="100%"/></div>
     </div>
   </div>
