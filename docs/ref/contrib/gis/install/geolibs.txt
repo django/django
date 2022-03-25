@@ -102,14 +102,18 @@ First, download GEOS from the GEOS website and untar the source archive::
     $ wget https://download.osgeo.org/geos/geos-X.Y.Z.tar.bz2
     $ tar xjf geos-X.Y.Z.tar.bz2
 
-Next, change into the directory where GEOS was unpacked, run the configure
-script, compile, and install::
+Then step into the GEOS directory, create a ``build`` folder, and step into
+it::
 
     $ cd geos-X.Y.Z
-    $ ./configure
-    $ make
-    $ sudo make install
-    $ cd ..
+    $ mkdir build
+    $ cd build
+
+Then build and install the package::
+
+    $ cmake -DCMAKE_BUILD_TYPE=Release ..
+    $ cmake --build .
+    $ sudo cmake --build . --target install
 
 Troubleshooting
 ~~~~~~~~~~~~~~~
