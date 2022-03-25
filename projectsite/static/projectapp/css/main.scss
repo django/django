@@ -64,7 +64,7 @@ p, a, span {
   &.dark-blue {color: $dark-blue;}
   &.normal {font-weight: normal;}
   &.antialias {font-smooth: antialias;}
-  &.caption {color: $dusty-blue;font-size: 1.6rem;line-height: 2.4rem;border-left: 1px solid $dusty-blue;padding-left: 2rem;}
+  &.caption {color: #7E94C2;font-size: 1.6rem;line-height: 2.4rem;border-left: 1px solid $dusty-blue;padding-left: 2rem;}
 }
 h1, h2, .freight-text {font-family: $freight-font;}
 h3, .h3, .ibm-plex {font-family: $ibm-plex-font;}
@@ -218,22 +218,29 @@ body {margin: 0 auto;}
       transition: $fast;
       background: no-repeat center center gray cover;
 
-      &.ro-website {background-image:url("../imgs/th-ro-website.png"); &:hover {background-image:url("../imgs/th-ro-website2.png");}}
-      &.ro-ftux {background-image:url("../imgs/th-ro-ftux.png"); &:hover {background-image:url("../imgs/th-ro-ftux2.png");}}
-      &.codepen-invite {background-image:url("../imgs/th-codepen-invite.png");opacity: 0.85; &:hover {opacity: 1;}}
+      &.ro-website {background-image:url("../imgs/th-ro-website2.png");}
+      &.ro-deal-editor {background-image:url("../imgs/th-ro-deal-editor2.png");}
+      &.codepen-invite {background-image:url("../imgs/th-codepen-invite.png");opacity: 0.85;}
       &.codepen-dashboard {background-image:url("../imgs/th-codepen-dashboard.png");opacity: 0.85; &:hover {opacity: 1;}}
-      &.rev-design {background-image:url("../imgs/th-rev-design.png"); &:hover {background-image:url("../imgs/th-rev-design2.png");}}
-      &.rev-email {background-image:url("../imgs/th-rev-email.png"); &:hover {background-image:url("../imgs/th-rev-email2.png");}}
-      &.rev-mktg {background-image:url("../imgs/th-rev-mktg.png"); &:hover {background-image:url("../imgs/th-rev-mktg2.png");}}
+      &.rev-design {background-image:url("../imgs/th-rev-design2.png");}
+      &.rev-email {background-image:url("../imgs/th-rev-email2.png");}
+      &.rev-mktg {background-image:url("../imgs/th-rev-mktg2.png"); }
       &.print {background-image:url("../imgs/th-print.png");opacity:0.85; &:hover {opacity: 1;}}
       &.portfolio {background-image:url("../imgs/th-portfolio.png");}
 
     }
   // FOOTER
+  .row.footer {padding-top: 5rem;}
+  .footer .eight.columns {
+    padding-left: 3rem;
+    position: relative;
+    top: -3rem;
+  }
     .thank-you .sm {
       color: $blue;
       display: block;
       text-decoration: none;
+      margin: 1rem 0;
       i {margin-right: 0.4rem;}
      }
      .made-with {margin-top: 7rem;}

@@ -3,8 +3,8 @@
 
 {% block prev %}Prev: Revinate Marketing Collateral{% endblock prev %}
 {% block prev-url %} {% url 'p_rev_design' %} {% endblock prev-url %}
-{% block next %}Next: Portfolio{% endblock next %}
-{% block next-url %}{% endblock next-url %}
+{% block next %}Back to list of projects{% endblock next %}
+{% block next-url %}{% url 'index' %}#projects{% endblock next-url %}
 
 <!-- # Project NAME -->
   {% block p-type %}
@@ -63,10 +63,10 @@
     </div>
     <div class="row project-indiv">
       <div class="one-half column">
-        <img src="{% static 'projectapp/imgs/prj/print/mania/TimWong.jpg' %}" alt="A spread for an article inspired by photographs" class="border space top x-bottom" width="100%" title="(3 of 5)">
+        <img src="{% static 'projectapp/imgs/prj/print/mania/TimWong.jpg' %}" alt="A spread for an article inspired by photographs" class="border space top x-bottom" width="100%">
       </div>
       <div class="one-half column">
-        <img src="{% static 'projectapp/imgs/prj/print/mania/LinaInterview-fixed2.jpg' %}" alt="Page layout for an interview with a previous Mania Magazine Editor-in-Chief"  class="border space top x-bottom" width="100%" title="(4 of 5)">
+        <img src="{% static 'projectapp/imgs/prj/print/mania/LinaInterview-fixed2.jpg' %}" alt="Page layout for an interview with a previous Mania Magazine Editor-in-Chief"  class="border space top x-bottom" width="100%">
       </div>
     </div>
     <!--  -->
@@ -175,9 +175,9 @@
         <div class="project-indiv body">
           <h3 class="h4">Media Kit</h3>
           <p>I was in charge of assembling the Becky Bones media kit. I led the art direction, the page layout, and made all the accompanying graphics.</p>
-          <img src="{% static 'projectapp/imgs/prj/print/beckybones/01-who-is.jpg' %}" alt="Page from the Media Kit" class="space bottom top" width="100%" title="(1 of 5)">
-    			<img src="{% static 'projectapp/imgs/prj/print/beckybones/04-celebrities.jpg' %}" alt="Page from the Media Kit where celebrities rock their Becky Bones gear" class="space bottom top" width="100%" title="(4 of 5)">
-    			<img src="{% static 'projectapp/imgs/prj/print/beckybones/05-giving.jpg' %}" alt="Page from the Media Kit that lists what grass-roots projects Becky Bones has contributed to" class=" top space" width="100%" title="(5 of 5)">
+          <img src="{% static 'projectapp/imgs/prj/print/beckybones/01-who-is.jpg' %}" alt="Page from the Media Kit" class="space bottom top" width="100%">
+    			<img src="{% static 'projectapp/imgs/prj/print/beckybones/04-celebrities.jpg' %}" alt="Page from the Media Kit where celebrities rock their Becky Bones gear" class="space bottom top" width="100%">
+    			<img src="{% static 'projectapp/imgs/prj/print/beckybones/05-giving.jpg' %}" alt="Page from the Media Kit that lists what grass-roots projects Becky Bones has contributed to" class=" top space" width="100%">
         </div>
       </div>
     </div>

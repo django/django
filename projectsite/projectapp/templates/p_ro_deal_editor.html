@@ -1,0 +1,209 @@
+{% extends 'project_detail.html' %}
+{% load static %}
+
+{% block prev %}Prev: RevOps Website{% endblock prev %}
+{% block prev-url %} {% url 'p_ro_website' %} {% endblock prev-url %}
+{% block next %}Next: Invite New User{% endblock next %}
+{% block next-url %} {% url 'p_codepen_invite' %} {% endblock next-url %}
+
+<!-- # Project NAME -->
+  {% block p-type %}
+    RevOps
+  {% endblock p-type %}
+  {% block p-name %}
+    Deal Editor
+  {% endblock p-name %}
+
+
+<!-- # Project BLURB -->
+  {% block p-blurb %}
+  The Deal Editor was the most-used part of the RevOps platform. SalesOps and Sales teams used it to streamline their sales agreement process. After a year of watching users and receiving feedback, we identified key points to improve its UX to make it even more attractive to brand new customers.
+  {% endblock p-blurb %}
+  {% block p-blurb-html %}
+  {% endblock p-blurb-html %}
+
+
+
+<!-- # Project METADATA 2 (ROLE & responsibilities) -->
+  {% block p-role %}
+    Product Designer
+  {% endblock p-role %}
+  {% block p-responsibilities %}
+    User journey mapping, prototyping, visual design, product design
+  {% endblock p-responsibilities %}
+
+
+
+<!-- # Project INTRO IMG -->
+{% block p-introimg %}
+  <div class="row">
+    <div class="twelve columns border">
+      <!-- <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/_intro.gif' %}" alt="..." width="100%" class="space x-top x-bottom"/> -->
+      <video
+        width="100%"
+        preload="auto"
+        playsinline
+        muted
+        controls="controls"
+        autoplay>
+          <source src="{% static 'projectapp/imgs/prj/ro_deal_editor/_intro.mp4' %}" type="video/mp4" />
+          <source src="{% static 'projectapp/imgs/prj/ro_deal_editor/_intro.webm' %}" type="video/webm" />
+      </video>
+    </div>
+  </div>
+{% endblock p-introimg %}
+
+
+
+<!-- # Actual PROJECT DETAILS & CONTENT -->
+  {% block p-body %}
+    <div class="row project-indiv">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <h2 class="new-section">Project Details</h2>
+          <h3 class="h4">Context</h3>
+          <p>The Deal Editor in RevOps is a tool to create a standardized Sales Agreement easily. Sales Operations can create “templates” and Sales could then use those templates and edit prices and additional products, but if they exceed a certain threshold (i.e. price change is beyond 10%).</p>
+          <h3>Where we started</h3>
+          <p>Before adopting RevOps our users were working with silo’d programs such as Microsoft Word and Excel – this made it extremely difficult to easily experiment with pricing on-the-fly because none of the changes would be tracked; no one would know <i>who</i> made the pricing change; and it is not obvious that any pricing change were made until you open up the file itself.</p>
+          <p>The first version of RevOps solved these pains by becoming the source of truth for products/SKUs, pricing, and deal information.</p>
+        </div>
+      </div>
+    </div>
+    <div class="row project-indiv">
+      <div class="nine columns">
+        <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/template_in_app.gif' %}" alt="..." class="border space top bottom" width="100%"/>
+      </div>
+      <div class="three columns">
+        <span class="block caption">
+          <strong>Left</strong> a gif of Deal Editor V1. Sales could start a sales order with pre-approved products and legal terms to get started. Adding, removing, editing items were all done on the left side-bar; the right served as a preview for the sales agreement.
+        </span>
+      </div>
+    </div>
+    <!--  -->
+    <div class="row project-indiv">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <p>The Deal Editor is the most-used part of the RevOps platform. To make it enticing to brand new users who may sign up for the service itself, we wanted to explore how we could make the tool’s UX better and even stickier. I made a <strong>user journey map</strong> for 2 personas – Sales Operations and Sales – to track potential questions, concerns, and hopes a brand new user may have.</p>
+          <p>I came with 2 goals for the new design:</p>
+          <ol class="goals-list sm">
+            <li>
+              <span class="circle-number sm">1</span>
+              <span class="goal-text">
+                <h3 class="h4">How might we make the Deal Editor even more intuitive so that SalesOps doesn’t have to spend time training their teams to use the tool?</h3>
+                The easier we make it for the SalesOps user's team to adopt, the easier it will be for all stakeholders to envision how RevOps fits into their workflow.
+              </span>
+            </li>
+            <li>
+              <span class="circle-number sm">2</span>
+              <span class="goal-text">
+                <h3 class="h4">How might we give Sales Reps immediate feedback and context for whether their deal customization will trigger a need for manual approval? </h3>
+                Since time is of the essence, Sales Reps would like to estimate what criteria would cause a manual approval vs. automatic approval. That way they could craft the best deal possibly given the situation.
+              </span>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  <!--  -->
+    <div class="row project-indiv">
+      <div class="twelve columns">
+        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/sketch_salesops.png' %}" alt="..." class="space top " width="100%"/>
+          <p class="caption"><strong>Above</strong> User journey exercise for the SalesOps persona.</p>
+        </div>
+        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/sketch_salesops2.png' %}" alt="..." class="space top " width="100%"/>
+          <p class="caption"><strong>Below</strong> User journey exercise for the Sales Rep persona.</p>
+        </div>
+      </div>
+    </div>
+    <div class="row project-indiv">
+      <div class="twelve columns">
+        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/sketch_sales.png' %}" alt="..." class="space top x-bottom" width="100%"/></div>
+        <div class="one-half column"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/sketch_sales2.png' %}" alt="..." class="space top x-bottom" width="100%"/></div>
+      </div>
+    </div>
+    <div class="row project-indiv">
+      <div class="nine columns">
+        <div class="project-indiv body">
+          <h3 class="h4">The Result</h3>
+          <p>With the goals in mind, I mocked up a new design for the Deal Editor that was a hybrid of inline editing and using a sidepanel. Our users were very familiar with tools like Word and Google Docs, so leveraging preëxisting familiarity was best and most intuitive.</p>
+        </div>
+      </div>
+    </div>
+    <div class="row project-indiv">
+      <div class="twelve columns border">
+          <video
+            width="100%"
+            preload="auto"
+            playsinline
+            muted
+            controls="controls"
+            autoplay>
+              <source src="{% static 'projectapp/imgs/prj/ro_deal_editor/_intro.mp4' %}" type="video/mp4" />
+              <source src="{% static 'projectapp/imgs/prj/ro_deal_editor/_intro.webm' %}" type="video/webm" />
+          </video>
+      </div>
+    </div>
+    <div class="row project-indiv">
+      <div class="twelve columns">
+          <p class="caption">The above video is a prototype for showing approval information immediately to the user and demonstrates what an interactive sales order form could be like.</p>
+          <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/img_deal_editor_future.png' %}" alt="..." class="space top bottom" width="100%"/>
+          <p class="caption">The mock above is an overview of the design improvements we explored: Table of Contents for easy navigation of the sales agreement, and ablity to add comments on specific parts of the deal.</p>
+      </div>
+    </div>
+    <!-- Price Adjustment -->
+    <div class="row project-indiv">
+      <div class="twelve columns">
+        <div class="column one-half">
+          <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/img_ToC.png' %}" alt="..." class="space top bottom" width="100%"/>
+        </div>
+        <div class="column one-half">
+          <p class="caption">The "Table of Contents" on the left serves as a way for quick navigation to different parts of the deal. It also highlights the parts where required fields may be missing – making if extremely easy for Sales Reps to know what they need to fill out.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Table of Contents -->
+    <div class="row project-indiv">
+      <div class="twelve columns">
+        <div class="project-indiv body">
+          <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/img_comment.png' %}" alt="..." class="space top bottom" width="100%"/>
+        </div>
+      </div>
+    </div>
+
+
+  {% endblock p-body %}
+
+  <div class="row project-indiv">
+    <div class="nine columns">
+      <div class="project-indiv body">
+        ...
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Mobile Nav  -->
+  <div class="row project-indiv">
+    <div class="nine columns">
+      <div class="project-indiv body">
+        <p>I also made a prototype for the Deal Editor navigation on mobile screens as an exploration exercise.</p>
+      </div>
+    </div>
+  </div>
+  <div class="row project-indiv">
+    <div class="twelve columns">
+      <div class="one-third column">
+        <img src="{% static 'projectapp/imgs/prj/ro_deal_editor/deal_editor_nav_m_loop.gif' %}" alt="..." class="" width="100%"/>
+      </div>
+    </div>
+  </div>
+
+
+
+<!-- Variables -->
+  <div class="row project-indiv">
+    <div class="twelve columns">
+      <div class="column one-half"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/img_product_desc.png' %}" alt="..." class="" width="100%"/></div>
+      <div class="column one-half"><img src="{% static 'projectapp/imgs/prj/ro_deal_editor/img_product_desc2.png' %}" alt="..." class="" width="100%"/></div>
+    </div>
+  </div>
