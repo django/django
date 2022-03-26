@@ -242,12 +242,23 @@ class CommonPasswordValidatorTest(SimpleTestCase):
 class NumericPasswordValidatorTest(SimpleTestCase):
     def test_validate(self):
         expected_error = "This password is entirely numeric."
+        code = "password_entirely_numeric"
+
         self.assertIsNone(NumericPasswordValidator().validate("a-safe-password"))
 
         with self.assertRaises(ValidationError) as cm:
             NumericPasswordValidator().validate("42424242")
         self.assertEqual(cm.exception.messages, [expected_error])
-        self.assertEqual(cm.exception.error_list[0].code, "password_entirely_numeric")
+        self.assertEqual(cm.exception.error_list[0].code, code)
+
+        with self.assertRaises(ValidationError) as cm:
+            # ፲ is the number ten in Ge'ez numerals (Ethiopic).
+            # While there are other numerals, Ethiopic is used for this test.
+            # https://en.wikipedia.org/wiki/Ge%CA%BDez_script#Numerals
+            geez_number = "-፲፲፲፲፲፲፲.፲"
+            NumericPasswordValidator().validate(geez_number)
+        self.assertEqual(cm.exception.messages, [expected_error])
+        self.assertEqual(cm.exception.error_list[0].code, code)
 
     def test_help_text(self):
         self.assertEqual(

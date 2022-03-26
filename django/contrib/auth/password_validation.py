@@ -256,7 +256,11 @@ class NumericPasswordValidator:
     """
 
     def validate(self, password, user=None):
-        if password.isdigit():
+        # Account for negative and float numbers.
+        unsigned = password.replace("-", "", 1)
+        password = unsigned.replace(".", "", 1)
+
+        if password.isnumeric():
             raise ValidationError(
                 _("This password is entirely numeric."),
                 code="password_entirely_numeric",
