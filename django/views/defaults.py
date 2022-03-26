@@ -72,7 +72,7 @@ def page_not_found(request, exception, template_name=ERROR_404_TEMPLATE_NAME):
             ERROR_PAGE_TEMPLATE
             % {
                 "title": "Not Found",
-                "details": "The requested resource was not found on this server.",
+                "details": "The requested resource was not found on this server.  <br> Go to <a href='/' style='color: black;'>Home page</a> Or <a onclick='history.back()' style='cursor: pointer; text-decoration: underline;'> Go Back</a>",
             },
         )
         body = template.render(Context(context))
