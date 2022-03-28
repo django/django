@@ -186,7 +186,7 @@ this. For a small app like polls, this process isn't too difficult.
 #. Next we'll create ``pyproject.toml``, ``setup.cfg``, and ``setup.py`` files
    which detail how to build and install the app. A full explanation of these
    files is beyond the scope of this tutorial, but the `setuptools
-   documentation <https://setuptools.readthedocs.io/en/latest/>`_ has a good
+   documentation <https://setuptools.pypa.io/en/latest/>`_ has a good
    explanation. Create the ``django-polls/pyproject.toml``,
    ``django-polls/setup.cfg``, and ``django-polls/setup.py`` files with the
    following contents:
