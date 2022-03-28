@@ -8,7 +8,7 @@ from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
 from django.test.client import RequestFactory
 from django.test.utils import override_script_prefix
-from django.urls import clear_url_caches, reverse, translate_url
+from django.urls import clear_url_caches, resolve, reverse, translate_url
 from django.utils import translation
 
 
@@ -197,6 +197,23 @@ class URLTranslationTests(URLTestCaseBase):
         with translation.override("nl"):
             self.assertEqual(translate_url("/nl/gebruikers/", "en"), "/en/users/")
             self.assertEqual(translation.get_language(), "nl")
+
+    def test_reverse_translated_with_captured_kwargs(self):
+        with translation.override("en"):
+            match = resolve("/translated/apo/")
+        # Links to the same page in other languages.
+        tests = [
+            ("nl", "/vertaald/apo/"),
+            ("pt-br", "/traduzidos/apo/"),
+        ]
+        for lang, expected_link in tests:
+            with translation.override(lang):
+                self.assertEqual(
+                    reverse(
+                        match.url_name, args=match.args, kwargs=match.captured_kwargs
+                    ),
+                    expected_link,
+                )
 
 
 class URLNamespaceTests(URLTestCaseBase):
