@@ -326,7 +326,11 @@ Tests
 URLs
 ~~~~
 
-* ...
+* The new :attr:`.ResolverMatch.captured_kwargs` attribute stores the captured
+  keyword arguments, as parsed from the URL.
+
+* The new :attr:`.ResolverMatch.extra_kwargs` attribute stores the additional
+  keyword arguments passed to the view function.
 
 Utilities
 ~~~~~~~~~
