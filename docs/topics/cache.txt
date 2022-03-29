@@ -699,6 +699,10 @@ setting for the middleware.  It can be used like this::
     def my_view(request):
         ...
 
+The ``key_prefix`` may be either a string, or a callable which receives the
+request object and returns the key prefix. This allows you to generate a key
+prefix dynamically. The callable may also return ``None`` to skip caching.
+
 The ``key_prefix`` and ``cache`` arguments may be specified together. The
 ``key_prefix`` argument and the :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`
 specified under :setting:`CACHES` will be concatenated.
