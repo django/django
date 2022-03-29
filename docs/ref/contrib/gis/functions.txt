@@ -221,7 +221,7 @@ south = ``π``; west = ``3π/2``.
 .. class:: BoundingCircle(expression, num_seg=48, **extra)
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_MinimumBoundingCircle.html>`__,
-`Oracle <https://docs.oracle.com/en/database/oracle/oracle-database/18/spatl/
+`Oracle <https://docs.oracle.com/en/database/oracle/oracle-database/21/spatl/
 SDO_GEOM-reference.html#GUID-82A61626-BB64-4793-B53D-A0DBEC91831A>`_
 
 Accepts a single geographic field or expression and returns the smallest circle
@@ -307,8 +307,8 @@ queryset is calculated::
 
 *Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-general-property-functions.html#function_st-envelope>`__,
-`Oracle <https://docs.oracle.com/en/database/oracle/oracle-database/18/spatl/
-SDO_GEOM-reference.html#GUID-646638D0-2C5F-490A-AF63-DE9B7A4C97C1__CHDJCEIH>`__,
+`Oracle <https://docs.oracle.com/en/database/oracle/oracle-database/21/spatl/
+spatial-operators-reference.html#GUID-ACED800F-3435-44AA-9606-D40934A23ED0>`__,
 `PostGIS <https://postgis.net/docs/ST_Envelope.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns the geometry
