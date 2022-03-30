@@ -29,10 +29,11 @@ from django.core.validators import EmailValidator, RegexValidator
 from django.db import migrations, models
 from django.db.migrations.serializer import BaseSerializer
 from django.db.migrations.writer import MigrationWriter, OperationWriter
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.utils.deconstruct import deconstructible
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import SimpleLazyObject
-from django.utils.timezone import get_default_timezone, get_fixed_timezone, utc
+from django.utils.timezone import get_default_timezone, get_fixed_timezone
 from django.utils.translation import gettext_lazy as _
 
 from .models import FoodManager, FoodQuerySet
@@ -532,6 +533,8 @@ class WriterTests(SimpleTestCase):
             datetime.datetime(2014, 1, 1, 1, 1),
             ("datetime.datetime(2014, 1, 1, 1, 1)", {"import datetime"}),
         )
+        with ignore_warnings(category=RemovedInDjango50Warning):
+            from django.utils.timezone import utc
         for tzinfo in (utc, datetime.timezone.utc):
             with self.subTest(tzinfo=tzinfo):
                 self.assertSerializedResultEqual(
@@ -909,7 +912,7 @@ class WriterTests(SimpleTestCase):
         Test comments at top of file.
         """
         migration = type("Migration", (migrations.Migration,), {"operations": []})
-        dt = datetime.datetime(2015, 7, 31, 4, 40, 0, 0, tzinfo=utc)
+        dt = datetime.datetime(2015, 7, 31, 4, 40, 0, 0, tzinfo=datetime.timezone.utc)
         with mock.patch("django.db.migrations.writer.now", lambda: dt):
             for include_header in (True, False):
                 with self.subTest(include_header=include_header):

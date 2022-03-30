@@ -1160,7 +1160,12 @@ implementation details see :ref:`using-the-views`.
 
 .. class:: LogoutView
 
-    Logs a user out.
+    Logs a user out on ``POST`` requests.
+
+    .. deprecated:: 4.1
+
+        Support for logging out on ``GET`` requests is deprecated and will be
+        removed in Django 5.0.
 
     **URL name:** ``logout``
 
@@ -1212,7 +1217,7 @@ implementation details see :ref:`using-the-views`.
 
 .. function:: logout_then_login(request, login_url=None)
 
-    Logs a user out, then redirects to the login page.
+    Logs a user out on ``POST`` requests, then redirects to the login page.
 
     **URL name:** No default URL provided
 
@@ -1220,6 +1225,11 @@ implementation details see :ref:`using-the-views`.
 
     * ``login_url``: The URL of the login page to redirect to.
       Defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
+
+    .. deprecated:: 4.1
+
+        Support for logging out on ``GET`` requests is deprecated and will be
+        removed in Django 5.0.
 
 .. class:: PasswordChangeView
 

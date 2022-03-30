@@ -2,7 +2,7 @@ import calendar
 import datetime
 
 from django.utils.html import avoid_wrapping
-from django.utils.timezone import is_aware, utc
+from django.utils.timezone import is_aware
 from django.utils.translation import gettext, ngettext_lazy
 
 TIME_STRINGS = {
@@ -54,7 +54,7 @@ def timesince(d, now=None, reversed=False, time_strings=None, depth=2):
     if now and not isinstance(now, datetime.datetime):
         now = datetime.datetime(now.year, now.month, now.day)
 
-    now = now or datetime.datetime.now(utc if is_aware(d) else None)
+    now = now or datetime.datetime.now(datetime.timezone.utc if is_aware(d) else None)
 
     if reversed:
         d, now = now, d

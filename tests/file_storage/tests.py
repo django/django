@@ -6,6 +6,7 @@ import threading
 import time
 import unittest
 from datetime import datetime, timedelta
+from datetime import timezone as datetime_timezone
 from io import StringIO
 from pathlib import Path
 from urllib.request import urlopen
@@ -168,7 +169,7 @@ class FileStorageTests(SimpleTestCase):
             naive_now = datetime.now()
             algiers_offset = now_in_algiers.tzinfo.utcoffset(naive_now)
             django_offset = timezone.get_current_timezone().utcoffset(naive_now)
-            utc_offset = timezone.utc.utcoffset(naive_now)
+            utc_offset = datetime_timezone.utc.utcoffset(naive_now)
             self.assertGreater(algiers_offset, utc_offset)
             self.assertLess(django_offset, utc_offset)
 
@@ -199,7 +200,7 @@ class FileStorageTests(SimpleTestCase):
             naive_now = datetime.now()
             algiers_offset = now_in_algiers.tzinfo.utcoffset(naive_now)
             django_offset = timezone.get_current_timezone().utcoffset(naive_now)
-            utc_offset = timezone.utc.utcoffset(naive_now)
+            utc_offset = datetime_timezone.utc.utcoffset(naive_now)
             self.assertGreater(algiers_offset, utc_offset)
             self.assertLess(django_offset, utc_offset)
 
