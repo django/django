@@ -546,6 +546,27 @@ The template used to render a field's ``<label>``, used when calling
 form by overriding this attribute or more generally by overriding the default
 template, see also :ref:`overriding-built-in-form-templates`.
 
+``as_div()``
+------------
+
+.. versionadded:: 4.1
+
+.. method:: Form.as_div()
+
+``as_div()`` renders the form using the template assigned to the
+forms ``template_name_div`` attribute, by default this template is
+``'django/forms/div.html'``. This template outputs the form as an HTML
+``<div>``::
+
+    >>> f = ContactForm()
+    >>> f.as_div()
+    '<div><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" required></div>\n<div><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" required></div>\n<div><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" required></div>\n<div><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself"></div>'
+    >>> print(f.as_div())
+    <div><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" required></div>
+    <div><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" required></div>
+    <div><label for="id_sender">Sender:</label> <input type="email" name="sender" id="id_sender" required></div>
+    <div><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself"></div>
+
 ``as_p()``
 ----------
 

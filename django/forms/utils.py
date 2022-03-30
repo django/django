@@ -73,6 +73,10 @@ class RenderableFormMixin(RenderableMixin):
         """Render as <li> elements excluding the surrounding <ul> tag."""
         return self.render(self.template_name_ul)
 
+    def as_div(self):
+        """Render as <div> elements."""
+        return self.render(self.template_name_div)
+
 
 class RenderableErrorMixin(RenderableMixin):
     def as_json(self, escape_html=False):

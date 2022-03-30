@@ -67,6 +67,7 @@ class BaseForm(RenderableFormMixin):
     use_required_attribute = True
 
     template_name = "django/forms/default.html"
+    template_name_div = "django/forms/div.html"
     template_name_p = "django/forms/p.html"
     template_name_table = "django/forms/table.html"
     template_name_ul = "django/forms/ul.html"
