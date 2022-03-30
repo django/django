@@ -1724,6 +1724,28 @@ class FTimeDeltaTests(TestCase):
             ]
             self.assertEqual(test_set, self.expnames[: i + 1])
 
+    def test_datetime_and_durationfield_addition_with_filter(self):
+        test_set = Experiment.objects.filter(end=F("start") + F("estimated_time"))
+        self.assertGreater(test_set.count(), 0)
+        self.assertEqual(
+            [e.name for e in test_set],
+            [
+                e.name
+                for e in Experiment.objects.all()
+                if e.end == e.start + e.estimated_time
+            ],
+        )
+
+    @skipUnlessDBFeature("supports_temporal_subtraction")
+    def test_datetime_subtraction_with_annotate_and_no_output_field(self):
+        test_set = Experiment.objects.annotate(
+            calculated_duration=F("end") - F("start")
+        )
+        self.assertEqual(
+            [e.calculated_duration for e in test_set],
+            [e.end - e.start for e in test_set],
+        )
+
     def test_mixed_comparisons1(self):
         for i, delay in enumerate(self.delays):
             test_set = [
@@ -2373,7 +2395,7 @@ class CombinableTests(SimpleTestCase):
 
 
 class CombinedExpressionTests(SimpleTestCase):
-    def test_resolve_output_field(self):
+    def test_resolve_output_field_number(self):
         tests = [
             (IntegerField, AutoField, IntegerField),
             (AutoField, IntegerField, IntegerField),
@@ -2394,6 +2416,72 @@ class CombinedExpressionTests(SimpleTestCase):
                         Expression(rhs()),
                     )
                     self.assertIsInstance(expr.output_field, combined)
+
+    def test_resolve_output_field_with_null(self):
+        def null():
+            return Value(None)
+
+        tests = [
+            # Numbers.
+            (AutoField, Combinable.ADD, null),
+            (DecimalField, Combinable.ADD, null),
+            (FloatField, Combinable.ADD, null),
+            (IntegerField, Combinable.ADD, null),
+            (IntegerField, Combinable.SUB, null),
+            (null, Combinable.ADD, IntegerField),
+            # Dates.
+            (DateField, Combinable.ADD, null),
+            (DateTimeField, Combinable.ADD, null),
+            (DurationField, Combinable.ADD, null),
+            (TimeField, Combinable.ADD, null),
+            (TimeField, Combinable.SUB, null),
+            (null, Combinable.ADD, DateTimeField),
+            (DateField, Combinable.SUB, null),
+        ]
+        msg = "Expression contains mixed types: "
+        for lhs, connector, rhs in tests:
+            with self.subTest(lhs=lhs, connector=connector, rhs=rhs):
+                expr = CombinedExpression(
+                    Expression(lhs()),
+                    connector,
+                    Expression(rhs()),
+                )
+                with self.assertRaisesMessage(FieldError, msg):
+                    expr.output_field
+
+    def test_resolve_output_field_dates(self):
+        tests = [
+            # Add - same type.
+            (DurationField, Combinable.ADD, DurationField, DurationField),
+            # Subtract - same type.
+            (DurationField, Combinable.SUB, DurationField, DurationField),
+            # Subtract - different type.
+            (DurationField, Combinable.SUB, DateField, FieldError),
+            (DurationField, Combinable.SUB, DateTimeField, FieldError),
+            (DurationField, Combinable.SUB, DateTimeField, FieldError),
+        ]
+        msg = "Expression contains mixed types: "
+        for lhs, connector, rhs, combined in tests:
+            with self.subTest(lhs=lhs, connector=connector, rhs=rhs, combined=combined):
+                expr = CombinedExpression(
+                    Expression(lhs()),
+                    connector,
+                    Expression(rhs()),
+                )
+                if issubclass(combined, Exception):
+                    with self.assertRaisesMessage(combined, msg):
+                        expr.output_field
+                else:
+                    self.assertIsInstance(expr.output_field, combined)
+
+    def test_mixed_char_date_with_annotate(self):
+        queryset = Experiment.objects.annotate(nonsense=F("name") + F("assigned"))
+        msg = (
+            "Expression contains mixed types: CharField, DateField. You must set "
+            "output_field."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            list(queryset)
 
 
 class ExpressionWrapperTests(SimpleTestCase):
