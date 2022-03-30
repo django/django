@@ -9,4 +9,5 @@ Django 4.0.4 fixes several bugs in 4.0.3.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 4.0 that caused ignoring multiple
+  ``FilteredRelation()`` relationships to the same field (:ticket:`33598`).
