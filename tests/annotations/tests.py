@@ -486,6 +486,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         book2 = Book.objects.annotate(adjusted_rating=None + F("rating")).get(
             pk=self.b1.pk
         )
+        self.assertIs(book1.adjusted_rating, None)
         self.assertEqual(book1.adjusted_rating, book2.adjusted_rating)
 
     def test_update_with_annotation(self):
