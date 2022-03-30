@@ -1449,8 +1449,43 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         with self.assertNoLogs("django.template", "DEBUG"):
             self.client.post(reverse("admin:admin_views_article_changelist"), post_data)
 
+    @override_settings(
+        AUTH_PASSWORD_VALIDATORS=[
+            {
+                "NAME": (
+                    "django.contrib.auth.password_validation."
+                    "UserAttributeSimilarityValidator"
+                )
+            },
+            {
+                "NAME": (
+                    "django.contrib.auth.password_validation."
+                    "NumericPasswordValidator"
+                )
+            },
+        ]
+    )
+    def test_password_change_helptext(self):
+        response = self.client.get(reverse("admin:password_change"))
+        self.assertContains(
+            response, '<div class="help" id="id_new_password1_helptext">'
+        )
+
 
 @override_settings(
+    AUTH_PASSWORD_VALIDATORS=[
+        {
+            "NAME": (
+                "django.contrib.auth.password_validation."
+                "UserAttributeSimilarityValidator"
+            )
+        },
+        {
+            "NAME": (
+                "django.contrib.auth.password_validation." "NumericPasswordValidator"
+            )
+        },
+    ],
     TEMPLATES=[
         {
             "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -1470,7 +1505,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                 ],
             },
         }
-    ]
+    ],
 )
 class AdminCustomTemplateTests(AdminViewBasicTestCase):
     def test_custom_model_admin_templates(self):
@@ -1561,6 +1596,19 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
         # this, the username is added to the change password form.
         self.assertContains(
             response, '<input type="text" name="username" value="super" class="hidden">'
+        )
+
+        # help text for passwords has an id.
+        self.assertContains(
+            response,
+            '<div class="help" id="id_password1_helptext"><ul><li>'
+            "Your password can’t be too similar to your other personal information."
+            "</li><li>Your password can’t be entirely numeric.</li></ul></div>",
+        )
+        self.assertContains(
+            response,
+            '<div class="help" id="id_password2_helptext">'
+            "Enter the same password as before, for verification.</div>",
         )
 
     def test_extended_bodyclass_template_index(self):
@@ -6271,17 +6319,17 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         self.assertContains(response, '<div class="form-row field-posted">')
         self.assertContains(response, '<div class="form-row field-value">')
         self.assertContains(response, '<div class="form-row">')
-        self.assertContains(response, '<div class="help">', 3)
+        self.assertContains(response, '<div class="help"', 3)
         self.assertContains(
             response,
-            '<div class="help">Some help text for the title (with Unicode ŠĐĆŽćžšđ)'
-            "</div>",
+            '<div class="help" id="id_title_helptext">Some help text for the title '
+            "(with Unicode ŠĐĆŽćžšđ)</div>",
             html=True,
         )
         self.assertContains(
             response,
-            '<div class="help">Some help text for the content (with Unicode ŠĐĆŽćžšđ)'
-            "</div>",
+            '<div class="help" id="id_content_helptext">Some help text for the content '
+            "(with Unicode ŠĐĆŽćžšđ)</div>",
             html=True,
         )
         self.assertContains(
@@ -6468,7 +6516,9 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
             reverse("admin:admin_views_fieldoverridepost_change", args=(p.pk,))
         )
         self.assertContains(
-            response, '<div class="help">Overridden help text for the date</div>'
+            response,
+            '<div class="help">Overridden help text for the date</div>',
+            html=True,
         )
         self.assertContains(
             response,
