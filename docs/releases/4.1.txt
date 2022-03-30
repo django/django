@@ -26,6 +26,23 @@ officially support the latest release of each series.
 What's new in Django 4.1
 ========================
 
+Asynchronous handlers for class-based views
+-------------------------------------------
+
+View subclasses may now define async HTTP method handlers::
+
+    import asyncio
+    from django.http import HttpResponse
+    from django.views import View
+
+    class AsyncView(View):
+        async def get(self, request, *args, **kwargs):
+            # Perform view logic using await.
+            await asyncio.sleep(1)
+            return HttpResponse("Hello async world!")
+
+See :ref:`async-class-based-views` for more details.
+
 .. _csrf-cookie-masked-usage:
 
 ``CSRF_COOKIE_MASKED`` setting
