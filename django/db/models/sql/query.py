@@ -2341,25 +2341,6 @@ class Query(BaseExpression):
             # Replace any existing "immediate load" field names.
             self.deferred_loading = frozenset(field_names), False
 
-    def get_loaded_field_names(self):
-        """
-        If any fields are marked to be deferred, return a dictionary mapping
-        models to a set of names in those fields that will be loaded. If a
-        model is not in the returned dictionary, none of its fields are
-        deferred.
-
-        If no fields are marked for deferral, return an empty dictionary.
-        """
-        # We cache this because we call this function multiple times
-        # (compiler.fill_related_selections, query.iterator)
-        try:
-            return self._loaded_field_names_cache
-        except AttributeError:
-            collection = {}
-            self.deferred_to_data(collection, self.get_loaded_field_names_cb)
-            self._loaded_field_names_cache = collection
-            return collection
-
     def get_loaded_field_names_cb(self, target, model, fields):
         """Callback used by get_deferred_field_names()."""
         target[model] = {f.attname for f in fields}
