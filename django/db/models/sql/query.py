@@ -703,7 +703,7 @@ class Query(BaseExpression):
         self.order_by = rhs.order_by or self.order_by
         self.extra_order_by = rhs.extra_order_by or self.extra_order_by
 
-    def deferred_to_data(self, target, callback):
+    def deferred_to_data(self, target):
         """
         Convert the self.deferred_loading data structure to an alternate data
         structure, describing the field that *will* be loaded. This is used to
@@ -713,9 +713,6 @@ class Query(BaseExpression):
         the result, only those that have field restrictions in place.
 
         The "target" parameter is the instance that is populated (in place).
-        The "callback" is a function that is called whenever a (model, field)
-        pair need to be added to "target". It accepts three parameters:
-        "target", and the model and list of fields being added for that model.
         """
         field_names, defer = self.deferred_loading
         if not field_names:
@@ -770,8 +767,8 @@ class Query(BaseExpression):
                 # "else" branch here.
                 if model in workset:
                     workset[model].update(values)
-            for model, values in workset.items():
-                callback(target, model, values)
+            for model, fields in workset.items():
+                target[model] = {f.attname for f in fields}
         else:
             for model, values in must_include.items():
                 if model in seen:
@@ -786,8 +783,8 @@ class Query(BaseExpression):
             # only "must include" fields are pulled in.
             for model in orig_opts.get_parent_list():
                 seen.setdefault(model, set())
-            for model, values in seen.items():
-                callback(target, model, values)
+            for model, fields in seen.items():
+                target[model] = {f.attname for f in fields}
 
     def table_alias(self, table_name, create=False, filtered_relation=None):
         """
@@ -2340,10 +2337,6 @@ class Query(BaseExpression):
         else:
             # Replace any existing "immediate load" field names.
             self.deferred_loading = frozenset(field_names), False
-
-    def get_loaded_field_names_cb(self, target, model, fields):
-        """Callback used by get_deferred_field_names()."""
-        target[model] = {f.attname for f in fields}
 
     def set_annotation_mask(self, names):
         """Set the mask of annotations that will be returned by the SELECT."""
