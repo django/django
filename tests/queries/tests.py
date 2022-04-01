@@ -1898,6 +1898,15 @@ class Queries5Tests(TestCase):
             Note.objects.extra(select={"foo": "'bar %%s'"})[0].foo, "bar %s"
         )
 
+    def test_extra_select_alias_sql_injection(self):
+        crafted_alias = """injected_name" from "queries_note"; --"""
+        msg = (
+            "Column aliases cannot contain whitespace characters, quotation marks, "
+            "semicolons, or SQL comments."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Note.objects.extra(select={crafted_alias: "1"})
+
     def test_queryset_reuse(self):
         # Using querysets doesn't mutate aliases.
         authors = Author.objects.filter(Q(name="a1") | Q(name="nonexistent"))

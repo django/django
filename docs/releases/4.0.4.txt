@@ -7,6 +7,14 @@ Django 4.0.4 release notes
 Django 4.0.4 fixes two security issues with severity "high" and two bugs in
 4.0.3.
 
+CVE-2022-28346: Potential SQL injection in ``QuerySet.annotate()``, ``aggregate()``, and ``extra()``
+====================================================================================================
+
+:meth:`.QuerySet.annotate`, :meth:`~.QuerySet.aggregate`, and
+:meth:`~.QuerySet.extra` methods were subject to SQL injection in column
+aliases, using a suitably crafted dictionary, with dictionary expansion, as the
+``**kwargs`` passed to these methods.
+
 Bugfixes
 ========
 
