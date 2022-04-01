@@ -7,6 +7,18 @@ from django.db.backends.base.operations import BaseDatabaseOperations
 class DatabaseOperations(BaseDatabaseOperations):
     cast_char_field_without_max_length = 'varchar'
     explain_prefix = 'EXPLAIN'
+    explain_options = frozenset(
+        [
+            "ANALYZE",
+            "BUFFERS",
+            "COSTS",
+            "SETTINGS",
+            "SUMMARY",
+            "TIMING",
+            "VERBOSE",
+            "WAL",
+        ]
+    )
     cast_data_types = {
         'AutoField': 'integer',
         'BigAutoField': 'bigint',
@@ -258,15 +270,20 @@ class DatabaseOperations(BaseDatabaseOperations):
         return super().subtract_temporals(internal_type, lhs, rhs)
 
     def explain_query_prefix(self, format=None, **options):
-        prefix = super().explain_query_prefix(format)
         extra = {}
+        # Normalize options.
+        if options:
+            options = {
+                name.upper(): "true" if value else "false"
+                for name, value in options.items()
+            }
+            for valid_option in self.explain_options:
+                value = options.pop(valid_option, None)
+                if value is not None:
+                    extra[valid_option.upper()] = value
+        prefix = super().explain_query_prefix(format, **options)
         if format:
             extra['FORMAT'] = format
-        if options:
-            extra.update({
-                name.upper(): 'true' if value else 'false'
-                for name, value in options.items()
-            })
         if extra:
             prefix += ' (%s)' % ', '.join('%s %s' % i for i in extra.items())
         return prefix
