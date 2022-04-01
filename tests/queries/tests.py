@@ -1737,6 +1737,15 @@ class Queries5Tests(TestCase):
             'bar %s'
         )
 
+    def test_extra_select_alias_sql_injection(self):
+        crafted_alias = """injected_name" from "queries_note"; --"""
+        msg = (
+            "Column aliases cannot contain whitespace characters, quotation marks, "
+            "semicolons, or SQL comments."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Note.objects.extra(select={crafted_alias: "1"})
+
 
 class SelectRelatedTests(TestCase):
     def test_tickets_3045_3288(self):
