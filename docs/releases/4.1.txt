@@ -288,6 +288,10 @@ Models
   on MariaDB and MySQL. For databases that do not support ``XOR``, the query
   will be converted to an equivalent using ``AND``, ``OR``, and ``NOT``.
 
+* The new :ref:`Field.non_db_attrs <custom-field-non_db_attrs>` attribute
+  allows customizing attributes of fields that don't affect a column
+  definition.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
