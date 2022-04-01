@@ -41,8 +41,8 @@ class ExplainTests(TestCase):
 
     @skipUnlessDBFeature('validates_explain_options')
     def test_unknown_options(self):
-        with self.assertRaisesMessage(ValueError, 'Unknown options: test, test2'):
-            Tag.objects.all().explain(test=1, test2=1)
+        with self.assertRaisesMessage(ValueError, "Unknown options: TEST, TEST2"):
+            Tag.objects.all().explain(**{"TEST": 1, "TEST2": 1})
 
     def test_unknown_format(self):
         msg = 'DOES NOT EXIST is not a recognized format.'
@@ -70,6 +70,35 @@ class ExplainTests(TestCase):
                 for name, value in options.items():
                     option = '{} {}'.format(name.upper(), 'true' if value else 'false')
                     self.assertIn(option, captured_queries[0]['sql'])
+
+    def test_option_sql_injection(self):
+        qs = Tag.objects.filter(name="test")
+        options = {"SUMMARY true) SELECT 1; --": True}
+        msg = "Invalid option name: 'SUMMARY true) SELECT 1; --'"
+        with self.assertRaisesMessage(ValueError, msg):
+            qs.explain(**options)
+
+    def test_invalid_option_names(self):
+        qs = Tag.objects.filter(name="test")
+        tests = [
+            'opt"ion',
+            "o'ption",
+            "op`tion",
+            "opti on",
+            "option--",
+            "optio\tn",
+            "o\nption",
+            "option;",
+            "你 好",
+            # [] are used by MSSQL.
+            "option[",
+            "option]",
+        ]
+        for invalid_option in tests:
+            with self.subTest(invalid_option):
+                msg = "Invalid option name: '%s'" % invalid_option
+                with self.assertRaisesMessage(ValueError, msg):
+                    qs.explain(**{invalid_option: True})
 
     @unittest.skipUnless(connection.vendor == 'mysql', 'MySQL specific')
     def test_mysql_text_to_traditional(self):
