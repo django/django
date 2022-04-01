@@ -49,6 +49,10 @@ __all__ = ["Query", "RawQuery"]
 # SQL comments are forbidden in column aliases.
 FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|--|/\*|\*/")
 
+# Inspired from
+# https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+EXPLAIN_OPTIONS_PATTERN = _lazy_re_compile(r"[\w\-]+")
+
 
 def get_field_names_from_opts(opts):
     if opts is None:
@@ -589,6 +593,12 @@ class Query(BaseExpression):
 
     def explain(self, using, format=None, **options):
         q = self.clone()
+        for option_name in options:
+            if (
+                not EXPLAIN_OPTIONS_PATTERN.fullmatch(option_name)
+                or "--" in option_name
+            ):
+                raise ValueError(f"Invalid option name: {option_name!r}.")
         q.explain_info = ExplainInfo(format, options)
         compiler = q.get_compiler(using=using)
         return "\n".join(compiler.explain_query())

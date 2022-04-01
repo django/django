@@ -15,6 +15,13 @@ CVE-2022-28346: Potential SQL injection in ``QuerySet.annotate()``, ``aggregate(
 aliases, using a suitably crafted dictionary, with dictionary expansion, as the
 ``**kwargs`` passed to these methods.
 
+CVE-2022-28347: Potential SQL injection via ``QuerySet.explain(**options)`` on PostgreSQL
+=========================================================================================
+
+:meth:`.QuerySet.explain` method was subject to SQL injection in option names,
+using a suitably crafted dictionary, with dictionary expansion, as the
+``**options`` argument.
+
 Bugfixes
 ========
 
