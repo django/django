@@ -34,6 +34,15 @@ class ValuesExpressionsTests(TestCase):
             [{"salary": 10}, {"salary": 20}, {"salary": 30}],
         )
 
+    def test_values_expression_alias_sql_injection(self):
+        crafted_alias = """injected_name" from "expressions_company"; --"""
+        msg = (
+            "Column aliases cannot contain whitespace characters, quotation marks, "
+            "semicolons, or SQL comments."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Company.objects.values(**{crafted_alias: F("ceo__salary")})
+
     def test_values_expression_group_by(self):
         # values() applies annotate() first, so values selected are grouped by
         # id, not firstname.
