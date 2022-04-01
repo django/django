@@ -1,0 +1,7 @@
+===========================
+Django 3.2.13 release notes
+===========================
+
+*April 11, 2022*
+
+Django 3.2.13 fixes two security issues with severity "high" in 3.2.12.
