@@ -148,21 +148,29 @@ class DeferredAttribute:
             return getattr(instance, link_field.attname)
         return None
 
+class classorinstancemethod(object):
+    def __init__(self, class_method, instance_method):
+        self.class_method = class_method
+        self.instance_method = instance_method
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return functools.partial(self.class_method, owner)
+        return functools.partial(self.instance_method, instance)
 
 class RegisterLookupMixin:
     @classmethod
     def _get_lookup(cls, lookup_name):
         return cls.get_lookups().get(lookup_name, None)
-
-    @classmethod
-    @functools.lru_cache(maxsize=None)
-    def get_lookups(cls):
+    
+    # @functools.lru_cache(maxsize=None)
+    def get_class_lookups(cls):
         class_lookups = [
             parent.__dict__.get("class_lookups", {}) for parent in inspect.getmro(cls)
         ]
         return cls.merge_dicts(class_lookups)
 
-    def get_lookup(self, lookup_name):
+    def __get_lookup(self, lookup_name):
         from django.db.models.lookups import Lookup
 
         found = self._get_lookup(lookup_name)
@@ -171,7 +179,18 @@ class RegisterLookupMixin:
         if found is not None and not issubclass(found, Lookup):
             return None
         return found
+    get_lookup = classorinstancemethod(__get_lookup,__get_lookup)
+    def get_instance_lookups(self):
+        # print("lookups = self.__class__.get_lookups()")
+        lookups = self.__class__.get_lookups()
+        # print(self.__class__)
+        instance_lookups = getattr(self, 'instance_lookups', None)
+        if instance_lookups:
+            lookups = {**lookups, **instance_lookups}
+        return lookups
 
+    get_lookups = classorinstancemethod(get_class_lookups, get_instance_lookups)
+    
     def get_transform(self, lookup_name):
         from django.db.models.lookups import Transform
 
@@ -193,7 +212,6 @@ class RegisterLookupMixin:
             merged.update(d)
         return merged
 
-    @classmethod
     def _clear_cached_lookups(cls):
         for subclass in subclasses(cls):
             subclass.get_lookups.cache_clear()
@@ -205,8 +223,19 @@ class RegisterLookupMixin:
         if "class_lookups" not in cls.__dict__:
             cls.class_lookups = {}
         cls.class_lookups[lookup_name] = lookup
-        cls._clear_cached_lookups()
+        # cls._clear_cached_lookups(cls)
         return lookup
+
+    def register_instance_lookup(self, lookup, lookup_name=None):
+        if lookup_name is None:
+            lookup_name = lookup.lookup_name
+        if "instance_lookups" not in self.__dict__:
+            self.instance_lookups = {}
+        self.instance_lookups[lookup_name] = lookup
+        # self._clear_cached_lookups()
+        return lookup
+
+    # register_lookup = classorinstancemethod(register_class_lookup,register_class_lookup)
 
     @classmethod
     def _unregister_lookup(cls, lookup, lookup_name=None):
