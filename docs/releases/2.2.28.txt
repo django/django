@@ -1,0 +1,7 @@
+===========================
+Django 2.2.28 release notes
+===========================
+
+*April 11, 2022*
+
+Django 2.2.28 fixes two security issues with severity "high" in 2.2.27.

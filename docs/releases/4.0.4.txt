@@ -2,9 +2,9 @@
 Django 4.0.4 release notes
 ==========================
 
-*Expected April 4, 2022*
+*April 11, 2022*
 
-Django 4.0.4 fixes several bugs in 4.0.3.
+Django 4.0.4 fixes two security issues with severity "high" and a bug in 4.0.3.
 
 Bugfixes
 ========
