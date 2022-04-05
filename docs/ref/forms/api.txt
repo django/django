@@ -534,6 +534,11 @@ default this template is ``'django/forms/default.html'``, which is a proxy for
 overriding the ``template_name`` attribute or more generally by overriding the
 default template, see also :ref:`overriding-built-in-form-templates`.
 
+.. versionchanged:: 4.1
+
+    In Django 4.1 the default which is a proxy for ``template_name_table`` is
+    deprecated and will be replaced by ``template_name_div`` in Django 5.0.
+
 ``template_name_label``
 -----------------------
 
@@ -546,17 +551,14 @@ The template used to render a field's ``<label>``, used when calling
 form by overriding this attribute or more generally by overriding the default
 template, see also :ref:`overriding-built-in-form-templates`.
 
-``as_div()``
-------------
+``template_name_div``
+---------------------
 
 .. versionadded:: 4.1
 
-.. method:: Form.as_div()
+.. attribute:: Form.template_name_div
 
-``as_div()`` renders the form using the template assigned to the
-forms ``template_name_div`` attribute, by default this template is
-``'django/forms/div.html'``. This template outputs the form as an HTML
-``<div>``::
+This template outputs the form as an HTML ``<div>``::
 
     >>> f = ContactForm()
     >>> f.as_div()
@@ -566,6 +568,42 @@ forms ``template_name_div`` attribute, by default this template is
     <div><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" required></div>
     <div><label for="id_sender">Sender:</label> <input type="email" name="sender" id="id_sender" required></div>
     <div><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself"></div>
+
+``get_context()``
+-----------------
+
+.. versionadded:: 4.0
+
+.. method:: Form.get_context()
+
+Return context for form rendering in a template.
+
+The available context is:
+
+* ``form``: The bound form.
+* ``fields``: All bound fields, except the hidden fields.
+* ``hidden_fields``: All hidden bound fields.
+* ``errors``: All non field related or hidden field related form errors.
+
+``render()``
+------------
+
+.. versionadded:: 4.0
+
+.. method:: Form.render(template_name=None, context=None, renderer=None)
+
+The render method is called by ``__str__`` as well as the
+:meth:`.Form.as_table`, :meth:`.Form.as_p`, and :meth:`.Form.as_ul` methods.
+All arguments are optional and default to:
+
+* ``template_name``: :attr:`.Form.template_name`
+* ``context``: Value returned by :meth:`.Form.get_context`
+* ``renderer``: Value returned by :attr:`.Form.default_renderer`
+
+The below methods are retained for backward compatibility and are not 
+recommended due to accessibility concerns. The recommended approach is 
+set the template to render your form with the ``template_name``
+attribute and to use ``str`` / ``{{ form }}`` to render your form.
 
 ``as_p()``
 ----------
@@ -625,37 +663,6 @@ forms ``template_name_table`` attribute, by default this template is
     <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" required></td></tr>
     <tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" required></td></tr>
     <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself"></td></tr>
-
-``get_context()``
------------------
-
-.. versionadded:: 4.0
-
-.. method:: Form.get_context()
-
-Return context for form rendering in a template.
-
-The available context is:
-
-* ``form``: The bound form.
-* ``fields``: All bound fields, except the hidden fields.
-* ``hidden_fields``: All hidden bound fields.
-* ``errors``: All non field related or hidden field related form errors.
-
-``render()``
-------------
-
-.. versionadded:: 4.0
-
-.. method:: Form.render(template_name=None, context=None, renderer=None)
-
-The render method is called by ``__str__`` as well as the
-:meth:`.Form.as_table`, :meth:`.Form.as_p`, and :meth:`.Form.as_ul` methods.
-All arguments are optional and default to:
-
-* ``template_name``: :attr:`.Form.template_name`
-* ``context``: Value returned by :meth:`.Form.get_context`
-* ``renderer``: Value returned by :attr:`.Form.default_renderer`
 
 .. _ref-forms-api-styling-form-rows:
 

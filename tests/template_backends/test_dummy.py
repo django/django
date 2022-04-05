@@ -66,6 +66,7 @@ class TemplateStringsTests(SimpleTestCase):
             self.skipTest("test doesn't apply to dummy backend")
 
         class TestForm(Form):
+            template_name = Form.template_name_div
             test_field = CharField()
 
         media = Media(js=["my-script.js"])

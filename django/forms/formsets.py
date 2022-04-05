@@ -32,6 +32,7 @@ class ManagementForm(Form):
     as well.
     """
 
+    template_name = Form.template_name_table
     TOTAL_FORMS = IntegerField(widget=HiddenInput)
     INITIAL_FORMS = IntegerField(widget=HiddenInput)
     # MIN_NUM_FORM_COUNT and MAX_NUM_FORM_COUNT are output with the rest of the
@@ -63,7 +64,6 @@ class BaseFormSet(RenderableFormMixin):
         ),
     }
     template_name = "django/forms/formsets/default.html"
-    template_name_div = "django/forms/formsets/div.html"
     template_name_p = "django/forms/formsets/p.html"
     template_name_table = "django/forms/formsets/table.html"
     template_name_ul = "django/forms/formsets/ul.html"

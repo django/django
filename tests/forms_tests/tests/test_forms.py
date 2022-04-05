@@ -41,9 +41,10 @@ from django.forms.renderers import DjangoTemplates, get_default_renderer
 from django.forms.utils import ErrorList
 from django.http import QueryDict
 from django.template import Context, Template
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.test.utils import override_settings
 from django.utils.datastructures import MultiValueDict
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.safestring import mark_safe
 
 from . import jinja2_tests
@@ -147,19 +148,16 @@ class FormsTestCase(SimpleTestCase):
                 ["Birthday", "1940-10-9"],
             ],
         )
+        # RemovedInDjango50Warning remove template_name override.
+        p.template_name = p.template_name_div
         self.assertHTMLEqual(
             str(p),
-            """
-            <tr><th><label for="id_first_name">First name:</label></th><td>
-            <input type="text" name="first_name" value="John" id="id_first_name"
-                required></td></tr>
-            <tr><th><label for="id_last_name">Last name:</label></th><td>
-            <input type="text" name="last_name" value="Lennon" id="id_last_name"
-                required></td></tr>
-            <tr><th><label for="id_birthday">Birthday:</label></th><td>
-            <input type="text" name="birthday" value="1940-10-9" id="id_birthday"
-                required></td></tr>
-            """,
+            '<div><label for="id_first_name">First name:</label><input type="text" '
+            'name="first_name" value="John" required id="id_first_name"></div><div>'
+            '<label for="id_last_name">Last name:</label><input type="text" '
+            'name="last_name" value="Lennon" required id="id_last_name"></div><div>'
+            '<label for="id_birthday">Birthday:</label><input type="text" '
+            'name="birthday" value="1940-10-9" required id="id_birthday"></div>',
         )
 
     def test_empty_dict(self):
@@ -171,18 +169,6 @@ class FormsTestCase(SimpleTestCase):
         self.assertEqual(p.errors["birthday"], ["This field is required."])
         self.assertFalse(p.is_valid())
         self.assertEqual(p.cleaned_data, {})
-        self.assertHTMLEqual(
-            str(p),
-            """<tr><th><label for="id_first_name">First name:</label></th><td>
-<ul class="errorlist"><li>This field is required.</li></ul>
-<input type="text" name="first_name" id="id_first_name" required></td></tr>
-<tr><th><label for="id_last_name">Last name:</label></th>
-<td><ul class="errorlist"><li>This field is required.</li></ul>
-<input type="text" name="last_name" id="id_last_name" required></td></tr>
-<tr><th><label for="id_birthday">Birthday:</label></th><td>
-<ul class="errorlist"><li>This field is required.</li></ul>
-<input type="text" name="birthday" id="id_birthday" required></td></tr>""",
-        )
         self.assertHTMLEqual(
             p.as_table(),
             """<tr><th><label for="id_first_name">First name:</label></th><td>
@@ -219,8 +205,10 @@ class FormsTestCase(SimpleTestCase):
 <p><label for="id_birthday">Birthday:</label>
 <input type="text" name="birthday" id="id_birthday" required></p>""",
         )
+        # RemovedInDjango50Warning remove template_name override.
+        p.template_name = p.template_name_div
         self.assertHTMLEqual(
-            p.as_div(),
+            str(p),
             '<div><label for="id_first_name">First name:</label><input type="text" '
             'name="first_name" required id="id_first_name"><ul class="errorlist"><li>'
             'This field is required.</li></ul></div><div><label for="id_last_name">'
@@ -248,16 +236,6 @@ class FormsTestCase(SimpleTestCase):
         self.assertFalse(p.is_valid())
         with self.assertRaises(AttributeError):
             p.cleaned_data
-
-        self.assertHTMLEqual(
-            str(p),
-            """<tr><th><label for="id_first_name">First name:</label></th><td>
-<input type="text" name="first_name" id="id_first_name" required></td></tr>
-<tr><th><label for="id_last_name">Last name:</label></th><td>
-<input type="text" name="last_name" id="id_last_name" required></td></tr>
-<tr><th><label for="id_birthday">Birthday:</label></th><td>
-<input type="text" name="birthday" id="id_birthday" required></td></tr>""",
-        )
         self.assertHTMLEqual(
             p.as_table(),
             """<tr><th><label for="id_first_name">First name:</label></th><td>
@@ -285,8 +263,10 @@ class FormsTestCase(SimpleTestCase):
 <p><label for="id_birthday">Birthday:</label>
 <input type="text" name="birthday" id="id_birthday" required></p>""",
         )
+        # RemovedInDjango50Warning remove template_name override.
+        p.template_name = p.template_name_div
         self.assertHTMLEqual(
-            p.as_div(),
+            str(p),
             '<div><label for="id_first_name">First name:</label><input type="text" '
             'name="first_name" id="id_first_name" required></div><div><label '
             'for="id_last_name">Last name:</label><input type="text" name="last_name" '
@@ -343,8 +323,10 @@ class FormsTestCase(SimpleTestCase):
             '<input type="text" name="birthday" value="1940-10-9" id="id_birthday" '
             "required></p>",
         )
+        # RemovedInDjango50Warning remove template_name override.
+        p.template_name = p.template_name_div
         self.assertHTMLEqual(
-            p.as_div(),
+            str(p),
             '<div><label for="id_first_name">First name:</label>'
             '<input type="text" name="first_name" value="John" id="id_first_name" '
             'required></div><div><label for="id_last_name">Last name:</label>'
@@ -470,8 +452,10 @@ class FormsTestCase(SimpleTestCase):
 <p><label for="birthday_id">Birthday:</label>
 <input type="text" name="birthday" id="birthday_id" required></p>""",
         )
+        # RemovedInDjango50Warning remove template_name override.
+        p.template_name = p.template_name_div
         self.assertHTMLEqual(
-            p.as_div(),
+            str(p),
             '<div><label for="first_name_id">First name:</label><input type="text" '
             'name="first_name" id="first_name_id" required></div><div><label '
             'for="last_name_id">Last name:</label><input type="text" '
@@ -787,8 +771,10 @@ class FormsTestCase(SimpleTestCase):
 </div></li>""",
         )
         # Need an auto_id to generate legend.
+        # RemovedInDjango50Warning remove template_name override.
+        f.template_name = f.template_name_div
         self.assertHTMLEqual(
-            f.as_div(),
+            str(f),
             '<div> Name: <input type="text" name="name" required></div><div><fieldset>'
             'Language:<div><div><label><input type="radio" name="language" value="P" '
             'required> Python</label></div><div><label><input type="radio" '
@@ -861,8 +847,10 @@ class FormsTestCase(SimpleTestCase):
             </div></p>
             """,
         )
+        # RemovedInDjango50Warning remove template_name override.
+        f.template_name = f.template_name_div
         self.assertHTMLEqual(
-            f.as_div(),
+            str(f),
             '<div><label for="id_name">Name:</label><input type="text" name="name" '
             'required id="id_name"></div><div><fieldset><legend>Language:</legend>'
             '<div id="id_language"><div><label for="id_language_0"><input '
@@ -1081,8 +1069,10 @@ class FormsTestCase(SimpleTestCase):
             '<option value="P">Paul McCartney</option>'
             "</select></p>",
         )
+        # RemovedInDjango50Warning remove template_name override.
+        f.template_name = f.template_name_div
         self.assertHTMLEqual(
-            f.as_div(),
+            str(f),
             '<div><label for="id_name">Name:</label><input type="text" name="name" '
             'required id="id_name"></div><div><label for="id_composers">Composers:'
             '</label><select name="composers" required id="id_composers" multiple>'
@@ -1131,8 +1121,10 @@ class FormsTestCase(SimpleTestCase):
             'id="id_composers_1">Paul McCartney</label></div>'
             "</div></p>",
         )
+        # RemovedInDjango50Warning remove template_name override.
+        f.template_name = f.template_name_div
         self.assertHTMLEqual(
-            f.as_div(),
+            str(f),
             '<div><label for="id_name">Name:</label><input type="text" name="name" '
             'required id="id_name"></div><div><fieldset><legend>Composers:</legend>'
             '<div id="id_composers"><div><label for="id_composers_0"><input '
@@ -1569,8 +1561,10 @@ class FormsTestCase(SimpleTestCase):
             <li>Password2: <input type="password" name="password2" required></li>
             """,
         )
+        # RemovedInDjango50Warning remove template_name override.
+        f.template_name = f.template_name_div
         self.assertHTMLEqual(
-            f.as_div(),
+            str(f),
             '<ul class="errorlist nonfield"><li>Please make sure your passwords match.'
             '</li></ul><div>Username: <input type="text" name="username" '
             'value="adrian" maxlength="10" required></div><div>Password1: <input '
@@ -1734,8 +1728,10 @@ class FormsTestCase(SimpleTestCase):
             "<li>(Hidden field hidden_input) This field is required.</li></ul>"
             '<p><input type="hidden" name="hidden_input" id="id_hidden_input"></p>',
         )
+        # RemovedInDjango50Warning remove template_name override.
+        f.template_name = f.template_name_div
         self.assertHTMLEqual(
-            f.as_div(),
+            str(f),
             '<ul class="errorlist nonfield"><li>Form error</li>'
             "<li>(Hidden field hidden_input) This field is required.</li></ul>"
             '<div><input type="hidden" name="hidden_input" id="id_hidden_input"></div>',
@@ -1984,8 +1980,10 @@ class FormsTestCase(SimpleTestCase):
             <input type="hidden" name="hidden_text"></p>
             """,
         )
+        # RemovedInDjango50Warning remove template_name override.
+        p.template_name = p.template_name_div
         self.assertHTMLEqual(
-            p.as_div(),
+            str(p),
             '<div>First name: <input type="text" name="first_name" required></div>'
             '<div>Last name: <input type="text" name="last_name" required></div><div>'
             'Birthday: <input type="text" name="birthday" required><input '
@@ -2024,8 +2022,10 @@ class FormsTestCase(SimpleTestCase):
 <input type="text" name="birthday" id="id_birthday" required>
 <input type="hidden" name="hidden_text" id="id_hidden_text"></p>""",
         )
+        # RemovedInDjango50Warning remove template_name override.
+        p.template_name = p.template_name_div
         self.assertHTMLEqual(
-            p.as_div(),
+            str(p),
             '<div><label for="id_first_name">First name:</label><input type="text" '
             'name="first_name" id="id_first_name" required></div><div><label '
             'for="id_last_name">Last name:</label><input type="text" name="last_name" '
@@ -2083,8 +2083,10 @@ class FormsTestCase(SimpleTestCase):
             <input type="hidden" name="hidden_text"></p>
             """,
         )
+        # RemovedInDjango50Warning remove template_name override.
+        p.template_name = p.template_name_div
         self.assertHTMLEqual(
-            p.as_div(),
+            str(p),
             '<ul class="errorlist nonfield"><li>(Hidden field hidden_text) This field '
             'is required.</li></ul><div>First name: <input type="text" '
             'name="first_name" value="John" required></div><div>Last name: <input '
@@ -2927,8 +2929,10 @@ Options: <select multiple name="options" required>
             <br>
             <span class="helptext">Wählen Sie mit Bedacht.</span></td></tr>""",
         )
+        # RemovedInDjango50Warning remove template_name override.
+        p.template_name = p.template_name_div
         self.assertHTMLEqual(
-            p.as_div(),
+            str(p),
             '<div>Username: <input type="text" name="username" maxlength="10" required>'
             '<span class="helptext">e.g., user@example.com</span></div>'
             '<div>Password: <input type="password" name="password" required>'
@@ -3554,8 +3558,10 @@ Password: <input type="password" name="password" required>
 <td><ul class="errorlist"><li>This field is required.</li></ul>
 <input type="number" name="age" id="id_age" required></td></tr>""",
         )
+        # RemovedInDjango50Warning remove template_name override.
+        p.template_name = p.template_name_div
         self.assertHTMLEqual(
-            p.as_div(),
+            str(p),
             '<div class="required error"><label for="id_name" class="required">Name:'
             '</label><input type="text" name="name" required id="id_name" />'
             '<ul class="errorlist"><li>This field is required.</li></ul></div>'
@@ -4165,8 +4171,10 @@ Password: <input type="password" name="password" required>
 <input id="id_first_name" name="first_name" type="text" value="John" required>
 <input id="id_last_name" name="last_name" type="hidden"></td></tr>""",
         )
+        # RemovedInDjango50Warning remove template_name override.
+        p.template_name = p.template_name_div
         self.assertHTMLEqual(
-            p.as_div(),
+            str(p),
             '<ul class="errorlist nonfield"><li>(Hidden field last_name) This field '
             'is required.</li></ul><div><label for="id_first_name">First name:</label>'
             '<input id="id_first_name" name="first_name" type="text" value="John" '
@@ -4221,8 +4229,10 @@ Password: <input type="password" name="password" required>
             </td></tr>
             """,
         )
+        # RemovedInDjango50Warning remove template_name override.
+        p.template_name = p.template_name_div
         self.assertHTMLEqual(
-            p.as_div(),
+            str(p),
             '<ul class="errorlist nonfield"><li>Generic validation error</li></ul>'
             '<div><label for="id_first_name">First name:</label><input '
             'id="id_first_name" name="first_name" type="text" value="John" required>'
@@ -4364,6 +4374,8 @@ Password: <input type="password" name="password" required>
 
     def test_html_safe(self):
         class SimpleForm(Form):
+            # RemovedInDjango50Warning Remove template_name override.
+            template_name = Form.template_name_div
             username = CharField()
 
         form = SimpleForm()
@@ -4425,8 +4437,10 @@ Password: <input type="password" name="password" required>
             '<option value="J">Java</option>'
             "</select></td></tr>",
         )
+        # RemovedInDjango50Warning Remove template_name override.
+        form.template_name = form.template_name_div
         self.assertHTMLEqual(
-            form.as_div(),
+            str(form),
             '<div><label for="id_f1">F1:</label><input id="id_f1" maxlength="30" '
             'name="f1" type="text" required></div><div><label for="id_f2">F2:</label>'
             '<input id="id_f2" maxlength="30" name="f2" type="text"></div><div><label '
@@ -4486,8 +4500,10 @@ Password: <input type="password" name="password" required>
             '<option value="J">Java</option>'
             "</select></td></tr>",
         )
+        # RemovedInDjango50Warning Remove template_name override.
+        form.template_name = form.template_name_div
         self.assertHTMLEqual(
-            form.as_div(),
+            str(form),
             '<div><label for="id_f1">F1:</label> <input id="id_f1" maxlength="30" '
             'name="f1" type="text"></div><div><label for="id_f2">F2:</label>'
             '<input id="id_f2" maxlength="30" name="f2" type="text"></div><div>'
@@ -4923,7 +4939,7 @@ class TemplateTests(SimpleTestCase):
             t = Template(
                 '<form method="post">'
                 "<table>"
-                "{{ form }}"
+                "{{ form.as_table }}"
                 "</table>"
                 '<input type="submit" required>'
                 "</form>"
@@ -5025,6 +5041,7 @@ class OverrideTests(SimpleTestCase):
     def test_cyclic_context_boundfield_render(self):
         class FirstNameForm(Form):
             first_name = CharField()
+            template_name = "django/forms/table.html"
             template_name_label = "forms_tests/cyclic_context_boundfield_render.html"
 
         f = FirstNameForm()
@@ -5043,4 +5060,70 @@ class OverrideTests(SimpleTestCase):
             str(f),
             '<label for="id_name" class="required">Name:</label>'
             '<legend class="required">Language:</legend>',
+        )
+
+
+class DeprecationTests(SimpleTestCase):
+    def test_warning(self):
+        form = Person()
+        msg = (
+            "The default template will change from 'django/forms/table.html' "
+            "to 'django/forms/div.html'. If you wish to continue to use render "
+            "your form as a table, use the 'as_table()' method."
+        )
+        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
+            str(form)
+
+
+@ignore_warnings(category=RemovedInDjango50Warning)
+class DeprecatedTests(SimpleTestCase):
+    def test_form(self):
+        # Pass a dictionary to a Form's __init__().
+        p = Person(
+            {"first_name": "John", "last_name": "Lennon", "birthday": "1940-10-9"}
+        )
+        self.assertHTMLEqual(
+            str(p),
+            """
+            <tr><th><label for="id_first_name">First name:</label></th><td>
+            <input type="text" name="first_name" value="John" id="id_first_name"
+                required></td></tr>
+            <tr><th><label for="id_last_name">Last name:</label></th><td>
+            <input type="text" name="last_name" value="Lennon" id="id_last_name"
+                required></td></tr>
+            <tr><th><label for="id_birthday">Birthday:</label></th><td>
+            <input type="text" name="birthday" value="1940-10-9" id="id_birthday"
+                required></td></tr>
+            """,
+        )
+
+    def test_empty_dict(self):
+        # Empty dictionaries are valid, too.
+        p = Person({})
+        self.assertHTMLEqual(
+            str(p),
+            """<tr><th><label for="id_first_name">First name:</label></th><td>
+<ul class="errorlist"><li>This field is required.</li></ul>
+<input type="text" name="first_name" id="id_first_name" required></td></tr>
+<tr><th><label for="id_last_name">Last name:</label></th>
+<td><ul class="errorlist"><li>This field is required.</li></ul>
+<input type="text" name="last_name" id="id_last_name" required></td></tr>
+<tr><th><label for="id_birthday">Birthday:</label></th><td>
+<ul class="errorlist"><li>This field is required.</li></ul>
+<input type="text" name="birthday" id="id_birthday" required></td></tr>""",
+        )
+
+    def test_unbound_form(self):
+        # If you don't pass any values to the Form's __init__(), or if you pass None,
+        # the Form will be considered unbound and won't do any validation. Form.errors
+        # will be an empty dictionary *but* Form.is_valid() will return False.
+        p = Person()
+        self.assertHTMLEqual(
+            str(p),
+            """<tr><th><label for="id_first_name">First name:</label></th><td>
+<input type="text" name="first_name" id="id_first_name" required></td></tr>
+<tr><th><label for="id_last_name">Last name:</label></th><td>
+<input type="text" name="last_name" id="id_last_name" required></td></tr>
+<tr><th><label for="id_birthday">Birthday:</label></th><td>
+<input type="text" name="birthday" id="id_birthday" required></td></tr>""",
         )

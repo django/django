@@ -1,5 +1,6 @@
 from django.forms import Form, HiddenInput, NullBooleanField, RadioSelect
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango50Warning
 
 from . import FormFieldAssertionsMixin
 
@@ -19,6 +20,7 @@ class NullBooleanFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertTrue(f.clean("true"))
         self.assertFalse(f.clean("false"))
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_nullbooleanfield_2(self):
         # The internal value is preserved if using HiddenInput (#7753).
         class HiddenNullBooleanForm(Form):

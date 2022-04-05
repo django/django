@@ -530,6 +530,16 @@ class BaseForm(RenderableFormMixin):
             value = value.replace(microsecond=0)
         return value
 
+    # RemovedInDjango50Warning
+    def template_check(self):
+        msg = (
+            "The default template will change from 'django/forms/table.html' "
+            "to 'django/forms/div.html'. If you wish to continue to use render "
+            "your form as a table, use the 'as_table()' method."
+        )
+        warnings.warn(msg, RemovedInDjango50Warning, stacklevel=2)
+        return ""
+
 
 class Form(BaseForm, metaclass=DeclarativeFieldsMetaclass):
     "A collection of Fields, plus their associated data."

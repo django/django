@@ -490,15 +490,53 @@ appropriately.
 Form rendering options
 ----------------------
 
+.. versionchanged:: 4.0
+
+    Template rendering of forms was added.
+
 .. admonition:: Additional form template furniture
 
     Don't forget that a form's output does *not* include the surrounding
     ``<form>`` tags, or the form's ``submit`` control. You will have to provide
     these yourself.
 
-There are other output options though for the ``<label>``/``<input>`` pairs:
+.. versionchanged::: 4.1
 
-* ``{{ form.as_div }}`` will render them them wrapped in ``<div>`` tags
+    The default template used by forms when calling ``str`` which renders
+    form as tables is deprecated and will be replaced by a template which 
+    renders the form in ``<div>`` tags. To adopt this new layout early you 
+    can override your forms :attr:`~django.forms.Form.template_name` attribute
+    to :attr:`~django.forms.Form.template_name_div`
+
+To customize your form rendering logic you can overriding the forms 
+:attr:`~django.forms.Form.template_name` attribute and render the form using a 
+custom template. The below example will result in ``{{ form }}`` being rendered
+as the output of the ``form_snippet.html`` template.
+
+In your templates:
+
+.. code-block:: html+django
+
+    # In your template:
+    {{ form }}
+
+    # In form_snippet.html:
+    {% for field in form %}
+        <div class="fieldWrapper">
+            {{ field.errors }}
+            {{ field.label_tag }} {{ field }}
+        </div>
+    {% endfor %}
+
+In your form::
+
+    class MyForm(forms.Form):
+        template_name = 'form_snippet.html'
+        ...
+
+There are other output options though for the ``<label>``/``<input>`` pairs
+which are retained for backward compatibility. These layouts are not 
+recommended due to accessibility concerns:
 
 * ``{{ form.as_table }}`` will render them as table cells wrapped in ``<tr>``
   tags
@@ -755,41 +793,6 @@ This example does not handle any errors in the hidden fields. Usually, an
 error in a hidden field is a sign of form tampering, since normal form
 interaction won't alter them. However, you could easily insert some error
 displays for those form errors, as well.
-
-Reusable form templates
------------------------
-
-If your site uses the same rendering logic for forms in multiple places, you
-can reduce duplication by saving the form's loop in a standalone template and
-overriding the forms :attr:`~django.forms.Form.template_name` attribute to
-render the form using the custom template. The below example will result in
-``{{ form }}`` being rendered as the output of the ``form_snippet.html``
-template.
-
-In your templates:
-
-.. code-block:: html+django
-
-    # In your template:
-    {{ form }}
-
-    # In form_snippet.html:
-    {% for field in form %}
-        <div class="fieldWrapper">
-            {{ field.errors }}
-            {{ field.label_tag }} {{ field }}
-        </div>
-    {% endfor %}
-
-In your form::
-
-    class MyForm(forms.Form):
-        template_name = 'form_snippet.html'
-        ...
-
-.. versionchanged:: 4.0
-
-    Template rendering of forms was added.
 
 Further topics
 ==============

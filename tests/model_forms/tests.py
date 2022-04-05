@@ -686,7 +686,7 @@ class ModelFormBaseTest(TestCase):
                 exclude = ["url"]
 
         self.assertHTMLEqual(
-            str(SubclassMeta()),
+            SubclassMeta().as_table(),
             """<tr><th><label for="id_name">Name:</label></th>
 <td><input id="id_name" type="text" name="name" maxlength="20" required></td></tr>
 <tr><th><label for="id_slug">Slug:</label></th>
@@ -703,7 +703,7 @@ class ModelFormBaseTest(TestCase):
 
         self.assertEqual(list(OrderFields.base_fields), ["url", "name"])
         self.assertHTMLEqual(
-            str(OrderFields()),
+            OrderFields().as_table(),
             """<tr><th><label for="id_url">The URL:</label></th>
 <td><input id="id_url" type="text" name="url" maxlength="40" required></td></tr>
 <tr><th><label for="id_name">Name:</label></th>
@@ -1459,7 +1459,7 @@ class ModelFormBasicTests(TestCase):
         self.assertEqual(Category.objects.count(), 0)
         f = BaseCategoryForm()
         self.assertHTMLEqual(
-            str(f),
+            f.as_table(),
             """<tr><th><label for="id_name">Name:</label></th>
 <td><input id="id_name" type="text" name="name" maxlength="20" required></td></tr>
 <tr><th><label for="id_slug">Slug:</label></th>
@@ -1537,7 +1537,7 @@ class ModelFormBasicTests(TestCase):
         # inserted as 'initial' data in each Field.
         f = RoykoForm(auto_id=False, instance=self.w_royko)
         self.assertHTMLEqual(
-            str(f),
+            f.as_table(),
             """
             <tr><th>Name:</th><td>
             <input type="text" name="name" value="Mike Royko" maxlength="50" required>
@@ -1701,7 +1701,7 @@ class ModelFormBasicTests(TestCase):
         # fields with the 'choices' attribute are represented by a ChoiceField.
         f = ArticleForm(auto_id=False)
         self.assertHTMLEqual(
-            str(f),
+            f.as_table(),
             """
             <tr><th>Headline:</th><td>
             <input type="text" name="headline" maxlength="50" required></td></tr>
@@ -1790,7 +1790,7 @@ class ModelFormBasicTests(TestCase):
 
         f = PartialArticleForm(auto_id=False)
         self.assertHTMLEqual(
-            str(f),
+            f.as_table(),
             """
             <tr><th>Headline:</th><td>
             <input type="text" name="headline" maxlength="50" required></td></tr>
@@ -2448,8 +2448,9 @@ class FileAndImageFieldTests(TestCase):
                 fields = "__all__"
 
         form = DocumentForm()
-        self.assertIn('name="myfile"', str(form))
-        self.assertNotIn("myfile-clear", str(form))
+        html = form.as_table()
+        self.assertIn('name="myfile"', html)
+        self.assertNotIn("myfile-clear", html)
         form = DocumentForm(
             files={"myfile": SimpleUploadedFile("something.txt", b"content")}
         )
@@ -2457,7 +2458,7 @@ class FileAndImageFieldTests(TestCase):
         doc = form.save(commit=False)
         self.assertEqual(doc.myfile.name, "something.txt")
         form = DocumentForm(instance=doc)
-        self.assertIn("myfile-clear", str(form))
+        self.assertIn("myfile-clear", form.as_table())
         form = DocumentForm(instance=doc, data={"myfile-clear": "true"})
         doc = form.save(commit=False)
         self.assertFalse(doc.myfile)
@@ -2489,7 +2490,7 @@ class FileAndImageFieldTests(TestCase):
             form.errors["myfile"],
             ["Please either submit a file or check the clear checkbox, not both."],
         )
-        rendered = str(form)
+        rendered = form.as_table()
         self.assertIn("something.txt", rendered)
         self.assertIn("myfile-clear", rendered)
 
@@ -2989,7 +2990,7 @@ class OtherModelFormTests(TestCase):
         self.assertEqual(list(CategoryForm.base_fields), ["description", "url"])
 
         self.assertHTMLEqual(
-            str(CategoryForm()),
+            CategoryForm().as_table(),
             """<tr><th><label for="id_description">Description:</label></th>
 <td><input type="text" name="description" id="id_description" required></td></tr>
 <tr><th><label for="id_url">The URL:</label></th>
@@ -3013,7 +3014,7 @@ class OtherModelFormTests(TestCase):
     def test_model_field_that_returns_none_to_exclude_itself_with_explicit_fields(self):
         self.assertEqual(list(CustomFieldForExclusionForm.base_fields), ["name"])
         self.assertHTMLEqual(
-            str(CustomFieldForExclusionForm()),
+            CustomFieldForExclusionForm().as_table(),
             """<tr><th><label for="id_name">Name:</label></th>
 <td><input id="id_name" type="text" name="name" maxlength="10" required></td></tr>""",
         )

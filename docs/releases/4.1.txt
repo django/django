@@ -216,6 +216,7 @@ Forms
   now allow using hashable objects, not only path strings, as long as those
   objects implement the ``__html__()`` method (typically when decorated with
   the :func:`~django.utils.html.html_safe` decorator).
+
 * :class:`Forms <django.forms.Form>` and
   :doc:`Formsets </topics/forms/formsets>` can now be rendered in ``<div>``
   tags via their new ``as_div()`` methods.

@@ -4,7 +4,7 @@
 {% endif %}
 {% for field, errors in fields %}
   <div{% set classes = field.css_classes() %}{% if classes %} class="{{ classes }}"{% endif %}>
-    {% if field.widget_type == 'radioselect' or field.widget_type == 'checkboxselectmultiple' %}
+    {% if field.use_fieldset %}
       <fieldset>
       {% if field.label %}{{ field.legend_tag() }}{% endif %}
     {% else %}
@@ -14,7 +14,7 @@
     {% if field.help_text %}
       <span class="helptext">{{ field.help_text|safe }}</span>
     {% endif %}
-    {% if field.widget_type == 'radioselect' or field.widget_type == 'CheckboxSelectMultiple' %}</fieldset>{% endif %}
+    {% if field.use_fieldset %}</fieldset>{% endif %}
     {% if loop.last %}
       {% for field in hidden_fields %}{{ field }}{% endfor %}
     {% endif %}

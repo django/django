@@ -789,15 +789,6 @@ Formsets have the following attributes and methods associated with rendering:
     :attr:`~django.forms.Form.template_name`. This is a proxy of ``as_table``
     by default.
 
-.. attribute:: BaseFormSet.template_name_div
-
-    .. versionadded:: 4.1
-
-    The name of the template used when calling :meth:`.as_div`. By default this
-    is ``'django/forms/formsets/div.html'``. This template renders the formset's
-    management form and then each form in the formset as per the form's
-    :meth:`~django.forms.Form.as_div` method.
-
 .. attribute:: BaseFormSet.template_name_p
 
     .. versionadded:: 4.0
@@ -846,12 +837,6 @@ Formsets have the following attributes and methods associated with rendering:
     * ``template_name``: :attr:`.template_name`
     * ``context``: Value returned by :meth:`.get_context`
     * ``renderer``: Value returned by :attr:`.renderer`
-
-.. method:: BaseFormSet.as_div()
-
-    .. versionadded:: 4.1
-
-    Renders the formset with the :attr:`.template_name_div` template.
 
 .. method:: BaseFormSet.as_p()
 

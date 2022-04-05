@@ -205,6 +205,7 @@ TestChoices = (
 
 
 class TestForm(Form):
+    template_name = Form.template_name_div
     text = fields.CharField()
     email = fields.EmailField()
     value = fields.IntegerField()

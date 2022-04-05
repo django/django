@@ -31,6 +31,8 @@ from . import jinja2_tests
 
 
 class Choice(Form):
+    # RemovedInDjango50Warning remove template_name override.
+    template_name = Form.template_name_div
     choice = CharField()
     votes = IntegerField()
 
@@ -124,8 +126,8 @@ class FormsFormsetTestCase(SimpleTestCase):
 <input type="hidden" name="choices-INITIAL_FORMS" value="0">
 <input type="hidden" name="choices-MIN_NUM_FORMS" value="0">
 <input type="hidden" name="choices-MAX_NUM_FORMS" value="1000">
-<tr><th>Choice:</th><td><input type="text" name="choices-0-choice"></td></tr>
-<tr><th>Votes:</th><td><input type="number" name="choices-0-votes"></td></tr>""",
+<div>Choice:<input type="text" name="choices-0-choice"></div>
+<div>Votes:<input type="number" name="choices-0-votes"></div>""",
         )
         # FormSet are treated similarly to Forms. FormSet has an is_valid()
         # method, and a cleaned_data or errors attribute depending on whether
@@ -912,7 +914,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         LimitedFavoriteDrinkFormSet = formset_factory(FavoriteDrinkForm, extra=3)
         formset = LimitedFavoriteDrinkFormSet()
         self.assertHTMLEqual(
-            "\n".join(str(form) for form in formset.forms),
+            "\n".join(form.as_table() for form in formset.forms),
             """<tr><th><label for="id_form-0-name">Name:</label></th>
 <td><input type="text" name="form-0-name" id="id_form-0-name"></td></tr>
 <tr><th><label for="id_form-1-name">Name:</label></th>
@@ -933,7 +935,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         )
         formset = LimitedFavoriteDrinkFormSet()
         self.assertHTMLEqual(
-            "\n".join(str(form) for form in formset.forms),
+            "\n".join(form.as_table() for form in formset.forms),
             """<tr><th><label for="id_form-0-name">Name:</label></th><td>
 <input type="text" name="form-0-name" id="id_form-0-name"></td></tr>
 <tr><th><label for="id_form-1-name">Name:</label></th>
@@ -947,7 +949,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         )
         formset = LimitedFavoriteDrinkFormSet()
         self.assertHTMLEqual(
-            "\n".join(str(form) for form in formset.forms),
+            "\n".join(form.as_table() for form in formset.forms),
             """<tr><th><label for="id_form-0-name">Name:</label></th>
 <td><input type="text" name="form-0-name" id="id_form-0-name"></td></tr>""",
         )
@@ -959,7 +961,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         LimitedFavoriteDrinkFormSet = formset_factory(FavoriteDrinkForm, extra=1)
         formset = LimitedFavoriteDrinkFormSet(initial=[{"name": "Fernet and Coke"}])
         self.assertHTMLEqual(
-            "\n".join(str(form) for form in formset.forms),
+            "\n".join(form.as_table() for form in formset.forms),
             """
             <tr><th><label for="id_form-0-name">Name:</label></th>
             <td><input type="text" name="form-0-name" value="Fernet and Coke"
@@ -991,7 +993,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         )
         formset = LimitedFavoriteDrinkFormSet(initial=initial)
         self.assertHTMLEqual(
-            "\n".join(str(form) for form in formset.forms),
+            "\n".join(form.as_table() for form in formset.forms),
             """
             <tr><th><label for="id_form-0-name">Name:</label></th>
             <td><input id="id_form-0-name" name="form-0-name" type="text"
@@ -1017,7 +1019,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         )
         formset = LimitedFavoriteDrinkFormSet(initial=initial)
         self.assertHTMLEqual(
-            "\n".join(str(form) for form in formset.forms),
+            "\n".join(form.as_table() for form in formset.forms),
             """
             <tr><th><label for="id_form-0-name">Name:</label></th>
             <td>
@@ -1108,7 +1110,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         )
         formset = LimitedFavoriteDrinkFormSet(initial=[{"name": "Gin Tonic"}])
         self.assertHTMLEqual(
-            "\n".join(str(form) for form in formset.forms),
+            "\n".join(form.as_table() for form in formset.forms),
             """
             <tr><th><label for="id_form-0-name">Name:</label></th>
             <td>
@@ -1578,7 +1580,7 @@ class FormsetAsTagTests(SimpleTestCase):
 
     def test_as_div(self):
         self.assertHTMLEqual(
-            self.formset.as_div(),
+            str(self.formset),
             self.management_form_html
             + (
                 '<div>Choice: <input type="text" name="choices-0-choice" '
