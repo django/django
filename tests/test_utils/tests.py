@@ -1402,6 +1402,11 @@ class AssertFormErrorTests(SimpleTestCase):
         response = mock.Mock(context=[{}])
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertFormError(response, "form", "field", "invalid value")
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormError(
+                response, "form", "field", "invalid value", msg_prefix=msg_prefix
+            )
 
     def test_field_not_in_form(self):
         msg = (
@@ -1411,6 +1416,11 @@ class AssertFormErrorTests(SimpleTestCase):
         response = mock.Mock(context=[{"form": TestForm.invalid()}])
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertFormError(response, "form", "other_field", "invalid value")
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormError(
+                response, "form", "other_field", "invalid value", msg_prefix=msg_prefix
+            )
 
     def test_field_with_no_errors(self):
         msg = (
@@ -1421,6 +1431,11 @@ class AssertFormErrorTests(SimpleTestCase):
         with self.assertRaisesMessage(AssertionError, msg) as ctx:
             self.assertFormError(response, "form", "field", "invalid value")
         self.assertIn("[] != ['invalid value']", str(ctx.exception))
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormError(
+                response, "form", "field", "invalid value", msg_prefix=msg_prefix
+            )
 
     def test_field_with_different_error(self):
         msg = (
@@ -1431,6 +1446,11 @@ class AssertFormErrorTests(SimpleTestCase):
         with self.assertRaisesMessage(AssertionError, msg) as ctx:
             self.assertFormError(response, "form", "field", "other error")
         self.assertIn("['invalid value'] != ['other error']", str(ctx.exception))
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormError(
+                response, "form", "field", "other error", msg_prefix=msg_prefix
+            )
 
     def test_basic_positive_assertion(self):
         response = mock.Mock(context=[{"form": TestForm.invalid()}])
@@ -1469,6 +1489,23 @@ class AssertFormErrorTests(SimpleTestCase):
     def test_non_field_errors(self):
         response = mock.Mock(context=[{"form": TestForm.invalid(nonfield=True)}])
         self.assertFormError(response, "form", None, "non-field error")
+
+    def test_different_non_field_errors(self):
+        response = mock.Mock(context=[{"form": TestForm.invalid(nonfield=True)}])
+        msg = (
+            "The non-field errors of form <TestForm bound=True, valid=False, "
+            "fields=(field)> don't match."
+        )
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
+            self.assertFormError(response, "form", None, "other non-field error")
+        self.assertIn(
+            "['non-field error'] != ['other non-field error']", str(ctx.exception)
+        )
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormError(
+                response, "form", None, "other non-field error", msg_prefix=msg_prefix
+            )
 
     @ignore_warnings(category=RemovedInDjango50Warning)
     def test_errors_none(self):
@@ -1518,6 +1555,11 @@ class AssertFormsetErrorTests(SimpleTestCase):
         response = mock.Mock(context=[{}])
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertFormsetError(response, "formset", 0, "field", "invalid value")
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormsetError(
+                response, "formset", 0, "field", "invalid value", msg_prefix=msg_prefix
+            )
 
     def test_field_not_in_form(self):
         msg = (
@@ -1533,6 +1575,16 @@ class AssertFormsetErrorTests(SimpleTestCase):
                 "other_field",
                 "invalid value",
             )
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormsetError(
+                response,
+                "formset",
+                0,
+                "other_field",
+                "invalid value",
+                msg_prefix=msg_prefix,
+            )
 
     def test_field_with_no_errors(self):
         msg = (
@@ -1543,6 +1595,11 @@ class AssertFormsetErrorTests(SimpleTestCase):
         with self.assertRaisesMessage(AssertionError, msg) as ctx:
             self.assertFormsetError(response, "formset", 0, "field", "invalid value")
         self.assertIn("[] != ['invalid value']", str(ctx.exception))
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormsetError(
+                response, "formset", 0, "field", "invalid value", msg_prefix=msg_prefix
+            )
 
     def test_field_with_different_error(self):
         msg = (
@@ -1553,6 +1610,11 @@ class AssertFormsetErrorTests(SimpleTestCase):
         with self.assertRaisesMessage(AssertionError, msg) as ctx:
             self.assertFormsetError(response, "formset", 0, "field", "other error")
         self.assertIn("['invalid value'] != ['other error']", str(ctx.exception))
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormsetError(
+                response, "formset", 0, "field", "other error", msg_prefix=msg_prefix
+            )
 
     def test_basic_positive_assertion(self):
         response = mock.Mock(context=[{"formset": TestFormset.invalid()}])
@@ -1594,6 +1656,47 @@ class AssertFormsetErrorTests(SimpleTestCase):
         )
         self.assertFormsetError(response, "formset", 0, None, "non-field error")
 
+    def test_different_non_field_errors(self):
+        response = mock.Mock(
+            context=[{}, {"formset": TestFormset.invalid(nonfield=True)}],
+        )
+        msg = (
+            "The non-field errors of form 0 of formset <TestFormset: bound=True "
+            "valid=False total_forms=1> don't match."
+        )
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
+            self.assertFormsetError(
+                response, "formset", 0, None, "other non-field error"
+            )
+        self.assertIn(
+            "['non-field error'] != ['other non-field error']", str(ctx.exception)
+        )
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormsetError(
+                response,
+                "formset",
+                0,
+                None,
+                "other non-field error",
+                msg_prefix=msg_prefix,
+            )
+
+    def test_no_non_field_errors(self):
+        response = mock.Mock(context=[{}, {"formset": TestFormset.invalid()}])
+        msg = (
+            "The non-field errors of form 0 of formset <TestFormset: bound=True "
+            "valid=False total_forms=1> don't match."
+        )
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
+            self.assertFormsetError(response, "formset", 0, None, "non-field error")
+        self.assertIn("[] != ['non-field error']", str(ctx.exception))
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormsetError(
+                response, "formset", 0, None, "non-field error", msg_prefix=msg_prefix
+            )
+
     def test_non_form_errors(self):
         response = mock.Mock(
             context=[
@@ -1602,6 +1705,38 @@ class AssertFormsetErrorTests(SimpleTestCase):
             ]
         )
         self.assertFormsetError(response, "formset", None, None, "error")
+
+    def test_different_non_form_errors(self):
+        response = mock.Mock(
+            context=[{}, {"formset": TestFormset.invalid(nonform=True)}],
+        )
+        msg = (
+            "The non-form errors of formset <TestFormset: bound=True valid=False "
+            "total_forms=0> don't match."
+        )
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
+            self.assertFormsetError(response, "formset", None, None, "other error")
+        self.assertIn("['error'] != ['other error']", str(ctx.exception))
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormsetError(
+                response, "formset", None, None, "other error", msg_prefix=msg_prefix
+            )
+
+    def test_no_non_form_errors(self):
+        response = mock.Mock(context=[{}, {"formset": TestFormset.invalid()}])
+        msg = (
+            "The non-form errors of formset <TestFormset: bound=True valid=False "
+            "total_forms=1> don't match."
+        )
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
+            self.assertFormsetError(response, "formset", None, None, "error")
+        self.assertIn("[] != ['error']", str(ctx.exception))
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormsetError(
+                response, "formset", None, None, "error", msg_prefix=msg_prefix
+            )
 
     def test_non_form_errors_with_field(self):
         response = mock.Mock(
