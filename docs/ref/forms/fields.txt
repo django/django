@@ -258,6 +258,36 @@ fields. We've specified ``auto_id=False`` to simplify the output::
     <p>Sender: <input type="email" name="sender" required> A valid email address, please.</p>
     <p>Cc myself: <input type="checkbox" name="cc_myself"></p>
 
+When a field has help text and :attr:`~django.forms.BoundField.id_for_label`
+returns a value the help text will be associated with the input using
+``aria-describedby``::
+
+    >>> from django import forms
+    >>> class UserForm(forms.Form):
+    ...     username = forms.CharField(max_length=10, help_text='e.g., user@example.com')
+    >>> f = UserForm()
+    >>> print(f.as_p())
+    <p><label for="id_username">Username:</label>
+    <input type="text" name="username" maxlength="10" required aria-describedby="id_username_helptext" id="id_username">
+    <span class="helptext" id="id_username_helptext">e.g., user@example.com</span></p>
+
+``aria-describedby`` can be customized by adding it to the ``attrs`` of
+the field's widget. In this scenario you'll need to also customize the form
+template to make the same customization to the ``id`` of the help text.
+
+    >>> class UserForm(forms.Form):
+    ...     username = forms.CharField(
+    ...         max_length=10, help_text='e.g., user@example.com',
+    ...         widget=forms.TextInput(attrs={'aria-describedby': 'custom-description'}),
+    ...     )
+    >>> f = UserForm()
+    >>> print(f['username'])
+    <input type="text" name="username" aria-describedby="custom-description" maxlength="10" id="id_username" required>
+
+.. versionchanged:: 4.1
+
+    ``aria-describedby`` was added to associate ``help_text`` with its input.
+
 ``error_messages``
 ------------------
 
