@@ -4579,7 +4579,9 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Author, new_field, old_field, strict=True)
         self.assertIsNone(self.get_column_collation(Author._meta.db_table, "name"))
 
-    @skipUnlessDBFeature("supports_collation_on_charfield")
+    @skipUnlessDBFeature(
+        "supports_collation_on_charfield", "supports_collation_on_textfield"
+    )
     def test_alter_field_type_and_db_collation(self):
         collation = connection.features.test_collations.get("non_default")
         if not collation:
