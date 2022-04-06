@@ -134,7 +134,7 @@ class UpdateQuery(Query):
             query = UpdateQuery(model)
             query.values = values
             if self.related_ids is not None:
-                query.add_filter("pk__in", self.related_ids)
+                query.add_filter("pk__in", self.related_ids[model])
             result.append(query)
         return result
 
