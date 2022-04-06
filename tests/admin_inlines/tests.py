@@ -452,7 +452,7 @@ class TestInline(TestDataMixin, TestCase):
         self.assertContains(
             response,
             '<input id="id_-1-0-name" type="text" class="vTextField" name="-1-0-name" '
-            'maxlength="100">',
+            'maxlength="100" aria-describedby="id_-1-0-name_helptext" >',
             html=True,
         )
         self.assertContains(

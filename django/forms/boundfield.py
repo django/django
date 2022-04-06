@@ -278,6 +278,13 @@ class BoundField:
                 attrs["required"] = True
         if self.field.disabled:
             attrs["disabled"] = True
+        id_for_label = self.id_for_label
+        if (
+            self.field.help_text
+            and id_for_label
+            and "aria-describedby" not in widget.attrs
+        ):
+            attrs["aria-describedby"] = "%s_helptext" % id_for_label
         return attrs
 
     @property

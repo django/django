@@ -940,7 +940,8 @@ class TestFieldOverridesByFormMeta(SimpleTestCase):
         )
         self.assertHTMLEqual(
             str(form["slug"]),
-            '<input id="id_slug" type="text" name="slug" maxlength="20" required>',
+            '<input id="id_slug" type="text" name="slug" maxlength="20" required '
+            'aria-describedby="id_slug_helptext">',
         )
 
     def test_label_overrides(self):
