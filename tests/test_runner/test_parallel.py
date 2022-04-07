@@ -4,6 +4,7 @@ import unittest
 
 from django.test import SimpleTestCase
 from django.test.runner import RemoteTestResult
+from django.utils.version import PY311
 
 try:
     import tblib.pickling_support
@@ -125,7 +126,9 @@ class RemoteTestResultTest(SimpleTestCase):
         self.assertEqual(event[0], "addSubTest")
         self.assertEqual(
             str(event[2]),
-            "dummy_test (test_runner.test_parallel.SampleFailingSubtest) (index=0)",
+            "dummy_test (test_runner.test_parallel.SampleFailingSubtest%s) (index=0)"
+            # Python 3.11 uses fully qualified test name in the output.
+            % (".dummy_test" if PY311 else ""),
         )
         self.assertEqual(repr(event[3][1]), "AssertionError('0 != 1')")
 
