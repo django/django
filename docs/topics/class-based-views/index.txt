@@ -128,3 +128,33 @@ the response (using the ``book_list.html`` template). But if the client issues
 a ``HEAD`` request, the response has an empty body and the ``Last-Modified``
 header indicates when the most recent book was published.  Based on this
 information, the client may or may not download the full object list.
+
+.. _async-class-based-views:
+
+Asynchronous class-based views
+==============================
+
+.. versionadded:: 4.1
+
+As well as the synchronous (``def``) method handlers already shown, ``View``
+subclasses may define asynchronous (``async def``) method handlers to leverage
+asynchronous code using ``await``::
+
+    import asyncio
+    from django.http import HttpResponse
+    from django.views import View
+
+    class AsyncView(View):
+        async def get(self, request, *args, **kwargs):
+            # Perform io-blocking view logic using await, sleep for example.
+            await asyncio.sleep(1)
+            return HttpResponse("Hello async world!")
+
+Within a single view-class, all user-defined method handlers must be either
+synchronous, using ``def``, or all asynchronous, using ``async def``. An
+``ImproperlyConfigured`` exception will be raised in ``as_view()`` if ``def``
+and ``async def`` declarations are mixed.
+
+Django will automatically detect asynchronous views and run them in an
+asynchronous context. You can read more about Django's asynchronous support,
+and how to best use async views, in :doc:`/topics/async`.
