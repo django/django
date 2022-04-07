@@ -163,7 +163,7 @@ class RegisterLookupMixin:
     def _get_lookup(cls, lookup_name):
         return cls.get_lookups().get(lookup_name, None)
     
-    # @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=None)
     def get_class_lookups(cls):
         class_lookups = [
             parent.__dict__.get("class_lookups", {}) for parent in inspect.getmro(cls)
@@ -180,6 +180,8 @@ class RegisterLookupMixin:
             return None
         return found
     get_lookup = classorinstancemethod(__get_lookup,__get_lookup)
+
+    @functools.lru_cache(maxsize=None)
     def get_instance_lookups(self):
         # print("lookups = self.__class__.get_lookups()")
         lookups = self.__class__.get_lookups()
@@ -212,9 +214,16 @@ class RegisterLookupMixin:
             merged.update(d)
         return merged
 
-    def _clear_cached_lookups(cls):
+    def _clear_class_cached_lookups(cls):
         for subclass in subclasses(cls):
-            subclass.get_lookups.cache_clear()
+            subclass.get_class_lookups.cache_clear()
+    
+    def __clear_instance_cached_lookups(cls):
+        for subclass in subclasses(cls):
+            subclass.get_instance_lookups.cache_clear()
+            subclass.get_class_lookups.cache_clear()
+
+    _clear_cached_lookups = classorinstancemethod(_clear_class_cached_lookups,__clear_instance_cached_lookups)
 
     @classmethod
     def register_lookup(cls, lookup, lookup_name=None):
@@ -223,7 +232,7 @@ class RegisterLookupMixin:
         if "class_lookups" not in cls.__dict__:
             cls.class_lookups = {}
         cls.class_lookups[lookup_name] = lookup
-        # cls._clear_cached_lookups(cls)
+        cls._clear_cached_lookups()
         return lookup
 
     def register_instance_lookup(self, lookup, lookup_name=None):
@@ -232,7 +241,7 @@ class RegisterLookupMixin:
         if "instance_lookups" not in self.__dict__:
             self.instance_lookups = {}
         self.instance_lookups[lookup_name] = lookup
-        # self._clear_cached_lookups()
+        self._clear_cached_lookups()
         return lookup
 
     # register_lookup = classorinstancemethod(register_class_lookup,register_class_lookup)
