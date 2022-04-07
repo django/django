@@ -26,6 +26,23 @@ officially support the latest release of each series.
 What's new in Django 4.1
 ========================
 
+Asynchronous handlers for class-based views
+-------------------------------------------
+
+View subclasses may now define async HTTP method handlers::
+
+    import asyncio
+    from django.http import HttpResponse
+    from django.views import View
+
+    class AsyncView(View):
+        async def get(self, request, *args, **kwargs):
+            # Perform view logic using await.
+            await asyncio.sleep(1)
+            return HttpResponse("Hello async world!")
+
+See :ref:`async-class-based-views` for more details.
+
 .. _csrf-cookie-masked-usage:
 
 ``CSRF_COOKIE_MASKED`` setting
@@ -288,6 +305,10 @@ Models
   on MariaDB and MySQL. For databases that do not support ``XOR``, the query
   will be converted to an equivalent using ``AND``, ``OR``, and ``NOT``.
 
+* The new :ref:`Field.non_db_attrs <custom-field-non_db_attrs>` attribute
+  allows customizing attributes of fields that don't affect a column
+  definition.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -326,6 +347,10 @@ Tests
 
 * A nested atomic block marked as durable in :class:`django.test.TestCase` now
   raises a ``RuntimeError``, the same as outside of tests.
+
+* :meth:`.SimpleTestCase.assertFormError` and
+  :meth:`~.SimpleTestCase.assertFormsetError` now support passing a
+  form/formset object directly.
 
 URLs
 ~~~~
@@ -449,6 +474,9 @@ Miscellaneous
 
 * The admin log out UI now uses ``POST`` requests.
 
+* The undocumented ``InlineAdminFormSet.non_form_errors`` property is replaced
+  by the ``non_form_errors()`` method. This is consistent with ``BaseFormSet``.
+
 .. _deprecated-features-4.1:
 
 Features deprecated in 4.1
@@ -551,6 +579,15 @@ Miscellaneous
 
 * The :data:`django.utils.timezone.utc` alias to :attr:`datetime.timezone.utc`
   is deprecated. Use :attr:`datetime.timezone.utc` directly.
+
+* Passing a response object and a form/formset name to
+  ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` is
+  deprecated. Use::
+
+    assertFormError(response.context['form_name'], …)
+    assertFormsetError(response.context['formset_name'], …)
+
+  or pass the form/formset object directly instead.
 
 Features removed in 4.1
 =======================

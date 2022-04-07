@@ -437,10 +437,10 @@ class ClientTest(TestCase):
         response = self.client.post("/form_view/", post_data)
         self.assertContains(response, "This field is required.", 3)
         self.assertTemplateUsed(response, "Invalid POST Template")
-
-        self.assertFormError(response, "form", "email", "This field is required.")
-        self.assertFormError(response, "form", "single", "This field is required.")
-        self.assertFormError(response, "form", "multi", "This field is required.")
+        form = response.context["form"]
+        self.assertFormError(form, "email", "This field is required.")
+        self.assertFormError(form, "single", "This field is required.")
+        self.assertFormError(form, "multi", "This field is required.")
 
     def test_form_error(self):
         "POST erroneous data to a form"
@@ -455,7 +455,9 @@ class ClientTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "Invalid POST Template")
 
-        self.assertFormError(response, "form", "email", "Enter a valid email address.")
+        self.assertFormError(
+            response.context["form"], "email", "Enter a valid email address."
+        )
 
     def test_valid_form_with_template(self):
         "POST valid data to a form using multiple templates"
@@ -480,10 +482,10 @@ class ClientTest(TestCase):
         self.assertTemplateUsed(response, "form_view.html")
         self.assertTemplateUsed(response, "base.html")
         self.assertTemplateNotUsed(response, "Invalid POST Template")
-
-        self.assertFormError(response, "form", "email", "This field is required.")
-        self.assertFormError(response, "form", "single", "This field is required.")
-        self.assertFormError(response, "form", "multi", "This field is required.")
+        form = response.context["form"]
+        self.assertFormError(form, "email", "This field is required.")
+        self.assertFormError(form, "single", "This field is required.")
+        self.assertFormError(form, "multi", "This field is required.")
 
     def test_form_error_with_template(self):
         "POST erroneous data to a form using multiple templates"
@@ -500,7 +502,9 @@ class ClientTest(TestCase):
         self.assertTemplateUsed(response, "base.html")
         self.assertTemplateNotUsed(response, "Invalid POST Template")
 
-        self.assertFormError(response, "form", "email", "Enter a valid email address.")
+        self.assertFormError(
+            response.context["form"], "email", "Enter a valid email address."
+        )
 
     def test_unknown_page(self):
         "GET an invalid URL"

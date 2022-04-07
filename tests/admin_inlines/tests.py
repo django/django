@@ -263,9 +263,7 @@ class TestInline(TestDataMixin, TestCase):
         stacked and tabular layouts.
         """
         response = self.client.get(reverse("admin:admin_inlines_holder4_add"))
-        self.assertContains(
-            response, '<div class="help">Awesome stacked help text is awesome.</div>', 4
-        )
+        self.assertContains(response, "Awesome stacked help text is awesome.", 4)
         self.assertContains(
             response,
             '<img src="/static/admin/img/icon-unknown.svg" '
