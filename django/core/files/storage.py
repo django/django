@@ -339,8 +339,20 @@ class FileSystemStorage(Storage):
 
         # Ensure the saved path is always relative to the storage root.
         name = os.path.relpath(full_path, self.location)
+        # Ensure the moved file has the same gid as the storage root.
+        self._ensure_location_group_id(full_path)
         # Store filenames with forward slashes, even on Windows.
         return str(name).replace("\\", "/")
+
+    def _ensure_location_group_id(self, full_path):
+        if os.name == "posix":
+            file_gid = os.stat(full_path).st_gid
+            location_gid = os.stat(self.location).st_gid
+            if file_gid != location_gid:
+                try:
+                    os.chown(full_path, uid=-1, gid=location_gid)
+                except PermissionError:
+                    pass
 
     def delete(self, name):
         if not name:
