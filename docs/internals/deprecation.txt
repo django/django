@@ -97,6 +97,10 @@ details on these changes.
 * The ``django.utils.timezone.utc`` alias to ``datetime.timezone.utc`` will be
   removed.
 
+* Passing a response object and a form/formset name to
+  ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` will no
+  longer be allowed.
+
 .. _deprecation-removed-in-4.1:
 
 4.1

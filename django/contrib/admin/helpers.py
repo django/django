@@ -441,9 +441,8 @@ class InlineAdminFormSet:
     def forms(self):
         return self.formset.forms
 
-    @property
     def non_form_errors(self):
-        return self.formset.non_form_errors
+        return self.formset.non_form_errors()
 
     @property
     def is_bound(self):
