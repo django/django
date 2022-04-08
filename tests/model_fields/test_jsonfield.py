@@ -88,7 +88,6 @@ class TestMethods(SimpleTestCase):
         transform = field.get_transform("my_transform")
         self.assertIs(transform, MyTransform)
         models.JSONField._unregister_lookup(MyTransform)
-        models.JSONField._clear_cached_lookups()
         transform = field.get_transform("my_transform")
         self.assertIsInstance(transform, KeyTransformFactory)
 

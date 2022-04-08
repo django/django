@@ -2770,16 +2770,16 @@ class SchemaTests(TransactionTestCase):
             with connection.schema_editor() as editor:
                 editor.add_constraint(Author, constraint)
                 sql = constraint.create_sql(Author, editor)
-        table = Author._meta.db_table
-        constraints = self.get_constraints(table)
-        self.assertIn(constraint.name, constraints)
-        self.assertIs(constraints[constraint.name]["unique"], True)
-        # SQL contains columns.
-        self.assertIs(sql.references_column(table, "name"), True)
-        self.assertIs(sql.references_column(table, "weight"), True)
-        # Remove constraint.
-        with connection.schema_editor() as editor:
-            editor.remove_constraint(Author, constraint)
+            table = Author._meta.db_table
+            constraints = self.get_constraints(table)
+            self.assertIn(constraint.name, constraints)
+            self.assertIs(constraints[constraint.name]["unique"], True)
+            # SQL contains columns.
+            self.assertIs(sql.references_column(table, "name"), True)
+            self.assertIs(sql.references_column(table, "weight"), True)
+            # Remove constraint.
+            with connection.schema_editor() as editor:
+                editor.remove_constraint(Author, constraint)
         self.assertNotIn(constraint.name, self.get_constraints(table))
 
     @skipUnlessDBFeature("supports_expression_indexes")
