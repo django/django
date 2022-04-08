@@ -978,6 +978,9 @@ class ForeignKey(ForeignObject):
         )
         self.db_constraint = db_constraint
 
+    def __class_getitem__(cls, *args, **kwargs):
+        return cls
+
     def check(self, **kwargs):
         return [
             *super().check(**kwargs),
