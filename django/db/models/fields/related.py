@@ -15,6 +15,7 @@ from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+from django.db.models.query_utils import classorinstancemethod
 
 from . import Field
 from .mixins import FieldCacheMixin
@@ -855,12 +856,6 @@ class ForeignObject(RelatedField):
     def reverse_path_infos(self):
         return self.get_reverse_path_info()
 
-    @classmethod
-    def get_lookups(cls):
-        bases = inspect.getmro(cls)
-        bases = bases[: bases.index(ForeignObject) + 1]
-        class_lookups = [parent.__dict__.get("class_lookups", {}) for parent in bases]
-        return cls.merge_dicts(class_lookups)
 
     def contribute_to_class(self, cls, name, private_only=False, **kwargs):
         super().contribute_to_class(cls, name, private_only=private_only, **kwargs)

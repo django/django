@@ -165,8 +165,12 @@ class RegisterLookupMixin:
     
     @functools.lru_cache(maxsize=None)
     def get_class_lookups(cls):
+        from django.db.models.fields.related import ForeignObject
+        bases = inspect.getmro(cls)
+        if issubclass(cls, ForeignObject):
+            bases = bases[: bases.index(ForeignObject) + 1]
         class_lookups = [
-            parent.__dict__.get("class_lookups", {}) for parent in inspect.getmro(cls)
+            parent.__dict__.get("class_lookups", {}) for parent in bases
         ]
         return cls.merge_dicts(class_lookups)
 
@@ -214,17 +218,13 @@ class RegisterLookupMixin:
             merged.update(d)
         return merged
 
-    def _clear_class_cached_lookups(cls):
+    def _clear_cached_lookups(cls):
         for subclass in subclasses(cls):
             subclass.get_class_lookups.cache_clear()
-    
-    def __clear_instance_cached_lookups(cls):
-        for subclass in subclasses(cls):
             subclass.get_instance_lookups.cache_clear()
-            subclass.get_class_lookups.cache_clear()
-
-    _clear_cached_lookups = classorinstancemethod(_clear_class_cached_lookups,__clear_instance_cached_lookups)
-
+    
+    _clear_cached_lookups = classorinstancemethod(_clear_cached_lookups,_clear_cached_lookups)
+    
     @classmethod
     def register_lookup(cls, lookup, lookup_name=None):
         if lookup_name is None:
@@ -255,6 +255,7 @@ class RegisterLookupMixin:
         if lookup_name is None:
             lookup_name = lookup.lookup_name
         del cls.class_lookups[lookup_name]
+        # cls._clear_cached_lookups()
 
 
 def select_related_descend(field, restricted, requested, load_fields, reverse=False):

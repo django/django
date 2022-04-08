@@ -316,7 +316,7 @@ class LookupTests(TestCase):
         field = Article._meta.get_field("author")
 
         # clear and re-cache
-        # field.get_lookups.cache_clear()
+        # field._clear_cached_lookups()
         self.assertNotIn("exactly", field.get_lookups())
 
         # registration should bust the cache
