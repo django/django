@@ -148,6 +148,7 @@ class DeferredAttribute:
             return getattr(instance, link_field.attname)
         return None
 
+
 class classorinstancemethod(object):
     def __init__(self, class_method, instance_method):
         self.class_method = class_method
@@ -158,49 +159,46 @@ class classorinstancemethod(object):
             return functools.partial(self.class_method, owner)
         return functools.partial(self.instance_method, instance)
 
+
 class RegisterLookupMixin:
-    @classmethod
-    def _get_lookup(cls, lookup_name):
-        return cls.get_lookups().get(lookup_name, None)
-    
     @functools.lru_cache(maxsize=None)
     def get_class_lookups(cls):
         from django.db.models.fields.related import ForeignObject
+
         bases = inspect.getmro(cls)
         if issubclass(cls, ForeignObject):
             bases = bases[: bases.index(ForeignObject) + 1]
-        class_lookups = [
-            parent.__dict__.get("class_lookups", {}) for parent in bases
-        ]
+        class_lookups = [parent.__dict__.get("class_lookups", {}) for parent in bases]
         return cls.merge_dicts(class_lookups)
 
     def __get_lookup(self, lookup_name):
         from django.db.models.lookups import Lookup
 
-        found = self._get_lookup(lookup_name)
+        found = self.get_lookups().get(lookup_name, None)
         if found is None and hasattr(self, "output_field"):
             return self.output_field.get_lookup(lookup_name)
         if found is not None and not issubclass(found, Lookup):
             return None
         return found
-    get_lookup = classorinstancemethod(__get_lookup,__get_lookup)
+
+    get_lookup = classorinstancemethod(__get_lookup, __get_lookup)
 
     @functools.lru_cache(maxsize=None)
     def get_instance_lookups(self):
         # print("lookups = self.__class__.get_lookups()")
         lookups = self.__class__.get_lookups()
         # print(self.__class__)
-        instance_lookups = getattr(self, 'instance_lookups', None)
+        instance_lookups = getattr(self, "instance_lookups", None)
         if instance_lookups:
             lookups = {**lookups, **instance_lookups}
         return lookups
 
     get_lookups = classorinstancemethod(get_class_lookups, get_instance_lookups)
-    
+
     def get_transform(self, lookup_name):
         from django.db.models.lookups import Transform
 
-        found = self._get_lookup(lookup_name)
+        found = self.get_lookups().get(lookup_name, None)
         if found is None and hasattr(self, "output_field"):
             return self.output_field.get_transform(lookup_name)
         if found is not None and not issubclass(found, Transform):
@@ -222,9 +220,11 @@ class RegisterLookupMixin:
         for subclass in subclasses(cls):
             subclass.get_class_lookups.cache_clear()
             subclass.get_instance_lookups.cache_clear()
-    
-    _clear_cached_lookups = classorinstancemethod(_clear_cached_lookups,_clear_cached_lookups)
-    
+
+    _clear_cached_lookups = classorinstancemethod(
+        _clear_cached_lookups, _clear_cached_lookups
+    )
+
     @classmethod
     def register_lookup(cls, lookup, lookup_name=None):
         if lookup_name is None:
@@ -244,8 +244,6 @@ class RegisterLookupMixin:
         self._clear_cached_lookups()
         return lookup
 
-    # register_lookup = classorinstancemethod(register_class_lookup,register_class_lookup)
-
     @classmethod
     def _unregister_lookup(cls, lookup, lookup_name=None):
         """
@@ -255,7 +253,7 @@ class RegisterLookupMixin:
         if lookup_name is None:
             lookup_name = lookup.lookup_name
         del cls.class_lookups[lookup_name]
-        # cls._clear_cached_lookups()
+        cls._clear_cached_lookups()
 
 
 def select_related_descend(field, restricted, requested, load_fields, reverse=False):
