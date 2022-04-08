@@ -2098,7 +2098,8 @@ class ModelMultipleChoiceFieldTests(TestCase):
             [self.c1, self.c2],
         )
         with self.assertRaises(ValidationError):
-            f.clean(["100"])
+            max_pk = max(Category.objects.values_list("pk", flat=True))
+            f.clean([f"{max_pk + 1}"])
         with self.assertRaises(ValidationError):
             f.clean("hello")
         with self.assertRaises(ValidationError):
