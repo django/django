@@ -369,10 +369,11 @@ For each field, we describe the default widget used if you don't specify
     * Default widget: :class:`TextInput`
     * Empty value: Whatever you've given as :attr:`empty_value`.
     * Normalizes to: A string.
-    * Uses :class:`~django.core.validators.MaxLengthValidator` and
-      :class:`~django.core.validators.MinLengthValidator` if ``max_length`` and
-      ``min_length`` are provided. Otherwise, all inputs are valid.
-    * Error message keys: ``required``, ``max_length``, ``min_length``
+    * Uses :class:`~django.core.validators.MaxLengthValidator`,
+      :class:`~django.core.validators.MinLengthValidator` and
+      :class:`~django.core.validators.RegexValidator` if ``max_length``,
+      ``min_length`` and ``pattern`` are provided. Otherwise, all inputs are valid.
+    * Error message keys: ``required``, ``max_length``, ``min_length``, ``invalid``
 
     Has the following optional arguments for validation:
 
@@ -390,6 +391,11 @@ For each field, we describe the default widget used if you don't specify
     .. attribute:: empty_value
 
        The value to use to represent "empty". Defaults to an empty string.
+
+    .. attribute:: pattern
+
+        If provided, this argument ensures that the string produces a match with
+        the regular expression
 
 ``ChoiceField``
 ---------------

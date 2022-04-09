@@ -258,17 +258,27 @@ class Field:
 
 class CharField(Field):
     def __init__(
-        self, *, max_length=None, min_length=None, strip=True, empty_value="", **kwargs
+        self,
+        *,
+        max_length=None,
+        min_length=None,
+        strip=True,
+        empty_value="",
+        pattern=None,
+        **kwargs,
     ):
         self.max_length = max_length
         self.min_length = min_length
         self.strip = strip
         self.empty_value = empty_value
+        self.pattern = pattern
         super().__init__(**kwargs)
         if min_length is not None:
             self.validators.append(validators.MinLengthValidator(int(min_length)))
         if max_length is not None:
             self.validators.append(validators.MaxLengthValidator(int(max_length)))
+        if pattern is not None:
+            self.validators.append(validators.RegexValidator(str(pattern)))
         self.validators.append(validators.ProhibitNullCharactersValidator())
 
     def to_python(self, value):
@@ -289,6 +299,8 @@ class CharField(Field):
         if self.min_length is not None and not widget.is_hidden:
             # The HTML attribute is minlength, not min_length.
             attrs["minlength"] = str(self.min_length)
+        if self.pattern is not None and not widget.is_hidden:
+            attrs["pattern"] = str(self.pattern)
         return attrs
 
 

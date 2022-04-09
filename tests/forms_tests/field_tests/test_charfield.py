@@ -111,6 +111,26 @@ class CharFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         )
         self.assertEqual(f.widget_attrs(HiddenInput()), {})
 
+    def test_charfield_pattern(self):
+        THREE_LETTERS_PATTERN = "[A-Za-z]{3}"
+        f = CharField(pattern=THREE_LETTERS_PATTERN)
+        self.assertEqual(
+            f.widget_attrs(TextInput()), {"pattern": THREE_LETTERS_PATTERN}
+        )
+        self.assertEqual(
+            f.widget_attrs(PasswordInput()), {"pattern": THREE_LETTERS_PATTERN}
+        )
+        self.assertEqual(f.widget_attrs(Textarea()), {"pattern": THREE_LETTERS_PATTERN})
+        self.assertEqual(f.widget_attrs(HiddenInput()), {})
+        self.assertWidgetRendersTo(
+            f,
+            '<input type="text" name="f" id="id_f" pattern="[A-Za-z]{3}" required>',
+        )
+        self.assertEqual(f.clean("ABC"), "ABC")
+        msg = "Enter a valid value."
+        with self.assertRaisesMessage(ValidationError, msg):
+            self.assertEqual(f.clean("123"))
+
     def test_charfield_strip(self):
         """
         Values have whitespace stripped but not if strip=False.
