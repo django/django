@@ -65,6 +65,17 @@ class TemplateReloadTests(SimpleTestCase):
         self.assertEqual(mock_reset.call_count, 2)
 
     @override_settings(
+        TEMPLATES=[
+            {
+                "DIRS": [""],
+                "BACKEND": "django.template.backends.django.DjangoTemplates",
+            }
+        ]
+    )
+    def test_template_dirs_ignore_empty_path(self):
+        self.assertEqual(autoreload.get_template_directories(), set())
+
+    @override_settings(
         TEMPLATES=[{
             'DIRS': [
                 str(ROOT) + '/absolute_str',
