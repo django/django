@@ -4,4 +4,12 @@ Django 3.2.13 release notes
 
 *April 11, 2022*
 
-Django 3.2.13 fixes two security issues with severity "high" in 3.2.12.
+Django 3.2.13 fixes two security issues with severity "high" in
+3.2.12 and a regression in 3.2.4.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 3.2.4 that caused the auto-reloader to no longer
+  detect changes when the ``DIRS`` option of the ``TEMPLATES`` setting
+  contained an empty string (:ticket:`33628`).
