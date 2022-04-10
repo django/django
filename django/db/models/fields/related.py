@@ -1,5 +1,3 @@
-import functools
-import inspect
 from functools import partial
 
 from django import forms
@@ -15,7 +13,6 @@ from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django.db.models.query_utils import classorinstancemethod
 
 from . import Field
 from .mixins import FieldCacheMixin
@@ -855,7 +852,6 @@ class ForeignObject(RelatedField):
     @cached_property
     def reverse_path_infos(self):
         return self.get_reverse_path_info()
-
 
     def contribute_to_class(self, cls, name, private_only=False, **kwargs):
         super().contribute_to_class(cls, name, private_only=private_only, **kwargs)
