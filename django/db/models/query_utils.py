@@ -25,7 +25,7 @@ PathInfo = namedtuple(
 
 def subclasses(cls):
     yield cls
-    for subclass in cls.__subclasses__():
+    for subclass in cls.__dict__.get("__subclasses__()", []):
         yield from subclasses(subclass)
 
 
@@ -233,15 +233,6 @@ class RegisterLookupMixin:
             cls.class_lookups = {}
         cls.class_lookups[lookup_name] = lookup
         cls._clear_cached_lookups()
-        return lookup
-
-    def register_instance_lookup(self, lookup, lookup_name=None):
-        if lookup_name is None:
-            lookup_name = lookup.lookup_name
-        if "instance_lookups" not in self.__dict__:
-            self.instance_lookups = {}
-        self.instance_lookups[lookup_name] = lookup
-        self._clear_cached_lookups()
         return lookup
 
     @classmethod
