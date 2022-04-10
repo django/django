@@ -25,7 +25,7 @@ PathInfo = namedtuple(
 
 def subclasses(cls):
     yield cls
-    for subclass in cls.__dict__.get("__subclasses__()", []):
+    for subclass in cls.__subclasses__():
         yield from subclasses(subclass)
 
 
@@ -184,11 +184,12 @@ class RegisterLookupMixin:
     get_lookup = classorinstancemethod(__get_lookup, __get_lookup)
 
     @functools.lru_cache(maxsize=None)
+    def get_only_instance_lookups(self):
+        return getattr(self, "instance_lookups", None)
+
     def get_instance_lookups(self):
-        # print("lookups = self.__class__.get_lookups()")
         lookups = self.__class__.get_lookups()
-        # print(self.__class__)
-        instance_lookups = getattr(self, "instance_lookups", None)
+        instance_lookups = self.get_only_instance_lookups()
         if instance_lookups:
             lookups = {**lookups, **instance_lookups}
         return lookups
@@ -216,13 +217,16 @@ class RegisterLookupMixin:
             merged.update(d)
         return merged
 
-    def _clear_cached_lookups(cls):
+    def _clear_class_cached_lookups(cls):
         for subclass in subclasses(cls):
             subclass.get_class_lookups.cache_clear()
-            subclass.get_instance_lookups.cache_clear()
+
+    def _clear_instance_cached_lookups(self):
+        self.get_only_instance_lookups.cache_clear()
+        self.__class__._clear_cached_lookups()
 
     _clear_cached_lookups = classorinstancemethod(
-        _clear_cached_lookups, _clear_cached_lookups
+        _clear_class_cached_lookups, _clear_instance_cached_lookups
     )
 
     @classmethod
