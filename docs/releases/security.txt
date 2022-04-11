@@ -36,6 +36,28 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+April 11, 2022 - :cve:`2022-28346`
+----------------------------------
+
+Potential SQL injection in ``QuerySet.annotate()``, ``aggregate()``, and
+``extra()``. `Full description
+<https://www.djangoproject.com/weblog/2022/apr/11/security-releases/>`__
+
+* Django 4.0 :commit:`(patch) <800828887a0509ad1162d6d407e94d8de7eafc60>`
+* Django 3.2 :commit:`(patch) <2044dac5c6968441be6f534c4139bcf48c5c7e48>`
+* Django 2.2 :commit:`(patch) <2c09e68ec911919360d5f8502cefc312f9e03c5d>`
+
+April 11, 2022 - :cve:`2022-28347`
+----------------------------------
+
+Potential SQL injection via ``QuerySet.explain(**options)`` on PostgreSQL.
+`Full description
+<https://www.djangoproject.com/weblog/2022/apr/11/security-releases/>`__
+
+* Django 4.0 :commit:`(patch) <00b0fc50e1738c7174c495464a5ef069408a4402>`
+* Django 3.2 :commit:`(patch) <9e19accb6e0a00ba77d5a95a91675bf18877c72d>`
+* Django 2.2 :commit:`(patch) <29a6c98b4c13af82064f993f0acc6e8fafa4d3f5>`
+
 February 1, 2022 - :cve:`2022-22818`
 ------------------------------------
 
