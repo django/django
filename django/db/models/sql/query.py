@@ -562,7 +562,7 @@ class Query(BaseExpression):
 
     def exists(self, using, limit=True):
         q = self.clone()
-        if not q.distinct:
+        if not (q.distinct and q.is_sliced):
             if q.group_by is True:
                 q.add_fields(
                     (f.attname for f in self.model._meta.concrete_fields), False
