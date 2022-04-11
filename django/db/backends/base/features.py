@@ -263,10 +263,6 @@ class BaseDatabaseFeatures:
     # What formats does the backend EXPLAIN syntax support?
     supported_explain_formats = set()
 
-    # Does DatabaseOperations.explain_query_prefix() raise ValueError if
-    # unknown kwargs are passed to QuerySet.explain()?
-    validates_explain_options = True
-
     # Does the backend support the default parameter in lead() and lag()?
     supports_default_in_lead_lag = True
 

@@ -57,7 +57,6 @@ class ExplainTests(TestCase):
                                     f"QuerySet.explain() result is not valid JSON: {e}"
                                 )
 
-    @skipUnlessDBFeature("validates_explain_options")
     def test_unknown_options(self):
         with self.assertRaisesMessage(ValueError, "Unknown options: TEST, TEST2"):
             Tag.objects.explain(**{"TEST": 1, "TEST2": 1})
