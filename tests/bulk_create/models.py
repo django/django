@@ -2,6 +2,7 @@ import datetime
 import uuid
 from decimal import Decimal
 
+from django.db.models.base import ModelBulkProcessMixin
 from django.db import models
 from django.utils import timezone
 
@@ -136,3 +137,8 @@ class RelatedModel(models.Model):
     name = models.CharField(max_length=15, null=True)
     country = models.OneToOneField(Country, models.CASCADE, primary_key=True)
     big_auto_fields = models.ManyToManyField(BigAutoFieldModel)
+
+
+class BulkyModel(models.Model, ModelBulkProcessMixin):
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=30, null=False)

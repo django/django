@@ -1,8 +1,10 @@
 import copy
 import inspect
 import warnings
+from abc import ABCMeta, abstractmethod
 from functools import partialmethod
 from itertools import chain
+
 
 import django
 from django.apps import apps
@@ -2413,3 +2415,167 @@ def model_unpickle(model_id):
 
 
 model_unpickle.__safe_for_unpickle__ = True
+
+
+class ModelBulkProcessContext(metaclass=ABCMeta):
+    """Bulk create/update context mananger to minimize memory usage."""
+
+    def __init__(
+        self,
+        *,
+        alias=None,
+        batch_size=1000,
+        clz,
+    ):
+        if alias is not None:
+            if isinstance(alias, str) is False:
+                raise ValueError(f"alias param must be str but, {alias}/{type(alias)} ")
+
+        if alias is None:
+            alias = "default"
+        self._alias: str = alias
+        self._batch_size: int = batch_size
+
+        self._bulk_model_ = None
+        if clz is not None:
+            if issubclass(clz, Model) is False:
+                raise ValueError(f"{clz} is not subclass of {Model}")
+
+            self._bulk_model_ = clz
+
+        self._bulk_list = list()
+
+        self._tot_count = 0
+
+    def __len__(self):
+        return self._tot_count
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is not None:
+            return
+
+        if self._is_empty_():
+            return True
+
+        self._bulk_process_(self._bulk_list)
+        self._bulk_list.clear()
+
+        return True
+
+    def _is_empty_(self):
+        return len(self._bulk_list) == 0
+
+    def _get_bulk_model_(self):
+        return self._bulk_model_
+
+    def add(self, model: Model):
+        # CHECK MODEL EQUALITY
+        if self._bulk_model_ is None:
+            self._bulk_model_ = model.__class__
+        else:
+            if self._bulk_model_ is not model.__class__:
+                raise ValueError(
+                    f"Bulk process cannot be done on different Model {self._bulk_model_} <> {model.__class__}"
+                )
+
+        self._bulk_list.append(model)
+        self._tot_count += 1
+        if len(self._bulk_list) < self._batch_size:
+            return
+
+        self._bulk_process_(chunked_list=self._bulk_list)
+        self._bulk_list.clear()
+
+    @abstractmethod
+    def _bulk_process_(self, chunked_list):
+        raise NotImplementedError()
+
+
+class _ModelBulkCreateContext(ModelBulkProcessContext):
+    def __init__(
+        self,
+        alias=None,
+        batch_size: int = 1000,
+        ignore_conflicts=False,
+        update_conflicts=False,
+        update_fields=None,
+        unique_fields=None,
+        clz=None,
+    ):
+        super().__init__(alias=alias, batch_size=batch_size, clz=clz)
+        self.ignore_conflicts = ignore_conflicts
+        self.update_conflicts = update_conflicts
+        self.update_fields = update_fields
+        self.unique_fields = unique_fields
+
+    def _bulk_process_(self, chunked_list):
+        if len(chunked_list) == 0:
+            return
+
+        objects = getattr(self._get_bulk_model_(), "objects")
+        objects.using(self._alias).bulk_create(
+            chunked_list,
+            batch_size=self._batch_size,
+            ignore_conflicts=self.ignore_conflicts,
+            update_conflicts=self.update_conflicts,
+            update_fields=self.update_fields,
+            unique_fields=self.unique_fields,
+        )
+
+
+class _ModelBulkUpdateContext(ModelBulkProcessContext):
+    def __init__(
+        self,
+        fields,
+        batch_size: int = 1000,
+        alias=None,
+        clz=None,
+    ):
+        super().__init__(batch_size=batch_size, alias=alias, clz=clz)
+        self._fields = fields[:]
+
+    def _bulk_process_(self, chunked_list):
+        if len(chunked_list) == 0:
+            return
+        objects = getattr(self._get_bulk_model_(), "objects")
+        objects.using(self._alias).bulk_update(
+            chunked_list, fields=self._fields, batch_size=self._batch_size
+        )
+
+
+class ModelBulkProcessMixin:
+    """Bulk create/update context manager mixin to minimize memory usage."""
+
+    @classmethod
+    def gen_bulk_create(
+        cls,
+        alias=None,  # database alias to use
+        batch_size=1000,  # batch_size must be provided
+        ignore_conflicts=False,
+        update_conflicts=False,
+        update_fields=None,
+        unique_fields=None,
+    ) -> ModelBulkProcessContext:
+        return _ModelBulkCreateContext(
+            alias=alias,
+            batch_size=batch_size,
+            ignore_conflicts=ignore_conflicts,
+            update_conflicts=update_conflicts,
+            update_fields=update_fields,
+            unique_fields=unique_fields,
+            clz=cls,
+        )
+
+    @classmethod
+    def gen_bulk_update(
+        cls,
+        fields,
+        alias=None,  # database alias to use
+        batch_size=1000,  # batch_size must be provided
+    ) -> ModelBulkProcessContext:
+        return _ModelBulkUpdateContext(
+            alias=alias, batch_size=batch_size, fields=fields, clz=cls
+        )
