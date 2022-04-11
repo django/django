@@ -1,6 +1,7 @@
 from math import ceil
 from operator import attrgetter
 
+
 from django.core.exceptions import FieldDoesNotExist
 from django.db import (
     IntegrityError,
@@ -34,6 +35,7 @@ from .models import (
     State,
     TwoFields,
     UpsertConflict,
+    BulkyModel,
 )
 
 
@@ -172,6 +174,69 @@ class BulkCreateTests(TestCase):
                 "NY",
             ],
             attrgetter("two_letter_code"),
+        )
+
+    @skipUnlessDBFeature("has_bulk_insert")
+    def test_bulk_create_model_mixin(self):
+        """
+        class BulkyModel(models.Model, ModelBulkProcessMixin):
+            id = models.BigAutoField(primary_key=True)
+            name = models.CharField(max_length=10, null=False)
+
+        With ModelBulkProcessMixin , We could minimize memory usage.
+        Without ModelBulkProcessMixin, We shold maintain bulk array size up to 100_000
+        or manually maintain arraysize up to batch_size like 10_000
+
+        if len(chunked_list)>10_000:
+            Model.objects.bulk_create(chunked_list)
+
+        and check remain in list again at the end.
+
+        if len(chunked_list)>0:
+            Model.objects.bulk_create(chunked_list)
+        """
+
+        names = [f"name-{num}" for num in range(100_000)]
+
+        with BulkyModel.gen_bulk_create(batch_size=10_000) as bulk:
+            for name in names:
+                bulk.add(BulkyModel(name=name))
+
+        self.assertEqual(100_000, BulkyModel.objects.all().count())
+
+    @skipUnlessDBFeature("has_bulk_insert")
+    def test_bulk_create_mixin_with_different_model(self):
+        """Bulk creation with many models that are different, is not recommended."""
+        names = [f"name-{num}" for num in range(100_000)]
+
+        with BulkyModel.gen_bulk_create(batch_size=10_000) as bulk:
+            bulk.add(BulkyModel(name="normal"))
+
+            with self.assertRaises(ValueError):
+                bulk.add(State(two_letter_code="US"))
+
+    @skipUnlessDBFeature("has_bulk_insert")
+    def test_bulk_update_model_mixin(self):
+        """
+        With ModelBulkProcessMixin , We could minimize memory usage
+        """
+
+        names = [f"name-{num}" for num in range(100_000)]
+
+        with BulkyModel.gen_bulk_create(batch_size=10_000) as create_bulk:
+            for name in names:
+                create_bulk.add(BulkyModel(name=name))
+
+        objs = BulkyModel.objects.all()
+        with BulkyModel.gen_bulk_update(
+            batch_size=10_000, fields=["name"]
+        ) as update_bulk:
+            for obj in objs:
+                obj.name = obj.name.replace("name", "new name")
+                update_bulk.add(obj)
+        self.assertEqual(0, BulkyModel.objects.filter(name__startswith="name").count())
+        self.assertEqual(
+            100_000, BulkyModel.objects.filter(name__startswith="new name").count()
         )
 
     @skipIfDBFeature("allows_auto_pk_0")
