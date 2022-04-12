@@ -770,6 +770,8 @@ exclude::
 This will create a formset that is capable of working with the data associated
 with the ``Author`` model. It works just like a regular formset::
 
+TODO CHANGE HTML 
+
     >>> formset = AuthorFormSet()
     >>> print(formset)
     <input type="hidden" name="form-TOTAL_FORMS" value="1" id="id_form-TOTAL_FORMS"><input type="hidden" name="form-INITIAL_FORMS" value="0" id="id_form-INITIAL_FORMS"><input type="hidden" name="form-MIN_NUM_FORMS" value="0" id="id_form-MIN_NUM_FORMS"><input type="hidden" name="form-MAX_NUM_FORMS" value="1000" id="id_form-MAX_NUM_FORMS">
@@ -960,6 +962,8 @@ If the value of ``max_num`` is greater than the number of existing related
 objects, up to ``extra`` additional blank forms will be added to the formset,
 so long as the total number of forms does not exceed ``max_num``::
 
+TO DO CHANGE HTML (remove as_table())
+
     >>> AuthorFormSet = modelformset_factory(Author, fields=('name',), max_num=4, extra=2)
     >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
     >>> for form in formset:
@@ -1126,6 +1130,8 @@ Third, you can manually render each field::
 If you opt to use this third method and you don't iterate over the fields with
 a ``{% for %}`` loop, you'll need to render the primary key field. For example,
 if you were rendering the ``name`` and ``age`` fields of a model::
+
+TO DO REMOVE <ul> <li> style.
 
     <form method="post">
         {{ formset.management_form }}

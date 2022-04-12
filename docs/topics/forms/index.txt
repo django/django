@@ -482,17 +482,14 @@ file uploads with your form, see :ref:`binding-uploaded-files`.
 Working with form templates
 ===========================
 
+.. versionchanged:: 4.0
+
+    Template rendering of forms was added.
+
 All you need to do to get your form into a template is to place the form
 instance into the template context. So if your form is called ``form`` in the
 context, ``{{ form }}`` will render its ``<label>`` and ``<input>`` elements
 appropriately.
-
-Form rendering options
-----------------------
-
-.. versionchanged:: 4.0
-
-    Template rendering of forms was added.
 
 .. admonition:: Additional form template furniture
 
@@ -502,16 +499,26 @@ Form rendering options
 
 .. versionchanged::: 4.1
 
-    The default template used by forms when calling ``str`` which renders
-    form as tables is deprecated and will be replaced by a template which 
-    renders the form in ``<div>`` tags. To adopt this new layout early you 
-    can override your forms :attr:`~django.forms.Form.template_name` attribute
-    to :attr:`~django.forms.Form.template_name_div`
+    TODO This following seems a bit much for a topic...
+    
+    Can we put this in the release notes? Then we can keep refering to it in
+    the docs. So we can say ".. versionchanged:: 4.1 ... The following example
+    uses the new ``<div>`` layout introduced in 4.1 which will become the 
+    default in 5.0, see x. 
 
-To customize your form rendering logic you can overriding the forms 
+    The ``default.html`` template used when calling str on a form is 
+    deprecated and will be removed in Django 5.0. This template was a proxy 
+    for the ``table.html`` and the default behaviour will change to render the
+    form in unsemantic ``<div>`` tags using the ``div.html`` template. To 
+    adopt this early you can ... TODO
+
+TODO: Give a small examle form and show default (div style) output of calling 
+str on a form?
+
+To customize your form rendering logic you can override the forms 
 :attr:`~django.forms.Form.template_name` attribute and render the form using a 
-custom template. The below example will result in ``{{ form }}`` being rendered
-as the output of the ``form_snippet.html`` template.
+custom template. The below example will result in ``{{ form }}`` being 
+rendered as the output of the ``form_snippet.html`` template.
 
 In your templates:
 
@@ -534,32 +541,7 @@ In your form::
         template_name = 'form_snippet.html'
         ...
 
-There are other output options though for the ``<label>``/``<input>`` pairs
-which are retained for backward compatibility. These layouts are not 
-recommended due to accessibility concerns:
-
-* ``{{ form.as_table }}`` will render them as table cells wrapped in ``<tr>``
-  tags
-
-* ``{{ form.as_p }}`` will render them wrapped in ``<p>`` tags
-
-* ``{{ form.as_ul }}`` will render them wrapped in ``<li>`` tags
-
-Note that you'll have to provide the surrounding ``<table>`` or ``<ul>``
-elements yourself.
-
-Here's the output of ``{{ form.as_p }}`` for our ``ContactForm`` instance:
-
-.. code-block:: html+django
-
-    <p><label for="id_subject">Subject:</label>
-        <input id="id_subject" type="text" name="subject" maxlength="100" required></p>
-    <p><label for="id_message">Message:</label>
-        <textarea name="message" id="id_message" required></textarea></p>
-    <p><label for="id_sender">Sender:</label>
-        <input type="email" name="sender" id="id_sender" required></p>
-    <p><label for="id_cc_myself">Cc myself:</label>
-        <input type="checkbox" name="cc_myself" id="id_cc_myself"></p>
+This will result in the output being ... TODO
 
 Note that each form field has an ID attribute set to ``id_<field-name>``, which
 is referenced by the accompanying label tag. This is important in ensuring that
@@ -793,6 +775,23 @@ This example does not handle any errors in the hidden fields. Usually, an
 error in a hidden field is a sign of form tampering, since normal form
 interaction won't alter them. However, you could easily insert some error
 displays for those form errors, as well.
+
+Legacy rendering options
+------------------------
+
+There are other output options though for the ``<label>``/``<input>`` pairs
+which are retained for backward compatibility. These layouts are not 
+recommended due to accessibility concerns:
+
+* ``{{ form.as_table }}`` will render them as table cells wrapped in ``<tr>``
+  tags
+
+* ``{{ form.as_p }}`` will render them wrapped in ``<p>`` tags
+
+* ``{{ form.as_ul }}`` will render them wrapped in ``<li>`` tags
+
+Note that you'll have to provide the surrounding ``<table>`` or ``<ul>``
+elements yourself.
 
 Further topics
 ==============

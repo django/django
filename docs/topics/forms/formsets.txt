@@ -27,9 +27,10 @@ in the formset and display them as you would with a regular form::
 
     >>> formset = ArticleFormSet()
     >>> for form in formset:
-    ...     print(form.as_table())
-    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title"></td></tr>
-    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date"></td></tr>
+    ...     print(form)
+    <input type="hidden" name="form-TOTAL_FORMS" value="1" id="id_form-TOTAL_FORMS"><input type="hidden" name="form-INITIAL_FORMS" value="0" id="id_form-INITIAL_FORMS"><input type="hidden" name="form-MIN_NUM_FORMS" value="0" id="id_form-MIN_NUM_FORMS"><input type="hidden" name="form-MAX_NUM_FORMS" value="1000" id="id_form-MAX_NUM_FORMS">
+    <div><label for="id_form-0-title">Title:</label><input type="text" name="form-0-title" id="id_form-0-title"></div>
+    <div><label for="id_form-0-pub_date">Pub date:</label><input type="text" name="form-0-pub_date" id="id_form-0-pub_date"></div>
 
 As you can see it only displayed one empty form. The number of empty forms
 that is displayed is controlled by the ``extra`` parameter. By default,
@@ -67,13 +68,13 @@ example::
     ... ])
 
     >>> for form in formset:
-    ...     print(form.as_table())
-    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Django is now open source" id="id_form-0-title"></td></tr>
-    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-12" id="id_form-0-pub_date"></td></tr>
-    <tr><th><label for="id_form-1-title">Title:</label></th><td><input type="text" name="form-1-title" id="id_form-1-title"></td></tr>
-    <tr><th><label for="id_form-1-pub_date">Pub date:</label></th><td><input type="text" name="form-1-pub_date" id="id_form-1-pub_date"></td></tr>
-    <tr><th><label for="id_form-2-title">Title:</label></th><td><input type="text" name="form-2-title" id="id_form-2-title"></td></tr>
-    <tr><th><label for="id_form-2-pub_date">Pub date:</label></th><td><input type="text" name="form-2-pub_date" id="id_form-2-pub_date"></td></tr>
+    ...     print(form)
+    <div><label for="id_form-0-title">Title:</label><input type="text" name="form-0-title" value="Django is now open source" id="id_form-0-title"></div>
+    <div><label for="id_form-0-pub_date">Pub date:</label><input type="text" name="form-0-pub_date" value="2022-04-11" id="id_form-0-pub_date"></div>
+    <div><label for="id_form-1-title">Title:</label><input type="text" name="form-1-title" id="id_form-1-title"></div>
+    <div><label for="id_form-1-pub_date">Pub date:</label><input type="text" name="form-1-pub_date" id="id_form-1-pub_date"></div>
+    <div><label for="id_form-2-title">Title:</label><input type="text" name="form-2-title" id="id_form-2-title"></div>
+    <div><label for="id_form-2-pub_date">Pub date:</label><input type="text" name="form-2-pub_date" id="id_form-2-pub_date"></div>
 
 There are now a total of three forms showing above. One for the initial data
 that was passed in and two extra forms. Also note that we are passing in a
@@ -101,9 +102,9 @@ gives you the ability to limit the number of forms the formset will display::
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2, max_num=1)
     >>> formset = ArticleFormSet()
     >>> for form in formset:
-    ...     print(form.as_table())
-    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title"></td></tr>
-    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date"></td></tr>
+    ...     print(form)
+    <div><label for="id_form-0-title">Title:</label><input type="text" name="form-0-title" id="id_form-0-title"></div>
+    <div><label for="id_form-0-pub_date">Pub date:</label><input type="text" name="form-0-pub_date" id="id_form-0-pub_date"></div>
 
 If the value of ``max_num`` is greater than the number of existing items in the
 initial data, up to ``extra`` additional blank forms will be added to the
@@ -475,16 +476,16 @@ Lets you create a formset with the ability to order::
     ...     {'title': 'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
     ... ])
     >>> for form in formset:
-    ...     print(form.as_table())
-    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Article #1" id="id_form-0-title"></td></tr>
-    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-10" id="id_form-0-pub_date"></td></tr>
-    <tr><th><label for="id_form-0-ORDER">Order:</label></th><td><input type="number" name="form-0-ORDER" value="1" id="id_form-0-ORDER"></td></tr>
-    <tr><th><label for="id_form-1-title">Title:</label></th><td><input type="text" name="form-1-title" value="Article #2" id="id_form-1-title"></td></tr>
-    <tr><th><label for="id_form-1-pub_date">Pub date:</label></th><td><input type="text" name="form-1-pub_date" value="2008-05-11" id="id_form-1-pub_date"></td></tr>
-    <tr><th><label for="id_form-1-ORDER">Order:</label></th><td><input type="number" name="form-1-ORDER" value="2" id="id_form-1-ORDER"></td></tr>
-    <tr><th><label for="id_form-2-title">Title:</label></th><td><input type="text" name="form-2-title" id="id_form-2-title"></td></tr>
-    <tr><th><label for="id_form-2-pub_date">Pub date:</label></th><td><input type="text" name="form-2-pub_date" id="id_form-2-pub_date"></td></tr>
-    <tr><th><label for="id_form-2-ORDER">Order:</label></th><td><input type="number" name="form-2-ORDER" id="id_form-2-ORDER"></td></tr>
+    ...     print(form)
+    <div><label for="id_form-0-title">Title:</label><input type="text" name="form-0-title" value="Article #1" id="id_form-0-title"></div>
+    <div><label for="id_form-0-pub_date">Pub date:</label><input type="text" name="form-0-pub_date" value="2008-05-10" id="id_form-0-pub_date"></div>
+    <div><label for="id_form-0-ORDER">Order:</label><input type="number" name="form-0-ORDER" value="1" id="id_form-0-ORDER"></div>
+    <div><label for="id_form-1-title">Title:</label><input type="text" name="form-1-title" value="Article #2" id="id_form-1-title"></div>
+    <div><label for="id_form-1-pub_date">Pub date:</label><input type="text" name="form-1-pub_date" value="2008-05-11" id="id_form-1-pub_date"></div>
+    <div><label for="id_form-1-ORDER">Order:</label><input type="number" name="form-1-ORDER" value="2" id="id_form-1-ORDER"></div>
+    <div><label for="id_form-2-title">Title:</label><input type="text" name="form-2-title" id="id_form-2-title"></div>
+    <div><label for="id_form-2-pub_date">Pub date:</label><input type="text" name="form-2-pub_date" id="id_form-2-pub_date"></div>
+    <div><label for="id_form-2-ORDER">Order:</label><input type="number" name="form-2-ORDER" id="id_form-2-ORDER"></div>
 
 This adds an additional field to each form. This new field is named ``ORDER``
 and is an ``forms.IntegerField``. For the forms that came from the initial
@@ -573,16 +574,17 @@ Lets you create a formset with the ability to select forms for deletion::
     ...     {'title': 'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
     ... ])
     >>> for form in formset:
-    ...     print(form.as_table())
-    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Article #1" id="id_form-0-title"></td></tr>
-    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-10" id="id_form-0-pub_date"></td></tr>
-    <tr><th><label for="id_form-0-DELETE">Delete:</label></th><td><input type="checkbox" name="form-0-DELETE" id="id_form-0-DELETE"></td></tr>
-    <tr><th><label for="id_form-1-title">Title:</label></th><td><input type="text" name="form-1-title" value="Article #2" id="id_form-1-title"></td></tr>
-    <tr><th><label for="id_form-1-pub_date">Pub date:</label></th><td><input type="text" name="form-1-pub_date" value="2008-05-11" id="id_form-1-pub_date"></td></tr>
-    <tr><th><label for="id_form-1-DELETE">Delete:</label></th><td><input type="checkbox" name="form-1-DELETE" id="id_form-1-DELETE"></td></tr>
-    <tr><th><label for="id_form-2-title">Title:</label></th><td><input type="text" name="form-2-title" id="id_form-2-title"></td></tr>
-    <tr><th><label for="id_form-2-pub_date">Pub date:</label></th><td><input type="text" name="form-2-pub_date" id="id_form-2-pub_date"></td></tr>
-    <tr><th><label for="id_form-2-DELETE">Delete:</label></th><td><input type="checkbox" name="form-2-DELETE" id="id_form-2-DELETE"></td></tr>
+    ...     print(form)
+    <div><label for="id_form-0-title">Title:</label><input type="text" name="form-0-title" value="Article #1" id="id_form-0-title" /></div>
+    <div><label for="id_form-0-pub_date">Pub date:</label><input type="text" name="form-0-pub_date" value="2008-05-10" id="id_form-0-pub_date" /></div>
+    <div><label for="id_form-0-DELETE">Delete:</label><input type="checkbox" name="form-0-DELETE" id="id_form-0-DELETE" /></div>
+    <div><label for="id_form-1-title">Title:</label><input type="text" name="form-1-title" value="Article #2" id="id_form-1-title" /></div>
+    <div><label for="id_form-1-pub_date">Pub date:</label><input type="text" name="form-1-pub_date" value="2008-05-11" id="id_form-1-pub_date" /></div>
+    <div><label for="id_form-1-DELETE">Delete:</label><input type="checkbox" name="form-1-DELETE" id="id_form-1-DELETE" /></div>
+    <div><label for="id_form-2-title">Title:</label><input type="text" name="form-2-title" id="id_form-2-title" /></div>
+    <div><label for="id_form-2-pub_date">Pub date:</label><input type="text" name="form-2-pub_date" id="id_form-2-pub_date" /></div>
+    <div><label for="id_form-2-DELETE">Delete:</label><input type="checkbox" name="form-2-DELETE" id="id_form-2-DELETE" /></div>
+
 
 Similar to ``can_order`` this adds a new field to each form named ``DELETE``
 and is a ``forms.BooleanField``. When data comes through marking any of the
@@ -699,10 +701,11 @@ fields/attributes of the order and deletion fields::
     >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet)
     >>> formset = ArticleFormSet()
     >>> for form in formset:
-    ...     print(form.as_table())
-    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title"></td></tr>
-    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date"></td></tr>
-    <tr><th><label for="id_form-0-my_field">My field:</label></th><td><input type="text" name="form-0-my_field" id="id_form-0-my_field"></td></tr>
+    ...     print(form)
+    <div><label for="id_form-0-title">Title:</label><input type="text" name="form-0-title" id="id_form-0-title" /></div>
+    <div><label for="id_form-0-pub_date">Pub date:</label><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></div>
+    <div><label for="id_form-0-my_field">My field:</label><input type="text" name="form-0-my_field" id="id_form-0-my_field" /></div>
+
 
 .. _custom-formset-form-kwargs:
 
@@ -770,6 +773,8 @@ Using a formset in views and templates
 ======================================
 
 Formsets have the following attributes and methods associated with rendering:
+
+TODO Move these as_* methods down the bottom. 
 
 .. attribute:: BaseFormSet.renderer
 
@@ -912,6 +917,8 @@ Manually rendered ``can_delete`` and ``can_order``
 
 If you manually render fields in the template, you can render
 ``can_delete`` parameter with ``{{ form.DELETE }}``:
+
+TODO change from <ul> <li> example.
 
 .. code-block:: html+django
 

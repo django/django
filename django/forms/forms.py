@@ -66,7 +66,7 @@ class BaseForm(RenderableFormMixin):
     prefix = None
     use_required_attribute = True
 
-    template_name = "django/forms/default.html"
+    template_name = None
     template_name_div = "django/forms/div.html"
     template_name_p = "django/forms/p.html"
     template_name_table = "django/forms/table.html"
@@ -529,16 +529,6 @@ class BaseForm(RenderableFormMixin):
         ):
             value = value.replace(microsecond=0)
         return value
-
-    # RemovedInDjango50Warning
-    def template_check(self):
-        msg = (
-            "The default template will change from 'django/forms/table.html' "
-            "to 'django/forms/div.html'. If you wish to continue to use render "
-            "your form as a table, use the 'as_table()' method."
-        )
-        warnings.warn(msg, RemovedInDjango50Warning, stacklevel=2)
-        return ""
 
 
 class Form(BaseForm, metaclass=DeclarativeFieldsMetaclass):
