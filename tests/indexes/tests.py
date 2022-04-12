@@ -336,7 +336,7 @@ class SchemaIndexesMySQLTests(TransactionTestCase):
                 ArticleTranslation._meta.db_table,
             )
         if storage != "InnoDB":
-            self.skip("This test only applies to the InnoDB storage engine")
+            self.skipTest("This test only applies to the InnoDB storage engine")
         index_sql = [
             str(statement)
             for statement in connection.schema_editor()._model_indexes_sql(
