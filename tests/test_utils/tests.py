@@ -2126,6 +2126,7 @@ class OverrideSettingsTests(SimpleTestCase):
             self.assertIn(expected_location, finder.locations)
 
 
+@skipUnlessDBFeature("supports_transactions")
 class TestBadSetUpTestData(TestCase):
     """
     An exception in setUpTestData() shouldn't leak a transaction which would
@@ -2160,6 +2161,7 @@ class TestBadSetUpTestData(TestCase):
         self.assertFalse(self._in_atomic_block)
 
 
+@skipUnlessDBFeature("supports_transactions")
 class CaptureOnCommitCallbacksTests(TestCase):
     databases = {"default", "other"}
     callback_called = False
