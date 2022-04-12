@@ -99,7 +99,7 @@ class LiveServerTestCloseConnectionTest(LiveServerBase):
         self.assertIsNotNone(conn.connection)
         with self.urlopen("/model_view/") as f:
             # The server can access the database.
-            self.assertEqual(f.read().splitlines(), [b"jane", b"robert"])
+            self.assertCountEqual(f.read().splitlines(), [b"jane", b"robert"])
         # Wait for the server's request thread to close the connection.
         # A timeout of 0.1 seconds should be more than enough. If the wait
         # times out, the assertion after should fail.
@@ -320,7 +320,7 @@ class LiveServerDatabase(LiveServerBase):
         Fixtures are properly loaded and visible to the live server thread.
         """
         with self.urlopen("/model_view/") as f:
-            self.assertEqual(f.read().splitlines(), [b"jane", b"robert"])
+            self.assertCountEqual(f.read().splitlines(), [b"jane", b"robert"])
 
     def test_database_writes(self):
         """
