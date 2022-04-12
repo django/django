@@ -93,6 +93,7 @@ class SchemaIndexesTests(TestCase):
             str(index.create_sql(Article, editor)),
         )
 
+    @skipUnlessDBFeature("supports_index_column_ordering")
     def test_descending_columns_list_sql(self):
         index = Index(fields=["-headline"], name="whitespace_idx")
         editor = connection.schema_editor()

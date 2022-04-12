@@ -328,6 +328,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def supports_index_column_ordering(self):
+        if self._mysql_storage_engine != "InnoDB":
+            return False
         if self.connection.mysql_is_mariadb:
             return self.connection.mysql_version >= (10, 8)
         return self.connection.mysql_version >= (8, 0, 1)
