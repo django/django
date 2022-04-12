@@ -339,11 +339,18 @@ Signals
   :data:`~django.db.models.signals.post_delete` signals now dispatch the
   ``origin`` of the deletion.
 
+.. _templates-4.1:
+
 Templates
 ~~~~~~~~~
 
 * :tfilter:`json_script` template filter now allows wrapping in a ``<script>``
   tag without the HTML ``id`` attribute.
+
+* The :class:`cached template loader <django.template.loaders.cached.Loader>`
+  is now enabled in development, when :setting:`DEBUG` is ``True``, and
+  :setting:`OPTIONS['loaders'] <TEMPLATES-OPTIONS>` isn't specified. You may
+  specify ``OPTIONS['loaders']`` to override this, if necessary.
 
 Tests
 ~~~~~
@@ -483,6 +490,10 @@ Miscellaneous
 
 * The undocumented ``InlineAdminFormSet.non_form_errors`` property is replaced
   by the ``non_form_errors()`` method. This is consistent with ``BaseFormSet``.
+
+* As per :ref:`above<templates-4.1>`, the cached template loader is now
+  enabled in development. You may specify ``OPTIONS['loaders']`` to override
+  this, if necessary.
 
 .. _deprecated-features-4.1:
 
