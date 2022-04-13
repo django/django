@@ -125,6 +125,8 @@ class MigrationTestBase(TransactionTestCase):
             )
 
     def assertFKExists(self, table, columns, to, value=True, using="default"):
+        if not connections[using].features.can_introspect_foreign_keys:
+            return
         with connections[using].cursor() as cursor:
             self.assertEqual(
                 value,
