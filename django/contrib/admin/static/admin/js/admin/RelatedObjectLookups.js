@@ -87,6 +87,35 @@
         }
     }
 
+    function updateRelatedSelectsOptions(currentSelect, win, objId, newRepr, newId) {
+        // After create/edit a model from the options next to the current
+        // select (+ or :pencil:) update ForeignKey PK of the rest of selects
+        // in the page.
+
+        const path = win.location.pathname;
+        // Extract the model from the popup url '.../<model>/add/' or
+        // '.../<model>/<id>/change/' depending the action (add or change).
+        const modelName = path.split('/')[path.split('/').length - (objId ? 4 : 3)];
+        const selectsRelated = document.querySelectorAll(`[data-model-ref="${modelName}"] select`);
+
+        selectsRelated.forEach(function(select) {
+            if (currentSelect === select) {
+                return;
+            }
+
+            let option = select.querySelector(`option[value="${objId}"]`);
+
+            if (!option) {
+                option = new Option(newRepr, newId);
+                select.options.add(option);
+                return;
+            }
+
+            option.textContent = newRepr;
+            option.value = newId;
+        });
+    }
+
     function dismissAddRelatedObjectPopup(win, newId, newRepr) {
         const name = removePopupIndex(win.name);
         const elem = document.getElementById(name);
@@ -94,6 +123,7 @@
             const elemName = elem.nodeName.toUpperCase();
             if (elemName === 'SELECT') {
                 elem.options[elem.options.length] = new Option(newRepr, newId, true, true);
+                updateRelatedSelectsOptions(elem, win, null, newRepr, newId);
             } else if (elemName === 'INPUT') {
                 if (elem.classList.contains('vManyToManyRawIdAdminField') && elem.value) {
                     elem.value += ',' + newId;
@@ -126,6 +156,7 @@
                 this.value = newId;
             }
         }).trigger('change');
+        updateRelatedSelectsOptions(selects[0], win, objId, newRepr, newId);
         selects.next().find('.select2-selection__rendered').each(function() {
             // The element can have a clear button as a child.
             // Use the lastChild to modify only the displayed value.
