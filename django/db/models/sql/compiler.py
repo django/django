@@ -1441,7 +1441,7 @@ class SQLCompiler:
 
 class SQLInsertCompiler(SQLCompiler):
     returning_fields = None
-    returning_params = tuple()
+    returning_params = ()
 
     def field_as_sql(self, field, val):
         """
