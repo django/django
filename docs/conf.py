@@ -127,7 +127,7 @@ else:
 django_next_version = "4.1"
 
 extlinks = {
-    "bpo": ("https://bugs.python.org/issue%s", "bpo-"),
+    "bpo": ("https://bugs.python.org/issue?@action=redirect&bpo=%s", "bpo-"),
     "commit": ("https://github.com/django/django/commit/%s", ""),
     "cve": ("https://nvd.nist.gov/vuln/detail/CVE-%s", "CVE-"),
     # A file or directory. GitHub redirects from blob to tree if needed.
