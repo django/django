@@ -2098,7 +2098,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
             [self.c1, self.c2],
         )
         with self.assertRaises(ValidationError):
-            f.clean(["100"])
+            f.clean(["0"])
         with self.assertRaises(ValidationError):
             f.clean("hello")
         with self.assertRaises(ValidationError):
