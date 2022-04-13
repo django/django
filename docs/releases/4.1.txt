@@ -158,7 +158,9 @@ Minor features
 Cache
 ~~~~~
 
-* ...
+* The ``key_prefix`` argument of the
+  :func:`~django.views.decorators.cache.cache_page` decorator can now be a
+  callable.
 
 CSRF
 ~~~~
