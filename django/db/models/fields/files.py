@@ -1,5 +1,6 @@
 import datetime
 import posixpath
+import weakref
 
 from django import forms
 from django.core import checks
@@ -16,7 +17,7 @@ from django.utils.translation import gettext_lazy as _
 class FieldFile(File):
     def __init__(self, instance, field, name):
         super().__init__(None, name)
-        self.instance = instance
+        self.instance = weakref.proxy(instance)
         self.field = field
         self.storage = field.storage
         self._committed = True
