@@ -11,6 +11,7 @@ class TestFeatures(TestCase):
         """
         All storage engines except MyISAM support transactions.
         """
+        del connection.features.supports_transactions
         with mock.patch(
             "django.db.connection.features._mysql_storage_engine", "InnoDB"
         ):
