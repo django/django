@@ -310,7 +310,7 @@ class RawQueryTests(TestCase):
             ("book_count", 1),
             ("book_count", 0),
         )
-        authors = Author.objects.all()
+        authors = Author.objects.order_by("pk")
         self.assertSuccessfulRawQuery(Author, query, authors, expected_annotations)
 
     def test_white_space_query(self):
