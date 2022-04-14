@@ -45,3 +45,9 @@ crafted file names.
 
 This issue has severity "low" according to the :ref:`Django security policy
 <security-disclosure>`.
+
+
+:mod:`django.shortcuts`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :func:`django.shortcuts.make_toast` function returns ``'toast'``.
