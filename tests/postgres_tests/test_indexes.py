@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from unittest import mock
 
 from django.contrib.postgres.indexes import (
@@ -18,10 +19,16 @@ from django.test.utils import modify_settings, register_lookup
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .fields import SearchVector, SearchVectorField
+from .indexes import DummyIndex
 from .models import CharFieldModel, IntegerArrayModel, Scene, TextFieldModel
 
 
-class IndexTestMixin:
+class IndexTestMixin(ABC):
+    @property
+    @abstractmethod
+    def index_class(self):
+        pass
+
     def test_name_auto_generation(self):
         index = self.index_class(fields=["field"])
         index.set_name_with_model(CharFieldModel)
@@ -234,6 +241,25 @@ class SpGistIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
         )
 
 
+class CustomIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
+    index_class = DummyIndex
+
+    def test_suffix(self):
+        self.assertEqual(self.index_class.suffix, "dummy")
+
+    def test_deconstruction(self):
+        field_name = "dummy_field"
+        index_name = "dummy_index"
+        index = self.index_class(fields=[field_name], name=index_name)
+        path, args, kwargs = index.deconstruct()
+        self.assertEqual(
+            path,
+            "django.contrib.postgres.indexes.%s" % self.index_class.__name__,
+        )
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {"fields": [field_name], "name": index_name})
+
+
 @modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
 class SchemaTests(PostgreSQLTestCase):
     get_opclass_query = """
@@ -260,6 +286,10 @@ class SchemaTests(PostgreSQLTestCase):
         index = GinIndex(fields=["field"], name=index_name)
         with connection.schema_editor() as editor:
             editor.add_index(IntegerArrayModel, index)
+            self.assertIn(
+                " USING gin ",
+                str(index.create_sql(IntegerArrayModel, editor)),
+            )
         constraints = self.get_constraints(IntegerArrayModel._meta.db_table)
         # Check gin index was added
         self.assertEqual(constraints[index_name]["type"], GinIndex.suffix)
@@ -386,6 +416,10 @@ class SchemaTests(PostgreSQLTestCase):
         index = BloomIndex(fields=["field"], name=index_name)
         with connection.schema_editor() as editor:
             editor.add_index(CharFieldModel, index)
+            self.assertIn(
+                " USING bloom ",
+                str(index.create_sql(CharFieldModel, editor)),
+            )
         constraints = self.get_constraints(CharFieldModel._meta.db_table)
         self.assertEqual(constraints[index_name]["type"], BloomIndex.suffix)
         with connection.schema_editor() as editor:
@@ -413,6 +447,10 @@ class SchemaTests(PostgreSQLTestCase):
         index = BrinIndex(fields=["field"], name=index_name, pages_per_range=4)
         with connection.schema_editor() as editor:
             editor.add_index(CharFieldModel, index)
+            self.assertIn(
+                " USING brin ",
+                str(index.create_sql(CharFieldModel, editor)),
+            )
         constraints = self.get_constraints(CharFieldModel._meta.db_table)
         self.assertEqual(constraints[index_name]["type"], BrinIndex.suffix)
         self.assertEqual(constraints[index_name]["options"], ["pages_per_range=4"])
@@ -444,6 +482,10 @@ class SchemaTests(PostgreSQLTestCase):
         index = BTreeIndex(fields=["field"], name=index_name)
         with connection.schema_editor() as editor:
             editor.add_index(CharFieldModel, index)
+            self.assertIn(
+                " USING btree ",
+                str(index.create_sql(CharFieldModel, editor)),
+            )
         constraints = self.get_constraints(CharFieldModel._meta.db_table)
         # The index was added.
         self.assertEqual(constraints[index_name]["type"], BTreeIndex.suffix)
@@ -476,6 +518,10 @@ class SchemaTests(PostgreSQLTestCase):
         index = GistIndex(fields=["field"], name=index_name)
         with connection.schema_editor() as editor:
             editor.add_index(CharFieldModel, index)
+            self.assertIn(
+                " USING gist ",
+                str(index.create_sql(CharFieldModel, editor)),
+            )
         constraints = self.get_constraints(CharFieldModel._meta.db_table)
         # The index was added.
         self.assertEqual(constraints[index_name]["type"], GistIndex.suffix)
@@ -562,6 +608,10 @@ class SchemaTests(PostgreSQLTestCase):
         index = HashIndex(fields=["field"], name=index_name)
         with connection.schema_editor() as editor:
             editor.add_index(CharFieldModel, index)
+            self.assertIn(
+                " USING hash ",
+                str(index.create_sql(CharFieldModel, editor)),
+            )
         constraints = self.get_constraints(CharFieldModel._meta.db_table)
         # The index was added.
         self.assertEqual(constraints[index_name]["type"], HashIndex.suffix)
@@ -594,6 +644,10 @@ class SchemaTests(PostgreSQLTestCase):
         index = SpGistIndex(fields=["field"], name=index_name)
         with connection.schema_editor() as editor:
             editor.add_index(TextFieldModel, index)
+            self.assertIn(
+                " USING spgist ",
+                str(index.create_sql(TextFieldModel, editor)),
+            )
         constraints = self.get_constraints(TextFieldModel._meta.db_table)
         # The index was added.
         self.assertEqual(constraints[index_name]["type"], SpGistIndex.suffix)
@@ -645,6 +699,32 @@ class SchemaTests(PostgreSQLTestCase):
                 with connection.schema_editor() as editor:
                     editor.add_index(Scene, index)
         self.assertNotIn(index_name, self.get_constraints(Scene._meta.db_table))
+
+    def test_dummy_index(self):
+        index_class = DummyIndex
+        index_name = "dummy_field_index"
+        # note the index doesn't use the suffix to id the indexing method
+        index_type = "gin"
+        model_class = CharFieldModel
+        field_name = "field"
+        # Ensure the table is there and doesn't have an index.
+        self.assertNotIn(field_name, self.get_constraints(model_class._meta.db_table))
+        # Add the index.
+        index = index_class(fields=[field_name], name=index_name)
+        with connection.schema_editor() as editor:
+            editor.add_index(model_class, index)
+            self.assertIn(
+                " USING %s " % index_type,
+                str(index.create_sql(model_class, editor)),
+            )
+        constraints = self.get_constraints(model_class._meta.db_table)
+        # The index was added.
+        self.assertEqual(constraints[index_name]["type"], index_type)
+        self.assertEqual(constraints[index_name]["columns"], [field_name])
+        # Drop the index.
+        with connection.schema_editor() as editor:
+            editor.remove_index(model_class, index)
+        self.assertNotIn(index_name, self.get_constraints(model_class._meta.db_table))
 
     def test_op_class(self):
         index_name = "test_op_class"
