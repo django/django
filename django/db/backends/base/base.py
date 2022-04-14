@@ -723,20 +723,27 @@ class BaseDatabaseWrapper:
             )
         return self.SchemaEditorClass(self, *args, **kwargs)
 
-    def on_commit(self, func):
+    def on_commit(self, func, robust=False):
         if not callable(func):
             raise TypeError("on_commit()'s callback must be a callable.")
-        if self.in_atomic_block:
-            # Transaction in progress; save for execution on commit.
-            self.run_on_commit.append((set(self.savepoint_ids), func))
-        elif not self.get_autocommit():
-            raise TransactionManagementError(
-                "on_commit() cannot be used in manual transaction management"
-            )
+        if not robust:
+            if self.in_atomic_block:
+                # Transaction in progress; save for execution on commit.
+                self.run_on_commit.append((set(self.savepoint_ids), func))
+            elif not self.get_autocommit():
+                raise TransactionManagementError(
+                    "on_commit() cannot be used in manual transaction management"
+                )
+            else:
+                # No transaction in progress and in autocommit mode; execute
+                # immediately.
+                func()
         else:
-            # No transaction in progress and in autocommit mode; execute
-            # immediately.
-            func()
+            if self.in_atomic_block:
+                self.run_on_commit.append((set(self.savepoint_ids), func))
+            else:
+                func()
+
 
     def run_and_clear_commit_hooks(self):
         self.validate_no_atomic_block()
