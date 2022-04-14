@@ -320,7 +320,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             for valid_option in self.explain_options:
                 value = options.pop(valid_option, None)
                 if value is not None:
-                    extra[valid_option.upper()] = value
+                    extra[valid_option] = value
         prefix = super().explain_query_prefix(format, **options)
         if format:
             extra["FORMAT"] = format
