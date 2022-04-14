@@ -370,6 +370,7 @@ class AtomicErrorsTests(TransactionTestCase):
         self.assertEqual(Reporter.objects.count(), 0)
 
 
+@skipUnlessDBFeature("uses_savepoints")
 @skipUnless(connection.vendor == "mysql", "MySQL-specific behaviors")
 class AtomicMySQLTests(TransactionTestCase):
 

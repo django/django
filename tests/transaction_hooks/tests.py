@@ -8,6 +8,7 @@ class ForcedError(Exception):
     pass
 
 
+@skipUnlessDBFeature("supports_transactions")
 class TestConnectionOnCommit(TransactionTestCase):
     """
     Tests for transaction.on_commit().
