@@ -21,6 +21,9 @@ class Category(models.Model):
     slug = models.SlugField(max_length=20)
     url = models.CharField("The URL", max_length=40)
 
+    class Meta:
+        ordering = ("pk",)
+
     def __str__(self):
         return self.name
 

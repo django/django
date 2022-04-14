@@ -78,11 +78,13 @@ def natural_key_test(self, format):
 
     # Deserialize and test.
     books = list(serializers.deserialize(format, string_data))
-    self.assertEqual(len(books), 2)
-    self.assertEqual(books[0].object.title, book1["title"])
-    self.assertEqual(books[0].object.pk, adrian.pk)
-    self.assertEqual(books[1].object.title, book2["title"])
-    self.assertIsNone(books[1].object.pk)
+    self.assertCountEqual(
+        [(book.object.title, book.object.pk) for book in books],
+        [
+            (book1["title"], adrian.pk),
+            (book2["title"], None),
+        ],
+    )
 
 
 def natural_pk_mti_test(self, format):
