@@ -212,7 +212,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         with register_lookup(DecimalField, Floor):
             books = Book.objects.annotate(floor_price=F("price__floor"))
 
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             books.values_list("pk", "floor_price"),
             [
                 (self.b1.pk, 30),
