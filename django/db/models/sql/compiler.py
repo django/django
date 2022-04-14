@@ -653,7 +653,12 @@ class SQLCompiler:
                 params.extend(f_params)
 
                 if self.query.select_for_update and features.has_select_for_update:
-                    if self.connection.get_autocommit():
+                    if (
+                        self.connection.get_autocommit()
+                        # Don't raise an exception when database doesn't
+                        # support transactions, as it's a noop.
+                        and features.supports_transactions
+                    ):
                         raise TransactionManagementError(
                             "select_for_update cannot be used outside of a transaction."
                         )

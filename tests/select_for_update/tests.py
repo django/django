@@ -491,7 +491,7 @@ class SelectForUpdateTests(TransactionTestCase):
                     str(Person.objects.filter(name="foo").select_for_update().query),
                 )
 
-    @skipUnlessDBFeature("has_select_for_update")
+    @skipUnlessDBFeature("has_select_for_update", "supports_transactions")
     def test_for_update_requires_transaction(self):
         """
         A TransactionManagementError is raised
@@ -501,7 +501,7 @@ class SelectForUpdateTests(TransactionTestCase):
         with self.assertRaisesMessage(transaction.TransactionManagementError, msg):
             list(Person.objects.select_for_update())
 
-    @skipUnlessDBFeature("has_select_for_update")
+    @skipUnlessDBFeature("has_select_for_update", "supports_transactions")
     def test_for_update_requires_transaction_only_in_execution(self):
         """
         No TransactionManagementError is raised
