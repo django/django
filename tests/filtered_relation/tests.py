@@ -155,7 +155,7 @@ class FilteredRelationTests(TestCase):
                 )
 
     def test_without_join(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             Author.objects.annotate(
                 book_alice=FilteredRelation(
                     "book", condition=Q(book__title__iexact="poem by alice")

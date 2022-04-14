@@ -104,7 +104,7 @@ class RecursiveSymmetricalM2MThroughTests(TestCase):
                 "first_meet": datetime.date(2013, 1, 5),
             },
         )
-        self.assertSequenceEqual(self.a.colleagues.all(), [self.b, self.c, self.d])
+        self.assertCountEqual(self.a.colleagues.all(), [self.b, self.c, self.d])
         self.assertSequenceEqual(self.b.colleagues.all(), [self.a])
 
     def test_recursive_m2m_remove(self):

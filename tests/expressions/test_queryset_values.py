@@ -73,10 +73,10 @@ class ValuesExpressionsTests(TestCase):
 
     def test_values_list_expression(self):
         companies = Company.objects.values_list("name", F("ceo__salary"))
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             companies, [("Example Inc.", 10), ("Foobar Ltd.", 20), ("Test GmbH", 30)]
         )
 
     def test_values_list_expression_flat(self):
         companies = Company.objects.values_list(F("ceo__salary"), flat=True)
-        self.assertSequenceEqual(companies, (10, 20, 30))
+        self.assertCountEqual(companies, (10, 20, 30))

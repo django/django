@@ -1643,7 +1643,7 @@ class Queries4Tests(TestCase):
 
         qs = CategoryItem.objects.filter(category__specialcategory__isnull=False)
         self.assertEqual(qs.count(), 2)
-        self.assertSequenceEqual(qs, [ci2, ci3])
+        self.assertCountEqual(qs, [ci2, ci3])
 
     def test_ticket15316_exclude_false(self):
         c1 = SimpleCategory.objects.create(name="category1")
@@ -1694,7 +1694,7 @@ class Queries4Tests(TestCase):
 
         qs = CategoryItem.objects.exclude(category__specialcategory__isnull=True)
         self.assertEqual(qs.count(), 2)
-        self.assertSequenceEqual(qs, [ci2, ci3])
+        self.assertCountEqual(qs, [ci2, ci3])
 
     def test_ticket15316_one2one_filter_false(self):
         c = SimpleCategory.objects.create(name="cat")
