@@ -348,6 +348,10 @@ Templates
 Tests
 ~~~~~
 
+* The :class:`.DiscoverRunner` now supports running tests in parallel on
+  macOS, Windows, and any other systems where the default
+  :mod:`multiprocessing` start method is ``spawn``.
+
 * A nested atomic block marked as durable in :class:`django.test.TestCase` now
   raises a ``RuntimeError``, the same as outside of tests.
 
