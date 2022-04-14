@@ -874,7 +874,7 @@ class ListFiltersTests(TestCase):
         request.user = self.alfred
         changelist = modeladmin.get_changelist_instance(request)
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEqual(
+        self.assertCountEqual(
             filterspec.lookup_choices,
             [
                 (self.djangonaut_book.pk, "Djangonaut: an art of living"),

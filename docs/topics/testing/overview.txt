@@ -81,7 +81,7 @@ your project's ``manage.py`` utility::
 
 Test discovery is based on the unittest module's :py:ref:`built-in test
 discovery <unittest-test-discovery>`.  By default, this will discover tests in
-any file named "test*.py" under the current working directory.
+any file named ``test*.py`` under the current working directory.
 
 You can specify particular tests to run by supplying any number of "test
 labels" to ``./manage.py test``. Each test label can be a full Python dotted
@@ -283,8 +283,8 @@ file, all Django tests run with :setting:`DEBUG`\=False. This is to ensure that
 the observed output of your code matches what will be seen in a production
 setting.
 
-Caches are not cleared after each test, and running "manage.py test fooapp" can
-insert data from the tests into the cache of a live system if you run your
+Caches are not cleared after each test, and running ``manage.py test fooapp``
+can insert data from the tests into the cache of a live system if you run your
 tests in production because, unlike databases, a separate "test cache" is not
 used. This behavior :ticket:`may change <11505>` in the future.
 

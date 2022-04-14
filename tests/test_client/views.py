@@ -7,7 +7,6 @@ from django.core import mail
 from django.core.exceptions import ValidationError
 from django.forms import fields
 from django.forms.forms import Form
-from django.forms.formsets import BaseFormSet, formset_factory
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -257,48 +256,6 @@ def form_view_with_template(request):
             "message": message,
         },
     )
-
-
-class BaseTestFormSet(BaseFormSet):
-    def clean(self):
-        """No two email addresses are the same."""
-        if any(self.errors):
-            # Don't bother validating the formset unless each form is valid
-            return
-
-        emails = []
-        for form in self.forms:
-            email = form.cleaned_data["email"]
-            if email in emails:
-                raise ValidationError(
-                    "Forms in a set must have distinct email addresses."
-                )
-            emails.append(email)
-
-
-TestFormSet = formset_factory(TestForm, BaseTestFormSet)
-
-
-def formset_view(request):
-    "A view that tests a simple formset"
-    if request.method == "POST":
-        formset = TestFormSet(request.POST)
-        if formset.is_valid():
-            t = Template("Valid POST data.", name="Valid POST Template")
-            c = Context()
-        else:
-            t = Template(
-                "Invalid POST data. {{ my_formset.errors }}",
-                name="Invalid POST Template",
-            )
-            c = Context({"my_formset": formset})
-    else:
-        formset = TestForm(request.GET)
-        t = Template(
-            "Viewing base formset. {{ my_formset }}.", name="Formset GET Template"
-        )
-        c = Context({"my_formset": formset})
-    return HttpResponse(t.render(c))
 
 
 @login_required

@@ -904,6 +904,9 @@ class BaseDatabaseSchemaEditor:
         actions = []
         null_actions = []
         post_actions = []
+        # Type suffix change? (e.g. auto increment).
+        old_type_suffix = old_field.db_type_suffix(connection=self.connection)
+        new_type_suffix = new_field.db_type_suffix(connection=self.connection)
         # Collation change?
         old_collation = getattr(old_field, "db_collation", None)
         new_collation = getattr(new_field, "db_collation", None)
@@ -914,7 +917,7 @@ class BaseDatabaseSchemaEditor:
             )
             actions.append(fragment)
         # Type change?
-        elif old_type != new_type:
+        elif (old_type, old_type_suffix) != (new_type, new_type_suffix):
             fragment, other_actions = self._alter_column_type_sql(
                 model, old_field, new_field, new_type
             )
@@ -1376,22 +1379,9 @@ class BaseDatabaseSchemaEditor:
         # - changing only a field name
         # - changing an attribute that doesn't affect the schema
         # - adding only a db_column and the column name is not changed
-        non_database_attrs = [
-            "blank",
-            "db_column",
-            "editable",
-            "error_messages",
-            "help_text",
-            "limit_choices_to",
-            # Database-level options are not supported, see #21961.
-            "on_delete",
-            "related_name",
-            "related_query_name",
-            "validators",
-            "verbose_name",
-        ]
-        for attr in non_database_attrs:
+        for attr in old_field.non_db_attrs:
             old_kwargs.pop(attr, None)
+        for attr in new_field.non_db_attrs:
             new_kwargs.pop(attr, None)
         return self.quote_name(old_field.column) != self.quote_name(
             new_field.column

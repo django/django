@@ -78,6 +78,13 @@ urlpatterns = [
         name="windows",
     ),
     re_path(r"^special_chars/(?P<chars>.+)/$", empty_view, name="special"),
+    re_path(r"^resolved/(?P<arg>\d+)/$", empty_view, {"extra": True}, name="resolved"),
+    re_path(
+        r"^resolved-overridden/(?P<arg>\d+)/(?P<overridden>\w+)/$",
+        empty_view,
+        {"extra": True, "overridden": "default"},
+        name="resolved-overridden",
+    ),
     re_path(r"^(?P<name>.+)/[0-9]+/$", empty_view, name="mixed"),
     re_path(r"^repeats/a{1,2}/$", empty_view, name="repeats"),
     re_path(r"^repeats/a{2,4}/$", empty_view, name="repeats2"),

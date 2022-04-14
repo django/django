@@ -502,7 +502,7 @@ class AggregationTests(TestCase):
 
     def test_sliced_conditional_aggregate(self):
         self.assertEqual(
-            Author.objects.all()[:5].aggregate(
+            Author.objects.order_by("pk")[:5].aggregate(
                 test=Sum(Case(When(age__lte=35, then=1)))
             )["test"],
             3,
@@ -1682,13 +1682,47 @@ class AggregationTests(TestCase):
             qs, ["Adrian Holovaty", "Peter Norvig"], lambda b: b.name
         )
 
-    def test_ticket_11293(self):
+    def test_filter_aggregates_or_connector(self):
         q1 = Q(price__gt=50)
         q2 = Q(authors__count__gt=1)
         query = Book.objects.annotate(Count("authors")).filter(q1 | q2).order_by("pk")
         self.assertQuerysetEqual(
             query,
             [self.b1.pk, self.b4.pk, self.b5.pk, self.b6.pk],
+            attrgetter("pk"),
+        )
+
+    def test_filter_aggregates_negated_and_connector(self):
+        q1 = Q(price__gt=50)
+        q2 = Q(authors__count__gt=1)
+        query = (
+            Book.objects.annotate(Count("authors")).filter(~(q1 & q2)).order_by("pk")
+        )
+        self.assertQuerysetEqual(
+            query,
+            [self.b1.pk, self.b2.pk, self.b3.pk, self.b4.pk, self.b6.pk],
+            attrgetter("pk"),
+        )
+
+    def test_filter_aggregates_xor_connector(self):
+        q1 = Q(price__gt=50)
+        q2 = Q(authors__count__gt=1)
+        query = Book.objects.annotate(Count("authors")).filter(q1 ^ q2).order_by("pk")
+        self.assertQuerysetEqual(
+            query,
+            [self.b1.pk, self.b4.pk, self.b6.pk],
+            attrgetter("pk"),
+        )
+
+    def test_filter_aggregates_negated_xor_connector(self):
+        q1 = Q(price__gt=50)
+        q2 = Q(authors__count__gt=1)
+        query = (
+            Book.objects.annotate(Count("authors")).filter(~(q1 ^ q2)).order_by("pk")
+        )
+        self.assertQuerysetEqual(
+            query,
+            [self.b2.pk, self.b3.pk, self.b5.pk],
             attrgetter("pk"),
         )
 

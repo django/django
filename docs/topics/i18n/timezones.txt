@@ -151,7 +151,7 @@ used.
     However, :ref:`as explained above <naive-datetime-objects>`, this isn't
     entirely reliable, and you should always work with aware datetimes in UTC
     in your own code. For instance, use :meth:`~datetime.datetime.fromtimestamp`
-    and set the ``tz`` parameter to :data:`~django.utils.timezone.utc`.
+    and set the ``tz`` parameter to :attr:`~datetime.timezone.utc`.
 
 Selecting the current time zone
 -------------------------------

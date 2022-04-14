@@ -129,7 +129,7 @@ class TestUtilsHtml(SimpleTestCase):
                     stripped = strip_tags(content)
                     elapsed = datetime.now() - start
                 self.assertEqual(elapsed.seconds, 0)
-                self.assertIn("Please try again.", stripped)
+                self.assertIn("Test string that has not been stripped.", stripped)
                 self.assertNotIn("<", stripped)
 
     def test_strip_spaces_between_tags(self):

@@ -1,4 +1,6 @@
-from datetime import datetime, tzinfo
+from datetime import datetime
+from datetime import timezone as datetime_timezone
+from datetime import tzinfo
 
 try:
     import zoneinfo
@@ -57,7 +59,7 @@ def utc(value):
     """
     Convert a datetime to UTC.
     """
-    return do_timezone(value, timezone.utc)
+    return do_timezone(value, datetime_timezone.utc)
 
 
 @register.filter("timezone")

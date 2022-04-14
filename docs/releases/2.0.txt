@@ -212,7 +212,7 @@ Management Commands
   ``PositiveIntegerField`` or ``PositiveSmallIntegerField``.
 
 * The new :option:`makemessages --add-location` option controls the comment
-  format in PO files.
+  format in ``.po`` files.
 
 * :djadmin:`loaddata` can now :ref:`read from stdin <loading-fixtures-stdin>`.
 
@@ -237,7 +237,7 @@ Models
   finds the starting index of a string inside another string.
 
 * On Oracle, ``AutoField`` and ``BigAutoField`` are now created as `identity
-  columns <https://docs.oracle.com/en/database/oracle/oracle-database/18/drdaa/
+  columns <https://docs.oracle.com/en/database/oracle/oracle-database/21/drdaa/
   intro-to-tools-and-products-supporting-migraiton.html#GUID-14E4817B-F3BC-4D99
   -B471-A0ACDC303CC9>`__.
 

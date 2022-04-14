@@ -13,6 +13,13 @@ urlpatterns = [
         views.empty_view,
         name="articles-year-month-day",
     ),
+    path("books/2007/", views.empty_view, {"extra": True}, name="books-2007"),
+    path(
+        "books/<int:year>/<int:month>/<int:day>/",
+        views.empty_view,
+        {"extra": True},
+        name="books-year-month-day",
+    ),
     path("users/", views.empty_view, name="users"),
     path("users/<id>/", views.empty_view, name="user-with-id"),
     path("included_urls/", include("urlpatterns.included_urls")),
@@ -27,6 +34,6 @@ urlpatterns = [
         views.empty_view,
         name="regex_only_optional",
     ),
-    path("", include("urlpatterns.more_urls")),
+    path("", include("urlpatterns.more_urls"), {"sub-extra": False}),
     path("<lang>/<path:url>/", views.empty_view, name="lang-and-path"),
 ]

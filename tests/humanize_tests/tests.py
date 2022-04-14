@@ -6,7 +6,7 @@ from django.template import Context, Template, defaultfilters
 from django.test import SimpleTestCase, modify_settings, override_settings
 from django.utils import translation
 from django.utils.html import escape
-from django.utils.timezone import get_fixed_timezone, utc
+from django.utils.timezone import get_fixed_timezone
 from django.utils.translation import gettext as _
 
 # Mock out datetime in some tests so they don't fail occasionally when they
@@ -359,7 +359,7 @@ class HumanizeTests(SimpleTestCase):
     def test_naturalday_uses_localtime(self):
         # Regression for #18504
         # This is 2012-03-08HT19:30:00-06:00 in America/Chicago
-        dt = datetime.datetime(2012, 3, 9, 1, 30, tzinfo=utc)
+        dt = datetime.datetime(2012, 3, 9, 1, 30, tzinfo=datetime.timezone.utc)
 
         orig_humanize_datetime, humanize.datetime = humanize.datetime, MockDateTime
         try:
@@ -396,7 +396,7 @@ class HumanizeTests(SimpleTestCase):
             now + datetime.timedelta(days=2, hours=6),
             now + datetime.timedelta(days=500),
             now.replace(tzinfo=naive()),
-            now.replace(tzinfo=utc),
+            now.replace(tzinfo=datetime.timezone.utc),
         ]
         result_list = [
             "test",

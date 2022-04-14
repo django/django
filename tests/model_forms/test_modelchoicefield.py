@@ -92,7 +92,7 @@ class ModelChoiceFieldTests(TestCase):
         self.assertEqual(len(f.choices), 2)
 
         # queryset can be changed after the field is created.
-        f.queryset = Category.objects.exclude(name="Third")
+        f.queryset = Category.objects.exclude(name="Third").order_by("pk")
         self.assertEqual(
             list(f.choices),
             [
@@ -119,7 +119,7 @@ class ModelChoiceFieldTests(TestCase):
         )
 
         # Overriding label_from_instance() to print custom labels.
-        f.queryset = Category.objects.all()
+        f.queryset = Category.objects.order_by("pk")
         f.label_from_instance = lambda obj: "category " + str(obj)
         self.assertEqual(
             list(f.choices),
@@ -132,7 +132,7 @@ class ModelChoiceFieldTests(TestCase):
         )
 
     def test_choices_freshness(self):
-        f = forms.ModelChoiceField(Category.objects.all())
+        f = forms.ModelChoiceField(Category.objects.order_by("pk"))
         self.assertEqual(len(f.choices), 4)
         self.assertEqual(
             list(f.choices),
@@ -173,7 +173,7 @@ class ModelChoiceFieldTests(TestCase):
             (self.c2.pk, "A test"),
             (self.c3.pk, "Third"),
         ]
-        categories = Category.objects.all()
+        categories = Category.objects.order_by("pk")
         for widget in [forms.RadioSelect, forms.RadioSelect()]:
             for blank in [True, False]:
                 with self.subTest(widget=widget, blank=blank):
@@ -336,7 +336,7 @@ class ModelChoiceFieldTests(TestCase):
         class CustomModelMultipleChoiceField(forms.ModelMultipleChoiceField):
             widget = CustomCheckboxSelectMultiple
 
-        field = CustomModelMultipleChoiceField(Category.objects.all())
+        field = CustomModelMultipleChoiceField(Category.objects.order_by("pk"))
         self.assertHTMLEqual(
             field.widget.render("name", []),
             (
@@ -382,7 +382,7 @@ class ModelChoiceFieldTests(TestCase):
             iterator = CustomModelChoiceIterator
             widget = CustomCheckboxSelectMultiple
 
-        field = CustomModelMultipleChoiceField(Category.objects.all())
+        field = CustomModelMultipleChoiceField(Category.objects.order_by("pk"))
         self.assertHTMLEqual(
             field.widget.render("name", []),
             """
@@ -416,7 +416,7 @@ class ModelChoiceFieldTests(TestCase):
     def test_queryset_manager(self):
         f = forms.ModelChoiceField(Category.objects)
         self.assertEqual(len(f.choices), 4)
-        self.assertEqual(
+        self.assertCountEqual(
             list(f.choices),
             [
                 ("", "---------"),

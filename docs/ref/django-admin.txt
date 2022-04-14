@@ -632,10 +632,10 @@ If you're in a multi-database setup, you might have fixture data that
 you want to load onto one database, but not onto another. In this
 situation, you can add a database identifier into the names of your fixtures.
 
-For example, if your :setting:`DATABASES` setting has a 'master' database
-defined, name the fixture ``mydata.master.json`` or
-``mydata.master.json.gz`` and the fixture will only be loaded when you
-specify you want to load data into the ``master`` database.
+For example, if your :setting:`DATABASES` setting has a 'users' database
+defined, name the fixture ``mydata.users.json`` or
+``mydata.users.json.gz`` and the fixture will only be loaded when you
+specify you want to load data into the ``users`` database.
 
 .. _loading-fixtures-stdin:
 
@@ -1311,7 +1311,7 @@ fly.
 For example, taking advantage of GitHub's feature to expose repositories as
 zip files, you can use a URL like::
 
-    django-admin startapp --template=https://github.com/githubuser/django-app-template/archive/master.zip myapp
+    django-admin startapp --template=https://github.com/githubuser/django-app-template/archive/main.zip myapp
 
 .. django-admin-option:: --extension EXTENSIONS, -e EXTENSIONS
 

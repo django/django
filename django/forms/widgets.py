@@ -234,6 +234,7 @@ class Widget(metaclass=MediaDefiningClass):
     is_localized = False
     is_required = False
     supports_microseconds = True
+    use_fieldset = False
 
     def __init__(self, attrs=None):
         self.attrs = {} if attrs is None else attrs.copy()
@@ -821,6 +822,7 @@ class RadioSelect(ChoiceWidget):
     input_type = "radio"
     template_name = "django/forms/widgets/radio.html"
     option_template_name = "django/forms/widgets/radio_option.html"
+    use_fieldset = True
 
     def id_for_label(self, id_, index=None):
         """
@@ -862,6 +864,7 @@ class MultiWidget(Widget):
     """
 
     template_name = "django/forms/widgets/multiwidget.html"
+    use_fieldset = True
 
     def __init__(self, widgets, attrs=None):
         if isinstance(widgets, dict):
@@ -1027,6 +1030,7 @@ class SelectDateWidget(Widget):
     input_type = "select"
     select_widget = Select
     date_re = _lazy_re_compile(r"(\d{4}|0)-(\d\d?)-(\d\d?)$")
+    use_fieldset = True
 
     def __init__(self, attrs=None, years=None, months=None, empty_label=None):
         self.attrs = attrs or {}

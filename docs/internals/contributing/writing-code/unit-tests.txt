@@ -55,10 +55,10 @@ Having problems? See :ref:`troubleshooting-unit-tests` for some common issues.
 Running tests using ``tox``
 ---------------------------
 
-`Tox <https://tox.readthedocs.io/>`_ is a tool for running tests in different
-virtual environments. Django includes a basic ``tox.ini`` that automates some
-checks that our build server performs on pull requests. To run the unit tests
-and other checks (such as :ref:`import sorting <coding-style-imports>`, the
+`Tox <https://tox.wiki/>`_ is a tool for running tests in different virtual
+environments. Django includes a basic ``tox.ini`` that automates some checks
+that our build server performs on pull requests. To run the unit tests and
+other checks (such as :ref:`import sorting <coding-style-imports>`, the
 :ref:`documentation spelling checker <documentation-spelling-check>`, and
 :ref:`code formatting <coding-style-python>`), install and run the ``tox``
 command from any place in the Django source tree:
@@ -107,8 +107,9 @@ The remainder of this documentation shows commands for running tests without
 ``tox``, however, any option passed to ``runtests.py`` can also be passed to
 ``tox`` by prefixing the argument list with ``--``, as above.
 
-Tox also respects the :envvar:`DJANGO_SETTINGS_MODULE` environment variable, if
-set. For example, the following is equivalent to the command above:
+``Tox`` also respects the :envvar:`DJANGO_SETTINGS_MODULE` environment
+variable, if set. For example, the following is equivalent to the command
+above:
 
 .. code-block:: console
 

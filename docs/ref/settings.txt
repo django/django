@@ -2442,8 +2442,17 @@ required value. For example::
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 This tells Django to trust the ``X-Forwarded-Proto`` header that comes from our
-proxy, and any time its value is ``'https'``, then the request is guaranteed to
-be secure (i.e., it originally came in via HTTPS).
+proxy and that the request is guaranteed to be secure (i.e., it originally came
+in via HTTPS) when:
+
+* the header value is ``'https'``, or
+* its initial, leftmost value is ``'https'`` in the case of a comma-separated
+  list of protocols (e.g. ``'https,http,http'``).
+
+.. versionchanged:: 4.1
+
+    Support for a comma-separated list of protocols in the header value was
+    added.
 
 You should *only* set this setting if you control your proxy or have some other
 guarantee that it sets/strips this header appropriately.
@@ -2463,8 +2472,9 @@ available in ``request.META``.)
 
     * Your Django app is behind a proxy.
     * Your proxy strips the ``X-Forwarded-Proto`` header from all incoming
-      requests. In other words, if end users include that header in their
-      requests, the proxy will discard it.
+      requests, even when it contains a comma-separated list of protocols. In
+      other words, if end users include that header in their requests, the
+      proxy will discard it.
     * Your proxy sets the ``X-Forwarded-Proto`` header and sends it to Django,
       but only for requests that originally come in via HTTPS.
 

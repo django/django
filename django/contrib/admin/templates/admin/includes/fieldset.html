@@ -20,7 +20,9 @@
                         {% endif %}
                     {% endif %}
                     {% if field.field.help_text %}
-                        <div class="help">{{ field.field.help_text|safe }}</div>
+                        <div class="help"{% if field.field.id_for_label %} id="{{ field.field.id_for_label }}_helptext"{% endif %}>
+                          {{ field.field.help_text|safe }}
+                        </div>
                     {% endif %}
                 </div>
             {% endfor %}

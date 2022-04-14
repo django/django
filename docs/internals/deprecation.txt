@@ -87,6 +87,20 @@ details on these changes.
 
 * Passing unsaved model instances to related filters will no longer be allowed.
 
+* ``created=True`` will be required in the signature of
+  ``RemoteUserBackend.configure_user()`` subclasses.
+
+* Support for logging out via ``GET`` requests in the
+  ``django.contrib.auth.views.LogoutView`` and
+  ``django.contrib.auth.views.logout_then_login()`` will be removed.
+
+* The ``django.utils.timezone.utc`` alias to ``datetime.timezone.utc`` will be
+  removed.
+
+* Passing a response object and a form/formset name to
+  ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` will no
+  longer be allowed.
+
 .. _deprecation-removed-in-4.1:
 
 4.1

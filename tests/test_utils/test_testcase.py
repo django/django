@@ -41,6 +41,7 @@ class TestTestCase(TestCase):
         with self.assertRaisesMessage(DatabaseOperationForbidden, message):
             Car.objects.using("other").get()
 
+    @skipUnlessDBFeature("supports_transactions")
     def test_reset_sequences(self):
         old_reset_sequences = self.reset_sequences
         self.reset_sequences = True
@@ -61,6 +62,10 @@ def assert_no_queries(test):
     return inner
 
 
+# On databases with no transaction support (for instance, MySQL with the MyISAM
+# engine), setUpTestData() is called before each test, so there is no need to
+# clone class level test data.
+@skipUnlessDBFeature("supports_transactions")
 class TestDataTests(TestCase):
     # setUpTestData re-assignment are also wrapped in TestData.
     jim_douglas = None

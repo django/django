@@ -11,7 +11,8 @@ included.
 Bug fixes
 =========
 
-* Fixed ``BCryptSHA256PasswordHasher`` with py-bcrypt and Python 3 (#21398).
+* Fixed ``BCryptSHA256PasswordHasher`` with ``py-bcrypt`` and Python 3
+  (#21398).
 * Fixed a regression that prevented a ``ForeignKey`` with a hidden reverse
   manager (``related_name`` ending with '+') from being used as a lookup for
   ``prefetch_related`` (#21410).

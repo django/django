@@ -140,6 +140,24 @@ class Field(RegisterLookupMixin):
     system_check_deprecated_details = None
     system_check_removed_details = None
 
+    # Attributes that don't affect a column definition.
+    # These attributes are ignored when altering the field.
+    non_db_attrs = (
+        "blank",
+        "choices",
+        "db_column",
+        "editable",
+        "error_messages",
+        "help_text",
+        "limit_choices_to",
+        # Database-level options are not supported, see #21961.
+        "on_delete",
+        "related_name",
+        "related_query_name",
+        "validators",
+        "verbose_name",
+    )
+
     # Field flags
     hidden = False
 
@@ -1212,7 +1230,7 @@ class CommaSeparatedIntegerField(CharField):
 
 def _to_naive(value):
     if timezone.is_aware(value):
-        value = timezone.make_naive(value, timezone.utc)
+        value = timezone.make_naive(value, datetime.timezone.utc)
     return value
 
 

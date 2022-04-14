@@ -111,6 +111,10 @@ class Index:
                 for field_name, _ in self.fields_orders
             ]
             col_suffixes = [order[1] for order in self.fields_orders]
+            if schema_editor.connection.features.supports_index_column_ordering:
+                col_suffixes = [order[1] for order in self.fields_orders]
+            else:
+                col_suffixes = [""] * len(self.fields_orders)
             expressions = None
         return schema_editor._create_index_sql(
             model,

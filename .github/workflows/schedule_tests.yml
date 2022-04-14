@@ -1,0 +1,50 @@
+name: Schedule tests
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version:
+          - '3.8'
+          - '3.9'
+          - '3.10'
+          - '3.11.0-alpha - 3.11.0'
+    name: Windows, SQLite, Python ${{ matrix.python-version }}
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+          cache-dependency-path: 'tests/requirements/py3.txt'
+      - name: Install and upgrade packaging tools
+        run: python -m pip install --upgrade pip setuptools wheel
+      - run: python -m pip install -r tests/requirements/py3.txt -e .
+      - name: Run tests
+        run: python tests/runtests.py -v2
+
+  javascript-tests:
+    runs-on: ubuntu-latest
+    name: JavaScript tests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '12'
+          cache: 'npm'
+          cache-dependency-path: '**/package.json'
+      - run: npm install
+      - run: npm test

@@ -42,6 +42,24 @@ option.
     also raised during model validation when the ``UniqueConstraint`` is
     violated.
 
+``BaseConstraint``
+==================
+
+.. class:: BaseConstraint(name)
+
+    Base class for all constraints. Subclasses must implement
+    ``constraint_sql()``, ``create_sql()``, and ``remove_sql()`` methods.
+
+All constraints have the following parameters in common:
+
+``name``
+--------
+
+.. attribute:: BaseConstraint.name
+
+The name of the constraint. You must always specify a unique name for the
+constraint.
+
 ``CheckConstraint``
 ===================
 
@@ -59,14 +77,6 @@ specifies the check you want the constraint to enforce.
 
 For example, ``CheckConstraint(check=Q(age__gte=18), name='age_gte_18')``
 ensures the age field is never less than 18.
-
-``name``
---------
-
-.. attribute:: CheckConstraint.name
-
-The name of the constraint. You must always specify a unique name for the
-constraint.
 
 ``UniqueConstraint``
 ====================
@@ -106,14 +116,6 @@ constraint to enforce.
 For example, ``UniqueConstraint(fields=['room', 'date'],
 name='unique_booking')`` ensures each room can only be booked once for each
 date.
-
-``name``
---------
-
-.. attribute:: UniqueConstraint.name
-
-The name of the constraint. You must always specify a unique name for the
-constraint.
 
 ``condition``
 -------------

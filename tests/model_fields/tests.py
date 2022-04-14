@@ -347,7 +347,7 @@ class GetChoicesLimitChoicesToTests(TestCase):
         cls.field = Bar._meta.get_field("a")
 
     def assertChoicesEqual(self, choices, objs):
-        self.assertEqual(choices, [(obj.pk, str(obj)) for obj in objs])
+        self.assertCountEqual(choices, [(obj.pk, str(obj)) for obj in objs])
 
     def test_get_choices(self):
         self.assertChoicesEqual(

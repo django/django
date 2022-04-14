@@ -22,8 +22,9 @@ Async views
 Any view can be declared async by making the callable part of it return a
 coroutine - commonly, this is done using ``async def``. For a function-based
 view, this means declaring the whole view using ``async def``. For a
-class-based view, this means making its ``__call__()`` method an ``async def``
-(not its ``__init__()`` or ``as_view()``).
+class-based view, this means declaring the HTTP method handlers, such as
+``get()`` and ``post()`` as ``async def`` (not its ``__init__()``, or
+``as_view()``).
 
 .. note::
 

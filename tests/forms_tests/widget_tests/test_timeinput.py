@@ -1,6 +1,6 @@
 from datetime import time
 
-from django.forms import TimeInput
+from django.forms import CharField, Form, TimeInput
 from django.utils import translation
 
 from .base import WidgetTest
@@ -66,4 +66,17 @@ class TimeInputTest(WidgetTest):
             "time",
             t,
             html='<input type="text" name="time" value="12:51:34">',
+        )
+
+    def test_fieldset(self):
+        class TestForm(Form):
+            template_name = "forms_tests/use_fieldset.html"
+            field = CharField(widget=self.widget)
+
+        form = TestForm()
+        self.assertIs(self.widget.use_fieldset, False)
+        self.assertHTMLEqual(
+            '<div><label for="id_field">Field:</label>'
+            '<input id="id_field" name="field" required type="text"></div>',
+            form.render(),
         )
