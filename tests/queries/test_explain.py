@@ -32,19 +32,11 @@ class ExplainTests(TestCase):
         for idx, queryset in enumerate(querysets):
             for format in all_formats:
                 with self.subTest(format=format, queryset=idx):
-                    with CaptureQueriesContext(connection) as captured_queries:
-                        if queryset.query.select_for_update:
-                            with transaction.atomic():
-                                result = queryset.explain(format=format)
-                        else:
-                            result = queryset.explain(format=format)
-                            self.assertEqual(len(captured_queries), 1)
+                    with self.assertNumQueries(1) as captured_queries:
+                        result = queryset.explain(format=format)
                         self.assertTrue(
-                            any(
-                                captured_query["sql"].startswith(
-                                    connection.ops.explain_prefix
-                                )
-                                for captured_query in captured_queries
+                            captured_queries[0]["sql"].startswith(
+                                connection.ops.explain_prefix
                             )
                         )
                         self.assertIsInstance(result, str)
