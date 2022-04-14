@@ -74,6 +74,8 @@ class ExplainTests(TestCase):
             msg += " Allowed formats: %s" % ", ".join(
                 sorted(connection.features.supported_explain_formats)
             )
+        else:
+            msg += f" {connection.display_name} does not support any formats."
         with self.assertRaisesMessage(ValueError, msg):
             Tag.objects.explain(format="does not exist")
 
