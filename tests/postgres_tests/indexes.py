@@ -11,7 +11,7 @@ class DummyIndex(PostgresIndex):
 
     def deconstruct(self):
         # for some reason all tests check path as well; this exists to fool
-        # them into seeing this dummy class as part of the builtin indexes
+        # them into seeing this class as part of the builtin index classes
         _, args, kwargs = super().deconstruct()
         path = "django.contrib.postgres.indexes.%s" % self.__class__.__name__
         return path, args, kwargs

@@ -137,10 +137,6 @@ Minor features
   specifying operator classes with the
   :class:`OpClass() <django.contrib.postgres.indexes.OpClass>` expression.
 
-* :class:`django.contrib.postgres.indexes.PostgresIndex` now passes the `using`
-  argument to the schema editor when generating the query. This enables
-  subclassing with custom suffixes distinct from the indexing method.
-
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
