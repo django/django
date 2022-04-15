@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 from unittest import mock
 
 from django.contrib.postgres.indexes import (
@@ -9,6 +8,7 @@ from django.contrib.postgres.indexes import (
     GistIndex,
     HashIndex,
     OpClass,
+    PostgresIndex,
     SpGistIndex,
 )
 from django.db import NotSupportedError, connection
@@ -19,16 +19,10 @@ from django.test.utils import modify_settings, register_lookup
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .fields import SearchVector, SearchVectorField
-from .indexes import DummyIndex
 from .models import CharFieldModel, IntegerArrayModel, Scene, TextFieldModel
 
 
-class IndexTestMixin(ABC):
-    @property
-    @abstractmethod
-    def index_class(self):
-        pass
-
+class IndexTestMixin:
     def test_name_auto_generation(self):
         index = self.index_class(fields=["field"])
         index.set_name_with_model(CharFieldModel)
@@ -239,25 +233,6 @@ class SpGistIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
         self.assertEqual(
             kwargs, {"fields": ["title"], "name": "test_title_spgist", "fillfactor": 80}
         )
-
-
-class CustomIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
-    index_class = DummyIndex
-
-    def test_suffix(self):
-        self.assertEqual(self.index_class.suffix, "dummy")
-
-    def test_deconstruction(self):
-        field_name = "dummy_field"
-        index_name = "dummy_index"
-        index = self.index_class(fields=[field_name], name=index_name)
-        path, args, kwargs = index.deconstruct()
-        self.assertEqual(
-            path,
-            "django.contrib.postgres.indexes.%s" % self.index_class.__name__,
-        )
-        self.assertEqual(args, ())
-        self.assertEqual(kwargs, {"fields": [field_name], "name": index_name})
 
 
 @modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
@@ -672,26 +647,20 @@ class SchemaTests(PostgreSQLTestCase):
                     editor.add_index(Scene, index)
         self.assertNotIn(index_name, self.get_constraints(Scene._meta.db_table))
 
-    def test_dummy_index(self):
-        index_class = DummyIndex
-        index_name = "dummy_field_index"
-        # note the index doesn't use the suffix to id the indexing method
-        index_type = "gin"
-        model_class = CharFieldModel
-        field_name = "field"
-        # Ensure the table is there and doesn't have an index.
-        self.assertNotIn(field_name, self.get_constraints(model_class._meta.db_table))
-        # Add the index.
-        index = index_class(fields=[field_name], name=index_name)
+    def test_custom_suffix(self):
+        class CustomSuffixIndex(PostgresIndex):
+            suffix = "sfx"
+
+            def create_sql(self, model, schema_editor, using="gin", **kwargs):
+                return super().create_sql(model, schema_editor, using=using, **kwargs)
+
+        index = CustomSuffixIndex(fields=["field"], name="custom_suffix_idx")
+        self.assertEqual(index.suffix, "sfx")
         with connection.schema_editor() as editor:
-            editor.add_index(model_class, index)
-        constraints = self.get_constraints(model_class._meta.db_table)
-        # The index was added.
-        self.assertEqual(constraints[index_name]["type"], index_type)
-        # Drop the index.
-        with connection.schema_editor() as editor:
-            editor.remove_index(model_class, index)
-        self.assertNotIn(index_name, self.get_constraints(model_class._meta.db_table))
+            self.assertIn(
+                " USING gin ",
+                str(index.create_sql(CharFieldModel, editor)),
+            )
 
     def test_op_class(self):
         index_name = "test_op_class"
