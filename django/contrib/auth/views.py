@@ -35,8 +35,12 @@ UserModel = get_user_model()
 
 
 class RedirectURLMixin:
+    next_page = None
     redirect_field_name = REDIRECT_FIELD_NAME
     success_url_allowed_hosts = set()
+
+    def get_success_url(self):
+        return self.get_redirect_url() or self.get_default_redirect_url()
 
     def get_redirect_url(self):
         """Return the user-originating redirect URL if it's safe."""
@@ -53,6 +57,12 @@ class RedirectURLMixin:
     def get_success_url_allowed_hosts(self):
         return {self.request.get_host(), *self.success_url_allowed_hosts}
 
+    def get_default_redirect_url(self):
+        """Return the default redirect URL."""
+        if self.next_page:
+            return resolve_url(self.next_page)
+        raise ImproperlyConfigured("No URL to redirect to. Provide a next_page.")
+
 
 class LoginView(RedirectURLMixin, FormView):
     """
@@ -61,7 +71,6 @@ class LoginView(RedirectURLMixin, FormView):
 
     form_class = AuthenticationForm
     authentication_form = None
-    next_page = None
     template_name = "registration/login.html"
     redirect_authenticated_user = False
     extra_context = None
@@ -79,9 +88,6 @@ class LoginView(RedirectURLMixin, FormView):
                 )
             return HttpResponseRedirect(redirect_to)
         return super().dispatch(request, *args, **kwargs)
-
-    def get_success_url(self):
-        return self.get_redirect_url() or self.get_default_redirect_url()
 
     def get_default_redirect_url(self):
         """Return the default redirect URL."""
@@ -125,7 +131,6 @@ class LogoutView(RedirectURLMixin, TemplateView):
     # RemovedInDjango50Warning: when the deprecation ends, remove "get" and
     # "head" from http_method_names.
     http_method_names = ["get", "head", "post", "options"]
-    next_page = None
     template_name = "registration/logged_out.html"
     extra_context = None
 
@@ -162,9 +167,6 @@ class LogoutView(RedirectURLMixin, TemplateView):
             return resolve_url(settings.LOGOUT_REDIRECT_URL)
         else:
             return self.request.path
-
-    def get_success_url(self):
-        return self.get_redirect_url() or self.get_default_redirect_url()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

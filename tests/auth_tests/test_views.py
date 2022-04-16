@@ -18,6 +18,7 @@ from django.contrib.auth.models import Permission, User
 from django.contrib.auth.views import (
     INTERNAL_RESET_SESSION_TOKEN,
     LoginView,
+    RedirectURLMixin,
     logout_then_login,
     redirect_to_login,
 )
@@ -38,6 +39,20 @@ from django.utils.http import urlsafe_base64_encode
 from .client import PasswordResetConfirmClient
 from .models import CustomUser, UUIDUser
 from .settings import AUTH_TEMPLATES
+
+
+class RedirectURLMixinTests(TestCase):
+    @override_settings(ROOT_URLCONF="auth_tests.urls")
+    def test_get_default_redirect_url_next_page(self):
+        class RedirectURLView(RedirectURLMixin):
+            next_page = "/custom/"
+
+        self.assertEqual(RedirectURLView().get_default_redirect_url(), "/custom/")
+
+    def test_get_default_redirect_url_no_next_page(self):
+        msg = "No URL to redirect to. Provide a next_page."
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            RedirectURLMixin().get_default_redirect_url()
 
 
 @override_settings(
