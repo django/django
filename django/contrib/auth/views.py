@@ -146,8 +146,8 @@ class LogoutView(RedirectURLMixin, TemplateView):
         """Logout may be done via POST."""
         auth_logout(request)
         redirect_to = self.get_success_url()
-        if redirect_to:
-            # Redirect to this page until the session has been cleared.
+        if redirect_to != request.get_full_path():
+            # Redirect to target page once the session has been cleared.
             return HttpResponseRedirect(redirect_to)
         return super().get(request, *args, **kwargs)
 
@@ -155,28 +155,16 @@ class LogoutView(RedirectURLMixin, TemplateView):
     get = post
 
     def get_default_redirect_url(self):
-        """Return the default redirect URL, or None if no URL is configured."""
+        """Return the default redirect URL."""
         if self.next_page:
             return resolve_url(self.next_page)
         elif settings.LOGOUT_REDIRECT_URL:
             return resolve_url(settings.LOGOUT_REDIRECT_URL)
         else:
-            return None
+            return self.request.path
 
     def get_success_url(self):
-        next_page = self.get_default_redirect_url()
-
-        if (
-            self.redirect_field_name in self.request.POST
-            or self.redirect_field_name in self.request.GET
-        ):
-            next_page = self.get_redirect_url()
-            if next_page == "":
-                if settings.LOGOUT_REDIRECT_URL:
-                    next_page = resolve_url(settings.LOGOUT_REDIRECT_URL)
-                else:
-                    next_page = self.request.path
-        return next_page
+        return self.get_redirect_url() or self.get_default_redirect_url()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
