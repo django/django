@@ -85,7 +85,10 @@ class LoginView(RedirectURLMixin, FormView):
 
     def get_default_redirect_url(self):
         """Return the default redirect URL."""
-        return resolve_url(self.next_page or settings.LOGIN_REDIRECT_URL)
+        if self.next_page:
+            return resolve_url(self.next_page)
+        else:
+            return resolve_url(settings.LOGIN_REDIRECT_URL)
 
     def get_form_class(self):
         return self.authentication_form or self.form_class
@@ -151,13 +154,17 @@ class LogoutView(RedirectURLMixin, TemplateView):
     # RemovedInDjango50Warning.
     get = post
 
-    def get_success_url(self):
-        if self.next_page is not None:
-            next_page = resolve_url(self.next_page)
+    def get_default_redirect_url(self):
+        """Return the default redirect URL, or None if no URL is configured."""
+        if self.next_page:
+            return resolve_url(self.next_page)
         elif settings.LOGOUT_REDIRECT_URL:
-            next_page = resolve_url(settings.LOGOUT_REDIRECT_URL)
+            return resolve_url(settings.LOGOUT_REDIRECT_URL)
         else:
-            next_page = self.next_page
+            return None
+
+    def get_success_url(self):
+        next_page = self.get_default_redirect_url()
 
         if (
             self.redirect_field_name in self.request.POST
