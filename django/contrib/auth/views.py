@@ -34,14 +34,27 @@ from django.views.generic.edit import FormView
 UserModel = get_user_model()
 
 
-class SuccessURLAllowedHostsMixin:
+class RedirectURLMixin:
+    redirect_field_name = REDIRECT_FIELD_NAME
     success_url_allowed_hosts = set()
+
+    def get_redirect_url(self):
+        """Return the user-originating redirect URL if it's safe."""
+        redirect_to = self.request.POST.get(
+            self.redirect_field_name, self.request.GET.get(self.redirect_field_name)
+        )
+        url_is_safe = url_has_allowed_host_and_scheme(
+            url=redirect_to,
+            allowed_hosts=self.get_success_url_allowed_hosts(),
+            require_https=self.request.is_secure(),
+        )
+        return redirect_to if url_is_safe else ""
 
     def get_success_url_allowed_hosts(self):
         return {self.request.get_host(), *self.success_url_allowed_hosts}
 
 
-class LoginView(SuccessURLAllowedHostsMixin, FormView):
+class LoginView(RedirectURLMixin, FormView):
     """
     Display the login form and handle the login action.
     """
@@ -49,7 +62,6 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
     form_class = AuthenticationForm
     authentication_form = None
     next_page = None
-    redirect_field_name = REDIRECT_FIELD_NAME
     template_name = "registration/login.html"
     redirect_authenticated_user = False
     extra_context = None
@@ -70,18 +82,6 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
 
     def get_success_url(self):
         return self.get_redirect_url() or self.get_default_redirect_url()
-
-    def get_redirect_url(self):
-        """Return the user-originating redirect URL if it's safe."""
-        redirect_to = self.request.POST.get(
-            self.redirect_field_name, self.request.GET.get(self.redirect_field_name)
-        )
-        url_is_safe = url_has_allowed_host_and_scheme(
-            url=redirect_to,
-            allowed_hosts=self.get_success_url_allowed_hosts(),
-            require_https=self.request.is_secure(),
-        )
-        return redirect_to if url_is_safe else ""
 
     def get_default_redirect_url(self):
         """Return the default redirect URL."""
@@ -114,7 +114,7 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
         return context
 
 
-class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
+class LogoutView(RedirectURLMixin, TemplateView):
     """
     Log out the user and display the 'You are logged out' message.
     """
@@ -123,7 +123,6 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
     # "head" from http_method_names.
     http_method_names = ["get", "head", "post", "options"]
     next_page = None
-    redirect_field_name = REDIRECT_FIELD_NAME
     template_name = "registration/logged_out.html"
     extra_context = None
 
@@ -164,17 +163,8 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
             self.redirect_field_name in self.request.POST
             or self.redirect_field_name in self.request.GET
         ):
-            next_page = self.request.POST.get(
-                self.redirect_field_name, self.request.GET.get(self.redirect_field_name)
-            )
-            url_is_safe = url_has_allowed_host_and_scheme(
-                url=next_page,
-                allowed_hosts=self.get_success_url_allowed_hosts(),
-                require_https=self.request.is_secure(),
-            )
-            # Security check -- Ensure the user-originating redirection URL is
-            # safe.
-            if not url_is_safe:
+            next_page = self.get_redirect_url()
+            if next_page == "":
                 if settings.LOGOUT_REDIRECT_URL:
                     next_page = resolve_url(settings.LOGOUT_REDIRECT_URL)
                 else:
