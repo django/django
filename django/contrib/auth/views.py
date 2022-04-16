@@ -142,16 +142,16 @@ class LogoutView(RedirectURLMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         """Logout may be done via POST."""
         auth_logout(request)
-        next_page = self.get_next_page()
-        if next_page:
+        redirect_to = self.get_success_url()
+        if redirect_to:
             # Redirect to this page until the session has been cleared.
-            return HttpResponseRedirect(next_page)
+            return HttpResponseRedirect(redirect_to)
         return super().get(request, *args, **kwargs)
 
     # RemovedInDjango50Warning.
     get = post
 
-    def get_next_page(self):
+    def get_success_url(self):
         if self.next_page is not None:
             next_page = resolve_url(self.next_page)
         elif settings.LOGOUT_REDIRECT_URL:
