@@ -350,7 +350,9 @@ class Command(BaseCommand):
                 columns = params["columns"]
                 if None in columns:
                     has_unsupported_constraint = True
-                columns = [x for x in columns if x is not None]
+                columns = [
+                    x for x in columns if x is not None and x in column_to_field_name
+                ]
                 if len(columns) > 1:
                     unique_together.append(
                         str(tuple(column_to_field_name[c] for c in columns))
