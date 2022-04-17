@@ -14,7 +14,7 @@ class TestStartProjectSettings(SimpleTestCase):
         template_settings_py = os.path.join(
             os.path.dirname(conf.__file__),
             "project_template",
-            "project_name",
+            "config",
             "settings.py-tpl",
         )
         test_settings_py = os.path.join(self.temp_dir.name, "test_settings.py")

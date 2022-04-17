@@ -566,19 +566,19 @@ class CustomTestRunnerOptionsSettingsTests(AdminScriptTestCase):
         self.write_settings("settings.py", sdict=settings)
 
     def test_default_options(self):
-        args = ["test", "--settings=test_project.settings"]
+        args = ["test", "--settings=config.settings"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "1:2:3")
 
     def test_default_and_given_options(self):
-        args = ["test", "--settings=test_project.settings", "--option_b=foo"]
+        args = ["test", "--settings=config.settings", "--option_b=foo"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "1:foo:3")
 
     def test_option_name_and_value_separated(self):
-        args = ["test", "--settings=test_project.settings", "--option_b", "foo"]
+        args = ["test", "--settings=config.settings", "--option_b", "foo"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "1:foo:3")
@@ -586,7 +586,7 @@ class CustomTestRunnerOptionsSettingsTests(AdminScriptTestCase):
     def test_all_options_given(self):
         args = [
             "test",
-            "--settings=test_project.settings",
+            "--settings=config.settings",
             "--option_a=bar",
             "--option_b=foo",
             "--option_c=31337",
@@ -615,7 +615,7 @@ class CustomTestRunnerOptionsCmdlineTests(AdminScriptTestCase):
             "--option_b=foo",
             "--option_c=31337",
         ]
-        out, err = self.run_django_admin(args, "test_project.settings")
+        out, err = self.run_django_admin(args, "config.settings")
         self.assertNoOutput(err)
         self.assertOutput(out, "bar:foo:31337")
 
@@ -627,13 +627,13 @@ class CustomTestRunnerOptionsCmdlineTests(AdminScriptTestCase):
             "--option_b=foo",
             "--option_c=31337",
         ]
-        out, err = self.run_django_admin(args, "test_project.settings")
+        out, err = self.run_django_admin(args, "config.settings")
         self.assertNoOutput(err)
         self.assertOutput(out, "bar:foo:31337")
 
     def test_no_testrunner(self):
         args = ["test", "--testrunner"]
-        out, err = self.run_django_admin(args, "test_project.settings")
+        out, err = self.run_django_admin(args, "config.settings")
         self.assertIn("usage", err)
         self.assertNotIn("Traceback", err)
         self.assertNoOutput(out)
