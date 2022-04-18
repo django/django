@@ -175,7 +175,10 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
             # Security check -- Ensure the user-originating redirection URL is
             # safe.
             if not url_is_safe:
-                next_page = self.request.path
+                if settings.LOGOUT_REDIRECT_URL:
+                    next_page = resolve_url(settings.LOGOUT_REDIRECT_URL)
+                else:
+                    next_page = self.request.path
         return next_page
 
     def get_context_data(self, **kwargs):
