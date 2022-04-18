@@ -2782,8 +2782,8 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertIs(os.path.isdir(testproject_dir), True)
         tests = [
             (["manage.py"], 0o700),
-            (["testproject"], 0o700),
-            (["testproject", "settings.py"], 0o600),
+            (["config"], 0o700),
+            (["config", "settings.py"], 0o600),
         ]
         for paths, expected_mode in tests:
             file_path = os.path.join(testproject_dir, *paths)
