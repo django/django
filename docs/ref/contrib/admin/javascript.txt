@@ -68,7 +68,7 @@ to the old listener signature as follows:
     }
 
     $(document).on('formset:added', (event, $row, formsetName) => {
-        if (event.detail.formsetName) {
+        if (event.detail && event.detail.formsetName) {
             // Django >= 4.1
             handleFormsetAdded(event.target, event.detail.formsetName)
         } else {
