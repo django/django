@@ -1072,8 +1072,9 @@ class Model(metaclass=ModelBase):
 
     def _prepare_related_fields_for_save(self, operation_name, fields=None):
         # Ensure that a model instance without a PK hasn't been assigned to
-        # a ForeignKey or OneToOneField on this model. If the field is
-        # nullable, allowing the save would result in silent data loss.
+        # a ForeignKey, GenericForeignKey or OneToOneField on this model. If
+        # the field is nullable, allowing the save would result in silent data
+        # loss.
         for field in self._meta.concrete_fields:
             if fields and field not in fields:
                 continue
@@ -1107,6 +1108,21 @@ class Model(metaclass=ModelBase):
                     self, field.attname
                 ):
                     field.delete_cached_value(self)
+        # GenericForeignKeys are private.
+        for field in self._meta.private_fields:
+            if fields and field not in fields:
+                continue
+            if (
+                field.is_relation
+                and field.is_cached(self)
+                and hasattr(field, "fk_field")
+            ):
+                obj = field.get_cached_value(self, default=None)
+                if obj and obj.pk is None:
+                    raise ValueError(
+                        f"{operation_name}() prohibited to prevent data loss due to "
+                        f"unsaved related object '{field.name}'."
+                    )
 
     def delete(self, using=None, keep_parents=False):
         if self.pk is None:

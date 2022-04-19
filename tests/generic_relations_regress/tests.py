@@ -1,4 +1,3 @@
-from django.db import IntegrityError
 from django.db.models import ProtectedError, Q, Sum
 from django.forms.models import modelform_factory
 from django.test import TestCase, skipIfDBFeature
@@ -15,7 +14,6 @@ from .models import (
     Contact,
     Content,
     D,
-    Developer,
     Guild,
     HasLinkThing,
     Link,
@@ -139,14 +137,6 @@ class GenericRelationTests(TestCase):
         self.assertEqual(len(places), 2)
         self.assertEqual(count_places(p1), 1)
         self.assertEqual(count_places(p2), 1)
-
-    def test_target_model_is_unsaved(self):
-        """Test related to #13085"""
-        # Fails with another, ORM-level error
-        dev1 = Developer(name="Joe")
-        note = Note(note="Deserves promotion", content_object=dev1)
-        with self.assertRaises(IntegrityError):
-            note.save()
 
     def test_target_model_len_zero(self):
         """
