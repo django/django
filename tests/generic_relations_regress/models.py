@@ -104,11 +104,6 @@ class Company(models.Model):
     links = GenericRelation(Link)
 
 
-# For testing #13085 fix, we also use Note model defined above
-class Developer(models.Model):
-    name = models.CharField(max_length=15)
-
-
 class Team(models.Model):
     name = models.CharField(max_length=15)
 
