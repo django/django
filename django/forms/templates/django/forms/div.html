@@ -10,15 +10,13 @@
     {% else %}
       {% if field.label %}{{ field.label_tag }}{% endif %}
     {% endif %}
+    {% if field.help_text %}<span class="helptext">{{ field.help_text|safe }}</span>{% endif %}
+    {{ errors }}
     {{ field }}
-    {% if field.help_text %}
-      <span class="helptext">{{ field.help_text|safe }}</span>
-    {% endif %}
     {% if field.use_fieldset %}</fieldset>{% endif %}
     {% if forloop.last %}
       {% for field in hidden_fields %}{{ field }}{% endfor %}
     {% endif %}
-    {{ errors }}
 </div>
 {% endfor %}
 {% if not fields and not errors %}

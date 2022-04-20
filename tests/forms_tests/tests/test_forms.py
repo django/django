@@ -209,14 +209,15 @@ class FormsTestCase(SimpleTestCase):
         p.template_name = p.template_name_div
         self.assertHTMLEqual(
             str(p),
-            '<div><label for="id_first_name">First name:</label><input type="text" '
-            'name="first_name" required id="id_first_name"><ul class="errorlist"><li>'
-            'This field is required.</li></ul></div><div><label for="id_last_name">'
-            'Last name:</label><input type="text" name="last_name" required '
-            'id="id_last_name"><ul class="errorlist"><li>This field is required.</li>'
-            '</ul></div><div><label for="id_birthday">Birthday:</label>'
-            '<input type="text" name="birthday" required id="id_birthday">'
-            '<ul class="errorlist"><li>This field is required.</li></ul></div>',
+            '<div><label for="id_first_name">First name:</label>'
+            '<ul class="errorlist"><li>This field is required.</li></ul>'
+            '<input type="text" name="first_name" required id="id_first_name"></div>'
+            '<div><label for="id_last_name">Last name:</label>'
+            '<ul class="errorlist"><li>This field is required.</li></ul>'
+            '<input type="text" name="last_name" required id="id_last_name"></div><div>'
+            '<label for="id_birthday">Birthday:</label>'
+            '<ul class="errorlist"><li>This field is required.</li></ul>'
+            '<input type="text" name="birthday" required id="id_birthday"></div>',
         )
 
     def test_empty_querydict_args(self):
@@ -2933,10 +2934,10 @@ Options: <select multiple name="options" required>
         p.template_name = p.template_name_div
         self.assertHTMLEqual(
             str(p),
-            '<div>Username: <input type="text" name="username" maxlength="10" required>'
-            '<span class="helptext">e.g., user@example.com</span></div>'
-            '<div>Password: <input type="password" name="password" required>'
-            '<span class="helptext">Wählen Sie mit Bedacht.</span></div>',
+            '<div>Username: <span class="helptext">e.g., user@example.com</span>'
+            '<input type="text" name="username" maxlength="10" required></div>'
+            '<div>Password: <span class="helptext">Wählen Sie mit Bedacht.</span>'
+            '<input type="password" name="password" required></div>',
         )
 
         # The help text is displayed whether or not data is provided for the form.
@@ -3563,8 +3564,8 @@ Password: <input type="password" name="password" required>
         self.assertHTMLEqual(
             str(p),
             '<div class="required error"><label for="id_name" class="required">Name:'
-            '</label><input type="text" name="name" required id="id_name" />'
-            '<ul class="errorlist"><li>This field is required.</li></ul></div>'
+            '</label><ul class="errorlist"><li>This field is required.</li></ul>'
+            '<input type="text" name="name" required id="id_name" /></div>'
             '<div class="required"><label for="id_is_cool" class="required">Is cool:'
             '</label><select name="is_cool" id="id_is_cool">'
             '<option value="unknown" selected>Unknown</option>'
@@ -3572,8 +3573,8 @@ Password: <input type="password" name="password" required>
             '</select></div><div><label for="id_email">Email:</label>'
             '<input type="email" name="email" id="id_email" /></div>'
             '<div class="required error"><label for="id_age" class="required">Age:'
-            '</label><input type="number" name="age" required id="id_age" />'
-            '<ul class="errorlist"><li>This field is required.</li></ul></div>',
+            '</label><ul class="errorlist"><li>This field is required.</li></ul>'
+            '<input type="number" name="age" required id="id_age" /></div>',
         )
 
     def test_label_has_required_css_class(self):
@@ -5118,6 +5119,7 @@ class DeprecatedTests(SimpleTestCase):
         # the Form will be considered unbound and won't do any validation. Form.errors
         # will be an empty dictionary *but* Form.is_valid() will return False.
         p = Person()
+        self.maxDiff = None
         self.assertHTMLEqual(
             str(p),
             """<tr><th><label for="id_first_name">First name:</label></th><td>
