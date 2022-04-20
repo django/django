@@ -5004,6 +5004,12 @@ class TemplateTests(SimpleTestCase):
 
 
 class OverrideTests(SimpleTestCase):
+    @override_settings(FORM_RENDERER="django.forms.renderers.DjangoDivFormRenderer")
+    def test_div_renderer(self):
+        f = Person()
+        breakpoint()
+        f.render()
+
     def test_use_custom_template(self):
         class Person(Form):
             first_name = CharField()

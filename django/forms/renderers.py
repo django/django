@@ -74,6 +74,17 @@ class Jinja2(EngineMixin, BaseRenderer):
         return Jinja2
 
 
+class DjangoDivFormRenderer(EngineMixin, DivBaseRenderer):
+    """
+    Load Django templates from the built-in widget templates in
+    django/forms/templates and from apps' 'templates' directory.
+
+    Use the 'django/forms/div.html' as the default template to render forms.
+    """
+
+    backend = DjangoTemplates
+
+
 class TemplatesSetting(BaseRenderer):
     """
     Load templates using template.loader.get_template() which is configured
