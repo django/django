@@ -828,46 +828,56 @@ class MigrateTests(MigrationTestBase):
         """
         out = io.StringIO()
         call_command("sqlmigrate", "migrations", "0001", stdout=out)
-        output = out.getvalue().lower()
 
-        index_tx_start = output.find(connection.ops.start_transaction_sql().lower())
-        index_op_desc_author = output.find("-- create model author")
-        index_create_table = output.find("create table")
-        index_op_desc_tribble = output.find("-- create model tribble")
-        index_op_desc_unique_together = output.find("-- alter unique_together")
-        index_tx_end = output.find(connection.ops.end_transaction_sql().lower())
+        lines = out.getvalue().splitlines()
 
         if connection.features.can_rollback_ddl:
-            self.assertGreater(index_tx_start, -1, "Transaction start not found")
-            self.assertGreater(
-                index_tx_end,
-                index_op_desc_unique_together,
-                "Transaction end not found or found before operation description "
-                "(unique_together)",
-            )
+            self.assertEqual(lines[0], connection.ops.start_transaction_sql())
+            self.assertEqual(lines[-1], connection.ops.end_transaction_sql())
+            lines = lines[1:-1]
 
-        self.assertGreater(
-            index_op_desc_author,
-            index_tx_start,
-            "Operation description (author) not found or found before transaction "
-            "start",
+        self.assertEqual(
+            lines[:3],
+            [
+                "--",
+                "-- Create model Author",
+                "--",
+            ],
         )
-        self.assertGreater(
-            index_create_table,
-            index_op_desc_author,
-            "CREATE TABLE not found or found before operation description (author)",
+        self.assertIn(
+            "create table %s" % connection.ops.quote_name("migrations_author").lower(),
+            lines[3].lower(),
         )
-        self.assertGreater(
-            index_op_desc_tribble,
-            index_create_table,
-            "Operation description (tribble) not found or found before CREATE TABLE "
-            "(author)",
+        pos = lines.index("--", 3)
+        self.assertEqual(
+            lines[pos : pos + 3],
+            [
+                "--",
+                "-- Create model Tribble",
+                "--",
+            ],
         )
-        self.assertGreater(
-            index_op_desc_unique_together,
-            index_op_desc_tribble,
-            "Operation description (unique_together) not found or found before "
-            "operation description (tribble)",
+        self.assertIn(
+            "create table %s" % connection.ops.quote_name("migrations_tribble").lower(),
+            lines[pos + 3].lower(),
+        )
+        pos = lines.index("--", pos + 3)
+        self.assertEqual(
+            lines[pos : pos + 3],
+            [
+                "--",
+                "-- Add field bool to tribble",
+                "--",
+            ],
+        )
+        pos = lines.index("--", pos + 3)
+        self.assertEqual(
+            lines[pos : pos + 3],
+            [
+                "--",
+                "-- Alter unique_together for author (1 constraint(s))",
+                "--",
+            ],
         )
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
@@ -880,49 +890,70 @@ class MigrateTests(MigrationTestBase):
 
         out = io.StringIO()
         call_command("sqlmigrate", "migrations", "0001", stdout=out, backwards=True)
-        output = out.getvalue().lower()
 
-        index_tx_start = output.find(connection.ops.start_transaction_sql().lower())
-        index_op_desc_unique_together = output.find("-- alter unique_together")
-        index_op_desc_tribble = output.find("-- create model tribble")
-        index_op_desc_author = output.find("-- create model author")
-        index_drop_table = output.rfind("drop table")
-        index_tx_end = output.find(connection.ops.end_transaction_sql().lower())
+        lines = out.getvalue().splitlines()
+        try:
+            if connection.features.can_rollback_ddl:
+                self.assertEqual(lines[0], connection.ops.start_transaction_sql())
+                self.assertEqual(lines[-1], connection.ops.end_transaction_sql())
+                lines = lines[1:-1]
 
-        if connection.features.can_rollback_ddl:
-            self.assertGreater(index_tx_start, -1, "Transaction start not found")
-            self.assertGreater(
-                index_tx_end,
-                index_op_desc_unique_together,
-                "Transaction end not found or found before DROP TABLE",
+            self.assertEqual(
+                lines[:3],
+                [
+                    "--",
+                    "-- Alter unique_together for author (1 constraint(s))",
+                    "--",
+                ],
             )
-        self.assertGreater(
-            index_op_desc_unique_together,
-            index_tx_start,
-            "Operation description (unique_together) not found or found before "
-            "transaction start",
-        )
-        self.assertGreater(
-            index_op_desc_tribble,
-            index_op_desc_unique_together,
-            "Operation description (tribble) not found or found before operation "
-            "description (unique_together)",
-        )
-        self.assertGreater(
-            index_op_desc_author,
-            index_op_desc_tribble,
-            "Operation description (author) not found or found before operation "
-            "description (tribble)",
-        )
-
-        self.assertGreater(
-            index_drop_table,
-            index_op_desc_author,
-            "DROP TABLE not found or found before operation description (author)",
-        )
-
-        # Cleanup by unmigrating everything
-        call_command("migrate", "migrations", "zero", verbosity=0)
+            pos = lines.index("--", 3)
+            self.assertEqual(
+                lines[pos : pos + 3],
+                [
+                    "--",
+                    "-- Add field bool to tribble",
+                    "--",
+                ],
+            )
+            pos = lines.index("--", pos + 3)
+            self.assertEqual(
+                lines[pos : pos + 3],
+                [
+                    "--",
+                    "-- Create model Tribble",
+                    "--",
+                ],
+            )
+            next_pos = lines.index("--", pos + 3)
+            drop_table_sql = (
+                "drop table %s"
+                % connection.ops.quote_name("migrations_tribble").lower()
+            )
+            for line in lines[pos + 3 : next_pos]:
+                if drop_table_sql in line.lower():
+                    break
+            else:
+                self.fail("DROP TABLE (tribble) not found.")
+            pos = next_pos
+            self.assertEqual(
+                lines[pos : pos + 3],
+                [
+                    "--",
+                    "-- Create model Author",
+                    "--",
+                ],
+            )
+            drop_table_sql = (
+                "drop table %s" % connection.ops.quote_name("migrations_author").lower()
+            )
+            for line in lines[pos + 3 :]:
+                if drop_table_sql in line.lower():
+                    break
+            else:
+                self.fail("DROP TABLE (author) not found.")
+        finally:
+            # Unmigrate everything.
+            call_command("migrate", "migrations", "zero", verbosity=0)
 
     @override_settings(
         MIGRATION_MODULES={"migrations": "migrations.test_migrations_non_atomic"}
