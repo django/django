@@ -1117,6 +1117,7 @@ by 3rd parties that allow you to use other databases with Django:
 * `Firebird`_
 * `Google Cloud Spanner`_
 * `Microsoft SQL Server`_
+* `TiDB`_
 
 The Django versions and ORM features supported by these unofficial backends
 vary considerably. Queries regarding the specific capabilities of these
@@ -1127,3 +1128,4 @@ the support channels provided by each 3rd party project.
 .. _Firebird: https://pypi.org/project/django-firebird/
 .. _Google Cloud Spanner: https://pypi.org/project/django-google-spanner/
 .. _Microsoft SQL Server: https://pypi.org/project/mssql-django/
+.. _TiDB: https://pypi.org/project/django-tidb/
