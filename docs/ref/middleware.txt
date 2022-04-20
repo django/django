@@ -199,6 +199,7 @@ enabled or disabled with a setting.
 * :setting:`SECURE_REDIRECT_EXEMPT`
 * :setting:`SECURE_REFERRER_POLICY`
 * :setting:`SECURE_SSL_HOST`
+* :setting:`SECURE_SSL_PORT`
 * :setting:`SECURE_SSL_REDIRECT`
 
 .. _http-strict-transport-security:
@@ -439,6 +440,11 @@ connections to HTTPS.
 
 If the :setting:`SECURE_SSL_HOST` setting has a value, all redirects will be
 sent to that host instead of the originally-requested host.
+
+If the :setting:`SECURE_SSL_PORT` settings has a value, redirects will specify
+this port. If it is not set, redirects will specify no port if HTTP request
+request had no explicit port, or will include original HTTP request port in
+redirect.
 
 If there are a few pages on your site that should be available over HTTP, and
 not redirected to HTTPS, you can list regular expressions to match those URLs

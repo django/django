@@ -2,6 +2,7 @@ import re
 
 from django.conf import settings
 from django.http import HttpResponsePermanentRedirect
+from django.http.request import split_domain_port
 from django.utils.deprecation import MiddlewareMixin
 
 
@@ -14,6 +15,7 @@ class SecurityMiddleware(MiddlewareMixin):
         self.content_type_nosniff = settings.SECURE_CONTENT_TYPE_NOSNIFF
         self.redirect = settings.SECURE_SSL_REDIRECT
         self.redirect_host = settings.SECURE_SSL_HOST
+        self.redirect_port = settings.SECURE_SSL_PORT
         self.redirect_exempt = [re.compile(r) for r in settings.SECURE_REDIRECT_EXEMPT]
         self.referrer_policy = settings.SECURE_REFERRER_POLICY
         self.cross_origin_opener_policy = settings.SECURE_CROSS_ORIGIN_OPENER_POLICY
@@ -26,8 +28,12 @@ class SecurityMiddleware(MiddlewareMixin):
             and not any(pattern.search(path) for pattern in self.redirect_exempt)
         ):
             host = self.redirect_host or request.get_host()
+            domain, origport = split_domain_port(host)
+            port = self.redirect_port or origport or 443
             return HttpResponsePermanentRedirect(
-                "https://%s%s" % (host, request.get_full_path())
+                "https://%s%s%s" % (domain,
+                                        ":" + str(port) if port != 443 else "",
+                                        request.get_full_path())
             )
 
     def process_response(self, request, response):

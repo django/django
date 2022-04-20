@@ -2518,6 +2518,17 @@ to this host rather than the originally-requested host
 (e.g. ``www.example.com``). If :setting:`SECURE_SSL_REDIRECT` is ``False``, this
 setting has no effect.
 
+.. setting:: SECURE_SSL_PORT
+
+``SECURE_SSL_PORT``
+-------------------
+
+Default: ``None``
+
+If configured, SSL redirects will be directed to this port rather than the
+originally-requested port if it was specified in the request. If
+:setting:`SECURE_SSL_REDIRECT` is ``False``, this setting has no effect.
+
 .. setting:: SECURE_SSL_REDIRECT
 
 ``SECURE_SSL_REDIRECT``
@@ -3741,6 +3752,7 @@ HTTP
   * :setting:`SECURE_REDIRECT_EXEMPT`
   * :setting:`SECURE_REFERRER_POLICY`
   * :setting:`SECURE_SSL_HOST`
+  * :setting:`SECURE_SSL_PORT`
   * :setting:`SECURE_SSL_REDIRECT`
 * :setting:`SIGNING_BACKEND`
 * :setting:`USE_X_FORWARDED_HOST`
