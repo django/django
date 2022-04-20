@@ -44,6 +44,7 @@ class BaseIterable:
         self.queryset = queryset
         self.chunked_fetch = chunked_fetch
         self.chunk_size = chunk_size
+        self.compiler = self.queryset.query.get_compiler(using=self.queryset.db)
 
 
 class ModelIterable(BaseIterable):
@@ -51,17 +52,15 @@ class ModelIterable(BaseIterable):
 
     def __iter__(self):
         queryset = self.queryset
-        db = queryset.db
-        compiler = queryset.query.get_compiler(using=db)
         # Execute the query. This will also fill compiler.select, klass_info,
         # and annotations.
-        results = compiler.execute_sql(
+        results = self.compiler.execute_sql(
             chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
         )
         select, klass_info, annotation_col_map = (
-            compiler.select,
-            compiler.klass_info,
-            compiler.annotation_col_map,
+            self.compiler.select,
+            self.compiler.klass_info,
+            self.compiler.annotation_col_map,
         )
         model_cls = klass_info["model"]
         select_fields = klass_info["select_fields"]
@@ -69,7 +68,9 @@ class ModelIterable(BaseIterable):
         init_list = [
             f[0].target.attname for f in select[model_fields_start:model_fields_end]
         ]
-        related_populators = get_related_populators(klass_info, select, db)
+        related_populators = get_related_populators(
+            klass_info, select, self.compiler.using
+        )
         known_related_objects = [
             (
                 field,
@@ -85,9 +86,9 @@ class ModelIterable(BaseIterable):
             )
             for field, related_objs in queryset._known_related_objects.items()
         ]
-        for row in compiler.results_iter(results):
+        for row in self.compiler.results_iter(results):
             obj = model_cls.from_db(
-                db, init_list, row[model_fields_start:model_fields_end]
+                self.compiler.using, init_list, row[model_fields_start:model_fields_end]
             )
             for rel_populator in related_populators:
                 rel_populator.populate(row, obj)
@@ -117,10 +118,7 @@ class ValuesIterable(BaseIterable):
     """
 
     def __iter__(self):
-        queryset = self.queryset
-        query = queryset.query
-        compiler = query.get_compiler(queryset.db)
-
+        query = self.queryset.query
         # extra(select=...) cols are always at the start of the row.
         names = [
             *query.extra_select,
@@ -128,7 +126,7 @@ class ValuesIterable(BaseIterable):
             *query.annotation_select,
         ]
         indexes = range(len(names))
-        for row in compiler.results_iter(
+        for row in self.compiler.results_iter(
             chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
         ):
             yield {names[i]: row[i] for i in indexes}
@@ -143,7 +141,6 @@ class ValuesListIterable(BaseIterable):
     def __iter__(self):
         queryset = self.queryset
         query = queryset.query
-        compiler = query.get_compiler(queryset.db)
 
         if queryset._fields:
             # extra(select=...) cols are always at the start of the row.
@@ -162,11 +159,11 @@ class ValuesListIterable(BaseIterable):
                 rowfactory = operator.itemgetter(*[index_map[f] for f in fields])
                 return map(
                     rowfactory,
-                    compiler.results_iter(
+                    self.compiler.results_iter(
                         chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
                     ),
                 )
-        return compiler.results_iter(
+        return self.compiler.results_iter(
             tuple_expected=True,
             chunked_fetch=self.chunked_fetch,
             chunk_size=self.chunk_size,
@@ -203,9 +200,7 @@ class FlatValuesListIterable(BaseIterable):
     """
 
     def __iter__(self):
-        queryset = self.queryset
-        compiler = queryset.query.get_compiler(queryset.db)
-        for row in compiler.results_iter(
+        for row in self.compiler.results_iter(
             chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
         ):
             yield row[0]
