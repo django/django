@@ -26,6 +26,23 @@ officially support the latest release of each series.
 What's new in Django 4.1
 ========================
 
+Asynchronous handlers for class-based views
+-------------------------------------------
+
+View subclasses may now define async HTTP method handlers::
+
+    import asyncio
+    from django.http import HttpResponse
+    from django.views import View
+
+    class AsyncView(View):
+        async def get(self, request, *args, **kwargs):
+            # Perform view logic using await.
+            await asyncio.sleep(1)
+            return HttpResponse("Hello async world!")
+
+See :ref:`async-class-based-views` for more details.
+
 .. _csrf-cookie-masked-usage:
 
 ``CSRF_COOKIE_MASKED`` setting
@@ -61,6 +78,11 @@ Minor features
 * The admin :meth:`history view <django.contrib.admin.ModelAdmin.history_view>`
   is now paginated.
 
+* Related widget wrappers now have a link to object's change form.
+
+* The :meth:`.AdminSite.get_app_list` method now allows changing the order of
+  apps and models on the admin index page.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -71,6 +93,9 @@ Minor features
 
 * The default iteration count for the PBKDF2 password hasher is increased from
   320,000 to 390,000.
+
+* The :meth:`.RemoteUserBackend.configure_user` method now allows synchronizing
+  user attributes with attributes in a remote system such as an LDAP directory.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -209,6 +234,10 @@ Forms
   objects implement the ``__html__()`` method (typically when decorated with
   the :func:`~django.utils.html.html_safe` decorator).
 
+* The new :attr:`.BoundField.use_fieldset` and :attr:`.Widget.use_fieldset`
+  attributes help to identify widgets where its inputs should be grouped in a
+  ``<fieldset>`` with a ``<legend>``.
+
 Generic Views
 ~~~~~~~~~~~~~
 
@@ -239,8 +268,12 @@ Management Commands
   migrations from the ``django_migrations`` table.
 
 * Python files created by :djadmin:`startproject`, :djadmin:`startapp`,
-  :djadmin:`makemigrations`, and :djadmin:`squashmigrations` are now formatted
-  using the ``black`` command if it is present on your ``PATH``.
+  :djadmin:`optimizemigration`, :djadmin:`makemigrations`, and
+  :djadmin:`squashmigrations` are now formatted using the ``black`` command if
+  it is present on your ``PATH``.
+
+* The new :djadmin:`optimizemigration` command allows optimizing operations for
+  a migration.
 
 Migrations
 ~~~~~~~~~~
@@ -267,16 +300,32 @@ Models
   as the ``chunk_size`` argument is provided. In older versions, no prefetching
   was done.
 
+* :class:`~django.db.models.Q` objects and querysets can now be combined using
+  ``^`` as the exclusive or (``XOR``) operator. ``XOR`` is natively supported
+  on MariaDB and MySQL. For databases that do not support ``XOR``, the query
+  will be converted to an equivalent using ``AND``, ``OR``, and ``NOT``.
+
+* The new :ref:`Field.non_db_attrs <custom-field-non_db_attrs>` attribute
+  allows customizing attributes of fields that don't affect a column
+  definition.
+
+* On PostgreSQL, ``AutoField``, ``BigAutoField``, and ``SmallAutoField`` are
+  now created as identity columns rather than serial columns with sequences.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :meth:`.HttpResponse.set_cookie` now supports :class:`~datetime.timedelta`
+  objects for the ``max_age`` argument.
 
 Security
 ~~~~~~~~
 
 * The new :setting:`SECRET_KEY_FALLBACKS` setting allows providing a list of
   values for secret key rotation.
+
+* The :setting:`SECURE_PROXY_SSL_HEADER` setting now supports a comma-separated
+  list of protocols in the header value.
 
 Serialization
 ~~~~~~~~~~~~~
@@ -290,27 +339,48 @@ Signals
   :data:`~django.db.models.signals.post_delete` signals now dispatch the
   ``origin`` of the deletion.
 
+.. _templates-4.1:
+
 Templates
 ~~~~~~~~~
 
 * :tfilter:`json_script` template filter now allows wrapping in a ``<script>``
   tag without the HTML ``id`` attribute.
 
+* The :class:`cached template loader <django.template.loaders.cached.Loader>`
+  is now enabled in development, when :setting:`DEBUG` is ``True``, and
+  :setting:`OPTIONS['loaders'] <TEMPLATES-OPTIONS>` isn't specified. You may
+  specify ``OPTIONS['loaders']`` to override this, if necessary.
+
 Tests
 ~~~~~
+
+* The :class:`.DiscoverRunner` now supports running tests in parallel on
+  macOS, Windows, and any other systems where the default
+  :mod:`multiprocessing` start method is ``spawn``.
 
 * A nested atomic block marked as durable in :class:`django.test.TestCase` now
   raises a ``RuntimeError``, the same as outside of tests.
 
+* :meth:`.SimpleTestCase.assertFormError` and
+  :meth:`~.SimpleTestCase.assertFormsetError` now support passing a
+  form/formset object directly.
+
 URLs
 ~~~~
 
-* ...
+* The new :attr:`.ResolverMatch.captured_kwargs` attribute stores the captured
+  keyword arguments, as parsed from the URL.
+
+* The new :attr:`.ResolverMatch.extra_kwargs` attribute stores the additional
+  keyword arguments passed to the view function.
 
 Utilities
 ~~~~~~~~~
 
 * ``SimpleLazyObject`` now supports addition operations.
+
+* :func:`~django.utils.safestring.mark_safe` now preserves lazy objects.
 
 Validators
 ~~~~~~~~~~
@@ -373,6 +443,14 @@ this difference. In Django 4.0 and earlier,
 second example query, but this undocumented behavior led to queries with
 excessive joins.
 
+Reverse foreign key changes for unsaved model instances
+-------------------------------------------------------
+
+In order to unify the behavior with many-to-many relations for unsaved model
+instances, a reverse foreign key now raises ``ValueError`` when calling
+:class:`related managers <django.db.models.fields.related.RelatedManager>` for
+unsaved objects.
+
 Miscellaneous
 -------------
 
@@ -398,10 +476,59 @@ Miscellaneous
 * The ``type="text/css"`` attribute is no longer included in ``<link>`` tags
   for CSS :doc:`form media </topics/forms/media>`.
 
+* ``formset:added`` and ``formset:removed`` JavaScript events are now pure
+  JavaScript events and don't depend on jQuery. See
+  :ref:`admin-javascript-inline-form-events` for more details on the change.
+
+* The ``exc_info`` argument of the undocumented
+  ``django.utils.log.log_response()`` function is replaced by ``exception``.
+
+* The ``size`` argument of the undocumented
+  ``django.views.static.was_modified_since()`` function is removed.
+
+* The admin log out UI now uses ``POST`` requests.
+
+* The undocumented ``InlineAdminFormSet.non_form_errors`` property is replaced
+  by the ``non_form_errors()`` method. This is consistent with ``BaseFormSet``.
+
+* As per :ref:`above<templates-4.1>`, the cached template loader is now
+  enabled in development. You may specify ``OPTIONS['loaders']`` to override
+  this, if necessary.
+
 .. _deprecated-features-4.1:
 
 Features deprecated in 4.1
 ==========================
+
+Log out via GET
+---------------
+
+Logging out via ``GET`` requests to the :py:class:`built-in logout view
+<django.contrib.auth.views.LogoutView>` is deprecated. Use ``POST`` requests
+instead.
+
+If you want to retain the user experience of an HTML link, you can use a form
+that is styled to appear as a link:
+
+.. code-block:: html
+
+  <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
+    {% csrf_token %}
+    <button type="submit">{% translate "Log out" %}</button>
+  </form>
+
+.. code-block:: css
+
+  #logout-form {
+    display: inline;
+  }
+  #logout-form button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+  }
 
 Miscellaneous
 -------------
@@ -453,9 +580,6 @@ Miscellaneous
   :meth:`~.SimpleTestCase.assertFormsetError` is deprecated. Use ``errors=[]``
   instead.
 
-* The ``exc_info`` argument of the undocumented
-  ``django.utils.log.log_response()`` function is replaced by ``exception``.
-
 * ``django.contrib.sessions.serializers.PickleSerializer`` is deprecated due to
   the risk of remote code execution.
 
@@ -463,6 +587,25 @@ Miscellaneous
   objects without providing the ``chunk_size`` argument is deprecated. In older
   versions, no prefetching was done. Providing a value for ``chunk_size``
   signifies that the additional query per chunk needed to prefetch is desired.
+
+* Passing unsaved model instances to related filters is deprecated. In Django
+  5.0, the exception will be raised.
+
+* ``created=True`` is added to the signature of
+  :meth:`.RemoteUserBackend.configure_user`. Support  for ``RemoteUserBackend``
+  subclasses that do not accept this argument is deprecated.
+
+* The :data:`django.utils.timezone.utc` alias to :attr:`datetime.timezone.utc`
+  is deprecated. Use :attr:`datetime.timezone.utc` directly.
+
+* Passing a response object and a form/formset name to
+  ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` is
+  deprecated. Use::
+
+    assertFormError(response.context['form_name'], …)
+    assertFormsetError(response.context['formset_name'], …)
+
+  or pass the form/formset object directly instead.
 
 Features removed in 4.1
 =======================

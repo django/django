@@ -86,6 +86,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "db_functions.datetime.test_extract_trunc.DateFunctionWithTimeZoneTests."
             "test_trunc_week_before_1000",
         },
+        "Oracle extracts seconds including fractional seconds (#33517).": {
+            "db_functions.datetime.test_extract_trunc.DateFunctionTests."
+            "test_extract_second_func_no_fractional",
+            "db_functions.datetime.test_extract_trunc.DateFunctionWithTimeZoneTests."
+            "test_extract_second_func_no_fractional",
+        },
         "Oracle doesn't support bitwise XOR.": {
             "expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor",
             "expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor_null",

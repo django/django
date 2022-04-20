@@ -1,4 +1,5 @@
 from django.db import connection, models
+from django.db.models.functions import Lower
 
 
 class People(models.Model):
@@ -117,3 +118,16 @@ class UniqueTogether(models.Model):
             ("from_field", "field1"),
             ("non_unique", "non_unique_0"),
         ]
+
+
+class FuncUniqueConstraint(models.Model):
+    name = models.CharField(max_length=255)
+    rank = models.IntegerField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                Lower("name"), models.F("rank"), name="index_lower_name"
+            )
+        ]
+        required_db_features = {"supports_expression_indexes"}

@@ -16,6 +16,9 @@ class Router:
 
     db_for_write = db_for_read
 
+    def allow_relation(self, obj1, obj2, **hints):
+        return True
+
 
 site = admin.AdminSite(name="test_adminsite")
 site.register(Book)

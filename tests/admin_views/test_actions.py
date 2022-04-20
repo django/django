@@ -190,7 +190,7 @@ class AdminActionsTest(TestCase):
         )
         # SubscriberAdmin.delete_queryset() sets overridden to True.
         self.assertIs(SubscriberAdmin.overridden, True)
-        self.assertEqual(Subscriber.objects.all().count(), 0)
+        self.assertEqual(Subscriber.objects.count(), 0)
 
     def test_delete_selected_uses_get_deleted_objects(self):
         """The delete_selected action uses ModelAdmin.get_deleted_objects()."""

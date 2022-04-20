@@ -12,7 +12,8 @@ from django.db.models.expressions import RawSQL
 from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import NothingNode, WhereNode
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext
+from django.test.utils import CaptureQueriesContext, ignore_warnings
+from django.utils.deprecation import RemovedInDjango50Warning
 
 from .models import (
     FK1,
@@ -1642,7 +1643,7 @@ class Queries4Tests(TestCase):
 
         qs = CategoryItem.objects.filter(category__specialcategory__isnull=False)
         self.assertEqual(qs.count(), 2)
-        self.assertSequenceEqual(qs, [ci2, ci3])
+        self.assertCountEqual(qs, [ci2, ci3])
 
     def test_ticket15316_exclude_false(self):
         c1 = SimpleCategory.objects.create(name="category1")
@@ -1693,7 +1694,7 @@ class Queries4Tests(TestCase):
 
         qs = CategoryItem.objects.exclude(category__specialcategory__isnull=True)
         self.assertEqual(qs.count(), 2)
-        self.assertSequenceEqual(qs, [ci2, ci3])
+        self.assertCountEqual(qs, [ci2, ci3])
 
     def test_ticket15316_one2one_filter_false(self):
         c = SimpleCategory.objects.create(name="cat")
@@ -1787,7 +1788,7 @@ class Queries5Tests(TestCase):
             [self.rank3, self.rank2, self.rank1],
         )
         self.assertSequenceEqual(
-            Ranking.objects.all().order_by("rank"),
+            Ranking.objects.order_by("rank"),
             [self.rank1, self.rank2, self.rank3],
         )
 
@@ -1882,6 +1883,10 @@ class Queries5Tests(TestCase):
             Note.objects.exclude(~Q() & ~Q()),
             [self.n1, self.n2],
         )
+        self.assertSequenceEqual(
+            Note.objects.exclude(~Q() ^ ~Q()),
+            [self.n1, self.n2],
+        )
 
     def test_extra_select_literal_percent_s(self):
         # Allow %%s to escape select clauses
@@ -1893,11 +1898,33 @@ class Queries5Tests(TestCase):
             Note.objects.extra(select={"foo": "'bar %%s'"})[0].foo, "bar %s"
         )
 
+    def test_extra_select_alias_sql_injection(self):
+        crafted_alias = """injected_name" from "queries_note"; --"""
+        msg = (
+            "Column aliases cannot contain whitespace characters, quotation marks, "
+            "semicolons, or SQL comments."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Note.objects.extra(select={crafted_alias: "1"})
+
     def test_queryset_reuse(self):
         # Using querysets doesn't mutate aliases.
         authors = Author.objects.filter(Q(name="a1") | Q(name="nonexistent"))
         self.assertEqual(Ranking.objects.filter(author__in=authors).get(), self.rank3)
         self.assertEqual(authors.count(), 1)
+
+    def test_filter_unsaved_object(self):
+        # These tests will catch ValueError in Django 5.0 when passing unsaved
+        # model instances to related filters becomes forbidden.
+        # msg = "Model instances passed to related filters must be saved."
+        msg = "Passing unsaved model instances to related filters is deprecated."
+        company = Company.objects.create(name="Django")
+        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+            Employment.objects.filter(employer=Company(name="unsaved"))
+        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+            Employment.objects.filter(employer__in=[company, Company(name="unsaved")])
+        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+            StaffUser.objects.filter(staff=Staff(name="unsaved"))
 
 
 class SelectRelatedTests(TestCase):
@@ -1944,9 +1971,9 @@ class NullableRelOrderingTests(TestCase):
         s = SingleObject.objects.create(name="s")
         r = RelatedObject.objects.create(single=s, f=1)
         p2 = Plaything.objects.create(name="p2", others=r)
-        qs = Plaything.objects.all().filter(others__isnull=False).order_by("pk")
+        qs = Plaything.objects.filter(others__isnull=False).order_by("pk")
         self.assertNotIn("JOIN", str(qs.query))
-        qs = Plaything.objects.all().filter(others__f__isnull=False).order_by("pk")
+        qs = Plaything.objects.filter(others__f__isnull=False).order_by("pk")
         self.assertIn("INNER", str(qs.query))
         qs = qs.order_by("others__single__name")
         # The ordering by others__single__pk will add one new join (to single)
@@ -2115,6 +2142,15 @@ class Queries6Tests(TestCase):
         sql = captured_queries[0]["sql"]
         self.assertIn("AS %s" % connection.ops.quote_name("col1"), sql)
 
+    def test_xor_subquery(self):
+        self.assertSequenceEqual(
+            Tag.objects.filter(
+                Exists(Tag.objects.filter(id=OuterRef("id"), name="t3"))
+                ^ Exists(Tag.objects.filter(id=OuterRef("id"), parent=self.t1))
+            ),
+            [self.t2],
+        )
+
 
 class RawQueriesTests(TestCase):
     @classmethod
@@ -2190,6 +2226,22 @@ class ExistsSql(TestCase):
         self.assertNotIn(id, qstr)
         self.assertNotIn(name, qstr)
 
+    def test_distinct_exists(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            self.assertIs(Article.objects.distinct().exists(), False)
+        self.assertEqual(len(captured_queries), 1)
+        captured_sql = captured_queries[0]["sql"]
+        self.assertNotIn(connection.ops.quote_name("id"), captured_sql)
+        self.assertNotIn(connection.ops.quote_name("name"), captured_sql)
+
+    def test_sliced_distinct_exists(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            self.assertIs(Article.objects.distinct()[1:3].exists(), False)
+        self.assertEqual(len(captured_queries), 1)
+        captured_sql = captured_queries[0]["sql"]
+        self.assertIn(connection.ops.quote_name("id"), captured_sql)
+        self.assertIn(connection.ops.quote_name("name"), captured_sql)
+
     def test_ticket_18414(self):
         Article.objects.create(name="one", created=datetime.datetime.now())
         Article.objects.create(name="one", created=datetime.datetime.now())
@@ -2219,16 +2271,16 @@ class QuerysetOrderedTests(unittest.TestCase):
 
     def test_cleared_default_ordering(self):
         self.assertIs(Tag.objects.all().ordered, True)
-        self.assertIs(Tag.objects.all().order_by().ordered, False)
+        self.assertIs(Tag.objects.order_by().ordered, False)
 
     def test_explicit_ordering(self):
-        self.assertIs(Annotation.objects.all().order_by("id").ordered, True)
+        self.assertIs(Annotation.objects.order_by("id").ordered, True)
 
     def test_empty_queryset(self):
         self.assertIs(Annotation.objects.none().ordered, True)
 
     def test_order_by_extra(self):
-        self.assertIs(Annotation.objects.all().extra(order_by=["id"]).ordered, True)
+        self.assertIs(Annotation.objects.extra(order_by=["id"]).ordered, True)
 
     def test_annotated_ordering(self):
         qs = Annotation.objects.annotate(num_notes=Count("notes"))
@@ -2417,6 +2469,30 @@ class QuerySetBitwiseOperationTests(TestCase):
         qs1 = Classroom.objects.filter(has_blackboard=False).order_by("-pk")[:1]
         qs2 = Classroom.objects.filter(has_blackboard=True).order_by("-name")[:1]
         self.assertCountEqual(qs1 | qs2, [self.room_3, self.room_4])
+
+    @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
+    def test_xor_with_rhs_slice(self):
+        qs1 = Classroom.objects.filter(has_blackboard=True)
+        qs2 = Classroom.objects.filter(has_blackboard=False)[:1]
+        self.assertCountEqual(qs1 ^ qs2, [self.room_1, self.room_2, self.room_3])
+
+    @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
+    def test_xor_with_lhs_slice(self):
+        qs1 = Classroom.objects.filter(has_blackboard=True)[:1]
+        qs2 = Classroom.objects.filter(has_blackboard=False)
+        self.assertCountEqual(qs1 ^ qs2, [self.room_1, self.room_2, self.room_4])
+
+    @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
+    def test_xor_with_both_slice(self):
+        qs1 = Classroom.objects.filter(has_blackboard=False)[:1]
+        qs2 = Classroom.objects.filter(has_blackboard=True)[:1]
+        self.assertCountEqual(qs1 ^ qs2, [self.room_1, self.room_2])
+
+    @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
+    def test_xor_with_both_slice_and_ordering(self):
+        qs1 = Classroom.objects.filter(has_blackboard=False).order_by("-pk")[:1]
+        qs2 = Classroom.objects.filter(has_blackboard=True).order_by("-name")[:1]
+        self.assertCountEqual(qs1 ^ qs2, [self.room_3, self.room_4])
 
     def test_subquery_aliases(self):
         combined = School.objects.filter(pk__isnull=False) & School.objects.filter(
@@ -2685,7 +2761,7 @@ class QuerySetSupportsPythonIdioms(TestCase):
         ]
 
     def get_ordered_articles(self):
-        return Article.objects.all().order_by("name")
+        return Article.objects.order_by("name")
 
     def test_can_get_items_using_index_and_slice_notation(self):
         self.assertEqual(self.get_ordered_articles()[0].name, "Article 1")
@@ -2839,7 +2915,7 @@ class EscapingTests(TestCase):
         r_a = ReservedName.objects.create(name="a", order=42)
         r_b = ReservedName.objects.create(name="b", order=37)
         self.assertSequenceEqual(
-            ReservedName.objects.all().order_by("order"),
+            ReservedName.objects.order_by("order"),
             [r_b, r_a],
         )
         self.assertSequenceEqual(
@@ -2983,7 +3059,7 @@ class ConditionalTests(TestCase):
         # ... but you can still order in a non-recursive fashion among linked
         # fields (the previous test failed because the default ordering was
         # recursive).
-        self.assertQuerysetEqual(LoopX.objects.all().order_by("y__x__y__x__id"), [])
+        self.assertQuerysetEqual(LoopX.objects.order_by("y__x__y__x__id"), [])
 
     # When grouping without specifying ordering, we add an explicit "ORDER BY NULL"
     # portion in MySQL to prevent unnecessary sorting.
@@ -3211,6 +3287,7 @@ class ExcludeTests(TestCase):
             [self.j1, self.j2],
         )
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_exclude_unsaved_o2o_object(self):
         jack = Staff.objects.create(name="jack")
         jack_staff = StaffUser.objects.create(staff=jack)
@@ -3220,6 +3297,19 @@ class ExcludeTests(TestCase):
         self.assertSequenceEqual(
             StaffUser.objects.exclude(staff=unsaved_object), [jack_staff]
         )
+
+    def test_exclude_unsaved_object(self):
+        # These tests will catch ValueError in Django 5.0 when passing unsaved
+        # model instances to related filters becomes forbidden.
+        # msg = "Model instances passed to related filters must be saved."
+        company = Company.objects.create(name="Django")
+        msg = "Passing unsaved model instances to related filters is deprecated."
+        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+            Employment.objects.exclude(employer=Company(name="unsaved"))
+        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+            Employment.objects.exclude(employer__in=[company, Company(name="unsaved")])
+        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+            StaffUser.objects.exclude(staff=Staff(name="unsaved"))
 
 
 class ExcludeTest17600(TestCase):
@@ -4175,7 +4265,7 @@ class RelatedLookupTypeTests(TestCase):
         pob.save()
         self.assertSequenceEqual(
             ObjectB.objects.filter(
-                objecta__in=ObjectB.objects.all().values_list("num")
+                objecta__in=ObjectB.objects.values_list("num")
             ).order_by("pk"),
             [ob, pob],
         )

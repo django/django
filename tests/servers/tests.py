@@ -99,7 +99,7 @@ class LiveServerTestCloseConnectionTest(LiveServerBase):
         self.assertIsNotNone(conn.connection)
         with self.urlopen("/model_view/") as f:
             # The server can access the database.
-            self.assertEqual(f.read().splitlines(), [b"jane", b"robert"])
+            self.assertCountEqual(f.read().splitlines(), [b"jane", b"robert"])
         # Wait for the server's request thread to close the connection.
         # A timeout of 0.1 seconds should be more than enough. If the wait
         # times out, the assertion after should fail.
@@ -173,7 +173,7 @@ class LiveServerViews(LiveServerBase):
         we can detect a content length from the response. This should be doable
         for all simple views and streaming responses where an iterable with
         length of one is passed. The latter follows as result of `set_content_length`
-        from https://github.com/python/cpython/blob/master/Lib/wsgiref/handlers.py.
+        from https://github.com/python/cpython/blob/main/Lib/wsgiref/handlers.py.
 
         If we cannot detect a content length we explicitly set the `Connection`
         header to `close` to notify the client that we do not actually support
@@ -320,7 +320,7 @@ class LiveServerDatabase(LiveServerBase):
         Fixtures are properly loaded and visible to the live server thread.
         """
         with self.urlopen("/model_view/") as f:
-            self.assertEqual(f.read().splitlines(), [b"jane", b"robert"])
+            self.assertCountEqual(f.read().splitlines(), [b"jane", b"robert"])
 
     def test_database_writes(self):
         """
@@ -329,7 +329,7 @@ class LiveServerDatabase(LiveServerBase):
         with self.urlopen("/create_model_instance/"):
             pass
         self.assertQuerysetEqual(
-            Person.objects.all().order_by("pk"),
+            Person.objects.order_by("pk"),
             ["jane", "robert", "emily"],
             lambda b: b.name,
         )

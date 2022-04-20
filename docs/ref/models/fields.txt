@@ -771,7 +771,7 @@ A :class:`CharField` that checks that the value is a valid email address using
 ``FileField``
 -------------
 
-.. class:: FileField(upload_to=None, max_length=100, **options)
+.. class:: FileField(upload_to='', storage=None, max_length=100, **options)
 
 A file-upload field.
 
@@ -1610,7 +1610,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     Set the :class:`ForeignKey` to the value passed to
     :func:`~django.db.models.SET()`, or if a callable is passed in,
     the result of calling it. In most cases, passing a callable will be
-    necessary to avoid executing queries at the time your models.py is
+    necessary to avoid executing queries at the time your ``models.py`` is
     imported::
 
         from django.conf import settings

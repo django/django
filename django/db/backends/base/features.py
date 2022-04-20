@@ -263,10 +263,6 @@ class BaseDatabaseFeatures:
     # What formats does the backend EXPLAIN syntax support?
     supported_explain_formats = set()
 
-    # Does DatabaseOperations.explain_query_prefix() raise ValueError if
-    # unknown kwargs are passed to QuerySet.explain()?
-    validates_explain_options = True
-
     # Does the backend support the default parameter in lead() and lag()?
     supports_default_in_lead_lag = True
 
@@ -324,6 +320,9 @@ class BaseDatabaseFeatures:
     supports_collation_on_textfield = True
     # Does the backend support non-deterministic collations?
     supports_non_deterministic_collations = True
+
+    # Does the backend support the logical XOR operator?
+    supports_logical_xor = False
 
     # Collation names for use by the Django test suite.
     test_collations = {

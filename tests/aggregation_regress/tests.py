@@ -471,12 +471,8 @@ class AggregationTests(TestCase):
     def test_aggregate_annotation(self):
         # Aggregates can be composed over annotations.
         # The return type is derived from the composed aggregate
-        vals = (
-            Book.objects.all()
-            .annotate(num_authors=Count("authors__id"))
-            .aggregate(
-                Max("pages"), Max("price"), Sum("num_authors"), Avg("num_authors")
-            )
+        vals = Book.objects.annotate(num_authors=Count("authors__id")).aggregate(
+            Max("pages"), Max("price"), Sum("num_authors"), Avg("num_authors")
         )
         self.assertEqual(
             vals,
@@ -506,7 +502,7 @@ class AggregationTests(TestCase):
 
     def test_sliced_conditional_aggregate(self):
         self.assertEqual(
-            Author.objects.all()[:5].aggregate(
+            Author.objects.order_by("pk")[:5].aggregate(
                 test=Sum(Case(When(age__lte=35, then=1)))
             )["test"],
             3,
@@ -588,10 +584,10 @@ class AggregationTests(TestCase):
             "pubdate, publisher, publisher_id, rating, store, tags"
         )
         with self.assertRaisesMessage(FieldError, msg):
-            Book.objects.all().aggregate(num_authors=Count("foo"))
+            Book.objects.aggregate(num_authors=Count("foo"))
 
         with self.assertRaisesMessage(FieldError, msg):
-            Book.objects.all().annotate(num_authors=Count("foo"))
+            Book.objects.annotate(num_authors=Count("foo"))
 
         msg = (
             "Cannot resolve keyword 'foo' into field. Choices are: authors, "
@@ -599,7 +595,7 @@ class AggregationTests(TestCase):
             "pages, price, pubdate, publisher, publisher_id, rating, store, tags"
         )
         with self.assertRaisesMessage(FieldError, msg):
-            Book.objects.all().annotate(num_authors=Count("authors__id")).aggregate(
+            Book.objects.annotate(num_authors=Count("authors__id")).aggregate(
                 Max("foo")
             )
 
@@ -932,7 +928,7 @@ class AggregationTests(TestCase):
             "the default name for another annotation."
         )
         with self.assertRaisesMessage(ValueError, msg):
-            Book.objects.all().annotate(
+            Book.objects.annotate(
                 Avg("authors__age"), authors__age__avg=Avg("authors__age")
             )
 
@@ -1686,13 +1682,47 @@ class AggregationTests(TestCase):
             qs, ["Adrian Holovaty", "Peter Norvig"], lambda b: b.name
         )
 
-    def test_ticket_11293(self):
+    def test_filter_aggregates_or_connector(self):
         q1 = Q(price__gt=50)
         q2 = Q(authors__count__gt=1)
         query = Book.objects.annotate(Count("authors")).filter(q1 | q2).order_by("pk")
         self.assertQuerysetEqual(
             query,
             [self.b1.pk, self.b4.pk, self.b5.pk, self.b6.pk],
+            attrgetter("pk"),
+        )
+
+    def test_filter_aggregates_negated_and_connector(self):
+        q1 = Q(price__gt=50)
+        q2 = Q(authors__count__gt=1)
+        query = (
+            Book.objects.annotate(Count("authors")).filter(~(q1 & q2)).order_by("pk")
+        )
+        self.assertQuerysetEqual(
+            query,
+            [self.b1.pk, self.b2.pk, self.b3.pk, self.b4.pk, self.b6.pk],
+            attrgetter("pk"),
+        )
+
+    def test_filter_aggregates_xor_connector(self):
+        q1 = Q(price__gt=50)
+        q2 = Q(authors__count__gt=1)
+        query = Book.objects.annotate(Count("authors")).filter(q1 ^ q2).order_by("pk")
+        self.assertQuerysetEqual(
+            query,
+            [self.b1.pk, self.b4.pk, self.b6.pk],
+            attrgetter("pk"),
+        )
+
+    def test_filter_aggregates_negated_xor_connector(self):
+        q1 = Q(price__gt=50)
+        q2 = Q(authors__count__gt=1)
+        query = (
+            Book.objects.annotate(Count("authors")).filter(~(q1 ^ q2)).order_by("pk")
+        )
+        self.assertQuerysetEqual(
+            query,
+            [self.b2.pk, self.b3.pk, self.b5.pk],
             attrgetter("pk"),
         )
 

@@ -899,6 +899,22 @@ class DateFunctionTests(TestCase):
             2,
         )
 
+    def test_extract_second_func_no_fractional(self):
+        start_datetime = datetime(2015, 6, 15, 14, 30, 50, 321)
+        end_datetime = datetime(2016, 6, 15, 14, 30, 50, 783)
+        if settings.USE_TZ:
+            start_datetime = timezone.make_aware(start_datetime)
+            end_datetime = timezone.make_aware(end_datetime)
+        obj = self.create_model(start_datetime, end_datetime)
+        self.assertSequenceEqual(
+            DTModel.objects.filter(start_datetime__second=F("end_datetime__second")),
+            [obj],
+        )
+        self.assertSequenceEqual(
+            DTModel.objects.filter(start_time__second=F("end_time__second")),
+            [obj],
+        )
+
     def test_trunc_func(self):
         start_datetime = datetime(999, 6, 15, 14, 30, 50, 321)
         end_datetime = datetime(2016, 6, 15, 14, 10, 50, 123)
@@ -1590,7 +1606,7 @@ class DateFunctionTests(TestCase):
         outer = Author.objects.annotate(
             newest_fan_year=TruncYear(Subquery(inner, output_field=DateTimeField()))
         )
-        tz = timezone.utc if settings.USE_TZ else None
+        tz = datetime_timezone.utc if settings.USE_TZ else None
         self.assertSequenceEqual(
             outer.order_by("name").values("name", "newest_fan_year"),
             [
@@ -1742,7 +1758,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
                         DTModel.objects.annotate(
                             day_melb=Extract("start_datetime", "day"),
                             day_utc=Extract(
-                                "start_datetime", "day", tzinfo=timezone.utc
+                                "start_datetime", "day", tzinfo=datetime_timezone.utc
                             ),
                         )
                         .order_by("start_datetime")
@@ -1810,9 +1826,8 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
     @ignore_warnings(category=RemovedInDjango50Warning)
     def test_trunc_ambiguous_and_invalid_times(self):
         sao = pytz.timezone("America/Sao_Paulo")
-        utc = timezone.utc
-        start_datetime = datetime(2016, 10, 16, 13, tzinfo=utc)
-        end_datetime = datetime(2016, 2, 21, 1, tzinfo=utc)
+        start_datetime = datetime(2016, 10, 16, 13, tzinfo=datetime_timezone.utc)
+        end_datetime = datetime(2016, 2, 21, 1, tzinfo=datetime_timezone.utc)
         self.create_model(start_datetime, end_datetime)
         with timezone.override(sao):
             with self.assertRaisesMessage(

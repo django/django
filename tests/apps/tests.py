@@ -33,20 +33,20 @@ HERE = os.path.dirname(__file__)
 
 
 class AppsTests(SimpleTestCase):
-    def test_singleton_master(self):
+    def test_singleton_main(self):
         """
-        Only one master registry can exist.
+        Only one main registry can exist.
         """
         with self.assertRaises(RuntimeError):
             Apps(installed_apps=None)
 
     def test_ready(self):
         """
-        Tests the ready property of the master registry.
+        Tests the ready property of the main registry.
         """
-        # The master app registry is always ready when the tests run.
+        # The main app registry is always ready when the tests run.
         self.assertIs(apps.ready, True)
-        # Non-master app registries are populated in __init__.
+        # Non-main app registries are populated in __init__.
         self.assertIs(Apps().ready, True)
         # The condition is set when apps are ready
         self.assertIs(apps.ready_event.is_set(), True)

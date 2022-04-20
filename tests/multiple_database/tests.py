@@ -219,11 +219,11 @@ class QueryTestCase(TestCase):
         # Retrieve related object by descriptor. Related objects should be
         # database-bound.
         self.assertEqual(
-            list(dive.authors.all().values_list("name", flat=True)), ["Mark Pilgrim"]
+            list(dive.authors.values_list("name", flat=True)), ["Mark Pilgrim"]
         )
 
         self.assertEqual(
-            list(mark.book_set.all().values_list("title", flat=True)),
+            list(mark.book_set.values_list("title", flat=True)),
             ["Dive into Python"],
         )
 
@@ -985,7 +985,7 @@ class QueryTestCase(TestCase):
         # Retrieve related object by descriptor. Related objects should be
         # database-bound.
         self.assertEqual(
-            list(dive.reviews.all().values_list("source", flat=True)), ["Python Weekly"]
+            list(dive.reviews.values_list("source", flat=True)), ["Python Weekly"]
         )
 
     def test_generic_key_reverse_operations(self):
@@ -2415,7 +2415,7 @@ class RouteForWriteTestCase(TestCase):
         book.authors.add(auth)
         with self.assertRaises(RouterUsed) as cm:
             with self.override_router():
-                book.authors.all().update(name="Different")
+                book.authors.update(name="Different")
         e = cm.exception
         self.assertEqual(e.mode, RouterUsed.WRITE)
         self.assertEqual(e.model, Person)
@@ -2497,7 +2497,7 @@ class RouteForWriteTestCase(TestCase):
         book.authors.add(auth)
         with self.assertRaises(RouterUsed) as cm:
             with self.override_router():
-                auth.book_set.all().update(title="Different")
+                auth.book_set.update(title="Different")
         e = cm.exception
         self.assertEqual(e.mode, RouterUsed.WRITE)
         self.assertEqual(e.model, Book)

@@ -16,7 +16,6 @@ from django.db import models
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
 from django.utils.functional import LazyObject, Promise
-from django.utils.timezone import utc
 from django.utils.version import get_docs_version
 
 
@@ -68,12 +67,10 @@ class DatetimeDatetimeSerializer(BaseSerializer):
     """For datetime.datetime."""
 
     def serialize(self):
-        if self.value.tzinfo is not None and self.value.tzinfo != utc:
-            self.value = self.value.astimezone(utc)
+        if self.value.tzinfo is not None and self.value.tzinfo != datetime.timezone.utc:
+            self.value = self.value.astimezone(datetime.timezone.utc)
         imports = ["import datetime"]
-        if self.value.tzinfo is not None:
-            imports.append("from django.utils.timezone import utc")
-        return repr(self.value).replace("datetime.timezone.utc", "utc"), set(imports)
+        return repr(self.value), set(imports)
 
 
 class DecimalSerializer(BaseSerializer):

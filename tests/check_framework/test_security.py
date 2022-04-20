@@ -20,6 +20,15 @@ class CheckSessionCookieSecureTest(SimpleTestCase):
         self.assertEqual(sessions.check_session_cookie_secure(None), [sessions.W010])
 
     @override_settings(
+        SESSION_COOKIE_SECURE="1",
+        INSTALLED_APPS=["django.contrib.sessions"],
+        MIDDLEWARE=[],
+    )
+    def test_session_cookie_secure_with_installed_app_truthy(self):
+        """SESSION_COOKIE_SECURE must be boolean."""
+        self.assertEqual(sessions.check_session_cookie_secure(None), [sessions.W010])
+
+    @override_settings(
         SESSION_COOKIE_SECURE=False,
         INSTALLED_APPS=[],
         MIDDLEWARE=["django.contrib.sessions.middleware.SessionMiddleware"],
@@ -67,6 +76,15 @@ class CheckSessionCookieHttpOnlyTest(SimpleTestCase):
         Warn if SESSION_COOKIE_HTTPONLY is off and "django.contrib.sessions"
         is in INSTALLED_APPS.
         """
+        self.assertEqual(sessions.check_session_cookie_httponly(None), [sessions.W013])
+
+    @override_settings(
+        SESSION_COOKIE_HTTPONLY="1",
+        INSTALLED_APPS=["django.contrib.sessions"],
+        MIDDLEWARE=[],
+    )
+    def test_session_cookie_httponly_with_installed_app_truthy(self):
+        """SESSION_COOKIE_HTTPONLY must be boolean."""
         self.assertEqual(sessions.check_session_cookie_httponly(None), [sessions.W013])
 
     @override_settings(
@@ -129,6 +147,14 @@ class CheckCSRFCookieSecureTest(SimpleTestCase):
         Warn if CsrfViewMiddleware is in MIDDLEWARE but
         CSRF_COOKIE_SECURE isn't True.
         """
+        self.assertEqual(csrf.check_csrf_cookie_secure(None), [csrf.W016])
+
+    @override_settings(
+        MIDDLEWARE=["django.middleware.csrf.CsrfViewMiddleware"],
+        CSRF_COOKIE_SECURE="1",
+    )
+    def test_with_csrf_cookie_secure_truthy(self):
+        """CSRF_COOKIE_SECURE must be boolean."""
         self.assertEqual(csrf.check_csrf_cookie_secure(None), [csrf.W016])
 
     @override_settings(

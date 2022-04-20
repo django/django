@@ -2,6 +2,7 @@ import copy
 import datetime
 import functools
 import inspect
+from collections import defaultdict
 from decimal import Decimal
 from uuid import UUID
 
@@ -94,7 +95,7 @@ class Combinable:
         if getattr(self, "conditional", False) and getattr(other, "conditional", False):
             return Q(self) & Q(other)
         raise NotImplementedError(
-            "Use .bitand() and .bitor() for bitwise logical operations."
+            "Use .bitand(), .bitor(), and .bitxor() for bitwise logical operations."
         )
 
     def bitand(self, other):
@@ -106,6 +107,13 @@ class Combinable:
     def bitrightshift(self, other):
         return self._combine(other, self.BITRIGHTSHIFT, False)
 
+    def __xor__(self, other):
+        if getattr(self, "conditional", False) and getattr(other, "conditional", False):
+            return Q(self) ^ Q(other)
+        raise NotImplementedError(
+            "Use .bitand(), .bitor(), and .bitxor() for bitwise logical operations."
+        )
+
     def bitxor(self, other):
         return self._combine(other, self.BITXOR, False)
 
@@ -113,7 +121,7 @@ class Combinable:
         if getattr(self, "conditional", False) and getattr(other, "conditional", False):
             return Q(self) | Q(other)
         raise NotImplementedError(
-            "Use .bitand() and .bitor() for bitwise logical operations."
+            "Use .bitand(), .bitor(), and .bitxor() for bitwise logical operations."
         )
 
     def bitor(self, other):
@@ -139,12 +147,17 @@ class Combinable:
 
     def __rand__(self, other):
         raise NotImplementedError(
-            "Use .bitand() and .bitor() for bitwise logical operations."
+            "Use .bitand(), .bitor(), and .bitxor() for bitwise logical operations."
         )
 
     def __ror__(self, other):
         raise NotImplementedError(
-            "Use .bitand() and .bitor() for bitwise logical operations."
+            "Use .bitand(), .bitor(), and .bitxor() for bitwise logical operations."
+        )
+
+    def __rxor__(self, other):
+        raise NotImplementedError(
+            "Use .bitand(), .bitor(), and .bitxor() for bitwise logical operations."
         )
 
 
@@ -297,18 +310,18 @@ class BaseExpression:
 
     def _resolve_output_field(self):
         """
-        Attempt to infer the output type of the expression. If the output
-        fields of all source fields match then, simply infer the same type
-        here. This isn't always correct, but it makes sense most of the time.
+        Attempt to infer the output type of the expression.
 
-        Consider the difference between `2 + 2` and `2 / 3`. Inferring
-        the type here is a convenience for the common case. The user should
-        supply their own output_field with more complex computations.
+        As a guess, if the output fields of all source fields match then simply
+        infer the same type here.
 
         If a source's output field resolves to None, exclude it from this check.
         If all sources are None, then an error is raised higher up the stack in
         the output_field property.
         """
+        # This guess is mostly a bad idea, but there is quite a lot of code
+        # (especially 3rd party Func subclasses) that depend on it, we'd need a
+        # deprecation path to fix it.
         sources_iter = (
             source for source in self.get_source_fields() if source is not None
         )
@@ -453,16 +466,129 @@ class Expression(BaseExpression, Combinable):
         return hash(self.identity)
 
 
-_connector_combinators = {
-    connector: [
-        (fields.IntegerField, fields.IntegerField, fields.IntegerField),
-        (fields.IntegerField, fields.DecimalField, fields.DecimalField),
-        (fields.DecimalField, fields.IntegerField, fields.DecimalField),
-        (fields.IntegerField, fields.FloatField, fields.FloatField),
-        (fields.FloatField, fields.IntegerField, fields.FloatField),
-    ]
-    for connector in (Combinable.ADD, Combinable.SUB, Combinable.MUL, Combinable.DIV)
-}
+# Type inference for CombinedExpression.output_field.
+# Missing items will result in FieldError, by design.
+#
+# The current approach for NULL is based on lowest common denominator behavior
+# i.e. if one of the supported databases is raising an error (rather than
+# return NULL) for `val <op> NULL`, then Django raises FieldError.
+NoneType = type(None)
+
+_connector_combinations = [
+    # Numeric operations - operands of same type.
+    {
+        connector: [
+            (fields.IntegerField, fields.IntegerField, fields.IntegerField),
+            (fields.FloatField, fields.FloatField, fields.FloatField),
+            (fields.DecimalField, fields.DecimalField, fields.DecimalField),
+        ]
+        for connector in (
+            Combinable.ADD,
+            Combinable.SUB,
+            Combinable.MUL,
+            # Behavior for DIV with integer arguments follows Postgres/SQLite,
+            # not MySQL/Oracle.
+            Combinable.DIV,
+            Combinable.MOD,
+            Combinable.POW,
+        )
+    },
+    # Numeric operations - operands of different type.
+    {
+        connector: [
+            (fields.IntegerField, fields.DecimalField, fields.DecimalField),
+            (fields.DecimalField, fields.IntegerField, fields.DecimalField),
+            (fields.IntegerField, fields.FloatField, fields.FloatField),
+            (fields.FloatField, fields.IntegerField, fields.FloatField),
+        ]
+        for connector in (
+            Combinable.ADD,
+            Combinable.SUB,
+            Combinable.MUL,
+            Combinable.DIV,
+        )
+    },
+    # Bitwise operators.
+    {
+        connector: [
+            (fields.IntegerField, fields.IntegerField, fields.IntegerField),
+        ]
+        for connector in (
+            Combinable.BITAND,
+            Combinable.BITOR,
+            Combinable.BITLEFTSHIFT,
+            Combinable.BITRIGHTSHIFT,
+            Combinable.BITXOR,
+        )
+    },
+    # Numeric with NULL.
+    {
+        connector: [
+            (field_type, NoneType, field_type),
+            (NoneType, field_type, field_type),
+        ]
+        for connector in (
+            Combinable.ADD,
+            Combinable.SUB,
+            Combinable.MUL,
+            Combinable.DIV,
+            Combinable.MOD,
+            Combinable.POW,
+        )
+        for field_type in (fields.IntegerField, fields.DecimalField, fields.FloatField)
+    },
+    # Date/DateTimeField/DurationField/TimeField.
+    {
+        Combinable.ADD: [
+            # Date/DateTimeField.
+            (fields.DateField, fields.DurationField, fields.DateTimeField),
+            (fields.DateTimeField, fields.DurationField, fields.DateTimeField),
+            (fields.DurationField, fields.DateField, fields.DateTimeField),
+            (fields.DurationField, fields.DateTimeField, fields.DateTimeField),
+            # DurationField.
+            (fields.DurationField, fields.DurationField, fields.DurationField),
+            # TimeField.
+            (fields.TimeField, fields.DurationField, fields.TimeField),
+            (fields.DurationField, fields.TimeField, fields.TimeField),
+        ],
+    },
+    {
+        Combinable.SUB: [
+            # Date/DateTimeField.
+            (fields.DateField, fields.DurationField, fields.DateTimeField),
+            (fields.DateTimeField, fields.DurationField, fields.DateTimeField),
+            (fields.DateField, fields.DateField, fields.DurationField),
+            (fields.DateField, fields.DateTimeField, fields.DurationField),
+            (fields.DateTimeField, fields.DateField, fields.DurationField),
+            (fields.DateTimeField, fields.DateTimeField, fields.DurationField),
+            # DurationField.
+            (fields.DurationField, fields.DurationField, fields.DurationField),
+            # TimeField.
+            (fields.TimeField, fields.DurationField, fields.TimeField),
+            (fields.TimeField, fields.TimeField, fields.DurationField),
+        ],
+    },
+]
+
+_connector_combinators = defaultdict(list)
+
+
+def register_combinable_fields(lhs, connector, rhs, result):
+    """
+    Register combinable types:
+        lhs <connector> rhs -> result
+    e.g.
+        register_combinable_fields(
+            IntegerField, Combinable.ADD, FloatField, FloatField
+        )
+    """
+    _connector_combinators[connector].append((lhs, rhs, result))
+
+
+for d in _connector_combinations:
+    for connector, field_types in d.items():
+        for lhs, rhs, result in field_types:
+            register_combinable_fields(lhs, connector, rhs, result)
 
 
 @functools.lru_cache(maxsize=128)
@@ -495,17 +621,21 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         self.lhs, self.rhs = exprs
 
     def _resolve_output_field(self):
-        try:
-            return super()._resolve_output_field()
-        except FieldError:
-            combined_type = _resolve_combined_type(
-                self.connector,
-                type(self.lhs.output_field),
-                type(self.rhs.output_field),
+        # We avoid using super() here for reasons given in
+        # Expression._resolve_output_field()
+        combined_type = _resolve_combined_type(
+            self.connector,
+            type(self.lhs._output_field_or_none),
+            type(self.rhs._output_field_or_none),
+        )
+        if combined_type is None:
+            raise FieldError(
+                f"Cannot infer type of {self.connector!r} expression involving these "
+                f"types: {self.lhs.output_field.__class__.__name__}, "
+                f"{self.rhs.output_field.__class__.__name__}. You must set "
+                f"output_field."
             )
-            if combined_type is None:
-                raise
-            return combined_type()
+        return combined_type()
 
     def as_sql(self, compiler, connection):
         expressions = []
@@ -909,12 +1039,15 @@ class RawSQL(Expression):
         self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
     ):
         # Resolve parents fields used in raw SQL.
-        for parent in query.model._meta.get_parent_list():
-            for parent_field in parent._meta.local_fields:
-                _, column_name = parent_field.get_attname_column()
-                if column_name.lower() in self.sql.lower():
-                    query.resolve_ref(parent_field.name, allow_joins, reuse, summarize)
-                    break
+        if query.model:
+            for parent in query.model._meta.get_parent_list():
+                for parent_field in parent._meta.local_fields:
+                    _, column_name = parent_field.get_attname_column()
+                    if column_name.lower() in self.sql.lower():
+                        query.resolve_ref(
+                            parent_field.name, allow_joins, reuse, summarize
+                        )
+                        break
         return super().resolve_expression(
             query, allow_joins, reuse, summarize, for_save
         )

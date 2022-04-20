@@ -9,6 +9,18 @@ from django.db.models.constants import OnConflict
 class DatabaseOperations(BaseDatabaseOperations):
     cast_char_field_without_max_length = "varchar"
     explain_prefix = "EXPLAIN"
+    explain_options = frozenset(
+        [
+            "ANALYZE",
+            "BUFFERS",
+            "COSTS",
+            "SETTINGS",
+            "SUMMARY",
+            "TIMING",
+            "VERBOSE",
+            "WAL",
+        ]
+    )
     cast_data_types = {
         "AutoField": "integer",
         "BigAutoField": "bigint",
@@ -77,12 +89,21 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)
+        if lookup_type == "second":
+            # Truncate fractional seconds.
+            return f"EXTRACT('second' FROM DATE_TRUNC('second', {field_name}))"
         return self.date_extract_sql(lookup_type, field_name)
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)
         # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
         return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
+
+    def time_extract_sql(self, lookup_type, field_name):
+        if lookup_type == "second":
+            # Truncate fractional seconds.
+            return f"EXTRACT('second' FROM DATE_TRUNC('second', {field_name}))"
+        return self.date_extract_sql(lookup_type, field_name)
 
     def time_trunc_sql(self, lookup_type, field_name, tzname=None):
         field_name = self._convert_field_to_tz(field_name, tzname)
@@ -289,17 +310,20 @@ class DatabaseOperations(BaseDatabaseOperations):
         return super().subtract_temporals(internal_type, lhs, rhs)
 
     def explain_query_prefix(self, format=None, **options):
-        prefix = super().explain_query_prefix(format)
         extra = {}
+        # Normalize options.
+        if options:
+            options = {
+                name.upper(): "true" if value else "false"
+                for name, value in options.items()
+            }
+            for valid_option in self.explain_options:
+                value = options.pop(valid_option, None)
+                if value is not None:
+                    extra[valid_option] = value
+        prefix = super().explain_query_prefix(format, **options)
         if format:
             extra["FORMAT"] = format
-        if options:
-            extra.update(
-                {
-                    name.upper(): "true" if value else "false"
-                    for name, value in options.items()
-                }
-            )
         if extra:
             prefix += " (%s)" % ", ".join("%s %s" % i for i in extra.items())
         return prefix

@@ -44,6 +44,7 @@ from .models import (
     Color,
     Color2,
     ComplexSortedPerson,
+    Country,
     CoverLetter,
     CustomArticle,
     CyclicOne,
@@ -126,6 +127,7 @@ from .models import (
     Telegram,
     Thing,
     Topping,
+    Traveler,
     UnchangeableObject,
     UndeletableObject,
     UnorderedObject,
@@ -1284,6 +1286,8 @@ site.register(ExplicitlyProvidedPK, GetFormsetsArgumentCheckingAdmin)
 site.register(ImplicitlyGeneratedPK, GetFormsetsArgumentCheckingAdmin)
 site.register(UserProxy)
 site.register(Box)
+site.register(Country)
+site.register(Traveler)
 
 # Register core models we need in our tests
 site.register(User, UserAdmin)

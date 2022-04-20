@@ -13,6 +13,9 @@ class RemovedInDjango50Warning(PendingDeprecationWarning):
     pass
 
 
+RemovedAfterNextVersionWarning = RemovedInDjango50Warning
+
+
 class warn_about_renamed_method:
     def __init__(
         self, class_name, old_method_name, new_method_name, deprecation_warning

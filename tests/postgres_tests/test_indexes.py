@@ -8,6 +8,7 @@ from django.contrib.postgres.indexes import (
     GistIndex,
     HashIndex,
     OpClass,
+    PostgresIndex,
     SpGistIndex,
 )
 from django.db import NotSupportedError, connection
@@ -330,9 +331,14 @@ class SchemaTests(PostgreSQLTestCase):
             name=index_name,
             fastupdate=True,
             gin_pending_list_limit=64,
+            db_tablespace="pg_default",
         )
         with connection.schema_editor() as editor:
             editor.add_index(IntegerArrayModel, index)
+            self.assertIn(
+                ") WITH (gin_pending_list_limit = 64, fastupdate = on) TABLESPACE",
+                str(index.create_sql(IntegerArrayModel, editor)),
+            )
         constraints = self.get_constraints(IntegerArrayModel._meta.db_table)
         self.assertEqual(constraints[index_name]["type"], "gin")
         self.assertEqual(
@@ -640,6 +646,21 @@ class SchemaTests(PostgreSQLTestCase):
                 with connection.schema_editor() as editor:
                     editor.add_index(Scene, index)
         self.assertNotIn(index_name, self.get_constraints(Scene._meta.db_table))
+
+    def test_custom_suffix(self):
+        class CustomSuffixIndex(PostgresIndex):
+            suffix = "sfx"
+
+            def create_sql(self, model, schema_editor, using="gin", **kwargs):
+                return super().create_sql(model, schema_editor, using=using, **kwargs)
+
+        index = CustomSuffixIndex(fields=["field"], name="custom_suffix_idx")
+        self.assertEqual(index.suffix, "sfx")
+        with connection.schema_editor() as editor:
+            self.assertIn(
+                " USING gin ",
+                str(index.create_sql(CharFieldModel, editor)),
+            )
 
     def test_op_class(self):
         index_name = "test_op_class"

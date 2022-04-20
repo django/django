@@ -113,7 +113,7 @@ class DepartmentListFilterLookupWithNonStringValue(SimpleListFilter):
                     employee.department.id,  # Intentionally not a string (Refs #19318)
                     employee.department.code,
                 )
-                for employee in model_admin.get_queryset(request).all()
+                for employee in model_admin.get_queryset(request)
             }
         )
 
@@ -874,7 +874,7 @@ class ListFiltersTests(TestCase):
         request.user = self.alfred
         changelist = modeladmin.get_changelist_instance(request)
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEqual(
+        self.assertCountEqual(
             filterspec.lookup_choices,
             [
                 (self.djangonaut_book.pk, "Djangonaut: an art of living"),
@@ -1150,7 +1150,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), list(Book.objects.all().order_by("-id")))
+        self.assertEqual(list(queryset), list(Book.objects.order_by("-id")))
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][1]
@@ -1440,19 +1440,18 @@ class ListFiltersTests(TestCase):
 
         filterspec = changelist.get_filters(request)[0][-1]
         self.assertEqual(filterspec.title, "department")
-        choices = list(filterspec.choices(changelist))
-
-        self.assertEqual(choices[0]["display"], "All")
-        self.assertIs(choices[0]["selected"], True)
-        self.assertEqual(choices[0]["query_string"], "?")
-
-        self.assertEqual(choices[1]["display"], "Development")
-        self.assertIs(choices[1]["selected"], False)
-        self.assertEqual(choices[1]["query_string"], "?department__code__exact=DEV")
-
-        self.assertEqual(choices[2]["display"], "Design")
-        self.assertIs(choices[2]["selected"], False)
-        self.assertEqual(choices[2]["query_string"], "?department__code__exact=DSN")
+        choices = [
+            (choice["display"], choice["selected"], choice["query_string"])
+            for choice in filterspec.choices(changelist)
+        ]
+        self.assertCountEqual(
+            choices,
+            [
+                ("All", True, "?"),
+                ("Development", False, "?department__code__exact=DEV"),
+                ("Design", False, "?department__code__exact=DSN"),
+            ],
+        )
 
         # Filter by Department=='Development' --------------------------------
 
@@ -1466,19 +1465,18 @@ class ListFiltersTests(TestCase):
 
         filterspec = changelist.get_filters(request)[0][-1]
         self.assertEqual(filterspec.title, "department")
-        choices = list(filterspec.choices(changelist))
-
-        self.assertEqual(choices[0]["display"], "All")
-        self.assertIs(choices[0]["selected"], False)
-        self.assertEqual(choices[0]["query_string"], "?")
-
-        self.assertEqual(choices[1]["display"], "Development")
-        self.assertIs(choices[1]["selected"], True)
-        self.assertEqual(choices[1]["query_string"], "?department__code__exact=DEV")
-
-        self.assertEqual(choices[2]["display"], "Design")
-        self.assertIs(choices[2]["selected"], False)
-        self.assertEqual(choices[2]["query_string"], "?department__code__exact=DSN")
+        choices = [
+            (choice["display"], choice["selected"], choice["query_string"])
+            for choice in filterspec.choices(changelist)
+        ]
+        self.assertCountEqual(
+            choices,
+            [
+                ("All", False, "?"),
+                ("Development", True, "?department__code__exact=DEV"),
+                ("Design", False, "?department__code__exact=DSN"),
+            ],
+        )
 
     def test_lookup_with_dynamic_value(self):
         """

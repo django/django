@@ -57,7 +57,6 @@ Bjørn
 blazingly
 boilerplatish
 Bokmål
-bolded
 Bonham
 bookmarklet
 bookmarklets
@@ -97,14 +96,12 @@ contenttypes
 contrib
 coroutine
 coroutines
-covariance
 criticals
 cron
 crontab
 cryptographic
 cryptographically
 csrfmiddlewaretoken
-css
 csv
 ctime
 Ctrl
@@ -140,7 +137,6 @@ dimensioned
 discoverable
 Disqus
 distro
-Django
 djangoproject
 dm
 docstring
@@ -153,7 +149,6 @@ Dreamweaver
 drilldown
 dropdown
 dropdowns
-drupal
 Dunck
 editability
 encodings
@@ -176,7 +171,6 @@ filesystem
 filesystems
 flatpage
 flatpages
-Flatpages
 fooapp
 formatter
 formatters
@@ -201,7 +195,6 @@ GiST
 Googol
 Greenhill
 gunicorn
-gz
 GZip
 gzipped
 hardcode
@@ -219,7 +212,6 @@ hostname
 hostnames
 hstore
 html
-http
 https
 Hypercorn
 ie
@@ -234,8 +226,6 @@ init
 inlines
 instantiation
 interdependencies
-interoperability
-iOS
 ipsum
 IPv
 IPython
@@ -365,13 +355,11 @@ Pinterest
 plaintext
 pluggable
 pluralizations
-po
 pooler
 postfix
 postgis
 postgres
 postgresql
-pq
 pre
 precisions
 precomputation
@@ -399,7 +387,6 @@ pseudocode
 psycopg
 Punycode
 Puthraya
-py
 pyformat
 pysqlite
 pythonic
@@ -409,7 +396,6 @@ querysets
 querystring
 queueing
 Quickstart
-QUnit
 quoteless
 Radziej
 rasters
@@ -425,7 +411,6 @@ recomputation
 recursed
 redeclare
 redirections
-redis
 redisplay
 redisplayed
 redisplaying
@@ -545,7 +530,6 @@ titlecase
 tokenized
 toolkits
 toolset
-Tox
 trac
 tracebacks
 transactional
@@ -558,7 +542,6 @@ trigram
 trigrams
 Turkmen
 tv
-ul
 umask
 unannotated
 unapplied
@@ -579,7 +562,6 @@ unhashable
 unioning
 uniterated
 unlocalized
-unmaintained
 unmanaged
 unparseable
 unparsed
@@ -607,15 +589,12 @@ UTF
 util
 utils
 Uvicorn
-uwsgi
 uWSGI
 validator
 validators
 validsite
-VARCHAR
 variadic
 vendored
-viewable
 virtualized
 whitespace
 whitespaces
@@ -627,6 +606,5 @@ wrappable
 wsgi
 www
 xe
-xgettext
 xxxxx
 Zope

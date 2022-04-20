@@ -167,8 +167,7 @@ many projects they are typically the most commonly used views.
         </ul>
 
     If you're using pagination, you can adapt the :ref:`example template from
-    the pagination docs <using-paginator-in-view>`. Change instances of
-    ``contacts`` in that example template to ``page_obj``.
+    the pagination docs <paginating-a-list-view>`.
 
 .. class:: django.views.generic.list.BaseListView
 

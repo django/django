@@ -18,7 +18,7 @@ class NullIfTests(TestCase):
         authors = Author.objects.annotate(nullif=NullIf("alias", "name")).values_list(
             "nullif"
         )
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             authors,
             [
                 ("smithj",),
@@ -34,7 +34,7 @@ class NullIfTests(TestCase):
         authors = Author.objects.annotate(
             nullif=NullIf("name", Value(None))
         ).values_list("nullif")
-        self.assertSequenceEqual(authors, [("John Smith",), ("Rhonda",)])
+        self.assertCountEqual(authors, [("John Smith",), ("Rhonda",)])
 
     def test_too_few_args(self):
         msg = "'NullIf' takes exactly 2 arguments (1 given)"

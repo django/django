@@ -35,8 +35,8 @@ def supports_color():
         except ImportError:
             return False
         else:
-            reg_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Console")
             try:
+                reg_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Console")
                 reg_key_value, _ = winreg.QueryValueEx(reg_key, "VirtualTerminalLevel")
             except FileNotFoundError:
                 return False

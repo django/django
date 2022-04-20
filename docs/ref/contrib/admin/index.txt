@@ -2896,6 +2896,39 @@ Templates can override or extend base admin templates as described in
 
         The ``model`` variable for each model was added.
 
+.. method:: AdminSite.get_app_list(request, app_label=None)
+
+    Returns a list of applications from the :doc:`application registry
+    </ref/applications/>` available for the current user. You can optionally
+    pass an ``app_label`` argument to get details for a single app. Each entry
+    in the list is a dictionary representing an application with the following
+    keys:
+
+    * ``app_label``: the application label
+    * ``app_url``: the URL of the application index in the admin
+    * ``has_module_perms``: a boolean indicating if displaying and accessing of
+      the module's index page is permitted for the current user
+    * ``models``: a list of the models available in the application
+    * ``name``: name of the application
+
+    Each model is a dictionary with the following keys:
+
+    * ``model``: the model class
+    * ``object_name``: class name of the model
+    * ``name``: plural name of the model
+    * ``perms``: a ``dict`` tracking ``add``, ``change``, ``delete``, and
+      ``view`` permissions
+    * ``admin_url``: admin changelist URL for the model
+    * ``add_url``: admin URL to add a new model instance
+
+    Lists of applications and models are sorted alphabetically by their names.
+    You can override this method to change the default order on the admin index
+    page.
+
+    .. versionchanged:: 4.1
+
+        The ``app_label`` argument was added.
+
 .. method:: AdminSite.has_permission(request)
 
     Returns ``True`` if the user for the given ``HttpRequest`` has permission

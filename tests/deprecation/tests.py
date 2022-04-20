@@ -3,6 +3,7 @@ import warnings
 from django.test import SimpleTestCase
 from django.utils.deprecation import (
     DeprecationInstanceCheck,
+    RemovedAfterNextVersionWarning,
     RemovedInNextVersionWarning,
     RenameMethodsBase,
 )
@@ -160,6 +161,11 @@ class RenameMethodsTests(SimpleTestCase):
         msg = "`DeprecatedMixin.old` is deprecated, use `new` instead."
         with self.assertWarnsMessage(DeprecationWarning, msg):
             deprecated.old()
+
+    def test_removedafternextversionwarning_pending(self):
+        self.assertTrue(
+            issubclass(RemovedAfterNextVersionWarning, PendingDeprecationWarning)
+        )
 
 
 class DeprecationInstanceCheckTest(SimpleTestCase):
