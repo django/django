@@ -45,33 +45,43 @@ class BaseIterable:
         self.chunked_fetch = chunked_fetch
         self.chunk_size = chunk_size
         self.compiler = self.queryset.query.get_compiler(using=self.queryset.db)
+        self.prepare_results()
+
+    def prepare_results(self):
+        """
+        Subclasses can override this to separate data fetching from data
+        preparation.
+        """
+        pass
 
 
 class ModelIterable(BaseIterable):
     """Iterable that yields a model instance for each row."""
 
-    def __iter__(self):
-        queryset = self.queryset
+    def prepare_results(self):
         # Execute the query. This will also fill compiler.select, klass_info,
         # and annotations.
-        results = self.compiler.execute_sql(
+        self.results = self.compiler.execute_sql(
             chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
         )
-        select, klass_info, annotation_col_map = (
+        select, klass_info, self.annotation_col_map = (
             self.compiler.select,
             self.compiler.klass_info,
             self.compiler.annotation_col_map,
         )
-        model_cls = klass_info["model"]
         select_fields = klass_info["select_fields"]
-        model_fields_start, model_fields_end = select_fields[0], select_fields[-1] + 1
-        init_list = [
-            f[0].target.attname for f in select[model_fields_start:model_fields_end]
+        # Set attributes used in __iter__().
+        self.model_fields_start = select_fields[0]
+        self.model_fields_end = select_fields[-1] + 1
+        self.model_cls = klass_info["model"]
+        self.init_list = [
+            f[0].target.attname
+            for f in select[self.model_fields_start : self.model_fields_end]
         ]
-        related_populators = get_related_populators(
+        self.related_populators = get_related_populators(
             klass_info, select, self.compiler.using
         )
-        known_related_objects = [
+        self.known_related_objects = [
             (
                 field,
                 related_objs,
@@ -79,25 +89,29 @@ class ModelIterable(BaseIterable):
                     *[
                         field.attname
                         if from_field == "self"
-                        else queryset.model._meta.get_field(from_field).attname
+                        else self.queryset.model._meta.get_field(from_field).attname
                         for from_field in field.from_fields
                     ]
                 ),
             )
-            for field, related_objs in queryset._known_related_objects.items()
+            for field, related_objs in self.queryset._known_related_objects.items()
         ]
-        for row in self.compiler.results_iter(results):
-            obj = model_cls.from_db(
-                self.compiler.using, init_list, row[model_fields_start:model_fields_end]
+
+    def __iter__(self):
+        for row in self.compiler.results_iter(self.results):
+            obj = self.model_cls.from_db(
+                self.compiler.using,
+                self.init_list,
+                row[self.model_fields_start : self.model_fields_end],
             )
-            for rel_populator in related_populators:
+            for rel_populator in self.related_populators:
                 rel_populator.populate(row, obj)
-            if annotation_col_map:
-                for attr_name, col_pos in annotation_col_map.items():
+            if self.annotation_col_map:
+                for attr_name, col_pos in self.annotation_col_map.items():
                     setattr(obj, attr_name, row[col_pos])
 
             # Add the known related objects to the model.
-            for field, rel_objs, rel_getter in known_related_objects:
+            for field, rel_objs, rel_getter in self.known_related_objects:
                 # Avoid overwriting objects loaded by, e.g., select_related().
                 if field.is_cached(obj):
                     continue
@@ -117,19 +131,20 @@ class ValuesIterable(BaseIterable):
     Iterable returned by QuerySet.values() that yields a dict for each row.
     """
 
-    def __iter__(self):
+    def prepare_results(self):
         query = self.queryset.query
         # extra(select=...) cols are always at the start of the row.
-        names = [
+        self.names = [
             *query.extra_select,
             *query.values_select,
             *query.annotation_select,
         ]
-        indexes = range(len(names))
+
+    def __iter__(self):
         for row in self.compiler.results_iter(
             chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
         ):
-            yield {names[i]: row[i] for i in indexes}
+            yield {name: row[i] for i, name in enumerate(self.names)}
 
 
 class ValuesListIterable(BaseIterable):
@@ -138,11 +153,10 @@ class ValuesListIterable(BaseIterable):
     for each row.
     """
 
-    def __iter__(self):
-        queryset = self.queryset
-        query = queryset.query
-
-        if queryset._fields:
+    def prepare_results(self):
+        self.rowfactory = None
+        if self.queryset._fields:
+            query = self.queryset.query
             # extra(select=...) cols are always at the start of the row.
             names = [
                 *query.extra_select,
@@ -150,19 +164,22 @@ class ValuesListIterable(BaseIterable):
                 *query.annotation_select,
             ]
             fields = [
-                *queryset._fields,
-                *(f for f in query.annotation_select if f not in queryset._fields),
+                *self.queryset._fields,
+                *(f for f in query.annotation_select if f not in self.queryset._fields),
             ]
             if fields != names:
                 # Reorder according to fields.
                 index_map = {name: idx for idx, name in enumerate(names)}
-                rowfactory = operator.itemgetter(*[index_map[f] for f in fields])
-                return map(
-                    rowfactory,
-                    self.compiler.results_iter(
-                        chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
-                    ),
-                )
+                self.rowfactory = operator.itemgetter(*[index_map[f] for f in fields])
+
+    def __iter__(self):
+        if self.rowfactory is not None:
+            return map(
+                self.rowfactory,
+                self.compiler.results_iter(
+                    chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
+                ),
+            )
         return self.compiler.results_iter(
             tuple_expected=True,
             chunked_fetch=self.chunked_fetch,
@@ -176,21 +193,23 @@ class NamedValuesListIterable(ValuesListIterable):
     namedtuple for each row.
     """
 
-    def __iter__(self):
-        queryset = self.queryset
-        if queryset._fields:
-            names = queryset._fields
+    def prepare_results(self):
+        if self.queryset._fields:
+            names = self.queryset._fields
         else:
-            query = queryset.query
+            query = self.queryset.query
             names = [
                 *query.extra_select,
                 *query.values_select,
                 *query.annotation_select,
             ]
-        tuple_class = create_namedtuple_class(*names)
+        self.tuple_class = create_namedtuple_class(*names)
+        super().prepare_results()
+
+    def __iter__(self):
         new = tuple.__new__
         for row in super().__iter__():
-            yield new(tuple_class, row)
+            yield new(self.tuple_class, row)
 
 
 class FlatValuesListIterable(BaseIterable):
