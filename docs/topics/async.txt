@@ -279,3 +279,29 @@ thread and thus is fully compatible with async mode. Note that sync code will
 always be in a *different* thread to any async code that is calling it, so you
 should avoid passing raw database handles or other thread-sensitive references
 around.
+
+In practice this restriction means that you should not pass features of the
+database ``connection`` object when calling ``sync_to_async()``. Doing so will
+trigger the thread safety checks:
+
+.. code-block:: pycon
+
+    # DJANGO_SETTINGS_MODULE=settings.py python -m asyncio
+    >>> import asyncio
+    >>> from asgiref.sync import sync_to_async
+    >>> from django.db import connection
+    >>> # In an async context so you cannot use the database directly:
+    >>> connection.cursor()
+    ...
+    django.core.exceptions.SynchronousOnlyOperation: You cannot call this from
+    an async context - use a thread or sync_to_async.
+    >>> # Nor can you pass resolved connection attributes across threads:
+    >>> await sync_to_async(connection.cursor)()
+    ...
+    django.db.utils.DatabaseError: DatabaseWrapper objects created in a thread
+    can only be used in that same thread. The object with alias 'default' was
+    created in thread id 4371465600 and this is thread id 6131478528.
+
+Rather, you should encapsulate all database access within a helper function
+that can be called with ``sync_to_async()`` without relying on the connection
+object in the calling code.
