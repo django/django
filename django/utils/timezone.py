@@ -30,6 +30,7 @@ __all__ = [  # noqa for utc RemovedInDjango50Warning.
     "deactivate",
     "override",
     "localtime",
+    "localdate",
     "now",
     "is_aware",
     "is_naive",
