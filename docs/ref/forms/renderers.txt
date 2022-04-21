@@ -36,6 +36,20 @@ must implement a ``render(template_name, context, request=None)`` method. It
 should return a rendered templates (as a string) or raise
 :exc:`~django.template.TemplateDoesNotExist`.
 
+.. class:: BaseRenderer
+
+    The base class for the built-in form renderers.
+
+    .. method:: get_template(template_name)
+
+        Subclasses must implement this method with the appropriate template
+        finding logic.
+
+    .. method:: render(template_name, context, request=None)
+
+        Renders the given template, or raises
+        :exc:`~django.template.TemplateDoesNotExist`.
+
 .. _built-in-template-form-renderers:
 
 Built-in-template form renderers
