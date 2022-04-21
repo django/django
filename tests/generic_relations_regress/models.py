@@ -111,15 +111,13 @@ class Developer(models.Model):
 
 class Team(models.Model):
     name = models.CharField(max_length=15)
-    members = models.ManyToManyField(Developer)
 
     def __len__(self):
-        return self.members.count()
+        return 0
 
 
 class Guild(models.Model):
     name = models.CharField(max_length=15)
-    members = models.ManyToManyField(Developer)
 
     def __bool__(self):
         return False
