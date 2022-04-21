@@ -2569,7 +2569,7 @@ class SquashMigrationsTests(MigrationTestBase):
             # we expect to hit a squash replacement cycle check error, but the actual
             # failure is dependent on the order in which the files are read on disk.
             with self.assertRaisesRegex(
-                ValueError,
+                CommandError,
                 r"Cyclical squash replacement found, starting at"
                 r" \('migrations', '2_(squashed|auto)'\)",
             ):
