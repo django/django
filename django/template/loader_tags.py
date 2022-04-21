@@ -40,8 +40,13 @@ class BlockContext:
 
 
 class BlockNode(Node):
+    __slots__ = ("name", "nodelist", "parent", "context")
+
     def __init__(self, name, nodelist, parent=None):
-        self.name, self.nodelist, self.parent = name, nodelist, parent
+        self.name = name
+        self.nodelist = nodelist
+        self.parent = parent
+        self.context = None
 
     def __repr__(self):
         return "<Block Node: %s. Contents: %r>" % (self.name, self.nodelist)
@@ -66,9 +71,9 @@ class BlockNode(Node):
         return result
 
     def super(self):
-        if not hasattr(self, "context"):
+        if self.context is None:
             raise TemplateSyntaxError(
-                "'%s' object has no attribute 'context'. Did you use "
+                "'%s' object has no context. Did you use "
                 "{{ block.super }} in a base template?" % self.__class__.__name__
             )
         render_context = self.context.render_context
@@ -81,6 +86,8 @@ class BlockNode(Node):
 
 
 class ExtendsNode(Node):
+    __slots__ = ("nodelist", "parent_name", "template_dirs", "blocks")
+
     must_be_first = True
     context_key = "extends_context"
 
@@ -158,6 +165,8 @@ class ExtendsNode(Node):
 
 
 class IncludeNode(Node):
+    __slots__ = ("template", "extra_context", "isolated_context")
+
     context_key = "__include_context"
 
     def __init__(

@@ -11,6 +11,8 @@ class ContextPopException(Exception):
 
 
 class ContextDict(dict):
+    __slots__ = ("context",)
+
     def __init__(self, context, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -25,6 +27,8 @@ class ContextDict(dict):
 
 
 class BaseContext:
+    __slots__ = ("dicts",)
+
     def __init__(self, dict_=None):
         self._reset_dicts(dict_)
 
@@ -132,6 +136,14 @@ class BaseContext:
 
 class Context(BaseContext):
     "A stack container for variable context"
+    __slots__ = (
+        "autoescape",
+        "use_l10n",
+        "use_tz",
+        "template_name",
+        "render_context",
+        "template",
+    )
 
     def __init__(self, dict_=None, autoescape=True, use_l10n=None, use_tz=None):
         self.autoescape = autoescape
@@ -184,7 +196,11 @@ class RenderContext(BaseContext):
     template context.
     """
 
-    template = None
+    __slots__ = ("template",)
+
+    def __init__(self, dict_=None):
+        super().__init__(dict_)
+        self.template = None
 
     def __iter__(self):
         yield from self.dicts[-1]
@@ -219,6 +235,8 @@ class RequestContext(Context):
     Additional processors can be specified as a list of callables
     using the "processors" keyword argument.
     """
+
+    __slots__ = ("request", "_processors", "_processors_index")
 
     def __init__(
         self,

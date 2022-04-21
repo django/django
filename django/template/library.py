@@ -10,7 +10,7 @@ from .exceptions import TemplateSyntaxError
 
 
 class InvalidTemplateLibrary(Exception):
-    pass
+    __slots__ = ()
 
 
 class Library:
@@ -20,6 +20,8 @@ class Library:
     The filter, simple_tag, and inclusion_tag methods provide a convenient
     way to register callables as tags.
     """
+
+    __slots__ = ("filters", "tags")
 
     def __init__(self):
         self.filters = {}
@@ -211,6 +213,8 @@ class TagHelperNode(Node):
     function.
     """
 
+    __slots__ = ("func", "takes_context", "args", "kwargs")
+
     def __init__(self, func, takes_context, args, kwargs):
         self.func = func
         self.takes_context = takes_context
@@ -226,6 +230,7 @@ class TagHelperNode(Node):
 
 
 class SimpleNode(TagHelperNode):
+    __slots__ = ("target_var",)
     child_nodelists = ()
 
     def __init__(self, func, takes_context, args, kwargs, target_var):
@@ -244,6 +249,8 @@ class SimpleNode(TagHelperNode):
 
 
 class InclusionNode(TagHelperNode):
+    __slots__ = ("filename",)
+
     def __init__(self, func, takes_context, args, kwargs, filename):
         super().__init__(func, takes_context, args, kwargs)
         self.filename = filename
