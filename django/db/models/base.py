@@ -1123,6 +1123,10 @@ class Model(metaclass=ModelBase):
                         f"{operation_name}() prohibited to prevent data loss due to "
                         f"unsaved related object '{field.name}'."
                     )
+                elif field._fk_field_set_none and getattr(self, field.fk_field) is None:
+                    # Use pk from related object if it has been saved after
+                    # an assignment.
+                    setattr(self, field.fk_field, obj.pk)
 
     def delete(self, using=None, keep_parents=False):
         if self.pk is None:

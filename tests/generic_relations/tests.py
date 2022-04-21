@@ -510,6 +510,25 @@ class GenericRelationsTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             tagged_item.save()
 
+    def test_save_generic_foreign_key_after_parent(self):
+        quartz = Mineral(name="Quartz", hardness=7)
+        tag = TaggedItem(tag="shiny", content_object=quartz)
+        quartz.save()
+        # ValueError is not raised as unsaved object since been saved.
+        tag.save()
+        tag.refresh_from_db()
+        self.assertEqual(tag.content_object, quartz)
+
+    def test_assign_gfk_id_none(self):
+        quartz = Mineral.objects.create(name="Quartz", hardness=7)
+        nullable_gfk = AllowsNullGFK.objects.create()
+        nullable_gfk.content_object = quartz
+        nullable_gfk.save()
+        nullable_gfk.object_id = None
+        nullable_gfk.save()
+        self.assertIsNone(nullable_gfk.object_id)
+        self.assertIsNone(nullable_gfk.content_object)
+
     @skipUnlessDBFeature("has_bulk_insert")
     def test_unsaved_generic_foreign_key_parent_bulk_create(self):
         quartz = Mineral(name="Quartz", hardness=7)

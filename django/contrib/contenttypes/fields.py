@@ -51,6 +51,7 @@ class GenericForeignKey(FieldCacheMixin):
         self.editable = False
         self.rel = None
         self.column = None
+        self._fk_field_set_none = False
 
     def contribute_to_class(self, cls, name, **kwargs):
         self.name = name
@@ -263,6 +264,7 @@ class GenericForeignKey(FieldCacheMixin):
         setattr(instance, self.ct_field, ct)
         setattr(instance, self.fk_field, fk)
         self.set_cached_value(instance, value)
+        self._fk_field_set_none = fk is None
 
 
 class GenericRel(ForeignObjectRel):
