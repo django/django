@@ -884,9 +884,9 @@ class MultiWidget(Widget):
         if self.is_localized:
             for widget in self.widgets:
                 widget.is_localized = self.is_localized
-        # value is a list of values, each corresponding to a widget
+        # value is a list/tuple of values, each corresponding to a widget
         # in self.widgets.
-        if not isinstance(value, list):
+        if not isinstance(value, (list, tuple)):
             value = self.decompress(value)
 
         final_attrs = context["widget"]["attrs"]

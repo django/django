@@ -133,6 +133,15 @@ class MultiWidgetTest(WidgetTest):
         self.check_html(
             widget,
             "name",
+            ("john", "lennon"),
+            html=(
+                '<input type="text" class="big" value="john" name="name_0">'
+                '<input type="text" class="small" value="lennon" name="name_1">'
+            ),
+        )
+        self.check_html(
+            widget,
+            "name",
             "john__lennon",
             html=(
                 '<input type="text" class="big" value="john" name="name_0">'
