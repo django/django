@@ -1,9 +1,12 @@
+# RemovedInDjango50Warning.
 import logging
+import warnings
 
 from django.contrib.gis.gdal import GDALException
 from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.forms.widgets import Textarea
 from django.utils import translation
+from django.utils.deprecation import RemovedInDjango50Warning
 
 # Creating a template context that contains Django settings
 # values needed by admin map templates.
@@ -15,6 +18,14 @@ class OpenLayersWidget(Textarea):
     """
     Render an OpenLayers map using the WKT of the geometry.
     """
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "django.contrib.gis.admin.OpenLayersWidget is deprecated.",
+            RemovedInDjango50Warning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
     def get_context(self, name, value, attrs):
         # Update the template parameters with any attributes passed in.

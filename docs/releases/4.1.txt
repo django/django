@@ -610,6 +610,8 @@ Miscellaneous
 
   or pass the form/formset object directly instead.
 
+* The undocumented ``django.contrib.gis.admin.OpenLayersWidget`` is deprecated.
+
 Features removed in 4.1
 =======================
 

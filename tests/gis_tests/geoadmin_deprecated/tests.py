@@ -125,3 +125,8 @@ class DeprecationTests(SimpleTestCase):
             DeprecatedOSMGeoAdmin(City, site)
         with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
             DeprecatedGeoModelAdmin(City, site)
+
+    def test_openlayerswidget_warning(self):
+        msg = "django.contrib.gis.admin.OpenLayersWidget is deprecated."
+        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
+            admin.OpenLayersWidget()
