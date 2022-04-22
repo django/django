@@ -110,7 +110,6 @@ class Index:
                 model._meta.get_field(field_name)
                 for field_name, _ in self.fields_orders
             ]
-            col_suffixes = [order[1] for order in self.fields_orders]
             if schema_editor.connection.features.supports_index_column_ordering:
                 col_suffixes = [order[1] for order in self.fields_orders]
             else:
