@@ -240,6 +240,11 @@ class BaseCommand:
     ``stealth_options``
         A tuple of any options the command uses which aren't defined by the
         argument parser.
+
+    ``formatter_class``
+        ArgumentParser formatter class which is used for formatting help messages,
+        e.g argparse.RawDescriptionHelpFormatter. Default value is
+        DjangoHelpFormatter
     """
 
     # Metadata about this command.
@@ -256,6 +261,8 @@ class BaseCommand:
     # Command-specific options not defined by the argument parser.
     stealth_options = ()
     suppressed_base_arguments = set()
+    # Default argparse formatter class
+    formatter_class = DjangoHelpFormatter
 
     def __init__(self, stdout=None, stderr=None, no_color=False, force_color=False):
         self.stdout = OutputWrapper(stdout or sys.stdout)
@@ -289,7 +296,7 @@ class BaseCommand:
         parser = CommandParser(
             prog="%s %s" % (os.path.basename(prog_name), subcommand),
             description=self.help or None,
-            formatter_class=DjangoHelpFormatter,
+            formatter_class=self.formatter_class,
             missing_args_message=getattr(self, "missing_args_message", None),
             called_from_command_line=getattr(self, "_called_from_command_line", None),
             **kwargs,

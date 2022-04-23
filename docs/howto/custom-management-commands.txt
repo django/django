@@ -223,6 +223,12 @@ All attributes can be set in your derived class and can be used in
     ``'__all__'`` can be used to specify that all system checks should be
     performed. Default value is ``'__all__'``.
 
+.. attribute:: BaseCommand.formatter_class
+
+    ArgumentParser formatter class which is used for formatting help messages,
+    e.g ``argparse.RawDescriptionHelpFormatter``. Default value is
+    ``DjangoHelpFormatter``
+
 .. attribute:: BaseCommand.style
 
     An instance attribute that helps create colored output when writing to
