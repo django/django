@@ -1434,6 +1434,18 @@ class AggregateTestCase(TestCase):
         )
         self.assertTrue(publisher_qs.exists())
 
+    def test_aggregation_filter_exists(self):
+        publishers_having_more_than_one_book_qs = (
+            Book.objects.values("publisher")
+            .annotate(cnt=Count("isbn"))
+            .filter(cnt__gt=1)
+        )
+        query = publishers_having_more_than_one_book_qs.query.exists(
+            using=connection.alias
+        )
+        _, _, group_by = query.get_compiler(connection=connection).pre_sql_setup()
+        self.assertEqual(len(group_by), 1)
+
     def test_aggregation_exists_annotation(self):
         published_books = Book.objects.filter(publisher=OuterRef("pk"))
         publisher_qs = Publisher.objects.annotate(
