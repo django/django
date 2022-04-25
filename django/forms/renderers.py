@@ -25,15 +25,8 @@ class BaseRenderer:
         return template.render(context, request=request).strip()
 
 
-class DivBaseRenderer:
+class DivBaseRenderer(BaseRenderer):
     template_name = "django/forms/div.html"
-
-    def get_template(self, template_name):
-        raise NotImplementedError("subclasses must implement get_template()")
-
-    def render(self, template_name, context, request=None):
-        template = self.get_template(template_name)
-        return template.render(context, request=request).strip()
 
 
 class EngineMixin:

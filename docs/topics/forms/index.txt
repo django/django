@@ -497,7 +497,7 @@ appropriately.
     ``<form>`` tags, or the form's ``submit`` control. You will have to provide
     these yourself.
 
-.. versionchanged::: 4.1
+.. versionchanged:: 4.1
 
     TODO This following seems a bit much for a topic...
     

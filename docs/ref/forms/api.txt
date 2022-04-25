@@ -1342,12 +1342,10 @@ In this example, ``ContactFormWithPriority`` contains all the fields from
 ``ContactForm``, plus an additional field, ``priority``. The ``ContactForm``
 fields are ordered first::
 
-TODO change to div html layout. 
-
     >>> class ContactFormWithPriority(ContactForm):
     ...     priority = forms.CharField()
     >>> f = ContactFormWithPriority(auto_id=False)
-    >>> print(f.as_ul())
+    >>> print(f)
     <div>Subject:<input type="text" name="subject" maxlength="100" required></div>
     <div>Message:<textarea name="message" cols="40" rows="10" required></textarea></div>
     <div>Sender:<input type="email" name="sender" required></div>
