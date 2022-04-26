@@ -1033,19 +1033,39 @@ calling the appropriate methods on the wrapped expression.
         to a column. The ``alias`` parameter will be ``None`` unless the
         expression has been annotated and is used for grouping.
 
-    .. method:: asc(nulls_first=False, nulls_last=False)
+    .. method:: asc(nulls_first=None, nulls_last=None)
 
         Returns the expression ready to be sorted in ascending order.
 
         ``nulls_first`` and ``nulls_last`` define how null values are sorted.
         See :ref:`using-f-to-sort-null-values` for example usage.
 
-    .. method:: desc(nulls_first=False, nulls_last=False)
+        .. versionchanged:: 4.1
+
+            In older versions, ``nulls_first`` and ``nulls_last`` defaulted to
+            ``False``.
+
+        .. deprecated:: 4.1
+
+            Passing ``nulls_first=False`` or ``nulls_last=False`` to ``asc()``
+            is deprecated. Use ``None`` instead.
+
+    .. method:: desc(nulls_first=None, nulls_last=None)
 
         Returns the expression ready to be sorted in descending order.
 
         ``nulls_first`` and ``nulls_last`` define how null values are sorted.
         See :ref:`using-f-to-sort-null-values` for example usage.
+
+        .. versionchanged:: 4.1
+
+            In older versions, ``nulls_first`` and ``nulls_last`` defaulted to
+            ``False``.
+
+        .. deprecated:: 4.1
+
+            Passing ``nulls_first=False`` or ``nulls_last=False`` to ``desc()``
+            is deprecated. Use ``None`` instead.
 
     .. method:: reverse_ordering()
 
