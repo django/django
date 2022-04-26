@@ -2535,17 +2535,16 @@ class OrderByTests(SimpleTestCase):
             OrderBy(F("field"), nulls_last=True),
             OrderBy(F("field"), nulls_last=True),
         )
-        self.assertNotEqual(
-            OrderBy(F("field"), nulls_last=True),
-            OrderBy(F("field"), nulls_last=False),
-        )
 
     def test_hash(self):
         self.assertEqual(
             hash(OrderBy(F("field"), nulls_last=True)),
             hash(OrderBy(F("field"), nulls_last=True)),
         )
-        self.assertNotEqual(
-            hash(OrderBy(F("field"), nulls_last=True)),
-            hash(OrderBy(F("field"), nulls_last=False)),
-        )
+
+    def test_nulls_false(self):
+        msg = "nulls_first and nulls_last cannot be False"
+        with self.assertRaisesMessage(ValueError, msg):
+            OrderBy(F("field"), nulls_first=False)
+        with self.assertRaisesMessage(ValueError, msg):
+            OrderBy(F("field"), nulls_last=False)
