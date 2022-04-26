@@ -1236,9 +1236,11 @@ class OrderBy(Expression):
     template = '%(expression)s %(ordering)s'
     conditional = False
 
-    def __init__(self, expression, descending=False, nulls_first=False, nulls_last=False):
+    def __init__(self, expression, descending=False, nulls_first=None, nulls_last=None):
         if nulls_first and nulls_last:
             raise ValueError('nulls_first and nulls_last are mutually exclusive')
+        if nulls_first is False or nulls_last is False:
+            raise ValueError("nulls_first and nulls_last cannot be False")
         self.nulls_first = nulls_first
         self.nulls_last = nulls_last
         self.descending = descending
@@ -1302,9 +1304,12 @@ class OrderBy(Expression):
 
     def reverse_ordering(self):
         self.descending = not self.descending
-        if self.nulls_first or self.nulls_last:
-            self.nulls_first = not self.nulls_first
-            self.nulls_last = not self.nulls_last
+        if self.nulls_first:
+            self.nulls_last = True
+            self.nulls_first = None
+        elif self.nulls_last:
+            self.nulls_first = True
+            self.nulls_last = None
         return self
 
     def asc(self):
