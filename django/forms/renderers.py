@@ -15,6 +15,9 @@ def get_default_renderer():
 
 
 class BaseRenderer:
+    form_template_name = "django/forms/default.html"
+    formset_template_name = "django/forms/formsets/default.html"
+
     def get_template(self, template_name):
         raise NotImplementedError("subclasses must implement get_template()")
 

@@ -244,6 +244,20 @@ File Uploads
 Forms
 ~~~~~
 
+* The default template used to render forms when cast to a string, e.g. in
+  templates as ``{{ form }}``, is now configurable at the project-level by
+  setting :attr:`~django.forms.renderers.BaseRenderer.form_template_name` on
+  the class provided for :setting:`FORM_RENDERER`.
+
+  :attr:`.Form.template_name` is now a property deferring to the renderer, but
+  may be overridden with a string value to specify the template name per-form
+  class.
+
+  Similarly, the default template used to render formsets can be specified via
+  the matching
+  :attr:`~django.forms.renderers.BaseRenderer.formset_template_name` renderer
+  attribute.
+
 * The new :meth:`~django.forms.BoundField.legend_tag` allows rendering field
   labels in ``<legend>`` tags via the new ``tag`` argument of
   :meth:`~django.forms.BoundField.label_tag`.

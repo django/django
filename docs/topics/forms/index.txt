@@ -759,10 +759,14 @@ Reusable form templates
 
 If your site uses the same rendering logic for forms in multiple places, you
 can reduce duplication by saving the form's loop in a standalone template and
-overriding the forms :attr:`~django.forms.Form.template_name` attribute to
-render the form using the custom template. The below example will result in
-``{{ form }}`` being rendered as the output of the ``form_snippet.html``
-template.
+setting a custom :setting:`FORM_RENDERER` to use that
+:attr:`~django.forms.renderers.BaseRenderer.form_template_name` site-wide. You
+can also customize per-form by overriding the form's
+:attr:`~django.forms.Form.template_name` attribute to render the form using the
+custom template.
+
+The below example will result in ``{{ form }}`` being rendered as the output of
+the ``form_snippet.html`` template.
 
 In your templates:
 
@@ -779,15 +783,41 @@ In your templates:
         </div>
     {% endfor %}
 
-In your form::
+Then you can configure the :setting:`FORM_RENDERER` setting:
+
+.. code-block:: python
+    :caption: settings.py
+
+    from django.forms.renderers import TemplatesSetting
+
+    class CustomFormRenderer(TemplatesSetting):
+        form_template_name = "form_snippet.html"
+
+    FORM_RENDERER = "project.settings.CustomFormRenderer"
+
+… or for a single form::
 
     class MyForm(forms.Form):
-        template_name = 'form_snippet.html'
+        template_name = "form_snippet.html"
         ...
+
+… or for a single render of a form instance, passing in the template name to
+the :meth:`.Form.render()`. Here's an example of this being used in a view::
+
+    def index(request):
+        form = MyForm()
+        rendered_form = form.render("form_snippet.html")
+        context = {'form': rendered_form}
+        return render(request, 'index.html', context)
 
 .. versionchanged:: 4.0
 
     Template rendering of forms was added.
+
+.. versionchanged:: 4.1
+
+    The ability to set the default ``form_template_name`` on the form renderer
+    was added.
 
 Further topics
 ==============

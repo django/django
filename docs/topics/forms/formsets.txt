@@ -783,11 +783,22 @@ Formsets have the following attributes and methods associated with rendering:
 
     .. versionadded:: 4.0
 
-    The name of the template used when calling ``__str__`` or :meth:`.render`.
-    This template renders the formset's management form and then each form in
-    the formset as per the template defined by the form's
-    :attr:`~django.forms.Form.template_name`. This is a proxy of ``as_table``
-    by default.
+    The name of the template rendered if the formset is cast into a string,
+    e.g. via ``print(formset)`` or in a template via ``{{ formset }}``.
+
+    By default, a property returning the value of the renderer's
+    :attr:`~django.forms.renderers.BaseRenderer.formset_template_name`. You may
+    set it as a string template name in order to override that for a particular
+    formset class.
+
+    This template will be used to render the formset's management form, and
+    then each form in the formset as per the template defined by the form's
+    :attr:`~django.forms.Form.template_name`.
+
+    .. versionchanged:: 4.1
+
+        In older versions ``template_name`` defaulted to the string value
+        ``'django/forms/formset/default.html'``.
 
 .. attribute:: BaseFormSet.template_name_p
 

@@ -62,7 +62,7 @@ class BaseFormSet(RenderableFormMixin):
             "%(field_names)s. You may need to file a bug report if the issue persists."
         ),
     }
-    template_name = "django/forms/formsets/default.html"
+
     template_name_p = "django/forms/formsets/p.html"
     template_name_table = "django/forms/formsets/table.html"
     template_name_ul = "django/forms/formsets/ul.html"
@@ -516,6 +516,10 @@ class BaseFormSet(RenderableFormMixin):
             return self.forms[0].media
         else:
             return self.empty_form.media
+
+    @property
+    def template_name(self):
+        return self.renderer.formset_template_name
 
     def get_context(self):
         return {"formset": self}
