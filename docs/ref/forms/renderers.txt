@@ -26,9 +26,16 @@ A custom renderer can be specified by updating the :setting:`FORM_RENDERER`
 setting. It defaults to
 ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``.
 
-You can also provide a custom renderer by setting the
+By specifying a custom form renderer and overriding
+:attr:`~.BaseRenderer.form_template_name` you can adjust the default form
+markup across your project from a single place.
+
+You can also provide a custom renderer per-form or per-widget by setting the
 :attr:`.Form.default_renderer` attribute or by using the ``renderer`` argument
-of :meth:`.Widget.render`.
+of :meth:`.Form.render`, or :meth:`.Widget.render`.
+
+Matching points apply to formset rendering. See :ref:`formset-rendering` for
+discussion.
 
 Use one of the :ref:`built-in template form renderers
 <built-in-template-form-renderers>` or implement your own. Custom renderers
@@ -39,6 +46,24 @@ should return a rendered templates (as a string) or raise
 .. class:: BaseRenderer
 
     The base class for the built-in form renderers.
+
+    .. attribute:: form_template_name
+
+        .. versionadded:: 4.1
+
+        The default name of the template to use to render a form.
+
+        Defaults to ``"django/forms/default.html"``, which is a proxy for
+        ``"django/forms/table.html"``.
+
+    .. attribute:: formset_template_name
+
+        .. versionadded:: 4.1
+
+        The default name of the template to use to render a formset.
+
+        Defaults to ``"django/forms/formsets/default.html"``, which is a proxy
+        for ``"django/forms/formsets/table.html"``.
 
     .. method:: get_template(template_name)
 
