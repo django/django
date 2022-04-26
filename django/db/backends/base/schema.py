@@ -1,4 +1,5 @@
 import logging
+import operator
 from datetime import datetime
 
 from django.db.backends.ddl_references import (
@@ -35,11 +36,15 @@ def _is_relevant_relation(relation, altered_field):
 
 
 def _all_related_fields(model):
-    return model._meta._get_fields(
-        forward=False,
-        reverse=True,
-        include_hidden=True,
-        include_parents=False,
+    # Related fields must be returned in a deterministic order.
+    return sorted(
+        model._meta._get_fields(
+            forward=False,
+            reverse=True,
+            include_hidden=True,
+            include_parents=False,
+        ),
+        key=operator.attrgetter("name"),
     )
 
 
