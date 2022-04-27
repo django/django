@@ -5,7 +5,9 @@ register = template.Library()
 
 class AdminLogNode(template.Node):
     def __init__(self, limit, varname, user):
-        self.limit, self.varname, self.user = limit, varname, user
+        self.limit = limit
+        self.varname = varname
+        self.user = user
 
     def __repr__(self):
         return "<GetAdminLog Node>"
