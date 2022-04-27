@@ -2025,6 +2025,12 @@ class RawQuerySet:
         if self._prefetch_related_lookups and not self._prefetch_done:
             self._prefetch_related_objects()
 
+    async def _async_fetch_all(self):
+        if self._result_cache is None:
+            self._result_cache = [result async for result in RawModelIterable(self)]
+        if self._prefetch_related_lookups and not self._prefetch_done:
+            sync_to_async(self._prefetch_related_objects)()
+
     def __len__(self):
         self._fetch_all()
         return len(self._result_cache)
@@ -2036,6 +2042,16 @@ class RawQuerySet:
     def __iter__(self):
         self._fetch_all()
         return iter(self._result_cache)
+
+    def __aiter__(self):
+        # Remember, __aiter__ itself is synchronous, it's the thing it returns
+        # that is async!
+        async def generator():
+            await self._async_fetch_all()
+            for item in self._result_cache:
+                yield item
+
+        return generator()
 
     def iterator(self):
         yield from RawModelIterable(self)
