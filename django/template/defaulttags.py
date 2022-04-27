@@ -46,7 +46,8 @@ class AutoEscapeControlNode(Node):
     __slots__ = ("setting", "nodelist")
 
     def __init__(self, setting, nodelist):
-        self.setting, self.nodelist = setting, nodelist
+        self.setting = setting
+        self.nodelist = nodelist
 
     def render(self, context):
         old_setting = context.autoescape
@@ -142,7 +143,8 @@ class FilterNode(Node):
     )
 
     def __init__(self, filter_expr, nodelist):
-        self.filter_expr, self.nodelist = filter_expr, nodelist
+        self.filter_expr = filter_expr
+        self.nodelist = nodelist
 
     def render(self, context):
         output = self.nodelist.render(context)
@@ -184,7 +186,8 @@ class ForNode(Node):
     def __init__(
         self, loopvars, sequence, is_reversed, nodelist_loop, nodelist_empty=None
     ):
-        self.loopvars, self.sequence = loopvars, sequence
+        self.loopvars = loopvars
+        self.sequence = sequence
         self.is_reversed = is_reversed
         self.nodelist_loop = nodelist_loop
         if nodelist_empty is None:
@@ -272,7 +275,8 @@ class IfChangedNode(Node):
     child_nodelists = ("nodelist_true", "nodelist_false")
 
     def __init__(self, nodelist_true, nodelist_false, *varlist):
-        self.nodelist_true, self.nodelist_false = nodelist_true, nodelist_false
+        self.nodelist_true = nodelist_true
+        self.nodelist_false = nodelist_false
         self._varlist = varlist
 
     def render(self, context):
@@ -352,7 +356,9 @@ class LoremNode(Node):
     __slots__ = ("count", "method", "common")
 
     def __init__(self, count, method, common):
-        self.count, self.method, self.common = count, method, common
+        self.count = count
+        self.method = method
+        self.common = common
 
     def render(self, context):
         try:
@@ -375,7 +381,8 @@ class RegroupNode(Node):
     __slots__ = ("target", "expression", "var_name")
 
     def __init__(self, target, expression, var_name):
-        self.target, self.expression = target, expression
+        self.target = target
+        self.expression = expression
         self.var_name = var_name
 
     def resolve_expression(self, obj, context):
