@@ -160,20 +160,39 @@ class GenericForeignKey(FieldCacheMixin):
     def get_cache_name(self):
         return self.name
 
-    def get_content_type(self, obj=None, id=None, using=None):
+    def get_content_type(self, obj=None, id=None, using=None, model=None):
         if obj is not None:
             return ContentType.objects.db_manager(obj._state.db).get_for_model(
                 obj, for_concrete_model=self.for_concrete_model
             )
         elif id is not None:
             return ContentType.objects.db_manager(using).get_for_id(id)
+        elif model is not None:
+            return ContentType.objects.db_manager(using).get_for_model(
+                model, for_concrete_model=self.for_concrete_model
+            )
         else:
             # This should never happen. I love comments like this, don't you?
             raise Exception("Impossible arguments to GFK.get_content_type!")
 
-    def get_prefetch_queryset(self, instances, queryset=None):
+    def get_prefetch_queryset(self, instances, queryset=None, querysets=None):
         if queryset is not None:
             raise ValueError("Custom queryset can't be used for this lookup.")
+
+        custom_queryset_dict = {}
+
+        if querysets is not None:
+            if not isinstance(querysets, list):
+                raise ValueError("Custom querysets must be a list for this lookup.")
+
+            for qs in querysets:
+                ct_id = self.get_content_type(model=qs.query.model, using=qs.db).pk
+                if ct_id in custom_queryset_dict:
+                    raise ValueError(
+                        "Multiple querysets on same model found. "
+                        "Only one queryset on each model is allowed."
+                    )
+                custom_queryset_dict[ct_id] = qs
 
         # For efficiency, group the instances by content type and then do one
         # query per model
@@ -192,9 +211,14 @@ class GenericForeignKey(FieldCacheMixin):
 
         ret_val = []
         for ct_id, fkeys in fk_dict.items():
-            instance = instance_dict[ct_id]
-            ct = self.get_content_type(id=ct_id, using=instance._state.db)
-            ret_val.extend(ct.get_all_objects_for_this_type(pk__in=fkeys))
+            if ct_id in custom_queryset_dict:
+                # If the custom queryset is already provided, then directly return that,
+                # otherwise get the data from the database
+                ret_val.extend(custom_queryset_dict[ct_id])
+            else:
+                instance = instance_dict[ct_id]
+                ct = self.get_content_type(id=ct_id, using=instance._state.db)
+                ret_val.extend(ct.get_all_objects_for_this_type(pk__in=fkeys))
 
         # For doing the join in Python, we have to match both the FK val and the
         # content type, so we use a callable that returns a (fk, class) pair.

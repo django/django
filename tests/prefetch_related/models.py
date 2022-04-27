@@ -182,6 +182,12 @@ class Article(models.Model):
     name = models.CharField(max_length=20)
 
 
+class Animal(models.Model):
+    name = models.CharField(max_length=20)
+    weight = models.FloatField()
+    tags = GenericRelation(TaggedItem, related_query_name="animals")
+
+
 class Bookmark(models.Model):
     url = models.URLField()
     tags = GenericRelation(TaggedItem, related_query_name="bookmarks")

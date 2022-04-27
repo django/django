@@ -203,6 +203,9 @@ Models
 
 * :meth:`~.QuerySet.prefetch_related` now supports
   :class:`~django.db.models.Prefetch` objects with sliced querysets.
+* Prefetching on a ``GenericForeignKey`` is now possible by using
+  ``GenericPrefetch`` class. A list of querysets that needs to prefetched
+  can be passed to ``GenericPrefetch`` class.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

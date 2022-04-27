@@ -24,10 +24,10 @@ class GenericForeignKeyTests(TestCase):
 
     def test_incorrect_get_prefetch_queryset_arguments(self):
         with self.assertRaisesMessage(
-            ValueError, "Custom queryset can't be used for this lookup."
+            ValueError, "Custom querysets must be a list for this lookup."
         ):
             Answer.question.get_prefetch_queryset(
-                Answer.objects.all(), Answer.objects.all()
+                Answer.objects.all(), querysets=Answer.objects.all()
             )
 
     def test_get_object_cache_respects_deleted_objects(self):

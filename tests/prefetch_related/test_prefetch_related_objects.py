@@ -1,7 +1,8 @@
 from django.db.models import Prefetch, prefetch_related_objects
+from django.db.models.query import GenericPrefetch
 from django.test import TestCase
 
-from .models import Author, Book, Reader
+from .models import Animal, Author, Book, Bookmark, Reader, TaggedItem
 
 
 class PrefetchRelatedObjectsTests(TestCase):
@@ -155,3 +156,31 @@ class PrefetchRelatedObjectsTests(TestCase):
 
         with self.assertNumQueries(0):
             self.assertCountEqual(book1.authors.all(), [self.author1, self.author2])
+
+    def test_generic_foreign_key(self):
+        bookmark1 = Bookmark.objects.create(url="https://www.djangoproject.com/")
+        animal1 = Animal.objects.create(name="lion", weight=100)
+
+        tagged_item1 = TaggedItem.objects.create(tag="great", content_object=bookmark1)
+        tagged_item2 = TaggedItem.objects.create(tag="awesome", content_object=animal1)
+        # Getting the instances again so that content object is deferred
+        tagged_item1 = TaggedItem.objects.get(id=tagged_item1.id)
+        tagged_item2 = TaggedItem.objects.get(id=tagged_item2.id)
+
+        with self.assertNumQueries(2):
+            prefetch_related_objects(
+                [tagged_item1, tagged_item2],
+                GenericPrefetch(
+                    "content_object",
+                    querysets=[Bookmark.objects.all(), Animal.objects.only("name")],
+                ),
+            )
+
+        with self.assertNumQueries(0):
+            self.assertEqual(tagged_item1.content_object.url, bookmark1.url)
+
+        with self.assertNumQueries(0):
+            self.assertEqual(tagged_item2.content_object.name, animal1.name)
+
+        with self.assertNumQueries(1):
+            self.assertEqual(tagged_item2.content_object.weight, animal1.weight)

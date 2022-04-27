@@ -2200,6 +2200,40 @@ class Prefetch:
         return hash((self.__class__, self.prefetch_to))
 
 
+class GenericPrefetch(Prefetch):
+    def __init__(self, lookup, querysets=None, to_attr=None):
+        for queryset in querysets:
+            if queryset is not None and (
+                isinstance(queryset, RawQuerySet)
+                or (
+                    hasattr(queryset, "_iterable_class")
+                    and not issubclass(queryset._iterable_class, ModelIterable)
+                )
+            ):
+                raise ValueError(
+                    "Prefetch querysets cannot use raw(), values(), and values_list()."
+                )
+        self.querysets = querysets
+        super(GenericPrefetch, self).__init__(lookup, to_attr=to_attr)
+
+    def __getstate__(self):
+        obj_dict = self.__dict__.copy()
+        obj_dict["querysets"] = []
+        for queryset in self.querysets:
+            if queryset is not None:
+                queryset = queryset._chain()
+                # Prevent the QuerySet from being evaluated
+                queryset._result_cache = []
+                queryset._prefetch_done = True
+                obj_dict["querysets"].append(queryset)
+        return obj_dict
+
+    def get_current_querysets(self, level):
+        if self.get_current_prefetch_to(level) == self.prefetch_to:
+            return self.querysets
+        return None
+
+
 def normalize_prefetch_lookups(lookups, prefix=None):
     """Normalize lookups into Prefetch objects."""
     ret = []
@@ -2448,6 +2482,14 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
     # The 'values to be matched' must be hashable as they will be used
     # in a dictionary.
 
+    # If the lookup is a Generic Prefetch class,
+    # it should send the querysets argument to get_prefetch_queryset
+    prefetch_queryset_kwargs = (
+        {"querysets": lookup.get_current_querysets(level)}
+        if isinstance(lookup, GenericPrefetch)
+        else {"queryset": lookup.get_current_queryset(level)}
+    )
+
     (
         rel_qs,
         rel_obj_attr,
@@ -2455,7 +2497,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
         single,
         cache_name,
         is_descriptor,
-    ) = prefetcher.get_prefetch_queryset(instances, lookup.get_current_queryset(level))
+    ) = prefetcher.get_prefetch_queryset(instances, **prefetch_queryset_kwargs)
     # We have to handle the possibility that the QuerySet we just got back
     # contains some prefetch_related lookups. We don't want to trigger the
     # prefetch_related functionality by evaluating the query. Rather, we need

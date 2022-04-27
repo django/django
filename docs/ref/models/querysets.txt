@@ -1110,11 +1110,16 @@ relationship, and does the 'joining' in Python. This allows it to prefetch
 many-to-many and many-to-one objects, which cannot be done using
 ``select_related``, in addition to the foreign key and one-to-one relationships
 that are supported by ``select_related``. It also supports prefetching of
-:class:`~django.contrib.contenttypes.fields.GenericRelation` and
-:class:`~django.contrib.contenttypes.fields.GenericForeignKey`, however, it
-must be restricted to a homogeneous set of results. For example, prefetching
-objects referenced by a ``GenericForeignKey`` is only supported if the query
-is restricted to one ``ContentType``.
+:class:`~django.contrib.contenttypes.fields.GenericRelation`, however, it
+must be restricted to a homogeneous set of results.
+
+.. versionchanged:: 4.2
+
+    It also supports prefetching of
+    :class:`~django.contrib.contenttypes.fields.GenericForeignKey`.
+    Custom ``QuerySet`` for each ``ContentType`` can be defined by wrapping
+    the lookup in :class:`~django.db.models.Prefetch` along with
+    the mapping of ``ContentType`` to ``QuerySet``
 
 For example, suppose you have these models::
 
@@ -4022,6 +4027,33 @@ attribute:
     provide a significant speed improvement over traditional
     ``prefetch_related`` calls which store the cached result within a
     ``QuerySet`` instance.
+
+.. versionadded:: 4.2
+
+``GenericPrefetch()`` objects
+-----------------------------
+
+.. class:: GenericPrefetch(lookup, querysets=None, to_attr=None)
+
+This lookup is similar to ``Prefetch()`` and it should only be used on
+``GenericForeignKey``. The ``querysets`` argument accepts
+list of ``Queryset`` objects of different models. This is useful when we
+require each content type to prefetch their own queryset separately.
+
+    >>> bookmark = Bookmark.objects.create(url="https://www.djangoproject.com/")
+    >>> animal = Animal.objects.create(name="lion", weight=100)
+    >>> TaggedItem.objects.create(
+            tag="great", content_object=bookmark
+        )
+    >>> TaggedItem.objects.create(
+            tag="awesome", content_object=animal
+        )
+    >>> prefetch = GenericPrefetch('content_object', [
+            Bookmark.objects.all(), Animal.objects.only("name")
+        ])
+    >>> TaggedItem.objects.prefetch_related(prefetch).all()
+    <QuerySet [<TaggedItem: Great>, <TaggedItem: Awesome>]>
+
 
 ``prefetch_related_objects()``
 ------------------------------
