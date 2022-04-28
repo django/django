@@ -275,10 +275,11 @@ class BaseDatabaseSchemaEditor:
 
     # Field <-> database mapping functions
 
-    def _iter_column_sql(self, column_db_type, params, model, field, include_default):
+    def _iter_column_sql(
+        self, column_db_type, params, model, field, field_db_params, include_default
+    ):
         yield column_db_type
-        collation = getattr(field, "db_collation", None)
-        if collation:
+        if collation := field_db_params.get("collation"):
             yield self._collate_sql(collation)
         # Work out nullability.
         null = field.null
@@ -335,8 +336,8 @@ class BaseDatabaseSchemaEditor:
         had set_attributes_from_name() called.
         """
         # Get the column's type and use that as the basis of the SQL.
-        db_params = field.db_parameters(connection=self.connection)
-        column_db_type = db_params["type"]
+        field_db_params = field.db_parameters(connection=self.connection)
+        column_db_type = field_db_params["type"]
         # Check for fields that aren't actually columns (e.g. M2M).
         if column_db_type is None:
             return None, None
@@ -345,7 +346,12 @@ class BaseDatabaseSchemaEditor:
             " ".join(
                 # This appends to the params being returned.
                 self._iter_column_sql(
-                    column_db_type, params, model, field, include_default
+                    column_db_type,
+                    params,
+                    model,
+                    field,
+                    field_db_params,
+                    include_default,
                 )
             ),
             params,
@@ -908,8 +914,8 @@ class BaseDatabaseSchemaEditor:
         old_type_suffix = old_field.db_type_suffix(connection=self.connection)
         new_type_suffix = new_field.db_type_suffix(connection=self.connection)
         # Collation change?
-        old_collation = getattr(old_field, "db_collation", None)
-        new_collation = getattr(new_field, "db_collation", None)
+        old_collation = old_db_params.get("collation")
+        new_collation = new_db_params.get("collation")
         if old_collation != new_collation:
             # Collation change handles also a type change.
             fragment = self._alter_column_collation_sql(

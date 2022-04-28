@@ -1182,6 +1182,11 @@ class CharField(Field):
             return connection.ops.cast_char_field_without_max_length
         return super().cast_db_type(connection)
 
+    def db_parameters(self, connection):
+        db_params = super().db_parameters(connection)
+        db_params["collation"] = self.db_collation
+        return db_params
+
     def get_internal_type(self):
         return "CharField"
 
@@ -2360,6 +2365,11 @@ class TextField(Field):
                     ),
                 )
         return errors
+
+    def db_parameters(self, connection):
+        db_params = super().db_parameters(connection)
+        db_params["collation"] = self.db_collation
+        return db_params
 
     def get_internal_type(self):
         return "TextField"
