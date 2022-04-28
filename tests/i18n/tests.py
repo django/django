@@ -865,11 +865,14 @@ class FormattingTests(SimpleTestCase):
         self.maxDiff = 3000
         # Catalan locale
         with translation.override("ca", deactivate=True):
-            self.assertEqual(r"j \d\e F \d\e Y", get_format("DATE_FORMAT"))
+            self.assertEqual(r"j E \d\e Y", get_format("DATE_FORMAT"))
             self.assertEqual(1, get_format("FIRST_DAY_OF_WEEK"))
             self.assertEqual(",", get_format("DECIMAL_SEPARATOR"))
             self.assertEqual("10:15", time_format(self.t))
             self.assertEqual("31 de desembre de 2009", date_format(self.d))
+            self.assertEqual(
+                "1 d'abril de 2009", date_format(datetime.date(2009, 4, 1))
+            )
             self.assertEqual(
                 "desembre del 2009", date_format(self.d, "YEAR_MONTH_FORMAT")
             )
