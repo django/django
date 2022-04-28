@@ -104,6 +104,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         "Raises ORA-00600: internal error code.": {
             "model_fields.test_jsonfield.TestQuerying.test_usage_in_subquery",
         },
+        "Oracle doesn't support changing collations on indexed columns (#33671).": {
+            "migrations.test_operations.OperationTests."
+            "test_alter_field_pk_fk_db_collation",
+        },
     }
     django_test_expected_failures = {
         # A bug in Django/cx_Oracle with respect to string handling (#23843).
