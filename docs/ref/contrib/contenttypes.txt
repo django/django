@@ -255,6 +255,11 @@ For example, it could be used for a tagging system like so::
         def __str__(self):
             return self.tag
 
+        class Meta:
+            indexes = [
+                models.Index(fields=["content_type", "object_id"]),
+            ]
+
 A normal :class:`~django.db.models.ForeignKey` can only "point
 to" one other model, which means that if the ``TaggedItem`` model used a
 :class:`~django.db.models.ForeignKey` it would have to
@@ -284,6 +289,14 @@ model:
        are the default field names
        :class:`~django.contrib.contenttypes.fields.GenericForeignKey` will
        look for.
+
+    Unlike for the :class:`~django.db.models.ForeignKey`, a database index is
+    *not* automatically created on the
+    :class:`~django.contrib.contenttypes.fields.GenericForeignKey`, so it's
+    recommended that you use
+    :attr:`Meta.indexes <django.db.models.Options.indexes>` to add your own
+    multiple column index. This behavior :ticket:`may change <23435>` in the
+    future.
 
     .. attribute:: GenericForeignKey.for_concrete_model
 
