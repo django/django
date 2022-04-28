@@ -1071,51 +1071,51 @@ msgstr "Des."
 
 msgctxt "alt. month"
 msgid "January"
-msgstr "gener"
+msgstr "de gener"
 
 msgctxt "alt. month"
 msgid "February"
-msgstr "febrer"
+msgstr "de febrer"
 
 msgctxt "alt. month"
 msgid "March"
-msgstr "març"
+msgstr "de març"
 
 msgctxt "alt. month"
 msgid "April"
-msgstr "abril"
+msgstr "d'abril"
 
 msgctxt "alt. month"
 msgid "May"
-msgstr "maig"
+msgstr "de maig"
 
 msgctxt "alt. month"
 msgid "June"
-msgstr "juny"
+msgstr "de juny"
 
 msgctxt "alt. month"
 msgid "July"
-msgstr "juliol"
+msgstr "de juliol"
 
 msgctxt "alt. month"
 msgid "August"
-msgstr "agost"
+msgstr "d'agost"
 
 msgctxt "alt. month"
 msgid "September"
-msgstr "setembre"
+msgstr "de setembre"
 
 msgctxt "alt. month"
 msgid "October"
-msgstr "octubre"
+msgstr "d'octubre"
 
 msgctxt "alt. month"
 msgid "November"
-msgstr "novembre"
+msgstr "de novembre"
 
 msgctxt "alt. month"
 msgid "December"
-msgstr "desembre"
+msgstr "de desembre"
 
 msgid "This is not a valid IPv6 address."
 msgstr "Aquesta no és una adreça IPv6 vàlida."
