@@ -217,7 +217,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             alter_field and getattr(alter_field[1], "primary_key", False)
         ):
             for name, field in list(body.items()):
-                if field.primary_key:
+                if field.primary_key and not (
+                    # Do not remove the old primary key when an altered field
+                    # that introduces a primary key is the same field.
+                    alter_field
+                    and name == alter_field[1].name
+                ):
                     field.primary_key = False
                     restore_pk_field = field
                     if field.auto_created:
