@@ -91,6 +91,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             elif "ORA-30673" in description and old_field.primary_key:
                 self._delete_primary_key(model, strict=True)
                 self._alter_field_type_workaround(model, old_field, new_field)
+            # If a collation is changing on a primary key, drop the primary key
+            # first.
+            elif "ORA-43923" in description and old_field.primary_key:
+                self._delete_primary_key(model, strict=True)
+                self.alter_field(model, old_field, new_field, strict)
+                # Restore a primary key, if needed.
+                if new_field.primary_key:
+                    self.execute(self._create_primary_key_sql(model, new_field))
             else:
                 raise
 
