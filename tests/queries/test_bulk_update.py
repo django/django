@@ -155,13 +155,19 @@ class BulkUpdateTests(TestCase):
         rows_updated = Note.objects.bulk_update(notes, ["note"])
         self.assertEqual(rows_updated, 2000)
 
-    def test_updated_rows_when_passing_duplicates(self):
+    def test_raise_on_duplicates(self):
+        msg = 'bulk_update() cannot update duplicates.'
         note = Note.objects.create(note="test-note", misc="test")
-        rows_updated = Note.objects.bulk_update([note, note], ["note"])
-        self.assertEqual(rows_updated, 1)
-        # Duplicates in different batches.
-        rows_updated = Note.objects.bulk_update([note, note], ["note"], batch_size=1)
-        self.assertEqual(rows_updated, 2)
+        # same batch
+        with self.assertRaisesMessage(ValueError, msg):
+            Note.objects.bulk_update([note, note], ["note"])
+        # duplicates in different batches
+        with self.assertRaisesMessage(ValueError, msg):
+            Note.objects.bulk_update([note, note], ["note"], batch_size=1)
+        # duplicates with pk=None
+        note_none = Note(note="test-note", misc="test")
+        with self.assertRaisesMessage(ValueError, msg):
+            Note.objects.bulk_update([note_none, note_none], ["note"], batch_size=1)
 
     def test_only_concrete_fields_allowed(self):
         obj = Valid.objects.create(valid="test")
