@@ -156,7 +156,7 @@ class BulkUpdateTests(TestCase):
         self.assertEqual(rows_updated, 2000)
 
     def test_raise_on_duplicates(self):
-        msg = 'bulk_update() cannot update duplicates.'
+        msg = "bulk_update() cannot update duplicates."
         note = Note.objects.create(note="test-note", misc="test")
         # same batch
         with self.assertRaisesMessage(ValueError, msg):

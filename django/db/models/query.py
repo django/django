@@ -808,7 +808,7 @@ class QuerySet:
         objs = tuple(objs)
         pks = set(obj.pk for obj in objs)
         if len(pks) < len(objs):
-            raise ValueError('bulk_update() cannot update duplicates.')
+            raise ValueError("bulk_update() cannot update duplicates.")
         if None in pks:
             raise ValueError("All bulk_update() objects must have a primary key set.")
         fields = [self.model._meta.get_field(name) for name in fields]
