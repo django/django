@@ -175,10 +175,13 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         return url_params_from_lookup_dict(limit_choices_to)
 
     def url_parameters(self):
-        from django.contrib.admin.views.main import TO_FIELD_VAR
+        from django.contrib.admin.views.main import TO_FIELD_VAR, SOURCE_MODEL_VAR
 
         params = self.base_url_parameters()
-        params.update({TO_FIELD_VAR: self.rel.get_related_field().name})
+        params.update({
+            TO_FIELD_VAR: self.rel.get_related_field().name,
+            SOURCE_MODEL_VAR: None,
+        })
         return params
 
     def label_and_url_for_value(self, value):
@@ -295,17 +298,19 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         )
 
     def get_context(self, name, value, attrs):
-        from django.contrib.admin.views.main import IS_POPUP_VAR, TO_FIELD_VAR
+        from django.contrib.admin.views.main import IS_POPUP_VAR, TO_FIELD_VAR, SOURCE_MODEL_VAR
 
         rel_opts = self.rel.model._meta
         info = (rel_opts.app_label, rel_opts.model_name)
         self.widget.choices = self.choices
         related_field_name = self.rel.get_related_field().name
+        m = self.rel.field.model
         url_params = "&".join(
             "%s=%s" % param
             for param in [
                 (TO_FIELD_VAR, related_field_name),
                 (IS_POPUP_VAR, 1),
+                (SOURCE_MODEL_VAR, m.__name__),
             ]
         )
         context = {

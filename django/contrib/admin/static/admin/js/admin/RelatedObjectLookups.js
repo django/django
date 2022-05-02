@@ -11,7 +11,7 @@
         relatedWindows.forEach(function(win) {
             if(!win.closed) {
                 win.dismissChildPopups();
-                win.close();    
+                win.close();
             }
         });
     }
@@ -19,7 +19,7 @@
     function setPopupIndex() {
         if(document.getElementsByName("_popup").length > 0) {
             const index = window.name.lastIndexOf("__") + 2;
-            popupIndex = parseInt(window.name.substring(index));   
+            popupIndex = parseInt(window.name.substring(index));
         } else {
             popupIndex = 0;
         }
@@ -87,7 +87,7 @@
         }
     }
 
-    function dismissAddRelatedObjectPopup(win, newId, newRepr) {
+    function dismissAddRelatedObjectPopup(win, newId, newRepr, optgroup) {
         const name = removePopupIndex(win.name);
         const elem = document.getElementById(name);
         if (elem) {
@@ -105,8 +105,9 @@
             $(elem).trigger('change');
         } else {
             const toId = name + "_to";
-            const o = new Option(newRepr, newId);
-            SelectBox.add_to_cache(toId, o);
+            const newOption = new Option(newRepr, newId);
+            newOption.group = optgroup;
+            SelectBox.add_to_cache(toId, newOption);
             SelectBox.redisplay(toId);
         }
         const index = relatedWindows.indexOf(win);

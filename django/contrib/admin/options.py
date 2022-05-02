@@ -69,6 +69,7 @@ from django.views.generic import RedirectView
 
 IS_POPUP_VAR = "_popup"
 TO_FIELD_VAR = "_to_field"
+SOURCE_MODEL_VAR = "_source_model"
 
 
 HORIZONTAL, VERTICAL = 1, 2
@@ -1296,6 +1297,7 @@ class ModelAdmin(BaseModelAdmin):
                 "save_on_top": self.save_on_top,
                 "to_field_var": TO_FIELD_VAR,
                 "is_popup_var": IS_POPUP_VAR,
+                "source_model_var": SOURCE_MODEL_VAR,
                 "app_label": app_label,
             }
         )
@@ -1341,6 +1343,16 @@ class ModelAdmin(BaseModelAdmin):
         # the presence of keys in request.POST.
 
         if IS_POPUP_VAR in request.POST:
+            source_model_name = request.POST.get(SOURCE_MODEL_VAR)
+            source_model = self.model._meta.app_config.get_model(source_model_name)
+            fclass = self.admin_site._registry[source_model].form
+            f = fclass()
+            choices = f.fields[self.opts.verbose_name_plural].choices
+            for optgroup, choices in choices:
+                for name, choice_obj in choices:
+                    if choice_obj == obj:
+                        obj_optgroup = optgroup
+
             to_field = request.POST.get(TO_FIELD_VAR)
             if to_field:
                 attr = str(to_field)
@@ -1351,6 +1363,7 @@ class ModelAdmin(BaseModelAdmin):
                 {
                     "value": str(value),
                     "obj": str(obj),
+                    "optgroup": obj_optgroup,
                 }
             )
             return TemplateResponse(
@@ -1861,6 +1874,7 @@ class ModelAdmin(BaseModelAdmin):
             "object_id": object_id,
             "original": obj,
             "is_popup": IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET,
+            "source_model": request.GET.get(SOURCE_MODEL_VAR),
             "to_field": to_field,
             "media": media,
             "inline_admin_formsets": inline_formsets,

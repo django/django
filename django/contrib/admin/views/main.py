@@ -11,6 +11,7 @@ from django.contrib.admin.exceptions import (
 from django.contrib.admin.options import (
     IS_POPUP_VAR,
     TO_FIELD_VAR,
+    SOURCE_MODEL_VAR,
     IncorrectLookupParameters,
 )
 from django.contrib.admin.utils import (
