@@ -176,6 +176,9 @@ class BaseDatabaseFeatures:
     # Can it create foreign key constraints inline when adding columns?
     can_create_inline_fk = True
 
+    # Can an index be renamed?
+    can_rename_index = False
+
     # Does it automatically index foreign keys?
     indexes_foreign_keys = True
 

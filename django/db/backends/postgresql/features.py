@@ -60,6 +60,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_update_conflicts = True
     supports_update_conflicts_with_target = True
     supports_covering_indexes = True
+    can_rename_index = True
     test_collations = {
         "non_default": "sv-x-icu",
         "swedish_ci": "sv-x-icu",
