@@ -23,6 +23,7 @@ from django.forms.formsets import (
     all_valid,
     formset_factory,
 )
+from django.forms.renderers import TemplatesSetting
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.test import SimpleTestCase
@@ -1434,6 +1435,26 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertIs(formset._should_delete_form(formset.forms[0]), True)
         self.assertIs(formset._should_delete_form(formset.forms[1]), False)
         self.assertIs(formset._should_delete_form(formset.forms[2]), False)
+
+    def test_template_name_uses_renderer_value(self):
+        class CustomRenderer(TemplatesSetting):
+            formset_template_name = "a/custom/formset/template.html"
+
+        ChoiceFormSet = formset_factory(Choice, renderer=CustomRenderer)
+
+        self.assertEqual(
+            ChoiceFormSet().template_name, "a/custom/formset/template.html"
+        )
+
+    def test_template_name_can_be_overridden(self):
+        class CustomFormSet(BaseFormSet):
+            template_name = "a/custom/formset/template.html"
+
+        ChoiceFormSet = formset_factory(Choice, formset=CustomFormSet)
+
+        self.assertEqual(
+            ChoiceFormSet().template_name, "a/custom/formset/template.html"
+        )
 
     def test_custom_renderer(self):
         """

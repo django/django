@@ -101,6 +101,8 @@ details on these changes.
   ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` will no
   longer be allowed.
 
+* The ``django.contrib.gis.admin.OpenLayersWidget`` will be removed.
+
 .. _deprecation-removed-in-4.1:
 
 4.1

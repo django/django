@@ -93,6 +93,7 @@ class SchemaIndexesTests(TestCase):
             str(index.create_sql(Article, editor)),
         )
 
+    @skipUnlessDBFeature("supports_index_column_ordering")
     def test_descending_columns_list_sql(self):
         index = Index(fields=["-headline"], name="whitespace_idx")
         editor = connection.schema_editor()
@@ -336,7 +337,7 @@ class SchemaIndexesMySQLTests(TransactionTestCase):
                 ArticleTranslation._meta.db_table,
             )
         if storage != "InnoDB":
-            self.skip("This test only applies to the InnoDB storage engine")
+            self.skipTest("This test only applies to the InnoDB storage engine")
         index_sql = [
             str(statement)
             for statement in connection.schema_editor()._model_indexes_sql(

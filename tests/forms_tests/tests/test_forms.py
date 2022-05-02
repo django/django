@@ -4397,7 +4397,7 @@ class Jinja2FormsTestCase(FormsTestCase):
 
 
 class CustomRenderer(DjangoTemplates):
-    pass
+    form_template_name = "forms_tests/form_snippet.html"
 
 
 class RendererTests(SimpleTestCase):
@@ -4813,7 +4813,22 @@ class TemplateTests(SimpleTestCase):
 
 
 class OverrideTests(SimpleTestCase):
-    def test_use_custom_template(self):
+    @override_settings(FORM_RENDERER="forms_tests.tests.test_forms.CustomRenderer")
+    def test_custom_renderer_template_name(self):
+        class Person(Form):
+            first_name = CharField()
+
+        get_default_renderer.cache_clear()
+        t = Template("{{ form }}")
+        html = t.render(Context({"form": Person()}))
+        expected = """
+        <div class="fieldWrapper"><label for="id_first_name">First name:</label>
+        <input type="text" name="first_name" required id="id_first_name"></div>
+        """
+        self.assertHTMLEqual(html, expected)
+        get_default_renderer.cache_clear()
+
+    def test_per_form_template_name(self):
         class Person(Form):
             first_name = CharField()
             template_name = "forms_tests/form_snippet.html"

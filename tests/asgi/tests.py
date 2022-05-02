@@ -2,7 +2,6 @@ import asyncio
 import sys
 import threading
 from pathlib import Path
-from unittest import skipIf
 
 from asgiref.testing import ApplicationCommunicator
 
@@ -23,10 +22,6 @@ from .urls import sync_waiter, test_filename
 TEST_STATIC_ROOT = Path(__file__).parent / "project" / "static"
 
 
-@skipIf(
-    sys.platform == "win32" and (3, 8, 0) < sys.version_info < (3, 8, 1),
-    "https://bugs.python.org/issue38563",
-)
 @override_settings(ROOT_URLCONF="asgi.urls")
 class ASGITest(SimpleTestCase):
     async_request_factory = AsyncRequestFactory()

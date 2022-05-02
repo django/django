@@ -98,7 +98,7 @@ Normally, you're either writing a Django field to match a particular database
 column type, or you will need a way to convert your data to, say, a string.
 
 For our ``Hand`` example, we could convert the card data to a string of 104
-characters by concatenating all the cards together in a pre-determined order --
+characters by concatenating all the cards together in a predetermined order --
 say, all the *north* cards first, then the *east*, *south* and *west* cards. So
 ``Hand`` objects can be saved to text or character columns in the database.
 
@@ -234,7 +234,7 @@ The counterpoint to writing your ``__init__()`` method is writing the
 :meth:`~.Field.deconstruct` method. It's used during :doc:`model migrations
 </topics/migrations>` to tell Django how to take an instance of your new field
 and reduce it to a serialized form - in particular, what arguments to pass to
-``__init__()`` to re-create it.
+``__init__()`` to recreate it.
 
 If you haven't added any extra options on top of the field you inherited from,
 then there's no need to write a new ``deconstruct()`` method. If, however,

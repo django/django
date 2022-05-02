@@ -291,7 +291,7 @@ class SelectForUpdateTests(TransactionTestCase):
             qs = Person.objects.select_for_update(of=("self", "born"))
             self.assertIs(qs.exists(), True)
 
-    @skipUnlessDBFeature("has_select_for_update_nowait")
+    @skipUnlessDBFeature("has_select_for_update_nowait", "supports_transactions")
     def test_nowait_raises_error_on_block(self):
         """
         If nowait is specified, we expect an error to be raised rather
@@ -312,7 +312,7 @@ class SelectForUpdateTests(TransactionTestCase):
         self.end_blocking_transaction()
         self.assertIsInstance(status[-1], DatabaseError)
 
-    @skipUnlessDBFeature("has_select_for_update_skip_locked")
+    @skipUnlessDBFeature("has_select_for_update_skip_locked", "supports_transactions")
     def test_skip_locked_skips_locked_rows(self):
         """
         If skip_locked is specified, the locked row is skipped resulting in
@@ -491,7 +491,7 @@ class SelectForUpdateTests(TransactionTestCase):
                     str(Person.objects.filter(name="foo").select_for_update().query),
                 )
 
-    @skipUnlessDBFeature("has_select_for_update")
+    @skipUnlessDBFeature("has_select_for_update", "supports_transactions")
     def test_for_update_requires_transaction(self):
         """
         A TransactionManagementError is raised
@@ -501,7 +501,7 @@ class SelectForUpdateTests(TransactionTestCase):
         with self.assertRaisesMessage(transaction.TransactionManagementError, msg):
             list(Person.objects.select_for_update())
 
-    @skipUnlessDBFeature("has_select_for_update")
+    @skipUnlessDBFeature("has_select_for_update", "supports_transactions")
     def test_for_update_requires_transaction_only_in_execution(self):
         """
         No TransactionManagementError is raised
@@ -599,7 +599,7 @@ class SelectForUpdateTests(TransactionTestCase):
         p = Person.objects.get(pk=self.person.pk)
         self.assertEqual("Fred", p.name)
 
-    @skipUnlessDBFeature("has_select_for_update")
+    @skipUnlessDBFeature("has_select_for_update", "supports_transactions")
     def test_raw_lock_not_available(self):
         """
         Running a raw query which can't obtain a FOR UPDATE lock raises

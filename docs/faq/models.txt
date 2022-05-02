@@ -37,8 +37,8 @@ call ``reset_queries()``, like this::
     from django.db import reset_queries
     reset_queries()
 
-Can I use Django with a pre-existing database?
-==============================================
+Can I use Django with a preexisting database?
+=============================================
 
 Yes. See :doc:`Integrating with a legacy database </howto/legacy-databases>`.
 

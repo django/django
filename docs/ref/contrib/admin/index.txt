@@ -1392,9 +1392,9 @@ templates used by the :class:`ModelAdmin` views:
 
     This method may be overridden with your own custom search method. For
     example, you might wish to search by an integer field, or use an external
-    tool such as Solr or Haystack. You must establish if the queryset changes
-    implemented by your search method may introduce duplicates into the results,
-    and return ``True`` in the second element of the return value.
+    tool such as `Solr`_ or `Haystack`_. You must establish if the queryset
+    changes implemented by your search method may introduce duplicates into the
+    results, and return ``True`` in the second element of the return value.
 
     For example, to search by ``name`` and ``age``, you could use::
 
@@ -1434,6 +1434,9 @@ templates used by the :class:`ModelAdmin` views:
 
         See the :ref:`spanning-multi-valued-relationships` topic for more
         discussion of this difference.
+
+.. _Solr: https://solr.apache.org
+.. _Haystack: https://haystacksearch.org
 
 .. method:: ModelAdmin.save_related(request, form, formsets, change)
 

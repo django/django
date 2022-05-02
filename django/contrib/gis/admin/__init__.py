@@ -27,8 +27,8 @@ __all__ = [
     "register",
     "site",
     "GISModelAdmin",
-    "OpenLayersWidget",
     # RemovedInDjango50Warning.
     "GeoModelAdmin",
+    "OpenLayersWidget",
     "OSMGeoAdmin",
 ]

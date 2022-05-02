@@ -508,7 +508,7 @@ class ModelAdminTests(TestCase):
 
         self.assertHTMLEqual(
             str(form["main_band"]),
-            '<div class="related-widget-wrapper">'
+            '<div class="related-widget-wrapper" data-model-ref="band">'
             '<select name="main_band" id="id_main_band" required>'
             '<option value="" selected>---------</option>'
             '<option value="%d">The Beatles</option>'
@@ -531,7 +531,7 @@ class ModelAdminTests(TestCase):
 
         self.assertHTMLEqual(
             str(form["main_band"]),
-            '<div class="related-widget-wrapper">'
+            '<div class="related-widget-wrapper" data-model-ref="band">'
             '<select name="main_band" id="id_main_band" required>'
             '<option value="" selected>---------</option>'
             '<option value="%d">The Doors</option>'

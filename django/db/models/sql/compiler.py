@@ -653,7 +653,12 @@ class SQLCompiler:
                 params.extend(f_params)
 
                 if self.query.select_for_update and features.has_select_for_update:
-                    if self.connection.get_autocommit():
+                    if (
+                        self.connection.get_autocommit()
+                        # Don't raise an exception when database doesn't
+                        # support transactions, as it's a noop.
+                        and features.supports_transactions
+                    ):
                         raise TransactionManagementError(
                             "select_for_update cannot be used outside of a transaction."
                         )
@@ -1429,9 +1434,8 @@ class SQLCompiler:
         result = list(self.execute_sql())
         # Some backends return 1 item tuples with strings, and others return
         # tuples with integers and strings. Flatten them out into strings.
-        output_formatter = (
-            json.dumps if self.query.explain_info.format == "json" else str
-        )
+        format_ = self.query.explain_info.format
+        output_formatter = json.dumps if format_ and format_.lower() == "json" else str
         for row in result[0]:
             if not isinstance(row, str):
                 yield " ".join(output_formatter(c) for c in row)
@@ -1441,7 +1445,7 @@ class SQLCompiler:
 
 class SQLInsertCompiler(SQLCompiler):
     returning_fields = None
-    returning_params = tuple()
+    returning_params = ()
 
     def field_as_sql(self, field, val):
         """

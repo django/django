@@ -148,10 +148,33 @@
     border-bottom: none;
 }
 
-#changelist-filter h3 {
+#changelist-filter h3,
+#changelist-filter details summary {
     font-weight: 400;
     padding: 0 15px;
     margin-bottom: 10px;
+}
+
+#changelist-filter details summary > * {
+    display: inline;
+}
+
+#changelist-filter details > summary {
+    list-style-type: none;
+}
+
+#changelist-filter details > summary::-webkit-details-marker {
+    display: none;
+}
+
+#changelist-filter details > summary::before {
+    content: '→';
+    font-weight: bold;
+    color: var(--link-hover-color);
+}
+
+#changelist-filter details[open] > summary::before {
+    content: '↓';
 }
 
 #changelist-filter ul {

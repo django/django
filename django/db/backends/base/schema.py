@@ -275,10 +275,11 @@ class BaseDatabaseSchemaEditor:
 
     # Field <-> database mapping functions
 
-    def _iter_column_sql(self, column_db_type, params, model, field, include_default):
+    def _iter_column_sql(
+        self, column_db_type, params, model, field, field_db_params, include_default
+    ):
         yield column_db_type
-        collation = getattr(field, "db_collation", None)
-        if collation:
+        if collation := field_db_params.get("collation"):
             yield self._collate_sql(collation)
         # Work out nullability.
         null = field.null
@@ -335,8 +336,8 @@ class BaseDatabaseSchemaEditor:
         had set_attributes_from_name() called.
         """
         # Get the column's type and use that as the basis of the SQL.
-        db_params = field.db_parameters(connection=self.connection)
-        column_db_type = db_params["type"]
+        field_db_params = field.db_parameters(connection=self.connection)
+        column_db_type = field_db_params["type"]
         # Check for fields that aren't actually columns (e.g. M2M).
         if column_db_type is None:
             return None, None
@@ -345,7 +346,12 @@ class BaseDatabaseSchemaEditor:
             " ".join(
                 # This appends to the params being returned.
                 self._iter_column_sql(
-                    column_db_type, params, model, field, include_default
+                    column_db_type,
+                    params,
+                    model,
+                    field,
+                    field_db_params,
+                    include_default,
                 )
             ),
             params,
@@ -817,13 +823,15 @@ class BaseDatabaseSchemaEditor:
                 self.execute(self._delete_unique_sql(model, constraint_name))
         # Drop incoming FK constraints if the field is a primary key or unique,
         # which might be a to_field target, and things are going to change.
+        old_collation = old_db_params.get("collation")
+        new_collation = new_db_params.get("collation")
         drop_foreign_keys = (
             self.connection.features.supports_foreign_keys
             and (
                 (old_field.primary_key and new_field.primary_key)
                 or (old_field.unique and new_field.unique)
             )
-            and old_type != new_type
+            and ((old_type != new_type) or (old_collation != new_collation))
         )
         if drop_foreign_keys:
             # '_meta.related_field' also contains M2M reverse fields, these
@@ -904,9 +912,10 @@ class BaseDatabaseSchemaEditor:
         actions = []
         null_actions = []
         post_actions = []
+        # Type suffix change? (e.g. auto increment).
+        old_type_suffix = old_field.db_type_suffix(connection=self.connection)
+        new_type_suffix = new_field.db_type_suffix(connection=self.connection)
         # Collation change?
-        old_collation = getattr(old_field, "db_collation", None)
-        new_collation = getattr(new_field, "db_collation", None)
         if old_collation != new_collation:
             # Collation change handles also a type change.
             fragment = self._alter_column_collation_sql(
@@ -914,7 +923,7 @@ class BaseDatabaseSchemaEditor:
             )
             actions.append(fragment)
         # Type change?
-        elif old_type != new_type:
+        elif (old_type, old_type_suffix) != (new_type, new_type_suffix):
             fragment, other_actions = self._alter_column_type_sql(
                 model, old_field, new_field, new_type
             )
@@ -1029,9 +1038,22 @@ class BaseDatabaseSchemaEditor:
         for old_rel, new_rel in rels_to_update:
             rel_db_params = new_rel.field.db_parameters(connection=self.connection)
             rel_type = rel_db_params["type"]
-            fragment, other_actions = self._alter_column_type_sql(
-                new_rel.related_model, old_rel.field, new_rel.field, rel_type
-            )
+            rel_collation = rel_db_params.get("collation")
+            old_rel_db_params = old_rel.field.db_parameters(connection=self.connection)
+            old_rel_collation = old_rel_db_params.get("collation")
+            if old_rel_collation != rel_collation:
+                # Collation change handles also a type change.
+                fragment = self._alter_column_collation_sql(
+                    new_rel.related_model,
+                    new_rel.field,
+                    rel_type,
+                    rel_collation,
+                )
+                other_actions = []
+            else:
+                fragment, other_actions = self._alter_column_type_sql(
+                    new_rel.related_model, old_rel.field, new_rel.field, rel_type
+                )
             self.execute(
                 self.sql_alter_column
                 % {

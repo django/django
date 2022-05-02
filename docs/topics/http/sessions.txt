@@ -609,7 +609,7 @@ of ``request.session`` as described above in `using sessions in views`_.
 .. note::
 
     Some browsers (Chrome, for example) provide settings that allow users to
-    continue browsing sessions after closing and re-opening the browser. In
+    continue browsing sessions after closing and reopening the browser. In
     some cases, this can interfere with the
     :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE` setting and prevent sessions
     from expiring on browser close. Please be aware of this while testing

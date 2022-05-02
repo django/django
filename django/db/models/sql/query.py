@@ -27,6 +27,7 @@ from django.db.models.expressions import (
     OuterRef,
     Ref,
     ResolvedOuterRef,
+    Value,
 )
 from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
@@ -40,9 +41,18 @@ from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
 from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
 from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
 from django.utils.functional import cached_property
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.tree import Node
 
 __all__ = ["Query", "RawQuery"]
+
+# Quotation marks ('"`[]), whitespace characters, semicolons, or inline
+# SQL comments are forbidden in column aliases.
+FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|--|/\*|\*/")
+
+# Inspired from
+# https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+EXPLAIN_OPTIONS_PATTERN = _lazy_re_compile(r"[\w\-]+")
 
 
 def get_field_names_from_opts(opts):
@@ -553,7 +563,7 @@ class Query(BaseExpression):
 
     def exists(self, using, limit=True):
         q = self.clone()
-        if not q.distinct:
+        if not (q.distinct and q.is_sliced):
             if q.group_by is True:
                 q.add_fields(
                     (f.attname for f in self.model._meta.concrete_fields), False
@@ -573,8 +583,7 @@ class Query(BaseExpression):
         q.clear_ordering(force=True)
         if limit:
             q.set_limits(high=1)
-        q.add_extra({"a": 1}, None, None, None, None, None)
-        q.set_extra_mask(["a"])
+        q.add_annotation(Value(1), "a")
         return q
 
     def has_results(self, using):
@@ -584,6 +593,12 @@ class Query(BaseExpression):
 
     def explain(self, using, format=None, **options):
         q = self.clone()
+        for option_name in options:
+            if (
+                not EXPLAIN_OPTIONS_PATTERN.fullmatch(option_name)
+                or "--" in option_name
+            ):
+                raise ValueError(f"Invalid option name: {option_name!r}.")
         q.explain_info = ExplainInfo(format, options)
         compiler = q.get_compiler(using=using)
         return "\n".join(compiler.explain_query())
@@ -1091,8 +1106,16 @@ class Query(BaseExpression):
             alias = seen[int_model] = join_info.joins[-1]
         return alias or seen[None]
 
+    def check_alias(self, alias):
+        if FORBIDDEN_ALIAS_PATTERN.search(alias):
+            raise ValueError(
+                "Column aliases cannot contain whitespace characters, quotation marks, "
+                "semicolons, or SQL comments."
+            )
+
     def add_annotation(self, annotation, alias, is_summary=False, select=True):
         """Add a single annotation expression to the Query."""
+        self.check_alias(alias)
         annotation = annotation.resolve_expression(
             self, allow_joins=True, reuse=None, summarize=is_summary
         )
@@ -2269,6 +2292,7 @@ class Query(BaseExpression):
             else:
                 param_iter = iter([])
             for name, entry in select.items():
+                self.check_alias(name)
                 entry = str(entry)
                 entry_params = []
                 pos = entry.find("%s")

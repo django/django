@@ -18,6 +18,7 @@ from django.contrib.auth.models import Permission, User
 from django.contrib.auth.views import (
     INTERNAL_RESET_SESSION_TOKEN,
     LoginView,
+    RedirectURLMixin,
     logout_then_login,
     redirect_to_login,
 )
@@ -38,6 +39,20 @@ from django.utils.http import urlsafe_base64_encode
 from .client import PasswordResetConfirmClient
 from .models import CustomUser, UUIDUser
 from .settings import AUTH_TEMPLATES
+
+
+class RedirectURLMixinTests(TestCase):
+    @override_settings(ROOT_URLCONF="auth_tests.urls")
+    def test_get_default_redirect_url_next_page(self):
+        class RedirectURLView(RedirectURLMixin):
+            next_page = "/custom/"
+
+        self.assertEqual(RedirectURLView().get_default_redirect_url(), "/custom/")
+
+    def test_get_default_redirect_url_no_next_page(self):
+        msg = "No URL to redirect to. Provide a next_page."
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            RedirectURLMixin().get_default_redirect_url()
 
 
 @override_settings(
@@ -984,6 +999,8 @@ class LogoutThenLoginTests(AuthViewsTestCase):
         csrf_token = get_token(req)
         req.COOKIES[settings.CSRF_COOKIE_NAME] = csrf_token
         req.POST = {"csrfmiddlewaretoken": csrf_token}
+        req.META["SERVER_NAME"] = "testserver"
+        req.META["SERVER_PORT"] = 80
         req.session = self.client.session
         response = logout_then_login(req)
         self.confirm_logged_out()
@@ -996,6 +1013,8 @@ class LogoutThenLoginTests(AuthViewsTestCase):
         csrf_token = get_token(req)
         req.COOKIES[settings.CSRF_COOKIE_NAME] = csrf_token
         req.POST = {"csrfmiddlewaretoken": csrf_token}
+        req.META["SERVER_NAME"] = "testserver"
+        req.META["SERVER_PORT"] = 80
         req.session = self.client.session
         response = logout_then_login(req, login_url="/custom/")
         self.confirm_logged_out()
@@ -1007,6 +1026,8 @@ class LogoutThenLoginTests(AuthViewsTestCase):
         self.login()
         req = HttpRequest()
         req.method = "GET"
+        req.META["SERVER_NAME"] = "testserver"
+        req.META["SERVER_PORT"] = 80
         req.session = self.client.session
         response = logout_then_login(req)
         # RemovedInDjango50Warning: When the deprecation ends, replace with
@@ -1335,11 +1356,18 @@ class LogoutTest(AuthViewsTestCase):
         response = self.client.post("/logout/")
         self.assertRedirects(response, "/custom/", fetch_redirect_response=False)
 
+    @override_settings(LOGOUT_REDIRECT_URL="/custom/")
+    def test_logout_redirect_url_setting_allowed_hosts_unsafe_host(self):
+        self.login()
+        response = self.client.post("/logout/allowed_hosts/?next=https://evil/")
+        self.assertRedirects(response, "/custom/", fetch_redirect_response=False)
+
     @override_settings(LOGOUT_REDIRECT_URL="logout")
     def test_logout_redirect_url_named_setting(self):
         self.login()
         response = self.client.post("/logout/")
-        self.assertRedirects(response, "/logout/", fetch_redirect_response=False)
+        self.assertContains(response, "Logged out")
+        self.confirm_logged_out()
 
 
 def get_perm(Model, perm):

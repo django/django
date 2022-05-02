@@ -377,7 +377,7 @@ For example, to output the data as a compressed JSON file::
 Removes all data from the database and re-executes any post-synchronization
 handlers. The table of which migrations have been applied is not cleared.
 
-If you would rather start from an empty database and re-run all migrations, you
+If you would rather start from an empty database and rerun all migrations, you
 should drop and recreate the database and then run :djadmin:`migrate` instead.
 
 .. django-admin-option:: --noinput, --no-input

@@ -1,8 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
-from django.db import IntegrityError
 from django.db.models import Q
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
 from .models import (
     AllowsNullGFK,
@@ -501,14 +500,26 @@ class GenericRelationsTests(TestCase):
         with self.assertRaisesMessage(FieldError, msg):
             TaggedItem.objects.get(content_object="")
 
-    def test_unsaved_instance_on_generic_foreign_key(self):
-        """
-        Assigning an unsaved object to GenericForeignKey should raise an
-        exception on model.save().
-        """
+    def test_unsaved_generic_foreign_key_parent_save(self):
         quartz = Mineral(name="Quartz", hardness=7)
-        with self.assertRaises(IntegrityError):
-            TaggedItem.objects.create(tag="shiny", content_object=quartz)
+        tagged_item = TaggedItem(tag="shiny", content_object=quartz)
+        msg = (
+            "save() prohibited to prevent data loss due to unsaved related object "
+            "'content_object'."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            tagged_item.save()
+
+    @skipUnlessDBFeature("has_bulk_insert")
+    def test_unsaved_generic_foreign_key_parent_bulk_create(self):
+        quartz = Mineral(name="Quartz", hardness=7)
+        tagged_item = TaggedItem(tag="shiny", content_object=quartz)
+        msg = (
+            "bulk_create() prohibited to prevent data loss due to unsaved related "
+            "object 'content_object'."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            TaggedItem.objects.bulk_create([tagged_item])
 
     def test_cache_invalidation_for_content_type_id(self):
         # Create a Vegetable and Mineral with the same id.

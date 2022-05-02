@@ -1061,8 +1061,8 @@ Miscellaneous
 
 * ``django.http.responses.REASON_PHRASES`` and
   ``django.core.handlers.wsgi.STATUS_CODE_TEXT`` have been removed. Use
-  Python's stdlib instead: :data:`http.client.responses` for Python 3 and
-  `httplib.responses`_ for Python 2.
+  Python's Standard Library instead: :data:`http.client.responses` for Python
+  3 and `httplib.responses`_ for Python 2.
 
   .. _`httplib.responses`: https://docs.python.org/2/library/httplib.html#httplib.responses
 

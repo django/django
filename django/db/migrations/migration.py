@@ -103,15 +103,14 @@ class Migration:
             # there instead
             if collect_sql:
                 schema_editor.collected_sql.append("--")
-                if not operation.reduces_to_sql:
-                    schema_editor.collected_sql.append(
-                        "-- MIGRATION NOW PERFORMS OPERATION THAT CANNOT BE WRITTEN AS "
-                        "SQL:"
-                    )
                 schema_editor.collected_sql.append("-- %s" % operation.describe())
                 schema_editor.collected_sql.append("--")
                 if not operation.reduces_to_sql:
+                    schema_editor.collected_sql.append(
+                        "-- THIS OPERATION CANNOT BE WRITTEN AS SQL"
+                    )
                     continue
+                collected_sql_before = len(schema_editor.collected_sql)
             # Save the state before the operation has run
             old_state = project_state.clone()
             operation.state_forwards(self.app_label, project_state)
@@ -131,6 +130,8 @@ class Migration:
                 operation.database_forwards(
                     self.app_label, schema_editor, old_state, project_state
                 )
+            if collect_sql and collected_sql_before == len(schema_editor.collected_sql):
+                schema_editor.collected_sql.append("-- (no-op)")
         return project_state
 
     def unapply(self, project_state, schema_editor, collect_sql=False):
@@ -167,15 +168,14 @@ class Migration:
         for operation, to_state, from_state in to_run:
             if collect_sql:
                 schema_editor.collected_sql.append("--")
-                if not operation.reduces_to_sql:
-                    schema_editor.collected_sql.append(
-                        "-- MIGRATION NOW PERFORMS OPERATION THAT CANNOT BE WRITTEN AS "
-                        "SQL:"
-                    )
                 schema_editor.collected_sql.append("-- %s" % operation.describe())
                 schema_editor.collected_sql.append("--")
                 if not operation.reduces_to_sql:
+                    schema_editor.collected_sql.append(
+                        "-- THIS OPERATION CANNOT BE WRITTEN AS SQL"
+                    )
                     continue
+                collected_sql_before = len(schema_editor.collected_sql)
             atomic_operation = operation.atomic or (
                 self.atomic and operation.atomic is not False
             )
@@ -191,6 +191,8 @@ class Migration:
                 operation.database_backwards(
                     self.app_label, schema_editor, from_state, to_state
                 )
+            if collect_sql and collected_sql_before == len(schema_editor.collected_sql):
+                schema_editor.collected_sql.append("-- (no-op)")
         return project_state
 
     def suggest_name(self):

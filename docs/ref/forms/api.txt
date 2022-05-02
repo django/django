@@ -527,12 +527,18 @@ a form object, and each rendering method returns a string.
 
 .. attribute:: Form.template_name
 
-The name of a template that is going to be rendered if the form is cast into a
-string, e.g. via ``print(form)`` or in a template via ``{{ form }}``. By
-default this template is ``'django/forms/default.html'``, which is a proxy for
-``'django/forms/table.html'``. The template can be changed per form by
-overriding the ``template_name`` attribute or more generally by overriding the
-default template, see also :ref:`overriding-built-in-form-templates`.
+The name of the template rendered if the form is cast into a string, e.g. via
+``print(form)`` or in a template via ``{{ form }}``.
+
+By default, a property returning the value of the renderer's
+:attr:`~django.forms.renderers.BaseRenderer.form_template_name`. You may set it
+as a string template name in order to override that for a particular form
+class.
+
+.. versionchanged:: 4.1
+
+    In older versions ``template_name`` defaulted to the string value
+    ``'django/forms/default.html'``.
 
 ``template_name_label``
 -----------------------

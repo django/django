@@ -323,6 +323,8 @@ class LookupTests(TestCase):
         with register_lookup(models.ForeignObject, Exactly):
             # getting the lookups again should re-cache
             self.assertIn("exactly", field.get_lookups())
+        # Unregistration should bust the cache.
+        self.assertNotIn("exactly", field.get_lookups())
 
 
 class BilateralTransformTests(TestCase):

@@ -2070,7 +2070,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
 
     def test_model_multiple_choice_field(self):
         f = forms.ModelMultipleChoiceField(Category.objects.all())
-        self.assertEqual(
+        self.assertCountEqual(
             list(f.choices),
             [
                 (self.c1.pk, "Entertainment"),
@@ -2098,7 +2098,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
             [self.c1, self.c2],
         )
         with self.assertRaises(ValidationError):
-            f.clean(["100"])
+            f.clean(["0"])
         with self.assertRaises(ValidationError):
             f.clean("hello")
         with self.assertRaises(ValidationError):
@@ -2139,7 +2139,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
 
         # queryset can be changed after the field is created.
         f.queryset = Category.objects.exclude(name="Third")
-        self.assertEqual(
+        self.assertCountEqual(
             list(f.choices),
             [(self.c1.pk, "Entertainment"), (self.c2.pk, "It's a test")],
         )
@@ -2151,7 +2151,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
 
         f.queryset = Category.objects.all()
         f.label_from_instance = lambda obj: "multicategory " + str(obj)
-        self.assertEqual(
+        self.assertCountEqual(
             list(f.choices),
             [
                 (self.c1.pk, "multicategory Entertainment"),

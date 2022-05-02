@@ -66,7 +66,6 @@ class BaseForm(RenderableFormMixin):
     prefix = None
     use_required_attribute = True
 
-    template_name = "django/forms/default.html"
     template_name_p = "django/forms/p.html"
     template_name_table = "django/forms/table.html"
     template_name_ul = "django/forms/ul.html"
@@ -315,6 +314,10 @@ class BaseForm(RenderableFormMixin):
                 # hidden fields.
                 output.append(str_hidden)
         return mark_safe("\n".join(output))
+
+    @property
+    def template_name(self):
+        return self.renderer.form_template_name
 
     def get_context(self):
         fields = []

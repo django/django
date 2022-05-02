@@ -212,7 +212,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         with register_lookup(DecimalField, Floor):
             books = Book.objects.annotate(floor_price=F("price__floor"))
 
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             books.values_list("pk", "floor_price"),
             [
                 (self.b1.pk, 30),
@@ -1076,6 +1076,40 @@ class NonAggregateAnnotationTestCase(TestCase):
             ],
         )
 
+    def test_alias_sql_injection(self):
+        crafted_alias = """injected_name" from "annotations_book"; --"""
+        msg = (
+            "Column aliases cannot contain whitespace characters, quotation marks, "
+            "semicolons, or SQL comments."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Book.objects.annotate(**{crafted_alias: Value(1)})
+
+    def test_alias_forbidden_chars(self):
+        tests = [
+            'al"ias',
+            "a'lias",
+            "ali`as",
+            "alia s",
+            "alias\t",
+            "ali\nas",
+            "alias--",
+            "ali/*as",
+            "alias*/",
+            "alias;",
+            # [] are used by MSSQL.
+            "alias[",
+            "alias]",
+        ]
+        msg = (
+            "Column aliases cannot contain whitespace characters, quotation marks, "
+            "semicolons, or SQL comments."
+        )
+        for crafted_alias in tests:
+            with self.subTest(crafted_alias):
+                with self.assertRaisesMessage(ValueError, msg):
+                    Book.objects.annotate(**{crafted_alias: Value(1)})
+
 
 class AliasTests(TestCase):
     @classmethod
@@ -1339,3 +1373,12 @@ class AliasTests(TestCase):
             with self.subTest(operation=operation):
                 with self.assertRaisesMessage(FieldError, msg):
                     getattr(qs, operation)("rating_alias")
+
+    def test_alias_sql_injection(self):
+        crafted_alias = """injected_name" from "annotations_book"; --"""
+        msg = (
+            "Column aliases cannot contain whitespace characters, quotation marks, "
+            "semicolons, or SQL comments."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Book.objects.alias(**{crafted_alias: Value(1)})
