@@ -7,6 +7,13 @@ from django.db.backends.utils import strip_quotes
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
+    # Setting all constraints to IMMEDIATE to allow changing data in the same
+    # transaction.
+    sql_update_with_default = (
+        "UPDATE %(table)s SET %(column)s = %(default)s WHERE %(column)s IS NULL"
+        "; SET CONSTRAINTS ALL IMMEDIATE"
+    )
+
     sql_delete_sequence = "DROP SEQUENCE IF EXISTS %(sequence)s CASCADE"
 
     sql_create_index = (
