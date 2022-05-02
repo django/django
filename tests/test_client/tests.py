@@ -43,7 +43,7 @@ from .views import TwoArgException, get_view, post_view, trace_view
 
 def middleware_urlconf(get_response):
     def middleware(request):
-        request.urlconf = "tests.test_client.urls_middleware_urlconf"
+        request.urlconf = "test_client.urls_middleware_urlconf"
         return get_response(request)
 
     return middleware
@@ -52,7 +52,7 @@ def middleware_urlconf(get_response):
 @async_only_middleware
 def async_middleware_urlconf(get_response):
     async def middleware(request):
-        request.urlconf = "tests.test_client.urls_middleware_urlconf"
+        request.urlconf = "test_client.urls_middleware_urlconf"
         return await get_response(request)
 
     return middleware
