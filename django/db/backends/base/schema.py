@@ -131,6 +131,7 @@ class BaseDatabaseSchemaEditor:
         "CREATE UNIQUE INDEX %(name)s ON %(table)s "
         "(%(columns)s)%(include)s%(condition)s"
     )
+    sql_rename_index = "ALTER INDEX %(old_name)s RENAME TO %(new_name)s"
     sql_delete_index = "DROP INDEX %(name)s"
 
     sql_create_pk = (
@@ -491,6 +492,16 @@ class BaseDatabaseSchemaEditor:
         ):
             return None
         self.execute(index.remove_sql(model, self))
+
+    def rename_index(self, model, old_index, new_index):
+        if self.connection.features.can_rename_index:
+            self.execute(
+                self._rename_index_sql(model, old_index.name, new_index.name),
+                params=None,
+            )
+        else:
+            self.remove_index(model, old_index)
+            self.add_index(model, new_index)
 
     def add_constraint(self, model, constraint):
         """Add a constraint to a model."""
@@ -1359,6 +1370,14 @@ class BaseDatabaseSchemaEditor:
             sql or self.sql_delete_index,
             table=Table(model._meta.db_table, self.quote_name),
             name=self.quote_name(name),
+        )
+
+    def _rename_index_sql(self, model, old_name, new_name):
+        return Statement(
+            self.sql_rename_index,
+            table=Table(model._meta.db_table, self.quote_name),
+            old_name=self.quote_name(old_name),
+            new_name=self.quote_name(new_name),
         )
 
     def _index_columns(self, table, columns, col_suffixes, opclasses):

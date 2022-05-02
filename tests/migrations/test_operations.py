@@ -2900,6 +2900,120 @@ class OperationTests(OperationTestBase):
         self.unapply_operations("test_rmin", project_state, operations=operations)
         self.assertIndexExists("test_rmin_pony", ["pink", "weight"])
 
+    def test_rename_index(self):
+        app_label = "test_rnin"
+        project_state = self.set_up_test_model(app_label, index=True)
+        table_name = app_label + "_pony"
+        self.assertIndexNameExists(table_name, "pony_pink_idx")
+        self.assertIndexNameNotExists(table_name, "new_pony_test_idx")
+        operation = migrations.RenameIndex(
+            "Pony", new_name="new_pony_test_idx", old_name="pony_pink_idx"
+        )
+        self.assertEqual(
+            operation.describe(),
+            "Rename index pony_pink_idx on Pony to new_pony_test_idx",
+        )
+        self.assertEqual(
+            operation.migration_name_fragment,
+            "rename_pony_pink_idx_new_pony_test_idx",
+        )
+
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        # Rename index.
+        expected_queries = 1 if connection.features.can_rename_index else 2
+        with connection.schema_editor() as editor, self.assertNumQueries(
+            expected_queries
+        ):
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertIndexNameNotExists(table_name, "pony_pink_idx")
+        self.assertIndexNameExists(table_name, "new_pony_test_idx")
+        # Reversal.
+        with connection.schema_editor() as editor, self.assertNumQueries(
+            expected_queries
+        ):
+            operation.database_backwards(app_label, editor, new_state, project_state)
+        self.assertIndexNameExists(table_name, "pony_pink_idx")
+        self.assertIndexNameNotExists(table_name, "new_pony_test_idx")
+        # Deconstruction.
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "RenameIndex")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(
+            definition[2],
+            {
+                "model_name": "Pony",
+                "old_name": "pony_pink_idx",
+                "new_name": "new_pony_test_idx",
+            },
+        )
+
+    def test_rename_index_arguments(self):
+        msg = "RenameIndex.old_name and old_fields are mutually exclusive."
+        with self.assertRaisesMessage(ValueError, msg):
+            migrations.RenameIndex(
+                "Pony",
+                new_name="new_idx_name",
+                old_name="old_idx_name",
+                old_fields=("weight", "pink"),
+            )
+        msg = "RenameIndex requires one of old_name and old_fields arguments to be set."
+        with self.assertRaisesMessage(ValueError, msg):
+            migrations.RenameIndex("Pony", new_name="new_idx_name")
+
+    def test_rename_index_unnamed_index(self):
+        app_label = "test_rninui"
+        project_state = self.set_up_test_model(app_label, index_together=True)
+        table_name = app_label + "_pony"
+        self.assertIndexNameNotExists(table_name, "new_pony_test_idx")
+        operation = migrations.RenameIndex(
+            "Pony", new_name="new_pony_test_idx", old_fields=("weight", "pink")
+        )
+        self.assertEqual(
+            operation.describe(),
+            "Rename unnamed index for ('weight', 'pink') on Pony to new_pony_test_idx",
+        )
+        self.assertEqual(
+            operation.migration_name_fragment,
+            "rename_pony_weight_pink_new_pony_test_idx",
+        )
+
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        # Rename index.
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertIndexNameExists(table_name, "new_pony_test_idx")
+        # Reverse is a no-op.
+        with connection.schema_editor() as editor, self.assertNumQueries(0):
+            operation.database_backwards(app_label, editor, new_state, project_state)
+        self.assertIndexNameExists(table_name, "new_pony_test_idx")
+        # Deconstruction.
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "RenameIndex")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(
+            definition[2],
+            {
+                "model_name": "Pony",
+                "new_name": "new_pony_test_idx",
+                "old_fields": ("weight", "pink"),
+            },
+        )
+
+    def test_rename_index_unknown_unnamed_index(self):
+        app_label = "test_rninuui"
+        project_state = self.set_up_test_model(app_label)
+        operation = migrations.RenameIndex(
+            "Pony", new_name="new_pony_test_idx", old_fields=("weight", "pink")
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        msg = "Found wrong number (0) of indexes for test_rninuui_pony(weight, pink)."
+        with connection.schema_editor() as editor:
+            with self.assertRaisesMessage(ValueError, msg):
+                operation.database_forwards(app_label, editor, project_state, new_state)
+
     def test_add_index_state_forwards(self):
         project_state = self.set_up_test_model("test_adinsf")
         index = models.Index(fields=["pink"], name="test_adinsf_pony_pink_idx")
@@ -2922,6 +3036,35 @@ class OperationTests(OperationTestBase):
         operation.state_forwards("test_rminsf", new_state)
         new_model = new_state.apps.get_model("test_rminsf", "Pony")
         self.assertIsNot(old_model, new_model)
+
+    def test_rename_index_state_forwards(self):
+        app_label = "test_rnidsf"
+        project_state = self.set_up_test_model(app_label, index=True)
+        old_model = project_state.apps.get_model(app_label, "Pony")
+        new_state = project_state.clone()
+
+        operation = migrations.RenameIndex(
+            "Pony", new_name="new_pony_pink_idx", old_name="pony_pink_idx"
+        )
+        operation.state_forwards(app_label, new_state)
+        new_model = new_state.apps.get_model(app_label, "Pony")
+        self.assertIsNot(old_model, new_model)
+        self.assertEqual(new_model._meta.indexes[0].name, "new_pony_pink_idx")
+
+    def test_rename_index_state_forwards_unnamed_index(self):
+        app_label = "test_rnidsfui"
+        project_state = self.set_up_test_model(app_label, index_together=True)
+        old_model = project_state.apps.get_model(app_label, "Pony")
+        new_state = project_state.clone()
+
+        operation = migrations.RenameIndex(
+            "Pony", new_name="new_pony_pink_idx", old_fields=("weight", "pink")
+        )
+        operation.state_forwards(app_label, new_state)
+        new_model = new_state.apps.get_model(app_label, "Pony")
+        self.assertIsNot(old_model, new_model)
+        self.assertEqual(new_model._meta.index_together, tuple())
+        self.assertEqual(new_model._meta.indexes[0].name, "new_pony_pink_idx")
 
     @skipUnlessDBFeature("supports_expression_indexes")
     def test_add_func_index(self):

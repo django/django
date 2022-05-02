@@ -12,6 +12,7 @@ from .models import (
     DeleteModel,
     RemoveConstraint,
     RemoveIndex,
+    RenameIndex,
     RenameModel,
 )
 from .special import RunPython, RunSQL, SeparateDatabaseAndState
@@ -26,6 +27,7 @@ __all__ = [
     "AlterModelOptions",
     "AddIndex",
     "RemoveIndex",
+    "RenameIndex",
     "AddField",
     "RemoveField",
     "AlterField",

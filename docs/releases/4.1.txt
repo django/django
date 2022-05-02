@@ -342,7 +342,10 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* The new :class:`~django.db.migrations.operations.RenameIndex` operation
+  allows renaming indexes defined in the
+  :attr:`Meta.indexes <django.db.models.Options.indexes>` or
+  :attr:`~django.db.models.Options.index_together` options.
 
 Models
 ~~~~~~

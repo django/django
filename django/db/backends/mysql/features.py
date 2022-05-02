@@ -344,3 +344,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             and self._mysql_storage_engine != "MyISAM"
             and self.connection.mysql_version >= (8, 0, 13)
         )
+
+    @cached_property
+    def can_rename_index(self):
+        if self.connection.mysql_is_mariadb:
+            return self.connection.mysql_version >= (10, 5, 2)
+        return True

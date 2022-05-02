@@ -187,6 +187,14 @@ class ProjectState:
                     model_state.options.pop(key, False)
         self.reload_model(app_label, model_name, delay=True)
 
+    def remove_model_options(self, app_label, model_name, option_name, value_to_remove):
+        model_state = self.models[app_label, model_name]
+        if objs := model_state.options.get(option_name):
+            model_state.options[option_name] = [
+                obj for obj in objs if tuple(obj) != tuple(value_to_remove)
+            ]
+        self.reload_model(app_label, model_name, delay=True)
+
     def alter_model_managers(self, app_label, model_name, managers):
         model_state = self.models[app_label, model_name]
         model_state.managers = list(managers)
@@ -208,6 +216,20 @@ class ProjectState:
 
     def remove_index(self, app_label, model_name, index_name):
         self._remove_option(app_label, model_name, "indexes", index_name)
+
+    def rename_index(self, app_label, model_name, old_index_name, new_index_name):
+        model_state = self.models[app_label, model_name]
+        objs = model_state.options["indexes"]
+
+        new_indexes = []
+        for obj in objs:
+            if obj.name == old_index_name:
+                obj = obj.clone()
+                obj.name = new_index_name
+            new_indexes.append(obj)
+
+        model_state.options["indexes"] = new_indexes
+        self.reload_model(app_label, model_name, delay=True)
 
     def add_constraint(self, app_label, model_name, constraint):
         self._append_option(app_label, model_name, "constraints", constraint)
