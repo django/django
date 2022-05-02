@@ -137,6 +137,7 @@
     background: var(--darkened-bg);
     border-left: none;
     margin: 0 0 0 30px;
+    word-break: break-word;
 }
 
 #changelist-filter h2 {
