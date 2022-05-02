@@ -1,8 +1,27 @@
+from functools import wraps
+
 from django.contrib.syndication import views
 from django.utils import feedgenerator
 from django.utils.timezone import get_fixed_timezone
 
 from .models import Article, Entry
+
+
+def wraps_decorator(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        value = f(*args, **kwargs)
+        return f"{value} -- decorated by @wraps."
+
+    return wrapper
+
+
+def common_decorator(f):
+    def wrapper(*args, **kwargs):
+        value = f(*args, **kwargs)
+        return f"{value} -- common decorated."
+
+    return wrapper
 
 
 class TestRss2Feed(views.Feed):
@@ -47,10 +66,44 @@ class TestRss2FeedWithCallableObject(TestRss2Feed):
     ttl = TimeToLive()
 
 
-class TestRss2FeedWithStaticMethod(TestRss2Feed):
+class TestRss2FeedWithDecoratedMethod(TestRss2Feed):
+    class TimeToLive:
+        @wraps_decorator
+        def __call__(self):
+            return 800
+
+    @staticmethod
+    @wraps_decorator
+    def feed_copyright():
+        return "Copyright (c) 2022, John Doe"
+
+    ttl = TimeToLive()
+
     @staticmethod
     def categories():
         return ("javascript", "vue")
+
+    @wraps_decorator
+    def title(self):
+        return "Overridden title"
+
+    @wraps_decorator
+    def item_title(self, item):
+        return f"Overridden item title: {item.title}"
+
+    @wraps_decorator
+    def description(self, obj):
+        return "Overridden description"
+
+    @wraps_decorator
+    def item_description(self):
+        return "Overridden item description"
+
+
+class TestRss2FeedWithWrongDecoratedMethod(TestRss2Feed):
+    @common_decorator
+    def item_description(self, item):
+        return f"Overridden item description: {item.title}"
 
 
 class TestRss2FeedWithGuidIsPermaLinkTrue(TestRss2Feed):
