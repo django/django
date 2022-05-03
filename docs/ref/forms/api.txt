@@ -520,8 +520,14 @@ Although ``<table>`` output is the default output style when you ``print`` a
 form, other output styles are available. Each style is available as a method on
 a form object, and each rendering method returns a string.
 
-``template_name``
+Default rendering
 -----------------
+
+The default rendering when you ``print`` a form uses the following methods and
+attributes.
+
+``template_name``
+~~~~~~~~~~~~~~~~~
 
 .. versionadded:: 4.0
 
@@ -540,95 +546,8 @@ class.
     In older versions ``template_name`` defaulted to the string value
     ``'django/forms/default.html'``.
 
-``template_name_label``
------------------------
-
-.. versionadded:: 4.0
-
-.. attribute:: Form.template_name_label
-
-The template used to render a field's ``<label>``, used when calling
-:meth:`BoundField.label_tag`/:meth:`~BoundField.legend_tag`. Can be changed per
-form by overriding this attribute or more generally by overriding the default
-template, see also :ref:`overriding-built-in-form-templates`.
-
-``as_p()``
-----------
-
-.. method:: Form.as_p()
-
-``as_p()`` renders the form using the template assigned to the forms
-``template_name_p`` attribute, by default this template is
-``'django/forms/p.html'``. This template renders the form as a series of
-``<p>`` tags, with each ``<p>`` containing one field::
-
-    >>> f = ContactForm()
-    >>> f.as_p()
-    '<p><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" required></p>\n<p><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" required></p>\n<p><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" required></p>\n<p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself"></p>'
-    >>> print(f.as_p())
-    <p><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" required></p>
-    <p><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" required></p>
-    <p><label for="id_sender">Sender:</label> <input type="email" name="sender" id="id_sender" required></p>
-    <p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself"></p>
-
-``as_ul()``
------------
-
-.. method:: Form.as_ul()
-
-``as_ul()`` renders the form using the template assigned to the forms
-``template_name_ul`` attribute, by default this template is
-``'django/forms/ul.html'``. This template renders the form as a series of
-``<li>`` tags, with each ``<li>`` containing one field. It does *not* include
-the ``<ul>`` or ``</ul>``, so that you can specify any HTML attributes on the
-``<ul>`` for flexibility::
-
-    >>> f = ContactForm()
-    >>> f.as_ul()
-    '<li><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" required></li>\n<li><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" required></li>\n<li><label for="id_sender">Sender:</label> <input type="email" name="sender" id="id_sender" required></li>\n<li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself"></li>'
-    >>> print(f.as_ul())
-    <li><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" required></li>
-    <li><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" required></li>
-    <li><label for="id_sender">Sender:</label> <input type="email" name="sender" id="id_sender" required></li>
-    <li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself"></li>
-
-``as_table()``
---------------
-
-.. method:: Form.as_table()
-
-Finally, ``as_table()`` renders the form using the template assigned to the
-forms ``template_name_table`` attribute, by default this template is
-``'django/forms/table.html'``. This template outputs the form as an HTML
-``<table>``::
-
-    >>> f = ContactForm()
-    >>> f.as_table()
-    '<tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" required></td></tr>\n<tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" required></td></tr>\n<tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" required></td></tr>\n<tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself"></td></tr>'
-    >>> print(f)
-    <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" required></td></tr>
-    <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" required></td></tr>
-    <tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" required></td></tr>
-    <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself"></td></tr>
-
-``get_context()``
------------------
-
-.. versionadded:: 4.0
-
-.. method:: Form.get_context()
-
-Return context for form rendering in a template.
-
-The available context is:
-
-* ``form``: The bound form.
-* ``fields``: All bound fields, except the hidden fields.
-* ``hidden_fields``: All hidden bound fields.
-* ``errors``: All non field related or hidden field related form errors.
-
 ``render()``
-------------
+~~~~~~~~~~~~
 
 .. versionadded:: 4.0
 
@@ -641,6 +560,115 @@ All arguments are optional and default to:
 * ``template_name``: :attr:`.Form.template_name`
 * ``context``: Value returned by :meth:`.Form.get_context`
 * ``renderer``: Value returned by :attr:`.Form.default_renderer`
+
+By passing ``template_name`` you can customize the template used for just a
+single call.
+
+``get_context()``
+~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 4.0
+
+.. method:: Form.get_context()
+
+Return the template context for rendering the form.
+
+The available context is:
+
+* ``form``: The bound form.
+* ``fields``: All bound fields, except the hidden fields.
+* ``hidden_fields``: All hidden bound fields.
+* ``errors``: All non field related or hidden field related form errors.
+
+``template_name_label``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 4.0
+
+.. attribute:: Form.template_name_label
+
+The template used to render a field's ``<label>``, used when calling
+:meth:`BoundField.label_tag`/:meth:`~BoundField.legend_tag`. Can be changed per
+form by overriding this attribute or more generally by overriding the default
+template, see also :ref:`overriding-built-in-form-templates`.
+
+Output styles
+-------------
+
+As well as rendering the form directly, such as in a template with
+``{{ form }}``, the following helper functions serve as a proxy to
+:meth:`Form.render` passing a particular ``template_name`` value.
+
+These helpers are most useful in a template, where you need to override the
+form renderer or form provided value but cannot pass the additional parameter
+to :meth:`~Form.render`. For example, you can render a form as an unordered
+list using ``{{ form.as_ul }}``.
+
+Each helper pairs a form method with an attribute giving the appropriate
+template name.
+
+``as_p()``
+~~~~~~~~~~
+
+.. attribute:: Form.template_name_p
+
+The template used by ``as_p()``. Default: ``'django/forms/p.html'``.
+
+.. method:: Form.as_p()
+
+``as_p()`` renders the form as a series of ``<p>`` tags, with each ``<p>``
+containing one field::
+
+    >>> f = ContactForm()
+    >>> f.as_p()
+    '<p><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" required></p>\n<p><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" required></p>\n<p><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" required></p>\n<p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself"></p>'
+    >>> print(f.as_p())
+    <p><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" required></p>
+    <p><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" required></p>
+    <p><label for="id_sender">Sender:</label> <input type="email" name="sender" id="id_sender" required></p>
+    <p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself"></p>
+
+``as_ul()``
+~~~~~~~~~~~
+
+.. attribute:: Form.template_name_ul
+
+The template used by ``as_ul()``. Default: ``'django/forms/ul.html'``.
+
+.. method:: Form.as_ul()
+
+``as_ul()`` renders the form as a series of ``<li>`` tags, with each ``<li>``
+containing one field. It does *not* include the ``<ul>`` or ``</ul>``, so that
+you can specify any HTML attributes on the ``<ul>`` for flexibility::
+
+    >>> f = ContactForm()
+    >>> f.as_ul()
+    '<li><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" required></li>\n<li><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" required></li>\n<li><label for="id_sender">Sender:</label> <input type="email" name="sender" id="id_sender" required></li>\n<li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself"></li>'
+    >>> print(f.as_ul())
+    <li><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" required></li>
+    <li><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" required></li>
+    <li><label for="id_sender">Sender:</label> <input type="email" name="sender" id="id_sender" required></li>
+    <li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself"></li>
+
+``as_table()``
+~~~~~~~~~~~~~~
+
+.. attribute:: Form.template_name_table
+
+The template used by ``as_table()``. Default: ``'django/forms/table.html'``.
+
+.. method:: Form.as_table()
+
+``as_table()`` renders the form as an HTML ``<table>``::
+
+    >>> f = ContactForm()
+    >>> f.as_table()
+    '<tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" required></td></tr>\n<tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" required></td></tr>\n<tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" required></td></tr>\n<tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself"></td></tr>'
+    >>> print(f)
+    <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" required></td></tr>
+    <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" required></td></tr>
+    <tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" required></td></tr>
+    <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself"></td></tr>
 
 .. _ref-forms-api-styling-form-rows:
 
