@@ -2,7 +2,7 @@
 Django 4.0.5 release notes
 ==========================
 
-*Expected May 3, 2022*
+*Expected June 1, 2022*
 
 Django 4.0.5 fixes several bugs in 4.0.4.
 
