@@ -1,5 +1,15 @@
-from django.db.models import BooleanField, Exists, F, OuterRef, Q
+from django.db.models import (
+    BooleanField,
+    Exists,
+    ExpressionWrapper,
+    F,
+    OuterRef,
+    Q,
+    Value,
+)
 from django.db.models.expressions import RawSQL
+from django.db.models.functions import Lower
+from django.db.models.sql.where import NothingNode
 from django.test import SimpleTestCase
 
 from .models import Tag
@@ -188,3 +198,19 @@ class QTests(SimpleTestCase):
         q = q1 & q2
         path, args, kwargs = q.deconstruct()
         self.assertEqual(Q(*args, **kwargs), q)
+
+    def test_flatten(self):
+        q = Q()
+        self.assertEqual(list(q.flatten()), [q])
+        q = Q(NothingNode())
+        self.assertEqual(list(q.flatten()), [q, q.children[0]])
+        q = Q(
+            ExpressionWrapper(
+                Q(RawSQL("id = 0", params=(), output_field=BooleanField()))
+                | Q(price=Value("4.55"))
+                | Q(name=Lower("category")),
+                output_field=BooleanField(),
+            )
+        )
+        flatten = list(q.flatten())
+        self.assertEqual(len(flatten), 7)
