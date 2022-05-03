@@ -350,6 +350,11 @@ Migrations
   :attr:`Meta.indexes <django.db.models.Options.indexes>` or
   :attr:`~django.db.models.Options.index_together` options.
 
+* The migrations autodetector now generates
+  :class:`~django.db.migrations.operations.RenameIndex` operations instead of
+  ``RemoveIndex`` and ``AddIndex``, when renaming indexes defined in the
+  :attr:`Meta.indexes <django.db.models.Options.indexes>`.
+
 Models
 ~~~~~~
 
