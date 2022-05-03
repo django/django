@@ -179,6 +179,7 @@ class MigrationAutodetector:
         self.generate_removed_indexes()
         # Generate field renaming operations.
         self.generate_renamed_fields()
+        self.generate_renamed_indexes()
         # Generate removal of foo together.
         self.generate_removed_altered_unique_together()
         self.generate_removed_altered_index_together()
@@ -1187,14 +1188,41 @@ class MigrationAutodetector:
 
             old_indexes = old_model_state.options[option_name]
             new_indexes = new_model_state.options[option_name]
-            add_idx = [idx for idx in new_indexes if idx not in old_indexes]
-            rem_idx = [idx for idx in old_indexes if idx not in new_indexes]
+            added_indexes = [idx for idx in new_indexes if idx not in old_indexes]
+            removed_indexes = [idx for idx in old_indexes if idx not in new_indexes]
+            renamed_indexes = []
+            # Find renamed indexes.
+            remove_from_added = []
+            remove_from_removed = []
+            for new_index in added_indexes:
+                new_index_dec = new_index.deconstruct()
+                new_index_name = new_index_dec[2].pop("name")
+                for old_index in removed_indexes:
+                    old_index_dec = old_index.deconstruct()
+                    old_index_name = old_index_dec[2].pop("name")
+                    # Indexes are the same except for the names.
+                    if (
+                        new_index_dec == old_index_dec
+                        and new_index_name != old_index_name
+                    ):
+                        renamed_indexes.append((old_index_name, new_index_name, None))
+                        remove_from_added.append(new_index)
+                        remove_from_removed.append(old_index)
+            # Remove renamed indexes from the lists of added and removed
+            # indexes.
+            added_indexes = [
+                idx for idx in added_indexes if idx not in remove_from_added
+            ]
+            removed_indexes = [
+                idx for idx in removed_indexes if idx not in remove_from_removed
+            ]
 
             self.altered_indexes.update(
                 {
                     (app_label, model_name): {
-                        "added_indexes": add_idx,
-                        "removed_indexes": rem_idx,
+                        "added_indexes": added_indexes,
+                        "removed_indexes": removed_indexes,
+                        "renamed_indexes": renamed_indexes,
                     }
                 }
             )
@@ -1218,6 +1246,21 @@ class MigrationAutodetector:
                     operations.RemoveIndex(
                         model_name=model_name,
                         name=index.name,
+                    ),
+                )
+
+    def generate_renamed_indexes(self):
+        for (app_label, model_name), alt_indexes in self.altered_indexes.items():
+            for old_index_name, new_index_name, old_fields in alt_indexes[
+                "renamed_indexes"
+            ]:
+                self.add_operation(
+                    app_label,
+                    operations.RenameIndex(
+                        model_name=model_name,
+                        new_name=new_index_name,
+                        old_name=old_index_name,
+                        old_fields=old_fields,
                     ),
                 )
 
