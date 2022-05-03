@@ -895,10 +895,10 @@ a.deletelink:focus, a.deletelink:hover {
     margin: 0 20px 0 0;
     font-weight: 300;
     font-size: 1.5rem;
-    color: var(--accent);
+    color: var(--header-branding-color);
 }
 
-#branding h1, #branding h1 a:link, #branding h1 a:visited {
+#branding h1 a:link, #branding h1 a:visited {
     color: var(--accent);
 }
 
