@@ -1,6 +1,7 @@
 import datetime
 from unittest import skipUnless
 
+from django.conf import settings
 from django.db import connection
 from django.db.models import CASCADE, ForeignKey, Index, Q
 from django.db.models.functions import Lower
@@ -600,11 +601,17 @@ class CoveringIndexTests(TransactionTestCase):
             condition=Q(pub_date__isnull=False),
         )
         with connection.schema_editor() as editor:
+            extra_sql = ""
+            if settings.DEFAULT_INDEX_TABLESPACE:
+                extra_sql = "TABLESPACE %s " % editor.quote_name(
+                    settings.DEFAULT_INDEX_TABLESPACE
+                )
             self.assertIn(
-                "(%s) INCLUDE (%s) WHERE %s "
+                "(%s) INCLUDE (%s) %sWHERE %s "
                 % (
                     editor.quote_name("headline"),
                     editor.quote_name("pub_date"),
+                    extra_sql,
                     editor.quote_name("pub_date"),
                 ),
                 str(index.create_sql(Article, editor)),
