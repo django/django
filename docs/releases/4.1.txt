@@ -453,6 +453,14 @@ backends.
 
 * Support for GDAL 2.1 is removed.
 
+* Support for PostGIS 2.4 is removed.
+
+Dropped support for PostgreSQL 10
+---------------------------------
+
+Upstream support for PostgreSQL 10 ends in November 2022. Django 4.1 supports
+PostgreSQL 11 and higher.
+
 Dropped support for MariaDB 10.2
 --------------------------------
 
