@@ -7,7 +7,7 @@ transcript.
 """
 from django.db import connection
 from django.db.models import F, Value
-from django.test import modify_settings, skipUnlessDBFeature
+from django.test import modify_settings
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import Character, Line, LineSavedSearch, Scene
@@ -265,7 +265,6 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
         )
         self.assertSequenceEqual(searched, [self.french])
 
-    @skipUnlessDBFeature("has_websearch_to_tsquery")
     def test_web_search(self):
         line_qs = Line.objects.annotate(search=SearchVector("dialogue"))
         searched = line_qs.filter(
@@ -290,7 +289,6 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
         )
         self.assertSequenceEqual(searched, [self.verse0, self.verse1])
 
-    @skipUnlessDBFeature("has_websearch_to_tsquery")
     def test_web_search_with_config(self):
         line_qs = Line.objects.annotate(
             search=SearchVector("scene__setting", "dialogue", config="french"),
