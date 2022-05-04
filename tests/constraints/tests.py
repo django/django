@@ -103,18 +103,6 @@ class CheckConstraintTests(TestCase):
         with self.assertRaises(IntegrityError):
             Product.objects.create(price=10, discounted_price=7, unit="l")
 
-    @skipUnlessDBFeature("supports_table_check_constraints")
-    def test_database_constraint_expression(self):
-        Product.objects.create(price=999, discounted_price=5)
-        with self.assertRaises(IntegrityError):
-            Product.objects.create(price=1000, discounted_price=5)
-
-    @skipUnlessDBFeature("supports_table_check_constraints")
-    def test_database_constraint_expressionwrapper(self):
-        Product.objects.create(price=499, discounted_price=5)
-        with self.assertRaises(IntegrityError):
-            Product.objects.create(price=500, discounted_price=5)
-
     @skipUnlessDBFeature(
         "supports_table_check_constraints", "can_introspect_check_constraints"
     )
@@ -122,8 +110,6 @@ class CheckConstraintTests(TestCase):
         constraints = get_constraints(Product._meta.db_table)
         for expected_name in (
             "price_gt_discounted_price",
-            "constraints_price_lt_1000_raw",
-            "constraints_price_neq_500_wrap",
             "constraints_product_price_gt_0",
         ):
             with self.subTest(expected_name):
