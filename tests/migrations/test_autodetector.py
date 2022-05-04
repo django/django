@@ -2598,6 +2598,79 @@ class AutodetectorTests(TestCase):
             old_name="book_title_author_idx",
         )
 
+    def test_rename_index_together_to_index(self):
+        changes = self.get_changes(
+            [self.author_empty, self.book_foo_together],
+            [self.author_empty, self.book_indexes],
+        )
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(
+            changes, "otherapp", 0, ["RenameIndex", "AlterUniqueTogether"]
+        )
+        self.assertOperationAttributes(
+            changes,
+            "otherapp",
+            0,
+            0,
+            model_name="book",
+            new_name="book_title_author_idx",
+            old_fields=("author", "title"),
+        )
+        self.assertOperationAttributes(
+            changes,
+            "otherapp",
+            0,
+            1,
+            name="book",
+            unique_together=set(),
+        )
+
+    def test_rename_index_together_to_index_extra_options(self):
+        # Indexes with extra options don't match indexes in index_together.
+        book_partial_index = ModelState(
+            "otherapp",
+            "Book",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
+                ("title", models.CharField(max_length=200)),
+            ],
+            {
+                "indexes": [
+                    models.Index(
+                        fields=["author", "title"],
+                        condition=models.Q(title__startswith="The"),
+                        name="book_title_author_idx",
+                    )
+                ],
+            },
+        )
+        changes = self.get_changes(
+            [self.author_empty, self.book_foo_together],
+            [self.author_empty, book_partial_index],
+        )
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(
+            changes,
+            "otherapp",
+            0,
+            ["AlterUniqueTogether", "AlterIndexTogether", "AddIndex"],
+        )
+
+    def test_rename_index_together_to_index_order_fields(self):
+        # Indexes with reordered fields don't match indexes in index_together.
+        changes = self.get_changes(
+            [self.author_empty, self.book_foo_together],
+            [self.author_empty, self.book_unordered_indexes],
+        )
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(
+            changes,
+            "otherapp",
+            0,
+            ["AlterUniqueTogether", "AlterIndexTogether", "AddIndex"],
+        )
+
     def test_order_fields_indexes(self):
         """Test change detection of reordering of fields in indexes."""
         changes = self.get_changes(
