@@ -1343,15 +1343,6 @@ class ModelAdmin(BaseModelAdmin):
         # the presence of keys in request.POST.
 
         if IS_POPUP_VAR in request.POST:
-            source_model_name = request.POST.get(SOURCE_MODEL_VAR)
-            source_model = self.model._meta.app_config.get_model(source_model_name)
-            fclass = self.admin_site._registry[source_model].form
-            f = fclass()
-            choices = f.fields[self.opts.verbose_name_plural].choices
-            for optgroup, choices in choices:
-                for name, choice_obj in choices:
-                    if choice_obj == obj:
-                        obj_optgroup = optgroup
 
             to_field = request.POST.get(TO_FIELD_VAR)
             if to_field:
@@ -1359,13 +1350,23 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 attr = obj._meta.pk.attname
             value = obj.serializable_value(attr)
-            popup_response_data = json.dumps(
-                {
+            popup_response = {
                     "value": str(value),
                     "obj": str(obj),
-                    "optgroup": obj_optgroup,
-                }
-            )
+            }
+
+            # Find the optgroup for the new item, if available
+            source_model_name = request.POST.get(SOURCE_MODEL_VAR)
+            if source_model_name:
+                source_model = self.model._meta.app_config.get_model(source_model_name)
+                form_class = self.admin_site._registry[source_model].form
+                choices = form_class().fields[self.opts.verbose_name_plural].choices
+                for optgroup, choices in choices:
+                    for name, choice_obj in choices:
+                        if choice_obj == obj:
+                            popup_response["optgroup"] = optgroup
+
+            popup_response_data = json.dumps(popup_response)
             return TemplateResponse(
                 request,
                 self.popup_response_template
