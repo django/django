@@ -800,12 +800,22 @@ Formsets have the following attributes and methods associated with rendering:
         In older versions ``template_name`` defaulted to the string value
         ``'django/forms/formset/default.html'``.
 
+
+.. attribute:: BaseFormSet.template_name_div
+
+    .. versionadded:: 4.1
+
+    The name of the template used when calling :meth:`.as_div`. By default this
+    is ``"django/forms/formsets/div.html"``. This template renders the
+    formset's management form and then each form in the formset as per the
+    form's :meth:`~django.forms.Form.as_div` method.
+
 .. attribute:: BaseFormSet.template_name_p
 
     .. versionadded:: 4.0
 
     The name of the template used when calling :meth:`.as_p`. By default this
-    is ``'django/forms/formsets/p.html'``. This template renders the formset's
+    is ``"django/forms/formsets/p.html"``. This template renders the formset's
     management form and then each form in the formset as per the form's
     :meth:`~django.forms.Form.as_p` method.
 
@@ -814,7 +824,7 @@ Formsets have the following attributes and methods associated with rendering:
     .. versionadded:: 4.0
 
     The name of the template used when calling :meth:`.as_table`. By default
-    this is ``'django/forms/formsets/table.html'``. This template renders the
+    this is ``"django/forms/formsets/table.html"``. This template renders the
     formset's management form and then each form in the formset as per the
     form's :meth:`~django.forms.Form.as_table` method.
 
@@ -823,7 +833,7 @@ Formsets have the following attributes and methods associated with rendering:
     .. versionadded:: 4.0
 
     The name of the template used when calling :meth:`.as_ul`. By default this
-    is ``'django/forms/formsets/ul.html'``. This template renders the formset's
+    is ``"django/forms/formsets/ul.html"``. This template renders the formset's
     management form and then each form in the formset as per the form's
     :meth:`~django.forms.Form.as_ul` method.
 
