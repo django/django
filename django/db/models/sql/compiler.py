@@ -907,6 +907,8 @@ class SQLCompiler:
 
             results = []
             for item in opts.ordering:
+                if hasattr(item, "prefix_references"):
+                    item = item.prefix_references(name)
                 if hasattr(item, "resolve_expression") and not isinstance(
                     item, OrderBy
                 ):

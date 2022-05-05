@@ -14,7 +14,15 @@ from django.db.models import (
 from django.db.models.functions import Upper
 from django.test import TestCase
 
-from .models import Article, Author, ChildArticle, OrderedByFArticle, Reference
+from .models import (
+    Article,
+    Author,
+    ChildArticle,
+    OrderedByExpressionChild,
+    OrderedByExpression,
+    OrderedByFArticle,
+    Reference,
+)
 
 
 class OrderingTests(TestCase):
@@ -517,6 +525,20 @@ class OrderingTests(TestCase):
             articles,
             ["Article 1", "Article 4", "Article 3", "Article 2"],
             attrgetter("headline"),
+        )
+
+    def test_order_by_fk_with_expression_in_ordering(self):
+        p3 = OrderedByExpression.objects.create(name="oBJ 3")
+        p2 = OrderedByExpression.objects.create(name="OBJ 2")
+        p1 = OrderedByExpression.objects.create(name="obj 1")
+
+        c3 = OrderedByExpressionChild.objects.create(parent=p3)
+        c2 = OrderedByExpressionChild.objects.create(parent=p2)
+        c1 = OrderedByExpressionChild.objects.create(parent=p1)
+
+        self.assertQuerysetEqual(
+            list(OrderedByExpressionChild.objects.order_by("parent")),
+            [c1, c2, c3],
         )
 
     def test_order_by_ptr_field_with_default_ordering_by_expression(self):

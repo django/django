@@ -62,3 +62,17 @@ class Reference(models.Model):
 
     class Meta:
         ordering = ("article",)
+
+
+class OrderedByExpression(models.Model):
+    name = models.CharField(max_length=30)
+
+    class Meta:
+        ordering = (models.functions.Lower("name"),)
+
+
+class OrderedByExpressionChild(models.Model):
+    parent = models.ForeignKey(OrderedByExpression, models.CASCADE)
+
+    def __str__(self) -> str:
+        return self.parent.name
