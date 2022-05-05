@@ -74,6 +74,24 @@ Validation of Constraints
 in the :attr:`Meta.constraints <django.db.models.Options.constraints>` option
 are now checked during :ref:`model validation <validating-objects>`.
 
+Form rendering accessibility
+----------------------------
+
+In order to aid users with screen readers, and other assistive technology, new
+``<div>`` based form templates are available from this release. These provide
+more accessible navigation than the older templates, and are able to correctly
+group related controls, such as radio-lists, into fieldsets.
+
+The new templates are recommended, and will become the default form rendering
+style when outputting a form, like ``{{ form }}`` in a template, from Django
+5.0.
+
+In order to ease adopting the new output style, the default form and formset
+templates are now configurable at the project level via the
+:setting:`FORM_RENDERER` setting.
+
+See :ref:`the Forms section (below)<forms-4.1>` for full details.
+
 .. _csrf-cookie-masked-usage:
 
 ``CSRF_COOKIE_MASKED`` setting
@@ -253,6 +271,8 @@ File Uploads
 
 * ...
 
+.. _forms-4.1:
+
 Forms
 ~~~~~
 
@@ -278,6 +298,34 @@ Forms
   :meth:`~.Form.as_table`, :meth:`~.Form.as_p` and :meth:`~.Form.as_ul` styles,
   as the template implements ``<fieldset>`` and ``<legend>`` to group related
   inputs and is easier for screen reader users to navigate.
+
+  The div-based output will become the default rendering style from Django 5.0.
+
+* In order to smooth adoption of the new ``<div>`` output style, two
+  transitional form renderer classes are available:
+  :class:`django.forms.renderers.DjangoDivFormRenderer` and
+  :class:`django.forms.renderers.Jinja2DivFormRenderer`, for the Django and
+  Jinja2 template backends respectively.
+
+  You can apply one of these via the :setting:`FORM_RENDERER` setting. For
+  example::
+
+    FORM_RENDERER = "django.forms.renderers.DjangoDivFormRenderer"
+
+  Once the ``<div>`` output style is the default, from Django 5.0, these
+  transitional renderers will be deprecated, for removal in Django 6.0. The
+  ``FORM_RENDERER`` declaration can be removed at that time.
+
+* If the new ``<div>`` output style is not appropriate for your project, you should
+  define a renderer subclass specifying
+  :attr:`~django.forms.renderers.BaseRenderer.form_template_name` and
+  :attr:`~django.forms.renderers.BaseRenderer.formset_template_name` for your
+  required style, and set :setting:`FORM_RENDERER` accordingly.
+
+  For example, for the ``<p>`` output style used by :meth:`~.Form.as_p`, you
+  would define a form renderer setting ``form_template_name`` to
+  ``"django/forms/p.html"`` and ``formset_template_name`` to
+  ``"django/forms/formsets/p.html"``.
 
 * The new :meth:`~django.forms.BoundField.legend_tag` allows rendering field
   labels in ``<legend>`` tags via the new ``tag`` argument of
@@ -713,6 +761,10 @@ Miscellaneous
 * The ability to pass ``nulls_first=False`` or ``nulls_last=False`` to
   ``Expression.asc()`` and ``Expression.desc()`` methods, and the ``OrderBy``
   expression is deprecated. Use ``None`` instead.
+
+* The ``"django/forms/default.html"`` and
+  ``"django/forms/formsets/default.html"`` templates which are a proxy to the
+  table-based templates are deprecated. Use the specific template instead.
 
 Features removed in 4.1
 =======================

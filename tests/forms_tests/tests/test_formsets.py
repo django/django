@@ -23,10 +23,12 @@ from django.forms.formsets import (
     all_valid,
     formset_factory,
 )
-from django.forms.renderers import TemplatesSetting
+from django.forms.renderers import TemplatesSetting, get_default_renderer
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.test import SimpleTestCase
+from django.test.utils import isolate_lru_cache
+from django.utils.deprecation import RemovedInDjango50Warning
 
 from . import jinja2_tests
 
@@ -125,8 +127,8 @@ class FormsFormsetTestCase(SimpleTestCase):
 <input type="hidden" name="choices-INITIAL_FORMS" value="0">
 <input type="hidden" name="choices-MIN_NUM_FORMS" value="0">
 <input type="hidden" name="choices-MAX_NUM_FORMS" value="1000">
-<tr><th>Choice:</th><td><input type="text" name="choices-0-choice"></td></tr>
-<tr><th>Votes:</th><td><input type="number" name="choices-0-votes"></td></tr>""",
+<div>Choice:<input type="text" name="choices-0-choice"></div>
+<div>Votes:<input type="number" name="choices-0-votes"></div>""",
         )
         # FormSet are treated similarly to Forms. FormSet has an is_valid()
         # method, and a cleaned_data or errors attribute depending on whether
@@ -976,12 +978,12 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = LimitedFavoriteDrinkFormSet()
         self.assertHTMLEqual(
             "\n".join(str(form) for form in formset.forms),
-            """<tr><th><label for="id_form-0-name">Name:</label></th>
-<td><input type="text" name="form-0-name" id="id_form-0-name"></td></tr>
-<tr><th><label for="id_form-1-name">Name:</label></th>
-<td><input type="text" name="form-1-name" id="id_form-1-name"></td></tr>
-<tr><th><label for="id_form-2-name">Name:</label></th>
-<td><input type="text" name="form-2-name" id="id_form-2-name"></td></tr>""",
+            """<div><label for="id_form-0-name">Name:</label>
+            <input type="text" name="form-0-name" id="id_form-0-name"></div>
+<div><label for="id_form-1-name">Name:</label>
+<input type="text" name="form-1-name" id="id_form-1-name"></div>
+<div><label for="id_form-2-name">Name:</label>
+<input type="text" name="form-2-name" id="id_form-2-name"></div>""",
         )
         # If max_num is 0 then no form is rendered at all.
         LimitedFavoriteDrinkFormSet = formset_factory(
@@ -997,10 +999,10 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = LimitedFavoriteDrinkFormSet()
         self.assertHTMLEqual(
             "\n".join(str(form) for form in formset.forms),
-            """<tr><th><label for="id_form-0-name">Name:</label></th><td>
-<input type="text" name="form-0-name" id="id_form-0-name"></td></tr>
-<tr><th><label for="id_form-1-name">Name:</label></th>
-<td><input type="text" name="form-1-name" id="id_form-1-name"></td></tr>""",
+            """<div><label for="id_form-0-name">Name:</label>
+<input type="text" name="form-0-name" id="id_form-0-name"></div>
+<div><label for="id_form-1-name">Name:</label>
+<input type="text" name="form-1-name" id="id_form-1-name"></div>""",
         )
 
     def test_limiting_extra_lest_than_max_num(self):
@@ -1011,8 +1013,8 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = LimitedFavoriteDrinkFormSet()
         self.assertHTMLEqual(
             "\n".join(str(form) for form in formset.forms),
-            """<tr><th><label for="id_form-0-name">Name:</label></th>
-<td><input type="text" name="form-0-name" id="id_form-0-name"></td></tr>""",
+            """<div><label for="id_form-0-name">Name:</label>
+<input type="text" name="form-0-name" id="id_form-0-name"></div>""",
         )
 
     def test_max_num_with_initial_data(self):
@@ -1024,11 +1026,11 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertHTMLEqual(
             "\n".join(str(form) for form in formset.forms),
             """
-            <tr><th><label for="id_form-0-name">Name:</label></th>
-            <td><input type="text" name="form-0-name" value="Fernet and Coke"
-                id="id_form-0-name"></td></tr>
-            <tr><th><label for="id_form-1-name">Name:</label></th>
-            <td><input type="text" name="form-1-name" id="id_form-1-name"></td></tr>
+            <div><label for="id_form-0-name">Name:</label>
+            <input type="text" name="form-0-name" value="Fernet and Coke"
+                id="id_form-0-name"></div>
+            <div><label for="id_form-1-name">Name:</label>
+            <input type="text" name="form-1-name" id="id_form-1-name"></div>
             """,
         )
 
@@ -1056,12 +1058,12 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertHTMLEqual(
             "\n".join(str(form) for form in formset.forms),
             """
-            <tr><th><label for="id_form-0-name">Name:</label></th>
-            <td><input id="id_form-0-name" name="form-0-name" type="text"
-                value="Fernet and Coke"></td></tr>
-            <tr><th><label for="id_form-1-name">Name:</label></th>
-            <td><input id="id_form-1-name" name="form-1-name" type="text"
-                value="Bloody Mary"></td></tr>
+            <div><label for="id_form-0-name">Name:</label>
+            <input id="id_form-0-name" name="form-0-name" type="text"
+                value="Fernet and Coke"></div>
+            <div><label for="id_form-1-name">Name:</label>
+            <input id="id_form-1-name" name="form-1-name" type="text"
+                value="Bloody Mary"></div>
             """,
         )
 
@@ -1082,18 +1084,15 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertHTMLEqual(
             "\n".join(str(form) for form in formset.forms),
             """
-            <tr><th><label for="id_form-0-name">Name:</label></th>
-            <td>
+            <div><label for="id_form-0-name">Name:</label>
             <input id="id_form-0-name" name="form-0-name" type="text" value="Gin Tonic">
-            </td></tr>
-            <tr><th><label for="id_form-1-name">Name:</label></th>
-            <td>
+            </div>
+            <div><label for="id_form-1-name">Name:</label>
             <input id="id_form-1-name" name="form-1-name" type="text"
-                value="Bloody Mary"></td></tr>
-            <tr><th><label for="id_form-2-name">Name:</label></th>
-            <td>
+                value="Bloody Mary"></div>
+            <div><label for="id_form-2-name">Name:</label>
             <input id="id_form-2-name" name="form-2-name" type="text"
-                value="Jack and Coke"></td></tr>
+                value="Jack and Coke"></div>
             """,
         )
 
@@ -1173,12 +1172,11 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertHTMLEqual(
             "\n".join(str(form) for form in formset.forms),
             """
-            <tr><th><label for="id_form-0-name">Name:</label></th>
-            <td>
+            <div><label for="id_form-0-name">Name:</label>
             <input type="text" name="form-0-name" value="Gin Tonic" id="id_form-0-name">
-            </td></tr>
-            <tr><th><label for="id_form-1-name">Name:</label></th>
-            <td><input type="text" name="form-1-name" id="id_form-1-name"></td></tr>""",
+            </div>
+            <div><label for="id_form-1-name">Name:</label>
+            <input type="text" name="form-1-name" id="id_form-1-name"></div>""",
         )
 
     def test_management_form_field_names(self):
@@ -1701,16 +1699,16 @@ class TestIsBoundBehavior(SimpleTestCase):
         # Can still render the formset.
         self.assertHTMLEqual(
             str(formset),
-            '<tr><td colspan="2">'
             '<ul class="errorlist nonfield">'
             "<li>(Hidden field TOTAL_FORMS) This field is required.</li>"
             "<li>(Hidden field INITIAL_FORMS) This field is required.</li>"
             "</ul>"
+            "<div>"
             '<input type="hidden" name="form-TOTAL_FORMS" id="id_form-TOTAL_FORMS">'
             '<input type="hidden" name="form-INITIAL_FORMS" id="id_form-INITIAL_FORMS">'
             '<input type="hidden" name="form-MIN_NUM_FORMS" id="id_form-MIN_NUM_FORMS">'
             '<input type="hidden" name="form-MAX_NUM_FORMS" id="id_form-MAX_NUM_FORMS">'
-            "</td></tr>\n",
+            "</div>\n",
         )
 
     def test_management_form_invalid_data(self):
@@ -1732,18 +1730,18 @@ class TestIsBoundBehavior(SimpleTestCase):
         # Can still render the formset.
         self.assertHTMLEqual(
             str(formset),
-            '<tr><td colspan="2">'
             '<ul class="errorlist nonfield">'
             "<li>(Hidden field TOTAL_FORMS) Enter a whole number.</li>"
             "<li>(Hidden field INITIAL_FORMS) Enter a whole number.</li>"
             "</ul>"
+            "<div>"
             '<input type="hidden" name="form-TOTAL_FORMS" value="two" '
             'id="id_form-TOTAL_FORMS">'
             '<input type="hidden" name="form-INITIAL_FORMS" value="one" '
             'id="id_form-INITIAL_FORMS">'
             '<input type="hidden" name="form-MIN_NUM_FORMS" id="id_form-MIN_NUM_FORMS">'
             '<input type="hidden" name="form-MAX_NUM_FORMS" id="id_form-MAX_NUM_FORMS">'
-            "</td></tr>\n",
+            "</div>\n",
         )
 
     def test_customize_management_form_error(self):
@@ -1889,3 +1887,17 @@ class AllValidTests(SimpleTestCase):
         ]
         self.assertEqual(formset1._errors, expected_errors)
         self.assertEqual(formset2._errors, expected_errors)
+
+
+class DeprecationTests(SimpleTestCase):
+    def test_warning(self):
+        from django.forms.utils import DEFAULT_TEMPLATE_DEPRECATION_MSG
+
+        with isolate_lru_cache(get_default_renderer), self.settings(
+            FORM_RENDERER="django.forms.renderers.DjangoTemplates"
+        ), self.assertRaisesMessage(
+            RemovedInDjango50Warning, DEFAULT_TEMPLATE_DEPRECATION_MSG
+        ):
+            ChoiceFormSet = formset_factory(Choice)
+            formset = ChoiceFormSet()
+            str(formset)

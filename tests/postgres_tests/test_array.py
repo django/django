@@ -1196,14 +1196,12 @@ class TestSplitFormField(PostgreSQLSimpleTestCase):
         self.assertHTMLEqual(
             str(SplitForm()),
             """
-            <tr>
-                <th><label for="id_array_0">Array:</label></th>
-                <td>
-                    <input id="id_array_0" name="array_0" type="text" required>
-                    <input id="id_array_1" name="array_1" type="text" required>
-                    <input id="id_array_2" name="array_2" type="text" required>
-                </td>
-            </tr>
+            <div>
+                <label for="id_array_0">Array:</label>
+                <input id="id_array_0" name="array_0" type="text" required>
+                <input id="id_array_1" name="array_1" type="text" required>
+                <input id="id_array_2" name="array_2" type="text" required>
+            </div>
         """,
         )
 
