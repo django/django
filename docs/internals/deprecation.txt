@@ -105,6 +105,9 @@ details on these changes.
 
 * The ``django.contrib.auth.hashers.CryptPasswordHasher`` will be removed.
 
+* The ``"django/forms/default.html"`` and
+  ``"django/forms/formsets/default.html"`` templates will be removed.
+
 * The ability to pass ``nulls_first=False`` or ``nulls_last=False`` to
   ``Expression.asc()`` and ``Expression.desc()`` methods, and the ``OrderBy``
   expression will be removed.
