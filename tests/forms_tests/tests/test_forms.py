@@ -42,8 +42,9 @@ from django.forms.utils import ErrorList
 from django.http import QueryDict
 from django.template import Context, Template
 from django.test import SimpleTestCase
-from django.test.utils import override_settings
+from django.test.utils import isolate_lru_cache, override_settings
 from django.utils.datastructures import MultiValueDict
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.safestring import mark_safe
 
 from . import jinja2_tests
@@ -149,17 +150,12 @@ class FormsTestCase(SimpleTestCase):
         )
         self.assertHTMLEqual(
             str(p),
-            """
-            <tr><th><label for="id_first_name">First name:</label></th><td>
-            <input type="text" name="first_name" value="John" id="id_first_name"
-                required></td></tr>
-            <tr><th><label for="id_last_name">Last name:</label></th><td>
-            <input type="text" name="last_name" value="Lennon" id="id_last_name"
-                required></td></tr>
-            <tr><th><label for="id_birthday">Birthday:</label></th><td>
-            <input type="text" name="birthday" value="1940-10-9" id="id_birthday"
-                required></td></tr>
-            """,
+            '<div><label for="id_first_name">First name:</label><input type="text" '
+            'name="first_name" value="John" required id="id_first_name"></div><div>'
+            '<label for="id_last_name">Last name:</label><input type="text" '
+            'name="last_name" value="Lennon" required id="id_last_name"></div><div>'
+            '<label for="id_birthday">Birthday:</label><input type="text" '
+            'name="birthday" value="1940-10-9" required id="id_birthday"></div>',
         )
         self.assertHTMLEqual(
             p.as_div(),
@@ -182,15 +178,15 @@ class FormsTestCase(SimpleTestCase):
         self.assertEqual(p.cleaned_data, {})
         self.assertHTMLEqual(
             str(p),
-            """<tr><th><label for="id_first_name">First name:</label></th><td>
-<ul class="errorlist"><li>This field is required.</li></ul>
-<input type="text" name="first_name" id="id_first_name" required></td></tr>
-<tr><th><label for="id_last_name">Last name:</label></th>
-<td><ul class="errorlist"><li>This field is required.</li></ul>
-<input type="text" name="last_name" id="id_last_name" required></td></tr>
-<tr><th><label for="id_birthday">Birthday:</label></th><td>
-<ul class="errorlist"><li>This field is required.</li></ul>
-<input type="text" name="birthday" id="id_birthday" required></td></tr>""",
+            '<div><label for="id_first_name">First name:</label>'
+            '<ul class="errorlist"><li>This field is required.</li></ul>'
+            '<input type="text" name="first_name" required id="id_first_name"></div>'
+            '<div><label for="id_last_name">Last name:</label>'
+            '<ul class="errorlist"><li>This field is required.</li></ul>'
+            '<input type="text" name="last_name" required id="id_last_name"></div><div>'
+            '<label for="id_birthday">Birthday:</label>'
+            '<ul class="errorlist"><li>This field is required.</li></ul>'
+            '<input type="text" name="birthday" required id="id_birthday"></div>',
         )
         self.assertHTMLEqual(
             p.as_table(),
@@ -261,12 +257,12 @@ class FormsTestCase(SimpleTestCase):
 
         self.assertHTMLEqual(
             str(p),
-            """<tr><th><label for="id_first_name">First name:</label></th><td>
-<input type="text" name="first_name" id="id_first_name" required></td></tr>
-<tr><th><label for="id_last_name">Last name:</label></th><td>
-<input type="text" name="last_name" id="id_last_name" required></td></tr>
-<tr><th><label for="id_birthday">Birthday:</label></th><td>
-<input type="text" name="birthday" id="id_birthday" required></td></tr>""",
+            '<div><label for="id_first_name">First name:</label><input type="text" '
+            'name="first_name" id="id_first_name" required></div><div><label '
+            'for="id_last_name">Last name:</label><input type="text" name="last_name" '
+            'id="id_last_name" required></div><div><label for="id_birthday">'
+            'Birthday:</label><input type="text" name="birthday" id="id_birthday" '
+            "required></div>",
         )
         self.assertHTMLEqual(
             p.as_table(),
@@ -4932,9 +4928,7 @@ class TemplateTests(SimpleTestCase):
 
             t = Template(
                 '<form method="post">'
-                "<table>"
                 "{{ form }}"
-                "</table>"
                 '<input type="submit" required>'
                 "</form>"
             )
@@ -4944,14 +4938,12 @@ class TemplateTests(SimpleTestCase):
         self.assertHTMLEqual(
             my_function("GET", {}),
             '<form method="post">'
-            "<table>"
-            "<tr><th>Username:</th><td>"
-            '<input type="text" name="username" maxlength="10" required></td></tr>'
-            "<tr><th>Password1:</th><td>"
-            '<input type="password" name="password1" required></td></tr>'
-            "<tr><th>Password2:</th><td>"
-            '<input type="password" name="password2" required></td></tr>'
-            "</table>"
+            "<div>Username:"
+            '<input type="text" name="username" maxlength="10" required></div>'
+            "<div>Password1:"
+            '<input type="password" name="password1" required></div>'
+            "<div>Password2:"
+            '<input type="password" name="password2" required></div>'
             '<input type="submit" required>'
             "</form>",
         )
@@ -4966,18 +4958,16 @@ class TemplateTests(SimpleTestCase):
                 },
             ),
             '<form method="post">'
-            "<table>"
-            '<tr><td colspan="2"><ul class="errorlist nonfield">'
-            "<li>Please make sure your passwords match.</li></ul></td></tr>"
-            '<tr><th>Username:</th><td><ul class="errorlist">'
+            '<ul class="errorlist nonfield">'
+            "<li>Please make sure your passwords match.</li></ul>"
+            '<div>Username:<ul class="errorlist">'
             "<li>Ensure this value has at most 10 characters (it has 23).</li></ul>"
             '<input type="text" name="username" '
-            'value="this-is-a-long-username" maxlength="10" required></td></tr>'
-            "<tr><th>Password1:</th><td>"
-            '<input type="password" name="password1" required></td></tr>'
-            "<tr><th>Password2:</th><td>"
-            '<input type="password" name="password2" required></td></tr>'
-            "</table>"
+            'value="this-is-a-long-username" maxlength="10" required></div>'
+            "<div>Password1:"
+            '<input type="password" name="password1" required></div>'
+            "<div>Password2:"
+            '<input type="password" name="password2" required></div>'
             '<input type="submit" required>'
             "</form>",
         )
@@ -5054,7 +5044,7 @@ class OverrideTests(SimpleTestCase):
 
         f = FirstNameForm()
         try:
-            self.assertInHTML("<th>1</th>", f.render())
+            f.render()
         except RecursionError:
             self.fail("Cyclic reference in BoundField.render().")
 
@@ -5069,3 +5059,16 @@ class OverrideTests(SimpleTestCase):
             '<label for="id_name" class="required">Name:</label>'
             '<legend class="required">Language:</legend>',
         )
+
+
+class DeprecationTests(SimpleTestCase):
+    def test_warning(self):
+        from django.forms.utils import DEFAULT_TEMPLATE_DEPRECATION_MSG
+
+        with isolate_lru_cache(get_default_renderer), self.settings(
+            FORM_RENDERER="django.forms.renderers.DjangoTemplates"
+        ), self.assertRaisesMessage(
+            RemovedInDjango50Warning, DEFAULT_TEMPLATE_DEPRECATION_MSG
+        ):
+            form = Person()
+            str(form)

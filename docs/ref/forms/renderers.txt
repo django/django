@@ -56,6 +56,12 @@ should return a rendered templates (as a string) or raise
         Defaults to ``"django/forms/default.html"``, which is a proxy for
         ``"django/forms/table.html"``.
 
+        .. deprecated:: 4.1
+
+        The ``"django/forms/default.html"`` template is deprecated and will be
+        removed in Django 5.0. The default will become
+        ``"django/forms/default.html"`` at that time.
+
     .. attribute:: formset_template_name
 
         .. versionadded:: 4.1
@@ -64,6 +70,12 @@ should return a rendered templates (as a string) or raise
 
         Defaults to ``"django/forms/formsets/default.html"``, which is a proxy
         for ``"django/forms/formsets/table.html"``.
+
+        .. deprecated:: 4.1
+
+        The ``"django/forms/formset/default.html"`` template is deprecated and
+        will be removed in Django 5.0. The default will become
+        ``"django/forms/formset/div.html"`` template.
 
     .. method:: get_template(template_name)
 
@@ -97,6 +109,26 @@ If you want to render templates with customizations from your
 :setting:`TEMPLATES` setting, such as context processors for example, use the
 :class:`TemplatesSetting` renderer.
 
+.. class:: DjangoDivFormRenderer
+
+.. versionadded:: 4.1
+
+Subclass of :class:`DjangoTemplates` that specifies
+:attr:`~BaseRenderer.form_template_name` and
+:attr:`~BaseRenderer.formset_template_name` as ``"django/forms/div.html"`` and
+``"django/forms/formset/div.html"`` respectively.
+
+This is a transitional renderer for opt-in to the new ``<div>`` based
+templates, which are the default from Django 5.0.
+
+Apply this via the :setting:`FORM_RENDERER` setting::
+
+    FORM_RENDERER = "django.forms.renderers.DjangoDivFormRenderer"
+
+Once the ``<div>`` templates are the default, this transitional renderer will
+be deprecated, for removal in Django 6.0. The ``FORM_RENDERER`` declaration can
+be removed at that time.
+
 ``Jinja2``
 ----------
 
@@ -112,6 +144,17 @@ third-party apps must have Jinja2 templates. Unless you provide your own Jinja2
 templates for widgets that don't have any, you can't use this renderer. For
 example, :mod:`django.contrib.admin` doesn't include Jinja2 templates for its
 widgets due to their usage of Django template tags.
+
+.. class:: Jinja2DivFormRenderer
+
+.. versionadded:: 4.1
+
+A transitional renderer as per :class:`DjangoDivFormRenderer` above, but
+subclassing :class:`Jinja2` for use with the Jinja2 backend.
+
+Apply this via the :setting:`FORM_RENDERER` setting::
+
+    FORM_RENDERER = "django.forms.renderers.Jinja2DivFormRenderer"
 
 ``TemplatesSetting``
 --------------------

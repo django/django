@@ -687,17 +687,15 @@ class TestFormField(PostgreSQLSimpleTestCase):
         self.assertHTMLEqual(
             str(form),
             """
-            <tr>
-                <th>
-                <label>Field:</label>
-                </th>
-                <td>
+            <div>
+                <fieldset>
+                    <legend>Field:</legend>
                     <input id="id_field_0_0" name="field_0_0" type="text">
                     <input id="id_field_0_1" name="field_0_1" type="text">
                     <input id="id_field_1_0" name="field_1_0" type="text">
                     <input id="id_field_1_1" name="field_1_1" type="text">
-                </td>
-            </tr>
+                </fieldset>
+            </div>
         """,
         )
         form = SplitForm(
@@ -788,13 +786,13 @@ class TestFormField(PostgreSQLSimpleTestCase):
         self.assertHTMLEqual(
             str(RangeForm()),
             """
-        <tr>
-            <th><label>Ints:</label></th>
-            <td>
+        <div>
+            <fieldset>
+                <legend>Ints:</legend>
                 <input id="id_ints_0" name="ints_0" type="number">
                 <input id="id_ints_1" name="ints_1" type="number">
-            </td>
-        </tr>
+            </fieldset>
+        </div>
         """,
         )
 

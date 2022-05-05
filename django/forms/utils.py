@@ -1,13 +1,16 @@
 import json
+import warnings
 from collections import UserList
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.forms.renderers import get_default_renderer
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.html import escape, format_html_join
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
+from django.utils.version import get_docs_version
 
 
 def pretty_name(name):
@@ -42,6 +45,16 @@ def flatatt(attrs):
     )
 
 
+DEFAULT_TEMPLATE_DEPRECATION_MSG = (
+    'The "default.html" templates for forms and formsets will be removed. These were '
+    'proxies to the equivalent "table.html" templates, but the new "div.html" '
+    "templates will be the default from Django 5.0. Transitional renderers are "
+    "provided to allow you to opt-in to the new output style now. See "
+    "https://docs.djangoproject.com/en/%s/releases/4.1/ for more details"
+    % get_docs_version()
+)
+
+
 class RenderableMixin:
     def get_context(self):
         raise NotImplementedError(
@@ -49,12 +62,17 @@ class RenderableMixin:
         )
 
     def render(self, template_name=None, context=None, renderer=None):
-        return mark_safe(
-            (renderer or self.renderer).render(
-                template_name or self.template_name,
-                context or self.get_context(),
+        renderer = renderer or self.renderer
+        template = template_name or self.template_name
+        context = context or self.get_context()
+        if (
+            template == "django/forms/default.html"
+            or template == "django/forms/formsets/default.html"
+        ):
+            warnings.warn(
+                DEFAULT_TEMPLATE_DEPRECATION_MSG, RemovedInDjango50Warning, stacklevel=2
             )
-        )
+        return mark_safe(renderer.render(template, context))
 
     __str__ = render
     __html__ = render
