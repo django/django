@@ -1150,6 +1150,9 @@ the data to the client. Because the content can't be accessed, many
 middleware can't function normally. For example the ``ETag`` and
 ``Content-Length`` headers can't be generated for streaming responses.
 
+The :class:`HttpResponseBase` base class is common between
+:class:`HttpResponse` and :class:`StreamingHttpResponse`.
+
 Attributes
 ----------
 
@@ -1218,3 +1221,12 @@ Methods
     This method is automatically called during the response initialization and
     set various headers (``Content-Length``, ``Content-Type``, and
     ``Content-Disposition``) depending on ``open_file``.
+
+``HttpResponseBase`` class
+==========================
+
+.. class:: HttpResponseBase
+
+The :class:`HttpResponseBase` class is common to all Django responses.
+It should not be used to create responses directly, but it can be
+useful for type-checking.
