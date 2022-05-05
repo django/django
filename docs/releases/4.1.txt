@@ -258,6 +258,15 @@ Forms
   :attr:`~django.forms.renderers.BaseRenderer.formset_template_name` renderer
   attribute.
 
+* The new ``div.html`` form template, referencing
+  :attr:`.Form.template_name_div` attribute, and matching :meth:`.Form.as_div`
+  method, render forms using HTML ``<div>`` elements.
+
+  This new output style is recommended over the existing
+  :meth:`~.Form.as_table`, :meth:`~.Form.as_p` and :meth:`~.Form.as_ul` styles,
+  as the template implements ``<fieldset>`` and ``<legend>`` to group related
+  inputs and is easier for screen reader users to navigate.
+
 * The new :meth:`~django.forms.BoundField.legend_tag` allows rendering field
   labels in ``<legend>`` tags via the new ``tag`` argument of
   :meth:`~django.forms.BoundField.label_tag`.
