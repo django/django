@@ -103,7 +103,9 @@ are loaded from the database::
         instance._state.adding = False
         instance._state.db = db
         # customization to store the original field values on the instance
-        instance._loaded_values = dict(zip(field_names, values))
+        instance._loaded_values = dict(
+            zip(field_names, (value for value in values if value is not DEFERRED))
+        )
         return instance
 
     def save(self, *args, **kwargs):
