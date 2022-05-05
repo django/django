@@ -1,0 +1,24 @@
+{{ errors }}
+{% if errors and not fields %}
+  <div>{% for field in hidden_fields %}{{ field }}{% endfor %}</div>
+{% endif %}
+{% for field, errors in fields %}
+  <div{% set classes = field.css_classes() %}{% if classes %} class="{{ classes }}"{% endif %}>
+    {% if field.use_fieldset %}
+      <fieldset>
+      {% if field.label %}{{ field.legend_tag() }}{% endif %}
+    {% else %}
+      {% if field.label %}{{ field.label_tag() }}{% endif %}
+    {% endif %}
+    {% if field.help_text %}<div class="helptext">{{ field.help_text|safe }}</div>{% endif %}
+    {{ errors }}
+    {{ field }}
+    {% if field.use_fieldset %}</fieldset>{% endif %}
+    {% if loop.last %}
+      {% for field in hidden_fields %}{{ field }}{% endfor %}
+    {% endif %}
+</div>
+{% endfor %}
+{% if not fields and not errors %}
+  {% for field in hidden_fields %}{{ field }}{% endfor %}
+{% endif %}

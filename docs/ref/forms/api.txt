@@ -607,6 +607,55 @@ list using ``{{ form.as_ul }}``.
 Each helper pairs a form method with an attribute giving the appropriate
 template name.
 
+``as_div()``
+~~~~~~~~~~~~
+
+.. attribute:: Form.template_name_div
+
+.. versionadded:: 4.1
+
+The template used by ``as_div()``. Default: ``'django/forms/div.html'``.
+
+.. method:: Form.as_div()
+
+.. versionadded:: 4.1
+
+``as_div()`` renders the form as a series of ``<div>`` elements, with each
+``<div>`` containing one field, such as:
+
+.. code-block:: pycon
+
+    >>> f = ContactForm()
+    >>> f.as_div()
+
+… gives HTML like:
+
+.. code-block:: html
+
+    <div>
+    <label for="id_subject">Subject:</label>
+    <input type="text" name="subject" maxlength="100" required id="id_subject">
+    </div>
+    <div>
+    <label for="id_message">Message:</label>
+    <input type="text" name="message" required id="id_message">
+    </div>
+    <div>
+    <label for="id_sender">Sender:</label>
+    <input type="email" name="sender" required id="id_sender">
+    </div>
+    <div>
+    <label for="id_cc_myself">Cc myself:</label>
+    <input type="checkbox" name="cc_myself" id="id_cc_myself">
+    </div>
+
+.. note::
+
+    Of the framework provided templates and output styles, ``as_div()`` is
+    recommended over the ``as_p()``, ``as_table()``, and ``as_ul()`` versions
+    as the template implements ``<fieldset>`` and ``<legend>`` to group related
+    inputs and is easier for screen reader users to navigate.
+
 ``as_p()``
 ~~~~~~~~~~
 

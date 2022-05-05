@@ -63,6 +63,7 @@ class BaseFormSet(RenderableFormMixin):
         ),
     }
 
+    template_name_div = "django/forms/formsets/div.html"
     template_name_p = "django/forms/formsets/p.html"
     template_name_table = "django/forms/formsets/table.html"
     template_name_ul = "django/forms/formsets/ul.html"

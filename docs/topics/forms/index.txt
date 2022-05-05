@@ -566,12 +566,14 @@ Form rendering options
 
 There are other output options though for the ``<label>``/``<input>`` pairs:
 
+* ``{{ form.as_div }}`` will render them wrapped in ``<div>`` tags.
+
 * ``{{ form.as_table }}`` will render them as table cells wrapped in ``<tr>``
-  tags
+  tags.
 
-* ``{{ form.as_p }}`` will render them wrapped in ``<p>`` tags
+* ``{{ form.as_p }}`` will render them wrapped in ``<p>`` tags.
 
-* ``{{ form.as_ul }}`` will render them wrapped in ``<li>`` tags
+* ``{{ form.as_ul }}`` will render them wrapped in ``<li>`` tags.
 
 Note that you'll have to provide the surrounding ``<table>`` or ``<ul>``
 elements yourself.
