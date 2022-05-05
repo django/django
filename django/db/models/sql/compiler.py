@@ -912,10 +912,15 @@ class SQLCompiler:
                 ):
                     item = item.desc() if descending else item.asc()
                 if isinstance(item, OrderBy):
-                    results.append((item, False))
+                    results.append(
+                        (item.prefix_references(f"{name}{LOOKUP_SEP}"), False)
+                    )
                     continue
                 results.extend(
-                    self.find_ordering_name(item, opts, alias, order, already_seen)
+                    (expr.prefix_references(f"{name}{LOOKUP_SEP}"), is_ref)
+                    for expr, is_ref in self.find_ordering_name(
+                        item, opts, alias, order, already_seen
+                    )
                 )
             return results
         targets, alias, _ = self.query.trim_joins(targets, joins, path)
