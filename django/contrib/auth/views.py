@@ -1,6 +1,7 @@
 import warnings
 from urllib.parse import urlparse, urlunparse
 
+from django.apps import apps
 from django.conf import settings
 
 # Avoid shadowing the login() and logout() views below.
@@ -19,8 +20,8 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.http import HttpResponseRedirect, QueryDict
-from django.shortcuts import resolve_url
-from django.urls import reverse_lazy
+from django.shortcuts import redirect, resolve_url
+from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.http import url_has_allowed_host_and_scheme, urlsafe_base64_decode
@@ -32,6 +33,7 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
 UserModel = get_user_model()
+MFA_USER_SESSION_ID = "mfa_user_session_id"
 
 
 class RedirectURLMixin:
@@ -105,9 +107,23 @@ class LoginView(RedirectURLMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
+        user = form.get_user()
+        success_url = self.get_success_url()
+
+        if (
+            settings.MFA_IS_ACTIVE
+            and apps.is_installed("django.contrib.mfa")
+            and user.device_set.exists()
+        ):
+            self.request.session[MFA_USER_SESSION_ID] = user.id
+            return redirect(
+                reverse("mfa:verification")
+                + f"?{self.redirect_field_name}={success_url}&device_name=totp"
+            )
+
         """Security check complete. Log the user in."""
-        auth_login(self.request, form.get_user())
-        return HttpResponseRedirect(self.get_success_url())
+        auth_login(self.request, user)
+        return HttpResponseRedirect(success_url)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
