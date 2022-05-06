@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+    {% if title %}
+    <title>{{ title }}</title>
+    {% else %}
+    <title>MFA</title>
+    {% endif %}
+</head>
+
+<body>
+    <main class="container">
+        <div>
+            {% if messages %}
+                {% for message in messages %}
+                    <div>{{message}}</div>
+                {% endfor %}
+            {% endif %}
+
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+</body>
+
+</html>

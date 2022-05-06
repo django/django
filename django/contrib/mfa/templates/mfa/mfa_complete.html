@@ -1,0 +1,6 @@
+{% extends 'mfa/base.html'%}
+
+{% block content %}
+<p>You have successfully set up multi-factor authentication.</p>
+<a href="{% url 'mfa:mfa' %}">MFA</a>
+{% endblock %}

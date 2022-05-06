@@ -1,0 +1,16 @@
+{% extends 'mfa/base.html'%}
+
+{% block content %}
+{% if devices %}
+<p>MFA devices.</p>
+<ul>
+    {% for device in devices %}
+        <li>
+            {{device.name}} 
+            <span><a href="{% url 'mfa:device-delete' device.slug %}">Deactivate</a></span>
+        </li>
+    {% endfor %}
+</ul>
+{% endif %}
+<a href="{% url 'mfa:totp-setup' %}">Set up MFA</a>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'mfa/base.html'%}
+
+{% block content %}
+<p>Please enter your one time password (OTP).</p>
+<form method="POST">
+    {% csrf_token %}
+    {{ form }}
+    <button type="submit">Submit</button>
+</form>
+<br>
+{% if device_name != "email"|upper %}
+<a href="{% url 'mfa:email-verification' %}?{{ redirect_field_name }}={{ verification_url }}&{{ redirect_field_name }}={{ next_url }}">
+     Send code to my email 
+</a>
+{% endif %}
+{% endblock %}

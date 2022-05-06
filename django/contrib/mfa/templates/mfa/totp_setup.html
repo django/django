@@ -1,0 +1,18 @@
+{% extends 'mfa/base.html'%}
+
+{% block content %}
+
+<p>Scan the QR code with your authenticator app and enter the code.</p>
+<form method="POST">
+    {% csrf_token %}
+    <img src="data:image/png;base64,{{form.qr_code.value}}" width="200" height="200">
+    <br>
+    {{ form }}
+    <button type="submit">Set up</button>
+</form>
+<br>
+<a href="{% url 'mfa:email-verification' %}?{{ redirect_field_name }}={{ redirect_url }}">
+    Use email instead 
+</a>
+
+{% endblock %}

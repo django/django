@@ -1,0 +1,15 @@
+{% extends 'mfa/base.html'%}
+
+{% block content %}
+<p>Please enter the code sent to your email.</p>
+<form method="POST">
+    {% csrf_token %}
+    {{ form }}
+    <br>
+    {% if errors %}
+    <a href="{% url 'email-mfa-new' %}">Try again.</a>
+    {% endif %}
+
+    <button type="submit">Set up</button>
+</form>
+{% endblock %}

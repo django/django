@@ -1,0 +1,12 @@
+{% extends 'mfa/base.html'%}
+
+{% block content %}
+<p>Deactivating MFA will make your account less secure.</p>
+<p>Are you sure you want to deactivate MFA?</p>
+<form method="POST">
+    {% csrf_token %}
+    {{ form }}
+    <button type="submit">Deactivate</button>
+</form>
+<a href="{% url 'mfa:mfa' %}">Cancel</a>
+{% endblock %}

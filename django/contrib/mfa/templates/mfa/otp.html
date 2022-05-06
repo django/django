@@ -1,0 +1,8 @@
+{% block content %}
+<p>Please enter your one time password (OTP).</p>
+<form method="POST">
+    {% csrf_token %}
+    {{ form }}
+    <button type="submit">Submit</button>
+</form>
+{% endblock %}

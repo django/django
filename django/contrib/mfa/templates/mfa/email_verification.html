@@ -1,0 +1,11 @@
+{% extends 'mfa/base.html'%}
+
+{% block content %}
+<p>Please enter your email address.</p>
+<form method="POST">
+    {% csrf_token %}
+    {{ form }}
+    <br>
+    <button type="submit">Submit</button>
+</form>
+{% endblock %}
