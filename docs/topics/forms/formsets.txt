@@ -287,12 +287,20 @@ sure you understand what they do before doing so.
 a form instance with a prefix of ``__prefix__`` for easier use in dynamic
 forms with JavaScript.
 
+.. _formsets-error-messages:
+
 ``error_messages``
 ------------------
 
 The ``error_messages`` argument lets you override the default messages that the
 formset will raise. Pass in a dictionary with keys matching the error messages
-you want to override. For example, here is the default error message when the
+you want to override. Error message keys include ``'too_few_forms'``,
+``'too_many_forms'``, and ``'missing_management_form'``. The
+``'too_few_forms'`` and ``'too_many_forms'`` error messages may contain
+``%(num)d``, which will be replaced with ``min_num`` and ``max_num``,
+respectively.
+
+For example, here is the default error message when the
 management form is missing::
 
     >>> formset = ArticleFormSet({})
@@ -308,6 +316,10 @@ And here is a custom error message::
     False
     >>> formset.non_form_errors()
     ['Sorry, something went wrong.']
+
+.. versionchanged:: 4.1
+
+    The ``'too_few_forms'`` and ``'too_many_forms'`` keys were added.
 
 Custom formset validation
 -------------------------
@@ -410,6 +422,9 @@ deletion, is less than or equal to ``max_num``.
 ``max_num`` was exceeded because the amount of initial data supplied was
 excessive.
 
+The error message can be customized by passing the ``'too_many_forms'`` message
+to the :ref:`formsets-error-messages` argument.
+
 .. note::
 
     Regardless of ``validate_max``, if the number of forms in a data set
@@ -445,6 +460,9 @@ deletion, is greater than or equal to ``min_num``.
     [{}, {}]
     >>> formset.non_form_errors()
     ['Please submit at least 3 forms.']
+
+The error message can be customized by passing the ``'too_few_forms'`` message
+to the :ref:`formsets-error-messages` argument.
 
 .. note::
 

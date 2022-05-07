@@ -6,7 +6,7 @@ from django.forms.utils import ErrorList, RenderableFormMixin
 from django.forms.widgets import CheckboxInput, HiddenInput, NumberInput
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django.utils.translation import ngettext
+from django.utils.translation import ngettext_lazy
 
 __all__ = ("BaseFormSet", "formset_factory", "all_valid")
 
@@ -60,6 +60,16 @@ class BaseFormSet(RenderableFormMixin):
         "missing_management_form": _(
             "ManagementForm data is missing or has been tampered with. Missing fields: "
             "%(field_names)s. You may need to file a bug report if the issue persists."
+        ),
+        "too_many_forms": ngettext_lazy(
+            "Please submit at most %(num)d form.",
+            "Please submit at most %(num)d forms.",
+            "num",
+        ),
+        "too_few_forms": ngettext_lazy(
+            "Please submit at least %(num)d form.",
+            "Please submit at least %(num)d forms.",
+            "num",
         ),
     }
 
@@ -425,12 +435,7 @@ class BaseFormSet(RenderableFormMixin):
                 TOTAL_FORM_COUNT
             ] > self.absolute_max:
                 raise ValidationError(
-                    ngettext(
-                        "Please submit at most %d form.",
-                        "Please submit at most %d forms.",
-                        self.max_num,
-                    )
-                    % self.max_num,
+                    self.error_messages["too_many_forms"] % {"num": self.max_num},
                     code="too_many_forms",
                 )
             if (
@@ -441,12 +446,7 @@ class BaseFormSet(RenderableFormMixin):
                 < self.min_num
             ):
                 raise ValidationError(
-                    ngettext(
-                        "Please submit at least %d form.",
-                        "Please submit at least %d forms.",
-                        self.min_num,
-                    )
-                    % self.min_num,
+                    self.error_messages["too_few_forms"] % {"num": self.min_num},
                     code="too_few_forms",
                 )
             # Give self.clean() a chance to do cross-form validation.
