@@ -351,3 +351,7 @@ class LateValidationView(generic.FormView):
     def form_valid(self, form):
         form.add_error(None, "There is an error")
         return self.form_invalid(form)
+
+class AuthorSearchView(generic.SimpleSearchView):
+    model = Author
+    search_fields = ["name"]

@@ -1,8 +1,11 @@
 import datetime
+from unicodedata import name
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, override_settings
 from django.views.generic.base import View
+
+from django.db.models import Q
 
 from .models import Artist, Author, Book, Page
 
@@ -264,3 +267,10 @@ class ListViewTests(TestCase):
         Author.objects.all().delete()
         for i in range(n):
             Author.objects.create(name="Author %02i" % i, slug="a%s" % i)
+
+    def test_search_list_view(self):
+        res = self.client.get("/list/authors/search/", {"q": "scott"})
+        original_author = Author.objects.get(name__icontains="scott")
+        self.assertEqual(res.context["object_list"][0], original_author)
+        self.assertEqual(res.status_code, 200)
+        self.assertTemplateUsed(res, "generic_views/author_list.html")

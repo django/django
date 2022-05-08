@@ -153,9 +153,7 @@ many projects they are typically the most commonly used views.
             path('', ArticleListView.as_view(), name='article-list'),
         ]
 
-    **Example myapp/article_list.html**:
-
-    .. code-block:: html+django
+    **Example myapp/article_list.html**::
 
         <h1>Articles</h1>
         <ul>
@@ -168,6 +166,52 @@ many projects they are typically the most commonly used views.
 
     If you're using pagination, you can adapt the :ref:`example template from
     the pagination docs <paginating-a-list-view>`.
+
+.. class:: django.views.generic.list.SimpleSearchView
+
+    A simple class based view for getting a simple search.
+    This view is same as ListView but it requires some extra parameters.
+
+    **Example myapp/views.py**::
+    
+        from django.views.generic.list import SimpleSearchView
+
+        from article.models import Article
+
+        class ArticleSearchView(SimpleSearchView):
+        
+            model = Article
+            paginate_by = 100  # if pagination is desired
+            query_param = 'q'  # query param name, default is 'q'
+            search_fields = ['headline', 'content']
+
+    **Example myapp/urls.py**::
+
+        from django.urls import path
+
+        from article.views import ArticleSearchView
+
+        urlpatterns = [
+            path('search/', ArticleSearchView.as_view(), name='article-search'),
+        ]
+    
+    **Example myapp/article_search.html**::
+
+        <h1>Articles</h1>
+
+        <form action="{% url 'article-search' %}" method="get">
+            <input type="text" name="q" placeholder="Search..." />
+            <input type="submit" value="Search" />
+        </form>
+
+        <ul>
+        {% for article in object_list %}
+            <li>{{ article.pub_date|date }} - {{ article.headline }}</li>
+        {% empty %}
+            <li>No articles yet.</li>
+        {% endfor %}
+        </ul>
+
 
 .. class:: django.views.generic.list.BaseListView
 

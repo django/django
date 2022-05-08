@@ -1,9 +1,13 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.core.paginator import InvalidPage, Paginator
 from django.db.models import QuerySet
+from django.db.models import Q
+from functools import reduce
+from operator import or_
 from django.http import Http404
 from django.utils.translation import gettext as _
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
+from django.core.exceptions import FieldDoesNotExist
 
 
 class MultipleObjectMixin(ContextMixin):
@@ -218,3 +222,39 @@ class ListView(MultipleObjectTemplateResponseMixin, BaseListView):
     Render some list of objects, set by `self.model` or `self.queryset`.
     `self.queryset` can actually be any iterable of items, not just a queryset.
     """
+
+
+class SimpleSearchView(ListView):
+    """
+    A list view that allows for simple search.
+    """
+    query_term = 'q'
+    fields = []
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        q = self.request.GET.get(self.query_term)
+        if len(self.fields):
+            opt = qs.model._meta
+            
+            for field in self.fields:
+                if field == 'pk':
+                    field = opt.pk.name
+                try:
+                    field = opt.get_field(field)
+                except FieldDoesNotExist:
+                    raise ImproperlyConfigured(
+                        "%s requires a field named %s" % (self.__class__.__name__, field)
+                    )
+                if q:
+                    qs = qs.filter(
+                        reduce(
+                            or_,
+                            (
+                                Q(**{f'{field}__icontains': q})
+                                for field in self.fields
+                            ),
+                        )
+                    )
+
+        return qs

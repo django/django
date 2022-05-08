@@ -216,6 +216,9 @@ urlpatterns = [
         "list/authors/paginated/custom_constructor/",
         views.AuthorListCustomPaginator.as_view(),
     ),
+    path(
+        "list/authors/search/", views.AuthorSearchView.as_view()
+    ),
     path("list/books/sorted/", views.BookList.as_view(ordering="name")),
     path(
         "list/books/sortedbypagesandnamedec/",

@@ -10,7 +10,7 @@ from django.views.generic.dates import (
 )
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
-from django.views.generic.list import ListView
+from django.views.generic.list import ListView, SimpleSearchView
 
 __all__ = [
     "View",
@@ -29,6 +29,7 @@ __all__ = [
     "UpdateView",
     "DeleteView",
     "ListView",
+    "SimpleSearchView",
     "GenericViewError",
 ]
 
