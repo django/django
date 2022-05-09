@@ -397,6 +397,10 @@ Templates
   :setting:`OPTIONS['loaders'] <TEMPLATES-OPTIONS>` isn't specified. You may
   specify ``OPTIONS['loaders']`` to override this, if necessary.
 
+* ``OPTIONS['dir_name']`` defines the name of the folder app directory template
+  loader uses. This can also be defined when defining the loader as its first
+  argument e.g. ``("django.template.loaders.cached.Loader", loaders)``
+
 Tests
 ~~~~~
 

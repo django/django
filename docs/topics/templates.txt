@@ -474,7 +474,7 @@ template engine.
 
 When :setting:`APP_DIRS <TEMPLATES-APP_DIRS>` is ``True``, ``DjangoTemplates``
 engines look for templates in the ``templates`` subdirectory of installed
-applications. This generic name was kept for backwards-compatibility.
+applications. Use ``dir_name`` in the options to set a different name
 
 ``DjangoTemplates`` engines accept the following :setting:`OPTIONS
 <TEMPLATES-OPTIONS>`:
@@ -514,6 +514,9 @@ applications. This generic name was kept for backwards-compatibility.
   :setting:`APP_DIRS <TEMPLATES-APP_DIRS>`.
 
   See :ref:`template-loaders` for details.
+
+* ``'dir_name'``: Defines the name of the template folder used in the
+  subdirectories when ``APP_DIRS`` is set to ``True``.
 
 * ``'string_if_invalid'``: the output, as a string, that the template system
   should use for invalid (e.g. misspelled) variables.
