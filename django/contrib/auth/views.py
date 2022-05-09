@@ -24,7 +24,11 @@ from django.shortcuts import redirect, resolve_url
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.deprecation import RemovedInDjango50Warning
-from django.utils.http import url_has_allowed_host_and_scheme, urlsafe_base64_decode
+from django.utils.http import (
+    get_path_and_query,
+    url_has_allowed_host_and_scheme,
+    urlsafe_base64_decode,
+)
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
@@ -117,8 +121,10 @@ class LoginView(RedirectURLMixin, FormView):
         ):
             self.request.session[MFA_USER_SESSION_ID] = user.id
             return redirect(
-                reverse("mfa:verification")
-                + f"?{self.redirect_field_name}={success_url}&device_name=totp"
+                get_path_and_query(
+                    reverse("mfa:verification"),
+                    {self.redirect_field_name: success_url, "device_name": "totp"},
+                )
             )
 
         """Security check complete. Log the user in."""

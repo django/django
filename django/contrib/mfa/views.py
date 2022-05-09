@@ -6,7 +6,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
-from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils.http import get_path_and_query, url_has_allowed_host_and_scheme
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import DeleteView
@@ -61,10 +61,11 @@ class EmailSetupView(ViewMixin, LoginRequiredMixin, FormView):
 
     def get(self, request, *args, **kwargs):
         if request.session.get(EMAIL_KEY_NAME) is None:
-            current_url = self.request.path
             return redirect(
-                reverse("mfa:email-verification")
-                + f"?{self.redirect_field_name}={current_url}"
+                get_path_and_query(
+                    reverse("mfa:email-verification"),
+                    {self.redirect_field_name: self.request.path},
+                )
             )
         form = self.form_class(**self.get_form_kwargs())
         return render(request, self.template_name, {"form": form})
@@ -79,7 +80,7 @@ class EmailVerificationView(RedirectURLMixin, ViewMixin, FormView):
     def form_valid(self, form):
         email = form.cleaned_data.get("email")
         if form.same_email(email):
-            if settings.RECEIVE_MFA_CODE is True:
+            if settings.RECEIVE_MFA_CODE:
                 mfa_code_signal.send_robust(
                     sender=self.__class__, mfa_code=form._generate_totp()
                 )
@@ -90,16 +91,17 @@ class EmailVerificationView(RedirectURLMixin, ViewMixin, FormView):
     def get_redirect_url(self):
         redirect_urls = self.request.GET.getlist(self.redirect_field_name)
         verification_url = reverse("mfa:verification")
+
         if self.safe_urls(redirect_urls) and verification_url in redirect_urls:
             try:
                 mfa_verification_url, next_url, *_ = redirect_urls
-                redirect_to = (
-                    mfa_verification_url
-                    + f"?{self.redirect_field_name}={next_url}&{self.device_name}=email"
-                )
-                return redirect_to
             except ValueError:
                 pass
+            else:
+                return get_path_and_query(
+                    mfa_verification_url,
+                    {self.redirect_field_name: next_url, self.device_name: "email"},
+                )
         return super().get_redirect_url()
 
     def safe_urls(self, urls):
