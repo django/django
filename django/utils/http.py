@@ -10,10 +10,11 @@ from urllib.parse import (
     _coerce_args,
     _splitnetloc,
     _splitparams,
+    quote,
     scheme_chars,
 )
 from urllib.parse import urlencode as original_urlencode
-from urllib.parse import uses_params
+from urllib.parse import urlparse, urlunparse, uses_params
 
 from django.utils.datastructures import MultiValueDict
 from django.utils.regex_helper import _lazy_re_compile
@@ -366,3 +367,11 @@ def escape_leading_slashes(url):
     if url.startswith("//"):
         url = "/%2F{}".format(url[2:])
     return url
+
+
+def get_path_and_query(path, query):
+    """Return a URL-encoded path and query."""
+    parsed = urlparse(path)
+    encoded_query = original_urlencode(query, safe="/", quote_via=quote)
+    parsed = parsed._replace(query=encoded_query)
+    return urlunparse(parsed)
