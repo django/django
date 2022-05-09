@@ -2657,25 +2657,25 @@ class CacheMiddlewareTest(SimpleTestCase):
 
         self.assertEqual(len(self.default_cache._cache), 0)
 
-        with self.subTest(hit="anonymous hit"):
-            request = self.factory.get("/")
-            request.user = AnonUser()
-            response = _view(request)
-            self.assertEqual(response.content, b"Hello, Anon!")
-            anon_cache_key = get_cache_key(
-                request, anon_key_prefix, "GET", cache=self.default_cache
-            )
-            self.assertIn(anon_cache_key, self.default_cache)
+        # anonymous hit
+        request = self.factory.get("/")
+        request.user = AnonUser()
+        response = _view(request)
+        self.assertEqual(response.content, b"Hello, Anon!")
+        anon_cache_key = get_cache_key(
+            request, anon_key_prefix, "GET", cache=self.default_cache
+        )
+        self.assertIn(anon_cache_key, self.default_cache)
 
-        with self.subTest(hit="authenticated hit"):
-            request = self.factory.get("/")
-            request.user = User()
-            response = _view(request)
-            self.assertEqual(response.content, b"Hello, User!")
-            auth_cache_key = get_cache_key(
-                request, auth_key_prefix, "GET", cache=self.default_cache
-            )
-            self.assertIn(auth_cache_key, self.default_cache)
+        # authenticated hit
+        request = self.factory.get("/")
+        request.user = User()
+        response = _view(request)
+        self.assertEqual(response.content, b"Hello, User!")
+        auth_cache_key = get_cache_key(
+            request, auth_key_prefix, "GET", cache=self.default_cache
+        )
+        self.assertIn(auth_cache_key, self.default_cache)
 
     def test_conditional_cache_key(self):
         """The key prefix callback bypasses the cache on query param"""
@@ -2698,35 +2698,31 @@ class CacheMiddlewareTest(SimpleTestCase):
 
         self.assertEqual(call_count, 0)
 
-        with self.subTest(hit="1st uncached hit"):
-            response = _view(self.factory.get(f"/?{nocache_flag}"))
-            self.assertEqual(response.content, b"1")
-            self.assertEqual(call_count, 1)
+        # 1st uncached hit
+        response = _view(self.factory.get(f"/?{nocache_flag}"))
+        self.assertEqual(response.content, b"1")
+        self.assertEqual(call_count, 1)
 
-        with self.subTest(hit="2nd uncached hit"):
-            response = _view(self.factory.get(f"/?{nocache_flag}"))
-            self.assertEqual(response.content, b"2")
-            self.assertEqual(call_count, 2)
+        # 2nd uncached hit
+        response = _view(self.factory.get(f"/?{nocache_flag}"))
+        self.assertEqual(response.content, b"2")
+        self.assertEqual(call_count, 2)
 
-        with self.subTest(hit="1st cached hit"):
-            request = self.factory.get("/")
-            response = _view(request)
-            self.assertEqual(response.content, b"3")
-            self.assertEqual(call_count, 3)
-            cache_key = get_cache_key(
-                request, key_prefix, "GET", cache=self.default_cache
-            )
-            self.assertIn(cache_key, self.default_cache)
+        # 1st cached hit
+        request = self.factory.get("/")
+        response = _view(request)
+        self.assertEqual(response.content, b"3")
+        self.assertEqual(call_count, 3)
+        cache_key = get_cache_key(request, key_prefix, "GET", cache=self.default_cache)
+        self.assertIn(cache_key, self.default_cache)
 
-        with self.subTest(hit="2nd cached hit"):
-            request = self.factory.get("/")
-            response = _view(request)
-            self.assertEqual(response.content, b"3")
-            self.assertEqual(call_count, 3)
-            cache_key = get_cache_key(
-                request, key_prefix, "GET", cache=self.default_cache
-            )
-            self.assertIn(cache_key, self.default_cache)
+        # 2nd cached hit
+        request = self.factory.get("/")
+        response = _view(request)
+        self.assertEqual(response.content, b"3")
+        self.assertEqual(call_count, 3)
+        cache_key = get_cache_key(request, key_prefix, "GET", cache=self.default_cache)
+        self.assertIn(cache_key, self.default_cache)
 
     def test_cache_page_timeout(self):
         # Page timeout takes precedence over the "max-age" section of the
