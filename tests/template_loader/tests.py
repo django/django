@@ -180,3 +180,40 @@ class TemplateLoaderTests(SimpleTestCase):
             ["template_loader/goodbye.html", "template_loader/hello.html"]
         )
         self.assertEqual(content, "Goodbye! (Django templates)\n")
+
+
+class CustomTemplateLoaderTests(SimpleTestCase):
+    @override_settings(
+        TEMPLATES=[
+            {
+                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "OPTIONS": {
+                    "loaders": [
+                        ("django.template.loaders.app_directories.Loader", "alt_templates")
+                    ],
+                },
+            },
+        ]
+    )
+    def test_custom_app_template_name(self):
+        template = select_template(
+            ["template_loader/custom.html"]
+        )
+        self.assertEqual(template.render(), "Custom page from template\n")
+
+    @override_settings(
+        TEMPLATES=[
+            {
+                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "APP_DIRS": True,
+                "OPTIONS": {
+                    "dir_name": "alt_templates",
+                },
+            },
+        ]
+    )
+    def test_dir_name(self):
+        template = select_template(
+            ["template_loader/custom.html"]
+        )
+        self.assertEqual(template.render(), "Custom page from template\n")

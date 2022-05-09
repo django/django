@@ -190,11 +190,30 @@ class DjangoTemplatesTests(TemplateStringsTests):
                             "django.template.loaders.cached.Loader",
                             [
                                 "django.template.loaders.filesystem.Loader",
-                                "django.template.loaders.app_directories.Loader",
+                                ("django.template.loaders.app_directories.Loader", None)
                             ],
                         )
                     ],
                 )
+
+    def test_dir_name_app_directory_loader(self):
+        engine = DjangoTemplates(
+            {"DIRS": [], "APP_DIRS": True, "NAME": "django",
+             "OPTIONS": {'dir_name': 'custom_template_folder'}}
+        )
+        self.assertEqual(
+            engine.engine.loaders,
+            [
+                (
+                    "django.template.loaders.cached.Loader",
+                    [
+                        "django.template.loaders.filesystem.Loader",
+                        ("django.template.loaders.app_directories.Loader",
+                         "custom_template_folder")
+                    ],
+                )
+            ],
+        )
 
     def test_dirs_pathlib(self):
         engine = DjangoTemplates(

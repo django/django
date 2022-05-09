@@ -21,6 +21,7 @@ class Engine:
         self,
         dirs=None,
         app_dirs=False,
+        dir_name=None,
         context_processors=None,
         debug=False,
         loaders=None,
@@ -37,7 +38,7 @@ class Engine:
         if loaders is None:
             loaders = ["django.template.loaders.filesystem.Loader"]
             if app_dirs:
-                loaders += ["django.template.loaders.app_directories.Loader"]
+                loaders += [("django.template.loaders.app_directories.Loader", dir_name)]
             loaders = [("django.template.loaders.cached.Loader", loaders)]
         else:
             if app_dirs:
