@@ -61,7 +61,7 @@ class EmailSetupView(ViewMixin, LoginRequiredMixin, FormView):
 
     def get(self, request, *args, **kwargs):
         if request.session.get(EMAIL_KEY_NAME) is None:
-            current_url = self.request.resolver_match.url_name
+            current_url = self.request.path
             return redirect(
                 reverse("mfa:email-verification")
                 + f"?{self.redirect_field_name}={current_url}"
