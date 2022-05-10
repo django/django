@@ -7,6 +7,14 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
+.. _deprecation-removed-in-5.1:
+
+5.1
+---
+
+See the :ref:`Django 4.2 release notes <deprecated-features-4.2>` for more
+details on these changes.
+
 .. _deprecation-removed-in-5.0:
 
 5.0
