@@ -202,6 +202,10 @@ class HashedFilesMixin:
             # Strip off the fragment so a path-like fragment won't interfere.
             url_path, fragment = urldefrag(url)
 
+            # Ignore URLs without a path
+            if not url_path:
+                return matched
+
             if url_path.startswith("/"):
                 # Otherwise the condition above would have returned prematurely.
                 assert url_path.startswith(settings.STATIC_URL)
