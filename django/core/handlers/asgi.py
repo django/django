@@ -164,12 +164,15 @@ class ASGIHandler(base.BaseHandler):
         except RequestAborted:
             return
         # Request is complete and can be served.
-        set_script_prefix(self.get_script_prefix(scope))
-        await sync_to_async(signals.request_started.send, thread_sensitive=True)(
-            sender=self.__class__, scope=scope
-        )
-        # Get the request and check for basic issues.
-        request, error_response = self.create_request(scope, body_file)
+        try:
+            set_script_prefix(self.get_script_prefix(scope))
+            await sync_to_async(signals.request_started.send, thread_sensitive=True)(
+                sender=self.__class__, scope=scope
+            )
+            # Get the request and check for basic issues.
+            request, error_response = self.create_request(scope, body_file)
+        finally:
+            body_file.close()
         if request is None:
             await self.send_response(error_response, send)
             return
@@ -192,6 +195,7 @@ class ASGIHandler(base.BaseHandler):
         while True:
             message = await receive()
             if message["type"] == "http.disconnect":
+                body_file.close()
                 # Early client disconnect.
                 raise RequestAborted()
             # Add a body chunk from the message, if provided.
