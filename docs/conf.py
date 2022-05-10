@@ -107,7 +107,7 @@ copyright = "Django Software Foundation and contributors"
 # built documents.
 #
 # The short X.Y version.
-version = "4.1"
+version = "4.2"
 # The full version, including alpha/beta/rc tags.
 try:
     from django import VERSION, get_version
@@ -124,7 +124,7 @@ else:
     release = django_release()
 
 # The "development version" of Django
-django_next_version = "4.1"
+django_next_version = "4.2"
 
 extlinks = {
     "bpo": ("https://bugs.python.org/issue?@action=redirect&bpo=%s", "bpo-"),
