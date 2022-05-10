@@ -17,6 +17,7 @@ from django.utils.crypto import (
     md5,
     pbkdf2,
 )
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_noop as _
 
@@ -797,6 +798,7 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
         pass
 
 
+# RemovedInDjango50Warning.
 class CryptPasswordHasher(BasePasswordHasher):
     """
     Password hashing using UNIX crypt (not recommended)
@@ -806,6 +808,14 @@ class CryptPasswordHasher(BasePasswordHasher):
 
     algorithm = "crypt"
     library = "crypt"
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "django.contrib.auth.hashers.CryptPasswordHasher is deprecated.",
+            RemovedInDjango50Warning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
     def salt(self):
         return get_random_string(2)
