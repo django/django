@@ -6,7 +6,6 @@ file upload handlers for processing.
 """
 import base64
 import binascii
-import cgi
 import collections
 import html
 from urllib.parse import unquote
@@ -20,6 +19,7 @@ from django.core.exceptions import (
 from django.core.files.uploadhandler import SkipFile, StopFutureHandlers, StopUpload
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str
+from django.utils.regex_helper import _lazy_re_compile
 
 __all__ = ("MultiPartParser", "MultiPartParserError", "InputStreamExhausted")
 
@@ -49,6 +49,8 @@ class MultiPartParser:
     and returns a tuple of ``(MultiValueDict(POST), MultiValueDict(FILES))``.
     """
 
+    boundary_re = _lazy_re_compile(rb"[ -~]{0,200}[!-~]")
+
     def __init__(self, META, input_data, upload_handlers, encoding=None):
         """
         Initialize the MultiPartParser object.
@@ -77,7 +79,7 @@ class MultiPartParser:
                 % force_str(content_type)
             )
         boundary = opts.get("boundary")
-        if not boundary or not cgi.valid_boundary(boundary):
+        if not boundary or not self.boundary_re.fullmatch(boundary):
             raise MultiPartParserError(
                 "Invalid boundary in multipart: %s" % force_str(boundary)
             )
