@@ -325,12 +325,6 @@ argument. For example::
             manifest_storage = StaticFilesStorage(location=settings.BASE_DIR)
             super().__init__(*args, manifest_storage=manifest_storage, **kwargs)
 
-.. versionchanged:: 4.0
-
-    Support for finding paths in JavaScript source map comments was added.
-
-    The ``manifest_storage`` argument was added.
-
 .. versionchanged:: 4.1
 
     Support for finding paths in CSS source map comments was added.
@@ -396,10 +390,6 @@ hashing algorithm.
 
 Use this mixin with a custom storage to append the MD5 hash of the file's
 content to the filename as :class:`~storage.ManifestStaticFilesStorage` does.
-
-.. versionchanged:: 4.0
-
-    The ``manifest_storage`` argument was added.
 
 Finders Module
 ==============

@@ -529,8 +529,6 @@ attributes.
 ``template_name``
 ~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 4.0
-
 .. attribute:: Form.template_name
 
 The name of the template rendered if the form is cast into a string, e.g. via
@@ -549,8 +547,6 @@ class.
 ``render()``
 ~~~~~~~~~~~~
 
-.. versionadded:: 4.0
-
 .. method:: Form.render(template_name=None, context=None, renderer=None)
 
 The render method is called by ``__str__`` as well as the
@@ -567,8 +563,6 @@ single call.
 ``get_context()``
 ~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 4.0
-
 .. method:: Form.get_context()
 
 Return the template context for rendering the form.
@@ -582,8 +576,6 @@ The available context is:
 
 ``template_name_label``
 ~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 4.0
 
 .. attribute:: Form.template_name_label
 
@@ -998,15 +990,11 @@ Customizing the error list format
 
     .. attribute:: renderer
 
-        .. versionadded:: 4.0
-
         Specifies the :doc:`renderer <renderers>` to use for ``ErrorList``.
         Defaults to ``None`` which means to use the default renderer
         specified by the :setting:`FORM_RENDERER` setting.
 
     .. attribute:: template_name
-
-        .. versionadded:: 4.0
 
         The name of the template used when calling ``__str__`` or
         :meth:`render`. By default this is
@@ -1015,15 +1003,11 @@ Customizing the error list format
 
     .. attribute:: template_name_text
 
-        .. versionadded:: 4.0
-
         The name of the template used when calling :meth:`.as_text`. By default
         this is ``'django/forms/errors/list/text.html'``. This template renders
         the errors as a list of bullet points.
 
     .. attribute:: template_name_ul
-
-        .. versionadded:: 4.0
 
         The name of the template used when calling :meth:`.as_ul`. By default
         this is ``'django/forms/errors/list/ul.html'``. This template renders
@@ -1031,8 +1015,6 @@ Customizing the error list format
         classes as defined by :attr:`.error_class`.
 
     .. method:: get_context()
-
-        .. versionadded:: 4.0
 
         Return context for rendering of errors in a template.
 
@@ -1042,8 +1024,6 @@ Customizing the error list format
         * ``error_class`` : A string of CSS classes.
 
     .. method:: render(template_name=None, context=None, renderer=None)
-
-        .. versionadded:: 4.0
 
         The render method is called by ``__str__`` as well as by the
         :meth:`.as_ul` method.
@@ -1068,10 +1048,6 @@ Customizing the error list format
     overriding the :attr:`.template_name` attribute or more generally by
     overriding the default template, see also
     :ref:`overriding-built-in-form-templates`.
-
-.. versionchanged:: 4.0
-
-    Rendering of :class:`ErrorList` was moved to the template engine.
 
 .. deprecated:: 4.0
 
@@ -1340,10 +1316,6 @@ Methods of ``BoundField``
     the :attr:`.Form.template_name_label` attribute or more generally by
     overriding the default template, see also
     :ref:`overriding-built-in-form-templates`.
-
-    .. versionchanged:: 4.0
-
-        The label is now rendered using the template engine.
 
     .. versionchanged:: 4.1
 

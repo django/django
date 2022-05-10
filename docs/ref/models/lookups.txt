@@ -218,8 +218,3 @@ following methods:
     .. method:: process_rhs(compiler, connection)
 
         Behaves the same way as :meth:`process_lhs`, for the right-hand side.
-
-    .. versionchanged:: 4.0
-
-        Support for using lookups in ``QuerySet`` annotations, aggregations,
-        and directly in filters was added.

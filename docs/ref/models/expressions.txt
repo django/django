@@ -416,8 +416,6 @@ The ``Aggregate`` API is as follows:
 
     .. attribute:: empty_result_set_value
 
-        .. versionadded:: 4.0
-
         Defaults to ``None`` since most aggregate functions result in ``NULL``
         when applied to an empty result set.
 
@@ -454,10 +452,6 @@ grouping) contains no entries.
 
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
 into the ``template`` attribute.
-
-.. versionchanged:: 4.0
-
-    The ``default`` argument was added.
 
 Creating your own Aggregate Functions
 -------------------------------------
@@ -962,8 +956,6 @@ calling the appropriate methods on the wrapped expression.
         ``False``.
 
     .. attribute:: empty_result_set_value
-
-        .. versionadded:: 4.0
 
         Tells Django which value should be returned when the expression is used
         to apply a function over an empty result set. Defaults to

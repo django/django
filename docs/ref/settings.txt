@@ -159,10 +159,6 @@ You can use a cache backend that doesn't ship with Django by setting
 :setting:`BACKEND <CACHES-BACKEND>` to a fully-qualified path of a cache
 backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
 
-.. versionchanged:: 4.0
-
-    The ``RedisCache`` backend was added.
-
 .. setting:: CACHES-KEY_FUNCTION
 
 ``KEY_FUNCTION``
@@ -493,13 +489,6 @@ requests originate from an insecure page).
 The setting also supports subdomains, so you could add
 ``'https://*.example.com'``, for example, to allow access from all subdomains
 of ``example.com``.
-
-.. versionchanged:: 4.0
-
-    The values in older versions must only include the hostname (possibly with
-    a leading dot) and not the scheme or an asterisk.
-
-    Also, ``Origin`` header checking isn't performed in older versions.
 
 .. setting:: DATABASES
 
@@ -2355,8 +2344,6 @@ already have it.
 ``SECURE_CROSS_ORIGIN_OPENER_POLICY``
 -------------------------------------
 
-.. versionadded:: 4.0
-
 Default: ``'same-origin'``
 
 Unless set to ``None``, the
@@ -2841,8 +2828,6 @@ the correct environment.
 ``USE_DEPRECATED_PYTZ``
 -----------------------
 
-.. versionadded:: 4.0
-
 Default: ``False``
 
 A boolean that specifies whether to use ``pytz``, rather than :mod:`zoneinfo`,
@@ -2884,10 +2869,6 @@ default or not. If this is set to ``True``, e.g. Django will display numbers and
 dates using the format of the current locale.
 
 See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
-
-.. versionchanged:: 4.0
-
-    In older versions, the default value is ``False``.
 
 .. deprecated:: 4.0
 

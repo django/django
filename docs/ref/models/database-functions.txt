@@ -1173,10 +1173,6 @@ It can also be registered as a transform. For example::
     >>> # Get vectors whose round() is less than 20
     >>> vectors = Vector.objects.filter(x__round__lt=20, y__round__lt=20)
 
-.. versionchanged:: 4.0
-
-    The ``precision`` argument was added.
-
 ``Sign``
 --------
 

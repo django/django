@@ -906,11 +906,6 @@ It also provides an additional method:
                 self.assertEqual(mail.outbox[0].subject, 'Contact Form')
                 self.assertEqual(mail.outbox[0].body, 'I like your site')
 
-    .. versionchanged:: 4.0
-
-        In older versions, new callbacks added while executing
-        :func:`.transaction.on_commit` callbacks were not captured.
-
 .. _live-test-server:
 
 ``LiveServerTestCase``
@@ -1649,12 +1644,6 @@ your test suite.
     raised if one of them cannot be parsed.
 
     Output in case of error can be customized with the ``msg`` argument.
-
-    .. versionchanged:: 4.0
-
-        In older versions, any attribute (not only boolean attributes) without
-        a value was considered equal to an attribute with the same name and
-        value.
 
 .. method:: SimpleTestCase.assertHTMLNotEqual(html1, html2, msg=None)
 

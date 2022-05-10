@@ -182,8 +182,6 @@ needs can be located.
 Context available in formset templates
 ======================================
 
-.. versionadded:: 4.0
-
 Formset templates receive a context from :meth:`.BaseFormSet.get_context`. By
 default, formsets receive a dictionary with the following values:
 
@@ -191,8 +189,6 @@ default, formsets receive a dictionary with the following values:
 
 Context available in form templates
 ===================================
-
-.. versionadded:: 4.0
 
 Form templates receive a context from :meth:`.Form.get_context`. By default,
 forms receive a dictionary with the following values:
@@ -224,8 +220,6 @@ defines ``widget['subwidgets']`` for looping purposes.
 Overriding built-in formset templates
 =====================================
 
-.. versionadded:: 4.0
-
 :attr:`.BaseFormSet.template_name`
 
 To override formset templates, you must use the :class:`TemplatesSetting`
@@ -236,8 +230,6 @@ renderer. Then overriding widget templates works :doc:`the same as
 
 Overriding built-in form templates
 ==================================
-
-.. versionadded:: 4.0
 
 :attr:`.Form.template_name`
 

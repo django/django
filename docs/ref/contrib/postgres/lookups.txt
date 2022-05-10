@@ -27,8 +27,6 @@ The ``trigram_similar`` lookup can be used on
 
 .. fieldlookup:: trigram_word_similar
 
-.. versionadded:: 4.0
-
 The ``trigram_word_similar`` lookup allows you to perform trigram word
 similarity lookups using a dedicated PostgreSQL extension. It can be
 approximately understood as measuring the greatest number of trigrams shared

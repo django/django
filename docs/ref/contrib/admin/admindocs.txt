@@ -55,10 +55,6 @@ system along with all the fields, properties, and methods available on it.
 Relationships to other models appear as hyperlinks. Descriptions are pulled
 from ``help_text`` attributes on fields or from docstrings on model methods.
 
-.. versionchanged:: 4.0
-
-    Older versions don't display model cached properties.
-
 A model with useful documentation might look like this::
 
     class BlogEntry(models.Model):

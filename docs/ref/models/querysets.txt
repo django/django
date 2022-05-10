@@ -1869,10 +1869,6 @@ raised if ``select_for_update()`` is used in autocommit mode.
     PostgreSQL doesn't support ``select_for_update()`` with
     :class:`~django.db.models.expressions.Window` expressions.
 
-.. versionchanged:: 4.0
-
-    The ``skip_locked`` argument was allowed on MariaDB 10.6+.
-
 ``raw()``
 ~~~~~~~~~
 
@@ -2331,10 +2327,6 @@ support it).
 .. _MySQL documentation: https://dev.mysql.com/doc/refman/en/sql-mode.html#ignore-strict-comparison
 .. _MariaDB documentation: https://mariadb.com/kb/en/ignore/
 
-.. versionchanged:: 4.0
-
-    Support for the fetching primary key attributes on SQLite 3.35+ was added.
-
 .. versionchanged:: 4.1
 
     The ``update_conflicts``, ``update_fields``, and ``unique_fields``
@@ -2363,10 +2355,6 @@ updated::
     >>> objs[1].headline = 'This is entry 2'
     >>> Entry.objects.bulk_update(objs, ['headline'])
     2
-
-.. versionchanged:: 4.0
-
-    The return value of the number of objects updated was added.
 
 :meth:`.QuerySet.update` is used to save the changes, so this is more efficient
 than iterating through the list of models and calling ``save()`` on each of
@@ -2777,8 +2765,6 @@ results and then checks if any were returned.
 .. method:: acontains(obj)
 
 *Asynchronous version*: ``acontains()``
-
-.. versionadded:: 4.0
 
 Returns ``True`` if the :class:`.QuerySet` contains ``obj``, and ``False`` if
 not. This tries to perform the query in the simplest and fastest way possible.
@@ -3832,8 +3818,6 @@ example usage.
 
 ``default``
 ~~~~~~~~~~~
-
-.. versionadded:: 4.0
 
 An optional argument that allows specifying a value to use as a default value
 when the queryset (or grouping) contains no entries.

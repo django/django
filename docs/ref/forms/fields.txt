@@ -1350,11 +1350,6 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
             def label_from_instance(self, obj):
                 return "My Object #%i" % obj.id
 
-    .. versionchanged:: 4.0
-
-        Support for containing ``%(value)s`` in the ``invalid_choice`` error
-        message was added.
-
 ``ModelMultipleChoiceField``
 ----------------------------
 
