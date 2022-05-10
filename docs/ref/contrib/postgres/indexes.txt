@@ -178,10 +178,6 @@ available from the ``django.contrib.postgres.indexes`` module.
 
     creates an exclusion constraint on ``circle`` using ``circle_ops``.
 
-    .. versionchanged:: 4.0
-
-        Support for functional unique constraints was added.
-
     .. versionchanged:: 4.1
 
         Support for exclusion constraints was added.

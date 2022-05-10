@@ -725,11 +725,6 @@ that specifies the template used to render each choice. For example, for the
           ...
         </div>
 
-    .. versionchanged:: 4.0
-
-        So they are announced more concisely by screen readers, radio buttons
-        were changed to render in ``<div>`` tags.
-
     For more granular control over the generated markup, you can loop over the
     radio buttons in the template. Assuming a form ``myform`` with a field
     ``beatles`` that uses a ``RadioSelect`` as its widget:
@@ -835,11 +830,6 @@ that specifies the template used to render each choice. For example, for the
 
     The outer ``<div>`` container receives the ``id`` attribute of the widget,
     if defined, or :attr:`BoundField.auto_id` otherwise.
-
-    .. versionchanged:: 4.0
-
-        So they are announced more concisely by screen readers, checkboxes were
-        changed to render in ``<div>`` tags.
 
 Like :class:`RadioSelect`, you can loop over the individual checkboxes for the
 widget's choices. Unlike :class:`RadioSelect`, the checkboxes won't include the

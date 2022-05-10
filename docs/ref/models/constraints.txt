@@ -118,8 +118,6 @@ ensures the age field is never less than 18.
 
 .. attribute:: UniqueConstraint.expressions
 
-.. versionadded:: 4.0
-
 Positional argument ``*expressions`` allows creating functional unique
 constraints on expressions and database functions.
 

@@ -163,8 +163,6 @@ particularly temporary.
 Redis
 -----
 
-.. versionadded:: 4.0
-
 Redis__ is an in-memory database that can be used for caching. To begin you'll
 need a Redis server running either locally or on a remote machine.
 
@@ -1074,10 +1072,6 @@ the cache backend.
     ``cache.aadd()`` or ``cache.adelete_many()``. See `Asynchronous support`_
     for more details.
 
-.. versionchanged:: 4.0
-
-    The async variants of methods were added to the ``BaseCache``.
-
 .. _cache_key_prefixing:
 
 Cache key prefixing
@@ -1208,8 +1202,6 @@ instance, to do this for the ``locmem`` backend, put this code in a module::
 
 Asynchronous support
 ====================
-
-.. versionadded:: 4.0
 
 Django has developing support for asynchronous cache backends, but does not
 yet support asynchronous caching. It will be coming in a future release.

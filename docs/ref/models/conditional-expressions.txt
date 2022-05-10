@@ -48,10 +48,6 @@ objects that have an ``output_field`` that is a
 :class:`~django.db.models.BooleanField`. The result is provided using the
 ``then`` keyword.
 
-.. versionchanged:: 4.0
-
-    Support for lookup expressions was added.
-
 Some examples::
 
     >>> from django.db.models import F, Q, When

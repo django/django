@@ -160,11 +160,6 @@ password from the `password file`_, you must specify them in the
 .. _connection service file: https://www.postgresql.org/docs/current/libpq-pgservice.html
 .. _password file: https://www.postgresql.org/docs/current/libpq-pgpass.html
 
-.. versionchanged:: 4.0
-
-    Support for connecting by a service name, and specifying a password file
-    was added.
-
 .. warning::
 
     Using a service name for testing purposes is not supported. This

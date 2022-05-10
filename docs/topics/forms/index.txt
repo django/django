@@ -552,10 +552,6 @@ the :meth:`.Form.render`. Here's an example of this being used in a view::
 
 See :ref:`ref-forms-api-outputting-html` for more details.
 
-.. versionchanged:: 4.0
-
-    Template rendering of forms was added.
-
 .. versionchanged:: 4.1
 
     The ability to set the default ``form_template_name`` on the form renderer
