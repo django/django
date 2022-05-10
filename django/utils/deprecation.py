@@ -5,15 +5,16 @@ import warnings
 from asgiref.sync import sync_to_async
 
 
-class RemovedInNextVersionWarning(DeprecationWarning):
+class RemovedInDjango50Warning(DeprecationWarning):
     pass
 
 
-class RemovedInDjango50Warning(PendingDeprecationWarning):
+class RemovedInDjango51Warning(PendingDeprecationWarning):
     pass
 
 
-RemovedAfterNextVersionWarning = RemovedInDjango50Warning
+RemovedInNextVersionWarning = RemovedInDjango50Warning
+RemovedAfterNextVersionWarning = RemovedInDjango51Warning
 
 
 class warn_about_renamed_method:
