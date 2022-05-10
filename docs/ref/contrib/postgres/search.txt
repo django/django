@@ -318,8 +318,6 @@ Usage example::
 ``TrigramWordSimilarity``
 -------------------------
 
-.. versionadded:: 4.0
-
 .. class:: TrigramWordSimilarity(string, expression, **extra)
 
 Accepts a string or expression, and a field name or expression. Returns the
@@ -357,8 +355,6 @@ Usage example::
 
 ``TrigramWordDistance``
 -----------------------
-
-.. versionadded:: 4.0
 
 .. class:: TrigramWordDistance(string, expression, **extra)
 

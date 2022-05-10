@@ -378,10 +378,6 @@ help distinguish them from form-specific errors. For example,
         <li>Articles in a set must have distinct titles.</li>
     </ul>
 
-.. versionchanged:: 4.0
-
-    The additional ``nonform`` class was added.
-
 Validating the number of forms in a formset
 ===========================================
 
@@ -654,8 +650,6 @@ control the widget used with
 ``deletion_widget``
 ^^^^^^^^^^^^^^^^^^^
 
-.. versionadded:: 4.0
-
 .. attribute:: BaseFormSet.deletion_widget
 
 Default: :class:`~django.forms.CheckboxInput`
@@ -672,8 +666,6 @@ Set ``deletion_widget`` to specify the widget class to be used with
 
 ``get_deletion_widget``
 ^^^^^^^^^^^^^^^^^^^^^^^
-
-.. versionadded:: 4.0
 
 .. method:: BaseFormSet.get_deletion_widget()
 
@@ -791,15 +783,11 @@ Formsets have the following attributes and methods associated with rendering:
 
 .. attribute:: BaseFormSet.renderer
 
-    .. versionadded:: 4.0
-
     Specifies the :doc:`renderer </ref/forms/renderers>` to use for the
     formset. Defaults to the renderer specified by the :setting:`FORM_RENDERER`
     setting.
 
 .. attribute:: BaseFormSet.template_name
-
-    .. versionadded:: 4.0
 
     The name of the template rendered if the formset is cast into a string,
     e.g. via ``print(formset)`` or in a template via ``{{ formset }}``.
@@ -830,16 +818,12 @@ Formsets have the following attributes and methods associated with rendering:
 
 .. attribute:: BaseFormSet.template_name_p
 
-    .. versionadded:: 4.0
-
     The name of the template used when calling :meth:`.as_p`. By default this
     is ``"django/forms/formsets/p.html"``. This template renders the formset's
     management form and then each form in the formset as per the form's
     :meth:`~django.forms.Form.as_p` method.
 
 .. attribute:: BaseFormSet.template_name_table
-
-    .. versionadded:: 4.0
 
     The name of the template used when calling :meth:`.as_table`. By default
     this is ``"django/forms/formsets/table.html"``. This template renders the
@@ -848,16 +832,12 @@ Formsets have the following attributes and methods associated with rendering:
 
 .. attribute:: BaseFormSet.template_name_ul
 
-    .. versionadded:: 4.0
-
     The name of the template used when calling :meth:`.as_ul`. By default this
     is ``"django/forms/formsets/ul.html"``. This template renders the formset's
     management form and then each form in the formset as per the form's
     :meth:`~django.forms.Form.as_ul` method.
 
 .. method:: BaseFormSet.get_context()
-
-    .. versionadded:: 4.0
 
     Returns the context for rendering a formset in a template.
 
@@ -866,8 +846,6 @@ Formsets have the following attributes and methods associated with rendering:
     * ``formset`` : The instance of the formset.
 
 .. method:: BaseFormSet.render(template_name=None, context=None, renderer=None)
-
-    .. versionadded:: 4.0
 
     The render method is called by ``__str__`` as well as the :meth:`.as_p`,
     :meth:`.as_ul`, and :meth:`.as_table` methods. All arguments are optional
@@ -939,10 +917,6 @@ formset will be rendered ``as_table``, with other helper methods of ``as_p``
 and ``as_ul`` being available. The rendering of the formset can be customized
 by specifying the ``template_name`` attribute, or more generally by
 :ref:`overriding the default template <overriding-built-in-formset-templates>`.
-
-.. versionchanged:: 4.0
-
-    Rendering of formsets was moved to the template engine.
 
 .. _manually-rendered-can-delete-and-can-order:
 

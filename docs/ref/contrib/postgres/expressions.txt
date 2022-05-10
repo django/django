@@ -13,8 +13,6 @@ These expressions are available from the
 
 .. class:: ArraySubquery(queryset)
 
-.. versionadded:: 4.0
-
 ``ArraySubquery`` is a :class:`~django.db.models.Subquery` that uses the
 PostgreSQL ``ARRAY`` constructor to build a list of values from the queryset,
 which must use :meth:`.QuerySet.values` to return only a single column.

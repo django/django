@@ -600,10 +600,6 @@ and tear down the test suite.
     custom arguments by calling ``parser.add_argument()`` inside the method, so
     that the :djadmin:`test` command will be able to use those arguments.
 
-    .. versionadded:: 4.0
-
-        The ``logger`` and ``shuffle`` arguments were added.
-
 Attributes
 ~~~~~~~~~~
 
@@ -725,8 +721,6 @@ Methods
 
 .. method:: DiscoverRunner.log(msg, level=None)
 
-    .. versionadded:: 4.0
-
     If a ``logger`` is set, logs the message at the given integer
     `logging level`_ (e.g. ``logging.DEBUG``, ``logging.INFO``, or
     ``logging.WARNING``). Otherwise, the message is printed to the console,
@@ -778,10 +772,6 @@ utility methods in the ``django.test.utils`` module.
     test databases should have their state serialized to allow usage of the
     :ref:`serialized_rollback <test-case-serialized-rollback>` feature. If
     it's not provided, it defaults to ``aliases``.
-
-    .. versionchanged:: 4.0
-
-        The ``serialized_aliases`` kwarg was added.
 
 .. function:: teardown_databases(old_config, parallel=0, keepdb=False)
 

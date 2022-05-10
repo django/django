@@ -94,10 +94,6 @@ Django's system checks are organized using the following tags:
 
 Some checks may be registered with multiple tags.
 
-.. versionchanged:: 4.0
-
-    The ``files`` tag was added.
-
 Core system checks
 ==================
 
@@ -156,8 +152,6 @@ If you're using MySQL or MariaDB, the following checks will be performed:
 
 Managing files
 --------------
-
-.. versionadded:: 4.0
 
 The following checks verify your setup for :doc:`/topics/files`:
 

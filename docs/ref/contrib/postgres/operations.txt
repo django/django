@@ -186,8 +186,6 @@ database.
 Adding constraints without enforcing validation
 ===============================================
 
-.. versionadded:: 4.0
-
 PostgreSQL supports the ``NOT VALID`` option with the ``ADD CONSTRAINT``
 statement to add check constraints without enforcing validation on existing
 rows. This option is useful if you want to skip the potentially lengthy scan of

@@ -1772,13 +1772,6 @@ locale is ``pl`` (Polish):
 Using ``floatformat`` with no argument is equivalent to using ``floatformat``
 with an argument of ``-1``.
 
-.. versionchanged:: 4.0
-
-    ``floatformat`` template filter no longer depends on the
-    :setting:`USE_L10N` setting and always returns localized output.
-
-    The ``u`` suffix to force disabling localization was added.
-
 .. templatefilter:: force_escape
 
 ``force_escape``

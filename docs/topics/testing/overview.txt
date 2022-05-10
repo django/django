@@ -239,11 +239,6 @@ You may randomize and/or reverse the execution order inside groups using the
 :option:`test --shuffle` and :option:`--reverse <test --reverse>` options. This
 can help with ensuring your tests are independent from each other.
 
-.. versionchanged:: 4.0
-
-    In older versions, failures detected when loading tests were not ordered
-    first.
-
 .. _test-case-serialized-rollback:
 
 Rollback emulation

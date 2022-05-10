@@ -8,8 +8,6 @@ GeoDjango's admin site
 ``GISModelAdmin``
 =================
 
-.. versionadded:: 4.0
-
 .. class:: GISModelAdmin
 
     .. attribute:: gis_widget

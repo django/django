@@ -1203,8 +1203,6 @@ subclass::
 
 .. attribute:: ModelAdmin.search_help_text
 
-    .. versionadded:: 4.0
-
     Set ``search_help_text`` to specify a descriptive text for the search box
     which will be displayed below it.
 
@@ -1938,8 +1936,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.get_formset_kwargs(request, obj, inline, prefix)
 
-    .. versionadded:: 4.0
-
     A hook for customizing the keyword arguments passed to the constructor of a
     formset. For example, to pass ``request`` to formset forms::
 
@@ -2090,10 +2086,6 @@ in your own admin JavaScript without including a second copy, you can use the
 forms or widgets depending on ``django.jQuery`` must specify
 ``js=['admin/js/jquery.init.js', …]`` when :ref:`declaring form media assets
 <assets-as-a-static-definition>`.
-
-.. versionchanged:: 4.0
-
-    jQuery was upgraded from 3.5.1 to 3.6.0.
 
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
@@ -2309,10 +2301,6 @@ The ``InlineModelAdmin`` class adds or customizes:
     from the model's inner ``Meta`` class. If this isn't given and the
     :attr:`.InlineModelAdmin.verbose_name` is defined, Django will use
     :attr:`.InlineModelAdmin.verbose_name` + ``'s'``.
-
-    .. versionchanged:: 4.0
-
-        The fallback to :attr:`.InlineModelAdmin.verbose_name` was added.
 
 .. attribute:: InlineModelAdmin.can_delete
 
@@ -2894,10 +2882,6 @@ Templates can override or extend base admin templates as described in
         ``view`` permissions
       * ``admin_url``: admin changelist URL for the model
       * ``add_url``: admin URL to add a new model instance
-
-    .. versionchanged:: 4.0
-
-        The ``model`` variable for each model was added.
 
 .. method:: AdminSite.get_app_list(request, app_label=None)
 
