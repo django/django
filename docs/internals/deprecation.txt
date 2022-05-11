@@ -103,6 +103,8 @@ details on these changes.
 
 * The ``django.contrib.gis.admin.OpenLayersWidget`` will be removed.
 
+* The ``django.contrib.auth.hashers.CryptPasswordHasher`` will be removed.
+
 .. _deprecation-removed-in-4.1:
 
 4.1

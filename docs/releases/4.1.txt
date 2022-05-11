@@ -683,6 +683,8 @@ Miscellaneous
 
 * The undocumented ``django.contrib.gis.admin.OpenLayersWidget`` is deprecated.
 
+* ``django.contrib.auth.hashers.CryptPasswordHasher`` is deprecated.
+
 Features removed in 4.1
 =======================
 
