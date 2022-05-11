@@ -18,9 +18,11 @@ from django.contrib.auth.hashers import (
     is_password_usable,
     make_password,
 )
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.test.utils import override_settings
+from django.utils.deprecation import RemovedInDjango50Warning
 
+# RemovedInDjango50Warning.
 try:
     import crypt
 except ImportError:
@@ -201,6 +203,7 @@ class TestUtilsHashPass(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             hasher.encode("password", salt="salt")
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     @skipUnless(crypt, "no crypt module to generate password.")
     @override_settings(
         PASSWORD_HASHERS=["django.contrib.auth.hashers.CryptPasswordHasher"]
@@ -219,6 +222,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(check_password("", blank_encoded))
         self.assertFalse(check_password(" ", blank_encoded))
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     @skipUnless(crypt, "no crypt module to generate password.")
     @override_settings(
         PASSWORD_HASHERS=["django.contrib.auth.hashers.CryptPasswordHasher"]
@@ -229,6 +233,7 @@ class TestUtilsHashPass(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             hasher.encode("password", salt="a")
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     @skipUnless(crypt, "no crypt module to generate password.")
     @override_settings(
         PASSWORD_HASHERS=["django.contrib.auth.hashers.CryptPasswordHasher"]
@@ -239,6 +244,15 @@ class TestUtilsHashPass(SimpleTestCase):
         with mock.patch("crypt.crypt", return_value=None):
             with self.assertRaisesMessage(TypeError, msg):
                 hasher.encode("password", salt="ab")
+
+    @skipUnless(crypt, "no crypt module to generate password.")
+    @override_settings(
+        PASSWORD_HASHERS=["django.contrib.auth.hashers.CryptPasswordHasher"]
+    )
+    def test_crypt_deprecation_warning(self):
+        msg = "django.contrib.auth.hashers.CryptPasswordHasher is deprecated."
+        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
+            get_hasher("crypt")
 
     @skipUnless(bcrypt, "bcrypt not installed")
     def test_bcrypt_sha256(self):
