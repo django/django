@@ -248,7 +248,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             for field_name, rel_table_name, rel_field_name in cursor.fetchall()
         }
 
-    def get_primary_key_column(self, cursor, table_name):
+    def get_primary_key_columns(self, cursor, table_name):
         cursor.execute(
             """
             SELECT
@@ -259,13 +259,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             WHERE
                 user_constraints.constraint_name = cols.constraint_name AND
                 user_constraints.constraint_type = 'P' AND
-                user_constraints.table_name = UPPER(%s) AND
-                cols.position = 1
+                user_constraints.table_name = UPPER(%s)
+            ORDER BY
+                cols.position
             """,
             [table_name],
         )
-        row = cursor.fetchone()
-        return self.identifier_converter(row[0]) if row else None
+        return [self.identifier_converter(row[0]) for row in cursor.fetchall()]
 
     def get_constraints(self, cursor, table_name):
         """

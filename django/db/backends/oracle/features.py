@@ -54,6 +54,13 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             V_I := P_I;
         END;
     """
+    create_test_table_with_composite_primary_key = """
+        CREATE TABLE test_table_composite_pk (
+            column_1 NUMBER(11) NOT NULL,
+            column_2 NUMBER(11) NOT NULL,
+            PRIMARY KEY (column_1, column_2)
+        )
+    """
     supports_callproc_kwargs = True
     supports_over_clause = True
     supports_frame_range_fixed_distance = True
