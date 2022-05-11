@@ -106,10 +106,13 @@ class Command(BaseCommand):
                         )
                     except NotImplementedError:
                         constraints = {}
-                    primary_key_column = (
-                        connection.introspection.get_primary_key_column(
+                    primary_key_columns = (
+                        connection.introspection.get_primary_key_columns(
                             cursor, table_name
                         )
+                    )
+                    primary_key_column = (
+                        primary_key_columns[0] if primary_key_columns else None
                     )
                     unique_columns = [
                         c["columns"][0]
@@ -150,6 +153,12 @@ class Command(BaseCommand):
                     # Add primary_key and unique, if necessary.
                     if column_name == primary_key_column:
                         extra_params["primary_key"] = True
+                        if len(primary_key_columns) > 1:
+                            comment_notes.append(
+                                "The composite primary key (%s) found, that is not "
+                                "supported. The first column is selected."
+                                % ", ".join(primary_key_columns)
+                            )
                     elif column_name in unique_columns:
                         extra_params["unique"] = True
 

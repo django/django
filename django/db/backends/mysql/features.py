@@ -39,6 +39,13 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             SET V_I = P_I;
         END;
     """
+    create_test_table_with_composite_primary_key = """
+        CREATE TABLE test_table_composite_pk (
+            column_1 INTEGER NOT NULL,
+            column_2 INTEGER NOT NULL,
+            PRIMARY KEY(column_1, column_2)
+        )
+    """
     # Neither MySQL nor MariaDB support partial indexes.
     supports_partial_indexes = False
     # COLLATE must be wrapped in parentheses because MySQL treats COLLATE as an
