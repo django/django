@@ -111,6 +111,9 @@ class Command(BaseCommand):
                             cursor, table_name
                         )
                     )
+                    composite_key = connection.introspection.get_composite_key(
+                        cursor, table_name
+                    )
                     unique_columns = [
                         c["columns"][0]
                         for c in constraints.values()
@@ -126,6 +129,11 @@ class Command(BaseCommand):
 
                 yield ""
                 yield ""
+                if composite_key:
+                    if len(composite_key) > 1:
+                        yield "# Composite key found for table '%s'" % table_name
+                        yield "# but not yet implemented, taking the first one"
+
                 yield "class %s(models.Model):" % table2model(table_name)
                 known_models.append(table2model(table_name))
                 used_column_names = []  # Holds column names used in the table so far

@@ -182,6 +182,20 @@ class BaseDatabaseIntrospection:
                 return constraint["columns"][0]
         return None
 
+    def get_composite_key(self, cursor, table_name):
+        """
+        Return the name of multiple-column primary keys for the given table.
+        """
+
+        cursor.execute(
+            "PRAGMA table_info(%s)" % self.connection.ops.quote_name(table_name)
+        )
+        primary_key_columns = []
+        for _, name, *_, pk in cursor.fetchall():
+            if pk:
+                primary_key_columns.append(name)
+        return primary_key_columns
+
     def get_constraints(self, cursor, table_name):
         """
         Retrieve any constraints or keys (unique, pk, fk, check, index)
