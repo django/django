@@ -17,6 +17,14 @@ urlpatterns = [
     # Default views
     path("nonexistent_url/", partial(defaults.page_not_found, exception=None)),
     path("server_error/", defaults.server_error),
+    path(
+        "server_error_with_request/",
+        views.server_error_with_request_reference_in_template,
+    ),
+    path(
+        "bad_request_with_request/",
+        views.bad_request_with_request_reference_in_template,
+    ),
     # a view that raises an exception for the debug view
     path("raises/", views.raises),
     path("raises400/", views.raises400),

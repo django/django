@@ -16,6 +16,7 @@ from django.views.debug import (
     technical_500_response,
 )
 from django.views.decorators.debug import sensitive_post_parameters, sensitive_variables
+from django.views.defaults import bad_request, server_error
 
 TEMPLATES_PATH = Path(__file__).resolve().parent / "templates"
 
@@ -56,6 +57,18 @@ class Raises500View(View):
             raise Exception
         except Exception:
             return technical_500_response(request, *sys.exc_info())
+
+
+def server_error_with_request_reference_in_template(request):
+    return server_error(request, template_name="error_page_with_request_reference.html")
+
+
+def bad_request_with_request_reference_in_template(request):
+    return bad_request(
+        request,
+        exception=Exception(),
+        template_name="error_page_with_request_reference.html",
+    )
 
 
 def raises400(request):

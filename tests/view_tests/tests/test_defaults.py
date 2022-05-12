@@ -138,6 +138,20 @@ class DefaultsTests(TestCase):
             response, "exception: Testing technical 404.", status_code=404
         )
 
+    def test_custom_templates_with_request_reference(self):
+        """
+        Custom error_with_request_reference.html template renders properly
+        with default 400 and 500 handlers.
+        """
+        response = self.client.get("/server_error_with_request/")
+        self.assertContains(
+            response, "You're at /server_error_with_request/ url", status_code=500
+        )
+        response = self.client.get("/bad_request_with_request/")
+        self.assertContains(
+            response, "You're at /bad_request_with_request/ url", status_code=400
+        )
+
     def test_get_absolute_url_attributes(self):
         "A model can set attributes on the get_absolute_url method"
         self.assertTrue(
