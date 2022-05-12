@@ -299,8 +299,8 @@ class IntegerField(Field):
     }
     re_decimal = _lazy_re_compile(r"\.0*\s*$")
 
-    def __init__(self, *, max_value=None, min_value=None, **kwargs):
-        self.max_value, self.min_value = max_value, min_value
+    def __init__(self, *, max_value=None, min_value=None, step_size=None, **kwargs):
+        self.max_value, self.min_value, self.step_size = max_value, min_value, step_size
         if kwargs.get("localize") and self.widget == NumberInput:
             # Localized number input is not well supported on most browsers
             kwargs.setdefault("widget", super().widget)
@@ -310,6 +310,8 @@ class IntegerField(Field):
             self.validators.append(validators.MaxValueValidator(max_value))
         if min_value is not None:
             self.validators.append(validators.MinValueValidator(min_value))
+        if step_size is not None:
+            self.validators.append(validators.StepValueValidator(step_size))
 
     def to_python(self, value):
         """
@@ -335,6 +337,8 @@ class IntegerField(Field):
                 attrs["min"] = self.min_value
             if self.max_value is not None:
                 attrs["max"] = self.max_value
+            if self.step_size is not None:
+                attrs["step"] = self.step_size
         return attrs
 
 
@@ -369,7 +373,11 @@ class FloatField(IntegerField):
     def widget_attrs(self, widget):
         attrs = super().widget_attrs(widget)
         if isinstance(widget, NumberInput) and "step" not in widget.attrs:
-            attrs.setdefault("step", "any")
+            if self.step_size is not None:
+                step = str(self.step_size)
+            else:
+                step = "any"
+            attrs.setdefault("step", step)
         return attrs
 
 

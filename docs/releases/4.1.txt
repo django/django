@@ -297,6 +297,11 @@ Forms
   error messages for invalid number of forms by passing ``'too_few_forms'``
   and ``'too_many_forms'`` keys.
 
+* :class:`~django.forms.IntegerField`, :class:`~django.forms.FloatField`, and
+  :class:`~django.forms.DecimalField` now optionally accept a ``step_size``
+  argument. This is used to set the ``step`` HTML attribute, and is validated
+  on form submission.
+
 Generic Views
 ~~~~~~~~~~~~~
 
@@ -444,7 +449,10 @@ Utilities
 Validators
 ~~~~~~~~~~
 
-* ...
+* The new :class:`~django.core.validators.StepValueValidator` checks if a value
+  is an integral multiple of a given step size. This new validator is used for
+  the new ``step_size`` argument added to form fields representing numeric
+  values.
 
 .. _backwards-incompatible-4.1:
 

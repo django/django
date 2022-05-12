@@ -17,6 +17,7 @@ from django.core.validators import (
     MinValueValidator,
     ProhibitNullCharactersValidator,
     RegexValidator,
+    StepValueValidator,
     URLValidator,
     int_list_validator,
     validate_comma_separated_integer_list,
@@ -440,12 +441,21 @@ TEST_DATA = [
     # limit_value may be a callable.
     (MinValueValidator(lambda: 1), 0, ValidationError),
     (MinValueValidator(lambda: 1), 1, None),
+    (StepValueValidator(3), 0, None),
     (MaxLengthValidator(10), "", None),
     (MaxLengthValidator(10), 10 * "x", None),
     (MaxLengthValidator(10), 15 * "x", ValidationError),
     (MinLengthValidator(10), 15 * "x", None),
     (MinLengthValidator(10), 10 * "x", None),
     (MinLengthValidator(10), "", ValidationError),
+    (StepValueValidator(3), 1, ValidationError),
+    (StepValueValidator(3), 8, ValidationError),
+    (StepValueValidator(3), 9, None),
+    (StepValueValidator(0.001), 0.55, None),
+    (StepValueValidator(0.001), 0.5555, ValidationError),
+    (StepValueValidator(Decimal(0.02)), 0.88, None),
+    (StepValueValidator(Decimal(0.02)), Decimal(0.88), None),
+    (StepValueValidator(Decimal(0.02)), Decimal(0.77), ValidationError),
     (URLValidator(EXTENDED_SCHEMES), "file://localhost/path", None),
     (URLValidator(EXTENDED_SCHEMES), "git://example.com/", None),
     (
@@ -715,6 +725,10 @@ class TestValidatorEquality(TestCase):
             MaxValueValidator(44),
         )
         self.assertEqual(MaxValueValidator(44), mock.ANY)
+        self.assertEqual(
+            StepValueValidator(0.003),
+            StepValueValidator(0.003),
+        )
         self.assertNotEqual(
             MaxValueValidator(44),
             MinValueValidator(44),
@@ -722,6 +736,10 @@ class TestValidatorEquality(TestCase):
         self.assertNotEqual(
             MinValueValidator(45),
             MinValueValidator(11),
+        )
+        self.assertNotEqual(
+            StepValueValidator(3),
+            StepValueValidator(2),
         )
 
     def test_decimal_equality(self):
