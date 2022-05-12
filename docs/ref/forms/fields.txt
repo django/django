@@ -492,18 +492,20 @@ For each field, we describe the default widget used if you don't specify
     * Normalizes to: A Python ``decimal``.
     * Validates that the given value is a decimal. Uses
       :class:`~django.core.validators.MaxValueValidator` and
-      :class:`~django.core.validators.MinValueValidator` if  ``max_value`` and
-      ``min_value`` are provided. Leading and trailing whitespace is ignored.
+      :class:`~django.core.validators.MinValueValidator` if ``max_value`` and
+      ``min_value`` are provided. Uses
+      :class:`~django.core.validators.StepValueValidator` if ``step_size`` is
+      provided. Leading and trailing whitespace is ignored.
     * Error message keys: ``required``, ``invalid``, ``max_value``,
       ``min_value``, ``max_digits``, ``max_decimal_places``,
-      ``max_whole_digits``
+      ``max_whole_digits``, ``step_size``.
 
     The ``max_value`` and ``min_value`` error messages may contain
     ``%(limit_value)s``, which will be substituted by the appropriate limit.
     Similarly, the ``max_digits``, ``max_decimal_places`` and
     ``max_whole_digits`` error messages may contain ``%(max)s``.
 
-    Takes four optional arguments:
+    Takes five optional arguments:
 
     .. attribute:: max_value
     .. attribute:: min_value
@@ -520,6 +522,14 @@ For each field, we describe the default widget used if you don't specify
     .. attribute:: decimal_places
 
         The maximum number of decimal places permitted.
+
+    .. attribute:: step_size
+
+        Limit valid inputs to an integral multiple of ``step_size``.
+
+    .. versionchanged:: 4.1
+
+        The ``step_size`` argument was added.
 
 ``DurationField``
 -----------------
@@ -636,13 +646,25 @@ For each field, we describe the default widget used if you don't specify
     * Validates that the given value is a float. Uses
       :class:`~django.core.validators.MaxValueValidator` and
       :class:`~django.core.validators.MinValueValidator` if ``max_value`` and
-      ``min_value`` are provided. Leading and trailing whitespace is allowed,
-      as in Python's ``float()`` function.
+      ``min_value`` are provided. Uses
+      :class:`~django.core.validators.StepValueValidator` if ``step_size`` is
+      provided. Leading and trailing whitespace is allowed, as in Python's
+      ``float()`` function.
     * Error message keys: ``required``, ``invalid``, ``max_value``,
-      ``min_value``
+      ``min_value``, ``step_size``.
 
-    Takes two optional arguments for validation, ``max_value`` and ``min_value``.
-    These control the range of values permitted in the field.
+    Takes three optional arguments:
+
+    .. attribute:: max_value
+    .. attribute:: min_value
+
+        These control the range of values permitted in the field.
+
+    .. attribute:: step_size
+
+        .. versionadded:: 4.1
+
+        Limit valid inputs to an integral multiple of ``step_size``.
 
 ``GenericIPAddressField``
 -------------------------
@@ -755,20 +777,29 @@ For each field, we describe the default widget used if you don't specify
     * Validates that the given value is an integer. Uses
       :class:`~django.core.validators.MaxValueValidator` and
       :class:`~django.core.validators.MinValueValidator` if ``max_value`` and
-      ``min_value`` are provided. Leading and trailing whitespace is allowed,
-      as in Python's ``int()`` function.
+      ``min_value`` are provided. Uses
+      :class:`~django.core.validators.StepValueValidator` if ``step_size`` is
+      provided. Leading and trailing whitespace is allowed, as in Python's
+      ``int()`` function.
     * Error message keys: ``required``, ``invalid``, ``max_value``,
-      ``min_value``
+      ``min_value``, ``step_size``
 
-    The ``max_value`` and ``min_value`` error messages may contain
-    ``%(limit_value)s``, which will be substituted by the appropriate limit.
+    The ``max_value``, ``min_value`` and ``step_size`` error messages may
+    contain ``%(limit_value)s``, which will be substituted by the appropriate
+    limit.
 
-    Takes two optional arguments for validation:
+    Takes three optional arguments for validation:
 
     .. attribute:: max_value
     .. attribute:: min_value
 
         These control the range of values permitted in the field.
+
+    .. attribute:: step_size
+
+        .. versionadded:: 4.1
+
+        Limit valid inputs to an integral multiple of ``step_size``.
 
 ``JSONField``
 -------------
