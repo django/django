@@ -190,14 +190,6 @@ class ConnectionHandler(BaseConnectionHandler):
         backend = load_backend(db["ENGINE"])
         return backend.DatabaseWrapper(db, alias)
 
-    def close_all(self):
-        for alias in self:
-            try:
-                connection = getattr(self._connections, alias)
-            except AttributeError:
-                continue
-            connection.close()
-
 
 class ConnectionRouter:
     def __init__(self, routers=None):
