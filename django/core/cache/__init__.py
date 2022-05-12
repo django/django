@@ -60,8 +60,7 @@ cache = ConnectionProxy(caches, DEFAULT_CACHE_ALIAS)
 def close_caches(**kwargs):
     # Some caches need to do a cleanup at the end of a request cycle. If not
     # implemented in a particular backend cache.close() is a no-op.
-    for cache in caches.all(initialized_only=True):
-        cache.close()
+    caches.close_all()
 
 
 signals.request_finished.connect(close_caches)
