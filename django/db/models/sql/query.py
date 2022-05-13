@@ -319,7 +319,7 @@ class Query(BaseExpression):
     def clone(self):
         """
         Return a copy of the current Query. A lightweight alternative to
-        to deepcopy().
+        deepcopy().
         """
         obj = Empty()
         obj.__class__ = self.__class__
