@@ -139,6 +139,9 @@ Minor features
 * The new :meth:`.GEOSGeometry.make_valid()` method allows converting invalid
   geometries to valid ones.
 
+* The new ``clone`` argument for :meth:`.GEOSGeometry.normalize` allows
+  creating a normalized clone of the geometry.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

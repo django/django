@@ -1528,11 +1528,17 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(GEOSGeometry("POINT(1.0e-1 1.0e+1)"), Point(0.1, 10))
 
     def test_normalize(self):
-        g = MultiPoint(Point(0, 0), Point(2, 2), Point(1, 1))
-        self.assertIsNone(g.normalize())
-        self.assertTrue(
-            g.equals_exact(MultiPoint(Point(2, 2), Point(1, 1), Point(0, 0)))
-        )
+        multipoint = MultiPoint(Point(0, 0), Point(2, 2), Point(1, 1))
+        normalized = MultiPoint(Point(2, 2), Point(1, 1), Point(0, 0))
+        # Geometry is normalized in-place and nothing is returned.
+        multipoint_1 = multipoint.clone()
+        self.assertIsNone(multipoint_1.normalize())
+        self.assertEqual(multipoint_1, normalized)
+        # If the `clone` keyword is set, then the geometry is not modified and
+        # a normalized clone of the geometry is returned instead.
+        multipoint_2 = multipoint.normalize(clone=True)
+        self.assertEqual(multipoint_2, normalized)
+        self.assertNotEqual(multipoint, normalized)
 
     @skipIf(geos_version_tuple() < (3, 8), "GEOS >= 3.8.0 is required")
     def test_make_valid(self):
