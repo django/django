@@ -222,8 +222,16 @@ class GEOSGeometryBase(GEOSBase):
         "Return the dimension of this Geometry (0=point, 1=line, 2=surface)."
         return capi.get_dims(self.ptr)
 
-    def normalize(self):
-        "Convert this Geometry to normal form (or canonical form)."
+    def normalize(self, clone=False):
+        """
+        Convert this Geometry to normal form (or canonical form).
+        If the `clone` keyword is set, then the geometry is not modified and a
+        normalized clone of the geometry is returned instead.
+        """
+        if clone:
+            clone = self.clone()
+            capi.geos_normalize(clone.ptr)
+            return clone
         capi.geos_normalize(self.ptr)
 
     def make_valid(self):
