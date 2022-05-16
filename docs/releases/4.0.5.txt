@@ -9,4 +9,5 @@ Django 4.0.5 fixes several bugs in 4.0.4.
 Bugfixes
 ========
 
-* ...
+* Fixed a bug in Django 4.0 where not all :setting:`OPTIONS <CACHES-OPTIONS>`
+  were passed to a Redis client (:ticket:`33681`).
