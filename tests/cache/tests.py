@@ -1898,6 +1898,23 @@ class RedisCacheTests(BaseCacheTests, TestCase):
         self.assertIsInstance(cache._cache._serializer.dumps(True), bytes)
         self.assertIsInstance(cache._cache._serializer.dumps("abc"), bytes)
 
+    @override_settings(
+        CACHES=caches_setting_for_tests(
+            base=RedisCache_params,
+            exclude=redis_excluded_caches,
+            OPTIONS={
+                "db": 5,
+                "socket_timeout": 0.1,
+                "retry_on_timeout": True,
+            },
+        )
+    )
+    def test_redis_pool_options(self):
+        pool = cache._cache._get_connection_pool(write=False)
+        self.assertEqual(pool.connection_kwargs["db"], 5)
+        self.assertEqual(pool.connection_kwargs["socket_timeout"], 0.1)
+        self.assertIs(pool.connection_kwargs["retry_on_timeout"], True)
+
 
 class FileBasedCachePathLibTests(FileBasedCacheTests):
     def mkdtemp(self):

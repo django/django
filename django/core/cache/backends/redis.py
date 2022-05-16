@@ -34,9 +34,9 @@ class RedisCacheClient:
         self,
         servers,
         serializer=None,
-        db=None,
         pool_class=None,
         parser_class=None,
+        **options,
     ):
         import redis
 
@@ -60,7 +60,7 @@ class RedisCacheClient:
             parser_class = import_string(parser_class)
         parser_class = parser_class or self._lib.connection.DefaultParser
 
-        self._pool_options = {"parser_class": parser_class, "db": db}
+        self._pool_options = {"parser_class": parser_class, **options}
 
     def _get_connection_pool_index(self, write):
         # Write to the first server. Read from other servers if there are more,
