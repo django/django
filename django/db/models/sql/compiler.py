@@ -787,6 +787,9 @@ class SQLCompiler:
                 result = ["SELECT"]
                 params = []
 
+                if self.query.comments:
+                    result += self.comments_sql()
+
                 if self.query.distinct:
                     distinct_result, distinct_params = self.connection.ops.distinct_sql(
                         distinct_fields,
@@ -1627,6 +1630,9 @@ class SQLCompiler:
                 else:
                     yield value
 
+    def comments_sql(self):
+        return [f"/* {comment} */" for comment in self.query.comments]
+
 
 class SQLInsertCompiler(SQLCompiler):
     returning_fields = None
@@ -1976,8 +1982,11 @@ class SQLUpdateCompiler(SQLCompiler):
             else:
                 values.append("%s = NULL" % qn(name))
         table = self.query.base_table
-        result = [
-            "UPDATE %s SET" % qn(table),
+        result = ["UPDATE"]
+        if self.query.comments:
+            result += self.comments_sql()
+        result += [
+            "%s SET" % qn(table),
             ", ".join(values),
         ]
         try:

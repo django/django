@@ -178,7 +178,9 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* The new :meth:`.QuerySet.comment` method allows for adding comments into
+  the generated SQL. This can be useful for correlating slow queries with
+  application code.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

@@ -4602,3 +4602,55 @@ class Ticket23622Tests(TestCase):
             set(Ticket23605A.objects.filter(qy).values_list("pk", flat=True)),
         )
         self.assertSequenceEqual(Ticket23605A.objects.filter(qx), [a2])
+
+
+class SqlCommentsInQueriesTests(TestCase):
+    def test_select(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            list(NamedCategory.objects.comment("! STRAIGHT_JOIN"))
+            list(NamedCategory.objects.comment("").comment("some comment"))
+        self.assertIn("SELECT /* ! STRAIGHT_JOIN */ ", captured_queries[0]["sql"])
+        self.assertIn("SELECT /*  */ /* some comment */ ", captured_queries[1]["sql"])
+
+    def test_comment_before_distinct(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            list(NamedCategory.objects.comment("DISTINCT").all().distinct())
+        self.assertIn("SELECT /* DISTINCT */ DISTINCT", captured_queries[0]["sql"])
+
+    def test_select_subquery(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            list(
+                NamedCategory.objects.annotate(
+                    foo=(
+                        Tag.objects.filter(category=OuterRef("id"))
+                        .comment("a subquery comment")
+                        .values("name")[:1]
+                    )
+                ).comment("a comment")
+            )
+        sql = captured_queries[0]["sql"]
+        self.assertIn("(SELECT /* a subquery comment */ ", sql)
+        self.assertIn("SELECT /* a comment */ ", sql)
+
+    def test_select_aggregate(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            Tag.objects.comment("a subquery comment").values("parent").annotate(
+                tag_per_parent=Count("pk")
+            ).aggregate(Max("tag_per_parent")),
+        sql = captured_queries[0]["sql"]
+        self.assertIn("(SELECT /* a subquery comment */ ", sql)
+
+    def test_update(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            NamedCategory.objects.comment("this is an update").update(name="monty")
+        self.assertIn("UPDATE /* this is an update */ ", captured_queries[0]["sql"])
+
+    def test_stops_delimiters_in_message(self):
+        for comment in ["foo=/a/b/c*/", "/*foo=/a/b/c", "**//SELECT nothing;//**"]:
+            msg = (
+                "Cannot pass strings containing /* or */ to comment(). "
+                "Escape or strip these delimiters before calling comment()."
+            )
+
+            with self.subTest(comment), self.assertRaisesMessage(ValueError, msg):
+                NamedCategory.objects.comment(comment)
