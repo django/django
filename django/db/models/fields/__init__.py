@@ -130,9 +130,9 @@ class Field(RegisterLookupMixin):
         "null": _("This field cannot be null."),
         "blank": _("This field cannot be blank."),
         "unique": _("%(model_name)s with this %(field_label)s already exists."),
-        # Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-        # Eg: "Title must be unique for pub_date year"
         "unique_for_date": _(
+            # Translators: The 'lookup_type' is one of 'date', 'year' or
+            # 'month'. Eg: "Title must be unique for pub_date year"
             "%(field_label)s must be unique for "
             "%(date_field_label)s %(lookup_type)s."
         ),
