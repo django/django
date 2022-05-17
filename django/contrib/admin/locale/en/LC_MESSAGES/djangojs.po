@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"POT-Creation-Date: 2022-05-17 05:26-0500\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -72,26 +72,26 @@ msgstr ""
 msgid "Click to remove all chosen %s at once."
 msgstr ""
 
-#: contrib/admin/static/admin/js/actions.js:64
+#: contrib/admin/static/admin/js/actions.js:67
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/admin/static/admin/js/actions.js:130
+#: contrib/admin/static/admin/js/actions.js:161
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
 
-#: contrib/admin/static/admin/js/actions.js:143
+#: contrib/admin/static/admin/js/actions.js:174
 msgid ""
 "You have selected an action, but you haven’t saved your changes to "
 "individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
 
-#: contrib/admin/static/admin/js/actions.js:144
+#: contrib/admin/static/admin/js/actions.js:175
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
 "fields. You’re probably looking for the Go button rather than the Save "
@@ -304,6 +304,12 @@ msgstr ""
 #: contrib/admin/static/admin/js/calendar.js:45
 msgctxt "one letter Saturday"
 msgid "S"
+msgstr ""
+
+#: contrib/admin/static/admin/js/change_form.js:14
+msgid ""
+"You have already submitted this form. Are you sure you want to submit it "
+"again?"
 msgstr ""
 
 #: contrib/admin/static/admin/js/collapse.js:16
