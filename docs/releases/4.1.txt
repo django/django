@@ -595,7 +595,7 @@ Miscellaneous
   constraints to be used for validation.
 
 * The undocumented ``URLResolver._is_callback()``,
-  ``URLResolver._callback_strs``, and ``URLPattern.lookup_str()`` have been
+  ``URLResolver._callback_strs``, and ``URLPattern.lookup_str()`` are
   moved to ``django.contrib.admindocs.utils``.
 
 .. _deprecated-features-4.1:
