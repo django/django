@@ -1,9 +1,8 @@
 import logging
 import sys
-import tempfile
 import traceback
 
-from asgiref.sync import ThreadSensitiveContext, sync_to_async
+from asgiref.sync import ThreadSensitiveContext, async_to_sync, sync_to_async
 
 from django.conf import settings
 from django.core import signals
@@ -24,6 +23,89 @@ from django.utils.functional import cached_property
 logger = logging.getLogger("django.request")
 
 
+class ASGIStream:
+    """
+    This class provides a minimalistic IO-like wrapper for an ASGI request
+    provided by a queue which is given as an asynchronous future
+    and its async event loop.
+    """
+
+    def __init__(self, receive):
+        self.buffer = bytearray()
+        self.receive = receive
+        self._has_more = True
+
+    @property
+    def has_more(self):
+        return bool(self._has_more or self.buffer)
+
+    def _receive_more_data(self):
+        if not self._has_more:
+            return b""
+
+        message = async_to_sync(self.receive)()
+        if message["type"] == "http.disconnect":
+            # Early client disconnect.
+            self._has_more = False  # safeguard against trying to call receive again
+            raise RequestAborted()
+
+        self._has_more = message.get("more_body", False)
+        return message.get("body", b"")
+
+    def read(self, size=-1):
+        while size == -1 or size > len(self.buffer):
+            self.buffer.extend(self._receive_more_data())
+            if not self._has_more:
+                break
+
+        if size == -1:
+            result = bytes(self.buffer)
+            self.buffer.clear()
+        else:
+            result = bytes(self.buffer[:size])
+            del self.buffer[:size]
+
+        return result
+
+    def readline(self, limit=-1):
+        while True:
+            lf_index = self.buffer.find(b"\n", 0, limit if limit > -1 else None)
+            if lf_index != -1:
+                result = bytes(self.buffer[: lf_index + 1])
+                del self.buffer[: lf_index + 1]
+                return result
+            elif limit != -1:
+                result = bytes(self.buffer[:limit])
+                del self.buffer[:limit]
+                return result
+            if not self._has_more:
+                break
+
+            self.buffer.extend(self._receive_more_data())
+
+        result = bytes(self.buffer)
+        self.buffer.clear()
+        return result
+
+    def readlines(self, hint=-1):
+        if not self.has_more:
+            return []
+
+        if hint == -1:
+            raw_data = self.read(-1)
+            bytelist = raw_data.split(b"\n")
+            if raw_data[-1] == 10:  # 10 -> b"\n"
+                bytelist.pop(len(bytelist) - 1)
+
+            return [line + b"\n" for line in bytelist]
+
+        return [self.readline() for _ in range(hint)]
+
+    def __iter__(self):
+        while self.has_more:
+            yield self.readline()
+
+
 class ASGIRequest(HttpRequest):
     """
     Custom request subclass that decodes from an ASGI-standard request dict
@@ -34,7 +116,7 @@ class ASGIRequest(HttpRequest):
     # body and aborts.
     body_receive_timeout = 60
 
-    def __init__(self, scope, body_file):
+    def __init__(self, scope, asgi_stream):
         self.scope = scope
         self._post_parse_error = False
         self._read_started = False
@@ -96,8 +178,7 @@ class ASGIRequest(HttpRequest):
             self.META[corrected_name] = value
         # Pull out request encoding, if provided.
         self._set_content_type_params(self.META)
-        # Directly assign the body file to be our stream.
-        self._stream = body_file
+        self._stream = asgi_stream
         # Other bits.
         self.resolver_match = None
 
@@ -158,26 +239,29 @@ class ASGIHandler(base.BaseHandler):
         """
         Handles the ASGI request. Called via the __call__ method.
         """
-        # Receive the HTTP request body as a stream object.
-        try:
-            body_file = await self.read_body(receive)
-        except RequestAborted:
-            return
-        # Request is complete and can be served.
-        try:
-            set_script_prefix(self.get_script_prefix(scope))
-            await sync_to_async(signals.request_started.send, thread_sensitive=True)(
-                sender=self.__class__, scope=scope
-            )
-            # Get the request and check for basic issues.
-            request, error_response = self.create_request(scope, body_file)
-        finally:
-            body_file.close()
+        set_script_prefix(self.get_script_prefix(scope))
+        await sync_to_async(signals.request_started.send, thread_sensitive=True)(
+            sender=self.__class__, scope=scope
+        )
+        # Wrap the ASGI input to provide #read and #readlines.
+        # As the underlying code is synchronous and aspects a (Byte-)stream,
+        # we would otherwise need to cache it in a temporary file
+        # resulting in additional writes/reads.
+        asgi_stream = ASGIStream(receive)
+        # Get the request and check for basic issues.
+        request, error_response = self.create_request(scope, asgi_stream)
         if request is None:
             await self.send_response(error_response, send)
             return
         # Get the response, using the async mode of BaseHandler.
-        response = await self.get_response_async(request)
+        try:
+            response = await self.get_response_async(request)
+        except RequestAborted:
+            # This error is thrown within the ASGIStream class.
+            # While processing the request input for creating the response,
+            # the client can abort the transmission.
+            return
+
         response._handler_class = self.__class__
         # Increase chunk size on file responses (ASGI servers handles low-level
         # chunking).
@@ -186,34 +270,13 @@ class ASGIHandler(base.BaseHandler):
         # Send the response.
         await self.send_response(response, send)
 
-    async def read_body(self, receive):
-        """Reads an HTTP body from an ASGI connection."""
-        # Use the tempfile that auto rolls-over to a disk file as it fills up.
-        body_file = tempfile.SpooledTemporaryFile(
-            max_size=settings.FILE_UPLOAD_MAX_MEMORY_SIZE, mode="w+b"
-        )
-        while True:
-            message = await receive()
-            if message["type"] == "http.disconnect":
-                body_file.close()
-                # Early client disconnect.
-                raise RequestAborted()
-            # Add a body chunk from the message, if provided.
-            if "body" in message:
-                body_file.write(message["body"])
-            # Quit out if that's the end.
-            if not message.get("more_body", False):
-                break
-        body_file.seek(0)
-        return body_file
-
-    def create_request(self, scope, body_file):
+    def create_request(self, scope, asgi_stream):
         """
         Create the Request object and returns either (request, None) or
         (None, response) if there is an error response.
         """
         try:
-            return self.request_class(scope, body_file), None
+            return self.request_class(scope, asgi_stream), None
         except UnicodeDecodeError:
             logger.warning(
                 "Bad Request (UnicodeDecodeError)",
