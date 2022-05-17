@@ -2641,6 +2641,106 @@ class CacheMiddlewareTest(SimpleTestCase):
         response = other_with_prefix_view(request, "16")
         self.assertEqual(response.content, b"Hello World 16")
 
+    def test_dynamic_cache_key(self):
+        """The key prefix is different for anonymous and authenticated users"""
+
+        cache_alias = "default"
+
+        anon_key_prefix = "anon"
+        auth_key_prefix = "auth"
+
+        class AnonUser:
+            @property
+            def is_authenticated(self):
+                return False
+
+            def __str__(self):
+                return "Anon"
+
+        class User:
+            @property
+            def is_authenticated(self):
+                return True
+
+            def __str__(self):
+                return "User"
+
+        def _cache_prefixer(request):
+            return auth_key_prefix if request.user.is_authenticated else anon_key_prefix
+
+        @cache_page(60, cache=cache_alias, key_prefix=_cache_prefixer)
+        def _view(request):
+            return HttpResponse(f"Hello, {request.user}!")
+
+        self.assertEqual(len(self.default_cache._cache), 0)
+
+        # anonymous hit
+        request = self.factory.get("/")
+        request.user = AnonUser()
+        response = _view(request)
+        self.assertEqual(response.content, b"Hello, Anon!")
+        anon_cache_key = get_cache_key(
+            request, anon_key_prefix, "GET", cache=self.default_cache
+        )
+        self.assertIn(anon_cache_key, self.default_cache)
+
+        # authenticated hit
+        request = self.factory.get("/")
+        request.user = User()
+        response = _view(request)
+        self.assertEqual(response.content, b"Hello, User!")
+        auth_cache_key = get_cache_key(
+            request, auth_key_prefix, "GET", cache=self.default_cache
+        )
+        self.assertIn(auth_cache_key, self.default_cache)
+
+    def test_conditional_cache_key(self):
+        """The key prefix callback bypasses the cache on query param"""
+
+        cache_alias = "default"
+        call_count = 0
+        key_prefix = "dynamic_prefix"
+        nocache_flag = "nocache"
+
+        def _cache_prefixer(request):
+            if nocache_flag in request.GET:  # skip caching
+                return None
+            return key_prefix
+
+        @cache_page(60, cache=cache_alias, key_prefix=_cache_prefixer)
+        def _view(request):
+            nonlocal call_count
+            call_count += 1
+            return HttpResponse(str(call_count))
+
+        self.assertEqual(call_count, 0)
+
+        # 1st uncached hit
+        response = _view(self.factory.get(f"/?{nocache_flag}"))
+        self.assertEqual(response.content, b"1")
+        self.assertEqual(call_count, 1)
+
+        # 2nd uncached hit
+        response = _view(self.factory.get(f"/?{nocache_flag}"))
+        self.assertEqual(response.content, b"2")
+        self.assertEqual(call_count, 2)
+
+        # 1st cached hit
+        request = self.factory.get("/")
+        response = _view(request)
+        self.assertEqual(response.content, b"3")
+        self.assertEqual(call_count, 3)
+        cache_key = get_cache_key(request, key_prefix, "GET", cache=self.default_cache)
+        self.assertIn(cache_key, self.default_cache)
+
+        # 2nd cached hit
+        request = self.factory.get("/")
+        response = _view(request)
+        self.assertEqual(response.content, b"3")
+        self.assertEqual(call_count, 3)
+        cache_key = get_cache_key(request, key_prefix, "GET", cache=self.default_cache)
+        self.assertIn(cache_key, self.default_cache)
+
     def test_cache_page_timeout(self):
         # Page timeout takes precedence over the "max-age" section of the
         # "Cache-Control".

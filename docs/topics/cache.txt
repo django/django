@@ -699,6 +699,32 @@ setting for the middleware.  It can be used like this::
     def my_view(request):
         ...
 
+The ``key_prefix`` may be either a string, or a callable which receives the
+request object and returns the key prefix. This allows you to generate a key
+prefix dynamically, for example to enable per-user caching::
+
+    def per_user_cache_prefixer(request):
+        if request.user.is_authenticated:
+            return f"user_{request.user.id}"
+        else:
+            return "anon"
+
+    @cache_page(60 * 60, key_prefix=per_user_cache_prefixer)
+    def my_view(request):
+        ...
+
+The callable may also return ``None`` to skip caching::
+
+    def selective_cache_prefixer(request):
+        # skip caching if URL contains "nocache" query param
+        if "nocache" in request.GET:
+            return None
+        return "prefix1"
+
+    @cache_page(60 * 60 * 24, key_prefix=selective_cache_prefixer)
+    def my_view(request):
+        ...
+
 The ``key_prefix`` and ``cache`` arguments may be specified together. The
 ``key_prefix`` argument and the :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`
 specified under :setting:`CACHES` will be concatenated.
@@ -706,6 +732,10 @@ specified under :setting:`CACHES` will be concatenated.
 Additionally, ``cache_page`` automatically sets ``Cache-Control`` and
 ``Expires`` headers in the response which affect :ref:`downstream caches
 <downstream-caches>`.
+
+.. versionchanged:: 4.1
+
+    Support for callable ``key_prefix`` was added.
 
 Specifying per-view cache in the URLconf
 ----------------------------------------
