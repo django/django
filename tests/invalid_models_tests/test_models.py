@@ -5,8 +5,9 @@ from django.core.checks.model_checks import _check_lazy_references
 from django.db import connection, connections, models
 from django.db.models.functions import Abs, Lower, Round
 from django.db.models.signals import post_init
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, ignore_warnings, skipUnlessDBFeature
 from django.test.utils import isolate_apps, override_settings, register_lookup
+from django.utils.deprecation import RemovedInDjango51Warning
 
 
 class EmptyRouter:
@@ -29,6 +30,7 @@ def get_max_column_name_length():
 
 
 @isolate_apps("invalid_models_tests")
+@ignore_warnings(category=RemovedInDjango51Warning)
 class IndexTogetherTests(SimpleTestCase):
     def test_non_iterable(self):
         class Model(models.Model):

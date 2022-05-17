@@ -17,6 +17,11 @@ details on these changes.
 
 * The ``BaseUserManager.make_random_password()`` method will be removed.
 
+* The model's ``Meta.index_together`` option will be removed.
+
+* The ``AlterIndexTogether`` migration operation will be removed. A stub
+  operation will remain for compatibility with historical migrations.
+
 .. _deprecation-removed-in-5.0:
 
 5.0

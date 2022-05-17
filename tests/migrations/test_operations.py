@@ -5,8 +5,14 @@ from django.db.migrations.operations.fields import FieldOperation
 from django.db.migrations.state import ModelState, ProjectState
 from django.db.models.functions import Abs
 from django.db.transaction import atomic
-from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
+from django.test import (
+    SimpleTestCase,
+    ignore_warnings,
+    override_settings,
+    skipUnlessDBFeature,
+)
 from django.test.utils import CaptureQueriesContext
+from django.utils.deprecation import RemovedInDjango51Warning
 
 from .models import FoodManager, FoodQuerySet, UnicodeModel
 from .test_base import OperationTestBase
@@ -2485,6 +2491,7 @@ class OperationTests(OperationTestBase):
             atomic=connection.features.supports_atomic_references_rename,
         )
 
+    @ignore_warnings(category=RemovedInDjango51Warning)
     def test_rename_field(self):
         """
         Tests the RenameField operation.
@@ -2556,6 +2563,7 @@ class OperationTests(OperationTestBase):
         self.assertColumnExists("test_rnflut_pony", "pink")
         self.assertColumnNotExists("test_rnflut_pony", "blue")
 
+    @ignore_warnings(category=RemovedInDjango51Warning)
     def test_rename_field_index_together(self):
         project_state = self.set_up_test_model("test_rnflit", index_together=True)
         operation = migrations.RenameField("Pony", "pink", "blue")
@@ -3062,6 +3070,7 @@ class OperationTests(OperationTestBase):
         with self.assertRaisesMessage(ValueError, msg):
             migrations.RenameIndex("Pony", new_name="new_idx_name")
 
+    @ignore_warnings(category=RemovedInDjango51Warning)
     def test_rename_index_unnamed_index(self):
         app_label = "test_rninui"
         project_state = self.set_up_test_model(app_label, index_together=True)
@@ -3157,6 +3166,7 @@ class OperationTests(OperationTestBase):
         self.assertIsNot(old_model, new_model)
         self.assertEqual(new_model._meta.indexes[0].name, "new_pony_pink_idx")
 
+    @ignore_warnings(category=RemovedInDjango51Warning)
     def test_rename_index_state_forwards_unnamed_index(self):
         app_label = "test_rnidsfui"
         project_state = self.set_up_test_model(app_label, index_together=True)
@@ -3291,6 +3301,7 @@ class OperationTests(OperationTestBase):
         # Ensure the index is still there
         self.assertIndexExists("test_alflin_pony", ["pink"])
 
+    @ignore_warnings(category=RemovedInDjango51Warning)
     def test_alter_index_together(self):
         """
         Tests the AlterIndexTogether operation.
@@ -3343,6 +3354,7 @@ class OperationTests(OperationTestBase):
             definition[2], {"name": "Pony", "index_together": {("pink", "weight")}}
         )
 
+    # RemovedInDjango51Warning.
     def test_alter_index_together_remove(self):
         operation = migrations.AlterIndexTogether("Pony", None)
         self.assertEqual(
@@ -3350,6 +3362,7 @@ class OperationTests(OperationTestBase):
         )
 
     @skipUnlessDBFeature("allows_multiple_constraints_on_same_fields")
+    @ignore_warnings(category=RemovedInDjango51Warning)
     def test_alter_index_together_remove_with_unique_together(self):
         app_label = "test_alintoremove_wunto"
         table_name = "%s_pony" % app_label

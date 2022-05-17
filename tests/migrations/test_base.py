@@ -255,7 +255,7 @@ class OperationTestBase(MigrationTestBase):
         unique_together=False,
         options=False,
         db_table=None,
-        index_together=False,
+        index_together=False,  # RemovedInDjango51Warning.
         constraints=None,
         indexes=None,
     ):
@@ -263,6 +263,7 @@ class OperationTestBase(MigrationTestBase):
         # Make the "current" state.
         model_options = {
             "swappable": "TEST_SWAP_MODEL",
+            # RemovedInDjango51Warning.
             "index_together": [["weight", "pink"]] if index_together else [],
             "unique_together": [["pink", "weight"]] if unique_together else [],
         }

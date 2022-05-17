@@ -12,8 +12,9 @@ from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.state import ModelState, ProjectState
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, ignore_warnings, override_settings
 from django.test.utils import isolate_lru_cache
+from django.utils.deprecation import RemovedInDjango51Warning
 
 from .models import FoodManager, FoodQuerySet
 
@@ -4588,6 +4589,7 @@ class AutodetectorTests(BaseAutodetectorTests):
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="Book")
 
 
+@ignore_warnings(category=RemovedInDjango51Warning)
 class AutodetectorIndexTogetherTests(BaseAutodetectorTests):
     book_index_together = ModelState(
         "otherapp",

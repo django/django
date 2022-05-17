@@ -275,6 +275,36 @@ Miscellaneous
 Features deprecated in 4.2
 ==========================
 
+``index_together`` option is deprecated in favor of ``indexes``
+---------------------------------------------------------------
+
+The :attr:`Meta.index_together <django.db.models.Options.index_together>`
+option is deprecated in favor of the :attr:`~django.db.models.Options.indexes`
+option.
+
+Migrating existing ``index_together`` should be handled as a migration. For
+example::
+
+    class Author(models.Model):
+        rank = models.IntegerField()
+        name = models.CharField(max_length=30)
+
+        class Meta:
+            index_together = [["rank", "name"]]
+
+Should become::
+
+    class Author(models.Model):
+        ranl = models.IntegerField()
+        name = models.CharField(max_length=30)
+
+        class Meta:
+            indexes = [models.Index(fields=["rank", "name"])]
+
+Running the :djadmin:`makemigrations` command will generate a migration
+containing a :class:`~django.db.migrations.operations.RenameIndex` operation
+which will rename the existing index.
+
 Miscellaneous
 -------------
 
@@ -282,3 +312,5 @@ Miscellaneous
   `recipes and best practices
   <https://docs.python.org/3/library/secrets.html#recipes-and-best-practices>`_
   for using Python's :py:mod:`secrets` module to generate passwords.
+
+* The ``AlterIndexTogether`` migration operation is deprecated.

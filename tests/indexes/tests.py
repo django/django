@@ -16,11 +16,13 @@ from django.db.models.functions import Lower
 from django.test import (
     TestCase,
     TransactionTestCase,
+    ignore_warnings,
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
 from django.test.utils import isolate_apps, override_settings
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango51Warning
 
 from .models import Article, ArticleTranslation, IndexedArticle2
 
@@ -78,6 +80,7 @@ class SchemaIndexesTests(TestCase):
             index_sql[0],
         )
 
+    @ignore_warnings(category=RemovedInDjango51Warning)
     @isolate_apps("indexes")
     def test_index_together_single_list(self):
         class IndexTogetherSingleList(Model):
