@@ -1701,6 +1701,17 @@ class QuerySet:
         clone._db = alias
         return clone
 
+    def comment(self, message):
+        """Adds a comment to be inserted into the query."""
+        clone = self._clone()
+        if "/*" in message or "*/" in message:
+            raise ValueError(
+                "Cannot pass strings containing /* or */ to comment(). "
+                "Escape or strip these delimiters before calling comment()."
+            )
+        clone.query.comments = (*clone.query.comments, message)
+        return clone
+
     ###################################
     # PUBLIC INTROSPECTION ATTRIBUTES #
     ###################################

@@ -628,6 +628,11 @@ class SQLCompiler:
                     result += distinct_result
                     params += distinct_params
 
+                if self.query.comments:
+                    result.append(
+                        " ".join(f"/*{comment}*/" for comment in self.query.comments)
+                    )
+
                 out_cols = []
                 col_idx = 1
                 for _, (s_sql, s_params), alias in self.select + extra_select:
@@ -1795,10 +1800,10 @@ class SQLUpdateCompiler(SQLCompiler):
             else:
                 values.append("%s = NULL" % qn(name))
         table = self.query.base_table
-        result = [
-            "UPDATE %s SET" % qn(table),
-            ", ".join(values),
-        ]
+        result = ["UPDATE"]
+        if self.query.comments:
+            result.append(" ".join(f"/*{comment}*/" for comment in self.query.comments))
+        result.extend(["%s SET" % qn(table), ", ".join(values)])
         where, params = self.compile(self.query.where)
         if where:
             result.append("WHERE %s" % where)

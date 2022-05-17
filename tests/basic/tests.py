@@ -720,6 +720,7 @@ class ManagerTest(SimpleTestCase):
         "alatest",
         "aupdate",
         "aupdate_or_create",
+        "comment",
     ]
 
     def test_manager_methods(self):

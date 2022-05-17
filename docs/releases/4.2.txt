@@ -163,7 +163,9 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* The new :meth:`.QuerySet.comment` method allows for injecting comments into
+  the generated SQL statements. This can be useful for traceability and adding
+  optimizer hints for supporting backends.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

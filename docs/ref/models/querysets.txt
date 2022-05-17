@@ -1887,6 +1887,55 @@ See the :doc:`/topics/db/sql` for more information.
   filtering. As such, it should generally be called from the ``Manager`` or
   from a fresh ``QuerySet`` instance.
 
+``comment()``
+~~~~~~~~~~~~~
+
+.. versionadded:: 4.2
+
+.. method:: comment(message)
+
+Adds an SQL comment to be inserted into the resultant SQL statement, after
+``SELECT``/``UPDATE``, and if applicable, ``DISTINCT``.. For example::
+
+    Entry.objects.comment("blog/views.py:50").all()
+
+...translates (roughly) into the following SQL::
+
+    SELECT /*blog/views.py:50*/ blog_entry.* FROM blog_entry
+
+This is useful for adding information to the SQL statement which when logged
+can be used to correlate slow and problematic queries to the generating source
+code.
+
+It can also be used to pass optimizer hints to supporting database engines.
+For example, on MySQL you can force the join order by setting the
+``STRAIGHT_JOIN`` hint with ``comment()`` like so::
+
+    Entry.objects.select_related('blog').comment("! STRAIGHT_JOIN").all()
+
+This results in the specially interpreted 'non-comment' comment::
+
+    SELECT /*! STRAIGHT_JOIN */ blog_entry.*, blog_blog.* FROM ...
+
+.. note::
+
+    The SQL block comment delimiters, ``/*`` and ``*/`` are added automatically.
+    To protect against SQL injection attacks and invalid queries any
+    combination of ``/*`` and ``*/`` present in the comment will raise an
+    exception. Strip or escape these delimiters from the comment to
+    circumvent this.
+
+Comments can be chained and will be added to the SQL statement as separate
+entries, for example::
+
+    Entry.objects.comment("blog/views.py:50").comment("python=3.11").update(
+        headline="This is new"
+    )
+
+...translates into::
+
+    UPDATE blog_entry.* /*blog/views.py:75*/ /*python=3.11*/ SET "headline" = 'This is new'
+
 Operators that return new ``QuerySet``\s
 ----------------------------------------
 

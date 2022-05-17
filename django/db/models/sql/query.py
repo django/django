@@ -226,6 +226,7 @@ class Query(BaseExpression):
     deferred_loading = (frozenset(), True)
 
     explain_info = None
+    comments = ()
 
     def __init__(self, model, alias_cols=True):
         self.model = model
