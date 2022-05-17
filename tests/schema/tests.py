@@ -53,8 +53,14 @@ from django.db.models.fields.json import KeyTextTransform
 from django.db.models.functions import Abs, Cast, Collate, Lower, Random, Upper
 from django.db.models.indexes import IndexExpression
 from django.db.transaction import TransactionManagementError, atomic
-from django.test import TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.test import (
+    TransactionTestCase,
+    ignore_warnings,
+    skipIfDBFeature,
+    skipUnlessDBFeature,
+)
 from django.test.utils import CaptureQueriesContext, isolate_apps, register_lookup
+from django.utils.deprecation import RemovedInDjango51Warning
 
 from .fields import CustomManyToManyField, InheritedManyToManyField, MediumBlobField
 from .models import (
@@ -2888,6 +2894,7 @@ class SchemaTests(TransactionTestCase):
             with self.assertRaises(DatabaseError):
                 editor.add_constraint(Author, constraint)
 
+    @ignore_warnings(category=RemovedInDjango51Warning)
     def test_index_together(self):
         """
         Tests removing and adding index_together constraints on a model.
@@ -2931,6 +2938,7 @@ class SchemaTests(TransactionTestCase):
             False,
         )
 
+    @ignore_warnings(category=RemovedInDjango51Warning)
     def test_index_together_with_fk(self):
         """
         Tests removing and adding index_together constraints that include
@@ -2949,6 +2957,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_index_together(Book, [["author", "title"]], [])
 
+    @ignore_warnings(category=RemovedInDjango51Warning)
     @isolate_apps("schema")
     def test_create_index_together(self):
         """
@@ -2978,6 +2987,7 @@ class SchemaTests(TransactionTestCase):
         )
 
     @skipUnlessDBFeature("allows_multiple_constraints_on_same_fields")
+    @ignore_warnings(category=RemovedInDjango51Warning)
     @isolate_apps("schema")
     def test_remove_index_together_does_not_remove_meta_indexes(self):
         class AuthorWithIndexedNameAndBirthday(Model):

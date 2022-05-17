@@ -397,6 +397,12 @@ Models
 * **models.W045**: Check constraint ``<constraint>`` contains ``RawSQL()``
   expression and won't be validated during the model ``full_clean()``.
 
+Migrations
+----------
+
+* **migrations.W001**: ``AlterIndexTogether`` is deprecated. Support for it
+  (except in historical migrations) will be removed in Django 5.1.
+
 Security
 --------
 

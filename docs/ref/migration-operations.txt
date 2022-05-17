@@ -106,6 +106,13 @@ Changes the model's set of custom indexes (the
 :attr:`~django.db.models.Options.index_together` option on the ``Meta``
 subclass).
 
+.. deprecated:: 4.2
+
+    ``AlterIndexTogether`` is deprecated in favor of
+    :class:`~django.db.migrations.operations.AddIndex`,
+    :class:`~django.db.migrations.operations.RemoveIndex`, and
+    :class:`~django.db.migrations.operations.RenameIndex` operations.
+
 ``AlterOrderWithRespectTo``
 ---------------------------
 
