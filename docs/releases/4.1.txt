@@ -132,11 +132,6 @@ Minor features
 * The :meth:`.AdminSite.get_app_list` method now allows changing the order of
   apps and models on the admin index page.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -146,11 +141,6 @@ Minor features
 * The :meth:`.RemoteUserBackend.configure_user` method now allows synchronizing
   user attributes with attributes in a remote system such as an LDAP directory.
 
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -159,11 +149,6 @@ Minor features
 
 * The new ``clone`` argument for :meth:`.GEOSGeometry.normalize` allows
   creating a normalized clone of the geometry.
-
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -189,16 +174,6 @@ Minor features
   specifying operator classes with the
   :class:`OpClass() <django.contrib.postgres.indexes.OpClass>` expression.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sessions`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -208,31 +183,11 @@ Minor features
   sitemap index templates should be updated for the adjusted :ref:`context
   variables <sitemap-index-context-variables>`.
 
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` now
   replaces paths to CSS source map references with their hashed counterparts.
-
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Cache
-~~~~~
-
-* ...
-
-CSRF
-~~~~
-
-* ...
 
 Database backends
 ~~~~~~~~~~~~~~~~~
@@ -245,31 +200,6 @@ Database backends
   current database version. The backend's
   ``DatabaseWrapper.init_connection_state()`` method must call ``super()`` in
   order for the check to run.
-
-Decorators
-~~~~~~~~~~
-
-* ...
-
-Email
-~~~~~
-
-* ...
-
-Error Reporting
-~~~~~~~~~~~~~~~
-
-* ...
-
-File Storage
-~~~~~~~~~~~~
-
-* ...
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
 
 .. _forms-4.1:
 
@@ -353,21 +283,11 @@ Forms
   argument. This is used to set the ``step`` HTML attribute, and is validated
   on form submission.
 
-Generic Views
-~~~~~~~~~~~~~
-
-* ...
-
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
 * The :func:`~django.conf.urls.i18n.i18n_patterns` function now supports
   languages with both scripts and regions.
-
-Logging
-~~~~~~~
-
-* ...
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -455,11 +375,6 @@ Security
 
 * The :setting:`SECURE_PROXY_SSL_HEADER` setting now supports a comma-separated
   list of protocols in the header value.
-
-Serialization
-~~~~~~~~~~~~~
-
-* ...
 
 Signals
 ~~~~~~~
