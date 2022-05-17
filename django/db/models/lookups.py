@@ -171,9 +171,10 @@ class Lookup(Expression):
         c.lhs = self.lhs.resolve_expression(
             query, allow_joins, reuse, summarize, for_save
         )
-        c.rhs = self.rhs.resolve_expression(
-            query, allow_joins, reuse, summarize, for_save
-        )
+        if hasattr(self.rhs, "resolve_expression"):
+            c.rhs = self.rhs.resolve_expression(
+                query, allow_joins, reuse, summarize, for_save
+            )
         return c
 
     def select_format(self, compiler, sql, params):

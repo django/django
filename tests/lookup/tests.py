@@ -23,6 +23,7 @@ from django.db.models.lookups import (
     Exact,
     GreaterThan,
     GreaterThanOrEqual,
+    IsNull,
     LessThan,
     LessThanOrEqual,
 )
@@ -1243,7 +1244,7 @@ class LookupQueryingTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.s1 = Season.objects.create(year=1942, gt=1942)
-        cls.s2 = Season.objects.create(year=1842, gt=1942)
+        cls.s2 = Season.objects.create(year=1842, gt=1942, nulled_text_field="text")
         cls.s3 = Season.objects.create(year=2042, gt=1942)
 
     def test_annotate(self):
@@ -1324,6 +1325,16 @@ class LookupQueryingTests(TestCase):
     def test_lookup_in_filter(self):
         qs = Season.objects.filter(GreaterThan(F("year"), 1910))
         self.assertCountEqual(qs, [self.s1, self.s3])
+
+    def test_isnull_lookup_in_filter(self):
+        self.assertSequenceEqual(
+            Season.objects.filter(IsNull(F("nulled_text_field"), False)),
+            [self.s2],
+        )
+        self.assertCountEqual(
+            Season.objects.filter(IsNull(F("nulled_text_field"), True)),
+            [self.s1, self.s3],
+        )
 
     def test_filter_lookup_lhs(self):
         qs = Season.objects.annotate(before_20=LessThan(F("year"), 2000)).filter(
