@@ -640,27 +640,6 @@ class ResolverTests(SimpleTestCase):
                                 % (e["name"], t.name),
                             )
 
-    def test_namespaced_view_detail(self):
-        resolver = get_resolver("urlpatterns_reverse.nested_urls")
-        self.assertTrue(resolver._is_callback("urlpatterns_reverse.nested_urls.view1"))
-        self.assertTrue(resolver._is_callback("urlpatterns_reverse.nested_urls.view2"))
-        self.assertTrue(resolver._is_callback("urlpatterns_reverse.nested_urls.View3"))
-        self.assertFalse(resolver._is_callback("urlpatterns_reverse.nested_urls.blub"))
-
-    def test_view_detail_as_method(self):
-        # Views which have a class name as part of their path.
-        resolver = get_resolver("urlpatterns_reverse.method_view_urls")
-        self.assertTrue(
-            resolver._is_callback(
-                "urlpatterns_reverse.method_view_urls.ViewContainer.method_view"
-            )
-        )
-        self.assertTrue(
-            resolver._is_callback(
-                "urlpatterns_reverse.method_view_urls.ViewContainer.classmethod_view"
-            )
-        )
-
     def test_populate_concurrency(self):
         """
         URLResolver._populate() can be called concurrently, but not more
