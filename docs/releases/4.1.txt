@@ -594,6 +594,10 @@ Miscellaneous
   :meth:`~django.db.models.BaseConstraint.validate` method to allow those
   constraints to be used for validation.
 
+* The undocumented ``URLResolver._is_callback()``,
+  ``URLResolver._callback_strs``, and ``URLPattern.lookup_str()`` have been
+  moved to ``django.contrib.admindocs.utils``.
+
 .. _deprecated-features-4.1:
 
 Features deprecated in 4.1
