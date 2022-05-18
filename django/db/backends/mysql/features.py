@@ -52,17 +52,14 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def minimum_database_version(self):
         if self.connection.mysql_is_mariadb:
-            return (10, 3)
+            return (10, 4)
         else:
             return (5, 7)
 
     @cached_property
     def bare_select_suffix(self):
-        if (
-            self.connection.mysql_is_mariadb and self.connection.mysql_version < (10, 4)
-        ) or (
-            not self.connection.mysql_is_mariadb
-            and self.connection.mysql_version < (8,)
+        if not self.connection.mysql_is_mariadb and self.connection.mysql_version < (
+            8,
         ):
             return " FROM DUAL"
         return ""
@@ -254,8 +251,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def can_introspect_check_constraints(self):
         if self.connection.mysql_is_mariadb:
-            version = self.connection.mysql_version
-            return version >= (10, 3, 10)
+            return True
         return self.connection.mysql_version >= (8, 0, 16)
 
     @cached_property
