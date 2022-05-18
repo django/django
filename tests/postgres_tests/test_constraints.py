@@ -845,7 +845,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         RangesModel.objects.create(ints=(10, 19))
         RangesModel.objects.create(ints=(51, 60))
 
-    @skipUnlessDBFeature("supports_covering_gist_indexes")
     def test_range_adjacent_gist_include(self):
         constraint_name = "ints_adjacent_gist_include"
         self.assertNotIn(
@@ -887,7 +886,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         RangesModel.objects.create(ints=(10, 19))
         RangesModel.objects.create(ints=(51, 60))
 
-    @skipUnlessDBFeature("supports_covering_gist_indexes")
     def test_range_adjacent_gist_include_condition(self):
         constraint_name = "ints_adjacent_gist_include_condition"
         self.assertNotIn(
@@ -921,7 +919,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             editor.add_constraint(RangesModel, constraint)
         self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
 
-    @skipUnlessDBFeature("supports_covering_gist_indexes")
     def test_range_adjacent_gist_include_deferrable(self):
         constraint_name = "ints_adjacent_gist_include_deferrable"
         self.assertNotIn(
@@ -954,27 +951,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.add_constraint(RangesModel, constraint)
         self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
-
-    def test_gist_include_not_supported(self):
-        constraint_name = "ints_adjacent_gist_include_not_supported"
-        constraint = ExclusionConstraint(
-            name=constraint_name,
-            expressions=[("ints", RangeOperators.ADJACENT_TO)],
-            index_type="gist",
-            include=["id"],
-        )
-        msg = (
-            "Covering exclusion constraints using a GiST index require "
-            "PostgreSQL 12+."
-        )
-        with connection.schema_editor() as editor:
-            with mock.patch(
-                "django.db.backends.postgresql.features.DatabaseFeatures."
-                "supports_covering_gist_indexes",
-                False,
-            ):
-                with self.assertRaisesMessage(NotSupportedError, msg):
-                    editor.add_constraint(RangesModel, constraint)
 
     def test_spgist_include_not_supported(self):
         constraint_name = "ints_adjacent_spgist_include_not_supported"
@@ -1062,7 +1038,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             editor.add_constraint(RangesModel, constraint)
         self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
 
-    @skipUnlessDBFeature("supports_covering_gist_indexes")
     def test_range_adjacent_gist_opclass_include(self):
         constraint_name = "ints_adjacent_gist_opclass_include"
         self.assertNotIn(
@@ -1210,7 +1185,6 @@ class ExclusionConstraintOpclassesDepracationTests(PostgreSQLTestCase):
         self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
 
     @ignore_warnings(category=RemovedInDjango50Warning)
-    @skipUnlessDBFeature("supports_covering_gist_indexes")
     def test_range_adjacent_gist_opclasses_include(self):
         constraint_name = "ints_adjacent_gist_opclasses_include"
         self.assertNotIn(

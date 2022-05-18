@@ -287,8 +287,8 @@ transform do not change. For example::
 
 .. admonition:: Case-insensitive collations
 
-    On PostgreSQL 12+, it's preferable to use non-deterministic collations
-    instead of the ``citext`` extension. You can create them using the
+    It's preferable to use non-deterministic collations instead of the
+    ``citext`` extension. You can create them using the
     :class:`~django.contrib.postgres.operations.CreateCollation` migration
     operation. For more details, see :ref:`manage-postgresql-collations` and
     the PostgreSQL documentation about `non-deterministic collations`_.
