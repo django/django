@@ -1118,11 +1118,11 @@ class QuerySet:
 
         collector = Collector(using=del_query.db, origin=self)
         collector.collect(del_query)
-        deleted, _rows_count = collector.delete()
+        _rows_count, deleted = collector.delete()
 
         # Clear the result cache, in case this QuerySet gets reused.
         self._result_cache = None
-        return deleted, _rows_count
+        return _rows_count, deleted
 
     delete.alters_data = True
     delete.queryset_only = True
