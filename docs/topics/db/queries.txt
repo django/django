@@ -942,8 +942,8 @@ updates. You will find that trying to use one raises
 ``SynchronousOnlyOperation``.
 
 If you wish to use a transaction, we suggest you write your ORM code inside a
-separate, synchronous function and then call that using sync_to_async - see
-:doc:/topics/async` for more.
+separate, synchronous function and then call that using ``sync_to_async`` - see
+:doc:`/topics/async` for more.
 
 .. _querying-jsonfield:
 
