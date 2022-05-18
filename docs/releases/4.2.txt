@@ -223,6 +223,12 @@ backends.
 
 * ...
 
+Dropped support for MariaDB 10.3
+--------------------------------
+
+Upstream support for MariaDB 10.3 ends in May 2023. Django 4.2 supports MariaDB
+10.4 and higher.
+
 Miscellaneous
 -------------
 
