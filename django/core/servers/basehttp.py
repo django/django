@@ -71,6 +71,11 @@ class WSGIServer(simple_server.WSGIServer):
         super().__init__(*args, **kwargs)
 
     def handle_error(self, request, client_address):
+        from django.conf import settings
+
+        if settings.DEBUG_PROPAGATE_EXCEPTIONS:
+            raise
+
         if is_broken_pipe_error():
             logger.info("- Broken pipe from %s\n", client_address)
         else:
@@ -116,6 +121,17 @@ class ServerHandler(simple_server.ServerHandler):
     def close(self):
         self.get_stdin()._read_limited()
         super().close()
+
+    def handle_error(self):
+        from django.conf import settings
+
+        if settings.DEBUG_PROPAGATE_EXCEPTIONS:
+            if self.status is None:
+                # status is excpected to exist in
+                # wsgiref.simple_server.ServerHandler.close().
+                self.status = "500 Propagated Exception"
+            raise
+        super().handle_error()
 
 
 class WSGIRequestHandler(simple_server.WSGIRequestHandler):
