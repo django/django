@@ -193,7 +193,7 @@ fields that are currently deferred for this model.
 Validating objects
 ==================
 
-There are three steps involved in validating a model:
+There are four steps involved in validating a model:
 
 1. Validate the model fields - :meth:`Model.clean_fields()`
 2. Validate the model as a whole - :meth:`Model.clean()`
