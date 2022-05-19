@@ -419,7 +419,10 @@ def _init_worker(
     start_method = multiprocessing.get_start_method()
 
     if start_method == "spawn":
-        process_setup(*process_setup_args)
+        if process_setup and callable(process_setup):
+            if process_setup_args is None:
+                process_setup_args = ()
+            process_setup(*process_setup_args)
         setup_test_environment()
 
     for alias in connections:
@@ -465,6 +468,7 @@ class ParallelTestSuite(unittest.TestSuite):
 
     # In case someone wants to modify these in a subclass.
     init_worker = _init_worker
+    process_setup_args = ()
     run_subsuite = _run_subsuite
     runner_class = RemoteTestRunner
 
@@ -476,6 +480,14 @@ class ParallelTestSuite(unittest.TestSuite):
         self.initial_settings = None
         self.serialized_contents = None
         super().__init__()
+
+    def process_setup(self, *args):
+        """
+        Stub method to simplify run() implementation. "self" is never actually
+        passed because a function implementing this method (__func__) is
+        always used, not the method itself.
+        """
+        pass
 
     def run(self, result):
         """
@@ -496,11 +508,13 @@ class ParallelTestSuite(unittest.TestSuite):
         counter = multiprocessing.Value(ctypes.c_int, 0)
         pool = multiprocessing.Pool(
             processes=self.processes,
-            initializer=self.init_worker,
+            initializer=self.init_worker.__func__,
             initargs=[
                 counter,
                 self.initial_settings,
                 self.serialized_contents,
+                self.process_setup.__func__,
+                self.process_setup_args,
             ],
         )
         args = [
