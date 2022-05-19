@@ -82,9 +82,8 @@ class ExplainTests(TestCase):
             {"verbose": True, "timing": True, "analyze": True},
             {"verbose": False, "timing": False, "analyze": True},
             {"summary": True},
+            {"settings": True},
         ]
-        if connection.features.is_postgresql_12:
-            test_options.append({"settings": True})
         if connection.features.is_postgresql_13:
             test_options.append({"analyze": True, "wal": True})
         for options in test_options:

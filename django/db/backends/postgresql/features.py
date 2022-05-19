@@ -6,7 +6,7 @@ from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    minimum_database_version = (11,)
+    minimum_database_version = (12,)
     allows_group_by_selected_pks = True
     can_return_columns_from_insert = True
     can_return_rows_from_bulk_insert = True
@@ -84,10 +84,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         }
 
     @cached_property
-    def is_postgresql_12(self):
-        return self.connection.pg_version >= 120000
-
-    @cached_property
     def is_postgresql_13(self):
         return self.connection.pg_version >= 130000
 
@@ -96,8 +92,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self.connection.pg_version >= 140000
 
     has_bit_xor = property(operator.attrgetter("is_postgresql_14"))
-    supports_covering_gist_indexes = property(operator.attrgetter("is_postgresql_12"))
     supports_covering_spgist_indexes = property(operator.attrgetter("is_postgresql_14"))
-    supports_non_deterministic_collations = property(
-        operator.attrgetter("is_postgresql_12")
-    )
