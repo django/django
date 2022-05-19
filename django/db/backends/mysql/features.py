@@ -61,15 +61,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         if self.connection.mysql_is_mariadb:
             return (10, 4)
         else:
-            return (5, 7)
-
-    @cached_property
-    def bare_select_suffix(self):
-        if not self.connection.mysql_is_mariadb and self.connection.mysql_version < (
-            8,
-        ):
-            return " FROM DUAL"
-        return ""
+            return (8,)
 
     @cached_property
     def test_collations(self):
@@ -128,27 +120,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     },
                 }
             )
-        if not self.connection.mysql_is_mariadb and self.connection.mysql_version < (
-            8,
-        ):
-            skips.update(
-                {
-                    "Casting to datetime/time is not supported by MySQL < 8.0. "
-                    "(#30224)": {
-                        "aggregation.tests.AggregateTestCase."
-                        "test_aggregation_default_using_time_from_python",
-                        "aggregation.tests.AggregateTestCase."
-                        "test_aggregation_default_using_datetime_from_python",
-                    },
-                    "MySQL < 8.0 returns string type instead of datetime/time. "
-                    "(#30224)": {
-                        "aggregation.tests.AggregateTestCase."
-                        "test_aggregation_default_using_time_from_database",
-                        "aggregation.tests.AggregateTestCase."
-                        "test_aggregation_default_using_datetime_from_database",
-                    },
-                }
-            )
         if self.connection.mysql_is_mariadb and (
             10,
             4,
@@ -173,21 +144,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                         "schema.tests.SchemaTests."
                         "test_alter_pk_with_self_referential_field",
                     },
-                }
-            )
-        if not self.connection.mysql_is_mariadb and self.connection.mysql_version < (
-            8,
-        ):
-            skips.update(
-                {
-                    "Parenthesized combined queries are not supported on MySQL < 8.": {
-                        "queries.test_qs_combinators.QuerySetSetOperationTests."
-                        "test_union_in_subquery",
-                        "queries.test_qs_combinators.QuerySetSetOperationTests."
-                        "test_union_in_subquery_related_outerref",
-                        "queries.test_qs_combinators.QuerySetSetOperationTests."
-                        "test_union_in_with_ordering",
-                    }
                 }
             )
         if not self.supports_explain_analyze:
@@ -342,16 +298,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return not self.connection.mysql_is_mariadb
 
     @cached_property
-    def supports_json_field(self):
-        if self.connection.mysql_is_mariadb:
-            return True
-        return self.connection.mysql_version >= (5, 7, 8)
-
-    @cached_property
     def can_introspect_json_field(self):
         if self.connection.mysql_is_mariadb:
-            return self.supports_json_field and self.can_introspect_check_constraints
-        return self.supports_json_field
+            return self.can_introspect_check_constraints
+        return True
 
     @cached_property
     def supports_index_column_ordering(self):

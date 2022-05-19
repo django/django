@@ -248,6 +248,12 @@ Dropped support for MariaDB 10.3
 Upstream support for MariaDB 10.3 ends in May 2023. Django 4.2 supports MariaDB
 10.4 and higher.
 
+Dropped support for MySQL 5.7
+-----------------------------
+
+Upstream support for MySQL 5.7 ends in October 2023. Django 4.2 supports MySQL
+8 and higher.
+
 Dropped support for PostgreSQL 11
 ---------------------------------
 
