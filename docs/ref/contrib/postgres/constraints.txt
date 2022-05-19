@@ -139,8 +139,8 @@ used for queries that select only included fields
 (:attr:`~ExclusionConstraint.include`) and filter only by indexed fields
 (:attr:`~ExclusionConstraint.expressions`).
 
-``include`` is supported for GiST indexes on PostgreSQL 12+ and SP-GiST
-indexes on PostgreSQL 14+.
+``include`` is supported for GiST indexes. PostgreSQL 14+ also supports
+``include`` for SP-GiST indexes.
 
 .. versionchanged:: 4.1
 
