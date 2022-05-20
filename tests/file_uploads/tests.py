@@ -12,7 +12,6 @@ from urllib.parse import quote
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
-from django.utils.http import parse_header_parameters
 from django.http.multipartparser import (
     FILE,
     MultiPartParser,
@@ -20,6 +19,7 @@ from django.http.multipartparser import (
     Parser,
 )
 from django.test import SimpleTestCase, TestCase, client, override_settings
+from django.utils.http import parse_header_parameters
 
 from . import uploadhandler
 from .models import FileModel

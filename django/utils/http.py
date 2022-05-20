@@ -11,9 +11,10 @@ from urllib.parse import (
     _splitnetloc,
     _splitparams,
     scheme_chars,
+    unquote,
 )
 from urllib.parse import urlencode as original_urlencode
-from urllib.parse import uses_params, unquote
+from urllib.parse import uses_params
 
 from django.utils.datastructures import MultiValueDict
 from django.utils.regex_helper import _lazy_re_compile
@@ -385,7 +386,8 @@ def _parse_header_params(s, f):
 
 def _parse_header(line, is_binary=False):
     def _f(x):
-        return x.encode('ascii') if is_binary else x
+        return x.encode("ascii") if is_binary else x
+
     plist = _parse_header_params(_f(";") + line, _f)
     key = plist.pop(0).lower()
     if is_binary:
@@ -404,7 +406,7 @@ def _parse_header(line, is_binary=False):
                 name = name[:-1]
                 if p.count(_f("'")) == 2:
                     has_encoding = True
-            value = p[i + 1:].strip()
+            value = p[i + 1 :].strip()
             if len(value) >= 2 and value[:1] == value[-1:] == _f('"'):
                 value = value[1:-1]
                 value = value.replace(_f("\\\\"), _f("\\")).replace(_f('\\"'), _f('"'))
@@ -420,5 +422,4 @@ def parse_header_parameters(line):
     Parse a Content-type like header.
     Return the main content-type and a dictionary of options.
     """
-    return (_parse_header(line, True) if isinstance(line, bytes)
-            else _parse_header(line))
+    return _parse_header(line, True) if isinstance(line, bytes) else _parse_header(line)
