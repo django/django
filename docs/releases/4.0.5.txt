@@ -14,3 +14,6 @@ Bugfixes
 
 * Fixed a bug in Django 4.0 that caused a crash of ``QuerySet.filter()`` on
   ``IsNull()`` expressions (:ticket:`33705`).
+
+* Fixed a bug in Django 4.0 where a hidden quick filter toolbar in the admin's
+  navigation sidebar was focusable (:ticket:`33725`).
