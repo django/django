@@ -46,7 +46,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '12'
+          node-version: '14'
           cache: 'npm'
           cache-dependency-path: '**/package.json'
       - run: npm install
