@@ -4556,8 +4556,8 @@ class TestComment(TestCase):
         with CaptureQueriesContext(connection) as captured_queries:
             list(NamedCategory.objects.comment("! STRAIGHT_JOIN"))
             list(NamedCategory.objects.comment("").comment("some comment"))
-        self.assertIn("SELECT /*! STRAIGHT_JOIN*/ ", captured_queries[0]["sql"])
-        self.assertIn("SELECT /**/ /*some comment*/ ", captured_queries[1]["sql"])
+        self.assertIn("SELECT /* ! STRAIGHT_JOIN */ ", captured_queries[0]["sql"])
+        self.assertIn("SELECT /*  */ /* some comment */ ", captured_queries[1]["sql"])
 
     def test_select_subquery(self):
         with CaptureQueriesContext(connection) as captured_queries:
@@ -4571,8 +4571,8 @@ class TestComment(TestCase):
                 ).comment("a comment")
             )
         sql = captured_queries[0]["sql"]
-        self.assertIn("(SELECT /*a subquery comment*/ ", sql)
-        self.assertIn("SELECT /*a comment*/ ", sql)
+        self.assertIn("(SELECT /* a subquery comment */ ", sql)
+        self.assertIn("SELECT /* a comment */ ", sql)
 
     def test_select_aggregate(self):
         with CaptureQueriesContext(connection) as captured_queries:
@@ -4580,12 +4580,12 @@ class TestComment(TestCase):
                 tag_per_parent=Count("pk")
             ).aggregate(Max("tag_per_parent")),
         sql = captured_queries[0]["sql"]
-        self.assertIn("(SELECT /*a subquery comment*/ ", sql)
+        self.assertIn("(SELECT /* a subquery comment */ ", sql)
 
     def test_update(self):
         with CaptureQueriesContext(connection) as captured_queries:
             NamedCategory.objects.comment("this is an update").update(name="monty")
-        self.assertIn("UPDATE /*this is an update*/ ", captured_queries[0]["sql"])
+        self.assertIn("UPDATE /* this is an update */ ", captured_queries[0]["sql"])
 
     def test_stops_delimiters_in_message(self):
         for message in ["foo=/a/b/c*/", "/*foo=/a/b/c", "**//SELECT nothing;//**"]:

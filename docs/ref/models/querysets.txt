@@ -1901,21 +1901,11 @@ Adds an SQL comment to be inserted into the resultant SQL statement, after
 
 ...translates (roughly) into the following SQL::
 
-    SELECT /*blog/views.py:50*/ blog_entry.* FROM blog_entry
+    SELECT /* blog/views.py:50 */ blog_entry.* FROM blog_entry
 
 This is useful for adding information to the SQL statement which when logged
 can be used to correlate slow and problematic queries to the generating source
 code.
-
-It can also be used to pass optimizer hints to supporting database engines.
-For example, on MySQL you can force the join order by setting the
-``STRAIGHT_JOIN`` hint with ``comment()`` like so::
-
-    Entry.objects.select_related('blog').comment("! STRAIGHT_JOIN").all()
-
-This results in the specially interpreted 'non-comment' comment::
-
-    SELECT /*! STRAIGHT_JOIN */ blog_entry.*, blog_blog.* FROM ...
 
 .. note::
 
@@ -1934,7 +1924,7 @@ entries, for example::
 
 ...translates into::
 
-    UPDATE blog_entry.* /*blog/views.py:75*/ /*python=3.11*/ SET "headline" = 'This is new'
+    UPDATE blog_entry.* /* blog/views.py:75 */ /* python=3.11 */ SET "headline" = 'This is new'
 
 Operators that return new ``QuerySet``\s
 ----------------------------------------

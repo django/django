@@ -629,9 +629,7 @@ class SQLCompiler:
                     params += distinct_params
 
                 if self.query.comments:
-                    result.append(
-                        " ".join(f"/*{comment}*/" for comment in self.query.comments)
-                    )
+                    result += (f"/* {comment} */" for comment in self.query.comments)
 
                 out_cols = []
                 col_idx = 1
@@ -1802,8 +1800,8 @@ class SQLUpdateCompiler(SQLCompiler):
         table = self.query.base_table
         result = ["UPDATE"]
         if self.query.comments:
-            result.append(" ".join(f"/*{comment}*/" for comment in self.query.comments))
-        result.extend(["%s SET" % qn(table), ", ".join(values)])
+            result += (f"/* {comment} */" for comment in self.query.comments)
+        result += (qn(table), "SET", ", ".join(values))
         where, params = self.compile(self.query.where)
         if where:
             result.append("WHERE %s" % where)
