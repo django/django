@@ -144,10 +144,14 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(toggle_button.get_attribute("aria-label"), "Toggle navigation")
         for link in self.selenium.find_elements_by_css_selector("#nav-sidebar a"):
             self.assertEqual(link.get_attribute("tabIndex"), "0")
+        filter_input = self.selenium.find_element_by_css_selector("#nav-filter")
+        self.assertEqual(filter_input.get_attribute("tabIndex"), "0")
         toggle_button.click()
         # Hidden sidebar is not reachable via keyboard navigation.
         for link in self.selenium.find_elements_by_css_selector("#nav-sidebar a"):
             self.assertEqual(link.get_attribute("tabIndex"), "-1")
+        filter_input = self.selenium.find_element_by_css_selector("#nav-filter")
+        self.assertEqual(filter_input.get_attribute("tabIndex"), "-1")
         main_element = self.selenium.find_element_by_css_selector("#main")
         self.assertNotIn("shifted", main_element.get_attribute("class").split())
 
@@ -182,9 +186,13 @@ class SeleniumTests(AdminSeleniumTestCase):
         # Hidden sidebar is not reachable via keyboard navigation.
         for link in self.selenium.find_elements_by_css_selector("#nav-sidebar a"):
             self.assertEqual(link.get_attribute("tabIndex"), "-1")
+        filter_input = self.selenium.find_element_by_css_selector("#nav-filter")
+        self.assertEqual(filter_input.get_attribute("tabIndex"), "-1")
         toggle_button.click()
         for link in self.selenium.find_elements_by_css_selector("#nav-sidebar a"):
             self.assertEqual(link.get_attribute("tabIndex"), "0")
+        filter_input = self.selenium.find_element_by_css_selector("#nav-filter")
+        self.assertEqual(filter_input.get_attribute("tabIndex"), "0")
         self.assertEqual(
             self.selenium.execute_script(
                 "return localStorage.getItem('django.admin.navSidebarIsOpen')"
