@@ -946,8 +946,11 @@ a.deletelink:focus, a.deletelink:hover {
 #user-tools a:focus, #user-tools a:hover,
 #logout-form button:active, #logout-form button:hover {
     text-decoration: none;
-    border-bottom-color: var(--primary);
-    color: var(--primary);
+    border-bottom: 0;
+}
+
+#logout-form button:active, #logout-form button:hover {
+    margin-bottom: 1px;
 }
 
 /* SIDEBAR */
