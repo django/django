@@ -12,12 +12,12 @@ from urllib.parse import quote
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
+from django.utils.http import parse_header_parameters
 from django.http.multipartparser import (
     FILE,
     MultiPartParser,
     MultiPartParserError,
     Parser,
-    parse_header,
 )
 from django.test import SimpleTestCase, TestCase, client, override_settings
 
@@ -924,7 +924,7 @@ class MultiParserTests(SimpleTestCase):
             ),
         )
         for raw_line, expected_title in test_data:
-            parsed = parse_header(raw_line)
+            parsed = parse_header_parameters(raw_line)
             self.assertEqual(parsed[1]["title"], expected_title)
 
     def test_rfc2231_wrong_title(self):
@@ -942,5 +942,5 @@ class MultiParserTests(SimpleTestCase):
             (b"Content-Type: application/x-stuff; title*=bar.html", b"bar.html"),
         )
         for raw_line, expected_title in test_data:
-            parsed = parse_header(raw_line)
+            parsed = parse_header_parameters(raw_line)
             self.assertEqual(parsed[1]["title"], expected_title)
