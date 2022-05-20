@@ -410,7 +410,7 @@ return a boolean.
     The ``covers`` predicate has the following equivalent definitions:
 
     * Every point of the other geometry is a point of this geometry.
-    * The DE-9IM Intersection Matrix for the two geometries is
+    * The `DE-9IM`_ Intersection Matrix for the two geometries is
       ``T*****FF*``, ``*T****FF*``, ``***T**FF*``, or ``****T*FF*``.
 
     If either geometry is empty, returns ``False``.
@@ -422,6 +422,8 @@ return a boolean.
     ``covers()`` should be preferred to :meth:`~GEOSGeometry.contains`. As an
     added benefit, ``covers()`` is more amenable to optimization and hence
     should outperform :meth:`~GEOSGeometry.contains`.
+
+    .. _DE-9IM: https://en.wikipedia.org/wiki/DE-9IM
 
 .. method:: GEOSGeometry.crosses(other)
 
