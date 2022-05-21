@@ -46,7 +46,7 @@ To run Django's test suite:
   ``docs/internals/contributing/writing-code/unit-tests.txt``, published online at
   https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#running-the-unit-tests
 
-Supporting the Development of Django &hearts
+Supporting the Development of Django :green_heart:
 ====================================
 
 Django's development depends on your contributions. 
