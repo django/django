@@ -3,6 +3,7 @@ import itertools
 import logging
 import os
 import signal
+import site
 import subprocess
 import sys
 import threading
@@ -10,6 +11,7 @@ import time
 import traceback
 import weakref
 from collections import defaultdict
+from operator import itemgetter
 from pathlib import Path
 from types import ModuleType
 from zipimport import zipimporter
@@ -151,6 +153,9 @@ def iter_modules_and_files(modules, extra_files):
             )
             sys_file_paths.append(origin)
 
+    stdlib_location_1 = os.path.dirname(os.__file__)
+    stdlib_location_2 = os.path.dirname(os.path.dirname(logging.__file__))
+    django_location = os.path.dirname(os.path.dirname(django.__file__))
     results = set()
     for filename in itertools.chain(sys_file_paths, extra_files):
         if not filename:
@@ -166,8 +171,19 @@ def iter_modules_and_files(modules, extra_files):
             logger.debug('"%s" raised when resolving path: "%s"', e, path)
             continue
         resolved_path = path.resolve().absolute()
-        results.add(resolved_path)
-    return frozenset(results)
+
+        if is_django_path(path):
+            results.add((resolved_path, 10))
+        elif filename.startswith(
+            (stdlib_location_1, stdlib_location_2, django_location)
+        ):
+            results.add((resolved_path, 5))
+        elif filename.startswith(tuple(site.getsitepackages())):
+            results.add((resolved_path, 30))
+        else:
+            results.add((resolved_path, 0))
+    results = tuple(result for result, rank in sorted(results, key=itemgetter(1)))
+    return results
 
 
 @functools.lru_cache(maxsize=1)
