@@ -87,7 +87,7 @@ def handle_default_options(options):
 def no_translations(handle_func):
     """Decorator that forces a command to run with translations deactivated."""
 
-    def wrapped(*args, **kwargs):
+    def wrapper(*args, **kwargs):
         from django.utils import translation
 
         saved_locale = translation.get_language()
@@ -99,7 +99,7 @@ def no_translations(handle_func):
                 translation.activate(saved_locale)
         return res
 
-    return wrapped
+    return wrapper
 
 
 class DjangoHelpFormatter(HelpFormatter):

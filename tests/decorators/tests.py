@@ -196,10 +196,10 @@ class ClsDec:
         self.myattr = myattr
 
     def __call__(self, f):
-        def wrapped():
+        def wrapper():
             return f() and self.myattr
 
-        return update_wrapper(wrapped, f)
+        return update_wrapper(wrapper, f)
 
 
 class MethodDecoratorTests(SimpleTestCase):
