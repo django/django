@@ -159,10 +159,11 @@ class DecoratorsTest(TestCase):
 # For testing method_decorator, a decorator that assumes a single argument.
 # We will get type arguments if there is a mismatch in the number of arguments.
 def simple_dec(func):
+    @wraps(func)
     def wrapper(arg):
         return func("test:" + arg)
 
-    return wraps(func)(wrapper)
+    return wrapper
 
 
 simple_dec_m = method_decorator(simple_dec)
