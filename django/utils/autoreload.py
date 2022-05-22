@@ -1,4 +1,3 @@
-import functools
 import itertools
 import logging
 import os
@@ -10,6 +9,7 @@ import time
 import traceback
 import weakref
 from collections import defaultdict
+from functools import lru_cache, wraps
 from pathlib import Path
 from types import ModuleType
 from zipimport import zipimporter
@@ -57,7 +57,7 @@ def is_django_path(path):
 
 
 def check_errors(fn):
-    @functools.wraps(fn)
+    @wraps(fn)
     def wrapper(*args, **kwargs):
         global _exception
         try:
@@ -120,7 +120,7 @@ def iter_all_python_module_files():
     return iter_modules_and_files(modules, frozenset(_error_files))
 
 
-@functools.lru_cache(maxsize=1)
+@lru_cache(maxsize=1)
 def iter_modules_and_files(modules, extra_files):
     """Iterate through all modules needed to be watched."""
     sys_file_paths = []
@@ -170,7 +170,7 @@ def iter_modules_and_files(modules, extra_files):
     return frozenset(results)
 
 
-@functools.lru_cache(maxsize=1)
+@lru_cache(maxsize=1)
 def common_roots(paths):
     """
     Return a tuple of common roots that are shared between the given paths.
@@ -463,7 +463,7 @@ class WatchmanReloader(BaseReloader):
         logger.debug("Watchman watch-project result: %s", result)
         return result["watch"], result.get("relative_path")
 
-    @functools.lru_cache
+    @lru_cache
     def _get_clock(self, root):
         return self.client.query("clock", root)["clock"]
 
