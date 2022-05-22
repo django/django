@@ -39,6 +39,14 @@ class TestRss2Feed(views.Feed):
     item_copyright = "Copyright (c) 2007, Sally Smith"
 
 
+class TestRss2FeedWithCallableObject(TestRss2Feed):
+    class TimeToLive:
+        def __call__(self):
+            return 700
+
+    ttl = TimeToLive()
+
+
 class TestRss2FeedWithGuidIsPermaLinkTrue(TestRss2Feed):
     def item_guid_is_permalink(self, item):
         return True
