@@ -1,4 +1,4 @@
-import functools
+from functools import wraps
 from importlib import import_module
 from inspect import getfullargspec, unwrap
 
@@ -120,7 +120,7 @@ class Library:
             ) = getfullargspec(unwrap(func))
             function_name = name or func.__name__
 
-            @functools.wraps(func)
+            @wraps(func)
             def compile_func(parser, token):
                 bits = token.split_contents()[1:]
                 target_var = None
@@ -175,7 +175,7 @@ class Library:
             ) = getfullargspec(unwrap(func))
             function_name = name or func.__name__
 
-            @functools.wraps(func)
+            @wraps(func)
             def compile_func(parser, token):
                 bits = token.split_contents()[1:]
                 args, kwargs = parse_bits(
