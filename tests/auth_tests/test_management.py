@@ -49,7 +49,7 @@ def mock_inputs(inputs):
     """
 
     def inner(test_func):
-        def wrapped(*args):
+        def wrapper(*args):
             class mock_getpass:
                 @staticmethod
                 def getpass(prompt=b"Password: ", stream=None):
@@ -90,7 +90,7 @@ def mock_inputs(inputs):
                 createsuperuser.getpass = old_getpass
                 builtins.input = old_input
 
-        return wrapped
+        return wrapper
 
     return inner
 

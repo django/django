@@ -52,7 +52,7 @@ def never_cache(view_func):
     """
 
     @wraps(view_func)
-    def _wrapped_view_func(request, *args, **kwargs):
+    def _wrapper_view_func(request, *args, **kwargs):
         # Ensure argument looks like a request.
         if not hasattr(request, "META"):
             raise TypeError(
@@ -63,4 +63,4 @@ def never_cache(view_func):
         add_never_cache_headers(response)
         return response
 
-    return _wrapped_view_func
+    return _wrapper_view_func
