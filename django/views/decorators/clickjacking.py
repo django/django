@@ -12,13 +12,14 @@ def xframe_options_deny(view_func):
         ...
     """
 
+    @wraps(view_func)
     def wrapper_view(*args, **kwargs):
         resp = view_func(*args, **kwargs)
         if resp.get("X-Frame-Options") is None:
             resp["X-Frame-Options"] = "DENY"
         return resp
 
-    return wraps(view_func)(wrapper_view)
+    return wrapper_view
 
 
 def xframe_options_sameorigin(view_func):
@@ -32,13 +33,14 @@ def xframe_options_sameorigin(view_func):
         ...
     """
 
+    @wraps(view_func)
     def wrapper_view(*args, **kwargs):
         resp = view_func(*args, **kwargs)
         if resp.get("X-Frame-Options") is None:
             resp["X-Frame-Options"] = "SAMEORIGIN"
         return resp
 
-    return wraps(view_func)(wrapper_view)
+    return wrapper_view
 
 
 def xframe_options_exempt(view_func):
@@ -51,9 +53,10 @@ def xframe_options_exempt(view_func):
         ...
     """
 
+    @wraps(view_func)
     def wrapper_view(*args, **kwargs):
         resp = view_func(*args, **kwargs)
         resp.xframe_options_exempt = True
         return resp
 
-    return wraps(view_func)(wrapper_view)
+    return wrapper_view
