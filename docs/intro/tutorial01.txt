@@ -264,7 +264,6 @@ Your app directory should now look like::
         admin.py
         apps.py
         migrations/
-            __init__.py
         models.py
         tests.py
         urls.py
