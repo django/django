@@ -259,8 +259,24 @@ class ASGIHandler(base.BaseHandler):
                 "headers": response_headers,
             }
         )
+        if response.async_streaming:
+            # Access `__aiter__` and not `streaming_content` directly in case
+            # it has been overridden in a subclass.
+            async for part in response:
+                for chunk, _ in self.chunk_bytes(part):
+                    await send(
+                        {
+                            "type": "http.response.body",
+                            "body": chunk,
+                            # Ignore "more" as there may be more parts; instead,
+                            # use an empty final closing message with False.
+                            "more_body": True,
+                        }
+                    )
+            # Final closing message.
+            await send({"type": "http.response.body"})
         # Streaming responses need to be pinned to their iterator.
-        if response.streaming:
+        elif response.streaming:
             # Access `__iter__` and not `streaming_content` directly in case
             # it has been overridden in a subclass.
             for part in response:

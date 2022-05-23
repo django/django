@@ -366,6 +366,7 @@ class HttpResponse(HttpResponseBase):
     """
 
     streaming = False
+    async_streaming = False
 
     def __init__(self, content=b"", *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -476,6 +477,32 @@ class StreamingHttpResponse(HttpResponseBase):
 
     def getvalue(self):
         return b"".join(self.streaming_content)
+
+
+class AsyncStreamingHttpResponse(StreamingHttpResponse):
+    """
+    A streaming HTTP response class with an asynchronous iterator as content, usable in ASGI context.
+    """
+
+    async_streaming = True
+
+    @property
+    async def streaming_content(self):
+        async for i in self._iterator:
+            yield self.make_bytes(i)
+
+    @streaming_content.setter
+    def streaming_content(self, value):
+        self._set_streaming_content(value)
+
+    def _set_streaming_content(self, value):
+        # Ensure we can never iterate on "value" more than once.
+        self._iterator = aiter(value)
+        if hasattr(value, 'close'):
+            self._resource_closers.append(value.close)
+
+    def __aiter__(self):
+        return self.streaming_content
 
 
 class FileResponse(StreamingHttpResponse):
