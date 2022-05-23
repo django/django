@@ -429,14 +429,8 @@ class QuerySet:
 
         if isinstance(k, slice):
             qs = self._chain()
-            if k.start is not None:
-                start = int(k.start)
-            else:
-                start = None
-            if k.stop is not None:
-                stop = int(k.stop)
-            else:
-                stop = None
+            start = int(k.start) if k.start is not None else None
+            stop = int(k.stop) if k.stop is not None else None
             qs.query.set_limits(start, stop)
             return list(qs)[:: k.step] if k.step else qs
 
