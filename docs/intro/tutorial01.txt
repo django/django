@@ -231,7 +231,6 @@ That'll create a directory :file:`polls`, which is laid out like this::
         admin.py
         apps.py
         migrations/
-            __init__.py
         models.py
         tests.py
         views.py
