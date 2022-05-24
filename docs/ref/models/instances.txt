@@ -224,8 +224,8 @@ This method calls :meth:`Model.clean_fields()`, :meth:`Model.clean()`,
 in that order and raises a :exc:`~django.core.exceptions.ValidationError` that
 has a ``message_dict`` attribute containing errors from all four stages.
 
-The optional ``exclude`` argument can be used to provide a list of field names
-that can be excluded from validation and cleaning.
+The optional ``exclude`` argument can be used to provide a ``set`` of field
+names that can be excluded from validation and cleaning.
 :class:`~django.forms.ModelForm` uses this argument to exclude fields that
 aren't present on your form from being validated since any errors raised could
 not be corrected by the user.
@@ -249,12 +249,16 @@ The first step ``full_clean()`` performs is to clean each individual field.
 
     The ``validate_constraints`` argument was added.
 
+.. versionchanged:: 4.1
+
+    An ``exclude`` value is now converted to a ``set`` rather than a ``list``.
+
 .. method:: Model.clean_fields(exclude=None)
 
 This method will validate all fields on your model. The optional ``exclude``
-argument lets you provide a list of field names to exclude from validation. It
-will raise a :exc:`~django.core.exceptions.ValidationError` if any fields fail
-validation.
+argument lets you provide a ``set`` of field names to exclude from validation.
+It will raise a :exc:`~django.core.exceptions.ValidationError` if any fields
+fail validation.
 
 The second step ``full_clean()`` performs is to call :meth:`Model.clean()`.
 This method should be overridden to perform custom validation on your model.
@@ -355,8 +359,8 @@ uniqueness constraints defined via :attr:`.Field.unique`,
 :attr:`.Field.unique_for_date`, :attr:`.Field.unique_for_month`,
 :attr:`.Field.unique_for_year`, or :attr:`Meta.unique_together
 <django.db.models.Options.unique_together>` on your model instead of individual
-field values. The optional ``exclude`` argument allows you to provide a list of
-field names to exclude from validation. It will raise a
+field values. The optional ``exclude`` argument allows you to provide a ``set``
+of field names to exclude from validation. It will raise a
 :exc:`~django.core.exceptions.ValidationError` if any fields fail validation.
 
 :class:`~django.db.models.UniqueConstraint`\s defined in the
@@ -380,7 +384,7 @@ Finally, ``full_clean()`` will check any other constraints on your model.
 
 This method validates all constraints defined in
 :attr:`Meta.constraints <django.db.models.Options.constraints>`. The
-optional ``exclude`` argument allows you to provide a list of field names to
+optional ``exclude`` argument allows you to provide a ``set`` of field names to
 exclude from validation. It will raise a
 :exc:`~django.core.exceptions.ValidationError` if any constraints fail
 validation.

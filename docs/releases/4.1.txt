@@ -561,6 +561,12 @@ Miscellaneous
   ``URLResolver._callback_strs``, and ``URLPattern.lookup_str()`` are
   moved to ``django.contrib.admindocs.utils``.
 
+* The :meth:`.Model.full_clean` method now converts an ``exclude`` value to the
+  ``set``. It’s also preferable to pass an ``exclude`` value as a ``set`` to
+  the :meth:`.Model.clean_fields`, :meth:`.Model.full_clean`,
+  :meth:`.Model.validate_unique`, and :meth:`.Model.validate_constraints`
+  methods.
+
 .. _deprecated-features-4.1:
 
 Features deprecated in 4.1
