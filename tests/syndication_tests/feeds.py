@@ -47,6 +47,12 @@ class TestRss2FeedWithCallableObject(TestRss2Feed):
     ttl = TimeToLive()
 
 
+class TestRss2FeedWithStaticMethod(TestRss2Feed):
+    @staticmethod
+    def categories():
+        return ("javascript", "vue")
+
+
 class TestRss2FeedWithGuidIsPermaLinkTrue(TestRss2Feed):
     def item_guid_is_permalink(self, item):
         return True

@@ -7,6 +7,7 @@ urlpatterns = [
     path(
         "syndication/rss2/with-callable-object/", feeds.TestRss2FeedWithCallableObject()
     ),
+    path("syndication/rss2/with-static-methods/", feeds.TestRss2FeedWithStaticMethod()),
     path("syndication/rss2/articles/<int:entry_id>/", feeds.TestGetObjectFeed()),
     path(
         "syndication/rss2/guid_ispermalink_true/",
