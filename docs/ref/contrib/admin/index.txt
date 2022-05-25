@@ -2995,11 +2995,11 @@ to reference your :class:`AdminSite` subclass.
 .. code-block:: python
     :caption: myapp/admin.py
 
-    from django.contrib.admin import AdminSite
+    from django.contrib import admin
 
     from .models import MyModel
 
-    class MyAdminSite(AdminSite):
+    class MyAdminSite(admin.AdminSite):
         site_header = 'Monty Python administration'
 
     admin_site = MyAdminSite(name='myadmin')
