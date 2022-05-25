@@ -39,6 +39,12 @@ class TestRss2Feed(views.Feed):
     item_copyright = "Copyright (c) 2007, Sally Smith"
 
 
+class TestRss2FeedWithStaticMethod(TestRss2Feed):
+    @staticmethod
+    def categories():
+        return ("javascript", "vue")
+
+
 class TestRss2FeedWithGuidIsPermaLinkTrue(TestRss2Feed):
     def item_guid_is_permalink(self, item):
         return True

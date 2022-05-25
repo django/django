@@ -196,6 +196,12 @@ class SyndicationFeedTest(FeedTestCase):
                 item.getElementsByTagName("guid")[0].attributes.get("isPermaLink")
             )
 
+    def test_rss2_feed_with_static_methods(self):
+        response = self.client.get("/syndication/rss2/with-static-methods/")
+        doc = minidom.parseString(response.content)
+        chan = doc.getElementsByTagName("rss")[0].getElementsByTagName("channel")[0]
+        self.assertCategories(chan, ["javascript", "vue"])
+
     def test_rss2_feed_guid_permalink_false(self):
         """
         Test if the 'isPermaLink' attribute of <guid> element of an item
