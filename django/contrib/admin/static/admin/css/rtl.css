@@ -114,16 +114,16 @@ thead th.sorted .text {
     float: right;
 }
 
-.submit-row {
-    text-align: left
-}
-
 .submit-row p.deletelink-box {
-    float: right;
+    float: left;
 }
 
 .submit-row input.default {
-    margin-left: 0;
+    margin: 0 0 5px 5px;
+}
+
+.submit-row input {
+    margin: 0 0 5px 5px;
 }
 
 .vDateField, .vTimeField {
@@ -149,8 +149,8 @@ form ul.inline li {
     padding-left: 7px;
 }
 
-input[type=submit].default, .submit-row input.default {
-    float: left;
+.submit-row {
+    text-align: right;
 }
 
 fieldset .fieldBox {

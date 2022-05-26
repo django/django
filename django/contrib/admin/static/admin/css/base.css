@@ -506,7 +506,6 @@ a.button {
 }
 
 .button.default, input[type=submit].default, .submit-row input.default {
-    float: right;
     border: none;
     font-weight: 400;
     background: var(--default-button-bg);
