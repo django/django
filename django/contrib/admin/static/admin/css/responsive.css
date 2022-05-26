@@ -239,10 +239,6 @@ input[type="submit"], button {
         padding: 10px 7px;
     }
 
-    .submit-row input.default {
-        margin: 0 0 5px 5px;
-    }
-
     .button, input[type=submit], input[type=button], .submit-row input, a.button {
         padding: 7px;
     }

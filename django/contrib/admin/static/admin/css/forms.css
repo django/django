@@ -259,7 +259,6 @@ fieldset.monospace textarea {
     background: var(--darkened-bg);
     border: 1px solid var(--hairline-color);
     border-radius: 4px;
-    text-align: right;
     overflow: hidden;
 }
 
@@ -270,11 +269,10 @@ body.popup .submit-row {
 .submit-row input {
     height: 35px;
     line-height: 15px;
-    margin: 0 0 5px 5px;
+    margin: 0 5px 5px 0;
 }
 
 .submit-row input.default {
-    margin: 0 0 5px 8px;
     text-transform: uppercase;
 }
 
@@ -283,7 +281,7 @@ body.popup .submit-row {
 }
 
 .submit-row p.deletelink-box {
-    float: left;
+    float: right;
     margin: 0;
 }
 
