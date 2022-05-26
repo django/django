@@ -1560,16 +1560,13 @@ class BaseDatabaseSchemaEditor:
         ):
             return None
 
-        def create_unique_name(*args, **kwargs):
-            return self.quote_name(self._create_index_name(*args, **kwargs))
-
         compiler = Query(model, alias_cols=False).get_compiler(
             connection=self.connection
         )
         table = model._meta.db_table
         columns = [field.column for field in fields]
         if name is None:
-            name = IndexName(table, columns, "_uniq", create_unique_name)
+            name = self._unique_constraint_name(table, columns, quote=True)
         else:
             name = self.quote_name(name)
         if condition or include or opclasses or expressions:
@@ -1591,6 +1588,17 @@ class BaseDatabaseSchemaEditor:
             deferrable=self._deferrable_constraint_sql(deferrable),
             include=self._index_include_sql(model, include),
         )
+
+    def _unique_constraint_name(self, table, columns, quote=True):
+        if quote:
+
+            def create_unique_name(*args, **kwargs):
+                return self.quote_name(self._create_index_name(*args, **kwargs))
+
+        else:
+            create_unique_name = self._create_index_name
+
+        return IndexName(table, columns, "_uniq", create_unique_name)
 
     def _delete_unique_sql(
         self,
