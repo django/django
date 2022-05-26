@@ -4588,10 +4588,11 @@ class TestComment(TestCase):
         self.assertIn("UPDATE /* this is an update */ ", captured_queries[0]["sql"])
 
     def test_stops_delimiters_in_message(self):
-        for message in ["foo=/a/b/c*/", "/*foo=/a/b/c", "**//SELECT nothing;//**"]:
-            with self.assertRaisesMessage(
-                ValueError,
+        for comment in ["foo=/a/b/c*/", "/*foo=/a/b/c", "**//SELECT nothing;//**"]:
+            msg = (
                 "Cannot pass strings containing /* or */ to comment(). "
-                "Escape or strip these delimiters before calling comment().",
-            ):
-                NamedCategory.objects.comment(message)
+                "Escape or strip these delimiters before calling comment()."
+            )
+
+            with self.subTest(comment), self.assertRaisesMessage(ValueError, msg):
+                NamedCategory.objects.comment(comment)

@@ -629,7 +629,7 @@ class SQLCompiler:
                     params += distinct_params
 
                 if self.query.comments:
-                    result += (f"/* {comment} */" for comment in self.query.comments)
+                    result += (self.comments_sql(),)
 
                 out_cols = []
                 col_idx = 1
@@ -1450,6 +1450,9 @@ class SQLCompiler:
             else:
                 yield row
 
+    def comments_sql(self):
+        return " ".join([f"/* {comment} */" for comment in self.query.comments])
+
 
 class SQLInsertCompiler(SQLCompiler):
     returning_fields = None
@@ -1800,7 +1803,7 @@ class SQLUpdateCompiler(SQLCompiler):
         table = self.query.base_table
         result = ["UPDATE"]
         if self.query.comments:
-            result += (f"/* {comment} */" for comment in self.query.comments)
+            result += (self.comments_sql(),)
         result += (qn(table), "SET", ", ".join(values))
         where, params = self.compile(self.query.where)
         if where:

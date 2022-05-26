@@ -702,6 +702,7 @@ class ManagerTest(SimpleTestCase):
         "union",
         "intersection",
         "difference",
+        "comment",
         "aaggregate",
         "abulk_create",
         "abulk_update",
@@ -720,7 +721,6 @@ class ManagerTest(SimpleTestCase):
         "alatest",
         "aupdate",
         "aupdate_or_create",
-        "comment",
     ]
 
     def test_manager_methods(self):

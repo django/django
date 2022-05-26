@@ -1702,7 +1702,7 @@ class QuerySet:
         return clone
 
     def comment(self, message):
-        """Adds a comment to be inserted into the query."""
+        """Add a comment to the query."""
         clone = self._clone()
         if "/*" in message or "*/" in message:
             raise ValueError(

@@ -1899,21 +1899,13 @@ Adds an SQL comment to be inserted into the resultant SQL statement, after
 
     Entry.objects.comment("blog/views.py:50").all()
 
-...translates (roughly) into the following SQL::
+… translates (roughly) into the following SQL::
 
     SELECT /* blog/views.py:50 */ blog_entry.* FROM blog_entry
 
 This is useful for adding information to the SQL statement which when logged
 can be used to correlate slow and problematic queries to the generating source
 code.
-
-.. note::
-
-    The SQL block comment delimiters, ``/*`` and ``*/`` are added automatically.
-    To protect against SQL injection attacks and invalid queries any
-    combination of ``/*`` and ``*/`` present in the comment will raise an
-    exception. Strip or escape these delimiters from the comment to
-    circumvent this.
 
 Comments can be chained and will be added to the SQL statement as separate
 entries, for example::
@@ -1922,7 +1914,7 @@ entries, for example::
         headline="This is new"
     )
 
-...translates into::
+… translates into::
 
     UPDATE blog_entry.* /* blog/views.py:75 */ /* python=3.11 */ SET "headline" = 'This is new'
 
