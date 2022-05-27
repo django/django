@@ -654,6 +654,16 @@ class ManyToOneTests(TestCase):
         self.assertIsNot(c.parent, p)
         self.assertEqual(c.parent, p)
 
+    def test_save_parent_after_assign(self):
+        category = Category(name="cats")
+        record = Record(category=category)
+        category.save()
+        record.save()
+        category.name = "dogs"
+        with self.assertNumQueries(0):
+            self.assertEqual(category.id, record.category_id)
+            self.assertEqual(category.name, record.category.name)
+
     def test_save_nullable_fk_after_parent(self):
         parent = Parent()
         child = ChildNullableParent(parent=parent)
