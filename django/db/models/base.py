@@ -1100,9 +1100,9 @@ class Model(metaclass=ModelBase):
                         "related object '%s'." % (operation_name, field.name)
                     )
                 elif getattr(self, field.attname) in field.empty_values:
-                    # Use pk from related object if it has been saved after
-                    # an assignment.
-                    setattr(self, field.attname, obj.pk)
+                    # Set related object if it has been saved after an
+                    # assignment.
+                    setattr(self, field.name, obj)
                 # If the relationship's pk/to_field was changed, clear the
                 # cached relationship.
                 if getattr(obj, field.target_field.attname) != getattr(
