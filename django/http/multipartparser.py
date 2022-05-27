@@ -748,7 +748,7 @@ def _parse_header_params(s):
     while s[:1] == b";":
         s = s[1:]
         end = s.find(b";")
-        while end > 0 and s.count(b'"', 0, end) % 2:
+        while end > 0 and (s.count(b'"', 0, end) - s.count(b'\\"', 0, end)) % 2:
             end = s.find(b";", end + 1)
         if end < 0:
             end = len(s)
