@@ -53,7 +53,9 @@ Minor features
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :doc:`GeoJSON serializer </ref/contrib/gis/serializers>` now outputs the
+  ``id`` key for serialized features, which defaults to the primary key of
+  objects.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

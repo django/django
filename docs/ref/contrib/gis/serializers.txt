@@ -25,6 +25,9 @@ serializer accepts the following additional option when it is called by
   have a model with more than one geometry field and you don't want to use the
   first defined geometry field (by default, the first geometry field is picked).
 
+* ``id_field``: A string containing the name of a field to use for the ``id``
+  key of the GeoJSON feature. By default, the primary key of objects is used.
+
 * ``srid``: The SRID to use for the ``geometry`` content. Defaults to 4326
   (WGS 84).
 
@@ -52,6 +55,7 @@ Would output::
       'features': [
         {
           'type': 'Feature',
+          'id': 1,
           'geometry': {
             'type': 'Point',
             'coordinates': [-87.650175, 41.850385]
@@ -66,3 +70,8 @@ Would output::
 When the ``fields`` parameter is not specified, the ``geojson`` serializer adds
 a ``pk`` key to the ``properties`` dictionary with the primary key of the
 object as the value.
+
+.. versionchanged:: 4.2
+
+    The ``id`` key for serialized features was added. Also, the ``id_field``
+    option was added to the ``geojson`` serializer.
