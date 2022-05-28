@@ -1518,6 +1518,9 @@ class FormattingTests(SimpleTestCase):
         with translation.override("de", deactivate=True):
             self.assertEqual(".", get_format("DECIMAL_SEPARATOR", lang="en"))
 
+    def test_get_format_lazy_format(self):
+        self.assertEqual(get_format(gettext_lazy("DATE_FORMAT")), "N j, Y")
+
     def test_localize_templatetag_and_filter(self):
         """
         Test the {% localize %} templatetag and the localize/unlocalize filters.
