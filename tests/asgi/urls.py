@@ -2,6 +2,7 @@ import threading
 
 from django.http import FileResponse, HttpResponse
 from django.urls import path
+from django.views.decorators.csrf import csrf_exempt
 
 
 def hello(request):
@@ -23,6 +24,11 @@ def sync_waiter(request):
     return hello(request)
 
 
+@csrf_exempt
+def post_echo(request):
+    return HttpResponse(request.body)
+
+
 sync_waiter.active_threads = set()
 sync_waiter.lock = threading.Lock()
 sync_waiter.barrier = threading.Barrier(2)
@@ -35,5 +41,6 @@ urlpatterns = [
     path("", hello),
     path("file/", lambda x: FileResponse(open(test_filename, "rb"))),
     path("meta/", hello_meta),
+    path("post/", post_echo),
     path("wait/", sync_waiter),
 ]
