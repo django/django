@@ -171,14 +171,14 @@ class ASGIHandler(base.BaseHandler):
             )
             # Get the request and check for basic issues.
             request, error_response = self.create_request(scope, body_file)
+            if request is None:
+                await self.send_response(error_response, send)
+                return
+            # Get the response, using the async mode of BaseHandler.
+            response = await self.get_response_async(request)
+            response._handler_class = self.__class__
         finally:
             body_file.close()
-        if request is None:
-            await self.send_response(error_response, send)
-            return
-        # Get the response, using the async mode of BaseHandler.
-        response = await self.get_response_async(request)
-        response._handler_class = self.__class__
         # Increase chunk size on file responses (ASGI servers handles low-level
         # chunking).
         if isinstance(response, FileResponse):
