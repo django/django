@@ -32,7 +32,7 @@ In your custom ``change_form.html`` template, extend the
     {% endblock %}
 
 .. code-block:: javascript
-    :caption: app/static/app/formset_handlers.js
+    :caption: ``app/static/app/formset_handlers.js``
 
     document.addEventListener('formset:added', (event) => {
         if (event.detail.formsetName == 'author_set') {

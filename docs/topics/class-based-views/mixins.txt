@@ -221,7 +221,7 @@ We'll demonstrate this with the ``Author`` model we used in the
 :doc:`generic class-based views introduction<generic-display>`.
 
 .. code-block:: python
-    :caption: views.py
+    :caption: ``views.py``
 
     from django.http import HttpResponseForbidden, HttpResponseRedirect
     from django.urls import reverse
@@ -253,7 +253,7 @@ look up the author we're interested in, which it does with a call to
 We can hook this into our URLs easily enough:
 
 .. code-block:: python
-    :caption: urls.py
+    :caption: ``urls.py``
 
     from django.urls import path
     from books.views import RecordInterestView

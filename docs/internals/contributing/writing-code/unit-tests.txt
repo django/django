@@ -564,7 +564,7 @@ Since this pattern involves a lot of boilerplate, Django provides the
     installed, you should pass the set of targeted ``app_label`` as arguments:
 
     .. code-block:: python
-        :caption: tests/app_label/tests.py
+        :caption: ``tests/app_label/tests.py``
 
         from django.db import models
         from django.test import SimpleTestCase

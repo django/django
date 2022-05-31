@@ -103,6 +103,7 @@ dt .literal, table .literal { background:none; }
 #bd a.reference { text-decoration: none; }
 #bd a.reference tt.literal { border-bottom: 1px #234f32 dotted; }
 div.code-block-caption { color: white; background-color: #234F32; margin: 0; padding: 2px 5px; width: 100%; font-family: monospace; font-size: small; line-height: 1.3em; }
+div.code-block-caption .literal {color: white; }
 div.literal-block-wrapper pre { margin-top: 0; }
 
 /* Restore colors of pygments hyperlinked code */
