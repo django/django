@@ -18,7 +18,7 @@ Let's update our poll detail template ("polls/detail.html") from the last
 tutorial, so that the template contains an HTML ``<form>`` element:
 
 .. code-block:: html+django
-    :caption: polls/templates/polls/detail.html
+    :caption: ``polls/templates/polls/detail.html``
 
     <form action="{% url 'polls:vote' question.id %}" method="post">
     {% csrf_token %}
@@ -64,7 +64,7 @@ something with it. Remember, in :doc:`Tutorial 3 </intro/tutorial03>`, we
 created a URLconf for the polls application that includes this line:
 
 .. code-block:: python
-    :caption: polls/urls.py
+    :caption: ``polls/urls.py``
 
     path('<int:question_id>/vote/', views.vote, name='vote'),
 
@@ -72,7 +72,7 @@ We also created a dummy implementation of the ``vote()`` function. Let's
 create a real version. Add the following to ``polls/views.py``:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     from django.http import HttpResponse, HttpResponseRedirect
     from django.shortcuts import get_object_or_404, render
@@ -152,7 +152,7 @@ After somebody votes in a question, the ``vote()`` view redirects to the results
 page for the question. Let's write that view:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     from django.shortcuts import get_object_or_404, render
 
@@ -168,7 +168,7 @@ redundancy later.
 Now, create a ``polls/results.html`` template:
 
 .. code-block:: html+django
-    :caption: polls/templates/polls/results.html
+    :caption: ``polls/templates/polls/results.html``
 
     <h1>{{ question.question_text }}</h1>
 
@@ -240,7 +240,7 @@ Amend URLconf
 First, open the ``polls/urls.py`` URLconf and change it like so:
 
 .. code-block:: python
-    :caption: polls/urls.py
+    :caption: ``polls/urls.py``
 
     from django.urls import path
 
@@ -265,7 +265,7 @@ views and use Django's generic views instead. To do so, open the
 ``polls/views.py`` file and change it like so:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import get_object_or_404, render

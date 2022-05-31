@@ -1472,7 +1472,7 @@ For example, if you had ``organic.py`` and ``synthetic.py`` in the ``models``
 directory:
 
 .. code-block:: python
-    :caption: myapp/models/__init__.py
+    :caption: ``myapp/models/__init__.py``
 
     from .organic import Person
     from .synthetic import Robot

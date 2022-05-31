@@ -172,7 +172,7 @@ whose name begins with ``test``.
 Put the following in the ``tests.py`` file in the ``polls`` application:
 
 .. code-block:: python
-    :caption: polls/tests.py
+    :caption: ``polls/tests.py``
 
     import datetime
 
@@ -261,7 +261,7 @@ return ``False`` if its ``pub_date`` is in the future. Amend the method in
 past:
 
 .. code-block:: python
-    :caption: polls/models.py
+    :caption: ``polls/models.py``
 
     def was_published_recently(self):
         now = timezone.now()
@@ -297,7 +297,7 @@ Add two more test methods to the same class, to test the behavior of the method
 more comprehensively:
 
 .. code-block:: python
-    :caption: polls/tests.py
+    :caption: ``polls/tests.py``
 
     def test_was_published_recently_with_old_question(self):
         """
@@ -413,7 +413,7 @@ In :doc:`Tutorial 4 </intro/tutorial04>` we introduced a class-based view,
 based on :class:`~django.views.generic.list.ListView`:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     class IndexView(generic.ListView):
         template_name = 'polls/index.html'
@@ -428,14 +428,14 @@ checks the date by comparing it with ``timezone.now()``. First we need to add
 an import:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     from django.utils import timezone
 
 and then we must amend the ``get_queryset`` method like so:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     def get_queryset(self):
         """
@@ -463,7 +463,7 @@ our :djadmin:`shell` session above.
 Add the following to ``polls/tests.py``:
 
 .. code-block:: python
-    :caption: polls/tests.py
+    :caption: ``polls/tests.py``
 
     from django.urls import reverse
 
@@ -471,7 +471,7 @@ and we'll create a shortcut function to create questions as well as a new test
 class:
 
 .. code-block:: python
-    :caption: polls/tests.py
+    :caption: ``polls/tests.py``
 
     def create_question(question_text, days):
         """
@@ -572,7 +572,7 @@ the *index*, users can still reach them if they know or guess the right URL. So
 we need to add a similar  constraint to ``DetailView``:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     class DetailView(generic.DetailView):
         ...
@@ -587,7 +587,7 @@ is in the past can be displayed, and that one with a ``pub_date`` in the future
 is not:
 
 .. code-block:: python
-    :caption: polls/tests.py
+    :caption: ``polls/tests.py``
 
     class QuestionDetailViewTests(TestCase):
         def test_future_question(self):

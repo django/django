@@ -1478,7 +1478,7 @@ Relationships defined this way on :ref:`abstract models
 concrete model and are not relative to the abstract model's ``app_label``:
 
 .. code-block:: python
-    :caption: products/models.py
+    :caption: ``products/models.py``
 
     from django.db import models
 
@@ -1489,7 +1489,7 @@ concrete model and are not relative to the abstract model's ``app_label``:
             abstract = True
 
 .. code-block:: python
-    :caption: production/models.py
+    :caption: ``production/models.py``
 
     from django.db import models
     from products.models import AbstractCar

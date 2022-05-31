@@ -1033,7 +1033,7 @@ example of subclassing the PostgreSQL engine to change a feature class
 ``allows_group_by_selected_pks_on_model``:
 
 .. code-block:: python
-    :caption: mysite/mydbengine/base.py
+    :caption: ``mysite/mydbengine/base.py``
 
     from django.db.backends.postgresql import base, features
 

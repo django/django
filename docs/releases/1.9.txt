@@ -1264,7 +1264,7 @@ attribute (as below). If the ``app_name`` is set in this new way, the
 ``app_name``. For example, the URL patterns in the tutorial are changed from:
 
 .. code-block:: python
-    :caption: mysite/urls.py
+    :caption: ``mysite/urls.py``
 
     urlpatterns = [
         url(r'^polls/', include('polls.urls', namespace="polls")),
@@ -1274,7 +1274,7 @@ attribute (as below). If the ``app_name`` is set in this new way, the
 to:
 
 .. code-block:: python
-    :caption: mysite/urls.py
+    :caption: ``mysite/urls.py``
 
     urlpatterns = [
         url(r'^polls/', include('polls.urls')),  # 'namespace="polls"' removed
@@ -1282,7 +1282,7 @@ to:
     ]
 
 .. code-block:: python
-    :caption: polls/urls.py
+    :caption: ``polls/urls.py``
 
     app_name = 'polls'  # added
     urlpatterns = [...]
@@ -1292,7 +1292,7 @@ is deprecated. Instead, pass ``admin.site.urls`` directly to
 ``django.conf.urls.url()``:
 
 .. code-block:: python
-    :caption: urls.py
+    :caption: ``urls.py``
 
     from django.conf.urls import url
     from django.contrib import admin

@@ -227,7 +227,7 @@ We already know what we want our HTML form to look like. Our starting point for
 it in Django is this:
 
 .. code-block:: python
-    :caption: forms.py
+    :caption: ``forms.py``
 
     from django import forms
 
@@ -277,7 +277,7 @@ To handle the form we need to instantiate it in the view for the URL where we
 want it to be published:
 
 .. code-block:: python
-    :caption: views.py
+    :caption: ``views.py``
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import render
@@ -404,7 +404,7 @@ Consider a more useful form than our minimal example above, which we could use
 to implement "contact me" functionality on a personal website:
 
 .. code-block:: python
-    :caption: forms.py
+    :caption: ``forms.py``
 
     from django import forms
 
@@ -453,7 +453,7 @@ values to a Python ``int`` and ``float`` respectively.
 Here's how the form data could be processed in the view that handles this form:
 
 .. code-block:: python
-    :caption: views.py
+    :caption: ``views.py``
 
     from django.core.mail import send_mail
 

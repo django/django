@@ -144,7 +144,7 @@ this. For a small app like polls, this process isn't too difficult.
 #. Create a file ``django-polls/README.rst`` with the following contents:
 
    .. code-block:: rst
-       :caption: django-polls/README.rst
+       :caption: ``django-polls/README.rst``
 
        =====
        Polls
@@ -191,7 +191,7 @@ this. For a small app like polls, this process isn't too difficult.
    with the following contents:
 
    .. code-block:: ini
-        :caption: django-polls/setup.cfg
+        :caption: ``django-polls/setup.cfg``
 
         [metadata]
         name = django-polls
@@ -226,7 +226,7 @@ this. For a small app like polls, this process isn't too difficult.
             Django >= X.Y  # Replace "X.Y" as appropriate
 
    .. code-block:: python
-        :caption: django-polls/setup.py
+        :caption: ``django-polls/setup.py``
 
         from setuptools import setup
 
@@ -240,7 +240,7 @@ this. For a small app like polls, this process isn't too difficult.
    contents:
 
    .. code-block:: text
-       :caption: django-polls/MANIFEST.in
+       :caption: ``django-polls/MANIFEST.in``
 
        include LICENSE
        include README.rst

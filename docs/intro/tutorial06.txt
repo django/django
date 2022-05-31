@@ -61,7 +61,7 @@ the path for templates.
 Put the following code in that stylesheet (``polls/static/polls/style.css``):
 
 .. code-block:: css
-    :caption: polls/static/polls/style.css
+    :caption: ``polls/static/polls/style.css``
 
     li a {
         color: green;
@@ -70,7 +70,7 @@ Put the following code in that stylesheet (``polls/static/polls/style.css``):
 Next, add the following at the top of ``polls/templates/polls/index.html``:
 
 .. code-block:: html+django
-    :caption: polls/templates/polls/index.html
+    :caption: ``polls/templates/polls/index.html``
 
     {% load static %}
 
@@ -101,7 +101,7 @@ called ``background.gif``. In other words, put your image in
 Then, add to your stylesheet (``polls/static/polls/style.css``):
 
 .. code-block:: css
-    :caption: polls/static/polls/style.css
+    :caption: ``polls/static/polls/style.css``
 
     body {
         background: white url("images/background.gif") no-repeat;
