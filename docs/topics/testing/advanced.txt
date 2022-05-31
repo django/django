@@ -88,7 +88,7 @@ must ensure that they are configured correctly, by calling
 For example, assuming the following class-based view:
 
 .. code-block:: python
-    :caption: views.py
+    :caption: ``views.py``
 
     from django.views.generic import TemplateView
 
@@ -105,7 +105,7 @@ the view, then passing a ``request`` to ``setup()``, before proceeding with
 your test's code:
 
 .. code-block:: python
-    :caption: tests.py
+    :caption: ``tests.py``
 
     from django.test import RequestFactory, TestCase
     from .views import HomeView
@@ -412,7 +412,7 @@ following structure::
 Let's take a look inside a couple of those files:
 
 .. code-block:: python
-    :caption: runtests.py
+    :caption: ``runtests.py``
 
     #!/usr/bin/env python
     import os
@@ -440,7 +440,7 @@ command-line options for controlling verbosity, passing in specific test
 labels to run, etc.
 
 .. code-block:: python
-    :caption: tests/test_settings.py
+    :caption: ``tests/test_settings.py``
 
     SECRET_KEY = 'fake-key'
     INSTALLED_APPS = [

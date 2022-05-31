@@ -141,7 +141,7 @@ These concepts are represented by Python classes. Edit the
 :file:`polls/models.py` file so it looks like this:
 
 .. code-block:: python
-    :caption: polls/models.py
+    :caption: ``polls/models.py``
 
     from django.db import models
 
@@ -217,7 +217,7 @@ add that dotted path to the :setting:`INSTALLED_APPS` setting. It'll look like
 this:
 
 .. code-block:: python
-    :caption: mysite/settings.py
+    :caption: ``mysite/settings.py``
 
     INSTALLED_APPS = [
         'polls.apps.PollsConfig',
@@ -424,7 +424,7 @@ representation of this object. Let's fix that by editing the ``Question`` model
 ``Choice``:
 
 .. code-block:: python
-    :caption: polls/models.py
+    :caption: ``polls/models.py``
 
     from django.db import models
 
@@ -448,7 +448,7 @@ automatically-generated admin.
 Let's also add a custom method to this model:
 
 .. code-block:: python
-    :caption: polls/models.py
+    :caption: ``polls/models.py``
 
     import datetime
 
@@ -646,7 +646,7 @@ have an admin interface. To do this, open the :file:`polls/admin.py` file, and
 edit it to look like this:
 
 .. code-block:: python
-    :caption: polls/admin.py
+    :caption: ``polls/admin.py``
 
     from django.contrib import admin
 
