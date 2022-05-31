@@ -564,7 +564,7 @@ current one as well as templates included via the :ttag:`include` tag,
 just like all block tags. For example:
 
 .. code-block:: html+django
-    :caption: base.html
+    :caption: ``base.html``
 
     {% autoescape off %}
     <h1>{% block title %}{% endblock %}</h1>
@@ -573,7 +573,7 @@ just like all block tags. For example:
     {% endautoescape %}
 
 .. code-block:: html+django
-    :caption: child.html
+    :caption: ``child.html``
 
     {% extends "base.html" %}
     {% block title %}This &amp; that{% endblock %}
@@ -653,14 +653,14 @@ of all comments related to the current task with::
 You can also access methods you've explicitly defined on your own models:
 
 .. code-block:: python
-    :caption: models.py
+    :caption: ``models.py``
 
     class Task(models.Model):
         def foo(self):
             return "bar"
 
 .. code-block:: html+django
-    :caption: template.html
+    :caption: ``template.html``
 
     {{ task.foo }}
 

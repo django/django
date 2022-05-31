@@ -245,7 +245,7 @@ Let's write the first view. Open the file ``polls/views.py``
 and put the following Python code in it:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     from django.http import HttpResponse
 
@@ -273,7 +273,7 @@ Your app directory should now look like::
 In the ``polls/urls.py`` file include the following code:
 
 .. code-block:: python
-    :caption: polls/urls.py
+    :caption: ``polls/urls.py``
 
     from django.urls import path
 
@@ -288,7 +288,7 @@ The next step is to point the root URLconf at the ``polls.urls`` module. In
 :func:`~django.urls.include` in the ``urlpatterns`` list, so you have:
 
 .. code-block:: python
-    :caption: mysite/urls.py
+    :caption: ``mysite/urls.py``
 
     from django.contrib import admin
     from django.urls import include, path

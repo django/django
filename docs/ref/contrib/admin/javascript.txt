@@ -32,7 +32,7 @@ In your custom ``change_form.html`` template, extend the
     {% endblock %}
 
 .. code-block:: javascript
-    :caption: app/static/app/formset_handlers.js
+    :caption: ``app/static/app/formset_handlers.js``
 
     (function($) {
         $(document).on('formset:added', function(event, $row, formsetName) {
@@ -70,7 +70,7 @@ listen to the event triggered from there. For example:
     {% endblock %}
 
 .. code-block:: javascript
-    :caption: app/static/app/unregistered_handlers.js
+    :caption: ``app/static/app/unregistered_handlers.js``
 
     django.jQuery(document).on('formset:added', function(event, $row, formsetName) {
         // Row added
