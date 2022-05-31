@@ -131,7 +131,7 @@ password from the `password file`_, you must specify them in the
 :setting:`OPTIONS` part of your database configuration in :setting:`DATABASES`:
 
 .. code-block:: python
-    :caption: settings.py
+    :caption: ``settings.py``
 
     DATABASES = {
         'default': {
@@ -144,7 +144,7 @@ password from the `password file`_, you must specify them in the
     }
 
 .. code-block:: text
-    :caption: .pg_service.conf
+    :caption: ``.pg_service.conf``
 
     [my_service]
     host=localhost
@@ -153,7 +153,7 @@ password from the `password file`_, you must specify them in the
     port=5432
 
 .. code-block:: text
-    :caption: .my_pgpass
+    :caption: ``.my_pgpass``
 
     localhost:5432:NAME:USER:PASSWORD
 
@@ -1081,7 +1081,7 @@ example of subclassing the PostgreSQL engine to change a feature class
 ``allows_group_by_selected_pks_on_model``:
 
 .. code-block:: python
-    :caption: mysite/mydbengine/base.py
+    :caption: ``mysite/mydbengine/base.py``
 
     from django.db.backends.postgresql import base, features
 
