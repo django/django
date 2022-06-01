@@ -608,7 +608,8 @@ class InspectDBTransactionalTests(TransactionTestCase):
                 output,
             )
             self.assertIn(
-                "column_2 = models.IntegerField()",
+                "column_2 = models.%s()"
+                % connection.features.introspected_field_types["IntegerField"],
                 output,
             )
         finally:
