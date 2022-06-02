@@ -772,6 +772,8 @@ utility methods:
 
     .. method:: models.BaseUserManager.make_random_password(length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
 
+        .. deprecated:: 4.2
+
         Returns a random password with the given length and given string of
         allowed characters. Note that the default value of ``allowed_chars``
         doesn't contain letters that can cause user confusion, including:

@@ -250,4 +250,7 @@ Features deprecated in 4.2
 Miscellaneous
 -------------
 
-* ...
+* The ``BaseUserManager.make_random_password()`` method is deprecated. See
+  `recipes and best practices
+  <https://docs.python.org/3/library/secrets.html#recipes-and-best-practices>`_
+  for using Python's :py:mod:`secrets` module to generate passwords.
