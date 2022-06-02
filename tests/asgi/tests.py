@@ -165,7 +165,11 @@ class ASGITest(SimpleTestCase):
 
     async def test_post_body(self):
         application = get_asgi_application()
-        scope = self.async_request_factory._base_scope(method="POST", path="/post/")
+        scope = self.async_request_factory._base_scope(
+            method="POST",
+            path="/post/",
+            query_string="echo=1",
+        )
         communicator = ApplicationCommunicator(application, scope)
         await communicator.send_input({"type": "http.request", "body": b"Echo!"})
         response_start = await communicator.receive_output()
@@ -174,6 +178,18 @@ class ASGITest(SimpleTestCase):
         response_body = await communicator.receive_output()
         self.assertEqual(response_body["type"], "http.response.body")
         self.assertEqual(response_body["body"], b"Echo!")
+
+    async def test_untouched_request_body_gets_closed(self):
+        application = get_asgi_application()
+        scope = self.async_request_factory._base_scope(method="POST", path="/post/")
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request"})
+        response_start = await communicator.receive_output()
+        self.assertEqual(response_start["type"], "http.response.start")
+        self.assertEqual(response_start["status"], 204)
+        response_body = await communicator.receive_output()
+        self.assertEqual(response_body["type"], "http.response.body")
+        self.assertEqual(response_body["body"], b"")
 
     async def test_get_query_string(self):
         application = get_asgi_application()

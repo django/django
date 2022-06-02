@@ -26,7 +26,10 @@ def sync_waiter(request):
 
 @csrf_exempt
 def post_echo(request):
-    return HttpResponse(request.body)
+    if request.GET.get("echo"):
+        return HttpResponse(request.body)
+    else:
+        return HttpResponse(status=204)
 
 
 sync_waiter.active_threads = set()

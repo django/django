@@ -59,6 +59,9 @@ class LimitedStream:
         self.buffer = sio.read()
         return line
 
+    def close(self):
+        pass
+
 
 class WSGIRequest(HttpRequest):
     def __init__(self, environ):
