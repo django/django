@@ -241,14 +241,13 @@ Use the ``django.test.Client`` class to make requests.
 
         Submitting files is a special case. To POST a file, you need only
         provide the file field name as a key, and a file handle to the file you
-        wish to upload as a value. For example::
+        wish to upload as a value. For example, if your form has fields
+        ``name`` and ``attachment``, the latter a
+        :class:`~django.forms.FileField`::
 
             >>> c = Client()
             >>> with open('wishlist.doc', 'rb') as fp:
             ...     c.post('/customers/wishes/', {'name': 'fred', 'attachment': fp})
-
-        (The name ``attachment`` here is not relevant; use whatever name your
-        file-processing code expects.)
 
         You may also provide any file-like object (e.g., :class:`~io.StringIO` or
         :class:`~io.BytesIO`) as a file handle. If you're uploading to an
