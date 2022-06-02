@@ -80,7 +80,11 @@ class CommonMiddlewareTest(SimpleTestCase):
         """
         request = self.rf.get("/slash")
         r = CommonMiddleware(get_response_empty).process_request(request)
+        self.assertIsNone(r)
+        response = HttpResponseNotFound()
+        r = CommonMiddleware(get_response_empty).process_response(request, response)
         self.assertEqual(r.status_code, 301)
+        self.assertEqual(r.url, "/slash/")
 
     @override_settings(APPEND_SLASH=True)
     def test_append_slash_redirect_querystring(self):
@@ -164,6 +168,9 @@ class CommonMiddlewareTest(SimpleTestCase):
         # Use 4 slashes because of RequestFactory behavior.
         request = self.rf.get("////evil.com/security")
         r = CommonMiddleware(get_response_404).process_request(request)
+        self.assertIsNone(r)
+        response = HttpResponseNotFound()
+        r = CommonMiddleware(get_response_404).process_response(request, response)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url, "/%2Fevil.com/security/")
         r = CommonMiddleware(get_response_404)(request)
@@ -354,6 +361,9 @@ class CommonMiddlewareTest(SimpleTestCase):
         request = self.rf.get("/slash")
         request.META["QUERY_STRING"] = "drink=café"
         r = CommonMiddleware(get_response_empty).process_request(request)
+        self.assertIsNone(r)
+        response = HttpResponseNotFound()
+        r = CommonMiddleware(get_response_empty).process_response(request, response)
         self.assertEqual(r.status_code, 301)
 
     def test_response_redirect_class(self):
