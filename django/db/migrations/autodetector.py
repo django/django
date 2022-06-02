@@ -1022,8 +1022,9 @@ class MigrationAutodetector:
 
     def _generate_added_field(self, app_label, model_name, field_name):
         field = self.to_state.models[app_label, model_name].get_field(field_name)
-        # Fields that are foreignkeys/m2ms depend on stuff
-        dependencies = []
+        # Adding a field always depends at least on its removal.
+        dependencies = [(app_label, model_name, field_name, False)]
+        # Fields that are foreignkeys/m2ms depend on stuff.
         if field.remote_field and field.remote_field.model:
             dependencies.extend(
                 self._get_dependencies_for_foreign_key(
