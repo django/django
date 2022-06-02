@@ -64,7 +64,6 @@ from .models import (
     AuthorWithDefaultHeight,
     AuthorWithEvenLongerName,
     AuthorWithIndexedName,
-    AuthorWithIndexedNameAndBirthday,
     AuthorWithUniqueName,
     AuthorWithUniqueNameAndBirthday,
     Book,
@@ -79,7 +78,6 @@ from .models import (
     Note,
     NoteRename,
     Tag,
-    TagIndexed,
     TagM2MTest,
     TagUniqueRename,
     Thing,
@@ -114,7 +112,6 @@ class SchemaTests(TransactionTestCase):
         Node,
         Note,
         Tag,
-        TagIndexed,
         TagM2MTest,
         TagUniqueRename,
         Thing,
@@ -2952,13 +2949,24 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_index_together(Book, [["author", "title"]], [])
 
+    @isolate_apps("schema")
     def test_create_index_together(self):
         """
         Tests creating models with index_together already defined
         """
+
+        class TagIndexed(Model):
+            title = CharField(max_length=255)
+            slug = SlugField(unique=True)
+
+            class Meta:
+                app_label = "schema"
+                index_together = [["slug", "title"]]
+
         # Create the table
         with connection.schema_editor() as editor:
             editor.create_model(TagIndexed)
+        self.isolated_local_models = [TagIndexed]
         # Ensure there is an index
         self.assertIs(
             any(
@@ -2970,10 +2978,19 @@ class SchemaTests(TransactionTestCase):
         )
 
     @skipUnlessDBFeature("allows_multiple_constraints_on_same_fields")
+    @isolate_apps("schema")
     def test_remove_index_together_does_not_remove_meta_indexes(self):
+        class AuthorWithIndexedNameAndBirthday(Model):
+            name = CharField(max_length=255)
+            birthday = DateField()
+
+            class Meta:
+                app_label = "schema"
+                index_together = [["name", "birthday"]]
+
         with connection.schema_editor() as editor:
             editor.create_model(AuthorWithIndexedNameAndBirthday)
-        self.local_models = [AuthorWithIndexedNameAndBirthday]
+        self.isolated_local_models = [AuthorWithIndexedNameAndBirthday]
         # Add the custom index
         index = Index(fields=["name", "birthday"], name="author_name_birthday_idx")
         custom_index_name = index.name

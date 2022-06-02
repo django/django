@@ -3,7 +3,15 @@ from unittest import skipUnless
 
 from django.conf import settings
 from django.db import connection
-from django.db.models import CASCADE, ForeignKey, Index, Q
+from django.db.models import (
+    CASCADE,
+    CharField,
+    DateTimeField,
+    ForeignKey,
+    Index,
+    Model,
+    Q,
+)
 from django.db.models.functions import Lower
 from django.test import (
     TestCase,
@@ -11,15 +19,10 @@ from django.test import (
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
-from django.test.utils import override_settings
+from django.test.utils import isolate_apps, override_settings
 from django.utils import timezone
 
-from .models import (
-    Article,
-    ArticleTranslation,
-    IndexedArticle2,
-    IndexTogetherSingleList,
-)
+from .models import Article, ArticleTranslation, IndexedArticle2
 
 
 class SchemaIndexesTests(TestCase):
@@ -79,8 +82,15 @@ class SchemaIndexesTests(TestCase):
             index_sql[0],
         )
 
+    @isolate_apps("indexes")
     def test_index_together_single_list(self):
-        # Test for using index_together with a single list (#22172)
+        class IndexTogetherSingleList(Model):
+            headline = CharField(max_length=100)
+            pub_date = DateTimeField()
+
+            class Meta:
+                index_together = ["headline", "pub_date"]
+
         index_sql = connection.schema_editor()._model_indexes_sql(
             IndexTogetherSingleList
         )
