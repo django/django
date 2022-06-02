@@ -11,6 +11,7 @@ from urllib.parse import (
     _splitnetloc,
     _splitparams,
     scheme_chars,
+    unquote,
 )
 from urllib.parse import urlencode as original_urlencode
 from urllib.parse import uses_params
@@ -368,17 +369,52 @@ def escape_leading_slashes(url):
     return url
 
 
-def _parseparam(s):
-    while s[:1] == ";":
+def _parse_header_params(s, f):
+    plist = []
+    while s[:1] == f(";"):
         s = s[1:]
-        end = s.find(";")
-        while end > 0 and (s.count('"', 0, end) - s.count('\\"', 0, end)) % 2:
-            end = s.find(";", end + 1)
+        end = s.find(f(";"))
+        while end > 0 and (s.count(f('"'), 0, end) - s.count(f('\\"'), 0, end)) % 2:
+            end = s.find(f(";"), end + 1)
         if end < 0:
             end = len(s)
-        f = s[:end]
-        yield f.strip()
+        p = s[:end]
+        plist.append(p.strip())
         s = s[end:]
+    return plist
+
+
+def _parse_header(line, is_binary=False):
+    def _f(x):
+        return x.encode("ascii") if is_binary else x
+
+    plist = _parse_header_params(_f(";") + line, _f)
+    key = plist.pop(0).lower()
+    if is_binary:
+        key = key.decode("ascii")
+    pdict = {}
+    for p in plist:
+        i = p.find(_f("="))
+        if i >= 0:
+            has_encoding = False
+            name = p[:i].strip().lower()
+            if is_binary:
+                name = name.decode("ascii")
+            if name.endswith("*"):
+                # Lang/encoding embedded in the value (like "filename*=UTF-8''file.ext")
+                # https://tools.ietf.org/html/rfc2231#section-4
+                name = name[:-1]
+                if p.count(_f("'")) == 2:
+                    has_encoding = True
+            value = p[i + 1 :].strip()
+            if len(value) >= 2 and value[:1] == value[-1:] == _f('"'):
+                value = value[1:-1]
+                value = value.replace(_f("\\\\"), _f("\\")).replace(_f('\\"'), _f('"'))
+            if has_encoding:
+                encoding, lang, value = value.split(_f("'"))
+                value = unquote(value.decode(), encoding=encoding.decode())
+            pdict[name] = value
+    return key, pdict
 
 
 def parse_header_parameters(line):
@@ -386,16 +422,4 @@ def parse_header_parameters(line):
     Parse a Content-type like header.
     Return the main content-type and a dictionary of options.
     """
-    parts = _parseparam(";" + line)
-    key = parts.__next__()
-    pdict = {}
-    for p in parts:
-        i = p.find("=")
-        if i >= 0:
-            name = p[:i].strip().lower()
-            value = p[i + 1 :].strip()
-            if len(value) >= 2 and value[0] == value[-1] == '"':
-                value = value[1:-1]
-                value = value.replace("\\\\", "\\").replace('\\"', '"')
-            pdict[name] = value
-    return key, pdict
+    return _parse_header(line, True) if isinstance(line, bytes) else _parse_header(line)

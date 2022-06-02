@@ -20,6 +20,7 @@ from django.http.multipartparser import (
     parse_header,
 )
 from django.test import SimpleTestCase, TestCase, client, override_settings
+from django.utils.http import parse_header_parameters
 
 from . import uploadhandler
 from .models import FileModel
@@ -924,7 +925,7 @@ class MultiParserTests(SimpleTestCase):
             ),
         )
         for raw_line, expected_title in test_data:
-            parsed = parse_header(raw_line)
+            parsed = parse_header_parameters(raw_line)
             self.assertEqual(parsed[1]["title"], expected_title)
 
     def test_rfc2231_wrong_title(self):
@@ -942,7 +943,7 @@ class MultiParserTests(SimpleTestCase):
             (b"Content-Type: application/x-stuff; title*=bar.html", b"bar.html"),
         )
         for raw_line, expected_title in test_data:
-            parsed = parse_header(raw_line)
+            parsed = parse_header_parameters(raw_line)
             self.assertEqual(parsed[1]["title"], expected_title)
 
     def test_parse_header_with_double_quotes_and_semicolon(self):
