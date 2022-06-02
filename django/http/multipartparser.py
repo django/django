@@ -19,6 +19,7 @@ from django.core.exceptions import (
 from django.core.files.uploadhandler import SkipFile, StopFutureHandlers, StopUpload
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str
+from django.utils.http import parse_header_parameters
 from django.utils.regex_helper import _lazy_re_compile
 
 __all__ = ("MultiPartParser", "MultiPartParserError", "InputStreamExhausted")
@@ -49,7 +50,7 @@ class MultiPartParser:
     and returns a tuple of ``(MultiValueDict(POST), MultiValueDict(FILES))``.
     """
 
-    boundary_re = _lazy_re_compile(rb"[ -~]{0,200}[!-~]")
+    boundary_re = _lazy_re_compile(r"[ -~]{0,200}[!-~]")
 
     def __init__(self, META, input_data, upload_handlers, encoding=None):
         """
@@ -67,17 +68,21 @@ class MultiPartParser:
         """
         # Content-Type should contain multipart and the boundary information.
         content_type = META.get("CONTENT_TYPE", "")
-        if not content_type.startswith("multipart/"):
-            raise MultiPartParserError("Invalid Content-Type: %s" % content_type)
 
-        # Parse the header to get the boundary to split the parts.
         try:
-            ctypes, opts = parse_header(content_type.encode("ascii"))
+            content_type.encode("ascii")
         except UnicodeEncodeError:
             raise MultiPartParserError(
                 "Invalid non-ASCII Content-Type in multipart: %s"
                 % force_str(content_type)
             )
+
+        if not content_type.startswith("multipart/"):
+            raise MultiPartParserError("Invalid Content-Type: %s" % content_type)
+
+        # Parse the header to get the boundary to split the parts.
+        ctypes, opts = parse_header_parameters(content_type)
+
         boundary = opts.get("boundary")
         if not boundary or not self.boundary_re.fullmatch(boundary):
             raise MultiPartParserError(
@@ -95,9 +100,7 @@ class MultiPartParser:
             # This means we shouldn't continue...raise an error.
             raise MultiPartParserError("Invalid content length: %r" % content_length)
 
-        if isinstance(boundary, str):
-            boundary = boundary.encode("ascii")
-        self._boundary = boundary
+        self._boundary = boundary.encode("ascii")
         self._input_data = input_data
 
         # For compatibility with low-level network APIs (with 32-bit integers),
