@@ -691,6 +691,12 @@ Miscellaneous
   ``"django/forms/formsets/default.html"`` templates which are a proxy to the
   table-based templates are deprecated. Use the specific template instead.
 
+* ``User.objects.make_random_password()`` generates a password that doesn't
+  comply with most password validators.
+  The python docs have a handy guide on recipes and best practices when it
+  comes to `passwords, secrets and basic security
+  <https://docs.python.org/3.10/library/secrets.html#recipes-and-best-practices>`_.
+
 Features removed in 4.1
 =======================
 

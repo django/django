@@ -772,6 +772,11 @@ utility methods:
 
     .. method:: models.BaseUserManager.make_random_password(length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
 
+        .. deprecated:: 4.1
+            The ``make_random_password`` method is deprecated and will be
+            removed in Django 5.0 as it's not used by Django and the generated
+            passwords don't comply with ``AUTH_PASSWORD_VALIDATORS``.
+
         Returns a random password with the given length and given string of
         allowed characters. Note that the default value of ``allowed_chars``
         doesn't contain letters that can cause user confusion, including:

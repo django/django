@@ -112,6 +112,8 @@ details on these changes.
   ``Expression.asc()`` and ``Expression.desc()`` methods, and the ``OrderBy``
   expression will be removed.
 
+* ``User.objects`` will no longer have a ``make_random_password`` method.
+
 .. _deprecation-removed-in-4.1:
 
 4.1

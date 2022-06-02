@@ -18,6 +18,8 @@ from django.db import connection, migrations
 from django.db.migrations.state import ModelState, ProjectState
 from django.db.models.signals import post_save
 from django.test import SimpleTestCase, TestCase, TransactionTestCase, override_settings
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango50Warning
 
 from .models import CustomEmailField, IntegerUsernameUser
 
@@ -164,6 +166,7 @@ class UserManagerTestCase(TransactionTestCase):
                 is_staff=False,
             )
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_make_random_password(self):
         allowed_chars = "abcdefg"
         password = UserManager().make_random_password(5, allowed_chars)
