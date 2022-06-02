@@ -128,6 +128,10 @@ class ASGIRequest(HttpRequest):
     def COOKIES(self):
         return parse_cookie(self.META.get("HTTP_COOKIE", ""))
 
+    def close(self):
+        super().close()
+        self._stream.close()
+
 
 class ASGIHandler(base.BaseHandler):
     """Handler for ASGI requests."""
@@ -164,21 +168,19 @@ class ASGIHandler(base.BaseHandler):
         except RequestAborted:
             return
         # Request is complete and can be served.
-        try:
-            set_script_prefix(self.get_script_prefix(scope))
-            await sync_to_async(signals.request_started.send, thread_sensitive=True)(
-                sender=self.__class__, scope=scope
-            )
-            # Get the request and check for basic issues.
-            request, error_response = self.create_request(scope, body_file)
-            if request is None:
-                await self.send_response(error_response, send)
-                return
-            # Get the response, using the async mode of BaseHandler.
-            response = await self.get_response_async(request)
-            response._handler_class = self.__class__
-        finally:
+        set_script_prefix(self.get_script_prefix(scope))
+        await sync_to_async(signals.request_started.send, thread_sensitive=True)(
+            sender=self.__class__, scope=scope
+        )
+        # Get the request and check for basic issues.
+        request, error_response = self.create_request(scope, body_file)
+        if request is None:
             body_file.close()
+            await self.send_response(error_response, send)
+            return
+        # Get the response, using the async mode of BaseHandler.
+        response = await self.get_response_async(request)
+        response._handler_class = self.__class__
         # Increase chunk size on file responses (ASGI servers handles low-level
         # chunking).
         if isinstance(response, FileResponse):
