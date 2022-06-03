@@ -1824,7 +1824,7 @@ class ModelAdmin(BaseModelAdmin):
             readonly_fields = flatten_fieldsets(fieldsets)
         else:
             readonly_fields = self.get_readonly_fields(request, obj)
-        adminForm = helpers.AdminForm(
+        admin_form = helpers.AdminForm(
             form,
             list(fieldsets),
             # Clear prepopulated fields on a view-only form to avoid a crash.
@@ -1834,7 +1834,7 @@ class ModelAdmin(BaseModelAdmin):
             readonly_fields,
             model_admin=self,
         )
-        media = self.media + adminForm.media
+        media = self.media + admin_form.media
 
         inline_formsets = self.get_inline_formsets(
             request, formsets, inline_instances, obj
@@ -1852,7 +1852,7 @@ class ModelAdmin(BaseModelAdmin):
             **self.admin_site.each_context(request),
             "title": title % self.opts.verbose_name,
             "subtitle": str(obj) if obj else None,
-            "adminform": adminForm,
+            "adminform": admin_form,
             "object_id": object_id,
             "original": obj,
             "is_popup": IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET,
