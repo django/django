@@ -389,11 +389,7 @@
         handleCalendarCallback: function(num) {
             let format = get_format('DATE_INPUT_FORMATS')[0];
             // the format needs to be escaped a little
-            format = format.replace('\\', '\\\\')
-                .replace('\r', '\\r')
-                .replace('\n', '\\n')
-                .replace('\t', '\\t')
-                .replace("'", "\\'");
+            format = DateTimeShortcuts.escapeFormat(format);
             return function(y, m, d) {
                 DateTimeShortcuts.calendarInputs[num].value = new Date(y, m - 1, d).strftime(format);
                 DateTimeShortcuts.calendarInputs[num].focus();
@@ -406,6 +402,14 @@
             DateTimeShortcuts.calendarInputs[num].value = d.strftime(get_format('DATE_INPUT_FORMATS')[0]);
             DateTimeShortcuts.calendarInputs[num].focus();
             DateTimeShortcuts.dismissCalendar(num);
+        },
+        escapeFormat: function(format) {
+            format = format.replace(/\\/g, "\\\\")
+                .replace(/\r/g, "\\r")
+                .replace(/\n/g, "\\n")
+                .replace(/\t/g, "\\t")
+                .replace(/'/g, "\\'");
+            return format;
         }
     };
 

@@ -40,3 +40,9 @@ QUnit.test('time zone offset warning', function(assert) {
     $('body').attr('data-admin-utc-offset', savedOffset);
     assert.equal($('.timezonewarning').text(), 'Note: You are 1 hour behind server time.');
 });
+
+QUnit.test('calendar escape format', function(assert) {
+    let dateInputFormat = "'%d \r\t\\\n %B \n\\\r\t %Y'";
+    dateInputFormat = DateTimeShortcuts.escapeFormat(dateInputFormat);
+    assert.equal(dateInputFormat, "\\'%d \\r\\t\\\\\\n %B \\n\\\\\\r\\t %Y\\'");
+});
