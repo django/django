@@ -141,7 +141,6 @@ class NullBooleanModel(models.Model):
 
 class BooleanModel(models.Model):
     bfield = models.BooleanField()
-    string = models.CharField(max_length=10, default="abc")
 
 
 class DateTimeModel(models.Model):
