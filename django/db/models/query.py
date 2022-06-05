@@ -845,7 +845,7 @@ class QuerySet:
         """
         Update the given fields in each of the given objects in the database.
         """
-        if batch_size is not None and batch_size < 0:
+        if batch_size is not None and batch_size <= 0:
             raise ValueError("Batch size must be a positive integer.")
         if not fields:
             raise ValueError("Field names must be given to bulk_update().")
