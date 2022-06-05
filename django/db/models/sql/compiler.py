@@ -330,8 +330,21 @@ class SQLCompiler:
                 if not self.query.standard_ordering:
                     field = field.copy()
                     field.reverse_ordering()
+                src = field.get_source_expressions()[0]
+                if isinstance(src, F):
+                    try:
+                        resolved = src.resolve_expression(self.query, summarize=True)
+                    except FieldError:
+                        pass  # Cannot promote to Ref (not part of the select clause)
+                    else:
+                        if isinstance(resolved, Ref) and not self.query.combinator:
+                            field.set_source_expressions([resolved])
+                            yield field, True
+                if isinstance(src, Ref) and not self.query.combinator:
+                    yield field, True
                 yield field, False
                 continue
+
             if field == "?":  # random
                 yield OrderBy(Random()), False
                 continue

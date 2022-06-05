@@ -480,6 +480,17 @@ class OrderingTests(TestCase):
             attrgetter("headline"),
         )
 
+    def test_order_by_f_expression_alias(self):
+        qs = (
+            Article.objects.filter(id__lt=0)
+            .annotate(test=Value(42))
+            .order_by(F("test").asc())
+        )
+        self.assertQuerysetEqual(qs, [])
+        sql = str(qs.query).upper()
+        fragment = sql[sql.find("ORDER BY") :]
+        self.assertEqual(fragment.count("TEST"), 1)
+
     def test_order_by_constant_value(self):
         # Order by annotated constant from selected columns.
         qs = Article.objects.annotate(
