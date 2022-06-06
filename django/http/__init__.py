@@ -6,6 +6,7 @@ from django.http.request import (
     UnreadablePostError,
 )
 from django.http.response import (
+    AsyncStreamingHttpResponse,
     BadHeaderError,
     FileResponse,
     Http404,
@@ -34,6 +35,7 @@ __all__ = [
     "HttpResponse",
     "HttpResponseBase",
     "StreamingHttpResponse",
+    "AsyncStreamingHttpResponse",
     "HttpResponseRedirect",
     "HttpResponsePermanentRedirect",
     "HttpResponseNotModified",
