@@ -19,6 +19,7 @@ from django.http import (
     parse_cookie,
 )
 from django.urls import set_script_prefix
+from django.utils.asyncio import aclosing
 from django.utils.functional import cached_property
 
 logger = logging.getLogger("django.request")
@@ -262,17 +263,18 @@ class ASGIHandler(base.BaseHandler):
         if response.async_streaming:
             # Access `__aiter__` and not `streaming_content` directly in case
             # it has been overridden in a subclass.
-            async for part in response:
-                for chunk, _ in self.chunk_bytes(part):
-                    await send(
-                        {
-                            "type": "http.response.body",
-                            "body": chunk,
-                            # Ignore "more" as there may be more parts; instead,
-                            # use an empty final closing message with False.
-                            "more_body": True,
-                        }
-                    )
+            async with aclosing(response.__aiter__()) as content:
+                async for part in content:
+                    for chunk, _ in self.chunk_bytes(part):
+                        await send(
+                            {
+                                "type": "http.response.body",
+                                "body": chunk,
+                                # Ignore "more" as there may be more parts; instead,
+                                # use an empty final closing message with False.
+                                "more_body": True,
+                            }
+                        )
             # Final closing message.
             await send({"type": "http.response.body"})
         # Streaming responses need to be pinned to their iterator.

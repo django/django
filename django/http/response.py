@@ -16,6 +16,7 @@ from django.core.exceptions import DisallowedRedirect
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import timezone
+from django.utils.asyncio import aclosing
 from django.utils.datastructures import CaseInsensitiveMapping
 from django.utils.encoding import iri_to_uri
 from django.utils.http import http_date
@@ -490,8 +491,9 @@ class AsyncStreamingHttpResponse(StreamingHttpResponse):
 
     @property
     async def streaming_content(self):
-        async for i in self._iterator:
-            yield self.make_bytes(i)
+        async with aclosing(self._iterator) as content:
+            async for part in content:
+                yield self.make_bytes(part)
 
     @streaming_content.setter
     def streaming_content(self, value):

@@ -37,3 +37,19 @@ def async_unsafe(message):
         return decorator(func)
     else:
         return decorator
+
+
+class aclosing:
+    """
+    Async context manager for safely finalizing an asynchronously cleaned-up
+    resource such as an async generator, calling its ``aclose()`` method.
+    """
+
+    def __init__(self, thing):
+        self.thing = thing
+
+    async def __aenter__(self):
+        return self.thing
+
+    async def __aexit__(self, *exc_info):
+        await self.thing.aclose()
