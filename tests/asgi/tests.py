@@ -284,3 +284,29 @@ class ASGITest(SimpleTestCase):
         self.assertEqual(len(sync_waiter.active_threads), 2)
 
         sync_waiter.active_threads.clear()
+
+    async def test_async_streaming(self):
+        """
+        Makes sure that AsyncStreamingHttpResponse works over ASGI.
+        """
+        application = get_asgi_application()
+        # Construct HTTP request.
+        scope = self.async_request_factory._base_scope(path="/stream/")
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request"})
+        # Read the response.
+        response_start = await communicator.receive_output()
+        self.assertEqual(response_start["type"], "http.response.start")
+        self.assertEqual(response_start["status"], 200)
+        self.assertEqual(
+            set(response_start["headers"]),
+            {
+                (b"Content-Type", b"text/html; charset=utf-8"),
+            },
+        )
+        for word in (b"I", b"am", b"a", b"stream"):
+            response_body = await communicator.receive_output()
+            self.assertEqual(response_body["type"], "http.response.body")
+            self.assertEqual(response_body["body"], word)
+        # Allow response.close() to finish.
+        await communicator.wait()
