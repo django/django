@@ -841,7 +841,7 @@ class QuerySet:
             ignore_conflicts=ignore_conflicts,
         )
 
-    def bulk_update(self, objs, fields, batch_size=None):
+    def bulk_update(self, objs, fields, batch_size=None, unique_field="pk"):
         """
         Update the given fields in each of the given objects in the database.
         """
@@ -849,9 +849,16 @@ class QuerySet:
             raise ValueError("Batch size must be a positive integer.")
         if not fields:
             raise ValueError("Field names must be given to bulk_update().")
+        if not unique_field:
+            raise ValueError("Unique field name can't be given empty to bulk_update().")
+        field = self.model._meta.get_field(unique_field)
+        if not field.unique:
+            raise ValueError(
+                f"'{unique_field}' field is not unique in '{self.model._meta.object_name}' model."
+            )
         objs = tuple(objs)
-        if any(obj.pk is None for obj in objs):
-            raise ValueError("All bulk_update() objects must have a primary key set.")
+        if any(getattr(obj, unique_field) is None for obj in objs):
+            raise ValueError(f"All bulk_update() objects must have '{unique_field}' set.")
         fields = [self.model._meta.get_field(name) for name in fields]
         if any(not f.concrete or f.many_to_many for f in fields):
             raise ValueError("bulk_update() can only be used with concrete fields.")
@@ -863,11 +870,11 @@ class QuerySet:
             obj._prepare_related_fields_for_save(
                 operation_name="bulk_update", fields=fields
             )
-        # PK is used twice in the resulting update query, once in the filter
+        # unique_field is used twice in the resulting update query, once in the filter
         # and once in the WHEN. Each field will also have one CAST.
         self._for_write = True
         connection = connections[self.db]
-        max_batch_size = connection.ops.bulk_batch_size(["pk", "pk"] + fields, objs)
+        max_batch_size = connection.ops.bulk_batch_size([unique_field, unique_field] + fields, objs)
         batch_size = min(batch_size, max_batch_size) if batch_size else max_batch_size
         requires_casting = connection.features.requires_casted_case_in_updates
         batches = (objs[i : i + batch_size] for i in range(0, len(objs), batch_size))
@@ -880,17 +887,21 @@ class QuerySet:
                     attr = getattr(obj, field.attname)
                     if not hasattr(attr, "resolve_expression"):
                         attr = Value(attr, output_field=field)
-                    when_statements.append(When(pk=obj.pk, then=attr))
+                    when_statements.append(
+                        When(**{unique_field: getattr(obj, unique_field)}, then=attr)
+                    )
                 case_statement = Case(*when_statements, output_field=field)
                 if requires_casting:
                     case_statement = Cast(case_statement, output_field=field)
                 update_kwargs[field.attname] = case_statement
-            updates.append(([obj.pk for obj in batch_objs], update_kwargs))
+            updates.append(([getattr(obj, unique_field) for obj in batch_objs], update_kwargs))
         rows_updated = 0
         queryset = self.using(self.db)
         with transaction.atomic(using=self.db, savepoint=False):
-            for pks, update_kwargs in updates:
-                rows_updated += queryset.filter(pk__in=pks).update(**update_kwargs)
+            for uniques, update_kwargs in updates:
+                rows_updated += queryset\
+                    .filter(**{f"{unique_field}__in": uniques})\
+                    .update(**update_kwargs)
         return rows_updated
 
     bulk_update.alters_data = True
