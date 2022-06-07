@@ -50,10 +50,9 @@ What Python version can I use with Django?
 ============== ===============
 Django version Python versions
 ============== ===============
-2.2            3.5, 3.6, 3.7, 3.8 (added in 2.2.8), 3.9 (added in 2.2.17)
-3.1            3.6, 3.7, 3.8, 3.9 (added in 3.1.3)
 3.2            3.6, 3.7, 3.8, 3.9, 3.10 (added in 3.2.9)
 4.0, 4.1       3.8, 3.9, 3.10
+4.2            3.8, 3.9, 3.10, 3.11
 ============== ===============
 
 For each version of Python, only the latest micro release (A.B.C) is officially

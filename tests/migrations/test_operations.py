@@ -260,6 +260,66 @@ class OperationTests(OperationTestBase):
         self.assertTableNotExists("test_crmomm_stable")
         self.assertTableNotExists("test_crmomm_stable_ponies")
 
+    @skipUnlessDBFeature("supports_collation_on_charfield", "supports_foreign_keys")
+    def test_create_fk_models_to_pk_field_db_collation(self):
+        """Creation of models with a FK to a PK with db_collation."""
+        collation = connection.features.test_collations.get("non_default")
+        if not collation:
+            self.skipTest("Language collations are not supported.")
+
+        app_label = "test_cfkmtopkfdbc"
+        operations = [
+            migrations.CreateModel(
+                "Pony",
+                [
+                    (
+                        "id",
+                        models.CharField(
+                            primary_key=True,
+                            max_length=10,
+                            db_collation=collation,
+                        ),
+                    ),
+                ],
+            )
+        ]
+        project_state = self.apply_operations(app_label, ProjectState(), operations)
+        # ForeignKey.
+        new_state = project_state.clone()
+        operation = migrations.CreateModel(
+            "Rider",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("pony", models.ForeignKey("Pony", models.CASCADE)),
+            ],
+        )
+        operation.state_forwards(app_label, new_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertColumnCollation(f"{app_label}_rider", "pony_id", collation)
+        # Reversal.
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+        # OneToOneField.
+        new_state = project_state.clone()
+        operation = migrations.CreateModel(
+            "ShetlandPony",
+            [
+                (
+                    "pony",
+                    models.OneToOneField("Pony", models.CASCADE, primary_key=True),
+                ),
+                ("cuteness", models.IntegerField(default=1)),
+            ],
+        )
+        operation.state_forwards(app_label, new_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertColumnCollation(f"{app_label}_shetlandpony", "pony_id", collation)
+        # Reversal.
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+
     def test_create_model_inheritance(self):
         """
         Tests the CreateModel operation on a multi-table inheritance setup.
@@ -407,6 +467,48 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[0], "CreateModel")
         self.assertEqual(definition[1], [])
         self.assertEqual(definition[2]["options"]["constraints"], [check_constraint])
+
+    @skipUnlessDBFeature("supports_table_check_constraints")
+    def test_create_model_with_boolean_expression_in_check_constraint(self):
+        app_label = "test_crmobechc"
+        rawsql_constraint = models.CheckConstraint(
+            check=models.expressions.RawSQL(
+                "price < %s", (1000,), output_field=models.BooleanField()
+            ),
+            name=f"{app_label}_price_lt_1000_raw",
+        )
+        wrapper_constraint = models.CheckConstraint(
+            check=models.expressions.ExpressionWrapper(
+                models.Q(price__gt=500) | models.Q(price__lt=500),
+                output_field=models.BooleanField(),
+            ),
+            name=f"{app_label}_price_neq_500_wrap",
+        )
+        operation = migrations.CreateModel(
+            "Product",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("price", models.IntegerField(null=True)),
+            ],
+            options={"constraints": [rawsql_constraint, wrapper_constraint]},
+        )
+
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        # Add table.
+        self.assertTableNotExists(app_label)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertTableExists(f"{app_label}_product")
+        insert_sql = f"INSERT INTO {app_label}_product (id, price) VALUES (%d, %d)"
+        with connection.cursor() as cursor:
+            with self.assertRaises(IntegrityError):
+                cursor.execute(insert_sql % (1, 1000))
+            cursor.execute(insert_sql % (1, 999))
+            with self.assertRaises(IntegrityError):
+                cursor.execute(insert_sql % (2, 500))
+            cursor.execute(insert_sql % (2, 499))
 
     def test_create_model_with_partial_unique_constraint(self):
         partial_unique_constraint = models.UniqueConstraint(
@@ -1923,6 +2025,63 @@ class OperationTests(OperationTestBase):
                 ("test_alflpkfk_pony", "id"),
             )
 
+    @skipUnlessDBFeature("supports_collation_on_charfield", "supports_foreign_keys")
+    def test_alter_field_pk_fk_db_collation(self):
+        """
+        AlterField operation of db_collation on primary keys changes any FKs
+        pointing to it.
+        """
+        collation = connection.features.test_collations.get("non_default")
+        if not collation:
+            self.skipTest("Language collations are not supported.")
+
+        app_label = "test_alflpkfkdbc"
+        project_state = self.apply_operations(
+            app_label,
+            ProjectState(),
+            [
+                migrations.CreateModel(
+                    "Pony",
+                    [
+                        ("id", models.CharField(primary_key=True, max_length=10)),
+                    ],
+                ),
+                migrations.CreateModel(
+                    "Rider",
+                    [
+                        ("pony", models.ForeignKey("Pony", models.CASCADE)),
+                    ],
+                ),
+                migrations.CreateModel(
+                    "Stable",
+                    [
+                        ("ponies", models.ManyToManyField("Pony")),
+                    ],
+                ),
+            ],
+        )
+        # State alteration.
+        operation = migrations.AlterField(
+            "Pony",
+            "id",
+            models.CharField(
+                primary_key=True,
+                max_length=10,
+                db_collation=collation,
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        # Database alteration.
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertColumnCollation(f"{app_label}_pony", "id", collation)
+        self.assertColumnCollation(f"{app_label}_rider", "pony_id", collation)
+        self.assertColumnCollation(f"{app_label}_stable_ponies", "pony_id", collation)
+        # Reversal.
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+
     def test_alter_field_pk_mti_fk(self):
         app_label = "test_alflpkmtifk"
         project_state = self.set_up_test_model(app_label, mti_model=True)
@@ -2650,6 +2809,69 @@ class OperationTests(OperationTestBase):
             operation.describe(), "Alter unique_together for Pony (0 constraint(s))"
         )
 
+    @skipUnlessDBFeature("allows_multiple_constraints_on_same_fields")
+    def test_remove_unique_together_on_pk_field(self):
+        app_label = "test_rutopkf"
+        project_state = self.apply_operations(
+            app_label,
+            ProjectState(),
+            operations=[
+                migrations.CreateModel(
+                    "Pony",
+                    fields=[("id", models.AutoField(primary_key=True))],
+                    options={"unique_together": {("id",)}},
+                ),
+            ],
+        )
+        table_name = f"{app_label}_pony"
+        pk_constraint_name = f"{table_name}_pkey"
+        unique_together_constraint_name = f"{table_name}_id_fb61f881_uniq"
+        self.assertConstraintExists(table_name, pk_constraint_name, value=False)
+        self.assertConstraintExists(
+            table_name, unique_together_constraint_name, value=False
+        )
+
+        new_state = project_state.clone()
+        operation = migrations.AlterUniqueTogether("Pony", set())
+        operation.state_forwards(app_label, new_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertConstraintExists(table_name, pk_constraint_name, value=False)
+        self.assertConstraintNotExists(table_name, unique_together_constraint_name)
+
+    @skipUnlessDBFeature("allows_multiple_constraints_on_same_fields")
+    def test_remove_unique_together_on_unique_field(self):
+        app_label = "test_rutouf"
+        project_state = self.apply_operations(
+            app_label,
+            ProjectState(),
+            operations=[
+                migrations.CreateModel(
+                    "Pony",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                        ("name", models.CharField(max_length=30, unique=True)),
+                    ],
+                    options={"unique_together": {("name",)}},
+                ),
+            ],
+        )
+        table_name = f"{app_label}_pony"
+        unique_constraint_name = f"{table_name}_name_key"
+        unique_together_constraint_name = f"{table_name}_name_694f3b9f_uniq"
+        self.assertConstraintExists(table_name, unique_constraint_name, value=False)
+        self.assertConstraintExists(
+            table_name, unique_together_constraint_name, value=False
+        )
+
+        new_state = project_state.clone()
+        operation = migrations.AlterUniqueTogether("Pony", set())
+        operation.state_forwards(app_label, new_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertConstraintExists(table_name, unique_constraint_name, value=False)
+        self.assertConstraintNotExists(table_name, unique_together_constraint_name)
+
     def test_add_index(self):
         """
         Test the AddIndex operation.
@@ -2741,6 +2963,125 @@ class OperationTests(OperationTestBase):
         self.unapply_operations("test_rmin", project_state, operations=operations)
         self.assertIndexExists("test_rmin_pony", ["pink", "weight"])
 
+    def test_rename_index(self):
+        app_label = "test_rnin"
+        project_state = self.set_up_test_model(app_label, index=True)
+        table_name = app_label + "_pony"
+        self.assertIndexNameExists(table_name, "pony_pink_idx")
+        self.assertIndexNameNotExists(table_name, "new_pony_test_idx")
+        operation = migrations.RenameIndex(
+            "Pony", new_name="new_pony_test_idx", old_name="pony_pink_idx"
+        )
+        self.assertEqual(
+            operation.describe(),
+            "Rename index pony_pink_idx on Pony to new_pony_test_idx",
+        )
+        self.assertEqual(
+            operation.migration_name_fragment,
+            "rename_pony_pink_idx_new_pony_test_idx",
+        )
+
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        # Rename index.
+        expected_queries = 1 if connection.features.can_rename_index else 2
+        with connection.schema_editor() as editor, self.assertNumQueries(
+            expected_queries
+        ):
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertIndexNameNotExists(table_name, "pony_pink_idx")
+        self.assertIndexNameExists(table_name, "new_pony_test_idx")
+        # Reversal.
+        with connection.schema_editor() as editor, self.assertNumQueries(
+            expected_queries
+        ):
+            operation.database_backwards(app_label, editor, new_state, project_state)
+        self.assertIndexNameExists(table_name, "pony_pink_idx")
+        self.assertIndexNameNotExists(table_name, "new_pony_test_idx")
+        # Deconstruction.
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "RenameIndex")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(
+            definition[2],
+            {
+                "model_name": "Pony",
+                "old_name": "pony_pink_idx",
+                "new_name": "new_pony_test_idx",
+            },
+        )
+
+    def test_rename_index_arguments(self):
+        msg = "RenameIndex.old_name and old_fields are mutually exclusive."
+        with self.assertRaisesMessage(ValueError, msg):
+            migrations.RenameIndex(
+                "Pony",
+                new_name="new_idx_name",
+                old_name="old_idx_name",
+                old_fields=("weight", "pink"),
+            )
+        msg = "RenameIndex requires one of old_name and old_fields arguments to be set."
+        with self.assertRaisesMessage(ValueError, msg):
+            migrations.RenameIndex("Pony", new_name="new_idx_name")
+
+    def test_rename_index_unnamed_index(self):
+        app_label = "test_rninui"
+        project_state = self.set_up_test_model(app_label, index_together=True)
+        table_name = app_label + "_pony"
+        self.assertIndexNameNotExists(table_name, "new_pony_test_idx")
+        operation = migrations.RenameIndex(
+            "Pony", new_name="new_pony_test_idx", old_fields=("weight", "pink")
+        )
+        self.assertEqual(
+            operation.describe(),
+            "Rename unnamed index for ('weight', 'pink') on Pony to new_pony_test_idx",
+        )
+        self.assertEqual(
+            operation.migration_name_fragment,
+            "rename_pony_weight_pink_new_pony_test_idx",
+        )
+
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        # Rename index.
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertIndexNameExists(table_name, "new_pony_test_idx")
+        # Reverse is a no-op.
+        with connection.schema_editor() as editor, self.assertNumQueries(0):
+            operation.database_backwards(app_label, editor, new_state, project_state)
+        self.assertIndexNameExists(table_name, "new_pony_test_idx")
+        # Reapply, RenameIndex operation is a noop when the old and new name
+        # match.
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, new_state, project_state)
+        self.assertIndexNameExists(table_name, "new_pony_test_idx")
+        # Deconstruction.
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "RenameIndex")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(
+            definition[2],
+            {
+                "model_name": "Pony",
+                "new_name": "new_pony_test_idx",
+                "old_fields": ("weight", "pink"),
+            },
+        )
+
+    def test_rename_index_unknown_unnamed_index(self):
+        app_label = "test_rninuui"
+        project_state = self.set_up_test_model(app_label)
+        operation = migrations.RenameIndex(
+            "Pony", new_name="new_pony_test_idx", old_fields=("weight", "pink")
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        msg = "Found wrong number (0) of indexes for test_rninuui_pony(weight, pink)."
+        with connection.schema_editor() as editor:
+            with self.assertRaisesMessage(ValueError, msg):
+                operation.database_forwards(app_label, editor, project_state, new_state)
+
     def test_add_index_state_forwards(self):
         project_state = self.set_up_test_model("test_adinsf")
         index = models.Index(fields=["pink"], name="test_adinsf_pony_pink_idx")
@@ -2763,6 +3104,35 @@ class OperationTests(OperationTestBase):
         operation.state_forwards("test_rminsf", new_state)
         new_model = new_state.apps.get_model("test_rminsf", "Pony")
         self.assertIsNot(old_model, new_model)
+
+    def test_rename_index_state_forwards(self):
+        app_label = "test_rnidsf"
+        project_state = self.set_up_test_model(app_label, index=True)
+        old_model = project_state.apps.get_model(app_label, "Pony")
+        new_state = project_state.clone()
+
+        operation = migrations.RenameIndex(
+            "Pony", new_name="new_pony_pink_idx", old_name="pony_pink_idx"
+        )
+        operation.state_forwards(app_label, new_state)
+        new_model = new_state.apps.get_model(app_label, "Pony")
+        self.assertIsNot(old_model, new_model)
+        self.assertEqual(new_model._meta.indexes[0].name, "new_pony_pink_idx")
+
+    def test_rename_index_state_forwards_unnamed_index(self):
+        app_label = "test_rnidsfui"
+        project_state = self.set_up_test_model(app_label, index_together=True)
+        old_model = project_state.apps.get_model(app_label, "Pony")
+        new_state = project_state.clone()
+
+        operation = migrations.RenameIndex(
+            "Pony", new_name="new_pony_pink_idx", old_fields=("weight", "pink")
+        )
+        operation.state_forwards(app_label, new_state)
+        new_model = new_state.apps.get_model(app_label, "Pony")
+        self.assertIsNot(old_model, new_model)
+        self.assertEqual(new_model._meta.index_together, tuple())
+        self.assertEqual(new_model._meta.indexes[0].name, "new_pony_pink_idx")
 
     @skipUnlessDBFeature("supports_expression_indexes")
     def test_add_func_index(self):

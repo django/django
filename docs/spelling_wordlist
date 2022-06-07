@@ -20,7 +20,6 @@ args
 async
 atomicity
 auth
-autoclobber
 autocommit
 autocomplete
 autocompletion
@@ -171,6 +170,7 @@ filesystem
 filesystems
 flatpage
 flatpages
+focusable
 fooapp
 formatter
 formatters
@@ -214,7 +214,6 @@ hstore
 html
 https
 Hypercorn
-ie
 ies
 iframe
 Igbo
@@ -306,8 +305,6 @@ multitenancy
 multithreaded
 multithreading
 multivalued
-myapp
-mysite
 mysql
 mysqlclient
 naïve
@@ -364,11 +361,13 @@ pre
 precisions
 precomputation
 preconfigured
+preescaped
 prefetch
 prefetched
 prefetches
 prefetching
 preload
+preloaded
 prepend
 prepended
 prepending
@@ -415,7 +414,7 @@ redisplay
 redisplayed
 redisplaying
 redisplays
-refactorings
+reenable
 referer
 referers
 reflow
@@ -454,7 +453,6 @@ serializability
 serializable
 serializer
 serializers
-sessionid
 shapefile
 shapefiles
 sharding
@@ -462,7 +460,6 @@ sitewide
 sliceable
 SMTP
 solaris
-Solr
 sortable
 Spectre
 Springmeyer
@@ -471,9 +468,6 @@ stacktrace
 stateful
 staticfile
 staticfiles
-stderr
-stdlib
-stdout
 storages
 stylesheet
 stylesheets
@@ -592,7 +586,6 @@ Uvicorn
 uWSGI
 validator
 validators
-validsite
 variadic
 vendored
 virtualized

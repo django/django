@@ -437,8 +437,6 @@ Arguments sent with this signal:
     superuser when ``interactive`` is ``True``.
 
 ``stdout``
-    .. versionadded:: 4.0
-
     A stream-like object where verbose output should be redirected.
 
 ``using``
@@ -496,8 +494,6 @@ Arguments sent with this signal:
     superuser when ``interactive`` is ``True``.
 
 ``stdout``
-    .. versionadded:: 4.0
-
     A stream-like object where verbose output should be redirected.
 
 ``using``

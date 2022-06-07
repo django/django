@@ -27,6 +27,7 @@ from django.db.models.expressions import (
     OuterRef,
     Ref,
     ResolvedOuterRef,
+    Value,
 )
 from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
@@ -40,12 +41,23 @@ from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
 from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
 from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
 from django.utils.functional import cached_property
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.tree import Node
 
 __all__ = ["Query", "RawQuery"]
 
+# Quotation marks ('"`[]), whitespace characters, semicolons, or inline
+# SQL comments are forbidden in column aliases.
+FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|--|/\*|\*/")
+
+# Inspired from
+# https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+EXPLAIN_OPTIONS_PATTERN = _lazy_re_compile(r"[\w\-]+")
+
 
 def get_field_names_from_opts(opts):
+    if opts is None:
+        return set()
     return set(
         chain.from_iterable(
             (f.name, f.attname) if f.concrete else (f.name,) for f in opts.get_fields()
@@ -301,12 +313,13 @@ class Query(BaseExpression):
         processing. Normally, this is self.model._meta, but it can be changed
         by subclasses.
         """
-        return self.model._meta
+        if self.model:
+            return self.model._meta
 
     def clone(self):
         """
         Return a copy of the current Query. A lightweight alternative to
-        to deepcopy().
+        deepcopy().
         """
         obj = Empty()
         obj.__class__ = self.__class__
@@ -550,7 +563,7 @@ class Query(BaseExpression):
 
     def exists(self, using, limit=True):
         q = self.clone()
-        if not q.distinct:
+        if not (q.distinct and q.is_sliced):
             if q.group_by is True:
                 q.add_fields(
                     (f.attname for f in self.model._meta.concrete_fields), False
@@ -570,8 +583,7 @@ class Query(BaseExpression):
         q.clear_ordering(force=True)
         if limit:
             q.set_limits(high=1)
-        q.add_extra({"a": 1}, None, None, None, None, None)
-        q.set_extra_mask(["a"])
+        q.add_annotation(Value(1), "a")
         return q
 
     def has_results(self, using):
@@ -581,6 +593,12 @@ class Query(BaseExpression):
 
     def explain(self, using, format=None, **options):
         q = self.clone()
+        for option_name in options:
+            if (
+                not EXPLAIN_OPTIONS_PATTERN.fullmatch(option_name)
+                or "--" in option_name
+            ):
+                raise ValueError(f"Invalid option name: {option_name!r}.")
         q.explain_info = ExplainInfo(format, options)
         compiler = q.get_compiler(using=using)
         return "\n".join(compiler.explain_query())
@@ -700,7 +718,7 @@ class Query(BaseExpression):
         self.order_by = rhs.order_by or self.order_by
         self.extra_order_by = rhs.extra_order_by or self.extra_order_by
 
-    def deferred_to_data(self, target, callback):
+    def deferred_to_data(self, target):
         """
         Convert the self.deferred_loading data structure to an alternate data
         structure, describing the field that *will* be loaded. This is used to
@@ -710,9 +728,6 @@ class Query(BaseExpression):
         the result, only those that have field restrictions in place.
 
         The "target" parameter is the instance that is populated (in place).
-        The "callback" is a function that is called whenever a (model, field)
-        pair need to be added to "target". It accepts three parameters:
-        "target", and the model and list of fields being added for that model.
         """
         field_names, defer = self.deferred_loading
         if not field_names:
@@ -767,8 +782,8 @@ class Query(BaseExpression):
                 # "else" branch here.
                 if model in workset:
                     workset[model].update(values)
-            for model, values in workset.items():
-                callback(target, model, values)
+            for model, fields in workset.items():
+                target[model] = {f.attname for f in fields}
         else:
             for model, values in must_include.items():
                 if model in seen:
@@ -783,8 +798,8 @@ class Query(BaseExpression):
             # only "must include" fields are pulled in.
             for model in orig_opts.get_parent_list():
                 seen.setdefault(model, set())
-            for model, values in seen.items():
-                callback(target, model, values)
+            for model, fields in seen.items():
+                target[model] = {f.attname for f in fields}
 
     def table_alias(self, table_name, create=False, filtered_relation=None):
         """
@@ -994,8 +1009,10 @@ class Query(BaseExpression):
         if self.alias_map:
             alias = self.base_table
             self.ref_alias(alias)
-        else:
+        elif self.model:
             alias = self.join(self.base_table_class(self.get_meta().db_table, None))
+        else:
+            alias = None
         return alias
 
     def count_active_tables(self):
@@ -1006,7 +1023,7 @@ class Query(BaseExpression):
         """
         return len([1 for count in self.alias_refcount.values() if count])
 
-    def join(self, join, reuse=None):
+    def join(self, join, reuse=None, reuse_with_filtered_relation=False):
         """
         Return an alias for the 'join', either reusing an existing alias for
         that join or creating a new one. 'join' is either a base_table_class or
@@ -1015,15 +1032,23 @@ class Query(BaseExpression):
         The 'reuse' parameter can be either None which means all joins are
         reusable, or it can be a set containing the aliases that can be reused.
 
+        The 'reuse_with_filtered_relation' parameter is used when computing
+        FilteredRelation instances.
+
         A join is always created as LOUTER if the lhs alias is LOUTER to make
         sure chains like t1 LOUTER t2 INNER t3 aren't generated. All new
         joins are created as LOUTER if the join is nullable.
         """
-        reuse_aliases = [
-            a
-            for a, j in self.alias_map.items()
-            if (reuse is None or a in reuse) and j.equals(join)
-        ]
+        if reuse_with_filtered_relation and reuse:
+            reuse_aliases = [
+                a for a, j in self.alias_map.items() if a in reuse and j.equals(join)
+            ]
+        else:
+            reuse_aliases = [
+                a
+                for a, j in self.alias_map.items()
+                if (reuse is None or a in reuse) and j == join
+            ]
         if reuse_aliases:
             if join.table_alias in reuse_aliases:
                 reuse_alias = join.table_alias
@@ -1081,8 +1106,16 @@ class Query(BaseExpression):
             alias = seen[int_model] = join_info.joins[-1]
         return alias or seen[None]
 
+    def check_alias(self, alias):
+        if FORBIDDEN_ALIAS_PATTERN.search(alias):
+            raise ValueError(
+                "Column aliases cannot contain whitespace characters, quotation marks, "
+                "semicolons, or SQL comments."
+            )
+
     def add_annotation(self, annotation, alias, is_summary=False, select=True):
         """Add a single annotation expression to the Query."""
+        self.check_alias(alias)
         annotation = annotation.resolve_expression(
             self, allow_joins=True, reuse=None, summarize=is_summary
         )
@@ -1318,6 +1351,7 @@ class Query(BaseExpression):
         can_reuse=None,
         allow_joins=True,
         split_subq=True,
+        reuse_with_filtered_relation=False,
         check_filterable=True,
     ):
         """
@@ -1340,6 +1374,9 @@ class Query(BaseExpression):
         upper in the code by add_q().
 
         The 'can_reuse' is a set of reusable joins for multijoins.
+
+        If 'reuse_with_filtered_relation' is True, then only joins in can_reuse
+        will be reused.
 
         The method will create a filter clause that can be added to the current
         query. However, if the filter isn't added to the query then the caller
@@ -1399,6 +1436,7 @@ class Query(BaseExpression):
                 alias,
                 can_reuse=can_reuse,
                 allow_many=allow_many,
+                reuse_with_filtered_relation=reuse_with_filtered_relation,
             )
 
             # Prevent iterator from being consumed by check_related_objects()
@@ -1560,6 +1598,7 @@ class Query(BaseExpression):
                     current_negated=current_negated,
                     allow_joins=True,
                     split_subq=False,
+                    reuse_with_filtered_relation=True,
                 )
             target_clause.add(child_clause, connector)
         return target_clause
@@ -1619,6 +1658,8 @@ class Query(BaseExpression):
             field = None
             filtered_relation = None
             try:
+                if opts is None:
+                    raise FieldDoesNotExist
                 field = opts.get_field(name)
             except FieldDoesNotExist:
                 if name in self.annotation_select:
@@ -1673,7 +1714,7 @@ class Query(BaseExpression):
             # Check if we need any joins for concrete inheritance cases (the
             # field lives in parent, but we are currently in one of its
             # children)
-            if model is not opts.model:
+            if opts is not None and model is not opts.model:
                 path_to_parent = opts.get_path_to_parent(model)
                 if path_to_parent:
                     path.extend(path_to_parent)
@@ -1709,7 +1750,15 @@ class Query(BaseExpression):
                 break
         return path, final_field, targets, names[pos + 1 :]
 
-    def setup_joins(self, names, opts, alias, can_reuse=None, allow_many=True):
+    def setup_joins(
+        self,
+        names,
+        opts,
+        alias,
+        can_reuse=None,
+        allow_many=True,
+        reuse_with_filtered_relation=False,
+    ):
         """
         Compute the necessary table joins for the passage through the fields
         given in 'names'. 'opts' is the Options class for the current model
@@ -1720,6 +1769,9 @@ class Query(BaseExpression):
         can be None in which case all joins are reusable or a set of aliases
         that can be reused. Note that non-reverse foreign keys are always
         reusable when using setup_joins().
+
+        The 'reuse_with_filtered_relation' can be used to force 'can_reuse'
+        parameter and force the relation on the given connections.
 
         If 'allow_many' is False, then any reverse foreign key seen will
         generate a MultiJoin exception.
@@ -1811,8 +1863,12 @@ class Query(BaseExpression):
                 nullable,
                 filtered_relation=filtered_relation,
             )
-            reuse = can_reuse if join.m2m else None
-            alias = self.join(connection, reuse=reuse)
+            reuse = can_reuse if join.m2m or reuse_with_filtered_relation else None
+            alias = self.join(
+                connection,
+                reuse=reuse,
+                reuse_with_filtered_relation=reuse_with_filtered_relation,
+            )
             joins.append(alias)
             if filtered_relation:
                 filtered_relation.path = joins[:]
@@ -2236,6 +2292,7 @@ class Query(BaseExpression):
             else:
                 param_iter = iter([])
             for name, entry in select.items():
+                self.check_alias(name)
                 entry = str(entry)
                 entry_params = []
                 pos = entry.find("%s")
@@ -2304,29 +2361,6 @@ class Query(BaseExpression):
         else:
             # Replace any existing "immediate load" field names.
             self.deferred_loading = frozenset(field_names), False
-
-    def get_loaded_field_names(self):
-        """
-        If any fields are marked to be deferred, return a dictionary mapping
-        models to a set of names in those fields that will be loaded. If a
-        model is not in the returned dictionary, none of its fields are
-        deferred.
-
-        If no fields are marked for deferral, return an empty dictionary.
-        """
-        # We cache this because we call this function multiple times
-        # (compiler.fill_related_selections, query.iterator)
-        try:
-            return self._loaded_field_names_cache
-        except AttributeError:
-            collection = {}
-            self.deferred_to_data(collection, self.get_loaded_field_names_cb)
-            self._loaded_field_names_cache = collection
-            return collection
-
-    def get_loaded_field_names_cb(self, target, model, fields):
-        """Callback used by get_deferred_field_names()."""
-        target[model] = {f.attname for f in fields}
 
     def set_annotation_mask(self, names):
         """Set the mask of annotations that will be returned by the SELECT."""

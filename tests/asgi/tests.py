@@ -2,7 +2,6 @@ import asyncio
 import sys
 import threading
 from pathlib import Path
-from unittest import skipIf
 
 from asgiref.testing import ApplicationCommunicator
 
@@ -23,10 +22,6 @@ from .urls import sync_waiter, test_filename
 TEST_STATIC_ROOT = Path(__file__).parent / "project" / "static"
 
 
-@skipIf(
-    sys.platform == "win32" and (3, 8, 0) < sys.version_info < (3, 8, 1),
-    "https://bugs.python.org/issue38563",
-)
 @override_settings(ROOT_URLCONF="asgi.urls")
 class ASGITest(SimpleTestCase):
     async_request_factory = AsyncRequestFactory()
@@ -167,6 +162,18 @@ class ASGITest(SimpleTestCase):
         response_body = await communicator.receive_output()
         self.assertEqual(response_body["type"], "http.response.body")
         self.assertEqual(response_body["body"], b"From Scotland,Wales")
+
+    async def test_post_body(self):
+        application = get_asgi_application()
+        scope = self.async_request_factory._base_scope(method="POST", path="/post/")
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request", "body": b"Echo!"})
+        response_start = await communicator.receive_output()
+        self.assertEqual(response_start["type"], "http.response.start")
+        self.assertEqual(response_start["status"], 200)
+        response_body = await communicator.receive_output()
+        self.assertEqual(response_body["type"], "http.response.body")
+        self.assertEqual(response_body["body"], b"Echo!")
 
     async def test_get_query_string(self):
         application = get_asgi_application()

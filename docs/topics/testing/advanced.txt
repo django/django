@@ -88,7 +88,7 @@ must ensure that they are configured correctly, by calling
 For example, assuming the following class-based view:
 
 .. code-block:: python
-    :caption: views.py
+    :caption: ``views.py``
 
     from django.views.generic import TemplateView
 
@@ -105,7 +105,7 @@ the view, then passing a ``request`` to ``setup()``, before proceeding with
 your test's code:
 
 .. code-block:: python
-    :caption: tests.py
+    :caption: ``tests.py``
 
     from django.test import RequestFactory, TestCase
     from .views import HomeView
@@ -412,7 +412,7 @@ following structure::
 Let's take a look inside a couple of those files:
 
 .. code-block:: python
-    :caption: runtests.py
+    :caption: ``runtests.py``
 
     #!/usr/bin/env python
     import os
@@ -440,7 +440,7 @@ command-line options for controlling verbosity, passing in specific test
 labels to run, etc.
 
 .. code-block:: python
-    :caption: tests/test_settings.py
+    :caption: ``tests/test_settings.py``
 
     SECRET_KEY = 'fake-key'
     INSTALLED_APPS = [
@@ -600,10 +600,6 @@ and tear down the test suite.
     custom arguments by calling ``parser.add_argument()`` inside the method, so
     that the :djadmin:`test` command will be able to use those arguments.
 
-    .. versionadded:: 4.0
-
-        The ``logger`` and ``shuffle`` arguments were added.
-
 Attributes
 ~~~~~~~~~~
 
@@ -725,8 +721,6 @@ Methods
 
 .. method:: DiscoverRunner.log(msg, level=None)
 
-    .. versionadded:: 4.0
-
     If a ``logger`` is set, logs the message at the given integer
     `logging level`_ (e.g. ``logging.DEBUG``, ``logging.INFO``, or
     ``logging.WARNING``). Otherwise, the message is printed to the console,
@@ -779,10 +773,6 @@ utility methods in the ``django.test.utils`` module.
     :ref:`serialized_rollback <test-case-serialized-rollback>` feature. If
     it's not provided, it defaults to ``aliases``.
 
-    .. versionchanged:: 4.0
-
-        The ``serialized_aliases`` kwarg was added.
-
 .. function:: teardown_databases(old_config, parallel=0, keepdb=False)
 
     Destroys the test databases, restoring pre-test conditions.
@@ -812,7 +802,7 @@ can be useful during testing.
       approve destroying the existing database. ``sys.exit`` is
       called if the user does not approve.
 
-    * If autoclobber is ``True``, the database will be destroyed
+    * If ``autoclobber`` is ``True``, the database will be destroyed
       without consulting the user.
 
     ``serialize`` determines if Django serializes the database into an

@@ -1006,8 +1006,6 @@ implementation details see :ref:`using-the-views`.
 
     .. attribute:: next_page
 
-        .. versionadded:: 4.0
-
         The URL to redirect to after login. Defaults to
         :setting:`LOGIN_REDIRECT_URL`.
 
@@ -1054,8 +1052,6 @@ implementation details see :ref:`using-the-views`.
         after login. Defaults to an empty :class:`set`.
 
     .. method:: get_default_redirect_url()
-
-        .. versionadded:: 4.0
 
         Returns the URL to redirect to after login. The default implementation
         resolves and returns :attr:`next_page` if set, or
@@ -1160,7 +1156,12 @@ implementation details see :ref:`using-the-views`.
 
 .. class:: LogoutView
 
-    Logs a user out.
+    Logs a user out on ``POST`` requests.
+
+    .. deprecated:: 4.1
+
+        Support for logging out on ``GET`` requests is deprecated and will be
+        removed in Django 5.0.
 
     **URL name:** ``logout``
 
@@ -1212,7 +1213,7 @@ implementation details see :ref:`using-the-views`.
 
 .. function:: logout_then_login(request, login_url=None)
 
-    Logs a user out, then redirects to the login page.
+    Logs a user out on ``POST`` requests, then redirects to the login page.
 
     **URL name:** No default URL provided
 
@@ -1220,6 +1221,11 @@ implementation details see :ref:`using-the-views`.
 
     * ``login_url``: The URL of the login page to redirect to.
       Defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
+
+    .. deprecated:: 4.1
+
+        Support for logging out on ``GET`` requests is deprecated and will be
+        removed in Django 5.0.
 
 .. class:: PasswordChangeView
 

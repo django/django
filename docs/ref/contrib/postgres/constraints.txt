@@ -12,7 +12,7 @@ PostgreSQL supports additional data integrity constraints available from the
 ``ExclusionConstraint``
 =======================
 
-.. class:: ExclusionConstraint(*, name, expressions, index_type=None, condition=None, deferrable=None, include=None, opclasses=())
+.. class:: ExclusionConstraint(*, name, expressions, index_type=None, condition=None, deferrable=None, include=None, opclasses=(), violation_error_message=None)
 
     Creates an exclusion constraint in the database. Internally, PostgreSQL
     implements exclusion constraints using indexes. The default index type is
@@ -27,12 +27,20 @@ PostgreSQL supports additional data integrity constraints available from the
     :exc:`~django.db.IntegrityError` is raised. Similarly, when update
     conflicts with an existing row.
 
+    Exclusion constraints are checked during the :ref:`model validation
+    <validating-objects>`.
+
+    .. versionchanged:: 4.1
+
+        In older versions, exclusion constraints were not checked during model
+        validation.
+
 ``name``
 --------
 
 .. attribute:: ExclusionConstraint.name
 
-The name of the constraint.
+See :attr:`.BaseConstraint.name`.
 
 ``expressions``
 ---------------
@@ -131,8 +139,8 @@ used for queries that select only included fields
 (:attr:`~ExclusionConstraint.include`) and filter only by indexed fields
 (:attr:`~ExclusionConstraint.expressions`).
 
-``include`` is supported for GiST indexes on PostgreSQL 12+ and SP-GiST
-indexes on PostgreSQL 14+.
+``include`` is supported for GiST indexes. PostgreSQL 14+ also supports
+``include`` for SP-GiST indexes.
 
 .. versionchanged:: 4.1
 
@@ -164,6 +172,15 @@ creates an exclusion constraint on ``circle`` using ``circle_ops``.
     The ``opclasses`` parameter is deprecated in favor of using
     :class:`OpClass() <django.contrib.postgres.indexes.OpClass>` in
     :attr:`~ExclusionConstraint.expressions`.
+
+``violation_error_message``
+---------------------------
+
+.. versionadded:: 4.1
+
+The error message used when ``ValidationError`` is raised during
+:ref:`model validation <validating-objects>`. Defaults to
+:attr:`.BaseConstraint.violation_error_message`.
 
 Examples
 --------

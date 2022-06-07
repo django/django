@@ -868,6 +868,18 @@ class AutodetectorTests(TestCase):
             "unique_together": {("title", "newfield2")},
         },
     )
+    book_unique_together = ModelState(
+        "otherapp",
+        "Book",
+        [
+            ("id", models.AutoField(primary_key=True)),
+            ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
+            ("title", models.CharField(max_length=200)),
+        ],
+        {
+            "unique_together": {("author", "title")},
+        },
+    )
     attribution = ModelState(
         "otherapp",
         "Attribution",
@@ -2410,6 +2422,37 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, ["AlterField"])
 
+    def test_alter_regex_string_to_compiled_regex(self):
+        regex_string = "^[a-z]+$"
+        from_state = ModelState(
+            "testapp",
+            "model",
+            [
+                (
+                    "id",
+                    models.AutoField(
+                        primary_key=True, validators=[RegexValidator(regex_string)]
+                    ),
+                )
+            ],
+        )
+        to_state = ModelState(
+            "testapp",
+            "model",
+            [
+                (
+                    "id",
+                    models.AutoField(
+                        primary_key=True,
+                        validators=[RegexValidator(re.compile(regex_string))],
+                    ),
+                )
+            ],
+        )
+        changes = self.get_changes([from_state], [to_state])
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterField"])
+
     def test_empty_foo_together(self):
         """
         #23452 - Empty unique/index_together shouldn't generate a migration.
@@ -2532,6 +2575,112 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, "otherapp", 0, ["RemoveIndex"])
         self.assertOperationAttributes(
             changes, "otherapp", 0, 0, model_name="book", name="book_title_author_idx"
+        )
+
+    def test_rename_indexes(self):
+        book_renamed_indexes = ModelState(
+            "otherapp",
+            "Book",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
+                ("title", models.CharField(max_length=200)),
+            ],
+            {
+                "indexes": [
+                    models.Index(
+                        fields=["author", "title"], name="renamed_book_title_author_idx"
+                    )
+                ],
+            },
+        )
+        changes = self.get_changes(
+            [self.author_empty, self.book_indexes],
+            [self.author_empty, book_renamed_indexes],
+        )
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(changes, "otherapp", 0, ["RenameIndex"])
+        self.assertOperationAttributes(
+            changes,
+            "otherapp",
+            0,
+            0,
+            model_name="book",
+            new_name="renamed_book_title_author_idx",
+            old_name="book_title_author_idx",
+        )
+
+    def test_rename_index_together_to_index(self):
+        changes = self.get_changes(
+            [self.author_empty, self.book_foo_together],
+            [self.author_empty, self.book_indexes],
+        )
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(
+            changes, "otherapp", 0, ["RenameIndex", "AlterUniqueTogether"]
+        )
+        self.assertOperationAttributes(
+            changes,
+            "otherapp",
+            0,
+            0,
+            model_name="book",
+            new_name="book_title_author_idx",
+            old_fields=("author", "title"),
+        )
+        self.assertOperationAttributes(
+            changes,
+            "otherapp",
+            0,
+            1,
+            name="book",
+            unique_together=set(),
+        )
+
+    def test_rename_index_together_to_index_extra_options(self):
+        # Indexes with extra options don't match indexes in index_together.
+        book_partial_index = ModelState(
+            "otherapp",
+            "Book",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
+                ("title", models.CharField(max_length=200)),
+            ],
+            {
+                "indexes": [
+                    models.Index(
+                        fields=["author", "title"],
+                        condition=models.Q(title__startswith="The"),
+                        name="book_title_author_idx",
+                    )
+                ],
+            },
+        )
+        changes = self.get_changes(
+            [self.author_empty, self.book_foo_together],
+            [self.author_empty, book_partial_index],
+        )
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(
+            changes,
+            "otherapp",
+            0,
+            ["AlterUniqueTogether", "AlterIndexTogether", "AddIndex"],
+        )
+
+    def test_rename_index_together_to_index_order_fields(self):
+        # Indexes with reordered fields don't match indexes in index_together.
+        changes = self.get_changes(
+            [self.author_empty, self.book_foo_together],
+            [self.author_empty, self.book_unordered_indexes],
+        )
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(
+            changes,
+            "otherapp",
+            0,
+            ["AlterUniqueTogether", "AlterIndexTogether", "AddIndex"],
         )
 
     def test_order_fields_indexes(self):
@@ -3661,16 +3810,16 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(
-            changes, "testapp", 0, ["RemoveField", "AddField", "DeleteModel"]
+            changes, "testapp", 0, ["RemoveField", "DeleteModel", "AddField"]
         )
         self.assertOperationAttributes(
             changes, "testapp", 0, 0, name="publishers", model_name="author"
         )
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Publisher")
         self.assertOperationAttributes(
-            changes, "testapp", 0, 1, name="publishers", model_name="author"
+            changes, "testapp", 0, 2, name="publishers", model_name="author"
         )
-        self.assertOperationAttributes(changes, "testapp", 0, 2, name="Publisher")
-        self.assertOperationFieldAttributes(changes, "testapp", 0, 1, max_length=100)
+        self.assertOperationFieldAttributes(changes, "testapp", 0, 2, max_length=100)
 
     def test_non_circular_foreignkey_dependency_removal(self):
         """
@@ -4207,6 +4356,36 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="book")
         self.assertMigrationDependencies(
             changes, "testapp", 0, [("otherapp", "__first__")]
+        )
+
+    def test_alter_unique_together_fk_to_m2m(self):
+        changes = self.get_changes(
+            [self.author_name, self.book_unique_together],
+            [
+                self.author_name,
+                ModelState(
+                    "otherapp",
+                    "Book",
+                    [
+                        ("id", models.AutoField(primary_key=True)),
+                        ("author", models.ManyToManyField("testapp.Author")),
+                        ("title", models.CharField(max_length=200)),
+                    ],
+                ),
+            ],
+        )
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(
+            changes, "otherapp", 0, ["AlterUniqueTogether", "RemoveField", "AddField"]
+        )
+        self.assertOperationAttributes(
+            changes, "otherapp", 0, 0, name="book", unique_together=set()
+        )
+        self.assertOperationAttributes(
+            changes, "otherapp", 0, 1, model_name="book", name="author"
+        )
+        self.assertOperationAttributes(
+            changes, "otherapp", 0, 2, model_name="book", name="author"
         )
 
     def test_alter_field_to_fk_dependency_other_app(self):

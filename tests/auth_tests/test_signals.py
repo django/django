@@ -60,13 +60,13 @@ class SignalTestCase(TestCase):
     def test_logout_anonymous(self):
         # The log_out function will still trigger the signal for anonymous
         # users.
-        self.client.get("/logout/next_page/")
+        self.client.post("/logout/next_page/")
         self.assertEqual(len(self.logged_out), 1)
         self.assertIsNone(self.logged_out[0])
 
     def test_logout(self):
         self.client.login(username="testclient", password="password")
-        self.client.get("/logout/next_page/")
+        self.client.post("/logout/next_page/")
         self.assertEqual(len(self.logged_out), 1)
         self.assertEqual(self.logged_out[0].username, "testclient")
 

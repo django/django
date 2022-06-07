@@ -34,6 +34,19 @@ You can evaluate a ``QuerySet`` in the following ways:
   Note: Don't use this if all you want to do is determine if at least one
   result exists. It's more efficient to use :meth:`~QuerySet.exists`.
 
+* **Asynchronous iteration.**. A ``QuerySet`` can also be iterated over using
+  ``async for``::
+
+      async for e in Entry.objects.all():
+        results.append(e)
+
+  Both synchronous and asynchronous iterators of QuerySets share the same
+  underlying cache.
+
+  .. versionchanged:: 4.1
+
+    Support for asynchronous iteration was added.
+
 * **Slicing.** As explained in :ref:`limiting-querysets`, a ``QuerySet`` can
   be sliced, using Python's array-slicing syntax. Slicing an unevaluated
   ``QuerySet`` usually returns another unevaluated ``QuerySet``, but Django
@@ -175,6 +188,12 @@ Methods that return new ``QuerySet``\s
 Django provides a range of ``QuerySet`` refinement methods that modify either
 the types of results returned by the ``QuerySet`` or the way its SQL query is
 executed.
+
+.. note::
+
+    These methods do not run database queries, therefore they are **safe to**
+    **run in asynchronous code**, and do not have separate asynchronous
+    versions.
 
 ``filter()``
 ~~~~~~~~~~~~
@@ -1581,6 +1600,13 @@ A queryset that has deferred fields will still return model instances. Each
 deferred field will be retrieved from the database if you access that field
 (one at a time, not all the deferred fields at once).
 
+.. note::
+
+    Deferred fields will not lazy-load like this from asynchronous code.
+    Instead, you will get a ``SynchronousOnlyOperation`` exception. If you are
+    writing asynchronous code, you should not try to access any fields that you
+    ``defer()``.
+
 You can make multiple calls to ``defer()``. Each call adds new fields to the
 deferred set::
 
@@ -1618,8 +1644,8 @@ one, doing so will result in an error.
     the full set of fields for the model will be significant.
 
     Even if you think you are in the advanced use-case situation, **only use
-    defer() when you cannot, at queryset load time, determine if you will need
-    the extra fields or not**. If you are frequently loading and using a
+    ``defer()`` when you cannot, at queryset load time, determine if you will
+    need the extra fields or not**. If you are frequently loading and using a
     particular subset of your data, the best choice you can make is to
     normalize your models and put the non-loaded data into a separate model
     (and database table). If the columns *must* stay in the one table for some
@@ -1702,6 +1728,11 @@ options.
 
 Using :meth:`only` and omitting a field requested using :meth:`select_related`
 is an error as well.
+
+As with ``defer()``, you cannot access the non-loaded fields from asynchronous
+code and expect them to load. Instead, you will get a
+``SynchronousOnlyOperation`` exception. Ensure that all fields you might access
+are in your ``only()`` call.
 
 .. note::
 
@@ -1838,10 +1869,6 @@ raised if ``select_for_update()`` is used in autocommit mode.
     PostgreSQL doesn't support ``select_for_update()`` with
     :class:`~django.db.models.expressions.Window` expressions.
 
-.. versionchanged:: 4.0
-
-    The ``skip_locked`` argument was allowed on MariaDB 10.6+.
-
 ``raw()``
 ~~~~~~~~~
 
@@ -1946,10 +1973,25 @@ something *other than* a ``QuerySet``.
 These methods do not use a cache (see :ref:`caching-and-querysets`). Rather,
 they query the database each time they're called.
 
+Because these methods evaluate the QuerySet, they are blocking calls, and so
+their main (synchronous) versions cannot be called from asynchronous code. For
+this reason, each has a corresponding asynchronous version with an ``a`` prefix
+- for example, rather than ``get(…)`` you can ``await aget(…)``.
+
+There is usually no difference in behavior apart from their asynchronous
+nature, but any differences are noted below next to each method.
+
+.. versionchanged:: 4.1
+
+    The asynchronous versions of each method, prefixed with ``a`` was added.
+
 ``get()``
 ~~~~~~~~~
 
 .. method:: get(*args, **kwargs)
+.. method:: aget(*args, **kwargs)
+
+*Asynchronous version*: ``aget()``
 
 Returns the object matching the given lookup parameters, which should be in
 the format described in `Field lookups`_. You should use lookups that are
@@ -1989,10 +2031,17 @@ can use :exc:`django.core.exceptions.ObjectDoesNotExist`  to handle
     except ObjectDoesNotExist:
         print("Either the blog or entry doesn't exist.")
 
+.. versionchanged:: 4.1
+
+    ``aget()`` method was added.
+
 ``create()``
 ~~~~~~~~~~~~
 
 .. method:: create(**kwargs)
+.. method:: acreate(*args, **kwargs)
+
+*Asynchronous version*: ``acreate()``
 
 A convenience method for creating an object and saving it all in one step.  Thus::
 
@@ -2013,10 +2062,17 @@ database, a call to ``create()`` will fail with an
 :exc:`~django.db.IntegrityError` since primary keys must be unique. Be
 prepared to handle the exception if you are using manual primary keys.
 
+.. versionchanged:: 4.1
+
+    ``acreate()`` method was added.
+
 ``get_or_create()``
 ~~~~~~~~~~~~~~~~~~~
 
 .. method:: get_or_create(defaults=None, **kwargs)
+.. method:: aget_or_create(defaults=None, **kwargs)
+
+*Asynchronous version*: ``aget_or_create()``
 
 A convenience method for looking up an object with the given ``kwargs`` (may be
 empty if your model has defaults for all fields), creating one if necessary.
@@ -2138,10 +2194,17 @@ whenever a request to a page has a side effect on your data. For more, see
   chapter because it isn't related to that book, but it can't create it either
   because ``title`` field should be unique.
 
+.. versionchanged:: 4.1
+
+    ``aget_or_create()`` method was added.
+
 ``update_or_create()``
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: update_or_create(defaults=None, **kwargs)
+.. method:: aupdate_or_create(defaults=None, **kwargs)
+
+*Asynchronous version*: ``aupdate_or_create()``
 
 A convenience method for updating an object with the given ``kwargs``, creating
 a new one if necessary. The ``defaults`` is a dictionary of (field, value)
@@ -2188,10 +2251,17 @@ Like :meth:`get_or_create` and :meth:`create`, if you're using manually
 specified primary keys and an object needs to be created but the key already
 exists in the database, an :exc:`~django.db.IntegrityError` is raised.
 
+.. versionchanged:: 4.1
+
+    ``aupdate_or_create()`` method was added.
+
 ``bulk_create()``
 ~~~~~~~~~~~~~~~~~
 
 .. method:: bulk_create(objs, batch_size=None, ignore_conflicts=False, update_conflicts=False, update_fields=None, unique_fields=None)
+.. method:: abulk_create(objs, batch_size=None, ignore_conflicts=False, update_conflicts=False, update_fields=None, unique_fields=None)
+
+*Asynchronous version*: ``abulk_create()``
 
 This method inserts the provided list of objects into the database in an
 efficient manner (generally only 1 query, no matter how many objects there
@@ -2257,20 +2327,21 @@ support it).
 .. _MySQL documentation: https://dev.mysql.com/doc/refman/en/sql-mode.html#ignore-strict-comparison
 .. _MariaDB documentation: https://mariadb.com/kb/en/ignore/
 
-.. versionchanged:: 4.0
-
-    Support for the fetching primary key attributes on SQLite 3.35+ was added.
-
 .. versionchanged:: 4.1
 
     The ``update_conflicts``, ``update_fields``, and ``unique_fields``
     parameters were added to support updating fields when a row insertion fails
     on conflict.
 
+    ``abulk_create()`` method was added.
+
 ``bulk_update()``
 ~~~~~~~~~~~~~~~~~
 
 .. method:: bulk_update(objs, fields, batch_size=None)
+.. method:: abulk_update(objs, fields, batch_size=None)
+
+*Asynchronous version*: ``abulk_update()``
 
 This method efficiently updates the given fields on the provided model
 instances, generally with one query, and returns the number of objects
@@ -2284,10 +2355,6 @@ updated::
     >>> objs[1].headline = 'This is entry 2'
     >>> Entry.objects.bulk_update(objs, ['headline'])
     2
-
-.. versionchanged:: 4.0
-
-    The return value of the number of objects updated was added.
 
 :meth:`.QuerySet.update` is used to save the changes, so this is more efficient
 than iterating through the list of models and calling ``save()`` on each of
@@ -2313,10 +2380,17 @@ The ``batch_size`` parameter controls how many objects are saved in a single
 query. The default is to update all objects in one batch, except for SQLite
 and Oracle which have restrictions on the number of variables used in a query.
 
+.. versionchanged:: 4.1
+
+    ``abulk_update()`` method was added.
+
 ``count()``
 ~~~~~~~~~~~
 
 .. method:: count()
+.. method:: acount()
+
+*Asynchronous version*: ``acount()``
 
 Returns an integer representing the number of objects in the database matching
 the ``QuerySet``.
@@ -2342,10 +2416,17 @@ database query like ``count()`` would.
 If the queryset has already been fully retrieved, ``count()`` will use that
 length rather than perform an extra database query.
 
+.. versionchanged:: 4.1
+
+    ``acount()`` method was added.
+
 ``in_bulk()``
 ~~~~~~~~~~~~~
 
 .. method:: in_bulk(id_list=None, *, field_name='pk')
+.. method:: ain_bulk(id_list=None, *, field_name='pk')
+
+*Asynchronous version*: ``ain_bulk()``
 
 Takes a list of field values (``id_list``) and the ``field_name`` for those
 values, and returns a dictionary mapping each value to an instance of the
@@ -2374,19 +2455,29 @@ Example::
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 
+.. versionchanged:: 4.1
+
+    ``ain_bulk()`` method was added.
+
 ``iterator()``
 ~~~~~~~~~~~~~~
 
 .. method:: iterator(chunk_size=None)
+.. method:: aiterator(chunk_size=None)
+
+*Asynchronous version*: ``aiterator()``
 
 Evaluates the ``QuerySet`` (by performing the query) and returns an iterator
-(see :pep:`234`) over the results. A ``QuerySet`` typically caches its results
-internally so that repeated evaluations do not result in additional queries. In
-contrast, ``iterator()`` will read results directly, without doing any caching
-at the ``QuerySet`` level (internally, the default iterator calls ``iterator()``
-and caches the return value). For a ``QuerySet`` which returns a large number of
-objects that you only need to access once, this can result in better
-performance and a significant reduction in memory.
+(see :pep:`234`) over the results, or an asynchronous iterator (see :pep:`492`)
+if you call its asynchronous version ``aiterator``.
+
+A ``QuerySet`` typically caches its results internally so that repeated
+evaluations do not result in additional queries. In contrast, ``iterator()``
+will read results directly, without doing any caching at the ``QuerySet`` level
+(internally, the default iterator calls ``iterator()`` and caches the return
+value). For a ``QuerySet`` which returns a large number of objects that you
+only need to access once, this can result in better performance and a
+significant reduction in memory.
 
 Note that using ``iterator()`` on a ``QuerySet`` which has already been
 evaluated will force it to evaluate again, repeating the query.
@@ -2394,6 +2485,11 @@ evaluated will force it to evaluate again, repeating the query.
 ``iterator()`` is compatible with previous calls to ``prefetch_related()`` as
 long as ``chunk_size`` is given. Larger values will necessitate fewer queries
 to accomplish the prefetching at the cost of greater memory usage.
+
+.. note::
+
+    ``aiterator()`` is *not* compatible with previous calls to
+    ``prefetch_related()``.
 
 On some databases (e.g. Oracle, `SQLite
 <https://www.sqlite.org/limits.html#max_variable_number>`_), the maximum number
@@ -2411,7 +2507,9 @@ once or streamed from the database using server-side cursors.
 
 .. versionchanged:: 4.1
 
-    Support for prefetching related objects was added.
+    Support for prefetching related objects was added to ``iterator()``.
+
+    ``aiterator()`` method was added.
 
 .. deprecated:: 4.1
 
@@ -2471,6 +2569,9 @@ value for ``chunk_size`` will result in Django using an implicit default of
 ~~~~~~~~~~~~
 
 .. method:: latest(*fields)
+.. method:: alatest(*fields)
+
+*Asynchronous version*: ``alatest()``
 
 Returns the latest object in the table based on the given field(s).
 
@@ -2512,18 +2613,32 @@ readability.
 
         Entry.objects.filter(pub_date__isnull=False).latest('pub_date')
 
+.. versionchanged:: 4.1
+
+    ``alatest()`` method was added.
+
 ``earliest()``
 ~~~~~~~~~~~~~~
 
 .. method:: earliest(*fields)
+.. method:: aearliest(*fields)
+
+*Asynchronous version*: ``aearliest()``
 
 Works otherwise like :meth:`~django.db.models.query.QuerySet.latest` except
 the direction is changed.
+
+.. versionchanged:: 4.1
+
+    ``aearliest()`` method was added.
 
 ``first()``
 ~~~~~~~~~~~
 
 .. method:: first()
+.. method:: afirst()
+
+*Asynchronous version*: ``afirst()``
 
 Returns the first object matched by the queryset, or ``None`` if there
 is no matching object. If the ``QuerySet`` has no ordering defined, then the
@@ -2542,17 +2657,31 @@ equivalent to the above example::
     except IndexError:
         p = None
 
+.. versionchanged:: 4.1
+
+    ``afirst()`` method was added.
+
 ``last()``
 ~~~~~~~~~~
 
 .. method:: last()
+.. method:: alast()
+
+*Asynchronous version*: ``alast()``
 
 Works like  :meth:`first()`, but returns the last object in the queryset.
+
+.. versionchanged:: 4.1
+
+    ``alast()`` method was added.
 
 ``aggregate()``
 ~~~~~~~~~~~~~~~
 
 .. method:: aggregate(*args, **kwargs)
+.. method:: aaggregate(*args, **kwargs)
+
+*Asynchronous version*: ``aaggregate()``
 
 Returns a dictionary of aggregate values (averages, sums, etc.) calculated over
 the ``QuerySet``. Each argument to ``aggregate()`` specifies a value that will
@@ -2585,10 +2714,17 @@ control the name of the aggregation value that is returned::
 For an in-depth discussion of aggregation, see :doc:`the topic guide on
 Aggregation </topics/db/aggregation>`.
 
+.. versionchanged:: 4.1
+
+    ``aaggregate()`` method was added.
+
 ``exists()``
 ~~~~~~~~~~~~
 
 .. method:: exists()
+.. method:: aexists()
+
+*Asynchronous version*: ``aexists()``
 
 Returns ``True`` if the :class:`.QuerySet` contains any results, and ``False``
 if not. This tries to perform the query in the simplest and fastest way
@@ -2618,12 +2754,17 @@ more overall work (one query for the existence check plus an extra one to later
 retrieve the results) than using ``bool(some_queryset)``, which retrieves the
 results and then checks if any were returned.
 
+.. versionchanged:: 4.1
+
+    ``aexists()`` method was added.
+
 ``contains()``
 ~~~~~~~~~~~~~~
 
 .. method:: contains(obj)
+.. method:: acontains(obj)
 
-.. versionadded:: 4.0
+*Asynchronous version*: ``acontains()``
 
 Returns ``True`` if the :class:`.QuerySet` contains ``obj``, and ``False`` if
 not. This tries to perform the query in the simplest and fastest way possible.
@@ -2647,10 +2788,17 @@ know that it will be at some point, then using ``some_queryset.contains(obj)``
 will make an additional database query, generally resulting in slower overall
 performance.
 
+.. versionchanged:: 4.1
+
+    ``acontains()`` method was added.
+
 ``update()``
 ~~~~~~~~~~~~
 
 .. method:: update(**kwargs)
+.. method:: aupdate(**kwargs)
+
+*Asynchronous version*: ``aupdate()``
 
 Performs an SQL update query for the specified fields, and returns
 the number of rows matched (which may not be equal to the number of rows
@@ -2721,6 +2869,10 @@ update a bunch of records for a model that has a custom
         e.comments_on = False
         e.save()
 
+.. versionchanged:: 4.1
+
+    ``aupdate()`` method was added.
+
 Ordered queryset
 ^^^^^^^^^^^^^^^^
 
@@ -2739,6 +2891,9 @@ unique field in the order that is specified without conflicts. For example::
 ~~~~~~~~~~~~
 
 .. method:: delete()
+.. method:: adelete()
+
+*Asynchronous version*: ``adelete()``
 
 Performs an SQL delete query on all rows in the :class:`.QuerySet` and
 returns the number of objects deleted and a dictionary with the number of
@@ -2789,6 +2944,10 @@ ForeignKeys which are set to :attr:`~django.db.models.ForeignKey.on_delete`
 Note that the queries generated in object deletion is an implementation
 detail subject to change.
 
+.. versionchanged:: 4.1
+
+    ``adelete()`` method was added.
+
 ``as_manager()``
 ~~~~~~~~~~~~~~~~
 
@@ -2798,10 +2957,16 @@ Class method that returns an instance of :class:`~django.db.models.Manager`
 with a copy of the ``QuerySet``’s methods. See
 :ref:`create-manager-with-queryset-methods` for more details.
 
+Note that unlike the other entries in this section, this does not have an
+asynchronous variant as it does not execute a query.
+
 ``explain()``
 ~~~~~~~~~~~~~
 
 .. method:: explain(format=None, **options)
+.. method:: aexplain(format=None, **options)
+
+*Asynchronous version*: ``aexplain()``
 
 Returns a string of the ``QuerySet``’s execution plan, which details how the
 database would execute the query, including any indexes or joins that would be
@@ -2840,6 +3005,10 @@ On some databases, flags may cause the query to be executed which could have
 adverse effects on your database. For example, the ``ANALYZE`` flag supported
 by MariaDB, MySQL 8.0.18+, and PostgreSQL could result in changes to data if
 there are triggers or if a function is called, even for a ``SELECT`` query.
+
+.. versionchanged:: 4.1
+
+    ``aexplain()`` method was added.
 
 .. _field-lookups:
 
@@ -3649,8 +3818,6 @@ example usage.
 
 ``default``
 ~~~~~~~~~~~
-
-.. versionadded:: 4.0
 
 An optional argument that allows specifying a value to use as a default value
 when the queryset (or grouping) contains no entries.

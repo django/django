@@ -41,6 +41,8 @@ class ResolverMatch:
         namespaces=None,
         route=None,
         tried=None,
+        captured_kwargs=None,
+        extra_kwargs=None,
     ):
         self.func = func
         self.args = args
@@ -48,6 +50,8 @@ class ResolverMatch:
         self.url_name = url_name
         self.route = route
         self.tried = tried
+        self.captured_kwargs = captured_kwargs
+        self.extra_kwargs = extra_kwargs
 
         # If a URLRegexResolver doesn't have a namespace or app_name, it passes
         # in an empty value.
@@ -78,7 +82,7 @@ class ResolverMatch:
             func = self._func_path
         return (
             "ResolverMatch(func=%s, args=%r, kwargs=%r, url_name=%r, "
-            "app_names=%r, namespaces=%r, route=%r)"
+            "app_names=%r, namespaces=%r, route=%r%s%s)"
             % (
                 func,
                 self.args,
@@ -87,6 +91,10 @@ class ResolverMatch:
                 self.app_names,
                 self.namespaces,
                 self.route,
+                f", captured_kwargs={self.captured_kwargs!r}"
+                if self.captured_kwargs
+                else "",
+                f", extra_kwargs={self.extra_kwargs!r}" if self.extra_kwargs else "",
             )
         )
 
@@ -416,27 +424,18 @@ class URLPattern:
     def resolve(self, path):
         match = self.pattern.match(path)
         if match:
-            new_path, args, kwargs = match
-            # Pass any extra_kwargs as **kwargs.
-            kwargs.update(self.default_args)
+            new_path, args, captured_kwargs = match
+            # Pass any default args as **kwargs.
+            kwargs = {**captured_kwargs, **self.default_args}
             return ResolverMatch(
-                self.callback, args, kwargs, self.pattern.name, route=str(self.pattern)
+                self.callback,
+                args,
+                kwargs,
+                self.pattern.name,
+                route=str(self.pattern),
+                captured_kwargs=captured_kwargs,
+                extra_kwargs=self.default_args,
             )
-
-    @cached_property
-    def lookup_str(self):
-        """
-        A string that identifies the view (e.g. 'path.to.view_function' or
-        'path.to.ClassBasedView').
-        """
-        callback = self.callback
-        if isinstance(callback, functools.partial):
-            callback = callback.func
-        if hasattr(callback, "view_class"):
-            callback = callback.view_class
-        elif not hasattr(callback, "__name__"):
-            return callback.__module__ + "." + callback.__class__.__name__
-        return callback.__module__ + "." + callback.__qualname__
 
 
 class URLResolver:
@@ -455,9 +454,6 @@ class URLResolver:
         self._reverse_dict = {}
         self._namespace_dict = {}
         self._app_dict = {}
-        # set of dotted paths to all functions and classes that are used in
-        # urlpatterns
-        self._callback_strs = set()
         self._populated = False
         self._local = Local()
 
@@ -531,7 +527,6 @@ class URLResolver:
                 if p_pattern.startswith("^"):
                     p_pattern = p_pattern[1:]
                 if isinstance(url_pattern, URLPattern):
-                    self._callback_strs.add(url_pattern.lookup_str)
                     bits = normalize(url_pattern.pattern.regex.pattern)
                     lookups.appendlist(
                         url_pattern.callback,
@@ -590,7 +585,6 @@ class URLResolver:
                             namespaces[namespace] = (p_pattern + prefix, sub_pattern)
                         for app_name, namespace_list in url_pattern.app_dict.items():
                             apps.setdefault(app_name, []).extend(namespace_list)
-                    self._callback_strs.update(url_pattern._callback_strs)
             self._namespace_dict[language_code] = namespaces
             self._app_dict[language_code] = apps
             self._reverse_dict[language_code] = lookups
@@ -635,11 +629,6 @@ class URLResolver:
             route2 = route2[1:]
         return route1 + route2
 
-    def _is_callback(self, name):
-        if not self._populated:
-            self._populate()
-        return name in self._callback_strs
-
     def resolve(self, path):
         path = str(path)  # path may be a reverse_lazy object
         tried = []
@@ -678,6 +667,11 @@ class URLResolver:
                             [self.namespace] + sub_match.namespaces,
                             self._join_route(current_route, sub_match.route),
                             tried,
+                            captured_kwargs=sub_match.captured_kwargs,
+                            extra_kwargs={
+                                **self.default_kwargs,
+                                **sub_match.extra_kwargs,
+                            },
                         )
                     tried.append([pattern])
             raise Resolver404({"tried": tried, "path": new_path})
@@ -737,7 +731,14 @@ class URLResolver:
                 else:
                     if set(kwargs).symmetric_difference(params).difference(defaults):
                         continue
-                    if any(kwargs.get(k, v) != v for k, v in defaults.items()):
+                    matches = True
+                    for k, v in defaults.items():
+                        if k in params:
+                            continue
+                        if kwargs.get(k, v) != v:
+                            matches = False
+                            break
+                    if not matches:
                         continue
                     candidate_subs = kwargs
                 # Convert the candidate subs to text using Converter.to_url().

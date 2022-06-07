@@ -46,8 +46,7 @@ class TrigramTest(PostgreSQLTestCase):
 
     def test_trigram_similarity(self):
         search = "Bat sat on cat."
-        # Round result of similarity because PostgreSQL 12+ uses greater
-        # precision.
+        # Round result of similarity because PostgreSQL uses greater precision.
         self.assertQuerysetEqual(
             self.Model.objects.filter(
                 field__trigram_similar=search,
@@ -77,8 +76,7 @@ class TrigramTest(PostgreSQLTestCase):
         )
 
     def test_trigram_similarity_alternate(self):
-        # Round result of distance because PostgreSQL 12+ uses greater
-        # precision.
+        # Round result of distance because PostgreSQL uses greater precision.
         self.assertQuerysetEqual(
             self.Model.objects.annotate(
                 distance=TrigramDistance("field", "Bat sat on cat."),

@@ -217,7 +217,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             alter_field and getattr(alter_field[1], "primary_key", False)
         ):
             for name, field in list(body.items()):
-                if field.primary_key:
+                if field.primary_key and not (
+                    # Do not remove the old primary key when an altered field
+                    # that introduces a primary key is the same field.
+                    alter_field
+                    and name == alter_field[1].name
+                ):
                     field.primary_key = False
                     restore_pk_field = field
                     if field.auto_created:
@@ -450,7 +455,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Alter by remaking table
         self._remake_table(model, alter_field=(old_field, new_field))
         # Rebuild tables with FKs pointing to this field.
-        if new_field.unique and old_type != new_type:
+        old_collation = old_db_params.get("collation")
+        new_collation = new_db_params.get("collation")
+        if new_field.unique and (
+            old_type != new_type or old_collation != new_collation
+        ):
             related_models = set()
             opts = new_field.model._meta
             for remote_field in opts.related_objects:

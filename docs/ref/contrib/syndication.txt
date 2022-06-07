@@ -1043,7 +1043,7 @@ and there are a set of methods that ``SyndicationFeed`` calls to get these extra
 attributes. Thus, you can subclass the appropriate feed generator class
 (``Atom1Feed`` or ``Rss201rev2Feed``) and extend these callbacks. They are:
 
-.. _georss: http://georss.org/
+.. _georss: https://georss.org
 .. _itunes podcast format: https://help.apple.com/itc/podcasts_connect/#/itcb54353390
 
 ``SyndicationFeed.root_attributes(self)``

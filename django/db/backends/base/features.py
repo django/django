@@ -176,6 +176,9 @@ class BaseDatabaseFeatures:
     # Can it create foreign key constraints inline when adding columns?
     can_create_inline_fk = True
 
+    # Can an index be renamed?
+    can_rename_index = False
+
     # Does it automatically index foreign keys?
     indexes_foreign_keys = True
 
@@ -257,15 +260,15 @@ class BaseDatabaseFeatures:
     create_test_procedure_without_params_sql = None
     create_test_procedure_with_int_param_sql = None
 
+    # SQL to create a table with a composite primary key for use by the Django
+    # test suite.
+    create_test_table_with_composite_primary_key = None
+
     # Does the backend support keyword parameters for cursor.callproc()?
     supports_callproc_kwargs = False
 
     # What formats does the backend EXPLAIN syntax support?
     supported_explain_formats = set()
-
-    # Does DatabaseOperations.explain_query_prefix() raise ValueError if
-    # unknown kwargs are passed to QuerySet.explain()?
-    validates_explain_options = True
 
     # Does the backend support the default parameter in lead() and lag()?
     supports_default_in_lead_lag = True

@@ -15,6 +15,12 @@ def get_default_renderer():
 
 
 class BaseRenderer:
+    # RemovedInDjango50Warning: When the deprecation ends, replace with
+    # form_template_name = "django/forms/div.html"
+    # formset_template_name = "django/forms/formsets/div.html"
+    form_template_name = "django/forms/default.html"
+    formset_template_name = "django/forms/formsets/default.html"
+
     def get_template(self, template_name):
         raise NotImplementedError("subclasses must implement get_template()")
 
@@ -59,6 +65,31 @@ class Jinja2(EngineMixin, BaseRenderer):
         from django.template.backends.jinja2 import Jinja2
 
         return Jinja2
+
+
+class DjangoDivFormRenderer(DjangoTemplates):
+    """
+    Load Django templates from django/forms/templates and from apps'
+    'templates' directory and use the 'div.html' template to render forms and
+    formsets.
+    """
+
+    # RemovedInDjango50Warning Deprecate this class in 5.0 and remove in 6.0.
+
+    form_template_name = "django/forms/div.html"
+    formset_template_name = "django/forms/formsets/div.html"
+
+
+class Jinja2DivFormRenderer(Jinja2):
+    """
+    Load Jinja2 templates from the built-in widget templates in
+    django/forms/jinja2 and from apps' 'jinja2' directory.
+    """
+
+    # RemovedInDjango50Warning Deprecate this class in 5.0 and remove in 6.0.
+
+    form_template_name = "django/forms/div.html"
+    formset_template_name = "django/forms/formsets/div.html"
 
 
 class TemplatesSetting(BaseRenderer):

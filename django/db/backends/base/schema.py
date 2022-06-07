@@ -1,4 +1,5 @@
 import logging
+import operator
 from datetime import datetime
 
 from django.db.backends.ddl_references import (
@@ -35,11 +36,15 @@ def _is_relevant_relation(relation, altered_field):
 
 
 def _all_related_fields(model):
-    return model._meta._get_fields(
-        forward=False,
-        reverse=True,
-        include_hidden=True,
-        include_parents=False,
+    # Related fields must be returned in a deterministic order.
+    return sorted(
+        model._meta._get_fields(
+            forward=False,
+            reverse=True,
+            include_hidden=True,
+            include_parents=False,
+        ),
+        key=operator.attrgetter("name"),
     )
 
 
@@ -126,6 +131,7 @@ class BaseDatabaseSchemaEditor:
         "CREATE UNIQUE INDEX %(name)s ON %(table)s "
         "(%(columns)s)%(include)s%(condition)s"
     )
+    sql_rename_index = "ALTER INDEX %(old_name)s RENAME TO %(new_name)s"
     sql_delete_index = "DROP INDEX %(name)s"
 
     sql_create_pk = (
@@ -275,10 +281,11 @@ class BaseDatabaseSchemaEditor:
 
     # Field <-> database mapping functions
 
-    def _iter_column_sql(self, column_db_type, params, model, field, include_default):
+    def _iter_column_sql(
+        self, column_db_type, params, model, field, field_db_params, include_default
+    ):
         yield column_db_type
-        collation = getattr(field, "db_collation", None)
-        if collation:
+        if collation := field_db_params.get("collation"):
             yield self._collate_sql(collation)
         # Work out nullability.
         null = field.null
@@ -335,8 +342,8 @@ class BaseDatabaseSchemaEditor:
         had set_attributes_from_name() called.
         """
         # Get the column's type and use that as the basis of the SQL.
-        db_params = field.db_parameters(connection=self.connection)
-        column_db_type = db_params["type"]
+        field_db_params = field.db_parameters(connection=self.connection)
+        column_db_type = field_db_params["type"]
         # Check for fields that aren't actually columns (e.g. M2M).
         if column_db_type is None:
             return None, None
@@ -345,7 +352,12 @@ class BaseDatabaseSchemaEditor:
             " ".join(
                 # This appends to the params being returned.
                 self._iter_column_sql(
-                    column_db_type, params, model, field, include_default
+                    column_db_type,
+                    params,
+                    model,
+                    field,
+                    field_db_params,
+                    include_default,
                 )
             ),
             params,
@@ -481,6 +493,16 @@ class BaseDatabaseSchemaEditor:
             return None
         self.execute(index.remove_sql(model, self))
 
+    def rename_index(self, model, old_index, new_index):
+        if self.connection.features.can_rename_index:
+            self.execute(
+                self._rename_index_sql(model, old_index.name, new_index.name),
+                params=None,
+            )
+        else:
+            self.remove_index(model, old_index)
+            self.add_index(model, new_index)
+
     def add_constraint(self, model, constraint):
         """Add a constraint to a model."""
         sql = constraint.create_sql(model, self)
@@ -506,7 +528,10 @@ class BaseDatabaseSchemaEditor:
         # Deleted uniques
         for fields in olds.difference(news):
             self._delete_composed_index(
-                model, fields, {"unique": True}, self.sql_delete_unique
+                model,
+                fields,
+                {"unique": True, "primary_key": False},
+                self.sql_delete_unique,
             )
         # Created uniques
         for field_names in news.difference(olds):
@@ -546,6 +571,17 @@ class BaseDatabaseSchemaEditor:
             exclude=meta_constraint_names | meta_index_names,
             **constraint_kwargs,
         )
+        if (
+            constraint_kwargs.get("unique") is True
+            and constraint_names
+            and self.connection.features.allows_multiple_constraints_on_same_fields
+        ):
+            # Constraint matching the unique_together name.
+            default_name = str(
+                self._unique_constraint_name(model._meta.db_table, columns, quote=False)
+            )
+            if default_name in constraint_names:
+                constraint_names = [default_name]
         if len(constraint_names) != 1:
             raise ValueError(
                 "Found wrong number (%s) of constraints for %s(%s)"
@@ -817,13 +853,15 @@ class BaseDatabaseSchemaEditor:
                 self.execute(self._delete_unique_sql(model, constraint_name))
         # Drop incoming FK constraints if the field is a primary key or unique,
         # which might be a to_field target, and things are going to change.
+        old_collation = old_db_params.get("collation")
+        new_collation = new_db_params.get("collation")
         drop_foreign_keys = (
             self.connection.features.supports_foreign_keys
             and (
                 (old_field.primary_key and new_field.primary_key)
                 or (old_field.unique and new_field.unique)
             )
-            and old_type != new_type
+            and ((old_type != new_type) or (old_collation != new_collation))
         )
         if drop_foreign_keys:
             # '_meta.related_field' also contains M2M reverse fields, these
@@ -904,9 +942,10 @@ class BaseDatabaseSchemaEditor:
         actions = []
         null_actions = []
         post_actions = []
+        # Type suffix change? (e.g. auto increment).
+        old_type_suffix = old_field.db_type_suffix(connection=self.connection)
+        new_type_suffix = new_field.db_type_suffix(connection=self.connection)
         # Collation change?
-        old_collation = getattr(old_field, "db_collation", None)
-        new_collation = getattr(new_field, "db_collation", None)
         if old_collation != new_collation:
             # Collation change handles also a type change.
             fragment = self._alter_column_collation_sql(
@@ -914,7 +953,7 @@ class BaseDatabaseSchemaEditor:
             )
             actions.append(fragment)
         # Type change?
-        elif old_type != new_type:
+        elif (old_type, old_type_suffix) != (new_type, new_type_suffix):
             fragment, other_actions = self._alter_column_type_sql(
                 model, old_field, new_field, new_type
             )
@@ -1029,9 +1068,22 @@ class BaseDatabaseSchemaEditor:
         for old_rel, new_rel in rels_to_update:
             rel_db_params = new_rel.field.db_parameters(connection=self.connection)
             rel_type = rel_db_params["type"]
-            fragment, other_actions = self._alter_column_type_sql(
-                new_rel.related_model, old_rel.field, new_rel.field, rel_type
-            )
+            rel_collation = rel_db_params.get("collation")
+            old_rel_db_params = old_rel.field.db_parameters(connection=self.connection)
+            old_rel_collation = old_rel_db_params.get("collation")
+            if old_rel_collation != rel_collation:
+                # Collation change handles also a type change.
+                fragment = self._alter_column_collation_sql(
+                    new_rel.related_model,
+                    new_rel.field,
+                    rel_type,
+                    rel_collation,
+                )
+                other_actions = []
+            else:
+                fragment, other_actions = self._alter_column_type_sql(
+                    new_rel.related_model, old_rel.field, new_rel.field, rel_type
+                )
             self.execute(
                 self.sql_alter_column
                 % {
@@ -1334,6 +1386,14 @@ class BaseDatabaseSchemaEditor:
             name=self.quote_name(name),
         )
 
+    def _rename_index_sql(self, model, old_name, new_name):
+        return Statement(
+            self.sql_rename_index,
+            table=Table(model._meta.db_table, self.quote_name),
+            old_name=self.quote_name(old_name),
+            new_name=self.quote_name(new_name),
+        )
+
     def _index_columns(self, table, columns, col_suffixes, opclasses):
         return Columns(table, columns, self.quote_name, col_suffixes=col_suffixes)
 
@@ -1376,22 +1436,9 @@ class BaseDatabaseSchemaEditor:
         # - changing only a field name
         # - changing an attribute that doesn't affect the schema
         # - adding only a db_column and the column name is not changed
-        non_database_attrs = [
-            "blank",
-            "db_column",
-            "editable",
-            "error_messages",
-            "help_text",
-            "limit_choices_to",
-            # Database-level options are not supported, see #21961.
-            "on_delete",
-            "related_name",
-            "related_query_name",
-            "validators",
-            "verbose_name",
-        ]
-        for attr in non_database_attrs:
+        for attr in old_field.non_db_attrs:
             old_kwargs.pop(attr, None)
+        for attr in new_field.non_db_attrs:
             new_kwargs.pop(attr, None)
         return self.quote_name(old_field.column) != self.quote_name(
             new_field.column
@@ -1527,16 +1574,13 @@ class BaseDatabaseSchemaEditor:
         ):
             return None
 
-        def create_unique_name(*args, **kwargs):
-            return self.quote_name(self._create_index_name(*args, **kwargs))
-
         compiler = Query(model, alias_cols=False).get_compiler(
             connection=self.connection
         )
         table = model._meta.db_table
         columns = [field.column for field in fields]
         if name is None:
-            name = IndexName(table, columns, "_uniq", create_unique_name)
+            name = self._unique_constraint_name(table, columns, quote=True)
         else:
             name = self.quote_name(name)
         if condition or include or opclasses or expressions:
@@ -1558,6 +1602,17 @@ class BaseDatabaseSchemaEditor:
             deferrable=self._deferrable_constraint_sql(deferrable),
             include=self._index_include_sql(model, include),
         )
+
+    def _unique_constraint_name(self, table, columns, quote=True):
+        if quote:
+
+            def create_unique_name(*args, **kwargs):
+                return self.quote_name(self._create_index_name(*args, **kwargs))
+
+        else:
+            create_unique_name = self._create_index_name
+
+        return IndexName(table, columns, "_uniq", create_unique_name)
 
     def _delete_unique_sql(
         self,

@@ -242,7 +242,7 @@ Read-only attributes
 Methods
 -------
 
-.. method:: AppConfig.get_models()
+.. method:: AppConfig.get_models(include_auto_created=False, include_swapped=False)
 
     Returns an iterable of :class:`~django.db.models.Model` classes for this
     application.
@@ -311,7 +311,7 @@ Methods
         once by Django. But in some corner cases, particularly in tests which
         are fiddling with installed applications, ``ready`` might be called more
         than once. In that case, either write idempotent methods, or put a flag
-        on your ``AppConfig`` classes to prevent re-running code which should
+        on your ``AppConfig`` classes to prevent rerunning code which should
         be executed exactly one time.
 
 .. _namespace package:

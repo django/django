@@ -241,14 +241,13 @@ Use the ``django.test.Client`` class to make requests.
 
         Submitting files is a special case. To POST a file, you need only
         provide the file field name as a key, and a file handle to the file you
-        wish to upload as a value. For example::
+        wish to upload as a value. For example, if your form has fields
+        ``name`` and ``attachment``, the latter a
+        :class:`~django.forms.FileField`::
 
             >>> c = Client()
             >>> with open('wishlist.doc', 'rb') as fp:
             ...     c.post('/customers/wishes/', {'name': 'fred', 'attachment': fp})
-
-        (The name ``attachment`` here is not relevant; use whatever name your
-        file-processing code expects.)
 
         You may also provide any file-like object (e.g., :class:`~io.StringIO` or
         :class:`~io.BytesIO`) as a file handle. If you're uploading to an
@@ -906,11 +905,6 @@ It also provides an additional method:
                 self.assertEqual(mail.outbox[0].subject, 'Contact Form')
                 self.assertEqual(mail.outbox[0].body, 'I like your site')
 
-    .. versionchanged:: 4.0
-
-        In older versions, new callbacks added while executing
-        :func:`.transaction.on_commit` callbacks were not captured.
-
 .. _live-test-server:
 
 ``LiveServerTestCase``
@@ -1473,47 +1467,65 @@ your test suite.
 
         self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': ['Enter a valid email address.']})
 
-.. method:: SimpleTestCase.assertFormError(response, form, field, errors, msg_prefix='')
+.. method:: SimpleTestCase.assertFormError(form, field, errors, msg_prefix='')
 
-    Asserts that a field on a form raises the provided list of errors when
-    rendered on the form.
+    Asserts that a field on a form raises the provided list of errors.
 
-    ``response`` must be a response instance returned by the
-    :class:`test client <django.test.Response>`.
+    ``form`` is a ``Form`` instance. The form must be
+    :ref:`bound <ref-forms-api-bound-unbound>` but not necessarily
+    validated (``assertFormError()`` will automatically call ``full_clean()``
+    on the form).
 
-    ``form`` is the name the ``Form`` instance was given in the template
-    context of the response.
+    ``field`` is the name of the field on the form to check. To check the form's
+    :meth:`non-field errors <django.forms.Form.non_field_errors>`, use
+    ``field=None``.
 
-    ``field`` is the name of the field on the form to check. If ``field``
-    has a value of ``None``, non-field errors (errors you can access via
-    :meth:`form.non_field_errors() <django.forms.Form.non_field_errors>`) will
-    be checked.
+    ``errors`` is a list of all the error strings that the field is expected to
+    have. You can also pass a single error string if you only expect one error
+    which means that ``errors='error message'`` is the same as
+    ``errors=['error message']``.
 
-    ``errors`` is an error string, or a list of error strings, that are
-    expected as a result of form validation.
+    .. versionchanged:: 4.1
 
-.. method:: SimpleTestCase.assertFormsetError(response, formset, form_index, field, errors, msg_prefix='')
+        In older versions, using an empty error list with ``assertFormError()``
+        would always pass, regardless of whether the field had any errors or
+        not. Starting from Django 4.1, using ``errors=[]`` will only pass if
+        the field actually has no errors.
+
+        Django 4.1 also changed the behavior of ``assertFormError()`` when a
+        field has multiple errors. In older versions, if a field had multiple
+        errors and you checked for only some of them, the test would pass.
+        Starting from Django 4.1, the error list must be an exact match to the
+        field's actual errors.
+
+    .. deprecated:: 4.1
+
+        Support for passing a response object and a form name to
+        ``assertFormError()`` is deprecated and will be removed in Django 5.0.
+        Use the form instance directly instead.
+
+.. method:: SimpleTestCase.assertFormsetError(formset, form_index, field, errors, msg_prefix='')
 
     Asserts that the ``formset`` raises the provided list of errors when
     rendered.
 
-    ``response`` must be a response instance returned by the
-    :class:`test client <django.test.Response>`.
+    ``formset`` is a ``Formset`` instance. The formset must be bound but not
+    necessarily validated (``assertFormsetError()`` will automatically call the
+    ``full_clean()`` on the formset).
 
-    ``formset`` is the name the ``Formset`` instance was given in the template
-    context of the response.
+    ``form_index`` is the number of the form within the ``Formset`` (starting
+    from 0). Use ``form_index=None`` to check the formset's non-form errors,
+    i.e. the errors you get when calling ``formset.non_form_errors()``. In that
+    case you must also use ``field=None``.
 
-    ``form_index`` is the number of the form within the ``Formset``.  If
-    ``form_index`` has a value of ``None``, non-form errors (errors you can
-    access via ``formset.non_form_errors()``) will be checked.
+    ``field`` and ``errors`` have the same meaning as the parameters to
+    ``assertFormError()``.
 
-    ``field`` is the name of the field on the form to check. If ``field``
-    has a value of ``None``, non-field errors (errors you can access via
-    :meth:`form.non_field_errors() <django.forms.Form.non_field_errors>`) will
-    be checked.
+    .. deprecated:: 4.1
 
-    ``errors`` is an error string, or a list of error strings, that are
-    expected as a result of form validation.
+        Support for passing a response object and a formset name to
+        ``assertFormsetError()`` is deprecated and will be removed in Django
+        5.0. Use the formset instance directly instead.
 
 .. method:: SimpleTestCase.assertContains(response, text, count=None, status_code=200, msg_prefix='', html=False)
 
@@ -1631,12 +1643,6 @@ your test suite.
     raised if one of them cannot be parsed.
 
     Output in case of error can be customized with the ``msg`` argument.
-
-    .. versionchanged:: 4.0
-
-        In older versions, any attribute (not only boolean attributes) without
-        a value was considered equal to an attribute with the same name and
-        value.
 
 .. method:: SimpleTestCase.assertHTMLNotEqual(html1, html2, msg=None)
 

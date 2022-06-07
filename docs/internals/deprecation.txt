@@ -7,6 +7,16 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
+.. _deprecation-removed-in-5.1:
+
+5.1
+---
+
+See the :ref:`Django 4.2 release notes <deprecated-features-4.2>` for more
+details on these changes.
+
+* The ``BaseUserManager.make_random_password()`` method will be removed.
+
 .. _deprecation-removed-in-5.0:
 
 5.0
@@ -89,6 +99,28 @@ details on these changes.
 
 * ``created=True`` will be required in the signature of
   ``RemoteUserBackend.configure_user()`` subclasses.
+
+* Support for logging out via ``GET`` requests in the
+  ``django.contrib.auth.views.LogoutView`` and
+  ``django.contrib.auth.views.logout_then_login()`` will be removed.
+
+* The ``django.utils.timezone.utc`` alias to ``datetime.timezone.utc`` will be
+  removed.
+
+* Passing a response object and a form/formset name to
+  ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` will no
+  longer be allowed.
+
+* The ``django.contrib.gis.admin.OpenLayersWidget`` will be removed.
+
+* The ``django.contrib.auth.hashers.CryptPasswordHasher`` will be removed.
+
+* The ``"django/forms/default.html"`` and
+  ``"django/forms/formsets/default.html"`` templates will be removed.
+
+* The ability to pass ``nulls_first=False`` or ``nulls_last=False`` to
+  ``Expression.asc()`` and ``Expression.desc()`` methods, and the ``OrderBy``
+  expression will be removed.
 
 .. _deprecation-removed-in-4.1:
 

@@ -163,8 +163,6 @@ particularly temporary.
 Redis
 -----
 
-.. versionadded:: 4.0
-
 Redis__ is an in-memory database that can be used for caching. To begin you'll
 need a Redis server running either locally or on a remote machine.
 
@@ -185,7 +183,7 @@ To use Redis as your cache backend with Django:
 * Set :setting:`LOCATION <CACHES-LOCATION>` to the URL pointing to your Redis
   instance, using the appropriate scheme. See the ``redis-py`` docs for
   `details on the available schemes
-  <https://redis-py.readthedocs.io/en/stable/#redis.ConnectionPool.from_url>`_.
+  <https://redis-py.readthedocs.io/en/stable/connections.html#redis.connection.ConnectionPool.from_url>`_.
 
 For example, if Redis is running on localhost (127.0.0.1) port 6379::
 
@@ -568,8 +566,8 @@ class`_ (``redis.ConnectionPool`` is used by default)::
         }
     }
 
-.. _`parser class`: https://github.com/andymccurdy/redis-py#parsers
-.. _`connection pool class`: https://github.com/andymccurdy/redis-py#connection-pools
+.. _`parser class`: https://github.com/redis/redis-py#parsers
+.. _`connection pool class`: https://github.com/redis/redis-py#connection-pools
 
 .. _the-per-site-cache:
 
@@ -1074,10 +1072,6 @@ the cache backend.
     ``cache.aadd()`` or ``cache.adelete_many()``. See `Asynchronous support`_
     for more details.
 
-.. versionchanged:: 4.0
-
-    The async variants of methods were added to the ``BaseCache``.
-
 .. _cache_key_prefixing:
 
 Cache key prefixing
@@ -1208,8 +1202,6 @@ instance, to do this for the ``locmem`` backend, put this code in a module::
 
 Asynchronous support
 ====================
-
-.. versionadded:: 4.0
 
 Django has developing support for asynchronous cache backends, but does not
 yet support asynchronous caching. It will be coming in a future release.

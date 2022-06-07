@@ -123,8 +123,23 @@ If the URL does not resolve, the function raises a
 
     .. attribute:: ResolverMatch.kwargs
 
-        The keyword arguments that would be passed to the view
+        All keyword arguments that would be passed to the view function, i.e.
+        :attr:`~ResolverMatch.captured_kwargs` and
+        :attr:`~ResolverMatch.extra_kwargs`.
+
+    .. attribute:: ResolverMatch.captured_kwargs
+
+        .. versionadded:: 4.1
+
+        The captured keyword arguments that would be passed to the view
         function, as parsed from the URL.
+
+    .. attribute:: ResolverMatch.extra_kwargs
+
+        .. versionadded:: 4.1
+
+        The additional keyword arguments that would be passed to the view
+        function.
 
     .. attribute:: ResolverMatch.url_name
 

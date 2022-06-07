@@ -71,11 +71,6 @@ class BooleanFieldTests(TestCase):
         b4.refresh_from_db()
         self.assertIs(b4.nbfield, False)
 
-        # When an extra clause exists, the boolean conversions are applied with
-        # an offset (#13293).
-        b5 = BooleanModel.objects.extra(select={"string_col": "string"})[0]
-        self.assertNotIsInstance(b5.pk, bool)
-
     def test_select_related(self):
         """
         Boolean fields retrieved via select_related() should return booleans.

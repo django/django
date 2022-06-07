@@ -164,3 +164,6 @@ class ForeignKeyTests(TestCase):
 
             class MyModel(models.Model):
                 child = models.ForeignKey(1, models.CASCADE)
+
+    def test_manager_class_getitem(self):
+        self.assertIs(models.ForeignKey["Foo"], models.ForeignKey)

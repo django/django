@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from django.core.exceptions import ImproperlyConfigured
@@ -11,6 +12,7 @@ from django.http import (
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import classonlymethod
+from django.utils.functional import classproperty
 
 logger = logging.getLogger("django.request")
 
@@ -57,6 +59,23 @@ class View:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
+    @classproperty
+    def view_is_async(cls):
+        handlers = [
+            getattr(cls, method)
+            for method in cls.http_method_names
+            if (method != "options" and hasattr(cls, method))
+        ]
+        if not handlers:
+            return False
+        is_async = asyncio.iscoroutinefunction(handlers[0])
+        if not all(asyncio.iscoroutinefunction(h) == is_async for h in handlers[1:]):
+            raise ImproperlyConfigured(
+                f"{cls.__qualname__} HTTP handlers must either be all sync or all "
+                "async."
+            )
+        return is_async
+
     @classonlymethod
     def as_view(cls, **initkwargs):
         """Main entry point for a request-response process."""
@@ -96,6 +115,10 @@ class View:
         # the dispatch method.
         view.__dict__.update(cls.dispatch.__dict__)
 
+        # Mark the callback if the view class is async.
+        if cls.view_is_async:
+            view._is_coroutine = asyncio.coroutines._is_coroutine
+
         return view
 
     def setup(self, request, *args, **kwargs):
@@ -132,7 +155,15 @@ class View:
         response = HttpResponse()
         response.headers["Allow"] = ", ".join(self._allowed_methods())
         response.headers["Content-Length"] = "0"
-        return response
+
+        if self.view_is_async:
+
+            async def func():
+                return response
+
+            return func()
+        else:
+            return response
 
     def _allowed_methods(self):
         return [m.upper() for m in self.http_method_names if hasattr(self, m)]

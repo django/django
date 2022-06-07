@@ -127,10 +127,6 @@ Python style
         """
         ...
 
-.. versionchanged:: 4.0.3
-
-    All Python code in Django was reformatted with `black`_.
-
 .. _coding-style-imports:
 
 Imports
@@ -171,7 +167,7 @@ Imports
   For example (comments are for explanatory purposes only):
 
   .. code-block:: python
-      :caption: django/contrib/admin/example.py
+      :caption: ``django/contrib/admin/example.py``
 
       # future
       from __future__ import unicode_literals

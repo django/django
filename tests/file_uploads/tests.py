@@ -944,3 +944,9 @@ class MultiParserTests(SimpleTestCase):
         for raw_line, expected_title in test_data:
             parsed = parse_header(raw_line)
             self.assertEqual(parsed[1]["title"], expected_title)
+
+    def test_parse_header_with_double_quotes_and_semicolon(self):
+        self.assertEqual(
+            parse_header(b'form-data; name="files"; filename="fo\\"o;bar"'),
+            ("form-data", {"name": b"files", "filename": b'fo"o;bar'}),
+        )

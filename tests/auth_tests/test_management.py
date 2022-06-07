@@ -23,6 +23,7 @@ from .models import (
     CustomUserNonUniqueUsername,
     CustomUserWithFK,
     CustomUserWithM2M,
+    CustomUserWithUniqueConstraint,
     Email,
     Organization,
     UserProxy,
@@ -48,7 +49,7 @@ def mock_inputs(inputs):
     """
 
     def inner(test_func):
-        def wrapped(*args):
+        def wrapper(*args):
             class mock_getpass:
                 @staticmethod
                 def getpass(prompt=b"Password: ", stream=None):
@@ -89,7 +90,7 @@ def mock_inputs(inputs):
                 createsuperuser.getpass = old_getpass
                 builtins.input = old_input
 
-        return wrapped
+        return wrapper
 
     return inner
 
@@ -1049,6 +1050,41 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         @mock_inputs(
             {"password": return_passwords, "username": return_usernames, "email": ""}
         )
+        def test(self):
+            call_command(
+                "createsuperuser",
+                interactive=True,
+                stdin=MockTTY(),
+                stdout=new_io,
+                stderr=new_io,
+            )
+            self.assertEqual(
+                new_io.getvalue().strip(),
+                "Error: That username is already taken.\n"
+                "Superuser created successfully.",
+            )
+
+        test(self)
+
+    @override_settings(AUTH_USER_MODEL="auth_tests.CustomUserWithUniqueConstraint")
+    def test_existing_username_meta_unique_constraint(self):
+        """
+        Creation fails if the username already exists and a custom user model
+        has UniqueConstraint.
+        """
+        user = CustomUserWithUniqueConstraint.objects.create(username="janet")
+        new_io = StringIO()
+        entered_passwords = ["password", "password"]
+        # Enter the existing username first and then a new one.
+        entered_usernames = [user.username, "joe"]
+
+        def return_passwords():
+            return entered_passwords.pop(0)
+
+        def return_usernames():
+            return entered_usernames.pop(0)
+
+        @mock_inputs({"password": return_passwords, "username": return_usernames})
         def test(self):
             call_command(
                 "createsuperuser",

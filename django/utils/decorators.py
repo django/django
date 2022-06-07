@@ -120,7 +120,7 @@ def make_middleware_decorator(middleware_class):
             middleware = middleware_class(view_func, *m_args, **m_kwargs)
 
             @wraps(view_func)
-            def _wrapped_view(request, *args, **kwargs):
+            def _wrapper_view(request, *args, **kwargs):
                 if hasattr(middleware, "process_request"):
                     result = middleware.process_request(request)
                     if result is not None:
@@ -155,7 +155,7 @@ def make_middleware_decorator(middleware_class):
                         return middleware.process_response(request, response)
                 return response
 
-            return _wrapped_view
+            return _wrapper_view
 
         return _decorator
 

@@ -157,66 +157,50 @@ class ConnectionHandler(BaseConnectionHandler):
             )
         elif databases[DEFAULT_DB_ALIAS] == {}:
             databases[DEFAULT_DB_ALIAS]["ENGINE"] = "django.db.backends.dummy"
+
+        # Configure default settings.
+        for conn in databases.values():
+            conn.setdefault("ATOMIC_REQUESTS", False)
+            conn.setdefault("AUTOCOMMIT", True)
+            conn.setdefault("ENGINE", "django.db.backends.dummy")
+            if conn["ENGINE"] == "django.db.backends." or not conn["ENGINE"]:
+                conn["ENGINE"] = "django.db.backends.dummy"
+            conn.setdefault("CONN_MAX_AGE", 0)
+            conn.setdefault("CONN_HEALTH_CHECKS", False)
+            conn.setdefault("OPTIONS", {})
+            conn.setdefault("TIME_ZONE", None)
+            for setting in [
+                "NAME",
+                "USER",
+                "PASSWORD",
+                "HOST",
+                "PORT",
+                "SYNC_DATABASE_ALIAS",
+                "ASYNC_DATABASE_ALIAS",
+            ]:
+                conn.setdefault(setting, "")
+
+            test_settings = conn.setdefault("TEST", {})
+            default_test_settings = [
+                ("CHARSET", None),
+                ("COLLATION", None),
+                ("MIGRATE", True),
+                ("MIRROR", None),
+                ("NAME", None),
+            ]
+            for key, value in default_test_settings:
+                test_settings.setdefault(key, value)
         return databases
 
     @property
     def databases(self):
+        # Maintained for backward compatibility as some 3rd party packages have
+        # made use of this private API in the past. It is no longer used within
+        # Django itself.
         return self.settings
 
-    def ensure_defaults(self, alias):
-        """
-        Put the defaults into the settings dictionary for a given connection
-        where no settings is provided.
-        """
-        try:
-            conn = self.databases[alias]
-        except KeyError:
-            raise self.exception_class(f"The connection '{alias}' doesn't exist.")
-
-        conn.setdefault("ATOMIC_REQUESTS", False)
-        conn.setdefault("AUTOCOMMIT", True)
-        conn.setdefault("ENGINE", "django.db.backends.dummy")
-        if conn["ENGINE"] == "django.db.backends." or not conn["ENGINE"]:
-            conn["ENGINE"] = "django.db.backends.dummy"
-        conn.setdefault("CONN_MAX_AGE", 0)
-        conn.setdefault("CONN_HEALTH_CHECKS", False)
-        conn.setdefault("OPTIONS", {})
-        conn.setdefault("TIME_ZONE", None)
-        for setting in [
-            "NAME",
-            "USER",
-            "PASSWORD",
-            "HOST",
-            "PORT",
-            "SYNC_DATABASE_ALIAS",
-            "ASYNC_DATABASE_ALIAS",
-        ]:
-            conn.setdefault(setting, "")
-
-    def prepare_test_settings(self, alias):
-        """
-        Make sure the test settings are available in the 'TEST' sub-dictionary.
-        """
-        try:
-            conn = self.databases[alias]
-        except KeyError:
-            raise self.exception_class(f"The connection '{alias}' doesn't exist.")
-
-        test_settings = conn.setdefault("TEST", {})
-        default_test_settings = [
-            ("CHARSET", None),
-            ("COLLATION", None),
-            ("MIGRATE", True),
-            ("MIRROR", None),
-            ("NAME", None),
-        ]
-        for key, value in default_test_settings:
-            test_settings.setdefault(key, value)
-
     def create_connection(self, alias):
-        self.ensure_defaults(alias)
-        self.prepare_test_settings(alias)
-        db = self.databases[alias]
+        db = self.settings[alias]
         backend = load_backend(db["ENGINE"])
         return backend.DatabaseWrapper(db, alias)
 

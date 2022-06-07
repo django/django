@@ -526,16 +526,14 @@ class AdminSite:
                     "models": [model_dict],
                 }
 
-        if label:
-            return app_dict.get(label)
         return app_dict
 
-    def get_app_list(self, request):
+    def get_app_list(self, request, app_label=None):
         """
         Return a sorted list of all the installed apps that have been
         registered in this site.
         """
-        app_dict = self._build_app_dict(request)
+        app_dict = self._build_app_dict(request, app_label)
 
         # Sort the apps alphabetically.
         app_list = sorted(app_dict.values(), key=lambda x: x["name"].lower())
@@ -568,16 +566,16 @@ class AdminSite:
         )
 
     def app_index(self, request, app_label, extra_context=None):
-        app_dict = self._build_app_dict(request, app_label)
-        if not app_dict:
+        app_list = self.get_app_list(request, app_label)
+
+        if not app_list:
             raise Http404("The requested admin page does not exist.")
-        # Sort the models alphabetically within each app.
-        app_dict["models"].sort(key=lambda x: x["name"])
+
         context = {
             **self.each_context(request),
-            "title": _("%(app)s administration") % {"app": app_dict["name"]},
+            "title": _("%(app)s administration") % {"app": app_list[0]["name"]},
             "subtitle": None,
-            "app_list": [app_dict],
+            "app_list": app_list,
             "app_label": app_label,
             **(extra_context or {}),
         }

@@ -55,6 +55,13 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         # Date/DateTime fields and timedeltas.
         "expressions.tests.FTimeDeltaTests.test_mixed_comparisons1",
     }
+    create_test_table_with_composite_primary_key = """
+        CREATE TABLE test_table_composite_pk (
+            column_1 INTEGER NOT NULL,
+            column_2 INTEGER NOT NULL,
+            PRIMARY KEY(column_1, column_2)
+        )
+    """
 
     def _django_test_skips(self, sqlite_version_info):
         skips = {

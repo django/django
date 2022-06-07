@@ -146,10 +146,6 @@ class PerformUniqueChecksTest(TestCase):
             mtv = ModelToValidate(number=10, name="Some Name")
             mtv.full_clean()
 
-    def test_func_unique_check_not_performed(self):
-        with self.assertNumQueries(0):
-            UniqueFuncConstraintModel(field="some name").full_clean()
-
     def test_unique_for_date(self):
         Post.objects.create(
             title="Django 1.0 is released",

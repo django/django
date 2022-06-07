@@ -28,10 +28,10 @@ able to store certain characters in the database, and information will be lost.
   for internal encoding.
 
 .. _MySQL manual: https://dev.mysql.com/doc/refman/en/charset-database.html
-.. _PostgreSQL manual: https://www.postgresql.org/docs/current/multibyte.html#id-1.6.10.5.6
-.. _Oracle manual: https://docs.oracle.com/en/database/oracle/oracle-database/18/nlspg/index.html
-.. _section 2: https://docs.oracle.com/en/database/oracle/oracle-database/18/nlspg/choosing-character-set.html
-.. _section 11: https://docs.oracle.com/en/database/oracle/oracle-database/18/nlspg/character-set-migration.html
+.. _PostgreSQL manual: https://www.postgresql.org/docs/current/multibyte.html#id-1.6.11.5.6
+.. _Oracle manual: https://docs.oracle.com/en/database/oracle/oracle-database/21/nlspg/index.html
+.. _section 2: https://docs.oracle.com/en/database/oracle/oracle-database/21/nlspg/choosing-character-set.html
+.. _section 11: https://docs.oracle.com/en/database/oracle/oracle-database/21/nlspg/character-set-migration.html
 
 All of Django's database backends automatically convert strings into
 the appropriate encoding for talking to the database. They also automatically

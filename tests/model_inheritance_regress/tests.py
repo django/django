@@ -667,3 +667,15 @@ class ModelInheritanceTest(TestCase):
             Politician.objects.get(pk=c1.politician_ptr_id).title,
             "senator 1",
         )
+
+    def test_mti_update_parent_through_child(self):
+        Politician.objects.create()
+        Congressman.objects.create()
+        Congressman.objects.update(title="senator 1")
+        self.assertEqual(Congressman.objects.get().title, "senator 1")
+
+    def test_mti_update_grand_parent_through_child(self):
+        Politician.objects.create()
+        Senator.objects.create()
+        Senator.objects.update(title="senator 1")
+        self.assertEqual(Senator.objects.get().title, "senator 1")

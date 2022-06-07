@@ -69,11 +69,6 @@ PostgreSQL
 PostgreSQL is the most capable of all the databases here in terms of schema
 support.
 
-The only caveat is that prior to PostgreSQL 11, adding columns with default
-values causes a full rewrite of the table, for a time proportional to its size.
-For this reason, it's recommended you always create new columns with
-``null=True``, as this way they will be added immediately.
-
 MySQL
 -----
 
@@ -426,7 +421,7 @@ historical model versions rather than importing them directly.
 
   If you import models directly rather than using the historical models,
   your migrations *may work initially* but will fail in the future when you
-  try to re-run old migrations (commonly, when you set up a new installation
+  try to rerun old migrations (commonly, when you set up a new installation
   and run through all the migrations to set up the database).
 
   This means that historical model problems may not be immediately obvious.

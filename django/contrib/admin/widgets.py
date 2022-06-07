@@ -318,6 +318,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
             "can_change_related": self.can_change_related,
             "can_delete_related": self.can_delete_related,
             "can_view_related": self.can_view_related,
+            "model_has_limit_choices_to": self.rel.limit_choices_to,
         }
         if self.can_add_related:
             context["add_related_url"] = self.get_related_url(info, "add")

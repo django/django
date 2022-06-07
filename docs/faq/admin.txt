@@ -49,10 +49,10 @@ My "list_filter" contains a ManyToManyField, but the filter doesn't display.
 ============================================================================
 
 Django won't bother displaying the filter for a ``ManyToManyField`` if there
-are fewer than two related objects.
+are no related objects.
 
 For example, if your :attr:`~django.contrib.admin.ModelAdmin.list_filter`
-includes :doc:`sites </ref/contrib/sites>`, and there's only one site in your
+includes :doc:`sites </ref/contrib/sites>`, and there are no sites in your
 database, it won't display a "Site" filter. In that case, filtering by site
 would be meaningless.
 

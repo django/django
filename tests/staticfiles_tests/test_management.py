@@ -17,7 +17,6 @@ from django.core.management import CommandError, call_command
 from django.core.management.base import SystemCheckError
 from django.test import RequestFactory, override_settings
 from django.test.utils import extend_sys_path
-from django.utils import timezone
 from django.utils._os import symlinks_supported
 from django.utils.functional import empty
 
@@ -531,7 +530,7 @@ class TestCollectionNonLocalStorage(TestNoFilesCreated, CollectionTestCase):
         storage = DummyStorage()
         self.assertEqual(
             storage.get_modified_time("name"),
-            datetime.datetime(1970, 1, 1, tzinfo=timezone.utc),
+            datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc),
         )
         with self.assertRaisesMessage(
             NotImplementedError, "This backend doesn't support absolute paths."

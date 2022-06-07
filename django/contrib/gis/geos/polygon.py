@@ -21,7 +21,7 @@ class Polygon(GEOSGeometry):
         >>> poly = Polygon(shell, (hole1, hole2))
 
         >>> # Example where a tuple parameters are used:
-        >>> poly = Polygon(((0, 0), (0, 10), (10, 10), (0, 10), (0, 0)),
+        >>> poly = Polygon(((0, 0), (0, 10), (10, 10), (10, 0), (0, 0)),
         ...                ((4, 4), (4, 6), (6, 6), (6, 4), (4, 4)))
         """
         if not args:

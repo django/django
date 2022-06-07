@@ -865,11 +865,14 @@ class FormattingTests(SimpleTestCase):
         self.maxDiff = 3000
         # Catalan locale
         with translation.override("ca", deactivate=True):
-            self.assertEqual(r"j \d\e F \d\e Y", get_format("DATE_FORMAT"))
+            self.assertEqual(r"j E \d\e Y", get_format("DATE_FORMAT"))
             self.assertEqual(1, get_format("FIRST_DAY_OF_WEEK"))
             self.assertEqual(",", get_format("DECIMAL_SEPARATOR"))
             self.assertEqual("10:15", time_format(self.t))
             self.assertEqual("31 de desembre de 2009", date_format(self.d))
+            self.assertEqual(
+                "1 d'abril de 2009", date_format(datetime.date(2009, 4, 1))
+            )
             self.assertEqual(
                 "desembre del 2009", date_format(self.d, "YEAR_MONTH_FORMAT")
             )
@@ -1514,6 +1517,9 @@ class FormattingTests(SimpleTestCase):
     def test_get_format_modules_lang(self):
         with translation.override("de", deactivate=True):
             self.assertEqual(".", get_format("DECIMAL_SEPARATOR", lang="en"))
+
+    def test_get_format_lazy_format(self):
+        self.assertEqual(get_format(gettext_lazy("DATE_FORMAT")), "N j, Y")
 
     def test_localize_templatetag_and_filter(self):
         """
@@ -2355,7 +2361,7 @@ class WatchForTranslationChangesTests(SimpleTestCase):
 
     def test_i18n_app_dirs(self):
         mocked_sender = mock.MagicMock()
-        with self.settings(INSTALLED_APPS=["tests.i18n.sampleproject"]):
+        with self.settings(INSTALLED_APPS=["i18n.sampleproject"]):
             watch_for_translation_changes(mocked_sender)
         project_dir = Path(__file__).parent / "sampleproject" / "locale"
         mocked_sender.watch_dir.assert_any_call(project_dir, "**/*.mo")

@@ -2,6 +2,7 @@ import datetime
 from unittest import mock
 
 from django.contrib.postgres.indexes import OpClass
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError, NotSupportedError, connection, transaction
 from django.db.models import (
     CheckConstraint,
@@ -612,17 +613,25 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             timezone.datetime(2018, 6, 28),
             timezone.datetime(2018, 6, 29),
         ]
-        HotelReservation.objects.create(
+        reservation = HotelReservation.objects.create(
             datespan=DateRange(datetimes[0].date(), datetimes[1].date()),
             start=datetimes[0],
             end=datetimes[1],
             room=room102,
         )
+        constraint.validate(HotelReservation, reservation)
         HotelReservation.objects.create(
             datespan=DateRange(datetimes[1].date(), datetimes[3].date()),
             start=datetimes[1],
             end=datetimes[3],
             room=room102,
+        )
+        HotelReservation.objects.create(
+            datespan=DateRange(datetimes[3].date(), datetimes[4].date()),
+            start=datetimes[3],
+            end=datetimes[4],
+            room=room102,
+            cancelled=True,
         )
         # Overlap dates.
         with self.assertRaises(IntegrityError), transaction.atomic():
@@ -632,33 +641,58 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
                 end=datetimes[2],
                 room=room102,
             )
+            msg = f"Constraint “{constraint.name}” is violated."
+            with self.assertRaisesMessage(ValidationError, msg):
+                constraint.validate(HotelReservation, reservation)
             reservation.save()
         # Valid range.
-        HotelReservation.objects.bulk_create(
-            [
-                # Other room.
-                HotelReservation(
-                    datespan=(datetimes[1].date(), datetimes[2].date()),
-                    start=datetimes[1],
-                    end=datetimes[2],
-                    room=room101,
-                ),
-                # Cancelled reservation.
-                HotelReservation(
-                    datespan=(datetimes[1].date(), datetimes[1].date()),
-                    start=datetimes[1],
-                    end=datetimes[2],
-                    room=room102,
-                    cancelled=True,
-                ),
-                # Other adjacent dates.
-                HotelReservation(
-                    datespan=(datetimes[3].date(), datetimes[4].date()),
-                    start=datetimes[3],
-                    end=datetimes[4],
-                    room=room102,
-                ),
-            ]
+        other_valid_reservations = [
+            # Other room.
+            HotelReservation(
+                datespan=(datetimes[1].date(), datetimes[2].date()),
+                start=datetimes[1],
+                end=datetimes[2],
+                room=room101,
+            ),
+            # Cancelled reservation.
+            HotelReservation(
+                datespan=(datetimes[1].date(), datetimes[1].date()),
+                start=datetimes[1],
+                end=datetimes[2],
+                room=room102,
+                cancelled=True,
+            ),
+            # Other adjacent dates.
+            HotelReservation(
+                datespan=(datetimes[3].date(), datetimes[4].date()),
+                start=datetimes[3],
+                end=datetimes[4],
+                room=room102,
+            ),
+        ]
+        for reservation in other_valid_reservations:
+            constraint.validate(HotelReservation, reservation)
+        HotelReservation.objects.bulk_create(other_valid_reservations)
+        # Excluded fields.
+        constraint.validate(
+            HotelReservation,
+            HotelReservation(
+                datespan=(datetimes[1].date(), datetimes[2].date()),
+                start=datetimes[1],
+                end=datetimes[2],
+                room=room102,
+            ),
+            exclude={"room"},
+        )
+        constraint.validate(
+            HotelReservation,
+            HotelReservation(
+                datespan=(datetimes[1].date(), datetimes[2].date()),
+                start=datetimes[1],
+                end=datetimes[2],
+                room=room102,
+            ),
+            exclude={"datespan", "start", "end", "room"},
         )
 
     @ignore_warnings(category=RemovedInDjango50Warning)
@@ -731,6 +765,21 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             constraint_name, self.get_constraints(RangesModel._meta.db_table)
         )
 
+    def test_validate_range_adjacent(self):
+        constraint = ExclusionConstraint(
+            name="ints_adjacent",
+            expressions=[("ints", RangeOperators.ADJACENT_TO)],
+            violation_error_message="Custom error message.",
+        )
+        range_obj = RangesModel.objects.create(ints=(20, 50))
+        constraint.validate(RangesModel, range_obj)
+        msg = "Custom error message."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(RangesModel, RangesModel(ints=(10, 20)))
+        constraint.validate(RangesModel, RangesModel(ints=(10, 19)))
+        constraint.validate(RangesModel, RangesModel(ints=(51, 60)))
+        constraint.validate(RangesModel, RangesModel(ints=(10, 20)), exclude={"ints"})
+
     def test_expressions_with_params(self):
         constraint_name = "scene_left_equal"
         self.assertNotIn(constraint_name, self.get_constraints(Scene._meta.db_table))
@@ -796,7 +845,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         RangesModel.objects.create(ints=(10, 19))
         RangesModel.objects.create(ints=(51, 60))
 
-    @skipUnlessDBFeature("supports_covering_gist_indexes")
     def test_range_adjacent_gist_include(self):
         constraint_name = "ints_adjacent_gist_include"
         self.assertNotIn(
@@ -838,7 +886,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         RangesModel.objects.create(ints=(10, 19))
         RangesModel.objects.create(ints=(51, 60))
 
-    @skipUnlessDBFeature("supports_covering_gist_indexes")
     def test_range_adjacent_gist_include_condition(self):
         constraint_name = "ints_adjacent_gist_include_condition"
         self.assertNotIn(
@@ -872,7 +919,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             editor.add_constraint(RangesModel, constraint)
         self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
 
-    @skipUnlessDBFeature("supports_covering_gist_indexes")
     def test_range_adjacent_gist_include_deferrable(self):
         constraint_name = "ints_adjacent_gist_include_deferrable"
         self.assertNotIn(
@@ -905,27 +951,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.add_constraint(RangesModel, constraint)
         self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
-
-    def test_gist_include_not_supported(self):
-        constraint_name = "ints_adjacent_gist_include_not_supported"
-        constraint = ExclusionConstraint(
-            name=constraint_name,
-            expressions=[("ints", RangeOperators.ADJACENT_TO)],
-            index_type="gist",
-            include=["id"],
-        )
-        msg = (
-            "Covering exclusion constraints using a GiST index require "
-            "PostgreSQL 12+."
-        )
-        with connection.schema_editor() as editor:
-            with mock.patch(
-                "django.db.backends.postgresql.features.DatabaseFeatures."
-                "supports_covering_gist_indexes",
-                False,
-            ):
-                with self.assertRaisesMessage(NotSupportedError, msg):
-                    editor.add_constraint(RangesModel, constraint)
 
     def test_spgist_include_not_supported(self):
         constraint_name = "ints_adjacent_spgist_include_not_supported"
@@ -1013,7 +1038,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             editor.add_constraint(RangesModel, constraint)
         self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
 
-    @skipUnlessDBFeature("supports_covering_gist_indexes")
     def test_range_adjacent_gist_opclass_include(self):
         constraint_name = "ints_adjacent_gist_opclass_include"
         self.assertNotIn(
@@ -1161,7 +1185,6 @@ class ExclusionConstraintOpclassesDepracationTests(PostgreSQLTestCase):
         self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
 
     @ignore_warnings(category=RemovedInDjango50Warning)
-    @skipUnlessDBFeature("supports_covering_gist_indexes")
     def test_range_adjacent_gist_opclasses_include(self):
         constraint_name = "ints_adjacent_gist_opclasses_include"
         self.assertNotIn(

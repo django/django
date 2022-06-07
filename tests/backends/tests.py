@@ -548,6 +548,12 @@ class BackendTestCase(TransactionTestCase):
         )
         self.assertEqual(tuple(kwargs["extra"].values()), params[1:])
 
+    def test_queries_bare_where(self):
+        sql = f"SELECT 1{connection.features.bare_select_suffix} WHERE 1=1"
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
+            self.assertEqual(cursor.fetchone(), (1,))
+
     def test_timezone_none_use_tz_false(self):
         connection.ensure_connection()
         with self.settings(TIME_ZONE=None, USE_TZ=False):
@@ -688,8 +694,12 @@ class FkConstraintsTests(TransactionTestCase):
             a.reporter_id = 30
             with connection.constraint_checks_disabled():
                 a.save()
-                with self.assertRaises(IntegrityError):
+                try:
                     connection.check_constraints(table_names=[Article._meta.db_table])
+                except IntegrityError:
+                    pass
+                else:
+                    self.skipTest("This backend does not support integrity checks.")
             transaction.set_rollback(True)
 
     def test_check_constraints_sql_keywords(self):
@@ -699,8 +709,12 @@ class FkConstraintsTests(TransactionTestCase):
             obj.reporter_id = 30
             with connection.constraint_checks_disabled():
                 obj.save()
-                with self.assertRaises(IntegrityError):
+                try:
                     connection.check_constraints(table_names=["order"])
+                except IntegrityError:
+                    pass
+                else:
+                    self.skipTest("This backend does not support integrity checks.")
             transaction.set_rollback(True)
 
 

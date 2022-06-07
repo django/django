@@ -563,8 +563,8 @@ class TestSerialization(PostgreSQLSimpleTestCase):
 
     lower_date = datetime.date(2014, 1, 1)
     upper_date = datetime.date(2014, 2, 2)
-    lower_dt = datetime.datetime(2014, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
-    upper_dt = datetime.datetime(2014, 2, 2, 12, 12, 12, tzinfo=timezone.utc)
+    lower_dt = datetime.datetime(2014, 1, 1, 0, 0, 0, tzinfo=datetime.timezone.utc)
+    upper_dt = datetime.datetime(2014, 2, 2, 12, 12, 12, tzinfo=datetime.timezone.utc)
 
     def test_dumping(self):
         instance = RangesModel(
@@ -687,17 +687,15 @@ class TestFormField(PostgreSQLSimpleTestCase):
         self.assertHTMLEqual(
             str(form),
             """
-            <tr>
-                <th>
-                <label>Field:</label>
-                </th>
-                <td>
+            <div>
+                <fieldset>
+                    <legend>Field:</legend>
                     <input id="id_field_0_0" name="field_0_0" type="text">
                     <input id="id_field_0_1" name="field_0_1" type="text">
                     <input id="id_field_1_0" name="field_1_0" type="text">
                     <input id="id_field_1_1" name="field_1_1" type="text">
-                </td>
-            </tr>
+                </fieldset>
+            </div>
         """,
         )
         form = SplitForm(
@@ -788,13 +786,13 @@ class TestFormField(PostgreSQLSimpleTestCase):
         self.assertHTMLEqual(
             str(RangeForm()),
             """
-        <tr>
-            <th><label>Ints:</label></th>
-            <td>
+        <div>
+            <fieldset>
+                <legend>Ints:</legend>
                 <input id="id_ints_0" name="ints_0" type="number">
                 <input id="id_ints_1" name="ints_1" type="number">
-            </td>
-        </tr>
+            </fieldset>
+        </div>
         """,
         )
 
@@ -991,7 +989,8 @@ class TestFormField(PostgreSQLSimpleTestCase):
         field = pg_forms.DateTimeRangeField()
         value = field.prepare_value(
             DateTimeTZRange(
-                datetime.datetime(2015, 5, 22, 16, 6, 33, tzinfo=timezone.utc), None
+                datetime.datetime(2015, 5, 22, 16, 6, 33, tzinfo=datetime.timezone.utc),
+                None,
             )
         )
         self.assertEqual(value, [datetime.datetime(2015, 5, 22, 18, 6, 33), None])
@@ -1092,4 +1091,16 @@ class TestWidget(PostgreSQLSimpleTestCase):
             f.widget.render("datetimerange", dt_range),
             '<input type="text" name="datetimerange_0" value="2006-01-10 07:30:00">'
             '<input type="text" name="datetimerange_1" value="2006-02-12 09:50:00">',
+        )
+
+    def test_range_widget_render_tuple_value(self):
+        field = pg_forms.ranges.DateTimeRangeField()
+        dt_range_tuple = (
+            datetime.datetime(2022, 4, 22, 10, 24),
+            datetime.datetime(2022, 5, 12, 9, 25),
+        )
+        self.assertHTMLEqual(
+            field.widget.render("datetimerange", dt_range_tuple),
+            '<input type="text" name="datetimerange_0" value="2022-04-22 10:24:00">'
+            '<input type="text" name="datetimerange_1" value="2022-05-12 09:25:00">',
         )

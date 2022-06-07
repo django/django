@@ -130,15 +130,33 @@ class Field(RegisterLookupMixin):
         "null": _("This field cannot be null."),
         "blank": _("This field cannot be blank."),
         "unique": _("%(model_name)s with this %(field_label)s already exists."),
-        # Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-        # Eg: "Title must be unique for pub_date year"
         "unique_for_date": _(
+            # Translators: The 'lookup_type' is one of 'date', 'year' or
+            # 'month'. Eg: "Title must be unique for pub_date year"
             "%(field_label)s must be unique for "
             "%(date_field_label)s %(lookup_type)s."
         ),
     }
     system_check_deprecated_details = None
     system_check_removed_details = None
+
+    # Attributes that don't affect a column definition.
+    # These attributes are ignored when altering the field.
+    non_db_attrs = (
+        "blank",
+        "choices",
+        "db_column",
+        "editable",
+        "error_messages",
+        "help_text",
+        "limit_choices_to",
+        # Database-level options are not supported, see #21961.
+        "on_delete",
+        "related_name",
+        "related_query_name",
+        "validators",
+        "verbose_name",
+    )
 
     # Field flags
     hidden = False
@@ -1164,6 +1182,11 @@ class CharField(Field):
             return connection.ops.cast_char_field_without_max_length
         return super().cast_db_type(connection)
 
+    def db_parameters(self, connection):
+        db_params = super().db_parameters(connection)
+        db_params["collation"] = self.db_collation
+        return db_params
+
     def get_internal_type(self):
         return "CharField"
 
@@ -1212,7 +1235,7 @@ class CommaSeparatedIntegerField(CharField):
 
 def _to_naive(value):
     if timezone.is_aware(value):
-        value = timezone.make_naive(value, timezone.utc)
+        value = timezone.make_naive(value, datetime.timezone.utc)
     return value
 
 
@@ -2342,6 +2365,11 @@ class TextField(Field):
                     ),
                 )
         return errors
+
+    def db_parameters(self, connection):
+        db_params = super().db_parameters(connection)
+        db_params["collation"] = self.db_collation
+        return db_params
 
     def get_internal_type(self):
         return "TextField"

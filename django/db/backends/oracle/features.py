@@ -54,12 +54,20 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             V_I := P_I;
         END;
     """
+    create_test_table_with_composite_primary_key = """
+        CREATE TABLE test_table_composite_pk (
+            column_1 NUMBER(11) NOT NULL,
+            column_2 NUMBER(11) NOT NULL,
+            PRIMARY KEY (column_1, column_2)
+        )
+    """
     supports_callproc_kwargs = True
     supports_over_clause = True
     supports_frame_range_fixed_distance = True
     supports_ignore_conflicts = False
     max_query_params = 2**16 - 1
     supports_partial_indexes = False
+    can_rename_index = True
     supports_slicing_ordering_in_compound = True
     allows_multiple_constraints_on_same_fields = False
     supports_boolean_expr_in_select_clause = False
@@ -103,6 +111,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         },
         "Raises ORA-00600: internal error code.": {
             "model_fields.test_jsonfield.TestQuerying.test_usage_in_subquery",
+        },
+        "Oracle doesn't support changing collations on indexed columns (#33671).": {
+            "migrations.test_operations.OperationTests."
+            "test_alter_field_pk_fk_db_collation",
         },
     }
     django_test_expected_failures = {

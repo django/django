@@ -247,8 +247,8 @@ You can edit it multiple times.
 
     .. method:: get_session_cookie_age()
 
-      Returns the age of session cookies, in seconds. Defaults to
-      :setting:`SESSION_COOKIE_AGE`.
+      Returns the value of the setting :setting:`SESSION_COOKIE_AGE`. This can
+      be overridden in a custom session backend.
 
     .. method:: set_expiry(value)
 
@@ -288,13 +288,28 @@ You can edit it multiple times.
         ``None``. Defaults to the value stored in the session by
         :meth:`set_expiry`, if there is one, or ``None``.
 
+      .. note::
+
+        This method is used by session backends to determine the session expiry
+        age in seconds when saving the session. It is not really intended for
+        usage outside of that context.
+
+        In particular, while it is **possible** to determine the remaining
+        lifetime of a session **just when** you have the correct
+        ``modification`` value **and** the ``expiry`` is set as a ``datetime``
+        object, where you do have the ``modification`` value, it is more
+        straight-forward to calculate the expiry by-hand::
+
+            expires_at = modification + timedelta(seconds=settings.SESSION_COOKIE_AGE)
+
     .. method:: get_expiry_date()
 
       Returns the date this session will expire. For sessions with no custom
       expiration (or those set to expire at browser close), this will equal the
       date :setting:`SESSION_COOKIE_AGE` seconds from now.
 
-      This function accepts the same keyword arguments as :meth:`get_expiry_age`.
+      This function accepts the same keyword arguments as
+      :meth:`get_expiry_age`, and similar notes on usage apply.
 
     .. method:: get_expire_at_browser_close()
 
@@ -594,7 +609,7 @@ of ``request.session`` as described above in `using sessions in views`_.
 .. note::
 
     Some browsers (Chrome, for example) provide settings that allow users to
-    continue browsing sessions after closing and re-opening the browser. In
+    continue browsing sessions after closing and reopening the browser. In
     some cases, this can interfere with the
     :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE` setting and prevent sessions
     from expiring on browser close. Please be aware of this while testing

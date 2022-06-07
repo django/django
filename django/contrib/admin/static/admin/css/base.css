@@ -878,7 +878,7 @@ a.deletelink:focus, a.deletelink:hover {
     overflow: hidden;
 }
 
-#header a:link, #header a:visited {
+#header a:link, #header a:visited, #logout-form button {
     color: var(--header-link-color);
 }
 
@@ -895,10 +895,10 @@ a.deletelink:focus, a.deletelink:hover {
     margin: 0 20px 0 0;
     font-weight: 300;
     font-size: 1.5rem;
-    color: var(--accent);
+    color: var(--header-branding-color);
 }
 
-#branding h1, #branding h1 a:link, #branding h1 a:visited {
+#branding h1 a:link, #branding h1 a:visited {
     color: var(--accent);
 }
 
@@ -914,25 +914,43 @@ a.deletelink:focus, a.deletelink:hover {
     text-decoration: none;
 }
 
+#logout-form {
+    display: inline;
+}
+
+#logout-form button {
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font-family: "Roboto","Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
+}
+
 #user-tools {
     float: right;
-    padding: 0;
     margin: 0 0 0 20px;
+    text-align: right;
+}
+
+#user-tools, #logout-form button{
+    padding: 0;
     font-weight: 300;
     font-size: 0.6875rem;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    text-align: right;
 }
 
-#user-tools a {
+#user-tools a, #logout-form button {
     border-bottom: 1px solid rgba(255, 255, 255, 0.25);
 }
 
-#user-tools a:focus, #user-tools a:hover {
+#user-tools a:focus, #user-tools a:hover,
+#logout-form button:active, #logout-form button:hover {
     text-decoration: none;
-    border-bottom-color: var(--primary);
-    color: var(--primary);
+    border-bottom: 0;
+}
+
+#logout-form button:active, #logout-form button:hover {
+    margin-bottom: 1px;
 }
 
 /* SIDEBAR */

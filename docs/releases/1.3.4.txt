@@ -20,7 +20,7 @@ as was reported to us recently. The Host header parsing in Django 1.3.3 and
 Django 1.4.1 -- specifically, ``django.http.HttpRequest.get_host()`` -- was
 incorrectly handling username/password information in the header. Thus, for
 example, the following Host header would be accepted by Django when running on
-"validsite.com"::
+``validsite.com``::
 
     Host: validsite.com:random@evilsite.com
 

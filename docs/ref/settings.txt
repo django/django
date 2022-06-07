@@ -159,10 +159,6 @@ You can use a cache backend that doesn't ship with Django by setting
 :setting:`BACKEND <CACHES-BACKEND>` to a fully-qualified path of a cache
 backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
 
-.. versionchanged:: 4.0
-
-    The ``RedisCache`` backend was added.
-
 .. setting:: CACHES-KEY_FUNCTION
 
 ``KEY_FUNCTION``
@@ -494,13 +490,6 @@ The setting also supports subdomains, so you could add
 ``'https://*.example.com'``, for example, to allow access from all subdomains
 of ``example.com``.
 
-.. versionchanged:: 4.0
-
-    The values in older versions must only include the hostname (possibly with
-    a leading dot) and not the scheme or an asterisk.
-
-    Also, ``Origin`` header checking isn't performed in older versions.
-
 .. setting:: DATABASES
 
 ``DATABASES``
@@ -643,7 +632,7 @@ Default: ``False``
 If set to ``True``, existing :ref:`persistent database connections
 <persistent-database-connections>` will be health checked before they are
 reused in each request performing database access. If the health check fails,
-the connection will be re-established without failing the request when the
+the connection will be reestablished without failing the request when the
 connection is no longer usable but the database server is ready to accept and
 serve new connections (e.g. after database server restart closing existing
 connections).
@@ -2355,8 +2344,6 @@ already have it.
 ``SECURE_CROSS_ORIGIN_OPENER_POLICY``
 -------------------------------------
 
-.. versionadded:: 4.0
-
 Default: ``'same-origin'``
 
 Unless set to ``None``, the
@@ -2442,8 +2429,17 @@ required value. For example::
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 This tells Django to trust the ``X-Forwarded-Proto`` header that comes from our
-proxy, and any time its value is ``'https'``, then the request is guaranteed to
-be secure (i.e., it originally came in via HTTPS).
+proxy and that the request is guaranteed to be secure (i.e., it originally came
+in via HTTPS) when:
+
+* the header value is ``'https'``, or
+* its initial, leftmost value is ``'https'`` in the case of a comma-separated
+  list of protocols (e.g. ``'https,http,http'``).
+
+.. versionchanged:: 4.1
+
+    Support for a comma-separated list of protocols in the header value was
+    added.
 
 You should *only* set this setting if you control your proxy or have some other
 guarantee that it sets/strips this header appropriately.
@@ -2463,8 +2459,9 @@ available in ``request.META``.)
 
     * Your Django app is behind a proxy.
     * Your proxy strips the ``X-Forwarded-Proto`` header from all incoming
-      requests. In other words, if end users include that header in their
-      requests, the proxy will discard it.
+      requests, even when it contains a comma-separated list of protocols. In
+      other words, if end users include that header in their requests, the
+      proxy will discard it.
     * Your proxy sets the ``X-Forwarded-Proto`` header and sends it to Django,
       but only for requests that originally come in via HTTPS.
 
@@ -2831,8 +2828,6 @@ the correct environment.
 ``USE_DEPRECATED_PYTZ``
 -----------------------
 
-.. versionadded:: 4.0
-
 Default: ``False``
 
 A boolean that specifies whether to use ``pytz``, rather than :mod:`zoneinfo`,
@@ -2874,10 +2869,6 @@ default or not. If this is set to ``True``, e.g. Django will display numbers and
 dates using the format of the current locale.
 
 See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
-
-.. versionchanged:: 4.0
-
-    In older versions, the default value is ``False``.
 
 .. deprecated:: 4.0
 

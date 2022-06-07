@@ -285,8 +285,6 @@ editing content:
 
     .. attribute:: form_class
 
-        .. versionadded:: 4.0
-
         Inherited from :class:`~django.views.generic.edit.BaseDeleteView`. The
         form class that will be used to confirm the request. By default
         :class:`django.forms.Form`, resulting in an empty form that is always
@@ -336,8 +334,3 @@ editing content:
     * :class:`django.views.generic.edit.DeletionMixin`
     * :class:`django.views.generic.edit.FormMixin`
     * :class:`django.views.generic.detail.BaseDetailView`
-
-    .. versionchanged:: 4.0
-
-        In older versions, ``BaseDeleteView`` does not inherit from
-        ``FormMixin``.

@@ -185,12 +185,6 @@ class CollationOperation(Operation):
         )
 
     def create_collation(self, schema_editor):
-        if self.deterministic is False and not (
-            schema_editor.connection.features.supports_non_deterministic_collations
-        ):
-            raise NotSupportedError(
-                "Non-deterministic collations require PostgreSQL 12+."
-            )
         args = {"locale": schema_editor.quote_name(self.locale)}
         if self.provider != "libc":
             args["provider"] = schema_editor.quote_name(self.provider)

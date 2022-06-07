@@ -1,12 +1,12 @@
 import re
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from decimal import Decimal
 
 from django import template
 from django.template import defaultfilters
 from django.utils.formats import number_format
 from django.utils.safestring import mark_safe
-from django.utils.timezone import is_aware, utc
+from django.utils.timezone import is_aware
 from django.utils.translation import gettext as _
 from django.utils.translation import (
     gettext_lazy,
@@ -283,7 +283,7 @@ class NaturalTimeFormatter:
         if not isinstance(value, date):  # datetime is a subclass of date
             return value
 
-        now = datetime.now(utc if is_aware(value) else None)
+        now = datetime.now(timezone.utc if is_aware(value) else None)
         if value < now:
             delta = now - value
             if delta.days != 0:

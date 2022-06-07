@@ -19,7 +19,7 @@ from asgiref.local import Local
 from django.conf import settings
 from django.utils.deprecation import RemovedInDjango50Warning
 
-__all__ = [
+__all__ = [  # noqa for utc RemovedInDjango50Warning.
     "utc",
     "get_fixed_timezone",
     "get_default_timezone",
@@ -30,6 +30,7 @@ __all__ = [
     "deactivate",
     "override",
     "localtime",
+    "localdate",
     "now",
     "is_aware",
     "is_naive",
@@ -41,7 +42,18 @@ __all__ = [
 NOT_PASSED = object()
 
 
-utc = timezone.utc
+def __getattr__(name):
+    if name != "utc":
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+    warnings.warn(
+        "The django.utils.timezone.utc alias is deprecated. "
+        "Please update your code to use datetime.timezone.utc instead.",
+        RemovedInDjango50Warning,
+        stacklevel=2,
+    )
+
+    return timezone.utc
 
 
 def get_fixed_timezone(offset):
@@ -224,7 +236,7 @@ def now():
     """
     Return an aware or naive datetime.datetime, depending on settings.USE_TZ.
     """
-    return datetime.now(tz=utc if settings.USE_TZ else None)
+    return datetime.now(tz=timezone.utc if settings.USE_TZ else None)
 
 
 # By design, these four functions don't perform any checks on their arguments.
@@ -339,3 +351,11 @@ def _datetime_ambiguous_or_imaginary(dt, tz):
             return False
 
     return tz.utcoffset(dt.replace(fold=not dt.fold)) != tz.utcoffset(dt)
+
+
+# RemovedInDjango50Warning.
+_DIR = dir()
+
+
+def __dir__():
+    return sorted([*_DIR, "utc"])

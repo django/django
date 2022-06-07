@@ -151,10 +151,6 @@ For example, to create a collation for German phone book ordering::
     ``provider``, and ``deterministic`` arguments. Therefore, ``locale`` is
     required to make this operation reversible.
 
-.. admonition:: Restrictions
-
-    Non-deterministic collations are supported only on PostgreSQL 12+.
-
 Concurrent index operations
 ===========================
 
@@ -185,8 +181,6 @@ database.
 
 Adding constraints without enforcing validation
 ===============================================
-
-.. versionadded:: 4.0
 
 PostgreSQL supports the ``NOT VALID`` option with the ``ADD CONSTRAINT``
 statement to add check constraints without enforcing validation on existing

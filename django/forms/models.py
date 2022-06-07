@@ -388,7 +388,7 @@ class BaseModelForm(BaseForm):
         For backwards-compatibility, exclude several types of fields from model
         validation. See tickets #12507, #12521, #12553.
         """
-        exclude = []
+        exclude = set()
         # Build up a list of fields that should be excluded from model field
         # validation and unique checks.
         for f in self.instance._meta.fields:
@@ -396,20 +396,20 @@ class BaseModelForm(BaseForm):
             # Exclude fields that aren't on the form. The developer may be
             # adding these values to the model after form validation.
             if field not in self.fields:
-                exclude.append(f.name)
+                exclude.add(f.name)
 
             # Don't perform model validation on fields that were defined
             # manually on the form and excluded via the ModelForm's Meta
             # class. See #12901.
             elif self._meta.fields and field not in self._meta.fields:
-                exclude.append(f.name)
+                exclude.add(f.name)
             elif self._meta.exclude and field in self._meta.exclude:
-                exclude.append(f.name)
+                exclude.add(f.name)
 
             # Exclude fields that failed form validation. There's no need for
             # the model fields to validate them as well.
             elif field in self._errors:
-                exclude.append(f.name)
+                exclude.add(f.name)
 
             # Exclude empty fields that are not required by the form, if the
             # underlying model field is required. This keeps the model field
@@ -425,7 +425,7 @@ class BaseModelForm(BaseForm):
                     and not form_field.required
                     and field_value in form_field.empty_values
                 ):
-                    exclude.append(f.name)
+                    exclude.add(f.name)
         return exclude
 
     def clean(self):
@@ -479,7 +479,7 @@ class BaseModelForm(BaseForm):
         # so this can't be part of _get_validation_exclusions().
         for name, field in self.fields.items():
             if isinstance(field, InlineForeignKeyField):
-                exclude.append(name)
+                exclude.add(name)
 
         try:
             self.instance = construct_instance(
@@ -806,7 +806,8 @@ class BaseModelFormSet(BaseFormSet):
         for form in valid_forms:
             exclude = form._get_validation_exclusions()
             unique_checks, date_checks = form.instance._get_unique_checks(
-                exclude=exclude
+                exclude=exclude,
+                include_meta_constraints=True,
             )
             all_unique_checks.update(unique_checks)
             all_date_checks.update(date_checks)

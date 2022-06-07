@@ -247,8 +247,8 @@ validation step, right after the form's ``clean()`` method is called.
 
 .. _overriding-modelform-clean-method:
 
-Overriding the clean() method
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Overriding the ``clean()`` method
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can override the ``clean()`` method on a model form to provide additional
 validation in the same way you can on a normal form.
@@ -820,7 +820,7 @@ Then, pass your ``BaseAuthorFormSet`` class to the factory function::
     >>> AuthorFormSet = modelformset_factory(
     ...     Author, fields=('name', 'title'), formset=BaseAuthorFormSet)
 
-If you want to return a formset that doesn't include *any* pre-existing
+If you want to return a formset that doesn't include *any* preexisting
 instances of the model, you can specify an empty QuerySet::
 
    >>> AuthorFormSet(queryset=Author.objects.none())

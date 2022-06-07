@@ -1,4 +1,3 @@
-import cgi
 import codecs
 import copy
 from io import BytesIO
@@ -22,7 +21,7 @@ from django.utils.datastructures import (
 )
 from django.utils.encoding import escape_uri_path, iri_to_uri
 from django.utils.functional import cached_property
-from django.utils.http import is_same_domain
+from django.utils.http import is_same_domain, parse_header_parameters
 from django.utils.regex_helper import _lazy_re_compile
 
 from .multipartparser import parse_header
@@ -97,7 +96,7 @@ class HttpRequest:
 
     def _set_content_type_params(self, meta):
         """Set content_type, content_params, and encoding."""
-        self.content_type, self.content_params = cgi.parse_header(
+        self.content_type, self.content_params = parse_header_parameters(
             meta.get("CONTENT_TYPE", "")
         )
         if "charset" in self.content_params:
@@ -261,7 +260,8 @@ class HttpRequest:
                 )
             header_value = self.META.get(header)
             if header_value is not None:
-                return "https" if header_value == secure_value else "http"
+                header_value, *_ = header_value.split(",", 1)
+                return "https" if header_value.strip() == secure_value else "http"
         return self._get_scheme()
 
     def is_secure(self):

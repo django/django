@@ -43,15 +43,6 @@ class Article(models.Model):
         ]
 
 
-# Model for index_together being used only with single list
-class IndexTogetherSingleList(models.Model):
-    headline = models.CharField(max_length=100)
-    pub_date = models.DateTimeField()
-
-    class Meta:
-        index_together = ["headline", "pub_date"]
-
-
 class IndexedArticle(models.Model):
     headline = models.CharField(max_length=100, db_index=True)
     body = models.TextField(db_index=True)

@@ -1,6 +1,6 @@
 import os
 import pathlib
-from datetime import datetime
+from datetime import datetime, timezone
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -9,7 +9,6 @@ from django.core.files import File, locks
 from django.core.files.move import file_move_safe
 from django.core.files.utils import validate_file_name
 from django.core.signals import setting_changed
-from django.utils import timezone
 from django.utils._os import safe_join
 from django.utils.crypto import get_random_string
 from django.utils.deconstruct import deconstructible
@@ -340,8 +339,20 @@ class FileSystemStorage(Storage):
 
         # Ensure the saved path is always relative to the storage root.
         name = os.path.relpath(full_path, self.location)
+        # Ensure the moved file has the same gid as the storage root.
+        self._ensure_location_group_id(full_path)
         # Store filenames with forward slashes, even on Windows.
         return str(name).replace("\\", "/")
+
+    def _ensure_location_group_id(self, full_path):
+        if os.name == "posix":
+            file_gid = os.stat(full_path).st_gid
+            location_gid = os.stat(self.location).st_gid
+            if file_gid != location_gid:
+                try:
+                    os.chown(full_path, uid=-1, gid=location_gid)
+                except PermissionError:
+                    pass
 
     def delete(self, name):
         if not name:

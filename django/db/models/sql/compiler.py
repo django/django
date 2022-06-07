@@ -310,8 +310,8 @@ class SQLCompiler:
             ordering = self.query.order_by
         elif self.query.order_by:
             ordering = self.query.order_by
-        elif self.query.get_meta().ordering:
-            ordering = self.query.get_meta().ordering
+        elif (meta := self.query.get_meta()) and meta.ordering:
+            ordering = meta.ordering
             self._meta_ordering = ordering
         else:
             ordering = []
@@ -645,11 +645,20 @@ class SQLCompiler:
                     params.extend(s_params)
                     out_cols.append(s_sql)
 
-                result += [", ".join(out_cols), "FROM", *from_]
+                result += [", ".join(out_cols)]
+                if from_:
+                    result += ["FROM", *from_]
+                elif self.connection.features.bare_select_suffix:
+                    result += [self.connection.features.bare_select_suffix]
                 params.extend(f_params)
 
                 if self.query.select_for_update and features.has_select_for_update:
-                    if self.connection.get_autocommit():
+                    if (
+                        self.connection.get_autocommit()
+                        # Don't raise an exception when database doesn't
+                        # support transactions, as it's a noop.
+                        and features.supports_transactions
+                    ):
                         raise TransactionManagementError(
                             "select_for_update cannot be used outside of a transaction."
                         )
@@ -796,7 +805,8 @@ class SQLCompiler:
         """
         result = []
         if opts is None:
-            opts = self.query.get_meta()
+            if (opts := self.query.get_meta()) is None:
+                return result
         only_load = self.deferred_to_columns()
         start_alias = start_alias or self.query.get_initial_alias()
         # The 'seen_models' is used to optimize checking the needed parent
@@ -902,10 +912,15 @@ class SQLCompiler:
                 ):
                     item = item.desc() if descending else item.asc()
                 if isinstance(item, OrderBy):
-                    results.append((item, False))
+                    results.append(
+                        (item.prefix_references(f"{name}{LOOKUP_SEP}"), False)
+                    )
                     continue
                 results.extend(
-                    self.find_ordering_name(item, opts, alias, order, already_seen)
+                    (expr.prefix_references(f"{name}{LOOKUP_SEP}"), is_ref)
+                    for expr, is_ref in self.find_ordering_name(
+                        item, opts, alias, order, already_seen
+                    )
                 )
             return results
         targets, alias, _ = self.query.trim_joins(targets, joins, path)
@@ -1001,7 +1016,7 @@ class SQLCompiler:
         if not opts:
             opts = self.query.get_meta()
             root_alias = self.query.get_initial_alias()
-        only_load = self.query.get_loaded_field_names()
+        only_load = self.deferred_to_columns()
 
         # Setup for the case when only particular related fields should be
         # included in the related selection.
@@ -1290,7 +1305,7 @@ class SQLCompiler:
         dictionary.
         """
         columns = {}
-        self.query.deferred_to_data(columns, self.query.get_loaded_field_names_cb)
+        self.query.deferred_to_data(columns)
         return columns
 
     def get_converters(self, expressions):
@@ -1424,9 +1439,8 @@ class SQLCompiler:
         result = list(self.execute_sql())
         # Some backends return 1 item tuples with strings, and others return
         # tuples with integers and strings. Flatten them out into strings.
-        output_formatter = (
-            json.dumps if self.query.explain_info.format == "json" else str
-        )
+        format_ = self.query.explain_info.format
+        output_formatter = json.dumps if format_ and format_.lower() == "json" else str
         for row in result[0]:
             if not isinstance(row, str):
                 yield " ".join(output_formatter(c) for c in row)
@@ -1436,7 +1450,7 @@ class SQLCompiler:
 
 class SQLInsertCompiler(SQLCompiler):
     returning_fields = None
-    returning_params = tuple()
+    returning_params = ()
 
     def field_as_sql(self, field, val):
         """
@@ -1831,7 +1845,23 @@ class SQLUpdateCompiler(SQLCompiler):
         query.clear_ordering(force=True)
         query.extra = {}
         query.select = []
-        query.add_fields([query.get_meta().pk.name])
+        meta = query.get_meta()
+        fields = [meta.pk.name]
+        related_ids_index = []
+        for related in self.query.related_updates:
+            if all(
+                path.join_field.primary_key for path in meta.get_path_to_parent(related)
+            ):
+                # If a primary key chain exists to the targeted related update,
+                # then the meta.pk value can be used for it.
+                related_ids_index.append((related, 0))
+            else:
+                # This branch will only be reached when updating a field of an
+                # ancestor that is not part of the primary key chain of a MTI
+                # tree.
+                related_ids_index.append((related, len(fields)))
+                fields.append(related._meta.pk.name)
+        query.add_fields(fields)
         super().pre_sql_setup()
 
         must_pre_select = (
@@ -1846,10 +1876,13 @@ class SQLUpdateCompiler(SQLCompiler):
             # don't want them to change), or the db backend doesn't support
             # selecting from the updating table (e.g. MySQL).
             idents = []
+            related_ids = collections.defaultdict(list)
             for rows in query.get_compiler(self.using).execute_sql(MULTI):
                 idents.extend(r[0] for r in rows)
+                for parent, index in related_ids_index:
+                    related_ids[parent].extend(r[index] for r in rows)
             self.query.add_filter("pk__in", idents)
-            self.query.related_ids = idents
+            self.query.related_ids = related_ids
         else:
             # The fast path. Filters and updates in one query.
             self.query.add_filter("pk__in", query)

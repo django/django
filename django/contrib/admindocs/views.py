@@ -30,7 +30,7 @@ from django.utils.inspect import (
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 
-from .utils import get_view_name
+from .utils import _is_callback, get_view_name
 
 # Exclude methods starting with these strings from documentation
 MODEL_METHODS_EXCLUDE = ("_", "add_", "delete", "save", "set_")
@@ -166,8 +166,7 @@ class ViewDetailView(BaseAdminDocsView):
 
     @staticmethod
     def _get_view_func(view):
-        urlconf = get_urlconf()
-        if get_resolver(urlconf)._is_callback(view):
+        if _is_callback(view):
             mod, func = get_mod_func(view)
             try:
                 # Separate the module and function, e.g.
@@ -456,7 +455,8 @@ def extract_views_from_urlpatterns(urlpatterns, base="", namespace=None):
     """
     Return a list of views from a list of urlpatterns.
 
-    Each object in the returned list is a two-tuple: (view_func, regex)
+    Each object in the returned list is a four-tuple:
+    (view_func, regex, namespace, name)
     """
     views = []
     for p in urlpatterns:

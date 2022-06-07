@@ -287,12 +287,20 @@ sure you understand what they do before doing so.
 a form instance with a prefix of ``__prefix__`` for easier use in dynamic
 forms with JavaScript.
 
+.. _formsets-error-messages:
+
 ``error_messages``
 ------------------
 
 The ``error_messages`` argument lets you override the default messages that the
 formset will raise. Pass in a dictionary with keys matching the error messages
-you want to override. For example, here is the default error message when the
+you want to override. Error message keys include ``'too_few_forms'``,
+``'too_many_forms'``, and ``'missing_management_form'``. The
+``'too_few_forms'`` and ``'too_many_forms'`` error messages may contain
+``%(num)d``, which will be replaced with ``min_num`` and ``max_num``,
+respectively.
+
+For example, here is the default error message when the
 management form is missing::
 
     >>> formset = ArticleFormSet({})
@@ -308,6 +316,10 @@ And here is a custom error message::
     False
     >>> formset.non_form_errors()
     ['Sorry, something went wrong.']
+
+.. versionchanged:: 4.1
+
+    The ``'too_few_forms'`` and ``'too_many_forms'`` keys were added.
 
 Custom formset validation
 -------------------------
@@ -366,10 +378,6 @@ help distinguish them from form-specific errors. For example,
         <li>Articles in a set must have distinct titles.</li>
     </ul>
 
-.. versionchanged:: 4.0
-
-    The additional ``nonform`` class was added.
-
 Validating the number of forms in a formset
 ===========================================
 
@@ -410,6 +418,9 @@ deletion, is less than or equal to ``max_num``.
 ``max_num`` was exceeded because the amount of initial data supplied was
 excessive.
 
+The error message can be customized by passing the ``'too_many_forms'`` message
+to the :ref:`formsets-error-messages` argument.
+
 .. note::
 
     Regardless of ``validate_max``, if the number of forms in a data set
@@ -445,6 +456,9 @@ deletion, is greater than or equal to ``min_num``.
     [{}, {}]
     >>> formset.non_form_errors()
     ['Please submit at least 3 forms.']
+
+The error message can be customized by passing the ``'too_few_forms'`` message
+to the :ref:`formsets-error-messages` argument.
 
 .. note::
 
@@ -636,8 +650,6 @@ control the widget used with
 ``deletion_widget``
 ^^^^^^^^^^^^^^^^^^^
 
-.. versionadded:: 4.0
-
 .. attribute:: BaseFormSet.deletion_widget
 
 Default: :class:`~django.forms.CheckboxInput`
@@ -654,8 +666,6 @@ Set ``deletion_widget`` to specify the widget class to be used with
 
 ``get_deletion_widget``
 ^^^^^^^^^^^^^^^^^^^^^^^
-
-.. versionadded:: 4.0
 
 .. method:: BaseFormSet.get_deletion_widget()
 
@@ -773,52 +783,61 @@ Formsets have the following attributes and methods associated with rendering:
 
 .. attribute:: BaseFormSet.renderer
 
-    .. versionadded:: 4.0
-
     Specifies the :doc:`renderer </ref/forms/renderers>` to use for the
     formset. Defaults to the renderer specified by the :setting:`FORM_RENDERER`
     setting.
 
 .. attribute:: BaseFormSet.template_name
 
-    .. versionadded:: 4.0
+    The name of the template rendered if the formset is cast into a string,
+    e.g. via ``print(formset)`` or in a template via ``{{ formset }}``.
 
-    The name of the template used when calling ``__str__`` or :meth:`.render`.
-    This template renders the formset's management form and then each form in
-    the formset as per the template defined by the form's
-    :attr:`~django.forms.Form.template_name`. This is a proxy of ``as_table``
-    by default.
+    By default, a property returning the value of the renderer's
+    :attr:`~django.forms.renderers.BaseRenderer.formset_template_name`. You may
+    set it as a string template name in order to override that for a particular
+    formset class.
+
+    This template will be used to render the formset's management form, and
+    then each form in the formset as per the template defined by the form's
+    :attr:`~django.forms.Form.template_name`.
+
+    .. versionchanged:: 4.1
+
+        In older versions ``template_name`` defaulted to the string value
+        ``'django/forms/formset/default.html'``.
+
+
+.. attribute:: BaseFormSet.template_name_div
+
+    .. versionadded:: 4.1
+
+    The name of the template used when calling :meth:`.as_div`. By default this
+    is ``"django/forms/formsets/div.html"``. This template renders the
+    formset's management form and then each form in the formset as per the
+    form's :meth:`~django.forms.Form.as_div` method.
 
 .. attribute:: BaseFormSet.template_name_p
 
-    .. versionadded:: 4.0
-
     The name of the template used when calling :meth:`.as_p`. By default this
-    is ``'django/forms/formsets/p.html'``. This template renders the formset's
+    is ``"django/forms/formsets/p.html"``. This template renders the formset's
     management form and then each form in the formset as per the form's
     :meth:`~django.forms.Form.as_p` method.
 
 .. attribute:: BaseFormSet.template_name_table
 
-    .. versionadded:: 4.0
-
     The name of the template used when calling :meth:`.as_table`. By default
-    this is ``'django/forms/formsets/table.html'``. This template renders the
+    this is ``"django/forms/formsets/table.html"``. This template renders the
     formset's management form and then each form in the formset as per the
     form's :meth:`~django.forms.Form.as_table` method.
 
 .. attribute:: BaseFormSet.template_name_ul
 
-    .. versionadded:: 4.0
-
     The name of the template used when calling :meth:`.as_ul`. By default this
-    is ``'django/forms/formsets/ul.html'``. This template renders the formset's
+    is ``"django/forms/formsets/ul.html"``. This template renders the formset's
     management form and then each form in the formset as per the form's
     :meth:`~django.forms.Form.as_ul` method.
 
 .. method:: BaseFormSet.get_context()
-
-    .. versionadded:: 4.0
 
     Returns the context for rendering a formset in a template.
 
@@ -827,8 +846,6 @@ Formsets have the following attributes and methods associated with rendering:
     * ``formset`` : The instance of the formset.
 
 .. method:: BaseFormSet.render(template_name=None, context=None, renderer=None)
-
-    .. versionadded:: 4.0
 
     The render method is called by ``__str__`` as well as the :meth:`.as_p`,
     :meth:`.as_ul`, and :meth:`.as_table` methods. All arguments are optional
@@ -900,10 +917,6 @@ formset will be rendered ``as_table``, with other helper methods of ``as_p``
 and ``as_ul`` being available. The rendering of the formset can be customized
 by specifying the ``template_name`` attribute, or more generally by
 :ref:`overriding the default template <overriding-built-in-formset-templates>`.
-
-.. versionchanged:: 4.0
-
-    Rendering of formsets was moved to the template engine.
 
 .. _manually-rendered-can-delete-and-can-order:
 

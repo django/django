@@ -77,7 +77,7 @@ backends that follow.
 .. note::
 
     Once a user has authenticated, Django stores which backend was used to
-    authenticate the user in the user's session, and re-uses the same backend
+    authenticate the user in the user's session, and reuses the same backend
     for the duration of that session whenever access to the currently
     authenticated user is needed. This effectively means that authentication
     sources are cached on a per-session basis, so if you change
@@ -229,7 +229,7 @@ Django's permission framework does not have a place to store permissions for
 anonymous users. However, the user object passed to an authentication backend
 may be an :class:`django.contrib.auth.models.AnonymousUser` object, allowing
 the backend to specify custom authorization behavior for anonymous users. This
-is especially useful for the authors of re-usable apps, who can delegate all
+is especially useful for the authors of reusable apps, who can delegate all
 questions of authorization to the auth backend, rather than needing settings,
 for example, to control anonymous access.
 
@@ -548,7 +548,7 @@ password resets. You must then provide some key implementation details:
         A string describing the name of the field on the user model that is
         used as the unique identifier. This will usually be a username of some
         kind, but it can also be an email address, or any other unique
-        identifier. The field *must* be unique (i.e., have ``unique=True`` set
+        identifier. The field *must* be unique (e.g. have ``unique=True`` set
         in its definition), unless you use a custom authentication backend that
         can support non-unique usernames.
 
@@ -771,6 +771,8 @@ utility methods:
         nominated by ``USERNAME_FIELD``.
 
     .. method:: models.BaseUserManager.make_random_password(length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
+
+        .. deprecated:: 4.2
 
         Returns a random password with the given length and given string of
         allowed characters. Note that the default value of ``allowed_chars``

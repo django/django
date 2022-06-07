@@ -1643,7 +1643,7 @@ class Queries4Tests(TestCase):
 
         qs = CategoryItem.objects.filter(category__specialcategory__isnull=False)
         self.assertEqual(qs.count(), 2)
-        self.assertSequenceEqual(qs, [ci2, ci3])
+        self.assertCountEqual(qs, [ci2, ci3])
 
     def test_ticket15316_exclude_false(self):
         c1 = SimpleCategory.objects.create(name="category1")
@@ -1694,7 +1694,7 @@ class Queries4Tests(TestCase):
 
         qs = CategoryItem.objects.exclude(category__specialcategory__isnull=True)
         self.assertEqual(qs.count(), 2)
-        self.assertSequenceEqual(qs, [ci2, ci3])
+        self.assertCountEqual(qs, [ci2, ci3])
 
     def test_ticket15316_one2one_filter_false(self):
         c = SimpleCategory.objects.create(name="cat")
@@ -1897,6 +1897,15 @@ class Queries5Tests(TestCase):
         self.assertEqual(
             Note.objects.extra(select={"foo": "'bar %%s'"})[0].foo, "bar %s"
         )
+
+    def test_extra_select_alias_sql_injection(self):
+        crafted_alias = """injected_name" from "queries_note"; --"""
+        msg = (
+            "Column aliases cannot contain whitespace characters, quotation marks, "
+            "semicolons, or SQL comments."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Note.objects.extra(select={crafted_alias: "1"})
 
     def test_queryset_reuse(self):
         # Using querysets doesn't mutate aliases.
@@ -2216,6 +2225,22 @@ class ExistsSql(TestCase):
         id, name = connection.ops.quote_name("id"), connection.ops.quote_name("name")
         self.assertNotIn(id, qstr)
         self.assertNotIn(name, qstr)
+
+    def test_distinct_exists(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            self.assertIs(Article.objects.distinct().exists(), False)
+        self.assertEqual(len(captured_queries), 1)
+        captured_sql = captured_queries[0]["sql"]
+        self.assertNotIn(connection.ops.quote_name("id"), captured_sql)
+        self.assertNotIn(connection.ops.quote_name("name"), captured_sql)
+
+    def test_sliced_distinct_exists(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            self.assertIs(Article.objects.distinct()[1:3].exists(), False)
+        self.assertEqual(len(captured_queries), 1)
+        captured_sql = captured_queries[0]["sql"]
+        self.assertIn(connection.ops.quote_name("id"), captured_sql)
+        self.assertIn(connection.ops.quote_name("name"), captured_sql)
 
     def test_ticket_18414(self):
         Article.objects.create(name="one", created=datetime.datetime.now())

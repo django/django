@@ -1,7 +1,7 @@
 """
 Decorators for views based on HTTP headers.
 """
-
+import datetime
 from functools import wraps
 
 from django.http import HttpResponseNotAllowed
@@ -91,7 +91,7 @@ def condition(etag_func=None, last_modified_func=None):
                     dt = last_modified_func(request, *args, **kwargs)
                     if dt:
                         if not timezone.is_aware(dt):
-                            dt = timezone.make_aware(dt, timezone.utc)
+                            dt = timezone.make_aware(dt, datetime.timezone.utc)
                         return int(dt.timestamp())
 
             # The value from etag_func() could be quoted or unquoted.

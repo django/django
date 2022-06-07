@@ -147,6 +147,26 @@ class Book(models.Model):
         )
 
 
+class NaturalKeyWithFKDependencyManager(models.Manager):
+    def get_by_natural_key(self, name, author):
+        return self.get(name=name, author__name=author)
+
+
+class NaturalKeyWithFKDependency(models.Model):
+    name = models.CharField(max_length=255)
+    author = models.ForeignKey(Person, models.CASCADE)
+
+    objects = NaturalKeyWithFKDependencyManager()
+
+    class Meta:
+        unique_together = ["name", "author"]
+
+    def natural_key(self):
+        return (self.name,) + self.author.natural_key()
+
+    natural_key.dependencies = ["fixtures_regress.Person"]
+
+
 class NKManager(models.Manager):
     def get_by_natural_key(self, data):
         return self.get(data=data)

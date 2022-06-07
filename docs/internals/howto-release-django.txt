@@ -63,7 +63,7 @@ You'll need a few things before getting started:
 * Access to Django's record on PyPI. Create a file with your credentials:
 
   .. code-block:: ini
-    :caption: ~/.pypirc
+    :caption: ``~/.pypirc``
 
     [pypi]
     username:YourUsername
@@ -100,8 +100,8 @@ any time leading up to the actual release:
 #. As the release approaches, watch Trac to make sure no release blockers
    are left for the upcoming release.
 
-#. Check with the other committers to make sure they don't have any
-   uncommitted changes for the release.
+#. Check with the other mergers to make sure they don't have any uncommitted
+   changes for the release.
 
 #. Proofread the release notes, including looking at the online version to
    :ref:`catch any broken links <documentation-link-check>` or reST errors, and

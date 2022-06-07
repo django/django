@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from django.apps import apps
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 
@@ -64,9 +65,8 @@ class ContentTypeManager(models.Manager):
         Given *models, return a dictionary mapping {model: content_type}.
         """
         results = {}
-        # Models that aren't already in the cache.
-        needed_app_labels = set()
-        needed_models = set()
+        # Models that aren't already in the cache grouped by app labels.
+        needed_models = defaultdict(set)
         # Mapping of opts to the list of models requiring it.
         needed_opts = defaultdict(list)
         for model in models:
@@ -74,14 +74,20 @@ class ContentTypeManager(models.Manager):
             try:
                 ct = self._get_from_cache(opts)
             except KeyError:
-                needed_app_labels.add(opts.app_label)
-                needed_models.add(opts.model_name)
+                needed_models[opts.app_label].add(opts.model_name)
                 needed_opts[opts].append(model)
             else:
                 results[model] = ct
         if needed_opts:
             # Lookup required content types from the DB.
-            cts = self.filter(app_label__in=needed_app_labels, model__in=needed_models)
+            condition = Q(
+                *(
+                    Q(("app_label", app_label), ("model__in", models))
+                    for app_label, models in needed_models.items()
+                ),
+                _connector=Q.OR,
+            )
+            cts = self.filter(condition)
             for ct in cts:
                 opts_models = needed_opts.pop(ct.model_class()._meta, [])
                 for model in opts_models:

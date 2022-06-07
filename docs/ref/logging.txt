@@ -200,10 +200,6 @@ This logging does not include framework-level initialization (e.g.
 ``COMMIT``, and ``ROLLBACK``). Turn on query logging in your database if you
 wish to view all database queries.
 
-.. versionchanged:: 4.0
-
-    The database ``alias`` was added to log messages.
-
 .. _django-security-logger:
 
 ``django.security.*``

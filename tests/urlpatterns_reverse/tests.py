@@ -89,7 +89,7 @@ resolve_test_data = (
         "mixed-args",
         views.empty_view,
         (),
-        {"arg2": "37"},
+        {"extra": True, "arg2": "37"},
     ),
     (
         "/included/mixed_args/42/37/",
@@ -639,27 +639,6 @@ class ResolverTests(SimpleTestCase):
                                 'Wrong URL name.  Expected "%s", got "%s".'
                                 % (e["name"], t.name),
                             )
-
-    def test_namespaced_view_detail(self):
-        resolver = get_resolver("urlpatterns_reverse.nested_urls")
-        self.assertTrue(resolver._is_callback("urlpatterns_reverse.nested_urls.view1"))
-        self.assertTrue(resolver._is_callback("urlpatterns_reverse.nested_urls.view2"))
-        self.assertTrue(resolver._is_callback("urlpatterns_reverse.nested_urls.View3"))
-        self.assertFalse(resolver._is_callback("urlpatterns_reverse.nested_urls.blub"))
-
-    def test_view_detail_as_method(self):
-        # Views which have a class name as part of their path.
-        resolver = get_resolver("urlpatterns_reverse.method_view_urls")
-        self.assertTrue(
-            resolver._is_callback(
-                "urlpatterns_reverse.method_view_urls.ViewContainer.method_view"
-            )
-        )
-        self.assertTrue(
-            resolver._is_callback(
-                "urlpatterns_reverse.method_view_urls.ViewContainer.classmethod_view"
-            )
-        )
 
     def test_populate_concurrency(self):
         """
@@ -1554,6 +1533,16 @@ class ResolverMatchTests(SimpleTestCase):
             "namespaces=[], route='^no_kwargs/([0-9]+)/([0-9]+)/$')",
         )
 
+    def test_repr_extra_kwargs(self):
+        self.assertEqual(
+            repr(resolve("/mixed_args/1986/11/")),
+            "ResolverMatch(func=urlpatterns_reverse.views.empty_view, args=(), "
+            "kwargs={'arg2': '11', 'extra': True}, url_name='mixed-args', "
+            "app_names=[], namespaces=[], "
+            "route='^mixed_args/([0-9]+)/(?P<arg2>[0-9]+)/$', "
+            "captured_kwargs={'arg2': '11'}, extra_kwargs={'extra': True})",
+        )
+
     @override_settings(ROOT_URLCONF="urlpatterns_reverse.reverse_lazy_urls")
     def test_classbased_repr(self):
         self.assertEqual(
@@ -1758,3 +1747,18 @@ class LookaheadTests(SimpleTestCase):
             with self.subTest(name=name, kwargs=kwargs):
                 with self.assertRaises(NoReverseMatch):
                     reverse(name, kwargs=kwargs)
+
+
+@override_settings(ROOT_URLCONF="urlpatterns_reverse.urls")
+class ReverseResolvedTests(SimpleTestCase):
+    def test_rereverse(self):
+        match = resolve("/resolved/12/")
+        self.assertEqual(
+            reverse(match.url_name, args=match.args, kwargs=match.kwargs),
+            "/resolved/12/",
+        )
+        match = resolve("/resolved-overridden/12/url/")
+        self.assertEqual(
+            reverse(match.url_name, args=match.args, kwargs=match.captured_kwargs),
+            "/resolved-overridden/12/url/",
+        )

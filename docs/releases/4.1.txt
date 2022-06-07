@@ -26,6 +26,72 @@ officially support the latest release of each series.
 What's new in Django 4.1
 ========================
 
+Asynchronous handlers for class-based views
+-------------------------------------------
+
+View subclasses may now define async HTTP method handlers::
+
+    import asyncio
+    from django.http import HttpResponse
+    from django.views import View
+
+    class AsyncView(View):
+        async def get(self, request, *args, **kwargs):
+            # Perform view logic using await.
+            await asyncio.sleep(1)
+            return HttpResponse("Hello async world!")
+
+See :ref:`async-class-based-views` for more details.
+
+Asynchronous ORM interface
+--------------------------
+
+``QuerySet`` now provides an asynchronous interface for all data access
+operations. These are named as-per the existing synchronous operations but with
+an ``a`` prefix, for example ``acreate()``, ``aget()``, and so on.
+
+The new interface allows you to write asynchronous code without needing to wrap
+ORM operations in ``sync_to_async()``::
+
+    async for author in Author.objects.filter(name__startswith="A"):
+        book = await author.books.afirst()
+
+Note that, at this stage, the underlying database operations remain
+synchronous, with contributions ongoing to push asynchronous support down into
+the SQL compiler, and integrate asynchronous database drivers. The new
+asynchronous queryset interface currently encapsulates the necessary
+``sync_to_async()`` operations for you, and will allow your code to take
+advantage of developments in the ORM's asynchronous support as it evolves.
+
+See :ref:`async-queries` for details and limitations.
+
+Validation of Constraints
+-------------------------
+
+:class:`Check <django.db.models.CheckConstraint>`,
+:class:`unique <django.db.models.UniqueConstraint>`, and :class:`exclusion
+<django.contrib.postgres.constraints.ExclusionConstraint>` constraints defined
+in the :attr:`Meta.constraints <django.db.models.Options.constraints>` option
+are now checked during :ref:`model validation <validating-objects>`.
+
+Form rendering accessibility
+----------------------------
+
+In order to aid users with screen readers, and other assistive technology, new
+``<div>`` based form templates are available from this release. These provide
+more accessible navigation than the older templates, and are able to correctly
+group related controls, such as radio-lists, into fieldsets.
+
+The new templates are recommended, and will become the default form rendering
+style when outputting a form, like ``{{ form }}`` in a template, from Django
+5.0.
+
+In order to ease adopting the new output style, the default form and formset
+templates are now configurable at the project level via the
+:setting:`FORM_RENDERER` setting.
+
+See :ref:`the Forms section (below)<forms-4.1>` for full details.
+
 .. _csrf-cookie-masked-usage:
 
 ``CSRF_COOKIE_MASKED`` setting
@@ -63,10 +129,8 @@ Minor features
 
 * Related widget wrappers now have a link to object's change form.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
+* The :meth:`.AdminSite.get_app_list` method now allows changing the order of
+  apps and models on the admin index page.
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -77,21 +141,14 @@ Minor features
 * The :meth:`.RemoteUserBackend.configure_user` method now allows synchronizing
   user attributes with attributes in a remote system such as an LDAP directory.
 
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new :meth:`.GEOSGeometry.make_valid()` method allows converting invalid
   geometries to valid ones.
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
+* The new ``clone`` argument for :meth:`.GEOSGeometry.normalize` allows
+  creating a normalized clone of the geometry.
 
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -117,16 +174,6 @@ Minor features
   specifying operator classes with the
   :class:`OpClass() <django.contrib.postgres.indexes.OpClass>` expression.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sessions`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -136,31 +183,11 @@ Minor features
   sitemap index templates should be updated for the adjusted :ref:`context
   variables <sitemap-index-context-variables>`.
 
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` now
   replaces paths to CSS source map references with their hashed counterparts.
-
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Cache
-~~~~~
-
-* ...
-
-CSRF
-~~~~
-
-* ...
 
 Database backends
 ~~~~~~~~~~~~~~~~~
@@ -174,33 +201,61 @@ Database backends
   ``DatabaseWrapper.init_connection_state()`` method must call ``super()`` in
   order for the check to run.
 
-Decorators
-~~~~~~~~~~
-
-* ...
-
-Email
-~~~~~
-
-* ...
-
-Error Reporting
-~~~~~~~~~~~~~~~
-
-* ...
-
-File Storage
-~~~~~~~~~~~~
-
-* ...
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
+.. _forms-4.1:
 
 Forms
 ~~~~~
+
+* The default template used to render forms when cast to a string, e.g. in
+  templates as ``{{ form }}``, is now configurable at the project-level by
+  setting :attr:`~django.forms.renderers.BaseRenderer.form_template_name` on
+  the class provided for :setting:`FORM_RENDERER`.
+
+  :attr:`.Form.template_name` is now a property deferring to the renderer, but
+  may be overridden with a string value to specify the template name per-form
+  class.
+
+  Similarly, the default template used to render formsets can be specified via
+  the matching
+  :attr:`~django.forms.renderers.BaseRenderer.formset_template_name` renderer
+  attribute.
+
+* The new ``div.html`` form template, referencing
+  :attr:`.Form.template_name_div` attribute, and matching :meth:`.Form.as_div`
+  method, render forms using HTML ``<div>`` elements.
+
+  This new output style is recommended over the existing
+  :meth:`~.Form.as_table`, :meth:`~.Form.as_p` and :meth:`~.Form.as_ul` styles,
+  as the template implements ``<fieldset>`` and ``<legend>`` to group related
+  inputs and is easier for screen reader users to navigate.
+
+  The div-based output will become the default rendering style from Django 5.0.
+
+* In order to smooth adoption of the new ``<div>`` output style, two
+  transitional form renderer classes are available:
+  :class:`django.forms.renderers.DjangoDivFormRenderer` and
+  :class:`django.forms.renderers.Jinja2DivFormRenderer`, for the Django and
+  Jinja2 template backends respectively.
+
+  You can apply one of these via the :setting:`FORM_RENDERER` setting. For
+  example::
+
+    FORM_RENDERER = "django.forms.renderers.DjangoDivFormRenderer"
+
+  Once the ``<div>`` output style is the default, from Django 5.0, these
+  transitional renderers will be deprecated, for removal in Django 6.0. The
+  ``FORM_RENDERER`` declaration can be removed at that time.
+
+* If the new ``<div>`` output style is not appropriate for your project, you should
+  define a renderer subclass specifying
+  :attr:`~django.forms.renderers.BaseRenderer.form_template_name` and
+  :attr:`~django.forms.renderers.BaseRenderer.formset_template_name` for your
+  required style, and set :setting:`FORM_RENDERER` accordingly.
+
+  For example, for the ``<p>`` output style used by :meth:`~.Form.as_p`, you
+  would define a form renderer setting ``form_template_name`` to
+  ``"django/forms/p.html"`` and ``formset_template_name`` to
+  ``"django/forms/formsets/p.html"``.
 
 * The new :meth:`~django.forms.BoundField.legend_tag` allows rendering field
   labels in ``<legend>`` tags via the new ``tag`` argument of
@@ -214,21 +269,25 @@ Forms
   objects implement the ``__html__()`` method (typically when decorated with
   the :func:`~django.utils.html.html_safe` decorator).
 
-Generic Views
-~~~~~~~~~~~~~
+* The new :attr:`.BoundField.use_fieldset` and :attr:`.Widget.use_fieldset`
+  attributes help to identify widgets where its inputs should be grouped in a
+  ``<fieldset>`` with a ``<legend>``.
 
-* ...
+* The :ref:`formsets-error-messages` argument for
+  :class:`~django.forms.formsets.BaseFormSet` now allows customizing
+  error messages for invalid number of forms by passing ``'too_few_forms'``
+  and ``'too_many_forms'`` keys.
+
+* :class:`~django.forms.IntegerField`, :class:`~django.forms.FloatField`, and
+  :class:`~django.forms.DecimalField` now optionally accept a ``step_size``
+  argument. This is used to set the ``step`` HTML attribute, and is validated
+  on form submission.
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
 * The :func:`~django.conf.urls.i18n.i18n_patterns` function now supports
   languages with both scripts and regions.
-
-Logging
-~~~~~~~
-
-* ...
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -254,7 +313,21 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* The new :class:`~django.db.migrations.operations.RenameIndex` operation
+  allows renaming indexes defined in the
+  :attr:`Meta.indexes <django.db.models.Options.indexes>` or
+  :attr:`~django.db.models.Options.index_together` options.
+
+* The migrations autodetector now generates
+  :class:`~django.db.migrations.operations.RenameIndex` operations instead of
+  ``RemoveIndex`` and ``AddIndex``, when renaming indexes defined in the
+  :attr:`Meta.indexes <django.db.models.Options.indexes>`.
+
+* The migrations autodetector now generates
+  :class:`~django.db.migrations.operations.RenameIndex` operations instead of
+  ``AlterIndexTogether`` and ``AddIndex``, when moving indexes defined in the
+  :attr:`Meta.index_together <django.db.models.Options.index_together>` to the
+  :attr:`Meta.indexes <django.db.models.Options.indexes>`.
 
 Models
 ~~~~~~
@@ -281,6 +354,13 @@ Models
   on MariaDB and MySQL. For databases that do not support ``XOR``, the query
   will be converted to an equivalent using ``AND``, ``OR``, and ``NOT``.
 
+* The new :ref:`Field.non_db_attrs <custom-field-non_db_attrs>` attribute
+  allows customizing attributes of fields that don't affect a column
+  definition.
+
+* On PostgreSQL, ``AutoField``, ``BigAutoField``, and ``SmallAutoField`` are
+  now created as identity columns rather than serial columns with sequences.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -293,10 +373,8 @@ Security
 * The new :setting:`SECRET_KEY_FALLBACKS` setting allows providing a list of
   values for secret key rotation.
 
-Serialization
-~~~~~~~~~~~~~
-
-* ...
+* The :setting:`SECURE_PROXY_SSL_HEADER` setting now supports a comma-separated
+  list of protocols in the header value.
 
 Signals
 ~~~~~~~
@@ -305,22 +383,41 @@ Signals
   :data:`~django.db.models.signals.post_delete` signals now dispatch the
   ``origin`` of the deletion.
 
+.. _templates-4.1:
+
 Templates
 ~~~~~~~~~
 
 * :tfilter:`json_script` template filter now allows wrapping in a ``<script>``
   tag without the HTML ``id`` attribute.
 
+* The :class:`cached template loader <django.template.loaders.cached.Loader>`
+  is now enabled in development, when :setting:`DEBUG` is ``True``, and
+  :setting:`OPTIONS['loaders'] <TEMPLATES-OPTIONS>` isn't specified. You may
+  specify ``OPTIONS['loaders']`` to override this, if necessary.
+
 Tests
 ~~~~~
+
+* The :class:`.DiscoverRunner` now supports running tests in parallel on
+  macOS, Windows, and any other systems where the default
+  :mod:`multiprocessing` start method is ``spawn``.
 
 * A nested atomic block marked as durable in :class:`django.test.TestCase` now
   raises a ``RuntimeError``, the same as outside of tests.
 
+* :meth:`.SimpleTestCase.assertFormError` and
+  :meth:`~.SimpleTestCase.assertFormsetError` now support passing a
+  form/formset object directly.
+
 URLs
 ~~~~
 
-* ...
+* The new :attr:`.ResolverMatch.captured_kwargs` attribute stores the captured
+  keyword arguments, as parsed from the URL.
+
+* The new :attr:`.ResolverMatch.extra_kwargs` attribute stores the additional
+  keyword arguments passed to the view function.
 
 Utilities
 ~~~~~~~~~
@@ -332,7 +429,10 @@ Utilities
 Validators
 ~~~~~~~~~~
 
-* ...
+* The new :class:`~django.core.validators.StepValueValidator` checks if a value
+  is an integral multiple of a given step size. This new validator is used for
+  the new ``step_size`` argument added to form fields representing numeric
+  values.
 
 .. _backwards-incompatible-4.1:
 
@@ -363,6 +463,14 @@ backends.
 -------------------------
 
 * Support for GDAL 2.1 is removed.
+
+* Support for PostGIS 2.4 is removed.
+
+Dropped support for PostgreSQL 10
+---------------------------------
+
+Upstream support for PostgreSQL 10 ends in November 2022. Django 4.1 supports
+PostgreSQL 11 and higher.
 
 Dropped support for MariaDB 10.2
 --------------------------------
@@ -430,10 +538,69 @@ Miscellaneous
 * The ``exc_info`` argument of the undocumented
   ``django.utils.log.log_response()`` function is replaced by ``exception``.
 
+* The ``size`` argument of the undocumented
+  ``django.views.static.was_modified_since()`` function is removed.
+
+* The admin log out UI now uses ``POST`` requests.
+
+* The undocumented ``InlineAdminFormSet.non_form_errors`` property is replaced
+  by the ``non_form_errors()`` method. This is consistent with ``BaseFormSet``.
+
+* As per :ref:`above<templates-4.1>`, the cached template loader is now
+  enabled in development. You may specify ``OPTIONS['loaders']`` to override
+  this, if necessary.
+
+* The undocumented ``django.contrib.auth.views.SuccessURLAllowedHostsMixin``
+  mixin is replaced by ``RedirectURLMixin``.
+
+* :class:`~django.db.models.BaseConstraint` subclasses must implement
+  :meth:`~django.db.models.BaseConstraint.validate` method to allow those
+  constraints to be used for validation.
+
+* The undocumented ``URLResolver._is_callback()``,
+  ``URLResolver._callback_strs``, and ``URLPattern.lookup_str()`` are
+  moved to ``django.contrib.admindocs.utils``.
+
+* The :meth:`.Model.full_clean` method now converts an ``exclude`` value to the
+  ``set``. It’s also preferable to pass an ``exclude`` value as a ``set`` to
+  the :meth:`.Model.clean_fields`, :meth:`.Model.full_clean`,
+  :meth:`.Model.validate_unique`, and :meth:`.Model.validate_constraints`
+  methods.
+
 .. _deprecated-features-4.1:
 
 Features deprecated in 4.1
 ==========================
+
+Log out via GET
+---------------
+
+Logging out via ``GET`` requests to the :py:class:`built-in logout view
+<django.contrib.auth.views.LogoutView>` is deprecated. Use ``POST`` requests
+instead.
+
+If you want to retain the user experience of an HTML link, you can use a form
+that is styled to appear as a link:
+
+.. code-block:: html
+
+  <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
+    {% csrf_token %}
+    <button type="submit">{% translate "Log out" %}</button>
+  </form>
+
+.. code-block:: css
+
+  #logout-form {
+    display: inline;
+  }
+  #logout-form button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+  }
 
 Miscellaneous
 -------------
@@ -499,6 +666,30 @@ Miscellaneous
 * ``created=True`` is added to the signature of
   :meth:`.RemoteUserBackend.configure_user`. Support  for ``RemoteUserBackend``
   subclasses that do not accept this argument is deprecated.
+
+* The :data:`django.utils.timezone.utc` alias to :attr:`datetime.timezone.utc`
+  is deprecated. Use :attr:`datetime.timezone.utc` directly.
+
+* Passing a response object and a form/formset name to
+  ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` is
+  deprecated. Use::
+
+    assertFormError(response.context['form_name'], …)
+    assertFormsetError(response.context['formset_name'], …)
+
+  or pass the form/formset object directly instead.
+
+* The undocumented ``django.contrib.gis.admin.OpenLayersWidget`` is deprecated.
+
+* ``django.contrib.auth.hashers.CryptPasswordHasher`` is deprecated.
+
+* The ability to pass ``nulls_first=False`` or ``nulls_last=False`` to
+  ``Expression.asc()`` and ``Expression.desc()`` methods, and the ``OrderBy``
+  expression is deprecated. Use ``None`` instead.
+
+* The ``"django/forms/default.html"`` and
+  ``"django/forms/formsets/default.html"`` templates which are a proxy to the
+  table-based templates are deprecated. Use the specific template instead.
 
 Features removed in 4.1
 =======================

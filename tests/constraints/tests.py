@@ -10,6 +10,7 @@ from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
 from .models import (
     ChildModel,
+    ChildUniqueConstraintProduct,
     Product,
     UniqueConstraintConditionProduct,
     UniqueConstraintDeferrable,
@@ -45,6 +46,24 @@ class BaseConstraintTests(SimpleTestCase):
         msg = "This method must be implemented by a subclass."
         with self.assertRaisesMessage(NotImplementedError, msg):
             c.remove_sql(None, None)
+
+    def test_validate(self):
+        c = BaseConstraint("name")
+        msg = "This method must be implemented by a subclass."
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            c.validate(None, None)
+
+    def test_default_violation_error_message(self):
+        c = BaseConstraint("name")
+        self.assertEqual(
+            c.get_violation_error_message(), "Constraint “name” is violated."
+        )
+
+    def test_custom_violation_error_message(self):
+        c = BaseConstraint(
+            "base_name", violation_error_message="custom %(name)s message"
+        )
+        self.assertEqual(c.get_violation_error_message(), "custom base_name message")
 
 
 class CheckConstraintTests(TestCase):
@@ -103,18 +122,6 @@ class CheckConstraintTests(TestCase):
         with self.assertRaises(IntegrityError):
             Product.objects.create(price=10, discounted_price=7, unit="l")
 
-    @skipUnlessDBFeature("supports_table_check_constraints")
-    def test_database_constraint_expression(self):
-        Product.objects.create(price=999, discounted_price=5)
-        with self.assertRaises(IntegrityError):
-            Product.objects.create(price=1000, discounted_price=5)
-
-    @skipUnlessDBFeature("supports_table_check_constraints")
-    def test_database_constraint_expressionwrapper(self):
-        Product.objects.create(price=499, discounted_price=5)
-        with self.assertRaises(IntegrityError):
-            Product.objects.create(price=500, discounted_price=5)
-
     @skipUnlessDBFeature(
         "supports_table_check_constraints", "can_introspect_check_constraints"
     )
@@ -122,8 +129,6 @@ class CheckConstraintTests(TestCase):
         constraints = get_constraints(Product._meta.db_table)
         for expected_name in (
             "price_gt_discounted_price",
-            "constraints_price_lt_1000_raw",
-            "constraints_price_neq_500_wrap",
             "constraints_product_price_gt_0",
         ):
             with self.subTest(expected_name):
@@ -136,16 +141,60 @@ class CheckConstraintTests(TestCase):
         constraints = get_constraints(ChildModel._meta.db_table)
         self.assertIn("constraints_childmodel_adult", constraints)
 
+    def test_validate(self):
+        check = models.Q(price__gt=models.F("discounted_price"))
+        constraint = models.CheckConstraint(check=check, name="price")
+        # Invalid product.
+        invalid_product = Product(price=10, discounted_price=42)
+        with self.assertRaises(ValidationError):
+            constraint.validate(Product, invalid_product)
+        with self.assertRaises(ValidationError):
+            constraint.validate(Product, invalid_product, exclude={"unit"})
+        # Fields used by the check constraint are excluded.
+        constraint.validate(Product, invalid_product, exclude={"price"})
+        constraint.validate(Product, invalid_product, exclude={"discounted_price"})
+        constraint.validate(
+            Product,
+            invalid_product,
+            exclude={"discounted_price", "price"},
+        )
+        # Valid product.
+        constraint.validate(Product, Product(price=10, discounted_price=5))
+
+    def test_validate_boolean_expressions(self):
+        constraint = models.CheckConstraint(
+            check=models.expressions.ExpressionWrapper(
+                models.Q(price__gt=500) | models.Q(price__lt=500),
+                output_field=models.BooleanField(),
+            ),
+            name="price_neq_500_wrap",
+        )
+        msg = f"Constraint “{constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(Product, Product(price=500, discounted_price=5))
+        constraint.validate(Product, Product(price=501, discounted_price=5))
+        constraint.validate(Product, Product(price=499, discounted_price=5))
+
+    def test_validate_rawsql_expressions_noop(self):
+        constraint = models.CheckConstraint(
+            check=models.expressions.RawSQL(
+                "price < %s OR price > %s",
+                (500, 500),
+                output_field=models.BooleanField(),
+            ),
+            name="price_neq_500_raw",
+        )
+        # RawSQL can not be checked and is always considered valid.
+        constraint.validate(Product, Product(price=500, discounted_price=5))
+        constraint.validate(Product, Product(price=501, discounted_price=5))
+        constraint.validate(Product, Product(price=499, discounted_price=5))
+
 
 class UniqueConstraintTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.p1, cls.p2 = UniqueConstraintProduct.objects.bulk_create(
-            [
-                UniqueConstraintProduct(name="p1", color="red"),
-                UniqueConstraintProduct(name="p2"),
-            ]
-        )
+        cls.p1 = UniqueConstraintProduct.objects.create(name="p1", color="red")
+        cls.p2 = UniqueConstraintProduct.objects.create(name="p2")
 
     def test_eq(self):
         self.assertEqual(
@@ -429,15 +478,135 @@ class UniqueConstraintTests(TestCase):
         with self.assertRaisesMessage(ValidationError, msg):
             UniqueConstraintProduct(
                 name=self.p1.name, color=self.p1.color
-            ).validate_unique()
+            ).validate_constraints()
 
     @skipUnlessDBFeature("supports_partial_indexes")
     def test_model_validation_with_condition(self):
-        """Partial unique constraints are ignored by Model.validate_unique()."""
+        """
+        Partial unique constraints are not ignored by
+        Model.validate_constraints().
+        """
         obj1 = UniqueConstraintConditionProduct.objects.create(name="p1", color="red")
         obj2 = UniqueConstraintConditionProduct.objects.create(name="p2")
-        UniqueConstraintConditionProduct(name=obj1.name, color="blue").validate_unique()
-        UniqueConstraintConditionProduct(name=obj2.name).validate_unique()
+        UniqueConstraintConditionProduct(
+            name=obj1.name, color="blue"
+        ).validate_constraints()
+        msg = "Constraint “name_without_color_uniq” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            UniqueConstraintConditionProduct(name=obj2.name).validate_constraints()
+
+    def test_validate(self):
+        constraint = UniqueConstraintProduct._meta.constraints[0]
+        msg = "Unique constraint product with this Name and Color already exists."
+        non_unique_product = UniqueConstraintProduct(
+            name=self.p1.name, color=self.p1.color
+        )
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(UniqueConstraintProduct, non_unique_product)
+        # Null values are ignored.
+        constraint.validate(
+            UniqueConstraintProduct,
+            UniqueConstraintProduct(name=self.p2.name, color=None),
+        )
+        # Existing instances have their existing row excluded.
+        constraint.validate(UniqueConstraintProduct, self.p1)
+        # Unique fields are excluded.
+        constraint.validate(
+            UniqueConstraintProduct,
+            non_unique_product,
+            exclude={"name"},
+        )
+        constraint.validate(
+            UniqueConstraintProduct,
+            non_unique_product,
+            exclude={"color"},
+        )
+        constraint.validate(
+            UniqueConstraintProduct,
+            non_unique_product,
+            exclude={"name", "color"},
+        )
+        # Validation on a child instance.
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(
+                UniqueConstraintProduct,
+                ChildUniqueConstraintProduct(name=self.p1.name, color=self.p1.color),
+            )
+
+    @skipUnlessDBFeature("supports_partial_indexes")
+    def test_validate_condition(self):
+        p1 = UniqueConstraintConditionProduct.objects.create(name="p1")
+        constraint = UniqueConstraintConditionProduct._meta.constraints[0]
+        msg = "Constraint “name_without_color_uniq” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(
+                UniqueConstraintConditionProduct,
+                UniqueConstraintConditionProduct(name=p1.name, color=None),
+            )
+        # Values not matching condition are ignored.
+        constraint.validate(
+            UniqueConstraintConditionProduct,
+            UniqueConstraintConditionProduct(name=p1.name, color="anything-but-none"),
+        )
+        # Existing instances have their existing row excluded.
+        constraint.validate(UniqueConstraintConditionProduct, p1)
+        # Unique field is excluded.
+        constraint.validate(
+            UniqueConstraintConditionProduct,
+            UniqueConstraintConditionProduct(name=p1.name, color=None),
+            exclude={"name"},
+        )
+
+    def test_validate_expression(self):
+        constraint = models.UniqueConstraint(Lower("name"), name="name_lower_uniq")
+        msg = "Constraint “name_lower_uniq” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(
+                UniqueConstraintProduct,
+                UniqueConstraintProduct(name=self.p1.name.upper()),
+            )
+        constraint.validate(
+            UniqueConstraintProduct,
+            UniqueConstraintProduct(name="another-name"),
+        )
+        # Existing instances have their existing row excluded.
+        constraint.validate(UniqueConstraintProduct, self.p1)
+        # Unique field is excluded.
+        constraint.validate(
+            UniqueConstraintProduct,
+            UniqueConstraintProduct(name=self.p1.name.upper()),
+            exclude={"name"},
+        )
+
+    def test_validate_expression_condition(self):
+        constraint = models.UniqueConstraint(
+            Lower("name"),
+            name="name_lower_without_color_uniq",
+            condition=models.Q(color__isnull=True),
+        )
+        non_unique_product = UniqueConstraintProduct(name=self.p2.name.upper())
+        msg = "Constraint “name_lower_without_color_uniq” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(UniqueConstraintProduct, non_unique_product)
+        # Values not matching condition are ignored.
+        constraint.validate(
+            UniqueConstraintProduct,
+            UniqueConstraintProduct(name=self.p1.name, color=self.p1.color),
+        )
+        # Existing instances have their existing row excluded.
+        constraint.validate(UniqueConstraintProduct, self.p2)
+        # Unique field is excluded.
+        constraint.validate(
+            UniqueConstraintProduct,
+            non_unique_product,
+            exclude={"name"},
+        )
+        # Field from a condition is excluded.
+        constraint.validate(
+            UniqueConstraintProduct,
+            non_unique_product,
+            exclude={"color"},
+        )
 
     def test_name(self):
         constraints = get_constraints(UniqueConstraintProduct._meta.db_table)

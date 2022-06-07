@@ -25,7 +25,7 @@ class PostgresIndex(Index):
     def create_sql(self, model, schema_editor, using="", **kwargs):
         self.check_supported(schema_editor)
         statement = super().create_sql(
-            model, schema_editor, using=" USING %s" % self.suffix, **kwargs
+            model, schema_editor, using=" USING %s" % (using or self.suffix), **kwargs
         )
         with_params = self.get_with_params()
         if with_params:
@@ -186,13 +186,6 @@ class GistIndex(PostgresIndex):
         if self.fillfactor is not None:
             with_params.append("fillfactor = %d" % self.fillfactor)
         return with_params
-
-    def check_supported(self, schema_editor):
-        if (
-            self.include
-            and not schema_editor.connection.features.supports_covering_gist_indexes
-        ):
-            raise NotSupportedError("Covering GiST indexes require PostgreSQL 12+.")
 
 
 class HashIndex(PostgresIndex):

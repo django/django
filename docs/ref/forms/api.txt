@@ -520,24 +520,62 @@ Although ``<table>`` output is the default output style when you ``print`` a
 form, other output styles are available. Each style is available as a method on
 a form object, and each rendering method returns a string.
 
-``template_name``
+Default rendering
 -----------------
 
-.. versionadded:: 4.0
+The default rendering when you ``print`` a form uses the following methods and
+attributes.
+
+``template_name``
+~~~~~~~~~~~~~~~~~
 
 .. attribute:: Form.template_name
 
-The name of a template that is going to be rendered if the form is cast into a
-string, e.g. via ``print(form)`` or in a template via ``{{ form }}``. By
-default this template is ``'django/forms/default.html'``, which is a proxy for
-``'django/forms/table.html'``. The template can be changed per form by
-overriding the ``template_name`` attribute or more generally by overriding the
-default template, see also :ref:`overriding-built-in-form-templates`.
+The name of the template rendered if the form is cast into a string, e.g. via
+``print(form)`` or in a template via ``{{ form }}``.
+
+By default, a property returning the value of the renderer's
+:attr:`~django.forms.renderers.BaseRenderer.form_template_name`. You may set it
+as a string template name in order to override that for a particular form
+class.
+
+.. versionchanged:: 4.1
+
+    In older versions ``template_name`` defaulted to the string value
+    ``'django/forms/default.html'``.
+
+``render()``
+~~~~~~~~~~~~
+
+.. method:: Form.render(template_name=None, context=None, renderer=None)
+
+The render method is called by ``__str__`` as well as the
+:meth:`.Form.as_table`, :meth:`.Form.as_p`, and :meth:`.Form.as_ul` methods.
+All arguments are optional and default to:
+
+* ``template_name``: :attr:`.Form.template_name`
+* ``context``: Value returned by :meth:`.Form.get_context`
+* ``renderer``: Value returned by :attr:`.Form.default_renderer`
+
+By passing ``template_name`` you can customize the template used for just a
+single call.
+
+``get_context()``
+~~~~~~~~~~~~~~~~~
+
+.. method:: Form.get_context()
+
+Return the template context for rendering the form.
+
+The available context is:
+
+* ``form``: The bound form.
+* ``fields``: All bound fields, except the hidden fields.
+* ``hidden_fields``: All hidden bound fields.
+* ``errors``: All non field related or hidden field related form errors.
 
 ``template_name_label``
------------------------
-
-.. versionadded:: 4.0
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. attribute:: Form.template_name_label
 
@@ -546,15 +584,81 @@ The template used to render a field's ``<label>``, used when calling
 form by overriding this attribute or more generally by overriding the default
 template, see also :ref:`overriding-built-in-form-templates`.
 
+Output styles
+-------------
+
+As well as rendering the form directly, such as in a template with
+``{{ form }}``, the following helper functions serve as a proxy to
+:meth:`Form.render` passing a particular ``template_name`` value.
+
+These helpers are most useful in a template, where you need to override the
+form renderer or form provided value but cannot pass the additional parameter
+to :meth:`~Form.render`. For example, you can render a form as an unordered
+list using ``{{ form.as_ul }}``.
+
+Each helper pairs a form method with an attribute giving the appropriate
+template name.
+
+``as_div()``
+~~~~~~~~~~~~
+
+.. attribute:: Form.template_name_div
+
+.. versionadded:: 4.1
+
+The template used by ``as_div()``. Default: ``'django/forms/div.html'``.
+
+.. method:: Form.as_div()
+
+.. versionadded:: 4.1
+
+``as_div()`` renders the form as a series of ``<div>`` elements, with each
+``<div>`` containing one field, such as:
+
+.. code-block:: pycon
+
+    >>> f = ContactForm()
+    >>> f.as_div()
+
+… gives HTML like:
+
+.. code-block:: html
+
+    <div>
+    <label for="id_subject">Subject:</label>
+    <input type="text" name="subject" maxlength="100" required id="id_subject">
+    </div>
+    <div>
+    <label for="id_message">Message:</label>
+    <input type="text" name="message" required id="id_message">
+    </div>
+    <div>
+    <label for="id_sender">Sender:</label>
+    <input type="email" name="sender" required id="id_sender">
+    </div>
+    <div>
+    <label for="id_cc_myself">Cc myself:</label>
+    <input type="checkbox" name="cc_myself" id="id_cc_myself">
+    </div>
+
+.. note::
+
+    Of the framework provided templates and output styles, ``as_div()`` is
+    recommended over the ``as_p()``, ``as_table()``, and ``as_ul()`` versions
+    as the template implements ``<fieldset>`` and ``<legend>`` to group related
+    inputs and is easier for screen reader users to navigate.
+
 ``as_p()``
-----------
+~~~~~~~~~~
+
+.. attribute:: Form.template_name_p
+
+The template used by ``as_p()``. Default: ``'django/forms/p.html'``.
 
 .. method:: Form.as_p()
 
-``as_p()`` renders the form using the template assigned to the forms
-``template_name_p`` attribute, by default this template is
-``'django/forms/p.html'``. This template renders the form as a series of
-``<p>`` tags, with each ``<p>`` containing one field::
+``as_p()`` renders the form as a series of ``<p>`` tags, with each ``<p>``
+containing one field::
 
     >>> f = ContactForm()
     >>> f.as_p()
@@ -566,16 +670,17 @@ template, see also :ref:`overriding-built-in-form-templates`.
     <p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself"></p>
 
 ``as_ul()``
------------
+~~~~~~~~~~~
+
+.. attribute:: Form.template_name_ul
+
+The template used by ``as_ul()``. Default: ``'django/forms/ul.html'``.
 
 .. method:: Form.as_ul()
 
-``as_ul()`` renders the form using the template assigned to the forms
-``template_name_ul`` attribute, by default this template is
-``'django/forms/ul.html'``. This template renders the form as a series of
-``<li>`` tags, with each ``<li>`` containing one field. It does *not* include
-the ``<ul>`` or ``</ul>``, so that you can specify any HTML attributes on the
-``<ul>`` for flexibility::
+``as_ul()`` renders the form as a series of ``<li>`` tags, with each ``<li>``
+containing one field. It does *not* include the ``<ul>`` or ``</ul>``, so that
+you can specify any HTML attributes on the ``<ul>`` for flexibility::
 
     >>> f = ContactForm()
     >>> f.as_ul()
@@ -587,14 +692,15 @@ the ``<ul>`` or ``</ul>``, so that you can specify any HTML attributes on the
     <li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself"></li>
 
 ``as_table()``
---------------
+~~~~~~~~~~~~~~
+
+.. attribute:: Form.template_name_table
+
+The template used by ``as_table()``. Default: ``'django/forms/table.html'``.
 
 .. method:: Form.as_table()
 
-Finally, ``as_table()`` renders the form using the template assigned to the
-forms ``template_name_table`` attribute, by default this template is
-``'django/forms/table.html'``. This template outputs the form as an HTML
-``<table>``::
+``as_table()`` renders the form as an HTML ``<table>``::
 
     >>> f = ContactForm()
     >>> f.as_table()
@@ -604,37 +710,6 @@ forms ``template_name_table`` attribute, by default this template is
     <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" required></td></tr>
     <tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" required></td></tr>
     <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself"></td></tr>
-
-``get_context()``
------------------
-
-.. versionadded:: 4.0
-
-.. method:: Form.get_context()
-
-Return context for form rendering in a template.
-
-The available context is:
-
-* ``form``: The bound form.
-* ``fields``: All bound fields, except the hidden fields.
-* ``hidden_fields``: All hidden bound fields.
-* ``errors``: All non field related or hidden field related form errors.
-
-``render()``
-------------
-
-.. versionadded:: 4.0
-
-.. method:: Form.render(template_name=None, context=None, renderer=None)
-
-The render method is called by ``__str__`` as well as the
-:meth:`.Form.as_table`, :meth:`.Form.as_p`, and :meth:`.Form.as_ul` methods.
-All arguments are optional and default to:
-
-* ``template_name``: :attr:`.Form.template_name`
-* ``context``: Value returned by :meth:`.Form.get_context`
-* ``renderer``: Value returned by :attr:`.Form.default_renderer`
 
 .. _ref-forms-api-styling-form-rows:
 
@@ -915,15 +990,11 @@ Customizing the error list format
 
     .. attribute:: renderer
 
-        .. versionadded:: 4.0
-
         Specifies the :doc:`renderer <renderers>` to use for ``ErrorList``.
         Defaults to ``None`` which means to use the default renderer
         specified by the :setting:`FORM_RENDERER` setting.
 
     .. attribute:: template_name
-
-        .. versionadded:: 4.0
 
         The name of the template used when calling ``__str__`` or
         :meth:`render`. By default this is
@@ -932,15 +1003,11 @@ Customizing the error list format
 
     .. attribute:: template_name_text
 
-        .. versionadded:: 4.0
-
         The name of the template used when calling :meth:`.as_text`. By default
         this is ``'django/forms/errors/list/text.html'``. This template renders
         the errors as a list of bullet points.
 
     .. attribute:: template_name_ul
-
-        .. versionadded:: 4.0
 
         The name of the template used when calling :meth:`.as_ul`. By default
         this is ``'django/forms/errors/list/ul.html'``. This template renders
@@ -948,8 +1015,6 @@ Customizing the error list format
         classes as defined by :attr:`.error_class`.
 
     .. method:: get_context()
-
-        .. versionadded:: 4.0
 
         Return context for rendering of errors in a template.
 
@@ -959,8 +1024,6 @@ Customizing the error list format
         * ``error_class`` : A string of CSS classes.
 
     .. method:: render(template_name=None, context=None, renderer=None)
-
-        .. versionadded:: 4.0
 
         The render method is called by ``__str__`` as well as by the
         :meth:`.as_ul` method.
@@ -985,10 +1048,6 @@ Customizing the error list format
     overriding the :attr:`.template_name` attribute or more generally by
     overriding the default template, see also
     :ref:`overriding-built-in-form-templates`.
-
-.. versionchanged:: 4.0
-
-    Rendering of :class:`ErrorList` was moved to the template engine.
 
 .. deprecated:: 4.0
 
@@ -1160,6 +1219,12 @@ Attributes of ``BoundField``
         >>> print(f['message'].name)
         message
 
+.. attribute:: BoundField.use_fieldset
+
+    .. versionadded:: 4.1
+
+    Returns the value of this BoundField widget's ``use_fieldset`` attribute.
+
 .. attribute:: BoundField.widget_type
 
     Returns the lowercased class name of the wrapped field's widget, with any
@@ -1251,10 +1316,6 @@ Methods of ``BoundField``
     the :attr:`.Form.template_name_label` attribute or more generally by
     overriding the default template, see also
     :ref:`overriding-built-in-form-templates`.
-
-    .. versionchanged:: 4.0
-
-        The label is now rendered using the template engine.
 
     .. versionchanged:: 4.1
 

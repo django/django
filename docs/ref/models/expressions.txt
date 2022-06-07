@@ -331,7 +331,7 @@ The ``Func`` API is as follows:
         customize the SQL as needed. For example:
 
         .. code-block:: python
-            :caption: django/db/models/functions.py
+            :caption: ``django/db/models/functions.py``
 
             class ConcatPair(Func):
                 ...
@@ -416,8 +416,6 @@ The ``Aggregate`` API is as follows:
 
     .. attribute:: empty_result_set_value
 
-        .. versionadded:: 4.0
-
         Defaults to ``None`` since most aggregate functions result in ``NULL``
         when applied to an empty result set.
 
@@ -454,10 +452,6 @@ grouping) contains no entries.
 
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
 into the ``template`` attribute.
-
-.. versionchanged:: 4.0
-
-    The ``default`` argument was added.
 
 Creating your own Aggregate Functions
 -------------------------------------
@@ -963,8 +957,6 @@ calling the appropriate methods on the wrapped expression.
 
     .. attribute:: empty_result_set_value
 
-        .. versionadded:: 4.0
-
         Tells Django which value should be returned when the expression is used
         to apply a function over an empty result set. Defaults to
         :py:data:`NotImplemented` which forces the expression to be computed on
@@ -972,7 +964,7 @@ calling the appropriate methods on the wrapped expression.
 
     .. method:: resolve_expression(query=None, allow_joins=True, reuse=None, summarize=False, for_save=False)
 
-        Provides the chance to do any pre-processing or validation of
+        Provides the chance to do any preprocessing or validation of
         the expression before it's added to the query. ``resolve_expression()``
         must also be called on any nested expressions. A ``copy()`` of ``self``
         should be returned with any necessary transformations.
@@ -1033,19 +1025,39 @@ calling the appropriate methods on the wrapped expression.
         to a column. The ``alias`` parameter will be ``None`` unless the
         expression has been annotated and is used for grouping.
 
-    .. method:: asc(nulls_first=False, nulls_last=False)
+    .. method:: asc(nulls_first=None, nulls_last=None)
 
         Returns the expression ready to be sorted in ascending order.
 
         ``nulls_first`` and ``nulls_last`` define how null values are sorted.
         See :ref:`using-f-to-sort-null-values` for example usage.
 
-    .. method:: desc(nulls_first=False, nulls_last=False)
+        .. versionchanged:: 4.1
+
+            In older versions, ``nulls_first`` and ``nulls_last`` defaulted to
+            ``False``.
+
+        .. deprecated:: 4.1
+
+            Passing ``nulls_first=False`` or ``nulls_last=False`` to ``asc()``
+            is deprecated. Use ``None`` instead.
+
+    .. method:: desc(nulls_first=None, nulls_last=None)
 
         Returns the expression ready to be sorted in descending order.
 
         ``nulls_first`` and ``nulls_last`` define how null values are sorted.
         See :ref:`using-f-to-sort-null-values` for example usage.
+
+        .. versionchanged:: 4.1
+
+            In older versions, ``nulls_first`` and ``nulls_last`` defaulted to
+            ``False``.
+
+        .. deprecated:: 4.1
+
+            Passing ``nulls_first=False`` or ``nulls_last=False`` to ``desc()``
+            is deprecated. Use ``None`` instead.
 
     .. method:: reverse_ordering()
 
@@ -1091,7 +1103,7 @@ We do some basic validation on the parameters, including requiring at least
 ``output_field`` here so that Django knows what kind of model field to assign
 the eventual result to.
 
-Now we implement the pre-processing and validation. Since we do not have
+Now we implement the preprocessing and validation. Since we do not have
 any of our own validation at this point, we delegate to the nested
 expressions::
 

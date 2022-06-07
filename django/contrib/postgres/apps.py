@@ -51,7 +51,7 @@ class PostgresConfig(AppConfig):
     def ready(self):
         setting_changed.connect(uninstall_if_needed)
         # Connections may already exist before we are called.
-        for conn in connections.all():
+        for conn in connections.all(initialized_only=True):
             if conn.vendor == "postgresql":
                 conn.introspection.data_types_reverse.update(
                     {

@@ -19,7 +19,7 @@ Basic forms
 Given a contact form:
 
 .. code-block:: python
-    :caption: forms.py
+    :caption: ``forms.py``
 
     from django import forms
 
@@ -34,7 +34,7 @@ Given a contact form:
 The view can be constructed using a ``FormView``:
 
 .. code-block:: python
-    :caption: views.py
+    :caption: ``views.py``
 
     from myapp.forms import ContactForm
     from django.views.generic.edit import FormView
@@ -97,7 +97,7 @@ First we need to add :meth:`~django.db.models.Model.get_absolute_url()` to our
 ``Author`` class:
 
 .. code-block:: python
-    :caption: models.py
+    :caption: ``models.py``
 
     from django.db import models
     from django.urls import reverse
@@ -113,7 +113,7 @@ work. Notice how we're just configuring the generic class-based views
 here; we don't have to write any logic ourselves:
 
 .. code-block:: python
-    :caption: views.py
+    :caption: ``views.py``
 
     from django.urls import reverse_lazy
     from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -147,7 +147,7 @@ and :attr:`~django.views.generic.edit.FormMixin.form_class` attributes, an
 Finally, we hook these new views into the URLconf:
 
 .. code-block:: python
-    :caption: urls.py
+    :caption: ``urls.py``
 
     from django.urls import path
     from myapp.views import AuthorCreateView, AuthorDeleteView, AuthorUpdateView
@@ -188,7 +188,7 @@ you can use a custom :class:`~django.forms.ModelForm` to do this. First, add
 the foreign key relation to the model:
 
 .. code-block:: python
-    :caption: models.py
+    :caption: ``models.py``
 
     from django.contrib.auth.models import User
     from django.db import models
@@ -204,7 +204,7 @@ to edit, and override
 :meth:`~django.views.generic.edit.ModelFormMixin.form_valid()` to add the user:
 
 .. code-block:: python
-    :caption: views.py
+    :caption: ``views.py``
 
     from django.contrib.auth.mixins import LoginRequiredMixin
     from django.views.generic.edit import CreateView

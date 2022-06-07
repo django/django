@@ -18,6 +18,7 @@ from django.contrib.auth.models import Permission, User
 from django.contrib.auth.views import (
     INTERNAL_RESET_SESSION_TOKEN,
     LoginView,
+    RedirectURLMixin,
     logout_then_login,
     redirect_to_login,
 )
@@ -29,14 +30,29 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import connection
 from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import CsrfViewMiddleware, get_token
-from django.test import Client, TestCase, override_settings
+from django.test import Client, TestCase, ignore_warnings, override_settings
 from django.test.client import RedirectCycleError
 from django.urls import NoReverseMatch, reverse, reverse_lazy
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.http import urlsafe_base64_encode
 
 from .client import PasswordResetConfirmClient
 from .models import CustomUser, UUIDUser
 from .settings import AUTH_TEMPLATES
+
+
+class RedirectURLMixinTests(TestCase):
+    @override_settings(ROOT_URLCONF="auth_tests.urls")
+    def test_get_default_redirect_url_next_page(self):
+        class RedirectURLView(RedirectURLMixin):
+            next_page = "/custom/"
+
+        self.assertEqual(RedirectURLView().get_default_redirect_url(), "/custom/")
+
+    def test_get_default_redirect_url_no_next_page(self):
+        msg = "No URL to redirect to. Provide a next_page."
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            RedirectURLMixin().get_default_redirect_url()
 
 
 @override_settings(
@@ -71,7 +87,7 @@ class AuthViewsTestCase(TestCase):
         return response
 
     def logout(self):
-        response = self.client.get("/admin/logout/")
+        response = self.client.post("/admin/logout/")
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(SESSION_KEY, self.client.session)
 
@@ -538,7 +554,7 @@ class ChangePasswordTest(AuthViewsTestCase):
         )
 
     def logout(self):
-        self.client.get("/logout/")
+        self.client.post("/logout/")
 
     def test_password_change_fails_with_invalid_old_password(self):
         self.login()
@@ -979,7 +995,12 @@ class LogoutThenLoginTests(AuthViewsTestCase):
     def test_default_logout_then_login(self):
         self.login()
         req = HttpRequest()
-        req.method = "GET"
+        req.method = "POST"
+        csrf_token = get_token(req)
+        req.COOKIES[settings.CSRF_COOKIE_NAME] = csrf_token
+        req.POST = {"csrfmiddlewaretoken": csrf_token}
+        req.META["SERVER_NAME"] = "testserver"
+        req.META["SERVER_PORT"] = 80
         req.session = self.client.session
         response = logout_then_login(req)
         self.confirm_logged_out()
@@ -988,11 +1009,31 @@ class LogoutThenLoginTests(AuthViewsTestCase):
     def test_logout_then_login_with_custom_login(self):
         self.login()
         req = HttpRequest()
-        req.method = "GET"
+        req.method = "POST"
+        csrf_token = get_token(req)
+        req.COOKIES[settings.CSRF_COOKIE_NAME] = csrf_token
+        req.POST = {"csrfmiddlewaretoken": csrf_token}
+        req.META["SERVER_NAME"] = "testserver"
+        req.META["SERVER_PORT"] = 80
         req.session = self.client.session
         response = logout_then_login(req, login_url="/custom/")
         self.confirm_logged_out()
         self.assertRedirects(response, "/custom/", fetch_redirect_response=False)
+
+    @ignore_warnings(category=RemovedInDjango50Warning)
+    @override_settings(LOGIN_URL="/login/")
+    def test_default_logout_then_login_get(self):
+        self.login()
+        req = HttpRequest()
+        req.method = "GET"
+        req.META["SERVER_NAME"] = "testserver"
+        req.META["SERVER_PORT"] = 80
+        req.session = self.client.session
+        response = logout_then_login(req)
+        # RemovedInDjango50Warning: When the deprecation ends, replace with
+        #   self.assertEqual(response.status_code, 405)
+        self.confirm_logged_out()
+        self.assertRedirects(response, "/login/", fetch_redirect_response=False)
 
 
 class LoginRedirectAuthenticatedUser(AuthViewsTestCase):
@@ -1136,7 +1177,7 @@ class LogoutTest(AuthViewsTestCase):
     def test_logout_default(self):
         "Logout without next_page option renders the default template"
         self.login()
-        response = self.client.get("/logout/")
+        response = self.client.post("/logout/")
         self.assertContains(response, "Logged out")
         self.confirm_logged_out()
 
@@ -1146,10 +1187,21 @@ class LogoutTest(AuthViewsTestCase):
         self.assertContains(response, "Logged out")
         self.confirm_logged_out()
 
+    def test_logout_with_get_raises_deprecation_warning(self):
+        self.login()
+        msg = (
+            "Log out via GET requests is deprecated and will be removed in Django 5.0. "
+            "Use POST requests for logging out."
+        )
+        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+            response = self.client.get("/logout/")
+        self.assertContains(response, "Logged out")
+        self.confirm_logged_out()
+
     def test_14377(self):
         # Bug 14377
         self.login()
-        response = self.client.get("/logout/")
+        response = self.client.post("/logout/")
         self.assertIn("site", response.context)
 
     def test_logout_doesnt_cache(self):
@@ -1157,16 +1209,16 @@ class LogoutTest(AuthViewsTestCase):
         The logout() view should send "no-cache" headers for reasons described
         in #25490.
         """
-        response = self.client.get("/logout/")
+        response = self.client.post("/logout/")
         self.assertIn("no-store", response.headers["Cache-Control"])
 
     def test_logout_with_overridden_redirect_url(self):
         # Bug 11223
         self.login()
-        response = self.client.get("/logout/next_page/")
+        response = self.client.post("/logout/next_page/")
         self.assertRedirects(response, "/somewhere/", fetch_redirect_response=False)
 
-        response = self.client.get("/logout/next_page/?next=/login/")
+        response = self.client.post("/logout/next_page/?next=/login/")
         self.assertRedirects(response, "/login/", fetch_redirect_response=False)
 
         self.confirm_logged_out()
@@ -1174,28 +1226,28 @@ class LogoutTest(AuthViewsTestCase):
     def test_logout_with_next_page_specified(self):
         "Logout with next_page option given redirects to specified resource"
         self.login()
-        response = self.client.get("/logout/next_page/")
+        response = self.client.post("/logout/next_page/")
         self.assertRedirects(response, "/somewhere/", fetch_redirect_response=False)
         self.confirm_logged_out()
 
     def test_logout_with_redirect_argument(self):
         "Logout with query string redirects to specified resource"
         self.login()
-        response = self.client.get("/logout/?next=/login/")
+        response = self.client.post("/logout/?next=/login/")
         self.assertRedirects(response, "/login/", fetch_redirect_response=False)
         self.confirm_logged_out()
 
     def test_logout_with_custom_redirect_argument(self):
         "Logout with custom query string redirects to specified resource"
         self.login()
-        response = self.client.get("/logout/custom_query/?follow=/somewhere/")
+        response = self.client.post("/logout/custom_query/?follow=/somewhere/")
         self.assertRedirects(response, "/somewhere/", fetch_redirect_response=False)
         self.confirm_logged_out()
 
     def test_logout_with_named_redirect(self):
         "Logout resolves names or URLs passed as next_page."
         self.login()
-        response = self.client.get("/logout/next_page/named/")
+        response = self.client.post("/logout/next_page/named/")
         self.assertRedirects(
             response, "/password_reset/", fetch_redirect_response=False
         )
@@ -1203,7 +1255,7 @@ class LogoutTest(AuthViewsTestCase):
 
     def test_success_url_allowed_hosts_same_host(self):
         self.login()
-        response = self.client.get("/logout/allowed_hosts/?next=https://testserver/")
+        response = self.client.post("/logout/allowed_hosts/?next=https://testserver/")
         self.assertRedirects(
             response, "https://testserver/", fetch_redirect_response=False
         )
@@ -1211,7 +1263,7 @@ class LogoutTest(AuthViewsTestCase):
 
     def test_success_url_allowed_hosts_safe_host(self):
         self.login()
-        response = self.client.get("/logout/allowed_hosts/?next=https://otherserver/")
+        response = self.client.post("/logout/allowed_hosts/?next=https://otherserver/")
         self.assertRedirects(
             response, "https://otherserver/", fetch_redirect_response=False
         )
@@ -1219,7 +1271,7 @@ class LogoutTest(AuthViewsTestCase):
 
     def test_success_url_allowed_hosts_unsafe_host(self):
         self.login()
-        response = self.client.get("/logout/allowed_hosts/?next=https://evil/")
+        response = self.client.post("/logout/allowed_hosts/?next=https://evil/")
         self.assertRedirects(
             response, "/logout/allowed_hosts/", fetch_redirect_response=False
         )
@@ -1246,7 +1298,7 @@ class LogoutTest(AuthViewsTestCase):
                     "bad_url": quote(bad_url),
                 }
                 self.login()
-                response = self.client.get(nasty_url)
+                response = self.client.post(nasty_url)
                 self.assertEqual(response.status_code, 302)
                 self.assertNotIn(
                     bad_url, response.url, "%s should be blocked" % bad_url
@@ -1272,7 +1324,7 @@ class LogoutTest(AuthViewsTestCase):
                     "good_url": quote(good_url),
                 }
                 self.login()
-                response = self.client.get(safe_url)
+                response = self.client.post(safe_url)
                 self.assertEqual(response.status_code, 302)
                 self.assertIn(good_url, response.url, "%s should be allowed" % good_url)
                 self.confirm_logged_out()
@@ -1286,7 +1338,7 @@ class LogoutTest(AuthViewsTestCase):
             "next_url": quote(non_https_next_url),
         }
         self.login()
-        response = self.client.get(url, secure=True)
+        response = self.client.post(url, secure=True)
         self.assertRedirects(response, logout_url, fetch_redirect_response=False)
         self.confirm_logged_out()
 
@@ -1295,20 +1347,27 @@ class LogoutTest(AuthViewsTestCase):
         self.login()
         self.client.post("/setlang/", {"language": "pl"})
         self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, "pl")
-        self.client.get("/logout/")
+        self.client.post("/logout/")
         self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, "pl")
 
     @override_settings(LOGOUT_REDIRECT_URL="/custom/")
     def test_logout_redirect_url_setting(self):
         self.login()
-        response = self.client.get("/logout/")
+        response = self.client.post("/logout/")
+        self.assertRedirects(response, "/custom/", fetch_redirect_response=False)
+
+    @override_settings(LOGOUT_REDIRECT_URL="/custom/")
+    def test_logout_redirect_url_setting_allowed_hosts_unsafe_host(self):
+        self.login()
+        response = self.client.post("/logout/allowed_hosts/?next=https://evil/")
         self.assertRedirects(response, "/custom/", fetch_redirect_response=False)
 
     @override_settings(LOGOUT_REDIRECT_URL="logout")
     def test_logout_redirect_url_named_setting(self):
         self.login()
-        response = self.client.get("/logout/")
-        self.assertRedirects(response, "/logout/", fetch_redirect_response=False)
+        response = self.client.post("/logout/")
+        self.assertContains(response, "Logged out")
+        self.confirm_logged_out()
 
 
 def get_perm(Model, perm):

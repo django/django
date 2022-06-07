@@ -42,7 +42,6 @@ urlpatterns = [
     path("bad_view/", views.bad_view),
     path("form_view/", views.form_view),
     path("form_view_with_template/", views.form_view_with_template),
-    path("formset_view/", views.formset_view),
     path("json_view/", views.json_view),
     path("login_protected_view/", views.login_protected_view),
     path("login_protected_method_view/", views.login_protected_method_view),

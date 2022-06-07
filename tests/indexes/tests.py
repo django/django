@@ -1,8 +1,17 @@
 import datetime
 from unittest import skipUnless
 
+from django.conf import settings
 from django.db import connection
-from django.db.models import CASCADE, ForeignKey, Index, Q
+from django.db.models import (
+    CASCADE,
+    CharField,
+    DateTimeField,
+    ForeignKey,
+    Index,
+    Model,
+    Q,
+)
 from django.db.models.functions import Lower
 from django.test import (
     TestCase,
@@ -10,15 +19,10 @@ from django.test import (
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
-from django.test.utils import override_settings
+from django.test.utils import isolate_apps, override_settings
 from django.utils import timezone
 
-from .models import (
-    Article,
-    ArticleTranslation,
-    IndexedArticle2,
-    IndexTogetherSingleList,
-)
+from .models import Article, ArticleTranslation, IndexedArticle2
 
 
 class SchemaIndexesTests(TestCase):
@@ -78,8 +82,15 @@ class SchemaIndexesTests(TestCase):
             index_sql[0],
         )
 
+    @isolate_apps("indexes")
     def test_index_together_single_list(self):
-        # Test for using index_together with a single list (#22172)
+        class IndexTogetherSingleList(Model):
+            headline = CharField(max_length=100)
+            pub_date = DateTimeField()
+
+            class Meta:
+                index_together = ["headline", "pub_date"]
+
         index_sql = connection.schema_editor()._model_indexes_sql(
             IndexTogetherSingleList
         )
@@ -93,6 +104,7 @@ class SchemaIndexesTests(TestCase):
             str(index.create_sql(Article, editor)),
         )
 
+    @skipUnlessDBFeature("supports_index_column_ordering")
     def test_descending_columns_list_sql(self):
         index = Index(fields=["-headline"], name="whitespace_idx")
         editor = connection.schema_editor()
@@ -336,7 +348,7 @@ class SchemaIndexesMySQLTests(TransactionTestCase):
                 ArticleTranslation._meta.db_table,
             )
         if storage != "InnoDB":
-            self.skip("This test only applies to the InnoDB storage engine")
+            self.skipTest("This test only applies to the InnoDB storage engine")
         index_sql = [
             str(statement)
             for statement in connection.schema_editor()._model_indexes_sql(
@@ -599,11 +611,17 @@ class CoveringIndexTests(TransactionTestCase):
             condition=Q(pub_date__isnull=False),
         )
         with connection.schema_editor() as editor:
+            extra_sql = ""
+            if settings.DEFAULT_INDEX_TABLESPACE:
+                extra_sql = "TABLESPACE %s " % editor.quote_name(
+                    settings.DEFAULT_INDEX_TABLESPACE
+                )
             self.assertIn(
-                "(%s) INCLUDE (%s) WHERE %s "
+                "(%s) INCLUDE (%s) %sWHERE %s "
                 % (
                     editor.quote_name("headline"),
                     editor.quote_name("pub_date"),
+                    extra_sql,
                     editor.quote_name("pub_date"),
                 ),
                 str(index.create_sql(Article, editor)),

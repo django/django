@@ -10,7 +10,7 @@ from django.db.models import (
     TextField,
     Value,
 )
-from django.db.models.expressions import CombinedExpression
+from django.db.models.expressions import CombinedExpression, register_combinable_fields
 from django.db.models.functions import Cast, Coalesce
 
 
@@ -77,6 +77,11 @@ class SearchVectorCombinable:
         if reversed:
             return CombinedSearchVector(other, connector, self, self.config)
         return CombinedSearchVector(self, connector, other, self.config)
+
+
+register_combinable_fields(
+    SearchVectorField, SearchVectorCombinable.ADD, SearchVectorField, SearchVectorField
+)
 
 
 class SearchVector(SearchVectorCombinable, Func):

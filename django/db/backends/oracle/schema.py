@@ -91,6 +91,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             elif "ORA-30673" in description and old_field.primary_key:
                 self._delete_primary_key(model, strict=True)
                 self._alter_field_type_workaround(model, old_field, new_field)
+            # If a collation is changing on a primary key, drop the primary key
+            # first.
+            elif "ORA-43923" in description and old_field.primary_key:
+                self._delete_primary_key(model, strict=True)
+                self.alter_field(model, old_field, new_field, strict)
+                # Restore a primary key, if needed.
+                if new_field.primary_key:
+                    self.execute(self._create_primary_key_sql(model, new_field))
             else:
                 raise
 
@@ -117,7 +125,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Add it
         self.add_field(model, new_temp_field)
         # Explicit data type conversion
-        # https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf
+        # https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf
         # /Data-Type-Comparison-Rules.html#GUID-D0C5A47E-6F93-4C2D-9E49-4F2B86B359DD
         new_value = self.quote_name(old_field.column)
         old_type = old_field.db_type(self.connection)

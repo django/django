@@ -1,3 +1,4 @@
+import warnings
 from urllib.parse import urlparse, urlunparse
 
 from django.conf import settings
@@ -21,6 +22,7 @@ from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import resolve_url
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.http import url_has_allowed_host_and_scheme, urlsafe_base64_decode
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
@@ -32,22 +34,43 @@ from django.views.generic.edit import FormView
 UserModel = get_user_model()
 
 
-class SuccessURLAllowedHostsMixin:
+class RedirectURLMixin:
+    next_page = None
+    redirect_field_name = REDIRECT_FIELD_NAME
     success_url_allowed_hosts = set()
+
+    def get_success_url(self):
+        return self.get_redirect_url() or self.get_default_redirect_url()
+
+    def get_redirect_url(self):
+        """Return the user-originating redirect URL if it's safe."""
+        redirect_to = self.request.POST.get(
+            self.redirect_field_name, self.request.GET.get(self.redirect_field_name)
+        )
+        url_is_safe = url_has_allowed_host_and_scheme(
+            url=redirect_to,
+            allowed_hosts=self.get_success_url_allowed_hosts(),
+            require_https=self.request.is_secure(),
+        )
+        return redirect_to if url_is_safe else ""
 
     def get_success_url_allowed_hosts(self):
         return {self.request.get_host(), *self.success_url_allowed_hosts}
 
+    def get_default_redirect_url(self):
+        """Return the default redirect URL."""
+        if self.next_page:
+            return resolve_url(self.next_page)
+        raise ImproperlyConfigured("No URL to redirect to. Provide a next_page.")
 
-class LoginView(SuccessURLAllowedHostsMixin, FormView):
+
+class LoginView(RedirectURLMixin, FormView):
     """
     Display the login form and handle the login action.
     """
 
     form_class = AuthenticationForm
     authentication_form = None
-    next_page = None
-    redirect_field_name = REDIRECT_FIELD_NAME
     template_name = "registration/login.html"
     redirect_authenticated_user = False
     extra_context = None
@@ -66,24 +89,12 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
             return HttpResponseRedirect(redirect_to)
         return super().dispatch(request, *args, **kwargs)
 
-    def get_success_url(self):
-        return self.get_redirect_url() or self.get_default_redirect_url()
-
-    def get_redirect_url(self):
-        """Return the user-originating redirect URL if it's safe."""
-        redirect_to = self.request.POST.get(
-            self.redirect_field_name, self.request.GET.get(self.redirect_field_name, "")
-        )
-        url_is_safe = url_has_allowed_host_and_scheme(
-            url=redirect_to,
-            allowed_hosts=self.get_success_url_allowed_hosts(),
-            require_https=self.request.is_secure(),
-        )
-        return redirect_to if url_is_safe else ""
-
     def get_default_redirect_url(self):
         """Return the default redirect URL."""
-        return resolve_url(self.next_page or settings.LOGIN_REDIRECT_URL)
+        if self.next_page:
+            return resolve_url(self.next_page)
+        else:
+            return resolve_url(settings.LOGIN_REDIRECT_URL)
 
     def get_form_class(self):
         return self.authentication_form or self.form_class
@@ -112,54 +123,50 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
         return context
 
 
-class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
+class LogoutView(RedirectURLMixin, TemplateView):
     """
     Log out the user and display the 'You are logged out' message.
     """
 
-    next_page = None
-    redirect_field_name = REDIRECT_FIELD_NAME
+    # RemovedInDjango50Warning: when the deprecation ends, remove "get" and
+    # "head" from http_method_names.
+    http_method_names = ["get", "head", "post", "options"]
     template_name = "registration/logged_out.html"
     extra_context = None
 
+    # RemovedInDjango50Warning: when the deprecation ends, move
+    # @method_decorator(csrf_protect) from post() to dispatch().
     @method_decorator(never_cache)
     def dispatch(self, request, *args, **kwargs):
-        auth_logout(request)
-        next_page = self.get_next_page()
-        if next_page:
-            # Redirect to this page until the session has been cleared.
-            return HttpResponseRedirect(next_page)
+        if request.method.lower() == "get":
+            warnings.warn(
+                "Log out via GET requests is deprecated and will be removed in Django "
+                "5.0. Use POST requests for logging out.",
+                RemovedInDjango50Warning,
+            )
         return super().dispatch(request, *args, **kwargs)
 
+    @method_decorator(csrf_protect)
     def post(self, request, *args, **kwargs):
         """Logout may be done via POST."""
-        return self.get(request, *args, **kwargs)
+        auth_logout(request)
+        redirect_to = self.get_success_url()
+        if redirect_to != request.get_full_path():
+            # Redirect to target page once the session has been cleared.
+            return HttpResponseRedirect(redirect_to)
+        return super().get(request, *args, **kwargs)
 
-    def get_next_page(self):
-        if self.next_page is not None:
-            next_page = resolve_url(self.next_page)
+    # RemovedInDjango50Warning.
+    get = post
+
+    def get_default_redirect_url(self):
+        """Return the default redirect URL."""
+        if self.next_page:
+            return resolve_url(self.next_page)
         elif settings.LOGOUT_REDIRECT_URL:
-            next_page = resolve_url(settings.LOGOUT_REDIRECT_URL)
+            return resolve_url(settings.LOGOUT_REDIRECT_URL)
         else:
-            next_page = self.next_page
-
-        if (
-            self.redirect_field_name in self.request.POST
-            or self.redirect_field_name in self.request.GET
-        ):
-            next_page = self.request.POST.get(
-                self.redirect_field_name, self.request.GET.get(self.redirect_field_name)
-            )
-            url_is_safe = url_has_allowed_host_and_scheme(
-                url=next_page,
-                allowed_hosts=self.get_success_url_allowed_hosts(),
-                require_https=self.request.is_secure(),
-            )
-            # Security check -- Ensure the user-originating redirection URL is
-            # safe.
-            if not url_is_safe:
-                next_page = self.request.path
-        return next_page
+            return self.request.path
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -1,3 +1,4 @@
+import inspect
 import threading
 from datetime import datetime, timedelta
 from unittest import mock
@@ -702,6 +703,24 @@ class ManagerTest(SimpleTestCase):
         "union",
         "intersection",
         "difference",
+        "aaggregate",
+        "abulk_create",
+        "abulk_update",
+        "acontains",
+        "acount",
+        "acreate",
+        "aearliest",
+        "aexists",
+        "aexplain",
+        "afirst",
+        "aget",
+        "aget_or_create",
+        "ain_bulk",
+        "aiterator",
+        "alast",
+        "alatest",
+        "aupdate",
+        "aupdate_or_create",
     ]
 
     def test_manager_methods(self):
@@ -716,6 +735,17 @@ class ManagerTest(SimpleTestCase):
         self.assertEqual(
             sorted(BaseManager._get_queryset_methods(models.QuerySet)),
             sorted(self.QUERYSET_PROXY_METHODS),
+        )
+
+    def test_manager_method_attributes(self):
+        self.assertEqual(Article.objects.get.__doc__, models.QuerySet.get.__doc__)
+        self.assertEqual(Article.objects.count.__name__, models.QuerySet.count.__name__)
+
+    def test_manager_method_signature(self):
+        self.assertEqual(
+            str(inspect.signature(Article.objects.bulk_create)),
+            "(objs, batch_size=None, ignore_conflicts=False, update_conflicts=False, "
+            "update_fields=None, unique_fields=None)",
         )
 
 

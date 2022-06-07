@@ -2,7 +2,7 @@ import datetime
 
 from django.test import SimpleTestCase
 from django.utils import feedgenerator
-from django.utils.timezone import get_fixed_timezone, utc
+from django.utils.timezone import get_fixed_timezone
 
 
 class FeedgeneratorTests(SimpleTestCase):
@@ -144,4 +144,7 @@ class FeedgeneratorTests(SimpleTestCase):
         for use_tz in (True, False):
             with self.settings(USE_TZ=use_tz):
                 rss_feed = feedgenerator.Rss201rev2Feed("title", "link", "description")
-                self.assertEqual(rss_feed.latest_post_date().tzinfo, utc)
+                self.assertEqual(
+                    rss_feed.latest_post_date().tzinfo,
+                    datetime.timezone.utc,
+                )

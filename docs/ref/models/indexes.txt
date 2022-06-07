@@ -80,8 +80,12 @@ define an index with a descending order for a column, add a hyphen before the
 field's name.
 
 For example ``Index(fields=['headline', '-pub_date'])`` would create SQL with
-``(headline, pub_date DESC)``. Index ordering isn't supported on MySQL. In that
-case, a descending index is created as a normal index.
+``(headline, pub_date DESC)``.
+
+.. admonition:: MySQL and MariaDB
+
+    Index ordering isn't supported on MySQL < 8.0.1 and MariaDB < 10.8. In that
+    case, a descending index is created as a normal index.
 
 ``name``
 --------
@@ -210,10 +214,9 @@ See the PostgreSQL documentation for more details about `covering indexes`_.
 
 .. admonition:: Restrictions on PostgreSQL
 
-    PostgreSQL 11+ only supports covering B-Tree indexes, PostgreSQL 12+ also
-    supports covering :class:`GiST indexes
-    <django.contrib.postgres.indexes.GistIndex>`, and PostgreSQL 14+ also
-    supports covering :class:`SP-GiST indexes
+    PostgreSQL supports covering B-Tree and :class:`GiST indexes
+    <django.contrib.postgres.indexes.GistIndex>`. PostgreSQL 14+ also supports
+    covering :class:`SP-GiST indexes
     <django.contrib.postgres.indexes.SpGistIndex>`.
 
 .. versionchanged:: 4.1

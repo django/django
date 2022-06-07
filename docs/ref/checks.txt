@@ -94,10 +94,6 @@ Django's system checks are organized using the following tags:
 
 Some checks may be registered with multiple tags.
 
-.. versionchanged:: 4.0
-
-    The ``files`` tag was added.
-
 Core system checks
 ==================
 
@@ -156,8 +152,6 @@ If you're using MySQL or MariaDB, the following checks will be performed:
 
 Managing files
 --------------
-
-.. versionadded:: 4.0
 
 The following checks verify your setup for :doc:`/topics/files`:
 
@@ -395,6 +389,8 @@ Models
 * **models.W043**: ``<database>`` does not support indexes on expressions.
 * **models.W044**: ``<database>`` does not support unique constraints on
   expressions.
+* **models.W045**: Check constraint ``<constraint>`` contains ``RawSQL()``
+  expression and won't be validated during the model ``full_clean()``.
 
 Security
 --------

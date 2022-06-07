@@ -19,6 +19,7 @@ from django.test import SimpleTestCase, TransactionTestCase, skipUnlessDBFeature
 from django.test.runner import (
     DiscoverRunner,
     Shuffler,
+    _init_worker,
     reorder_test_bin,
     reorder_tests,
     shuffle_tests,
@@ -480,8 +481,6 @@ class ManageCommandTests(unittest.TestCase):
 # Isolate from the real environment.
 @mock.patch.dict(os.environ, {}, clear=True)
 @mock.patch.object(multiprocessing, "cpu_count", return_value=12)
-# Python 3.8 on macOS defaults to 'spawn' mode.
-@mock.patch.object(multiprocessing, "get_start_method", return_value="fork")
 class ManageCommandParallelTests(SimpleTestCase):
     def test_parallel_default(self, *mocked_objects):
         with captured_stderr() as stderr:
@@ -507,8 +506,8 @@ class ManageCommandParallelTests(SimpleTestCase):
         # Parallel is disabled by default.
         self.assertEqual(stderr.getvalue(), "")
 
-    def test_parallel_spawn(self, mocked_get_start_method, mocked_cpu_count):
-        mocked_get_start_method.return_value = "spawn"
+    @mock.patch.object(multiprocessing, "get_start_method", return_value="spawn")
+    def test_parallel_spawn(self, *mocked_objects):
         with captured_stderr() as stderr:
             call_command(
                 "test",
@@ -517,8 +516,8 @@ class ManageCommandParallelTests(SimpleTestCase):
             )
         self.assertIn("parallel=1", stderr.getvalue())
 
-    def test_no_parallel_spawn(self, mocked_get_start_method, mocked_cpu_count):
-        mocked_get_start_method.return_value = "spawn"
+    @mock.patch.object(multiprocessing, "get_start_method", return_value="spawn")
+    def test_no_parallel_spawn(self, *mocked_objects):
         with captured_stderr() as stderr:
             call_command(
                 "test",
@@ -639,6 +638,91 @@ class CustomTestRunnerOptionsCmdlineTests(AdminScriptTestCase):
         self.assertIn("usage", err)
         self.assertNotIn("Traceback", err)
         self.assertNoOutput(out)
+
+
+class NoInitializeSuiteTestRunnerTests(SimpleTestCase):
+    @mock.patch.object(multiprocessing, "get_start_method", return_value="spawn")
+    @mock.patch(
+        "django.test.runner.ParallelTestSuite.initialize_suite",
+        side_effect=Exception("initialize_suite() is called."),
+    )
+    def test_no_initialize_suite_test_runner(self, *mocked_objects):
+        """
+        The test suite's initialize_suite() method must always be called when
+        using spawn. It cannot rely on a test runner implementation.
+        """
+
+        class NoInitializeSuiteTestRunner(DiscoverRunner):
+            def setup_test_environment(self, **kwargs):
+                return
+
+            def setup_databases(self, **kwargs):
+                return
+
+            def run_checks(self, databases):
+                return
+
+            def teardown_databases(self, old_config, **kwargs):
+                return
+
+            def teardown_test_environment(self, **kwargs):
+                return
+
+            def run_suite(self, suite, **kwargs):
+                kwargs = self.get_test_runner_kwargs()
+                runner = self.test_runner(**kwargs)
+                return runner.run(suite)
+
+        with self.assertRaisesMessage(Exception, "initialize_suite() is called."):
+            runner = NoInitializeSuiteTestRunner(
+                verbosity=0, interactive=False, parallel=2
+            )
+            runner.run_tests(
+                [
+                    "test_runner_apps.sample.tests_sample.TestDjangoTestCase",
+                    "test_runner_apps.simple.tests",
+                ]
+            )
+
+
+class TestRunnerInitializerTests(SimpleTestCase):
+
+    # Raise an exception to don't actually run tests.
+    @mock.patch.object(
+        multiprocessing, "Pool", side_effect=Exception("multiprocessing.Pool()")
+    )
+    def test_no_initialize_suite_test_runner(self, mocked_pool):
+        class StubTestRunner(DiscoverRunner):
+            def setup_test_environment(self, **kwargs):
+                return
+
+            def setup_databases(self, **kwargs):
+                return
+
+            def run_checks(self, databases):
+                return
+
+            def teardown_databases(self, old_config, **kwargs):
+                return
+
+            def teardown_test_environment(self, **kwargs):
+                return
+
+            def run_suite(self, suite, **kwargs):
+                kwargs = self.get_test_runner_kwargs()
+                runner = self.test_runner(**kwargs)
+                return runner.run(suite)
+
+        runner = StubTestRunner(verbosity=0, interactive=False, parallel=2)
+        with self.assertRaisesMessage(Exception, "multiprocessing.Pool()"):
+            runner.run_tests(
+                [
+                    "test_runner_apps.sample.tests_sample.TestDjangoTestCase",
+                    "test_runner_apps.simple.tests",
+                ]
+            )
+        # Initializer must be a function.
+        self.assertIs(mocked_pool.call_args.kwargs["initializer"], _init_worker)
 
 
 class Ticket17477RegressionTests(AdminScriptTestCase):

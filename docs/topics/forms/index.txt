@@ -164,7 +164,7 @@ So when we handle a model instance in a view, we typically retrieve it from the
 database. When we're dealing with a form we typically instantiate it in the
 view.
 
-When we instantiate a form, we can opt to leave it empty or pre-populate it, for
+When we instantiate a form, we can opt to leave it empty or prepopulate it, for
 example with:
 
 * data from a saved model instance (as in the case of admin forms for editing)
@@ -207,7 +207,7 @@ Now you'll also need a view corresponding to that ``/your-name/`` URL which will
 find the appropriate key/value pairs in the request, and then process them.
 
 This is a very simple form. In practice, a form might contain dozens or
-hundreds of fields, many of which might need to be pre-populated, and we might
+hundreds of fields, many of which might need to be prepopulated, and we might
 expect the user to work through the edit-submit cycle several times before
 concluding the operation.
 
@@ -227,7 +227,7 @@ We already know what we want our HTML form to look like. Our starting point for
 it in Django is this:
 
 .. code-block:: python
-    :caption: forms.py
+    :caption: ``forms.py``
 
     from django import forms
 
@@ -277,7 +277,7 @@ To handle the form we need to instantiate it in the view for the URL where we
 want it to be published:
 
 .. code-block:: python
-    :caption: views.py
+    :caption: ``views.py``
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import render
@@ -404,7 +404,7 @@ Consider a more useful form than our minimal example above, which we could use
 to implement "contact me" functionality on a personal website:
 
 .. code-block:: python
-    :caption: forms.py
+    :caption: ``forms.py``
 
     from django import forms
 
@@ -453,7 +453,7 @@ values to a Python ``int`` and ``float`` respectively.
 Here's how the form data could be processed in the view that handles this form:
 
 .. code-block:: python
-    :caption: views.py
+    :caption: ``views.py``
 
     from django.core.mail import send_mail
 
@@ -487,23 +487,89 @@ instance into the template context. So if your form is called ``form`` in the
 context, ``{{ form }}`` will render its ``<label>`` and ``<input>`` elements
 appropriately.
 
-Form rendering options
-----------------------
-
 .. admonition:: Additional form template furniture
 
     Don't forget that a form's output does *not* include the surrounding
     ``<form>`` tags, or the form's ``submit`` control. You will have to provide
     these yourself.
 
+Reusable form templates
+-----------------------
+
+The HTML output when rendering a form is itself generated via a template. You
+can control this by creating an appropriate template file and setting a custom
+:setting:`FORM_RENDERER` to use that
+:attr:`~django.forms.renderers.BaseRenderer.form_template_name` site-wide. You
+can also customize per-form by overriding the form's
+:attr:`~django.forms.Form.template_name` attribute to render the form using the
+custom template, or by passing the template name directly to
+:meth:`.Form.render`.
+
+The example below will result in ``{{ form }}`` being rendered as the output of
+the ``form_snippet.html`` template.
+
+In your templates:
+
+.. code-block:: html+django
+
+    # In your template:
+    {{ form }}
+
+    # In form_snippet.html:
+    {% for field in form %}
+        <div class="fieldWrapper">
+            {{ field.errors }}
+            {{ field.label_tag }} {{ field }}
+        </div>
+    {% endfor %}
+
+Then you can configure the :setting:`FORM_RENDERER` setting:
+
+.. code-block:: python
+    :caption: ``settings.py``
+
+    from django.forms.renderers import TemplatesSetting
+
+    class CustomFormRenderer(TemplatesSetting):
+        form_template_name = "form_snippet.html"
+
+    FORM_RENDERER = "project.settings.CustomFormRenderer"
+
+… or for a single form::
+
+    class MyForm(forms.Form):
+        template_name = "form_snippet.html"
+        ...
+
+… or for a single render of a form instance, passing in the template name to
+the :meth:`.Form.render`. Here's an example of this being used in a view::
+
+    def index(request):
+        form = MyForm()
+        rendered_form = form.render("form_snippet.html")
+        context = {'form': rendered_form}
+        return render(request, 'index.html', context)
+
+See :ref:`ref-forms-api-outputting-html` for more details.
+
+.. versionchanged:: 4.1
+
+    The ability to set the default ``form_template_name`` on the form renderer
+    was added.
+
+Form rendering options
+----------------------
+
 There are other output options though for the ``<label>``/``<input>`` pairs:
 
+* ``{{ form.as_div }}`` will render them wrapped in ``<div>`` tags.
+
 * ``{{ form.as_table }}`` will render them as table cells wrapped in ``<tr>``
-  tags
+  tags.
 
-* ``{{ form.as_p }}`` will render them wrapped in ``<p>`` tags
+* ``{{ form.as_p }}`` will render them wrapped in ``<p>`` tags.
 
-* ``{{ form.as_ul }}`` will render them wrapped in ``<li>`` tags
+* ``{{ form.as_ul }}`` will render them wrapped in ``<li>`` tags.
 
 Note that you'll have to provide the surrounding ``<table>`` or ``<ul>``
 elements yourself.
@@ -686,6 +752,32 @@ Useful attributes on ``{{ field }}`` include:
 
         <label for="id_email">Email address:</label>
 
+``{{ field.legend_tag }}``
+
+    .. versionadded:: 4.1
+
+    Similar to ``field.label_tag`` but uses a ``<legend>`` tag in place of
+    ``<label>``, for widgets with multiple inputs wrapped in a ``<fieldset>``.
+
+``{{ field.use_fieldset }}``
+
+    .. versionadded:: 4.1
+
+    This attribute is ``True`` if the form field's widget contains multiple
+    inputs that should be semantically grouped in a ``<fieldset>`` with a
+    ``<legend>`` to improve accessibility. An example use in a template:
+
+.. code-block:: html+django
+
+    {% if field.use_fieldset %}
+      <fieldset>
+      {% if field.label %}{{ field.legend_tag }}{% endif %}
+    {% else %}
+      {% if field.label %}{{ field.label_tag }}{% endif %}
+    {% endif %}
+    {{ field }}
+    {% if field.use_fieldset %}</fieldset>{% endif %}
+
 ``{{ field.value }}``
     The value of the field. e.g ``someone@example.com``.
 
@@ -727,41 +819,6 @@ This example does not handle any errors in the hidden fields. Usually, an
 error in a hidden field is a sign of form tampering, since normal form
 interaction won't alter them. However, you could easily insert some error
 displays for those form errors, as well.
-
-Reusable form templates
------------------------
-
-If your site uses the same rendering logic for forms in multiple places, you
-can reduce duplication by saving the form's loop in a standalone template and
-overriding the forms :attr:`~django.forms.Form.template_name` attribute to
-render the form using the custom template. The below example will result in
-``{{ form }}`` being rendered as the output of the ``form_snippet.html``
-template.
-
-In your templates:
-
-.. code-block:: html+django
-
-    # In your template:
-    {{ form }}
-
-    # In form_snippet.html:
-    {% for field in form %}
-        <div class="fieldWrapper">
-            {{ field.errors }}
-            {{ field.label_tag }} {{ field }}
-        </div>
-    {% endfor %}
-
-In your form::
-
-    class MyForm(forms.Form):
-        template_name = 'form_snippet.html'
-        ...
-
-.. versionchanged:: 4.0
-
-    Template rendering of forms was added.
 
 Further topics
 ==============

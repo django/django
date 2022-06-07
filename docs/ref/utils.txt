@@ -332,7 +332,8 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
 .. class:: SyndicationFeed
 
-    Base class for all syndication feeds. Subclasses should provide write().
+    Base class for all syndication feeds. Subclasses should provide
+    ``write()``.
 
     .. method:: __init__(title, link, description, language=None, author_email=None, author_name=None, author_link=None, subtitle=None, categories=None, feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs)
 
@@ -600,7 +601,7 @@ escaping HTML.
 
 .. function:: conditional_escape(text)
 
-    Similar to ``escape()``, except that it doesn't operate on pre-escaped
+    Similar to ``escape()``, except that it doesn't operate on preescaped
     strings, so it will not double escape.
 
 .. function:: format_html(format_string, *args, **kwargs)
@@ -841,6 +842,11 @@ appropriate entities.
 .. data:: utc
 
     :class:`~datetime.tzinfo` instance that represents UTC.
+
+    .. deprecated:: 4.1
+
+        This is an alias to :attr:`datetime.timezone.utc`. Use
+        :attr:`datetime.timezone.utc` directly.
 
 .. function:: get_fixed_timezone(offset)
 
