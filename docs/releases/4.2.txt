@@ -212,6 +212,10 @@ Models
 * :ref:`Registering lookups <lookup-registration-api>` on
   :class:`~django.db.models.Field` instances is now supported.
 
+* The new ``robust`` argument for :func:`~django.db.transaction.on_commit`
+  allows performing actions that can fail after a database transaction is
+  successfully committed.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
