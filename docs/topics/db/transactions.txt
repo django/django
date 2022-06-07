@@ -297,7 +297,7 @@ include a `Celery`_ task, an email notification, or a cache invalidation.
 Django provides the :func:`on_commit` function to register callback functions
 that should be executed after a transaction is successfully committed:
 
-.. function:: on_commit(func, using=None)
+.. function:: on_commit(func, using=None, robust=False)
 
 Pass any function (that takes no arguments) to :func:`on_commit`::
 
@@ -324,6 +324,15 @@ callback will be executed immediately.
 If that hypothetical database write is instead rolled back (typically when an
 unhandled exception is raised in an :func:`atomic` block), your function will
 be discarded and never called.
+
+It's sometimes useful to register callback functions that can fail. Passing
+``robust=True`` allows the next functions to be executed even if the current
+function throws an exception. All errors derived from Python's ``Exception``
+class are caught and logged to the ``django.db.backends.base`` logger.
+
+.. versionchanged:: 4.2
+
+    The ``robust`` argument was added.
 
 Savepoints
 ----------
@@ -366,10 +375,14 @@ registered.
 Exception handling
 ------------------
 
-If one on-commit function within a given transaction raises an uncaught
-exception, no later registered functions in that same transaction will run.
-This is the same behavior as if you'd executed the functions sequentially
-yourself without :func:`on_commit`.
+If one on-commit function registered with ``robust=False`` within a given
+transaction raises an uncaught exception, no later registered functions in that
+same transaction will run. This is the same behavior as if you'd executed the
+functions sequentially yourself without :func:`on_commit`.
+
+.. versionchanged:: 4.2
+
+    The ``robust`` argument was added.
 
 Timing of execution
 -------------------
