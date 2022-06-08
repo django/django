@@ -691,6 +691,7 @@ there is an ``OuterRef``, this will not be possible to resolve).
 
 The example above assumes that there is at least one comment on a post.  To 
 correctly handle the case where there are no comments on a post, use :class:`~django.db.models.functions.Coalesce`:
+
     >>> Post.objects.filter(length__gt=Coalesce(Subquery(total_comments), 0))
 
 Raw SQL expressions
