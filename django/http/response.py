@@ -373,7 +373,7 @@ class HttpResponse(HttpResponseBase):
         self.content = content
 
     def __repr__(self):
-        return "<%(cls)s status_code=%(status_code)d%(content_type)s>" % {
+        return "<%(cls)s status_code=%(status_code)s%(content_type)s>" % {
             "cls": self.__class__.__name__,
             "status_code": self.status_code,
             "content_type": self._content_type_for_repr,
