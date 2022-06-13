@@ -1032,7 +1032,12 @@ class QuerySet:
 
     def first(self):
         """Return the first object of a query or None if no match is found."""
-        for obj in (self if self.ordered else self.order_by("pk"))[:1]:
+        if self.ordered:
+            queryset = self
+        else:
+            self._check_ordering_first_last_queryset_aggregation(method="first")
+            queryset = self.order_by("pk")
+        for obj in queryset[:1]:
             return obj
 
     async def afirst(self):
@@ -1040,7 +1045,12 @@ class QuerySet:
 
     def last(self):
         """Return the last object of a query or None if no match is found."""
-        for obj in (self.reverse() if self.ordered else self.order_by("-pk"))[:1]:
+        if self.ordered:
+            queryset = self.reverse()
+        else:
+            self._check_ordering_first_last_queryset_aggregation(method="last")
+            queryset = self.order_by("-pk")
+        for obj in queryset[:1]:
             return obj
 
     async def alast(self):
@@ -1925,6 +1935,15 @@ class QuerySet:
     def _check_operator_queryset(self, other, operator_):
         if self.query.combinator or other.query.combinator:
             raise TypeError(f"Cannot use {operator_} operator with combined queryset.")
+
+    def _check_ordering_first_last_queryset_aggregation(self, method):
+        if isinstance(self.query.group_by, tuple) and not any(
+            col.output_field is self.model._meta.pk for col in self.query.group_by
+        ):
+            raise TypeError(
+                f"Cannot use QuerySet.{method}() on an unordered queryset performing "
+                f"aggregation. Add an ordering with order_by()."
+            )
 
 
 class InstanceCheckMeta(type):
