@@ -3,7 +3,7 @@ from unittest import mock
 from django.conf import settings
 from django.db import connection, models
 from django.db.models.functions import Lower, Upper
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 
 from .models import Book, ChildModel1, ChildModel2
@@ -305,6 +305,7 @@ class SimpleIndexesTests(SimpleTestCase):
         )
 
 
+@override_settings(DEFAULT_TABLESPACE=None)
 class IndexesTests(TestCase):
     @skipUnlessDBFeature("supports_tablespaces")
     def test_db_tablespace(self):
