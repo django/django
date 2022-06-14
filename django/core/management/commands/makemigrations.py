@@ -254,12 +254,7 @@ class Command(BaseCommand):
                 if self.verbosity >= 1:
                     # Display a relative path if it's below the current working
                     # directory, or an absolute path otherwise.
-                    try:
-                        migration_string = os.path.relpath(writer.path)
-                    except ValueError:
-                        migration_string = writer.path
-                    if migration_string.startswith(".."):
-                        migration_string = writer.path
+                    migration_string = self.get_relative_path(writer.path)
                     self.log("  %s\n" % self.style.MIGRATE_LABEL(migration_string))
                     for operation in migration.operations:
                         self.log("    - %s" % operation.describe())
@@ -290,6 +285,16 @@ class Command(BaseCommand):
                     )
                     self.log(writer.as_string())
         run_formatters(self.written_files)
+
+    @staticmethod
+    def get_relative_path(path):
+        try:
+            migration_string = os.path.relpath(path)
+        except ValueError:
+            migration_string = path
+        if migration_string.startswith(".."):
+            migration_string = path
+        return migration_string
 
     def handle_merge(self, loader, conflicts):
         """
