@@ -832,6 +832,13 @@ migrations are detected.
 Diverts log output and input prompts to ``stderr``, writing only paths of
 generated migration files to ``stdout``.
 
+.. django-admin-option:: --update
+
+.. versionadded:: 4.2
+
+Merges model changes into the latest migration and optimize the resulting
+operations.
+
 ``migrate``
 -----------
 
