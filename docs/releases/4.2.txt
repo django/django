@@ -158,6 +158,9 @@ Management Commands
 * :djadmin:`makemessages` command now supports locales with private sub-tags
   such as ``nl_NL-x-informal``.
 
+* The new :option:`makemigrations --update` option merges model changes into
+  the latest migration and optimizes the resulting operations.
+
 Migrations
 ~~~~~~~~~~
 
