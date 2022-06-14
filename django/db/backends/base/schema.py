@@ -2,6 +2,7 @@ import logging
 import operator
 from datetime import datetime
 
+from django.conf import settings
 from django.db.backends.ddl_references import (
     Columns,
     Expressions,
@@ -1306,6 +1307,8 @@ class BaseDatabaseSchemaEditor:
         if db_tablespace is None:
             if len(fields) == 1 and fields[0].db_tablespace:
                 db_tablespace = fields[0].db_tablespace
+            elif settings.DEFAULT_INDEX_TABLESPACE:
+                db_tablespace = settings.DEFAULT_INDEX_TABLESPACE
             elif model._meta.db_tablespace:
                 db_tablespace = model._meta.db_tablespace
         if db_tablespace is not None:
