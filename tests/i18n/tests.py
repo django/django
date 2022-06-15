@@ -1902,9 +1902,10 @@ class MiscTests(SimpleTestCase):
         USE_I18N=True,
         LANGUAGES=[
             ("en", "English"),
+            ("ar-dz", "Algerian Arabic"),
             ("de", "German"),
             ("de-at", "Austrian German"),
-            ("pt-br", "Portuguese (Brazil)"),
+            ("pt-BR", "Portuguese (Brazil)"),
         ],
     )
     def test_get_supported_language_variant_real(self):
@@ -1915,8 +1916,11 @@ class MiscTests(SimpleTestCase):
         self.assertEqual(g("de-at"), "de-at")
         self.assertEqual(g("de-ch"), "de")
         self.assertEqual(g("pt-br"), "pt-br")
+        self.assertEqual(g("pt-BR"), "pt-BR")
         self.assertEqual(g("pt"), "pt-br")
         self.assertEqual(g("pt-pt"), "pt-br")
+        self.assertEqual(g("ar-dz"), "ar-dz")
+        self.assertEqual(g("ar-DZ"), "ar-DZ")
         with self.assertRaises(LookupError):
             g("pt", strict=True)
         with self.assertRaises(LookupError):
@@ -1946,7 +1950,6 @@ class MiscTests(SimpleTestCase):
         LANGUAGES=[
             ("en", "English"),
             ("en-latn-us", "Latin English"),
-            ("en-Latn-US", "BCP 47 case format"),
             ("de", "German"),
             ("de-1996", "German, orthography of 1996"),
             ("de-at", "Austrian German"),
@@ -1970,6 +1973,7 @@ class MiscTests(SimpleTestCase):
             ("/de/", "de"),
             ("/de-1996/", "de-1996"),
             ("/de-at/", "de-at"),
+            ("/de-AT/", "de-AT"),
             ("/de-ch/", "de"),
             ("/de-ch-1901/", "de-ch-1901"),
             ("/de-simple-page-test/", None),
