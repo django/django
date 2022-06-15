@@ -478,8 +478,9 @@ def check_for_language(lang_code):
 def get_languages():
     """
     Cache of settings.LANGUAGES in a dictionary for easy lookups by key.
+    Convert keys to lowercase as they should be treated as case-insensitive.
     """
-    return dict(settings.LANGUAGES)
+    return {key.lower(): value for key, value in dict(settings.LANGUAGES).items()}
 
 
 @functools.lru_cache(maxsize=1000)
@@ -510,7 +511,7 @@ def get_supported_language_variant(lang_code, strict=False):
         supported_lang_codes = get_languages()
 
         for code in possible_lang_codes:
-            if code in supported_lang_codes and check_for_language(code):
+            if code.lower() in supported_lang_codes and check_for_language(code):
                 return code
         if not strict:
             # if fr-fr is not supported, try fr-ca.
