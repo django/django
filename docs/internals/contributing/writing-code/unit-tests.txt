@@ -278,7 +278,7 @@ dependencies:
 
 *  aiosmtpd_
 *  argon2-cffi_ 19.1.0+
-*  asgiref_ 3.4.1+ (required)
+*  asgiref_ 3.5.2+ (required)
 *  bcrypt_
 *  colorama_
 *  docutils_
