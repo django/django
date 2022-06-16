@@ -567,6 +567,9 @@ Miscellaneous
   :meth:`.Model.validate_unique`, and :meth:`.Model.validate_constraints`
   methods.
 
+* The minimum supported version of ``asgiref`` is increased from 3.4.1 to
+  3.5.2.
+
 .. _deprecated-features-4.1:
 
 Features deprecated in 4.1
