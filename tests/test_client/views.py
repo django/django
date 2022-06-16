@@ -18,6 +18,7 @@ from django.shortcuts import render
 from django.template import Context, Template
 from django.test import Client
 from django.utils.decorators import method_decorator
+from django.views.generic import TemplateView
 
 
 def get_view(request):
@@ -418,3 +419,7 @@ class TwoArgException(Exception):
 
 def two_arg_exception(request):
     raise TwoArgException("one", "two")
+
+
+class CBView(TemplateView):
+    template_name = "base.html"

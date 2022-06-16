@@ -249,7 +249,8 @@ PostgreSQL 12 and higher.
 Miscellaneous
 -------------
 
-* ...
+* The undocumented ``SimpleTemplateResponse.rendering_attrs`` and
+  ``TemplateResponse.rendering_attrs`` are renamed to ``non_picklable_attrs``.
 
 .. _deprecated-features-4.2:
 
