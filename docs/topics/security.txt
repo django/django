@@ -308,5 +308,5 @@ security protection of the web server, operating system and other components.
   pages also include security principles that apply to any system.
 
 .. _LimitRequestBody: https://httpd.apache.org/docs/2.4/mod/core.html#limitrequestbody
-.. _Top 10 list: https://owasp.org/www-project-top-ten/OWASP_Top_Ten_2017/
+.. _Top 10 list: https://owasp.org/Top10/
 .. _web security: https://infosec.mozilla.org/guidelines/web_security.html
