@@ -63,3 +63,8 @@ class TrigramSimilar(PostgresOperatorLookup):
 class TrigramWordSimilar(PostgresOperatorLookup):
     lookup_name = "trigram_word_similar"
     postgres_operator = "%%>"
+
+
+class TrigramStrictWordSimilar(PostgresOperatorLookup):
+    lookup_name = "trigram_strict_word_similar"
+    postgres_operator = "%%>>"

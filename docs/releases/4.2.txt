@@ -65,7 +65,12 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :lookup:`trigram_strict_word_similar` lookup, and the
+  :class:`TrigramStrictWordSimilarity()
+  <django.contrib.postgres.search.TrigramStrictWordSimilarity>` and
+  :class:`TrigramStrictWordDistance()
+  <django.contrib.postgres.search.TrigramStrictWordDistance>` expressions allow
+  using trigram strict word similarity.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
