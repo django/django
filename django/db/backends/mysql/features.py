@@ -113,6 +113,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "related fields.": {
                 "update.tests.AdvancedTests."
                 "test_update_ordered_by_inline_m2m_annotation",
+                "update.tests.AdvancedTests.test_update_ordered_by_m2m_annotation",
             },
         }
         if "ONLY_FULL_GROUP_BY" in self.connection.sql_mode:
