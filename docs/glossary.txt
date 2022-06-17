@@ -75,3 +75,5 @@ Glossary
 
     view
         A function responsible for rendering a page.
+     App
+        A small library representing a discrete part of a larger project
