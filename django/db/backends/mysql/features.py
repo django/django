@@ -105,6 +105,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "scalar value but it's not implemented (#25287).": {
                 "expressions.tests.FTimeDeltaTests.test_durationfield_multiply_divide",
             },
+            "UPDATE ... ORDER BY syntax on MySQL/MariaDB does not support ordering by"
+            "related fields.": {
+                "update.tests.AdvancedTests."
+                "test_update_ordered_by_inline_m2m_annotation",
+            },
         }
         if "ONLY_FULL_GROUP_BY" in self.connection.sql_mode:
             skips.update(
