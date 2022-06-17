@@ -225,12 +225,29 @@ class AdvancedTests(TestCase):
                             new_name=annotation,
                         ).update(name=F("new_name"))
 
+    def test_update_ordered_by_m2m_aggregation_annotation(self):
+        msg = (
+            "Cannot update when ordering by an aggregate: "
+            "Count(Col(update_bar_m2m_foo, update.Bar_m2m_foo.foo))"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Bar.objects.annotate(m2m_count=Count("m2m_foo")).order_by(
+                "m2m_count"
+            ).update(x=2)
+
     def test_update_ordered_by_inline_m2m_annotation(self):
         foo = Foo.objects.create(target="test")
         Bar.objects.create(foo=foo)
 
         Bar.objects.order_by(Abs("m2m_foo")).update(x=2)
         self.assertEqual(Bar.objects.get().x, 2)
+
+    def test_update_ordered_by_m2m_annotation(self):
+        foo = Foo.objects.create(target="test")
+        Bar.objects.create(foo=foo)
+
+        Bar.objects.annotate(abs_id=Abs("m2m_foo")).order_by("abs_id").update(x=3)
+        self.assertEqual(Bar.objects.get().x, 3)
 
 
 @unittest.skipUnless(
@@ -259,14 +276,12 @@ class MySQLUpdateOrderByTest(TestCase):
                 self.assertEqual(updated, 2)
 
     def test_order_by_update_on_unique_constraint_annotation(self):
-        # Ordering by annotations is omitted because they cannot be resolved in
-        # .update().
-        with self.assertRaises(IntegrityError):
-            UniqueNumber.objects.annotate(number_inverse=F("number").desc(),).order_by(
-                "number_inverse"
-            ).update(
-                number=F("number") + 1,
-            )
+        updated = (
+            UniqueNumber.objects.annotate(number_inverse=F("number").desc())
+            .order_by("number_inverse")
+            .update(number=F("number") + 1)
+        )
+        self.assertEqual(updated, 2)
 
     def test_order_by_update_on_parent_unique_constraint(self):
         # Ordering by inherited fields is omitted because joined fields cannot
