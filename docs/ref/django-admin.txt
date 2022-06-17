@@ -352,6 +352,15 @@ Outputs only the objects specified by a comma separated list of primary keys.
 This is only available when dumping one model. By default, all the records of
 the model are output.
 
+.. django-admin-option:: --filters FILTERS
+
+Outputs only the objects specified by the filters dict where you can specify any Django-like base filter.
+This is only available when dumping one model. By default, all the records of
+the model are output.
+once::
+
+    django-admin dumpdata --filters '{"id__gt":5, "username__contains":"dj"}'
+
 .. django-admin-option:: --output OUTPUT, -o OUTPUT
 
 Specifies a file to write the serialized data to. By default, the data goes to

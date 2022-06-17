@@ -84,6 +84,7 @@ class DumpDataAssertMixin:
         use_base_manager=False,
         exclude_list=[],
         primary_keys="",
+        filters=None
     ):
         new_io = StringIO()
         filename = filename and os.path.join(tempfile.gettempdir(), filename)
@@ -99,6 +100,7 @@ class DumpDataAssertMixin:
             use_base_manager=use_base_manager,
             exclude=exclude_list,
             primary_keys=primary_keys,
+            filters=filters,
         )
         if filename:
             file_root, file_ext = os.path.splitext(filename)

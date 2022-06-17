@@ -508,6 +508,26 @@ This is only available when dumping one model. By default, all the records of
 the model are output.
 .INDENT 0.0
 .TP
+.B \-\-filters FILTERS
+.UNINDENT
+.sp
+Outputs only the objects specified by the filters dict where you can specify any Django-like base filter.
+This is only available when dumping one model. By default, all the records of
+the model are output.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+django\-admin dumpdata auth.user \-\-filters '{"id__gt":5, "username__contains":"dj"}'
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.INDENT 0.0
+.TP
 .B \-\-output OUTPUT, \-o OUTPUT
 .UNINDENT
 .sp

@@ -1,5 +1,6 @@
 import gzip
 import os
+import json
 import warnings
 
 from django.apps import apps
@@ -97,6 +98,13 @@ class Command(BaseCommand):
             "list of keys. This option only works when you specify one model.",
         )
         parser.add_argument(
+            "--filters",
+            dest="filters",
+            help="Expect a dict-like string format containing "
+            ">>> '{<column_name>[__<condition>]:<value>}' it will use Django base filters." 
+            "This option only works when you specify one model.",
+        )
+        parser.add_argument(
             "-o", "--output", help="Specifies file to which the output is written."
         )
 
@@ -111,17 +119,29 @@ class Command(BaseCommand):
         use_natural_primary_keys = options["use_natural_primary_keys"]
         use_base_manager = options["use_base_manager"]
         pks = options["primary_keys"]
+        filters = options["filters"]
 
         if pks:
             primary_keys = [pk.strip() for pk in pks.split(",")]
         else:
             primary_keys = []
+        if filters:
+            try:
+                filters_dict = json.loads(filters)
+            except json.JSONDecodeError as ex:
+                raise CommandError("Wrong format on --filters parameter try with "
+                    "'{<column_name>[__<condition>]:<value>}'")
+        else:
+            filters = {}
+
 
         excluded_models, excluded_apps = parse_apps_and_model_labels(excludes)
 
         if not app_labels:
             if primary_keys:
                 raise CommandError("You can only use --pks option with one model")
+            if filters:
+                raise CommandError("You can only use --filters option with one model")
             app_list = dict.fromkeys(
                 app_config
                 for app_config in apps.get_app_configs()
@@ -131,6 +151,8 @@ class Command(BaseCommand):
         else:
             if len(app_labels) > 1 and primary_keys:
                 raise CommandError("You can only use --pks option with one model")
+            if len(app_labels) > 1 and filters:
+                raise CommandError("You can only use --filters option with one model")
             app_list = {}
             for label in app_labels:
                 try:
@@ -159,6 +181,10 @@ class Command(BaseCommand):
                     if primary_keys:
                         raise CommandError(
                             "You can only use --pks option with one model"
+                        )
+                    if filters:
+                        raise CommandError(
+                            "You can only use --filters option with one model"
                         )
                     # This is just an app - no model qualifier
                     app_label = label
@@ -216,6 +242,8 @@ class Command(BaseCommand):
                     queryset = objects.using(using).order_by(model._meta.pk.name)
                     if primary_keys:
                         queryset = queryset.filter(pk__in=primary_keys)
+                    if filters:
+                        queryset = queryset.filter(**filters_dict)
                     if count_only:
                         yield queryset.order_by().count()
                     else:

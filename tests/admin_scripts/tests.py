@@ -3003,6 +3003,12 @@ class Dumpdata(AdminScriptTestCase):
         self.assertOutput(err, "You can only use --pks option with one model")
         self.assertNoOutput(out)
 
+    def test_filters_parsing(self):
+        args = ["dumpdata", "--filters=''"]
+        out, err = self.run_manage(args)
+        self.assertOutput(err, "Wrong format on --filters parameter try with "
+            "'{<column_name>[__<condition>]:<value>}'")
+        self.assertNoOutput(out)
 
 class MainModule(AdminScriptTestCase):
     """python -m django works like django-admin."""
