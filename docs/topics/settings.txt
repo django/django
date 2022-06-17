@@ -24,6 +24,7 @@ Here are a couple of example settings::
 
     If you set :setting:`DEBUG` to ``False``, you also need to properly set
     the :setting:`ALLOWED_HOSTS` setting.
+    INSTALLED_APPS is used to register our apps in a project and register modules we are using in our project
 
 Because a settings file is a Python module, the following apply:
 
