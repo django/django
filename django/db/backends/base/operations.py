@@ -9,7 +9,6 @@ from django.db import NotSupportedError, transaction
 from django.db.backends import utils
 from django.utils import timezone
 from django.utils.encoding import force_str
-from django.utils.regex_helper import _lazy_re_compile
 
 
 class BaseDatabaseOperations:
@@ -54,8 +53,6 @@ class BaseDatabaseOperations:
 
     # Prefix for EXPLAIN queries, or None EXPLAIN isn't supported.
     explain_prefix = None
-
-    extract_trunc_lookup_pattern = _lazy_re_compile(r"[\w\-_()]+")
 
     def __init__(self, connection):
         self.connection = connection
@@ -103,7 +100,7 @@ class BaseDatabaseOperations:
         """
         return "%s"
 
-    def date_extract_sql(self, lookup_type, field_name):
+    def date_extract_sql(self, lookup_type, sql, params):
         """
         Given a lookup_type of 'year', 'month', or 'day', return the SQL that
         extracts a value from the given date field field_name.
@@ -113,7 +110,7 @@ class BaseDatabaseOperations:
             "method"
         )
 
-    def date_trunc_sql(self, lookup_type, field_name, tzname=None):
+    def date_trunc_sql(self, lookup_type, sql, params, tzname=None):
         """
         Given a lookup_type of 'year', 'month', or 'day', return the SQL that
         truncates the given date or datetime field field_name to a date object
@@ -127,7 +124,7 @@ class BaseDatabaseOperations:
             "method."
         )
 
-    def datetime_cast_date_sql(self, field_name, tzname):
+    def datetime_cast_date_sql(self, sql, params, tzname):
         """
         Return the SQL to cast a datetime value to date value.
         """
@@ -136,7 +133,7 @@ class BaseDatabaseOperations:
             "datetime_cast_date_sql() method."
         )
 
-    def datetime_cast_time_sql(self, field_name, tzname):
+    def datetime_cast_time_sql(self, sql, params, tzname):
         """
         Return the SQL to cast a datetime value to time value.
         """
@@ -145,7 +142,7 @@ class BaseDatabaseOperations:
             "datetime_cast_time_sql() method"
         )
 
-    def datetime_extract_sql(self, lookup_type, field_name, tzname):
+    def datetime_extract_sql(self, lookup_type, sql, params, tzname):
         """
         Given a lookup_type of 'year', 'month', 'day', 'hour', 'minute', or
         'second', return the SQL that extracts a value from the given
@@ -156,7 +153,7 @@ class BaseDatabaseOperations:
             "method"
         )
 
-    def datetime_trunc_sql(self, lookup_type, field_name, tzname):
+    def datetime_trunc_sql(self, lookup_type, sql, params, tzname):
         """
         Given a lookup_type of 'year', 'month', 'day', 'hour', 'minute', or
         'second', return the SQL that truncates the given datetime field
@@ -167,7 +164,7 @@ class BaseDatabaseOperations:
             "method"
         )
 
-    def time_trunc_sql(self, lookup_type, field_name, tzname=None):
+    def time_trunc_sql(self, lookup_type, sql, params, tzname=None):
         """
         Given a lookup_type of 'hour', 'minute' or 'second', return the SQL
         that truncates the given time or datetime field field_name to a time
@@ -180,12 +177,12 @@ class BaseDatabaseOperations:
             "subclasses of BaseDatabaseOperations may require a time_trunc_sql() method"
         )
 
-    def time_extract_sql(self, lookup_type, field_name):
+    def time_extract_sql(self, lookup_type, sql, params):
         """
         Given a lookup_type of 'hour', 'minute', or 'second', return the SQL
         that extracts a value from the given time field field_name.
         """
-        return self.date_extract_sql(lookup_type, field_name)
+        return self.date_extract_sql(lookup_type, sql, params)
 
     def deferrable_sql(self):
         """
