@@ -13,6 +13,7 @@ except ImportError:
     pytz = None
 
 from django.conf import settings
+from django.db import DataError, OperationalError
 from django.db.models import (
     DateField,
     DateTimeField,
@@ -244,8 +245,7 @@ class DateFunctionTests(TestCase):
         self.create_model(start_datetime, end_datetime)
         self.create_model(end_datetime, start_datetime)
 
-        msg = "Invalid lookup_name: "
-        with self.assertRaisesMessage(ValueError, msg):
+        with self.assertRaises((DataError, OperationalError, ValueError)):
             DTModel.objects.filter(
                 start_datetime__year=Extract(
                     "start_datetime", "day' FROM start_datetime)) OR 1=1;--"
@@ -940,14 +940,18 @@ class DateFunctionTests(TestCase):
             end_datetime = timezone.make_aware(end_datetime)
         self.create_model(start_datetime, end_datetime)
         self.create_model(end_datetime, start_datetime)
-        msg = "Invalid kind: "
-        with self.assertRaisesMessage(ValueError, msg):
-            DTModel.objects.filter(
+        # Database backends raise an exception or don't return any results.
+        try:
+            exists = DTModel.objects.filter(
                 start_datetime__date=Trunc(
                     "start_datetime",
                     "year', start_datetime)) OR 1=1;--",
                 )
             ).exists()
+        except (DataError, OperationalError):
+            pass
+        else:
+            self.assertIs(exists, False)
 
     def test_trunc_func(self):
         start_datetime = datetime(999, 6, 15, 14, 30, 50, 321)
