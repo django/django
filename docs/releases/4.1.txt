@@ -459,6 +459,20 @@ backends.
   ``DatabaseOperations.insert_statement()`` method is replaced by
   ``on_conflict`` that accepts ``django.db.models.constants.OnConflict``.
 
+* Several date and time methods on ``DatabaseOperations`` now take ``sql`` and
+  ``params`` arguments instead of ``field_name`` and return 2-tuple containing
+  some SQL and the parameters to be interpolated into that SQL. The changed
+  methods have these new signatures:
+
+  * ``DatabaseOperations.date_extract_sql(lookup_type, sql, params)``
+  * ``DatabaseOperations.datetime_extract_sql(lookup_type, sql, params, tzname)``
+  * ``DatabaseOperations.time_extract_sql(lookup_type, sql, params)``
+  * ``DatabaseOperations.date_trunc_sql(lookup_type, sql, params, tzname=None)``
+  * ``DatabaseOperations.datetime_trunc_sql(self, lookup_type, sql, params, tzname)``
+  * ``DatabaseOperations.time_trunc_sql(lookup_type, sql, params, tzname=None)``
+  * ``DatabaseOperations.datetime_cast_date_sql(sql, params, tzname)``
+  * ``DatabaseOperations.datetime_cast_time_sql(sql, params, tzname)``
+
 :mod:`django.contrib.gis`
 -------------------------
 

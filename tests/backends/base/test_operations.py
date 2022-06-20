@@ -115,49 +115,49 @@ class SimpleDatabaseOperationTests(SimpleTestCase):
         with self.assertRaisesMessage(
             NotImplementedError, self.may_require_msg % "date_extract_sql"
         ):
-            self.ops.date_extract_sql(None, None)
+            self.ops.date_extract_sql(None, None, None)
 
     def test_time_extract_sql(self):
         with self.assertRaisesMessage(
             NotImplementedError, self.may_require_msg % "date_extract_sql"
         ):
-            self.ops.time_extract_sql(None, None)
+            self.ops.time_extract_sql(None, None, None)
 
     def test_date_trunc_sql(self):
         with self.assertRaisesMessage(
             NotImplementedError, self.may_require_msg % "date_trunc_sql"
         ):
-            self.ops.date_trunc_sql(None, None)
+            self.ops.date_trunc_sql(None, None, None)
 
     def test_time_trunc_sql(self):
         with self.assertRaisesMessage(
             NotImplementedError, self.may_require_msg % "time_trunc_sql"
         ):
-            self.ops.time_trunc_sql(None, None)
+            self.ops.time_trunc_sql(None, None, None)
 
     def test_datetime_trunc_sql(self):
         with self.assertRaisesMessage(
             NotImplementedError, self.may_require_msg % "datetime_trunc_sql"
         ):
-            self.ops.datetime_trunc_sql(None, None, None)
+            self.ops.datetime_trunc_sql(None, None, None, None)
 
     def test_datetime_cast_date_sql(self):
         with self.assertRaisesMessage(
             NotImplementedError, self.may_require_msg % "datetime_cast_date_sql"
         ):
-            self.ops.datetime_cast_date_sql(None, None)
+            self.ops.datetime_cast_date_sql(None, None, None)
 
     def test_datetime_cast_time_sql(self):
         with self.assertRaisesMessage(
             NotImplementedError, self.may_require_msg % "datetime_cast_time_sql"
         ):
-            self.ops.datetime_cast_time_sql(None, None)
+            self.ops.datetime_cast_time_sql(None, None, None)
 
     def test_datetime_extract_sql(self):
         with self.assertRaisesMessage(
             NotImplementedError, self.may_require_msg % "datetime_extract_sql"
         ):
-            self.ops.datetime_extract_sql(None, None, None)
+            self.ops.datetime_extract_sql(None, None, None, None)
 
 
 class DatabaseOperationTests(TestCase):
