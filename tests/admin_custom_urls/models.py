@@ -41,7 +41,7 @@ class ActionAdmin(admin.ModelAdmin):
 
             return update_wrapper(wrapper, view)
 
-        info = self.model._meta.app_label, self.model._meta.model_name
+        info = self.opts.app_label, self.opts.model_name
 
         view_name = "%s_%s_add" % info
 

@@ -490,10 +490,8 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         Return True if the model associated with this admin should be
         allowed to be referenced by the specified field.
         """
-        opts = self.model._meta
-
         try:
-            field = opts.get_field(to_field)
+            field = self.opts.get_field(to_field)
         except FieldDoesNotExist:
             return False
 
@@ -504,7 +502,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
         # Allow reverse relationships to models defining m2m fields if they
         # target the specified field.
-        for many_to_many in opts.many_to_many:
+        for many_to_many in self.opts.many_to_many:
             if many_to_many.m2m_target_field_name() == to_field:
                 return True
 
@@ -518,7 +516,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
         related_objects = (
             f
-            for f in opts.get_fields(include_hidden=True)
+            for f in self.opts.get_fields(include_hidden=True)
             if (f.auto_created and not f.concrete)
         )
         for related_object in related_objects:
@@ -653,7 +651,7 @@ class ModelAdmin(BaseModelAdmin):
         super().__init__()
 
     def __str__(self):
-        return "%s.%s" % (self.model._meta.app_label, self.__class__.__name__)
+        return "%s.%s" % (self.opts.app_label, self.__class__.__name__)
 
     def __repr__(self):
         return (
@@ -688,7 +686,7 @@ class ModelAdmin(BaseModelAdmin):
             wrapper.model_admin = self
             return update_wrapper(wrapper, view)
 
-        info = self.model._meta.app_label, self.model._meta.model_name
+        info = self.opts.app_label, self.opts.model_name
 
         return [
             path("", wrap(self.changelist_view), name="%s_%s_changelist" % info),
@@ -1162,11 +1160,10 @@ class ModelAdmin(BaseModelAdmin):
         """
         match = request.resolver_match
         if self.preserve_filters and match:
-            opts = self.model._meta
             current_url = "%s:%s" % (match.app_name, match.url_name)
             changelist_url = "admin:%s_%s_changelist" % (
-                opts.app_label,
-                opts.model_name,
+                self.opts.app_label,
+                self.opts.model_name,
             )
             if current_url == changelist_url:
                 preserved_filters = request.GET.urlencode()
@@ -1255,11 +1252,10 @@ class ModelAdmin(BaseModelAdmin):
     def render_change_form(
         self, request, context, add=False, change=False, form_url="", obj=None
     ):
-        opts = self.model._meta
-        app_label = opts.app_label
+        app_label = self.opts.app_label
         preserved_filters = self.get_preserved_filters(request)
         form_url = add_preserved_filters(
-            {"preserved_filters": preserved_filters, "opts": opts}, form_url
+            {"preserved_filters": preserved_filters, "opts": self.opts}, form_url
         )
         view_on_site_url = self.get_view_on_site_url(obj)
         has_editable_inline_admin_formsets = False
@@ -1290,7 +1286,7 @@ class ModelAdmin(BaseModelAdmin):
                 "has_absolute_url": view_on_site_url is not None,
                 "absolute_url": view_on_site_url,
                 "form_url": form_url,
-                "opts": opts,
+                "opts": self.opts,
                 "content_type_id": get_content_type_for_model(self.model).pk,
                 "save_as": self.save_as,
                 "save_on_top": self.save_on_top,
@@ -1310,7 +1306,7 @@ class ModelAdmin(BaseModelAdmin):
             request,
             form_template
             or [
-                "admin/%s/%s/change_form.html" % (app_label, opts.model_name),
+                "admin/%s/%s/change_form.html" % (app_label, self.opts.model_name),
                 "admin/%s/change_form.html" % app_label,
                 "admin/change_form.html",
             ],
@@ -1440,7 +1436,7 @@ class ModelAdmin(BaseModelAdmin):
                 },
             )
 
-        opts = self.model._meta
+        opts = self.opts
         preserved_filters = self.get_preserved_filters(request)
 
         msg_dict = {
@@ -1507,15 +1503,14 @@ class ModelAdmin(BaseModelAdmin):
             return self.response_post_save_change(request, obj)
 
     def _response_post_save(self, request, obj):
-        opts = self.model._meta
         if self.has_view_or_change_permission(request):
             post_url = reverse(
-                "admin:%s_%s_changelist" % (opts.app_label, opts.model_name),
+                "admin:%s_%s_changelist" % (self.opts.app_label, self.opts.model_name),
                 current_app=self.admin_site.name,
             )
             preserved_filters = self.get_preserved_filters(request)
             post_url = add_preserved_filters(
-                {"preserved_filters": preserved_filters, "opts": opts}, post_url
+                {"preserved_filters": preserved_filters, "opts": self.opts}, post_url
             )
         else:
             post_url = reverse("admin:index", current_app=self.admin_site.name)
@@ -1608,8 +1603,6 @@ class ModelAdmin(BaseModelAdmin):
         """
         Determine the HttpResponse for the delete_view stage.
         """
-        opts = self.model._meta
-
         if IS_POPUP_VAR in request.POST:
             popup_response_data = json.dumps(
                 {
@@ -1622,8 +1615,8 @@ class ModelAdmin(BaseModelAdmin):
                 self.popup_response_template
                 or [
                     "admin/%s/%s/popup_response.html"
-                    % (opts.app_label, opts.model_name),
-                    "admin/%s/popup_response.html" % opts.app_label,
+                    % (self.opts.app_label, self.opts.model_name),
+                    "admin/%s/popup_response.html" % self.opts.app_label,
                     "admin/popup_response.html",
                 ],
                 {
@@ -1635,7 +1628,7 @@ class ModelAdmin(BaseModelAdmin):
             request,
             _("The %(name)s “%(obj)s” was deleted successfully.")
             % {
-                "name": opts.verbose_name,
+                "name": self.opts.verbose_name,
                 "obj": obj_display,
             },
             messages.SUCCESS,
@@ -1643,20 +1636,19 @@ class ModelAdmin(BaseModelAdmin):
 
         if self.has_change_permission(request, None):
             post_url = reverse(
-                "admin:%s_%s_changelist" % (opts.app_label, opts.model_name),
+                "admin:%s_%s_changelist" % (self.opts.app_label, self.opts.model_name),
                 current_app=self.admin_site.name,
             )
             preserved_filters = self.get_preserved_filters(request)
             post_url = add_preserved_filters(
-                {"preserved_filters": preserved_filters, "opts": opts}, post_url
+                {"preserved_filters": preserved_filters, "opts": self.opts}, post_url
             )
         else:
             post_url = reverse("admin:index", current_app=self.admin_site.name)
         return HttpResponseRedirect(post_url)
 
     def render_delete_form(self, request, context):
-        opts = self.model._meta
-        app_label = opts.app_label
+        app_label = self.opts.app_label
 
         request.current_app = self.admin_site.name
         context.update(
@@ -1670,7 +1662,7 @@ class ModelAdmin(BaseModelAdmin):
             self.delete_confirmation_template
             or [
                 "admin/{}/{}/delete_confirmation.html".format(
-                    app_label, opts.model_name
+                    app_label, self.opts.model_name
                 ),
                 "admin/{}/delete_confirmation.html".format(app_label),
                 "admin/delete_confirmation.html",
@@ -1723,7 +1715,7 @@ class ModelAdmin(BaseModelAdmin):
         initial = dict(request.GET.items())
         for k in initial:
             try:
-                f = self.model._meta.get_field(k)
+                f = self.opts.get_field(k)
             except FieldDoesNotExist:
                 continue
             # We have to special-case M2Ms as a list of comma-separated PKs.
@@ -1756,9 +1748,6 @@ class ModelAdmin(BaseModelAdmin):
                 "The field %s cannot be referenced." % to_field
             )
 
-        model = self.model
-        opts = model._meta
-
         if request.method == "POST" and "_saveasnew" in request.POST:
             object_id = None
 
@@ -1780,7 +1769,9 @@ class ModelAdmin(BaseModelAdmin):
                     raise PermissionDenied
 
             if obj is None:
-                return self._get_obj_does_not_exist_redirect(request, opts, object_id)
+                return self._get_obj_does_not_exist_redirect(
+                    request, self.opts, object_id
+                )
 
         fieldsets = self.get_fieldsets(request, obj)
         ModelForm = self.get_form(
@@ -1855,7 +1846,7 @@ class ModelAdmin(BaseModelAdmin):
             title = _("View %s")
         context = {
             **self.admin_site.each_context(request),
-            "title": title % opts.verbose_name,
+            "title": title % self.opts.verbose_name,
             "subtitle": str(obj) if obj else None,
             "adminform": adminForm,
             "object_id": object_id,
@@ -1895,7 +1886,7 @@ class ModelAdmin(BaseModelAdmin):
     def _get_edited_object_pks(self, request, prefix):
         """Return POST data values of list_editable primary keys."""
         pk_pattern = re.compile(
-            r"{}-\d+-{}$".format(re.escape(prefix), self.model._meta.pk.name)
+            r"{}-\d+-{}$".format(re.escape(prefix), self.opts.pk.name)
         )
         return [value for key, value in request.POST.items() if pk_pattern.match(key)]
 
@@ -1922,8 +1913,7 @@ class ModelAdmin(BaseModelAdmin):
         """
         from django.contrib.admin.views.main import ERROR_FLAG
 
-        opts = self.model._meta
-        app_label = opts.app_label
+        app_label = self.opts.app_label
         if not self.has_view_or_change_permission(request):
             raise PermissionDenied
 
@@ -2033,7 +2023,7 @@ class ModelAdmin(BaseModelAdmin):
                         changecount,
                     ) % {
                         "count": changecount,
-                        "name": model_ngettext(opts, changecount),
+                        "name": model_ngettext(self.opts, changecount),
                     }
                     self.message_user(request, msg, messages.SUCCESS)
 
@@ -2064,7 +2054,7 @@ class ModelAdmin(BaseModelAdmin):
 
         context = {
             **self.admin_site.each_context(request),
-            "module_name": str(opts.verbose_name_plural),
+            "module_name": str(self.opts.verbose_name_plural),
             "selection_note": _("0 of %(cnt)s selected") % {"cnt": len(cl.result_list)},
             "selection_note_all": selection_note_all % {"total_count": cl.result_count},
             "title": cl.title,
@@ -2089,7 +2079,7 @@ class ModelAdmin(BaseModelAdmin):
             request,
             self.change_list_template
             or [
-                "admin/%s/%s/change_list.html" % (app_label, opts.model_name),
+                "admin/%s/%s/change_list.html" % (app_label, self.opts.model_name),
                 "admin/%s/change_list.html" % app_label,
                 "admin/change_list.html",
             ],
@@ -2110,8 +2100,7 @@ class ModelAdmin(BaseModelAdmin):
 
     def _delete_view(self, request, object_id, extra_context):
         "The 'delete' admin view for this model."
-        opts = self.model._meta
-        app_label = opts.app_label
+        app_label = self.opts.app_label
 
         to_field = request.POST.get(TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR))
         if to_field and not self.to_field_allowed(request, to_field):
@@ -2125,7 +2114,7 @@ class ModelAdmin(BaseModelAdmin):
             raise PermissionDenied
 
         if obj is None:
-            return self._get_obj_does_not_exist_redirect(request, opts, object_id)
+            return self._get_obj_does_not_exist_redirect(request, self.opts, object_id)
 
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
@@ -2140,14 +2129,14 @@ class ModelAdmin(BaseModelAdmin):
             if perms_needed:
                 raise PermissionDenied
             obj_display = str(obj)
-            attr = str(to_field) if to_field else opts.pk.attname
+            attr = str(to_field) if to_field else self.opts.pk.attname
             obj_id = obj.serializable_value(attr)
             self.log_deletion(request, obj, obj_display)
             self.delete_model(request, obj)
 
             return self.response_delete(request, obj_display, obj_id)
 
-        object_name = str(opts.verbose_name)
+        object_name = str(self.opts.verbose_name)
 
         if perms_needed or protected:
             title = _("Cannot delete %(name)s") % {"name": object_name}
@@ -2164,7 +2153,7 @@ class ModelAdmin(BaseModelAdmin):
             "model_count": dict(model_count).items(),
             "perms_lacking": perms_needed,
             "protected": protected,
-            "opts": opts,
+            "opts": self.opts,
             "app_label": app_label,
             "preserved_filters": self.get_preserved_filters(request),
             "is_popup": IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET,
@@ -2191,8 +2180,7 @@ class ModelAdmin(BaseModelAdmin):
             raise PermissionDenied
 
         # Then get the history for this object.
-        opts = model._meta
-        app_label = opts.app_label
+        app_label = self.opts.app_label
         action_list = (
             LogEntry.objects.filter(
                 object_id=unquote(object_id),
@@ -2215,9 +2203,9 @@ class ModelAdmin(BaseModelAdmin):
             "page_range": page_range,
             "page_var": PAGE_VAR,
             "pagination_required": paginator.count > 100,
-            "module_name": str(capfirst(opts.verbose_name_plural)),
+            "module_name": str(capfirst(self.opts.verbose_name_plural)),
             "object": obj,
-            "opts": opts,
+            "opts": self.opts,
             "preserved_filters": self.get_preserved_filters(request),
             **(extra_context or {}),
         }
@@ -2228,7 +2216,7 @@ class ModelAdmin(BaseModelAdmin):
             request,
             self.object_history_template
             or [
-                "admin/%s/%s/object_history.html" % (app_label, opts.model_name),
+                "admin/%s/%s/object_history.html" % (app_label, self.opts.model_name),
                 "admin/%s/object_history.html" % app_label,
                 "admin/object_history.html",
             ],
@@ -2318,11 +2306,11 @@ class InlineModelAdmin(BaseModelAdmin):
         super().__init__()
         if self.verbose_name_plural is None:
             if self.verbose_name is None:
-                self.verbose_name_plural = self.model._meta.verbose_name_plural
+                self.verbose_name_plural = self.opts.verbose_name_plural
             else:
                 self.verbose_name_plural = format_lazy("{}s", self.verbose_name)
         if self.verbose_name is None:
-            self.verbose_name = self.model._meta.verbose_name
+            self.verbose_name = self.opts.verbose_name
 
     @property
     def media(self):
