@@ -42,7 +42,7 @@ class PostGISAdapter:
         return hash(self.ewkb)
 
     def __str__(self):
-        return self.getquoted()
+        return self.getquoted().decode()
 
     @classmethod
     def _fix_polygon(cls, poly):
