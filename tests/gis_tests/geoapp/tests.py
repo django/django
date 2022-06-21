@@ -212,6 +212,14 @@ class GeoModelTest(TestCase):
         with self.assertNumQueries(0):  # Ensure point isn't deferred.
             self.assertIsInstance(cities2[0].point, Point)
 
+    def test_gis_query_as_string(self):
+        """GIS queries can be represented as strings."""
+        query = City.objects.filter(point__within=Polygon.from_bbox((0, 0, 2, 2)))
+        self.assertIn(
+            connection.ops.quote_name(City._meta.db_table),
+            str(query.query),
+        )
+
     def test_dumpdata_loaddata_cycle(self):
         """
         Test a dumpdata/loaddata cycle with geographic data.
