@@ -41,6 +41,8 @@ class Extract(TimezoneMixin, Transform):
         super().__init__(expression, **extra)
 
     def as_sql(self, compiler, connection):
+        if not connection.ops.extract_trunc_lookup_pattern.fullmatch(self.lookup_name):
+            raise ValueError("Invalid lookup_name: %s" % self.lookup_name)
         sql, params = compiler.compile(self.lhs)
         lhs_output_field = self.lhs.output_field
         if isinstance(lhs_output_field, DateTimeField):
@@ -192,6 +194,8 @@ class TruncBase(TimezoneMixin, Transform):
         super().__init__(expression, output_field=output_field, **extra)
 
     def as_sql(self, compiler, connection):
+        if not connection.ops.extract_trunc_lookup_pattern.fullmatch(self.kind):
+            raise ValueError("Invalid kind: %s" % self.kind)
         inner_sql, inner_params = compiler.compile(self.lhs)
         tzname = None
         if isinstance(self.lhs.output_field, DateTimeField):
