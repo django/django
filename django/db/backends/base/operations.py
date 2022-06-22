@@ -9,6 +9,7 @@ from django.db import NotSupportedError, transaction
 from django.db.backends import utils
 from django.utils import timezone
 from django.utils.encoding import force_str
+from django.utils.regex_helper import _lazy_re_compile
 
 
 class BaseDatabaseOperations:
@@ -53,6 +54,8 @@ class BaseDatabaseOperations:
 
     # Prefix for EXPLAIN queries, or None EXPLAIN isn't supported.
     explain_prefix = None
+
+    extract_trunc_lookup_pattern = _lazy_re_compile(r"[\w\-_()]+")
 
     def __init__(self, connection):
         self.connection = connection
