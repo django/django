@@ -235,11 +235,8 @@ class ASGITest(SimpleTestCase):
         # Give response.close() time to finish.
         await communicator.wait()
 
-        # At this point, AsyncToSync does not have a current executor. Thus
-        # SyncToAsync falls-back to .single_thread_executor.
-        target_thread = next(iter(SyncToAsync.single_thread_executor._threads))
+        # AsyncToSync should have executed the signals in the same thread.
         request_started_thread, request_finished_thread = signal_handler.threads
-        self.assertEqual(request_started_thread, target_thread)
-        self.assertEqual(request_finished_thread, target_thread)
+        self.assertEqual(request_started_thread, request_finished_thread)
         request_started.disconnect(signal_handler)
         request_finished.disconnect(signal_handler)
