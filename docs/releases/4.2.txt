@@ -204,6 +204,9 @@ Models
 * :meth:`~.QuerySet.prefetch_related` now supports
   :class:`~django.db.models.Prefetch` objects with sliced querysets.
 
+* :ref:`Registering lookups <lookup-registration-api>` on
+  :class:`~django.db.models.Field` instances is now supported.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
