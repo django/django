@@ -6,7 +6,7 @@ from asgiref.sync import async_to_sync, sync_to_async
 
 from django.db import NotSupportedError, connection
 from django.db.models import Sum
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import SimpleModel
 
@@ -110,6 +110,22 @@ class AsyncQuerySetTest(TestCase):
         instances = [SimpleModel(field=i) for i in range(10)]
         qs = await SimpleModel.objects.abulk_create(instances)
         self.assertEqual(len(qs), 10)
+
+    @skipUnlessDBFeature("has_bulk_insert", "supports_update_conflicts")
+    @skipIfDBFeature("supports_update_conflicts_with_target")
+    @async_to_sync
+    async def test_update_conflicts_unique_field_unsupported(self):
+        msg = (
+            "This database backend does not support updating conflicts with specifying "
+            "unique fields that can trigger the upsert."
+        )
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            await SimpleModel.objects.abulk_create(
+                [SimpleModel(field=1), SimpleModel(field=2)],
+                update_conflicts=True,
+                update_fields=["field"],
+                unique_fields=["created"],
+            )
 
     async def test_abulk_update(self):
         instances = SimpleModel.objects.all()
