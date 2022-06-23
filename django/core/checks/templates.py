@@ -50,15 +50,15 @@ def check_string_if_invalid_is_string(app_configs, **kwargs):
 @register(Tags.templates)
 def check_for_template_tags_with_the_same_name(app_configs, **kwargs):
     errors = []
-    libraries = defaultdict(list)
+    libraries = defaultdict(set)
 
     for conf in settings.TEMPLATES:
         custom_libraries = conf.get("OPTIONS", {}).get("libraries", {})
         for module_name, module_path in custom_libraries.items():
-            libraries[module_name].append(module_path)
+            libraries[module_name].add(module_path)
 
     for module_name, module_path in get_template_tag_modules():
-        libraries[module_name].append(module_path)
+        libraries[module_name].add(module_path)
 
     for library_name, items in libraries.items():
         if len(items) > 1:
@@ -66,7 +66,7 @@ def check_for_template_tags_with_the_same_name(app_configs, **kwargs):
                 Error(
                     E003.msg.format(
                         repr(library_name),
-                        ", ".join(repr(item) for item in items),
+                        ", ".join(repr(item) for item in sorted(items)),
                     ),
                     id=E003.id,
                 )
