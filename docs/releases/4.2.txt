@@ -214,7 +214,8 @@ URLs
 Utilities
 ~~~~~~~~~
 
-* ...
+* The new ``encoder`` parameter for :meth:`django.utils.html.json_script`
+  function allows customizing a JSON encoder class.
 
 Validators
 ~~~~~~~~~~

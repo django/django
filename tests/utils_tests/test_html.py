@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 
+from django.core.serializers.json import DjangoJSONEncoder
 from django.test import SimpleTestCase
 from django.utils.functional import lazystr
 from django.utils.html import (
@@ -210,6 +211,16 @@ class TestUtilsHtml(SimpleTestCase):
         for arg, expected in tests:
             with self.subTest(arg=arg):
                 self.assertEqual(json_script(arg, "test_id"), expected)
+
+    def test_json_script_custom_encoder(self):
+        class CustomDjangoJSONEncoder(DjangoJSONEncoder):
+            def encode(self, o):
+                return '{"hello": "world"}'
+
+        self.assertHTMLEqual(
+            json_script({}, encoder=CustomDjangoJSONEncoder),
+            '<script type="application/json">{"hello": "world"}</script>',
+        )
 
     def test_json_script_without_id(self):
         self.assertHTMLEqual(
