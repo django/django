@@ -161,6 +161,19 @@ class CheckTemplateTagLibrariesWithSameName(SimpleTestCase):
     @override_settings(
         INSTALLED_APPS=["check_framework.template_test_apps.same_tags_app_1"]
     )
+    def test_template_tags_same_library_in_installed_apps_libraries(self):
+        with self.settings(
+            TEMPLATES=[
+                self.get_settings(
+                    "same_tags", "same_tags_app_1.templatetags.same_tags"
+                ),
+            ]
+        ):
+            self.assertEqual(check_for_template_tags_with_the_same_name(None), [])
+
+    @override_settings(
+        INSTALLED_APPS=["check_framework.template_test_apps.same_tags_app_1"]
+    )
     def test_template_tags_with_same_library_name_and_module_name(self):
         with self.settings(
             TEMPLATES=[
