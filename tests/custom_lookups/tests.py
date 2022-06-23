@@ -330,7 +330,7 @@ class LookupTests(TestCase):
         field = Article._meta.get_field("author")
 
         # clear and re-cache
-        field.get_lookups.cache_clear()
+        field.get_class_lookups.cache_clear()
         self.assertNotIn("exactly", field.get_lookups())
 
         # registration should bust the cache
@@ -670,6 +670,37 @@ class RegisterLookupTests(SimpleTestCase):
             self.assertEqual(author_name.get_lookup("sw"), CustomStartsWith)
         self.assertIsNone(author_name.get_lookup("sw"))
 
+    def test_instance_lookup(self):
+        author_name = Author._meta.get_field("name")
+        author_alias = Author._meta.get_field("alias")
+        with register_lookup(author_name, CustomStartsWith):
+            self.assertEqual(author_name.instance_lookups, {"sw": CustomStartsWith})
+            self.assertEqual(author_name.get_lookup("sw"), CustomStartsWith)
+            self.assertIsNone(author_alias.get_lookup("sw"))
+        self.assertIsNone(author_name.get_lookup("sw"))
+        self.assertEqual(author_name.instance_lookups, {})
+        self.assertIsNone(author_alias.get_lookup("sw"))
+
+    def test_instance_lookup_override_class_lookups(self):
+        author_name = Author._meta.get_field("name")
+        author_alias = Author._meta.get_field("alias")
+        with register_lookup(models.CharField, CustomStartsWith, lookup_name="st_end"):
+            with register_lookup(author_alias, CustomEndsWith, lookup_name="st_end"):
+                self.assertEqual(author_name.get_lookup("st_end"), CustomStartsWith)
+                self.assertEqual(author_alias.get_lookup("st_end"), CustomEndsWith)
+            self.assertEqual(author_name.get_lookup("st_end"), CustomStartsWith)
+            self.assertEqual(author_alias.get_lookup("st_end"), CustomStartsWith)
+        self.assertIsNone(author_name.get_lookup("st_end"))
+        self.assertIsNone(author_alias.get_lookup("st_end"))
+
+    def test_instance_lookup_override(self):
+        author_name = Author._meta.get_field("name")
+        with register_lookup(author_name, CustomStartsWith, lookup_name="st_end"):
+            self.assertEqual(author_name.get_lookup("st_end"), CustomStartsWith)
+            author_name.register_lookup(CustomEndsWith, lookup_name="st_end")
+            self.assertEqual(author_name.get_lookup("st_end"), CustomEndsWith)
+        self.assertIsNone(author_name.get_lookup("st_end"))
+
     def test_lookup_on_transform(self):
         transform = Div3Transform
         with register_lookup(Div3Transform, CustomStartsWith):
@@ -682,10 +713,16 @@ class RegisterLookupTests(SimpleTestCase):
         self.assertEqual(transform.get_lookups(), {})
 
     def test_transform_on_field(self):
-        author_age = Author._meta.get_field("age")
-        with register_lookup(models.IntegerField, Div3Transform):
-            self.assertEqual(author_age.get_transform("div3"), Div3Transform)
-        self.assertIsNone(author_age.get_transform("div3"))
+        author_name = Author._meta.get_field("name")
+        author_alias = Author._meta.get_field("alias")
+        with register_lookup(models.CharField, Div3Transform):
+            self.assertEqual(author_alias.get_transform("div3"), Div3Transform)
+            self.assertEqual(author_name.get_transform("div3"), Div3Transform)
+        with register_lookup(author_alias, Div3Transform):
+            self.assertEqual(author_alias.get_transform("div3"), Div3Transform)
+            self.assertIsNone(author_name.get_transform("div3"))
+        self.assertIsNone(author_alias.get_transform("div3"))
+        self.assertIsNone(author_name.get_transform("div3"))
 
     def test_related_lookup(self):
         article_author = Article._meta.get_field("author")
@@ -693,3 +730,9 @@ class RegisterLookupTests(SimpleTestCase):
             self.assertIsNone(article_author.get_lookup("sw"))
         with register_lookup(models.ForeignKey, RelatedMoreThan):
             self.assertEqual(article_author.get_lookup("rmt"), RelatedMoreThan)
+
+    def test_instance_related_lookup(self):
+        article_author = Article._meta.get_field("author")
+        with register_lookup(article_author, RelatedMoreThan):
+            self.assertEqual(article_author.get_lookup("rmt"), RelatedMoreThan)
+        self.assertIsNone(article_author.get_lookup("rmt"))
