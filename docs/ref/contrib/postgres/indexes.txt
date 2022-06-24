@@ -73,7 +73,7 @@ available from the ``django.contrib.postgres.indexes`` module.
     Set the ``fastupdate`` parameter to ``False`` to disable the `GIN Fast
     Update Technique`_ that's enabled by default in PostgreSQL.
 
-    Provide an integer number of bytes to the gin_pending_list_limit_ parameter
+    Provide an integer number of kilobytes to the gin_pending_list_limit_ parameter
     to tune the maximum size of the GIN pending list which is used when
     ``fastupdate`` is enabled.
 
