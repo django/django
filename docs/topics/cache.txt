@@ -496,6 +496,15 @@ flag on the connection's socket::
         }
     }
 
+``pymemcache`` by default sets the following options (you can override them on
+your :setting:`OPTIONS <CACHES-OPTIONS>`)::
+
+    'OPTIONS': {
+        'allow_unicode_keys': True,
+        'default_noreply': False,
+        'serde': pymemcache.serde.pickle_serde,
+    }
+
 .. _the-per-site-cache:
 
 The per-site cache
