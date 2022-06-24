@@ -17,7 +17,6 @@ from django.http.multipartparser import (
     MultiPartParser,
     MultiPartParserError,
     Parser,
-    parse_header,
 )
 from django.test import SimpleTestCase, TestCase, client, override_settings
 
@@ -906,47 +905,3 @@ class MultiParserTests(SimpleTestCase):
         for file_name in CANDIDATE_INVALID_FILE_NAMES:
             with self.subTest(file_name=file_name):
                 self.assertIsNone(parser.sanitize_file_name(file_name))
-
-    def test_rfc2231_parsing(self):
-        test_data = (
-            (
-                b"Content-Type: application/x-stuff; "
-                b"title*=us-ascii'en-us'This%20is%20%2A%2A%2Afun%2A%2A%2A",
-                "This is ***fun***",
-            ),
-            (
-                b"Content-Type: application/x-stuff; title*=UTF-8''foo-%c3%a4.html",
-                "foo-ä.html",
-            ),
-            (
-                b"Content-Type: application/x-stuff; title*=iso-8859-1''foo-%E4.html",
-                "foo-ä.html",
-            ),
-        )
-        for raw_line, expected_title in test_data:
-            parsed = parse_header(raw_line)
-            self.assertEqual(parsed[1]["title"], expected_title)
-
-    def test_rfc2231_wrong_title(self):
-        """
-        Test wrongly formatted RFC 2231 headers (missing double single quotes).
-        Parsing should not crash (#24209).
-        """
-        test_data = (
-            (
-                b"Content-Type: application/x-stuff; "
-                b"title*='This%20is%20%2A%2A%2Afun%2A%2A%2A",
-                b"'This%20is%20%2A%2A%2Afun%2A%2A%2A",
-            ),
-            (b"Content-Type: application/x-stuff; title*='foo.html", b"'foo.html"),
-            (b"Content-Type: application/x-stuff; title*=bar.html", b"bar.html"),
-        )
-        for raw_line, expected_title in test_data:
-            parsed = parse_header(raw_line)
-            self.assertEqual(parsed[1]["title"], expected_title)
-
-    def test_parse_header_with_double_quotes_and_semicolon(self):
-        self.assertEqual(
-            parse_header(b'form-data; name="files"; filename="fo\\"o;bar"'),
-            ("form-data", {"name": b"files", "filename": b'fo"o;bar'}),
-        )
