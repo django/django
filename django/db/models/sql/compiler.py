@@ -548,6 +548,11 @@ class SQLCompiler:
                         or not features.supports_slicing_ordering_in_compound
                     ):
                         part_sql = "({})".format(part_sql)
+                elif (
+                    self.query.subquery
+                    and features.supports_slicing_ordering_in_compound
+                ):
+                    part_sql = "({})".format(part_sql)
                 parts += ((part_sql, part_args),)
             except EmptyResultSet:
                 # Omit the empty queryset with UNION and with DIFFERENCE if the

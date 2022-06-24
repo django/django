@@ -116,6 +116,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "migrations.test_operations.OperationTests."
             "test_alter_field_pk_fk_db_collation",
         },
+        "Oracle raises an error when a subquery contains unnecessary ORDER BY "
+        "clause (#32786).": {
+            "queries.test_qs_combinators.QuerySetSetOperationTests."
+            "test_union_in_with_ordering",
+        },
     }
     django_test_expected_failures = {
         # A bug in Django/cx_Oracle with respect to string handling (#23843).

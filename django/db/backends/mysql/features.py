@@ -175,6 +175,25 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     },
                 }
             )
+        if (
+            self.connection.mysql_is_mariadb and self.connection.mysql_version < (10, 4)
+        ) or (
+            not self.connection.mysql_is_mariadb
+            and self.connection.mysql_version < (8,)
+        ):
+            skips.update(
+                {
+                    "Parenthesized combined queries are not supported on MySQL < 8 and "
+                    "MariaDB < 10.4": {
+                        "queries.test_qs_combinators.QuerySetSetOperationTests."
+                        "test_union_in_subquery",
+                        "queries.test_qs_combinators.QuerySetSetOperationTests."
+                        "test_union_in_subquery_related_outerref",
+                        "queries.test_qs_combinators.QuerySetSetOperationTests."
+                        "test_union_in_with_ordering",
+                    }
+                }
+            )
         if not self.supports_explain_analyze:
             skips.update(
                 {
