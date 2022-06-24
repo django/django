@@ -548,6 +548,17 @@ flag on the connection's socket::
         }
     }
 
+``pymemcache`` by default sets the following options (you can override them on
+your :setting:`OPTIONS <CACHES-OPTIONS>`)::
+
+    'OPTIONS': {
+        'allow_unicode_keys': True,
+        # WARNING: changing default_noreply to True is not supported.
+        # See https://code.djangoproject.com/ticket/32749#comment:3
+        'default_noreply': False,
+        'serde': pymemcache.serde.pickle_serde,
+    }
+
 Here's an example configuration for a ``redis`` based backend that selects
 database ``10`` (by default Redis ships with 16 logical databases), specifies a
 `parser class`_ (``redis.connection.HiredisParser`` will be used by default if
