@@ -96,7 +96,13 @@ class Lookup:
             value = self.apply_bilateral_transforms(value)
             value = value.resolve_expression(compiler.query)
         if hasattr(value, 'as_sql'):
-            return compiler.compile(value)
+            sql, params = compiler.compile(value)
+            # Ensure expression is wrapped in parentheses to respect operator
+            # precedence but avoid double wrapping as it can be misinterpreted
+            # on some backends (e.g. subqueries on SQLite).
+            if sql and sql[0] != '(':
+                sql = '(%s)' % sql
+            return sql, params
         else:
             return self.get_db_prep_lookup(value, connection)
 
