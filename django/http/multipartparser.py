@@ -8,7 +8,6 @@ import base64
 import binascii
 import collections
 import html
-from urllib.parse import unquote
 
 from django.conf import settings
 from django.core.exceptions import (
@@ -675,8 +674,9 @@ def parse_boundary_stream(stream, max_header_size):
         # This terminology ("main value" and "dictionary of
         # parameters") is from the Python docs.
         try:
-            main_value_pair, params = parse_header(line)
+            main_value_pair, params = parse_header_parameters(line.decode())
             name, value = main_value_pair.split(":", 1)
+            params = {k: v.encode() for k, v in params.items()}
         except ValueError:  # Invalid header.
             continue
 
@@ -703,50 +703,3 @@ class Parser:
         for sub_stream in boundarystream:
             # Iterate over each part
             yield parse_boundary_stream(sub_stream, 1024)
-
-
-def parse_header(line):
-    """
-    Parse the header into a key-value.
-
-    Input (line): bytes, output: str for key/name, bytes for values which
-    will be decoded later.
-    """
-    plist = _parse_header_params(b";" + line)
-    key = plist.pop(0).lower().decode("ascii")
-    pdict = {}
-    for p in plist:
-        i = p.find(b"=")
-        if i >= 0:
-            has_encoding = False
-            name = p[:i].strip().lower().decode("ascii")
-            if name.endswith("*"):
-                # Lang/encoding embedded in the value (like "filename*=UTF-8''file.ext")
-                # https://tools.ietf.org/html/rfc2231#section-4
-                name = name[:-1]
-                if p.count(b"'") == 2:
-                    has_encoding = True
-            value = p[i + 1 :].strip()
-            if len(value) >= 2 and value[:1] == value[-1:] == b'"':
-                value = value[1:-1]
-                value = value.replace(b"\\\\", b"\\").replace(b'\\"', b'"')
-            if has_encoding:
-                encoding, lang, value = value.split(b"'")
-                value = unquote(value.decode(), encoding=encoding.decode())
-            pdict[name] = value
-    return key, pdict
-
-
-def _parse_header_params(s):
-    plist = []
-    while s[:1] == b";":
-        s = s[1:]
-        end = s.find(b";")
-        while end > 0 and (s.count(b'"', 0, end) - s.count(b'\\"', 0, end)) % 2:
-            end = s.find(b";", end + 1)
-        if end < 0:
-            end = len(s)
-        f = s[:end]
-        plist.append(f.strip())
-        s = s[end:]
-    return plist

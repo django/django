@@ -472,3 +472,41 @@ class ParseHeaderParameterTests(unittest.TestCase):
         for header, expected in tests:
             with self.subTest(header=header):
                 self.assertEqual(parse_header_parameters(header), expected)
+
+    def test_rfc2231_parsing(self):
+        test_data = (
+            (
+                "Content-Type: application/x-stuff; "
+                "title*=us-ascii'en-us'This%20is%20%2A%2A%2Afun%2A%2A%2A",
+                "This is ***fun***",
+            ),
+            (
+                "Content-Type: application/x-stuff; title*=UTF-8''foo-%c3%a4.html",
+                "foo-ä.html",
+            ),
+            (
+                "Content-Type: application/x-stuff; title*=iso-8859-1''foo-%E4.html",
+                "foo-ä.html",
+            ),
+        )
+        for raw_line, expected_title in test_data:
+            parsed = parse_header_parameters(raw_line)
+            self.assertEqual(parsed[1]["title"], expected_title)
+
+    def test_rfc2231_wrong_title(self):
+        """
+        Test wrongly formatted RFC 2231 headers (missing double single quotes).
+        Parsing should not crash (#24209).
+        """
+        test_data = (
+            (
+                "Content-Type: application/x-stuff; "
+                "title*='This%20is%20%2A%2A%2Afun%2A%2A%2A",
+                "'This%20is%20%2A%2A%2Afun%2A%2A%2A",
+            ),
+            ("Content-Type: application/x-stuff; title*='foo.html", "'foo.html"),
+            ("Content-Type: application/x-stuff; title*=bar.html", "bar.html"),
+        )
+        for raw_line, expected_title in test_data:
+            parsed = parse_header_parameters(raw_line)
+            self.assertEqual(parsed[1]["title"], expected_title)
