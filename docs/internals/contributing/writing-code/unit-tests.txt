@@ -522,25 +522,8 @@ Isolating model registration
 
 To avoid polluting the global :attr:`~django.apps.apps` registry and prevent
 unnecessary table creation, models defined in a test method should be bound to
-a temporary ``Apps`` instance::
-
-    from django.apps.registry import Apps
-    from django.db import models
-    from django.test import SimpleTestCase
-
-    class TestModelDefinition(SimpleTestCase):
-        def test_model_definition(self):
-            test_apps = Apps(['app_label'])
-
-            class TestModel(models.Model):
-                class Meta:
-                    apps = test_apps
-            ...
-
-.. function:: django.test.utils.isolate_apps(*app_labels, attr_name=None, kwarg_name=None)
-
-Since this pattern involves a lot of boilerplate, Django provides the
-:func:`~django.test.utils.isolate_apps` decorator. It's used like this::
+a temporary ``Apps`` instance. To do this, use the
+:func:`~django.test.utils.isolate_apps` decorator::
 
     from django.db import models
     from django.test import SimpleTestCase
@@ -581,45 +564,3 @@ Since this pattern involves a lot of boilerplate, Django provides the
                     class Meta:
                         app_label = 'other_app_label'
                 ...
-
-The decorator can also be applied to classes::
-
-    from django.db import models
-    from django.test import SimpleTestCase
-    from django.test.utils import isolate_apps
-
-    @isolate_apps('app_label')
-    class TestModelDefinition(SimpleTestCase):
-        def test_model_definition(self):
-            class TestModel(models.Model):
-                pass
-            ...
-
-The temporary ``Apps`` instance used to isolate model registration can be
-retrieved as an attribute when used as a class decorator by using the
-``attr_name`` parameter::
-
-    from django.db import models
-    from django.test import SimpleTestCase
-    from django.test.utils import isolate_apps
-
-    @isolate_apps('app_label', attr_name='apps')
-    class TestModelDefinition(SimpleTestCase):
-        def test_model_definition(self):
-            class TestModel(models.Model):
-                pass
-            self.assertIs(self.apps.get_model('app_label', 'TestModel'), TestModel)
-
-Or as an argument on the test method when used as a method decorator by using
-the ``kwarg_name`` parameter::
-
-    from django.db import models
-    from django.test import SimpleTestCase
-    from django.test.utils import isolate_apps
-
-    class TestModelDefinition(SimpleTestCase):
-        @isolate_apps('app_label', kwarg_name='apps')
-        def test_model_definition(self, apps):
-            class TestModel(models.Model):
-                pass
-            self.assertIs(apps.get_model('app_label', 'TestModel'), TestModel)
