@@ -1398,6 +1398,69 @@ LOCALE_PATHS, LANGUAGE_CODE      Default translation and loaded translations
 MEDIA_ROOT, DEFAULT_FILE_STORAGE Default file storage
 ================================ ========================
 
+Isolating apps
+--------------
+
+.. function:: utils.isolate_apps(*app_labels, attr_name=None, kwarg_name=None)
+
+    Registers the models defined within a wrapped context into their own
+    isolated :attr:`~django.apps.apps` registry. This functionality is useful
+    when creating model classes for tests, as the classes will be cleanly
+    deleted afterward, and there is no risk of name collisions.
+
+    The app labels which the isolated registry should contain must be passed as
+    individual arguments. You can use ``isolate_apps()`` as a decorator or a
+    context manager. For example::
+
+        from django.db import models
+        from django.test import SimpleTestCase
+        from django.test.utils import isolate_apps
+
+        class MyModelTests(SimpleTestCase):
+
+            @isolate_apps("app_label")
+            def test_model_definition(self):
+                class TestModel(models.Model):
+                    pass
+                ...
+
+    … or::
+
+        with isolate_apps("app_label"):
+            class TestModel(models.Model):
+                pass
+            ...
+
+    The decorator form can also be applied to classes.
+
+    Two optional keyword arguments can be specified:
+
+    * ``attr_name``: attribute assigned the isolated registry if used as a
+      class decorator.
+    * ``kwarg_name``: keyword argument passing the isolated registry if used as
+      a function decorator.
+
+    The temporary ``Apps`` instance used to isolate model registration can be
+    retrieved as an attribute when used as a class decorator by using the
+    ``attr_name`` parameter::
+
+        @isolate_apps("app_label", attr_name="apps")
+        class TestModelDefinition(SimpleTestCase):
+            def test_model_definition(self):
+                class TestModel(models.Model):
+                    pass
+                self.assertIs(self.apps.get_model("app_label", "TestModel"), TestModel)
+
+    … or alternatively as an argument on the test method when used as a method
+    decorator by using the ``kwarg_name`` parameter::
+
+        class TestModelDefinition(SimpleTestCase):
+            @isolate_apps("app_label", kwarg_name="apps")
+            def test_model_definition(self, apps):
+                class TestModel(models.Model):
+                    pass
+                self.assertIs(apps.get_model("app_label", "TestModel"), TestModel)
+
 .. _emptying-test-outbox:
 
 Emptying the test outbox
