@@ -24,8 +24,6 @@ from django.utils.functional import cached_property
 from django.utils.http import is_same_domain, parse_header_parameters
 from django.utils.regex_helper import _lazy_re_compile
 
-from .multipartparser import parse_header
-
 RAISE_ERROR = object()
 host_validation_re = _lazy_re_compile(
     r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:[0-9]+)?$"
@@ -620,15 +618,13 @@ class QueryDict(MultiValueDict):
 
 class MediaType:
     def __init__(self, media_type_raw_line):
-        full_type, self.params = parse_header(
-            media_type_raw_line.encode("ascii") if media_type_raw_line else b""
+        full_type, self.params = parse_header_parameters(
+            media_type_raw_line if media_type_raw_line else ""
         )
         self.main_type, _, self.sub_type = full_type.partition("/")
 
     def __str__(self):
-        params_str = "".join(
-            "; %s=%s" % (k, v.decode("ascii")) for k, v in self.params.items()
-        )
+        params_str = "".join("; %s=%s" % (k, v) for k, v in self.params.items())
         return "%s%s%s" % (
             self.main_type,
             ("/%s" % self.sub_type) if self.sub_type else "",
