@@ -314,8 +314,12 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
                 kwargs["queryset"] = queryset
 
         form_field = db_field.formfield(**kwargs)
-        if isinstance(form_field.widget, SelectMultiple) and not isinstance(
-            form_field.widget, (CheckboxSelectMultiple, AutocompleteSelectMultiple)
+        if (
+            isinstance(form_field.widget, SelectMultiple)
+            and form_field.widget.allow_multiple_selected
+            and not isinstance(
+                form_field.widget, (CheckboxSelectMultiple, AutocompleteSelectMultiple)
+            )
         ):
             msg = _(
                 "Hold down “Control”, or “Command” on a Mac, to select more than one."
