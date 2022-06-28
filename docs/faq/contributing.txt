@@ -68,7 +68,7 @@ issue over and over. This sort of behavior will not gain you any additional
 attention -- certainly not the attention that you need in order to get your
 issue addressed.
 
-But I've reminded you several times and you keep ignoring my patch!
+But I've reminded you several times, and you keep ignoring my patch!
 ===================================================================
 
 Seriously - we're not ignoring you. If your patch stands no chance of
