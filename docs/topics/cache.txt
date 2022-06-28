@@ -548,8 +548,8 @@ flag on the connection's socket::
         }
     }
 
-``pymemcache`` by default sets the following options (you can override them on
-your :setting:`OPTIONS <CACHES-OPTIONS>`)::
+By default, the ``PyMemcacheCache`` backend sets the following options (you can
+override them in your :setting:`OPTIONS <CACHES-OPTIONS>`)::
 
     'OPTIONS': {
         'allow_unicode_keys': True,
