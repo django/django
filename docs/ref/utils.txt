@@ -655,6 +655,20 @@ escaping HTML.
             ((u.first_name, u.last_name) for u in users)
         )
 
+.. function:: json_script(value, element_id=None)
+
+    Escapes all HTML/XML special characters with their Unicode escapes, so
+    value is safe for use with JavaScript. Also wraps the escaped JSON in a
+    ``<script>`` tag. If the ``element_id`` parameter is not ``None``, the
+    ``<script>`` tag is given the passed id. For example::
+
+        >> json_script({"hello": "world"}, element_id="hello-data")
+        '<script id="hello-data" type="application/json">{"hello": "world"}</script>'
+
+    .. versionchanged:: 4.1
+
+        In older versions, the ``element_id`` argument was required.
+
 .. function:: strip_tags(value)
 
     Tries to remove anything that looks like an HTML tag from the string, that
