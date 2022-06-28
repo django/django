@@ -655,14 +655,6 @@ def parse_boundary_stream(stream, max_header_size):
     # the payload.
     header_end = chunk.find(b"\r\n\r\n")
 
-    def _parse_header(line):
-        main_value_pair, params = parse_header(line)
-        try:
-            name, value = main_value_pair.split(":", 1)
-        except ValueError:
-            raise ValueError("Invalid header: %r" % line)
-        return name, (value, params)
-
     if header_end == -1:
         # we find no header, so we just mark this fact and pass on
         # the stream verbatim
@@ -683,8 +675,9 @@ def parse_boundary_stream(stream, max_header_size):
         # This terminology ("main value" and "dictionary of
         # parameters") is from the Python docs.
         try:
-            name, (value, params) = _parse_header(line)
-        except ValueError:
+            main_value_pair, params = parse_header(line)
+            name, value = main_value_pair.split(":", 1)
+        except ValueError:  # Invalid header.
             continue
 
         if name == "content-disposition":
