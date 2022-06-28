@@ -30,10 +30,6 @@ class SimpleArrayField(forms.CharField):
             self.max_length = max_length
             self.validators.append(ArrayMaxLengthValidator(int(max_length)))
 
-    def clean(self, value):
-        value = super().clean(value)
-        return [self.base_field.clean(val) for val in value]
-
     def prepare_value(self, value):
         if isinstance(value, list):
             return self.delimiter.join(

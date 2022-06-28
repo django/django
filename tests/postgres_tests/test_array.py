@@ -1087,11 +1087,6 @@ class TestSimpleFormField(PostgreSQLSimpleTestCase):
         self.assertIsInstance(form_field, SimpleArrayField)
         self.assertEqual(form_field.max_length, 4)
 
-    def test_model_field_choices(self):
-        model_field = ArrayField(models.IntegerField(choices=((1, "A"), (2, "B"))))
-        form_field = model_field.formfield()
-        self.assertEqual(form_field.clean("1,2"), [1, 2])
-
     def test_already_converted_value(self):
         field = SimpleArrayField(forms.CharField())
         vals = ["a", "b", "c"]
@@ -1111,6 +1106,40 @@ class TestSimpleFormField(PostgreSQLSimpleTestCase):
         self.assertIs(field.has_changed(None, []), False)
         self.assertIs(field.has_changed([], None), False)
         self.assertIs(field.has_changed([], ""), False)
+
+
+class TestChoiceFormField(PostgreSQLTestCase):
+    def test_model_field_choices(self):
+        model_field = ArrayField(models.IntegerField(choices=((1, "A"), (2, "B"))))
+        form_field = model_field.formfield()
+        self.assertEqual(form_field.clean(["1", "2"]), [1, 2])
+
+    def test_model_field_formfield(self):
+        model_field = ArrayField(
+            models.CharField(max_length=27, choices=(("a1", "A1"), ("b1", "B1")))
+        )
+        form_field = model_field.formfield()
+        self.assertIsInstance(form_field, forms.TypedMultipleChoiceField)
+        self.assertEqual(form_field.coerce, model_field.base_field.to_python)
+
+    def test_model_field_formfield_validation(self):
+        model_field = ArrayField(models.IntegerField(choices=((1, "A1"), (2, "B1"))))
+        form_field = model_field.formfield()
+        self.assertEqual(form_field.clean(["1", "2"]), [1, 2])
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            form_field.clean(["a1"])
+        self.assertEqual(
+            cm.exception.messages[0],
+            "Select a valid choice. a1 is not one of the available choices.",
+        )
+
+    def test_model_field_formfield_choices(self):
+        with self.assertRaises(NotImplementedError):
+            model_field = ArrayField(
+                models.CharField(max_length=27), choices=(("a1", "A1"), ("b1", "B1"))
+            )
+            form_field = model_field.formfield()
+            form_field.clean(["a1", "b1"])
 
 
 class TestSplitFormField(PostgreSQLSimpleTestCase):

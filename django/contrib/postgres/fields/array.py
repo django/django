@@ -1,5 +1,6 @@
 import json
 
+from django import forms
 from django.contrib.postgres import lookups
 from django.contrib.postgres.forms import SimpleArrayField
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
@@ -202,14 +203,23 @@ class ArrayField(CheckFieldDefaultMixin, Field):
                 )
 
     def formfield(self, **kwargs):
-        return super().formfield(
-            **{
+        if self.base_field.choices and "choices_form_class" not in kwargs:
+            defaults = {
+                "choices_form_class": forms.TypedMultipleChoiceField,
+                "coerce": self.base_field.to_python,
+            }
+            defaults.update(kwargs)
+            return self.base_field.formfield(**defaults)
+        elif not self.choices:
+            defaults = {
                 "form_class": SimpleArrayField,
                 "base_field": self.base_field.formfield(),
                 "max_length": self.size,
-                **kwargs,
             }
-        )
+            defaults.update(kwargs)
+        else:
+            raise NotImplementedError("Choices should be defined in base field.")
+        return super().formfield(**defaults)
 
 
 class ArrayRHSMixin:

@@ -35,6 +35,10 @@ may be a good choice for the :ref:`range fields <range-fields>` and
     creates a mutable default that is shared between all instances of
     ``ArrayField``.
 
+    If you want to limit the accepted values with a
+    :attr:`~django.db.models.Field.choices` parameter, define the choices in the
+    base_field definition, not in the ``ArrayField`` definition.
+
     .. attribute:: base_field
 
         This is a required argument.
