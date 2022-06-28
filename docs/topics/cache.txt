@@ -149,6 +149,15 @@ on the IP addresses 172.19.26.240 (port 11211), 172.19.26.242 (port 11212), and
         }
     }
 
+By default, the ``PyMemcacheCache`` backend sets the following options (you can
+override them in your :setting:`OPTIONS <CACHES-OPTIONS>`)::
+
+    'OPTIONS': {
+        'allow_unicode_keys': True,
+        'default_noreply': False,
+        'serde': pymemcache.serde.pickle_serde,
+    }
+
 A final point about Memcached is that memory-based caching has a
 disadvantage: because the cached data is stored in memory, the data will be
 lost if your server crashes. Clearly, memory isn't intended for permanent data
@@ -546,15 +555,6 @@ flag on the connection's socket::
                 'use_pooling': True,
             }
         }
-    }
-
-By default, the ``PyMemcacheCache`` backend sets the following options (you can
-override them in your :setting:`OPTIONS <CACHES-OPTIONS>`)::
-
-    'OPTIONS': {
-        'allow_unicode_keys': True,
-        'default_noreply': False,
-        'serde': pymemcache.serde.pickle_serde,
     }
 
 Here's an example configuration for a ``redis`` based backend that selects
