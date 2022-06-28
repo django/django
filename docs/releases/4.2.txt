@@ -253,6 +253,9 @@ Miscellaneous
 * The undocumented ``SimpleTemplateResponse.rendering_attrs`` and
   ``TemplateResponse.rendering_attrs`` are renamed to ``non_picklable_attrs``.
 
+* The undocumented ``django.http.multipartparser.parse_header()`` function is
+  removed. Use ``django.utils.http.parse_header_parameters()`` instead.
+
 .. _deprecated-features-4.2:
 
 Features deprecated in 4.2
