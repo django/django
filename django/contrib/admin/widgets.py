@@ -51,13 +51,12 @@ class FilteredSelectMultiple(forms.SelectMultiple):
 class BaseAdminDateWidget(forms.DateInput):
     class Media:
         js = [
-            "admin/js/calendar.js",
             "admin/js/admin/DateTimeShortcuts.js",
         ]
 
     def __init__(self, attrs=None, format=None):
-        attrs = {"class": "vDateField", "size": "10", **(attrs or {})}
-        super().__init__(attrs=attrs, format=format)
+        attrs = {"type": "date", "class": "vDateField", "size": "10", **(attrs or {})}
+        super().__init__(attrs=attrs, format="%Y-%m-%d")
 
 
 class AdminDateWidget(BaseAdminDateWidget):
@@ -67,13 +66,28 @@ class AdminDateWidget(BaseAdminDateWidget):
 class BaseAdminTimeWidget(forms.TimeInput):
     class Media:
         js = [
-            "admin/js/calendar.js",
             "admin/js/admin/DateTimeShortcuts.js",
         ]
 
     def __init__(self, attrs=None, format=None):
-        attrs = {"class": "vTimeField", "size": "8", **(attrs or {})}
-        super().__init__(attrs=attrs, format=format)
+        attrs = {"type": "time", "class": "vTimeField", "size": "8", **(attrs or {})}
+        super().__init__(attrs=attrs, format="%H:%M:%S")
+
+
+class AdminDateTimeWidget(forms.DateTimeInput):
+    class Media:
+        js = [
+            "admin/js/admin/DateTimeShortcuts.js",
+        ]
+
+    def __init__(self, attrs=None, format=None):
+        attrs = {
+            "type": "datetime-local",
+            "class": "vDateTimeField",
+            "size": "8",
+            **(attrs or {}),
+        }
+        super().__init__(attrs=attrs, format="%Y-%m-%dT%H:%M:%S")
 
 
 class AdminTimeWidget(BaseAdminTimeWidget):

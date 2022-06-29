@@ -226,17 +226,14 @@ def localize_input(value, default=None):
         return str(value)
     elif isinstance(value, (decimal.Decimal, float, int)):
         return number_format(value)
-    elif isinstance(value, datetime.datetime):
-        format = default or get_format("DATETIME_INPUT_FORMATS")[0]
-        format = sanitize_strftime_format(format)
-        return value.strftime(format)
+    elif isinstance(value, (datetime.datetime, datetime.time)):
+        if default:
+            return value.strftime(sanitize_strftime_format(default))
+        return value.replace(microsecond=0).isoformat()
     elif isinstance(value, datetime.date):
-        format = default or get_format("DATE_INPUT_FORMATS")[0]
-        format = sanitize_strftime_format(format)
-        return value.strftime(format)
-    elif isinstance(value, datetime.time):
-        format = default or get_format("TIME_INPUT_FORMATS")[0]
-        return value.strftime(format)
+        if default:
+            return value.strftime(sanitize_strftime_format(default))
+        return value.isoformat()
     return value
 
 

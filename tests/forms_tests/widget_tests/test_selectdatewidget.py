@@ -447,7 +447,7 @@ class SelectDateWidgetTest(WidgetTest):
             w.value_from_datadict(
                 {"date_year": "2010", "date_month": "8", "date_day": "13"}, {}, "date"
             ),
-            "13-08-2010",
+            "2010-08-13",
         )
 
         self.assertHTMLEqual(
@@ -530,7 +530,7 @@ class SelectDateWidgetTest(WidgetTest):
             w.value_from_datadict(
                 {"date_year": "1899", "date_month": "8", "date_day": "13"}, {}, "date"
             ),
-            "13-08-1899",
+            "1899-08-13",
         )
         # And years before 1000 (demonstrating the need for
         # sanitize_strftime_format).
@@ -539,7 +539,7 @@ class SelectDateWidgetTest(WidgetTest):
             w.value_from_datadict(
                 {"date_year": "0001", "date_month": "8", "date_day": "13"}, {}, "date"
             ),
-            "13-08-0001",
+            "0001-08-13",
         )
 
     @override_settings(DATE_INPUT_FORMATS=["%d.%m.%Y"])
@@ -547,9 +547,9 @@ class SelectDateWidgetTest(WidgetTest):
         w = SelectDateWidget(years=("0001", "1899", "2009", "2010"))
         with translation.override(None):
             for values, expected_value in (
-                (("0001", "8", "13"), "13.08.0001"),
-                (("1899", "7", "11"), "11.07.1899"),
-                (("2009", "3", "7"), "07.03.2009"),
+                (("0001", "8", "13"), "0001-08-13"),
+                (("1899", "7", "11"), "1899-07-11"),
+                (("2009", "3", "7"), "2009-03-07"),
             ):
                 with self.subTest(values=values):
                     data = {

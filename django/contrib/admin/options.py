@@ -101,10 +101,7 @@ class IncorrectLookupParameters(Exception):
 # by adding to ModelAdmin.formfield_overrides.
 
 FORMFIELD_FOR_DBFIELD_DEFAULTS = {
-    models.DateTimeField: {
-        "form_class": forms.SplitDateTimeField,
-        "widget": widgets.AdminSplitDateTime,
-    },
+    models.DateTimeField: {"widget": widgets.AdminDateTimeWidget},
     models.DateField: {"widget": widgets.AdminDateWidget},
     models.TimeField: {"widget": widgets.AdminTimeWidget},
     models.TextField: {"widget": widgets.AdminTextareaWidget},
