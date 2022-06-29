@@ -17,7 +17,10 @@ from django.utils.translation import gettext_lazy as _
 class FieldFile(File):
     def __init__(self, instance, field, name):
         super().__init__(None, name)
-        self.instance = weakref.proxy(instance)
+        if field.weak:
+            self.instance = weakref.proxy(instance)
+        else:
+            self.instance = instance
         self.field = field
         self.storage = field.storage
         self._committed = True
@@ -179,8 +182,8 @@ class FileDescriptor(DeferredAttribute):
 
         # The instance dict contains whatever was originally assigned
         # in __set__.
-        file = super().__get__(instance, cls)
 
+        file = super().__get__(instance, cls)
         # If this value is a string (instance.file = "path/to/file") or None
         # then we simply wrap it with the appropriate attribute class according
         # to the file field. [This is FieldFile for FileFields and
@@ -233,10 +236,16 @@ class FileField(Field):
     description = _("File")
 
     def __init__(
-        self, verbose_name=None, name=None, upload_to="", storage=None, **kwargs
+        self,
+        verbose_name=None,
+        name=None,
+        upload_to="",
+        storage=None,
+        weak=True,
+        **kwargs,
     ):
         self._primary_key_set_explicitly = "primary_key" in kwargs
-
+        self.weak = weak
         self.storage = storage or default_storage
         if callable(self.storage):
             # Hold a reference to the callable for deconstruct().

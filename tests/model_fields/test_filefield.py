@@ -1,8 +1,10 @@
+import io
 import os
 import pickle
 import sys
 import tempfile
 import unittest
+import weakref
 from pathlib import Path
 
 from django.core.exceptions import SuspiciousFileOperation
@@ -186,3 +188,26 @@ class FileFieldTests(TestCase):
 
         document = MyDocument(myfile="test_file.py")
         self.assertEqual(document.myfile.field.model, MyDocument)
+
+    def test_weak_file_field(self):
+        document = Document(weakfile="test_file.py")
+        self.assertIsInstance(document.weakfile.instance, weakref.ProxyType)
+
+    def test_weak_file_field_save_out_of_scope(self):
+        def get_weakfile():
+            document = Document(weakfile="test_file.py")
+            return document.weakfile
+
+        weakfile = get_weakfile()
+        new = io.StringIO("print('hello world!')")
+        with self.assertRaises(ReferenceError):
+            weakfile.save("new-name", new)
+
+    def test_weak_file_field_delete_out_of_scope(self):
+        def get_weakfile():
+            document = Document(weakfile="test_file.py")
+            return document.weakfile
+
+        weakfile = get_weakfile()
+        with self.assertRaises(ReferenceError):
+            weakfile.delete()
