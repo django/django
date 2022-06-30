@@ -64,14 +64,14 @@ If your bug or feature request touches on anything visual in nature, there
 are a few additional guidelines to follow:
 
 * Include screenshots in your ticket which are the visual equivalent of a
-  minimal testcase. Show off the issue, not the crazy customizations
+  minimal test case. Show off the issue, not the crazy customizations
   you've made to your browser.
 
 * If the issue is difficult to show off using a still image, consider
   capturing a *brief* screencast. If your software permits it, capture only
   the relevant area of the screen.
 
-* If you're offering a patch which changes the look or behavior of Django's
+* If you're offering a patch that changes the look or behavior of Django's
   UI, you **must** attach before *and* after screenshots/screencasts.
   Tickets lacking these are difficult for triagers to assess quickly.
 
@@ -109,7 +109,7 @@ part of that. Here are some tips on how to make a request most effectively:
   achieving the same thing.
 
 If there's a consensus agreement on the feature, then it's appropriate to
-create a ticket. Include a link the discussion on |django-developers| in the
+create a ticket. Include a link to the discussion on |django-developers| in the
 ticket description.
 
 As with most open-source projects, code talks. If you are willing to write the

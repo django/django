@@ -16,7 +16,7 @@ coordinated at `Transifex`_.
 
 If you find an incorrect translation or want to discuss specific translations,
 go to the `Django project page`_. If you would like to help out with
-translating or add a language that isn't yet translated, here's what to do:
+translating or adding a language that isn't yet translated, here's what to do:
 
 * Introduce yourself on the `Django internationalization forum`_.
 
@@ -35,9 +35,9 @@ translating or add a language that isn't yet translated, here's what to do:
   procedural problems and handle the actual translation process.
 
 * Once you are a member of a team choose the translation resource you
-  want to update on the team page. For example the "core" resource refers
+  want to update on the team page. For example, the "core" resource refers
   to the translation catalog that contains all non-contrib translations.
-  Each of the contrib apps also have a resource (prefixed with "contrib").
+  Each of the contrib apps also has a resource (prefixed with "contrib").
 
   .. note::
      For more information about how to use Transifex, read the
