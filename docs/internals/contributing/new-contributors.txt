@@ -148,8 +148,8 @@ some advice to make your work on Django more useful and rewarding.
   ensure that the *Needs tests*, *Needs documentation*, and *Patch needs
   improvement* flags are unchecked once you've addressed all review comments.
 
-  Remember that Django has an 8 month release cycle, so there's plenty of time
-  for your patch to be reviewed.
+  Remember that Django has an eight-month release cycle, so there's plenty of
+  time for your patch to be reviewed.
 
   Finally, a well-timed reminder can help. See :ref:`contributing code FAQ
   <new-contributors-faq>` for ideas here.

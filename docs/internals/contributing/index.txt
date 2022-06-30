@@ -26,7 +26,7 @@ The work on Django itself falls into three major areas:
 
 **Localizing Django** 🗺️
     Django is translated into over 100 languages - There's even some
-    translation for Klingon?! The i18n team are always looking for translators
+    translation for Klingon?! The i18n team is always looking for translators
     to help maintain and increase language reach.
 
     See :doc:`localizing` to help translate Django.

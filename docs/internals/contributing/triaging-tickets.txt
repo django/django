@@ -6,10 +6,10 @@ Django uses Trac_ for managing the work on the code base. Trac is a
 community-tended garden of the bugs people have found and the features people
 would like to see added. As in any garden, sometimes there are weeds to be
 pulled and sometimes there are flowers and vegetables that need picking. We need
-your help to sort out one from the other, and in the end we all benefit
+your help to sort out one from the other, and in the end, we all benefit
 together.
 
-Like all gardens, we can aspire to perfection but in reality there's no such
+Like all gardens, we can aspire to perfection, but in reality there's no such
 thing. Even in the most pristine garden there are still snails and insects.
 In a community garden there are also helpful people who -- with the best of
 intentions -- fertilize the weeds and poison the roses. It's the job of the
@@ -154,7 +154,7 @@ Someday/Maybe
 -------------
 
 This stage isn't shown on the diagram. It's used sparingly to keep track of
-high-level ideas or long term feature requests.
+high-level ideas or long-term feature requests.
 
 These tickets are uncommon and overall less useful since they don't describe
 concrete actionable issues. They are enhancement requests that we might
@@ -227,7 +227,7 @@ easier to find.
 Severity
 --------
 
-The *severity* attribute is used to identify blockers, that is, issues which
+The *severity* attribute is used to identify blockers, that is, issues that
 should get fixed before releasing the next version of Django. Typically those
 issues are bugs causing regressions from earlier versions or potentially
 causing severe data losses. This attribute is quite rarely used and the vast
@@ -256,7 +256,7 @@ Keywords
 --------
 
 With this field you may label a ticket with multiple keywords. This can be
-useful, for example, to group several tickets of a same theme. Keywords can
+useful, for example, to group several tickets on the same theme. Keywords can
 either be comma or space separated. Keyword search finds the keyword string
 anywhere in the keywords. For example, clicking on a ticket with the keyword
 "form" will yield similar tickets tagged with keywords containing strings such
@@ -306,7 +306,7 @@ A ticket can be resolved in a number of ways:
       submit support queries as tickets).
 
 * wontfix
-      Used when a someone decides that the request isn't appropriate for
+      Used when someone decides that the request isn't appropriate for
       consideration in Django. Sometimes a ticket is closed as "wontfix" with a
       request for the reporter to start a discussion on the |django-developers|
       mailing list if they feel differently from the rationale provided by the
@@ -393,7 +393,7 @@ However, we do ask the following of all general community members working in
 the ticket database:
 
 * Please **don't** promote your own tickets to "Ready for checkin". You
-  may mark other people's tickets which you've reviewed as "Ready for
+  may mark other people's tickets that you've reviewed as "Ready for
   checkin", but you should get at minimum one other community member to
   review a patch that you submit.
 
@@ -437,9 +437,9 @@ Next, we mark the current point in history as being "bad" since the test fails::
 
 Now, we need to find a point in git history before the regression was
 introduced (i.e. a point where the test passes). Use something like
-``git checkout HEAD~100`` to checkout an earlier revision (100 commits earlier,
+``git checkout HEAD~100`` to check out an earlier revision (100 commits earlier,
 in this case). Check if the test fails. If so, mark that point as "bad"
-(``git bisect bad``), then checkout an earlier revision and recheck. Once you
+(``git bisect bad``), then check out an earlier revision and recheck. Once you
 find a revision where your test passes, mark it as "good"::
 
     $ git bisect good

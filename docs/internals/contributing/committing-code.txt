@@ -16,8 +16,8 @@ requests.
 
 When committing a pull request, make sure each individual commit matches the
 commit guidelines described below. Contributors are expected to provide the
-best pull requests possible. In practice however, mergers - who will likely be
-more familiar with the commit guidelines - may decide to bring a commit up to
+best pull requests possible. In practice mergers - who will likely be more 
+familiar with the commit guidelines - may decide to bring a commit up to
 standard themselves.
 
 You may want to have Jenkins or GitHub actions test the pull request with one
@@ -211,7 +211,7 @@ Nobody's perfect; mistakes will be committed.
 But try very hard to ensure that mistakes don't happen. Just because we have a
 reversion policy doesn't relax your responsibility to aim for the highest
 quality possible. Really: double-check your work, or have it checked by
-another merger, **before** you commit it in the first place!
+another merger **before** you commit it in the first place!
 
 When a mistaken commit is discovered, please follow these guidelines:
 
