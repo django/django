@@ -724,7 +724,7 @@ serialization formats. Here are a couple of tips to make things go more
 smoothly:
 
 #. Look at the existing Django fields (in
-   :file:`django/db/models/fields/__init__.py`) for inspiration. Try to find
+   :source:`django/db/models/fields/__init__.py`) for inspiration. Try to find
    a field that's similar to what you want and extend it a little bit,
    instead of creating an entirely new field from scratch.
 
@@ -761,7 +761,7 @@ In addition to the above details, there are a few guidelines which can greatly
 improve the efficiency and readability of the field's code.
 
 #. The source for Django's own ``ImageField`` (in
-   ``django/db/models/fields/files.py``) is a great example of how to
+   :source:`django/db/models/fields/files.py`) is a great example of how to
    subclass ``FileField`` to support a particular type of file, as it
    incorporates all of the techniques described above.
 

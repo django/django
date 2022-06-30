@@ -23,7 +23,7 @@ Getting the raw documentation
 
 Though Django's documentation is intended to be read as HTML at
 https://docs.djangoproject.com/, we edit it as a collection of text files for
-maximum flexibility. These files live in the top-level ``docs/`` directory of a
+maximum flexibility. These files live in the top-level :source:`docs/` directory of a
 Django release.
 
 If you'd like to start contributing to our docs, get the development version of

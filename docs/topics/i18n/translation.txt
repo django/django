@@ -2080,7 +2080,7 @@ translations for the same literal:
 #. Then, it looks for and uses if it exists a ``locale`` directory in each
    of the installed apps listed in :setting:`INSTALLED_APPS`.  The ones
    appearing first have higher precedence than the ones appearing later.
-#. Finally, the Django-provided base translation in ``django/conf/locale``
+#. Finally, the Django-provided base translation in :source:`django/conf/locale`
    is used as a fallback.
 
 .. seealso::
