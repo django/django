@@ -707,8 +707,8 @@ class FormattingTests(SimpleTestCase):
                     {
                         "decimal_field": "66.666,666",
                         "float_field": "99.999,999",
-                        "date_field": "2009-12-31",
-                        "datetime_field": "2009-12-31T20:50",
+                        "date_field": "31/12/2009",
+                        "datetime_field": "31/12/2009 20:50",
                         "time_field": "20:50",
                         "integer_field": "1.234",
                     }
@@ -775,8 +775,8 @@ class FormattingTests(SimpleTestCase):
                     {
                         "decimal_field": "66666,666",
                         "float_field": "99999,999",
-                        "date_field": "2009-12-31",
-                        "datetime_field": "2009-12-31T20:50",
+                        "date_field": "31/12/2009",
+                        "datetime_field": "31/12/2009 20:50",
                         "time_field": "20:50",
                         "integer_field": "1234",
                     }
@@ -1012,8 +1012,8 @@ class FormattingTests(SimpleTestCase):
                 {
                     "decimal_field": "66666.666",
                     "float_field": "99999.999",
-                    "date_field": "2009-12-31",
-                    "datetime_field": "2009-12-31T20:50",
+                    "date_field": "12/31/2009",
+                    "datetime_field": "12/31/2009 20:50",
                     "time_field": "20:50",
                     "integer_field": "1234",
                 }
@@ -1155,7 +1155,7 @@ class FormattingTests(SimpleTestCase):
             )
             self.assertEqual(
                 localize_input(datetime.datetime(2009, 12, 31, 6, 0, 0)),
-                "2009-12-31T06:00:00",
+                "31.12.2009 06:00:00",
             )
             self.assertEqual(
                 datetime.datetime(2009, 12, 31, 6, 0, 0),
@@ -1173,9 +1173,7 @@ class FormattingTests(SimpleTestCase):
         tests = (
             (True, "True"),
             (datetime.date(1, 1, 1), "0001-01-01"),
-            (datetime.datetime(1, 1, 1), "0001-01-01T00:00:00"),
-            (datetime.time(12, 23), "12:23:00"),
-            (datetime.time(12, 23, 45), "12:23:45"),
+            (datetime.datetime(1, 1, 1), "0001-01-01 00:00:00"),
         )
         with self.settings(USE_THOUSAND_SEPARATOR=True):
             for value, expected in tests:
@@ -1409,14 +1407,14 @@ class FormattingTests(SimpleTestCase):
             self.assertHTMLEqual(
                 template_as_text.render(context),
                 '<input id="id_date_added" name="date_added" type="text" '
-                'value="2009-12-31T06:00:00" required>;'
+                'value="31.12.2009 06:00:00" required>;'
                 '<input id="id_cents_paid" name="cents_paid" type="text" value="59,47" '
                 "required>",
             )
             self.assertHTMLEqual(
                 template_as_hidden.render(context),
                 '<input id="id_date_added" name="date_added" type="hidden" '
-                'value="2009-12-31T06:00:00">;'
+                'value="31.12.2009 06:00:00">;'
                 '<input id="id_cents_paid" name="cents_paid" type="hidden" '
                 'value="59,47">',
             )

@@ -58,7 +58,8 @@ class LogEntryTests(TestCase):
             "site": self.site.pk,
             "title": "Changed",
             "hist": "Some content",
-            "created": "2008-03-12T11:54",
+            "created_0": "2008-03-12",
+            "created_1": "11:54",
         }
         change_url = reverse(
             "admin:admin_utils_article_change", args=[quote(self.a1.pk)]
@@ -98,7 +99,8 @@ class LogEntryTests(TestCase):
             "site": self.site.pk,
             "title": "Changed",
             "hist": "Some content",
-            "created": "12/03/2008 11:54",
+            "created_0": "12/03/2008",
+            "created_1": "11:54",
         }
         with translation.override("fr"):
             change_url = reverse(
@@ -275,7 +277,8 @@ class LogEntryTests(TestCase):
             "site": self.site.pk,
             "title": "Foo",
             "hist": "Bar",
-            "created": "2015-12-25T00:00",
+            "created_0": "2015-12-25",
+            "created_1": "00:00",
         }
         changelist_url = reverse("admin:admin_utils_articleproxy_changelist")
 

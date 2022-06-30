@@ -1186,6 +1186,8 @@ class SelectDateWidget(Widget):
         if y == m == d == "":
             return None
         if y is not None and m is not None and d is not None:
+            input_format = get_format("DATE_INPUT_FORMATS")[0]
+            input_format = formats.sanitize_strftime_format(input_format)
             try:
                 date_value = datetime.date(int(y), int(m), int(d))
             except ValueError:
@@ -1194,7 +1196,7 @@ class SelectDateWidget(Widget):
                 return "%s-%s-%s" % (y or 0, m or 0, d or 0)
             except OverflowError:
                 return "0-0-0"
-            return date_value.isoformat()
+            return date_value.strftime(input_format)
         return data.get(name)
 
     def value_omitted_from_data(self, data, files, name):

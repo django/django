@@ -253,28 +253,34 @@ class AdminViewBasicTestCase(TestCase):
             # there is no title in database, give one here or formset will fail.
             "article_set-0-title": "Norske bostaver æøå skaper problemer",
             "article_set-0-content": "&lt;p&gt;Middle content&lt;/p&gt;",
-            "article_set-0-date": "2008-03-18T11:54:58",
+            "article_set-0-date_0": "2008-03-18",
+            "article_set-0-date_1": "11:54:58",
             "article_set-0-section": cls.s1.pk,
             "article_set-1-id": cls.a2.pk,
             "article_set-1-title": "Need a title.",
             "article_set-1-content": "&lt;p&gt;Oldest content&lt;/p&gt;",
-            "article_set-1-date": "2000-03-18T11:54:58",
+            "article_set-1-date_0": "2000-03-18",
+            "article_set-1-date_1": "11:54:58",
             "article_set-2-id": cls.a3.pk,
             "article_set-2-title": "Need a title.",
             "article_set-2-content": "&lt;p&gt;Newest content&lt;/p&gt;",
-            "article_set-2-date": "2009-03-18T11:54:58",
+            "article_set-2-date_0": "2009-03-18",
+            "article_set-2-date_1": "11:54:58",
             "article_set-3-id": "",
             "article_set-3-title": "",
             "article_set-3-content": "",
-            "article_set-3-date": "",
+            "article_set-3-date_0": "",
+            "article_set-3-date_1": "",
             "article_set-4-id": "",
             "article_set-4-title": "",
             "article_set-4-content": "",
-            "article_set-4-date": "",
+            "article_set-4-date_0": "",
+            "article_set-4-date_1": "",
             "article_set-5-id": "",
             "article_set-5-title": "",
             "article_set-5-content": "",
-            "article_set-5-date": "",
+            "article_set-5-date_0": "",
+            "article_set-5-date_1": "",
         }
 
     def setUp(self):
@@ -395,7 +401,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             IS_POPUP_VAR: "1",
             "title": "title with a new\nline",
             "content": "some content",
-            "date": "2010-09-10T14:55:39",
+            "date_0": "2010-09-10",
+            "date_1": "14:55:39",
         }
         response = self.client.post(reverse("admin:admin_views_article_add"), post_data)
         self.assertContains(response, "title with a new\\nline")
@@ -1584,7 +1591,8 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
             reverse("admin:admin_views_customarticle_add"),
             {
                 "content": "<p>great article</p>",
-                "date": "2008-03-18T10:54:39",
+                "date_0": "2008-03-18",
+                "date_1": "10:54:39",
             },
         )
         self.assertRedirects(
@@ -1625,7 +1633,8 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
             reverse("admin:admin_views_customarticle_add") + "?%s=1" % IS_POPUP_VAR,
             {
                 "content": "<p>great article</p>",
-                "date": "2008-03-18T10:54:39",
+                "date_0": "2008-03-18",
+                "date_1": "10:54:39",
                 IS_POPUP_VAR: "1",
             },
         )
@@ -2369,7 +2378,8 @@ class AdminViewPermissionsTest(TestCase):
         add_dict = {
             "title": "Døm ikke",
             "content": "<p>great article</p>",
-            "date": "2008-03-18T10:54:39",
+            "date_0": "2008-03-18",
+            "date_1": "10:54:39",
             "section": self.s1.pk,
         }
         # Change User should not have access to add articles
@@ -2502,7 +2512,8 @@ class AdminViewPermissionsTest(TestCase):
         change_dict = {
             "title": "Ikke fordømt",
             "content": "<p>edited article</p>",
-            "date": "2008-03-18T10:54:39",
+            "date_0": "2008-03-18",
+            "date_1": "10:54:39",
             "section": self.s1.pk,
         }
         article_change_url = reverse(
@@ -2700,7 +2711,8 @@ class AdminViewPermissionsTest(TestCase):
             "_saveasnew": "Save as new",
             "title": "Ikke fordømt",
             "content": "<p>edited article</p>",
-            "date": "2008-03-18T10:54:39",
+            "date_0": "2008-03-18",
+            "date_1": "10:54:39",
             "section": self.s1.pk,
         }
         article_change_url = reverse(
@@ -2807,7 +2819,8 @@ class AdminViewPermissionsTest(TestCase):
             "article_set-3-id": [""],
             "article_set-3-title": ["A title"],
             "article_set-3-content": ["Added content"],
-            "article_set-3-date": ["2008-3-18T11:54:58"],
+            "article_set-3-date_0": ["2008-3-18"],
+            "article_set-3-date_1": ["11:54:58"],
             "article_set-3-section": [str(self.s1.pk)],
         }
         response = self.client.post(
@@ -3252,7 +3265,8 @@ class AdminViewPermissionsTest(TestCase):
         post_data = {
             "title": "Fun & games",
             "content": "Some content",
-            "date": "2015-10-31T16:35:00",
+            "date_0": "2015-10-31",
+            "date_1": "16:35:00",
             "_save": "Save",
         }
         response = self.client.post(
@@ -3324,7 +3338,8 @@ class AdminViewProxyModelPermissionsTests(TestCase):
         data = {
             "username": "can_add",
             "password": "secret",
-            "date_joined": "2019-01-15T16:59:10",
+            "date_joined_0": "2019-01-15",
+            "date_joined_1": "16:59:10",
         }
         response = self.client.post(url, data, follow=True)
         self.assertEqual(response.status_code, 200)
@@ -3345,7 +3360,8 @@ class AdminViewProxyModelPermissionsTests(TestCase):
         data = {
             "password": self.user_proxy.password,
             "username": self.user_proxy.username,
-            "date_joined": self.user_proxy.date_joined.strftime("%Y-%m-%dT%H:%M:%S"),
+            "date_joined_0": self.user_proxy.date_joined.strftime("%Y-%m-%d"),
+            "date_joined_1": self.user_proxy.date_joined.strftime("%H:%M:%S"),
             "first_name": "first_name",
         }
         url = reverse("admin:admin_views_userproxy_change", args=(self.user_proxy.pk,))
@@ -7181,8 +7197,10 @@ class UserAdminTest(TestCase):
             "username": "newuser",
             "password1": "newpassword",
             "password2": "newpassword",
-            "last_login": "2007-05-30T13:20:10",
-            "date_joined": "2007-05-30T13:20:10",
+            "last_login_0": "2007-05-30",
+            "last_login_1": "13:20:10",
+            "date_joined_0": "2007-05-30",
+            "date_joined_1": "13:20:10",
             IS_POPUP_VAR: "1",
             "_save": "1",
         }
@@ -8045,8 +8063,10 @@ class AdminKeepChangeListFiltersTests(TestCase):
         # Test redirect on "Save".
         post_data = {
             "username": "joepublic",
-            "last_login": "2007-05-30T13:20:10",
-            "date_joined": "2007-05-30T13:20:10",
+            "last_login_0": "2007-05-30",
+            "last_login_1": "13:20:10",
+            "date_joined_0": "2007-05-30",
+            "date_joined_1": "13:20:10",
         }
 
         post_data["_save"] = 1

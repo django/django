@@ -87,7 +87,7 @@ class FormsTestCase(SimpleTestCase):
     def test_form(self):
         # Pass a dictionary to a Form's __init__().
         p = Person(
-            {"first_name": "John", "last_name": "Lennon", "birthday": "1940-10-09"}
+            {"first_name": "John", "last_name": "Lennon", "birthday": "1940-10-9"}
         )
 
         self.assertTrue(p.is_bound)
@@ -111,7 +111,7 @@ class FormsTestCase(SimpleTestCase):
         )
         self.assertHTMLEqual(
             str(p["birthday"]),
-            '<input type="text" name="birthday" value="1940-10-09" id="id_birthday" '
+            '<input type="text" name="birthday" value="1940-10-9" id="id_birthday" '
             "required>",
         )
 
@@ -133,7 +133,7 @@ class FormsTestCase(SimpleTestCase):
             "required>"
             '<input type="text" name="last_name" value="Lennon" id="id_last_name" '
             "required>"
-            '<input type="text" name="birthday" value="1940-10-09" id="id_birthday" '
+            '<input type="text" name="birthday" value="1940-10-9" id="id_birthday" '
             "required>",
         )
 
@@ -147,7 +147,7 @@ class FormsTestCase(SimpleTestCase):
             [
                 ["First name", "John"],
                 ["Last name", "Lennon"],
-                ["Birthday", "1940-10-09"],
+                ["Birthday", "1940-10-9"],
             ],
         )
         self.assertHTMLEqual(
@@ -157,7 +157,7 @@ class FormsTestCase(SimpleTestCase):
             '<label for="id_last_name">Last name:</label><input type="text" '
             'name="last_name" value="Lennon" required id="id_last_name"></div><div>'
             '<label for="id_birthday">Birthday:</label><input type="text" '
-            'name="birthday" value="1940-10-09" required id="id_birthday"></div>',
+            'name="birthday" value="1940-10-9" required id="id_birthday"></div>',
         )
         self.assertHTMLEqual(
             p.as_div(),
@@ -166,7 +166,7 @@ class FormsTestCase(SimpleTestCase):
             '<label for="id_last_name">Last name:</label><input type="text" '
             'name="last_name" value="Lennon" required id="id_last_name"></div><div>'
             '<label for="id_birthday">Birthday:</label><input type="text" '
-            'name="birthday" value="1940-10-09" required id="id_birthday"></div>',
+            'name="birthday" value="1940-10-9" required id="id_birthday"></div>',
         )
 
     def test_empty_dict(self):
@@ -318,7 +318,7 @@ class FormsTestCase(SimpleTestCase):
             {
                 "first_name": "John",
                 "last_name": "\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111",
-                "birthday": "1940-10-09",
+                "birthday": "1940-10-9",
             }
         )
         self.assertHTMLEqual(
@@ -331,7 +331,7 @@ class FormsTestCase(SimpleTestCase):
             'value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111"'
             'id="id_last_name" required></td></tr>\n'
             '<tr><th><label for="id_birthday">Birthday:</label></th><td>'
-            '<input type="text" name="birthday" value="1940-10-09" id="id_birthday" '
+            '<input type="text" name="birthday" value="1940-10-9" id="id_birthday" '
             "required></td></tr>",
         )
         self.assertHTMLEqual(
@@ -344,7 +344,7 @@ class FormsTestCase(SimpleTestCase):
             'value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" '
             'id="id_last_name" required></li>\n'
             '<li><label for="id_birthday">Birthday:</label> '
-            '<input type="text" name="birthday" value="1940-10-09" id="id_birthday" '
+            '<input type="text" name="birthday" value="1940-10-9" id="id_birthday" '
             "required></li>",
         )
         self.assertHTMLEqual(
@@ -357,7 +357,7 @@ class FormsTestCase(SimpleTestCase):
             'value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" '
             'id="id_last_name" required></p>\n'
             '<p><label for="id_birthday">Birthday:</label> '
-            '<input type="text" name="birthday" value="1940-10-09" id="id_birthday" '
+            '<input type="text" name="birthday" value="1940-10-9" id="id_birthday" '
             "required></p>",
         )
         self.assertHTMLEqual(
@@ -368,7 +368,7 @@ class FormsTestCase(SimpleTestCase):
             '<input type="text" name="last_name"'
             'value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" '
             'id="id_last_name" required></div><div><label for="id_birthday">'
-            'Birthday:</label><input type="text" name="birthday" value="1940-10-09" '
+            'Birthday:</label><input type="text" name="birthday" value="1940-10-9" '
             'id="id_birthday" required></div>',
         )
 
@@ -413,7 +413,7 @@ class FormsTestCase(SimpleTestCase):
         data = {
             "first_name": "John",
             "last_name": "Lennon",
-            "birthday": "1940-10-09",
+            "birthday": "1940-10-9",
             "extra1": "hello",
             "extra2": "hello",
         }
@@ -2064,7 +2064,7 @@ class FormsTestCase(SimpleTestCase):
         # prepended. This message is displayed at the top of the output, regardless of
         # its field's order in the form.
         p = Person(
-            {"first_name": "John", "last_name": "Lennon", "birthday": "1940-10-09"},
+            {"first_name": "John", "last_name": "Lennon", "birthday": "1940-10-9"},
             auto_id=False,
         )
         self.assertHTMLEqual(
@@ -2078,7 +2078,7 @@ class FormsTestCase(SimpleTestCase):
             <tr><th>Last name:</th><td>
             <input type="text" name="last_name" value="Lennon" required></td></tr>
             <tr><th>Birthday:</th><td>
-            <input type="text" name="birthday" value="1940-10-09" required>
+            <input type="text" name="birthday" value="1940-10-9" required>
             <input type="hidden" name="hidden_text"></td></tr>
             """,
         )
@@ -2091,8 +2091,7 @@ class FormsTestCase(SimpleTestCase):
             </li>
             <li>Last name: <input type="text" name="last_name" value="Lennon" required>
             </li>
-            <li>Birthday:
-            <input type="text" name="birthday" value="1940-10-09" required>
+            <li>Birthday: <input type="text" name="birthday" value="1940-10-9" required>
             <input type="hidden" name="hidden_text"></li>
             """,
         )
@@ -2105,7 +2104,7 @@ class FormsTestCase(SimpleTestCase):
             </p>
             <p>Last name: <input type="text" name="last_name" value="Lennon" required>
             </p>
-            <p>Birthday: <input type="text" name="birthday" value="1940-10-09" required>
+            <p>Birthday: <input type="text" name="birthday" value="1940-10-9" required>
             <input type="hidden" name="hidden_text"></p>
             """,
         )
@@ -2115,7 +2114,7 @@ class FormsTestCase(SimpleTestCase):
             'is required.</li></ul><div>First name: <input type="text" '
             'name="first_name" value="John" required></div><div>Last name: <input '
             'type="text" name="last_name" value="Lennon" required></div><div>'
-            'Birthday: <input type="text" name="birthday" value="1940-10-09" required>'
+            'Birthday: <input type="text" name="birthday" value="1940-10-9" required>'
             '<input type="hidden" name="hidden_text"></div>',
         )
 
@@ -3177,7 +3176,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
         data = {
             "person1-first_name": "John",
             "person1-last_name": "Lennon",
-            "person1-birthday": "1940-10-09",
+            "person1-birthday": "1940-10-9",
         }
         p = Person(data, prefix="person1")
         self.assertHTMLEqual(
@@ -3190,7 +3189,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
             <input type="text" name="person1-last_name" value="Lennon"
                 id="id_person1-last_name" required></li>
             <li><label for="id_person1-birthday">Birthday:</label>
-            <input type="text" name="person1-birthday" value="1940-10-09"
+            <input type="text" name="person1-birthday" value="1940-10-9"
                 id="id_person1-birthday" required></li>
             """,
         )
@@ -3206,7 +3205,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
         )
         self.assertHTMLEqual(
             str(p["birthday"]),
-            '<input type="text" name="person1-birthday" value="1940-10-09" '
+            '<input type="text" name="person1-birthday" value="1940-10-9" '
             'id="id_person1-birthday" required>',
         )
         self.assertEqual(p.errors, {})
@@ -3233,7 +3232,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
 
         # In this example, the data doesn't have a prefix, but the form requires it, so
         # the form doesn't "see" the fields.
-        data = {"first_name": "John", "last_name": "Lennon", "birthday": "1940-10-09"}
+        data = {"first_name": "John", "last_name": "Lennon", "birthday": "1940-10-9"}
         p = Person(data, prefix="person1")
         self.assertEqual(p.errors["first_name"], ["This field is required."])
         self.assertEqual(p.errors["last_name"], ["This field is required."])
@@ -3244,10 +3243,10 @@ Options: <select multiple name="options" aria-invalid="true" required>
         data = {
             "person1-first_name": "John",
             "person1-last_name": "Lennon",
-            "person1-birthday": "1940-10-09",
+            "person1-birthday": "1940-10-9",
             "person2-first_name": "Jim",
             "person2-last_name": "Morrison",
-            "person2-birthday": "1943-12-08",
+            "person2-birthday": "1943-12-8",
         }
         p1 = Person(data, prefix="person1")
         self.assertTrue(p1.is_valid())
@@ -3294,7 +3293,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
         data = {
             "foo-prefix-first_name": "John",
             "foo-prefix-last_name": "Lennon",
-            "foo-prefix-birthday": "1940-10-09",
+            "foo-prefix-birthday": "1940-10-9",
         }
         p = Person(data, prefix="foo")
         self.assertTrue(p.is_valid())
@@ -4378,7 +4377,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
             "fields=(first_name;last_name;birthday)>",
         )
         p = Person(
-            {"first_name": "John", "last_name": "Lennon", "birthday": "1940-10-09"}
+            {"first_name": "John", "last_name": "Lennon", "birthday": "1940-10-9"}
         )
         self.assertEqual(
             repr(p),

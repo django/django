@@ -2,7 +2,7 @@ import gettext
 import os
 import re
 import zoneinfo
-from datetime import date, datetime, time, timedelta
+from datetime import datetime, timedelta
 from importlib import import_module
 from unittest import skipUnless
 
@@ -100,7 +100,7 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
         self.assertFormfield(Event, "start_date", widgets.AdminDateWidget)
 
     def test_DateTimeField(self):
-        self.assertFormfield(Member, "birthdate", widgets.AdminDateTimeWidget)
+        self.assertFormfield(Member, "birthdate", widgets.AdminSplitDateTime)
 
     def test_TimeField(self):
         self.assertFormfield(Event, "start_time", widgets.AdminTimeWidget)
@@ -226,7 +226,7 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
         ma = MemberAdmin(Member, admin.site)
         f1 = ma.formfield_for_dbfield(Member._meta.get_field("birthdate"), request=None)
         self.assertIsInstance(f1.widget, widgets.AdminSplitDateTime)
-        self.assertIsInstance(f1, forms.DateTimeField)
+        self.assertIsInstance(f1, forms.SplitDateTimeField)
 
     def test_formfield_overrides_for_custom_field(self):
         """
@@ -398,17 +398,17 @@ class AdminDateWidgetTest(SimpleTestCase):
     def test_attrs(self):
         w = widgets.AdminDateWidget()
         self.assertHTMLEqual(
-            w.render("test", date(2007, 12, 1)),
+            w.render("test", datetime(2007, 12, 1, 9, 30)),
             '<p class="date">'
-            '<input value="2007-12-01" type="date" class="vDateField" name="test" '
+            '<input value="2007-12-01" type="text" class="vDateField" name="test" '
             'size="10"></p>',
         )
         # pass attrs to widget
         w = widgets.AdminDateWidget(attrs={"size": 20, "class": "myDateField"})
         self.assertHTMLEqual(
-            w.render("test", date(2007, 12, 1)),
+            w.render("test", datetime(2007, 12, 1, 9, 30)),
             '<p class="date">'
-            '<input value="2007-12-01" type="date" class="myDateField" name="test" '
+            '<input value="2007-12-01" type="text" class="myDateField" name="test" '
             'size="20"></p>',
         )
 
@@ -417,17 +417,17 @@ class AdminTimeWidgetTest(SimpleTestCase):
     def test_attrs(self):
         w = widgets.AdminTimeWidget()
         self.assertHTMLEqual(
-            w.render("test", time(9, 30)),
+            w.render("test", datetime(2007, 12, 1, 9, 30)),
             '<p class="time">'
-            '<input value="09:30:00" type="time" class="vTimeField" name="test" '
+            '<input value="09:30:00" type="text" class="vTimeField" name="test" '
             'size="8"></p>',
         )
         # pass attrs to widget
         w = widgets.AdminTimeWidget(attrs={"size": 20, "class": "myTimeField"})
         self.assertHTMLEqual(
-            w.render("test", time(9, 30)),
+            w.render("test", datetime(2007, 12, 1, 9, 30)),
             '<p class="time">'
-            '<input value="09:30:00" type="time" class="myTimeField" name="test" '
+            '<input value="09:30:00" type="text" class="myTimeField" name="test" '
             'size="20"></p>',
         )
 
@@ -438,9 +438,9 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
             '<p class="datetime">'
-            'Date: <input value="2007-12-01" type="date" class="vDateField" '
+            'Date: <input value="2007-12-01" type="text" class="vDateField" '
             'name="test_0" size="10"><br>'
-            'Time: <input value="09:30:00" type="time" class="vTimeField" '
+            'Time: <input value="09:30:00" type="text" class="vTimeField" '
             'name="test_1" size="8"></p>',
         )
 
@@ -452,9 +452,9 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
             self.assertHTMLEqual(
                 w.render("test", datetime(2007, 12, 1, 9, 30)),
                 '<p class="datetime">'
-                'Datum: <input value="2007-12-01" type="date" '
+                'Datum: <input value="01.12.2007" type="text" '
                 'class="vDateField" name="test_0"size="10"><br>'
-                'Zeit: <input value="09:30:00" type="time" class="vTimeField" '
+                'Zeit: <input value="09:30:00" type="text" class="vTimeField" '
                 'name="test_1" size="8"></p>',
             )
 

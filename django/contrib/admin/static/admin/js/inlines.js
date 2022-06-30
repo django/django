@@ -220,6 +220,10 @@
                 $(".datetimeshortcuts").remove();
                 DateTimeShortcuts.init();
             }
+            if (typeof DateTimeISOShortcuts !== "undefined") {
+                $(".datetimeshortcuts").remove();
+                DateTimeISOShortcuts.init();
+            }
         };
 
         const updateSelectFilter = function() {
@@ -283,6 +287,10 @@
             if (typeof DateTimeShortcuts !== "undefined") {
                 $(".datetimeshortcuts").remove();
                 DateTimeShortcuts.init();
+            }
+            if (typeof DateTimeISOShortcuts !== "undefined") {
+                $(".datetimeshortcuts").remove();
+                DateTimeISOShortcuts.init();
             }
         };
 
