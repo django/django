@@ -217,6 +217,13 @@ Utilities
 * The new ``encoder`` parameter for :meth:`django.utils.html.json_script`
   function allows customizing a JSON encoder class.
 
+* The private internal vendored copy of ``urllib.parse.urlsplit()`` now strips
+  ``'\r'``, ``'\n'``, and ``'\t'`` (see :cve:`2022-0391` and :bpo:`43882`).
+  This is to protect projects that may be incorrectly using the internal
+  ``url_has_allowed_host_and_scheme()`` function, instead of using one of the
+  documented functions for handling URL redirects. The Django functions were
+  not affected.
+
 Validators
 ~~~~~~~~~~
 
