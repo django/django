@@ -177,6 +177,7 @@ class URLHasAllowedHostAndSchemeTests(unittest.TestCase):
             r"http:/\example.com",
             'javascript:alert("XSS")',
             "\njavascript:alert(x)",
+            "java\nscript:alert(x)",
             "\x08//example.com",
             r"http://otherserver\@example.com",
             r"http:\\testserver\@example.com",

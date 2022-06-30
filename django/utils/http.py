@@ -46,6 +46,10 @@ ASCTIME_DATE = _lazy_re_compile(r"^\w{3} %s %s %s %s$" % (__M, __D2, __T, __Y))
 RFC3986_GENDELIMS = ":/?#[]@"
 RFC3986_SUBDELIMS = "!$&'()*+,;="
 
+# TODO: Remove when dropping support for PY38.
+# Unsafe bytes to be removed per WHATWG spec.
+_UNSAFE_URL_BYTES_TO_REMOVE = ["\t", "\r", "\n"]
+
 
 def urlencode(query, doseq=False):
     """
@@ -278,6 +282,7 @@ def url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
     )
 
 
+# TODO: Remove when dropping support for PY38.
 # Copied from urllib.parse.urlparse() but uses fixed urlsplit() function.
 def _urlparse(url, scheme="", allow_fragments=True):
     """Parse a URL into 6 components:
@@ -296,8 +301,15 @@ def _urlparse(url, scheme="", allow_fragments=True):
     return _coerce_result(result)
 
 
-# Copied from urllib.parse.urlsplit() with
-# https://github.com/python/cpython/pull/661 applied.
+# TODO: Remove when dropping support for PY38.
+def _remove_unsafe_bytes_from_url(url):
+    for b in _UNSAFE_URL_BYTES_TO_REMOVE:
+        url = url.replace(b, "")
+    return url
+
+
+# TODO: Remove when dropping support for PY38.
+# Backport of urllib.parse.urlsplit() from Python 3.9.
 def _urlsplit(url, scheme="", allow_fragments=True):
     """Parse a URL into 5 components:
     <scheme>://<netloc>/<path>?<query>#<fragment>
@@ -305,6 +317,9 @@ def _urlsplit(url, scheme="", allow_fragments=True):
     Note that we don't break the components up in smaller bits
     (e.g. netloc is a single string) and we don't expand % escapes."""
     url, scheme, _coerce_result = _coerce_args(url, scheme)
+    url = _remove_unsafe_bytes_from_url(url)
+    scheme = _remove_unsafe_bytes_from_url(scheme)
+
     netloc = query = fragment = ""
     i = url.find(":")
     if i > 0:
