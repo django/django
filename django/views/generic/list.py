@@ -171,7 +171,7 @@ class BaseListView(MultipleObjectMixin, View):
                         "class_name": self.__class__.__name__,
                     }
                 )
-        context = self.get_context_data()
+        context = self.get_context_data(**kwargs)
         return self.render_to_response(context)
 
 
