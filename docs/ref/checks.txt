@@ -83,6 +83,7 @@ Django's system checks are organized using the following tags:
   you specify configured database aliases using the ``--database`` option when
   calling the :djadmin:`check` command.
 * ``files``: Checks files related configuration.
+* ``migrations``: Checks of migration operations.
 * ``models``: Checks of model, field, and manager definitions.
 * ``security``: Checks security related configuration.
 * ``signals``: Checks on signal declarations and handler registrations.
@@ -93,6 +94,10 @@ Django's system checks are organized using the following tags:
 * ``urls``: Checks URL configuration.
 
 Some checks may be registered with multiple tags.
+
+.. versionchanged:: 4.2
+
+    The ``migrations`` tag was added.
 
 Core system checks
 ==================

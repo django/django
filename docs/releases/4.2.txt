@@ -169,7 +169,8 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* The new :ref:`generic mechanism <migrations-removing-operation>` allows
+  handling the deprecation of migration operations.
 
 Models
 ~~~~~~
