@@ -148,7 +148,7 @@ Now, our ``my_callback`` function will be called each time a request finishes.
             ...
 
             def ready(self):
-                # Implicitly connect a signal handlers decorated with @receiver.
+                # Implicitly connect signal handlers decorated with @receiver.
                 from . import signals
                 # Explicitly connect a signal handler.
                 request_finished.connect(signals.my_callback)
