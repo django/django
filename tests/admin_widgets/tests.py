@@ -413,6 +413,29 @@ class AdminDateWidgetTest(SimpleTestCase):
         )
 
 
+class AdminDateISOWidgetTest(SimpleTestCase):
+    def test_attrs(self):
+        w = widgets.AdminDateISOWidget()
+        self.assertHTMLEqual(
+            w.render("test", datetime(2007, 12, 1, 9, 30)),
+            '<input value="2007-12-01" type="date" class="vDateField" name="test" '
+            'size="10">',
+        )
+        # pass attrs to widget
+        w = widgets.AdminDateISOWidget(attrs={"size": 20, "class": "myDateField"})
+        self.assertHTMLEqual(
+            w.render("test", datetime(2007, 12, 1, 9, 30)),
+            '<input value="2007-12-01" type="date" class="myDateField" name="test" '
+            'size="20">',
+        )
+
+    def test_media(self):
+        self.assertListEqual(
+            widgets.AdminTimeISOWidget.Media.js,
+            ["admin/js/admin/DateTimeISOShortcuts.js"]
+        )
+
+
 class AdminTimeWidgetTest(SimpleTestCase):
     def test_attrs(self):
         w = widgets.AdminTimeWidget()
@@ -429,6 +452,52 @@ class AdminTimeWidgetTest(SimpleTestCase):
             '<p class="time">'
             '<input value="09:30:00" type="text" class="myTimeField" name="test" '
             'size="20"></p>',
+        )
+
+
+class AdminTimeISOWidgetTest(SimpleTestCase):
+    def test_attrs(self):
+        w = widgets.AdminTimeISOWidget()
+        self.assertHTMLEqual(
+            w.render("test", datetime(2007, 12, 1, 9, 30)),
+            '<input value="09:30:00" type="time" class="vTimeField" name="test" '
+            'size="8">',
+        )
+        # pass attrs to widget
+        w = widgets.AdminTimeISOWidget(attrs={"size": 20, "class": "myTimeField"})
+        self.assertHTMLEqual(
+            w.render("test", datetime(2007, 12, 1, 9, 30)),
+            '<input value="09:30:00" type="time" class="myTimeField" name="test" '
+            'size="20">',
+        )
+
+    def test_media(self):
+        self.assertListEqual(
+            widgets.AdminTimeISOWidget.Media.js,
+            ["admin/js/admin/DateTimeISOShortcuts.js"]
+        )
+
+
+class AdminDateTimeISOWidgetTest(SimpleTestCase):
+    def test_attrs(self):
+        w = widgets.AdminDateTimeISOWidget()
+        self.assertHTMLEqual(
+            w.render("test", datetime(2007, 12, 1, 9, 30)),
+            '<input value="2007-12-01T09:30:00" type="datetime-local" class="vDateTimeField" name="test" '
+            'size="8">',
+        )
+        # pass attrs to widget
+        w = widgets.AdminDateTimeISOWidget(attrs={"size": 20, "class": "myTimeField"})
+        self.assertHTMLEqual(
+            w.render("test", datetime(2007, 12, 1, 9, 30)),
+            '<input value="2007-12-01T09:30:00" type="datetime-local" class="myTimeField" name="test" '
+            'size="20">',
+        )
+
+    def test_media(self):
+        self.assertListEqual(
+            widgets.AdminTimeISOWidget.Media.js,
+            ["admin/js/admin/DateTimeISOShortcuts.js"]
         )
 
 
