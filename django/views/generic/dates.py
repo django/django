@@ -33,16 +33,7 @@ class YearMixin:
 
     def get_year(self):
         """Return the year for which this view should display data."""
-        year = self.year
-        if year is None:
-            try:
-                year = self.kwargs["year"]
-            except KeyError:
-                try:
-                    year = self.request.GET["year"]
-                except KeyError:
-                    raise Http404(_("No year specified"))
-        return year
+        return _get_time_unit(self, "year")
 
     def get_next_year(self, date):
         """Get the next valid year."""
@@ -83,16 +74,7 @@ class MonthMixin:
 
     def get_month(self):
         """Return the month for which this view should display data."""
-        month = self.month
-        if month is None:
-            try:
-                month = self.kwargs["month"]
-            except KeyError:
-                try:
-                    month = self.request.GET["month"]
-                except KeyError:
-                    raise Http404(_("No month specified"))
-        return month
+        return _get_time_unit(self, "month")
 
     def get_next_month(self, date):
         """Get the next valid month."""
@@ -136,16 +118,7 @@ class DayMixin:
 
     def get_day(self):
         """Return the day for which this view should display data."""
-        day = self.day
-        if day is None:
-            try:
-                day = self.kwargs["day"]
-            except KeyError:
-                try:
-                    day = self.request.GET["day"]
-                except KeyError:
-                    raise Http404(_("No day specified"))
-        return day
+        return _get_time_unit(self, "day")
 
     def get_next_day(self, date):
         """Get the next valid day."""
@@ -183,16 +156,7 @@ class WeekMixin:
 
     def get_week(self):
         """Return the week for which this view should display data."""
-        week = self.week
-        if week is None:
-            try:
-                week = self.kwargs["week"]
-            except KeyError:
-                try:
-                    week = self.request.GET["week"]
-                except KeyError:
-                    raise Http404(_("No week specified"))
-        return week
+        return _get_time_unit(self, "week")
 
     def get_next_week(self, date):
         """Get the next valid week."""
@@ -695,6 +659,20 @@ def _date_from_string(
                 "format": format,
             }
         )
+
+
+def _get_time_unit(generic_view, time_unit_name):
+    """Return a time unit (year, month, week, day) for which a view should display data."""
+    time_unit = getattr(generic_view, time_unit_name)
+    if time_unit is None:
+        try:
+            time_unit = generic_view.kwargs[time_unit_name]
+        except KeyError:
+            try:
+                time_unit = generic_view.request.GET[time_unit_name]
+            except KeyError:
+                raise Http404(_("No %s specified") % time_unit_name)
+    return time_unit
 
 
 def _get_next_prev(generic_view, date, is_previous, period):
