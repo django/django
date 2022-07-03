@@ -1,6 +1,88 @@
 [build-system]
-requires = ['setuptools>=40.8.0', 'wheel']
-build-backend = 'setuptools.build_meta:__legacy__'
+requires = ["hatchling>=1.6.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "Django"
+description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
+readme = "README.rst"
+license = "BSD-3-Clause"
+requires-python = ">=3.8"
+authors = [
+  { name = "Django Software Foundation", email = "foundation@djangoproject.com" },
+]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Environment :: Web Environment",
+  "Framework :: Django",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: BSD License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Topic :: Internet :: WWW/HTTP",
+  "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+  "Topic :: Internet :: WWW/HTTP :: WSGI",
+  "Topic :: Software Development :: Libraries :: Application Frameworks",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+  "asgiref >= 3.5.2",
+  "backports.zoneinfo; python_version<'3.9'",
+  "sqlparse >= 0.2.2",
+  "tzdata; sys_platform == 'win32'",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+argon2 = [
+  "argon2-cffi >= 19.1.0",
+]
+bcrypt = [
+  "bcrypt",
+]
+
+[project.scripts]
+django-admin = "django.core.management:execute_from_command_line"
+
+[project.urls]
+Documentation = "https://docs.djangoproject.com/"
+Funding = "https://www.djangoproject.com/fundraising/"
+Homepage = "https://www.djangoproject.com/"
+"Release notes" = "https://docs.djangoproject.com/en/stable/releases/"
+Source = "https://github.com/django/django"
+Tracker = "https://code.djangoproject.com/"
+
+[tool.hatch.version]
+source = "code"
+path = "django/__init__.py"
+search-paths = ["."]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/django",
+  "/docs",
+  "/extras",
+  "/js_tests",
+  "/scripts",
+  "/tests",
+  "/AUTHORS",
+  "/Gruntfile.js",
+  "/INSTALL",
+  "/LICENSE",
+  "/LICENSE.python",
+  "/package.json",
+  "*.rst",
+]
+
+[tool.isort]
+profile = "black"
+default_section = "THIRDPARTY"
+known_first_party = ["django"]
 
 [tool.black]
 target-version = ['py38']
