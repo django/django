@@ -436,8 +436,8 @@ class SQLCompiler:
         for expr, is_ref in self._order_by_pairs():
             resolved = expr.resolve_expression(self.query, allow_joins=True, reuse=None)
             if self.query.combinator and self.select:
-                src = resolved.get_source_expressions()[0]
-                expr_src = expr.get_source_expressions()[0]
+                src = resolved.expression
+                expr_src = expr.expression
                 # Relabel order by columns to raw numbers if this is a combined
                 # query; necessary since the columns can't be referenced by the
                 # fully qualified name and the simple column names may collide.
