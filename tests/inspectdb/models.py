@@ -9,6 +9,7 @@ class People(models.Model):
 
 class Message(models.Model):
     from_field = models.ForeignKey(People, models.CASCADE, db_column="from_id")
+    author = models.ForeignKey(People, models.CASCADE, related_name="message_authors")
 
 
 class PeopleData(models.Model):
