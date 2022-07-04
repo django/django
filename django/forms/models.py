@@ -657,6 +657,7 @@ class BaseModelFormSet(BaseFormSet):
     """
 
     model = None
+    edit_only = False
 
     # Set of fields that must be unique among forms of this set.
     unique_fields = set()
