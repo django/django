@@ -133,6 +133,7 @@ class Command(BaseCommand):
                 known_models.append(table2model(table_name))
                 used_column_names = []  # Holds column names used in the table so far
                 column_to_field_name = {}  # Maps column names to names of model fields
+                used_relations = set() #  Holds relations used in the table so far
                 for row in table_description:
                     comment_notes = (
                         []
@@ -223,6 +224,11 @@ class Command(BaseCommand):
                     )
                     if field_type.startswith(("ForeignKey(", "OneToOneField(")):
                         field_desc += ", models.DO_NOTHING"
+
+                    if is_relation:
+                        if rel_to in used_relations:
+                            field_desc += f", related_name='{att_name}'"
+                        used_relations.add(rel_to)
 
                     if extra_params:
                         if not field_desc.endswith("("):
