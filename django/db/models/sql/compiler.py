@@ -435,21 +435,18 @@ class SQLCompiler:
 
         for expr, is_ref in self._order_by_pairs():
             resolved = expr.resolve_expression(self.query, allow_joins=True, reuse=None)
-            if self.query.combinator and self.select:
+            if not is_ref and self.query.combinator and self.select:
                 src = resolved.expression
                 expr_src = expr.expression
-                # Relabel order by columns to raw numbers if this is a combined
-                # query; necessary since the columns can't be referenced by the
-                # fully qualified name and the simple column names may collide.
-                for idx, (sel_expr, _, col_alias) in enumerate(self.select):
-                    if is_ref and col_alias == src.refs:
-                        src = src.source
-                    elif col_alias and not (
+                for sel_expr, _, col_alias in self.select:
+                    if col_alias and not (
                         isinstance(expr_src, F) and col_alias == expr_src.name
                     ):
                         continue
                     if src == sel_expr:
-                        resolved.set_source_expressions([RawSQL("%d" % (idx + 1), ())])
+                        resolved.set_source_expressions(
+                            [Ref(col_alias if col_alias else src.target.column, src)]
+                        )
                         break
                 else:
                     if col_alias:
@@ -853,7 +850,11 @@ class SQLCompiler:
                 for _, (o_sql, o_params, _) in order_by:
                     ordering.append(o_sql)
                     params.extend(o_params)
-                result.append("ORDER BY %s" % ", ".join(ordering))
+                order_by_sql = "ORDER BY %s" % ", ".join(ordering)
+                if combinator and features.requires_compound_order_by_subquery:
+                    result = ["SELECT * FROM (", *result, ")", order_by_sql]
+                else:
+                    result.append(order_by_sql)
 
             if with_limit_offset:
                 result.append(
