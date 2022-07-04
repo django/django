@@ -235,6 +235,7 @@ class BaseDatabaseFeatures:
     supports_select_difference = True
     supports_slicing_ordering_in_compound = False
     supports_parentheses_in_compound = True
+    requires_compound_order_by_subquery = False
 
     # Does the database support SQL 2003 FILTER (WHERE ...) in aggregate
     # expressions?

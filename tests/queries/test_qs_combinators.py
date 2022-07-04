@@ -61,6 +61,24 @@ class QuerySetSetOperationTests(TestCase):
         self.assertSequenceEqual(qs3.none(), [])
         self.assertNumbersEqual(qs3, [0, 1, 8, 9], ordered=False)
 
+    def test_union_order_with_null_first_last(self):
+        Number.objects.filter(other_num=5).update(other_num=None)
+        qs1 = Number.objects.filter(num__lte=1)
+        qs2 = Number.objects.filter(num__gte=2)
+        qs3 = qs1.union(qs2)
+        self.assertSequenceEqual(
+            qs3.order_by(
+                F("other_num").asc(nulls_first=True),
+            ).values_list("other_num", flat=True),
+            [None, 1, 2, 3, 4, 6, 7, 8, 9, 10],
+        )
+        self.assertSequenceEqual(
+            qs3.order_by(
+                F("other_num").asc(nulls_last=True),
+            ).values_list("other_num", flat=True),
+            [1, 2, 3, 4, 6, 7, 8, 9, 10, None],
+        )
+
     @skipUnlessDBFeature("supports_select_intersection")
     def test_intersection_with_empty_qs(self):
         qs1 = Number.objects.all()
