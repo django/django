@@ -127,12 +127,14 @@ class Command(BaseCommand):
                     yield "# The error was: %s" % e
                     continue
 
+                model_name = table2model(table_name)
                 yield ""
                 yield ""
-                yield "class %s(models.Model):" % table2model(table_name)
-                known_models.append(table2model(table_name))
+                yield "class %s(models.Model):" % model_name
+                known_models.append(model_name)
                 used_column_names = []  # Holds column names used in the table so far
                 column_to_field_name = {}  # Maps column names to names of model fields
+                used_relations = set()  # Holds foreign relations used in the table.
                 for row in table_description:
                     comment_notes = (
                         []
@@ -186,6 +188,12 @@ class Command(BaseCommand):
                             field_type = "%s(%s" % (rel_type, rel_to)
                         else:
                             field_type = "%s('%s'" % (rel_type, rel_to)
+                        if rel_to in used_relations:
+                            extra_params["related_name"] = "%s_%s_set" % (
+                                model_name.lower(),
+                                att_name,
+                            )
+                        used_relations.add(rel_to)
                     else:
                         # Calling `get_field_type` to get the field type string and any
                         # additional parameters and notes.
