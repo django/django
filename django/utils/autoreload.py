@@ -657,16 +657,7 @@ def start_django(reloader, main_func, *args, **kwargs):
     django_main_thread.start()
 
     while not reloader.should_stop:
-        try:
-            reloader.run(django_main_thread)
-        except WatchmanUnavailable as ex:
-            # It's possible that the watchman service shuts down or otherwise
-            # becomes unavailable. In that case, use the StatReloader.
-            reloader = StatReloader()
-            logger.error("Error connecting to Watchman: %s", ex)
-            logger.info(
-                "Watching for file changes with %s", reloader.__class__.__name__
-            )
+        reloader.run(django_main_thread)
 
 
 def run_with_reloader(main_func, *args, **kwargs):

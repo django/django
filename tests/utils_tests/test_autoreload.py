@@ -381,16 +381,6 @@ class RunWithReloaderTests(SimpleTestCase):
 
 
 class StartDjangoTests(SimpleTestCase):
-    @mock.patch("django.utils.autoreload.StatReloader")
-    def test_watchman_becomes_unavailable(self, mocked_stat):
-        mocked_stat.should_stop.return_value = True
-        fake_reloader = mock.MagicMock()
-        fake_reloader.should_stop = False
-        fake_reloader.run.side_effect = autoreload.WatchmanUnavailable()
-
-        autoreload.start_django(fake_reloader, lambda: None)
-        self.assertEqual(mocked_stat.call_count, 1)
-
     @mock.patch("django.utils.autoreload.ensure_echo_on")
     def test_echo_on_called(self, mocked_echo):
         fake_reloader = mock.MagicMock()
