@@ -218,7 +218,8 @@ class RedisCache(BaseCache):
         for key, value in data.items():
             key = self.make_and_validate_key(key, version=version)
             safe_data[key] = value
-        self._cache.set_many(safe_data, self.get_backend_timeout(timeout))
+        if safe_data:
+            self._cache.set_many(safe_data, self.get_backend_timeout(timeout))
         return []
 
     def delete_many(self, keys, version=None):
@@ -226,7 +227,8 @@ class RedisCache(BaseCache):
         for key in keys:
             key = self.make_and_validate_key(key, version=version)
             safe_keys.append(key)
-        self._cache.delete_many(safe_keys)
+        if safe_keys:
+            self._cache.delete_many(safe_keys)
 
     def clear(self):
         return self._cache.clear()

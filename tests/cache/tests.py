@@ -1834,6 +1834,18 @@ class RedisCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(pool.connection_kwargs["socket_timeout"], 0.1)
         self.assertIs(pool.connection_kwargs["retry_on_timeout"], True)
 
+    def test_delete_many_no_keys(self):
+        # Behaviour when no keys are passed should not raise
+        # redis.exceptions.ResponseError: wrong number of arguments
+        # for 'del' command
+        self.assertIsNone(cache.delete_many([]))
+
+    def test_set_many_empty_data(self):
+        # Behaviour when an empty dict is passed should not raise
+        # redis.exceptions.ResponseError: Command # 1 (MSET)
+        # of pipeline caused error: wrong number of arguments for 'mset' command
+        self.assertEqual(cache.set_many({}), [])
+
 
 class FileBasedCachePathLibTests(FileBasedCacheTests):
     def mkdtemp(self):
