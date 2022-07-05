@@ -217,3 +217,4 @@ if __name__ == "__main__":
     options = parser.parse_args()
 
     eval(options.cmd[0])(options.resources, options.languages)
+    #edited by komiljon
