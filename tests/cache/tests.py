@@ -577,6 +577,9 @@ class BaseCacheTests:
         self.assertIsNone(cache.get("key1"))
         self.assertIsNone(cache.get("key2"))
 
+    def test_set_many_empty_data(self):
+        self.assertEqual(cache.set_many({}), [])
+
     def test_delete_many(self):
         # Multiple keys can be deleted using delete_many
         cache.set_many({"key1": "spam", "key2": "eggs", "key3": "ham"})
@@ -584,6 +587,9 @@ class BaseCacheTests:
         self.assertIsNone(cache.get("key1"))
         self.assertIsNone(cache.get("key2"))
         self.assertEqual(cache.get("key3"), "ham")
+
+    def test_delete_many_no_keys(self):
+        self.assertIsNone(cache.delete_many([]))
 
     def test_clear(self):
         # The cache can be emptied using clear
@@ -1833,18 +1839,6 @@ class RedisCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(pool.connection_kwargs["db"], 5)
         self.assertEqual(pool.connection_kwargs["socket_timeout"], 0.1)
         self.assertIs(pool.connection_kwargs["retry_on_timeout"], True)
-
-    def test_delete_many_no_keys(self):
-        # Behaviour when no keys are passed should not raise
-        # redis.exceptions.ResponseError: wrong number of arguments
-        # for 'del' command
-        self.assertIsNone(cache.delete_many([]))
-
-    def test_set_many_empty_data(self):
-        # Behaviour when an empty dict is passed should not raise
-        # redis.exceptions.ResponseError: Command # 1 (MSET)
-        # of pipeline caused error: wrong number of arguments for 'mset' command
-        self.assertEqual(cache.set_many({}), [])
 
 
 class FileBasedCachePathLibTests(FileBasedCacheTests):
