@@ -123,6 +123,12 @@ form .aligned div.help {
     padding-left: 10px;
 }
 
+form .aligned p.datetime div.help.timezonewarning {
+    margin-left: 0;
+    padding-left: 0;
+    font-weight: normal;
+}
+
 form .aligned label + p.help,
 form .aligned label + div.help {
     margin-left: 0;
