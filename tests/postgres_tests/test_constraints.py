@@ -444,17 +444,39 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             )
             self.assertNotEqual(constraint_2, constraint_9)
             self.assertNotEqual(constraint_7, constraint_8)
+
+        constraint_10 = ExclusionConstraint(
+            name="exclude_overlapping",
+            expressions=[
+                (F("datespan"), RangeOperators.OVERLAPS),
+                (F("room"), RangeOperators.EQUAL),
+            ],
+            condition=Q(cancelled=False),
+            violation_error_message="custom error",
+        )
+        constraint_11 = ExclusionConstraint(
+            name="exclude_overlapping",
+            expressions=[
+                (F("datespan"), RangeOperators.OVERLAPS),
+                (F("room"), RangeOperators.EQUAL),
+            ],
+            condition=Q(cancelled=False),
+            violation_error_message="other custom error",
+        )
         self.assertEqual(constraint_1, constraint_1)
         self.assertEqual(constraint_1, mock.ANY)
         self.assertNotEqual(constraint_1, constraint_2)
         self.assertNotEqual(constraint_1, constraint_3)
         self.assertNotEqual(constraint_1, constraint_4)
+        self.assertNotEqual(constraint_1, constraint_10)
         self.assertNotEqual(constraint_2, constraint_3)
         self.assertNotEqual(constraint_2, constraint_4)
         self.assertNotEqual(constraint_2, constraint_7)
         self.assertNotEqual(constraint_4, constraint_5)
         self.assertNotEqual(constraint_5, constraint_6)
         self.assertNotEqual(constraint_1, object())
+        self.assertNotEqual(constraint_10, constraint_11)
+        self.assertEqual(constraint_10, constraint_10)
 
     def test_deconstruct(self):
         constraint = ExclusionConstraint(

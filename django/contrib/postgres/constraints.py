@@ -186,6 +186,7 @@ class ExclusionConstraint(BaseConstraint):
                 and self.deferrable == other.deferrable
                 and self.include == other.include
                 and self.opclasses == other.opclasses
+                and self.violation_error_message == other.violation_error_message
             )
         return super().__eq__(other)
 

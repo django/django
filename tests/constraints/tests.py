@@ -65,6 +65,29 @@ class BaseConstraintTests(SimpleTestCase):
         )
         self.assertEqual(c.get_violation_error_message(), "custom base_name message")
 
+    def test_custom_violation_error_message_clone(self):
+        constraint = BaseConstraint(
+            "base_name",
+            violation_error_message="custom %(name)s message",
+        ).clone()
+        self.assertEqual(
+            constraint.get_violation_error_message(),
+            "custom base_name message",
+        )
+
+    def test_deconstruction(self):
+        constraint = BaseConstraint(
+            "base_name",
+            violation_error_message="custom %(name)s message",
+        )
+        path, args, kwargs = constraint.deconstruct()
+        self.assertEqual(path, "django.db.models.BaseConstraint")
+        self.assertEqual(args, ())
+        self.assertEqual(
+            kwargs,
+            {"name": "base_name", "violation_error_message": "custom %(name)s message"},
+        )
+
 
 class CheckConstraintTests(TestCase):
     def test_eq(self):
@@ -84,6 +107,28 @@ class CheckConstraintTests(TestCase):
             models.CheckConstraint(check=check2, name="price"),
         )
         self.assertNotEqual(models.CheckConstraint(check=check1, name="price"), 1)
+        self.assertNotEqual(
+            models.CheckConstraint(check=check1, name="price"),
+            models.CheckConstraint(
+                check=check1, name="price", violation_error_message="custom error"
+            ),
+        )
+        self.assertNotEqual(
+            models.CheckConstraint(
+                check=check1, name="price", violation_error_message="custom error"
+            ),
+            models.CheckConstraint(
+                check=check1, name="price", violation_error_message="other custom error"
+            ),
+        )
+        self.assertEqual(
+            models.CheckConstraint(
+                check=check1, name="price", violation_error_message="custom error"
+            ),
+            models.CheckConstraint(
+                check=check1, name="price", violation_error_message="custom error"
+            ),
+        )
 
     def test_repr(self):
         constraint = models.CheckConstraint(
@@ -215,6 +260,38 @@ class UniqueConstraintTests(TestCase):
         )
         self.assertNotEqual(
             models.UniqueConstraint(fields=["foo", "bar"], name="unique"), 1
+        )
+        self.assertNotEqual(
+            models.UniqueConstraint(fields=["foo", "bar"], name="unique"),
+            models.UniqueConstraint(
+                fields=["foo", "bar"],
+                name="unique",
+                violation_error_message="custom error",
+            ),
+        )
+        self.assertNotEqual(
+            models.UniqueConstraint(
+                fields=["foo", "bar"],
+                name="unique",
+                violation_error_message="custom error",
+            ),
+            models.UniqueConstraint(
+                fields=["foo", "bar"],
+                name="unique",
+                violation_error_message="other custom error",
+            ),
+        )
+        self.assertEqual(
+            models.UniqueConstraint(
+                fields=["foo", "bar"],
+                name="unique",
+                violation_error_message="custom error",
+            ),
+            models.UniqueConstraint(
+                fields=["foo", "bar"],
+                name="unique",
+                violation_error_message="custom error",
+            ),
         )
 
     def test_eq_with_condition(self):
