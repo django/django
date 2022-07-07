@@ -24,6 +24,7 @@ from django.utils.dateparse import (
     parse_duration,
     parse_time,
 )
+from django.utils.deprecation import DeprecationForHistoricalMigrationMixin
 from django.utils.duration import duration_microseconds, duration_string
 from django.utils.functional import Promise, cached_property
 from django.utils.ipv6 import clean_ipv6_address
@@ -111,7 +112,7 @@ def return_None():
 
 
 @total_ordering
-class Field(RegisterLookupMixin):
+class Field(DeprecationForHistoricalMigrationMixin, RegisterLookupMixin):
     """Base class for all field types"""
 
     # Designates whether empty strings fundamentally are allowed at the
@@ -137,8 +138,7 @@ class Field(RegisterLookupMixin):
             "%(date_field_label)s %(lookup_type)s."
         ),
     }
-    system_check_deprecated_details = None
-    system_check_removed_details = None
+    check_type = "fields"
 
     # Attributes that don't affect a column definition.
     # These attributes are ignored when altering the field.
@@ -263,7 +263,7 @@ class Field(RegisterLookupMixin):
             *self._check_null_allowed_for_primary_keys(),
             *self._check_backend_specific_checks(**kwargs),
             *self._check_validators(),
-            *self._check_deprecation_details(),
+            *self.check_deprecation_details(),
         ]
 
     def _check_field_name(self):
@@ -440,33 +440,6 @@ class Field(RegisterLookupMixin):
                     )
                 )
         return errors
-
-    def _check_deprecation_details(self):
-        if self.system_check_removed_details is not None:
-            return [
-                checks.Error(
-                    self.system_check_removed_details.get(
-                        "msg",
-                        "%s has been removed except for support in historical "
-                        "migrations." % self.__class__.__name__,
-                    ),
-                    hint=self.system_check_removed_details.get("hint"),
-                    obj=self,
-                    id=self.system_check_removed_details.get("id", "fields.EXXX"),
-                )
-            ]
-        elif self.system_check_deprecated_details is not None:
-            return [
-                checks.Warning(
-                    self.system_check_deprecated_details.get(
-                        "msg", "%s has been deprecated." % self.__class__.__name__
-                    ),
-                    hint=self.system_check_deprecated_details.get("hint"),
-                    obj=self,
-                    id=self.system_check_deprecated_details.get("id", "fields.WXXX"),
-                )
-            ]
-        return []
 
     def get_col(self, alias, output_field=None):
         if alias == self.model._meta.db_table and (
