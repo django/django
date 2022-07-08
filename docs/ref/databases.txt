@@ -352,7 +352,7 @@ MySQL notes
 Version support
 ---------------
 
-Django supports MySQL 5.7 and higher.
+Django supports MySQL 8 and higher.
 
 Django's ``inspectdb`` feature uses the ``information_schema`` database, which
 contains detailed data on all database schemas.
@@ -535,11 +535,10 @@ Several other `MySQLdb connection options`_ may be useful, such as ``ssl``,
 Setting ``sql_mode``
 ~~~~~~~~~~~~~~~~~~~~
 
-From MySQL 5.7 onward, the default value of the ``sql_mode`` option contains
-``STRICT_TRANS_TABLES``. That option escalates warnings into errors when data
-are truncated upon insertion, so Django highly recommends activating a
-`strict mode`_ for MySQL to prevent data loss (either ``STRICT_TRANS_TABLES``
-or ``STRICT_ALL_TABLES``).
+The default value of the ``sql_mode`` option contains ``STRICT_TRANS_TABLES``.
+That option escalates warnings into errors when data are truncated upon
+insertion, so Django highly recommends activating a `strict mode`_ for MySQL to
+prevent data loss (either ``STRICT_TRANS_TABLES`` or ``STRICT_ALL_TABLES``).
 
 .. _strict mode: https://dev.mysql.com/doc/refman/en/sql-mode.html#sql-mode-strict
 
