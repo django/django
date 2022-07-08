@@ -214,7 +214,9 @@ CSRF
 Decorators
 ~~~~~~~~~~
 
-* ...
+* The :func:`~django.views.decorators.cache.cache_control` and
+  :func:`~django.views.decorators.cache.never_cache` decorators now support
+  wrapping asynchronous view functions.
 
 Email
 ~~~~~
