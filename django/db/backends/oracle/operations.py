@@ -105,7 +105,7 @@ END;
         return extract_sql, (*params, extract_param)
 
     def date_trunc_sql(self, lookup_type, sql, params, tzname=None):
-        sql, params = self._convert_field_to_tz(sql, params, tzname)
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
         # https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ROUND-and-TRUNC-Date-Functions.html
         trunc_param = None
         if lookup_type in ("year", "month"):
@@ -128,7 +128,7 @@ END;
         tzname, sign, offset = split_tzname_delta(tzname)
         return f"{sign}{offset}" if offset else tzname
 
-    def _convert_field_to_tz(self, sql, params, tzname):
+    def _convert_sql_to_tz(self, sql, params, tzname):
         if not (settings.USE_TZ and tzname):
             return sql, params
         if not self._tzname_re.match(tzname):
@@ -147,13 +147,13 @@ END;
         return sql, params
 
     def datetime_cast_date_sql(self, sql, params, tzname):
-        sql, params = self._convert_field_to_tz(sql, params, tzname)
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
         return f"TRUNC({sql})", params
 
     def datetime_cast_time_sql(self, sql, params, tzname):
         # Since `TimeField` values are stored as TIMESTAMP change to the
         # default date and convert the field to the specified timezone.
-        sql, params = self._convert_field_to_tz(sql, params, tzname)
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
         convert_datetime_sql = (
             f"TO_TIMESTAMP(CONCAT('1900-01-01 ', TO_CHAR({sql}, 'HH24:MI:SS.FF')), "
             f"'YYYY-MM-DD HH24:MI:SS.FF')"
@@ -164,11 +164,11 @@ END;
         )
 
     def datetime_extract_sql(self, lookup_type, sql, params, tzname):
-        sql, params = self._convert_field_to_tz(sql, params, tzname)
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
         return self.date_extract_sql(lookup_type, sql, params)
 
     def datetime_trunc_sql(self, lookup_type, sql, params, tzname):
-        sql, params = self._convert_field_to_tz(sql, params, tzname)
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
         # https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ROUND-and-TRUNC-Date-Functions.html
         trunc_param = None
         if lookup_type in ("year", "month"):
@@ -192,7 +192,7 @@ END;
         # The implementation is similar to `datetime_trunc_sql` as both
         # `DateTimeField` and `TimeField` are stored as TIMESTAMP where
         # the date part of the later is ignored.
-        sql, params = self._convert_field_to_tz(sql, params, tzname)
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
         trunc_param = None
         if lookup_type == "hour":
             trunc_param = "HH24"
