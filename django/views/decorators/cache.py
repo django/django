@@ -1,8 +1,12 @@
+import asyncio
 from functools import wraps
 
 from django.middleware.cache import CacheMiddleware
 from django.utils.cache import add_never_cache_headers, patch_cache_control
-from django.utils.decorators import decorator_from_middleware_with_args
+from django.utils.decorators import (
+    decorator_from_middleware_with_args,
+    sync_and_async_middleware,
+)
 
 
 def cache_page(timeout, *, cache=None, key_prefix=None):
@@ -26,10 +30,10 @@ def cache_page(timeout, *, cache=None, key_prefix=None):
     )
 
 
+@sync_and_async_middleware
 def cache_control(**kwargs):
     def _cache_controller(viewfunc):
-        @wraps(viewfunc)
-        def _cache_controlled(request, *args, **kw):
+        def _process_request(request):
             # Ensure argument looks like a request.
             if not hasattr(request, "META"):
                 raise TypeError(
@@ -37,11 +41,27 @@ def cache_control(**kwargs):
                     "decorating a classmethod, be sure to use "
                     "@method_decorator."
                 )
-            response = viewfunc(request, *args, **kw)
+
+        def _process_response(response, **kwargs):
             patch_cache_control(response, **kwargs)
+
+        @wraps(viewfunc)
+        def _wrapper_view_sync(request, *args, **kw):
+            _process_request(request)
+            response = viewfunc(request, *args, **kw)
+            _process_response(response, **kwargs)
             return response
 
-        return _cache_controlled
+        @wraps(viewfunc)
+        async def _wrapper_view_async(request, *args, **kw):
+            _process_request(request)
+            response = await viewfunc(request, *args, **kw)
+            _process_response(response, **kwargs)
+            return response
+
+        if asyncio.iscoroutinefunction(viewfunc):
+            return _wrapper_view_async
+        return _wrapper_view_sync
 
     return _cache_controller
 

@@ -474,6 +474,21 @@ class MethodDecoratorTests(SimpleTestCase):
         self.assertIsNotNone(func_module)
 
 
+class SyncAndAsyncDecoratorTests(TestCase):
+    """
+    Tests to make sure all builtin decorators declare themselves as sync and
+    async capable.
+    """
+
+    def test_decorators_syanc_and_async_capable(self):
+        decorators = (cache_control,)
+
+        for decorator in decorators:
+            with self.subTest(decorator):
+                self.assertTrue(decorator.sync_capable)
+                self.assertTrue(decorator.async_capable)
+
+
 class XFrameOptionsDecoratorsTests(TestCase):
     """
     Tests for the X-Frame-Options decorators.
@@ -589,6 +604,10 @@ class NeverCacheDecoratorTest(SimpleTestCase):
 
 
 class CacheControlDecoratorTest(SimpleTestCase):
+    """
+    Tests for the cache control decorator.
+    """
+
     def test_cache_control_decorator_http_request(self):
         class MyClass:
             @cache_control(a="b")
@@ -614,3 +633,41 @@ class CacheControlDecoratorTest(SimpleTestCase):
         request = HttpRequest()
         response = MyClass().a_view(HttpRequestProxy(request))
         self.assertEqual(response.headers["Cache-Control"], "a=b")
+
+    def test_cache_control_empty_decorator(self):
+        @cache_control()
+        def a_view(request):
+            return HttpResponse()
+
+        response = a_view(HttpRequest())
+        self.assertEqual(response.get("Cache-Control"), "")
+
+    async def test_cache_control_empty_decorator_with_async_view(self):
+        @cache_control()
+        async def an_async_view(request):
+            return HttpResponse()
+
+        response = await an_async_view(HttpRequest())
+        self.assertEqual(response.get("Cache-Control"), "")
+
+    def test_cache_control_full_decorator(self):
+        @cache_control(max_age=123, private=True, public=True, custom=456)
+        def a_view(request):
+            return HttpResponse()
+
+        response = a_view(HttpRequest())
+        cache_control_items = response.get("Cache-Control").split(", ")
+        self.assertEqual(
+            set(cache_control_items), {"max-age=123", "private", "public", "custom=456"}
+        )
+
+    async def test_cache_control_full_decorator_with_async_view(self):
+        @cache_control(max_age=123, private=True, public=True, custom=456)
+        async def an_async_view(request):
+            return HttpResponse()
+
+        response = await an_async_view(HttpRequest())
+        cache_control_items = response.get("Cache-Control").split(", ")
+        self.assertEqual(
+            set(cache_control_items), {"max-age=123", "private", "public", "custom=456"}
+        )
