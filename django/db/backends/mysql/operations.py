@@ -389,12 +389,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         return prefix
 
     def regex_lookup(self, lookup_type):
-        # REGEXP BINARY doesn't work correctly in MySQL 8+ and REGEXP_LIKE
-        # doesn't exist in MySQL 5.x or in MariaDB.
-        if (
-            self.connection.mysql_version < (8, 0, 0)
-            or self.connection.mysql_is_mariadb
-        ):
+        # REGEXP_LIKE doesn't exist in MariaDB.
+        if self.connection.mysql_is_mariadb:
             if lookup_type == "regex":
                 return "%s REGEXP BINARY %s"
             return "%s REGEXP %s"
