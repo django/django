@@ -70,6 +70,7 @@ def xframe_options_sameorigin(view_func):
     return _wrapper_view_sync
 
 
+@sync_and_async_middleware
 def xframe_options_exempt(view_func):
     """
     Modify a view function by setting a response variable that instructs
@@ -80,10 +81,21 @@ def xframe_options_exempt(view_func):
         ...
     """
 
-    @wraps(view_func)
-    def wrapper_view(*args, **kwargs):
-        resp = view_func(*args, **kwargs)
-        resp.xframe_options_exempt = True
-        return resp
+    def _process_response(response):
+        response.xframe_options_exempt = True
 
-    return wrapper_view
+    @wraps(view_func)
+    def _wrapper_view_sync(*args, **kwargs):
+        response = view_func(*args, **kwargs)
+        _process_response(response)
+        return response
+
+    @wraps(view_func)
+    async def _wrapper_view_async(*args, **kwargs):
+        response = await view_func(*args, **kwargs)
+        _process_response(response)
+        return response
+
+    if asyncio.iscoroutinefunction(view_func):
+        return _wrapper_view_async
+    return _wrapper_view_sync

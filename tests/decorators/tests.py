@@ -486,6 +486,7 @@ class SyncAndAsyncDecoratorTests(TestCase):
             never_cache,
             xframe_options_deny,
             xframe_options_sameorigin,
+            xframe_options_exempt,
         )
 
         for decorator in decorators:
@@ -559,15 +560,35 @@ class XFrameOptionsDecoratorsTests(SimpleTestCase):
         def a_view(request):
             return HttpResponse()
 
-        req = HttpRequest()
-        resp = a_view(req)
-        self.assertIsNone(resp.get("X-Frame-Options", None))
-        self.assertTrue(resp.xframe_options_exempt)
+        request = HttpRequest()
+        response = a_view(request)
+        self.assertIsNone(response.get("X-Frame-Options"))
+        self.assertTrue(response.xframe_options_exempt)
 
         # Since the real purpose of the exempt decorator is to suppress
         # the middleware's functionality, let's make sure it actually works...
-        r = XFrameOptionsMiddleware(a_view)(req)
-        self.assertIsNone(r.get("X-Frame-Options", None))
+        middleware_response = XFrameOptionsMiddleware(a_view)(request)
+        self.assertIsNone(middleware_response.get("X-Frame-Options"))
+
+    async def test_exempt_decorator_with_async_view(self):
+        """
+        Ensures @xframe_options_exempt properly instructs the
+        XFrameOptionsMiddleware to NOT set the header.
+        """
+
+        @xframe_options_exempt
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        response = await an_async_view(request)
+        self.assertIsNone(response.get("X-Frame-Options"))
+        self.assertTrue(response.xframe_options_exempt)
+
+        # Since the real purpose of the exempt decorator is to suppress
+        # the middleware's functionality, let's make sure it actually works...
+        middleware_response = await XFrameOptionsMiddleware(an_async_view)(request)
+        self.assertIsNone(middleware_response.get("X-Frame-Options"))
 
 
 class HttpRequestProxy:
