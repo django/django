@@ -117,6 +117,10 @@ client-side caching.
     :func:`~django.utils.cache.patch_cache_control` for the details of the
     transformation.
 
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
+
 .. function:: never_cache(view_func)
 
     This decorator adds an ``Expires`` header to the current date/time.
@@ -126,6 +130,10 @@ client-side caching.
     should never be cached.
 
     Each header is only added if it isn't already set.
+
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
 
 .. module:: django.views.decorators.common
 

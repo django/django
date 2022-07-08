@@ -73,6 +73,31 @@ from an async view, you will trigger Django's
 :ref:`asynchronous safety protection <async-safety>` to protect your data from
 corruption.
 
+Decorators
+----------
+
+.. versionadded:: 5.0
+
+The following decorators can be used with both synchronous and asynchronous
+view functions:
+
+* :func:`~django.views.decorators.cache.cache_control`
+* :func:`~django.views.decorators.cache.never_cache`
+
+For example::
+
+    from django.views.decorators.cache import never_cache
+
+
+    @never_cache
+    def my_sync_view(request):
+        ...
+
+
+    @never_cache
+    async def my_async_view(request):
+        ...
+
 Queries & the ORM
 -----------------
 
