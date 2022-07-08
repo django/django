@@ -19,6 +19,7 @@ from django.views.decorators.clickjacking import (
     xframe_options_exempt,
     xframe_options_sameorigin,
 )
+from django.views.decorators.common import no_append_slash
 from django.views.decorators.http import (
     condition,
     require_GET,
@@ -487,6 +488,7 @@ class SyncAndAsyncDecoratorTests(TestCase):
             xframe_options_deny,
             xframe_options_sameorigin,
             xframe_options_exempt,
+            no_append_slash,
             vary_on_headers,
             vary_on_cookie,
         )
@@ -800,3 +802,25 @@ class VaryDecoratorsTests(SimpleTestCase):
         self.assertIn("Cookie", response.get("Vary"))
         vary_items_set = {item.strip() for item in response.get("Vary").split(",")}
         self.assertIn("Cookie", vary_items_set)
+
+
+class CommonDecoratorTest(SimpleTestCase):
+    """
+    Tests for the common decorators.
+    """
+
+    def test_no_append_slash_decorator(self):
+        @no_append_slash
+        def a_view(request):
+            return HttpResponse()
+
+        self.assertIs(a_view.should_append_slash, False)
+        a_view(HttpRequest())
+
+    async def test_no_append_slash_decorator_with_async_view(self):
+        @no_append_slash
+        async def an_async_view(request):
+            return HttpResponse()
+
+        self.assertIs(an_async_view.should_append_slash, False)
+        await an_async_view(HttpRequest())
