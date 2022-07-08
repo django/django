@@ -484,6 +484,7 @@ class SyncAndAsyncDecoratorTests(TestCase):
         decorators = (
             cache_control,
             never_cache,
+            xframe_options_deny,
         )
 
         for decorator in decorators:
@@ -492,7 +493,7 @@ class SyncAndAsyncDecoratorTests(TestCase):
                 self.assertTrue(decorator.async_capable)
 
 
-class XFrameOptionsDecoratorsTests(TestCase):
+class XFrameOptionsDecoratorsTests(SimpleTestCase):
     """
     Tests for the X-Frame-Options decorators.
     """
@@ -506,8 +507,20 @@ class XFrameOptionsDecoratorsTests(TestCase):
         def a_view(request):
             return HttpResponse()
 
-        r = a_view(HttpRequest())
-        self.assertEqual(r.headers["X-Frame-Options"], "DENY")
+        response = a_view(HttpRequest())
+        self.assertEqual(response.headers["X-Frame-Options"], "DENY")
+
+    async def test_deny_decorator_with_async_view(self):
+        """
+        Ensures @xframe_options_deny properly sets the X-Frame-Options header.
+        """
+
+        @xframe_options_deny
+        async def an_async_view(request):
+            return HttpResponse()
+
+        response = await an_async_view(HttpRequest())
+        self.assertEqual(response.headers["X-Frame-Options"], "DENY")
 
     def test_sameorigin_decorator(self):
         """

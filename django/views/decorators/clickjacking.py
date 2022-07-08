@@ -1,6 +1,10 @@
+import asyncio
 from functools import wraps
 
+from django.utils.decorators import sync_and_async_middleware
 
+
+@sync_and_async_middleware
 def xframe_options_deny(view_func):
     """
     Modify a view function so its response has the X-Frame-Options HTTP
@@ -12,14 +16,25 @@ def xframe_options_deny(view_func):
         ...
     """
 
-    @wraps(view_func)
-    def wrapper_view(*args, **kwargs):
-        resp = view_func(*args, **kwargs)
-        if resp.get("X-Frame-Options") is None:
-            resp["X-Frame-Options"] = "DENY"
-        return resp
+    def _process_response(response):
+        if response.get("X-Frame-Options") is None:
+            response["X-Frame-Options"] = "DENY"
 
-    return wrapper_view
+    @wraps(view_func)
+    def _wrapper_view_sync(*args, **kwargs):
+        response = view_func(*args, **kwargs)
+        _process_response(response)
+        return response
+
+    @wraps(view_func)
+    async def _wrapper_view_async(*args, **kwargs):
+        response = await view_func(*args, **kwargs)
+        _process_response(response)
+        return response
+
+    if asyncio.iscoroutinefunction(view_func):
+        return _wrapper_view_async
+    return _wrapper_view_sync
 
 
 def xframe_options_sameorigin(view_func):
