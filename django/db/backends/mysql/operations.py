@@ -66,7 +66,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             return f"EXTRACT({lookup_type} FROM {sql})", params
 
     def date_trunc_sql(self, lookup_type, sql, params, tzname=None):
-        sql, params = self._convert_field_to_tz(sql, params, tzname)
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
         fields = {
             "year": "%Y-01-01",
             "month": "%Y-%m-01",
@@ -89,7 +89,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         tzname, sign, offset = split_tzname_delta(tzname)
         return f"{sign}{offset}" if offset else tzname
 
-    def _convert_field_to_tz(self, sql, params, tzname):
+    def _convert_sql_to_tz(self, sql, params, tzname):
         if tzname and settings.USE_TZ and self.connection.timezone_name != tzname:
             return f"CONVERT_TZ({sql}, %s, %s)", (
                 *params,
@@ -99,19 +99,19 @@ class DatabaseOperations(BaseDatabaseOperations):
         return sql, params
 
     def datetime_cast_date_sql(self, sql, params, tzname):
-        sql, params = self._convert_field_to_tz(sql, params, tzname)
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
         return f"DATE({sql})", params
 
     def datetime_cast_time_sql(self, sql, params, tzname):
-        sql, params = self._convert_field_to_tz(sql, params, tzname)
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
         return f"TIME({sql})", params
 
     def datetime_extract_sql(self, lookup_type, sql, params, tzname):
-        sql, params = self._convert_field_to_tz(sql, params, tzname)
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
         return self.date_extract_sql(lookup_type, sql, params)
 
     def datetime_trunc_sql(self, lookup_type, sql, params, tzname):
-        sql, params = self._convert_field_to_tz(sql, params, tzname)
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
         fields = ["year", "month", "day", "hour", "minute", "second"]
         format = ("%Y-", "%m", "-%d", " %H:", "%i", ":%s")
         format_def = ("0000-", "01", "-01", " 00:", "00", ":00")
@@ -136,7 +136,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return sql, params
 
     def time_trunc_sql(self, lookup_type, sql, params, tzname=None):
-        sql, params = self._convert_field_to_tz(sql, params, tzname)
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
         fields = {
             "hour": "%H:00:00",
             "minute": "%H:%i:00",

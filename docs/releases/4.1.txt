@@ -459,6 +459,10 @@ backends.
   ``DatabaseOperations.insert_statement()`` method is replaced by
   ``on_conflict`` that accepts ``django.db.models.constants.OnConflict``.
 
+* ``DatabaseOperations._convert_field_to_tz()`` is replaced by
+  ``DatabaseOperations._convert_sql_to_tz()`` that accepts the ``sql``,
+  ``params``, and ``tzname`` arguments.
+
 * Several date and time methods on ``DatabaseOperations`` now take ``sql`` and
   ``params`` arguments instead of ``field_name`` and return 2-tuple containing
   some SQL and the parameters to be interpolated into that SQL. The changed
