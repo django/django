@@ -1,3 +1,4 @@
+from typing import Union
 from pathlib import Path
 
 import jinja2
@@ -37,9 +38,9 @@ class Jinja2(BaseEngine):
     def from_string(self, template_code):
         return Template(self.env.from_string(template_code), self)
 
-    def get_template(self, template_name):
+    def get_template(self, template_name: Union[str, Path]):
         try:
-            return Template(self.env.get_template(template_name), self)
+            return Template(self.env.get_template(str(template_name)), self)
         except jinja2.TemplateNotFound as exc:
             raise TemplateDoesNotExist(exc.name, backend=self) from exc
         except jinja2.TemplateSyntaxError as exc:
