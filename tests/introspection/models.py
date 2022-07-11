@@ -41,9 +41,9 @@ class Article(models.Model):
 
     class Meta:
         ordering = ("headline",)
-        index_together = [
-            ["headline", "pub_date"],
-            ["headline", "response_to", "pub_date", "reporter"],
+        indexes = [
+            models.Index(fields=["headline", "pub_date"]),
+            models.Index(fields=["headline", "response_to", "pub_date", "reporter"]),
         ]
 
 
