@@ -38,9 +38,7 @@ class Article(models.Model):
     )
 
     class Meta:
-        index_together = [
-            ["headline", "pub_date"],
-        ]
+        indexes = [models.Index(fields=["headline", "pub_date"])]
 
 
 class IndexedArticle(models.Model):
