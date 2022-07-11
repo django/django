@@ -24,7 +24,7 @@
 
 <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"
   data-admin-utc-offset="{% now "Z" %}">
-
+<a href="#content-start" class="skip-to-content-link">{% translate 'Skip to main content' %}</a>
 <!-- Container -->
 <div id="container">
 
@@ -81,7 +81,7 @@
           {% include "admin/nav_sidebar.html" %}
         {% endblock %}
       {% endif %}
-      <div class="content">
+      <div id="content-start" class="content" tabindex="-1">
         {% block messages %}
           {% if messages %}
             <ul class="messagelist">{% for message in messages %}

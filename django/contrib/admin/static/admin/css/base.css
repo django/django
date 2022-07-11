@@ -814,6 +814,20 @@ a.deletelink:focus, a.deletelink:hover {
     max-width: 100%;
 }
 
+.skip-to-content-link {
+    position: absolute;
+    top: -999px;
+    margin: 5px;
+    padding: 5px;
+    background: var(--body-bg);
+    z-index: 1;
+}
+
+.skip-to-content-link:focus {
+    left: 0px;
+    top: 0px;
+}
+
 #content {
     padding: 20px 40px;
 }
