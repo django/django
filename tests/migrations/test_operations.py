@@ -2489,10 +2489,7 @@ class OperationTests(OperationTestBase):
         """
         Tests the RenameField operation.
         """
-        project_state = self.set_up_test_model(
-            "test_rnfl", unique_together=True, index_together=True
-        )
-        # Test the state alteration
+        project_state = self.set_up_test_model("test_rnfl")
         operation = migrations.RenameField("Pony", "pink", "blue")
         self.assertEqual(operation.describe(), "Rename field pink on Pony to blue")
         self.assertEqual(operation.migration_name_fragment, "rename_pink_pony_blue")
@@ -2500,46 +2497,19 @@ class OperationTests(OperationTestBase):
         operation.state_forwards("test_rnfl", new_state)
         self.assertIn("blue", new_state.models["test_rnfl", "pony"].fields)
         self.assertNotIn("pink", new_state.models["test_rnfl", "pony"].fields)
-        # Make sure the unique_together has the renamed column too
-        self.assertIn(
-            "blue", new_state.models["test_rnfl", "pony"].options["unique_together"][0]
-        )
-        self.assertNotIn(
-            "pink", new_state.models["test_rnfl", "pony"].options["unique_together"][0]
-        )
-        # Make sure the index_together has the renamed column too
-        self.assertIn(
-            "blue", new_state.models["test_rnfl", "pony"].options["index_together"][0]
-        )
-        self.assertNotIn(
-            "pink", new_state.models["test_rnfl", "pony"].options["index_together"][0]
-        )
-        # Test the database alteration
+        # Rename field.
         self.assertColumnExists("test_rnfl_pony", "pink")
         self.assertColumnNotExists("test_rnfl_pony", "blue")
         with connection.schema_editor() as editor:
             operation.database_forwards("test_rnfl", editor, project_state, new_state)
         self.assertColumnExists("test_rnfl_pony", "blue")
         self.assertColumnNotExists("test_rnfl_pony", "pink")
-        # Ensure the unique constraint has been ported over
-        with connection.cursor() as cursor:
-            cursor.execute("INSERT INTO test_rnfl_pony (blue, weight) VALUES (1, 1)")
-            with self.assertRaises(IntegrityError):
-                with atomic():
-                    cursor.execute(
-                        "INSERT INTO test_rnfl_pony (blue, weight) VALUES (1, 1)"
-                    )
-            cursor.execute("DELETE FROM test_rnfl_pony")
-        # Ensure the index constraint has been ported over
-        self.assertIndexExists("test_rnfl_pony", ["weight", "blue"])
-        # And test reversal
+        # Reversal.
         with connection.schema_editor() as editor:
             operation.database_backwards("test_rnfl", editor, new_state, project_state)
         self.assertColumnExists("test_rnfl_pony", "pink")
         self.assertColumnNotExists("test_rnfl_pony", "blue")
-        # Ensure the index constraint has been reset
-        self.assertIndexExists("test_rnfl_pony", ["weight", "pink"])
-        # And deconstruction
+        # Deconstruction.
         definition = operation.deconstruct()
         self.assertEqual(definition[0], "RenameField")
         self.assertEqual(definition[1], [])
@@ -2547,6 +2517,74 @@ class OperationTests(OperationTestBase):
             definition[2],
             {"model_name": "Pony", "old_name": "pink", "new_name": "blue"},
         )
+
+    def test_rename_field_unique_together(self):
+        project_state = self.set_up_test_model("test_rnflut", unique_together=True)
+        operation = migrations.RenameField("Pony", "pink", "blue")
+        new_state = project_state.clone()
+        operation.state_forwards("test_rnflut", new_state)
+        # unique_together has the renamed column.
+        self.assertIn(
+            "blue",
+            new_state.models["test_rnflut", "pony"].options["unique_together"][0],
+        )
+        self.assertNotIn(
+            "pink",
+            new_state.models["test_rnflut", "pony"].options["unique_together"][0],
+        )
+        # Rename field.
+        self.assertColumnExists("test_rnflut_pony", "pink")
+        self.assertColumnNotExists("test_rnflut_pony", "blue")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_rnflut", editor, project_state, new_state)
+        self.assertColumnExists("test_rnflut_pony", "blue")
+        self.assertColumnNotExists("test_rnflut_pony", "pink")
+        # The unique constraint has been ported over.
+        with connection.cursor() as cursor:
+            cursor.execute("INSERT INTO test_rnflut_pony (blue, weight) VALUES (1, 1)")
+            with self.assertRaises(IntegrityError):
+                with atomic():
+                    cursor.execute(
+                        "INSERT INTO test_rnflut_pony (blue, weight) VALUES (1, 1)"
+                    )
+            cursor.execute("DELETE FROM test_rnflut_pony")
+        # Reversal.
+        with connection.schema_editor() as editor:
+            operation.database_backwards(
+                "test_rnflut", editor, new_state, project_state
+            )
+        self.assertColumnExists("test_rnflut_pony", "pink")
+        self.assertColumnNotExists("test_rnflut_pony", "blue")
+
+    def test_rename_field_index_together(self):
+        project_state = self.set_up_test_model("test_rnflit", index_together=True)
+        operation = migrations.RenameField("Pony", "pink", "blue")
+        new_state = project_state.clone()
+        operation.state_forwards("test_rnflit", new_state)
+        self.assertIn("blue", new_state.models["test_rnflit", "pony"].fields)
+        self.assertNotIn("pink", new_state.models["test_rnflit", "pony"].fields)
+        # index_together has the renamed column.
+        self.assertIn(
+            "blue", new_state.models["test_rnflit", "pony"].options["index_together"][0]
+        )
+        self.assertNotIn(
+            "pink", new_state.models["test_rnflit", "pony"].options["index_together"][0]
+        )
+        # Rename field.
+        self.assertColumnExists("test_rnflit_pony", "pink")
+        self.assertColumnNotExists("test_rnflit_pony", "blue")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_rnflit", editor, project_state, new_state)
+        self.assertColumnExists("test_rnflit_pony", "blue")
+        self.assertColumnNotExists("test_rnflit_pony", "pink")
+        # The index constraint has been ported over.
+        self.assertIndexExists("test_rnflit_pony", ["weight", "blue"])
+        # Reversal.
+        with connection.schema_editor() as editor:
+            operation.database_backwards(
+                "test_rnflit", editor, new_state, project_state
+            )
+        self.assertIndexExists("test_rnflit_pony", ["weight", "pink"])
 
     def test_rename_field_with_db_column(self):
         project_state = self.apply_operations(
