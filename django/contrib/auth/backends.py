@@ -57,8 +57,7 @@ class ModelBackend(BaseBackend):
         Reject users with is_active=False. Custom user models that don't have
         that attribute are allowed.
         """
-        is_active = getattr(user, "is_active", None)
-        return is_active or is_active is None
+        return getattr(user, "is_active", True)
 
     def _get_user_permissions(self, user_obj):
         return user_obj.user_permissions.all()
