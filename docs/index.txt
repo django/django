@@ -58,7 +58,7 @@ will help you know where to look for certain things:
 * :doc:`Topic guides </topics/index>` discuss key topics and concepts at a
   fairly high level and provide useful background information and explanation.
 
-* :doc:`Reference guides </ref/index>` contain technical reference for APIs and
+* :doc:`Reference guides </ref/index>` contain technical references for APIs and
   other aspects of Django's machinery. They describe how it works and how to
   use it but assume that you have a basic understanding of key concepts.
 
