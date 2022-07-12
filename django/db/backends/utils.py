@@ -47,7 +47,7 @@ class CursorWrapper:
 
     def callproc(self, procname, params=None, kparams=None):
         # Keyword parameters for callproc aren't supported in PEP 249, but the
-        # database driver may support them (e.g. cx_Oracle).
+        # database driver may support them (e.g. oracledb).
         if kparams is not None and not self.db.features.supports_callproc_kwargs:
             raise NotSupportedError(
                 "Keyword parameters for callproc are not supported on this "

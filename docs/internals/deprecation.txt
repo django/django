@@ -38,6 +38,8 @@ details on these changes.
 * Support for calling ``format_html()`` without passing args or kwargs will be
   removed.
 
+* Support for ``cx_Oracle`` will be removed.
+
 .. _deprecation-removed-in-5.1:
 
 5.1

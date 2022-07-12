@@ -90,9 +90,9 @@ database bindings are installed.
 * If you're using SQLite you might want to read the :ref:`SQLite backend notes
   <sqlite-notes>`.
 
-* If you're using Oracle, you'll need a copy of cx_Oracle_, but please
-  read the :ref:`notes for the Oracle backend <oracle-notes>` for details
-  regarding supported versions of both Oracle and ``cx_Oracle``.
+* If you're using Oracle, you'll need to install oracledb_, but please read the
+  :ref:`notes for the Oracle backend <oracle-notes>` for details regarding
+  supported versions of both Oracle and ``oracledb``.
 
 * If you're using an unofficial 3rd party backend, please consult the
   documentation provided for any additional requirements.
@@ -115,7 +115,7 @@ database queries, Django will need permission to create a test database.
 .. _psycopg: https://www.psycopg.org/psycopg3/
 .. _psycopg2: https://www.psycopg.org/
 .. _SQLite: https://www.sqlite.org/
-.. _cx_Oracle: https://oracle.github.io/python-cx_Oracle/
+.. _oracledb: https://oracle.github.io/python-oracledb/
 .. _Oracle: https://www.oracle.com/
 
 .. _install-django-code:

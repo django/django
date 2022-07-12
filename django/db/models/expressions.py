@@ -1036,7 +1036,7 @@ class Value(SQLiteNumericMixin, Expression):
             if hasattr(output_field, "get_placeholder"):
                 return output_field.get_placeholder(val, compiler, connection), [val]
         if val is None:
-            # cx_Oracle does not always convert None to the appropriate
+            # oracledb does not always convert None to the appropriate
             # NULL type (like in case expressions using numbers), so we
             # use a literal SQL NULL
             return "NULL", []

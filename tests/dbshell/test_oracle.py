@@ -5,7 +5,7 @@ from django.db.backends.oracle.client import DatabaseClient
 from django.test import SimpleTestCase
 
 
-@skipUnless(connection.vendor == "oracle", "Requires cx_Oracle to be installed")
+@skipUnless(connection.vendor == "oracle", "Requires oracledb to be installed")
 class OracleDbshellTests(SimpleTestCase):
     def settings_to_cmd_args_env(self, settings_dict, parameters=None, rlwrap=False):
         if parameters is None:

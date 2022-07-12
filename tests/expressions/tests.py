@@ -536,7 +536,7 @@ class BasicExpressionsTests(TestCase):
 
         results = list(qs)
         # Could use Coalesce(subq, Value('')) instead except for the bug in
-        # cx_Oracle mentioned in #23843.
+        # oracledb mentioned in #23843.
         bob = results[0]
         if (
             bob["largest_company"] == ""

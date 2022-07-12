@@ -42,7 +42,7 @@ class InsertVar:
 class Oracle_datetime(datetime.datetime):
     """
     A datetime object, with an additional class attribute
-    to tell cx_Oracle to save the microseconds too.
+    to tell oracledb to save the microseconds too.
     """
 
     input_size = Database.TIMESTAMP
