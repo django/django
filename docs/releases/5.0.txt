@@ -386,6 +386,10 @@ Models
   ``CHAR(32)`` column. See the migration guide above for more details on
   :ref:`migrating-uuidfield`.
 
+* Django now supports `oracledb`_ version 1.3.2 or higher. Support for
+  ``cx_Oracle`` is deprecated as of this release and will be removed in Django
+  6.0.
+
 Pagination
 ~~~~~~~~~~
 
@@ -605,6 +609,11 @@ Miscellaneous
 
 * Support for calling ``format_html()`` without passing args or kwargs will be
   removed.
+
+* Support for ``cx_Oracle`` is deprecated in favor of `oracledb`_ 1.3.2+ Python
+  driver.
+
+.. _`oracledb`: https://oracle.github.io/python-oracledb/
 
 Features removed in 5.0
 =======================

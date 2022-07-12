@@ -1,11 +1,10 @@
 from collections import namedtuple
 
-import cx_Oracle
-
 from django.db import models
 from django.db.backends.base.introspection import BaseDatabaseIntrospection
 from django.db.backends.base.introspection import FieldInfo as BaseFieldInfo
 from django.db.backends.base.introspection import TableInfo as BaseTableInfo
+from django.db.backends.oracle.oracledb_any import oracledb
 
 FieldInfo = namedtuple(
     "FieldInfo", BaseFieldInfo._fields + ("is_autofield", "is_json", "comment")
@@ -18,22 +17,22 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     # Maps type objects to Django Field types.
     data_types_reverse = {
-        cx_Oracle.DB_TYPE_DATE: "DateField",
-        cx_Oracle.DB_TYPE_BINARY_DOUBLE: "FloatField",
-        cx_Oracle.DB_TYPE_BLOB: "BinaryField",
-        cx_Oracle.DB_TYPE_CHAR: "CharField",
-        cx_Oracle.DB_TYPE_CLOB: "TextField",
-        cx_Oracle.DB_TYPE_INTERVAL_DS: "DurationField",
-        cx_Oracle.DB_TYPE_NCHAR: "CharField",
-        cx_Oracle.DB_TYPE_NCLOB: "TextField",
-        cx_Oracle.DB_TYPE_NVARCHAR: "CharField",
-        cx_Oracle.DB_TYPE_NUMBER: "DecimalField",
-        cx_Oracle.DB_TYPE_TIMESTAMP: "DateTimeField",
-        cx_Oracle.DB_TYPE_VARCHAR: "CharField",
+        oracledb.DB_TYPE_DATE: "DateField",
+        oracledb.DB_TYPE_BINARY_DOUBLE: "FloatField",
+        oracledb.DB_TYPE_BLOB: "BinaryField",
+        oracledb.DB_TYPE_CHAR: "CharField",
+        oracledb.DB_TYPE_CLOB: "TextField",
+        oracledb.DB_TYPE_INTERVAL_DS: "DurationField",
+        oracledb.DB_TYPE_NCHAR: "CharField",
+        oracledb.DB_TYPE_NCLOB: "TextField",
+        oracledb.DB_TYPE_NVARCHAR: "CharField",
+        oracledb.DB_TYPE_NUMBER: "DecimalField",
+        oracledb.DB_TYPE_TIMESTAMP: "DateTimeField",
+        oracledb.DB_TYPE_VARCHAR: "CharField",
     }
 
     def get_field_type(self, data_type, description):
-        if data_type == cx_Oracle.NUMBER:
+        if data_type == oracledb.NUMBER:
             precision, scale = description[4:6]
             if scale == 0:
                 if precision > 11:
@@ -52,7 +51,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     return "IntegerField"
             elif scale == -127:
                 return "FloatField"
-        elif data_type == cx_Oracle.NCLOB and description.is_json:
+        elif data_type == oracledb.NCLOB and description.is_json:
             return "JSONField"
 
         return super().get_field_type(data_type, description)
@@ -193,7 +192,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 is_json,
                 comment,
             ) = field_map[name]
-            name %= {}  # cx_Oracle, for some reason, doubles percent signs.
+            name %= {}  # oracledb, for some reason, doubles percent signs.
             description.append(
                 FieldInfo(
                     self.identifier_converter(name),

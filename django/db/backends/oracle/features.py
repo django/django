@@ -125,7 +125,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         },
     }
     django_test_expected_failures = {
-        # A bug in Django/cx_Oracle with respect to string handling (#23843).
+        # A bug in Django/oracledb with respect to string handling (#23843).
         "annotations.tests.NonAggregateAnnotationTestCase.test_custom_functions",
         "annotations.tests.NonAggregateAnnotationTestCase."
         "test_custom_functions_can_ref_other_functions",
