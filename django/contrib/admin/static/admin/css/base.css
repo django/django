@@ -5,6 +5,7 @@
 @import url(fonts.css);
 
 /* VARIABLE DEFINITIONS */
+html[data-theme="light"],
 :root {
   --primary: #79aec8;
   --secondary: #417690;
@@ -900,7 +901,7 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 #branding {
-    float: left;
+    display: flex;
 }
 
 #branding h1 {
