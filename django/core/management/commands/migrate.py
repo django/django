@@ -81,7 +81,10 @@ class Command(BaseCommand):
             "--check",
             action="store_true",
             dest="check_unapplied",
-            help="Exits with a non-zero status if unapplied migrations exist.",
+            help=(
+                "Exits with a non-zero status if unapplied migrations exist. Does not "
+                "apply migrations."
+            ),
         )
         parser.add_argument(
             "--prune",
