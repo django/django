@@ -5,7 +5,7 @@ from django.template import Library, Node, TemplateSyntaxError, Variable
 from django.template.base import TokenType, render_value_in_context
 from django.template.defaulttags import token_kwargs
 from django.utils import translation
-from django.utils.safestring import SafeData, mark_safe
+from django.utils.safestring import SafeData, SafeString, mark_safe
 
 register = Library()
 
@@ -198,7 +198,7 @@ class BlockTranslateNode(Node):
             with translation.override(None):
                 result = self.render(context, nested=True)
         if self.asvar:
-            context[self.asvar] = result
+            context[self.asvar] = SafeString(result)
             return ""
         else:
             return result

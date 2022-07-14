@@ -270,6 +270,9 @@ Miscellaneous
 * The undocumented ``django.http.multipartparser.parse_header()`` function is
   removed. Use ``django.utils.http.parse_header_parameters()`` instead.
 
+* :ttag:`{% blocktranslate asvar … %}<blocktranslate>` result is now marked as
+  safe for (HTML) output purposes.
+
 .. _deprecated-features-4.2:
 
 Features deprecated in 4.2
