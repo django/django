@@ -707,6 +707,11 @@ In practice you'll use this to get a string you can use in multiple places in a
 template or so you can use the output as an argument for other template tags or
 filters.
 
+.. versionchanged:: 4.2
+
+    In older versions, ``asvar`` instances weren't marked as safe for (HTML)
+    output purposes.
+
 ``{% blocktranslate %}`` also supports :ref:`contextual
 markers<contextual-markers>` using the ``context`` keyword:
 
