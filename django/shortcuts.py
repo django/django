@@ -56,9 +56,7 @@ def _get_queryset(klass):
     the job.
     """
     # If it is a model class or anything else with ._default_manager
-    if hasattr(klass, "_default_manager"):
-        return klass._default_manager.all()
-    return klass
+    return klass._default_manager.all() if hasattr(klass, "_default_manager") else klass
 
 
 def get_object_or_404(klass, *args, **kwargs):
