@@ -2,7 +2,8 @@ from unittest.mock import ANY
 
 from django.core import checks
 from django.core.checks.migrations import check_migration_operations
-from django.db import migrations
+from django.db import connections, migrations
+from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.operations.base import Operation
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -58,7 +59,8 @@ class DeprecatedMigrationOperationTests(TestCase):
         INSTALLED_APPS=["check_framework.migrations_test_apps.index_together_app"]
     )
     def tests_check_alter_index_together(self):
-        errors = check_migration_operations()
+        self.assertEqual(check_migration_operations(), [])
+        errors = check_migration_operations(databases={"default"})
         self.assertEqual(
             errors,
             [
@@ -70,6 +72,10 @@ class DeprecatedMigrationOperationTests(TestCase):
                 )
             ],
         )
+        # Mark migration as applied.
+        executor = MigrationExecutor(connections["default"])
+        executor.recorder.record_applied("index_together_app", "0001_initial")
+        self.assertEqual(check_migration_operations(databases={"default"}), [])
 
 
 class RemovedMigrationOperationTests(TestCase):
