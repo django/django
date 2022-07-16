@@ -20,7 +20,12 @@ from django.views.decorators.clickjacking import (
     xframe_options_sameorigin,
 )
 from django.views.decorators.common import no_append_slash
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import (
+    csrf_exempt,
+    csrf_protect,
+    ensure_csrf_cookie,
+    requires_csrf_token,
+)
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import (
     condition,
@@ -491,6 +496,9 @@ class SyncAndAsyncDecoratorTests(TestCase):
             xframe_options_sameorigin,
             xframe_options_exempt,
             no_append_slash,
+            csrf_protect,
+            requires_csrf_token,
+            ensure_csrf_cookie,
             csrf_exempt,
             sensitive_post_parameters,
             require_http_methods,
@@ -838,6 +846,69 @@ class CsrfDecoratorTests(SimpleTestCase):
     """
     Tests for the CSRF decorators.
     """
+
+    csrf_token = "1bcdefghij2bcdefghij3bcdefghij4bcdefghij5bcdefghij6bcdefghijABCD"
+
+    def setUp(self):
+        # Use request that will trigger the middleware but has a csrf token
+        self.request = HttpRequest()
+        self.request.method = "POST"
+        self.request.POST["csrfmiddlewaretoken"] = self.csrf_token
+        self.request.COOKIES["csrftoken"] = self.csrf_token
+
+    def test_csrf_protect_decorator(self):
+        @csrf_protect
+        def a_view(request):
+            return HttpResponse()
+
+        response = a_view(self.request)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(self.request.csrf_processing_done)
+
+    async def test_csrf_protect_decorator_with_async_view(self):
+        @csrf_protect
+        async def an_async_view(request):
+            return HttpResponse()
+
+        response = await an_async_view(self.request)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(self.request.csrf_processing_done)
+
+    def test_requires_csrf_token_decorator(self):
+        @requires_csrf_token
+        def a_view(request):
+            return HttpResponse()
+
+        response = a_view(self.request)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(self.request.csrf_processing_done)
+
+    async def test_requires_csrf_token_decorator_with_async_view(self):
+        @requires_csrf_token
+        async def an_async_view(request):
+            return HttpResponse()
+
+        response = await an_async_view(self.request)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(self.request.csrf_processing_done)
+
+    def test_ensure_csrf_cookie_decorator(self):
+        @ensure_csrf_cookie
+        def a_view(request):
+            return HttpResponse()
+
+        response = a_view(self.request)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(self.request.csrf_processing_done)
+
+    async def test_ensure_csrf_cookie_decorator_with_async_view(self):
+        @ensure_csrf_cookie
+        async def an_async_view(request):
+            return HttpResponse()
+
+        response = await an_async_view(self.request)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(self.request.csrf_processing_done)
 
     def test_csrf_exempt_decorator(self):
         @csrf_exempt

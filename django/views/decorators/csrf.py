@@ -11,6 +11,7 @@ This decorator adds CSRF protection in exactly the same way as
 CsrfViewMiddleware, but it can be used on a per view basis.  Using both, or
 using the decorator multiple times, is harmless and efficient.
 """
+csrf_protect = sync_and_async_middleware(csrf_protect)
 
 
 class _EnsureCsrfToken(CsrfViewMiddleware):
@@ -26,6 +27,7 @@ Use this decorator on views that need a correct csrf_token available to
 RequestContext, but without the CSRF protection that csrf_protect
 enforces.
 """
+requires_csrf_token = sync_and_async_middleware(requires_csrf_token)
 
 
 class _EnsureCsrfCookie(CsrfViewMiddleware):
@@ -45,6 +47,7 @@ ensure_csrf_cookie.__doc__ = """
 Use this decorator to ensure that a view sets a CSRF cookie, whether or not it
 uses the csrf_token template tag, or the CsrfViewMiddleware is used.
 """
+ensure_csrf_cookie = sync_and_async_middleware(ensure_csrf_cookie)
 
 
 @sync_and_async_middleware
