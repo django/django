@@ -490,6 +490,7 @@ class SyncAndAsyncDecoratorTests(TestCase):
 
     def test_decorators_syanc_and_async_capable(self):
         decorators = (
+            cache_page,
             cache_control,
             never_cache,
             xframe_options_deny,
@@ -513,6 +514,44 @@ class SyncAndAsyncDecoratorTests(TestCase):
             with self.subTest(decorator):
                 self.assertTrue(decorator.sync_capable)
                 self.assertTrue(decorator.async_capable)
+
+
+class CachePageDecoratorTests(SimpleTestCase):
+    """
+    Tests for the caching decorators.
+    """
+
+    def test_cache_page_decorator(self):
+        @cache_page(123)
+        def a_view(request):
+            return "response"
+
+        response = a_view(HttpRequest())
+        self.assertEqual(response, "response")
+
+    async def test_cache_page_decorator_with_async_view(self):
+        @cache_page(123)
+        async def an_async_view(request):
+            return "response"
+
+        response = await an_async_view(HttpRequest())
+        self.assertEqual(response, "response")
+
+    def test_cache_page_decorator_with_key_prefix(self):
+        @cache_page(123, key_prefix="test")
+        def a_view(request):
+            return "response"
+
+        response = a_view(HttpRequest())
+        self.assertEqual(response, "response")
+
+    async def test_cache_page_decorator_with_key_prefix_with_async_view(self):
+        @cache_page(123, key_prefix="test")
+        async def an_async_view(request):
+            return "response"
+
+        response = await an_async_view(HttpRequest())
+        self.assertEqual(response, "response")
 
 
 class XFrameOptionsDecoratorsTests(SimpleTestCase):

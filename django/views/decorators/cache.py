@@ -9,6 +9,7 @@ from django.utils.decorators import (
 )
 
 
+@sync_and_async_middleware
 def cache_page(timeout, *, cache=None, key_prefix=None):
     """
     Decorator for views that tries getting the page from the cache and
