@@ -20,6 +20,7 @@ from django.views.decorators.clickjacking import (
     xframe_options_sameorigin,
 )
 from django.views.decorators.common import no_append_slash
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import (
     condition,
     require_GET,
@@ -489,6 +490,7 @@ class SyncAndAsyncDecoratorTests(TestCase):
             xframe_options_sameorigin,
             xframe_options_exempt,
             no_append_slash,
+            csrf_exempt,
             vary_on_headers,
             vary_on_cookie,
         )
@@ -823,4 +825,26 @@ class CommonDecoratorTest(SimpleTestCase):
             return HttpResponse()
 
         self.assertIs(an_async_view.should_append_slash, False)
+        await an_async_view(HttpRequest())
+
+
+class CsrfDecoratorTests(SimpleTestCase):
+    """
+    Tests for the CSRF decorators.
+    """
+
+    def test_csrf_exempt_decorator(self):
+        @csrf_exempt
+        def a_view(request):
+            return HttpResponse()
+
+        self.assertIs(a_view.csrf_exempt, True)
+        a_view(HttpRequest())
+
+    async def test_csrf_exempt_decorator_with_async_view(self):
+        @csrf_exempt
+        async def an_async_view(request):
+            return HttpResponse()
+
+        self.assertIs(an_async_view.csrf_exempt, True)
         await an_async_view(HttpRequest())

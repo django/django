@@ -1,7 +1,8 @@
+import asyncio
 from functools import wraps
 
 from django.middleware.csrf import CsrfViewMiddleware, get_token
-from django.utils.decorators import decorator_from_middleware
+from django.utils.decorators import decorator_from_middleware, sync_and_async_middleware
 
 csrf_protect = decorator_from_middleware(CsrfViewMiddleware)
 csrf_protect.__name__ = "csrf_protect"
@@ -46,13 +47,23 @@ uses the csrf_token template tag, or the CsrfViewMiddleware is used.
 """
 
 
+@sync_and_async_middleware
 def csrf_exempt(view_func):
     """Mark a view function as being exempt from the CSRF view protection."""
     # view_func.csrf_exempt = True would also work, but decorators are nicer
     # if they don't have side effects, so return a new function.
     @wraps(view_func)
-    def wrapper_view(*args, **kwargs):
+    def _wrapper_view_sync(*args, **kwargs):
         return view_func(*args, **kwargs)
+
+    @wraps(view_func)
+    async def _wrapper_view_async(*args, **kwargs):
+        return await view_func(*args, **kwargs)
+
+    if asyncio.iscoroutinefunction(view_func):
+        wrapper_view = _wrapper_view_async
+    else:
+        wrapper_view = _wrapper_view_sync
 
     wrapper_view.csrf_exempt = True
     return wrapper_view
