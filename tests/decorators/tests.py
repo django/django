@@ -491,6 +491,10 @@ class SyncAndAsyncDecoratorTests(TestCase):
             xframe_options_exempt,
             no_append_slash,
             csrf_exempt,
+            require_http_methods,
+            require_GET,
+            require_POST,
+            require_safe,
             vary_on_headers,
             vary_on_cookie,
         )
@@ -848,3 +852,169 @@ class CsrfDecoratorTests(SimpleTestCase):
 
         self.assertIs(an_async_view.csrf_exempt, True)
         await an_async_view(HttpRequest())
+
+
+class RequireHttpMethodsDecoratorTests(SimpleTestCase):
+    def test_require_http_methods_decorator_successful(self):
+        @require_http_methods(["HEAD"])
+        def a_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.method = "HEAD"
+        response = a_view(request)
+        self.assertEqual(response.status_code, 200)
+
+    async def test_require_http_methods_decorator_successful_with_async_view(self):
+        @require_http_methods(["HEAD"])
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.method = "HEAD"
+        response = await an_async_view(request)
+        self.assertEqual(response.status_code, 200)
+
+    def test_require_http_methods_decorator_unsuccessful(self):
+        @require_http_methods(["HEAD"])
+        def a_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.method = "GET"
+        response = a_view(request)
+        self.assertEqual(response.status_code, 405)
+
+    async def test_require_http_methods_decorator_unsuccessful_with_async_view(self):
+        @require_http_methods(["HEAD"])
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.method = "GET"
+        response = await an_async_view(request)
+        self.assertEqual(response.status_code, 405)
+
+    def test_require_get_decorator_successful(self):
+        @require_GET
+        def a_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.method = "GET"
+        response = a_view(request)
+        self.assertEqual(response.status_code, 200)
+
+    async def test_require_get_decorator_successful_with_async_view(self):
+        @require_GET
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.method = "GET"
+        response = await an_async_view(request)
+        self.assertEqual(response.status_code, 200)
+
+    def test_require_get_decorator_unsuccessful(self):
+        @require_GET
+        def a_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.method = "POST"
+        response = a_view(request)
+        self.assertEqual(response.status_code, 405)
+
+    async def test_require_get_decorator_unsuccessful_with_async_view(self):
+        @require_GET
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.method = "POST"
+        response = await an_async_view(request)
+        self.assertEqual(response.status_code, 405)
+
+    def test_require_post_decorator_successful(self):
+        @require_POST
+        def a_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.method = "POST"
+        response = a_view(request)
+        self.assertEqual(response.status_code, 200)
+
+    async def test_require_post_decorator_successful_with_async_view(self):
+        @require_POST
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.method = "POST"
+        response = await an_async_view(request)
+        self.assertEqual(response.status_code, 200)
+
+    def test_require_post_decorator_unsuccessful(self):
+        @require_POST
+        def a_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.method = "GET"
+        response = a_view(request)
+        self.assertEqual(response.status_code, 405)
+
+    async def test_require_post_decorator_unsuccessful_with_async_view(self):
+        @require_POST
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.method = "GET"
+        response = await an_async_view(request)
+        self.assertEqual(response.status_code, 405)
+
+    def test_require_safe_decorator_successful(self):
+        @require_safe
+        def a_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        # Only GET and HEAD are safe methods
+        request.method = "HEAD"
+        response = a_view(request)
+        self.assertEqual(response.status_code, 200)
+
+    async def test_require_safe_decorator_successful_with_async_view(self):
+        @require_safe
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        # Only GET and HEAD are safe methods
+        request.method = "HEAD"
+        response = await an_async_view(request)
+        self.assertEqual(response.status_code, 200)
+
+    def test_require_safe_decorator_unsuccessful(self):
+        @require_safe
+        def a_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        # Only GET and HEAD are safe methods
+        request.method = "POST"
+        response = a_view(request)
+        self.assertEqual(response.status_code, 405)
+
+    async def test_require_safe_decorator_unsuccessful_with_async_view(self):
+        @require_safe
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        # Only GET and HEAD are safe methods
+        request.method = "POST"
+        response = await an_async_view(request)
+        self.assertEqual(response.status_code, 405)

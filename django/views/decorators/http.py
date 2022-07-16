@@ -1,6 +1,7 @@
 """
 Decorators for views based on HTTP headers.
 """
+import asyncio
 import datetime
 from functools import wraps
 
@@ -8,13 +9,14 @@ from django.http import HttpResponseNotAllowed
 from django.middleware.http import ConditionalGetMiddleware
 from django.utils import timezone
 from django.utils.cache import get_conditional_response
-from django.utils.decorators import decorator_from_middleware
+from django.utils.decorators import decorator_from_middleware, sync_and_async_middleware
 from django.utils.http import http_date, quote_etag
 from django.utils.log import log_response
 
 conditional_page = decorator_from_middleware(ConditionalGetMiddleware)
 
 
+@sync_and_async_middleware
 def require_http_methods(request_method_list):
     """
     Decorator to make a view only accept particular request methods.  Usage::
@@ -28,8 +30,7 @@ def require_http_methods(request_method_list):
     """
 
     def decorator(func):
-        @wraps(func)
-        def inner(request, *args, **kwargs):
+        def _process_request(request):
             if request.method not in request_method_list:
                 response = HttpResponseNotAllowed(request_method_list)
                 log_response(
@@ -40,23 +41,43 @@ def require_http_methods(request_method_list):
                     request=request,
                 )
                 return response
-            return func(request, *args, **kwargs)
 
-        return inner
+        @wraps(func)
+        def _wrapper_view_sync(request, *args, **kwargs):
+            response = _process_request(request)
+            if response is not None:
+                return response
+
+            return func(request)
+
+        @wraps(func)
+        async def _wrapper_view_async(request, *args, **kwargs):
+            response = _process_request(request)
+            if response is not None:
+                return response
+
+            return await func(request)
+
+        if asyncio.iscoroutinefunction(func):
+            return _wrapper_view_async
+        return _wrapper_view_sync
 
     return decorator
 
 
 require_GET = require_http_methods(["GET"])
 require_GET.__doc__ = "Decorator to require that a view only accepts the GET method."
+require_GET = sync_and_async_middleware(require_GET)
 
 require_POST = require_http_methods(["POST"])
 require_POST.__doc__ = "Decorator to require that a view only accepts the POST method."
+require_POST = sync_and_async_middleware(require_POST)
 
 require_safe = require_http_methods(["GET", "HEAD"])
 require_safe.__doc__ = (
     "Decorator to require that a view only accepts safe methods: GET and HEAD."
 )
+require_safe = sync_and_async_middleware(require_safe)
 
 
 def condition(etag_func=None, last_modified_func=None):
