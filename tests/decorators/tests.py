@@ -27,6 +27,7 @@ from django.views.decorators.csrf import (
     requires_csrf_token,
 )
 from django.views.decorators.debug import sensitive_post_parameters
+from django.views.decorators.gzip import gzip_page
 from django.views.decorators.http import (
     condition,
     require_GET,
@@ -501,6 +502,7 @@ class SyncAndAsyncDecoratorTests(TestCase):
             requires_csrf_token,
             ensure_csrf_cookie,
             csrf_exempt,
+            gzip_page,
             sensitive_post_parameters,
             require_http_methods,
             require_GET,
@@ -1010,6 +1012,37 @@ class DebugDecoratorsTests(SimpleTestCase):
         response = await an_async_view(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(request.sensitive_post_parameters, ("a", "b"))
+
+
+class GzipDecoratorsTests(SimpleTestCase):
+    """
+    Tests for the gzip decorator.
+    """
+
+    # Gzip ignores content that is too short
+    content = "Content " * 100
+
+    def test_gzip_decorator(self):
+        @gzip_page
+        def a_view(request):
+            return HttpResponse(content=self.content)
+
+        request = HttpRequest()
+        request.META["HTTP_ACCEPT_ENCODING"] = "gzip"
+        response = a_view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get("Content-Encoding"), "gzip")
+
+    async def test_gzip_decorator_with_async_view(self):
+        @gzip_page
+        async def an_async_view(request):
+            return HttpResponse(content=self.content)
+
+        request = HttpRequest()
+        request.META["HTTP_ACCEPT_ENCODING"] = "gzip"
+        response = await an_async_view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get("Content-Encoding"), "gzip")
 
 
 class RequireHttpMethodsDecoratorTests(SimpleTestCase):
