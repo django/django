@@ -487,6 +487,7 @@ class SyncAndAsyncDecoratorTests(TestCase):
             xframe_options_deny,
             xframe_options_sameorigin,
             xframe_options_exempt,
+            vary_on_headers,
         )
 
         for decorator in decorators:
@@ -747,3 +748,33 @@ class CacheControlDecoratorTest(SimpleTestCase):
         self.assertEqual(
             set(cache_control_items), {"max-age=123", "private", "public", "custom=456"}
         )
+
+
+class VaryDecoratorsTests(SimpleTestCase):
+    """
+    Tests for the vary decorators.
+    """
+
+    def test_vary_on_headers_decorator(self):
+        @vary_on_headers("Header", "Another-header")
+        def a_view(request):
+            return HttpResponse()
+
+        response = a_view(HttpRequest())
+        self.assertEqual(response.status_code, 200)
+        # Assert each decorator argument is in the response header
+        vary_items_set = {item.strip() for item in response.get("Vary").split(",")}
+        self.assertIn("Header", vary_items_set)
+        self.assertIn("Another-header", vary_items_set)
+
+    async def test_vary_on_headers_decorator_with_async_view(self):
+        @vary_on_headers("Header", "Another-header")
+        async def an_async_view(request):
+            return HttpResponse()
+
+        response = await an_async_view(HttpRequest())
+        self.assertEqual(response.status_code, 200)
+        # Assert each decorator argument is in the response header
+        vary_items_set = {item.strip() for item in response.get("Vary").split(",")}
+        self.assertIn("Header", vary_items_set)
+        self.assertIn("Another-header", vary_items_set)

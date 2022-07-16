@@ -1,8 +1,11 @@
+import asyncio
 from functools import wraps
 
 from django.utils.cache import patch_vary_headers
+from django.utils.decorators import sync_and_async_middleware
 
 
+@sync_and_async_middleware
 def vary_on_headers(*headers):
     """
     A view decorator that adds the specified headers to the Vary header of the
@@ -16,13 +19,24 @@ def vary_on_headers(*headers):
     """
 
     def decorator(func):
-        @wraps(func)
-        def inner_func(*args, **kwargs):
-            response = func(*args, **kwargs)
+        def _process_response(response):
             patch_vary_headers(response, headers)
+
+        @wraps(func)
+        def _wrapper_view_sync(*args, **kwargs):
+            response = func(*args, **kwargs)
+            _process_response(response)
             return response
 
-        return inner_func
+        @wraps(func)
+        async def _wrapper_view_async(*args, **kwargs):
+            response = await func(*args, **kwargs)
+            _process_response(response)
+            return response
+
+        if asyncio.iscoroutinefunction(func):
+            return _wrapper_view_async
+        return _wrapper_view_sync
 
     return decorator
 
