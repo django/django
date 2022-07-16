@@ -41,6 +41,7 @@ def vary_on_headers(*headers):
     return decorator
 
 
+@sync_and_async_middleware
 def vary_on_cookie(func):
     """
     A view decorator that adds "Cookie" to the Vary header of a response. This
@@ -51,10 +52,21 @@ def vary_on_cookie(func):
             ...
     """
 
-    @wraps(func)
-    def inner_func(*args, **kwargs):
-        response = func(*args, **kwargs)
+    def _process_response(response):
         patch_vary_headers(response, ("Cookie",))
+
+    @wraps(func)
+    def _wrapper_view_sync(*args, **kwargs):
+        response = func(*args, **kwargs)
+        _process_response(response)
         return response
 
-    return inner_func
+    @wraps(func)
+    async def _wrapper_view_async(*args, **kwargs):
+        response = await func(*args, **kwargs)
+        _process_response(response)
+        return response
+
+    if asyncio.iscoroutinefunction(func):
+        return _wrapper_view_async
+    return _wrapper_view_sync

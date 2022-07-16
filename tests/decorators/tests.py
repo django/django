@@ -488,6 +488,7 @@ class SyncAndAsyncDecoratorTests(TestCase):
             xframe_options_sameorigin,
             xframe_options_exempt,
             vary_on_headers,
+            vary_on_cookie,
         )
 
         for decorator in decorators:
@@ -778,3 +779,24 @@ class VaryDecoratorsTests(SimpleTestCase):
         vary_items_set = {item.strip() for item in response.get("Vary").split(",")}
         self.assertIn("Header", vary_items_set)
         self.assertIn("Another-header", vary_items_set)
+
+    def test_vary_on_cookie_decorator(self):
+        @vary_on_cookie
+        def a_view(request):
+            return HttpResponse()
+
+        response = a_view(HttpRequest())
+        self.assertEqual(response.status_code, 200)
+        vary_items_set = {item.strip() for item in response.get("Vary").split(",")}
+        self.assertIn("Cookie", vary_items_set)
+
+    async def test_vary_on_cookie_decorator_with_async_view(self):
+        @vary_on_cookie
+        async def an_async_view(request):
+            return HttpResponse()
+
+        response = await an_async_view(HttpRequest())
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Cookie", response.get("Vary"))
+        vary_items_set = {item.strip() for item in response.get("Vary").split(",")}
+        self.assertIn("Cookie", vary_items_set)
