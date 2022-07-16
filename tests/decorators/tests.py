@@ -30,6 +30,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.gzip import gzip_page
 from django.views.decorators.http import (
     condition,
+    conditional_page,
     require_GET,
     require_http_methods,
     require_POST,
@@ -504,6 +505,7 @@ class SyncAndAsyncDecoratorTests(TestCase):
             csrf_exempt,
             gzip_page,
             sensitive_post_parameters,
+            conditional_page,
             require_http_methods,
             require_GET,
             require_POST,
@@ -1043,6 +1045,28 @@ class GzipDecoratorsTests(SimpleTestCase):
         response = await an_async_view(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get("Content-Encoding"), "gzip")
+
+
+class ConditionalTests(SimpleTestCase):
+    def test_conditional_page_decorator_successful(self):
+        @conditional_page
+        def a_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.method = "HEAD"
+        response = a_view(request)
+        self.assertEqual(response.status_code, 200)
+
+    async def test_conditional_page_decorator_successful_with_async_view(self):
+        @conditional_page
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.method = "HEAD"
+        response = await an_async_view(request)
+        self.assertEqual(response.status_code, 200)
 
 
 class RequireHttpMethodsDecoratorTests(SimpleTestCase):

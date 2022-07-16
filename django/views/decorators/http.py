@@ -14,6 +14,7 @@ from django.utils.http import http_date, quote_etag
 from django.utils.log import log_response
 
 conditional_page = decorator_from_middleware(ConditionalGetMiddleware)
+conditional_page = sync_and_async_middleware(conditional_page)
 
 
 @sync_and_async_middleware
