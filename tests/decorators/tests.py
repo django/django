@@ -21,6 +21,7 @@ from django.views.decorators.clickjacking import (
 )
 from django.views.decorators.common import no_append_slash
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import (
     condition,
     require_GET,
@@ -491,6 +492,7 @@ class SyncAndAsyncDecoratorTests(TestCase):
             xframe_options_exempt,
             no_append_slash,
             csrf_exempt,
+            sensitive_post_parameters,
             require_http_methods,
             require_GET,
             require_POST,
@@ -852,6 +854,52 @@ class CsrfDecoratorTests(SimpleTestCase):
 
         self.assertIs(an_async_view.csrf_exempt, True)
         await an_async_view(HttpRequest())
+
+
+class DebugDecoratorsTests(SimpleTestCase):
+    """
+    Tests for the debug decorators.
+    """
+
+    def test_sensitive_post_parameters_without_parameters(self):
+        @sensitive_post_parameters()
+        def a_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        response = a_view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(request.sensitive_post_parameters, "__ALL__")
+
+    async def test_sensitive_post_parameters_without_parameters_with_async_view(self):
+        @sensitive_post_parameters()
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        response = await an_async_view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(request.sensitive_post_parameters, "__ALL__")
+
+    def test_sensitive_post_parameters_with_parameters(self):
+        @sensitive_post_parameters("a", "b")
+        def a_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        response = a_view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(request.sensitive_post_parameters, ("a", "b"))
+
+    async def test_sensitive_post_parameters_with_parameters_with_async_view(self):
+        @sensitive_post_parameters("a", "b")
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        response = await an_async_view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(request.sensitive_post_parameters, ("a", "b"))
 
 
 class RequireHttpMethodsDecoratorTests(SimpleTestCase):

@@ -1,6 +1,8 @@
+import asyncio
 from functools import wraps
 
 from django.http import HttpRequest
+from django.utils.decorators import sync_and_async_middleware
 
 
 def sensitive_variables(*variables):
@@ -46,6 +48,7 @@ def sensitive_variables(*variables):
     return decorator
 
 
+@sync_and_async_middleware
 def sensitive_post_parameters(*parameters):
     """
     Indicate which POST parameters used in the decorated view are sensitive,
@@ -77,8 +80,7 @@ def sensitive_post_parameters(*parameters):
         )
 
     def decorator(view):
-        @wraps(view)
-        def sensitive_post_parameters_wrapper(request, *args, **kwargs):
+        def _process_request(request):
             if not isinstance(request, HttpRequest):
                 raise TypeError(
                     "sensitive_post_parameters didn't receive an HttpRequest "
@@ -89,8 +91,19 @@ def sensitive_post_parameters(*parameters):
                 request.sensitive_post_parameters = parameters
             else:
                 request.sensitive_post_parameters = "__ALL__"
+
+        @wraps(view)
+        def _wrapper_view_sync(request, *args, **kwargs):
+            _process_request(request)
             return view(request, *args, **kwargs)
 
-        return sensitive_post_parameters_wrapper
+        @wraps(view)
+        async def _wrapper_view_async(request, *args, **kwargs):
+            _process_request(request)
+            return await view(request, *args, **kwargs)
+
+        if asyncio.iscoroutinefunction(view):
+            return _wrapper_view_async
+        return _wrapper_view_sync
 
     return decorator
