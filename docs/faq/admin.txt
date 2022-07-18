@@ -99,13 +99,13 @@ like to make should be possible by editing the stylesheet.
 What browsers are supported for using the admin?
 ================================================
 
-The admin provides a fully-functional experience to the recent versions of
-modern, web standards compliant browsers. On desktop this means Chrome, Edge,
-Firefox, Opera, Safari, and others.
+The Admin provides a fully-functional experience for the recent versions of
+modern, web standards-compliant browsers. On the desktop, this means Chrome,
+Edge, Firefox, Opera, Safari, and others.
 
 On mobile and tablet devices, the admin provides a responsive experience for
-web standards compliant browsers. This includes the major browsers on both
-Android and iOS.
+web standards-compliant browsers. This includes the major browsers on both
+On Android and iOS.
 
 Depending on feature support, there *may* be minor stylistic differences
 between browsers. These are considered acceptable variations in rendering.
