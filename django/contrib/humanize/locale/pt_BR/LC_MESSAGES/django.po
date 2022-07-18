@@ -317,43 +317,43 @@ msgstr "%(delta)s a partir de agora"
 msgctxt "naturaltime-past"
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] "%dano"
-msgstr[1] "%danos"
+msgstr[0] "%d ano"
+msgstr[1] "%d anos"
 
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] "%dmês"
-msgstr[1] "%dmeses"
+msgstr[0] "%d mês"
+msgstr[1] "%d meses"
 
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%d week"
 msgid_plural "%d weeks"
-msgstr[0] "%dsemanas"
-msgstr[1] "%dsemanas"
+msgstr[0] "%d semanas"
+msgstr[1] "%d semanas"
 
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] "%ddia"
-msgstr[1] "%ddias"
+msgstr[0] "%d dia"
+msgstr[1] "%d dias"
 
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] "%dhora"
-msgstr[1] "%dhoras"
+msgstr[0] "%d hora"
+msgstr[1] "%d horas"
 
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] "%dminuto"
-msgstr[1] "%dminutos"
+msgstr[0] "%d minuto"
+msgstr[1] "%d minutos"
 
 #. Translators: 'naturaltime-future' strings will be included in '%(delta)s
 #. from now'
@@ -361,40 +361,40 @@ msgstr[1] "%dminutos"
 msgctxt "naturaltime-future"
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] "%dano"
+msgstr[0] "%d ano"
 msgstr[1] "%d anos"
 
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] "%dmês"
-msgstr[1] "%dmeses"
+msgstr[0] "%d mês"
+msgstr[1] "%d meses"
 
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d week"
 msgid_plural "%d weeks"
-msgstr[0] "%dsemana"
-msgstr[1] "%dsemanas"
+msgstr[0] "%d semana"
+msgstr[1] "%d semanas"
 
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] "%ddia"
-msgstr[1] "%ddias"
+msgstr[0] "%d dia"
+msgstr[1] "%d dias"
 
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] "%dhora"
-msgstr[1] "%dhoras"
+msgstr[0] "%d hora"
+msgstr[1] "%d horas"
 
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] "%dminuto"
-msgstr[1] "%dminutos"
+msgstr[0] "%d minuto"
+msgstr[1] "%d minutos"
