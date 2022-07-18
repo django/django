@@ -8,7 +8,7 @@ geospatial libraries:
 ========================  ====================================  ================================  ===========================================
 Program                   Description                           Required                          Supported Versions
 ========================  ====================================  ================================  ===========================================
-:doc:`GEOS <../geos>`     Geometry Engine Open Source           Yes                               3.10, 3.9, 3.8, 3.7, 3.6
+:doc:`GEOS <../geos>`     Geometry Engine Open Source           Yes                               3.11, 3.10, 3.9, 3.8, 3.7, 3.6
 `PROJ`_                   Cartographic Projections library      Yes (PostgreSQL and SQLite only)  9.x, 8.x, 7.x, 6.x, 5.x, 4.x
 :doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes                               3.5, 3.4, 3.3, 3.2, 3.1, 3.0, 2.4, 2.3, 2.2
 :doc:`GeoIP <../geoip2>`  IP-based geolocation library          No                                2
@@ -26,6 +26,7 @@ totally fine with GeoDjango. Your mileage may vary.
     GEOS 3.8.0 2019-10-10
     GEOS 3.9.0 2020-12-14
     GEOS 3.10.0 2021-10-20
+    GEOS 3.11.0 2022-07-01
     GDAL 2.2.0 2017-05
     GDAL 2.3.0 2018-05
     GDAL 2.4.0 2018-12
