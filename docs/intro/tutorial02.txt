@@ -523,6 +523,7 @@ Save these changes and start a new Python interactive shell by running
     >>> q.choice_set.create(choice_text='The sky', votes=0)
     <Choice: The sky>
     >>> c = q.choice_set.create(choice_text='Just hacking again', votes=0)
+    <Choice: Just hacking again>
 
     # Choice objects have API access to their related Question objects.
     >>> c.question
