@@ -303,8 +303,10 @@ body.popup .submit-row {
     padding: 10px 15px;
     height: 15px;
     line-height: 15px;
-    margin: 0 0 0 5px;
+    margin: 0 5px 5px 5px;
     color: var(--button-fg);
+    vertical-align: top;
+    text-decoration: none;
 }
 
 .submit-row a.deletelink:focus,
