@@ -20,12 +20,7 @@ from io import StringIO
 from django.core.management import call_command
 from django.db import connections
 from django.test import SimpleTestCase, TestCase
-from django.test.utils import (
-    NullTimeKeeper,
-    TimeKeeper,
-    captured_stdout,
-    iter_test_cases,
-)
+from django.test.utils import NullTimeKeeper, TimeKeeper, iter_test_cases
 from django.test.utils import setup_databases as _setup_databases
 from django.test.utils import setup_test_environment
 from django.test.utils import teardown_databases as _teardown_databases
@@ -433,8 +428,6 @@ def _init_worker(
             if value := serialized_contents.get(alias):
                 connection._test_serialized_contents = value
         connection.creation.setup_worker_connection(_worker_id)
-        with captured_stdout():
-            call_command("check", databases=connections)
 
 
 def _run_subsuite(args):
