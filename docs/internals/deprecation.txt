@@ -20,7 +20,8 @@ details on these changes.
 * The model's ``Meta.index_together`` option will be removed.
 
 * The ``AlterIndexTogether`` migration operation will be removed. A stub
-  operation will remain for compatibility with historical migrations.
+  operation will remain for compatibility with historical (already applied)
+  migrations.
 
 .. _deprecation-removed-in-5.0:
 
@@ -230,12 +231,13 @@ details on these changes.
   removed.
 
 * The model ``NullBooleanField`` will be removed. A stub field will remain for
-  compatibility with historical migrations.
+  compatibility with historical (already applied) migrations.
 
 * ``django.conf.urls.url()`` will be removed.
 
 * The model ``django.contrib.postgres.fields.JSONField`` will be removed. A
-  stub field will remain for compatibility with historical migrations.
+  stub field will remain for compatibility with historical (already applied)
+  migrations.
 
 * ``django.contrib.postgres.forms.JSONField``,
   ``django.contrib.postgres.fields.jsonb.KeyTransform``, and
@@ -484,7 +486,7 @@ details on these changes.
 * The ``django.core.urlresolvers`` module will be removed.
 
 * The model ``CommaSeparatedIntegerField`` will be removed. A stub field will
-  remain for compatibility with historical migrations.
+  remain for compatibility with historical (already applied) migrations.
 
 * Support for the template ``Context.has_key()`` method will be removed.
 
@@ -751,7 +753,7 @@ details on these changes.
   the root package of their application.
 
 * The model and form ``IPAddressField`` will be removed. A stub field will
-  remain for compatibility with historical migrations.
+  remain for compatibility with historical (already applied) migrations.
 
 * ``AppCommand.handle_app()`` will no longer be supported.
 

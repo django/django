@@ -476,7 +476,8 @@ similar to the following::
         system_check_deprecated_details = {
             'msg': (
                 'IPAddressField has been deprecated. Support for it (except '
-                'in historical migrations) will be removed in Django 1.9.'
+                'in historical migrations that have been applied) will be '
+                'removed in Django 1.9.'
             ),
             'hint': 'Use GenericIPAddressField instead.',  # optional
             'id': 'fields.W900',  # pick a unique ID for your field.
@@ -491,7 +492,7 @@ to::
         system_check_removed_details = {
             'msg': (
                 'IPAddressField has been removed except for support in '
-                'historical migrations.'
+                'historical (already applied) migrations.'
             ),
             'hint': 'Use GenericIPAddressField instead.',
             'id': 'fields.E900',  # pick a unique ID for your field.
@@ -524,8 +525,8 @@ to the following::
         system_check_deprecated_details = {
             "msg": (
                 "MyCustomOperation has been deprecated. Support for it "
-                "(except in historical migrations) will be removed in "
-                "Django 5.1."
+                "(except in historical migrations that have been applied) "
+                "will be removed in Django 5.1."
             ),
             "hint": "Use DifferentOperation instead.",  # optional
             "id": "migrations.W900",  # pick a unique ID for your operation.
@@ -540,7 +541,7 @@ to::
         system_check_removed_details = {
             "msg": (
                 "MyCustomOperation has been removed except for support in "
-                "historical migrations."
+                "historical (already applied) migrations."
             ),
             "hint': "Use DifferentOperation instead.",
             "id": "migrations.E900",  # pick a unique ID for your operation.

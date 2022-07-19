@@ -64,7 +64,8 @@ class DeprecatedMigrationOperationTests(TestCase):
             [
                 checks.Warning(
                     "AlterIndexTogether is deprecated. Support for it (except in "
-                    "historical migrations) will be removed in Django 5.1.",
+                    "historical migrations that have been applied) will be removed in "
+                    "Django 5.1.",
                     obj=ANY,
                     id="migrations.W001",
                 )
@@ -88,7 +89,7 @@ class RemovedMigrationOperationTests(TestCase):
                 checks.Error(
                     msg=(
                         "MyOperation has been removed except for support in historical "
-                        "migrations."
+                        "(already applied) migrations."
                     ),
                     obj=my_operation,
                     id="migrations.EXXX",

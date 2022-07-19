@@ -618,7 +618,7 @@ class AlterIndexTogether(AlterTogetherOptionOperation):
     system_check_deprecated_details = {
         "msg": (
             "AlterIndexTogether is deprecated. Support for it (except in historical "
-            "migrations) will be removed in Django 5.1."
+            "migrations that have been applied) will be removed in Django 5.1."
         ),
         "id": "migrations.W001",
     }

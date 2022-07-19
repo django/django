@@ -18,7 +18,7 @@ class DeprecatedFieldsTests(SimpleTestCase):
             [
                 checks.Error(
                     "IPAddressField has been removed except for support in "
-                    "historical migrations.",
+                    "historical (already applied) migrations.",
                     hint="Use GenericIPAddressField instead.",
                     obj=IPAddressModel._meta.get_field("ip"),
                     id="fields.E900",
@@ -36,7 +36,7 @@ class DeprecatedFieldsTests(SimpleTestCase):
             [
                 checks.Error(
                     "CommaSeparatedIntegerField is removed except for support in "
-                    "historical migrations.",
+                    "historical (already applied) migrations.",
                     hint=(
                         "Use "
                         "CharField(validators=[validate_comma_separated_integer_list]) "
@@ -58,7 +58,7 @@ class DeprecatedFieldsTests(SimpleTestCase):
             [
                 checks.Error(
                     "NullBooleanField is removed except for support in historical "
-                    "migrations.",
+                    "(already applied) migrations.",
                     hint="Use BooleanField(null=True) instead.",
                     obj=NullBooleanFieldModel._meta.get_field("nb"),
                     id="fields.E903",
@@ -78,7 +78,7 @@ class DeprecatedFieldsTests(SimpleTestCase):
             [
                 checks.Error(
                     "django.contrib.postgres.fields.JSONField is removed except "
-                    "for support in historical migrations.",
+                    "for support in historical (already applied) migrations.",
                     hint="Use django.db.models.JSONField instead.",
                     obj=PostgresJSONFieldModel._meta.get_field("field"),
                     id="fields.E904",

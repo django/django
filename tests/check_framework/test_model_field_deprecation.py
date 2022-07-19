@@ -66,7 +66,7 @@ class TestRemovedField(SimpleTestCase):
                 checks.Error(
                     msg=(
                         "MyField has been removed except for support in historical "
-                        "migrations."
+                        "(already applied) migrations."
                     ),
                     obj=Model._meta.get_field("name"),
                     id="fields.EXXX",

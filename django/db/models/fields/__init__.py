@@ -1196,7 +1196,7 @@ class CommaSeparatedIntegerField(CharField):
     system_check_removed_details = {
         "msg": (
             "CommaSeparatedIntegerField is removed except for support in "
-            "historical migrations."
+            "historical (already applied) migrations."
         ),
         "hint": (
             "Use CharField(validators=[validate_comma_separated_integer_list]) "
@@ -2048,7 +2048,7 @@ class IPAddressField(Field):
     system_check_removed_details = {
         "msg": (
             "IPAddressField has been removed except for support in "
-            "historical migrations."
+            "historical (already applied) migrations."
         ),
         "hint": "Use GenericIPAddressField instead.",
         "id": "fields.E900",
@@ -2174,8 +2174,8 @@ class NullBooleanField(BooleanField):
     description = _("Boolean (Either True, False or None)")
     system_check_removed_details = {
         "msg": (
-            "NullBooleanField is removed except for support in historical "
-            "migrations."
+            "NullBooleanField is removed except for support in historical (already "
+            "applied) migrations."
         ),
         "hint": "Use BooleanField(null=True) instead.",
         "id": "fields.E903",

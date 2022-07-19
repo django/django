@@ -172,8 +172,8 @@ class DeprecationForHistoricalMigrationMixin:
                 checks.Error(
                     self.system_check_removed_details.get(
                         "msg",
-                        "%s has been removed except for support in historical "
-                        "migrations." % self.__class__.__name__,
+                        "%s has been removed except for support in historical (already "
+                        "applied) migrations." % self.__class__.__name__,
                     ),
                     hint=self.system_check_removed_details.get("hint"),
                     obj=self,

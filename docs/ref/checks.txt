@@ -207,7 +207,7 @@ Model fields
 * **fields.E190**: ``<database>`` does not support a database collation on
   ``<field_type>``\s.
 * **fields.E900**: ``IPAddressField`` has been removed except for support in
-  historical migrations.
+  historical (already applied) migrations.
 * **fields.W900**: ``IPAddressField`` has been deprecated. Support for it
   (except in historical migrations) will be removed in Django 1.9. *This check
   appeared in Django 1.7 and 1.8*.
@@ -215,19 +215,19 @@ Model fields
   for it (except in historical migrations) will be removed in Django 2.0. *This
   check appeared in Django 1.10 and 1.11*.
 * **fields.E901**: ``CommaSeparatedIntegerField`` is removed except for support
-  in historical migrations.
+  in historical (already applied) migrations.
 * **fields.W902**: ``FloatRangeField`` is deprecated and will be removed in
   Django 3.1. *This check appeared in Django 2.2 and 3.0*.
 * **fields.W903**: ``NullBooleanField`` is deprecated. Support for it (except
   in historical migrations) will be removed in Django 4.0. *This check appeared
   in Django 3.1 and 3.2*.
 * **fields.E903**: ``NullBooleanField`` is removed except for support in
-  historical migrations.
+  historical (already applied) migrations.
 * **fields.W904**: ``django.contrib.postgres.fields.JSONField`` is deprecated.
   Support for it (except in historical migrations) will be removed in Django
   4.0. *This check appeared in Django 3.1 and 3.2*.
 * **fields.E904**: ``django.contrib.postgres.fields.JSONField`` is removed
-  except for support in historical migrations.
+  except for support in historical (already applied) migrations.
 
 File fields
 ~~~~~~~~~~~
@@ -401,7 +401,8 @@ Migrations
 ----------
 
 * **migrations.W001**: ``AlterIndexTogether`` is deprecated. Support for it
-  (except in historical migrations) will be removed in Django 5.1.
+  (except in historical migrations that have been applied) will be removed in
+  Django 5.1.
 
 Security
 --------
