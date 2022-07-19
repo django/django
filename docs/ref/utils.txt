@@ -663,7 +663,7 @@ escaping HTML.
     ``<script>`` tag is given the passed id. For example::
 
         >> json_script({"hello": "world"}, element_id="hello-data")
-        '<script id="hello-data" type="application/json">{"hello": "world"}</script>'
+        '<script id="hello-data" type="application/json">{"hello":"world"}</script>'
 
     The ``encoder``, which defaults to
     :class:`django.core.serializers.json.DjangoJSONEncoder`, will be used to

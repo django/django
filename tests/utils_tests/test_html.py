@@ -192,7 +192,7 @@ class TestUtilsHtml(SimpleTestCase):
             (
                 {"a": "<script>test&ing</script>"},
                 '<script id="test_id" type="application/json">'
-                '{"a": "\\u003Cscript\\u003Etest\\u0026ing\\u003C/script\\u003E"}'
+                '{"a":"\\u003Cscript\\u003Etest\\u0026ing\\u003C/script\\u003E"}'
                 "</script>",
             ),
             # Lazy strings are quoted
@@ -204,7 +204,7 @@ class TestUtilsHtml(SimpleTestCase):
             (
                 {"a": lazystr("<script>test&ing</script>")},
                 '<script id="test_id" type="application/json">'
-                '{"a": "\\u003Cscript\\u003Etest\\u0026ing\\u003C/script\\u003E"}'
+                '{"a":"\\u003Cscript\\u003Etest\\u0026ing\\u003C/script\\u003E"}'
                 "</script>",
             ),
         )
@@ -225,7 +225,7 @@ class TestUtilsHtml(SimpleTestCase):
     def test_json_script_without_id(self):
         self.assertHTMLEqual(
             json_script({"key": "value"}),
-            '<script type="application/json">{"key": "value"}</script>',
+            '<script type="application/json">{"key":"value"}</script>',
         )
 
     def test_smart_urlquote(self):

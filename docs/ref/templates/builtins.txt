@@ -1848,7 +1848,7 @@ If ``value`` is the dictionary ``{'hello': 'world'}``, the output will be:
 
 .. code-block:: html
 
-    <script id="hello-data" type="application/json">{"hello": "world"}</script>
+    <script id="hello-data" type="application/json">{"hello":"world"}</script>
 
 The resulting data can be accessed in JavaScript like this:
 
@@ -1861,7 +1861,7 @@ example if ``value`` is ``{'hello': 'world</script>&amp;'}``, the output is:
 
 .. code-block:: html
 
-    <script id="hello-data" type="application/json">{"hello": "world\\u003C/script\\u003E\\u0026amp;"}</script>
+    <script id="hello-data" type="application/json">{"hello":"world\\u003C/script\\u003E\\u0026amp;"}</script>
 
 This is compatible with a strict Content Security Policy that prohibits in-page
 script execution. It also maintains a clean separation between passive data and

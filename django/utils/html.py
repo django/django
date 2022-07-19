@@ -67,9 +67,10 @@ def json_script(value, element_id=None, encoder=None):
     """
     from django.core.serializers.json import DjangoJSONEncoder
 
-    json_str = json.dumps(value, cls=encoder or DjangoJSONEncoder).translate(
-        _json_script_escapes
-    )
+    json_str = json.dumps(
+        value, ensure_ascii=False, separators=(',', ':'),
+        cls=encoder or DjangoJSONEncoder
+    ).translate(_json_script_escapes)
     if element_id:
         template = '<script id="{}" type="application/json">{}</script>'
         args = (element_id, mark_safe(json_str))
