@@ -1841,6 +1841,7 @@ class Model(metaclass=ModelBase):
             )
         return errors
 
+    # RemovedInDjango51Warning.
     @classmethod
     def _check_index_together(cls):
         """Check the value of "index_together" option."""
