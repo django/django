@@ -305,20 +305,20 @@ body.popup .submit-row {
     line-height: 15px;
     margin: 0 5px 5px 5px;
     color: var(--button-fg);
-    vertical-align: top;
-    text-decoration: none;
 }
 
 .submit-row a.deletelink:focus,
 .submit-row a.deletelink:hover,
 .submit-row a.deletelink:active {
     background: var(--delete-button-hover-bg);
+    text-decoration: none;
 }
 
 .submit-row a.closelink:focus,
 .submit-row a.closelink:hover,
 .submit-row a.closelink:active {
     background: var(--close-button-hover-bg);
+    text-decoration: none;
 }
 
 /* CUSTOM FORM FIELDS */
