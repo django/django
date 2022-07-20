@@ -303,7 +303,7 @@ body.popup .submit-row {
     padding: 10px 15px;
     height: 15px;
     line-height: 15px;
-    margin: 0 5px 5px 5px;
+    margin: 0 5px 5px 0;
     color: var(--button-fg);
 }
 
