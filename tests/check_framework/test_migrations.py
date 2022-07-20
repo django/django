@@ -1,11 +1,7 @@
-from unittest.mock import ANY
-
 from django.core import checks
-from django.core.checks.migrations import check_migration_operations
 from django.db import migrations
 from django.db.migrations.operations.base import Operation
 from django.test import TestCase
-from django.test.utils import override_settings
 
 
 class DeprecatedMigrationOperationTests(TestCase):
@@ -50,23 +46,6 @@ class DeprecatedMigrationOperationTests(TestCase):
                     obj=my_operation,
                     hint="Use something else.",
                     id="migrations.W999",
-                )
-            ],
-        )
-
-    @override_settings(
-        INSTALLED_APPS=["check_framework.migrations_test_apps.index_together_app"]
-    )
-    def tests_check_alter_index_together(self):
-        errors = check_migration_operations()
-        self.assertEqual(
-            errors,
-            [
-                checks.Warning(
-                    "AlterIndexTogether is deprecated. Support for it (except in "
-                    "historical migrations) will be removed in Django 5.1.",
-                    obj=ANY,
-                    id="migrations.W001",
                 )
             ],
         )

@@ -319,8 +319,6 @@ Miscellaneous
   <https://docs.python.org/3/library/secrets.html#recipes-and-best-practices>`_
   for using Python's :py:mod:`secrets` module to generate passwords.
 
-* The ``AlterIndexTogether`` migration operation is deprecated.
-
 * The ``length_is`` template filter is deprecated in favor of :tfilter:`length`
   and the ``==`` operator within an :ttag:`{% if %}<if>` tag. For example
 

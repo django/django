@@ -19,9 +19,6 @@ details on these changes.
 
 * The model's ``Meta.index_together`` option will be removed.
 
-* The ``AlterIndexTogether`` migration operation will be removed. A stub
-  operation will remain for compatibility with historical migrations.
-
 * The ``length_is`` template filter will be removed.
 
 * The ``django.contrib.auth.hashers.SHA1PasswordHasher``,
