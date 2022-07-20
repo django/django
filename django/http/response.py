@@ -556,7 +556,9 @@ class FileResponse(StreamingHttpResponse):
             disposition = "attachment" if self.as_attachment else "inline"
             try:
                 filename.encode("ascii")
-                file_expr = 'filename="{}"'.format(filename)
+                file_expr = 'filename="{}"'.format(
+                    filename.replace("\\", "\\\\").replace('"', r"\"")
+                )
             except UnicodeEncodeError:
                 file_expr = "filename*=utf-8''{}".format(quote(filename))
             self.headers["Content-Disposition"] = "{}; {}".format(

@@ -6,4 +6,10 @@ Django 3.2.15 release notes
 
 Django 3.2.15 fixes a security issue with severity "high" in 3.2.14.
 
-...
+CVE-2022-36359: Potential reflected file download vulnerability in ``FileResponse``
+===================================================================================
+
+An application may have been vulnerable to a reflected file download (RFD)
+attack that sets the Content-Disposition header of a
+:class:`~django.http.FileResponse` when the ``filename`` was derived from
+user-supplied input. The ``filename`` is now escaped to avoid this possibility.
