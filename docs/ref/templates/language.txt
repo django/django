@@ -431,6 +431,14 @@ Here are some tips for working with inheritance:
   In larger templates, this technique helps you see which ``{% block %}``
   tags are being closed.
 
+* When a parent block is overridden in an if condition, the overridden content
+  is output regardless of the truthiness of the condition. For example, this
+  template will still override the content of its parent block::
+
+      {% if False %}
+          {% block content %}Foo{% endblock content %}
+      {% endif %}
+
 Finally, note that you can't define multiple :ttag:`block` tags with the same
 name in the same template. This limitation exists because a block tag works in
 "both" directions. That is, a block tag doesn't just provide a hole to fill --
