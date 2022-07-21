@@ -42,6 +42,7 @@ DEFAULT_NAMES = (
     "proxy",
     "swappable",
     "auto_created",
+    # Must be kept for backward compatibility with old migrations.
     "index_together",
     "apps",
     "default_permissions",
@@ -115,7 +116,7 @@ class Options:
         self.indexes = []
         self.constraints = []
         self.unique_together = []
-        self.index_together = []
+        self.index_together = []  # RemovedInDjango51Warning.
         self.select_on_save = False
         self.default_permissions = ("add", "change", "delete", "view")
         self.permissions = []

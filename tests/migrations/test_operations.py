@@ -2491,7 +2491,6 @@ class OperationTests(OperationTestBase):
             atomic=connection.features.supports_atomic_references_rename,
         )
 
-    @ignore_warnings(category=RemovedInDjango51Warning)
     def test_rename_field(self):
         """
         Tests the RenameField operation.
