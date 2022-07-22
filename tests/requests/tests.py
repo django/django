@@ -640,10 +640,11 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(request.POST, {"name": ["Hello GĂŒnter"]})
 
     def test_set_encoding_clears_GET(self):
+        payload = FakePayload("")
         request = WSGIRequest(
             {
                 "REQUEST_METHOD": "GET",
-                "wsgi.input": "",
+                "wsgi.input": payload,
                 "QUERY_STRING": "name=Hello%20G%C3%BCnter",
             }
         )
