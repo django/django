@@ -144,7 +144,7 @@ class ServerHandler(simple_server.ServerHandler):
             self.request_handler.close_connection = True
 
     def close(self):
-        self.get_stdin()._read_limited()
+        self.get_stdin().read()
         super().close()
 
 

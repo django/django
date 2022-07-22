@@ -523,6 +523,10 @@ Miscellaneous
 
 .. _`redis-py`: https://pypi.org/project/redis/
 
+* Manually instantiated ``WSGIRequest`` objects must be provided a file-like
+  object for ``wsgi.input``. Previously, Django was more lax than the expected
+  behavior as specified by the WSGI specification.
+
 .. _deprecated-features-4.2:
 
 Features deprecated in 4.2
