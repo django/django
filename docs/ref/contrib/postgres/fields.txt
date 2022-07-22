@@ -47,7 +47,9 @@ may be a good choice for the :ref:`range fields <range-fields>` and
         with the exception of those handling relational data
         (:class:`~django.db.models.ForeignKey`,
         :class:`~django.db.models.OneToOneField` and
-        :class:`~django.db.models.ManyToManyField`).
+        :class:`~django.db.models.ManyToManyField`) and file fields (
+        :class:`~django.db.models.FileField` and
+        :class:`~django.db.models.ImageField`).
 
         It is possible to nest array fields - you can specify an instance of
         ``ArrayField`` as the ``base_field``. For example::
