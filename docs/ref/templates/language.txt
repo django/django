@@ -431,9 +431,10 @@ Here are some tips for working with inheritance:
   In larger templates, this technique helps you see which ``{% block %}``
   tags are being closed.
 
-* When a parent block is overridden in an if condition, the overridden content
-  is output regardless of the truthiness of the condition. For example, this
-  template will still override the content of its parent block::
+* :ttag:`{% block %}<block>` tags are evaluated first. That's why the content
+  of a block is always overridden, regardless of the truthiness of surrounding
+  tags. For example, this template will *always* override the content of the
+  ``title`` block::
 
       {% if change_title %}
           {% block title %}Hello!{% endblock title %}
