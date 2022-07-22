@@ -610,7 +610,7 @@ class RequestsTests(SimpleTestCase):
         """
 
         class ExplodingBytesIO(BytesIO):
-            def read(self, len=0):
+            def read(self, size=-1, /):
                 raise OSError("kaboom!")
 
         payload = b"name=value"
@@ -659,7 +659,7 @@ class RequestsTests(SimpleTestCase):
         """
 
         class ExplodingBytesIO(BytesIO):
-            def read(self, len=0):
+            def read(self, size=-1, /):
                 raise OSError("kaboom!")
 
         payload = b"x"
