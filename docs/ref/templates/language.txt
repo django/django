@@ -435,8 +435,8 @@ Here are some tips for working with inheritance:
   is output regardless of the truthiness of the condition. For example, this
   template will still override the content of its parent block::
 
-      {% if False %}
-          {% block content %}Foo{% endblock content %}
+      {% if change_title %}
+          {% block title %}Hello!{% endblock title %}
       {% endif %}
 
 Finally, note that you can't define multiple :ttag:`block` tags with the same
