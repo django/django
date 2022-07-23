@@ -69,11 +69,45 @@ class NodeTests(unittest.TestCase):
         self.node1.negate()
         self.assertFalse(self.node1.negated)
 
+    def test_new_instance(self):
+        SubNode = type("SubNode", (Node,), {})
+
+        a = SubNode([SubNode(["a", "b"], OR), "c"], AND)
+        b = SubNode._new_instance(a.children, a.connector, a.negated)
+        self.assertEqual(a, b)
+        # Children lists are the same object, but equal.
+        self.assertIsNot(a.children, b.children)
+        self.assertEqual(a.children, b.children)
+        # Child Node objects are the same objects.
+        for a_child, b_child in zip(a.children, b.children):
+            if isinstance(a_child, Node):
+                self.assertIs(a_child, b_child)
+            self.assertEqual(a_child, b_child)
+
+    def test_copy(self):
+        a = Node([Node(["a", "b"], OR), "c"], AND)
+        b = copy.copy(a)
+        self.assertEqual(a, b)
+        # Children lists are the same object.
+        self.assertIs(a.children, b.children)
+        # Child Node objects are the same objects.
+        for a_child, b_child in zip(a.children, b.children):
+            if isinstance(a_child, Node):
+                self.assertIs(a_child, b_child)
+            self.assertEqual(a_child, b_child)
+
     def test_deepcopy(self):
-        node4 = copy.copy(self.node1)
-        node5 = copy.deepcopy(self.node1)
-        self.assertIs(self.node1.children, node4.children)
-        self.assertIsNot(self.node1.children, node5.children)
+        a = Node([Node(["a", "b"], OR), "c"], AND)
+        b = copy.deepcopy(a)
+        self.assertEqual(a, b)
+        # Children lists are not be the same object, but equal.
+        self.assertIsNot(a.children, b.children)
+        self.assertEqual(a.children, b.children)
+        # Child Node objects are not be the same objects.
+        for a_child, b_child in zip(a.children, b.children):
+            if isinstance(a_child, Node):
+                self.assertIsNot(a_child, b_child)
+            self.assertEqual(a_child, b_child)
 
     def test_eq_children(self):
         node = Node(self.node1_children)
