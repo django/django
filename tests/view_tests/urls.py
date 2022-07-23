@@ -31,6 +31,7 @@ urlpatterns = [
     # i18n views
     path("i18n/", include("django.conf.urls.i18n")),
     path("jsi18n/", i18n.JavaScriptCatalog.as_view(packages=["view_tests"])),
+    path("jsi18n_no_packages/", i18n.JavaScriptCatalog.as_view()),
     path("jsi18n/app1/", i18n.JavaScriptCatalog.as_view(packages=["view_tests.app1"])),
     path("jsi18n/app2/", i18n.JavaScriptCatalog.as_view(packages=["view_tests.app2"])),
     path("jsi18n/app5/", i18n.JavaScriptCatalog.as_view(packages=["view_tests.app5"])),
