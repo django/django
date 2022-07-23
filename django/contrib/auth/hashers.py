@@ -17,7 +17,7 @@ from django.utils.crypto import (
     md5,
     pbkdf2,
 )
-from django.utils.deprecation import RemovedInDjango50Warning
+from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_noop as _
 
@@ -624,12 +624,21 @@ class ScryptPasswordHasher(BasePasswordHasher):
         pass
 
 
+# RemovedInDjango51Warning.
 class SHA1PasswordHasher(BasePasswordHasher):
     """
     The SHA1 password hashing algorithm (not recommended)
     """
 
     algorithm = "sha1"
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "django.contrib.auth.hashers.SHA1PasswordHasher is deprecated.",
+            RemovedInDjango51Warning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
     def encode(self, password, salt):
         self._check_encode_args(password, salt)
@@ -708,6 +717,7 @@ class MD5PasswordHasher(BasePasswordHasher):
         pass
 
 
+# RemovedInDjango51Warning.
 class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
     """
     Very insecure algorithm that you should *never* use; store SHA1 hashes
@@ -719,6 +729,14 @@ class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
     """
 
     algorithm = "unsalted_sha1"
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher is deprecated.",
+            RemovedInDjango51Warning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
     def salt(self):
         return ""
@@ -752,6 +770,7 @@ class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
         pass
 
 
+# RemovedInDjango51Warning.
 class UnsaltedMD5PasswordHasher(BasePasswordHasher):
     """
     Incredibly insecure algorithm that you should *never* use; stores unsalted
@@ -765,6 +784,14 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
     """
 
     algorithm = "unsalted_md5"
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "django.contrib.auth.hashers.UnsaltedMD5PasswordHasher is deprecated.",
+            RemovedInDjango51Warning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
     def salt(self):
         return ""

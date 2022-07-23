@@ -24,6 +24,10 @@ details on these changes.
 
 * The ``length_is`` template filter will be removed.
 
+* The ``django.contrib.auth.hashers.SHA1PasswordHasher``,
+  ``django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher``, and
+  ``django.contrib.auth.hashers.UnsaltedMD5PasswordHasher`` will be removed.
+
 .. _deprecation-removed-in-5.0:
 
 5.0
