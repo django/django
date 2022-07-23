@@ -2658,7 +2658,7 @@ class JoinPromoter:
             # to rel_a would remove a valid match from the query. So, we need
             # to promote any existing INNER to LOUTER (it is possible this
             # promotion in turn will be demoted later on).
-            if self.effective_connector == "OR" and votes < self.num_children:
+            if self.effective_connector == OR and votes < self.num_children:
                 to_promote.add(table)
             # If connector is AND and there is a filter that can match only
             # when there is a joinable row, then use INNER. For example, in
@@ -2670,8 +2670,8 @@ class JoinPromoter:
             #     (rel_a__col__icontains=Alex | rel_a__col__icontains=Russell)
             # then if rel_a doesn't produce any rows, the whole condition
             # can't match. Hence we can safely use INNER join.
-            if self.effective_connector == "AND" or (
-                self.effective_connector == "OR" and votes == self.num_children
+            if self.effective_connector == AND or (
+                self.effective_connector == OR and votes == self.num_children
             ):
                 to_demote.add(table)
             # Finally, what happens in cases where we have:

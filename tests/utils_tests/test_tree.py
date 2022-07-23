@@ -1,6 +1,7 @@
 import copy
 import unittest
 
+from django.db.models.sql import AND, OR
 from django.utils.tree import Node
 
 
@@ -56,9 +57,9 @@ class NodeTests(unittest.TestCase):
         self.assertEqual(str(node3), "(DEFAULT: ('a', 1), ('b', 2), ('c', 3))")
 
     def test_add_eq_child_mixed_connector(self):
-        node = Node(["a", "b"], "OR")
-        self.assertEqual(node.add("a", "AND"), "a")
-        self.assertEqual(node, Node([Node(["a", "b"], "OR"), "a"], "AND"))
+        node = Node(["a", "b"], OR)
+        self.assertEqual(node.add("a", AND), "a")
+        self.assertEqual(node, Node([Node(["a", "b"], OR), "a"], AND))
 
     def test_negate(self):
         # negated is False by default
