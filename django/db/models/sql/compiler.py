@@ -19,6 +19,7 @@ from django.db.models.sql.constants import (
     SINGLE,
 )
 from django.db.models.sql.query import Query, get_order_dir
+from django.db.models.sql.where import AND
 from django.db.transaction import TransactionManagementError
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
@@ -1435,7 +1436,7 @@ class SQLCompiler:
         for index, select_col in enumerate(self.query.select):
             lhs_sql, lhs_params = self.compile(select_col)
             rhs = "%s.%s" % (qn(alias), qn2(columns[index]))
-            self.query.where.add(RawSQL("%s = %s" % (lhs_sql, rhs), lhs_params), "AND")
+            self.query.where.add(RawSQL("%s = %s" % (lhs_sql, rhs), lhs_params), AND)
 
         sql, params = self.as_sql()
         return "EXISTS (%s)" % sql, params

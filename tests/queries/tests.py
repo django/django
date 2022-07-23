@@ -10,7 +10,7 @@ from django.db import DEFAULT_DB_ALIAS, connection
 from django.db.models import Count, Exists, F, Max, OuterRef, Q
 from django.db.models.expressions import RawSQL
 from django.db.models.sql.constants import LOUTER
-from django.db.models.sql.where import NothingNode, WhereNode
+from django.db.models.sql.where import AND, OR, NothingNode, WhereNode
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext, ignore_warnings
 from django.utils.deprecation import RemovedInDjango50Warning
@@ -3559,16 +3559,16 @@ class WhereNodeTest(SimpleTestCase):
 
     def test_empty_full_handling_disjunction(self):
         compiler = WhereNodeTest.MockCompiler()
-        w = WhereNode(children=[NothingNode()], connector="OR")
+        w = WhereNode(children=[NothingNode()], connector=OR)
         with self.assertRaises(EmptyResultSet):
             w.as_sql(compiler, connection)
         w.negate()
         self.assertEqual(w.as_sql(compiler, connection), ("", []))
-        w = WhereNode(children=[self.DummyNode(), self.DummyNode()], connector="OR")
+        w = WhereNode(children=[self.DummyNode(), self.DummyNode()], connector=OR)
         self.assertEqual(w.as_sql(compiler, connection), ("(dummy OR dummy)", []))
         w.negate()
         self.assertEqual(w.as_sql(compiler, connection), ("NOT (dummy OR dummy)", []))
-        w = WhereNode(children=[NothingNode(), self.DummyNode()], connector="OR")
+        w = WhereNode(children=[NothingNode(), self.DummyNode()], connector=OR)
         self.assertEqual(w.as_sql(compiler, connection), ("dummy", []))
         w.negate()
         self.assertEqual(w.as_sql(compiler, connection), ("NOT (dummy)", []))
@@ -3581,14 +3581,14 @@ class WhereNodeTest(SimpleTestCase):
         w.negate()
         with self.assertRaises(EmptyResultSet):
             w.as_sql(compiler, connection)
-        w.connector = "OR"
+        w.connector = OR
         with self.assertRaises(EmptyResultSet):
             w.as_sql(compiler, connection)
         w.negate()
         self.assertEqual(w.as_sql(compiler, connection), ("", []))
-        w = WhereNode(children=[empty_w, NothingNode()], connector="OR")
+        w = WhereNode(children=[empty_w, NothingNode()], connector=OR)
         self.assertEqual(w.as_sql(compiler, connection), ("", []))
-        w = WhereNode(children=[empty_w, NothingNode()], connector="AND")
+        w = WhereNode(children=[empty_w, NothingNode()], connector=AND)
         with self.assertRaises(EmptyResultSet):
             w.as_sql(compiler, connection)
 
