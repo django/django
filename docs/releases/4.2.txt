@@ -332,3 +332,7 @@ Miscellaneous
 
     {% if value|length_is:4 %}…{% endif %}
     {{ value|length_is:4 }}
+
+* ``django.contrib.auth.hashers.SHA1PasswordHasher``,
+  ``django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher``, and
+  ``django.contrib.auth.hashers.UnsaltedMD5PasswordHasher`` are deprecated.
