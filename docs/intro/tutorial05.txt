@@ -491,7 +491,6 @@ class:
             If no questions exist, an appropriate message is displayed.
             """
             response = self.client.get(reverse('polls:index'))
-            self.assertEqual(response.status_code, 200)
             self.assertContains(response, "No polls are available.")
             self.assertQuerysetEqual(response.context['latest_question_list'], [])
 
@@ -515,7 +514,6 @@ class:
             """
             create_question(question_text="Future question.", days=30)
             response = self.client.get(reverse('polls:index'))
-            self.assertEqual(response.status_code, 200)
             self.assertContains(response, "No polls are available.")
             self.assertQuerysetEqual(response.context['latest_question_list'], [])
 
@@ -556,8 +554,10 @@ repetition out of the process of creating questions.
 "No polls are available." and verifies the ``latest_question_list`` is empty.
 Note that the :class:`django.test.TestCase` class provides some additional
 assertion methods. In these examples, we use
-:meth:`~django.test.SimpleTestCase.assertContains()` and
-:meth:`~django.test.TransactionTestCase.assertQuerysetEqual()`.
+:meth:`~django.test.SimpleTestCase.assertContains()` which checks the message
+and the status code, and
+:meth:`~django.test.TransactionTestCase.assertQuerysetEqual()` which checks the
+queryset.
 
 In ``test_past_question``, we create a question and verify that it appears in
 the list.
