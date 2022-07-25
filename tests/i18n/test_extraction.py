@@ -513,14 +513,14 @@ class BasicExtractorTests(ExtractorTests):
         cmd.default_locale_path = os.path.join(self.test_dir, "locale")
         found_files = cmd.find_files(self.test_dir)
         self.assertGreater(len(found_files), 1)
-        found_exts = {os.path.splitext(tfile.file)[1] for tfile in found_files}
+        found_exts = {os.path.splitext(tfile.path)[1] for tfile in found_files}
         self.assertEqual(found_exts.difference({".py", ".html", ".txt"}), set())
 
         cmd.extensions = [".js"]
         cmd.domain = "djangojs"
         found_files = cmd.find_files(self.test_dir)
         self.assertGreater(len(found_files), 1)
-        found_exts = {os.path.splitext(tfile.file)[1] for tfile in found_files}
+        found_exts = {os.path.splitext(tfile.path)[1] for tfile in found_files}
         self.assertEqual(found_exts.difference({".js"}), set())
 
     @mock.patch("django.core.management.commands.makemessages.popen_wrapper")
@@ -583,12 +583,11 @@ class BasicExtractorTests(ExtractorTests):
             'msgstr ""\n'
         )
         with tempfile.NamedTemporaryFile() as pot_file:
-            pot_filename = pot_file.name
+            pot_filename = Path(pot_file.name)
         write_pot_file(pot_filename, msgs)
-        with open(pot_filename, encoding="utf-8") as fp:
-            pot_contents = fp.read()
-            self.assertIn("Content-Type: text/plain; charset=UTF-8", pot_contents)
-            self.assertIn("mañana; charset=CHARSET", pot_contents)
+        pot_contents = pot_filename.read_text(encoding="utf-8")
+        self.assertIn("Content-Type: text/plain; charset=UTF-8", pot_contents)
+        self.assertIn("mañana; charset=CHARSET", pot_contents)
 
 
 class JavaScriptExtractorTests(ExtractorTests):
