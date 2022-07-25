@@ -3,6 +3,7 @@ import shutil
 import struct
 import tempfile
 import zipfile
+from pathlib import Path
 from unittest import mock
 
 from django.contrib.gis.gdal import GDALRaster, SpatialReference
@@ -24,6 +25,11 @@ class GDALRasterTests(SimpleTestCase):
             os.path.dirname(__file__), "../data/rasters/raster.tif"
         )
         self.rs = GDALRaster(self.rs_path)
+
+    def test_gdalraster_input_as_path(self):
+        rs_path = Path(__file__).parent.parent / "data" / "rasters" / "raster.tif"
+        rs = GDALRaster(rs_path)
+        self.assertEqual(str(rs_path), rs.name)
 
     def test_rs_name_repr(self):
         self.assertEqual(self.rs_path, self.rs.name)
