@@ -65,10 +65,6 @@ def get_commands():
     pairs from this dictionary can then be used in calls to
     load_command_class(app_name, command_name)
 
-    If a specific version of a command must be loaded (e.g., with the
-    startapp command), the instantiated module can be placed in the
-    dictionary in place of the application name.
-
     The dictionary is cached on the first call and reused on subsequent
     calls.
     """
