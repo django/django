@@ -57,6 +57,9 @@ Minor features
   ``id`` key for serialized features, which defaults to the primary key of
   objects.
 
+* The :class:`~django.contrib.gis.gdal.GDALRaster` class now supports
+  :class:`pathlib.Path`.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
