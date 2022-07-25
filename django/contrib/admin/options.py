@@ -1690,7 +1690,7 @@ class ModelAdmin(BaseModelAdmin):
                 has_change_permission = inline.has_change_permission(request, obj)
                 has_delete_permission = inline.has_delete_permission(request, obj)
             else:
-                # Disable all edit-permissions, and overide formset settings.
+                # Disable all edit-permissions, and override formset settings.
                 has_add_permission = (
                     has_change_permission
                 ) = has_delete_permission = False
