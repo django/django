@@ -195,8 +195,8 @@ this. For a small app like polls, this process isn't too difficult.
         :caption: ``django-polls/pyproject.toml``
 
         [build-system]
-        requires = ['setuptools>=40.8.0', 'wheel']
-        build-backend = 'setuptools.build_meta:__legacy__'
+        requires = ["setuptools>=61.0"]
+        build-backend = "setuptools.build_meta"
 
    .. code-block:: ini
         :caption: ``django-polls/setup.cfg``
@@ -242,8 +242,8 @@ this. For a small app like polls, this process isn't too difficult.
 #. Only Python modules and packages are included in the package by default. To
    include additional files, we'll need to create a ``MANIFEST.in`` file. The
    setuptools docs referred to in the previous step discuss this file in more
-   detail. To include the templates, the ``README.rst`` and our ``LICENSE``
-   file, create a file ``django-polls/MANIFEST.in`` with the following
+   detail. To include the static files, the template files, the ``README.rst`` and ``LICENSE``
+   files, create a file ``django-polls/MANIFEST.in`` with the following
    contents:
 
    .. code-block:: text
@@ -264,9 +264,10 @@ this. For a small app like polls, this process isn't too difficult.
    you add some files to it. Many Django apps also provide their documentation
    online through sites like `readthedocs.org <https://readthedocs.org>`_.
 
-#. Try building your package with ``python setup.py sdist`` (run from inside
+#. Try building your package with ``python -m build`` (run from inside
    ``django-polls``). This creates a directory called ``dist`` and builds your
-   new package, ``django-polls-0.1.tar.gz``.
+   new package in two formats: ``django-polls-0.1.tar.gz`` (the source package)
+   and ``django-polls-0.1-py3-none-any.whl`` (the built package).
 
 For more information on packaging, see Python's `Tutorial on Packaging and
 Distributing Projects
