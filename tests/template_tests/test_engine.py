@@ -1,5 +1,3 @@
-import os
-
 from django.core.exceptions import ImproperlyConfigured
 from django.template import Context
 from django.template.engine import Engine
@@ -7,7 +5,7 @@ from django.test import SimpleTestCase, override_settings
 
 from .utils import ROOT, TEMPLATE_DIR
 
-OTHER_DIR = os.path.join(ROOT, "other_templates")
+OTHER_DIR = ROOT / "other_templates"
 
 
 class EngineTest(SimpleTestCase):

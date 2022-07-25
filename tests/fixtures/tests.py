@@ -1,10 +1,10 @@
 import gzip
-import os
 import sys
 import tempfile
 import unittest
 import warnings
 from io import StringIO
+from pathlib import Path
 from unittest import mock
 
 from django.apps import apps
@@ -86,7 +86,7 @@ class DumpDataAssertMixin:
         primary_keys="",
     ):
         new_io = StringIO()
-        filename = filename and os.path.join(tempfile.gettempdir(), filename)
+        filename = filename and Path(tempfile.gettempdir()) / filename
         management.call_command(
             "dumpdata",
             *args,
@@ -101,7 +101,7 @@ class DumpDataAssertMixin:
             primary_keys=primary_keys,
         )
         if filename:
-            file_root, file_ext = os.path.splitext(filename)
+            file_root = filename.with_suffix("")
             compression_formats = {
                 ".bz2": (open, file_root),
                 ".gz": (gzip.open, filename),
@@ -115,12 +115,12 @@ class DumpDataAssertMixin:
                 compression_formats[".lzma"] = (lzma.open, filename)
                 compression_formats[".xz"] = (lzma.open, filename)
             try:
-                open_method, file_path = compression_formats[file_ext]
+                open_method, file_path = compression_formats[filename.suffix]
             except KeyError:
                 open_method, file_path = open, filename
             with open_method(file_path, "rt") as f:
                 command_output = f.read()
-            os.remove(file_path)
+            file_path.unlink()
         else:
             command_output = new_io.getvalue().strip()
         if format == "json":
@@ -1110,12 +1110,12 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
     def test_loading_stdin(self):
         """Loading fixtures from stdin with json and xml."""
-        tests_dir = os.path.dirname(__file__)
-        fixture_json = os.path.join(tests_dir, "fixtures", "fixture1.json")
-        fixture_xml = os.path.join(tests_dir, "fixtures", "fixture3.xml")
+        tests_dir = Path(__file__).parent
+        fixture_json = tests_dir / "fixtures" / "fixture1.json"
+        fixture_xml = tests_dir / "fixtures" / "fixture3.xml"
 
         with mock.patch(
-            "django.core.management.commands.loaddata.sys.stdin", open(fixture_json)
+            "django.core.management.commands.loaddata.sys.stdin", fixture_json.open()
         ):
             management.call_command("loaddata", "--format=json", "-", verbosity=0)
             self.assertSequenceEqual(
@@ -1124,7 +1124,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             )
 
         with mock.patch(
-            "django.core.management.commands.loaddata.sys.stdin", open(fixture_xml)
+            "django.core.management.commands.loaddata.sys.stdin", fixture_xml.open()
         ):
             management.call_command("loaddata", "--format=xml", "-", verbosity=0)
             self.assertSequenceEqual(

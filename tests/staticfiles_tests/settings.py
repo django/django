@@ -1,7 +1,7 @@
 import os.path
 from pathlib import Path
 
-TEST_ROOT = os.path.dirname(__file__)
+TEST_ROOT = Path(__file__).parent
 
 TEST_SETTINGS = {
     "MEDIA_URL": "media/",

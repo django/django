@@ -1,12 +1,12 @@
-import os
 from functools import wraps
+from pathlib import Path
 
 from django.template.engine import Engine
 from django.test.utils import override_settings
 from django.utils.safestring import mark_safe
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
-TEMPLATE_DIR = os.path.join(ROOT, "templates")
+ROOT = Path(__file__).parent
+TEMPLATE_DIR = ROOT / "templates"
 
 
 def setup(templates, *args, test_once=False):

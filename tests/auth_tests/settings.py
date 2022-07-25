@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 AUTH_MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -8,7 +8,7 @@ AUTH_MIDDLEWARE = [
 AUTH_TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(os.path.dirname(__file__), "templates")],
+        "DIRS": [Path(__file__).parent / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

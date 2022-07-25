@@ -1,8 +1,8 @@
 import gettext
-import os
 import re
 from datetime import datetime, timedelta
 from importlib import import_module
+from pathlib import Path
 from unittest import skipUnless
 
 try:
@@ -1089,9 +1089,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
 
         # Get month name translations for every locale
         month_string = "May"
-        path = os.path.join(
-            os.path.dirname(import_module("django.contrib.admin").__file__), "locale"
-        )
+        path = Path(import_module("django.contrib.admin").__file__).parent / "locale"
         for language_code, language_name in settings.LANGUAGES:
             try:
                 catalog = gettext.translation("djangojs", path, [language_code])
@@ -1788,7 +1786,7 @@ class ImageFieldWidgetsSeleniumTests(AdminWidgetSeleniumTestCase):
 
         photo_input_id = "id_photo"
         save_and_edit_button_css_selector = "input[value='Save and continue editing']"
-        tests_files_folder = "%s/files" % os.getcwd()
+        tests_files_folder = Path.cwd() / "files"
         clear_checkbox_id = "photo-clear_id"
 
         def _submit_and_wait():

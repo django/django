@@ -1,5 +1,4 @@
 import compileall
-import os
 from importlib import import_module
 
 from django.db import connection, connections
@@ -648,9 +647,9 @@ class PycLoaderTests(MigrationTestBase):
         ) as migration_dir:
             # Compile .py files to .pyc files and delete .py files.
             compileall.compile_dir(migration_dir, force=True, quiet=1, legacy=True)
-            for name in os.listdir(migration_dir):
-                if name.endswith(".py"):
-                    os.remove(os.path.join(migration_dir, name))
+            for path in migration_dir.iterdir():
+                if path.suffix == ".py":
+                    path.unlink()
             loader = MigrationLoader(connection)
             self.assertIn(("migrations", "0001_initial"), loader.disk_migrations)
 
@@ -663,9 +662,8 @@ class PycLoaderTests(MigrationTestBase):
             module="migrations.test_migrations_bad_pyc"
         ) as migration_dir:
             # The -tpl suffix is to avoid the pyc exclusion in MANIFEST.in.
-            os.rename(
-                os.path.join(migration_dir, "0001_initial.pyc-tpl"),
-                os.path.join(migration_dir, "0001_initial.pyc"),
+            migration_dir.joinpath("0001_initial.pyc-tpl").rename(
+                migration_dir / "0001_initial.pyc"
             )
             msg = (
                 r"Couldn't import '\w+.migrations.0001_initial' as it appears "

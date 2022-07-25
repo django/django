@@ -1,5 +1,6 @@
 import os
 import shutil
+from pathlib import Path
 from unittest import skipIf
 
 from django.core.exceptions import ImproperlyConfigured
@@ -55,11 +56,11 @@ class ImageFieldTestMixin(SerializeMixin):
             shutil.rmtree(temp_storage_dir)
         os.mkdir(temp_storage_dir)
 
-        file_path1 = os.path.join(os.path.dirname(__file__), "4x8.png")
-        self.file1 = self.File(open(file_path1, "rb"), name="4x8.png")
+        file_path1 = Path(__file__).parent / "4x8.png"
+        self.file1 = self.File(file_path1.open("rb"), name="4x8.png")
 
-        file_path2 = os.path.join(os.path.dirname(__file__), "8x4.png")
-        self.file2 = self.File(open(file_path2, "rb"), name="8x4.png")
+        file_path2 = Path(__file__).parent / "8x4.png"
+        self.file2 = self.File(file_path2.open("rb"), name="8x4.png")
 
     def tearDown(self):
         """

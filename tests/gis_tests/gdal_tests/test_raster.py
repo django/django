@@ -21,18 +21,16 @@ class GDALRasterTests(SimpleTestCase):
     """
 
     def setUp(self):
-        self.rs_path = os.path.join(
-            os.path.dirname(__file__), "../data/rasters/raster.tif"
-        )
+        self.rs_path = Path(__file__).parent.parent / "data" / "rasters" / "raster.tif"
         self.rs = GDALRaster(self.rs_path)
 
-    def test_gdalraster_input_as_path(self):
-        rs_path = Path(__file__).parent.parent / "data" / "rasters" / "raster.tif"
+    def test_gdalraster_input_as_str(self):
+        rs_path = os.path.join(os.path.dirname(__file__), "../data/rasters/raster.tif")
         rs = GDALRaster(rs_path)
         self.assertEqual(str(rs_path), rs.name)
 
     def test_rs_name_repr(self):
-        self.assertEqual(self.rs_path, self.rs.name)
+        self.assertEqual(str(self.rs_path), self.rs.name)
         self.assertRegex(repr(self.rs), r"<Raster object at 0x\w+>")
 
     def test_rs_driver(self):
@@ -756,7 +754,7 @@ class GDALRasterTests(SimpleTestCase):
 
 
 class GDALBandTests(SimpleTestCase):
-    rs_path = os.path.join(os.path.dirname(__file__), "../data/rasters/raster.tif")
+    rs_path = Path(__file__).parent.parent / "data" / "rasters" / "raster.tif"
 
     def test_band_data(self):
         rs = GDALRaster(self.rs_path)
@@ -781,11 +779,11 @@ class GDALBandTests(SimpleTestCase):
 
     def test_band_statistics(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
-            rs_path = os.path.join(tmp_dir, "raster.tif")
+            rs_path = Path(tmp_dir) / "raster.tif"
             shutil.copyfile(self.rs_path, rs_path)
             rs = GDALRaster(rs_path)
             band = rs.bands[0]
-            pam_file = rs_path + ".aux.xml"
+            pam_file = rs_path.with_suffix(".tif.aux.xml")
             smin, smax, smean, sstd = band.statistics(approximate=True)
             self.assertEqual(smin, 0)
             self.assertEqual(smax, 9)
@@ -805,12 +803,12 @@ class GDALBandTests(SimpleTestCase):
 
             # Statistics are persisted into PAM file on band close
             rs = band = None
-            self.assertTrue(os.path.isfile(pam_file))
+            self.assertTrue(pam_file.is_file())
 
     def _remove_aux_file(self):
-        pam_file = self.rs_path + ".aux.xml"
-        if os.path.isfile(pam_file):
-            os.remove(pam_file)
+        pam_file = self.rs_path.with_suffix(".tif.aux.xml")
+        if pam_file.is_file():
+            pam_file.unlink()
 
     def test_read_mode_error(self):
         # Open raster in read mode

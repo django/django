@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from unittest import mock
 
@@ -7,10 +6,10 @@ from django.test import SimpleTestCase, override_settings
 from django.urls.resolvers import LocaleRegexDescriptor, RegexPattern
 from django.utils import translation
 
-here = os.path.dirname(os.path.abspath(__file__))
+here = Path(__file__).parent
 
 
-@override_settings(LOCALE_PATHS=[os.path.join(here, "translations", "locale")])
+@override_settings(LOCALE_PATHS=[here / "translations" / "locale"])
 class LocaleRegexDescriptorTests(SimpleTestCase):
     def setUp(self):
         translation.trans_real._translations = {}

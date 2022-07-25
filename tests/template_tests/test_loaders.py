@@ -3,6 +3,7 @@ import sys
 import tempfile
 import unittest
 from contextlib import contextmanager
+from pathlib import Path
 
 from django.template import TemplateDoesNotExist
 from django.template.engine import Engine
@@ -28,7 +29,7 @@ class CachedLoaderTests(SimpleTestCase):
 
     def test_get_template(self):
         template = self.engine.get_template("index.html")
-        self.assertEqual(template.origin.name, os.path.join(TEMPLATE_DIR, "index.html"))
+        self.assertEqual(template.origin.name, str(TEMPLATE_DIR / "index.html"))
         self.assertEqual(template.origin.template_name, "index.html")
         self.assertEqual(
             template.origin.loader, self.engine.template_loaders[0].loaders[0]
@@ -39,7 +40,7 @@ class CachedLoaderTests(SimpleTestCase):
 
         # Run a second time from cache
         template = self.engine.get_template("index.html")
-        self.assertEqual(template.origin.name, os.path.join(TEMPLATE_DIR, "index.html"))
+        self.assertEqual(template.origin.name, str(TEMPLATE_DIR / "index.html"))
         self.assertEqual(template.origin.template_name, "index.html")
         self.assertEqual(
             template.origin.loader, self.engine.template_loaders[0].loaders[0]
@@ -151,7 +152,7 @@ class FileSystemLoaderTests(SimpleTestCase):
 
     def test_get_template(self):
         template = self.engine.get_template("index.html")
-        self.assertEqual(template.origin.name, os.path.join(TEMPLATE_DIR, "index.html"))
+        self.assertEqual(template.origin.name, str(TEMPLATE_DIR / "index.html"))
         self.assertEqual(template.origin.template_name, "index.html")
         self.assertEqual(template.origin.loader, self.engine.template_loaders[0])
         self.assertEqual(
@@ -163,7 +164,7 @@ class FileSystemLoaderTests(SimpleTestCase):
             loaders=[("django.template.loaders.filesystem.Loader", [TEMPLATE_DIR])]
         )
         template = engine.get_template("index.html")
-        self.assertEqual(template.origin.name, os.path.join(TEMPLATE_DIR, "index.html"))
+        self.assertEqual(template.origin.name, str(TEMPLATE_DIR / "index.html"))
 
     def test_loaders_dirs_empty(self):
         """An empty dirs list in loaders overrides top level dirs."""
@@ -219,9 +220,9 @@ class FileSystemLoaderTests(SimpleTestCase):
     )
     def test_permissions_error(self):
         with tempfile.NamedTemporaryFile() as tmpfile:
-            tmpdir = os.path.dirname(tmpfile.name)
-            tmppath = os.path.join(tmpdir, tmpfile.name)
-            os.chmod(tmppath, 0o0222)
+            tmpdir = Path(tmpfile.name).parent
+            tmppath = tmpdir / tmpfile.name
+            tmppath.chmod(0o0222)
             with self.set_dirs([tmpdir]):
                 with self.assertRaisesMessage(PermissionError, "Permission denied"):
                     self.engine.get_template(tmpfile.name)
@@ -245,7 +246,7 @@ class AppDirectoriesLoaderTests(SimpleTestCase):
     @override_settings(INSTALLED_APPS=["template_tests"])
     def test_get_template(self):
         template = self.engine.get_template("index.html")
-        self.assertEqual(template.origin.name, os.path.join(TEMPLATE_DIR, "index.html"))
+        self.assertEqual(template.origin.name, str(TEMPLATE_DIR / "index.html"))
         self.assertEqual(template.origin.template_name, "index.html")
         self.assertEqual(template.origin.loader, self.engine.template_loaders[0])
 

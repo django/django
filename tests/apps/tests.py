@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 from django.apps import AppConfig, apps
 from django.apps.registry import Apps
@@ -29,7 +29,7 @@ SOME_INSTALLED_APPS_NAMES = [
     "django.contrib.auth",
 ] + SOME_INSTALLED_APPS[2:]
 
-HERE = os.path.dirname(__file__)
+HERE = Path(__file__).parent
 
 
 class AppsTests(SimpleTestCase):
@@ -491,9 +491,9 @@ class NamespacePackageAppTests(SimpleTestCase):
     # location for it (if its inside a normal package with an __init__.py that
     # isn't possible). In order to avoid cluttering the already-full tests/ dir
     # (which is on sys.path), we add these new entries to sys.path temporarily.
-    base_location = os.path.join(HERE, "namespace_package_base")
-    other_location = os.path.join(HERE, "namespace_package_other_base")
-    app_path = os.path.join(base_location, "nsapp")
+    base_location = HERE / "namespace_package_base"
+    other_location = HERE / "namespace_package_other_base"
+    app_path = base_location / "nsapp"
 
     def test_single_path(self):
         """
@@ -502,7 +502,7 @@ class NamespacePackageAppTests(SimpleTestCase):
         with extend_sys_path(self.base_location):
             with self.settings(INSTALLED_APPS=["nsapp"]):
                 app_config = apps.get_app_config("nsapp")
-                self.assertEqual(app_config.path, self.app_path)
+                self.assertEqual(app_config.path, str(self.app_path))
 
     def test_multiple_paths(self):
         """
@@ -527,4 +527,4 @@ class NamespacePackageAppTests(SimpleTestCase):
         with extend_sys_path(self.base_location, self.other_location):
             with self.settings(INSTALLED_APPS=["nsapp.apps.NSAppConfig"]):
                 app_config = apps.get_app_config("nsapp")
-                self.assertEqual(app_config.path, self.app_path)
+                self.assertEqual(app_config.path, str(self.app_path))

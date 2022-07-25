@@ -1,4 +1,3 @@
-import os
 import re
 import tempfile
 import threading
@@ -104,7 +103,7 @@ class Tests(TestCase):
             connections = ConnectionHandler(settings_dict)
             connections["default"].ensure_connection()
             connections["default"].close()
-            self.assertTrue(os.path.isfile(os.path.join(tmp, "test.db")))
+            self.assertTrue(Path(tmp).joinpath("test.db").is_file())
 
     @mock.patch.object(connection, "get_database_version", return_value=(3, 8))
     def test_check_database_version_supported(self, mocked_get_database_version):

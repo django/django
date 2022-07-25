@@ -1,5 +1,5 @@
-import os
 import unittest
+from pathlib import Path
 
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile, TemporaryUploadedFile
@@ -15,9 +15,7 @@ except ImportError:
 
 
 def get_img_path(path):
-    return os.path.join(
-        os.path.abspath(os.path.join(__file__, "..", "..")), "tests", path
-    )
+    return Path(__file__).parent.parent / "tests" / path
 
 
 @unittest.skipUnless(Image, "Pillow is required to test ImageField")
@@ -25,10 +23,7 @@ class ImageFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
     def test_imagefield_annotate_with_image_after_clean(self):
         f = ImageField()
 
-        img_path = get_img_path("filepath_test_files/1x1.png")
-        with open(img_path, "rb") as img_file:
-            img_data = img_file.read()
-
+        img_data = get_img_path("filepath_test_files/1x1.png").read_bytes()
         img_file = SimpleUploadedFile("1x1.png", img_data)
         img_file.content_type = "text/plain"
 
@@ -47,10 +42,7 @@ class ImageFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         try:
             Image.register_mime(BmpImageFile.format, None)
             f = ImageField()
-            img_path = get_img_path("filepath_test_files/1x1.bmp")
-            with open(img_path, "rb") as img_file:
-                img_data = img_file.read()
-
+            img_data = get_img_path("filepath_test_files/1x1.bmp").read_bytes()
             img_file = SimpleUploadedFile("1x1.bmp", img_data)
             img_file.content_type = "text/plain"
 
@@ -63,9 +55,7 @@ class ImageFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
     def test_file_extension_validation(self):
         f = ImageField()
-        img_path = get_img_path("filepath_test_files/1x1.png")
-        with open(img_path, "rb") as img_file:
-            img_data = img_file.read()
+        img_data = get_img_path("filepath_test_files/1x1.png").read_bytes()
         img_file = SimpleUploadedFile("1x1.txt", img_data)
         with self.assertRaisesMessage(
             ValidationError, "File extension “txt” is not allowed."

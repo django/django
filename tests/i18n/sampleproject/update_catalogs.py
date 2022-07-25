@@ -29,29 +29,28 @@ How this script helps:
 import os
 import re
 import sys
+from pathlib import Path
 
-proj_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.abspath(os.path.join(proj_dir, "..", "..", "..")))
+proj_dir = Path(__file__).parent
+sys.path.append(str(proj_dir.parent.parent.parent))
 
 
 def update_translation_catalogs():
     """Run makemessages and compilemessages in sampleproject."""
     from django.core.management import call_command
 
-    prev_cwd = os.getcwd()
+    prev_cwd = Path().cwd()
 
     os.chdir(proj_dir)
     call_command("makemessages")
     call_command("compilemessages")
 
     # keep the diff friendly - remove 'POT-Creation-Date'
-    pofile = os.path.join(proj_dir, "locale", "fr", "LC_MESSAGES", "django.po")
+    pofile = proj_dir / "locale" / "fr" / "LC_MESSAGES" / "django.po"
 
-    with open(pofile) as f:
-        content = f.read()
+    content = pofile.read_text()
     content = re.sub(r'^"POT-Creation-Date.+$\s', "", content, flags=re.MULTILINE)
-    with open(pofile, "w") as f:
-        f.write(content)
+    pofile.write_text(content)
 
     os.chdir(prev_cwd)
 

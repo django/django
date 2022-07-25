@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
@@ -6,17 +6,15 @@ from django.utils.translation import activate, get_language, trans_real
 
 from .utils import POFileAssertionMixin
 
-SAMPLEPROJECT_DIR = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "sampleproject"
-)
-SAMPLEPROJECT_LOCALE = os.path.join(SAMPLEPROJECT_DIR, "locale")
+SAMPLEPROJECT_DIR = Path(__file__).parent / "sampleproject"
+SAMPLEPROJECT_LOCALE = SAMPLEPROJECT_DIR / "locale"
 
 
 @override_settings(LOCALE_PATHS=[SAMPLEPROJECT_LOCALE])
 class FrenchTestCase(SimpleTestCase):
     """Tests using the French translations of the sampleproject."""
 
-    PO_FILE = os.path.join(SAMPLEPROJECT_LOCALE, "fr", "LC_MESSAGES", "django.po")
+    PO_FILE = SAMPLEPROJECT_LOCALE / "fr" / "LC_MESSAGES" / "django.po"
 
     def setUp(self):
         self._language = get_language()
@@ -40,8 +38,7 @@ class ExtractingStringsWithPercentSigns(POFileAssertionMixin, FrenchTestCase):
 
     def setUp(self):
         super().setUp()
-        with open(self.PO_FILE) as fp:
-            self.po_contents = fp.read()
+        self.po_contents = self.PO_FILE.read_text()
 
     def test_trans_tag_with_percent_symbol_at_the_end(self):
         self.assertMsgId(

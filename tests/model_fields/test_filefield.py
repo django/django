@@ -116,14 +116,13 @@ class FileFieldTests(TestCase):
 
     def test_media_root_pathlib(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
-            with override_settings(MEDIA_ROOT=Path(tmp_dir)):
+            tmp_dir = Path(tmp_dir)
+            with override_settings(MEDIA_ROOT=tmp_dir):
                 with TemporaryUploadedFile(
                     "foo.txt", "text/plain", 1, "utf-8"
                 ) as tmp_file:
                     Document.objects.create(myfile=tmp_file)
-                    self.assertTrue(
-                        os.path.exists(os.path.join(tmp_dir, "unused", "foo.txt"))
-                    )
+                    self.assertTrue(tmp_dir.joinpath("unused", "foo.txt").exists())
 
     def test_pickle(self):
         with tempfile.TemporaryDirectory() as tmp_dir:

@@ -1,7 +1,6 @@
 import datetime
 import importlib
 import io
-import os
 import shutil
 import sys
 from unittest import mock
@@ -1369,8 +1368,8 @@ class MigrateTests(MigrationTestBase):
             try:
                 call_command("migrate", "migrations", verbosity=0)
                 # Delete the replaced migrations.
-                os.remove(os.path.join(migration_dir, "0001_initial.py"))
-                os.remove(os.path.join(migration_dir, "0002_second.py"))
+                migration_dir.joinpath("0001_initial.py").unlink()
+                migration_dir.joinpath("0002_second.py").unlink()
                 # --prune cannot be used before removing the "replaces"
                 # attribute.
                 call_command(
@@ -1444,26 +1443,22 @@ class MakeMigrationsTests(MigrationTestBase):
             call_command("makemigrations", "migrations", verbosity=0)
 
             # Check for empty __init__.py file in migrations folder
-            init_file = os.path.join(migration_dir, "__init__.py")
-            self.assertTrue(os.path.exists(init_file))
-
-            with open(init_file) as fp:
-                content = fp.read()
-            self.assertEqual(content, "")
+            init_file = migration_dir / "__init__.py"
+            self.assertTrue(init_file.exists())
+            self.assertEqual(init_file.read_text(), "")
 
             # Check for existing 0001_initial.py file in migration folder
-            initial_file = os.path.join(migration_dir, "0001_initial.py")
-            self.assertTrue(os.path.exists(initial_file))
+            initial_file = migration_dir / "0001_initial.py"
+            self.assertTrue(initial_file.exists())
 
-            with open(initial_file, encoding="utf-8") as fp:
-                content = fp.read()
-                self.assertIn("migrations.CreateModel", content)
-                self.assertIn("initial = True", content)
+            content = initial_file.read_text(encoding="utf-8")
+            self.assertIn("migrations.CreateModel", content)
+            self.assertIn("initial = True", content)
 
-                self.assertIn("úñí©óðé µóðéø", content)  # Meta.verbose_name
-                self.assertIn("úñí©óðé µóðéøß", content)  # Meta.verbose_name_plural
-                self.assertIn("ÚÑÍ¢ÓÐÉ", content)  # title.verbose_name
-                self.assertIn("“Ðjáñgó”", content)  # title.default
+            self.assertIn("úñí©óðé µóðéø", content)  # Meta.verbose_name
+            self.assertIn("úñí©óðé µóðéøß", content)  # Meta.verbose_name_plural
+            self.assertIn("ÚÑÍ¢ÓÐÉ", content)  # title.verbose_name
+            self.assertIn("“Ðjáñgó”", content)  # title.default
 
     def test_makemigrations_order(self):
         """
@@ -1478,7 +1473,7 @@ class MakeMigrationsTests(MigrationTestBase):
             call_command(
                 "makemigrations", "migrations", "--empty", "-n", "a", "-v", "0"
             )
-            self.assertTrue(os.path.exists(os.path.join(migration_dir, "0002_a.py")))
+            self.assertTrue(migration_dir.joinpath("0002_a.py").exists())
 
     def test_makemigrations_empty_connections(self):
         empty_connections = ConnectionHandler({"default": {}})
@@ -1493,8 +1488,8 @@ class MakeMigrationsTests(MigrationTestBase):
             # with an app
             with self.temporary_migration_module() as migration_dir:
                 call_command("makemigrations", "migrations", verbosity=0)
-                init_file = os.path.join(migration_dir, "__init__.py")
-                self.assertTrue(os.path.exists(init_file))
+                init_file = migration_dir / "__init__.py"
+                self.assertTrue(init_file.exists())
 
     @override_settings(INSTALLED_APPS=["migrations", "migrations2"])
     def test_makemigrations_consistency_checks_respect_routers(self):
@@ -1516,8 +1511,8 @@ class MakeMigrationsTests(MigrationTestBase):
         ) as has_table:
             with self.temporary_migration_module() as migration_dir:
                 call_command("makemigrations", "migrations", verbosity=0)
-                initial_file = os.path.join(migration_dir, "0001_initial.py")
-                self.assertTrue(os.path.exists(initial_file))
+                initial_file = migration_dir / "0001_initial.py"
+                self.assertTrue(initial_file.exists())
                 self.assertEqual(has_table.call_count, 1)  # 'default' is checked
 
                 # Router says not to migrate 'other' so consistency shouldn't
@@ -1565,8 +1560,8 @@ class MakeMigrationsTests(MigrationTestBase):
             with self.assertRaisesMessage(ValueError, "Cannot serialize"):
                 call_command("makemigrations", "migrations", verbosity=0)
 
-            initial_file = os.path.join(migration_dir, "0001_initial.py")
-            self.assertFalse(os.path.exists(initial_file))
+            initial_file = migration_dir / "0001_initial.py"
+            self.assertFalse(initial_file.exists())
 
     def test_makemigrations_conflict_exit(self):
         """
@@ -1610,20 +1605,16 @@ class MakeMigrationsTests(MigrationTestBase):
             call_command("makemigrations", "migrations", empty=True, verbosity=0)
 
             # Check for existing 0001_initial.py file in migration folder
-            initial_file = os.path.join(migration_dir, "0001_initial.py")
-            self.assertTrue(os.path.exists(initial_file))
+            initial_file = migration_dir / "0001_initial.py"
+            self.assertTrue(initial_file.exists())
 
-            with open(initial_file, encoding="utf-8") as fp:
-                content = fp.read()
-
-                # Remove all whitespace to check for empty dependencies and operations
-                content = content.replace(" ", "")
-                self.assertIn(
-                    "dependencies=[]" if HAS_BLACK else "dependencies=[\n]", content
-                )
-                self.assertIn(
-                    "operations=[]" if HAS_BLACK else "operations=[\n]", content
-                )
+            content = initial_file.read_text()
+            # Remove all whitespace to check for empty dependencies and operations
+            content = content.replace(" ", "")
+            self.assertIn(
+                "dependencies=[]" if HAS_BLACK else "dependencies=[\n]", content
+            )
+            self.assertIn("operations=[]" if HAS_BLACK else "operations=[\n]", content)
 
     @override_settings(MIGRATION_MODULES={"migrations": None})
     def test_makemigrations_disabled_migrations_for_app(self):
@@ -1717,8 +1708,8 @@ class MakeMigrationsTests(MigrationTestBase):
                         interactive=True,
                         verbosity=0,
                     )
-                merge_file = os.path.join(migration_dir, "0003_merge.py")
-                self.assertFalse(os.path.exists(merge_file))
+                merge_file = migration_dir / "0003_merge.py"
+                self.assertFalse(merge_file.exists())
 
     def test_makemigrations_interactive_accept(self):
         """
@@ -1738,8 +1729,8 @@ class MakeMigrationsTests(MigrationTestBase):
                     interactive=True,
                     stdout=out,
                 )
-                merge_file = os.path.join(migration_dir, "0003_merge.py")
-                self.assertTrue(os.path.exists(merge_file))
+                merge_file = migration_dir / "0003_merge.py"
+                self.assertTrue(merge_file.exists())
             self.assertIn("Created new merge migration", out.getvalue())
 
     def test_makemigrations_default_merge_name(self):
@@ -1754,13 +1745,11 @@ class MakeMigrationsTests(MigrationTestBase):
                 interactive=False,
                 stdout=out,
             )
-            merge_file = os.path.join(
-                migration_dir,
-                "0003_merge_0002_conflicting_second_0002_second.py",
+            merge_file = (
+                migration_dir / "0003_merge_0002_conflicting_second_0002_second.py"
             )
-            self.assertIs(os.path.exists(merge_file), True)
-            with open(merge_file, encoding="utf-8") as fp:
-                content = fp.read()
+            self.assertIs(merge_file.exists(), True)
+            content = merge_file.read_text(encoding="utf-8")
             if HAS_BLACK:
                 target_str = '("migrations", "0002_conflicting_second")'
             else:
@@ -1783,8 +1772,8 @@ class MakeMigrationsTests(MigrationTestBase):
                     interactive=True,
                     stdout=out,
                 )
-                merge_file = os.path.join(migration_dir, "0003_merge_20160102_0304.py")
-                self.assertTrue(os.path.exists(merge_file))
+                merge_file = migration_dir / "0003_merge_20160102_0304.py"
+                self.assertTrue(merge_file.exists())
             self.assertIn("Created new merge migration", out.getvalue())
 
     def test_makemigrations_non_interactive_not_null_addition(self):
@@ -2022,8 +2011,8 @@ class MakeMigrationsTests(MigrationTestBase):
                 interactive=False,
                 stdout=out,
             )
-            merge_file = os.path.join(migration_dir, "0003_merge.py")
-            self.assertTrue(os.path.exists(merge_file))
+            merge_file = migration_dir / "0003_merge.py"
+            self.assertTrue(merge_file.exists())
         output = out.getvalue()
         self.assertIn("Merging migrations", output)
         self.assertIn("Branch 0002_second", output)
@@ -2048,8 +2037,8 @@ class MakeMigrationsTests(MigrationTestBase):
                 interactive=False,
                 stdout=out,
             )
-            merge_file = os.path.join(migration_dir, "0003_merge.py")
-            self.assertFalse(os.path.exists(merge_file))
+            merge_file = migration_dir / "0003_merge.py"
+            self.assertFalse(merge_file.exists())
         output = out.getvalue()
         self.assertIn("Merging migrations", output)
         self.assertIn("Branch 0002_second", output)
@@ -2075,8 +2064,8 @@ class MakeMigrationsTests(MigrationTestBase):
                 stdout=out,
                 verbosity=3,
             )
-            merge_file = os.path.join(migration_dir, "0003_merge.py")
-            self.assertFalse(os.path.exists(merge_file))
+            merge_file = migration_dir / "0003_merge.py"
+            self.assertFalse(merge_file.exists())
         output = out.getvalue()
         self.assertIn("Merging migrations", output)
         self.assertIn("Branch 0002_second", output)
@@ -2163,7 +2152,7 @@ class MakeMigrationsTests(MigrationTestBase):
                 stdout=out,
                 stderr=err,
             )
-        initial_file = os.path.join(migration_dir, "0001_initial.py")
+        initial_file = migration_dir / "0001_initial.py"
         self.assertEqual(out.getvalue(), f"{initial_file}\n")
         self.assertIn("    - Create model ModelWithCustomBase\n", err.getvalue())
 
@@ -2183,7 +2172,7 @@ class MakeMigrationsTests(MigrationTestBase):
                 stdout=out,
                 stderr=err,
             )
-        merge_file = os.path.join(migration_dir, "0003_merge.py")
+        merge_file = migration_dir / "0003_merge.py"
         self.assertEqual(out.getvalue(), f"{merge_file}\n")
         self.assertIn(f"Created new merge migration {merge_file}", err.getvalue())
 
@@ -2206,8 +2195,8 @@ class MakeMigrationsTests(MigrationTestBase):
             call_command("makemigrations", "migrations", stdout=out)
 
             # Migrations file is actually created in the expected path.
-            initial_file = os.path.join(migration_dir, "0001_initial.py")
-            self.assertTrue(os.path.exists(initial_file))
+            initial_file = migration_dir / "0001_initial.py"
+            self.assertTrue(initial_file.exists())
 
         # Command output indicates the migration is created.
         self.assertIn(" - Create model SillyModel", out.getvalue())
@@ -2237,9 +2226,9 @@ class MakeMigrationsTests(MigrationTestBase):
                 call_command(
                     "makemigrations", "migrations", name="merge", merge=True, stdout=out
                 )
-                merge_file = os.path.join(migration_dir, "0003_merge.py")
+                merge_file = migration_dir / "0003_merge.py"
                 # This will fail if interactive is False by default
-                self.assertFalse(os.path.exists(merge_file))
+                self.assertFalse(merge_file.exists())
             self.assertNotIn("Created new merge migration", out.getvalue())
 
     @override_settings(
@@ -2283,8 +2272,8 @@ class MakeMigrationsTests(MigrationTestBase):
                     interactive=True,
                     stdout=out,
                 )
-                merge_file = os.path.join(migration_dir, "0003_merge.py")
-                self.assertFalse(os.path.exists(merge_file))
+                merge_file = migration_dir / "0003_merge.py"
+                self.assertFalse(merge_file.exists())
             self.assertIn("No conflicts detected to merge.", out.getvalue())
 
     @override_settings(
@@ -2344,14 +2333,13 @@ class MakeMigrationsTests(MigrationTestBase):
                     migration_name,
                     *args,
                 )
-                migration_file = os.path.join(
-                    migration_dir, "%s_%s.py" % (migration_count, migration_name)
+                migration_file = (
+                    migration_dir / f"{migration_count}_{migration_name}.py"
                 )
                 # Check for existing migration file in migration folder
-                self.assertTrue(os.path.exists(migration_file))
-                with open(migration_file, encoding="utf-8") as fp:
-                    content = fp.read()
-                    content = content.replace(" ", "")
+                self.assertTrue(migration_file.exists())
+                content = migration_file.read_text(encoding="utf-8")
+                content = content.replace(" ", "")
                 return content
 
             # generate an initial migration
@@ -2394,7 +2382,7 @@ class MakeMigrationsTests(MigrationTestBase):
         with self.temporary_migration_module() as tmpdir:
             with self.assertRaises(SystemExit):
                 call_command("makemigrations", "--check", "migrations", verbosity=0)
-            self.assertFalse(os.path.exists(tmpdir))
+            self.assertFalse(tmpdir.exists())
 
         with self.temporary_migration_module(
             module="migrations.test_migrations_no_changes"
@@ -2411,9 +2399,7 @@ class MakeMigrationsTests(MigrationTestBase):
         apps.register_model("migrations", UnicodeModel)
         with self.temporary_migration_module() as migration_dir:
             call_command("makemigrations", "migrations", stdout=out)
-            self.assertIn(
-                os.path.join(migration_dir, "0001_initial.py"), out.getvalue()
-            )
+            self.assertIn(str(migration_dir / "0001_initial.py"), out.getvalue())
 
     def test_makemigrations_migration_path_output_valueerror(self):
         """
@@ -2426,7 +2412,7 @@ class MakeMigrationsTests(MigrationTestBase):
         with self.temporary_migration_module() as migration_dir:
             with mock.patch("os.path.relpath", side_effect=ValueError):
                 call_command("makemigrations", "migrations", stdout=out)
-        self.assertIn(os.path.join(migration_dir, "0001_initial.py"), out.getvalue())
+        self.assertIn(str(migration_dir / "0001_initial.py"), out.getvalue())
 
     def test_makemigrations_inconsistent_history(self):
         """
@@ -2609,44 +2595,34 @@ class MakeMigrationsTests(MigrationTestBase):
         with self.temporary_migration_module(
             module="migrations.test_migrations"
         ) as migration_dir:
-            migration_file = os.path.join(migration_dir, "0002_second.py")
-            with open(migration_file) as fp:
-                initial_content = fp.read()
+            migration_file = migration_dir / "0002_second.py"
+            initial_content = migration_file.read_text()
 
             with captured_stdout() as out:
                 call_command("makemigrations", "migrations", update=True)
             self.assertFalse(
-                any(
-                    filename.startswith("0003")
-                    for filename in os.listdir(migration_dir)
-                )
+                any(path.name.startswith("0003") for path in migration_dir.iterdir())
             )
-            self.assertIs(os.path.exists(migration_file), False)
-            new_migration_file = os.path.join(
-                migration_dir,
-                "0002_delete_tribble_author_rating_modelwithcustombase_and_more.py",
+            self.assertFalse(migration_file.exists())
+            new_migration_file = (
+                migration_dir
+                / "0002_delete_tribble_author_rating_modelwithcustombase_and_more.py"
             )
-            with open(new_migration_file) as fp:
-                self.assertNotEqual(initial_content, fp.read())
+            self.assertNotEqual(initial_content, new_migration_file.read_text())
             self.assertIn(f"Deleted {migration_file}", out.getvalue())
 
     def test_makemigrations_update_existing_name(self):
         with self.temporary_migration_module(
             module="migrations.test_auto_now_add"
         ) as migration_dir:
-            migration_file = os.path.join(migration_dir, "0001_initial.py")
-            with open(migration_file) as fp:
-                initial_content = fp.read()
+            migration_file = migration_dir / "0001_initial.py"
+            initial_content = migration_file.read_text()
 
             with captured_stdout() as out:
                 call_command("makemigrations", "migrations", update=True)
-            self.assertIs(os.path.exists(migration_file), False)
-            new_migration_file = os.path.join(
-                migration_dir,
-                "0001_initial_updated.py",
-            )
-            with open(new_migration_file) as fp:
-                self.assertNotEqual(initial_content, fp.read())
+            self.assertFalse(migration_file.exists())
+            new_migration_file = migration_dir / "0001_initial_updated.py"
+            self.assertNotEqual(initial_content, new_migration_file.read_text())
             self.assertIn(f"Deleted {migration_file}", out.getvalue())
 
     def test_makemigrations_update_applied_migration(self):
@@ -2679,12 +2655,14 @@ class MakeMigrationsTests(MigrationTestBase):
             with captured_stdout() as out:
                 call_command("makemigrations", "migrations", update=True)
             # Previous migration exists.
-            previous_migration_file = os.path.join(migration_dir, "0005_fifth.py")
-            self.assertIs(os.path.exists(previous_migration_file), True)
+            previous_migration_file = migration_dir / "0005_fifth.py"
+            self.assertTrue(previous_migration_file.exists())
             # New updated migration exists.
-            files = [f for f in os.listdir(migration_dir) if f.startswith("0005_auto")]
-            updated_migration_file = os.path.join(migration_dir, files[0])
-            self.assertIs(os.path.exists(updated_migration_file), True)
+            files = [
+                f for f in migration_dir.iterdir() if f.name.startswith("0005_auto")
+            ]
+            updated_migration_file = migration_dir / files[0]
+            self.assertTrue(updated_migration_file.exists())
             self.assertIn(
                 f"Updated migration {updated_migration_file} requires manual porting.\n"
                 f"Previous migration {previous_migration_file} was kept and must be "
@@ -2730,10 +2708,8 @@ class SquashMigrationsTests(MigrationTestBase):
                 no_color=True,
             )
 
-            squashed_migration_file = os.path.join(
-                migration_dir, "0001_squashed_0002_second.py"
-            )
-            self.assertTrue(os.path.exists(squashed_migration_file))
+            squashed_migration_file = migration_dir / "0001_squashed_0002_second.py"
+            self.assertTrue(squashed_migration_file.exists())
         self.assertEqual(
             out.getvalue(),
             "Will squash the following migrations:\n"
@@ -2757,12 +2733,9 @@ class SquashMigrationsTests(MigrationTestBase):
                 "squashmigrations", "migrations", "0002", interactive=False, verbosity=0
             )
 
-            squashed_migration_file = os.path.join(
-                migration_dir, "0001_squashed_0002_second.py"
-            )
-            with open(squashed_migration_file, encoding="utf-8") as fp:
-                content = fp.read()
-                self.assertIn("initial = True", content)
+            squashed_migration_file = migration_dir / "0001_squashed_0002_second.py"
+            content = squashed_migration_file.read_text()
+            self.assertIn("initial = True", content)
 
     def test_squashmigrations_optimizes(self):
         """
@@ -2815,17 +2788,16 @@ class SquashMigrationsTests(MigrationTestBase):
                 stdout=out,
             )
 
-            squashed_migration_file = os.path.join(
-                migration_dir, "0002_second_squashed_0003_third.py"
+            squashed_migration_file = (
+                migration_dir / "0002_second_squashed_0003_third.py"
             )
-            with open(squashed_migration_file, encoding="utf-8") as fp:
-                content = fp.read()
-                if HAS_BLACK:
-                    test_str = '        ("migrations", "0001_initial")'
-                else:
-                    test_str = "        ('migrations', '0001_initial')"
-                self.assertIn(test_str, content)
-                self.assertNotIn("initial = True", content)
+            content = squashed_migration_file.read_text()
+            if HAS_BLACK:
+                test_str = '        ("migrations", "0001_initial")'
+            else:
+                test_str = "        ('migrations', '0001_initial')"
+            self.assertIn(test_str, content)
+            self.assertNotIn("initial = True", content)
         out = out.getvalue()
         self.assertNotIn(" - 0001_initial", out)
         self.assertIn(" - 0002_second", out)
@@ -2867,10 +2839,8 @@ class SquashMigrationsTests(MigrationTestBase):
                 interactive=False,
                 verbosity=0,
             )
-            squashed_migration_file = os.path.join(
-                migration_dir, "0001_%s.py" % squashed_name
-            )
-            self.assertTrue(os.path.exists(squashed_migration_file))
+            squashed_migration_file = migration_dir / f"0001_{squashed_name}.py"
+            self.assertTrue(squashed_migration_file.exists())
 
     def test_squashed_name_without_start_migration_name(self):
         """--squashed-name also works if a start migration is omitted."""
@@ -2886,10 +2856,8 @@ class SquashMigrationsTests(MigrationTestBase):
                 interactive=False,
                 verbosity=0,
             )
-            squashed_migration_file = os.path.join(
-                migration_dir, "0001_%s.py" % squashed_name
-            )
-            self.assertTrue(os.path.exists(squashed_migration_file))
+            squashed_migration_file = migration_dir / f"0001_{squashed_name}.py"
+            self.assertTrue(squashed_migration_file.exists())
 
     def test_squashed_name_exists(self):
         msg = "Migration 0001_initial already exists. Use a different name."
@@ -2918,11 +2886,8 @@ class SquashMigrationsTests(MigrationTestBase):
                 stdout=out,
                 no_color=True,
             )
-            squashed_migration_file = os.path.join(
-                migration_dir,
-                "0001_squashed_0002_second.py",
-            )
-            self.assertTrue(os.path.exists(squashed_migration_file))
+            squashed_migration_file = migration_dir / "0001_squashed_0002_second.py"
+            self.assertTrue(squashed_migration_file.exists())
         black_warning = ""
         if HAS_BLACK:
             black_warning = (
@@ -3030,8 +2995,8 @@ class OptimizeMigrationTests(MigrationTestBase):
             call_command(
                 "optimizemigration", "migrations", "0002", stdout=out, no_color=True
             )
-            migration_file = os.path.join(migration_dir, "0002_second.py")
-            self.assertTrue(os.path.exists(migration_file))
+            migration_file = migration_dir / "0002_second.py"
+            self.assertTrue(migration_file.exists())
             call_command(
                 "optimizemigration",
                 "migrations",
@@ -3050,16 +3015,15 @@ class OptimizeMigrationTests(MigrationTestBase):
             call_command(
                 "optimizemigration", "migrations", "0001", stdout=out, no_color=True
             )
-            initial_migration_file = os.path.join(migration_dir, "0001_initial.py")
-            self.assertTrue(os.path.exists(initial_migration_file))
-            with open(initial_migration_file) as fp:
-                content = fp.read()
-                self.assertIn(
-                    '("bool", models.BooleanField'
-                    if HAS_BLACK
-                    else "('bool', models.BooleanField",
-                    content,
-                )
+            initial_migration_file = migration_dir / "0001_initial.py"
+            self.assertTrue(initial_migration_file.exists())
+            content = initial_migration_file.read_text()
+            self.assertIn(
+                '("bool", models.BooleanField'
+                if HAS_BLACK
+                else "('bool', models.BooleanField",
+                content,
+            )
         self.assertEqual(
             out.getvalue(),
             f"Optimizing from 4 operations to 2 operations.\n"
@@ -3079,16 +3043,15 @@ class OptimizeMigrationTests(MigrationTestBase):
                 no_color=True,
                 verbosity=0,
             )
-            initial_migration_file = os.path.join(migration_dir, "0001_initial.py")
-            self.assertTrue(os.path.exists(initial_migration_file))
-            with open(initial_migration_file) as fp:
-                content = fp.read()
-                self.assertIn(
-                    '("bool", models.BooleanField'
-                    if HAS_BLACK
-                    else "('bool', models.BooleanField",
-                    content,
-                )
+            initial_migration_file = migration_dir / "0001_initial.py"
+            self.assertTrue(initial_migration_file.exists())
+            content = initial_migration_file.read_text()
+            self.assertIn(
+                '("bool", models.BooleanField'
+                if HAS_BLACK
+                else "('bool', models.BooleanField",
+                content,
+            )
         self.assertEqual(out.getvalue(), "")
 
     def test_creates_replace_migration_manual_porting(self):
@@ -3099,13 +3062,10 @@ class OptimizeMigrationTests(MigrationTestBase):
             call_command(
                 "optimizemigration", "migrations", "0003", stdout=out, no_color=True
             )
-            optimized_migration_file = os.path.join(
-                migration_dir, "0003_third_optimized.py"
-            )
-            self.assertTrue(os.path.exists(optimized_migration_file))
-            with open(optimized_migration_file) as fp:
-                content = fp.read()
-                self.assertIn("replaces = [", content)
+            optimized_migration_file = migration_dir / "0003_third_optimized.py"
+            self.assertTrue(optimized_migration_file.exists())
+            content = optimized_migration_file.read_text()
+            self.assertIn("replaces = [", content)
         black_warning = ""
         if HAS_BLACK:
             black_warning = (
@@ -3137,10 +3097,8 @@ class OptimizeMigrationTests(MigrationTestBase):
             )
             with self.assertRaisesMessage(CommandError, msg):
                 call_command("optimizemigration", "migrations", "0004", stdout=out)
-            optimized_migration_file = os.path.join(
-                migration_dir, "0004_fourth_optimized.py"
-            )
-            self.assertFalse(os.path.exists(optimized_migration_file))
+            optimized_migration_file = migration_dir / "0004_fourth_optimized.py"
+            self.assertFalse(optimized_migration_file.exists())
         self.assertEqual(
             out.getvalue(), "Optimizing from 3 operations to 2 operations.\n"
         )

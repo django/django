@@ -61,9 +61,9 @@ warnings.filterwarnings(
 # much increase in memory usage.
 gc.set_threshold(100_000)
 
-RUNTESTS_DIR = os.path.abspath(os.path.dirname(__file__))
+RUNTESTS_DIR = Path(__file__).parent.resolve()
 
-TEMPLATE_DIR = os.path.join(RUNTESTS_DIR, "templates")
+TEMPLATE_DIR = RUNTESTS_DIR / "templates"
 
 # Create a specific subdirectory for the duration of the test suite.
 TMPDIR = tempfile.mkdtemp(prefix="django_")
@@ -125,7 +125,7 @@ def get_test_modules(gis_enabled):
         SUBDIRS_TO_SKIP[""].add("gis_tests")
 
     for dirname in discovery_dirs:
-        dirpath = os.path.join(RUNTESTS_DIR, dirname)
+        dirpath = RUNTESTS_DIR / dirname
         subdirs_to_skip = SUBDIRS_TO_SKIP[dirname]
         with os.scandir(dirpath) as entries:
             for f in entries:
@@ -390,9 +390,7 @@ def django_tests(
         max_parallel = parallel
 
     if verbosity >= 1:
-        msg = "Testing against Django installed in '%s'" % os.path.dirname(
-            django.__file__
-        )
+        msg = "Testing against Django installed in '%s'" % Path(django.__file__).parent
         if max_parallel > 1:
             msg += " with up to %d processes" % max_parallel
         print(msg)

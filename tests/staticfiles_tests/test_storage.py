@@ -363,11 +363,11 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
     def setUp(self):
         super().setUp()
 
-        temp_dir = tempfile.mkdtemp()
-        os.makedirs(os.path.join(temp_dir, "test"))
-        self._clear_filename = os.path.join(temp_dir, "test", "cleared.txt")
-        with open(self._clear_filename, "w") as f:
-            f.write("to be deleted in one test")
+        temp_dir = Path(tempfile.mkdtemp())
+        self._clear_filename = temp_dir / "test" / "cleared.txt"
+        self._clear_filename.parent.mkdir()
+        self._clear_filename.write_text("to be deleted in one test")
+        self.addCleanup(self._clear_filename.unlink, missing_ok=True)
 
         self.patched_settings = self.settings(
             STATICFILES_DIRS=settings.STATICFILES_DIRS + [temp_dir],
@@ -378,10 +378,6 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
 
     def tearDown(self):
         self.patched_settings.disable()
-
-        if os.path.exists(self._clear_filename):
-            os.unlink(self._clear_filename)
-
         storage.staticfiles_storage.manifest_strict = self._manifest_strict
         super().tearDown()
 
@@ -437,7 +433,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         self.assertTrue(os.path.exists(original_path))
 
         # delete the original file form the app, collect with clear
-        os.unlink(self._clear_filename)
+        self._clear_filename.unlink()
         self.run_collectstatic(clear=True)
 
         self.assertFileNotFound(original_path)
@@ -476,14 +472,14 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         self.hashed_file_path(missing_file_name)
 
     def test_intermediate_files(self):
-        cached_files = os.listdir(os.path.join(settings.STATIC_ROOT, "cached"))
+        cached_files = Path(settings.STATIC_ROOT).joinpath("cached").iterdir()
         # Intermediate files shouldn't be created for reference.
         self.assertEqual(
             len(
                 [
                     cached_file
                     for cached_file in cached_files
-                    if cached_file.startswith("relative.")
+                    if cached_file.name.startswith("relative.")
                 ]
             ),
             2,
@@ -568,7 +564,7 @@ class TestCustomManifestStorage(SimpleTestCase):
         )
 
     def test_read_manifest_nonexistent(self):
-        os.remove(self.manifest_file)
+        self.manifest_file.unlink()
         self.assertIsNone(self.staticfiles_storage.read_manifest())
 
     def test_save_manifest_override(self):
@@ -580,7 +576,7 @@ class TestCustomManifestStorage(SimpleTestCase):
         self.assertNotEqual(new_manifest, self.manifest)
 
     def test_save_manifest_create(self):
-        os.remove(self.manifest_file)
+        self.manifest_file.unlink()
         self.staticfiles_storage.save_manifest()
         self.assertIs(self.manifest_file.exists(), True)
         new_manifest = json.loads(self.staticfiles_storage.read_manifest())
@@ -696,12 +692,12 @@ class TestCollectionHashedFilesCache(CollectionTestCase):
 
     def setUp(self):
         super().setUp()
-        self._temp_dir = temp_dir = tempfile.mkdtemp()
-        os.makedirs(os.path.join(temp_dir, "test"))
+        self._temp_dir = temp_dir = Path(tempfile.mkdtemp())
+        temp_dir.joinpath("test").mkdir()
         self.addCleanup(shutil.rmtree, temp_dir)
 
     def _get_filename_path(self, filename):
-        return os.path.join(self._temp_dir, "test", filename)
+        return self._temp_dir / "test" / filename
 
     def test_file_change_after_collectstatic(self):
         # Create initial static files.
@@ -711,10 +707,9 @@ class TestCollectionHashedFilesCache(CollectionTestCase):
             ("xyz.png", "xyz"),
         )
         for filename, content in file_contents:
-            with open(self._get_filename_path(filename), "w") as f:
-                f.write(content)
+            self._get_filename_path(filename).write_text(content)
 
-        with self.modify_settings(STATICFILES_DIRS={"append": self._temp_dir}):
+        with self.modify_settings(STATICFILES_DIRS={"append": [self._temp_dir]}):
             finders.get_finder.cache_clear()
             err = StringIO()
             # First collectstatic run.
@@ -727,8 +722,9 @@ class TestCollectionHashedFilesCache(CollectionTestCase):
 
             # Change the contents of the png files.
             for filename in ("foo.png", "xyz.png"):
-                with open(self._get_filename_path(filename), "w+b") as f:
-                    f.write(b"new content of file to change its hash")
+                self._get_filename_path(filename).write_bytes(
+                    b"new content of file to change its hash"
+                )
 
             # The hashes of the png files in the CSS file are updated after
             # a second collectstatic.

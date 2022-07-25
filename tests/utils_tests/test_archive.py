@@ -3,6 +3,7 @@ import stat
 import sys
 import tempfile
 import unittest
+from pathlib import Path
 
 from django.core.exceptions import SuspiciousOperation
 from django.test import SimpleTestCase
@@ -25,8 +26,8 @@ except ImportError:
 
 class TestArchive(unittest.TestCase):
     def setUp(self):
-        self.testdir = os.path.join(os.path.dirname(__file__), "archives")
-        self.old_cwd = os.getcwd()
+        self.testdir = Path(__file__).parent / "archives"
+        self.old_cwd = Path.cwd()
         os.chdir(self.testdir)
 
     def tearDown(self):
@@ -36,21 +37,18 @@ class TestArchive(unittest.TestCase):
         with os.scandir(self.testdir) as entries:
             for entry in entries:
                 with self.subTest(entry.name), tempfile.TemporaryDirectory() as tmpdir:
+                    tmpdir = Path(tmpdir)
                     if (entry.name.endswith(".bz2") and not HAS_BZ2) or (
                         entry.name.endswith((".lzma", ".xz")) and not HAS_LZMA
                     ):
                         continue
                     archive.extract(entry.path, tmpdir)
-                    self.assertTrue(os.path.isfile(os.path.join(tmpdir, "1")))
-                    self.assertTrue(os.path.isfile(os.path.join(tmpdir, "2")))
-                    self.assertTrue(os.path.isfile(os.path.join(tmpdir, "foo", "1")))
-                    self.assertTrue(os.path.isfile(os.path.join(tmpdir, "foo", "2")))
-                    self.assertTrue(
-                        os.path.isfile(os.path.join(tmpdir, "foo", "bar", "1"))
-                    )
-                    self.assertTrue(
-                        os.path.isfile(os.path.join(tmpdir, "foo", "bar", "2"))
-                    )
+                    self.assertTrue(tmpdir.joinpath("1").is_file())
+                    self.assertTrue(tmpdir.joinpath("2").is_file())
+                    self.assertTrue(tmpdir.joinpath("foo", "1").is_file())
+                    self.assertTrue(tmpdir.joinpath("foo", "2").is_file())
+                    self.assertTrue(tmpdir.joinpath("foo", "bar", "1").is_file())
+                    self.assertTrue(tmpdir.joinpath("foo", "bar", "2").is_file())
 
     @unittest.skipIf(
         sys.platform == "win32", "Python on Windows has a limited os.chmod()."
@@ -69,19 +67,20 @@ class TestArchive(unittest.TestCase):
                 ):
                     continue
                 with self.subTest(entry.name), tempfile.TemporaryDirectory() as tmpdir:
+                    tmpdir = Path(tmpdir)
                     archive.extract(entry.path, tmpdir)
                     # An executable file in the archive has executable
                     # permissions.
-                    filepath = os.path.join(tmpdir, "executable")
-                    self.assertEqual(os.stat(filepath).st_mode & mask, 0o775)
+                    filepath = tmpdir / "executable"
+                    self.assertEqual(filepath.stat().st_mode & mask, 0o775)
                     # A file is readable even if permission data is missing.
-                    filepath = os.path.join(tmpdir, "no_permissions")
-                    self.assertEqual(os.stat(filepath).st_mode & mask, 0o666 & ~umask)
+                    filepath = tmpdir / "no_permissions"
+                    self.assertEqual(filepath.stat().st_mode & mask, 0o666 & ~umask)
 
 
 class TestArchiveInvalid(SimpleTestCase):
     def test_extract_function_traversal(self):
-        archives_dir = os.path.join(os.path.dirname(__file__), "traversal_archives")
+        archives_dir = Path(__file__).parent / "traversal_archives"
         tests = [
             ("traversal.tar", ".."),
             ("traversal_absolute.tar", "/tmp/evil.py"),
@@ -95,4 +94,4 @@ class TestArchiveInvalid(SimpleTestCase):
         for entry, invalid_path in tests:
             with self.subTest(entry), tempfile.TemporaryDirectory() as tmpdir:
                 with self.assertRaisesMessage(SuspiciousOperation, msg % invalid_path):
-                    archive.extract(os.path.join(archives_dir, entry), tmpdir)
+                    archive.extract(archives_dir / entry, tmpdir)
