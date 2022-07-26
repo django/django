@@ -615,14 +615,6 @@ class AlterIndexTogether(AlterTogetherOptionOperation):
 
     option_name = "index_together"
 
-    system_check_deprecated_details = {
-        "msg": (
-            "AlterIndexTogether is deprecated. Support for it (except in historical "
-            "migrations) will be removed in Django 5.1."
-        ),
-        "id": "migrations.W001",
-    }
-
     def __init__(self, name, index_together):
         super().__init__(name, index_together)
 

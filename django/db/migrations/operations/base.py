@@ -1,8 +1,7 @@
 from django.db import router
-from django.utils.deprecation import DeprecationForHistoricalMigrationMixin
 
 
-class Operation(DeprecationForHistoricalMigrationMixin):
+class Operation:
     """
     Base class for migration operations.
 
@@ -33,8 +32,6 @@ class Operation(DeprecationForHistoricalMigrationMixin):
     elidable = False
 
     serialization_expand_args = []
-
-    check_type = "migrations"
 
     def __new__(cls, *args, **kwargs):
         # We capture the arguments to make returning them trivial

@@ -219,12 +219,6 @@ class Migration:
             name = new_name
         return name
 
-    def check(self):
-        errors = []
-        for operation in self.operations:
-            errors.extend(operation.check_deprecation_details())
-        return errors
-
 
 class SwappableTuple(tuple):
     """

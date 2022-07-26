@@ -102,16 +102,17 @@ subclass).
 
 .. class:: AlterIndexTogether(name, index_together)
 
-Changes the model's set of custom indexes (the
-:attr:`~django.db.models.Options.index_together` option on the ``Meta``
-subclass).
+Changes the model's set of custom indexes (the ``index_together`` option on the
+``Meta`` subclass).
 
-.. deprecated:: 4.2
+.. warning::
 
-    ``AlterIndexTogether`` is deprecated in favor of
-    :class:`~django.db.migrations.operations.AddIndex`,
-    :class:`~django.db.migrations.operations.RemoveIndex`, and
-    :class:`~django.db.migrations.operations.RenameIndex` operations.
+    ``AlterIndexTogether`` is officially supported only for pre-Django 4.2
+    migration files. For backward compatibility reasons, it's still part of the
+    public API, and there's no plan to deprecate or remove it, but it should
+    not be used for new migrations. Use
+    :class:`~django.db.migrations.operations.AddIndex` and
+    :class:`~django.db.migrations.operations.RemoveIndex` operations instead.
 
 ``AlterOrderWithRespectTo``
 ---------------------------

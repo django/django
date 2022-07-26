@@ -503,56 +503,6 @@ database migrations such as ``__init__()``, ``deconstruct()``, and
 which reference the field exist. For example, after squashing migrations and
 removing the old ones, you should be able to remove the field completely.
 
-.. _migrations-removing-operation:
-
-Considerations when removing migration operations
-=================================================
-
-.. versionadded:: 4.2
-
-Removing custom operations from your project or third-party app will cause a
-problem if they are referenced in old migrations.
-
-To help with this situation, Django provides some operation attributes to
-assist with operation deprecation using the :doc:`system checks framework
-</topics/checks>`.
-
-Add the ``system_check_deprecated_details`` attribute to your operation similar
-to the following::
-
-    class MyCustomOperation(Operation):
-        system_check_deprecated_details = {
-            "msg": (
-                "MyCustomOperation has been deprecated. Support for it "
-                "(except in historical migrations) will be removed in "
-                "Django 5.1."
-            ),
-            "hint": "Use DifferentOperation instead.",  # optional
-            "id": "migrations.W900",  # pick a unique ID for your operation.
-        }
-
-After a deprecation period of your choosing (two or three feature releases for
-operations in Django itself), change the ``system_check_deprecated_details``
-attribute to ``system_check_removed_details`` and update the dictionary similar
-to::
-
-    class MyCustomOperation(Operation):
-        system_check_removed_details = {
-            "msg": (
-                "MyCustomOperation has been removed except for support in "
-                "historical migrations."
-            ),
-            "hint': "Use DifferentOperation instead.",
-            "id": "migrations.E900",  # pick a unique ID for your operation.
-        }
-
-You should keep the operation's methods that are required for it to operate in
-database migrations such as ``__init__()``, ``state_forwards()``,
-``database_forwards()``, and ``database_backwards()``. Keep this stub operation
-for as long as any migrations which reference the operation exist. For example,
-after squashing migrations and removing the old ones, you should be able to
-remove the operation completely.
-
 .. _data-migrations:
 
 Data Migrations

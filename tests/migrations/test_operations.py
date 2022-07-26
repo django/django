@@ -3353,7 +3353,6 @@ class OperationTests(OperationTestBase):
             definition[2], {"name": "Pony", "index_together": {("pink", "weight")}}
         )
 
-    # RemovedInDjango51Warning.
     def test_alter_index_together_remove(self):
         operation = migrations.AlterIndexTogether("Pony", None)
         self.assertEqual(

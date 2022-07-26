@@ -172,8 +172,7 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* The new :ref:`generic mechanism <migrations-removing-operation>` allows
-  handling the deprecation of migration operations.
+* ...
 
 Models
 ~~~~~~
@@ -311,6 +310,13 @@ Running the :djadmin:`makemigrations` command will generate a migration
 containing a :class:`~django.db.migrations.operations.RenameIndex` operation
 which will rename the existing index.
 
+The ``AlterIndexTogether`` migration operation is now officially supported only
+for pre-Django 4.2 migration files. For backward compatibility reasons, it's
+still part of the public API, and there's no plan to deprecate or remove it,
+but it should not be used for new migrations. Use
+:class:`~django.db.migrations.operations.AddIndex` and
+:class:`~django.db.migrations.operations.RemoveIndex` operations instead.
+
 Miscellaneous
 -------------
 
@@ -318,8 +324,6 @@ Miscellaneous
   `recipes and best practices
   <https://docs.python.org/3/library/secrets.html#recipes-and-best-practices>`_
   for using Python's :py:mod:`secrets` module to generate passwords.
-
-* The ``AlterIndexTogether`` migration operation is deprecated.
 
 * The ``length_is`` template filter is deprecated in favor of :tfilter:`length`
   and the ``==`` operator within an :ttag:`{% if %}<if>` tag. For example

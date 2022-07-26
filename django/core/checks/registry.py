@@ -15,7 +15,6 @@ class Tags:
     compatibility = "compatibility"
     database = "database"
     files = "files"
-    migrations = "migrations"
     models = "models"
     security = "security"
     signals = "signals"
