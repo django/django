@@ -1290,6 +1290,12 @@ def create_many_to_many_intermediary_model(field, klass):
             "apps": field.model._meta.apps,
         },
     )
+
+    def to_str(self):
+        from_label = getattr(self, self.__from_field)
+        to_label = getattr(self, self.__to_field)
+        return _("“%(from)s” to “%(to)s”") % {"from": from_label, "to": to_label}
+
     # Construct and return the new class.
     return type(
         name,
@@ -1297,6 +1303,9 @@ def create_many_to_many_intermediary_model(field, klass):
         {
             "Meta": meta,
             "__module__": klass.__module__,
+            "__str__": to_str,
+            "__to_field": to,
+            "__from_field": from_,
             from_: models.ForeignKey(
                 klass,
                 related_name="%s+" % name,
