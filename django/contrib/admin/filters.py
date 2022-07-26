@@ -202,10 +202,7 @@ class RelatedFieldListFilter(FieldListFilter):
         return self.field.null or (self.field.is_relation and self.field.many_to_many)
 
     def has_output(self):
-        if self.include_empty_choice:
-            extra = 1
-        else:
-            extra = 0
+        extra = 1 if self.include_empty_choice else 0
         return len(self.lookup_choices) + extra > 1
 
     def expected_parameters(self):

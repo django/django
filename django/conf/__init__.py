@@ -46,8 +46,8 @@ class SettingsReference(str):
     the value in memory but serializes to a settings.NAME attribute reference.
     """
 
-    def __new__(self, value, setting_name):
-        return str.__new__(self, value)
+    def __new__(cls, value, setting_name):
+        return str.__new__(cls, value)
 
     def __init__(self, value, setting_name):
         self.setting_name = setting_name
@@ -68,7 +68,7 @@ class LazySettings(LazyObject):
         """
         settings_module = os.environ.get(ENVIRONMENT_VARIABLE)
         if not settings_module:
-            desc = ("setting %s" % name) if name else "settings"
+            desc = f"setting {name}" if name else "settings"
             raise ImproperlyConfigured(
                 "Requested %s, but settings are not configured. "
                 "You must either define the environment variable %s "
@@ -147,7 +147,7 @@ class LazySettings(LazyObject):
             return value
         from django.urls import get_script_prefix
 
-        return "%s%s" % (get_script_prefix(), value)
+        return f"{get_script_prefix()}{value}"
 
     @property
     def configured(self):
@@ -204,9 +204,7 @@ class Settings:
                 if setting in tuple_settings and not isinstance(
                     setting_value, (list, tuple)
                 ):
-                    raise ImproperlyConfigured(
-                        "The %s setting must be a list or a tuple." % setting
-                    )
+                    raise ImproperlyConfigured(f"The {setting} setting must be a list or a tuple.")
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
@@ -230,7 +228,7 @@ class Settings:
             zoneinfo_root = Path("/usr/share/zoneinfo")
             zone_info_file = zoneinfo_root.joinpath(*self.TIME_ZONE.split("/"))
             if zoneinfo_root.exists() and not zone_info_file.exists():
-                raise ValueError("Incorrect timezone setting: %s" % self.TIME_ZONE)
+                raise ValueError(f"Incorrect timezone setting: {self.TIME_ZONE}")
             # Move the time zone info into os.environ. See ticket #2315 for why
             # we don't do this unconditionally (breaks Windows).
             os.environ["TZ"] = self.TIME_ZONE

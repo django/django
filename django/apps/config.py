@@ -119,7 +119,7 @@ class AppConfig:
             # If the apps module defines more than one AppConfig subclass,
             # the default one can declare default = True.
             if module_has_submodule(app_module, APPS_MODULE_NAME):
-                mod_path = "%s.%s" % (entry, APPS_MODULE_NAME)
+                mod_path = f"{entry}.{APPS_MODULE_NAME}"
                 mod = import_module(mod_path)
                 # Check if there's exactly one AppConfig candidate,
                 # excluding those that explicitly define default = False.
@@ -186,7 +186,7 @@ class AppConfig:
                     cls_name,
                 )
                 if candidates:
-                    msg += " Choices are: %s." % ", ".join(candidates)
+                    msg += f' Choices are: {", ".join(candidates)}.'
                 raise ImportError(msg)
             else:
                 # Re-trigger the module import exception.
@@ -202,21 +202,15 @@ class AppConfig:
         if app_name is None:
             try:
                 app_name = app_config_class.name
-            except AttributeError:
-                raise ImproperlyConfigured("'%s' must supply a name attribute." % entry)
+            except AttributeError as e:
+                raise ImproperlyConfigured("'%s' must supply a name attribute." % entry) from e
 
         # Ensure app_name points to a valid module.
         try:
             app_module = import_module(app_name)
-        except ImportError:
-            raise ImproperlyConfigured(
-                "Cannot import '%s'. Check that '%s.%s.name' is correct."
-                % (
-                    app_name,
-                    app_config_class.__module__,
-                    app_config_class.__qualname__,
-                )
-            )
+        except ImportError as exc:
+            raise ImproperlyConfigured("Cannot import '%s'. Check that '%s.%s.name' is correct." % (app_name, app_config_class.__module__, app_config_class.__qualname__,)) from exc
+
 
         # Entry is a path to an app config class.
         return app_config_class(app_name, app_module)
@@ -233,10 +227,8 @@ class AppConfig:
             self.apps.check_apps_ready()
         try:
             return self.models[model_name.lower()]
-        except KeyError:
-            raise LookupError(
-                "App '%s' doesn't have a '%s' model." % (self.label, model_name)
-            )
+        except KeyError as e:
+            raise LookupError("App '%s' doesn't have a '%s' model." % (self.label, model_name)) from e
 
     def get_models(self, include_auto_created=False, include_swapped=False):
         """
@@ -265,7 +257,7 @@ class AppConfig:
         self.models = self.apps.all_models[self.label]
 
         if module_has_submodule(self.module, MODELS_MODULE_NAME):
-            models_module_name = "%s.%s" % (self.name, MODELS_MODULE_NAME)
+            models_module_name = f"{self.name}.{MODELS_MODULE_NAME}"
             self.models_module = import_module(models_module_name)
 
     def ready(self):

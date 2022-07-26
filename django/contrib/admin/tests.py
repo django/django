@@ -152,10 +152,7 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         Select the <OPTION> with the value `value` inside the <SELECT> widget
         identified by the CSS selector `selector`.
         """
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.support.ui import Select
-
-        select = Select(self.selenium.find_element(By.CSS_SELECTOR, selector))
+        select = self._extracted_from_deselect_option_3(selector)
         select.select_by_value(value)
 
     def deselect_option(self, selector, value):
@@ -163,11 +160,14 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         Deselect the <OPTION> with the value `value` inside the <SELECT> widget
         identified by the CSS selector `selector`.
         """
+        select = self._extracted_from_deselect_option_3(selector)
+        select.deselect_by_value(value)
+
+    # TODO Rename this here and in `select_option` and `deselect_option`
+    def _extracted_from_deselect_option_3(self, selector):
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support.ui import Select
-
-        select = Select(self.selenium.find_element(By.CSS_SELECTOR, selector))
-        select.deselect_by_value(value)
+        return Select(self.selenium.find_element(By.CSS_SELECTOR, selector))
 
     def assertCountSeleniumElements(self, selector, count, root_element=None):
         """
@@ -187,9 +187,7 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
 
         if values:
             options = self.selenium.find_elements(By.CSS_SELECTOR, options_selector)
-            actual_values = []
-            for option in options:
-                actual_values.append(option.get_attribute("value"))
+            actual_values = [option.get_attribute("value") for option in options]
             self.assertEqual(values, actual_values)
         else:
             # Prevent the `find_elements(By.CSS_SELECTOR, …)` call from blocking

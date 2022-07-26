@@ -85,10 +85,7 @@ class Apps:
 
             # Phase 1: initialize app configs and import app modules.
             for entry in installed_apps:
-                if isinstance(entry, AppConfig):
-                    app_config = entry
-                else:
-                    app_config = AppConfig.create(entry)
+                app_config = entry if isinstance(entry, AppConfig) else AppConfig.create(entry)
                 if app_config.label in self.app_configs:
                     raise ImproperlyConfigured(
                         "Application labels aren't unique, "
@@ -102,8 +99,7 @@ class Apps:
             counts = Counter(
                 app_config.name for app_config in self.app_configs.values()
             )
-            duplicates = [name for name, count in counts.most_common() if count > 1]
-            if duplicates:
+            if duplicates := [name for name, count in counts.most_common() if count > 1]:
                 raise ImproperlyConfigured(
                     "Application names aren't unique, "
                     "duplicates: %s" % ", ".join(duplicates)
@@ -156,13 +152,13 @@ class Apps:
         self.check_apps_ready()
         try:
             return self.app_configs[app_label]
-        except KeyError:
+        except KeyError as e:
             message = "No installed app with label '%s'." % app_label
             for app_config in self.get_app_configs():
                 if app_config.name == app_label:
                     message += " Did you mean '%s'?" % app_config.label
                     break
-            raise LookupError(message)
+            raise LookupError(message) from e
 
     # This method is performance-critical at least for Django's test suite.
     @functools.lru_cache(maxsize=None)

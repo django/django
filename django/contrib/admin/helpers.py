@@ -284,10 +284,7 @@ class AdminReadonlyField:
                 if getattr(attr, "boolean", False):
                     result_repr = _boolean_icon(value)
                 else:
-                    if hasattr(value, "__html__"):
-                        result_repr = value
-                    else:
-                        result_repr = linebreaksbr(value)
+                    result_repr = value if hasattr(value, "__html__") else linebreaksbr(value)
             else:
                 if isinstance(f.remote_field, ManyToManyRel) and value is not None:
                     result_repr = ", ".join(map(str, value.all()))
@@ -384,7 +381,7 @@ class InlineAdminFormSet:
         empty_form = self.formset.empty_form
         meta_labels = empty_form._meta.labels or {}
         meta_help_texts = empty_form._meta.help_texts or {}
-        for i, field_name in enumerate(flatten_fieldsets(self.fieldsets)):
+        for field_name in flatten_fieldsets(self.fieldsets):
             if fk and fk.name == field_name:
                 continue
             if not self.has_change_permission or field_name in self.readonly_fields:

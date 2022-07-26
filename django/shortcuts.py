@@ -83,10 +83,8 @@ def get_object_or_404(klass, *args, **kwargs):
         )
     try:
         return queryset.get(*args, **kwargs)
-    except queryset.model.DoesNotExist:
-        raise Http404(
-            "No %s matches the given query." % queryset.model._meta.object_name
-        )
+    except queryset.model.DoesNotExist as e:
+        raise Http404(f"No {queryset.model._meta.object_name} matches the given query.") from e
 
 
 def get_list_or_404(klass, *args, **kwargs):
@@ -108,9 +106,8 @@ def get_list_or_404(klass, *args, **kwargs):
         )
     obj_list = list(queryset.filter(*args, **kwargs))
     if not obj_list:
-        raise Http404(
-            "No %s matches the given query." % queryset.model._meta.object_name
-        )
+        raise Http404(f"No {queryset.model._meta.object_name} matches the given query.")
+
     return obj_list
 
 

@@ -1,3 +1,4 @@
+import contextlib
 import copy
 import json
 import re
@@ -864,7 +865,7 @@ class ModelAdmin(BaseModelAdmin):
         try:
             object_id = field.to_python(object_id)
             return queryset.get(**{field.name: object_id})
-        except (model.DoesNotExist, ValidationError, ValueError):
+        except (model.DoesNotExist, ValueError):
             return None
 
     def get_changelist_form(self, request, **kwargs):
@@ -1200,13 +1201,11 @@ class ModelAdmin(BaseModelAdmin):
             # attempt to get the level if passed a string
             try:
                 level = getattr(messages.constants, level.upper())
-            except AttributeError:
+            except AttributeError as e:
                 levels = messages.constants.DEFAULT_TAGS.values()
                 levels_repr = ", ".join("`%s`" % level for level in levels)
-                raise ValueError(
-                    "Bad message level string: `%s`. Possible values are: %s"
-                    % (level, levels_repr)
-                )
+                raise ValueError("Bad message level string: `%s`. Possible values are: %s" % (level, levels_repr)) from e
+
 
         messages.add_message(
             request, level, message, extra_tags=extra_tags, fail_silently=fail_silently
@@ -1262,15 +1261,8 @@ class ModelAdmin(BaseModelAdmin):
             {"preserved_filters": preserved_filters, "opts": self.opts}, form_url
         )
         view_on_site_url = self.get_view_on_site_url(obj)
-        has_editable_inline_admin_formsets = False
-        for inline in context["inline_admin_formsets"]:
-            if (
-                inline.has_add_permission
-                or inline.has_change_permission
-                or inline.has_delete_permission
-            ):
-                has_editable_inline_admin_formsets = True
-                break
+        has_editable_inline_admin_formsets = any((inline.has_add_permission or inline.has_change_permission or inline.has_delete_permission) for inline in context["inline_admin_formsets"])
+
         context.update(
             {
                 "add": add,
@@ -1555,14 +1547,8 @@ class ModelAdmin(BaseModelAdmin):
         data.pop("index", None)
 
         # Use the action whose button was pushed
-        try:
+        with contextlib.suppress(IndexError):
             data.update({"action": data.getlist("action")[action_index]})
-        except IndexError:
-            # If we didn't get an action from the chosen form that's invalid
-            # POST data, so by deleting action it'll fail the validation check
-            # below. So no need to do anything here
-            pass
-
         action_form = self.action_form(data, auto_id=None)
         action_form.fields["action"].choices = self.get_action_choices(request)
 
@@ -1765,13 +1751,8 @@ class ModelAdmin(BaseModelAdmin):
         else:
             obj = self.get_object(request, unquote(object_id), to_field)
 
-            if request.method == "POST":
-                if not self.has_change_permission(request, obj):
-                    raise PermissionDenied
-            else:
-                if not self.has_view_or_change_permission(request, obj):
-                    raise PermissionDenied
-
+            if request.method == "POST" and not self.has_change_permission(request, obj) or request.method != "POST" and not self.has_view_or_change_permission(request, obj):
+                raise PermissionDenied
             if obj is None:
                 return self._get_obj_does_not_exist_redirect(
                     request, self.opts, object_id
@@ -2039,11 +2020,7 @@ class ModelAdmin(BaseModelAdmin):
             formset = cl.formset = FormSet(queryset=cl.result_list)
 
         # Build the list of media to be used by the formset.
-        if formset:
-            media = self.media + formset.media
-        else:
-            media = self.media
-
+        media = self.media + formset.media if formset else self.media
         # Build the action form and populate it with available actions.
         if actions:
             action_form = self.action_form(auto_id=None)
@@ -2380,35 +2357,29 @@ class InlineModelAdmin(BaseModelAdmin):
                 templates it's not rendered using the field information, but
                 just using a generic "deletion_field" of the InlineModelAdmin.
                 """
-                if self.cleaned_data.get(DELETION_FIELD_NAME, False):
-                    using = router.db_for_write(self._meta.model)
-                    collector = NestedObjects(using=using)
-                    if self.instance._state.adding:
-                        return
-                    collector.collect([self.instance])
-                    if collector.protected:
-                        objs = []
-                        for p in collector.protected:
-                            objs.append(
-                                # Translators: Model verbose name and instance
-                                # representation, suitable to be an item in a
-                                # list.
-                                _("%(class_name)s %(instance)s")
-                                % {"class_name": p._meta.verbose_name, "instance": p}
-                            )
-                        params = {
-                            "class_name": self._meta.model._meta.verbose_name,
-                            "instance": self.instance,
-                            "related_objects": get_text_list(objs, _("and")),
-                        }
-                        msg = _(
-                            "Deleting %(class_name)s %(instance)s would require "
-                            "deleting the following protected related objects: "
-                            "%(related_objects)s"
-                        )
-                        raise ValidationError(
-                            msg, code="deleting_protected", params=params
-                        )
+                if not self.cleaned_data.get(DELETION_FIELD_NAME, False):
+                    return
+                using = router.db_for_write(self._meta.model)
+                collector = NestedObjects(using=using)
+                if self.instance._state.adding:
+                    return
+                collector.collect([self.instance])
+                if collector.protected:
+                    objs = [_("%(class_name)s %(instance)s") % {"class_name": p._meta.verbose_name, "instance": p} for p in collector.protected]
+
+                    params = {
+                        "class_name": self._meta.model._meta.verbose_name,
+                        "instance": self.instance,
+                        "related_objects": get_text_list(objs, _("and")),
+                    }
+                    msg = _(
+                        "Deleting %(class_name)s %(instance)s would require "
+                        "deleting the following protected related objects: "
+                        "%(related_objects)s"
+                    )
+                    raise ValidationError(
+                        msg, code="deleting_protected", params=params
+                    )
 
             def is_valid(self):
                 result = super().is_valid()

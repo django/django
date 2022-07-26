@@ -185,7 +185,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         key = self.rel.get_related_field().name
         try:
             obj = self.rel.model._default_manager.using(self.db).get(**{key: value})
-        except (ValueError, self.rel.model.DoesNotExist, ValidationError):
+        except (ValueError, self.rel.model.DoesNotExist):
             return "", ""
 
         try:
@@ -367,7 +367,7 @@ class AdminURLFieldWidget(forms.URLInput):
 
     def get_context(self, name, value, attrs):
         try:
-            self.validator(value if value else "")
+            self.validator(value or "")
             url_valid = True
         except ValidationError:
             url_valid = False
