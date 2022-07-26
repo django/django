@@ -64,7 +64,7 @@ depends on core.js for utility functions like removeChildren or quickElement
             }
             return days;
         },
-        draw: function(month, year, div_id, callback, selected) { // month = 1-12, year = 1-9999
+        draw: function(month, year, divbox_id, div_id, callback, drawMonthChoices, selected) { // month = 1-12, year = 1-9999
             const today = new Date();
             const todayDay = today.getDate();
             const todayMonth = today.getMonth() + 1;
@@ -92,7 +92,12 @@ depends on core.js for utility functions like removeChildren or quickElement
             const calDiv = document.getElementById(div_id);
             removeChildren(calDiv);
             const calTable = document.createElement('table');
-            quickElement('caption', calTable, CalendarNamespace.monthsOfYear[month - 1] + ' ' + year);
+            const caption = quickElement('caption', calTable, '');
+            const captionLink = quickElement('a', caption, CalendarNamespace.monthsOfYear[month - 1] + ' ' + year, 'href', '#');
+            captionLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                drawMonthChoices();
+            });
             const tableBody = quickElement('tbody', calTable);
 
             // Draw days-of-week header
@@ -111,14 +116,6 @@ depends on core.js for utility functions like removeChildren or quickElement
             for (let i = 0; i < startingPos; i++) {
                 nonDayCell = quickElement('td', tableRow, ' ');
                 nonDayCell.className = "nonday";
-            }
-
-            function calendarMonth(y, m) {
-                function onClick(e) {
-                    e.preventDefault();
-                    callback(y, m, this.textContent);
-                }
-                return onClick;
             }
 
             // Draw days of month
@@ -143,7 +140,11 @@ depends on core.js for utility functions like removeChildren or quickElement
 
                 const cell = quickElement('td', tableRow, '', 'class', todayClass);
                 const link = quickElement('a', cell, currentDay, 'href', '#');
-                link.addEventListener('click', calendarMonth(year, month));
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    callback(year, month, this.textContent);
+                    document.getElementById(divbox_id).style.display = 'none';
+                });
                 currentDay++;
             }
 
@@ -158,15 +159,19 @@ depends on core.js for utility functions like removeChildren or quickElement
     };
 
     // Calendar -- A calendar instance
-    function Calendar(div_id, callback, selected) {
+    function Calendar(divbox_id, div_id, callback, drawMonthChoices, selected) {
         // div_id (string) is the ID of the element in which the calendar will
         //     be displayed
         // callback (string) is the name of a JavaScript function that will be
         //     called with the parameters (year, month, day) when a day in the
         //     calendar is clicked
+        this.divbox_id = divbox_id;
         this.div_id = div_id;
         this.callback = callback;
+        this.drawMonthChoices = drawMonthChoices;
         this.today = new Date();
+        //currentDay used in drawMonthChoices and drawYearChoices funcs(in DateTimeShortcuts.js) to set current day in input.
+        this.currentDay = this.today.getDate();
         this.currentMonth = this.today.getMonth() + 1;
         this.currentYear = this.today.getFullYear();
         if (typeof selected !== 'undefined') {
@@ -175,9 +180,10 @@ depends on core.js for utility functions like removeChildren or quickElement
     }
     Calendar.prototype = {
         drawCurrent: function() {
-            CalendarNamespace.draw(this.currentMonth, this.currentYear, this.div_id, this.callback, this.selected);
+            CalendarNamespace.draw(this.currentMonth, this.currentYear, this.divbox_id, this.div_id, this.callback, this.drawMonthChoices, this.selected);
         },
-        drawDate: function(month, year, selected) {
+        drawDate: function(day, month, year, selected) {
+            this.currentDay = day;
             this.currentMonth = month;
             this.currentYear = year;
 
@@ -187,25 +193,39 @@ depends on core.js for utility functions like removeChildren or quickElement
 
             this.drawCurrent();
         },
-        drawPreviousMonth: function() {
-            if (this.currentMonth === 1) {
-                this.currentMonth = 12;
-                this.currentYear--;
+        drawPreviousMonth: function(num) {
+            const captionlink = document.getElementById('yearcaption' + num);
+            // when we are in monthlist box, we have captionlink.
+            if (captionlink !== null) {                                    
+                captionlink.textContent = this.currentYear = parseInt(captionlink.textContent) - 1;
             }
             else {
-                this.currentMonth--;
+                // here we are in main calendar box.
+                if (this.currentMonth === 1) {
+                    this.currentMonth = 12;
+                    this.currentYear--;
+                }
+                else {
+                    this.currentMonth--;
+                }
+                this.drawCurrent();
             }
-            this.drawCurrent();
         },
-        drawNextMonth: function() {
-            if (this.currentMonth === 12) {
-                this.currentMonth = 1;
-                this.currentYear++;
+        drawNextMonth: function(num) {
+            const captionlink = document.getElementById('yearcaption' + num);
+            if (captionlink !== null) {
+                captionlink.textContent = this.currentYear = parseInt(captionlink.textContent) + 1;
             }
             else {
-                this.currentMonth++;
+                if (this.currentMonth === 12) {
+                    this.currentMonth = 1;
+                    this.currentYear++;
+                }
+                else {
+                    this.currentMonth++;
+                }
+                this.drawCurrent();
             }
-            this.drawCurrent();
         },
         drawPreviousYear: function() {
             this.currentYear--;

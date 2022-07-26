@@ -1172,6 +1172,241 @@ class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertGreater(member.birthdate, now - error_margin)
         self.assertLess(member.birthdate, now + error_margin)
 
+    def test_show_hide_month_picker_widgets(self):
+        """
+        Pressing the ESC key (in month picker page) closes the box and clicking
+        on calendar icon after that, opens date picker page. clicking on a month
+        in month picker page fill input and opens date picker page.
+        """
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.common.keys import Keys
+
+        self.admin_login(username="super", password="secret", login_url="/")
+        # Open a page that has a date and time picker widgets
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_widgets_member_add")
+        )
+
+        # Click the calendar icon
+        cal_icon = self.selenium.find_element(By.ID, "calendarlink0")
+        cal_icon.click()
+        cal_box0 = self.selenium.find_element(By.ID, "calendarbox0")
+        # Click the calendar caption link (open month picker page)
+        cal_box0.find_element(By.TAG_NAME, "caption").find_element(
+            By.TAG_NAME, "a"
+        ).click()
+        # The calendar box with month picker (inside that) is visible
+        self.assertTrue(
+            cal_box0.find_element(By.CSS_SELECTOR, ".monthlist").is_displayed()
+        )
+        # Press the ESC key
+        self.selenium.find_element(By.TAG_NAME, "body").send_keys([Keys.ESCAPE])
+        # The calendar box with month picker is hidden
+        self.assertFalse(cal_box0.is_displayed())
+        cal_icon.click()
+        # The calendar box with date picker is visible
+        self.assertTrue(cal_box0.is_displayed())
+        # <th>S</th> used as identifier for date picker page
+        cal_box0.find_element(By.XPATH, "//th[contains(text(), 'S')]")
+
+        # Click the calendar caption link (open month picker page)
+        cal_box0.find_element(By.TAG_NAME, "caption").find_element(
+            By.TAG_NAME, "a"
+        ).click()
+        # click on August month
+        cal_box0.find_element(By.XPATH, "//a[contains(text(), 'August')]").click()
+        # <th>S</th> used as identifier for date picker page
+        cal_box0.find_element(By.XPATH, "//th[contains(text(), 'S')]")
+        self.assertEqual(
+            self.selenium.find_element(By.ID, "id_birthdate_0").get_attribute("value"),
+            datetime.today().strftime("%Y-08-%d"),
+        )
+
+    def test_month_picker_selected_class_and_input(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(username="super", password="secret", login_url="/")
+        # Open a page that has a date and time picker widgets
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_widgets_member_add")
+        )
+
+        # fill in the birth date with day unequal today
+        day = "01" if datetime.today().day != 1 else "02"
+        self.selenium.find_element(By.ID, "id_birthdate_0").send_keys("2013-06-" + day)
+
+        # Click the calendar icon
+        self.selenium.find_element(By.ID, "calendarlink0").click()
+
+        cal_box0 = self.selenium.find_element(By.ID, "calendarbox0")
+        # Click the calendar caption link (open month picker page)
+        cal_box0.find_element(By.TAG_NAME, "caption").find_element(
+            By.TAG_NAME, "a"
+        ).click()
+        monthlist = cal_box0.find_element(By.CSS_SELECTOR, ".monthlist")
+
+        # selected_class verify ----------------------------------
+        tds = monthlist.find_elements(By.TAG_NAME, "td")
+        selected = tds[5]
+        self.assertEqual(selected.get_attribute("class"), "selected")
+        self.assertEqual(selected.text, "June")
+
+        # input checks ----------------------------------
+        # clicking on a month should kept date filled in input before.
+        monthlist.find_element(By.XPATH, "//a[contains(text(), 'June')]").click()
+        self.assertEqual(
+            self.selenium.find_element(By.ID, "id_birthdate_0").get_attribute("value"),
+            "2013-06-" + day,
+        )
+
+    def test_month_picker_prev_next_links(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(username="super", password="secret", login_url="/")
+        # Open a page that has a date and time picker widgets
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_widgets_member_add")
+        )
+
+        # fill in the birth date.
+        self.selenium.find_element(By.ID, "id_birthdate_0").send_keys("2013-06-01")
+
+        # Click the calendar icon
+        self.selenium.find_element(By.ID, "calendarlink0").click()
+
+        cal_box0 = self.selenium.find_element(By.ID, "calendarbox0")
+        # Click the calendar caption link (open month picker page)
+        cal_box0.find_element(By.TAG_NAME, "caption").find_element(
+            By.TAG_NAME, "a"
+        ).click()
+
+        # prev link ----------------------------------
+        # 1 year backward
+        cal_box0.find_element(By.CSS_SELECTOR, ".calendarnav-previous").click()
+        # click on June month
+        cal_box0.find_element(By.XPATH, "//a[contains(text(), 'June')]").click()
+        self.assertEqual(
+            self.selenium.find_element(By.ID, "id_birthdate_0").get_attribute("value"),
+            "2012-06-01",
+        )
+
+        # next link ----------------------------------
+        # Click the calendar caption link (open month picker page)
+        cal_box0.find_element(By.TAG_NAME, "caption").find_element(
+            By.TAG_NAME, "a"
+        ).click()
+        # 1 year forward
+        cal_box0.find_element(By.CSS_SELECTOR, ".calendarnav-next").click()
+        # click on June month
+        cal_box0.find_element(By.XPATH, "//a[contains(text(), 'June')]").click()
+        self.assertEqual(
+            self.selenium.find_element(By.ID, "id_birthdate_0").get_attribute("value"),
+            "2013-06-01",
+        )
+
+    def test_show_hide_year_picker_widgets(self):
+        """
+        Pressing the ESC key (in year picker page) closes the box and clicking
+        on calendar icon after that, opens date picker page. clicking on a year
+        in year picker page fill input and opens month picker page.
+        """
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.common.keys import Keys
+
+        self.admin_login(username="super", password="secret", login_url="/")
+        # Open a page that has a date and time picker widgets
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_widgets_member_add")
+        )
+
+        # Click the calendar icon
+        cal_icon = self.selenium.find_element(By.ID, "calendarlink0")
+        cal_icon.click()
+        cal_box0 = self.selenium.find_element(By.ID, "calendarbox0")
+        # Click the calendar caption link (open month picker page)
+        cal_box0.find_element(By.TAG_NAME, "caption").find_element(
+            By.TAG_NAME, "a"
+        ).click()
+        # Click the calendar caption link again (open year picker page)
+        cal_box0.find_element(By.TAG_NAME, "caption").find_element(
+            By.TAG_NAME, "a"
+        ).click()
+        # The calendar box with year picker is visible
+        self.assertTrue(cal_box0.find_element(By.ID, "yearlist0").is_displayed())
+        # Press the ESC key
+        self.selenium.find_element(By.TAG_NAME, "body").send_keys([Keys.ESCAPE])
+        # The calendar box with year picker is hidden
+        self.assertFalse(cal_box0.is_displayed())
+
+        # Click the calendar icon
+        cal_icon.click()
+        # <th>S</th> used as identifier for date picker page
+        cal_box0.find_element(By.XPATH, "//th[contains(text(), 'S')]")
+        # Click the calendar caption link (open month picker page)
+        cal_box0.find_element(By.TAG_NAME, "caption").find_element(
+            By.TAG_NAME, "a"
+        ).click()
+        # Click the calendar caption link again (open year picker page)
+        cal_box0.find_element(By.TAG_NAME, "caption").find_element(
+            By.TAG_NAME, "a"
+        ).click()
+        # Click on 2020 year link
+        cal_box0.find_element(By.XPATH, "//a[contains(text(), '2020')]").click()
+        # The calendar box with month picker is visible
+        self.assertTrue(
+            cal_box0.find_element(By.CSS_SELECTOR, ".monthlist").is_displayed()
+        )
+        calbox0_caption = cal_box0.find_element(By.TAG_NAME, "caption")
+        self.assertEqual(
+            calbox0_caption.find_element(By.TAG_NAME, "a").get_attribute("text"),
+            "2020",
+        )
+        self.assertEqual(
+            self.selenium.find_element(By.ID, "id_birthdate_0").get_attribute("value"),
+            datetime.today().strftime("2020-%m-%d"),
+        )
+
+    def test_year_picker_selected_class_and_input(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(username="super", password="secret", login_url="/")
+        # Open a page that has a date and time picker widgets
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_widgets_member_add")
+        )
+
+        # fill in the birth date with day unequal today
+        day = "01" if datetime.today().day != 1 else "02"
+        self.selenium.find_element(By.ID, "id_birthdate_0").send_keys("1800-06-" + day)
+
+        # Click the calendar icon
+        self.selenium.find_element(By.ID, "calendarlink0").click()
+
+        cal_box0 = self.selenium.find_element(By.ID, "calendarbox0")
+        # Click the calendar caption link (open month picker page)
+        cal_box0.find_element(By.TAG_NAME, "caption").find_element(
+            By.TAG_NAME, "a"
+        ).click()
+        # Click the calendar caption link again (open year picker page)
+        cal_box0.find_element(By.TAG_NAME, "caption").find_element(
+            By.TAG_NAME, "a"
+        ).click()
+        yearlist_ul = cal_box0.find_element(By.CSS_SELECTOR, ".yearlist")
+
+        # selected_class verify ----------------------------------
+        selected_year = yearlist_ul.find_element(
+            By.XPATH, "//a[contains(text(), '1800')]"
+        )
+        self.assertEqual(selected_year.get_attribute("class"), "selected")
+
+        # input checks ----------------------------------
+        # clicking on a year should kept date filled in input before.
+        yearlist_ul.find_element(By.XPATH, "//a[contains(text(), '1800')]").click()
+        self.assertEqual(
+            self.selenium.find_element(By.ID, "id_birthdate_0").get_attribute("value"),
+            "1800-06-" + day,
+        )
+
 
 # The above tests run with Asia/Singapore which are on the positive side of
 # UTC. Here we test with a timezone on the negative side.

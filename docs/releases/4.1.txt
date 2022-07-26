@@ -126,6 +126,10 @@ Minor features
 
 * The admin :meth:`history view <django.contrib.admin.ModelAdmin.history_view>`
   is now paginated.
+  
+* Now admin calendar caption is selectable and opens ``monthlist`` and
+  ``yearlist``. now it's easy adding older dates like birthday via admin
+  calendar widget.
 
 * Related widget wrappers now have a link to object's change form.
 

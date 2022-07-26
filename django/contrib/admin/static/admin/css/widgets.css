@@ -409,6 +409,20 @@ span.clearable-file-input label {
     background: var(--accent);
 }
 
+.calendar caption a {
+	color: #333;
+}
+
+.calendar caption a:hover {
+	color: #000;
+	text-shadow: 0.1px 0.1px #000;
+}
+
+.calendar caption a:focus {
+	color: #000;
+	text-decoration: none;
+}
+
 .calendar th {
     padding: 8px 5px;
     background: var(--darkened-bg);
@@ -458,6 +472,54 @@ span.clearable-file-input label {
 .calendar td a:active, .timelist a:active {
     background: var(--header-bg);
     color: white;
+}
+
+.calendar .monthlist caption {
+	padding: 7px;
+}
+
+.calendar .monthlist caption a {
+    font-size: 0.8125rem;
+}
+
+.calendar .monthlist td a {
+	padding: 7px;
+}
+
+.calendar ul.yearlist {
+	display: block;
+	height: 200px;
+	overflow: auto;	
+	padding: 0px;
+	margin: 0px;
+}
+
+.calendar .yearlist li {
+	list-style-type: none;	
+}
+
+.calendar .yearlist a {
+	list-style-type: none;
+	display: block;
+	text-decoration: none;
+    font-weight: 400;
+	font-size: 0.8125rem;
+	padding: 3px;
+	color: var(--body-quiet-color);
+	padding-inline-start: 15px;
+}
+
+.calendar .yearlist li a:hover {
+    background: var(--primary);
+	color: white;
+}
+
+.calendar .yearlist a.selected {
+	font-size: 0.9375rem;
+	font-weight: 700; 
+	padding: 7px;
+	padding-inline-start: 19px;
+	color: var(--header-bg);
 }
 
 .calendarnav {
