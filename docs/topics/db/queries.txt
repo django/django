@@ -995,6 +995,12 @@ To query for missing keys, use the ``isnull`` lookup::
     On PostgreSQL, if only one key or index is used, the SQL operator ``->`` is
     used. If multiple operators are used then the ``#>`` operator is used.
 
+.. admonition:: SQLite users
+
+    On SQLite, ``"true"``, ``"false"``, and ``"null"`` string values will
+    always be interpreted as ``True``, ``False``, and JSON ``null``
+    respectively.
+
 .. _containment-and-key-lookups:
 
 Containment and key lookups
