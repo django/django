@@ -66,11 +66,14 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def test_collations(self):
         charset = "utf8"
-        if self.connection.mysql_is_mariadb and self.connection.mysql_version >= (
-            10,
-            6,
+        if (
+            self.connection.mysql_is_mariadb
+            and self.connection.mysql_version >= (10, 6)
+        ) or (
+            not self.connection.mysql_is_mariadb
+            and self.connection.mysql_version >= (8, 0, 30)
         ):
-            # utf8 is an alias for utf8mb3 in MariaDB 10.6+.
+            # utf8 is an alias for utf8mb3 in MariaDB 10.6+ and MySQL 8.0.30+.
             charset = "utf8mb3"
         return {
             "ci": f"{charset}_general_ci",
