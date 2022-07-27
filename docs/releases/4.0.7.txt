@@ -2,9 +2,9 @@
 Django 4.0.7 release notes
 ==========================
 
-*Expected August 2, 2022*
+*Expected August 3, 2022*
 
-Django 4.0.7 fixes several bugs in 4.0.6.
+Django 4.0.7 fixes a security issue and several bugs in 4.0.6.
 
 Bugfixes
 ========

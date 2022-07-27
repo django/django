@@ -1,0 +1,9 @@
+===========================
+Django 3.2.15 release notes
+===========================
+
+*Expected August 3, 2022*
+
+Django 3.2.15 fixes a security issue in 3.2.14.
+
+...
