@@ -609,14 +609,14 @@ class Model(metaclass=ModelBase):
         return "%s object (%s)" % (self.__class__.__name__, self.pk)
 
     def __eq__(self, other):
+        if self is other:
+            return True
         if not isinstance(other, Model):
             return NotImplemented
         if self._meta.concrete_model != other._meta.concrete_model:
             return False
         my_pk = self.pk
-        if my_pk is None:
-            return self is other
-        return my_pk == other.pk
+        return my_pk is not None and my_pk == other.pk
 
     def __hash__(self):
         if self.pk is None:
