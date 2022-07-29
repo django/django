@@ -350,3 +350,17 @@ Miscellaneous
 * ``django.contrib.auth.hashers.SHA1PasswordHasher``,
   ``django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher``, and
   ``django.contrib.auth.hashers.UnsaltedMD5PasswordHasher`` are deprecated.
+
+* ``django.contrib.postgres.fields.CICharField`` is deprecated in favor of
+  ``CharField(db_collation="…")`` with a case-insensitive non-deterministic
+  collation.
+
+* ``django.contrib.postgres.fields.CIEmailField`` is deprecated in favor of
+  ``EmailField(db_collation="…")`` with a case-insensitive non-deterministic
+  collation.
+
+* ``django.contrib.postgres.fields.CITextField`` is deprecated in favor of
+  ``TextField(db_collation="…")`` with a case-insensitive non-deterministic
+  collation.
+
+* ``django.contrib.postgres.fields.CIText`` mixin is deprecated.

@@ -119,6 +119,7 @@ class Character(models.Model):
     name = models.CharField(max_length=255)
 
 
+# RemovedInDjango51Warning.
 class CITestModel(PostgreSQLModel):
     name = CICharField(primary_key=True, max_length=255)
     email = CIEmailField()
