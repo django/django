@@ -103,11 +103,11 @@ class GeoIP2:
             reader = geoip2.database.Reader(str(path), mode=cache)
             db_type = reader.metadata().database_type
 
-            if db_type.endswith("City"):
+            if "City" in db_type:
                 # GeoLite City database detected.
                 self._city = reader
                 self._city_file = path
-            elif db_type.endswith("Country"):
+            elif "Country" in db_type:
                 # GeoIP Country database detected.
                 self._country = reader
                 self._country_file = path

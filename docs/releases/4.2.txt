@@ -60,6 +60,9 @@ Minor features
 * The :class:`~django.contrib.gis.gdal.GDALRaster` class now supports
   :class:`pathlib.Path`.
 
+* The :class:`~django.contrib.gis.geoip2.GeoIP2` class now supports  ``.mmdb``
+  files downloaded from DB-IP.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
