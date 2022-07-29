@@ -96,7 +96,8 @@ class URLValidator(RegexValidator):
         r"^(?:[a-z0-9.+-]*)://"  # scheme is validated separately
         r"(?:[^\s:@/]+(?::[^\s:@/]*)?@)?"  # user:pass authentication
         r"(?:" + ipv4_re + "|" + ipv6_re + "|" + host_re + ")"
-        r"(?::[0-9]{1,5})?"  # port
+        r"(?::(0|6553[0-5]|655[0-2][0-9]|65[0-4][0-9]{2}|6[0-4][0-9]{3}"
+        r"|[1-5]([0-9]?){4}|[1-9]([0-9]?){3}))?"  # port
         r"(?:[/?#][^\s]*)?"  # resource path
         r"\Z",
         re.IGNORECASE,
