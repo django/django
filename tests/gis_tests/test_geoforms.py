@@ -166,12 +166,12 @@ class GeometryFieldTest(SimpleTestCase):
 
         self.assertInHTML(
             '<textarea id="id_pt2" class="vSerializedField required" cols="150"'
-            ' rows="10" name="pt2"></textarea>',
+            ' rows="10" name="pt2" hidden></textarea>',
             output,
         )
         self.assertInHTML(
             '<textarea id="id_pt3" class="vSerializedField required" cols="150"'
-            ' rows="10" name="pt3"></textarea>',
+            ' rows="10" name="pt3" hidden></textarea>',
             output,
         )
         # Only the invalid PNT(0) triggers an error log entry.
