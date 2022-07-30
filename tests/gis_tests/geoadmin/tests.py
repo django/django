@@ -16,7 +16,7 @@ class GeoAdminTest(SimpleTestCase):
                 output = str(form["point"])
         self.assertInHTML(
             '<textarea id="id_point" class="vSerializedField required" cols="150"'
-            ' rows="10" name="point"></textarea>',
+            ' rows="10" name="point" hidden></textarea>',
             output,
         )
 
@@ -27,7 +27,7 @@ class GeoAdminTest(SimpleTestCase):
             output = str(form["point"])
         self.assertInHTML(
             '<textarea id="id_point" class="vSerializedField required" cols="150"'
-            ' rows="10" name="point"></textarea>',
+            ' rows="10" name="point" hidden></textarea>',
             output,
         )
         self.assertEqual(len(cm.records), 1)

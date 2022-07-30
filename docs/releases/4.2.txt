@@ -63,6 +63,10 @@ Minor features
 * The :class:`~django.contrib.gis.geoip2.GeoIP2` class now supports  ``.mmdb``
   files downloaded from DB-IP.
 
+* The OpenLayers template widget no longer includes inline CSS (which also
+  removes the former ``map_css`` block) to better comply with a strict Content
+  Security Policy.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
