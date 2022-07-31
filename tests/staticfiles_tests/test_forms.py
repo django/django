@@ -29,10 +29,11 @@ class StaticFilesFormsMediaTestCase(SimpleTestCase):
         )
         self.assertEqual(
             str(m),
-            """<link href="https://example.com/assets/path/to/css1" media="all" rel="stylesheet">
-<link href="/path/to/css2" media="all" rel="stylesheet">
-<script src="/path/to/js1"></script>
-<script src="http://media.other.com/path/to/js2"></script>
-<script src="https://secure.other.com/path/to/js3"></script>
-<script src="https://example.com/assets/relative/path/to/js4"></script>""",
+            '<link href="https://example.com/assets/path/to/css1" media="all" '
+            'rel="stylesheet">\n'
+            '<link href="/path/to/css2" media="all" rel="stylesheet">\n'
+            '<script src="/path/to/js1"></script>\n'
+            '<script src="http://media.other.com/path/to/js2"></script>\n'
+            '<script src="https://secure.other.com/path/to/js3"></script>\n'
+            '<script src="https://example.com/assets/relative/path/to/js4"></script>',
         )
