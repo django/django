@@ -72,18 +72,18 @@ class Command(BaseCommand):
                                 )
                     content_type_display = "\n".join(ct_info)
                     self.stdout.write(
-                        """Some content types in your database are stale and can be deleted.
-Any objects that depend on these content types will also be deleted.
-The content types and dependent objects that would be deleted are:
-
-%s
-
-This list doesn't include any cascade deletions to data outside of Django's
-models (uncommon).
-
-Are you sure you want to delete these content types?
-If you're unsure, answer 'no'."""
-                        % content_type_display
+                        "Some content types in your database are stale and can be "
+                        "deleted.\n"
+                        "Any objects that depend on these content types will also be "
+                        "deleted.\n"
+                        "The content types and dependent objects that would be deleted "
+                        "are:\n\n"
+                        f"{content_type_display}\n\n"
+                        "This list doesn't include any cascade deletions to data "
+                        "outside of Django's\n"
+                        "models (uncommon).\n\n"
+                        "Are you sure you want to delete these content types?\n"
+                        "If you're unsure, answer 'no'."
                     )
                     ok_to_delete = input("Type 'yes' to continue, or 'no' to cancel: ")
                 else:
