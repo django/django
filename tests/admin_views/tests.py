@@ -800,8 +800,9 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertIs(response.context["cl"].has_related_field_in_list_display(), False)
 
     def test_limited_filter(self):
-        """Ensure admin changelist filters do not contain objects excluded via limit_choices_to.
-        This also tests relation-spanning filters (e.g. 'color__value').
+        """
+        Admin changelist filters do not contain objects excluded via
+        limit_choices_to.
         """
         response = self.client.get(reverse("admin:admin_views_thing_changelist"))
         self.assertContains(
