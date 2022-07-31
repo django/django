@@ -3,6 +3,7 @@ import enum
 import json
 import unittest
 import uuid
+import warnings
 
 from django import forms
 from django.core import checks, exceptions, serializers, validators
@@ -14,6 +15,7 @@ from django.db.models.functions import Cast, JSONObject, Upper
 from django.test import TransactionTestCase, modify_settings, override_settings
 from django.test.utils import isolate_apps
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango51Warning
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase, PostgreSQLWidgetTestCase
 from .models import (
@@ -1134,12 +1136,15 @@ class TestChoiceFormField(PostgreSQLTestCase):
         )
 
     def test_model_field_formfield_choices(self):
-        with self.assertRaises(NotImplementedError):
-            model_field = ArrayField(
-                models.CharField(max_length=27), choices=(("a1", "A1"), ("b1", "B1"))
-            )
-            form_field = model_field.formfield()
-            form_field.clean(["a1", "b1"])
+        model_field = ArrayField(
+            models.CharField(max_length=27), choices=(("a1", "A1"), ("b1", "B1"))
+        )
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            model_field.formfield()
+            assert len(w) == 1
+            assert issubclass(w[-1].category, RemovedInDjango51Warning)
+            assert "Choices should be defined in base field." in str(w[-1].message)
 
 
 class TestSplitFormField(PostgreSQLSimpleTestCase):

@@ -1,4 +1,5 @@
 import json
+import warnings
 
 from django import forms
 from django.contrib.postgres import lookups
@@ -8,6 +9,7 @@ from django.core import checks, exceptions
 from django.db.models import Field, Func, IntegerField, Transform, Value
 from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.lookups import Exact, In
+from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.translation import gettext_lazy as _
 
 from ..utils import prefix_validation_error
@@ -204,22 +206,22 @@ class ArrayField(CheckFieldDefaultMixin, Field):
 
     def formfield(self, **kwargs):
         if self.base_field.choices and "choices_form_class" not in kwargs:
+            obj = self.base_field
             defaults = {
                 "choices_form_class": forms.TypedMultipleChoiceField,
-                "coerce": self.base_field.to_python,
             }
-            defaults.update(kwargs)
-            return self.base_field.formfield(**defaults)
-        elif not self.choices:
+        else:
+            obj = super()
             defaults = {
                 "form_class": SimpleArrayField,
                 "base_field": self.base_field.formfield(),
                 "max_length": self.size,
             }
-            defaults.update(kwargs)
-        else:
-            raise NotImplementedError("Choices should be defined in base field.")
-        return super().formfield(**defaults)
+            if self.choices:
+                warnings.warn(
+                    "Choices should be defined in base field.", RemovedInDjango51Warning
+                )
+        return obj.formfield(**{**defaults, **kwargs})
 
 
 class ArrayRHSMixin:
