@@ -1,6 +1,6 @@
-======
+<h1 align="center">
 Django
-======
+</h1>  
 
 Django is a high-level Python web framework that encourages rapid development
 and clean, pragmatic design. Thanks for checking it out.
@@ -46,8 +46,11 @@ To run Django's test suite:
   ``docs/internals/contributing/writing-code/unit-tests.txt``, published online at
   https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#running-the-unit-tests
 
+
+<h1 align="center">
 Supporting the Development of Django
-====================================
+</h1>  
+
 
 Django's development depends on your contributions. 
 
