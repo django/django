@@ -2,8 +2,12 @@
 Django
 </h1>  
 
+<h3 align="center">
 Django is a high-level Python web framework that encourages rapid development
 and clean, pragmatic design. Thanks for checking it out.
+</h3>  
+<hr>
+
 
 All documentation is in the "``docs``" directory and online at
 https://docs.djangoproject.com/en/stable/. If you're just getting started,
@@ -47,9 +51,9 @@ To run Django's test suite:
   https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#running-the-unit-tests
 
 
-<h1 align="center">
+<h2 align="center">
 Supporting the Development of Django
-</h1>  
+</h2>  
 
 
 Django's development depends on your contributions. 
