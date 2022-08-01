@@ -101,11 +101,6 @@ from other Django widget attributes.
 
     The OpenGIS geometry type, generally set by the form field.
 
-.. attribute:: BaseGeometryWidget.map_height
-.. attribute:: BaseGeometryWidget.map_width
-
-    Height and width of the widget map (default is 400x600).
-
 .. attribute:: BaseGeometryWidget.map_srid
 
     SRID code used by the map (default is 4326).
@@ -124,6 +119,11 @@ from other Django widget attributes.
 
     The template used to render the map widget.
 
+.. versionchanged: 4.2
+
+   The ``map_width``/``map_height`` attributes are not used any longer.
+   Set your map sizes with your own site’s CSS.
+
 You can pass widget attributes in the same manner that for any other Django
 widget. For example::
 
@@ -131,7 +131,7 @@ widget. For example::
 
     class MyGeoForm(forms.Form):
         point = forms.PointField(widget=
-            forms.OSMWidget(attrs={'map_width': 800, 'map_height': 500}))
+            forms.OSMWidget(attrs={'display_raw': True}))
 
 Widget classes
 --------------

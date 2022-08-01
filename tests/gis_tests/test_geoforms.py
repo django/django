@@ -444,9 +444,7 @@ class GeometryWidgetTests(SimpleTestCase):
                     "is_hidden": False,
                     "attrs": {
                         "map_srid": 4326,
-                        "map_width": 600,
                         "geom_type": "GEOMETRY",
-                        "map_height": 400,
                         "display_raw": False,
                     },
                     "name": "name",

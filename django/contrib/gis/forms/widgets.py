@@ -18,8 +18,6 @@ class BaseGeometryWidget(Widget):
 
     geom_type = "GEOMETRY"
     map_srid = 4326
-    map_width = 600
-    map_height = 400
     display_raw = False
 
     supports_3d = False
@@ -27,7 +25,7 @@ class BaseGeometryWidget(Widget):
 
     def __init__(self, attrs=None):
         self.attrs = {}
-        for key in ("geom_type", "map_srid", "map_width", "map_height", "display_raw"):
+        for key in ("geom_type", "map_srid", "display_raw"):
             self.attrs[key] = getattr(self, key)
         if attrs:
             self.attrs.update(attrs)
