@@ -5,17 +5,17 @@
 # Erlend Eelmets <debcf78e@opayq.com>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
-# Martin Pajuste <martinpajuste@gmail.com>, 2015
-# Martin Pajuste <martinpajuste@gmail.com>, 2016,2019-2020
+# Martin <martinpajuste@gmail.com>, 2015,2022
+# Martin <martinpajuste@gmail.com>, 2016,2019-2020
 # Marti Raudsepp <marti@juffo.org>, 2016
 # Ragnar Rebase <rrebase@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-09-03 15:38+0000\n"
-"Last-Translator: Erlend Eelmets <debcf78e@opayq.com>\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: Martin <martinpajuste@gmail.com>, 2015,2022\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -23,6 +23,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: et\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Kustuta valitud %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -34,10 +38,6 @@ msgstr "Ei saa kustutada %(name)s"
 
 msgid "Are you sure?"
 msgstr "Kas olete kindel?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Kustuta valitud %(verbose_name_plural)s"
 
 msgid "Administration"
 msgstr "Administreerimine"
@@ -268,8 +268,9 @@ msgstr "valitud 0/%(cnt)s"
 msgid "Change history: %s"
 msgstr "Muudatuste ajalugu: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -524,6 +525,12 @@ msgstr "Unustasite oma parooli või kasutajanime?"
 msgid "Toggle navigation"
 msgstr "Lülita navigeerimine sisse"
 
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
+
 msgid "Date/time"
 msgstr "Kuupäev/kellaaeg"
 
@@ -532,6 +539,12 @@ msgstr "Kasutaja"
 
 msgid "Action"
 msgstr "Toiming"
+
+msgid "entry"
+msgstr "sissekanne"
+
+msgid "entries"
+msgstr "sissekanded"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -589,7 +602,11 @@ msgstr "Lisa veel üks %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Kustuta valitud %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Vaata valitud %(model)s"
+
+msgid "Thanks for spending some quality time with the web site today."
 msgstr "Tänan, et veetsite aega meie lehel."
 
 msgid "Log in again"

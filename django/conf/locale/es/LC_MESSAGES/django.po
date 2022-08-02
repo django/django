@@ -1,48 +1,61 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# 8cb2d5a716c3c9a99b6d20472609a4d5_6d03802 <ce931cb71bc28f3f828fb2dad368a4f7_5255>, 2011
+# Abe Estrada, 2013
 # Abe Estrada, 2013
 # albertoalcolea <albertoalcolea@gmail.com>, 2014
+# albertoalcolea <albertoalcolea@gmail.com>, 2014
+# Amanda Copete, 2017
 # Amanda Copete, 2017
 # Antoni Aloy <aaloy@apsl.net>, 2011-2014,2017,2019
 # Claude Paroz <claude@2xlibre.net>, 2020
 # Diego Andres Sanabria Martin <diegueus9@gmail.com>, 2012
 # Diego Schulz <dschulz@gmail.com>, 2012
+# e4db27214f7e7544f2022c647b585925_bb0e321, 2014,2020
 # e4db27214f7e7544f2022c647b585925_bb0e321, 2015-2016
 # e4db27214f7e7544f2022c647b585925_bb0e321, 2014
 # e4db27214f7e7544f2022c647b585925_bb0e321, 2020
-# Ernesto Rico Schmidt <e.rico.schmidt@gmail.com>, 2017
+# Ernesto Rico Schmidt <ernesto@rico-schmidt.name>, 2017
+# Ernesto Rico Schmidt <ernesto@rico-schmidt.name>, 2017
 # 8cb2d5a716c3c9a99b6d20472609a4d5_6d03802 <ce931cb71bc28f3f828fb2dad368a4f7_5255>, 2011
 # Ignacio José Lizarán Rus <ilizaran@gmail.com>, 2019
 # Igor Támara <igor@tamarapatino.org>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # José Luis <alagunajs@gmail.com>, 2016
+# José Luis <alagunajs@gmail.com>, 2016
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011,2013
 # Luigy, 2019
+# Luigy, 2019
 # Marc Garcia <garcia.marc@gmail.com>, 2011
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
+# mpachas <miguel.pachas.garcia@gmail.com>, 2022
 # monobotsoft <monobot.soft@gmail.com>, 2012
 # ntrrgc <ntrrgc@gmail.com>, 2013
 # ntrrgc <ntrrgc@gmail.com>, 2013
 # Pablo, 2015
+# Pablo, 2015
+# Sebastián Magrí, 2013
 # Sebastián Magrí, 2013
 # Uriel Medina <urimeba511@gmail.com>, 2020-2021
+# Veronicabh <vero.blazher@gmail.com>, 2015
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-24 16:30+0000\n"
-"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2013-04-25 06:49+0000\n"
+"Last-Translator: mpachas <miguel.pachas.garcia@gmail.com>, 2022\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
 
 msgid "Afrikaans"
 msgstr "Africano"
@@ -234,7 +247,7 @@ msgid "Marathi"
 msgstr "Maratí"
 
 msgid "Malay"
-msgstr ""
+msgstr "Malayo"
 
 msgid "Burmese"
 msgstr "Birmano"
@@ -414,6 +427,10 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Asegúrese de que este valor es mayor o igual a %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "Asegúrese de que este valor es múltiplo de %(limit_value)s."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -424,6 +441,9 @@ msgstr[0] ""
 "Asegúrese de que este valor tenga al menos %(limit_value)d caracter (tiene "
 "%(show_value)d)."
 msgstr[1] ""
+"Asegúrese de que este valor tenga al menos %(limit_value)d carácter(es) "
+"(tiene%(show_value)d)."
+msgstr[2] ""
 "Asegúrese de que este valor tenga al menos %(limit_value)d carácter(es) "
 "(tiene%(show_value)d)."
 
@@ -440,6 +460,9 @@ msgstr[0] ""
 msgstr[1] ""
 "Asegúrese de que este valor tenga menos de %(limit_value)d caracteres (tiene "
 "%(show_value)d)."
+msgstr[2] ""
+"Asegúrese de que este valor tenga menos de %(limit_value)d caracteres (tiene "
+"%(show_value)d)."
 
 msgid "Enter a number."
 msgstr "Introduzca un número."
@@ -449,12 +472,14 @@ msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] "Asegúrese de que no hay más de %(max)s dígito en total."
 msgstr[1] "Asegúrese de que no haya más de %(max)s dígitos en total."
+msgstr[2] "Asegúrese de que no haya más de %(max)s dígitos en total."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] "Asegúrese de que no haya más de %(max)s dígito decimal."
 msgstr[1] "Asegúrese de que no haya más de %(max)s dígitos decimales."
+msgstr[2] "Asegúrese de que no haya más de %(max)s dígitos decimales."
 
 #, python-format
 msgid ""
@@ -464,6 +489,8 @@ msgid_plural ""
 msgstr[0] ""
 "Asegúrese de que no haya más de %(max)s dígito antes del punto decimal"
 msgstr[1] ""
+"Asegúrese de que no haya más de %(max)s dígitos antes del punto decimal."
+msgstr[2] ""
 "Asegúrese de que no haya más de %(max)s dígitos antes del punto decimal."
 
 #, python-format
@@ -485,6 +512,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s con este %(field_labels)s ya existe."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "No se cumple la restricción \"%(name)s\"."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Valor %(value)r no es una opción válida."
 
@@ -498,8 +529,8 @@ msgstr "Este campo no puede estar vacío."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Ya existe %(model_name)s con este %(field_label)s."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -753,6 +784,9 @@ msgstr[0] ""
 msgstr[1] ""
 "Asegúrese de que este nombre de archivo tenga como máximo %(max)d "
 "carácter(es) (tiene %(length)d)."
+msgstr[2] ""
+"Asegúrese de que este nombre de archivo tenga como máximo %(max)d "
+"carácter(es) (tiene %(length)d)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
@@ -800,16 +834,18 @@ msgstr ""
 "problema persiste."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Por favor, envíe %d formulario como máximo."
-msgstr[1] "Por favor, envíe %d formularios como máximo."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Por favor, envíe %(num)d formulario como máximo."
+msgstr[1] "Por favor, envíe %(num)d formularios como máximo."
+msgstr[2] "Por favor, envíe %(num)d formularios como máximo."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Por favor, envíe %d formulario como máximo."
-msgstr[1] "Por favor, envíe %d formularios como máximo."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Por favor, envíe %(num)d formulario como mínimo."
+msgstr[1] "Por favor, envíe %(num)d formularios como mínimo."
+msgstr[2] "Por favor, envíe %(num)d formularios como mínimo."
 
 msgid "Order"
 msgstr "Orden"
@@ -882,6 +918,7 @@ msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d byte"
 msgstr[1] "%(size)d bytes"
+msgstr[2] "%(size)d bytes"
 
 #, python-format
 msgid "%s KB"
@@ -922,82 +959,82 @@ msgid "noon"
 msgstr "mediodía"
 
 msgid "Monday"
-msgstr "Lunes"
+msgstr "lunes"
 
 msgid "Tuesday"
-msgstr "Martes"
+msgstr "martes"
 
 msgid "Wednesday"
-msgstr "Miércoles"
+msgstr "miércoles"
 
 msgid "Thursday"
-msgstr "Jueves"
+msgstr "jueves"
 
 msgid "Friday"
-msgstr "Viernes"
+msgstr "viernes"
 
 msgid "Saturday"
-msgstr "Sábado"
+msgstr "sábado"
 
 msgid "Sunday"
-msgstr "Domingo"
+msgstr "domingo"
 
 msgid "Mon"
-msgstr "Lun"
+msgstr "lun"
 
 msgid "Tue"
-msgstr "Mar"
+msgstr "mar"
 
 msgid "Wed"
-msgstr "Mié"
+msgstr "mié"
 
 msgid "Thu"
-msgstr "Jue"
+msgstr "jue"
 
 msgid "Fri"
-msgstr "Vie"
+msgstr "vie"
 
 msgid "Sat"
-msgstr "Sáb"
+msgstr "sáb"
 
 msgid "Sun"
-msgstr "Dom"
+msgstr "dom"
 
 msgid "January"
-msgstr "Enero"
+msgstr "enero"
 
 msgid "February"
-msgstr "Febrero"
+msgstr "febrero"
 
 msgid "March"
-msgstr "Marzo"
+msgstr "marzo"
 
 msgid "April"
-msgstr "Abril"
+msgstr "abril"
 
 msgid "May"
-msgstr "Mayo"
+msgstr "mayo"
 
 msgid "June"
-msgstr "Junio"
+msgstr "junio"
 
 msgid "July"
-msgstr "Julio"
+msgstr "julio"
 
 msgid "August"
-msgstr "Agosto"
+msgstr "agosto"
 
 msgid "September"
-msgstr "Septiembre"
+msgstr "septiembre"
 
 msgid "October"
-msgstr "Octubre"
+msgstr "octubre"
 
 msgid "November"
-msgstr "Noviembre"
+msgstr "noviembre"
 
 msgid "December"
-msgstr "Diciembre"
+msgstr "diciembre"
 
 msgid "jan"
 msgstr "ene"
@@ -1045,91 +1082,91 @@ msgstr "Feb."
 
 msgctxt "abbrev. month"
 msgid "March"
-msgstr "Mar."
+msgstr "marzo"
 
 msgctxt "abbrev. month"
 msgid "April"
-msgstr "Abr."
+msgstr "abril"
 
 msgctxt "abbrev. month"
 msgid "May"
-msgstr "Mayo"
+msgstr "mayo"
 
 msgctxt "abbrev. month"
 msgid "June"
-msgstr "Jun."
+msgstr "junio"
 
 msgctxt "abbrev. month"
 msgid "July"
-msgstr "Jul."
+msgstr "julio"
 
 msgctxt "abbrev. month"
 msgid "Aug."
-msgstr "Ago."
+msgstr "ago."
 
 msgctxt "abbrev. month"
 msgid "Sept."
-msgstr "Sept."
+msgstr "sept."
 
 msgctxt "abbrev. month"
 msgid "Oct."
-msgstr "Oct."
+msgstr "oct."
 
 msgctxt "abbrev. month"
 msgid "Nov."
-msgstr "Nov."
+msgstr "nov."
 
 msgctxt "abbrev. month"
 msgid "Dec."
-msgstr "Dic."
+msgstr "dic."
 
 msgctxt "alt. month"
 msgid "January"
-msgstr "Enero"
+msgstr "enero"
 
 msgctxt "alt. month"
 msgid "February"
-msgstr "Febrero"
+msgstr "febrero"
 
 msgctxt "alt. month"
 msgid "March"
-msgstr "Marzo"
+msgstr "marzo"
 
 msgctxt "alt. month"
 msgid "April"
-msgstr "Abril"
+msgstr "abril"
 
 msgctxt "alt. month"
 msgid "May"
-msgstr "Mayo"
+msgstr "mayo"
 
 msgctxt "alt. month"
 msgid "June"
-msgstr "Junio"
+msgstr "junio"
 
 msgctxt "alt. month"
 msgid "July"
-msgstr "Julio"
+msgstr "julio"
 
 msgctxt "alt. month"
 msgid "August"
-msgstr "Agosto"
+msgstr "agosto"
 
 msgctxt "alt. month"
 msgid "September"
-msgstr "Septiembre"
+msgstr "septiembre"
 
 msgctxt "alt. month"
 msgid "October"
-msgstr "Octubre"
+msgstr "octubre"
 
 msgctxt "alt. month"
 msgid "November"
-msgstr "Noviembre"
+msgstr "noviembre"
 
 msgctxt "alt. month"
 msgid "December"
-msgstr "Diciembre"
+msgstr "diciembre"
 
 msgid "This is not a valid IPv6 address."
 msgstr "No es una dirección IPv6 válida."
@@ -1151,36 +1188,42 @@ msgid "%(num)d year"
 msgid_plural "%(num)d years"
 msgstr[0] "%(num)d años"
 msgstr[1] "%(num)d años"
+msgstr[2] "%(num)d años"
 
 #, python-format
 msgid "%(num)d month"
 msgid_plural "%(num)d months"
 msgstr[0] "%(num)d mes"
 msgstr[1] "%(num)d meses"
+msgstr[2] "%(num)d meses"
 
 #, python-format
 msgid "%(num)d week"
 msgid_plural "%(num)d weeks"
 msgstr[0] "%(num)d semana"
 msgstr[1] "%(num)d semanas"
+msgstr[2] "%(num)d semanas"
 
 #, python-format
 msgid "%(num)d day"
 msgid_plural "%(num)d days"
 msgstr[0] "%(num)d día"
 msgstr[1] "%(num)d días"
+msgstr[2] "%(num)d días"
 
 #, python-format
 msgid "%(num)d hour"
 msgid_plural "%(num)d hours"
 msgstr[0] "%(num)d hora"
 msgstr[1] "%(num)d horas"
+msgstr[2] "%(num)d horas"
 
 #, python-format
 msgid "%(num)d minute"
 msgid_plural "%(num)d minutes"
 msgstr[0] "%(num)d minutos"
 msgstr[1] "%(num)d minutes"
+msgstr[2] "%(num)d minutes"
 
 msgid "Forbidden"
 msgstr "Prohibido"

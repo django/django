@@ -2,22 +2,22 @@
 #
 # Translators:
 # edgars <edgars.jekabsons@gmail.com>, 2011
-# NullIsNot0 <nullisnot0@inbox.lv>, 2017
-# NullIsNot0 <nullisnot0@inbox.lv>, 2017-2018
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2017-2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # krikulis <kristaps.kulis@gmail.com>, 2014
 # Māris Nartišs <maris.gis@gmail.com>, 2016
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
 # Mārtiņš Šulcs <shulcsm@gmail.com>, 2018
-# NullIsNot0 <nullisnot0@inbox.lv>, 2018-2021
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2018-2021
 # peterisb <pb@sungis.lv>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-24 16:30+0000\n"
-"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2013-04-25 06:49+0000\n"
+"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -217,7 +217,7 @@ msgid "Marathi"
 msgstr "maratiešu"
 
 msgid "Malay"
-msgstr ""
+msgstr "malajiešu"
 
 msgid "Burmese"
 msgstr "birmiešu"
@@ -395,6 +395,10 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Vērtībai jābūt lielākai vai vienādai ar %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "Vērtībai jābūt reizinājumam no %(limit_value)s."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -473,6 +477,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s ar šādu lauka %(field_labels)s vērtību jau eksistē."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Konstante “%(name)s” ir pārkāpta."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Vērtība %(value)r ir nederīga izvēle."
 
@@ -486,8 +494,8 @@ msgstr "Šis lauks nevar būt tukšs"
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s ar šādu lauka %(field_label)s vērtību jau eksistē."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -782,18 +790,18 @@ msgstr ""
 "%(field_names)s. Paziņojiet par kļūdu, ja problēma atkārtojas."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Lūdzu iesniedziet ne vairāk kā %d formu."
-msgstr[1] "Lūdzu iesniedziet ne vairāk kā %d formu."
-msgstr[2] "Lūdzu iesniedziet ne vairāk kā %d formas."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Lūdzu iesniedziet ne vairāk par %(num)d formām."
+msgstr[1] "Lūdzu iesniedziet ne vairāk par %(num)d formu."
+msgstr[2] "Lūdzu iesniedziet ne vairāk par %(num)d formām."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Lūdzu iesniedziet vismaz %d formu."
-msgstr[1] "Lūdzu iesniedziet vismaz %d formu."
-msgstr[2] "Lūdzu iesniedziet vismaz %d formas."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Lūdzu iesniedziet vismaz %(num)d formas."
+msgstr[1] "Lūdzu iesniedziet vismaz %(num)d formu."
+msgstr[2] "Lūdzu iesniedziet vismaz %(num)d formas."
 
 msgid "Order"
 msgstr "Sakārtojums"

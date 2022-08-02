@@ -2,17 +2,17 @@
 #
 # Translators:
 # André Hagenbruch, 2011-2012
-# Florian Apolloner <florian@apolloner.eu>, 2020-2021
+# Florian Apolloner <florian@apolloner.eu>, 2020-2022
 # Jannis Leidel <jannis@leidel.info>, 2011,2013-2016
-# Jannis Vajen, 2016
+# jnns, 2016
 # Markus Holtermann <info@markusholtermann.eu>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-11-28 17:14+0000\n"
-"Last-Translator: Raphael Michel <mail@raphaelmichel.de>\n"
+"POT-Creation-Date: 2022-05-17 05:26-0500\n"
+"PO-Revision-Date: 2013-04-25 07:59+0000\n"
+"Last-Translator: Florian Apolloner <florian@apolloner.eu>, 2020-2022\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -263,6 +263,13 @@ msgstr "Fr"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Sa"
+
+msgid ""
+"You have already submitted this form. Are you sure you want to submit it "
+"again?"
+msgstr ""
+"Das Formular wurde bereits abgeschickt. Soll es wirklich nochmals "
+"abgeschickt werden?"
 
 msgid "Show"
 msgstr "Einblenden"

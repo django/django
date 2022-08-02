@@ -2,13 +2,14 @@
 #
 # Translators:
 # Ali Ismayilov <ali@ismailov.info>, 2011
+# Nicat Məmmədov <n1c4t97@gmail.com>, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2013-04-24 20:19+0000\n"
+"Last-Translator: Nicat Məmmədov <n1c4t97@gmail.com>, 2022\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +19,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "Administrativ Dokumentasiya"
 
 msgid "Home"
 msgstr "Ev"
@@ -53,7 +54,7 @@ msgid "List of all the template tags and their functions."
 msgstr ""
 
 msgid "Filters"
-msgstr ""
+msgstr "Filterlər"
 
 msgid ""
 "Filters are actions which can be applied to variables in a template to alter "
@@ -86,7 +87,7 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
+"The admin documentation system requires Python’s <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
 
@@ -137,16 +138,16 @@ msgid "Template: %(name)s"
 msgstr ""
 
 #, python-format
-msgid "Template: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
 msgstr ""
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
 msgstr ""
 
 msgid "(does not exist)"
-msgstr ""
+msgstr "(mövcud deyil)"
 
 msgid "Back to Documentation"
 msgstr ""

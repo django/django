@@ -4,6 +4,8 @@
 # HuanCheng Bai白宦成 <xiqingongzi@gmail.com>, 2017-2018
 # lanbla <lanlinwen@buaa.edu.cn>, 2021
 # Daniel Duan <DaNmarner@gmail.com>, 2013
+# Fan Xu <xlivevil@aliyun.com>, 2022
+# Huanqun Yang, 2022
 # jamin M <lxxmbyx@163.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
@@ -29,15 +31,15 @@
 # ced773123cfad7b4e8b79ca80f736af9, 2011-2012
 # Ziya Tang <tcztzy@gmail.com>, 2018
 # 付峥 <fuzheng1998@outlook.com>, 2018
-# fangjiaqi77 <370358679@qq.com>, 2020
+# Fangjiaqi77 <370358679@qq.com>, 2020
 # Kevin Sze <leiarix@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-22 03:05+0000\n"
-"Last-Translator: lanbla <lanlinwen@buaa.edu.cn>\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2013-04-25 06:49+0000\n"
+"Last-Translator: Huanqun Yang, 2022\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -410,6 +412,10 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "确保该值大于或等于%(limit_value)s。"
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "确保该值是步长的倍数%(limit_value)s"
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -467,6 +473,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "包含 %(field_labels)s 的 %(model_name)s 已经存在。"
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "约束 “%(name)s” 是无效的"
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "值 %(value)r 不是有效选项。"
 
@@ -480,8 +490,8 @@ msgstr "此字段不能为空。"
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "具有 %(field_label)s 的 %(model_name)s 已存在。"
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -762,14 +772,14 @@ msgstr ""
 "在，你可能需要提交错误报告。"
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "请最多提交 %d 个表单。"
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "请最多提交 %(num)d 个表单。"
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "请至少提交 %d 个表单。"
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "请至少提交 %(num)d 个表单。"
 
 msgid "Order"
 msgstr "排序"

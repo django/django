@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Jihad Bahmaid Al-Halki, 2022
 # Riterix <infosrabah@gmail.com>, 2019-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-06-23 12:16+0000\n"
-"Last-Translator: Riterix <infosrabah@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:26-0500\n"
+"PO-Revision-Date: 2013-04-25 07:59+0000\n"
+"Last-Translator: Jihad Bahmaid Al-Halki, 2022\n"
 "Language-Team: Arabic (Algeria) (http://www.transifex.com/django/django/"
 "language/ar_DZ/)\n"
 "MIME-Version: 1.0\n"
@@ -191,6 +192,54 @@ msgstr "نوفمبر"
 msgid "December"
 msgstr "ديسمبر"
 
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "يناير"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "فبراير"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "مارس"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "أبريل"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "مايو"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "يونيو"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "يوليو"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "أغسطس"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "سبتمبر"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "أكتوبر"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "نوفمبر"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "ديسمبر"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "ح"
@@ -218,6 +267,11 @@ msgstr "ج"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "س"
+
+msgid ""
+"You have already submitted this form. Are you sure you want to submit it "
+"again?"
+msgstr ""
 
 msgid "Show"
 msgstr "أظهر"

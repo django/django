@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Jihad Bahmaid Al-Halki, 2022
 # Riterix <infosrabah@gmail.com>, 2019-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-14 22:38+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: Jihad Bahmaid Al-Halki, 2022\n"
 "Language-Team: Arabic (Algeria) (http://www.transifex.com/django/django/"
 "language/ar_DZ/)\n"
 "MIME-Version: 1.0\n"
@@ -17,6 +18,10 @@ msgstr ""
 "Language: ar_DZ\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "حذف سجلات %(verbose_name_plural)s المحددة"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -28,10 +33,6 @@ msgstr "لا يمكن حذف %(name)s"
 
 msgid "Are you sure?"
 msgstr "هل أنت متأكد؟"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "حذف سجلات %(verbose_name_plural)s المحددة"
 
 msgid "Administration"
 msgstr "الإدارة"
@@ -269,8 +270,9 @@ msgstr "لا شيء محدد من %(cnt)s"
 msgid "Change history: %s"
 msgstr "تاريخ التغيير: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -521,7 +523,13 @@ msgid "Forgotten your password or username?"
 msgstr "نسيت كلمة المرور أو اسم المستخدم الخاص بك؟"
 
 msgid "Toggle navigation"
-msgstr ""
+msgstr "تغيير التنقل"
+
+msgid "Start typing to filter…"
+msgstr "ابدأ بالكتابة لبدء التصفية(الفلترة)..."
+
+msgid "Filter navigation items"
+msgstr "تصفية عناصر التنقل"
 
 msgid "Date/time"
 msgstr "التاريخ/الوقت"
@@ -531,6 +539,12 @@ msgstr "المستخدم"
 
 msgid "Action"
 msgstr "إجراء"
+
+msgid "entry"
+msgstr ""
+
+msgid "entries"
+msgstr ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -592,8 +606,12 @@ msgstr "أضف %(model)s آخر"
 msgid "Delete selected %(model)s"
 msgstr "حذف %(model)s المختارة"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "شكراً لك على قضائك بعض الوقت مع الموقع اليوم."
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "شكرا لأخذك بعض الوقت في الموقع اليوم."
 
 msgid "Log in again"
 msgstr "ادخل مجدداً"

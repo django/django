@@ -2,19 +2,19 @@
 #
 # Translators:
 # edgars <edgars.jekabsons@gmail.com>, 2011
-# NullIsNot0 <nullisnot0@inbox.lv>, 2017
-# NullIsNot0 <nullisnot0@inbox.lv>, 2018
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Māris Nartišs <maris.gis@gmail.com>, 2016
-# NullIsNot0 <nullisnot0@inbox.lv>, 2019-2021
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2019-2021
 # peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-10-06 05:10+0000\n"
-"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -269,8 +269,9 @@ msgstr "0 no %(cnt)s izvēlēti"
 msgid "Change history: %s"
 msgstr "Izmaiņu vēsture: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -538,6 +539,12 @@ msgstr "Lietotājs"
 msgid "Action"
 msgstr "Darbība"
 
+msgid "entry"
+msgstr "ieraksts"
+
+msgid "entries"
+msgstr "ieraksti"
+
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
@@ -594,6 +601,10 @@ msgstr "Pievienot citu %(model)s"
 #, python-format
 msgid "Delete selected %(model)s"
 msgstr "Dzēst izvēlēto %(model)s"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Apskatīt atzīmētos %(model)s"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Paldies, ka šodien vietnei veltījāt kvalitatīvu laiku."

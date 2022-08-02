@@ -4,13 +4,14 @@
 # Ali Ismayilov <ali@ismailov.info>, 2011-2012
 # Emin Mastizada <emin@linux.com>, 2016,2020
 # Emin Mastizada <emin@linux.com>, 2016
+# Nicat Məmmədov <n1c4t97@gmail.com>, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-14 20:39+0000\n"
-"Last-Translator: Emin Mastizada <emin@linux.com>\n"
+"POT-Creation-Date: 2022-05-17 05:26-0500\n"
+"PO-Revision-Date: 2013-04-25 07:59+0000\n"
+"Last-Translator: Nicat Məmmədov <n1c4t97@gmail.com>, 2022\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -183,6 +184,54 @@ msgstr "Noyabr"
 msgid "December"
 msgstr "Dekabr"
 
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Yan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Fev"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mar"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "May"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "İyn"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "İyl"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Avq"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Sen"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Noy"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Dek"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "B"
@@ -210,6 +259,11 @@ msgstr "C"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Ş"
+
+msgid ""
+"You have already submitted this form. Are you sure you want to submit it "
+"again?"
+msgstr ""
 
 msgid "Show"
 msgstr "Göstər"

@@ -1,19 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015,2017,2020-2021
+# Aarni Koskela, 2015,2017,2020-2022
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jiri Grönroos <jiri.gronroos@iki.fi>, 2021
-# Klaus Dahlén <klaus.dahlen@gmail.com>, 2012
+# Klaus Dahlén, 2012
 # Nikolay Korotkiy <sikmir@disroot.org>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-22 15:46+0000\n"
-"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: Aarni Koskela, 2015,2017,2020-2022\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -267,8 +267,9 @@ msgstr "0 valittuna %(cnt)s mahdollisesta"
 msgid "Change history: %s"
 msgstr "Muokkaushistoria: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -538,6 +539,12 @@ msgstr "Käyttäjä"
 msgid "Action"
 msgstr "Tapahtuma"
 
+msgid "entry"
+msgstr "merkintä"
+
+msgid "entries"
+msgstr "merkinnät"
+
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
@@ -593,6 +600,10 @@ msgstr "Lisää toinen %(model)s"
 #, python-format
 msgid "Delete selected %(model)s"
 msgstr "Poista valitut %(model)s"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Näytä valitut %(model)s"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Kiitos sivuillamme viettämästäsi ajasta."

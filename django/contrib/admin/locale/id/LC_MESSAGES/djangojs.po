@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2021
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2021-2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # oon arfiandwi <oon.arfiandwi@gmail.com>, 2020
 # rodin <romihardiyanto@gmail.com>, 2011-2012
@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-09-14 00:31+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:26-0500\n"
+"PO-Revision-Date: 2013-04-25 07:59+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2021-2022\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -259,6 +259,13 @@ msgstr "J"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
+
+msgid ""
+"You have already submitted this form. Are you sure you want to submit it "
+"again?"
+msgstr ""
+"Anda telah mengajukan formulir ini. Apakah anda yakin ingin mengajukannya "
+"kembali?"
 
 msgid "Show"
 msgstr "Bentangkan"

@@ -9,17 +9,17 @@
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # jaap3 <jaap.roes@gmail.com>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Jeffrey Gelens <jeffrey@noppo.pro>, 2011-2012
-# Sander Steffann <inactive+steffann@transifex.com>, 2015
+# 6a27f10aef159701c7a5ff07f0fb0a78_05545ed <bc5d401a7ecd9343dd5afac265ed8ab3_4845>, 2011-2012
+# 8de006b1b0894aab6aef71979dcd8bd6_5c6b207 <ff2658a8d8dbebbd9cc240b8c133a515_234097>, 2015
 # Tino de Bruijn <tinodb@gmail.com>, 2011
-# Tonnes <tonnes.mb@gmail.com>, 2019
+# Tonnes <tonnes.mb@gmail.com>, 2019,2022
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-17 08:42+0000\n"
-"Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2013-04-25 08:09+0000\n"
+"Last-Translator: Tonnes <tonnes.mb@gmail.com>, 2019,2022\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -143,6 +143,9 @@ msgstr "arbeidsfactor"
 
 msgid "checksum"
 msgstr "checksum"
+
+msgid "block size"
+msgstr "blokgrootte"
 
 msgid "name"
 msgstr "naam"

@@ -2,7 +2,7 @@
 #
 # Translators:
 # Antoni Aloy <aaloy@apsl.net>, 2015,2017
-# Ernesto Avilés, 2015
+# e4db27214f7e7544f2022c647b585925_bb0e321, 2015
 # Ignacio José Lizarán Rus <ilizaran@gmail.com>, 2019
 # Igor Támara <igor@tamarapatino.org>, 2015
 # Pablo, 2015
@@ -13,15 +13,16 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-09-25 17:40+0000\n"
-"Last-Translator: Uriel Medina <urimeba511@gmail.com>\n"
+"PO-Revision-Date: 2015-01-19 09:22+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
 
 msgid "PostgreSQL extensions"
 msgstr "Extensiones de PostgreSQL"
@@ -77,6 +78,9 @@ msgstr[0] ""
 msgstr[1] ""
 "La lista contiene %(show_value)d elementos, no debería contener más de "
 "%(limit_value)d."
+msgstr[2] ""
+"La lista contiene %(show_value)d elementos, no debería contener más de "
+"%(limit_value)d."
 
 #, python-format
 msgid ""
@@ -89,6 +93,9 @@ msgstr[0] ""
 "La lista contiene %(show_value)d elemento, no debería contener menos de "
 "%(limit_value)d."
 msgstr[1] ""
+"La lista contiene %(show_value)d elementos, no debería contener menos de "
+"%(limit_value)d."
+msgstr[2] ""
 "La lista contiene %(show_value)d elementos, no debería contener menos de "
 "%(limit_value)d."
 

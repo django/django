@@ -2,21 +2,22 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Ramiro Morales, 2014-2016,2020-2021
+# Ramiro Morales, 2014-2016,2020-2022
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-03-21 12:54+0000\n"
-"Last-Translator: Ramiro Morales\n"
+"POT-Creation-Date: 2022-05-17 05:26-0500\n"
+"PO-Revision-Date: 2013-04-25 07:59+0000\n"
+"Last-Translator: Ramiro Morales, 2014-2016,2020-2022\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es_AR\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -75,6 +76,7 @@ msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s de %(cnt)s seleccionado/a"
 msgstr[1] "%(sel)s de %(cnt)s seleccionados/as"
+msgstr[2] "%(sel)s de %(cnt)s seleccionados/as"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
@@ -125,6 +127,9 @@ msgstr[0] ""
 msgstr[1] ""
 "Nota: Ud. se encuentra en una zona horaria que está %s horas adelantada "
 "respecto a la del servidor."
+msgstr[2] ""
+"Nota: Ud. se encuentra en una zona horaria que está %s horas adelantada "
+"respecto a la del servidor."
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
@@ -133,6 +138,9 @@ msgstr[0] ""
 "Nota: Ud. se encuentra en una zona horaria que está %s hora atrasada "
 "respecto a la del servidor."
 msgstr[1] ""
+"Nota: Ud. se encuentra en una zona horaria que está %s horas atrasada "
+"respecto a la del servidor."
+msgstr[2] ""
 "Nota: Ud. se encuentra en una zona horaria que está %s horas atrasada "
 "respecto a la del servidor."
 
@@ -158,40 +166,40 @@ msgid "Tomorrow"
 msgstr "Mañana"
 
 msgid "January"
-msgstr "Enero"
+msgstr "enero"
 
 msgid "February"
-msgstr "Febrero"
+msgstr "febrero"
 
 msgid "March"
-msgstr "Marzo"
+msgstr "marzo"
 
 msgid "April"
-msgstr "Abril"
+msgstr "abril"
 
 msgid "May"
-msgstr "Mayo"
+msgstr "mayo"
 
 msgid "June"
-msgstr "Junio"
+msgstr "junio"
 
 msgid "July"
-msgstr "Julio"
+msgstr "julio"
 
 msgid "August"
-msgstr "Agosto"
+msgstr "agosto"
 
 msgid "September"
-msgstr "Setiembre"
+msgstr "setiembre"
 
 msgid "October"
-msgstr "Octubre"
+msgstr "octubre"
 
 msgid "November"
-msgstr "Noviembre"
+msgstr "noviembre"
 
 msgid "December"
-msgstr "Diciembre"
+msgstr "diciembre"
 
 msgctxt "abbrev. month January"
 msgid "Jan"
@@ -268,6 +276,12 @@ msgstr "V"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
+
+msgid ""
+"You have already submitted this form. Are you sure you want to submit it "
+"again?"
+msgstr ""
+"Ya ha enviado este formulario. ¿Está seguro de que desea enviarlo nuevamente?"
 
 msgid "Show"
 msgstr "Mostrar"

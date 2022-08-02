@@ -2,10 +2,10 @@
 #
 # Translators:
 # Oleksandr Chernihov <o.chernihov@gmail.com>, 2014
-# Boryslav Larin <brabadu@gmail.com>, 2011
+# Boryslav Larin <brabadu@gmail.com>, 2011,2022
 # Denis Podlesniy <haos616@gmail.com>, 2016
 # Igor Melnyk, 2014-2015,2017
-# Illia Volochii <illia.volochii@gmail.com>, 2019,2021
+# Illia Volochii <illia.volochii@gmail.com>, 2019,2021-2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2014
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
@@ -21,9 +21,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-12-02 22:16+0000\n"
-"Last-Translator: Illia Volochii <illia.volochii@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2013-04-25 06:49+0000\n"
+"Last-Translator: Boryslav Larin <brabadu@gmail.com>, 2011,2022\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -373,6 +373,8 @@ msgid ""
 "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
+"Введіть коректне значення 'slug' (короткого заголовку), що може містити "
+"тільки літери, числа, символи підкреслювання або дефіси."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Введіть коректну IPv4 адресу."
@@ -399,6 +401,10 @@ msgstr "Переконайтеся, що це значення менше чи �
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Переконайтеся, що це значення більше чи дорівнює %(limit_value)s."
+
+#, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -482,6 +488,8 @@ msgid ""
 "File extension “%(extension)s” is not allowed. Allowed extensions are: "
 "%(allowed_extensions)s."
 msgstr ""
+"Розширення файлу '%(extension)s' не дозволено. Дозволені розширення: ' "
+"%(allowed_extensions)s'."
 
 msgid "Null characters are not allowed."
 msgstr "Символи Null не дозволені."
@@ -492,6 +500,10 @@ msgstr "та"
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s з таким %(field_labels)s вже існує."
+
+#, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr ""
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
@@ -507,8 +519,8 @@ msgstr "Це поле не може бути порожнім."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s з таким %(field_label)s вже існує."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -526,7 +538,7 @@ msgstr ""
 
 #, python-format
 msgid "“%(value)s” value must be either True, False, or None."
-msgstr ""
+msgstr "Значення \"%(value)s\" повинне бути True, False, або None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Булеве значення (True або False)"
@@ -558,6 +570,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"Значення \"%(value)s\" має невірний формат. Воно повинне бути у форматі YYYY-"
+"MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
 
 #, python-format
 msgid ""
@@ -644,6 +658,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"Значення \"%(value)s\" має невірний формат. Воно повинне бути у форматі HH:"
+"MM[:ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
@@ -662,7 +678,7 @@ msgstr "Необроблені двійкові дані"
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
-msgstr ""
+msgstr "“%(value)s” не є валідним UUID."
 
 msgid "Universally unique identifier"
 msgstr "Універсальний унікальний ідентифікатор"
@@ -797,16 +813,16 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
@@ -1151,50 +1167,50 @@ msgstr ", "
 #, python-format
 msgid "%(num)d year"
 msgid_plural "%(num)d years"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(num)d рік"
+msgstr[1] "%(num)d роки"
+msgstr[2] "%(num)d років"
+msgstr[3] "%(num)d років"
 
 #, python-format
 msgid "%(num)d month"
 msgid_plural "%(num)d months"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(num)d місяць"
+msgstr[1] "%(num)d місяці"
+msgstr[2] "%(num)d місяців"
+msgstr[3] "%(num)d місяців"
 
 #, python-format
 msgid "%(num)d week"
 msgid_plural "%(num)d weeks"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(num)d тиждень"
+msgstr[1] "%(num)d тижні"
+msgstr[2] "%(num)d тижнів"
+msgstr[3] "%(num)d тижнів"
 
 #, python-format
 msgid "%(num)d day"
 msgid_plural "%(num)d days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(num)d день"
+msgstr[1] "%(num)d дні"
+msgstr[2] "%(num)d днів"
+msgstr[3] "%(num)d днів"
 
 #, python-format
 msgid "%(num)d hour"
 msgid_plural "%(num)d hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(num)d година"
+msgstr[1] "%(num)d години"
+msgstr[2] "%(num)d годин"
+msgstr[3] "%(num)d годин"
 
 #, python-format
 msgid "%(num)d minute"
 msgid_plural "%(num)d minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(num)d хвилина"
+msgstr[1] "%(num)d хвилини"
+msgstr[2] "%(num)d хвилин"
+msgstr[3] "%(num)d хвилин"
 
 msgid "Forbidden"
 msgstr "Заборонено"
@@ -1214,6 +1230,10 @@ msgid ""
 "enable them, at least for this site, or for HTTPS connections, or for “same-"
 "origin” requests."
 msgstr ""
+"Якщо ви налаштували свій браузер таким чином, щоб заборонити йому передавати "
+"заголовок «Referer», будь ласка, дозвольте йому відсилати даний заголовок "
+"принаймні для даного сайту, або для всіх HTTPS-з'єднань, або для подібних "
+"запитів."
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "

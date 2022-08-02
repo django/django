@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Jihad Bahmaid Al-Halki, 2022
 # Riterix <infosrabah@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-12-14 22:38+0000\n"
-"Last-Translator: Riterix <infosrabah@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2013-04-25 08:09+0000\n"
+"Last-Translator: Jihad Bahmaid Al-Halki, 2022\n"
 "Language-Team: Arabic (Algeria) (http://www.transifex.com/django/django/"
 "language/ar_DZ/)\n"
 "MIME-Version: 1.0\n"
@@ -134,6 +135,9 @@ msgstr "عامل العمل"
 
 msgid "checksum"
 msgstr "تدقيق المجموع"
+
+msgid "block size"
+msgstr "حجم البلوك (Block)"
 
 msgid "name"
 msgstr "الاسم"

@@ -10,16 +10,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-11-30 23:58+0000\n"
-"Last-Translator: Nuno Mariz <nmariz@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2013-04-25 08:09+0000\n"
+"Last-Translator: Nuno Mariz <nmariz@gmail.com>, 2013,2015,2017\n"
 "Language-Team: Portuguese (http://www.transifex.com/django/django/language/"
 "pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pt\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
+"1000000 == 0 ? 1 : 2;\n"
 
 msgid "Personal info"
 msgstr "Informação pessoal"
@@ -56,8 +57,8 @@ msgstr "Nenhuma palavra-chave definida."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Formato de palavra-chave inválido ou função de mistura desconhecida."
 
-msgid "The two password fields didn't match."
-msgstr "Os dois campos da palavra-passe não coincidem."
+msgid "The two password fields didn’t match."
+msgstr ""
 
 msgid "Password"
 msgstr "Palavra-passe"
@@ -69,12 +70,9 @@ msgid "Enter the same password as before, for verification."
 msgstr "Introduza a palavra-passe como acima, para verificação."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Não são guardadas palavras-passe sem encriptação, portanto não é possível "
-"visualizar a password deste utilizador, mas poderá modificar a palavra-passe "
-"através <a href=\"{}\">deste formulário</a>."
 
 #, python-format
 msgid ""
@@ -139,6 +137,9 @@ msgstr "fator trabalho"
 
 msgid "checksum"
 msgstr "verificação"
+
+msgid "block size"
+msgstr ""
 
 msgid "name"
 msgstr "nome"
@@ -240,6 +241,9 @@ msgstr[0] ""
 msgstr[1] ""
 "Esta palavra-passe é muito curta. Deve conter pelo menos %(min_length)d "
 "caracteres."
+msgstr[2] ""
+"Esta palavra-passe é muito curta. Deve conter pelo menos %(min_length)d "
+"caracteres."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -248,27 +252,27 @@ msgstr[0] ""
 "A sua palavra-passe deve conter pelo menos %(min_length)d caractere."
 msgstr[1] ""
 "A sua palavra-passe deve conter pelo menos %(min_length)d caracteres."
+msgstr[2] ""
+"A sua palavra-passe deve conter pelo menos %(min_length)d caracteres."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "A palavra-passe é muito semelhante ao %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
-"Sua palavra-passe não pode ser muito semelhante a outras informações "
-"pessoais."
 
 msgid "This password is too common."
 msgstr "Esta palavra-passe é muito comum."
 
-msgid "Your password can't be a commonly used password."
-msgstr "A sua palavra-passe não pode ser uma palavra-passe comum."
+msgid "Your password can’t be a commonly used password."
+msgstr ""
 
 msgid "This password is entirely numeric."
 msgstr "Esta palavra-passe é inteiramente numérica."
 
-msgid "Your password can't be entirely numeric."
-msgstr "Sua palavra-passe não pode ser inteiramente numérica."
+msgid "Your password can’t be entirely numeric."
+msgstr ""
 
 #, python-format
 msgid "Password reset on %(site_name)s"

@@ -2,6 +2,7 @@
 #
 # Translators:
 # Aleksa Cukovic` <aleksacukovic1@gmail.com>, 2020
+# Danijela Popović, 2022
 # Igor Jerosimić, 2019-2021
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
@@ -9,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-18 23:38+0000\n"
-"Last-Translator: Igor Jerosimić\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2013-04-25 06:49+0000\n"
+"Last-Translator: Danijela Popović, 2022\n"
 "Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
 "language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
@@ -389,6 +390,10 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Ova vrednost mora biti veća od %(limit_value)s ili tačno toliko."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -467,6 +472,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s sa poljem %(field_labels)s već postoji."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr ""
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Vrednost %(value)r nije validna."
 
@@ -480,8 +489,8 @@ msgstr "Ovo polje ne može da ostane prazno."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s sa ovom vrednošću %(field_label)s već postoji."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -524,6 +533,8 @@ msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"Vrednost “%(value)s” ima odgovarajući format (GGGG-MM-DD), ali nije validan "
+"datum."
 
 msgid "Date (without time)"
 msgstr "Datum (bez vremena)"
@@ -533,19 +544,23 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"Vrednost “%(value)s” je u nevažećem formatu. Mora se uneti u formatu YYYY-MM-"
+"DD HH:MM[:ss[.uuuuuu]][TZ]."
 
 #, python-format
 msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"Vrednost “%(value)s” je u odgovarajućem formatu (YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ]), ali nije validna vrednost za datum i vreme."
 
 msgid "Date (with time)"
 msgstr "Datum (sa vremenom)"
 
 #, python-format
 msgid "“%(value)s” value must be a decimal number."
-msgstr ""
+msgstr "Vrednost “%(value)s” mora biti decimalni broj."
 
 msgid "Decimal number"
 msgstr "Decimalni broj"
@@ -555,6 +570,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
+"Vrednost “%(value)s” nije u odgovarajućem formatu. Mora biti u formatu [DD] "
+"[[HH:]MM:]ss[.uuuuuu]."
 
 msgid "Duration"
 msgstr "Vremenski interval"
@@ -567,14 +584,14 @@ msgstr "Putanja fajla"
 
 #, python-format
 msgid "“%(value)s” value must be a float."
-msgstr ""
+msgstr "Vrednost “%(value)s” value mora biti tipa float."
 
 msgid "Floating point number"
 msgstr "Broj sa pokrenom zapetom"
 
 #, python-format
 msgid "“%(value)s” value must be an integer."
-msgstr ""
+msgstr "Vrednost “%(value)s” mora biti ceo broj."
 
 msgid "Integer"
 msgstr "Ceo broj"
@@ -593,7 +610,7 @@ msgstr "IP adresa"
 
 #, python-format
 msgid "“%(value)s” value must be either None, True or False."
-msgstr ""
+msgstr "Vrednost “%(value)s” mora biti None, True ili False."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Bulova vrednost (True, False ili None)"
@@ -619,12 +636,16 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"Vrednost “%(value)s” nije u odgovarajućem formatu. Mora biti u formatu HH:"
+"MM[:ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
 "“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"Vrednost “%(value)s” je u odgovarajućem formatu (HH:MM[:ss[.uuuuuu]]), ali "
+"nije validna vrednost za vreme."
 
 msgid "Time"
 msgstr "Vreme"
@@ -637,7 +658,7 @@ msgstr "Sirovi binarni podaci"
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
-msgstr ""
+msgstr "Vrednost “%(value)s” nije validan UUID (jedinstveni ID)."
 
 msgid "Universally unique identifier"
 msgstr "Univerzalno jedinstveni identifikator"
@@ -656,7 +677,7 @@ msgstr "Vrednost mora biti ispravni JSON."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr ""
+msgstr "Instanca modela %(model)s sa vrednošću %(field)s %(value)r ne postoji."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Strani ključ (tip određuje referentno polje)"
@@ -765,15 +786,15 @@ msgstr ""
 "nastavi."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""

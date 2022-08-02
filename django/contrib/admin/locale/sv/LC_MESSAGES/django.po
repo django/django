@@ -1,10 +1,12 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Albin Larsson <albin.post@gmail.com>, 2022
 # Alex Nordlund <deep.alexander@gmail.com>, 2012
 # Andreas Pelme <andreas@pelme.se>, 2014
 # d7bcbd5f5cbecdc2b959899620582440, 2011
 # Cybjit <cybjit@gmail.com>, 2012
+# Elias Johnstone <eli87as@gmail.com>, 2022
 # Henrik Palmlund Wahlgren <henrik@pwit.se>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Johan Rohdin, 2021
@@ -18,9 +20,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-04-01 12:33+0000\n"
-"Last-Translator: Johan Rohdin\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: Elias Johnstone <eli87as@gmail.com>, 2022\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -81,10 +83,10 @@ msgid "Has date"
 msgstr "Har datum"
 
 msgid "Empty"
-msgstr ""
+msgstr "Tom"
 
 msgid "Not empty"
-msgstr ""
+msgstr "Inte tom"
 
 #, python-format
 msgid ""
@@ -272,8 +274,9 @@ msgstr "0 av %(cnt)s valda"
 msgid "Change history: %s"
 msgstr "Ändringshistorik: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -405,7 +408,7 @@ msgid "Filter"
 msgstr "Filtrera"
 
 msgid "Clear all filters"
-msgstr ""
+msgstr "Rensa alla filter"
 
 msgid "Remove from sorting"
 msgstr "Ta bort från sortering"
@@ -527,7 +530,13 @@ msgid "Forgotten your password or username?"
 msgstr "Har du glömt lösenordet eller användarnamnet?"
 
 msgid "Toggle navigation"
-msgstr ""
+msgstr "Växla navigering"
+
+msgid "Start typing to filter…"
+msgstr "Börja skriv för att filtrera..."
+
+msgid "Filter navigation items"
+msgstr "Filtrera navigeringsobjekt"
 
 msgid "Date/time"
 msgstr "Datum tid"
@@ -537,6 +546,12 @@ msgstr "Användare"
 
 msgid "Action"
 msgstr "Händelse"
+
+msgid "entry"
+msgstr "post"
+
+msgid "entries"
+msgstr "poster"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -594,8 +609,12 @@ msgstr "Lägg till %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Ta bort markerade %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Tack för att du spenderade lite kvalitetstid med webbplatsen idag."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Visa valda %(model)s"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Tack för att du spenderade kvalitetstid med webbplatsen idag."
 
 msgid "Log in again"
 msgstr "Logga in igen"

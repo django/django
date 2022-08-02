@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Resulkary <resulsaparov@gmail.com>, 2020
+# Resul <resulsaparov@gmail.com>, 2020
+# Welbeck Garli <welbeckgrlyw@gmail.com>, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-07-06 11:55+0000\n"
-"Last-Translator: Resulkary <resulsaparov@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2013-04-24 18:32+0000\n"
+"Last-Translator: Welbeck Garli <welbeckgrlyw@gmail.com>, 2022\n"
 "Language-Team: Turkmen (http://www.transifex.com/django/django/language/"
 "tk/)\n"
 "MIME-Version: 1.0\n"
@@ -36,11 +37,11 @@ msgid "redirect to"
 msgstr "gönükdirilen salgy"
 
 msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"“http://”."
+"This can be either an absolute path (as above) or a full URL starting with a "
+"scheme such as “https://”."
 msgstr ""
-"Bu ýa doly ýol (ýokardaky ýaly) ýa-da “http://” bilen başlaýan doly URL "
-"bolup biler."
+"(ýokarydaky ýaly) absolýut yzarlama ýa-da \"https://\" bilen başlanýan "
+"sahypa gönükdirmesi bolup biler."
 
 msgid "redirect"
 msgstr "gönükdirme"

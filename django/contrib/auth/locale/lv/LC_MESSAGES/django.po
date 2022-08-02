@@ -1,18 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# NullIsNot0 <nullisnot0@inbox.lv>, 2017
-# NullIsNot0 <nullisnot0@inbox.lv>, 2017
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
-# NullIsNot0 <nullisnot0@inbox.lv>, 2019,2021
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2019,2021
 # peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-10-06 05:08+0000\n"
-"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
+"PO-Revision-Date: 2013-04-25 08:09+0000\n"
+"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -81,8 +81,8 @@ msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
-"Lūdzu ievadi korektu %(username)s un paroli personāla kontam. Ņem vērā, ka "
-"abi ievades lauki ir reģistr jūtīgi."
+"Lūdzu ievadiet korektu informāciju laukos %(username)s un parole. Ņemiet "
+"vērā, ka abi ievades lauki ir reģistrjutīgi."
 
 msgid "This account is inactive."
 msgstr "Šis konts nav aktīvs."
@@ -185,7 +185,7 @@ msgid "Specific permissions for this user."
 msgstr "Lietotāja specifiskās tiesības."
 
 msgid "username"
-msgstr "lietotāja vārds"
+msgstr "lietotājvārds"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr "Obligāts. 150 vai mazāk zīmes. Tikai burti, cipari un @/./+/-/_ ."

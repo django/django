@@ -2,7 +2,7 @@
 #
 # Translators:
 # Antoni Aloy <aaloy@apsl.net>, 2012,2015
-# Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015
+# e4db27214f7e7544f2022c647b585925_bb0e321, 2015
 # Igor Támara <igor@tamarapatino.org>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
@@ -11,16 +11,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-20 03:01+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2013-04-24 18:45+0000\n"
+"Last-Translator: Marc Garcia <garcia.marc@gmail.com>, 2011\n"
 "Language-Team: Spanish (Colombia) (http://www.transifex.com/django/django/"
 "language/es_CO/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es_CO\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
 
 msgid "GIS"
 msgstr "GIS"
@@ -29,7 +30,7 @@ msgid "The base GIS field."
 msgstr "El campo GIS base."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
 
 msgid "Point"
@@ -88,5 +89,5 @@ msgid "No feeds are registered."
 msgstr "No se han registrado canales de contenido."
 
 #, python-format
-msgid "Slug %r isn't registered."
-msgstr "El slug %r no está registrado."
+msgid "Slug %r isn’t registered."
+msgstr ""

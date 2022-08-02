@@ -5,18 +5,18 @@
 # Florian Apolloner <florian@apolloner.eu>, 2011
 # Dimitris Glezos <glezos@transifex.com>, 2012
 # Florian Apolloner <florian@apolloner.eu>, 2020-2022
-# Jannis Vajen, 2013
+# jnns, 2013
 # Jannis Leidel <jannis@leidel.info>, 2013-2018,2020
-# Jannis Vajen, 2016
+# jnns, 2016
 # Markus Holtermann <info@markusholtermann.eu>, 2020
 # Markus Holtermann <info@markusholtermann.eu>, 2013,2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2022-01-15 11:22+0000\n"
-"Last-Translator: Florian Apolloner <florian@apolloner.eu>\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: Florian Apolloner <florian@apolloner.eu>, 2020-2022\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -276,8 +276,9 @@ msgstr "0 von %(cnt)s ausgewählt"
 msgid "Change history: %s"
 msgstr "Änderungsgeschichte: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -553,6 +554,12 @@ msgstr "Benutzer"
 msgid "Action"
 msgstr "Aktion"
 
+msgid "entry"
+msgstr "Eintrag"
+
+msgid "entries"
+msgstr "Einträge"
+
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
@@ -608,6 +615,10 @@ msgstr "%(model)s hinzufügen"
 #, python-format
 msgid "Delete selected %(model)s"
 msgstr "Ausgewählte %(model)s löschen"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Ausgewählte %(model)s ansehen"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr ""

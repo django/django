@@ -4,19 +4,19 @@
 # André Hagenbruch, 2011-2012
 # Florian Apolloner <florian@apolloner.eu>, 2011
 # Daniel Roschka <dunedan@phoenitydawn.de>, 2016
-# Florian Apolloner <florian@apolloner.eu>, 2018,2020-2021
-# Jannis Vajen, 2011,2013
+# Florian Apolloner <florian@apolloner.eu>, 2018,2020-2022
+# jnns, 2011,2013
 # Jannis Leidel <jannis@leidel.info>, 2013-2018,2020
-# Jannis Vajen, 2016
+# jnns, 2016
 # Markus Holtermann <info@markusholtermann.eu>, 2013,2015
 # Raphael Michel <mail@raphaelmichel.de>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-28 18:34+0000\n"
-"Last-Translator: Florian Apolloner <florian@apolloner.eu>\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2013-04-25 06:49+0000\n"
+"Last-Translator: Florian Apolloner <florian@apolloner.eu>, 2018,2020-2022\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -394,6 +394,10 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Dieser Wert muss größer oder gleich %(limit_value)s sein."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "Dieser Wert muss ein Vielfaches von %(limit_value)s sein."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -471,6 +475,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s mit diesem %(field_labels)s existiert bereits."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Bedingung „%(name)s“ ist nicht erfüllt."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Wert %(value)r ist keine gültige Option."
 
@@ -484,8 +492,8 @@ msgstr "Dieses Feld darf nicht leer sein."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s mit diesem %(field_label)s existiert bereits."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -786,16 +794,16 @@ msgstr ""
 "Fehler dauerhaft besteht."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Bitte höchstens %d Formular abschicken."
-msgstr[1] "Bitte höchstens %d Formulare abschicken."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Bitte höchstens %(num)d Forumlar abschicken."
+msgstr[1] "Bitte höchstens %(num)d Formulare abschicken."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Bitte mindestens %d Formular abschicken."
-msgstr[1] "Bitte mindestens %d Formulare abschicken."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Bitte mindestends %(num)d Formular abschicken."
+msgstr[1] "Bitte mindestens %(num)d Formulare abschicken."
 
 msgid "Order"
 msgstr "Reihenfolge"

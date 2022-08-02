@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Albin Larsson <albin.post@gmail.com>, 2022
 # Andreas Pelme <andreas@pelme.se>, 2012,2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2014
@@ -12,8 +13,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-10-27 05:33+0000\n"
-"Last-Translator: Tomas Lööw <tomas.loow@mailbox.org>\n"
+"PO-Revision-Date: 2013-04-24 20:19+0000\n"
+"Last-Translator: Albin Larsson <albin.post@gmail.com>, 2022\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -161,12 +162,12 @@ msgstr "Mall: %(name)s"
 
 #, python-format
 msgid "Template: <q>%(name)s</q>"
-msgstr ""
+msgstr "Mall:<q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template <q>%(name)s</q>:"
-msgstr ""
+msgstr "Sökvägen för mall <q>%(name)s</q>:"
 
 msgid "(does not exist)"
 msgstr "(finns inte)"

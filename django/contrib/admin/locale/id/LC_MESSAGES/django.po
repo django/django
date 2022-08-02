@@ -2,7 +2,7 @@
 #
 # Translators:
 # Claude Paroz <claude@2xlibre.net>, 2014
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # oon arfiandwi <oon.arfiandwi@gmail.com>, 2016,2020
@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-10-06 09:12+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2022\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -271,8 +271,9 @@ msgstr "0 dari %(cnt)s dipilih"
 msgid "Change history: %s"
 msgstr "Ubah riwayat: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -542,6 +543,12 @@ msgstr "Pengguna"
 msgid "Action"
 msgstr "Aksi"
 
+msgid "entry"
+msgstr "masukan"
+
+msgid "entries"
+msgstr "masukan"
+
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
@@ -596,6 +603,10 @@ msgstr "Tambahkan %(model)s yang lain"
 #, python-format
 msgid "Delete selected %(model)s"
 msgstr "Hapus %(model)s yang dipilih"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Menampilkan %(model)s terpilih"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr ""

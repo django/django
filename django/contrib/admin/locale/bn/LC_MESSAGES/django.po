@@ -3,14 +3,15 @@
 # Translators:
 # Anubhab Baksi, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Md Arshad Hussain, 2022
 # Tahmid Rafi <rafi.tahmid@gmail.com>, 2012-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: Md Arshad Hussain, 2022\n"
 "Language-Team: Bengali (http://www.transifex.com/django/django/language/"
 "bn/)\n"
 "MIME-Version: 1.0\n"
@@ -18,6 +19,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: bn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "চিহ্নিত অংশটি %(verbose_name_plural)s মুছে ফেলুন"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -30,12 +35,8 @@ msgstr "%(name)s ডিলিট করা সম্ভব নয়"
 msgid "Are you sure?"
 msgstr "আপনি কি নিশ্চিত?"
 
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "চিহ্নিত অংশটি %(verbose_name_plural)s মুছে ফেলুন"
-
 msgid "Administration"
-msgstr ""
+msgstr "প্রয়োগ"
 
 msgid "All"
 msgstr "সকল"
@@ -65,10 +66,16 @@ msgid "This year"
 msgstr "এ বছরে"
 
 msgid "No date"
-msgstr ""
+msgstr "কোন তারিখ নেই"
 
 msgid "Has date"
-msgstr ""
+msgstr "তারিখ আছে"
+
+msgid "Empty"
+msgstr "খালি"
+
+msgid "Not empty"
+msgstr "খালি নেই"
 
 #, python-format
 msgid ""
@@ -86,11 +93,20 @@ msgstr "আরো একটি %(verbose_name)s যোগ করুন"
 msgid "Remove"
 msgstr "মুছে ফেলুন"
 
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "পরিবর্তন"
+
+msgid "Deletion"
+msgstr ""
+
 msgid "action time"
 msgstr "কার্য সময়"
 
 msgid "user"
-msgstr ""
+msgstr "ব্যবহারকারী"
 
 msgid "content type"
 msgstr ""
@@ -99,7 +115,7 @@ msgid "object id"
 msgstr "অবজেক্ট আইডি"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "অবজেক্ট উপস্থাপক"
 
@@ -116,32 +132,32 @@ msgid "log entries"
 msgstr "লগ এন্ট্রিসমূহ"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "%(object)s অ্যাড করা হয়েছে"
+msgid "Added “%(object)s”."
+msgstr "“%(object)s” যোগ করা হয়েছে। "
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr ""
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "“%(object)s” — %(changes)s পরিবর্তন করা হয়েছে"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "\"%(object)s\" ডিলিট করা হয়েছে"
+msgid "Deleted “%(object)s.”"
+msgstr "“%(object)s.” মুছে ফেলা হয়েছে"
 
 msgid "LogEntry Object"
 msgstr "লগ-এন্ট্রি দ্রব্য"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
+msgid "Added {name} “{object}”."
 msgstr ""
 
 msgid "Added."
-msgstr ""
+msgstr "যুক্ত করা হয়েছে"
 
 msgid "and"
 msgstr "এবং"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
 msgstr ""
 
 #, python-brace-format
@@ -149,7 +165,7 @@ msgid "Changed {fields}."
 msgstr ""
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
 msgstr ""
 
 msgid "No fields changed."
@@ -158,38 +174,39 @@ msgstr "কোন ফিল্ড পরিবর্তন হয়নি।"
 msgid "None"
 msgstr "কিছু না"
 
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
+msgstr "নিম্নে আপনি আবার তা সম্পাদনা/পরিবর্তন করতে পারেন।"
+
+#, python-brace-format
 msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr ""
+"{name} \"{obj}\" সফলভাবে যুক্ত হয়েছে৷ নিম্নে আপনি আরেকটি {name} যুক্ত করতে পারেন।"
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
+msgid "The {name} “{obj}” was changed successfully."
 msgstr ""
 
 msgid ""
@@ -201,11 +218,11 @@ msgid "No action selected."
 msgstr "কোনো কাজ "
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" সফলতার সাথে মুছে ফেলা হয়েছে।"
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr ""
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
 
 #, python-format
@@ -215,6 +232,10 @@ msgstr "%s যোগ করুন"
 #, python-format
 msgid "Change %s"
 msgstr "%s পরিবর্তন করুন"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "ডাটাবেস সমস্যা"
@@ -239,8 +260,9 @@ msgstr "%(cnt)s টি থেকে ০ টি সিলেক্ট করা �
 msgid "Change history: %s"
 msgstr "ইতিহাস পরিবর্তনঃ %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr ""
@@ -270,8 +292,8 @@ msgstr ""
 msgid "Page not found"
 msgstr "পৃষ্ঠা পাওয়া যায়নি"
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "দুঃখিত, অনুরোধকৃত পাতাটি পাওয়া যায়নি।"
+msgid "We’re sorry, but the requested page could not be found."
+msgstr "আমরা দুঃখিত, কিন্তু অনুরোধকৃত পাতা খুঁজে পাওয়া যায়নি।"
 
 msgid "Home"
 msgstr "নীড়পাতা"
@@ -286,7 +308,7 @@ msgid "Server Error <em>(500)</em>"
 msgstr "সার্ভার সমস্যা <em>(৫০০)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 
@@ -306,12 +328,25 @@ msgstr "%(total_count)s টি %(module_name)s এর সবগুলোই স�
 msgid "Clear selection"
 msgstr "চিহ্নিত অংশের চিহ্ন মুছে ফেলুন"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "%(name)s এপ্লিকেশন এর মডেল গুলো"
+
+msgid "Add"
+msgstr "যোগ করুন"
+
+msgid "View"
+msgstr "দেখুন"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "কোন কিছু দেখার বা সম্পাদনা/পরিবর্তন করার আপনার কোন অনুমতি নেই।"
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
-"প্রথমে একটি সদস্যনাম ও পাসওয়ার্ড প্রবেশ করান। তারপরে আপনি ‍আরও সদস্য-অপশন যুক্ত করতে "
-"পারবেন।"
+"প্রথমে, একজন ব্যবহারকারীর নাম এবং পাসওয়ার্ড লিখুন। তাহলে, আপনি ব্যবহারকারীর "
+"অন্যান্য অনেক অপশনগুলো পরিবর্তন করতে সক্ষম হবেন। "
 
 msgid "Enter a username and password."
 msgstr "ইউজার নেইম এবং পাসওয়ার্ড টাইপ করুন।"
@@ -320,10 +355,10 @@ msgid "Change password"
 msgstr "পাসওয়ার্ড বদলান"
 
 msgid "Please correct the error below."
-msgstr "অনুগ্রহ করে নিচের ভুলগুলো সংশোধন করুন।"
+msgstr "দয়া করে নিম্নবর্ণিত ভুলটি সংশোধন করুন।"
 
 msgid "Please correct the errors below."
-msgstr ""
+msgstr "দয়া করে নিম্নবর্ণিত ভুলগুলো সংশোধন করুন।"
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
@@ -353,6 +388,9 @@ msgstr "সাইটে দেখুন"
 
 msgid "Filter"
 msgstr "ফিল্টার"
+
+msgid "Clear all filters"
+msgstr ""
 
 msgid "Remove from sorting"
 msgstr "ক্রমানুসারে সাজানো থেকে বিরত হোন"
@@ -393,11 +431,11 @@ msgstr ""
 msgid "Objects"
 msgstr ""
 
-msgid "Yes, I'm sure"
-msgstr "হ্যা়ঁ, আমি নিশ্চিত"
+msgid "Yes, I’m sure"
+msgstr "হ্যাঁ, আমি নিশ্চিত"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "না, আমাক পূর্বের জায়গায় ফিরিয়ে নাও"
 
 msgid "Delete multiple objects"
 msgstr "একাধিক জিনিস মুছে ফেলুন"
@@ -421,9 +459,6 @@ msgid ""
 "following objects and their related items will be deleted:"
 msgstr ""
 
-msgid "Change"
-msgstr "পরিবর্তন"
-
 msgid "Delete?"
 msgstr "মুছে ফেলুন?"
 
@@ -432,23 +467,13 @@ msgid " By %(filter_title)s "
 msgstr " %(filter_title)s অনুযায়ী "
 
 msgid "Summary"
-msgstr ""
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s এপ্লিকেশন এর মডেল গুলো"
-
-msgid "Add"
-msgstr "যোগ করুন"
-
-msgid "You don't have permission to edit anything."
-msgstr "কোন কিছু পরিবর্তনে আপনার অধিকার নেই।"
+msgstr "সারসংক্ষেপ"
 
 msgid "Recent actions"
 msgstr ""
 
 msgid "My actions"
-msgstr ""
+msgstr "আমার করনীয়"
 
 msgid "None available"
 msgstr "কিছুই পাওয়া যায়নি"
@@ -457,12 +482,13 @@ msgid "Unknown content"
 msgstr "অজানা বিষয়"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"আপনার ডাটাবেস ইনস্টলে সমস্যা হয়েছে। নিশ্চিত করুন যে, ডাটাবেস টেবিলগুলো সঠিকভাবে "
-"তৈরী হয়েছে, এবং যথাযথ সদস্যের ডাটাবেস পড়ার অধিকার রয়েছে।"
+"আপনার ড্যাটাবেস ইন্সটলেশন করার ক্ষেত্রে কিছু সমস্যা রয়েছে। নিশ্চিত করুন যে আপনি "
+"যথাযথ ড্যাটাবেস টেবিলগুলো তৈরী করেছেন এবং নিশ্চিত করুন যে উক্ত ড্যাটাবেসটি অন্যান্য "
+"ব্যবহারকারী দ্বারা ব্যবহারযোগ্য হবে। "
 
 #, python-format
 msgid ""
@@ -473,6 +499,15 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "ইউজার নেইম অথবা পাসওয়ার্ড ভুলে গেছেন?"
 
+msgid "Toggle navigation"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
+
 msgid "Date/time"
 msgstr "তারিখ/সময়"
 
@@ -482,10 +517,16 @@ msgstr "সদস্য"
 msgid "Action"
 msgstr "কার্য"
 
+msgid "entry"
+msgstr ""
+
+msgid "entries"
+msgstr ""
+
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
-msgstr "এই অবজেক্টের কোন ইতিহাস নেই। সম্ভবত এটি প্রশাসন সাইট দিয়ে তৈরী করা হয়নি।"
+msgstr ""
 
 msgid "Show all"
 msgstr "সব দেখান"
@@ -493,19 +534,7 @@ msgstr "সব দেখান"
 msgid "Save"
 msgstr "সংরক্ষণ করুন"
 
-msgid "Popup closing..."
-msgstr ""
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Delete selected %(model)s"
+msgid "Popup closing…"
 msgstr ""
 
 msgid "Search"
@@ -530,8 +559,30 @@ msgstr "সংরক্ষণ করুন এবং আরেকটি যে�
 msgid "Save and continue editing"
 msgstr "সংরক্ষণ করুন এবং সম্পাদনা চালিয়ে যান"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "ওয়েবসাইটে কিছু সময় কাটানোর জন্য আপনাকে আন্তরিক ধন্যবাদ।"
+msgid "Save and view"
+msgstr "সংরক্ষণ করুন এবং দেখুন"
+
+msgid "Close"
+msgstr "বন্ধ করুন"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "%(model)s নির্বাচিত অংশটি পরিবর্তন করুন"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "আরো একটি%(model)s যুক্ত করুন"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "%(model)s নির্বাচিত অংশটি মুছুন "
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "আজকে ওয়েব সাইট আপনার গুনগত সময় দেয়ার জন্য আপনাকে ধন্যবাদ।"
 
 msgid "Log in again"
 msgstr "পুনরায় প্রবেশ করুন"
@@ -543,11 +594,12 @@ msgid "Your password was changed."
 msgstr "আপনার পাসওয়ার্ড বদলানো হয়েছে।"
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"অনুগ্রহ করে আপনার পুরনো পাসওয়ার্ড প্রবেশ করান, নিরাপত্তার কাতিরে, এবং পরপর দু’বার "
-"নতুন পাসওয়ার্ড প্রবেশ করান, যাচাই করার জন্য।"
+"দয়া করে নিরাপত্তার জন্য আপনার পুরানো পাসওয়ার্ডটি লিখুন, এবং তারপর নতুন পাসওয়ার্ডটি "
+"দুইবার লিখুন যাতে করে আপনি সঠিক পাসওয়ার্ডটি লিখেছেন কি না তা আমরা যাচাই করতে "
+"পারি। "
 
 msgid "Change my password"
 msgstr "আমার পাসওয়ার্ড পরিবর্তন করুন"
@@ -582,14 +634,19 @@ msgstr ""
 "রিসেটের জন্য অনুগ্রহ করে নতুনভাবে আবেদন করুন।"
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"আপনার পাসওয়ার্ড সংযোজন করার জন্য আমরা আপনাকে নির্দেশাবলী সম্বলিত একটি ই-মেইল "
+"পাঠাবো, যদি আপনার দেয়া ই-মেইলে আইডিটি এখানে বিদ্যমান থাকে। আপনি খুব দ্রুত তা "
+"পেয়ে যাবেন। "
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
+"আপনি যদি কোন ই-মেইল না পেয়ে থাকে, তবে দয়া করে নিশ্চিত করুন আপনি যে ই-মেইল আইডি "
+"দিয়ে নিবন্ধন করেছিলেন তা এখানে লিখেছেন, এবং আপনার স্পাম ফোল্ডার চেক করুন। "
 
 #, python-format
 msgid ""
@@ -602,8 +659,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "অনুগ্রহ করে নিচের পাতাটিতে যান এবং নতুন পাসওয়ার্ড বাছাই করুনঃ"
 
-msgid "Your username, in case you've forgotten:"
-msgstr "আপনার সদস্যনাম, যদি ভুলে গিয়ে থাকেনঃ"
+msgid "Your username, in case you’ve forgotten:"
+msgstr "আপনার ব্যবহারকারীর নাম, যদি আপনি ভুলে গিয়ে থাকেন:"
 
 msgid "Thanks for using our site!"
 msgstr "আমাদের সাইট ব্যবহারের জন্য ধন্যবাদ!"
@@ -613,11 +670,11 @@ msgid "The %(site_name)s team"
 msgstr "%(site_name)s দল"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"পাসওয়ার্ড ভুলে গেছেন? নিচে আপনার ইমেইল এড্রেস দিন, এবং আমরা নতুন পাসওয়ার্ড সেট "
-"করার নিয়ম-কানুন আপনাকে ই-মেইল করব।"
+"আপনার পাসওয়ার্ড ভুলে গিয়েছেন? নিম্নে আপনার ই-মেইল আইডি লিখুন, এবং আমরা আপনাকে "
+"নতুন পাসওয়ার্ড সংযোজন করার জন্য নির্দেশাবলী সম্বলিত ই-মেইল পাঠাবো।"
 
 msgid "Email address:"
 msgstr "ইমেইল ঠিকানা:"
@@ -635,6 +692,10 @@ msgstr "%s বাছাই করুন"
 #, python-format
 msgid "Select %s to change"
 msgstr "%s পরিবর্তনের জন্য বাছাই করুন"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "দেখার জন্য %s নির্বাচন করুন"
 
 msgid "Date:"
 msgstr "তারিখঃ"

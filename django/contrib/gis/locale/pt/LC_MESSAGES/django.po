@@ -4,24 +4,25 @@
 # Claudio Fernandes <squeral@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jorgecarleitao <jorgecarleitao@gmail.com>, 2015
-# Manuela Silva <inactive+h_manuela_rodsilva@transifex.com>, 2015
+# 425fe09b3064b9f906f637fff94056ae_a00ea56 <0fa3588fa89906bfcb3a354600956e0e_308047>, 2015
 # Nuno Mariz <nmariz@gmail.com>, 2011-2012,2015
-# Paulo Köch <paulo.koch@gmail.com>, 2011
+# 12574c6d66324e145c1d19e02acecb73_84badd8 <4e8d94859927eab3b50486d21249c068_5346>, 2011
 # Raúl Pedro Fernandes Santos, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2013-04-24 18:45+0000\n"
+"Last-Translator: Nuno Mariz <nmariz@gmail.com>, 2011-2012,2015\n"
 "Language-Team: Portuguese (http://www.transifex.com/django/django/language/"
 "pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pt\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
+"1000000 == 0 ? 1 : 2;\n"
 
 msgid "GIS"
 msgstr "SIG"
@@ -30,10 +31,8 @@ msgid "The base GIS field."
 msgstr "O campo GIS base."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
-"O campo de Geometria base -- mapeia para o tipo de Geometria de "
-"Especificação do OpenGIS."
 
 msgid "Point"
 msgstr "Ponto"
@@ -91,5 +90,5 @@ msgid "No feeds are registered."
 msgstr "Nenhum feed está registado."
 
 #, python-format
-msgid "Slug %r isn't registered."
-msgstr "O slug %r não está registado."
+msgid "Slug %r isn’t registered."
+msgstr ""

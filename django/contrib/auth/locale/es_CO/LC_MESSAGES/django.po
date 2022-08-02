@@ -2,7 +2,7 @@
 #
 # Translators:
 # albertoalcolea <albertoalcolea@gmail.com>, 2014
-# Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015
+# e4db27214f7e7544f2022c647b585925_bb0e321, 2015
 # guillem <serra.guillem@gmail.com>, 2012
 # Igor Támara <igor@tamarapatino.org>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -13,16 +13,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-09-24 14:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2013-04-25 08:09+0000\n"
+"Last-Translator: Veronicabh <vero.blazher@gmail.com>, 2015\n"
 "Language-Team: Spanish (Colombia) (http://www.transifex.com/django/django/"
 "language/es_CO/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es_CO\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
 
 msgid "Personal info"
 msgstr "Información personal"
@@ -59,8 +60,8 @@ msgstr "No se ha establecido la clave."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Formato de clave incorrecto o algoritmo de hash desconocido."
 
-msgid "The two password fields didn't match."
-msgstr "Los dos campos de contraseña no coinciden."
+msgid "The two password fields didn’t match."
+msgstr ""
 
 msgid "Password"
 msgstr "Contraseña"
@@ -72,7 +73,7 @@ msgid "Enter the same password as before, for verification."
 msgstr "Para verificar, ingrese la misma contraseña anterior."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 
@@ -137,6 +138,9 @@ msgstr "factor trabajo"
 
 msgid "checksum"
 msgstr "suma de verificación"
+
+msgid "block size"
+msgstr ""
 
 msgid "name"
 msgstr "nombre"
@@ -238,32 +242,35 @@ msgstr[0] ""
 msgstr[1] ""
 "Esta contraseña es demasiado corta. Debe contener al menos %(min_length)d "
 "caracteres."
+msgstr[2] ""
+"Esta contraseña es demasiado corta. Debe contener al menos %(min_length)d "
+"caracteres."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] "Su contraseña debe contener por lo menos %(min_length)d carácter."
 msgstr[1] "Su contraseña debe contener por lo menos %(min_length)d caracteres."
+msgstr[2] "Su contraseña debe contener por lo menos %(min_length)d caracteres."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "La contraseña es muy parecida a %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
-"Su contraseña no puede asemejarse tanto a su otra información personal."
 
 msgid "This password is too common."
 msgstr "Esta contraseña es demasiado común."
 
-msgid "Your password can't be a commonly used password."
-msgstr "La contraseña no puede ser una contraseña de uso común."
+msgid "Your password can’t be a commonly used password."
+msgstr ""
 
 msgid "This password is entirely numeric."
 msgstr "Esta contraseña es completamente numérica."
 
-msgid "Your password can't be entirely numeric."
-msgstr "Su contraseña no puede ser completamente numérica."
+msgid "Your password can’t be entirely numeric."
+msgstr ""
 
 #, python-format
 msgid "Password reset on %(site_name)s"

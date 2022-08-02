@@ -3,21 +3,22 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Leonardo José Guzmán <ljguzman@gmail.com>, 2013
-# Ramiro Morales, 2013-2021
+# Ramiro Morales, 2013-2022
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-19 14:47+0000\n"
-"Last-Translator: Ramiro Morales\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: Ramiro Morales, 2013-2022\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es_AR\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
 
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
@@ -253,12 +254,14 @@ msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "Se ha modificado con éxito %(count)s %(name)s."
 msgstr[1] "Se han modificado con éxito %(count)s %(name)s."
+msgstr[2] "Se han modificado con éxito %(count)s %(name)s."
 
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s seleccionados/as"
 msgstr[1] "Todos/as (%(total_count)s en total) han sido seleccionados/as"
+msgstr[2] "Todos/as (%(total_count)s en total) han sido seleccionados/as"
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -268,8 +271,9 @@ msgstr "0 de %(cnt)s seleccionados/as"
 msgid "Change history: %s"
 msgstr "Historia de modificaciones: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -545,6 +549,12 @@ msgstr "Usuario"
 msgid "Action"
 msgstr "Acción"
 
+msgid "entry"
+msgstr "entrada"
+
+msgid "entries"
+msgstr "entradas"
+
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
@@ -569,6 +579,7 @@ msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s resultado"
 msgstr[1] "%(counter)s resultados"
+msgstr[2] "%(counter)s resultados"
 
 #, python-format
 msgid "%(full_result_count)s total"
@@ -600,6 +611,10 @@ msgstr "Agregar otro/a %(model)s"
 #, python-format
 msgid "Delete selected %(model)s"
 msgstr "Eliminar %(model)s seleccionados/as"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Ver %(model)s seleccionado/a"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Gracias por el tiempo que ha dedicado al sitio web hoy."

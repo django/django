@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Albin Larsson <albin.post@gmail.com>, 2022
 # Andreas Pelme <andreas@pelme.se>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2015
@@ -11,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2019-01-28 14:06+0000\n"
-"Last-Translator: Petter Strandmark <petter.strandmark@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2013-04-24 18:45+0000\n"
+"Last-Translator: Albin Larsson <albin.post@gmail.com>, 2022\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -29,7 +30,7 @@ msgid "The base GIS field."
 msgstr "Basklassen för GIS-fält."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "Basklassen för geometri-fält -- motsvarar ”Geometry”-typen i OpenGIS-"
 "specifikationen."
@@ -88,5 +89,5 @@ msgid "No feeds are registered."
 msgstr "Inga flöden är registrerade."
 
 #, python-format
-msgid "Slug %r isn't registered."
+msgid "Slug %r isn’t registered."
 msgstr "Slugen %r är inte registrerad."

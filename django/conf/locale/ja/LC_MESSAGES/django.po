@@ -6,6 +6,7 @@
 # Goto Hayato <habita.gh@gmail.com>, 2021
 # Goto Hayato <habita.gh@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Kamiyama Satoshi, 2021
 # Kentaro Matsuzaki <kentaro0919@gmail.com>, 2015
 # Masashi SHIBATA <contact@c-bata.link>, 2017
 # Nikita K <hiyori.amatsuki@gmail.com>, 2019
@@ -18,9 +19,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-18 21:19+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2013-04-25 06:49+0000\n"
+"Last-Translator: Kamiyama Satoshi, 2021\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -219,7 +220,7 @@ msgid "Marathi"
 msgstr "マラーティー語"
 
 msgid "Malay"
-msgstr ""
+msgstr "マレー語"
 
 msgid "Burmese"
 msgstr "ビルマ語"
@@ -398,6 +399,10 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "この値は %(limit_value)s 以上でなければなりません。"
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -458,6 +463,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "この %(field_labels)s を持った %(model_name)s が既に存在します。"
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr ""
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "%(value)r は有効な選択肢ではありません。"
 
@@ -471,8 +480,8 @@ msgstr "このフィールドは空ではいけません。"
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "この %(field_label)s を持った %(model_name)s が既に存在します。"
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -765,14 +774,14 @@ msgstr ""
 "ません。"
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "最多 %d のフォームを送信してください。"
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] ""
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "最少 %d のフォームを送信してください。"
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] ""
 
 msgid "Order"
 msgstr "並び変え"

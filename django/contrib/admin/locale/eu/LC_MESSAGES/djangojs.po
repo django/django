@@ -2,16 +2,16 @@
 #
 # Translators:
 # Aitzol Naberan <anaberan@codesyntax.com>, 2011
-# Eneko Illarramendi <eneko@illarra.com>, 2017
+# Eneko Illarramendi <eneko@illarra.com>, 2017,2022
 # Jannis Leidel <jannis@leidel.info>, 2011
-# julen <julenx@gmail.com>, 2012-2013
+# julen, 2012-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
+"POT-Creation-Date: 2022-05-17 05:26-0500\n"
+"PO-Revision-Date: 2013-04-25 07:59+0000\n"
+"Last-Translator: Eneko Illarramendi <eneko@illarra.com>, 2017,2022\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -84,20 +84,31 @@ msgstr ""
 "gorde gabeko aldaketak galduko dira."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Ekintza bat hautatu duzu, baina oraindik ez duzu eremuetako aldaketak gorde. "
-"Mesedez, sakatu OK gordetzeko. Ekintza berriro exekutatu beharko duzu."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Ekintza bat hautatu duzu, baina ez duzu inongo aldaketarik egin eremuetan. "
-"Litekeena da, Gorde botoia beharrean Aurrera botoiaren bila aritzea."
+
+msgid "Now"
+msgstr "Orain"
+
+msgid "Midnight"
+msgstr "Gauerdia"
+
+msgid "6 a.m."
+msgstr "6 a.m."
+
+msgid "Noon"
+msgstr "Eguerdia"
+
+msgid "6 p.m."
+msgstr "6 p.m."
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
@@ -111,26 +122,11 @@ msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "Oharra: zerbitzariaren denborarekiko ordu %s atzerago zaude. "
 msgstr[1] "Oharra: zerbitzariaren denborarekiko %s ordu atzerago zaude. "
 
-msgid "Now"
-msgstr "Orain"
-
 msgid "Choose a Time"
 msgstr "Aukeratu ordu bat"
 
 msgid "Choose a time"
 msgstr "Aukeratu ordu bat"
-
-msgid "Midnight"
-msgstr "Gauerdia"
-
-msgid "6 a.m."
-msgstr "6 a.m."
-
-msgid "Noon"
-msgstr "Eguerdia"
-
-msgid "6 p.m."
-msgstr "6 p.m."
 
 msgid "Cancel"
 msgstr "Atzera"
@@ -148,68 +144,121 @@ msgid "Tomorrow"
 msgstr "Bihar"
 
 msgid "January"
-msgstr "Urtarrila"
+msgstr "urtarrila"
 
 msgid "February"
-msgstr "Otsaila"
+msgstr "otsaila"
 
 msgid "March"
-msgstr "Martxoa"
+msgstr "martxoa"
 
 msgid "April"
-msgstr "Apirila"
+msgstr "apirila"
 
 msgid "May"
-msgstr "Maiatza"
+msgstr "maiatza"
 
 msgid "June"
-msgstr "Ekaina"
+msgstr "ekaina"
 
 msgid "July"
-msgstr "Uztaila"
+msgstr "uztaila"
 
 msgid "August"
-msgstr "Abuztua"
+msgstr "abuztua"
 
 msgid "September"
-msgstr "Iraila"
+msgstr "iraila"
 
 msgid "October"
-msgstr "Urria"
+msgstr "urria"
 
 msgid "November"
-msgstr "Azaroa"
+msgstr "azaroa"
 
 msgid "December"
-msgstr "Abendua"
+msgstr "abendua"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "urt."
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "ots."
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "mar."
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "api."
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "mai."
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "eka."
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "uzt."
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "abu."
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "ira."
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "urr."
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "aza."
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "abe."
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr "I"
+msgstr "ig."
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr "A"
+msgstr "al."
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr "A"
+msgstr "ar."
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr "A"
+msgstr "az."
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr "O"
+msgstr "og."
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr "O"
+msgstr "ol."
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr "L"
+msgstr "lr."
+
+msgid ""
+"You have already submitted this form. Are you sure you want to submit it "
+"again?"
+msgstr ""
 
 msgid "Show"
 msgstr "Erakutsi"
