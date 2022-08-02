@@ -2,6 +2,7 @@
 #
 # Translators:
 # HuanCheng Bai白宦成 <xiqingongzi@gmail.com>, 2018
+# Fan Xu <xlivevil@aliyun.com>, 2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kewei Ma <marknv.42@gmail.com>, 2016
 # Lele Long <schemacs@gmail.com>, 2011,2015
@@ -17,9 +18,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-02-07 04:25+0000\n"
-"Last-Translator: Veoco <one@nomox.cn>\n"
+"POT-Creation-Date: 2022-05-17 05:26-0500\n"
+"PO-Revision-Date: 2022-07-25 07:59+0000\n"
+"Last-Translator: Fan Xu <xlivevil@aliyun.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -262,6 +263,11 @@ msgstr "F"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
+
+msgid ""
+"You have already submitted this form. Are you sure you want to submit it "
+"again?"
+msgstr "您已经提交了此表单。确实要再次提交吗？"
 
 msgid "Show"
 msgstr "显示"
