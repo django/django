@@ -16,8 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fr\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
-"1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -76,7 +75,6 @@ msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s sur %(cnt)s sélectionné"
 msgstr[1] "%(sel)s sur %(cnt)s sélectionnés"
-msgstr[2] "%(sel)s sur %(cnt)s sélectionnés"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
@@ -123,14 +121,12 @@ msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
 msgstr[0] "Note : l'heure du serveur précède votre heure de %s heure."
 msgstr[1] "Note : l'heure du serveur précède votre heure de %s heures."
-msgstr[2] "Note : l'heure du serveur précède votre heure de %s heures."
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "Note : votre heure précède l'heure du serveur de %s heure."
 msgstr[1] "Note : votre heure précède l'heure du serveur de %s heures."
-msgstr[2] "Note : votre heure précède l'heure du serveur de %s heures."
 
 msgid "Choose a Time"
 msgstr "Choisir une heure"

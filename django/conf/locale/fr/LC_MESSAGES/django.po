@@ -21,8 +21,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fr\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
-"1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "Afrikaans"
 msgstr "Afrikaans"
@@ -414,9 +413,6 @@ msgstr[0] ""
 msgstr[1] ""
 "Assurez-vous que cette valeur comporte au moins %(limit_value)d caractères "
 "(actuellement %(show_value)d)."
-msgstr[2] ""
-"Assurez-vous que cette valeur comporte au moins %(limit_value)d caractères "
-"(actuellement %(show_value)d)."
 
 #, python-format
 msgid ""
@@ -431,9 +427,6 @@ msgstr[0] ""
 msgstr[1] ""
 "Assurez-vous que cette valeur comporte au plus %(limit_value)d caractères "
 "(actuellement %(show_value)d)."
-msgstr[2] ""
-"Assurez-vous que cette valeur comporte au plus %(limit_value)d caractères "
-"(actuellement %(show_value)d)."
 
 msgid "Enter a number."
 msgstr "Saisissez un nombre."
@@ -443,7 +436,6 @@ msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] "Assurez-vous qu'il n'y a pas plus de %(max)s chiffre au total."
 msgstr[1] "Assurez-vous qu’il n’y a pas plus de %(max)s chiffres au total."
-msgstr[2] "Assurez-vous qu’il n’y a pas plus de %(max)s chiffres au total."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
@@ -451,8 +443,6 @@ msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] ""
 "Assurez-vous qu'il n'y a pas plus de %(max)s chiffre après la virgule."
 msgstr[1] ""
-"Assurez-vous qu’il n’y a pas plus de %(max)s chiffres après la virgule."
-msgstr[2] ""
 "Assurez-vous qu’il n’y a pas plus de %(max)s chiffres après la virgule."
 
 #, python-format
@@ -463,8 +453,6 @@ msgid_plural ""
 msgstr[0] ""
 "Assurez-vous qu'il n'y a pas plus de %(max)s chiffre avant la virgule."
 msgstr[1] ""
-"Assurez-vous qu’il n’y a pas plus de %(max)s chiffres avant la virgule."
-msgstr[2] ""
 "Assurez-vous qu’il n’y a pas plus de %(max)s chiffres avant la virgule."
 
 #, python-format
@@ -760,9 +748,6 @@ msgstr[0] ""
 msgstr[1] ""
 "Assurez-vous que ce nom de fichier comporte au plus %(max)d caractères "
 "(actuellement %(length)d)."
-msgstr[2] ""
-"Assurez-vous que ce nom de fichier comporte au plus %(max)d caractères "
-"(actuellement %(length)d)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr "Envoyez un fichier ou cochez la case d’effacement, mais pas les deux."
@@ -812,14 +797,12 @@ msgid "Please submit at most %(num)d form."
 msgid_plural "Please submit at most %(num)d forms."
 msgstr[0] "Veuillez soumettre au plus %(num)d formulaire."
 msgstr[1] "Veuillez soumettre au plus %(num)d formulaires."
-msgstr[2] "Veuillez soumettre au plus %(num)d formulaires."
 
 #, python-format
 msgid "Please submit at least %(num)d form."
 msgid_plural "Please submit at least %(num)d forms."
 msgstr[0] "Veuillez soumettre au moins %(num)d formulaire."
 msgstr[1] "Veuillez soumettre au moins %(num)d formulaires."
-msgstr[2] "Veuillez soumettre au moins %(num)d formulaires."
 
 msgid "Order"
 msgstr "Ordre"
@@ -895,7 +878,6 @@ msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d octet"
 msgstr[1] "%(size)d octets"
-msgstr[2] "%(size)d octets"
 
 #, python-format
 msgid "%s KB"
@@ -1165,42 +1147,36 @@ msgid "%(num)d year"
 msgid_plural "%(num)d years"
 msgstr[0] "%(num)d année"
 msgstr[1] "%(num)d années"
-msgstr[2] "%(num)d années"
 
 #, python-format
 msgid "%(num)d month"
 msgid_plural "%(num)d months"
 msgstr[0] "%(num)d mois"
 msgstr[1] "%(num)d mois"
-msgstr[2] "%(num)d mois"
 
 #, python-format
 msgid "%(num)d week"
 msgid_plural "%(num)d weeks"
 msgstr[0] "%(num)d semaine"
 msgstr[1] "%(num)d semaines"
-msgstr[2] "%(num)d semaines"
 
 #, python-format
 msgid "%(num)d day"
 msgid_plural "%(num)d days"
 msgstr[0] "%(num)d jour"
 msgstr[1] "%(num)d jours"
-msgstr[2] "%(num)d jours"
 
 #, python-format
 msgid "%(num)d hour"
 msgid_plural "%(num)d hours"
 msgstr[0] "%(num)d heure"
 msgstr[1] "%(num)d heures"
-msgstr[2] "%(num)d heures"
 
 #, python-format
 msgid "%(num)d minute"
 msgid_plural "%(num)d minutes"
 msgstr[0] "%(num)d minute"
 msgstr[1] "%(num)d minutes"
-msgstr[2] "%(num)d minutes"
 
 msgid "Forbidden"
 msgstr "Interdit"
