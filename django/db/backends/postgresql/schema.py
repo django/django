@@ -112,9 +112,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 )
         return None
 
-    def _alter_column_type_sql(self, model, old_field, new_field, new_type):
-        self.sql_alter_column_type = "ALTER COLUMN %(column)s TYPE %(type)s"
-        # Cast when data type changed.
+    def _using_sql(self, new_field, old_field):
         using_sql = " USING %(column)s::%(type)s"
         new_internal_type = new_field.get_internal_type()
         old_internal_type = old_field.get_internal_type()
@@ -123,9 +121,18 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             if list(self._field_base_data_types(old_field)) != list(
                 self._field_base_data_types(new_field)
             ):
-                self.sql_alter_column_type += using_sql
+                return using_sql
         elif self._field_data_type(old_field) != self._field_data_type(new_field):
+            return using_sql
+        return ""
+
+    def _alter_column_type_sql(self, model, old_field, new_field, new_type):
+        self.sql_alter_column_type = "ALTER COLUMN %(column)s TYPE %(type)s"
+        # Cast when data type changed.
+        if using_sql := self._using_sql(new_field, old_field):
             self.sql_alter_column_type += using_sql
+        new_internal_type = new_field.get_internal_type()
+        old_internal_type = old_field.get_internal_type()
         # Make ALTER TYPE with IDENTITY make sense.
         table = strip_quotes(model._meta.db_table)
         auto_field_types = {
@@ -185,6 +192,25 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             ]
         else:
             return super()._alter_column_type_sql(model, old_field, new_field, new_type)
+
+    def _alter_column_collation_sql(
+        self, model, new_field, new_type, new_collation, old_field
+    ):
+        sql = self.sql_alter_column_collate
+        # Cast when data type changed.
+        if using_sql := self._using_sql(new_field, old_field):
+            sql += using_sql
+        return (
+            sql
+            % {
+                "column": self.quote_name(new_field.column),
+                "type": new_type,
+                "collation": " " + self._collate_sql(new_collation)
+                if new_collation
+                else "",
+            },
+            [],
+        )
 
     def _alter_field(
         self,

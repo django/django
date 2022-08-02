@@ -25,6 +25,7 @@ class ArrayField(CheckFieldDefaultMixin, Field):
 
     def __init__(self, base_field, size=None, **kwargs):
         self.base_field = base_field
+        self.db_collation = getattr(self.base_field, "db_collation", None)
         self.size = size
         if self.size:
             self.default_validators = [
@@ -96,6 +97,11 @@ class ArrayField(CheckFieldDefaultMixin, Field):
     def cast_db_type(self, connection):
         size = self.size or ""
         return "%s[%s]" % (self.base_field.cast_db_type(connection), size)
+
+    def db_parameters(self, connection):
+        db_params = super().db_parameters(connection)
+        db_params["collation"] = self.db_collation
+        return db_params
 
     def get_placeholder(self, value, compiler, connection):
         return "%s::{}".format(self.db_type(connection))
