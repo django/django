@@ -1236,6 +1236,55 @@ class SchemaTests(TransactionTestCase):
             with self.assertRaisesMessage(DataError, msg):
                 editor.alter_field(ArrayModel, old_field, new_field, strict=True)
 
+    @isolate_apps("schema")
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @skipUnlessDBFeature(
+        "supports_collation_on_charfield",
+        "supports_non_deterministic_collations",
+    )
+    def test_db_collation_arrayfield(self):
+        from django.contrib.postgres.fields import ArrayField
+
+        ci_collation = "case_insensitive"
+        cs_collation = "en-x-icu"
+
+        def drop_collation():
+            with connection.cursor() as cursor:
+                cursor.execute(f"DROP COLLATION IF EXISTS {ci_collation}")
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"CREATE COLLATION IF NOT EXISTS {ci_collation} (provider = icu, "
+                f"locale = 'und-u-ks-level2', deterministic = false)"
+            )
+        self.addCleanup(drop_collation)
+
+        class ArrayModel(Model):
+            field = ArrayField(CharField(max_length=16, db_collation=ci_collation))
+
+            class Meta:
+                app_label = "schema"
+
+        # Create the table.
+        with connection.schema_editor() as editor:
+            editor.create_model(ArrayModel)
+        self.isolated_local_models = [ArrayModel]
+        self.assertEqual(
+            self.get_column_collation(ArrayModel._meta.db_table, "field"),
+            ci_collation,
+        )
+        # Alter collation.
+        old_field = ArrayModel._meta.get_field("field")
+        new_field_cs = ArrayField(CharField(max_length=16, db_collation=cs_collation))
+        new_field_cs.set_attributes_from_name("field")
+        new_field_cs.model = ArrayField
+        with connection.schema_editor() as editor:
+            editor.alter_field(ArrayModel, old_field, new_field_cs, strict=True)
+        self.assertEqual(
+            self.get_column_collation(ArrayModel._meta.db_table, "field"),
+            cs_collation,
+        )
+
     def test_alter_textfield_to_null(self):
         """
         #24307 - Should skip an alter statement on databases with
