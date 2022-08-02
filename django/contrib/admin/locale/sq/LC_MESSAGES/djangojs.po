@@ -2,14 +2,14 @@
 #
 # Translators:
 # Besnik Bleta <besnik@programeshqip.org>, 2011-2012,2015
-# Besnik Bleta <besnik@programeshqip.org>, 2020-2021
+# Besnik Bleta <besnik@programeshqip.org>, 2020-2022
 # Besnik Bleta <besnik@programeshqip.org>, 2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-15 13:33+0000\n"
+"POT-Creation-Date: 2022-05-17 05:26-0500\n"
+"PO-Revision-Date: 2022-07-25 07:59+0000\n"
 "Last-Translator: Besnik Bleta <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
@@ -261,6 +261,13 @@ msgstr "P"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
+
+msgid ""
+"You have already submitted this form. Are you sure you want to submit it "
+"again?"
+msgstr ""
+"E keni parashtruar tashmë këtë formular. Jeni i sigurt se doni ta "
+"riparashtroni?"
 
 msgid "Show"
 msgstr "Shfaqe"

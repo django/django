@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2020
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2022
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-21 12:54+0000\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2022-07-25 07:05+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
 "language/dsb/)\n"
@@ -19,6 +19,10 @@ msgstr ""
 "%100==4 ? 2 : 3);\n"
 
 #, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Wubrane %(verbose_name_plural)s lašowaś"
+
+#, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s su se wulašowali."
 
@@ -28,10 +32,6 @@ msgstr "%(name)s njedajo se lašowaś"
 
 msgid "Are you sure?"
 msgstr "Sćo se wěsty?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Wubrane %(verbose_name_plural)s lašowaś"
 
 msgid "Administration"
 msgstr "Administracija"
@@ -269,8 +269,9 @@ msgstr "0 z %(cnt)s wubranych"
 msgid "Change history: %s"
 msgstr "Změnowa historija: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -524,6 +525,12 @@ msgstr "Sćo swójo gronidło abo wužywarske mě zabył?"
 msgid "Toggle navigation"
 msgstr "Nawigaciju pśešaltowaś"
 
+msgid "Start typing to filter…"
+msgstr "Pišćo, aby filtrował …"
+
+msgid "Filter navigation items"
+msgstr "Nawigaciske zapiski filtrowaś"
+
 msgid "Date/time"
 msgstr "Datum/cas"
 
@@ -532,6 +539,12 @@ msgstr "Wužywaŕ"
 
 msgid "Action"
 msgstr "Akcija"
+
+msgid "entry"
+msgstr "zapisk"
+
+msgid "entries"
+msgstr "zapiski"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -591,8 +604,13 @@ msgstr "Dalšny %(model)s pśidaś"
 msgid "Delete selected %(model)s"
 msgstr "Wubrane %(model)s lašowaś"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Źěkujomy se, až sćo źinsa wěsty cas na websedle pśebywał."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Wubrany %(model)s pokazaś"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
+"Wjeliki źěk, až sćo sebje brał źinsa cas za pśeglědowanje kwality websedła."
 
 msgid "Log in again"
 msgstr "Hyšći raz pśizjawiś"

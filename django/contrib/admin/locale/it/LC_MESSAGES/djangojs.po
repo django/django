@@ -8,14 +8,15 @@
 # Mirco Grillo <mirco.grillomg@gmail.com>, 2020
 # Nicola Larosa <transifex@teknico.net>, 2011-2012
 # palmux <palmux@gmail.com>, 2015,2021
+# Paolo Melchiorre <paolo@melchiorre.org>, 2022
 # Stefano Brentegani <sbrentegani@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-15 15:58+0000\n"
-"Last-Translator: palmux <palmux@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:26-0500\n"
+"PO-Revision-Date: 2022-07-25 07:59+0000\n"
+"Last-Translator: Paolo Melchiorre <paolo@melchiorre.org>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -264,6 +265,11 @@ msgstr "V"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
+
+msgid ""
+"You have already submitted this form. Are you sure you want to submit it "
+"again?"
+msgstr "Hai già inviato questo modulo. Sei sicuro di volerlo inviare di nuovo?"
 
 msgid "Show"
 msgstr "Mostra"

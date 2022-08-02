@@ -7,6 +7,7 @@
 # Carlo Miron <carlo@miron.it>, 2018-2019
 # Davide Targa <davide.targa@gmail.com>, 2021
 # Denis Darii <denis.darii@gmail.com>, 2011
+# Emanuele Di Giacomo, 2021
 # Flavio Curella <flavio.curella@gmail.com>, 2013,2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Themis Savvidis <themhs@gmail.com>, 2013
@@ -15,6 +16,7 @@
 # Mirco Grillo <mirco.grillomg@gmail.com>, 2018,2020
 # Nicola Larosa <transifex@teknico.net>, 2013
 # palmux <palmux@gmail.com>, 2014-2015,2017,2021
+# Paolo Melchiorre <paolo@melchiorre.org>, 2022
 # Mattia Procopio <promat85@gmail.com>, 2015
 # Riccardo Magliocchetti <riccardo.magliocchetti@gmail.com>, 2017
 # Stefano Brentegani <sbrentegani@gmail.com>, 2014-2017
@@ -22,9 +24,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-18 21:19+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-07-25 06:49+0000\n"
+"Last-Translator: Paolo Melchiorre <paolo@melchiorre.org>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -223,7 +225,7 @@ msgid "Marathi"
 msgstr "Marathi"
 
 msgid "Malay"
-msgstr ""
+msgstr "Malese"
 
 msgid "Burmese"
 msgstr "Birmano"
@@ -402,6 +404,12 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Assicurati che questo valore sia maggiore o uguale a %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+"Assicurarsi che questo valore sia un multiplo della dimensione di passo "
+"%(limit_value)s."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -472,6 +480,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s con questa %(field_labels)s esiste già."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Il vincolo “%(name)s” è stato violato."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Il valore %(value)r non è una scelta valida."
 
@@ -485,8 +497,8 @@ msgstr "Questo campo non può essere vuoto."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s con questo %(field_label)s esiste già."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -785,16 +797,16 @@ msgstr ""
 "errore se il problema persiste."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Si prega di inviare al massimo %d form."
-msgstr[1] "Si prega di inviare al massimo %d form."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Si prega di inviare al massimo %(num)d form."
+msgstr[1] "Si prega di inviare al massimo %(num)d form."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Si prega di inviare almeno %d form."
-msgstr[1] "Si prega di inviare almeno %d form."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Si prega di inviare almeno %(num)d form."
+msgstr[1] "Si prega di inviare almeno %(num)d form."
 
 msgid "Order"
 msgstr "Ordine"

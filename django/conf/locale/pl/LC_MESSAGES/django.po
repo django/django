@@ -1,12 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# sidewinder <adam.klosiu@gmail.com>, 2014
+# 8ffa075ab2f53c280beb2c066769d1ac_169beb5 <462ee687bbf3107fab5af73e8cc690d0_217822>, 2014
 # Adam Stachowicz <saibamenppl@gmail.com>, 2015
 # angularcircle, 2011,2013
 # angularcircle, 2011,2013
 # angularcircle, 2014
 # Dariusz Paluch <taxido0@gmail.com>, 2015
+# Darek505, 2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janusz Harkot <jh@trilab.pl>, 2014-2015
 # Kacper Krupa <pagenoare@gmail.com>, 2013
@@ -14,8 +15,8 @@
 # 0d5641585fd67fbdb97037c19ab83e4c_18c98b0 <f6e7dac08616696bd890d93a38e13b13_5231>, 2011
 # 0d5641585fd67fbdb97037c19ab83e4c_18c98b0 <f6e7dac08616696bd890d93a38e13b13_5231>, 2011
 # Łukasz Rekucki (lqc) <lrekucki@gmail.com>, 2011
-# m_aciek <maciej.olko@gmail.com>, 2016-2021
-# m_aciek <maciej.olko@gmail.com>, 2015
+# Maciej Olko <maciej.olko@gmail.com>, 2016-2021
+# Maciej Olko <maciej.olko@gmail.com>, 2015
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2020-2021
 # Michał Pasternak <michal.dtz@gmail.com>, 2013
 # c10516f0462e552b4c3672569f0745a7_cc5cca2 <841826256cd8f47d0e443806a8e56601_19204>, 2012
@@ -25,15 +26,15 @@
 # Radek Czajka <radoslaw.czajka@nowoczesnapolska.org.pl>, 2013
 # Radek Czajka <radoslaw.czajka@nowoczesnapolska.org.pl>, 2013
 # Roman Barczyński, 2012
-# sidewinder <adam.klosiu@gmail.com>, 2014
+# 8ffa075ab2f53c280beb2c066769d1ac_169beb5 <462ee687bbf3107fab5af73e8cc690d0_217822>, 2014
 # Tomasz Kajtoch <tomekkaj@tomekkaj.pl>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-18 23:25+0000\n"
-"Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-07-25 06:49+0000\n"
+"Last-Translator: Darek505\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -410,6 +411,12 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Upewnij się, że ta wartość jest większa lub równa %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+"Upewnij się, że ta wartość jest wielokrotnością wielkości kroku"
+"%(limit_value)s."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -503,6 +510,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s z tymi %(field_labels)s już istnieje."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Ograniczenie \"%(name)s\" zostało naruszone."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Wartość %(value)r nie jest poprawnym wyborem."
 
@@ -516,8 +527,8 @@ msgstr "To pole nie może być puste."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Istnieje już %(model_name)s z tą wartością pola %(field_label)s."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -820,20 +831,20 @@ msgstr ""
 "%(field_names)s. Złóż zgłoszenie błędu, jeśli problem się powtarza."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Proszę wysłać co najwyżej %d formularz."
-msgstr[1] "Proszę wysłać co najwyżej %d formularze."
-msgstr[2] "Proszę wysłać co najwyżej %d formularzy."
-msgstr[3] "Proszę wysłać co najwyżej %d formularzy."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Proszę wysłać co najwyżej %(num)dformularz."
+msgstr[1] "Proszę wysłać co najwyżej %(num)d formularze."
+msgstr[2] "Proszę wysłać co najwyżej %(num)dformularzy."
+msgstr[3] "Proszę wysłać co najwyżej %(num)dformularzy."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Proszę wysłać co najmniej %d formularz."
-msgstr[1] "Proszę wysłać co najmniej %d formularze."
-msgstr[2] "Proszę wysłać co najmniej %d formularzy."
-msgstr[3] "Proszę wysłać co najmniej %d formularzy."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Proszę wysłać co najmniej %(num)d formularz."
+msgstr[1] "Proszę wysłać co najmniej %(num)dformularze."
+msgstr[2] "Proszę wysłać co najmniej %(num)d formularzy."
+msgstr[3] "Proszę wysłać co najmniej %(num)d formularzy."
 
 msgid "Order"
 msgstr "Kolejność"

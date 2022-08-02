@@ -2,6 +2,7 @@
 #
 # Translators:
 # Andreas Pelme <andreas@pelme.se>, 2012
+# Elias Johnstone <eli87as@gmail.com>, 2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2014
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
@@ -12,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Mattias Hansson <mattias.gothenburg@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:26-0500\n"
+"PO-Revision-Date: 2022-07-25 07:59+0000\n"
+"Last-Translator: Elias Johnstone <eli87as@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -88,8 +89,8 @@ msgstr ""
 "operation kommer de ändringar som inte sparats att gå förlorade."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
 "Du har markerat en operation, men du har inte sparat sparat dina ändringar "
@@ -97,8 +98,8 @@ msgstr ""
 "behöva köra operationen på nytt."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
 "Du har markerat en operation och du har inte gjort några ändringar i "
@@ -188,6 +189,54 @@ msgstr "november"
 msgid "December"
 msgstr "december"
 
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "jan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "feb"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "mar"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "maj"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "jun"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "jul"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "aug"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "sep"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "dec"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "S"
@@ -215,6 +264,13 @@ msgstr "F"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "L"
+
+msgid ""
+"You have already submitted this form. Are you sure you want to submit it "
+"again?"
+msgstr ""
+"Du har redan skickat in detta formulär. Är du säker på att du vill skicka in "
+"det igen?"
 
 msgid "Show"
 msgstr "Visa"
