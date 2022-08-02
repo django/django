@@ -5,16 +5,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jensadne <jensadne@pvv.ntnu.no>, 2013
 # Sigurd Gartmann <sigurdga-transifex@sigurdga.no>, 2012
-# Sivert Olstad, 2021
+# Sivert Olstad, 2021-2022
 # velmont <odin.omdal@gmail.com>, 2012
 # Vibeke Uthaug, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-18 12:44+0000\n"
-"Last-Translator: Vibeke Uthaug\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2022-07-25 07:05+0000\n"
+"Last-Translator: Sivert Olstad\n"
 "Language-Team: Norwegian Nynorsk (http://www.transifex.com/django/django/"
 "language/nn/)\n"
 "MIME-Version: 1.0\n"
@@ -269,8 +269,9 @@ msgstr "Ingen av %(cnt)s valde"
 msgid "Change history: %s"
 msgstr "Endringshistorikk: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -506,7 +507,6 @@ msgid ""
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-" match \n"
 "Noko er gale med databaseinstallasjonen din. Syt for at databasetabellane er "
 "oppretta og at brukaren har dei naudsynte løyve."
 
@@ -516,7 +516,7 @@ msgid ""
 "page. Would you like to login to a different account?"
 msgstr ""
 "Du er stadfesta som %(username)s, men er ikkje autentisert til å få tilgang "
-"til denne sida . Ynskjer du å logge inn med ein annan konto?"
+"til denne sida. Ynskjer du å logge inn med ein annan konto?"
 
 msgid "Forgotten your password or username?"
 msgstr "Gløymd brukarnamn eller passord?"
@@ -538,6 +538,12 @@ msgstr "Brukar"
 
 msgid "Action"
 msgstr "Handling"
+
+msgid "entry"
+msgstr ""
+
+msgid "entries"
+msgstr ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -594,6 +600,10 @@ msgstr "Opprett ny %(model)s"
 #, python-format
 msgid "Delete selected %(model)s"
 msgstr "Slett valde %(model)s"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Takk for at du brukte litt kvalitetstid på nettsida i dag. "

@@ -3,7 +3,7 @@
 # Translators:
 # Bruno Brouard <annoa.b@gmail.com>, 2021
 # Simon Charette <charette.s@gmail.com>, 2012
-# Claude Paroz <claude@2xlibre.net>, 2013-2021
+# Claude Paroz <claude@2xlibre.net>, 2013-2022
 # Claude Paroz <claude@2xlibre.net>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jean-Baptiste Mora, 2014
@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-23 17:19+0000\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-07-25 06:49+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -395,6 +395,12 @@ msgstr ""
 "Assurez-vous que cette valeur est supérieure ou égale à %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+"Assurez-vous que cette valeur est un multiple de la taille de pas "
+"%(limit_value)s."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -468,6 +474,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "Un objet %(model_name)s avec ces champs %(field_labels)s existe déjà."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "La contrainte « %(name)s » n’est pas respectée."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "La valeur « %(value)r » n’est pas un choix valide."
 
@@ -481,8 +491,8 @@ msgstr "Ce champ ne peut pas être vide."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Un objet %(model_name)s avec ce champ %(field_label)s existe déjà."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -783,16 +793,16 @@ msgstr ""
 "rapport de bogue si le problème persiste."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Veuillez soumettre au plus %d formulaire."
-msgstr[1] "Veuillez soumettre au plus %d formulaires."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Veuillez soumettre au plus %(num)d formulaire."
+msgstr[1] "Veuillez soumettre au plus %(num)d formulaires."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Veuillez soumettre au moins %d formulaire."
-msgstr[1] "Veuillez soumettre au moins %d formulaires."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Veuillez soumettre au moins %(num)d formulaire."
+msgstr[1] "Veuillez soumettre au moins %(num)d formulaires."
 
 msgid "Order"
 msgstr "Ordre"
