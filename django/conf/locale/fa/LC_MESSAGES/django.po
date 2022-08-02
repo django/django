@@ -6,6 +6,7 @@
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Arash Fazeli <a.fazeli@gmail.com>, 2012
 # Eric Hamiter <ehamiter@gmail.com>, 2019
+# Eshagh <ase.mugem@gmail.com>, 2022
 # Farshad Asadpour, 2021
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
@@ -23,9 +24,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-24 16:28+0000\n"
-"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-07-25 06:49+0000\n"
+"Last-Translator: Eshagh <ase.mugem@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -401,6 +402,10 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "مطمئن شوید این مقدار بزرگتر و یا مساوی %(limit_value)s است."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -470,6 +475,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "‏%(model_name)s با این %(field_labels)s وجود دارد."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr ""
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "مقدار %(value)r انتخاب معتبری نیست. "
 
@@ -483,8 +492,8 @@ msgstr "این فیلد نمی تواند خالی باشد."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s با این %(field_label)s از قبل موجود است."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -778,16 +787,16 @@ msgstr ""
 "%(field_names)s. اگر این مشکل ادامه داشت، آن را گزارش کنید."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "لطفاً تعدا فرم‌ها حداکثر %d باشد."
-msgstr[1] "لطفاً تعداد فرم‌ها حداکثر %d باشد."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "لطفاً تعداد فرم‌ها حداقل %d باشد."
-msgstr[1] "لطفاً تعدا فرم‌ ها حداقل %d باشد."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Order"
 msgstr "ترتیب:"
@@ -1127,37 +1136,37 @@ msgstr "،"
 msgid "%(num)d year"
 msgid_plural "%(num)d years"
 msgstr[0] "%(num)d سال"
-msgstr[1] "%(num)d سال ها"
+msgstr[1] "%(num)d سال"
 
 #, python-format
 msgid "%(num)d month"
 msgid_plural "%(num)d months"
 msgstr[0] "%(num)d ماه"
-msgstr[1] "%(num)d ماه ها"
+msgstr[1] "%(num)d ماه"
 
 #, python-format
 msgid "%(num)d week"
 msgid_plural "%(num)d weeks"
 msgstr[0] "%(num)d هفته"
-msgstr[1] "%(num)d هفته ها"
+msgstr[1] "%(num)d هفته"
 
 #, python-format
 msgid "%(num)d day"
 msgid_plural "%(num)d days"
 msgstr[0] "%(num)d روز"
-msgstr[1] "%(num)d روزها"
+msgstr[1] "%(num)d روز"
 
 #, python-format
 msgid "%(num)d hour"
 msgid_plural "%(num)d hours"
 msgstr[0] "%(num)d ساعت"
-msgstr[1] "%(num)d ساعت ها"
+msgstr[1] "%(num)d ساعت"
 
 #, python-format
 msgid "%(num)d minute"
 msgid_plural "%(num)d minutes"
 msgstr[0] "%(num)d دقیقه"
-msgstr[1] "%(num)d دقیقه ها"
+msgstr[1] "%(num)d دقیقه"
 
 msgid "Forbidden"
 msgstr "ممنوع"

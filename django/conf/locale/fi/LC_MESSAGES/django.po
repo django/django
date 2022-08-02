@@ -1,19 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015,2017-2018,2020-2021
+# Aarni Koskela, 2015,2017-2018,2020-2022
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jiri Grönroos <jiri.gronroos@iki.fi>, 2021
 # Lasse Liehu <larso@gmx.com>, 2015
 # Mika Mäkelä <mika.m.makela@gmail.com>, 2018
-# Klaus Dahlén <klaus.dahlen@gmail.com>, 2011
+# Klaus Dahlén, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-25 07:24+0000\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-07-25 06:49+0000\n"
 "Last-Translator: Aarni Koskela\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
@@ -391,6 +391,10 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Tämän luvun on oltava vähintään %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "Varmista, että arvo on askelkoon %(limit_value)smonikerta. "
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -462,6 +466,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s jolla on nämä %(field_labels)s on jo olemassa."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Rajoitetta \"%(name)s\" loukataan."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Arvo %(value)r ei kelpaa."
 
@@ -475,8 +483,8 @@ msgstr "Tämä kenttä ei voi olla tyhjä."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s jolla on tämä %(field_label)s, on jo olemassa."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -769,16 +777,16 @@ msgstr ""
 "tämän bugina."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Lähetä enintään %d lomake."
-msgstr[1] "Lähetä enintään %d lomaketta."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Lähetä enintään%(num)d lomake."
+msgstr[1] "Lähetä enintään %(num)d lomaketta."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Lähetä vähintään %d lomake."
-msgstr[1] "Lähetä vähintään %d lomaketta."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Lähetä vähintään %(num)d lomake."
+msgstr[1] "Lähetä vähintään %(num)d lomaketta. "
 
 msgid "Order"
 msgstr "Järjestys"
