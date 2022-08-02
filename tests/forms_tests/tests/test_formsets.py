@@ -1910,3 +1910,14 @@ class DeprecationTests(SimpleTestCase):
             ChoiceFormSet = formset_factory(Choice)
             formset = ChoiceFormSet()
             str(formset)
+
+    def test_no_management_form_warning(self):
+        """
+        Management forms are already rendered with the new div template.
+        """
+        with isolate_lru_cache(get_default_renderer), self.settings(
+            FORM_RENDERER="django.forms.renderers.DjangoTemplates"
+        ):
+            ChoiceFormSet = formset_factory(Choice, formset=BaseFormSet)
+            formset = ChoiceFormSet()
+            str(formset.management_form)

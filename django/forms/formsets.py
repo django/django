@@ -32,6 +32,8 @@ class ManagementForm(Form):
     as well.
     """
 
+    template_name = "django/forms/div.html"  # RemovedInDjango50Warning.
+
     TOTAL_FORMS = IntegerField(widget=HiddenInput)
     INITIAL_FORMS = IntegerField(widget=HiddenInput)
     # MIN_NUM_FORM_COUNT and MAX_NUM_FORM_COUNT are output with the rest of the
