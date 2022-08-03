@@ -1,8 +1,8 @@
-============================================
-Django 4.1 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 4.1 release notes
+========================
 
-*Expected August 2022*
+*August 3, 2022*
 
 Welcome to Django 4.1!
 
@@ -388,8 +388,8 @@ Signals
 Templates
 ~~~~~~~~~
 
-* :tfilter:`json_script` template filter now allows wrapping in a ``<script>``
-  tag without the HTML ``id`` attribute.
+* The HTML ``<script>`` element ``id`` attribute is no longer required when
+  wrapping the :tfilter:`json_script` template filter.
 
 * The :class:`cached template loader <django.template.loaders.cached.Loader>`
   is now enabled in development, when :setting:`DEBUG` is ``True``, and
@@ -579,7 +579,7 @@ Miscellaneous
   ``URLResolver._callback_strs``, and ``URLPattern.lookup_str()`` are
   moved to ``django.contrib.admindocs.utils``.
 
-* The :meth:`.Model.full_clean` method now converts an ``exclude`` value to the
+* The :meth:`.Model.full_clean` method now converts an ``exclude`` value to a
   ``set``. It’s also preferable to pass an ``exclude`` value as a ``set`` to
   the :meth:`.Model.clean_fields`, :meth:`.Model.full_clean`,
   :meth:`.Model.validate_unique`, and :meth:`.Model.validate_constraints`
