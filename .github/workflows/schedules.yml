@@ -5,6 +5,10 @@ on:
     - cron: '42 2 * * *'
   workflow_dispatch:
 
+permissions:
+  actions: write
+  contents: read
+
 jobs:
   trigger-runs:
     runs-on: ubuntu-latest
