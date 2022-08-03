@@ -68,18 +68,35 @@ class ArrayField(CheckFieldDefaultMixin, Field):
             )
         else:
             # Remove the field name checks as they are not needed here.
-            base_errors = self.base_field.check()
-            if base_errors:
-                messages = "\n    ".join(
-                    "%s (%s)" % (error.msg, error.id) for error in base_errors
+            base_checks = self.base_field.check()
+            if base_checks:
+                error_messages = "\n    ".join(
+                    "%s (%s)" % (base_check.msg, base_check.id)
+                    for base_check in base_checks
+                    if isinstance(base_check, checks.Error)
                 )
-                errors.append(
-                    checks.Error(
-                        "Base field for array has errors:\n    %s" % messages,
-                        obj=self,
-                        id="postgres.E001",
+                if error_messages:
+                    errors.append(
+                        checks.Error(
+                            "Base field for array has errors:\n    %s" % error_messages,
+                            obj=self,
+                            id="postgres.E001",
+                        )
                     )
+                warning_messages = "\n    ".join(
+                    "%s (%s)" % (base_check.msg, base_check.id)
+                    for base_check in base_checks
+                    if isinstance(base_check, checks.Warning)
                 )
+                if warning_messages:
+                    errors.append(
+                        checks.Warning(
+                            "Base field for array has warnings:\n    %s"
+                            % warning_messages,
+                            obj=self,
+                            id="postgres.W004",
+                        )
+                    )
         return errors
 
     def set_attributes_from_name(self, name):

@@ -223,6 +223,15 @@ Model fields
   4.0. *This check appeared in Django 3.1 and 3.2*.
 * **fields.E904**: ``django.contrib.postgres.fields.JSONField`` is removed
   except for support in historical migrations.
+* **fields.W905**: ``django.contrib.postgres.fields.CICharField`` is
+  deprecated. Support for it (except in historical migrations) will be removed
+  in Django 5.1.
+* **fields.W906**: ``django.contrib.postgres.fields.CIEmailField`` is
+  deprecated. Support for it (except in historical migrations) will be removed
+  in Django 5.1.
+* **fields.W907**: ``django.contrib.postgres.fields.CITextField`` is
+  deprecated. Support for it (except in historical migrations) will be removed
+  in Django 5.1.
 
 File fields
 ~~~~~~~~~~~
@@ -851,6 +860,7 @@ fields:
 * **postgres.E003**: ``<field>`` default should be a callable instead of an
   instance so that it's not shared between all field instances. *This check was
   changed to* ``fields.E010`` *in Django 3.1*.
+* **postgres.W004**: Base field for array has warnings: ...
 
 ``sites``
 ---------
