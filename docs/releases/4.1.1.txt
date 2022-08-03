@@ -9,4 +9,5 @@ Django 4.1.1 fixes several bugs in 4.1.
 Bugfixes
 ========
 
-* ...
+* Reallowed, following a regression in Django 4.1, using ``GeoIP2()`` when GEOS
+  is not installed (:ticket:`33886`).
