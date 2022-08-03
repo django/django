@@ -259,6 +259,8 @@ transform do not change. For example::
 
 .. class:: CIText(**options)
 
+    .. deprecated:: 4.2
+
     A mixin to create case-insensitive text fields backed by the citext_ type.
     Read about `the performance considerations`_ prior to using it.
 
@@ -274,8 +276,28 @@ transform do not change. For example::
     Several fields that use the mixin are provided:
 
 .. class:: CICharField(**options)
+
+    .. deprecated:: 4.2
+
+        ``CICharField`` is deprecated in favor of
+        ``CharField(db_collation="…")`` with a case-insensitive
+        non-deterministic collation.
+
 .. class:: CIEmailField(**options)
+
+    .. deprecated:: 4.2
+
+        ``CIEmailField`` is deprecated in favor of
+        ``EmailField(db_collation="…")`` with a case-insensitive
+        non-deterministic collation.
+
 .. class:: CITextField(**options)
+
+    .. deprecated:: 4.2
+
+        ``CITextField`` is deprecated in favor of
+        ``TextField(db_collation="…")`` with a case-insensitive
+        non-deterministic collation.
 
     These fields subclass :class:`~django.db.models.CharField`,
     :class:`~django.db.models.EmailField`, and

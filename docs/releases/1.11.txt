@@ -215,11 +215,11 @@ Minor features
   parameter to specify a custom class to encode data types not supported by the
   standard encoder.
 
-* The new :class:`~django.contrib.postgres.fields.CIText` mixin and
+* The new ``CIText`` mixin and
   :class:`~django.contrib.postgres.operations.CITextExtension` migration
   operation allow using PostgreSQL's ``citext`` extension for case-insensitive
-  lookups. Three fields are provided: :class:`.CICharField`,
-  :class:`.CIEmailField`, and :class:`.CITextField`.
+  lookups. Three fields are provided: ``CICharField``, ``CIEmailField``, and
+  ``CITextField``.
 
 * The new :class:`~django.contrib.postgres.aggregates.JSONBAgg` allows
   aggregating values as a JSON array.
