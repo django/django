@@ -1,0 +1,12 @@
+==========================
+Django 4.1.1 release notes
+==========================
+
+*Expected September 5, 2022*
+
+Django 4.1.1 fixes several bugs in 4.1.
+
+Bugfixes
+========
+
+* ...
