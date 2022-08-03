@@ -308,7 +308,7 @@ example::
 Should become::
 
     class Author(models.Model):
-        ranl = models.IntegerField()
+        rank = models.IntegerField()
         name = models.CharField(max_length=30)
 
         class Meta:
