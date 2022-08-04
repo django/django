@@ -151,7 +151,11 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* :class:`~django.forms.ModelForm` now accepts the new ``Meta`` option
+  ``formfield_callback`` to customize form fields.
+
+* :func:`~django.forms.models.modelform_factory` now respects the
+  ``formfield_callback`` attribute of the ``form``’s ``Meta``.
 
 Generic Views
 ~~~~~~~~~~~~~

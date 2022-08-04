@@ -548,8 +548,8 @@ the ``name`` field::
                 },
             }
 
-You can also specify ``field_classes`` to customize the type of fields
-instantiated by the form.
+You can also specify ``field_classes`` or ``formfield_callback`` to customize
+the type of fields instantiated by the form.
 
 For example, if you wanted to use ``MySlugFormField`` for the ``slug``
 field, you could do the following::
@@ -565,6 +565,21 @@ field, you could do the following::
                 'slug': MySlugFormField,
             }
 
+or::
+
+    from django.forms import ModelForm
+    from myapp.models import Article
+
+    def formfield_for_dbfield(db_field, **kwargs):
+        if db_field.name == "slug":
+            return MySlugFormField()
+        return db_field.formfield(**kwargs)
+
+    class ArticleForm(ModelForm):
+        class Meta:
+            model = Article
+            fields = ["pub_date", "headline", "content", "reporter", "slug"]
+            formfield_callback = formfield_for_dbfield
 
 Finally, if you want complete control over of a field -- including its type,
 validators, required, etc. -- you can do this by declaratively specifying
@@ -638,6 +653,9 @@ the field declaratively and setting its ``validators`` parameter::
     See the :doc:`form field documentation </ref/forms/fields>` for more information
     on fields and their arguments.
 
+.. versionchanged:: 4.2
+
+    The ``Meta.formfield_callback`` attribute was added.
 
 Enabling localization of fields
 -------------------------------
