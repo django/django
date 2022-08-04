@@ -4,6 +4,10 @@ on:
   pull_request_target:
     types: [opened]
 
+permissions:
+  issues: write
+  pull-requests: read
+
 jobs:
   build:
     name: Hello new contributor
