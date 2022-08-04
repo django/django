@@ -14,3 +14,7 @@ Bugfixes
 
 * Fixed a regression in Django 4.1 that caused a crash of admin's autocomplete
   widgets when translations are deactivated (:ticket:`33888`).
+
+* Fixed a regression in Django 4.1 that caused a crash of the ``test``
+  management command when running in parallel and ``multiprocessing`` start
+  method is ``spawn`` (:ticket:`33891`).
