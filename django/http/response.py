@@ -699,7 +699,7 @@ class JsonResponse(HttpResponse):
         json_dumps_params=None,
         **kwargs,
     ):
-        if safe and not isinstance(data, dict):
+        if safe and not isinstance(data, (dict, list)):
             raise TypeError(
                 "In order to allow non-dict objects to be serialized set the "
                 "safe parameter to False."
