@@ -443,6 +443,11 @@ def _run_subsuite(args):
     return subsuite_index, result.events
 
 
+def _process_setup_stub(*args):
+    """Stub method to simplify run() implementation."""
+    pass
+
+
 class ParallelTestSuite(unittest.TestSuite):
     """
     Run a series of tests in parallel in several processes.
@@ -461,6 +466,7 @@ class ParallelTestSuite(unittest.TestSuite):
 
     # In case someone wants to modify these in a subclass.
     init_worker = _init_worker
+    process_setup = _process_setup_stub
     process_setup_args = ()
     run_subsuite = _run_subsuite
     runner_class = RemoteTestRunner
@@ -473,14 +479,6 @@ class ParallelTestSuite(unittest.TestSuite):
         self.initial_settings = None
         self.serialized_contents = None
         super().__init__()
-
-    def process_setup(self, *args):
-        """
-        Stub method to simplify run() implementation. "self" is never actually
-        passed because a function implementing this method (__func__) is
-        always used, not the method itself.
-        """
-        pass
 
     def run(self, result):
         """
