@@ -55,6 +55,8 @@ class ASGITest(SimpleTestCase):
         response_body = await communicator.receive_output()
         self.assertEqual(response_body["type"], "http.response.body")
         self.assertEqual(response_body["body"], b"Hello World!")
+        # Allow response.close() to finish.
+        await communicator.wait()
 
     async def test_file_response(self):
         """
@@ -162,6 +164,8 @@ class ASGITest(SimpleTestCase):
         response_body = await communicator.receive_output()
         self.assertEqual(response_body["type"], "http.response.body")
         self.assertEqual(response_body["body"], b"From Scotland,Wales")
+        # Allow response.close() to finish
+        await communicator.wait()
 
     async def test_post_body(self):
         application = get_asgi_application()
@@ -191,6 +195,8 @@ class ASGITest(SimpleTestCase):
                 response_body = await communicator.receive_output()
                 self.assertEqual(response_body["type"], "http.response.body")
                 self.assertEqual(response_body["body"], b"Hello Andrew!")
+                # Allow response.close() to finish
+                await communicator.wait()
 
     async def test_disconnect(self):
         application = get_asgi_application()
