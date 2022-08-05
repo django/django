@@ -38,7 +38,7 @@ ALLOWED_HOSTS = []
 # https://en.wikipedia.org/wiki/List_of_tz_zones_by_name (although not all
 # systems may support all possibilities). When USE_TZ is True, this is
 # interpreted as the default user time zone.
-TIME_ZONE = "America/Chicago"
+TIME_ZONE = None
 
 # If you set this to True, Django will use timezone-aware datetimes.
 USE_TZ = False
