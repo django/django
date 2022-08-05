@@ -18,3 +18,6 @@ Bugfixes
 * Fixed a regression in Django 4.1 that caused a crash of the ``test``
   management command when running in parallel and ``multiprocessing`` start
   method is ``spawn`` (:ticket:`33891`).
+
+* Reverted a fix (:ticket:`28889`) to prevented double submission of admin
+  forms which caused a regression (:ticket:`33893`).
