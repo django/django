@@ -436,6 +436,11 @@ The ``action`` decorator
         make_published.allowed_permissions = ['publish']
         make_published.short_description = 'Mark selected stories as published'
 
+    .. note::
+    
+        The description string will be %-formatted. %-signs intended to be
+        printed as-is should be escaped with another %-sign, i.e. as %%.
+    
     Use of this decorator is not compulsory to make an action function, but it
     can be useful to use it without arguments as a marker in your source to
     identify the purpose of the function::
