@@ -127,7 +127,6 @@ class Command(BaseCommand):
         threading = options["use_threading"]
         # 'shutdown_message' is a stealth option.
         shutdown_message = options.get("shutdown_message", "")
-        quit_command = "CTRL-BREAK" if sys.platform == "win32" else "CONTROL-C"
 
         if not options["skip_checks"]:
             self.stdout.write("Performing system checks...\n\n")
@@ -135,6 +134,39 @@ class Command(BaseCommand):
         # Need to check migrations here, so can't use the
         # requires_migrations_check attribute.
         self.check_migrations()
+        try:
+            handler = self.get_handler(*args, **options)
+            run(
+                self.addr,
+                int(self.port),
+                handler,
+                ipv6=self.use_ipv6,
+                threading=threading,
+                server_cls=self.server_cls,
+                on_bind=self._on_bind,
+            )
+        except OSError as e:
+            # Use helpful error messages instead of ugly tracebacks.
+            ERRORS = {
+                errno.EACCES: f"You don't have permission to access port {self.port}.",
+                errno.EADDRINUSE: f"Port {self.port} is already in use.",
+                errno.EADDRNOTAVAIL: f"IP address {self.addr!r} can't be assigned to.",
+            }
+            try:
+                error_text = ERRORS[e.errno]
+            except KeyError:
+                error_text = e
+            self.stderr.write(f"Error: {error_text}")
+            # Need to use an OS exit because sys.exit doesn't work in a thread
+            os._exit(1)
+        except KeyboardInterrupt:
+            if shutdown_message:
+                self.stdout.write(shutdown_message)
+            sys.exit(0)
+
+    def _on_bind(self, server_port):
+        """Display server name and port after server bind."""
+        quit_command = "CTRL-BREAK" if sys.platform == "win32" else "CONTROL-C"
         now = datetime.now().strftime("%B %d, %Y - %X")
         self.stdout.write(now)
         self.stdout.write(
@@ -148,36 +180,7 @@ class Command(BaseCommand):
                 "settings": settings.SETTINGS_MODULE,
                 "protocol": self.protocol,
                 "addr": "[%s]" % self.addr if self._raw_ipv6 else self.addr,
-                "port": self.port,
+                "port": server_port,
                 "quit_command": quit_command,
             }
         )
-
-        try:
-            handler = self.get_handler(*args, **options)
-            run(
-                self.addr,
-                int(self.port),
-                handler,
-                ipv6=self.use_ipv6,
-                threading=threading,
-                server_cls=self.server_cls,
-            )
-        except OSError as e:
-            # Use helpful error messages instead of ugly tracebacks.
-            ERRORS = {
-                errno.EACCES: "You don't have permission to access that port.",
-                errno.EADDRINUSE: "That port is already in use.",
-                errno.EADDRNOTAVAIL: "That IP address can't be assigned to.",
-            }
-            try:
-                error_text = ERRORS[e.errno]
-            except KeyError:
-                error_text = e
-            self.stderr.write("Error: %s" % error_text)
-            # Need to use an OS exit because sys.exit doesn't work in a thread
-            os._exit(1)
-        except KeyboardInterrupt:
-            if shutdown_message:
-                self.stdout.write(shutdown_message)
-            sys.exit(0)
