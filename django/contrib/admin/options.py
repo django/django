@@ -864,7 +864,7 @@ class ModelAdmin(BaseModelAdmin):
         try:
             object_id = field.to_python(object_id)
             return queryset.get(**{field.name: object_id})
-        except (model.DoesNotExist, ValidationError, ValueError):
+        except (model.DoesNotExist, ValueError):
             return None
 
     def get_changelist_form(self, request, **kwargs):
@@ -1889,9 +1889,7 @@ class ModelAdmin(BaseModelAdmin):
 
     def _get_edited_object_pks(self, request, prefix):
         """Return POST data values of list_editable primary keys."""
-        pk_pattern = re.compile(
-            r"{}-\d+-{}$".format(re.escape(prefix), self.opts.pk.name)
-        )
+        pk_pattern = re.compile(f"{re.escape(prefix)}-\d+-{self.opts.pk.name}$")
         return [value for key, value in request.POST.items() if pk_pattern.match(key)]
 
     def _get_list_editable_queryset(self, request, prefix):
@@ -2319,12 +2317,12 @@ class InlineModelAdmin(BaseModelAdmin):
     @property
     def media(self):
         extra = "" if settings.DEBUG else ".min"
-        js = ["vendor/jquery/jquery%s.js" % extra, "jquery.init.js", "inlines.js"]
+        js = [f"vendor/jquery/jquery{extra}.js", "jquery.init.js", "inlines.js"]
         if self.filter_vertical or self.filter_horizontal:
             js.extend(["SelectBox.js", "SelectFilter2.js"])
         if self.classes and "collapse" in self.classes:
             js.append("collapse.js")
-        return forms.Media(js=["admin/js/%s" % url for url in js])
+        return forms.Media(js=[f"admin/js/{url}" for url in js])
 
     def get_extra(self, request, obj=None, **kwargs):
         """Hook for customizing the number of extra inline forms."""

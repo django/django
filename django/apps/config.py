@@ -56,7 +56,7 @@ class AppConfig:
         self.models = None
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, self.label)
+        return f"<{self.__class__.__name__}: {self.label}>"
 
     @cached_property
     def default_auto_field(self):
@@ -233,10 +233,8 @@ class AppConfig:
             self.apps.check_apps_ready()
         try:
             return self.models[model_name.lower()]
-        except KeyError:
-            raise LookupError(
-                "App '%s' doesn't have a '%s' model." % (self.label, model_name)
-            )
+        except KeyError as e:
+            raise LookupError("App '%s' doesn't have a '%s' model." % (self.label, model_name)) from e
 
     def get_models(self, include_auto_created=False, include_swapped=False):
         """

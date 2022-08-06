@@ -247,10 +247,8 @@ class AdminReadonlyField:
         )
 
     def get_admin_url(self, remote_field, remote_obj):
-        url_name = "admin:%s_%s_change" % (
-            remote_field.model._meta.app_label,
-            remote_field.model._meta.model_name,
-        )
+        url_name = f"admin:{remote_field.model._meta.app_label}_{remote_field.model._meta.model_name}_change"
+
         try:
             url = reverse(
                 url_name,
@@ -263,12 +261,8 @@ class AdminReadonlyField:
 
     def contents(self):
         from django.contrib.admin.templatetags.admin_list import _boolean_icon
+        field, obj, model_admin = self.field["field"], self.form.instance, self.model_admin
 
-        field, obj, model_admin = (
-            self.field["field"],
-            self.form.instance,
-            self.model_admin,
-        )
         try:
             f, attr, value = lookup_field(field, obj, model_admin)
         except (AttributeError, ValueError, ObjectDoesNotExist):
@@ -276,25 +270,17 @@ class AdminReadonlyField:
         else:
             if field in self.form.fields:
                 widget = self.form[field].field.widget
-                # This isn't elegant but suffices for contrib.auth's
-                # ReadOnlyPasswordHashWidget.
                 if getattr(widget, "read_only", False):
                     return widget.render(field, value)
             if f is None:
                 if getattr(attr, "boolean", False):
                     result_repr = _boolean_icon(value)
                 else:
-                    if hasattr(value, "__html__"):
-                        result_repr = value
-                    else:
-                        result_repr = linebreaksbr(value)
+                    result_repr = value if hasattr(value, "__html__") else linebreaksbr(value)
             else:
                 if isinstance(f.remote_field, ManyToManyRel) and value is not None:
                     result_repr = ", ".join(map(str, value.all()))
-                elif (
-                    isinstance(f.remote_field, (ForeignObjectRel, OneToOneField))
-                    and value is not None
-                ):
+                elif isinstance(f.remote_field, (ForeignObjectRel, OneToOneField)) and value is not None:
                     result_repr = self.get_admin_url(f.remote_field, value)
                 else:
                     result_repr = display_for_field(value, f, self.empty_value_display)
@@ -384,7 +370,7 @@ class InlineAdminFormSet:
         empty_form = self.formset.empty_form
         meta_labels = empty_form._meta.labels or {}
         meta_help_texts = empty_form._meta.help_texts or {}
-        for i, field_name in enumerate(flatten_fieldsets(self.fieldsets)):
+        for field_name in flatten_fieldsets(self.fieldsets):
             if fk and fk.name == field_name:
                 continue
             if not self.has_change_permission or field_name in self.readonly_fields:
@@ -392,50 +378,19 @@ class InlineAdminFormSet:
                 widget_is_hidden = False
                 if form_field is not None:
                     widget_is_hidden = form_field.widget.is_hidden
-                yield {
-                    "name": field_name,
-                    "label": meta_labels.get(field_name)
-                    or label_for_field(
-                        field_name,
-                        self.opts.model,
-                        self.opts,
-                        form=empty_form,
-                    ),
-                    "widget": {"is_hidden": widget_is_hidden},
-                    "required": False,
-                    "help_text": meta_help_texts.get(field_name)
-                    or help_text_for_field(field_name, self.opts.model),
-                }
+                yield {"name": field_name, "label": meta_labels.get(field_name) or label_for_field(field_name, self.opts.model, self.opts, form=empty_form), "widget": {"is_hidden": widget_is_hidden}, "required": False, "help_text": meta_help_texts.get(field_name) or help_text_for_field(field_name, self.opts.model)}
+
             else:
                 form_field = empty_form.fields[field_name]
                 label = form_field.label
                 if label is None:
-                    label = label_for_field(
-                        field_name, self.opts.model, self.opts, form=empty_form
-                    )
-                yield {
-                    "name": field_name,
-                    "label": label,
-                    "widget": form_field.widget,
-                    "required": form_field.required,
-                    "help_text": form_field.help_text,
-                }
+                    label = label_for_field(field_name, self.opts.model, self.opts, form=empty_form)
+
+                yield {"name": field_name, "label": label, "widget": form_field.widget, "required": form_field.required, "help_text": form_field.help_text}
 
     def inline_formset_data(self):
         verbose_name = self.opts.verbose_name
-        return json.dumps(
-            {
-                "name": "#%s" % self.formset.prefix,
-                "options": {
-                    "prefix": self.formset.prefix,
-                    "addText": gettext("Add another %(verbose_name)s")
-                    % {
-                        "verbose_name": capfirst(verbose_name),
-                    },
-                    "deleteText": gettext("Remove"),
-                },
-            }
-        )
+        return json.dumps({"name": f"#{self.formset.prefix}", "options": {"prefix": self.formset.prefix, "addText": (gettext("Add another %(verbose_name)s") % {"verbose_name": capfirst(verbose_name)}), "deleteText": gettext("Remove")}})
 
     @property
     def forms(self):
@@ -515,8 +470,7 @@ class InlineAdminForm(AdminForm):
         return AdminField(self.form, self.formset._pk_field.name, False)
 
     def fk_field(self):
-        fk = getattr(self.formset, "fk", None)
-        if fk:
+        if fk := getattr(self.formset, "fk", None):
             return AdminField(self.form, fk.name, False)
         else:
             return ""

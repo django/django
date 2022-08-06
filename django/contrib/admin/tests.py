@@ -207,14 +207,14 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         Assert that the <SELECT> widget identified by `selector` has the
         options with the given `values`.
         """
-        self._assertOptionsValues("%s > option" % selector, values)
+        self._assertOptionsValues(f"{selector} > option", values)
 
     def assertSelectedOptions(self, selector, values):
         """
         Assert that the <SELECT> widget identified by `selector` has the
         selected options with the given `values`.
         """
-        self._assertOptionsValues("%s > option:checked" % selector, values)
+        self._assertOptionsValues(f"{selector} > option:checked", values)
 
     def has_css_class(self, selector, klass):
         """

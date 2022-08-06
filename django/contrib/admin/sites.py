@@ -1,3 +1,4 @@
+import contextlib
 import re
 from functools import update_wrapper
 from weakref import WeakSet
@@ -116,10 +117,8 @@ class AdminSite:
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
             if model._meta.abstract:
-                raise ImproperlyConfigured(
-                    "The model %s is abstract, so it cannot be registered with admin."
-                    % model.__name__
-                )
+                raise ImproperlyConfigured(f"The model {model.__name__} is abstract, so it cannot be registered with admin.")
+
 
             if model in self._registry:
                 registered_admin = str(self._registry[model])
@@ -448,12 +447,12 @@ class AdminSite:
         if settings.APPEND_SLASH and not url.endswith("/"):
             urlconf = getattr(request, "urlconf", None)
             try:
-                match = resolve("%s/" % request.path_info, urlconf)
+                match = resolve(f"{request.path_info}/", urlconf)
             except Resolver404:
                 pass
             else:
                 if getattr(match.func, "should_append_slash", True):
-                    return HttpResponsePermanentRedirect("%s/" % request.path)
+                    return HttpResponsePermanentRedirect(f"{request.path}/")
         raise Http404
 
     def _build_app_dict(self, request, label=None):
@@ -462,69 +461,35 @@ class AdminSite:
         of a specific app.
         """
         app_dict = {}
-
         if label:
-            models = {
-                m: m_a
-                for m, m_a in self._registry.items()
-                if m._meta.app_label == label
-            }
+            models = {m: m_a for m, m_a in self._registry.items() if m._meta.app_label == label}
+
         else:
             models = self._registry
-
         for model, model_admin in models.items():
             app_label = model._meta.app_label
-
             has_module_perms = model_admin.has_module_permission(request)
             if not has_module_perms:
                 continue
-
             perms = model_admin.get_model_perms(request)
-
-            # Check whether user has any perm for this module.
-            # If so, add the module to the model_list.
             if True not in perms.values():
                 continue
+            info = app_label, model._meta.model_name
+            model_dict = {"model": model, "name": capfirst(model._meta.verbose_name_plural), "object_name": model._meta.object_name, "perms": perms, "admin_url": None, "add_url": None}
 
-            info = (app_label, model._meta.model_name)
-            model_dict = {
-                "model": model,
-                "name": capfirst(model._meta.verbose_name_plural),
-                "object_name": model._meta.object_name,
-                "perms": perms,
-                "admin_url": None,
-                "add_url": None,
-            }
             if perms.get("change") or perms.get("view"):
                 model_dict["view_only"] = not perms.get("change")
-                try:
-                    model_dict["admin_url"] = reverse(
-                        "admin:%s_%s_changelist" % info, current_app=self.name
-                    )
-                except NoReverseMatch:
-                    pass
+                with contextlib.suppress(NoReverseMatch):
+                    model_dict["admin_url"] = reverse("admin:%s_%s_changelist" % info, current_app=self.name)
+
             if perms.get("add"):
-                try:
-                    model_dict["add_url"] = reverse(
-                        "admin:%s_%s_add" % info, current_app=self.name
-                    )
-                except NoReverseMatch:
-                    pass
+                with contextlib.suppress(NoReverseMatch):
+                    model_dict["add_url"] = reverse("admin:%s_%s_add" % info, current_app=self.name)
 
             if app_label in app_dict:
                 app_dict[app_label]["models"].append(model_dict)
             else:
-                app_dict[app_label] = {
-                    "name": apps.get_app_config(app_label).verbose_name,
-                    "app_label": app_label,
-                    "app_url": reverse(
-                        "admin:app_list",
-                        kwargs={"app_label": app_label},
-                        current_app=self.name,
-                    ),
-                    "has_module_perms": has_module_perms,
-                    "models": [model_dict],
-                }
+                app_dict[app_label] = {"name": apps.get_app_config(app_label).verbose_name, "app_label": app_label, "app_url": reverse("admin:app_list", kwargs={"app_label": app_label}, current_app=self.name), "has_module_perms": has_module_perms, "models": [model_dict]}
 
         return app_dict
 

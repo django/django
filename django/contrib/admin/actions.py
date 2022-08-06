@@ -43,8 +43,7 @@ def delete_selected(modeladmin, request, queryset):
     if request.POST.get("post") and not protected:
         if perms_needed:
             raise PermissionDenied
-        n = queryset.count()
-        if n:
+        if n := queryset.count():
             for obj in queryset:
                 obj_display = str(obj)
                 modeladmin.log_deletion(request, obj, obj_display)

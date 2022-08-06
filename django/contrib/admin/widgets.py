@@ -139,14 +139,8 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         rel_to = self.rel.model
         if rel_to in self.admin_site._registry:
             # The related object is registered with the same AdminSite
-            related_url = reverse(
-                "admin:%s_%s_changelist"
-                % (
-                    rel_to._meta.app_label,
-                    rel_to._meta.model_name,
-                ),
-                current_app=self.admin_site.name,
-            )
+            related_url = reverse(f"admin:{rel_to._meta.app_label}_{rel_to._meta.model_name}_changelist", current_app=self.admin_site.name)
+
 
             params = self.url_parameters()
             if params:
@@ -185,22 +179,13 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         key = self.rel.get_related_field().name
         try:
             obj = self.rel.model._default_manager.using(self.db).get(**{key: value})
-        except (ValueError, self.rel.model.DoesNotExist, ValidationError):
+        except (ValueError, self.rel.model.DoesNotExist):
             return "", ""
-
         try:
-            url = reverse(
-                "%s:%s_%s_change"
-                % (
-                    self.admin_site.name,
-                    obj._meta.app_label,
-                    obj._meta.object_name.lower(),
-                ),
-                args=(obj.pk,),
-            )
-        except NoReverseMatch:
-            url = ""  # Admin not registered for target model.
+            url = reverse(f"{self.admin_site.name}:{obj._meta.app_label}_{obj._meta.object_name.lower()}_change", args=(obj.pk,))
 
+        except NoReverseMatch:
+            url = ""
         return Truncator(obj).words(14), url
 
 
@@ -367,16 +352,15 @@ class AdminURLFieldWidget(forms.URLInput):
 
     def get_context(self, name, value, attrs):
         try:
-            self.validator(value if value else "")
+            self.validator(value or "")
             url_valid = True
         except ValidationError:
             url_valid = False
         context = super().get_context(name, value, attrs)
         context["current_label"] = _("Currently:")
         context["change_label"] = _("Change:")
-        context["widget"]["href"] = (
-            smart_urlquote(context["widget"]["value"]) if value else ""
-        )
+        context["widget"]["href"] = smart_urlquote(context["widget"]["value"]) if value else ""
+
         context["url_valid"] = url_valid
         return context
 
@@ -400,57 +384,7 @@ class AdminUUIDInputWidget(forms.TextInput):
 # Mapping of lowercase language codes [returned by Django's get_language()] to
 # language codes supported by select2.
 # See django/contrib/admin/static/admin/js/vendor/select2/i18n/*
-SELECT2_TRANSLATIONS = {
-    x.lower(): x
-    for x in [
-        "ar",
-        "az",
-        "bg",
-        "ca",
-        "cs",
-        "da",
-        "de",
-        "el",
-        "en",
-        "es",
-        "et",
-        "eu",
-        "fa",
-        "fi",
-        "fr",
-        "gl",
-        "he",
-        "hi",
-        "hr",
-        "hu",
-        "id",
-        "is",
-        "it",
-        "ja",
-        "km",
-        "ko",
-        "lt",
-        "lv",
-        "mk",
-        "ms",
-        "nb",
-        "nl",
-        "pl",
-        "pt-BR",
-        "pt",
-        "ro",
-        "ru",
-        "sk",
-        "sr-Cyrl",
-        "sr",
-        "sv",
-        "th",
-        "tr",
-        "uk",
-        "vi",
-    ]
-}
-SELECT2_TRANSLATIONS.update({"zh-hans": "zh-CN", "zh-hant": "zh-TW"})
+SELECT2_TRANSLATIONS = {x.lower(): x for x in ["ar", "az", "bg", "ca", "cs", "da", "de", "el", "en", "es", "et", "eu", "fa", "fi", "fr", "gl", "he", "hi", "hr", "hu", "id", "is", "it", "ja", "km", "ko", "lt", "lv", "mk", "ms", "nb", "nl", "pl", "pt-BR", "pt", "ro", "ru", "sk", "sr-Cyrl", "sr", "sv", "th", "tr", "uk", "vi",]} | {"zh-hans": "zh-CN", "zh-hant": "zh-TW"}
 
 
 def get_select2_language():
@@ -519,64 +453,35 @@ class AutocompleteMixin:
 
     def optgroups(self, name, value, attr=None):
         """Return selected options based on the ModelChoiceIterator."""
-        default = (None, [], 0)
+        default = None, [], 0
         groups = [default]
         has_selected = False
-        selected_choices = {
-            str(v) for v in value if str(v) not in self.choices.field.empty_values
-        }
+        selected_choices = {str(v) for v in value if str(v) not in self.choices.field.empty_values}
+
         if not self.is_required and not self.allow_multiple_selected:
             default[1].append(self.create_option(name, "", "", False, 0))
         remote_model_opts = self.field.remote_field.model._meta
-        to_field_name = getattr(
-            self.field.remote_field, "field_name", remote_model_opts.pk.attname
-        )
+        to_field_name = getattr(self.field.remote_field, "field_name", remote_model_opts.pk.attname)
+
         to_field_name = remote_model_opts.get_field(to_field_name).attname
-        choices = (
-            (getattr(obj, to_field_name), self.choices.field.label_from_instance(obj))
-            for obj in self.choices.queryset.using(self.db).filter(
-                **{"%s__in" % to_field_name: selected_choices}
-            )
-        )
+        choices = ((getattr(obj, to_field_name), self.choices.field.label_from_instance(obj)) for obj in self.choices.queryset.using(self.db).filter(**{f"{to_field_name}__in": selected_choices}))
+
         for option_value, option_label in choices:
-            selected = str(option_value) in value and (
-                has_selected is False or self.allow_multiple_selected
-            )
+            selected = str(option_value) in value and (has_selected is False or self.allow_multiple_selected)
+
             has_selected |= selected
             index = len(default[1])
             subgroup = default[1]
-            subgroup.append(
-                self.create_option(
-                    name, option_value, option_label, selected_choices, index
-                )
-            )
+            subgroup.append(self.create_option(name, option_value, option_label, selected_choices, index))
+
         return groups
 
     @property
     def media(self):
         extra = "" if settings.DEBUG else ".min"
-        i18n_file = (
-            ("admin/js/vendor/select2/i18n/%s.js" % self.i18n_name,)
-            if self.i18n_name
-            else ()
-        )
-        return forms.Media(
-            js=(
-                "admin/js/vendor/jquery/jquery%s.js" % extra,
-                "admin/js/vendor/select2/select2.full%s.js" % extra,
-            )
-            + i18n_file
-            + (
-                "admin/js/jquery.init.js",
-                "admin/js/autocomplete.js",
-            ),
-            css={
-                "screen": (
-                    "admin/css/vendor/select2/select2%s.css" % extra,
-                    "admin/css/autocomplete.css",
-                ),
-            },
-        )
+        i18n_file = (f"admin/js/vendor/select2/i18n/{self.i18n_name}.js",) if self.i18n_name else ()
+
+        return forms.Media(js=(f"admin/js/vendor/jquery/jquery{extra}.js", f"admin/js/vendor/select2/select2.full{extra}.js") + i18n_file + ("admin/js/jquery.init.js", "admin/js/autocomplete.js"), css={"screen": (f"admin/css/vendor/select2/select2{extra}.css", "admin/css/autocomplete.css")})
 
 
 class AutocompleteSelect(AutocompleteMixin, forms.Select):
