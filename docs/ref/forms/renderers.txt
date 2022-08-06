@@ -60,7 +60,7 @@ should return a rendered templates (as a string) or raise
 
         The ``"django/forms/default.html"`` template is deprecated and will be
         removed in Django 5.0. The default will become
-        ``"django/forms/default.html"`` at that time.
+        ``"django/forms/div.html"`` at that time.
 
     .. attribute:: formset_template_name
 
