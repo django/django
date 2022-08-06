@@ -1669,7 +1669,7 @@ class Window(SQLiteNumericMixin, Expression):
         if not connection.features.supports_over_clause:
             raise NotSupportedError("This backend does not support window expressions.")
         expr_sql, params = compiler.compile(self.source_expression)
-        window_sql, window_params = [], []
+        window_sql, window_params = [], ()
 
         if self.partition_by is not None:
             sql_expr, sql_params = self.partition_by.as_sql(
@@ -1678,24 +1678,23 @@ class Window(SQLiteNumericMixin, Expression):
                 template="PARTITION BY %(expressions)s",
             )
             window_sql.append(sql_expr)
-            window_params.extend(sql_params)
+            window_params += tuple(sql_params)
 
         if self.order_by is not None:
             order_sql, order_params = compiler.compile(self.order_by)
             window_sql.append(order_sql)
-            window_params.extend(order_params)
+            window_params += tuple(order_params)
 
         if self.frame:
             frame_sql, frame_params = compiler.compile(self.frame)
             window_sql.append(frame_sql)
-            window_params.extend(frame_params)
+            window_params += tuple(frame_params)
 
-        params.extend(window_params)
         template = template or self.template
 
         return (
             template % {"expression": expr_sql, "window": " ".join(window_sql).strip()},
-            params,
+            (*params, *window_params),
         )
 
     def as_sqlite(self, compiler, connection):
