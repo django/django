@@ -26,3 +26,6 @@ Bugfixes
 * Fixed a regression in Django 4.1 that caused a crash of
   :class:`~django.db.models.expressions.Window` expressions with
   :class:`~django.contrib.postgres.aggregates.ArrayAgg` (:ticket:`33898`).
+
+* Fixed a regression in Django 4.1 that caused a migration crash on SQLite
+  3.35.5+ when removing an indexed field (:ticket:`33899`).
