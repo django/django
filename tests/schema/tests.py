@@ -813,6 +813,25 @@ class SchemaTests(TransactionTestCase):
                 False,
             )
 
+    def test_remove_indexed_field(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(BookWithoutAuthor)
+            # Add the index in model
+            index = Index(fields=["title"], name="book_title_field_idx")
+            index_name = index.name
+            BookWithoutAuthor._meta.indexes = [index]
+            with connection.schema_editor() as editor:
+                editor.add_index(BookWithoutAuthor, index)
+            # Ensure the index exist
+            constraints = self.get_constraints(
+                BookWithoutAuthor._meta.db_table
+            )
+            self.assertIn(index_name, constraints)
+            with CaptureQueriesContext(connection) as ctx:
+                editor.remove_field(BookWithoutAuthor, BookWithoutAuthor._meta.get_field("title"))
+        columns = self.column_classes(BookWithoutAuthor)
+        self.assertNotIn("title", columns)
+
     def test_alter(self):
         """
         Tests simple altering of fields
