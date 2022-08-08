@@ -573,7 +573,7 @@ require translation in the future::
 
     <title>{% translate "myvar" noop %}</title>
 
-Internally, inline translations use an
+Internally, inline translations use a
 :func:`~django.utils.translation.gettext` call.
 
 In case a template var (``myvar`` above) is passed to the tag, the tag will
