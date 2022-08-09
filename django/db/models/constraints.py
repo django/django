@@ -326,9 +326,12 @@ class UniqueConstraint(BaseConstraint):
             # Ignore constraints with excluded fields.
             if exclude:
                 for expression in self.expressions:
-                    for expr in expression.flatten():
-                        if isinstance(expr, F) and expr.name in exclude:
-                            return
+                    if hasattr(expression, "flatten"):
+                        for expr in expression.flatten():
+                            if isinstance(expr, F) and expr.name in exclude:
+                                return
+                    elif isinstance(expression, F) and expression.name in exclude:
+                        return
             replacement_map = instance._get_field_value_map(
                 meta=model._meta, exclude=exclude
             )
