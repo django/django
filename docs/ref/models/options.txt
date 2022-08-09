@@ -302,14 +302,35 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.permissions
 
-    Extra permissions to enter into the permissions table when creating this object.
-    Add, change, delete, and view permissions are automatically created for each
-    model. This example specifies an extra permission, ``can_deliver_pizzas``::
+    Extra permissions to enter into the permissions table when creating this
+    object. Add, change, delete, and view permissions are automatically created
+    for each model. This example specifies an extra permission,
+    ``can_deliver_pizzas``::
 
         permissions = [('can_deliver_pizzas', 'Can deliver pizzas')]
 
     This is a list or tuple of 2-tuples in the format ``(permission_code,
     human_readable_permission_name)``.
+
+     The permission code and name on an (abstract) model may contain
+    ``%(model_name)s`` and ``%(verbose_name)s``. The models inheriting from the
+    base model will then have those permissions specific to the inheriting
+    model, e.g.::
+
+        class Base(models.Model):
+            ...
+
+            class Meta:
+                permissions = (
+                    ("can_deliver_%(model_name)s", "Can deliver %(verbose_name)"),
+                )
+
+
+        class Pizza(Base):
+            pass
+
+    The model ``Pizza`` now has the permissions ``can_deliver_pizza`` with the
+    label "Can deliver pizza".
 
 ``default_permissions``
 -----------------------

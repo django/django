@@ -203,6 +203,18 @@ class Options:
 
             self.unique_together = normalize_together(self.unique_together)
             self.index_together = normalize_together(self.index_together)
+
+            # Replace any %(model_name)s / %(verbose_name)s placeholders.
+            perms = meta_attrs.pop('permissions', self.permissions)
+            interpolated_perms = []
+            if perms:
+                for codename, name in perms:
+                    codename = codename % {'model_name': self.model_name}
+                    name = name % {'verbose_name': self.verbose_name}
+                    interpolated_perms.append((codename, name))
+
+            self.permissions = interpolated_perms
+
             if self.index_together:
                 warnings.warn(
                     f"'index_together' is deprecated. Use 'Meta.indexes' in "
@@ -525,6 +537,7 @@ class Options:
         combined with filtering of field properties is the public API for
         obtaining this field list.
         """
+
         # For legacy reasons, the fields property should only contain forward
         # fields that are not private or with a m2m cardinality. Therefore we
         # pass these three filters as filters to the generator.
@@ -551,8 +564,8 @@ class Options:
                 f
                 for f in self._get_fields(reverse=False)
                 if is_not_an_m2m_field(f)
-                and is_not_a_generic_relation(f)
-                and is_not_a_generic_foreign_key(f)
+                   and is_not_a_generic_relation(f)
+                   and is_not_a_generic_foreign_key(f)
             ),
         )
 
