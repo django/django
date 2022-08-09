@@ -343,7 +343,7 @@ when loading Django templates; it's a search path.
 Now create a directory called ``admin`` inside ``templates``, and copy the
 template ``admin/base_site.html`` from within the default Django admin
 template directory in the source code of Django itself
-(``django/contrib/admin/templates``) into that directory.
+(:source:`django/contrib/admin/templates`) into that directory.
 
 .. admonition:: Where are the Django source files?
 
