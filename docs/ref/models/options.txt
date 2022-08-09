@@ -307,12 +307,12 @@ Django quotes column and table names behind the scenes.
     for each model. This example specifies an extra permission,
     ``can_deliver_pizzas``::
 
-        permissions = [('can_deliver_pizzas', 'Can deliver pizzas')]
+        permissions = [('can_deliver_pizza', 'Can deliver pizza')]
 
     This is a list or tuple of 2-tuples in the format ``(permission_code,
     human_readable_permission_name)``.
 
-     The permission code and name on an (abstract) model may contain
+    The permission code and name on an (abstract) model may contain
     ``%(model_name)s`` and ``%(verbose_name)s``. The models inheriting from the
     base model will then have those permissions specific to the inheriting
     model, e.g.::
