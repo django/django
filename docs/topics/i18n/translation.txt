@@ -649,8 +649,8 @@ You can use multiple expressions inside a single ``blocktranslate`` tag::
 .. note:: The previous more verbose format is still supported:
    ``{% blocktranslate with book|title as book_t and author|title as author_t %}``
 
-Other block tags (for example ``{% for %}`` or ``{% if %}``) are not allowed
-inside a ``blocktranslate`` tag.
+Other block tags (for example :ttag:`{% for %}<for>` or :ttag:`{% if %}<if>`) are
+not allowed inside a ``blocktranslate`` tag.
 
 If resolving one of the block arguments fails, ``blocktranslate`` will fall
 back to the default language by deactivating the currently active language
