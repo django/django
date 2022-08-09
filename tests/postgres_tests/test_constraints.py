@@ -65,6 +65,16 @@ class SchemaTests(PostgreSQLTestCase):
             RangesModel.objects.create(ints=(20, 50))
         RangesModel.objects.create(ints=(10, 30))
 
+    def test_check_constraint_array_contains(self):
+        constraint = CheckConstraint(
+            check=Q(field__contains=[1]),
+            name="array_contains",
+        )
+        msg = f"Constraint “{constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(IntegerArrayModel, IntegerArrayModel())
+        constraint.validate(IntegerArrayModel, IntegerArrayModel(field=[1]))
+
     def test_check_constraint_daterange_contains(self):
         constraint_name = "dates_contains"
         self.assertNotIn(
