@@ -78,6 +78,9 @@ class RangeField(models.Field):
     def _choices_is_value(cls, value):
         return isinstance(value, (list, tuple)) or super()._choices_is_value(value)
 
+    def get_placeholder(self, value, compiler, connection):
+        return "%s::{}".format(self.db_type(connection))
+
     def get_prep_value(self, value):
         if value is None:
             return None
