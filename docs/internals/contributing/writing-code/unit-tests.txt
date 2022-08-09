@@ -379,9 +379,9 @@ and also excludes several directories not relevant to the results
 Contrib apps
 ============
 
-Tests for contrib apps can be found in the ``tests/`` directory, typically
+Tests for contrib apps can be found in the :source:`tests/` directory, typically
 under ``<app_name>_tests``. For example, tests for ``contrib.auth`` are located
-in ``tests/auth_tests``.
+in :source:`tests/auth_tests`.
 
 .. _troubleshooting-unit-tests:
 

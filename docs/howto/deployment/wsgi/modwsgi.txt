@@ -197,7 +197,7 @@ admin app (and any other installed apps). This is however not the case when you
 use any other server arrangement. You're responsible for setting up Apache, or
 whichever web server you're using, to serve the admin files.
 
-The admin files live in (:file:`django/contrib/admin/static/admin`) of the
+The admin files live in (:source:`django/contrib/admin/static/admin`) of the
 Django distribution.
 
 We **strongly** recommend using :mod:`django.contrib.staticfiles` to handle the

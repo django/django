@@ -526,7 +526,7 @@ calls ``save()`` and loops until an unused ``session_key`` is generated.
 
 If you're using the ``django.contrib.sessions.backends.db`` backend, each
 session is a normal Django model. The ``Session`` model is defined in
-``django/contrib/sessions/models.py``. Because it's a normal model, you can
+:source:`django/contrib/sessions/models.py`. Because it's a normal model, you can
 access sessions using the normal Django database API::
 
     >>> from django.contrib.sessions.models import Session

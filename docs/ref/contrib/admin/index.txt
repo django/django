@@ -2591,8 +2591,8 @@ templates for a specific app, or a specific model.
 Set up your projects admin template directories
 -----------------------------------------------
 
-The admin template files are located in the ``contrib/admin/templates/admin``
-directory.
+The admin template files are located in the
+:source:`django/contrib/admin/templates/admin` directory.
 
 In order to override one or more of them, first create an ``admin`` directory
 in your project's ``templates`` directory. This can be any of the directories
@@ -2611,7 +2611,7 @@ directory, so make sure you name the directory in all lowercase if you are
 going to run your app on a case-sensitive filesystem.
 
 To override an admin template for a specific app, copy and edit the template
-from the ``django/contrib/admin/templates/admin`` directory, and save it to one
+from the :source:`django/contrib/admin/templates/admin` directory, and save it to one
 of the directories you just created.
 
 For example, if we wanted to add a tool to the change list view for all the
@@ -2729,10 +2729,10 @@ override to your project:
     {% endblock %}
 
 The list of CSS variables are defined at
-:file:`django/contrib/admin/static/admin/css/base.css`.
+:source:`django/contrib/admin/static/admin/css/base.css`.
 
 Dark mode variables, respecting the `prefers-color-scheme`_ media query, are
-defined at :file:`django/contrib/admin/static/admin/css/dark_mode.css`. This is
+defined at :source:`django/contrib/admin/static/admin/css/dark_mode.css`. This is
 linked to the document in ``{% block dark-mode-vars %}``.
 
 .. _prefers-color-scheme: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme

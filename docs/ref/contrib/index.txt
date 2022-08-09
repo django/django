@@ -6,7 +6,7 @@ Django aims to follow Python's :ref:`"batteries included" philosophy
 <tut-batteries-included>`. It ships with a variety of extra, optional tools
 that solve common web development problems.
 
-This code lives in ``django/contrib`` in the Django distribution. This document
+This code lives in :source:`django/contrib` in the Django distribution. This document
 gives a rundown of the packages in ``contrib``, along with any dependencies
 those packages have.
 

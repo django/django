@@ -438,7 +438,7 @@ cache backend with Django, use the Python import path as the
 
 If you're building your own backend, you can use the standard cache backends
 as reference implementations. You'll find the code in the
-``django/core/cache/backends/`` directory of the Django source.
+:source:`django/core/cache/backends/` directory of the Django source.
 
 Note: Without a really compelling reason, such as a host that doesn't support
 them, you should stick to the cache backends included with Django. They've

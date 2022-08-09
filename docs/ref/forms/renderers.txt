@@ -101,8 +101,8 @@ This renderer uses a standalone
 :class:`~django.template.backends.django.DjangoTemplates`
 engine (unconnected to what you might have configured in the
 :setting:`TEMPLATES` setting). It loads templates first from the built-in form
-templates directory in ``django/forms/templates`` and then from the installed
-apps' templates directories using the :class:`app_directories
+templates directory in :source:`django/forms/templates` and then from the
+installed apps' templates directories using the :class:`app_directories
 <django.template.loaders.app_directories.Loader>` loader.
 
 If you want to render templates with customizations from your
@@ -136,8 +136,8 @@ be removed at that time.
 
 This renderer is the same as the :class:`DjangoTemplates` renderer except that
 it uses a :class:`~django.template.backends.jinja2.Jinja2` backend. Templates
-for the built-in widgets are located in ``django/forms/jinja2`` and installed
-apps can provide templates in a ``jinja2`` directory.
+for the built-in widgets are located in :source:`django/forms/jinja2` and
+installed apps can provide templates in a ``jinja2`` directory.
 
 To use this backend, all the forms and widgets in your project and its
 third-party apps must have Jinja2 templates. Unless you provide your own Jinja2
