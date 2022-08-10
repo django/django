@@ -389,12 +389,15 @@ class BaseExpression:
         )
         return clone
 
-    def replace_references(self, references_map):
+    def replace_expressions(self, replacements):
+        if replacement := replacements.get(self):
+            return replacement
         clone = self.copy()
+        source_expressions = clone.get_source_expressions()
         clone.set_source_expressions(
             [
-                expr.replace_references(references_map)
-                for expr in self.get_source_expressions()
+                expr.replace_expressions(replacements) if expr else None
+                for expr in source_expressions
             ]
         )
         return clone
@@ -808,8 +811,8 @@ class F(Combinable):
     ):
         return query.resolve_ref(self.name, allow_joins, reuse, summarize)
 
-    def replace_references(self, references_map):
-        return references_map.get(self.name, self)
+    def replace_expressions(self, replacements):
+        return replacements.get(self, self)
 
     def asc(self, **kwargs):
         return OrderBy(self, **kwargs)
