@@ -306,15 +306,15 @@ Child models will then inherit the specific permission::
 
             class Meta:
                 permissions = (
-                    ("can_deliver_%(model_name)s", "Can deliver %(verbose_name)s"),
+                    ("close_%(model_name)s", "Can close %(verbose_name)s"),
                 )
 
 
-        class Pizza(Base):
+        class Task(Base):
             pass
 
-The model ``Pizza`` now has the permissions ``can_deliver_pizza`` with the
-label "Can deliver pizza".
+The model ``Task`` now has the permissions ``close_task`` with the
+label "Can close task".
 
 .. versionchanged:: 4.2
 

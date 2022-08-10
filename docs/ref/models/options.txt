@@ -322,14 +322,14 @@ Django quotes column and table names behind the scenes.
 
             class Meta:
                 permissions = (
-                    ("can_deliver_%(model_name)s", "Can deliver %(verbose_name)"),
+                    ("deliver_%(model_name)s", "Can deliver %(verbose_name)"),
                 )
 
 
         class Pizza(Base):
             pass
 
-    The model ``Pizza`` now has the permissions ``can_deliver_pizza`` with the
+    The model ``Pizza`` now has the permission ``deliver_pizza`` with the
     label "Can deliver pizza".
 
     .. versionchanged:: 4.2
