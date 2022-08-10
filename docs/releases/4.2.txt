@@ -214,7 +214,11 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* The new :func:`django.template.Engine.get_default_backend()` function allows
+  retrieving the first configured
+  :class:`~django.template.backends.django.DjangoTemplates` backend, allowing
+  for easier access to the backend's methods (e.g.
+  ``Engine.get_default_backend().from_string(template_code)``).
 
 Tests
 ~~~~~

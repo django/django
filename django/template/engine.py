@@ -98,6 +98,14 @@ class Engine:
         >>> template.render(context)
         'Hello world!'
         """
+        return Engine.get_default_backend().engine
+
+    @staticmethod
+    def get_default_backend():
+        """
+        Return the first DjangoTemplates backend that's configured, or raise
+        ImproperlyConfigured if none are configured.
+        """
         # Since Engine is imported in django.template and since
         # DjangoTemplates is a wrapper around this Engine class,
         # local imports are required to avoid import loops.
@@ -106,7 +114,7 @@ class Engine:
 
         for backend in engines.all():
             if isinstance(backend, DjangoTemplates):
-                return backend.engine
+                return backend
         raise ImproperlyConfigured("No DjangoTemplates backend is configured.")
 
     @cached_property

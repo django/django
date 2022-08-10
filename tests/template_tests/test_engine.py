@@ -1,4 +1,5 @@
 import os
+from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
 from django.template import Context
@@ -65,12 +66,19 @@ class RenderToStringTest(SimpleTestCase):
         )
 
 
-class GetDefaultTests(SimpleTestCase):
+class GetDefaultBackendTests(SimpleTestCase):
     @override_settings(TEMPLATES=[])
     def test_no_engines_configured(self):
         msg = "No DjangoTemplates backend is configured."
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            Engine.get_default()
+            Engine.get_default_backend()
+
+
+class GetDefaultTests(SimpleTestCase):
+    @mock.patch.object(Engine, "get_default_backend")
+    def test_get_default_backend_called(self, mock):
+        Engine.get_default()
+        self.assertTrue(mock.called)
 
     @override_settings(
         TEMPLATES=[
