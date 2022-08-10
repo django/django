@@ -1303,14 +1303,19 @@ class When(Expression):
         # WHERE clause, but in a CASE WHEN expression they must use a predicate
         # that's always True.
         if condition_sql == "":
-            condition_sql, condition_params = compiler.compile(Value(True))
+            if connection.features.supports_boolean_expr_in_select_clause:
+                condition_sql, condition_params = compiler.compile(Value(True))
+            else:
+                condition_sql, condition_params = "1=1", ()
         template_params["condition"] = condition_sql
-        sql_params.extend(condition_params)
         result_sql, result_params = compiler.compile(self.result)
         template_params["result"] = result_sql
-        sql_params.extend(result_params)
         template = template or self.template
-        return template % template_params, sql_params
+        return template % template_params, (
+            *sql_params,
+            *condition_params,
+            *result_params,
+        )
 
     def get_group_by_cols(self, alias=None):
         # This is not a complete expression and cannot be used in GROUP BY.
