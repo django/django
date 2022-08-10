@@ -65,6 +65,16 @@ class SchemaTests(PostgreSQLTestCase):
             RangesModel.objects.create(ints=(20, 50))
         RangesModel.objects.create(ints=(10, 30))
 
+    def test_check_constraint_array_contains(self):
+        constraint = CheckConstraint(
+            check=Q(field__contains=[1]),
+            name="array_contains",
+        )
+        msg = f"Constraint “{constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(IntegerArrayModel, IntegerArrayModel())
+        constraint.validate(IntegerArrayModel, IntegerArrayModel(field=[1]))
+
     def test_check_constraint_daterange_contains(self):
         constraint_name = "dates_contains"
         self.assertNotIn(
@@ -112,6 +122,41 @@ class SchemaTests(PostgreSQLTestCase):
             timestamps=(datetime_1, datetime_2),
             timestamps_inner=(datetime_1, datetime_2),
         )
+
+    def test_check_constraint_range_contains(self):
+        constraint = CheckConstraint(
+            check=Q(ints__contains=(1, 5)),
+            name="ints_contains",
+        )
+        msg = f"Constraint “{constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(RangesModel, RangesModel(ints=(6, 10)))
+
+    def test_check_constraint_range_lower_upper(self):
+        constraint = CheckConstraint(
+            check=Q(ints__startswith__gte=0) & Q(ints__endswith__lte=99),
+            name="ints_range_lower_upper",
+        )
+        msg = f"Constraint “{constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(RangesModel, RangesModel(ints=(-1, 20)))
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(RangesModel, RangesModel(ints=(0, 100)))
+        constraint.validate(RangesModel, RangesModel(ints=(0, 99)))
+
+    def test_check_constraint_range_lower_with_nulls(self):
+        constraint = CheckConstraint(
+            check=Q(ints__isnull=True) | Q(ints__startswith__gte=0),
+            name="ints_optional_positive_range",
+        )
+        constraint.validate(RangesModel, RangesModel())
+        constraint = CheckConstraint(
+            check=Q(ints__startswith__gte=0),
+            name="ints_positive_range",
+        )
+        msg = f"Constraint “{constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(RangesModel, RangesModel())
 
     def test_opclass(self):
         constraint = UniqueConstraint(
