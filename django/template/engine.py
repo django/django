@@ -86,8 +86,8 @@ class Engine:
     @functools.lru_cache
     def get_default():
         """
-        Return the first DjangoTemplates backend that's configured, or raise
-        ImproperlyConfigured if none are configured.
+        Return the engine of the first DjangoTemplates backend that's configured,
+        or raise ImproperlyConfigured if none are configured.
 
         This is required for preserving historical APIs that rely on a
         globally available, implicitly configured engine such as:
@@ -104,9 +104,9 @@ class Engine:
         from django.template import engines
         from django.template.backends.django import DjangoTemplates
 
-        for engine in engines.all():
-            if isinstance(engine, DjangoTemplates):
-                return engine.engine
+        for backend in engines.all():
+            if isinstance(backend, DjangoTemplates):
+                return backend.engine
         raise ImproperlyConfigured("No DjangoTemplates backend is configured.")
 
     @cached_property

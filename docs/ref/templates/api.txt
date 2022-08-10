@@ -147,8 +147,8 @@ overridden by what's passed by
 .. staticmethod:: Engine.get_default()
 
     Returns the underlying :class:`Engine` from the first configured
-    :class:`~django.template.backends.django.DjangoTemplates` engine. Raises
-    :exc:`~django.core.exceptions.ImproperlyConfigured` if no engines are
+    :class:`~django.template.backends.django.DjangoTemplates` backend. Raises
+    :exc:`~django.core.exceptions.ImproperlyConfigured` if no backends are
     configured.
 
     It's required for preserving APIs that rely on a globally available,
