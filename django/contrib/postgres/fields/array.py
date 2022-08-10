@@ -12,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from ..utils import prefix_validation_error
 from .utils import AttributeSetter
 
-__all__ = ["ArrayField"]
+__all__ = ["ArrayField", "ArrayOrMatrixField"]
 
 
 class ArrayField(CheckFieldDefaultMixin, Field):
@@ -233,6 +233,19 @@ class ArrayField(CheckFieldDefaultMixin, Field):
                 **kwargs,
             }
         )
+
+
+class ArrayOrMatrixField(ArrayField):
+
+    _SUPPORTED_TYPES = (list, tuple)
+
+    def get_db_prep_value(self, value, connection, prepared=False):
+        if isinstance(value, self._SUPPORTED_TYPES):
+            return [
+                self.get_db_prep_value(i, connection, prepared=prepared) for i in value
+            ]
+        else:
+            return super().get_db_prep_value(value, connection, prepared=prepared)
 
 
 class ArrayRHSMixin:

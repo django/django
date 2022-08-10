@@ -2,6 +2,7 @@ from django.db import models
 
 from .fields import (
     ArrayField,
+    ArrayOrMatrixField,
     BigIntegerRangeField,
     CICharField,
     CIEmailField,
@@ -49,6 +50,10 @@ class PostgreSQLModel(models.Model):
 
 class IntegerArrayModel(PostgreSQLModel):
     field = ArrayField(models.IntegerField(), default=list, blank=True)
+
+
+class IntegerArrayOrMatrixModel(PostgreSQLModel):
+    field = ArrayOrMatrixField(models.IntegerField(), default=list, blank=True)
 
 
 class NullableIntegerArrayModel(PostgreSQLModel):

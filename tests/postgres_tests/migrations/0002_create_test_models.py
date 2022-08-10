@@ -2,6 +2,7 @@ from django.db import migrations, models
 
 from ..fields import (
     ArrayField,
+    ArrayOrMatrixField,
     BigIntegerRangeField,
     CICharField,
     CIEmailField,
@@ -140,6 +141,30 @@ class Migration(migrations.Migration):
                 (
                     "field",
                     ArrayField(
+                        models.IntegerField(), blank=True, default=list, size=None
+                    ),
+                ),
+            ],
+            options={
+                "required_db_vendor": "postgresql",
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name="IntegerArrayOrMatrixModel",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        verbose_name="ID",
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
+                (
+                    "field",
+                    ArrayOrMatrixField(
                         models.IntegerField(), blank=True, default=list, size=None
                     ),
                 ),

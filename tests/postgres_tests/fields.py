@@ -12,6 +12,7 @@ try:
     from django.contrib.postgres.fields import CITextField  # RemovedInDjango51Warning.
     from django.contrib.postgres.fields import (
         ArrayField,
+        ArrayOrMatrixField,
         BigIntegerRangeField,
         DateRangeField,
         DateTimeRangeField,
@@ -46,6 +47,7 @@ except ImportError:
             return name, path, args, kwargs
 
     ArrayField = DummyArrayField
+    ArrayOrMatrixField = DummyArrayField
     BigIntegerRangeField = models.Field
     CICharField = models.Field  # RemovedInDjango51Warning.
     CIEmailField = models.Field  # RemovedInDjango51Warning.
