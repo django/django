@@ -741,12 +741,6 @@ instead they are part of the selected columns.
 
 .. class:: Window(expression, partition_by=None, order_by=None, frame=None, output_field=None)
 
-    .. attribute:: filterable
-
-        Defaults to ``False``. The SQL standard disallows referencing window
-        functions in the ``WHERE`` clause and Django raises an exception when
-        constructing a ``QuerySet`` that would do that.
-
     .. attribute:: template
 
         Defaults to ``%(expression)s OVER (%(window)s)'``. If only the
@@ -818,6 +812,31 @@ to reduce repetition::
     >>>         expression=Min('rating'), **window,
     >>>     ),
     >>> )
+
+Filtering against window functions is supported as long as lookups are not
+disjunctive (not using ``OR`` or ``XOR`` as a connector) and against a queryset
+performing aggregation.
+
+For example, a query that relies on aggregation and has an ``OR``-ed filter
+against a window function and a field is not supported. Applying combined
+predicates post-aggregation could cause rows that would normally be excluded
+from groups to be included::
+
+    >>> qs = Movie.objects.annotate(
+    >>>     category_rank=Window(
+    >>>         Rank(), partition_by='category', order_by='-rating'
+    >>>     ),
+    >>>     scenes_count=Count('actors'),
+    >>> ).filter(
+    >>>     Q(category_rank__lte=3) | Q(title__contains='Batman')
+    >>> )
+    >>> list(qs)
+    NotImplementedError: Heterogeneous disjunctive predicates against window functions
+    are not implemented when performing conditional aggregation.
+
+.. versionchanged:: 4.2
+
+    Support for filtering against window functions was added.
 
 Among Django's built-in database backends, MySQL 8.0.2+, PostgreSQL, and Oracle
 support window expressions. Support for different window expression features

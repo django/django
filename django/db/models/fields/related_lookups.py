@@ -14,6 +14,7 @@ from django.utils.deprecation import RemovedInDjango50Warning
 
 class MultiColSource:
     contains_aggregate = False
+    contains_over_clause = False
 
     def __init__(self, alias, targets, sources, field):
         self.targets, self.sources, self.field, self.alias = (
