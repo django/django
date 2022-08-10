@@ -372,6 +372,7 @@ class AbstractInheritanceTests(SimpleTestCase):
             "declared field of the same name."
         )
         with self.assertRaisesMessage(FieldError, msg):
+
             class Descendant(ConcreteParent, AbstractParent):
                 concreteparent_ptr = models.CharField(max_length=30)
 
