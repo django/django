@@ -57,19 +57,21 @@ class SQLCompiler:
             f"connection={self.connection!r} using={self.using!r}>"
         )
 
-    def setup_query(self):
+    def setup_query(self, with_col_aliases=False):
         if all(self.query.alias_refcount[a] == 0 for a in self.query.alias_map):
             self.query.get_initial_alias()
-        self.select, self.klass_info, self.annotation_col_map = self.get_select()
+        self.select, self.klass_info, self.annotation_col_map = self.get_select(
+            with_col_aliases=with_col_aliases,
+        )
         self.col_count = len(self.select)
 
-    def pre_sql_setup(self):
+    def pre_sql_setup(self, with_col_aliases=False):
         """
         Do any necessary class setup immediately prior to producing SQL. This
         is for things that can't necessarily be done in __init__ because we
         might not have all the pieces in place at that time.
         """
-        self.setup_query()
+        self.setup_query(with_col_aliases=with_col_aliases)
         order_by = self.get_order_by()
         self.where, self.having = self.query.where.split_having()
         extra_select = self.get_extra_select(order_by, self.select)
@@ -224,7 +226,7 @@ class SQLCompiler:
             ]
         return expressions
 
-    def get_select(self):
+    def get_select(self, with_col_aliases=False):
         """
         Return three values:
         - a list of 3-tuples of (expression, (sql, params), alias)
@@ -287,6 +289,7 @@ class SQLCompiler:
             get_select_from_parent(klass_info)
 
         ret = []
+        col_idx = 1
         for col, alias in select:
             try:
                 sql, params = self.compile(col)
@@ -301,6 +304,9 @@ class SQLCompiler:
                     sql, params = self.compile(Value(empty_result_set_value))
             else:
                 sql, params = col.select_format(self, sql, params)
+            if alias is None and with_col_aliases:
+                alias = f"col{col_idx}"
+                col_idx += 1
             ret.append((col, (sql, params), alias))
         return ret, klass_info, annotations
 
@@ -588,7 +594,9 @@ class SQLCompiler:
         """
         refcounts_before = self.query.alias_refcount.copy()
         try:
-            extra_select, order_by, group_by = self.pre_sql_setup()
+            extra_select, order_by, group_by = self.pre_sql_setup(
+                with_col_aliases=with_col_aliases,
+            )
             for_update_part = None
             # Is a LIMIT/OFFSET clause needed?
             with_limit_offset = with_limits and (
@@ -635,19 +643,12 @@ class SQLCompiler:
                     params += distinct_params
 
                 out_cols = []
-                col_idx = 1
                 for _, (s_sql, s_params), alias in self.select + extra_select:
                     if alias:
                         s_sql = "%s AS %s" % (
                             s_sql,
                             self.connection.ops.quote_name(alias),
                         )
-                    elif with_col_aliases:
-                        s_sql = "%s AS %s" % (
-                            s_sql,
-                            self.connection.ops.quote_name("col%d" % col_idx),
-                        )
-                        col_idx += 1
                     params.extend(s_params)
                     out_cols.append(s_sql)
 
@@ -768,8 +769,6 @@ class SQLCompiler:
                 sub_selects = []
                 sub_params = []
                 for index, (select, _, alias) in enumerate(self.select, start=1):
-                    if not alias and with_col_aliases:
-                        alias = "col%d" % index
                     if alias:
                         sub_selects.append(
                             "%s.%s"
