@@ -189,7 +189,9 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* ``QuerySet`` now extensively supports filtering against
+  :ref:`window-functions` with the exception of disjunctive filter lookups
+  against window functions when performing aggregation.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

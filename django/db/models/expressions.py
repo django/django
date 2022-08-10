@@ -836,6 +836,7 @@ class ResolvedOuterRef(F):
     """
 
     contains_aggregate = False
+    contains_over_clause = False
 
     def as_sql(self, *args, **kwargs):
         raise ValueError(
@@ -1209,6 +1210,12 @@ class OrderByList(Func):
         if not self.source_expressions:
             return "", ()
         return super().as_sql(*args, **kwargs)
+
+    def get_group_by_cols(self):
+        group_by_cols = []
+        for order_by in self.get_source_expressions():
+            group_by_cols.extend(order_by.get_group_by_cols())
+        return group_by_cols
 
 
 @deconstructible(path="django.db.models.ExpressionWrapper")
@@ -1631,7 +1638,6 @@ class Window(SQLiteNumericMixin, Expression):
     # be introduced in the query as a result is not desired.
     contains_aggregate = False
     contains_over_clause = True
-    filterable = False
 
     def __init__(
         self,
@@ -1733,7 +1739,12 @@ class Window(SQLiteNumericMixin, Expression):
         return "<%s: %s>" % (self.__class__.__name__, self)
 
     def get_group_by_cols(self, alias=None):
-        return []
+        group_by_cols = []
+        if self.partition_by:
+            group_by_cols.extend(self.partition_by.get_group_by_cols())
+        if self.order_by is not None:
+            group_by_cols.extend(self.order_by.get_group_by_cols())
+        return group_by_cols
 
 
 class WindowFrame(Expression):
