@@ -198,6 +198,7 @@ class ExclusionConstraint(BaseConstraint):
         replacement_map = instance._get_field_value_map(
             meta=model._meta, exclude=exclude
         )
+        replacements = {F(field): value for field, value in replacement_map.items()}
         lookups = []
         for idx, (expression, operator) in enumerate(self.expressions):
             if isinstance(expression, str):
@@ -210,7 +211,7 @@ class ExclusionConstraint(BaseConstraint):
                     for expr in expression.flatten():
                         if isinstance(expr, F) and expr.name in exclude:
                             return
-            rhs_expression = expression.replace_references(replacement_map)
+            rhs_expression = expression.replace_expressions(replacements)
             # Remove OpClass because it only has sense during the constraint
             # creation.
             if isinstance(expression, OpClass):
