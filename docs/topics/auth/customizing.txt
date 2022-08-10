@@ -296,8 +296,10 @@ checks if a user may close tasks::
 
     user.has_perm('app.close_task')
 
-Custom permissions may contain the ``%(model_name)s`` and ``%(verbose_name)s``
-placeholders. Child models will then inherit the specific permission::
+Custom permissions may contain placeholders. ``%(model_name)s`` is available
+in the ``codename``. ``%(verbose_name)s`` is available in the ``name``.
+
+Child models will then inherit the specific permission::
 
         class Base(models.Model):
             # ...
@@ -313,6 +315,10 @@ placeholders. Child models will then inherit the specific permission::
 
 The model ``Pizza`` now has the permissions ``can_deliver_pizza`` with the
 label "Can deliver pizza".
+
+.. versionchanged:: 4.2
+
+    Substitutions for ``model_name`` and ``verbose_name`` were added.
 
 .. _extending-user:
 

@@ -564,8 +564,8 @@ class Options:
                 f
                 for f in self._get_fields(reverse=False)
                 if is_not_an_m2m_field(f)
-                   and is_not_a_generic_relation(f)
-                   and is_not_a_generic_foreign_key(f)
+                and is_not_a_generic_relation(f)
+                and is_not_a_generic_foreign_key(f)
             ),
         )
 

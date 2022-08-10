@@ -312,10 +312,10 @@ Django quotes column and table names behind the scenes.
     This is a list or tuple of 2-tuples in the format ``(permission_code,
     human_readable_permission_name)``.
 
-    The permission code and name on an (abstract) model may contain
-    ``%(model_name)s`` and ``%(verbose_name)s``. The models inheriting from the
-    base model will then have those permissions specific to the inheriting
-    model, e.g.::
+    Extra permissions may contain placeholders. ``%(model_name)s`` is
+    available in the ``codename``. ``%(verbose_name)s`` is available in the
+    ``name``. The models inheriting from the base model will then have those
+    permissions specific to the inheriting model, e.g.::
 
         class Base(models.Model):
             ...
@@ -331,6 +331,10 @@ Django quotes column and table names behind the scenes.
 
     The model ``Pizza`` now has the permissions ``can_deliver_pizza`` with the
     label "Can deliver pizza".
+
+    .. versionchanged:: 4.2
+
+        Substitutions for ``model_name`` and ``verbose_name`` were added.
 
 ``default_permissions``
 -----------------------

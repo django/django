@@ -199,6 +199,7 @@ class AbstractInheritanceTests(SimpleTestCase):
             "the same name from base class 'ConcreteDescendant'."
         )
         with self.assertRaisesMessage(FieldError, msg):
+
             class Descendant(ConcreteDescendant):
                 name = models.IntegerField()
 
