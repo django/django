@@ -23,4 +23,7 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
         super().prepare_database()
         # Check that postgis extension is installed.
         with self.cursor() as cursor:
+            cursor.execute("SELECT 1 FROM pg_extension WHERE extname = 'postgis'")
+            if cursor.fetchone()[0]:
+                return
             cursor.execute("CREATE EXTENSION IF NOT EXISTS postgis")
