@@ -193,6 +193,7 @@ class Query(BaseExpression):
     distinct = False
     distinct_fields = ()
     select_for_update = False
+    lock_in_share_mode = False
     select_for_update_nowait = False
     select_for_update_skip_locked = False
     select_for_update_of = ()

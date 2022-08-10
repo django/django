@@ -1526,6 +1526,15 @@ class QuerySet:
         obj.query.select_for_no_key_update = no_key
         return obj
 
+    def lock_in_share_mode(self):
+        """
+        Return a new QuerySet instance that will select objects with a
+        LOCK IN SHARE MODE.
+        """
+        obj = self._chain()
+        obj.query.lock_in_share_mode = True
+        return obj
+
     def select_related(self, *fields):
         """
         Return a new QuerySet instance that will select related objects.

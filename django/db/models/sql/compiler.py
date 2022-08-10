@@ -757,6 +757,8 @@ class SQLCompiler:
 
             if for_update_part and not features.for_update_after_from:
                 result.append(for_update_part)
+            elif self.query.lock_in_share_mode:
+                result.append("LOCK IN SHARE MODE")
 
             if self.query.subquery and extra_select:
                 # If the query is used as a subquery, the extra selects would
