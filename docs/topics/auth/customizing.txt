@@ -313,7 +313,7 @@ Child models will then inherit the specific permission::
         class Task(Base):
             pass
 
-The model ``Task`` now has the permissions ``close_task`` with the
+The model ``Task`` now has the permission ``close_task`` with the
 label "Can close task".
 
 .. versionchanged:: 4.2
