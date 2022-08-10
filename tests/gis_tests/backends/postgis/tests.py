@@ -16,7 +16,7 @@ class TestsPostGISCreateExtension(TestCase):
         # Make sure extension is not there before we test creation
         with connection.cursor() as cursor:
             cursor.execute("DROP EXTENSION IF EXISTS postgis CASCADE")
-        assert not self._extension_exists()
+        self.assertIs(self._extension_exists(), False)
 
         connection.prepare_database()
 
