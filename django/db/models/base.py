@@ -119,6 +119,9 @@ class ModelBase(type):
             else:
                 app_label = app_config.label
 
+        if app_label is None:
+            app_label = getattr(meta, 'app_label', None)
+
         new_class.add_to_class('_meta', Options(meta, app_label))
         if not abstract:
             new_class.add_to_class(

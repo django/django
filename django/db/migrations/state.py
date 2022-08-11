@@ -227,7 +227,7 @@ class ProjectState:
 
 class AppConfigStub(AppConfig):
     """Stub of an AppConfig. Only provides a label and a dict of models."""
-    def __init__(self, label):
+    def __init__(self, label, default_auto_field):
         self.apps = None
         self.models = {}
         # App-label and app-name are not the same thing, so technically passing
@@ -235,6 +235,7 @@ class AppConfigStub(AppConfig):
         # the app name, but we need something unique, and the label works fine.
         self.label = label
         self.name = label
+        self.default_auto_field = default_auto_field
 
     def import_models(self):
         self.models = self.apps.all_models[self.label]
@@ -258,7 +259,7 @@ class StateApps(Apps):
                 self.real_models.append(ModelState.from_model(model, exclude_rels=True))
         # Populate the app registry with a stub for each application.
         app_labels = {model_state.app_label for model_state in models.values()}
-        app_configs = [AppConfigStub(label) for label in sorted([*real_apps, *app_labels])]
+        app_configs = [AppConfigStub(label, global_apps.get_app_config(label).default_auto_field) for label in sorted([*real_apps, *app_labels])]
         super().__init__(app_configs)
 
         # These locks get in the way of copying as implemented in clone(),
@@ -329,7 +330,7 @@ class StateApps(Apps):
     def register_model(self, app_label, model):
         self.all_models[app_label][model._meta.model_name] = model
         if app_label not in self.app_configs:
-            self.app_configs[app_label] = AppConfigStub(app_label)
+            self.app_configs[app_label] = AppConfigStub(app_label, global_apps.get_app_config(app_label).default_auto_field)
             self.app_configs[app_label].apps = self
         self.app_configs[app_label].models[model._meta.model_name] = model
         self.do_pending_operations(model)
