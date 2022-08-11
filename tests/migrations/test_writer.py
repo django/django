@@ -413,6 +413,14 @@ class WriterTests(SimpleTestCase):
             "(2, migrations.test_writer.IntFlagEnum['B'])], "
             "default=migrations.test_writer.IntFlagEnum['A'])",
         )
+        self.assertSerializedResultEqual(
+            IntFlagEnum.A | IntFlagEnum.B,
+            (
+                "migrations.test_writer.IntFlagEnum['A'] | "
+                "migrations.test_writer.IntFlagEnum['B']",
+                {"import migrations.test_writer"},
+            ),
+        )
 
     def test_serialize_choices(self):
         class TextChoices(models.TextChoices):
