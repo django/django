@@ -130,7 +130,9 @@ class EnumSerializer(BaseSerializer):
         else:
             members = (self.value,)
         return (
-            " | ".join(f"{module}.{enum_class.__qualname__}[{item.name!r}]" for item in members),
+            " | ".join(
+                f"{module}.{enum_class.__qualname__}[{item.name!r}]" for item in members
+            ),
             {"import %s" % module},
         )
 

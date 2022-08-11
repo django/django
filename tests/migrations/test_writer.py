@@ -334,15 +334,24 @@ class WriterTests(SimpleTestCase):
         )
         self.assertSerializedResultEqual(
             IntFlagEnum.A,
-            ("migrations.test_writer.IntFlagEnum['A']", {"import migrations.test_writer"}),
+            (
+                "migrations.test_writer.IntFlagEnum['A']",
+                {"import migrations.test_writer"},
+            ),
         )
         self.assertSerializedResultEqual(
             IntFlagEnum.B,
-            ("migrations.test_writer.IntFlagEnum['B']", {"import migrations.test_writer"}),
+            (
+                "migrations.test_writer.IntFlagEnum['B']",
+                {"import migrations.test_writer"},
+            ),
         )
         self.assertSerializedResultEqual(
             IntFlagEnum.A | IntFlagEnum.B,
-            ("migrations.test_writer.IntFlagEnum['B'] | migrations.test_writer.IntFlagEnum['A']", {"import migrations.test_writer"}),
+            (
+                "migrations.test_writer.IntFlagEnum['B'] | migrations.test_writer.IntFlagEnum['A']",
+                {"import migrations.test_writer"},
+            ),
         )
 
         self.assertSerializedResultEqual(
