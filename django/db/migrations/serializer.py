@@ -125,8 +125,12 @@ class EnumSerializer(BaseSerializer):
     def serialize(self):
         enum_class = self.value.__class__
         module = enum_class.__module__
+        if issubclass(enum_class, enum.Flag):
+            members, __ = enum._decompose(enum_class, self.value)
+        else:
+            members = (self.value,)
         return (
-            "%s.%s[%r]" % (module, enum_class.__qualname__, self.value.name),
+            " | ".join(f"{module}.{enum_class.__qualname__}[{item.name!r}]" for item in members),
             {"import %s" % module},
         )
 
@@ -154,7 +158,9 @@ class FunctionTypeSerializer(BaseSerializer):
                 "import %s" % module
             }
         # Further error checking
-        if self.value.__name__ == "<lambda>":
+        # use .co_name, since this can not be modified, whereas __name__ can be altered
+        # https://stackoverflow.com/a/56451124/67579
+        if self.value.__code__.co_name == "<lambda>":
             raise ValueError("Cannot serialize function: lambda")
         if self.value.__module__ is None:
             raise ValueError("Cannot serialize function %r: No module" % self.value)

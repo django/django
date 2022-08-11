@@ -80,6 +80,11 @@ class IntEnum(enum.IntEnum):
     B = 2
 
 
+class IntFlagEnum(enum.IntFlag):
+    A = 1
+    B = 2
+
+
 class OperationWriterTests(SimpleTestCase):
     def test_empty_signature(self):
         operation = custom_migration_operations.operations.TestOperation()
@@ -327,6 +332,19 @@ class WriterTests(SimpleTestCase):
             IntEnum.B,
             ("migrations.test_writer.IntEnum['B']", {"import migrations.test_writer"}),
         )
+        self.assertSerializedResultEqual(
+            IntFlagEnum.A,
+            ("migrations.test_writer.IntFlagEnum['A']", {"import migrations.test_writer"}),
+        )
+        self.assertSerializedResultEqual(
+            IntFlagEnum.B,
+            ("migrations.test_writer.IntFlagEnum['B']", {"import migrations.test_writer"}),
+        )
+        self.assertSerializedResultEqual(
+            IntFlagEnum.A | IntFlagEnum.B,
+            ("migrations.test_writer.IntFlagEnum['B'] | migrations.test_writer.IntFlagEnum['A']", {"import migrations.test_writer"}),
+        )
+
         self.assertSerializedResultEqual(
             self.NestedEnum.A,
             (
