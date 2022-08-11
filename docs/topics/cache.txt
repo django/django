@@ -1207,6 +1207,17 @@ instance, to do this for the ``locmem`` backend, put this code in a module::
 ...and use the dotted Python path to this class in the
 :setting:`BACKEND <CACHES-BACKEND>` portion of your :setting:`CACHES` setting.
 
+By default, only memcached overrides the ``validate_key`` method, so to remove
+the warning, you can just pass an empty method. For example, with the
+``redis`` backend:
+
+    from django.core.cache.backends.redis import RedisCache
+
+    class CustomRedisCache(RedisCache):
+        def validate_key(self, key):
+            """This can be empty if no custom validation is required."""
+            pass
+
 .. _asynchronous_support:
 
 Asynchronous support
