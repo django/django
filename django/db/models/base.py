@@ -123,10 +123,10 @@ class ModelBase(type):
 
         app_label = None
 
-        # Look for an application configuration to attach the model to.
-        app_config = apps.get_containing_app_config(module)
-
         if getattr(meta, "app_label", None) is None:
+            # Look for an application configuration to attach the model to.
+            app_config = apps.get_containing_app_config(module)
+
             if app_config is None:
                 if not abstract:
                     raise RuntimeError(
