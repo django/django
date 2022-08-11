@@ -205,7 +205,7 @@ class ExclusionConstraint(BaseConstraint):
             if isinstance(expression, F):
                 if exclude and expression.name in exclude:
                     return
-                rhs_expression = replacement_map.get(expression.name, expression)
+                rhs_expression = expression.replace_references(replacement_map)
             else:
                 rhs_expression = expression.replace_references(replacement_map)
                 if exclude:
