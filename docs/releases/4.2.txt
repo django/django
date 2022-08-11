@@ -192,7 +192,7 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* Migrations now support serialization of ``enum.Flag`` objects.
 
 Models
 ~~~~~~
