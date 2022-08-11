@@ -9,6 +9,7 @@ all about the internals of models in order to get the information it needs.
 import copy
 import difflib
 import functools
+import numbers
 import sys
 from collections import Counter, namedtuple
 from collections.abc import Iterator, Mapping
@@ -283,7 +284,10 @@ class Query(BaseExpression):
         done by the database interface at execution time.
         """
         sql, params = self.sql_with_params()
-        return sql % params
+        return sql % tuple(
+            param if isinstance(param, numbers.Number) else f"'{param}'"
+            for param in params
+        )
 
     def sql_with_params(self):
         """
