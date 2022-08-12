@@ -369,3 +369,6 @@ Miscellaneous
   collation.
 
 * ``django.contrib.postgres.fields.CIText`` mixin is deprecated.
+
+* The ``map_height`` and ``map_width`` attributes of ``BaseGeometryWidget`` are
+  deprecated, use CSS to size map widgets instead.

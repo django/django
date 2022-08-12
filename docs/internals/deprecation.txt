@@ -32,6 +32,9 @@ details on these changes.
 
 * The ``django.contrib.postgres.fields.CIText`` mixin will be removed.
 
+* The ``map_width`` and ``map_height`` attributes of ``BaseGeometryWidget``
+  will be removed.
+
 .. _deprecation-removed-in-5.0:
 
 5.0

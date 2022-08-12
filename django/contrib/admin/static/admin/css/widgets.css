@@ -578,3 +578,9 @@ select + .related-widget-wrapper-link,
 .related-widget-wrapper-link + .related-widget-wrapper-link {
     margin-left: 7px;
 }
+
+/* GIS MAPS */
+.dj_map {
+    width: 600px;
+    height: 400px;
+}
