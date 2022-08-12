@@ -279,7 +279,6 @@ class BaseDatabaseOperations:
             u_params = ()
         else:
             u_params = {to_string(k): to_string(v) for k, v in params.items()}
-        # TODO Wrap params
         return "QUERY = %r - PARAMS = %r" % (sql, u_params)
 
     def last_insert_id(self, cursor, table_name, pk_name):
