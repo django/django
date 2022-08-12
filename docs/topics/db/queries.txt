@@ -1054,8 +1054,8 @@ used. This is done as follows::
 
     Casting a resulting KeyTransform might still be in resemble json format.
     For example, ``Cast(KeyTransform('breed', 'data'), TextField())`` would result
-    in ``'"labrador"'`` instead of ``'labrador'``. So __contain='dor"' would
-    also be true.
+    in ``'"labrador"'`` instead of ``'labrador'``. So filtering
+    ``breed_name__contains='dor"'`` would also be true.
 
 .. class:: KeyTextTransform
 
