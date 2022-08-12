@@ -20,7 +20,7 @@ from .models import (
 )
 
 try:
-    from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange
+    from psycopg2.extras import DateRange, DateTimeRange, DateTimeTZRange, NumericRange
 
     from django.contrib.postgres import fields as pg_fields
     from django.contrib.postgres import forms as pg_forms
@@ -1103,4 +1103,60 @@ class TestWidget(PostgreSQLSimpleTestCase):
             field.widget.render("datetimerange", dt_range_tuple),
             '<input type="text" name="datetimerange_0" value="2022-04-22 10:24:00">'
             '<input type="text" name="datetimerange_1" value="2022-05-12 09:25:00">',
+        )
+
+
+class TestQuerySetQueryStr(PostgreSQLTestCase):
+    def test_numeric_range(self):
+        self.assertIn(
+            "&& '[1,5)'",
+            str(
+                RangesModel.objects.filter(
+                    ints__overlap=NumericRange(1, 5),
+                )
+                .values("id")
+                .query
+            ),
+        )
+
+    def test_date_range(self):
+        self.assertIn(
+            "daterange('2015-01-01', '2015-05-04', '[)')",
+            str(
+                RangeLookupsModel.objects.filter(
+                    timestamp__date__contained_by=DateRange("2015-01-01", "2015-05-04"),
+                )
+                .values("id")
+                .query
+            ),
+        )
+
+    def test_timezone_range(self):
+        self.assertIn(
+            "tstzrange('2015-01-01T09:00', '2015-05-04T23:55', '[)')",
+            str(
+                RangeLookupsModel.objects.filter(
+                    timestamp__contained_by=DateTimeTZRange(
+                        "2015-01-01T09:00",
+                        "2015-05-04T23:55",
+                    ),
+                )
+                .values("id")
+                .query
+            ),
+        )
+
+    def test_datetime_range(self):
+        self.assertIn(
+            "tsrange('2015-01-01T09:00', '2015-05-04T23:55', '[)')",
+            str(
+                RangeLookupsModel.objects.filter(
+                    timestamp__contained_by=DateTimeRange(
+                        "2015-01-01T09:00",
+                        "2015-05-04T23:55",
+                    ),
+                )
+                .values("id")
+                .query
+            ),
         )

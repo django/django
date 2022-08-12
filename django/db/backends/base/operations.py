@@ -1,5 +1,6 @@
 import datetime
 import decimal
+import numbers
 from importlib import import_module
 
 import sqlparse
@@ -278,7 +279,7 @@ class BaseDatabaseOperations:
             u_params = ()
         else:
             u_params = {to_string(k): to_string(v) for k, v in params.items()}
-
+        # TODO Wrap params
         return "QUERY = %r - PARAMS = %r" % (sql, u_params)
 
     def last_insert_id(self, cursor, table_name, pk_name):
@@ -768,3 +769,9 @@ class BaseDatabaseOperations:
 
     def on_conflict_suffix_sql(self, fields, on_conflict, update_fields, unique_fields):
         return ""
+
+    def wrap_param(self, param):
+        """
+        Returns wrapped parameter.
+        """
+        return param if isinstance(param, numbers.Number) else f"'{param}'"

@@ -2,6 +2,7 @@ from psycopg2.extras import Inet
 
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
+from django.db.backends.postgresql.adapters import adapt
 from django.db.backends.utils import split_tzname_delta
 from django.db.models.constants import OnConflict
 
@@ -354,3 +355,9 @@ class DatabaseOperations(BaseDatabaseOperations):
             update_fields,
             unique_fields,
         )
+
+    def wrap_param(self, param):
+        """
+        Returns wrapped parameter.
+        """
+        return adapt(param)

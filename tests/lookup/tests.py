@@ -726,7 +726,7 @@ class LookupTests(TestCase):
             .values("pk")
             .query
         )
-        self.assertIn(" IN (a1, a2, a3, a4, a5, a6, a7) ", str(query))
+        self.assertIn(" IN ('a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7') ", str(query))
 
     def test_in_ignore_none(self):
         with self.assertNumQueries(1) as ctx:
