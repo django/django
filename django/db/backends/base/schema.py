@@ -637,6 +637,8 @@ class BaseDatabaseSchemaEditor:
         # It might not actually have a column behind it
         if definition is None:
             return
+        if col_type_suffix := field.db_type_suffix(connection=self.connection):
+            definition += f" {col_type_suffix}"
         # Check constraints can go on the column SQL here
         db_params = field.db_parameters(connection=self.connection)
         if db_params["check"]:
