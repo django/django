@@ -1034,7 +1034,7 @@ To query on a :class:`~django.db.models.JSONField`::
     ... )
     <QuerySet [<Dog: Rufus>]>
 
-Nested key transfoms can also be done as follows::
+Nested key transforms can also be done as follows::
 
     >>> Dogs.objects.annotate(
     ...     owner_other_pet_name=KeyTransform(
@@ -1042,7 +1042,7 @@ Nested key transfoms can also be done as follows::
     ...         )).filter(owner_other_pet_name__exact=[{'name': 'Fishy'}])
     <QuerySet [<Dog: Rufus>]>
 
-To query the resulting json as text, the .. class:: Cast fucntion needs to be
+To query the resulting json as text, the .. class:: Cast function needs to be
 used. This is done as follows::
 
     >>> Dogs.objects.annotate(
@@ -1053,8 +1053,9 @@ used. This is done as follows::
 .. warning::
 
     Casting a resulting KeyTransform might still be in resemble json format.
-    For example, Cast(KeyTransform('breed', 'data'), TextField()) would result
-    in '"labrador"' instead of 'labrador'. So __contain='dor"' would also be true.
+    For example, ``Cast(KeyTransform('breed', 'data'), TextField())`` would result
+    in ``'"labrador"'`` instead of ``'labrador'``. So __contain='dor"' would
+    also be true.
 
 .. class:: KeyTextTransform
 
@@ -1063,7 +1064,7 @@ need to be .. class:: Cast to a ``TextField`` to be treat the result as text.
 
 .. note::
 
-    This feature is currently supported only in postgreSQL databases.
+    This feature is currently supported only in postgresql databases.
 
 To query based on a given dictionary key, use that key as the lookup name::
 
