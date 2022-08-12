@@ -712,6 +712,9 @@ Miscellaneous
   ``"django/forms/formsets/default.html"`` templates which are a proxy to the
   table-based templates are deprecated. Use the specific template instead.
 
+* The undocumented ``LogoutView.get_next_page()`` method is renamed to
+  ``get_success_url()``.
+
 Features removed in 4.1
 =======================
 
