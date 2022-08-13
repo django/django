@@ -165,7 +165,7 @@ Generic Views
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added support and translations for the Central Kurdish (Sorani) language.
 
 Logging
 ~~~~~~~

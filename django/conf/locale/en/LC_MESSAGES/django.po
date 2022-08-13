@@ -59,6 +59,10 @@ msgid "Catalan"
 msgstr ""
 
 #: conf/global_settings.py:68
+msgid "Central Kurdish (Sorani)"
+msgstr ""
+
+#: conf/global_settings.py:68
 msgid "Czech"
 msgstr ""
 
