@@ -193,6 +193,9 @@ Models
   :ref:`window-functions` with the exception of disjunctive filter lookups
   against window functions when performing aggregation.
 
+* :meth:`~.QuerySet.prefetch_related` now supports
+  :class:`~django.db.models.Prefetch` objects with sliced querysets.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
