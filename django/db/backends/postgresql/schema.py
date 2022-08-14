@@ -96,6 +96,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # and text[size], so skip them.
             if "[" in db_type:
                 return None
+            # Non-deterministic collations on Postgresql don't support indexes
+            # for operator classes varchar_pattern_ops/text_pattern_ops.
+            if getattr(field, "db_collation", None):
+                return None
             if db_type.startswith("varchar"):
                 return self._create_index_sql(
                     model,

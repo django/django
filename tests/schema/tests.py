@@ -1321,6 +1321,42 @@ class SchemaTests(TransactionTestCase):
             cs_collation,
         )
 
+    @isolate_apps("schema")
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @skipUnlessDBFeature(
+        "supports_collation_on_charfield",
+        "supports_non_deterministic_collations",
+    )
+    def test_unique_with_collation_charfield(self):
+        ci_collation = "case_insensitive"
+
+        def drop_collation():
+            with connection.cursor() as cursor:
+                cursor.execute(f"DROP COLLATION IF EXISTS {ci_collation}")
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"CREATE COLLATION IF NOT EXISTS {ci_collation} (provider = icu, "
+                f"locale = 'und-u-ks-level2', deterministic = false)"
+            )
+        self.addCleanup(drop_collation)
+
+        class CiCharModel(Model):
+            field = CharField(max_length=16, db_collation=ci_collation, unique=True)
+
+            class Meta:
+                app_label = "schema"
+
+        # Create the table.
+        with connection.schema_editor() as editor:
+            editor.create_model(CiCharModel)
+        self.isolated_local_models = [CiCharModel]
+        self.assertEqual(
+            self.get_column_collation(CiCharModel._meta.db_table, "field"),
+            ci_collation,
+        )
+        self.assertIn("field", self.get_uniques(CiCharModel._meta.db_table))
+
     def test_alter_textfield_to_null(self):
         """
         #24307 - Should skip an alter statement on databases with
