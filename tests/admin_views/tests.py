@@ -6166,7 +6166,20 @@ class SeleniumTests(AdminSeleniumTestCase):
         ]
         self.assertEqual(
             fonts,
-            ["Roboto", "Lucida Grande", "Verdana", "Arial", "sans-serif"],
+            [
+                "-apple-system",
+                "BlinkMacSystemFont",
+                "Segoe UI",
+                "system-ui",
+                "Roboto",
+                "Helvetica Neue",
+                "Arial",
+                "sans-serif",
+                "Apple Color Emoji",
+                "Segoe UI Emoji",
+                "Segoe UI Symbol",
+                "Noto Color Emoji",
+            ],
         )
 
     def test_search_input_filtered_page(self):

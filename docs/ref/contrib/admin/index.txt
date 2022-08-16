@@ -2708,10 +2708,10 @@ creating your own ``AdminSite`` instance (see below), and changing the
 Theming support
 ===============
 
-The admin uses CSS variables to define colors. This allows changing colors
-without having to override many individual CSS rules. For example, if you
-preferred purple instead of blue you could add a ``admin/base.html`` template
-override to your project:
+The admin uses CSS variables to define colors and fonts. This allows changing
+themes without having to override many individual CSS rules. For example, if
+you preferred purple instead of blue you could add a ``admin/base.html``
+template override to your project:
 
 .. code-block:: html+django
 

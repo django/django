@@ -35,6 +35,10 @@ Minor features
 * The light or dark color theme of the admin can now be toggled in the UI, as
   well as being set to follow the system setting.
 
+* The admin's font stack now prefers system UI fonts and no longer requires
+  downloading fonts. Additionally, CSS variables are available to more easily
+  override the default font families.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
