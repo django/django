@@ -1009,7 +1009,7 @@ Unless you are sure you wish to work with SQL ``NULL`` values, consider setting
 Key, index, and path transforms
 -------------------------------
 
-.. class:: KeyTransform(key_name, *args, **kwargs)
+.. class:: json.KeyTransform(key_name, *args, **kwargs)
 
 A :class:`~django.db.models.Transform` to access a key named ``key_name`` in a
 :class:`~django.db.models.JSONField`. ``key_name`` could also be an integer to
@@ -1029,9 +1029,9 @@ To query on a :class:`~django.db.models.JSONField`::
     ...     },
     ... })
     <Dog: Rufus>
-    >>> Dog.objects.annotate(breed_name=KeyTransform('breed', 'data')).filter(
-    ...     breed_name__exact='labrador'
-    ... )
+    >>> Dog.objects.annotate(
+    ...     breed_name=KeyTransform('breed', 'data')
+    ... ).filter(breed_name__exact='labrador')
     <QuerySet [<Dog: Rufus>]>
 
 Nested key transforms can also be done as follows::
@@ -1039,16 +1039,22 @@ Nested key transforms can also be done as follows::
     >>> Dogs.objects.annotate(
     ...     owner_other_pet_name=KeyTransform(
     ...         'other_pets',KeyTransform('owner', 'data')
-    ...         )).filter(owner_other_pet_name__exact=[{'name': 'Fishy'}])
+    ...     )).filter(owner_other_pet_name__exact=[{'name': 'Fishy'}])
     <QuerySet [<Dog: Rufus>]>
 
-To query the resulting json as text, the .. class:: Cast function needs to be
-used. This is done as follows::
+To query the resulting json as text, the :class:`~django.db.models.functions.Cast`
+function needs to be used. This is done as follows::
 
     >>> Dogs.objects.annotate(
     ...     breed_name=Cast(KeyTransform('breed', 'data'), TextField())
-    ...     ).filter(breed_name__contains='lab')
+    ... ).filter(breed_name__contains='lab')
     <QuerySet [<Dog: Rufus>]>
+
+.. class:: json.KeyTextTransform(key_name, *args, **kwargs)
+
+    This returns the resulting key transform in the form of text. This would also
+    need to be :class:`~django.db.models.functions.Cast` to a ``TextField`` to be
+    treat the result as text.
 
 .. warning::
 
@@ -1057,14 +1063,10 @@ used. This is done as follows::
     in ``'"labrador"'`` instead of ``'labrador'``. So filtering
     ``breed_name__contains='dor"'`` would also be true.
 
-.. class:: KeyTextTransform
-
-This returns the resulting key transform in the form of text. This would also
-need to be .. class:: Cast to a ``TextField`` to be treat the result as text.
-
 .. note::
 
-    This feature is currently supported only in postgresql databases.
+    .. class:: json.KeyTextTransform is alias to .. class:: json.KeyTransform for
+    non-postgresql databases.
 
 To query based on a given dictionary key, use that key as the lookup name::
 
