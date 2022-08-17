@@ -39,6 +39,10 @@ Minor features
   downloading fonts. Additionally, CSS variables are available to more easily
   override the default font families.
 
+* The :source:`admin/delete_confirmation.html
+  <django/contrib/admin/templates/admin/delete_confirmation.html>` template now
+  has some additional blocks and scripting hooks to ease customization.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
