@@ -164,7 +164,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 self.sql_drop_indentity
                 % {
                     "table": self.quote_name(table),
-                    "column": self.quote_name(strip_quotes(old_field.column)),
+                    "column": self.quote_name(strip_quotes(new_field.column)),
                 }
             )
             column = strip_quotes(new_field.column)
