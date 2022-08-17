@@ -1303,7 +1303,10 @@ class TestReadOnlyChangeViewInlinePermissions(TestCase):
             '<a href="/admin/admin_inlines/poll/" class="closelink">Close</a>',
             html=True,
         )
-        delete_link = '<p class="deletelink-box"><a href="/admin/admin_inlines/poll/%s/delete/" class="deletelink">Delete</a></p>'  # noqa
+        delete_link = (
+            '<a href="/admin/admin_inlines/poll/%s/delete/" class="deletelink">Delete'
+            "</a>"
+        )
         self.assertNotContains(response, delete_link % self.poll.id, html=True)
         self.assertNotContains(
             response,

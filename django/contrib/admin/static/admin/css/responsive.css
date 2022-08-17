@@ -232,7 +232,7 @@ input[type="submit"], button {
     }
 
     .submit-row {
-        padding: 8px 8px 3px 8px;
+        padding: 8px;
     }
 
     .submit-row a.deletelink {
@@ -819,30 +819,23 @@ input[type="submit"], button {
     /* Submit row */
 
     .submit-row {
-        padding: 10px 10px 5px;
+        padding: 10px;
         margin: 0 0 15px;
-        display: flex;
         flex-direction: column;
-    }
-
-    .submit-row > * {
-        width: 100%;
+        gap: 8px;
     }
 
     .submit-row input, .submit-row input.default, .submit-row a {
-        float: none;
-        margin: 0 0 10px;
         text-align: center;
     }
 
     .submit-row a.closelink {
-        float: none;
         padding: 10px 0;
         text-align: center;
     }
 
-    .submit-row p.deletelink-box {
-        order: 4;
+    .submit-row a.deletelink {
+        margin: 0;
     }
 
     /* Messages */

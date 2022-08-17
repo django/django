@@ -114,16 +114,9 @@ thead th.sorted .text {
     float: right;
 }
 
-.submit-row p.deletelink-box {
-    float: left;
-}
-
-.submit-row input.default {
-    margin: 0 0 5px 5px;
-}
-
-.submit-row input {
-    margin: 0 0 5px 5px;
+.submit-row a.deletelink {
+    margin-left: 0;
+    margin-right: auto;
 }
 
 .vDateField, .vTimeField {
