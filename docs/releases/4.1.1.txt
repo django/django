@@ -39,3 +39,7 @@ Bugfixes
 * Fixed a regression in Django 4.1 that caused an incorrect migration when
   adding ``AutoField``, ``BigAutoField``, or ``SmallAutoField`` on PostgreSQL
   (:ticket:`33919`).
+
+* Fixed a regression in Django 4.1 that caused a migration crash on PostgreSQL
+  when altering ``AutoField``, ``BigAutoField``, or ``SmallAutoField`` to
+  ``OneToOneField`` (:ticket:`33932`).
