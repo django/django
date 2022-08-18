@@ -1,3 +1,4 @@
+import json
 import datetime
 import os
 from decimal import Decimal
@@ -1683,11 +1684,13 @@ class ModelFormBasicTests(TestCase):
             ],
         )
         self.assertEqual(f.cleaned_data, {"url": "foo"})
-        msg = "The Category could not be created because the data didn't validate."
-        with self.assertRaisesMessage(ValueError, msg):
+        msg = "The Category could not be created because the data didn't validate:"
+        msg_data = f"\n{json.dumps(f.errors.get_json_data(escape_html=True), indent=2)}"
+        with self.assertRaisesMessage(ValueError, msg + msg_data):
             f.save()
         f = BaseCategoryForm({"name": "", "slug": "", "url": "foo"})
-        with self.assertRaisesMessage(ValueError, msg):
+        msg_data = f"\n{json.dumps(f.errors.get_json_data(escape_html=True), indent=2)}"
+        with self.assertRaisesMessage(ValueError, msg + msg_data):
             f.save()
 
     def test_multi_fields(self):
