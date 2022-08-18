@@ -3594,12 +3594,6 @@ class WhereNodeTest(SimpleTestCase):
 
 
 class QuerySetExceptionTests(SimpleTestCase):
-    def test_iter_exceptions(self):
-        qs = ExtraInfo.objects.only("author")
-        msg = "'ManyToOneRel' object has no attribute 'attname'"
-        with self.assertRaisesMessage(AttributeError, msg):
-            list(qs)
-
     def test_invalid_order_by(self):
         msg = "Cannot resolve keyword '*' into field. Choices are: created, id, name"
         with self.assertRaisesMessage(FieldError, msg):
