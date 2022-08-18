@@ -2,6 +2,7 @@
 Helper functions for creating Form classes from Django models
 and database field objects.
 """
+import json
 from itertools import chain
 
 from django.core.exceptions import (
@@ -530,10 +531,14 @@ class BaseModelForm(BaseForm):
         """
         if self.errors:
             raise ValueError(
-                "The %s could not be %s because the data didn't validate."
+                "The %s could not be %s because the data didn't validate:\n%s"
                 % (
                     self.instance._meta.object_name,
                     "created" if self.instance._state.adding else "changed",
+                    json.dumps(
+                        self.errors.get_json_data(escape_html=True),
+                        indent=2
+                    )
                 )
             )
         if commit:
