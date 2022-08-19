@@ -27,7 +27,7 @@ from django.views.decorators.csrf import (
     ensure_csrf_cookie,
     requires_csrf_token,
 )
-from django.views.decorators.debug import sensitive_post_parameters
+from django.views.decorators.debug import sensitive_post_parameters, sensitive_variables
 from django.views.decorators.gzip import gzip_page
 from django.views.decorators.http import (
     condition,
@@ -507,6 +507,7 @@ class SyncAndAsyncDecoratorTests(TestCase):
             ensure_csrf_cookie,
             csrf_exempt,
             gzip_page,
+            sensitive_variables,
             sensitive_post_parameters,
             conditional_page,
             require_http_methods,
@@ -980,6 +981,42 @@ class DebugDecoratorsTests(SimpleTestCase):
     """
     Tests for the debug decorators.
     """
+
+    def test_sensitive_variables_without_parameters(self):
+        @sensitive_variables()
+        def a_view(request):
+            return HttpResponse()
+
+        response = a_view(HttpRequest())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(a_view.sensitive_variables, "__ALL__")
+
+    async def test_sensitive_variables_without_parameters_with_async_view(self):
+        @sensitive_variables()
+        async def an_async_view(request):
+            return HttpResponse()
+
+        response = await an_async_view(HttpRequest())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(an_async_view.sensitive_variables, "__ALL__")
+
+    def test_sensitive_variables_with_parameters(self):
+        @sensitive_variables("a", "b")
+        def a_view(request):
+            return HttpResponse()
+
+        response = a_view(HttpRequest())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(a_view.sensitive_variables, ("a", "b"))
+
+    async def test_sensitive_variables_with_parameters_with_async_view(self):
+        @sensitive_variables("a", "b")
+        async def an_async_view(request):
+            return HttpResponse()
+
+        response = await an_async_view(HttpRequest())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(an_async_view.sensitive_variables, ("a", "b"))
 
     def test_sensitive_post_parameters_without_parameters(self):
         @sensitive_post_parameters()

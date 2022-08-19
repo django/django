@@ -5,6 +5,7 @@ from django.http import HttpRequest
 from django.utils.decorators import sync_and_async_middleware
 
 
+@sync_and_async_middleware
 def sensitive_variables(*variables):
     """
     Indicate which variables used in the decorated function are sensitive so
