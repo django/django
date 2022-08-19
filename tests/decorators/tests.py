@@ -1,3 +1,4 @@
+import datetime
 from functools import update_wrapper, wraps
 from unittest import TestCase, mock
 
@@ -31,6 +32,8 @@ from django.views.decorators.gzip import gzip_page
 from django.views.decorators.http import (
     condition,
     conditional_page,
+    etag,
+    last_modified,
     require_GET,
     require_http_methods,
     require_POST,
@@ -510,6 +513,9 @@ class SyncAndAsyncDecoratorTests(TestCase):
             require_GET,
             require_POST,
             require_safe,
+            condition,
+            etag,
+            last_modified,
             vary_on_headers,
             vary_on_cookie,
         )
@@ -1233,3 +1239,103 @@ class RequireHttpMethodsDecoratorTests(SimpleTestCase):
         request.method = "POST"
         response = await an_async_view(request)
         self.assertEqual(response.status_code, 405)
+
+
+class HttpDecoratorTests(SimpleTestCase):
+    def _etag_func(request, *args, **kwargs):
+        return '"abc123"'
+
+    def _last_modified_func(request, *args, **kwargs):
+        return datetime.datetime(2020, 1, 1)
+
+    def test_condition_decorator(self):
+        @condition(
+            etag_func=self._etag_func,
+            last_modified_func=self._last_modified_func,
+        )
+        def a_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.method = "GET"
+        response = a_view(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["ETag"], '"abc123"')
+        self.assertEqual(
+            response.headers["Last-Modified"],
+            "Wed, 01 Jan 2020 00:00:00 GMT",
+        )
+
+    async def test_condition_decorator_with_async_view(self):
+        @condition(
+            etag_func=self._etag_func,
+            last_modified_func=self._last_modified_func,
+        )
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.method = "GET"
+        response = await an_async_view(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["ETag"], '"abc123"')
+        self.assertEqual(
+            response.headers["Last-Modified"],
+            "Wed, 01 Jan 2020 00:00:00 GMT",
+        )
+
+    def test_etag_decorator(self):
+        @etag(self._etag_func)
+        def a_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.method = "GET"
+        response = a_view(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["ETag"], '"abc123"')
+
+    async def test_etag_decorator_with_async_view(self):
+        @etag(self._etag_func)
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.method = "GET"
+        response = await an_async_view(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["ETag"], '"abc123"')
+
+    def test_last_modified_decorator(self):
+        @last_modified(self._last_modified_func)
+        def a_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.method = "GET"
+        response = a_view(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.headers["Last-Modified"],
+            "Wed, 01 Jan 2020 00:00:00 GMT",
+        )
+
+    async def test_last_modified_decorator_with_async_view(self):
+        @last_modified(self._last_modified_func)
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.method = "GET"
+        response = await an_async_view(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.headers["Last-Modified"],
+            "Wed, 01 Jan 2020 00:00:00 GMT",
+        )

@@ -81,6 +81,7 @@ require_safe.__doc__ = (
 require_safe = sync_and_async_middleware(require_safe)
 
 
+@sync_and_async_middleware
 def condition(etag_func=None, last_modified_func=None):
     """
     Decorator to support conditional retrieval (or change) for a view
@@ -105,21 +106,34 @@ def condition(etag_func=None, last_modified_func=None):
     """
 
     def decorator(func):
-        @wraps(func)
-        def inner(request, *args, **kwargs):
-            # Compute values (if any) for the requested resource.
-            def get_last_modified():
-                if last_modified_func:
-                    dt = last_modified_func(request, *args, **kwargs)
-                    if dt:
-                        if not timezone.is_aware(dt):
-                            dt = timezone.make_aware(dt, datetime.timezone.utc)
-                        return int(dt.timestamp())
-
+        def _get_res_etag(request, *args, **kwargs):
             # The value from etag_func() could be quoted or unquoted.
             res_etag = etag_func(request, *args, **kwargs) if etag_func else None
             res_etag = quote_etag(res_etag) if res_etag is not None else None
-            res_last_modified = get_last_modified()
+            return res_etag
+
+        def _get_last_modified(request, *args, **kwargs):
+            # Compute values (if any) for the requested resource.
+            if last_modified_func:
+                dt = last_modified_func(request, *args, **kwargs)
+                if dt:
+                    if not timezone.is_aware(dt):
+                        dt = timezone.make_aware(dt, datetime.timezone.utc)
+                    return int(dt.timestamp())
+
+        def _process_response(request, response, res_etag, res_last_modified):
+            # Set relevant headers on the response if they don't already exist
+            # and if the request method is safe.
+            if request.method in ("GET", "HEAD"):
+                if res_last_modified and not response.has_header("Last-Modified"):
+                    response.headers["Last-Modified"] = http_date(res_last_modified)
+                if res_etag:
+                    response.headers.setdefault("ETag", res_etag)
+
+        @wraps(func)
+        def _wrapper_view_sync(request, *args, **kwargs):
+            res_etag = _get_res_etag(request, *args, **kwargs)
+            res_last_modified = _get_last_modified(request, *args, **kwargs)
 
             response = get_conditional_response(
                 request,
@@ -130,25 +144,41 @@ def condition(etag_func=None, last_modified_func=None):
             if response is None:
                 response = func(request, *args, **kwargs)
 
-            # Set relevant headers on the response if they don't already exist
-            # and if the request method is safe.
-            if request.method in ("GET", "HEAD"):
-                if res_last_modified and not response.has_header("Last-Modified"):
-                    response.headers["Last-Modified"] = http_date(res_last_modified)
-                if res_etag:
-                    response.headers.setdefault("ETag", res_etag)
+            _process_response(request, response, res_etag, res_last_modified)
 
             return response
 
-        return inner
+        @wraps(func)
+        async def _wrapper_view_async(request, *args, **kwargs):
+            res_etag = _get_res_etag(request, *args, **kwargs)
+            res_last_modified = _get_last_modified(request, *args, **kwargs)
+
+            response = get_conditional_response(
+                request,
+                etag=res_etag,
+                last_modified=res_last_modified,
+            )
+
+            if response is None:
+                response = await func(request, *args, **kwargs)
+
+            _process_response(request, response, res_etag, res_last_modified)
+
+            return response
+
+        if asyncio.iscoroutinefunction(func):
+            return _wrapper_view_async
+        return _wrapper_view_sync
 
     return decorator
 
 
 # Shortcut decorators for common cases based on ETag or Last-Modified only
+@sync_and_async_middleware
 def etag(etag_func):
     return condition(etag_func=etag_func)
 
 
+@sync_and_async_middleware
 def last_modified(last_modified_func):
     return condition(last_modified_func=last_modified_func)
