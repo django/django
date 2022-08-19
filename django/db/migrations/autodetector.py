@@ -1418,7 +1418,7 @@ class MigrationAutodetector:
         dependencies = [(dep_app_label, dep_object_name, None, True)]
         if getattr(field.remote_field, "through", None):
             through_app_label, through_object_name = resolve_relation(
-                remote_field_model,
+                field.remote_field.through,
                 app_label,
                 model_name,
             )
