@@ -1,4 +1,5 @@
 import logging
+import warnings
 
 from django.conf import settings
 from django.contrib.gis import gdal
@@ -6,6 +7,7 @@ from django.contrib.gis.geometry import json_regex
 from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.forms.widgets import Widget
 from django.utils import translation
+from django.utils.deprecation import RemovedInDjango51Warning
 
 logger = logging.getLogger("django.contrib.gis")
 
@@ -18,8 +20,8 @@ class BaseGeometryWidget(Widget):
 
     geom_type = "GEOMETRY"
     map_srid = 4326
-    map_width = 600
-    map_height = 400
+    map_width = 600  # RemovedInDjango51Warning
+    map_height = 400  # RemovedInDjango51Warning
     display_raw = False
 
     supports_3d = False
@@ -29,6 +31,17 @@ class BaseGeometryWidget(Widget):
         self.attrs = {}
         for key in ("geom_type", "map_srid", "map_width", "map_height", "display_raw"):
             self.attrs[key] = getattr(self, key)
+        if (
+            (attrs and ("map_width" in attrs or "map_height" in attrs))
+            or self.map_width != 600
+            or self.map_height != 400
+        ):
+            warnings.warn(
+                "The map_height and map_width widget attributes are deprecated. Please "
+                "use CSS to size map widgets.",
+                category=RemovedInDjango51Warning,
+                stacklevel=2,
+            )
         if attrs:
             self.attrs.update(attrs)
 

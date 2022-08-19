@@ -195,8 +195,8 @@ this. For a small app like polls, this process isn't too difficult.
         :caption: ``django-polls/pyproject.toml``
 
         [build-system]
-        requires = ['setuptools>=40.8.0', 'wheel']
-        build-backend = 'setuptools.build_meta:__legacy__'
+        requires = ['setuptools>=40.8.0']
+        build-backend = 'setuptools.build_meta'
 
    .. code-block:: ini
         :caption: ``django-polls/setup.cfg``

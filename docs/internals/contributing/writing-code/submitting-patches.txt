@@ -303,6 +303,6 @@ All tickets
 * Is the pull request a single squashed commit with a message that follows our
   :ref:`commit message format <committing-guidelines>`?
 * Are you the patch author and a new contributor? Please add yourself to the
-  ``AUTHORS`` file and submit a `Contributor License Agreement`_.
+  :source:`AUTHORS` file and submit a `Contributor License Agreement`_.
 
 .. _Contributor License Agreement: https://www.djangoproject.com/foundation/cla/

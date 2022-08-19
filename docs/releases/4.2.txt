@@ -32,7 +32,16 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The light or dark color theme of the admin can now be toggled in the UI, as
+  well as being set to follow the system setting.
+
+* The admin's font stack now prefers system UI fonts and no longer requires
+  downloading fonts. Additionally, CSS variables are available to more easily
+  override the default font families.
+
+* The :source:`admin/delete_confirmation.html
+  <django/contrib/admin/templates/admin/delete_confirmation.html>` template now
+  has some additional blocks and scripting hooks to ease customization.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -59,6 +68,13 @@ Minor features
 
 * The :class:`~django.contrib.gis.gdal.GDALRaster` class now supports
   :class:`pathlib.Path`.
+
+* The :class:`~django.contrib.gis.geoip2.GeoIP2` class now supports  ``.mmdb``
+  files downloaded from DB-IP.
+
+* The OpenLayers template widget no longer includes inline CSS (which also
+  removes the former ``map_css`` block) to better comply with a strict Content
+  Security Policy.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -143,7 +159,11 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* :class:`~django.forms.ModelForm` now accepts the new ``Meta`` option
+  ``formfield_callback`` to customize form fields.
+
+* :func:`~django.forms.models.modelform_factory` now respects the
+  ``formfield_callback`` attribute of the ``form``’s ``Meta``.
 
 Generic Views
 ~~~~~~~~~~~~~
@@ -177,7 +197,12 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* ``QuerySet`` now extensively supports filtering against
+  :ref:`window-functions` with the exception of disjunctive filter lookups
+  against window functions when performing aggregation.
+
+* :meth:`~.QuerySet.prefetch_related` now supports
+  :class:`~django.db.models.Prefetch` objects with sliced querysets.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -300,7 +325,7 @@ example::
 Should become::
 
     class Author(models.Model):
-        ranl = models.IntegerField()
+        rank = models.IntegerField()
         name = models.CharField(max_length=30)
 
         class Meta:
@@ -343,3 +368,20 @@ Miscellaneous
 * ``django.contrib.auth.hashers.SHA1PasswordHasher``,
   ``django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher``, and
   ``django.contrib.auth.hashers.UnsaltedMD5PasswordHasher`` are deprecated.
+
+* ``django.contrib.postgres.fields.CICharField`` is deprecated in favor of
+  ``CharField(db_collation="…")`` with a case-insensitive non-deterministic
+  collation.
+
+* ``django.contrib.postgres.fields.CIEmailField`` is deprecated in favor of
+  ``EmailField(db_collation="…")`` with a case-insensitive non-deterministic
+  collation.
+
+* ``django.contrib.postgres.fields.CITextField`` is deprecated in favor of
+  ``TextField(db_collation="…")`` with a case-insensitive non-deterministic
+  collation.
+
+* ``django.contrib.postgres.fields.CIText`` mixin is deprecated.
+
+* The ``map_height`` and ``map_width`` attributes of ``BaseGeometryWidget`` are
+  deprecated, use CSS to size map widgets instead.

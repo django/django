@@ -1,0 +1,45 @@
+==========================
+Django 4.1.1 release notes
+==========================
+
+*Expected September 5, 2022*
+
+Django 4.1.1 fixes several bugs in 4.1.
+
+Bugfixes
+========
+
+* Reallowed, following a regression in Django 4.1, using ``GeoIP2()`` when GEOS
+  is not installed (:ticket:`33886`).
+
+* Fixed a regression in Django 4.1 that caused a crash of admin's autocomplete
+  widgets when translations are deactivated (:ticket:`33888`).
+
+* Fixed a regression in Django 4.1 that caused a crash of the ``test``
+  management command when running in parallel and ``multiprocessing`` start
+  method is ``spawn`` (:ticket:`33891`).
+
+* Fixed a regression in Django 4.1 that caused an incorrect redirection to the
+  admin changelist view when using *"Save and continue editing"* and *"Save and
+  add another"* options (:ticket:`33893`).
+
+* Fixed a regression in Django 4.1 that caused a crash of
+  :class:`~django.db.models.expressions.Window` expressions with
+  :class:`~django.contrib.postgres.aggregates.ArrayAgg` (:ticket:`33898`).
+
+* Fixed a regression in Django 4.1 that caused a migration crash on SQLite
+  3.35.5+ when removing an indexed field (:ticket:`33899`).
+
+* Fixed a bug in Django 4.1 that caused a crash of model validation on
+  ``UniqueConstraint()`` with field names in ``expressions`` (:ticket:`33902`).
+
+* Fixed a bug in Django 4.1 that caused an incorrect validation of
+  ``CheckConstraint()`` with range fields on PostgreSQL (:ticket:`33905`).
+
+* Fixed a regression in Django 4.1 that caused an incorrect migration when
+  adding ``AutoField``, ``BigAutoField``, or ``SmallAutoField`` on PostgreSQL
+  (:ticket:`33919`).
+
+* Fixed a regression in Django 4.1 that caused a migration crash on PostgreSQL
+  when altering ``AutoField``, ``BigAutoField``, or ``SmallAutoField`` to
+  ``OneToOneField`` (:ticket:`33932`).

@@ -9,6 +9,7 @@ from django.db import DatabaseError, NotSupportedError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import F, OrderBy, RawSQL, Ref, Value
 from django.db.models.functions import Cast, Random
+from django.db.models.lookups import Lookup
 from django.db.models.query_utils import select_related_descend
 from django.db.models.sql.constants import (
     CURSOR,
@@ -57,21 +58,25 @@ class SQLCompiler:
             f"connection={self.connection!r} using={self.using!r}>"
         )
 
-    def setup_query(self):
+    def setup_query(self, with_col_aliases=False):
         if all(self.query.alias_refcount[a] == 0 for a in self.query.alias_map):
             self.query.get_initial_alias()
-        self.select, self.klass_info, self.annotation_col_map = self.get_select()
+        self.select, self.klass_info, self.annotation_col_map = self.get_select(
+            with_col_aliases=with_col_aliases,
+        )
         self.col_count = len(self.select)
 
-    def pre_sql_setup(self):
+    def pre_sql_setup(self, with_col_aliases=False):
         """
         Do any necessary class setup immediately prior to producing SQL. This
         is for things that can't necessarily be done in __init__ because we
         might not have all the pieces in place at that time.
         """
-        self.setup_query()
+        self.setup_query(with_col_aliases=with_col_aliases)
         order_by = self.get_order_by()
-        self.where, self.having = self.query.where.split_having()
+        self.where, self.having, self.qualify = self.query.where.split_having_qualify(
+            must_group_by=self.query.group_by is not None
+        )
         extra_select = self.get_extra_select(order_by, self.select)
         self.has_extra_select = bool(extra_select)
         group_by = self.get_group_by(self.select + extra_select, order_by)
@@ -224,7 +229,7 @@ class SQLCompiler:
             ]
         return expressions
 
-    def get_select(self):
+    def get_select(self, with_col_aliases=False):
         """
         Return three values:
         - a list of 3-tuples of (expression, (sql, params), alias)
@@ -287,6 +292,7 @@ class SQLCompiler:
             get_select_from_parent(klass_info)
 
         ret = []
+        col_idx = 1
         for col, alias in select:
             try:
                 sql, params = self.compile(col)
@@ -301,6 +307,9 @@ class SQLCompiler:
                     sql, params = self.compile(Value(empty_result_set_value))
             else:
                 sql, params = col.select_format(self, sql, params)
+            if alias is None and with_col_aliases:
+                alias = f"col{col_idx}"
+                col_idx += 1
             ret.append((col, (sql, params), alias))
         return ret, klass_info, annotations
 
@@ -578,6 +587,74 @@ class SQLCompiler:
             params.extend(part)
         return result, params
 
+    def get_qualify_sql(self):
+        where_parts = []
+        if self.where:
+            where_parts.append(self.where)
+        if self.having:
+            where_parts.append(self.having)
+        inner_query = self.query.clone()
+        inner_query.subquery = True
+        inner_query.where = inner_query.where.__class__(where_parts)
+        # Augment the inner query with any window function references that
+        # might have been masked via values() and alias(). If any masked
+        # aliases are added they'll be masked again to avoid fetching
+        # the data in the `if qual_aliases` branch below.
+        select = {
+            expr: alias for expr, _, alias in self.get_select(with_col_aliases=True)[0]
+        }
+        qual_aliases = set()
+        replacements = {}
+        expressions = list(self.qualify.leaves())
+        while expressions:
+            expr = expressions.pop()
+            if select_alias := (select.get(expr) or replacements.get(expr)):
+                replacements[expr] = select_alias
+            elif isinstance(expr, Lookup):
+                expressions.extend(expr.get_source_expressions())
+            else:
+                num_qual_alias = len(qual_aliases)
+                select_alias = f"qual{num_qual_alias}"
+                qual_aliases.add(select_alias)
+                inner_query.add_annotation(expr, select_alias)
+                replacements[expr] = select_alias
+        self.qualify = self.qualify.replace_expressions(
+            {expr: Ref(alias, expr) for expr, alias in replacements.items()}
+        )
+        inner_query_compiler = inner_query.get_compiler(
+            self.using, elide_empty=self.elide_empty
+        )
+        inner_sql, inner_params = inner_query_compiler.as_sql(
+            # The limits must be applied to the outer query to avoid pruning
+            # results too eagerly.
+            with_limits=False,
+            # Force unique aliasing of selected columns to avoid collisions
+            # and make rhs predicates referencing easier.
+            with_col_aliases=True,
+        )
+        qualify_sql, qualify_params = self.compile(self.qualify)
+        result = [
+            "SELECT * FROM (",
+            inner_sql,
+            ")",
+            self.connection.ops.quote_name("qualify"),
+            "WHERE",
+            qualify_sql,
+        ]
+        if qual_aliases:
+            # If some select aliases were unmasked for filtering purposes they
+            # must be masked back.
+            cols = [self.connection.ops.quote_name(alias) for alias in select.values()]
+            result = [
+                "SELECT",
+                ", ".join(cols),
+                "FROM (",
+                *result,
+                ")",
+                self.connection.ops.quote_name("qualify_mask"),
+            ]
+        return result, list(inner_params) + qualify_params
+
     def as_sql(self, with_limits=True, with_col_aliases=False):
         """
         Create the SQL for this query. Return the SQL string and list of
@@ -588,7 +665,9 @@ class SQLCompiler:
         """
         refcounts_before = self.query.alias_refcount.copy()
         try:
-            extra_select, order_by, group_by = self.pre_sql_setup()
+            extra_select, order_by, group_by = self.pre_sql_setup(
+                with_col_aliases=with_col_aliases,
+            )
             for_update_part = None
             # Is a LIMIT/OFFSET clause needed?
             with_limit_offset = with_limits and (
@@ -606,6 +685,9 @@ class SQLCompiler:
                 result, params = self.get_combinator_sql(
                     combinator, self.query.combinator_all
                 )
+            elif self.qualify:
+                result, params = self.get_qualify_sql()
+                order_by = None
             else:
                 distinct_fields, distinct_params = self.get_distinct()
                 # This must come after 'select', 'ordering', and 'distinct'
@@ -635,19 +717,12 @@ class SQLCompiler:
                     params += distinct_params
 
                 out_cols = []
-                col_idx = 1
                 for _, (s_sql, s_params), alias in self.select + extra_select:
                     if alias:
                         s_sql = "%s AS %s" % (
                             s_sql,
                             self.connection.ops.quote_name(alias),
                         )
-                    elif with_col_aliases:
-                        s_sql = "%s AS %s" % (
-                            s_sql,
-                            self.connection.ops.quote_name("col%d" % col_idx),
-                        )
-                        col_idx += 1
                     params.extend(s_params)
                     out_cols.append(s_sql)
 
@@ -768,8 +843,6 @@ class SQLCompiler:
                 sub_selects = []
                 sub_params = []
                 for index, (select, _, alias) in enumerate(self.select, start=1):
-                    if not alias and with_col_aliases:
-                        alias = "col%d" % index
                     if alias:
                         sub_selects.append(
                             "%s.%s"

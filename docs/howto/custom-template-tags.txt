@@ -1153,5 +1153,5 @@ The only new concept here is the ``self.nodelist.render(context)`` in
 ``UpperNode.render()``.
 
 For more examples of complex rendering, see the source code of
-:ttag:`{% for %}<for>` in ``django/template/defaulttags.py`` and
-:ttag:`{% if %}<if>` in ``django/template/smartif.py``.
+:ttag:`{% for %}<for>` in :source:`django/template/defaulttags.py` and
+:ttag:`{% if %}<if>` in :source:`django/template/smartif.py`.

@@ -28,10 +28,13 @@ class SQLDeleteCompiler(compiler.SQLDeleteCompiler, SQLCompiler):
         # the SQLDeleteCompiler's default implementation when multiple tables
         # are involved since MySQL/MariaDB will generate a more efficient query
         # plan than when using a subquery.
-        where, having = self.query.where.split_having()
-        if self.single_alias or having:
-            # DELETE FROM cannot be used when filtering against aggregates
-            # since it doesn't allow for GROUP BY and HAVING clauses.
+        where, having, qualify = self.query.where.split_having_qualify(
+            must_group_by=self.query.group_by is not None
+        )
+        if self.single_alias or having or qualify:
+            # DELETE FROM cannot be used when filtering against aggregates or
+            # window functions as it doesn't allow for GROUP BY/HAVING clauses
+            # and the subquery wrapping (necessary to emulate QUALIFY).
             return super().as_sql()
         result = [
             "DELETE %s FROM"

@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2021
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2022
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-23 23:47+0000\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-06-25 06:49+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
 "language/dsb/)\n"
@@ -388,6 +388,11 @@ msgstr ""
 "Zawěsććo, až toś ta gódnota jo wětša ako abo to samske ako %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+"Zawěsććo, až toś gódnota jo wjelesere kšacoweje wjelikosći %(limit_value)s."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -475,6 +480,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s z toś tym %(field_labels)s južo eksistěrujo."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Wobranicowanje \"%(name)s\" jo pśestupjone."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Gódnota %(value)r njejo płaśiwa wóleńska móžnosć."
 
@@ -488,8 +497,8 @@ msgstr "Toś to pólo njamóžo prozne byś."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s z toś tym %(field_label)s južo eksistěrujo."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -796,20 +805,20 @@ msgstr ""
 "eksistěrujo."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Pšosym wótposćelśo maksimalnje %d formular."
-msgstr[1] "Pšosym wótposćelśo maksimalnje %d formulara."
-msgstr[2] "Pšosym wótposćelśo maksimalnje %d formulary."
-msgstr[3] "Pšosym wótposćelśo maksimalnje %d formularow."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Pšosym wótposćelśo maksimalnje %(num)d formular."
+msgstr[1] "Pšosym wótposćelśo maksimalnje %(num)d formulara."
+msgstr[2] "Pšosym wótposćelśo maksimalnje %(num)d formulary."
+msgstr[3] "Pšosym wótposćelśo maksimalnje %(num)d formularow."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Pšosym wótposćelśo minimalnje %d formular."
-msgstr[1] "Pšosym wótposćelśo minimalnje %d formulara."
-msgstr[2] "Pšosym wótposćelśo minimalnje %d formulary."
-msgstr[3] "Pšosym wótposćelśo minimalnje %d formularow."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Pšosym wótposćelśo minimalnje %(num)d formular."
+msgstr[1] "Pšosym wótposćelśo minimalnje %(num)d formulara."
+msgstr[2] "Pšosym wótposćelśo minimalnje %(num)d formulary."
+msgstr[3] "Pšosym wótposćelśo minimalnje %(num)d formularow."
 
 msgid "Order"
 msgstr "Rěd"

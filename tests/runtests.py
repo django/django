@@ -244,6 +244,13 @@ def setup_collect_tests(start_at, start_after, test_labels=None):
     settings.LOGGING = log_config
     settings.SILENCED_SYSTEM_CHECKS = [
         "fields.W342",  # ForeignKey(unique=True) -> OneToOneField
+        # django.contrib.postgres.fields.CICharField deprecated.
+        "fields.W905",
+        "postgres.W004",
+        # django.contrib.postgres.fields.CIEmailField deprecated.
+        "fields.W906",
+        # django.contrib.postgres.fields.CITextField deprecated.
+        "fields.W907",
     ]
 
     # RemovedInDjango50Warning

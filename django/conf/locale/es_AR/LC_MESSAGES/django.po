@@ -4,13 +4,13 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lardissone <lardissone@gmail.com>, 2014
 # poli <poli@devartis.com>, 2014
-# Ramiro Morales, 2013-2021
+# Ramiro Morales, 2013-2022
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-19 14:56+0000\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-07-25 06:49+0000\n"
 "Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -388,6 +388,10 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Asegúrese de que este valor sea mayor o igual a %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "Asegúrese de que este valor sea múltiplo de %(limit_value)s."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -459,6 +463,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "Ya existe un/a %(model_name)s con este/a %(field_labels)s."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "No se cumple la restricción “%(name)s”."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "El valor %(value)r no es una opción válida."
 
@@ -472,8 +480,8 @@ msgstr "Este campo no puede estar en blanco."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Ya existe un/a %(model_name)s con este/a %(field_label)s."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -774,16 +782,16 @@ msgstr ""
 "un error."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Por favor envíe un máximo de %d formulario."
-msgstr[1] "Por favor envíe un máximo de %d formularios."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Por favor envíe un máximo de %(num)d formulario."
+msgstr[1] "Por favor envíe un máximo de %(num)d formularios."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Por favor envíe %d o mas formularios."
-msgstr[1] "Por favor envíe %d o mas formularios."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Por favor envíe %(num)d o mas formularios."
+msgstr[1] "Por favor envíe %(num)d o mas formularios."
 
 msgid "Order"
 msgstr "Ordenar"
@@ -898,22 +906,22 @@ msgid "noon"
 msgstr "mediodía"
 
 msgid "Monday"
-msgstr "Lunes"
+msgstr "lunes"
 
 msgid "Tuesday"
-msgstr "Martes"
+msgstr "martes"
 
 msgid "Wednesday"
-msgstr "Miércoles"
+msgstr "miércoles"
 
 msgid "Thursday"
-msgstr "Jueves"
+msgstr "jueves"
 
 msgid "Friday"
-msgstr "Viernes"
+msgstr "viernes"
 
 msgid "Saturday"
-msgstr "Sábado"
+msgstr "sábado"
 
 msgid "Sunday"
 msgstr "Domingo"
@@ -940,40 +948,40 @@ msgid "Sun"
 msgstr "Dom"
 
 msgid "January"
-msgstr "Enero"
+msgstr "enero"
 
 msgid "February"
-msgstr "Febrero"
+msgstr "febrero"
 
 msgid "March"
-msgstr "Marzo"
+msgstr "marzo"
 
 msgid "April"
-msgstr "Abril"
+msgstr "abril"
 
 msgid "May"
-msgstr "Mayo"
+msgstr "mayo"
 
 msgid "June"
-msgstr "Junio"
+msgstr "junio"
 
 msgid "July"
-msgstr "Julio"
+msgstr "julio"
 
 msgid "August"
-msgstr "Agosto"
+msgstr "agosto"
 
 msgid "September"
-msgstr "Setiembre"
+msgstr "setiembre"
 
 msgid "October"
-msgstr "Octubre"
+msgstr "octubre"
 
 msgid "November"
-msgstr "Noviembre"
+msgstr "noviembre"
 
 msgid "December"
-msgstr "Diciembre"
+msgstr "diciembre"
 
 msgid "jan"
 msgstr "ene"

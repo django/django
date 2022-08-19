@@ -1343,7 +1343,7 @@ However it is not enforced at the model or database level. Use a
 
 .. attribute:: TextField.db_collation
 
-    The database collation name of the field.
+    Optional. The database collation name of the field.
 
     .. note::
 
