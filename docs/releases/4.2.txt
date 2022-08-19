@@ -151,7 +151,8 @@ CSRF
 Decorators
 ~~~~~~~~~~
 
-* ...
+* All the documented :doc:`view decorators </topics/http/decorators>` are now
+  compatible with both synchronous and asynchronous views.
 
 Email
 ~~~~~

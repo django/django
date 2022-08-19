@@ -135,6 +135,32 @@ a purely synchronous codebase under ASGI because the request-handling code is
 still all running asynchronously. In general you will only want to enable ASGI
 mode if you have asynchronous code in your project.
 
+Async view decorators
+=====================
+
+.. versionadded:: 4.2
+
+All the documented :doc:`view decorators </topics/http/decorators>` are
+compatible with both synchronous and asynchronous views. Note that only the
+view itself can be asynchronous; any functions passed to a decorator (e.g. with
+:meth:`~django.views.decorators.http.condition`) must be synchronous. Usage::
+
+    from django.views.decorators.http import condition
+
+    # The function passed to the decorator must be a synchronous function
+    def etag_func(request, *args, **kwargs):
+        return '"abc123"'
+
+    # The view itself can be synchronous...
+    @condition(etag_func=etag_func)
+    def my_sync_view(request):
+        return HttpResponse()
+
+    # ... or it can be asynchronous
+    @condition(etag_func=etag_func)
+    async def my_async_view(request):
+        return HttpResponse()
+
 .. _async-safety:
 
 Async safety
