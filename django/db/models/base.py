@@ -1322,7 +1322,9 @@ class Model(metaclass=ModelBase):
             if len(unique_check) != len(lookup_kwargs):
                 continue
 
-            qs = model_class._default_manager.filter(**lookup_kwargs)
+            qs = model_class._default_manager.using(self._state.db).filter(
+                **lookup_kwargs
+            )
 
             # Exclude the current object from the query if we are editing an
             # instance (as opposed to creating a new one)
@@ -1363,7 +1365,9 @@ class Model(metaclass=ModelBase):
                 )
             lookup_kwargs[field] = getattr(self, field)
 
-            qs = model_class._default_manager.filter(**lookup_kwargs)
+            qs = model_class._default_manager.using(self._state.db).filter(
+                **lookup_kwargs
+            )
             # Exclude the current object from the query if we are editing an
             # instance (as opposed to creating a new one)
             if not self._state.adding and self.pk is not None:

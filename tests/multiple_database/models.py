@@ -47,7 +47,7 @@ class BookManager(models.Manager):
 
 
 class Book(models.Model):
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100, unique_for_date="published")
     published = models.DateField()
     authors = models.ManyToManyField(Person)
     editor = models.ForeignKey(

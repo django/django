@@ -7,6 +7,7 @@ from unittest.mock import Mock
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
+from django.core.exceptions import ValidationError
 from django.db import DEFAULT_DB_ALIAS, router, transaction
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
@@ -1301,6 +1302,26 @@ class QueryTestCase(TestCase):
         mark.edited.get_or_create(
             title="Dive into Water", published=datetime.date(2009, 5, 4), extra_arg=True
         )
+
+    def test_unique_validation(self):
+        "Model.validate_unique() uses the correct database"
+        mickey = Person.objects.using("default").create(name="Mickey")
+        donald = Person.objects.using("default").create(name="Donald")
+        other_donald = Person.objects.using("other").create(name="Donald")
+        self.assertIsNone(other_donald.validate_unique())
+
+    def test_unique_for_date(self):
+        "unique_for_date uses the correct database"
+        dive1 = Book.objects.using("other").create(
+            title="Dive into Python", published=datetime.date(2009, 5, 4)
+        )
+        dive2 = Book.objects.using("other").create(
+            title="Dive into Python", published=datetime.date(2009, 5, 4)
+        )
+        with self.assertRaisesMessage(
+            ValidationError, "{'title': ['Title must be unique for Published date.']}"
+        ):
+            dive2.validate_unique()
 
 
 class ConnectionRouterTestCase(SimpleTestCase):
