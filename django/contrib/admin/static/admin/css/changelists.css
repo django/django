@@ -223,25 +223,20 @@
 
 /* DATE DRILLDOWN */
 
-.change-list ul.toplinks {
+.change-list .toplinks {
     display: flex;
-    padding: 0 0 5px 0;
-    margin: 0;
+    padding-bottom: 5px;
     flex-wrap: wrap;
     gap: 3px 17px;
-}
-
-.change-list ul.toplinks li {
     font-weight: bold;
-    list-style-type: none;
 }
 
-.change-list ul.toplinks .date-back a {
+.change-list .toplinks .date-back {
     color: var(--body-quiet-color);
 }
 
-.change-list ul.toplinks .date-back a:focus,
-.change-list ul.toplinks .date-back a:hover {
+.change-list .toplinks .date-back:focus,
+.change-list .toplinks .date-back:hover {
     color: var(--link-hover-color);
 }
 
