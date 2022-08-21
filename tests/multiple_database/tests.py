@@ -1302,6 +1302,19 @@ class QueryTestCase(TestCase):
             title="Dive into Water", published=datetime.date(2009, 5, 4), extra_arg=True
         )
 
+    def test_order_with_respect_to(self):
+        """
+        Model.set_XXX_order() and Model.get_{previous|next}_in_order() use
+        the correct database.
+        """
+        human = Person.objects.using("other").create(name="Human")
+        dog = Pet.objects.using("other").create(name="Dog", owner=human)
+        cat = Pet.objects.using("other").create(name="Cat", owner=human)
+        duck = Pet.objects.using("other").create(name="Duck", owner=human)
+        human.set_pet_order([duck.pk, dog.pk, cat.pk], "other")
+        self.assertEqual(dog.get_next_in_order(), cat)
+        self.assertEqual(dog.get_previous_in_order(), duck)
+
 
 class ConnectionRouterTestCase(SimpleTestCase):
     @override_settings(

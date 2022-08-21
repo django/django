@@ -70,7 +70,7 @@ class Pet(models.Model):
     owner = models.ForeignKey(Person, models.CASCADE)
 
     class Meta:
-        ordering = ("name",)
+        order_with_respect_to = "owner"
 
 
 class UserProfile(models.Model):

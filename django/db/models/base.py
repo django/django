@@ -1175,13 +1175,14 @@ class Model(metaclass=ModelBase):
             order_field = self._meta.order_with_respect_to
             filter_args = order_field.get_filter_kwargs_for_object(self)
             obj = (
-                self.__class__._default_manager.filter(**filter_args)
+                self.__class__._default_manager.using(self._state.db)
+                .filter(**filter_args)
                 .filter(
                     **{
                         "_order__%s"
-                        % op: self.__class__._default_manager.values("_order").filter(
-                            **{self._meta.pk.name: self.pk}
-                        )
+                        % op: self.__class__._default_manager.using(self._state.db)
+                        .values("_order")
+                        .filter(**{self._meta.pk.name: self.pk})
                     }
                 )
                 .order_by(order)[:1]
@@ -2457,7 +2458,9 @@ class Model(metaclass=ModelBase):
 def method_set_order(self, ordered_obj, id_list, using=None):
     order_wrt = ordered_obj._meta.order_with_respect_to
     filter_args = order_wrt.get_forward_related_filter(self)
-    ordered_obj.objects.db_manager(using).filter(**filter_args).bulk_update(
+    ordered_obj.objects.db_manager(using or self._state.db).filter(
+        **filter_args
+    ).bulk_update(
         [ordered_obj(pk=pk, _order=order) for order, pk in enumerate(id_list)],
         ["_order"],
     )
