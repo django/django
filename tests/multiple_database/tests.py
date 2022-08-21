@@ -1305,14 +1305,14 @@ class QueryTestCase(TestCase):
 
     def test_unique_validation(self):
         "Model.validate_unique() uses the correct database"
-        mickey = Person.objects.using("default").create(name="Mickey")
-        donald = Person.objects.using("default").create(name="Donald")
+        Person.objects.using("default").create(name="Mickey")
+        Person.objects.using("default").create(name="Donald")
         other_donald = Person.objects.using("other").create(name="Donald")
         self.assertIsNone(other_donald.validate_unique())
 
     def test_unique_for_date(self):
         "unique_for_date uses the correct database"
-        dive1 = Book.objects.using("other").create(
+        Book.objects.using("other").create(
             title="Dive into Python", published=datetime.date(2009, 5, 4)
         )
         dive2 = Book.objects.using("other").create(
