@@ -254,13 +254,22 @@ however, if you're searching more than a few hundred records, you're likely to
 run into performance problems. Full text search is a more intensive process
 than comparing the size of an integer, for example.
 
+.. versionadded:: 3.2
+
 In the event that all the fields you're querying on are contained within one
 particular model, you can create a functional
 :class:`GIN <django.contrib.postgres.indexes.GinIndex>` or
 :class:`GiST <django.contrib.postgres.indexes.GistIndex>` index which matches
 the search vector you wish to use. For example::
 
-    GinIndex(SearchVector('body_text'), name='body_search_vector_idx')
+    GinIndex(
+        SearchVector('first_name', 'last_name', config='english'),
+        name='search_vector_idx',
+    )
+
+In this case, it's important to specify the ``config`` argument in
+``SearchVector`` because otherwise PostgreSQL will consider the function
+mutable and will throw an error.
 
 The PostgreSQL documentation has details on
 `creating indexes for full text search
