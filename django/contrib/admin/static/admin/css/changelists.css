@@ -224,18 +224,16 @@
 /* DATE DRILLDOWN */
 
 .change-list ul.toplinks {
-    display: block;
-    float: left;
-    padding: 0;
+    display: flex;
+    padding: 0 0 5px 0;
     margin: 0;
-    width: 100%;
+    flex-wrap: wrap;
+    gap: 3px 17px;
 }
 
 .change-list ul.toplinks li {
-    padding: 3px 6px;
     font-weight: bold;
     list-style-type: none;
-    display: inline-block;
 }
 
 .change-list ul.toplinks .date-back a {
