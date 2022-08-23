@@ -85,9 +85,10 @@ class InlineFormsetTests(TestCase):
         #24958 - Variant of test_inlineformset_factory_nulls_default_pks for
         the case of a parent object with a UUID alternate key and a child
         object that relates to that alternate key.
+        #32210 - Parent object with a UUID alternate key should not None.
         """
         FormSet = inlineformset_factory(
             ParentWithUUIDAlternateKey, ChildRelatedViaAK, fields="__all__"
         )
         formset = FormSet()
-        self.assertIsNone(formset.forms[0].fields["parent"].initial)
+        self.assertIsNotNone(formset.forms[0].fields["parent"].initial)
