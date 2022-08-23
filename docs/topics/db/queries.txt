@@ -1013,9 +1013,9 @@ Key, index, and path transforms
 
 A :class:`~django.db.models.Transform` to access a key named ``key_name`` in a
 :class:`~django.db.models.JSONField`. ``key_name`` could also be an integer to
-transform to an array index. The field instance which is to be transformed
-should be passed as the second argument. This would return the resulting key
-transform which is also in the form of json.
+transform into an array index. The instance of the :class:`~django.db.models.JSONField`
+which is to be transformed should be passed in as the second argument. This would
+return the resulting key transform which is also in the form of json.
 
 To query on a :class:`~django.db.models.JSONField`::
 
@@ -1042,13 +1042,8 @@ Nested key transforms can also be done as follows::
     ...     )).filter(owner_other_pet_name__exact=[{'name': 'Fishy'}])
     <QuerySet [<Dog: Rufus>]>
 
-To query the resulting json as text, the :class:`~django.db.models.functions.Cast`
-function needs to be used. This is done as follows::
-
-    >>> Dogs.objects.annotate(
-    ...     breed_name=Cast(KeyTransform('breed', 'data'), TextField())
-    ... ).filter(breed_name__contains='lab')
-    <QuerySet [<Dog: Rufus>]>
+If the query result is needed in the form of text, use the resulting json as text,
+use .. class:: json.KeyTextTransform.
 
 .. class:: json.KeyTextTransform(key_name, *args, **kwargs)
 
@@ -1056,17 +1051,10 @@ function needs to be used. This is done as follows::
     need to be :class:`~django.db.models.functions.Cast` to a ``TextField`` to be
     treat the result as text.
 
-.. warning::
-
-    Casting a resulting KeyTransform might still be in resemble json format.
-    For example, ``Cast(KeyTransform('breed', 'data'), TextField())`` would result
-    in ``'"labrador"'`` instead of ``'labrador'``. So filtering
-    ``breed_name__contains='dor"'`` would also be true.
-
 .. note::
 
     .. class:: json.KeyTextTransform is alias to .. class:: json.KeyTransform for
-    non-postgresql databases.
+    sqlite and oracle databases.
 
 To query based on a given dictionary key, use that key as the lookup name::
 
