@@ -1039,7 +1039,8 @@ Nested key transforms can also be done as follows::
     >>> Dogs.objects.annotate(
     ...     owner_other_pet_name=KeyTransform(
     ...         'other_pets',KeyTransform('owner', 'data')
-    ...     )).filter(owner_other_pet_name__exact=[{'name': 'Fishy'}])
+    ...     )
+    ... ).filter(owner_other_pet_name__exact=[{'name': 'Fishy'}])
     <QuerySet [<Dog: Rufus>]>
 
 If the query result is needed in the form of text, use the resulting json as text,
