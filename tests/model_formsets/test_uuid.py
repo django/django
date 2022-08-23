@@ -93,8 +93,7 @@ class InlineFormsetTests(TestCase):
         formset = FormSet()
         self.assertIsNotNone(formset.forms[0].fields["parent"].initial)
 
-    def test_inlineformset_factory_nulls_default_pks_alternate_key_relation_with_child(
-        self):
+    def test_inlineformset_factory_nulls_default_pks_alternate_key_with_child(self):
         """
         #32210 - After validate formset, Parent object with a UUID alternate key
         should not None.
@@ -110,7 +109,8 @@ class InlineFormsetTests(TestCase):
                 "childrelatedviaak_set-0-name": "Foo",
                 "childrelatedviaak_set-1-name": "",
                 "childrelatedviaak_set-2-name": "",
-            })
+            }
+        )
         formset_validated = formset.is_valid()
         # Check formset is valid
         self.assertTrue(formset_validated)
