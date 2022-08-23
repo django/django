@@ -308,9 +308,11 @@ Pass any function (that takes no arguments) to :func:`on_commit`::
 
     transaction.on_commit(do_something)
 
-You can also wrap your function in a lambda::
+You can also bind arguments to your function using :func:`functools.partial`::
 
-    transaction.on_commit(lambda: some_celery_task.delay('arg1'))
+    from functools import partial
+
+    transaction.on_commit(partial(some_celery_task.delay, 'arg1'))
 
 The function you pass in will be called immediately after a hypothetical
 database write made where ``on_commit()`` is called would be successfully
