@@ -1043,7 +1043,7 @@ Nested key transforms can also be done as follows::
     <QuerySet [<Dog: Rufus>]>
 
 If the query result is needed in the form of text, use the resulting json as text,
-use .. class:: json.KeyTextTransform.
+use :class:`~django.db.models.json.KeyTextTransform`.
 
 .. class:: json.KeyTextTransform(key_name, *args, **kwargs)
 
@@ -1051,10 +1051,10 @@ use .. class:: json.KeyTextTransform.
     need to be :class:`~django.db.models.functions.Cast` to a ``TextField`` to be
     treat the result as text.
 
-.. note::
+.. admonition:: Oracle and SQLite users
 
-    .. class:: json.KeyTextTransform is alias to .. class:: json.KeyTransform for
-    sqlite and oracle databases.
+    :class:`~django.db.models.json.KeyTextTransform` is alias to
+    :class:`~django.db.models.json.KeyTransform` for sqlite and oracle databases.
 
 To query based on a given dictionary key, use that key as the lookup name::
 
