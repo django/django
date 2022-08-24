@@ -49,3 +49,6 @@ Bugfixes
 
 * Fixed a regression in Django 4.1 that caused an incorrect migration when
   renaming a model with ``ManyToManyField`` and ``db_table`` (:ticket:`33953`).
+
+* Reallowed, following a regression in Django 4.1, creating reverse foreign key
+  managers on unsaved instances (:ticket:`33952`).
