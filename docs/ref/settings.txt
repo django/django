@@ -2043,8 +2043,8 @@ directories containing the actual translation files.
 
 Default: A logging configuration dictionary.
 
-A data structure containing configuration information. The contents of
-this data structure will be passed as the argument to the
+A data structure containing configuration information. When not-empty, the
+contents of this data structure will be passed as the argument to the
 configuration method described in :setting:`LOGGING_CONFIG`.
 
 Among other things, the default logging configuration passes HTTP 500 server
