@@ -11,7 +11,11 @@ from urllib.request import build_opener
 import django
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from django.core.management.utils import handle_extensions, run_formatters
+from django.core.management.utils import (
+    find_formatters,
+    handle_extensions,
+    run_formatters,
+)
 from django.template import Context, Engine
 from django.utils import archive
 from django.utils.http import parse_header_parameters
@@ -106,6 +110,10 @@ class TemplateCommand(BaseCommand):
                     "Destination directory '%s' does not "
                     "exist, please create it first." % top_dir
                 )
+
+        # Find formatters, which are external executables, before input
+        # from the templates can sneak into the path.
+        formatter_paths = find_formatters()
 
         extensions = tuple(handle_extensions(options["extensions"]))
         extra_files = []
@@ -224,7 +232,7 @@ class TemplateCommand(BaseCommand):
                 else:
                     shutil.rmtree(path_to_remove)
 
-        run_formatters(self.written_files)
+        run_formatters(self.written_files, **formatter_paths)
 
     def handle_template(self, template, subdir):
         """
