@@ -1362,6 +1362,19 @@ files is:
     byte-compile invalid ``*.py`` files, template files ending with ``.py-tpl``
     will be renamed to ``.py``.
 
+.. _trusted_code_warning:
+
+.. warning::
+
+   The contents of custom app (or project) templates should always be
+   audited before use: Such templates define code that will become
+   part of your project, and this means that such code will be trusted
+   as much as any app you install, or code you write yourself.
+   Further, even rendering the templates is, effectively, executing
+   code that was provided as input to the management command. The
+   Django template language may provide wide access into the system,
+   so make sure any custom template you use is worthy of your trust.
+
 ``startproject``
 ----------------
 
@@ -1418,8 +1431,9 @@ The :class:`template context <django.template.Context>` used is:
 - ``docs_version`` -- the version of the documentation: ``'dev'`` or ``'1.x'``
 - ``django_version`` -- the version of Django, e.g. ``'2.0.3'``
 
-Please also see the :ref:`rendering warning <render_warning>` as mentioned
-for :djadmin:`startapp`.
+Please also see the :ref:`rendering warning <render_warning>` and
+:ref:`trusted code warning <trusted_code_warning>` as mentioned for
+:djadmin:`startapp`.
 
 ``test``
 --------
