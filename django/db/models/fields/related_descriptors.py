@@ -647,15 +647,6 @@ def create_reverse_many_to_one_manager(superclass, rel):
 
             self.core_filters = {self.field.name: instance}
 
-            # Even if this relation is not to pk, we require still pk value.
-            # The wish is that the instance has been already saved to DB,
-            # although having a pk value isn't a guarantee of that.
-            if self.instance.pk is None:
-                raise ValueError(
-                    f"{instance.__class__.__name__!r} instance needs to have a primary "
-                    f"key value before this relationship can be used."
-                )
-
         def __call__(self, *, manager):
             manager = getattr(self.model, manager)
             manager_class = create_reverse_many_to_one_manager(manager.__class__, rel)
@@ -720,6 +711,14 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 pass  # nothing to clear from cache
 
         def get_queryset(self):
+            # Even if this relation is not to pk, we require still pk value.
+            # The wish is that the instance has been already saved to DB,
+            # although having a pk value isn't a guarantee of that.
+            if self.instance.pk is None:
+                raise ValueError(
+                    f"{self.instance.__class__.__name__!r} instance needs to have a "
+                    f"primary key value before this relationship can be used."
+                )
             try:
                 return self.instance._prefetched_objects_cache[
                     self.field.remote_field.get_cache_name()
