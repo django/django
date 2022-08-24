@@ -253,6 +253,8 @@ _active.local_value = _callback_strs
 
 
 def _is_callback(name, urlresolver=None):
+    if not hasattr(_active, "local_value"):
+        _active.local_value = _callback_strs
     if urlresolver and not urlresolver._populated:
         register_callback(urlresolver, _active.local_value)
     return name in _active.local_value
