@@ -43,6 +43,11 @@ Minor features
   <django/contrib/admin/templates/admin/delete_confirmation.html>` template now
   has some additional blocks and scripting hooks to ease customization.
 
+* The chosen options of
+  :attr:`~django.contrib.admin.ModelAdmin.filter_horizontal` and
+  :attr:`~django.contrib.admin.ModelAdmin.filter_vertical` widgets are now
+  filterable.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
