@@ -99,39 +99,47 @@ class CursorWrapper:
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = "mysql"
+
     # This dictionary maps Field objects to their associated MySQL column
     # types, as strings. Column-type strings can contain format strings; they'll
     # be interpolated against the values of Field.__dict__ before being output.
     # If a column type is set to None, it won't be included in the output.
-    data_types = {
-        "AutoField": "integer AUTO_INCREMENT",
-        "BigAutoField": "bigint AUTO_INCREMENT",
-        "BinaryField": "longblob",
-        "BooleanField": "bool",
-        "CharField": "varchar(%(max_length)s)",
-        "DateField": "date",
-        "DateTimeField": "datetime(6)",
-        "DecimalField": "numeric(%(max_digits)s, %(decimal_places)s)",
-        "DurationField": "bigint",
-        "FileField": "varchar(%(max_length)s)",
-        "FilePathField": "varchar(%(max_length)s)",
-        "FloatField": "double precision",
-        "IntegerField": "integer",
-        "BigIntegerField": "bigint",
-        "IPAddressField": "char(15)",
-        "GenericIPAddressField": "char(39)",
-        "JSONField": "json",
-        "OneToOneField": "integer",
-        "PositiveBigIntegerField": "bigint UNSIGNED",
-        "PositiveIntegerField": "integer UNSIGNED",
-        "PositiveSmallIntegerField": "smallint UNSIGNED",
-        "SlugField": "varchar(%(max_length)s)",
-        "SmallAutoField": "smallint AUTO_INCREMENT",
-        "SmallIntegerField": "smallint",
-        "TextField": "longtext",
-        "TimeField": "time(6)",
-        "UUIDField": "char(32)",
-    }
+    @cached_property
+    def data_types(self):
+        def uuid_db_type():
+            if self.has_db_uuid_type:
+                return "uuid"
+            return "char(32)"
+
+        return {
+            "AutoField": "integer AUTO_INCREMENT",
+            "BigAutoField": "bigint AUTO_INCREMENT",
+            "BinaryField": "longblob",
+            "BooleanField": "bool",
+            "CharField": "varchar(%(max_length)s)",
+            "DateField": "date",
+            "DateTimeField": "datetime(6)",
+            "DecimalField": "numeric(%(max_digits)s, %(decimal_places)s)",
+            "DurationField": "bigint",
+            "FileField": "varchar(%(max_length)s)",
+            "FilePathField": "varchar(%(max_length)s)",
+            "FloatField": "double precision",
+            "IntegerField": "integer",
+            "BigIntegerField": "bigint",
+            "IPAddressField": "char(15)",
+            "GenericIPAddressField": "char(39)",
+            "JSONField": "json",
+            "OneToOneField": "integer",
+            "PositiveBigIntegerField": "bigint UNSIGNED",
+            "PositiveIntegerField": "integer UNSIGNED",
+            "PositiveSmallIntegerField": "smallint UNSIGNED",
+            "SlugField": "varchar(%(max_length)s)",
+            "SmallAutoField": "smallint AUTO_INCREMENT",
+            "SmallIntegerField": "smallint",
+            "TextField": "longtext",
+            "TimeField": "time(6)",
+            "UUIDField": uuid_db_type(),
+        }
 
     # For these data types:
     # - MySQL < 8.0.13 doesn't accept default values and implicitly treats them
@@ -442,3 +450,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def sql_mode(self):
         sql_mode = self.mysql_server_data["sql_mode"]
         return set(sql_mode.split(",") if sql_mode else ())
+
+    @cached_property
+    def has_db_uuid_type(self):
+        return self.mysql_is_mariadb and self.mysql_version >= (10, 7, 0)

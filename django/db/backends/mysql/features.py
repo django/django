@@ -57,6 +57,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_logical_xor = True
 
     @cached_property
+    def has_native_uuid_field(self):
+        return self.connection.has_db_uuid_type
+
+    @cached_property
     def minimum_database_version(self):
         if self.connection.mysql_is_mariadb:
             return (10, 4)

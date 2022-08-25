@@ -65,7 +65,7 @@ and two directions (forward and reverse) for a total of six combinations.
 
 from django.core.exceptions import FieldError
 from django.db import DEFAULT_DB_ALIAS, connections, router, transaction
-from django.db.models import Q, Window, signals
+from django.db.models import F, Q, Window, signals
 from django.db.models.functions import RowNumber
 from django.db.models.lookups import GreaterThan, LessThanOrEqual
 from django.db.models.query import QuerySet
@@ -1084,14 +1084,25 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             join_table = fk.model._meta.db_table
             connection = connections[queryset.db]
             qn = connection.ops.quote_name
-            queryset = queryset.extra(
-                select={
-                    "_prefetch_related_val_%s"
-                    % f.attname: "%s.%s"
-                    % (qn(join_table), qn(f.column))
+
+            if "ForeignKey" == fk.__class__.__name__:
+                annotated_fields = {
+                    f"_prefetch_related_val_{f.attname}": F(
+                        f"{self.query_field_name}__{f.target_field.name}"
+                    )
                     for f in fk.local_related_fields
                 }
-            )
+                queryset = queryset.annotate(**annotated_fields)
+            else:
+                queryset = queryset.extra(
+                    select={
+                        "_prefetch_related_val_%s"
+                        % f.attname: "%s.%s"
+                        % (qn(join_table), qn(f.column))
+                        for f in fk.local_related_fields
+                    }
+                )
+
             return (
                 queryset,
                 lambda result: tuple(
