@@ -10,7 +10,9 @@ from django.db.models import Index
 from django.utils.datastructures import OrderedSet
 
 FieldInfo = namedtuple(
-    "FieldInfo", BaseFieldInfo._fields + ("extra", "is_unsigned", "has_json_constraint")
+    "FieldInfo",
+    BaseFieldInfo._fields
+    + ("extra", "is_unsigned", "has_json_constraint", "data_type"),
 )
 InfoLine = namedtuple(
     "InfoLine",
@@ -64,6 +66,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # constraints clauses to introspect JSONField.
         if description.has_json_constraint:
             return "JSONField"
+        if description.data_type.upper() == "UUID":
+            return "UUIDField"
         return field_type
 
     def get_table_list(self, cursor):
@@ -158,6 +162,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     info.extra,
                     info.is_unsigned,
                     line[0] in json_constraints,
+                    info.data_type,
                 )
             )
         return fields
