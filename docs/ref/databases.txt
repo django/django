@@ -291,9 +291,9 @@ live for the duration of the transaction.
 Manually-specifying values of auto-incrementing primary keys
 ------------------------------------------------------------
 
-Django uses PostgreSQL's `SERIAL data type`_ to store auto-incrementing primary
-keys. A ``SERIAL`` column is populated with values from a `sequence`_ that
-keeps track of the next available value. Manually assigning a value to an
+Django uses PostgreSQL's identity columns to store auto-incrementing primary
+keys. An identity column is populated with values from a `sequence`_ that keeps
+track of the next available value. Manually assigning a value to an
 auto-incrementing field doesn't update the field's sequence, which might later
 cause a conflict. For example::
 
@@ -310,7 +310,11 @@ If you need to specify such values, reset the sequence afterward to avoid
 reusing a value that's already in the table. The :djadmin:`sqlsequencereset`
 management command generates the SQL statements to do that.
 
-.. _SERIAL data type: https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL
+.. versionchanged:: 4.1
+
+    In older versions, PostgreSQL’s ``SERIAL`` data type was used instead of
+    identity columns.
+
 .. _sequence: https://www.postgresql.org/docs/current/sql-createsequence.html
 
 Test database templates
