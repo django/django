@@ -248,10 +248,10 @@ current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_. For example::
             constraints = [
                 ExclusionConstraint(
                     name='exclude_overlapping_reservations',
-                    expressions=(
+                    expressions=[
                         (TsTzRange('start', 'end', RangeBoundary()), RangeOperators.OVERLAPS),
                         ('room', RangeOperators.EQUAL),
-                    ),
+                    ],
                     condition=Q(cancelled=False),
                 ),
             ]

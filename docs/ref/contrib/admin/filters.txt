@@ -33,13 +33,13 @@ Each specified field should be either a ``BooleanField``, ``CharField``,
 ``ManyToManyField``, for example::
 
     class PersonAdmin(admin.ModelAdmin):
-        list_filter = ('is_staff', 'company')
+        list_filter = ['is_staff', 'company']
 
 Field names in ``list_filter`` can also span relations
 using the ``__`` lookup, for example::
 
     class PersonAdmin(admin.UserAdmin):
-        list_filter = ('company__name',)
+        list_filter = ['company__name']
 
 Using a ``SimpleListFilter``
 ============================
@@ -70,10 +70,10 @@ and ``parameter_name`` attributes, and override the ``lookups`` and
             human-readable name for the option that will appear
             in the right sidebar.
             """
-            return (
+            return [
                 ('80s', _('in the eighties')),
                 ('90s', _('in the nineties')),
-            )
+            ]
 
         def queryset(self, request, queryset):
             """
@@ -95,7 +95,7 @@ and ``parameter_name`` attributes, and override the ``lookups`` and
                 )
 
     class PersonAdmin(admin.ModelAdmin):
-        list_filter = (DecadeBornListFilter,)
+        list_filter = [DecadeBornListFilter]
 
 .. note::
 
@@ -144,9 +144,9 @@ field name and the second element is a class inheriting from
 ``django.contrib.admin.FieldListFilter``, for example::
 
     class PersonAdmin(admin.ModelAdmin):
-        list_filter = (
+        list_filter = [
             ('is_staff', admin.BooleanFieldListFilter),
-        )
+        ]
 
 Here the ``is_staff`` field will use the ``BooleanFieldListFilter``. Specifying
 only the field name, fields will automatically use the appropriate filter for
@@ -159,9 +159,9 @@ You can limit the choices of a related model to the objects involved in
 that relation using ``RelatedOnlyFieldListFilter``::
 
     class BookAdmin(admin.ModelAdmin):
-        list_filter = (
+        list_filter = [
             ('author', admin.RelatedOnlyFieldListFilter),
-        )
+        ]
 
 Assuming ``author`` is a ``ForeignKey`` to a ``User`` model, this will
 limit the ``list_filter`` choices to the users who have written a book,
@@ -172,9 +172,9 @@ filter on both empty strings and nulls, depending on what the field
 allows to store::
 
     class BookAdmin(admin.ModelAdmin):
-        list_filter = (
+        list_filter = [
             ('title', admin.EmptyFieldListFilter),
-        )
+        ]
 
 By defining a filter using the ``__in`` lookup, it is possible to filter for
 any of a group of values. You need to override the ``expected_parameters``

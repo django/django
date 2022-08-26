@@ -204,7 +204,7 @@ object:
 
     class QuestionAdmin(admin.ModelAdmin):
         # ...
-        list_display = ('question_text', 'pub_date')
+        list_display = ['question_text', 'pub_date']
 
 For good measure, let's also include the ``was_published_recently()`` method
 from :doc:`Tutorial 2 </intro/tutorial02>`:
@@ -214,7 +214,7 @@ from :doc:`Tutorial 2 </intro/tutorial02>`:
 
     class QuestionAdmin(admin.ModelAdmin):
         # ...
-        list_display = ('question_text', 'pub_date', 'was_published_recently')
+        list_display = ['question_text', 'pub_date', 'was_published_recently']
 
 Now the question change list page looks like this:
 

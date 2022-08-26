@@ -781,7 +781,7 @@ To apply permission checks to :doc:`class-based views
         class MyView(PermissionRequiredMixin, View):
             permission_required = 'polls.add_choice'
             # Or multiple of permissions:
-            permission_required = ('polls.view_choice', 'polls.change_choice')
+            permission_required = ['polls.view_choice', 'polls.change_choice']
 
     You can set any of the parameters of
     :class:`~django.contrib.auth.mixins.AccessMixin` to customize the handling
