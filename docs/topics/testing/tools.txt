@@ -237,7 +237,7 @@ Use the ``django.test.Client`` class to make requests.
         list or tuple for the required key. For example, this value of ``data``
         would submit three selected values for the field named ``choices``::
 
-            {'choices': ('a', 'b', 'd')}
+            {'choices': ['a', 'b', 'd']}
 
         Submitting files is a special case. To POST a file, you need only
         provide the file field name as a key, and a file handle to the file you

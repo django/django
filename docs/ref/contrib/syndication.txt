@@ -556,7 +556,7 @@ This example illustrates all possible attributes and methods for a
             Returns the feed's categories as iterable over strings.
             """
 
-        categories = ("python", "django") # Hard-coded list of categories.
+        categories = ["python", "django"] # Hard-coded list of categories.
 
         # COPYRIGHT NOTICE -- One of the following three is optional. The
         # framework looks for them in this order.
@@ -604,7 +604,7 @@ This example illustrates all possible attributes and methods for a
             Returns a list of items to publish in this feed.
             """
 
-        items = ('Item 1', 'Item 2') # Hard-coded items.
+        items = ['Item 1', 'Item 2'] # Hard-coded items.
 
         # GET_OBJECT -- This is required for feeds that publish different data
         # for different URL parameters. (See "A complex example" above.)
@@ -870,7 +870,7 @@ This example illustrates all possible attributes and methods for a
             Returns the categories for every item in the feed.
             """
 
-        item_categories = ("python", "django") # Hard-coded categories.
+        item_categories = ["python", "django"] # Hard-coded categories.
 
         # ITEM COPYRIGHT NOTICE (only applicable to Atom feeds) -- One of the
         # following three is optional. The framework looks for them in this
