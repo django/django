@@ -48,6 +48,9 @@ class Serializer(base.Serializer):
     def handle_field(self, obj, field):
         self._current[field.name] = self._value_from_field(obj, field)
 
+    def handle_extra_attr(self, obj, field):
+        self._current[field] = getattr(obj, field)
+
     def handle_fk_field(self, obj, field):
         if self.use_natural_foreign_keys and hasattr(
             field.remote_field.model, "natural_key"

@@ -69,6 +69,29 @@ resulting output; it never appears in the ``fields`` part.
     serialized object doesn't specify all the fields that are required by a
     model, the deserializer will not be able to save deserialized instances.
 
+Extra attributes
+~~~~~~~~~~~~~~~~
+
+.. versionadded:: 4.2
+
+If you want to serialize attributes or properties on the model object that
+aren't model fields, you can specify an ``extra`` argument to the serializer::
+
+    from django.core import serializers
+    data = serializers.serialize('xml', SomeModel.objects.all(), extra=('some_property',))
+
+In this example the ``some_property`` attribute of the model will be serialized
+in addition to all the model fields.
+
+The ``fields`` and ``extra`` arguments can be combined to get a subset of the
+model fields as well as the extra non-field attributes specified.
+
+.. note::
+
+    Deserializing a model that was serialized with additional extra attributes
+    will result in an error, as deserialization requires that only the model
+    fields be specified.
+
 Inherited models
 ----------------
 

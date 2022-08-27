@@ -410,6 +410,17 @@ class SerializersTestBase:
         self.assertEqual(self._get_field_values(child_data, "parent_m2m"), [])
         self.assertEqual(self._get_field_values(child_data, "parent_data"), [])
 
+    def test_serialize_extra_non_field_attributes(self):
+        """
+        Tests that non-field attributes can be serialized if passed in
+        explicitly to fields.
+        """
+        a = Author(name="Some Random Person")
+        serial_str = serializers.serialize(self.serializer_name, [a], extra=["age"])
+        age_values = self._get_field_values(serial_str, "age")
+        self.assertEqual(len(age_values), 1)
+        self.assertEqual(int(age_values[0]), 42)
+
 
 class SerializerAPITests(SimpleTestCase):
     def test_stream_class(self):

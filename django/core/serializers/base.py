@@ -125,7 +125,11 @@ class Serializer:
         self.selected_fields = fields
         self.use_natural_foreign_keys = use_natural_foreign_keys
         self.use_natural_primary_keys = use_natural_primary_keys
+        self.extra_fields = options.pop("extra", None)
         progress_bar = self.progress_class(progress_output, object_count)
+
+        def field_is_selected(field):
+            return self.selected_fields is None or field in self.selected_fields
 
         self.start_serialization()
         self.first = True
@@ -147,24 +151,18 @@ class Serializer:
             for field in concrete_model._meta.local_fields:
                 if field.serialize or field is pk_parent:
                     if field.remote_field is None:
-                        if (
-                            self.selected_fields is None
-                            or field.attname in self.selected_fields
-                        ):
+                        if field_is_selected(field.attname):
                             self.handle_field(obj, field)
                     else:
-                        if (
-                            self.selected_fields is None
-                            or field.attname[:-3] in self.selected_fields
-                        ):
+                        if field_is_selected(field.attname[:-3]):
                             self.handle_fk_field(obj, field)
             for field in concrete_model._meta.local_many_to_many:
                 if field.serialize:
-                    if (
-                        self.selected_fields is None
-                        or field.attname in self.selected_fields
-                    ):
+                    if field_is_selected(field.attname):
                         self.handle_m2m_field(obj, field)
+            if self.extra_fields:
+                for field in self.extra_fields:
+                    self.handle_extra_attr(obj, field)
             self.end_object(obj)
             progress_bar.update(count)
             self.first = self.first and False
@@ -205,6 +203,14 @@ class Serializer:
         """
         raise NotImplementedError(
             "subclasses of Serializer must provide a handle_field() method"
+        )
+
+    def handle_attr(self, obj, attr):
+        """
+        Called to handle a non-field attribute on an object.
+        """
+        raise NotImplementedError(
+            "subclasses of Serializer must provide a handle_attr() method"
         )
 
     def handle_fk_field(self, obj, field):

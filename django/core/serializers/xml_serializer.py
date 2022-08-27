@@ -11,6 +11,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
+from django.utils.encoding import force_str
 from django.utils.xmlutils import SimplerXMLGenerator, UnserializableContentError
 
 
@@ -97,6 +98,17 @@ class Serializer(base.Serializer):
         else:
             self.xml.addQuickElement("None")
 
+        self.xml.endElement("field")
+
+    def handle_extra_attr(self, obj, field):
+        self.indent(2)
+        self.xml.startElement(
+            "field",
+            {
+                "name": field,
+            },
+        )
+        self.xml.characters(force_str(getattr(obj, field)))
         self.xml.endElement("field")
 
     def handle_fk_field(self, obj, field):
