@@ -710,6 +710,7 @@ To find the earliest year an entry was published, we can issue the query::
 This example finds the value of the highest rated entry and the total number
 of comments on all entries for each year::
 
+    >>> from django.db.models import OuterRef, Subquery, Sum
     >>> Entry.objects.values('pub_date__year').annotate(
     ...     top_rating=Subquery(
     ...         Entry.objects.filter(
