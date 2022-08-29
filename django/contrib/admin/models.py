@@ -14,12 +14,6 @@ ADDITION = 1
 CHANGE = 2
 DELETION = 3
 
-ACTION_FLAG_CHOICES = (
-    (ADDITION, _("Addition")),
-    (CHANGE, _("Change")),
-    (DELETION, _("Deletion")),
-)
-
 
 class LogEntryManager(models.Manager):
     use_in_migrations = True
@@ -46,6 +40,13 @@ class LogEntryManager(models.Manager):
 
 
 class LogEntry(models.Model):
+    
+    class ActionFlagChoices(models.TextChoices):
+        ADDITION = _("Addition")
+        CHANGE = _("Change")
+        DELETION = _("Deletion")  
+    
+    
     action_time = models.DateTimeField(
         _("action time"),
         default=timezone.now,
@@ -68,7 +69,7 @@ class LogEntry(models.Model):
     # (https://docs.python.org/library/functions.html#repr)
     object_repr = models.CharField(_("object repr"), max_length=200)
     action_flag = models.PositiveSmallIntegerField(
-        _("action flag"), choices=ACTION_FLAG_CHOICES
+        _("action flag"), choices=ActionFlagChoices.choices
     )
     # change_message is either a string or a JSON structure
     change_message = models.TextField(_("change message"), blank=True)
