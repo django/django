@@ -1557,6 +1557,20 @@ class WindowFunctionTests(TestCase):
                 )
             )
 
+    def test_invalid_filter(self):
+        msg = (
+            "Heterogeneous disjunctive predicates against window functions are not "
+            "implemented when performing conditional aggregation."
+        )
+        qs = Employee.objects.annotate(
+            window=Window(Rank()),
+            past_dept_cnt=Count("past_departments"),
+        )
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            list(qs.filter(Q(window=1) | Q(department="Accounting")))
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            list(qs.exclude(window=1, department="Accounting"))
+
 
 class WindowUnsupportedTests(TestCase):
     def test_unsupported_backend(self):
@@ -1612,20 +1626,6 @@ class NonQueryWindowTests(SimpleTestCase):
         msg = "Subclasses must implement window_frame_start_end()."
         with self.assertRaisesMessage(NotImplementedError, msg):
             frame.window_frame_start_end(None, None, None)
-
-    def test_invalid_filter(self):
-        msg = (
-            "Heterogeneous disjunctive predicates against window functions are not "
-            "implemented when performing conditional aggregation."
-        )
-        qs = Employee.objects.annotate(
-            window=Window(Rank()),
-            past_dept_cnt=Count("past_departments"),
-        )
-        with self.assertRaisesMessage(NotImplementedError, msg):
-            list(qs.filter(Q(window=1) | Q(department="Accounting")))
-        with self.assertRaisesMessage(NotImplementedError, msg):
-            list(qs.exclude(window=1, department="Accounting"))
 
     def test_invalid_order_by(self):
         msg = (
