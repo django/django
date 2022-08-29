@@ -1074,12 +1074,12 @@ class OperationTests(OperationTestBase):
                 ),
             ],
         )
-        new_state = project_state.clone()
-        operation = migrations.RenameModel("Pony", "PinkPony")
-        operation.state_forwards(app_label, new_state)
-        with connection.schema_editor() as editor:
-            operation.database_forwards(app_label, editor, project_state, new_state)
-
+        new_state = self.apply_operations(
+            app_label,
+            project_state,
+            operations=[migrations.RenameModel("Pony", "PinkPony")],
+            atomic=connection.features.supports_atomic_references_rename,
+        )
         Pony = new_state.apps.get_model(app_label, "PinkPony")
         Rider = new_state.apps.get_model(app_label, "Rider")
         pony = Pony.objects.create()
