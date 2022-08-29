@@ -43,6 +43,8 @@ Minor features
   <django/contrib/admin/templates/admin/delete_confirmation.html>` template now
   has some additional blocks and scripting hooks to ease customization.
 
+* jQuery is upgraded from version 3.6.0 to 3.6.1.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
