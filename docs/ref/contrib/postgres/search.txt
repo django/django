@@ -265,10 +265,6 @@ the search vector you wish to use. For example::
         name='search_vector_idx',
     )
 
-In this case, it's important to specify the ``config`` argument in
-``SearchVector`` because otherwise PostgreSQL will consider the function
-mutable and will throw an error.
-
 The PostgreSQL documentation has details on
 `creating indexes for full text search
 <https://www.postgresql.org/docs/current/textsearch-tables.html#TEXTSEARCH-TABLES-INDEX>`_.
