@@ -260,7 +260,10 @@ particular model, you can create a functional
 :class:`GiST <django.contrib.postgres.indexes.GistIndex>` index which matches
 the search vector you wish to use. For example::
 
-    GinIndex(SearchVector('body_text'), name='body_search_vector_idx')
+    GinIndex(
+        SearchVector('body_text', 'headline', config='english'),
+        name='search_vector_idx',
+    )
 
 The PostgreSQL documentation has details on
 `creating indexes for full text search
