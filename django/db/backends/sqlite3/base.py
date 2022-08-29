@@ -301,7 +301,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     for column_name, (
                         referenced_column_name,
                         referenced_table_name,
-                    ) in relations:
+                    ) in relations.items():
                         cursor.execute(
                             """
                             SELECT REFERRING.`%s`, REFERRING.`%s` FROM `%s` as REFERRING
