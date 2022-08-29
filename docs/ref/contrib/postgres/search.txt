@@ -254,8 +254,6 @@ however, if you're searching more than a few hundred records, you're likely to
 run into performance problems. Full text search is a more intensive process
 than comparing the size of an integer, for example.
 
-.. versionadded:: 3.2
-
 In the event that all the fields you're querying on are contained within one
 particular model, you can create a functional
 :class:`GIN <django.contrib.postgres.indexes.GinIndex>` or
