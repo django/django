@@ -261,7 +261,7 @@ particular model, you can create a functional
 the search vector you wish to use. For example::
 
     GinIndex(
-        SearchVector('first_name', 'last_name', config='english'),
+        SearchVector('body_text', 'headline', config='english'),
         name='search_vector_idx',
     )
 
