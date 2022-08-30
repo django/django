@@ -4,6 +4,7 @@ from django import forms
 from django.core import checks, exceptions
 from django.db import NotSupportedError, connections, router
 from django.db.models import lookups
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import TextField
 from django.db.models.lookups import PostgresOperatorLookup, Transform
 from django.utils.translation import gettext_lazy as _
@@ -378,6 +379,18 @@ class KeyTextTransform(KeyTransform):
             lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
             json_path = compile_json_path(key_transforms)
             return "(%s ->> %%s)" % lhs, tuple(params) + (json_path,)
+
+    @classmethod
+    def from_lookup(cls, lookup):
+        transform, *keys = lookup.split(LOOKUP_SEP)
+        if not keys:
+            raise ValueError("Lookup must contain key or index transforms.")
+        for key in keys:
+            transform = cls(key, transform)
+        return transform
+
+
+KT = KeyTextTransform.from_lookup
 
 
 class KeyTransformTextLookupMixin:
