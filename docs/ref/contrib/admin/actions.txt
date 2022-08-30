@@ -149,6 +149,24 @@ That code will give us an admin change list that looks something like this:
 
 .. image:: _images/adding-actions-to-the-modeladmin.png
 
+Actions are also available in the admin object detail page. We can adjust the
+description to show we are only talking about a single object::
+
+    @admin.action(
+        description="Mark selected story as published",
+        description_plural="Mark selected stories as published",
+    )
+    def make_published(modeladmin, request, queryset):
+        pass
+
+This will give us an admin object detail page that looks like this:
+
+.. image:: _images/adding-actions-to-the-modeladmin-detail-view.png
+
+.. versionchanged:: 6.0
+
+    Actions where added to the admin object detail page.
+
 That's really all there is to it! If you're itching to write your own actions,
 you now know enough to get started. The rest of this document covers more
 advanced techniques.
