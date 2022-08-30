@@ -371,7 +371,7 @@ the ``location`` method of the sitemap. For example::
     from django.contrib import sitemaps
     from django.urls import reverse
 
-    class StaticViewSitemap(sitemaps.Sitemap):
+    class StaticViewSitemap(Sitemap):
         priority = 0.5
         changefreq = 'daily'
 
@@ -388,7 +388,7 @@ the ``location`` method of the sitemap. For example::
     from .sitemaps import StaticViewSitemap
     from . import views
 
-    sitemaps = {
+    sitemap = {
         'static': StaticViewSitemap,
     }
 
