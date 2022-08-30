@@ -545,3 +545,112 @@ class AdminActionsPermissionTests(TestCase):
             reverse("admin:admin_views_subscriber_changelist"), delete_confirmation_data
         )
         self.assertEqual(response.status_code, 403)
+
+
+@override_settings(ROOT_URLCONF="admin_views.urls")
+class AdminDetailActionsTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.superuser = User.objects.create_superuser(
+            username="super", password="secret", email="super@example.com"
+        )
+        cls.s1 = ExternalSubscriber.objects.create(
+            name="John Doe", email="john@example.org"
+        )
+
+    def setUp(self):
+        self.client.force_login(self.superuser)
+
+    def test_available_detail_actions(self):
+        """
+        - Action 1 has not description.
+        - Action 2 has custom description.
+        - Action 3 ("Detail download") is not displayed because user does not
+          have permission.
+        - "Delete" action is not displayed in change view because already
+          exists a button for it.
+        """
+
+        response = self.client.get(
+            reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk])
+        )
+
+        self.assertContains(
+            response,
+            """<label>Action: <select name="action" required>
+            <option value="" selected>---------</option>
+            <option value="redirect_to">Redirect to (Awesome action)</option>
+            <option value="external_mail">External mail (Another awesome
+            action)</option>
+            <option value="download">Download subscription</option>
+            <option value="no_perm">No permission to run</option>
+            </select>""",
+            html=True,
+        )
+
+    def test_detail_actions_are_not_present_in_add_view(self):
+        """
+        `add_view` inherits the same function as `change_view` but actions are
+        not present here.
+        """
+
+        response = self.client.get(reverse("admin:admin_views_externalsubscriber_add"))
+        self.assertNotContains(
+            response,
+            "<div class='actions'>",
+            html=True,
+        )
+
+    def test_update_external_subscriber_without_select_an_action(self):
+        """
+        Select an action is not required in change view.
+        """
+
+        self.client.post(
+            reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
+            {
+                "name": "Foo Bar",
+                "email": "foo@bar.com",
+                "_save": "Save",
+                "action": "",
+            },
+        )
+        external_subscriber = ExternalSubscriber.objects.get()
+        self.assertEqual(external_subscriber.name, "Foo Bar")
+        self.assertEqual(external_subscriber.email, "foo@bar.com")
+
+    def test_external_subscriber_is_not_updated_when_select_an_action(self):
+        """
+        Edit the Subscriber and then choose an action won't save the changes.
+        """
+        self.client.post(
+            reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
+            {
+                "name": "Foo Bar",
+                "email": "foo@bar.com",
+                "_save": "Save",
+                "action": "external_mail",
+            },
+        )
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, "Greetings from a function action")
+        external_subscriber = ExternalSubscriber.objects.get()
+        self.assertEqual(external_subscriber.name, "John Doe")
+        self.assertEqual(external_subscriber.email, "john@example.org")
+
+    def test_custom_function_action_streaming_response(self):
+        """
+        A custom action may return a StreamingHttpResponse with the
+        name of the External Subscriber.
+        """
+
+        response = self.client.post(
+            reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
+            {"action": "download"},
+        )
+        content = b"".join(list(response))
+        self.assertEqual(
+            content,
+            f"This is the content of the file written by {self.s1.name}".encode(),
+        )
+        self.assertEqual(response.status_code, 200)

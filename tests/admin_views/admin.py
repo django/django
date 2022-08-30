@@ -414,7 +414,13 @@ def redirect_to(modeladmin, request, selected):
 
 @admin.action(description="Download subscription")
 def download(modeladmin, request, selected):
-    buf = StringIO("This is the content of the file")
+    from django.db.models.query import QuerySet
+
+    if isinstance(selected, QuerySet):
+        buf = StringIO("This is the content of the file")
+    else:
+        buf = StringIO(f"This is the content of the file written by {selected.name}")
+
     return StreamingHttpResponse(FileWrapper(buf))
 
 

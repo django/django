@@ -5,6 +5,8 @@ from django.contrib.admin.utils import quote
 from django.urls import Resolver404, get_script_prefix, resolve
 from django.utils.http import urlencode
 
+from .base import InclusionAdminNode
+
 register = template.Library()
 
 
@@ -68,3 +70,30 @@ def add_preserved_filters(context, url, popup=False, to_field=None):
 
     parsed_url[3] = urlencode(merged_qs)
     return urlunsplit(parsed_url)
+
+
+def admin_actions(context):
+    """
+    Track the number of times the action field has been rendered on the page,
+    so we know which value to use.
+    """
+    context["action_index"] = context.get("action_index", -1) + 1
+    return context
+
+
+@register.tag(name="admin_actions")
+def admin_actions_tag(parser, token):
+    return InclusionAdminNode(
+        parser, token, func=admin_actions, template_name="actions.html"
+    )
+
+
+@register.tag(name="change_list_object_tools")
+def change_list_object_tools_tag(parser, token):
+    """Display the row of change list object tools."""
+    return InclusionAdminNode(
+        parser,
+        token,
+        func=lambda context: context,
+        template_name="change_list_object_tools.html",
+    )
