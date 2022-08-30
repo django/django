@@ -1,5 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_urls static admin_modify %}
+{% load i18n l10n admin_urls static admin_modify %}
 
 {% block title %}{% if errors %}{% translate "Error:" %} {% endif %}{{ block.super }}{% endblock %}
 {% block extrahead %}{{ block.super }}
@@ -7,7 +7,13 @@
 {{ media }}
 {% endblock %}
 
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/forms.css" %}">{% endblock %}
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static "admin/css/forms.css" %}">
+  {% if action_form %}
+  <script src="{% url 'admin:jsi18n' %}"></script>
+  {% endif %}
+{% endblock %}
 
 {% block coltype %}colM{% endblock %}
 
@@ -35,7 +41,14 @@
 {% endif %}
 {% endblock %}
 <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}{% if form_url %}action="{{ form_url }}" {% endif %}method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
-<div>
+<div id="changeform">
+{% if action_form %}
+  {% admin_actions %}
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="{{ action_checkbox_name }}" value="{{ object_id|unlocalize }}">
+  </form>
+{% endif %}
 {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
 {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
 {% if source_model %}<input type="hidden" name="{{ source_model_var }}" value="{{ source_model }}">{% endif %}
