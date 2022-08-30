@@ -1059,6 +1059,33 @@ To query for missing keys, use the ``isnull`` lookup::
     :lookup:`istartswith`, :lookup:`lt`, :lookup:`lte`, :lookup:`gt`, and
     :lookup:`gte`, as well as with :ref:`containment-and-key-lookups`.
 
+``KT()`` expressions
+~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 4.2
+
+.. module:: django.db.models.fields.json
+
+.. class:: KT(lookup)
+
+    Represents the text value of a key, index, or path transform of
+    :class:`~django.db.models.JSONField`. You can use the double underscore
+    notation in ``lookup`` to chain dictionary key and index transforms.
+
+    For example::
+
+        >>> from django.db.models.fields.json import KT
+        >>> Dog.objects.create(name="Shep", data={
+        ...     "owner": {"name": "Bob"},
+        ...     "breed": ["collie", "lhasa apso"],
+        ... })
+        <Dog: Shep>
+        >>> Dogs.objects.annotate(
+        ...     first_breed=KT("data__breed__1"),
+        ...     owner_name=KT("data__owner__name")
+        ... ).filter(first_breed__startswith="lhasa", owner_name="Bob")
+        <QuerySet [<Dog: Shep>]>
+
 .. note::
 
     Due to the way in which key-path queries work,
