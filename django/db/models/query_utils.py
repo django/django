@@ -285,14 +285,16 @@ def select_related_descend(field, restricted, requested, load_fields, reverse=Fa
             return False
     if not restricted and field.null:
         return False
-    if load_fields:
-        if field.attname not in load_fields:
-            if restricted and field.name in requested:
-                msg = (
-                    "Field %s.%s cannot be both deferred and traversed using "
-                    "select_related at the same time."
-                ) % (field.model._meta.object_name, field.name)
-                raise FieldError(msg)
+    if (
+        restricted
+        and load_fields
+        and field.name in requested
+        and field.attname not in load_fields
+    ):
+        raise FieldError(
+            f"Field {field.model._meta.object_name}.{field.name} cannot be both "
+            "deferred and traversed using select_related at the same time."
+        )
     return True
 
 
