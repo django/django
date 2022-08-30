@@ -216,6 +216,10 @@ Models
   allows performing actions that can fail after a database transaction is
   successfully committed.
 
+* The new :class:`KT() <django.db.models.fields.json.KT>` expression represents
+  the text value of a key, index, or path transform of
+  :class:`~django.db.models.JSONField`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
