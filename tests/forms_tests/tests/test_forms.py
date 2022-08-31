@@ -2724,7 +2724,7 @@ Options: <select multiple name="options" required>
 
         # Rollback initial data
         form.set_initial_data()
-        self.assertEqual(form.data['initial-name'], form.data['name'])
+        self.assertEqual(form.data["initial-name"], form.data["name"])
 
     def test_changed_data(self):
         class Person(Form):

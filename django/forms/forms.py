@@ -546,7 +546,7 @@ class BaseForm(RenderableFormMixin):
         _mutable = self.data._mutable
         self.data._mutable = True
 
-        initial_prefix = 'initial-'
+        initial_prefix = "initial-"
         for key in self.data.keys():
             if initial_prefix + key in self.data:
                 self.data[key] = self.data[initial_prefix + key]
