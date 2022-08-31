@@ -343,22 +343,6 @@ transform do not change. For example::
     valid for a given field. This can be done using the
     :class:`~django.contrib.postgres.validators.KeysValidator`.
 
-KeyTransform() expression
--------------------------
-
-.. class:: hstore.KeyTransform(key_name, *args, **kwargs)
-
-Returns the value of the given ``key_name``. This allows you to annotate a key
-value. For example::
-
-    >>> from django.contrib.postgres.fields.hstore import KeyTransform
-    >>> Dog.objects.create(name="Rufus", data={"breed": "labrador"})
-    >>> Dog.objects.create(name="Meg", data={"breed": "collie", "owner": "Bob"})
-
-    >>> rufus = Dog.objects.annotate(breed=KeyTransform("breed", "data"))[0]
-    >>> rufus.breed
-    'labrador'
-
 Querying ``HStoreField``
 ------------------------
 
@@ -394,6 +378,13 @@ You can chain other lookups after key lookups::
 
     >>> Dog.objects.filter(data__breed__contains='l')
     <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
+
+or use ``F()`` expressions to annotate a key value. For example::
+
+    >>> from django.db.models import F
+    >>> rufus = Dog.objects.annotate(breed=F("data__breed"))[0]
+    >>> rufus.breed
+    'labrador'
 
 If the key you wish to query by clashes with the name of another lookup, you
 need to use the :lookup:`hstorefield.contains` lookup instead.
