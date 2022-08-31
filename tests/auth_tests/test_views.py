@@ -1519,9 +1519,9 @@ class ChangelistTests(AuthViewsTestCase):
         # ReadOnlyPasswordHashWidget is used to render the field.
         self.assertContains(
             response,
-            "<strong>algorithm</strong>: %s\n\n"
-            "<strong>salt</strong>: %s********************\n\n"
-            "<strong>hash</strong>: %s**************************\n\n"
+            "<strong>algorithm</strong>: <bdi>%s</bdi>\n\n"
+            "<strong>salt</strong>: <bdi>%s********************</bdi>\n\n"
+            "<strong>hash</strong>: <bdi>%s**************************</bdi>\n\n"
             % (
                 algo,
                 salt[:2],
