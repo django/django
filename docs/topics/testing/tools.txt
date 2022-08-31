@@ -257,8 +257,11 @@ Use the ``django.test.Client`` class to make requests.
         For example::
 
             >>> from io import BytesIO
-            >>> img = BytesIO(b'mybinarydata')
-            >>> img.name = 'myimage.jpg'
+            >>> img = BytesIO(
+            ...     b"GIF89a\x01\x00\x01\x00\x00\x00\x00!\xf9\x04\x01\x00\x00\x00"
+            ...     b"\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x01\x00\x00"
+            ... )
+            >>> img.name = "myimage.gif"
 
         Note that if you wish to use the same file handle for multiple
         ``post()`` calls then you will need to manually reset the file
