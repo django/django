@@ -533,6 +533,26 @@ class BaseForm(RenderableFormMixin):
             value = value.replace(microsecond=0)
         return value
 
+    def set_initial_data(self):
+        """
+        After validation check fails, Set form's data as initial data.
+
+        If validation check fails, data is overwritten with the entered value.
+        This leads to change of initial data value(entered value)
+        which causes the problem of not detecting values.
+
+        So, for detect value change after form is invalidated set data as initial data.
+        """
+        _mutable = self.data._mutable
+        self.data._mutable = True
+
+        initial_prefix = 'initial-'
+        for key in self.data.keys():
+            if initial_prefix + key in self.data:
+                self.data[key] = self.data[initial_prefix + key]
+
+        self.data._mutable = _mutable
+
 
 class Form(BaseForm, metaclass=DeclarativeFieldsMetaclass):
     "A collection of Fields, plus their associated data."

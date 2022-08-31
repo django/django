@@ -1807,6 +1807,7 @@ class ModelAdmin(BaseModelAdmin):
                     return self.response_change(request, new_object)
             else:
                 form_validated = False
+                form.set_initial_data()
         else:
             if add:
                 initial = self.get_changeform_initial_data(request)
