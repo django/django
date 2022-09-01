@@ -4,6 +4,8 @@ from datetime import date, datetime
 
 from django.core.exceptions import FieldError
 from django.db import connection, models
+from django.db.models.fields.related_lookups import RelatedGreaterThan
+from django.db.models.lookups import EndsWith, StartsWith
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import register_lookup
 from django.utils import timezone
@@ -218,6 +220,18 @@ class DateTimeTransform(models.Transform):
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
         return "from_unixtime({})".format(lhs), params
+
+
+class CustomStartsWith(StartsWith):
+    lookup_name = "sw"
+
+
+class CustomEndsWith(EndsWith):
+    lookup_name = "ew"
+
+
+class RelatedMoreThan(RelatedGreaterThan):
+    lookup_name = "rmt"
 
 
 class LookupTests(TestCase):
@@ -647,3 +661,35 @@ class SubqueryTransformTests(TestCase):
                 id__in=Author.objects.filter(age__div3=2)
             )
             self.assertSequenceEqual(qs, [a2])
+
+
+class RegisterLookupTests(SimpleTestCase):
+    def test_class_lookup(self):
+        author_name = Author._meta.get_field("name")
+        with register_lookup(models.CharField, CustomStartsWith):
+            self.assertEqual(author_name.get_lookup("sw"), CustomStartsWith)
+        self.assertIsNone(author_name.get_lookup("sw"))
+
+    def test_lookup_on_transform(self):
+        transform = Div3Transform
+        with register_lookup(Div3Transform, CustomStartsWith):
+            with register_lookup(Div3Transform, CustomEndsWith):
+                self.assertEqual(
+                    transform.get_lookups(),
+                    {"sw": CustomStartsWith, "ew": CustomEndsWith},
+                )
+            self.assertEqual(transform.get_lookups(), {"sw": CustomStartsWith})
+        self.assertEqual(transform.get_lookups(), {})
+
+    def test_transform_on_field(self):
+        author_age = Author._meta.get_field("age")
+        with register_lookup(models.IntegerField, Div3Transform):
+            self.assertEqual(author_age.get_transform("div3"), Div3Transform)
+        self.assertIsNone(author_age.get_transform("div3"))
+
+    def test_related_lookup(self):
+        article_author = Article._meta.get_field("author")
+        with register_lookup(models.Field, CustomStartsWith):
+            self.assertIsNone(article_author.get_lookup("sw"))
+        with register_lookup(models.ForeignKey, RelatedMoreThan):
+            self.assertEqual(article_author.get_lookup("rmt"), RelatedMoreThan)
