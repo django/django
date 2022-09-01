@@ -55,3 +55,7 @@ Bugfixes
 
 * Fixed a regression in Django 4.1 that caused a migration crash on SQLite <
   3.20 (:ticket:`33960`).
+
+* Fixed a regression in Django 4.1 that caused an admin crash when the
+  :mod:`~django.contrib.admindocs` app was used (:ticket:`33955`,
+  :ticket:`33971`).
