@@ -1,7 +1,7 @@
 import copy
-from collections import defaultdict
 import json
 import re
+from collections import defaultdict
 from functools import partial, update_wrapper
 from urllib.parse import quote as urlquote
 
@@ -1030,7 +1030,7 @@ class ModelAdmin(BaseModelAdmin):
         choices = [] + default_choices
         for func, name, description in self.get_actions(request).values():
             choice = (name, description % model_format_dict(self.opts))
-            choices[getattr(func, 'action_group', None)].append(choice)
+            choices[getattr(func, "action_group", None)].append(choice)
         return list(choices.items())
 
     def get_action(self, action):
