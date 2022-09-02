@@ -172,6 +172,12 @@ class URLTranslationTests(URLTestCaseBase):
             self.assertEqual(translate_url('/nl/gebruikers/', 'en'), '/en/users/')
             self.assertEqual(translation.get_language(), 'nl')
 
+    def test_locale_not_interepreted_as_regex(self):
+        with translation.override("e("):
+            # Would previously error:
+            # re.error: missing ), unterminated subpattern at position 1
+            reverse("users")
+
 
 class URLNamespaceTests(URLTestCaseBase):
     """

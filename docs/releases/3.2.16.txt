@@ -6,4 +6,8 @@ Django 3.2.16 release notes
 
 Django 3.2.16 fixes a security issue with severity "medium" in 3.2.15.
 
-...
+CVE-2022-41323: Potential denial-of-service vulnerability in internationalized URLs
+===================================================================================
+
+Internationalized URLs were subject to potential denial of service attack via
+the locale parameter.
