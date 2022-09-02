@@ -6,4 +6,8 @@ Django 4.0.8 release notes
 
 Django 4.0.8 fixes a security issue with severity "medium" in 4.0.7.
 
-...
+CVE-2022-41323: Potential denial-of-service vulnerability in internationalized URLs
+===================================================================================
+
+Internationalized URLs were subject to potential denial of service attack via
+the locale parameter.

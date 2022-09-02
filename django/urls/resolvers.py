@@ -346,7 +346,7 @@ class LocalePrefixPattern:
     @property
     def regex(self):
         # This is only used by reverse() and cached in _reverse_dict.
-        return re.compile(self.language_prefix)
+        return re.compile(re.escape(self.language_prefix))
 
     @property
     def language_prefix(self):
