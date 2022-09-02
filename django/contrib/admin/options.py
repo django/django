@@ -1,4 +1,5 @@
 import copy
+from collections import defaultdict
 import json
 import re
 from functools import partial, update_wrapper
@@ -1024,11 +1025,13 @@ class ModelAdmin(BaseModelAdmin):
         Return a list of choices for use in a form object.  Each choice is a
         tuple (name, description).
         """
+        choices = defaultdict(list)
+        choices[None].extend(default_choices)
         choices = [] + default_choices
         for func, name, description in self.get_actions(request).values():
             choice = (name, description % model_format_dict(self.opts))
-            choices.append(choice)
-        return choices
+            choices[getattr(func, 'action_group', None)].append(choice)
+        return list(choices.items())
 
     def get_action(self, action):
         """

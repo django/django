@@ -1,4 +1,4 @@
-def action(function=None, *, permissions=None, description=None):
+def action(function=None, *, permissions=None, description=None, group=None):
     """
     Conveniently add attributes to an action function::
 
@@ -23,6 +23,8 @@ def action(function=None, *, permissions=None, description=None):
             func.allowed_permissions = permissions
         if description is not None:
             func.short_description = description
+        if group is not None:
+            func.action_group = group
         return func
 
     if function is None:
