@@ -2308,11 +2308,13 @@ This has a number of caveats though:
 
     batch_size = 100
     objs = (Entry(headline='Test %s' % i) for i in range(1000))
+    i = 0
     while True:
-        batch = list(islice(objs, batch_size))
+        batch = list(islice(objs, batch_size * i, batch_size * (i + 1)))
         if not batch:
             break
         Entry.objects.bulk_create(batch, batch_size)
+        i += 1
 
 The ``batch_size`` parameter controls how many objects are created in a single
 query. The default is to create all objects in one batch, except for SQLite
