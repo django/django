@@ -107,8 +107,9 @@ class BaseDatabaseWrapper:
         self._thread_ident = _thread.get_ident()
 
         # A list of no-argument functions to run when the transaction commits.
-        # Each entry is an (sids, func) tuple, where sids is a set of the
-        # active savepoint IDs when this function was registered.
+        # Each entry is an (sids, func, robust) tuple, where sids is a set of
+        # the active savepoint IDs when this function was registered and robust
+        # specifies whether it's allowed for the function to fail.
         self.run_on_commit = []
 
         # Should we run the on-commit hooks the next time set_autocommit(True)
