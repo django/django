@@ -64,7 +64,13 @@ and two directions (forward and reverse) for a total of six combinations.
 """
 
 from django.core.exceptions import FieldError
-from django.db import DEFAULT_DB_ALIAS, connections, router, transaction
+from django.db import (
+    DEFAULT_DB_ALIAS,
+    NotSupportedError,
+    connections,
+    router,
+    transaction,
+)
 from django.db.models import F, Q, Window, signals
 from django.db.models.functions import RowNumber
 from django.db.models.lookups import GreaterThan, LessThanOrEqual
@@ -85,13 +91,16 @@ class ForeignKeyDeferredAttribute(DeferredAttribute):
 
 def _filter_prefetch_queryset(queryset, field_name, instances):
     predicate = Q(**{f"{field_name}__in": instances})
+    db = queryset._db or DEFAULT_DB_ALIAS
     if queryset.query.is_sliced:
+        if not connections[db].features.supports_over_clause:
+            raise NotSupportedError(
+                "Prefetching from a limited queryset is only supported on backends "
+                "that support window functions."
+            )
         low_mark, high_mark = queryset.query.low_mark, queryset.query.high_mark
         order_by = [
-            expr
-            for expr, _ in queryset.query.get_compiler(
-                using=queryset._db or DEFAULT_DB_ALIAS
-            ).get_order_by()
+            expr for expr, _ in queryset.query.get_compiler(using=db).get_order_by()
         ]
         window = Window(RowNumber(), partition_by=field_name, order_by=order_by)
         predicate &= GreaterThan(window, low_mark)
