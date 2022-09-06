@@ -118,9 +118,9 @@ class AdminEmailHandler(logging.Handler):
             exc_info = record.exc_info
         else:
             exc_info = (
-                record.exc_class if hasattr(record, 'exc_class') else None, 
+                record.exc_class if hasattr(record, "exc_class") else None,
                 record.getMessage(),
-                None
+                None,
             )
 
         reporter = self.reporter_class(request, is_email=True, *exc_info)

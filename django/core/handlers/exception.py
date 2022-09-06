@@ -123,7 +123,7 @@ def response_for_exception(request, exc):
         )
         security_logger.error(
             str(exc),
-            extra={"status_code": 400, "request": request, 'exc_class': exc.__class__},
+            extra={"status_code": 400, "request": request, "exc_class": exc.__class__},
         )
         if settings.DEBUG:
             response = debug.technical_500_response(

@@ -108,7 +108,7 @@ class LoggingAssertionMixin:
             self.assertEqual(record.getMessage(), msg)
             self.assertEqual(record.status_code, status_code)
             if exc_class:
-                if hasattr(record, 'exc_info') and record.exc_info != None:
+                if hasattr(record, "exc_info") and record.exc_info is not None:
                     self.assertEqual(record.exc_info[0], exc_class)
                 else:
                     self.assertEqual(record.exc_class, exc_class)
