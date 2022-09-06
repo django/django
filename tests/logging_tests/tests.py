@@ -108,8 +108,10 @@ class LoggingAssertionMixin:
             self.assertEqual(record.getMessage(), msg)
             self.assertEqual(record.status_code, status_code)
             if exc_class:
-                self.assertIsNotNone(record.exc_info)
-                self.assertEqual(record.exc_info[0], exc_class)
+                if hasattr(record, 'exc_info') and record.exc_info != None:
+                    self.assertEqual(record.exc_info[0], exc_class)
+                else:
+                    self.assertEqual(record.exc_class, exc_class)
 
 
 @override_settings(DEBUG=True, ROOT_URLCONF="logging_tests.urls")
