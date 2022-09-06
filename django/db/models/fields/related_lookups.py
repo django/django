@@ -93,7 +93,6 @@ class RelatedIn(In):
             elif not getattr(self.rhs, "has_select_fields", True) and not getattr(
                 self.lhs.field.target_field, "primary_key", False
             ):
-                self.rhs.clear_select_clause()
                 if (
                     getattr(self.lhs.output_field, "primary_key", False)
                     and self.lhs.output_field.model == self.rhs.model
@@ -105,7 +104,7 @@ class RelatedIn(In):
                     target_field = self.lhs.field.name
                 else:
                     target_field = self.lhs.field.target_field.name
-                self.rhs.add_fields([target_field], True)
+                self.rhs.set_values([target_field])
         return super().get_prep_lookup()
 
     def as_sql(self, compiler, connection):
