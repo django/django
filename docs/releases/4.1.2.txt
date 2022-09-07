@@ -9,4 +9,5 @@ Django 4.1.2 fixes several bugs in 4.1.1.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 4.1 that caused a migration crash on PostgreSQL
+  when adding a model with ``ExclusionConstraint`` (:ticket:`33982`).
