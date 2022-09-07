@@ -10,12 +10,14 @@ from django.db.models import (
     F,
     Func,
     IntegerField,
+    Model,
     Q,
     UniqueConstraint,
 )
 from django.db.models.fields.json import KeyTextTransform
 from django.db.models.functions import Cast, Left, Lower
 from django.test import ignore_warnings, modify_settings, skipUnlessDBFeature
+from django.test.utils import isolate_apps
 from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango50Warning
 
@@ -1150,6 +1152,29 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.add_constraint(Room, constraint)
         self.assertIn(constraint_name, self.get_constraints(Room._meta.db_table))
+
+    @isolate_apps("postgres_tests")
+    def test_table_create(self):
+        constraint_name = "exclusion_equal_number_tc"
+
+        class ModelWithExclusionConstraint(Model):
+            number = IntegerField()
+
+            class Meta:
+                app_label = "postgres_tests"
+                constraints = [
+                    ExclusionConstraint(
+                        name=constraint_name,
+                        expressions=[("number", RangeOperators.EQUAL)],
+                    )
+                ]
+
+        with connection.schema_editor() as editor:
+            editor.create_model(ModelWithExclusionConstraint)
+        self.assertIn(
+            constraint_name,
+            self.get_constraints(ModelWithExclusionConstraint._meta.db_table),
+        )
 
 
 @modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
