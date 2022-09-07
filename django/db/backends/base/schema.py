@@ -269,7 +269,9 @@ class BaseDatabaseSchemaEditor:
         sql = self.sql_create_table % {
             "table": self.quote_name(model._meta.db_table),
             "definition": ", ".join(
-                constraint for constraint in (*column_sqls, *constraints) if constraint
+                str(constraint)
+                for constraint in (*column_sqls, *constraints)
+                if constraint
             ),
         }
         if model._meta.db_tablespace:
