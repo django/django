@@ -156,9 +156,7 @@ class SchemaTests(PostgreSQLTestCase):
             check=Q(ints__startswith__gte=0),
             name="ints_positive_range",
         )
-        msg = f"Constraint “{constraint.name}” is violated."
-        with self.assertRaisesMessage(ValidationError, msg):
-            constraint.validate(RangesModel, RangesModel())
+        constraint.validate(RangesModel, RangesModel())
 
     def test_opclass(self):
         constraint = UniqueConstraint(
