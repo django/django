@@ -803,8 +803,9 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertIs(response.context["cl"].has_related_field_in_list_display(), False)
 
     def test_limited_filter(self):
-        """Ensure admin changelist filters do not contain objects excluded via limit_choices_to.
-        This also tests relation-spanning filters (e.g. 'color__value').
+        """
+        Admin changelist filters do not contain objects excluded via
+        limit_choices_to.
         """
         response = self.client.get(reverse("admin:admin_views_thing_changelist"))
         self.assertContains(
@@ -6165,7 +6166,20 @@ class SeleniumTests(AdminSeleniumTestCase):
         ]
         self.assertEqual(
             fonts,
-            ["Roboto", "Lucida Grande", "Verdana", "Arial", "sans-serif"],
+            [
+                "-apple-system",
+                "BlinkMacSystemFont",
+                "Segoe UI",
+                "system-ui",
+                "Roboto",
+                "Helvetica Neue",
+                "Arial",
+                "sans-serif",
+                "Apple Color Emoji",
+                "Segoe UI Emoji",
+                "Segoe UI Symbol",
+                "Noto Color Emoji",
+            ],
         )
 
     def test_search_input_filtered_page(self):
@@ -6430,6 +6444,45 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(traveler.born_country.name, "Argentina")
         self.assertEqual(traveler.living_country.name, "Italy")
         self.assertEqual(traveler.favorite_country_to_vacation.name, "Qatar")
+
+    def test_redirect_on_add_view_add_another_button(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        add_url = reverse("admin7:admin_views_section_add")
+        self.selenium.get(self.live_server_url + add_url)
+        name_input = self.selenium.find_element(By.ID, "id_name")
+        name_input.send_keys("Test section 1")
+        self.selenium.find_element(
+            By.XPATH, '//input[@value="Save and add another"]'
+        ).click()
+        self.assertEqual(Section.objects.count(), 1)
+        name_input = self.selenium.find_element(By.ID, "id_name")
+        name_input.send_keys("Test section 2")
+        self.selenium.find_element(
+            By.XPATH, '//input[@value="Save and add another"]'
+        ).click()
+        self.assertEqual(Section.objects.count(), 2)
+
+    def test_redirect_on_add_view_continue_button(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        add_url = reverse("admin7:admin_views_section_add")
+        self.selenium.get(self.live_server_url + add_url)
+        name_input = self.selenium.find_element(By.ID, "id_name")
+        name_input.send_keys("Test section 1")
+        self.selenium.find_element(
+            By.XPATH, '//input[@value="Save and continue editing"]'
+        ).click()
+        self.assertEqual(Section.objects.count(), 1)
+        name_input = self.selenium.find_element(By.ID, "id_name")
+        name_input_value = name_input.get_attribute("value")
+        self.assertEqual(name_input_value, "Test section 1")
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")

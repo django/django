@@ -25,6 +25,7 @@ class ArrayField(CheckFieldDefaultMixin, Field):
 
     def __init__(self, base_field, size=None, **kwargs):
         self.base_field = base_field
+        self.db_collation = getattr(self.base_field, "db_collation", None)
         self.size = size
         if self.size:
             self.default_validators = [
@@ -67,18 +68,35 @@ class ArrayField(CheckFieldDefaultMixin, Field):
             )
         else:
             # Remove the field name checks as they are not needed here.
-            base_errors = self.base_field.check()
-            if base_errors:
-                messages = "\n    ".join(
-                    "%s (%s)" % (error.msg, error.id) for error in base_errors
+            base_checks = self.base_field.check()
+            if base_checks:
+                error_messages = "\n    ".join(
+                    "%s (%s)" % (base_check.msg, base_check.id)
+                    for base_check in base_checks
+                    if isinstance(base_check, checks.Error)
                 )
-                errors.append(
-                    checks.Error(
-                        "Base field for array has errors:\n    %s" % messages,
-                        obj=self,
-                        id="postgres.E001",
+                if error_messages:
+                    errors.append(
+                        checks.Error(
+                            "Base field for array has errors:\n    %s" % error_messages,
+                            obj=self,
+                            id="postgres.E001",
+                        )
                     )
+                warning_messages = "\n    ".join(
+                    "%s (%s)" % (base_check.msg, base_check.id)
+                    for base_check in base_checks
+                    if isinstance(base_check, checks.Warning)
                 )
+                if warning_messages:
+                    errors.append(
+                        checks.Warning(
+                            "Base field for array has warnings:\n    %s"
+                            % warning_messages,
+                            obj=self,
+                            id="postgres.W004",
+                        )
+                    )
         return errors
 
     def set_attributes_from_name(self, name):
@@ -96,6 +114,11 @@ class ArrayField(CheckFieldDefaultMixin, Field):
     def cast_db_type(self, connection):
         size = self.size or ""
         return "%s[%s]" % (self.base_field.cast_db_type(connection), size)
+
+    def db_parameters(self, connection):
+        db_params = super().db_parameters(connection)
+        db_params["collation"] = self.db_collation
+        return db_params
 
     def get_placeholder(self, value, compiler, connection):
         return "%s::{}".format(self.db_type(connection))

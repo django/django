@@ -573,7 +573,7 @@ require translation in the future::
 
     <title>{% translate "myvar" noop %}</title>
 
-Internally, inline translations use an
+Internally, inline translations use a
 :func:`~django.utils.translation.gettext` call.
 
 In case a template var (``myvar`` above) is passed to the tag, the tag will
@@ -649,8 +649,8 @@ You can use multiple expressions inside a single ``blocktranslate`` tag::
 .. note:: The previous more verbose format is still supported:
    ``{% blocktranslate with book|title as book_t and author|title as author_t %}``
 
-Other block tags (for example ``{% for %}`` or ``{% if %}``) are not allowed
-inside a ``blocktranslate`` tag.
+Other block tags (for example :ttag:`{% for %}<for>` or :ttag:`{% if %}<if>`) are
+not allowed inside a ``blocktranslate`` tag.
 
 If resolving one of the block arguments fails, ``blocktranslate`` will fall
 back to the default language by deactivating the currently active language
@@ -2080,7 +2080,7 @@ translations for the same literal:
 #. Then, it looks for and uses if it exists a ``locale`` directory in each
    of the installed apps listed in :setting:`INSTALLED_APPS`.  The ones
    appearing first have higher precedence than the ones appearing later.
-#. Finally, the Django-provided base translation in ``django/conf/locale``
+#. Finally, the Django-provided base translation in :source:`django/conf/locale`
    is used as a fallback.
 
 .. seealso::

@@ -4,10 +4,12 @@ Django 4.0.7 release notes
 
 *August 3, 2022*
 
-Django 4.0.7 fixes a security issue with severity "high" and several bugs in
-4.0.6.
+Django 4.0.7 fixes a security issue with severity "high" in 4.0.6.
 
-Bugfixes
-========
+CVE-2022-36359: Potential reflected file download vulnerability in ``FileResponse``
+===================================================================================
 
-* ...
+An application may have been vulnerable to a reflected file download (RFD)
+attack that sets the Content-Disposition header of a
+:class:`~django.http.FileResponse` when the ``filename`` was derived from
+user-supplied input. The ``filename`` is now escaped to avoid this possibility.

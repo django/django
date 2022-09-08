@@ -6,17 +6,17 @@
 # Harro van der Klauw <hvdklauw@gmail.com>, 2012
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Jeffrey Gelens <jeffrey@noppo.pro>, 2011-2012
+# 6a27f10aef159701c7a5ff07f0fb0a78_05545ed <bc5d401a7ecd9343dd5afac265ed8ab3_4845>, 2011-2012
 # Meteor0id, 2019-2020
 # 8de006b1b0894aab6aef71979dcd8bd6_5c6b207 <ff2658a8d8dbebbd9cc240b8c133a515_234097>, 2015
-# Tonnes <tonnes.mb@gmail.com>, 2019-2020
+# Tonnes <tonnes.mb@gmail.com>, 2019-2020,2022
 # wunki <petar@wunki.org>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-13 11:10+0000\n"
+"POT-Creation-Date: 2022-05-17 05:26-0500\n"
+"PO-Revision-Date: 2022-07-25 07:59+0000\n"
 "Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -192,6 +192,54 @@ msgstr "november"
 msgid "December"
 msgstr "december"
 
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "jan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "feb"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "mrt"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "mei"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "jun"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "jul"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "aug"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "sep"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "dec"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "Z"
@@ -219,6 +267,13 @@ msgstr "V"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Z"
+
+msgid ""
+"You have already submitted this form. Are you sure you want to submit it "
+"again?"
+msgstr ""
+"U hebt dit formulier al verstuurd. Weet u zeker dat u het nogmaals wilt "
+"versturen?"
 
 msgid "Show"
 msgstr "Tonen"

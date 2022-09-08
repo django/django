@@ -245,10 +245,11 @@ class FormsFormsetTestCase(SimpleTestCase):
         )
         self.assertHTMLEqual(
             "\n".join(form.as_ul() for form in formset.forms),
-            """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico"></li>
-<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>
-<li>Choice: <input type="text" name="choices-1-choice"></li>
-<li>Votes: <input type="number" name="choices-1-votes"></li>""",
+            '<li>Choice: <input type="text" name="choices-0-choice" value="Calexico">'
+            "</li>"
+            '<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>'
+            '<li>Choice: <input type="text" name="choices-1-choice"></li>'
+            '<li>Votes: <input type="number" name="choices-1-votes"></li>',
         )
 
     def test_blank_form_unfilled(self):
@@ -564,14 +565,15 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = ChoiceFormSet(initial=initial, auto_id=False, prefix="choices")
         self.assertHTMLEqual(
             "\n".join(form.as_ul() for form in formset.forms),
-            """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico"></li>
-<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>
-<li>Choice: <input type="text" name="choices-1-choice"></li>
-<li>Votes: <input type="number" name="choices-1-votes"></li>
-<li>Choice: <input type="text" name="choices-2-choice"></li>
-<li>Votes: <input type="number" name="choices-2-votes"></li>
-<li>Choice: <input type="text" name="choices-3-choice"></li>
-<li>Votes: <input type="number" name="choices-3-votes"></li>""",
+            '<li>Choice: <input type="text" name="choices-0-choice" value="Calexico">'
+            "</li>"
+            '<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>'
+            '<li>Choice: <input type="text" name="choices-1-choice"></li>'
+            '<li>Votes: <input type="number" name="choices-1-votes"></li>'
+            '<li>Choice: <input type="text" name="choices-2-choice"></li>'
+            '<li>Votes: <input type="number" name="choices-2-votes"></li>'
+            '<li>Choice: <input type="text" name="choices-3-choice"></li>'
+            '<li>Votes: <input type="number" name="choices-3-votes"></li>',
         )
         # Retrieving an empty form works. Tt shows up in the form list.
         self.assertTrue(formset.empty_form.empty_permitted)
@@ -595,15 +597,17 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = ChoiceFormSet(initial=initial, auto_id=False, prefix="choices")
         self.assertHTMLEqual(
             "\n".join(form.as_ul() for form in formset.forms),
-            """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico"></li>
-<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>
-<li>Delete: <input type="checkbox" name="choices-0-DELETE"></li>
-<li>Choice: <input type="text" name="choices-1-choice" value="Fergie"></li>
-<li>Votes: <input type="number" name="choices-1-votes" value="900"></li>
-<li>Delete: <input type="checkbox" name="choices-1-DELETE"></li>
-<li>Choice: <input type="text" name="choices-2-choice"></li>
-<li>Votes: <input type="number" name="choices-2-votes"></li>
-<li>Delete: <input type="checkbox" name="choices-2-DELETE"></li>""",
+            '<li>Choice: <input type="text" name="choices-0-choice" value="Calexico">'
+            "</li>"
+            '<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>'
+            '<li>Delete: <input type="checkbox" name="choices-0-DELETE"></li>'
+            '<li>Choice: <input type="text" name="choices-1-choice" value="Fergie">'
+            "</li>"
+            '<li>Votes: <input type="number" name="choices-1-votes" value="900"></li>'
+            '<li>Delete: <input type="checkbox" name="choices-1-DELETE"></li>'
+            '<li>Choice: <input type="text" name="choices-2-choice"></li>'
+            '<li>Votes: <input type="number" name="choices-2-votes"></li>'
+            '<li>Delete: <input type="checkbox" name="choices-2-DELETE"></li>',
         )
         # To delete something, set that form's special delete field to 'on'.
         # Let's go ahead and delete Fergie.
@@ -738,15 +742,17 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = ChoiceFormSet(initial=initial, auto_id=False, prefix="choices")
         self.assertHTMLEqual(
             "\n".join(form.as_ul() for form in formset.forms),
-            """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico"></li>
-<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>
-<li>Order: <input type="number" name="choices-0-ORDER" value="1"></li>
-<li>Choice: <input type="text" name="choices-1-choice" value="Fergie"></li>
-<li>Votes: <input type="number" name="choices-1-votes" value="900"></li>
-<li>Order: <input type="number" name="choices-1-ORDER" value="2"></li>
-<li>Choice: <input type="text" name="choices-2-choice"></li>
-<li>Votes: <input type="number" name="choices-2-votes"></li>
-<li>Order: <input type="number" name="choices-2-ORDER"></li>""",
+            '<li>Choice: <input type="text" name="choices-0-choice" value="Calexico">'
+            "</li>"
+            '<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>'
+            '<li>Order: <input type="number" name="choices-0-ORDER" value="1"></li>'
+            '<li>Choice: <input type="text" name="choices-1-choice" value="Fergie">'
+            "</li>"
+            '<li>Votes: <input type="number" name="choices-1-votes" value="900"></li>'
+            '<li>Order: <input type="number" name="choices-1-ORDER" value="2"></li>'
+            '<li>Choice: <input type="text" name="choices-2-choice"></li>'
+            '<li>Votes: <input type="number" name="choices-2-votes"></li>'
+            '<li>Order: <input type="number" name="choices-2-ORDER"></li>',
         )
         data = {
             "choices-TOTAL_FORMS": "3",  # the number of forms rendered
@@ -864,22 +870,25 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = ChoiceFormSet(initial=initial, auto_id=False, prefix="choices")
         self.assertHTMLEqual(
             "\n".join(form.as_ul() for form in formset.forms),
-            """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico"></li>
-<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>
-<li>Order: <input type="number" name="choices-0-ORDER" value="1"></li>
-<li>Delete: <input type="checkbox" name="choices-0-DELETE"></li>
-<li>Choice: <input type="text" name="choices-1-choice" value="Fergie"></li>
-<li>Votes: <input type="number" name="choices-1-votes" value="900"></li>
-<li>Order: <input type="number" name="choices-1-ORDER" value="2"></li>
-<li>Delete: <input type="checkbox" name="choices-1-DELETE"></li>
-<li>Choice: <input type="text" name="choices-2-choice" value="The Decemberists"></li>
-<li>Votes: <input type="number" name="choices-2-votes" value="500"></li>
-<li>Order: <input type="number" name="choices-2-ORDER" value="3"></li>
-<li>Delete: <input type="checkbox" name="choices-2-DELETE"></li>
-<li>Choice: <input type="text" name="choices-3-choice"></li>
-<li>Votes: <input type="number" name="choices-3-votes"></li>
-<li>Order: <input type="number" name="choices-3-ORDER"></li>
-<li>Delete: <input type="checkbox" name="choices-3-DELETE"></li>""",
+            '<li>Choice: <input type="text" name="choices-0-choice" value="Calexico">'
+            "</li>"
+            '<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>'
+            '<li>Order: <input type="number" name="choices-0-ORDER" value="1"></li>'
+            '<li>Delete: <input type="checkbox" name="choices-0-DELETE"></li>'
+            '<li>Choice: <input type="text" name="choices-1-choice" value="Fergie">'
+            "</li>"
+            '<li>Votes: <input type="number" name="choices-1-votes" value="900"></li>'
+            '<li>Order: <input type="number" name="choices-1-ORDER" value="2"></li>'
+            '<li>Delete: <input type="checkbox" name="choices-1-DELETE"></li>'
+            '<li>Choice: <input type="text" name="choices-2-choice" '
+            'value="The Decemberists"></li>'
+            '<li>Votes: <input type="number" name="choices-2-votes" value="500"></li>'
+            '<li>Order: <input type="number" name="choices-2-ORDER" value="3"></li>'
+            '<li>Delete: <input type="checkbox" name="choices-2-DELETE"></li>'
+            '<li>Choice: <input type="text" name="choices-3-choice"></li>'
+            '<li>Votes: <input type="number" name="choices-3-votes"></li>'
+            '<li>Order: <input type="number" name="choices-3-ORDER"></li>'
+            '<li>Delete: <input type="checkbox" name="choices-3-DELETE"></li>',
         )
         # Let's delete Fergie, and put The Decemberists ahead of Calexico.
         data = {
@@ -1901,3 +1910,14 @@ class DeprecationTests(SimpleTestCase):
             ChoiceFormSet = formset_factory(Choice)
             formset = ChoiceFormSet()
             str(formset)
+
+    def test_no_management_form_warning(self):
+        """
+        Management forms are already rendered with the new div template.
+        """
+        with isolate_lru_cache(get_default_renderer), self.settings(
+            FORM_RENDERER="django.forms.renderers.DjangoTemplates"
+        ):
+            ChoiceFormSet = formset_factory(Choice, formset=BaseFormSet)
+            formset = ChoiceFormSet()
+            str(formset.management_form)

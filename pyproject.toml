@@ -1,6 +1,6 @@
 [build-system]
-requires = ['setuptools>=40.8.0', 'wheel']
-build-backend = 'setuptools.build_meta:__legacy__'
+requires = ['setuptools>=40.8.0']
+build-backend = 'setuptools.build_meta'
 
 [tool.black]
 target-version = ['py38']

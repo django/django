@@ -526,11 +526,6 @@ class InlineAdminForm(AdminForm):
 
         return AdminField(self.form, DELETION_FIELD_NAME, False)
 
-    def ordering_field(self):
-        from django.forms.formsets import ORDERING_FIELD_NAME
-
-        return AdminField(self.form, ORDERING_FIELD_NAME, False)
-
 
 class InlineFieldset(Fieldset):
     def __init__(self, formset, *args, **kwargs):

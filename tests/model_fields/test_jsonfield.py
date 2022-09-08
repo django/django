@@ -370,6 +370,7 @@ class TestQuerying(TestCase):
             ).order_by("key"),
         ):
             self.assertSequenceEqual(qs, [self.objs[4]])
+        none_val = "" if connection.features.interprets_empty_strings_as_nulls else None
         qs = NullableJSONModel.objects.filter(value__isnull=False)
         self.assertQuerysetEqual(
             qs.filter(value__isnull=False)
@@ -381,7 +382,7 @@ class TestQuerying(TestCase):
             .values("key")
             .annotate(count=Count("key"))
             .order_by("count"),
-            [(None, 0), ("g", 1)],
+            [(none_val, 0), ("g", 1)],
             operator.itemgetter("key", "count"),
         )
 
@@ -493,6 +494,17 @@ class TestQuerying(TestCase):
             .filter(chain="g"),
             [self.objs[4]],
         )
+
+    def test_key_text_transform_char_lookup(self):
+        qs = NullableJSONModel.objects.annotate(
+            char_value=KeyTextTransform("foo", "value"),
+        ).filter(char_value__startswith="bar")
+        self.assertSequenceEqual(qs, [self.objs[7]])
+
+        qs = NullableJSONModel.objects.annotate(
+            char_value=KeyTextTransform(1, KeyTextTransform("bar", "value")),
+        ).filter(char_value__startswith="bar")
+        self.assertSequenceEqual(qs, [self.objs[7]])
 
     def test_expression_wrapper_key_transform(self):
         self.assertCountEqual(

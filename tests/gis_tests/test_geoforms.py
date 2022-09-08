@@ -5,6 +5,7 @@ from django.contrib.gis.forms import BaseGeometryWidget, OpenLayersWidget
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
 from django.test import SimpleTestCase, override_settings
+from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.html import escape
 
 
@@ -166,12 +167,12 @@ class GeometryFieldTest(SimpleTestCase):
 
         self.assertInHTML(
             '<textarea id="id_pt2" class="vSerializedField required" cols="150"'
-            ' rows="10" name="pt2"></textarea>',
+            ' rows="10" name="pt2" hidden></textarea>',
             output,
         )
         self.assertInHTML(
             '<textarea id="id_pt3" class="vSerializedField required" cols="150"'
-            ' rows="10" name="pt3"></textarea>',
+            ' rows="10" name="pt3" hidden></textarea>',
             output,
         )
         # Only the invalid PNT(0) triggers an error log entry.
@@ -485,3 +486,19 @@ class GeometryWidgetTests(SimpleTestCase):
         form = PointForm(data={"p": point.json})
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data["p"].srid, 4326)
+
+    def test_deprecated_width_and_height(self):
+        class CustomGeometryWidget(forms.BaseGeometryWidget):
+            map_height = 300
+            map_width = 550
+
+        msg = (
+            "The map_height and map_width widget attributes are deprecated. Please use "
+            "CSS to size map widgets."
+        )
+        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
+            CustomGeometryWidget()
+        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
+            forms.BaseGeometryWidget({"map_width": 400})
+        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
+            forms.BaseGeometryWidget({"map_height": 600})
