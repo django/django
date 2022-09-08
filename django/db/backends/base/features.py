@@ -302,6 +302,9 @@ class BaseDatabaseFeatures:
     # Does the backend support boolean expressions in SELECT and GROUP BY
     # clauses?
     supports_boolean_expr_in_select_clause = True
+    # Does the backend support comparing boolean expressions in WHERE clauses?
+    # Eg: WHERE (price > 0) IS NOT NULL
+    supports_comparing_boolean_expr = True
 
     # Does the backend support JSONField?
     supports_json_field = True
