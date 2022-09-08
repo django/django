@@ -1047,53 +1047,19 @@ To query for missing keys, use the ``isnull`` lookup::
     >>> Dog.objects.filter(data__owner__isnull=True)
     <QuerySet [<Dog: Shep>]>
 
-.. class:: json.KeyTransform(key_name, *args, **kwargs)
+.. class:: json.KT(lookup)
 
-    A :class:`~django.db.models.Transform` to access a key named ``key_name`` in a
-    :class:`~django.db.models.JSONField`. ``key_name`` could also be an integer to
-    transform into an array index. The instance of the :class:`~django.db.models.JSONField`
-    which is to be transformed should be passed in as the second argument. This would
-    return the resulting key transform which is also in the form of json.
+    A class that returns the resulting key transformed JSON in the form of text.
+    ``lookup`` argument be a string starting with the name of the
+    :class:`~django.db.models.JSONField` and subsequent key or index transforms
+    seperated by ``__`` (double underscores).
 
-    To query on a :class:`~django.db.models.JSONField`::
+    To query for ``Dog.data``::
 
-        >>> Dog.objects.create(name='Rufus', data={
-        ...     'breed': 'labrador',
-        ...     'owner': {
-        ...         'name': 'Bob',
-        ...         'other_pets': [{
-        ...             'name': 'Fishy',
-        ...         }],
-        ...     },
-        ... })
-        <Dog: Rufus>
-        >>> Dog.objects.annotate(
-        ...     breed_name=KeyTransform('breed', 'data')
-        ... ).filter(breed_name__exact='labrador')
-        <QuerySet [<Dog: Rufus>]>
-
-    Nested key transforms can also be done as follows::
-
-        >>> Dogs.objects.annotate(
-        ...     owner_other_pet_name=KeyTransform(
-        ...         'other_pets',KeyTransform('owner', 'data')
-        ...     )
-        ... ).filter(owner_other_pet_name__exact=[{'name': 'Fishy'}])
-        <QuerySet [<Dog: Rufus>]>
-
-    If the query result is needed in the form of text, use
-    :class:`~django.db.models.json.KeyTextTransform`.
-
-.. class:: json.KeyTextTransform(key_name, *args, **kwargs)
-
-    This returns the resulting key transform in the form of text. This would also
-    need to be :class:`~django.db.models.functions.Cast` to a ``TextField`` to be
-    treat the result as text.
-
-.. admonition:: Oracle and SQLite users
-
-    :class:`~django.db.models.json.KeyTextTransform` is alias to
-    :class:`~django.db.models.json.KeyTransform` for Oracle and SQLite databases.
+      >>> Dog.objects.create(name='Shep', data={'breed': ['collie', 'lhasa apso']})
+      <Dog: Shep>
+      >>> Dogs.objects.annotate(breed=KT("data__breed__1")).filter(breed='lhasa apso')
+      <QuerySet [<Dog: Shep>]>
 
 .. note::
 
