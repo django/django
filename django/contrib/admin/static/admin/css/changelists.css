@@ -231,6 +231,10 @@
     font-weight: bold;
 }
 
+.change-list .toplinks a {
+    font-size: 0.8125rem;
+}
+
 .change-list .toplinks .date-back {
     color: var(--body-quiet-color);
 }
