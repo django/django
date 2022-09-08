@@ -1313,7 +1313,7 @@ class TransactionTestCase(SimpleTestCase):
                 inhibit_post_migrate=inhibit_post_migrate,
             )
 
-    def assertQuerysetEqual(self, qs, values, transform=None, ordered=True, msg=None):
+    def assertQuerySetEqual(self, qs, values, transform=None, ordered=True, msg=None):
         values = list(values)
         items = qs
         if transform is not None:
@@ -1328,6 +1328,8 @@ class TransactionTestCase(SimpleTestCase):
                 "ordered value."
             )
         return self.assertEqual(list(items), values, msg=msg)
+
+        assertQuerysetEqual = assertQuerySetEqual
 
     def assertNumQueries(self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs):
         conn = connections[using]
