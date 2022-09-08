@@ -1663,6 +1663,17 @@ class AggregateTestCase(TestCase):
         ).values_list("publisher_count", flat=True)
         self.assertSequenceEqual(books_breakdown, [1] * 6)
 
+    def test_aggregation_exists_multivalued_outeref(self):
+        self.assertCountEqual(
+            Publisher.objects.annotate(
+                books_exists=Exists(
+                    Book.objects.filter(publisher=OuterRef("book__publisher"))
+                ),
+                books_count=Count("book"),
+            ),
+            Publisher.objects.all(),
+        )
+
     def test_filter_in_subquery_or_aggregation(self):
         """
         Filtering against an aggregate requires the usage of the HAVING clause.
