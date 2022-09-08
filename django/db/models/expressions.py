@@ -1481,6 +1481,14 @@ class Exists(Subquery):
         clone.negated = not self.negated
         return clone
 
+    def get_group_by_cols(self, alias=None):
+        # self.query only gets limited to a single row in the .exists() call
+        # from self.as_sql() so deferring to Query.get_group_by_cols() is
+        # inappropriate.
+        if alias is None:
+            return [self]
+        return super().get_group_by_cols(alias)
+
     def as_sql(self, compiler, connection, template=None, **extra_context):
         query = self.query.exists(using=connection.alias)
         try:
