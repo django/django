@@ -15,3 +15,6 @@ Bugfixes
 * Fixed a regression in Django 4.1 that caused aggregation over a queryset that
   contained an ``Exists`` annotation to crash due to too many selected columns
   (:ticket:`33992`).
+
+* Fixed a bug in Django 4.1 that caused an incorrect validation of
+  ``CheckConstraint`` on ``NULL`` values (:ticket:`33996`).

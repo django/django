@@ -64,6 +64,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_slicing_ordering_in_compound = True
     allows_multiple_constraints_on_same_fields = False
     supports_boolean_expr_in_select_clause = False
+    supports_comparing_boolean_expr = False
     supports_primitives_in_json_field = False
     supports_json_field_contains = False
     supports_collation_on_textfield = False

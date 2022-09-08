@@ -102,6 +102,15 @@ specifies the check you want the constraint to enforce.
 For example, ``CheckConstraint(check=Q(age__gte=18), name='age_gte_18')``
 ensures the age field is never less than 18.
 
+.. admonition:: Oracle
+
+    Checks with nullable fields on Oracle must include a condition allowing for
+    ``NULL`` values in order for :meth:`validate() <BaseConstraint.validate>`
+    to behave the same as check constraints validation. For example, if ``age``
+    is a nullable field::
+
+        CheckConstraint(check=Q(age__gte=18) | Q(age__isnull=True), name='age_gte_18')
+
 .. versionchanged:: 4.1
 
     The ``violation_error_message`` argument was added.
