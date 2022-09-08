@@ -11,7 +11,7 @@ import logging
 from collections import namedtuple
 
 from django.core.exceptions import FieldError
-from django.db import DEFAULT_DB_ALIAS, DatabaseError
+from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
 
@@ -115,7 +115,8 @@ class Q(tree.Node):
         matches against the expressions.
         """
         # Avoid circular imports.
-        from django.db.models import Value
+        from django.db.models import BooleanField, Value
+        from django.db.models.functions import Coalesce
         from django.db.models.sql import Query
         from django.db.models.sql.constants import SINGLE
 
@@ -126,7 +127,10 @@ class Q(tree.Node):
             query.add_annotation(value, name, select=False)
         query.add_annotation(Value(1), "_check")
         # This will raise a FieldError if a field is missing in "against".
-        query.add_q(self)
+        if connections[using].features.supports_comparing_boolean_expr:
+            query.add_q(Q(Coalesce(self, True, output_field=BooleanField())))
+        else:
+            query.add_q(self)
         compiler = query.get_compiler(using=using)
         try:
             return compiler.execute_sql(SINGLE) is not None
