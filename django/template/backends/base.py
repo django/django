@@ -17,8 +17,17 @@ class BaseEngine:
         """
         params = params.copy()
         self.name = params.pop("NAME")
-        self.dirs = list(params.pop("DIRS"))
         self.app_dirs = params.pop("APP_DIRS")
+
+        dirs = params.pop("DIRS")
+        dirs_type = type(dirs)
+        if dirs_type != list:
+            raise ImproperlyConfigured(
+                f"TEMPLATES->DIRS should be a list but is an {dirs_type} instead!"
+            )
+
+        self.dirs = list(dirs)
+
         if params:
             raise ImproperlyConfigured(
                 "Unknown parameters: {}".format(", ".join(params))
