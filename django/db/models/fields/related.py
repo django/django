@@ -1164,15 +1164,21 @@ class ForeignKey(ForeignObject):
                 "its related model %r has not been loaded yet"
                 % (self.name, self.remote_field.model)
             )
-        return super().formfield(
-            **{
-                "form_class": forms.ModelChoiceField,
-                "queryset": self.remote_field.model._default_manager.using(using),
-                "to_field_name": self.remote_field.field_name,
-                **kwargs,
-                "blank": self.blank,
-            }
-        )
+
+        if "form_class" not in kwargs:
+            kwargs["form_class"] = forms.ModelChoiceField
+
+        if "queryset" not in kwargs:
+            kwargs["queryset"] = self.remote_field.model._default_manager.using(
+                using)
+
+        if "to_field_name" not in kwargs:
+            kwargs["to_field_name"] = self.remote_field.field_name
+
+        if "blank" not in kwargs:
+            kwargs["blank"] = self.blank
+
+        return super().formfield(**kwargs)
 
     def db_check(self, connection):
         return None
