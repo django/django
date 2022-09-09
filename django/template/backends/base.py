@@ -20,12 +20,10 @@ class BaseEngine:
         self.app_dirs = params.pop("APP_DIRS")
 
         dirs = params.pop("DIRS")
-        dirs_type = type(dirs)
-        if dirs_type != list:
+        if type(dirs) != list:
             raise ImproperlyConfigured(
-                f"TEMPLATES->DIRS should be a list but is an {dirs_type} instead!"
+                "Settings parameter TEMPLATES->DIRS is not a list"
             )
-
         self.dirs = list(dirs)
 
         if params:
