@@ -607,24 +607,41 @@ class SQLCompiler:
         select = {
             expr: alias for expr, _, alias in self.get_select(with_col_aliases=True)[0]
         }
+        select_aliases = set(select.values())
         qual_aliases = set()
         replacements = {}
-        expressions = list(self.qualify.leaves())
-        while expressions:
-            expr = expressions.pop()
-            if select_alias := (select.get(expr) or replacements.get(expr)):
-                replacements[expr] = select_alias
-            elif isinstance(expr, Lookup):
-                expressions.extend(expr.get_source_expressions())
-            else:
-                num_qual_alias = len(qual_aliases)
-                select_alias = f"qual{num_qual_alias}"
-                qual_aliases.add(select_alias)
-                inner_query.add_annotation(expr, select_alias)
-                replacements[expr] = select_alias
+
+        def collect_replacements(expressions):
+            while expressions:
+                expr = expressions.pop()
+                if expr in replacements:
+                    continue
+                elif select_alias := select.get(expr):
+                    replacements[expr] = select_alias
+                elif isinstance(expr, Lookup):
+                    expressions.extend(expr.get_source_expressions())
+                elif isinstance(expr, Ref):
+                    if expr.refs not in select_aliases:
+                        expressions.extend(expr.get_source_expressions())
+                else:
+                    num_qual_alias = len(qual_aliases)
+                    select_alias = f"qual{num_qual_alias}"
+                    qual_aliases.add(select_alias)
+                    inner_query.add_annotation(expr, select_alias)
+                    replacements[expr] = select_alias
+
+        collect_replacements(list(self.qualify.leaves()))
         self.qualify = self.qualify.replace_expressions(
             {expr: Ref(alias, expr) for expr, alias in replacements.items()}
         )
+        order_by = []
+        for order_by_expr, *_ in self.get_order_by():
+            collect_replacements(order_by_expr.get_source_expressions())
+            order_by.append(
+                order_by_expr.replace_expressions(
+                    {expr: Ref(alias, expr) for expr, alias in replacements.items()}
+                )
+            )
         inner_query_compiler = inner_query.get_compiler(
             self.using, elide_empty=self.elide_empty
         )
@@ -657,7 +674,18 @@ class SQLCompiler:
                 ")",
                 self.connection.ops.quote_name("qualify_mask"),
             ]
-        return result, list(inner_params) + qualify_params
+        params = list(inner_params) + qualify_params
+        # As the SQL spec is unclear on whether or not derived tables
+        # ordering must propagate it has to be explicitly repeated on the
+        # outer-most query to ensure it's preserved.
+        if order_by:
+            ordering_sqls = []
+            for ordering in order_by:
+                ordering_sql, ordering_params = self.compile(ordering)
+                ordering_sqls.append(ordering_sql)
+                ordering_params.extend(ordering_params)
+            result.extend(["ORDER BY", ", ".join(ordering_sqls)])
+        return result, params
 
     def as_sql(self, with_limits=True, with_col_aliases=False):
         """
