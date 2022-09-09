@@ -1052,9 +1052,9 @@ To query for missing keys, use the ``isnull`` lookup::
     A class that returns the resulting key transformed JSON in the form of text.
     ``lookup`` argument be a string starting with the name of the
     :class:`~django.db.models.JSONField` and subsequent key or index transforms
-    seperated by ``__`` (double underscores).
+    separated by ``__`` (double underscores).
 
-    To query for ``Dog.data``::
+    To text transform :class:`~django.db.models.JSONField` - ``Dog.data``::
 
       >>> Dog.objects.create(name='Shep', data={'breed': ['collie', 'lhasa apso']})
       <Dog: Shep>
