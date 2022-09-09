@@ -37,7 +37,7 @@ many projects they are typically the most commonly used views.
     #. :meth:`~django.views.generic.detail.BaseDetailView.get`
     #. :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
 
-    **Example myapp/views.py**::
+    **Example views.py**::
 
         from django.utils import timezone
         from django.views.generic.detail import DetailView
@@ -53,7 +53,7 @@ many projects they are typically the most commonly used views.
                 context['now'] = timezone.now()
                 return context
 
-    **Example myapp/urls.py**::
+    **Example urls.py**::
 
         from django.urls import path
 
@@ -63,7 +63,7 @@ many projects they are typically the most commonly used views.
             path('<slug:slug>/', ArticleDetailView.as_view(), name='article-detail'),
         ]
 
-    **Example myapp/article_detail.html**:
+    **Example article_detail.html**:
 
     .. code-block:: html+django
 
@@ -143,7 +143,7 @@ many projects they are typically the most commonly used views.
                 context['now'] = timezone.now()
                 return context
 
-    **Example myapp/urls.py**::
+    **Example urls.py**::
 
         from django.urls import path
 
@@ -153,7 +153,7 @@ many projects they are typically the most commonly used views.
             path('', ArticleListView.as_view(), name='article-list'),
         ]
 
-    **Example myapp/article_list.html**:
+    **Example article_list.html**:
 
     .. code-block:: html+django
 
