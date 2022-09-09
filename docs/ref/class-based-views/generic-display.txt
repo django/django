@@ -57,7 +57,7 @@ many projects they are typically the most commonly used views.
 
         from django.urls import path
 
-        from article.views import ArticleDetailView
+        from articles.views import ArticleDetailView
 
         urlpatterns = [
             path('<slug:slug>/', ArticleDetailView.as_view(), name='article-detail'),
@@ -147,7 +147,7 @@ many projects they are typically the most commonly used views.
 
         from django.urls import path
 
-        from article.views import ArticleListView
+        from articles.views import ArticleListView
 
         urlpatterns = [
             path('', ArticleListView.as_view(), name='article-list'),
