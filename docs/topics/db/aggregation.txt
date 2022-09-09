@@ -111,7 +111,7 @@ belong to this ``QuerySet``. This is done by appending an ``aggregate()``
 clause onto the ``QuerySet``::
 
     >>> from django.db.models import Avg
-    >>> Book.objects.aggregate(Avg('price'))
+    >>> Book.objects.all().aggregate(Avg('price'))
     {'price__avg': 34.35}
 
 The ``all()`` is redundant in this example, so this could be simplified to::
