@@ -909,6 +909,10 @@ class Model(metaclass=ModelBase):
         """Save all the parents of cls using values from self."""
         meta = cls._meta
         inserted = False
+
+        if self.pk is None and self._state.adding is True:
+            self._state.related_managers_cache = {}
+
         for parent, field in meta.parents.items():
             # Make sure the link fields are synced between parent and self.
             if (

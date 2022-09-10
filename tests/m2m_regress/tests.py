@@ -1,3 +1,4 @@
+from pydoc_data.topics import topics
 from django.core.exceptions import FieldError
 from django.test import TestCase
 
@@ -70,6 +71,21 @@ class M2MRegressionTests(TestCase):
 
         self.assertSequenceEqual(sr_child.related.all(), [sr_sibling.selfrefer_ptr])
         self.assertSequenceEqual(sr_sibling.related.all(), [sr_child.selfrefer_ptr])
+
+    def test_m2m_instance_clone(self):
+        t1 = Tag.objects.create(name = "t1")
+        Entry.objects.create(name = "e1")
+        entry = Entry.objects.all()[0]
+        entry.topics.set([t1])
+        old_topics = entry.topics.all()
+        entry.pk = None
+        entry._state.adding = True
+        entry.save()
+        entry.topics.set(old_topics)
+        self.assertCountEqual(
+            entry.topics.all(),
+            Entry.objects.get(pk=entry.pk).topics.all()
+        )
 
     def test_m2m_pk_field_type(self):
         # Regression for #11311 - The primary key for models in a m2m relation
