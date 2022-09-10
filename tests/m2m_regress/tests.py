@@ -82,8 +82,7 @@ class M2MRegressionTests(TestCase):
         entry.save()
         entry.topics.set(old_topics)
         self.assertCountEqual(
-            entry.topics.all(),
-            Entry.objects.get(pk=entry.pk).topics.all()
+            entry.topics.all(), Entry.objects.get(pk=entry.pk).topics.all()
         )
 
     def test_m2m_pk_field_type(self):
