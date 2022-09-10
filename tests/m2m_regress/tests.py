@@ -1,4 +1,3 @@
-from pydoc_data.topics import topics
 from django.core.exceptions import FieldError
 from django.test import TestCase
 
