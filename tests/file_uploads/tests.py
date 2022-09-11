@@ -9,6 +9,7 @@ from io import BytesIO, StringIO
 from unittest import mock
 from urllib.parse import quote
 
+from django.conf import DEFAULT_STORAGE_ALIAS
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files import temp as tempfile
 from django.core.files.storage import default_storage
@@ -806,7 +807,11 @@ class DirectoryCreationTests(SimpleTestCase):
         sys.platform == "win32", "Python on Windows doesn't have working os.chmod()."
     )
     @override_settings(
-        DEFAULT_FILE_STORAGE="django.core.files.storage.FileSystemStorage"
+        STORAGES={
+            DEFAULT_STORAGE_ALIAS: {
+                "BACKEND": "django.core.files.storage.FileSystemStorage",
+            }
+        }
     )
     def test_readonly_root(self):
         """Permission errors are not swallowed"""

@@ -16,10 +16,12 @@ from pathlib import Path
 import django
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.deprecation import RemovedInDjango50Warning
+from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
+DEFAULT_STORAGE_ALIAS = "default"
+STATICFILES_STORAGE_ALIAS = "staticfiles"
 
 # RemovedInDjango50Warning
 USE_DEPRECATED_PYTZ_DEPRECATED_MSG = (
@@ -37,6 +39,14 @@ USE_L10N_DEPRECATED_MSG = (
 CSRF_COOKIE_MASKED_DEPRECATED_MSG = (
     "The CSRF_COOKIE_MASKED transitional setting is deprecated. Support for "
     "it will be removed in Django 5.0."
+)
+
+DEFAULT_FILE_STORAGE_DEPRECATED_MSG = (
+    "The DEFAULT_FILE_STORAGE setting is deprecated. Use STORAGES instead."
+)
+
+STATICFILES_STORAGE_DEPRECATED_MSG = (
+    "The STATICFILES_STORAGE setting is deprecated. Use STORAGES instead."
 )
 
 
@@ -177,6 +187,22 @@ class LazySettings(LazyObject):
         # paths.
         return self.__getattr__("USE_L10N")
 
+    # RemovedInDjango51Warning.
+    @property
+    def DEFAULT_FILE_STORAGE(self):
+        self._show_deprecation_warning(
+            DEFAULT_FILE_STORAGE_DEPRECATED_MSG, RemovedInDjango51Warning
+        )
+        return self.__getattr__("DEFAULT_FILE_STORAGE")
+
+    # RemovedInDjango51Warning.
+    @property
+    def STATICFILES_STORAGE(self):
+        self._show_deprecation_warning(
+            STATICFILES_STORAGE_DEPRECATED_MSG, RemovedInDjango51Warning
+        )
+        return self.__getattr__("STATICFILES_STORAGE")
+
 
 class Settings:
     def __init__(self, settings_module):
@@ -240,6 +266,20 @@ class Settings:
         if self.is_overridden("USE_L10N"):
             warnings.warn(USE_L10N_DEPRECATED_MSG, RemovedInDjango50Warning)
 
+        if self.is_overridden("DEFAULT_FILE_STORAGE"):
+            if self.is_overridden("STORAGES"):
+                raise ImproperlyConfigured(
+                    "DEFAULT_FILE_STORAGE/STORAGES are mutually exclusive."
+                )
+            warnings.warn(DEFAULT_FILE_STORAGE_DEPRECATED_MSG, RemovedInDjango51Warning)
+
+        if self.is_overridden("STATICFILES_STORAGE"):
+            if self.is_overridden("STORAGES"):
+                raise ImproperlyConfigured(
+                    "STATICFILES_STORAGE/STORAGES are mutually exclusive."
+                )
+            warnings.warn(STATICFILES_STORAGE_DEPRECATED_MSG, RemovedInDjango51Warning)
+
     def is_overridden(self, setting):
         return setting in self._explicit_settings
 
@@ -276,9 +316,29 @@ class UserSettingsHolder:
             warnings.warn(USE_L10N_DEPRECATED_MSG, RemovedInDjango50Warning)
         if name == "CSRF_COOKIE_MASKED":
             warnings.warn(CSRF_COOKIE_MASKED_DEPRECATED_MSG, RemovedInDjango50Warning)
+        if name == "DEFAULT_FILE_STORAGE":
+            self.STORAGES[DEFAULT_STORAGE_ALIAS] = {
+                "BACKEND": self.DEFAULT_FILE_STORAGE
+            }
+            warnings.warn(DEFAULT_FILE_STORAGE_DEPRECATED_MSG, RemovedInDjango51Warning)
+        if name == "STATICFILES_STORAGE":
+            self.STORAGES[STATICFILES_STORAGE_ALIAS] = {
+                "BACKEND": self.STATICFILES_STORAGE
+            }
+            warnings.warn(STATICFILES_STORAGE_DEPRECATED_MSG, RemovedInDjango51Warning)
         super().__setattr__(name, value)
         if name == "USE_DEPRECATED_PYTZ":
             warnings.warn(USE_DEPRECATED_PYTZ_DEPRECATED_MSG, RemovedInDjango50Warning)
+        # RemovedInDjango51Warning.
+        if name == "STORAGES":
+            self.STORAGES.setdefault(
+                DEFAULT_STORAGE_ALIAS,
+                {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+            )
+            self.STORAGES.setdefault(
+                STATICFILES_STORAGE_ALIAS,
+                {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+            )
 
     def __delattr__(self, name):
         self._deleted.add(name)

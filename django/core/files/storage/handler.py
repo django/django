@@ -1,4 +1,4 @@
-from django.conf import settings
+from django.conf import DEFAULT_STORAGE_ALIAS, STATICFILES_STORAGE_ALIAS, settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
@@ -19,6 +19,15 @@ class StorageHandler:
     def backends(self):
         if self._backends is None:
             self._backends = settings.STORAGES.copy()
+            # RemovedInDjango51Warning.
+            if settings.is_overridden("DEFAULT_FILE_STORAGE"):
+                self._backends[DEFAULT_STORAGE_ALIAS] = {
+                    "BACKEND": settings.DEFAULT_FILE_STORAGE
+                }
+            if settings.is_overridden("STATICFILES_STORAGE"):
+                self._backends[STATICFILES_STORAGE_ALIAS] = {
+                    "BACKEND": settings.STATICFILES_STORAGE
+                }
         return self._backends
 
     def __getitem__(self, alias):

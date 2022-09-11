@@ -156,9 +156,10 @@ Behind the scenes, Django delegates decisions about how and where to store files
 to a file storage system. This is the object that actually understands things
 like file systems, opening and reading files, etc.
 
-Django's default file storage is given by the :setting:`DEFAULT_FILE_STORAGE`
-setting; if you don't explicitly provide a storage system, this is the one that
-will be used.
+Django's default file storage is
+``'``:class:`django.core.files.storage.FileSystemStorage`\ ``'``. If you don't
+explicitly provide a storage system in the ``default`` key of the
+:setting:`STORAGES` setting, this is the one that will be used.
 
 See below for details of the built-in default file storage system, and see
 :doc:`/howto/custom-file-storage` for information on writing your own file
