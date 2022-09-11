@@ -4,11 +4,11 @@ import posixpath
 import re
 from urllib.parse import unquote, urldefrag, urlsplit, urlunsplit
 
-from django.conf import settings
+from django.conf import STATICFILES_STORAGE_ALIAS, settings
 from django.contrib.staticfiles.utils import check_settings, matches_patterns
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
-from django.core.files.storage import FileSystemStorage, get_storage_class
+from django.core.files.storage import FileSystemStorage, storages
 from django.utils.crypto import md5
 from django.utils.functional import LazyObject
 
@@ -526,7 +526,7 @@ class ManifestStaticFilesStorage(ManifestFilesMixin, StaticFilesStorage):
 
 class ConfiguredStorage(LazyObject):
     def _setup(self):
-        self._wrapped = get_storage_class(settings.STATICFILES_STORAGE)()
+        self._wrapped = storages[STATICFILES_STORAGE_ALIAS]
 
 
 staticfiles_storage = ConfiguredStorage()

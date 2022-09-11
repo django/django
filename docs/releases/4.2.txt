@@ -95,7 +95,12 @@ Custom file storages
 --------------------
 
 The new :setting:`STORAGES` setting allows configuring multiple custom file
-storage backends.
+storage backends. It also controls storage engines for managing
+:doc:`files </topics/files>` (the ``"defaut"`` key) and :doc:`static files
+</ref/contrib/staticfiles>` (the ``"staticfiles"`` key).
+
+The old ``DEFAULT_FILE_STORAGE`` and ``STATICFILES_STORAGE`` settings are
+deprecated as of this release.
 
 Minor features
 --------------
@@ -674,3 +679,11 @@ Miscellaneous
 
 * Passing positional arguments to ``Signer`` and ``TimestampSigner`` is
   deprecated in favor of keyword-only arguments.
+
+* The ``DEFAULT_FILE_STORAGE`` setting is deprecated in favor of
+  ``STORAGES["default"]``.
+
+* The ``STATICFILES_STORAGE`` setting is deprecated in favor of
+  ``STORAGES["staticfiles"]``.
+
+* The ``django.core.files.storage.get_storage_class()`` function is deprecated.

@@ -2629,7 +2629,7 @@ A set of Django template filters useful for adding a "human touch" to data. See
 To link to static files that are saved in :setting:`STATIC_ROOT` Django ships
 with a :ttag:`static` template tag. If the :mod:`django.contrib.staticfiles`
 app is installed, the tag will serve files using ``url()`` method of the
-storage specified by :setting:`STATICFILES_STORAGE`. For example::
+storage specified by ``staticfiles`` in :setting:`STORAGES`. For example::
 
     {% load static %}
     <img src="{% static 'images/hi.jpg' %}" alt="Hi!">

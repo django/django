@@ -45,6 +45,12 @@ details on these changes.
 * Support for passing positional arguments to ``Signer`` and
   ``TimestampSigner`` will be removed.
 
+* The ``DEFAULT_FILE_STORAGE`` and ``STATICFILES_STORAGE`` settings will be
+  removed.
+
+* The ``django.core.files.storage.get_storage_class()`` function will be
+  removed.
+
 .. _deprecation-removed-in-5.0:
 
 5.0

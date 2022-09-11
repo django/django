@@ -8,7 +8,7 @@ from io import StringIO
 from pathlib import Path
 from unittest import mock
 
-from django.conf import settings
+from django.conf import STATICFILES_STORAGE_ALIAS, settings
 from django.contrib.staticfiles import finders, storage
 from django.contrib.staticfiles.management.commands.collectstatic import (
     Command as CollectstaticCommand,
@@ -369,7 +369,13 @@ class TestHashedFiles:
         self.assertPostCondition()
 
 
-@override_settings(STATICFILES_STORAGE="staticfiles_tests.storage.ExtraPatternsStorage")
+@override_settings(
+    STORAGES={
+        STATICFILES_STORAGE_ALIAS: {
+            "BACKEND": "staticfiles_tests.storage.ExtraPatternsStorage",
+        },
+    }
+)
 class TestExtraPatternsStorage(CollectionTestCase):
     def setUp(self):
         storage.staticfiles_storage.hashed_files.clear()  # avoid cache interference
@@ -399,7 +405,11 @@ class TestExtraPatternsStorage(CollectionTestCase):
 
 
 @override_settings(
-    STATICFILES_STORAGE="django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+    STORAGES={
+        STATICFILES_STORAGE_ALIAS: {
+            "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+        },
+    }
 )
 class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
     """
@@ -559,7 +569,13 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         self.assertEqual(manifest_content, {"dummy.txt": "dummy.txt"})
 
 
-@override_settings(STATICFILES_STORAGE="staticfiles_tests.storage.NoneHashStorage")
+@override_settings(
+    STORAGES={
+        STATICFILES_STORAGE_ALIAS: {
+            "BACKEND": "staticfiles_tests.storage.NoneHashStorage",
+        },
+    }
+)
 class TestCollectionNoneHashStorage(CollectionTestCase):
     hashed_file_path = hashed_file_path
 
@@ -569,7 +585,11 @@ class TestCollectionNoneHashStorage(CollectionTestCase):
 
 
 @override_settings(
-    STATICFILES_STORAGE="staticfiles_tests.storage.NoPostProcessReplacedPathStorage"
+    STORAGES={
+        STATICFILES_STORAGE_ALIAS: {
+            "BACKEND": "staticfiles_tests.storage.NoPostProcessReplacedPathStorage",
+        },
+    }
 )
 class TestCollectionNoPostProcessReplacedPaths(CollectionTestCase):
     run_collectstatic_in_setUp = False
@@ -580,7 +600,13 @@ class TestCollectionNoPostProcessReplacedPaths(CollectionTestCase):
         self.assertIn("post-processed", stdout.getvalue())
 
 
-@override_settings(STATICFILES_STORAGE="staticfiles_tests.storage.SimpleStorage")
+@override_settings(
+    STORAGES={
+        STATICFILES_STORAGE_ALIAS: {
+            "BACKEND": "staticfiles_tests.storage.SimpleStorage",
+        },
+    }
+)
 class TestCollectionSimpleStorage(CollectionTestCase):
     hashed_file_path = hashed_file_path
 
@@ -733,7 +759,11 @@ class TestStaticFilePermissions(CollectionTestCase):
     @override_settings(
         FILE_UPLOAD_PERMISSIONS=0o655,
         FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o765,
-        STATICFILES_STORAGE="staticfiles_tests.test_storage.CustomStaticFilesStorage",
+        STORAGES={
+            STATICFILES_STORAGE_ALIAS: {
+                "BACKEND": "staticfiles_tests.test_storage.CustomStaticFilesStorage",
+            },
+        },
     )
     def test_collect_static_files_subclass_of_static_storage(self):
         call_command("collectstatic", **self.command_params)
@@ -753,7 +783,11 @@ class TestStaticFilePermissions(CollectionTestCase):
 
 
 @override_settings(
-    STATICFILES_STORAGE="django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+    STORAGES={
+        STATICFILES_STORAGE_ALIAS: {
+            "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+        },
+    }
 )
 class TestCollectionHashedFilesCache(CollectionTestCase):
     """

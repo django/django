@@ -5,7 +5,7 @@ import warnings
 from io import StringIO
 from unittest import mock
 
-from django.conf import settings
+from django.conf import STATICFILES_STORAGE_ALIAS, settings
 from django.contrib.staticfiles.finders import get_finder, get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ImproperlyConfigured
@@ -2106,12 +2106,14 @@ class OverrideSettingsTests(SimpleTestCase):
 
     def test_override_staticfiles_storage(self):
         """
-        Overriding the STATICFILES_STORAGE setting should be reflected in
+        Overriding the STORAGES setting should be reflected in
         the value of django.contrib.staticfiles.storage.staticfiles_storage.
         """
         new_class = "ManifestStaticFilesStorage"
         new_storage = "django.contrib.staticfiles.storage." + new_class
-        with self.settings(STATICFILES_STORAGE=new_storage):
+        with self.settings(
+            STORAGES={STATICFILES_STORAGE_ALIAS: {"BACKEND": new_storage}}
+        ):
             self.assertEqual(staticfiles_storage.__class__.__name__, new_class)
 
     def test_override_staticfiles_finders(self):

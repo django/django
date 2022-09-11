@@ -1441,16 +1441,15 @@ when settings are changed.
 
 Django itself uses this signal to reset various data:
 
-================================= ========================
-Overridden settings               Data reset
-================================= ========================
-USE_TZ, TIME_ZONE                 Databases timezone
-TEMPLATES                         Template engines
-SERIALIZATION_MODULES             Serializers cache
-LOCALE_PATHS, LANGUAGE_CODE       Default translation and loaded translations
-MEDIA_ROOT, DEFAULT_FILE_STORAGE  Default file storage
-STATIC_ROOT, STATIC_URL, STORAGES Storages configuration
-================================= ========================
+============================================================================ ========================
+Overridden settings                                                          Data reset
+============================================================================ ========================
+USE_TZ, TIME_ZONE                                                            Databases timezone
+TEMPLATES                                                                    Template engines
+SERIALIZATION_MODULES                                                        Serializers cache
+LOCALE_PATHS, LANGUAGE_CODE                                                  Default translation and loaded translations
+DEFAULT_FILE_STORAGE, STATICFILES_STORAGE, STATIC_ROOT, STATIC_URL, STORAGES Storages configuration
+============================================================================ ========================
 
 Isolating apps
 --------------

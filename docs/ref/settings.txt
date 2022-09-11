@@ -1356,6 +1356,12 @@ Default: ``'``:class:`django.core.files.storage.FileSystemStorage`\ ``'``
 Default file storage class to be used for any file-related operations that don't
 specify a particular storage system. See :doc:`/topics/files`.
 
+.. deprecated:: 4.2
+
+    This setting is deprecated. Starting with Django 4.2, default file storage
+    engine can be configured with the :setting:`STORAGES` setting under the
+    ``default`` key.
+
 .. setting:: DEFAULT_FROM_EMAIL
 
 ``DEFAULT_FROM_EMAIL``
@@ -2615,13 +2621,28 @@ See also the :doc:`/ref/checks` documentation.
 
 Default::
 
-    {}
+    {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
 
 A dictionary containing the settings for all storages to be used with Django.
 It is a nested dictionary whose contents map a storage alias to a dictionary
 containing the options for an individual storage.
 
-Storages can have any alias you choose.
+Storages can have any alias you choose. However, there are two aliases with
+special significance:
+
+* ``default`` for :doc:`managing files </topics/files>`.
+  ``'``:class:`django.core.files.storage.FileSystemStorage`\ ``'`` is the
+  default storage engine.
+* ``staticfiles`` for :doc:`managing static files </ref/contrib/staticfiles>`.
+  ``'``:class:`django.contrib.staticfiles.storage.StaticFilesStorage`\ ``'`` is
+  the default storage engine.
 
 The following is an example ``settings.py`` snippet defining a custom file
 storage called ``example``::
@@ -3598,9 +3619,15 @@ The file storage engine to use when collecting static files with the
 :djadmin:`collectstatic` management command.
 
 A ready-to-use instance of the storage backend defined in this setting
-can be found at ``django.contrib.staticfiles.storage.staticfiles_storage``.
+can be found under ``staticfiles`` key in ``django.core.files.storage.storages``.
 
 For an example, see :ref:`staticfiles-from-cdn`.
+
+.. deprecated:: 4.2
+
+    This setting is deprecated. Starting with Django 4.2, static files storage
+    engine can be configured with the :setting:`STORAGES` setting under the
+    ``staticfiles`` key.
 
 .. setting:: STATICFILES_FINDERS
 
@@ -3627,8 +3654,8 @@ used.
 One finder is disabled by default:
 ``django.contrib.staticfiles.finders.DefaultStorageFinder``. If added to
 your :setting:`STATICFILES_FINDERS` setting, it will look for static files in
-the default file storage as defined by the :setting:`DEFAULT_FILE_STORAGE`
-setting.
+the default file storage as defined by the ``default`` key in the
+:setting:`STORAGES` setting.
 
 .. note::
 
