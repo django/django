@@ -556,7 +556,7 @@ On PostgreSQL, the SQL looks like:
 Referencing columns from the outer queryset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. class:: OuterRef(field)
+.. class:: OuterRef(field, output_field=None)
 
 Use ``OuterRef`` when a queryset in a ``Subquery`` needs to refer to a field
 from the outer query or its transform. It acts like an :class:`F` expression
@@ -569,6 +569,19 @@ parent. For example, this queryset would need to be within a nested pair of
 ``Subquery`` instances to resolve correctly::
 
     >>> Book.objects.filter(author=OuterRef(OuterRef('pk')))
+
+An ``OuterRef`` cannot be resolved to its ``output_field`` until its queryset
+is annotated to an outer query, therefore we cannot infer which lookups are
+available on the field. Should you wish to filter on a queryset annotation
+from an ``OuterRef`` you must provide an ``output_field`` on instantiation::
+
+    >>> Post.objects.annotate(name_contained_in_other_posts=Exists(
+    >>>     Subquery(
+    >>>         Post.objects.annotate(
+    >>>             outer_name=OuterRef('name', output_field=CharField())
+    >>>         ).filter(outer_name__contains=F('name'))
+    >>>     )
+    >>> ))
 
 .. versionchanged:: 3.2
 
