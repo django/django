@@ -838,6 +838,16 @@ class ResolvedOuterRef(F):
     contains_aggregate = False
     contains_over_clause = False
 
+    def __init__(self, name, output_field=None):
+        """
+        Arguments:
+         * name: the name of the field this expression references
+         * output_field: the output type of the referenced field. Used for
+                         coercing lookup expressions
+        """
+        super().__init__(name)
+        self.output_field = output_field
+
     def as_sql(self, *args, **kwargs):
         raise ValueError(
             "This queryset contains a reference to an outer query and may "
@@ -858,14 +868,35 @@ class ResolvedOuterRef(F):
     def get_group_by_cols(self, alias=None):
         return []
 
+    def get_lookup(self, lookup_name):
+        lookup = (
+            self.output_field.get_lookup(lookup_name) if self.output_field else None
+        )
+        if not lookup:
+            raise ValueError(
+                "Could not find lookup %s for %s. Please provide appropriate"
+                " output_field." % (lookup_name, self.__class__.__name__)
+            )
+        return lookup
+
 
 class OuterRef(F):
     contains_aggregate = False
 
+    def __init__(self, name, output_field=None):
+        """
+        Arguments:
+         * name: the name of the field this expression references
+         * output_field: the output type of the referenced field. Used for
+                         coercing lookup expressions
+        """
+        super().__init__(name)
+        self.output_field = output_field
+
     def resolve_expression(self, *args, **kwargs):
         if isinstance(self.name, self.__class__):
             return self.name
-        return ResolvedOuterRef(self.name)
+        return ResolvedOuterRef(self.name, output_field=self.output_field)
 
     def relabeled_clone(self, relabels):
         return self

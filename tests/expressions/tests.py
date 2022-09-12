@@ -836,6 +836,34 @@ class BasicExpressionsTests(TestCase):
         ).get(pk=self.gmbh.pk)
         self.assertEqual(gmbh_salary.max_ceo_salary_raise, 2332)
 
+    def test_lookup_filter_on_annotation_with_outerref(self):
+        annotated_queryset = Company.objects.annotate(
+            salary_raise=OuterRef("num_employees", output_field=IntegerField()),
+        )
+        gmbh_salary = Company.objects.annotate(
+            true_filter=Exists(Subquery(annotated_queryset.filter(salary_raise__gt=1))),
+            false_filter=Exists(
+                Subquery(annotated_queryset.filter(salary_raise__lt=1))
+            ),
+        ).get(pk=self.gmbh.pk)
+        self.assertTrue(gmbh_salary.true_filter)
+        self.assertFalse(gmbh_salary.false_filter)
+
+    def test_invalid_lookup_filter_on_annotation_with_outerref(self):
+        annotated_queryset = Company.objects.annotate(
+            salary_raise=OuterRef("num_employees", output_field=IntegerField()),
+        )
+        with self.assertRaisesMessage(
+            ValueError,
+            "Could not find lookup month for ResolvedOuterRef. Please provide"
+            " appropriate output_field.",
+        ):
+            Company.objects.annotate(
+                invalid_filter=Exists(
+                    Subquery(annotated_queryset.filter(salary_raise__month=1))
+                ),
+            )
+
     def test_annotation_with_nested_outerref(self):
         self.gmbh.point_of_contact = Employee.objects.get(lastname="Meyer")
         self.gmbh.save()
