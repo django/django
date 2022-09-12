@@ -2720,6 +2720,49 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_unique_together(Book, [["author", "title"]], [])
 
+    def _test_composed_index_with_fk(self, index):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+        table = Book._meta.db_table
+        self.assertEqual(Book._meta.indexes, [])
+        Book._meta.indexes = [index]
+        with connection.schema_editor() as editor:
+            editor.add_index(Book, index)
+        self.assertIn(index.name, self.get_constraints(table))
+        Book._meta.indexes = []
+        with connection.schema_editor() as editor:
+            editor.remove_index(Book, index)
+        self.assertNotIn(index.name, self.get_constraints(table))
+
+    @skipUnlessDBFeature("supports_expression_indexes")
+    def test_composed_func_transform_index_with_fk(self):
+        index = Index(F("title__lower"), name="book_title_lower_idx")
+        with register_lookup(CharField, Lower):
+            self._test_composed_index_with_fk(index)
+
+    def _test_composed_constraint_with_fk(self, constraint):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+        table = Book._meta.db_table
+        self.assertEqual(Book._meta.constraints, [])
+        Book._meta.constraints = [constraint]
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Book, constraint)
+        self.assertIn(constraint.name, self.get_constraints(table))
+        Book._meta.constraints = []
+        with connection.schema_editor() as editor:
+            editor.remove_constraint(Book, constraint)
+        self.assertNotIn(constraint.name, self.get_constraints(table))
+
+    @skipUnlessDBFeature(
+        "supports_column_check_constraints", "can_introspect_check_constraints"
+    )
+    def test_composed_check_constraint_with_fk(self):
+        constraint = CheckConstraint(check=Q(author__gt=0), name="book_author_check")
+        self._test_composed_constraint_with_fk(constraint)
+
     @skipUnlessDBFeature("allows_multiple_constraints_on_same_fields")
     def test_remove_unique_together_does_not_remove_meta_constraints(self):
         with connection.schema_editor() as editor:
