@@ -83,8 +83,8 @@ class PerformConstraintChecksTest(TestCase):
         self.assertEqual(
             cm.exception.message_dict,
             {
-                "__all__": [
-                    "Constraint “name_without_color_uniq_validation” is violated."
+                "name": [
+                    "Constraint “name_without_color_uniq_validation” is violated.",
                 ]
             },
         )

@@ -834,8 +834,9 @@ class UniqueConstraintTests(TestCase):
             name=obj1.name, color="blue"
         ).validate_constraints()
         msg = "Constraint “name_without_color_uniq” is violated."
-        with self.assertRaisesMessage(ValidationError, msg):
+        with self.assertRaisesMessage(ValidationError, msg) as cm:
             UniqueConstraintConditionProduct(name=obj2.name).validate_constraints()
+        self.assertEqual(cm.exception.message_dict, {"name": [msg]})
 
     def test_model_validation_constraint_no_code_error(self):
         class ValidateNoCodeErrorConstraint(UniqueConstraint):
