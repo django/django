@@ -34,14 +34,14 @@ INTERNAL_IPS = []
 # "*" matches anything, ".example.com" matches example.com and all subdomains
 ALLOWED_HOSTS = []
 
+# If you set this to True, Django will use timezone-aware datetimes.
+USE_TZ = False
+
 # Local time zone for this installation. All choices can be found here:
 # https://en.wikipedia.org/wiki/List_of_tz_zones_by_name (although not all
 # systems may support all possibilities). When USE_TZ is True, this is
 # interpreted as the default user time zone.
 TIME_ZONE = "America/Chicago"
-
-# If you set this to True, Django will use timezone-aware datetimes.
-USE_TZ = False
 
 # RemovedInDjango50Warning: It's a transitional setting helpful in migrating
 # from pytz tzinfo to ZoneInfo(). Set True to continue using pytz tzinfo
