@@ -1118,7 +1118,7 @@ class QueryTestCase(TestCase):
 
         # Set a foreign key with an object from a different database
         msg = (
-            'Cannot assign "<ContentType: multiple_database | book>": the '
+            'Cannot assign "<ContentType: Multiple_Database | book>": the '
             "current database router prevents this relation."
         )
         with self.assertRaisesMessage(ValueError, msg):
