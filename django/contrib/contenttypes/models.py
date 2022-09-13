@@ -162,7 +162,10 @@ class ContentType(models.Model):
         model = self.model_class()
         if not model:
             return self.model
-        return "%s | %s" % (model._meta.app_label, model._meta.verbose_name)
+        return "%s | %s" % (
+            model._meta.app_config.verbose_name,
+            model._meta.verbose_name,
+        )
 
     def model_class(self):
         """Return the model class for this type of content."""

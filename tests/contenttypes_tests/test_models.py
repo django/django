@@ -280,7 +280,11 @@ class ContentTypesTests(TestCase):
 
     def test_str(self):
         ct = ContentType.objects.get(app_label="contenttypes_tests", model="site")
-        self.assertEqual(str(ct), "contenttypes_tests | site")
+        self.assertEqual(str(ct), "Contenttypes_Tests | site")
+
+    def test_str_auth(self):
+        ct = ContentType.objects.get(app_label="auth", model="group")
+        self.assertEqual(str(ct), "Authentication and Authorization | group")
 
     def test_name(self):
         ct = ContentType.objects.get(app_label="contenttypes_tests", model="site")
@@ -288,7 +292,7 @@ class ContentTypesTests(TestCase):
 
     def test_app_labeled_name(self):
         ct = ContentType.objects.get(app_label="contenttypes_tests", model="site")
-        self.assertEqual(ct.app_labeled_name, "contenttypes_tests | site")
+        self.assertEqual(ct.app_labeled_name, "Contenttypes_Tests | site")
 
     def test_name_unknown_model(self):
         ct = ContentType(app_label="contenttypes_tests", model="unknown")
