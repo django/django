@@ -231,19 +231,17 @@ def run(
     addr,
     port,
     wsgi_handler,
+    on_bind,
     ipv6=False,
     threading=False,
     server_cls=WSGIServer,
-    on_bind=None,
 ):
     server_address = (addr, port)
     cls_dict = {}
 
-    if on_bind is not None:
-
-        def server_bind(self):
-            server_cls.server_bind(self)
-            on_bind(self.server_port)
+    def server_bind(self):
+        server_cls.server_bind(self)
+        on_bind(self.server_port)
 
     cls_dict["server_bind"] = server_bind
 
