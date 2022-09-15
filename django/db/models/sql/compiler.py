@@ -683,7 +683,7 @@ class SQLCompiler:
             for ordering in order_by:
                 ordering_sql, ordering_params = self.compile(ordering)
                 ordering_sqls.append(ordering_sql)
-                ordering_params.extend(ordering_params)
+                params.extend(ordering_params)
             result.extend(["ORDER BY", ", ".join(ordering_sqls)])
         return result, params
 
