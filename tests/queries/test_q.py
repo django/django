@@ -263,6 +263,10 @@ class QTests(SimpleTestCase):
                     Q(*items, _connector=connector),
                 )
 
+    def test_fields(self):
+        q = Q(Q(field_1=1) & Q(field_2=1), field_2=1, field_3__lookup=True)
+        self.assertEqual(q.fields, {"field_1", "field_2", "field_3"})
+
 
 class QCheckTests(TestCase):
     def test_basic(self):

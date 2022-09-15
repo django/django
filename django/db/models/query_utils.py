@@ -175,6 +175,18 @@ class Q(tree.Node):
     def __hash__(self):
         return hash(self.identity)
 
+    @property
+    def fields(self):
+        def determine_fields(filter_expr):
+            if isinstance(filter_expr, Q):
+                return filter_expr.fields
+            field = filter_expr[0].split(LOOKUP_SEP)[0]
+            return {field}
+
+        return set(
+            field for child in self.children for field in determine_fields(child)
+        )
+
 
 class DeferredAttribute:
     """
