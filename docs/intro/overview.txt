@@ -7,7 +7,7 @@ designed to make common web development tasks fast and easy. Here's an informal
 overview of how to write a database-driven web app with Django.
 
 The goal of this document is to give you enough technical specifics to
-understand how Django works, but this isn't intended to be a tutorial or
+understand how Django works, but this isn't intended to be a tutorial or 
 reference -- but we've got both! When you're ready to start a project, you can
 :doc:`start with the tutorial </intro/tutorial01>` or :doc:`dive right into more
 detailed documentation </topics/index>`.
