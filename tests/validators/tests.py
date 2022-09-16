@@ -548,6 +548,7 @@ TEST_DATA = [
         Decimal("70E-6"),
         ValidationError,
     ),
+    (DecimalValidator(max_digits=2, decimal_places=1), Decimal("0E+1"), None),
     # 'Enter a number.' errors
     *[
         (
