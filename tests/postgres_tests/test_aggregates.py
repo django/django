@@ -686,6 +686,15 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             ],
         )
 
+    def test_values_list(self):
+        tests = [ArrayAgg("integer_field"), JSONBAgg("integer_field")]
+        for aggregation in tests:
+            with self.subTest(aggregation=aggregation):
+                self.assertCountEqual(
+                    AggregateTestModel.objects.values_list(aggregation),
+                    [([0],), ([1],), ([2],), ([0],)],
+                )
+
 
 class TestAggregateDistinct(PostgreSQLTestCase):
     @classmethod
