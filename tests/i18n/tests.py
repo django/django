@@ -869,10 +869,8 @@ class FormattingTests(SimpleTestCase):
             self.assertEqual(1, get_format("FIRST_DAY_OF_WEEK"))
             self.assertEqual(",", get_format("DECIMAL_SEPARATOR"))
             self.assertEqual("10:15", time_format(self.t))
-            self.assertEqual("31 de desembre de 2009", date_format(self.d))
-            self.assertEqual(
-                "1 d'abril de 2009", date_format(datetime.date(2009, 4, 1))
-            )
+            self.assertEqual("31 desembre de 2009", date_format(self.d))
+            self.assertEqual("1 abril de 2009", date_format(datetime.date(2009, 4, 1)))
             self.assertEqual(
                 "desembre del 2009", date_format(self.d, "YEAR_MONTH_FORMAT")
             )
@@ -891,10 +889,8 @@ class FormattingTests(SimpleTestCase):
                 self.assertEqual("66666,666", localize(self.n))
                 self.assertEqual("99999,999", localize(self.f))
                 self.assertEqual("10000", localize(self.long))
-                self.assertEqual("31 de desembre de 2009", localize(self.d))
-                self.assertEqual(
-                    "31 de desembre de 2009 a les 20:50", localize(self.dt)
-                )
+                self.assertEqual("31 desembre de 2009", localize(self.d))
+                self.assertEqual("31 desembre de 2009 a les 20:50", localize(self.dt))
 
             with self.settings(USE_THOUSAND_SEPARATOR=True):
                 self.assertEqual("66.666,666", Template("{{ n }}").render(self.ctxt))
@@ -933,10 +929,10 @@ class FormattingTests(SimpleTestCase):
                 self.assertEqual("66666,666", Template("{{ n }}").render(self.ctxt))
                 self.assertEqual("99999,999", Template("{{ f }}").render(self.ctxt))
                 self.assertEqual(
-                    "31 de desembre de 2009", Template("{{ d }}").render(self.ctxt)
+                    "31 desembre de 2009", Template("{{ d }}").render(self.ctxt)
                 )
                 self.assertEqual(
-                    "31 de desembre de 2009 a les 20:50",
+                    "31 desembre de 2009 a les 20:50",
                     Template("{{ dt }}").render(self.ctxt),
                 )
                 self.assertEqual(
@@ -1319,7 +1315,7 @@ class FormattingTests(SimpleTestCase):
             with translation.override("de-at", deactivate=True):
                 self.assertEqual("66.666,666", Template("{{ n }}").render(self.ctxt))
             with translation.override("es-us", deactivate=True):
-                self.assertEqual("31 de Diciembre de 2009", date_format(self.d))
+                self.assertEqual("31 de diciembre de 2009", date_format(self.d))
 
     def test_localized_input(self):
         """
@@ -1517,6 +1513,9 @@ class FormattingTests(SimpleTestCase):
     def test_get_format_modules_lang(self):
         with translation.override("de", deactivate=True):
             self.assertEqual(".", get_format("DECIMAL_SEPARATOR", lang="en"))
+
+    def test_get_format_lazy_format(self):
+        self.assertEqual(get_format(gettext_lazy("DATE_FORMAT")), "N j, Y")
 
     def test_localize_templatetag_and_filter(self):
         """
@@ -1899,9 +1898,10 @@ class MiscTests(SimpleTestCase):
         USE_I18N=True,
         LANGUAGES=[
             ("en", "English"),
+            ("ar-dz", "Algerian Arabic"),
             ("de", "German"),
             ("de-at", "Austrian German"),
-            ("pt-br", "Portuguese (Brazil)"),
+            ("pt-BR", "Portuguese (Brazil)"),
         ],
     )
     def test_get_supported_language_variant_real(self):
@@ -1912,8 +1912,11 @@ class MiscTests(SimpleTestCase):
         self.assertEqual(g("de-at"), "de-at")
         self.assertEqual(g("de-ch"), "de")
         self.assertEqual(g("pt-br"), "pt-br")
+        self.assertEqual(g("pt-BR"), "pt-BR")
         self.assertEqual(g("pt"), "pt-br")
         self.assertEqual(g("pt-pt"), "pt-br")
+        self.assertEqual(g("ar-dz"), "ar-dz")
+        self.assertEqual(g("ar-DZ"), "ar-DZ")
         with self.assertRaises(LookupError):
             g("pt", strict=True)
         with self.assertRaises(LookupError):
@@ -1943,7 +1946,6 @@ class MiscTests(SimpleTestCase):
         LANGUAGES=[
             ("en", "English"),
             ("en-latn-us", "Latin English"),
-            ("en-Latn-US", "BCP 47 case format"),
             ("de", "German"),
             ("de-1996", "German, orthography of 1996"),
             ("de-at", "Austrian German"),
@@ -1967,6 +1969,7 @@ class MiscTests(SimpleTestCase):
             ("/de/", "de"),
             ("/de-1996/", "de-1996"),
             ("/de-at/", "de-at"),
+            ("/de-AT/", "de-AT"),
             ("/de-ch/", "de"),
             ("/de-ch-1901/", "de-ch-1901"),
             ("/de-simple-page-test/", None),

@@ -11,6 +11,7 @@ from urllib.parse import (
     _splitnetloc,
     _splitparams,
     scheme_chars,
+    unquote,
 )
 from urllib.parse import urlencode as original_urlencode
 from urllib.parse import uses_params
@@ -44,6 +45,10 @@ ASCTIME_DATE = _lazy_re_compile(r"^\w{3} %s %s %s %s$" % (__M, __D2, __T, __Y))
 
 RFC3986_GENDELIMS = ":/?#[]@"
 RFC3986_SUBDELIMS = "!$&'()*+,;="
+
+# TODO: Remove when dropping support for PY38.
+# Unsafe bytes to be removed per WHATWG spec.
+_UNSAFE_URL_BYTES_TO_REMOVE = ["\t", "\r", "\n"]
 
 
 def urlencode(query, doseq=False):
@@ -277,6 +282,7 @@ def url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
     )
 
 
+# TODO: Remove when dropping support for PY38.
 # Copied from urllib.parse.urlparse() but uses fixed urlsplit() function.
 def _urlparse(url, scheme="", allow_fragments=True):
     """Parse a URL into 6 components:
@@ -295,8 +301,15 @@ def _urlparse(url, scheme="", allow_fragments=True):
     return _coerce_result(result)
 
 
-# Copied from urllib.parse.urlsplit() with
-# https://github.com/python/cpython/pull/661 applied.
+# TODO: Remove when dropping support for PY38.
+def _remove_unsafe_bytes_from_url(url):
+    for b in _UNSAFE_URL_BYTES_TO_REMOVE:
+        url = url.replace(b, "")
+    return url
+
+
+# TODO: Remove when dropping support for PY38.
+# Backport of urllib.parse.urlsplit() from Python 3.9.
 def _urlsplit(url, scheme="", allow_fragments=True):
     """Parse a URL into 5 components:
     <scheme>://<netloc>/<path>?<query>#<fragment>
@@ -304,6 +317,9 @@ def _urlsplit(url, scheme="", allow_fragments=True):
     Note that we don't break the components up in smaller bits
     (e.g. netloc is a single string) and we don't expand % escapes."""
     url, scheme, _coerce_result = _coerce_args(url, scheme)
+    url = _remove_unsafe_bytes_from_url(url)
+    scheme = _remove_unsafe_bytes_from_url(scheme)
+
     netloc = query = fragment = ""
     i = url.find(":")
     if i > 0:
@@ -387,15 +403,25 @@ def parse_header_parameters(line):
     Return the main content-type and a dictionary of options.
     """
     parts = _parseparam(";" + line)
-    key = parts.__next__()
+    key = parts.__next__().lower()
     pdict = {}
     for p in parts:
         i = p.find("=")
         if i >= 0:
+            has_encoding = False
             name = p[:i].strip().lower()
+            if name.endswith("*"):
+                # Lang/encoding embedded in the value (like "filename*=UTF-8''file.ext")
+                # https://tools.ietf.org/html/rfc2231#section-4
+                name = name[:-1]
+                if p.count("'") == 2:
+                    has_encoding = True
             value = p[i + 1 :].strip()
             if len(value) >= 2 and value[0] == value[-1] == '"':
                 value = value[1:-1]
                 value = value.replace("\\\\", "\\").replace('\\"', '"')
+            if has_encoding:
+                encoding, lang, value = value.split("'")
+                value = unquote(value, encoding=encoding)
             pdict[name] = value
     return key, pdict

@@ -16,7 +16,7 @@ from django.db.models.functions import Lower
 from django.db.models.lookups import Exact, GreaterThan, IsNull, LessThan
 from django.db.models.sql.constants import SINGLE
 from django.db.models.sql.query import JoinPromoter, Query, get_field_names_from_opts
-from django.db.models.sql.where import OR
+from django.db.models.sql.where import AND, OR
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import register_lookup
 
@@ -214,6 +214,6 @@ class TestQueryNoModel(TestCase):
 class JoinPromoterTest(SimpleTestCase):
     def test_repr(self):
         self.assertEqual(
-            repr(JoinPromoter("AND", 3, True)),
+            repr(JoinPromoter(AND, 3, True)),
             "JoinPromoter(connector='AND', num_children=3, negated=True)",
         )

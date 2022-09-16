@@ -212,6 +212,14 @@ class GeoModelTest(TestCase):
         with self.assertNumQueries(0):  # Ensure point isn't deferred.
             self.assertIsInstance(cities2[0].point, Point)
 
+    def test_gis_query_as_string(self):
+        """GIS queries can be represented as strings."""
+        query = City.objects.filter(point__within=Polygon.from_bbox((0, 0, 2, 2)))
+        self.assertIn(
+            connection.ops.quote_name(City._meta.db_table),
+            str(query.query),
+        )
+
     def test_dumpdata_loaddata_cycle(self):
         """
         Test a dumpdata/loaddata cycle with geographic data.
@@ -337,12 +345,9 @@ class GeoLookupTest(TestCase):
         invalid_geom = fromstr("POLYGON((0 0, 0 1, 1 1, 1 0, 1 1, 1 0, 0 0))")
         State.objects.create(name="invalid", poly=invalid_geom)
         qs = State.objects.all()
-        if connection.ops.oracle or (
-            connection.ops.mysql and connection.mysql_version < (8, 0, 0)
-        ):
+        if connection.ops.oracle:
             # Kansas has adjacent vertices with distance 6.99244813842e-12
             # which is smaller than the default Oracle tolerance.
-            # It's invalid on MySQL < 8 also.
             qs = qs.exclude(name="Kansas")
             self.assertEqual(
                 State.objects.filter(name="Kansas", poly__isvalid=False).count(), 1

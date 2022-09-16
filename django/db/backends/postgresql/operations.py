@@ -47,22 +47,24 @@ class DatabaseOperations(BaseDatabaseOperations):
             )
         return "%s"
 
-    def date_extract_sql(self, lookup_type, field_name):
+    def date_extract_sql(self, lookup_type, sql, params):
         # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
+        extract_sql = f"EXTRACT(%s FROM {sql})"
+        extract_param = lookup_type
         if lookup_type == "week_day":
             # For consistency across backends, we return Sunday=1, Saturday=7.
-            return "EXTRACT('dow' FROM %s) + 1" % field_name
+            extract_sql = f"EXTRACT(%s FROM {sql}) + 1"
+            extract_param = "dow"
         elif lookup_type == "iso_week_day":
-            return "EXTRACT('isodow' FROM %s)" % field_name
+            extract_param = "isodow"
         elif lookup_type == "iso_year":
-            return "EXTRACT('isoyear' FROM %s)" % field_name
-        else:
-            return "EXTRACT('%s' FROM %s)" % (lookup_type, field_name)
+            extract_param = "isoyear"
+        return extract_sql, (extract_param, *params)
 
-    def date_trunc_sql(self, lookup_type, field_name, tzname=None):
-        field_name = self._convert_field_to_tz(field_name, tzname)
+    def date_trunc_sql(self, lookup_type, sql, params, tzname=None):
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
         # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
-        return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
+        return f"DATE_TRUNC(%s, {sql})", (lookup_type, *params)
 
     def _prepare_tzname_delta(self, tzname):
         tzname, sign, offset = split_tzname_delta(tzname)
@@ -71,43 +73,47 @@ class DatabaseOperations(BaseDatabaseOperations):
             return f"{tzname}{sign}{offset}"
         return tzname
 
-    def _convert_field_to_tz(self, field_name, tzname):
+    def _convert_sql_to_tz(self, sql, params, tzname):
         if tzname and settings.USE_TZ:
-            field_name = "%s AT TIME ZONE '%s'" % (
-                field_name,
-                self._prepare_tzname_delta(tzname),
+            tzname_param = self._prepare_tzname_delta(tzname)
+            return f"{sql} AT TIME ZONE %s", (*params, tzname_param)
+        return sql, params
+
+    def datetime_cast_date_sql(self, sql, params, tzname):
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
+        return f"({sql})::date", params
+
+    def datetime_cast_time_sql(self, sql, params, tzname):
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
+        return f"({sql})::time", params
+
+    def datetime_extract_sql(self, lookup_type, sql, params, tzname):
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
+        if lookup_type == "second":
+            # Truncate fractional seconds.
+            return (
+                f"EXTRACT(%s FROM DATE_TRUNC(%s, {sql}))",
+                ("second", "second", *params),
             )
-        return field_name
+        return self.date_extract_sql(lookup_type, sql, params)
 
-    def datetime_cast_date_sql(self, field_name, tzname):
-        field_name = self._convert_field_to_tz(field_name, tzname)
-        return "(%s)::date" % field_name
-
-    def datetime_cast_time_sql(self, field_name, tzname):
-        field_name = self._convert_field_to_tz(field_name, tzname)
-        return "(%s)::time" % field_name
-
-    def datetime_extract_sql(self, lookup_type, field_name, tzname):
-        field_name = self._convert_field_to_tz(field_name, tzname)
-        if lookup_type == "second":
-            # Truncate fractional seconds.
-            return f"EXTRACT('second' FROM DATE_TRUNC('second', {field_name}))"
-        return self.date_extract_sql(lookup_type, field_name)
-
-    def datetime_trunc_sql(self, lookup_type, field_name, tzname):
-        field_name = self._convert_field_to_tz(field_name, tzname)
+    def datetime_trunc_sql(self, lookup_type, sql, params, tzname):
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
         # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
-        return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
+        return f"DATE_TRUNC(%s, {sql})", (lookup_type, *params)
 
-    def time_extract_sql(self, lookup_type, field_name):
+    def time_extract_sql(self, lookup_type, sql, params):
         if lookup_type == "second":
             # Truncate fractional seconds.
-            return f"EXTRACT('second' FROM DATE_TRUNC('second', {field_name}))"
-        return self.date_extract_sql(lookup_type, field_name)
+            return (
+                f"EXTRACT(%s FROM DATE_TRUNC(%s, {sql}))",
+                ("second", "second", *params),
+            )
+        return self.date_extract_sql(lookup_type, sql, params)
 
-    def time_trunc_sql(self, lookup_type, field_name, tzname=None):
-        field_name = self._convert_field_to_tz(field_name, tzname)
-        return "DATE_TRUNC('%s', %s)::time" % (lookup_type, field_name)
+    def time_trunc_sql(self, lookup_type, sql, params, tzname=None):
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
+        return f"DATE_TRUNC(%s, {sql})::time", (lookup_type, *params)
 
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
@@ -136,6 +142,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         ):
             if internal_type in ("IPAddressField", "GenericIPAddressField"):
                 lookup = "HOST(%s)"
+            # RemovedInDjango51Warning.
             elif internal_type in ("CICharField", "CIEmailField", "CITextField"):
                 lookup = "%s::citext"
             else:

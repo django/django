@@ -55,19 +55,27 @@ class Extract(TimezoneMixin, Transform):
         lhs_output_field = self.lhs.output_field
         if isinstance(lhs_output_field, DateTimeField):
             tzname = self.get_tzname()
-            sql = connection.ops.datetime_extract_sql(self.lookup_name, sql, tzname)
+            sql, params = connection.ops.datetime_extract_sql(
+                self.lookup_name, sql, tuple(params), tzname
+            )
         elif self.tzinfo is not None:
             raise ValueError("tzinfo can only be used with DateTimeField.")
         elif isinstance(lhs_output_field, DateField):
-            sql = connection.ops.date_extract_sql(self.lookup_name, sql)
+            sql, params = connection.ops.date_extract_sql(
+                self.lookup_name, sql, tuple(params)
+            )
         elif isinstance(lhs_output_field, TimeField):
-            sql = connection.ops.time_extract_sql(self.lookup_name, sql)
+            sql, params = connection.ops.time_extract_sql(
+                self.lookup_name, sql, tuple(params)
+            )
         elif isinstance(lhs_output_field, DurationField):
             if not connection.features.has_native_duration_field:
                 raise ValueError(
                     "Extract requires native DurationField database support."
                 )
-            sql = connection.ops.time_extract_sql(self.lookup_name, sql)
+            sql, params = connection.ops.time_extract_sql(
+                self.lookup_name, sql, tuple(params)
+            )
         else:
             # resolve_expression has already validated the output_field so this
             # assert should never be hit.
@@ -235,23 +243,29 @@ class TruncBase(TimezoneMixin, Transform):
         super().__init__(expression, output_field=output_field, **extra)
 
     def as_sql(self, compiler, connection):
-        inner_sql, inner_params = compiler.compile(self.lhs)
+        sql, params = compiler.compile(self.lhs)
         tzname = None
         if isinstance(self.lhs.output_field, DateTimeField):
             tzname = self.get_tzname()
         elif self.tzinfo is not None:
             raise ValueError("tzinfo can only be used with DateTimeField.")
         if isinstance(self.output_field, DateTimeField):
-            sql = connection.ops.datetime_trunc_sql(self.kind, inner_sql, tzname)
+            sql, params = connection.ops.datetime_trunc_sql(
+                self.kind, sql, tuple(params), tzname
+            )
         elif isinstance(self.output_field, DateField):
-            sql = connection.ops.date_trunc_sql(self.kind, inner_sql, tzname)
+            sql, params = connection.ops.date_trunc_sql(
+                self.kind, sql, tuple(params), tzname
+            )
         elif isinstance(self.output_field, TimeField):
-            sql = connection.ops.time_trunc_sql(self.kind, inner_sql, tzname)
+            sql, params = connection.ops.time_trunc_sql(
+                self.kind, sql, tuple(params), tzname
+            )
         else:
             raise ValueError(
                 "Trunc only valid on DateField, TimeField, or DateTimeField."
             )
-        return sql, inner_params
+        return sql, params
 
     def resolve_expression(
         self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
@@ -380,10 +394,9 @@ class TruncDate(TruncBase):
 
     def as_sql(self, compiler, connection):
         # Cast to date rather than truncate to date.
-        lhs, lhs_params = compiler.compile(self.lhs)
+        sql, params = compiler.compile(self.lhs)
         tzname = self.get_tzname()
-        sql = connection.ops.datetime_cast_date_sql(lhs, tzname)
-        return sql, lhs_params
+        return connection.ops.datetime_cast_date_sql(sql, tuple(params), tzname)
 
 
 class TruncTime(TruncBase):
@@ -393,10 +406,9 @@ class TruncTime(TruncBase):
 
     def as_sql(self, compiler, connection):
         # Cast to time rather than truncate to time.
-        lhs, lhs_params = compiler.compile(self.lhs)
+        sql, params = compiler.compile(self.lhs)
         tzname = self.get_tzname()
-        sql = connection.ops.datetime_cast_time_sql(lhs, tzname)
-        return sql, lhs_params
+        return connection.ops.datetime_cast_time_sql(sql, tuple(params), tzname)
 
 
 class TruncHour(TruncBase):

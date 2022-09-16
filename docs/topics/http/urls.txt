@@ -767,7 +767,7 @@ so that it takes the instance namespace into consideration when creating and
 displaying polls.
 
 .. code-block:: python
-    :caption: urls.py
+    :caption: ``urls.py``
 
     from django.urls import include, path
 
@@ -777,7 +777,7 @@ displaying polls.
     ]
 
 .. code-block:: python
-    :caption: polls/urls.py
+    :caption: ``polls/urls.py``
 
     from django.urls import path
 
@@ -836,7 +836,7 @@ module, or a string reference to the module, to :func:`~django.urls.include`,
 not the list of ``urlpatterns`` itself.
 
 .. code-block:: python
-    :caption: polls/urls.py
+    :caption: ``polls/urls.py``
 
     from django.urls import path
 
@@ -850,7 +850,7 @@ not the list of ``urlpatterns`` itself.
     ]
 
 .. code-block:: python
-    :caption: urls.py
+    :caption: ``urls.py``
 
     from django.urls import include, path
 

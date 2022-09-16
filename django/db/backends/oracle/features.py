@@ -54,6 +54,13 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             V_I := P_I;
         END;
     """
+    create_test_table_with_composite_primary_key = """
+        CREATE TABLE test_table_composite_pk (
+            column_1 NUMBER(11) NOT NULL,
+            column_2 NUMBER(11) NOT NULL,
+            PRIMARY KEY (column_1, column_2)
+        )
+    """
     supports_callproc_kwargs = True
     supports_over_clause = True
     supports_frame_range_fixed_distance = True
@@ -64,6 +71,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_slicing_ordering_in_compound = True
     allows_multiple_constraints_on_same_fields = False
     supports_boolean_expr_in_select_clause = False
+    supports_comparing_boolean_expr = False
     supports_primitives_in_json_field = False
     supports_json_field_contains = False
     supports_collation_on_textfield = False

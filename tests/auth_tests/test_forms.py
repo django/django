@@ -1159,14 +1159,13 @@ class ReadOnlyPasswordHashTest(SimpleTestCase):
         )
         self.assertHTMLEqual(
             widget.render("name", value, {"id": "id_password"}),
-            """
-            <div id="id_password">
-                <strong>algorithm</strong>: pbkdf2_sha256
-                <strong>iterations</strong>: 100000
-                <strong>salt</strong>: a6Pucb******
-                <strong>hash</strong>: WmCkn9**************************************
-            </div>
-            """,
+            '<div id="id_password">'
+            "    <strong>algorithm</strong>: <bdi>pbkdf2_sha256</bdi>"
+            "    <strong>iterations</strong>: <bdi>100000</bdi>"
+            "    <strong>salt</strong>: <bdi>a6Pucb******</bdi>"
+            "    <strong>hash</strong>: "
+            "       <bdi>WmCkn9**************************************</bdi>"
+            "</div>",
         )
 
     def test_readonly_field_has_changed(self):

@@ -47,7 +47,9 @@ may be a good choice for the :ref:`range fields <range-fields>` and
         with the exception of those handling relational data
         (:class:`~django.db.models.ForeignKey`,
         :class:`~django.db.models.OneToOneField` and
-        :class:`~django.db.models.ManyToManyField`).
+        :class:`~django.db.models.ManyToManyField`) and file fields (
+        :class:`~django.db.models.FileField` and
+        :class:`~django.db.models.ImageField`).
 
         It is possible to nest array fields - you can specify an instance of
         ``ArrayField`` as the ``base_field``. For example::
@@ -257,6 +259,8 @@ transform do not change. For example::
 
 .. class:: CIText(**options)
 
+    .. deprecated:: 4.2
+
     A mixin to create case-insensitive text fields backed by the citext_ type.
     Read about `the performance considerations`_ prior to using it.
 
@@ -272,8 +276,28 @@ transform do not change. For example::
     Several fields that use the mixin are provided:
 
 .. class:: CICharField(**options)
+
+    .. deprecated:: 4.2
+
+        ``CICharField`` is deprecated in favor of
+        ``CharField(db_collation="…")`` with a case-insensitive
+        non-deterministic collation.
+
 .. class:: CIEmailField(**options)
+
+    .. deprecated:: 4.2
+
+        ``CIEmailField`` is deprecated in favor of
+        ``EmailField(db_collation="…")`` with a case-insensitive
+        non-deterministic collation.
+
 .. class:: CITextField(**options)
+
+    .. deprecated:: 4.2
+
+        ``CITextField`` is deprecated in favor of
+        ``TextField(db_collation="…")`` with a case-insensitive
+        non-deterministic collation.
 
     These fields subclass :class:`~django.db.models.CharField`,
     :class:`~django.db.models.EmailField`, and
@@ -354,6 +378,13 @@ You can chain other lookups after key lookups::
 
     >>> Dog.objects.filter(data__breed__contains='l')
     <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
+
+or use ``F()`` expressions to annotate a key value. For example::
+
+    >>> from django.db.models import F
+    >>> rufus = Dog.objects.annotate(breed=F("data__breed"))[0]
+    >>> rufus.breed
+    'labrador'
 
 If the key you wish to query by clashes with the name of another lookup, you
 need to use the :lookup:`hstorefield.contains` lookup instead.

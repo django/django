@@ -8,7 +8,6 @@ import base64
 import binascii
 import collections
 import html
-from urllib.parse import unquote
 
 from django.conf import settings
 from django.core.exceptions import (
@@ -19,6 +18,7 @@ from django.core.exceptions import (
 from django.core.files.uploadhandler import SkipFile, StopFutureHandlers, StopUpload
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str
+from django.utils.http import parse_header_parameters
 from django.utils.regex_helper import _lazy_re_compile
 
 __all__ = ("MultiPartParser", "MultiPartParserError", "InputStreamExhausted")
@@ -49,7 +49,7 @@ class MultiPartParser:
     and returns a tuple of ``(MultiValueDict(POST), MultiValueDict(FILES))``.
     """
 
-    boundary_re = _lazy_re_compile(rb"[ -~]{0,200}[!-~]")
+    boundary_re = _lazy_re_compile(r"[ -~]{0,200}[!-~]")
 
     def __init__(self, META, input_data, upload_handlers, encoding=None):
         """
@@ -70,14 +70,16 @@ class MultiPartParser:
         if not content_type.startswith("multipart/"):
             raise MultiPartParserError("Invalid Content-Type: %s" % content_type)
 
-        # Parse the header to get the boundary to split the parts.
         try:
-            ctypes, opts = parse_header(content_type.encode("ascii"))
+            content_type.encode("ascii")
         except UnicodeEncodeError:
             raise MultiPartParserError(
                 "Invalid non-ASCII Content-Type in multipart: %s"
                 % force_str(content_type)
             )
+
+        # Parse the header to get the boundary to split the parts.
+        _, opts = parse_header_parameters(content_type)
         boundary = opts.get("boundary")
         if not boundary or not self.boundary_re.fullmatch(boundary):
             raise MultiPartParserError(
@@ -95,9 +97,7 @@ class MultiPartParser:
             # This means we shouldn't continue...raise an error.
             raise MultiPartParserError("Invalid content length: %r" % content_length)
 
-        if isinstance(boundary, str):
-            boundary = boundary.encode("ascii")
-        self._boundary = boundary
+        self._boundary = boundary.encode("ascii")
         self._input_data = input_data
 
         # For compatibility with low-level network APIs (with 32-bit integers),
@@ -654,14 +654,6 @@ def parse_boundary_stream(stream, max_header_size):
     # the payload.
     header_end = chunk.find(b"\r\n\r\n")
 
-    def _parse_header(line):
-        main_value_pair, params = parse_header(line)
-        try:
-            name, value = main_value_pair.split(":", 1)
-        except ValueError:
-            raise ValueError("Invalid header: %r" % line)
-        return name, (value, params)
-
     if header_end == -1:
         # we find no header, so we just mark this fact and pass on
         # the stream verbatim
@@ -682,8 +674,10 @@ def parse_boundary_stream(stream, max_header_size):
         # This terminology ("main value" and "dictionary of
         # parameters") is from the Python docs.
         try:
-            name, (value, params) = _parse_header(line)
-        except ValueError:
+            main_value_pair, params = parse_header_parameters(line.decode())
+            name, value = main_value_pair.split(":", 1)
+            params = {k: v.encode() for k, v in params.items()}
+        except ValueError:  # Invalid header.
             continue
 
         if name == "content-disposition":
@@ -709,50 +703,3 @@ class Parser:
         for sub_stream in boundarystream:
             # Iterate over each part
             yield parse_boundary_stream(sub_stream, 1024)
-
-
-def parse_header(line):
-    """
-    Parse the header into a key-value.
-
-    Input (line): bytes, output: str for key/name, bytes for values which
-    will be decoded later.
-    """
-    plist = _parse_header_params(b";" + line)
-    key = plist.pop(0).lower().decode("ascii")
-    pdict = {}
-    for p in plist:
-        i = p.find(b"=")
-        if i >= 0:
-            has_encoding = False
-            name = p[:i].strip().lower().decode("ascii")
-            if name.endswith("*"):
-                # Lang/encoding embedded in the value (like "filename*=UTF-8''file.ext")
-                # https://tools.ietf.org/html/rfc2231#section-4
-                name = name[:-1]
-                if p.count(b"'") == 2:
-                    has_encoding = True
-            value = p[i + 1 :].strip()
-            if len(value) >= 2 and value[:1] == value[-1:] == b'"':
-                value = value[1:-1]
-                value = value.replace(b"\\\\", b"\\").replace(b'\\"', b'"')
-            if has_encoding:
-                encoding, lang, value = value.split(b"'")
-                value = unquote(value.decode(), encoding=encoding.decode())
-            pdict[name] = value
-    return key, pdict
-
-
-def _parse_header_params(s):
-    plist = []
-    while s[:1] == b";":
-        s = s[1:]
-        end = s.find(b";")
-        while end > 0 and s.count(b'"', 0, end) % 2:
-            end = s.find(b";", end + 1)
-        if end < 0:
-            end = len(s)
-        f = s[:end]
-        plist.append(f.strip())
-        s = s[end:]
-    return plist

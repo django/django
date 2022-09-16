@@ -14,12 +14,15 @@ __all__ = ["BaseConstraint", "CheckConstraint", "Deferrable", "UniqueConstraint"
 
 
 class BaseConstraint:
-    violation_error_message = _("Constraint “%(name)s” is violated.")
+    default_violation_error_message = _("Constraint “%(name)s” is violated.")
+    violation_error_message = None
 
     def __init__(self, name, violation_error_message=None):
         self.name = name
         if violation_error_message is not None:
             self.violation_error_message = violation_error_message
+        else:
+            self.violation_error_message = self.default_violation_error_message
 
     @property
     def contains_expressions(self):
@@ -43,7 +46,13 @@ class BaseConstraint:
     def deconstruct(self):
         path = "%s.%s" % (self.__class__.__module__, self.__class__.__name__)
         path = path.replace("django.db.models.constraints", "django.db.models")
-        return (path, (), {"name": self.name})
+        kwargs = {"name": self.name}
+        if (
+            self.violation_error_message is not None
+            and self.violation_error_message != self.default_violation_error_message
+        ):
+            kwargs["violation_error_message"] = self.violation_error_message
+        return (path, (), kwargs)
 
     def clone(self):
         _, args, kwargs = self.deconstruct()
@@ -94,7 +103,11 @@ class CheckConstraint(BaseConstraint):
 
     def __eq__(self, other):
         if isinstance(other, CheckConstraint):
-            return self.name == other.name and self.check == other.check
+            return (
+                self.name == other.name
+                and self.check == other.check
+                and self.violation_error_message == other.violation_error_message
+            )
         return super().__eq__(other)
 
     def deconstruct(self):
@@ -273,6 +286,7 @@ class UniqueConstraint(BaseConstraint):
                 and self.include == other.include
                 and self.opclasses == other.opclasses
                 and self.expressions == other.expressions
+                and self.violation_error_message == other.violation_error_message
             )
         return super().__eq__(other)
 
@@ -312,14 +326,20 @@ class UniqueConstraint(BaseConstraint):
             # Ignore constraints with excluded fields.
             if exclude:
                 for expression in self.expressions:
-                    for expr in expression.flatten():
-                        if isinstance(expr, F) and expr.name in exclude:
-                            return
-            replacement_map = instance._get_field_value_map(
-                meta=model._meta, exclude=exclude
-            )
+                    if hasattr(expression, "flatten"):
+                        for expr in expression.flatten():
+                            if isinstance(expr, F) and expr.name in exclude:
+                                return
+                    elif isinstance(expression, F) and expression.name in exclude:
+                        return
+            replacements = {
+                F(field): value
+                for field, value in instance._get_field_value_map(
+                    meta=model._meta, exclude=exclude
+                ).items()
+            }
             expressions = [
-                Exact(expr, expr.replace_references(replacement_map))
+                Exact(expr, expr.replace_expressions(replacements))
                 for expr in self.expressions
             ]
             queryset = queryset.filter(*expressions)

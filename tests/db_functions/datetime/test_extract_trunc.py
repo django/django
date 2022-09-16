@@ -13,6 +13,7 @@ except ImportError:
     pytz = None
 
 from django.conf import settings
+from django.db import DataError, OperationalError
 from django.db.models import (
     DateField,
     DateTimeField,
@@ -234,6 +235,22 @@ class DateFunctionTests(TestCase):
                 ).filter(**{"start_datetime__%s__lte" % lookup: F("end_year")})
                 self.assertEqual(qs.count(), 1)
                 self.assertGreaterEqual(str(qs.query).lower().count("extract"), 2)
+
+    def test_extract_lookup_name_sql_injection(self):
+        start_datetime = datetime(2015, 6, 15, 14, 30, 50, 321)
+        end_datetime = datetime(2016, 6, 15, 14, 10, 50, 123)
+        if settings.USE_TZ:
+            start_datetime = timezone.make_aware(start_datetime)
+            end_datetime = timezone.make_aware(end_datetime)
+        self.create_model(start_datetime, end_datetime)
+        self.create_model(end_datetime, start_datetime)
+
+        with self.assertRaises((DataError, OperationalError, ValueError)):
+            DTModel.objects.filter(
+                start_datetime__year=Extract(
+                    "start_datetime", "day' FROM start_datetime)) OR 1=1;--"
+                )
+            ).exists()
 
     def test_extract_func(self):
         start_datetime = datetime(2015, 6, 15, 14, 30, 50, 321)
@@ -914,6 +931,27 @@ class DateFunctionTests(TestCase):
             DTModel.objects.filter(start_time__second=F("end_time__second")),
             [obj],
         )
+
+    def test_trunc_lookup_name_sql_injection(self):
+        start_datetime = datetime(2015, 6, 15, 14, 30, 50, 321)
+        end_datetime = datetime(2016, 6, 15, 14, 10, 50, 123)
+        if settings.USE_TZ:
+            start_datetime = timezone.make_aware(start_datetime)
+            end_datetime = timezone.make_aware(end_datetime)
+        self.create_model(start_datetime, end_datetime)
+        self.create_model(end_datetime, start_datetime)
+        # Database backends raise an exception or don't return any results.
+        try:
+            exists = DTModel.objects.filter(
+                start_datetime__date=Trunc(
+                    "start_datetime",
+                    "year', start_datetime)) OR 1=1;--",
+                )
+            ).exists()
+        except (DataError, OperationalError):
+            pass
+        else:
+            self.assertIs(exists, False)
 
     def test_trunc_func(self):
         start_datetime = datetime(999, 6, 15, 14, 30, 50, 321)

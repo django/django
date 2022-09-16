@@ -93,6 +93,9 @@ class FakePayload:
         self.__content.write(content)
         self.__len += len(content)
 
+    def close(self):
+        pass
+
 
 def closing_iterator_wrapper(iterable, close):
     try:

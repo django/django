@@ -112,9 +112,11 @@ manual connect route::
 
 Alternatively, you can use a :func:`receiver` decorator:
 
-.. function:: receiver(signal)
+.. function:: receiver(signal, **kwargs)
 
     :param signal: A signal or a list of signals to connect a function to.
+    :param kwargs: Wildcard keyword arguments to pass to a
+        :ref:`function <receiver-functions>`.
 
 Here's how you connect with the decorator::
 
@@ -148,7 +150,7 @@ Now, our ``my_callback`` function will be called each time a request finishes.
             ...
 
             def ready(self):
-                # Implicitly connect a signal handlers decorated with @receiver.
+                # Implicitly connect signal handlers decorated with @receiver.
                 from . import signals
                 # Explicitly connect a signal handler.
                 request_finished.connect(signals.my_callback)

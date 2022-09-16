@@ -577,6 +577,9 @@ class BaseCacheTests:
         self.assertIsNone(cache.get("key1"))
         self.assertIsNone(cache.get("key2"))
 
+    def test_set_many_empty_data(self):
+        self.assertEqual(cache.set_many({}), [])
+
     def test_delete_many(self):
         # Multiple keys can be deleted using delete_many
         cache.set_many({"key1": "spam", "key2": "eggs", "key3": "ham"})
@@ -584,6 +587,9 @@ class BaseCacheTests:
         self.assertIsNone(cache.get("key1"))
         self.assertIsNone(cache.get("key2"))
         self.assertEqual(cache.get("key3"), "ham")
+
+    def test_delete_many_no_keys(self):
+        self.assertIsNone(cache.delete_many([]))
 
     def test_clear(self):
         # The cache can be emptied using clear

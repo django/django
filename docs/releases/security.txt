@@ -36,6 +36,26 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+August 3, 2022 - :cve:`2022-36359`
+----------------------------------
+
+Potential reflected file download vulnerability in FileResponse. `Full
+description
+<https://www.djangoproject.com/weblog/2022/aug/03/security-releases/>`__
+
+* Django 4.0 :commit:`(patch) <b7d9529cbe0af4adabb6ea5d01ed8dcce3668fb3>`
+* Django 3.2 :commit:`(patch) <b3e4494d759202a3b6bf247fd34455bf13be5b80>`
+
+July 4, 2022 - :cve:`2022-34265`
+--------------------------------
+
+Potential SQL injection via ``Trunc(kind)`` and ``Extract(lookup_name)``
+arguments. `Full description
+<https://www.djangoproject.com/weblog/2022/jul/04/security-releases/>`__
+
+* Django 4.0 :commit:`(patch) <0dc9c016fadb71a067e5a42be30164e3f96c0492>`
+* Django 3.2 :commit:`(patch) <a9010fe5555e6086a9d9ae50069579400ef0685e>`
+
 April 11, 2022 - :cve:`2022-28346`
 ----------------------------------
 

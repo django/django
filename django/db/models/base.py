@@ -1100,9 +1100,9 @@ class Model(metaclass=ModelBase):
                         "related object '%s'." % (operation_name, field.name)
                     )
                 elif getattr(self, field.attname) in field.empty_values:
-                    # Use pk from related object if it has been saved after
-                    # an assignment.
-                    setattr(self, field.attname, obj.pk)
+                    # Set related object if it has been saved after an
+                    # assignment.
+                    setattr(self, field.name, obj)
                 # If the relationship's pk/to_field was changed, clear the
                 # cached relationship.
                 if getattr(obj, field.target_field.attname) != getattr(
@@ -1152,8 +1152,8 @@ class Model(metaclass=ModelBase):
         op = "gt" if is_next else "lt"
         order = "" if is_next else "-"
         param = getattr(self, field.attname)
-        q = Q((field.name, param), (f"pk__{op}", self.pk), _connector=Q.AND)
-        q = Q(q, (f"{field.name}__{op}", param), _connector=Q.OR)
+        q = Q.create([(field.name, param), (f"pk__{op}", self.pk)], connector=Q.AND)
+        q = Q.create([q, (f"{field.name}__{op}", param)], connector=Q.OR)
         qs = (
             self.__class__._default_manager.using(self._state.db)
             .filter(**kwargs)
@@ -1841,6 +1841,7 @@ class Model(metaclass=ModelBase):
             )
         return errors
 
+    # RemovedInDjango51Warning.
     @classmethod
     def _check_index_together(cls):
         """Check the value of "index_together" option."""

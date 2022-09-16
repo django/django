@@ -260,7 +260,10 @@ particular model, you can create a functional
 :class:`GiST <django.contrib.postgres.indexes.GistIndex>` index which matches
 the search vector you wish to use. For example::
 
-    GinIndex(SearchVector('body_text'), name='body_search_vector_idx')
+    GinIndex(
+        SearchVector('body_text', 'headline', config='english'),
+        name='search_vector_idx',
+    )
 
 The PostgreSQL documentation has details on
 `creating indexes for full text search
@@ -286,9 +289,9 @@ Trigram similarity
 ==================
 
 Another approach to searching is trigram similarity. A trigram is a group of
-three consecutive characters. In addition to the :lookup:`trigram_similar` and
-:lookup:`trigram_word_similar` lookups, you can use a couple of other
-expressions.
+three consecutive characters. In addition to the :lookup:`trigram_similar`,
+:lookup:`trigram_word_similar`, and :lookup:`trigram_strict_word_similar`
+lookups, you can use a couple of other expressions.
 
 To use them, you need to activate the `pg_trgm extension
 <https://www.postgresql.org/docs/current/pgtrgm.html>`_ on PostgreSQL. You can
@@ -334,6 +337,18 @@ Usage example::
     ... ).filter(similarity__gt=0.3).order_by('-similarity')
     [<Author: Katy Stevens>]
 
+``TrigramStrictWordSimilarity``
+-------------------------------
+
+.. class:: TrigramStrictWordSimilarity(string, expression, **extra)
+
+.. versionadded:: 4.2
+
+Accepts a string or expression, and a field name or expression. Returns the
+trigram strict word similarity between the two arguments. Similar to
+:class:`TrigramWordSimilarity() <TrigramWordSimilarity>`, except that it forces
+extent boundaries to match word boundaries.
+
 ``TrigramDistance``
 -------------------
 
@@ -371,3 +386,13 @@ Usage example::
     ...     distance=TrigramWordDistance(test, 'name'),
     ... ).filter(distance__lte=0.7).order_by('distance')
     [<Author: Katy Stevens>]
+
+``TrigramStrictWordDistance``
+-----------------------------
+
+.. class:: TrigramStrictWordDistance(string, expression, **extra)
+
+.. versionadded:: 4.2
+
+Accepts a string or expression, and a field name or expression. Returns the
+trigram strict word distance between the two arguments.

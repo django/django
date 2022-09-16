@@ -38,18 +38,7 @@ class Article(models.Model):
     )
 
     class Meta:
-        index_together = [
-            ["headline", "pub_date"],
-        ]
-
-
-# Model for index_together being used only with single list
-class IndexTogetherSingleList(models.Model):
-    headline = models.CharField(max_length=100)
-    pub_date = models.DateTimeField()
-
-    class Meta:
-        index_together = ["headline", "pub_date"]
+        indexes = [models.Index(fields=["headline", "pub_date"])]
 
 
 class IndexedArticle(models.Model):

@@ -24,7 +24,7 @@ Let's see how this works by reordering the fields on the edit form. Replace
 the ``admin.site.register(Question)`` line with:
 
 .. code-block:: python
-    :caption: polls/admin.py
+    :caption: ``polls/admin.py``
 
     from django.contrib import admin
 
@@ -53,7 +53,7 @@ And speaking of forms with dozens of fields, you might want to split the form
 up into fieldsets:
 
 .. code-block:: python
-    :caption: polls/admin.py
+    :caption: ``polls/admin.py``
 
     from django.contrib import admin
 
@@ -87,7 +87,7 @@ There are two ways to solve this problem. The first is to register ``Choice``
 with the admin just as we did with ``Question``:
 
 .. code-block:: python
-    :caption: polls/admin.py
+    :caption: ``polls/admin.py``
 
     from django.contrib import admin
 
@@ -121,7 +121,7 @@ Remove the ``register()`` call for the ``Choice`` model. Then, edit the ``Questi
 registration code to read:
 
 .. code-block:: python
-    :caption: polls/admin.py
+    :caption: ``polls/admin.py``
 
     from django.contrib import admin
 
@@ -168,7 +168,7 @@ tabular way of displaying inline related objects. To use it, change the
 ``ChoiceInline`` declaration to read:
 
 .. code-block:: python
-    :caption: polls/admin.py
+    :caption: ``polls/admin.py``
 
     class ChoiceInline(admin.TabularInline):
         #...
@@ -200,21 +200,21 @@ tuple of field names to display, as columns, on the change list page for the
 object:
 
 .. code-block:: python
-    :caption: polls/admin.py
+    :caption: ``polls/admin.py``
 
     class QuestionAdmin(admin.ModelAdmin):
         # ...
-        list_display = ('question_text', 'pub_date')
+        list_display = ['question_text', 'pub_date']
 
 For good measure, let's also include the ``was_published_recently()`` method
 from :doc:`Tutorial 2 </intro/tutorial02>`:
 
 .. code-block:: python
-    :caption: polls/admin.py
+    :caption: ``polls/admin.py``
 
     class QuestionAdmin(admin.ModelAdmin):
         # ...
-        list_display = ('question_text', 'pub_date', 'was_published_recently')
+        list_display = ['question_text', 'pub_date', 'was_published_recently']
 
 Now the question change list page looks like this:
 
@@ -232,7 +232,7 @@ You can improve that by using the :func:`~django.contrib.admin.display`
 decorator on that method (in :file:`polls/models.py`), as follows:
 
 .. code-block:: python
-    :caption: polls/models.py
+    :caption: ``polls/models.py``
 
     from django.contrib import admin
 
@@ -310,7 +310,7 @@ Open your settings file (:file:`mysite/settings.py`, remember) and add a
 :setting:`DIRS <TEMPLATES-DIRS>` option in the :setting:`TEMPLATES` setting:
 
 .. code-block:: python
-    :caption: mysite/settings.py
+    :caption: ``mysite/settings.py``
 
     TEMPLATES = [
         {
@@ -343,7 +343,7 @@ when loading Django templates; it's a search path.
 Now create a directory called ``admin`` inside ``templates``, and copy the
 template ``admin/base_site.html`` from within the default Django admin
 template directory in the source code of Django itself
-(``django/contrib/admin/templates``) into that directory.
+(:source:`django/contrib/admin/templates`) into that directory.
 
 .. admonition:: Where are the Django source files?
 

@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/psf/black
-    rev: 22.3.0
+    rev: 22.8.0
     hooks:
     - id: black
       exclude: \.py-tpl$
@@ -9,10 +9,10 @@ repos:
     hooks:
       - id: isort
   - repo: https://github.com/PyCQA/flake8
-    rev: 4.0.1
+    rev: 5.0.4
     hooks:
       - id: flake8
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.15.0
+    rev: v8.23.0
     hooks:
       - id: eslint

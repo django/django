@@ -10,12 +10,14 @@ from django.db.models import (
     F,
     Func,
     IntegerField,
+    Model,
     Q,
     UniqueConstraint,
 )
 from django.db.models.fields.json import KeyTextTransform
 from django.db.models.functions import Cast, Left, Lower
 from django.test import ignore_warnings, modify_settings, skipUnlessDBFeature
+from django.test.utils import isolate_apps
 from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango50Warning
 
@@ -65,6 +67,16 @@ class SchemaTests(PostgreSQLTestCase):
             RangesModel.objects.create(ints=(20, 50))
         RangesModel.objects.create(ints=(10, 30))
 
+    def test_check_constraint_array_contains(self):
+        constraint = CheckConstraint(
+            check=Q(field__contains=[1]),
+            name="array_contains",
+        )
+        msg = f"Constraint “{constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(IntegerArrayModel, IntegerArrayModel())
+        constraint.validate(IntegerArrayModel, IntegerArrayModel(field=[1]))
+
     def test_check_constraint_daterange_contains(self):
         constraint_name = "dates_contains"
         self.assertNotIn(
@@ -112,6 +124,39 @@ class SchemaTests(PostgreSQLTestCase):
             timestamps=(datetime_1, datetime_2),
             timestamps_inner=(datetime_1, datetime_2),
         )
+
+    def test_check_constraint_range_contains(self):
+        constraint = CheckConstraint(
+            check=Q(ints__contains=(1, 5)),
+            name="ints_contains",
+        )
+        msg = f"Constraint “{constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(RangesModel, RangesModel(ints=(6, 10)))
+
+    def test_check_constraint_range_lower_upper(self):
+        constraint = CheckConstraint(
+            check=Q(ints__startswith__gte=0) & Q(ints__endswith__lte=99),
+            name="ints_range_lower_upper",
+        )
+        msg = f"Constraint “{constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(RangesModel, RangesModel(ints=(-1, 20)))
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(RangesModel, RangesModel(ints=(0, 100)))
+        constraint.validate(RangesModel, RangesModel(ints=(0, 99)))
+
+    def test_check_constraint_range_lower_with_nulls(self):
+        constraint = CheckConstraint(
+            check=Q(ints__isnull=True) | Q(ints__startswith__gte=0),
+            name="ints_optional_positive_range",
+        )
+        constraint.validate(RangesModel, RangesModel())
+        constraint = CheckConstraint(
+            check=Q(ints__startswith__gte=0),
+            name="ints_positive_range",
+        )
+        constraint.validate(RangesModel, RangesModel())
 
     def test_opclass(self):
         constraint = UniqueConstraint(
@@ -444,17 +489,39 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             )
             self.assertNotEqual(constraint_2, constraint_9)
             self.assertNotEqual(constraint_7, constraint_8)
+
+        constraint_10 = ExclusionConstraint(
+            name="exclude_overlapping",
+            expressions=[
+                (F("datespan"), RangeOperators.OVERLAPS),
+                (F("room"), RangeOperators.EQUAL),
+            ],
+            condition=Q(cancelled=False),
+            violation_error_message="custom error",
+        )
+        constraint_11 = ExclusionConstraint(
+            name="exclude_overlapping",
+            expressions=[
+                (F("datespan"), RangeOperators.OVERLAPS),
+                (F("room"), RangeOperators.EQUAL),
+            ],
+            condition=Q(cancelled=False),
+            violation_error_message="other custom error",
+        )
         self.assertEqual(constraint_1, constraint_1)
         self.assertEqual(constraint_1, mock.ANY)
         self.assertNotEqual(constraint_1, constraint_2)
         self.assertNotEqual(constraint_1, constraint_3)
         self.assertNotEqual(constraint_1, constraint_4)
+        self.assertNotEqual(constraint_1, constraint_10)
         self.assertNotEqual(constraint_2, constraint_3)
         self.assertNotEqual(constraint_2, constraint_4)
         self.assertNotEqual(constraint_2, constraint_7)
         self.assertNotEqual(constraint_4, constraint_5)
         self.assertNotEqual(constraint_5, constraint_6)
         self.assertNotEqual(constraint_1, object())
+        self.assertNotEqual(constraint_10, constraint_11)
+        self.assertEqual(constraint_10, constraint_10)
 
     def test_deconstruct(self):
         constraint = ExclusionConstraint(
@@ -1083,6 +1150,29 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.add_constraint(Room, constraint)
         self.assertIn(constraint_name, self.get_constraints(Room._meta.db_table))
+
+    @isolate_apps("postgres_tests")
+    def test_table_create(self):
+        constraint_name = "exclusion_equal_number_tc"
+
+        class ModelWithExclusionConstraint(Model):
+            number = IntegerField()
+
+            class Meta:
+                app_label = "postgres_tests"
+                constraints = [
+                    ExclusionConstraint(
+                        name=constraint_name,
+                        expressions=[("number", RangeOperators.EQUAL)],
+                    )
+                ]
+
+        with connection.schema_editor() as editor:
+            editor.create_model(ModelWithExclusionConstraint)
+        self.assertIn(
+            constraint_name,
+            self.get_constraints(ModelWithExclusionConstraint._meta.db_table),
+        )
 
 
 @modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})

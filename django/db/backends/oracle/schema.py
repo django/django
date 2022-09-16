@@ -242,9 +242,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             )
             return cursor.fetchone()[0]
 
-    def _alter_column_collation_sql(self, model, new_field, new_type, new_collation):
+    def _alter_column_collation_sql(
+        self, model, new_field, new_type, new_collation, old_field
+    ):
         if new_collation is None:
             new_collation = self._get_default_collation(model._meta.db_table)
         return super()._alter_column_collation_sql(
-            model, new_field, new_type, new_collation
+            model, new_field, new_type, new_collation, old_field
         )

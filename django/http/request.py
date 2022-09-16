@@ -24,8 +24,6 @@ from django.utils.functional import cached_property
 from django.utils.http import is_same_domain, parse_header_parameters
 from django.utils.regex_helper import _lazy_re_compile
 
-from .multipartparser import parse_header
-
 RAISE_ERROR = object()
 host_validation_re = _lazy_re_compile(
     r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:[0-9]+)?$"
@@ -53,6 +51,8 @@ class HttpRequest:
     _encoding = None
     _upload_handlers = []
 
+    non_picklable_attrs = frozenset(["resolver_match", "_stream"])
+
     def __init__(self):
         # WARNING: The `WSGIRequest` subclass doesn't call `super`.
         # Any variable assignment made here should also happen in
@@ -79,6 +79,21 @@ class HttpRequest:
             self.method,
             self.get_full_path(),
         )
+
+    def __getstate__(self):
+        obj_dict = self.__dict__.copy()
+        for attr in self.non_picklable_attrs:
+            if attr in obj_dict:
+                del obj_dict[attr]
+        return obj_dict
+
+    def __deepcopy__(self, memo):
+        obj = copy.copy(self)
+        for attr in self.non_picklable_attrs:
+            if hasattr(self, attr):
+                setattr(obj, attr, copy.deepcopy(getattr(self, attr), memo))
+        memo[id(self)] = obj
+        return obj
 
     @cached_property
     def headers(self):
@@ -340,6 +355,8 @@ class HttpRequest:
                 self._body = self.read()
             except OSError as e:
                 raise UnreadablePostError(*e.args) from e
+            finally:
+                self._stream.close()
             self._stream = BytesIO(self._body)
         return self._body
 
@@ -618,15 +635,13 @@ class QueryDict(MultiValueDict):
 
 class MediaType:
     def __init__(self, media_type_raw_line):
-        full_type, self.params = parse_header(
-            media_type_raw_line.encode("ascii") if media_type_raw_line else b""
+        full_type, self.params = parse_header_parameters(
+            media_type_raw_line if media_type_raw_line else ""
         )
         self.main_type, _, self.sub_type = full_type.partition("/")
 
     def __str__(self):
-        params_str = "".join(
-            "; %s=%s" % (k, v.decode("ascii")) for k, v in self.params.items()
-        )
+        params_str = "".join("; %s=%s" % (k, v) for k, v in self.params.items())
         return "%s%s%s" % (
             self.main_type,
             ("/%s" % self.sub_type) if self.sub_type else "",

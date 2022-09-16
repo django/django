@@ -114,7 +114,7 @@ class QTests(SimpleTestCase):
                 ("price", F("discounted_price")),
             ),
         )
-        self.assertEqual(kwargs, {"_connector": "OR"})
+        self.assertEqual(kwargs, {"_connector": Q.OR})
 
     def test_deconstruct_xor(self):
         q1 = Q(price__gt=F("discounted_price"))
@@ -128,7 +128,7 @@ class QTests(SimpleTestCase):
                 ("price", F("discounted_price")),
             ),
         )
-        self.assertEqual(kwargs, {"_connector": "XOR"})
+        self.assertEqual(kwargs, {"_connector": Q.XOR})
 
     def test_deconstruct_and(self):
         q1 = Q(price__gt=F("discounted_price"))
@@ -215,6 +215,15 @@ class QTests(SimpleTestCase):
         )
         flatten = list(q.flatten())
         self.assertEqual(len(flatten), 7)
+
+    def test_create_helper(self):
+        items = [("a", 1), ("b", 2), ("c", 3)]
+        for connector in [Q.AND, Q.OR, Q.XOR]:
+            with self.subTest(connector=connector):
+                self.assertEqual(
+                    Q.create(items, connector=connector),
+                    Q(*items, _connector=connector),
+                )
 
 
 class QCheckTests(TestCase):

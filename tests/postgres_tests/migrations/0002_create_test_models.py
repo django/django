@@ -291,6 +291,7 @@ class Migration(migrations.Migration):
             options=None,
             bases=None,
         ),
+        # RemovedInDjango51Warning.
         migrations.CreateModel(
             name="CITestModel",
             fields=[

@@ -366,11 +366,28 @@ class HttpResponse(HttpResponseBase):
     """
 
     streaming = False
+    non_picklable_attrs = frozenset(
+        [
+            "resolver_match",
+            # Non-picklable attributes added by test clients.
+            "client",
+            "context",
+            "json",
+            "templates",
+        ]
+    )
 
     def __init__(self, content=b"", *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Content is a bytestring. See the `content` property methods.
         self.content = content
+
+    def __getstate__(self):
+        obj_dict = self.__dict__.copy()
+        for attr in self.non_picklable_attrs:
+            if attr in obj_dict:
+                del obj_dict[attr]
+        return obj_dict
 
     def __repr__(self):
         return "<%(cls)s status_code=%(status_code)d%(content_type)s>" % {
@@ -556,7 +573,9 @@ class FileResponse(StreamingHttpResponse):
             disposition = "attachment" if self.as_attachment else "inline"
             try:
                 filename.encode("ascii")
-                file_expr = 'filename="{}"'.format(filename)
+                file_expr = 'filename="{}"'.format(
+                    filename.replace("\\", "\\\\").replace('"', r"\"")
+                )
             except UnicodeEncodeError:
                 file_expr = "filename*=utf-8''{}".format(quote(filename))
             self.headers["Content-Disposition"] = "{}; {}".format(

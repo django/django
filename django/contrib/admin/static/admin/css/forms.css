@@ -123,6 +123,12 @@ form .aligned div.help {
     padding-left: 10px;
 }
 
+form .aligned p.datetime div.help.timezonewarning {
+    margin-left: 0;
+    padding-left: 0;
+    font-weight: normal;
+}
+
 form .aligned label + p.help,
 form .aligned label + div.help {
     margin-left: 0;
@@ -242,19 +248,21 @@ fieldset.collapsed .collapse-toggle {
 /* MONOSPACE TEXTAREAS */
 
 fieldset.monospace textarea {
-    font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
+    font-family: var(--font-family-monospace);
 }
 
 /* SUBMIT ROW */
 
 .submit-row {
-    padding: 12px 14px 7px;
+    padding: 12px 14px 12px;
     margin: 0 0 20px;
     background: var(--darkened-bg);
     border: 1px solid var(--hairline-color);
     border-radius: 4px;
-    text-align: right;
     overflow: hidden;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 body.popup .submit-row {
@@ -264,21 +272,18 @@ body.popup .submit-row {
 .submit-row input {
     height: 35px;
     line-height: 15px;
-    margin: 0 0 5px 5px;
+}
+
+.submit-row input, .submit-row a {
+    margin: 0;
 }
 
 .submit-row input.default {
-    margin: 0 0 5px 8px;
     text-transform: uppercase;
 }
 
-.submit-row p {
-    margin: 0.3em;
-}
-
-.submit-row p.deletelink-box {
-    float: left;
-    margin: 0;
+.submit-row a.deletelink {
+    margin-left: auto;
 }
 
 .submit-row a.deletelink {
@@ -288,7 +293,6 @@ body.popup .submit-row {
     padding: 10px 15px;
     height: 15px;
     line-height: 15px;
-    margin-bottom: 5px;
     color: var(--button-fg);
 }
 
@@ -299,7 +303,6 @@ body.popup .submit-row {
     padding: 10px 15px;
     height: 15px;
     line-height: 15px;
-    margin: 0 0 0 5px;
     color: var(--button-fg);
 }
 
@@ -307,12 +310,14 @@ body.popup .submit-row {
 .submit-row a.deletelink:hover,
 .submit-row a.deletelink:active {
     background: var(--delete-button-hover-bg);
+    text-decoration: none;
 }
 
 .submit-row a.closelink:focus,
 .submit-row a.closelink:hover,
 .submit-row a.closelink:active {
     background: var(--close-button-hover-bg);
+    text-decoration: none;
 }
 
 /* CUSTOM FORM FIELDS */

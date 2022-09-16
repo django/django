@@ -25,6 +25,8 @@ def format(
         module in locale.localeconv() LC_NUMERIC grouping (e.g. (3, 2, 0)).
     * thousand_sep: Thousand separator symbol (for example ",")
     """
+    if number is None or number == "":
+        return mark_safe(number)
     use_grouping = (
         use_l10n or (use_l10n is None and settings.USE_L10N)
     ) and settings.USE_THOUSAND_SEPARATOR

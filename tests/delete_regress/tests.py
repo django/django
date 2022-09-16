@@ -399,3 +399,19 @@ class DeleteDistinct(SimpleTestCase):
             Book.objects.distinct().delete()
         with self.assertRaisesMessage(TypeError, msg):
             Book.objects.distinct("id").delete()
+
+
+class SetQueryCountTests(TestCase):
+    def test_set_querycount(self):
+        policy = Policy.objects.create()
+        version = Version.objects.create(policy=policy)
+        location = Location.objects.create(version=version)
+        Item.objects.create(
+            version=version,
+            location=location,
+            location_default=location,
+            location_value=location,
+        )
+        # 3 UPDATEs for SET of item values and one for DELETE locations.
+        with self.assertNumQueries(4):
+            location.delete()

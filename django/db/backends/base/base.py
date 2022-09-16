@@ -1,6 +1,7 @@
 import _thread
 import copy
 import datetime
+import logging
 import threading
 import time
 import warnings
@@ -25,6 +26,8 @@ from django.utils.functional import cached_property
 
 NO_DB_ALIAS = "__no_db__"
 RAN_DB_VERSION_CHECK = set()
+
+logger = logging.getLogger("django.db.backends.base")
 
 
 # RemovedInDjango50Warning
@@ -104,8 +107,9 @@ class BaseDatabaseWrapper:
         self._thread_ident = _thread.get_ident()
 
         # A list of no-argument functions to run when the transaction commits.
-        # Each entry is an (sids, func) tuple, where sids is a set of the
-        # active savepoint IDs when this function was registered.
+        # Each entry is an (sids, func, robust) tuple, where sids is a set of
+        # the active savepoint IDs when this function was registered and robust
+        # specifies whether it's allowed for the function to fail.
         self.run_on_commit = []
 
         # Should we run the on-commit hooks the next time set_autocommit(True)
@@ -417,7 +421,9 @@ class BaseDatabaseWrapper:
 
         # Remove any callbacks registered while this savepoint was active.
         self.run_on_commit = [
-            (sids, func) for (sids, func) in self.run_on_commit if sid not in sids
+            (sids, func, robust)
+            for (sids, func, robust) in self.run_on_commit
+            if sid not in sids
         ]
 
     @async_unsafe
@@ -723,12 +729,12 @@ class BaseDatabaseWrapper:
             )
         return self.SchemaEditorClass(self, *args, **kwargs)
 
-    def on_commit(self, func):
+    def on_commit(self, func, robust=False):
         if not callable(func):
             raise TypeError("on_commit()'s callback must be a callable.")
         if self.in_atomic_block:
             # Transaction in progress; save for execution on commit.
-            self.run_on_commit.append((set(self.savepoint_ids), func))
+            self.run_on_commit.append((set(self.savepoint_ids), func, robust))
         elif not self.get_autocommit():
             raise TransactionManagementError(
                 "on_commit() cannot be used in manual transaction management"
@@ -736,15 +742,36 @@ class BaseDatabaseWrapper:
         else:
             # No transaction in progress and in autocommit mode; execute
             # immediately.
-            func()
+            if robust:
+                try:
+                    func()
+                except Exception as e:
+                    logger.error(
+                        f"Error calling {func.__qualname__} in on_commit() (%s).",
+                        e,
+                        exc_info=True,
+                    )
+            else:
+                func()
 
     def run_and_clear_commit_hooks(self):
         self.validate_no_atomic_block()
         current_run_on_commit = self.run_on_commit
         self.run_on_commit = []
         while current_run_on_commit:
-            sids, func = current_run_on_commit.pop(0)
-            func()
+            _, func, robust = current_run_on_commit.pop(0)
+            if robust:
+                try:
+                    func()
+                except Exception as e:
+                    logger.error(
+                        f"Error calling {func.__qualname__} in on_commit() during "
+                        f"transaction (%s).",
+                        e,
+                        exc_info=True,
+                    )
+            else:
+                func()
 
     @contextmanager
     def execute_wrapper(self, wrapper):

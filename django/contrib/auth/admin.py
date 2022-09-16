@@ -138,7 +138,7 @@ class UserAdmin(admin.ModelAdmin):
             raise PermissionDenied
         if extra_context is None:
             extra_context = {}
-        username_field = self.model._meta.get_field(self.model.USERNAME_FIELD)
+        username_field = self.opts.get_field(self.model.USERNAME_FIELD)
         defaults = {
             "auto_populated_fields": (),
             "username_help_text": username_field.help_text,
@@ -155,7 +155,7 @@ class UserAdmin(admin.ModelAdmin):
             raise Http404(
                 _("%(name)s object with primary key %(key)r does not exist.")
                 % {
-                    "name": self.model._meta.verbose_name,
+                    "name": self.opts.verbose_name,
                     "key": escape(id),
                 }
             )
@@ -183,11 +183,11 @@ class UserAdmin(admin.ModelAdmin):
             form = self.change_password_form(user)
 
         fieldsets = [(None, {"fields": list(form.base_fields)})]
-        adminForm = admin.helpers.AdminForm(form, fieldsets, {})
+        admin_form = admin.helpers.AdminForm(form, fieldsets, {})
 
         context = {
             "title": _("Change password: %s") % escape(user.get_username()),
-            "adminForm": adminForm,
+            "adminForm": admin_form,
             "form_url": form_url,
             "form": form,
             "is_popup": (IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET),
@@ -197,7 +197,7 @@ class UserAdmin(admin.ModelAdmin):
             "has_delete_permission": False,
             "has_change_permission": True,
             "has_absolute_url": False,
-            "opts": self.model._meta,
+            "opts": self.opts,
             "original": user,
             "save_as": False,
             "show_save": True,

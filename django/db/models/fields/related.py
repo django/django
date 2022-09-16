@@ -407,12 +407,13 @@ class RelatedField(FieldCacheMixin, Field):
         select all instances of self.related_field.model related through
         this field to obj. obj is an instance of self.model.
         """
-        base_filter = (
-            (rh_field.attname, getattr(obj, lh_field.attname))
-            for lh_field, rh_field in self.related_fields
+        base_q = Q.create(
+            [
+                (rh_field.attname, getattr(obj, lh_field.attname))
+                for lh_field, rh_field in self.related_fields
+            ]
         )
         descriptor_filter = self.get_extra_descriptor_filter(obj)
-        base_q = Q(*base_filter)
         if isinstance(descriptor_filter, dict):
             return base_q & Q(**descriptor_filter)
         elif descriptor_filter:
@@ -857,7 +858,7 @@ class ForeignObject(RelatedField):
 
     @classmethod
     @functools.lru_cache(maxsize=None)
-    def get_lookups(cls):
+    def get_class_lookups(cls):
         bases = inspect.getmro(cls)
         bases = bases[: bases.index(ForeignObject) + 1]
         class_lookups = [parent.__dict__.get("class_lookups", {}) for parent in bases]

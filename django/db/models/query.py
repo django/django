@@ -834,18 +834,29 @@ class QuerySet:
 
         return objs
 
-    async def abulk_create(self, objs, batch_size=None, ignore_conflicts=False):
+    async def abulk_create(
+        self,
+        objs,
+        batch_size=None,
+        ignore_conflicts=False,
+        update_conflicts=False,
+        update_fields=None,
+        unique_fields=None,
+    ):
         return await sync_to_async(self.bulk_create)(
             objs=objs,
             batch_size=batch_size,
             ignore_conflicts=ignore_conflicts,
+            update_conflicts=update_conflicts,
+            update_fields=update_fields,
+            unique_fields=unique_fields,
         )
 
     def bulk_update(self, objs, fields, batch_size=None):
         """
         Update the given fields in each of the given objects in the database.
         """
-        if batch_size is not None and batch_size < 0:
+        if batch_size is not None and batch_size <= 0:
             raise ValueError("Batch size must be a positive integer.")
         if not fields:
             raise ValueError("Field names must be given to bulk_update().")
@@ -1032,7 +1043,12 @@ class QuerySet:
 
     def first(self):
         """Return the first object of a query or None if no match is found."""
-        for obj in (self if self.ordered else self.order_by("pk"))[:1]:
+        if self.ordered:
+            queryset = self
+        else:
+            self._check_ordering_first_last_queryset_aggregation(method="first")
+            queryset = self.order_by("pk")
+        for obj in queryset[:1]:
             return obj
 
     async def afirst(self):
@@ -1040,7 +1056,12 @@ class QuerySet:
 
     def last(self):
         """Return the last object of a query or None if no match is found."""
-        for obj in (self.reverse() if self.ordered else self.order_by("-pk"))[:1]:
+        if self.ordered:
+            queryset = self.reverse()
+        else:
+            self._check_ordering_first_last_queryset_aggregation(method="last")
+            queryset = self.order_by("-pk")
+        for obj in queryset[:1]:
             return obj
 
     async def alast(self):
@@ -1159,6 +1180,20 @@ class QuerySet:
         self._for_write = True
         query = self.query.chain(sql.UpdateQuery)
         query.add_update_values(kwargs)
+
+        # Inline annotations in order_by(), if possible.
+        new_order_by = []
+        for col in query.order_by:
+            if annotation := query.annotations.get(col):
+                if getattr(annotation, "contains_aggregate", False):
+                    raise exceptions.FieldError(
+                        f"Cannot update when ordering by an aggregate: {annotation}"
+                    )
+                new_order_by.append(annotation)
+            else:
+                new_order_by.append(col)
+        query.order_by = tuple(new_order_by)
+
         # Clear any annotations so that they won't be present in subqueries.
         query.annotations = {}
         with transaction.mark_for_rollback_on_error(using=self.db):
@@ -1925,6 +1960,15 @@ class QuerySet:
     def _check_operator_queryset(self, other, operator_):
         if self.query.combinator or other.query.combinator:
             raise TypeError(f"Cannot use {operator_} operator with combined queryset.")
+
+    def _check_ordering_first_last_queryset_aggregation(self, method):
+        if isinstance(self.query.group_by, tuple) and not any(
+            col.output_field is self.model._meta.pk for col in self.query.group_by
+        ):
+            raise TypeError(
+                f"Cannot use QuerySet.{method}() on an unordered queryset performing "
+                f"aggregation. Add an ordering with order_by()."
+            )
 
 
 class InstanceCheckMeta(type):

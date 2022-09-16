@@ -224,10 +224,12 @@
         </h3></li>
         {% endif %}{% endifchanged %}
         <li class="frame {{ frame.type }}">
-          {% if not frame.tb %}
-            {% if forloop.first %}None{% else %}Traceback: None{% endif %}
-          {% else %}
+          {% if frame.tb %}
             <code class="fname">{{ frame.filename }}</code>, line {{ frame.lineno }}, in {{ frame.function }}
+          {% elif forloop.first %}
+            None
+          {% else %}
+            Traceback: None
           {% endif %}
 
           {% if frame.context_line %}
@@ -325,7 +327,7 @@ The above exception ({{ frame.exc_cause|force_escape }}) was the direct cause of
 {% else %}
 During handling of the above exception ({{ frame.exc_cause|force_escape }}), another exception occurred:
 {% endif %}{% endif %}{% endifchanged %}  {% if frame.tb %}File "{{ frame.filename }}"{% if frame.context_line %}, line {{ frame.lineno }}{% endif %}, in {{ frame.function }}
-{% if frame.context_line %}    {% spaceless %}{{ frame.context_line }}{% endspaceless %}{% endif %}{% else %}{% if forloop.first %}None{% else %}Traceback: None{% endif %}{% endif %}{% endfor %}
+{% if frame.context_line %}    {% spaceless %}{{ frame.context_line }}{% endspaceless %}{% endif %}{% elif forloop.first %}None{% else %}Traceback: None{% endif %}{% endfor %}
 
 Exception Type: {{ exception_type }}{% if request %} at {{ request.path_info }}{% endif %}
 Exception Value: {{ exception_value|force_escape }}
@@ -390,28 +392,28 @@ Exception Value: {{ exception_value|force_escape }}
   {% else %}
     <p>No POST data</p>
   {% endif %}
+
   <h3 id="files-info">FILES</h3>
   {% if request.FILES %}
     <table class="req">
-        <thead>
-            <tr>
-                <th>Variable</th>
-                <th>Value</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for k, v in request_FILES_items %}
-                <tr>
-                    <td>{{ k }}</td>
-                    <td class="code"><pre>{{ v|pprint }}</pre></td>
-                </tr>
-            {% endfor %}
-        </tbody>
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for k, v in request_FILES_items %}
+          <tr>
+            <td>{{ k }}</td>
+            <td class="code"><pre>{{ v|pprint }}</pre></td>
+          </tr>
+        {% endfor %}
+      </tbody>
     </table>
   {% else %}
     <p>No FILES data</p>
   {% endif %}
-
 
   <h3 id="cookie-info">COOKIES</h3>
   {% if request.COOKIES %}
@@ -444,10 +446,10 @@ Exception Value: {{ exception_value|force_escape }}
       </tr>
     </thead>
     <tbody>
-      {% for var in request_meta.items|dictsort:0 %}
+      {% for k, v in request_meta.items|dictsort:0 %}
         <tr>
-          <td>{{ var.0 }}</td>
-          <td class="code"><pre>{{ var.1|pprint }}</pre></td>
+          <td>{{ k }}</td>
+          <td class="code"><pre>{{ v|pprint }}</pre></td>
         </tr>
       {% endfor %}
     </tbody>
@@ -466,10 +468,10 @@ Exception Value: {{ exception_value|force_escape }}
       </tr>
     </thead>
     <tbody>
-      {% for var in settings.items|dictsort:0 %}
+      {% for k, v in settings.items|dictsort:0 %}
         <tr>
-          <td>{{ var.0 }}</td>
-          <td class="code"><pre>{{ var.1|pprint }}</pre></td>
+          <td>{{ k }}</td>
+          <td class="code"><pre>{{ v|pprint }}</pre></td>
         </tr>
       {% endfor %}
     </tbody>

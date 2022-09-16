@@ -433,6 +433,15 @@ class InspectDBTestCase(TestCase):
         # The error message depends on the backend
         self.assertIn("# The error was:", output)
 
+    def test_same_relations(self):
+        out = StringIO()
+        call_command("inspectdb", "inspectdb_message", stdout=out)
+        self.assertIn(
+            "author = models.ForeignKey('InspectdbPeople', models.DO_NOTHING, "
+            "related_name='inspectdbmessage_author_set')",
+            out.getvalue(),
+        )
+
 
 class InspectDBTransactionalTests(TransactionTestCase):
     available_apps = ["inspectdb"]
@@ -585,3 +594,33 @@ class InspectDBTransactionalTests(TransactionTestCase):
                 )
                 cursor.execute("DROP SERVER IF EXISTS inspectdb_server")
                 cursor.execute("DROP EXTENSION IF EXISTS file_fdw")
+
+    @skipUnlessDBFeature("create_test_table_with_composite_primary_key")
+    def test_composite_primary_key(self):
+        table_name = "test_table_composite_pk"
+        with connection.cursor() as cursor:
+            cursor.execute(
+                connection.features.create_test_table_with_composite_primary_key
+            )
+        out = StringIO()
+        if connection.vendor == "sqlite":
+            field_type = connection.features.introspected_field_types["AutoField"]
+        else:
+            field_type = connection.features.introspected_field_types["IntegerField"]
+        try:
+            call_command("inspectdb", table_name, stdout=out)
+            output = out.getvalue()
+            self.assertIn(
+                f"column_1 = models.{field_type}(primary_key=True)  # The composite "
+                f"primary key (column_1, column_2) found, that is not supported. The "
+                f"first column is selected.",
+                output,
+            )
+            self.assertIn(
+                "column_2 = models.%s()"
+                % connection.features.introspected_field_types["IntegerField"],
+                output,
+            )
+        finally:
+            with connection.cursor() as cursor:
+                cursor.execute("DROP TABLE %s" % table_name)

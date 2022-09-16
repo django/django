@@ -349,7 +349,7 @@ add it to a ``UserAdmin`` class which is registered with the
 
     # Define a new User admin
     class UserAdmin(BaseUserAdmin):
-        inlines = (EmployeeInline,)
+        inlines = [EmployeeInline]
 
     # Re-register UserAdmin
     admin.site.unregister(User)
@@ -772,6 +772,8 @@ utility methods:
 
     .. method:: models.BaseUserManager.make_random_password(length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
 
+        .. deprecated:: 4.2
+
         Returns a random password with the given length and given string of
         allowed characters. Note that the default value of ``allowed_chars``
         doesn't contain letters that can cause user confusion, including:
@@ -892,10 +894,10 @@ custom user class.
         class CustomUserAdmin(UserAdmin):
             ...
             fieldsets = UserAdmin.fieldsets + (
-                (None, {'fields': ('custom_field',)}),
+                (None, {'fields': ['custom_field']}),
             )
             add_fieldsets = UserAdmin.add_fieldsets + (
-                (None, {'fields': ('custom_field',)}),
+                (None, {'fields': ['custom_field']}),
             )
 
     See :ref:`a full example <custom-users-admin-full-example>` for more
@@ -1103,7 +1105,7 @@ code would be required in the app's ``admin.py`` file::
 
         class Meta:
             model = MyUser
-            fields = ('email', 'date_of_birth')
+            fields = ['email', 'date_of_birth']
 
         def clean_password2(self):
             # Check that the two password entries match
@@ -1131,7 +1133,7 @@ code would be required in the app's ``admin.py`` file::
 
         class Meta:
             model = MyUser
-            fields = ('email', 'password', 'date_of_birth', 'is_active', 'is_admin')
+            fields = ['email', 'password', 'date_of_birth', 'is_active', 'is_admin']
 
 
     class UserAdmin(BaseUserAdmin):
@@ -1142,24 +1144,24 @@ code would be required in the app's ``admin.py`` file::
         # The fields to be used in displaying the User model.
         # These override the definitions on the base UserAdmin
         # that reference specific fields on auth.User.
-        list_display = ('email', 'date_of_birth', 'is_admin')
-        list_filter = ('is_admin',)
-        fieldsets = (
-            (None, {'fields': ('email', 'password')}),
-            ('Personal info', {'fields': ('date_of_birth',)}),
-            ('Permissions', {'fields': ('is_admin',)}),
-        )
+        list_display = ['email', 'date_of_birth', 'is_admin']
+        list_filter = ['is_admin']
+        fieldsets = [
+            (None, {'fields': ['email', 'password']}),
+            ('Personal info', {'fields': ['date_of_birth']}),
+            ('Permissions', {'fields': ['is_admin']}),
+        ]
         # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
         # overrides get_fieldsets to use this attribute when creating a user.
-        add_fieldsets = (
+        add_fieldsets = [
             (None, {
-                'classes': ('wide',),
-                'fields': ('email', 'date_of_birth', 'password1', 'password2'),
+                'classes': ['wide'],
+                'fields': ['email', 'date_of_birth', 'password1', 'password2'],
             }),
-        )
-        search_fields = ('email',)
-        ordering = ('email',)
-        filter_horizontal = ()
+        ]
+        search_fields = ['email']
+        ordering = ['email']
+        filter_horizontal = []
 
 
     # Now register the new UserAdmin...

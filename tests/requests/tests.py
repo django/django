@@ -1,3 +1,4 @@
+import pickle
 from io import BytesIO
 from itertools import chain
 from urllib.parse import urlencode
@@ -668,6 +669,20 @@ class RequestsTests(SimpleTestCase):
         )
         with self.assertRaises(UnreadablePostError):
             request.FILES
+
+    def test_pickling_request(self):
+        request = HttpRequest()
+        request.method = "GET"
+        request.path = "/testpath/"
+        request.META = {
+            "QUERY_STRING": ";some=query&+query=string",
+            "SERVER_NAME": "example.com",
+            "SERVER_PORT": 80,
+        }
+        request.COOKIES = {"post-key": "post-value"}
+        dump = pickle.dumps(request)
+        request_from_pickle = pickle.loads(dump)
+        self.assertEqual(repr(request), repr(request_from_pickle))
 
 
 class HostValidationTests(SimpleTestCase):

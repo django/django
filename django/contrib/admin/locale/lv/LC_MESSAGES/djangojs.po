@@ -1,17 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# NullIsNot0 <nullisnot0@inbox.lv>, 2017
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
 # Jannis Leidel <jannis@leidel.info>, 2011
-# NullIsNot0 <nullisnot0@inbox.lv>, 2020-2021
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2020-2021
 # peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-25 22:47+0000\n"
-"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
+"POT-Creation-Date: 2022-05-17 05:26-0500\n"
+"PO-Revision-Date: 2022-07-25 07:59+0000\n"
+"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -265,6 +265,11 @@ msgstr "Pk"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Se"
+
+msgid ""
+"You have already submitted this form. Are you sure you want to submit it "
+"again?"
+msgstr "Jūs jau iesniedzāt šo formu. Vai vēlaties to iesniegt vēlreiz?"
 
 msgid "Show"
 msgstr "Parādīt"

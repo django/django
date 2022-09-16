@@ -516,13 +516,6 @@ underscores to spaces. See :ref:`Verbose field names <verbose-field-names>`.
 A list of validators to run for this field. See the :doc:`validators
 documentation </ref/validators>` for more information.
 
-Registering and fetching lookups
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-``Field`` implements the :ref:`lookup registration API <lookup-registration-api>`.
-The API can be used to customize which lookups are available for a field class, and
-how lookups are fetched from a field.
-
 .. _model-field-types:
 
 Field types
@@ -1200,8 +1193,8 @@ A field for storing JSON encoded data. In Python the data is represented in its
 Python native format: dictionaries, lists, strings, numbers, booleans and
 ``None``.
 
-``JSONField`` is supported on MariaDB, MySQL 5.7.8+, Oracle, PostgreSQL, and
-SQLite (with the :ref:`JSON1 extension enabled <sqlite-json1>`).
+``JSONField`` is supported on MariaDB, MySQL, Oracle, PostgreSQL, and SQLite
+(with the :ref:`JSON1 extension enabled <sqlite-json1>`).
 
 .. attribute:: JSONField.encoder
 
@@ -1343,7 +1336,7 @@ However it is not enforced at the model or database level. Use a
 
 .. attribute:: TextField.db_collation
 
-    The database collation name of the field.
+    Optional. The database collation name of the field.
 
     .. note::
 
@@ -1458,7 +1451,7 @@ Relationships defined this way on :ref:`abstract models
 concrete model and are not relative to the abstract model's ``app_label``:
 
 .. code-block:: python
-    :caption: products/models.py
+    :caption: ``products/models.py``
 
     from django.db import models
 
@@ -1469,7 +1462,7 @@ concrete model and are not relative to the abstract model's ``app_label``:
             abstract = True
 
 .. code-block:: python
-    :caption: production/models.py
+    :caption: ``production/models.py``
 
     from django.db import models
     from products.models import AbstractCar
@@ -2241,6 +2234,18 @@ Field API reference
 
         This method must be added to fields prior to 1.7 to migrate its data
         using :doc:`/topics/migrations`.
+
+Registering and fetching lookups
+================================
+
+``Field`` implements the :ref:`lookup registration API <lookup-registration-api>`.
+The API can be used to customize which lookups are available for a field class
+and its instances, and how lookups are fetched from a field.
+
+.. versionchanged:: 4.2
+
+    Support for registering lookups on :class:`~django.db.models.Field`
+    instances was added.
 
 .. _model-field-attributes:
 

@@ -179,6 +179,7 @@ class AutocompleteMixinTests(TestCase):
             ("sr-cyrl", "sr-Cyrl"),
             ("zh-hans", "zh-CN"),
             ("zh-hant", "zh-TW"),
+            (None, None),
         )
         for lang, select_lang in languages:
             with self.subTest(lang=lang):

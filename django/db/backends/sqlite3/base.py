@@ -1,6 +1,7 @@
 """
 SQLite backend for the sqlite3 module in the standard library.
 """
+import datetime
 import decimal
 import warnings
 from itertools import chain
@@ -10,7 +11,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils.asyncio import async_unsafe
-from django.utils.dateparse import parse_datetime, parse_time
+from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.regex_helper import _lazy_re_compile
 
 from ._functions import register as register_functions
@@ -29,12 +30,23 @@ def decoder(conv_func):
     return lambda s: conv_func(s.decode())
 
 
+def adapt_date(val):
+    return val.isoformat()
+
+
+def adapt_datetime(val):
+    return val.isoformat(" ")
+
+
 Database.register_converter("bool", b"1".__eq__)
+Database.register_converter("date", decoder(parse_date))
 Database.register_converter("time", decoder(parse_time))
 Database.register_converter("datetime", decoder(parse_datetime))
 Database.register_converter("timestamp", decoder(parse_datetime))
 
 Database.register_adapter(decimal.Decimal, str)
+Database.register_adapter(datetime.date, adapt_date)
+Database.register_adapter(datetime.datetime, adapt_datetime)
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
@@ -289,7 +301,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     for column_name, (
                         referenced_column_name,
                         referenced_table_name,
-                    ) in relations:
+                    ) in relations.items():
                         cursor.execute(
                             """
                             SELECT REFERRING.`%s`, REFERRING.`%s` FROM `%s` as REFERRING

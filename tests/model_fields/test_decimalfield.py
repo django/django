@@ -67,10 +67,19 @@ class DecimalFieldTests(TestCase):
 
     def test_save_nan_invalid(self):
         msg = "“nan” value must be a decimal number."
-        with self.assertRaisesMessage(ValidationError, msg):
-            BigD.objects.create(d=float("nan"))
-        with self.assertRaisesMessage(ValidationError, msg):
-            BigD.objects.create(d=math.nan)
+        for value in [float("nan"), math.nan, "nan"]:
+            with self.subTest(value), self.assertRaisesMessage(ValidationError, msg):
+                BigD.objects.create(d=value)
+
+    def test_save_inf_invalid(self):
+        msg = "“inf” value must be a decimal number."
+        for value in [float("inf"), math.inf, "inf"]:
+            with self.subTest(value), self.assertRaisesMessage(ValidationError, msg):
+                BigD.objects.create(d=value)
+        msg = "“-inf” value must be a decimal number."
+        for value in [float("-inf"), -math.inf, "-inf"]:
+            with self.subTest(value), self.assertRaisesMessage(ValidationError, msg):
+                BigD.objects.create(d=value)
 
     def test_fetch_from_db_without_float_rounding(self):
         big_decimal = BigD.objects.create(d=Decimal(".100000000000000000000000000005"))

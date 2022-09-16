@@ -167,7 +167,7 @@ class FileDescriptor(DeferredAttribute):
             return self
 
         # This is slightly complicated, so worth an explanation.
-        # instance.file`needs to ultimately return some instance of `File`,
+        # instance.file needs to ultimately return some instance of `File`,
         # probably a subclass. Additionally, this returned object needs to have
         # the FieldFile API so that users can easily do things like
         # instance.file.path and have that delegated to the file storage engine.

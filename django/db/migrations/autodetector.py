@@ -189,14 +189,14 @@ class MigrationAutodetector:
         self.generate_renamed_indexes()
         # Generate removal of foo together.
         self.generate_removed_altered_unique_together()
-        self.generate_removed_altered_index_together()
+        self.generate_removed_altered_index_together()  # RemovedInDjango51Warning.
         # Generate field operations.
         self.generate_removed_fields()
         self.generate_added_fields()
         self.generate_altered_fields()
         self.generate_altered_order_with_respect_to()
         self.generate_altered_unique_together()
-        self.generate_altered_index_together()
+        self.generate_altered_index_together()  # RemovedInDjango51Warning.
         self.generate_added_indexes()
         self.generate_added_constraints()
         self.generate_altered_db_table()
@@ -616,6 +616,7 @@ class MigrationAutodetector:
             indexes = model_state.options.pop("indexes")
             constraints = model_state.options.pop("constraints")
             unique_together = model_state.options.pop("unique_together", None)
+            # RemovedInDjango51Warning.
             index_together = model_state.options.pop("index_together", None)
             order_with_respect_to = model_state.options.pop(
                 "order_with_respect_to", None
@@ -745,6 +746,7 @@ class MigrationAutodetector:
                     ),
                     dependencies=related_dependencies,
                 )
+            # RemovedInDjango51Warning.
             if index_together:
                 self.add_operation(
                     app_label,
@@ -834,6 +836,7 @@ class MigrationAutodetector:
                         related_fields[field_name] = field
             # Generate option removal first
             unique_together = model_state.options.pop("unique_together", None)
+            # RemovedInDjango51Warning.
             index_together = model_state.options.pop("index_together", None)
             if unique_together:
                 self.add_operation(
@@ -843,6 +846,7 @@ class MigrationAutodetector:
                         unique_together=None,
                     ),
                 )
+            # RemovedInDjango51Warning.
             if index_together:
                 self.add_operation(
                     app_label,
@@ -1022,8 +1026,9 @@ class MigrationAutodetector:
 
     def _generate_added_field(self, app_label, model_name, field_name):
         field = self.to_state.models[app_label, model_name].get_field(field_name)
-        # Fields that are foreignkeys/m2ms depend on stuff
-        dependencies = []
+        # Adding a field always depends at least on its removal.
+        dependencies = [(app_label, model_name, field_name, False)]
+        # Fields that are foreignkeys/m2ms depend on stuff.
         if field.remote_field and field.remote_field.model:
             dependencies.extend(
                 self._get_dependencies_for_foreign_key(
@@ -1417,7 +1422,7 @@ class MigrationAutodetector:
         dependencies = [(dep_app_label, dep_object_name, None, True)]
         if getattr(field.remote_field, "through", None):
             through_app_label, through_object_name = resolve_relation(
-                remote_field_model,
+                field.remote_field.through,
                 app_label,
                 model_name,
             )
@@ -1499,6 +1504,7 @@ class MigrationAutodetector:
     def generate_removed_altered_unique_together(self):
         self._generate_removed_altered_foo_together(operations.AlterUniqueTogether)
 
+    # RemovedInDjango51Warning.
     def generate_removed_altered_index_together(self):
         self._generate_removed_altered_foo_together(operations.AlterIndexTogether)
 
@@ -1521,6 +1527,7 @@ class MigrationAutodetector:
     def generate_altered_unique_together(self):
         self._generate_altered_foo_together(operations.AlterUniqueTogether)
 
+    # RemovedInDjango51Warning.
     def generate_altered_index_together(self):
         self._generate_altered_foo_together(operations.AlterIndexTogether)
 

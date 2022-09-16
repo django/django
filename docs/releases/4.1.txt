@@ -1,8 +1,8 @@
-============================================
-Django 4.1 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 4.1 release notes
+========================
 
-*Expected August 2022*
+*August 3, 2022*
 
 Welcome to Django 4.1!
 
@@ -388,8 +388,8 @@ Signals
 Templates
 ~~~~~~~~~
 
-* :tfilter:`json_script` template filter now allows wrapping in a ``<script>``
-  tag without the HTML ``id`` attribute.
+* The HTML ``<script>`` element ``id`` attribute is no longer required when
+  wrapping the :tfilter:`json_script` template filter.
 
 * The :class:`cached template loader <django.template.loaders.cached.Loader>`
   is now enabled in development, when :setting:`DEBUG` is ``True``, and
@@ -458,6 +458,24 @@ backends.
 * The ``ignore_conflicts`` argument of the
   ``DatabaseOperations.insert_statement()`` method is replaced by
   ``on_conflict`` that accepts ``django.db.models.constants.OnConflict``.
+
+* ``DatabaseOperations._convert_field_to_tz()`` is replaced by
+  ``DatabaseOperations._convert_sql_to_tz()`` that accepts the ``sql``,
+  ``params``, and ``tzname`` arguments.
+
+* Several date and time methods on ``DatabaseOperations`` now take ``sql`` and
+  ``params`` arguments instead of ``field_name`` and return 2-tuple containing
+  some SQL and the parameters to be interpolated into that SQL. The changed
+  methods have these new signatures:
+
+  * ``DatabaseOperations.date_extract_sql(lookup_type, sql, params)``
+  * ``DatabaseOperations.datetime_extract_sql(lookup_type, sql, params, tzname)``
+  * ``DatabaseOperations.time_extract_sql(lookup_type, sql, params)``
+  * ``DatabaseOperations.date_trunc_sql(lookup_type, sql, params, tzname=None)``
+  * ``DatabaseOperations.datetime_trunc_sql(self, lookup_type, sql, params, tzname)``
+  * ``DatabaseOperations.time_trunc_sql(lookup_type, sql, params, tzname=None)``
+  * ``DatabaseOperations.datetime_cast_date_sql(sql, params, tzname)``
+  * ``DatabaseOperations.datetime_cast_time_sql(sql, params, tzname)``
 
 :mod:`django.contrib.gis`
 -------------------------
@@ -560,6 +578,15 @@ Miscellaneous
 * The undocumented ``URLResolver._is_callback()``,
   ``URLResolver._callback_strs``, and ``URLPattern.lookup_str()`` are
   moved to ``django.contrib.admindocs.utils``.
+
+* The :meth:`.Model.full_clean` method now converts an ``exclude`` value to a
+  ``set``. It’s also preferable to pass an ``exclude`` value as a ``set`` to
+  the :meth:`.Model.clean_fields`, :meth:`.Model.full_clean`,
+  :meth:`.Model.validate_unique`, and :meth:`.Model.validate_constraints`
+  methods.
+
+* The minimum supported version of ``asgiref`` is increased from 3.4.1 to
+  3.5.2.
 
 .. _deprecated-features-4.1:
 
@@ -684,6 +711,9 @@ Miscellaneous
 * The ``"django/forms/default.html"`` and
   ``"django/forms/formsets/default.html"`` templates which are a proxy to the
   table-based templates are deprecated. Use the specific template instead.
+
+* The undocumented ``LogoutView.get_next_page()`` method is renamed to
+  ``get_success_url()``.
 
 Features removed in 4.1
 =======================

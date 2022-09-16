@@ -7,6 +7,8 @@ try:
     from django.contrib.postgres.search import (
         TrigramDistance,
         TrigramSimilarity,
+        TrigramStrictWordDistance,
+        TrigramStrictWordSimilarity,
         TrigramWordDistance,
         TrigramWordSimilarity,
     )
@@ -43,6 +45,25 @@ class TrigramTest(PostgreSQLTestCase):
             self.Model.objects.filter(field__trigram_word_similar="Middlesborough"),
             [obj],
         )
+        self.assertSequenceEqual(
+            self.Model.objects.filter(field__trigram_word_similar="Middle"),
+            [obj],
+        )
+
+    def test_trigram_strict_word_search_matched(self):
+        obj = self.Model.objects.create(
+            field="Gumby rides on the path of Middlesbrough",
+        )
+        self.assertSequenceEqual(
+            self.Model.objects.filter(
+                field__trigram_strict_word_similar="Middlesborough"
+            ),
+            [obj],
+        )
+        self.assertSequenceEqual(
+            self.Model.objects.filter(field__trigram_strict_word_similar="Middle"),
+            [],
+        )
 
     def test_trigram_similarity(self):
         search = "Bat sat on cat."
@@ -75,6 +96,19 @@ class TrigramTest(PostgreSQLTestCase):
             ],
         )
 
+    def test_trigram_strict_word_similarity(self):
+        search = "matt"
+        self.assertSequenceEqual(
+            self.Model.objects.filter(field__trigram_word_similar=search)
+            .annotate(word_similarity=TrigramStrictWordSimilarity(search, "field"))
+            .values("field", "word_similarity")
+            .order_by("-word_similarity"),
+            [
+                {"field": "Cat sat on mat.", "word_similarity": 0.5},
+                {"field": "Matthew", "word_similarity": 0.44444445},
+            ],
+        )
+
     def test_trigram_similarity_alternate(self):
         # Round result of distance because PostgreSQL uses greater precision.
         self.assertQuerysetEqual(
@@ -101,6 +135,20 @@ class TrigramTest(PostgreSQLTestCase):
             [
                 {"field": "Cat sat on mat.", "word_distance": 0},
                 {"field": "Matthew", "word_distance": 0.25},
+            ],
+        )
+
+    def test_trigram_strict_word_distance(self):
+        self.assertSequenceEqual(
+            self.Model.objects.annotate(
+                word_distance=TrigramStrictWordDistance("matt", "field"),
+            )
+            .filter(word_distance__lte=0.7)
+            .values("field", "word_distance")
+            .order_by("word_distance"),
+            [
+                {"field": "Cat sat on mat.", "word_distance": 0.5},
+                {"field": "Matthew", "word_distance": 0.5555556},
             ],
         )
 

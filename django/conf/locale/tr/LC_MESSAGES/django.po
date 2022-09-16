@@ -2,7 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015-2021
+# BouRock, 2015-2022
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@gmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-19 17:51+0000\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-07-25 06:49+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -397,6 +397,11 @@ msgstr ""
 "Bu değerin %(limit_value)s değerinden büyük veya eşit olduğuna emin olun."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+"Bu değerin %(limit_value)s adım boyutunun katları olduğundan emin olun."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -468,6 +473,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "Bu %(field_labels)s alanına sahip %(model_name)s zaten mevcut."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "\"%(name)s\" kısıtlaması ihlal edildi."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "%(value)r değeri geçerli bir seçim değil."
 
@@ -481,8 +490,8 @@ msgstr "Bu alan boş olamaz."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Bu %(field_label)s alanına sahip %(model_name)s zaten mevcut."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -781,16 +790,16 @@ msgstr ""
 "%(field_names)s. Sorun devam ederse bir hata raporu dosyalamanız gerekebilir."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Lütfen en fazla %d form gönderin."
-msgstr[1] "Lütfen en fazla %d form gönderin."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Lütfen en fazla %(num)d form gönderin."
+msgstr[1] "Lütfen en fazla %(num)d form gönderin."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Lütfen en az %d form gönderin."
-msgstr[1] "Lütfen en az %d form gönderin."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Lütfen en az %(num)d form gönderin."
+msgstr[1] "Lütfen en az %(num)d form gönderin."
 
 msgid "Order"
 msgstr "Sıralama"

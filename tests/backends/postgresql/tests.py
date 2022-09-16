@@ -283,6 +283,7 @@ class Tests(TestCase):
         for lookup in lookups:
             with self.subTest(lookup=lookup):
                 self.assertIn("::text", do.lookup_cast(lookup))
+        # RemovedInDjango51Warning.
         for lookup in lookups:
             for field_type in ("CICharField", "CIEmailField", "CITextField"):
                 with self.subTest(lookup=lookup, field_type=field_type):

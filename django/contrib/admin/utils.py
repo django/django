@@ -10,6 +10,7 @@ from django.db.models.deletion import Collector
 from django.forms.utils import pretty_name
 from django.urls import NoReverseMatch, reverse
 from django.utils import formats, timezone
+from django.utils.hashable import make_hashable
 from django.utils.html import format_html
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.text import capfirst
@@ -401,7 +402,14 @@ def display_for_field(value, field, empty_value_display):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
 
     if getattr(field, "flatchoices", None):
-        return dict(field.flatchoices).get(value, empty_value_display)
+        try:
+            return dict(field.flatchoices).get(value, empty_value_display)
+        except TypeError:
+            # Allow list-like choices.
+            flatchoices = make_hashable(field.flatchoices)
+            value = make_hashable(value)
+            return dict(flatchoices).get(value, empty_value_display)
+
     # BooleanField needs special-case null-handling, so it comes before the
     # general null test.
     elif isinstance(field, models.BooleanField):

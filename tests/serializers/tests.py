@@ -410,6 +410,33 @@ class SerializersTestBase:
         self.assertEqual(self._get_field_values(child_data, "parent_m2m"), [])
         self.assertEqual(self._get_field_values(child_data, "parent_data"), [])
 
+    def test_serialize_only_pk(self):
+        with self.assertNumQueries(5) as ctx:
+            serializers.serialize(
+                self.serializer_name,
+                Article.objects.all(),
+                use_natural_foreign_keys=False,
+            )
+
+        categories_sql = ctx[1]["sql"]
+        self.assertNotIn(connection.ops.quote_name("meta_data_id"), categories_sql)
+        meta_data_sql = ctx[2]["sql"]
+        self.assertNotIn(connection.ops.quote_name("kind"), meta_data_sql)
+
+    def test_serialize_no_only_pk_with_natural_keys(self):
+        with self.assertNumQueries(5) as ctx:
+            serializers.serialize(
+                self.serializer_name,
+                Article.objects.all(),
+                use_natural_foreign_keys=True,
+            )
+
+        categories_sql = ctx[1]["sql"]
+        self.assertNotIn(connection.ops.quote_name("meta_data_id"), categories_sql)
+        # CategoryMetaData has natural_key().
+        meta_data_sql = ctx[2]["sql"]
+        self.assertIn(connection.ops.quote_name("kind"), meta_data_sql)
+
 
 class SerializerAPITests(SimpleTestCase):
     def test_stream_class(self):

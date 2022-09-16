@@ -6,7 +6,7 @@ from django.db.models import F
 from django.db.models.constraints import BaseConstraint
 from django.db.models.functions import Lower
 from django.db.transaction import atomic
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import (
     ChildModel,
@@ -65,6 +65,29 @@ class BaseConstraintTests(SimpleTestCase):
         )
         self.assertEqual(c.get_violation_error_message(), "custom base_name message")
 
+    def test_custom_violation_error_message_clone(self):
+        constraint = BaseConstraint(
+            "base_name",
+            violation_error_message="custom %(name)s message",
+        ).clone()
+        self.assertEqual(
+            constraint.get_violation_error_message(),
+            "custom base_name message",
+        )
+
+    def test_deconstruction(self):
+        constraint = BaseConstraint(
+            "base_name",
+            violation_error_message="custom %(name)s message",
+        )
+        path, args, kwargs = constraint.deconstruct()
+        self.assertEqual(path, "django.db.models.BaseConstraint")
+        self.assertEqual(args, ())
+        self.assertEqual(
+            kwargs,
+            {"name": "base_name", "violation_error_message": "custom %(name)s message"},
+        )
+
 
 class CheckConstraintTests(TestCase):
     def test_eq(self):
@@ -84,6 +107,28 @@ class CheckConstraintTests(TestCase):
             models.CheckConstraint(check=check2, name="price"),
         )
         self.assertNotEqual(models.CheckConstraint(check=check1, name="price"), 1)
+        self.assertNotEqual(
+            models.CheckConstraint(check=check1, name="price"),
+            models.CheckConstraint(
+                check=check1, name="price", violation_error_message="custom error"
+            ),
+        )
+        self.assertNotEqual(
+            models.CheckConstraint(
+                check=check1, name="price", violation_error_message="custom error"
+            ),
+            models.CheckConstraint(
+                check=check1, name="price", violation_error_message="other custom error"
+            ),
+        )
+        self.assertEqual(
+            models.CheckConstraint(
+                check=check1, name="price", violation_error_message="custom error"
+            ),
+            models.CheckConstraint(
+                check=check1, name="price", violation_error_message="custom error"
+            ),
+        )
 
     def test_repr(self):
         constraint = models.CheckConstraint(
@@ -189,6 +234,23 @@ class CheckConstraintTests(TestCase):
         constraint.validate(Product, Product(price=501, discounted_price=5))
         constraint.validate(Product, Product(price=499, discounted_price=5))
 
+    @skipUnlessDBFeature("supports_comparing_boolean_expr")
+    def test_validate_nullable_field_with_none(self):
+        # Nullable fields should be considered valid on None values.
+        constraint = models.CheckConstraint(
+            check=models.Q(price__gte=0),
+            name="positive_price",
+        )
+        constraint.validate(Product, Product())
+
+    @skipIfDBFeature("supports_comparing_boolean_expr")
+    def test_validate_nullable_field_with_isnull(self):
+        constraint = models.CheckConstraint(
+            check=models.Q(price__gte=0) | models.Q(price__isnull=True),
+            name="positive_price",
+        )
+        constraint.validate(Product, Product())
+
 
 class UniqueConstraintTests(TestCase):
     @classmethod
@@ -215,6 +277,38 @@ class UniqueConstraintTests(TestCase):
         )
         self.assertNotEqual(
             models.UniqueConstraint(fields=["foo", "bar"], name="unique"), 1
+        )
+        self.assertNotEqual(
+            models.UniqueConstraint(fields=["foo", "bar"], name="unique"),
+            models.UniqueConstraint(
+                fields=["foo", "bar"],
+                name="unique",
+                violation_error_message="custom error",
+            ),
+        )
+        self.assertNotEqual(
+            models.UniqueConstraint(
+                fields=["foo", "bar"],
+                name="unique",
+                violation_error_message="custom error",
+            ),
+            models.UniqueConstraint(
+                fields=["foo", "bar"],
+                name="unique",
+                violation_error_message="other custom error",
+            ),
+        )
+        self.assertEqual(
+            models.UniqueConstraint(
+                fields=["foo", "bar"],
+                name="unique",
+                violation_error_message="custom error",
+            ),
+            models.UniqueConstraint(
+                fields=["foo", "bar"],
+                name="unique",
+                violation_error_message="custom error",
+            ),
         )
 
     def test_eq_with_condition(self):
@@ -606,6 +700,20 @@ class UniqueConstraintTests(TestCase):
             UniqueConstraintProduct,
             non_unique_product,
             exclude={"color"},
+        )
+
+    def test_validate_expression_str(self):
+        constraint = models.UniqueConstraint("name", name="name_uniq")
+        msg = "Constraint “name_uniq” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(
+                UniqueConstraintProduct,
+                UniqueConstraintProduct(name=self.p1.name),
+            )
+        constraint.validate(
+            UniqueConstraintProduct,
+            UniqueConstraintProduct(name=self.p1.name),
+            exclude={"name"},
         )
 
     def test_name(self):

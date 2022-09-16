@@ -492,6 +492,15 @@ some cases.
 consequence, any custom deletion logic in ``delete()`` handlers should be
 moved to ``form_valid()``, or a shared helper method, if required.
 
+Table and column naming scheme changes on Oracle
+------------------------------------------------
+
+Django 4.0 inadvertently changed the table and column naming scheme on Oracle.
+This causes errors for models and fields with names longer than 30 characters.
+Unfortunately, renaming some Oracle tables and columns is required. Use the
+upgrade script in :ticket:`33789 <33789#comment:15>` to generate ``RENAME``
+statements to change naming scheme.
+
 Miscellaneous
 -------------
 

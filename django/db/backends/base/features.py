@@ -260,6 +260,10 @@ class BaseDatabaseFeatures:
     create_test_procedure_without_params_sql = None
     create_test_procedure_with_int_param_sql = None
 
+    # SQL to create a table with a composite primary key for use by the Django
+    # test suite.
+    create_test_table_with_composite_primary_key = None
+
     # Does the backend support keyword parameters for cursor.callproc()?
     supports_callproc_kwargs = False
 
@@ -298,6 +302,9 @@ class BaseDatabaseFeatures:
     # Does the backend support boolean expressions in SELECT and GROUP BY
     # clauses?
     supports_boolean_expr_in_select_clause = True
+    # Does the backend support comparing boolean expressions in WHERE clauses?
+    # Eg: WHERE (price > 0) IS NOT NULL
+    supports_comparing_boolean_expr = True
 
     # Does the backend support JSONField?
     supports_json_field = True

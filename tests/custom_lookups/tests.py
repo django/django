@@ -4,6 +4,8 @@ from datetime import date, datetime
 
 from django.core.exceptions import FieldError
 from django.db import connection, models
+from django.db.models.fields.related_lookups import RelatedGreaterThan
+from django.db.models.lookups import EndsWith, StartsWith
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import register_lookup
 from django.utils import timezone
@@ -75,7 +77,7 @@ class YearTransform(models.Transform):
 
     def as_sql(self, compiler, connection):
         lhs_sql, params = compiler.compile(self.lhs)
-        return connection.ops.date_extract_sql("year", lhs_sql), params
+        return connection.ops.date_extract_sql("year", lhs_sql, params)
 
     @property
     def output_field(self):
@@ -220,6 +222,18 @@ class DateTimeTransform(models.Transform):
         return "from_unixtime({})".format(lhs), params
 
 
+class CustomStartsWith(StartsWith):
+    lookup_name = "sw"
+
+
+class CustomEndsWith(EndsWith):
+    lookup_name = "ew"
+
+
+class RelatedMoreThan(RelatedGreaterThan):
+    lookup_name = "rmt"
+
+
 class LookupTests(TestCase):
     def test_custom_name_lookup(self):
         a1 = Author.objects.create(name="a1", birthdate=date(1981, 2, 16))
@@ -316,7 +330,7 @@ class LookupTests(TestCase):
         field = Article._meta.get_field("author")
 
         # clear and re-cache
-        field.get_lookups.cache_clear()
+        field.get_class_lookups.cache_clear()
         self.assertNotIn("exactly", field.get_lookups())
 
         # registration should bust the cache
@@ -647,3 +661,78 @@ class SubqueryTransformTests(TestCase):
                 id__in=Author.objects.filter(age__div3=2)
             )
             self.assertSequenceEqual(qs, [a2])
+
+
+class RegisterLookupTests(SimpleTestCase):
+    def test_class_lookup(self):
+        author_name = Author._meta.get_field("name")
+        with register_lookup(models.CharField, CustomStartsWith):
+            self.assertEqual(author_name.get_lookup("sw"), CustomStartsWith)
+        self.assertIsNone(author_name.get_lookup("sw"))
+
+    def test_instance_lookup(self):
+        author_name = Author._meta.get_field("name")
+        author_alias = Author._meta.get_field("alias")
+        with register_lookup(author_name, CustomStartsWith):
+            self.assertEqual(author_name.instance_lookups, {"sw": CustomStartsWith})
+            self.assertEqual(author_name.get_lookup("sw"), CustomStartsWith)
+            self.assertIsNone(author_alias.get_lookup("sw"))
+        self.assertIsNone(author_name.get_lookup("sw"))
+        self.assertEqual(author_name.instance_lookups, {})
+        self.assertIsNone(author_alias.get_lookup("sw"))
+
+    def test_instance_lookup_override_class_lookups(self):
+        author_name = Author._meta.get_field("name")
+        author_alias = Author._meta.get_field("alias")
+        with register_lookup(models.CharField, CustomStartsWith, lookup_name="st_end"):
+            with register_lookup(author_alias, CustomEndsWith, lookup_name="st_end"):
+                self.assertEqual(author_name.get_lookup("st_end"), CustomStartsWith)
+                self.assertEqual(author_alias.get_lookup("st_end"), CustomEndsWith)
+            self.assertEqual(author_name.get_lookup("st_end"), CustomStartsWith)
+            self.assertEqual(author_alias.get_lookup("st_end"), CustomStartsWith)
+        self.assertIsNone(author_name.get_lookup("st_end"))
+        self.assertIsNone(author_alias.get_lookup("st_end"))
+
+    def test_instance_lookup_override(self):
+        author_name = Author._meta.get_field("name")
+        with register_lookup(author_name, CustomStartsWith, lookup_name="st_end"):
+            self.assertEqual(author_name.get_lookup("st_end"), CustomStartsWith)
+            author_name.register_lookup(CustomEndsWith, lookup_name="st_end")
+            self.assertEqual(author_name.get_lookup("st_end"), CustomEndsWith)
+        self.assertIsNone(author_name.get_lookup("st_end"))
+
+    def test_lookup_on_transform(self):
+        transform = Div3Transform
+        with register_lookup(Div3Transform, CustomStartsWith):
+            with register_lookup(Div3Transform, CustomEndsWith):
+                self.assertEqual(
+                    transform.get_lookups(),
+                    {"sw": CustomStartsWith, "ew": CustomEndsWith},
+                )
+            self.assertEqual(transform.get_lookups(), {"sw": CustomStartsWith})
+        self.assertEqual(transform.get_lookups(), {})
+
+    def test_transform_on_field(self):
+        author_name = Author._meta.get_field("name")
+        author_alias = Author._meta.get_field("alias")
+        with register_lookup(models.CharField, Div3Transform):
+            self.assertEqual(author_alias.get_transform("div3"), Div3Transform)
+            self.assertEqual(author_name.get_transform("div3"), Div3Transform)
+        with register_lookup(author_alias, Div3Transform):
+            self.assertEqual(author_alias.get_transform("div3"), Div3Transform)
+            self.assertIsNone(author_name.get_transform("div3"))
+        self.assertIsNone(author_alias.get_transform("div3"))
+        self.assertIsNone(author_name.get_transform("div3"))
+
+    def test_related_lookup(self):
+        article_author = Article._meta.get_field("author")
+        with register_lookup(models.Field, CustomStartsWith):
+            self.assertIsNone(article_author.get_lookup("sw"))
+        with register_lookup(models.ForeignKey, RelatedMoreThan):
+            self.assertEqual(article_author.get_lookup("rmt"), RelatedMoreThan)
+
+    def test_instance_related_lookup(self):
+        article_author = Article._meta.get_field("author")
+        with register_lookup(article_author, RelatedMoreThan):
+            self.assertEqual(article_author.get_lookup("rmt"), RelatedMoreThan)
+        self.assertIsNone(article_author.get_lookup("rmt"))

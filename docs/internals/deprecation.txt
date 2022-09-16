@@ -15,6 +15,26 @@ about each item can often be found in the release notes of two versions prior.
 See the :ref:`Django 4.2 release notes <deprecated-features-4.2>` for more
 details on these changes.
 
+* The ``BaseUserManager.make_random_password()`` method will be removed.
+
+* The model's ``Meta.index_together`` option will be removed.
+
+* The ``length_is`` template filter will be removed.
+
+* The ``django.contrib.auth.hashers.SHA1PasswordHasher``,
+  ``django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher``, and
+  ``django.contrib.auth.hashers.UnsaltedMD5PasswordHasher`` will be removed.
+
+* The model ``django.contrib.postgres.fields.CICharField``,
+  ``django.contrib.postgres.fields.CIEmailField``, and
+  ``django.contrib.postgres.fields.CITextField`` will be removed. Stub fields
+  will remain for compatibility with historical migrations.
+
+* The ``django.contrib.postgres.fields.CIText`` mixin will be removed.
+
+* The ``map_width`` and ``map_height`` attributes of ``BaseGeometryWidget``
+  will be removed.
+
 .. _deprecation-removed-in-5.0:
 
 5.0

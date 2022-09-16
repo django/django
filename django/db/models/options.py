@@ -1,6 +1,7 @@
 import bisect
 import copy
 import inspect
+import warnings
 from collections import defaultdict
 
 from django.apps import apps
@@ -10,6 +11,7 @@ from django.db import connections
 from django.db.models import AutoField, Manager, OrderWrt, UniqueConstraint
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, OrderedSet
+from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.text import camel_case_to_spaces, format_lazy
@@ -40,6 +42,7 @@ DEFAULT_NAMES = (
     "proxy",
     "swappable",
     "auto_created",
+    # Must be kept for backward compatibility with old migrations.
     "index_together",
     "apps",
     "default_permissions",
@@ -113,7 +116,7 @@ class Options:
         self.indexes = []
         self.constraints = []
         self.unique_together = []
-        self.index_together = []
+        self.index_together = []  # RemovedInDjango51Warning.
         self.select_on_save = False
         self.default_permissions = ("add", "change", "delete", "view")
         self.permissions = []
@@ -200,6 +203,12 @@ class Options:
 
             self.unique_together = normalize_together(self.unique_together)
             self.index_together = normalize_together(self.index_together)
+            if self.index_together:
+                warnings.warn(
+                    f"'index_together' is deprecated. Use 'Meta.indexes' in "
+                    f"{self.label!r} instead.",
+                    RemovedInDjango51Warning,
+                )
             # App label/class name interpolation for names of constraints and
             # indexes.
             if not getattr(cls._meta, "abstract", False):

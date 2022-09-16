@@ -77,34 +77,46 @@ END;
             f"ORDER BY {cache_key} OFFSET %%s ROWS FETCH FIRST 1 ROWS ONLY"
         )
 
-    def date_extract_sql(self, lookup_type, field_name):
+    # EXTRACT format cannot be passed in parameters.
+    _extract_format_re = _lazy_re_compile(r"[A-Z_]+")
+
+    def date_extract_sql(self, lookup_type, sql, params):
+        extract_sql = f"TO_CHAR({sql}, %s)"
+        extract_param = None
         if lookup_type == "week_day":
             # TO_CHAR(field, 'D') returns an integer from 1-7, where 1=Sunday.
-            return "TO_CHAR(%s, 'D')" % field_name
+            extract_param = "D"
         elif lookup_type == "iso_week_day":
-            return "TO_CHAR(%s - 1, 'D')" % field_name
+            extract_sql = f"TO_CHAR({sql} - 1, %s)"
+            extract_param = "D"
         elif lookup_type == "week":
             # IW = ISO week number
-            return "TO_CHAR(%s, 'IW')" % field_name
+            extract_param = "IW"
         elif lookup_type == "quarter":
-            return "TO_CHAR(%s, 'Q')" % field_name
+            extract_param = "Q"
         elif lookup_type == "iso_year":
-            return "TO_CHAR(%s, 'IYYY')" % field_name
+            extract_param = "IYYY"
         else:
+            lookup_type = lookup_type.upper()
+            if not self._extract_format_re.fullmatch(lookup_type):
+                raise ValueError(f"Invalid loookup type: {lookup_type!r}")
             # https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/EXTRACT-datetime.html
-            return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
+            return f"EXTRACT({lookup_type} FROM {sql})", params
+        return extract_sql, (*params, extract_param)
 
-    def date_trunc_sql(self, lookup_type, field_name, tzname=None):
-        field_name = self._convert_field_to_tz(field_name, tzname)
+    def date_trunc_sql(self, lookup_type, sql, params, tzname=None):
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
         # https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ROUND-and-TRUNC-Date-Functions.html
+        trunc_param = None
         if lookup_type in ("year", "month"):
-            return "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
+            trunc_param = lookup_type.upper()
         elif lookup_type == "quarter":
-            return "TRUNC(%s, 'Q')" % field_name
+            trunc_param = "Q"
         elif lookup_type == "week":
-            return "TRUNC(%s, 'IW')" % field_name
+            trunc_param = "IW"
         else:
-            return "TRUNC(%s)" % field_name
+            return f"TRUNC({sql})", params
+        return f"TRUNC({sql}, %s)", (*params, trunc_param)
 
     # Oracle crashes with "ORA-03113: end-of-file on communication channel"
     # if the time zone name is passed in parameter. Use interpolation instead.
@@ -116,77 +128,80 @@ END;
         tzname, sign, offset = split_tzname_delta(tzname)
         return f"{sign}{offset}" if offset else tzname
 
-    def _convert_field_to_tz(self, field_name, tzname):
+    def _convert_sql_to_tz(self, sql, params, tzname):
         if not (settings.USE_TZ and tzname):
-            return field_name
+            return sql, params
         if not self._tzname_re.match(tzname):
             raise ValueError("Invalid time zone name: %s" % tzname)
         # Convert from connection timezone to the local time, returning
         # TIMESTAMP WITH TIME ZONE and cast it back to TIMESTAMP to strip the
         # TIME ZONE details.
         if self.connection.timezone_name != tzname:
-            return "CAST((FROM_TZ(%s, '%s') AT TIME ZONE '%s') AS TIMESTAMP)" % (
-                field_name,
-                self.connection.timezone_name,
-                self._prepare_tzname_delta(tzname),
+            from_timezone_name = self.connection.timezone_name
+            to_timezone_name = self._prepare_tzname_delta(tzname)
+            return (
+                f"CAST((FROM_TZ({sql}, '{from_timezone_name}') AT TIME ZONE "
+                f"'{to_timezone_name}') AS TIMESTAMP)",
+                params,
             )
-        return field_name
+        return sql, params
 
-    def datetime_cast_date_sql(self, field_name, tzname):
-        field_name = self._convert_field_to_tz(field_name, tzname)
-        return "TRUNC(%s)" % field_name
+    def datetime_cast_date_sql(self, sql, params, tzname):
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
+        return f"TRUNC({sql})", params
 
-    def datetime_cast_time_sql(self, field_name, tzname):
+    def datetime_cast_time_sql(self, sql, params, tzname):
         # Since `TimeField` values are stored as TIMESTAMP change to the
         # default date and convert the field to the specified timezone.
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
         convert_datetime_sql = (
-            "TO_TIMESTAMP(CONCAT('1900-01-01 ', TO_CHAR(%s, 'HH24:MI:SS.FF')), "
-            "'YYYY-MM-DD HH24:MI:SS.FF')"
-        ) % self._convert_field_to_tz(field_name, tzname)
-        return "CASE WHEN %s IS NOT NULL THEN %s ELSE NULL END" % (
-            field_name,
-            convert_datetime_sql,
+            f"TO_TIMESTAMP(CONCAT('1900-01-01 ', TO_CHAR({sql}, 'HH24:MI:SS.FF')), "
+            f"'YYYY-MM-DD HH24:MI:SS.FF')"
+        )
+        return (
+            f"CASE WHEN {sql} IS NOT NULL THEN {convert_datetime_sql} ELSE NULL END",
+            (*params, *params),
         )
 
-    def datetime_extract_sql(self, lookup_type, field_name, tzname):
-        field_name = self._convert_field_to_tz(field_name, tzname)
-        return self.date_extract_sql(lookup_type, field_name)
+    def datetime_extract_sql(self, lookup_type, sql, params, tzname):
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
+        return self.date_extract_sql(lookup_type, sql, params)
 
-    def datetime_trunc_sql(self, lookup_type, field_name, tzname):
-        field_name = self._convert_field_to_tz(field_name, tzname)
+    def datetime_trunc_sql(self, lookup_type, sql, params, tzname):
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
         # https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ROUND-and-TRUNC-Date-Functions.html
+        trunc_param = None
         if lookup_type in ("year", "month"):
-            sql = "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
+            trunc_param = lookup_type.upper()
         elif lookup_type == "quarter":
-            sql = "TRUNC(%s, 'Q')" % field_name
+            trunc_param = "Q"
         elif lookup_type == "week":
-            sql = "TRUNC(%s, 'IW')" % field_name
-        elif lookup_type == "day":
-            sql = "TRUNC(%s)" % field_name
+            trunc_param = "IW"
         elif lookup_type == "hour":
-            sql = "TRUNC(%s, 'HH24')" % field_name
+            trunc_param = "HH24"
         elif lookup_type == "minute":
-            sql = "TRUNC(%s, 'MI')" % field_name
+            trunc_param = "MI"
+        elif lookup_type == "day":
+            return f"TRUNC({sql})", params
         else:
-            sql = (
-                "CAST(%s AS DATE)" % field_name
-            )  # Cast to DATE removes sub-second precision.
-        return sql
+            # Cast to DATE removes sub-second precision.
+            return f"CAST({sql} AS DATE)", params
+        return f"TRUNC({sql}, %s)", (*params, trunc_param)
 
-    def time_trunc_sql(self, lookup_type, field_name, tzname=None):
+    def time_trunc_sql(self, lookup_type, sql, params, tzname=None):
         # The implementation is similar to `datetime_trunc_sql` as both
         # `DateTimeField` and `TimeField` are stored as TIMESTAMP where
         # the date part of the later is ignored.
-        field_name = self._convert_field_to_tz(field_name, tzname)
+        sql, params = self._convert_sql_to_tz(sql, params, tzname)
+        trunc_param = None
         if lookup_type == "hour":
-            sql = "TRUNC(%s, 'HH24')" % field_name
+            trunc_param = "HH24"
         elif lookup_type == "minute":
-            sql = "TRUNC(%s, 'MI')" % field_name
+            trunc_param = "MI"
         elif lookup_type == "second":
-            sql = (
-                "CAST(%s AS DATE)" % field_name
-            )  # Cast to DATE removes sub-second precision.
-        return sql
+            # Cast to DATE removes sub-second precision.
+            return f"CAST({sql} AS DATE)", params
+        return f"TRUNC({sql}, %s)", (*params, trunc_param)
 
     def get_db_converters(self, expression):
         converters = super().get_db_converters(expression)
@@ -309,14 +324,15 @@ END;
         # `statement` doesn't contain the query parameters. Substitute
         # parameters manually.
         if isinstance(params, (tuple, list)):
-            for i, param in enumerate(params):
+            for i, param in enumerate(reversed(params), start=1):
+                param_num = len(params) - i
                 statement = statement.replace(
-                    ":arg%d" % i, force_str(param, errors="replace")
+                    ":arg%d" % param_num, force_str(param, errors="replace")
                 )
         elif isinstance(params, dict):
-            for key, param in params.items():
+            for key in sorted(params, key=len, reverse=True):
                 statement = statement.replace(
-                    ":%s" % key, force_str(param, errors="replace")
+                    ":%s" % key, force_str(params[key], errors="replace")
                 )
         return statement
 
