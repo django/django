@@ -486,8 +486,10 @@ class DecimalValidator:
                 self.messages["invalid"], code="invalid", params={"value": value}
             )
         if exponent >= 0:
-            # A positive exponent adds that many trailing zeros.
-            digits = len(digit_tuple) + exponent
+            digits = len(digit_tuple)
+            if digit_tuple != (0,):
+                # A positive exponent adds that many trailing zeros.
+                digits += exponent
             decimals = 0
         else:
             # If the absolute value of the negative exponent is larger than the
