@@ -669,13 +669,9 @@ class UniqueConstraint(BaseConstraint):
                 if (self.condition & Exists(queryset.filter(self.condition))).check(
                     against, using=using
                 ):
-                    code = (
-                        "unique"
-                        if self.condition.referenced_base_fields == set(self.fields)
-                        else self.violation_error_code
-                    )
                     raise ValidationError(
-                        message=self.get_violation_error_message(), code=code
+                        message=self.get_violation_error_message(),
+                        code=self.violation_error_code or "unique",
                     )
             except FieldError:
                 pass
