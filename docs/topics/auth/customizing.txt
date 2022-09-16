@@ -789,11 +789,10 @@ Extending Django's default ``User``
 If you're entirely happy with Django's :class:`~django.contrib.auth.models.User`
 model, but you want to add some additional profile information, you could
 subclass :class:`django.contrib.auth.models.AbstractUser` and add your custom
-profile fields, although we'd recommend a separate model as described in the
-"Model design considerations" note of :ref:`specifying-custom-user-model`.
-``AbstractUser`` provides the full implementation of the default
-:class:`~django.contrib.auth.models.User` as an :ref:`abstract model
-<abstract-base-classes>`.
+profile fields, although we'd recommend a separate model as described in
+:ref:`specifying-custom-user-model`. ``AbstractUser`` provides the full
+implementation of the default :class:`~django.contrib.auth.models.User` as an
+:ref:`abstract model <abstract-base-classes>`.
 
 .. _custom-users-and-the-built-in-auth-forms:
 
