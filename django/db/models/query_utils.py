@@ -176,16 +176,23 @@ class Q(tree.Node):
         return hash(self.identity)
 
     @property
-    def fields(self):
-        def determine_fields(filter_expr):
-            if isinstance(filter_expr, Q):
-                return filter_expr.fields
-            field = filter_expr[0].split(LOOKUP_SEP)[0]
-            return {field}
+    def referenced_base_fields(self):
+        """
+        Retrieve all base fields referenced directly or through F expressions excluding
+        any fields referenced through joins.
+        """
+        # Avoid circular imports
+        from django.db.models import F
 
-        return set(
-            field for child in self.children for field in determine_fields(child)
+        f_references = set(expr.name for expr in self.flatten() if isinstance(expr, F))
+        q_references = set(
+            child[0].split(LOOKUP_SEP)[0]
+            for expr in self.flatten()
+            if isinstance(expr, Q)
+            for child in expr.children
+            if isinstance(child, tuple)
         )
+        return f_references | q_references
 
 
 class DeferredAttribute:

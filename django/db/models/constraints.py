@@ -671,7 +671,7 @@ class UniqueConstraint(BaseConstraint):
                 ):
                     code = (
                         "unique"
-                        if self.condition.fields == set(self.fields)
+                        if self.condition.referenced_base_fields == set(self.fields)
                         else self.violation_error_code
                     )
                     raise ValidationError(
