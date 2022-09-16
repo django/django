@@ -623,7 +623,7 @@ msgid "Positive integer"
 msgstr "Positief geheel getal"
 
 msgid "Positive small integer"
-msgstr "Postitief klein geheel getal"
+msgstr "Positief klein geheel getal"
 
 #, python-format
 msgid "Slug (up to %(max_length)s)"
