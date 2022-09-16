@@ -18,3 +18,7 @@ Bugfixes
 
 * Fixed a bug in Django 4.1 that caused an incorrect validation of
   ``CheckConstraint`` on ``NULL`` values (:ticket:`33996`).
+
+* Fixed a regression in Django 4.1 that caused a
+  ``QuerySet.values()/values_list()`` crash on ``ArrayAgg()`` and
+  ``JSONBAgg()`` (:ticket:`34016`).
