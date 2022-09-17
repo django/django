@@ -11,10 +11,6 @@ class Employee(models.Model):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
 
-    # TODO: _check_ordering
-    # class Meta:
-    #     ordering = ("last_name", "first_name")
-
     def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
@@ -25,11 +21,11 @@ class Employee2(models.Model):
     last_name = models.CharField(max_length=20)
     composite_pk = models.CompositeField('branch', 'employee_code', primary_key=True)
 
-    # TODO: _check_ordering
-    # class Meta:
-    #     ordering = ("last_name", "first_name")
+    class Meta:
+        ordering = ("last_name", "first_name")
 
     def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
 Employee2._meta.local_fields = [f for f in Employee2._meta.local_fields if f != Employee2._meta.pk] + [Employee2._meta.pk]
+print(Employee2._meta.pk.component_fields)

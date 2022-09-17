@@ -485,8 +485,8 @@ class Model(metaclass=ModelBase):
         seen_attname = {}
         field_conflicts = []
         def see_field(field, name=None):
-            if hasattr(field, 'names'):
-                for name in field.names:
+            if hasattr(field, 'component_names'):
+                for name in field.component_names:
                     if name in seen_attname:
                         field_conflicts.append((name, field.name))
                     seen_attname[name] = field.name
