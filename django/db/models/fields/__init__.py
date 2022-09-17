@@ -576,6 +576,8 @@ class Field(RegisterLookupMixin):
             path = path.replace("django.db.models.fields.json", "django.db.models")
         elif path.startswith("django.db.models.fields.proxy"):
             path = path.replace("django.db.models.fields.proxy", "django.db.models")
+        elif path.startswith("django.db.models.fields.composite"):
+            path = path.replace("django.db.models.fields.composite", "django.db.models")
         elif path.startswith("django.db.models.fields"):
             path = path.replace("django.db.models.fields", "django.db.models")
         # Return basic info - other fields should override this.
