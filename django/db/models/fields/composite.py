@@ -43,6 +43,11 @@ class CompositeType:
     def __iter__(self):
         return (getattr(self._instance, name) for name in self._fields)
 
+    def __eq__(self, other):
+        if isinstance(other, CompositeType):
+            return tuple(self).__eq__(tuple(other))
+        return tuple(self).__eq__(other)
+
     def __getnewargs__(self):
         'Return self as a plain tuple.  Used by copy and pickle.'
         return tuple(self)
@@ -81,7 +86,10 @@ class CompositeField(Field):
 
     descriptor_class = CompositeDeferredAttribute
     def __init__(self, *names, **kwargs):
-        super().__init__(**kwargs, db_column=None, auto_created=True, editable=False)
+        kwargs['auto_created'] = True
+        kwargs['db_column'] = None
+        kwargs['editable'] = False
+        super().__init__(**kwargs)
         self.names = names
         # self.columns = None
 
