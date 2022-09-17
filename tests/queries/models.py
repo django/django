@@ -68,6 +68,9 @@ class Annotation(models.Model):
 class DateTimePK(models.Model):
     date = models.DateTimeField(primary_key=True, default=datetime.datetime.now)
 
+    class Meta:
+        ordering = ["date"]
+
 
 class ExtraInfo(models.Model):
     info = models.CharField(max_length=100)

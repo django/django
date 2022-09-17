@@ -1819,6 +1819,7 @@ class Query(BaseExpression):
             final_transformer = functools.partial(
                 transform, name=name, previous=final_transformer
             )
+            final_transformer.has_transforms = True
         # Then, add the path to the query's joins. Note that we can't trim
         # joins at this stage - we will need the information about join type
         # of the trimmed joins.
