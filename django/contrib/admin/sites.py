@@ -267,7 +267,7 @@ class AdminSite:
         urlpatterns = [
             path("", wrap(self.index), name="index"),
             path("login/", self.login, name="login"),
-            path("logout/", wrap(self.logout), name="logout"),
+            path("logout/", self.logout, name="logout"),
             path(
                 "password_change/",
                 wrap(self.password_change, cacheable=True),
