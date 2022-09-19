@@ -31,4 +31,5 @@ class CompositePKTests(TestCase):
         Employee.objects.create(branch="root", employee_code=1234, first_name="Foo", last_name="Bar")
         Employee.objects.create(pk=("root", 1235), first_name="Foo", last_name="Baz")
 
-        # Employee.objects.get(pk=("root", 1235))
+        Employee.objects.get(pk=("root", 1235))
+        Employee.objects.filter(pk__in=[("root", 1234), ("root", 1235)]).last()

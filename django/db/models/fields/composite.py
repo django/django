@@ -1,6 +1,20 @@
 from django.db.models.fields import Field
 from django.db.models.query_utils import DeferredAttribute
 from django.db.models.signals import class_prepared
+from django.utils.functional import cached_property
+from django.db.models.expressions import ExpressionList, Col
+
+class CompositeCol(ExpressionList):
+    def __init__(self, alias, target: 'CompositeField', output_field=None):
+        if output_field is None:
+            output_field = target
+        self.cols = [Col(alias, field) for field in target.component_fields]
+        super().__init__(*self.cols, output_field=output_field)
+        self.alias, self.target = alias, target
+
+    def as_sql(self, compiler, connection):
+        sql, params = super().as_sql(compiler, connection)
+        return "(%s)" % sql, params
 
 class CompositeType:
     _composite_type = None
@@ -114,6 +128,17 @@ class CompositeField(Field):
             cls._meta.index_together = (*cls._meta.index_together, self.component_names)
 
         return result
+
+    def get_col(self, alias, output_field=None):
+        if alias == self.model._meta.db_table and (
+            output_field is None or output_field == self
+        ):
+            return self.cached_col
+        return CompositeCol(alias, self, output_field)
+
+    @cached_property
+    def cached_col(self):
+        return CompositeCol(self.model._meta.db_table, self)
 
 def resolve_columns(*args, **kwargs):
     cls = kwargs.pop('sender')

@@ -2,7 +2,7 @@ import itertools
 import math
 
 from django.core.exceptions import EmptyResultSet
-from django.db.models.expressions import Case, Expression, Func, Value, When
+from django.db.models.expressions import Case, Expression, ExpressionList, Func, Value, When
 from django.db.models.fields import (
     BooleanField,
     CharField,
@@ -356,6 +356,18 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
             return template % lhs_sql, params
         return super().as_sql(compiler, connection)
 
+    def as_sqlite(self, compiler, connection):
+        from django.db.models.sql.where import AND, WhereNode
+        if isinstance(self.lhs, ExpressionList):
+            lhs = self.lhs.get_source_expressions()
+            if len(lhs) != len(self.rhs):
+                raise ValueError(
+                    f"The QuerySet value for an exact lookup must has same"
+                    f"arity for lhs and rhs ({len(lhs)} != {len(self.rhs)})"
+                )
+            exprs = [Exact(l, r) for l, r in zip(self.lhs.get_source_expressions(), self.rhs)]
+            return compiler.compile(WhereNode(exprs, connector=AND))
+        return self.as_sql(compiler, connection)
 
 @Field.register_lookup
 class IExact(BuiltinLookup):
@@ -463,6 +475,13 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
         ):
             return self.split_parameter_list_as_sql(compiler, connection)
         return super().as_sql(compiler, connection)
+
+    def as_sqlite(self, compiler, connection):
+        from django.db.models.sql.where import OR, WhereNode
+        if isinstance(self.lhs, ExpressionList):
+            exprs = [Exact(self.lhs, rhs) for rhs in self.rhs]
+            return compiler.compile(WhereNode(exprs, connector=OR))
+        return self.as_sql(compiler, connection)
 
     def split_parameter_list_as_sql(self, compiler, connection):
         # This is a special case for databases which limit the number of

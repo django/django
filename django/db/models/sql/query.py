@@ -1740,6 +1740,17 @@ class Query(BaseExpression):
                 break
         return path, final_field, targets, names[pos + 1 :]
 
+    def expand_components(self, final_field, prefix=None, lookup_sep=LOOKUP_SEP):
+        result = []
+        for field in final_field.component_fields:
+            if hasattr(field, 'component_fields'):
+                result.extend(self.expand_components(field, prefix=prefix, lookup_sep=lookup_sep))
+            elif prefix:
+                result.append(prefix + lookup_sep + field.attname)
+            else:
+                result.append(field.attname)
+        return result
+
     def setup_joins(
         self,
         names,
@@ -2177,7 +2188,9 @@ class Query(BaseExpression):
         If 'ordering' is empty, clear all ordering from the query.
         """
         errors = []
+        flatten_ordering = []
         for item in ordering:
+            flatten_ordering.append(item)
             if isinstance(item, str):
                 if item == "?":
                     continue
@@ -2189,7 +2202,18 @@ class Query(BaseExpression):
                     continue
                 # names_to_path() validates the lookup. A descriptive
                 # FieldError will be raise if it's not.
-                self.names_to_path(item.split(LOOKUP_SEP), self.model._meta)
+                lookup_splitted = item.split(LOOKUP_SEP)
+                path, final_field, _, lookup_parts = self.names_to_path(lookup_splitted, self.model._meta)
+                if not lookup_parts and hasattr(final_field, "component_fields"):
+                    flatten_ordering.pop()
+                    field_parts = lookup_splitted[0 : len(lookup_splitted) - len(lookup_parts)]
+                    path_prefix = LOOKUP_SEP.join(field_parts[0:-1])
+                    for name in self.expand_components(final_field, prefix=path_prefix):
+                        expr = name
+                        if item.startswith("-"):
+                            expr = F(expr).desc()
+                        flatten_ordering.append(expr)
+
             elif not hasattr(item, "resolve_expression"):
                 errors.append(item)
             if getattr(item, "contains_aggregate", False):
@@ -2200,7 +2224,7 @@ class Query(BaseExpression):
         if errors:
             raise FieldError("Invalid order_by arguments: %s" % errors)
         if ordering:
-            self.order_by += ordering
+            self.order_by += tuple(flatten_ordering)
         else:
             self.default_ordering = False
 
