@@ -50,6 +50,10 @@ class Author(models.Model):
     name = models.CharField(max_length=100)
 
 
+class Journalist(Author):
+    specialty = models.CharField(max_length=100)
+
+
 class Book(models.Model):
     name = models.CharField(max_length=100)
     authors = models.ManyToManyField(Author, related_name="books")
