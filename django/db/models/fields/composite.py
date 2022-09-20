@@ -1,5 +1,6 @@
 from django.db.models.expressions import Col, ExpressionList
 from django.db.models.fields import Field
+from django.db.models.lookups import TupleExact
 from django.db.models.query_utils import DeferredAttribute
 from django.db.models.signals import class_prepared
 from django.utils.functional import cached_property
@@ -16,6 +17,11 @@ class CompositeCol(ExpressionList):
     def as_sql(self, compiler, connection):
         sql, params = super().as_sql(compiler, connection)
         return "(%s)" % sql, params
+
+    def get_lookup(self, lookup):
+        if lookup == "exact":
+            return TupleExact
+        return super().get_lookup(lookup)
 
 
 class CompositeType:

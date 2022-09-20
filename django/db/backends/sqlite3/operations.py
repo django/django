@@ -259,6 +259,9 @@ class DatabaseOperations(BaseDatabaseOperations):
             ),
         ]
 
+    def tuple_operation(self, expression):
+        return False
+
     def adapt_datetimefield_value(self, value):
         if value is None:
             return None

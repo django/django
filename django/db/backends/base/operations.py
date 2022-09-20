@@ -489,6 +489,13 @@ class BaseDatabaseOperations:
         """
         return ""
 
+    def tuple_operation(self, expression):
+        """
+        If tuple unsupport, it would expand tuple to several conditions.
+        Now only `Exact`/`TupleExact` and `In` support this.
+        """
+        return True
+
     def prep_for_like_query(self, x):
         """Prepare a value for use in a LIKE query."""
         return str(x).replace("\\", "\\\\").replace("%", r"\%").replace("_", r"\_")
