@@ -781,9 +781,13 @@ class ForeignObject(RelatedField):
     def _get_joining_columns(self, source):
         joining_columns = []
         for lhs_field, rhs_field in source:
-            if hasattr(lhs_field, 'component_fields') and hasattr(rhs_field, 'component_fields'):
+            if hasattr(lhs_field, "component_fields") and hasattr(
+                rhs_field, "component_fields"
+            ):
                 joining_columns.extend(
-                    self._get_joining_columns(zip(lhs_field.component_fields, rhs_field.component_fields))
+                    self._get_joining_columns(
+                        zip(lhs_field.component_fields, rhs_field.component_fields)
+                    )
                 )
             else:
                 joining_columns.append((lhs_field.column, rhs_field.column))

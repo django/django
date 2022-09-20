@@ -484,14 +484,15 @@ class Model(metaclass=ModelBase):
         _NOTPRESENT = object()
         seen_attname = {}
         field_conflicts = []
+
         def see_field(field, name=None):
-            if hasattr(field, 'component_names'):
+            if hasattr(field, "component_names"):
                 for name in field.component_names:
                     if name in seen_attname:
                         field_conflicts.append((name, field.name))
                     seen_attname[name] = field.name
                 return
-            if name is None and hasattr(field, 'attname'):
+            if name is None and hasattr(field, "attname"):
                 name = field.attname
             if name is not None:
                 if name in seen_attname:
