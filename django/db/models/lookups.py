@@ -4,7 +4,14 @@ import warnings
 
 from django.core.exceptions import EmptyResultSet, FullResultSet
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.models.expressions import Case, Expression, ExpressionList, Func, Value, When
+from django.db.models.expressions import (
+    Case,
+    Expression,
+    ExpressionList,
+    Func,
+    Value,
+    When,
+)
 from django.db.models.fields import (
     BooleanField,
     CharField,
@@ -386,6 +393,7 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
 
     def as_sqlite(self, compiler, connection):
         from django.db.models.sql.where import AND, WhereNode
+
         if isinstance(self.lhs, ExpressionList):
             lhs = self.lhs.get_source_expressions()
             if len(lhs) != len(self.rhs):
@@ -393,9 +401,13 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
                     f"The QuerySet value for an exact lookup must has same"
                     f"arity for lhs and rhs ({len(lhs)} != {len(self.rhs)})"
                 )
-            exprs = [Exact(l, r) for l, r in zip(self.lhs.get_source_expressions(), self.rhs)]
+            exprs = [
+                Exact(lhs, rhs)
+                for lhs, rhs in zip(self.lhs.get_source_expressions(), self.rhs)
+            ]
             return compiler.compile(WhereNode(exprs, connector=AND))
         return self.as_sql(compiler, connection)
+
 
 @Field.register_lookup
 class IExact(BuiltinLookup):
@@ -549,6 +561,7 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
 
     def as_sqlite(self, compiler, connection):
         from django.db.models.sql.where import OR, WhereNode
+
         if isinstance(self.lhs, ExpressionList):
             exprs = [Exact(self.lhs, rhs) for rhs in self.rhs]
             return compiler.compile(WhereNode(exprs, connector=OR))
