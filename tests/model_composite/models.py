@@ -7,7 +7,7 @@ from django.db import models
 
 class Employee(models.Model):
     composite_pk = models.CompositeField("branch", "employee_code", primary_key=True)
-    branch = models.TextField()
+    branch = models.CharField(max_length=255)
     employee_code = models.IntegerField(db_column="code")
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
@@ -17,7 +17,7 @@ class Employee(models.Model):
 
 
 class Employee2(models.Model):
-    branch = models.TextField()
+    branch = models.CharField(max_length=255)
     employee_code = models.IntegerField(db_column="code")
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
@@ -37,7 +37,7 @@ Employee2._meta.local_fields = [
 
 class User(models.Model):
     employee_id = models.CompositeField("employee_branch", "employee_code")
-    employee_branch = models.TextField()
+    employee_branch = models.CharField(max_length=255)
     employee_code = models.IntegerField()
     employee = models.ForeignObject(
         Employee,
