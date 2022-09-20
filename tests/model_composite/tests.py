@@ -41,7 +41,7 @@ class CompositePKTests(TestCase):
         user_id = User.objects.create(employee_branch="root", employee_code=1234).id
 
         self.assertEqual(User.objects.get(employee_branch="root", employee_code=1234).employee.last_name, "Bar")
-        self.assertEqual(User.objects.get(employee_branch="root", employee_code=1234).employee.last_name, "Bar")
+        self.assertEqual(User.objects.get(employee_branch="root", employee_code=1234).employee2.last_name, "Bar")
 
         self.assertEqual(User.objects.order_by('employee__pk').get(employee_code=1234, employee__branch="root").employee.last_name, "Bar")
         self.assertEqual(User.objects.get(employee__pk=("root", 1234)).employee.last_name, "Bar")

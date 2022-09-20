@@ -1754,9 +1754,9 @@ class Query(BaseExpression):
             if hasattr(field, 'component_fields'):
                 result.extend(self.expand_components(field, prefix=prefix, lookup_sep=lookup_sep))
             elif prefix:
-                result.append(prefix + lookup_sep + field.attname)
+                result.append(prefix + lookup_sep + field.name)
             else:
-                result.append(field.attname)
+                result.append(field.name)
         return result
 
     def expand_components(self, name):
@@ -1770,10 +1770,15 @@ class Query(BaseExpression):
 
         lookup_splitted = name.split(LOOKUP_SEP)
         path, final_field, _, lookup_parts = self.names_to_path(lookup_splitted, self.model._meta)
-        if not lookup_parts and hasattr(final_field, "component_fields"):
-            field_parts = lookup_splitted[0 : len(lookup_splitted) - len(lookup_parts)]
-            path_prefix = LOOKUP_SEP.join(field_parts[0:-1])
+        if lookup_parts:
+            return flatten_names
+        if hasattr(final_field, "component_fields"):
+            path_prefix = LOOKUP_SEP.join(lookup_splitted[0:-1])
             flatten_names = tuple(self._expand_components(final_field, prefix=path_prefix))
+        elif lookup_splitted[-1] == 'pk':
+            path_prefix = LOOKUP_SEP.join(lookup_splitted[0:-1])
+            name = path_prefix + LOOKUP_SEP + final_field.name if path_prefix else final_field.name
+            flatten_names = (name,)
         return flatten_names
 
     def setup_joins(
@@ -2366,6 +2371,8 @@ class Query(BaseExpression):
                     expanded = self.expand_components(field_name)
                 except:
                     pass
+            if expanded is None:
+                expanded = (field_name,)
             flatten_fields.update(expanded)
 
         if defer:
@@ -2404,6 +2411,8 @@ class Query(BaseExpression):
                     expanded = self.expand_components(field_name)
                 except:
                     pass
+            if expanded is None:
+                expanded = (field_name,)
             flatten_fields.update(expanded)
 
 

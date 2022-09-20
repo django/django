@@ -41,6 +41,26 @@ class CompositeType:
             class_namespace[field] = bind_property(field)
         return type(name, (cls,), class_namespace)
 
+    def resolve_expression(self, *args, **kwargs):
+        def resolve_value(value):
+            if isinstance(value, CompositeType):
+                value = tuple(value)
+            if hasattr(value, "resolve_expression"):
+                value = value.resolve_expression(*args, **kwargs)
+            elif isinstance(value, (list, tuple)):
+                # The items of the iterable may be expressions and therefore need
+                # to be resolved independently.
+                values = (
+                    resolve_value(sub_value)
+                    for sub_value in value
+                )
+                type_ = type(value)
+                if hasattr(type_, "_make"):  # namedtuple
+                    return type_(*values)
+                return type_(values)
+            return value
+        return resolve_value(self)
+
     def __init__(self, instance):
         self._instance = instance
 
