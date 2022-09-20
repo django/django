@@ -778,11 +778,20 @@ class ForeignObject(RelatedField):
         attname, column = super().get_attname_column()
         return attname, None
 
+    def _get_joining_columns(self, source):
+        joining_columns = []
+        for lhs_field, rhs_field in source:
+            if hasattr(lhs_field, 'component_fields') and hasattr(rhs_field, 'component_fields'):
+                joining_columns.extend(
+                    self._get_joining_columns(zip(lhs_field.component_fields, rhs_field.component_fields))
+                )
+            else:
+                joining_columns.append((lhs_field.column, rhs_field.column))
+        return joining_columns
+
     def get_joining_columns(self, reverse_join=False):
         source = self.reverse_related_fields if reverse_join else self.related_fields
-        return tuple(
-            (lhs_field.column, rhs_field.column) for lhs_field, rhs_field in source
-        )
+        return tuple(self._get_joining_columns(source))
 
     def get_reverse_joining_columns(self):
         return self.get_joining_columns(reverse_join=True)
