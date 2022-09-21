@@ -7,12 +7,13 @@ from threading import Lock
 
 from django.core.exceptions import EmptyResultSet, FieldError
 from django.db import DEFAULT_DB_ALIAS, connection
-from django.db.models import Count, Exists, F, Max, OuterRef, Q
+from django.db.models import CharField, Count, Exists, F, Max, OuterRef, Q
 from django.db.models.expressions import RawSQL
+from django.db.models.functions import ExtractYear, Length, LTrim
 from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import AND, OR, NothingNode, WhereNode
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext, ignore_warnings
+from django.test.utils import CaptureQueriesContext, ignore_warnings, register_lookup
 from django.utils.deprecation import RemovedInDjango50Warning
 
 from .models import (
@@ -390,6 +391,33 @@ class Queries1Tests(TestCase):
         self.assertIn("OUTER JOIN", str(qs.query))
         qs = qs.order_by("id")
         self.assertNotIn("OUTER JOIN", str(qs.query))
+
+    def test_filter_by_related_field_transform(self):
+        extra_old = ExtraInfo.objects.create(
+            info="extra 12",
+            date=DateTimePK.objects.create(date=datetime.datetime(2020, 12, 10)),
+        )
+        ExtraInfo.objects.create(info="extra 11", date=DateTimePK.objects.create())
+        a5 = Author.objects.create(name="a5", num=5005, extra=extra_old)
+
+        fk_field = ExtraInfo._meta.get_field("date")
+        with register_lookup(fk_field, ExtractYear):
+            self.assertSequenceEqual(
+                ExtraInfo.objects.filter(date__year=2020),
+                [extra_old],
+            )
+            self.assertSequenceEqual(
+                Author.objects.filter(extra__date__year=2020), [a5]
+            )
+
+    def test_filter_by_related_field_nested_transforms(self):
+        extra = ExtraInfo.objects.create(info=" extra")
+        a5 = Author.objects.create(name="a5", num=5005, extra=extra)
+        info_field = ExtraInfo._meta.get_field("info")
+        with register_lookup(info_field, Length), register_lookup(CharField, LTrim):
+            self.assertSequenceEqual(
+                Author.objects.filter(extra__info__ltrim__length=5), [a5]
+            )
 
     def test_get_clears_ordering(self):
         """

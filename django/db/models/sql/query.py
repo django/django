@@ -1278,10 +1278,6 @@ class Query(BaseExpression):
         # supports both transform and lookup for the name.
         lookup_class = lhs.get_lookup(lookup_name)
         if not lookup_class:
-            if lhs.field.is_relation:
-                raise FieldError(
-                    "Related Field got invalid lookup: {}".format(lookup_name)
-                )
             # A lookup wasn't found. Try to interpret the name as a transform
             # and do an Exact lookup against it.
             lhs = self.try_transform(lhs, lookup_name)
@@ -1450,12 +1446,6 @@ class Query(BaseExpression):
             can_reuse.update(join_list)
 
         if join_info.final_field.is_relation:
-            # No support for transforms for relational fields
-            num_lookups = len(lookups)
-            if num_lookups > 1:
-                raise FieldError(
-                    "Related Field got invalid lookup: {}".format(lookups[0])
-                )
             if len(targets) == 1:
                 col = self._get_col(targets[0], join_info.final_field, alias)
             else:
