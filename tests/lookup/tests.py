@@ -786,10 +786,16 @@ class LookupTests(TestCase):
 
     def test_relation_nested_lookup_error(self):
         # An invalid nested lookup on a related field raises a useful error.
-        msg = "Related Field got invalid lookup: editor"
+        msg = (
+            "Unsupported lookup 'editor' for ForeignKey or join on the field not "
+            "permitted."
+        )
         with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(author__editor__name="James")
-        msg = "Related Field got invalid lookup: foo"
+        msg = (
+            "Unsupported lookup 'foo' for ForeignKey or join on the field not "
+            "permitted."
+        )
         with self.assertRaisesMessage(FieldError, msg):
             Tag.objects.filter(articles__foo="bar")
 
