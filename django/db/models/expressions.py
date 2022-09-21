@@ -533,6 +533,7 @@ _connector_combinations = [
             Combinable.SUB,
             Combinable.MUL,
             Combinable.DIV,
+            Combinable.MOD,
         )
     },
     # Bitwise operators.
