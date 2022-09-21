@@ -211,30 +211,21 @@ class EmailMessage:
         Initialize a single email message (which can be sent to multiple
         recipients).
         """
-        if to:
-            if isinstance(to, str):
-                raise TypeError('"to" argument must be a list or tuple')
-            self.to = list(to)
-        else:
-            self.to = []
-        if cc:
-            if isinstance(cc, str):
-                raise TypeError('"cc" argument must be a list or tuple')
-            self.cc = list(cc)
-        else:
-            self.cc = []
-        if bcc:
-            if isinstance(bcc, str):
-                raise TypeError('"bcc" argument must be a list or tuple')
-            self.bcc = list(bcc)
-        else:
-            self.bcc = []
-        if reply_to:
-            if isinstance(reply_to, str):
-                raise TypeError('"reply_to" argument must be a list or tuple')
-            self.reply_to = list(reply_to)
-        else:
-            self.reply_to = []
+        list_or_tuple_arguments = {
+            'to': to,
+            'cc': cc,
+            'bcc': bcc,
+            'reply_to': reply_to
+        }
+        for attribute_name, argument_value in list_or_tuple_arguments.items():
+            if argument_value:
+                if isinstance(argument_value, str):
+                    raise TypeError(f'"{attribute_name}" argument must be a list or tuple')
+                set_value = list(argument_value)
+            else:
+                set_value = []
+            setattr(self, attribute_name, set_value)
+            
         self.from_email = from_email or settings.DEFAULT_FROM_EMAIL
         self.subject = subject
         self.body = body or ""
