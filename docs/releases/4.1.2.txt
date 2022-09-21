@@ -23,3 +23,7 @@ Bugfixes
 * Fixed a regression in Django 4.1 that caused a
   ``QuerySet.values()/values_list()`` crash on ``ArrayAgg()`` and
   ``JSONBAgg()`` (:ticket:`34016`).
+
+* Fixed a bug in Django 4.1 that caused :attr:`.ModelAdmin.autocomplete_fields`
+  to be incorrectly selected after adding/changing related instances via popups
+  (:ticket:`34025`).
