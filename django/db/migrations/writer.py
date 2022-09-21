@@ -271,7 +271,7 @@ class MigrationWriter:
 
     @property
     def filename(self):
-        return "%s.py" % self.migration.name
+        return "%s.py" % self.migration.name.replace(".", "_")
 
     @property
     def path(self):
