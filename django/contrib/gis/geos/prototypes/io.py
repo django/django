@@ -173,7 +173,7 @@ class _WKBReader(IOBase):
             return wkb_reader_read_hex(self.ptr, wkb, len(wkb))
         elif isinstance(wkb, str):
             wkb_s = wkb.encode()
-            return wkb_reader_read_hex(self.ptr, wkb_s, len(wkb))
+            return wkb_reader_read_hex(self.ptr, wkb_s, len(wkb_s))
         else:
             raise TypeError
 
