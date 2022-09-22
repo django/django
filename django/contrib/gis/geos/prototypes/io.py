@@ -169,8 +169,11 @@ class _WKBReader(IOBase):
         if isinstance(wkb, memoryview):
             wkb_s = bytes(wkb)
             return wkb_reader_read(self.ptr, wkb_s, len(wkb_s))
-        elif isinstance(wkb, (bytes, str)):
+        elif isinstance(wkb, bytes):
             return wkb_reader_read_hex(self.ptr, wkb, len(wkb))
+        elif isinstance(wkb, str):
+            wkb_s = wkb.encode()
+            return wkb_reader_read_hex(self.ptr, wkb_s, len(wkb))
         else:
             raise TypeError
 
