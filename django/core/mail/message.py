@@ -220,7 +220,8 @@ class EmailMessage:
         for attribute_name, argument_value in list_or_tuple_arguments.items():
             if argument_value:
                 if isinstance(argument_value, str):
-                    raise TypeError(f'"{attribute_name}" argument must be a list or tuple')
+                    msg = f'"{attribute_name}" argument must be a list or tuple.'
+                    raise TypeError(msg)
                 set_value = list(argument_value)
             else:
                 set_value = []
