@@ -1,12 +1,15 @@
+{% load i18n %}
 <button class="theme-toggle">
-  <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
-  <svg class="theme-icon-when-auto">
+  <div class="visually-hidden theme-label-when-auto">{% translate 'Toggle theme (current theme: auto)' %}</div>
+  <div class="visually-hidden theme-label-when-light">{% translate 'Toggle theme (current theme: light)' %}</div>
+  <div class="visually-hidden theme-label-when-dark">{% translate 'Toggle theme (current theme: dark)' %}</div>
+  <svg aria-hidden="true" class="theme-icon-when-auto">
     <use xlink:href="#icon-auto" />
   </svg>
-  <svg class="theme-icon-when-dark">
+  <svg aria-hidden="true" class="theme-icon-when-dark">
     <use xlink:href="#icon-moon" />
   </svg>
-  <svg class="theme-icon-when-light">
+  <svg aria-hidden="true" class="theme-icon-when-light">
     <use xlink:href="#icon-sun" />
   </svg>
 </button>
