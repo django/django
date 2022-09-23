@@ -181,17 +181,18 @@ class Q(tree.Node):
         Retrieve all base fields referenced directly or through F expressions excluding
         any fields referenced through joins.
         """
-        # Avoid circular imports
+        # Avoid circular imports.
         from django.db.models import F
 
-        f_references = set(expr.name for expr in self.flatten() if isinstance(expr, F))
-        q_references = set(
+        expressions = list(self.flatten())
+        f_references = {expr.name for expr in expressions if isinstance(expr, F)}
+        q_references = {
             child[0].split(LOOKUP_SEP)[0]
-            for expr in self.flatten()
+            for expr in expressions
             if isinstance(expr, Q)
             for child in expr.children
             if isinstance(child, tuple)
-        )
+        }
         return f_references | q_references
 
 
