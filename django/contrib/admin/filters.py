@@ -399,10 +399,10 @@ class DateFieldListFilter(FieldListFilter):
         )
         if field.null:
             self.lookup_kwarg_isnull = f"{field_path}__isnull"
-            self.links += ((_("No date"),
-            {f"{self.field_generic}isnull": "True"}),
-            (_("Has date"),
-            {f"{self.field_generic}isnull": "False"}))
+            self.links += (
+                (_("No date"), {f"{self.field_generic}isnull": "True"}),
+                (_("Has date"), {f"{self.field_generic}isnull": "False"})
+            )
 
         super().__init__(field, request, params, model, model_admin, field_path)
 
@@ -486,7 +486,10 @@ FieldListFilter.register(lambda f: True, AllValuesFieldListFilter)
 
 class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
     def field_choices(self, field, request, model_admin):
-        pk_qs = model_admin.get_queryset(request).distinct().values_list(f"{self.field_path}__pk", flat=True)
+        pk_qs = model_admin.get_queryset(request).distinct().values_list(
+            f"{self.field_path}__pk",
+            flat=True
+            )
 
         ordering = self.field_admin_ordering(field, request, model_admin)
         return field.get_choices(
