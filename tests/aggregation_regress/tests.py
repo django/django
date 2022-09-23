@@ -178,10 +178,19 @@ class AggregationTests(TestCase):
             )
             .annotate(sum_discount=Sum("discount_price"))
         )
-        self.assertSequenceEqual(
-            values,
-            [{"discount_price": Decimal("59.38"), "sum_discount": Decimal("59.38")}],
-        )
+        with self.assertNumQueries(1) as ctx:
+            self.assertSequenceEqual(
+                values,
+                [
+                    {
+                        "discount_price": Decimal("59.38"),
+                        "sum_discount": Decimal("59.38"),
+                    }
+                ],
+            )
+        if connection.features.allows_group_by_refs:
+            alias = connection.ops.quote_name("discount_price")
+            self.assertIn(f"GROUP BY {alias}", ctx[0]["sql"])
 
     def test_aggregates_in_where_clause(self):
         """

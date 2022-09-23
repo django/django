@@ -419,6 +419,8 @@ class BaseExpression:
 
     def get_group_by_cols(self, alias=None):
         if not self.contains_aggregate:
+            if alias:
+                return [Ref(alias, self)]
             return [self]
         cols = []
         for source in self.get_source_expressions():
@@ -1243,7 +1245,7 @@ class ExpressionWrapper(SQLiteNumericMixin, Expression):
             return expression.get_group_by_cols(alias=alias)
         # For non-expressions e.g. an SQL WHERE clause, the entire
         # `expression` must be included in the GROUP BY clause.
-        return super().get_group_by_cols()
+        return super().get_group_by_cols(alias=alias)
 
     def as_sql(self, compiler, connection):
         return compiler.compile(self.expression)

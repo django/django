@@ -131,9 +131,12 @@ class SQLCompiler:
             # Converts string references to expressions.
             for expr in self.query.group_by:
                 if not hasattr(expr, "as_sql"):
-                    expressions.append(self.query.resolve_ref(expr))
-                else:
-                    expressions.append(expr)
+                    expr = self.query.resolve_ref(expr)
+                if not self.connection.features.allows_group_by_refs and isinstance(
+                    expr, Ref
+                ):
+                    expr = expr.source
+                expressions.append(expr)
         # Note that even if the group_by is set, it is only the minimal
         # set to group by. So, we need to add cols in select, order_by, and
         # having into the select in any case.
@@ -344,7 +347,13 @@ class SQLCompiler:
                 if not self.query.standard_ordering:
                     field = field.copy()
                     field.reverse_ordering()
-                yield field, False
+                if isinstance(field.expression, F) and (
+                    annotation := self.query.annotation_select.get(
+                        field.expression.name
+                    )
+                ):
+                    field.expression = Ref(field.expression.name, annotation)
+                yield field, isinstance(field.expression, Ref)
                 continue
             if field == "?":  # random
                 yield OrderBy(Random()), False
@@ -432,6 +441,10 @@ class SQLCompiler:
         """
         result = []
         seen = set()
+        replacements = {
+            expr: Ref(alias, expr)
+            for alias, expr in self.query.annotation_select.items()
+        }
 
         for expr, is_ref in self._order_by_pairs():
             resolved = expr.resolve_expression(self.query, allow_joins=True, reuse=None)
@@ -461,7 +474,7 @@ class SQLCompiler:
                         q.add_annotation(expr_src, col_name)
                     self.query.add_select_col(resolved, col_name)
                     resolved.set_source_expressions([RawSQL(f"{order_by_idx}", ())])
-            sql, params = self.compile(resolved)
+            sql, params = self.compile(resolved.replace_expressions(replacements))
             # Don't add the same column twice, but the order direction is
             # not taken into account so we strip it. When this entire method
             # is refactored into expressions, then we can check each part as we
