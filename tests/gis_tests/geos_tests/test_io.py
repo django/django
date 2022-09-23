@@ -70,12 +70,12 @@ class GEOSIOTest(SimpleTestCase):
         str1 = "000000000140140000000000004037000000000000"
         wkb_1 = memoryview(binascii.a2b_hex(str1))
         ref_1 = GEOSGeometry(str1)
-        
+
         g3 = wkb_r.read(wkb_1)
         g4 = wkb_r.read(str1)
         for geom in (g3, g4):
             self.assertEqual(ref_1, geom)
-        
+
         bad_input = (1, 5.23, None, False)
         for bad_wkb in bad_input:
             with self.assertRaises(TypeError):
