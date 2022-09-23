@@ -621,6 +621,14 @@ from the DB will get updated. In effect there is an automatic
 ``update_fields`` in this case. If you assign or change any deferred field
 value, the field will be added to the updated fields.
 
+.. note::
+
+    If ``update_fields`` is passed in, only the
+    :meth:`~django.db.models.Field.pre_save` methods of the ``update_fields``
+    are called. For example, this means that date/time fields with
+    ``auto_now=True`` will not be updated unless they are included in the
+    ``update_fields``.
+
 Deleting objects
 ================
 
