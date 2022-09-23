@@ -2220,8 +2220,8 @@ class Query(BaseExpression):
         primary key, and the query would be equivalent, the optimization
         will be made automatically.
         """
-        # Column names from JOINs to check collisions with aliases.
         if allow_aliases:
+            # Column names from JOINs to check collisions with aliases.
             column_names = set()
             seen_models = set()
             for join in list(self.alias_map.values())[1:]:  # Skip base table.
@@ -2231,7 +2231,20 @@ class Query(BaseExpression):
                         {field.column for field in model._meta.local_concrete_fields}
                     )
                     seen_models.add(model)
-
+            if self.values_select:
+                # If grouping by aliases is allowed assign selected values
+                # aliases by moving them to annotations.
+                group_by_annotations = {}
+                values_select = {}
+                for alias, expr in zip(self.values_select, self.select):
+                    if isinstance(expr, Col):
+                        values_select[alias] = expr
+                    else:
+                        group_by_annotations[alias] = expr
+                self.annotations = {**group_by_annotations, **self.annotations}
+                self.append_annotation_mask(group_by_annotations)
+                self.select = tuple(values_select.values())
+                self.values_select = tuple(values_select)
         group_by = list(self.select)
         if self.annotation_select:
             for alias, annotation in self.annotation_select.items():
