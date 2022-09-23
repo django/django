@@ -131,6 +131,20 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return ""
 
     def _alter_column_type_sql(self, model, old_field, new_field, new_type):
+        # Drop indexes on varchar/text/citext columns that are changing to a
+        # different type.
+        old_db_params = old_field.db_parameters(connection=self.connection)
+        old_type = old_db_params["type"]
+        if (old_field.db_index or old_field.unique) and (
+            (old_type.startswith("varchar") and not new_type.startswith("varchar"))
+            or (old_type.startswith("text") and not new_type.startswith("text"))
+            or (old_type.startswith("citext") and not new_type.startswith("citext"))
+        ):
+            index_name = self._create_index_name(
+                model._meta.db_table, [old_field.column], suffix="_like"
+            )
+            self.execute(self._delete_index_sql(model, index_name))
+
         self.sql_alter_column_type = "ALTER COLUMN %(column)s TYPE %(type)s"
         # Cast when data type changed.
         if using_sql := self._using_sql(new_field, old_field):
@@ -227,18 +241,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         new_db_params,
         strict=False,
     ):
-        # Drop indexes on varchar/text/citext columns that are changing to a
-        # different type.
-        if (old_field.db_index or old_field.unique) and (
-            (old_type.startswith("varchar") and not new_type.startswith("varchar"))
-            or (old_type.startswith("text") and not new_type.startswith("text"))
-            or (old_type.startswith("citext") and not new_type.startswith("citext"))
-        ):
-            index_name = self._create_index_name(
-                model._meta.db_table, [old_field.column], suffix="_like"
-            )
-            self.execute(self._delete_index_sql(model, index_name))
-
         super()._alter_field(
             model,
             old_field,
