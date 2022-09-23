@@ -2231,6 +2231,20 @@ class Query(BaseExpression):
                     )
                     seen_models.add(model)
 
+        if allow_aliases and self.values_select:
+            # If grouping by aliases is allowed assign selected values
+            # aliases by moving them to annotations.
+            group_by_annotations = {}
+            values_select = {}
+            for alias, expr in zip(self.values_select, self.select):
+                if isinstance(expr, Col):
+                    values_select[alias] = expr
+                else:
+                    group_by_annotations[alias] = expr
+            self.annotations = {**group_by_annotations, **self.annotations}
+            self.append_annotation_mask(group_by_annotations)
+            self.select = tuple(values_select.values())
+            self.values_select = tuple(values_select)
         group_by = list(self.select)
         if self.annotation_select:
             for alias, annotation in self.annotation_select.items():

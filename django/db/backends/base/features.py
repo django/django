@@ -10,6 +10,7 @@ class BaseDatabaseFeatures:
     allows_group_by_lob = True
     allows_group_by_pk = False
     allows_group_by_selected_pks = False
+    allows_group_by_refs = True
     empty_fetchmany_value = []
     update_can_self_select = True
 
