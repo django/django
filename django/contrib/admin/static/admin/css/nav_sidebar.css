@@ -59,8 +59,13 @@
     content: '\00AB';
 }
 
+.main > #nav-sidebar {
+    visibility: hidden;
+}
+
 .main.shifted > #nav-sidebar {
     margin-left: 0;
+    visibility: visible;
 }
 
 [dir="rtl"] .main.shifted > #nav-sidebar {
