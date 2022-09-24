@@ -6,18 +6,18 @@ It's sometimes useful to prepopulate your database with hard-coded data when
 you're first setting up an app. You can provide initial data with migrations or
 fixtures.
 
-Providing initial data with migrations
-======================================
+Provide initial data with migrations
+====================================
 
-If you want to automatically load initial data for an app, create a
+To automatically load initial data for an app, create a
 :ref:`data migration <data-migrations>`. Migrations are run when setting up the
 test database, so the data will be available there, subject to :ref:`some
 limitations <test-case-serialized-rollback>`.
 
 .. _initial-data-via-fixtures:
 
-Providing data with fixtures
-============================
+Provide data with fixtures
+==========================
 
 You can also provide data using fixtures, however, this data isn't loaded
 automatically, except if you use :attr:`.TransactionTestCase.fixtures`.
@@ -80,16 +80,29 @@ from the fixture and reloaded into the database. Note this means that if you
 change one of the rows created by a fixture and then run :djadmin:`loaddata`
 again, you'll wipe out any changes you've made.
 
-Where Django finds fixture files
---------------------------------
+Tell Django where to look for fixture files
+-------------------------------------------
 
-By default, Django looks in the ``fixtures`` directory inside each app for
-fixtures. You can set the :setting:`FIXTURE_DIRS` setting to a list of
-additional directories where Django should look.
+By default, Django looks for fixtures in the ``fixtures`` directory inside each
+app for, so the command ``loaddata sample`` will find the file
+``my_app/fixtures/sample.json``. This works with relative paths as well, so
+``loaddata my_app/sample`` will find the file
+``my_app/fixtures/my_app/sample.json``.
 
-When running :djadmin:`manage.py loaddata <loaddata>`, you can also
-specify a path to a fixture file, which overrides searching the usual
-directories.
+Django also looks for fixtures in the list of directories provided in the
+:setting:`FIXTURE_DIRS` setting.
+
+To completely prevent default search form happening, use an absolute path to
+specify the location of your fixture file, e.g. ``loaddata /path/to/sample``.
+
+.. admonition:: Namespace your fixture files
+
+    Django will use the first fixture file it finds whose name matches, so if
+    you have fixture files with the same name in different applications, you
+    will be unable to distinguish between them in your ``loaddata`` commands.
+    The easiest way to avoid this problem is by *namespacing* your fixture
+    files. That is, by putting them inside a directory named for their
+    application, as in the relative path example above.
 
 .. seealso::
 
