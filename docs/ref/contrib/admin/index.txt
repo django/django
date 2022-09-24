@@ -2682,6 +2682,30 @@ app or per model. The following can:
 * ``search_form.html``
 * ``submit_line.html``
 
+``actions.html``
+====================
+
+.. attribute:: cl
+
+    ChangeList class. Contains alot of different useful attributes. Some of them are mentioned below. For more information regarding this class, please have a look at :source:`django/contrib/admin/views/main.py`.
+
+.. attribute:: cl.result_count
+
+    Number of items in the result
+
+.. attribute:: cl.result_list
+
+    List of all the items
+
+.. attribute:: action_form
+
+    Contains the fields for the action form
+
+.. attribute:: module_name
+
+    The name of the model in plural form
+
+
 For those templates that cannot be overridden in this way, you may still
 override them for your entire project by placing the new version in your
 ``templates/admin`` directory. This is particularly useful to create custom 404
