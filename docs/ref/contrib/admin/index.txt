@@ -2687,7 +2687,7 @@ app or per model. The following can:
 
 .. attribute:: cl
 
-    ChangeList class. Contains alot of different useful attributes. Some of them are mentioned below. For more information regarding this class, please have a look at :source:`django/contrib/admin/views/main.py`.
+    ChangeList class. Contains a lot of different useful attributes. Some of them are mentioned below. For more information regarding this class, please have a look at :source:`django/contrib/admin/views/main.py`.
 
 .. attribute:: cl.result_count
 
