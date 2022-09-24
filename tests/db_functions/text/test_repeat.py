@@ -24,7 +24,7 @@ class RepeatTests(TestCase):
         for function, repeated_text in tests:
             with self.subTest(function=function):
                 authors = Author.objects.annotate(repeated_text=function)
-                self.assertQuerysetEqual(
+                self.assertQuerySetEqual(
                     authors, [repeated_text], lambda a: a.repeated_text, ordered=False
                 )
 

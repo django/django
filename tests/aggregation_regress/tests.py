@@ -828,7 +828,7 @@ class AggregationTests(TestCase):
         # Regression for #10113 - Fields mentioned in order_by() must be
         # included in the GROUP BY. This only becomes a problem when the
         # order_by introduces a new join.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Book.objects.annotate(num_authors=Count("authors")).order_by(
                 "publisher__name", "name"
             ),
@@ -851,7 +851,7 @@ class AggregationTests(TestCase):
             .annotate(Avg("authors__age"))
             .order_by("name")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 (
@@ -914,7 +914,7 @@ class AggregationTests(TestCase):
             .filter(n_authors__gt=2)
             .order_by("n_authors")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Book.objects.filter(id__in=ids),
             [
                 "Python Web Development with Django",
@@ -1023,7 +1023,7 @@ class AggregationTests(TestCase):
         # the original query can still be used
         books = Book.objects.all()
         books.aggregate(Avg("authors__age"))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             books.all(),
             [
                 "Artificial Intelligence: A Modern Approach",
@@ -1059,7 +1059,7 @@ class AggregationTests(TestCase):
             .order_by("sheets")
             .values("sheets")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs, [150, 175, 224, 264, 473, 566], lambda b: int(b["sheets"])
         )
 
@@ -1084,7 +1084,7 @@ class AggregationTests(TestCase):
         self.assertEqual(sorted(p.name for p in publishers), ["Apress", "Sams"])
 
         books = Book.objects.filter(publisher__in=publishers)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             books,
             [
                 "Practical Django Projects",
@@ -1190,7 +1190,7 @@ class AggregationTests(TestCase):
             .filter(pages__lt=F("n_authors") * 200)
             .values_list("pk")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Book.objects.filter(pk__in=qs),
             ["Python Web Development with Django"],
             attrgetter("name"),
@@ -1239,7 +1239,7 @@ class AggregationTests(TestCase):
             .filter(Q(n_authors=2) | Q(name="Python Web Development with Django"))
             .order_by("name")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 "Artificial Intelligence: A Modern Approach",
@@ -1258,7 +1258,7 @@ class AggregationTests(TestCase):
                 )
             )
         ).order_by("name")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 "The Definitive Guide to Django: Web Development Done Right",
@@ -1273,7 +1273,7 @@ class AggregationTests(TestCase):
             .filter(Q(rating_sum__gt=5.5) | Q(rating_sum__isnull=True))
             .order_by("pk")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 "Apress",
@@ -1290,7 +1290,7 @@ class AggregationTests(TestCase):
             .filter(Q(rating_sum__gt=F("book_count")) | Q(rating_sum=None))
             .order_by("num_awards")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 "Jonno's House of Books",
@@ -1308,7 +1308,7 @@ class AggregationTests(TestCase):
             .annotate(authorCount=Count("authors"))
             .order_by("authorCount")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Python Web Development with Django", 3),
@@ -1387,14 +1387,14 @@ class AggregationTests(TestCase):
             .filter(book_cnt=2)
             .order_by("name")
         )
-        self.assertQuerysetEqual(qs, ["Peter Norvig"], lambda b: b.name)
+        self.assertQuerySetEqual(qs, ["Peter Norvig"], lambda b: b.name)
         # Neither in this case
         qs = (
             Author.objects.annotate(book_count=Count("book"))
             .filter(book_count=2)
             .order_by("name")
         )
-        self.assertQuerysetEqual(qs, ["Peter Norvig"], lambda b: b.name)
+        self.assertQuerySetEqual(qs, ["Peter Norvig"], lambda b: b.name)
         # This case used to fail because the ORM couldn't resolve the
         # automatically generated annotation name `book__count`
         qs = (
@@ -1402,7 +1402,7 @@ class AggregationTests(TestCase):
             .filter(book__count=2)
             .order_by("name")
         )
-        self.assertQuerysetEqual(qs, ["Peter Norvig"], lambda b: b.name)
+        self.assertQuerySetEqual(qs, ["Peter Norvig"], lambda b: b.name)
         # Referencing the auto-generated name in an aggregate() also works.
         self.assertEqual(
             Author.objects.annotate(Count("book")).aggregate(Max("book__count")),
@@ -1570,7 +1570,7 @@ class AggregationTests(TestCase):
                 self.assertEqual(len(grouping), 2)
                 self.assertIn("id", grouping[0][0])
                 self.assertIn("id", grouping[1][0])
-                self.assertQuerysetEqual(
+                self.assertQuerySetEqual(
                     qs.order_by("name"),
                     [
                         ("Artificial Intelligence: A Modern Approach", 2),
@@ -1659,7 +1659,7 @@ class AggregationTests(TestCase):
             .exclude(Q(book_cnt=2), Q(book_cnt=2))
             .order_by("name")
         )
-        self.assertQuerysetEqual(qs, expected_results, lambda b: b.name)
+        self.assertQuerySetEqual(qs, expected_results, lambda b: b.name)
         expected_results = Author.objects.exclude(
             pk__in=Author.objects.annotate(book_cnt=Count("book")).filter(book_cnt=2)
         ).order_by("name")
@@ -1669,7 +1669,7 @@ class AggregationTests(TestCase):
             .exclude(Q(book_cnt=2) | Q(book_cnt=2))
             .order_by("name")
         )
-        self.assertQuerysetEqual(qs, expected_results, lambda b: b.name)
+        self.assertQuerySetEqual(qs, expected_results, lambda b: b.name)
 
     def test_name_filters(self):
         qs = (
@@ -1677,7 +1677,7 @@ class AggregationTests(TestCase):
             .filter(Q(book__count__exact=2) | Q(name="Adrian Holovaty"))
             .order_by("name")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs, ["Adrian Holovaty", "Peter Norvig"], lambda b: b.name
         )
 
@@ -1690,7 +1690,7 @@ class AggregationTests(TestCase):
             .filter(Q(name="Peter Norvig") | Q(age=F("book__count") + 33))
             .order_by("name")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs, ["Adrian Holovaty", "Peter Norvig"], lambda b: b.name
         )
 
@@ -1698,7 +1698,7 @@ class AggregationTests(TestCase):
         q1 = Q(price__gt=50)
         q2 = Q(authors__count__gt=1)
         query = Book.objects.annotate(Count("authors")).filter(q1 | q2).order_by("pk")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             query,
             [self.b1.pk, self.b4.pk, self.b5.pk, self.b6.pk],
             attrgetter("pk"),
@@ -1710,7 +1710,7 @@ class AggregationTests(TestCase):
         query = (
             Book.objects.annotate(Count("authors")).filter(~(q1 & q2)).order_by("pk")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             query,
             [self.b1.pk, self.b2.pk, self.b3.pk, self.b4.pk, self.b6.pk],
             attrgetter("pk"),
@@ -1720,7 +1720,7 @@ class AggregationTests(TestCase):
         q1 = Q(price__gt=50)
         q2 = Q(authors__count__gt=1)
         query = Book.objects.annotate(Count("authors")).filter(q1 ^ q2).order_by("pk")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             query,
             [self.b1.pk, self.b4.pk, self.b6.pk],
             attrgetter("pk"),
@@ -1732,7 +1732,7 @@ class AggregationTests(TestCase):
         query = (
             Book.objects.annotate(Count("authors")).filter(~(q1 ^ q2)).order_by("pk")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             query,
             [self.b2.pk, self.b3.pk, self.b5.pk],
             attrgetter("pk"),
@@ -1756,7 +1756,7 @@ class AggregationTests(TestCase):
         qs = Book.objects.annotate(account=Count("authors")).filter(
             account=F("publisher__num_awards")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs, ["Sams Teach Yourself Django in 24 Hours"], lambda b: b.name
         )
 
@@ -1873,7 +1873,7 @@ class SelfReferentialFKTests(TestCase):
         t1 = SelfRefFK.objects.create(name="t1")
         SelfRefFK.objects.create(name="t2", parent=t1)
         SelfRefFK.objects.create(name="t3", parent=t1)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             SelfRefFK.objects.annotate(num_children=Count("children")).order_by("name"),
             [("t1", 2), ("t2", 0), ("t3", 0)],
             lambda x: (x.name, x.num_children),

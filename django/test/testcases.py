@@ -1322,7 +1322,16 @@ class TransactionTestCase(SimpleTestCase):
                 inhibit_post_migrate=inhibit_post_migrate,
             )
 
-    def assertQuerysetEqual(self, qs, values, transform=None, ordered=True, msg=None):
+    # RemovedInDjango51Warning.
+    def assertQuerysetEqual(self, *args, **kw):
+        warnings.warn(
+            "assertQuerysetEqual() is deprecated in favor of assertQuerySetEqual().",
+            category=RemovedInDjango51Warning,
+            stacklevel=2,
+        )
+        return self.assertQuerySetEqual(*args, **kw)
+
+    def assertQuerySetEqual(self, qs, values, transform=None, ordered=True, msg=None):
         values = list(values)
         items = qs
         if transform is not None:

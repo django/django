@@ -539,7 +539,8 @@ Tests
   <django.db.transaction.on_commit>` in a list. This allows you to test such
   callbacks without using the slower :class:`.TransactionTestCase`.
 
-* :meth:`.TransactionTestCase.assertQuerysetEqual` now supports direct
+* :meth:`TransactionTestCase.assertQuerysetEqual()
+  <django.test.TransactionTestCase.assertQuerySetEqual>` now supports direct
   comparison against another queryset rather than being restricted to
   comparison against a list of string representations of objects when using the
   default value for the ``transform`` argument.

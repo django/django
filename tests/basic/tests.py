@@ -199,7 +199,7 @@ class ModelTest(TestCase):
         some_pub_date = datetime(2014, 5, 16, 12, 1)
         for headline in headlines:
             Article(headline=headline, pub_date=some_pub_date).save()
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.order_by("headline"),
             sorted(headlines),
             transform=lambda a: a.headline,

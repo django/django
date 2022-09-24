@@ -422,3 +422,6 @@ Miscellaneous
 
 * ``SimpleTestCase.assertFormsetError()`` is deprecated in favor of
   ``assertFormSetError()``.
+
+* ``TransactionTestCase.assertQuerysetEqual()`` is deprecated in favor of
+  ``assertQuerySetEqual()``.

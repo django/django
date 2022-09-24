@@ -33,10 +33,10 @@ class BasicCustomPKTests(TestCase):
         )
         self.assertSequenceEqual(Employee.objects.all(), [self.fran, self.dan])
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Business.objects.filter(name="Sears"), ["Sears"], lambda b: b.name
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Business.objects.filter(pk="Sears"),
             [
                 "Sears",
@@ -52,7 +52,7 @@ class BasicCustomPKTests(TestCase):
             self.business.employees.all(),
             [self.fran, self.dan],
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             self.fran.business_set.all(),
             [
                 "Sears",
@@ -73,14 +73,14 @@ class BasicCustomPKTests(TestCase):
             [self.fran, self.dan],
         )
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Business.objects.filter(employees__employee_code=123),
             [
                 "Sears",
             ],
             lambda b: b.name,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Business.objects.filter(employees__pk=123),
             [
                 "Sears",
@@ -88,7 +88,7 @@ class BasicCustomPKTests(TestCase):
             lambda b: b.name,
         )
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Business.objects.filter(employees__first_name__startswith="Fran"),
             [
                 "Sears",

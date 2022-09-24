@@ -248,7 +248,7 @@ class BasicExpressionsTests(TestCase):
     def test_update_with_fk(self):
         # ForeignKey can become updated with the value of another ForeignKey.
         self.assertEqual(Company.objects.update(point_of_contact=F("ceo")), 3)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Company.objects.all(),
             ["Joe Smith", "Frank Meyer", "Max Mustermann"],
             lambda c: str(c.point_of_contact),
@@ -259,7 +259,7 @@ class BasicExpressionsTests(TestCase):
         Number.objects.create(integer=1, float=1.0)
         Number.objects.create(integer=2)
         Number.objects.filter(float__isnull=False).update(float=Value(None))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Number.objects.all(), [None, None], lambda n: n.float, ordered=False
         )
 
@@ -272,7 +272,7 @@ class BasicExpressionsTests(TestCase):
         )
         c.save()
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Company.objects.filter(ceo__firstname=F("point_of_contact__firstname")),
             ["Foobar Ltd.", "Test GmbH"],
             lambda c: c.name,
@@ -1027,7 +1027,7 @@ class IterableLookupInnerExpressionsTests(TestCase):
         queryset = SimulationRun.objects.exclude(
             midpoint__range=[F("start__time"), F("end__time")]
         )
-        self.assertQuerysetEqual(queryset, [], ordered=False)
+        self.assertQuerySetEqual(queryset, [], ordered=False)
         for alias in queryset.query.alias_map.values():
             if isinstance(alias, Join):
                 self.assertEqual(alias.join_type, constants.LOUTER)
@@ -1079,7 +1079,7 @@ class IterableLookupInnerExpressionsTests(TestCase):
         the test simple.
         """
         queryset = Company.objects.filter(name__in=[F("num_chairs") + "1)) OR ((1==1"])
-        self.assertQuerysetEqual(queryset, [], ordered=False)
+        self.assertQuerySetEqual(queryset, [], ordered=False)
 
     def test_in_lookup_allows_F_expressions_and_expressions_for_datetimes(self):
         start = datetime.datetime(2016, 2, 3, 15, 0, 0)
@@ -1285,7 +1285,7 @@ class ExpressionsNumericTests(TestCase):
         We can fill a value in all objects with an other value of the
         same object.
         """
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Number.objects.all(),
             [(-1, -1), (42, 42), (1337, 1337)],
             lambda n: (n.integer, round(n.float)),
@@ -1299,7 +1299,7 @@ class ExpressionsNumericTests(TestCase):
         self.assertEqual(
             Number.objects.filter(integer__gt=0).update(integer=F("integer") + 1), 2
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Number.objects.all(),
             [(-1, -1), (43, 42), (1338, 1337)],
             lambda n: (n.integer, round(n.float)),
@@ -1314,7 +1314,7 @@ class ExpressionsNumericTests(TestCase):
         self.assertEqual(
             Number.objects.filter(integer__gt=0).update(integer=F("integer") + 1), 2
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Number.objects.exclude(float=F("integer")),
             [(43, 42), (1338, 1337)],
             lambda n: (n.integer, round(n.float)),
@@ -2025,7 +2025,7 @@ class FTimeDeltaTests(TestCase):
             )
             .order_by("name")
         )
-        self.assertQuerysetEqual(over_estimate, ["e3", "e4", "e5"], lambda e: e.name)
+        self.assertQuerySetEqual(over_estimate, ["e3", "e4", "e5"], lambda e: e.name)
 
     def test_duration_with_datetime_microseconds(self):
         delta = datetime.timedelta(microseconds=8999999999999999)
@@ -2042,7 +2042,7 @@ class FTimeDeltaTests(TestCase):
         more_than_4_days = Experiment.objects.filter(
             assigned__lt=F("completed") - Value(datetime.timedelta(days=4))
         )
-        self.assertQuerysetEqual(more_than_4_days, ["e3", "e4", "e5"], lambda e: e.name)
+        self.assertQuerySetEqual(more_than_4_days, ["e3", "e4", "e5"], lambda e: e.name)
 
     def test_negative_timedelta_update(self):
         # subtract 30 seconds, 30 minutes, 2 hours and 2 days

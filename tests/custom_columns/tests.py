@@ -50,7 +50,7 @@ class CustomColumnsTests(TestCase):
         self.assertSequenceEqual(self.article.authors.all(), [self.a2, self.a1])
 
     def test_get_all_articles_for_an_author(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             self.a1.article_set.all(),
             [
                 "Django lets you build web apps easily",
