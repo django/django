@@ -54,7 +54,7 @@ from django.test.utils import (
     modify_settings,
     override_settings,
 )
-from django.utils.deprecation import RemovedInDjango50Warning
+from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
 from django.utils.functional import classproperty
 from django.utils.version import PY310
 from django.views.static import serve
@@ -206,18 +206,18 @@ class _AssertFormErrorDeprecationHelper:
             )
 
     @staticmethod
-    def assertFormsetError(
+    def assertFormSetError(
         self, response, formset, form_index, field, errors, msg_prefix=""
     ):
         """
         Search for a formset named "formset" in the "response" and dispatch to
-        the new assertFormsetError() using that instance. If the name is found
+        the new assertFormSetError() using that instance. If the name is found
         in multiple contexts they're all checked in order and any failure will
         abort the test.
         """
         warning_msg = (
-            f"Passing response to assertFormsetError() is deprecated. Use the formset "
-            f"object directly: assertFormsetError(response.context[{formset!r}], "
+            f"Passing response to assertFormSetError() is deprecated. Use the formset "
+            f"object directly: assertFormSetError(response.context[{formset!r}], "
             f"{form_index!r}, ...)"
         )
         warnings.warn(warning_msg, RemovedInDjango50Warning, stacklevel=2)
@@ -234,7 +234,7 @@ class _AssertFormErrorDeprecationHelper:
             if formset not in context or not hasattr(context[formset], "forms"):
                 continue
             found_formset = True
-            self.assertFormsetError(
+            self.assertFormSetError(
                 context[formset], form_index, field, errors, msg_prefix
             )
         if not found_formset:
@@ -737,10 +737,19 @@ class SimpleTestCase(unittest.TestCase):
         errors = to_list(errors)
         self._assert_form_error(form, field, errors, msg_prefix, f"form {form!r}")
 
+    # RemovedInDjango51Warning.
+    def assertFormsetError(self, *args, **kw):
+        warnings.warn(
+            "assertFormsetError() is deprecated in favor of assertFormSetError().",
+            category=RemovedInDjango51Warning,
+            stacklevel=2,
+        )
+        return self.assertFormSetError(*args, **kw)
+
     # RemovedInDjango50Warning: When the deprecation ends, remove the
     # decorator.
     @_AssertFormErrorDeprecationHelper.patch_signature
-    def assertFormsetError(self, formset, form_index, field, errors, msg_prefix=""):
+    def assertFormSetError(self, formset, form_index, field, errors, msg_prefix=""):
         """
         Similar to assertFormError() but for formsets.
 
@@ -752,7 +761,7 @@ class SimpleTestCase(unittest.TestCase):
         """
         if errors is None:
             warnings.warn(
-                "Passing errors=None to assertFormsetError() is deprecated, "
+                "Passing errors=None to assertFormSetError() is deprecated, "
                 "use errors=[] instead.",
                 RemovedInDjango50Warning,
                 stacklevel=2,

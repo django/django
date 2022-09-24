@@ -8110,7 +8110,7 @@ class AdminViewOnSiteTests(TestCase):
         Issue #20522
         Verifying that if the parent form fails validation, the inlines also
         run validation even if validation is contingent on parent form data.
-        Also, assertFormError() and assertFormsetError() is usable for admin
+        Also, assertFormError() and assertFormSetError() is usable for admin
         forms and formsets.
         """
         # The form validation should fail because 'some_required_info' is
@@ -8134,7 +8134,7 @@ class AdminViewOnSiteTests(TestCase):
             ["This field is required."],
         )
         self.assertFormError(response.context["adminform"], None, [])
-        self.assertFormsetError(
+        self.assertFormSetError(
             response.context["inline_admin_formset"],
             0,
             None,
@@ -8143,7 +8143,7 @@ class AdminViewOnSiteTests(TestCase):
                 "contrived test case"
             ],
         )
-        self.assertFormsetError(
+        self.assertFormSetError(
             response.context["inline_admin_formset"], None, None, []
         )
 
@@ -8179,7 +8179,7 @@ class AdminViewOnSiteTests(TestCase):
             "some_required_info",
             ["This field is required."],
         )
-        self.assertFormsetError(
+        self.assertFormSetError(
             response.context["inline_admin_formset"],
             0,
             None,

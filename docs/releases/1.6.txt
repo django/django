@@ -321,7 +321,7 @@ Minor features
 
 * The :class:`~django.test.SimpleTestCase` class includes a new assertion
   helper for testing formset errors:
-  :meth:`~django.test.SimpleTestCase.assertFormsetError`.
+  ``django.test.SimpleTestCase.assertFormsetError()``.
 
 * The list of related fields added to a
   :class:`~django.db.models.query.QuerySet` by

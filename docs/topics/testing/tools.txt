@@ -1573,16 +1573,16 @@ your test suite.
         ``assertFormError()`` is deprecated and will be removed in Django 5.0.
         Use the form instance directly instead.
 
-.. method:: SimpleTestCase.assertFormsetError(formset, form_index, field, errors, msg_prefix='')
+.. method:: SimpleTestCase.assertFormSetError(formset, form_index, field, errors, msg_prefix='')
 
     Asserts that the ``formset`` raises the provided list of errors when
     rendered.
 
-    ``formset`` is a ``Formset`` instance. The formset must be bound but not
-    necessarily validated (``assertFormsetError()`` will automatically call the
+    ``formset`` is a ``FormSet`` instance. The formset must be bound but not
+    necessarily validated (``assertFormSetError()`` will automatically call the
     ``full_clean()`` on the formset).
 
-    ``form_index`` is the number of the form within the ``Formset`` (starting
+    ``form_index`` is the number of the form within the ``FormSet`` (starting
     from 0). Use ``form_index=None`` to check the formset's non-form errors,
     i.e. the errors you get when calling ``formset.non_form_errors()``. In that
     case you must also use ``field=None``.
@@ -1593,8 +1593,13 @@ your test suite.
     .. deprecated:: 4.1
 
         Support for passing a response object and a formset name to
-        ``assertFormsetError()`` is deprecated and will be removed in Django
+        ``assertFormSetError()`` is deprecated and will be removed in Django
         5.0. Use the formset instance directly instead.
+
+    .. deprecated:: 4.2
+
+        The ``assertFormsetError()`` assertion method is deprecated. Use
+        ``assertFormSetError()`` instead.
 
 .. method:: SimpleTestCase.assertContains(response, text, count=None, status_code=200, msg_prefix='', html=False)
 
