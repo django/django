@@ -2259,7 +2259,7 @@ class ModelAdmin(BaseModelAdmin):
             formset_params = self.get_formset_kwargs(request, obj, inline, prefix)
             formset = FormSet(**formset_params)
 
-            def user_deleted_form(request, obj, formset, index):
+            def user_deleted_form(request, obj, formset, index, inline):
                 """Return whether or not the user deleted the form."""
                 return (
                     inline.has_delete_permission(request, obj)
@@ -2270,7 +2270,7 @@ class ModelAdmin(BaseModelAdmin):
             # data won't be in request.POST), unless the form was deleted.
             if not inline.has_change_permission(request, obj if change else None):
                 for index, form in enumerate(formset.initial_forms):
-                    if user_deleted_form(request, obj, formset, index):
+                    if user_deleted_form(request, obj, formset, index, inline):
                         continue
                     form._errors = {}
                     form.cleaned_data = form.initial
