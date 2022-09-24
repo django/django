@@ -56,25 +56,18 @@ class GEOSIOTest(SimpleTestCase):
         # Creating a WKBReader instance
         wkb_r = WKBReader()
 
-        hex = b"000000000140140000000000004037000000000000"
-        wkb = memoryview(binascii.a2b_hex(hex))
-        ref = GEOSGeometry(hex)
+        hex_bin = b"000000000140140000000000004037000000000000"
+        hex_str = "000000000140140000000000004037000000000000"
+        wkb = memoryview(binascii.a2b_hex(hex_bin))
+        ref = GEOSGeometry(hex_bin)
 
         # read() should return a GEOSGeometry on either a hex string or
         # a WKB buffer.
         g1 = wkb_r.read(wkb)
-        g2 = wkb_r.read(hex)
-        for geom in (g1, g2):
+        g2 = wkb_r.read(hex_bin)
+        g3 = wkb_r.read(hex_str)
+        for geom in (g1, g2, g3):
             self.assertEqual(ref, geom)
-
-        str1 = "000000000140140000000000004037000000000000"
-        wkb_1 = memoryview(binascii.a2b_hex(str1))
-        ref_1 = GEOSGeometry(str1)
-
-        g3 = wkb_r.read(wkb_1)
-        g4 = wkb_r.read(str1)
-        for geom in (g3, g4):
-            self.assertEqual(ref_1, geom)
 
         bad_input = (1, 5.23, None, False)
         for bad_wkb in bad_input:
