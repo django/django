@@ -46,8 +46,8 @@ html[data-theme="light"],
     --button-hover-bg: #609ab6;
     --default-button-bg: var(--secondary);
     --default-button-hover-bg: #205067;
-    --close-button-bg: #888; /* Previously #bbb, contrast 1.92 */
-    --close-button-hover-bg: #747474;
+    --close-button-bg: #747474; /* Previously #888, contrast 4.67 */
+    --close-button-hover-bg: #333;
     --delete-button-bg: #ba2121;
     --delete-button-hover-bg: #a41515;
 
