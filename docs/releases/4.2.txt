@@ -51,6 +51,9 @@ Minor features
 * The ``admin/base.html`` template now has a new block ``nav-breadcrumbs``
   which contains the navigation landmark and the ``breadcrumbs`` block.
 
+* :attr:`.ModelAdmin.list_editable` now uses atomic transactions when making
+  edits.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
