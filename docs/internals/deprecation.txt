@@ -35,6 +35,8 @@ details on these changes.
 * The ``map_width`` and ``map_height`` attributes of ``BaseGeometryWidget``
   will be removed.
 
+* The ``SimpleTestCase.assertFormsetError()`` method will be removed.
+
 .. _deprecation-removed-in-5.0:
 
 5.0

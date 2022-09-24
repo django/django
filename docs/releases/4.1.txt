@@ -407,8 +407,8 @@ Tests
   raises a ``RuntimeError``, the same as outside of tests.
 
 * :meth:`.SimpleTestCase.assertFormError` and
-  :meth:`~.SimpleTestCase.assertFormsetError` now support passing a
-  form/formset object directly.
+  :meth:`assertFormsetError() <django.test.SimpleTestCase.assertFormSetError>`
+  now support passing a form/formset object directly.
 
 URLs
 ~~~~
@@ -671,8 +671,8 @@ Miscellaneous
 
 * The undocumented ability to pass ``errors=None`` to
   :meth:`.SimpleTestCase.assertFormError` and
-  :meth:`~.SimpleTestCase.assertFormsetError` is deprecated. Use ``errors=[]``
-  instead.
+  :meth:`assertFormsetError() <django.test.SimpleTestCase.assertFormSetError>`
+  is deprecated. Use ``errors=[]`` instead.
 
 * ``django.contrib.sessions.serializers.PickleSerializer`` is deprecated due to
   the risk of remote code execution.
