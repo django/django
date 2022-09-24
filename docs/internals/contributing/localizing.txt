@@ -51,6 +51,9 @@ So don't miss the string freeze period (between the release candidate and the
 feature release) to take the opportunity to complete and fix the translations
 for your language!
 
+When adding a new language, note that the `intro` and `index` Transifex resources
+must be translated at a minimum.
+
 Formats
 =======
 
