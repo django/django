@@ -2107,9 +2107,17 @@ class CacheUtils(SimpleTestCase):
             (None, {"private": True}, {"private"}),
             ("", {"private": True}, {"private"}),
             # no-cache.
+            ("", {"no_cache": "False"}, {"no-cache=False"}),
+            ("", {"no-cache": False}, {""}),
+            ("", {"no-cache": None}, {""}),
+            ("", {"no-cache": ()}, {""}),
+            ("", {"no-cache": set()}, {""}),
+            ("", {"no-cache": 0}, {""}),
+            ("", {"no-cache": "0"}, {"no-cache=0"}),
             ("", {"no_cache": "Set-Cookie"}, {"no-cache=Set-Cookie"}),
             ("", {"no-cache": "Set-Cookie"}, {"no-cache=Set-Cookie"}),
             ("no-cache=Set-Cookie", {"no_cache": True}, {"no-cache"}),
+            ("no-cache=Set-Cookie", {"no_cache": False}, {"no-cache=Set-Cookie"}),
             ("no-cache=Set-Cookie,no-cache=Link", {"no_cache": True}, {"no-cache"}),
             (
                 "no-cache=Set-Cookie",

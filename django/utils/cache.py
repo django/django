@@ -41,6 +41,8 @@ def patch_cache_control(response, **kwargs):
       are converted to hyphens.
     * If the value of a parameter is True (exactly True, not just a
       true value), only the parameter name is added to the header.
+    * For `no-cache` directive if the value of a parameter is Falsy (casts to False),
+      parameter name is excluded from the header
     * All other parameters are added with their value, after applying
       str() to it.
     """
@@ -84,7 +86,8 @@ def patch_cache_control(response, **kwargs):
         directive = k.replace("_", "-")
         if directive == "no-cache":
             # no-cache supports multiple field names.
-            cc[directive].add(v)
+            if bool(v) is not False:
+                cc[directive].add(v)
         else:
             cc[directive] = v
 
