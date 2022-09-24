@@ -787,7 +787,7 @@ add some database-specific features:
 * Database :attr:`~TransactionTestCase.fixtures`.
 * Test :ref:`skipping based on database backend features <skipping-tests>`.
 * The remaining specialized :meth:`assert*
-  <TransactionTestCase.assertQuerysetEqual>` methods.
+  <TransactionTestCase.assertQuerySetEqual>` methods.
 
 Django's :class:`TestCase` class is a more commonly used subclass of
 ``TransactionTestCase`` that makes use of database transaction facilities
@@ -1777,7 +1777,7 @@ your test suite.
 
     Output in case of error can be customized with the ``msg`` argument.
 
-.. method:: TransactionTestCase.assertQuerysetEqual(qs, values, transform=None, ordered=True, msg=None)
+.. method:: TransactionTestCase.assertQuerySetEqual(qs, values, transform=None, ordered=True, msg=None)
 
     Asserts that a queryset ``qs`` matches a particular iterable of values
     ``values``.
@@ -1793,6 +1793,11 @@ your test suite.
     raised.
 
     Output in case of error can be customized with the ``msg`` argument.
+
+    .. deprecated:: 4.2
+
+        The ``assertQuerysetEqual()`` assertion method is deprecated. Use
+        ``assertQuerySetEqual()`` instead.
 
 .. method:: TransactionTestCase.assertNumQueries(num, func, *args, **kwargs)
 

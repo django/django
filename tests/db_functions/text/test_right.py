@@ -13,12 +13,12 @@ class RightTests(TestCase):
 
     def test_basic(self):
         authors = Author.objects.annotate(name_part=Right("name", 5))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors.order_by("name"), ["Smith", "honda"], lambda a: a.name_part
         )
         # If alias is null, set it to the first 2 lower characters of the name.
         Author.objects.filter(alias__isnull=True).update(alias=Lower(Right("name", 2)))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors.order_by("name"), ["smithj", "da"], lambda a: a.alias
         )
 
@@ -30,6 +30,6 @@ class RightTests(TestCase):
         authors = Author.objects.annotate(
             name_part=Right("name", Value(3, output_field=IntegerField()))
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors.order_by("name"), ["ith", "nda"], lambda a: a.name_part
         )

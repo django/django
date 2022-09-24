@@ -259,7 +259,7 @@ class InlineFormsetTests(TestCase):
 
         self.assertTrue(formset.is_valid())
         formset.save()
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             dalnet.host_set.order_by("hostname"),
             Host.objects.filter(
                 hostname__in=[

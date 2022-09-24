@@ -39,12 +39,12 @@ class NowTests(TestCase):
         a2.save()
         a2.refresh_from_db()
         self.assertIsInstance(a2.published, datetime)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.filter(published__lte=Now()),
             ["How to Django"],
             lambda a: a.title,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.filter(published__gt=Now()),
             ["How to Time Travel"],
             lambda a: a.title,

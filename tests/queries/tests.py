@@ -662,7 +662,7 @@ class Queries1Tests(TestCase):
 
     def test_tickets_2874_3002(self):
         qs = Item.objects.select_related().order_by("note__note", "name")
-        self.assertQuerysetEqual(qs, [self.i2, self.i4, self.i1, self.i3])
+        self.assertQuerySetEqual(qs, [self.i2, self.i4, self.i1, self.i3])
 
         # This is also a good select_related() test because there are multiple
         # Note entries in the SQL. The two Note items should be different.
@@ -1075,41 +1075,41 @@ class Queries1Tests(TestCase):
             Tag._meta.ordering = original_ordering
 
     def test_exclude(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Item.objects.exclude(tags__name="t4"),
             Item.objects.filter(~Q(tags__name="t4")),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Item.objects.exclude(Q(tags__name="t4") | Q(tags__name="t3")),
             Item.objects.filter(~(Q(tags__name="t4") | Q(tags__name="t3"))),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Item.objects.exclude(Q(tags__name="t4") | ~Q(tags__name="t3")),
             Item.objects.filter(~(Q(tags__name="t4") | ~Q(tags__name="t3"))),
         )
 
     def test_nested_exclude(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Item.objects.exclude(~Q(tags__name="t4")),
             Item.objects.filter(~~Q(tags__name="t4")),
         )
 
     def test_double_exclude(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Item.objects.filter(Q(tags__name="t4")),
             Item.objects.filter(~~Q(tags__name="t4")),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Item.objects.filter(Q(tags__name="t4")),
             Item.objects.filter(~Q(~Q(tags__name="t4"))),
         )
 
     def test_exclude_in(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Item.objects.exclude(Q(tags__name__in=["t4", "t3"])),
             Item.objects.filter(~Q(tags__name__in=["t4", "t3"])),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Item.objects.filter(Q(tags__name__in=["t4", "t3"])),
             Item.objects.filter(~~Q(tags__name__in=["t4", "t3"])),
         )
@@ -1996,7 +1996,7 @@ class SubclassFKTests(TestCase):
 
 class CustomPkTests(TestCase):
     def test_ticket7371(self):
-        self.assertQuerysetEqual(Related.objects.order_by("custom"), [])
+        self.assertQuerySetEqual(Related.objects.order_by("custom"), [])
 
 
 class NullableRelOrderingTests(TestCase):
@@ -2947,8 +2947,8 @@ class WeirdQuerysetSlicingTests(TestCase):
     def test_zero_length_values_slicing(self):
         n = 42
         with self.assertNumQueries(0):
-            self.assertQuerysetEqual(Article.objects.values()[n:n], [])
-            self.assertQuerysetEqual(Article.objects.values_list()[n:n], [])
+            self.assertQuerySetEqual(Article.objects.values()[n:n], [])
+            self.assertQuerySetEqual(Article.objects.values_list()[n:n], [])
 
 
 class EscapingTests(TestCase):
@@ -3479,23 +3479,23 @@ class NullInExcludeTest(TestCase):
 
     def test_null_in_exclude_qs(self):
         none_val = "" if connection.features.interprets_empty_strings_as_nulls else None
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             NullableName.objects.exclude(name__in=[]),
             ["i1", none_val],
             attrgetter("name"),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             NullableName.objects.exclude(name__in=["i1"]),
             [none_val],
             attrgetter("name"),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             NullableName.objects.exclude(name__in=["i3"]),
             ["i1", none_val],
             attrgetter("name"),
         )
         inner_qs = NullableName.objects.filter(name="i1").values_list("name")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             NullableName.objects.exclude(name__in=inner_qs),
             [none_val],
             attrgetter("name"),
@@ -3511,7 +3511,7 @@ class NullInExcludeTest(TestCase):
         SQL's COL NOT IN (list containing null) handling is too weird to
         abstract away.
         """
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             NullableName.objects.exclude(name__in=[None]), ["i1"], attrgetter("name")
         )
 
@@ -3537,14 +3537,14 @@ class EmptyStringsAsNullTest(TestCase):
         cls.nc = NamedCategory.objects.create(name="")
 
     def test_direct_exclude(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             NamedCategory.objects.exclude(name__in=["nonexistent"]),
             [self.nc.pk],
             attrgetter("pk"),
         )
 
     def test_joined_exclude(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             DumbCategory.objects.exclude(namedcategory__name__in=["nonexistent"]),
             [self.nc.pk],
             attrgetter("pk"),
@@ -3552,7 +3552,7 @@ class EmptyStringsAsNullTest(TestCase):
 
     def test_21001(self):
         foo = NamedCategory.objects.create(name="foo")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             NamedCategory.objects.exclude(name=""), [foo.pk], attrgetter("pk")
         )
 
@@ -3760,7 +3760,7 @@ class NullJoinPromotionOrTest(TestCase):
         qs1_filter = Identifier.objects.filter(
             program__id=p1.id, channel__id=c1.id
         ).order_by("pk")
-        self.assertQuerysetEqual(qs1_doubleneg, qs1_filter, lambda x: x)
+        self.assertQuerySetEqual(qs1_doubleneg, qs1_filter, lambda x: x)
         self.assertEqual(
             str(qs1_filter.query).count("JOIN"), str(qs1_doubleneg.query).count("JOIN")
         )
@@ -3785,7 +3785,7 @@ class NullJoinPromotionOrTest(TestCase):
         qs1_doubleneg = Identifier.objects.exclude(
             ~Q(Q(program__id=p2.id, channel__id=c1.id) | Q(program__id=p1.id))
         ).order_by("pk")
-        self.assertQuerysetEqual(qs1_doubleneg, qs1_filter, lambda x: x)
+        self.assertQuerySetEqual(qs1_doubleneg, qs1_filter, lambda x: x)
         self.assertEqual(
             str(qs1_filter.query).count("JOIN"), str(qs1_doubleneg.query).count("JOIN")
         )
@@ -3811,7 +3811,7 @@ class NullJoinPromotionOrTest(TestCase):
         qs2 = Identifier.objects.filter(
             Q(Q(program__id=p2.id, channel__id=c1.id) | ~Q(program__id=p1.id))
         ).order_by("pk")
-        self.assertQuerysetEqual(qs1, qs2, lambda x: x)
+        self.assertQuerySetEqual(qs1, qs2, lambda x: x)
         self.assertEqual(str(qs1.query).count("JOIN"), str(qs2.query).count("JOIN"))
         self.assertEqual(0, str(qs1.query).count("INNER JOIN"))
         self.assertEqual(

@@ -37,6 +37,8 @@ details on these changes.
 
 * The ``SimpleTestCase.assertFormsetError()`` method will be removed.
 
+* The ``TransactionTestCase.assertQuerysetEqual()`` method will be removed.
+
 .. _deprecation-removed-in-5.0:
 
 5.0

@@ -49,7 +49,7 @@ class BulkCreateTests(TestCase):
     def test_simple(self):
         created = Country.objects.bulk_create(self.data)
         self.assertEqual(created, self.data)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Country.objects.order_by("-name"),
             [
                 "United States of America",
@@ -119,7 +119,7 @@ class BulkCreateTests(TestCase):
                 Country(name="Tortall", iso_two_letter="TA"),
             ]
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             ProxyCountry.objects.all(),
             {"Qwghlm", "Tortall"},
             attrgetter("name"),
@@ -131,7 +131,7 @@ class BulkCreateTests(TestCase):
                 ProxyProxyCountry(name="Netherlands", iso_two_letter="NT"),
             ]
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             ProxyProxyCountry.objects.all(),
             {
                 "Qwghlm",
@@ -146,7 +146,7 @@ class BulkCreateTests(TestCase):
         State.objects.bulk_create(
             [State(two_letter_code=s) for s in ["IL", "NY", "CA", "ME"]]
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             State.objects.order_by("two_letter_code"),
             [
                 "CA",
@@ -163,7 +163,7 @@ class BulkCreateTests(TestCase):
             State.objects.bulk_create(
                 [State(two_letter_code=s) for s in ["IL", "NY", "CA", "ME"]]
             )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             State.objects.order_by("two_letter_code"),
             [
                 "CA",

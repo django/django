@@ -1661,7 +1661,7 @@ class ModelFormsetTest(TestCase):
 
         PlayerInlineFormSet = inlineformset_factory(Team, Player, fields="__all__")
         formset = PlayerInlineFormSet()
-        self.assertQuerysetEqual(formset.get_queryset(), [])
+        self.assertQuerySetEqual(formset.get_queryset(), [])
 
         formset = PlayerInlineFormSet(instance=team)
         players = formset.get_queryset()

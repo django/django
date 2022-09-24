@@ -178,7 +178,7 @@ class SignalTests(BaseSignalSetup, TestCase):
             )
             data[:] = []
 
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 Person.objects.all(),
                 [
                     "James Jones",

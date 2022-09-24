@@ -264,47 +264,56 @@ class AssertNumQueriesUponConnectionTests(TransactionTestCase):
                 list(Car.objects.all())
 
 
-class AssertQuerysetEqualTests(TestCase):
+class AssertQuerySetEqualTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.p1 = Person.objects.create(name="p1")
         cls.p2 = Person.objects.create(name="p2")
 
-    def test_empty(self):
+    def test_rename_assertquerysetequal_deprecation_warning(self):
+        msg = "assertQuerysetEqual() is deprecated in favor of assertQuerySetEqual()."
+        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
+            self.assertQuerysetEqual()
+
+    @ignore_warnings(category=RemovedInDjango51Warning)
+    def test_deprecated_assertquerysetequal(self):
         self.assertQuerysetEqual(Person.objects.filter(name="p3"), [])
 
+    def test_empty(self):
+        self.assertQuerySetEqual(Person.objects.filter(name="p3"), [])
+
     def test_ordered(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Person.objects.order_by("name"),
             [self.p1, self.p2],
         )
 
     def test_unordered(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Person.objects.order_by("name"), [self.p2, self.p1], ordered=False
         )
 
     def test_queryset(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Person.objects.order_by("name"),
             Person.objects.order_by("name"),
         )
 
     def test_flat_values_list(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Person.objects.order_by("name").values_list("name", flat=True),
             ["p1", "p2"],
         )
 
     def test_transform(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Person.objects.order_by("name"),
             [self.p1.pk, self.p2.pk],
             transform=lambda x: x.pk,
         )
 
     def test_repr_transform(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Person.objects.order_by("name"),
             [repr(self.p1), repr(self.p2)],
             transform=repr,
@@ -318,16 +327,16 @@ class AssertQuerysetEqualTests(TestCase):
             "ordered value."
         )
         with self.assertRaisesMessage(ValueError, msg):
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 Person.objects.all(),
                 [self.p1, self.p2],
             )
         # No error for one value.
-        self.assertQuerysetEqual(Person.objects.filter(name="p1"), [self.p1])
+        self.assertQuerySetEqual(Person.objects.filter(name="p1"), [self.p1])
 
     def test_repeated_values(self):
         """
-        assertQuerysetEqual checks the number of appearance of each item
+        assertQuerySetEqual checks the number of appearance of each item
         when used with option ordered=False.
         """
         batmobile = Car.objects.create(name="Batmobile")
@@ -343,10 +352,10 @@ class AssertQuerysetEqualTests(TestCase):
             ]
         )
         with self.assertRaises(AssertionError):
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 self.p1.cars.all(), [batmobile, k2000], ordered=False
             )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             self.p1.cars.all(), [batmobile] * 2 + [k2000] * 4, ordered=False
         )
 
@@ -356,7 +365,7 @@ class AssertQuerysetEqualTests(TestCase):
         names.append("Extra Person")
 
         with self.assertRaises(AssertionError) as ctx:
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 Person.objects.filter(name__startswith="Joe"),
                 names,
                 ordered=False,
@@ -368,7 +377,7 @@ class AssertQuerysetEqualTests(TestCase):
         self.maxDiff = None
         try:
             with self.assertRaises(AssertionError) as ctx:
-                self.assertQuerysetEqual(
+                self.assertQuerySetEqual(
                     Person.objects.filter(name__startswith="Joe"),
                     names,
                     ordered=False,

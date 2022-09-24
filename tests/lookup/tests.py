@@ -130,7 +130,7 @@ class LookupTests(TestCase):
         # returns results using database-level iteration.
         self.assertIsInstance(Article.objects.iterator(), collections.abc.Iterator)
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.iterator(),
             [
                 "Article 5",
@@ -144,7 +144,7 @@ class LookupTests(TestCase):
             transform=attrgetter("headline"),
         )
         # iterator() can be used on any QuerySet.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.filter(headline__endswith="4").iterator(),
             ["Article 4"],
             transform=attrgetter("headline"),
@@ -818,52 +818,52 @@ class LookupTests(TestCase):
             ]
         )
         # zero-or-more
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.filter(headline__regex=r"fo*"),
             Article.objects.filter(headline__in=["f", "fo", "foo", "fooo"]),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.filter(headline__iregex=r"fo*"),
             Article.objects.filter(headline__in=["f", "fo", "foo", "fooo", "hey-Foo"]),
         )
         # one-or-more
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.filter(headline__regex=r"fo+"),
             Article.objects.filter(headline__in=["fo", "foo", "fooo"]),
         )
         # wildcard
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.filter(headline__regex=r"fooo?"),
             Article.objects.filter(headline__in=["foo", "fooo"]),
         )
         # leading anchor
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.filter(headline__regex=r"^b"),
             Article.objects.filter(headline__in=["bar", "baxZ", "baz"]),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.filter(headline__iregex=r"^a"),
             Article.objects.filter(headline="AbBa"),
         )
         # trailing anchor
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.filter(headline__regex=r"z$"),
             Article.objects.filter(headline="baz"),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.filter(headline__iregex=r"z$"),
             Article.objects.filter(headline__in=["baxZ", "baz"]),
         )
         # character sets
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.filter(headline__regex=r"ba[rz]"),
             Article.objects.filter(headline__in=["bar", "baz"]),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.filter(headline__regex=r"ba.[RxZ]"),
             Article.objects.filter(headline="baxZ"),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.filter(headline__iregex=r"ba[RxZ]"),
             Article.objects.filter(headline__in=["bar", "baxZ", "baz"]),
         )
@@ -882,7 +882,7 @@ class LookupTests(TestCase):
         )
 
         # alternation
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.filter(headline__regex=r"oo(f|b)"),
             Article.objects.filter(
                 headline__in=[
@@ -893,7 +893,7 @@ class LookupTests(TestCase):
                 ]
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.filter(headline__iregex=r"oo(f|b)"),
             Article.objects.filter(
                 headline__in=[
@@ -905,13 +905,13 @@ class LookupTests(TestCase):
                 ]
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.filter(headline__regex=r"^foo(f|b)"),
             Article.objects.filter(headline__in=["foobar", "foobarbaz", "foobaz"]),
         )
 
         # greedy matching
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.filter(headline__regex=r"b.*az"),
             Article.objects.filter(
                 headline__in=[
@@ -923,7 +923,7 @@ class LookupTests(TestCase):
                 ]
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.filter(headline__iregex=r"b.*ar"),
             Article.objects.filter(
                 headline__in=[
@@ -951,7 +951,7 @@ class LookupTests(TestCase):
                 Article(pub_date=now, headline="bazbaRFOO"),
             ]
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.filter(headline__regex=r"b(.).*b\1").values_list(
                 "headline", flat=True
             ),
@@ -963,14 +963,14 @@ class LookupTests(TestCase):
         A regex lookup does not fail on null/None values
         """
         Season.objects.create(year=2012, gt=None)
-        self.assertQuerysetEqual(Season.objects.filter(gt__regex=r"^$"), [])
+        self.assertQuerySetEqual(Season.objects.filter(gt__regex=r"^$"), [])
 
     def test_regex_non_string(self):
         """
         A regex lookup does not fail on non-string fields
         """
         s = Season.objects.create(year=2013, gt=444)
-        self.assertQuerysetEqual(Season.objects.filter(gt__regex=r"^444$"), [s])
+        self.assertQuerySetEqual(Season.objects.filter(gt__regex=r"^444$"), [s])
 
     def test_regex_non_ascii(self):
         """

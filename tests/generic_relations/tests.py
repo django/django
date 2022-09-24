@@ -122,7 +122,7 @@ class GenericRelationsTests(TestCase):
         qs = TaggedItem.objects.filter(
             Q(animal__isnull=False) | Q(manualpk__id=1)
         ).order_by("tag")
-        self.assertQuerysetEqual(qs, ["hairy", "mpk", "yellow"], lambda x: x.tag)
+        self.assertQuerySetEqual(qs, ["hairy", "mpk", "yellow"], lambda x: x.tag)
 
     def test_exclude_generic_relations(self):
         """
@@ -199,7 +199,7 @@ class GenericRelationsTests(TestCase):
         If you delete an object with an explicit Generic relation, the related
         objects are deleted when the source object is deleted.
         """
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             TaggedItem.objects.all(),
             [
                 ("fatty", Vegetable, self.bacon.pk),
@@ -211,7 +211,7 @@ class GenericRelationsTests(TestCase):
         )
         self.lion.delete()
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             TaggedItem.objects.all(),
             [
                 ("fatty", Vegetable, self.bacon.pk),
@@ -228,7 +228,7 @@ class GenericRelationsTests(TestCase):
         TaggedItem.objects.create(content_object=self.quartz, tag="clearish")
         quartz_pk = self.quartz.pk
         self.quartz.delete()
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             TaggedItem.objects.all(),
             [
                 ("clearish", Mineral, quartz_pk),
@@ -252,7 +252,7 @@ class GenericRelationsTests(TestCase):
         tag.delete()
 
         self.assertSequenceEqual(self.lion.tags.all(), [self.yellow])
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             TaggedItem.objects.all(),
             [
                 ("fatty", Vegetable, self.bacon.pk),

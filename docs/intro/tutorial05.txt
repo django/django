@@ -491,7 +491,7 @@ class:
             response = self.client.get(reverse('polls:index'))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, "No polls are available.")
-            self.assertQuerysetEqual(response.context['latest_question_list'], [])
+            self.assertQuerySetEqual(response.context['latest_question_list'], [])
 
         def test_past_question(self):
             """
@@ -500,7 +500,7 @@ class:
             """
             question = create_question(question_text="Past question.", days=-30)
             response = self.client.get(reverse('polls:index'))
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 response.context['latest_question_list'],
                 [question],
             )
@@ -513,7 +513,7 @@ class:
             create_question(question_text="Future question.", days=30)
             response = self.client.get(reverse('polls:index'))
             self.assertContains(response, "No polls are available.")
-            self.assertQuerysetEqual(response.context['latest_question_list'], [])
+            self.assertQuerySetEqual(response.context['latest_question_list'], [])
 
         def test_future_question_and_past_question(self):
             """
@@ -523,7 +523,7 @@ class:
             question = create_question(question_text="Past question.", days=-30)
             create_question(question_text="Future question.", days=30)
             response = self.client.get(reverse('polls:index'))
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 response.context['latest_question_list'],
                 [question],
             )
@@ -535,7 +535,7 @@ class:
             question1 = create_question(question_text="Past question 1.", days=-30)
             question2 = create_question(question_text="Past question 2.", days=-5)
             response = self.client.get(reverse('polls:index'))
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 response.context['latest_question_list'],
                 [question2, question1],
             )
@@ -551,7 +551,7 @@ repetition out of the process of creating questions.
 Note that the :class:`django.test.TestCase` class provides some additional
 assertion methods. In these examples, we use
 :meth:`~django.test.SimpleTestCase.assertContains()` and
-:meth:`~django.test.TransactionTestCase.assertQuerysetEqual()`.
+:meth:`~django.test.TransactionTestCase.assertQuerySetEqual()`.
 
 In ``test_past_question``, we create a question and verify that it appears in
 the list.

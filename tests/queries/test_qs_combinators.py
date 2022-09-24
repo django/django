@@ -15,7 +15,7 @@ class QuerySetSetOperationTests(TestCase):
         Number.objects.bulk_create(Number(num=i, other_num=10 - i) for i in range(10))
 
     def assertNumbersEqual(self, queryset, expected_numbers, ordered=True):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             queryset, expected_numbers, operator.attrgetter("num"), ordered
         )
 
@@ -145,7 +145,7 @@ class QuerySetSetOperationTests(TestCase):
     def test_ordering_by_alias(self):
         qs1 = Number.objects.filter(num__lte=1).values(alias=F("num"))
         qs2 = Number.objects.filter(num__gte=2, num__lte=3).values(alias=F("num"))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs1.union(qs2).order_by("-alias"),
             [3, 2, 1, 0],
             operator.itemgetter("alias"),
@@ -159,13 +159,13 @@ class QuerySetSetOperationTests(TestCase):
     def test_ordering_by_f_expression_and_alias(self):
         qs1 = Number.objects.filter(num__lte=1).values(alias=F("other_num"))
         qs2 = Number.objects.filter(num__gte=2, num__lte=3).values(alias=F("other_num"))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs1.union(qs2).order_by(F("alias").desc()),
             [10, 9, 8, 7],
             operator.itemgetter("alias"),
         )
         Number.objects.create(num=-1)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs1.union(qs2).order_by(F("alias").desc(nulls_last=True)),
             [10, 9, 8, 7, None],
             operator.itemgetter("alias"),
@@ -267,7 +267,7 @@ class QuerySetSetOperationTests(TestCase):
             qs1.union(qs2).order_by("annotation", "num").values_list("num", flat=True),
             [6, 7, 8, 9, 0, 1, 2, 3, 4, 5],
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs1.union(qs2)
             .order_by(
                 F("annotation") * F("multiplier"),
