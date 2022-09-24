@@ -109,8 +109,7 @@ input[type="submit"], button {
 
     #toolbar form #searchbar {
         flex: 1 0 auto;
-        min-width: 160px;
-        width: 0;
+        max-width: 50vw;
         height: 22px;
         margin: 0 10px 0 6px;
     }
