@@ -1,0 +1,22 @@
+
+#app-filter {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 2px 5px;
+    margin: 5px 0;
+    border: 1px solid var(--border-color);
+    background-color: var(--darkened-bg);
+    color: var(--body-fg);
+
+    flex: 1;
+    min-width: 150px;
+    max-height: 2em;
+}
+
+#app-filter:focus {
+    border-color: var(--body-quiet-color);
+}
+
+#app-filter.no-results {
+    background: var(--message-error-bg);
+}

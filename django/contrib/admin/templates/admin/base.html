@@ -10,7 +10,9 @@
 {% endblock %}
 {% if not is_popup and is_nav_sidebar_enabled %}
   <link rel="stylesheet" href="{% static "admin/css/nav_sidebar.css" %}">
+  <link rel="stylesheet" href="{% static "admin/css/app_filter.css" %}">
   <script src="{% static 'admin/js/nav_sidebar.js' %}" defer></script>
+  <script src="{% static 'admin/js/app_filter.js' %}" defer></script>
 {% endif %}
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}">{% endif %}
 {% block responsive %}
