@@ -48,6 +48,9 @@ Minor features
   :attr:`~django.contrib.admin.ModelAdmin.filter_vertical` widgets are now
   filterable.
 
+* The ``admin/base.html`` template now has a new block ``nav-breadcrumbs``
+  which contains the navigation landmark and the ``breadcrumbs`` block.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
