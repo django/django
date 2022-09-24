@@ -81,7 +81,7 @@ class UsernameField(forms.CharField):
         }
 
 
-class UserCreationForm(forms.ModelForm):
+class BaseUserCreationForm(forms.ModelForm):
     """
     A form that creates a user, with no privileges, from the given username and
     password.
@@ -144,6 +144,21 @@ class UserCreationForm(forms.ModelForm):
             if hasattr(self, "save_m2m"):
                 self.save_m2m()
         return user
+
+
+class UserCreationForm(BaseUserCreationForm):
+    error_messages = {
+        **BaseUserCreationForm.error_messages,
+        "unique": _("A user with that username already exists."),
+    }
+
+    def clean_username(self):
+        """Reject usernames that differ only in case."""
+        username = self.cleaned_data.get("username")
+        if username and User.objects.filter(username__iexact=username).exists():
+            raise forms.ValidationError(self.error_messages["unique"], code="unique")
+        else:
+            return username
 
 
 class UserChangeForm(forms.ModelForm):
