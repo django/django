@@ -11,8 +11,17 @@
 
 {% block nav-sidebar %}{% endblock %}
 
+{% block content_title %}
+  <div class="admin-index-title">
+    {% if title %}<h1>{{ title }}</h1>{% endif %}
+    <input type="search" id="app-filter"
+           placeholder="{% translate 'Start typing to filter…' %}"
+           aria-label="{% translate 'Filter navigation items' %}">
+  </div>
+{% endblock %}
+
 {% block content %}
-<div id="content-main">
+<div id="content-main" class="filterable-apps-table">
   {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
 </div>
 {% endblock %}

@@ -20,3 +20,34 @@
 #app-filter.no-results {
     background: var(--message-error-bg);
 }
+
+/* Styles only relevant to index pages */
+
+.filterable-apps-table caption {
+    /* The captions were resized when using a filter.
+     This ensures that they keep their original width. */
+    width: calc(100% - 16px);
+}
+
+.admin-index-title {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 767px) {
+    .admin-index-title {
+        margin-bottom: 10px;
+    }
+}
+
+.admin-index-title h1 {
+    flex: 2;
+    margin-bottom: 0;
+    padding-right: 1em;
+}
+
+.admin-index-title #app-filter {
+    display: inline-block;
+}
+
