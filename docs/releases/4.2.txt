@@ -127,6 +127,9 @@ Minor features
 * :class:`~django.contrib.auth.forms.UserCreationForm` now saves many-to-many
   form fields for a custom user model.
 
+* The new :class:`~django.contrib.auth.forms.BaseUserCreationForm` is now the
+  recommended base class for customizing the user creation form.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -483,6 +486,10 @@ Miscellaneous
 
 * The minimum supported version of ``asgiref`` is increased from 3.5.2 to
   3.6.0.
+
+* :class:`~django.contrib.auth.forms.UserCreationForm` now rejects usernames
+  that differ only in case. If you need the previous behavior, use
+  :class:`~django.contrib.auth.forms.BaseUserCreationForm` instead.
 
 .. _deprecated-features-4.2:
 

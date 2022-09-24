@@ -1654,9 +1654,12 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
     A form used in the admin interface to change a user's information and
     permissions.
 
-.. class:: UserCreationForm
+.. class:: BaseUserCreationForm
 
-    A :class:`~django.forms.ModelForm` for creating a new user.
+    .. versionadded:: 4.2
+
+    A :class:`~django.forms.ModelForm` for creating a new user. This is the
+    recommended base class if you need to customize the user creation form.
 
     It has three fields: ``username`` (from the user model), ``password1``,
     and ``password2``. It verifies that ``password1`` and ``password2`` match,
@@ -1665,10 +1668,18 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
     sets the user's password using
     :meth:`~django.contrib.auth.models.User.set_password()`.
 
+.. class:: UserCreationForm
+
+    Inherits from :class:`BaseUserCreationForm`. To help prevent confusion with
+    similar usernames, the form doesn't allow usernames that differ only in
+    case.
+
     .. versionchanged:: 4.2
 
         In older versions, :class:`UserCreationForm` didn't save many-to-many
         form fields for a custom user model.
+
+        In older versions, usernames that differ only in case are allowed.
 
 .. currentmodule:: django.contrib.auth
 
