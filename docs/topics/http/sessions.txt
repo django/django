@@ -72,28 +72,31 @@ If you have multiple caches defined in :setting:`CACHES`, Django will use the
 default cache. To use another cache, set :setting:`SESSION_CACHE_ALIAS` to the
 name of that cache.
 
-Once your cache is configured, you've got two choices for how to store data in
-the cache:
+Once your cache is configured, you have to choose between a database-backed
+cache or a non-persistent cache.
 
-* Set :setting:`SESSION_ENGINE` to
-  ``"django.contrib.sessions.backends.cache"`` for a simple caching session
-  store. Session data will be stored directly in your cache. However, session
-  data may not be persistent: cached data can be evicted if the cache fills
-  up or if the cache server is restarted.
+The database cache ``django.contrib.sessions.backends.cached_db`` uses a
+write-through cache -- every write to the cache will also be written to the
+database. Session reads only use the database if the data is not already in the
+cache.
 
-* For persistent, cached data, set :setting:`SESSION_ENGINE` to
-  ``"django.contrib.sessions.backends.cached_db"``. This uses a
-  write-through cache -- every write to the cache will also be written to
-  the database. Session reads only use the database if the data is not
-  already in the cache.
+For persistent, cached data, set :setting:`SESSION_ENGINE` to
+``"django.contrib.sessions.backends.cached_db"``. And follow the configuration
+instructions for the `using database-backed sessions`_.
 
-Both session stores are quite fast, but the simple cache is faster because it
-disregards persistence. In most cases, the ``cached_db`` backend will be fast
-enough, but if you need that last bit of performance, and are willing to let
-session data be expunged from time to time, the ``cache`` backend is for you.
+To use the non-persistent cache ``django.contrib.sessions.backends.cache`` set
+:setting:`SESSION_ENGINE` to ``"django.contrib.sessions.backends.cache"`` for a
+simple caching session store. Session data will be stored only in your cache.
 
-If you use the ``cached_db`` session backend, you also need to follow the
-configuration instructions for the `using database-backed sessions`_.
+This is faster because it disregards database persistence. But you will have to
+handle edge cases caused by a non-persistent cache. Cached data can be evicted
+if the cache fills up or if the cache server is restarted. This might lead to a
+more complex operational setup.
+
+One solution you can use is to configure cache backends such as Memcached and
+Redis to be persistent. But unless your cache backend is persistent, opt for
+the database cache to avoid edge cases caused by transient, unreliable data in
+production.
 
 Using file-based sessions
 -------------------------
