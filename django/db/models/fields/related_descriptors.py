@@ -65,7 +65,7 @@ and two directions (forward and reverse) for a total of six combinations.
 
 from asgiref.sync import sync_to_async
 
-from django.core.exceptions import FieldError
+from django.core.exceptions import FetchMissingFieldError, FieldError
 from django.db import (
     DEFAULT_DB_ALIAS,
     NotSupportedError,
@@ -73,10 +73,10 @@ from django.db import (
     router,
     transaction,
 )
-from django.db.models import Q, Window, signals
+from django.db.models import Q, Window, fetch_missing_fields, signals
 from django.db.models.functions import RowNumber
 from django.db.models.lookups import GreaterThan, LessThanOrEqual
-from django.db.models.query import QuerySet
+from django.db.models.query import Prefetch, QuerySet, prefetch_related_objects
 from django.db.models.query_utils import DeferredAttribute
 from django.db.models.utils import AltersData, resolve_callables
 from django.utils.functional import cached_property
@@ -233,7 +233,24 @@ class ForwardManyToOneDescriptor:
             else:
                 rel_obj = None
             if rel_obj is None and has_value:
-                rel_obj = self.get_object(instance)
+                if fetch_missing_fields.get_current_related_strategy() == "never":
+                    raise FetchMissingFieldError
+                peers = [
+                    peer
+                    for weakref_peer in instance._state.peers
+                    if (peer := weakref_peer()) is not None and not self.is_cached(peer)
+                ]
+                if len(peers) > 1:
+                    # If the instance was fetched with other instances then
+                    # prefetch the field for all of them
+                    qs = self.get_queryset()
+                    prefetch_related_objects(
+                        peers, Prefetch(self.field.name, queryset=qs)
+                    )
+                    rel_obj = self.field.get_cached_value(instance)
+                else:
+                    rel_obj = self.get_object(instance)
+
                 remote_field = self.field.remote_field
                 # If this is a one-to-one relation, set the reverse accessor
                 # cache on the related object to the current instance to avoid
@@ -476,16 +493,34 @@ class ReverseOneToOneDescriptor:
             if related_pk is None:
                 rel_obj = None
             else:
-                filter_args = self.related.field.get_forward_related_filter(instance)
-                try:
-                    rel_obj = self.get_queryset(instance=instance).get(**filter_args)
-                except self.related.related_model.DoesNotExist:
-                    rel_obj = None
+                peers = [
+                    peer
+                    for weakref_peer in instance._state.peers
+                    if (peer := weakref_peer()) is not None and not self.is_cached(peer)
+                ]
+                if len(peers) > 1:
+                    # If the instance was fetched with other instances then
+                    # prefetch the field for all of them
+                    qs = self.get_queryset()
+                    prefetch_related_objects(
+                        peers, Prefetch(self.related.get_accessor_name(), queryset=qs)
+                    )
+                    rel_obj = self.related.get_cached_value(instance)
                 else:
-                    # Set the forward accessor cache on the related object to
-                    # the current instance to avoid an extra SQL query if it's
-                    # accessed later on.
-                    self.related.field.set_cached_value(rel_obj, instance)
+                    filter_args = self.related.field.get_forward_related_filter(
+                        instance
+                    )
+                    try:
+                        rel_obj = self.get_queryset(instance=instance).get(
+                            **filter_args
+                        )
+                    except self.related.related_model.DoesNotExist:
+                        rel_obj = None
+                    else:
+                        # Set the forward accessor cache on the related object to
+                        # the current instance to avoid an extra SQL query if it's
+                        # accessed later on.
+                        self.related.field.set_cached_value(rel_obj, instance)
             self.related.set_cached_value(instance, rel_obj)
 
         if rel_obj is None:

@@ -10,8 +10,9 @@ import inspect
 import logging
 from collections import namedtuple
 
-from django.core.exceptions import FieldError
+from django.core.exceptions import FetchMissingFieldError, FieldError
 from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections
+from django.db.models import fetch_missing_fields
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
 
@@ -175,7 +176,28 @@ class DeferredAttribute:
             # might be able to reuse the already loaded value. Refs #18343.
             val = self._check_parent_chain(instance)
             if val is None:
-                instance.refresh_from_db(fields=[field_name])
+                if fetch_missing_fields.get_current_deferred_strategy() == "never":
+                    raise FetchMissingFieldError
+
+                peers = [
+                    peer
+                    for weakref_peer in instance._state.peers
+                    if (peer := weakref_peer()) is not None
+                ]
+
+                if len(peers) > 1:
+                    value_by_pk = {
+                        pk: value
+                        for pk, value in instance.__class__._base_manager.db_manager()
+                        .filter(pk__in=[peer.pk for peer in peers])
+                        .values_list("pk", field_name)
+                    }
+
+                    for peer in peers:
+                        peer.__dict__[field_name] = value_by_pk[peer.pk]
+                else:
+                    instance.refresh_from_db(fields=[field_name])
+
             else:
                 data[field_name] = val
         return data[field_name]

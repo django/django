@@ -1,4 +1,5 @@
-from django.core.exceptions import FieldDoesNotExist, FieldError
+from django.core.exceptions import FetchMissingFieldError, FieldDoesNotExist, FieldError
+from django.db.models import fetch_missing_fields
 from django.test import SimpleTestCase, TestCase
 
 from .models import (
@@ -35,6 +36,24 @@ class DeferTests(AssertionMixin, TestCase):
         self.assert_delayed(qs.defer("name").get(pk=self.p1.pk), 1)
         self.assert_delayed(qs.defer("related__first")[0], 0)
         self.assert_delayed(qs.defer("name").defer("value")[0], 2)
+
+    @fetch_missing_fields("never")
+    def test_strict_defer_raise_exception(self):
+        with self.assertRaises(FetchMissingFieldError):
+            list(Primary.objects.defer("name"))[0].name
+
+    @fetch_missing_fields("never")
+    def test_strict_only_raise_exception(self):
+        with self.assertRaises(FetchMissingFieldError):
+            list(Primary.objects.only("value"))[0].name
+
+    @fetch_missing_fields("peers")
+    def test_fetch_missing_fields_peers(self):
+        Primary.objects.create(name="p2", value="xx", related=self.s1)
+
+        with self.assertNumQueries(2):
+            for p in Primary.objects.defer("value"):
+                p.value
 
     def test_only(self):
         qs = Primary.objects.all()

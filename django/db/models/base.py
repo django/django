@@ -454,6 +454,7 @@ class ModelState:
     # on the actual save.
     adding = True
     fields_cache = ModelStateFieldsCacheDescriptor()
+    peers = ()
 
 
 class Model(AltersData, metaclass=ModelBase):

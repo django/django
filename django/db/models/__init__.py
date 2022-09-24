@@ -1,5 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import signals
+from django.db.models._fetch_missing_fields import fetch_missing_fields
 from django.db.models.aggregates import *  # NOQA
 from django.db.models.aggregates import __all__ as aggregates_all
 from django.db.models.constraints import *  # NOQA
@@ -112,4 +113,5 @@ __all__ += [
     "ManyToOneRel",
     "ManyToManyRel",
     "OneToOneRel",
+    "fetch_missing_fields",
 ]

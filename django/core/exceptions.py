@@ -243,3 +243,7 @@ class SynchronousOnlyOperation(Exception):
     """The user tried to call a sync-only function from an async context."""
 
     pass
+
+
+class FetchMissingFieldError(Exception):
+    """The user tried accessing a field that was not loaded from the database."""

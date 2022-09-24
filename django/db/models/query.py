@@ -5,6 +5,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import operator
 import warnings
+import weakref
 from itertools import chain, islice
 
 from asgiref.sync import sync_to_async
@@ -20,7 +21,14 @@ from django.db import (
     router,
     transaction,
 )
-from django.db.models import AutoField, DateField, DateTimeField, Field, sql
+from django.db.models import (
+    AutoField,
+    DateField,
+    DateTimeField,
+    Field,
+    fetch_missing_fields,
+    sql,
+)
 from django.db.models.constants import LOOKUP_SEP, OnConflict
 from django.db.models.deletion import Collector
 from django.db.models.expressions import Case, F, Value, When
@@ -1879,6 +1887,15 @@ class QuerySet(AltersData):
     def _fetch_all(self):
         if self._result_cache is None:
             self._result_cache = list(self._iterable_class(self))
+            # If we're fetching objects tell them about each other so they can
+            # prefetch for each other during attribute access.
+            if (
+                issubclass(self._iterable_class, ModelIterable)
+                and fetch_missing_fields.get_current_related_strategy() == "peers"
+            ):
+                peers = [weakref.ref(peer) for peer in self._result_cache]
+                for instance in self._result_cache:
+                    instance._state.peers = peers
         if self._prefetch_related_lookups and not self._prefetch_done:
             self._prefetch_related_objects()
 

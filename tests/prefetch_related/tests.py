@@ -3,7 +3,12 @@ from unittest import mock
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import NotSupportedError, connection
-from django.db.models import Prefetch, QuerySet, prefetch_related_objects
+from django.db.models import (
+    Prefetch,
+    QuerySet,
+    fetch_missing_fields,
+    prefetch_related_objects,
+)
 from django.db.models.query import get_prefetcher
 from django.db.models.sql import Query
 from django.test import (
@@ -104,6 +109,11 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
 
         normal_books = [a.first_book for a in Author.objects.all()]
         self.assertEqual(books, normal_books)
+
+    @fetch_missing_fields("never")
+    def test_fetch_missing_fields_never_works_with_prefetch_related(self):
+        authors = list(Author.objects.prefetch_related("first_book"))
+        authors[0].first_book
 
     def test_foreignkey_reverse(self):
         with self.assertNumQueries(2):
@@ -876,7 +886,7 @@ class CustomPrefetchTests(TestCase):
 
         # Test ForwardManyToOneDescriptor.
         houses = House.objects.select_related("owner")
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(3):
             rooms = Room.objects.prefetch_related("house")
             lst1 = self.traverse_qs(rooms, [["house", "owner"]])
         with self.assertNumQueries(2):
@@ -913,7 +923,7 @@ class CustomPrefetchTests(TestCase):
 
         # Test ReverseOneToOneDescriptor.
         houses = House.objects.select_related("owner")
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(3):
             rooms = Room.objects.prefetch_related("main_room_of")
             lst1 = self.traverse_qs(rooms, [["main_room_of", "owner"]])
         with self.assertNumQueries(2):

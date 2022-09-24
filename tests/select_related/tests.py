@@ -78,7 +78,7 @@ class SelectRelatedTests(TestCase):
             self.assertEqual(domain.name, "Eukaryota")
 
     def test_list_without_select_related(self):
-        with self.assertNumQueries(9):
+        with self.assertNumQueries(3):
             world = Species.objects.all()
             families = [o.genus.family.name for o in world]
             self.assertEqual(
