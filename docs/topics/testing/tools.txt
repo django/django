@@ -1101,7 +1101,7 @@ Fixture loading
 A test case for a database-backed website isn't much use if there isn't any
 data in the database. Tests are more readable and it's more maintainable to
 create objects using the ORM, for example in :meth:`TestCase.setUpTestData`,
-however, you can also use fixtures.
+however, you can also use :ref:`fixtures <fixtures-explanation>`.
 
 A fixture is a collection of data that Django knows how to import into a
 database. For example, if your site has user accounts, you might set up a
@@ -1139,8 +1139,8 @@ Here's specifically what will happen:
 
 * Then, all the named fixtures are installed. In this example, Django will
   install any JSON fixture named ``mammals``, followed by any fixture named
-  ``birds``. See the :djadmin:`loaddata` documentation for more
-  details on defining and installing fixtures.
+  ``birds``. See the :ref:`fixtures-explanation` topic for more details on
+  defining and installing fixtures.
 
 For performance reasons, :class:`TestCase` loads fixtures once for the entire
 test class, before :meth:`~TestCase.setUpTestData`, instead of before each

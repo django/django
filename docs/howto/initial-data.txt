@@ -19,8 +19,9 @@ limitations <test-case-serialized-rollback>`.
 Provide data with fixtures
 ==========================
 
-You can also provide data using fixtures, however, this data isn't loaded
-automatically, except if you use :attr:`.TransactionTestCase.fixtures`.
+You can also provide data using :ref:`fixtures <fixtures-explanation>`,
+however, this data isn't loaded automatically, except if you use
+:attr:`.TransactionTestCase.fixtures`.
 
 A fixture is a collection of data that Django knows how to import into a
 database. The most straightforward way of creating a fixture if you've already
