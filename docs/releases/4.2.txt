@@ -223,6 +223,9 @@ Models
   the text value of a key, index, or path transform of
   :class:`~django.db.models.JSONField`.
 
+* :class:`~django.db.models.functions.Now` now supports microsecond precision
+  on MySQL and millisecond precision on SQLite.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
