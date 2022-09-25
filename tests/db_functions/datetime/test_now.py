@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 
-from django.db.models.functions import Now
+from django.db import connection
+from django.db.models import TextField
+from django.db.models.functions import Cast, Now
 from django.test import TestCase
 from django.utils import timezone
 
@@ -47,3 +49,17 @@ class NowTests(TestCase):
             ["How to Time Travel"],
             lambda a: a.title,
         )
+
+    def test_microseconds(self):
+        Article.objects.create(
+            title="How to Django",
+            text=lorem_ipsum,
+            written=timezone.now(),
+        )
+        now_string = (
+            Article.objects.annotate(now_string=Cast(Now(), TextField()))
+            .get()
+            .now_string
+        )
+        precision = connection.features.time_cast_precision
+        self.assertRegex(now_string, rf"^.*\.\d{{1,{precision}}}")
