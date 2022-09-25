@@ -322,6 +322,9 @@ Miscellaneous
 * The ``autofocus`` HTML attribute in the admin search box is removed as it can
   be confusing for screen readers.
 
+* The :option:`makemigrations --check` option no longer creates missing
+  migration files.
+
 .. _deprecated-features-4.2:
 
 Features deprecated in 4.2
