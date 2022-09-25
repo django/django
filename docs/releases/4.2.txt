@@ -48,6 +48,8 @@ Minor features
   :attr:`~django.contrib.admin.ModelAdmin.filter_vertical` widgets are now
   filterable.
 
+* The autofocus was removed from the search box
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
