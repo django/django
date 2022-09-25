@@ -37,4 +37,6 @@ jobs:
       - name: Build docs
         run: |
           cd docs
-          sphinx-build -b spelling -n -q -W --keep-going -d _build/doctrees -D language=en_US -j auto . _build/spelling
+          export SPHINXOPTS="-q -W --keep-going -j auto"
+          export LANGUAGE=en_US
+          make spelling

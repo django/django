@@ -14,14 +14,10 @@ ifndef LANGUAGE
 override LANGUAGE = en
 endif
 
-# Convert something like "en_US" to "en", because Sphinx does not recognize
-# underscores. Country codes should be passed using a dash, e.g. "pt-BR".
-LANGUAGEOPT = $(firstword $(subst _, ,$(LANGUAGE)))
-
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
-ALLSPHINXOPTS   = -n -d $(BUILDDIR)/doctrees -D language=$(LANGUAGEOPT) $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
+ALLSPHINXOPTS   = -n -d $(BUILDDIR)/doctrees -D language=$(LANGUAGE) $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 # the i18n builder cannot share the environment and doctrees with the others
 I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
