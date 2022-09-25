@@ -131,9 +131,9 @@ Arguments sent with this signal:
 
 ``raw``
     A boolean; ``True`` if the model is saved exactly as presented
-    (i.e. when loading a fixture). One should not query/modify other
-    records in the database as the database might not be in a
-    consistent state yet.
+    (i.e. when loading a :ref:`fixture <fixtures-explanation>`). One should not
+    query/modify other records in the database as the database might not be in
+    a consistent state yet.
 
 ``using``
     The database alias being used.
@@ -164,9 +164,9 @@ Arguments sent with this signal:
 
 ``raw``
     A boolean; ``True`` if the model is saved exactly as presented
-    (i.e. when loading a fixture). One should not query/modify other
-    records in the database as the database might not be in a
-    consistent state yet.
+    (i.e. when loading a :ref:`fixture <fixtures-explanation>`). One should not
+    query/modify other records in the database as the database might not be in
+    a consistent state yet.
 
 ``using``
     The database alias being used.
