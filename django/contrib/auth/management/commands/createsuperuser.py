@@ -282,13 +282,11 @@ class Command(BaseCommand):
     def username_is_unique(self):
         if self.username_field.unique:
             return True
-        for unique_constraint in self.UserModel._meta.total_unique_constraints:
-            if (
-                len(unique_constraint.fields) == 1
-                and unique_constraint.fields[0] == self.username_field.name
-            ):
-                return True
-        return False
+        return any(
+            len(unique_constraint.fields) == 1
+            and unique_constraint.fields[0] == self.username_field.name
+            for unique_constraint in self.UserModel._meta.total_unique_constraints
+        )
 
     def _validate_username(self, username, verbose_field_name, database):
         """Validate username. If invalid, return a string error message."""
