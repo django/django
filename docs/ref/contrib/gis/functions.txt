@@ -328,7 +328,7 @@ are returned unchanged.
 
 .. class:: FromWKB(expression, **extra)
 
-.. versionadded:: 3.1
+.. versionadded:: 4.2
 
 *Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-wkb-functions.html#function_st-geomfromwkb>`__,
@@ -341,7 +341,7 @@ Creates geometry from `Well-known binary (WKB)`_ representation.
 
 .. class:: FromWKT(expression, **extra)
 
-.. versionadded:: 3.1
+.. versionadded:: 4.2
 
 *Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-wkt-functions.html#function_st-geomfromtext>`__,

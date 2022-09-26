@@ -6,7 +6,7 @@ from decimal import Decimal
 from django.contrib.gis.db.models import GeometryField, PolygonField, functions
 from django.contrib.gis.geos import GEOSGeometry, LineString, Point, Polygon, fromstr
 from django.contrib.gis.measure import Area
-from django.db import NotSupportedError, connection, models
+from django.db import NotSupportedError, connection
 from django.db.models import IntegerField, Sum, Value
 from django.test import TestCase, skipUnlessDBFeature
 
@@ -330,12 +330,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
     def test_fromwkb(self):
         g = Point(56.811078, 60.608647)
         g2 = City.objects.values_list(
-            functions.FromWKB(
-                models.Value(
-                    bytes(g.wkb),
-                    output_field=models.BinaryField(),
-                )
-            ),
+            functions.FromWKB(Value(g.wkb.tobytes())),
             flat=True,
         )[0]
         self.assertEqual(g, g2)
@@ -344,7 +339,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
     def test_fromwkt(self):
         g = Point(56.811078, 60.608647)
         g2 = City.objects.values_list(
-            functions.FromWKT(models.Value(g.wkt)),
+            functions.FromWKT(Value(g.wkt)),
             flat=True,
         )[0]
         self.assertEqual(g, g2)

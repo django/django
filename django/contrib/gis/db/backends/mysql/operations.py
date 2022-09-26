@@ -63,8 +63,8 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     )
 
     function_names = {
-        'FromWKB': 'ST_GeomFromWKB',
-        'FromWKT': 'ST_GeomFromText',
+        "FromWKB": "ST_GeomFromWKB",
+        "FromWKT": "ST_GeomFromText",
     }
 
     @cached_property
