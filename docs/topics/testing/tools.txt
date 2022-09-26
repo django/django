@@ -34,16 +34,15 @@ short:
 * Use Django's test client to establish that the correct template is being
   rendered and that the template is passed the correct context data.
 
-* The :class:`~django.test.RequestFactory` is a trimmed down version of the test client that bypasses the routing and middleware layers
-  so you can test your view as you would test any other function in python with known inputs, 
-  testing for specific outputs. More detail on this can be found in :doc:`advanced testing topics</topics/testing/advanced>`.
+* The :class:`~django.test.RequestFactory` is a trimmed down version of the
+  test client that bypasses the routing and middleware layers so you can test
+  your view as you would test any other function in python with known inputs, 
+  testing for specific outputs.
 
 * Use in-browser frameworks like Selenium_ to test *rendered* HTML and the
   *behavior* of web pages, namely JavaScript functionality. Django also
   provides special support for those frameworks; see the section on
   :class:`~django.test.LiveServerTestCase` for more details.
-
-
 
 A comprehensive test suite should use a combination of all of these test types.
 
