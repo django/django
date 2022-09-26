@@ -1537,7 +1537,7 @@ class ChangeListTests(TestCase):
         self.assertContains(
             response,
             '<input type="text" size="40" name="q" value="" id="searchbar" '
-            'autofocus aria-describedby="searchbar_helptext">',
+            'aria-describedby="searchbar_helptext">',
         )
 
 
