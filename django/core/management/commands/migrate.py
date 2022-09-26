@@ -82,8 +82,8 @@ class Command(BaseCommand):
             action="store_true",
             dest="check_unapplied",
             help=(
-                "Exits with a non-zero status if unapplied migrations exist. Does not "
-                "apply migrations."
+                "Exits with a non-zero status if unapplied migrations exist and does "
+                "not actually apply migrations."
             ),
         )
         parser.add_argument(
