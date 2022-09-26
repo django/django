@@ -10,6 +10,7 @@ class DataPoint(models.Model):
     name = models.CharField(max_length=20)
     value = models.CharField(max_length=20)
     another_value = models.CharField(max_length=20, blank=True)
+    is_active = models.BooleanField(default=True)
 
 
 class RelatedPoint(models.Model):

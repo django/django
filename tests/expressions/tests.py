@@ -48,6 +48,7 @@ from django.db.models.expressions import (
     Col,
     Combinable,
     CombinedExpression,
+    NegatedExpression,
     RawSQL,
     Ref,
 )
@@ -2534,6 +2535,61 @@ class ExpressionWrapperTests(SimpleTestCase):
         group_by_cols = expr.get_group_by_cols()
         self.assertEqual(group_by_cols, [expr.expression])
         self.assertEqual(group_by_cols[0].output_field, expr.output_field)
+
+
+class NegatedExpressionTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        ceo = Employee.objects.create(firstname="Joe", lastname="Smith", salary=10)
+        cls.eu_company = Company.objects.create(
+            name="Example Inc.",
+            num_employees=2300,
+            num_chairs=5,
+            ceo=ceo,
+            based_in_eu=True,
+        )
+        cls.non_eu_company = Company.objects.create(
+            name="Foobar Ltd.",
+            num_employees=3,
+            num_chairs=4,
+            ceo=ceo,
+            based_in_eu=False,
+        )
+
+    def test_invert(self):
+        f = F("field")
+        self.assertEqual(~f, NegatedExpression(f))
+        self.assertIsNot(~~f, f)
+        self.assertEqual(~~f, f)
+
+    def test_filter(self):
+        self.assertSequenceEqual(
+            Company.objects.filter(~F("based_in_eu")),
+            [self.non_eu_company],
+        )
+
+        qs = Company.objects.annotate(eu_required=~Value(False))
+        self.assertSequenceEqual(
+            qs.filter(based_in_eu=F("eu_required")).order_by("eu_required"),
+            [self.eu_company],
+        )
+        self.assertSequenceEqual(
+            qs.filter(based_in_eu=~~F("eu_required")),
+            [self.eu_company],
+        )
+        self.assertSequenceEqual(
+            qs.filter(based_in_eu=~F("eu_required")),
+            [self.non_eu_company],
+        )
+        self.assertSequenceEqual(qs.filter(based_in_eu=~F("based_in_eu")), [])
+
+    def test_values(self):
+        self.assertSequenceEqual(
+            Company.objects.annotate(negated=~F("based_in_eu"))
+            .values_list("name", "negated")
+            .order_by("name"),
+            [("Example Inc.", False), ("Foobar Ltd.", True)],
+        )
 
 
 class OrderByTests(SimpleTestCase):

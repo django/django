@@ -2,7 +2,7 @@ import unittest
 
 from django.core.exceptions import FieldError
 from django.db import IntegrityError, connection, transaction
-from django.db.models import CharField, Count, F, IntegerField, Max
+from django.db.models import Case, CharField, Count, F, IntegerField, Max, When
 from django.db.models.functions import Abs, Concat, Lower
 from django.test import TestCase
 from django.test.utils import register_lookup
@@ -81,7 +81,7 @@ class AdvancedTests(TestCase):
     def setUpTestData(cls):
         cls.d0 = DataPoint.objects.create(name="d0", value="apple")
         cls.d2 = DataPoint.objects.create(name="d2", value="banana")
-        cls.d3 = DataPoint.objects.create(name="d3", value="banana")
+        cls.d3 = DataPoint.objects.create(name="d3", value="banana", is_active=False)
         cls.r1 = RelatedPoint.objects.create(name="r1", data=cls.d3)
 
     def test_update(self):
@@ -248,6 +248,32 @@ class AdvancedTests(TestCase):
 
         Bar.objects.annotate(abs_id=Abs("m2m_foo")).order_by("abs_id").update(x=3)
         self.assertEqual(Bar.objects.get().x, 3)
+
+    def test_update_negated_f(self):
+        DataPoint.objects.update(is_active=~F("is_active"))
+        self.assertCountEqual(
+            DataPoint.objects.values_list("name", "is_active"),
+            [("d0", False), ("d2", False), ("d3", True)],
+        )
+        DataPoint.objects.update(is_active=~F("is_active"))
+        self.assertCountEqual(
+            DataPoint.objects.values_list("name", "is_active"),
+            [("d0", True), ("d2", True), ("d3", False)],
+        )
+
+    def test_update_negated_f_conditional_annotation(self):
+        DataPoint.objects.annotate(
+            is_d2=Case(When(name="d2", then=True), default=False)
+        ).update(is_active=~F("is_d2"))
+        self.assertCountEqual(
+            DataPoint.objects.values_list("name", "is_active"),
+            [("d0", True), ("d2", False), ("d3", True)],
+        )
+
+    def test_updating_non_conditional_field(self):
+        msg = "Cannot negate non-conditional expressions."
+        with self.assertRaisesMessage(TypeError, msg):
+            DataPoint.objects.update(is_active=~F("name"))
 
 
 @unittest.skipUnless(

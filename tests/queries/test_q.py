@@ -8,7 +8,7 @@ from django.db.models import (
     Q,
     Value,
 )
-from django.db.models.expressions import RawSQL
+from django.db.models.expressions import NegatedExpression, RawSQL
 from django.db.models.functions import Lower
 from django.db.models.sql.where import NothingNode
 from django.test import SimpleTestCase, TestCase
@@ -87,7 +87,7 @@ class QTests(SimpleTestCase):
         ]
         for q in tests:
             with self.subTest(q=q):
-                self.assertIs(q.negated, True)
+                self.assertIsInstance(q, NegatedExpression)
 
     def test_deconstruct(self):
         q = Q(price__gt=F("discounted_price"))
