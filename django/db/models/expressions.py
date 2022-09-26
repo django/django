@@ -162,6 +162,9 @@ class Combinable:
             "Use .bitand(), .bitor(), and .bitxor() for bitwise logical operations."
         )
 
+    def __invert__(self):
+        return NegatedExpression(self)
+
 
 class BaseExpression:
     """Base class for all query expressions."""
@@ -827,6 +830,9 @@ class F(Combinable):
     def __hash__(self):
         return hash(self.name)
 
+    def copy(self):
+        return copy.copy(self)
+
 
 class ResolvedOuterRef(F):
     """
@@ -1252,6 +1258,57 @@ class ExpressionWrapper(SQLiteNumericMixin, Expression):
         return "{}({})".format(self.__class__.__name__, self.expression)
 
 
+class NegatedExpression(ExpressionWrapper):
+    """The logical negation of a conditional expression."""
+
+    def __init__(self, expression):
+        super().__init__(expression, output_field=fields.BooleanField())
+
+    def __invert__(self):
+        return self.expression.copy()
+
+    def as_sql(self, compiler, connection):
+        try:
+            sql, params = super().as_sql(compiler, connection)
+        except EmptyResultSet:
+            features = compiler.connection.features
+            if not features.supports_boolean_expr_in_select_clause:
+                return "1=1", ()
+            return compiler.compile(Value(True))
+        ops = compiler.connection.ops
+        # Some database backends (e.g. Oracle) don't allow EXISTS() and filters
+        # to be compared to another expression unless they're wrapped in a CASE
+        # WHEN.
+        if not ops.conditional_expression_supported_in_where_clause(self.expression):
+            return f"CASE WHEN {sql} = 0 THEN 1 ELSE 0 END", params
+        return f"NOT {sql}", params
+
+    def resolve_expression(
+        self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
+    ):
+        resolved = super().resolve_expression(
+            query, allow_joins, reuse, summarize, for_save
+        )
+        if not getattr(resolved.expression, "conditional", False):
+            raise TypeError("Cannot negate non-conditional expressions.")
+        return resolved
+
+    def select_format(self, compiler, sql, params):
+        # Wrap boolean expressions with a CASE WHEN expression if a database
+        # backend (e.g. Oracle) doesn't support boolean expression in SELECT or
+        # GROUP BY list.
+        expression_supported_in_where_clause = (
+            compiler.connection.ops.conditional_expression_supported_in_where_clause
+        )
+        if (
+            not compiler.connection.features.supports_boolean_expr_in_select_clause
+            # Avoid double wrapping.
+            and expression_supported_in_where_clause(self.expression)
+        ):
+            sql = "CASE WHEN {} THEN 1 ELSE 0 END".format(sql)
+        return sql, params
+
+
 @deconstructible(path="django.db.models.When")
 class When(Expression):
     template = "WHEN %(condition)s THEN %(result)s"
@@ -1486,33 +1543,9 @@ class Exists(Subquery):
     template = "EXISTS(%(subquery)s)"
     output_field = fields.BooleanField()
 
-    def __init__(self, queryset, negated=False, **kwargs):
-        self.negated = negated
+    def __init__(self, queryset, **kwargs):
         super().__init__(queryset, **kwargs)
         self.query = self.query.exists()
-
-    def __invert__(self):
-        clone = self.copy()
-        clone.negated = not self.negated
-        return clone
-
-    def as_sql(self, compiler, connection, **extra_context):
-        try:
-            sql, params = super().as_sql(
-                compiler,
-                connection,
-                **extra_context,
-            )
-        except EmptyResultSet:
-            if self.negated:
-                features = compiler.connection.features
-                if not features.supports_boolean_expr_in_select_clause:
-                    return "1=1", ()
-                return compiler.compile(Value(True))
-            raise
-        if self.negated:
-            sql = "NOT {}".format(sql)
-        return sql, params
 
     def select_format(self, compiler, sql, params):
         # Wrap EXISTS() with a CASE WHEN expression if a database backend

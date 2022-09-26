@@ -236,6 +236,9 @@ Models
 * :class:`~django.db.models.functions.Now` now supports microsecond precision
   on MySQL and millisecond precision on SQLite.
 
+* :class:`F() <django.db.models.F>` expressions that output ``BooleanField``
+  can now be negated using ``~F()`` (inversion operator).
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -344,6 +347,9 @@ Miscellaneous
 
 * The minimum supported version of ``sqlparse`` is increased from 0.2.2 to
   0.2.3.
+
+* The undocumented ``negated`` parameter of the
+  :class:`~django.db.models.Exists` expression is removed.
 
 .. _deprecated-features-4.2:
 
