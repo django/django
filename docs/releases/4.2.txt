@@ -319,6 +319,9 @@ Miscellaneous
 * :ttag:`{% blocktranslate asvar … %}<blocktranslate>` result is now marked as
   safe for (HTML) output purposes.
 
+* The ``autofocus`` HTML attribute in the admin search box is removed as it can
+  be confusing for screen readers.
+
 .. _deprecated-features-4.2:
 
 Features deprecated in 4.2
