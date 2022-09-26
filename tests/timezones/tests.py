@@ -1497,18 +1497,14 @@ class AdminTests(TestCase):
 
     @requires_tz_support
     def test_change_readonly(self):
-        Timestamp.objects.create()
-        # re-fetch the object for backends that lose microseconds (MySQL)
-        t = Timestamp.objects.get()
+        t = Timestamp.objects.create()
         response = self.client.get(
             reverse("admin_tz:timezones_timestamp_change", args=(t.pk,))
         )
         self.assertContains(response, t.created.astimezone(EAT).isoformat())
 
     def test_change_readonly_in_other_timezone(self):
-        Timestamp.objects.create()
-        # re-fetch the object for backends that lose microseconds (MySQL)
-        t = Timestamp.objects.get()
+        t = Timestamp.objects.create()
         with timezone.override(ICT):
             response = self.client.get(
                 reverse("admin_tz:timezones_timestamp_change", args=(t.pk,))
