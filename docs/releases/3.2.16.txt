@@ -1,0 +1,9 @@
+===========================
+Django 3.2.16 release notes
+===========================
+
+*October 4, 2022*
+
+Django 3.2.16 fixes a security issue with severity "medium" in 3.2.15.
+
+...
