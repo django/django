@@ -91,6 +91,10 @@ class InlineFormsetTests(TestCase):
             ParentWithUUIDAlternateKey, ChildRelatedViaAK, fields="__all__"
         )
         formset = FormSet()
+
+        # When Child model relation to Parent model UUIDField but this UUIDField
+        # is not primary key so this UUIDField initial value shouldn't be None,
+        # Otherwise it'll generate Integrity error on saving parent model data.
         self.assertIsNotNone(formset.forms[0].fields["parent"].initial)
 
     def test_inlineformset_factory_nulls_default_pks_alternate_key_with_child(self):
