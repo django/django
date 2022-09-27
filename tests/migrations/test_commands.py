@@ -356,6 +356,26 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_book")
 
     @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.migrated_app",
+        ]
+    )
+    def test_migrate_check_migrated_app(self):
+        out = io.StringIO()
+        try:
+            call_command("migrate", "migrated_app", verbosity=0)
+            call_command(
+                "migrate",
+                "migrated_app",
+                stdout=out,
+                check_unapplied=True,
+            )
+            self.assertEqual(out.getvalue(), "")
+        finally:
+            # Unmigrate everything.
+            call_command("migrate", "migrated_app", "zero", verbosity=0)
+
+    @override_settings(
         MIGRATION_MODULES={
             "migrations": "migrations.test_migrations_plan",
         }

@@ -156,3 +156,15 @@ class MigrateSignalTests(TransactionTestCase):
             ],
             ["migrate_signals.Signal"],
         )
+        # Migrating with an empty plan and --check doesn't emit signals.
+        pre_migrate_receiver = Receiver(signals.pre_migrate)
+        post_migrate_receiver = Receiver(signals.post_migrate)
+        management.call_command(
+            "migrate",
+            database=MIGRATE_DATABASE,
+            verbosity=MIGRATE_VERBOSITY,
+            interactive=MIGRATE_INTERACTIVE,
+            check_unapplied=True,
+        )
+        self.assertEqual(pre_migrate_receiver.call_counter, 0)
+        self.assertEqual(post_migrate_receiver.call_counter, 0)
