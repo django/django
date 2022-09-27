@@ -172,3 +172,7 @@ class TestNumberFormat(SimpleTestCase):
 
         price = EuroDecimal("1.23")
         self.assertEqual(nformat(price, ","), "€ 1,23")
+
+    def test_empty(self):
+        self.assertEqual(nformat("", "."), "")
+        self.assertEqual(nformat(None, "."), "None")

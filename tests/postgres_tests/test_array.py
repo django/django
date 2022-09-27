@@ -5,6 +5,7 @@ import unittest
 import uuid
 
 from django import forms
+from django.contrib.admin.utils import display_for_field
 from django.core import checks, exceptions, serializers, validators
 from django.core.exceptions import FieldError
 from django.core.management import call_command
@@ -1366,3 +1367,39 @@ class TestSplitFormWidget(PostgreSQLWidgetTestCase):
             ),
             False,
         )
+
+
+class TestAdminUtils(PostgreSQLTestCase):
+    empty_value = "-empty-"
+
+    def test_array_display_for_field(self):
+        array_field = ArrayField(models.IntegerField())
+        display_value = display_for_field(
+            [1, 2],
+            array_field,
+            self.empty_value,
+        )
+        self.assertEqual(display_value, "1, 2")
+
+    def test_array_with_choices_display_for_field(self):
+        array_field = ArrayField(
+            models.IntegerField(),
+            choices=[
+                ([1, 2, 3], "1st choice"),
+                ([1, 2], "2nd choice"),
+            ],
+        )
+
+        display_value = display_for_field(
+            [1, 2],
+            array_field,
+            self.empty_value,
+        )
+        self.assertEqual(display_value, "2nd choice")
+
+        display_value = display_for_field(
+            [99, 99],
+            array_field,
+            self.empty_value,
+        )
+        self.assertEqual(display_value, self.empty_value)

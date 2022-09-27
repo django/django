@@ -183,11 +183,11 @@ class UserAdmin(admin.ModelAdmin):
             form = self.change_password_form(user)
 
         fieldsets = [(None, {"fields": list(form.base_fields)})]
-        adminForm = admin.helpers.AdminForm(form, fieldsets, {})
+        admin_form = admin.helpers.AdminForm(form, fieldsets, {})
 
         context = {
             "title": _("Change password: %s") % escape(user.get_username()),
-            "adminForm": adminForm,
+            "adminForm": admin_form,
             "form_url": form_url,
             "form": form,
             "is_popup": (IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET),

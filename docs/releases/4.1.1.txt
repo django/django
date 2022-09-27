@@ -2,7 +2,7 @@
 Django 4.1.1 release notes
 ==========================
 
-*Expected September 5, 2022*
+*September 5, 2022*
 
 Django 4.1.1 fixes several bugs in 4.1.
 
@@ -39,3 +39,23 @@ Bugfixes
 * Fixed a regression in Django 4.1 that caused an incorrect migration when
   adding ``AutoField``, ``BigAutoField``, or ``SmallAutoField`` on PostgreSQL
   (:ticket:`33919`).
+
+* Fixed a regression in Django 4.1 that caused a migration crash on PostgreSQL
+  when altering ``AutoField``, ``BigAutoField``, or ``SmallAutoField`` to
+  ``OneToOneField`` (:ticket:`33932`).
+
+* Fixed a migration crash on ``ManyToManyField`` fields with ``through``
+  referencing models in different apps (:ticket:`33938`).
+
+* Fixed a regression in Django 4.1 that caused an incorrect migration when
+  renaming a model with ``ManyToManyField`` and ``db_table`` (:ticket:`33953`).
+
+* Reallowed, following a regression in Django 4.1, creating reverse foreign key
+  managers on unsaved instances (:ticket:`33952`).
+
+* Fixed a regression in Django 4.1 that caused a migration crash on SQLite <
+  3.20 (:ticket:`33960`).
+
+* Fixed a regression in Django 4.1 that caused an admin crash when the
+  :mod:`~django.contrib.admindocs` app was used (:ticket:`33955`,
+  :ticket:`33971`).

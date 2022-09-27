@@ -739,7 +739,7 @@ Django can serialize the following:
 - ``datetime.date``, ``datetime.time``, and ``datetime.datetime`` instances
   (include those that are timezone-aware)
 - ``decimal.Decimal`` instances
-- ``enum.Enum`` instances
+- ``enum.Enum``  and ``enum.Flag`` instances
 - ``uuid.UUID`` instances
 - :func:`functools.partial` and :class:`functools.partialmethod` instances
   which have serializable ``func``, ``args``, and ``keywords`` values.
@@ -755,6 +755,10 @@ Django can serialize the following:
 - Unbound methods used from within the class body
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
+
+.. versionchanged:: 4.2
+
+    Serialization support for ``enum.Flag`` was added.
 
 Django cannot serialize:
 

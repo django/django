@@ -160,7 +160,10 @@ class SQLCompiler:
         expressions = self.collapse_group_by(expressions, having_group_by)
 
         for expr in expressions:
-            sql, params = self.compile(expr)
+            try:
+                sql, params = self.compile(expr)
+            except EmptyResultSet:
+                continue
             sql, params = expr.select_format(self, sql, params)
             params_hash = make_hashable(params)
             if (sql, params_hash) not in seen:
@@ -256,8 +259,9 @@ class SQLCompiler:
             select.append((RawSQL(sql, params), alias))
             select_idx += 1
         assert not (self.query.select and self.query.default_cols)
+        select_mask = self.query.get_select_mask()
         if self.query.default_cols:
-            cols = self.get_default_columns()
+            cols = self.get_default_columns(select_mask)
         else:
             # self.query.select is a special case. These columns never go to
             # any model.
@@ -278,7 +282,7 @@ class SQLCompiler:
             select_idx += 1
 
         if self.query.select_related:
-            related_klass_infos = self.get_related_selections(select)
+            related_klass_infos = self.get_related_selections(select, select_mask)
             klass_info["related_klass_infos"] = related_klass_infos
 
             def get_select_from_parent(klass_info):
@@ -603,24 +607,41 @@ class SQLCompiler:
         select = {
             expr: alias for expr, _, alias in self.get_select(with_col_aliases=True)[0]
         }
+        select_aliases = set(select.values())
         qual_aliases = set()
         replacements = {}
-        expressions = list(self.qualify.leaves())
-        while expressions:
-            expr = expressions.pop()
-            if select_alias := (select.get(expr) or replacements.get(expr)):
-                replacements[expr] = select_alias
-            elif isinstance(expr, Lookup):
-                expressions.extend(expr.get_source_expressions())
-            else:
-                num_qual_alias = len(qual_aliases)
-                select_alias = f"qual{num_qual_alias}"
-                qual_aliases.add(select_alias)
-                inner_query.add_annotation(expr, select_alias)
-                replacements[expr] = select_alias
+
+        def collect_replacements(expressions):
+            while expressions:
+                expr = expressions.pop()
+                if expr in replacements:
+                    continue
+                elif select_alias := select.get(expr):
+                    replacements[expr] = select_alias
+                elif isinstance(expr, Lookup):
+                    expressions.extend(expr.get_source_expressions())
+                elif isinstance(expr, Ref):
+                    if expr.refs not in select_aliases:
+                        expressions.extend(expr.get_source_expressions())
+                else:
+                    num_qual_alias = len(qual_aliases)
+                    select_alias = f"qual{num_qual_alias}"
+                    qual_aliases.add(select_alias)
+                    inner_query.add_annotation(expr, select_alias)
+                    replacements[expr] = select_alias
+
+        collect_replacements(list(self.qualify.leaves()))
         self.qualify = self.qualify.replace_expressions(
             {expr: Ref(alias, expr) for expr, alias in replacements.items()}
         )
+        order_by = []
+        for order_by_expr, *_ in self.get_order_by():
+            collect_replacements(order_by_expr.get_source_expressions())
+            order_by.append(
+                order_by_expr.replace_expressions(
+                    {expr: Ref(alias, expr) for expr, alias in replacements.items()}
+                )
+            )
         inner_query_compiler = inner_query.get_compiler(
             self.using, elide_empty=self.elide_empty
         )
@@ -653,7 +674,18 @@ class SQLCompiler:
                 ")",
                 self.connection.ops.quote_name("qualify_mask"),
             ]
-        return result, list(inner_params) + qualify_params
+        params = list(inner_params) + qualify_params
+        # As the SQL spec is unclear on whether or not derived tables
+        # ordering must propagate it has to be explicitly repeated on the
+        # outer-most query to ensure it's preserved.
+        if order_by:
+            ordering_sqls = []
+            for ordering in order_by:
+                ordering_sql, ordering_params = self.compile(ordering)
+                ordering_sqls.append(ordering_sql)
+                params.extend(ordering_params)
+            result.extend(["ORDER BY", ", ".join(ordering_sqls)])
+        return result, params
 
     def as_sql(self, with_limits=True, with_col_aliases=False):
         """
@@ -870,7 +902,9 @@ class SQLCompiler:
             # Finally do cleanup - get rid of the joins we created above.
             self.query.reset_refcounts(refcounts_before)
 
-    def get_default_columns(self, start_alias=None, opts=None, from_parent=None):
+    def get_default_columns(
+        self, select_mask, start_alias=None, opts=None, from_parent=None
+    ):
         """
         Compute the default columns for selecting every field in the base
         model. Will sometimes be called to pull in related models (e.g. via
@@ -886,7 +920,6 @@ class SQLCompiler:
         if opts is None:
             if (opts := self.query.get_meta()) is None:
                 return result
-        only_load = self.deferred_to_columns()
         start_alias = start_alias or self.query.get_initial_alias()
         # The 'seen_models' is used to optimize checking the needed parent
         # alias for a given field. This also includes None -> start_alias to
@@ -912,7 +945,7 @@ class SQLCompiler:
                 # parent model data is already present in the SELECT clause,
                 # and we want to avoid reloading the same data again.
                 continue
-            if field.model in only_load and field.attname not in only_load[field.model]:
+            if select_mask and field not in select_mask:
                 continue
             alias = self.query.join_parent_model(opts, model, start_alias, seen_models)
             column = field.get_col(alias)
@@ -1063,6 +1096,7 @@ class SQLCompiler:
     def get_related_selections(
         self,
         select,
+        select_mask,
         opts=None,
         root_alias=None,
         cur_depth=1,
@@ -1095,7 +1129,6 @@ class SQLCompiler:
         if not opts:
             opts = self.query.get_meta()
             root_alias = self.query.get_initial_alias()
-        only_load = self.deferred_to_columns()
 
         # Setup for the case when only particular related fields should be
         # included in the related selection.
@@ -1109,7 +1142,6 @@ class SQLCompiler:
             klass_info["related_klass_infos"] = related_klass_infos
 
         for f in opts.fields:
-            field_model = f.model._meta.concrete_model
             fields_found.add(f.name)
 
             if restricted:
@@ -1129,10 +1161,9 @@ class SQLCompiler:
             else:
                 next = False
 
-            if not select_related_descend(
-                f, restricted, requested, only_load.get(field_model)
-            ):
+            if not select_related_descend(f, restricted, requested, select_mask):
                 continue
+            related_select_mask = select_mask.get(f) or {}
             klass_info = {
                 "model": f.remote_field.model,
                 "field": f,
@@ -1148,7 +1179,7 @@ class SQLCompiler:
             _, _, _, joins, _, _ = self.query.setup_joins([f.name], opts, root_alias)
             alias = joins[-1]
             columns = self.get_default_columns(
-                start_alias=alias, opts=f.remote_field.model._meta
+                related_select_mask, start_alias=alias, opts=f.remote_field.model._meta
             )
             for col in columns:
                 select_fields.append(len(select))
@@ -1156,6 +1187,7 @@ class SQLCompiler:
             klass_info["select_fields"] = select_fields
             next_klass_infos = self.get_related_selections(
                 select,
+                related_select_mask,
                 f.remote_field.model._meta,
                 alias,
                 cur_depth + 1,
@@ -1171,8 +1203,9 @@ class SQLCompiler:
                 if o.field.unique and not o.many_to_many
             ]
             for f, model in related_fields:
+                related_select_mask = select_mask.get(f) or {}
                 if not select_related_descend(
-                    f, restricted, requested, only_load.get(model), reverse=True
+                    f, restricted, requested, related_select_mask, reverse=True
                 ):
                     continue
 
@@ -1195,7 +1228,10 @@ class SQLCompiler:
                 related_klass_infos.append(klass_info)
                 select_fields = []
                 columns = self.get_default_columns(
-                    start_alias=alias, opts=model._meta, from_parent=opts.model
+                    related_select_mask,
+                    start_alias=alias,
+                    opts=model._meta,
+                    from_parent=opts.model,
                 )
                 for col in columns:
                     select_fields.append(len(select))
@@ -1203,7 +1239,13 @@ class SQLCompiler:
                 klass_info["select_fields"] = select_fields
                 next = requested.get(f.related_query_name(), {})
                 next_klass_infos = self.get_related_selections(
-                    select, model._meta, alias, cur_depth + 1, next, restricted
+                    select,
+                    related_select_mask,
+                    model._meta,
+                    alias,
+                    cur_depth + 1,
+                    next,
+                    restricted,
                 )
                 get_related_klass_infos(klass_info, next_klass_infos)
 
@@ -1239,7 +1281,9 @@ class SQLCompiler:
                     }
                     related_klass_infos.append(klass_info)
                     select_fields = []
+                    field_select_mask = select_mask.get((name, f)) or {}
                     columns = self.get_default_columns(
+                        field_select_mask,
                         start_alias=alias,
                         opts=model._meta,
                         from_parent=opts.model,
@@ -1251,6 +1295,7 @@ class SQLCompiler:
                     next_requested = requested.get(name, {})
                     next_klass_infos = self.get_related_selections(
                         select,
+                        field_select_mask,
                         opts=model._meta,
                         root_alias=alias,
                         cur_depth=cur_depth + 1,
@@ -1376,16 +1421,6 @@ class SQLCompiler:
                 )
             )
         return result
-
-    def deferred_to_columns(self):
-        """
-        Convert the self.deferred_loading data structure to mapping of table
-        names to sets of column names which are to be loaded. Return the
-        dictionary.
-        """
-        columns = {}
-        self.query.deferred_to_data(columns)
-        return columns
 
     def get_converters(self, expressions):
         converters = {}

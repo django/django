@@ -59,6 +59,8 @@ from django.utils.functional import classproperty
 from django.utils.version import PY310
 from django.views.static import serve
 
+logger = logging.getLogger("django.test")
+
 __all__ = (
     "TestCase",
     "TransactionTestCase",
@@ -1510,10 +1512,23 @@ class TestCase(TransactionTestCase):
         finally:
             while True:
                 callback_count = len(connections[using].run_on_commit)
-                for _, callback in connections[using].run_on_commit[start_count:]:
+                for _, callback, robust in connections[using].run_on_commit[
+                    start_count:
+                ]:
                     callbacks.append(callback)
                     if execute:
-                        callback()
+                        if robust:
+                            try:
+                                callback()
+                            except Exception as e:
+                                logger.error(
+                                    f"Error calling {callback.__qualname__} in "
+                                    f"on_commit() (%s).",
+                                    e,
+                                    exc_info=True,
+                                )
+                        else:
+                            callback()
 
                 if callback_count == len(connections[using].run_on_commit):
                     break

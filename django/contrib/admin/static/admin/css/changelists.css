@@ -223,27 +223,24 @@
 
 /* DATE DRILLDOWN */
 
-.change-list ul.toplinks {
-    display: block;
-    float: left;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-}
-
-.change-list ul.toplinks li {
-    padding: 3px 6px;
+.change-list .toplinks {
+    display: flex;
+    padding-bottom: 5px;
+    flex-wrap: wrap;
+    gap: 3px 17px;
     font-weight: bold;
-    list-style-type: none;
-    display: inline-block;
 }
 
-.change-list ul.toplinks .date-back a {
+.change-list .toplinks a {
+    font-size: 0.8125rem;
+}
+
+.change-list .toplinks .date-back {
     color: var(--body-quiet-color);
 }
 
-.change-list ul.toplinks .date-back a:focus,
-.change-list ul.toplinks .date-back a:hover {
+.change-list .toplinks .date-back:focus,
+.change-list .toplinks .date-back:hover {
     color: var(--link-hover-color);
 }
 
@@ -258,7 +255,13 @@
     vertical-align: baseline;
 }
 
+/* Once the :has() pseudo-class is supported by all browsers, the tr.selected
+   selector and the JS adding the class can be removed. */
 #changelist table tbody tr.selected {
+    background-color: var(--selected-row);
+}
+
+#changelist table tbody tr:has(input[type=checkbox]:checked) {
     background-color: var(--selected-row);
 }
 

@@ -1588,6 +1588,32 @@ class SchemaTests(TransactionTestCase):
         # OneToOneField.
         self.assertEqual(counts, {"fks": expected_fks, "uniques": 1, "indexes": 0})
 
+    def test_autofield_to_o2o(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Note)
+
+        # Rename the field.
+        old_field = Author._meta.get_field("id")
+        new_field = AutoField(primary_key=True)
+        new_field.set_attributes_from_name("note_ptr")
+        new_field.model = Author
+
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+        # Alter AutoField to OneToOneField.
+        new_field_o2o = OneToOneField(Note, CASCADE)
+        new_field_o2o.set_attributes_from_name("note_ptr")
+        new_field_o2o.model = Author
+
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, new_field, new_field_o2o, strict=True)
+        columns = self.column_classes(Author)
+        field_type, _ = columns["note_ptr_id"]
+        self.assertEqual(
+            field_type, connection.features.introspected_field_types["IntegerField"]
+        )
+
     def test_alter_field_fk_keeps_index(self):
         with connection.schema_editor() as editor:
             editor.create_model(Author)
@@ -2693,6 +2719,74 @@ class SchemaTests(TransactionTestCase):
         # Alter it back
         with connection.schema_editor() as editor:
             editor.alter_unique_together(Book, [["author", "title"]], [])
+
+    def _test_composed_index_with_fk(self, index):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+        table = Book._meta.db_table
+        self.assertEqual(Book._meta.indexes, [])
+        Book._meta.indexes = [index]
+        with connection.schema_editor() as editor:
+            editor.add_index(Book, index)
+        self.assertIn(index.name, self.get_constraints(table))
+        Book._meta.indexes = []
+        with connection.schema_editor() as editor:
+            editor.remove_index(Book, index)
+        self.assertNotIn(index.name, self.get_constraints(table))
+
+    def test_composed_index_with_fk(self):
+        index = Index(fields=["author", "title"], name="book_author_title_idx")
+        self._test_composed_index_with_fk(index)
+
+    def test_composed_desc_index_with_fk(self):
+        index = Index(fields=["-author", "title"], name="book_author_title_idx")
+        self._test_composed_index_with_fk(index)
+
+    @skipUnlessDBFeature("supports_expression_indexes")
+    def test_composed_func_index_with_fk(self):
+        index = Index(F("author"), F("title"), name="book_author_title_idx")
+        self._test_composed_index_with_fk(index)
+
+    @skipUnlessDBFeature("supports_expression_indexes")
+    def test_composed_desc_func_index_with_fk(self):
+        index = Index(F("author").desc(), F("title"), name="book_author_title_idx")
+        self._test_composed_index_with_fk(index)
+
+    @skipUnlessDBFeature("supports_expression_indexes")
+    def test_composed_func_transform_index_with_fk(self):
+        index = Index(F("title__lower"), name="book_title_lower_idx")
+        with register_lookup(CharField, Lower):
+            self._test_composed_index_with_fk(index)
+
+    def _test_composed_constraint_with_fk(self, constraint):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+        table = Book._meta.db_table
+        self.assertEqual(Book._meta.constraints, [])
+        Book._meta.constraints = [constraint]
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Book, constraint)
+        self.assertIn(constraint.name, self.get_constraints(table))
+        Book._meta.constraints = []
+        with connection.schema_editor() as editor:
+            editor.remove_constraint(Book, constraint)
+        self.assertNotIn(constraint.name, self.get_constraints(table))
+
+    def test_composed_constraint_with_fk(self):
+        constraint = UniqueConstraint(
+            fields=["author", "title"],
+            name="book_author_title_uniq",
+        )
+        self._test_composed_constraint_with_fk(constraint)
+
+    @skipUnlessDBFeature(
+        "supports_column_check_constraints", "can_introspect_check_constraints"
+    )
+    def test_composed_check_constraint_with_fk(self):
+        constraint = CheckConstraint(check=Q(author__gt=0), name="book_author_check")
+        self._test_composed_constraint_with_fk(constraint)
 
     @skipUnlessDBFeature("allows_multiple_constraints_on_same_fields")
     def test_remove_unique_together_does_not_remove_meta_constraints(self):

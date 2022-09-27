@@ -481,6 +481,7 @@ class ClearableFileInput(FileInput):
                 "clear_checkbox_label": self.clear_checkbox_label,
             }
         )
+        context["widget"]["attrs"].setdefault("disabled", False)
         return context
 
     def value_from_datadict(self, data, files, name):

@@ -1,6 +1,8 @@
 """
 Various complex queries that have been problematic in the past.
 """
+import datetime
+
 from django.db import models
 from django.db.models.functions import Now
 
@@ -64,7 +66,7 @@ class Annotation(models.Model):
 
 
 class DateTimePK(models.Model):
-    date = models.DateTimeField(primary_key=True, auto_now_add=True)
+    date = models.DateTimeField(primary_key=True, default=datetime.datetime.now)
 
 
 class ExtraInfo(models.Model):

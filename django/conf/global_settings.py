@@ -65,6 +65,7 @@ LANGUAGES = [
     ("br", gettext_noop("Breton")),
     ("bs", gettext_noop("Bosnian")),
     ("ca", gettext_noop("Catalan")),
+    ("ckb", gettext_noop("Central Kurdish (Sorani)")),
     ("cs", gettext_noop("Czech")),
     ("cy", gettext_noop("Welsh")),
     ("da", gettext_noop("Danish")),
@@ -154,7 +155,7 @@ LANGUAGES = [
 ]
 
 # Languages using BiDi (right-to-left) layout
-LANGUAGES_BIDI = ["he", "ar", "ar-dz", "fa", "ur"]
+LANGUAGES_BIDI = ["he", "ar", "ar-dz", "ckb", "fa", "ur"]
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.

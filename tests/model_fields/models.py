@@ -1,5 +1,4 @@
 import json
-import os
 import tempfile
 import uuid
 
@@ -265,7 +264,6 @@ if Image:
     # Set up a temp directory for file storage.
     temp_storage_dir = tempfile.mkdtemp()
     temp_storage = FileSystemStorage(temp_storage_dir)
-    temp_upload_to_dir = os.path.join(temp_storage.location, "tests")
 
     class Person(models.Model):
         """

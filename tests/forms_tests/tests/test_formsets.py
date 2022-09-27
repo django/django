@@ -179,6 +179,10 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertTrue(hasattr(formset.empty_form, "custom_kwarg"))
         self.assertEqual(formset.empty_form.custom_kwarg, 1)
 
+    def test_empty_permitted_ignored_empty_form(self):
+        formset = ArticleFormSet(form_kwargs={"empty_permitted": False})
+        self.assertIs(formset.empty_form.empty_permitted, True)
+
     def test_formset_validation(self):
         # FormSet instances can also have an error attribute if validation failed for
         # any of the forms.

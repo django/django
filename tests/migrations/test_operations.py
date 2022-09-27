@@ -1058,8 +1058,8 @@ class OperationTests(OperationTestBase):
             Pony._meta.get_field("riders").remote_field.through.objects.count(), 2
         )
 
-    def test_rename_model_with_db_table_noop(self):
-        app_label = "test_rmwdbtn"
+    def test_rename_model_with_db_table_rename_m2m(self):
+        app_label = "test_rmwdbrm2m"
         project_state = self.apply_operations(
             app_label,
             ProjectState(),
@@ -1069,32 +1069,28 @@ class OperationTests(OperationTestBase):
                     fields=[
                         ("id", models.AutoField(primary_key=True)),
                     ],
-                    options={"db_table": "rider"},
                 ),
                 migrations.CreateModel(
                     "Pony",
                     fields=[
                         ("id", models.AutoField(primary_key=True)),
-                        (
-                            "rider",
-                            models.ForeignKey("%s.Rider" % app_label, models.CASCADE),
-                        ),
+                        ("riders", models.ManyToManyField("Rider")),
                     ],
+                    options={"db_table": "pony"},
                 ),
             ],
         )
-        new_state = project_state.clone()
-        operation = migrations.RenameModel("Rider", "Runner")
-        operation.state_forwards(app_label, new_state)
-
-        with connection.schema_editor() as editor:
-            with self.assertNumQueries(0):
-                operation.database_forwards(app_label, editor, project_state, new_state)
-        with connection.schema_editor() as editor:
-            with self.assertNumQueries(0):
-                operation.database_backwards(
-                    app_label, editor, new_state, project_state
-                )
+        new_state = self.apply_operations(
+            app_label,
+            project_state,
+            operations=[migrations.RenameModel("Pony", "PinkPony")],
+            atomic=connection.features.supports_atomic_references_rename,
+        )
+        Pony = new_state.apps.get_model(app_label, "PinkPony")
+        Rider = new_state.apps.get_model(app_label, "Rider")
+        pony = Pony.objects.create()
+        rider = Rider.objects.create()
+        pony.riders.add(rider)
 
     def test_rename_m2m_target_model(self):
         app_label = "test_rename_m2m_target_model"
@@ -2436,6 +2432,45 @@ class OperationTests(OperationTestBase):
                 ),
                 migrations.AlterField(
                     "Pony", "slug", models.CharField(unique=True, max_length=99)
+                ),
+            ],
+        )
+
+    def test_alter_field_pk_fk_char_to_int(self):
+        app_label = "alter_field_pk_fk_char_to_int"
+        project_state = self.apply_operations(
+            app_label,
+            ProjectState(),
+            operations=[
+                migrations.CreateModel(
+                    name="Parent",
+                    fields=[
+                        ("id", models.CharField(max_length=255, primary_key=True)),
+                    ],
+                ),
+                migrations.CreateModel(
+                    name="Child",
+                    fields=[
+                        ("id", models.BigAutoField(primary_key=True)),
+                        (
+                            "parent",
+                            models.ForeignKey(
+                                f"{app_label}.Parent",
+                                on_delete=models.CASCADE,
+                            ),
+                        ),
+                    ],
+                ),
+            ],
+        )
+        self.apply_operations(
+            app_label,
+            project_state,
+            operations=[
+                migrations.AlterField(
+                    model_name="parent",
+                    name="id",
+                    field=models.BigIntegerField(primary_key=True),
                 ),
             ],
         )

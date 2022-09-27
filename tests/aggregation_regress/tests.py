@@ -554,6 +554,9 @@ class AggregationTests(TestCase):
             325,
         )
 
+    def test_q_annotation_aggregate(self):
+        self.assertEqual(Book.objects.annotate(has_pk=Q(pk__isnull=False)).count(), 6)
+
     def test_decimal_aggregate_annotation_filter(self):
         """
         Filtering on an aggregate annotation with Decimal values should work.

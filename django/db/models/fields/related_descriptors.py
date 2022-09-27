@@ -64,7 +64,13 @@ and two directions (forward and reverse) for a total of six combinations.
 """
 
 from django.core.exceptions import FieldError
-from django.db import DEFAULT_DB_ALIAS, connections, router, transaction
+from django.db import (
+    DEFAULT_DB_ALIAS,
+    NotSupportedError,
+    connections,
+    router,
+    transaction,
+)
 from django.db.models import Q, Window, signals
 from django.db.models.functions import RowNumber
 from django.db.models.lookups import GreaterThan, LessThanOrEqual
@@ -85,13 +91,16 @@ class ForeignKeyDeferredAttribute(DeferredAttribute):
 
 def _filter_prefetch_queryset(queryset, field_name, instances):
     predicate = Q(**{f"{field_name}__in": instances})
+    db = queryset._db or DEFAULT_DB_ALIAS
     if queryset.query.is_sliced:
+        if not connections[db].features.supports_over_clause:
+            raise NotSupportedError(
+                "Prefetching from a limited queryset is only supported on backends "
+                "that support window functions."
+            )
         low_mark, high_mark = queryset.query.low_mark, queryset.query.high_mark
         order_by = [
-            expr
-            for expr, _ in queryset.query.get_compiler(
-                using=queryset._db or DEFAULT_DB_ALIAS
-            ).get_order_by()
+            expr for expr, _ in queryset.query.get_compiler(using=db).get_order_by()
         ]
         window = Window(RowNumber(), partition_by=field_name, order_by=order_by)
         predicate &= GreaterThan(window, low_mark)
@@ -647,15 +656,6 @@ def create_reverse_many_to_one_manager(superclass, rel):
 
             self.core_filters = {self.field.name: instance}
 
-            # Even if this relation is not to pk, we require still pk value.
-            # The wish is that the instance has been already saved to DB,
-            # although having a pk value isn't a guarantee of that.
-            if self.instance.pk is None:
-                raise ValueError(
-                    f"{instance.__class__.__name__!r} instance needs to have a primary "
-                    f"key value before this relationship can be used."
-                )
-
         def __call__(self, *, manager):
             manager = getattr(self.model, manager)
             manager_class = create_reverse_many_to_one_manager(manager.__class__, rel)
@@ -720,6 +720,14 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 pass  # nothing to clear from cache
 
         def get_queryset(self):
+            # Even if this relation is not to pk, we require still pk value.
+            # The wish is that the instance has been already saved to DB,
+            # although having a pk value isn't a guarantee of that.
+            if self.instance.pk is None:
+                raise ValueError(
+                    f"{self.instance.__class__.__name__!r} instance needs to have a "
+                    f"primary key value before this relationship can be used."
+                )
             try:
                 return self.instance._prefetched_objects_cache[
                     self.field.remote_field.get_cache_name()

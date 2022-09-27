@@ -114,16 +114,9 @@ thead th.sorted .text {
     float: right;
 }
 
-.submit-row p.deletelink-box {
-    float: left;
-}
-
-.submit-row input.default {
-    margin: 0 0 5px 5px;
-}
-
-.submit-row input {
-    margin: 0 0 5px 5px;
+.submit-row a.deletelink {
+    margin-left: 0;
+    margin-right: auto;
 }
 
 .vDateField, .vTimeField {
@@ -205,6 +198,38 @@ fieldset .fieldBox {
 
 .selector .selector-filter {
     text-align: right;
+}
+
+.selector-add {
+  background: url(../img/selector-icons.svg) 0 -64px no-repeat;
+}
+
+.active.selector-add:focus, .active.selector-add:hover {
+  background-position: 0 -80px;
+}
+
+.selector-remove {
+  background: url(../img/selector-icons.svg) 0 -96px no-repeat;
+}
+
+.active.selector-remove:focus, .active.selector-remove:hover {
+  background-position: 0 -112px;
+}
+
+a.selector-chooseall {
+    background: url(../img/selector-icons.svg) right -128px no-repeat;
+}
+
+a.active.selector-chooseall:focus, a.active.selector-chooseall:hover {
+    background-position: 100% -144px;
+}
+
+a.selector-clearall {
+    background: url(../img/selector-icons.svg) 0 -160px no-repeat;
+}
+
+a.active.selector-clearall:focus, a.active.selector-clearall:hover {
+    background-position: 0 -176px;
 }
 
 .inline-deletelink {

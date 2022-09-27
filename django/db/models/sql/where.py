@@ -244,6 +244,10 @@ class WhereNode(tree.Node):
     def contains_over_clause(self):
         return self._contains_over_clause(self)
 
+    @property
+    def is_summary(self):
+        return any(child.is_summary for child in self.children)
+
     @staticmethod
     def _resolve_leaf(expr, query, *args, **kwargs):
         if hasattr(expr, "resolve_expression"):

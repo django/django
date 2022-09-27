@@ -27,6 +27,7 @@ from django.db.models import (
 )
 from django.db.models.expressions import RawSQL
 from django.db.models.fields.json import (
+    KT,
     KeyTextTransform,
     KeyTransform,
     KeyTransformFactory,
@@ -370,18 +371,15 @@ class TestQuerying(TestCase):
             ).order_by("key"),
         ):
             self.assertSequenceEqual(qs, [self.objs[4]])
+        none_val = "" if connection.features.interprets_empty_strings_as_nulls else None
         qs = NullableJSONModel.objects.filter(value__isnull=False)
         self.assertQuerysetEqual(
             qs.filter(value__isnull=False)
-            .annotate(
-                key=KeyTextTransform(
-                    "f", KeyTransform("1", KeyTransform("d", "value"))
-                ),
-            )
+            .annotate(key=KT("value__d__1__f"))
             .values("key")
             .annotate(count=Count("key"))
             .order_by("count"),
-            [(None, 0), ("g", 1)],
+            [(none_val, 0), ("g", 1)],
             operator.itemgetter("key", "count"),
         )
 
@@ -493,6 +491,17 @@ class TestQuerying(TestCase):
             .filter(chain="g"),
             [self.objs[4]],
         )
+
+    def test_key_text_transform_char_lookup(self):
+        qs = NullableJSONModel.objects.annotate(
+            char_value=KeyTextTransform("foo", "value"),
+        ).filter(char_value__startswith="bar")
+        self.assertSequenceEqual(qs, [self.objs[7]])
+
+        qs = NullableJSONModel.objects.annotate(
+            char_value=KeyTextTransform(1, KeyTextTransform("bar", "value")),
+        ).filter(char_value__startswith="bar")
+        self.assertSequenceEqual(qs, [self.objs[7]])
 
     def test_expression_wrapper_key_transform(self):
         self.assertCountEqual(
@@ -1066,3 +1075,20 @@ class TestQuerying(TestCase):
             ).filter(chain=F("related_key__0")),
             [related_obj],
         )
+
+    def test_key_text_transform_from_lookup(self):
+        qs = NullableJSONModel.objects.annotate(b=KT("value__bax__foo")).filter(
+            b__contains="ar",
+        )
+        self.assertSequenceEqual(qs, [self.objs[7]])
+        qs = NullableJSONModel.objects.annotate(c=KT("value__o")).filter(
+            c__contains="uot",
+        )
+        self.assertSequenceEqual(qs, [self.objs[4]])
+
+    def test_key_text_transform_from_lookup_invalid(self):
+        msg = "Lookup must contain key or index transforms."
+        with self.assertRaisesMessage(ValueError, msg):
+            KT("value")
+        with self.assertRaisesMessage(ValueError, msg):
+            KT("")

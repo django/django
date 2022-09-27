@@ -516,13 +516,6 @@ underscores to spaces. See :ref:`Verbose field names <verbose-field-names>`.
 A list of validators to run for this field. See the :doc:`validators
 documentation </ref/validators>` for more information.
 
-Registering and fetching lookups
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-``Field`` implements the :ref:`lookup registration API <lookup-registration-api>`.
-The API can be used to customize which lookups are available for a field class, and
-how lookups are fetched from a field.
-
 .. _model-field-types:
 
 Field types
@@ -2241,6 +2234,18 @@ Field API reference
 
         This method must be added to fields prior to 1.7 to migrate its data
         using :doc:`/topics/migrations`.
+
+Registering and fetching lookups
+================================
+
+``Field`` implements the :ref:`lookup registration API <lookup-registration-api>`.
+The API can be used to customize which lookups are available for a field class
+and its instances, and how lookups are fetched from a field.
+
+.. versionchanged:: 4.2
+
+    Support for registering lookups on :class:`~django.db.models.Field`
+    instances was added.
 
 .. _model-field-attributes:
 

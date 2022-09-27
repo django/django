@@ -2,60 +2,90 @@
     DJANGO Admin styles
 */
 
-@import url(fonts.css);
-
 /* VARIABLE DEFINITIONS */
 html[data-theme="light"],
 :root {
-  --primary: #79aec8;
-  --secondary: #417690;
-  --accent: #f5dd5d;
-  --primary-fg: #fff;
+    --primary: #79aec8;
+    --secondary: #417690;
+    --accent: #f5dd5d;
+    --primary-fg: #fff;
 
-  --body-fg: #333;
-  --body-bg: #fff;
-  --body-quiet-color: #666;
-  --body-loud-color: #000;
+    --body-fg: #333;
+    --body-bg: #fff;
+    --body-quiet-color: #666;
+    --body-loud-color: #000;
 
-  --header-color: #ffc;
-  --header-branding-color: var(--accent);
-  --header-bg: var(--secondary);
-  --header-link-color: var(--primary-fg);
+    --header-color: #ffc;
+    --header-branding-color: var(--accent);
+    --header-bg: var(--secondary);
+    --header-link-color: var(--primary-fg);
 
-  --breadcrumbs-fg: #c4dce8;
-  --breadcrumbs-link-fg: var(--body-bg);
-  --breadcrumbs-bg: var(--primary);
+    --breadcrumbs-fg: #c4dce8;
+    --breadcrumbs-link-fg: var(--body-bg);
+    --breadcrumbs-bg: var(--primary);
 
-  --link-fg: #447e9b;
-  --link-hover-color: #036;
-  --link-selected-fg: #5b80b2;
+    --link-fg: #447e9b;
+    --link-hover-color: #036;
+    --link-selected-fg: #5b80b2;
 
-  --hairline-color: #e8e8e8;
-  --border-color: #ccc;
+    --hairline-color: #e8e8e8;
+    --border-color: #ccc;
 
-  --error-fg: #ba2121;
+    --error-fg: #ba2121;
 
-  --message-success-bg: #dfd;
-  --message-warning-bg: #ffc;
-  --message-error-bg: #ffefef;
+    --message-success-bg: #dfd;
+    --message-warning-bg: #ffc;
+    --message-error-bg: #ffefef;
 
-  --darkened-bg: #f8f8f8; /* A bit darker than --body-bg */
-  --selected-bg: #e4e4e4; /* E.g. selected table cells */
-  --selected-row: #ffc;
+    --darkened-bg: #f8f8f8; /* A bit darker than --body-bg */
+    --selected-bg: #e4e4e4; /* E.g. selected table cells */
+    --selected-row: #ffc;
 
-  --button-fg: #fff;
-  --button-bg: var(--primary);
-  --button-hover-bg: #609ab6;
-  --default-button-bg: var(--secondary);
-  --default-button-hover-bg: #205067;
-  --close-button-bg: #888; /* Previously #bbb, contrast 1.92 */
-  --close-button-hover-bg: #747474;
-  --delete-button-bg: #ba2121;
-  --delete-button-hover-bg: #a41515;
+    --button-fg: #fff;
+    --button-bg: var(--primary);
+    --button-hover-bg: #609ab6;
+    --default-button-bg: var(--secondary);
+    --default-button-hover-bg: #205067;
+    --close-button-bg: #747474;
+    --close-button-hover-bg: #333;
+    --delete-button-bg: #ba2121;
+    --delete-button-hover-bg: #a41515;
 
-  --object-tools-fg: var(--button-fg);
-  --object-tools-bg: var(--close-button-bg);
-  --object-tools-hover-bg: var(--close-button-hover-bg);
+    --object-tools-fg: var(--button-fg);
+    --object-tools-bg: var(--close-button-bg);
+    --object-tools-hover-bg: var(--close-button-hover-bg);
+
+    --font-family-primary:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        system-ui,
+        Roboto,
+        "Helvetica Neue",
+        Arial,
+        sans-serif,
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol",
+        "Noto Color Emoji";
+    --font-family-monospace:
+        ui-monospace,
+        Menlo,
+        Monaco,
+        "Cascadia Mono",
+        "Segoe UI Mono",
+        "Roboto Mono",
+        "Oxygen Mono",
+        "Ubuntu Monospace",
+        "Source Code Pro",
+        "Fira Mono",
+        "Droid Sans Mono",
+        "Courier New",
+        monospace,
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol",
+        "Noto Color Emoji";
 }
 
 html, body {
@@ -66,7 +96,7 @@ body {
     margin: 0;
     padding: 0;
     font-size: 0.875rem;
-    font-family: "Roboto","Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
+    font-family: var(--font-family-primary);
     color: var(--body-fg);
     background: var(--body-bg);
 }
@@ -198,7 +228,7 @@ blockquote {
 }
 
 code, pre {
-    font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
+    font-family: var(--font-family-monospace);
     color: var(--body-quiet-color);
     font-size: 0.75rem;
     overflow-x: auto;
@@ -442,7 +472,7 @@ input, textarea, select, .form-row p, form .button {
     margin: 2px 0;
     padding: 2px 3px;
     vertical-align: middle;
-    font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+    font-family: var(--font-family-primary);
     font-weight: normal;
     font-size: 0.8125rem;
 }
@@ -936,7 +966,7 @@ a.deletelink:focus, a.deletelink:hover {
     background: none;
     border: 0;
     cursor: pointer;
-    font-family: "Roboto","Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
+    font-family: var(--font-family-primary);
 }
 
 #user-tools {
@@ -1100,4 +1130,8 @@ a.deletelink:focus, a.deletelink:hover {
 .paginator a:focus, .paginator a:hover {
     color: white;
     background: var(--link-hover-color);
+}
+
+.base-svgs {
+    display: none;
 }

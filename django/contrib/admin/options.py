@@ -1824,7 +1824,7 @@ class ModelAdmin(BaseModelAdmin):
             readonly_fields = flatten_fieldsets(fieldsets)
         else:
             readonly_fields = self.get_readonly_fields(request, obj)
-        adminForm = helpers.AdminForm(
+        admin_form = helpers.AdminForm(
             form,
             list(fieldsets),
             # Clear prepopulated fields on a view-only form to avoid a crash.
@@ -1834,7 +1834,7 @@ class ModelAdmin(BaseModelAdmin):
             readonly_fields,
             model_admin=self,
         )
-        media = self.media + adminForm.media
+        media = self.media + admin_form.media
 
         inline_formsets = self.get_inline_formsets(
             request, formsets, inline_instances, obj
@@ -1852,7 +1852,7 @@ class ModelAdmin(BaseModelAdmin):
             **self.admin_site.each_context(request),
             "title": title % self.opts.verbose_name,
             "subtitle": str(obj) if obj else None,
-            "adminform": adminForm,
+            "adminform": admin_form,
             "object_id": object_id,
             "original": obj,
             "is_popup": IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET,
@@ -2259,7 +2259,7 @@ class ModelAdmin(BaseModelAdmin):
             formset_params = self.get_formset_kwargs(request, obj, inline, prefix)
             formset = FormSet(**formset_params)
 
-            def user_deleted_form(request, obj, formset, index):
+            def user_deleted_form(request, obj, formset, index, inline):
                 """Return whether or not the user deleted the form."""
                 return (
                     inline.has_delete_permission(request, obj)
@@ -2270,7 +2270,7 @@ class ModelAdmin(BaseModelAdmin):
             # data won't be in request.POST), unless the form was deleted.
             if not inline.has_change_permission(request, obj if change else None):
                 for index, form in enumerate(formset.initial_forms):
-                    if user_deleted_form(request, obj, formset, index):
+                    if user_deleted_form(request, obj, formset, index, inline):
                         continue
                     form._errors = {}
                     form.cleaned_data = form.initial

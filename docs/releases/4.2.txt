@@ -35,6 +35,22 @@ Minor features
 * The light or dark color theme of the admin can now be toggled in the UI, as
   well as being set to follow the system setting.
 
+* The admin's font stack now prefers system UI fonts and no longer requires
+  downloading fonts. Additionally, CSS variables are available to more easily
+  override the default font families.
+
+* The :source:`admin/delete_confirmation.html
+  <django/contrib/admin/templates/admin/delete_confirmation.html>` template now
+  has some additional blocks and scripting hooks to ease customization.
+
+* The chosen options of
+  :attr:`~django.contrib.admin.ModelAdmin.filter_horizontal` and
+  :attr:`~django.contrib.admin.ModelAdmin.filter_vertical` widgets are now
+  filterable.
+
+* The ``admin/base.html`` template now has a new block ``nav-breadcrumbs``
+  which contains the navigation landmark and the ``breadcrumbs`` block.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -165,7 +181,7 @@ Generic Views
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added support and translations for the Central Kurdish (Sorani) language.
 
 Logging
 ~~~~~~~
@@ -184,7 +200,7 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* Migrations now support serialization of ``enum.Flag`` objects.
 
 Models
 ~~~~~~
@@ -195,6 +211,17 @@ Models
 
 * :meth:`~.QuerySet.prefetch_related` now supports
   :class:`~django.db.models.Prefetch` objects with sliced querysets.
+
+* :ref:`Registering lookups <lookup-registration-api>` on
+  :class:`~django.db.models.Field` instances is now supported.
+
+* The new ``robust`` argument for :func:`~django.db.transaction.on_commit`
+  allows performing actions that can fail after a database transaction is
+  successfully committed.
+
+* The new :class:`KT() <django.db.models.fields.json.KT>` expression represents
+  the text value of a key, index, or path transform of
+  :class:`~django.db.models.JSONField`.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -291,6 +318,9 @@ Miscellaneous
 
 * :ttag:`{% blocktranslate asvar … %}<blocktranslate>` result is now marked as
   safe for (HTML) output purposes.
+
+* The ``autofocus`` HTML attribute in the admin search box is removed as it can
+  be confusing for screen readers.
 
 .. _deprecated-features-4.2:
 

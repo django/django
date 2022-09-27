@@ -758,6 +758,9 @@ class ManyToOneTests(TestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             th.child_set.count()
+        # The reverse foreign key manager can be created.
+        self.assertEqual(th.child_set.model, Third)
+
         th.save()
         # Now the model is saved, so we will need to execute a query.
         with self.assertNumQueries(1):

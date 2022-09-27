@@ -5875,13 +5875,17 @@ class SeleniumTests(AdminSeleniumTestCase):
         url = self.live_server_url + reverse("admin7:admin_views_pizza_add")
         self.selenium.get(url)
         self.selenium.find_elements(By.LINK_TEXT, "Show")[0].click()
-        filter_box = self.selenium.find_element(By.ID, "id_toppings_filter")
+        from_filter_box = self.selenium.find_element(By.ID, "id_toppings_filter")
         from_box = self.selenium.find_element(By.ID, "id_toppings_from")
+        to_filter_box = self.selenium.find_element(By.ID, "id_toppings_filter_selected")
         to_box = self.selenium.find_element(By.ID, "id_toppings_to")
         self.assertEqual(
-            to_box.get_property("offsetHeight"),
             (
-                filter_box.get_property("offsetHeight")
+                to_filter_box.get_property("offsetHeight")
+                + to_box.get_property("offsetHeight")
+            ),
+            (
+                from_filter_box.get_property("offsetHeight")
                 + from_box.get_property("offsetHeight")
             ),
         )
@@ -5896,13 +5900,21 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         url = self.live_server_url + reverse("admin7:admin_views_question_add")
         self.selenium.get(url)
-        filter_box = self.selenium.find_element(By.ID, "id_related_questions_filter")
+        from_filter_box = self.selenium.find_element(
+            By.ID, "id_related_questions_filter"
+        )
         from_box = self.selenium.find_element(By.ID, "id_related_questions_from")
+        to_filter_box = self.selenium.find_element(
+            By.ID, "id_related_questions_filter_selected"
+        )
         to_box = self.selenium.find_element(By.ID, "id_related_questions_to")
         self.assertEqual(
-            to_box.get_property("offsetHeight"),
             (
-                filter_box.get_property("offsetHeight")
+                to_filter_box.get_property("offsetHeight")
+                + to_box.get_property("offsetHeight")
+            ),
+            (
+                from_filter_box.get_property("offsetHeight")
                 + from_box.get_property("offsetHeight")
             ),
         )
@@ -6166,7 +6178,20 @@ class SeleniumTests(AdminSeleniumTestCase):
         ]
         self.assertEqual(
             fonts,
-            ["Roboto", "Lucida Grande", "Verdana", "Arial", "sans-serif"],
+            [
+                "-apple-system",
+                "BlinkMacSystemFont",
+                "Segoe UI",
+                "system-ui",
+                "Roboto",
+                "Helvetica Neue",
+                "Arial",
+                "sans-serif",
+                "Apple Color Emoji",
+                "Segoe UI Emoji",
+                "Segoe UI Symbol",
+                "Noto Color Emoji",
+            ],
         )
 
     def test_search_input_filtered_page(self):
