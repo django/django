@@ -4,7 +4,7 @@ Django 4.1.2 release notes
 
 *October 4, 2022*
 
-Django 4.1.2 fixes a security issue with severity "medium" several bugs in
+Django 4.1.2 fixes a security issue with severity "medium" and several bugs in
 4.1.1.
 
 Bugfixes
