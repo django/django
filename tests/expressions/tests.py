@@ -2416,7 +2416,13 @@ class CombinedExpressionTests(SimpleTestCase):
             (IntegerField, FloatField, FloatField),
             (FloatField, IntegerField, FloatField),
         ]
-        connectors = [Combinable.ADD, Combinable.SUB, Combinable.MUL, Combinable.DIV]
+        connectors = [
+            Combinable.ADD,
+            Combinable.SUB,
+            Combinable.MUL,
+            Combinable.DIV,
+            Combinable.MOD,
+        ]
         for lhs, rhs, combined in tests:
             for connector in connectors:
                 with self.subTest(
