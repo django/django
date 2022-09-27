@@ -1,0 +1,9 @@
+==========================
+Django 4.0.8 release notes
+==========================
+
+*October 4, 2022*
+
+Django 4.0.8 fixes a security issue with severity "medium" in 4.0.7.
+
+...
