@@ -2,9 +2,10 @@
 Django 4.1.2 release notes
 ==========================
 
-*Expected October 4, 2022*
+*October 4, 2022*
 
-Django 4.1.2 fixes several bugs in 4.1.1.
+Django 4.1.2 fixes a security issue with severity "medium" several bugs in
+4.1.1.
 
 Bugfixes
 ========
