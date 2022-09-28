@@ -1639,12 +1639,12 @@ class AggregateTestCase(TestCase):
             )
             .annotate(count=Count("authors"))
         )
-        self.assertSequenceEqual(books_qs, [book])
-        # FIXME: GROUP BY doesn't need to include a subquery with
-        # non-multivalued JOINs, see Col.possibly_multivalued (refs #31150):
-        # with self.assertNumQueries(1) as ctx:
-        #     self.assertSequenceEqual(books_qs, [book])
-        # self.assertEqual(ctx[0]['sql'].count('SELECT'), 2)
+        with self.assertNumQueries(1) as ctx:
+            self.assertSequenceEqual(books_qs, [book])
+        # Outerquery SELECT, annotation SELECT, and WHERE SELECT but GROUP BY
+        # selected alias, if allowed.
+        if connection.features.allows_group_by_refs:
+            self.assertEqual(ctx[0]["sql"].count("SELECT"), 3)
 
     @skipUnlessDBFeature("supports_subqueries_in_group_by")
     def test_aggregation_nested_subquery_outerref(self):

@@ -123,6 +123,7 @@ class SQLCompiler:
         if self.query.group_by is None:
             return []
         expressions = []
+        allows_group_by_refs = self.connection.features.allows_group_by_refs
         if self.query.group_by is not True:
             # If the group by is set to a list (by .values() call most likely),
             # then we need to add everything in it to the GROUP BY clause.
@@ -132,20 +133,21 @@ class SQLCompiler:
             for expr in self.query.group_by:
                 if not hasattr(expr, "as_sql"):
                     expr = self.query.resolve_ref(expr)
-                if not self.connection.features.allows_group_by_refs and isinstance(
-                    expr, Ref
-                ):
+                if not allows_group_by_refs and isinstance(expr, Ref):
                     expr = expr.source
                 expressions.append(expr)
         # Note that even if the group_by is set, it is only the minimal
         # set to group by. So, we need to add cols in select, order_by, and
         # having into the select in any case.
         ref_sources = {expr.source for expr in expressions if isinstance(expr, Ref)}
-        for expr, _, _ in select:
+        aliased_exprs = {}
+        for expr, _, alias in select:
             # Skip members of the select clause that are already included
             # by reference.
             if expr in ref_sources:
                 continue
+            if alias:
+                aliased_exprs[expr] = alias
             cols = expr.get_group_by_cols()
             for col in cols:
                 expressions.append(col)
@@ -163,6 +165,8 @@ class SQLCompiler:
         expressions = self.collapse_group_by(expressions, having_group_by)
 
         for expr in expressions:
+            if allows_group_by_refs and (alias := aliased_exprs.get(expr)):
+                expr = Ref(alias, expr)
             try:
                 sql, params = self.compile(expr)
             except EmptyResultSet:
