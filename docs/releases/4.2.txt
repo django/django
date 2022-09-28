@@ -274,7 +274,8 @@ Utilities
 Validators
 ~~~~~~~~~~
 
-* ...
+* The list of common passwords used by ``CommonPasswordValidator`` is updated
+  to the most recent version.
 
 .. _backwards-incompatible-4.2:
 
