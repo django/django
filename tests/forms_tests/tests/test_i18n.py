@@ -84,12 +84,12 @@ class FormsI18nTests(SimpleTestCase):
             '<div id="id_somechoice">\n'
             '<div><label for="id_somechoice_0">'
             '<input type="radio" id="id_somechoice_0" value="\xc5" name="somechoice" '
-            "required> En tied\xe4</label></div>\n"
+            "required> <span>En tied\xe4</span></label></div>\n"
             '<div><label for="id_somechoice_1">'
             '<input type="radio" id="id_somechoice_1" value="\xf8" name="somechoice" '
-            'required> Mies</label></div>\n<div><label for="id_somechoice_2">'
+            'required> <span>Mies</span></label></div>\n<div><label for="id_somechoice_2">'
             '<input type="radio" id="id_somechoice_2" value="\xdf" name="somechoice" '
-            "required> Nainen</label></div>\n</div></p>",
+            "required> <span>Nainen</span></label></div>\n</div></p>",
         )
 
         # Translated error messages
