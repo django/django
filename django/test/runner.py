@@ -398,6 +398,7 @@ def _init_worker(
     serialized_contents=None,
     process_setup=None,
     process_setup_args=None,
+    debug_mode=None,
 ):
     """
     Switch to databases dedicated to this worker.
@@ -420,7 +421,7 @@ def _init_worker(
                 process_setup_args = ()
             process_setup(*process_setup_args)
         django.setup()
-        setup_test_environment()
+        setup_test_environment(debug=debug_mode)
 
     for alias in connections:
         connection = connections[alias]
@@ -473,10 +474,13 @@ class ParallelTestSuite(unittest.TestSuite):
     run_subsuite = _run_subsuite
     runner_class = RemoteTestRunner
 
-    def __init__(self, subsuites, processes, failfast=False, buffer=False):
+    def __init__(
+        self, subsuites, processes, failfast=False, debug_mode=False, buffer=False
+    ):
         self.subsuites = subsuites
         self.processes = processes
         self.failfast = failfast
+        self.debug_mode = debug_mode
         self.buffer = buffer
         self.initial_settings = None
         self.serialized_contents = None
@@ -508,6 +512,7 @@ class ParallelTestSuite(unittest.TestSuite):
                 self.serialized_contents,
                 self.process_setup.__func__,
                 self.process_setup_args,
+                self.debug_mode,
             ],
         )
         args = [
@@ -933,6 +938,7 @@ class DiscoverRunner:
                     subsuites,
                     processes,
                     self.failfast,
+                    self.debug_mode,
                     self.buffer,
                 )
         return suite
