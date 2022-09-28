@@ -23,3 +23,6 @@ Bugfixes
 * Fixed a regression in Django 4.1 that caused a
   ``QuerySet.values()/values_list()`` crash on ``ArrayAgg()`` and
   ``JSONBAgg()`` (:ticket:`34016`).
+
+* Fixed a regression in Django 4.1 where the app registry was not populated
+  running parallel tests with the spawn start-method (:ticket:`340101`).
