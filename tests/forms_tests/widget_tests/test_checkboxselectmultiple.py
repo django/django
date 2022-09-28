@@ -17,13 +17,13 @@ class CheckboxSelectMultipleTest(WidgetTest):
             ["J"],
             html="""
             <div>
-            <div><label><input checked type="checkbox" name="beatles" value="J"> John
+            <div><label><input checked type="checkbox" name="beatles" value="J"> <span>John</span>
             </label></div>
-            <div><label><input type="checkbox" name="beatles" value="P"> Paul
+            <div><label><input type="checkbox" name="beatles" value="P"> <span>Paul</span>
             </label></div>
-            <div><label><input type="checkbox" name="beatles" value="G"> George
+            <div><label><input type="checkbox" name="beatles" value="G"> <span>George</span>
             </label></div>
-            <div><label><input type="checkbox" name="beatles" value="R"> Ringo
+            <div><label><input type="checkbox" name="beatles" value="R"> <span>Ringo</span>
             </label></div>
             </div>
         """,
@@ -36,13 +36,13 @@ class CheckboxSelectMultipleTest(WidgetTest):
             ["J", "P"],
             html="""
             <div>
-            <div><label><input checked type="checkbox" name="beatles" value="J"> John
+            <div><label><input checked type="checkbox" name="beatles" value="J"> <span>John</span>
             </label></div>
-            <div><label><input checked type="checkbox" name="beatles" value="P"> Paul
+            <div><label><input checked type="checkbox" name="beatles" value="P"> <span>Paul</span>
             </label></div>
-            <div><label><input type="checkbox" name="beatles" value="G"> George
+            <div><label><input type="checkbox" name="beatles" value="G"> <span>George</span>
             </label></div>
-            <div><label><input type="checkbox" name="beatles" value="R"> Ringo
+            <div><label><input type="checkbox" name="beatles" value="R"> <span>Ringo</span>
             </label></div>
             </div>
         """,
@@ -59,15 +59,15 @@ class CheckboxSelectMultipleTest(WidgetTest):
             None,
             html="""
             <div>
-            <div><label><input type="checkbox" name="beatles" value=""> Unknown
+            <div><label><input type="checkbox" name="beatles" value=""> <span>Unknown</span>
             </label></div>
-            <div><label><input type="checkbox" name="beatles" value="J"> John
+            <div><label><input type="checkbox" name="beatles" value="J"> <span>John</span>
             </label></div>
-            <div><label><input type="checkbox" name="beatles" value="P"> Paul
+            <div><label><input type="checkbox" name="beatles" value="P"> <span>Paul</span>
             </label></div>
-            <div><label><input type="checkbox" name="beatles" value="G"> George
+            <div><label><input type="checkbox" name="beatles" value="G"> <span>George</span>
             </label></div>
-            <div><label><input type="checkbox" name="beatles" value="R"> Ringo
+            <div><label><input type="checkbox" name="beatles" value="R"> <span>Ringo</span>
             </label></div>
             </div>
         """,
@@ -82,23 +82,23 @@ class CheckboxSelectMultipleTest(WidgetTest):
         html = """
         <div id="media">
         <div> <label for="media_0">
-        <input type="checkbox" name="nestchoice" value="unknown" id="media_0"> Unknown
+        <input type="checkbox" name="nestchoice" value="unknown" id="media_0"> <span>Unknown</span>
         </label></div>
         <div>
-        <label>Audio</label>
+        <label><span>Audio</span></label>
         <div> <label for="media_1_0">
         <input checked type="checkbox" name="nestchoice" value="vinyl" id="media_1_0">
-        Vinyl</label></div>
+        <span>Vinyl</span></label></div>
         <div> <label for="media_1_1">
-        <input type="checkbox" name="nestchoice" value="cd" id="media_1_1"> CD
+        <input type="checkbox" name="nestchoice" value="cd" id="media_1_1"> <span>CD</span>
         </label></div>
         </div><div>
-        <label>Video</label>
+        <label><span>Video</span></label>
         <div> <label for="media_2_0">
-        <input type="checkbox" name="nestchoice" value="vhs" id="media_2_0"> VHS
+        <input type="checkbox" name="nestchoice" value="vhs" id="media_2_0"> <span>VHS</span>
         </label></div>
         <div> <label for="media_2_1">
-        <input type="checkbox" name="nestchoice" value="dvd" id="media_2_1" checked> DVD
+        <input type="checkbox" name="nestchoice" value="dvd" id="media_2_1" checked> <span>DVD</span>
         </label></div>
         </div>
         </div>
@@ -120,20 +120,20 @@ class CheckboxSelectMultipleTest(WidgetTest):
         html = """
         <div>
         <div> <label>
-        <input type="checkbox" name="nestchoice" value="unknown"> Unknown</label></div>
+        <input type="checkbox" name="nestchoice" value="unknown"> <span>Unknown</span></label></div>
         <div>
-        <label>Audio</label>
+        <label><span>Audio</span></label>
         <div> <label>
-        <input checked type="checkbox" name="nestchoice" value="vinyl"> Vinyl
+        <input checked type="checkbox" name="nestchoice" value="vinyl"> <span>Vinyl</span>
         </label></div>
         <div> <label>
-        <input type="checkbox" name="nestchoice" value="cd"> CD</label></div>
+        <input type="checkbox" name="nestchoice" value="cd"> <span>CD</span></label></div>
         </div><div>
-        <label>Video</label>
+        <label><span>Video</span></label>
         <div> <label>
-        <input type="checkbox" name="nestchoice" value="vhs"> VHS</label></div>
+        <input type="checkbox" name="nestchoice" value="vhs"> <span>VHS</span></label></div>
         <div> <label>
-        <input type="checkbox" name="nestchoice" value="dvd"checked> DVD</label></div>
+        <input type="checkbox" name="nestchoice" value="dvd"checked> <span>DVD</span></label></div>
         </div>
         </div>
         """
@@ -153,13 +153,13 @@ class CheckboxSelectMultipleTest(WidgetTest):
         <div id="abc">
         <div>
         <label for="abc_0">
-        <input checked type="checkbox" name="letters" value="a" id="abc_0"> A</label>
+        <input checked type="checkbox" name="letters" value="a" id="abc_0"> <span>A</span></label>
         </div>
         <div><label for="abc_1">
-        <input type="checkbox" name="letters" value="b" id="abc_1"> B</label></div>
+        <input type="checkbox" name="letters" value="b" id="abc_1"> <span>B</span></label></div>
         <div>
         <label for="abc_2">
-        <input checked type="checkbox" name="letters" value="c" id="abc_2"> C</label>
+        <input checked type="checkbox" name="letters" value="c" id="abc_2"> <span>C</span></label>
         </div>
         </div>
         """
@@ -182,13 +182,13 @@ class CheckboxSelectMultipleTest(WidgetTest):
         <div id="abc">
         <div>
         <label for="abc_0">
-        <input checked type="checkbox" name="letters" value="a" id="abc_0"> A</label>
+        <input checked type="checkbox" name="letters" value="a" id="abc_0"> <span>A</span></label>
         </div>
         <div><label for="abc_1">
-        <input type="checkbox" name="letters" value="b" id="abc_1"> B</label></div>
+        <input type="checkbox" name="letters" value="b" id="abc_1"> <span>B</span></label></div>
         <div>
         <label for="abc_2">
-        <input checked type="checkbox" name="letters" value="c" id="abc_2"> C</label>
+        <input checked type="checkbox" name="letters" value="c" id="abc_2"> <span>C</span></label>
         </div>
         </div>
         """
@@ -203,11 +203,11 @@ class CheckboxSelectMultipleTest(WidgetTest):
         ]
         html = """
         <div>
-        <div><label><input type="checkbox" name="numbers" value="1"> One</label></div>
+        <div><label><input type="checkbox" name="numbers" value="1"> <span>One</span></label></div>
         <div><label>
-        <input type="checkbox" name="numbers" value="1000"> One thousand</label></div>
+        <input type="checkbox" name="numbers" value="1000"> <span>One thousand</span></label></div>
         <div><label>
-        <input type="checkbox" name="numbers" value="1000000"> One million</label></div>
+        <input type="checkbox" name="numbers" value="1000000"> <span>One million</span></label></div>
         </div>
         """
         self.check_html(self.widget(choices=choices), "numbers", None, html=html)
@@ -219,9 +219,9 @@ class CheckboxSelectMultipleTest(WidgetTest):
         html = """
         <div>
         <div><label>
-        <input type="checkbox" name="times" value="00:00:00"> midnight</label></div>
+        <input type="checkbox" name="times" value="00:00:00"> <span>midnight</span></label></div>
         <div><label>
-        <input type="checkbox" name="times" value="12:00:00"> noon</label></div>
+        <input type="checkbox" name="times" value="12:00:00"> <span>noon</span></label></div>
         </div>
         """
         self.check_html(self.widget(choices=choices), "times", None, html=html)
@@ -266,12 +266,12 @@ class CheckboxSelectMultipleTest(WidgetTest):
             form.render(),
             '<div><fieldset><legend>Field:</legend><div id="id_field">'
             '<div><label for="id_field_0"><input type="checkbox" '
-            'name="field" value="J" id="id_field_0"> John</label></div>'
+            'name="field" value="J" id="id_field_0"> <span>John</span></label></div>'
             '<div><label for="id_field_1"><input type="checkbox" '
-            'name="field" value="P" id="id_field_1">Paul</label></div>'
+            'name="field" value="P" id="id_field_1"><span>Paul</span></label></div>'
             '<div><label for="id_field_2"><input type="checkbox" '
-            'name="field" value="G" id="id_field_2"> George</label></div>'
+            'name="field" value="G" id="id_field_2"> <span>George</span></label></div>'
             '<div><label for="id_field_3"><input type="checkbox" '
             'name="field" value="R" id="id_field_3">'
-            "Ringo</label></div></div></fieldset></div>",
+            "<span>Ringo</span></label></div></div></fieldset></div>",
         )
