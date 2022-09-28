@@ -1147,13 +1147,11 @@ class Query(BaseExpression):
             if col.alias in self.external_aliases
         ]
 
-    def get_group_by_cols(self, alias=None, wrapper=None):
+    def get_group_by_cols(self, wrapper=None):
         # If wrapper is referenced by an alias for an explicit GROUP BY through
         # values() a reference to this expression and not the self must be
         # returned to ensure external column references are not grouped against
         # as well.
-        if alias:
-            return [Ref(alias, wrapper or self)]
         external_cols = self.get_external_cols()
         if any(col.possibly_multivalued for col in external_cols):
             return [wrapper or self]
@@ -2247,11 +2245,16 @@ class Query(BaseExpression):
                 self.select = tuple(values_select.values())
                 self.values_select = tuple(values_select)
         group_by = list(self.select)
-        if self.annotation_select:
-            for alias, annotation in self.annotation_select.items():
-                if not allow_aliases or alias in column_names:
-                    alias = None
-                group_by_cols = annotation.get_group_by_cols(alias=alias)
+        for alias, annotation in self.annotation_select.items():
+            if not (group_by_cols := annotation.get_group_by_cols()):
+                continue
+            if (
+                allow_aliases
+                and alias not in column_names
+                and not annotation.contains_aggregate
+            ):
+                group_by.append(Ref(alias, annotation))
+            else:
                 group_by.extend(group_by_cols)
         self.group_by = tuple(group_by)
 

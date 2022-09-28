@@ -329,6 +329,8 @@ Miscellaneous
 * The :option:`makemigrations --check` option no longer creates missing
   migration files.
 
+* The ``alias`` argument for :meth:`.Expression.get_group_by_cols` is removed.
+
 .. _deprecated-features-4.2:
 
 Features deprecated in 4.2
