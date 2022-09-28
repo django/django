@@ -5,6 +5,7 @@ class Product(models.Model):
     price = models.IntegerField(null=True)
     discounted_price = models.IntegerField(null=True)
     unit = models.CharField(max_length=15, null=True)
+    data = models.JSONField(default=dict)
 
     class Meta:
         required_db_features = {

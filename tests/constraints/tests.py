@@ -251,6 +251,19 @@ class CheckConstraintTests(TestCase):
         )
         constraint.validate(Product, Product())
 
+    def test_validate_json_key_transform(self):
+        constraint = models.CheckConstraint(
+            check=models.Q(data__key="val"),
+            name="key_transform",
+        )
+        constraint.validate(Product, Product(data={"key": "val"}))
+        # validate() should not raise an error if there's no "key": "val" property.
+        constraint.validate(Product, Product())
+        # validate() should raise an error if "key" has a value other than "val".
+        msg = f"Constraint “{constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(Product, Product(data={"key": "not-val"}))
+
 
 class UniqueConstraintTests(TestCase):
     @classmethod

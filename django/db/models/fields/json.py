@@ -92,6 +92,13 @@ class JSONField(CheckFieldDefaultMixin, Field):
     def get_internal_type(self):
         return "JSONField"
 
+    def get_placeholder(self, value, compiler, connection):
+        return (
+            "%s::{}".format(self.db_type(connection))
+            if connection.vendor == "postgresql"
+            else "%s"
+        )
+
     def get_prep_value(self, value):
         if value is None:
             return value
