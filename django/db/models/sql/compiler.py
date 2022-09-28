@@ -535,8 +535,8 @@ class SQLCompiler:
             if not query.is_empty()
         ]
         if not features.supports_slicing_ordering_in_compound:
-            for query, compiler in zip(self.query.combined_queries, compilers):
-                if query.low_mark or query.high_mark:
+            for compiler in compilers:
+                if compiler.query.is_sliced:
                     raise DatabaseError(
                         "LIMIT/OFFSET not allowed in subqueries of compound statements."
                     )
@@ -544,6 +544,11 @@ class SQLCompiler:
                     raise DatabaseError(
                         "ORDER BY not allowed in subqueries of compound statements."
                     )
+        elif self.query.is_sliced and combinator == "union":
+            limit = (self.query.low_mark, self.query.high_mark)
+            for compiler in compilers:
+                if not compiler.query.is_sliced:
+                    compiler.query.set_limits(*limit)
         parts = ()
         for compiler in compilers:
             try:

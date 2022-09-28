@@ -1440,9 +1440,7 @@ class AggregateTestCase(TestCase):
             .annotate(cnt=Count("isbn"))
             .filter(cnt__gt=1)
         )
-        query = publishers_having_more_than_one_book_qs.query.exists(
-            using=connection.alias
-        )
+        query = publishers_having_more_than_one_book_qs.query.exists()
         _, _, group_by = query.get_compiler(connection=connection).pre_sql_setup()
         self.assertEqual(len(group_by), 1)
 
