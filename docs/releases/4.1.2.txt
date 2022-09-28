@@ -27,3 +27,7 @@ Bugfixes
 * Fixed a bug in Django 4.1 that caused :attr:`.ModelAdmin.autocomplete_fields`
   to be incorrectly selected after adding/changing related instances via popups
   (:ticket:`34025`).
+
+* Fixed a regression in Django 4.1 where the app registry was not populated
+  when running parallel tests with the ``multiprocessing`` start method
+  ``spawn`` (:ticket:`34010`).
