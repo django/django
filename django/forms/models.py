@@ -538,7 +538,12 @@ class BaseModelForm(BaseForm):
             )
         if commit:
             # If committing, save the instance and the m2m data immediately.
-            self.instance.save()
+            save_kwargs = {}
+
+            if self.changed_data:
+                save_kwargs['update_fields'] = self.changed_data.keys()
+
+            self.instance.save(**save_kwargs)
             self._save_m2m()
         else:
             # If not committing, add a method to the form to allow deferred
