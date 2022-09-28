@@ -17,6 +17,7 @@ from contextlib import contextmanager
 from importlib import import_module
 from io import StringIO
 
+import django
 from django.core.management import call_command
 from django.db import connections
 from django.test import SimpleTestCase, TestCase
@@ -418,6 +419,7 @@ def _init_worker(
             if process_setup_args is None:
                 process_setup_args = ()
             process_setup(*process_setup_args)
+        django.setup()
         setup_test_environment()
 
     for alias in connections:
