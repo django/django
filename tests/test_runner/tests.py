@@ -713,7 +713,9 @@ class TestRunnerInitializerTests(SimpleTestCase):
                 runner = self.test_runner(**kwargs)
                 return runner.run(suite)
 
-        runner = StubTestRunner(verbosity=0, interactive=False, parallel=2)
+        runner = StubTestRunner(
+            verbosity=0, interactive=False, parallel=2, debug_mode=True
+        )
         with self.assertRaisesMessage(Exception, "multiprocessing.Pool()"):
             runner.run_tests(
                 [
@@ -723,6 +725,9 @@ class TestRunnerInitializerTests(SimpleTestCase):
             )
         # Initializer must be a function.
         self.assertIs(mocked_pool.call_args.kwargs["initializer"], _init_worker)
+        initargs = mocked_pool.call_args.kwargs["initargs"]
+        self.assertEqual(len(initargs), 6)
+        self.assertEqual(initargs[5], True)  # debug_mode
 
 
 class Ticket17477RegressionTests(AdminScriptTestCase):
