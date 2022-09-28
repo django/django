@@ -556,7 +556,7 @@ class Query(BaseExpression):
     def has_filters(self):
         return self.where
 
-    def exists(self, using, limit=True):
+    def exists(self, limit=True):
         q = self.clone()
         if not (q.distinct and q.is_sliced):
             if q.group_by is True:
@@ -568,11 +568,8 @@ class Query(BaseExpression):
                 q.set_group_by(allow_aliases=False)
             q.clear_select_clause()
         if q.combined_queries and q.combinator == "union":
-            limit_combined = connections[
-                using
-            ].features.supports_slicing_ordering_in_compound
             q.combined_queries = tuple(
-                combined_query.exists(using, limit=limit_combined)
+                combined_query.exists(limit=False)
                 for combined_query in q.combined_queries
             )
         q.clear_ordering(force=True)
@@ -1150,12 +1147,16 @@ class Query(BaseExpression):
             if col.alias in self.external_aliases
         ]
 
-    def get_group_by_cols(self, alias=None):
+    def get_group_by_cols(self, alias=None, wrapper=None):
+        # If wrapper is referenced by an alias for an explicit GROUP BY
+        # through values() a reference to this expression and not the
+        # self must be returned to ensure external column references are
+        # not grouped against as well.
         if alias:
-            return [Ref(alias, self)]
+            return [Ref(alias, wrapper or self)]
         external_cols = self.get_external_cols()
         if any(col.possibly_multivalued for col in external_cols):
-            return [self]
+            return [wrapper or self]
         return external_cols
 
     def as_sql(self, compiler, connection):
