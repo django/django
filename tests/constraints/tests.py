@@ -6,7 +6,7 @@ from django.db.models import F
 from django.db.models.constraints import BaseConstraint
 from django.db.models.functions import Lower
 from django.db.transaction import atomic
-from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
 from .models import (
     ChildModel,
@@ -234,19 +234,10 @@ class CheckConstraintTests(TestCase):
         constraint.validate(Product, Product(price=501, discounted_price=5))
         constraint.validate(Product, Product(price=499, discounted_price=5))
 
-    @skipUnlessDBFeature("supports_comparing_boolean_expr")
     def test_validate_nullable_field_with_none(self):
         # Nullable fields should be considered valid on None values.
         constraint = models.CheckConstraint(
             check=models.Q(price__gte=0),
-            name="positive_price",
-        )
-        constraint.validate(Product, Product())
-
-    @skipIfDBFeature("supports_comparing_boolean_expr")
-    def test_validate_nullable_field_with_isnull(self):
-        constraint = models.CheckConstraint(
-            check=models.Q(price__gte=0) | models.Q(price__isnull=True),
             name="positive_price",
         )
         constraint.validate(Product, Product())

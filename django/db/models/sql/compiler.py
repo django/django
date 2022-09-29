@@ -2028,6 +2028,17 @@ class SQLAggregateCompiler(SQLCompiler):
         return sql, params
 
 
+class SQLCheckCompiler(SQLCompiler):
+    col_count = 1
+    check_sql = """\
+SELECT 1 WHERE COALESCE(%s, TRUE)
+"""
+
+    def as_sql(self):
+        condition, params = self.compile(self.query.where)
+        return self.check_sql % condition, params
+
+
 def cursor_iter(cursor, sentinel, col_count, itersize):
     """
     Yield blocks of rows from a cursor and ensure the cursor is closed when

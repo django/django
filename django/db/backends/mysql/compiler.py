@@ -78,3 +78,7 @@ class SQLUpdateCompiler(compiler.SQLUpdateCompiler, SQLCompiler):
 
 class SQLAggregateCompiler(compiler.SQLAggregateCompiler, SQLCompiler):
     pass
+
+
+class SQLCheckCompiler(compiler.SQLCheckCompiler, SQLCompiler):
+    pass

@@ -2,11 +2,21 @@
 Query subclasses which provide extra functionality beyond simple data retrieval.
 """
 
+import logging
+
 from django.core.exceptions import FieldError
-from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE, NO_RESULTS
+from django.db import DatabaseError
+from django.db.models.sql.constants import (
+    CURSOR,
+    GET_ITERATOR_CHUNK_SIZE,
+    NO_RESULTS,
+    SINGLE,
+)
 from django.db.models.sql.query import Query
 
-__all__ = ["DeleteQuery", "UpdateQuery", "InsertQuery", "AggregateQuery"]
+__all__ = ["DeleteQuery", "UpdateQuery", "InsertQuery", "AggregateQuery", "CheckQuery"]
+
+logger = logging.getLogger("django.db.models")
 
 
 class DeleteQuery(Query):
@@ -169,3 +179,26 @@ class AggregateQuery(Query):
     def __init__(self, model, inner_query):
         self.inner_query = inner_query
         super().__init__(model)
+
+
+class CheckQuery(Query):
+    compiler = "SQLCheckCompiler"
+
+    def __init__(self):
+        super().__init__(model=None)
+
+    def do_check(self, q, against, using):
+        from django.db.models import Value
+
+        for name, value in against.items():
+            if not hasattr(value, "resolve_expression"):
+                value = Value(value)
+            self.add_annotation(value, name, select=False)
+        # This will raise a FieldError if a field is missing in "against".
+        self.add_q(q)
+        compiler = self.get_compiler(using=using)
+        try:
+            return compiler.execute_sql(SINGLE) is not None
+        except DatabaseError as e:
+            logger.warning("Got a database error calling check() on %r: %s", self, e)
+            return True
