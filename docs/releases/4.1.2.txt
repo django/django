@@ -39,3 +39,7 @@ Bugfixes
 * Fixed a regression in Django 4.1 that didn't alter a sequence type when
   altering type of pre-Django 4.1 serial columns on PostgreSQL
   (:ticket:`34058`).
+
+* Fixed a regression in Django 4.1 that caused a crash for :class:`View`
+  subclasses with asynchronous handlers when handling non-allowed HTTP methods
+  (:ticket:`34062`).
