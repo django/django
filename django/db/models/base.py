@@ -910,8 +910,8 @@ class Model(metaclass=ModelBase):
         meta = cls._meta
         inserted = False
 
-        if self.pk is None and self._state.adding is True:
-            self._state.related_managers_cache = {}
+        if self.pk is None:
+            self._state.related_managers_cache.clear()
 
         for parent, field in meta.parents.items():
             # Make sure the link fields are synced between parent and self.

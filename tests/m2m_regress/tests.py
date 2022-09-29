@@ -78,7 +78,6 @@ class M2MRegressionTests(TestCase):
         entry.topics.set([t1])
         old_topics = entry.topics.all()
         entry.pk = None
-        entry._state.adding = True
         entry.save()
         entry.topics.set(old_topics)
         self.assertCountEqual(
