@@ -89,6 +89,7 @@ class Options:
         "many_to_many",
         "concrete_fields",
         "local_concrete_fields",
+        "_non_pk_concrete_field_names",
         "_forward_fields_map",
         "managers",
         "managers_map",
@@ -980,6 +981,19 @@ class Options:
             attr = inspect.getattr_static(self.model, name)
             if isinstance(attr, property):
                 names.append(name)
+        return frozenset(names)
+
+    @cached_property
+    def _non_pk_concrete_field_names(self):
+        """
+        Return a set of the non-pk concrete field names defined on the model.
+        """
+        names = []
+        for field in self.concrete_fields:
+            if not field.primary_key:
+                names.append(field.name)
+                if field.name != field.attname:
+                    names.append(field.attname)
         return frozenset(names)
 
     @cached_property
