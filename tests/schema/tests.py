@@ -1785,6 +1785,41 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(SmallIntegerPK, old_field, new_field, strict=True)
 
+    @isolate_apps("schema")
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    def test_alter_serial_auto_field_to_bigautofield(self):
+        class SerialAutoField(Model):
+            id = SmallAutoField(primary_key=True)
+
+            class Meta:
+                app_label = "schema"
+
+        table = SerialAutoField._meta.db_table
+        column = SerialAutoField._meta.get_field("id").column
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f'CREATE TABLE "{table}" '
+                f'("{column}" smallserial NOT NULL PRIMARY KEY)'
+            )
+        try:
+            old_field = SerialAutoField._meta.get_field("id")
+            new_field = BigAutoField(primary_key=True)
+            new_field.model = SerialAutoField
+            new_field.set_attributes_from_name("id")
+            with connection.schema_editor() as editor:
+                editor.alter_field(SerialAutoField, old_field, new_field, strict=True)
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT data_type FROM pg_sequences WHERE sequencename = %s",
+                    [f"{table}_{column}_seq"],
+                )
+                row = cursor.fetchone()
+                sequence_data_type = row[0] if row and row[0] else None
+                self.assertEqual(sequence_data_type, "bigint")
+        finally:
+            with connection.cursor() as cursor:
+                cursor.execute(f'DROP TABLE "{table}"')
+
     def test_alter_int_pk_to_int_unique(self):
         """
         Should be able to rename an IntegerField(primary_key=True) to

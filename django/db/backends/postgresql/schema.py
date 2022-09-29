@@ -13,7 +13,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         "UPDATE %(table)s SET %(column)s = %(default)s WHERE %(column)s IS NULL"
         "; SET CONSTRAINTS ALL IMMEDIATE"
     )
-
+    sql_alter_sequence_type = "ALTER SEQUENCE IF EXISTS %(sequence)s AS %(type)s"
     sql_delete_sequence = "DROP SEQUENCE IF EXISTS %(sequence)s CASCADE"
 
     sql_create_index = (
@@ -179,6 +179,29 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                     self.sql_delete_sequence
                     % {
                         "sequence": self.quote_name(sequence_name),
+                    },
+                    [],
+                ),
+            ]
+        elif new_is_auto and old_is_auto and old_internal_type != new_internal_type:
+            fragment, _ = super()._alter_column_type_sql(
+                model, old_field, new_field, new_type
+            )
+            column = strip_quotes(new_field.column)
+            sequence_name = f"{table}_{column}_seq"
+            db_types = {
+                "AutoField": "integer",
+                "BigAutoField": "bigint",
+                "SmallAutoField": "smallint",
+            }
+            return fragment, [
+                # Alter the sequence type if exists (Django 4.1+ identity
+                # columns don't have it).
+                (
+                    self.sql_alter_sequence_type
+                    % {
+                        "sequence": self.quote_name(sequence_name),
+                        "type": db_types[new_internal_type],
                     },
                     [],
                 ),

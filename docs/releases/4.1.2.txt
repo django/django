@@ -35,3 +35,7 @@ Bugfixes
 * Fixed a regression in Django 4.1 where the ``--debug-mode`` argument to
   ``test`` did not work when running parallel tests with the
   ``multiprocessing`` start method ``spawn`` (:ticket:`34010`).
+
+* Fixed a regression in Django 4.1 that didn't alter a sequence type when
+  altering type of pre-Django 4.1 serial columns on PostgreSQL
+  (:ticket:`34058`).
