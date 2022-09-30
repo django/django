@@ -4,7 +4,6 @@ from django.test import TestCase
 from .models import (
     Book,
     Car,
-    ConfusedBook,
     CustomManager,
     CustomQuerySet,
     DeconstructibleCustomManager,
@@ -196,10 +195,6 @@ class CustomManagerTests(TestCase):
             ordered=False,
         )
 
-    def test_fk_related_manager_reused(self):
-        self.assertIs(self.b1.favorite_books, self.b1.favorite_books)
-        self.assertIn("favorite_books", self.b1._state.related_managers_cache)
-
     def test_gfk_related_manager(self):
         Person.objects.create(
             first_name="Bugs", last_name="Bunny", fun=True, favorite_thing=self.b1
@@ -248,67 +243,6 @@ class CustomManagerTests(TestCase):
             ordered=False,
         )
 
-    def test_gfk_related_manager_reused(self):
-        self.assertIs(
-            self.b1.fun_people_favorite_things,
-            self.b1.fun_people_favorite_things,
-        )
-        self.assertIn(
-            "fun_people_favorite_things",
-            self.b1._state.related_managers_cache,
-        )
-
-    def test_gfk_related_manager_not_reused_when_alternate(self):
-        self.assertIsNot(
-            self.b1.favorite_things(manager="fun_people"),
-            self.b1.favorite_things(manager="fun_people"),
-        )
-
-    def test_gfk_related_manager_no_overlap_when_not_hidden(self):
-        """
-        If a GenericRelation defines a related_query_name (and thus the
-        related_name) which shadows another GenericRelation, it should not
-        cause those separate managers to clash.
-        """
-        book = ConfusedBook.objects.create(
-            title="How to program",
-            author="Rodney Dangerfield",
-        )
-        person = Person.objects.create(
-            first_name="Bugs",
-            last_name="Bunny",
-            fun=True,
-            favorite_thing=book,
-        )
-        fun_person = FunPerson.objects.create(
-            first_name="Droopy",
-            last_name="Dog",
-            fun=False,
-            favorite_thing=book,
-        )
-        # The managers don't collide in the internal cache.
-        self.assertIsNot(book.favorite_things, book.less_favorite_things)
-        self.assertIs(book.favorite_things, book.favorite_things)
-        self.assertIs(book.less_favorite_things, book.less_favorite_things)
-        # Both managers are cached separately despite the collision in names.
-        self.assertIn("favorite_things", book._state.related_managers_cache)
-        self.assertIn("less_favorite_things", book._state.related_managers_cache)
-        # "less_favorite_things" isn't available as a reverse related manager,
-        # so never ends up in the cache.
-        self.assertQuerysetEqual(fun_person.favorite_things.all(), [book])
-        with self.assertRaises(AttributeError):
-            fun_person.less_favorite_things
-        self.assertIn("favorite_things", fun_person._state.related_managers_cache)
-        self.assertNotIn(
-            "less_favorite_things",
-            fun_person._state.related_managers_cache,
-        )
-        # The GenericRelation doesn't exist for Person, only FunPerson, so the
-        # exception prevents the cache from being polluted.
-        with self.assertRaises(AttributeError):
-            person.favorite_things
-        self.assertNotIn("favorite_things", person._state.related_managers_cache)
-
     def test_m2m_related_manager(self):
         bugs = Person.objects.create(first_name="Bugs", last_name="Bunny", fun=True)
         self.b1.authors.add(bugs)
@@ -354,16 +288,6 @@ class CustomManagerTests(TestCase):
             lambda c: c.first_name,
             ordered=False,
         )
-
-    def test_m2m_related_forward_manager_reused(self):
-        self.assertIs(self.b1.authors, self.b1.authors)
-        self.assertIn("authors", self.b1._state.related_managers_cache)
-
-    def test_m2m_related_revers_manager_reused(self):
-        bugs = Person.objects.create(first_name="Bugs", last_name="Bunny")
-        self.b1.authors.add(bugs)
-        self.assertIs(bugs.books, bugs.books)
-        self.assertIn("books", bugs._state.related_managers_cache)
 
     def test_removal_through_default_fk_related_manager(self, bulk=True):
         bugs = FunPerson.objects.create(

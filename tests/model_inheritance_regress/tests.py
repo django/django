@@ -416,11 +416,6 @@ class ModelInheritanceTest(TestCase):
         parties = list(p4.bachelorparty_set.all())
         self.assertEqual(parties, [bachelor, messy_parent])
 
-    def test_abstract_base_class_m2m_relation_inheritance_manager_reused(self):
-        p1 = Person.objects.create(name="Alice")
-        self.assertIs(p1.birthdayparty_set, p1.birthdayparty_set)
-        self.assertIs(p1.bachelorparty_set, p1.bachelorparty_set)
-
     def test_abstract_verbose_name_plural_inheritance(self):
         """
         verbose_name_plural correctly inherited from ABC if inheritance chain
