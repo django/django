@@ -591,14 +591,6 @@ class ReverseManyToOneDescriptor:
         self.field = rel.field
 
     @cached_property
-    def related_manager_cache_key(self):
-        # Being able to access the manager instance precludes it from being
-        # hidden. The rel's accessor name is used to allow multiple managers
-        # to the same model to coexist. e.g. post.attached_comment_set and
-        # post.attached_link_set are separately cached.
-        return self.rel.get_cache_name()
-
-    @cached_property
     def related_manager_cls(self):
         related_model = self.rel.related_model
 
@@ -619,11 +611,8 @@ class ReverseManyToOneDescriptor:
         """
         if instance is None:
             return self
-        key = self.related_manager_cache_key
-        instance_cache = instance._state.related_managers_cache
-        if key not in instance_cache:
-            instance_cache[key] = self.related_manager_cls(instance)
-        return instance_cache[key]
+
+        return self.related_manager_cls(instance)
 
     def _get_set_deprecation_msg_params(self):
         return (
@@ -940,17 +929,6 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor):
             self.rel,
             reverse=self.reverse,
         )
-
-    @cached_property
-    def related_manager_cache_key(self):
-        if self.reverse:
-            # Symmetrical M2Ms won't have an accessor name, but should never
-            # end up in the reverse branch anyway, as the related_name ends up
-            # being hidden, and no public manager is created.
-            return self.rel.get_cache_name()
-        else:
-            # For forward managers, defer to the field name.
-            return self.field.get_cache_name()
 
     def _get_set_deprecation_msg_params(self):
         return (

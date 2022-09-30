@@ -164,22 +164,6 @@ class Book(models.Model):
         base_manager_name = "annotated_objects"
 
 
-class ConfusedBook(models.Model):
-    title = models.CharField(max_length=50)
-    author = models.CharField(max_length=30)
-    favorite_things = GenericRelation(
-        Person,
-        content_type_field="favorite_thing_type",
-        object_id_field="favorite_thing_id",
-    )
-    less_favorite_things = GenericRelation(
-        FunPerson,
-        content_type_field="favorite_thing_type",
-        object_id_field="favorite_thing_id",
-        related_query_name="favorite_things",
-    )
-
-
 class FastCarManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(top_speed__gt=150)

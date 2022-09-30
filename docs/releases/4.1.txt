@@ -530,7 +530,8 @@ Miscellaneous
 * Related managers for :class:`~django.db.models.ForeignKey`,
   :class:`~django.db.models.ManyToManyField`, and
   :class:`~django.contrib.contenttypes.fields.GenericRelation` are now cached
-  on the :class:`~django.db.models.Model` instance to which they belong.
+  on the :class:`~django.db.models.Model` instance to which they belong. *This
+  change was reverted in Django 4.1.2.*
 
 * The Django test runner now returns a non-zero error code for unexpected
   successes from tests marked with :py:func:`unittest.expectedFailure`.
