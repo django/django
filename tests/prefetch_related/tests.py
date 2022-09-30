@@ -1353,14 +1353,6 @@ class ForeignKeyToFieldTest(TestCase):
                 ],
             )
 
-    def test_m2m_manager_reused(self):
-        author = Author.objects.prefetch_related(
-            "favorite_authors",
-            "favors_me",
-        ).first()
-        self.assertIs(author.favorite_authors, author.favorite_authors)
-        self.assertIs(author.favors_me, author.favors_me)
-
 
 class LookupOrderingTest(TestCase):
     """
