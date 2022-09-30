@@ -434,18 +434,11 @@ class ModelBase(type):
         return cls._meta.default_manager
 
 
-class ModelStateCacheDescriptor:
-    """
-    Upon first access, replace itself with an empty dictionary on the instance.
-    """
-
-    def __set_name__(self, owner, name):
-        self.attribute_name = name
-
+class ModelStateFieldsCacheDescriptor:
     def __get__(self, instance, cls=None):
         if instance is None:
             return self
-        res = instance.__dict__[self.attribute_name] = {}
+        res = instance.fields_cache = {}
         return res
 
 
@@ -458,20 +451,7 @@ class ModelState:
     # explicit (non-auto) PKs. This impacts validation only; it has no effect
     # on the actual save.
     adding = True
-    fields_cache = ModelStateCacheDescriptor()
-    related_managers_cache = ModelStateCacheDescriptor()
-
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        if "fields_cache" in state:
-            state["fields_cache"] = self.fields_cache.copy()
-        # Manager instances stored in related_managers_cache won't necessarily
-        # be deserializable if they were dynamically created via an inner
-        # scope, e.g. create_forward_many_to_many_manager() and
-        # create_generic_related_manager().
-        if "related_managers_cache" in state:
-            state["related_managers_cache"] = {}
-        return state
+    fields_cache = ModelStateFieldsCacheDescriptor()
 
 
 class Model(metaclass=ModelBase):
@@ -633,6 +613,7 @@ class Model(metaclass=ModelBase):
         """Hook to allow choosing the attributes to pickle."""
         state = self.__dict__.copy()
         state["_state"] = copy.copy(state["_state"])
+        state["_state"].fields_cache = state["_state"].fields_cache.copy()
         # memoryview cannot be pickled, so cast it to bytes and store
         # separately.
         _memoryview_attrs = []
