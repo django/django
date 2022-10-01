@@ -2012,13 +2012,14 @@ your resulting ``User`` model will have the following attributes::
 A ``RelatedObjectDoesNotExist`` exception is raised when accessing the reverse
 relationship if an entry in the related table doesn't exist. This is a subclass
 of the target model's :exc:`Model.DoesNotExist
-<django.db.models.Model.DoesNotExist>` exception. For example, if a user
-doesn't have a supervisor designated by ``MySpecialUser``::
+<django.db.models.Model.DoesNotExist>` exception and can be accessed as an
+attribute of the reverse accessor. For example, if a user doesn't have a
+supervisor designated by ``MySpecialUser``::
 
-    >>> user.supervisor_of
-    Traceback (most recent call last):
-        ...
-    RelatedObjectDoesNotExist: User has no supervisor_of.
+    try:
+        user.supervisor_of
+    except User.supervisor_of.RelatedObjectDoesNotExist:
+        pass
 
 .. _onetoone-arguments:
 
