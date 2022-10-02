@@ -93,6 +93,7 @@ class BaseDatabaseWrapper:
         # Tracks if the transaction should be rolled back to the next
         # available savepoint because of an exception in an inner block.
         self.needs_rollback = False
+        self.rollback_exc = None
 
         # Connection termination related attributes.
         self.close_at = None
@@ -526,7 +527,7 @@ class BaseDatabaseWrapper:
             raise TransactionManagementError(
                 "An error occurred in the current transaction. You can't "
                 "execute queries until the end of the 'atomic' block."
-            )
+            ) from self.rollback_exc
 
     # ##### Foreign key constraints checks handling #####
 
