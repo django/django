@@ -578,11 +578,7 @@ def get_language_from_request(request, check_path=False):
             return get_supported_language_variant(accept_lang)
         except LookupError:
             continue
-
-    try:
-        return get_supported_language_variant(settings.LANGUAGE_CODE)
-    except LookupError:
-        return settings.LANGUAGE_CODE
+    return None
 
 
 @functools.lru_cache(maxsize=1000)
