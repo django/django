@@ -53,7 +53,7 @@ def check_for_language(x):
 
 
 def get_language_from_request(request, check_path=False):
-    return settings.LANGUAGE_CODE
+    return None
 
 
 def get_language_from_path(request):

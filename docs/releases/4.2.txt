@@ -186,6 +186,10 @@ Internationalization
 
 * Added support and translations for the Central Kurdish (Sorani) language.
 
+* The :class:`~django.middleware.locale.LocaleMiddleware` now respects a
+  language from the request when :func:`~django.conf.urls.i18n.i18n_patterns`
+  is used with the ``prefix_default_language`` argument set to ``False``.
+
 Logging
 ~~~~~~~
 

@@ -2137,8 +2137,22 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
         response = self.client.get("/fr/simple/")
         self.assertEqual(response.content, b"Oui")
 
-    def test_unprefixed_language_other_than_accept_language(self):
+    def test_unprefixed_language_with_accept_language(self):
+        """'Accept-Language' is respected."""
         response = self.client.get("/simple/", HTTP_ACCEPT_LANGUAGE="fr")
+        self.assertRedirects(response, "/fr/simple/")
+
+    def test_unprefixed_language_with_cookie_language(self):
+        """A language set in the cookies is respected."""
+        self.client.cookies.load({settings.LANGUAGE_COOKIE_NAME: "fr"})
+        response = self.client.get("/simple/")
+        self.assertRedirects(response, "/fr/simple/")
+
+    def test_unprefixed_language_with_non_valid_language(self):
+        response = self.client.get("/simple/", HTTP_ACCEPT_LANGUAGE="fi")
+        self.assertEqual(response.content, b"Yes")
+        self.client.cookies.load({settings.LANGUAGE_COOKIE_NAME: "fi"})
+        response = self.client.get("/simple/")
         self.assertEqual(response.content, b"Yes")
 
     def test_page_with_dash(self):
@@ -2214,10 +2228,7 @@ class CountrySpecificLanguageTests(SimpleTestCase):
 
     def test_get_language_from_request_null(self):
         lang = trans_null.get_language_from_request(None)
-        self.assertEqual(lang, "en")
-        with override_settings(LANGUAGE_CODE="de"):
-            lang = trans_null.get_language_from_request(None)
-            self.assertEqual(lang, "de")
+        self.assertEqual(lang, None)
 
     def test_specific_language_codes(self):
         # issue 11915
