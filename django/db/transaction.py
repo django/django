@@ -118,10 +118,11 @@ def mark_for_rollback_on_error(using=None):
     """
     try:
         yield
-    except Exception:
+    except Exception as exc:
         connection = get_connection(using)
         if connection.in_atomic_block:
             connection.needs_rollback = True
+            connection.rollback_exc = exc
         raise
 
 
