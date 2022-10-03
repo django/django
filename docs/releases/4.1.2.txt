@@ -47,3 +47,6 @@ Bugfixes
 * Reverted caching related managers for ``ForeignKey``, ``ManyToManyField``,
   and ``GenericRelation`` that caused the incorrect refreshing of related
   objects (:ticket:`33984`).
+
+* Relaxed the system check added in Django 4.1 for the same name used for
+  multiple template tag modules to a warning (:ticket:`32987`).
