@@ -193,6 +193,7 @@ class RunPython(Operation):
             self.code(from_state.apps, schema_editor)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        from_state.clear_delayed_apps_cache()
         if self.reverse_code is None:
             raise NotImplementedError("You cannot reverse this operation")
         if router.allow_migrate(
