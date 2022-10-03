@@ -78,7 +78,7 @@ class RangeMaxValueValidator(MaxValueValidator):
         return a.upper is None or a.upper > b
 
     message = _(
-        "Ensure that this range is completely less than or equal to %(limit_value)s."
+        "Ensure that the upper bound of the range is not greater than %(limit_value)s."
     )
 
 
@@ -87,5 +87,5 @@ class RangeMinValueValidator(MinValueValidator):
         return a.lower is None or a.lower < b
 
     message = _(
-        "Ensure that this range is completely greater than or equal to %(limit_value)s."
+        "Ensure that the lower bound of the range is not less than %(limit_value)s."
     )
