@@ -76,7 +76,7 @@ from django.db.models.functions import RowNumber
 from django.db.models.lookups import GreaterThan, LessThanOrEqual
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import DeferredAttribute
-from django.db.models.utils import resolve_callables
+from django.db.models.utils import AltersData, resolve_callables
 from django.utils.functional import cached_property
 
 
@@ -635,7 +635,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
     the related model, and adds behaviors specific to many-to-one relations.
     """
 
-    class RelatedManager(superclass):
+    class RelatedManager(superclass, AltersData):
         def __init__(self, instance):
             super().__init__()
 
@@ -946,7 +946,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
     the related model, and adds behaviors specific to many-to-many relations.
     """
 
-    class ManyRelatedManager(superclass):
+    class ManyRelatedManager(superclass, AltersData):
         def __init__(self, instance=None):
             super().__init__()
 

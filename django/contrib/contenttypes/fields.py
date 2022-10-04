@@ -16,6 +16,7 @@ from django.db.models.fields.related import (
 from django.db.models.query_utils import PathInfo
 from django.db.models.sql import AND
 from django.db.models.sql.where import WhereNode
+from django.db.models.utils import AltersData
 from django.utils.functional import cached_property
 
 
@@ -560,7 +561,7 @@ def create_generic_related_manager(superclass, rel):
     specific to generic relations.
     """
 
-    class GenericRelatedObjectManager(superclass):
+    class GenericRelatedObjectManager(superclass, AltersData):
         def __init__(self, instance=None):
             super().__init__()
 
