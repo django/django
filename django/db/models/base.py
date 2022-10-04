@@ -48,7 +48,7 @@ from django.db.models.signals import (
     pre_init,
     pre_save,
 )
-from django.db.models.utils import make_model_tuple
+from django.db.models.utils import AltersData, make_model_tuple
 from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
 from django.utils.text import capfirst, get_text_list
@@ -456,7 +456,7 @@ class ModelState:
     fields_cache = ModelStateFieldsCacheDescriptor()
 
 
-class Model(metaclass=ModelBase):
+class Model(AltersData, metaclass=ModelBase):
     def __init__(self, *args, **kwargs):
         # Alias some things as locals to avoid repeat global lookups
         cls = self.__class__

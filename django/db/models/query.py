@@ -27,7 +27,11 @@ from django.db.models.expressions import Case, F, Ref, Value, When
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import FilteredRelation, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
-from django.db.models.utils import create_namedtuple_class, resolve_callables
+from django.db.models.utils import (
+    AltersData,
+    create_namedtuple_class,
+    resolve_callables,
+)
 from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import cached_property, partition
@@ -284,7 +288,7 @@ class FlatValuesListIterable(BaseIterable):
             yield row[0]
 
 
-class QuerySet:
+class QuerySet(AltersData):
     """Represent a lazy database lookup for a set of objects."""
 
     def __init__(self, model=None, query=None, using=None, hints=None):
