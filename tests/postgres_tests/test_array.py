@@ -421,9 +421,9 @@ class TestQuerying(PostgreSQLTestCase):
                 .annotate(arrayagg=ArrayAgg("id"))
                 .order_by("field__0"),
                 [
-                    {"field__0": 1, "arrayagg": [1]},
-                    {"field__0": 2, "arrayagg": [2, 3]},
-                    {"field__0": 20, "arrayagg": [4]},
+                    {"field__0": 1, "arrayagg": [self.objs[0].pk]},
+                    {"field__0": 2, "arrayagg": [self.objs[1].pk, self.objs[2].pk]},
+                    {"field__0": 20, "arrayagg": [self.objs[3].pk]},
                 ],
             )
         alias = connection.ops.quote_name("field__0")
