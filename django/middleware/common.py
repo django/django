@@ -38,7 +38,7 @@ class CommonMiddleware(MiddlewareMixin):
         """
 
         # Check for denied User-Agents
-        user_agent = request.META.get("HTTP_USER_AGENT")
+        user_agent = request.headers.get("User-Agent")
         if user_agent is not None:
             for user_agent_regex in settings.DISALLOWED_USER_AGENTS:
                 if user_agent_regex.search(user_agent):
@@ -121,10 +121,10 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
         if response.status_code == 404 and not settings.DEBUG:
             domain = request.get_host()
             path = request.get_full_path()
-            referer = request.META.get("HTTP_REFERER", "")
+            referer = request.headers.get("Referer", "")
 
             if not self.is_ignorable_request(request, path, domain, referer):
-                ua = request.META.get("HTTP_USER_AGENT", "<none>")
+                ua = request.headers.get("User-Agent", "<none>")
                 ip = request.META.get("REMOTE_ADDR", "<none>")
                 mail_managers(
                     "Broken %slink on %s"

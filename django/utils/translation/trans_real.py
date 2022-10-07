@@ -566,7 +566,7 @@ def get_language_from_request(request, check_path=False):
     except LookupError:
         pass
 
-    accept = request.META.get("HTTP_ACCEPT_LANGUAGE", "")
+    accept = request.headers.get("Accept-Language", "")
     for accept_lang, unused in parse_accept_lang_header(accept):
         if accept_lang == "*":
             break

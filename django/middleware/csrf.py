@@ -442,7 +442,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
         if "HTTP_ORIGIN" in request.META:
             if not self._origin_verified(request):
                 return self._reject(
-                    request, REASON_BAD_ORIGIN % request.META["HTTP_ORIGIN"]
+                    request, REASON_BAD_ORIGIN % request.headers["Origin"]
                 )
         elif request.is_secure():
             # If the Origin header wasn't provided, reject HTTPS requests if
