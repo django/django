@@ -91,8 +91,8 @@ to ``"django.contrib.sessions.backends.cache"``.
 
 The cache backend can be made persistent by using a persistent cache, such as
 Redis with appropriate configuration. But unless your cache is definitely
-configured for sufficient persistence, opt for the cached database backend, to
-avoid edge cases caused by unreliable data storage in production.
+configured for sufficient persistence, opt for the cached database backend.
+This avoids edge cases caused by unreliable data storage in production.
 
 Using file-based sessions
 -------------------------
