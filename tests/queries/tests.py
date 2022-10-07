@@ -882,22 +882,22 @@ class Queries1Tests(TestCase):
         Eaten.objects.create(meal="m")
         q = Eaten.objects.none()
         with self.assertNumQueries(0):
-            self.assertQuerysetEqual(q.all(), [])
-            self.assertQuerysetEqual(q.filter(meal="m"), [])
-            self.assertQuerysetEqual(q.exclude(meal="m"), [])
-            self.assertQuerysetEqual(q.complex_filter({"pk": 1}), [])
-            self.assertQuerysetEqual(q.select_related("food"), [])
-            self.assertQuerysetEqual(q.annotate(Count("food")), [])
-            self.assertQuerysetEqual(q.order_by("meal", "food"), [])
-            self.assertQuerysetEqual(q.distinct(), [])
-            self.assertQuerysetEqual(q.extra(select={"foo": "1"}), [])
-            self.assertQuerysetEqual(q.reverse(), [])
+            self.assertSequenceEqual(q.all(), [])
+            self.assertSequenceEqual(q.filter(meal="m"), [])
+            self.assertSequenceEqual(q.exclude(meal="m"), [])
+            self.assertSequenceEqual(q.complex_filter({"pk": 1}), [])
+            self.assertSequenceEqual(q.select_related("food"), [])
+            self.assertSequenceEqual(q.annotate(Count("food")), [])
+            self.assertSequenceEqual(q.order_by("meal", "food"), [])
+            self.assertSequenceEqual(q.distinct(), [])
+            self.assertSequenceEqual(q.extra(select={"foo": "1"}), [])
+            self.assertSequenceEqual(q.reverse(), [])
             q.query.low_mark = 1
             msg = "Cannot change a query once a slice has been taken."
             with self.assertRaisesMessage(TypeError, msg):
                 q.extra(select={"foo": "1"})
-            self.assertQuerysetEqual(q.defer("meal"), [])
-            self.assertQuerysetEqual(q.only("meal"), [])
+            self.assertSequenceEqual(q.defer("meal"), [])
+            self.assertSequenceEqual(q.only("meal"), [])
 
     def test_ticket7791(self):
         # There were "issues" when ordering and distinct-ing on fields related
@@ -964,7 +964,7 @@ class Queries1Tests(TestCase):
         def g():
             yield n_obj.pk
 
-        self.assertQuerysetEqual(Note.objects.filter(pk__in=f()), [])
+        self.assertSequenceEqual(Note.objects.filter(pk__in=f()), [])
         self.assertEqual(list(Note.objects.filter(pk__in=g())), [n_obj])
 
     def test_ticket10742(self):
@@ -1457,7 +1457,7 @@ class Queries2Tests(TestCase):
 class Queries3Tests(TestCase):
     def test_ticket7107(self):
         # This shouldn't create an infinite loop.
-        self.assertQuerysetEqual(Valid.objects.all(), [])
+        self.assertSequenceEqual(Valid.objects.all(), [])
 
     def test_datetimes_invalid_field(self):
         # An error should be raised when QuerySet.datetimes() is passed the
@@ -1594,7 +1594,7 @@ class Queries4Tests(TestCase):
         otherteachers = Teacher.objects.exclude(pk=t1.pk).exclude(friends=t1)
         qs1 = otherteachers.filter(schools=s1).filter(schools=s2)
         qs2 = otherteachers.filter(schools=s1).filter(schools=s3)
-        self.assertQuerysetEqual(qs1 | qs2, [])
+        self.assertSequenceEqual(qs1 | qs2, [])
 
     def test_ticket7095(self):
         # Updates that are filtered on the model being updated are somewhat
@@ -1666,7 +1666,7 @@ class Queries4Tests(TestCase):
     def test_ticket10181(self):
         # Avoid raising an EmptyResultSet if an inner query is probably
         # empty (and hence, not executed).
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Tag.objects.filter(id__in=Tag.objects.filter(id__in=[])), []
         )
 
@@ -1974,8 +1974,8 @@ class SelectRelatedTests(TestCase):
         # Once upon a time, select_related() with circular relations would loop
         # infinitely if you forgot to specify "depth". Now we set an arbitrary
         # default upper bound.
-        self.assertQuerysetEqual(X.objects.all(), [])
-        self.assertQuerysetEqual(X.objects.select_related(), [])
+        self.assertSequenceEqual(X.objects.all(), [])
+        self.assertSequenceEqual(X.objects.select_related(), [])
 
 
 class SubclassFKTests(TestCase):
@@ -2923,8 +2923,8 @@ class WeirdQuerysetSlicingTests(TestCase):
 
     def test_tickets_7698_10202(self):
         # People like to slice with '0' as the high-water mark.
-        self.assertQuerysetEqual(Article.objects.all()[0:0], [])
-        self.assertQuerysetEqual(Article.objects.all()[0:0][:10], [])
+        self.assertSequenceEqual(Article.objects.all()[0:0], [])
+        self.assertSequenceEqual(Article.objects.all()[0:0][:10], [])
         self.assertEqual(Article.objects.all()[:0].count(), 0)
         msg = "Cannot change a query once a slice has been taken."
         with self.assertRaisesMessage(TypeError, msg):
@@ -3101,7 +3101,7 @@ class ConditionalTests(TestCase):
         # ... but you can still order in a non-recursive fashion among linked
         # fields (the previous test failed because the default ordering was
         # recursive).
-        self.assertQuerysetEqual(LoopX.objects.order_by("y__x__y__x__id"), [])
+        self.assertSequenceEqual(LoopX.objects.order_by("y__x__y__x__id"), [])
 
     # When grouping without specifying ordering, we add an explicit "ORDER BY NULL"
     # portion in MySQL to prevent unnecessary sorting.
@@ -3448,7 +3448,7 @@ class ExcludeTest17600(TestCase):
         those items not having any orders at all. The correct way to write
         this query in SQL seems to be using two nested subqueries.
         """
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Order.objects.exclude(~Q(items__status=1)).distinct(),
             [self.o1],
         )
@@ -4474,7 +4474,7 @@ class TestTicket24279(TestCase):
     def test_ticket_24278(self):
         School.objects.create()
         qs = School.objects.filter(Q(pk__in=()) | Q())
-        self.assertQuerysetEqual(qs, [])
+        self.assertSequenceEqual(qs, [])
 
 
 class TestInvalidValuesRelation(SimpleTestCase):

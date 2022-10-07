@@ -759,10 +759,10 @@ class AggregationTests(TestCase):
         qs = Clues.objects.values("EntryID__Entry").annotate(
             Appearances=Count("EntryID"), Distinct_Clues=Count("Clue", distinct=True)
         )
-        self.assertQuerysetEqual(qs, [])
+        self.assertSequenceEqual(qs, [])
 
         qs = Entries.objects.annotate(clue_count=Count("clues__ID"))
-        self.assertQuerysetEqual(qs, [])
+        self.assertSequenceEqual(qs, [])
 
     def test_boolean_conversion(self):
         # Aggregates mixed up ordering of columns for backend's convert_values

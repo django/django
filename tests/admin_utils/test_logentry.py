@@ -148,7 +148,7 @@ class LogEntryTests(TestCase):
         )
         response = self.client.post(change_url, post_data)
         self.assertRedirects(response, reverse("admin:admin_utils_site_changelist"))
-        self.assertQuerysetEqual(Article.objects.filter(pk=a2.pk), [])
+        self.assertSequenceEqual(Article.objects.filter(pk=a2.pk), [])
         logentry = LogEntry.objects.filter(content_type__model__iexact="site").latest(
             "action_time"
         )

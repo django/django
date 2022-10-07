@@ -17,14 +17,7 @@ class CustomColumnsTests(TestCase):
         cls.article.authors.set(cls.authors)
 
     def test_query_all_available_authors(self):
-        self.assertQuerysetEqual(
-            Author.objects.all(),
-            [
-                "Peter Jones",
-                "John Smith",
-            ],
-            str,
-        )
+        self.assertSequenceEqual(Author.objects.all(), [self.a2, self.a1])
 
     def test_get_first_name(self):
         self.assertEqual(
@@ -33,12 +26,9 @@ class CustomColumnsTests(TestCase):
         )
 
     def test_filter_first_name(self):
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Author.objects.filter(first_name__exact="John"),
-            [
-                "John Smith",
-            ],
-            str,
+            [self.a1],
         )
 
     def test_field_error(self):
@@ -57,14 +47,7 @@ class CustomColumnsTests(TestCase):
             self.a1.last
 
     def test_get_all_authors_for_an_article(self):
-        self.assertQuerysetEqual(
-            self.article.authors.all(),
-            [
-                "Peter Jones",
-                "John Smith",
-            ],
-            str,
-        )
+        self.assertSequenceEqual(self.article.authors.all(), [self.a2, self.a1])
 
     def test_get_all_articles_for_an_author(self):
         self.assertQuerysetEqual(
@@ -76,8 +59,8 @@ class CustomColumnsTests(TestCase):
         )
 
     def test_get_author_m2m_relation(self):
-        self.assertQuerysetEqual(
-            self.article.authors.filter(last_name="Jones"), ["Peter Jones"], str
+        self.assertSequenceEqual(
+            self.article.authors.filter(last_name="Jones"), [self.a2]
         )
 
     def test_author_querying(self):

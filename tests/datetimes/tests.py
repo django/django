@@ -85,7 +85,7 @@ class DateTimesTests(TestCase):
                 datetime.datetime(2010, 7, 28),
             ],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.datetimes("comments__approval_date", "day"), []
         )
         self.assertSequenceEqual(
