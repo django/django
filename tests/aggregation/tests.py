@@ -1687,7 +1687,7 @@ class AggregateTestCase(TestCase):
         authors = Author.objects.annotate(
             Count("book"),
         ).filter(Q(book__count__gt=0) | Q(pk__in=Book.objects.values("authors")))
-        self.assertQuerysetEqual(authors, Author.objects.all(), ordered=False)
+        self.assertCountEqual(authors, Author.objects.all())
 
     def test_aggregation_random_ordering(self):
         """Random() is not included in the GROUP BY when used for ordering."""

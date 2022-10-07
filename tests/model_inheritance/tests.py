@@ -68,7 +68,7 @@ class ModelInheritanceTests(TestCase):
         # Even though p.supplier for a Place 'p' (a parent of a Supplier), a
         # Restaurant object cannot access that reverse relation, since it's not
         # part of the Place-Supplier Hierarchy.
-        self.assertQuerysetEqual(Place.objects.filter(supplier__name="foo"), [])
+        self.assertSequenceEqual(Place.objects.filter(supplier__name="foo"), [])
         msg = (
             "Cannot resolve keyword 'supplier' into field. Choices are: "
             "address, chef, chef_id, id, italianrestaurant, lot, name, "
@@ -93,7 +93,7 @@ class ModelInheritanceTests(TestCase):
             getattr(post, "attached_%(class)s_set")
 
     def test_model_with_distinct_related_query_name(self):
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Post.objects.filter(attached_model_inheritance_comments__is_spam=True), []
         )
 
@@ -146,7 +146,7 @@ class ModelInheritanceTests(TestCase):
         self.assertEqual(s.titles.related_val, (s.id,))
         # Higher level test for correct query values (title foof not
         # accidentally found).
-        self.assertQuerysetEqual(s.titles.all(), [])
+        self.assertSequenceEqual(s.titles.all(), [])
 
     def test_update_parent_filtering(self):
         """
