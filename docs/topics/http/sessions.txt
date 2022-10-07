@@ -75,28 +75,24 @@ name of that cache.
 Once your cache is configured, you have to choose between a database-backed
 cache or a non-persistent cache.
 
-The database cache ``django.contrib.sessions.backends.cached_db`` uses a
-write-through cache -- every write to the cache will also be written to the
-database. Session reads only use the database if the data is not already in the
-cache.
-
-For persistent, cached data, set :setting:`SESSION_ENGINE` to
-``"django.contrib.sessions.backends.cached_db"``. And follow the configuration
+The cached database backend (``cached_db``) uses a write-through cache --
+session writes are applied to both the cache and the database. Session reads
+use the cache, or the database if the data has been evicted from the cache. To
+use this backend, set :setting:`SESSION_ENGINE` to
+``"django.contrib.sessions.backends.cached_db"``, and follow the configuration
 instructions for the `using database-backed sessions`_.
 
-To use the non-persistent cache ``django.contrib.sessions.backends.cache`` set
-:setting:`SESSION_ENGINE` to ``"django.contrib.sessions.backends.cache"`` for a
-simple caching session store. Session data will be stored only in your cache.
+The cache backend (``cache``) stores session data only in your cache. This is
+faster because it avoids database persistence, but you will have to consider
+what happens when cache data is evicted. Eviction can occur if the cache fills
+up or the cache server is restarted, and it will mean session data is lost,
+including logging out users. To use this backend, set :setting:`SESSION_ENGINE`
+to ``"django.contrib.sessions.backends.cache"``.
 
-This is faster because it disregards database persistence. But you will have to
-handle edge cases caused by a non-persistent cache. Cached data can be evicted
-if the cache fills up or if the cache server is restarted. This might lead to a
-more complex operational setup.
-
-One solution you can use is to configure cache backends such as Memcached and
-Redis to be persistent. But unless your cache backend is persistent, opt for
-the database cache to avoid edge cases caused by transient, unreliable data in
-production.
+The cache backend can be made persistent by using a persistent cache, such as
+Redis with appropriate configuration. But unless your cache is definitely
+configured for sufficient persistence, opt for the cached database backend, to
+avoid edge cases caused by unreliable data storage in production.
 
 Using file-based sessions
 -------------------------
