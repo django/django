@@ -312,6 +312,19 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         # created password should be unusable
         self.assertFalse(u.has_usable_password())
 
+    def test_validate_username(self):
+        msg = (
+            "Enter a valid username. This value may contain only letters, numbers, "
+            "and @/./+/-/_ characters."
+        )
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command(
+                "createsuperuser",
+                interactive=False,
+                username="🤠",
+                email="joe@somewhere.org",
+            )
+
     def test_non_ascii_verbose_name(self):
         @mock_inputs(
             {

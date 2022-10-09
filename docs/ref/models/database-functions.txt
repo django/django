@@ -495,6 +495,11 @@ Usage example::
     ``Now()`` uses ``STATEMENT_TIMESTAMP`` instead. If you need the transaction
     timestamp, use :class:`django.contrib.postgres.functions.TransactionNow`.
 
+.. versionchanged:: 4.2
+
+    Support for microsecond precision on MySQL and millisecond precision on
+    SQLite were added.
+
 ``Trunc``
 ---------
 

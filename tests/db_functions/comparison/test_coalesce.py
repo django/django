@@ -15,7 +15,7 @@ class CoalesceTests(TestCase):
         Author.objects.create(name="John Smith", alias="smithj")
         Author.objects.create(name="Rhonda")
         authors = Author.objects.annotate(display_name=Coalesce("alias", "name"))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors.order_by("name"), ["smithj", "Rhonda"], lambda a: a.display_name
         )
 
@@ -39,7 +39,7 @@ class CoalesceTests(TestCase):
         article = Article.objects.annotate(
             headline=Coalesce("summary", "text", output_field=TextField()),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             article.order_by("title"), [lorem_ipsum], lambda a: a.headline
         )
         # mixed Text and Char wrapped
@@ -48,7 +48,7 @@ class CoalesceTests(TestCase):
                 Lower("summary"), Lower("text"), output_field=TextField()
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             article.order_by("title"), [lorem_ipsum.lower()], lambda a: a.headline
         )
 
@@ -56,11 +56,11 @@ class CoalesceTests(TestCase):
         Author.objects.create(name="John Smith", alias="smithj")
         Author.objects.create(name="Rhonda")
         authors = Author.objects.order_by(Coalesce("alias", "name"))
-        self.assertQuerysetEqual(authors, ["Rhonda", "John Smith"], lambda a: a.name)
+        self.assertQuerySetEqual(authors, ["Rhonda", "John Smith"], lambda a: a.name)
         authors = Author.objects.order_by(Coalesce("alias", "name").asc())
-        self.assertQuerysetEqual(authors, ["Rhonda", "John Smith"], lambda a: a.name)
+        self.assertQuerySetEqual(authors, ["Rhonda", "John Smith"], lambda a: a.name)
         authors = Author.objects.order_by(Coalesce("alias", "name").desc())
-        self.assertQuerysetEqual(authors, ["John Smith", "Rhonda"], lambda a: a.name)
+        self.assertQuerySetEqual(authors, ["John Smith", "Rhonda"], lambda a: a.name)
 
     def test_empty_queryset(self):
         Author.objects.create(name="John Smith")

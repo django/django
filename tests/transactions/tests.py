@@ -339,8 +339,11 @@ class AtomicErrorsTests(TransactionTestCase):
                 "An error occurred in the current transaction. You can't "
                 "execute queries until the end of the 'atomic' block."
             )
-            with self.assertRaisesMessage(transaction.TransactionManagementError, msg):
+            with self.assertRaisesMessage(
+                transaction.TransactionManagementError, msg
+            ) as cm:
                 r2.save(force_update=True)
+        self.assertIsInstance(cm.exception.__cause__, IntegrityError)
         self.assertEqual(Reporter.objects.get(pk=r1.pk).last_name, "Haddock")
 
     @skipIfDBFeature("atomic_transactions")

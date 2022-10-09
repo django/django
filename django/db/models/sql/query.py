@@ -556,7 +556,7 @@ class Query(BaseExpression):
     def has_filters(self):
         return self.where
 
-    def exists(self, using, limit=True):
+    def exists(self, limit=True):
         q = self.clone()
         if not (q.distinct and q.is_sliced):
             if q.group_by is True:
@@ -568,11 +568,8 @@ class Query(BaseExpression):
                 q.set_group_by(allow_aliases=False)
             q.clear_select_clause()
         if q.combined_queries and q.combinator == "union":
-            limit_combined = connections[
-                using
-            ].features.supports_slicing_ordering_in_compound
             q.combined_queries = tuple(
-                combined_query.exists(using, limit=limit_combined)
+                combined_query.exists(limit=False)
                 for combined_query in q.combined_queries
             )
         q.clear_ordering(force=True)
@@ -1150,12 +1147,14 @@ class Query(BaseExpression):
             if col.alias in self.external_aliases
         ]
 
-    def get_group_by_cols(self, alias=None):
-        if alias:
-            return [Ref(alias, self)]
+    def get_group_by_cols(self, wrapper=None):
+        # If wrapper is referenced by an alias for an explicit GROUP BY through
+        # values() a reference to this expression and not the self must be
+        # returned to ensure external column references are not grouped against
+        # as well.
         external_cols = self.get_external_cols()
         if any(col.possibly_multivalued for col in external_cols):
-            return [self]
+            return [wrapper or self]
         return external_cols
 
     def as_sql(self, compiler, connection):
@@ -1819,6 +1818,7 @@ class Query(BaseExpression):
             final_transformer = functools.partial(
                 transform, name=name, previous=final_transformer
             )
+            final_transformer.has_transforms = True
         # Then, add the path to the query's joins. Note that we can't trim
         # joins at this stage - we will need the information about join type
         # of the trimmed joins.
@@ -2219,8 +2219,8 @@ class Query(BaseExpression):
         primary key, and the query would be equivalent, the optimization
         will be made automatically.
         """
-        # Column names from JOINs to check collisions with aliases.
         if allow_aliases:
+            # Column names from JOINs to check collisions with aliases.
             column_names = set()
             seen_models = set()
             for join in list(self.alias_map.values())[1:]:  # Skip base table.
@@ -2230,13 +2230,31 @@ class Query(BaseExpression):
                         {field.column for field in model._meta.local_concrete_fields}
                     )
                     seen_models.add(model)
-
+            if self.values_select:
+                # If grouping by aliases is allowed assign selected values
+                # aliases by moving them to annotations.
+                group_by_annotations = {}
+                values_select = {}
+                for alias, expr in zip(self.values_select, self.select):
+                    if isinstance(expr, Col):
+                        values_select[alias] = expr
+                    else:
+                        group_by_annotations[alias] = expr
+                self.annotations = {**group_by_annotations, **self.annotations}
+                self.append_annotation_mask(group_by_annotations)
+                self.select = tuple(values_select.values())
+                self.values_select = tuple(values_select)
         group_by = list(self.select)
-        if self.annotation_select:
-            for alias, annotation in self.annotation_select.items():
-                if not allow_aliases or alias in column_names:
-                    alias = None
-                group_by_cols = annotation.get_group_by_cols(alias=alias)
+        for alias, annotation in self.annotation_select.items():
+            if not (group_by_cols := annotation.get_group_by_cols()):
+                continue
+            if (
+                allow_aliases
+                and alias not in column_names
+                and not annotation.contains_aggregate
+            ):
+                group_by.append(Ref(alias, annotation))
+            else:
                 group_by.extend(group_by_cols)
         self.group_by = tuple(group_by)
 

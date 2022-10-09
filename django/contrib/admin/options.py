@@ -2011,15 +2011,17 @@ class ModelAdmin(BaseModelAdmin):
             )
             if formset.is_valid():
                 changecount = 0
-                for form in formset.forms:
-                    if form.has_changed():
-                        obj = self.save_form(request, form, change=True)
-                        self.save_model(request, obj, form, change=True)
-                        self.save_related(request, form, formsets=[], change=True)
-                        change_msg = self.construct_change_message(request, form, None)
-                        self.log_change(request, obj, change_msg)
-                        changecount += 1
-
+                with transaction.atomic(using=router.db_for_write(self.model)):
+                    for form in formset.forms:
+                        if form.has_changed():
+                            obj = self.save_form(request, form, change=True)
+                            self.save_model(request, obj, form, change=True)
+                            self.save_related(request, form, formsets=[], change=True)
+                            change_msg = self.construct_change_message(
+                                request, form, None
+                            )
+                            self.log_change(request, obj, change_msg)
+                            changecount += 1
                 if changecount:
                     msg = ngettext(
                         "%(count)s %(name)s was changed successfully.",

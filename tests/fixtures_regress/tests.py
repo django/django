@@ -599,7 +599,7 @@ class TestFixtures(TestCase):
     @override_settings(FIXTURE_DIRS=[Path(_cur_dir) / "fixtures_1"])
     def test_fixtures_dir_pathlib(self):
         management.call_command("loaddata", "inner/absolute.json", verbosity=0)
-        self.assertQuerysetEqual(Absolute.objects.all(), [1], transform=lambda o: o.pk)
+        self.assertQuerySetEqual(Absolute.objects.all(), [1], transform=lambda o: o.pk)
 
 
 class NaturalKeyFixtureTests(TestCase):
@@ -792,7 +792,7 @@ class NaturalKeyFixtureTests(TestCase):
             verbosity=0,
         )
         books = Book.objects.all()
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             books,
             [
                 "<Book: Cryptonomicon by Neal Stephenson (available at Amazon, "

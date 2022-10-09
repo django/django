@@ -1,10 +1,10 @@
 from copy import copy, deepcopy
 
-from django.core.checks import Error
+from django.core.checks import Warning
 from django.core.checks.templates import (
     E001,
     E002,
-    E003,
+    W003,
     check_for_template_tags_with_the_same_name,
     check_setting_app_dirs_loaders,
     check_string_if_invalid_is_string,
@@ -108,15 +108,15 @@ class CheckTemplateTagLibrariesWithSameName(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.error_same_tags = Error(
-            E003.msg.format(
+        cls.warning_same_tags = Warning(
+            W003.msg.format(
                 "'same_tags'",
                 "'check_framework.template_test_apps.same_tags_app_1."
                 "templatetags.same_tags', "
                 "'check_framework.template_test_apps.same_tags_app_2."
                 "templatetags.same_tags'",
             ),
-            id=E003.id,
+            id=W003.id,
         )
 
     @staticmethod
@@ -139,7 +139,7 @@ class CheckTemplateTagLibrariesWithSameName(SimpleTestCase):
     def test_template_tags_with_same_name(self):
         self.assertEqual(
             check_for_template_tags_with_the_same_name(None),
-            [self.error_same_tags],
+            [self.warning_same_tags],
         )
 
     def test_template_tags_with_same_library_name(self):
@@ -155,7 +155,7 @@ class CheckTemplateTagLibrariesWithSameName(SimpleTestCase):
         ):
             self.assertEqual(
                 check_for_template_tags_with_the_same_name(None),
-                [self.error_same_tags],
+                [self.warning_same_tags],
             )
 
     @override_settings(
@@ -186,15 +186,15 @@ class CheckTemplateTagLibrariesWithSameName(SimpleTestCase):
             self.assertEqual(
                 check_for_template_tags_with_the_same_name(None),
                 [
-                    Error(
-                        E003.msg.format(
+                    Warning(
+                        W003.msg.format(
                             "'same_tags'",
                             "'check_framework.template_test_apps.different_tags_app."
                             "templatetags.different_tags', "
                             "'check_framework.template_test_apps.same_tags_app_1."
                             "templatetags.same_tags'",
                         ),
-                        id=E003.id,
+                        id=W003.id,
                     )
                 ],
             )

@@ -46,7 +46,7 @@ from django.test.utils import (
     setup_test_environment,
 )
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
-from django.utils.deprecation import RemovedInDjango50Warning
+from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
 from django.utils.log import DEFAULT_LOGGING
 from django.utils.version import PY311
 
@@ -264,47 +264,56 @@ class AssertNumQueriesUponConnectionTests(TransactionTestCase):
                 list(Car.objects.all())
 
 
-class AssertQuerysetEqualTests(TestCase):
+class AssertQuerySetEqualTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.p1 = Person.objects.create(name="p1")
         cls.p2 = Person.objects.create(name="p2")
 
-    def test_empty(self):
+    def test_rename_assertquerysetequal_deprecation_warning(self):
+        msg = "assertQuerysetEqual() is deprecated in favor of assertQuerySetEqual()."
+        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
+            self.assertQuerysetEqual()
+
+    @ignore_warnings(category=RemovedInDjango51Warning)
+    def test_deprecated_assertquerysetequal(self):
         self.assertQuerysetEqual(Person.objects.filter(name="p3"), [])
 
+    def test_empty(self):
+        self.assertQuerySetEqual(Person.objects.filter(name="p3"), [])
+
     def test_ordered(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Person.objects.order_by("name"),
             [self.p1, self.p2],
         )
 
     def test_unordered(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Person.objects.order_by("name"), [self.p2, self.p1], ordered=False
         )
 
     def test_queryset(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Person.objects.order_by("name"),
             Person.objects.order_by("name"),
         )
 
     def test_flat_values_list(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Person.objects.order_by("name").values_list("name", flat=True),
             ["p1", "p2"],
         )
 
     def test_transform(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Person.objects.order_by("name"),
             [self.p1.pk, self.p2.pk],
             transform=lambda x: x.pk,
         )
 
     def test_repr_transform(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Person.objects.order_by("name"),
             [repr(self.p1), repr(self.p2)],
             transform=repr,
@@ -318,16 +327,16 @@ class AssertQuerysetEqualTests(TestCase):
             "ordered value."
         )
         with self.assertRaisesMessage(ValueError, msg):
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 Person.objects.all(),
                 [self.p1, self.p2],
             )
         # No error for one value.
-        self.assertQuerysetEqual(Person.objects.filter(name="p1"), [self.p1])
+        self.assertQuerySetEqual(Person.objects.filter(name="p1"), [self.p1])
 
     def test_repeated_values(self):
         """
-        assertQuerysetEqual checks the number of appearance of each item
+        assertQuerySetEqual checks the number of appearance of each item
         when used with option ordered=False.
         """
         batmobile = Car.objects.create(name="Batmobile")
@@ -343,10 +352,10 @@ class AssertQuerysetEqualTests(TestCase):
             ]
         )
         with self.assertRaises(AssertionError):
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 self.p1.cars.all(), [batmobile, k2000], ordered=False
             )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             self.p1.cars.all(), [batmobile] * 2 + [k2000] * 4, ordered=False
         )
 
@@ -356,7 +365,7 @@ class AssertQuerysetEqualTests(TestCase):
         names.append("Extra Person")
 
         with self.assertRaises(AssertionError) as ctx:
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 Person.objects.filter(name__startswith="Joe"),
                 names,
                 ordered=False,
@@ -368,7 +377,7 @@ class AssertQuerysetEqualTests(TestCase):
         self.maxDiff = None
         try:
             with self.assertRaises(AssertionError) as ctx:
-                self.assertQuerysetEqual(
+                self.assertQuerySetEqual(
                     Person.objects.filter(name__startswith="Joe"),
                     names,
                     ordered=False,
@@ -1517,44 +1526,53 @@ class AssertFormErrorTests(SimpleTestCase):
             )
 
 
-class AssertFormsetErrorTests(SimpleTestCase):
+class AssertFormSetErrorTests(SimpleTestCase):
     @ignore_warnings(category=RemovedInDjango50Warning)
     def test_non_client_response(self):
         msg = (
-            "assertFormsetError() is only usable on responses fetched using "
+            "assertFormSetError() is only usable on responses fetched using "
             "the Django test Client."
         )
         response = HttpResponse()
         with self.assertRaisesMessage(ValueError, msg):
-            self.assertFormsetError(response, "formset", 0, "field", "invalid value")
+            self.assertFormSetError(response, "formset", 0, "field", "invalid value")
 
     @ignore_warnings(category=RemovedInDjango50Warning)
     def test_response_with_no_context(self):
         msg = "Response did not use any contexts to render the response"
         response = mock.Mock(context=[])
         with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormsetError(response, "formset", 0, "field", "invalid value")
+            self.assertFormSetError(response, "formset", 0, "field", "invalid value")
 
     @ignore_warnings(category=RemovedInDjango50Warning)
     def test_formset_not_in_context(self):
         msg = "The formset 'formset' was not used to render the response"
         response = mock.Mock(context=[{}])
         with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormsetError(response, "formset", 0, "field", "invalid value")
+            self.assertFormSetError(response, "formset", 0, "field", "invalid value")
         msg_prefix = "Custom prefix"
         with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
-            self.assertFormsetError(
+            self.assertFormSetError(
                 response, "formset", 0, "field", "invalid value", msg_prefix=msg_prefix
             )
 
-    def test_single_error(self):
+    def test_rename_assertformseterror_deprecation_warning(self):
+        msg = "assertFormsetError() is deprecated in favor of assertFormSetError()."
+        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
+            self.assertFormsetError()
+
+    @ignore_warnings(category=RemovedInDjango51Warning)
+    def test_deprecated_assertformseterror(self):
         self.assertFormsetError(TestFormset.invalid(), 0, "field", "invalid value")
 
+    def test_single_error(self):
+        self.assertFormSetError(TestFormset.invalid(), 0, "field", "invalid value")
+
     def test_error_list(self):
-        self.assertFormsetError(TestFormset.invalid(), 0, "field", ["invalid value"])
+        self.assertFormSetError(TestFormset.invalid(), 0, "field", ["invalid value"])
 
     def test_empty_errors_valid_formset(self):
-        self.assertFormsetError(TestFormset.valid(), 0, "field", [])
+        self.assertFormSetError(TestFormset.valid(), 0, "field", [])
 
     def test_multiple_forms(self):
         formset = TestFormset(
@@ -1566,8 +1584,8 @@ class AssertFormsetErrorTests(SimpleTestCase):
             }
         )
         formset.full_clean()
-        self.assertFormsetError(formset, 0, "field", [])
-        self.assertFormsetError(formset, 1, "field", ["invalid value"])
+        self.assertFormSetError(formset, 0, "field", [])
+        self.assertFormSetError(formset, 1, "field", ["invalid value"])
 
     def test_field_not_in_form(self):
         msg = (
@@ -1575,12 +1593,12 @@ class AssertFormsetErrorTests(SimpleTestCase):
             "does not contain the field 'other_field'."
         )
         with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormsetError(
+            self.assertFormSetError(
                 TestFormset.invalid(), 0, "other_field", "invalid value"
             )
         msg_prefix = "Custom prefix"
         with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
-            self.assertFormsetError(
+            self.assertFormSetError(
                 TestFormset.invalid(),
                 0,
                 "other_field",
@@ -1594,11 +1612,11 @@ class AssertFormsetErrorTests(SimpleTestCase):
             "valid=True total_forms=1> don't match."
         )
         with self.assertRaisesMessage(AssertionError, msg) as ctx:
-            self.assertFormsetError(TestFormset.valid(), 0, "field", "invalid value")
+            self.assertFormSetError(TestFormset.valid(), 0, "field", "invalid value")
         self.assertIn("[] != ['invalid value']", str(ctx.exception))
         msg_prefix = "Custom prefix"
         with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
-            self.assertFormsetError(
+            self.assertFormSetError(
                 TestFormset.valid(), 0, "field", "invalid value", msg_prefix=msg_prefix
             )
 
@@ -1608,11 +1626,11 @@ class AssertFormsetErrorTests(SimpleTestCase):
             "valid=False total_forms=1> don't match."
         )
         with self.assertRaisesMessage(AssertionError, msg) as ctx:
-            self.assertFormsetError(TestFormset.invalid(), 0, "field", "other error")
+            self.assertFormSetError(TestFormset.invalid(), 0, "field", "other error")
         self.assertIn("['invalid value'] != ['other error']", str(ctx.exception))
         msg_prefix = "Custom prefix"
         with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
-            self.assertFormsetError(
+            self.assertFormSetError(
                 TestFormset.invalid(), 0, "field", "other error", msg_prefix=msg_prefix
             )
 
@@ -1622,7 +1640,7 @@ class AssertFormsetErrorTests(SimpleTestCase):
             "bound, it will never have any errors."
         )
         with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormsetError(TestFormset(), 0, "field", [])
+            self.assertFormSetError(TestFormset(), 0, "field", [])
 
     def test_empty_errors_invalid_formset(self):
         msg = (
@@ -1630,11 +1648,11 @@ class AssertFormsetErrorTests(SimpleTestCase):
             "valid=False total_forms=1> don't match."
         )
         with self.assertRaisesMessage(AssertionError, msg) as ctx:
-            self.assertFormsetError(TestFormset.invalid(), 0, "field", [])
+            self.assertFormSetError(TestFormset.invalid(), 0, "field", [])
         self.assertIn("['invalid value'] != []", str(ctx.exception))
 
     def test_non_field_errors(self):
-        self.assertFormsetError(
+        self.assertFormSetError(
             TestFormset.invalid(nonfield=True), 0, None, "non-field error"
         )
 
@@ -1644,7 +1662,7 @@ class AssertFormsetErrorTests(SimpleTestCase):
             "valid=False total_forms=1> don't match."
         )
         with self.assertRaisesMessage(AssertionError, msg) as ctx:
-            self.assertFormsetError(
+            self.assertFormSetError(
                 TestFormset.invalid(nonfield=True), 0, None, "other non-field error"
             )
         self.assertIn(
@@ -1652,7 +1670,7 @@ class AssertFormsetErrorTests(SimpleTestCase):
         )
         msg_prefix = "Custom prefix"
         with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
-            self.assertFormsetError(
+            self.assertFormSetError(
                 TestFormset.invalid(nonfield=True),
                 0,
                 None,
@@ -1666,16 +1684,16 @@ class AssertFormsetErrorTests(SimpleTestCase):
             "valid=False total_forms=1> don't match."
         )
         with self.assertRaisesMessage(AssertionError, msg) as ctx:
-            self.assertFormsetError(TestFormset.invalid(), 0, None, "non-field error")
+            self.assertFormSetError(TestFormset.invalid(), 0, None, "non-field error")
         self.assertIn("[] != ['non-field error']", str(ctx.exception))
         msg_prefix = "Custom prefix"
         with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
-            self.assertFormsetError(
+            self.assertFormSetError(
                 TestFormset.invalid(), 0, None, "non-field error", msg_prefix=msg_prefix
             )
 
     def test_non_form_errors(self):
-        self.assertFormsetError(TestFormset.invalid(nonform=True), None, None, "error")
+        self.assertFormSetError(TestFormset.invalid(nonform=True), None, None, "error")
 
     def test_different_non_form_errors(self):
         msg = (
@@ -1683,13 +1701,13 @@ class AssertFormsetErrorTests(SimpleTestCase):
             "total_forms=0> don't match."
         )
         with self.assertRaisesMessage(AssertionError, msg) as ctx:
-            self.assertFormsetError(
+            self.assertFormSetError(
                 TestFormset.invalid(nonform=True), None, None, "other error"
             )
         self.assertIn("['error'] != ['other error']", str(ctx.exception))
         msg_prefix = "Custom prefix"
         with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
-            self.assertFormsetError(
+            self.assertFormSetError(
                 TestFormset.invalid(nonform=True),
                 None,
                 None,
@@ -1703,11 +1721,11 @@ class AssertFormsetErrorTests(SimpleTestCase):
             "total_forms=1> don't match."
         )
         with self.assertRaisesMessage(AssertionError, msg) as ctx:
-            self.assertFormsetError(TestFormset.invalid(), None, None, "error")
+            self.assertFormSetError(TestFormset.invalid(), None, None, "error")
         self.assertIn("[] != ['error']", str(ctx.exception))
         msg_prefix = "Custom prefix"
         with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
-            self.assertFormsetError(
+            self.assertFormSetError(
                 TestFormset.invalid(),
                 None,
                 None,
@@ -1718,7 +1736,7 @@ class AssertFormsetErrorTests(SimpleTestCase):
     def test_non_form_errors_with_field(self):
         msg = "You must use field=None with form_index=None."
         with self.assertRaisesMessage(ValueError, msg):
-            self.assertFormsetError(
+            self.assertFormSetError(
                 TestFormset.invalid(nonform=True), None, "field", "error"
             )
 
@@ -1728,7 +1746,7 @@ class AssertFormsetErrorTests(SimpleTestCase):
             "1 form."
         )
         with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormsetError(TestFormset.invalid(), 2, "field", "error")
+            self.assertFormSetError(TestFormset.invalid(), 2, "field", "error")
 
     def test_form_index_too_big_plural(self):
         formset = TestFormset(
@@ -1745,7 +1763,7 @@ class AssertFormsetErrorTests(SimpleTestCase):
             "forms."
         )
         with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormsetError(formset, 2, "field", "error")
+            self.assertFormSetError(formset, 2, "field", "error")
 
 
 # RemovedInDjango50Warning
@@ -1845,15 +1863,15 @@ class AssertFormErrorDeprecationTests(SimpleTestCase):
             "valid=False total_forms=1> don't match."
         )
         with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormsetError(TestFormset.invalid(), 0, "field", None)
+            self.assertFormSetError(TestFormset.invalid(), 0, "field", None)
 
     def test_assert_formset_error_errors_none_warning(self):
         msg = (
-            "Passing errors=None to assertFormsetError() is deprecated, use "
+            "Passing errors=None to assertFormSetError() is deprecated, use "
             "errors=[] instead."
         )
         with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
-            self.assertFormsetError(TestFormset.valid(), 0, "field", None)
+            self.assertFormSetError(TestFormset.valid(), 0, "field", None)
 
     def _assert_formset_error_old_api_cases(
         self, formset, form_index, field, errors, msg_prefix
@@ -1933,8 +1951,8 @@ class AssertFormErrorDeprecationTests(SimpleTestCase):
 
     def test_assert_formset_error_old_api(self):
         deprecation_msg = (
-            "Passing response to assertFormsetError() is deprecated. Use the formset "
-            "object directly: assertFormsetError(response.context['formset'], 0, ...)"
+            "Passing response to assertFormSetError() is deprecated. Use the formset "
+            "object directly: assertFormSetError(response.context['formset'], 0, ...)"
         )
         for args, kwargs in self._assert_formset_error_old_api_cases(
             formset="formset",
@@ -1945,7 +1963,7 @@ class AssertFormErrorDeprecationTests(SimpleTestCase):
         ):
             with self.subTest(args=args, kwargs=kwargs):
                 with self.assertWarnsMessage(RemovedInDjango50Warning, deprecation_msg):
-                    self.assertFormsetError(*args, **kwargs)
+                    self.assertFormSetError(*args, **kwargs)
 
     @ignore_warnings(category=RemovedInDjango50Warning)
     def test_assert_formset_error_old_api_assertion_error(self):
@@ -1958,7 +1976,7 @@ class AssertFormErrorDeprecationTests(SimpleTestCase):
         ):
             with self.subTest(args=args, kwargs=kwargs):
                 with self.assertRaises(AssertionError):
-                    self.assertFormsetError(*args, **kwargs)
+                    self.assertFormSetError(*args, **kwargs)
 
 
 class FirstUrls:

@@ -178,7 +178,7 @@ class WhereNode(tree.Node):
                 sql_string = "(%s)" % sql_string
         return sql_string, result_params
 
-    def get_group_by_cols(self, alias=None):
+    def get_group_by_cols(self):
         cols = []
         for child in self.children:
             cols.extend(child.get_group_by_cols())

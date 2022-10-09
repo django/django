@@ -25,7 +25,7 @@ class BaseOrderWithRespectToTests:
 
     def test_default_to_insertion_order(self):
         # Answers will always be ordered in the order they were inserted.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             self.q1.answer_set.all(),
             [
                 "John",
@@ -82,7 +82,7 @@ class BaseOrderWithRespectToTests:
         # Change the ordering to the swapped version -
         # this changes the ordering of the queryset.
         a.question.set_answer_order(id_list)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             self.q1.answer_set.all(),
             ["John", "Paul", "George", "Number five", "Ringo"],
             attrgetter("text"),

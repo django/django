@@ -10,7 +10,7 @@ class SampleTestCase(TestCase):
 
     def test_class_fixtures(self):
         "Test cases can load fixture objects into models defined in packages"
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.all(),
             [
                 "Django conquers world!",
@@ -26,7 +26,7 @@ class FixtureTestCase(TestCase):
         "Fixtures can load data into models defined in packages"
         # Load fixture 1. Single JSON file, with two objects
         management.call_command("loaddata", "model_package_fixture1.json", verbosity=0)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.all(),
             [
                 "Time to reform copyright",
@@ -38,7 +38,7 @@ class FixtureTestCase(TestCase):
         # Load fixture 2. JSON file imported by default. Overwrites some
         # existing objects
         management.call_command("loaddata", "model_package_fixture2.json", verbosity=0)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.all(),
             [
                 "Django conquers world!",
@@ -54,7 +54,7 @@ class FixtureTestCase(TestCase):
         ):
             management.call_command("loaddata", "unknown.json", verbosity=0)
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.all(),
             [
                 "Django conquers world!",

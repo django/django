@@ -162,7 +162,7 @@ Minor features
 * The ``HttpOnly`` flag can be set on the CSRF cookie with
   :setting:`CSRF_COOKIE_HTTPONLY`.
 
-* The :meth:`~django.test.TransactionTestCase.assertQuerysetEqual` now checks
+* The ``assertQuerysetEqual()`` now checks
   for undefined order and raises :exc:`ValueError` if undefined
   order is spotted. The order is seen as undefined if the given ``QuerySet``
   isn't ordered and there is more than one ordered value to compare against.
@@ -321,7 +321,7 @@ Minor features
 
 * The :class:`~django.test.SimpleTestCase` class includes a new assertion
   helper for testing formset errors:
-  :meth:`~django.test.SimpleTestCase.assertFormsetError`.
+  ``django.test.SimpleTestCase.assertFormsetError()``.
 
 * The list of related fields added to a
   :class:`~django.db.models.query.QuerySet` by

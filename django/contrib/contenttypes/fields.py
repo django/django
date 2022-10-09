@@ -552,14 +552,6 @@ class ReverseGenericManyToOneDescriptor(ReverseManyToOneDescriptor):
             self.rel,
         )
 
-    @cached_property
-    def related_manager_cache_key(self):
-        # By default, GenericRel instances will be marked as hidden unless
-        # related_query_name is given (their accessor name being "+" when
-        # hidden), which would cause multiple GenericRelations declared on a
-        # single model to collide, so always use the remote field's name.
-        return self.field.get_cache_name()
-
 
 def create_generic_related_manager(superclass, rel):
     """

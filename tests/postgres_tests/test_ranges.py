@@ -631,7 +631,7 @@ class TestValidators(PostgreSQLSimpleTestCase):
     def test_max(self):
         validator = RangeMaxValueValidator(5)
         validator(NumericRange(0, 5))
-        msg = "Ensure that this range is completely less than or equal to 5."
+        msg = "Ensure that the upper bound of the range is not greater than 5."
         with self.assertRaises(exceptions.ValidationError) as cm:
             validator(NumericRange(0, 10))
         self.assertEqual(cm.exception.messages[0], msg)
@@ -642,7 +642,7 @@ class TestValidators(PostgreSQLSimpleTestCase):
     def test_min(self):
         validator = RangeMinValueValidator(5)
         validator(NumericRange(10, 15))
-        msg = "Ensure that this range is completely greater than or equal to 5."
+        msg = "Ensure that the lower bound of the range is not less than 5."
         with self.assertRaises(exceptions.ValidationError) as cm:
             validator(NumericRange(0, 10))
         self.assertEqual(cm.exception.messages[0], msg)

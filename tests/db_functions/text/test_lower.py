@@ -11,11 +11,11 @@ class LowerTests(TestCase):
         Author.objects.create(name="John Smith", alias="smithj")
         Author.objects.create(name="Rhonda")
         authors = Author.objects.annotate(lower_name=Lower("name"))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors.order_by("name"), ["john smith", "rhonda"], lambda a: a.lower_name
         )
         Author.objects.update(name=Lower("name"))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors.order_by("name"),
             [
                 ("john smith", "john smith"),
@@ -35,6 +35,6 @@ class LowerTests(TestCase):
             Author.objects.create(name="John Smith", alias="smithj")
             Author.objects.create(name="Rhonda")
             authors = Author.objects.filter(name__lower__exact="john smith")
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 authors.order_by("name"), ["John Smith"], lambda a: a.name
             )

@@ -1230,10 +1230,10 @@ class QueryTestCase(TestCase):
         val = Book.objects.db_manager("other").raw(
             "SELECT id FROM multiple_database_book"
         )
-        self.assertQuerysetEqual(val, [dive.pk], attrgetter("pk"))
+        self.assertQuerySetEqual(val, [dive.pk], attrgetter("pk"))
 
         val = Book.objects.raw("SELECT id FROM multiple_database_book").using("other")
-        self.assertQuerysetEqual(val, [dive.pk], attrgetter("pk"))
+        self.assertQuerySetEqual(val, [dive.pk], attrgetter("pk"))
 
     def test_select_related(self):
         """

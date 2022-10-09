@@ -48,6 +48,12 @@ Minor features
   :attr:`~django.contrib.admin.ModelAdmin.filter_vertical` widgets are now
   filterable.
 
+* The ``admin/base.html`` template now has a new block ``nav-breadcrumbs``
+  which contains the navigation landmark and the ``breadcrumbs`` block.
+
+* :attr:`.ModelAdmin.list_editable` now uses atomic transactions when making
+  edits.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -220,6 +226,9 @@ Models
   the text value of a key, index, or path transform of
   :class:`~django.db.models.JSONField`.
 
+* :class:`~django.db.models.functions.Now` now supports microsecond precision
+  on MySQL and millisecond precision on SQLite.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -271,7 +280,8 @@ Utilities
 Validators
 ~~~~~~~~~~
 
-* ...
+* The list of common passwords used by ``CommonPasswordValidator`` is updated
+  to the most recent version.
 
 .. _backwards-incompatible-4.2:
 
@@ -315,6 +325,14 @@ Miscellaneous
 
 * :ttag:`{% blocktranslate asvar … %}<blocktranslate>` result is now marked as
   safe for (HTML) output purposes.
+
+* The ``autofocus`` HTML attribute in the admin search box is removed as it can
+  be confusing for screen readers.
+
+* The :option:`makemigrations --check` option no longer creates missing
+  migration files.
+
+* The ``alias`` argument for :meth:`.Expression.get_group_by_cols` is removed.
 
 .. _deprecated-features-4.2:
 
@@ -401,3 +419,9 @@ Miscellaneous
 
 * The ``map_height`` and ``map_width`` attributes of ``BaseGeometryWidget`` are
   deprecated, use CSS to size map widgets instead.
+
+* ``SimpleTestCase.assertFormsetError()`` is deprecated in favor of
+  ``assertFormSetError()``.
+
+* ``TransactionTestCase.assertQuerysetEqual()`` is deprecated in favor of
+  ``assertQuerySetEqual()``.
