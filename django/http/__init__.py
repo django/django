@@ -1,5 +1,6 @@
 from django.http.cookie import SimpleCookie, parse_cookie
 from django.http.request import (
+    HttpHeaders,
     HttpRequest,
     QueryDict,
     RawPostDataException,
@@ -27,6 +28,7 @@ from django.http.response import (
 __all__ = [
     "SimpleCookie",
     "parse_cookie",
+    "HttpHeaders",
     "HttpRequest",
     "QueryDict",
     "RawPostDataException",

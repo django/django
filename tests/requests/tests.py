@@ -5,9 +5,14 @@ from urllib.parse import urlencode
 
 from django.core.exceptions import DisallowedHost
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
-from django.http import HttpRequest, RawPostDataException, UnreadablePostError
+from django.http import (
+    HttpHeaders,
+    HttpRequest,
+    RawPostDataException,
+    UnreadablePostError,
+)
 from django.http.multipartparser import MultiPartParserError
-from django.http.request import HttpHeaders, split_domain_port
+from django.http.request import split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
 

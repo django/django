@@ -1066,6 +1066,52 @@ class RequestFactoryTest(SimpleTestCase):
         echoed_request_line = "TRACE {} {}".format(url_path, protocol)
         self.assertContains(response, echoed_request_line)
 
+    def test_request_factory_default_headers(self):
+        request = RequestFactory(
+            HTTP_AUTHORIZATION="Bearer faketoken",
+            HTTP_X_ANOTHER_HEADER="some other value",
+        ).get("/somewhere/")
+        self.assertEqual(request.headers["authorization"], "Bearer faketoken")
+        self.assertIn("HTTP_AUTHORIZATION", request.META)
+        self.assertEqual(request.headers["x-another-header"], "some other value")
+        self.assertIn("HTTP_X_ANOTHER_HEADER", request.META)
+
+        request = RequestFactory(
+            headers={
+                "Authorization": "Bearer faketoken",
+                "X-Another-Header": "some other value",
+            }
+        ).get("/somewhere/")
+        self.assertEqual(request.headers["authorization"], "Bearer faketoken")
+        self.assertIn("HTTP_AUTHORIZATION", request.META)
+        self.assertEqual(request.headers["x-another-header"], "some other value")
+        self.assertIn("HTTP_X_ANOTHER_HEADER", request.META)
+
+    def test_request_factory_sets_headers(self):
+        for method_name, view in self.http_methods_and_views:
+            method = getattr(self.request_factory, method_name)
+            request = method(
+                "/somewhere/",
+                HTTP_AUTHORIZATION="Bearer faketoken",
+                HTTP_X_ANOTHER_HEADER="some other value",
+            )
+            self.assertEqual(request.headers["authorization"], "Bearer faketoken")
+            self.assertIn("HTTP_AUTHORIZATION", request.META)
+            self.assertEqual(request.headers["x-another-header"], "some other value")
+            self.assertIn("HTTP_X_ANOTHER_HEADER", request.META)
+
+            request = method(
+                "/somewhere/",
+                headers={
+                    "Authorization": "Bearer faketoken",
+                    "X-Another-Header": "some other value",
+                },
+            )
+            self.assertEqual(request.headers["authorization"], "Bearer faketoken")
+            self.assertIn("HTTP_AUTHORIZATION", request.META)
+            self.assertEqual(request.headers["x-another-header"], "some other value")
+            self.assertIn("HTTP_X_ANOTHER_HEADER", request.META)
+
 
 @override_settings(ROOT_URLCONF="test_client.urls")
 class AsyncClientTest(TestCase):
@@ -1170,6 +1216,18 @@ class AsyncRequestFactoryTest(SimpleTestCase):
             "/somewhere/",
             AUTHORIZATION="Bearer faketoken",
             X_ANOTHER_HEADER="some other value",
+        )
+        self.assertEqual(request.headers["authorization"], "Bearer faketoken")
+        self.assertIn("HTTP_AUTHORIZATION", request.META)
+        self.assertEqual(request.headers["x-another-header"], "some other value")
+        self.assertIn("HTTP_X_ANOTHER_HEADER", request.META)
+
+        request = self.request_factory.get(
+            "/somewhere/",
+            headers={
+                "Authorization": "Bearer faketoken",
+                "X-Another-Header": "some other value",
+            },
         )
         self.assertEqual(request.headers["authorization"], "Bearer faketoken")
         self.assertIn("HTTP_AUTHORIZATION", request.META)

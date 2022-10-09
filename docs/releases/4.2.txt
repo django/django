@@ -279,6 +279,22 @@ Tests
 * The :option:`test --debug-sql` option now formats SQL queries with
   ``sqlparse``.
 
+* The :class:`~django.test.RequestFactory`,
+  :class:`~django.test.AsyncRequestFactory`, :class:`~django.test.Client`, and
+  :class:`~django.test.AsyncClient` classes now support the ``headers``
+  parameter, which accepts a dictionary of header names and values. This allows
+  a more natural syntax for declaring headers.
+
+  .. code-block:: python
+
+     # Before:
+     self.client.get("/home/", HTTP_ACCEPT_LANGUAGE="fr")
+     await self.async_client.get("/home/", ACCEPT_LANGUAGE="fr")
+
+     # After:
+     self.client.get("/home/", headers={"accept-language": "fr"})
+     await self.async_client.get("/home/", headers={"accept-language": "fr"})
+
 URLs
 ~~~~
 
