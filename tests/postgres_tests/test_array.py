@@ -218,7 +218,9 @@ class TestQuerying(PostgreSQLTestCase):
                 NullableIntegerArrayModel(order=2, field=[2]),
                 NullableIntegerArrayModel(order=3, field=[2, 3]),
                 NullableIntegerArrayModel(order=4, field=[20, 30, 40]),
-                NullableIntegerArrayModel(order=5, field=None),
+                NullableIntegerArrayModel(
+                    order=5, field=None, field_nested=[[None, None], [None, None]]
+                ),
             ]
         )
 
@@ -239,6 +241,36 @@ class TestQuerying(PostgreSQLTestCase):
     def test_exact(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__exact=[1]), self.objs[:1]
+        )
+
+    def test_exact_null(self):
+        instance = NullableIntegerArrayModel.objects.create(field=[None])
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__exact=[None]), [instance]
+        )
+
+    def test_exact_nested_null(self):
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(
+                field_nested__exact=[[None, None], [None, None]]
+            ),
+            [self.objs[4]],
+        )
+
+    def test_exact_nested_null_one_array(self):
+        instance = NullableIntegerArrayModel.objects.create(field_nested=[[None, None]])
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(
+                field_nested__exact=[[None, None]]
+            ),
+            [instance],
+        )
+
+    def test_exact_nested_null_1darray(self):
+        instance = NullableIntegerArrayModel.objects.create(field_nested=[None, None])
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field_nested__exact=[None, None]),
+            [instance],
         )
 
     def test_exact_with_expression(self):

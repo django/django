@@ -237,7 +237,10 @@ class ArrayField(CheckFieldDefaultMixin, Field):
 
 class ArrayRHSMixin:
     def __init__(self, lhs, rhs):
-        if isinstance(rhs, (tuple, list)):
+        # When ARRAY-s are full of None, let psycopg2 handle these corner cases
+        # (See https://github.com/psycopg/psycopg2/issues/1507,
+        #      https://code.djangoproject.com/ticket/34080).
+        if isinstance(rhs, (tuple, list)) and any(self._rhs_not_none_values(rhs)):
             expressions = []
             for value in rhs:
                 if not hasattr(value, "resolve_expression"):
@@ -255,6 +258,13 @@ class ArrayRHSMixin:
         rhs, rhs_params = super().process_rhs(compiler, connection)
         cast_type = self.lhs.output_field.cast_db_type(connection)
         return "%s::%s" % (rhs, cast_type), rhs_params
+
+    def _rhs_not_none_values(self, rhs):
+        for x in rhs:
+            if isinstance(x, (list, tuple)):
+                yield from self._rhs_not_none_values(x)
+            elif x is not None:
+                yield True
 
 
 @ArrayField.register_lookup
