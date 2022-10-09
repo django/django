@@ -22,6 +22,11 @@ form .form-row p {
     padding-left: 0;
 }
 
+.form-row > div {
+    display: flex;
+    flex-wrap: wrap;
+}
+
 /* FORM LABELS */
 
 label {
@@ -69,7 +74,6 @@ form ul.inline li {
 .aligned label {
     display: block;
     padding: 4px 10px 0 0;
-    float: left;
     width: 160px;
     word-wrap: break-word;
     line-height: 1;
@@ -82,12 +86,17 @@ form ul.inline li {
     height: 26px;
 }
 
-.aligned label + p, .aligned label + div.help, .aligned label + div.readonly {
+.aligned label + p, .aligned .checkbox-row + div.help, .aligned label + div.readonly {
     padding: 6px 0;
     margin-top: 0;
     margin-bottom: 0;
     margin-left: 170px;
     overflow-wrap: break-word;
+}
+
+.aligned label + div.readonly,
+.aligned label + .datetime {
+    margin-left: 0;
 }
 
 .aligned ul label {
@@ -117,7 +126,6 @@ form .aligned div.radiolist {
 
 form .aligned p.help,
 form .aligned div.help {
-    clear: left;
     margin-top: 0;
     margin-left: 160px;
     padding-left: 10px;
@@ -129,8 +137,7 @@ form .aligned p.datetime div.help.timezonewarning {
     font-weight: normal;
 }
 
-form .aligned label + p.help,
-form .aligned label + div.help {
+form .aligned .checkbox-row + .help {
     margin-left: 0;
     padding-left: 0;
 }

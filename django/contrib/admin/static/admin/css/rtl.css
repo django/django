@@ -111,7 +111,6 @@ thead th.sorted .text {
 
 .aligned label {
     padding: 0 0 3px 1em;
-    float: right;
 }
 
 .submit-row a.deletelink {
@@ -127,10 +126,6 @@ thead th.sorted .text {
     margin-left: 5px;
 }
 
-form .aligned p.help, form .aligned div.help {
-    clear: right;
-}
-
 form .aligned ul {
     margin-right: 163px;
     margin-left: 0;
@@ -140,6 +135,17 @@ form ul.inline li {
     float: right;
     padding-right: 0;
     padding-left: 7px;
+}
+
+form .aligned p.help,
+form .aligned div.help {
+    margin-right: 160px;
+    padding-right: 10px;
+}
+
+form .aligned .checkbox-row + .help {
+    margin-right: 0;
+    padding-right: 0;
 }
 
 .submit-row {
