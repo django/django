@@ -312,6 +312,7 @@ td, th {
     border-bottom: 1px solid var(--hairline-color);
     vertical-align: top;
     padding: 8px;
+    word-break: break-word;
 }
 
 th {
