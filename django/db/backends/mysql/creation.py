@@ -75,7 +75,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         load_cmd[-1] = target_database_name
 
         with subprocess.Popen(
-            dump_cmd, stdout=subprocess.PIPE, env=dump_env
+            dump_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=dump_env
         ) as dump_proc:
             with subprocess.Popen(
                 load_cmd,
@@ -85,3 +85,11 @@ class DatabaseCreation(BaseDatabaseCreation):
             ):
                 # Allow dump_proc to receive a SIGPIPE if the load process exits.
                 dump_proc.stdout.close()
+
+            err = dump_proc.stderr.read().decode()
+
+        if dump_proc.returncode != 0:
+            self.log("Got a fatal error cloning the test database: %s" % err)
+            sys.exit(2)
+
+        self.log("Got a non-fatal error cloning the test database: %s" % err)

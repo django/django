@@ -56,6 +56,15 @@ class DatabaseCreationTests(SimpleTestCase):
                 creation._clone_test_db("suffix", verbosity=0, keepdb=True)
                 _clone_db.assert_not_called()
 
+    def test_clone_test_db_unexpected_error(self, *mock_objects):
+        creation = DatabaseCreation(connection)
+        with mock.patch.object(subprocess, "Popen") as mocked_popen:
+            mocked_popen.__enter__.returncode = 2
+            mocked_popen.__enter__.stderr.read.return_value = b"error!"
+
+            with self.assertRaises(SystemExit):
+                creation._clone_db("source_db", "target_db")
+
     def test_clone_test_db_options_ordering(self):
         creation = DatabaseCreation(connection)
         try:
@@ -72,6 +81,9 @@ class DatabaseCreationTests(SimpleTestCase):
                 },
             }
             with mock.patch.object(subprocess, "Popen") as mocked_popen:
+                mocked_popen.__enter__.returncode = 0
+                mocked_popen.__enter__.stderr.read.return_value = b""
+
                 creation._clone_db("source_db", "target_db")
                 mocked_popen.assert_has_calls(
                     [
