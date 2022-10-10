@@ -14,7 +14,7 @@ from .signals import user_logged_in, user_logged_out, user_login_failed
 SESSION_KEY = "_auth_user_id"
 BACKEND_SESSION_KEY = "_auth_user_backend"
 HASH_SESSION_KEY = "_auth_user_hash"
-REDIRECT_FIELD_NAME = "next"
+REDIRECT_FIELD_NAME = getattr(settings, "REDIRECT_FIELD_NAME", "next")
 
 
 def load_backend(path):

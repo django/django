@@ -527,6 +527,8 @@ LOGIN_REDIRECT_URL = "/accounts/profile/"
 
 LOGOUT_REDIRECT_URL = None
 
+REDIRECT_FIELD_NAME = "next"
+
 # The number of seconds a password reset link is valid for (default: 3 days).
 PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 3
 
