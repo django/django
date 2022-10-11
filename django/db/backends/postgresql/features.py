@@ -20,6 +20,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update_of = True
     has_select_for_update_skip_locked = True
     has_select_for_no_key_update = True
+    has_select_for_share = True
+    has_select_for_share_nowait = True
     can_release_savepoints = True
     supports_tablespaces = True
     supports_transactions = True

@@ -1510,6 +1510,16 @@ class QuerySet:
             return self
         return self._combinator_query("difference", *other_qs)
 
+    def select_for_share(self, nowait=False):
+        """
+        Return a new QuerySet instance that will select objects with a
+        FOR SHARE lock.
+        """
+        obj = self._chain()
+        obj.query.select_for_share = True
+        obj.query.select_for_share_nowait = nowait
+        return obj
+
     def select_for_update(self, nowait=False, skip_locked=False, of=(), no_key=False):
         """
         Return a new QuerySet instance that will select objects with a

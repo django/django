@@ -11,6 +11,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     # MySQL doesn't support sliced subqueries with IN/ALL/ANY/SOME.
     allow_sliced_subqueries_with_in = False
     has_select_for_update = True
+    has_select_for_share = True
     supports_forward_references = False
     supports_regex_backreferencing = False
     supports_date_lookup_using_string = False
@@ -259,6 +260,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             not self.connection.mysql_is_mariadb
             and self.connection.mysql_version >= (8, 0, 1)
         )
+
+    @cached_property
+    def has_select_for_share_nowait(self):
+        if self.connection.mysql_is_mariadb:
+            return True
+        return self.connection.mysql_version >= (8, 0, 1)
 
     @cached_property
     def supports_explain_analyze(self):

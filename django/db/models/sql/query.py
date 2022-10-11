@@ -197,6 +197,8 @@ class Query(BaseExpression):
     select_for_update_skip_locked = False
     select_for_update_of = ()
     select_for_no_key_update = False
+    select_for_share = False
+    select_for_share_nowait = False
     select_related = False
     # Arbitrary limit for select_related to prevents infinite recursion.
     max_depth = 5
@@ -2225,7 +2227,7 @@ class Query(BaseExpression):
         query (not even the model's default).
         """
         if not force and (
-            self.is_sliced or self.distinct_fields or self.select_for_update
+            self.is_sliced or self.distinct_fields or self.select_for_update or self.select_for_share
         ):
             return
         self.order_by = ()

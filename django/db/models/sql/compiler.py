@@ -757,6 +757,29 @@ class SQLCompiler:
 
             if for_update_part and not features.for_update_after_from:
                 result.append(for_update_part)
+            elif self.query.select_for_share :
+                # and features.has_select_for_share
+                if (
+                    self.connection.get_autocommit()
+                    # Don't raise an exception when database doesn't
+                    # support transactions, as it's a noop.
+                    and features.supports_transactions
+                ):
+                    raise TransactionManagementError(
+                        "select_for_share cannot be used outside of a transaction."
+                    )
+                nowait = self.query.select_for_share_nowait
+                # If it's a NOWAIT query but the
+                # backend doesn't support it, raise NotSupportedError to
+                # prevent a possible deadlock.
+                if nowait and not features.has_select_for_share_nowait:
+                    raise NotSupportedError(
+                        "NOWAIT is not supported on this database backend."
+                    )
+                for_share_part = self.connection.ops.for_share_sql(
+                    nowait=nowait
+                )
+                result.append(for_share_part)
 
             if self.query.subquery and extra_select:
                 # If the query is used as a subquery, the extra selects would

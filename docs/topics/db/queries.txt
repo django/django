@@ -1776,3 +1776,22 @@ Finally, it's important to note that the Django database layer is merely an
 interface to your database. You can access your database via other tools,
 programming languages or database frameworks; there's nothing Django-specific
 about your database.
+
+
+select_for_share
+------------------------
+If you want use share lock.
+try Entry.objects.select_for_share()
+it is almost the same as select_for_update()
+    def select_for_share(self, nowait=False):
+        """
+        Return a new QuerySet instance that will select objects with a
+        FOR SHARE lock.
+        """
+        obj = self._chain()
+        obj.query.select_for_share = True
+        obj.query.select_for_share_nowait = nowait
+        return obj
+
+
+

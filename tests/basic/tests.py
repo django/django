@@ -685,6 +685,7 @@ class ManagerTest(SimpleTestCase):
         "last",
         "order_by",
         "select_for_update",
+        "select_for_share",
         "select_related",
         "prefetch_related",
         "values",
