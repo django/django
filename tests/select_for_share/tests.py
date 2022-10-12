@@ -1,7 +1,7 @@
 import threading
 import time
 
-from django.db import OperationalError, connection, transaction
+from django.db import OperationalError, connection, transaction, NotSupportedError
 from django.test import TransactionTestCase, skipUnlessDBFeature
 
 from .models import City, Country, Person, PersonProfile
@@ -37,8 +37,8 @@ class SelectForUpdateTests(TransactionTestCase):
         try:
             with transaction.atomic():
                 """
-                The backend's FOR UPDATE variant appears in
-                generated SQL when select_for_update is invoked.
+                The backend's FOR SHARE variant appears in
+                generated SQL when select_for_share is invoked.
                 """
                 sql = Person.objects.select_for_share().query
                 self.assertTrue(self.has_for_share_sql(str(sql)))
@@ -110,16 +110,18 @@ class SelectForUpdateTests(TransactionTestCase):
         """
         self.get_write_lock()
         time.sleep(2)
-        res = False
         with transaction.atomic():
             try:
                 data = Person.objects.filter(name="Reinhardt").select_for_share(
                     nowait=True
                 )
                 list(data)
+                self.assertTrue(False)
             except OperationalError:
-                res = True
-            self.assertTrue(res)
+                self.assertTrue(True)
+            except NotSupportedError:
+                # If NOWAIT is not supported, there is no need to test
+                pass
 
     @skipUnlessDBFeature("has_select_for_share")
     def test_select_for_share_with_get(self):
@@ -154,7 +156,7 @@ class SelectForUpdateTests(TransactionTestCase):
                     pass
 
         job = threading.Thread(target=share_lock)
-        job.setDaemon(True)
+        job.daemon = True
         job.start()
 
     def get_write_lock(self, nowait: bool = True):
@@ -175,5 +177,5 @@ class SelectForUpdateTests(TransactionTestCase):
                     return False
 
         job = threading.Thread(target=writ_lock)
-        job.setDaemon(True)
+        job.daemon(True)
         job.start()

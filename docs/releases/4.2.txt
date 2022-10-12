@@ -114,9 +114,9 @@ Minor features
 * ...
 
 :mod:`django.db.models.query.QuerySet`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* The new :func:`django.db.models.query.QuerySet.select_for_share` function returns ``'QuerySet'``.
+* ...
 
 
 Cache
