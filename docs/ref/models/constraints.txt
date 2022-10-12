@@ -34,6 +34,17 @@ option.
     Constraints are checked during the :ref:`model validation
     <validating-objects>`.
 
+.. admonition:: Validation of Constraints with ``JSONField``
+
+    Constraints containing :class:`~django.db.models.JSONField` may not raise
+    validation errors as key, index, and path transforms have many
+    database-specific caveats. This :ticket:`may be fully supported later
+    <34059>`.
+
+    You should always check that there are no log messages, in the
+    ``django.db.models`` logger, like *"Got a database error calling check() on
+    …"* to confirm it's validated properly.
+
 .. versionchanged:: 4.1
 
     In older versions, constraints were not checked during model validation.
