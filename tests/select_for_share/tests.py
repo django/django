@@ -1,5 +1,6 @@
 import threading
 import time
+
 from django.db import OperationalError, connection, transaction
 from django.test import TransactionTestCase, skipUnlessDBFeature
 
