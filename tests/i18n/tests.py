@@ -550,26 +550,13 @@ class FormattingTests(SimpleTestCase):
                 self.assertIn(
                     "23", time_format(some_datetime)
                 )  # Uses TIME_FORMAT by default
+                self.assertIn("2017", date_format(some_datetime, "DATETIME_FORMAT"))
+                self.assertIn("2017", date_format(some_date, "YEAR_MONTH_FORMAT"))
+                self.assertIn("14", date_format(some_date, "MONTH_DAY_FORMAT"))
+                self.assertIn("2017", date_format(some_date, "SHORT_DATE_FORMAT"))
                 self.assertIn(
                     "2017",
-                    date_format(some_datetime, format=get_format("DATETIME_FORMAT")),
-                )
-                self.assertIn(
-                    "2017",
-                    date_format(some_date, format=get_format("YEAR_MONTH_FORMAT")),
-                )
-                self.assertIn(
-                    "14", date_format(some_date, format=get_format("MONTH_DAY_FORMAT"))
-                )
-                self.assertIn(
-                    "2017",
-                    date_format(some_date, format=get_format("SHORT_DATE_FORMAT")),
-                )
-                self.assertIn(
-                    "2017",
-                    date_format(
-                        some_datetime, format=get_format("SHORT_DATETIME_FORMAT")
-                    ),
+                    date_format(some_datetime, "SHORT_DATETIME_FORMAT"),
                 )
 
     def test_locale_independent(self):
@@ -961,7 +948,7 @@ class FormattingTests(SimpleTestCase):
                     Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(self.ctxt),
                 )
                 self.assertEqual(
-                    date_format(datetime.datetime.now(), "DATE_FORMAT"),
+                    date_format(datetime.datetime.now()),
                     Template('{% now "DATE_FORMAT" %}').render(self.ctxt),
                 )
 
