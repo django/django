@@ -1,7 +1,7 @@
 import threading
 import time
 
-from django.db import OperationalError, connection, transaction, NotSupportedError
+from django.db import NotSupportedError, OperationalError, connection, transaction
 from django.test import TransactionTestCase, skipUnlessDBFeature
 
 from .models import City, Country, Person, PersonProfile
@@ -123,6 +123,30 @@ class SelectForUpdateTests(TransactionTestCase):
                 # If NOWAIT is not supported, there is no need to test
                 pass
 
+    @skipUnlessDBFeature("has_select_for_share", "supports_transactions")
+    def test_raw_lock_wait_available(self):
+        """
+        A thread running a select_for_update
+        and try select_for_share, want wait and success
+        """
+        self.get_write_lock()
+        time.sleep(2)
+        with transaction.atomic():
+            try:
+                start = time.time()
+                data = Person.objects.filter(name="Reinhardt").select_for_share()
+                list(data)
+                end = time.time()
+                if round(end - start) < 2:
+                    # Estimated according to the waiting time
+                    self.assertTrue(False)
+                self.assertTrue(True)
+            except OperationalError:
+                self.assertTrue(False)
+            except NotSupportedError:
+                # If NOWAIT is not supported, there is no need to test
+                pass
+
     @skipUnlessDBFeature("has_select_for_share")
     def test_select_for_share_with_get(self):
         """select for share with get"""
@@ -177,5 +201,5 @@ class SelectForUpdateTests(TransactionTestCase):
                     return False
 
         job = threading.Thread(target=writ_lock)
-        job.daemon(True)
+        job.daemon = True
         job.start()

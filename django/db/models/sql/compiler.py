@@ -757,8 +757,7 @@ class SQLCompiler:
 
             if for_update_part and not features.for_update_after_from:
                 result.append(for_update_part)
-            elif self.query.select_for_share:
-                # and features.has_select_for_share
+            elif self.query.select_for_share and features.has_select_for_share:
                 if (
                     self.connection.get_autocommit()
                     # Don't raise an exception when database doesn't
