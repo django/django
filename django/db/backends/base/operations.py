@@ -231,9 +231,7 @@ class BaseDatabaseOperations:
         """
         Return the FOR SHARE SQL clause to lock rows for an update operation.
         """
-        return "FOR SHARE%s" % (
-            " NOWAIT" if nowait else ""
-        )
+        return "FOR SHARE%s" % (" NOWAIT" if nowait else "")
 
     def for_update_sql(self, nowait=False, skip_locked=False, of=(), no_key=False):
         """

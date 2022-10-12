@@ -1,20 +1,9 @@
 import threading
 import time
-from django.db import (
-    connection,
-    transaction, OperationalError,
-)
-from django.test import (
-    TransactionTestCase,
-    skipUnlessDBFeature,
-)
+from django.db import OperationalError, connection, transaction
+from django.test import TransactionTestCase, skipUnlessDBFeature
 
-from .models import (
-    City,
-    Country,
-    Person,
-    PersonProfile,
-)
+from .models import City, Country, Person, PersonProfile
 
 
 class SelectForUpdateTests(TransactionTestCase):
@@ -105,7 +94,8 @@ class SelectForUpdateTests(TransactionTestCase):
         with transaction.atomic():
             try:
                 data = Person.objects.filter(name="Reinhardt").select_for_update(
-                    nowait=True)
+                    nowait=True
+                )
                 list(data)
             except OperationalError:
                 res = True
@@ -123,7 +113,8 @@ class SelectForUpdateTests(TransactionTestCase):
         with transaction.atomic():
             try:
                 data = Person.objects.filter(name="Reinhardt").select_for_share(
-                    nowait=True)
+                    nowait=True
+                )
                 list(data)
             except OperationalError:
                 res = True
@@ -149,7 +140,7 @@ class SelectForUpdateTests(TransactionTestCase):
 
     def get_share_lock(self):
         """
-            Start transaction and use select for share
+        Start transaction and use select for share
         """
 
         def share_lock():
@@ -167,14 +158,15 @@ class SelectForUpdateTests(TransactionTestCase):
 
     def get_write_lock(self, nowait: bool = True):
         """
-            Start transaction and use select for update
+        Start transaction and use select for update
         """
 
         def writ_lock():
             with transaction.atomic():
                 try:
                     data = Person.objects.filter(name="Reinhardt").select_for_update(
-                        nowait=nowait)
+                        nowait=nowait
+                    )
                     list(data)
                     time.sleep(5)
                     return True

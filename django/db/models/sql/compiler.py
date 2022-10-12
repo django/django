@@ -757,7 +757,7 @@ class SQLCompiler:
 
             if for_update_part and not features.for_update_after_from:
                 result.append(for_update_part)
-            elif self.query.select_for_share :
+            elif self.query.select_for_share:
                 # and features.has_select_for_share
                 if (
                     self.connection.get_autocommit()
@@ -776,9 +776,7 @@ class SQLCompiler:
                     raise NotSupportedError(
                         "NOWAIT is not supported on this database backend."
                     )
-                for_share_part = self.connection.ops.for_share_sql(
-                    nowait=nowait
-                )
+                for_share_part = self.connection.ops.for_share_sql(nowait=nowait)
                 result.append(for_share_part)
 
             if self.query.subquery and extra_select:
