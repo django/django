@@ -1,14 +1,11 @@
 import threading
 import time
 from django.db import (
-    DatabaseError,
-    NotSupportedError,
     connection,
     transaction, OperationalError,
 )
 from django.test import (
     TransactionTestCase,
-    skipIfDBFeature,
     skipUnlessDBFeature,
 )
 
@@ -55,7 +52,7 @@ class SelectForUpdateTests(TransactionTestCase):
                 """
                 sql = Person.objects.select_for_share().query
                 self.assertTrue(self.has_for_share_sql(str(sql)))
-        except Exception as e:
+        except Exception:
             self.assertTrue(False)
 
     @skipUnlessDBFeature("has_select_for_share_nowait")
@@ -72,7 +69,7 @@ class SelectForUpdateTests(TransactionTestCase):
                 """
                 sql = Person.objects.select_for_share(nowait=True).query
                 self.assertTrue(self.has_for_share_sql(str(sql), nowait=True))
-        except Exception as e:
+        except Exception:
             self.assertTrue(False)
 
     @skipUnlessDBFeature("has_select_for_share", "supports_transactions")
@@ -95,7 +92,6 @@ class SelectForUpdateTests(TransactionTestCase):
             qs = list(Person.objects.order_by("pk").select_for_share()[1:2])
             self.assertEqual(qs[0], other)
 
-
     @skipUnlessDBFeature("has_select_for_share")
     @skipUnlessDBFeature("supports_transactions")
     def test_block(self):
@@ -104,13 +100,14 @@ class SelectForUpdateTests(TransactionTestCase):
         and try select_for_update ,want error
         """
         self.get_share_lock()
-        time.sleep(1)
+        time.sleep(2)
         res = False
         with transaction.atomic():
             try:
-                data = Person.objects.filter(name="Reinhardt").select_for_update(nowait=True)
+                data = Person.objects.filter(name="Reinhardt").select_for_update(
+                    nowait=True)
                 list(data)
-            except OperationalError as e:
+            except OperationalError:
                 res = True
             self.assertTrue(res)
 
@@ -121,16 +118,16 @@ class SelectForUpdateTests(TransactionTestCase):
         and try select_for_share, want error
         """
         self.get_write_lock()
-        time.sleep(1)
+        time.sleep(2)
         res = False
         with transaction.atomic():
             try:
-                data = Person.objects.filter(name="Reinhardt").select_for_share(nowait=True)
+                data = Person.objects.filter(name="Reinhardt").select_for_share(
+                    nowait=True)
                 list(data)
-            except OperationalError as e:
+            except OperationalError:
                 res = True
             self.assertTrue(res)
-
 
     @skipUnlessDBFeature("has_select_for_share")
     def test_select_for_share_with_get(self):
@@ -146,44 +143,42 @@ class SelectForUpdateTests(TransactionTestCase):
         """
         with transaction.atomic():
             qs = Person.objects.filter(
-                id__in=Person.objects.order_by("-id").select_for_update()
-            )
-            qss = Person.objects.filter(
                 id__in=Person.objects.order_by("-id").select_for_share()
             )
             self.assertIn("ORDER BY", str(qs.query))
-
 
     def get_share_lock(self):
         """
             Start transaction and use select for share
         """
+
         def share_lock():
             with transaction.atomic():
                 try:
                     data = Person.objects.filter(name="Reinhardt").select_for_share()
                     list(data)
-                    time.sleep(3)
-                except Exception as e:
+                    time.sleep(5)
+                except Exception:
                     pass
 
         job = threading.Thread(target=share_lock)
         job.setDaemon(True)
         job.start()
 
-    def get_write_lock(self,nowait: bool = True):
+    def get_write_lock(self, nowait: bool = True):
         """
             Start transaction and use select for update
         """
+
         def writ_lock():
             with transaction.atomic():
                 try:
                     data = Person.objects.filter(name="Reinhardt").select_for_update(
                         nowait=nowait)
                     list(data)
-                    time.sleep(3)
+                    time.sleep(5)
                     return True
-                except OperationalError as e:
+                except OperationalError:
                     return False
 
         job = threading.Thread(target=writ_lock)

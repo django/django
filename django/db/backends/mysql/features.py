@@ -264,7 +264,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def has_select_for_share_nowait(self):
         if self.connection.mysql_is_mariadb:
-            return True
+            return False
         return self.connection.mysql_version >= (8, 0, 1)
 
     @cached_property
