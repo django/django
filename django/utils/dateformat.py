@@ -43,6 +43,7 @@ class Formatter:
 
     def __init__(self, obj):
         self.data = obj
+        self.type = "datetime"
 
         if isinstance(obj, datetime):
             # Timezone is only supported when formatting datetime objects, not
@@ -55,11 +56,14 @@ class Formatter:
             if not _datetime_ambiguous_or_imaginary(obj, timezone):
                 self.timezone = timezone
 
+        elif isinstance(obj, date):
+            self.type = "date"
+
     def format(self, formatstr):
         pieces = []
         for i, piece in enumerate(re_formatchars.split(str(formatstr))):
             if i % 2:
-                if type(self.data) is date and piece in self.time_specifiers:
+                if self.type == "date" and piece in self.time_specifiers:
                     raise TypeError(
                         "The format for date objects may not contain "
                         "time-related format specifiers (found '%s')." % piece
@@ -228,7 +232,7 @@ class Formatter:
     def r(self):
         "RFC 5322 formatted date; e.g. 'Thu, 21 Dec 2000 16:01:07 +0200'"
         value = self.data
-        if not isinstance(value, datetime):
+        if self.type == "date":
             # Assume midnight in default timezone if datetime.date provided.
             default_timezone = get_default_timezone()
             value = datetime.combine(value, time.min).replace(tzinfo=default_timezone)
@@ -278,7 +282,7 @@ class Formatter:
     def U(self):
         "Seconds since the Unix epoch (January 1 1970 00:00:00 GMT)"
         value = self.data
-        if not isinstance(value, datetime):
+        if self.type == "date":
             value = datetime.combine(value, time.min)
         return str(int(value.timestamp()))
 
