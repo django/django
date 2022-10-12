@@ -320,6 +320,11 @@ class PaginationTests(SimpleTestCase):
             with self.subTest(page=page):
                 self.assertEqual(expected, list(next(page_iterator)))
 
+        self.assertEqual(
+            [str(page) for page in iter(paginator)],
+            ["<Page 1 of 2>", "<Page 2 of 2>"],
+        )
+
     def test_get_elided_page_range(self):
         # Paginator.validate_number() must be called:
         paginator = Paginator([1, 2, 3], 2)
