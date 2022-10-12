@@ -104,15 +104,16 @@ class TimeFormat(Formatter):
         """
         hour = self.data.hour % 12 or 12
         minute = self.data.minute
-        return f"{hour}:{minute:02d}" if minute else hour
+        return f"{hour}:{minute:02d}" if minute else f"{hour}"
 
     def g(self):
         "Hour, 12-hour format without leading zeros; i.e. '1' to '12'"
-        return self.data.hour % 12 or 12
+        hour = self.data.hour % 12 or 12
+        return f"{hour}"
 
     def G(self):
         "Hour, 24-hour format without leading zeros; i.e. '0' to '23'"
-        return self.data.hour
+        return f"{self.data.hour}"
 
     def h(self):
         "Hour, 12-hour format; i.e. '01' to '12'"
@@ -193,7 +194,7 @@ class TimeFormat(Formatter):
         # UTC) only days can be negative (days=-1) and seconds are always
         # positive. e.g. UTC-1 -> timedelta(days=-1, seconds=82800, microseconds=0)
         # Positive offsets have days=0
-        return offset.days * 86400 + offset.seconds
+        return str(offset.days * 86400 + offset.seconds)
 
 
 class DateFormat(TimeFormat):
@@ -232,7 +233,7 @@ class DateFormat(TimeFormat):
 
     def j(self):
         "Day of the month without leading zeros; i.e. '1' to '31'"
-        return self.data.day
+        return f"{self.data.day}"
 
     def l(self):  # NOQA: E743, E741
         "Day of the week, textual, long; e.g. 'Friday'"
@@ -240,7 +241,7 @@ class DateFormat(TimeFormat):
 
     def L(self):
         "Boolean for whether it is a leap year; i.e. True or False"
-        return calendar.isleap(self.data.year)
+        return str(calendar.isleap(self.data.year))
 
     def m(self):
         "Month; i.e. '01' to '12'"
@@ -252,7 +253,7 @@ class DateFormat(TimeFormat):
 
     def n(self):
         "Month without leading zeros; i.e. '1' to '12'"
-        return self.data.month
+        return f"{self.data.month}"
 
     def N(self):
         "Month abbreviation in Associated Press style. Proprietary extension."
@@ -260,7 +261,7 @@ class DateFormat(TimeFormat):
 
     def o(self):
         "ISO 8601 year number matching the ISO week number (W)"
-        return self.data.isocalendar().year
+        return str(self.data.isocalendar().year)
 
     def r(self):
         "RFC 5322 formatted date; e.g. 'Thu, 21 Dec 2000 16:01:07 +0200'"
@@ -291,22 +292,22 @@ class DateFormat(TimeFormat):
 
     def t(self):
         "Number of days in the given month; i.e. '28' to '31'"
-        return calendar.monthrange(self.data.year, self.data.month)[1]
+        return str(calendar.monthrange(self.data.year, self.data.month)[1])
 
     def U(self):
         "Seconds since the Unix epoch (January 1 1970 00:00:00 GMT)"
         value = self.data
         if not isinstance(value, datetime):
             value = datetime.combine(value, time.min)
-        return int(value.timestamp())
+        return str(int(value.timestamp()))
 
     def w(self):
         "Day of the week, numeric, i.e. '0' (Sunday) to '6' (Saturday)"
-        return (self.data.weekday() + 1) % 7
+        return str((self.data.weekday() + 1) % 7)
 
     def W(self):
         "ISO-8601 week number of year, weeks starting on Monday"
-        return self.data.isocalendar().week
+        return str(self.data.isocalendar().week)
 
     def y(self):
         """Year, 2 digits with leading zeros; e.g. '99'."""
@@ -319,7 +320,7 @@ class DateFormat(TimeFormat):
 
     def z(self):
         """Day of the year, i.e. 1 to 366."""
-        return self.data.timetuple().tm_yday
+        return str(self.data.timetuple().tm_yday)
 
 
 def format(value, format_string):
