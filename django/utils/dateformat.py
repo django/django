@@ -93,7 +93,7 @@ class TimeFormat(Formatter):
             return ""
 
         try:
-            if hasattr(self.data, "tzinfo") and self.data.tzinfo:
+            if getattr(self.data, "tzinfo", None):
                 return self.data.tzname() or ""
         except NotImplementedError:
             pass
@@ -139,7 +139,8 @@ class TimeFormat(Formatter):
         if self._no_timezone_or_datetime_is_ambiguous_or_imaginary:
             return ""
 
-        seconds = self.Z()
+        offset = self.timezone.utcoffset(self.data)
+        seconds = offset.days * 86400 + offset.seconds
         sign = "-" if seconds < 0 else "+"
         seconds = abs(seconds)
         return "%s%02d%02d" % (sign, seconds // 3600, (seconds // 60) % 60)
@@ -293,7 +294,7 @@ class DateFormat(TimeFormat):
 
     def t(self):
         "Number of days in the given month; i.e. '28' to '31'"
-        return "%02d" % calendar.monthrange(self.data.year, self.data.month)[1]
+        return calendar.monthrange(self.data.year, self.data.month)[1]
 
     def U(self):
         "Seconds since the Unix epoch (January 1 1970 00:00:00 GMT)"
