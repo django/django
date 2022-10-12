@@ -217,7 +217,7 @@ def localize(value, use_l10n=None):
     elif isinstance(value, datetime.date):
         return date_format(value, use_l10n=use_l10n)
     elif isinstance(value, datetime.time):
-        return time_format(value, "TIME_FORMAT", use_l10n=use_l10n)
+        return time_format(value, use_l10n=use_l10n)
     return value
 
 
