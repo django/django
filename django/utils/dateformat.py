@@ -3,15 +3,15 @@ PHP date() style date formatting
 See https://www.php.net/date for format strings
 
 Usage:
->>> import datetime
->>> d = datetime.datetime.now()
+>>> from datetime import datetime
+>>> d = datetime.now()
 >>> df = DateFormat(d)
 >>> print(df.format('jS F Y H:i'))
 7th October 2003 11:39
 >>>
 """
 import calendar
-import datetime
+from datetime import date, datetime, time
 from email.utils import format_datetime as format_datetime_rfc5322
 
 from django.utils.dates import (
@@ -40,7 +40,7 @@ class Formatter:
         pieces = []
         for i, piece in enumerate(re_formatchars.split(str(formatstr))):
             if i % 2:
-                if type(self.data) is datetime.date and hasattr(TimeFormat, piece):
+                if type(self.data) is date and hasattr(TimeFormat, piece):
                     raise TypeError(
                         "The format for date objects may not contain "
                         "time-related format specifiers (found '%s')." % piece
@@ -59,7 +59,7 @@ class TimeFormat(Formatter):
         # We only support timezone when formatting datetime objects,
         # not date objects (timezone information not appropriate),
         # or time objects (against established django policy).
-        if isinstance(obj, datetime.datetime):
+        if isinstance(obj, datetime):
             if is_naive(obj):
                 self.timezone = get_default_timezone()
             else:
@@ -264,7 +264,7 @@ class DateFormat(TimeFormat):
 
     def r(self):
         "RFC 5322 formatted date; e.g. 'Thu, 21 Dec 2000 16:01:07 +0200'"
-        if type(self.data) is datetime.date:
+        if type(self.data) is date:
             raise TypeError(
                 "The format for date objects may not contain time-related "
                 "format specifiers (found 'r')."
@@ -298,8 +298,8 @@ class DateFormat(TimeFormat):
     def U(self):
         "Seconds since the Unix epoch (January 1 1970 00:00:00 GMT)"
         value = self.data
-        if not isinstance(value, datetime.datetime):
-            value = datetime.datetime.combine(value, datetime.time.min)
+        if not isinstance(value, datetime):
+            value = datetime.combine(value, time.min)
         return int(value.timestamp())
 
     def w(self):
