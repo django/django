@@ -36,11 +36,15 @@ re_escaped = _lazy_re_compile(r"\\(.)")
 
 
 class Formatter:
+    date_specifiers = frozenset("bcdDEFIjlLmMnNorStUwWyYz")
+    time_specifiers = frozenset("aAefgGhHiOPsTuZ")
+    all_specifiers = date_specifiers | time_specifiers
+
     def format(self, formatstr):
         pieces = []
         for i, piece in enumerate(re_formatchars.split(str(formatstr))):
             if i % 2:
-                if type(self.data) is date and hasattr(TimeFormat, piece):
+                if type(self.data) is date and piece in self.time_specifiers:
                     raise TypeError(
                         "The format for date objects may not contain "
                         "time-related format specifiers (found '%s')." % piece

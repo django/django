@@ -3,7 +3,7 @@ from datetime import date, datetime, time, timezone, tzinfo
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import TZ_SUPPORT, requires_tz_support
 from django.utils import dateformat, translation
-from django.utils.dateformat import format
+from django.utils.dateformat import Formatter, format
 from django.utils.timezone import get_default_timezone, get_fixed_timezone, make_aware
 
 
@@ -213,7 +213,7 @@ class DateFormatTests(SimpleTestCase):
     def test_invalid_time_format_specifiers(self):
         my_birthday = date(1984, 8, 7)
 
-        for specifier in ["a", "A", "f", "g", "G", "h", "H", "i", "P", "s", "u"]:
+        for specifier in Formatter.time_specifiers:
             with self.subTest(specifier=specifier):
                 msg = (
                     "The format for date objects may not contain time-related "
