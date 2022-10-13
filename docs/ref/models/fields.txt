@@ -330,7 +330,8 @@ scenes.
 
 .. attribute:: Field.db_index
 
-If ``True``, a database index will be created for this field.
+If ``True``, one or more database indexes will be created for this field 
+depending on the field type.
 
 ``db_tablespace``
 -----------------
