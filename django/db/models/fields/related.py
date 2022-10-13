@@ -1886,10 +1886,7 @@ class ManyToManyField(RelatedField):
         # specify *what* on my non-reversible relation?!"), so we set it up
         # automatically. The funky name reduces the chance of an accidental
         # clash.
-        if self.remote_field.symmetrical and (
-            self.remote_field.model == RECURSIVE_RELATIONSHIP_CONSTANT
-            or self.remote_field.model == cls._meta.object_name
-        ):
+        if self.remote_field.symmetrical and self.remote_field.model in (RECURSIVE_RELATIONSHIP_CONSTANT, cls._meta.object_name):
             self.remote_field.related_name = "%s_rel_+" % name
         elif self.remote_field.is_hidden():
             # If the backwards relation is disabled, replace the original

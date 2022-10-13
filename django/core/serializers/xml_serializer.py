@@ -390,10 +390,7 @@ def getInnerText(node):
     # inspired by https://mail.python.org/pipermail/xml-sig/2005-March/011022.html
     inner_text = []
     for child in node.childNodes:
-        if (
-            child.nodeType == child.TEXT_NODE
-            or child.nodeType == child.CDATA_SECTION_NODE
-        ):
+        if child.nodeType in (child.TEXT_NODE, child.CDATA_SECTION_NODE):
             inner_text.append(child.data)
         elif child.nodeType == child.ELEMENT_NODE:
             inner_text.extend(getInnerText(child))

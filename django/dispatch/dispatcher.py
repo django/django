@@ -251,7 +251,7 @@ class Signal:
                 senderkey = _make_id(sender)
                 receivers = []
                 for (receiverkey, r_senderkey), receiver in self.receivers:
-                    if r_senderkey == NONE_ID or r_senderkey == senderkey:
+                    if r_senderkey in (NONE_ID, senderkey):
                         receivers.append(receiver)
                 if self.use_caching:
                     if not receivers:

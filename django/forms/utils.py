@@ -65,10 +65,7 @@ class RenderableMixin:
         renderer = renderer or self.renderer
         template = template_name or self.template_name
         context = context or self.get_context()
-        if (
-            template == "django/forms/default.html"
-            or template == "django/forms/formsets/default.html"
-        ):
+        if template in ("django/forms/default.html", "django/forms/formsets/default.html"):
             warnings.warn(
                 DEFAULT_TEMPLATE_DEPRECATION_MSG, RemovedInDjango50Warning, stacklevel=2
             )
