@@ -293,7 +293,7 @@ class Options:
                 self.order_with_respect_to = next(
                     f
                     for f in self._get_fields(reverse=False)
-                    if f.name == query or f.attname == query
+                    if query in (f.name, f.attname)
                 )
             except StopIteration:
                 raise FieldDoesNotExist(
