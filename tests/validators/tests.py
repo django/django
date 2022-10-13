@@ -313,6 +313,11 @@ TEST_DATA = [
     (validate_email, "example@inv-.alid-.com", ValidationError),
     (validate_email, "example@inv-.-alid.com", ValidationError),
     (validate_email, 'test@example.com\n\n<script src="x.js">', ValidationError),
+    (validate_email, "ùnîcódë@valid.com", None),
+    (validate_email, "统一码@例子.com", None),
+    (validate_email, "统一码@例子.集团", None),
+    (validate_email, "يونيكود@مثال.com", None),
+    (validate_email, "يونيكود@مثال.الجزائر", None),
     # Quoted-string format (CR not allowed)
     (validate_email, '"\\\011"@here.com', None),
     (validate_email, '"\\\012"@here.com', ValidationError),
