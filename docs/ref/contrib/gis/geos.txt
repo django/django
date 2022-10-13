@@ -181,7 +181,7 @@ Geometry Objects
 
 .. class:: GEOSGeometry(geo_input, srid=None)
 
-    :param geo_input: Geometry input value (string or buffer)
+    :param geo_input: Geometry input value (string or :class:`memoryview`)
     :param srid: spatial reference identifier
     :type srid: int
 
@@ -206,14 +206,14 @@ The ``srid`` parameter, if given, is set as the SRID of the created geometry if
 The following input formats, along with their corresponding Python types,
 are accepted:
 
-=======================  ==========
+=======================  ==============
 Format                   Input Type
-=======================  ==========
+=======================  ==============
 WKT / EWKT               ``str``
 HEX / HEXEWKB            ``str``
-WKB / EWKB               ``buffer``
+WKB / EWKB               ``memoryview``
 :rfc:`GeoJSON <7946>`    ``str``
-=======================  ==========
+=======================  ==============
 
 For the GeoJSON format, the SRID is set based on the ``crs`` member. If ``crs``
 isn't provided, the SRID defaults to 4326.
