@@ -81,7 +81,23 @@ class CarAdmin(admin.ModelAdmin):
         )
 
 
+class PersonInfo(models.Model):
+    def json_empty(self):
+        return ["none"]
+
+    name = models.CharField(max_length=20)
+    extra = models.JSONField(default=json_empty)
+
+
+class PersonInfoAdmin(admin.ModelAdmin):
+    def response_post_save_add(self, request, obj):
+        return HttpResponseRedirect(
+            reverse("admin:admin_custom_urls_personinfo_history", args=[obj.pk])
+        )
+
+
 site = admin.AdminSite(name="admin_custom_urls")
 site.register(Action, ActionAdmin)
 site.register(Person, PersonAdmin)
 site.register(Car, CarAdmin)
+site.register(PersonInfo, PersonInfoAdmin)

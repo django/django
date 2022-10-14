@@ -98,7 +98,7 @@ class BoundField:
             )
         return widget.render(
             name=self.html_initial_name if only_initial else self.html_name,
-            value=self.value(),
+            value=self.value(only_initial),
             attrs=attrs,
             renderer=self.form.renderer,
         )
@@ -126,14 +126,14 @@ class BoundField:
         """
         return self.form._widget_data_value(self.field.widget, self.html_name)
 
-    def value(self):
+    def value(self, only_initial=False):
         """
         Return the value for this BoundField, using the initial value if
         the form is not bound or the data otherwise.
         """
         data = self.initial
         if self.form.is_bound:
-            data = self.field.bound_data(self.data, data)
+            data = self.field.bound_data(self.data, data, only_initial)
         return self.field.prepare_value(data)
 
     def _has_changed(self):

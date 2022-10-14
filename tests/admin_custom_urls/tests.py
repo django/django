@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.admin.utils import quote
 from django.contrib.admin.views.main import IS_POPUP_VAR
 from django.contrib.auth.models import User
@@ -5,7 +7,7 @@ from django.template.response import TemplateResponse
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from .models import Action, Car, Person
+from .models import Action, Car, Person, PersonInfo
 
 
 @override_settings(
@@ -131,6 +133,35 @@ class AdminCustomUrlsTest(TestCase):
             reverse(
                 "admin_custom_urls:admin_custom_urls_person_delete", args=[person.pk]
             ),
+        )
+
+    def test_post_save_change_fail_form_validation(self):
+        PersonInfo.objects.create(name="Junki Yoon", extra=["test"])
+        self.assertEqual(PersonInfo.objects.count(), 1)
+        person_info = PersonInfo.objects.all()[0]
+        post_url = reverse(
+            "admin_custom_urls:admin_custom_urls_personinfo_change",
+            args=[person_info.pk],
+        )
+        # fail validation.
+        invalid_data = {
+            "name": "",
+            "extra": json.dumps(["test123"]),
+            "initial-extra": json.dumps(["test"]),
+        }
+        response = self.client.post(post_url, invalid_data)
+
+        # initial-extra value should be ["test"], not ["test123"].
+        self.assertHTMLEqual(
+            str(response.context["adminform"].form),
+            '<div><label for="id_name">Name:</label>'
+            '<ul class="errorlist"><li>This field is required.</li></ul>'
+            '<input type="text" name="name" class="vTextField" maxlength="20" '
+            'required id="id_name"></div>'
+            '<div><label for="id_extra">Extra:</label>'
+            '<textarea name="extra" cols="40" rows="10" required id="id_extra">'
+            '[&quot;test123&quot;]</textarea><input type="hidden" name="initial-extra"'
+            'value="[&quot;test&quot;]" id="initial-id_extra"></div>',
         )
 
     def test_post_url_continue(self):

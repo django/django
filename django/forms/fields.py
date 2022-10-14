@@ -200,7 +200,7 @@ class Field:
         self.run_validators(value)
         return value
 
-    def bound_data(self, data, initial):
+    def bound_data(self, data, initial, only_initial=False):
         """
         Return the value that should be shown for this field on render of a
         bound form, given the submitted POST data for the field and the initial
@@ -677,7 +677,7 @@ class FileField(Field):
             return initial
         return super().clean(data)
 
-    def bound_data(self, data, initial):
+    def bound_data(self, data, initial, only_initial=False):
         if data in (None, FILE_INPUT_CONTRADICTION):
             return initial
         return data
@@ -1365,8 +1365,8 @@ class JSONField(CharField):
         else:
             return converted
 
-    def bound_data(self, data, initial):
-        if self.disabled:
+    def bound_data(self, data, initial, only_initial=False):
+        if self.disabled or only_initial:
             return initial
         if data is None:
             return None
