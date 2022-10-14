@@ -2707,25 +2707,6 @@ Options: <select multiple name="options" required>
                 actual = form.get_initial_for_field(field, field_name)
                 self.assertEqual(actual, expected)
 
-    def test_set_initial_data(self):
-        class PersonForm(forms.Form):
-            first_name = CharField(show_hidden_initial=True)
-
-        data = QueryDict(mutable=True)
-        data.update(
-            {
-                "initial-name": "Yoon",
-                "name": "John",
-            }
-        )
-        data._mutable = False
-
-        form = PersonForm(data=data)
-
-        # Rollback initial data
-        form.set_initial_data()
-        self.assertEqual(form.data["initial-name"], form.data["name"])
-
     def test_changed_data(self):
         class Person(Form):
             first_name = CharField(initial="Hans")
