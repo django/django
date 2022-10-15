@@ -784,7 +784,7 @@ msgstr ""
 
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
-msgstr "Зробить коректний вибір, %(value)s немає серед варіантів вибору."
+msgstr "Зробіть коректний вибір, %(value)s немає серед варіантів вибору."
 
 msgid "Enter a list of values."
 msgstr "Введіть список значень."
@@ -859,7 +859,7 @@ msgid "The inline value did not match the parent instance."
 msgstr "Зв'язане значення не відповідає батьківському екземпляру."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "Зробить коректний вибір. Такого варіанту нема серед доступних."
+msgstr "Зробіть коректний вибір. Такого варіанту нема серед доступних."
 
 #, python-format
 msgid "“%(pk)s” is not a valid value."
