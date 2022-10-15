@@ -1070,7 +1070,7 @@ msgid "December"
 msgstr "दिसंबर"
 
 msgid "This is not a valid IPv6 address."
-msgstr ""
+msgstr "यह एक मान्य IPv6 एड्रेस नहीं है।"
 
 #, python-format
 msgctxt "String to return when truncating text"
@@ -1165,7 +1165,7 @@ msgid "No year specified"
 msgstr "कोई साल निर्दिष्ट नहीं किया गया "
 
 msgid "Date out of range"
-msgstr ""
+msgstr "तिथि सीमा से बाहर"
 
 msgid "No month specified"
 msgstr "कोई महीने निर्दिष्ट नहीं किया गया "
@@ -1219,7 +1219,7 @@ msgid "Index of %(directory)s"
 msgstr "%(directory)s का अनुक्रमणिका"
 
 msgid "The install worked successfully! Congratulations!"
-msgstr ""
+msgstr "सफलतापूर्वक इंस्टॉल हो गया! बधाई हो!"
 
 #, python-format
 msgid ""
@@ -1251,4 +1251,4 @@ msgid "Django Community"
 msgstr ""
 
 msgid "Connect, get help, or contribute"
-msgstr ""
+msgstr "जुडिये, सहायता प्राप्त करें या योगदान करें"
