@@ -279,12 +279,12 @@ class BoundField:
         if self.field.disabled:
             attrs["disabled"] = True
         id_for_label = self.id_for_label
-        if (
-            self.field.help_text
-            and id_for_label
-            and "aria-describedby" not in widget.attrs
-        ):
-            attrs["aria-describedby"] = "%s_helptext" % id_for_label
+        if self.field.help_text and id_for_label:
+            helptext_id = '%s_helptext' % id_for_label
+            if 'aria-describedby' in widget.attrs:
+                attrs['aria-describedby'] = f"{helptext_id} {attrs['aria-describedby']}"
+            else:
+                attrs['aria-describedby'] = helptext_id
         return attrs
 
     @property

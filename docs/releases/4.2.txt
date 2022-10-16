@@ -178,6 +178,9 @@ Forms
 
 * Session cookies are now treated as credentials and therefore hidden and
   replaced with stars (``**********``) in error reports.
+*  Currently, help text is not programmatically identifiable. To improve accessibility
+  :attr:`~django.forms.Field.help_text` is now
+  associated to its input using ``aria-describedby``.
 
 Generic Views
 ~~~~~~~~~~~~~

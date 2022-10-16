@@ -284,7 +284,7 @@ template to make the same customization to the ``id`` of the help text.
     >>> print(f['username'])
     <input type="text" name="username" aria-describedby="custom-description" maxlength="10" id="id_username" required>
 
-.. versionchanged:: 4.1
+.. versionchanged:: 4.2
 
     ``aria-describedby`` was added to associate ``help_text`` with its input.
 
