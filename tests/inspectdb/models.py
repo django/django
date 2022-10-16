@@ -132,3 +132,11 @@ class FuncUniqueConstraint(models.Model):
             )
         ]
         required_db_features = {"supports_expression_indexes"}
+
+
+class DbComment(models.Model):
+    rank = models.IntegerField(db_comment="'Rank' column comment")
+
+    class Meta:
+        db_table_comment = "Custom table comment"
+        required_db_features = {"supports_comments"}

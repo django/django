@@ -9,7 +9,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     sql_alter_column_null = "MODIFY %(column)s %(type)s NULL"
     sql_alter_column_not_null = "MODIFY %(column)s %(type)s NOT NULL"
-    sql_alter_column_type = "MODIFY %(column)s %(type)s%(collation)s"
+    sql_alter_column_type = "MODIFY %(column)s %(type)s%(collation)s%(comment)s"
     sql_alter_column_no_default_null = "ALTER COLUMN %(column)s SET DEFAULT NULL"
 
     # No 'CASCADE' which works as a no-op in MySQL but is undocumented
@@ -31,6 +31,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_pk = "ALTER TABLE %(table)s DROP PRIMARY KEY"
 
     sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s"
+
+    sql_alter_table_comment = "ALTER TABLE %(table)s COMMENT = %(comment)s"
+    sql_alter_column_comment = None
 
     @property
     def sql_delete_check(self):
@@ -228,3 +231,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def _rename_field_sql(self, table, old_field, new_field, new_type):
         new_type = self._set_field_new_type_null_status(old_field, new_type)
         return super()._rename_field_sql(table, old_field, new_field, new_type)
+
+    def _alter_column_comment_sql(self, model, new_field, new_type, new_db_comment):
+        # Comment is alter when altering the column type.
+        return "", []
+
+    def _comment_sql(self, comment):
+        comment_sql = super()._comment_sql(comment)
+        return f" COMMENT {comment_sql}"

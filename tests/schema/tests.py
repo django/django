@@ -273,6 +273,27 @@ class SchemaTests(TransactionTestCase):
                 if f.name == column
             )
 
+    def get_column_comment(self, table, column):
+        with connection.cursor() as cursor:
+            return next(
+                f.comment
+                for f in connection.introspection.get_table_description(cursor, table)
+                if f.name == column
+            )
+
+    def get_table_comment(self, table):
+        with connection.cursor() as cursor:
+            return next(
+                t.comment
+                for t in connection.introspection.get_table_list(cursor)
+                if t.name == table
+            )
+
+    def assert_column_comment_not_exists(self, table, column):
+        with connection.cursor() as cursor:
+            columns = connection.introspection.get_table_description(cursor, table)
+        self.assertFalse(any([c.name == column and c.comment for c in columns]))
+
     def assertIndexOrder(self, table, index, order):
         constraints = self.get_constraints(table)
         self.assertIn(index, constraints)
@@ -4388,6 +4409,186 @@ class SchemaTests(TransactionTestCase):
                 "schema_author_nom_de_plume_7570a851_like",
                 "schema_author_nom_de_plume_key",
             ],
+        )
+
+    @skipUnlessDBFeature("supports_comments")
+    def test_add_db_comment_charfield(self):
+        comment = "Custom comment"
+        field = CharField(max_length=255, db_comment=comment)
+        field.set_attributes_from_name("name_with_comment")
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.add_field(Author, field)
+        self.assertEqual(
+            self.get_column_comment(Author._meta.db_table, "name_with_comment"),
+            comment,
+        )
+
+    @skipUnlessDBFeature("supports_comments")
+    def test_add_db_comment_and_default_charfield(self):
+        comment = "Custom comment with default"
+        field = CharField(max_length=255, default="Joe Doe", db_comment=comment)
+        field.set_attributes_from_name("name_with_comment_default")
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            Author.objects.create(name="Before adding a new field")
+            editor.add_field(Author, field)
+
+        self.assertEqual(
+            self.get_column_comment(Author._meta.db_table, "name_with_comment_default"),
+            comment,
+        )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"SELECT name_with_comment_default FROM {Author._meta.db_table};"
+            )
+            for row in cursor.fetchall():
+                self.assertEqual(row[0], "Joe Doe")
+
+    @skipUnlessDBFeature("supports_comments")
+    def test_alter_db_comment(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Add comment.
+        old_field = Author._meta.get_field("name")
+        new_field = CharField(max_length=255, db_comment="Custom comment")
+        new_field.set_attributes_from_name("name")
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+        self.assertEqual(
+            self.get_column_comment(Author._meta.db_table, "name"),
+            "Custom comment",
+        )
+        # Alter comment.
+        old_field = new_field
+        new_field = CharField(max_length=255, db_comment="New custom comment")
+        new_field.set_attributes_from_name("name")
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+        self.assertEqual(
+            self.get_column_comment(Author._meta.db_table, "name"),
+            "New custom comment",
+        )
+        # Remove comment.
+        old_field = new_field
+        new_field = CharField(max_length=255)
+        new_field.set_attributes_from_name("name")
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+        self.assertIn(
+            self.get_column_comment(Author._meta.db_table, "name"),
+            [None, ""],
+        )
+
+    @skipUnlessDBFeature("supports_comments", "supports_foreign_keys")
+    def test_alter_db_comment_foreign_key(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+
+        comment = "FK custom comment"
+        old_field = Book._meta.get_field("author")
+        new_field = ForeignKey(Author, CASCADE, db_comment=comment)
+        new_field.set_attributes_from_name("author")
+        with connection.schema_editor() as editor:
+            editor.alter_field(Book, old_field, new_field, strict=True)
+        self.assertEqual(
+            self.get_column_comment(Book._meta.db_table, "author_id"),
+            comment,
+        )
+
+    @skipUnlessDBFeature("supports_comments")
+    def test_alter_field_type_preserve_comment(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+
+        comment = "This is the name."
+        old_field = Author._meta.get_field("name")
+        new_field = CharField(max_length=255, db_comment=comment)
+        new_field.set_attributes_from_name("name")
+        new_field.model = Author
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+        self.assertEqual(
+            self.get_column_comment(Author._meta.db_table, "name"),
+            comment,
+        )
+        # Changing a field type should preserve the comment.
+        old_field = new_field
+        new_field = CharField(max_length=511, db_comment=comment)
+        new_field.set_attributes_from_name("name")
+        new_field.model = Author
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, new_field, old_field, strict=True)
+        # Comment is preserved.
+        self.assertEqual(
+            self.get_column_comment(Author._meta.db_table, "name"),
+            comment,
+        )
+
+    @isolate_apps("schema")
+    @skipUnlessDBFeature("supports_comments")
+    def test_db_comment_table(self):
+        class ModelWithDbTableComment(Model):
+            class Meta:
+                app_label = "schema"
+                db_table_comment = "Custom table comment"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(ModelWithDbTableComment)
+        self.isolated_local_models = [ModelWithDbTableComment]
+        self.assertEqual(
+            self.get_table_comment(ModelWithDbTableComment._meta.db_table),
+            "Custom table comment",
+        )
+        # Alter table comment.
+        old_db_table_comment = ModelWithDbTableComment._meta.db_table_comment
+        with connection.schema_editor() as editor:
+            editor.alter_db_table_comment(
+                ModelWithDbTableComment, old_db_table_comment, "New table comment"
+            )
+        self.assertEqual(
+            self.get_table_comment(ModelWithDbTableComment._meta.db_table),
+            "New table comment",
+        )
+        # Remove table comment.
+        old_db_table_comment = ModelWithDbTableComment._meta.db_table_comment
+        with connection.schema_editor() as editor:
+            editor.alter_db_table_comment(
+                ModelWithDbTableComment, old_db_table_comment, None
+            )
+        self.assertIn(
+            self.get_table_comment(ModelWithDbTableComment._meta.db_table),
+            [None, ""],
+        )
+
+    @isolate_apps("schema")
+    @skipUnlessDBFeature("supports_comments", "supports_foreign_keys")
+    def test_db_comments_from_abstract_model(self):
+        class AbstractModelWithDbComments(Model):
+            name = CharField(
+                max_length=255, db_comment="Custom comment", null=True, blank=True
+            )
+
+            class Meta:
+                app_label = "schema"
+                abstract = True
+                db_table_comment = "Custom table comment"
+
+        class ModelWithDbComments(AbstractModelWithDbComments):
+            pass
+
+        with connection.schema_editor() as editor:
+            editor.create_model(ModelWithDbComments)
+        self.isolated_local_models = [ModelWithDbComments]
+
+        self.assertEqual(
+            self.get_column_comment(ModelWithDbComments._meta.db_table, "name"),
+            "Custom comment",
+        )
+        self.assertEqual(
+            self.get_table_comment(ModelWithDbComments._meta.db_table),
+            "Custom table comment",
         )
 
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")

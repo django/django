@@ -773,6 +773,14 @@ class AutodetectorTests(BaseAutodetectorTests):
             "verbose_name": "Authi",
         },
     )
+    author_with_db_table_comment = ModelState(
+        "testapp",
+        "Author",
+        [
+            ("id", models.AutoField(primary_key=True)),
+        ],
+        {"db_table_comment": "Table comment"},
+    )
     author_with_db_table_options = ModelState(
         "testapp",
         "Author",
@@ -2348,6 +2356,58 @@ class AutodetectorTests(BaseAutodetectorTests):
         self.assertOperationAttributes(
             changes, "testapp", 0, 1, name="newauthor", table="author_three"
         )
+
+    def test_alter_db_table_comment_add(self):
+        changes = self.get_changes(
+            [self.author_empty], [self.author_with_db_table_comment]
+        )
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterModelTableComment"])
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 0, name="author", table_comment="Table comment"
+        )
+
+    def test_alter_db_table_comment_change(self):
+        author_with_new_db_table_comment = ModelState(
+            "testapp",
+            "Author",
+            [
+                ("id", models.AutoField(primary_key=True)),
+            ],
+            {"db_table_comment": "New table comment"},
+        )
+        changes = self.get_changes(
+            [self.author_with_db_table_comment],
+            [author_with_new_db_table_comment],
+        )
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterModelTableComment"])
+        self.assertOperationAttributes(
+            changes,
+            "testapp",
+            0,
+            0,
+            name="author",
+            table_comment="New table comment",
+        )
+
+    def test_alter_db_table_comment_remove(self):
+        changes = self.get_changes(
+            [self.author_with_db_table_comment],
+            [self.author_empty],
+        )
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterModelTableComment"])
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 0, name="author", db_table_comment=None
+        )
+
+    def test_alter_db_table_comment_no_changes(self):
+        changes = self.get_changes(
+            [self.author_with_db_table_comment],
+            [self.author_with_db_table_comment],
+        )
+        self.assertNumberMigrations(changes, "testapp", 0)
 
     def test_identical_regex_doesnt_alter(self):
         from_state = ModelState(

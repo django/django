@@ -40,6 +40,41 @@ in the future.
 .. _psycopg: https://www.psycopg.org/psycopg3/
 .. _psycopg library: https://pypi.org/project/psycopg/
 
+Comments on columns and tables
+------------------------------
+
+The new :attr:`Field.db_comment <django.db.models.Field.db_comment>` and
+:attr:`Meta.db_table_comment <django.db.models.Options.db_table_comment>`
+options allow creating comments on columns and tables, respectively. For
+example::
+
+    from django.db import models
+
+    class Question(models.Model):
+        text = models.TextField(db_comment="Poll question")
+        pub_date = models.DateTimeField(
+            db_comment="Date and time when the question was published",
+        )
+
+        class Meta:
+            db_table_comment = "Poll questions"
+
+
+    class Answer(models.Model):
+        question = models.ForeignKey(
+            Question,
+            on_delete=models.CASCADE,
+            db_comment="Reference to a question"
+        )
+        answer = models.TextField(db_comment="Question answer")
+
+        class Meta:
+            db_table_comment = "Question answers"
+
+Also, the new :class:`~django.db.migrations.operations.AlterModelTableComment`
+operation allows changing table comments defined in the
+:attr:`Meta.db_table_comment <django.db.models.Options.db_table_comment>`.
+
 Mitigation for the BREACH attack
 --------------------------------
 

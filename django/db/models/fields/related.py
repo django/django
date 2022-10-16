@@ -1428,6 +1428,14 @@ class ManyToManyField(RelatedField):
                     id="fields.W345",
                 )
             )
+        if self.db_comment:
+            warnings.append(
+                checks.Warning(
+                    "db_comment has no effect on ManyToManyField.",
+                    obj=self,
+                    id="fields.W346",
+                )
+            )
 
         return warnings
 

@@ -129,6 +129,24 @@ class InspectDBTestCase(TestCase):
             "null_json_field = models.JSONField(blank=True, null=True)", output
         )
 
+    @skipUnlessDBFeature("supports_comments")
+    def test_db_comments(self):
+        out = StringIO()
+        call_command("inspectdb", "inspectdb_dbcomment", stdout=out)
+        output = out.getvalue()
+        integer_field_type = connection.features.introspected_field_types[
+            "IntegerField"
+        ]
+        self.assertIn(
+            f"rank = models.{integer_field_type}("
+            f"db_comment=\"'Rank' column comment\")",
+            output,
+        )
+        self.assertIn(
+            "        db_table_comment = 'Custom table comment'",
+            output,
+        )
+
     @skipUnlessDBFeature("supports_collation_on_charfield")
     @skipUnless(test_collation, "Language collations are not supported.")
     def test_char_field_db_collation(self):

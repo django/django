@@ -5,18 +5,20 @@ from MySQLdb.constants import FIELD_TYPE
 
 from django.db.backends.base.introspection import BaseDatabaseIntrospection
 from django.db.backends.base.introspection import FieldInfo as BaseFieldInfo
-from django.db.backends.base.introspection import TableInfo
+from django.db.backends.base.introspection import TableInfo as BaseTableInfo
 from django.db.models import Index
 from django.utils.datastructures import OrderedSet
 
 FieldInfo = namedtuple(
-    "FieldInfo", BaseFieldInfo._fields + ("extra", "is_unsigned", "has_json_constraint")
+    "FieldInfo",
+    BaseFieldInfo._fields + ("extra", "is_unsigned", "has_json_constraint", "comment"),
 )
 InfoLine = namedtuple(
     "InfoLine",
     "col_name data_type max_len num_prec num_scale extra column_default "
-    "collation is_unsigned",
+    "collation is_unsigned comment",
 )
+TableInfo = namedtuple("TableInfo", BaseTableInfo._fields + ("comment",))
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -68,9 +70,18 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_table_list(self, cursor):
         """Return a list of table and view names in the current database."""
-        cursor.execute("SHOW FULL TABLES")
+        cursor.execute(
+            """
+            SELECT
+                table_name,
+                table_type,
+                table_comment
+            FROM information_schema.tables
+            WHERE table_schema = DATABASE()
+            """
+        )
         return [
-            TableInfo(row[0], {"BASE TABLE": "t", "VIEW": "v"}.get(row[1]))
+            TableInfo(row[0], {"BASE TABLE": "t", "VIEW": "v"}.get(row[1]), row[2])
             for row in cursor.fetchall()
         ]
 
@@ -128,7 +139,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 CASE
                     WHEN column_type LIKE '%% unsigned' THEN 1
                     ELSE 0
-                END AS is_unsigned
+                END AS is_unsigned,
+                column_comment
             FROM information_schema.columns
             WHERE table_name = %s AND table_schema = DATABASE()
             """,
@@ -159,6 +171,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     info.extra,
                     info.is_unsigned,
                     line[0] in json_constraints,
+                    info.comment,
                 )
             )
         return fields

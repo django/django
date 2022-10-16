@@ -5,10 +5,13 @@ import cx_Oracle
 from django.db import models
 from django.db.backends.base.introspection import BaseDatabaseIntrospection
 from django.db.backends.base.introspection import FieldInfo as BaseFieldInfo
-from django.db.backends.base.introspection import TableInfo
+from django.db.backends.base.introspection import TableInfo as BaseTableInfo
 from django.utils.functional import cached_property
 
-FieldInfo = namedtuple("FieldInfo", BaseFieldInfo._fields + ("is_autofield", "is_json"))
+FieldInfo = namedtuple(
+    "FieldInfo", BaseFieldInfo._fields + ("is_autofield", "is_json", "comment")
+)
+TableInfo = namedtuple("TableInfo", BaseTableInfo._fields + ("comment",))
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -77,8 +80,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """Return a list of table and view names in the current database."""
         cursor.execute(
             """
-            SELECT table_name, 't'
+            SELECT
+                user_tables.table_name,
+                't',
+                user_tab_comments.comments
             FROM user_tables
+            LEFT OUTER JOIN
+                user_tab_comments
+                ON user_tab_comments.table_name = user_tables.table_name
             WHERE
                 NOT EXISTS (
                     SELECT 1
@@ -86,13 +95,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     WHERE user_mviews.mview_name = user_tables.table_name
                 )
             UNION ALL
-            SELECT view_name, 'v' FROM user_views
+            SELECT view_name, 'v', NULL FROM user_views
             UNION ALL
-            SELECT mview_name, 'v' FROM user_mviews
+            SELECT mview_name, 'v', NULL FROM user_mviews
         """
         )
         return [
-            TableInfo(self.identifier_converter(row[0]), row[1])
+            TableInfo(self.identifier_converter(row[0]), row[1], row[2])
             for row in cursor.fetchall()
         ]
 
@@ -131,10 +140,15 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     )
                     THEN 1
                     ELSE 0
-                END as is_json
+                END as is_json,
+                user_col_comments.comments as col_comment
             FROM user_tab_cols
             LEFT OUTER JOIN
                 user_tables ON user_tables.table_name = user_tab_cols.table_name
+            LEFT OUTER JOIN
+                user_col_comments ON
+                user_col_comments.column_name = user_tab_cols.column_name AND
+                user_col_comments.table_name = user_tab_cols.table_name
             WHERE user_tab_cols.table_name = UPPER(%s)
             """,
             [table_name],
@@ -146,6 +160,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 collation,
                 is_autofield,
                 is_json,
+                comment,
             )
             for (
                 column,
@@ -154,6 +169,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 display_size,
                 is_autofield,
                 is_json,
+                comment,
             ) in cursor.fetchall()
         }
         self.cache_bust_counter += 1
@@ -165,7 +181,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         description = []
         for desc in cursor.description:
             name = desc[0]
-            display_size, default, collation, is_autofield, is_json = field_map[name]
+            (
+                display_size,
+                default,
+                collation,
+                is_autofield,
+                is_json,
+                comment,
+            ) = field_map[name]
             name %= {}  # cx_Oracle, for some reason, doubles percent signs.
             description.append(
                 FieldInfo(
@@ -180,6 +203,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     collation,
                     is_autofield,
                     is_json,
+                    comment,
                 )
             )
         return description
