@@ -442,6 +442,11 @@ Miscellaneous
 
 * The default scheme for ``forms.URLField`` will change from ``"http"`` to
   ``"https"`` in Django 6.0.
+* The undocumented ``django.utils.dateformat.DateFormat`` and
+  ``django.utils.dateformat.TimeFormat`` classes, and the
+  ``django.utils.dateformat.time_format()`` function are deprecated in favor of
+  ``django.utils.dateformat.Formatter`` and
+  ``django.utils.dateformat.format()`` respectively.
 
 Features removed in 5.0
 =======================

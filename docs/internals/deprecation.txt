@@ -35,6 +35,10 @@ details on these changes.
 * The default scheme for ``forms.URLField`` will change from ``"http"`` to
   ``"https"``.
 
+* The undocumented ``django.utils.dateformat.DateFormat`` and
+  ``django.utils.dateformat.TimeFormat`` classes, and the
+  ``django.utils.dateformat.time_format()`` function will be removed.
+
 .. _deprecation-removed-in-5.1:
 
 5.1

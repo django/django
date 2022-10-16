@@ -8,7 +8,7 @@ from django.utils.timezone import get_default_timezone, get_fixed_timezone, make
 
 
 @override_settings(TIME_ZONE="Europe/Copenhagen")
-class DateFormatTests(SimpleTestCase):
+class FormatterTests(SimpleTestCase):
     def setUp(self):
         self._orig_lang = translation.get_language()
         translation.activate("en-us")
@@ -204,7 +204,7 @@ class DateFormatTests(SimpleTestCase):
 
             for specifier in ["e", "O", "T", "Z"]:
                 with self.subTest(specifier=specifier):
-                    self.assertEqual(dateformat.time_format(noon, specifier), "")
+                    self.assertEqual(dateformat.format(noon, specifier), "")
 
         # Ticket #16924 -- We don't need timezone support to test this
         self.assertEqual(dateformat.format(aware_dt, "O"), "-0330")
@@ -247,7 +247,7 @@ class DateFormatTests(SimpleTestCase):
             ("8:30 p.m.", time(20, 30)),
         ]:
             with self.subTest(time=t):
-                self.assertEqual(dateformat.time_format(t, "P"), expected)
+                self.assertEqual(dateformat.format(t, "P"), expected)
 
     def test_r_format_with_date(self):
         # Assume midnight in default timezone if datetime.date provided.

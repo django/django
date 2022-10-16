@@ -11,7 +11,7 @@ from pprint import pformat
 from urllib.parse import quote
 
 from django.utils import formats
-from django.utils.dateformat import format, time_format
+from django.utils.dateformat import format
 from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.encoding import iri_to_uri
 from django.utils.html import avoid_wrapping, conditional_escape, escape, escapejs
@@ -789,7 +789,7 @@ def time(value, arg=None):
         return formats.time_format(value, arg)
     except (AttributeError, TypeError):
         try:
-            return time_format(value, arg)
+            return format(value, arg)
         except (AttributeError, TypeError):
             return ""
 

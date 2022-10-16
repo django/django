@@ -5,12 +5,13 @@ See https://www.php.net/date for format strings
 Usage:
 >>> from datetime import datetime
 >>> d = datetime.now()
->>> df = DateFormat(d)
->>> print(df.format('jS F Y H:i'))
+>>> f = Formatter(d)
+>>> print(f.format('jS F Y H:i'))
 7th October 2003 11:39
 >>>
 """
 import calendar
+import warnings
 from datetime import date, datetime, time
 from email.utils import format_datetime as format_datetime_rfc5322
 
@@ -22,6 +23,7 @@ from django.utils.dates import (
     WEEKDAYS,
     WEEKDAYS_ABBR,
 )
+from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.timezone import (
     _datetime_ambiguous_or_imaginary,
     get_default_timezone,
@@ -339,20 +341,34 @@ class Formatter:
 
 
 class TimeFormat(Formatter):
-    pass
+    def __init__(self, obj):
+        warnings.warn(
+            "django.utils.dateformat.TimeFormat is deprecated in favor of "
+            "django.utils.dateformat.Formatter.",
+            RemovedInDjango51Warning,
+        )
+        super().__init__(obj)
 
 
 class DateFormat(TimeFormat):
-    pass
+    def __init__(self, obj):
+        warnings.warn(
+            "django.utils.dateformat.DateFormat is deprecated in favor of "
+            "django.utils.dateformat.Formatter.",
+            RemovedInDjango51Warning,
+        )
+        super().__init__(obj)
 
 
 def format(value, format_string):
-    "Convenience function"
-    df = DateFormat(value)
-    return df.format(format_string)
+    """Convenience function for formatting of dates and times."""
+    return Formatter(value).format(format_string)
 
 
 def time_format(value, format_string):
-    "Convenience function"
-    tf = TimeFormat(value)
-    return tf.format(format_string)
+    warnings.warn(
+        "django.utils.dateformat.time_format() is deprecated in favor of "
+        "django.utils.dateformat.format().",
+        RemovedInDjango51Warning,
+    )
+    return format(value, format_string)
