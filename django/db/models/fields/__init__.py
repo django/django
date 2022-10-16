@@ -200,6 +200,7 @@ class Field(RegisterLookupMixin):
         auto_created=False,
         validators=(),
         error_messages=None,
+        db_comment=None,
     ):
         self.name = name
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
@@ -221,6 +222,7 @@ class Field(RegisterLookupMixin):
         self.help_text = help_text
         self.db_index = db_index
         self.db_column = db_column
+        self.db_comment = db_comment
         self._db_tablespace = db_tablespace
         self.auto_created = auto_created
 
@@ -259,6 +261,7 @@ class Field(RegisterLookupMixin):
             *self._check_field_name(),
             *self._check_choices(),
             *self._check_db_index(),
+            *self._check_db_comment(**kwargs),
             *self._check_null_allowed_for_primary_keys(),
             *self._check_backend_specific_checks(**kwargs),
             *self._check_validators(),
@@ -384,6 +387,28 @@ class Field(RegisterLookupMixin):
             ]
         else:
             return []
+
+    def _check_db_comment(self, databases=None, **kwargs):
+        if not self.db_comment or not databases:
+            return []
+        errors = []
+        for db in databases:
+            if not router.allow_migrate_model(db, self.model):
+                continue
+            connection = connections[db]
+            if not (
+                connection.features.supports_comments
+                or "supports_comments" in self.model._meta.required_db_features
+            ):
+                errors.append(
+                    checks.Warning(
+                        f"{connection.display_name} does not support comments on "
+                        f"columns (db_comment).",
+                        obj=self,
+                        id="fields.W163",
+                    )
+                )
+        return errors
 
     def _check_null_allowed_for_primary_keys(self):
         if (
@@ -538,6 +563,7 @@ class Field(RegisterLookupMixin):
             "choices": None,
             "help_text": "",
             "db_column": None,
+            "db_comment": None,
             "db_tablespace": None,
             "auto_created": False,
             "validators": [],

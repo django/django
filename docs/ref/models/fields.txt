@@ -325,6 +325,21 @@ characters that aren't allowed in Python variable names -- notably, the
 hyphen -- that's OK. Django quotes column and table names behind the
 scenes.
 
+``db_comment``
+--------------
+
+.. versionadded:: 4.2
+
+.. attribute:: Field.db_comment
+
+The comment on the database column to use for this field. It is useful for
+documenting fields for individuals with direct database access who may not be
+looking at your Django code. For example::
+
+    pub_date = models.DateTimeField(
+        db_comment="Date and time when the article was published",
+    )
+
 ``db_index``
 ------------
 

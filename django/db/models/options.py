@@ -30,6 +30,7 @@ DEFAULT_NAMES = (
     "verbose_name",
     "verbose_name_plural",
     "db_table",
+    "db_table_comment",
     "ordering",
     "unique_together",
     "permissions",
@@ -112,6 +113,7 @@ class Options:
         self.verbose_name = None
         self.verbose_name_plural = None
         self.db_table = ""
+        self.db_table_comment = ""
         self.ordering = []
         self._ordering_clash = False
         self.indexes = []

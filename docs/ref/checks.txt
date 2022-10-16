@@ -196,6 +196,8 @@ Model fields
 * **fields.W161**: Fixed default value provided.
 * **fields.W162**: ``<database>`` does not support a database index on
   ``<field data type>`` columns.
+* **fields.W163**: ``<database>`` does not support comments on columns
+  (``db_comment``).
 * **fields.E170**: ``BinaryField``’s ``default`` cannot be a string. Use bytes
   content instead.
 * **fields.E180**: ``<database>`` does not support ``JSONField``\s.
@@ -315,6 +317,7 @@ Related fields
   the table name of ``<model>``/``<model>.<field name>``.
 * **fields.W345**: ``related_name`` has no effect on ``ManyToManyField`` with a
   symmetrical relationship, e.g. to "self".
+* **fields.W346**: ``db_comment`` has no effect on ``ManyToManyField``.
 
 Models
 ------
@@ -400,6 +403,8 @@ Models
   expressions.
 * **models.W045**: Check constraint ``<constraint>`` contains ``RawSQL()``
   expression and won't be validated during the model ``full_clean()``.
+* **models.W046**: ``<database>`` does not support comments on tables
+  (``db_table_comment``).
 
 Security
 --------

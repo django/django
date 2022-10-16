@@ -1023,3 +1023,35 @@ class JSONFieldTests(TestCase):
             field = models.JSONField(default=callable_default)
 
         self.assertEqual(Model._meta.get_field("field").check(), [])
+
+
+@isolate_apps("invalid_models_tests")
+class DbCommentTests(TestCase):
+    def test_db_comment(self):
+        class Model(models.Model):
+            field = models.IntegerField(db_comment="Column comment")
+
+        errors = Model._meta.get_field("field").check(databases=self.databases)
+        expected = (
+            []
+            if connection.features.supports_comments
+            else [
+                DjangoWarning(
+                    f"{connection.display_name} does not support comments on columns "
+                    f"(db_comment).",
+                    obj=Model._meta.get_field("field"),
+                    id="fields.W163",
+                ),
+            ]
+        )
+        self.assertEqual(errors, expected)
+
+    def test_db_comment_required_db_features(self):
+        class Model(models.Model):
+            field = models.IntegerField(db_comment="Column comment")
+
+            class Meta:
+                required_db_features = {"supports_comments"}
+
+        errors = Model._meta.get_field("field").check(databases=self.databases)
+        self.assertEqual(errors, [])

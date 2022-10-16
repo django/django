@@ -88,6 +88,17 @@ lose any data in the old table.
 Changes the model's table name (the :attr:`~django.db.models.Options.db_table`
 option on the ``Meta`` subclass).
 
+``AlterModelTableComment``
+--------------------------
+
+.. versionadded:: 4.2
+
+.. class:: AlterModelTableComment(name, table_comment)
+
+Changes the model's table comment (the
+:attr:`~django.db.models.Options.db_table_comment` option on the ``Meta``
+subclass).
+
 ``AlterUniqueTogether``
 -----------------------
 
