@@ -197,6 +197,7 @@ class TestingHttpRequest(HttpRequest):
         return getattr(self, "_is_secure_override", False)
 
 
+# TODO: review tests using this to use .data.
 class PostErrorRequest(TestingHttpRequest):
     """
     TestingHttpRequest that can raise errors when accessing POST data.
@@ -207,10 +208,10 @@ class PostErrorRequest(TestingHttpRequest):
     def _get_post(self):
         if self.post_error is not None:
             raise self.post_error
-        return self._post
+        return self.data
 
     def _set_post(self, post):
-        self._post = post
+        self.data = post
 
     POST = property(_get_post, _set_post)
 
