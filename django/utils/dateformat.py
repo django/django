@@ -57,6 +57,9 @@ class Formatter:
         elif isinstance(obj, date):
             self.type = "date"
 
+        elif isinstance(obj, time):
+            self.type = "time"
+
     def format(self, formatstr):
         escape = 0
         output = ""
@@ -71,9 +74,16 @@ class Formatter:
 
             if escape % 2 or char not in self.all_specifiers:
                 output += char
+            elif self.type == "datetime":
+                output += getattr(self, char)()
             elif self.type == "date" and char in self.time_specifiers:
                 raise TypeError(
                     "The format for date objects may not contain time-related "
+                    f"format specifiers (found {char!r})."
+                )
+            elif self.type == "time" and char in self.date_specifiers:
+                raise TypeError(
+                    "The format for time objects may not contain date-related "
                     f"format specifiers (found {char!r})."
                 )
             else:
