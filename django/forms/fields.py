@@ -677,10 +677,8 @@ class FileField(Field):
             return initial
         return super().clean(data)
 
-    def bound_data(self, data, initial):
-        if data in (None, FILE_INPUT_CONTRADICTION):
-            return initial
-        return data
+    def bound_data(self, _, initial):
+        return initial
 
     def has_changed(self, initial, data):
         return not self.disabled and data is not None

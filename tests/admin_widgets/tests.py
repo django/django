@@ -1772,3 +1772,56 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         profiles = Profile.objects.all()
         self.assertEqual(len(profiles), 1)
         self.assertEqual(profiles[0].user.username, username_value)
+
+
+class ImageFieldWidgetsSeleniumTests(AdminWidgetSeleniumTestCase):
+    def test_clearablefileinput_widget(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(username="super", password="secret", login_url="/")
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_widgets_student_add"),
+        )
+
+        photo_input_id = "id_photo"
+        save_and_edit_button_css_selector = "input[value='Save and continue editing']"
+        tests_files_folder = "%s/files" % os.getcwd()
+        clear_checkbox_id = "photo-clear_id"
+
+        def _submit_and_wait():
+            with self.wait_page_loaded():
+                self.selenium.find_element(
+                    By.CSS_SELECTOR, save_and_edit_button_css_selector
+                ).click()
+
+        # Add a student.
+        title_input = self.selenium.find_element(By.ID, "id_name")
+        title_input.send_keys("Joe Doe")
+        photo_input = self.selenium.find_element(By.ID, photo_input_id)
+        photo_input.send_keys(f"{tests_files_folder}/test.png")
+        _submit_and_wait()
+        student = Student.objects.last()
+        self.assertEqual(student.name, "Joe Doe")
+        self.assertEqual(student.photo.name, "photos/test.png")
+        # Uploading non-image files is not supported by Safari with Selenium,
+        # so upload a broken one instead.
+        photo_input = self.selenium.find_element(By.ID, photo_input_id)
+        photo_input.send_keys(f"{tests_files_folder}/brokenimg.png")
+        _submit_and_wait()
+        self.assertEqual(
+            self.selenium.find_element(By.CSS_SELECTOR, ".errorlist li").text,
+            (
+                "Upload a valid image. The file you uploaded was either not an image "
+                "or a corrupted image."
+            ),
+        )
+        # "Currently" with "Clear" checkbox and "Change" still shown.
+        cover_field_row = self.selenium.find_element(By.CSS_SELECTOR, ".field-photo")
+        self.assertIn("Currently", cover_field_row.text)
+        self.assertIn("Change", cover_field_row.text)
+        # "Clear" box works.
+        self.selenium.find_element(By.ID, clear_checkbox_id).click()
+        _submit_and_wait()
+        student.refresh_from_db()
+        self.assertEqual(student.name, "Joe Doe")
+        self.assertEqual(student.photo.name, "")
