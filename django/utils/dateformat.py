@@ -22,7 +22,6 @@ from django.utils.dates import (
     WEEKDAYS,
     WEEKDAYS_ABBR,
 )
-from django.utils.regex_helper import _lazy_re_compile
 from django.utils.timezone import (
     _datetime_ambiguous_or_imaginary,
     get_default_timezone,
@@ -30,8 +29,6 @@ from django.utils.timezone import (
     make_aware,
 )
 from django.utils.translation import gettext as _
-
-re_formatchars = _lazy_re_compile(r"(?<!\\)((?:\\{2})*)(\\*)(.)")
 
 
 class Formatter:
@@ -58,20 +55,34 @@ class Formatter:
         elif isinstance(obj, date):
             self.type = "date"
 
-    def _replace_token(self, match):
-        prefix, escape, specifier = match.groups()
-        prefix = prefix[::2] if prefix else ""
-        if escape or specifier not in self.all_specifiers:
-            return prefix + specifier
-        if self.type == "date" and specifier in self.time_specifiers:
-            raise TypeError(
-                "The format for date objects may not contain time-related "
-                f"format specifiers (found {specifier!r})."
-            )
-        return prefix + getattr(self, specifier)()
-
     def format(self, formatstr):
-        return re_formatchars.sub(self._replace_token, str(formatstr))
+        escape = 0
+        output = ""
+
+        for char in formatstr:
+            if char == "\\":
+                escape += 1
+                continue
+
+            if escape:
+                output += "\\" * (escape // 2)
+
+            if escape % 2 or char not in self.all_specifiers:
+                output += char
+            elif self.type == "date" and char in self.time_specifiers:
+                raise TypeError(
+                    "The format for date objects may not contain time-related "
+                    f"format specifiers (found {char!r})."
+                )
+            else:
+                output += getattr(self, char)()
+
+            escape = 0
+
+        if escape:
+            output += "\\" * (escape // 2 + 1)
+
+        return output
 
     def a(self):
         "'a.m.' or 'p.m.'"
