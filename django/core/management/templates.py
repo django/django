@@ -232,7 +232,7 @@ class TemplateCommand(BaseCommand):
                 else:
                     shutil.rmtree(path_to_remove)
 
-        run_formatters(self.written_files, **formatter_paths)
+        run_formatters([top_dir], **formatter_paths)
 
     def handle_template(self, template, subdir):
         """
