@@ -1093,7 +1093,10 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             connection = connections[queryset.db]
             qn = connection.ops.quote_name
 
-            if "ForeignKey" == fk.__class__.__name__:
+            if (
+                connection.features.has_native_uuid_field
+                and "ForeignKey" == fk.__class__.__name__
+            ):
                 annotated_fields = {
                     f"_prefetch_related_val_{f.attname}": F(
                         f"{self.query_field_name}__{f.target_field.name}"

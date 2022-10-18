@@ -129,6 +129,11 @@ Minor features
 
 * ...
 
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* Using native UUID data type on MariaDB 10.7+
+
 Cache
 ~~~~~
 
