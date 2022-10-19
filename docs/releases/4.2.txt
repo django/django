@@ -181,6 +181,8 @@ Forms
 *  Currently, help text is not programmatically identifiable. To improve accessibility
   :attr:`~django.forms.Field.help_text` is now
   associated to its input using ``aria-describedby``.
+*  To improve accessibility
+  :attr:`~django.forms.Field.help_text` is now associated to its input using ``aria-describedby``.
 
 Generic Views
 ~~~~~~~~~~~~~
