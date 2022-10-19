@@ -278,11 +278,6 @@ Forms
   :class:`~django.forms.formsets.BaseFormSet` now allows customizing
   error messages for invalid number of forms by passing ``'too_few_forms'``
   and ``'too_many_forms'`` keys.
-* To improve accessibility :attr:`~django.forms.Field.help_text` is now
-  associated to its input using ``aria-describedby``.
-
-Generic Views
-~~~~~~~~~~~~~
 
 * :class:`~django.forms.IntegerField`, :class:`~django.forms.FloatField`, and
   :class:`~django.forms.DecimalField` now optionally accept a ``step_size``
