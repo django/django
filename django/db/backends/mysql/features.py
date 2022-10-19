@@ -349,3 +349,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         if self.connection.mysql_is_mariadb:
             return True
         return self.connection.mysql_version >= (8, 0, 13)
+
+    @cached_property
+    def has_native_uuid_field(self):
+        is_mariadb = self.connection.mysql_is_mariadb
+        return is_mariadb and self.connection.mysql_version >= (10, 7)

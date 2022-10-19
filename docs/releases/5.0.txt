@@ -377,6 +377,10 @@ Models
 * :meth:`.QuerySet.aiterator` now supports previous calls to
   ``prefetch_related()``.
 
+* On MariaDB 10.7+, ``UUIDField`` is now created as ``UUID`` column rather than
+  ``CHAR(32)`` column. See the migration guide above for more details on
+  :ref:`migrating-uuidfield`.
+
 Pagination
 ~~~~~~~~~~
 
@@ -482,6 +486,38 @@ Using ``create_defaults__exact`` may now be required with ``QuerySet.update_or_c
 ``create_defaults``. As a consequence, any models that have a field named
 ``create_defaults`` that are used with an ``update_or_create()`` should specify
 the field in the lookup with ``create_defaults__exact``.
+
+.. _migrating-uuidfield:
+
+Migrating existing ``UUIDField`` on MariaDB 10.7+
+-------------------------------------------------
+
+On MariaDB 10.7+, ``UUIDField`` is now created as ``UUID`` column rather than
+``CHAR(32)`` column. As a consequence, any ``UUIDField`` created in
+Django < 5.0 should be replaced with a ``UUIDField`` subclass backed by
+``CHAR(32)``::
+
+    class Char32UUIDField(models.UUIDField):
+        def db_type(self, connection):
+            return "char(32)"
+
+For example::
+
+    class MyModel(models.Model):
+        uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
+
+Should become::
+
+    class Char32UUIDField(models.UUIDField):
+        def db_type(self, connection):
+            return "char(32)"
+
+
+    class MyModel(models.Model):
+        uuid = Char32UUIDField(primary_key=True, default=uuid.uuid4)
+
+Running the :djadmin:`makemigrations` command will generate a migration
+containing a no-op ``AlterField`` operation.
 
 Miscellaneous
 -------------

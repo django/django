@@ -103,7 +103,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # types, as strings. Column-type strings can contain format strings; they'll
     # be interpolated against the values of Field.__dict__ before being output.
     # If a column type is set to None, it won't be included in the output.
-    data_types = {
+
+    _data_types = {
         "AutoField": "integer AUTO_INCREMENT",
         "BigAutoField": "bigint AUTO_INCREMENT",
         "BinaryField": "longblob",
@@ -132,6 +133,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         "TimeField": "time(6)",
         "UUIDField": "char(32)",
     }
+
+    @cached_property
+    def data_types(self):
+        _data_types = self._data_types.copy()
+        if self.features.has_native_uuid_field:
+            _data_types["UUIDField"] = "uuid"
+        return _data_types
 
     # For these data types:
     # - MySQL < 8.0.13 doesn't accept default values and implicitly treats them
