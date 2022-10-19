@@ -259,7 +259,7 @@ fields. We've specified ``auto_id=False`` to simplify the output::
     <p>Cc myself: <input type="checkbox" name="cc_myself"></p>
 
 When a field has help text and :attr:`~django.forms.BoundField.id_for_label`
-returns a value the help text will be associated with the input using
+returns a value `help_text` will be associated with the input using
 ``aria-describedby``::
 
     >>> from django import forms
