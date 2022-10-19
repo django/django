@@ -12,7 +12,7 @@ from django.db.models import (
     Subquery,
     Value,
 )
-from django.db.models.functions import Upper
+from django.db.models.functions import Length, Upper
 from django.test import TestCase
 
 from .models import (
@@ -598,4 +598,12 @@ class OrderingTests(TestCase):
         self.assertSequenceEqual(
             OrderedByExpressionGrandChild.objects.order_by("parent"),
             [g1, g2, g3],
+        )
+
+    def test_order_by_expression_ref(self):
+        self.assertQuerySetEqual(
+            Author.objects.annotate(upper_name=Upper("name")).order_by(
+                Length("upper_name")
+            ),
+            Author.objects.order_by(Length(Upper("name"))),
         )
