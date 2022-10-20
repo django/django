@@ -1,3 +1,5 @@
+import hashlib
+
 from unittest import mock, skipUnless
 
 from django.conf.global_settings import PASSWORD_HASHERS
@@ -40,6 +42,16 @@ try:
     import argon2
 except ImportError:
     argon2 = None
+
+"""
+In MacOS 10+, hashlib.scrypt will break due to the automatic
+replacement of OpenSSL with LibreSSL
+"""
+has_scrypt = True
+try:
+    hashlib.scrypt()
+except AttributeError:
+    has_scrypt = False
 
 
 class PBKDF2SingleIterationHasher(PBKDF2PasswordHasher):
@@ -797,6 +809,7 @@ class TestUtilsHashPassArgon2(SimpleTestCase):
             setattr(hasher, attr, old_value)
 
 
+@skipUnless(has_scrypt, "scrypt not available")
 @override_settings(PASSWORD_HASHERS=PASSWORD_HASHERS)
 class TestUtilsHashPassScrypt(SimpleTestCase):
     def test_scrypt(self):
