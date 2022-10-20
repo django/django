@@ -29,6 +29,10 @@ sys.path.insert(1, dirname(dirname(abspath(__file__))))
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.append(abspath(join(dirname(__file__), "_ext")))
 
+# Use the module to GitHub url resolver, but import it after the _ext directoy
+# it lives in has been added to sys.path.
+from sphinx_utils import github_linkcode_resolve  # NOQA
+
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -42,6 +46,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx.ext.autosectionlabel",
+    "sphinx.ext.linkcode",
 ]
 
 # AutosectionLabel settings.
@@ -427,3 +432,10 @@ epub_cover = ("", "epub-cover.html")
 
 # If false, no index is generated.
 # epub_use_index = True
+
+
+def linkcode_resolve(domain, info):
+    """
+    Resolves link to view source code.
+    """
+    return github_linkcode_resolve(domain, info)
