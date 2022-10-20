@@ -12,7 +12,7 @@ Installing Uvicorn
 
 You can install Uvicorn with ``pip``::
 
-    python -m pip install uvicorn gunicorn
+    python -m pip install uvicorn
 
 Running Django in Uvicorn
 =========================
@@ -24,7 +24,7 @@ called (separated by a colon).
 
 For a typical Django project, invoking Uvicorn would look like::
 
-    gunicorn myproject.asgi:application -k uvicorn.workers.UvicornWorker
+    uvicorn myproject.asgi:application
 
 This will start one process listening on ``127.0.0.1:8000``. It requires that
 your project be on the Python path; to ensure that run this command from the
