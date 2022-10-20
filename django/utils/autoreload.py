@@ -159,7 +159,11 @@ def iter_modules_and_files(modules, extra_files):
         if hasattr(logging, "__file__")
         else ""
     )
-    django_location = os.path.dirname(os.path.dirname(django.__file__))
+    django_location = (
+        os.path.dirname(os.path.dirname(django.__file__))
+        if hasattr(django, "__file__")
+        else ""
+    )
 
     results = set()
     for filename in itertools.chain(sys_file_paths, extra_files):
@@ -176,13 +180,13 @@ def iter_modules_and_files(modules, extra_files):
             logger.debug('"%s" raised when resolving path: "%s"', e, path)
             continue
         resolved_path = path.resolve().absolute()
-        if filename.startswith(django_location):
+        if django_location and filename.startswith(django_location):
             results.add((resolved_path, 5))
         elif is_django_path(path):
             results.add((resolved_path, 7))
         elif stdlib_location_1 and filename.startswith(stdlib_location_1):
             results.add((resolved_path, 10))
-        elif filename.startswith(stdlib_location_2):
+        elif stdlib_location_2 and filename.startswith(stdlib_location_2):
             results.add((resolved_path, 10))
         elif filename.startswith(tuple(site.getusersitepackages())):
             results.add((resolved_path, 20))
