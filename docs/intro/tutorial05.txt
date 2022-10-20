@@ -144,7 +144,7 @@ whose date lies in the future:
 
 .. console::
 
-    $ python manage.py shell
+    $ python3 manage.py shell
 
 .. code-block:: pycon
 
@@ -204,7 +204,7 @@ In the terminal, we can run our test:
 
 .. console::
 
-    $ python manage.py test polls
+    $ python3 manage.py test polls
 
 and you'll see something like::
 
@@ -358,7 +358,7 @@ environment in the :djadmin:`shell`:
 
 .. console::
 
-    $ python manage.py shell
+    $ python3 manage.py shell
 
 .. code-block:: pycon
 
