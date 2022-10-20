@@ -172,7 +172,7 @@ Go ahead and install the previously cloned copy of Django:
 
 .. console::
 
-    $ python -m pip install -e /path/to/your/local/clone/django/
+    $ python3 -m pip install -e /path/to/your/local/clone/django/
 
 The installed version of Django is now pointing at your local copy by installing
 in editable mode. You will immediately see any changes you make to it, which is
@@ -204,7 +204,7 @@ Before running the test suite, enter the Django ``tests/`` directory using the
 
 .. console::
 
-    $ python -m pip install -r requirements/py3.txt
+    $ python3 -m pip install -r requirements/py3.txt
 
 If you encounter an error during the installation, your system might be missing
 a dependency for one or more of the Python packages. Consult the failing
