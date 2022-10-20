@@ -13,6 +13,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
 from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.backends.utils import debug_transaction
 from django.utils.asyncio import async_unsafe
 from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
@@ -306,7 +307,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def _commit(self):
         if self.connection is not None:
-            with wrap_oracle_errors():
+            with debug_transaction(self, "COMMIT"), wrap_oracle_errors():
                 return self.connection.commit()
 
     # Oracle doesn't support releasing savepoints. But we fake them when query

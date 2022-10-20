@@ -199,7 +199,8 @@ Internationalization
 Logging
 ~~~~~~~
 
-* ...
+* The :ref:`django-db-logger` logger now logs transaction management queries
+  (``BEGIN``, ``COMMIT``, and ``ROLLBACK``) at the ``DEBUG`` level.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
