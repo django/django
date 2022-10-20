@@ -84,7 +84,7 @@ Start the server (or restart it if it's already running):
 
 .. console::
 
-    $ python manage.py runserver
+    $ python3 manage.py runserver
 
 Reload ``http://localhost:8000/polls/`` and you should see that the question
 links are green (Django style!) which means that your stylesheet was properly
