@@ -41,10 +41,11 @@ try:
 except ImportError:
     argon2 = None
 
-# hashlib.scrypt requires OpenSSL 1.1.0+, and would break if replaced,
-# for example, by LibreSSL.
+# scrypt requires OpenSSL 1.1+
 try:
-    from _hashlib import scrypt
+    import hashlib
+
+    scrypt = hashlib.scrypt
 except ImportError:
     scrypt = None
 
