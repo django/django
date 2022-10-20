@@ -19,7 +19,7 @@ database called SQLite_ so you won't need to set up a database just yet.
 Get the latest version of Python at https://www.python.org/downloads/ or with
 your operating system's package manager.
 
-You can verify that Python is installed by typing ``python`` from your shell;
+You can verify that Python is installed by typing ``python3`` from your shell;
 you should see something like::
 
     Python 3.x.y
@@ -65,7 +65,7 @@ You've got three options to install Django:
 Verifying
 =========
 
-To verify that Django can be seen by Python, type ``python`` from your shell.
+To verify that Django can be seen by Python, type ``python3`` from your shell.
 Then at the Python prompt, try to import Django:
 
 .. parsed-literal::
