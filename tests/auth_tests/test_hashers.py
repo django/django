@@ -1,5 +1,4 @@
 import hashlib
-
 from unittest import mock, skipUnless
 
 from django.conf.global_settings import PASSWORD_HASHERS
@@ -43,15 +42,11 @@ try:
 except ImportError:
     argon2 = None
 
-"""
-In MacOS 10+, hashlib.scrypt will break due to the automatic
-replacement of OpenSSL with LibreSSL
-"""
-has_scrypt = True
+# hashlib.scrypt requires OpenSSL 1.0+, and would break if replaced (e.g. by LibreSSL)
 try:
-    hashlib.scrypt()
+    has_scrypt = hashlib.scrypt
 except AttributeError:
-    has_scrypt = False
+    has_scrypt = None
 
 
 class PBKDF2SingleIterationHasher(PBKDF2PasswordHasher):
