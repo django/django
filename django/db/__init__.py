@@ -65,7 +65,6 @@ signals.request_finished.connect(close_old_connections)
 
 # Register an event to close all connections before forking a process.
 def close_all_connections(**kwargs):
-    print('called')
     connections.close_all()
 
 
