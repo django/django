@@ -1,3 +1,5 @@
+import os
+
 from django.core import signals
 from django.db.utils import (
     DEFAULT_DB_ALIAS,
@@ -59,3 +61,12 @@ def close_old_connections(**kwargs):
 
 signals.request_started.connect(close_old_connections)
 signals.request_finished.connect(close_old_connections)
+
+
+# Register an event to close all connections before forking a process.
+def close_all_connections(**kwargs):
+    print('called')
+    connections.close_all()
+
+
+os.register_at_fork(before=close_all_connections)
