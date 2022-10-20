@@ -80,7 +80,7 @@ Argument    Value
             arguments passed to ``__init__()``)
 
 ``kwargs``  ``{'question_text': "What's new?",``
-            ``'pub_date': datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=<UTC>)}``
+            ``'pub_date': datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=datetime.timezone.utc)}``
 ==========  ===============================================================
 
 ``post_init``
