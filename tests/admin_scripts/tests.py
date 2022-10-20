@@ -2483,6 +2483,23 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, "additional_dir")))
 
+    def test_custom_project_template_non_python_files_not_formatted(self):
+        template_path = os.path.join(custom_templates_dir, "project_template")
+        args = ["startproject", "--template", template_path, "customtestproject"]
+        testproject_dir = os.path.join(self.test_dir, "customtestproject")
+
+        _, err = self.run_django_admin(args)
+        self.assertNoOutput(err)
+        with open(
+            os.path.join(template_path, "additional_dir", "requirements.in")
+        ) as f:
+            expected = f.read()
+        with open(
+            os.path.join(testproject_dir, "additional_dir", "requirements.in")
+        ) as f:
+            result = f.read()
+        self.assertEqual(expected, result)
+
     def test_template_dir_with_trailing_slash(self):
         "Ticket 17475: Template dir passed has a trailing path separator"
         template_path = os.path.join(custom_templates_dir, "project_template" + os.sep)
