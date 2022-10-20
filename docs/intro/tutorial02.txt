@@ -92,7 +92,7 @@ that, run the following command:
 
 .. console::
 
-    $ python manage.py migrate
+    $ python3 manage.py migrate
 
 The :djadmin:`migrate` command looks at the :setting:`INSTALLED_APPS` setting
 and creates any necessary database tables according to the database settings
@@ -233,7 +233,7 @@ Now Django knows to include the ``polls`` app. Let's run another command:
 
 .. console::
 
-    $ python manage.py makemigrations polls
+    $ python3 manage.py makemigrations polls
 
 You should see something similar to the following:
 
@@ -262,7 +262,7 @@ moment - but first, let's see what SQL that migration would run. The
 
 .. console::
 
-    $ python manage.py sqlmigrate polls 0001
+    $ python3 manage.py sqlmigrate polls 0001
 
 You should see something similar to the following (we've reformatted it for
 readability):
@@ -327,14 +327,14 @@ Note the following:
   changes.
 
 If you're interested, you can also run
-:djadmin:`python manage.py check <check>`; this checks for any problems in
+:djadmin:`python3 manage.py check <check>`; this checks for any problems in
 your project without making migrations or touching the database.
 
 Now, run :djadmin:`migrate` again to create those model tables in your database:
 
 .. console::
 
-    $ python manage.py migrate
+    $ python3 manage.py migrate
     Operations to perform:
       Apply all migrations: admin, auth, contenttypes, polls, sessions
     Running migrations:
@@ -354,9 +354,9 @@ losing data. We'll cover them in more depth in a later part of the tutorial,
 but for now, remember the three-step guide to making model changes:
 
 * Change your models (in ``models.py``).
-* Run :djadmin:`python manage.py makemigrations <makemigrations>` to create
+* Run :djadmin:`python3 manage.py makemigrations <makemigrations>` to create
   migrations for those changes
-* Run :djadmin:`python manage.py migrate <migrate>` to apply those changes to
+* Run :djadmin:`python3 manage.py migrate <migrate>` to apply those changes to
   the database.
 
 The reason that there are separate commands to make and apply migrations is
@@ -375,9 +375,9 @@ API Django gives you. To invoke the Python shell, use this command:
 
 .. console::
 
-    $ python manage.py shell
+    $ python3 manage.py shell
 
-We're using this instead of simply typing "python", because :file:`manage.py`
+We're using this instead of simply typing "python3", because :file:`manage.py`
 sets the :envvar:`DJANGO_SETTINGS_MODULE` environment variable, which gives
 Django the Python import path to your :file:`mysite/settings.py` file.
 
@@ -468,7 +468,7 @@ you aren't familiar with time zone handling in Python, you can learn more in
 the :doc:`time zone support docs </topics/i18n/timezones>`.
 
 Save these changes and start a new Python interactive shell by running
-``python manage.py shell`` again::
+``python3 manage.py shell`` again::
 
     >>> from polls.models import Choice, Question
 
@@ -578,7 +578,7 @@ following command:
 
 .. console::
 
-    $ python manage.py createsuperuser
+    $ python3 manage.py createsuperuser
 
 Enter your desired username and press enter.
 
@@ -611,7 +611,7 @@ If the server is not running start it like so:
 
 .. console::
 
-    $ python manage.py runserver
+    $ python3 manage.py runserver
 
 Now, open a web browser and go to "/admin/" on your local domain -- e.g.,
 http://127.0.0.1:8000/admin/. You should see the admin's login screen:
