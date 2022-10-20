@@ -53,8 +53,8 @@ automatically:
 
 .. console::
 
-    $ python manage.py makemigrations
-    $ python manage.py migrate
+    $ python3 manage.py makemigrations
+    $ python3 manage.py migrate
 
 The :djadmin:`makemigrations` command looks at all your available models and
 creates migrations for whichever tables don't already exist. :djadmin:`migrate`
