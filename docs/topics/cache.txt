@@ -363,6 +363,19 @@ user ``apache``, make sure the directory ``/var/tmp/django_cache`` exists and
 is readable and writable by the user ``apache``, or that it can be created by
 the user ``apache``.
 
+.. warning:: 
+
+    The filesystem cache is intended as an easy way to test caching, not as a 
+    serious caching strategy. It is not designed to scale.
+     
+    If you do need file based caching in your application, consider using 
+    DiskCache_. DiskCache is an Apache2 licensed disk
+    and file backed cache library, written in pure-Python, and compatible with 
+    Django.
+
+    .. _DiskCache: https://grantjenks.com/docs/diskcache/. 
+    
+
 .. warning::
 
     When the cache :setting:`LOCATION <CACHES-LOCATION>` is contained within
