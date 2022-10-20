@@ -8,6 +8,7 @@ from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 
 class MultipleObjectMixin(ContextMixin):
     """A mixin for views manipulating multiple objects."""
+
     allow_empty = True
     queryset = None
     model = None
@@ -15,7 +16,7 @@ class MultipleObjectMixin(ContextMixin):
     paginate_orphans = 0
     context_object_name = None
     paginator_class = Paginator
-    page_kwarg = 'page'
+    page_kwarg = "page"
     ordering = None
 
     def get_queryset(self):
@@ -35,9 +36,7 @@ class MultipleObjectMixin(ContextMixin):
             raise ImproperlyConfigured(
                 "%(cls)s is missing a QuerySet. Define "
                 "%(cls)s.model, %(cls)s.queryset, or override "
-                "%(cls)s.get_queryset()." % {
-                    'cls': self.__class__.__name__
-                }
+                "%(cls)s.get_queryset()." % {"cls": self.__class__.__name__}
             )
         ordering = self.get_ordering()
         if ordering:
@@ -54,25 +53,30 @@ class MultipleObjectMixin(ContextMixin):
     def paginate_queryset(self, queryset, page_size):
         """Paginate the queryset, if needed."""
         paginator = self.get_paginator(
-            queryset, page_size, orphans=self.get_paginate_orphans(),
-            allow_empty_first_page=self.get_allow_empty())
+            queryset,
+            page_size,
+            orphans=self.get_paginate_orphans(),
+            allow_empty_first_page=self.get_allow_empty(),
+        )
         page_kwarg = self.page_kwarg
         page = self.kwargs.get(page_kwarg) or self.request.GET.get(page_kwarg) or 1
         try:
             page_number = int(page)
         except ValueError:
-            if page == 'last':
+            if page == "last":
                 page_number = paginator.num_pages
             else:
-                raise Http404(_('Page is not “last”, nor can it be converted to an int.'))
+                raise Http404(
+                    _("Page is not “last”, nor can it be converted to an int.")
+                )
         try:
             page = paginator.page(page_number)
             return (paginator, page, page.object_list, page.has_other_pages())
         except InvalidPage as e:
-            raise Http404(_('Invalid page (%(page_number)s): %(message)s') % {
-                'page_number': page_number,
-                'message': str(e)
-            })
+            raise Http404(
+                _("Invalid page (%(page_number)s): %(message)s")
+                % {"page_number": page_number, "message": str(e)}
+            )
 
     def get_paginate_by(self, queryset):
         """
@@ -80,12 +84,17 @@ class MultipleObjectMixin(ContextMixin):
         """
         return self.paginate_by
 
-    def get_paginator(self, queryset, per_page, orphans=0,
-                      allow_empty_first_page=True, **kwargs):
+    def get_paginator(
+        self, queryset, per_page, orphans=0, allow_empty_first_page=True, **kwargs
+    ):
         """Return an instance of the paginator for this view."""
         return self.paginator_class(
-            queryset, per_page, orphans=orphans,
-            allow_empty_first_page=allow_empty_first_page, **kwargs)
+            queryset,
+            per_page,
+            orphans=orphans,
+            allow_empty_first_page=allow_empty_first_page,
+            **kwargs,
+        )
 
     def get_paginate_orphans(self):
         """
@@ -105,8 +114,8 @@ class MultipleObjectMixin(ContextMixin):
         """Get the name of the item to be used in the context."""
         if self.context_object_name:
             return self.context_object_name
-        elif hasattr(object_list, 'model'):
-            return '%s_list' % object_list.model._meta.model_name
+        elif hasattr(object_list, "model"):
+            return "%s_list" % object_list.model._meta.model_name
         else:
             return None
 
@@ -116,19 +125,21 @@ class MultipleObjectMixin(ContextMixin):
         page_size = self.get_paginate_by(queryset)
         context_object_name = self.get_context_object_name(queryset)
         if page_size:
-            paginator, page, queryset, is_paginated = self.paginate_queryset(queryset, page_size)
+            paginator, page, queryset, is_paginated = self.paginate_queryset(
+                queryset, page_size
+            )
             context = {
-                'paginator': paginator,
-                'page_obj': page,
-                'is_paginated': is_paginated,
-                'object_list': queryset
+                "paginator": paginator,
+                "page_obj": page,
+                "is_paginated": is_paginated,
+                "object_list": queryset,
             }
         else:
             context = {
-                'paginator': None,
-                'page_obj': None,
-                'is_paginated': False,
-                'object_list': queryset
+                "paginator": None,
+                "page_obj": None,
+                "is_paginated": False,
+                "object_list": queryset,
             }
         if context_object_name is not None:
             context[context_object_name] = queryset
@@ -138,6 +149,7 @@ class MultipleObjectMixin(ContextMixin):
 
 class BaseListView(MultipleObjectMixin, View):
     """A base view for displaying a list of objects."""
+
     def get(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
         allow_empty = self.get_allow_empty()
@@ -146,21 +158,27 @@ class BaseListView(MultipleObjectMixin, View):
             # When pagination is enabled and object_list is a queryset,
             # it's better to do a cheap query than to load the unpaginated
             # queryset in memory.
-            if self.get_paginate_by(self.object_list) is not None and hasattr(self.object_list, 'exists'):
+            if self.get_paginate_by(self.object_list) is not None and hasattr(
+                self.object_list, "exists"
+            ):
                 is_empty = not self.object_list.exists()
             else:
                 is_empty = not self.object_list
             if is_empty:
-                raise Http404(_('Empty list and “%(class_name)s.allow_empty” is False.') % {
-                    'class_name': self.__class__.__name__,
-                })
+                raise Http404(
+                    _("Empty list and “%(class_name)s.allow_empty” is False.")
+                    % {
+                        "class_name": self.__class__.__name__,
+                    }
+                )
         context = self.get_context_data()
         return self.render_to_response(context)
 
 
 class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
     """Mixin for responding with a template and list of objects."""
-    template_name_suffix = '_list'
+
+    template_name_suffix = "_list"
 
     def get_template_names(self):
         """
@@ -178,14 +196,18 @@ class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
         # app and model name. This name gets put at the end of the template
         # name list so that user-supplied names override the automatically-
         # generated ones.
-        if hasattr(self.object_list, 'model'):
+        if hasattr(self.object_list, "model"):
             opts = self.object_list.model._meta
-            names.append("%s/%s%s.html" % (opts.app_label, opts.model_name, self.template_name_suffix))
+            names.append(
+                "%s/%s%s.html"
+                % (opts.app_label, opts.model_name, self.template_name_suffix)
+            )
         elif not names:
             raise ImproperlyConfigured(
                 "%(cls)s requires either a 'template_name' attribute "
-                "or a get_queryset() method that returns a QuerySet." % {
-                    'cls': self.__class__.__name__,
+                "or a get_queryset() method that returns a QuerySet."
+                % {
+                    "cls": self.__class__.__name__,
                 }
             )
         return names

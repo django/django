@@ -1,6 +1,4 @@
-from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation,
-)
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.core.checks import Error
 from django.core.exceptions import FieldDoesNotExist, FieldError
@@ -9,7 +7,7 @@ from django.test import SimpleTestCase
 from django.test.utils import isolate_apps
 
 
-@isolate_apps('model_inheritance')
+@isolate_apps("model_inheritance")
 class AbstractInheritanceTests(SimpleTestCase):
     def test_single_parent(self):
         class AbstractBase(models.Model):
@@ -30,9 +28,9 @@ class AbstractInheritanceTests(SimpleTestCase):
         class DerivedGrandChild(AbstractDescendant):
             pass
 
-        self.assertEqual(AbstractDescendant._meta.get_field('name').max_length, 50)
-        self.assertEqual(DerivedChild._meta.get_field('name').max_length, 50)
-        self.assertEqual(DerivedGrandChild._meta.get_field('name').max_length, 50)
+        self.assertEqual(AbstractDescendant._meta.get_field("name").max_length, 50)
+        self.assertEqual(DerivedChild._meta.get_field("name").max_length, 50)
+        self.assertEqual(DerivedGrandChild._meta.get_field("name").max_length, 50)
 
     def test_multiple_inheritance_allows_inherited_field(self):
         """
@@ -56,7 +54,7 @@ class AbstractInheritanceTests(SimpleTestCase):
             pass
 
         self.assertEqual(Child.check(), [])
-        inherited_field = Child._meta.get_field('name')
+        inherited_field = Child._meta.get_field("name")
         self.assertIsInstance(inherited_field, models.CharField)
         self.assertEqual(inherited_field.max_length, 255)
 
@@ -92,7 +90,7 @@ class AbstractInheritanceTests(SimpleTestCase):
             pass
 
         self.assertEqual(Child.check(), [])
-        inherited_field = Child._meta.get_field('name')
+        inherited_field = Child._meta.get_field("name")
         self.assertIsInstance(inherited_field, models.CharField)
         self.assertEqual(inherited_field.max_length, 255)
 
@@ -123,7 +121,7 @@ class AbstractInheritanceTests(SimpleTestCase):
             name = models.IntegerField()
 
         self.assertEqual(Child.check(), [])
-        inherited_field = Child._meta.get_field('name')
+        inherited_field = Child._meta.get_field("name")
         self.assertIsInstance(inherited_field, models.IntegerField)
 
     def test_multiple_inheritance_cannot_shadow_concrete_inherited_field(self):
@@ -142,22 +140,24 @@ class AbstractInheritanceTests(SimpleTestCase):
         class AnotherChild(AbstractParent, ConcreteParent):
             pass
 
-        self.assertIsInstance(FirstChild._meta.get_field('name'), models.CharField)
+        self.assertIsInstance(FirstChild._meta.get_field("name"), models.CharField)
         self.assertEqual(
             AnotherChild.check(),
-            [Error(
-                "The field 'name' clashes with the field 'name' "
-                "from model 'model_inheritance.concreteparent'.",
-                obj=AnotherChild._meta.get_field('name'),
-                id="models.E006",
-            )]
+            [
+                Error(
+                    "The field 'name' clashes with the field 'name' "
+                    "from model 'model_inheritance.concreteparent'.",
+                    obj=AnotherChild._meta.get_field("name"),
+                    id="models.E006",
+                )
+            ],
         )
 
     def test_virtual_field(self):
         class RelationModel(models.Model):
             content_type = models.ForeignKey(ContentType, models.CASCADE)
             object_id = models.PositiveIntegerField()
-            content_object = GenericForeignKey('content_type', 'object_id')
+            content_object = GenericForeignKey("content_type", "object_id")
 
         class RelatedModelAbstract(models.Model):
             field = GenericRelation(RelationModel)
@@ -177,8 +177,12 @@ class AbstractInheritanceTests(SimpleTestCase):
         class ExtendModelAbstract(ModelAbstract):
             field = GenericRelation(RelationModel)
 
-        self.assertIsInstance(OverrideRelatedModelAbstract._meta.get_field('field'), models.CharField)
-        self.assertIsInstance(ExtendModelAbstract._meta.get_field('field'), GenericRelation)
+        self.assertIsInstance(
+            OverrideRelatedModelAbstract._meta.get_field("field"), models.CharField
+        )
+        self.assertIsInstance(
+            ExtendModelAbstract._meta.get_field("field"), GenericRelation
+        )
 
     def test_cannot_override_indirect_abstract_field(self):
         class AbstractBase(models.Model):
@@ -195,6 +199,7 @@ class AbstractInheritanceTests(SimpleTestCase):
             "the same name from base class 'ConcreteDescendant'."
         )
         with self.assertRaisesMessage(FieldError, msg):
+
             class Descendant(ConcreteDescendant):
                 name = models.IntegerField()
 
@@ -215,11 +220,11 @@ class AbstractInheritanceTests(SimpleTestCase):
                 return self.first_name + self.last_name
 
         msg = "Descendant has no field named %r"
-        with self.assertRaisesMessage(FieldDoesNotExist, msg % 'middle_name'):
-            Descendant._meta.get_field('middle_name')
+        with self.assertRaisesMessage(FieldDoesNotExist, msg % "middle_name"):
+            Descendant._meta.get_field("middle_name")
 
-        with self.assertRaisesMessage(FieldDoesNotExist, msg % 'full_name'):
-            Descendant._meta.get_field('full_name')
+        with self.assertRaisesMessage(FieldDoesNotExist, msg % "full_name"):
+            Descendant._meta.get_field("full_name")
 
     def test_overriding_field_removed_by_concrete_model(self):
         class AbstractModel(models.Model):
@@ -234,7 +239,9 @@ class AbstractInheritanceTests(SimpleTestCase):
         class OverrideRemovedFieldByConcreteModel(RemovedAbstractModelField):
             foo = models.CharField(max_length=50)
 
-        self.assertEqual(OverrideRemovedFieldByConcreteModel._meta.get_field('foo').max_length, 50)
+        self.assertEqual(
+            OverrideRemovedFieldByConcreteModel._meta.get_field("foo").max_length, 50
+        )
 
     def test_shadowed_fkey_id(self):
         class Foo(models.Model):
@@ -251,12 +258,14 @@ class AbstractInheritanceTests(SimpleTestCase):
 
         self.assertEqual(
             Descendant.check(),
-            [Error(
-                "The field 'foo_id' clashes with the field 'foo' "
-                "from model 'model_inheritance.descendant'.",
-                obj=Descendant._meta.get_field('foo_id'),
-                id='models.E006',
-            )]
+            [
+                Error(
+                    "The field 'foo_id' clashes with the field 'foo' "
+                    "from model 'model_inheritance.descendant'.",
+                    obj=Descendant._meta.get_field("foo_id"),
+                    id="models.E006",
+                )
+            ],
         )
 
     def test_shadow_related_name_when_set_to_none(self):
@@ -271,7 +280,7 @@ class AbstractInheritanceTests(SimpleTestCase):
             foo = models.IntegerField()
 
         class Bar(models.Model):
-            bar = models.ForeignKey(Foo, models.CASCADE, related_name='bar')
+            bar = models.ForeignKey(Foo, models.CASCADE, related_name="bar")
 
         self.assertEqual(Bar.check(), [])
 
@@ -286,21 +295,22 @@ class AbstractInheritanceTests(SimpleTestCase):
             pass
 
         class Foo(models.Model):
-            foo = models.ForeignKey(Descendant, models.CASCADE, related_name='foo')
+            foo = models.ForeignKey(Descendant, models.CASCADE, related_name="foo")
 
         self.assertEqual(
-            Foo._meta.get_field('foo').check(),
+            Foo._meta.get_field("foo").check(),
             [
                 Error(
-                    "Reverse accessor for 'model_inheritance.Foo.foo' clashes "
-                    "with field name 'model_inheritance.Descendant.foo'.",
+                    "Reverse accessor 'Descendant.foo' for "
+                    "'model_inheritance.Foo.foo' clashes with field name "
+                    "'model_inheritance.Descendant.foo'.",
                     hint=(
                         "Rename field 'model_inheritance.Descendant.foo', or "
                         "add/change a related_name argument to the definition "
                         "for field 'model_inheritance.Foo.foo'."
                     ),
-                    obj=Foo._meta.get_field('foo'),
-                    id='fields.E302',
+                    obj=Foo._meta.get_field("foo"),
+                    id="fields.E302",
                 ),
                 Error(
                     "Reverse query name for 'model_inheritance.Foo.foo' "
@@ -311,10 +321,10 @@ class AbstractInheritanceTests(SimpleTestCase):
                         "add/change a related_name argument to the definition "
                         "for field 'model_inheritance.Foo.foo'."
                     ),
-                    obj=Foo._meta.get_field('foo'),
-                    id='fields.E303',
+                    obj=Foo._meta.get_field("foo"),
+                    id="fields.E303",
                 ),
-            ]
+            ],
         )
 
     def test_multi_inheritance_field_clashes(self):
@@ -336,12 +346,14 @@ class AbstractInheritanceTests(SimpleTestCase):
 
         self.assertEqual(
             ConcreteDescendant.check(),
-            [Error(
-                "The field 'name' clashes with the field 'name' from "
-                "model 'model_inheritance.concretebase'.",
-                obj=ConcreteDescendant._meta.get_field('name'),
-                id="models.E006",
-            )]
+            [
+                Error(
+                    "The field 'name' clashes with the field 'name' from "
+                    "model 'model_inheritance.concretebase'.",
+                    obj=ConcreteDescendant._meta.get_field("name"),
+                    id="models.E006",
+                )
+            ],
         )
 
     def test_override_one2one_relation_auto_field_clashes(self):
@@ -360,6 +372,7 @@ class AbstractInheritanceTests(SimpleTestCase):
             "declared field of the same name."
         )
         with self.assertRaisesMessage(FieldError, msg):
+
             class Descendant(ConcreteParent, AbstractParent):
                 concreteparent_ptr = models.CharField(max_length=30)
 
@@ -387,36 +400,50 @@ class AbstractInheritanceTests(SimpleTestCase):
             age = models.SmallIntegerField()
 
         def fields(model):
-            if not hasattr(model, '_meta'):
+            if not hasattr(model, "_meta"):
                 return []
             return [(f.name, f.__class__) for f in model._meta.get_fields()]
 
-        model_dict = {'__module__': 'model_inheritance'}
-        model1 = type('Model1', (AbstractModel, Mixin), model_dict.copy())
-        model2 = type('Model2', (Mixin2, AbstractModel), model_dict.copy())
-        model3 = type('Model3', (DescendantMixin, AbstractModel), model_dict.copy())
-        model4 = type('Model4', (Mixin2, Mixin, AbstractModel), model_dict.copy())
-        model5 = type('Model5', (Mixin2, ConcreteModel2, Mixin, AbstractModel), model_dict.copy())
+        model_dict = {"__module__": "model_inheritance"}
+        model1 = type("Model1", (AbstractModel, Mixin), model_dict.copy())
+        model2 = type("Model2", (Mixin2, AbstractModel), model_dict.copy())
+        model3 = type("Model3", (DescendantMixin, AbstractModel), model_dict.copy())
+        model4 = type("Model4", (Mixin2, Mixin, AbstractModel), model_dict.copy())
+        model5 = type(
+            "Model5", (Mixin2, ConcreteModel2, Mixin, AbstractModel), model_dict.copy()
+        )
 
         self.assertEqual(
             fields(model1),
-            [('id', models.AutoField), ('name', models.CharField), ('age', models.IntegerField)]
+            [
+                ("id", models.AutoField),
+                ("name", models.CharField),
+                ("age", models.IntegerField),
+            ],
         )
 
-        self.assertEqual(fields(model2), [('id', models.AutoField), ('name', models.CharField)])
-        self.assertEqual(getattr(model2, 'age'), 2)
+        self.assertEqual(
+            fields(model2), [("id", models.AutoField), ("name", models.CharField)]
+        )
+        self.assertEqual(getattr(model2, "age"), 2)
 
-        self.assertEqual(fields(model3), [('id', models.AutoField), ('name', models.CharField)])
+        self.assertEqual(
+            fields(model3), [("id", models.AutoField), ("name", models.CharField)]
+        )
 
-        self.assertEqual(fields(model4), [('id', models.AutoField), ('name', models.CharField)])
-        self.assertEqual(getattr(model4, 'age'), 2)
+        self.assertEqual(
+            fields(model4), [("id", models.AutoField), ("name", models.CharField)]
+        )
+        self.assertEqual(getattr(model4, "age"), 2)
 
         self.assertEqual(
             fields(model5),
             [
-                ('id', models.AutoField), ('foo', models.IntegerField),
-                ('concretemodel_ptr', models.OneToOneField),
-                ('age', models.SmallIntegerField), ('concretemodel2_ptr', models.OneToOneField),
-                ('name', models.CharField),
-            ]
+                ("id", models.AutoField),
+                ("foo", models.IntegerField),
+                ("concretemodel_ptr", models.OneToOneField),
+                ("age", models.SmallIntegerField),
+                ("concretemodel2_ptr", models.OneToOneField),
+                ("name", models.CharField),
+            ],
         )

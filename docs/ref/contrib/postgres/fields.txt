@@ -47,7 +47,9 @@ may be a good choice for the :ref:`range fields <range-fields>` and
         with the exception of those handling relational data
         (:class:`~django.db.models.ForeignKey`,
         :class:`~django.db.models.OneToOneField` and
-        :class:`~django.db.models.ManyToManyField`).
+        :class:`~django.db.models.ManyToManyField`) and file fields (
+        :class:`~django.db.models.FileField` and
+        :class:`~django.db.models.ImageField`).
 
         It is possible to nest array fields - you can specify an instance of
         ``ArrayField`` as the ``base_field``. For example::
@@ -257,6 +259,8 @@ transform do not change. For example::
 
 .. class:: CIText(**options)
 
+    .. deprecated:: 4.2
+
     A mixin to create case-insensitive text fields backed by the citext_ type.
     Read about `the performance considerations`_ prior to using it.
 
@@ -272,8 +276,28 @@ transform do not change. For example::
     Several fields that use the mixin are provided:
 
 .. class:: CICharField(**options)
+
+    .. deprecated:: 4.2
+
+        ``CICharField`` is deprecated in favor of
+        ``CharField(db_collation="…")`` with a case-insensitive
+        non-deterministic collation.
+
 .. class:: CIEmailField(**options)
+
+    .. deprecated:: 4.2
+
+        ``CIEmailField`` is deprecated in favor of
+        ``EmailField(db_collation="…")`` with a case-insensitive
+        non-deterministic collation.
+
 .. class:: CITextField(**options)
+
+    .. deprecated:: 4.2
+
+        ``CITextField`` is deprecated in favor of
+        ``TextField(db_collation="…")`` with a case-insensitive
+        non-deterministic collation.
 
     These fields subclass :class:`~django.db.models.CharField`,
     :class:`~django.db.models.EmailField`, and
@@ -287,8 +311,8 @@ transform do not change. For example::
 
 .. admonition:: Case-insensitive collations
 
-    On PostgreSQL 12+, it's preferable to use non-deterministic collations
-    instead of the ``citext`` extension. You can create them using the
+    It's preferable to use non-deterministic collations instead of the
+    ``citext`` extension. You can create them using the
     :class:`~django.contrib.postgres.operations.CreateCollation` migration
     operation. For more details, see :ref:`manage-postgresql-collations` and
     the PostgreSQL documentation about `non-deterministic collations`_.
@@ -355,8 +379,22 @@ You can chain other lookups after key lookups::
     >>> Dog.objects.filter(data__breed__contains='l')
     <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
 
+or use ``F()`` expressions to annotate a key value. For example::
+
+    >>> from django.db.models import F
+    >>> rufus = Dog.objects.annotate(breed=F("data__breed"))[0]
+    >>> rufus.breed
+    'labrador'
+
 If the key you wish to query by clashes with the name of another lookup, you
 need to use the :lookup:`hstorefield.contains` lookup instead.
+
+.. note::
+
+    Key transforms can also be chained with: :lookup:`contains`,
+    :lookup:`icontains`, :lookup:`endswith`, :lookup:`iendswith`,
+    :lookup:`iexact`, :lookup:`regex`, :lookup:`iregex`, :lookup:`startswith`,
+    and :lookup:`istartswith` lookups.
 
 .. warning::
 
@@ -496,9 +534,9 @@ All of the range fields translate to :ref:`psycopg2 Range objects
 <psycopg2:adapt-range>` in Python, but also accept tuples as input if no bounds
 information is necessary. The default is lower bound included, upper bound
 excluded, that is ``[)`` (see the PostgreSQL documentation for details about
-`different bounds`_).
-
-.. _different bounds: https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-IO
+`different bounds`_). The default bounds can be changed for non-discrete range
+fields (:class:`.DateTimeRangeField` and :class:`.DecimalRangeField`) by using
+the ``default_bounds`` argument.
 
 ``IntegerRangeField``
 ---------------------
@@ -531,22 +569,42 @@ excluded, that is ``[)`` (see the PostgreSQL documentation for details about
 ``DecimalRangeField``
 ---------------------
 
-.. class:: DecimalRangeField(**options)
+.. class:: DecimalRangeField(default_bounds='[)', **options)
 
     Stores a range of floating point values. Based on a
     :class:`~django.db.models.DecimalField`. Represented by a ``numrange`` in
     the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
     Python.
 
+    .. attribute:: DecimalRangeField.default_bounds
+
+        .. versionadded:: 4.1
+
+        Optional. The value of ``bounds`` for list and tuple inputs. The
+        default is lower bound included, upper bound excluded, that is ``[)``
+        (see the PostgreSQL documentation for details about
+        `different bounds`_). ``default_bounds`` is not used for
+        :class:`~psycopg2:psycopg2.extras.NumericRange` inputs.
+
 ``DateTimeRangeField``
 ----------------------
 
-.. class:: DateTimeRangeField(**options)
+.. class:: DateTimeRangeField(default_bounds='[)', **options)
 
     Stores a range of timestamps. Based on a
     :class:`~django.db.models.DateTimeField`. Represented by a ``tstzrange`` in
     the database and a :class:`~psycopg2:psycopg2.extras.DateTimeTZRange` in
     Python.
+
+    .. attribute:: DateTimeRangeField.default_bounds
+
+        .. versionadded:: 4.1
+
+        Optional. The value of ``bounds`` for list and tuple inputs. The
+        default is lower bound included, upper bound excluded, that is ``[)``
+        (see the PostgreSQL documentation for details about
+        `different bounds`_). ``default_bounds`` is not used for
+        :class:`~psycopg2:psycopg2.extras.DateTimeTZRange` inputs.
 
 ``DateRangeField``
 ------------------
@@ -877,3 +935,5 @@ used with a custom range functions that expected boundaries, for example to
 define :class:`~django.contrib.postgres.constraints.ExclusionConstraint`. See
 `the PostgreSQL documentation for the full details <https://www.postgresql.org/
 docs/current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_.
+
+.. _different bounds: https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-IO

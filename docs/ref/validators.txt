@@ -10,7 +10,7 @@ Writing validators
 
 A validator is a callable that takes a value and raises a
 :exc:`~django.core.exceptions.ValidationError` if it doesn't meet some
-criteria. Validators can be useful for re-using validation logic between
+criteria. Validators can be useful for reusing validation logic between
 different types of fields.
 
 For example, here's a validator that only allows even numbers::
@@ -333,3 +333,15 @@ to, or in lieu of custom ``field.clean()`` methods.
 
         The error code used by :exc:`~django.core.exceptions.ValidationError`
         if validation fails. Defaults to ``"null_characters_not_allowed"``.
+
+``StepValueValidator``
+----------------------
+
+.. versionadded:: 4.1
+
+.. class:: StepValueValidator(limit_value, message=None)
+
+    Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
+    ``'step_size'`` if ``value`` is not an integral multiple of
+    ``limit_value``, which can be a float, integer or decimal value or a
+    callable.

@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Igor Jerosimić, 2021
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-09-24 14:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-09-22 09:22+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
-"language/sr%40latin/)\n"
+"language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -49,13 +50,13 @@ msgid "last login"
 msgstr "poslednja prijava"
 
 msgid "No password set."
-msgstr ""
+msgstr "Lozinka nije uneta."
 
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr ""
 
-msgid "The two password fields didn't match."
-msgstr "Dva polja za lozinke se nisu poklopila."
+msgid "The two password fields didn’t match."
+msgstr ""
 
 msgid "Password"
 msgstr "Lozinka"
@@ -67,7 +68,7 @@ msgid "Enter the same password as before, for verification."
 msgstr ""
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 
@@ -130,6 +131,9 @@ msgstr "faktor rada"
 
 msgid "checksum"
 msgstr "suma za proveru"
+
+msgid "block size"
+msgstr ""
 
 msgid "name"
 msgstr "ime"
@@ -239,19 +243,19 @@ msgstr[2] ""
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr ""
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
 
 msgid "This password is too common."
 msgstr ""
 
-msgid "Your password can't be a commonly used password."
+msgid "Your password can’t be a commonly used password."
 msgstr ""
 
 msgid "This password is entirely numeric."
 msgstr ""
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr ""
 
 #, python-format

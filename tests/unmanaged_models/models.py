@@ -13,7 +13,7 @@ class A01(models.Model):
     f_b = models.IntegerField()
 
     class Meta:
-        db_table = 'a01'
+        db_table = "a01"
 
 
 class B01(models.Model):
@@ -22,18 +22,18 @@ class B01(models.Model):
     f_b = models.IntegerField()
 
     class Meta:
-        db_table = 'b01'
+        db_table = "b01"
         # 'managed' is True by default. This tests we can set it explicitly.
         managed = True
 
 
 class C01(models.Model):
-    mm_a = models.ManyToManyField(A01, db_table='d01')
+    mm_a = models.ManyToManyField(A01, db_table="d01")
     f_a = models.CharField(max_length=10, db_index=True)
     f_b = models.IntegerField()
 
     class Meta:
-        db_table = 'c01'
+        db_table = "c01"
 
 
 # All of these models use the same tables as the previous set (they are shadows
@@ -45,13 +45,13 @@ class A02(models.Model):
     f_a = models.CharField(max_length=10, db_index=True)
 
     class Meta:
-        db_table = 'a01'
+        db_table = "a01"
         managed = False
 
 
 class B02(models.Model):
     class Meta:
-        db_table = 'b01'
+        db_table = "b01"
         managed = False
 
     fk_a = models.ForeignKey(A02, models.CASCADE)
@@ -67,7 +67,7 @@ class C02(models.Model):
     f_b = models.IntegerField()
 
     class Meta:
-        db_table = 'c01'
+        db_table = "c01"
         managed = False
 
 
@@ -76,7 +76,7 @@ class Intermediate(models.Model):
     c02 = models.ForeignKey(C02, models.CASCADE, db_column="c01_id")
 
     class Meta:
-        db_table = 'd01'
+        db_table = "d01"
         managed = False
 
 

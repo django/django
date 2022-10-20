@@ -234,8 +234,8 @@ them. Note that if you *do* use them, the ORM will have to go and get them in
 a separate query, making this a pessimization if you use it inappropriately.
 
 Don't be too aggressive in deferring fields without profiling as the database
-has to read most of the non-text, non-VARCHAR data from the disk for a single
-row in the results, even if it ends up only using a few columns. The
+has to read most of the non-text, non-``VARCHAR`` data from the disk for a
+single row in the results, even if it ends up only using a few columns. The
 ``defer()`` and ``only()`` methods are most useful when you can avoid loading a
 lot of text data or for fields that might take a lot of processing to convert
 back to Python. As always, profile first, then optimize.
@@ -261,44 +261,52 @@ But:
 
 .. _overuse_of_count_and_exists:
 
-Don't overuse ``count()`` and ``exists()``
-------------------------------------------
+Don't overuse ``contains()``, ``count()``, and ``exists()``
+-----------------------------------------------------------
 
 If you are going to need other data from the QuerySet, evaluate it immediately.
 
-For example, assuming an Email model that has a ``subject`` attribute and a
-many-to-many relation to User, the following code is optimal::
+For example, assuming a ``Group`` model that has a many-to-many relation to
+``User``, the following code is optimal::
 
-    if display_emails:
-        emails = user.emails.all()
-        if emails:
-            print('You have', len(emails), 'emails:')
-            for email in emails:
-                print(email.subject)
+    members = group.members.all()
+
+    if display_group_members:
+        if members:
+            if current_user in members:
+                print("You and", len(members) - 1, "other users are members of this group.")
+            else:
+                print("There are", len(members), "members in this group.")
+
+            for member in members:
+                print(member.username)
         else:
-            print('You do not have any emails.')
+            print("There are no members in this group.")
 
 It is optimal because:
 
 #. Since QuerySets are lazy, this does no database queries if
-   ``display_emails`` is ``False``.
+   ``display_group_members`` is ``False``.
 
-#. Storing ``user.emails.all()`` in the ``emails`` variable allows its result
-   cache to be re-used.
+#. Storing ``group.members.all()`` in the ``members`` variable allows its
+   result cache to be reused.
 
-#. The line ``if emails`` causes ``QuerySet.__bool__()`` to be called, which
-   causes the ``user.emails.all()`` query to be run on the database. If there
+#. The line ``if members:`` causes ``QuerySet.__bool__()`` to be called, which
+   causes the ``group.members.all()`` query to be run on the database. If there
    aren't any results, it will return ``False``, otherwise ``True``.
 
-#. The use of ``len(emails)`` calls ``QuerySet.__len__()``, reusing the result
-   cache.
+#. The line ``if current_user in members:`` checks if the user is in the result
+   cache, so no additional database queries are issued.
 
-#. The ``for`` loop iterates over the already filled cache.
+#. The use of ``len(members)`` calls ``QuerySet.__len__()``, reusing the result
+   cache, so again, no database queries are issued.
+
+#. The ``for member`` loop iterates over the result cache.
 
 In total, this code does either one or zero database queries. The only
-deliberate optimization performed is using the ``emails`` variable. Using
-``QuerySet.exists()`` for the ``if`` or ``QuerySet.count()`` for the count
-would each cause additional queries.
+deliberate optimization performed is using the ``members`` variable. Using
+``QuerySet.exists()`` for the ``if``, ``QuerySet.contains()`` for the ``in``,
+or ``QuerySet.count()`` for the count would each cause additional queries.
 
 Use ``QuerySet.update()`` and ``delete()``
 ------------------------------------------

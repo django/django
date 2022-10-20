@@ -14,7 +14,7 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if kwargs.get('alias', '') != NO_DB_ALIAS:
+        if kwargs.get("alias", "") != NO_DB_ALIAS:
             self.features = DatabaseFeatures(self)
             self.ops = PostGISOperations(self)
             self.introspection = PostGISIntrospection(self)
@@ -23,4 +23,7 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
         super().prepare_database()
         # Check that postgis extension is installed.
         with self.cursor() as cursor:
+            cursor.execute("SELECT 1 FROM pg_extension WHERE extname = %s", ["postgis"])
+            if bool(cursor.fetchone()):
+                return
             cursor.execute("CREATE EXTENSION IF NOT EXISTS postgis")

@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Dimce Grozdanoski <dimce.grozdanoski@gmail.com>, 2021
 # dekomote <dr.mote@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2016-2017,2019,2021
@@ -10,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-06-11 17:28+0000\n"
-"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-09-22 07:21+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
 "mk/)\n"
 "MIME-Version: 1.0\n"
@@ -73,7 +74,7 @@ msgid "Has date"
 msgstr "Има датум"
 
 msgid "Empty"
-msgstr ""
+msgstr "Празно"
 
 msgid "Not empty"
 msgstr ""
@@ -136,7 +137,7 @@ msgstr "ставки во записникот"
 
 #, python-format
 msgid "Added “%(object)s”."
-msgstr ""
+msgstr "Додадено “%(object)s”."
 
 #, python-format
 msgid "Changed “%(object)s” — %(changes)s"
@@ -144,7 +145,7 @@ msgstr ""
 
 #, python-format
 msgid "Deleted “%(object)s.”"
-msgstr ""
+msgstr "Избришано “%(object)s.”"
 
 msgid "LogEntry Object"
 msgstr "Запис во дневник"
@@ -513,6 +514,12 @@ msgstr "Ја заборавивте вашата лозинка или кори�
 msgid "Toggle navigation"
 msgstr ""
 
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
+
 msgid "Date/time"
 msgstr "Датум/час"
 
@@ -576,9 +583,8 @@ msgstr "Додади уште %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Избриши ги избраните %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
+msgid "Thanks for spending some quality time with the web site today."
 msgstr ""
-"Ви благодариме што денеска поминавте квалитетно време со интернет страницава."
 
 msgid "Log in again"
 msgstr "Најавете се повторно"

@@ -2,19 +2,19 @@
 #
 # Translators:
 # edgars <edgars.jekabsons@gmail.com>, 2011
-# NullIsNot0 <nullisnot0@inbox.lv>, 2017
-# NullIsNot0 <nullisnot0@inbox.lv>, 2018
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Māris Nartišs <maris.gis@gmail.com>, 2016
-# NullIsNot0 <nullisnot0@inbox.lv>, 2019-2020
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2019-2021
 # peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-22 17:27+0000\n"
-"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2022-07-25 07:05+0000\n"
+"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -23,6 +23,10 @@ msgstr ""
 "Language: lv\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
 "2);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Izdzēst izvēlēto %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -34,10 +38,6 @@ msgstr "Nevar izdzēst %(name)s"
 
 msgid "Are you sure?"
 msgstr "Vai esat pārliecināts?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Izdzēst izvēlēto %(verbose_name_plural)s"
 
 msgid "Administration"
 msgstr "Administrācija"
@@ -269,8 +269,9 @@ msgstr "0 no %(cnt)s izvēlēti"
 msgid "Change history: %s"
 msgstr "Izmaiņu vēsture: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -523,6 +524,12 @@ msgstr "Aizmirsi paroli vai lietotājvārdu?"
 msgid "Toggle navigation"
 msgstr "Pārslēgt navigāciju"
 
+msgid "Start typing to filter…"
+msgstr "Sāciet rakstīt, lai atlasītu…"
+
+msgid "Filter navigation items"
+msgstr "Atlasīt navigācijas vienības"
+
 msgid "Date/time"
 msgstr "Datums/laiks"
 
@@ -531,6 +538,12 @@ msgstr "Lietotājs"
 
 msgid "Action"
 msgstr "Darbība"
+
+msgid "entry"
+msgstr "ieraksts"
+
+msgid "entries"
+msgstr "ieraksti"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -589,8 +602,12 @@ msgstr "Pievienot citu %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Dzēst izvēlēto %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Paldies par pavadīto laiku mājas lapā."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Apskatīt atzīmētos %(model)s"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Paldies, ka šodien vietnei veltījāt kvalitatīvu laiku."
 
 msgid "Log in again"
 msgstr "Pieslēgties vēlreiz"

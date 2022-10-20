@@ -17,16 +17,16 @@ class DeprecationTests(TestCase):
                 pass
 
     def test_settings_init_warning(self):
-        settings_module = ModuleType('fake_settings_module')
-        settings_module.SECRET_KEY = 'foo'
+        settings_module = ModuleType("fake_settings_module")
+        settings_module.SECRET_KEY = "foo"
         settings_module.USE_TZ = True
         settings_module.USE_L10N = False
-        sys.modules['fake_settings_module'] = settings_module
+        sys.modules["fake_settings_module"] = settings_module
         try:
             with self.assertRaisesMessage(RemovedInDjango50Warning, self.msg):
-                Settings('fake_settings_module')
+                Settings("fake_settings_module")
         finally:
-            del sys.modules['fake_settings_module']
+            del sys.modules["fake_settings_module"]
 
     def test_access_warning(self):
         with self.assertRaisesMessage(RemovedInDjango50Warning, self.msg):

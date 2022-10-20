@@ -2,13 +2,13 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2020
+# znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-15 01:22+0000\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-09-22 16:42+0000\n"
 "Last-Translator: znotdead <zhirafchik@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
@@ -21,6 +21,10 @@ msgstr ""
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Выдаліць абраныя %(verbose_name_plural)s"
+
+#, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Выдалілі %(count)d %(items)s."
 
@@ -30,10 +34,6 @@ msgstr "Не ўдаецца выдаліць %(name)s"
 
 msgid "Are you sure?"
 msgstr "Ці ўпэўненыя вы?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Выдаліць абраныя %(verbose_name_plural)s"
 
 msgid "Administration"
 msgstr "Адміністрацыя"
@@ -524,6 +524,12 @@ msgstr "Забыліся на імя ці пароль?"
 msgid "Toggle navigation"
 msgstr "Пераключыць навігацыю"
 
+msgid "Start typing to filter…"
+msgstr "Пачніце ўводзіць, каб адфільтраваць..."
+
+msgid "Filter navigation items"
+msgstr "Фільтраваць элементы навігацыі"
+
 msgid "Date/time"
 msgstr "Час, дата"
 
@@ -591,7 +597,7 @@ msgstr "Дадаць яшчэ %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Выдаліць абраныя %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
+msgid "Thanks for spending some quality time with the web site today."
 msgstr "Дзякуем за час, які вы сёньня правялі на гэтай пляцоўцы."
 
 msgid "Log in again"

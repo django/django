@@ -102,9 +102,17 @@ subclass).
 
 .. class:: AlterIndexTogether(name, index_together)
 
-Changes the model's set of custom indexes (the
-:attr:`~django.db.models.Options.index_together` option on the ``Meta``
-subclass).
+Changes the model's set of custom indexes (the ``index_together`` option on the
+``Meta`` subclass).
+
+.. warning::
+
+    ``AlterIndexTogether`` is officially supported only for pre-Django 4.2
+    migration files. For backward compatibility reasons, it's still part of the
+    public API, and there's no plan to deprecate or remove it, but it should
+    not be used for new migrations. Use
+    :class:`~django.db.migrations.operations.AddIndex` and
+    :class:`~django.db.migrations.operations.RemoveIndex` operations instead.
 
 ``AlterOrderWithRespectTo``
 ---------------------------
@@ -221,6 +229,22 @@ Creates an index in the database table for the model with ``model_name``.
 .. class:: RemoveIndex(model_name, name)
 
 Removes the index named ``name`` from the model with ``model_name``.
+
+``RenameIndex``
+---------------
+
+.. versionadded:: 4.1
+
+.. class:: RenameIndex(model_name, new_name, old_name=None, old_fields=None)
+
+Renames an index in the database table for the model with ``model_name``.
+Exactly one of ``old_name`` and ``old_fields`` can be provided. ``old_fields``
+is an iterable of the strings, often corresponding to fields of
+:attr:`~django.db.models.Options.index_together`.
+
+On databases that don't support an index renaming statement (SQLite and MariaDB
+< 10.5.2), the operation will drop and recreate the index, which can be
+expensive.
 
 ``AddConstraint``
 -----------------

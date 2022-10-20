@@ -99,8 +99,13 @@ overridden by what's passed by
       * ``'django.template.loaders.app_directories.Loader'`` if and only if
         ``app_dirs`` is ``True``.
 
-      If ``debug`` is ``False``, these loaders are wrapped in
+      These loaders are then wrapped in
       :class:`django.template.loaders.cached.Loader`.
+
+      .. versionchanged:: 4.1
+
+        In older versions, the cached template loader was only enabled by
+        default when ``DEBUG`` was ``False``.
 
       See :ref:`template-loaders` for details.
 
@@ -654,7 +659,7 @@ Here's what each of the built-in processors does:
 ``django.contrib.auth.context_processors.auth``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: auth
+.. function:: auth(request)
 
 If this processor is enabled, every ``RequestContext`` will contain these
 variables:
@@ -672,7 +677,7 @@ variables:
 ``django.template.context_processors.debug``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: debug
+.. function:: debug(request)
 
 If this processor is enabled, every ``RequestContext`` will contain these two
 variables -- but only if your :setting:`DEBUG` setting is set to ``True`` and
@@ -689,7 +694,7 @@ the request's IP address (``request.META['REMOTE_ADDR']``) is in the
 ``django.template.context_processors.i18n``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: i18n
+.. function:: i18n(request)
 
 If this processor is enabled, every ``RequestContext`` will contain these
 variables:
@@ -713,7 +718,7 @@ If this processor is enabled, every ``RequestContext`` will contain a variable
 ``django.template.context_processors.static``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: static
+.. function:: static(request)
 
 If this processor is enabled, every ``RequestContext`` will contain a variable
 ``STATIC_URL``, providing the value of the :setting:`STATIC_URL` setting.
@@ -734,7 +739,7 @@ If this processor is enabled, every ``RequestContext`` will contain a variable
 ``django.template.context_processors.tz``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: tz
+.. function:: tz(request)
 
 If this processor is enabled, every ``RequestContext`` will contain a variable
 ``TIME_ZONE``, providing the name of the currently active time zone.
@@ -905,10 +910,9 @@ loaders that come with Django:
 
 .. class:: cached.Loader
 
-    By default (when :setting:`DEBUG` is ``True``), the template system reads
-    and compiles your templates every time they're rendered. While the Django
-    template system is quite fast, the overhead from reading and compiling
-    templates can add up.
+    While the Django template system is quite fast, if it needs to read and
+    compile your templates every time they're rendered, the overhead from that
+    can add up.
 
     You configure the cached template loader with a list of other loaders that
     it should wrap. The wrapped loaders are used to locate unknown templates
@@ -917,11 +921,9 @@ loaders that come with Django:
     subsequent requests to load the same template.
 
     This loader is automatically enabled if :setting:`OPTIONS['loaders']
-    <TEMPLATES-OPTIONS>` isn't specified and :setting:`OPTIONS['debug']
-    <TEMPLATES-OPTIONS>` is ``False`` (the latter option defaults to the value
-    of :setting:`DEBUG`).
+    <TEMPLATES-OPTIONS>` isn't specified.
 
-    You can also enable template caching with some custom template loaders
+    You can manually specify template caching with some custom template loaders
     using settings like this::
 
         TEMPLATES = [{
@@ -946,6 +948,12 @@ loaders that come with Django:
         that the ``Node`` implementation for each tag is thread-safe. For more
         information, see :ref:`template tag thread safety considerations
         <template_tag_thread_safety>`.
+
+    .. versionchanged:: 4.1
+
+        The cached template loader was enabled whenever ``OPTIONS['loaders']``
+        is not specified. Previously it was only enabled when ``DEBUG`` was
+        ``False``.
 
 ``django.template.loaders.locmem.Loader``
 

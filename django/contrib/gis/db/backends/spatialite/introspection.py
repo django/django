@@ -1,6 +1,7 @@
 from django.contrib.gis.gdal import OGRGeomType
 from django.db.backends.sqlite3.introspection import (
-    DatabaseIntrospection, FlexibleFieldLookupDict,
+    DatabaseIntrospection,
+    FlexibleFieldLookupDict,
 )
 
 
@@ -9,15 +10,16 @@ class GeoFlexibleFieldLookupDict(FlexibleFieldLookupDict):
     Subclass that includes updates the `base_data_types_reverse` dict
     for geometry field types.
     """
+
     base_data_types_reverse = {
         **FlexibleFieldLookupDict.base_data_types_reverse,
-        'point': 'GeometryField',
-        'linestring': 'GeometryField',
-        'polygon': 'GeometryField',
-        'multipoint': 'GeometryField',
-        'multilinestring': 'GeometryField',
-        'multipolygon': 'GeometryField',
-        'geometrycollection': 'GeometryField',
+        "point": "GeometryField",
+        "linestring": "GeometryField",
+        "polygon": "GeometryField",
+        "multipoint": "GeometryField",
+        "multilinestring": "GeometryField",
+        "multipolygon": "GeometryField",
+        "geometrycollection": "GeometryField",
     }
 
 
@@ -27,14 +29,18 @@ class SpatiaLiteIntrospection(DatabaseIntrospection):
     def get_geometry_type(self, table_name, description):
         with self.connection.cursor() as cursor:
             # Querying the `geometry_columns` table to get additional metadata.
-            cursor.execute('SELECT coord_dimension, srid, geometry_type '
-                           'FROM geometry_columns '
-                           'WHERE f_table_name=%s AND f_geometry_column=%s',
-                           (table_name, description.name))
+            cursor.execute(
+                "SELECT coord_dimension, srid, geometry_type "
+                "FROM geometry_columns "
+                "WHERE f_table_name=%s AND f_geometry_column=%s",
+                (table_name, description.name),
+            )
             row = cursor.fetchone()
             if not row:
-                raise Exception('Could not find a geometry column for "%s"."%s"' %
-                                (table_name, description.name))
+                raise Exception(
+                    'Could not find a geometry column for "%s"."%s"'
+                    % (table_name, description.name)
+                )
 
             # OGRGeomType does not require GDAL and makes it easy to convert
             # from OGC geom type name to Django field.
@@ -51,18 +57,21 @@ class SpatiaLiteIntrospection(DatabaseIntrospection):
             srid = row[1]
             field_params = {}
             if srid != 4326:
-                field_params['srid'] = srid
-            if (isinstance(dim, str) and 'Z' in dim) or dim == 3:
-                field_params['dim'] = 3
+                field_params["srid"] = srid
+            if (isinstance(dim, str) and "Z" in dim) or dim == 3:
+                field_params["dim"] = 3
         return field_type, field_params
 
     def get_constraints(self, cursor, table_name):
         constraints = super().get_constraints(cursor, table_name)
-        cursor.execute('SELECT f_geometry_column '
-                       'FROM geometry_columns '
-                       'WHERE f_table_name=%s AND spatial_index_enabled=1', (table_name,))
+        cursor.execute(
+            "SELECT f_geometry_column "
+            "FROM geometry_columns "
+            "WHERE f_table_name=%s AND spatial_index_enabled=1",
+            (table_name,),
+        )
         for row in cursor.fetchall():
-            constraints['%s__spatial__index' % row[0]] = {
+            constraints["%s__spatial__index" % row[0]] = {
                 "columns": [row[0]],
                 "primary_key": False,
                 "unique": False,

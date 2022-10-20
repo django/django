@@ -4,7 +4,7 @@ from django.utils.functional import cached_property
 
 
 class ArraySubquery(Subquery):
-    template = 'ARRAY(%(subquery)s)'
+    template = "ARRAY(%(subquery)s)"
 
     def __init__(self, queryset, **kwargs):
         super().__init__(queryset, **kwargs)

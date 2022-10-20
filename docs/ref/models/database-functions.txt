@@ -358,8 +358,7 @@ as ``__(lookup_name)``, e.g. ``__year``.
 Since ``DateField``\s don't have a time component, only ``Extract`` subclasses
 that deal with date-parts can be used with ``DateField``::
 
-    >>> from datetime import datetime
-    >>> from django.utils import timezone
+    >>> from datetime import datetime, timezone
     >>> from django.db.models.functions import (
     ...     ExtractDay, ExtractMonth, ExtractQuarter, ExtractWeek,
     ...     ExtractIsoWeekDay, ExtractWeekDay, ExtractIsoYear, ExtractYear,
@@ -409,8 +408,7 @@ Each class is also a ``Transform`` registered on ``DateTimeField`` as
 
 ``DateTimeField`` examples::
 
-    >>> from datetime import datetime
-    >>> from django.utils import timezone
+    >>> from datetime import datetime, timezone
     >>> from django.db.models.functions import (
     ...     ExtractDay, ExtractHour, ExtractMinute, ExtractMonth,
     ...     ExtractQuarter, ExtractSecond, ExtractWeek, ExtractIsoWeekDay,
@@ -447,6 +445,7 @@ to that timezone before the value is extracted. The example below converts to
 the Melbourne timezone (UTC +10:00), which changes the day, weekday, and hour
 values that are returned::
 
+    >>> from django.utils import timezone
     >>> import zoneinfo
     >>> melb = zoneinfo.ZoneInfo('Australia/Melbourne')  # UTC+10:00
     >>> with timezone.override(melb):
@@ -495,6 +494,11 @@ Usage example::
     current transaction started. Therefore for cross-database compatibility,
     ``Now()`` uses ``STATEMENT_TIMESTAMP`` instead. If you need the transaction
     timestamp, use :class:`django.contrib.postgres.functions.TransactionNow`.
+
+.. versionchanged:: 4.2
+
+    Support for microsecond precision on MySQL and millisecond precision on
+    SQLite were added.
 
 ``Trunc``
 ---------
@@ -620,10 +624,9 @@ with less precision. ``expression`` can have an ``output_field`` of either
 Since ``DateField``\s don't have a time component, only ``Trunc`` subclasses
 that deal with date-parts can be used with ``DateField``::
 
-    >>> from datetime import datetime
+    >>> from datetime import datetime, timezone
     >>> from django.db.models import Count
     >>> from django.db.models.functions import TruncMonth, TruncYear
-    >>> from django.utils import timezone
     >>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=timezone.utc)
     >>> start2 = datetime(2015, 6, 15, 14, 40, 2, 123, tzinfo=timezone.utc)
     >>> start3 = datetime(2015, 12, 31, 17, 5, 27, 999, tzinfo=timezone.utc)
@@ -699,12 +702,11 @@ datetimes with less precision. ``expression`` must have an ``output_field`` of
 
 Usage example::
 
-    >>> from datetime import date, datetime
+    >>> from datetime import date, datetime, timezone
     >>> from django.db.models import Count
     >>> from django.db.models.functions import (
     ...     TruncDate, TruncDay, TruncHour, TruncMinute, TruncSecond,
     ... )
-    >>> from django.utils import timezone
     >>> import zoneinfo
     >>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=timezone.utc)
     >>> Experiment.objects.create(start_datetime=start1, start_date=start1.date())
@@ -753,10 +755,9 @@ with less precision. ``expression`` can have an ``output_field`` of either
 Since ``TimeField``\s don't have a date component, only ``Trunc`` subclasses
 that deal with time-parts can be used with ``TimeField``::
 
-    >>> from datetime import datetime
+    >>> from datetime import datetime, timezone
     >>> from django.db.models import Count, TimeField
     >>> from django.db.models.functions import TruncHour
-    >>> from django.utils import timezone
     >>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=timezone.utc)
     >>> start2 = datetime(2014, 6, 15, 14, 40, 2, 123, tzinfo=timezone.utc)
     >>> start3 = datetime(2015, 12, 31, 17, 5, 27, 999, tzinfo=timezone.utc)
@@ -1176,10 +1177,6 @@ It can also be registered as a transform. For example::
     >>> FloatField.register_lookup(Round)
     >>> # Get vectors whose round() is less than 20
     >>> vectors = Vector.objects.filter(x__round__lt=20, y__round__lt=20)
-
-.. versionchanged:: 4.0
-
-    The ``precision`` argument was added.
 
 ``Sign``
 --------

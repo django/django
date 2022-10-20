@@ -675,7 +675,7 @@ Internationalization
   beginning and end of a line and merge all lines into one using a space
   character to separate them. This is quite useful for indenting the content of
   a ``{% blocktrans %}`` tag without having the indentation characters end up
-  in the corresponding entry in the PO file, which makes the translation
+  in the corresponding entry in the ``.po`` file, which makes the translation
   process easier.
 
 * When you run :djadmin:`makemessages` from the root directory of your project,
@@ -685,7 +685,7 @@ Internationalization
 
 * The :djadmin:`makemessages` command now always adds the ``--previous``
   command line flag to the ``msgmerge`` command, keeping previously translated
-  strings in po files for fuzzy strings.
+  strings in ``.po`` files for fuzzy strings.
 
 * The following settings to adjust the language cookie options were introduced:
   :setting:`LANGUAGE_COOKIE_AGE`, :setting:`LANGUAGE_COOKIE_DOMAIN`
@@ -976,12 +976,12 @@ every time you change the schema.
 Additionally, like the rest of Django's old ``syncdb`` code, ``initial_data``
 has been started down the deprecation path and will be removed in Django 1.9.
 
-deconstruct() and serializability
----------------------------------
+``deconstruct()`` and serializability
+-------------------------------------
 
 Django now requires all Field classes and all of their constructor arguments
 to be serializable. If you modify the constructor signature in your custom
-Field in any way, you'll need to implement a deconstruct() method;
+Field in any way, you'll need to implement a ``deconstruct()`` method;
 we've expanded the custom field documentation with :ref:`instructions
 on implementing this method <custom-field-deconstruct-method>`.
 

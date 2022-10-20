@@ -7,8 +7,9 @@ from . import Error, Tags, Warning, register
 
 @register(Tags.urls)
 def check_url_config(app_configs, **kwargs):
-    if getattr(settings, 'ROOT_URLCONF', None):
+    if getattr(settings, "ROOT_URLCONF", None):
         from django.urls import get_resolver
+
         resolver = get_resolver()
         return check_resolver(resolver)
     return []
@@ -18,10 +19,10 @@ def check_resolver(resolver):
     """
     Recursively check the resolver.
     """
-    check_method = getattr(resolver, 'check', None)
+    check_method = getattr(resolver, "check", None)
     if check_method is not None:
         return check_method()
-    elif not hasattr(resolver, 'resolve'):
+    elif not hasattr(resolver, "resolve"):
         return get_warning_for_invalid_pattern(resolver)
     else:
         return []
@@ -32,21 +33,24 @@ def check_url_namespaces_unique(app_configs, **kwargs):
     """
     Warn if URL namespaces used in applications aren't unique.
     """
-    if not getattr(settings, 'ROOT_URLCONF', None):
+    if not getattr(settings, "ROOT_URLCONF", None):
         return []
 
     from django.urls import get_resolver
+
     resolver = get_resolver()
     all_namespaces = _load_all_namespaces(resolver)
     counter = Counter(all_namespaces)
     non_unique_namespaces = [n for n, count in counter.items() if count > 1]
     errors = []
     for namespace in non_unique_namespaces:
-        errors.append(Warning(
-            "URL namespace '{}' isn't unique. You may not be able to reverse "
-            "all URLs in this namespace".format(namespace),
-            id="urls.W005",
-        ))
+        errors.append(
+            Warning(
+                "URL namespace '{}' isn't unique. You may not be able to reverse "
+                "all URLs in this namespace".format(namespace),
+                id="urls.W005",
+            )
+        )
     return errors
 
 
@@ -54,13 +58,14 @@ def _load_all_namespaces(resolver, parents=()):
     """
     Recursively load all namespaces from URL patterns.
     """
-    url_patterns = getattr(resolver, 'url_patterns', [])
+    url_patterns = getattr(resolver, "url_patterns", [])
     namespaces = [
-        ':'.join(parents + (url.namespace,)) for url in url_patterns
-        if getattr(url, 'namespace', None) is not None
+        ":".join(parents + (url.namespace,))
+        for url in url_patterns
+        if getattr(url, "namespace", None) is not None
     ]
     for pattern in url_patterns:
-        namespace = getattr(pattern, 'namespace', None)
+        namespace = getattr(pattern, "namespace", None)
         current = parents
         if namespace is not None:
             current += (namespace,)
@@ -85,26 +90,28 @@ def get_warning_for_invalid_pattern(pattern):
     else:
         hint = None
 
-    return [Error(
-        "Your URL pattern {!r} is invalid. Ensure that urlpatterns is a list "
-        "of path() and/or re_path() instances.".format(pattern),
-        hint=hint,
-        id="urls.E004",
-    )]
+    return [
+        Error(
+            "Your URL pattern {!r} is invalid. Ensure that urlpatterns is a list "
+            "of path() and/or re_path() instances.".format(pattern),
+            hint=hint,
+            id="urls.E004",
+        )
+    ]
 
 
 @register(Tags.urls)
 def check_url_settings(app_configs, **kwargs):
     errors = []
-    for name in ('STATIC_URL', 'MEDIA_URL'):
+    for name in ("STATIC_URL", "MEDIA_URL"):
         value = getattr(settings, name)
-        if value and not value.endswith('/'):
+        if value and not value.endswith("/"):
             errors.append(E006(name))
     return errors
 
 
 def E006(name):
     return Error(
-        'The {} setting must end with a slash.'.format(name),
-        id='urls.E006',
+        "The {} setting must end with a slash.".format(name),
+        id="urls.E006",
     )

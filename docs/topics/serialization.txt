@@ -56,7 +56,7 @@ If you only want a subset of fields to be serialized, you can
 specify a ``fields`` argument to the serializer::
 
     from django.core import serializers
-    data = serializers.serialize('xml', SomeModel.objects.all(), fields=('name','size'))
+    data = serializers.serialize('xml', SomeModel.objects.all(), fields=['name','size'])
 
 In this example, only the ``name`` and ``size`` attributes of each model will
 be serialized. The primary key is always serialized as the ``pk`` element in the
@@ -328,9 +328,10 @@ YAML serialization looks quite similar to JSON. The object list is serialized
 as a sequence mappings with the keys "pk", "model" and "fields". Each field is
 again a mapping with the key being name of the field and the value the value::
 
-    -   fields: {expire_date: !!timestamp '2013-01-16 08:16:59.844560+00:00'}
-        model: sessions.session
-        pk: 4b678b301dfd8a4e0dad910de3ae245b
+    - model: sessions.session
+      pk: 4b678b301dfd8a4e0dad910de3ae245b
+      fields:
+        expire_date: 2013-01-16 08:16:59.844560+00:00
 
 Referential fields are again represented by the PK or sequence of PKs.
 

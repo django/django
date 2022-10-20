@@ -1,25 +1,30 @@
 """Redis cache backend."""
 
+import pickle
 import random
 import re
 
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
-from django.core.serializers.base import PickleSerializer
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
 
-class RedisSerializer(PickleSerializer):
+class RedisSerializer:
+    def __init__(self, protocol=None):
+        self.protocol = pickle.HIGHEST_PROTOCOL if protocol is None else protocol
+
     def dumps(self, obj):
-        if isinstance(obj, int):
+        # Only skip pickling for integers, a int subclasses as bool should be
+        # pickled.
+        if type(obj) is int:
             return obj
-        return super().dumps(obj)
+        return pickle.dumps(obj, self.protocol)
 
     def loads(self, data):
         try:
             return int(data)
         except ValueError:
-            return super().loads(data)
+            return pickle.loads(data)
 
 
 class RedisCacheClient:
@@ -27,9 +32,9 @@ class RedisCacheClient:
         self,
         servers,
         serializer=None,
-        db=None,
         pool_class=None,
         parser_class=None,
+        **options,
     ):
         import redis
 
@@ -53,7 +58,7 @@ class RedisCacheClient:
             parser_class = import_string(parser_class)
         parser_class = parser_class or self._lib.connection.DefaultParser
 
-        self._pool_options = {'parser_class': parser_class, 'db': db}
+        self._pool_options = {"parser_class": parser_class, **options}
 
     def _get_connection_pool_index(self, write):
         # Write to the first server. Read from other servers if there are more,
@@ -66,7 +71,8 @@ class RedisCacheClient:
         index = self._get_connection_pool_index(write)
         if index not in self._pools:
             self._pools[index] = self._pool_class.from_url(
-                self._servers[index], **self._pool_options,
+                self._servers[index],
+                **self._pool_options,
             )
         return self._pools[index]
 
@@ -154,12 +160,12 @@ class RedisCache(BaseCache):
     def __init__(self, server, params):
         super().__init__(params)
         if isinstance(server, str):
-            self._servers = re.split('[;,]', server)
+            self._servers = re.split("[;,]", server)
         else:
             self._servers = server
 
         self._class = RedisCacheClient
-        self._options = params.get('OPTIONS', {})
+        self._options = params.get("OPTIONS", {})
 
     @cached_property
     def _cache(self):
@@ -193,7 +199,9 @@ class RedisCache(BaseCache):
         return self._cache.delete(key)
 
     def get_many(self, keys, version=None):
-        key_map = {self.make_and_validate_key(key, version=version): key for key in keys}
+        key_map = {
+            self.make_and_validate_key(key, version=version): key for key in keys
+        }
         ret = self._cache.get_many(key_map.keys())
         return {key_map[k]: v for k, v in ret.items()}
 
@@ -206,6 +214,8 @@ class RedisCache(BaseCache):
         return self._cache.incr(key, delta)
 
     def set_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
+        if not data:
+            return []
         safe_data = {}
         for key, value in data.items():
             key = self.make_and_validate_key(key, version=version)
@@ -214,10 +224,9 @@ class RedisCache(BaseCache):
         return []
 
     def delete_many(self, keys, version=None):
-        safe_keys = []
-        for key in keys:
-            key = self.make_and_validate_key(key, version=version)
-            safe_keys.append(key)
+        if not keys:
+            return
+        safe_keys = [self.make_and_validate_key(key, version=version) for key in keys]
         self._cache.delete_many(safe_keys)
 
     def clear(self):

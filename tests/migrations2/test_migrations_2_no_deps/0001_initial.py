@@ -6,7 +6,6 @@ class Migration(migrations.Migration):
     dependencies = []
 
     operations = [
-
         migrations.CreateModel(
             "OtherAuthor",
             [
@@ -17,5 +16,4 @@ class Migration(migrations.Migration):
                 ("silly_field", models.BooleanField(default=False)),
             ],
         ),
-
     ]

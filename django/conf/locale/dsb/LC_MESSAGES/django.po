@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2021
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2022
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-02-01 22:04+0000\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-06-25 06:49+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
 "language/dsb/)\n"
@@ -207,6 +207,9 @@ msgstr "Mongolšćina"
 msgid "Marathi"
 msgstr "Marathi"
 
+msgid "Malay"
+msgstr "Malayzišćina"
+
 msgid "Burmese"
 msgstr "Myanmaršćina"
 
@@ -385,6 +388,11 @@ msgstr ""
 "Zawěsććo, až toś ta gódnota jo wětša ako abo to samske ako %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+"Zawěsććo, až toś gódnota jo wjelesere kšacoweje wjelikosći %(limit_value)s."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -472,6 +480,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s z toś tym %(field_labels)s južo eksistěrujo."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Wobranicowanje \"%(name)s\" jo pśestupjone."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Gódnota %(value)r njejo płaśiwa wóleńska móžnosć."
 
@@ -485,8 +497,8 @@ msgstr "Toś to pólo njamóžo prozne byś."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s z toś tym %(field_label)s južo eksistěrujo."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -793,20 +805,20 @@ msgstr ""
 "eksistěrujo."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Pšosym wótposćelśo maksimalnje %d formular."
-msgstr[1] "Pšosym wótposćelśo maksimalnje %d formulara."
-msgstr[2] "Pšosym wótposćelśo maksimalnje %d formulary."
-msgstr[3] "Pšosym wótposćelśo maksimalnje %d formularow."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Pšosym wótposćelśo maksimalnje %(num)d formular."
+msgstr[1] "Pšosym wótposćelśo maksimalnje %(num)d formulara."
+msgstr[2] "Pšosym wótposćelśo maksimalnje %(num)d formulary."
+msgstr[3] "Pšosym wótposćelśo maksimalnje %(num)d formularow."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Pšosym wótposćelśo minimalnje %d formular."
-msgstr[1] "Pšosym wótposćelśo minimalnje %d formulara."
-msgstr[2] "Pšosym wótposćelśo minimalnje %d formulary."
-msgstr[3] "Pšosym wótposćelśo minimalnje %d formularow."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Pšosym wótposćelśo minimalnje %(num)d formular."
+msgstr[1] "Pšosym wótposćelśo minimalnje %(num)d formulara."
+msgstr[2] "Pšosym wótposćelśo minimalnje %(num)d formulary."
+msgstr[3] "Pšosym wótposćelśo minimalnje %(num)d formularow."
 
 msgid "Order"
 msgstr "Rěd"
@@ -1148,52 +1160,52 @@ msgid ", "
 msgstr ", "
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d lěto"
-msgstr[1] "%d lěśe"
-msgstr[2] "%d lěta"
-msgstr[3] "%d lět"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d lěto"
+msgstr[1] "%(num)d lěśe"
+msgstr[2] "%(num)d lěta"
+msgstr[3] "%(num)d lět"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d mjasec"
-msgstr[1] "%d mjaseca"
-msgstr[2] "%d mjasece"
-msgstr[3] "%d mjasecow"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d mjasec"
+msgstr[1] "%(num)d mjaseca"
+msgstr[2] "%(num)d mjasece"
+msgstr[3] "%(num)dmjasecow"
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d tyźeń"
-msgstr[1] "%d tyéznja"
-msgstr[2] "%d tyźenje"
-msgstr[3] "%d tyźenjow"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d tyźeń"
+msgstr[1] "%(num)d tyźenja"
+msgstr[2] "%(num)d tyźenje"
+msgstr[3] "%(num)d tyźenjow"
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d źeń"
-msgstr[1] "%d dnja"
-msgstr[2] "%d dny"
-msgstr[3] "%d dnjow"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d źeń "
+msgstr[1] "%(num)d dnja"
+msgstr[2] "%(num)d dny"
+msgstr[3] "%(num)d dnjow"
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d góźina"
-msgstr[1] "%d góźinje"
-msgstr[2] "%d góźiny"
-msgstr[3] "%d góźin"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d góźina"
+msgstr[1] "%(num)d góźinje"
+msgstr[2] "%(num)d góźiny"
+msgstr[3] "%(num)d góźin"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minuta"
-msgstr[1] "%d minuśe"
-msgstr[2] "%d minuty"
-msgstr[3] "%d minutow"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d minuta"
+msgstr[1] "%(num)d minuśe"
+msgstr[2] "%(num)d minuty"
+msgstr[3] "%(num)d minutow"
 
 msgid "Forbidden"
 msgstr "Zakazany"
@@ -1203,12 +1215,12 @@ msgstr "CSRF-pśeglědanje njejo se raźiło. Napšašowanje jo se pśetergnuło
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Wiźiśo toś tu powěźeńku, dokulaž toś to HTTPS-sedło trjeba głowu 'Referer', "
-"aby se pśez waš webwobglědowak słało, ale žedna njejo se pósłała. Toś ta "
+"Wiźiśo toś tu powěźeńku, dokulaž toś to HTTPS-sedło trjeba \"Referer header"
+"\", aby se pśez waš webwobglědowak słało, ale žedna njejo se pósłała. Toś ta "
 "głowa jo trěbna z pśicynow wěstoty, aby so zawěsćiło, až waš wobglědowak "
 "njekaprujo se wót tśeśich."
 

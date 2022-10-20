@@ -25,32 +25,37 @@ def ping_google(sitemap_url=None, ping_url=PING_URL, sitemap_uses_https=True):
     function will attempt to deduce it by using urls.reverse().
     """
     sitemap_full_url = _get_sitemap_full_url(sitemap_url, sitemap_uses_https)
-    params = urlencode({'sitemap': sitemap_full_url})
-    urlopen('%s?%s' % (ping_url, params))
+    params = urlencode({"sitemap": sitemap_full_url})
+    urlopen("%s?%s" % (ping_url, params))
 
 
 def _get_sitemap_full_url(sitemap_url, sitemap_uses_https=True):
-    if not django_apps.is_installed('django.contrib.sites'):
-        raise ImproperlyConfigured("ping_google requires django.contrib.sites, which isn't installed.")
+    if not django_apps.is_installed("django.contrib.sites"):
+        raise ImproperlyConfigured(
+            "ping_google requires django.contrib.sites, which isn't installed."
+        )
 
     if sitemap_url is None:
         try:
             # First, try to get the "index" sitemap URL.
-            sitemap_url = reverse('django.contrib.sitemaps.views.index')
+            sitemap_url = reverse("django.contrib.sitemaps.views.index")
         except NoReverseMatch:
             try:
                 # Next, try for the "global" sitemap URL.
-                sitemap_url = reverse('django.contrib.sitemaps.views.sitemap')
+                sitemap_url = reverse("django.contrib.sitemaps.views.sitemap")
             except NoReverseMatch:
                 pass
 
     if sitemap_url is None:
-        raise SitemapNotFound("You didn't provide a sitemap_url, and the sitemap URL couldn't be auto-detected.")
+        raise SitemapNotFound(
+            "You didn't provide a sitemap_url, and the sitemap URL couldn't be "
+            "auto-detected."
+        )
 
-    Site = django_apps.get_model('sites.Site')
+    Site = django_apps.get_model("sites.Site")
     current_site = Site.objects.get_current()
-    scheme = 'https' if sitemap_uses_https else 'http'
-    return '%s://%s%s' % (scheme, current_site.domain, sitemap_url)
+    scheme = "https" if sitemap_uses_https else "http"
+    return "%s://%s%s" % (scheme, current_site.domain, sitemap_url)
 
 
 class Sitemap:
@@ -109,8 +114,8 @@ class Sitemap:
             obj, lang_code = item
             # Activate language from item-tuple or forced one before calling location.
             with translation.override(force_lang_code or lang_code):
-                return self._get('location', item)
-        return self._get('location', item)
+                return self._get("location", item)
+        return self._get("location", item)
 
     @property
     def paginator(self):
@@ -134,13 +139,13 @@ class Sitemap:
             )
         # RemovedInDjango50Warning: when the deprecation ends, replace 'http'
         # with 'https'.
-        return self.protocol or protocol or 'http'
+        return self.protocol or protocol or "http"
 
     def get_domain(self, site=None):
         # Determine domain
         if site is None:
-            if django_apps.is_installed('django.contrib.sites'):
-                Site = django_apps.get_model('sites.Site')
+            if django_apps.is_installed("django.contrib.sites"):
+                Site = django_apps.get_model("sites.Site")
                 try:
                     site = Site.objects.get_current()
                 except Site.DoesNotExist:
@@ -157,6 +162,17 @@ class Sitemap:
         domain = self.get_domain(site)
         return self._urls(page, protocol, domain)
 
+    def get_latest_lastmod(self):
+        if not hasattr(self, "lastmod"):
+            return None
+        if callable(self.lastmod):
+            try:
+                return max([self.lastmod(item) for item in self.items()])
+            except TypeError:
+                return None
+        else:
+            return self.lastmod
+
     def _urls(self, page, protocol, domain):
         urls = []
         latest_lastmod = None
@@ -164,40 +180,45 @@ class Sitemap:
 
         paginator_page = self.paginator.page(page)
         for item in paginator_page.object_list:
-            loc = f'{protocol}://{domain}{self._location(item)}'
-            priority = self._get('priority', item)
-            lastmod = self._get('lastmod', item)
+            loc = f"{protocol}://{domain}{self._location(item)}"
+            priority = self._get("priority", item)
+            lastmod = self._get("lastmod", item)
 
             if all_items_lastmod:
                 all_items_lastmod = lastmod is not None
-                if (all_items_lastmod and
-                        (latest_lastmod is None or lastmod > latest_lastmod)):
+                if all_items_lastmod and (
+                    latest_lastmod is None or lastmod > latest_lastmod
+                ):
                     latest_lastmod = lastmod
 
             url_info = {
-                'item': item,
-                'location': loc,
-                'lastmod': lastmod,
-                'changefreq': self._get('changefreq', item),
-                'priority': str(priority if priority is not None else ''),
-                'alternates': [],
+                "item": item,
+                "location": loc,
+                "lastmod": lastmod,
+                "changefreq": self._get("changefreq", item),
+                "priority": str(priority if priority is not None else ""),
+                "alternates": [],
             }
 
             if self.i18n and self.alternates:
                 for lang_code in self._languages():
-                    loc = f'{protocol}://{domain}{self._location(item, lang_code)}'
-                    url_info['alternates'].append({
-                        'location': loc,
-                        'lang_code': lang_code,
-                    })
+                    loc = f"{protocol}://{domain}{self._location(item, lang_code)}"
+                    url_info["alternates"].append(
+                        {
+                            "location": loc,
+                            "lang_code": lang_code,
+                        }
+                    )
                 if self.x_default:
                     lang_code = settings.LANGUAGE_CODE
-                    loc = f'{protocol}://{domain}{self._location(item, lang_code)}'
-                    loc = loc.replace(f'/{lang_code}/', '/', 1)
-                    url_info['alternates'].append({
-                        'location': loc,
-                        'lang_code': 'x-default',
-                    })
+                    loc = f"{protocol}://{domain}{self._location(item, lang_code)}"
+                    loc = loc.replace(f"/{lang_code}/", "/", 1)
+                    url_info["alternates"].append(
+                        {
+                            "location": loc,
+                            "lang_code": "x-default",
+                        }
+                    )
 
             urls.append(url_info)
 
@@ -212,8 +233,8 @@ class GenericSitemap(Sitemap):
     changefreq = None
 
     def __init__(self, info_dict, priority=None, changefreq=None, protocol=None):
-        self.queryset = info_dict['queryset']
-        self.date_field = info_dict.get('date_field')
+        self.queryset = info_dict["queryset"]
+        self.date_field = info_dict.get("date_field")
         self.priority = self.priority or priority
         self.changefreq = self.changefreq or changefreq
         self.protocol = self.protocol or protocol
@@ -225,4 +246,13 @@ class GenericSitemap(Sitemap):
     def lastmod(self, item):
         if self.date_field is not None:
             return getattr(item, self.date_field)
+        return None
+
+    def get_latest_lastmod(self):
+        if self.date_field is not None:
+            return (
+                self.queryset.order_by("-" + self.date_field)
+                .values_list(self.date_field, flat=True)
+                .first()
+            )
         return None

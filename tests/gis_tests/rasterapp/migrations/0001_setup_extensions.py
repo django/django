@@ -9,10 +9,12 @@ if connection.features.supports_raster:
         # PostGIS 3+ requires postgis_raster extension.
         if pg_version[1:] >= (3,):
             operations = [
-                CreateExtension('postgis_raster'),
+                CreateExtension("postgis_raster"),
             ]
         else:
             operations = []
+
 else:
+
     class Migration(migrations.Migration):
         operations = []

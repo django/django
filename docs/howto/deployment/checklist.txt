@@ -59,6 +59,22 @@ or from a file::
     with open('/etc/secret_key.txt') as f:
         SECRET_KEY = f.read().strip()
 
+If rotating secret keys, you may use :setting:`SECRET_KEY_FALLBACKS`::
+
+    import os
+    SECRET_KEY = os.environ['CURRENT_SECRET_KEY']
+    SECRET_KEY_FALLBACKS = [
+        os.environ['OLD_SECRET_KEY'],
+    ]
+
+Ensure that old secret keys are removed from ``SECRET_KEY_FALLBACKS`` in a
+timely manner.
+
+.. versionchanged:: 4.1
+
+    The ``SECRET_KEY_FALLBACKS`` setting was added to support rotating secret
+    keys.
+
 :setting:`DEBUG`
 ----------------
 
@@ -207,8 +223,10 @@ This helps a lot on virtualized hosts with limited network performance.
 --------------------
 
 Enabling the cached template loader often improves performance drastically, as
-it avoids compiling each template every time it needs to be rendered. See the
-:ref:`template loaders docs <template-loaders>` for more information.
+it avoids compiling each template every time it needs to be rendered. When
+:setting:`DEBUG = False <DEBUG>`, the cached template loader is enabled
+automatically. See :class:`django.template.loaders.cached.Loader` for more
+information.
 
 Error reporting
 ===============

@@ -4,11 +4,11 @@ import weakref
 
 from django.utils.inspect import func_accepts_kwargs
 
-logger = logging.getLogger('django.dispatch')
+logger = logging.getLogger("django.dispatch")
 
 
 def _make_id(target):
-    if hasattr(target, '__func__'):
+    if hasattr(target, "__func__"):
         return (id(target.__self__), id(target.__func__))
     return id(target)
 
@@ -28,6 +28,7 @@ class Signal:
         receivers
             { receiverkey (id) : weakref(receiver) }
     """
+
     def __init__(self, use_caching=False):
         """
         Create a new signal.
@@ -81,10 +82,12 @@ class Signal:
         # If DEBUG is on, check that we got a good receiver
         if settings.configured and settings.DEBUG:
             if not callable(receiver):
-                raise TypeError('Signal receivers must be callable.')
+                raise TypeError("Signal receivers must be callable.")
             # Check for **kwargs
             if not func_accepts_kwargs(receiver):
-                raise ValueError("Signal receivers must accept keyword arguments (**kwargs).")
+                raise ValueError(
+                    "Signal receivers must accept keyword arguments (**kwargs)."
+                )
 
         if dispatch_uid:
             lookup_key = (dispatch_uid, _make_id(sender))
@@ -95,7 +98,7 @@ class Signal:
             ref = weakref.ref
             receiver_object = receiver
             # Check for bound methods
-            if hasattr(receiver, '__self__') and hasattr(receiver, '__func__'):
+            if hasattr(receiver, "__self__") and hasattr(receiver, "__func__"):
                 ref = weakref.WeakMethod
                 receiver_object = receiver.__self__
             receiver = ref(receiver)
@@ -164,7 +167,10 @@ class Signal:
 
         Return a list of tuple pairs [(receiver, response), ... ].
         """
-        if not self.receivers or self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
+        if (
+            not self.receivers
+            or self.sender_receivers_cache.get(sender) is NO_RECEIVERS
+        ):
             return []
 
         return [
@@ -191,7 +197,10 @@ class Signal:
         If any receiver raises an error (specifically any subclass of
         Exception), return the error instance as the result for that receiver.
         """
-        if not self.receivers or self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
+        if (
+            not self.receivers
+            or self.sender_receivers_cache.get(sender) is NO_RECEIVERS
+        ):
             return []
 
         # Call each receiver with whatever arguments it can accept.
@@ -202,7 +211,7 @@ class Signal:
                 response = receiver(signal=self, sender=sender, **named)
             except Exception as err:
                 logger.error(
-                    'Error calling %s in Signal.send_robust() (%s)',
+                    "Error calling %s in Signal.send_robust() (%s)",
                     receiver.__qualname__,
                     err,
                     exc_info=err,
@@ -217,8 +226,9 @@ class Signal:
         if self._dead_receivers:
             self._dead_receivers = False
             self.receivers = [
-                r for r in self.receivers
-                if not(isinstance(r[1], weakref.ReferenceType) and r[1]() is None)
+                r
+                for r in self.receivers
+                if not (isinstance(r[1], weakref.ReferenceType) and r[1]() is None)
             ]
 
     def _live_receivers(self, sender):
@@ -283,6 +293,7 @@ def receiver(signal, **kwargs):
         def signals_receiver(sender, **kwargs):
             ...
     """
+
     def _decorator(func):
         if isinstance(signal, (list, tuple)):
             for s in signal:
@@ -290,4 +301,5 @@ def receiver(signal, **kwargs):
         else:
             signal.connect(func, **kwargs)
         return func
+
     return _decorator

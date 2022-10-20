@@ -94,10 +94,6 @@ Django's system checks are organized using the following tags:
 
 Some checks may be registered with multiple tags.
 
-.. versionchanged:: 4.0
-
-    The ``files`` tag was added.
-
 Core system checks
 ==================
 
@@ -157,8 +153,6 @@ If you're using MySQL or MariaDB, the following checks will be performed:
 Managing files
 --------------
 
-.. versionadded:: 4.0
-
 The following checks verify your setup for :doc:`/topics/files`:
 
 * **files.E001**: The :setting:`FILE_UPLOAD_TEMP_DIR` setting refers to the
@@ -172,7 +166,7 @@ Model fields
 * **fields.E003**: ``pk`` is a reserved word that cannot be used as a field
   name.
 * **fields.E004**: ``choices`` must be an iterable (e.g., a list or tuple).
-* **fields.E005**: ``choices`` must be an iterable returning ``(actual value,
+* **fields.E005**: ``choices`` must be an iterable containing ``(actual value,
   human readable name)`` tuples.
 * **fields.E006**: ``db_index`` must be ``None``, ``True`` or ``False``.
 * **fields.E007**: Primary keys must not have ``null=True``.
@@ -191,12 +185,12 @@ Model fields
 * **fields.E130**: ``DecimalField``\s must define a ``decimal_places`` attribute.
 * **fields.E131**: ``decimal_places`` must be a non-negative integer.
 * **fields.E132**: ``DecimalField``\s must define a ``max_digits`` attribute.
-* **fields.E133**: ``max_digits`` must be a non-negative integer.
+* **fields.E133**: ``max_digits`` must be a positive integer.
 * **fields.E134**: ``max_digits`` must be greater or equal to ``decimal_places``.
 * **fields.E140**: ``FilePathField``\s must have either ``allow_files`` or
   ``allow_folders`` set to True.
-* **fields.E150**: ``GenericIPAddressField``\s cannot accept blank values if
-  null values are not allowed, as blank values are stored as nulls.
+* **fields.E150**: ``GenericIPAddressField``\s cannot have ``blank=True`` if
+  ``null=False``, as blank values are stored as nulls.
 * **fields.E160**: The options ``auto_now``, ``auto_now_add``, and ``default``
   are mutually exclusive. Only one of these options may be present.
 * **fields.W161**: Fixed default value provided.
@@ -229,6 +223,15 @@ Model fields
   4.0. *This check appeared in Django 3.1 and 3.2*.
 * **fields.E904**: ``django.contrib.postgres.fields.JSONField`` is removed
   except for support in historical migrations.
+* **fields.W905**: ``django.contrib.postgres.fields.CICharField`` is
+  deprecated. Support for it (except in historical migrations) will be removed
+  in Django 5.1.
+* **fields.W906**: ``django.contrib.postgres.fields.CIEmailField`` is
+  deprecated. Support for it (except in historical migrations) will be removed
+  in Django 5.1.
+* **fields.W907**: ``django.contrib.postgres.fields.CITextField`` is
+  deprecated. Support for it (except in historical migrations) will be removed
+  in Django 5.1.
 
 File fields
 ~~~~~~~~~~~
@@ -247,17 +250,18 @@ Related fields
   either not installed, or is abstract.
 * **fields.E301**: Field defines a relation with the model
   ``<app_label>.<model>`` which has been swapped out.
-* **fields.E302**: Accessor for field ``<app_label>.<model>.<field name>``
-  clashes with field ``<app_label>.<model>.<field name>``.
-* **fields.E303**: Reverse query name for field
-  ``<app_label>.<model>.<field name>`` clashes with field
+* **fields.E302**: Reverse accessor ``<related model>.<accessor name>`` for
+  ``<app_label>.<model>.<field name>`` clashes with field name
   ``<app_label>.<model>.<field name>``.
-* **fields.E304**: Field name ``<app_label>.<model>.<field name>`` clashes with
-  accessor for ``<app_label>.<model>.<field name>``.
-* **fields.E305**: Field name ``<app_label>.<model>.<field name>`` clashes with
-  reverse query name for ``<app_label>.<model>.<field name>``.
-* **fields.E306**: Related name must be a valid Python identifier or end with
-  a ``'+'``.
+* **fields.E303**: Reverse query name for ``<app_label>.<model>.<field name>``
+  clashes with field name ``<app_label>.<model>.<field name>``.
+* **fields.E304**: Reverse accessor ``<related model>.<accessor name>`` for
+  ``<app_label>.<model>.<field name>`` clashes with reverse accessor for
+  ``<app_label>.<model>.<field name>``.
+* **fields.E305**: Reverse query name for ``<app_label>.<model>.<field name>``
+  clashes with reverse query name for ``<app_label>.<model>.<field name>``.
+* **fields.E306**: The name ``<name>`` is invalid ``related_name`` for field
+  ``<model>.<field name>``.
 * **fields.E307**: The field ``<app label>.<model>.<field name>`` was declared
   with a lazy reference to ``<app label>.<model>``, but app ``<app label>``
   isn't installed or doesn't provide model ``<model>``.
@@ -324,8 +328,8 @@ Models
   sets ``primary_key=True``.
 * **models.E005**: The field ``<field name>`` from parent model ``<model>``
   clashes with the field ``<field name>`` from parent model ``<model>``.
-* **models.E006**: The field clashes with the field ``<field name>`` from model
-  ``<model>``.
+* **models.E006**: The field ``<field name>`` clashes with the field
+  ``<field name>`` from model ``<model>``.
 * **models.E007**: Field ``<field name>`` has column name ``<column name>``
   that is used by another field.
 * **models.E008**: ``index_together`` must be a list or tuple.
@@ -394,6 +398,8 @@ Models
 * **models.W043**: ``<database>`` does not support indexes on expressions.
 * **models.W044**: ``<database>`` does not support unique constraints on
   expressions.
+* **models.W045**: Check constraint ``<constraint>`` contains ``RawSQL()``
+  expression and won't be validated during the model ``full_clean()``.
 
 Security
 --------
@@ -456,8 +462,8 @@ The following checks are run if you use the :option:`check --deploy` option:
 * **security.W009**: Your :setting:`SECRET_KEY` has less than 50 characters,
   less than 5 unique characters, or it's prefixed with ``'django-insecure-'``
   indicating that it was generated automatically by Django. Please generate a
-  long and random ``SECRET_KEY``, otherwise many of Django's security-critical
-  features will be vulnerable to attack.
+  long and random value, otherwise many of Django's security-critical features
+  will be vulnerable to attack.
 * **security.W010**: You have :mod:`django.contrib.sessions` in your
   :setting:`INSTALLED_APPS` but you have not set
   :setting:`SESSION_COOKIE_SECURE` to ``True``. Using a secure-only session
@@ -510,6 +516,12 @@ The following checks are run if you use the :option:`check --deploy` option:
   to an invalid value.
 * **security.E024**: You have set the
   :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY` setting to an invalid value.
+* **security.W025**: Your
+  :setting:`SECRET_KEY_FALLBACKS[n] <SECRET_KEY_FALLBACKS>` has less than 50
+  characters, less than 5 unique characters, or it's prefixed with
+  ``'django-insecure-'`` indicating that it was generated automatically by
+  Django. Please generate a long and random value, otherwise many of Django's
+  security-critical features will be vulnerable to attack.
 
 The following checks verify that your security-related settings are correctly
 configured:
@@ -540,6 +552,11 @@ configured:
 * **templates.E002**: ``string_if_invalid`` in :setting:`TEMPLATES`
   :setting:`OPTIONS <TEMPLATES-OPTIONS>` must be a string but got: ``{value}``
   (``{type}``).
+* **templates.E003**:``<name>`` is used for multiple template tag modules:
+  ``<module list>``. *This check was changed to* ``templates.W003`` *in Django
+  4.1.2*.
+* **templates.W003**:``<name>`` is used for multiple template tag modules:
+  ``<module list>``.
 
 Translation
 -----------
@@ -846,6 +863,7 @@ fields:
 * **postgres.E003**: ``<field>`` default should be a callable instead of an
   instance so that it's not shared between all field instances. *This check was
   changed to* ``fields.E010`` *in Django 3.1*.
+* **postgres.W004**: Base field for array has warnings: ...
 
 ``sites``
 ---------

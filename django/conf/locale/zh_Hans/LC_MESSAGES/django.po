@@ -2,7 +2,10 @@
 #
 # Translators:
 # HuanCheng Bai白宦成 <xiqingongzi@gmail.com>, 2017-2018
+# lanbla <lanlinwen@buaa.edu.cn>, 2021
 # Daniel Duan <DaNmarner@gmail.com>, 2013
+# Fan Xu <xlivevil@aliyun.com>, 2022
+# Huanqun Yang, 2022
 # jamin M <lxxmbyx@163.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
@@ -13,7 +16,7 @@
 # matthew Yip <yymmatthew@gmail.com>, 2020
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # Ronald White <tkliuxing@me.com>, 2014
-# pylemon <leeway1985@gmail.com>, 2013
+# Lemon Li <leeway1985@gmail.com>, 2013
 # Ray Wang <pivstone@gmail.com>, 2017
 # slene <vslene@gmail.com>, 2011
 # Sun Liwen <sunliwen@gmail.com>, 2014
@@ -28,15 +31,15 @@
 # ced773123cfad7b4e8b79ca80f736af9, 2011-2012
 # Ziya Tang <tcztzy@gmail.com>, 2018
 # 付峥 <fuzheng1998@outlook.com>, 2018
-# fangjiaqi77 <370358679@qq.com>, 2020
+# Fangjiaqi77 <370358679@qq.com>, 2020
 # Kevin Sze <leiarix@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-02-07 04:20+0000\n"
-"Last-Translator: Veoco <one@nomox.cn>\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-07-25 06:49+0000\n"
+"Last-Translator: Huanqun Yang\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -234,6 +237,9 @@ msgstr "蒙古语"
 msgid "Marathi"
 msgstr "马拉地语"
 
+msgid "Malay"
+msgstr "马来语"
+
 msgid "Burmese"
 msgstr "缅甸语"
 
@@ -406,6 +412,10 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "确保该值大于或等于%(limit_value)s。"
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "确保该值是步长的倍数%(limit_value)s"
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -463,6 +473,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "包含 %(field_labels)s 的 %(model_name)s 已经存在。"
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "约束 “%(name)s” 是无效的"
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "值 %(value)r 不是有效选项。"
 
@@ -476,8 +490,8 @@ msgstr "此字段不能为空。"
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "具有 %(field_label)s 的 %(model_name)s 已存在。"
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -758,14 +772,14 @@ msgstr ""
 "在，你可能需要提交错误报告。"
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "请最多提交 %d 个表单。"
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "请最多提交 %(num)d 个表单。"
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "请至少提交 %d 个表单。"
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "请至少提交 %(num)d 个表单。"
 
 msgid "Order"
 msgstr "排序"
@@ -1101,34 +1115,34 @@ msgid ", "
 msgstr "，"
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d 年"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d 年"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d 月"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d 月"
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d 周"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d 周"
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d 日"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d 日"
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d 小时"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d 小时"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d 分钟"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d 分钟"
 
 msgid "Forbidden"
 msgstr "禁止访问"
@@ -1138,12 +1152,12 @@ msgstr "CSRF验证失败. 请求被中断."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"您看到此消息是因为此HTTPS站点要求Web浏览器发送的“Referer头”没被发送。出于安全"
-"原因，此HTTP头是必需的，以确保您的浏览器不会被第三方劫持。"
+"您看到此消息是由于HTTPS站点需要您的浏览器发送 'Referer header'，但是该信息并"
+"未被发送。出于安全原因，此HTTP头是必需的，以确保您的浏览器不会被第三方劫持。"
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"

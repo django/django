@@ -1,0 +1,431 @@
+============================================
+Django 4.2 release notes - UNDER DEVELOPMENT
+============================================
+
+*Expected April 2023*
+
+Welcome to Django 4.2!
+
+These release notes cover the :ref:`new features <whats-new-4.2>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-4.2>` you'll
+want to be aware of when upgrading from Django 4.1 or earlier. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-4.2>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Python compatibility
+====================
+
+Django 4.2 supports Python 3.8, 3.9, 3.10, and 3.11. We **highly recommend**
+and only officially support the latest release of each series.
+
+.. _whats-new-4.2:
+
+What's new in Django 4.2
+========================
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The light or dark color theme of the admin can now be toggled in the UI, as
+  well as being set to follow the system setting.
+
+* The admin's font stack now prefers system UI fonts and no longer requires
+  downloading fonts. Additionally, CSS variables are available to more easily
+  override the default font families.
+
+* The :source:`admin/delete_confirmation.html
+  <django/contrib/admin/templates/admin/delete_confirmation.html>` template now
+  has some additional blocks and scripting hooks to ease customization.
+
+* The chosen options of
+  :attr:`~django.contrib.admin.ModelAdmin.filter_horizontal` and
+  :attr:`~django.contrib.admin.ModelAdmin.filter_vertical` widgets are now
+  filterable.
+
+* The ``admin/base.html`` template now has a new block ``nav-breadcrumbs``
+  which contains the navigation landmark and the ``breadcrumbs`` block.
+
+* :attr:`.ModelAdmin.list_editable` now uses atomic transactions when making
+  edits.
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The default iteration count for the PBKDF2 password hasher is increased from
+  390,000 to 480,000.
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The :doc:`GeoJSON serializer </ref/contrib/gis/serializers>` now outputs the
+  ``id`` key for serialized features, which defaults to the primary key of
+  objects.
+
+* The :class:`~django.contrib.gis.gdal.GDALRaster` class now supports
+  :class:`pathlib.Path`.
+
+* The :class:`~django.contrib.gis.geoip2.GeoIP2` class now supports  ``.mmdb``
+  files downloaded from DB-IP.
+
+* The OpenLayers template widget no longer includes inline CSS (which also
+  removes the former ``map_css`` block) to better comply with a strict Content
+  Security Policy.
+
+:mod:`django.contrib.messages`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :lookup:`trigram_strict_word_similar` lookup, and the
+  :class:`TrigramStrictWordSimilarity()
+  <django.contrib.postgres.search.TrigramStrictWordSimilarity>` and
+  :class:`TrigramStrictWordDistance()
+  <django.contrib.postgres.search.TrigramStrictWordDistance>` expressions allow
+  using trigram strict word similarity.
+
+:mod:`django.contrib.redirects`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* ...
+
+CSRF
+~~~~
+
+* ...
+
+Decorators
+~~~~~~~~~~
+
+* ...
+
+Email
+~~~~~
+
+* ...
+
+Error Reporting
+~~~~~~~~~~~~~~~
+
+* ...
+
+File Storage
+~~~~~~~~~~~~
+
+* ...
+
+File Uploads
+~~~~~~~~~~~~
+
+* ...
+
+Forms
+~~~~~
+
+* :class:`~django.forms.ModelForm` now accepts the new ``Meta`` option
+  ``formfield_callback`` to customize form fields.
+
+* :func:`~django.forms.models.modelform_factory` now respects the
+  ``formfield_callback`` attribute of the ``form``’s ``Meta``.
+
+Generic Views
+~~~~~~~~~~~~~
+
+* ...
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* Added support and translations for the Central Kurdish (Sorani) language.
+
+* The :class:`~django.middleware.locale.LocaleMiddleware` now respects a
+  language from the request when :func:`~django.conf.urls.i18n.i18n_patterns`
+  is used with the ``prefix_default_language`` argument set to ``False``.
+
+Logging
+~~~~~~~
+
+* ...
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* :djadmin:`makemessages` command now supports locales with private sub-tags
+  such as ``nl_NL-x-informal``.
+
+* The new :option:`makemigrations --update` option merges model changes into
+  the latest migration and optimizes the resulting operations.
+
+Migrations
+~~~~~~~~~~
+
+* Migrations now support serialization of ``enum.Flag`` objects.
+
+Models
+~~~~~~
+
+* ``QuerySet`` now extensively supports filtering against
+  :ref:`window-functions` with the exception of disjunctive filter lookups
+  against window functions when performing aggregation.
+
+* :meth:`~.QuerySet.prefetch_related` now supports
+  :class:`~django.db.models.Prefetch` objects with sliced querysets.
+
+* :ref:`Registering lookups <lookup-registration-api>` on
+  :class:`~django.db.models.Field` instances is now supported.
+
+* The new ``robust`` argument for :func:`~django.db.transaction.on_commit`
+  allows performing actions that can fail after a database transaction is
+  successfully committed.
+
+* The new :class:`KT() <django.db.models.fields.json.KT>` expression represents
+  the text value of a key, index, or path transform of
+  :class:`~django.db.models.JSONField`.
+
+* :class:`~django.db.models.functions.Now` now supports microsecond precision
+  on MySQL and millisecond precision on SQLite.
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Security
+~~~~~~~~
+
+* ...
+
+Serialization
+~~~~~~~~~~~~~
+
+* ...
+
+Signals
+~~~~~~~
+
+* ...
+
+Templates
+~~~~~~~~~
+
+* ...
+
+Tests
+~~~~~
+
+* ...
+
+URLs
+~~~~
+
+* ...
+
+Utilities
+~~~~~~~~~
+
+* The new ``encoder`` parameter for :meth:`django.utils.html.json_script`
+  function allows customizing a JSON encoder class.
+
+* The private internal vendored copy of ``urllib.parse.urlsplit()`` now strips
+  ``'\r'``, ``'\n'``, and ``'\t'`` (see :cve:`2022-0391` and :bpo:`43882`).
+  This is to protect projects that may be incorrectly using the internal
+  ``url_has_allowed_host_and_scheme()`` function, instead of using one of the
+  documented functions for handling URL redirects. The Django functions were
+  not affected.
+
+Validators
+~~~~~~~~~~
+
+* The list of common passwords used by ``CommonPasswordValidator`` is updated
+  to the most recent version.
+
+.. _backwards-incompatible-4.2:
+
+Backwards incompatible changes in 4.2
+=====================================
+
+Database backend API
+--------------------
+
+This section describes changes that may be needed in third-party database
+backends.
+
+* ...
+
+Dropped support for MariaDB 10.3
+--------------------------------
+
+Upstream support for MariaDB 10.3 ends in May 2023. Django 4.2 supports MariaDB
+10.4 and higher.
+
+Dropped support for MySQL 5.7
+-----------------------------
+
+Upstream support for MySQL 5.7 ends in October 2023. Django 4.2 supports MySQL
+8 and higher.
+
+Dropped support for PostgreSQL 11
+---------------------------------
+
+Upstream support for PostgreSQL 11 ends in November 2023. Django 4.2 supports
+PostgreSQL 12 and higher.
+
+Miscellaneous
+-------------
+
+* The undocumented ``SimpleTemplateResponse.rendering_attrs`` and
+  ``TemplateResponse.rendering_attrs`` are renamed to ``non_picklable_attrs``.
+
+* The undocumented ``django.http.multipartparser.parse_header()`` function is
+  removed. Use ``django.utils.http.parse_header_parameters()`` instead.
+
+* :ttag:`{% blocktranslate asvar … %}<blocktranslate>` result is now marked as
+  safe for (HTML) output purposes.
+
+* The ``autofocus`` HTML attribute in the admin search box is removed as it can
+  be confusing for screen readers.
+
+* The :option:`makemigrations --check` option no longer creates missing
+  migration files.
+
+* The ``alias`` argument for :meth:`.Expression.get_group_by_cols` is removed.
+
+.. _deprecated-features-4.2:
+
+Features deprecated in 4.2
+==========================
+
+``index_together`` option is deprecated in favor of ``indexes``
+---------------------------------------------------------------
+
+The :attr:`Meta.index_together <django.db.models.Options.index_together>`
+option is deprecated in favor of the :attr:`~django.db.models.Options.indexes`
+option.
+
+Migrating existing ``index_together`` should be handled as a migration. For
+example::
+
+    class Author(models.Model):
+        rank = models.IntegerField()
+        name = models.CharField(max_length=30)
+
+        class Meta:
+            index_together = [["rank", "name"]]
+
+Should become::
+
+    class Author(models.Model):
+        rank = models.IntegerField()
+        name = models.CharField(max_length=30)
+
+        class Meta:
+            indexes = [models.Index(fields=["rank", "name"])]
+
+Running the :djadmin:`makemigrations` command will generate a migration
+containing a :class:`~django.db.migrations.operations.RenameIndex` operation
+which will rename the existing index.
+
+The ``AlterIndexTogether`` migration operation is now officially supported only
+for pre-Django 4.2 migration files. For backward compatibility reasons, it's
+still part of the public API, and there's no plan to deprecate or remove it,
+but it should not be used for new migrations. Use
+:class:`~django.db.migrations.operations.AddIndex` and
+:class:`~django.db.migrations.operations.RemoveIndex` operations instead.
+
+Miscellaneous
+-------------
+
+* The ``BaseUserManager.make_random_password()`` method is deprecated. See
+  `recipes and best practices
+  <https://docs.python.org/3/library/secrets.html#recipes-and-best-practices>`_
+  for using Python's :py:mod:`secrets` module to generate passwords.
+
+* The ``length_is`` template filter is deprecated in favor of :tfilter:`length`
+  and the ``==`` operator within an :ttag:`{% if %}<if>` tag. For example
+
+  .. code-block:: html+django
+
+    {% if value|length == 4 %}…{% endif %}
+    {% if value|length == 4 %}True{% else %}False{% endif %}
+
+  instead of:
+
+  .. code-block:: html+django
+
+    {% if value|length_is:4 %}…{% endif %}
+    {{ value|length_is:4 }}
+
+* ``django.contrib.auth.hashers.SHA1PasswordHasher``,
+  ``django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher``, and
+  ``django.contrib.auth.hashers.UnsaltedMD5PasswordHasher`` are deprecated.
+
+* ``django.contrib.postgres.fields.CICharField`` is deprecated in favor of
+  ``CharField(db_collation="…")`` with a case-insensitive non-deterministic
+  collation.
+
+* ``django.contrib.postgres.fields.CIEmailField`` is deprecated in favor of
+  ``EmailField(db_collation="…")`` with a case-insensitive non-deterministic
+  collation.
+
+* ``django.contrib.postgres.fields.CITextField`` is deprecated in favor of
+  ``TextField(db_collation="…")`` with a case-insensitive non-deterministic
+  collation.
+
+* ``django.contrib.postgres.fields.CIText`` mixin is deprecated.
+
+* The ``map_height`` and ``map_width`` attributes of ``BaseGeometryWidget`` are
+  deprecated, use CSS to size map widgets instead.
+
+* ``SimpleTestCase.assertFormsetError()`` is deprecated in favor of
+  ``assertFormSetError()``.
+
+* ``TransactionTestCase.assertQuerysetEqual()`` is deprecated in favor of
+  ``assertQuerySetEqual()``.

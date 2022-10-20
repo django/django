@@ -90,7 +90,7 @@ Default settings
 
 A Django settings file doesn't have to define any settings if it doesn't need
 to. Each setting has a sensible default value. These defaults live in the
-module :file:`django/conf/global_settings.py`.
+module :source:`django/conf/global_settings.py`.
 
 Here's the algorithm Django uses in compiling settings:
 
@@ -250,7 +250,7 @@ If you set :envvar:`DJANGO_SETTINGS_MODULE`, access settings values somehow,
 that settings have already been configured. There is a property for this
 purpose:
 
-.. attribute: django.conf.settings.configured
+.. attribute:: django.conf.settings.configured
 
 For example::
 

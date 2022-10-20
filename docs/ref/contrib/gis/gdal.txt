@@ -1107,9 +1107,10 @@ blue.
     raster should be opened in write mode. For newly-created rasters, the second
     parameter is ignored and the new raster is always created in write mode.
 
-    The first parameter can take three forms: a string representing a file path
-    (filesystem or GDAL virtual filesystem), a dictionary with values defining
-    a new raster, or a bytes object representing a raster file.
+    The first parameter can take three forms: a string or
+    :class:`~pathlib.Path` representing a file path (filesystem or GDAL virtual
+    filesystem), a dictionary with values defining a new raster, or a bytes
+    object representing a raster file.
 
     If the input is a file path, the raster is opened from there. If the input
     is raw data in a dictionary, the parameters ``width``, ``height``, and
@@ -1160,9 +1161,9 @@ blue.
         >>> rst.name  # Stored in a random path in the vsimem filesystem.
         '/vsimem/da300bdb-129d-49a8-b336-e410a9428dad'
 
-    .. versionchanged:: 4.0
+    .. versionchanged:: 4.2
 
-        Creating rasters in any GDAL virtual filesystem was allowed.
+        Support for :class:`pathlib.Path` ``ds_input`` was added.
 
     .. attribute:: name
 
@@ -1521,8 +1522,7 @@ blue.
         to mark pixels that are not valid data. Such pixels should generally not
         be displayed, nor contribute to analysis operations.
 
-        To delete an existing "no data" value, set this property to ``None``
-        (requires GDAL ≥ 2.1).
+        To delete an existing "no data" value, set this property to ``None``.
 
     .. method:: datatype(as_string=False)
 
@@ -1822,8 +1822,6 @@ Here's how to create a raster and return it as a file in an
 
 Using other Virtual Filesystems
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 4.0
 
 Depending on the local build of GDAL other virtual filesystems may be
 supported. You can use them by prepending the provided path with the

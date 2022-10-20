@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-15 18:04+0000\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2021-12-25 07:05+0000\n"
 "Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
@@ -136,22 +136,22 @@ msgstr "записи у логовима"
 
 #, python-format
 msgid "Added “%(object)s”."
-msgstr ""
+msgstr "Додат објекат класе „%(object)s“."
 
 #, python-format
 msgid "Changed “%(object)s” — %(changes)s"
-msgstr ""
+msgstr "Промењен објекат класе „%(object)s“ - %(changes)s"
 
 #, python-format
 msgid "Deleted “%(object)s.”"
-msgstr ""
+msgstr "Уклоњен објекат класе „%(object)s“."
 
 msgid "LogEntry Object"
 msgstr "Објекат уноса лога"
 
 #, python-brace-format
 msgid "Added {name} “{object}”."
-msgstr ""
+msgstr "Додат објекат {name} \"{object}\"."
 
 msgid "Added."
 msgstr "Додато."
@@ -266,8 +266,9 @@ msgstr "0 од %(cnt)s изабрано"
 msgid "Change history: %s"
 msgstr "Историјат измена: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -516,6 +517,12 @@ msgstr "Заборавили сте лозинку или корисничко �
 msgid "Toggle navigation"
 msgstr "Укључи/искључи мени"
 
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
+
 msgid "Date/time"
 msgstr "Датум/време"
 
@@ -524,6 +531,12 @@ msgstr "Корисник"
 
 msgid "Action"
 msgstr "Радња"
+
+msgid "entry"
+msgstr ""
+
+msgid "entries"
+msgstr ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -580,8 +593,12 @@ msgstr "Додај још један модел %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Обриши одабрани модел %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Хвала што сте данас провели време на овом сајту."
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
 
 msgid "Log in again"
 msgstr "Поновна пријава"
@@ -651,7 +668,7 @@ msgid "Please go to the following page and choose a new password:"
 msgstr "Идите на следећу страницу и поставите нову лозинку."
 
 msgid "Your username, in case you’ve forgotten:"
-msgstr ""
+msgstr "Ваше корисничко име, уколико сте заборавили:"
 
 msgid "Thanks for using our site!"
 msgstr "Хвала што користите наш сајт!"

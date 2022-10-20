@@ -167,7 +167,7 @@ You could import ``mysite.settings``, ``mysite.urls``, and ``mysite.myapp``,
 but not ``settings``, ``urls``, or ``myapp`` as top-level modules.
 
 Anything imported as a top-level module can be placed adjacent to the new
-``manage.py``. For instance, to decouple "myapp" from the project module and
+``manage.py``. For instance, to decouple ``myapp`` from the project module and
 import it as just ``myapp``, place it outside the ``mysite/`` directory::
 
     manage.py
@@ -634,7 +634,7 @@ Django 1.4 also includes several smaller improvements worth noting:
   :meth:`~django.db.models.query.QuerySet.distinct`.
 
 * The admin login page will add a password reset link if you include a URL with
-  the name ``'admin_password_reset'`` in your urls.py, so plugging in the
+  the name ``'admin_password_reset'`` in your ``urls.py``, so plugging in the
   built-in password reset mechanism and making it available is now much easier.
   For details, see :ref:`auth_password_reset`.
 
@@ -1060,7 +1060,7 @@ Session cookies now have the ``httponly`` flag by default
 
 Session cookies now include the ``httponly`` attribute by default to
 help reduce the impact of potential XSS attacks. As a consequence of
-this change, session cookie data, including sessionid, is no longer
+this change, session cookie data, including ``sessionid``, is no longer
 accessible from JavaScript in many browsers. For strict backwards
 compatibility, use ``SESSION_COOKIE_HTTPONLY = False`` in your
 settings file.

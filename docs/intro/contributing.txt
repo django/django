@@ -199,8 +199,8 @@ work and haven't broken other parts of Django. If you've never run Django's test
 suite before, it's a good idea to run it once beforehand to get familiar with
 its output.
 
-Before running the test suite, install its dependencies by ``cd``-ing into the
-Django ``tests/`` directory and then running:
+Before running the test suite, enter the Django ``tests/`` directory using the
+``cd tests`` command, and install test dependencies by running:
 
 .. console::
 
@@ -314,7 +314,7 @@ Writing a test for ticket #99999
 --------------------------------
 
 In order to resolve this ticket, we'll add a ``make_toast()`` function to the
-top-level ``django`` module. First we are going to write a test that tries to
+``django.shortcuts`` module. First we are going to write a test that tries to
 use the function and check that its output looks correct.
 
 Navigate to Django's ``tests/shortcuts/`` folder and create a new file

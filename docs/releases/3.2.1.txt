@@ -71,7 +71,7 @@ Bugfixes
 
 * Fixed a bug in Django 3.2 where an admin changelist would crash when deleting
   objects filtered against multi-valued relationships (:ticket:`32682`). The
-  admin changelist now uses ``Exists()`` instead ``QuerySet.distinct()``
+  admin changelist now uses ``Exists()`` instead of ``QuerySet.distinct()``
   because calling ``delete()`` after ``distinct()`` is not allowed in Django
   3.2 to address a data loss possibility.
 

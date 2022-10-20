@@ -53,7 +53,7 @@ def check_for_language(x):
 
 
 def get_language_from_request(request, check_path=False):
-    return settings.LANGUAGE_CODE
+    return None
 
 
 def get_language_from_path(request):
@@ -61,7 +61,7 @@ def get_language_from_path(request):
 
 
 def get_supported_language_variant(lang_code, strict=False):
-    if lang_code == settings.LANGUAGE_CODE:
+    if lang_code and lang_code.lower() == settings.LANGUAGE_CODE.lower():
         return lang_code
     else:
         raise LookupError(lang_code)

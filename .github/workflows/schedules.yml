@@ -1,0 +1,46 @@
+name: Schedule
+
+on:
+  schedule:
+    - cron: '42 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  trigger-runs:
+    runs-on: ubuntu-latest
+    environment: schedules
+    name: Trigger Full Build
+    # Only trigger on the main Django repository
+    if: (github.event_name == 'schedule' && github.repository == 'django/django') || (github.event_name != 'schedule')
+    strategy:
+      matrix:
+        branch:
+          - main
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.SCHEDULE_WORKFLOW_TOKEN}}
+          script: |
+            const yesterday = new Date(new Date() - (1000 * 3600 * 24)).toISOString();
+            const { data: commits } = await github.rest.repos.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: '${{ matrix.branch }}',
+              since: yesterday,
+              per_page: 1
+            });
+            if (commits.length) {
+              console.log(`Found new commit with SHA ${commits[0].sha} on branch ${{ matrix.branch }}`)
+              await github.rest.actions.createWorkflowDispatch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: '.github/workflows/schedule_tests.yml',
+                ref: '${{ matrix.branch }}',
+              })
+            } else {
+              console.log(`No commits found since ${yesterday} on brach ${{ matrix.branch }}`)
+            }

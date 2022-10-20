@@ -28,7 +28,7 @@ class Field(GDALBase):
         # Getting the pointer for this field.
         fld_ptr = capi.get_feat_field_defn(feat.ptr, index)
         if not fld_ptr:
-            raise GDALException('Cannot create OGR Field, invalid pointer given.')
+            raise GDALException("Cannot create OGR Field, invalid pointer given.")
         self.ptr = fld_ptr
 
         # Setting the class depending upon the OGR Field Type (OFT)
@@ -41,14 +41,26 @@ class Field(GDALBase):
     # #### Field Methods ####
     def as_double(self):
         "Retrieve the Field's value as a double (float)."
-        return capi.get_field_as_double(self._feat.ptr, self._index) if self.is_set else None
+        return (
+            capi.get_field_as_double(self._feat.ptr, self._index)
+            if self.is_set
+            else None
+        )
 
     def as_int(self, is_64=False):
         "Retrieve the Field's value as an integer."
         if is_64:
-            return capi.get_field_as_integer64(self._feat.ptr, self._index) if self.is_set else None
+            return (
+                capi.get_field_as_integer64(self._feat.ptr, self._index)
+                if self.is_set
+                else None
+            )
         else:
-            return capi.get_field_as_integer(self._feat.ptr, self._index) if self.is_set else None
+            return (
+                capi.get_field_as_integer(self._feat.ptr, self._index)
+                if self.is_set
+                else None
+            )
 
     def as_string(self):
         "Retrieve the Field's value as a string."
@@ -63,12 +75,22 @@ class Field(GDALBase):
             return None
         yy, mm, dd, hh, mn, ss, tz = [c_int() for i in range(7)]
         status = capi.get_field_as_datetime(
-            self._feat.ptr, self._index, byref(yy), byref(mm), byref(dd),
-            byref(hh), byref(mn), byref(ss), byref(tz))
+            self._feat.ptr,
+            self._index,
+            byref(yy),
+            byref(mm),
+            byref(dd),
+            byref(hh),
+            byref(mn),
+            byref(ss),
+            byref(tz),
+        )
         if status:
             return (yy, mm, dd, hh, mn, ss, tz)
         else:
-            raise GDALException('Unable to retrieve date & time information from the field.')
+            raise GDALException(
+                "Unable to retrieve date & time information from the field."
+            )
 
     # #### Field Properties ####
     @property
@@ -225,7 +247,6 @@ OGRFieldTypes = {
     9: OFTDate,
     10: OFTTime,
     11: OFTDateTime,
-    # New 64-bit integer types in GDAL 2
     12: OFTInteger64,
     13: OFTInteger64List,
 }

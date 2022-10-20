@@ -7,6 +7,9 @@ Trigram similarity
 
 .. fieldlookup:: trigram_similar
 
+``trigram_similar``
+-------------------
+
 The ``trigram_similar`` lookup allows you to perform trigram lookups,
 measuring the number of trigrams (three consecutive characters) shared, using a
 dedicated PostgreSQL extension. A trigram lookup is given an expression and
@@ -27,7 +30,8 @@ The ``trigram_similar`` lookup can be used on
 
 .. fieldlookup:: trigram_word_similar
 
-.. versionadded:: 4.0
+``trigram_word_similar``
+------------------------
 
 The ``trigram_word_similar`` lookup allows you to perform trigram word
 similarity lookups using a dedicated PostgreSQL extension. It can be
@@ -47,6 +51,25 @@ The ``trigram_word_similar`` lookup can be used on
 
     >>> Sentence.objects.filter(name__trigram_word_similar='Middlesborough')
     ['<Sentence: Gumby rides on the path of Middlesbrough>']
+
+.. fieldlookup:: trigram_strict_word_similar
+
+``trigram_strict_word_similar``
+-------------------------------
+
+.. versionadded:: 4.2
+
+Similar to :lookup:`trigram_word_similar`, except that it forces extent
+boundaries to match word boundaries.
+
+To use it, add ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`
+and activate the `pg_trgm extension`_ on PostgreSQL. You can install the
+extension using the
+:class:`~django.contrib.postgres.operations.TrigramExtension` migration
+operation.
+
+The ``trigram_strict_word_similar`` lookup can be used on
+:class:`~django.db.models.CharField` and :class:`~django.db.models.TextField`.
 
 .. _`pg_trgm extension`: https://www.postgresql.org/docs/current/pgtrgm.html
 

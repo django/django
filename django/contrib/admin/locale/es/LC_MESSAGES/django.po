@@ -4,7 +4,7 @@
 # abraham.martin <abraham.martin@gmail.com>, 2014
 # Antoni Aloy <aaloy@apsl.net>, 2011-2014
 # Claude Paroz <claude@2xlibre.net>, 2014
-# Ernesto Avilés, 2015-2016
+# e4db27214f7e7544f2022c647b585925_bb0e321, 2015-2016
 # 8cb2d5a716c3c9a99b6d20472609a4d5_6d03802 <ce931cb71bc28f3f828fb2dad368a4f7_5255>, 2011
 # guillem <serra.guillem@gmail.com>, 2012
 # Ignacio José Lizarán Rus <ilizaran@gmail.com>, 2019
@@ -17,14 +17,14 @@
 # Marc Garcia <garcia.marc@gmail.com>, 2011
 # Miguel Angel Tribaldos <mtribaldos@gmail.com>, 2017
 # Pablo, 2015
-# Uriel Medina <urimeba511@gmail.com>, 2020
+# Uriel Medina <urimeba511@gmail.com>, 2020-2021
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-09-25 17:35+0000\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-10 03:53+0000\n"
 "Last-Translator: Uriel Medina <urimeba511@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
@@ -33,6 +33,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Eliminar %(verbose_name_plural)s seleccionado/s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -44,10 +48,6 @@ msgstr "No se puede eliminar %(name)s"
 
 msgid "Are you sure?"
 msgstr "¿Está seguro?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Eliminar %(verbose_name_plural)s seleccionado/s"
 
 msgid "Administration"
 msgstr "Administración"
@@ -546,6 +546,12 @@ msgstr "¿Ha olvidado la contraseña o el nombre de usuario?"
 msgid "Toggle navigation"
 msgstr "Activar navegación"
 
+msgid "Start typing to filter…"
+msgstr "Empiece a escribir para filtrar…"
+
+msgid "Filter navigation items"
+msgstr "Filtrar elementos de navegación"
+
 msgid "Date/time"
 msgstr "Fecha/hora"
 
@@ -611,8 +617,8 @@ msgstr "Añadir otro %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Eliminar %(model)s seleccionada/o"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Gracias por el tiempo que ha dedicado hoy al sitio web."
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Gracias por pasar un buen rato con el sitio web hoy."
 
 msgid "Log in again"
 msgstr "Iniciar sesión de nuevo"

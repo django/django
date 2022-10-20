@@ -62,9 +62,13 @@ need to distinguish caches by the ``Accept-language`` header.
 
 .. function:: add_never_cache_headers(response)
 
+    Adds an ``Expires`` header to the current date/time.
+
     Adds a ``Cache-Control: max-age=0, no-cache, no-store, must-revalidate,
     private`` header to a response to indicate that a page should never be
     cached.
+
+    Each header is only added if it isn't already set.
 
 .. function:: patch_vary_headers(response, newheaders)
 
@@ -328,7 +332,8 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
 .. class:: SyndicationFeed
 
-    Base class for all syndication feeds. Subclasses should provide write().
+    Base class for all syndication feeds. Subclasses should provide
+    ``write()``.
 
     .. method:: __init__(title, link, description, language=None, author_email=None, author_name=None, author_link=None, subtitle=None, categories=None, feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs)
 
@@ -504,6 +509,11 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
         z = person.friends         # does not call
         x is z                     # is True
 
+    .. deprecated:: 4.1
+
+        The ``name`` parameter is deprecated and will be removed in Django 5.0
+        as it's unnecessary as of Python 3.6.
+
 .. class:: classproperty(method=None)
 
     Similar to :py:func:`@classmethod <classmethod>`, the ``@classproperty``
@@ -591,7 +601,7 @@ escaping HTML.
 
 .. function:: conditional_escape(text)
 
-    Similar to ``escape()``, except that it doesn't operate on pre-escaped
+    Similar to ``escape()``, except that it doesn't operate on preescaped
     strings, so it will not double escape.
 
 .. function:: format_html(format_string, *args, **kwargs)
@@ -644,6 +654,29 @@ escaping HTML.
             '\n', "<li>{} {}</li>",
             ((u.first_name, u.last_name) for u in users)
         )
+
+.. function:: json_script(value, element_id=None, encoder=None)
+
+    Escapes all HTML/XML special characters with their Unicode escapes, so
+    value is safe for use with JavaScript. Also wraps the escaped JSON in a
+    ``<script>`` tag. If the ``element_id`` parameter is not ``None``, the
+    ``<script>`` tag is given the passed id. For example::
+
+        >> json_script({"hello": "world"}, element_id="hello-data")
+        '<script id="hello-data" type="application/json">{"hello": "world"}</script>'
+
+    The ``encoder``, which defaults to
+    :class:`django.core.serializers.json.DjangoJSONEncoder`, will be used to
+    serialize the data. See :ref:`JSON serialization
+    <serialization-formats-json>` for more details about this serializer.
+
+    .. versionchanged:: 4.1
+
+        In older versions, the ``element_id`` argument was required.
+
+    .. versionchanged:: 4.2
+
+        The ``encoder`` argument was added.
 
 .. function:: strip_tags(value)
 
@@ -832,6 +865,11 @@ appropriate entities.
 .. data:: utc
 
     :class:`~datetime.tzinfo` instance that represents UTC.
+
+    .. deprecated:: 4.1
+
+        This is an alias to :attr:`datetime.timezone.utc`. Use
+        :attr:`datetime.timezone.utc` directly.
 
 .. function:: get_fixed_timezone(offset)
 

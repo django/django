@@ -4,13 +4,13 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lardissone <lardissone@gmail.com>, 2014
 # poli <poli@devartis.com>, 2014
-# Ramiro Morales, 2013-2021
+# Ramiro Morales, 2013-2022
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-03-21 12:52+0000\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-07-25 06:49+0000\n"
 "Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -209,6 +209,9 @@ msgstr "mongol"
 msgid "Marathi"
 msgstr "maratí"
 
+msgid "Malay"
+msgstr "malayo"
+
 msgid "Burmese"
 msgstr "burmés"
 
@@ -385,6 +388,10 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Asegúrese de que este valor sea mayor o igual a %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "Asegúrese de que este valor sea múltiplo de %(limit_value)s."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -456,6 +463,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "Ya existe un/a %(model_name)s con este/a %(field_labels)s."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "No se cumple la restricción “%(name)s”."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "El valor %(value)r no es una opción válida."
 
@@ -469,8 +480,8 @@ msgstr "Este campo no puede estar en blanco."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Ya existe un/a %(model_name)s con este/a %(field_label)s."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -771,16 +782,16 @@ msgstr ""
 "un error."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Por favor envíe un máximo de %d formulario."
-msgstr[1] "Por favor envíe un máximo de %d formularios."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Por favor envíe un máximo de %(num)d formulario."
+msgstr[1] "Por favor envíe un máximo de %(num)d formularios."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Por favor envíe %d o mas formularios."
-msgstr[1] "Por favor envíe %d o mas formularios."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Por favor envíe %(num)d o mas formularios."
+msgstr[1] "Por favor envíe %(num)d o mas formularios."
 
 msgid "Order"
 msgstr "Ordenar"
@@ -895,22 +906,22 @@ msgid "noon"
 msgstr "mediodía"
 
 msgid "Monday"
-msgstr "Lunes"
+msgstr "lunes"
 
 msgid "Tuesday"
-msgstr "Martes"
+msgstr "martes"
 
 msgid "Wednesday"
-msgstr "Miércoles"
+msgstr "miércoles"
 
 msgid "Thursday"
-msgstr "Jueves"
+msgstr "jueves"
 
 msgid "Friday"
-msgstr "Viernes"
+msgstr "viernes"
 
 msgid "Saturday"
-msgstr "Sábado"
+msgstr "sábado"
 
 msgid "Sunday"
 msgstr "Domingo"
@@ -937,40 +948,40 @@ msgid "Sun"
 msgstr "Dom"
 
 msgid "January"
-msgstr "Enero"
+msgstr "enero"
 
 msgid "February"
-msgstr "Febrero"
+msgstr "febrero"
 
 msgid "March"
-msgstr "Marzo"
+msgstr "marzo"
 
 msgid "April"
-msgstr "Abril"
+msgstr "abril"
 
 msgid "May"
-msgstr "Mayo"
+msgstr "mayo"
 
 msgid "June"
-msgstr "Junio"
+msgstr "junio"
 
 msgid "July"
-msgstr "Julio"
+msgstr "julio"
 
 msgid "August"
-msgstr "Agosto"
+msgstr "agosto"
 
 msgid "September"
-msgstr "Setiembre"
+msgstr "setiembre"
 
 msgid "October"
-msgstr "Octubre"
+msgstr "octubre"
 
 msgid "November"
-msgstr "Noviembre"
+msgstr "noviembre"
 
 msgid "December"
-msgstr "Diciembre"
+msgstr "diciembre"
 
 msgid "jan"
 msgstr "ene"
@@ -1120,40 +1131,40 @@ msgid ", "
 msgstr ", "
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d año"
-msgstr[1] "%d años"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d año"
+msgstr[1] "%(num)d años"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d mes"
-msgstr[1] "%d meses"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d mes"
+msgstr[1] "%(num)d meses"
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d semana"
-msgstr[1] "%d semanas"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d semana"
+msgstr[1] "%(num)d semanas"
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d día"
-msgstr[1] "%d días"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d día"
+msgstr[1] "%(num)d días"
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d hora"
-msgstr[1] "%d horas"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d hora"
+msgstr[1] "%(num)d horas"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minuto"
-msgstr[1] "%d minutos"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d minuto"
+msgstr[1] "%(num)d minutos"
 
 msgid "Forbidden"
 msgstr "Prohibido"
@@ -1163,15 +1174,15 @@ msgstr "Verificación CSRF fallida. Petición abortada."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
 "Ud. está viendo este mensaje porque este sitio HTTPS tiene como "
-"requerimiento que su browser Web envíe una cabecera “Referer” pero el mismo "
-"no ha enviado una. El hecho de que esta cabecera sea obligatoria es una "
-"medida de seguridad para comprobar que su browser no está siendo controlado "
-"por terceros."
+"requerimiento que su navegador web envíe un encabezado “Referer” pero el "
+"mismo no ha enviado uno. El hecho de que este  encabezado sea obligatorio es "
+"una medida de seguridad para comprobar que su navegador no está siendo "
+"controlado por terceros."
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"

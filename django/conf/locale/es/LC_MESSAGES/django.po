@@ -1,17 +1,23 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# 8cb2d5a716c3c9a99b6d20472609a4d5_6d03802 <ce931cb71bc28f3f828fb2dad368a4f7_5255>, 2011
+# Abe Estrada, 2013
 # Abe Estrada, 2013
 # albertoalcolea <albertoalcolea@gmail.com>, 2014
+# albertoalcolea <albertoalcolea@gmail.com>, 2014
+# Amanda Copete, 2017
 # Amanda Copete, 2017
 # Antoni Aloy <aaloy@apsl.net>, 2011-2014,2017,2019
 # Claude Paroz <claude@2xlibre.net>, 2020
 # Diego Andres Sanabria Martin <diegueus9@gmail.com>, 2012
 # Diego Schulz <dschulz@gmail.com>, 2012
+# e4db27214f7e7544f2022c647b585925_bb0e321, 2014,2020
 # e4db27214f7e7544f2022c647b585925_bb0e321, 2015-2016
 # e4db27214f7e7544f2022c647b585925_bb0e321, 2014
 # e4db27214f7e7544f2022c647b585925_bb0e321, 2020
-# Ernesto Rico Schmidt <e.rico.schmidt@gmail.com>, 2017
+# Ernesto Rico Schmidt <ernesto@rico-schmidt.name>, 2017
+# Ernesto Rico Schmidt <ernesto@rico-schmidt.name>, 2017
 # 8cb2d5a716c3c9a99b6d20472609a4d5_6d03802 <ce931cb71bc28f3f828fb2dad368a4f7_5255>, 2011
 # Ignacio José Lizarán Rus <ilizaran@gmail.com>, 2019
 # Igor Támara <igor@tamarapatino.org>, 2015
@@ -21,6 +27,8 @@
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011,2013
 # Luigy, 2019
 # Marc Garcia <garcia.marc@gmail.com>, 2011
+# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
+# mpachas <miguel.pachas.garcia@gmail.com>, 2022
 # monobotsoft <monobot.soft@gmail.com>, 2012
 # ntrrgc <ntrrgc@gmail.com>, 2013
 # ntrrgc <ntrrgc@gmail.com>, 2013
@@ -32,9 +40,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-02-11 06:03+0000\n"
-"Last-Translator: Uriel Medina <urimeba511@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-07-25 06:49+0000\n"
+"Last-Translator: mpachas <miguel.pachas.garcia@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -232,6 +240,9 @@ msgstr "Mongol"
 msgid "Marathi"
 msgstr "Maratí"
 
+msgid "Malay"
+msgstr "Malayo"
+
 msgid "Burmese"
 msgstr "Birmano"
 
@@ -410,6 +421,10 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Asegúrese de que este valor es mayor o igual a %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "Asegúrese de que este valor es múltiplo de %(limit_value)s."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -481,6 +496,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s con este %(field_labels)s ya existe."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "No se cumple la restricción \"%(name)s\"."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Valor %(value)r no es una opción válida."
 
@@ -494,8 +513,8 @@ msgstr "Este campo no puede estar vacío."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Ya existe %(model_name)s con este %(field_label)s."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -796,16 +815,16 @@ msgstr ""
 "problema persiste."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Por favor, envíe %d formulario como máximo."
-msgstr[1] "Por favor, envíe %d formularios como máximo."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Por favor, envíe %(num)d formulario como máximo."
+msgstr[1] "Por favor, envíe %(num)d formularios como máximo."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Por favor, envíe %d formulario como máximo."
-msgstr[1] "Por favor, envíe %d formularios como máximo."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Por favor, envíe %(num)d formulario como mínimo."
+msgstr[1] "Por favor, envíe %(num)d formularios como mínimo."
 
 msgid "Order"
 msgstr "Orden"
@@ -918,82 +937,82 @@ msgid "noon"
 msgstr "mediodía"
 
 msgid "Monday"
-msgstr "Lunes"
+msgstr "lunes"
 
 msgid "Tuesday"
-msgstr "Martes"
+msgstr "martes"
 
 msgid "Wednesday"
-msgstr "Miércoles"
+msgstr "miércoles"
 
 msgid "Thursday"
-msgstr "Jueves"
+msgstr "jueves"
 
 msgid "Friday"
-msgstr "Viernes"
+msgstr "viernes"
 
 msgid "Saturday"
-msgstr "Sábado"
+msgstr "sábado"
 
 msgid "Sunday"
-msgstr "Domingo"
+msgstr "domingo"
 
 msgid "Mon"
-msgstr "Lun"
+msgstr "lun"
 
 msgid "Tue"
-msgstr "Mar"
+msgstr "mar"
 
 msgid "Wed"
-msgstr "Mié"
+msgstr "mié"
 
 msgid "Thu"
-msgstr "Jue"
+msgstr "jue"
 
 msgid "Fri"
-msgstr "Vie"
+msgstr "vie"
 
 msgid "Sat"
-msgstr "Sáb"
+msgstr "sáb"
 
 msgid "Sun"
-msgstr "Dom"
+msgstr "dom"
 
 msgid "January"
-msgstr "Enero"
+msgstr "enero"
 
 msgid "February"
-msgstr "Febrero"
+msgstr "febrero"
 
 msgid "March"
-msgstr "Marzo"
+msgstr "marzo"
 
 msgid "April"
-msgstr "Abril"
+msgstr "abril"
 
 msgid "May"
-msgstr "Mayo"
+msgstr "mayo"
 
 msgid "June"
-msgstr "Junio"
+msgstr "junio"
 
 msgid "July"
-msgstr "Julio"
+msgstr "julio"
 
 msgid "August"
-msgstr "Agosto"
+msgstr "agosto"
 
 msgid "September"
-msgstr "Septiembre"
+msgstr "septiembre"
 
 msgid "October"
-msgstr "Octubre"
+msgstr "octubre"
 
 msgid "November"
-msgstr "Noviembre"
+msgstr "noviembre"
 
 msgid "December"
-msgstr "Diciembre"
+msgstr "diciembre"
 
 msgid "jan"
 msgstr "ene"
@@ -1041,91 +1060,91 @@ msgstr "Feb."
 
 msgctxt "abbrev. month"
 msgid "March"
-msgstr "Mar."
+msgstr "marzo"
 
 msgctxt "abbrev. month"
 msgid "April"
-msgstr "Abr."
+msgstr "abril"
 
 msgctxt "abbrev. month"
 msgid "May"
-msgstr "Mayo"
+msgstr "mayo"
 
 msgctxt "abbrev. month"
 msgid "June"
-msgstr "Jun."
+msgstr "junio"
 
 msgctxt "abbrev. month"
 msgid "July"
-msgstr "Jul."
+msgstr "julio"
 
 msgctxt "abbrev. month"
 msgid "Aug."
-msgstr "Ago."
+msgstr "ago."
 
 msgctxt "abbrev. month"
 msgid "Sept."
-msgstr "Sept."
+msgstr "sept."
 
 msgctxt "abbrev. month"
 msgid "Oct."
-msgstr "Oct."
+msgstr "oct."
 
 msgctxt "abbrev. month"
 msgid "Nov."
-msgstr "Nov."
+msgstr "nov."
 
 msgctxt "abbrev. month"
 msgid "Dec."
-msgstr "Dic."
+msgstr "dic."
 
 msgctxt "alt. month"
 msgid "January"
-msgstr "Enero"
+msgstr "enero"
 
 msgctxt "alt. month"
 msgid "February"
-msgstr "Febrero"
+msgstr "febrero"
 
 msgctxt "alt. month"
 msgid "March"
-msgstr "Marzo"
+msgstr "marzo"
 
 msgctxt "alt. month"
 msgid "April"
-msgstr "Abril"
+msgstr "abril"
 
 msgctxt "alt. month"
 msgid "May"
-msgstr "Mayo"
+msgstr "mayo"
 
 msgctxt "alt. month"
 msgid "June"
-msgstr "Junio"
+msgstr "junio"
 
 msgctxt "alt. month"
 msgid "July"
-msgstr "Julio"
+msgstr "julio"
 
 msgctxt "alt. month"
 msgid "August"
-msgstr "Agosto"
+msgstr "agosto"
 
 msgctxt "alt. month"
 msgid "September"
-msgstr "Septiembre"
+msgstr "septiembre"
 
 msgctxt "alt. month"
 msgid "October"
-msgstr "Octubre"
+msgstr "octubre"
 
 msgctxt "alt. month"
 msgid "November"
-msgstr "Noviembre"
+msgstr "noviembre"
 
 msgctxt "alt. month"
 msgid "December"
-msgstr "Diciembre"
+msgstr "diciembre"
 
 msgid "This is not a valid IPv6 address."
 msgstr "No es una dirección IPv6 válida."
@@ -1133,7 +1152,7 @@ msgstr "No es una dirección IPv6 válida."
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s…"
-msgstr "%(truncated_text)s..."
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "o"
@@ -1143,40 +1162,40 @@ msgid ", "
 msgstr ", "
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d año"
-msgstr[1] "%d años"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d años"
+msgstr[1] "%(num)d años"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d mes"
-msgstr[1] "%d meses"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d mes"
+msgstr[1] "%(num)d meses"
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d semana"
-msgstr[1] "%d semanas"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d semana"
+msgstr[1] "%(num)d semanas"
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d día"
-msgstr[1] "%d días"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d día"
+msgstr[1] "%(num)d días"
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d hora"
-msgstr[1] "%d horas"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d hora"
+msgstr[1] "%(num)d horas"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minuto"
-msgstr[1] "%d minutos"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d minutos"
+msgstr[1] "%(num)d minutes"
 
 msgid "Forbidden"
 msgstr "Prohibido"
@@ -1186,11 +1205,11 @@ msgstr "La verificación CSRF ha fallado. Solicitud abortada."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Está viendo este mensaje porque este sitio HTTPS requiere que su navegador "
+"Estás viendo este mensaje porque este sitio HTTPS requiere que tu navegador "
 "web envíe un \"encabezado de referencia\", pero no se envió ninguno. Este "
 "encabezado es necesario por razones de seguridad, para garantizar que su "
 "navegador no sea secuestrado por terceros."

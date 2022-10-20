@@ -9,7 +9,7 @@ Django comes with an optional "flatpages" application. It lets you store "flat"
 HTML content in a database and handles the management for you via Django's
 admin interface and a Python API.
 
-A flatpage is a object with a URL, title and content. Use it for one-off,
+A flatpage is an object with a URL, title and content. Use it for one-off,
 special-case pages, such as "About" or "Privacy Policy" pages, that you want to
 store in a database but for which you don't want to develop a custom Django
 application.
@@ -185,17 +185,17 @@ registering a custom ``ModelAdmin`` for ``FlatPage``::
 
     # Define a new FlatPageAdmin
     class FlatPageAdmin(FlatPageAdmin):
-        fieldsets = (
-            (None, {'fields': ('url', 'title', 'content', 'sites')}),
+        fieldsets = [
+            (None, {'fields': ['url', 'title', 'content', 'sites']}),
             (_('Advanced options'), {
-                'classes': ('collapse',),
-                'fields': (
+                'classes': ['collapse'],
+                'fields': [
                     'enable_comments',
                     'registration_required',
                     'template_name',
-                ),
+                ],
             }),
-        )
+        ]
 
     # Re-register FlatPageAdmin
     admin.site.unregister(FlatPage)

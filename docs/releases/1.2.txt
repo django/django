@@ -16,32 +16,28 @@ Overview
 
 Django 1.2 introduces several large, important new features, including:
 
-* Support for `multiple database connections`_ in a single Django instance.
+* Support for :ref:`multiple database connections
+  <support-for-multiple-databases>` in a single Django instance.
 
 * `Model validation`_ inspired by Django's form validation.
 
-* Vastly `improved protection against Cross-Site Request Forgery`_ (CSRF).
+* Vastly :ref:`improved protection against Cross-Site Request Forgery
+  <improved-csrf-protection>` (CSRF).
 
-* A new `user "messages" framework`_ with support for cookie- and session-based
-  message for both anonymous and authenticated users.
+* A new :ref:`user "messages" framework <messages-framework>` with support for
+  cookie- and session-based message for both anonymous and authenticated users.
 
 * Hooks for `object-level permissions`_, `permissions for anonymous users`_,
-  and `more flexible username requirements`_.
+  and :ref:`more flexible username requirements
+  <relaxed-requirements-for-usernames>`.
 
 * Customization of email sending via `email backends`_.
 
 * New :ref:`"smart" if template tag <new-in-1.2-smart-if>` which supports
   comparison operators.
 
-.. _multiple database connections: `support for multiple databases`_
-.. _improved protection against Cross-Site Request Forgery: `improved CSRF protection`_
-.. _user "messages" framework: `messages framework`_
-.. _more flexible username requirements: `relaxed requirements for usernames`_
-
-These are just the highlights; full details and a complete list of features `may
-be found below`_.
-
-.. _may be found below: `What's new in Django 1.2`_
+These are just the highlights; full details and a complete list of features
+:ref:`may be found below <whats-new-1.2>`.
 
 .. seealso::
 
@@ -80,9 +76,8 @@ backwards-incompatible. The big changes are:
   :func:`~django.contrib.auth.decorators.login_required`, and
   :func:`~django.contrib.auth.decorators.permission_required`, decorators
   from :mod:`django.contrib.auth` only apply to functions and no longer
-  work on methods. There's a simple one-line fix `detailed below`_.
-
-.. _detailed below: `user_passes_test, login_required and permission_required`_
+  work on methods. There's a simple one-line fix :ref:`detailed below
+  <user-passes-test-login-required-permission-required>`.
 
 Again, these are just the big features that will affect the most users. Users
 upgrading from previous versions of Django are heavily encouraged to consult
@@ -118,6 +113,8 @@ announced prior to the release of Django 1.3.
 What's new in Django 1.2
 ========================
 
+.. _support-for-multiple-databases:
+
 Support for multiple databases
 ------------------------------
 
@@ -137,6 +134,8 @@ validation behavior. Note, however, that validation must still be performed
 explicitly. Simply invoking a model instance's ``save()`` method will not
 perform any validation of the instance's data.
 
+.. _improved-csrf-protection:
+
 Improved CSRF protection
 ------------------------
 
@@ -147,6 +146,8 @@ perform some action on your website, using the credentials of a logged-in user
 who visits the malicious site in their browser. A related type of attack, "login
 CSRF," where an attacking site tricks a user's browser into logging into a site
 with someone else's credentials, is also covered.
+
+.. _messages-framework:
 
 Messages framework
 ------------------
@@ -176,6 +177,8 @@ User already did.  This is useful for centralizing permission handling - apps
 can always delegate the question of whether something is allowed or not to
 the authorization/authentication backend. See the :doc:`authentication
 docs </topics/auth/index>` for more details.
+
+.. _relaxed-requirements-for-usernames:
 
 Relaxed requirements for usernames
 ----------------------------------
@@ -557,6 +560,8 @@ independent rendering. When the :ttag:`cycle` tag was not thread safe,
 the state of the :ttag:`cycle` tag would leak between multiple
 renderings of the same :ttag:`include`. Now that the :ttag:`cycle` tag
 is thread safe, this leakage no longer occurs.
+
+.. _user-passes-test-login-required-permission-required:
 
 ``user_passes_test``, ``login_required`` and ``permission_required``
 --------------------------------------------------------------------

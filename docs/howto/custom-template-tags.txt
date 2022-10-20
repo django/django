@@ -79,8 +79,8 @@ an application.
 .. admonition:: Behind the scenes
 
     For a ton of examples, read the source code for Django's default filters
-    and tags. They're in ``django/template/defaultfilters.py`` and
-    ``django/template/defaulttags.py``, respectively.
+    and tags. They're in :source:`django/template/defaultfilters.py` and
+    :source:`django/template/defaulttags.py`, respectively.
 
     For more information on the :ttag:`load` tag, read its documentation.
 
@@ -1153,5 +1153,5 @@ The only new concept here is the ``self.nodelist.render(context)`` in
 ``UpperNode.render()``.
 
 For more examples of complex rendering, see the source code of
-:ttag:`{% for %}<for>` in ``django/template/defaulttags.py`` and
-:ttag:`{% if %}<if>` in ``django/template/smartif.py``.
+:ttag:`{% for %}<for>` in :source:`django/template/defaulttags.py` and
+:ttag:`{% if %}<if>` in :source:`django/template/smartif.py`.

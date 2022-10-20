@@ -7,6 +7,6 @@ def helloworld(request):
 
 
 urlpatterns = [
-    path('', helloworld),
-    path('file/', lambda x: FileResponse(open(__file__, 'rb'))),
+    path("", helloworld),
+    path("file/", lambda x: FileResponse(open(__file__, "rb"))),
 ]

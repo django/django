@@ -18,10 +18,10 @@ class Apps:
     """
 
     def __init__(self, installed_apps=()):
-        # installed_apps is set to None when creating the master registry
+        # installed_apps is set to None when creating the main registry
         # because it cannot be populated at that point. Other registries must
         # provide a list of installed apps and are populated immediately.
-        if installed_apps is None and hasattr(sys.modules[__name__], 'apps'):
+        if installed_apps is None and hasattr(sys.modules[__name__], "apps"):
             raise RuntimeError("You must supply an installed_apps argument.")
 
         # Mapping of app labels => model names => model classes. Every time a
@@ -54,7 +54,7 @@ class Apps:
         # `lazy_model_operation()` and `do_pending_operations()` methods.
         self._pending_operations = defaultdict(list)
 
-        # Populate apps and models, unless it's the master registry.
+        # Populate apps and models, unless it's the main registry.
         if installed_apps is not None:
             self.populate(installed_apps)
 
@@ -92,20 +92,22 @@ class Apps:
                 if app_config.label in self.app_configs:
                     raise ImproperlyConfigured(
                         "Application labels aren't unique, "
-                        "duplicates: %s" % app_config.label)
+                        "duplicates: %s" % app_config.label
+                    )
 
                 self.app_configs[app_config.label] = app_config
                 app_config.apps = self
 
             # Check for duplicate app names.
             counts = Counter(
-                app_config.name for app_config in self.app_configs.values())
-            duplicates = [
-                name for name, count in counts.most_common() if count > 1]
+                app_config.name for app_config in self.app_configs.values()
+            )
+            duplicates = [name for name, count in counts.most_common() if count > 1]
             if duplicates:
                 raise ImproperlyConfigured(
                     "Application names aren't unique, "
-                    "duplicates: %s" % ", ".join(duplicates))
+                    "duplicates: %s" % ", ".join(duplicates)
+                )
 
             self.apps_ready = True
 
@@ -201,7 +203,7 @@ class Apps:
             self.check_apps_ready()
 
         if model_name is None:
-            app_label, model_name = app_label.split('.')
+            app_label, model_name = app_label.split(".")
 
         app_config = self.get_app_config(app_label)
 
@@ -217,17 +219,22 @@ class Apps:
         model_name = model._meta.model_name
         app_models = self.all_models[app_label]
         if model_name in app_models:
-            if (model.__name__ == app_models[model_name].__name__ and
-                    model.__module__ == app_models[model_name].__module__):
+            if (
+                model.__name__ == app_models[model_name].__name__
+                and model.__module__ == app_models[model_name].__module__
+            ):
                 warnings.warn(
-                    "Model '%s.%s' was already registered. "
-                    "Reloading models is not advised as it can lead to inconsistencies, "
-                    "most notably with related models." % (app_label, model_name),
-                    RuntimeWarning, stacklevel=2)
+                    "Model '%s.%s' was already registered. Reloading models is not "
+                    "advised as it can lead to inconsistencies, most notably with "
+                    "related models." % (app_label, model_name),
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
             else:
                 raise RuntimeError(
-                    "Conflicting '%s' models in application '%s': %s and %s." %
-                    (model_name, app_label, app_models[model_name], model))
+                    "Conflicting '%s' models in application '%s': %s and %s."
+                    % (model_name, app_label, app_models[model_name], model)
+                )
         app_models[model_name] = model
         self.do_pending_operations(model)
         self.clear_cache()
@@ -254,8 +261,8 @@ class Apps:
         candidates = []
         for app_config in self.app_configs.values():
             if object_name.startswith(app_config.name):
-                subpath = object_name[len(app_config.name):]
-                if subpath == '' or subpath[0] == '.':
+                subpath = object_name[len(app_config.name) :]
+                if subpath == "" or subpath[0] == ".":
                     candidates.append(app_config)
         if candidates:
             return sorted(candidates, key=lambda ac: -len(ac.name))[0]
@@ -270,8 +277,7 @@ class Apps:
         """
         model = self.all_models[app_label].get(model_name.lower())
         if model is None:
-            raise LookupError(
-                "Model '%s.%s' not registered." % (app_label, model_name))
+            raise LookupError("Model '%s.%s' not registered." % (app_label, model_name))
         return model
 
     @functools.lru_cache(maxsize=None)
@@ -286,13 +292,14 @@ class Apps:
         change after Django has loaded the settings, there is no reason to get
         the respective settings attribute over and over again.
         """
+        to_string = to_string.lower()
         for model in self.get_models(include_swapped=True):
             swapped = model._meta.swapped
             # Is this model swapped out for the model given by to_string?
-            if swapped and swapped == to_string:
+            if swapped and swapped.lower() == to_string:
                 return model._meta.swappable
             # Is this model swappable and the one given by to_string?
-            if model._meta.swappable and model._meta.label == to_string:
+            if model._meta.swappable and model._meta.label_lower == to_string:
                 return model._meta.swappable
         return None
 
@@ -402,6 +409,7 @@ class Apps:
             def apply_next_model(model):
                 next_function = partial(apply_next_model.func, model)
                 self.lazy_model_operation(next_function, *more_models)
+
             apply_next_model.func = function
 
             # If the model has already been imported and registered, partially

@@ -63,7 +63,7 @@ You'll need a few things before getting started:
 * Access to Django's record on PyPI. Create a file with your credentials:
 
   .. code-block:: ini
-    :caption: ~/.pypirc
+    :caption: ``~/.pypirc``
 
     [pypi]
     username:YourUsername
@@ -100,8 +100,8 @@ any time leading up to the actual release:
 #. As the release approaches, watch Trac to make sure no release blockers
    are left for the upcoming release.
 
-#. Check with the other committers to make sure they don't have any
-   uncommitted changes for the release.
+#. Check with the other mergers to make sure they don't have any uncommitted
+   changes for the release.
 
 #. Proofread the release notes, including looking at the online version to
    :ref:`catch any broken links <documentation-link-check>` or reST errors, and
@@ -121,9 +121,9 @@ any time leading up to the actual release:
 
         $ python scripts/manage_translations.py fetch
 
-   and then commit the changed/added files (both .po and .mo). Sometimes there
-   are validation errors which need to be debugged, so avoid doing this task
-   immediately before a release is needed.
+   and then commit the changed/added files (both ``.po`` and ``.mo``).
+   Sometimes there are validation errors which need to be debugged, so avoid
+   doing this task immediately before a release is needed.
 
 #. :ref:`Update the django-admin manual page <django-admin-manpage>`::
 
@@ -314,16 +314,12 @@ Now you're ready to actually put the release out there. To do this:
 
         $ scp Django-A.B.C.checksum.txt.asc djangoproject.com:/home/www/www/media/pgp/Django-A.B.C.checksum.txt
 
-#. Test that the release packages install correctly using ``easy_install``
-   and ``pip``. Here's one method::
+#. Test that the release packages install correctly using ``pip``. Here's one
+   method::
 
         $ RELEASE_VERSION='1.7.2'
         $ MAJOR_VERSION=`echo $RELEASE_VERSION| cut -c 1-3`
 
-        $ python -m venv django-easy-install
-        $ . django-easy-install/bin/activate
-        $ easy_install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz
-        $ deactivate
         $ python -m venv django-pip
         $ . django-pip/bin/activate
         $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz
@@ -349,9 +345,9 @@ Now you're ready to actually put the release out there. To do this:
        $ twine upload -s dist/*
 
 #. Go to the `Add release page in the admin`__, enter the new release number
-   exactly as it appears in the name of the tarball (Django-<version>.tar.gz).
-   So for example enter "1.5.1" or "1.4c2", etc. If the release is part of
-   an LTS branch, mark it so.
+   exactly as it appears in the name of the tarball
+   (``Django-<version>.tar.gz``). So for example enter "1.5.1" or "1.4c2", etc.
+   If the release is part of an LTS branch, mark it so.
 
    __ https://www.djangoproject.com/admin/releases/release/add/
 

@@ -5,9 +5,9 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            'Foo',
+            "Foo",
             [
-                ('id', models.AutoField(primary_key=True)),
+                ("id", models.AutoField(primary_key=True)),
             ],
         ),
     ]

@@ -5,36 +5,50 @@ import unicodedata
 from binascii import Error as BinasciiError
 from email.utils import formatdate
 from urllib.parse import (
-    ParseResult, SplitResult, _coerce_args, _splitnetloc, _splitparams,
-    scheme_chars, urlencode as original_urlencode, uses_params,
+    ParseResult,
+    SplitResult,
+    _coerce_args,
+    _splitnetloc,
+    _splitparams,
+    scheme_chars,
+    unquote,
 )
+from urllib.parse import urlencode as original_urlencode
+from urllib.parse import uses_params
 
 from django.utils.datastructures import MultiValueDict
 from django.utils.regex_helper import _lazy_re_compile
 
 # based on RFC 7232, Appendix C
-ETAG_MATCH = _lazy_re_compile(r'''
+ETAG_MATCH = _lazy_re_compile(
+    r"""
     \A(      # start of string and capture group
     (?:W/)?  # optional weak indicator
     "        # opening quote
     [^"]*    # any sequence of non-quote characters
     "        # end quote
     )\Z      # end of string and capture group
-''', re.X)
+""",
+    re.X,
+)
 
-MONTHS = 'jan feb mar apr may jun jul aug sep oct nov dec'.split()
-__D = r'(?P<day>\d{2})'
-__D2 = r'(?P<day>[ \d]\d)'
-__M = r'(?P<mon>\w{3})'
-__Y = r'(?P<year>\d{4})'
-__Y2 = r'(?P<year>\d{2})'
-__T = r'(?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})'
-RFC1123_DATE = _lazy_re_compile(r'^\w{3}, %s %s %s %s GMT$' % (__D, __M, __Y, __T))
-RFC850_DATE = _lazy_re_compile(r'^\w{6,9}, %s-%s-%s %s GMT$' % (__D, __M, __Y2, __T))
-ASCTIME_DATE = _lazy_re_compile(r'^\w{3} %s %s %s %s$' % (__M, __D2, __T, __Y))
+MONTHS = "jan feb mar apr may jun jul aug sep oct nov dec".split()
+__D = r"(?P<day>[0-9]{2})"
+__D2 = r"(?P<day>[ 0-9][0-9])"
+__M = r"(?P<mon>\w{3})"
+__Y = r"(?P<year>[0-9]{4})"
+__Y2 = r"(?P<year>[0-9]{2})"
+__T = r"(?P<hour>[0-9]{2}):(?P<min>[0-9]{2}):(?P<sec>[0-9]{2})"
+RFC1123_DATE = _lazy_re_compile(r"^\w{3}, %s %s %s %s GMT$" % (__D, __M, __Y, __T))
+RFC850_DATE = _lazy_re_compile(r"^\w{6,9}, %s-%s-%s %s GMT$" % (__D, __M, __Y2, __T))
+ASCTIME_DATE = _lazy_re_compile(r"^\w{3} %s %s %s %s$" % (__M, __D2, __T, __Y))
 
 RFC3986_GENDELIMS = ":/?#[]@"
 RFC3986_SUBDELIMS = "!$&'()*+,;="
+
+# TODO: Remove when dropping support for PY38.
+# Unsafe bytes to be removed per WHATWG spec.
+_UNSAFE_URL_BYTES_TO_REMOVE = ["\t", "\r", "\n"]
 
 
 def urlencode(query, doseq=False):
@@ -44,7 +58,7 @@ def urlencode(query, doseq=False):
     """
     if isinstance(query, MultiValueDict):
         query = query.lists()
-    elif hasattr(query, 'items'):
+    elif hasattr(query, "items"):
         query = query.items()
     query_params = []
     for key, value in query:
@@ -112,7 +126,7 @@ def parse_http_date(date):
         raise ValueError("%r is not in a valid HTTP date format" % date)
     try:
         tz = datetime.timezone.utc
-        year = int(m['year'])
+        year = int(m["year"])
         if year < 100:
             current_year = datetime.datetime.now(tz=tz).year
             current_century = current_year - (current_year % 100)
@@ -122,11 +136,11 @@ def parse_http_date(date):
                 year += current_century - 100
             else:
                 year += current_century
-        month = MONTHS.index(m['mon'].lower()) + 1
-        day = int(m['day'])
-        hour = int(m['hour'])
-        min = int(m['min'])
-        sec = int(m['sec'])
+        month = MONTHS.index(m["mon"].lower()) + 1
+        day = int(m["day"])
+        hour = int(m["hour"])
+        min = int(m["min"])
+        sec = int(m["sec"])
         result = datetime.datetime(year, month, day, hour, min, sec, tzinfo=tz)
         return int(result.timestamp())
     except Exception as exc:
@@ -145,6 +159,7 @@ def parse_http_date_safe(date):
 
 # Base 36 functions: useful for generating compact URLs
 
+
 def base36_to_int(s):
     """
     Convert a base 36 string to an int. Raise ValueError if the input won't fit
@@ -160,12 +175,12 @@ def base36_to_int(s):
 
 def int_to_base36(i):
     """Convert an integer to a base36 string."""
-    char_set = '0123456789abcdefghijklmnopqrstuvwxyz'
+    char_set = "0123456789abcdefghijklmnopqrstuvwxyz"
     if i < 0:
         raise ValueError("Negative base36 conversion input.")
     if i < 36:
         return char_set[i]
-    b36 = ''
+    b36 = ""
     while i != 0:
         i, n = divmod(i, 36)
         b36 = char_set[n] + b36
@@ -177,7 +192,7 @@ def urlsafe_base64_encode(s):
     Encode a bytestring to a base64 string for use in URLs. Strip any trailing
     equal signs.
     """
-    return base64.urlsafe_b64encode(s).rstrip(b'\n=').decode('ascii')
+    return base64.urlsafe_b64encode(s).rstrip(b"\n=").decode("ascii")
 
 
 def urlsafe_base64_decode(s):
@@ -187,7 +202,7 @@ def urlsafe_base64_decode(s):
     """
     s = s.encode()
     try:
-        return base64.urlsafe_b64decode(s.ljust(len(s) + len(s) % 4, b'='))
+        return base64.urlsafe_b64decode(s.ljust(len(s) + len(s) % 4, b"="))
     except (LookupError, BinasciiError) as e:
         raise ValueError(e)
 
@@ -198,11 +213,11 @@ def parse_etags(etag_str):
     defined by RFC 7232. Return a list of quoted ETags, or ['*'] if all ETags
     should be matched.
     """
-    if etag_str.strip() == '*':
-        return ['*']
+    if etag_str.strip() == "*":
+        return ["*"]
     else:
         # Parse each ETag individually, and return any that are valid.
-        etag_matches = (ETAG_MATCH.match(etag.strip()) for etag in etag_str.split(','))
+        etag_matches = (ETAG_MATCH.match(etag.strip()) for etag in etag_str.split(","))
         return [match[1] for match in etag_matches if match]
 
 
@@ -231,8 +246,9 @@ def is_same_domain(host, pattern):
 
     pattern = pattern.lower()
     return (
-        pattern[0] == '.' and (host.endswith(pattern) or host == pattern[1:]) or
-        pattern == host
+        pattern[0] == "."
+        and (host.endswith(pattern) or host == pattern[1:])
+        or pattern == host
     )
 
 
@@ -259,14 +275,16 @@ def url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
         allowed_hosts = {allowed_hosts}
     # Chrome treats \ completely as / in paths but it could be part of some
     # basic auth credentials so we need to check both URLs.
-    return (
-        _url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=require_https) and
-        _url_has_allowed_host_and_scheme(url.replace('\\', '/'), allowed_hosts, require_https=require_https)
+    return _url_has_allowed_host_and_scheme(
+        url, allowed_hosts, require_https=require_https
+    ) and _url_has_allowed_host_and_scheme(
+        url.replace("\\", "/"), allowed_hosts, require_https=require_https
     )
 
 
+# TODO: Remove when dropping support for PY38.
 # Copied from urllib.parse.urlparse() but uses fixed urlsplit() function.
-def _urlparse(url, scheme='', allow_fragments=True):
+def _urlparse(url, scheme="", allow_fragments=True):
     """Parse a URL into 6 components:
     <scheme>://<netloc>/<path>;<params>?<query>#<fragment>
     Return a 6-tuple: (scheme, netloc, path, params, query, fragment).
@@ -275,41 +293,52 @@ def _urlparse(url, scheme='', allow_fragments=True):
     url, scheme, _coerce_result = _coerce_args(url, scheme)
     splitresult = _urlsplit(url, scheme, allow_fragments)
     scheme, netloc, url, query, fragment = splitresult
-    if scheme in uses_params and ';' in url:
+    if scheme in uses_params and ";" in url:
         url, params = _splitparams(url)
     else:
-        params = ''
+        params = ""
     result = ParseResult(scheme, netloc, url, params, query, fragment)
     return _coerce_result(result)
 
 
-# Copied from urllib.parse.urlsplit() with
-# https://github.com/python/cpython/pull/661 applied.
-def _urlsplit(url, scheme='', allow_fragments=True):
+# TODO: Remove when dropping support for PY38.
+def _remove_unsafe_bytes_from_url(url):
+    for b in _UNSAFE_URL_BYTES_TO_REMOVE:
+        url = url.replace(b, "")
+    return url
+
+
+# TODO: Remove when dropping support for PY38.
+# Backport of urllib.parse.urlsplit() from Python 3.9.
+def _urlsplit(url, scheme="", allow_fragments=True):
     """Parse a URL into 5 components:
     <scheme>://<netloc>/<path>?<query>#<fragment>
     Return a 5-tuple: (scheme, netloc, path, query, fragment).
     Note that we don't break the components up in smaller bits
     (e.g. netloc is a single string) and we don't expand % escapes."""
     url, scheme, _coerce_result = _coerce_args(url, scheme)
-    netloc = query = fragment = ''
-    i = url.find(':')
+    url = _remove_unsafe_bytes_from_url(url)
+    scheme = _remove_unsafe_bytes_from_url(scheme)
+
+    netloc = query = fragment = ""
+    i = url.find(":")
     if i > 0:
         for c in url[:i]:
             if c not in scheme_chars:
                 break
         else:
-            scheme, url = url[:i].lower(), url[i + 1:]
+            scheme, url = url[:i].lower(), url[i + 1 :]
 
-    if url[:2] == '//':
+    if url[:2] == "//":
         netloc, url = _splitnetloc(url, 2)
-        if (('[' in netloc and ']' not in netloc) or
-                (']' in netloc and '[' not in netloc)):
+        if ("[" in netloc and "]" not in netloc) or (
+            "]" in netloc and "[" not in netloc
+        ):
             raise ValueError("Invalid IPv6 URL")
-    if allow_fragments and '#' in url:
-        url, fragment = url.split('#', 1)
-    if '?' in url:
-        url, query = url.split('?', 1)
+    if allow_fragments and "#" in url:
+        url, fragment = url.split("#", 1)
+    if "?" in url:
+        url, query = url.split("?", 1)
     v = SplitResult(scheme, netloc, url, query, fragment)
     return _coerce_result(v)
 
@@ -317,7 +346,7 @@ def _urlsplit(url, scheme='', allow_fragments=True):
 def _url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
     # Chrome considers any URL with more than two slashes to be absolute, but
     # urlparse is not so flexible. Treat any url with three slashes as unsafe.
-    if url.startswith('///'):
+    if url.startswith("///"):
         return False
     try:
         url_info = _urlparse(url)
@@ -332,15 +361,16 @@ def _url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
     # Forbid URLs that start with control characters. Some browsers (like
     # Chrome) ignore quite a few control characters at the start of a
     # URL and might consider the URL as scheme relative.
-    if unicodedata.category(url[0])[0] == 'C':
+    if unicodedata.category(url[0])[0] == "C":
         return False
     scheme = url_info.scheme
     # Consider URLs without a scheme (e.g. //example.com/p) to be http.
     if not url_info.scheme and url_info.netloc:
-        scheme = 'http'
-    valid_schemes = ['https'] if require_https else ['http', 'https']
-    return ((not url_info.netloc or url_info.netloc in allowed_hosts) and
-            (not scheme or scheme in valid_schemes))
+        scheme = "http"
+    valid_schemes = ["https"] if require_https else ["http", "https"]
+    return (not url_info.netloc or url_info.netloc in allowed_hosts) and (
+        not scheme or scheme in valid_schemes
+    )
 
 
 def escape_leading_slashes(url):
@@ -349,6 +379,49 @@ def escape_leading_slashes(url):
     escaped to prevent browsers from handling the path as schemaless and
     redirecting to another host.
     """
-    if url.startswith('//'):
-        url = '/%2F{}'.format(url[2:])
+    if url.startswith("//"):
+        url = "/%2F{}".format(url[2:])
     return url
+
+
+def _parseparam(s):
+    while s[:1] == ";":
+        s = s[1:]
+        end = s.find(";")
+        while end > 0 and (s.count('"', 0, end) - s.count('\\"', 0, end)) % 2:
+            end = s.find(";", end + 1)
+        if end < 0:
+            end = len(s)
+        f = s[:end]
+        yield f.strip()
+        s = s[end:]
+
+
+def parse_header_parameters(line):
+    """
+    Parse a Content-type like header.
+    Return the main content-type and a dictionary of options.
+    """
+    parts = _parseparam(";" + line)
+    key = parts.__next__().lower()
+    pdict = {}
+    for p in parts:
+        i = p.find("=")
+        if i >= 0:
+            has_encoding = False
+            name = p[:i].strip().lower()
+            if name.endswith("*"):
+                # Lang/encoding embedded in the value (like "filename*=UTF-8''file.ext")
+                # https://tools.ietf.org/html/rfc2231#section-4
+                name = name[:-1]
+                if p.count("'") == 2:
+                    has_encoding = True
+            value = p[i + 1 :].strip()
+            if len(value) >= 2 and value[0] == value[-1] == '"':
+                value = value[1:-1]
+                value = value.replace("\\\\", "\\").replace('\\"', '"')
+            if has_encoding:
+                encoding, lang, value = value.split("'")
+                value = unquote(value, encoding=encoding)
+            pdict[name] = value
+    return key, pdict

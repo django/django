@@ -56,9 +56,9 @@ Here's an example::
     class CalendarWidget(forms.TextInput):
         class Media:
             css = {
-                'all': ('pretty.css',)
+                'all': ['pretty.css'],
             }
-            js = ('animations.js', 'actions.js')
+            js = ['animations.js', 'actions.js']
 
 This code defines a ``CalendarWidget``, which will be based on ``TextInput``.
 Every time the CalendarWidget is used on a form, that form will be directed
@@ -71,7 +71,7 @@ can be retrieved through this property::
 
     >>> w = CalendarWidget()
     >>> print(w.media)
-    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet">
+    <link href="http://static.example.com/pretty.css" media="all" rel="stylesheet">
     <script src="http://static.example.com/animations.js"></script>
     <script src="http://static.example.com/actions.js"></script>
 
@@ -96,8 +96,8 @@ provide two CSS options -- one for the screen, and one for print::
 
     class Media:
         css = {
-            'screen': ('pretty.css',),
-            'print': ('newspaper.css',)
+            'screen': ['pretty.css'],
+            'print': ['newspaper.css'],
         }
 
 If a group of CSS files are appropriate for multiple output media types,
@@ -107,16 +107,21 @@ requirements::
 
     class Media:
         css = {
-            'screen': ('pretty.css',),
-            'tv,projector': ('lo_res.css',),
-            'print': ('newspaper.css',)
+            'screen': ['pretty.css'],
+            'tv,projector': ['lo_res.css'],
+            'print': ['newspaper.css],
         }
 
 If this last CSS definition were to be rendered, it would become the following HTML::
 
-    <link href="http://static.example.com/pretty.css" type="text/css" media="screen" rel="stylesheet">
-    <link href="http://static.example.com/lo_res.css" type="text/css" media="tv,projector" rel="stylesheet">
-    <link href="http://static.example.com/newspaper.css" type="text/css" media="print" rel="stylesheet">
+    <link href="http://static.example.com/pretty.css" media="screen" rel="stylesheet">
+    <link href="http://static.example.com/lo_res.css" media="tv,projector" rel="stylesheet">
+    <link href="http://static.example.com/newspaper.css" media="print" rel="stylesheet">
+
+.. versionchanged:: 4.1
+
+    In older versions, the ``type="text/css"`` attribute is included in CSS
+    links.
 
 ``js``
 ------
@@ -139,14 +144,14 @@ example above::
     >>> class FancyCalendarWidget(CalendarWidget):
     ...     class Media:
     ...         css = {
-    ...             'all': ('fancy.css',)
+    ...             'all': ['fancy.css'],
     ...         }
-    ...         js = ('whizbang.js',)
+    ...         js = ['whizbang.js']
 
     >>> w = FancyCalendarWidget()
     >>> print(w.media)
-    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet">
-    <link href="http://static.example.com/fancy.css" type="text/css" media="all" rel="stylesheet">
+    <link href="http://static.example.com/pretty.css" media="all" rel="stylesheet">
+    <link href="http://static.example.com/fancy.css" media="all" rel="stylesheet">
     <script src="http://static.example.com/animations.js"></script>
     <script src="http://static.example.com/actions.js"></script>
     <script src="http://static.example.com/whizbang.js"></script>
@@ -159,13 +164,13 @@ an ``extend=False`` declaration to the ``Media`` declaration::
     ...     class Media:
     ...         extend = False
     ...         css = {
-    ...             'all': ('fancy.css',)
+    ...             'all': ['fancy.css'],
     ...         }
-    ...         js = ('whizbang.js',)
+    ...         js = ['whizbang.js']
 
     >>> w = FancyCalendarWidget()
     >>> print(w.media)
-    <link href="http://static.example.com/fancy.css" type="text/css" media="all" rel="stylesheet">
+    <link href="http://static.example.com/fancy.css" media="all" rel="stylesheet">
     <script src="http://static.example.com/whizbang.js"></script>
 
 If you require even more control over inheritance, define your assets using a
@@ -190,8 +195,8 @@ be defined in a dynamic fashion::
     class CalendarWidget(forms.TextInput):
         @property
         def media(self):
-            return forms.Media(css={'all': ('pretty.css',)},
-                               js=('animations.js', 'actions.js'))
+            return forms.Media(css={'all': ['pretty.css']},
+                               js=['animations.js', 'actions.js'])
 
 See the section on `Media objects`_ for more details on how to construct
 return values for dynamic ``media`` properties.
@@ -201,7 +206,10 @@ return values for dynamic ``media`` properties.
 Paths in asset definitions
 ==========================
 
-Paths used to specify assets can be either relative or absolute. If a
+Paths as strings
+----------------
+
+String paths used to specify assets can be either relative or absolute. If a
 path starts with ``/``, ``http://`` or ``https://``, it will be
 interpreted as an absolute path, and left as-is. All other paths will
 be prepended with the value of the appropriate prefix. If the
@@ -222,13 +230,13 @@ was ``None``::
     >>> class CalendarWidget(forms.TextInput):
     ...     class Media:
     ...         css = {
-    ...             'all': ('/css/pretty.css',),
+    ...             'all': ['/css/pretty.css'],
     ...         }
-    ...         js = ('animations.js', 'http://othersite.com/actions.js')
+    ...         js = ['animations.js', 'http://othersite.com/actions.js']
 
     >>> w = CalendarWidget()
     >>> print(w.media)
-    <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet">
+    <link href="/css/pretty.css" media="all" rel="stylesheet">
     <script src="http://uploads.example.com/animations.js"></script>
     <script src="http://othersite.com/actions.js"></script>
 
@@ -236,7 +244,7 @@ But if :setting:`STATIC_URL` is ``'http://static.example.com/'``::
 
     >>> w = CalendarWidget()
     >>> print(w.media)
-    <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet">
+    <link href="/css/pretty.css" media="all" rel="stylesheet">
     <script src="http://static.example.com/animations.js"></script>
     <script src="http://othersite.com/actions.js"></script>
 
@@ -245,9 +253,31 @@ Or if :mod:`~django.contrib.staticfiles` is configured using the
 
     >>> w = CalendarWidget()
     >>> print(w.media)
-    <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet">
+    <link href="/css/pretty.css" media="all" rel="stylesheet">
     <script src="https://static.example.com/animations.27e20196a850.js"></script>
     <script src="http://othersite.com/actions.js"></script>
+
+Paths as objects
+----------------
+
+.. versionadded:: 4.1
+
+Asset paths may also be given as hashable objects implementing an
+``__html__()`` method. The ``__html__()`` method is typically added using the
+:func:`~django.utils.html.html_safe` decorator. The object is responsible for
+outputting the complete HTML ``<script>`` or ``<link>`` tag content::
+
+    >>> from django import forms
+    >>> from django.utils.html import html_safe
+    >>>
+    >>> @html_safe
+    >>> class JSPath:
+    ...     def __str__(self):
+    ...         return '<script src="https://example.org/asset.js" rel="stylesheet">'
+
+    >>> class SomeWidget(forms.TextInput):
+    ...     class Media:
+    ...         js = [JSPath()]
 
 ``Media`` objects
 =================
@@ -268,12 +298,12 @@ operator to filter out a medium of interest. For example::
 
     >>> w = CalendarWidget()
     >>> print(w.media)
-    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet">
+    <link href="http://static.example.com/pretty.css" media="all" rel="stylesheet">
     <script src="http://static.example.com/animations.js"></script>
     <script src="http://static.example.com/actions.js"></script>
 
     >>> print(w.media['css'])
-    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet">
+    <link href="http://static.example.com/pretty.css" media="all" rel="stylesheet">
 
 When you use the subscript operator, the value that is returned is a
 new ``Media`` object -- but one that only contains the media of interest.
@@ -289,18 +319,18 @@ specified by both::
     >>> class CalendarWidget(forms.TextInput):
     ...     class Media:
     ...         css = {
-    ...             'all': ('pretty.css',)
+    ...             'all': ['pretty.css'],
     ...         }
-    ...         js = ('animations.js', 'actions.js')
+    ...         js = ['animations.js', 'actions.js']
 
     >>> class OtherWidget(forms.TextInput):
     ...     class Media:
-    ...         js = ('whizbang.js',)
+    ...         js = ['whizbang.js']
 
     >>> w1 = CalendarWidget()
     >>> w2 = OtherWidget()
     >>> print(w1.media + w2.media)
-    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet">
+    <link href="http://static.example.com/pretty.css" media="all" rel="stylesheet">
     <script src="http://static.example.com/animations.js"></script>
     <script src="http://static.example.com/actions.js"></script>
     <script src="http://static.example.com/whizbang.js"></script>
@@ -320,10 +350,10 @@ For example::
     >>> from django import forms
     >>> class CalendarWidget(forms.TextInput):
     ...     class Media:
-    ...         js = ('jQuery.js', 'calendar.js', 'noConflict.js')
+    ...         js = ['jQuery.js', 'calendar.js', 'noConflict.js']
     >>> class TimeWidget(forms.TextInput):
     ...     class Media:
-    ...         js = ('jQuery.js', 'time.js', 'noConflict.js')
+    ...         js = ['jQuery.js', 'time.js', 'noConflict.js']
     >>> w1 = CalendarWidget()
     >>> w2 = TimeWidget()
     >>> print(w1.media + w2.media)
@@ -356,7 +386,7 @@ are part of the form::
 
     >>> f = ContactForm()
     >>> f.media
-    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet">
+    <link href="http://static.example.com/pretty.css" media="all" rel="stylesheet">
     <script src="http://static.example.com/animations.js"></script>
     <script src="http://static.example.com/actions.js"></script>
     <script src="http://static.example.com/whizbang.js"></script>
@@ -370,13 +400,13 @@ CSS for form layout -- add a ``Media`` declaration to the form::
     ...
     ...     class Media:
     ...         css = {
-    ...             'all': ('layout.css',)
+    ...             'all': ['layout.css'],
     ...         }
 
     >>> f = ContactForm()
     >>> f.media
-    <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet">
-    <link href="http://static.example.com/layout.css" type="text/css" media="all" rel="stylesheet">
+    <link href="http://static.example.com/pretty.css" media="all" rel="stylesheet">
+    <link href="http://static.example.com/layout.css" media="all" rel="stylesheet">
     <script src="http://static.example.com/animations.js"></script>
     <script src="http://static.example.com/actions.js"></script>
     <script src="http://static.example.com/whizbang.js"></script>

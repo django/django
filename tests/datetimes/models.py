@@ -19,7 +19,7 @@ class Comment(models.Model):
     approval_date = models.DateTimeField(null=True)
 
     def __str__(self):
-        return 'Comment to %s (%s)' % (self.article.title, self.pub_date)
+        return "Comment to %s (%s)" % (self.article.title, self.pub_date)
 
 
 class Category(models.Model):

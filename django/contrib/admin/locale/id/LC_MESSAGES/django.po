@@ -2,21 +2,21 @@
 #
 # Translators:
 # Claude Paroz <claude@2xlibre.net>, 2014
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2019
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # oon arfiandwi <oon.arfiandwi@gmail.com>, 2016,2020
 # rodin <romihardiyanto@gmail.com>, 2011-2013
 # rodin <romihardiyanto@gmail.com>, 2013-2017
-# sage <laymonage@gmail.com>, 2019
+# sag᠎e <laymonage@gmail.com>, 2019
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2020-12-24 09:53+0000\n"
-"Last-Translator: oon arfiandwi <oon.arfiandwi@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2022-07-25 07:05+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -271,8 +271,9 @@ msgstr "0 dari %(cnt)s dipilih"
 msgid "Change history: %s"
 msgstr "Ubah riwayat: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -527,6 +528,12 @@ msgstr "Lupa nama pengguna atau sandi?"
 msgid "Toggle navigation"
 msgstr "Alihkan navigasi"
 
+msgid "Start typing to filter…"
+msgstr "Mulai mengetik untuk menyaring..."
+
+msgid "Filter navigation items"
+msgstr "Navigasi pencarian barang"
+
 msgid "Date/time"
 msgstr "Tanggal/waktu"
 
@@ -535,6 +542,12 @@ msgstr "Pengguna"
 
 msgid "Action"
 msgstr "Aksi"
+
+msgid "entry"
+msgstr "masukan"
+
+msgid "entries"
+msgstr "masukan"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -591,8 +604,14 @@ msgstr "Tambahkan %(model)s yang lain"
 msgid "Delete selected %(model)s"
 msgstr "Hapus %(model)s yang dipilih"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Terima kasih telah menggunakan situs ini hari ini."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Menampilkan %(model)s terpilih"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
+"Terima kasih untuk meluangkan waktu berkualitas dengan jaringan situs hari "
+"ini."
 
 msgid "Log in again"
 msgstr "Masuk kembali"

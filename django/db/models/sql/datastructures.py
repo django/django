@@ -11,6 +11,7 @@ class MultiJoin(Exception):
     multi-valued join was attempted (if the caller wants to treat that
     exceptionally).
     """
+
     def __init__(self, names_pos, path_with_names):
         self.level = names_pos
         # The path travelled, this includes the path to the multijoin.
@@ -25,7 +26,8 @@ class Join:
     """
     Used by sql.Query and sql.SQLCompiler to generate JOIN clauses into the
     FROM entry. For example, the SQL generated could be
-        LEFT OUTER JOIN "sometable" T1 ON ("othertable"."sometable_id" = "sometable"."id")
+        LEFT OUTER JOIN "sometable" T1
+        ON ("othertable"."sometable_id" = "sometable"."id")
 
     This class is primarily used in Query.alias_map. All entries in alias_map
     must be Join compatible by providing the following attributes and methods:
@@ -38,8 +40,17 @@ class Join:
         - as_sql()
         - relabeled_clone()
     """
-    def __init__(self, table_name, parent_alias, table_alias, join_type,
-                 join_field, nullable, filtered_relation=None):
+
+    def __init__(
+        self,
+        table_name,
+        parent_alias,
+        table_alias,
+        join_type,
+        join_field,
+        nullable,
+        filtered_relation=None,
+    ):
         # Join table
         self.table_name = table_name
         self.parent_alias = parent_alias
@@ -69,35 +80,47 @@ class Join:
 
         # Add a join condition for each pair of joining columns.
         for lhs_col, rhs_col in self.join_cols:
-            join_conditions.append('%s.%s = %s.%s' % (
-                qn(self.parent_alias),
-                qn2(lhs_col),
-                qn(self.table_alias),
-                qn2(rhs_col),
-            ))
+            join_conditions.append(
+                "%s.%s = %s.%s"
+                % (
+                    qn(self.parent_alias),
+                    qn2(lhs_col),
+                    qn(self.table_alias),
+                    qn2(rhs_col),
+                )
+            )
 
         # Add a single condition inside parentheses for whatever
         # get_extra_restriction() returns.
-        extra_cond = self.join_field.get_extra_restriction(self.table_alias, self.parent_alias)
+        extra_cond = self.join_field.get_extra_restriction(
+            self.table_alias, self.parent_alias
+        )
         if extra_cond:
             extra_sql, extra_params = compiler.compile(extra_cond)
-            join_conditions.append('(%s)' % extra_sql)
+            join_conditions.append("(%s)" % extra_sql)
             params.extend(extra_params)
         if self.filtered_relation:
             extra_sql, extra_params = compiler.compile(self.filtered_relation)
             if extra_sql:
-                join_conditions.append('(%s)' % extra_sql)
+                join_conditions.append("(%s)" % extra_sql)
                 params.extend(extra_params)
         if not join_conditions:
             # This might be a rel on the other end of an actual declared field.
-            declared_field = getattr(self.join_field, 'field', self.join_field)
+            declared_field = getattr(self.join_field, "field", self.join_field)
             raise ValueError(
                 "Join generated an empty ON clause. %s did not yield either "
                 "joining columns or extra restrictions." % declared_field.__class__
             )
-        on_clause_sql = ' AND '.join(join_conditions)
-        alias_str = '' if self.table_alias == self.table_name else (' %s' % self.table_alias)
-        sql = '%s %s%s ON (%s)' % (self.join_type, qn(self.table_name), alias_str, on_clause_sql)
+        on_clause_sql = " AND ".join(join_conditions)
+        alias_str = (
+            "" if self.table_alias == self.table_name else (" %s" % self.table_alias)
+        )
+        sql = "%s %s%s ON (%s)" % (
+            self.join_type,
+            qn(self.table_name),
+            alias_str,
+            on_clause_sql,
+        )
         return sql, params
 
     def relabeled_clone(self, change_map):
@@ -105,12 +128,19 @@ class Join:
         new_table_alias = change_map.get(self.table_alias, self.table_alias)
         if self.filtered_relation is not None:
             filtered_relation = self.filtered_relation.clone()
-            filtered_relation.path = [change_map.get(p, p) for p in self.filtered_relation.path]
+            filtered_relation.path = [
+                change_map.get(p, p) for p in self.filtered_relation.path
+            ]
         else:
             filtered_relation = None
         return self.__class__(
-            self.table_name, new_parent_alias, new_table_alias, self.join_type,
-            self.join_field, self.nullable, filtered_relation=filtered_relation,
+            self.table_name,
+            new_parent_alias,
+            new_table_alias,
+            self.join_type,
+            self.join_field,
+            self.nullable,
+            filtered_relation=filtered_relation,
         )
 
     @property
@@ -153,6 +183,7 @@ class BaseTable:
         SELECT * FROM "foo" WHERE somecond
     could be generated by this class.
     """
+
     join_type = None
     parent_alias = None
     filtered_relation = None
@@ -162,12 +193,16 @@ class BaseTable:
         self.table_alias = alias
 
     def as_sql(self, compiler, connection):
-        alias_str = '' if self.table_alias == self.table_name else (' %s' % self.table_alias)
+        alias_str = (
+            "" if self.table_alias == self.table_name else (" %s" % self.table_alias)
+        )
         base_sql = compiler.quote_name_unless_alias(self.table_name)
         return base_sql + alias_str, []
 
     def relabeled_clone(self, change_map):
-        return self.__class__(self.table_name, change_map.get(self.table_alias, self.table_alias))
+        return self.__class__(
+            self.table_name, change_map.get(self.table_alias, self.table_alias)
+        )
 
     @property
     def identity(self):

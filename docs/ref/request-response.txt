@@ -853,9 +853,15 @@ Methods
     Sets a cookie. The parameters are the same as in the
     :class:`~http.cookies.Morsel` cookie object in the Python standard library.
 
-    * ``max_age`` should be an integer number of seconds, or ``None`` (default)
-      if the cookie should last only as long as the client's browser session.
-      If ``expires`` is not specified, it will be calculated.
+    * ``max_age`` should be a :class:`~datetime.timedelta` object, an integer
+      number of seconds, or ``None`` (default) if the cookie should last only
+      as long as the client's browser session. If ``expires`` is not specified,
+      it will be calculated.
+
+      .. versionchanged:: 4.1
+
+        Support for ``timedelta`` objects was added.
+
     * ``expires`` should either be a string in the format
       ``"Wdy, DD-Mon-YY HH:MM:SS GMT"`` or a ``datetime.datetime`` object
       in UTC. If ``expires`` is a ``datetime`` object, the ``max_age``
@@ -1144,6 +1150,9 @@ the data to the client. Because the content can't be accessed, many
 middleware can't function normally. For example the ``ETag`` and
 ``Content-Length`` headers can't be generated for streaming responses.
 
+The :class:`HttpResponseBase` base class is common between
+:class:`HttpResponse` and :class:`StreamingHttpResponse`.
+
 Attributes
 ----------
 
@@ -1212,3 +1221,12 @@ Methods
     This method is automatically called during the response initialization and
     set various headers (``Content-Length``, ``Content-Type``, and
     ``Content-Disposition``) depending on ``open_file``.
+
+``HttpResponseBase`` class
+==========================
+
+.. class:: HttpResponseBase
+
+The :class:`HttpResponseBase` class is common to all Django responses.
+It should not be used to create responses directly, but it can be
+useful for type-checking.

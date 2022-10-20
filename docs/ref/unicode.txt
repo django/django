@@ -28,10 +28,10 @@ able to store certain characters in the database, and information will be lost.
   for internal encoding.
 
 .. _MySQL manual: https://dev.mysql.com/doc/refman/en/charset-database.html
-.. _PostgreSQL manual: https://www.postgresql.org/docs/current/multibyte.html#id-1.6.10.5.6
-.. _Oracle manual: https://docs.oracle.com/en/database/oracle/oracle-database/18/nlspg/index.html
-.. _section 2: https://docs.oracle.com/en/database/oracle/oracle-database/18/nlspg/choosing-character-set.html
-.. _section 11: https://docs.oracle.com/en/database/oracle/oracle-database/18/nlspg/character-set-migration.html
+.. _PostgreSQL manual: https://www.postgresql.org/docs/current/multibyte.html#id-1.6.11.5.6
+.. _Oracle manual: https://docs.oracle.com/en/database/oracle/oracle-database/21/nlspg/index.html
+.. _section 2: https://docs.oracle.com/en/database/oracle/oracle-database/21/nlspg/choosing-character-set.html
+.. _section 11: https://docs.oracle.com/en/database/oracle/oracle-database/21/nlspg/character-set-migration.html
 
 All of Django's database backends automatically convert strings into
 the appropriate encoding for talking to the database. They also automatically
@@ -291,8 +291,8 @@ Files
 If you intend to allow users to upload files, you must ensure that the
 environment used to run Django is configured to work with non-ASCII file names.
 If your environment isn't configured correctly, you'll encounter
-``UnicodeEncodeError`` exceptions when saving files with file names that
-contain non-ASCII characters.
+``UnicodeEncodeError`` exceptions when saving files with file names or content
+that contains non-ASCII characters.
 
 Filesystem support for UTF-8 file names varies and might depend on the
 environment. Check your current configuration in an interactive Python shell by
@@ -306,7 +306,7 @@ This should output "UTF-8".
 The ``LANG`` environment variable is responsible for setting the expected
 encoding on Unix platforms. Consult the documentation for your operating system
 and application server for the appropriate syntax and location to set this
-variable.
+variable. See the :doc:`/howto/deployment/wsgi/modwsgi` for examples.
 
 In your development environment, you might need to add a setting to your
 ``~.bashrc`` analogous to:::

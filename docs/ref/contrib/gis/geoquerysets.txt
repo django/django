@@ -351,8 +351,8 @@ SpatiaLite  ``Intersects(poly, geom)``
 ``isvalid``
 -----------
 
-*Availability*: MySQL (≥ 5.7.5), `PostGIS
-<https://postgis.net/docs/ST_IsValid.html>`__, Oracle, SpatiaLite
+*Availability*: MySQL, `PostGIS <https://postgis.net/docs/ST_IsValid.html>`__,
+Oracle, SpatiaLite
 
 Tests if the geometry is valid.
 
@@ -838,7 +838,7 @@ Keyword Argument       Description
                        details.
 =====================  =====================================================
 
-__ https://docs.oracle.com/en/database/oracle/oracle-database/18/spatl/
+__ https://docs.oracle.com/en/database/oracle/oracle-database/21/spatl/
    spatial-concepts.html#GUID-CE10AB14-D5EA-43BA-A647-DAC9EEF41EE6
 
 Example::

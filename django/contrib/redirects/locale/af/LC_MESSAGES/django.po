@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Charl du Plessis <cjdupless@gmail.com>, 2021
 # F Wolff <friedel@translate.org.za>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2019-01-04 18:46+0000\n"
-"Last-Translator: F Wolff <friedel@translate.org.za>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-08-09 13:09+0000\n"
+"Last-Translator: Charl du Plessis <cjdupless@gmail.com>\n"
 "Language-Team: Afrikaans (http://www.transifex.com/django/django/language/"
 "af/)\n"
 "MIME-Version: 1.0\n"
@@ -27,21 +28,21 @@ msgid "redirect from"
 msgstr "aanstuurvorm"
 
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr ""
-"Hierdie moet ’n absolute pad wees, die domeinnaam uitgesluit. Voorbeeld: “/"
+"This should be an absolute path, excluding the domain name. Example: “/"
 "events/search/”."
+msgstr ""
+"Hierdie moet ’n absolute pad wees met die domeinnaam uitgesluit. Soos "
+"byvoorbeeld: “/events/search/”."
 
 msgid "redirect to"
 msgstr "stuur aan na"
 
 msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
+"This can be either an absolute path (as above) or a full URL starting with a "
+"scheme such as “https://”."
 msgstr ""
-"Hierdie kan óf ’n absolute pad wees (soos bo) of 'n volle URL beginnende met "
-"“http://”."
+"Hierdie kan òf 'n absolute pad wees (soos bo) òf 'n volledige URL wees wat "
+"begin met 'n skema soos \"https://\"."
 
 msgid "redirect"
 msgstr "aanstuur"

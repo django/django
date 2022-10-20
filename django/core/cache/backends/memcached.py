@@ -4,7 +4,10 @@ import re
 import time
 
 from django.core.cache.backends.base import (
-    DEFAULT_TIMEOUT, BaseCache, InvalidCacheKey, memcache_key_warnings,
+    DEFAULT_TIMEOUT,
+    BaseCache,
+    InvalidCacheKey,
+    memcache_key_warnings,
 )
 from django.utils.functional import cached_property
 
@@ -13,7 +16,7 @@ class BaseMemcachedCache(BaseCache):
     def __init__(self, server, params, library, value_not_found_exception):
         super().__init__(params)
         if isinstance(server, str):
-            self._servers = re.split('[;,]', server)
+            self._servers = re.split("[;,]", server)
         else:
             self._servers = server
 
@@ -23,7 +26,7 @@ class BaseMemcachedCache(BaseCache):
 
         self._lib = library
         self._class = library.Client
-        self._options = params.get('OPTIONS') or {}
+        self._options = params.get("OPTIONS") or {}
 
     @property
     def client_servers(self):
@@ -74,7 +77,8 @@ class BaseMemcachedCache(BaseCache):
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_and_validate_key(key, version=version)
         if not self._cache.set(key, value, self.get_backend_timeout(timeout)):
-            # make sure the key doesn't keep its old value in case of failure to set (memcached's 1MB limit)
+            # Make sure the key doesn't keep its old value in case of failure
+            # to set (memcached's 1MB limit).
             self._cache.delete(key)
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
@@ -86,7 +90,9 @@ class BaseMemcachedCache(BaseCache):
         return bool(self._cache.delete(key))
 
     def get_many(self, keys, version=None):
-        key_map = {self.make_and_validate_key(key, version=version): key for key in keys}
+        key_map = {
+            self.make_and_validate_key(key, version=version): key for key in keys
+        }
         ret = self._cache.get_multi(key_map.keys())
         return {key_map[k]: v for k, v in ret.items()}
 
@@ -118,7 +124,9 @@ class BaseMemcachedCache(BaseCache):
             safe_key = self.make_and_validate_key(key, version=version)
             safe_data[safe_key] = value
             original_keys[safe_key] = key
-        failed_keys = self._cache.set_multi(safe_data, self.get_backend_timeout(timeout))
+        failed_keys = self._cache.set_multi(
+            safe_data, self.get_backend_timeout(timeout)
+        )
         return [original_keys[k] for k in failed_keys]
 
     def delete_many(self, keys, version=None):
@@ -135,15 +143,19 @@ class BaseMemcachedCache(BaseCache):
 
 class PyLibMCCache(BaseMemcachedCache):
     "An implementation of a cache binding using pylibmc"
+
     def __init__(self, server, params):
         import pylibmc
-        super().__init__(server, params, library=pylibmc, value_not_found_exception=pylibmc.NotFound)
+
+        super().__init__(
+            server, params, library=pylibmc, value_not_found_exception=pylibmc.NotFound
+        )
 
     @property
     def client_servers(self):
         output = []
         for server in self._servers:
-            output.append(server[5:] if server.startswith('unix:') else server)
+            output.append(server[5:] if server.startswith("unix:") else server)
         return output
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
@@ -160,13 +172,17 @@ class PyLibMCCache(BaseMemcachedCache):
 
 class PyMemcacheCache(BaseMemcachedCache):
     """An implementation of a cache binding using pymemcache."""
+
     def __init__(self, server, params):
         import pymemcache.serde
-        super().__init__(server, params, library=pymemcache, value_not_found_exception=KeyError)
+
+        super().__init__(
+            server, params, library=pymemcache, value_not_found_exception=KeyError
+        )
         self._class = self._lib.HashClient
         self._options = {
-            'allow_unicode_keys': True,
-            'default_noreply': False,
-            'serde': pymemcache.serde.pickle_serde,
+            "allow_unicode_keys": True,
+            "default_noreply": False,
+            "serde": pymemcache.serde.pickle_serde,
             **self._options,
         }

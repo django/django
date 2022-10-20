@@ -6,7 +6,7 @@ class Article(models.Model):
     publication_date = models.DateField()
 
     class Meta:
-        swappable = 'TEST_ARTICLE_MODEL'
+        swappable = "TEST_ARTICLE_MODEL"
 
 
 class AlternateArticle(models.Model):

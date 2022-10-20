@@ -2,13 +2,13 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016-2017,2019
+# znotdead <zhirafchik@gmail.com>, 2016-2017,2019,2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-10-16 18:29+0000\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-09-22 16:48+0000\n"
 "Last-Translator: znotdead <zhirafchik@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
@@ -136,6 +136,9 @@ msgstr "множнік працы"
 
 msgid "checksum"
 msgstr "кантрольная сума"
+
+msgid "block size"
+msgstr "памер блока"
 
 msgid "name"
 msgstr "назва"

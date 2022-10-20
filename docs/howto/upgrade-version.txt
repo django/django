@@ -69,7 +69,7 @@ environment variable. For example, to show warnings while running tests:
 
 If you're not using the Django test runner, you may need to also ensure that
 any console output is not captured which would hide deprecation warnings. For
-example, if you use `pytest <https://pytest.org/>`__:
+example, if you use `pytest <https://docs.pytest.org/>`__:
 
 .. code-block:: console
 

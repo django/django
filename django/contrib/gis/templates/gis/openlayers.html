@@ -1,19 +1,13 @@
 {% load i18n l10n %}
-<style type="text/css">{% block map_css %}{% get_current_language_bidi as LANGUAGE_BIDI %}
-    #{{ id }}_map { width: {{ map_width }}px; height: {{ map_height }}px; }
-    #{{ id }}_map .aligned label { float: inherit; }
-    #{{ id }}_div_map { position: relative; vertical-align: top; float: {{ LANGUAGE_BIDI|yesno:"right,left" }}; }
-    {% if not display_raw %}#{{ id }} { display: none; }{% endif %}
-    {% endblock %}
-</style>
 
-<div id="{{ id }}_div_map">
-    <div id="{{ id }}_map"></div>
-    {% if not disabled %}<span class="clear_features"><a href="javascript:{{ module }}.clearFeatures()">{% translate "Delete all Features" %}</a></span>{% endif %}
+<div id="{{ id }}_div_map" class="dj_map_wrapper">
+    {# RemovedInDjango51Warning: when the deprecation ends, remove data-width and data-height attributes. #}
+    <div id="{{ id }}_map" class="dj_map" data-width="{{ map_width }}" data-height="{{ map_height }}"></div>
+    {% if not disabled %}<span class="clear_features"><a href="">{% translate "Delete all Features" %}</a></span>{% endif %}
     {% if display_raw %}<p>{% translate "Debugging window (serialized value)" %}</p>{% endif %}
-    <textarea id="{{ id }}" class="vSerializedField required" cols="150" rows="10" name="{{ name }}">{{ serialized }}</textarea>
+    <textarea id="{{ id }}" class="vSerializedField required" cols="150" rows="10" name="{{ name }}"
+              {% if not display_raw %} hidden{% endif %}>{{ serialized }}</textarea>
     <script>
-        {% block map_options %}var map_options = {};{% endblock %}
         {% block base_layer %}
             var base_layer = new ol.layer.Tile({
                 source: new ol.source.XYZ({
@@ -30,7 +24,6 @@
             geom_name: '{{ geom_type }}',
             id: '{{ id }}',
             map_id: '{{ id }}_map',
-            map_options: map_options,
             map_srid: {{ map_srid|unlocalize }},
             name: '{{ name }}'
         };

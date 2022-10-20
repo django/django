@@ -26,15 +26,66 @@ A custom renderer can be specified by updating the :setting:`FORM_RENDERER`
 setting. It defaults to
 ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``.
 
-You can also provide a custom renderer by setting the
+By specifying a custom form renderer and overriding
+:attr:`~.BaseRenderer.form_template_name` you can adjust the default form
+markup across your project from a single place.
+
+You can also provide a custom renderer per-form or per-widget by setting the
 :attr:`.Form.default_renderer` attribute or by using the ``renderer`` argument
-of :meth:`.Widget.render`.
+of :meth:`.Form.render`, or :meth:`.Widget.render`.
+
+Matching points apply to formset rendering. See :ref:`formset-rendering` for
+discussion.
 
 Use one of the :ref:`built-in template form renderers
 <built-in-template-form-renderers>` or implement your own. Custom renderers
 must implement a ``render(template_name, context, request=None)`` method. It
 should return a rendered templates (as a string) or raise
 :exc:`~django.template.TemplateDoesNotExist`.
+
+.. class:: BaseRenderer
+
+    The base class for the built-in form renderers.
+
+    .. attribute:: form_template_name
+
+        .. versionadded:: 4.1
+
+        The default name of the template to use to render a form.
+
+        Defaults to ``"django/forms/default.html"``, which is a proxy for
+        ``"django/forms/table.html"``.
+
+        .. deprecated:: 4.1
+
+        The ``"django/forms/default.html"`` template is deprecated and will be
+        removed in Django 5.0. The default will become
+        ``"django/forms/div.html"`` at that time.
+
+    .. attribute:: formset_template_name
+
+        .. versionadded:: 4.1
+
+        The default name of the template to use to render a formset.
+
+        Defaults to ``"django/forms/formsets/default.html"``, which is a proxy
+        for ``"django/forms/formsets/table.html"``.
+
+        .. deprecated:: 4.1
+
+        The ``"django/forms/formset/default.html"`` template is deprecated and
+        will be removed in Django 5.0. The default will become
+        ``"django/forms/formset/div.html"`` template.
+
+    .. method:: get_template(template_name)
+
+        Subclasses must implement this method with the appropriate template
+        finding logic.
+
+    .. method:: render(template_name, context, request=None)
+
+        Renders the given template, or raises
+        :exc:`~django.template.TemplateDoesNotExist`.
 
 .. _built-in-template-form-renderers:
 
@@ -50,13 +101,33 @@ This renderer uses a standalone
 :class:`~django.template.backends.django.DjangoTemplates`
 engine (unconnected to what you might have configured in the
 :setting:`TEMPLATES` setting). It loads templates first from the built-in form
-templates directory in ``django/forms/templates`` and then from the installed
-apps' templates directories using the :class:`app_directories
+templates directory in :source:`django/forms/templates` and then from the
+installed apps' templates directories using the :class:`app_directories
 <django.template.loaders.app_directories.Loader>` loader.
 
 If you want to render templates with customizations from your
 :setting:`TEMPLATES` setting, such as context processors for example, use the
 :class:`TemplatesSetting` renderer.
+
+.. class:: DjangoDivFormRenderer
+
+.. versionadded:: 4.1
+
+Subclass of :class:`DjangoTemplates` that specifies
+:attr:`~BaseRenderer.form_template_name` and
+:attr:`~BaseRenderer.formset_template_name` as ``"django/forms/div.html"`` and
+``"django/forms/formset/div.html"`` respectively.
+
+This is a transitional renderer for opt-in to the new ``<div>`` based
+templates, which are the default from Django 5.0.
+
+Apply this via the :setting:`FORM_RENDERER` setting::
+
+    FORM_RENDERER = "django.forms.renderers.DjangoDivFormRenderer"
+
+Once the ``<div>`` templates are the default, this transitional renderer will
+be deprecated, for removal in Django 6.0. The ``FORM_RENDERER`` declaration can
+be removed at that time.
 
 ``Jinja2``
 ----------
@@ -65,8 +136,8 @@ If you want to render templates with customizations from your
 
 This renderer is the same as the :class:`DjangoTemplates` renderer except that
 it uses a :class:`~django.template.backends.jinja2.Jinja2` backend. Templates
-for the built-in widgets are located in ``django/forms/jinja2`` and installed
-apps can provide templates in a ``jinja2`` directory.
+for the built-in widgets are located in :source:`django/forms/jinja2` and
+installed apps can provide templates in a ``jinja2`` directory.
 
 To use this backend, all the forms and widgets in your project and its
 third-party apps must have Jinja2 templates. Unless you provide your own Jinja2
@@ -74,22 +145,33 @@ templates for widgets that don't have any, you can't use this renderer. For
 example, :mod:`django.contrib.admin` doesn't include Jinja2 templates for its
 widgets due to their usage of Django template tags.
 
+.. class:: Jinja2DivFormRenderer
+
+.. versionadded:: 4.1
+
+A transitional renderer as per :class:`DjangoDivFormRenderer` above, but
+subclassing :class:`Jinja2` for use with the Jinja2 backend.
+
+Apply this via the :setting:`FORM_RENDERER` setting::
+
+    FORM_RENDERER = "django.forms.renderers.Jinja2DivFormRenderer"
+
 ``TemplatesSetting``
 --------------------
 
 .. class:: TemplatesSetting
 
-This renderer gives you complete control of how widget templates are sourced.
-It uses :func:`~django.template.loader.get_template` to find widget
-templates based on what's configured in the :setting:`TEMPLATES` setting.
+This renderer gives you complete control of how form and widget templates are
+sourced. It uses :func:`~django.template.loader.get_template` to find templates
+based on what's configured in the :setting:`TEMPLATES` setting.
 
-Using this renderer along with the built-in widget templates requires either:
+Using this renderer along with the built-in templates requires either:
 
 * ``'django.forms'`` in :setting:`INSTALLED_APPS` and at least one engine
   with :setting:`APP_DIRS=True <TEMPLATES-APP_DIRS>`.
 
-* Adding the built-in widgets templates directory in :setting:`DIRS
-  <TEMPLATES-DIRS>` of one of your template engines. To generate that path::
+* Adding the built-in templates directory in :setting:`DIRS <TEMPLATES-DIRS>`
+  of one of your template engines. To generate that path::
 
     import django
     django.__path__[0] + '/forms/templates'  # or '/forms/jinja2'
@@ -100,8 +182,6 @@ needs can be located.
 Context available in formset templates
 ======================================
 
-.. versionadded:: 4.0
-
 Formset templates receive a context from :meth:`.BaseFormSet.get_context`. By
 default, formsets receive a dictionary with the following values:
 
@@ -109,8 +189,6 @@ default, formsets receive a dictionary with the following values:
 
 Context available in form templates
 ===================================
-
-.. versionadded:: 4.0
 
 Form templates receive a context from :meth:`.Form.get_context`. By default,
 forms receive a dictionary with the following values:
@@ -142,8 +220,6 @@ defines ``widget['subwidgets']`` for looping purposes.
 Overriding built-in formset templates
 =====================================
 
-.. versionadded:: 4.0
-
 :attr:`.BaseFormSet.template_name`
 
 To override formset templates, you must use the :class:`TemplatesSetting`
@@ -154,8 +230,6 @@ renderer. Then overriding widget templates works :doc:`the same as
 
 Overriding built-in form templates
 ==================================
-
-.. versionadded:: 4.0
 
 :attr:`.Form.template_name`
 

@@ -5,13 +5,14 @@
 # Igor Jerosimić, 2019-2021
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
+# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-15 17:16+0000\n"
-"Last-Translator: Igor Jerosimić\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-24 16:29+0000\n"
+"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -209,6 +210,9 @@ msgstr "монголски"
 
 msgid "Marathi"
 msgstr "маратхи"
+
+msgid "Malay"
+msgstr "малајски"
 
 msgid "Burmese"
 msgstr "бурмански"
@@ -1118,7 +1122,7 @@ msgstr "Ово није валидна IPv6 адреса."
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s…"
-msgstr "%(truncated_text)s..."
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "или"
@@ -1128,46 +1132,46 @@ msgid ", "
 msgstr ", "
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d година"
-msgstr[1] "%d године"
-msgstr[2] "%d година"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d година"
+msgstr[1] "%(num)d године"
+msgstr[2] "%(num)d година"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d месец"
-msgstr[1] "%d месеца"
-msgstr[2] "%d месеци"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d месец"
+msgstr[1] "%(num)d месеца"
+msgstr[2] "%(num)d месеци"
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d недеља"
-msgstr[1] "%d недеље"
-msgstr[2] "%d недеља"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d недеља"
+msgstr[1] "%(num)d недеље"
+msgstr[2] "%(num)d недеља"
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d дан"
-msgstr[1] "%d дана"
-msgstr[2] "%d дана"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d дан"
+msgstr[1] "%(num)d дана"
+msgstr[2] "%(num)d дана"
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d час"
-msgstr[1] "%d часа"
-msgstr[2] "%d часова"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d сат"
+msgstr[1] "%(num)d сата"
+msgstr[2] "%(num)d сати"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d минут"
-msgstr[1] "%d минута"
-msgstr[2] "%d минута"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d минут"
+msgstr[1] "%(num)d минута"
+msgstr[2] "%(num)d минута"
 
 msgid "Forbidden"
 msgstr "Забрањено"
@@ -1177,7 +1181,7 @@ msgstr "CSRF верификација није прошла. Захтев одб
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""

@@ -26,22 +26,24 @@ class Reporter(models.Model):
     interval = models.DurationField()
 
     class Meta:
-        unique_together = ('first_name', 'last_name')
+        unique_together = ("first_name", "last_name")
 
 
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateField()
-    body = models.TextField(default='')
+    body = models.TextField(default="")
     reporter = models.ForeignKey(Reporter, models.CASCADE)
-    response_to = models.ForeignKey('self', models.SET_NULL, null=True)
-    unmanaged_reporters = models.ManyToManyField(Reporter, through='ArticleReporter', related_name='+')
+    response_to = models.ForeignKey("self", models.SET_NULL, null=True)
+    unmanaged_reporters = models.ManyToManyField(
+        Reporter, through="ArticleReporter", related_name="+"
+    )
 
     class Meta:
-        ordering = ('headline',)
-        index_together = [
-            ["headline", "pub_date"],
-            ['headline', 'response_to', 'pub_date', 'reporter'],
+        ordering = ("headline",)
+        indexes = [
+            models.Index(fields=["headline", "pub_date"]),
+            models.Index(fields=["headline", "response_to", "pub_date", "reporter"]),
         ]
 
 
@@ -62,10 +64,13 @@ class Comment(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['article', 'email', 'pub_date'], name='article_email_pub_date_uniq'),
+            models.UniqueConstraint(
+                fields=["article", "email", "pub_date"],
+                name="article_email_pub_date_uniq",
+            ),
         ]
         indexes = [
-            models.Index(fields=['email', 'pub_date'], name='email_pub_date_idx'),
+            models.Index(fields=["email", "pub_date"], name="email_pub_date_idx"),
         ]
 
 
@@ -75,10 +80,12 @@ class CheckConstraintModel(models.Model):
 
     class Meta:
         required_db_features = {
-            'supports_table_check_constraints',
+            "supports_table_check_constraints",
         }
         constraints = [
-            models.CheckConstraint(name='up_votes_gte_0_check', check=models.Q(up_votes__gte=0)),
+            models.CheckConstraint(
+                name="up_votes_gte_0_check", check=models.Q(up_votes__gte=0)
+            ),
         ]
 
 
@@ -87,11 +94,11 @@ class UniqueConstraintConditionModel(models.Model):
     color = models.CharField(max_length=32, null=True)
 
     class Meta:
-        required_db_features = {'supports_partial_indexes'}
+        required_db_features = {"supports_partial_indexes"}
         constraints = [
             models.UniqueConstraint(
-                fields=['name'],
-                name='cond_name_without_color_uniq',
+                fields=["name"],
+                name="cond_name_without_color_uniq",
                 condition=models.Q(color__isnull=True),
             ),
         ]

@@ -1,13 +1,18 @@
 repos:
+  - repo: https://github.com/psf/black
+    rev: 22.10.0
+    hooks:
+    - id: black
+      exclude: \.py-tpl$
   - repo: https://github.com/PyCQA/isort
-    rev: 5.9.1
+    rev: 5.10.1
     hooks:
       - id: isort
   - repo: https://github.com/PyCQA/flake8
-    rev: 3.9.2
+    rev: 5.0.4
     hooks:
       - id: flake8
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v7.30.0
+    rev: v8.24.0
     hooks:
       - id: eslint

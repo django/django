@@ -2,13 +2,13 @@ import base64
 
 
 class Base64Converter:
-    regex = r'[a-zA-Z0-9+/]*={0,2}'
+    regex = r"[a-zA-Z0-9+/]*={0,2}"
 
     def to_python(self, value):
         return base64.b64decode(value)
 
     def to_url(self, value):
-        return base64.b64encode(value).decode('ascii')
+        return base64.b64encode(value).decode("ascii")
 
 
 class DynamicConverter:
@@ -17,7 +17,7 @@ class DynamicConverter:
 
     @property
     def regex(self):
-        return r'[0-9a-zA-Z]+'
+        return r"[0-9a-zA-Z]+"
 
     @regex.setter
     def regex(self):

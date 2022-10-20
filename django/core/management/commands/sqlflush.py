@@ -14,12 +14,16 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         super().add_arguments(parser)
         parser.add_argument(
-            '--database', default=DEFAULT_DB_ALIAS,
-            help='Nominates a database to print the SQL for. Defaults to the "default" database.',
+            "--database",
+            default=DEFAULT_DB_ALIAS,
+            help=(
+                'Nominates a database to print the SQL for. Defaults to the "default" '
+                "database."
+            ),
         )
 
     def handle(self, **options):
-        sql_statements = sql_flush(self.style, connections[options['database']])
-        if not sql_statements and options['verbosity'] >= 1:
-            self.stderr.write('No tables found.')
-        return '\n'.join(sql_statements)
+        sql_statements = sql_flush(self.style, connections[options["database"]])
+        if not sql_statements and options["verbosity"] >= 1:
+            self.stderr.write("No tables found.")
+        return "\n".join(sql_statements)

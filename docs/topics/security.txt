@@ -216,8 +216,6 @@ security middleware reference <referrer-policy>` for details.
 Cross-origin opener policy
 ==========================
 
-.. versionadded:: 4.0
-
 The cross-origin opener policy (COOP) header allows browsers to isolate a
 top-level window from other documents by putting them in a different context
 group so that they cannot directly interact with the top-level window. If a
@@ -296,7 +294,8 @@ security protection of the web server, operating system and other components.
 * Django does not throttle requests to authenticate users. To protect against
   brute-force attacks against the authentication system, you may consider
   deploying a Django plugin or web server module to throttle these requests.
-* Keep your :setting:`SECRET_KEY` a secret.
+* Keep your :setting:`SECRET_KEY`, and :setting:`SECRET_KEY_FALLBACKS` if in
+  use, secret.
 * It is a good idea to limit the accessibility of your caching system and
   database using a firewall.
 * Take a look at the Open Web Application Security Project (OWASP) `Top 10
@@ -307,5 +306,5 @@ security protection of the web server, operating system and other components.
   pages also include security principles that apply to any system.
 
 .. _LimitRequestBody: https://httpd.apache.org/docs/2.4/mod/core.html#limitrequestbody
-.. _Top 10 list: https://owasp.org/www-project-top-ten/OWASP_Top_Ten_2017/
+.. _Top 10 list: https://owasp.org/Top10/
 .. _web security: https://infosec.mozilla.org/guidelines/web_security.html

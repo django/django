@@ -1,35 +1,44 @@
 """
-Testing some internals of the template processing. These are *not* examples to be copied in user code.
+Testing some internals of the template processing.
+These are *not* examples to be copied in user code.
 """
 from django.template import Library, TemplateSyntaxError
 from django.template.base import (
-    FilterExpression, Lexer, Parser, Token, TokenType, Variable,
+    FilterExpression,
+    Lexer,
+    Parser,
+    Token,
+    TokenType,
+    Variable,
 )
 from django.template.defaultfilters import register as filter_library
 from django.test import SimpleTestCase
 
 
 class ParserTests(SimpleTestCase):
-
     def test_token_smart_split(self):
         """
         #7027 -- _() syntax should work with spaces
         """
-        token = Token(TokenType.BLOCK, 'sometag _("Page not found") value|yesno:_("yes,no")')
+        token = Token(
+            TokenType.BLOCK, 'sometag _("Page not found") value|yesno:_("yes,no")'
+        )
         split = token.split_contents()
-        self.assertEqual(split, ["sometag", '_("Page not found")', 'value|yesno:_("yes,no")'])
+        self.assertEqual(
+            split, ["sometag", '_("Page not found")', 'value|yesno:_("yes,no")']
+        )
 
     def test_repr(self):
-        token = Token(TokenType.BLOCK, 'some text')
+        token = Token(TokenType.BLOCK, "some text")
         self.assertEqual(repr(token), '<Block token: "some text...">')
         parser = Parser([token], builtins=[filter_library])
         self.assertEqual(
             repr(parser),
             '<Parser tokens=[<Block token: "some text...">]>',
         )
-        filter_expression = FilterExpression('news|upper', parser)
+        filter_expression = FilterExpression("news|upper", parser)
         self.assertEqual(repr(filter_expression), "<FilterExpression 'news|upper'>")
-        lexer = Lexer('{% for i in 1 %}{{ a }}\n{% endfor %}')
+        lexer = Lexer("{% for i in 1 %}{{ a }}\n{% endfor %}")
         self.assertEqual(
             repr(lexer),
             '<Lexer template_string="{% for i in 1 %}{{ a...", verbatim=False>',
@@ -56,7 +65,9 @@ class ParserTests(SimpleTestCase):
 
         # Filtered variables should reject access of attributes beginning with
         # underscores.
-        msg = "Variables and attributes may not begin with underscores: 'article._hidden'"
+        msg = (
+            "Variables and attributes may not begin with underscores: 'article._hidden'"
+        )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             FilterExpression("article._hidden|upper", p)
 
@@ -81,13 +92,15 @@ class ParserTests(SimpleTestCase):
 
         # Variables should reject access of attributes and variables beginning
         # with underscores.
-        for name in ['article._hidden', '_article']:
+        for name in ["article._hidden", "_article"]:
             msg = f"Variables and attributes may not begin with underscores: '{name}'"
             with self.assertRaisesMessage(TemplateSyntaxError, msg):
                 Variable(name)
 
         # Variables should raise on non string type
-        with self.assertRaisesMessage(TypeError, "Variable must be a string or number, got <class 'dict'>"):
+        with self.assertRaisesMessage(
+            TypeError, "Variable must be a string or number, got <class 'dict'>"
+        ):
             Variable({})
 
     def test_filter_args_count(self):
@@ -113,23 +126,24 @@ class ParserTests(SimpleTestCase):
         @register.filter
         def two_one_opt_arg(value, arg, arg2=False):
             pass
+
         parser.add_library(register)
         for expr in (
-                '1|no_arguments:"1"',
-                '1|two_arguments',
-                '1|two_arguments:"1"',
-                '1|two_one_opt_arg',
+            '1|no_arguments:"1"',
+            "1|two_arguments",
+            '1|two_arguments:"1"',
+            "1|two_one_opt_arg",
         ):
             with self.assertRaises(TemplateSyntaxError):
                 FilterExpression(expr, parser)
         for expr in (
-                # Correct number of arguments
-                '1|no_arguments',
-                '1|one_argument:"1"',
-                # One optional
-                '1|one_opt_argument',
-                '1|one_opt_argument:"1"',
-                # Not supplying all
-                '1|two_one_opt_arg:"1"',
+            # Correct number of arguments
+            "1|no_arguments",
+            '1|one_argument:"1"',
+            # One optional
+            "1|one_opt_argument",
+            '1|one_opt_argument:"1"',
+            # Not supplying all
+            '1|two_one_opt_arg:"1"',
         ):
             FilterExpression(expr, parser)

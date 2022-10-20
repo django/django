@@ -15,9 +15,9 @@ class SchemaIndexesTests(TransactionTestCase):
         with connection.cursor() as cursor:
             constraints = connection.introspection.get_constraints(cursor, table)
             return {
-                name: constraint['columns']
+                name: constraint["columns"]
                 for name, constraint in constraints.items()
-                if constraint['index']
+                if constraint["index"]
             }
 
     def has_spatial_indexes(self, table):
@@ -32,31 +32,31 @@ class SchemaIndexesTests(TransactionTestCase):
 
     def test_using_sql(self):
         if not connection.ops.postgis:
-            self.skipTest('This is a PostGIS-specific test.')
-        index = Index(fields=['point'])
+            self.skipTest("This is a PostGIS-specific test.")
+        index = Index(fields=["point"])
         editor = connection.schema_editor()
         self.assertIn(
-            '%s USING ' % editor.quote_name(City._meta.db_table),
+            "%s USING " % editor.quote_name(City._meta.db_table),
             str(index.create_sql(City, editor)),
         )
 
-    @isolate_apps('gis_tests.geoapp')
+    @isolate_apps("gis_tests.geoapp")
     def test_namespaced_db_table(self):
         if not connection.ops.postgis:
-            self.skipTest('PostGIS-specific test.')
+            self.skipTest("PostGIS-specific test.")
 
         class SchemaCity(models.Model):
             point = models.PointField()
 
             class Meta:
-                app_label = 'geoapp'
+                app_label = "geoapp"
                 db_table = 'django_schema"."geoapp_schema_city'
 
-        index = Index(fields=['point'])
+        index = Index(fields=["point"])
         editor = connection.schema_editor()
         create_index_sql = str(index.create_sql(SchemaCity, editor))
         self.assertIn(
-            '%s USING ' % editor.quote_name(SchemaCity._meta.db_table),
+            "%s USING " % editor.quote_name(SchemaCity._meta.db_table),
             create_index_sql,
         )
         self.assertIn(
@@ -66,12 +66,12 @@ class SchemaIndexesTests(TransactionTestCase):
 
     def test_index_name(self):
         if not self.has_spatial_indexes(City._meta.db_table):
-            self.skipTest('Spatial indexes in Meta.indexes are not supported.')
-        index_name = 'custom_point_index_name'
-        index = Index(fields=['point'], name=index_name)
+            self.skipTest("Spatial indexes in Meta.indexes are not supported.")
+        index_name = "custom_point_index_name"
+        index = Index(fields=["point"], name=index_name)
         with connection.schema_editor() as editor:
             editor.add_index(City, index)
             indexes = self.get_indexes(City._meta.db_table)
             self.assertIn(index_name, indexes)
-            self.assertEqual(indexes[index_name], ['point'])
+            self.assertEqual(indexes[index_name], ["point"])
             editor.remove_index(City, index)

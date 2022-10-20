@@ -1,7 +1,6 @@
 import argparse
 import ctypes
 import faulthandler
-import hashlib
 import io
 import itertools
 import logging
@@ -18,14 +17,16 @@ from contextlib import contextmanager
 from importlib import import_module
 from io import StringIO
 
+import django
 from django.core.management import call_command
 from django.db import connections
 from django.test import SimpleTestCase, TestCase
-from django.test.utils import (
-    NullTimeKeeper, TimeKeeper, iter_test_cases,
-    setup_databases as _setup_databases, setup_test_environment,
-    teardown_databases as _teardown_databases, teardown_test_environment,
-)
+from django.test.utils import NullTimeKeeper, TimeKeeper, iter_test_cases
+from django.test.utils import setup_databases as _setup_databases
+from django.test.utils import setup_test_environment
+from django.test.utils import teardown_databases as _teardown_databases
+from django.test.utils import teardown_test_environment
+from django.utils.crypto import new_hash
 from django.utils.datastructures import OrderedSet
 from django.utils.deprecation import RemovedInDjango50Warning
 
@@ -42,7 +43,7 @@ except ImportError:
 
 class DebugSQLTextTestResult(unittest.TextTestResult):
     def __init__(self, stream, descriptions, verbosity):
-        self.logger = logging.getLogger('django.db.backends')
+        self.logger = logging.getLogger("django.db.backends")
         self.logger.setLevel(logging.DEBUG)
         self.debug_sql_stream = None
         super().__init__(stream, descriptions, verbosity)
@@ -65,7 +66,7 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
         super().addError(test, err)
         if self.debug_sql_stream is None:
             # Error before tests e.g. in setUpTestData().
-            sql = ''
+            sql = ""
         else:
             self.debug_sql_stream.seek(0)
             sql = self.debug_sql_stream.read()
@@ -80,7 +81,11 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
         super().addSubTest(test, subtest, err)
         if err is not None:
             self.debug_sql_stream.seek(0)
-            errors = self.failures if issubclass(err[0], test.failureException) else self.errors
+            errors = (
+                self.failures
+                if issubclass(err[0], test.failureException)
+                else self.errors
+            )
             errors[-1] = errors[-1] + (self.debug_sql_stream.read(),)
 
     def printErrorList(self, flavour, errors):
@@ -107,6 +112,11 @@ class PDBDebugResult(unittest.TextTestResult):
         super().addFailure(test, err)
         self.debug(err)
 
+    def addSubTest(self, test, subtest, err):
+        if err is not None:
+            self.debug(err)
+        super().addSubTest(test, subtest, err)
+
     def debug(self, error):
         self._restoreStdout()
         self.buffer = False
@@ -119,6 +129,7 @@ class DummyList:
     """
     Dummy list class for faking storage of results in unittest.TestResult.
     """
+
     __slots__ = ()
 
     def append(self, item):
@@ -152,10 +163,10 @@ class RemoteTestResult(unittest.TestResult):
         # attributes. This is possible since they aren't used after unpickling
         # after being sent to ParallelTestSuite.
         state = self.__dict__.copy()
-        state.pop('_stdout_buffer', None)
-        state.pop('_stderr_buffer', None)
-        state.pop('_original_stdout', None)
-        state.pop('_original_stderr', None)
+        state.pop("_stdout_buffer", None)
+        state.pop("_stderr_buffer", None)
+        state.pop("_original_stdout", None)
+        state.pop("_original_stderr", None)
         return state
 
     @property
@@ -171,7 +182,8 @@ class RemoteTestResult(unittest.TestResult):
         pickle.loads(pickle.dumps(obj))
 
     def _print_unpicklable_subtest(self, test, subtest, pickle_exc):
-        print("""
+        print(
+            """
 Subtest failed:
 
     test: {}
@@ -184,7 +196,10 @@ test runner cannot handle it cleanly. Here is the pickling error:
 
 You should re-run this test with --parallel=1 to reproduce the failure
 with a cleaner failure message.
-""".format(test, subtest, pickle_exc))
+""".format(
+                test, subtest, pickle_exc
+            )
+        )
 
     def check_picklable(self, test, err):
         # Ensure that sys.exc_info() tuples are picklable. This displays a
@@ -197,11 +212,16 @@ with a cleaner failure message.
             self._confirm_picklable(err)
         except Exception as exc:
             original_exc_txt = repr(err[1])
-            original_exc_txt = textwrap.fill(original_exc_txt, 75, initial_indent='    ', subsequent_indent='    ')
+            original_exc_txt = textwrap.fill(
+                original_exc_txt, 75, initial_indent="    ", subsequent_indent="    "
+            )
             pickle_exc_txt = repr(exc)
-            pickle_exc_txt = textwrap.fill(pickle_exc_txt, 75, initial_indent='    ', subsequent_indent='    ')
+            pickle_exc_txt = textwrap.fill(
+                pickle_exc_txt, 75, initial_indent="    ", subsequent_indent="    "
+            )
             if tblib is None:
-                print("""
+                print(
+                    """
 
 {} failed:
 
@@ -213,9 +233,13 @@ parallel test runner to handle this exception cleanly.
 In order to see the traceback, you should install tblib:
 
     python -m pip install tblib
-""".format(test, original_exc_txt))
+""".format(
+                        test, original_exc_txt
+                    )
+                )
             else:
-                print("""
+                print(
+                    """
 
 {} failed:
 
@@ -230,7 +254,10 @@ Here's the error encountered while trying to pickle the exception:
 
 You should re-run this test with the --parallel=1 option to reproduce the
 failure and get a correct traceback.
-""".format(test, original_exc_txt, pickle_exc_txt))
+""".format(
+                        test, original_exc_txt, pickle_exc_txt
+                    )
+                )
             raise
 
     def check_subtest_picklable(self, test, subtest):
@@ -242,28 +269,28 @@ failure and get a correct traceback.
 
     def startTestRun(self):
         super().startTestRun()
-        self.events.append(('startTestRun',))
+        self.events.append(("startTestRun",))
 
     def stopTestRun(self):
         super().stopTestRun()
-        self.events.append(('stopTestRun',))
+        self.events.append(("stopTestRun",))
 
     def startTest(self, test):
         super().startTest(test)
-        self.events.append(('startTest', self.test_index))
+        self.events.append(("startTest", self.test_index))
 
     def stopTest(self, test):
         super().stopTest(test)
-        self.events.append(('stopTest', self.test_index))
+        self.events.append(("stopTest", self.test_index))
 
     def addError(self, test, err):
         self.check_picklable(test, err)
-        self.events.append(('addError', self.test_index, err))
+        self.events.append(("addError", self.test_index, err))
         super().addError(test, err)
 
     def addFailure(self, test, err):
         self.check_picklable(test, err)
-        self.events.append(('addFailure', self.test_index, err))
+        self.events.append(("addFailure", self.test_index, err))
         super().addFailure(test, err)
 
     def addSubTest(self, test, subtest, err):
@@ -274,15 +301,15 @@ failure and get a correct traceback.
             # check_picklable() performs the tblib check.
             self.check_picklable(test, err)
             self.check_subtest_picklable(test, subtest)
-            self.events.append(('addSubTest', self.test_index, subtest, err))
+            self.events.append(("addSubTest", self.test_index, subtest, err))
         super().addSubTest(test, subtest, err)
 
     def addSuccess(self, test):
-        self.events.append(('addSuccess', self.test_index))
+        self.events.append(("addSuccess", self.test_index))
         super().addSuccess(test)
 
     def addSkip(self, test, reason):
-        self.events.append(('addSkip', self.test_index, reason))
+        self.events.append(("addSkip", self.test_index, reason))
         super().addSkip(test, reason)
 
     def addExpectedFailure(self, test, err):
@@ -293,23 +320,23 @@ failure and get a correct traceback.
         if tblib is None:
             err = err[0], err[1], None
         self.check_picklable(test, err)
-        self.events.append(('addExpectedFailure', self.test_index, err))
+        self.events.append(("addExpectedFailure", self.test_index, err))
         super().addExpectedFailure(test, err)
 
     def addUnexpectedSuccess(self, test):
-        self.events.append(('addUnexpectedSuccess', self.test_index))
+        self.events.append(("addUnexpectedSuccess", self.test_index))
         super().addUnexpectedSuccess(test)
 
     def wasSuccessful(self):
         """Tells whether or not this result was a success."""
-        failure_types = {'addError', 'addFailure', 'addSubTest', 'addUnexpectedSuccess'}
+        failure_types = {"addError", "addFailure", "addSubTest", "addUnexpectedSuccess"}
         return all(e[0] not in failure_types for e in self.events)
 
     def _exc_info_to_string(self, err, test):
         # Make this method no-op. It only powers the default unittest behavior
         # for recording errors, but this class pickles errors into 'events'
         # instead.
-        return ''
+        return ""
 
 
 class RemoteTestRunner:
@@ -341,18 +368,18 @@ def get_max_test_processes():
     The maximum number of test processes when using the --parallel option.
     """
     # The current implementation of the parallel test runner requires
-    # multiprocessing to start subprocesses with fork().
-    if multiprocessing.get_start_method() != 'fork':
+    # multiprocessing to start subprocesses with fork() or spawn().
+    if multiprocessing.get_start_method() not in {"fork", "spawn"}:
         return 1
     try:
-        return int(os.environ['DJANGO_TEST_PROCESSES'])
+        return int(os.environ["DJANGO_TEST_PROCESSES"])
     except KeyError:
         return multiprocessing.cpu_count()
 
 
 def parallel_type(value):
     """Parse value passed to the --parallel option."""
-    if value == 'auto':
+    if value == "auto":
         return value
     try:
         return int(value)
@@ -365,7 +392,14 @@ def parallel_type(value):
 _worker_id = 0
 
 
-def _init_worker(counter):
+def _init_worker(
+    counter,
+    initial_settings=None,
+    serialized_contents=None,
+    process_setup=None,
+    process_setup_args=None,
+    debug_mode=None,
+):
     """
     Switch to databases dedicated to this worker.
 
@@ -379,15 +413,24 @@ def _init_worker(counter):
         counter.value += 1
         _worker_id = counter.value
 
+    start_method = multiprocessing.get_start_method()
+
+    if start_method == "spawn":
+        if process_setup and callable(process_setup):
+            if process_setup_args is None:
+                process_setup_args = ()
+            process_setup(*process_setup_args)
+        django.setup()
+        setup_test_environment(debug=debug_mode)
+
     for alias in connections:
         connection = connections[alias]
-        settings_dict = connection.creation.get_test_db_clone_settings(str(_worker_id))
-        # connection.settings_dict must be updated in place for changes to be
-        # reflected in django.db.connections. If the following line assigned
-        # connection.settings_dict = settings_dict, new threads would connect
-        # to the default database instead of the appropriate clone.
-        connection.settings_dict.update(settings_dict)
-        connection.close()
+        if start_method == "spawn":
+            # Restore initial settings in spawned processes.
+            connection.settings_dict.update(initial_settings[alias])
+            if value := serialized_contents.get(alias):
+                connection._test_serialized_contents = value
+        connection.creation.setup_worker_connection(_worker_id)
 
 
 def _run_subsuite(args):
@@ -401,6 +444,11 @@ def _run_subsuite(args):
     runner = runner_class(failfast=failfast, buffer=buffer)
     result = runner.run(subsuite)
     return subsuite_index, result.events
+
+
+def _process_setup_stub(*args):
+    """Stub method to simplify run() implementation."""
+    pass
 
 
 class ParallelTestSuite(unittest.TestSuite):
@@ -421,14 +469,21 @@ class ParallelTestSuite(unittest.TestSuite):
 
     # In case someone wants to modify these in a subclass.
     init_worker = _init_worker
+    process_setup = _process_setup_stub
+    process_setup_args = ()
     run_subsuite = _run_subsuite
     runner_class = RemoteTestRunner
 
-    def __init__(self, subsuites, processes, failfast=False, buffer=False):
+    def __init__(
+        self, subsuites, processes, failfast=False, debug_mode=False, buffer=False
+    ):
         self.subsuites = subsuites
         self.processes = processes
         self.failfast = failfast
+        self.debug_mode = debug_mode
         self.buffer = buffer
+        self.initial_settings = None
+        self.serialized_contents = None
         super().__init__()
 
     def run(self, result):
@@ -446,11 +501,19 @@ class ParallelTestSuite(unittest.TestSuite):
         Even with tblib, errors may still occur for dynamically created
         exception classes which cannot be unpickled.
         """
+        self.initialize_suite()
         counter = multiprocessing.Value(ctypes.c_int, 0)
         pool = multiprocessing.Pool(
             processes=self.processes,
             initializer=self.init_worker.__func__,
-            initargs=[counter],
+            initargs=[
+                counter,
+                self.initial_settings,
+                self.serialized_contents,
+                self.process_setup.__func__,
+                self.process_setup_args,
+                self.debug_mode,
+            ],
         )
         args = [
             (self.runner_class, index, subsuite, self.failfast, self.buffer)
@@ -488,6 +551,17 @@ class ParallelTestSuite(unittest.TestSuite):
     def __iter__(self):
         return iter(self.subsuites)
 
+    def initialize_suite(self):
+        if multiprocessing.get_start_method() == "spawn":
+            self.initial_settings = {
+                alias: connections[alias].settings_dict for alias in connections
+            }
+            self.serialized_contents = {
+                alias: connections[alias]._test_serialized_contents
+                for alias in connections
+                if alias in self.serialized_aliases
+            }
+
 
 class Shuffler:
     """
@@ -500,30 +574,30 @@ class Shuffler:
     """
 
     # This doesn't need to be cryptographically strong, so use what's fastest.
-    hash_algorithm = 'md5'
+    hash_algorithm = "md5"
 
     @classmethod
     def _hash_text(cls, text):
-        h = hashlib.new(cls.hash_algorithm)
-        h.update(text.encode('utf-8'))
+        h = new_hash(cls.hash_algorithm, usedforsecurity=False)
+        h.update(text.encode("utf-8"))
         return h.hexdigest()
 
     def __init__(self, seed=None):
         if seed is None:
             # Limit seeds to 10 digits for simpler output.
             seed = random.randint(0, 10**10 - 1)
-            seed_source = 'generated'
+            seed_source = "generated"
         else:
-            seed_source = 'given'
+            seed_source = "given"
         self.seed = seed
         self.seed_source = seed_source
 
     @property
     def seed_display(self):
-        return f'{self.seed!r} ({self.seed_source})'
+        return f"{self.seed!r} ({self.seed_source})"
 
     def _hash_item(self, item, key):
-        text = '{}{}'.format(self.seed, key(item))
+        text = "{}{}".format(self.seed, key(item))
         return self._hash_text(text)
 
     def shuffle(self, items, key):
@@ -539,8 +613,10 @@ class Shuffler:
         for item in items:
             hashed = self._hash_item(item, key)
             if hashed in hashes:
-                msg = 'item {!r} has same hash {!r} as item {!r}'.format(
-                    item, hashed, hashes[hashed],
+                msg = "item {!r} has same hash {!r} as item {!r}".format(
+                    item,
+                    hashed,
+                    hashes[hashed],
                 )
                 raise RuntimeError(msg)
             hashes[hashed] = item
@@ -556,12 +632,29 @@ class DiscoverRunner:
     test_loader = unittest.defaultTestLoader
     reorder_by = (TestCase, SimpleTestCase)
 
-    def __init__(self, pattern=None, top_level=None, verbosity=1,
-                 interactive=True, failfast=False, keepdb=False,
-                 reverse=False, debug_mode=False, debug_sql=False, parallel=0,
-                 tags=None, exclude_tags=None, test_name_patterns=None,
-                 pdb=False, buffer=False, enable_faulthandler=True,
-                 timing=False, shuffle=False, logger=None, **kwargs):
+    def __init__(
+        self,
+        pattern=None,
+        top_level=None,
+        verbosity=1,
+        interactive=True,
+        failfast=False,
+        keepdb=False,
+        reverse=False,
+        debug_mode=False,
+        debug_sql=False,
+        parallel=0,
+        tags=None,
+        exclude_tags=None,
+        test_name_patterns=None,
+        pdb=False,
+        buffer=False,
+        enable_faulthandler=True,
+        timing=False,
+        shuffle=False,
+        logger=None,
+        **kwargs,
+    ):
 
         self.pattern = pattern
         self.top_level = top_level
@@ -582,7 +675,9 @@ class DiscoverRunner:
                 faulthandler.enable(file=sys.__stderr__.fileno())
         self.pdb = pdb
         if self.pdb and self.parallel > 1:
-            raise ValueError('You cannot use --pdb with parallel tests; pass --parallel=1 to use it.')
+            raise ValueError(
+                "You cannot use --pdb with parallel tests; pass --parallel=1 to use it."
+            )
         self.buffer = buffer
         self.test_name_patterns = None
         self.time_keeper = TimeKeeper() if timing else NullTimeKeeper()
@@ -590,7 +685,7 @@ class DiscoverRunner:
             # unittest does not export the _convert_select_pattern function
             # that converts command-line arguments to patterns.
             self.test_name_patterns = {
-                pattern if '*' in pattern else '*%s*' % pattern
+                pattern if "*" in pattern else "*%s*" % pattern
                 for pattern in test_name_patterns
             }
         self.shuffle = shuffle
@@ -600,73 +695,99 @@ class DiscoverRunner:
     @classmethod
     def add_arguments(cls, parser):
         parser.add_argument(
-            '-t', '--top-level-directory', dest='top_level',
-            help='Top level of project for unittest discovery.',
+            "-t",
+            "--top-level-directory",
+            dest="top_level",
+            help="Top level of project for unittest discovery.",
         )
         parser.add_argument(
-            '-p', '--pattern', default="test*.py",
-            help='The test matching pattern. Defaults to test*.py.',
+            "-p",
+            "--pattern",
+            default="test*.py",
+            help="The test matching pattern. Defaults to test*.py.",
         )
         parser.add_argument(
-            '--keepdb', action='store_true',
-            help='Preserves the test DB between runs.'
+            "--keepdb", action="store_true", help="Preserves the test DB between runs."
         )
         parser.add_argument(
-            '--shuffle', nargs='?', default=False, type=int, metavar='SEED',
-            help='Shuffles test case order.',
+            "--shuffle",
+            nargs="?",
+            default=False,
+            type=int,
+            metavar="SEED",
+            help="Shuffles test case order.",
         )
         parser.add_argument(
-            '-r', '--reverse', action='store_true',
-            help='Reverses test case order.',
+            "-r",
+            "--reverse",
+            action="store_true",
+            help="Reverses test case order.",
         )
         parser.add_argument(
-            '--debug-mode', action='store_true',
-            help='Sets settings.DEBUG to True.',
+            "--debug-mode",
+            action="store_true",
+            help="Sets settings.DEBUG to True.",
         )
         parser.add_argument(
-            '-d', '--debug-sql', action='store_true',
-            help='Prints logged SQL queries on failure.',
+            "-d",
+            "--debug-sql",
+            action="store_true",
+            help="Prints logged SQL queries on failure.",
         )
         parser.add_argument(
-            '--parallel', nargs='?', const='auto', default=0,
-            type=parallel_type, metavar='N',
+            "--parallel",
+            nargs="?",
+            const="auto",
+            default=0,
+            type=parallel_type,
+            metavar="N",
             help=(
-                'Run tests using up to N parallel processes. Use the value '
+                "Run tests using up to N parallel processes. Use the value "
                 '"auto" to run one test process for each processor core.'
             ),
         )
         parser.add_argument(
-            '--tag', action='append', dest='tags',
-            help='Run only tests with the specified tag. Can be used multiple times.',
+            "--tag",
+            action="append",
+            dest="tags",
+            help="Run only tests with the specified tag. Can be used multiple times.",
         )
         parser.add_argument(
-            '--exclude-tag', action='append', dest='exclude_tags',
-            help='Do not run tests with the specified tag. Can be used multiple times.',
+            "--exclude-tag",
+            action="append",
+            dest="exclude_tags",
+            help="Do not run tests with the specified tag. Can be used multiple times.",
         )
         parser.add_argument(
-            '--pdb', action='store_true',
-            help='Runs a debugger (pdb, or ipdb if installed) on error or failure.'
+            "--pdb",
+            action="store_true",
+            help="Runs a debugger (pdb, or ipdb if installed) on error or failure.",
         )
         parser.add_argument(
-            '-b', '--buffer', action='store_true',
-            help='Discard output from passing tests.',
+            "-b",
+            "--buffer",
+            action="store_true",
+            help="Discard output from passing tests.",
         )
         parser.add_argument(
-            '--no-faulthandler', action='store_false', dest='enable_faulthandler',
-            help='Disables the Python faulthandler module during tests.',
+            "--no-faulthandler",
+            action="store_false",
+            dest="enable_faulthandler",
+            help="Disables the Python faulthandler module during tests.",
         )
         parser.add_argument(
-            '--timing', action='store_true',
+            "--timing",
+            action="store_true",
+            help=("Output timings, including database set up and total run time."),
+        )
+        parser.add_argument(
+            "-k",
+            action="append",
+            dest="test_name_patterns",
             help=(
-                'Output timings, including database set up and total run time.'
-            ),
-        )
-        parser.add_argument(
-            '-k', action='append', dest='test_name_patterns',
-            help=(
-                'Only run test methods and classes that match the pattern '
-                'or substring. Can be used multiple times. Same as '
-                'unittest -k option.'
+                "Only run test methods and classes that match the pattern "
+                "or substring. Can be used multiple times. Same as "
+                "unittest -k option."
             ),
         )
 
@@ -688,9 +809,7 @@ class DiscoverRunner:
         if level is None:
             level = logging.INFO
         if self.logger is None:
-            if self.verbosity <= 0 or (
-                self.verbosity == 1 and level < logging.INFO
-            ):
+            if self.verbosity <= 0 or (self.verbosity == 1 and level < logging.INFO):
                 return
             print(msg)
         else:
@@ -704,7 +823,7 @@ class DiscoverRunner:
         if self.shuffle is False:
             return
         shuffler = Shuffler(seed=self.shuffle)
-        self.log(f'Using shuffle seed: {shuffler.seed_display}')
+        self.log(f"Using shuffle seed: {shuffler.seed_display}")
         self._shuffler = shuffler
 
     @contextmanager
@@ -736,15 +855,15 @@ class DiscoverRunner:
             if os.path.exists(label_as_path):
                 assert tests is None
                 raise RuntimeError(
-                    f'One of the test labels is a path to a file: {label!r}, '
-                    f'which is not supported. Use a dotted module name or '
-                    f'path to a directory instead.'
+                    f"One of the test labels is a path to a file: {label!r}, "
+                    f"which is not supported. Use a dotted module name or "
+                    f"path to a directory instead."
                 )
             return tests
 
         kwargs = discover_kwargs.copy()
         if os.path.isdir(label_as_path) and not self.top_level:
-            kwargs['top_level_dir'] = find_top_level(label_as_path)
+            kwargs["top_level_dir"] = find_top_level(label_as_path)
 
         with self.load_with_patterns():
             tests = self.test_loader.discover(start_dir=label, **kwargs)
@@ -757,18 +876,18 @@ class DiscoverRunner:
     def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
         if extra_tests is not None:
             warnings.warn(
-                'The extra_tests argument is deprecated.',
+                "The extra_tests argument is deprecated.",
                 RemovedInDjango50Warning,
                 stacklevel=2,
             )
-        test_labels = test_labels or ['.']
+        test_labels = test_labels or ["."]
         extra_tests = extra_tests or []
 
         discover_kwargs = {}
         if self.pattern is not None:
-            discover_kwargs['pattern'] = self.pattern
+            discover_kwargs["pattern"] = self.pattern
         if self.top_level is not None:
-            discover_kwargs['top_level_dir'] = self.top_level
+            discover_kwargs["top_level_dir"] = self.top_level
         self.setup_shuffler()
 
         all_tests = []
@@ -781,12 +900,12 @@ class DiscoverRunner:
         if self.tags or self.exclude_tags:
             if self.tags:
                 self.log(
-                    'Including test tag(s): %s.' % ', '.join(sorted(self.tags)),
+                    "Including test tag(s): %s." % ", ".join(sorted(self.tags)),
                     level=logging.DEBUG,
                 )
             if self.exclude_tags:
                 self.log(
-                    'Excluding test tag(s): %s.' % ', '.join(sorted(self.exclude_tags)),
+                    "Excluding test tag(s): %s." % ", ".join(sorted(self.exclude_tags)),
                     level=logging.DEBUG,
                 )
             all_tests = filter_tests_by_tags(all_tests, self.tags, self.exclude_tags)
@@ -795,13 +914,15 @@ class DiscoverRunner:
         # _FailedTest objects include things like test modules that couldn't be
         # found or that couldn't be loaded due to syntax errors.
         test_types = (unittest.loader._FailedTest, *self.reorder_by)
-        all_tests = list(reorder_tests(
-            all_tests,
-            test_types,
-            shuffler=self._shuffler,
-            reverse=self.reverse,
-        ))
-        self.log('Found %d test(s).' % len(all_tests))
+        all_tests = list(
+            reorder_tests(
+                all_tests,
+                test_types,
+                shuffler=self._shuffler,
+                reverse=self.reverse,
+            )
+        )
+        self.log("Found %d test(s)." % len(all_tests))
         suite = self.test_suite(all_tests)
 
         if self.parallel > 1:
@@ -817,14 +938,20 @@ class DiscoverRunner:
                     subsuites,
                     processes,
                     self.failfast,
+                    self.debug_mode,
                     self.buffer,
                 )
         return suite
 
     def setup_databases(self, **kwargs):
         return _setup_databases(
-            self.verbosity, self.interactive, time_keeper=self.time_keeper, keepdb=self.keepdb,
-            debug_sql=self.debug_sql, parallel=self.parallel, **kwargs
+            self.verbosity,
+            self.interactive,
+            time_keeper=self.time_keeper,
+            keepdb=self.keepdb,
+            debug_sql=self.debug_sql,
+            parallel=self.parallel,
+            **kwargs,
         )
 
     def get_resultclass(self):
@@ -835,16 +962,16 @@ class DiscoverRunner:
 
     def get_test_runner_kwargs(self):
         return {
-            'failfast': self.failfast,
-            'resultclass': self.get_resultclass(),
-            'verbosity': self.verbosity,
-            'buffer': self.buffer,
+            "failfast": self.failfast,
+            "resultclass": self.get_resultclass(),
+            "verbosity": self.verbosity,
+            "buffer": self.buffer,
         }
 
     def run_checks(self, databases):
         # Checks are run after database creation since some checks require
         # database access.
-        call_command('check', verbosity=self.verbosity, databases=databases)
+        call_command("check", verbosity=self.verbosity, databases=databases)
 
     def run_suite(self, suite, **kwargs):
         kwargs = self.get_test_runner_kwargs()
@@ -854,7 +981,7 @@ class DiscoverRunner:
         finally:
             if self._shuffler is not None:
                 seed_display = self._shuffler.seed_display
-                self.log(f'Used shuffle seed: {seed_display}')
+                self.log(f"Used shuffle seed: {seed_display}")
 
     def teardown_databases(self, old_config, **kwargs):
         """Destroy all the non-mirror databases."""
@@ -870,16 +997,18 @@ class DiscoverRunner:
         teardown_test_environment()
 
     def suite_result(self, suite, result, **kwargs):
-        return len(result.failures) + len(result.errors)
+        return (
+            len(result.failures) + len(result.errors) + len(result.unexpectedSuccesses)
+        )
 
     def _get_databases(self, suite):
         databases = {}
         for test in iter_test_cases(suite):
-            test_databases = getattr(test, 'databases', None)
-            if test_databases == '__all__':
+            test_databases = getattr(test, "databases", None)
+            if test_databases == "__all__":
                 test_databases = connections
             if test_databases:
-                serialized_rollback = getattr(test, 'serialized_rollback', False)
+                serialized_rollback = getattr(test, "serialized_rollback", False)
                 databases.update(
                     (alias, serialized_rollback or databases.get(alias, False))
                     for alias in test_databases
@@ -891,7 +1020,8 @@ class DiscoverRunner:
         unused_databases = [alias for alias in connections if alias not in databases]
         if unused_databases:
             self.log(
-                'Skipping setup of unused database(s): %s.' % ', '.join(sorted(unused_databases)),
+                "Skipping setup of unused database(s): %s."
+                % ", ".join(sorted(unused_databases)),
                 level=logging.DEBUG,
             )
         return databases
@@ -907,21 +1037,20 @@ class DiscoverRunner:
         """
         if extra_tests is not None:
             warnings.warn(
-                'The extra_tests argument is deprecated.',
+                "The extra_tests argument is deprecated.",
                 RemovedInDjango50Warning,
                 stacklevel=2,
             )
         self.setup_test_environment()
         suite = self.build_suite(test_labels, extra_tests)
         databases = self.get_databases(suite)
-        serialized_aliases = set(
-            alias
-            for alias, serialize in databases.items() if serialize
+        suite.serialized_aliases = set(
+            alias for alias, serialize in databases.items() if serialize
         )
-        with self.time_keeper.timed('Total database setup'):
+        with self.time_keeper.timed("Total database setup"):
             old_config = self.setup_databases(
                 aliases=databases,
-                serialized_aliases=serialized_aliases,
+                serialized_aliases=suite.serialized_aliases,
             )
         run_failed = False
         try:
@@ -932,7 +1061,7 @@ class DiscoverRunner:
             raise
         finally:
             try:
-                with self.time_keeper.timed('Total database teardown'):
+                with self.time_keeper.timed("Total database teardown"):
                     self.teardown_databases(old_config)
                 self.teardown_test_environment()
             except Exception:
@@ -955,7 +1084,7 @@ def try_importing(label):
     except (ImportError, TypeError):
         return (False, False)
 
-    return (True, hasattr(mod, '__path__'))
+    return (True, hasattr(mod, "__path__"))
 
 
 def find_top_level(top_level):
@@ -971,7 +1100,7 @@ def find_top_level(top_level):
     # top-level module or as a directory path, unittest unfortunately prefers
     # the latter.
     while True:
-        init_py = os.path.join(top_level, '__init__.py')
+        init_py = os.path.join(top_level, "__init__.py")
         if not os.path.exists(init_py):
             break
         try_next = os.path.dirname(top_level)
@@ -983,7 +1112,7 @@ def find_top_level(top_level):
 
 
 def _class_shuffle_key(cls):
-    return f'{cls.__module__}.{cls.__qualname__}'
+    return f"{cls.__module__}.{cls.__qualname__}"
 
 
 def shuffle_tests(tests, shuffler):
@@ -1068,9 +1197,7 @@ def partition_suite_by_case(suite):
     """Partition a test suite by test case, preserving the order of tests."""
     suite_class = type(suite)
     all_tests = iter_test_cases(suite)
-    return [
-        suite_class(tests) for _, tests in itertools.groupby(all_tests, type)
-    ]
+    return [suite_class(tests) for _, tests in itertools.groupby(all_tests, type)]
 
 
 def test_match_tags(test, tags, exclude_tags):
@@ -1078,11 +1205,11 @@ def test_match_tags(test, tags, exclude_tags):
         # Tests that couldn't load always match to prevent tests from falsely
         # passing due e.g. to syntax errors.
         return True
-    test_tags = set(getattr(test, 'tags', []))
-    test_fn_name = getattr(test, '_testMethodName', str(test))
+    test_tags = set(getattr(test, "tags", []))
+    test_fn_name = getattr(test, "_testMethodName", str(test))
     if hasattr(test, test_fn_name):
         test_fn = getattr(test, test_fn_name)
-        test_fn_tags = list(getattr(test_fn, 'tags', []))
+        test_fn_tags = list(getattr(test_fn, "tags", []))
         test_tags = test_tags.union(test_fn_tags)
     if tags and test_tags.isdisjoint(tags):
         return False

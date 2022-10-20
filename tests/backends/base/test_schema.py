@@ -4,9 +4,9 @@ from django.test import SimpleTestCase
 
 
 class SchemaEditorTests(SimpleTestCase):
-
     def test_effective_default_callable(self):
         """SchemaEditor.effective_default() shouldn't call callable defaults."""
+
         class MyStr(str):
             def __call__(self):
                 return self

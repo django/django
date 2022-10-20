@@ -2,10 +2,12 @@
 Module for abstract serializer/unserializer base classes.
 """
 import pickle
+import warnings
 from io import StringIO
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.utils.deprecation import RemovedInDjango50Warning
 
 DEFER_FIELD = object()
 
@@ -15,7 +17,13 @@ class PickleSerializer:
     Simple wrapper around pickle to be used in signing.dumps()/loads() and
     cache backends.
     """
+
     def __init__(self, protocol=None):
+        warnings.warn(
+            "PickleSerializer is deprecated due to its security risk. Use "
+            "JSONSerializer instead.",
+            RemovedInDjango50Warning,
+        )
         self.protocol = pickle.HIGHEST_PROTOCOL if protocol is None else protocol
 
     def dumps(self, obj):
@@ -27,11 +35,13 @@ class PickleSerializer:
 
 class SerializerDoesNotExist(KeyError):
     """The requested serializer was not found."""
+
     pass
 
 
 class SerializationError(Exception):
     """Something bad happened during serialization."""
+
     pass
 
 
@@ -44,11 +54,15 @@ class DeserializationError(Exception):
         Factory method for creating a deserialization error which has a more
         explanatory message.
         """
-        return cls("%s: (%s:pk=%s) field_value was '%s'" % (original_exc, model, fk, field_value))
+        return cls(
+            "%s: (%s:pk=%s) field_value was '%s'"
+            % (original_exc, model, fk, field_value)
+        )
 
 
 class M2MDeserializationError(Exception):
     """Something bad happened during deserialization of a ManyToManyField."""
+
     def __init__(self, original_exc, pk):
         self.original_exc = original_exc
         self.pk = pk
@@ -70,10 +84,12 @@ class ProgressBar:
         if self.prev_done >= done:
             return
         self.prev_done = done
-        cr = '' if self.total_count == 1 else '\r'
-        self.output.write(cr + '[' + '.' * done + ' ' * (self.progress_width - done) + ']')
+        cr = "" if self.total_count == 1 else "\r"
+        self.output.write(
+            cr + "[" + "." * done + " " * (self.progress_width - done) + "]"
+        )
         if done == self.progress_width:
-            self.output.write('\n')
+            self.output.write("\n")
         self.output.flush()
 
 
@@ -88,8 +104,18 @@ class Serializer:
     progress_class = ProgressBar
     stream_class = StringIO
 
-    def serialize(self, queryset, *, stream=None, fields=None, use_natural_foreign_keys=False,
-                  use_natural_primary_keys=False, progress_output=None, object_count=0, **options):
+    def serialize(
+        self,
+        queryset,
+        *,
+        stream=None,
+        fields=None,
+        use_natural_foreign_keys=False,
+        use_natural_primary_keys=False,
+        progress_output=None,
+        object_count=0,
+        **options,
+    ):
         """
         Serialize a queryset.
         """
@@ -113,20 +139,31 @@ class Serializer:
             # be serialized, otherwise deserialization isn't possible.
             if self.use_natural_primary_keys:
                 pk = concrete_model._meta.pk
-                pk_parent = pk if pk.remote_field and pk.remote_field.parent_link else None
+                pk_parent = (
+                    pk if pk.remote_field and pk.remote_field.parent_link else None
+                )
             else:
                 pk_parent = None
             for field in concrete_model._meta.local_fields:
                 if field.serialize or field is pk_parent:
                     if field.remote_field is None:
-                        if self.selected_fields is None or field.attname in self.selected_fields:
+                        if (
+                            self.selected_fields is None
+                            or field.attname in self.selected_fields
+                        ):
                             self.handle_field(obj, field)
                     else:
-                        if self.selected_fields is None or field.attname[:-3] in self.selected_fields:
+                        if (
+                            self.selected_fields is None
+                            or field.attname[:-3] in self.selected_fields
+                        ):
                             self.handle_fk_field(obj, field)
             for field in concrete_model._meta.local_many_to_many:
                 if field.serialize:
-                    if self.selected_fields is None or field.attname in self.selected_fields:
+                    if (
+                        self.selected_fields is None
+                        or field.attname in self.selected_fields
+                    ):
                         self.handle_m2m_field(obj, field)
             self.end_object(obj)
             progress_bar.update(count)
@@ -138,7 +175,9 @@ class Serializer:
         """
         Called when serializing of the queryset starts.
         """
-        raise NotImplementedError('subclasses of Serializer must provide a start_serialization() method')
+        raise NotImplementedError(
+            "subclasses of Serializer must provide a start_serialization() method"
+        )
 
     def end_serialization(self):
         """
@@ -150,7 +189,9 @@ class Serializer:
         """
         Called when serializing of an object starts.
         """
-        raise NotImplementedError('subclasses of Serializer must provide a start_object() method')
+        raise NotImplementedError(
+            "subclasses of Serializer must provide a start_object() method"
+        )
 
     def end_object(self, obj):
         """
@@ -162,26 +203,32 @@ class Serializer:
         """
         Called to handle each individual (non-relational) field on an object.
         """
-        raise NotImplementedError('subclasses of Serializer must provide a handle_field() method')
+        raise NotImplementedError(
+            "subclasses of Serializer must provide a handle_field() method"
+        )
 
     def handle_fk_field(self, obj, field):
         """
         Called to handle a ForeignKey field.
         """
-        raise NotImplementedError('subclasses of Serializer must provide a handle_fk_field() method')
+        raise NotImplementedError(
+            "subclasses of Serializer must provide a handle_fk_field() method"
+        )
 
     def handle_m2m_field(self, obj, field):
         """
         Called to handle a ManyToManyField.
         """
-        raise NotImplementedError('subclasses of Serializer must provide a handle_m2m_field() method')
+        raise NotImplementedError(
+            "subclasses of Serializer must provide a handle_m2m_field() method"
+        )
 
     def getvalue(self):
         """
         Return the fully serialized queryset (or None if the output stream is
         not seekable).
         """
-        if callable(getattr(self.stream, 'getvalue', None)):
+        if callable(getattr(self.stream, "getvalue", None)):
             return self.stream.getvalue()
 
 
@@ -205,7 +252,9 @@ class Deserializer:
 
     def __next__(self):
         """Iteration interface -- return the next item in the stream"""
-        raise NotImplementedError('subclasses of Deserializer must provide a __next__() method')
+        raise NotImplementedError(
+            "subclasses of Deserializer must provide a __next__() method"
+        )
 
 
 class DeserializedObject:
@@ -249,18 +298,26 @@ class DeserializedObject:
         self.m2m_data = {}
         for field, field_value in self.deferred_fields.items():
             opts = self.object._meta
-            label = opts.app_label + '.' + opts.model_name
+            label = opts.app_label + "." + opts.model_name
             if isinstance(field.remote_field, models.ManyToManyRel):
                 try:
-                    values = deserialize_m2m_values(field, field_value, using, handle_forward_references=False)
+                    values = deserialize_m2m_values(
+                        field, field_value, using, handle_forward_references=False
+                    )
                 except M2MDeserializationError as e:
-                    raise DeserializationError.WithData(e.original_exc, label, self.object.pk, e.pk)
+                    raise DeserializationError.WithData(
+                        e.original_exc, label, self.object.pk, e.pk
+                    )
                 self.m2m_data[field.name] = values
             elif isinstance(field.remote_field, models.ManyToOneRel):
                 try:
-                    value = deserialize_fk_value(field, field_value, using, handle_forward_references=False)
+                    value = deserialize_fk_value(
+                        field, field_value, using, handle_forward_references=False
+                    )
                 except Exception as e:
-                    raise DeserializationError.WithData(e, label, self.object.pk, field_value)
+                    raise DeserializationError.WithData(
+                        e, label, self.object.pk, field_value
+                    )
                 setattr(self.object, field.attname, value)
         self.save()
 
@@ -274,9 +331,14 @@ def build_instance(Model, data, db):
     """
     default_manager = Model._meta.default_manager
     pk = data.get(Model._meta.pk.attname)
-    if (pk is None and hasattr(default_manager, 'get_by_natural_key') and
-            hasattr(Model, 'natural_key')):
-        natural_key = Model(**data).natural_key()
+    if (
+        pk is None
+        and hasattr(default_manager, "get_by_natural_key")
+        and hasattr(Model, "natural_key")
+    ):
+        obj = Model(**data)
+        obj._state.db = db
+        natural_key = obj.natural_key()
         try:
             data[Model._meta.pk.attname] = Model._meta.pk.to_python(
                 default_manager.db_manager(db).get_by_natural_key(*natural_key).pk
@@ -288,13 +350,20 @@ def build_instance(Model, data, db):
 
 def deserialize_m2m_values(field, field_value, using, handle_forward_references):
     model = field.remote_field.model
-    if hasattr(model._default_manager, 'get_by_natural_key'):
+    if hasattr(model._default_manager, "get_by_natural_key"):
+
         def m2m_convert(value):
-            if hasattr(value, '__iter__') and not isinstance(value, str):
-                return model._default_manager.db_manager(using).get_by_natural_key(*value).pk
+            if hasattr(value, "__iter__") and not isinstance(value, str):
+                return (
+                    model._default_manager.db_manager(using)
+                    .get_by_natural_key(*value)
+                    .pk
+                )
             else:
                 return model._meta.pk.to_python(value)
+
     else:
+
         def m2m_convert(v):
             return model._meta.pk.to_python(v)
 
@@ -320,8 +389,11 @@ def deserialize_fk_value(field, field_value, using, handle_forward_references):
     model = field.remote_field.model
     default_manager = model._default_manager
     field_name = field.remote_field.field_name
-    if (hasattr(default_manager, 'get_by_natural_key') and
-            hasattr(field_value, '__iter__') and not isinstance(field_value, str)):
+    if (
+        hasattr(default_manager, "get_by_natural_key")
+        and hasattr(field_value, "__iter__")
+        and not isinstance(field_value, str)
+    ):
         try:
             obj = default_manager.db_manager(using).get_by_natural_key(*field_value)
         except ObjectDoesNotExist:

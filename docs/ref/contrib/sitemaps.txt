@@ -156,9 +156,9 @@ Note:
         In both cases, "absolute path" means a URL that doesn't include the
         protocol or domain. Examples:
 
-        * Good: :file:`'/foo/bar/'`
-        * Bad: :file:`'example.com/foo/bar/'`
-        * Bad: :file:`'https://example.com/foo/bar/'`
+        * Good: ``'/foo/bar/'``
+        * Bad: ``'example.com/foo/bar/'``
+        * Bad: ``'https://example.com/foo/bar/'``
 
         If :attr:`~Sitemap.location` isn't provided, the framework will call
         the ``get_absolute_url()`` method on each object as returned by
@@ -294,6 +294,23 @@ Note:
         fallback entry with a value of :setting:`LANGUAGE_CODE`. The default is
         ``False``.
 
+    .. method:: Sitemap.get_latest_lastmod()
+
+        .. versionadded:: 4.1
+
+        **Optional.** A method that returns the latest value returned by
+        :attr:`~Sitemap.lastmod`. This function is used to add the ``lastmod``
+        attribute to :ref:`Sitemap index context
+        variables<sitemap-index-context-variables>`.
+
+        By default :meth:`~Sitemap.get_latest_lastmod` returns:
+
+        * If :attr:`~Sitemap.lastmod` is an attribute:
+          :attr:`~Sitemap.lastmod`.
+        * If :attr:`~Sitemap.lastmod` is a method:
+          The latest ``lastmod`` returned by calling the method with all
+          items returned by :meth:`Sitemap.items`.
+
 Shortcuts
 =========
 
@@ -306,7 +323,8 @@ The sitemap framework provides a convenience class for a common case:
     a ``queryset`` entry. This queryset will be used to generate the items
     of the sitemap. It may also have a ``date_field`` entry that
     specifies a date field for objects retrieved from the ``queryset``.
-    This will be used for the :attr:`~Sitemap.lastmod` attribute in the
+    This will be used for the :attr:`~Sitemap.lastmod` attribute and
+    :meth:`~Sitemap.get_latest_lastmod` methods in the in the
     generated sitemap.
 
     The :attr:`~Sitemap.priority`, :attr:`~Sitemap.changefreq`,
@@ -403,7 +421,8 @@ Here's what the relevant URLconf lines would look like for the example above::
     from django.contrib.sitemaps import views
 
     urlpatterns = [
-        path('sitemap.xml', views.index, {'sitemaps': sitemaps}),
+        path('sitemap.xml', views.index, {'sitemaps': sitemaps},
+             name='django.contrib.sitemaps.views.index'),
         path('sitemap-<section>.xml', views.sitemap, {'sitemaps': sitemaps},
              name='django.contrib.sitemaps.views.sitemap'),
     ]
@@ -412,6 +431,10 @@ This will automatically generate a :file:`sitemap.xml` file that references
 both :file:`sitemap-flatpages.xml` and :file:`sitemap-blog.xml`. The
 :class:`~django.contrib.sitemaps.Sitemap` classes and the ``sitemaps``
 dict don't change at all.
+
+If all sitemaps have a ``lastmod`` returned by
+:meth:`Sitemap.get_latest_lastmod` the sitemap index will have a
+``Last-Modified`` header equal to the latest ``lastmod``.
 
 You should create an index file if one of your sitemaps has more than 50,000
 URLs. In this case, Django will automatically paginate the sitemap, and the
@@ -433,6 +456,9 @@ with a caching decorator -- you must name your sitemap view and pass
              {'sitemaps': sitemaps}, name='sitemaps'),
     ]
 
+.. versionchanged:: 4.1
+
+    Use of the ``Last-Modified`` header was added.
 
 Template customization
 ======================
@@ -447,7 +473,7 @@ parameter to the ``sitemap`` and ``index`` views via the URLconf::
         path('custom-sitemap.xml', views.index, {
             'sitemaps': sitemaps,
             'template_name': 'custom_sitemap.html'
-        }),
+        }, name='django.contrib.sitemaps.views.index'),
         path('custom-sitemap-<section>.xml', views.sitemap, {
             'sitemaps': sitemaps,
             'template_name': 'custom_sitemap.html'
@@ -468,10 +494,23 @@ When customizing the templates for the
 :func:`~django.contrib.sitemaps.views.sitemap` views, you can rely on the
 following context variables.
 
+.. _sitemap-index-context-variables:
+
 Index
 -----
 
-The variable ``sitemaps`` is a list of absolute URLs to each of the sitemaps.
+The variable ``sitemaps`` is a list of objects containing the ``location`` and
+``lastmod`` attribute for each of the sitemaps. Each URL exposes the following
+attributes:
+
+- ``location``: The location (url & page) of the sitemap.
+- ``lastmod``: Populated by the :meth:`~Sitemap.get_latest_lastmod`
+  method for each sitemap.
+
+.. versionchanged:: 4.1
+
+    The context was changed to a list of objects with ``location`` and optional
+    ``lastmod`` attributes.
 
 Sitemap
 -------
@@ -534,9 +573,13 @@ that: :func:`django.contrib.sitemaps.ping_google()`.
     ``ping_google`` takes these optional arguments:
 
     * ``sitemap_url`` - The absolute path to your site's sitemap (e.g.,
-      :file:`'/sitemap.xml'`). If this argument isn't provided, ``ping_google``
-      will attempt to figure out your sitemap by performing a reverse lookup in
-      your URLconf.
+      :file:`'/sitemap.xml'`).
+
+      If this argument isn't provided, ``ping_google`` will perform a reverse
+      lookup in your URLconf, for URLs named
+      ``'django.contrib.sitemaps.views.index'`` and then
+      ``'django.contrib.sitemaps.views.sitemap'`` (without further arguments) to
+      automatically determine the sitemap URL.
 
     * ``ping_url`` - Defaults to Google's Ping Tool:
       https://www.google.com/webmasters/tools/ping.

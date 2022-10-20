@@ -12,6 +12,7 @@ class TestingHttpResponse(HttpResponse):
     A version of HttpResponse that stores what cookie values are passed to
     set_cookie() when CSRF_USE_SESSIONS=False.
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # This is a list of the cookie values passed to set_cookie() over
@@ -24,7 +25,6 @@ class TestingHttpResponse(HttpResponse):
 
 
 class _CsrfCookieRotator(MiddlewareMixin):
-
     def process_response(self, request, response):
         rotate_token(request)
         return response
@@ -35,18 +35,18 @@ csrf_rotating_token = decorator_from_middleware(_CsrfCookieRotator)
 
 @csrf_protect
 def protected_view(request):
-    return HttpResponse('OK')
+    return HttpResponse("OK")
 
 
 @ensure_csrf_cookie
 def ensure_csrf_cookie_view(request):
-    return HttpResponse('OK')
+    return HttpResponse("OK")
 
 
 @csrf_protect
 @ensure_csrf_cookie
 def ensured_and_protected_view(request):
-    return TestingHttpResponse('OK')
+    return TestingHttpResponse("OK")
 
 
 @csrf_protect
@@ -57,26 +57,30 @@ def sandwiched_rotate_token_view(request):
     This is a view that calls rotate_token() in process_response() between two
     calls to CsrfViewMiddleware.process_response().
     """
-    return TestingHttpResponse('OK')
+    return TestingHttpResponse("OK")
 
 
 def post_form_view(request):
     """Return a POST form (without a token)."""
-    return HttpResponse(content="""
-<html><body><h1>\u00a1Unicode!<form method="post"><input type="text"></form></body></html>
-""")
+    return HttpResponse(
+        content="""
+<html>
+<body><h1>\u00a1Unicode!<form method="post"><input type="text"></form></body>
+</html>
+"""
+    )
 
 
 def token_view(request):
     context = RequestContext(request, processors=[csrf])
-    template = Template('{% csrf_token %}')
+    template = Template("{% csrf_token %}")
     return HttpResponse(template.render(context))
 
 
 def non_token_view_using_request_processor(request):
     """Use the csrf view processor instead of the token."""
     context = RequestContext(request, processors=[csrf])
-    template = Template('')
+    template = Template("")
     return HttpResponse(template.render(context))
 
 

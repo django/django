@@ -246,8 +246,8 @@ following URL patterns which optionally take a page argument::
     from django.urls import re_path
 
     urlpatterns = [
-        re_path(r'^blog/(page-(\d+)/)?$', blog_articles),                  # bad
-        re_path(r'^comments/(?:page-(?P<page_number>\d+)/)?$', comments),  # good
+        re_path(r'^blog/(page-([0-9]+)/)?$', blog_articles),                  # bad
+        re_path(r'^comments/(?:page-(?P<page_number>[0-9]+)/)?$', comments),  # good
     ]
 
 Both patterns use nested arguments and will resolve: for example,
@@ -317,8 +317,9 @@ default argument for ``num``, ``1``. If the second pattern matches,
 Performance
 ===========
 
-Each regular expression in a ``urlpatterns`` is compiled the first time it's
-accessed. This makes the system blazingly fast.
+Django processes regular expressions in the ``urlpatterns`` list which is
+compiled the first time it's accessed. Subsequent requests use the cached
+configuration via the URL resolver.
 
 Syntax of the ``urlpatterns`` variable
 ======================================
@@ -767,7 +768,7 @@ so that it takes the instance namespace into consideration when creating and
 displaying polls.
 
 .. code-block:: python
-    :caption: urls.py
+    :caption: ``urls.py``
 
     from django.urls import include, path
 
@@ -777,7 +778,7 @@ displaying polls.
     ]
 
 .. code-block:: python
-    :caption: polls/urls.py
+    :caption: ``polls/urls.py``
 
     from django.urls import path
 
@@ -836,7 +837,7 @@ module, or a string reference to the module, to :func:`~django.urls.include`,
 not the list of ``urlpatterns`` itself.
 
 .. code-block:: python
-    :caption: polls/urls.py
+    :caption: ``polls/urls.py``
 
     from django.urls import path
 
@@ -850,7 +851,7 @@ not the list of ``urlpatterns`` itself.
     ]
 
 .. code-block:: python
-    :caption: urls.py
+    :caption: ``urls.py``
 
     from django.urls import include, path
 

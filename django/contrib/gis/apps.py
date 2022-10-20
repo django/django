@@ -4,9 +4,11 @@ from django.utils.translation import gettext_lazy as _
 
 
 class GISConfig(AppConfig):
-    default_auto_field = 'django.db.models.AutoField'
-    name = 'django.contrib.gis'
+    default_auto_field = "django.db.models.AutoField"
+    name = "django.contrib.gis"
     verbose_name = _("GIS")
 
     def ready(self):
-        serializers.BUILTIN_SERIALIZERS.setdefault('geojson', 'django.contrib.gis.serializers.geojson')
+        serializers.BUILTIN_SERIALIZERS.setdefault(
+            "geojson", "django.contrib.gis.serializers.geojson"
+        )

@@ -2,10 +2,14 @@
 #
 # Translators:
 # Ahmad Hosseini <ahmadly.com@gmail.com>, 2020
+# alirezamastery <alireza.mastery@gmail.com>, 2021
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Arash Fazeli <a.fazeli@gmail.com>, 2012
 # Eric Hamiter <ehamiter@gmail.com>, 2019
+# Eshagh <ase.mugem@gmail.com>, 2022
+# Farshad Asadpour, 2021
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
 # Mazdak Badakhshan <geraneum@gmail.com>, 2014
 # Milad Hazrati <miladhazrati75@gmail.com>, 2019
 # MJafar Mashhadi <raindigital2007@gmail.com>, 2018
@@ -20,9 +24,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-04-03 06:19+0000\n"
-"Last-Translator: rahim agh <rahim.aghareb@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-07-25 06:49+0000\n"
+"Last-Translator: Eshagh <ase.mugem@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -220,6 +224,9 @@ msgstr "مغولی"
 msgid "Marathi"
 msgstr "مِراتی"
 
+msgid "Malay"
+msgstr "Malay"
+
 msgid "Burmese"
 msgstr "برمه‌ای"
 
@@ -395,6 +402,10 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "مطمئن شوید این مقدار بزرگتر و یا مساوی %(limit_value)s است."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -464,6 +475,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "‏%(model_name)s با این %(field_labels)s وجود دارد."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr ""
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "مقدار %(value)r انتخاب معتبری نیست. "
 
@@ -477,8 +492,8 @@ msgstr "این فیلد نمی تواند خالی باشد."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s با این %(field_label)s از قبل موجود است."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -768,18 +783,20 @@ msgid ""
 "ManagementForm data is missing or has been tampered with. Missing fields: "
 "%(field_names)s. You may need to file a bug report if the issue persists."
 msgstr ""
+"اطلاعات ManagementForm مفقود یا دستکاری شده است. ردیف های مفقود شده: "
+"%(field_names)s. اگر این مشکل ادامه داشت، آن را گزارش کنید."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "لطفاً تعدا فرم‌ها حداکثر %d باشد."
-msgstr[1] "لطفاً تعداد فرم‌ها حداکثر %d باشد."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "لطفاً تعداد فرم‌ها حداقل %d باشد."
-msgstr[1] "لطفاً تعدا فرم‌ ها حداقل %d باشد."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Order"
 msgstr "ترتیب:"
@@ -1106,7 +1123,7 @@ msgstr "این مقدار آدرس IPv6 معتبری نیست."
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s…"
-msgstr "%(truncated_text)s ..."
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "یا"
@@ -1116,40 +1133,40 @@ msgid ", "
 msgstr "،"
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d سال"
-msgstr[1] "%d سال"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d سال"
+msgstr[1] "%(num)d سال"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d ماه"
-msgstr[1] "%d ماه"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d ماه"
+msgstr[1] "%(num)d ماه"
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d هفته"
-msgstr[1] "%d هفته"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d هفته"
+msgstr[1] "%(num)d هفته"
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d روز"
-msgstr[1] "%d روز"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d روز"
+msgstr[1] "%(num)d روز"
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d ساعت"
-msgstr[1] "%d ساعت"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d ساعت"
+msgstr[1] "%(num)d ساعت"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d دقیقه"
-msgstr[1] "%d دقیقه"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d دقیقه"
+msgstr[1] "%(num)d دقیقه"
 
 msgid "Forbidden"
 msgstr "ممنوع"
@@ -1159,14 +1176,14 @@ msgstr "‏CSRF تأیید نشد. درخواست لغو شد."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"شما این پیغام را می‌بینید چون این وب‌گاه HTTPS نیازمند یک \"Referer header\" "
-"یا سرتیتر ارجاع دهنده است که باید توسط مرورگر شما ارسال شود. این سرتیتر به "
-"دلایل امنیتی مورد نیاز است تا اطمینان حاصل شود که مرورگر شما توسط شخص سومی "
-"مورد سوءاستفاده قرار نگرفته باشد."
+"شما این پیغام را مشاهده میکنید برای اینکه این HTTPS site نیازمند یک "
+"\"Referer header\"  برای ارسال توسط مرورگر شما دارد،‌اما مقداری ارسال "
+"نمیشود . این هدر الزامی میباشد برای امنیت ، در واقع برای اینکه مرورگر شما "
+"مطمین شود hijack به عنوان نفر سوم (third parties) در میان نیست"
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"

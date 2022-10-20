@@ -172,7 +172,7 @@ By default, Django uses the :ref:`dictConfig format
 <logging-config-dictschema>`.
 
 In order to configure logging, you use :setting:`LOGGING` to define a
-dictionary of logging settings. These settings describes the loggers,
+dictionary of logging settings. These settings describe the loggers,
 handlers, filters and formatters that you want in your logging setup,
 and the log levels and other properties that you want those components
 to have.
@@ -207,7 +207,7 @@ To begin, here's a small configuration that will allow you to output all log
 messages to the console:
 
 .. code-block:: python
-    :caption: settings.py
+    :caption: ``settings.py``
 
     import os
 
@@ -235,7 +235,7 @@ logging system print more messages from just the :ref:`django-logger` named
 logger:
 
 .. code-block:: python
-    :caption: settings.py
+    :caption: ``settings.py``
 
     import os
 
@@ -272,7 +272,7 @@ You don't have to log to the console. Here's a configuration which writes all
 logging from the :ref:`django-logger` named logger to a local file:
 
 .. code-block:: python
-    :caption: settings.py
+    :caption: ``settings.py``
 
     LOGGING = {
         'version': 1,
@@ -299,7 +299,7 @@ location that's writable by the user that's running the Django application.
 Finally, here's an example of a fairly complex logging setup:
 
 .. code-block:: python
-    :caption: settings.py
+    :caption: ``settings.py``
 
     LOGGING = {
         'version': 1,
@@ -444,7 +444,7 @@ Here's an example that disables Django's logging configuration and then
 manually configures logging:
 
 .. code-block:: python
-    :caption: settings.py
+    :caption: ``settings.py``
 
     LOGGING_CONFIG = None
 

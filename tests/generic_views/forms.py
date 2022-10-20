@@ -9,7 +9,7 @@ class AuthorForm(forms.ModelForm):
 
     class Meta:
         model = Author
-        fields = ['name', 'slug']
+        fields = ["name", "slug"]
 
 
 class ContactForm(forms.Form):
@@ -22,5 +22,5 @@ class ConfirmDeleteForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        if 'confirm' not in cleaned_data:
-            raise forms.ValidationError('You must confirm the delete.')
+        if "confirm" not in cleaned_data:
+            raise forms.ValidationError("You must confirm the delete.")

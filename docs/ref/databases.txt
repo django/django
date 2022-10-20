@@ -30,7 +30,7 @@ General notes
 Persistent connections
 ----------------------
 
-Persistent connections avoid the overhead of re-establishing a connection to
+Persistent connections avoid the overhead of reestablishing a connection to
 the database in each request. They're controlled by the
 :setting:`CONN_MAX_AGE` parameter which defines the maximum lifetime of a
 connection. It can be set independently for each database.
@@ -62,8 +62,19 @@ At the end of each request, Django closes the connection if it has reached its
 maximum age or if it is in an unrecoverable error state. If any database
 errors have occurred while processing the requests, Django checks whether the
 connection still works, and closes it if it doesn't. Thus, database errors
-affect at most one request; if the connection becomes unusable, the next
-request gets a fresh connection.
+affect at most one request per each application's worker thread; if the
+connection becomes unusable, the next request gets a fresh connection.
+
+Setting :setting:`CONN_HEALTH_CHECKS` to ``True`` can be used to improve the
+robustness of connection reuse and prevent errors when a connection has been
+closed by the database server which is now ready to accept and serve new
+connections, e.g. after database server restart. The health check is performed
+only once per request and only if the database is being accessed during the
+handling of the request.
+
+.. versionchanged:: 4.1
+
+    The :setting:`CONN_HEALTH_CHECKS` setting was added.
 
 Caveats
 ~~~~~~~
@@ -103,7 +114,7 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 10 and higher. `psycopg2`_ 2.5.4 or higher is
+Django supports PostgreSQL 12 and higher. `psycopg2`_ 2.8.4 or higher is
 required, though the latest release is recommended.
 
 .. _psycopg2: https://www.psycopg.org/
@@ -120,7 +131,7 @@ password from the `password file`_, you must specify them in the
 :setting:`OPTIONS` part of your database configuration in :setting:`DATABASES`:
 
 .. code-block:: python
-    :caption: settings.py
+    :caption: ``settings.py``
 
     DATABASES = {
         'default': {
@@ -133,7 +144,7 @@ password from the `password file`_, you must specify them in the
     }
 
 .. code-block:: text
-    :caption: .pg_service.conf
+    :caption: ``.pg_service.conf``
 
     [my_service]
     host=localhost
@@ -142,17 +153,17 @@ password from the `password file`_, you must specify them in the
     port=5432
 
 .. code-block:: text
-    :caption: .my_pgpass
+    :caption: ``.my_pgpass``
 
     localhost:5432:NAME:USER:PASSWORD
 
 .. _connection service file: https://www.postgresql.org/docs/current/libpq-pgservice.html
 .. _password file: https://www.postgresql.org/docs/current/libpq-pgpass.html
 
-.. versionchanged:: 4.0
+.. warning::
 
-    Support for connecting by a service name, and specifying a password file
-    was added.
+    Using a service name for testing purposes is not supported. This
+    :ticket:`may be implemented later <33685>`.
 
 Optimizing PostgreSQL's configuration
 -------------------------------------
@@ -280,9 +291,9 @@ live for the duration of the transaction.
 Manually-specifying values of auto-incrementing primary keys
 ------------------------------------------------------------
 
-Django uses PostgreSQL's `SERIAL data type`_ to store auto-incrementing primary
-keys. A ``SERIAL`` column is populated with values from a `sequence`_ that
-keeps track of the next available value. Manually assigning a value to an
+Django uses PostgreSQL's identity columns to store auto-incrementing primary
+keys. An identity column is populated with values from a `sequence`_ that keeps
+track of the next available value. Manually assigning a value to an
 auto-incrementing field doesn't update the field's sequence, which might later
 cause a conflict. For example::
 
@@ -299,7 +310,11 @@ If you need to specify such values, reset the sequence afterward to avoid
 reusing a value that's already in the table. The :djadmin:`sqlsequencereset`
 management command generates the SQL statements to do that.
 
-.. _SERIAL data type: https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL
+.. versionchanged:: 4.1
+
+    In older versions, PostgreSQL’s ``SERIAL`` data type was used instead of
+    identity columns.
+
 .. _sequence: https://www.postgresql.org/docs/current/sql-createsequence.html
 
 Test database templates
@@ -328,7 +343,7 @@ non-durable <https://www.postgresql.org/docs/current/non-durability.html>`_.
 MariaDB notes
 =============
 
-Django supports MariaDB 10.3 and higher.
+Django supports MariaDB 10.4 and higher.
 
 To use MariaDB, use the MySQL backend, which is shared between the two. See the
 :ref:`MySQL notes <mysql-notes>` for more details.
@@ -341,7 +356,7 @@ MySQL notes
 Version support
 ---------------
 
-Django supports MySQL 5.7 and higher.
+Django supports MySQL 8 and higher.
 
 Django's ``inspectdb`` feature uses the ``information_schema`` database, which
 contains detailed data on all database schemas.
@@ -524,11 +539,10 @@ Several other `MySQLdb connection options`_ may be useful, such as ``ssl``,
 Setting ``sql_mode``
 ~~~~~~~~~~~~~~~~~~~~
 
-From MySQL 5.7 onward, the default value of the ``sql_mode`` option contains
-``STRICT_TRANS_TABLES``. That option escalates warnings into errors when data
-are truncated upon insertion, so Django highly recommends activating a
-`strict mode`_ for MySQL to prevent data loss (either ``STRICT_TRANS_TABLES``
-or ``STRICT_ALL_TABLES``).
+The default value of the ``sql_mode`` option contains ``STRICT_TRANS_TABLES``.
+That option escalates warnings into errors when data are truncated upon
+insertion, so Django highly recommends activating a `strict mode`_ for MySQL to
+prevent data loss (either ``STRICT_TRANS_TABLES`` or ``STRICT_ALL_TABLES``).
 
 .. _strict mode: https://dev.mysql.com/doc/refman/en/sql-mode.html#sql-mode-strict
 
@@ -1070,7 +1084,7 @@ example of subclassing the PostgreSQL engine to change a feature class
 ``allows_group_by_selected_pks_on_model``:
 
 .. code-block:: python
-    :caption: mysite/mydbengine/base.py
+    :caption: ``mysite/mydbengine/base.py``
 
     from django.db.backends.postgresql import base, features
 
@@ -1104,7 +1118,10 @@ by 3rd parties that allow you to use other databases with Django:
 
 * `CockroachDB`_
 * `Firebird`_
+* `Google Cloud Spanner`_
 * `Microsoft SQL Server`_
+* `TiDB`_
+* `YugabyteDB`_
 
 The Django versions and ORM features supported by these unofficial backends
 vary considerably. Queries regarding the specific capabilities of these
@@ -1113,4 +1130,7 @@ the support channels provided by each 3rd party project.
 
 .. _CockroachDB: https://pypi.org/project/django-cockroachdb/
 .. _Firebird: https://pypi.org/project/django-firebird/
-.. _Microsoft SQL Server: https://pypi.org/project/django-mssql-backend/
+.. _Google Cloud Spanner: https://pypi.org/project/django-google-spanner/
+.. _Microsoft SQL Server: https://pypi.org/project/mssql-django/
+.. _TiDB: https://pypi.org/project/django-tidb/
+.. _YugabyteDB: https://pypi.org/project/django-yugabytedb/

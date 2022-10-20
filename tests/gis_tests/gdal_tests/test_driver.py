@@ -5,28 +5,37 @@ from django.contrib.gis.gdal import Driver, GDALException
 
 valid_drivers = (
     # vector
-    'ESRI Shapefile', 'MapInfo File', 'TIGER', 'S57', 'DGN', 'Memory', 'CSV',
-    'GML', 'KML',
+    "ESRI Shapefile",
+    "MapInfo File",
+    "TIGER",
+    "S57",
+    "DGN",
+    "Memory",
+    "CSV",
+    "GML",
+    "KML",
     # raster
-    'GTiff', 'JPEG', 'MEM', 'PNG',
+    "GTiff",
+    "JPEG",
+    "MEM",
+    "PNG",
 )
 
-invalid_drivers = ('Foo baz', 'clucka', 'ESRI Shp', 'ESRI rast')
+invalid_drivers = ("Foo baz", "clucka", "ESRI Shp", "ESRI rast")
 
 aliases = {
-    'eSrI': 'ESRI Shapefile',
-    'TigER/linE': 'TIGER',
-    'SHAPE': 'ESRI Shapefile',
-    'sHp': 'ESRI Shapefile',
-    'tiFf': 'GTiff',
-    'tIf': 'GTiff',
-    'jPEg': 'JPEG',
-    'jpG': 'JPEG',
+    "eSrI": "ESRI Shapefile",
+    "TigER/linE": "TIGER",
+    "SHAPE": "ESRI Shapefile",
+    "sHp": "ESRI Shapefile",
+    "tiFf": "GTiff",
+    "tIf": "GTiff",
+    "jPEg": "JPEG",
+    "jpG": "JPEG",
 }
 
 
 class DriverTest(unittest.TestCase):
-
     def test01_valid_driver(self):
         "Testing valid GDAL/OGR Data Source Drivers."
         for d in valid_drivers:
@@ -45,15 +54,16 @@ class DriverTest(unittest.TestCase):
             dr = Driver(alias)
             self.assertEqual(full_name, str(dr))
 
-    @mock.patch('django.contrib.gis.gdal.driver.vcapi.get_driver_count')
-    @mock.patch('django.contrib.gis.gdal.driver.rcapi.get_driver_count')
-    @mock.patch('django.contrib.gis.gdal.driver.vcapi.register_all')
-    @mock.patch('django.contrib.gis.gdal.driver.rcapi.register_all')
+    @mock.patch("django.contrib.gis.gdal.driver.vcapi.get_driver_count")
+    @mock.patch("django.contrib.gis.gdal.driver.rcapi.get_driver_count")
+    @mock.patch("django.contrib.gis.gdal.driver.vcapi.register_all")
+    @mock.patch("django.contrib.gis.gdal.driver.rcapi.register_all")
     def test_registered(self, rreg, vreg, rcount, vcount):
         """
         Prototypes are registered only if their respective driver counts are
         zero.
         """
+
         def check(rcount_val, vcount_val):
             vreg.reset_mock()
             rreg.reset_mock()

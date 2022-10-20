@@ -6,10 +6,17 @@
 from ctypes import POINTER, c_char_p, c_double, c_int, c_long, c_void_p
 
 from django.contrib.gis.gdal.envelope import OGREnvelope
-from django.contrib.gis.gdal.libgdal import GDAL_VERSION, lgdal
+from django.contrib.gis.gdal.libgdal import lgdal
 from django.contrib.gis.gdal.prototypes.generation import (
-    bool_output, const_string_output, double_output, geom_output, int64_output,
-    int_output, srs_output, void_output, voidptr_output,
+    bool_output,
+    const_string_output,
+    double_output,
+    geom_output,
+    int64_output,
+    int_output,
+    srs_output,
+    void_output,
+    voidptr_output,
 )
 
 c_int_p = POINTER(c_int)  # shortcut type
@@ -18,9 +25,13 @@ c_int_p = POINTER(c_int)  # shortcut type
 register_all = void_output(lgdal.OGRRegisterAll, [], errcheck=False)
 cleanup_all = void_output(lgdal.OGRCleanupAll, [], errcheck=False)
 get_driver = voidptr_output(lgdal.OGRGetDriver, [c_int])
-get_driver_by_name = voidptr_output(lgdal.OGRGetDriverByName, [c_char_p], errcheck=False)
+get_driver_by_name = voidptr_output(
+    lgdal.OGRGetDriverByName, [c_char_p], errcheck=False
+)
 get_driver_count = int_output(lgdal.OGRGetDriverCount, [])
-get_driver_name = const_string_output(lgdal.OGR_Dr_GetName, [c_void_p], decoding='ascii')
+get_driver_name = const_string_output(
+    lgdal.OGR_Dr_GetName, [c_void_p], decoding="ascii"
+)
 
 # DataSource
 open_ds = voidptr_output(lgdal.OGROpen, [c_char_p, c_int, POINTER(c_void_p)])
@@ -41,10 +52,13 @@ get_next_feature = voidptr_output(lgdal.OGR_L_GetNextFeature, [c_void_p])
 reset_reading = void_output(lgdal.OGR_L_ResetReading, [c_void_p], errcheck=False)
 test_capability = int_output(lgdal.OGR_L_TestCapability, [c_void_p, c_char_p])
 get_spatial_filter = geom_output(lgdal.OGR_L_GetSpatialFilter, [c_void_p])
-set_spatial_filter = void_output(lgdal.OGR_L_SetSpatialFilter, [c_void_p, c_void_p], errcheck=False)
+set_spatial_filter = void_output(
+    lgdal.OGR_L_SetSpatialFilter, [c_void_p, c_void_p], errcheck=False
+)
 set_spatial_filter_rect = void_output(
     lgdal.OGR_L_SetSpatialFilterRect,
-    [c_void_p, c_double, c_double, c_double, c_double], errcheck=False
+    [c_void_p, c_double, c_double, c_double, c_double],
+    errcheck=False,
 )
 
 # Feature Definition Routines
@@ -64,16 +78,17 @@ get_feat_field_defn = voidptr_output(lgdal.OGR_F_GetFieldDefnRef, [c_void_p, c_i
 get_fid = int_output(lgdal.OGR_F_GetFID, [c_void_p])
 get_field_as_datetime = int_output(
     lgdal.OGR_F_GetFieldAsDateTime,
-    [c_void_p, c_int, c_int_p, c_int_p, c_int_p, c_int_p, c_int_p, c_int_p]
+    [c_void_p, c_int, c_int_p, c_int_p, c_int_p, c_int_p, c_int_p, c_int_p],
 )
 get_field_as_double = double_output(lgdal.OGR_F_GetFieldAsDouble, [c_void_p, c_int])
 get_field_as_integer = int_output(lgdal.OGR_F_GetFieldAsInteger, [c_void_p, c_int])
-get_field_as_integer64 = int64_output(lgdal.OGR_F_GetFieldAsInteger64, [c_void_p, c_int])
-if GDAL_VERSION >= (2, 2):
-    is_field_set = bool_output(lgdal.OGR_F_IsFieldSetAndNotNull, [c_void_p, c_int])
-else:
-    is_field_set = bool_output(lgdal.OGR_F_IsFieldSet, [c_void_p, c_int])
-get_field_as_string = const_string_output(lgdal.OGR_F_GetFieldAsString, [c_void_p, c_int])
+get_field_as_integer64 = int64_output(
+    lgdal.OGR_F_GetFieldAsInteger64, [c_void_p, c_int]
+)
+is_field_set = bool_output(lgdal.OGR_F_IsFieldSetAndNotNull, [c_void_p, c_int])
+get_field_as_string = const_string_output(
+    lgdal.OGR_F_GetFieldAsString, [c_void_p, c_int]
+)
 get_field_index = int_output(lgdal.OGR_F_GetFieldIndex, [c_void_p, c_char_p])
 
 # Field Routines

@@ -4,6 +4,7 @@ import unittest
 
 from django.test import SimpleTestCase
 from django.test.runner import RemoteTestResult
+from django.utils.version import PY311
 
 try:
     import tblib.pickling_support
@@ -16,6 +17,7 @@ class ExceptionThatFailsUnpickling(Exception):
     After pickling, this class fails unpickling with an error about incorrect
     arguments passed to __init__().
     """
+
     def __init__(self, arg):
         super().__init__()
 
@@ -52,10 +54,9 @@ class SampleFailingSubtest(SimpleTestCase):
 
 
 class RemoteTestResultTest(SimpleTestCase):
-
     def _test_error_exc_info(self):
         try:
-            raise ValueError('woops')
+            raise ValueError("woops")
         except ValueError:
             return sys.exc_info()
 
@@ -75,16 +76,16 @@ class RemoteTestResultTest(SimpleTestCase):
 
     def test_was_successful_one_skip(self):
         result = RemoteTestResult()
-        result.addSkip(None, 'Skipped')
+        result.addSkip(None, "Skipped")
         self.assertIs(result.wasSuccessful(), True)
 
-    @unittest.skipUnless(tblib is not None, 'requires tblib to be installed')
+    @unittest.skipUnless(tblib is not None, "requires tblib to be installed")
     def test_was_successful_one_error(self):
         result = RemoteTestResult()
         result.addError(None, self._test_error_exc_info())
         self.assertIs(result.wasSuccessful(), False)
 
-    @unittest.skipUnless(tblib is not None, 'requires tblib to be installed')
+    @unittest.skipUnless(tblib is not None, "requires tblib to be installed")
     def test_was_successful_one_failure(self):
         result = RemoteTestResult()
         result.addFailure(None, self._test_error_exc_info())
@@ -96,17 +97,17 @@ class RemoteTestResultTest(SimpleTestCase):
         self.assertEqual(result.events, loaded_result.events)
 
     def test_pickle_errors_detection(self):
-        picklable_error = RuntimeError('This is fine')
-        not_unpicklable_error = ExceptionThatFailsUnpickling('arg')
+        picklable_error = RuntimeError("This is fine")
+        not_unpicklable_error = ExceptionThatFailsUnpickling("arg")
 
         result = RemoteTestResult()
         result._confirm_picklable(picklable_error)
 
-        msg = '__init__() missing 1 required positional argument'
+        msg = "__init__() missing 1 required positional argument"
         with self.assertRaisesMessage(TypeError, msg):
             result._confirm_picklable(not_unpicklable_error)
 
-    @unittest.skipUnless(tblib is not None, 'requires tblib to be installed')
+    @unittest.skipUnless(tblib is not None, "requires tblib to be installed")
     def test_add_failing_subtests(self):
         """
         Failing subtests are added correctly using addSubTest().
@@ -114,7 +115,7 @@ class RemoteTestResultTest(SimpleTestCase):
         # Manually run a test with failing subtests to prevent the failures
         # from affecting the actual test run.
         result = RemoteTestResult()
-        subtest_test = SampleFailingSubtest(methodName='dummy_test')
+        subtest_test = SampleFailingSubtest(methodName="dummy_test")
         subtest_test.run(result=result)
 
         events = result.events
@@ -122,8 +123,13 @@ class RemoteTestResultTest(SimpleTestCase):
         self.assertIs(result.wasSuccessful(), False)
 
         event = events[1]
-        self.assertEqual(event[0], 'addSubTest')
-        self.assertEqual(str(event[2]), 'dummy_test (test_runner.test_parallel.SampleFailingSubtest) (index=0)')
+        self.assertEqual(event[0], "addSubTest")
+        self.assertEqual(
+            str(event[2]),
+            "dummy_test (test_runner.test_parallel.SampleFailingSubtest%s) (index=0)"
+            # Python 3.11 uses fully qualified test name in the output.
+            % (".dummy_test" if PY311 else ""),
+        )
         self.assertEqual(repr(event[3][1]), "AssertionError('0 != 1')")
 
         event = events[2]
