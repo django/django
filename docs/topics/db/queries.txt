@@ -347,7 +347,8 @@ queryset. You may do this by converting the ``query`` attribute to a string.
     >>> str(q.query)
 
 This prints the SQL that is used to query the database. From there, you may
-looks for unexpected clauses, etc.
+look for unexpected clauses, etc. Note that this SQL may require modification
+to be used against the database directly. It is useful as a reference first.
 
 .. _limiting-querysets:
 
