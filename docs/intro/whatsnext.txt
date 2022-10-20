@@ -163,7 +163,7 @@ You can get a local copy of the HTML documentation following a few steps:
 
   .. console::
 
-        $ python -m pip install Sphinx
+        $ python3 -m pip install Sphinx
 
 * Then, use the included ``Makefile`` to turn the documentation into HTML:
 
