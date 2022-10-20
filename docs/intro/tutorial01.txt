@@ -18,7 +18,7 @@ in a shell prompt (indicated by the $ prefix):
 
 .. console::
 
-    $ python -m django --version
+    $ python3 -m django --version
 
 If Django is installed, you should see the version of your installation. If it
 isn't, you'll get an error telling "No module named django".
@@ -126,7 +126,7 @@ you haven't already, and run the following commands:
 
 .. console::
 
-   $ python manage.py runserver
+   $ python3 manage.py runserver
 
 You'll see the following output on the command line:
 
@@ -172,7 +172,7 @@ It worked!
 
     .. console::
 
-        $ python manage.py runserver 8080
+        $ python3 manage.py runserver 8080
 
     If you want to change the server's IP, pass it along with the port. For
     example, to listen on all available public IPs (which is useful if you are
@@ -181,7 +181,7 @@ It worked!
 
     .. console::
 
-        $ python manage.py runserver 0.0.0.0:8000
+        $ python3 manage.py runserver 0.0.0.0:8000
 
     Full docs for the development server can be found in the
     :djadmin:`runserver` reference.
@@ -222,7 +222,7 @@ and type this command:
 
 .. console::
 
-    $ python manage.py startapp polls
+    $ python3 manage.py startapp polls
 
 That'll create a directory :file:`polls`, which is laid out like this::
 
@@ -319,7 +319,7 @@ the following command:
 
 .. console::
 
-   $ python manage.py runserver
+   $ python3 manage.py runserver
 
 Go to http://localhost:8000/polls/ in your browser, and you should see the
 text "*Hello, world. You're at the polls index.*", which you defined in the
