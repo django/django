@@ -255,7 +255,7 @@ patches. Those patches will typically exist as pull requests on GitHub and
 can be easily integrated into your local repository::
 
     git checkout -b pull_xxxxx upstream/main
-    curl https://github.com/django/django/pull/xxxxx.patch | git am
+    curl -L https://github.com/django/django/pull/xxxxx.patch | git am
 
 This will create a new branch and then apply the changes from the pull request
 to it. At this point you can run the tests or do anything else you need to
