@@ -1,8 +1,11 @@
 import copy
 import itertools
 import operator
+from typing import Callable, Union
 import warnings
 from functools import total_ordering, wraps
+from inspect import iscoroutinefunction
+from asgiref.sync import sync_to_async
 
 
 class cached_property:
@@ -402,8 +405,10 @@ class SimpleLazyObject(LazyObject):
     Designed for compound objects of unknown type. For builtins or objects of
     known type, use django.utils.functional.lazy.
     """
+    _setupfunc: Callable
+    _wrapped: Union[Callable, object]
 
-    def __init__(self, func):
+    def __init__(self, func: Callable):
         """
         Pass in a callable that returns the object to be wrapped.
 
@@ -416,7 +421,23 @@ class SimpleLazyObject(LazyObject):
         super().__init__()
 
     def _setup(self):
-        self._wrapped = self._setupfunc()
+        if iscoroutinefunction(self._setupfunc):
+            self._wrapped = self._setupfunc
+        else:
+            self._wrapped = self._setupfunc()
+
+    def __await__(self):
+        async def _():
+            if iscoroutinefunction(self._wrapped):
+                self._wrapped = await self._wrapped()
+            elif callable(self._wrapped):
+                self._wrapped = await sync_to_async(self._wrapped)()
+            return self._wrapped
+
+        if not hasattr(self, "_wrapped") or self._wrapped is empty:
+            self._wrapped = self._setupfunc
+
+        return _().__await__()
 
     # Return a meaningful representation of the lazy object for debugging
     # without evaluating the wrapped object.
