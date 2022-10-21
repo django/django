@@ -1715,7 +1715,12 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         self.wait_for_value("#id_username", "newuser")
         self.selenium.back()
 
+        # Chrome and Safari don't update related object links when selecting
+        # the same option as previously submitted. As a consequence, the
+        # "pencil" and "eye" buttons remain disable, so select "---------"
+        # first.
         select = Select(self.selenium.find_element(By.ID, "id_user"))
+        select.select_by_index(0)
         select.select_by_value("newuser")
         # Click the Change User button to change it
         self.selenium.find_element(By.ID, "change_id_user").click()
