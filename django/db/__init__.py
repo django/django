@@ -1,4 +1,5 @@
 import os
+import platform
 
 from django.core import signals
 from django.db.utils import (
@@ -64,8 +65,10 @@ signals.request_finished.connect(close_old_connections)
 
 
 # Register an event to close all connections before forking a process.
+# Only register if the platform supports forking.
 def close_all_connections(**kwargs):
     connections.close_all()
 
 
-os.register_at_fork(before=close_all_connections)
+if platform.system() == "Linux":
+    os.register_at_fork(before=close_all_connections)
