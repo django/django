@@ -363,6 +363,16 @@ user ``apache``, make sure the directory ``/var/tmp/django_cache`` exists and
 is readable and writable by the user ``apache``, or that it can be created by
 the user ``apache``.
 
+.. warning:: 
+
+    The filesystem cache is intended as an easy way to test caching, not as a 
+    serious caching strategy. It is not designed to handle a large number of 
+    files.    
+
+    If you do need to use filesystem caching for a large number of files then
+    it is recommended that you subclass ``FileBasedCache`` and override the 
+    ``_cull`` function.
+
 .. warning::
 
     When the cache :setting:`LOCATION <CACHES-LOCATION>` is contained within
