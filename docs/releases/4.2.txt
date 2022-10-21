@@ -145,7 +145,8 @@ Minor features
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :meth:`.Sitemap.get_languages_for_item` method allows customizing the
+  list of languages for which the item is displayed.
 
 :mod:`django.contrib.sites`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
