@@ -40,6 +40,14 @@ try:
 except ImportError:
     argon2 = None
 
+# scrypt requires OpenSSL 1.1+
+try:
+    import hashlib
+
+    scrypt = hashlib.scrypt
+except ImportError:
+    scrypt = None
+
 
 class PBKDF2SingleIterationHasher(PBKDF2PasswordHasher):
     iterations = 1
@@ -757,6 +765,7 @@ class TestUtilsHashPassArgon2(SimpleTestCase):
             setattr(hasher, attr, old_value)
 
 
+@skipUnless(scrypt, "scrypt not available")
 @override_settings(PASSWORD_HASHERS=PASSWORD_HASHERS)
 class TestUtilsHashPassScrypt(SimpleTestCase):
     def test_scrypt(self):
