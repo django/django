@@ -311,6 +311,15 @@ Note:
           The latest ``lastmod`` returned by calling the method with all
           items returned by :meth:`Sitemap.items`.
 
+    .. method:: Sitemap.get_languages_for_item(item, lang_code)
+
+        .. versionadded:: 4.2
+
+        **Optional.** A method that returns the sequence of language codes for
+        which the item is displayed. By default
+        :meth:`~Sitemap.get_languages_for_item` returns
+        :attr:`~Sitemap.languages`.
+
 Shortcuts
 =========
 
