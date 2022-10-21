@@ -71,4 +71,4 @@ def close_all_connections(**kwargs):
 
 
 if platform.system() == "Linux":
-    os.register_at_fork(before=close_all_connections)
+    os.register_at_fork(after_in_child=close_all_connections)
