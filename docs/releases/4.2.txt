@@ -236,7 +236,8 @@ Models
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* ``QueryDict`` instances now can be deep copied, but will drop any
+  ``TemporaryUploadedFile`` values (:ticket:`29510`).
 
 Security
 ~~~~~~~~

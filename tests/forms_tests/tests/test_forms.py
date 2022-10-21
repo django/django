@@ -4,7 +4,7 @@ import json
 import uuid
 
 from django.core.exceptions import NON_FIELD_ERRORS
-from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files.uploadedfile import SimpleUploadedFile, TemporaryUploadedFile
 from django.core.validators import MaxValueValidator, RegexValidator
 from django.forms import (
     BooleanField,
@@ -239,6 +239,14 @@ class FormsTestCase(SimpleTestCase):
             '<ul class="errorlist"><li>This field is required.</li></ul>'
             '<input type="text" name="birthday" required id="id_birthday"></div>',
         )
+
+    def test_copying_querydict_with_temp_file(self):
+        data = QueryDict(mutable=True)
+        data["file"] = TemporaryUploadedFile("test", "text/plain", 1, "utf8")
+        data["file"].write(b"1")
+        data["file"].seek(0)
+        copied_data = copy.deepcopy(data)
+        self.assertIsNone(copied_data["file"])
 
     def test_empty_querydict_args(self):
         data = QueryDict()

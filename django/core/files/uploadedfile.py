@@ -79,6 +79,9 @@ class TemporaryUploadedFile(UploadedFile):
         )
         super().__init__(file, name, content_type, size, charset, content_type_extra)
 
+    def __deepcopy__(self, memo):
+        return None
+
     def temporary_file_path(self):
         """Return the full path of this file."""
         return self.file.name
