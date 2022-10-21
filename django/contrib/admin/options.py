@@ -195,12 +195,13 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
                             request
                         ),
                     )
-                formfield.widget = widgets.RelatedFieldWidgetWrapper(
-                    formfield.widget,
-                    db_field.remote_field,
-                    self.admin_site,
-                    **wrapper_kwargs,
-                )
+                if not isinstance(formfield.widget, widgets.RelatedFieldWidgetWrapper):
+                    formfield.widget = widgets.RelatedFieldWidgetWrapper(
+                        formfield.widget,
+                        db_field.remote_field,
+                        self.admin_site,
+                        **wrapper_kwargs,
+                    )
 
             return formfield
 
