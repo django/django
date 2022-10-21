@@ -3,7 +3,7 @@ import multiprocessing
 import unittest
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db import DEFAULT_DB_ALIAS, ProgrammingError, connection 
+from django.db import DEFAULT_DB_ALIAS, ProgrammingError, connection
 from django.db.utils import ConnectionHandler, load_backend
 from django.test import SimpleTestCase, TestCase
 from django.utils.connection import ConnectionDoesNotExist
@@ -93,7 +93,9 @@ def connection_is_open():
 class DatabaseConnectionForkedProcessTests(SimpleTestCase):
     databases = ["default"]
 
-    @unittest.skipUnless(connection.vendor == "sqlite3", "SQLite connections are always usable")
+    @unittest.skipUnless(
+        connection.vendor == "sqlite3", "SQLite connections are always usable"
+    )
     def test_connections_closed_on_forked_process(self):
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1")
