@@ -24,6 +24,14 @@ model system.
 
 .. warning::
 
+    Signals can make your code harder to maintain. Consider implementing a
+    helper method on a :ref:`custom manager <custom-managers>`, to
+    both update your models and perform additional logic, or else
+    :ref:`overriding model methods <overriding-model-methods>` before using
+    model signals.
+
+.. warning::
+
     Many of these signals are sent by various model methods like
     ``__init__()`` or :meth:`~django.db.models.Model.save` that you can
     override in your own code.
@@ -549,6 +557,12 @@ Request/response signals
    :synopsis: Core signals sent by the request/response system.
 
 Signals sent by the core framework when processing a request.
+
+.. warning::
+
+    Signals can make your code harder to maintain. Consider :doc:`using a
+    middleware </topics/http/middleware>` before using request/response
+    signals.
 
 ``request_started``
 -------------------
