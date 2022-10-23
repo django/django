@@ -477,10 +477,9 @@ Save these changes and start a new Python interactive shell by running
     >>> q
     <QuerySet [<Question: What's up?>]>
     # Print the SQL used to query the database
-    >>> from pprint import pprint
-    >>> pprint(q.query)
-    ('SELECT "polls_question"."id", "polls_question"."question_text", '
-    '"polls_question"."pub_date" FROM "polls_question"')
+    >>> print(q.query)
+    SELECT "polls_question"."id", "polls_question"."question_text",
+    "polls_question"."pub_date" FROM "polls_question"
 
     # Django provides a rich database lookup API that's entirely driven by
     # keyword arguments.
