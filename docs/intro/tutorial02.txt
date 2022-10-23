@@ -478,7 +478,7 @@ Save these changes and start a new Python interactive shell by running
     <QuerySet [<Question: What's up?>]>
     # Print the SQL used to query the database
     >>> from pprint import pprint
-    >>> pprint(str(q.query))
+    >>> pprint(q.query)
     ('SELECT "polls_question"."id", "polls_question"."question_text", '
     '"polls_question"."pub_date" FROM "polls_question"')
 
