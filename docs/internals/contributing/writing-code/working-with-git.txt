@@ -196,7 +196,7 @@ When upstream (``django/django``) has changed, you should rebase your work. To
 do this, use::
 
   git fetch upstream
-  git rebase
+  git rebase upstream/main
 
 The work is automatically rebased using the branch you forked on, in the
 example case using ``upstream/main``.
