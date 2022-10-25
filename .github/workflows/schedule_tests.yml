@@ -19,7 +19,7 @@ jobs:
           - '3.8'
           - '3.9'
           - '3.10'
-          - '3.11-dev'
+          - '3.11'
     name: Windows, SQLite, Python ${{ matrix.python-version }}
     continue-on-error: true
     steps:
