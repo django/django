@@ -20,8 +20,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     atomic_transactions = False
     can_clone_databases = True
     supports_temporal_subtraction = True
-    supports_select_intersection = False
-    supports_select_difference = False
     supports_slicing_ordering_in_compound = True
     supports_index_on_text_field = False
     supports_update_conflicts = True
@@ -321,6 +319,15 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             and self._mysql_storage_engine != "MyISAM"
             and self.connection.mysql_version >= (8, 0, 13)
         )
+
+    @cached_property
+    def supports_select_intersection(self):
+        is_mariadb = self.connection.mysql_is_mariadb
+        return is_mariadb or self.connection.mysql_version >= (8, 0, 31)
+
+    supports_select_difference = property(
+        operator.attrgetter("supports_select_intersection")
+    )
 
     @cached_property
     def can_rename_index(self):
