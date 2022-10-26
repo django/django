@@ -96,9 +96,17 @@ class BoundField:
             attrs.setdefault(
                 "id", self.html_initial_id if only_initial else self.auto_id
             )
+        if only_initial and self.html_initial_name in self.form.data:
+            # Propagate the hidden initial value.
+            value = self.form._widget_data_value(
+                self.field.hidden_widget(),
+                self.html_initial_name,
+            )
+        else:
+            value = self.value()
         return widget.render(
             name=self.html_initial_name if only_initial else self.html_name,
-            value=self.value(),
+            value=value,
             attrs=attrs,
             renderer=self.form.renderer,
         )
