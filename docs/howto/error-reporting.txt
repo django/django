@@ -281,7 +281,11 @@ following attributes and methods:
 
             import re
 
-            re.compile(r'API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.IGNORECASE)
+            re.compile(r'API|TOKEN|KEY|SECRET|PASS|SIGNATURE|HTTP_COOKIE', flags=re.IGNORECASE)
+
+        .. versionchanged:: 4.2
+
+            ``HTTP_COOKIE`` was added.
 
     .. method:: is_active(request)
 
