@@ -328,6 +328,66 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             msg_prefix="Couldn't find an input with the right value in the response",
         )
 
+    def test_add_query_string_persists(self):
+        save_options = [
+            {"_addanother": "1"},  # "Save and add another".
+            {"_continue": "1"},  # "Save and continue editing".
+            {"_saveasnew": "1"},  # "Save as new".
+        ]
+        other_options = [
+            "",
+            "_changelist_filters=is_staff__exact%3D0",
+            f"{IS_POPUP_VAR}=1",
+            f"{TO_FIELD_VAR}=id",
+        ]
+        url = reverse("admin:auth_user_add")
+        for i, save_option in enumerate(save_options):
+            for j, other_option in enumerate(other_options):
+                with self.subTest(save_option=save_option, other_option=other_option):
+                    qsl = "username=newuser"
+                    if other_option:
+                        qsl = f"{qsl}&{other_option}"
+                    response = self.client.post(
+                        f"{url}?{qsl}",
+                        {
+                            "username": f"newuser{i}{j}",
+                            "password1": "newpassword",
+                            "password2": "newpassword",
+                            **save_option,
+                        },
+                    )
+                    parsed_url = urlparse(response.url)
+                    self.assertEqual(parsed_url.query, qsl)
+
+    def test_change_query_string_persists(self):
+        save_options = [
+            {"_addanother": "1"},  # "Save and add another".
+            {"_continue": "1"},  # "Save and continue editing".
+        ]
+        other_options = [
+            "",
+            "_changelist_filters=warm%3D1",
+            f"{IS_POPUP_VAR}=1",
+            f"{TO_FIELD_VAR}=id",
+        ]
+        url = reverse("admin:admin_views_color_change", args=(self.color1.pk,))
+        for save_option in save_options:
+            for other_option in other_options:
+                with self.subTest(save_option=save_option, other_option=other_option):
+                    qsl = "value=blue"
+                    if other_option:
+                        qsl = f"{qsl}&{other_option}"
+                    response = self.client.post(
+                        f"{url}?{qsl}",
+                        {
+                            "value": "gold",
+                            "warm": True,
+                            **save_option,
+                        },
+                    )
+                    parsed_url = urlparse(response.url)
+                    self.assertEqual(parsed_url.query, qsl)
+
     def test_basic_edit_GET(self):
         """
         A smoke test to ensure GET on the change_view works.
