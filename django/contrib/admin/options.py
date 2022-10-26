@@ -3,7 +3,9 @@ import enum
 import json
 import re
 from functools import partial, update_wrapper
+from urllib.parse import parse_qsl
 from urllib.parse import quote as urlquote
+from urllib.parse import urlparse
 
 from django import forms
 from django.conf import settings
@@ -1346,12 +1348,17 @@ class ModelAdmin(BaseModelAdmin):
             context,
         )
 
+    def _get_preserved_qsl(self, request, preserved_filters):
+        query_string = urlparse(request.build_absolute_uri()).query
+        return parse_qsl(query_string.replace(preserved_filters, ""))
+
     def response_add(self, request, obj, post_url_continue=None):
         """
         Determine the HttpResponse for the add_view stage.
         """
         opts = obj._meta
         preserved_filters = self.get_preserved_filters(request)
+        preserved_qsl = self._get_preserved_qsl(request, preserved_filters)
         obj_url = reverse(
             "admin:%s_%s_change" % (opts.app_label, opts.model_name),
             args=(quote(obj.pk),),
@@ -1409,7 +1416,11 @@ class ModelAdmin(BaseModelAdmin):
             if post_url_continue is None:
                 post_url_continue = obj_url
             post_url_continue = add_preserved_filters(
-                {"preserved_filters": preserved_filters, "opts": opts},
+                {
+                    "preserved_filters": preserved_filters,
+                    "preserved_qsl": preserved_qsl,
+                    "opts": opts,
+                },
                 post_url_continue,
             )
             return HttpResponseRedirect(post_url_continue)
@@ -1425,7 +1436,12 @@ class ModelAdmin(BaseModelAdmin):
             self.message_user(request, msg, messages.SUCCESS)
             redirect_url = request.path
             redirect_url = add_preserved_filters(
-                {"preserved_filters": preserved_filters, "opts": opts}, redirect_url
+                {
+                    "preserved_filters": preserved_filters,
+                    "preserved_qsl": preserved_qsl,
+                    "opts": opts,
+                },
+                redirect_url,
             )
             return HttpResponseRedirect(redirect_url)
 
@@ -1471,6 +1487,7 @@ class ModelAdmin(BaseModelAdmin):
 
         opts = self.opts
         preserved_filters = self.get_preserved_filters(request)
+        preserved_qsl = self._get_preserved_qsl(request, preserved_filters)
 
         msg_dict = {
             "name": opts.verbose_name,
@@ -1487,7 +1504,12 @@ class ModelAdmin(BaseModelAdmin):
             self.message_user(request, msg, messages.SUCCESS)
             redirect_url = request.path
             redirect_url = add_preserved_filters(
-                {"preserved_filters": preserved_filters, "opts": opts}, redirect_url
+                {
+                    "preserved_filters": preserved_filters,
+                    "preserved_qsl": preserved_qsl,
+                    "opts": opts,
+                },
+                redirect_url,
             )
             return HttpResponseRedirect(redirect_url)
 
@@ -1524,7 +1546,12 @@ class ModelAdmin(BaseModelAdmin):
                 current_app=self.admin_site.name,
             )
             redirect_url = add_preserved_filters(
-                {"preserved_filters": preserved_filters, "opts": opts}, redirect_url
+                {
+                    "preserved_filters": preserved_filters,
+                    "preserved_qsl": preserved_qsl,
+                    "opts": opts,
+                },
+                redirect_url,
             )
             return HttpResponseRedirect(redirect_url)
 
