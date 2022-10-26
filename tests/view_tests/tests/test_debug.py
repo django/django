@@ -1696,6 +1696,12 @@ class ExceptionReporterFilterTests(
         )
         self.assertNotIn(b"super_secret", response.content)
 
+    @override_settings(SESSION_COOKIE_NAME="djangosession")
+    def test_cleanse_session_cookie_value(self):
+        self.client.cookies.load({"djangosession": "should not be displayed"})
+        response = self.client.get("/raises500/")
+        self.assertNotContains(response, "should not be displayed", status_code=500)
+
 
 class CustomExceptionReporterFilter(SafeExceptionReporterFilter):
     cleansed_substitute = "XXXXXXXXXXXXXXXXXXXX"

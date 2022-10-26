@@ -110,7 +110,7 @@ class SafeExceptionReporterFilter:
 
     cleansed_substitute = "********************"
     hidden_settings = _lazy_re_compile(
-        "API|TOKEN|KEY|SECRET|PASS|SIGNATURE", flags=re.I
+        "API|TOKEN|KEY|SECRET|PASS|SIGNATURE|HTTP_COOKIE", flags=re.I
     )
 
     def cleanse_setting(self, key, value):
@@ -118,10 +118,13 @@ class SafeExceptionReporterFilter:
         Cleanse an individual setting key/value of sensitive content. If the
         value is a dictionary, recursively cleanse the keys in that dictionary.
         """
-        try:
-            is_sensitive = self.hidden_settings.search(key)
-        except TypeError:
-            is_sensitive = False
+        if key == settings.SESSION_COOKIE_NAME:
+            is_sensitive = True
+        else:
+            try:
+                is_sensitive = self.hidden_settings.search(key)
+            except TypeError:
+                is_sensitive = False
 
         if is_sensitive:
             cleansed = self.cleansed_substitute
@@ -157,6 +160,14 @@ class SafeExceptionReporterFilter:
         if not hasattr(request, "META"):
             return {}
         return {k: self.cleanse_setting(k, v) for k, v in request.META.items()}
+
+    def get_safe_cookies(self, request):
+        """
+        Return a dictionary of request.COOKIES with sensitive values redacted.
+        """
+        if not hasattr(request, "COOKIES"):
+            return {}
+        return {k: self.cleanse_setting(k, v) for k, v in request.COOKIES.items()}
 
     def is_active(self, request):
         """
@@ -359,6 +370,7 @@ class ExceptionReporter:
             "frames": frames,
             "request": self.request,
             "request_meta": self.filter.get_safe_request_meta(self.request),
+            "request_COOKIES_items": self.filter.get_safe_cookies(self.request).items(),
             "user_str": user_str,
             "filtered_POST_items": list(
                 self.filter.get_post_parameters(self.request).items()
@@ -376,7 +388,6 @@ class ExceptionReporter:
         if self.request is not None:
             c["request_GET_items"] = self.request.GET.items()
             c["request_FILES_items"] = self.request.FILES.items()
-            c["request_COOKIES_items"] = self.request.COOKIES.items()
             c["request_insecure_uri"] = self._get_raw_insecure_uri()
             c["raising_view_name"] = get_caller(self.request)
 
