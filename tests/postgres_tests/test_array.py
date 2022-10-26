@@ -414,6 +414,21 @@ class TestQuerying(PostgreSQLTestCase):
             [obj_1, obj_2],
         )
 
+    def test_overlap_values(self):
+        qs = NullableIntegerArrayModel.objects.filter(order__lt=3)
+        self.assertCountEqual(
+            NullableIntegerArrayModel.objects.filter(
+                field__overlap=qs.values_list("field"),
+            ),
+            self.objs[:3],
+        )
+        self.assertCountEqual(
+            NullableIntegerArrayModel.objects.filter(
+                field__overlap=qs.values("field"),
+            ),
+            self.objs[:3],
+        )
+
     def test_lookups_autofield_array(self):
         qs = (
             NullableIntegerArrayModel.objects.filter(
