@@ -102,6 +102,9 @@ Minor features
   <django.contrib.postgres.search.TrigramStrictWordDistance>` expressions allow
   using trigram strict word similarity.
 
+* The :lookup:`arrayfield.overlap` lookup now supports ``QuerySet.values()``
+  and ``values_list()`` as a right-hand side.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
