@@ -18,8 +18,9 @@ project.
 Python compatibility
 ====================
 
-Django 4.1 supports Python 3.8, 3.9, and 3.10. We **highly recommend** and only
-officially support the latest release of each series.
+Django 4.1 supports Python 3.8, 3.9, 3.10, and 3.11 (as of 4.1.3). We
+**highly recommend** and only officially support the latest release of each
+series.
 
 .. _whats-new-4.1:
 
