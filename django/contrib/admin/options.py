@@ -2,7 +2,9 @@ import copy
 import json
 import re
 from functools import partial, update_wrapper
+from urllib.parse import parse_qsl
 from urllib.parse import quote as urlquote
+from urllib.parse import urlparse
 
 from django import forms
 from django.conf import settings
@@ -1379,8 +1381,14 @@ class ModelAdmin(BaseModelAdmin):
             self.message_user(request, format_html(msg, **msg_dict), messages.SUCCESS)
             if post_url_continue is None:
                 post_url_continue = obj_url
+            query_string = urlparse(request.build_absolute_uri()).query
+            preserved_qsl = parse_qsl(query_string.replace(preserved_filters, ""))
             post_url_continue = add_preserved_filters(
-                {"preserved_filters": preserved_filters, "opts": opts},
+                {
+                    "preserved_filters": preserved_filters,
+                    "preserved_qsl": preserved_qsl,
+                    "opts": opts,
+                },
                 post_url_continue,
             )
             return HttpResponseRedirect(post_url_continue)
@@ -1394,9 +1402,16 @@ class ModelAdmin(BaseModelAdmin):
                 **msg_dict,
             )
             self.message_user(request, msg, messages.SUCCESS)
+            query_string = urlparse(request.build_absolute_uri()).query
+            preserved_qsl = parse_qsl(query_string.replace(preserved_filters, ""))
             redirect_url = request.path
             redirect_url = add_preserved_filters(
-                {"preserved_filters": preserved_filters, "opts": opts}, redirect_url
+                {
+                    "preserved_filters": preserved_filters,
+                    "preserved_qsl": preserved_qsl,
+                    "opts": opts,
+                },
+                redirect_url,
             )
             return HttpResponseRedirect(redirect_url)
 
@@ -1456,9 +1471,16 @@ class ModelAdmin(BaseModelAdmin):
                 **msg_dict,
             )
             self.message_user(request, msg, messages.SUCCESS)
+            query_string = urlparse(request.build_absolute_uri()).query
+            preserved_qsl = parse_qsl(query_string.replace(preserved_filters, ""))
             redirect_url = request.path
             redirect_url = add_preserved_filters(
-                {"preserved_filters": preserved_filters, "opts": opts}, redirect_url
+                {
+                    "preserved_filters": preserved_filters,
+                    "preserved_qsl": preserved_qsl,
+                    "opts": opts,
+                },
+                redirect_url,
             )
             return HttpResponseRedirect(redirect_url)
 
@@ -1494,8 +1516,15 @@ class ModelAdmin(BaseModelAdmin):
                 "admin:%s_%s_add" % (opts.app_label, opts.model_name),
                 current_app=self.admin_site.name,
             )
+            query_string = urlparse(request.build_absolute_uri()).query
+            preserved_qsl = parse_qsl(query_string.replace(preserved_filters, ""))
             redirect_url = add_preserved_filters(
-                {"preserved_filters": preserved_filters, "opts": opts}, redirect_url
+                {
+                    "preserved_filters": preserved_filters,
+                    "preserved_qsl": preserved_qsl,
+                    "opts": opts,
+                },
+                redirect_url,
             )
             return HttpResponseRedirect(redirect_url)
 

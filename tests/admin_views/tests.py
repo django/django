@@ -334,6 +334,43 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             msg_prefix="Couldn't find an input with the right value in the response",
         )
 
+    def test_add_query_string_persists(self):
+        tests = [
+            {"_addanother": "1"},  # "Save and add another".
+            {"_continue": "1"},  # "Save and continue editing".
+        ]
+        for i, save_option in enumerate(tests):
+            with self.subTest(save_option):
+                url = reverse("admin:auth_user_add")
+                response = self.client.post(
+                    f"{url}?username=newuser",
+                    {
+                        "username": f"newuser{i}",
+                        "password1": "newpassword",
+                        "password2": "newpassword",
+                        **save_option,
+                    },
+                )
+                self.assertIn("username=newuser", response.url)
+
+    def test_change_query_string_persists(self):
+        tests = [
+            {"_addanother": "1"},  # "Save and add another".
+            {"_continue": "1"},  # "Save and continue editing".
+        ]
+        for save_option in tests:
+            with self.subTest(save_option):
+                url = reverse("admin:admin_views_color_change", args=(self.color1.pk,))
+                response = self.client.post(
+                    f"{url}?value=blue",
+                    {
+                        "value": "gold",
+                        "warm": True,
+                        **save_option,
+                    },
+                )
+                self.assertIn("value=blue", response.url)
+
     def test_basic_edit_GET(self):
         """
         A smoke test to ensure GET on the change_view works.
