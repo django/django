@@ -5,8 +5,13 @@ from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 
-temp_storage_dir = tempfile.mkdtemp()
-temp_storage = FileSystemStorage(temp_storage_dir)
+try:
+    from PIL import Image
+except ImportError:
+    Image = None
+else:
+    temp_storage_dir = tempfile.mkdtemp()
+    temp_storage = FileSystemStorage(temp_storage_dir)
 
 
 class MyFileField(models.FileField):
@@ -182,9 +187,10 @@ class Advisor(models.Model):
 
 class Student(models.Model):
     name = models.CharField(max_length=255)
-    photo = models.ImageField(
-        storage=temp_storage, upload_to="photos", blank=True, null=True
-    )
+    if Image:
+        photo = models.ImageField(
+            storage=temp_storage, upload_to="photos", blank=True, null=True
+        )
 
     class Meta:
         ordering = ("name",)

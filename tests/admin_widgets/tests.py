@@ -3,6 +3,7 @@ import os
 import re
 from datetime import datetime, timedelta
 from importlib import import_module
+from unittest import skipUnless
 
 try:
     import zoneinfo
@@ -38,6 +39,7 @@ from .models import (
     Company,
     Event,
     Honeycomb,
+    Image,
     Individual,
     Inventory,
     Member,
@@ -1774,6 +1776,7 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertEqual(profiles[0].user.username, username_value)
 
 
+@skipUnless(Image, "Pillow not installed")
 class ImageFieldWidgetsSeleniumTests(AdminWidgetSeleniumTestCase):
     def test_clearablefileinput_widget(self):
         from selenium.webdriver.common.by import By
