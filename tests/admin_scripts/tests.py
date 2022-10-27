@@ -1587,6 +1587,21 @@ class ManageRunserver(SimpleTestCase):
         call_command(self.cmd, addrport="7000")
         self.assertServerSettings("127.0.0.1", "7000")
 
+    @mock.patch("django.core.management.commands.runserver.run")
+    @mock.patch("django.core.management.base.BaseCommand.check_migrations")
+    def test_zero_ip_addr(self, *mocked_objects):
+        call_command(
+            "runserver",
+            addrport="0:8000",
+            use_reloader=False,
+            skip_checks=True,
+            stdout=self.output,
+        )
+        self.assertIn(
+            "Starting development server at http://0.0.0.0:8000/",
+            self.output.getvalue(),
+        )
+
     @unittest.skipUnless(socket.has_ipv6, "platform doesn't support IPv6")
     def test_runner_addrport_ipv6(self):
         call_command(self.cmd, addrport="", use_ipv6=True)
@@ -2467,6 +2482,23 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, "additional_dir")))
+
+    def test_custom_project_template_non_python_files_not_formatted(self):
+        template_path = os.path.join(custom_templates_dir, "project_template")
+        args = ["startproject", "--template", template_path, "customtestproject"]
+        testproject_dir = os.path.join(self.test_dir, "customtestproject")
+
+        _, err = self.run_django_admin(args)
+        self.assertNoOutput(err)
+        with open(
+            os.path.join(template_path, "additional_dir", "requirements.in")
+        ) as f:
+            expected = f.read()
+        with open(
+            os.path.join(testproject_dir, "additional_dir", "requirements.in")
+        ) as f:
+            result = f.read()
+        self.assertEqual(expected, result)
 
     def test_template_dir_with_trailing_slash(self):
         "Ticket 17475: Template dir passed has a trailing path separator"

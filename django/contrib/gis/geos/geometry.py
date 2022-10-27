@@ -417,7 +417,7 @@ class GEOSGeometryBase(GEOSBase):
     def wkb(self):
         """
         Return the WKB (Well-Known Binary) representation of this Geometry
-        as a Python buffer.  SRID and Z values are not included, use the
+        as a Python memoryview. SRID and Z values are not included, use the
         `ewkb` property instead.
         """
         return wkb_w(3 if self.hasz else 2).write(self)
@@ -425,7 +425,7 @@ class GEOSGeometryBase(GEOSBase):
     @property
     def ewkb(self):
         """
-        Return the EWKB representation of this Geometry as a Python buffer.
+        Return the EWKB representation of this Geometry as a Python memoryview.
         This is an extension of the WKB specification that includes any SRID
         value that are a part of this geometry.
         """
@@ -535,7 +535,7 @@ class GEOSGeometryBase(GEOSBase):
         self, width, quadsegs=8, end_cap_style=1, join_style=1, mitre_limit=5.0
     ):
         """
-        Same as buffer() but allows customizing the style of the buffer.
+        Same as buffer() but allows customizing the style of the memoryview.
 
         End cap style can be round (1), flat (2), or square (3).
         Join style can be round (1), mitre (2), or bevel (3).
@@ -721,7 +721,7 @@ class GEOSGeometry(GEOSGeometryBase, ListMixin):
             - WKT
             - HEXEWKB (a PostGIS-specific canonical form)
             - GeoJSON (requires GDAL)
-         * buffer:
+         * memoryview:
             - WKB
 
         The `srid` keyword specifies the Source Reference Identifier (SRID)
@@ -751,7 +751,7 @@ class GEOSGeometry(GEOSGeometryBase, ListMixin):
             # When the input is a pointer to a geometry (GEOM_PTR).
             g = geo_input
         elif isinstance(geo_input, memoryview):
-            # When the input is a buffer (WKB).
+            # When the input is a memoryview (WKB).
             g = wkb_r().read(geo_input)
         elif isinstance(geo_input, GEOSGeometry):
             g = capi.geom_clone(geo_input.ptr)

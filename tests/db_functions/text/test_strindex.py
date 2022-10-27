@@ -12,7 +12,7 @@ class StrIndexTests(TestCase):
         Author.objects.create(name="J. R. R. Tolkien")
         Author.objects.create(name="Terry Pratchett")
         authors = Author.objects.annotate(fullstop=StrIndex("name", Value("R.")))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors.order_by("name"), [9, 4, 0], lambda a: a.fullstop
         )
 
@@ -28,7 +28,7 @@ class StrIndexTests(TestCase):
             written=timezone.now(),
         )
         articles = Article.objects.annotate(title_pos=StrIndex("text", "title"))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             articles.order_by("title"), [15, 0], lambda a: a.title_pos
         )
 
@@ -36,7 +36,7 @@ class StrIndexTests(TestCase):
         Author.objects.create(name="Terry Pratchett")
         Author.objects.create(name="J. R. R. Tolkien")
         Author.objects.create(name="George. R. R. Martin")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Author.objects.order_by(StrIndex("name", Value("R.")).asc()),
             [
                 "Terry Pratchett",
@@ -45,7 +45,7 @@ class StrIndexTests(TestCase):
             ],
             lambda a: a.name,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Author.objects.order_by(StrIndex("name", Value("R.")).desc()),
             [
                 "George. R. R. Martin",
@@ -60,12 +60,12 @@ class StrIndexTests(TestCase):
         Author.objects.create(name="皇帝")
         Author.objects.create(name="皇帝 ツリー")
         authors = Author.objects.annotate(sb=StrIndex("name", Value("リ")))
-        self.assertQuerysetEqual(authors.order_by("name"), [2, 0, 5], lambda a: a.sb)
+        self.assertQuerySetEqual(authors.order_by("name"), [2, 0, 5], lambda a: a.sb)
 
     def test_filtering(self):
         Author.objects.create(name="George. R. R. Martin")
         Author.objects.create(name="Terry Pratchett")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Author.objects.annotate(middle_name=StrIndex("name", Value("R."))).filter(
                 middle_name__gt=0
             ),

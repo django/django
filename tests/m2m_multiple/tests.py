@@ -24,7 +24,7 @@ class M2MMultipleTests(TestCase):
         a2.primary_categories.add(c1, c2)
         a2.secondary_categories.add(c4)
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             a1.primary_categories.all(),
             [
                 "Crime",
@@ -32,7 +32,7 @@ class M2MMultipleTests(TestCase):
             ],
             lambda c: c.name,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             a2.primary_categories.all(),
             [
                 "News",
@@ -40,22 +40,22 @@ class M2MMultipleTests(TestCase):
             ],
             lambda c: c.name,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             a1.secondary_categories.all(),
             [
                 "Life",
             ],
             lambda c: c.name,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             c1.primary_article_set.all(),
             [
                 "Parrot runs",
             ],
             lambda a: a.headline,
         )
-        self.assertQuerysetEqual(c1.secondary_article_set.all(), [])
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(c1.secondary_article_set.all(), [])
+        self.assertQuerySetEqual(
             c2.primary_article_set.all(),
             [
                 "Parrot steals",
@@ -63,17 +63,17 @@ class M2MMultipleTests(TestCase):
             ],
             lambda a: a.headline,
         )
-        self.assertQuerysetEqual(c2.secondary_article_set.all(), [])
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(c2.secondary_article_set.all(), [])
+        self.assertQuerySetEqual(
             c3.primary_article_set.all(),
             [
                 "Parrot steals",
             ],
             lambda a: a.headline,
         )
-        self.assertQuerysetEqual(c3.secondary_article_set.all(), [])
-        self.assertQuerysetEqual(c4.primary_article_set.all(), [])
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(c3.secondary_article_set.all(), [])
+        self.assertQuerySetEqual(c4.primary_article_set.all(), [])
+        self.assertQuerySetEqual(
             c4.secondary_article_set.all(),
             [
                 "Parrot steals",

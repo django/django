@@ -1036,13 +1036,16 @@ calling the appropriate methods on the wrapped expression.
 
         ``expression`` is the same as ``self``.
 
-    .. method:: get_group_by_cols(alias=None)
+    .. method:: get_group_by_cols()
 
         Responsible for returning the list of columns references by
         this expression. ``get_group_by_cols()`` should be called on any
         nested expressions. ``F()`` objects, in particular, hold a reference
-        to a column. The ``alias`` parameter will be ``None`` unless the
-        expression has been annotated and is used for grouping.
+        to a column.
+
+        .. versionchanged:: 4.2
+
+            The ``alias=None`` keyword argument was removed.
 
     .. method:: asc(nulls_first=None, nulls_last=None)
 

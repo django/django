@@ -211,6 +211,17 @@ need to call a model's :meth:`~Model.full_clean()` method if you plan to handle
 validation errors yourself, or if you have excluded fields from the
 :class:`~django.forms.ModelForm` that require validation.
 
+.. warning::
+
+    Constraints containing :class:`~django.db.models.JSONField` may not raise
+    validation errors as key, index, and path transforms have many
+    database-specific caveats. This :ticket:`may be fully supported later
+    <34059>`.
+
+    You should always check that there are no log messages, in the
+    ``django.db.models`` logger, like *"Got a database error calling check() on
+    …"* to confirm it's validated properly.
+
 .. versionchanged:: 4.1
 
     In older versions, constraints were not checked during the model
@@ -620,6 +631,14 @@ When saving a model fetched through deferred model loading
 from the DB will get updated. In effect there is an automatic
 ``update_fields`` in this case. If you assign or change any deferred field
 value, the field will be added to the updated fields.
+
+.. admonition:: ``Field.pre_save()`` and ``update_fields``
+
+    If ``update_fields`` is passed in, only the
+    :meth:`~django.db.models.Field.pre_save` methods of the ``update_fields``
+    are called. For example, this means that date/time fields with
+    ``auto_now=True`` will not be updated unless they are included in the
+    ``update_fields``.
 
 Deleting objects
 ================

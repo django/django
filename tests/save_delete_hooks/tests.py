@@ -16,7 +16,7 @@ class SaveDeleteHookTests(TestCase):
             ],
         )
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Person.objects.all(),
             [
                 "John Smith",
@@ -34,4 +34,4 @@ class SaveDeleteHookTests(TestCase):
                 "After deletion",
             ],
         )
-        self.assertQuerysetEqual(Person.objects.all(), [])
+        self.assertQuerySetEqual(Person.objects.all(), [])

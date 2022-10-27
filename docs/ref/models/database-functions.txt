@@ -495,6 +495,11 @@ Usage example::
     ``Now()`` uses ``STATEMENT_TIMESTAMP`` instead. If you need the transaction
     timestamp, use :class:`django.contrib.postgres.functions.TransactionNow`.
 
+.. versionchanged:: 4.2
+
+    Support for microsecond precision on MySQL and millisecond precision on
+    SQLite were added.
+
 ``Trunc``
 ---------
 
@@ -716,8 +721,8 @@ Usage example::
     {'date': datetime.date(2014, 6, 15),
      'day': datetime.datetime(2014, 6, 16, 0, 0, tzinfo=zoneinfo.ZoneInfo('Australia/Melbourne')),
      'hour': datetime.datetime(2014, 6, 16, 0, 0, tzinfo=zoneinfo.ZoneInfo('Australia/Melbourne')),
-     'minute': 'minute': datetime.datetime(2014, 6, 15, 14, 30, tzinfo=zoneinfo.ZoneInfo('UTC')),
-     'second': datetime.datetime(2014, 6, 15, 14, 30, 50, tzinfo=zoneinfo.ZoneInfo('UTC'))
+     'minute': 'minute': datetime.datetime(2014, 6, 15, 14, 30, tzinfo=timezone.utc),
+     'second': datetime.datetime(2014, 6, 15, 14, 30, 50, tzinfo=timezone.utc)
     }
 
 ``TimeField`` truncation

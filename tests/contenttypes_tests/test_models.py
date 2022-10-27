@@ -1,5 +1,7 @@
+from django.apps import apps
 from django.contrib.contenttypes.models import ContentType, ContentTypeManager
 from django.db import models
+from django.db.migrations.state import ProjectState
 from django.test import TestCase, override_settings
 from django.test.utils import isolate_apps
 
@@ -88,6 +90,14 @@ class ContentTypesTests(TestCase):
                 ContentType: ContentType.objects.get_for_model(ContentType),
                 FooWithUrl: ContentType.objects.get_for_model(FooWithUrl),
             },
+        )
+
+    def test_get_for_models_migrations(self):
+        state = ProjectState.from_apps(apps.get_app_config("contenttypes"))
+        ContentType = state.apps.get_model("contenttypes", "ContentType")
+        cts = ContentType.objects.get_for_models(ContentType)
+        self.assertEqual(
+            cts, {ContentType: ContentType.objects.get_for_model(ContentType)}
         )
 
     def test_get_for_models_full_cache(self):
@@ -272,9 +282,17 @@ class ContentTypesTests(TestCase):
         ct = ContentType.objects.get(app_label="contenttypes_tests", model="site")
         self.assertEqual(str(ct), "contenttypes_tests | site")
 
+    def test_name(self):
+        ct = ContentType.objects.get(app_label="contenttypes_tests", model="site")
+        self.assertEqual(ct.name, "site")
+
     def test_app_labeled_name(self):
         ct = ContentType.objects.get(app_label="contenttypes_tests", model="site")
         self.assertEqual(ct.app_labeled_name, "contenttypes_tests | site")
+
+    def test_name_unknown_model(self):
+        ct = ContentType(app_label="contenttypes_tests", model="unknown")
+        self.assertEqual(ct.name, "unknown")
 
     def test_app_labeled_name_unknown_model(self):
         ct = ContentType(app_label="contenttypes_tests", model="unknown")

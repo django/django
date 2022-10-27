@@ -6317,17 +6317,23 @@ class SeleniumTests(AdminSeleniumTestCase):
         finally:
             self.selenium.set_window_size(current_size["width"], current_size["height"])
 
-    def test_updating_related_objects_updates_fk_selects(self):
+    def test_updating_related_objects_updates_fk_selects_except_autocompletes(self):
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support.ui import Select
 
         born_country_select_id = "id_born_country"
         living_country_select_id = "id_living_country"
+        living_country_select2_textbox_id = "select2-id_living_country-container"
         favorite_country_to_vacation_select_id = "id_favorite_country_to_vacation"
         continent_select_id = "id_continent"
 
         def _get_HTML_inside_element_by_id(id_):
             return self.selenium.find_element(By.ID, id_).get_attribute("innerHTML")
+
+        def _get_text_inside_element_by_selector(selector):
+            return self.selenium.find_element(By.CSS_SELECTOR, selector).get_attribute(
+                "innerText"
+            )
 
         self.admin_login(
             username="super", password="secret", login_url=reverse("admin:index")
@@ -6353,12 +6359,16 @@ class SeleniumTests(AdminSeleniumTestCase):
             <option value="1" selected="">Argentina</option>
             """,
         )
-        self.assertHTMLEqual(
-            _get_HTML_inside_element_by_id(living_country_select_id),
-            """
-            <option value="" selected="">---------</option>
-            <option value="1">Argentina</option>
-            """,
+        # Argentina isn't added to the living_country select nor selected by
+        # the select2 widget.
+        self.assertEqual(
+            _get_text_inside_element_by_selector(f"#{living_country_select_id}"), ""
+        )
+        self.assertEqual(
+            _get_text_inside_element_by_selector(
+                f"#{living_country_select2_textbox_id}"
+            ),
+            "",
         )
         # Argentina won't appear because favorite_country_to_vacation field has
         # limit_choices_to.
@@ -6386,13 +6396,18 @@ class SeleniumTests(AdminSeleniumTestCase):
             <option value="2">Spain</option>
             """,
         )
-        self.assertHTMLEqual(
-            _get_HTML_inside_element_by_id(living_country_select_id),
-            """
-            <option value="" selected="">---------</option>
-            <option value="1">Argentina</option>
-            <option value="2" selected="">Spain</option>
-            """,
+
+        # Spain is added to the living_country select and it's also selected by
+        # the select2 widget.
+        self.assertEqual(
+            _get_text_inside_element_by_selector(f"#{living_country_select_id} option"),
+            "Spain",
+        )
+        self.assertEqual(
+            _get_text_inside_element_by_selector(
+                f"#{living_country_select2_textbox_id}"
+            ),
+            "Spain",
         )
         # Spain won't appear because favorite_country_to_vacation field has
         # limit_choices_to.
@@ -6422,13 +6437,17 @@ class SeleniumTests(AdminSeleniumTestCase):
             <option value="2">Italy</option>
             """,
         )
-        self.assertHTMLEqual(
-            _get_HTML_inside_element_by_id(living_country_select_id),
-            """
-            <option value="" selected="">---------</option>
-            <option value="1">Argentina</option>
-            <option value="2" selected="">Italy</option>
-            """,
+        # Italy is added to the living_country select and it's also selected by
+        # the select2 widget.
+        self.assertEqual(
+            _get_text_inside_element_by_selector(f"#{living_country_select_id} option"),
+            "Italy",
+        )
+        self.assertEqual(
+            _get_text_inside_element_by_selector(
+                f"#{living_country_select2_textbox_id}"
+            ),
+            "Italy",
         )
         # favorite_country_to_vacation field has no options.
         self.assertHTMLEqual(
@@ -8091,7 +8110,7 @@ class AdminViewOnSiteTests(TestCase):
         Issue #20522
         Verifying that if the parent form fails validation, the inlines also
         run validation even if validation is contingent on parent form data.
-        Also, assertFormError() and assertFormsetError() is usable for admin
+        Also, assertFormError() and assertFormSetError() is usable for admin
         forms and formsets.
         """
         # The form validation should fail because 'some_required_info' is
@@ -8115,7 +8134,7 @@ class AdminViewOnSiteTests(TestCase):
             ["This field is required."],
         )
         self.assertFormError(response.context["adminform"], None, [])
-        self.assertFormsetError(
+        self.assertFormSetError(
             response.context["inline_admin_formset"],
             0,
             None,
@@ -8124,7 +8143,7 @@ class AdminViewOnSiteTests(TestCase):
                 "contrived test case"
             ],
         )
-        self.assertFormsetError(
+        self.assertFormSetError(
             response.context["inline_admin_formset"], None, None, []
         )
 
@@ -8160,7 +8179,7 @@ class AdminViewOnSiteTests(TestCase):
             "some_required_info",
             ["This field is required."],
         )
-        self.assertFormsetError(
+        self.assertFormSetError(
             response.context["inline_admin_formset"],
             0,
             None,

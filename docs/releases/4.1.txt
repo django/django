@@ -18,8 +18,9 @@ project.
 Python compatibility
 ====================
 
-Django 4.1 supports Python 3.8, 3.9, and 3.10. We **highly recommend** and only
-officially support the latest release of each series.
+Django 4.1 supports Python 3.8, 3.9, 3.10, and 3.11 (as of 4.1.3). We
+**highly recommend** and only officially support the latest release of each
+series.
 
 .. _whats-new-4.1:
 
@@ -407,8 +408,8 @@ Tests
   raises a ``RuntimeError``, the same as outside of tests.
 
 * :meth:`.SimpleTestCase.assertFormError` and
-  :meth:`~.SimpleTestCase.assertFormsetError` now support passing a
-  form/formset object directly.
+  :meth:`assertFormsetError() <django.test.SimpleTestCase.assertFormSetError>`
+  now support passing a form/formset object directly.
 
 URLs
 ~~~~
@@ -530,7 +531,8 @@ Miscellaneous
 * Related managers for :class:`~django.db.models.ForeignKey`,
   :class:`~django.db.models.ManyToManyField`, and
   :class:`~django.contrib.contenttypes.fields.GenericRelation` are now cached
-  on the :class:`~django.db.models.Model` instance to which they belong.
+  on the :class:`~django.db.models.Model` instance to which they belong. *This
+  change was reverted in Django 4.1.2.*
 
 * The Django test runner now returns a non-zero error code for unexpected
   successes from tests marked with :py:func:`unittest.expectedFailure`.
@@ -670,8 +672,8 @@ Miscellaneous
 
 * The undocumented ability to pass ``errors=None`` to
   :meth:`.SimpleTestCase.assertFormError` and
-  :meth:`~.SimpleTestCase.assertFormsetError` is deprecated. Use ``errors=[]``
-  instead.
+  :meth:`assertFormsetError() <django.test.SimpleTestCase.assertFormSetError>`
+  is deprecated. Use ``errors=[]`` instead.
 
 * ``django.contrib.sessions.serializers.PickleSerializer`` is deprecated due to
   the risk of remote code execution.

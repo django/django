@@ -317,8 +317,9 @@ default argument for ``num``, ``1``. If the second pattern matches,
 Performance
 ===========
 
-Each regular expression in a ``urlpatterns`` is compiled the first time it's
-accessed. This makes the system blazingly fast.
+Django processes regular expressions in the ``urlpatterns`` list which is
+compiled the first time it's accessed. Subsequent requests use the cached
+configuration via the URL resolver.
 
 Syntax of the ``urlpatterns`` variable
 ======================================

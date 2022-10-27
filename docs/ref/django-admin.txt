@@ -825,6 +825,11 @@ Generate migration files without Django version and timestamp header.
 Makes ``makemigrations`` exit with a non-zero status when model changes without
 migrations are detected.
 
+.. versionchanged:: 4.2
+
+    In older versions, the missing migrations were also created when using the
+    ``--check`` option.
+
 .. django-admin-option:: --scriptable
 
 .. versionadded:: 4.1
@@ -1003,8 +1008,8 @@ separate ports by executing ``django-admin runserver`` more than once.
 
 Note that the default IP address, ``127.0.0.1``, is not accessible from other
 machines on your network. To make your development server viewable to other
-machines on the network, use its own IP address (e.g. ``192.168.2.1``) or
-``0.0.0.0`` or ``::`` (with IPv6 enabled).
+machines on the network, use its own IP address (e.g. ``192.168.2.1``), ``0``
+(shortcut for ``0.0.0.0``), ``0.0.0.0``, or ``::`` (with IPv6 enabled).
 
 You can provide an IPv6 address surrounded by brackets
 (e.g. ``[200a::1]:8000``). This will automatically enable IPv6 support.

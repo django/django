@@ -13,6 +13,7 @@ from .models import (
     Profile,
     ReleaseEvent,
     School,
+    Student,
     User,
     VideoStream,
 )
@@ -72,5 +73,6 @@ site.register(Bee)
 site.register(Advisor)
 
 site.register(School, SchoolAdmin)
+site.register(Student)
 
 site.register(Profile)

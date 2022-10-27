@@ -10,6 +10,7 @@ class BaseDatabaseFeatures:
     allows_group_by_lob = True
     allows_group_by_pk = False
     allows_group_by_selected_pks = False
+    allows_group_by_refs = True
     empty_fetchmany_value = []
     update_can_self_select = True
 
@@ -235,6 +236,7 @@ class BaseDatabaseFeatures:
     supports_select_difference = True
     supports_slicing_ordering_in_compound = False
     supports_parentheses_in_compound = True
+    requires_compound_order_by_subquery = False
 
     # Does the database support SQL 2003 FILTER (WHERE ...) in aggregate
     # expressions?

@@ -68,7 +68,7 @@ class ModelInheritanceTests(TestCase):
         # Even though p.supplier for a Place 'p' (a parent of a Supplier), a
         # Restaurant object cannot access that reverse relation, since it's not
         # part of the Place-Supplier Hierarchy.
-        self.assertQuerysetEqual(Place.objects.filter(supplier__name="foo"), [])
+        self.assertSequenceEqual(Place.objects.filter(supplier__name="foo"), [])
         msg = (
             "Cannot resolve keyword 'supplier' into field. Choices are: "
             "address, chef, chef_id, id, italianrestaurant, lot, name, "
@@ -93,7 +93,7 @@ class ModelInheritanceTests(TestCase):
             getattr(post, "attached_%(class)s_set")
 
     def test_model_with_distinct_related_query_name(self):
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Post.objects.filter(attached_model_inheritance_comments__is_spam=True), []
         )
 
@@ -146,7 +146,7 @@ class ModelInheritanceTests(TestCase):
         self.assertEqual(s.titles.related_val, (s.id,))
         # Higher level test for correct query values (title foof not
         # accidentally found).
-        self.assertQuerysetEqual(s.titles.all(), [])
+        self.assertSequenceEqual(s.titles.all(), [])
 
     def test_update_parent_filtering(self):
         """
@@ -316,7 +316,7 @@ class ModelInheritanceDataTests(TestCase):
         )
 
     def test_filter_inherited_model(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             ItalianRestaurant.objects.filter(address="1234 W. Ash"),
             [
                 "Ristorante Miron",
@@ -327,7 +327,7 @@ class ModelInheritanceDataTests(TestCase):
     def test_update_inherited_model(self):
         self.italian_restaurant.address = "1234 W. Elm"
         self.italian_restaurant.save()
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             ItalianRestaurant.objects.filter(address="1234 W. Elm"),
             [
                 "Ristorante Miron",
@@ -337,14 +337,14 @@ class ModelInheritanceDataTests(TestCase):
 
     def test_parent_fields_available_for_filtering_in_child_model(self):
         # Parent fields can be used directly in filters on the child model.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Restaurant.objects.filter(name="Demon Dogs"),
             [
                 "Demon Dogs",
             ],
             attrgetter("name"),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             ItalianRestaurant.objects.filter(address="1234 W. Ash"),
             [
                 "Ristorante Miron",
@@ -405,12 +405,12 @@ class ModelInheritanceDataTests(TestCase):
             p.restaurant
 
         self.assertEqual(p.supplier, s1)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             self.italian_restaurant.provider.order_by("-name"),
             ["Luigi's Pasta", "Joe's Chickens"],
             attrgetter("name"),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Restaurant.objects.filter(provider__name__contains="Chickens"),
             [
                 "Ristorante Miron",
@@ -418,7 +418,7 @@ class ModelInheritanceDataTests(TestCase):
             ],
             attrgetter("name"),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             ItalianRestaurant.objects.filter(provider__name__contains="Chickens"),
             [
                 "Ristorante Miron",
@@ -515,14 +515,14 @@ class ModelInheritanceDataTests(TestCase):
             name="Central market",
             address="610 some street",
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Place.objects.filter(supplier__isnull=False),
             [
                 "Central market",
             ],
             attrgetter("name"),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Place.objects.filter(supplier__isnull=True).order_by("name"),
             [
                 "Demon Dogs",
@@ -537,7 +537,7 @@ class ModelInheritanceDataTests(TestCase):
             name="Central market",
             address="610 some street",
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Place.objects.exclude(supplier__isnull=False).order_by("name"),
             [
                 "Demon Dogs",
@@ -545,7 +545,7 @@ class ModelInheritanceDataTests(TestCase):
             ],
             attrgetter("name"),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Place.objects.exclude(supplier__isnull=True),
             [
                 "Central market",

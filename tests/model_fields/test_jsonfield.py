@@ -373,7 +373,7 @@ class TestQuerying(TestCase):
             self.assertSequenceEqual(qs, [self.objs[4]])
         none_val = "" if connection.features.interprets_empty_strings_as_nulls else None
         qs = NullableJSONModel.objects.filter(value__isnull=False)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs.filter(value__isnull=False)
             .annotate(key=KT("value__d__1__f"))
             .values("key")
@@ -392,7 +392,7 @@ class TestQuerying(TestCase):
             .annotate(count=Count("value__d__0"))
             .order_by("count")
         )
-        self.assertQuerysetEqual(qs, [0, 1], operator.itemgetter("count"))
+        self.assertQuerySetEqual(qs, [0, 1], operator.itemgetter("count"))
 
     def test_order_grouping_custom_decoder(self):
         NullableJSONModel.objects.create(value_custom={"a": "b"})

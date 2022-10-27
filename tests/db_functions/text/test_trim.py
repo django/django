@@ -15,7 +15,7 @@ class TrimTests(TestCase):
             rtrim=RTrim("name"),
             trim=Trim("name"),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors.order_by("alias"),
             [
                 ("John ", "  John", "John"),
@@ -38,4 +38,4 @@ class TrimTests(TestCase):
                     authors = Author.objects.filter(
                         **{"name__%s" % transform.lookup_name: trimmed_name}
                     )
-                    self.assertQuerysetEqual(authors, [" John  "], lambda a: a.name)
+                    self.assertQuerySetEqual(authors, [" John  "], lambda a: a.name)

@@ -13,14 +13,14 @@ class TestLookupQuery(TestCase):
         cls.contact1 = Contact.objects.create(company_code=1, customer_code=20)
 
     def test_deep_mixed_forward(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Address.objects.filter(customer__contacts=self.contact1),
             [self.address.id],
             attrgetter("id"),
         )
 
     def test_deep_mixed_backward(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Contact.objects.filter(customer__address=self.address),
             [self.contact1.id],
             attrgetter("id"),

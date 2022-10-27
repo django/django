@@ -144,7 +144,7 @@ class DeferTests(AssertionMixin, TestCase):
         obj = Primary.objects.defer("value").get(name="p2")
         obj.name = "a new name"
         obj.save()
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Primary.objects.all(),
             [
                 "p1",

@@ -240,19 +240,19 @@ class LegacyDatabaseTests(TestCase):
         )
         morning_min_dt = datetime.datetime(2011, 9, 1, 3, 20, 40)
         afternoon_min_dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Session.objects.annotate(dt=Min("events__dt")).order_by("dt"),
             [morning_min_dt, afternoon_min_dt],
             transform=lambda d: d.dt,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Session.objects.annotate(dt=Min("events__dt")).filter(
                 dt__lt=afternoon_min_dt
             ),
             [morning_min_dt],
             transform=lambda d: d.dt,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Session.objects.annotate(dt=Min("events__dt")).filter(
                 dt__gte=afternoon_min_dt
             ),
@@ -536,19 +536,19 @@ class NewDatabaseTests(TestCase):
         )
         morning_min_dt = datetime.datetime(2011, 9, 1, 3, 20, 40, tzinfo=EAT)
         afternoon_min_dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Session.objects.annotate(dt=Min("events__dt")).order_by("dt"),
             [morning_min_dt, afternoon_min_dt],
             transform=lambda d: d.dt,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Session.objects.annotate(dt=Min("events__dt")).filter(
                 dt__lt=afternoon_min_dt
             ),
             [morning_min_dt],
             transform=lambda d: d.dt,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Session.objects.annotate(dt=Min("events__dt")).filter(
                 dt__gte=afternoon_min_dt
             ),
@@ -1497,18 +1497,14 @@ class AdminTests(TestCase):
 
     @requires_tz_support
     def test_change_readonly(self):
-        Timestamp.objects.create()
-        # re-fetch the object for backends that lose microseconds (MySQL)
-        t = Timestamp.objects.get()
+        t = Timestamp.objects.create()
         response = self.client.get(
             reverse("admin_tz:timezones_timestamp_change", args=(t.pk,))
         )
         self.assertContains(response, t.created.astimezone(EAT).isoformat())
 
     def test_change_readonly_in_other_timezone(self):
-        Timestamp.objects.create()
-        # re-fetch the object for backends that lose microseconds (MySQL)
-        t = Timestamp.objects.get()
+        t = Timestamp.objects.create()
         with timezone.override(ICT):
             response = self.client.get(
                 reverse("admin_tz:timezones_timestamp_change", args=(t.pk,))

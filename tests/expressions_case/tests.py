@@ -80,7 +80,7 @@ class CaseExpressionTests(TestCase):
         ]
 
     def test_annotate(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.annotate(
                 test=Case(
                     When(integer=1, then=Value("one")),
@@ -101,7 +101,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_annotate_without_default(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.annotate(
                 test=Case(
                     When(integer=1, then=1),
@@ -113,7 +113,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_annotate_with_expression_as_value(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.annotate(
                 f_test=Case(
                     When(integer=1, then=F("integer") + 1),
@@ -126,7 +126,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_annotate_with_expression_as_condition(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.annotate(
                 f_test=Case(
                     When(integer2=F("integer"), then=Value("equal")),
@@ -146,7 +146,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_annotate_with_join_in_value(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.annotate(
                 join_test=Case(
                     When(integer=1, then=F("o2o_rel__integer") + 1),
@@ -160,7 +160,7 @@ class CaseExpressionTests(TestCase):
 
     def test_annotate_with_in_clause(self):
         fk_rels = FKCaseTestModel.objects.filter(integer__in=[5])
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.only("pk", "integer")
             .annotate(
                 in_test=Sum(
@@ -176,7 +176,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_annotate_with_join_in_condition(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.annotate(
                 join_test=Case(
                     When(integer2=F("o2o_rel__integer"), then=Value("equal")),
@@ -197,7 +197,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_annotate_with_join_in_predicate(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.annotate(
                 join_test=Case(
                     When(o2o_rel__integer=1, then=Value("one")),
@@ -219,7 +219,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_annotate_with_annotation_in_value(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.annotate(
                 f_plus_1=F("integer") + 1,
                 f_plus_3=F("integer") + 3,
@@ -237,7 +237,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_annotate_with_annotation_in_condition(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.annotate(
                 f_plus_1=F("integer") + 1,
             )
@@ -261,7 +261,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_annotate_with_annotation_in_predicate(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.annotate(
                 f_minus_2=F("integer") - 2,
             )
@@ -287,7 +287,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_annotate_with_aggregation_in_value(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.values(*self.group_by_fields)
             .annotate(
                 min=Min("fk_rel__integer"),
@@ -313,7 +313,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_annotate_with_aggregation_in_condition(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.values(*self.group_by_fields)
             .annotate(
                 min=Min("fk_rel__integer"),
@@ -339,7 +339,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_annotate_with_aggregation_in_predicate(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.values(*self.group_by_fields)
             .annotate(
                 max=Max("fk_rel__integer"),
@@ -365,7 +365,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_annotate_exclude(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.annotate(
                 test=Case(
                     When(integer=1, then=Value("one")),
@@ -426,7 +426,7 @@ class CaseExpressionTests(TestCase):
         self.assertTrue(all(obj.selected == "selected" for obj in objects))
 
     def test_combined_expression(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.annotate(
                 test=Case(
                     When(integer=1, then=2),
@@ -440,7 +440,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_in_subquery(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.filter(
                 pk__in=CaseTestModel.objects.annotate(
                     test=Case(
@@ -469,7 +469,7 @@ class CaseExpressionTests(TestCase):
             When(pk=0, then=Value("0")),
             default=Value("1"),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.annotate(somecase=SOME_CASE).order_by("pk"),
             CaseTestModel.objects.annotate(somecase=SOME_CASE)
             .order_by("pk")
@@ -532,7 +532,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_filter(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.filter(
                 integer2=Case(
                     When(integer=2, then=3),
@@ -545,7 +545,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_filter_without_default(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.filter(
                 integer2=Case(
                     When(integer=2, then=3),
@@ -557,7 +557,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_filter_with_expression_as_value(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.filter(
                 integer2=Case(
                     When(integer=2, then=F("integer") + 1),
@@ -570,7 +570,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_filter_with_expression_as_condition(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.filter(
                 string=Case(
                     When(integer2=F("integer"), then=Value("2")),
@@ -582,7 +582,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_filter_with_join_in_value(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.filter(
                 integer2=Case(
                     When(integer=2, then=F("o2o_rel__integer") + 1),
@@ -595,7 +595,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_filter_with_join_in_condition(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.filter(
                 integer=Case(
                     When(integer2=F("o2o_rel__integer") + 1, then=2),
@@ -607,7 +607,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_filter_with_join_in_predicate(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.filter(
                 integer2=Case(
                     When(o2o_rel__integer=1, then=1),
@@ -620,7 +620,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_filter_with_annotation_in_value(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.annotate(
                 f=F("integer"),
                 f_plus_1=F("integer") + 1,
@@ -637,7 +637,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_filter_with_annotation_in_condition(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.annotate(
                 f_plus_1=F("integer") + 1,
             )
@@ -653,7 +653,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_filter_with_annotation_in_predicate(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.annotate(
                 f_plus_1=F("integer") + 1,
             )
@@ -670,7 +670,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_filter_with_aggregation_in_value(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.values(*self.group_by_fields)
             .annotate(
                 min=Min("fk_rel__integer"),
@@ -688,7 +688,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_filter_with_aggregation_in_condition(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.values(*self.group_by_fields)
             .annotate(
                 min=Min("fk_rel__integer"),
@@ -706,7 +706,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_filter_with_aggregation_in_predicate(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.values(*self.group_by_fields)
             .annotate(
                 max=Max("fk_rel__integer"),
@@ -730,7 +730,7 @@ class CaseExpressionTests(TestCase):
                 default=Value("other"),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [
                 (1, "one"),
@@ -751,7 +751,7 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=2),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [(1, 1), (2, 2), (3, None), (2, 2), (3, None), (3, None), (4, None)],
             transform=attrgetter("integer", "integer2"),
@@ -765,7 +765,7 @@ class CaseExpressionTests(TestCase):
                 default="integer",
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [("1", 2), ("2", 5), ("3", 3), ("2", 5), ("3", 3), ("3", 3), ("4", 4)],
             transform=attrgetter("string", "integer"),
@@ -778,7 +778,7 @@ class CaseExpressionTests(TestCase):
                 When(integer2=F("integer") + 1, then=Value("+1")),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [
                 (1, "equal"),
@@ -823,7 +823,7 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=2),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [(1, 1), (2, 2), (3, None), (2, 2), (3, None), (3, None), (4, None)],
             transform=attrgetter("integer", "big_integer"),
@@ -837,7 +837,7 @@ class CaseExpressionTests(TestCase):
                 default=b"",
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [
                 (1, b"one"),
@@ -859,7 +859,7 @@ class CaseExpressionTests(TestCase):
                 default=False,
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [
                 (1, True),
@@ -880,7 +880,7 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=date(2015, 1, 2)),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [
                 (1, date(2015, 1, 1)),
@@ -901,7 +901,7 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=datetime(2015, 1, 2)),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [
                 (1, datetime(2015, 1, 1)),
@@ -924,7 +924,7 @@ class CaseExpressionTests(TestCase):
                 ),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [
                 (1, Decimal("1.1")),
@@ -945,7 +945,7 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=timedelta(2)),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [
                 (1, timedelta(1)),
@@ -967,7 +967,7 @@ class CaseExpressionTests(TestCase):
                 default=Value(""),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [
                 (1, "1@example.com"),
@@ -988,7 +988,7 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=Value("~/2")),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [(1, "~/1"), (2, "~/2"), (3, ""), (2, "~/2"), (3, ""), (3, ""), (4, "")],
             transform=lambda o: (o.integer, str(o.file)),
@@ -1002,7 +1002,7 @@ class CaseExpressionTests(TestCase):
                 default=Value(""),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [(1, "~/1"), (2, "~/2"), (3, ""), (2, "~/2"), (3, ""), (3, ""), (4, "")],
             transform=attrgetter("integer", "file_path"),
@@ -1015,7 +1015,7 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=2.2),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [(1, 1.1), (2, 2.2), (3, None), (2, 2.2), (3, None), (3, None), (4, None)],
             transform=attrgetter("integer", "float"),
@@ -1029,7 +1029,7 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=Value("~/2")),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [(1, "~/1"), (2, "~/2"), (3, ""), (2, "~/2"), (3, ""), (3, ""), (4, "")],
             transform=lambda o: (o.integer, str(o.image)),
@@ -1043,7 +1043,7 @@ class CaseExpressionTests(TestCase):
                 output_field=GenericIPAddressField(),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [
                 (1, "1.1.1.1"),
@@ -1064,7 +1064,7 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=False),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [
                 (1, True),
@@ -1085,7 +1085,7 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=2),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [(1, 1), (2, 2), (3, None), (2, 2), (3, None), (3, None), (4, None)],
             transform=attrgetter("integer", "positive_big_integer"),
@@ -1098,7 +1098,7 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=2),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [(1, 1), (2, 2), (3, None), (2, 2), (3, None), (3, None), (4, None)],
             transform=attrgetter("integer", "positive_integer"),
@@ -1111,7 +1111,7 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=2),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [(1, 1), (2, 2), (3, None), (2, 2), (3, None), (3, None), (4, None)],
             transform=attrgetter("integer", "positive_small_integer"),
@@ -1125,7 +1125,7 @@ class CaseExpressionTests(TestCase):
                 default=Value(""),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [(1, "1"), (2, "2"), (3, ""), (2, "2"), (3, ""), (3, ""), (4, "")],
             transform=attrgetter("integer", "slug"),
@@ -1138,7 +1138,7 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=2),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [(1, 1), (2, 2), (3, None), (2, 2), (3, None), (3, None), (4, None)],
             transform=attrgetter("integer", "small_integer"),
@@ -1151,7 +1151,7 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=Value("2")),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.filter(string__in=["1", "2"]).order_by("pk"),
             [(1, "1"), (2, "2"), (2, "2")],
             transform=attrgetter("integer", "string"),
@@ -1165,7 +1165,7 @@ class CaseExpressionTests(TestCase):
                 default=Value(""),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [(1, "1"), (2, "2"), (3, ""), (2, "2"), (3, ""), (3, ""), (4, "")],
             transform=attrgetter("integer", "text"),
@@ -1178,7 +1178,7 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=time(2)),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [
                 (1, time(1)),
@@ -1200,7 +1200,7 @@ class CaseExpressionTests(TestCase):
                 default=Value(""),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [
                 (1, "http://1.example.com/"),
@@ -1221,7 +1221,7 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=UUID("22222222222222222222222222222222")),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [
                 (1, UUID("11111111111111111111111111111111")),
@@ -1244,7 +1244,7 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=obj2.pk),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.order_by("pk"),
             [
                 (1, obj1.pk),
@@ -1259,7 +1259,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_lookup_in_condition(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.annotate(
                 test=Case(
                     When(integer__lt=2, then=Value("less than 2")),
@@ -1280,7 +1280,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_lookup_different_fields(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.annotate(
                 test=Case(
                     When(integer=2, integer2=3, then=Value("when")),
@@ -1300,7 +1300,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_combined_q_object(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.annotate(
                 test=Case(
                     When(Q(integer=2) | Q(integer2=3), then=Value("when")),
@@ -1320,7 +1320,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_order_by_conditional_implicit(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.filter(integer__lte=2)
             .annotate(
                 test=Case(
@@ -1335,7 +1335,7 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_order_by_conditional_explicit(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.filter(integer__lte=2)
             .annotate(
                 test=Case(
@@ -1357,7 +1357,7 @@ class CaseExpressionTests(TestCase):
         #    would remove o from the results. So, in effect we are testing that
         #    we are promoting the fk_rel join to a left outer join here.
         # 2. The default value of 3 is generated for the case expression.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.filter(pk=o.pk).annotate(
                 foo=Case(
                     When(fk_rel__pk=1, then=2),
@@ -1368,7 +1368,7 @@ class CaseExpressionTests(TestCase):
             lambda x: (x, x.foo),
         )
         # Now 2 should be generated, as the fk_rel is null.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.filter(pk=o.pk).annotate(
                 foo=Case(
                     When(fk_rel__isnull=True, then=2),
@@ -1387,7 +1387,7 @@ class CaseExpressionTests(TestCase):
         #    would remove o from the results. So, in effect we are testing that
         #    we are promoting the fk_rel join to a left outer join here.
         # 2. The default value of 3 is generated for the case expression.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.filter(pk=o.pk).annotate(
                 foo=Case(
                     When(fk_rel__pk=1, then=2),
@@ -1402,7 +1402,7 @@ class CaseExpressionTests(TestCase):
             lambda x: (x, x.foo, x.bar),
         )
         # Now 2 should be generated, as the fk_rel is null.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             CaseTestModel.objects.filter(pk=o.pk).annotate(
                 foo=Case(
                     When(fk_rel__isnull=True, then=2),
@@ -1434,7 +1434,7 @@ class CaseExpressionTests(TestCase):
         # The integer=4 case has one integer, thus the result is 1, and
         # integer=10 doesn't have any and this too generates 1 (instead of 0)
         # as ~Q() also matches nulls.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [(1, 2), (2, 2), (2, 2), (3, 2), (3, 2), (3, 2), (4, 1), (10, 1)],
             lambda x: x[1:],
@@ -1459,7 +1459,7 @@ class CaseExpressionTests(TestCase):
             .order_by("integer")
         )
         self.assertEqual(str(qs.query).count(" JOIN "), 1)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 (1, 2, 2),
@@ -1485,7 +1485,7 @@ class CaseExpressionTests(TestCase):
         ]
         for case, value in tests:
             with self.subTest(case=case):
-                self.assertQuerysetEqual(
+                self.assertQuerySetEqual(
                     CaseTestModel.objects.values("string")
                     .annotate(
                         case=case,
@@ -1522,7 +1522,7 @@ class CaseDocumentationExamples(TestCase):
         )
 
     def test_simple_example(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Client.objects.annotate(
                 discount=Case(
                     When(account_type=Client.GOLD, then=Value("5%")),
@@ -1537,7 +1537,7 @@ class CaseDocumentationExamples(TestCase):
     def test_lookup_example(self):
         a_month_ago = date.today() - timedelta(days=30)
         a_year_ago = date.today() - timedelta(days=365)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Client.objects.annotate(
                 discount=Case(
                     When(registered_on__lte=a_year_ago, then=Value("10%")),
@@ -1559,7 +1559,7 @@ class CaseDocumentationExamples(TestCase):
                 default=Value(Client.REGULAR),
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Client.objects.order_by("pk"),
             [("Jane Doe", "G"), ("James Smith", "R"), ("Jack Black", "P")],
             transform=attrgetter("name", "account_type"),
@@ -1614,7 +1614,7 @@ class CaseDocumentationExamples(TestCase):
     def test_filter_example(self):
         a_month_ago = date.today() - timedelta(days=30)
         a_year_ago = date.today() - timedelta(days=365)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Client.objects.filter(
                 registered_on__lte=Case(
                     When(account_type=Client.GOLD, then=a_month_ago),

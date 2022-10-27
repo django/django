@@ -25,7 +25,7 @@ class ReverseTests(TestCase):
 
     def test_basic(self):
         authors = Author.objects.annotate(backward=Reverse("name"))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors,
             [
                 ("John Smith", "htimS nhoJ"),

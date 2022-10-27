@@ -181,10 +181,10 @@ It worked!
 
     .. console::
 
-        $ python manage.py runserver 0:8000
+        $ python manage.py runserver 0.0.0.0:8000
 
-    **0** is a shortcut for **0.0.0.0**. Full docs for the development server
-    can be found in the :djadmin:`runserver` reference.
+    Full docs for the development server can be found in the
+    :djadmin:`runserver` reference.
 
 .. admonition:: Automatic reloading of :djadmin:`runserver`
 

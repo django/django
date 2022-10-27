@@ -4,7 +4,7 @@ from collections import defaultdict
 from django.conf import settings
 from django.template.backends.django import get_template_tag_modules
 
-from . import Error, Tags, register
+from . import Error, Tags, Warning, register
 
 E001 = Error(
     "You have 'APP_DIRS': True in your TEMPLATES but also specify 'loaders' "
@@ -15,7 +15,7 @@ E002 = Error(
     "'string_if_invalid' in TEMPLATES OPTIONS must be a string but got: {} ({}).",
     id="templates.E002",
 )
-E003 = Error(
+W003 = Warning(
     "{} is used for multiple template tag modules: {}",
     id="templates.E003",
 )
@@ -63,12 +63,12 @@ def check_for_template_tags_with_the_same_name(app_configs, **kwargs):
     for library_name, items in libraries.items():
         if len(items) > 1:
             errors.append(
-                Error(
-                    E003.msg.format(
+                Warning(
+                    W003.msg.format(
                         repr(library_name),
                         ", ".join(repr(item) for item in sorted(items)),
                     ),
-                    id=E003.id,
+                    id=W003.id,
                 )
             )
 

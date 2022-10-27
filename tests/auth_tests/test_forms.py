@@ -590,6 +590,14 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
                     form.fields[field_name].widget.attrs["autocomplete"], autocomplete
                 )
 
+    def test_no_password(self):
+        data = {"username": "username"}
+        form = AuthenticationForm(None, data)
+        self.assertIs(form.is_valid(), False)
+        self.assertEqual(
+            form["password"].errors, [Field.default_error_messages["required"]]
+        )
+
 
 class SetPasswordFormTest(TestDataMixin, TestCase):
     def test_password_verification(self):
@@ -653,6 +661,23 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
         self.assertIn(
             "This password is too short. It must contain at least 12 characters.",
             form["new_password2"].errors,
+        )
+
+    def test_no_password(self):
+        user = User.objects.get(username="testclient")
+        data = {"new_password1": "new-password"}
+        form = SetPasswordForm(user, data)
+        self.assertIs(form.is_valid(), False)
+        self.assertEqual(
+            form["new_password2"].errors, [Field.default_error_messages["required"]]
+        )
+        form = SetPasswordForm(user, {})
+        self.assertIs(form.is_valid(), False)
+        self.assertEqual(
+            form["new_password1"].errors, [Field.default_error_messages["required"]]
+        )
+        self.assertEqual(
+            form["new_password2"].errors, [Field.default_error_messages["required"]]
         )
 
     def test_password_whitespace_not_stripped(self):
@@ -1201,6 +1226,7 @@ class AdminPasswordChangeFormTest(TestDataMixin, TestCase):
         self.assertEqual(password_changed.call_count, 0)
         form.save()
         self.assertEqual(password_changed.call_count, 1)
+        self.assertEqual(form.changed_data, ["password"])
 
     def test_password_whitespace_not_stripped(self):
         user = User.objects.get(username="testclient")
@@ -1212,6 +1238,7 @@ class AdminPasswordChangeFormTest(TestDataMixin, TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data["password1"], data["password1"])
         self.assertEqual(form.cleaned_data["password2"], data["password2"])
+        self.assertEqual(form.changed_data, ["password"])
 
     def test_non_matching_passwords(self):
         user = User.objects.get(username="testclient")
@@ -1220,6 +1247,7 @@ class AdminPasswordChangeFormTest(TestDataMixin, TestCase):
         self.assertEqual(
             form.errors["password2"], [form.error_messages["password_mismatch"]]
         )
+        self.assertEqual(form.changed_data, ["password"])
 
     def test_missing_passwords(self):
         user = User.objects.get(username="testclient")
@@ -1228,6 +1256,7 @@ class AdminPasswordChangeFormTest(TestDataMixin, TestCase):
         required_error = [Field.default_error_messages["required"]]
         self.assertEqual(form.errors["password1"], required_error)
         self.assertEqual(form.errors["password2"], required_error)
+        self.assertEqual(form.changed_data, [])
 
     def test_one_password(self):
         user = User.objects.get(username="testclient")
@@ -1235,9 +1264,11 @@ class AdminPasswordChangeFormTest(TestDataMixin, TestCase):
         required_error = [Field.default_error_messages["required"]]
         self.assertEqual(form1.errors["password1"], required_error)
         self.assertNotIn("password2", form1.errors)
+        self.assertEqual(form1.changed_data, [])
         form2 = AdminPasswordChangeForm(user, {"password1": "test", "password2": ""})
         self.assertEqual(form2.errors["password2"], required_error)
         self.assertNotIn("password1", form2.errors)
+        self.assertEqual(form2.changed_data, [])
 
     def test_html_autocomplete_attributes(self):
         user = User.objects.get(username="testclient")
