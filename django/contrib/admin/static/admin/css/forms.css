@@ -9,10 +9,6 @@
     border-bottom: 1px solid var(--hairline-color);
 }
 
-.form-row a {
-    text-decoration: underline;
-}
-
 .form-row img, .form-row input {
     vertical-align: middle;
 }
