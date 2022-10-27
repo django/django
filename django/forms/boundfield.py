@@ -280,11 +280,11 @@ class BoundField:
             attrs["disabled"] = True
         id_for_label = self.id_for_label
         if self.field.help_text and id_for_label:
-            helptext_id = '%s_helptext' % id_for_label
+            helptext_id = "%s_helptext" % id_for_label
             if described_by := widget.attrs.get("aria-describedby"):
                 attrs["aria-describedby"] = f"{helptext_id} {described_by}"
             else:
-                attrs['aria-describedby'] = helptext_id
+                attrs["aria-describedby"] = helptext_id
         return attrs
 
     @property
