@@ -182,7 +182,8 @@ Forms
   :attr:`~django.forms.Field.help_text` is now
   associated to its input using ``aria-describedby``.
 *  To improve accessibility
-  :attr:`~django.forms.Field.help_text` is now associated to its input using ``aria-describedby``.
+  :attr:`~django.forms.Field.help_text` is now associated to
+  its input using ``aria-describedby``.
 
 Generic Views
 ~~~~~~~~~~~~~
