@@ -10,7 +10,7 @@
     {% else %}
       {% if field.label %}{{ field.label_tag }}{% endif %}
     {% endif %}
-    {% if field.help_text %}<div class="helptext">{{ field.help_text|safe }}</div>{% endif %}
+    {% if field.help_text %}<div class="helptext"{% if field.id_for_label %} id="{{ field.id_for_label}}_helptext"{% endif %}>{{ field.help_text|safe }}</div>{% endif %}
     {{ errors }}
     {{ field }}
     {% if field.use_fieldset %}</fieldset>{% endif %}

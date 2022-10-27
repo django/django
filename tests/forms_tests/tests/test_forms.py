@@ -3028,6 +3028,19 @@ Options: <select multiple name="options" required>
                 )
 
             p = UserRegistration()
+        
+            self.assertHTMLEqual(
+                p.as_div(),
+                '<div><label for="id_username">Username:</label>'
+                '<input type="text" name="username" maxlength="10" required '
+                'aria-describedby="id_username_helptext" id="id_username">'
+                '<span class="helptext" id="id_username_helptext">'
+                'e.g., user@example.com</span></div><div><label for="id_password">'
+                'Password:</label><input type="password" name="password" '
+                'required aria-describedby="id_password_helptext" id="id_password">'
+                '<span class="helptext" id="id_password_helptext">'
+                "Wählen Sie mit Bedacht.</span></div>",
+            )
             self.assertHTMLEqual(
                 p.as_ul(),
                 '<li><label for="id_username">Username:</label>'
@@ -3079,11 +3092,26 @@ Options: <select multiple name="options" required>
             )
 
         p = UserRegistration()
+        
+        self.assertHTMLEqual(
+                p.as_div(),
+                '<div><label for="id_username">Username:</label>'
+                '<div class="helptext" id="id_username_helptext">'
+                'e.g., user@example.com</div>'
+                '<input type="text" name="username" maxlength="10" required '
+                'aria-describedby="id_username_helptext custom-description" '
+                'id="id_username"></div><div><label for="id_password">Password:'
+                '</label><div class="helptext" id="id_password_helptext">'
+                "Wählen Sie mit Bedacht.</div>"
+                '<input type="password" name="password" required '
+                'aria-describedby="id_password_helptext" id="id_password">'
+                '</div>',
+            )
         self.assertHTMLEqual(
             p.as_ul(),
             '<li><label for="id_username">Username:</label><input type="text" '
             'name="username" maxlength="10" required '
-            'aria-describedby="custom-description" '
+            'aria-describedby="id_username_helptext custom-description" '
             'id="id_username"><span class="helptext" id="id_username_helptext">'
             'e.g., user@example.com</span></li><li><label for="id_password">Password:'
             '</label><input type="password" name="password" required '
@@ -3095,7 +3123,7 @@ Options: <select multiple name="options" required>
             p.as_p(),
             '<p><label for="id_username">Username:</label><input type="text" '
             'name="username" maxlength="10" required '
-            'aria-describedby="custom-description" '
+            'aria-describedby="id_username_helptext custom-description" '
             'id="id_username"><span class="helptext" id="id_username_helptext">'
             'e.g., user@example.com</span></p><p><label for="id_password">Password:'
             '</label><input type="password" name="password" required '
@@ -3107,7 +3135,7 @@ Options: <select multiple name="options" required>
             p.as_table(),
             '<tr><th><label for="id_username">Username:</label></th><td>'
             '<input type="text" name="username" maxlength="10" required '
-            'aria-describedby="custom-description" id="id_username"><br>'
+            'aria-describedby="id_username_helptext custom-description" id="id_username"><br>'
             '<span class="helptext" id="id_username_helptext">'
             "e.g., user@example.com</span></td></tr><tr><th>"
             '<label for="id_password">Password:</label></th><td>'
