@@ -84,7 +84,6 @@ class TemplateCommand(BaseCommand):
         )
 
     def handle(self, app_or_project, name, target=None, **options):
-        self.written_files = []
         self.app_or_project = app_or_project
         self.a_or_an = "an" if app_or_project == "app" else "a"
         self.paths_to_remove = []
@@ -209,7 +208,6 @@ class TemplateCommand(BaseCommand):
                 else:
                     shutil.copyfile(old_path, new_path)
 
-                self.written_files.append(new_path)
                 if self.verbosity >= 2:
                     self.stdout.write("Creating %s" % new_path)
                 try:
@@ -232,7 +230,7 @@ class TemplateCommand(BaseCommand):
                 else:
                     shutil.rmtree(path_to_remove)
 
-        run_formatters(self.written_files, **formatter_paths)
+        run_formatters([top_dir], **formatter_paths)
 
     def handle_template(self, template, subdir):
         """

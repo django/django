@@ -445,11 +445,6 @@ class SQLCompiler:
         """
         result = []
         seen = set()
-        replacements = {
-            expr: Ref(alias, expr)
-            for alias, expr in self.query.annotation_select.items()
-        }
-
         for expr, is_ref in self._order_by_pairs():
             resolved = expr.resolve_expression(self.query, allow_joins=True, reuse=None)
             if not is_ref and self.query.combinator and self.select:
@@ -478,7 +473,7 @@ class SQLCompiler:
                         q.add_annotation(expr_src, col_name)
                     self.query.add_select_col(resolved, col_name)
                     resolved.set_source_expressions([RawSQL(f"{order_by_idx}", ())])
-            sql, params = self.compile(resolved.replace_expressions(replacements))
+            sql, params = self.compile(resolved)
             # Don't add the same column twice, but the order direction is
             # not taken into account so we strip it. When this entire method
             # is refactored into expressions, then we can check each part as we

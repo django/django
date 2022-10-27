@@ -17,6 +17,8 @@ from contextlib import contextmanager
 from importlib import import_module
 from io import StringIO
 
+import sqlparse
+
 import django
 from django.core.management import call_command
 from django.db import connections
@@ -95,7 +97,9 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
             self.stream.writeln(self.separator2)
             self.stream.writeln(err)
             self.stream.writeln(self.separator2)
-            self.stream.writeln(sql_debug)
+            self.stream.writeln(
+                sqlparse.format(sql_debug, reindent=True, keyword_case="upper")
+            )
 
 
 class PDBDebugResult(unittest.TextTestResult):

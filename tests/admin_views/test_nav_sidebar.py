@@ -43,21 +43,29 @@ class AdminSidebarTests(TestCase):
     def test_sidebar_not_on_index(self):
         response = self.client.get(reverse("test_with_sidebar:index"))
         self.assertContains(response, '<div class="main" id="main">')
-        self.assertNotContains(response, '<nav class="sticky" id="nav-sidebar">')
+        self.assertNotContains(
+            response, '<nav class="sticky" id="nav-sidebar" aria-label="Sidebar">'
+        )
 
     def test_sidebar_disabled(self):
         response = self.client.get(reverse("test_without_sidebar:index"))
-        self.assertNotContains(response, '<nav class="sticky" id="nav-sidebar">')
+        self.assertNotContains(
+            response, '<nav class="sticky" id="nav-sidebar" aria-label="Sidebar">'
+        )
 
     def test_sidebar_unauthenticated(self):
         self.client.logout()
         response = self.client.get(reverse("test_with_sidebar:login"))
-        self.assertNotContains(response, '<nav class="sticky" id="nav-sidebar">')
+        self.assertNotContains(
+            response, '<nav class="sticky" id="nav-sidebar" aria-label="Sidebar">'
+        )
 
     def test_sidebar_aria_current_page(self):
         url = reverse("test_with_sidebar:auth_user_changelist")
         response = self.client.get(url)
-        self.assertContains(response, '<nav class="sticky" id="nav-sidebar">')
+        self.assertContains(
+            response, '<nav class="sticky" id="nav-sidebar" aria-label="Sidebar">'
+        )
         self.assertContains(
             response, '<a href="%s" aria-current="page">Users</a>' % url
         )
@@ -80,7 +88,9 @@ class AdminSidebarTests(TestCase):
     def test_sidebar_aria_current_page_missing_without_request_context_processor(self):
         url = reverse("test_with_sidebar:auth_user_changelist")
         response = self.client.get(url)
-        self.assertContains(response, '<nav class="sticky" id="nav-sidebar">')
+        self.assertContains(
+            response, '<nav class="sticky" id="nav-sidebar" aria-label="Sidebar">'
+        )
         # Does not include aria-current attribute.
         self.assertContains(response, '<a href="%s">Users</a>' % url)
         self.assertNotContains(response, "aria-current")
@@ -146,16 +156,15 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         self.assertEqual(toggle_button.tag_name, "button")
         self.assertEqual(toggle_button.get_attribute("aria-label"), "Toggle navigation")
-        for link in self.selenium.find_elements(By.CSS_SELECTOR, "#nav-sidebar a"):
-            self.assertEqual(link.get_attribute("tabIndex"), "0")
-        filter_input = self.selenium.find_element(By.CSS_SELECTOR, "#nav-filter")
-        self.assertEqual(filter_input.get_attribute("tabIndex"), "0")
+        nav_sidebar = self.selenium.find_element(By.ID, "nav-sidebar")
+        self.assertEqual(nav_sidebar.get_attribute("aria-expanded"), "true")
+        self.assertTrue(nav_sidebar.is_displayed())
         toggle_button.click()
-        # Hidden sidebar is not reachable via keyboard navigation.
-        for link in self.selenium.find_elements(By.CSS_SELECTOR, "#nav-sidebar a"):
-            self.assertEqual(link.get_attribute("tabIndex"), "-1")
-        filter_input = self.selenium.find_element(By.CSS_SELECTOR, "#nav-filter")
-        self.assertEqual(filter_input.get_attribute("tabIndex"), "-1")
+
+        # Hidden sidebar is not visible.
+        nav_sidebar = self.selenium.find_element(By.ID, "nav-sidebar")
+        self.assertEqual(nav_sidebar.get_attribute("aria-expanded"), "false")
+        self.assertFalse(nav_sidebar.is_displayed())
         main_element = self.selenium.find_element(By.CSS_SELECTOR, "#main")
         self.assertNotIn("shifted", main_element.get_attribute("class").split())
 
@@ -189,16 +198,14 @@ class SeleniumTests(AdminSeleniumTestCase):
         toggle_button = self.selenium.find_element(
             By.CSS_SELECTOR, "#toggle-nav-sidebar"
         )
-        # Hidden sidebar is not reachable via keyboard navigation.
-        for link in self.selenium.find_elements(By.CSS_SELECTOR, "#nav-sidebar a"):
-            self.assertEqual(link.get_attribute("tabIndex"), "-1")
-        filter_input = self.selenium.find_element(By.CSS_SELECTOR, "#nav-filter")
-        self.assertEqual(filter_input.get_attribute("tabIndex"), "-1")
+        # Hidden sidebar is not visible.
+        nav_sidebar = self.selenium.find_element(By.ID, "nav-sidebar")
+        self.assertEqual(nav_sidebar.get_attribute("aria-expanded"), "false")
+        self.assertFalse(nav_sidebar.is_displayed())
         toggle_button.click()
-        for link in self.selenium.find_elements(By.CSS_SELECTOR, "#nav-sidebar a"):
-            self.assertEqual(link.get_attribute("tabIndex"), "0")
-        filter_input = self.selenium.find_element(By.CSS_SELECTOR, "#nav-filter")
-        self.assertEqual(filter_input.get_attribute("tabIndex"), "0")
+        nav_sidebar = self.selenium.find_element(By.ID, "nav-sidebar")
+        self.assertEqual(nav_sidebar.get_attribute("aria-expanded"), "true")
+        self.assertTrue(nav_sidebar.is_displayed())
         self.assertEqual(
             self.selenium.execute_script(
                 "return localStorage.getItem('django.admin.navSidebarIsOpen')"
