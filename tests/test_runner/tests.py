@@ -156,8 +156,7 @@ class TestSuiteTests(SimpleTestCase):
     def make_tests(self):
         """Return an iterable of tests."""
         suite = self.make_test_suite()
-        tests = list(iter_test_cases(suite))
-        return tests
+        return list(iter_test_cases(suite))
 
     def test_shuffle_tests(self):
         tests = self.make_tests()

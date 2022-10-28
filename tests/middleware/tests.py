@@ -1027,8 +1027,7 @@ class ETagGZipMiddlewareTest(SimpleTestCase):
         """
 
         def get_response(req):
-            response = HttpResponse(self.compressible_string)
-            return response
+            return HttpResponse(self.compressible_string)
 
         def get_cond_response(req):
             return ConditionalGetMiddleware(get_response)(req)
