@@ -4,10 +4,9 @@ import warnings
 from functools import partialmethod
 from itertools import chain
 
-import django
-
 from asgiref.sync import sync_to_async
 
+import django
 from django.apps import apps
 from django.conf import settings
 from django.core import checks
@@ -741,10 +740,7 @@ class Model(metaclass=ModelBase):
         self._state.db = db_instance._state.db
 
     async def arefresh_from_db(self, using=None, fields=None):
-        return await sync_to_async(self.refresh_from_db)(
-            using=using,
-            fields=fields
-        )
+        return await sync_to_async(self.refresh_from_db)(using=using, fields=fields)
 
     def serializable_value(self, field_name):
         """
@@ -819,12 +815,14 @@ class Model(metaclass=ModelBase):
 
     save.alters_data = True
 
-    async def asave(self, force_insert=False, force_update=False, using=None, update_fields=None):
+    async def asave(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
         return await sync_to_async(self.save)(
             force_insert=force_insert,
             force_update=force_update,
             using=using,
-            update_fields=update_fields
+            update_fields=update_fields,
         )
 
     def save_base(
