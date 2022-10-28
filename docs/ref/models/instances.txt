@@ -191,7 +191,7 @@ all of the instance's fields when a deferred field is reloaded::
 A helper method that returns a set containing the attribute names of all those
 fields that are currently deferred for this model.
 
-.. versionchanged:: 4.1
+.. versionchanged:: 4.2
 
     ``arefresh_from_db()`` method was added.
 
@@ -426,7 +426,7 @@ method. See :ref:`overriding-model-methods` for more details.
 
 The model save process also has some subtleties; see the sections below.
 
-.. versionchanged:: 4.1
+.. versionchanged:: 4.2
 
     ``asave()`` method was added.
 
@@ -677,7 +677,7 @@ Sometimes with :ref:`multi-table inheritance <multi-table-inheritance>` you may
 want to delete only a child model's data. Specifying ``keep_parents=True`` will
 keep the parent model's data.
 
-.. versionchanged:: 4.1
+.. versionchanged:: 4.2
 
     ``adelete()`` method was added.
 

@@ -866,16 +866,16 @@ code will automatically support those arguments when they are added.
 Asynchronous model methods
 ==========================
 
-.. versionadded:: 4.1
+.. versionadded:: 4.2
 
 If you are writing asynchronous views or code, you cannot use the ORM for
-model methods that use the database in quite the way we have described
+model methods in the way we have described
 above, as you cannot call *blocking* synchronous code from asynchronous
 code - it will block up the event loop (or, more likely, Django will
 notice and raise a ``SynchronousOnlyOperation`` to stop that from
 happening).
 
-Fortunately, you can use some asynchronous model methods that use the database.
+Fortunately, you can use some asynchronous model methods that use the database:
 
 - ``asave()`` works asynchronously for :meth:`~Model.save`.
 - ``adelete()`` works asynchronously for :meth:`~Model.delete`.
