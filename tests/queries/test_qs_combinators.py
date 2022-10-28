@@ -61,6 +61,32 @@ class QuerySetSetOperationTests(TestCase):
         self.assertSequenceEqual(qs3.none(), [])
         self.assertNumbersEqual(qs3, [0, 1, 8, 9], ordered=False)
 
+    def test_union_none_slice(self):
+        qs1 = Number.objects.filter(num__lte=0)
+        qs2 = Number.objects.none()
+        qs3 = qs1.union(qs2)
+        self.assertNumbersEqual(qs3[:1], [0])
+
+    def test_union_empty_filter_slice(self):
+        qs1 = Number.objects.filter(num__lte=0)
+        qs2 = Number.objects.filter(pk__in=[])
+        qs3 = qs1.union(qs2)
+        self.assertNumbersEqual(qs3[:1], [0])
+
+    @skipUnlessDBFeature("supports_slicing_ordering_in_compound")
+    def test_union_slice_compound_empty(self):
+        qs1 = Number.objects.filter(num__lte=0)[:1]
+        qs2 = Number.objects.none()
+        qs3 = qs1.union(qs2)
+        self.assertNumbersEqual(qs3[:1], [0])
+
+    @skipUnlessDBFeature("supports_slicing_ordering_in_compound")
+    def test_union_combined_slice_compound_empty(self):
+        qs1 = Number.objects.filter(num__lte=2)[:3]
+        qs2 = Number.objects.none()
+        qs3 = qs1.union(qs2)
+        self.assertNumbersEqual(qs3.order_by("num")[2:3], [2])
+
     def test_union_order_with_null_first_last(self):
         Number.objects.filter(other_num=5).update(other_num=None)
         qs1 = Number.objects.filter(num__lte=1)
