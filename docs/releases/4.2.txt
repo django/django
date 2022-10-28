@@ -51,6 +51,9 @@ Minor features
 * The ``admin/base.html`` template now has a new block ``nav-breadcrumbs``
   which contains the navigation landmark and the ``breadcrumbs`` block.
 
+* :attr:`.ModelAdmin.list_editable` now uses atomic transactions when making
+  edits.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -173,6 +176,9 @@ Forms
 * :func:`~django.forms.models.modelform_factory` now respects the
   ``formfield_callback`` attribute of the ``form``’s ``Meta``.
 
+* Session cookies are now treated as credentials and therefore hidden and
+  replaced with stars (``**********``) in error reports.
+
 Generic Views
 ~~~~~~~~~~~~~
 
@@ -182,6 +188,10 @@ Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
 * Added support and translations for the Central Kurdish (Sorani) language.
+
+* The :class:`~django.middleware.locale.LocaleMiddleware` now respects a
+  language from the request when :func:`~django.conf.urls.i18n.i18n_patterns`
+  is used with the ``prefix_default_language`` argument set to ``False``.
 
 Logging
 ~~~~~~~
@@ -254,7 +264,8 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* The :option:`test --debug-sql` option now formats SQL queries with
+  ``sqlparse``.
 
 URLs
 ~~~~
@@ -328,6 +339,11 @@ Miscellaneous
 
 * The :option:`makemigrations --check` option no longer creates missing
   migration files.
+
+* The ``alias`` argument for :meth:`.Expression.get_group_by_cols` is removed.
+
+* The minimum supported version of ``sqlparse`` is increased from 0.2.2 to
+  0.2.3.
 
 .. _deprecated-features-4.2:
 
@@ -414,3 +430,9 @@ Miscellaneous
 
 * The ``map_height`` and ``map_width`` attributes of ``BaseGeometryWidget`` are
   deprecated, use CSS to size map widgets instead.
+
+* ``SimpleTestCase.assertFormsetError()`` is deprecated in favor of
+  ``assertFormSetError()``.
+
+* ``TransactionTestCase.assertQuerysetEqual()`` is deprecated in favor of
+  ``assertQuerySetEqual()``.

@@ -517,7 +517,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             .order_by("store_name")
         )
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             books,
             ["Amazon.com", "Books.com", "Mamma and Pappa's Books"],
             lambda b: b.store_name,
@@ -609,7 +609,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             .filter(chain="Westfield")
         )
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Angus & Robinson", "Westfield", True, "155860191"),
@@ -629,7 +629,7 @@ class NonAggregateAnnotationTestCase(TestCase):
 
     def test_order_by_annotation(self):
         authors = Author.objects.annotate(other_age=F("age")).order_by("other_age")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors,
             [
                 25,
@@ -651,7 +651,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             .annotate(age_count=Count("age"))
             .order_by("age_count", "age")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors,
             [
                 (25, 1),
@@ -735,7 +735,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             (2, "Buffy", False, 42, "Summers", 18, Decimal(40000.00), store.name, 17),
         ]
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs.order_by("id"),
             rows,
             lambda e: (
@@ -786,7 +786,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         ]
 
         # and we respect deferred columns!
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs.defer("age").order_by("id"),
             rows,
             lambda e: (
@@ -835,7 +835,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             )
         ).order_by("name")
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Apple", "APPL"),
@@ -891,7 +891,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         # LOWER function supported by:
         # oracle, postgres, mysql, sqlite, sqlserver
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Apple", "APPL".lower()),
@@ -1333,7 +1333,7 @@ class AliasTests(TestCase):
     def test_order_by_alias(self):
         qs = Author.objects.alias(other_age=F("age")).order_by("other_age")
         self.assertIs(hasattr(qs.first(), "other_age"), False)
-        self.assertQuerysetEqual(qs, [34, 34, 35, 46, 57], lambda a: a.age)
+        self.assertQuerySetEqual(qs, [34, 34, 35, 46, 57], lambda a: a.age)
 
     def test_order_by_alias_aggregate(self):
         qs = (
@@ -1342,7 +1342,7 @@ class AliasTests(TestCase):
             .order_by("age_count", "age")
         )
         self.assertIs(hasattr(qs.first(), "age_count"), False)
-        self.assertQuerysetEqual(qs, [35, 46, 57, 34], lambda a: a["age"])
+        self.assertQuerySetEqual(qs, [35, 46, 57, 34], lambda a: a["age"])
 
     def test_dates_alias(self):
         qs = Book.objects.alias(

@@ -1659,8 +1659,8 @@ one, doing so will result in an error.
     have measured that the difference between returning the fields you need and
     the full set of fields for the model will be significant.
 
-    Even if you think you are in the advanced use-case situation, **only use
-    ``defer()`` when you cannot, at queryset load time, determine if you will
+    Even if you think you are in the advanced use-case situation, **only use**
+    ``defer()`` **when you cannot, at queryset load time, determine if you will
     need the extra fields or not**. If you are frequently loading and using a
     particular subset of your data, the best choice you can make is to
     normalize your models and put the non-loaded data into a separate model

@@ -294,7 +294,7 @@ dependencies:
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
 *  gettext_ (:ref:`gettext_on_windows`)
 *  selenium_
-*  sqlparse_ 0.2.2+ (required)
+*  sqlparse_ 0.2.3+ (required)
 *  tblib_ 1.5.0+
 
 You can find these dependencies in `pip requirements files`_ inside the

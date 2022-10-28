@@ -240,19 +240,19 @@ class LegacyDatabaseTests(TestCase):
         )
         morning_min_dt = datetime.datetime(2011, 9, 1, 3, 20, 40)
         afternoon_min_dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Session.objects.annotate(dt=Min("events__dt")).order_by("dt"),
             [morning_min_dt, afternoon_min_dt],
             transform=lambda d: d.dt,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Session.objects.annotate(dt=Min("events__dt")).filter(
                 dt__lt=afternoon_min_dt
             ),
             [morning_min_dt],
             transform=lambda d: d.dt,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Session.objects.annotate(dt=Min("events__dt")).filter(
                 dt__gte=afternoon_min_dt
             ),
@@ -536,19 +536,19 @@ class NewDatabaseTests(TestCase):
         )
         morning_min_dt = datetime.datetime(2011, 9, 1, 3, 20, 40, tzinfo=EAT)
         afternoon_min_dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Session.objects.annotate(dt=Min("events__dt")).order_by("dt"),
             [morning_min_dt, afternoon_min_dt],
             transform=lambda d: d.dt,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Session.objects.annotate(dt=Min("events__dt")).filter(
                 dt__lt=afternoon_min_dt
             ),
             [morning_min_dt],
             transform=lambda d: d.dt,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Session.objects.annotate(dt=Min("events__dt")).filter(
                 dt__gte=afternoon_min_dt
             ),

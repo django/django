@@ -70,7 +70,7 @@ class DeferRegressionTest(TestCase):
         obj = Leaf.objects.only("name", "child").select_related()[0]
         self.assertEqual(obj.child.name, "c1")
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Leaf.objects.select_related().only("child__name", "second_child__name"),
             [
                 "l1",

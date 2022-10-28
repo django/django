@@ -407,7 +407,7 @@ Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
     >>> q.question_text
     "What's new?"
     >>> q.pub_date
-    datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=<UTC>)
+    datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=datetime.timezone.utc)
 
     # Change values by changing the attributes, then calling save().
     >>> q.question_text = "What's up?"

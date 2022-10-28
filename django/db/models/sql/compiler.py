@@ -123,6 +123,7 @@ class SQLCompiler:
         if self.query.group_by is None:
             return []
         expressions = []
+        allows_group_by_refs = self.connection.features.allows_group_by_refs
         if self.query.group_by is not True:
             # If the group by is set to a list (by .values() call most likely),
             # then we need to add everything in it to the GROUP BY clause.
@@ -131,18 +132,22 @@ class SQLCompiler:
             # Converts string references to expressions.
             for expr in self.query.group_by:
                 if not hasattr(expr, "as_sql"):
-                    expressions.append(self.query.resolve_ref(expr))
-                else:
-                    expressions.append(expr)
+                    expr = self.query.resolve_ref(expr)
+                if not allows_group_by_refs and isinstance(expr, Ref):
+                    expr = expr.source
+                expressions.append(expr)
         # Note that even if the group_by is set, it is only the minimal
         # set to group by. So, we need to add cols in select, order_by, and
         # having into the select in any case.
         ref_sources = {expr.source for expr in expressions if isinstance(expr, Ref)}
-        for expr, _, _ in select:
+        aliased_exprs = {}
+        for expr, _, alias in select:
             # Skip members of the select clause that are already included
             # by reference.
             if expr in ref_sources:
                 continue
+            if alias:
+                aliased_exprs[expr] = alias
             cols = expr.get_group_by_cols()
             for col in cols:
                 expressions.append(col)
@@ -160,6 +165,8 @@ class SQLCompiler:
         expressions = self.collapse_group_by(expressions, having_group_by)
 
         for expr in expressions:
+            if allows_group_by_refs and (alias := aliased_exprs.get(expr)):
+                expr = Ref(alias, expr)
             try:
                 sql, params = self.compile(expr)
             except EmptyResultSet:
@@ -344,7 +351,13 @@ class SQLCompiler:
                 if not self.query.standard_ordering:
                     field = field.copy()
                     field.reverse_ordering()
-                yield field, False
+                if isinstance(field.expression, F) and (
+                    annotation := self.query.annotation_select.get(
+                        field.expression.name
+                    )
+                ):
+                    field.expression = Ref(field.expression.name, annotation)
+                yield field, isinstance(field.expression, Ref)
                 continue
             if field == "?":  # random
                 yield OrderBy(Random()), False
@@ -432,7 +445,6 @@ class SQLCompiler:
         """
         result = []
         seen = set()
-
         for expr, is_ref in self._order_by_pairs():
             resolved = expr.resolve_expression(self.query, allow_joins=True, reuse=None)
             if not is_ref and self.query.combinator and self.select:
@@ -522,8 +534,8 @@ class SQLCompiler:
             if not query.is_empty()
         ]
         if not features.supports_slicing_ordering_in_compound:
-            for query, compiler in zip(self.query.combined_queries, compilers):
-                if query.low_mark or query.high_mark:
+            for compiler in compilers:
+                if compiler.query.is_sliced:
                     raise DatabaseError(
                         "LIMIT/OFFSET not allowed in subqueries of compound statements."
                     )
@@ -531,6 +543,11 @@ class SQLCompiler:
                     raise DatabaseError(
                         "ORDER BY not allowed in subqueries of compound statements."
                     )
+        elif self.query.is_sliced and combinator == "union":
+            limit = (self.query.low_mark, self.query.high_mark)
+            for compiler in compilers:
+                if not compiler.query.is_sliced:
+                    compiler.query.set_limits(*limit)
         parts = ()
         for compiler in compilers:
             try:
@@ -699,9 +716,7 @@ class SQLCompiler:
             )
             for_update_part = None
             # Is a LIMIT/OFFSET clause needed?
-            with_limit_offset = with_limits and (
-                self.query.high_mark is not None or self.query.low_mark
-            )
+            with_limit_offset = with_limits and self.query.is_sliced
             combinator = self.query.combinator
             features = self.connection.features
             if combinator:
