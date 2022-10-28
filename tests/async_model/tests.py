@@ -1,5 +1,3 @@
-from traceback import print_tb
-from turtle import title
 from django.test import TestCase
 from .models import Book
 
