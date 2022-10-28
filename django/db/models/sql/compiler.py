@@ -716,9 +716,7 @@ class SQLCompiler:
             )
             for_update_part = None
             # Is a LIMIT/OFFSET clause needed?
-            with_limit_offset = with_limits and (
-                self.query.high_mark is not None or self.query.low_mark
-            )
+            with_limit_offset = with_limits and self.query.is_sliced
             combinator = self.query.combinator
             features = self.connection.features
             if combinator:
