@@ -861,6 +861,26 @@ code will automatically support those arguments when they are added.
     :data:`~django.db.models.signals.pre_save`, and
     :data:`~django.db.models.signals.post_save` are called.
 
+.. _async-model-methods:
+
+Asynchronous model methods
+==========================
+
+.. versionadded:: 4.1
+
+If you are writing asynchronous views or code, you cannot use the ORM for
+model methods that use the database in quite the way we have described
+above, as you cannot call *blocking* synchronous code from asynchronous
+code - it will block up the event loop (or, more likely, Django will
+notice and raise a ``SynchronousOnlyOperation`` to stop that from
+happening).
+
+Fortunately, you can use some asynchronous model methods that use the database.
+
+- ``asave()`` works asynchronously for :meth:`~Model.save`.
+- ``adelete()`` works asynchronously for :meth:`~Model.delete`.
+- ``arefresh_from_db()`` works asynchronously for :meth:`~Model.refresh_from_db`.
+
 Executing custom SQL
 --------------------
 

@@ -132,6 +132,9 @@ value from the database::
     >>> obj.field  # Loads the field from the database
 
 .. method:: Model.refresh_from_db(using=None, fields=None)
+.. method:: Model.arefresh_from_db(using=None, fields=None)
+
+*Asynchronous version*: ``arefresh_from_db()``
 
 If you need to reload a model's values from the database, you can use the
 ``refresh_from_db()`` method. When this method is called without arguments the
@@ -187,6 +190,10 @@ all of the instance's fields when a deferred field is reloaded::
 
 A helper method that returns a set containing the attribute names of all those
 fields that are currently deferred for this model.
+
+.. versionchanged:: 4.1
+
+    ``arefresh_from_db()`` method was added.
 
 .. _validating-objects:
 
@@ -395,6 +402,9 @@ Saving objects
 To save an object back to the database, call ``save()``:
 
 .. method:: Model.save(force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None)
+.. method:: Model.asave(force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None)
+
+*Asynchronous version*: ``asave()``
 
 For details on using the ``force_insert`` and ``force_update`` arguments, see
 :ref:`ref-models-force-insert`. Details about the ``update_fields`` argument
@@ -404,6 +414,10 @@ If you want customized saving behavior, you can override this ``save()``
 method. See :ref:`overriding-model-methods` for more details.
 
 The model save process also has some subtleties; see the sections below.
+
+.. versionchanged:: 4.1
+
+    ``asave()`` method was added.
 
 Auto-incrementing primary keys
 ------------------------------
@@ -633,6 +647,9 @@ Deleting objects
 ================
 
 .. method:: Model.delete(using=DEFAULT_DB_ALIAS, keep_parents=False)
+.. method:: Model.adelete(using=DEFAULT_DB_ALIAS, keep_parents=False)
+
+*Asynchronous version*: ``adelete()``
 
 Issues an SQL ``DELETE`` for the object. This only deletes the object in the
 database; the Python instance will still exist and will still have data in
@@ -648,6 +665,10 @@ method. See :ref:`overriding-model-methods` for more details.
 Sometimes with :ref:`multi-table inheritance <multi-table-inheritance>` you may
 want to delete only a child model's data. Specifying ``keep_parents=True`` will
 keep the parent model's data.
+
+.. versionchanged:: 4.1
+
+    ``adelete()`` method was added.
 
 Pickling objects
 ================
