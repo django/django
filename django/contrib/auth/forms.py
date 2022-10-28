@@ -163,7 +163,9 @@ class UserChangeForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         password = self.fields.get("password")
         if password:
-            password.help_text = password.help_text.format("../password/")
+            password.help_text = password.help_text.format(
+                f"../../{self.instance.pk}/password/"
+            )
         user_permissions = self.fields.get("user_permissions")
         if user_permissions:
             user_permissions.queryset = user_permissions.queryset.select_related(
@@ -378,12 +380,11 @@ class SetPasswordForm(forms.Form):
     def clean_new_password2(self):
         password1 = self.cleaned_data.get("new_password1")
         password2 = self.cleaned_data.get("new_password2")
-        if password1 and password2:
-            if password1 != password2:
-                raise ValidationError(
-                    self.error_messages["password_mismatch"],
-                    code="password_mismatch",
-                )
+        if password1 and password2 and password1 != password2:
+            raise ValidationError(
+                self.error_messages["password_mismatch"],
+                code="password_mismatch",
+            )
         password_validation.validate_password(password2, self.user)
         return password2
 

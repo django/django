@@ -176,6 +176,9 @@ Forms
 * :func:`~django.forms.models.modelform_factory` now respects the
   ``formfield_callback`` attribute of the ``form``’s ``Meta``.
 
+* Session cookies are now treated as credentials and therefore hidden and
+  replaced with stars (``**********``) in error reports.
+
 Generic Views
 ~~~~~~~~~~~~~
 
@@ -261,7 +264,8 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* The :option:`test --debug-sql` option now formats SQL queries with
+  ``sqlparse``.
 
 URLs
 ~~~~
@@ -337,6 +341,9 @@ Miscellaneous
   migration files.
 
 * The ``alias`` argument for :meth:`.Expression.get_group_by_cols` is removed.
+
+* The minimum supported version of ``sqlparse`` is increased from 0.2.2 to
+  0.2.3.
 
 .. _deprecated-features-4.2:
 
