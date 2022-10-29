@@ -3,7 +3,7 @@ from django.test import TestCase
 from .models import Book
 
 
-class AsyncModelOoperationTest(TestCase):
+class AsyncModelOperationTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.s1 = Book.objects.create(
