@@ -936,7 +936,8 @@ a.deletelink:focus, a.deletelink:hover {
 
 #branding h1 {
     padding: 0;
-    margin: 0 20px 0 0;
+    margin: 0;
+    margin-inline-end: 20px;
     font-weight: 300;
     font-size: 1.5rem;
     color: var(--header-branding-color);
