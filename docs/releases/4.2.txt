@@ -26,15 +26,6 @@ and only officially support the latest release of each series.
 What's new in Django 4.2
 ========================
 
-Asynchronous Model interface
-----------------------------
-
-``Model`` now provides an asynchronous interface for some model methods that
-user database. These are named as -per the existing synchronous operations but
-with an ``a`` prefix, for example ``asave()``, ``adelete()``, and so on.
-
-see :ref:`async-model-methods` for details.
-
 Minor features
 --------------
 
@@ -244,6 +235,10 @@ Models
 
 * :class:`~django.db.models.functions.Now` now supports microsecond precision
   on MySQL and millisecond precision on SQLite.
+
+* ``Model`` now provides an asynchronous interface for some model methods that
+  user database. These are named as -per the existing synchronous operations
+  but with an ``a`` prefix, for example ``asave()``, ``adelete()``, and so on.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

@@ -76,6 +76,7 @@ corruption.
 Queries & the ORM
 -----------------
 
+.. versionadded:: 4.1
 
 With some exceptions, Django can run ORM queries asynchronously as well::
 
@@ -92,10 +93,9 @@ Detailed notes can be found in :ref:`async-queries`, but in short:
 
 Django also supports some asynchronous model methods that use the database::
 
-    async def updateBook(...):
-        book = await author.books.afirst()
-        book.pages = 20
-        await book.asave()
+    async def make_book(...):
+        book = Book(...)
+        await book.asave(using="secondary")
 
 Detailed notes can be found in :ref:`async-model-methods`.
 
