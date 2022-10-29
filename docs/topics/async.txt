@@ -97,7 +97,6 @@ Django also supports some asynchronous model methods that use the database::
         book = Book(...)
         await book.asave(using="secondary")
 
-Detailed notes can be found in :ref:`async-model-methods`.
 
 Transactions do not yet work in async mode. If you have a piece of code that
 needs transactions behavior, we recommend you write that piece as a single
