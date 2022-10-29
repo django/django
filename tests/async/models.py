@@ -9,8 +9,3 @@ class RelatedModel(models.Model):
 class SimpleModel(models.Model):
     field = models.IntegerField()
     created = models.DateTimeField(default=timezone.now)
-
-
-class Book(models.Model):
-    title = models.CharField(max_length=200)
-    pages = models.IntegerField(default=0)

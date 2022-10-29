@@ -1,33 +1,25 @@
 from django.test import TestCase
 
-from .models import Book
+from .models import SimpleModel
 
 
 class AsyncModelOperationTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.s1 = Book.objects.create(
-            title="David Copperfield",
-        )
-        cls.s2 = Book.objects.create(
-            title="The Great Gatsby",
-        )
+        cls.s1 = SimpleModel.objects.create(field=0)
 
     async def test_asave(self):
-        book = await Book.objects.aget(title="David Copperfield")
-        book.pages = 10
-        await book.asave()
-        getBook = await Book.objects.aget(title="David Copperfield")
-        self.assertEqual(book.pages, getBook.pages)
+        self.s1.field = 10
+        await self.s1.asave()
+        refetched = await SimpleModel.objects.aget()
+        self.assertEqual(refetched.field, 10)
 
     async def test_adelete(self):
-        book = await Book.objects.aget(title="The Great Gatsby")
-        await book.adelete()
-        count = await Book.objects.acount()
-        self.assertEqual(count, 1)
+        await self.s1.adelete()
+        count = await SimpleModel.objects.acount()
+        self.assertEqual(count, 0)
 
     async def test_arefresh_from_db(self):
-        book = await Book.objects.aget(title="The Great Gatsby")
-        await Book.objects.filter(pk=book.pk).aupdate(pages=20)
-        await book.arefresh_from_db()
-        self.assertEqual(book.pages, 20)
+        await SimpleModel.objects.filter(pk=self.s1.pk).aupdate(field=20)
+        await self.s1.arefresh_from_db()
+        self.assertEqual(self.s1.field, 20)

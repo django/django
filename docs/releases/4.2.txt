@@ -236,9 +236,9 @@ Models
 * :class:`~django.db.models.functions.Now` now supports microsecond precision
   on MySQL and millisecond precision on SQLite.
 
-* ``Model`` now provides an asynchronous interface for some model methods that
-  user database. These are named as -per the existing synchronous operations
-  but with an ``a`` prefix, for example ``asave()``, ``adelete()``, and so on.
+* ``Model`` now provides asynchronous versions of some model methods that use
+  the database, using an ``a`` prefix: :meth:`~Model.adelete()`,
+  :meth:`~Model.arefresh_from_db()`, and :meth:`~Model.asave()`.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
