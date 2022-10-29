@@ -531,7 +531,6 @@ class SQLCompiler:
         compilers = [
             query.get_compiler(self.using, self.connection, self.elide_empty)
             for query in self.query.combined_queries
-            if not query.is_empty()
         ]
         if not features.supports_slicing_ordering_in_compound:
             for compiler in compilers:
@@ -546,6 +545,11 @@ class SQLCompiler:
         elif self.query.is_sliced and combinator == "union":
             limit = (self.query.low_mark, self.query.high_mark)
             for compiler in compilers:
+                # A sliced union cannot have its parts elided as some of them
+                # might be sliced as well and in the event where only a single
+                # part produces a non-empty resultset it might be impossible to
+                # generate valid SQL.
+                compiler.elide_empty = False
                 if not compiler.query.is_sliced:
                     compiler.query.set_limits(*limit)
         parts = ()
