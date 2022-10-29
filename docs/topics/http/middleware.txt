@@ -312,7 +312,7 @@ If your middleware has both ``sync_capable = True`` and
 ``async_capable = True``, then Django will pass it the request without
 converting it. In this case, you can work out if your middleware will receive
 async requests by checking if the ``get_response`` object you are passed is a
-coroutine function, using :py:func:`asyncio.iscoroutinefunction`.
+coroutine function, using ``asyncio.iscoroutinefunction``.
 
 The ``django.utils.decorators`` module contains
 :func:`~django.utils.decorators.sync_only_middleware`,
