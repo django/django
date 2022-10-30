@@ -91,9 +91,19 @@ Detailed notes can be found in :ref:`async-queries`, but in short:
 * ``async for`` is supported on all QuerySets (including the output of
   ``values()`` and ``values_list()``.)
 
+Django also supports some asynchronous model methods that use the database::
+
+    async def make_book(...):
+        book = Book(...)
+        await book.asave(using="secondary")
+
 Transactions do not yet work in async mode. If you have a piece of code that
 needs transactions behavior, we recommend you write that piece as a single
 synchronous function and call it using :func:`sync_to_async`.
+
+.. versionchanged:: 4.2
+
+    Asynchronous model interface was added.
 
 Performance
 -----------
