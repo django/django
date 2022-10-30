@@ -1707,9 +1707,11 @@ one, doing so will result in an error.
 
 .. method:: only(*fields)
 
-The ``only()`` method is more or less the opposite of :meth:`defer()`. You call
-it with the fields that should *not* be deferred when retrieving a model.  If
-you have a model where almost all the fields need to be deferred, using
+The ``only()`` method is essentially the opposite of :meth:`defer`. Only the
+fields passed into this method and that are *not* already specified as deferred
+are loaded immediately when the queryset is evaluated.
+
+If you have a model where almost all the fields need to be deferred, using
 ``only()`` to specify the complementary set of fields can result in simpler
 code.
 
@@ -1734,8 +1736,7 @@ logically::
     # Final result is that everything except "headline" is deferred.
     Entry.objects.only("headline", "body").defer("body")
 
-    # Final result loads headline and body immediately (only() replaces any
-    # existing set of fields).
+    # Final result loads headline immediately.
     Entry.objects.defer("body").only("headline", "body")
 
 All of the cautions in the note for the :meth:`defer` documentation apply to
@@ -1755,6 +1756,11 @@ are in your ``only()`` call.
     When calling :meth:`~django.db.models.Model.save()` for instances with
     deferred fields, only the loaded fields will be saved. See
     :meth:`~django.db.models.Model.save()` for more details.
+
+.. note::
+
+    When using :meth:`defer` after ``only()`` the fields in :meth:`defer` will
+    override ``only()`` for fields that are listed in both.
 
 ``using()``
 ~~~~~~~~~~~
