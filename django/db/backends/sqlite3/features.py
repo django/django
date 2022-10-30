@@ -18,7 +18,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     atomic_transactions = False
     can_rollback_ddl = True
     can_create_inline_fk = False
-    supports_paramstyle_pyformat = False
     requires_literal_defaults = True
     can_clone_databases = True
     supports_temporal_subtraction = True
