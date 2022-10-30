@@ -819,14 +819,6 @@ If you're getting this error, you can solve it by:
 SQLite does not support the ``SELECT ... FOR UPDATE`` syntax. Calling it will
 have no effect.
 
-"pyformat" parameter style in raw queries not supported
--------------------------------------------------------
-
-For most backends, raw queries (``Manager.raw()`` or ``cursor.execute()``)
-can use the "pyformat" parameter style, where placeholders in the query
-are given as ``'%(name)s'`` and the parameters are passed as a dictionary
-rather than a list. SQLite does not support this.
-
 .. _sqlite-isolation:
 
 Isolation when using ``QuerySet.iterator()``
