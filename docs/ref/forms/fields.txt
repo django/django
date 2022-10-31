@@ -259,21 +259,22 @@ fields. We've specified ``auto_id=False`` to simplify the output::
     <p>Cc myself: <input type="checkbox" name="cc_myself"></p>
 
 When a field has help text and :attr:`~django.forms.BoundField.id_for_label`
-returns a value `help_text` will be associated with the input using
+returns a value, we associate``help_text`` with the input using
 ``aria-describedby``::
 
     >>> from django import forms
     >>> class UserForm(forms.Form):
     ...     username = forms.CharField(max_length=10, help_text='e.g., user@example.com')
     >>> f = UserForm()
-    >>> print(f.as_p())
-    <p><label for="id_username">Username:</label>
+    >>> print(f.as_div())
+    <div><label for="id_username">Username:</label>
+    <div class="helptext" id="id_username_helptext">e.g., user@example.com</div>
     <input type="text" name="username" maxlength="10" required aria-describedby="id_username_helptext" id="id_username">
-    <span class="helptext" id="id_username_helptext">e.g., user@example.com</span></p>
-
-``aria-describedby`` can be customized by adding it to the ``attrs`` of
-the field's widget. In this scenario you'll need to also customize the form
-template to make the same customization to the ``id`` of the help text.
+    </div>
+    
+``aria-describedby`` can include both default and the custom attribute.
+Custom attribute can be added to the ``attrs`` dict of
+the field's widget.
 
     >>> class UserForm(forms.Form):
     ...     username = forms.CharField(
@@ -282,7 +283,7 @@ template to make the same customization to the ``id`` of the help text.
     ...     )
     >>> f = UserForm()
     >>> print(f['username'])
-    <input type="text" name="username" aria-describedby="custom-description" maxlength="10" id="id_username" required>
+    <input type="text" name="username" aria-describedby="id_username_helptext custom-description" maxlength="10" id="id_username" required>
 
 .. versionchanged:: 4.2
 
