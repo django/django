@@ -72,7 +72,7 @@ html[data-theme="dark"] {
     padding: 0;
     background: transparent;
     vertical-align: middle;
-    margin-left: 5px;
+    margin-inline-start: 5px;
     margin-top: -1px;
 }
 
