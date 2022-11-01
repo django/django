@@ -6,7 +6,11 @@ from django.db import NotSupportedError, connections, router
 from django.db.models import lookups
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import TextField
-from django.db.models.lookups import PostgresOperatorLookup, Transform
+from django.db.models.lookups import (
+    FieldGetDbPrepValueMixin,
+    PostgresOperatorLookup,
+    Transform,
+)
 from django.utils.translation import gettext_lazy as _
 
 from . import Field
@@ -92,10 +96,15 @@ class JSONField(CheckFieldDefaultMixin, Field):
     def get_internal_type(self):
         return "JSONField"
 
-    def get_prep_value(self, value):
+    def get_db_prep_value(self, value, connection, prepared=False):
+        if hasattr(value, "as_sql"):
+            return value
+        return connection.ops.adapt_json_value(value, self.encoder)
+
+    def get_db_prep_save(self, value, connection):
         if value is None:
             return value
-        return json.dumps(value, cls=self.encoder)
+        return self.get_db_prep_value(value, connection)
 
     def get_transform(self, name):
         transform = super().get_transform(name)
@@ -141,7 +150,7 @@ def compile_json_path(key_transforms, include_root=True):
     return "".join(path)
 
 
-class DataContains(PostgresOperatorLookup):
+class DataContains(FieldGetDbPrepValueMixin, PostgresOperatorLookup):
     lookup_name = "contains"
     postgres_operator = "@>"
 
@@ -156,7 +165,7 @@ class DataContains(PostgresOperatorLookup):
         return "JSON_CONTAINS(%s, %s)" % (lhs, rhs), params
 
 
-class ContainedBy(PostgresOperatorLookup):
+class ContainedBy(FieldGetDbPrepValueMixin, PostgresOperatorLookup):
     lookup_name = "contained_by"
     postgres_operator = "<@"
 

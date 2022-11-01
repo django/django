@@ -1,9 +1,20 @@
+import json
+from functools import lru_cache, partial
+
 from psycopg2.extras import Inet
+from psycopg2.extras import Json as Jsonb
 
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import split_tzname_delta
 from django.db.models.constants import OnConflict
+
+
+@lru_cache
+def get_json_dumps(encoder):
+    if encoder is None:
+        return json.dumps
+    return partial(json.dumps, cls=encoder)
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -307,6 +318,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         if value:
             return Inet(value)
         return None
+
+    def adapt_json_value(self, value, encoder):
+        return Jsonb(value, dumps=get_json_dumps(encoder))
 
     def subtract_temporals(self, internal_type, lhs, rhs):
         if internal_type == "DateField":
