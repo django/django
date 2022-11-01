@@ -29,6 +29,8 @@ from django.core.management import (
     call_command,
     color,
     execute_from_command_line,
+    get_commands,
+    load_command_class,
 )
 from django.core.management.base import LabelCommand, SystemCheckError
 from django.core.management.commands.listurls import Command as ListurlsCommand
@@ -257,10 +259,19 @@ class DjangoAdminNoSettings(AdminScriptTestCase):
         Commands that don't require settings succeed if the settings file
         doesn't exist.
         """
-        args = ["startproject"]
-        out, err = self.run_django_admin(args, settings_file="bad_settings")
-        self.assertNoOutput(out)
-        self.assertOutput(err, "You must provide a project name", regex=True)
+        for cmd, owner in get_commands().items():
+            if owner != "django.core":
+                continue
+            with self.subTest(command=cmd):
+                out, err = self.run_django_admin(
+                    [cmd, "--help"], settings_file="bad_settings"
+                )
+                klass = load_command_class(owner, cmd)
+                if klass.requires_settings:
+                    msg = "No module named 'bad_settings'."
+                    self.assertOutput(err, msg)
+                else:
+                    self.assertNotIn("bad_settings", err)
 
 
 class DjangoAdminDefaultSettings(AdminScriptTestCase):
@@ -888,6 +899,18 @@ class ManageNoSettings(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+
+    def test_runserver_with_bad_settings(self):
+        args = ["runserver", "--settings=bad_settings", "--nostatic"]
+        out, err = self.run_manage(args)
+        self.assertNoOutput(out)
+        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+
+    def test_startapp_with_bad_settings(self):
+        args = ["startapp", "--settings=bad_settings", "app1"]
+        out, err = self.run_manage(args)
+        self.assertNoOutput(out)
+        self.assertNoOutput(err)
 
     def test_builtin_with_bad_environment(self):
         """
@@ -1867,6 +1890,7 @@ class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
 class ManageRunserverHelpOutput(AdminScriptTestCase):
     def test_suppressed_options(self):
         """runserver doesn't support --verbosity and --trackback options."""
+        self.write_settings("settings.py")
         out, err = self.run_manage(["runserver", "--help"])
         self.assertNotInOutput(out, "--verbosity")
         self.assertNotInOutput(out, "--trackback")
