@@ -558,7 +558,7 @@ subclass::
 
           @admin.display(description='Name')
           def upper_case_name(obj):
-              return ("%s %s" % (obj.first_name, obj.last_name)).upper()
+              return f"{obj.first_name} {obj.last_name}".upper()
 
           class PersonAdmin(admin.ModelAdmin):
               list_display = [upper_case_name]
@@ -571,7 +571,7 @@ subclass::
 
               @admin.display(description='Name')
               def upper_case_name(self, obj):
-                  return ("%s %s" % (obj.first_name, obj.last_name)).upper()
+                  return f"{obj.first_name} {obj.last_name}".upper()
 
     * A string representing a model attribute or method (without any required
       arguments). For example::
@@ -585,7 +585,8 @@ subclass::
 
               @admin.display(description='Birth decade')
               def decade_born_in(self):
-                  return '%d’s' % (self.birthday.year // 10 * 10)
+                  decade = self.birthday.year // 10 * 10
+                  return f'{decade}’s'
 
           class PersonAdmin(admin.ModelAdmin):
               list_display = ['name', 'decade_born_in']
