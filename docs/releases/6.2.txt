@@ -183,6 +183,10 @@ Management Commands
   model renames. After upgrading, you will see new migrations detected for
   unmanaged models that have changed since their creation.
 
+* Whether to suppress an :exc:`ImportError` escaping from a settings module is
+  configurable by the new :attr:`.BaseCommand.requires_settings` attribute
+  (default ``True``). In previous versions, such errors were always suppressed.
+
 Migrations
 ~~~~~~~~~~
 
