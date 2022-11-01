@@ -1412,12 +1412,12 @@ class ManageSettingsWithSettingsErrors(AdminScriptTestCase):
         self.write_settings(
             "settings.py",
             extra="from django.core.exceptions import ImproperlyConfigured\n"
-            "raise ImproperlyConfigured()",
+            "raise ImproperlyConfigured('Improper configuration')",
         )
         args = ["help"]
         out, err = self.run_manage(args)
         self.assertOutput(out, "only Django core commands are listed")
-        self.assertNoOutput(err)
+        self.assertOutput(err, "Improper configuration")
 
 
 class ManageCheck(AdminScriptTestCase):
