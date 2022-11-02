@@ -337,6 +337,19 @@ using the ``disabled`` HTML attribute so that it won't be editable by users.
 Even if a user tampers with the field's value submitted to the server, it will
 be ignored in favor of the value from the form's initial data.
 
+``template_name``
+-----------------
+
+.. attribute:: Field.template_name
+
+.. versionadded:: 5.0
+
+The ``template_name`` argument allows a custom template to be used when the
+field is rendered with :meth:`~django.forms.BoundField.as_field_group`. By 
+default this value is set to ``"django/forms/field.html"``. Can be changed per
+field by overriding this attribute or more generally by overriding the default
+template, see also :ref:`overriding-built-in-field-templates`.
+
 Checking if the field data has changed
 ======================================
 

@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.forms.utils import (
     ErrorDict,
     ErrorList,
+    RenderableFieldMixin,
     RenderableMixin,
     flatatt,
     pretty_name,
@@ -257,6 +258,18 @@ class FormsUtilsTestCase(SimpleTestCase):
         msg = "Subclasses of RenderableMixin must provide a get_context() method."
         with self.assertRaisesMessage(NotImplementedError, msg):
             mixin.get_context()
+
+    def test_field_mixin_as_hidden_must_be_implemented(self):
+        mixin = RenderableFieldMixin()
+        msg = "Subclasses of RenderableFieldMixin must provide an as_hidden() method."
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            mixin.as_hidden()
+
+    def test_field_mixin_as_widget_must_be_implemented(self):
+        mixin = RenderableFieldMixin()
+        msg = "Subclasses of RenderableFieldMixin must provide an as_widget() method."
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            mixin.as_widget()
 
     def test_pretty_name(self):
         self.assertEqual(pretty_name("john_doe"), "John doe")

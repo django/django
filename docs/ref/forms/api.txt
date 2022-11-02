@@ -1257,6 +1257,16 @@ Attributes of ``BoundField``
         >>> print(f["message"].name)
         message
 
+.. attribute:: BoundField.template_name
+
+    .. versionadded:: 5.0
+
+    The name of the template rendered with :meth:`.BoundField.as_field_group`.
+
+    A property returning the value of the
+    :attr:`~django.forms.Field.template_name` if set otherwise
+    :attr:`~django.forms.renderers.BaseRenderer.field_template_name`.
+
 .. attribute:: BoundField.use_fieldset
 
     Returns the value of this BoundField widget's ``use_fieldset`` attribute.
@@ -1280,6 +1290,15 @@ Attributes of ``BoundField``
 
 Methods of ``BoundField``
 -------------------------
+
+.. method:: BoundField.as_field_group()
+
+    .. versionadded:: 5.0
+
+    Renders the field using :meth:`.BoundField.render` with default values
+    which renders the ``BoundField``, including its label, help text and errors
+    using the template's :attr:`~django.forms.Field.template_name` if set
+    otherwise :attr:`~django.forms.renderers.BaseRenderer.field_template_name`
 
 .. method:: BoundField.as_hidden(attrs=None, **kwargs)
 
@@ -1320,6 +1339,13 @@ Methods of ``BoundField``
         >>> f = ContactForm(data={"message": ""})
         >>> f["message"].css_classes("foo bar")
         'foo bar required'
+
+.. method:: BoundField.get_context()
+
+    .. versionadded:: 5.0
+
+    Return the template context for rendering the field. The available context
+    is ``field`` being the instance of the bound field.
 
 .. method:: BoundField.label_tag(contents=None, attrs=None, label_suffix=None, tag=None)
 
@@ -1367,6 +1393,20 @@ Methods of ``BoundField``
     ``<legend>`` tags. This is useful when rendering radio and multiple
     checkbox widgets where ``<legend>`` may be more appropriate than a
     ``<label>``.
+
+.. method:: BoundField.render(template_name=None, context=None, renderer=None)
+
+    .. versionadded:: 5.0
+
+    The render method is called by ``as_field_group``. All arguments are 
+    optional and default to:
+
+    * ``template_name``: :attr:`.BoundField.template_name`
+    * ``context``: Value returned by :meth:`.BoundField.get_context`
+    * ``renderer``: Value returned by :attr:`.Form.default_renderer`
+
+    By passing ``template_name`` you can customize the template used for just a
+    single call.
 
 .. method:: BoundField.value()
 
