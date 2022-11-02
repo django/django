@@ -59,6 +59,14 @@ should return a rendered templates (as a string) or raise
 
         Defaults to ``"django/forms/formsets/div.html"`` template.
 
+    .. attribute:: field_template_name
+
+        .. versionadded:: 5.0
+
+        The default name of the template used to render a ``BoundField``.
+
+        Defaults to ``"django/forms/field.html"``
+
     .. method:: get_template(template_name)
 
         Subclasses must implement this method with the appropriate template
@@ -160,6 +168,14 @@ forms receive a dictionary with the following values:
 * ``fields``: All bound fields, except the hidden fields.
 * ``hidden_fields``: All hidden bound fields.
 * ``errors``: All non field related or hidden field related form errors.
+
+Context available in field templates
+====================================
+
+Field templates receive a context from :meth:`.BoundField.get_context`. By
+default, fields receive a dictionary with the following values:
+
+* ``field``: The :class:`~django.forms.BoundField`.
 
 Context available in widget templates
 =====================================

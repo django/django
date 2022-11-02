@@ -4602,6 +4602,7 @@ class Jinja2FormsTestCase(FormsTestCase):
 
 class CustomRenderer(DjangoTemplates):
     form_template_name = "forms_tests/form_snippet.html"
+    field_template_name = "forms_tests/custom_field.html"
 
 
 class RendererTests(SimpleTestCase):
@@ -5009,6 +5010,17 @@ class TemplateTests(SimpleTestCase):
             "('username', 'adrian')]",
         )
 
+    def test_custom_field_template(self):
+        class MyForm(Form):
+            first_name = CharField(template_name="forms_tests/custom_field.html")
+
+        f = MyForm()
+        self.assertHTMLEqual(
+            f.render(),
+            '<div><label for="id_first_name">First name:</label><p>Custom Field<p>'
+            '<input type="text" name="first_name" required id="id_first_name"></div>',
+        )
+
 
 class OverrideTests(SimpleTestCase):
     @override_settings(FORM_RENDERER="forms_tests.tests.test_forms.CustomRenderer")
@@ -5022,6 +5034,22 @@ class OverrideTests(SimpleTestCase):
         expected = """
         <div class="fieldWrapper"><label for="id_first_name">First name:</label>
         <input type="text" name="first_name" required id="id_first_name"></div>
+        """
+        self.assertHTMLEqual(html, expected)
+        get_default_renderer.cache_clear()
+
+    @override_settings(FORM_RENDERER="forms_tests.tests.test_forms.CustomRenderer")
+    def test_custom_renderer_field_template_name(self):
+        class Person(Form):
+            first_name = CharField()
+
+        get_default_renderer.cache_clear()
+        t = Template("{{ form.first_name.as_field }}")
+        html = t.render(Context({"form": Person()}))
+        expected = """
+        <label for="id_first_name">First name:</label>
+        <p>Custom Field<p>
+        <input type="text" name="first_name" required id="id_first_name">
         """
         self.assertHTMLEqual(html, expected)
         get_default_renderer.cache_clear()

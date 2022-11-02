@@ -106,6 +106,7 @@ class Field:
         localize=False,
         disabled=False,
         label_suffix=None,
+        template_name=None,
     ):
         # required -- Boolean that specifies whether the field is required.
         #             True by default.
@@ -163,6 +164,7 @@ class Field:
         self.error_messages = messages
 
         self.validators = [*self.default_validators, *validators]
+        self.template_name = template_name
 
         super().__init__()
 

@@ -37,6 +37,70 @@ compatible with Django 5.0.
 What's new in Django 5.0
 ========================
 
+BoundField becomes renderable
+-----------------------------
+
+The new :meth:`~django.forms.BoundField.as_field` method allows rendering of
+the fields including their label, help text and errors.
+
+``as_field()`` renders fields with the ``"django/forms/field.html"`` template
+by default and can be customized on a per-project, per-field or per-request
+basis.
+
+Custom form templates can now be written more succinctly as defining each
+element for each field can be avoided. For example, the template below::
+
+    <form>
+    ...
+    <div>
+    {{ form.name.label }}
+    {% if form.name.help_text %}<div class="helptext">{{ form.name.help_text|safe }}</div>{% endif %}
+    {{ form.name.errors }}
+    {{ form.name }}
+    <div class="row">
+        <div class="col">
+        {{ form.email.label }}
+        {% if form.email.help_text %}<div class="helptext">{{ form.email.help_text|safe }}</div>{% endif %}
+        {{ form.email.errors }}
+        {{ form.email }}}
+        </div>
+        <div class="col">
+        {{ form.password.label }}
+        {% if form.password.help_text %}<div class="helptext">{{ form.password.help_text|safe }}</div>{% endif %}
+        {{ form.password.errors }}
+        {{ form.password }}}
+        </div>
+    </div>
+    </div>
+    ...
+    </form>
+
+Can now be simplified too::
+
+    <form>
+    ...
+    <div>
+    {{ form.name.as_field }}
+    <div class="row">
+        <div class="col">{{ form.email.as_field }}</div>
+        <div class="col">{{ form.password.as_field }}</div>
+    </div>
+    </div>
+    ...
+    </form>
+
+To customize the default template, the field template can be set:
+
+* At a project level by defining
+  :attr:`~django.forms.renderers.BaseRenderer.field_template_name` on a
+  custom :setting:`FORM_RENDERER`.
+
+* On a per-field basis by using :attr:`~django.forms.Field.template_name` when
+  defining a field in your form.
+
+* On a per-request basis by calling :meth:`~django.forms.BoundField.render` and
+  supplying a template name.
+
 Minor features
 --------------
 
