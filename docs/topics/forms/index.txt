@@ -559,13 +559,73 @@ the :meth:`.Form.render`. Here's an example of this being used in a view::
 
 See :ref:`ref-forms-api-outputting-html` for more details.
 
+.. _reusable-field-group-templates:
+
+Reusable field group templates
+------------------------------
+
+.. versionadded:: 5.0
+
+Each field is available as an attribute of the form, using
+``{{form.name_of_field }}`` in a template. A field has a
+:meth:`~django.forms.BoundField.as_field_group` method which renders the
+related elements of the field as a group, its label, widget, errors, and help
+text.
+
+This allows generic templates to be written that arrange fields elements in the
+required layout. For example:
+
+.. code-block:: html+django
+
+    {{ form.non_field_errors }}
+    <div class="fieldWrapper">
+      {{ form.subject.as_field_group }}
+    </div>
+    <div class="fieldWrapper">
+      {{ form.message.as_field_group }}
+    </div>
+    <div class="fieldWrapper">
+      {{ form.sender.as_field_group }}
+    </div>
+    <div class="fieldWrapper">
+      {{ form.cc_myself.as_field_group }}
+    </div>
+
+By default Django uses the ``"django/forms/field.html"`` template which is
+designed for use with the default ``"django/forms/div.html"`` form style.
+
+The default template can be customized by by setting
+:attr:`~django.forms.renderers.BaseRenderer.field_template_name` in your
+project-level :setting:`FORM_RENDERER`::
+
+    from django.forms.renderers import TemplatesSetting
+
+
+    class CustomFormRenderer(TemplatesSetting):
+        field_template_name = "field_snippet.html"
+
+… or on a single field::
+
+    class MyForm(forms.Form):
+        subject = forms.CharField(template_name="my_custom_template.html")
+        ...
+
+… or on a per-request basis by calling
+:meth:`.BoundField.render` and supplying a template name::
+
+    def index(request):
+        form = ContactForm()
+        subject = form["subject"]
+        context = {"subject": subject.render("my_custom_template.html")}
+        return render(request, "index.html", context)
+
 Rendering fields manually
 -------------------------
 
-We don't have to let Django unpack the form's fields; we can do it manually if
-we like (allowing us to reorder the fields, for example). Each field is
-available as an attribute of the form using ``{{ form.name_of_field }}``, and
-in a Django template, will be rendered appropriately. For example:
+More fine grained control over field rendering is also possible. Likely this
+will be in a custom field template, to allow the template to be written once
+and reused for each field. However, it can also be directly accessed from the
+field attribute on the form. For example:
 
 .. code-block:: html+django
 

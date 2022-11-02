@@ -45,6 +45,69 @@ toggled on via the UI. This behavior can be changed via the new
 :attr:`.ModelAdmin.show_facets` attribute. For more information see
 :ref:`facet-filters`.
 
+Simplified templates for form field rendering
+---------------------------------------------
+
+Django 5.0 introduces the concept of a field group, and field group templates.
+This simplifies rendering of the related elements of a Django form field such
+as its label, widget, help text, and errors.
+
+For example, the template below:
+
+.. code-block:: html+django
+
+    <form>
+    ...
+    <div>
+      {{ form.name.label }}
+      {% if form.name.help_text %}
+        <div class="helptext">{{ form.name.help_text|safe }}</div>
+      {% endif %}
+      {{ form.name.errors }}
+      {{ form.name }}
+      <div class="row">
+        <div class="col">
+          {{ form.email.label }}
+          {% if form.email.help_text %}
+            <div class="helptext">{{ form.email.help_text|safe }}</div>
+          {% endif %}
+          {{ form.email.errors }}
+          {{ form.email }}
+        </div>
+        <div class="col">
+          {{ form.password.label }}
+          {% if form.password.help_text %}
+            <div class="helptext">{{ form.password.help_text|safe }}</div>
+          {% endif %}
+          {{ form.password.errors }}
+          {{ form.password }}
+        </div>
+      </div>
+    </div>
+    ...
+    </form>
+
+Can now be simplified to:
+
+.. code-block:: html+django
+
+    <form>
+    ...
+    <div>
+      {{ form.name.as_field_group }}
+      <div class="row">
+        <div class="col">{{ form.email.as_field_group }}</div>
+        <div class="col">{{ form.password.as_field_group }}</div>
+      </div>
+    </div>
+    ...
+    </form>
+
+:meth:`~django.forms.BoundField.as_field_group` renders fields with the
+``"django/forms/field.html"`` template by default and can be customized on a
+per-project, per-field, or per-request basis. See
+:ref:`reusable-field-group-templates`.
+
 Minor features
 --------------
 
