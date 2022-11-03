@@ -522,9 +522,9 @@ class Query(BaseExpression):
         result = compiler.execute_sql(SINGLE)
         if result is None:
             result = empty_set_result
-
-        converters = compiler.get_converters(outer_query.annotation_select.values())
-        result = next(compiler.apply_converters((result,), converters))
+        else:
+            converters = compiler.get_converters(outer_query.annotation_select.values())
+            result = next(compiler.apply_converters((result,), converters))
 
         return dict(zip(outer_query.annotation_select, result))
 

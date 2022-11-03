@@ -921,6 +921,8 @@ class Field(RegisterLookupMixin):
 
     def get_db_prep_save(self, value, connection):
         """Return field's value prepared for saving into a database."""
+        if hasattr(value, "as_sql"):
+            return value
         return self.get_db_prep_value(value, connection=connection, prepared=False)
 
     def has_default(self):
@@ -1715,6 +1717,8 @@ class DecimalField(Field):
     def get_db_prep_value(self, value, connection, prepared=False):
         if not prepared:
             value = self.get_prep_value(value)
+        if hasattr(value, "as_sql"):
+            return value
         return connection.ops.adapt_decimalfield_value(
             value, self.max_digits, self.decimal_places
         )

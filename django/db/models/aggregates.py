@@ -85,6 +85,8 @@ class Aggregate(Func):
             return c
         if hasattr(default, "resolve_expression"):
             default = default.resolve_expression(query, allow_joins, reuse, summarize)
+            if default._output_field_or_none is None:
+                default.output_field = c._output_field_or_none
         else:
             default = Value(default, c._output_field_or_none)
         c.default = None  # Reset the default argument before wrapping.
