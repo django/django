@@ -689,6 +689,11 @@ def create_generic_related_manager(superclass, rel):
 
         add.alters_data = True
 
+        async def aadd(self, *objs, bulk=True):
+            return await sync_to_async(self.add)(*objs, bulk=bulk)
+
+        aadd.alters_data = True
+
         def remove(self, *objs, bulk=True):
             if not objs:
                 return
@@ -696,10 +701,20 @@ def create_generic_related_manager(superclass, rel):
 
         remove.alters_data = True
 
+        async def aremove(self, *objs, bulk=True):
+            return await sync_to_async(self.remove)(*objs, bulk=bulk)
+
+        aremove.alters_data = True
+
         def clear(self, *, bulk=True):
             self._clear(self, bulk)
 
         clear.alters_data = True
+
+        async def aclear(self, *, bulk=True):
+            return await sync_to_async(self.clear)(bulk=bulk)
+
+        aclear.alters_data = True
 
         def _clear(self, queryset, bulk):
             self._remove_prefetched_objects()
@@ -739,6 +754,11 @@ def create_generic_related_manager(superclass, rel):
                     self.add(*new_objs, bulk=bulk)
 
         set.alters_data = True
+
+        async def aset(self, objs, *, bulk=True, clear=False):
+            return await sync_to_async(self.set)(objs, bulk=bulk, clear=clear)
+
+        aset.alters_data = True
 
         def create(self, **kwargs):
             self._remove_prefetched_objects()
