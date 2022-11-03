@@ -158,7 +158,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # between multiple threads. The safe-guarding will be handled at a
         # higher level by the `BaseDatabaseWrapper.allow_thread_sharing`
         # property. This is necessary as the shareability is disabled by
-        # default in pysqlite and it cannot be changed once a connection is
+        # default in sqlite3 and it cannot be changed once a connection is
         # opened.
         if "check_same_thread" in kwargs and kwargs["check_same_thread"]:
             warnings.warn(
@@ -357,7 +357,7 @@ FORMAT_QMARK_REGEX = _lazy_re_compile(r"(?<!%)%s")
 
 class SQLiteCursorWrapper(Database.Cursor):
     """
-    Django uses "format" style placeholders, but pysqlite2 uses "qmark" style.
+    Django uses "format" style placeholders, but sqlite3 uses "qmark" style.
     This fixes it -- but note that if you want to use a literal "%s" in a query,
     you'll need to use "%%s".
     """
