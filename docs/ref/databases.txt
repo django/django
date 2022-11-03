@@ -853,6 +853,10 @@ raised.
 To enable the JSON1 extension you can follow the instruction on
 `the wiki page`_.
 
+.. note::
+
+    The JSON1 extension is enabled by default on SQLite 3.38+.
+
 .. _JSON1 extension: https://www.sqlite.org/json1.html
 .. _the wiki page: https://code.djangoproject.com/wiki/JSON1Extension
 
