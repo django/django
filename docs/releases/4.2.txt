@@ -444,6 +444,42 @@ but it should not be used for new migrations. Use
 :class:`~django.db.migrations.operations.AddIndex` and
 :class:`~django.db.migrations.operations.RemoveIndex` operations instead.
 
+Passing encoded JSON string literals to ``JSONField`` is deprecated
+-------------------------------------------------------------------
+
+``JSONField`` and its associated lookups and aggregates use to allow passing
+JSON encoded string literals which caused ambiguity on whether string literals
+were already encoded from database backend's perspective.
+
+During the deprecation period string literals will be attempted to be JSON
+decoded and a warning will be emitted on success that points at passing
+non-encoded forms instead.
+
+Code that use to pass JSON encoded string literals::
+
+    Document.objects.bulk_create(
+        Document(data=Value("null")),
+        Document(data=Value("[]")),
+        Document(data=Value('"foo-bar"')),
+    )
+    Document.objects.annotate(
+        JSONBAgg("field", default=Value('[]')),
+    )
+
+Should become::
+
+    Document.objects.bulk_create(
+        Document(data=Value(None, JSONField())),
+        Document(data=[]),
+        Document(data="foo-bar"),
+    )
+    Document.objects.annotate(
+        JSONBAgg("field", default=[]),
+    )
+
+From Django 5.1+ string literals will be implicitly interpreted as JSON string
+literals.
+
 Miscellaneous
 -------------
 

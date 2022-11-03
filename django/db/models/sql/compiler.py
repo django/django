@@ -1637,9 +1637,7 @@ class SQLInsertCompiler(SQLCompiler):
                     "Window expressions are not allowed in this query (%s=%r)."
                     % (field.name, value)
                 )
-        else:
-            value = field.get_db_prep_save(value, connection=self.connection)
-        return value
+        return field.get_db_prep_save(value, connection=self.connection)
 
     def pre_save_val(self, field, obj):
         """
@@ -1893,18 +1891,14 @@ class SQLUpdateCompiler(SQLCompiler):
                     )
             elif hasattr(val, "prepare_database_save"):
                 if field.remote_field:
-                    val = field.get_db_prep_save(
-                        val.prepare_database_save(field),
-                        connection=self.connection,
-                    )
+                    val = val.prepare_database_save(field)
                 else:
                     raise TypeError(
                         "Tried to update field %s with a model instance, %r. "
                         "Use a value compatible with %s."
                         % (field, val, field.__class__.__name__)
                     )
-            else:
-                val = field.get_db_prep_save(val, connection=self.connection)
+            val = field.get_db_prep_save(val, connection=self.connection)
 
             # Getting the placeholder for the field.
             if hasattr(field, "get_placeholder"):
