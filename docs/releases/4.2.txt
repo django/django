@@ -161,7 +161,8 @@ Email
 Error Reporting
 ~~~~~~~~~~~~~~~
 
-* The debug page now shows :pep:`exception notes <678>` on Python 3.11+.
+* The debug page now shows :pep:`exception notes <678>` and
+  :pep:`fine-grained error locations <657>` on Python 3.11+.
 
 File Storage
 ~~~~~~~~~~~~
