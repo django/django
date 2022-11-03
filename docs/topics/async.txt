@@ -97,13 +97,17 @@ Django also supports some asynchronous model methods that use the database::
         book = Book(...)
         await book.asave(using="secondary")
 
+    async def make_book_with_tags(tags, ...):
+        book = await Book.objects.acreate(...)
+        await book.tags.aset(tags)
+
 Transactions do not yet work in async mode. If you have a piece of code that
 needs transactions behavior, we recommend you write that piece as a single
 synchronous function and call it using :func:`sync_to_async`.
 
 .. versionchanged:: 4.2
 
-    Asynchronous model interface was added.
+    Asynchronous model and related manager interfaces were added.
 
 Performance
 -----------

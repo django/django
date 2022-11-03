@@ -243,6 +243,11 @@ Models
   database, using an ``a`` prefix: :meth:`~.Model.adelete`,
   :meth:`~.Model.arefresh_from_db`, and :meth:`~.Model.asave`.
 
+* Related managers now provide asynchronous versions of methods that change a
+  set of related objects, using an ``a`` prefix: :meth:`~.RelatedManager.aadd`,
+  :meth:`~.RelatedManager.aclear`, :meth:`~.RelatedManager.aremove`, and
+  :meth:`~.RelatedManager.aset`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
