@@ -168,9 +168,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def last_executed_query(self, cursor, sql, params):
         # Python substitutes parameters in Modules/_sqlite/cursor.c with:
-        # pysqlite_statement_bind_parameters(
-        #   self->statement, parameters, allow_8bit_chars
-        # );
+        # bind_parameters(state, self->statement, parameters);
         # Unfortunately there is no way to reach self->statement from Python,
         # so we quote and substitute parameters manually.
         if params:
