@@ -36,7 +36,7 @@ class BadHeaderError(ValueError):
     pass
 
 
-# Header names that contain structured address data (RFC #5322)
+# Header names that contain structured address data (RFC 5322).
 ADDRESS_HEADERS = {
     "from",
     "sender",
@@ -382,8 +382,8 @@ class EmailMessage:
             encoding = self.encoding or settings.DEFAULT_CHARSET
             attachment = SafeMIMEText(content, subtype, encoding)
         elif basetype == "message" and subtype == "rfc822":
-            # Bug #18967: per RFC2046 s5.2.1, message/rfc822 attachments
-            # must not be base64 encoded.
+            # Bug #18967: Per RFC 2046 Section 5.2.1, message/rfc822
+            # attachments must not be base64 encoded.
             if isinstance(content, EmailMessage):
                 # convert content into an email.Message first
                 content = content.message()

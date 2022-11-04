@@ -21,7 +21,7 @@ by managing the ``Vary`` header of responses. It includes functions to patch
 the header of response objects directly and decorators that change functions to
 do that header-patching themselves.
 
-For information on the ``Vary`` header, see :rfc:`7231#section-7.1.4`.
+For information on the ``Vary`` header, see :rfc:`9110#section-12.5.5`.
 
 Essentially, the ``Vary`` HTTP header defines which headers a cache should take
 into account when building its cache key. Requests with the same path but
@@ -75,7 +75,7 @@ need to distinguish caches by the ``Accept-language`` header.
     Adds (or updates) the ``Vary`` header in the given ``HttpResponse`` object.
     ``newheaders`` is a list of header names that should be in ``Vary``. If
     headers contains an asterisk, then ``Vary`` header will consist of a single
-    asterisk ``'*'``, according to :rfc:`7231#section-7.1.4`. Otherwise,
+    asterisk ``'*'``, according to :rfc:`9110#section-12.5.5`. Otherwise,
     existing headers in ``Vary`` aren't removed.
 
 .. function:: get_cache_key(request, key_prefix=None, method='GET', cache=None)
@@ -721,7 +721,7 @@ escaping HTML.
 .. function:: http_date(epoch_seconds=None)
 
     Formats the time to match the :rfc:`1123#section-5.2.14` date format as
-    specified by HTTP :rfc:`7231#section-7.1.1.1`.
+    specified by HTTP :rfc:`9110#section-5.6.7`.
 
     Accepts a floating point number expressed in seconds since the epoch in
     UTC--such as that outputted by ``time.time()``. If set to ``None``,

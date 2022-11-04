@@ -329,7 +329,7 @@ class ETagProcessingTests(unittest.TestCase):
         )
         self.assertEqual(parse_etags("*"), ["*"])
 
-        # Ignore RFC 2616 ETags that are invalid according to RFC 7232.
+        # Ignore RFC 2616 ETags that are invalid according to RFC 9110.
         self.assertEqual(parse_etags(r'"etag", "e\"t\"ag"'), ['"etag"'])
 
     def test_quoting(self):

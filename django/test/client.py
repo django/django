@@ -110,7 +110,7 @@ def conditional_content_removal(request, response):
     """
     Simulate the behavior of most web servers by removing the content of
     responses for HEAD requests, 1xx, 204, and 304 responses. Ensure
-    compliance with RFC 7230, section 3.3.3.
+    compliance with RFC 9112 Section 6.3.
     """
     if 100 <= response.status_code < 200 or response.status_code in (204, 304):
         if response.streaming:
@@ -987,7 +987,7 @@ class Client(ClientMixin, RequestFactory):
                 extra["SERVER_PORT"] = str(url.port)
 
             path = url.path
-            # RFC 2616: bare domains without path are treated as the root.
+            # RFC 3986 Section 6.2.3: Empty path should be normalized to "/".
             if not path and url.netloc:
                 path = "/"
             # Prepend the request path to handle relative path redirects

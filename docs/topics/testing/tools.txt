@@ -350,7 +350,7 @@ Use the ``django.test.Client`` class to make requests.
         ``Response`` object. Useful for simulating diagnostic probes.
 
         Unlike the other request methods, ``data`` is not provided as a keyword
-        parameter in order to comply with :rfc:`7231#section-4.3.8`, which
+        parameter in order to comply with :rfc:`9110#section-9.3.8`, which
         mandates that TRACE requests must not have a body.
 
         The ``follow``, ``secure``, and ``extra`` arguments act the same as for

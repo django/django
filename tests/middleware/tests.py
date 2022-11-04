@@ -640,7 +640,7 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
     def test_not_modified_headers(self):
         """
         The 304 Not Modified response should include only the headers required
-        by section 4.1 of RFC 7232, Last-Modified, and the cookies.
+        by RFC 9110 Section 15.4.5, Last-Modified, and the cookies.
         """
 
         def get_response(req):

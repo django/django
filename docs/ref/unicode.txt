@@ -146,7 +146,7 @@ URI and IRI handling
 Web frameworks have to deal with URLs (which are a type of IRI). One
 requirement of URLs is that they are encoded using only ASCII characters.
 However, in an international environment, you might need to construct a
-URL from an :rfc:`IRI <3987>` -- very loosely speaking, a :rfc:`URI <2396>`
+URL from an :rfc:`IRI <3987>` -- very loosely speaking, a :rfc:`URI <3986>`
 that can contain Unicode characters. Use these functions for quoting and
 converting an IRI to a URI:
 

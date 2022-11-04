@@ -759,7 +759,7 @@ Attributes
 
 .. attribute:: HttpResponse.status_code
 
-    The :rfc:`HTTP status code <7231#section-6>` for the response.
+    The :rfc:`HTTP status code <9110#section-15>` for the response.
 
     Unless :attr:`reason_phrase` is explicitly set, modifying the value of
     ``status_code`` outside the constructor will also modify the value of
@@ -768,7 +768,7 @@ Attributes
 .. attribute:: HttpResponse.reason_phrase
 
     The HTTP reason phrase for the response. It uses the :rfc:`HTTP standard's
-    <7231#section-6.1>` default reason phrases.
+    <9110#section-15.1>` default reason phrases.
 
     Unless explicitly set, ``reason_phrase`` is determined by the value of
     :attr:`status_code`.
@@ -803,9 +803,9 @@ Methods
     :setting:`DEFAULT_CHARSET` settings, by default:
     ``"text/html; charset=utf-8"``.
 
-    ``status`` is the :rfc:`HTTP status code <7231#section-6>` for the response.
-    You can use Python's :py:class:`http.HTTPStatus` for meaningful aliases,
-    such as ``HTTPStatus.NO_CONTENT``.
+    ``status`` is the :rfc:`HTTP status code <9110#section-15>` for the
+    response. You can use Python's :py:class:`http.HTTPStatus` for meaningful
+    aliases, such as ``HTTPStatus.NO_CONTENT``.
 
     ``reason`` is the HTTP response phrase. If not provided, a default phrase
     will be used.
@@ -1163,7 +1163,7 @@ Attributes
 
 .. attribute:: StreamingHttpResponse.status_code
 
-    The :rfc:`HTTP status code <7231#section-6>` for the response.
+    The :rfc:`HTTP status code <9110#section-15>` for the response.
 
     Unless :attr:`reason_phrase` is explicitly set, modifying the value of
     ``status_code`` outside the constructor will also modify the value of
@@ -1172,7 +1172,7 @@ Attributes
 .. attribute:: StreamingHttpResponse.reason_phrase
 
     The HTTP reason phrase for the response. It uses the :rfc:`HTTP standard's
-    <7231#section-6.1>` default reason phrases.
+    <9110#section-15.1>` default reason phrases.
 
     Unless explicitly set, ``reason_phrase`` is determined by the value of
     :attr:`status_code`.
