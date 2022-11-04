@@ -9,3 +9,7 @@ class RelatedModel(models.Model):
 class SimpleModel(models.Model):
     field = models.IntegerField()
     created = models.DateTimeField(default=timezone.now)
+
+
+class ManyToManyModel(models.Model):
+    simples = models.ManyToManyField("SimpleModel")

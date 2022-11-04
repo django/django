@@ -76,6 +76,9 @@ Related objects reference
         intermediate instance(s).
 
     .. method:: create(through_defaults=None, **kwargs)
+    .. method:: acreate(through_defaults=None, **kwargs)
+
+        *Asynchronous version*: ``acreate``
 
         Creates a new object, saves it and puts it in the related object set.
         Returns the newly created object::
@@ -109,6 +112,10 @@ Related objects reference
         :ref:`intermediate model <intermediary-manytomany>` instance, if
         needed. You can use callables as values in the ``through_defaults``
         dictionary.
+
+        .. versionchanged:: 4.1
+
+            ``acreate()`` method was added.
 
     .. method:: remove(*objs, bulk=True)
 
