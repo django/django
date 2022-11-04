@@ -11,3 +11,8 @@ Bugfixes
 
 * Fixed a regression in Django 4.1 that caused an unnecessary table rebuilt
   when adding ``ManyToManyField`` on SQLite (:ticket:`34138`).
+
+* Fixed a bug in Django 4.1 that caused a crash of the sitemap index view with
+  an empty :meth:`Sitemap.items() <django.contrib.sitemaps.Sitemap.items>` and
+  a callable :attr:`~django.contrib.sitemaps.Sitemap.lastmod`
+  (:ticket:`34088`).
