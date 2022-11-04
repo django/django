@@ -63,6 +63,8 @@ and two directions (forward and reverse) for a total of six combinations.
    ``ReverseManyToManyDescriptor``, use ``ManyToManyDescriptor`` instead.
 """
 
+from asgiref.sync import sync_to_async
+
 from django.core.exceptions import FieldError
 from django.db import connections, router, transaction
 from django.db.models import Q, signals
@@ -765,6 +767,11 @@ def create_reverse_many_to_one_manager(superclass, rel):
 
         create.alters_data = True
 
+        async def acreate(self, **kwargs):
+            return await sync_to_async(self.create)(**kwargs)
+
+        acreate.alters_data = True
+
         def get_or_create(self, **kwargs):
             self._check_fk_val()
             kwargs[self.field.name] = self.instance
@@ -773,6 +780,11 @@ def create_reverse_many_to_one_manager(superclass, rel):
 
         get_or_create.alters_data = True
 
+        async def aget_or_create(self, **kwargs):
+            return await sync_to_async(self.get_or_create)(**kwargs)
+
+        aget_or_create.alters_data = True
+
         def update_or_create(self, **kwargs):
             self._check_fk_val()
             kwargs[self.field.name] = self.instance
@@ -780,6 +792,11 @@ def create_reverse_many_to_one_manager(superclass, rel):
             return super(RelatedManager, self.db_manager(db)).update_or_create(**kwargs)
 
         update_or_create.alters_data = True
+
+        async def aupdate_or_create(self, **kwargs):
+            return await sync_to_async(self.update_or_create)(**kwargs)
+
+        aupdate_or_create.alters_data = True
 
         # remove() and clear() are only provided if the ForeignKey can have a
         # value of null.
@@ -1161,6 +1178,13 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
         create.alters_data = True
 
+        async def acreate(self, *, through_defaults=None, **kwargs):
+            return await sync_to_async(self.create)(
+                through_defaults=through_defaults, **kwargs
+            )
+
+        acreate.alters_data = True
+
         def get_or_create(self, *, through_defaults=None, **kwargs):
             db = router.db_for_write(self.instance.__class__, instance=self.instance)
             obj, created = super(ManyRelatedManager, self.db_manager(db)).get_or_create(
@@ -1174,6 +1198,13 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
         get_or_create.alters_data = True
 
+        async def aget_or_create(self, *, through_defaults=None, **kwargs):
+            return await sync_to_async(self.get_or_create)(
+                through_defaults=through_defaults, **kwargs
+            )
+
+        aget_or_create.alters_data = True
+
         def update_or_create(self, *, through_defaults=None, **kwargs):
             db = router.db_for_write(self.instance.__class__, instance=self.instance)
             obj, created = super(
@@ -1186,6 +1217,13 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             return obj, created
 
         update_or_create.alters_data = True
+
+        async def aupdate_or_create(self, *, through_defaults=None, **kwargs):
+            return await sync_to_async(self.update_or_create)(
+                through_defaults=through_defaults, **kwargs
+            )
+
+        aupdate_or_create.alters_data = True
 
         def _get_target_ids(self, target_field_name, objs):
             """
