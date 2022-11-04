@@ -2112,8 +2112,25 @@ class SchemaTests(TransactionTestCase):
         with self.assertRaises(DatabaseError):
             self.column_classes(new_field.remote_field.through)
         # Add the field
-        with connection.schema_editor() as editor:
+        with CaptureQueriesContext(
+            connection
+        ) as ctx, connection.schema_editor() as editor:
             editor.add_field(LocalAuthorWithM2M, new_field)
+        # Table is not rebuilt.
+        self.assertEqual(
+            len(
+                [
+                    query["sql"]
+                    for query in ctx.captured_queries
+                    if "CREATE TABLE" in query["sql"]
+                ]
+            ),
+            1,
+        )
+        self.assertIs(
+            any("DROP TABLE" in query["sql"] for query in ctx.captured_queries),
+            False,
+        )
         # Ensure there is now an m2m table there
         columns = self.column_classes(new_field.remote_field.through)
         self.assertEqual(
