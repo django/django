@@ -379,7 +379,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def add_field(self, model, field):
         """Create a field on a model."""
-        if (
+        # Special-case implicit M2M tables.
+        if field.many_to_many and field.remote_field.through._meta.auto_created:
+            self.create_model(field.remote_field.through)
+        elif (
             # Primary keys and unique fields are not supported in ALTER TABLE
             # ADD COLUMN.
             field.primary_key
