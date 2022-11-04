@@ -83,7 +83,7 @@ class StaticTests(SimpleTestCase):
         """Handle bogus If-Modified-Since values gracefully
 
         Assume that a file is modified since an invalid timestamp as per RFC
-        2616, section 14.25.
+        9110 Section 13.1.3.
         """
         file_name = "file.txt"
         invalid_date = "Mon, 28 May 999999999999 28:25:26 GMT"
@@ -99,7 +99,7 @@ class StaticTests(SimpleTestCase):
         """Handle even more bogus If-Modified-Since values gracefully
 
         Assume that a file is modified since an invalid timestamp as per RFC
-        2616, section 14.25.
+        9110 Section 13.1.3.
         """
         file_name = "file.txt"
         invalid_date = ": 1291108438, Wed, 20 Oct 2010 14:05:00 GMT"

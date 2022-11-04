@@ -827,7 +827,7 @@ class CookieTests(unittest.TestCase):
         )
 
     def test_cookie_edgecases(self):
-        # Cookies that RFC6265 allows.
+        # Cookies that RFC 6265 allows.
         self.assertEqual(
             parse_cookie("a=b; Domain=example.com"), {"a": "b", "Domain": "example.com"}
         )
@@ -837,7 +837,7 @@ class CookieTests(unittest.TestCase):
 
     def test_invalid_cookies(self):
         """
-        Cookie strings that go against RFC6265 but browsers will send if set
+        Cookie strings that go against RFC 6265 but browsers will send if set
         via document.cookie.
         """
         # Chunks without an equals sign appear as unnamed values per

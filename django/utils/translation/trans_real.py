@@ -30,8 +30,8 @@ _default = None
 # magic gettext number to separate context from message
 CONTEXT_SEPARATOR = "\x04"
 
-# Format of Accept-Language header values. From RFC 2616, section 14.4 and 3.9
-# and RFC 3066, section 2.1
+# Format of Accept-Language header values. From RFC 9110 Sections 12.4.2 and
+# 12.5.4, and RFC 5646 Section 2.1.
 accept_language_re = _lazy_re_compile(
     r"""
         # "en", "en-au", "x-y-z", "es-419", "*"

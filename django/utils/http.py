@@ -19,7 +19,7 @@ from urllib.parse import uses_params
 from django.utils.datastructures import MultiValueDict
 from django.utils.regex_helper import _lazy_re_compile
 
-# based on RFC 7232, Appendix C
+# Based on RFC 9110 Appendix A.
 ETAG_MATCH = _lazy_re_compile(
     r"""
     \A(      # start of string and capture group
@@ -94,8 +94,8 @@ def urlencode(query, doseq=False):
 
 def http_date(epoch_seconds=None):
     """
-    Format the time to match the RFC1123 date format as specified by HTTP
-    RFC7231 section 7.1.1.1.
+    Format the time to match the RFC 5322 date format as specified by RFC 9110
+    Section 5.6.7.
 
     `epoch_seconds` is a floating point number expressed in seconds since the
     epoch, in UTC - such as that outputted by time.time(). If set to None, it
@@ -108,15 +108,15 @@ def http_date(epoch_seconds=None):
 
 def parse_http_date(date):
     """
-    Parse a date format as specified by HTTP RFC7231 section 7.1.1.1.
+    Parse a date format as specified by HTTP RFC 9110 Section 5.6.7.
 
     The three formats allowed by the RFC are accepted, even if only the first
     one is still in widespread use.
 
     Return an integer expressed in seconds since the epoch, in UTC.
     """
-    # email.utils.parsedate() does the job for RFC1123 dates; unfortunately
-    # RFC7231 makes it mandatory to support RFC850 dates too. So we roll
+    # email.utils.parsedate() does the job for RFC 1123 dates; unfortunately
+    # RFC 9110 makes it mandatory to support RFC 850 dates too. So we roll
     # our own RFC-compliant parsing.
     for regex in RFC1123_DATE, RFC850_DATE, ASCTIME_DATE:
         m = regex.match(date)
@@ -210,7 +210,7 @@ def urlsafe_base64_decode(s):
 def parse_etags(etag_str):
     """
     Parse a string of ETags given in an If-None-Match or If-Match header as
-    defined by RFC 7232. Return a list of quoted ETags, or ['*'] if all ETags
+    defined by RFC 9110. Return a list of quoted ETags, or ['*'] if all ETags
     should be matched.
     """
     if etag_str.strip() == "*":
