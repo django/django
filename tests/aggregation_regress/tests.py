@@ -23,7 +23,7 @@ from django.db.models import (
     Variance,
     When,
 )
-from django.test import TestCase, skipUnlessAnyDBFeature, skipUnlessDBFeature
+from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import Approximate
 
 from .models import (
@@ -1420,7 +1420,7 @@ class AggregationTests(TestCase):
         # The query executes without problems.
         self.assertEqual(len(qs.exclude(publisher=-1)), 6)
 
-    @skipUnlessAnyDBFeature("allows_group_by_pk", "allows_group_by_selected_pks")
+    @skipUnlessDBFeature("allows_group_by_selected_pks")
     def test_aggregate_duplicate_columns(self):
         # Regression test for #17144
 
@@ -1448,7 +1448,7 @@ class AggregationTests(TestCase):
             ],
         )
 
-    @skipUnlessAnyDBFeature("allows_group_by_pk", "allows_group_by_selected_pks")
+    @skipUnlessDBFeature("allows_group_by_selected_pks")
     def test_aggregate_duplicate_columns_only(self):
         # Works with only() too.
         results = Author.objects.only("id", "name").annotate(
@@ -1474,18 +1474,14 @@ class AggregationTests(TestCase):
             ],
         )
 
-    @skipUnlessAnyDBFeature("allows_group_by_pk", "allows_group_by_selected_pks")
+    @skipUnlessDBFeature("allows_group_by_selected_pks")
     def test_aggregate_duplicate_columns_select_related(self):
         # And select_related()
         results = Book.objects.select_related("contact").annotate(
             num_authors=Count("authors")
         )
         _, _, grouping = results.query.get_compiler(using="default").pre_sql_setup()
-        # In the case of `group_by_selected_pks` we also group by contact.id
-        # because of the select_related.
-        self.assertEqual(
-            len(grouping), 1 if connection.features.allows_group_by_pk else 2
-        )
+        self.assertEqual(len(grouping), 2)
         self.assertIn("id", grouping[0][0])
         self.assertNotIn("name", grouping[0][0])
         self.assertNotIn("contact", grouping[0][0])
