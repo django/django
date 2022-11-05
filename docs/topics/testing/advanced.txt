@@ -107,10 +107,10 @@ For example, assuming the following class-based view:
 
 
     class HomeView(TemplateView):
-        template_name = 'myapp/home.html'
+        template_name = "myapp/home.html"
 
         def get_context_data(self, **kwargs):
-            kwargs['environment'] = 'Production'
+            kwargs["environment"] = "Production"
             return super().get_context_data(**kwargs)
 
 You may directly test the ``get_context_data()`` method by first instantiating
@@ -126,12 +126,12 @@ your test's code:
 
     class HomePageTest(TestCase):
         def test_environment_set_in_context(self):
-            request = RequestFactory().get('/')
+            request = RequestFactory().get("/")
             view = HomeView()
             view.setup(request)
 
             context = view.get_context_data()
-            self.assertIn('environment', context)
+            self.assertIn("environment", context)
 
 .. _topics-testing-advanced-multiple-hosts:
 
@@ -436,7 +436,7 @@ Let's take a look inside a couple of those files:
     from django.test.utils import get_runner
 
     if __name__ == "__main__":
-        os.environ['DJANGO_SETTINGS_MODULE'] = 'tests.test_settings'
+        os.environ["DJANGO_SETTINGS_MODULE"] = "tests.test_settings"
         django.setup()
         TestRunner = get_runner(settings)
         test_runner = TestRunner()
@@ -455,7 +455,7 @@ labels to run, etc.
 .. code-block:: python
     :caption: ``tests/test_settings.py``
 
-    SECRET_KEY = 'fake-key'
+    SECRET_KEY = "fake-key"
     INSTALLED_APPS = [
         "tests",
     ]

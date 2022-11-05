@@ -183,7 +183,6 @@ Put the following in the ``tests.py`` file in the ``polls`` application:
 
 
     class QuestionModelTests(TestCase):
-
         def test_was_published_recently_with_future_question(self):
             """
             was_published_recently() returns False for questions whose pub_date
@@ -308,6 +307,7 @@ more comprehensively:
         old_question = Question(pub_date=time)
         self.assertIs(old_question.was_published_recently(), False)
 
+
     def test_was_published_recently_with_recent_question(self):
         """
         was_published_recently() returns True for questions whose pub_date
@@ -416,12 +416,12 @@ based on :class:`~django.views.generic.list.ListView`:
     :caption: ``polls/views.py``
 
     class IndexView(generic.ListView):
-        template_name = 'polls/index.html'
-        context_object_name = 'latest_question_list'
+        template_name = "polls/index.html"
+        context_object_name = "latest_question_list"
 
         def get_queryset(self):
             """Return the last five published questions."""
-            return Question.objects.order_by('-pub_date')[:5]
+            return Question.objects.order_by("-pub_date")[:5]
 
 We need to amend the ``get_queryset()`` method and change it so that it also
 checks the date by comparing it with ``timezone.now()``. First we need to add
@@ -442,9 +442,9 @@ and then we must amend the ``get_queryset`` method like so:
         Return the last five published questions (not including those set to be
         published in the future).
         """
-        return Question.objects.filter(
-            pub_date__lte=timezone.now()
-        ).order_by('-pub_date')[:5]
+        return Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[
+            :5
+        ]
 
 ``Question.objects.filter(pub_date__lte=timezone.now())`` returns a queryset
 containing ``Question``\s whose ``pub_date`` is less than or equal to - that
@@ -488,10 +488,10 @@ class:
             """
             If no questions exist, an appropriate message is displayed.
             """
-            response = self.client.get(reverse('polls:index'))
+            response = self.client.get(reverse("polls:index"))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, "No polls are available.")
-            self.assertQuerySetEqual(response.context['latest_question_list'], [])
+            self.assertQuerySetEqual(response.context["latest_question_list"], [])
 
         def test_past_question(self):
             """
@@ -499,9 +499,9 @@ class:
             index page.
             """
             question = create_question(question_text="Past question.", days=-30)
-            response = self.client.get(reverse('polls:index'))
+            response = self.client.get(reverse("polls:index"))
             self.assertQuerySetEqual(
-                response.context['latest_question_list'],
+                response.context["latest_question_list"],
                 [question],
             )
 
@@ -511,9 +511,9 @@ class:
             the index page.
             """
             create_question(question_text="Future question.", days=30)
-            response = self.client.get(reverse('polls:index'))
+            response = self.client.get(reverse("polls:index"))
             self.assertContains(response, "No polls are available.")
-            self.assertQuerySetEqual(response.context['latest_question_list'], [])
+            self.assertQuerySetEqual(response.context["latest_question_list"], [])
 
         def test_future_question_and_past_question(self):
             """
@@ -522,9 +522,9 @@ class:
             """
             question = create_question(question_text="Past question.", days=-30)
             create_question(question_text="Future question.", days=30)
-            response = self.client.get(reverse('polls:index'))
+            response = self.client.get(reverse("polls:index"))
             self.assertQuerySetEqual(
-                response.context['latest_question_list'],
+                response.context["latest_question_list"],
                 [question],
             )
 
@@ -534,9 +534,9 @@ class:
             """
             question1 = create_question(question_text="Past question 1.", days=-30)
             question2 = create_question(question_text="Past question 2.", days=-5)
-            response = self.client.get(reverse('polls:index'))
+            response = self.client.get(reverse("polls:index"))
             self.assertQuerySetEqual(
-                response.context['latest_question_list'],
+                response.context["latest_question_list"],
                 [question2, question1],
             )
 
@@ -576,6 +576,7 @@ we need to add a similar  constraint to ``DetailView``:
 
     class DetailView(generic.DetailView):
         ...
+
         def get_queryset(self):
             """
             Excludes any questions that aren't published yet.
@@ -595,8 +596,8 @@ is not:
             The detail view of a question with a pub_date in the future
             returns a 404 not found.
             """
-            future_question = create_question(question_text='Future question.', days=5)
-            url = reverse('polls:detail', args=(future_question.id,))
+            future_question = create_question(question_text="Future question.", days=5)
+            url = reverse("polls:detail", args=(future_question.id,))
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
 
@@ -605,8 +606,8 @@ is not:
             The detail view of a question with a pub_date in the past
             displays the question's text.
             """
-            past_question = create_question(question_text='Past Question.', days=-5)
-            url = reverse('polls:detail', args=(past_question.id,))
+            past_question = create_question(question_text="Past Question.", days=-5)
+            url = reverse("polls:detail", args=(past_question.id,))
             response = self.client.get(url)
             self.assertContains(response, past_question.question_text)
 

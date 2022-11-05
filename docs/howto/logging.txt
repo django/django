@@ -118,10 +118,10 @@ file ``general.log`` (at the project root):
 
     LOGGING = {
         # [...]
-        'handlers': {
-            'file': {
-                'class': 'logging.FileHandler',
-                'filename': 'general.log',
+        "handlers": {
+            "file": {
+                "class": "logging.FileHandler",
+                "filename": "general.log",
             },
         },
     }
@@ -138,9 +138,9 @@ messages of all levels). Using the example above, adding:
     :emphasize-lines: 4
 
     {
-        'class': 'logging.FileHandler',
-        'filename': 'general.log',
-        'level': 'DEBUG',
+        "class": "logging.FileHandler",
+        "filename": "general.log",
+        "level": "DEBUG",
     }
 
 would define a handler configuration that only accepts records of level
@@ -157,10 +157,10 @@ example:
 
     LOGGING = {
         # [...]
-        'loggers': {
-            '': {
-                'level': 'DEBUG',
-                'handlers': ['file'],
+        "loggers": {
+            "": {
+                "level": "DEBUG",
+                "handlers": ["file"],
             },
         },
     }
@@ -196,14 +196,14 @@ formatters named ``verbose`` and ``simple``:
 
     LOGGING = {
         # [...]
-        'formatters': {
-            'verbose': {
-                'format': '{name} {levelname} {asctime} {module} {process:d} {thread:d} {message}',
-                'style': '{',
+        "formatters": {
+            "verbose": {
+                "format": "{name} {levelname} {asctime} {module} {process:d} {thread:d} {message}",
+                "style": "{",
             },
-            'simple': {
-                'format': '{levelname} {message}',
-                'style': '{',
+            "simple": {
+                "format": "{levelname} {message}",
+                "style": "{",
             },
         },
     }
@@ -222,11 +222,11 @@ dictionary referring to the formatter by name, for example:
 
     LOGGING = {
         # [...]
-        'handlers': {
-            'file': {
-                'class': 'logging.FileHandler',
-                'filename': 'general.log',
-                'formatter': 'verbose',
+        "handlers": {
+            "file": {
+                "class": "logging.FileHandler",
+                "filename": "general.log",
+                "formatter": "verbose",
             },
         },
     }
@@ -257,10 +257,8 @@ A logger mapping named ``my_app.views`` will capture records from this logger:
 
     LOGGING = {
         # [...]
-        'loggers': {
-            'my_app.views': {
-                ...
-            },
+        "loggers": {
+            "my_app.views": {...},
         },
     }
 
@@ -273,10 +271,8 @@ from loggers anywhere within the ``my_app`` namespace (including
 
     LOGGING = {
         # [...]
-        'loggers': {
-            'my_app': {
-                ...
-            },
+        "loggers": {
+            "my_app": {...},
         },
     }
 

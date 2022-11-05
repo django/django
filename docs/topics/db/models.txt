@@ -241,10 +241,10 @@ ones:
 
     .. code-block:: pycon
 
-        >>> fruit = Fruit.objects.create(name='Apple')
-        >>> fruit.name = 'Pear'
+        >>> fruit = Fruit.objects.create(name="Apple")
+        >>> fruit.name = "Pear"
         >>> fruit.save()
-        >>> Fruit.objects.values_list('name', flat=True)
+        >>> Fruit.objects.values_list("name", flat=True)
         <QuerySet ['Apple', 'Pear']>
 
 :attr:`~Field.unique`

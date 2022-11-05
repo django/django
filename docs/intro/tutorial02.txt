@@ -148,7 +148,7 @@ These concepts are represented by Python classes. Edit the
 
     class Question(models.Model):
         question_text = models.CharField(max_length=200)
-        pub_date = models.DateTimeField('date published')
+        pub_date = models.DateTimeField("date published")
 
 
     class Choice(models.Model):
@@ -220,13 +220,13 @@ this:
     :caption: ``mysite/settings.py``
 
     INSTALLED_APPS = [
-        'polls.apps.PollsConfig',
-        'django.contrib.admin',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-        'django.contrib.messages',
-        'django.contrib.staticfiles',
+        "polls.apps.PollsConfig",
+        "django.contrib.admin",
+        "django.contrib.auth",
+        "django.contrib.contenttypes",
+        "django.contrib.sessions",
+        "django.contrib.messages",
+        "django.contrib.staticfiles",
     ]
 
 Now Django knows to include the ``polls`` app. Let's run another command:
@@ -428,10 +428,12 @@ representation of this object. Let's fix that by editing the ``Question`` model
 
     from django.db import models
 
+
     class Question(models.Model):
         # ...
         def __str__(self):
             return self.question_text
+
 
     class Choice(models.Model):
         # ...

@@ -30,11 +30,13 @@ database-schema problems. Here's a quick example:
 
     from django.db import models
 
+
     class Reporter(models.Model):
         full_name = models.CharField(max_length=70)
 
         def __str__(self):
             return self.full_name
+
 
     class Article(models.Model):
         pub_date = models.DateField()
@@ -150,6 +152,7 @@ only step required is to register your model in the admin site:
 
     from django.db import models
 
+
     class Article(models.Model):
         pub_date = models.DateField()
         headline = models.CharField(max_length=200)
@@ -196,9 +199,9 @@ example above:
     from . import views
 
     urlpatterns = [
-        path('articles/<int:year>/', views.year_archive),
-        path('articles/<int:year>/<int:month>/', views.month_archive),
-        path('articles/<int:year>/<int:month>/<int:pk>/', views.article_detail),
+        path("articles/<int:year>/", views.year_archive),
+        path("articles/<int:year>/<int:month>/", views.month_archive),
+        path("articles/<int:year>/<int:month>/<int:pk>/", views.article_detail),
     ]
 
 The code above maps URL paths to Python callback functions ("views"). The path
@@ -235,10 +238,11 @@ and renders the template with the retrieved data. Here's an example view for
 
     from .models import Article
 
+
     def year_archive(request, year):
         a_list = Article.objects.filter(pub_date__year=year)
-        context = {'year': year, 'article_list': a_list}
-        return render(request, 'news/year_archive.html', context)
+        context = {"year": year, "article_list": a_list}
+        return render(request, "news/year_archive.html", context)
 
 This example uses Django's :doc:`template system </topics/templates>`, which has
 several powerful features but strives to stay simple enough for non-programmers

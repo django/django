@@ -182,7 +182,10 @@ Imports
       # Django
       from django.http import Http404
       from django.http.response import (
-          Http404, HttpResponse, HttpResponseNotAllowed, StreamingHttpResponse,
+          Http404,
+          HttpResponse,
+          HttpResponseNotAllowed,
+          StreamingHttpResponse,
           cookie,
       )
 
@@ -195,7 +198,7 @@ Imports
       except ImportError:
           yaml = None
 
-      CONSTANT = 'foo'
+      CONSTANT = "foo"
 
 
       class Example:

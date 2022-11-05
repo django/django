@@ -553,8 +553,9 @@ a temporary ``Apps`` instance. To do this, use the
         from django.test import SimpleTestCase
         from django.test.utils import isolate_apps
 
+
         class TestModelDefinition(SimpleTestCase):
-            @isolate_apps('app_label', 'other_app_label')
+            @isolate_apps("app_label", "other_app_label")
             def test_model_definition(self):
                 # This model automatically receives app_label='app_label'
                 class TestModel(models.Model):
@@ -562,5 +563,6 @@ a temporary ``Apps`` instance. To do this, use the
 
                 class OtherAppModel(models.Model):
                     class Meta:
-                        app_label = 'other_app_label'
+                        app_label = "other_app_label"
+
                 ...

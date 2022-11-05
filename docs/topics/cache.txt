@@ -831,8 +831,8 @@ a cached item, for example:
     >>> from django.core.cache import cache
     >>> from django.core.cache.utils import make_template_fragment_key
     # cache key for {% cache 500 sidebar username %}
-    >>> key = make_template_fragment_key('sidebar', [username])
-    >>> cache.delete(key) # invalidates cached template fragment
+    >>> key = make_template_fragment_key("sidebar", [username])
+    >>> cache.delete(key)  # invalidates cached template fragment
     True
 
 .. _low-level-cache-api:

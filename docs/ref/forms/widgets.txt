@@ -227,8 +227,8 @@ foundation for custom widgets.
         .. code-block:: pycon
 
             >>> from django import forms
-            >>> name = forms.TextInput(attrs={'size': 10, 'title': 'Your name'})
-            >>> name.render('name', 'A name')
+            >>> name = forms.TextInput(attrs={"size": 10, "title": "Your name"})
+            >>> name.render("name", "A name")
             '<input title="Your name" type="text" name="name" value="A name" size="10">'
 
         If you assign a value of ``True`` or ``False`` to an attribute,

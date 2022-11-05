@@ -229,8 +229,10 @@ We'll demonstrate this with the ``Author`` model we used in the
     from django.views.generic.detail import SingleObjectMixin
     from books.models import Author
 
+
     class RecordInterestView(SingleObjectMixin, View):
         """Records the current user's interest in an author."""
+
         model = Author
 
         def post(self, request, *args, **kwargs):
@@ -241,7 +243,9 @@ We'll demonstrate this with the ``Author`` model we used in the
             self.object = self.get_object()
             # Actually record interest somehow here!
 
-            return HttpResponseRedirect(reverse('author-detail', kwargs={'pk': self.object.pk}))
+            return HttpResponseRedirect(
+                reverse("author-detail", kwargs={"pk": self.object.pk})
+            )
 
 In practice you'd probably want to record the interest in a key-value
 store rather than in a relational database, so we've left that bit
@@ -259,8 +263,12 @@ We can hook this into our URLs easily enough:
     from books.views import RecordInterestView
 
     urlpatterns = [
-        #...
-        path('author/<int:pk>/interest/', RecordInterestView.as_view(), name='author-interest'),
+        # ...
+        path(
+            "author/<int:pk>/interest/",
+            RecordInterestView.as_view(),
+            name="author-interest",
+        ),
     ]
 
 Note the ``pk`` named group, which

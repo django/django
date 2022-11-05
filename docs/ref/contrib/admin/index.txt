@@ -2984,10 +2984,12 @@ to reference your :class:`AdminSite` subclass.
 
     from .models import MyModel
 
-    class MyAdminSite(admin.AdminSite):
-        site_header = 'Monty Python administration'
 
-    admin_site = MyAdminSite(name='myadmin')
+    class MyAdminSite(admin.AdminSite):
+        site_header = "Monty Python administration"
+
+
+    admin_site = MyAdminSite(name="myadmin")
     admin_site.register(MyModel)
 
 
@@ -2999,7 +3001,7 @@ to reference your :class:`AdminSite` subclass.
     from myapp.admin import admin_site
 
     urlpatterns = [
-        path('myadmin/', admin_site.urls),
+        path("myadmin/", admin_site.urls),
     ]
 
 Note that you may not want autodiscovery of ``admin`` modules when using your
@@ -3023,6 +3025,7 @@ returns a site instance.
 
     from django.contrib import admin
 
+
     class MyAdminSite(admin.AdminSite):
         ...
 
@@ -3031,15 +3034,16 @@ returns a site instance.
 
     from django.contrib.admin.apps import AdminConfig
 
+
     class MyAdminConfig(AdminConfig):
-        default_site = 'myproject.admin.MyAdminSite'
+        default_site = "myproject.admin.MyAdminSite"
 
 .. code-block:: python
     :caption: ``myproject/settings.py``
 
     INSTALLED_APPS = [
         # [...]
-        'myproject.apps.MyAdminConfig',  # replaces 'django.contrib.admin'
+        "myproject.apps.MyAdminConfig",  # replaces 'django.contrib.admin'
         # [...]
     ]
 

@@ -773,8 +773,8 @@ displaying polls.
     from django.urls import include, path
 
     urlpatterns = [
-        path('author-polls/', include('polls.urls', namespace='author-polls')),
-        path('publisher-polls/', include('polls.urls', namespace='publisher-polls')),
+        path("author-polls/", include("polls.urls", namespace="author-polls")),
+        path("publisher-polls/", include("polls.urls", namespace="publisher-polls")),
     ]
 
 .. code-block:: python
@@ -784,11 +784,11 @@ displaying polls.
 
     from . import views
 
-    app_name = 'polls'
+    app_name = "polls"
     urlpatterns = [
-        path('', views.IndexView.as_view(), name='index'),
-        path('<int:pk>/', views.DetailView.as_view(), name='detail'),
-        ...
+        path("", views.IndexView.as_view(), name="index"),
+        path("<int:pk>/", views.DetailView.as_view(), name="detail"),
+        ...,
     ]
 
 Using this setup, the following lookups are possible:
@@ -843,11 +843,11 @@ not the list of ``urlpatterns`` itself.
 
     from . import views
 
-    app_name = 'polls'
+    app_name = "polls"
     urlpatterns = [
-        path('', views.IndexView.as_view(), name='index'),
-        path('<int:pk>/', views.DetailView.as_view(), name='detail'),
-        ...
+        path("", views.IndexView.as_view(), name="index"),
+        path("<int:pk>/", views.DetailView.as_view(), name="detail"),
+        ...,
     ]
 
 .. code-block:: python
@@ -856,7 +856,7 @@ not the list of ``urlpatterns`` itself.
     from django.urls import include, path
 
     urlpatterns = [
-        path('polls/', include('polls.urls')),
+        path("polls/", include("polls.urls")),
     ]
 
 The URLs defined in ``polls.urls`` will have an application namespace ``polls``.

@@ -912,16 +912,16 @@ corresponding lookups.
 .. code-block:: python
 
     class RangeOperators:
-        EQUAL = '='
-        NOT_EQUAL = '<>'
-        CONTAINS = '@>'
-        CONTAINED_BY = '<@'
-        OVERLAPS = '&&'
-        FULLY_LT = '<<'
-        FULLY_GT = '>>'
-        NOT_LT = '&>'
-        NOT_GT = '&<'
-        ADJACENT_TO = '-|-'
+        EQUAL = "="
+        NOT_EQUAL = "<>"
+        CONTAINS = "@>"
+        CONTAINED_BY = "<@"
+        OVERLAPS = "&&"
+        FULLY_LT = "<<"
+        FULLY_GT = ">>"
+        NOT_LT = "&>"
+        NOT_GT = "&<"
+        ADJACENT_TO = "-|-"
 
 RangeBoundary() expressions
 ---------------------------

@@ -75,9 +75,11 @@ slightly different, because they take an argument:
     def detail(request, question_id):
         return HttpResponse("You're looking at question %s." % question_id)
 
+
     def results(request, question_id):
         response = "You're looking at the results of question %s."
         return HttpResponse(response % question_id)
+
 
     def vote(request, question_id):
         return HttpResponse("You're voting on question %s." % question_id)
@@ -94,13 +96,13 @@ Wire these new views into the ``polls.urls`` module by adding the following
 
     urlpatterns = [
         # ex: /polls/
-        path('', views.index, name='index'),
+        path("", views.index, name="index"),
         # ex: /polls/5/
-        path('<int:question_id>/', views.detail, name='detail'),
+        path("<int:question_id>/", views.detail, name="detail"),
         # ex: /polls/5/results/
-        path('<int:question_id>/results/', views.results, name='results'),
+        path("<int:question_id>/results/", views.results, name="results"),
         # ex: /polls/5/vote/
-        path('<int:question_id>/vote/', views.vote, name='vote'),
+        path("<int:question_id>/vote/", views.vote, name="vote"),
     ]
 
 Take a look in your browser, at "/polls/34/". It'll run the ``detail()``
@@ -155,9 +157,10 @@ commas, according to publication date:
 
 
     def index(request):
-        latest_question_list = Question.objects.order_by('-pub_date')[:5]
-        output = ', '.join([q.question_text for q in latest_question_list])
+        latest_question_list = Question.objects.order_by("-pub_date")[:5]
+        output = ", ".join([q.question_text for q in latest_question_list])
         return HttpResponse(output)
+
 
     # Leave the rest of the views (detail, results, vote) unchanged
 
@@ -227,10 +230,10 @@ Now let's update our ``index`` view in ``polls/views.py`` to use the template:
 
 
     def index(request):
-        latest_question_list = Question.objects.order_by('-pub_date')[:5]
-        template = loader.get_template('polls/index.html')
+        latest_question_list = Question.objects.order_by("-pub_date")[:5]
+        template = loader.get_template("polls/index.html")
         context = {
-            'latest_question_list': latest_question_list,
+            "latest_question_list": latest_question_list,
         }
         return HttpResponse(template.render(context, request))
 
@@ -259,9 +262,9 @@ rewritten:
 
 
     def index(request):
-        latest_question_list = Question.objects.order_by('-pub_date')[:5]
-        context = {'latest_question_list': latest_question_list}
-        return render(request, 'polls/index.html', context)
+        latest_question_list = Question.objects.order_by("-pub_date")[:5]
+        context = {"latest_question_list": latest_question_list}
+        return render(request, "polls/index.html", context)
 
 Note that once we've done this in all these views, we no longer need to import
 :mod:`~django.template.loader` and :class:`~django.http.HttpResponse` (you'll
@@ -286,13 +289,14 @@ for a given poll. Here's the view:
     from django.shortcuts import render
 
     from .models import Question
+
     # ...
     def detail(request, question_id):
         try:
             question = Question.objects.get(pk=question_id)
         except Question.DoesNotExist:
             raise Http404("Question does not exist")
-        return render(request, 'polls/detail.html', {'question': question})
+        return render(request, "polls/detail.html", {"question": question})
 
 The new concept here: The view raises the :exc:`~django.http.Http404` exception
 if a question with the requested ID doesn't exist.
@@ -321,10 +325,11 @@ provides a shortcut. Here's the ``detail()`` view, rewritten:
     from django.shortcuts import get_object_or_404, render
 
     from .models import Question
+
     # ...
     def detail(request, question_id):
         question = get_object_or_404(Question, pk=question_id)
-        return render(request, 'polls/detail.html', {'question': question})
+        return render(request, "polls/detail.html", {"question": question})
 
 The :func:`~django.shortcuts.get_object_or_404` function takes a Django model
 as its first argument and an arbitrary number of keyword arguments, which it
@@ -438,12 +443,12 @@ file, go ahead and add an ``app_name`` to set the application namespace:
 
     from . import views
 
-    app_name = 'polls'
+    app_name = "polls"
     urlpatterns = [
-        path('', views.index, name='index'),
-        path('<int:question_id>/', views.detail, name='detail'),
-        path('<int:question_id>/results/', views.results, name='results'),
-        path('<int:question_id>/vote/', views.vote, name='vote'),
+        path("", views.index, name="index"),
+        path("<int:question_id>/", views.detail, name="detail"),
+        path("<int:question_id>/results/", views.results, name="results"),
+        path("<int:question_id>/vote/", views.vote, name="vote"),
     ]
 
 Now change your ``polls/index.html`` template from:

@@ -1455,8 +1455,9 @@ concrete model and are not relative to the abstract model's ``app_label``:
 
     from django.db import models
 
+
     class AbstractCar(models.Model):
-        manufacturer = models.ForeignKey('Manufacturer', on_delete=models.CASCADE)
+        manufacturer = models.ForeignKey("Manufacturer", on_delete=models.CASCADE)
 
         class Meta:
             abstract = True
@@ -1467,11 +1468,14 @@ concrete model and are not relative to the abstract model's ``app_label``:
     from django.db import models
     from products.models import AbstractCar
 
+
     class Manufacturer(models.Model):
         pass
 
+
     class Car(AbstractCar):
         pass
+
 
     # Car.manufacturer will point to `production.Manufacturer` here.
 

@@ -98,8 +98,8 @@ You can also change a password programmatically, using
 .. code-block:: pycon
 
     >>> from django.contrib.auth.models import User
-    >>> u = User.objects.get(username='john')
-    >>> u.set_password('new password')
+    >>> u = User.objects.get(username="john")
+    >>> u.set_password("new password")
     >>> u.save()
 
 If you have the Django admin installed, you can also change user's passwords

@@ -318,12 +318,10 @@ trigger the thread safety checks:
     >>> from django.db import connection
     >>> # In an async context so you cannot use the database directly:
     >>> connection.cursor()
-    ...
     django.core.exceptions.SynchronousOnlyOperation: You cannot call this from
     an async context - use a thread or sync_to_async.
     >>> # Nor can you pass resolved connection attributes across threads:
     >>> await sync_to_async(connection.cursor)()
-    ...
     django.db.utils.DatabaseError: DatabaseWrapper objects created in a thread
     can only be used in that same thread. The object with alias 'default' was
     created in thread id 4371465600 and this is thread id 6131478528.

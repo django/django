@@ -1266,10 +1266,7 @@ attribute (as below). If the ``app_name`` is set in this new way, the
 .. code-block:: python
     :caption: ``mysite/urls.py``
 
-    urlpatterns = [
-        url(r'^polls/', include('polls.urls', namespace="polls")),
-        ...
-    ]
+    urlpatterns = [url(r"^polls/", include("polls.urls", namespace="polls")), ...]
 
 to:
 
@@ -1277,14 +1274,14 @@ to:
     :caption: ``mysite/urls.py``
 
     urlpatterns = [
-        url(r'^polls/', include('polls.urls')),  # 'namespace="polls"' removed
-        ...
+        url(r"^polls/", include("polls.urls")),  # 'namespace="polls"' removed
+        ...,
     ]
 
 .. code-block:: python
     :caption: ``polls/urls.py``
 
-    app_name = 'polls'  # added
+    app_name = "polls"  # added
     urlpatterns = [...]
 
 This change also means that the old way of including an ``AdminSite`` instance
@@ -1298,7 +1295,7 @@ is deprecated. Instead, pass ``admin.site.urls`` directly to
     from django.contrib import admin
 
     urlpatterns = [
-        url(r'^admin/', admin.site.urls),
+        url(r"^admin/", admin.site.urls),
     ]
 
 URL application namespace required if setting an instance namespace

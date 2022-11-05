@@ -134,11 +134,11 @@ password from the `password file`_, you must specify them in the
     :caption: ``settings.py``
 
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'OPTIONS': {
-                'service': 'my_service',
-                'passfile': '.my_pgpass',
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "OPTIONS": {
+                "service": "my_service",
+                "passfile": ".my_pgpass",
             },
         }
     }
@@ -1084,9 +1084,11 @@ example of subclassing the PostgreSQL engine to change a feature class
 
     from django.db.backends.postgresql import base, features
 
+
     class DatabaseFeatures(features.DatabaseFeatures):
         def allows_group_by_selected_pks_on_model(self, model):
             return True
+
 
     class DatabaseWrapper(base.DatabaseWrapper):
         features_class = DatabaseFeatures
