@@ -309,7 +309,12 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ...
+* ``DatabaseFeatures.allows_group_by_pk`` is removed as it only remained to
+  accommodate a MySQL extension that has been supplanted by proper functional
+  dependency detection in MySQL 5.7.15. Note that
+  ``DatabaseFeatures.allows_group_by_selected_pks`` is still supported and
+  should be enabled if your backend supports functional dependency detection in
+  ``GROUP BY`` clauses as specified by the ``SQL:1999`` standard.
 
 Dropped support for MariaDB 10.3
 --------------------------------
