@@ -235,7 +235,9 @@ class SQLCompiler:
             expressions = [
                 expr
                 for expr in expressions
-                if expr in pks or getattr(expr, "alias", None) not in aliases
+                if expr in pks
+                or expr in having
+                or getattr(expr, "alias", None) not in aliases
             ]
         return expressions
 
