@@ -3038,9 +3038,9 @@ returns a site instance.
     :caption: ``myproject/settings.py``
 
     INSTALLED_APPS = [
-        ...
+        # [...]
         'myproject.apps.MyAdminConfig',  # replaces 'django.contrib.admin'
-        ...
+        # [...]
     ]
 
 .. _multiple-admin-sites:

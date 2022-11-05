@@ -199,7 +199,7 @@ Imports
 
 
       class Example:
-          # ...
+          pass
 
 * Use convenience imports whenever available. For example, do this::
 

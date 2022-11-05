@@ -37,21 +37,21 @@ Some examples
         num_employees__gt=F('num_chairs') + F('num_chairs'))
 
     # How many chairs are needed for each company to seat all employees?
-    >>> company = Company.objects.filter(
-    ...    num_employees__gt=F('num_chairs')).annotate(
-    ...    chairs_needed=F('num_employees') - F('num_chairs')).first()
-    >>> company.num_employees
+    company = Company.objects.filter(
+        num_employees__gt=F('num_chairs')).annotate(
+        chairs_needed=F('num_employees') - F('num_chairs')).first()
+    ## >>> company.num_employees
     120
-    >>> company.num_chairs
+    ## >>> company.num_chairs
     50
-    >>> company.chairs_needed
+    ## >>> company.chairs_needed
     70
 
     # Create a new company using expressions.
-    >>> company = Company.objects.create(name='Google', ticker=Upper(Value('goog')))
+    company = Company.objects.create(name='Google', ticker=Upper(Value('goog')))
     # Be sure to refresh it if you need to access the field.
-    >>> company.refresh_from_db()
-    >>> company.ticker
+    company.refresh_from_db()
+    company.ticker
     'GOOG'
 
     # Annotate models with an aggregated value. Both forms
