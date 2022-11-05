@@ -258,7 +258,7 @@ class Command(BaseCommand):
                         f"Fixtures saved in '{file_name}'.",
                         RuntimeWarning,
                     )
-                stream = open_method(file_path, "wt", **kwargs)
+                stream = open_method(file_path, "wt", encoding="utf-8", **kwargs)
             else:
                 stream = None
             try:
