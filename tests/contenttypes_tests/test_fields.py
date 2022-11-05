@@ -49,7 +49,7 @@ class GenericForeignKeyTests(TestCase):
         old_entity = answer.question
         answer.refresh_from_db()
         new_entity = answer.question
-        self.assertNotEqual(id(old_entity), id(new_entity))
+        self.assertIsNot(old_entity, new_entity)
 
 
 class GenericRelationTests(TestCase):
