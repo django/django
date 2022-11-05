@@ -737,6 +737,11 @@ class Model(AltersData, metaclass=ModelBase):
             if field.is_cached(self):
                 field.delete_cached_value(self)
 
+        # Clear cached private relations.
+        for field in self._meta.private_fields:
+            if field.is_relation and field.is_cached(self):
+                field.delete_cached_value(self)
+
         self._state.db = db_instance._state.db
 
     async def arefresh_from_db(self, using=None, fields=None):

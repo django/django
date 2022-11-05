@@ -43,6 +43,14 @@ class GenericForeignKeyTests(TestCase):
             self.assertIsNone(post.parent)
             self.assertIsNone(post.parent)
 
+    def test_clear_cached_generic_relation(self):
+        question = Question.objects.create(text="What is your name?")
+        answer = Answer.objects.create(text="Answer", question=question)
+        old_entity = answer.question
+        answer.refresh_from_db()
+        new_entity = answer.question
+        self.assertNotEqual(id(old_entity), id(new_entity))
+
 
 class GenericRelationTests(TestCase):
     def test_value_to_string(self):
